@@ -506,6 +506,16 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     end
 
     module Reflection
+
+      Looks_primitive = -> x do  # `nil` is NOT primitive by this definition!
+        case x
+        when ::TrueClass, ::Fixnum, ::Float, ::Symbol, ::String  # [#003]#trueish-note
+          true
+        else
+          false
+        end
+      end
+
       Autoloader_[ self ]
     end
 

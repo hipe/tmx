@@ -54,13 +54,14 @@ module Skylab::MyTerm::TestSupport
     define_method :__call_this_one_time_only do |st| # (avoid warnings re: consts)
 
       count = 0
-      target = 'imagemagick.rb'
+      target = 'imagemagick'
+      r = - target.length .. -1
 
       begin
         o = st.gets
         o or break
         count += 1
-        if target == ::File.basename( o.path )
+        if target == o.path[ r ]
           found = true
           break
         end

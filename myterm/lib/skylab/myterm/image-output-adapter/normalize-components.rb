@@ -28,7 +28,6 @@ module Skylab::MyTerm
 
         @_see = method :__normal_see
         @_finish = method :__normal_finish
-        @_snapshot = Callback_::Box.new
 
         begin
           no = st.gets
@@ -43,9 +42,8 @@ module Skylab::MyTerm
 
       def ___build_node_stream
 
-        o = @_rw.to_node_streamer
-        o.on_operation = MONADIC_EMPTINESS_
-        o.execute
+        _o = @_rw.to_non_operation_node_streamer
+        _o.execute
       end
 
       def __normal_see qk
@@ -55,9 +53,8 @@ module Skylab::MyTerm
           _add_invalid qk
           @_see = method :___abnormal_see
           @_finish = method :__abnormal_finish
-        else
-          @_snapshot.add :k, :qkn
         end
+        # (we used to add the item to a "snapshot" box here)
         NIL_
       end
 
@@ -81,8 +78,7 @@ module Skylab::MyTerm
       end
 
       def __normal_finish
-        _sn = remove_instance_variable :@_snapshot
-        Result__.new NO_ERRORS_, IS_AVAILABLE___, _sn
+        NORMAL_RESULT___
       end
 
       def __abnormal_finish
@@ -106,17 +102,10 @@ module Skylab::MyTerm
         Result__.new _em_proc, NOT_AVAILABLE___
       end
 
-      def __TAKE_ME_via_snapshot_build_and_send_image
+      Result__ = ::Struct.new :reason_proc, :is_available
 
-        Here_::Build_and_send_image_[ @snapshot_, @kernel_, & @oes_p_ ]
-      end
+      NORMAL_RESULT___ = Result__.new nil, true
 
-      Result__ = ::Struct.new :reason_proc, :is_available, :shh__
-
-      IS_AVAILABLE___ = true
-      MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
-      NO_ERRORS_ = nil
-      NOTHING_ = nil
       NOT_AVAILABLE___ = false
     end
   end

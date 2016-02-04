@@ -57,4 +57,3 @@ module Skylab::MyTerm::TestSupport
     end
   end
 end
-# #pending-rename: now this relies on aspects tested in (1)

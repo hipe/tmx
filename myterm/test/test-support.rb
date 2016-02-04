@@ -74,7 +74,7 @@ module Skylab::MyTerm::TestSupport
 
     def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
 
-      @root_ACS = Home_.__build_root_ACS
+      @root_ACS = build_root_ACS_
 
       _ze = Home_.lib_.zerk
 
@@ -82,17 +82,27 @@ module Skylab::MyTerm::TestSupport
 
       NIL_
     end  # •cp1
-  end
 
-  # --
+    def build_root_ACS_
+      Home_.__build_root_ACS
+    end
+  end
 
   Callback_ = ::Skylab::Callback
 
   Autoloader__ = Callback_::Autoloader
+
+  module Stubs
+    Autoloader__[ self ]
+  end
+
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
-  COMMON_ADAPTER_CONST_ = :Imagemagick
   Home_ = ::Skylab::MyTerm
+
+  COMMON_ADAPTER_CONST_ = :Imagemagick
+  EMPTY_S_ = Home_::EMPTY_S_
+  Lazy_ = Callback_::Lazy
   NIL_ = nil
   NONE_ = nil
   TS_ = self

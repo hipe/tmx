@@ -24,17 +24,32 @@ module Skylab::MyTerm
 
       def module  # (doesn't cache the require'ing)
 
-        if @file
-          _load_path = @file[ 0 ... - Autoloader_::EXTNAME.length ]
+        const = adapter_name.as_const
+
+        if @_box_mod.const_defined? const, false
+
+          @_box_mod.const_get const, false
         else
-          self._COVER_ME
+          ___load_and_autoloaderize_module const
+        end
+      end
+
+      def ___load_and_autoloaderize_module const
+
+        if @file
+          self._WORKED_THEN_BECAME_UNCOVERED
+          load_path = @file[ 0 ... - Autoloader_::EXTNAME.length ]
+        else
+          load_path = ::File.join @dir, Autoloader_::CORE_  # #violation
         end
 
-        require _load_path  # ..
+        require load_path  # ..
 
-        _const = adapter_name.as_const
+        mod = @_box_mod.const_get const, false
 
-        @_box_mod.const_get _const, false
+        Autoloader_[ mod, load_path ]
+
+        mod
       end
 
       def adapter_name_const

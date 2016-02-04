@@ -1,3 +1,5 @@
+[#013] #open if you rip out the flyweightism from font, ..
+
 [#012] #open specs are currently not faked so they're built assuming
              particular fonts are found.. (but given the scope of this
              utility, *maybe* it will be ok..)

@@ -30,11 +30,11 @@ module Skylab::MyTerm
       _cls = Home_::Models_::Appearance
       _k = ___custom_kernel
       _cls.new _k
-    end
+    end  # :cp3
 
     def ___custom_kernel
-      @___custom_kernel ||= Custom_Kernel___.new( Home_, :Models_ )
-    end
+      @___custom_kernel ||= Custom_Kernel___.new Home_, :Models_
+    end  # :cp2
 
     def lib_
 
@@ -130,6 +130,7 @@ module Skylab::MyTerm
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
+  EMPTY_S_ = ''
   Home_ = self
   Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
   Autoloader_[ Models_ = ::Module.new ]

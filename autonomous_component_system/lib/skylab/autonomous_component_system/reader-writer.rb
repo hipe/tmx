@@ -95,6 +95,12 @@ module Skylab::Autonomous_Component_System
 
     # -
 
+    def to_non_operation_node_streamer
+      o = to_node_streamer
+      o.on_operation = MONADIC_EMPTINESS_  # operation nodes don't get serialized
+      o
+    end
+
     def to_node_streamer
       @_cached[ :_to_node_streamer_ ].call
     end

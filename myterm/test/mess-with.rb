@@ -2,40 +2,43 @@ module Skylab::MyTerm::TestSupport
 
   class Mess_With < Callback_::Actor::Monadic
 
-    # (mocking/stubbing hax)
+    # -
 
-    def initialize x, & edit
-      @_x = x
-      @_edit_p = edit
-    end
-
-    def execute
-      @_edit_p[ self ]
-      NIL_
-    end
-
-    def replace_with_dynamic_stub m, & edit
-
-      _real_object = @_x.send m
-
-      o = Make_dynamic_stub_proxy.new _real_object
-      edit[ o ]
-      stub_object = o.finish
-
-      redefine m do
-        stub_object
+      def initialize mutatee
+        @_mutatee = mutatee
       end
-      NIL_
-    end
 
-    def redefine m, & p
-      @_x.send :define_singleton_method, m, & p
-      NIL_
-    end
+      def execute
+        self  # there is no `flush` - you just mutate
+      end
 
+      def replace_with_partially_stubbed_proxy sym, & edit
+
+        original_getter = @_mutatee.method sym
+
+        redefine_as_memoized sym do
+
+          _original_object = original_getter[]
+
+          _original_object or self._SANITY
+
+          Make_dynamic_stub_proxy.call _original_object, & edit
+        end
+      end
+
+      def redefine_as_memoized sym, & repl
+
+        @_mutatee.send :define_singleton_method, sym, Lazy_.call( & repl )
+        NIL_
+      end
+
+    # -
     class Make_dynamic_stub_proxy < Callback_::Actor::Monadic
 
       def initialize real_object, & edit
+        if ! real_object
+          self._SANITY
+        end
         @_real_object = real_object
         @_edit_p = edit
       end
@@ -43,6 +46,8 @@ module Skylab::MyTerm::TestSupport
       def execute
 
         cls = ::Class.new ::BasicObject
+
+        real_object = @_real_object
 
         cls.send :define_method, :method_missing do | m, * a, & p |
 
@@ -54,9 +59,9 @@ module Skylab::MyTerm::TestSupport
 
         @_stubbed_proxy = cls.new
 
-        @_edit[ self ]
+        @_edit_p[ self ]
 
-        finish
+        @_stubbed_proxy
       end
 
       def if_then m, * args, & p
@@ -82,10 +87,6 @@ module Skylab::MyTerm::TestSupport
           end
         end
         NIL_
-      end
-
-      def finish
-        @_stubbed_proxy
       end
     end
   end

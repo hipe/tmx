@@ -14,9 +14,7 @@ module Skylab::Autonomous_Component_System
 
       def via_customization_and_rw_ customization_x, rw
 
-        o = rw.to_node_streamer
-
-        o.on_operation = MONADIC_EMPTINESS_  # operation nodes don't get serialized
+        o = rw.to_non_operation_node_streamer
 
         if customization_x
           ___when_customizations customization_x, o

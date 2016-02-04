@@ -94,4 +94,3 @@ module Skylab::MyTerm
     Here_ = self
   end
 end
-# #pending-rename: b.d

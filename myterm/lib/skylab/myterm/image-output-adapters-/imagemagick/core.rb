@@ -8,20 +8,54 @@ module Skylab::MyTerm
 
     # -- Operations
 
+    def __set_background_image__component_operation
+
+      o = _normalize_image_related_component
+      yield :is_available, o.is_available
+      yield :unavailability_reason_tuple_proc, o.reason_proc
+
+      -> & pp do
+
+        _sess = _begin_session
+        _sess.set_background_image__( & pp[ self ] )
+      end
+    end
+
+    def __OSA_script__component_operation
+
+      o = _normalize_image_related_component
+      yield :is_available, o.is_available
+      yield :unavailability_reason_tuple_proc, o.reason_proc
+
+      -> & pp do
+        _sess = _begin_session
+        _sess.build_osa_script_( & pp[ self ] )
+      end
+    end
+
     def __imagemagick_command__component_operation
+
+      o = _normalize_image_related_component
+      yield :is_available, o.is_available
+      yield :unavailability_reason_tuple_proc, o.reason_proc
+
+      -> & pp do
+        _sess = _begin_session
+        _sess.build_imagemagick_command_( & pp[ self ] )
+      end
+    end
+
+    def _begin_session
+
+      Here_::Session___.begin_cold_session__ self
+    end
+
+    def _normalize_image_related_component
 
       _rw = @_svc.reader_writer__
 
-      o = Home_::Image_Output_Adapter::Normalize_Components.call(
+      Home_::Image_Output_Adapter::Normalize_Components.call(
         _rw, :is_required_to_make_image_ )
-
-      yield :is_available, o.is_available
-
-      yield :unavailability_reason_tuple_proc, o.reason_proc
-
-      -> do
-        self._K
-      end
     end
 
     # -- Components
@@ -51,6 +85,11 @@ module Skylab::MyTerm
       Home_::Image_Output_Adapter::Common_Component_Association.
         reader_of_component_associations_by_method_in self
     end
+
+    def kernel_
+      @_svc.kernel_
+    end
+
+    Here_ = self
   end
 end
-# #pending-rename: b.d

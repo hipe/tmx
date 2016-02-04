@@ -32,7 +32,7 @@ module Skylab::MyTerm
       self
     end
 
-    # -- experimental flyweightism (not clean)
+    # -- experimental flyweightism (not clean) #open [#013]
 
     def __init_as_flyweight ke
       @kernel_ = ke
@@ -80,6 +80,8 @@ module Skylab::MyTerm
 
     def __path__component_association
 
+      yield :internal_name, :font
+
       -> st, & pp do
 
         path = st.current_token
@@ -122,6 +124,12 @@ module Skylab::MyTerm
       Here_::Collection_Controller___.new @kernel_, & pp
     end
 
+    def component_association_reader  # again
+
+      Home_::Image_Output_Adapter::Common_Component_Association.
+        reader_of_component_associations_by_method_in self
+    end
+
     attr_reader(
       :path,
     )
@@ -129,6 +137,5 @@ module Skylab::MyTerm
     Here_ = self
   end
 end
-# #pending-rename: b.d
 # #tombstone: contextualization
 # #tombstone: contextualization (again)

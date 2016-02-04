@@ -1,15 +1,13 @@
 # numbering scheme
 
-1 - #pending-rename give 'models' number 1
+1-3 - (reserved for pre-model-level experiments)
 
-    "models" *is* what tests the API. use of the API *is* what tests models.
+4 - "models" *is* what tests the API. use of the API *is* what tests models.
 
 (skip 1 for room to grow)
 
-3 - persistence
+7 - persistence
 
-4 -  non-interactive CLI (relates to Phase-2/Milestone-5)
+10 -  non-interactive CLI (relates to Phase-2/Milestone-5)
 
-(skip 2 for room to grow)
-
-7 - iCLI (etc)
+13 - iCLI (etc)

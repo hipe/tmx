@@ -94,6 +94,7 @@ module Skylab::Zerk  # intro in [#001] README
   GENERIC_ERROR_EXITSTATUS = 5
   Home_ = self
   KEEP_PARSING_ = true
+  MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil

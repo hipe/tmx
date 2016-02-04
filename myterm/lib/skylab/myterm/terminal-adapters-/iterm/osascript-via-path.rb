@@ -1,33 +1,33 @@
 module Skylab::MyTerm
 
   Terminal_Adapters_ = ::Module.new
+  Terminal_Adapters_::Iterm = ::Module.new
+  class Terminal_Adapters_::Iterm::Osascript_via_Path < Callback_::Actor::Monadic
 
-  class Terminal_Adapters_::Iterm
+    def initialize path, & oes_p
 
-    def initialize ke
-      @_kernel = ke
+      @_oes_p = oes_p
+      @_unsanitized_image_path = path
     end
 
-    def set_background_image_to path, & x_p
+    def execute
+
+      path = @_unsanitized_image_path
 
       if /[\\" ]/ =~ path || path.length.zero?
         self._COVER_ME_invalid_looking_path
       else
-        ___set_background_image_to_valid_looking_path path, & x_p
+        remove_instance_variable :@_oes_p
+        @image_path = remove_instance_variable :@_unsanitized_image_path
+        freeze
       end
     end
 
-    def ___set_background_image_to_valid_looking_path path, & oes_p_NOT_USED_YET
+    def send_into_system_conduit_ sycond, & oes_p
 
-      _script = <<-HERE
-        tell application "iTerm"
-          tell current session of current window
-            set background image to "#{ path }"
-          end tell
-        end tell
-      HERE
+      s_a = ___get_string_array
 
-      _i, o, e, w = ___system_conduit.popen3 'osascript', '-e', _script
+      _i, o, e, w = sycond.popen3( s_a )
 
       s = e.gets
       if s
@@ -45,8 +45,40 @@ module Skylab::MyTerm
       end
     end
 
-    def ___system_conduit
-      @_kernel.silo( :Installation ).system_conduit
+    def express_into_under y, _
+      _write_script_lines_into y
     end
+
+    def ___get_string_array
+
+      s_a = 'osascript', '-e'
+      s_a.push ___get_script_string
+      s_a
+    end
+
+    def ___get_script_string
+      _write_script_lines_into ""
+    end
+
+    def _write_script_lines_into y
+
+      _path = @image_path
+
+      _big_s = <<-HERE.gsub %r(^[ ]{8}), EMPTY_S_
+        tell application "iTerm"
+          tell current session of current window
+            set background image to "#{ _path }"
+          end tell
+        end tell
+      HERE
+
+      _s_a = _big_s.split %r((?<=\n))
+      _s_a.each do |s|
+        y << s
+      end
+      y
+    end
+
+    NEWLINE_ = "\n"
   end
 end

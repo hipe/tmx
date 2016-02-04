@@ -121,7 +121,6 @@ module Skylab::Zerk
       :branchesque
     end
 
-    MONADIC_EMPTINESS_ = -> _ { NIL }
     UI_node_stream_for___ = Interface_stream_for_.curry[ :UI ]
   end
 end

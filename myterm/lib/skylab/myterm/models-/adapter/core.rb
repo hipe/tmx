@@ -182,4 +182,3 @@ module Skylab::MyTerm
     IDENTITY_ = -> x { x }
   end
 end
-# #pending-rename: b.d

@@ -2,99 +2,60 @@ module Skylab::MyTerm
 
   class Image_Output_Adapters_::Imagemagick
 
-    class Build_and_send_image_ < Callback_::Actor::Dyadic
+    class Session___
 
-      def initialize snapshot, kernel, & oes_p
-        @_kernel = kernel
-        @_oes_p = oes_p
-        @_snapshot = snapshot
+      class << self
+        alias_method :begin_cold_session__, :new
+        private :new
+      end  # >>
+
+      def initialize acs
+        @ACS = acs
       end
 
-      def execute
+      def set_background_image__ & oes_p
 
-        ok = ___resolve_command
-        ok && __emit_info
-        ok &&= __build_image
-        ok && __send_image
-      end
+        osa_script = build_osa_script_( & oes_p )
 
-      def ___resolve_command
+        if osa_script
+          ___maybe_emit_info_about_the_osa_script osa_script, & oes_p
 
-        _installation = @_kernel.silo :Installation
+          _sycond = @_kernel.silo( :Installation ).system_conduit
 
-        o = Here_::Build_command_.new( & @_oes_p )
-
-        o.image_output_path = _installation.get_volatile_image_path
-        o.snapshot = @_snapshot
-
-        command = o.execute
-
-        if command
-          @_command = command
-          ACHIEVED_
+          osa_script.send_into_system_conduit_ _sycond, & oes_p
         else
-          cmd_s_a
+          osa_script
         end
       end
 
-      def __emit_info
+      def ___maybe_emit_info_about_the_osa_script osa_script, & oes_p
 
-        cmd_s_a = @_command.string_array
+        @_oes_p.call :info, :expression, :command do |y|
 
-        @_oes_p.call :info, :expression, :command do | y |
-
-          _p = Home_.lib_.shellwords.method :shellescape
-
-          y << "(attempting: #{ cmd_s_a.map( & _p ) * ' ' })"  # SPACE_
+          y << "(attempting: #{ osa_script.thru_shellescape_ })"
         end
-
         NIL_
       end
 
-      def __build_image
+      def build_osa_script_ & oes_p
 
-        _system_conduit = @_kernel.silo( :Installation ).system_conduit
-
-        _, o, @_e, @_w = _system_conduit.popen3( * @_command.string_array )
-
-        s = @_e.gets
-        if s
-          ___when_one_error_line s
-
+        im_cmd = build_imagemagick_command_( & oes_p )
+        if im_cmd
+          _path = im_cmd.image_path
+          Home_::Terminal_Adapters_::Iterm::Osascript_via_Path[ _path, & oes_p ]
         else
-
-          x = o.gets
-          x and self._COVER_ME  # utility is quiet
-
-          @_d = @_w.value.exitstatus
-          if @_d.zero?
-            ACHIEVED_
-          else
-            self._COVER_ME
-          end
+          im_cmd
         end
       end
 
-      def ___when_one_error_line s
+      def build_imagemagick_command_ & oes_p
 
-        # (might block if you try to read more now)
+        _installation = @ACS.kernel_.silo :Installation
 
-        @_oes_p.call :error, :expression, :system_call_failed do | y |
-          y << s
-        end
-
-        if @_w.alive?
-          @_w.exit
-        end
-
-        UNABLE_
-      end
-
-      def __send_image
-
-        _iterm = Home_::Terminal_Adapters_::Iterm.new @_kernel
-
-        _iterm.set_background_image_to @_command.image_path, & @_oes_p
+        o = Here_::Imagemagick_Command_via_Appearance___.new( & oes_p )
+        o.appearance = @ACS
+        o.image_output_path = _installation.get_volatile_image_path
+        o.execute
       end
     end
   end

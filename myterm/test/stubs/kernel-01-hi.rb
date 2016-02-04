@@ -1,230 +1,43 @@
 module Skylab::MyTerm::TestSupport
 
-  module Sandboxed_Kernels
+  module Stubs::Kernel_01_Hi
 
-    # ~ assertion methods (might move) & references
+    _build_faked_out_kernel = Lazy_.call do
 
-    def expect_failed_  # might move
-      @result.should eql result_value_for_failed_
-    end
+      ke = Home_::Custom_Kernel___.new Home_, :Models_  # •cp2
 
-    def result_value_for_failed_
-      false
-    end
+      inst = ke.silo :Installation
 
-    # ~ preserve entire state (including emissions) of a request
+      o = TS_::Mess_With[ inst ]
 
-    def begin_state_
-      State.new self
-    end
+      # when the controller asks for `fonts_dir`, give it this string:
 
-    class State
+      o.redefine_as_memoized :fonts_dir do
+        '/talisker'
+      end
 
-      # visit one particular test context to capture elements of its
-      # action under test for subsequent use in several assertions
+      # when the thing globs on that dir, give it these paths
 
-      def initialize test_context
+      o.replace_with_partially_stubbed_proxy :filesystem do |fs|
 
-        @_test_context = test_context
-
-        bx = Callback_::Box.new
-        @__em_bx = bx
-
-        @proc = -> * i_a, & ev_p  do
-
-          if @_test_context.do_debug
-            @_test_context.debug_IO.puts i_a.inspect
-          end
-
-          _a = bx.touch i_a do
-            []
-          end
-          _ = Callback_.test_support::Future_Expect::Event_Record[ i_a, ev_p ]
-          _a.push _
-
-          false  # err on this side
+        fs.if_then :glob, '/talisker/*' do
+          [
+            '/talikser/wazoozle.dfont',
+            '/talisker/I_AM_a_font.dfont',
+          ]
         end
       end
 
-      def finish
-
-        remove_instance_variable :@proc
-
-        _bx = remove_instance_variable :@__em_bx
-        @emissions = Callback_.test_support::Future_Expect::Emissions.new _bx
-
-        tc = remove_instance_variable :@_test_context
-
-        @result = tc.remove_instance_variable :@result
-        @kernel = tc.remove_instance_variable :@subject_kernel_
-        freeze
+      o.redefine_as_memoized :system_conduit do
+        TS_::Stubs::System_Conduit_01_Hi.instance
       end
 
-      attr_reader(
-        :emissions,
-        :proc,
-        :kernel,
-        :result,
-      )
-    end
-
-    # ~
-
-    def persistence_payload_for_font_ s  # BE CAREFUL - we don't escape the name!
-
-      <<-HERE.unindent
-        {
-          "adapter": "imagemagick",
-          "adapters": {
-            "imagemagick": {
-              "background_font" : "#{ s }"
-            }
-          }
-        }
-      HERE
-    end
-
-    # ~ mutate kernels
-
-    _danger_memo :read_only_kernel_with_no_data_ do
-
-      _path = TestSupport_::Fixtures.dir :empty_esque_directory
-
-      _new_kernel_with_data_path _path
-    end
-
-    def new_mutable_kernel_with_nothing_persisted_
-
-      hack_a_kernel_ do | o |
-
-        o.__eradicate_thing
-      end
-    end
-
-    def new_mutable_kernel_with_no_data_
-
-      td = common_tmpdir_
-      td.prepare
-      _new_kernel_with_data_path td.to_path
-    end
-
-    def new_mutable_kernel_with_appearance_ string
-
-      hack_a_kernel_ do | o |
-
-        o.accept_persistence_payload_string string
-      end
-    end
-
-    def _new_kernel_with_data_path path
-
-      hack_a_kernel_ do | o |
-
-        o._set_data_path path
-      end
-    end
-
-    def hack_a_kernel_ & edit
-
-      ke = start_a_kernel_
-      edit_kernel_by_ ke, & edit
       ke
     end
 
-    def start_a_kernel_
-      Home_::Build_default_application_kernel___[]
-    end
-
-    def edit_kernel_by_ ke, & edit
-      Edit_kernel__[ ke, & edit ]
-      NIL_
-    end
-
-    class Edit_kernel__
-
-      class << self
-        def [] ke
-          yield new ke
-          NIL_
-        end
-        private :new
-      end
-
-      def initialize ke
-        @_kernel = ke
-      end
-
-      # ~ manupulate dootily has
-
-      def __eradicate_thing
-
-        _mock_installation_method :any_existing_read_writable_IO do
-          NIL_
-        end ; nil
-      end
-
-      def _set_data_path path
-
-        _mock_installation_method :_data_path do
-          path
-        end ; nil
-      end
-
-      def accept_persistence_payload_string string
-
-        once = Callback_.memoize do
-          require 'stringio'
-          io = ::StringIO.new string
-          def io.path
-            "[mt]/string-IO-xizzi.json"
-          end
-          io
-        end
-
-        @_kernel.send :define_singleton_method, :_string_IO_for_testing_ do
-          once[]
-        end
-
-        _mock_installation_method :any_existing_read_writable_IO do
-
-          io = once[]
-          io.rewind
-          io
-        end
-
-        NIL_
-      end
-
-      def _mock_installation_method m, & p
-
-        _installation_daemon.send :define_singleton_method, m, & p
-        NIL_
-      end
-
-      def mess_with_installation & xxx
-
-        TS_::Mess_With.call _installation_daemon, & xxx
-      end
-
-      def _installation_daemon
-        @_kernel.silo :Installation
-      end
-    end
-
-    # ~ tmpdir
-
-    _danger_memo :common_tmpdir_ do
-
-      _path = ::File.join Home_.lib_.system.defaults.dev_tmpdir_path, '[mt]'
-
-      Home_.lib_.system.filesystem.tmpdir(
-        :max_mkdirs, 2,
-        :path, _path,
-        :debug_IO, debug_IO,
-        :be_verbose, do_debug,
-      )
-    end
-
-    EMPTY_A_ = [].freeze
+    define_singleton_method :instance, Lazy_.call( & _build_faked_out_kernel )
   end
 end
+# #tombstone: early prototype of the state pattern
+# #tombstone: a persistence graph
+# #tombstone: tmpdir
