@@ -61,6 +61,14 @@ module Skylab::SearchAndReplace::TestSupport
       my_fixture_tree_ '3-the-wazizzle-worktree'
     end
 
+    memoize :_ONE_LINE_FILE do
+      'one-line.txt'
+    end
+
+    memoize :_THREE_LINES_FILE do
+      'three-lines.txt'
+    end
+
     def build_stream_for_single_path_to_file_with_three_lines_
 
       _path = TestSupport_::Fixtures.file :three_lines
@@ -99,6 +107,14 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     # -- assertion (shared)
+
+    def include_alternation_for_ s_a
+      _ = s_a.map do |s|
+        "'#{ s }'"
+      end.join ' | '
+
+      be_include _
+    end
 
     def match_controller_array_for_ es
       match_controller_stream_for_( es ).to_a
@@ -164,6 +180,24 @@ module Skylab::SearchAndReplace::TestSupport
     end
   end
 
+  module My_API
+
+    def self.[] tcc
+      Require_Zerk_[]
+      Zerk_.test_support::API[ tcc ]
+      tcc.include self
+    end
+
+    def build_root_ACS
+
+      _oes_p = event_log.handle_event_selectively
+
+      root = Home_::Root_Autonomous_Component_System_.new( & _oes_p )
+      root._init_with_defaults
+      root
+    end  # •cp1
+  end
+
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
@@ -173,7 +207,14 @@ module Skylab::SearchAndReplace::TestSupport
   end
 
   Expect_Screens = -> tcc do
-    Home_.lib_.zerk.test_support.lib( :expect_screens )[ tcc ]
+    Require_Zerk_[]
+    Zerk_.test_support.lib( :expect_screens )[ tcc ]
+  end
+
+  # --
+
+  Require_Zerk_ = Callback_::Lazy.call do
+    Zerk_ = Home_.lib_.zerk ; nil
   end
 
   Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]

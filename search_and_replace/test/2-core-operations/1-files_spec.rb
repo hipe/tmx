@@ -2,57 +2,62 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - (1) files", wip: true do
+  describe "[sa] core operations - (1) files" do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :expect_event
-    use :operations
+    use :my_API
 
     context "ask for a not found interface node from root" do
 
-      call_by_ do
-        call_ :ziffo
+      call_by do
+        call :ziffo
       end
 
       it "result value is failure result" do
-        fails_
+        fails
       end
 
-      it "emission" do
+      it "emits alternation" do
 
-        only_emission.should ( be_emission :error, :uninterpretable_token do | ev |
+        _be_this = be_emission_ending_with :no_such_association do |ev|
 
-          _ = ' paths | path | filename_patterns | filename_pattern '
+          _ = black_and_white ev
 
-          black_and_white( ev ).should be_include _
-        end )
+          _.should include_alternation_for_(
+            %w( paths path filename_patterns filename_pattern ) )
+        end
+
+        only_emission.should _be_this
       end
     end
 
     context "ask for subject (take defaults, go one past the end)" do
 
-      call_by_ do
-        call_ :search, :files_by_find, :wazooza
+      call_by do
+        call :search, :files_by_find, :wazooza
       end
 
       it "fails" do
-        fails_
+        fails
       end
 
-      it "emission" do
+      it "emits" do
 
-        _ = :request_had_unexpected_argument
-        only_emission.should ( be_emission_ending_with _ do |y|
-          y.should eql [ 'unexpected argument (ick :wazooza)' ]
-        end )
+        _ = :arguments_continued_past_end_of_phrase
+
+        _be_this = be_emission_ending_with _ do |y|
+
+          y.last.should be_include ' end of phrase - unexpected argument: \'wa'
+        end
+
+        only_emission.should _be_this
       end
     end
 
     context "as for subject (intentionally give empty arys for dootilyhahs)" do
 
-      call_by_ do
-        call_(
+      call_by do
+        call(
           :paths, EMPTY_A_,
           :filename_patterns, EMPTY_A_,
           :search, :files_by_find,
@@ -60,23 +65,25 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "fails" do
-        fails_
+        fails
       end
 
-      it "emission says .." do
+      it "emits multi-line emission" do
 
-        _em = last_emission.should be_emission_ending_with :uninterpretable_token
+        _be_this = be_emission_ending_with :required_component_not_present do |y|
+          y.fetch(0).should eql "'search' is not available because:"
+          y.fetch(1).should eql "  • required component not present: 'paths'"
+        end
 
-        black_and_white( _em.cached_event_value ).should match(
-          %r(\bto search you must have some paths\b)i )
+        last_emission.should _be_this
       end
     end
 
     context "see the files matched by the find command" do
 
-      call_by_ do
+      call_by do
 
-        call_(
+        call(
           :path, common_haystack_directory_,
           :filename_pattern, '*-line*.txt',
           :search, :files_by_find,
@@ -90,7 +97,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "result is a stream of the matched files" do
 
-        st = result_value_
+        st = root_ACS_result
         _ = st.gets
         __ = st.gets
         st.gets.should be_nil
@@ -100,11 +107,38 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
+    context "unavailability.. (note we pass a nil ruby regexp explicitly)" do
+
+      call_by do
+
+        call(
+          :ruby_regexp, nil,
+          :path, common_haystack_directory_,
+          :search,
+          :files_by_grep,
+        )
+      end
+
+      it "fails" do
+        fails
+      end
+
+      it "emits non-contexutalized" do
+
+        _be_this = be_emission_ending_with :required_component_not_present do |y|
+
+          y.should eql [ "required component not present: 'ruby-regexp'" ]
+        end
+
+        last_emission.should _be_this
+      end
+    end
+
     context "see the files matched by grep" do
 
-      call_by_ do
+      call_by do
 
-        call_(
+        state = call(
           :ruby_regexp, /\bwazoozle\b/i,
           :path, common_haystack_directory_,
           :filename_pattern, '*-line*.txt',
@@ -112,14 +146,16 @@ module Skylab::SearchAndReplace::TestSupport
           :files_by_grep,
         )
 
-        st = @result
+        st = state.result
         if st
           _x = st.gets
           _x_ = st.gets
           _x__ = st.gets
-          @freeform_state_value_x = [ _x, _x_, _x__ ]
+          st.upstream.release_resource
+          state.to_state_with_customized_result [ _x, _x_, _x__ ]
+        else
+          state
         end
-        nil
       end
 
       it "emits the grep command (sort of)" do
@@ -129,7 +165,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "result is a stream of paths" do
 
-        a = state_.freeform_value_x
+        a = root_ACS_customized_result
         basename_( a.fetch 0 ).should eql 'three-lines.txt'
         a[ 1 ] and fail
       end

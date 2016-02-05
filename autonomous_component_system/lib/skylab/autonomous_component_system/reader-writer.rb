@@ -8,9 +8,24 @@ module Skylab::Autonomous_Component_System
     # the "reader" or equivalent)..
 
     class << self
-      alias_method :for_componentesque, :new
+
+      def for_componentesque acs
+
+        # (memoizing the r/w is #experimental, might become opt-out)
+
+        if acs.instance_variable_defined? IVAR__
+          acs.instance_variable_get IVAR__
+        else
+          x = new acs
+          acs.instance_variable_set IVAR__, x
+          x
+        end
+      end
+
       private :new
     end  # >>
+
+    IVAR__ = :@___reader_writer_by_autonomous_component_system
 
     def initialize acs
 
@@ -89,7 +104,7 @@ module Skylab::Autonomous_Component_System
       if @ACS_.respond_to? m
         @ACS_.send m
       else
-        Home_::Operation::Formal_.reader_of_formal_operations_by_method_in @ACS_
+        Home_::Operation::Formal.reader_of_formal_operations_by_method_in @ACS_
       end
     end
 

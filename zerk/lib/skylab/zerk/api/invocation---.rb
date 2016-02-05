@@ -58,23 +58,35 @@ module Skylab::Zerk
           @_stream.current_token )
 
         if asc
-          @_memory.clear
-          if asc.association_is_available  # (k)
-            @_stream.advance_one
-            if @_stream.no_unparsed_exists  # (m)
-
-              _qk = @_stack.last.qualified_knownness_of_association__ asc
-              _bc = _bound_call_for _qk
-              Result__[ _bc ]
-            else
-              _ = asc.model_classifications.category_symbol
-              send PARSE_AFTER_VIA_SHAPE___.fetch( _ ), asc
-            end
-          else
-            __when_association_is_not_available asc
-          end
+          ___maybe_parse_this_component_association asc
         else
           NOTHING_  # let the next guy try
+        end
+      end
+
+      def ___maybe_parse_this_component_association asc  # (k)
+
+        # (implementation of availiability is not reflected in [#012])
+
+        @_memory.clear
+        p = asc.unavailability
+        if p
+          __when_association_is_not_available p, asc
+        else
+          ___parse_this_component_association asc
+        end
+      end
+
+      def ___parse_this_component_association asc
+        @_stream.advance_one
+        if @_stream.no_unparsed_exists  # (m)
+
+          _qk = @_stack.last.qualified_knownness_of_association__ asc
+          _bc = _bound_call_for _qk
+          Result__[ _bc ]
+        else
+          _ = asc.model_classifications.category_symbol
+          send PARSE_AFTER_VIA_SHAPE___.fetch( _ ), asc
         end
       end
 
@@ -157,20 +169,19 @@ module Skylab::Zerk
 
         fo = fo_p[ ss ]
 
-        if fo.operation_is_available
-
-          __parse_available_formal_operation fo
+        p = fo.unavailability
+        if p
+          ___when_operation_not_available p, fo
         else
-          ___when_operation_not_available fo
+          __parse_available_formal_operation fo
         end
       end
 
-      def ___when_operation_not_available fo
+      def ___when_operation_not_available p, fo
 
-        p = fo.unavailability_reason_tuple_proc
-        if p
-          ( * sym_a, ev_p ) = p.call
-          _handler.call( * sym_a, & ev_p )
+        a = p.call
+        if a
+          _express_this a
         else
           _handler.call :error, :operation_is_not_available do
             Here_::When_operation_is_not_available___[ fo ]
@@ -180,13 +191,24 @@ module Skylab::Zerk
         Stop_parsing_because_unable__[]
       end
 
-      def __when_association_is_not_available asc
+      def __when_association_is_not_available p, asc
 
-        _handler.call :error, :association_is_not_available do
-          Here_::When_association_is_not_available___[ @_stack, asc ]
+        a = p.call
+        if a
+          _express_this a
+        else
+          _handler.call :error, :association_is_not_available do
+            Here_::When_association_is_not_available___[ @_stack, asc ]
+          end
         end
 
         Stop_parsing_because_unable__[]
+      end
+
+      def _express_this a
+        ( * sym_a, ev_p ) = a
+        _handler.call( * sym_a, & ev_p )
+        NIL_
       end
 
       def __parse_available_formal_operation fo  # (e)

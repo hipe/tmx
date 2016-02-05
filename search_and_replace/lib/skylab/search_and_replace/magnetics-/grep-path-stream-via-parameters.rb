@@ -2,14 +2,14 @@ module Skylab::SearchAndReplace
 
   class Magnetics_::Grep_Path_Stream_via_Parameters
 
-    def initialize & pp
+    def initialize & oes_p
 
       @chunk_size = 50  # ..
       @grep_extended_regexp_string = nil
       @ruby_regexp = nil
       @_shellwords = Home_.lib_.shellwords
 
-      @_pp = pp
+      @_oes_p = oes_p
     end
 
     attr_writer(
@@ -158,8 +158,6 @@ module Skylab::SearchAndReplace
       a = []
 
       send :"__write_grep_options_for__#{ @for }__", a
-
-      @_oes_p = @_pp[ nil ]
 
       gr = Home_.lib_.system.filesystem.grep(
         :grep_extended_regexp_string, @grep_extended_regexp_string,

@@ -3,16 +3,17 @@ module Skylab::MyTerm
   class Image_Output_Adapters_::Imagemagick  # (notes in [#003], [#004])
 
     def initialize svc
+
       @_svc = svc
+      @_unavailability = method :__image_gen_related_component_unavailability
+      @_use_cached_unavailability = false
     end
 
     # -- Operations
 
     def __set_background_image__component_operation
 
-      o = _normalize_image_related_component
-      yield :is_available, o.is_available
-      yield :unavailability_reason_tuple_proc, o.reason_proc
+      yield :unavailability, @_unavailability
 
       -> & pp do
 
@@ -23,9 +24,7 @@ module Skylab::MyTerm
 
     def __OSA_script__component_operation
 
-      o = _normalize_image_related_component
-      yield :is_available, o.is_available
-      yield :unavailability_reason_tuple_proc, o.reason_proc
+      yield :unavailability, @_unavailability
 
       -> & pp do
         _sess = _begin_session
@@ -35,9 +34,7 @@ module Skylab::MyTerm
 
     def __imagemagick_command__component_operation
 
-      o = _normalize_image_related_component
-      yield :is_available, o.is_available
-      yield :unavailability_reason_tuple_proc, o.reason_proc
+      yield :unavailability, @_unavailability
 
       -> & pp do
         _sess = _begin_session
@@ -50,12 +47,26 @@ module Skylab::MyTerm
       Here_::Session___.begin_cold_session__ self
     end
 
-    def _normalize_image_related_component
+    def __image_gen_related_component_unavailability _fo
+
+      if @_use_cached_unavailability
+        @_cached_unavailability
+      else
+        @_use_cached_unavailability = true   # #during [#014] maybe use [ze] index instead
+        x = ___determine_image_generational_unavailability
+        @_cached_unavailability = x
+        x
+      end
+    end
+
+    def ___determine_image_generational_unavailability
 
       _rw = @_svc.reader_writer__
 
-      Home_::Image_Output_Adapter::Normalize_Components.call(
+      _o = Home_::Image_Output_Adapter::Normalize_Components.call(
         _rw, :is_required_to_make_image_ )
+
+      _o.to_unavailability
     end
 
     # -- Components

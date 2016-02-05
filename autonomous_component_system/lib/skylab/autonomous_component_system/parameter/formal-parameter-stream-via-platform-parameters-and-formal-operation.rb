@@ -2,7 +2,9 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    module Box_via_platform_params_and_metadata
+    module Formal_Parameter_Stream_via_Platform_Parameters_and_Formal_Operation
+
+      # 1x here. [#029]
 
       # like those of component associations, every sub-component of any
       # formal operation is subject to change. this includes the proc
@@ -11,10 +13,9 @@ module Skylab::Autonomous_Component_System
       # in light of the long note after this block about optionals,
       # one aspect we *can* isomorph from the platform proc is a linear
       # order of formal parameters. as such, we do.
+      #
 
       class << self ; def [] a, fo
-
-        out_bx = Callback_::Box.new
 
         if a.length.nonzero? && :block == a.last.first
           # a block (if utilized by the implementor) serves as an event
@@ -29,13 +30,13 @@ module Skylab::Autonomous_Component_System
           MONADIC_EMPTINESS_
         end
 
-        a.each do | cat, sym |
+        Callback_::Stream.via_nonsparse_array a do |(cat, sym)|
 
           edit = PARAM_ARITY___.fetch cat
 
           existing = use_bx[ sym ]
 
-          _add_me = if existing
+          if existing
             existing.dup.instance_exec do
               if edit
                 instance_exec( & edit )
@@ -52,11 +53,7 @@ module Skylab::Autonomous_Component_System
               @name_symbol = sym
             end
           end
-
-          out_bx.add sym, _add_me
         end
-
-        out_bx
       end ; end
 
       PARAM_ARITY___ = {

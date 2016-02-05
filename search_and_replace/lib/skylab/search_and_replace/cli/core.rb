@@ -19,9 +19,12 @@ module Skylab::SearchAndReplace
 
     Prototype___ = Lazy_.call do
 
+      self._NOT_YET  # #during #milestone-6
+
       # _ = rsx.bridge_for( :filesystem ).pwd
 
-      cli = Home_.lib_.zerk::HybridCLI.begin
+      Require_Zerk_[]
+      cli = Zerk_::HybridCLI.begin
 
       cli.root_ACS = -> & top_oes_p do
         acs = Root_Autonomous_Component_System_.new( & top_oes_p )

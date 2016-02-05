@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Formal_  # 1x [mt] 1x here
+    class Formal  # 1x [mt] 1x here
 
       # the "formal" part of the operation is that which is defined by the
       # association-like DSL expression. this data is wrapped by this node
@@ -39,7 +39,6 @@ module Skylab::Autonomous_Component_System
 
       def ___init_via m, ss
         @_method_name = m
-        @operation_is_available = true
         @selection_stack = ss
         self
       end
@@ -52,6 +51,21 @@ module Skylab::Autonomous_Component_System
           nil,  # no modifiers for such a call
           arg_st,
           pp ]
+      end
+
+      def deliverable_as_is & oes_p  # for [#ac-027]
+
+        _pp = -> _ do
+          oes_p
+        end
+
+        _ = deliverable_ Request_for_Deliverable_[
+          @selection_stack,
+          nil,  # no modifiers
+          nil,  # no arg stream - the formal op must specify its params
+          _pp ]
+
+        _
       end
 
       def deliverable_ dreq
@@ -101,20 +115,19 @@ module Skylab::Autonomous_Component_System
 
       attr_reader :description_proc
 
-      def __accept__is_available__meta_component st
-        @operation_is_available = st.gets_one
+      def __accept__unavailability__meta_component st
+        @_unavailability_proc = st.gets_one
         NIL_
       end
 
-      def __accept__unavailability_reason_tuple_proc__meta_component st
-        # (it's a proc that produces a tuple of N symbols and one proc!)
-        @unavailability_reason_tuple_proc = st.gets_one ; nil
-      end
+      attr_reader :_unavailability_proc
 
-      attr_reader(
-        :operation_is_available,
-        :unavailability_reason_tuple_proc,
-      )
+      def unavailability
+        p = _unavailability_proc
+        if p
+          p[ self ]
+        end
+      end
 
       def __accept__parameter__meta_component st
 
@@ -125,12 +138,30 @@ module Skylab::Autonomous_Component_System
 
       attr_reader :box
 
+      def __accept__parameters_from__meta_component st
+        @parameters_from_proc_ = st.gets_one
+        NIL_
+      end
+
+      attr_reader :parameters_from_proc_
+
+      def name_symbol  # [ze]
+        @selection_stack.fetch( -1 ).as_variegated_symbol
+      end
+
       def name
         @selection_stack.fetch( -1 )
       end
 
       attr_reader :selection_stack  # [ze]
+
+      def reifier  # for now, for [ze] to spy on module
+        @_reifier
+      end
+
+      def associationesque_category
+        :formal_operation
+      end
     end
   end
 end
-# #pending-rename: promote to public [mt]

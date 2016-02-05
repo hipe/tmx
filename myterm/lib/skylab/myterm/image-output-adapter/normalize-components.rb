@@ -99,14 +99,12 @@ module Skylab::MyTerm
           [ :info, :expression, :remaining_required_fields, _p ]
         end
 
-        Result__.new _em_proc, NOT_AVAILABLE___
+        Result__.new _em_proc
       end
 
-      Result__ = ::Struct.new :reason_proc, :is_available
+      Result__ = ::Struct.new :to_unavailability
 
-      NORMAL_RESULT___ = Result__.new nil, true
-
-      NOT_AVAILABLE___ = false
+      NORMAL_RESULT___ = Result__.new nil
     end
   end
 end

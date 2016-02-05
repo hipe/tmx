@@ -38,6 +38,7 @@ module Skylab::Zerk
     end
 
     def is_available= st
+      self._CHANGED  # #during #milestone-7
       @_is_avaiable_proc = st.gets_one ; nil
     end
 
@@ -78,6 +79,7 @@ module Skylab::Zerk
     end
 
     def is_available
+      self._CHANGED  # #during #milestone-7
       @_is_avaiable_proc.call
     end
 

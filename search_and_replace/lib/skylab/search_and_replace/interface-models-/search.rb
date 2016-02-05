@@ -2,93 +2,77 @@ module Skylab::SearchAndReplace
 
   class Interface_Models_::Search
 
-    # #frontier(s) here (and prototyping eyeblood):
-    #
-    #   • subject is a  "dynamic compound" - its associations
-    #     are determined entirely at "runtime" (as opposed to by method
-    #     definitions).
-    #
-    #   • subject is a "component as model"s - it defines
-    #     instance methods that are usually defined as methods on the class
-    #     of same. it's a "hybrid" ..
+    class << self
 
-    def initialize comp_a, & _IGNORING_oes_P
+      def interpret_compound_component p, acs
+        p[ new acs ]
+      end
+      private :new
+    end  # >>
 
-      # which interface nodes are active is determined from above.
-      # #todo-at-end is it as open issue that this might go stale & out of sync w/
-      # UI, but we can't cover that until much later..
-
-      @_component_a = comp_a
+    def initialize acs  # assume ruby regexp
 
       @functions_directory = nil
       @replacement_expression = nil
+
+      _ = acs.instance_variable_get :@_zerk_index_  # ..
+      @_zerk_index_ = Zerk_::Index.new self, _
     end
 
-    # .. you want it to look like a *compound* node so the parser recurses ..
+    def __files_by_find__component_operation
 
-    def interpret_compound_component p, & _oes_p_p
-      p[ self ]
+      # (assuming that to get to this host node, nonzero paths)
+
+      yield :parameters_from, @_zerk_index_.parent_frame.reader_proc
+
+      Interface_Models_::Files_by_Find
     end
 
-    self._LOOK_the_below_methods_upstream_API_has_changed  # near phase 1 milestone 1
+    def __files_by_grep__component_operation
 
-    def to_stream_for_component_interface
+      yield :unavailability, @_zerk_index_.unavailability_proc
+      yield :parameters_from, @_zerk_index_.reader_proc
 
-      # for the components dynamically injected to us from above,
-      # for now we must manaully build the associations for them
-
-      _st = Callback_::Stream.via_nonsparse_array @_component_a
-
-      _from_above = _st.map_by do | component |
-
-        _nf = component.name_
-
-        _asc = ACS_::Component_Association.via_name_and_model(
-          _nf, component )
-
-        Callback_::Qualified_Knownness.via_value_and_association(
-          component, _asc )
-      end
-
-      _from_above.concat_by ___my_additional_associations
+      Interface_Models_::Files_by_Grep
     end
 
-    def ___my_additional_associations
+    if false
 
-      ACS_::For_Interface::Infer_stream[ self ]
+    def __counts__component_operation
+
+      yield :unavailability, @_common_unav
+
+      Interface_Models_::Counts
+    end
+
+    def __matches__component_operation
+
+      yield :unavailability, @_common_unav
+
+      Interface_Models_::Matches
     end
 
     def __replacement_expression__component_association
 
       # always from this frame the caller has the ability to specify a
-      # replacement expression. (there's no real reason we don't add this
-      # fieldlike component up above like others except for the "feeling"
-      # that it belongs here.)
+      # replacement expression.
 
-      -> st, & pp do
-        if st.unparsed_exists
-          Callback_::Known_Known[ st.gets_one ]
-        end
-      end
+      Any_value_
     end
 
-    def __replace__component_association
+    def __replace__component_operation
 
-      if @replacement_expression
-        @replace ||= Replace_Model_Proxy___.new self  # ivar because we gotta..
-      end
+      self._REDO  # was Replace_Model_Proxy___
     end
 
     def __functions_directory__component_association
 
-      -> st do
-        if st.unparsed_exists
-          Callback_::Known_Known[ st.gets_one ]
-        end
-      end
+      Any_value_
     end
 
-    def __build_replacement_bound_call & pp
+    end
+
+    def __WAS_build_replacement_bound_call & pp
 
       # OK we're still figuring this out - because we form the counterpart
       # association's component model to look "entitesque", we want to
@@ -111,24 +95,10 @@ module Skylab::SearchAndReplace
       _bc
     end
 
-    class Replace_Model_Proxy___
-
-      # the only reason that (for now) we have to make this bump is
-      # because we want it to look entitesque and not primitivesque
-
-      def initialize _
-        @_guy = _
-      end
-
-      def interpret_component st, & pp
-        if st.no_unparsed_exists
-          @_guy.__build_replacement_bound_call( & pp )
-        else
-          self._RIDE_THIS_50_50_its_OK
-        end
+    Any_value_ = -> st, & _pp do
+      if st.unparsed_exists
+        Callback_::Known_Known[ st.gets_one ]
       end
     end
-
-    Require_ACS_[]
   end
 end

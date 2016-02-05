@@ -10,7 +10,7 @@ module Skylab::SearchAndReplace
 
       def initialize st, main_vc, ent_ada
 
-        @FILE_WRITE_IS_ENABLED = false  # would-be dry run. for now, edited manually during dev #todo-at-end
+        @FILE_WRITE_IS_ENABLED = false  # would-be dry run. for now, edited manually during dev  #open [#019] (this rewrite)
 
         @entity_node_adapter = ent_ada
         @expression_agent = main_vc.expression_agent

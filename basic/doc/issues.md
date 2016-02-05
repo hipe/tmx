@@ -1,3 +1,4 @@
+[#056]       [ yielder mapper ]
 [#055]       [ hotstrings ]
 [#054]       [ the "classify list" algorithm ]
 [#053]       this one tree traversal algorithm

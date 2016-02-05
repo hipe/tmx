@@ -13,27 +13,29 @@ module Skylab::Autonomous_Component_System
 
         ss, modz, arg_st, pp = dreq.to_a
 
-        fo_bx = ( @_formals_box ||= ___build_box )
+        _fo_st = ___build_formals_stream
 
-        o = Home_::Parameter::Normalize.new arg_st, ss, fo_bx
-
-        if 1 == fo_bx.length
-
-          # having only one formal argument is a special case: for these
-          # (for now) we do NOT support the use of named argument(s).
-
-          o.current_symbol = fo_bx.at_position( 0 ).name_symbol
+        o = Home_::Parameter::Normalize.new ss, _fo_st
+        p = @formal.parameters_from_proc_
+        if p
+          self._NEVER_BEEN_NEEDED
         end
 
-        _args = o.to_flat_platform_arguments
+        o.argument_stream = arg_st
 
-        _bc = Callback_::Bound_Call[ _args, @_p, :call, & pp ]
+        args = o.to_flat_platform_arglist  # usu throws but might change [#028]#A
 
-        Here_::Delivery_::Deliverable.new modz, ss, _bc
+        if args
+          _bc = Callback_::Bound_Call[ args, @_p, :call, & pp ]
+          Here_::Delivery_::Deliverable.new modz, ss, _bc
+        else
+          args
+        end
       end
 
-      def ___build_box
-        ACS_::Parameter::Box_via_platform_params_and_metadata[
+      def ___build_formals_stream
+        ACS_::Parameter::
+          Formal_Parameter_Stream_via_Platform_Parameters_and_Formal_Operation[
           @_p.parameters,
           @formal,
         ]

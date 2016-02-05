@@ -89,7 +89,7 @@ module Skylab::SearchAndReplace
       o = Home_::Magnetics_::File_Session_Stream_via_Parameters.new( & @_oes_p )
       o.ruby_regexp = dep.ruby_regexp
       o.upstream_path_stream = @_file_path_stream
-      o.grep_extended_regexp_string = dep.grep_extended_regexp_string
+      o.grep_extended_regexp_string = dep.egrep_pattern
       o
     end
 

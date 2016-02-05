@@ -1,4 +1,27 @@
+[#029]       [ stream via platform params ..]
+
+[#028]       parameters normalize..
+
+[#027]       this tracks two separate but related phenomena:
+
+             specifically, the experiment of where a formal operation
+             indicates as required (or maybe optional) parameter another
+             formal operation (to mean its true-ish result) (a [ze] thing).
+
+             more generally this is also used to track side-effects of
+             (and hook-outs necessary for) formals that define their own
+             parameter value readers.
+
+             (if this breaks out into its own file, see comments this commit)
+
+[#026]       for now, if an association is `is_singular_of` another
+             association, *by the storage implementation* (ivars)
+             the singular form of actual value is stored in the storage
+             location of the plural variant, after this singular value
+             is "upgraded" to being one-length array.
+
 [#025]       #after: [#010]
+
 [#023]       tracks places where the assumption is made that we are not
              long-running. if/when "long-running"-ness occurs for an
              application, these are areas that make calculations redudantly.
@@ -24,7 +47,8 @@
 
 [#011]   #when:[#sa-019] sub `ACS_` for `Home_` (this idiom didn't age well)
 
-[#010] #open this big campaign (the 9 milestones) (has subscribers here)
+[#010]     #after #milestone-9 decide if we keep this way or not..
+             this big campaign (the 9 milestones) (has subscribers here)
 
 [#009]       intro to operations..
 

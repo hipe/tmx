@@ -6,8 +6,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :operations
+    def self.call_by_ ; end
 
     context "(normal)" do
 

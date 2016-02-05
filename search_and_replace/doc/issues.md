@@ -1,4 +1,4 @@
-[#019] #open the rewrite (has subscribers)
+[#019] #during (or after) #milestone-8 (i.e this rewrite) (has subscribers)
 
 [#018]    #usability-enhancement - location #before:[#017]
 
@@ -7,7 +7,6 @@
 [#016]    #usability-enhancement - munge "next" over "next file?"
 
 [#015] #open this new regexp 'o' option - what should we do with it?
-
 
 [#014]    #track #experiment ONLY TO SUPPORT TESTS :/
 
@@ -49,19 +48,30 @@
              of the first two categories. streams of these nodes facilitate
              modality clients rendering content with semantic styling.
 
-[#011] #open  #blocker this will CONVERT non-unixy newlines to unixy.
+[#011] #during #milestone-8
+             this should be a step towards "releasing" this..
+             #blocker this will CONVERT non-unixy newlines to unixy.
              this was an accident stemming from the "optimization" near
              `NEWLINE_SEXP_` and the custom line scanner and will
              require some redesign (either never use a const value for
              these or detect which was used and whether (ICK) the
              sequence changes.)
 
+
 [#010]       edit sessions
 [#009]   #investigate consider merging read-only rendering with edit session rendering
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline
-[#006] #done #feature support for spaces in list items
-[#005] #done #feature make this one button with three labels instead of three buttons
+
+[#006] #during #milestone-6 descriptions
+             ( #was: #done #feature support for spaces in list items )
+
+[#005] #open improve architecture so we can pass things like system
+             conduits in some way that does not disrupt the elegance of
+             the [#ac-027] relationships.
+
+             ( #was: #feature make this one button with three labels
+               instead of three buttons )
 [#004]       #feature should check mtime before write, abort for that file if stale
 [#003]       [ track a historic node ]
 [#002]       -wip-them-all (in [ts]) *uses* this guy..

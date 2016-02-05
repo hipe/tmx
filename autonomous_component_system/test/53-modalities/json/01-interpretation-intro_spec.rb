@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       it "when one is not present - validation is not invoked, ivar not set" do
 
         sn = _from '{"last_name":"x"}'
-        sn.instance_variables.should eql [ :@last_name ]
+        sn.instance_variable_defined?( :@last_name ) or fail
         sn.last_name.should eql "x"
       end
 

@@ -20,6 +20,18 @@ module Skylab::SearchAndReplace
     [
       :children, {
 
+        path: -> do
+          # #milestone-6: this is API only
+        end,
+
+        filename_pattern: -> do
+          # #milestone-6: this is API only
+        end,
+
+        egrep_pattern: -> do
+          # #milestone-6: this is supposed to "appear" IFF ruby regexp
+        end,
+
         search: -> do
           [
             :children, {
@@ -79,8 +91,9 @@ module Skylab::SearchAndReplace
         root = Root_Autonomous_Component_System_.new( & oes_p )
         root._init_with_defaults
 
-        Home_.lib_.zerk::API.call x_a, root
-      end
+        Require_Zerk_[]
+        Zerk_::API.call x_a, root
+      end  # :cp1
     end  # >>
   end
 
@@ -128,6 +141,9 @@ module Skylab::SearchAndReplace
       @ruby_regexp = nil
 
       @_oes_p = oes_p
+
+      Require_Zerk_[]
+      @_zerk_index_ = Zerk_::Index.new self
     end
 
     def _init_with_defaults
@@ -155,10 +171,15 @@ module Skylab::SearchAndReplace
       -> st, & pp do
         if st.unparsed_exists
           x = st.gets_one
-          if x.respond_to? :casefold?
-            Callback_::Known_Known[ x ]
+          if x
+            if x.respond_to? :casefold?
+              Callback_::Known_Known[ x ]
+            else
+              ___interpret_ruby_regexp x, & pp
+            end
           else
-            ___interpret_ruby_regexp x, & pp
+            # setting it to false-ish has been requested explicitly
+            Callback_::Known_Known[ x ]
           end
         end
       end
@@ -202,11 +223,6 @@ module Skylab::SearchAndReplace
 
     def __egrep_pattern__component_association
 
-      # for UI (when we get there), we want this to show up only when etc
-      if ! @ruby_regexp
-        yield :intent, :API  # that is, not UI
-      end
-
       -> st, & pp do
         if st.unparsed_exists
           x = st.gets_one
@@ -217,15 +233,12 @@ module Skylab::SearchAndReplace
       end
     end
 
-
     def __paths__component_association
 
       yield :is_plural_of, :path
     end
 
     def __path__component_association
-
-      yield :intent, :API  # don't show this for UI, just use `paths`
 
       yield :is_singular_of, :paths
 
@@ -244,8 +257,6 @@ module Skylab::SearchAndReplace
 
     def __filename_pattern__component_association
 
-      yield :intent, :API  # same as up above
-
       yield :is_singular_of, :filename_patterns
 
       -> st do
@@ -258,58 +269,15 @@ module Skylab::SearchAndReplace
 
     def __search__component_association
 
-      a = nil
-      if Nonzero_array_[ @paths ]
-
-        fbf = _build :Files_by_Find, @paths, @filename_patterns
-
-        a = [ fbf ]
-
-        if @ruby_regexp
-
-          fbg = _build :Files_by_Grep, @egrep_pattern, @ruby_regexp, fbf
-
-          a.push fbg
-
-          a.push _build( :Counts, fbg )
-
-          a.push _build( :Matches, fbg )
-        end
+      yield :unavailability, -> asc do
+        @_zerk_index_.unavailability_by_stated_dependency asc, :paths
       end
 
-      if a
-        Home_::Interface_Models_::Search.new a, & @_oes_p
-      else
-        -> _st, & pp do
-          Cannot_search_until___[ pp ]
-          UNABLE_
-        end
-      end
-    end
-
-    def _build const, * a
-
-      _nf = Callback_::Name.via_variegated_symbol const.downcase
-      a.push _nf
-      _cls = Home_::Interface_Models_.const_get const, false
-      _cls.new( * a )
-    end
-
-    Cannot_search_until___ = -> pp do
-      pp[ nil ].call :error, :expression, :uninterpretable_token do |y|
-        y << "(to search you must have some paths..)"  # experiment
-      end
+      Home_::Interface_Models_::Search
     end
   end
 
-  Nonzero_array_ = -> x do
-    if x
-      x.length.nonzero?
-    end
-  end
-
-  if false  # #todo-during-descriptions
-
+  if false  # #open [#006]
         @y << "(display, edit, and execute the details of your search)"
 
       def xx
@@ -411,8 +379,11 @@ module Skylab::SearchAndReplace
   end
 
   Require_ACS_ = Lazy_.call do
-    ACS_ = Lib_::ACS[]
-    NIL_
+    ACS_ = Lib_::ACS[] ; nil
+  end
+
+  Require_Zerk_ = Lazy_.call do
+    Zerk_ = Home_.lib_.zerk ; nil
   end
 
   Autoloader_ = Callback_::Autoloader

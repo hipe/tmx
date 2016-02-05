@@ -5,9 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] auxiliaries - function - (2) failures", wip: true do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :expect_event
-    use :operations
+    use :my_API
 
     memoize( :_ruby_regexp ) { /wazoo/i }
 

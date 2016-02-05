@@ -216,7 +216,7 @@ better this time.
   component from a collection-like receiver with this important difference
   from the `retrieve_` disussed in [#br-031]: the subject method *cannot*
   take a block or similar handler *as a parameter* to effect fail-case
-  behavior. (it may however use such a handler that is interanal to the
+  behavior. (it may however use such a handler that is internal to the
   receiver.) its fail-case behavior may be undefined. [#br-031] about
   the universal retrieve operation discusses this term and other related
   terms. in practice a subject method is used to implement such a method.

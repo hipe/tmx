@@ -6,8 +6,6 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :operations
 
     shared_subject :_the_edit_session_prototype do
 

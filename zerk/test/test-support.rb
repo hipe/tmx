@@ -140,10 +140,12 @@ module Skylab::Zerk::TestSupport
 
   ACHIEVED_ = true
   EMPTY_A_ = []
+  EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = "".freeze
   MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NOTHING_ = Home_::NOTHING_
   SPACE_ = Home_::SPACE_
   TS_ = self
   UNABLE_ = false

@@ -34,6 +34,13 @@ module Skylab::Fields
       Parse___.new( o, x_a, self ).execute
     end
 
+    def to_required_symbol_stream
+      h = optionals_hash
+      Callback_::Stream.via_nonsparse_array( @_h.keys ).reduce_by do |sym|
+        ! h[ sym ]
+      end
+    end
+
     def optionals_hash
       @_is_parsed || _parse
       @_indexes.optionals

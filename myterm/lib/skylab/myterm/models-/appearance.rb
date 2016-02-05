@@ -44,7 +44,7 @@ module Skylab::MyTerm
 
     def component_operation_reader
 
-      mine = ACS_::Operation::Formal_.reader_of_formal_operations_by_method_in self
+      mine = ACS_::Operation::Formal.reader_of_formal_operations_by_method_in self
 
       -> sym do
 

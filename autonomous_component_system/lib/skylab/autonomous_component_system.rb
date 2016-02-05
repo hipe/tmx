@@ -190,7 +190,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       # -- Initializers
 
       def initialize m
-        @association_is_available = true
         @association_method_name = m
         @_name_mutation = nil
       end
@@ -243,12 +242,20 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # ~ availability (mode client must implement)
 
-      def accept__is_available__meta_component yes
-        @association_is_available = yes
+      def accept__unavailability__meta_component x
+        @_unavailability_proc = x
         NIL_
       end
 
-      attr_reader :association_is_available
+      attr_reader :_unavailability_proc
+
+      def unavailability
+        p = _unavailability_proc
+        if p
+          p[ self ]
+        end
+      end
+
 
       # ~ description
 
@@ -336,7 +343,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def accept__is_singular_of__meta_component sym
 
-        _name_as_ivar_will_be :"@#{ sym }"
+        _name_as_ivar_will_be :"@#{ sym }"  # implement the one side of [#026]
         @is_singular_of = sym ; nil
       end
 
@@ -370,12 +377,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # ~ constants
 
-      def category
+      def associationesque_category
         :association
-      end
-
-      def sub_category
-        :common
       end
 
       # --
@@ -474,8 +477,16 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Value_writer_in = -> acs do
 
         -> qk do
+
           if qk.is_known_known
-            acs.instance_variable_set qk.name.as_ivar, qk.value_x
+            x = qk.value_x
+            asc = qk.association
+
+            if asc.is_singular_of  # the other side of [#026]
+              x = [ x ]
+            end
+
+            acs.instance_variable_set asc.name.as_ivar, x
           else
             self._NEVER_BEEN_NEEDED
           end

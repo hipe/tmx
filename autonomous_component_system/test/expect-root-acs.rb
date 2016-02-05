@@ -6,9 +6,12 @@ module Skylab::Autonomous_Component_System::TestSupport
       tcc.include self
     end
 
+    def root_ACS_customized_result
+      root_ACS_state.__customized_result
+    end
+
     def root_ACS_result
-      _sta = root_ACS_state
-      _sta.result
+      root_ACS_state.result
     end
 
     def root_ACS
@@ -23,10 +26,24 @@ module Skylab::Autonomous_Component_System::TestSupport
         _a = remove_instance_variable( :@event_log ).flush_to_array
       end
 
-      Custom_State___[ result, _a, root_ACS ]
+      Custom_State___.new result, _a, root_ACS
     end
 
-    Custom_State___ = ::Struct.new :result, :emission_array, :root
+    class Custom_State___
+
+      def initialize * a
+        @result, @emission_array, @root = a
+      end
+
+      attr_reader( :result, :emission_array, :root )
+
+      def to_state_with_customized_result x
+        State_with_Customized_Result___[ x, @emission_array, @root ]
+      end
+    end
+
+    State_with_Customized_Result___ = ::Struct.new(
+      :__customized_result, :emission_array, :root )
 
     def build_root_ACS  # *is* `build_cold_root_ACS`
 

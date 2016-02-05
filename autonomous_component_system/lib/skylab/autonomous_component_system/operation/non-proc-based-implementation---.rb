@@ -14,32 +14,40 @@ module Skylab::Autonomous_Component_System
 
         ss, modz, arg_st, pp = dreq.to_a
 
-        _fo_bx = ___build_formals_box
+        _fo_st = ___build_formals_stream
 
-        _o = ACS_::Parameter::Normalize.new arg_st, ss, _fo_bx
+        o = Home_::Parameter::Normalize.new ss, _fo_st
 
-        _oes_p = pp[ ss.fetch( -2 ) ]  # VERY not sure what we want here
+        p = @formal.parameters_from_proc_
+        if p
+          o.parameters_value_reader = p.call
+        else
+          o.argument_stream = arg_st
+        end
 
+        _receiver = ss.fetch( -2 )
+        _oes_p = pp[ _receiver ]  # TOTALLY up in the air, but look OK .. #at [#010]
         sess = @_implementor_x.new( & _oes_p )
 
-        _o.write_into sess  # throws otherwise
+        ok = o.write_into sess  # usu just throws, but might change [#028]#A
 
-        _bc = Callback_::Bound_Call[ nil, sess, :execute ]
-
-        Here_::Delivery_::Deliverable.new modz, ss, _bc
+        if ok
+          _bc = Callback_::Bound_Call[ nil, sess, :execute ]
+          Here_::Delivery_::Deliverable.new modz, ss, _bc
+        else
+          ok
+        end
       end
 
-      def ___build_formals_box
+      def ___build_formals_stream
 
-        _sym_a = @_pfoz.symbols
+        # (if your parameters include a false-ish key, shame on you)
 
         op_h = @_pfoz.optionals_hash
 
-        fo_bx = Callback_::Box.new
+        Callback_::Stream.via_nonsparse_array( @_pfoz.symbols ).map_by do |sym|
 
-        _sym_a.each do |sym|
-
-          _param = Home_::Parameter.new_by_ do
+          Home_::Parameter.new_by_ do
             @name_symbol = sym
             @parameter_arity = if op_h[ sym ]
               :zero_or_one
@@ -47,10 +55,11 @@ module Skylab::Autonomous_Component_System
               :one
             end
           end
-
-          fo_bx.add sym, _param
         end
-        fo_bx
+      end
+
+      def moduleish
+        @_implementor_x
       end
     end
   end

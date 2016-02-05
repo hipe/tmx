@@ -5,9 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] auxiliaries - function - (3) success", wip: true do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :expect_event
-    use :operations
+    use :my_API
     use :magnetics_mutable_file_session
 
     context "(one file one match, good function stuff)" do

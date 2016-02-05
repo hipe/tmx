@@ -2,6 +2,51 @@ module Skylab::Basic
 
   module Yielder
 
+    class Mapper  # :[#056]. see also [#ca-047] for more complex version
+
+      def initialize * x_a
+
+        st = Callback_::Polymorphic_Stream.via_array x_a
+
+        y = st.gets_one
+
+        sct = Params___.new
+        until st.no_unparsed_exists
+          sct[ st.gets_one ] = st.gets_one
+        end
+        first, subsequent = sct.to_a
+
+        subsequent_p = -> s do
+          y << subsequent[ s ]
+        end
+
+        p = -> s do
+          y << first[ s ]
+          p = subsequent_p
+        end
+
+        first_p = p
+
+        @y = ::Enumerator::Yielder.new do |s|
+          p[ s ]
+        end
+
+        @_reset = -> do
+          p = first_p ; nil
+        end
+      end
+
+      Params___ = ::Struct.new :first, :subsequent
+
+      def reset
+        @_reset[]
+      end
+
+      attr_reader(
+        :y
+      )
+    end
+
     # <-
 
   class Counting < ::Enumerator::Yielder

@@ -4,6 +4,7 @@
 [#010]       the external functions experiment ..
 [#009]       transplant "parameters" from [hl]
 [#008]       #in-situ [ the absorber method maker ]
+[#007]       [ SESSION PATTERN ]
 [#006]       for retrospective ..
 [#005]       [ from ]
 [#004]       [ basic fields ]

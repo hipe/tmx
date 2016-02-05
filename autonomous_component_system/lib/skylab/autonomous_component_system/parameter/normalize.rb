@@ -2,135 +2,145 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Normalize
+    class Normalize  # much docs at [#028]
 
-      # if for flat platform parameters, produce an argument array.
-      # otherwise (and for random access), do that.
-      # for both, do defaults and check missing requireds.
+      def initialize sel_stack, fo_st
 
-      Require_field_library_[]
-
-      def initialize arg_st, sel_stack, fo_bx
-
-        @argument_stream = arg_st
-        @_current_formal = nil
-        @_formal_box = fo_bx
+        @_formals_stream = fo_st
         @selection_stack = sel_stack
+
+        @_receive_parameter_value_source = -> m, x do
+          remove_instance_variable :@_receive_parameter_value_source
+          send m, x
+        end
+
+        @_output_operation = -> m do
+          remove_instance_variable :@_output_operation
+          send m
+        end
       end
 
-      def current_symbol= sym
-        @_current_formal = @_formal_box.fetch sym
-        sym
+      # -- asserted to happen only once
+
+      def argument_stream= st
+        @_receive_parameter_value_source[ :__recv_arg_stream_once, st ] ; st
       end
 
-      def to_flat_platform_arguments
+      def parameters_value_reader= rdr
+        @_receive_parameter_value_source[ :__recv_params_value_rdr_once, rdr ]
+        rdr
+      end
 
-        bx = __build_box_for_flat_platform_arguments
-
-        @_intake = -> x do
-          bx.replace @_current_formal.name_symbol, x
-          NIL_
-        end
-        _intake
-
-        args = []
-        @_accept = -> x, par do
-          if Field_::Takes_many_arguments[ par ]
-            if x
-              args.concat x
-            end
-          else
-            args.push x
-          end
-        end
-        _normalize_against bx
-        args
+      def to_flat_platform_arglist
+        @_output_operation[ :__flush_to_platform_arguments_once ]
       end
 
       def write_into o
+        @_parameter_value_recipient = o
+        @_output_operation[ :__flush_to_write_into_once ]
+      end
 
+      # -- only once's
+
+      def __recv_arg_stream_once arg_st
+        @_argument_shape = :Argument_Stream
+        @__argument_stream = arg_st ; nil
+      end
+
+      def __recv_params_value_rdr_once rdr
+        @_argument_shape = :Parameters_Reader
+        @__parameters_reader = rdr ; nil
+      end
+
+      def __flush_to_platform_arguments_once
+
+        _execute :Platform_Arglist
+      end
+
+      def __flush_to_write_into_once
+
+        _ent = remove_instance_variable :@_parameter_value_recipient
+
+        _execute _ent, :Write_Into
+      end
+
+      def _execute * args, target_sym
+
+        _const = :"#{ target_sym }__via__#{ @_argument_shape }___"
+
+        _x = Here_.const_get _const, false
+
+        _x.new( * args, self ).execute
+      end
+
+      # -- for subs
+
+      def flush_formals_stream_to_box_
         bx = Callback_::Box.new
-
-        @_intake = -> x do
-
-          _k = @_current_formal.name_symbol
-          bx.add _k, x
-          NIL_
-        end
-        _intake
-
-        @_accept = -> x, par do
-
-          o.send :"#{ par.name_symbol }=", x
-          NIL_
-        end
-
-        _normalize_against bx
-
-        NIL_
+        st = release_formals_stream_
+        begin
+          fo = st.gets
+          fo or break
+          bx.add fo.name_symbol, fo
+          redo
+        end while nil
+        bx
       end
 
-      def __build_box_for_flat_platform_arguments
-
-        # must be a fully nil'd out box in formal order
-
-        h = {}
-        @_formal_box.a_.each do |k|
-          h[ k ] = nil
-        end
-        Callback_::Box.via_integral_parts @_formal_box.a_.dup, h
+      def release_formals_stream_
+        remove_instance_variable :@_formals_stream
       end
 
-      def _intake
+      def release_parameters_value_reader__
+        remove_instance_variable :@__parameters_reader
+      end
 
-        st = @argument_stream
+      def parse_from_argument_stream_into_against_ h, fo_bx  # [#]"head parse"
 
-        if @_current_formal
+        st = @__argument_stream
 
+        if 1 == fo_bx.length
           if st.no_unparsed_exists
-            self._DO_ME_probably_finish
+            self._COVER_ME_probably_fine_to_just_finish
           else
-            _assume_and_accept_value
+            _k = fo_bx.at_position( 0 ).name_symbol
+            h[ _k ] = st.gets_one
           end
         else
-          h = @_formal_box.h_
+          fo_h = fo_bx.h_
           begin
             if st.no_unparsed_exists
               break
             end
-            @_current_formal = h[ st.current_token ]
-            if @_current_formal
-              st.advance_one
-              _assume_and_accept_value
-              redo
-            end
-            break
+            k = st.current_token
+            fo = fo_h[ k ]
+            fo or break
+            st.advance_one
+            h[ k ] = st.gets_one
+            redo
           end while nil
         end
-        NIL_
+
+        h
       end
 
-      def _assume_and_accept_value
+      def normalize_argument_hash_against_stream_ rdr_p, fo_st, & accept
 
-        _x = @argument_stream.gets_one
-        @_intake[ _x ]
-        NIL_
-      end
+        Require_field_library_[]
 
-      def _normalize_against out_bx  # #[#117]
+        # in formal order but for only those entries that exist in the hash
+        # (where entries with false & nil values count as existing), the
+        # block will receive each value-formal pair
 
         miss_a = nil
 
-        act_h = out_bx.h_
-        st = @_formal_box.to_value_stream
-
         begin
-          par = st.gets
+          par = fo_st.gets
           par or break
           k = par.name_symbol
 
           had = true
-          x = act_h.fetch k do
+          x = rdr_p.call k do
             had = false ; nil
           end
 
@@ -140,22 +150,25 @@ module Skylab::Autonomous_Component_System
             did = true
           end
 
-          if Field_::Is_required[ par ] && x.nil?
+          if x.nil? && Field_::Is_required[ par ]
             ( miss_a ||= [] ).push par
             redo
           end
 
-          if had || did
-            # (for random access, don't write nils if they were not passed)
-            @_accept[ x, par ]
+          if had || did  # [#]"why we skip certain acceptances"
+            accept[ x, par ]
           end
 
           redo
         end while nil
 
         if miss_a
+
+          # [#004]#exe explains why we raise here
+          # but this may change soon..
           raise ::ArgumentError, ___say_missing( miss_a )
-            # [#004]#exe explains why we raise here
+        else
+          ACHIEVED_
         end
       end
 

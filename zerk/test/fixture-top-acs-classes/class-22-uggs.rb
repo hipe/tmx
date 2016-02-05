@@ -20,7 +20,11 @@ module Skylab::Zerk::TestSupport
 
     def __flickerer__component_operation
 
-      yield :is_available, @_flicker_yes
+      yield :unavailability, -> * do
+        if ! @_flicker_yes
+          EMPTY_P_
+        end
+      end
 
       -> do
         :_yep_
@@ -33,7 +37,11 @@ module Skylab::Zerk::TestSupport
 
     def __upper_color__component_association
 
-      yield :is_available, @_ucolor_yes
+      yield :unavailability, -> * do
+        if ! @_ucolor_yes
+          EMPTY_P_
+        end
+      end
 
       Here_::Class_72_Color
     end
