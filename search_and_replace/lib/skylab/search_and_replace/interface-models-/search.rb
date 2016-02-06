@@ -44,11 +44,10 @@ module Skylab::SearchAndReplace
       Interface_Models_::Counts
     end
 
-    if false
-
     def __matches__component_operation
 
-      yield :unavailability, @_common_unav
+      yield :unavailability, @_zerk_index_.unavailability_proc
+      yield :parameters_from, @_zerk_index_.reader_proc
 
       Interface_Models_::Matches
     end
@@ -63,37 +62,15 @@ module Skylab::SearchAndReplace
 
     def __replace__component_operation
 
-      self._REDO  # was Replace_Model_Proxy___
+      yield :unavailability, @_zerk_index_.unavailability_proc
+      yield :parameters_from, @_zerk_index_.reader_proc
+
+      Home_::Interface_Models_::Replace
     end
 
     def __functions_directory__component_association
 
       Any_value_
-    end
-
-    end
-
-    def __WAS_build_replacement_bound_call & pp
-
-      # OK we're still figuring this out - because we form the counterpart
-      # association's component model to look "entitesque", we want to
-      # result in a bound call here? ..
-
-      dependency = @_component_a.fetch( -1 )
-        # yikes - randomly access a volatile UI structure to get a dependency
-
-      if ! dependency.respond_to? :to_mutable_file_session_stream
-        self._HARDCODED_OFFSET_CHANGED
-      end
-
-      o = Home_::Interface_Models_::Replace.new( & pp )
-      o.functions_directory = @functions_directory
-      o.streamer = dependency
-      o.replacement_expression = @replacement_expression
-
-      _bc = Callback_::Bound_Call[ nil, o, :to_file_session_stream ]
-
-      _bc
     end
 
     Any_value_ = -> st, & _pp do

@@ -6,50 +6,27 @@ module Skylab::SearchAndReplace
       'see the matching strings (not just files)'
     end
 
-    def initialize fbg, nf
+    PARAMETERS = Parameters_[
+      files_by_grep: nil,
+      ruby_regexp: nil,
+      egrep_pattern: :optional,
+    ]
+    attr_writer( * PARAMETERS.symbols )
 
-      @_files_by_grep = fbg
-      @name_ = nf
+    def initialize & oes_p
+      @egrep_pattern = nil
+      @_oes_p = oes_p
     end
 
-    attr_reader(
-      :name_,
-    )
-
-    def interpret_component st, & pp
-
-      if st.no_unparsed_exists
-
-        _otr = dup._init_as_hot( & pp )
-
-        Callback_::Bound_Call[ nil, _otr, :___to_match_stream ]
-      end
+    def with__files_by_grep__ o  # see sib
+      o.for = :paths
+      o.execute
     end
 
-    def to_mutable_file_session_stream params_x, & pp  # NOTE highlight eventually
+    def execute  # formerly "to match stream"
 
-      dup._init_as_hot( & pp ).__to_mutable_file_session_stream params_x
-    end
-
-    # == all hot below
-
-    def _init_as_hot & pp
-      @_pp = pp
-      @_oes_p = @_pp[ self ]
-      self
-    end
-
-    def __to_mutable_file_session_stream repl_params_x
-
-      ok = _resolve_file_path_stream
-      ok && __build_mutable_file_session_stream( repl_params_x )
-    end
-
-    def ___to_match_stream
-
-      ok = _resolve_file_path_stream
-      ok &&= __resolve_file_session_stream
-      ok && ___via_file_session_stream
+      _ok = __resolve_file_session_stream
+      _ok && ___via_file_session_stream
     end
 
     def ___via_file_session_stream
@@ -64,7 +41,7 @@ module Skylab::SearchAndReplace
 
       _ = __build_read_only_file_session_stream
 
-      _write_trueish :@_file_session_stream, _
+      __write_trueish :@_file_session_stream, _
     end
 
     def __build_read_only_file_session_stream
@@ -74,7 +51,7 @@ module Skylab::SearchAndReplace
       o.execute
     end
 
-    def __build_mutable_file_session_stream repl_params_x
+    def to_mutable_file_session_stream_for__ repl_params_x  # highlight eventually
 
       o = _begin_common_file_session_stream
       o.for = :for_interactive_search_and_replace
@@ -84,22 +61,14 @@ module Skylab::SearchAndReplace
 
     def _begin_common_file_session_stream
 
-      dep = @_files_by_grep
-
       o = Home_::Magnetics_::File_Session_Stream_via_Parameters.new( & @_oes_p )
-      o.ruby_regexp = dep.ruby_regexp
-      o.upstream_path_stream = @_file_path_stream
-      o.grep_extended_regexp_string = dep.egrep_pattern
+      o.ruby_regexp = @ruby_regexp
+      o.upstream_path_stream = @files_by_grep
+      o.grep_extended_regexp_string = @egrep_pattern
       o
     end
 
-    def _resolve_file_path_stream
-
-      _ = @_files_by_grep.to_file_path_stream :for, :paths, & @_pp
-      _write_trueish :@_file_path_stream, _
-    end
-
-    def _write_trueish ivar, x
+    def __write_trueish ivar, x
       if x
         instance_variable_set ivar, x
         ACHIEVED_
@@ -107,7 +76,10 @@ module Skylab::SearchAndReplace
         x
       end
     end
+
+    def handle_event_selectively_for_zerk
+      @_oes_p
+    end
   end
 end
-
 # #history: this splintered off of node [#003]

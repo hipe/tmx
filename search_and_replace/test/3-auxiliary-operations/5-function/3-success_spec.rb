@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - (3) success", wip: true do
+  describe "[sa] auxiliaries - function - (3) success" do
 
     TS_[ self ]
     use :my_API
@@ -15,7 +15,7 @@ module Skylab::SearchAndReplace::TestSupport
         _dir = the_wazizzle_worktree_
         _func_dir = common_functions_dir_
 
-        call_(
+        _state = call(
           :ruby_regexp, /\bHAHA\b/,
           :path, _dir,
           :filename_pattern, '*-wazizzle.txt',
@@ -25,7 +25,7 @@ module Skylab::SearchAndReplace::TestSupport
           :replace,
         )
 
-        @result.gets
+        _state.result.gets
       end
 
       shared_subject :_performance do

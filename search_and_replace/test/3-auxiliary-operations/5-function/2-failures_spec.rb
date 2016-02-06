@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - (2) failures", wip: true do
+  describe "[sa] auxiliaries - function - (2) failures" do
 
     TS_[ self ]
     use :my_API
@@ -15,13 +15,12 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "you have a strange function and no function directory" do
 
-      shared_subject :state_ do
+      call_by do
         _call_with_directory nil
-        flush_event_log_and_result_to_state @result
       end
 
       it "fails" do
-        fails_
+        fails
       end
 
       it "events" do
@@ -37,19 +36,22 @@ module Skylab::SearchAndReplace::TestSupport
 
         last_emission.should _be_this
       end
+
+      def expression_agent_for_expect_event
+        Callback_::Event.codifying_expression_agent_instance
+      end
     end
 
     context "if you have an existent directory but no file" do
 
-      shared_subject :state_ do
+      call_by do
 
         _dir = TestSupport_::Fixtures.dir :empty_esque_directory
         _call_with_directory _dir
-        flush_event_log_and_result_to_state @result
       end
 
       it "fails" do
-        fails_
+        fails
       end
 
       it "events" do
@@ -69,7 +71,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     define_method :_call_with_directory do |dir|
 
-      call_(
+      call(
         :ruby_regexp, _ruby_regexp,
         :path, common_haystack_directory_,
         :filename_pattern, _filename_pattern,

@@ -443,8 +443,7 @@ module Skylab::SearchAndReplace
       end
 
       def to_stream_for_resolving_buttonesque_selection  # for above
-        _ = Callback_::Stream.via_nonsparse_array @_available_butz_a
-        _
+        Callback_::Stream.via_nonsparse_array @_available_butz_a
       end
 
       attr_reader(

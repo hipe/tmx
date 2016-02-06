@@ -2,17 +2,16 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - (3) matches", wip: true do
+  describe "[sa] core operations - (3) matches" do
 
     TS_[ self ]
-    use :memoizer_methods
-    def self.call_by_ ; end
+    use :my_API
 
     context "(normal)" do
 
-      call_by_ do
+      call_by do
 
-        call_(
+        _state = call(
           :ruby_regexp, /\b(with one line|wazoozle)\b/i,
           :path, common_haystack_directory_,
           :filename_patterns, EMPTY_A_,
@@ -20,8 +19,7 @@ module Skylab::SearchAndReplace::TestSupport
           :matches,
         )
 
-        _statistify
-        NIL_
+        _statistify _state
       end
 
       it "matches exist across two files" do
@@ -110,11 +108,11 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "(multiline)" do
 
-      call_by_ do
+      call_by do
 
         _path = my_fixture_tree_ '1-multiline'
 
-        call_(
+        _state = call(
           :egrep_pattern, '[a-z_]+\(',
           :ruby_regexp, /[a-z_]+\([^)]*\)/,
           :path, _path,
@@ -123,8 +121,7 @@ module Skylab::SearchAndReplace::TestSupport
           :matches,
         )
 
-        _statistify
-        NIL_
+        _statistify _state
       end
 
       _FILE = 'file-1.txt'
@@ -174,13 +171,12 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _matches_box
-      state_.freeform_value_x
+      root_ACS_customized_result
     end
 
-    def _statistify
+    def _statistify state
 
-      st = @result
-      @result = nil
+      st = state.result
 
       _Per_File = ___Per_File
 
@@ -198,9 +194,7 @@ module Skylab::SearchAndReplace::TestSupport
         for_[ ma.path ].add_match ma
       end
 
-      @freeform_state_value_x = matchbox
-
-      NIL_
+      state.to_state_with_customized_result matchbox
     end
 
     dangerous_memoize :___Per_File do

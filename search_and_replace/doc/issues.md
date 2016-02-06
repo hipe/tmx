@@ -1,3 +1,18 @@
+[#020] #if-you-like-pain (we first thought of this while implementing
+             the last of all the "re-writes" where "hybrid" entities
+             became plain old (and clean!) [#fi-007] sessions): for any
+             one of these guys (but probably the last one, "matches")
+             it would be nice if this was isomorphic with making the
+             session class as we have done: rather than that, use A)
+             a plain-old-proc in conjunction with B) its declaration
+             of a special parameter value source (like before) with C)
+             the paramers DSL (oldschool [ac] style) to stipulate which
+             of its parameters are optional. all of this can in theory
+             replace cases where we have implemented an operation with
+             a session-class that has a trivial, 1-method body..
+             but this all is an effort that at the least should start
+             in [ze] with a dedicated story-ACS.
+
 [#019] #during (or after) #milestone-8 (i.e this rewrite) (has subscribers)
 
 [#018]    #usability-enhancement - location #before:[#017]

@@ -37,11 +37,10 @@ module Skylab::SearchAndReplace
 
       @_oes_p.call :info, :grep_command_head do
 
-        _ = Callback_::Event.inline_neutral_with(
+        Callback_::Event.inline_neutral_with(
           :grep_command_head,
           :command_head, _command_string,
         )
-        _
       end
 
       @_grep_runner = gr
@@ -122,8 +121,7 @@ module Skylab::SearchAndReplace
       if _did
 
         _cmd = open_cmd.close
-        _ = @_grep_runner.line_content_stream_via_command _cmd
-        _
+        @_grep_runner.line_content_stream_via_command _cmd
       end
     end
 

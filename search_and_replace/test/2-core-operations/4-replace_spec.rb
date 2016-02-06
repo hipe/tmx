@@ -2,16 +2,16 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - (4) replace", wip: true do
+  describe "[sa] core operations - (4) replace" do
 
     TS_[ self ]
-    use :memoizer_methods
+    use :my_API
 
     shared_subject :_the_edit_session_prototype do
 
       _dir = the_wazizzle_worktree_
 
-      call_(
+      state = call(
         :ruby_regexp, /\bHAHA\b/,
         :path, _dir,
         :filename_pattern, '*',
@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace::TestSupport
         :replace,
       )
 
-      a = @result.to_a
+      a = state.result.to_a
       1 == a.length or fail
       a.fetch 0
     end

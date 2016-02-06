@@ -409,16 +409,14 @@ module Skylab::SearchAndReplace
         def __to_line_stream_when_matches
 
           _ = _to_line_sexp_array_stream_when_matches
-          _ = o::Line_stream_via_line_sexp_array_stream[ _ ]
-          _
+          o::Line_stream_via_line_sexp_array_stream[ _ ]
         end
 
         def _to_line_sexp_array_stream_when_matches
 
           o = _stream_magnetics
           _ = o::Sexp_stream_via_matches_block[ @_match_controllers, self, @_big_string ]
-          _ = o::Line_sexp_array_stream_via_sexp_stream[ _ ]
-          _
+              o::Line_sexp_array_stream_via_sexp_stream[ _ ]
         end
 
         def __to_line_stream_when_static
