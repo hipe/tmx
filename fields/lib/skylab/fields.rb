@@ -36,14 +36,21 @@ module Skylab::Fields
 
     def to_required_symbol_stream
       h = optionals_hash
-      Callback_::Stream.via_nonsparse_array( @_h.keys ).reduce_by do |sym|
-        ! h[ sym ]
+      st = Callback_::Stream.via_nonsparse_array @_h.keys
+      if h
+        st.reduce_by do |sym|
+          ! h[ sym ]
+        end
+      else
+        st
       end
     end
 
     def optionals_hash
       @_is_parsed || _parse
-      @_indexes.optionals
+      if @_indexes
+        @_indexes.optionals
+      end
     end
 
     def symbols * sym

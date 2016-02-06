@@ -6,34 +6,30 @@ module Skylab::SearchAndReplace
       "the grep --count option - \"Only a count of selected lines ..\""
     end
 
-    def initialize fbg, nf
+    PARAMETERS = Parameters_[
+      files_by_grep: nil,
+    ]
+    attr_writer( * PARAMETERS.symbols )
 
-      @_files_by_grep = fbg
-      @name_ = nf
+    def initialize & oes_p
+      @_oes_p = oes_p
     end
 
-    attr_reader(
-      :name_,
-    )
-
-    def interpret_component st, & pp
-
-      if st.no_unparsed_exists
-
-        Callback_::Bound_Call[ nil, dup, :___to_stream_with_summary, & pp ]
-      end
+    def with__files_by_grep__ o  # [#ac-027]#A (synax might change)
+      o.for = :counts
+      o.execute
     end
 
-    def ___to_stream_with_summary & pp
+    def execute
 
-      st = ___to_count_stream( & pp )
-      if st
+      st = @files_by_grep
+      _oes_p = @_oes_p
+      # -
 
         tot_paths = 0 ; tot_matches = 0
 
         summarize = -> do
           summarize = EMPTY_P_
-          _oes_p = pp[ self ]
           _oes_p.call :info, :expression, :summary do | y |
 
             _ = plural_noun tot_matches, 'match'
@@ -55,18 +51,12 @@ module Skylab::SearchAndReplace
           end
           o
         end
-      else
-        st
-      end
+      # -
     end
 
-    def ___to_count_stream & pp
-
-      @_files_by_grep.to_file_path_stream(
-        :for, :counts,
-        & pp )
+    def handle_event_selectively_for_zerk
+      @_oes_p
     end
   end
 end
-
 # #history: this splintered off of node [#003]

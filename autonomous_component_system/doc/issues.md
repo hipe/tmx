@@ -14,6 +14,9 @@
 
              (if this breaks out into its own file, see comments this commit)
 
+             :#A is custom execution of the [#fi-007] session, amounting
+             to a system-private API. this tracks patterns near that.
+
 [#026]       for now, if an association is `is_singular_of` another
              association, *by the storage implementation* (ivars)
              the singular form of actual value is stored in the storage

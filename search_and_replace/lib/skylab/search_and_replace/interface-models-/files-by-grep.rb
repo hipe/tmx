@@ -13,6 +13,10 @@ module Skylab::SearchAndReplace
     ]
     attr_writer( * PARAMETERS.symbols )
 
+    attr_writer(  # [#ac-027]#A - system-private API
+      :for,
+    )
+
     def initialize & oes_p
 
       @do_highlight = nil
@@ -37,7 +41,7 @@ module Skylab::SearchAndReplace
       o.execute
     end
 
-    def handle_event_selectively_for_ACS  # because [#ac-027]
+    def handle_event_selectively_for_zerk  # because [#ac-027]
       @_oes_p
     end
   end

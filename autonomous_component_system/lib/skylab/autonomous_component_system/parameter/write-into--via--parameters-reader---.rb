@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
 
         _rdr = n11n.release_parameters_value_reader__
 
-        hrdr = _rdr.to_hot_reader__( & sess.handle_event_selectively_for_ACS )
+        hrdr = _rdr.to_hot_reader_for_ACS_for__ sess
 
         _rdr_p = -> k, & else_p do
 

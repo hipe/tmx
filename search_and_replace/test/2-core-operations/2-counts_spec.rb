@@ -2,18 +2,16 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - (2) counts", wip: true do
+  describe "[sa] core operations - (2) counts" do
 
     TS_[ self ]
-
-    def self.call_by_
-    end
+    use :my_API
 
     context 'normal case' do
 
-      call_by_ do
+      call_by do
 
-        call_(
+        state = call(
           :ruby_regexp, /[ ]/,
           :path, common_haystack_directory_,
           :filename_patterns, EMPTY_A_,
@@ -21,10 +19,10 @@ module Skylab::SearchAndReplace::TestSupport
           :counts,
         )
 
+        a = state.result  # see next method (normally it's a stream)
+
         # eek sort of normalize the result we get back from `find` in a way
         # that hopefully won't break when files are added in the future ..
-
-        a = @result.to_a
 
         h = { 'one': 0, 'three': 1 }
         other = h.length - 1
@@ -39,9 +37,18 @@ module Skylab::SearchAndReplace::TestSupport
           end
         end
 
-        @freeform_state_value_x = a
-        @result = nil
-        NIL_
+        state.to_state_with_customized_result a
+      end
+
+      def root_ACS_state_via result, acs
+
+        # kinda nasty - because the "summary" event doesn't fire until once
+        # we exhaust the stream, and we can't emit any events once the event
+        # log has closed, then we must exhaust the stream before the event
+        # log closes. so we exhaust the stream by flushing it to an array
+        # before the "expect event" library closes the log & makes the state.
+
+        super result.to_a, acs
       end
 
       it "each structure has count (grep-style, number of matches per file)" do
@@ -58,7 +65,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "none of the matches had zero or less" do
 
-        _no = state_.freeform_value_x.detect do | sct |
+        _no = root_ACS_customized_result.detect do |sct|
           sct.count < 1
         end
 
@@ -66,11 +73,11 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def _first
-        state_.freeform_value_x.fetch 0
+        root_ACS_customized_result.fetch 0
       end
 
       def _second
-        state_.freeform_value_x.fetch 1
+        root_ACS_customized_result.fetch 1
       end
     end
   end

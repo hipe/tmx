@@ -154,7 +154,7 @@ module Skylab::Autonomous_Component_System
         # -- experimental -
         #    expose these four datapoints so this actually looks like a bound
         #    call (for [ze]) BUT look at everything you lose (before hooks
-        #    and after hooks..)
+        #    and after hooks..) (used by [ze])
 
         def bound_call
           @_bound_call

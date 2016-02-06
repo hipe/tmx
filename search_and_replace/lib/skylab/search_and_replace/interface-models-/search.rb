@@ -36,14 +36,15 @@ module Skylab::SearchAndReplace
       Interface_Models_::Files_by_Grep
     end
 
-    if false
-
     def __counts__component_operation
 
-      yield :unavailability, @_common_unav
+      yield :unavailability, @_zerk_index_.unavailability_proc
+      yield :parameters_from, @_zerk_index_.reader_proc
 
       Interface_Models_::Counts
     end
+
+    if false
 
     def __matches__component_operation
 

@@ -34,7 +34,7 @@ module Skylab::SearchAndReplace
       end
     end
 
-    def handle_event_selectively_for_ACS  # for [#ac-027]
+    def handle_event_selectively_for_zerk  # for [#ac-027]
       @_oes_p
     end
   end

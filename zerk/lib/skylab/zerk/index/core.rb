@@ -7,6 +7,7 @@ module Skylab::Zerk
     # autonomous) nodes, they need to do traversals to determine their
     # availabilty and to assemble their arguments. this facilitates the
     # traversal and experiments with the caching of same. (very near [#ac-027])
+    # now with better circular-dependeny checking.
 
     def initialize acs, parent_index=nil
 
@@ -19,7 +20,7 @@ module Skylab::Zerk
       @reader_proc = -> { self }  # because we provide •here
 
       @unavailability_proc = -> asq do
-        _state = __for_assembly_touch_formal asq
+        _state = __cached_state_procedurally asq
         _state._cached_unavailability_proc
       end
 
@@ -33,10 +34,10 @@ module Skylab::Zerk
       :unavailability_proc,
     )
 
-    # -- only as value reader (b.c :here)
+    # -- we have one method to implement b.c :here
 
-    def to_hot_reader__ & oes_p
-      Hot_Reader___.new self, & oes_p
+    def to_hot_reader_for_ACS_for__ sess
+      Hot_Reader___.new sess, self, & sess.handle_event_selectively_for_zerk
     end
 
     # --
@@ -47,44 +48,16 @@ module Skylab::Zerk
 
     # --
 
-    def __for_assembly_touch_formal fo
-
-      k = fo.name_symbol
-
-      if @_cache[ k ]
-        self._CRAY_fun
-      end
-
-      @_cache[ k ] = :_CIRCULAR_
-
-      entry = __build_entry_for_op_as_requested fo
-
-      @_cache[ k ] = entry
-
-      entry
-    end
-
-    def __build_entry_for_op_as_requested fo
-
-      # in the formal operation's definition it has requested that we do
-      # the work of determining if the operation is available..
-
-      _pz = fo.reifier.moduleish::PARAMETERS
-      _st = _pz.to_required_symbol_stream
-
-      unava_p_a = _accumulate_unavailabilities _st
-
-      if unava_p_a
-        Entry_for_Net_Unavailable_Formal_Operation___.new unava_p_a, fo
-      else
-        Entry_for_Available_Formal_Operation__.new fo
-      end
-    end
-
     def unavailability_by_stated_dependency asc, * sym_a
 
       # we can't cache anything for the asc itself because part of the
       # cache's key would need to be all the argument symbols too..
+
+      k = asc.name_symbol
+      en = @_cache[ k ]
+      if en
+        self._WHAT  # this suggests we're doing it wrong
+      end
 
       _st = Callback_::Stream.via_nonsparse_array sym_a
       unava_p_a = _accumulate_unavailabilities _st
@@ -97,9 +70,9 @@ module Skylab::Zerk
 
       unava_p_a = nil
       begin
-        sym = st.gets
-        sym or break
-        _state = _cached_state sym
+        k = st.gets
+        k or break
+        _state = _cached_state_recursively k
         unava_p = _state._cached_unavailability_proc
         if unava_p
           ( unava_p_a ||= [] ).push unava_p
@@ -109,129 +82,243 @@ module Skylab::Zerk
       unava_p_a
     end
 
-    def __build_and_cache_entry_for_op_from_the_outside fo
+    def _cached_state_recursively k, stack=nil
 
-      # when (for example) an op "requires" another op, we need to defer
-      # to that other op's own representation of whether or not it is
-      # available, rather than just recursing to the above here and now.
-
-      unava = fo.unavailability
-      entry = if unava
-        self._NEAT
+      en = @_cache[k]
+      if en
+        if en.in_progress
+          self._EEK
+        else
+          en
+        end
       else
-        Entry_for_Available_Formal_Operation__.new fo
-      end
-      @_cache[ fo.name_symbol ] = entry
-      entry
-    end
-
-    def _cached_state k
-
-      had = true
-      x = @_cache.fetch k do
-        @_cache[ k ] = :_CIRCULAR_2_
-        had = false
-      end
-      if had
-        x
-      else
-        ___maybe_build_and_cache_entry_for k
+        asq = ___read_association_here k
+        if asq
+          _build_and_cache_state_for_asq_found_here asq, stack, false
+        elsif @_next
+          __read_and_cache_from_towards_root k, stack
+        else
+          self._COVER_ME_reached_root_without_finding_association
+        end
       end
     end
 
-    def ___maybe_build_and_cache_entry_for k
+    def ___read_association_here k
 
       rdr = @_rdr[]
-      asc = rdr.read_association k
-      if asc
-        __build_and_cache_entry_for_association asc
-      else
 
+      @_cache[ k ] = READING___
+      asq = rdr.read_association k
+      if ! asq
         fo_p = rdr.read_formal_operation k
         if fo_p
           _nf = Callback_::Name.via_variegated_symbol k
-          _fo = fo_p[ [ rdr, _nf ] ]
-          __build_and_cache_entry_for_op_from_the_outside _fo
-        else
-          ___maybe_build_and_cache_by_looking_upwards k
+          asq = fo_p[ [ rdr, _nf ] ]
         end
       end
+      @_cache[ k ] = nil
+      asq
     end
 
-    def ___maybe_build_and_cache_by_looking_upwards k
+    READING___ = :_reading_
 
-      if @_next
+    def __cached_state_procedurally asq
+      _build_and_cache_state_for_asq_found_here asq, nil, true
+    end
 
-        state = @_next._cached_state k
-        state or self._SANITY
+    def _build_and_cache_state_for_asq_found_here asq, stack, is_procedural
 
-        # NOTE - we're gonna cache these here now in addition to the
-        # presumable caching that the parent index does. when the time comes
-        # to #stale-the-cache near #milestone-7, then it's more to have to
-        # stale..
+      k = asq.name_symbol
 
-        @_cache[ k ] = state
-        state
-      else
-        self._COVER_ME_association_not_found_anywhere_upwards
+      bs = BUILD_STATE___.fetch( asq.associationesque_category ).new(
+        asq, stack, self, is_procedural )
+
+      @_cache[ k ] = bs
+      state = bs.execute
+      @_cache[ k ] = state
+      state
+    end
+
+    def __read_and_cache_from_towards_root k, stack
+
+      # NOTE - we're gonna cache these here now in addition to the
+      # presumable caching that the parent index does. when the time comes
+      # to #stale-the-cache near #milestone-7, then it's more to have to
+      # stale..
+
+      state = @_next._cached_state_recursively k, stack
+      @_cache[ k ] = state
+      state
+    end
+
+    # -- only for "build state"
+
+    def __reader
+      @_rdr[]
+    end
+
+    o = {}
+
+    class Build_State__
+
+      # assume that the cache is locked with us as the entry
+
+      # the "procedurally" flag means that this request to build state
+      # came at the behest of one of the callbacks in the selfsame definition
+      # of the associationesque, so we should not descend into that callback
+      # again.
+
+      def initialize asq, stack, index, is_procedural
+
+        _k = asq.name_symbol
+
+        @_stack = if stack
+          [ * stack, _k ]
+        else
+          [ _k ]
+        end
+
+        @_be_procecural = is_procedural
+        @_index = index
+      end
+
+      def in_progress
+        true
       end
     end
 
-    def __build_and_cache_entry_for_association asc
+    o[ :association ] =
+    class Build_Association_State____ < Build_State__
 
-      # assume the association represents a required component (for someone).
-      # for determining any unavailability of the might-be component, we
-      # first check if the association signals that the component is
-      # unavailable. otherwise (and it's available), we use the knownness and
-      # any known value of the component to determine unavailability - for a
-      # component to be available it must be set and not nil.
+      def initialize( asq, * )
+        super
+        @_asc = asq
+      end
 
-      unava_p = asc.unavailability
+      def execute
 
-      entry = if unava_p
-        self._FUN_AND_EASY
-        Entry_for_Unavailable___.new unava_p
-      else
+        # assume the association represents a required component (for someone).
+        # for determining any unavailability of the might-be component, we
+        # first check if the association signals that the component is
+        # unavailable..
 
-        _rdr = @_rdr[]
-        kn = _rdr.read_value asc
+        if @_be_procecural
+          self._COVER_ME_never_needed_procedural_for_assoc_before
+        end
 
-        if kn.is_effectively_known
+        unava_p = @_asc.unavailability
+        if unava_p
+          self._FUN_AND_EASY
+          EG_Entry_for_Unava___.new unava_p, @_asc
+        else
+          ___build_state_for_available_asc
+        end
+      end
+
+      def ___build_state_for_available_asc
+
+        # ..otherwise (and it's available), we use the knownness and any known
+        # value of the component to determine unavailability: for a component
+        # to be available it must be set and not nil.
+
+        kn = @_index.__reader.read_value @_asc
+
+        _no = if kn.is_effectively_known  # if it is set and not nil
           Require_field_library_[]
-          if Fields_::Takes_many_arguments[ asc ]
-            if kn.value_x.length.zero?
-              effectively_unknown = true
+          if Fields_::Takes_many_arguments[ @_asc ]
+            if kn.value_x.length.zero?  # if it is the empty array
+              true
             end
           end
         else
-          effectively_unknown = true
+          true  # it is nil or not set
         end
 
-        if effectively_unknown
-          ___build_entry_for_missing_required_component asc
+        if _no
+          ___build_entry_for_missing_required_component
         else
           Entry_for_Effectively_Known___.new kn
         end
       end
-      @_cache[ asc.name_symbol ] = entry
-      entry
-    end
 
-    def ___build_entry_for_missing_required_component asc
+      def ___build_entry_for_missing_required_component
 
-      nf = asc.name
+        nf = @_asc.name
 
-      _unava_p = -> do
-        _ev_p = -> y do
-          y << "required component not present: #{ nm nf }"
+        _unava_p = -> do
+          _ev_p = -> y do
+            y << "required component not present: #{ nm nf }"
+          end
+          [ :error, :expression, :required_component_not_present, _ev_p ]
         end
-        [ :error, :expression, :required_component_not_present, _ev_p ]
+
+        Entry_for_Effectively_Unknown___.new _unava_p, @_asc
       end
 
-      Entry_for_Effectively_Unknown___.new _unava_p, asc
+      self
     end
 
-    class Entry_for_Net_Unavailable_Formal_Operation___
+    o[ :formal_operation ] =
+    class Build_Formal_Operation_State____ < Build_State__
+
+      def initialize( fo, * )
+        super
+        @_fo = fo
+      end
+
+      def execute
+        if @_be_procecural
+          __build_state_for_op_procedurally
+        else
+          ___build_state_for_op_autonomously
+        end
+      end
+
+      def ___build_state_for_op_autonomously
+
+        # when (for example) an op "requires" another op, we need to defer
+        # to that other op's own representation of whether or not it is
+        # available, rather than just recursing to the above here and now.
+
+        unava = @_fo.unavailability
+        if unava
+          self._NEAT
+        else
+          Entry_for_Available_Formal_Operation__.new @_fo
+        end
+      end
+
+      def __build_state_for_op_procedurally
+
+        # in the formal operation's definition it has requested that we do
+        # the work of determining if the operation is available..
+
+        _ = @_fo.reifier.moduleish::PARAMETERS
+        _st = _.to_required_symbol_stream
+
+        unava_p_a = @_index._accumulate_unavailabilities _st
+
+        if unava_p_a
+          Entry_for_Net_Unavailable_Formal_Operation___.new unava_p_a, @_fo
+        else
+          Entry_for_Available_Formal_Operation__.new @_fo
+        end
+      end
+
+      self
+    end
+
+    BUILD_STATE___ = o
+
+    # --
+
+    class Bruh__
+      def in_progress
+        false
+      end
+    end
+
+    class Entry_for_Net_Unavailable_Formal_Operation___ < Bruh__
 
       def initialize unava_p_a, fo
         @_fo = fo
@@ -255,7 +342,7 @@ module Skylab::Zerk
       end
     end
 
-    class Entry_for_Available_Formal_Operation__
+    class Entry_for_Available_Formal_Operation__ < Bruh__
 
       def initialize fo
         @_formal = fo
@@ -276,7 +363,7 @@ module Skylab::Zerk
       end
     end
 
-    class Entry_for_Effectively_Unknown___
+    class Entry_for_Effectively_Unknown___ < Bruh__
 
       def initialize unava_p, asc
         @_asc = asc
@@ -300,7 +387,7 @@ module Skylab::Zerk
       end
     end
 
-    class Entry_for_Effectively_Known___
+    class Entry_for_Effectively_Known___ < Bruh__
 
       def initialize kn
         @_kn = kn
@@ -330,16 +417,17 @@ module Skylab::Zerk
       # [#ac-027] zerk-like operations the act of "reading values" can
       # potentially involve executing operations, which requires hotness.
 
-      def initialize idx, & oes_p
+      def initialize sess, idx, & oes_p
         @_index = idx
+        @_session = sess
         @_oes_p = oes_p
       end
 
-      def read_value_via_symbol__ sym # result must be a knownness
+      def read_value_via_symbol__ k  # result must be a knownness
 
         # here's a move we don't dare attempt in the reader/writer..
 
-        entry = @_index._cached_state sym
+        entry = @_index._cached_state_recursively k
         if entry._is_formal_operation
           if entry._was_available
             ___read_value_of_operation entry
@@ -355,8 +443,15 @@ module Skylab::Zerk
 
         deliv = entry._formal.deliverable_as_is( & @_oes_p )
         if deliv
-          rslt = deliv.deliver
-          send :"__knownness_when__#{ rslt.delivery_status }__", rslt
+
+          m = :"with__#{ entry._formal.name_symbol }__"  # begin [#ac-027]#A
+
+          if @_session.respond_to? m
+            __knownness_for_customly_execute m, deliv
+          else
+            rslt = deliv.deliver
+            send :"__knownness_when__#{ rslt.delivery_status }__", rslt
+          end
         else
           self._NEVER_HAPPENED_BEFORE_but_OK
           Callback_::KNOWN_UNKNOWN
@@ -365,6 +460,16 @@ module Skylab::Zerk
 
       def __knownness_when__delivery_succeeded__ rslt
         Callback_::Known_Known[ rslt.delivery_value ]
+      end
+
+      def __knownness_for_customly_execute m, deliv
+
+        x = @_session.send m, deliv.bound_call.receiver
+        if x
+          Callback_::Known_Known[ x ]
+        else
+          self._ETC_easy
+        end
       end
     end
 

@@ -44,6 +44,7 @@ module Skylab::Autonomous_Component_System
         # (if your parameters include a false-ish key, shame on you)
 
         op_h = @_pfoz.optionals_hash
+        op_h ||= MONADIC_EMPTINESS_
 
         Callback_::Stream.via_nonsparse_array( @_pfoz.symbols ).map_by do |sym|
 
