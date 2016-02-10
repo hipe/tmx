@@ -248,7 +248,7 @@ module Skylab::BeautySalon
 
       TRIM_RX__ = /\A \# [ \t]*  ( | [^ \t]+ (?: [ \t]+[^ \t]+ )*  )  [ \t]* \r?\n  \z/x
 
-      def content_string
+      def line_string
         @content_s
       end
 
@@ -271,12 +271,12 @@ module Skylab::BeautySalon
         scn = Callback_::Stream.via_nonsparse_array @a
         cs = scn.gets
         if cs
-          s = cs.content_string
+          s = cs.line_string
           a = [ s ]
           was_connector = CONNECTOR_RX__ =~ s
         end
         while cs = scn.gets
-          s = cs.content_string
+          s = cs.line_string
           if ! was_connector
             a.push SPACE_
           end

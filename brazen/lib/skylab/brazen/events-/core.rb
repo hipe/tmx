@@ -278,7 +278,7 @@ module Skylab::Brazen
       end
     end
 
-    class SubPhrase___
+    class SubPhrase___  # #[#hu-046] phrase assembler (this is the first)
 
       include SubPhrase_Methods__
 

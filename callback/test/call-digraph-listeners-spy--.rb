@@ -48,17 +48,23 @@ module Skylab::Callback::TestSupport
 
       def initialize ss, pl
 
-        @payload_x = pl
+        @_payload_x = pl
         @stream_symbol = ss
       end
 
-      attr_reader :payload_x, :stream_symbol
+      def to_a  # e.g for pretty debugging output
+        [ @stream_symbol, @_payload_x ]
+      end
+
+      def produce_line_content_string
+        @_payload_x
+      end
+
+      attr_reader(
+        :stream_symbol,
+      )
 
       alias_method :channel_x, :stream_symbol
-
-      def to_a  # e.g for pretty debugging output
-        [ @stream_symbol, @payload_x ]
-      end
     end
 
     # ~ retrieving and deleting emissions

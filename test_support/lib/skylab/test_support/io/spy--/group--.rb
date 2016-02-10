@@ -172,20 +172,18 @@ module Skylab::TestSupport
     class Line___  # #[#007]
 
       def initialize stream_symbol, string
-        @stream_symbol = stream_symbol ; @string = string
-      end
-
-      attr_reader :stream_symbol, :string
-
-      alias_method :channel_x, :stream_symbol
-
-      def payload_x
-        @string.chop
+        @stream_symbol = stream_symbol
+        @string = string
       end
 
       def to_a
         [ @stream_symbol, @string ]
       end
+
+      attr_reader(
+        :stream_symbol,
+        :string,
+      )
     end
 
   public

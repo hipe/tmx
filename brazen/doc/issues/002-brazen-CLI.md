@@ -242,21 +242,3 @@ the clientstream will know *that* this formal property was engaged by virtue
 of the existence of the known known. to know *whether* the one form or
 the other was used it can infer this from the true-ish-ness of the
 value.
-
-
-
-
-## :#GEC - generated event contextualizations
-
-this has now become a "redundancy pool" with:
-
-  • [#hu-043] the API Action inflection hack (a "feature island") -AND-
-
-  • our [#083], a "feature island" -AND-
-
-  • [#ac-007] a small implementation there (the newest)
-
-so that's *four* implementations of pretty much the same behavior,
-with *two* that are #[#sl-134] "feature islands" meaning they have test
-coverage but aren't used anywhere in production.
-_

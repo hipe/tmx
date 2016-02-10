@@ -157,21 +157,21 @@ module Skylab::TestSupport
 
         class << self
 
-          def call content_string, parent, & oes_p
+          def call line_s, parent, & oes_p
 
-            content_string.chomp!
+            line_s.chomp!
 
             cls = md = nil
             Predicates__.constants.each do |i|
               cls = Predicates__.const_get i
-              md = cls.match content_string
+              md = cls.match line_s
               md and break
             end
 
             if md
               cls.build md, parent, & oes_p
             else
-              raise "did not match anything: #{ content_string.inspect }"
+              raise "did not match anything: #{ line_s.inspect }"
             end
           end
         end

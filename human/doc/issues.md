@@ -1,6 +1,7 @@
+[#046]       phrase assembler
 [#045] #open (in [sa] reverse-lookup for pluralized words..)
 [#044]       design patterns of expression ..
-[#043]       the API action inflection hack ..
+[#043]       contextualization !!! (was: "the API action inflection hack") ..
 [#042]       (segment on NPR - joel warner ; peter macgraw ; manatee)
 [#041]       track wishes for conjunction phrase support #universal
 [#040]       a note

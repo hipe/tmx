@@ -46,7 +46,7 @@
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
 [#090]       arity ..
-[#089] #open integrate the *four* redundancies at [#002]#GEC
+[#089] #open unify with [#hu-043]  (unify contextualization)
              ( became the ACS )
 [#088]       the meta-meta-properties justification ..
 [#087]       #track similar normalization logics
@@ -54,7 +54,7 @@
                ignored for the greater good, for usability
 [#085] #hole (#was: (#moved-to: [#ba-052]))
 [#084]       +#wishlist a `flag` meta-meta property
-[#083]       ( this #feature-island is descirbed at [#002]#GEC )
+[#083] #hole ( #moved-to: [#hu-043] contextualization )
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor
@@ -94,8 +94,7 @@
 [#065]       track stubbing hacks in the universe (for reactive model trees)
              ( #was: #track procs are always not-promoted )
              ( #was: #done implement unmarshaling for strings with newlines (git-config) )
-[#064] #hole
-             ( #was: either rename `desc` to `entity_description` or make
+[#064] #hole ( #was: either rename `desc` to `entity_description` or make
              the syntax smarter without bloating it. )
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]

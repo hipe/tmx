@@ -436,7 +436,7 @@ module Skylab::Brazen
 
       def _bound_action_via_normal_name_symbol_stream sym_st
 
-        ad_st = to_adapter_stream_
+        ad_st = to_adapter_stream
         sym = sym_st.gets_one
 
         ad = ad_st.gets
@@ -460,7 +460,7 @@ module Skylab::Brazen
         end
       end
 
-      def to_adapter_stream_
+      def to_adapter_stream  # public because "when help" which is public
 
         o = _build_adapter_producer
 
@@ -543,7 +543,7 @@ module Skylab::Brazen
 
       # --
 
-      def wrap_adapter_stream_with_ordering_buffer_ st
+      def wrap_adapter_stream_with_ordering_buffer st
         Callback_::Stream.ordered st
       end
 
@@ -601,9 +601,14 @@ module Skylab::Brazen
           sym = qkn.name_symbol
           _x = qkn.value_x
 
-          cls = ___view_controller_class_via_option_property_name_symbol sym
+          _cls = ___view_controller_class_via_option_property_name_symbol sym
+          o = _cls.new
 
-          a.push cls.new( _x, _expression, self )
+          o.command_string = _x
+          o.invocation_expression = _expression
+          o.invocation_reflection = self
+          a.push o
+
           redo
         end while nil
 
@@ -640,8 +645,8 @@ module Skylab::Brazen
         :resources,
         :receive_multiple_matching_via_adapters_and_token__,
         :receive_no_matching_via_token__,
-        :to_adapter_stream_,
-        :wrap_adapter_stream_with_ordering_buffer_,
+        :to_adapter_stream,
+        :wrap_adapter_stream_with_ordering_buffer,
         :__view_controller_class_for__help__option,
       )
 
@@ -673,14 +678,13 @@ module Skylab::Brazen
 
         prepare_for_employment_under otr
 
-        _exp = _expression
-
-        _when = When_[]::Help::For_Action.new nil, _exp, self
-
-        _when.produce_result
+        o = When_[]::Help::For_Action.new
+        o.invocation_expression = _expression
+        o.invocation_reflection = self
+        o.produce_result
       end
 
-      def to_section_stream__  # not options. see [#]/figure-3
+      def to_section_stream  # not options. see [#]/figure-3
 
         cp = @categorized_properties
         cat_st = ___to_relevant_category_stream
@@ -783,10 +787,12 @@ module Skylab::Brazen
 
         _cls = send _m  # ensure that it is explicit
 
-        _when = _cls.new nil, exp, self
+        o = _cls.new
+        o.invocation_expression = exp
+        o.invocation_reflection = self
 
         a = []
-        a.push _when
+        a.push o
 
         argv = @resources.argv
 
@@ -908,7 +914,7 @@ module Skylab::Brazen
       public(
         :didactic_argument_properties,
         :receive_show_help,
-        :to_section_stream__,
+        :to_section_stream,
         :__view_controller_class_for__help__option,
       )
     end  # action adapter
@@ -924,10 +930,10 @@ module Skylab::Brazen
       def receive_show_help otr  # as branch, contrast with leaf, see [#]note-930
 
         prepare_for_employment_under otr
-
-        When_[]::Help::For_Branch.new(
-          nil, _expression, self
-        ).produce_result
+        o = When_[]::Help::For_Branch.new
+        o.invocation_expression = _expression
+        o.invocation_reflection = self
+        o.produce_result
       end
 
       public(
@@ -1384,12 +1390,12 @@ module Skylab::Brazen
 
       def auxiliary_syntax_string_for_help_option_ help  # (iso.client)
 
-        _ = subprogram_name_string_
+        _ = subprogram_name_string
         __ = @_expression.render_property_as_option_ help
         "#{ _ } #{ __ }"
       end
 
-      def subprogram_name_string_
+      def subprogram_name_string
         write_invocation_string_parts_into( [] ) * SPACE_
       end
 
@@ -1735,7 +1741,7 @@ module Skylab::Brazen
         NIL_
       end
 
-      # -- #GEC
+      # -- the below is an inline-treatment of #[#hu-043], as #open [#089]
 
       def maybe_inflect_line_for_positivity_via_event s, ev
         if ev.verb_lexeme
@@ -1965,7 +1971,7 @@ module Skylab::Brazen
 
       # --
 
-      alias_method :option_parser__, :_option_parser  # publicize only one
+      alias_method :option_parser, :_option_parser  # publicize only one
 
       public(
         :category_for,  # [st]
@@ -1976,8 +1982,8 @@ module Skylab::Brazen
         :expression_strategy_for_category,  # [st]
         :express_invite_to_general_help,
         :expression_strategy_for_property,
-        :option_parser__,
-        :subprogram_name_string_,
+        :option_parser,
+        :subprogram_name_string,
         :write_any_auxiliary_syntax_strings_into_,
       )
 

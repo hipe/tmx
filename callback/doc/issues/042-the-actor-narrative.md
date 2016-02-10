@@ -1,4 +1,4 @@
-# the actor dream :[#066]
+# the actor dream :[#042]
 
 ## the idea
 

@@ -209,7 +209,7 @@ module Skylab::Autonomous_Component_System
 
       Write_contextual_prefix_into__ = -> phrases, expag, stack, ok_ness do
 
-        # (:[#007]. redunds with [#br-002]:GEC (see).)
+        # (:[#007]. redunds with [#hu-043] (see).)
 
         s_a = stack.map do | nf |
           nf.as_human

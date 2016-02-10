@@ -31,7 +31,7 @@ module Skylab::Brazen
 
         _primary_syntax_string = _render_main_syntax_string_didactically
 
-        _section_expression.express_section(
+        express_section(
           :header, 'usage',
           :tight,
 
@@ -53,7 +53,7 @@ module Skylab::Brazen
 
         if s_a && s_a.length.nonzero?
 
-          _section_expression.express_section(
+          express_section(
             :header, 'description',
             :tight_IFF_one_line,
 
@@ -66,13 +66,12 @@ module Skylab::Brazen
         NIL_
       end
 
-      def express_section * x_a, & x_p
-
-        _section_expression.express_section_via x_a, & x_p
-      end
-
       def option_parser
         @_option_parser
+      end
+
+      def express_options_as_actions_for_help
+        true  # in [br] we always do it this way
       end
 
       # -- for general "when" nodes
@@ -81,7 +80,7 @@ module Skylab::Brazen
 
         _primary_syntax_string = _render_main_syntax_string_didactically
 
-        _section_expression.express_section :header, 'usage', :tight do | y |
+        express_section :header, 'usage', :tight do | y |
 
           y << _primary_syntax_string  # assume
         end
@@ -91,7 +90,7 @@ module Skylab::Brazen
 
       def express_invite_to_general_help( * )
 
-        _ = @_reflection.subprogram_name_string_
+        _ = @_reflection.subprogram_name_string
         __ = Home_::CLI_Support::SHORT_HELP
         _express_invite_to "#{ _ } #{ __ }"  # eek - assumes this
       end
@@ -125,6 +124,10 @@ module Skylab::Brazen
         _sxy = _build_syntax_assembly
 
         _sxy.render_main_syntax_string_didactically
+      end
+
+      def express_section * x_a, & x_p  # used by help "when"
+        _section_expression.express_section_via x_a, & x_p
       end
 
       def _section_expression

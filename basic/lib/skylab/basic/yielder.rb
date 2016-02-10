@@ -9,41 +9,53 @@ module Skylab::Basic
         st = Callback_::Polymorphic_Stream.via_array x_a
 
         y = st.gets_one
-
-        sct = Params___.new
-        until st.no_unparsed_exists
-          sct[ st.gets_one ] = st.gets_one
-        end
-        first, subsequent = sct.to_a
-
-        subsequent_p = -> s do
-          y << subsequent[ s ]
+        if y
+          self.downstream_line_yielder = y
         end
 
-        p = -> s do
-          y << first[ s ]
-          p = subsequent_p
-        end
-
-        first_p = p
-
-        @y = ::Enumerator::Yielder.new do |s|
-          p[ s ]
-        end
-
-        @_reset = -> do
-          p = first_p ; nil
-        end
+        begin
+          instance_variable_set IVARS___.fetch( st.gets_one ), st.gets_one
+        end until st.no_unparsed_exists
       end
 
-      Params___ = ::Struct.new :first, :subsequent
+      IVARS___ = {
+        first: :@on_first_string,
+        subsequent: :@on_subsequent_string,
+      }
+
+      def initialize_copy _
+        @y = nil
+      end
+
+      def downstream_line_yielder= y
+        reset
+        @y = ::Enumerator::Yielder.new do |s|
+          send @_m, s
+        end
+        @downstream_line_yielder = y
+      end
 
       def reset
-        @_reset[]
+        @_m = :___receive_first_line ; nil
+      end
+
+      def ___receive_first_line s
+        _ = @on_first_string[ s ]
+        @downstream_line_yielder << _
+        @_m = :___receive_subsequent_line
+        NIL_
+      end
+
+      def ___receive_subsequent_line s
+        _ = @on_subsequent_string[ s ]
+        @downstream_line_yielder << _
+        NIL_
       end
 
       attr_reader(
-        :y
+        :on_first_string,
+        :on_subsequent_string,
+        :y,
       )
     end
 

@@ -234,7 +234,7 @@ module Skylab::Fields::TestSupport
         @em_a.length.should eql 1
         em = @em_a.shift
         em.stream_symbol.should eql :error
-        em.payload_x.should eql '"toff tofferson" did not match regex: /^[A-Z]/'
+        em.produce_line_content_string.should eql '"toff tofferson" did not match regex: /^[A-Z]/'
         o.first_name.should eql "Billford Brimley"
       end
 

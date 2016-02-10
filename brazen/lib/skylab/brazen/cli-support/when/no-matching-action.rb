@@ -16,9 +16,9 @@ module Skylab::Brazen
         o = @_expression
         token = @_token
 
-        _scn = @_reflection.to_adapter_stream_.reduce_by( & :is_visible )
+        _scn = @_reflection.to_adapter_stream.reduce_by( & :is_visible )
 
-        scn = @_reflection.wrap_adapter_stream_with_ordering_buffer_ _scn
+        scn = @_reflection.wrap_adapter_stream_with_ordering_buffer _scn
 
         o.express do
           "unrecognized action #{ ick token }"

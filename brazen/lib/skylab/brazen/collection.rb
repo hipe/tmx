@@ -240,6 +240,11 @@ module Skylab::Brazen
         NIL_
       end
 
+      def set_qualified_knownness_value_and_name x, nf
+        @qualified_knownness =
+          Callback_::Qualified_Knownness.via_value_and_association x, nf
+      end
+
       def execute
 
         x = @qualified_knownness.value_x

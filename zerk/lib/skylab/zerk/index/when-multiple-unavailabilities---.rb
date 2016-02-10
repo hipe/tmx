@@ -47,3 +47,4 @@ module Skylab::Zerk
     end
   end
 end
+# #open [#024] redundancy

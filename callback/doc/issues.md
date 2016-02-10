@@ -1,4 +1,3 @@
-[#066]       #track implementations of recursive context (e.g [ac])
 [#065]       when expect-event is rewritten.. (notify these guys)
 [#064]    #to-explore imagine threads, etc
 [#063]       #tracking in-situ, also, wishlist: "struct-like". imagine:

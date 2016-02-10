@@ -54,6 +54,7 @@ module Skylab::Zerk
     end
 
     def __accept_resources sin, sout, serr, pn_s_a
+      self._THIS_aint_finished
       @sin
     end
 

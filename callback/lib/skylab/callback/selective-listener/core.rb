@@ -118,11 +118,12 @@ module Skylab::Callback
 
       def initialize i_a, x
         i_a.frozen? or fail "i_a must be frozen"
-        @channel_i_a = i_a ; @payload_x = x
+        @channel_i_a = i_a
+        @_playload_x = x
         freeze
       end
 
-      attr_reader :channel_i_a, :payload_x
+      attr_reader :channel_i_a
 
       alias_method :channel_x, :channel_i_a
     end

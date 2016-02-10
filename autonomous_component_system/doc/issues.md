@@ -1,3 +1,19 @@
+[#031]       a "selection stack" is effectively (when complete) a reference
+             pointing to a "fully qualified" formal operation ("action" in
+             [br]).
+
+             • it's typically an array (but may be a [#ba-002]#LL linked list)
+             • it always has at least a "root" item (representing the start)
+             • when complete the top item represents the formal operation
+             • every item but the root item must produce a [#ca-060] `name`
+             • when complete it is always at least two items long
+
+             the selection stack can be used both in the fancy [#hu-043]
+             contextualization of emissions, and it can be used in
+             assembling a prepared, callable operation.
+
+[#030]       kind of nasty API point near formal op building (in-situ)
+
 [#029]       [ stream via platform params ..]
 
 [#028]       parameters normalize..
@@ -30,8 +46,13 @@
              application, these are areas that make calculations redudantly.
 
 [#022]       [ reader-writer ] AND theory..
-[#021]       [ contextualization of expression emissions ]  #[#ca-066]
-[#020]       [ contextualization of event structures ]  #[#ca-066]
+
+[#021] #open investigate for de-duping near #[#hu-043]
+             [ contextualization of expression emissions ]
+
+[#020] #open investigate for de-duping near #[#hu-043]
+             [ contextualization of event structures ]
+
 [#019]       [ intent ]
 [#018]       [ load ticket ]  (as a concept)
 [#017]       #when: [#010] finally look at keyword args
@@ -57,7 +78,9 @@
 
 [#008]   #possible-feature extension API for the *modifiers* for use in mutation sessions
              (we're not sure we want this yet. this just tracks the idea.)
-[#007]       our take on [#br-002]#GEC (see)
+
+[#007] #open our take on [#hu-043]
+
 [#006]       construction, composition and eventing ..
 [#005]       the master list of sections ..
 [#004]       thoughts on ACS isomorphisms ..

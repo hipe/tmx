@@ -44,7 +44,7 @@ module Skylab::Brazen
 
       def ___add_invocation_string_parts
 
-        s = @_reflection.subprogram_name_string_
+        s = @_reflection.subprogram_name_string
         if s
           @_parts.push s
         end

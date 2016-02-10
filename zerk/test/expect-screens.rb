@@ -242,11 +242,11 @@ module Skylab::Zerk::TestSupport
       end
 
       def __all_lines
-        @___all_lines ||= _to_stream_line_stream( & :content_string ).to_a
+        @___all_lines ||= _to_stream_line_stream( & :line_string ).to_a
       end
 
       def to_content_line_stream_on sym
-        _to_stream_line_stream_on( sym ).map_by( & :content_string )
+        _to_stream_line_stream_on( sym ).map_by( & :line_string )
       end
 
       def _to_stream_line_stream_on sym
@@ -270,7 +270,7 @@ module Skylab::Zerk::TestSupport
         if :serr != o.stream_symbol
           self._LAST_LINE_SHOULD_ALWAYS_BE_ON_SERR
         end
-        Hotstring_Index___.new( o.content_string )  # ..
+        Hotstring_Index___.new( o.line_string )  # ..
       end
 
     # -- writers (while open only)
@@ -384,7 +384,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    Stream_Line__ = ::Struct.new :content_string, :stream_symbol
+    Stream_Line__ = ::Struct.new :line_string, :stream_symbol
       # #[#ts-007] (2 of 2 in universe)
 
     class Button_Set_Matcher__
