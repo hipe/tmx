@@ -28,7 +28,7 @@ module Skylab::Human
         NIL_
       end
 
-      Classically___ = Callback_::Lazy.call do
+      Classically___ = Lazy_.call do
         o = Classifier___.new
         o.on_failed = Classically_Failed___
         o.on_neutralled = Classically_Neutraled___

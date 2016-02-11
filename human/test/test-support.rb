@@ -30,7 +30,7 @@ module Skylab::Human::TestSupport
 
     def memoize_ sym, & p
 
-      define_method sym, Home_::Callback_.memoize( & p )
+      define_method sym, Callback_.memoize( & p )
     end
   end
 
@@ -47,7 +47,9 @@ module Skylab::Human::TestSupport
     end
   end
 
-  EMPTY_A_ = [].freeze
   Home_ = ::Skylab::Human
+
+  Callback_ = Home_::Callback_
+  EMPTY_A_ = [].freeze
   NIL_ = nil
 end

@@ -20,7 +20,11 @@ module Skylab::Human
         NIL_
       end
 
-      def build_string__
+      def add_space
+        @_tokens.push Spacer___[] ; nil
+      end
+
+      def build_string_
 
         st = Callback_::Stream.via_nonsparse_array @_tokens
         tok = st.gets
@@ -42,6 +46,15 @@ module Skylab::Human
           @s = s
         end
         attr_reader :s
+      end
+
+      Spacer___ = Lazy_.call do
+        class Spacer____
+          def s
+            NOTHING_
+          end
+          self
+        end.new
       end
     end
   end

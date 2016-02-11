@@ -114,14 +114,24 @@ module Skylab::Basic
           alias_method :call, :_call
         end
 
-        _P = '.?!:'
-        _P_ = "[#{ _P }]*"
+        pnct = ".?!:"
+        pnct_nl = "#{ pnct }\r\n"
+
+        body = "(?<body> .* [^#{ pnct_nl }])? (?<close> [#{ pnct }]*"
+        body_ = " [\r\n]*)"
+
         UNPARENTHESIZE_RX___ = /\A(?:
-          (?<open> \( )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }\) ) |
-          (?<open> \[ )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }\] ) |
-          (?<open>  < )  (?<body> .*[^#{ _P }] )?  (?<close> #{ _P_ }>  ) |
-                         (?<body> .+[^#{ _P }] )   (?<close> [#{ _P }]+ )
+          (?<open> \( ) #{ body } \) #{ body_ } |
+          (?<open> \[ ) #{ body } \] #{ body_ } |
+          (?<open> <  ) #{ body }  > #{ body_ } |
+          (?<body> .* [^#{ pnct_nl }])? (?<close> [#{ pnct }\r\n]+ )
         )\z/x
+
+        # that last phrase is: match zero or more chars whose any last
+        # character is something other than a punctuation or newline-esque.
+        # also, after that match *one* or more characters that *are* in
+        # this same set. note this parses "foo\n" and "\n".
+
       end
     end
   end

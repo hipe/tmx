@@ -1592,7 +1592,7 @@ module Skylab::Brazen
         class Emission_Interpreter____ < Callback_::Emission::Interpreter
 
           def __expression__ i_a, & x_p
-            _ :"receive__#{ i_a[ 0 ] }__expression", i_a[ 2 .. -1 ], & x_p
+            _ :"___express_expression", i_a, & x_p
           end
 
           def __data__ i_a, & x_p
@@ -1607,124 +1607,72 @@ module Skylab::Brazen
         end
       end
 
-      def __receive_data_emission i_a, & x_p  # publicize whenever
+      def ___express_expression i_a, & y_p
 
-        # NOTE below signature is :+#experimental. we may later omit the channel
+        if :payload == i_a.first
+          __express_emission_to_payload i_a, & y_p
+        else
+          _emit_contextualizable_non_payload_emission i_a, & y_p
+        end
+      end
+
+      def receive_event_on_channel ev, i_a  # #public-API  [cm] [gv]
+
+        if :payload == i_a.first
+          _express_event_to_payload ev
+        else
+          _emit_contextualizable_non_payload_emission( i_a ) { ev }
+        end
+      end
+
+      def receive_conventional_emission i_a, & ev_p  # #public-API [cm]
+
+        if :payload == i_a.first
+          _express_event_to_payload ev_p[]
+        else
+          _emit_contextualizable_non_payload_emission i_a, & ev_p
+        end
+      end
+
+      def _express_event_to_payload ev
+
+        _y = outbound_line_yielder_for__payload__
+        ev.express_into_under _y, expression_agent
+        UNRELIABLE_
+      end
+
+      def __express_emission_to_payload i_a, & y_p
+
+        _y = outbound_line_yielder_for__payload__
+        expression_agent.calculate _y, & y_p
+        UNRELIABLE_
+      end
+
+      def _emit_contextualizable_non_payload_emission i_a, & x_p
+
+        o = Home_.lib_.human::NLP::EN::Contextualization.new
+        o.expression_agent = expression_agent
+        o.line_yielder = _info_line_yielder
+        o.express_emission i_a, & x_p
+
+        __init_exitstatus_and_send_invite_via_c15n o
+
+        UNRELIABLE_
+      end
+
+      def __receive_data_emission i_a, & x_p  # [cm]
+
+        # this hooks out to methods the client itself must define.
+        # NOTE below is #experimental - we may later omit the channel
 
         send :"receive__#{ i_a.fetch( 2 ) }__data", i_a, & x_p
       end
 
-      def receive__error__expression sym, & msg_p
-
-        receive_negative_event _event_via_expression( false, sym, & msg_p )
-      end
-
-      def receive__info__expression sym, & msg_p
-
-        receive_neutral_event _event_via_expression( nil, sym, & msg_p )
-      end
-
-      def receive__payload__expression sym, & msg_p
-
-        receive_payload_event _event_via_expression( true, sym, & msg_p )
-      end
-
-      def _event_via_expression ok, sym, & msg_p
-
-        Callback_::Event.inline_with sym, :ok, ok do | y, _ |
-          instance_exec y, & msg_p
-        end
-      end
-
-      def receive_conventional_emission i_a, & ev_p  # :+#public-API
-
-        if ev_p
-          receive_event_on_channel ev_p[], i_a
-        else
-          self._COVER_ME_emission_does_not_comply_to_this_modality
-        end
-      end
-
-      def receive_event_on_channel ev, i_a  # :+#public-API
-
-        ev_ = ev.to_event
-
-        has_OK_tag = if ev_.has_member :ok
-          ok_x = ev_.ok
-          true
-        end
-
-        if has_OK_tag && ! ok_x.nil?
-          if ok_x
-            if ev_.has_member :is_completion and ev_.is_completion
-              receive_completion_event ev
-            elsif :payload == i_a.first  # or ! ev.verb_lexeme
-              receive_payload_event ev
-            else
-              receive_positive_event ev
-            end
-          else
-            receive_negative_event ev
-          end
-        else
-          receive_neutral_event ev
-        end
-      end
-
-      def receive_positive_event ev
-        ev_ = ev.to_event
-        a = render_event_lines ev
-        s = inflect_line_for_positivity_via_event a.first, ev
-        s and a[ 0 ] = s
-        send_non_payload_event_lines_with_redundancy_filter a
-        maybe_use_exit_status_via_OK_or_not_OK_event ev_
-        NIL_
-      end
-
-      def receive_negative_event ev
-        a = render_event_lines ev
-        s = maybe_inflect_line_for_negativity_via_event a.first, ev
-        s and a[ 0 ] = s
-        send_non_payload_event_lines_with_redundancy_filter a
-        send_invitation ev
-        maybe_use_exit_status some_err_code_for_event ev
-        NIL_
-      end
-
-      def receive_success_event ev
-        receive_completion_event ev  # while it works
-      end
-
-      def receive_completion_event ev
-        a = render_event_lines ev
-        s = maybe_inflect_line_for_completion_via_event a.first, ev
-        s and a[ 0 ] = s
-        send_non_payload_event_lines a
-        maybe_use_exit_status SUCCESS_EXITSTATUS
-        NIL_
-      end
-
-      def receive_neutral_event ev
-        a = render_event_lines ev
-        send_non_payload_event_lines a
-        maybe_use_exit_status SUCCESS_EXITSTATUS
-        NIL_
-      end
+      # --
 
       def express_invite_to_general_help
 
         _expression.express_invite_to_general_help
-      end
-
-      def receive_payload_event ev
-        send_payload_event_lines render_event_lines ev
-        maybe_use_exit_status_via_OK_or_not_OK_event ev.to_event
-      end
-
-      def receive_info_event ev
-        _a = render_event_lines ev
-        send_non_payload_event_lines _a
-        NIL_
       end
 
       def express & y_p  # [cme]
@@ -1741,137 +1689,43 @@ module Skylab::Brazen
         NIL_
       end
 
-      # -- the below is an inline-treatment of #[#hu-043], as #open [#089]
+      def render_event_lines ev  # [ts]
 
-      def maybe_inflect_line_for_positivity_via_event s, ev
-        if ev.verb_lexeme
-          inflect_line_for_positivity_via_event s, ev
-        else
-          s
-        end
+        ev.express_into_under [], expression_agent
       end
 
-      def inflect_line_for_positivity_via_event s, ev
-        if ev.respond_to? :inflected_noun
-          __ilfp s, ev
-        else
-          s
-        end
-      end
-
-      def __ilfp s, ev
-
-        open, inside, close = unparenthesize s
-
-        _mutate_by_maybe_downcasing_first inside
-
-        n_s = ev.inflected_noun
-        v_s = ev.verb_lexeme.progressive
-        gerund_phrase = "#{ [ v_s, n_s ].compact * SPACE_ }"
-
-        _inside_ = if LOOKS_LIKE_ONE_WORD_RX__ =~ inside
-          "#{ inside } #{ gerund_phrase }"
-        else
-          "while #{ gerund_phrase }, #{ inside }"
-        end
-
-        "#{ open }#{ _inside_ }#{ close }"
-      end
-
-      def maybe_inflect_line_for_negativity_via_event s, ev
-        open, inside, close = unparenthesize s
-        _mutate_by_maybe_downcasing_first inside
-        if ev.respond_to? :inflected_verb
-          v_s = ev.inflected_verb
-          lex = ev.noun_lexeme and n_s = lex.lemma
-          prefix = "couldn't #{ [ v_s, n_s ].compact * SPACE_ } because "
-        end
-        "#{ open }#{ prefix }#{ inside }#{ close }"
-      end
-
-      def maybe_inflect_line_for_completion_via_event s, ev
-        if ev.respond_to? :inflected_noun
-          __milfc s, ev
-        else
-          s
-        end
-      end
-
-      def __milfc s, ev
-
-        open, inside, close = unparenthesize s
-        _mutate_by_maybe_downcasing_first inside
-
-        if LOOKS_LIKE_ONE_WORD_RX__ =~ inside
-
-          maybe_inflect_line_for_positivity_via_event s, ev
-
-        else
-
-          n_s = ev.inflected_noun
-          v_s = ev.verb_lexeme.preterite
-
-          prefix = if n_s
-            "#{ v_s } #{ n_s }: "
-          else
-            v_s
-          end
-
-          "#{ open }#{ prefix }#{ inside }#{ close }"
-        end
-      end
-
-      LOOKS_LIKE_ONE_WORD_RX__ = /\A[a-z]+\z/
-
-      def unparenthesize s
-        LIB_.basic::String.unparenthesize_message_string s
-      end
-
-      define_method :_mutate_by_maybe_downcasing_first, -> do
-        rx = nil
-        -> s do
-          if s
-            rx ||= /\A[A-Z](?![A-Z])/
-            s.sub! rx do | s_ |
-              s_.downcase!
-            end
-            NIL_
-          end
-        end
-      end.call
-
-      def render_event_lines ev
-
-        _expag = expression_agent
-        _ = ev.express_into_under [], _expag
-        _
-      end
-
-      def send_non_payload_event_lines_with_redundancy_filter a
-        if 1 == a.length
-          s = redundancy_filter[ a.first ]
-          send_non_payload_event_lines [ s ]
-        else
-          send_non_payload_event_lines a
-        end
-      end
-
-      def redundancy_filter
-        @redundancy_filter ||= CLI_::Adapter_Expression__::Redundancy_Filter.new
-      end
-
-      def send_payload_event_lines a
-        a.each( & outbound_line_yielder_for__payload__.method( :<< ) )
-        NIL_
-      end
-
-      def send_non_payload_event_lines a
+      def send_non_payload_event_lines a  # [ts]
 
         a.each( & _info_line_yielder.method( :<< ) )
         NIL_
       end
 
-      def maybe_use_exit_status_via_OK_or_not_OK_event ev
+      def __init_exitstatus_and_send_invite_via_c15n o
+
+        ev = o.event
+        x = o.trilean.value_x
+
+        if ev
+          if x.nil?
+            maybe_use_exit_status SUCCESS_EXITSTATUS
+          else
+            ___maybe_use_exit_status_via_OK_or_not_OK_event ev.to_event
+            if false == x
+              send_invitation ev
+            end
+          end
+        elsif x
+          maybe_use_exit_status SUCCESS_EXITSTATUS
+        elsif x.nil?
+          # ..
+        else
+          maybe_use_exit_status GENERIC_ERROR_EXITSTATUS
+        end
+        NIL_
+      end
+
+      def ___maybe_use_exit_status_via_OK_or_not_OK_event ev  # NOTE:
+        # NOT for events where `ok` is nil (neutral events)
         d = _any_exit_status_for_event ev
         d or ev.ok && ( d = SUCCESS_EXITSTATUS )
         d ||= some_err_code_for_event ev

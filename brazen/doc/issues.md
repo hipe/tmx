@@ -46,7 +46,7 @@
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
 [#090]       arity ..
-[#089] #open unify with [#hu-043]  (unify contextualization)
+[#089] #hole ( #was: unify with [#hu-043]  (unify contextualization) )
              ( became the ACS )
 [#088]       the meta-meta-properties justification ..
 [#087]       #track similar normalization logics
@@ -163,7 +163,7 @@
              ( was: #parent-node: [#011] event prototype )
 [#022]       [ EDIT: document formal properties  ]
              ( #was: entity identifier. #moved-to: [#here-091] )
-             ( #was: #done obliterate `receive_negative_event` and the rest - single
+             ( #was: #done obliterate `r_eceive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false )
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host

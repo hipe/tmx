@@ -56,7 +56,7 @@ module Skylab::CodeMetrics
 
         # -- our default hook-in behavior for particular shared events
 
-        # ~ most of our events ore on the "data" channel but see #note-075
+        # ~ most of our events are on the "data" channel but see #note-075
 
         def receive_conventional_emission i_a, & ev_p
 

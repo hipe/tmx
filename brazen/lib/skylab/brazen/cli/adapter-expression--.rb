@@ -160,22 +160,6 @@ module Skylab::Brazen
         @_line_yielder << _
         NIL_
       end
-
-      class Redundancy_Filter
-
-        def initialize
-          @_last_line = nil
-        end
-
-        def [] s
-          if @_last_line
-            "also #{ s }"
-          else
-            @_last_line = s
-            s
-          end
-        end
-      end
     end
   end
 end
