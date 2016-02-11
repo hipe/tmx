@@ -546,6 +546,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Basic = sidesys[ :Basic ]
       Brazen = sidesys[ :Brazen ]
       Fields = sidesys[ :Fields ]
+      Human = sidesys[ :Human ]
+
       JSON = stdlib[ :JSON ]
 
       system_lib = sidesys[ :System ]

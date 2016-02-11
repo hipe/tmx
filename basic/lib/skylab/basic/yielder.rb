@@ -2,7 +2,10 @@ module Skylab::Basic
 
   module Yielder
 
-    class Mapper  # :[#056]. see also [#ca-047] for more complex version
+    class Mapper  # :[#056].
+
+      # see also [#hu-047] for a stream version
+      # see also [#ca-047] for more complex version
 
       def initialize * x_a
 

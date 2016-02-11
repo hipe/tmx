@@ -6,7 +6,7 @@ module Skylab::Human
 
     # (..and here)
 
-    module Nlp::En::Expression_Frame_Support
+    module NLP::EN::Expression_Frame_Support
 
       class << self
         def [] tcm

@@ -11,25 +11,30 @@ module Skylab::Human::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  module ModuleMethods
+  TS_Joist_ = -> tcc do  # #until after [#sa-019]
+    tcc.send :define_singleton_method, :use, Use_method__
+  end
 
-    define_method :use, -> do
+    Use_method__ = -> do
 
       cache_h = {}
 
-      -> sym do
+      -> k do
 
-        ( cache_h.fetch sym do
-
-          cache_h[ sym ] = TestSupport_.fancy_lookup sym, TS_
-
+        ( cache_h.fetch k do
+          x = TestSupport_.fancy_lookup k, TS_
+          cache_h[ k ] = x
+          x
         end )[ self ]
         NIL_
       end
     end.call
 
-    def memoize_ sym, & p
+  module ModuleMethods
 
+    define_method :use, Use_method__
+
+    def memoize_ sym, & p
       define_method sym, Callback_.memoize( & p )
     end
   end
@@ -46,6 +51,14 @@ module Skylab::Human::TestSupport
       TestSupport_.debug_IO
     end
   end
+
+  # --
+
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
+  # --
 
   Home_ = ::Skylab::Human
 

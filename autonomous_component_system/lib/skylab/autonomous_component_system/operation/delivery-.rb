@@ -139,7 +139,7 @@ module Skylab::Autonomous_Component_System
             _deliveree_frame, _reader_writer
           ) do
             _nf_a = ss[ 1 .. -2 ].map( & :name )
-            _LL = Home_.lib_.basic::List.linked_list_via_array _nf_a
+            _LL = Home_.lib_.basic::List::Linked.via_array _nf_a
             _LL
           end
 

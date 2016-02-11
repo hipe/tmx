@@ -382,20 +382,29 @@ module Skylab::Autonomous_Component_System
 
         def __express_contextualized_expression y, asc, expag, & y_p
 
-          o = Home_::Modalities::Human::Contextualized_Expression.new
+          # (this block has a unit test counterpart at [#hu-043]"C")
 
-          o.say_association = -> asc_ do
-            expag.calculate do
-              code asc_.name.as_variegated_symbol
-            end
-          end
+          o = Home_.lib_.human::NLP::EN::Contextualization.new
 
-          o.context_linked_list = @context_linked_list
           o.expression_agent = expag
           o.expression_proc = y_p
+
+          o.express_subject_association = -> asc_ do
+            code asc_.name.as_variegated_symbol
+          end
+
+          o.express_selection_stack_item = -> ctxt_p do
+            calculate( & ctxt_p )
+          end
+
+          o.selection_stack = @context_linked_list
+          # (the above is not a proper [#ac-031] selection stack but it's OK)
+
           o.subject_association = asc
-          o.upstream_line_yielder = y
-          o.execute  # result is y
+
+          o.express_selection_stack.nestedly
+
+          o.express_into y  # result is y
         end
 
         def _sort qkn_a

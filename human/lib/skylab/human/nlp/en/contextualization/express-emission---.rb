@@ -51,24 +51,20 @@ module Skylab::Human
 
     Line_Downstream_via_Line_Stream___ = -> kns do
 
-      st = kns.line_stream
-      o = Here_::First_Line_Contextualization_[ kns ]
+      str = Streamer_.new
 
-      p = -> do
-        s = st.gets
-        if s
-          p = -> do
-            # (hi.)
-            st.gets
-          end
-          o.line = s
-          o.build_line
-        end
+      str.on_first = -> s do
+        o = Here_::First_Line_Contextualization_[ kns ]
+        o.line = s
+        o.build_line
       end
 
-      kns.line_downstream = Callback_.stream do
-        p[]
-      end
+      str.on_subsequent = IDENTITY_
+
+      _st = str.to_stream_around kns.line_stream
+
+      kns.line_downstream = _st
+
       NIL_
     end
 
@@ -100,9 +96,9 @@ module Skylab::Human
 
       def ___determine_line_stream
         kns = @knowns_
-        nla = Newline_Adder__.new
+        nla = Newline_Adder_.new
         kns.expression_agent.calculate nla.y, & kns.event_proc
-        kns.line_stream = Callback_::Stream.via_nonsparse_array nla.a
+        kns.line_stream = nla.to_line_stream
         NIL_
       end
 
@@ -137,12 +133,11 @@ module Skylab::Human
         kns = @knowns_
         @_ev = kns.event_proc.call
         kns.event = @_ev
-        nla = Newline_Adder__.new
+        nla = Newline_Adder_.new
 
         ev = @_ev.to_event
         kns.expression_agent.calculate nla.y, ev, & ev.message_proc
-
-        kns.line_stream = Callback_::Stream.via_nonsparse_array nla.a
+        kns.line_stream = nla.to_line_stream
         NIL_
       end
 
@@ -157,24 +152,6 @@ module Skylab::Human
         @knowns_.trilean = tri
         NIL_
       end
-    end
-
-    class Newline_Adder__  # #stowaway
-
-      def initialize
-
-        @y = ::Enumerator::Yielder.new do |s|
-          if NL_RX___ =~ s
-            s = "#{ s }#{ NEWLINE_ }"
-          end
-          @a.push s
-        end
-        @a = []
-      end
-
-      attr_reader :a, :y
-
-      NL_RX___ = /(?<!\n)\z/  # ..
     end
   end
 end

@@ -4,7 +4,9 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP - EN - contextualization - express brazenly" do
 
-    TestSupport_::Memoization_and_subject_sharing[ self ]  # #after [#sa-019] (and the other)
+    TS_Joist_[ self ]
+    use :memoizer_methods
+    use :NLP_EN_contextualization
 
     it "all inline / expression / negative - nothing" do
 
@@ -105,16 +107,12 @@ module Skylab::Human::TestSupport
 
     def _lines_via_emission * i_a, & ev_p
 
-      o = _subject_class.new
+      o = subject_class_.new
       a = []
-      o.expression_agent = Home_.lib_.brazen::API.expression_agent_instance
+      o.expression_agent = common_expag_
       o.line_yielder = a
       o.express_emission i_a, & ev_p
       a
-    end
-
-    def _subject_class
-      Home_::NLP::EN::Contextualization
     end
   end
 end

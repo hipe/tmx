@@ -5,7 +5,7 @@ module Skylab::Human::TestSupport
   describe "[hu] NLP en expression-frames - O & S (object count)" do
 
     extend TS_
-    use :nlp_en_expression_frame_support
+    use :NLP_EN_expression_frame_support
 
     # [td] permute --x "more is expected" -x "(no expectation)"
     # --polarity negative -ppositive --count 0 -c1 -c2 -c3

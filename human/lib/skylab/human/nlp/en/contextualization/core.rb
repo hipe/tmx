@@ -32,20 +32,27 @@ module Skylab::Human
 
     NODES__ = {
       channel: nil,
-      expression_agent: nil,
-      event_proc: nil,
-      event: nil,
+      expression_proc: nil,  # subset of `event_proc`
       initial_phrase_conjunction: :nilable,
       inflected_verb: :nilable,
       line_downstream: nil,
-      line_stream: nil,
-      line_yielder: nil,
       selection_stack: nil,
       trilean: :nilable,
       verb_lemma: :nilable,
       verb_subject: :nilable,
       verb_object: :nilable,
     }
+
+    attr_accessor(  # the below are plain old options, not used as nodes
+      :express_selection_stack_item,
+      :express_subject_association,
+      :expression_agent,
+      :event,
+      :event_proc,
+      :line_stream,
+      :line_yielder,
+      :subject_association,
+    )
 
     ivar = ::Hash.new { |h,k| h[k] = :"@#{ k }" }
 
@@ -78,19 +85,21 @@ module Skylab::Human
       Here_::Express_Emission___[ self ]
       @channel = i_a
       @event_proc = ev_p
+      express_into @line_yielder
+      UNRELIABLE_
+    end
+
+    def express_into y  # mutates c15n for now
 
       _so = _bound_solver
       st = _so.solve_for_ :line_downstream
-      y = @line_yielder  # ..
-
       begin
         s = st.gets
         s or break
         y << s
         redo
       end while nil
-
-      UNRELIABLE_
+      y
     end
 
     def build_string
@@ -122,6 +131,66 @@ module Skylab::Human
       @_solver ||= Here_::Solver___.new_for__ NODES__.keys
       @_solver.add_entry__ when_x, can_produce_x, & by_p
       NIL_
+    end
+
+    def selection_stack_as_linked_list__
+
+      ss = @selection_stack
+      if ss.respond_to? :each_with_index
+        Home_.lib_.basic::List::Linked.via_array ss
+      else
+        ss
+      end
+    end
+
+    class Streamer_
+
+      attr_writer(
+        :on_first,
+        :on_subsequent,
+      )
+
+      def to_stream_around st
+
+        p = -> do
+          s = st.gets
+          if s
+            p = -> do
+              s_ = st.gets
+              if s_
+                @on_subsequent[ s_ ]
+              end
+            end
+            @on_first[ s ]
+          end
+        end
+
+        Callback_.stream do
+          p[]
+        end
+      end
+    end
+
+    class Newline_Adder_
+
+      def initialize
+
+        @y = ::Enumerator::Yielder.new do |s|
+          if NL_RX___ =~ s
+            s = "#{ s }#{ NEWLINE_ }"
+          end
+          @_a.push s
+        end
+        @_a = []
+      end
+
+      attr_reader :y
+
+      def to_line_stream
+        Callback_::Stream.via_nonsparse_array @_a
+      end
+
+      NL_RX___ = /(?<!\n)\z/  # ..
     end
 
     class Transition_ < Callback_::Actor::Monadic

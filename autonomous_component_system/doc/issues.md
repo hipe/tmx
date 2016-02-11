@@ -47,11 +47,9 @@
 
 [#022]       [ reader-writer ] AND theory..
 
-[#021] #open investigate for de-duping near #[#hu-043]
-             [ contextualization of expression emissions ]
+[#021] #hole ( assimilated c15n into [hu] )
 
-[#020] #open investigate for de-duping near #[#hu-043]
-             [ contextualization of event structures ]
+[#020] #hole ( assimilated c15n into [hu] )
 
 [#019]       [ intent ]
 [#018]       [ load ticket ]  (as a concept)
@@ -79,7 +77,7 @@
 [#008]   #possible-feature extension API for the *modifiers* for use in mutation sessions
              (we're not sure we want this yet. this just tracks the idea.)
 
-[#007] #open our take on [#hu-043]
+[#007] #hole ( assilated c15n into [hu] )
 
 [#006]       construction, composition and eventing ..
 [#005]       the master list of sections ..

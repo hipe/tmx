@@ -4,11 +4,13 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP - EN - contextualization intro" do
 
-    it "loads" do
-      _subject_class
-    end
+    TS_Joist_[ self ]
+    use :memoizer_methods
+    use :NLP_EN_contextualization
 
-    TestSupport_::Memoization_and_subject_sharing[ self ]
+    it "loads" do
+      subject_class_
+    end
 
     context "(classic setup)" do
 
@@ -132,14 +134,10 @@ module Skylab::Human::TestSupport
     end
 
     dangerous_memoize :_beginning_prototype do
-      o = _subject_class.new
+      o = subject_class_.new
       o.express_selection_stack.classically
       o.express_trilean.classically
       o
-    end
-
-    def _subject_class
-      Home_::NLP::EN::Contextualization
     end
   end
 end

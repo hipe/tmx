@@ -1,3 +1,4 @@
+[#047]       [ evented stream thing (first and subsequent) ]
 [#046]       phrase assembler
 [#045] #open (in [sa] reverse-lookup for pluralized words..)
 [#044]       design patterns of expression ..

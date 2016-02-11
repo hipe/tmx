@@ -62,14 +62,14 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         it "any subsequent lines are expressed as-is" do
 
-          __last_line.should eql "so i guess that's that."
+          __last_line.should eql "so i guess that's that.\n"
         end
 
-        it "we re-place any parenthesis and punctuation correctly" do
+        it "we re-place any parenthesis and punctuation correctly (and add newlines)" do
 
           s = _first_line
           s[ 0 ].should eql '('
-          s[ -2 .. -1 ].should eql '.)'
+          s[ -3 .. -1 ].should eql ".)\n"
         end
 
         it "we put the component name as the subject of the predicate" do

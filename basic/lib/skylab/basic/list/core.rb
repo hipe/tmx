@@ -69,27 +69,6 @@ module Skylab::Basic
         end
       end
 
-      def linked_list_via * a
-        linked_list_via_array a
-      end
-
-      def linked_list_via_array a
-
-        if a.length.nonzero?
-          d = a.length - 1
-          curr = nil
-          begin
-            curr = Linked[ curr, a.fetch( d ) ]
-            if d.zero?
-              break
-            end
-            d -= 1
-            redo
-          end while nil
-          curr
-        end
-      end
-
       def pair_stream_via_even_iambic a
         Build_pair_stream_via_even_iambic__[ a ]
       end
@@ -100,8 +79,24 @@ module Skylab::Basic
       class << self
 
         def via * x_a
+          via_array x_a
+        end
 
-          List_.linked_list_via_array x_a
+        def via_array a
+
+          if a.length.nonzero?
+            d = a.length - 1
+            curr = nil
+            begin
+              curr = self[ curr, a.fetch( d ) ]
+              if d.zero?
+                break
+              end
+              d -= 1
+              redo
+            end while nil
+            curr
+          end
         end
 
         alias_method :[], :new

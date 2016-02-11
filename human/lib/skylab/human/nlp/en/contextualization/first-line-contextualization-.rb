@@ -44,20 +44,23 @@ module Skylab::Human
       end  # >>
 
       def __init kns
-        @knowns_ = kns ; self
+        @knowns_ = kns
+        @on_pre_articulation_ = nil
+        self
       end
 
       attr_writer(
         :line,
+        :on_pre_articulation_,
       )
 
       def build_line
 
-        @prefix_ = nil
+        @prefix_ = nil ; @suffix_ = nil
         ___unparenthesize_the_line
         __downcase_the_first_letter
         __do_something_special
-        "#{ @_open }#{ @prefix_ }#{ @content_ }#{ @_close }"
+        "#{ @_open }#{ @prefix_ }#{ @content_ }#{ @suffix_ }#{ @_close }"
       end
 
       def ___unparenthesize_the_line
@@ -72,6 +75,21 @@ module Skylab::Human
       end
 
       def __do_something_special
+        p = @on_pre_articulation_
+        if p
+          p[]
+        else
+          ___when_event_or_when_emission
+        end
+        NIL_
+      end
+
+      attr_writer(  # typically called during the above hook
+        :prefix_,
+        :suffix_,
+      )
+
+      def ___when_event_or_when_emission
 
         ev = @knowns_.event
         if ev
