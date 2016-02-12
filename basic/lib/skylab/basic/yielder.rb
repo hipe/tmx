@@ -7,57 +7,42 @@ module Skylab::Basic
       # see also [#hu-047] for a stream version
       # see also [#ca-047] for more complex version
 
-      def initialize * x_a
-
-        st = Callback_::Polymorphic_Stream.via_array x_a
-
-        y = st.gets_one
-        if y
-          self.downstream_line_yielder = y
-        end
-
-        begin
-          instance_variable_set IVARS___.fetch( st.gets_one ), st.gets_one
-        end until st.no_unparsed_exists
+      def map_first_by & p
+        @map_first = p
       end
 
-      IVARS___ = {
-        first: :@on_first_string,
-        subsequent: :@on_subsequent_string,
-      }
+      def map_subsequent_by & p
+        @map_subsequent = p
+      end
 
       def initialize_copy _
         @y = nil
       end
 
-      def downstream_line_yielder= y
+      def downstream_yielder= y
         reset
-        @y = ::Enumerator::Yielder.new do |s|
-          send @_m, s
+        @y = ::Enumerator::Yielder.new do |x|
+          send @_m, x
         end
-        @downstream_line_yielder = y
+        @downstream_yielder = y
       end
 
       def reset
-        @_m = :___receive_first_line ; nil
+        @_m = :___receive_first_item ; nil
       end
 
-      def ___receive_first_line s
-        _ = @on_first_string[ s ]
-        @downstream_line_yielder << _
-        @_m = :___receive_subsequent_line
+      def ___receive_first_item x
+        @downstream_yielder << @map_first[ x ]
+        @_m = :___receive_subsequent_item
         NIL_
       end
 
-      def ___receive_subsequent_line s
-        _ = @on_subsequent_string[ s ]
-        @downstream_line_yielder << _
+      def ___receive_subsequent_item x
+        @downstream_yielder << @map_subsequent[ x ]
         NIL_
       end
 
       attr_reader(
-        :on_first_string,
-        :on_subsequent_string,
         :y,
       )
     end

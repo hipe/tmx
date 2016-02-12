@@ -19,17 +19,25 @@ module Skylab::Zerk
 
         _ev_p = -> y do
 
-          mapper = Home_.lib_.basic::Yielder::Mapper.new y,
-            :first,      -> s { "  • #{ s }" },
-            :subsequent, -> s { "    #{ s }" }
+          o = Home_.lib_.basic::Yielder::Mapper.new
+
+          o.downstream_yielder = y
+
+          o.map_first_by do |s|
+            "  • #{ s }"
+          end
+
+          o.map_subsequent_by do |s|
+            "    #{ s }"
+          end
 
           y << "#{ nm asc.name } is not available because:"
 
           unava_p_a.each do |p|
             (*sym_a, ev_p_) = p[]
             :expression == sym_a[ 1 ] or self._HELL_NO
-            mapper.reset
-            calculate mapper.y, & ev_p_
+            o.reset
+            calculate o.y, & ev_p_
           end
 
           y

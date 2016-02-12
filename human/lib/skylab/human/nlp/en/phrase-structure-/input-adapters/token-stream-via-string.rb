@@ -87,8 +87,6 @@ module Skylab::Human
           end
           NIL_
         end
-
-        EMPTY_P_ = -> {}
       end
     end
   end

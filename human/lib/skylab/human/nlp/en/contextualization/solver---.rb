@@ -93,7 +93,16 @@ module Skylab::Human
         def initialize o, h, a
           @_entries = a
           @_entry_via_destination = h
-          @_knowns = o
+          @knowns_ = o
+        end
+
+        def __explain stack
+          _prefix = if 1 == stack.length
+            "from the starting state "
+          else
+            "under (#{ stack[ 0..-2 ] * ', ' }) "
+          end
+          "#{ _prefix }'#{ stack.last }' was necessary but was not set"
         end
 
         def solve_for_ k
@@ -107,13 +116,13 @@ module Skylab::Human
         end
 
         def _read_knownness_for k
-          @_knowns.send k
+          @knowns_.send k
         end
 
         attr_reader(
           :_entries,
           :_entry_via_destination,
-          :_knowns,
+          :knowns_,
         )
       end
 
@@ -130,7 +139,7 @@ module Skylab::Human
 
         def initialize stack, seen, rdr
           @_reader = rdr
-          @_knowns = rdr._knowns
+          @knowns_ = rdr.knowns_
           @_seen = seen
           @_stack = stack
         end
@@ -140,7 +149,7 @@ module Skylab::Human
           k = @_stack.last
           @_seen[ k ] = true
           _recurse
-          _ = @_knowns.send k
+          _ = @knowns_.send k
           _
         end
 
@@ -149,7 +158,8 @@ module Skylab::Human
           ways = @_reader._entry_via_destination.fetch @_stack.last
 
           if ! ways
-            self._COVER_ME_no_solution  # for now we are "deterministic"
+            # for now we are "deterministic"
+            raise ::KeyError, @_reader.__explain( @_stack )
           end
 
           if 1 != ways.length
@@ -179,7 +189,7 @@ module Skylab::Human
             _new_brosef._recurse
           end
 
-          entry._by_p.call @_knowns
+          entry._by_p.call @knowns_
 
           NIL_
         end

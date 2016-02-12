@@ -20,8 +20,12 @@ module Skylab::Human
         NIL_
       end
 
-      def add_space
-        @_tokens.push Spacer___[] ; nil
+      def add_lazy_space
+        @_tokens.push Lazy_Space___[] ; nil
+      end
+
+      def add_comma
+        @_tokens.push Comma___[] ; nil
       end
 
       def build_string_
@@ -34,7 +38,10 @@ module Skylab::Human
           begin
             tok = st.gets
             tok or break
-            s.concat "#{ SPACE_ }#{ tok.s }"
+            if tok.is_prefixed_by_space
+              s.concat SPACE_
+            end
+            s.concat tok.s
             redo
           end while nil
           s
@@ -46,12 +53,31 @@ module Skylab::Human
           @s = s
         end
         attr_reader :s
+        def is_prefixed_by_space
+          true
+        end
       end
 
-      Spacer___ = Lazy_.call do
-        class Spacer____
+      Lazy_Space___ = Lazy_.call do
+        class Lazy_Space____
           def s
-            NOTHING_
+            EMPTY_S_
+          end
+          def is_prefixed_by_space
+            true
+          end
+          self
+        end.new
+      end
+
+      Comma___ = Lazy_.call do
+        COMMA___ = ','
+        class Comma____
+          def s
+            COMMA___
+          end
+          def is_prefixed_by_space
+            false
           end
           self
         end.new

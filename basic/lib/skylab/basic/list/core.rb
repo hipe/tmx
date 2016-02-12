@@ -144,6 +144,8 @@ module Skylab::Basic
         a
       end
 
+      alias_method :to_array, :to_a  # if you want to be sure receiver is not nil
+
       def to_element_stream_assuming_nonsparse
 
         existent_linked_list = self

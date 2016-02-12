@@ -60,12 +60,12 @@ module Skylab::Human
         ___unparenthesize_the_line
         __downcase_the_first_letter
         __do_something_special
-        "#{ @_open }#{ @prefix_ }#{ @content_ }#{ @suffix_ }#{ @_close }"
+        "#{ @_open }#{ @prefix_ }#{ @content_ }#{ @suffix_ }#{ @close_ }"
       end
 
       def ___unparenthesize_the_line
         _line = remove_instance_variable :@line
-        @_open, @content_, @_close =
+        @_open, @content_, @close_ =
           Home_.lib_.basic::String.unparenthesize_message_string( _line )
         NIL_
       end
@@ -87,6 +87,11 @@ module Skylab::Human
       attr_writer(  # typically called during the above hook
         :prefix_,
         :suffix_,
+        :close_,
+      )
+
+      attr_reader(
+        :close_,  # used to be private to this concern..
       )
 
       def ___when_event_or_when_emission

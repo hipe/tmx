@@ -134,7 +134,17 @@ module Skylab::Human::TestSupport
     end
 
     dangerous_memoize :_beginning_prototype do
+
       o = subject_class_.new
+
+      o.to_say_selection_stack_item = -> s do
+
+        # (in this file we represent the selection stack items as strings
+        # for readability. as such we need this custom hook to "render" them.)
+
+        s  # might be nil for those root "frames" that we make be nil
+      end
+
       o.express_selection_stack.classically
       o.express_trilean.classically
       o

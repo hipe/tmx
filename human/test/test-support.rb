@@ -12,7 +12,9 @@ module Skylab::Human::TestSupport
   TestSupport_::Quickie.enable_kernel_describe
 
   TS_Joist_ = -> tcc do  # #until after [#sa-019]
+
     tcc.send :define_singleton_method, :use, Use_method__
+    tcc.include InstanceMethods
   end
 
     Use_method__ = -> do
@@ -54,6 +56,10 @@ module Skylab::Human::TestSupport
 
   # --
 
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_Event[ tcc ]
+  end
+
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
@@ -64,5 +70,9 @@ module Skylab::Human::TestSupport
 
   Callback_ = Home_::Callback_
   EMPTY_A_ = [].freeze
+  Lazy_ = Callback_::Lazy
+  NEWLINE_ = "\n"
   NIL_ = nil
+  NOTHING_ = nil
+  UNRELIABLE_ = :_unre_
 end

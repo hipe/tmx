@@ -28,7 +28,7 @@ module Skylab::Human
       end  # >>
 
       def initialize kns
-        @_knowns = kns
+        @knowns_ = kns
       end
 
       attr_accessor(
@@ -39,11 +39,11 @@ module Skylab::Human
       def execute
 
         _ = self.line_stream_via_channel || Here_::Line_Stream_via_Channel___
-        _[ @_knowns ]
+        _[ @knowns_ ]
 
         _ = self.line_downstream_via_line_stream
         _ ||= Here_::Line_Downstream_via_Line_Stream___
-        _[ @_knowns ]
+        _[ @knowns_ ]
 
         NIL_
       end
@@ -84,13 +84,13 @@ module Skylab::Human
       end
     end
 
-    class Line_Stream_via_Expression___ < Transition_  # #stowaway
+    class Line_Stream_via_Expression___ < Here_::Transition_  # #stowaway
 
       # assume event proc. side-effect is to resolve a trilean (shh)
 
       def execute
         ___determine_line_stream
-        send DERIVE_TRILEAN___.fetch @knowns_.channel.fetch 0
+        derive_trilean_from_channel_if_necessary_
         NIL_
       end
 
@@ -101,22 +101,9 @@ module Skylab::Human
         kns.line_stream = nla.to_line_stream
         NIL_
       end
-
-      DERIVE_TRILEAN___ = {
-        info: :__set_trilean_when_info,
-        error: :___set_trilean_when_error,
-      }
-
-      def ___set_trilean_when_error
-        @knowns_.trilean = false ; nil  # could change to ||=
-      end
-
-      def __set_trilean_when_info
-        @knowns_.trilean = nil ; nil  # could change to ||=
-      end
     end
 
-    class Line_Stream_via_Event___ < Transition_ # #stowaway
+    class Line_Stream_via_Event___ < Here_::Transition_ # #stowaway
 
       # assume event proc. side-effect is to resolve a trilean and .. (shh)
 

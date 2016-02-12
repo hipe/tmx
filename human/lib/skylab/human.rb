@@ -23,10 +23,12 @@ module Skylab::Human  # :[#001].
 
   ACHIEVED_ = true
   CLI = nil  # for host
+  EMPTY_P_ = -> {}
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }
   NIL_ = nil
+  NONE_ = nil
   KEEP_PARSING_ = true
   SPACE_ = ' '
 

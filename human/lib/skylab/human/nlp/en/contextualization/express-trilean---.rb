@@ -4,31 +4,33 @@ module Skylab::Human
 
     class Express_Trilean___
 
+      GIVEN__ = [
+        :trilean,
+        :verb_lemma,
+        :verb_subject,
+      ]
+
+      MAKE__ = [
+        :initial_phrase_conjunction,
+        :inflected_verb,
+      ]
+
       def initialize kns
-        @_knowns = kns
+        @knowns_ = kns
+      end
+
+      def classically_but
+        o = Classically__[].dup
+        @knowns_.when_ GIVEN__, MAKE__, & o.to_proc
+        o
       end
 
       def classically
-
-        @_knowns.when_(
-
-          [ # when i get these:
-            :trilean,
-            :verb_lemma,
-            :verb_subject,
-          ],
-
-          [ # i can give these:
-            :initial_phrase_conjunction,
-            :inflected_verb,
-          ],
-
-          & Classically___[].to_proc
-        )
+        @knowns_.when_ GIVEN__, MAKE__, & Classically__[].to_proc
         NIL_
       end
 
-      Classically___ = Lazy_.call do
+      Classically__ = Lazy_.call do
         o = Classifier___.new
         o.on_failed = Classically_Failed___
         o.on_neutralled = Classically_Neutraled___
@@ -49,10 +51,10 @@ module Skylab::Human
         end
 
         def to_proc
-          @___to_proc ||= method :___via
+          @___to_proc ||= method :_via
         end
 
-        def ___via kns
+        def _via kns
           x = kns.trilean.value_x
           if x
             @on_succeeded[ kns ]
@@ -75,7 +77,7 @@ module Skylab::Human
           _FAILED ||= "failed".freeze
         end
 
-        kns.initial_phrase_conjunction = NIL_
+        kns.initial_phrase_conjunction = NONE_
         kns.inflected_verb = _
         NIL_
       end
@@ -111,7 +113,7 @@ module Skylab::Human
           'succeeded'
         end
 
-        kns.initial_phrase_conjunction = NIL_
+        kns.initial_phrase_conjunction = NONE_
         kns.inflected_verb = _
         NIL_
       end

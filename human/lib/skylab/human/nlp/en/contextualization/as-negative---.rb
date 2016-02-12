@@ -31,7 +31,7 @@ module Skylab::Human
           as.add_any_string v_s
           as.add_any_string n_s
           as.add_string "because"
-          as.add_space
+          as.add_lazy_space
 
           @prefix_ = as.build_string_
         end

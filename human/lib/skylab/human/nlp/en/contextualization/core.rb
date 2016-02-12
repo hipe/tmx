@@ -2,14 +2,22 @@ module Skylab::Human
 
   class NLP::EN::Contextualization  # IS (see) :[#043].
 
-    def initialize
+    def initialize & p
       @_solver = nil
+
+      if p
+        @emission_downhandler = p
+      end
     end
 
     # -- (usually) as prototype
 
     def express_selection_stack
       Here_::Express_Selection_Stack___.new self
+    end
+
+    def express_subject_association
+      Here_::Express_Subject_Association___.new self
     end
 
     def express_trilean
@@ -28,10 +36,13 @@ module Skylab::Human
       if @_solver.is_writable_
         @_solver = @_solver.to_read_only__
       end
+
+      @_bound_solver = nil
     end
 
     NODES__ = {
       channel: nil,
+      emission_handler: nil,  # endpoint
       expression_proc: nil,  # subset of `event_proc`
       initial_phrase_conjunction: :nilable,
       inflected_verb: :nilable,
@@ -44,14 +55,15 @@ module Skylab::Human
     }
 
     attr_accessor(  # the below are plain old options, not used as nodes
-      :express_selection_stack_item,
-      :express_subject_association,
+      :emission_downhandler,
       :expression_agent,
       :event,
       :event_proc,
       :line_stream,
       :line_yielder,
       :subject_association,
+      :to_say_selection_stack_item,
+      :to_say_subject_association,
     )
 
     ivar = ::Hash.new { |h,k| h[k] = :"@#{ k }" }
@@ -77,6 +89,13 @@ module Skylab::Human
 
     # -- different forms expression
 
+    def to_emission_handler  # as referenced in [#043]
+
+      _so = bound_solver_
+      _oes_p = _so.solve_for_ :emission_handler
+      _oes_p
+    end
+
     def express_emission i_a, & ev_p
 
       if @_solver
@@ -89,9 +108,20 @@ module Skylab::Human
       UNRELIABLE_
     end
 
+    def __emit_expression i_a, & ev_p
+
+      @channel = i_a
+      @expression_proc = ev_p
+      me = self
+      @emission_handler.call( * i_a ) do |y|
+        me.express_into y
+      end
+      UNRELIABLE_
+    end
+
     def express_into y  # mutates c15n for now
 
-      _so = _bound_solver
+      _so = bound_solver_
       st = _so.solve_for_ :line_downstream
       begin
         s = st.gets
@@ -105,7 +135,7 @@ module Skylab::Human
     def build_string
 
       as = Here_::Phrase_Assembly.new
-      so = _bound_solver
+      so = bound_solver_
 
       _ic = so.solve_for_ :initial_phrase_conjunction
       _vs = so.solve_for_ :verb_subject
@@ -120,8 +150,8 @@ module Skylab::Human
       as.build_string_
     end
 
-    def _bound_solver
-      @_solver.bound_to_knowns__ self
+    def bound_solver_
+      @_bound_solver ||= @_solver.bound_to_knowns__ self
     end
 
     # -- for sub-clients
@@ -131,16 +161,6 @@ module Skylab::Human
       @_solver ||= Here_::Solver___.new_for__ NODES__.keys
       @_solver.add_entry__ when_x, can_produce_x, & by_p
       NIL_
-    end
-
-    def selection_stack_as_linked_list__
-
-      ss = @selection_stack
-      if ss.respond_to? :each_with_index
-        Home_.lib_.basic::List::Linked.via_array ss
-      else
-        ss
-      end
     end
 
     class Streamer_
@@ -176,10 +196,7 @@ module Skylab::Human
       def initialize
 
         @y = ::Enumerator::Yielder.new do |s|
-          if NL_RX___ =~ s
-            s = "#{ s }#{ NEWLINE_ }"
-          end
-          @_a.push s
+          @_a.push Plus_newline_if_necessary_[ s ]
         end
         @_a = []
       end
@@ -189,21 +206,21 @@ module Skylab::Human
       def to_line_stream
         Callback_::Stream.via_nonsparse_array @_a
       end
-
-      NL_RX___ = /(?<!\n)\z/  # ..
     end
 
-    class Transition_ < Callback_::Actor::Monadic
-
-      def initialize kns
-        @knowns_ = kns
+    Plus_newline_if_necessary_ = -> s do
+      if NL_RX___ =~ s
+        s = "#{ s }#{ NEWLINE_ }"
       end
+      s
     end
+
+    NL_RX___ = /(?<!\n)\z/  # ..
 
     Here_ = self
     Lazy_ = Callback_::Lazy
-    NOTHING_ = nil
     NEWLINE_ = "\n"
+    NOTHING_ = nil
     UNRELIABLE_ = :_UNRELIABLE_from_hu_c15n_
   end
 end

@@ -389,11 +389,11 @@ module Skylab::Autonomous_Component_System
           o.expression_agent = expag
           o.expression_proc = y_p
 
-          o.express_subject_association = -> asc_ do
+          o.to_say_subject_association = -> asc_ do
             code asc_.name.as_variegated_symbol
           end
 
-          o.express_selection_stack_item = -> ctxt_p do
+          o.to_say_selection_stack_item = -> ctxt_p do
             calculate( & ctxt_p )
           end
 

@@ -21,13 +21,13 @@ of inflecting them based on their structural characteristics.
 
   • it has a [#fi-007] session interface.
 
-  • it is or will probably be [#sl-023] dup-mutate compatible.
+  • it is [#sl-023] dup-mutate compatible.
 
 in one form of usage, this amounts to a map function of [#ca-001]
 emissions:
 
-  • the session has (in effect) a reader method that results in
-    an emission handler.
+  • the session has a method that produces an emission handler.
+    (`to_emission_handler`, cross-referenced to here.)
 
   • the session can be constructed with and/or has a writer for
     an emission handler.

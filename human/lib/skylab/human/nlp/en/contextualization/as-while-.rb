@@ -24,7 +24,7 @@ module Skylab::Human
         v_s = ev.verb_lexeme.progressive
 
         as = Here_::Phrase_Assembly.new
-        as.add_space
+        as.add_lazy_space
 
         one = looks_like_one_word_
 
