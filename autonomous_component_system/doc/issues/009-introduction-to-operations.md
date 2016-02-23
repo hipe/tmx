@@ -118,7 +118,7 @@ that fails delivery will lead to more or less immediate exit from the
 edit session, regardless of any remaining operations in the "queue" for
 that edit session.
 
-in cases of success, the implementor may chose to result in the same `x`
+in cases of success, the implementer may chose to result in the same `x`
 (component) that was passed to it so that this component "bubbles out" and
 can be used as the final result of the edit session (which can be useful
 for edit sessions that build or remove items where the caller may want to

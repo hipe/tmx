@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Event_Support_  # [#cm-008]#Scope-stack-trick
+  module Event_Support_  # #[#sl-155] #Scope stack trick
 
-    Events_::Component_Not_Found = Callback_::Event.prototype_with(
+    Events::Component_Not_Found = Callback_::Event.prototype_with(
 
       :component_not_found,
 
@@ -11,14 +11,14 @@ module Skylab::Brazen
       :ACS, nil,
 
       :error_category, :key_error,
-      :ok, false
+      :ok, false,
 
     ) do | y, o |
 
-      Events_::Component_Not_Found::Express_into_under_of___[ y, self, o ]
+      Events::Component_Not_Found::Express_into_under_of___[ y, self, o ]
     end
 
-    module Events_::Component_Not_Found::Express_into_under_of___
+    module Events::Component_Not_Found::Express_into_under_of___
 
       include Expresser  # (see comments here)
 
@@ -32,7 +32,7 @@ module Skylab::Brazen
         # structures. even with just the condition tree being the four
         # permutation of two conditionals, the cleanup of a jumble like this
         # is the purpose of [#hu-039] (rule-table-like), investigation of
-        # which we are prerequisiting on the completion of [#br-035] at
+        # which we are prerequisiting on the completion of [#ac-007] at
         # least.
 
         # remember that by design any client can implement its own

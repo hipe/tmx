@@ -1,4 +1,18 @@
-# thoughts on the canonic component events :[#035]
+# common events :[#007]
+
+## caveat
+
+these "common events" predate this current host library by quite a bit.
+they have been moved here from the library in which they were conceived
+because this is the rightful home for them semantically; however, they
+carry with them many conventions that have been superceded by new
+conventions discovered since their inception.
+
+
+
+
+# == from the original
+
 
   • we started DRY-tracking these common sorts of events.
   • the common theme here is that they relate to *mutating* a collection
@@ -8,7 +22,7 @@
     • A - not found
     • B - deleted (removed, destroyed)
     • C - already added
-    • D - added (created
+    • D - added (created)
     • E - no change
     • F - modified (updated, edited)
 

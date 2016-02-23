@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Event_Support_  # [#cm-008]#Scope-stack-trick
+  module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events_::Component_Already_Added = Callback_::Event.prototype_with(  # :+[#035]:C
+    Events::Component_Already_Added = Callback_::Event.prototype_with(  # [#007]:#C
 
       :component_already_added,
 
@@ -16,11 +16,11 @@ module Skylab::Brazen
     ) do | y, ev |
 
       o = ev.dup
-      o.extend Events_::Component_Already_Added::Expresser___
+      o.extend Events::Component_Already_Added::Expresser___
       o.__express_into_under y, self
     end
 
-    module Events_::Component_Already_Added::Expresser___
+    module Events::Component_Already_Added::Expresser___
 
       include Expresser
 
@@ -62,7 +62,7 @@ module Skylab::Brazen
         elsif @can_express_collection_related_
 
           express_collection_via_members
-          accept_sentence_part 'already has'  # :+[#035]:WISH-A
+          accept_sentence_part 'already has'  # [#007]:#WISH-A
           _express_component_somehow
 
         else

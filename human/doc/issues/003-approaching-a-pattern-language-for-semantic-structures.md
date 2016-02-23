@@ -129,7 +129,7 @@ range for a number of exponents for an instance to have?".
 
 when dealing with expressing the sensical range for a certain count in
 general, we call that `arity` -- a concept that is introduced an explored
-in [#br-090]. to avoid a confusion that will become evident below, we will
+in [#fi-014]. to avoid a confusion that will become evident below, we will
 always call this the `categorization exponent arity` because it represents
 the sensical range for the count of exponents in a `categorization`.
 
@@ -454,7 +454,7 @@ noun have multiple genders? etc.)
 
 we can now also model `categorization exponent arity` as a category (but note
 that it is a `categorization` of the arity and not a representation of it -
-it is lossy. arity representation is explored in [#br-090].)
+it is lossy. arity representation is explored in [#fi-014].)
 
                   +-----------------+    +---------------+
                   | cat. exp. arity |--->| meta-category |

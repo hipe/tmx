@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  module Property
+  module Events_Support_
 
-    Events::Extra = Callback_::Event.prototype_with(
+    Home_::Events::Extra = Callback_::Event.prototype_with(
 
       :extra_properties,
 

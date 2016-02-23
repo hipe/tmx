@@ -66,7 +66,7 @@
 [#016] #idea "decision tree" - see why a particular entity failed
                against the criteria as a subset tree of the crit. tree
              ( #was: #done remove fixed field requirement )
-[#015]       ( #moved-to: [#br-035]:WISH-A )
+[#015]       ( #moved-to: [#ac-007]:WISH-A )
              ( #was: #done rearch to find issues.md )
 [#014]       the open issue report, stored critera ..
 [#013] #open overreach - #waiting-for: [#005]

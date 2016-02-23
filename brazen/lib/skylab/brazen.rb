@@ -40,8 +40,7 @@ module Skylab::Brazen
     end
 
     def event const
-
-      Home_::Events_.const_get const, false
+      Home_.lib_.the_ACS_lib::Events.const_get const, false
     end
 
     def expression_agent_library
@@ -203,6 +202,7 @@ module Skylab::Brazen
 
     define_singleton_method :_memoize, Callback_::Lazy
 
+    The_ACS_lib = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]

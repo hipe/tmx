@@ -2244,7 +2244,7 @@ module Skylab::Callback
       end
     end  # >>
 
-    # -- higher-level derivatives (for [#br-035] expressive events usually)
+    # -- higher-level derivatives (for [#ac-007] expressive events usually)
 
     def express_into_under y, expag  # #hook-out [#br-023]
       name = self

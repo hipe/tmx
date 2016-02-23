@@ -18,7 +18,8 @@
 
 [#028]       parameters normalize..
 
-[#027]       this tracks two separate but related phenomena:
+[#027]       ..
+             this tracks two separate but related phenomena:
 
              specifically, the experiment of where a formal operation
              indicates as required (or maybe optional) parameter another
@@ -32,6 +33,9 @@
 
              :#A is custom execution of the [#fi-007] session, amounting
              to a system-private API. this tracks patterns near that.
+
+             coincidentally, [#ze-027] is related.
+
 
 [#026]       for now, if an association is `is_singular_of` another
              association, *by the storage implementation* (ivars)
@@ -49,7 +53,8 @@
 
 [#021] #hole ( assimilated c15n into [hu] )
 
-[#020] #hole ( assimilated c15n into [hu] )
+[#020]       [ parameter ]
+             ( #was: assimilated c15n into [hu] )
 
 [#019]       [ intent ]
 [#018]       [ load ticket ]  (as a concept)
@@ -77,7 +82,8 @@
 [#008]   #possible-feature extension API for the *modifiers* for use in mutation sessions
              (we're not sure we want this yet. this just tracks the idea.)
 
-[#007] #hole ( assilated c15n into [hu] )
+[#007]       "expressive events" (and the canonic component events) ..
+             ( was: assilated c15n into [hu] )
 
 [#006]       construction, composition and eventing ..
 [#005]       the master list of sections ..

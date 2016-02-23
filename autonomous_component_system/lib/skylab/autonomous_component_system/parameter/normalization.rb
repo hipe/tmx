@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Normalize  # much docs at [#028]
+    class Normalization  # much docs at [#028]
 
       def initialize sel_stack, fo_st
 
@@ -18,6 +18,8 @@ module Skylab::Autonomous_Component_System
           remove_instance_variable :@_output_operation
           send m
         end
+
+        @on_missing_required = nil  # (remove this line during conflict resolution)
       end
 
       # -- asserted to happen only once
@@ -166,25 +168,29 @@ module Skylab::Autonomous_Component_System
 
           # [#004]#exe explains why we raise here
           # but this may change soon..
-          raise ::ArgumentError, ___say_missing( miss_a )
+          ___when_missing_requireds miss_a
         else
           ACHIEVED_
         end
       end
 
-      def ___say_missing par_a
+      def ___when_missing_requireds miss_a
 
-        _s_a = @selection_stack[ 1 .. -1 ].map do |qk|
-          "`#{ qk.name.as_variegated_symbol }`"
+        ev = Field_::Events::Missing.new_with(
+          :miss_a, miss_a,
+          :selection_stack, @selection_stack,
+          :lemma, :parameter,
+        )
+
+        oes_p = @on_missing_required
+        if oes_p
+          oes_p.call :error, :missing_required_properties do
+            ev
+          end
+          UNABLE_
+        else
+          raise ev.to_exception
         end
-
-        _for = " for #{ _s_a * SPACE_ }"
-
-        _s_a = par_a.map do |par|
-          "`#{ par.name_symbol }`"
-        end
-
-        "missing required argument(s) (#{ _s_a * ', '})#{ _for }"
       end
     end
   end

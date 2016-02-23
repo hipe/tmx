@@ -1,15 +1,15 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
   # the purpose of this file is exactly twofold. it is:
   #
   #   1) to define the eponymous module (because it must)
   #
   #   2) to define a support module that many client event modules
-  #      will pull in using the [#cm-008]#Scope-stack-trick
+  #      will pull in using the [#sl-155] scope stack trick
   #
   # (but while we are at it we stowaway "small" event prototypes here too)
 
-  Autoloader_[ Events_ = ::Module.new ]  # [#035] expressive/canonic events
+  Autoloader_[ Events = ::Module.new ]  # [#007] expressive/canonic events
 
   module Event_Support_  # publicize if needed. stowaway.
 

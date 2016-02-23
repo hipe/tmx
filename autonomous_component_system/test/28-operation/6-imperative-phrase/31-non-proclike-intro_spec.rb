@@ -11,13 +11,14 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "missing required args raises semantic arg error" do
 
+      _s = "'zoof' was missing required parameters 'foo' and 'quux'"
+
       begin
         call_ :zoof
       rescue ::ArgumentError => e
       end
 
-      e.message.should eql "missing required argument(s) #{
-        }(`foo`, `quux`) for `zoof`"
+      e.message.should eql _s
     end
 
     context "supply the required args" do

@@ -45,7 +45,7 @@
 [#092]       [ CLI styling ]
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
-[#090]       arity ..
+[#090] #hole ( #moved to [fi] )
 [#089] #hole ( #was: unify with [#hu-043]  (unify contextualization) )
              ( became the ACS )
 [#088]       the meta-meta-properties justification ..
@@ -141,7 +141,7 @@
 [#036]    #watching to go from a literal to a resolved const its kind of awful
              to lose and re-parse the demarcation that is already present
              in it but meh is it worth it to hack the algorithm for this?
-[#035]       "expressive events" (and the canonic component events) ..
+[#035] #hole ( #moved-to: [ac] )
              ( #was: #tracking-tag events that should not be UI-level events )
 [#034]       #parent-node: [#026] the deleting narrative ..
 [#033]       #parent-node: [#026]  [the update narrative]

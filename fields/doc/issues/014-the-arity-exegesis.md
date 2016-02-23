@@ -1,5 +1,6 @@
-# the arity exegesis :[#090]
+# the arity exegesis :[#014]
 
+(EDIT: moved here from [br] because better semantic fit.)
 
 (EDIT: moved here from [fa] before it sunsetted. some parts are
 likely stale but overall is hopefully still legit.)
@@ -316,7 +317,7 @@ left with a matrix of common examples from nature:
                                                 the count of filenames it
                                                 accepts. (more e.g at [4])
 
-the leftmost column contains all of what we call the "useful five" :[#029]
+the leftmost column contains all of what we call the "useful five"
 arities, which we here present as the most useful of the `parameter arities`.
 (even though in this model we will rarely use the `zero` term as
 `parameter arity`). the topmost row contains the two most useful arities

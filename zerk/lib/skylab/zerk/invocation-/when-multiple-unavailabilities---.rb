@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Index
+  module Invocation_
 
     class When_multiple_unavailabilities___ < Callback_::Actor::Dyadic
 

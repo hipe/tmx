@@ -199,7 +199,7 @@ module Skylab::Snag
 
       class D_as_C____ < Home_.lib_.system.filesystem_lib::Models::Directory::As::Collection
 
-        # -- Expressive event hook-ins  (near [#br-035])j
+        # -- Expressive event hook-ins  (near [#ac-007])
 
         def name  # while #open [#br-107]
           model_name

@@ -304,7 +304,7 @@ module Skylab::Brazen
           end
         end
 
-      ## ~~ parameter arity - read synopsis [#090]
+      ## ~~ parameter arity - read synopsis [#fi-014]
 
         class self::Property
 

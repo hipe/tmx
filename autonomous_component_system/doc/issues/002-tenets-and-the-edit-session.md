@@ -43,7 +43,7 @@ violoation of which should occur only with good reason.
 
 • model classes are implemeted as many small, "autonomous" components
   rather than needing to cram many different property-level concerns
-  into one node. :+#DT1
+  into one node. #DT1
 
 • (new in this version) we attempt a consistent inteface whether the
   mutatee is more like a "collection" or more like an "entity" (because

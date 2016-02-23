@@ -53,7 +53,7 @@ module Skylab::System
       end
 
       def name
-        NIL_  # for [#br-035] expressive events, this class name is not pretty
+        NIL_  # for [#ac-007] expressive events, this class name is not pretty
       end
 
       def to_pathname

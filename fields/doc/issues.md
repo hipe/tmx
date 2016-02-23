@@ -1,4 +1,5 @@
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."
+[#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
 [#013]       p8r
 [#012]       #done redesign this `with_client` nonsense
 [#010]       the external functions experiment ..

@@ -67,8 +67,8 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "missing multiple required args - raises argument error" do
 
-      _s = "missing required argument(s) (`red`, `green`, `blue`) #{
-        }for `set_color_of_upper`"
+      _s = "'set-color-of-upper' was missing required parameters #{
+        }'red', 'green' and 'blue'"
 
       shoe = _new_shoe
 

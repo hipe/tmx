@@ -95,11 +95,11 @@ module Skylab::Autonomous_Component_System
         end
 
         if x.respond_to? :call
-          @_reifier = Here_::Proc_based_Implementation___.new x, self
+          @_reifier = Here_::NormalRepresentation_for_Proc___.new x, self
         else
 
           _pfoz = x::PARAMETERS  # NOTE - `respond_to?` :parameters whenever
-          @_reifier = Here_::NonProc_based_Implementation___.new _pfoz, x, self
+          @_reifier = Here_::NormalRepresentation_for_NonProc___.new _pfoz, x, self
         end
 
         self

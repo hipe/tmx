@@ -9,12 +9,14 @@ module Skylab::Zerk::TestSupport
 
     it "missing required args - raises arg. error (cp)" do
 
+      _s = "'zoof' was missing required parameters 'foo' and 'quux'"
+
       begin
         call :zoof  # #test-03
       rescue ::ArgumentError => e
       end
-      e.message.should eql "missing required argument(s) #{
-        }(`foo`, `quux`) for `zoof`"
+
+      e.message.should eql _s
     end
 
     context "extra args" do

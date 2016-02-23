@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Method_based_Implementation___
+    class NormalRepresentation_for_Method___
 
       # implement what we now call "transitive operations" (in [#009]):
       #

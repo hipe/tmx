@@ -399,7 +399,7 @@ module Skylab::TanMan
 
         # experimental :+[#029] entity not yet associated with document
         # we shoehorned this in after everything to work with the new
-        # [#br-035] exprssive events. could use better integration..
+        # [#ac-007] exprssive events. could use better integration..
 
         def initialize from_node, to_node
           @from_node = from_node

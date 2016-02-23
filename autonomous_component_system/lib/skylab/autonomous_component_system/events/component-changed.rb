@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Event_Support_  # [#cm-008]#Scope-stack-trick
+  module Event_Support_  # #[#sl-155] scope stack trick
 
     expression = nil
 
-    Events_::Component_Changed = Callback_::Event.prototype_with(  # :+[#035]:F
+    Events::Component_Changed = Callback_::Event.prototype_with(  # [#007]:#F
 
       :component_changed,
 

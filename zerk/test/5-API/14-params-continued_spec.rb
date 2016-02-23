@@ -56,11 +56,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "lists the missing argument(s)" do
-        _msg.should be_include 'missing required argument(s) (`action`)'
+        _msg.should match %r(\bmissing required parameter [^[:alnum:]]*action\b)
       end
 
       it "expresses the fully qualified name of the operation" do
-        _msg.should match %r(\bfor `shoe` `globbie_complex`\z)
+        _msg.should match %r(\bshoe[^[:alnum:]]+globbie[^[:alnum:]]complex\b)
       end
     end
 

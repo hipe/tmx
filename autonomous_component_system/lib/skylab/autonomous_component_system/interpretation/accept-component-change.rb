@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
 
         as_component_via_component = -> x do
 
-          # for a value to be compatible with [#br-035] expressive events
+          # for a value to be compatible with [#ac-007] expressive events
           # it must respond to one particular method. it is certainly not
           # within the domain of concern of the primitive component value
           # to respond to this method so we put it in a wrapper that does

@@ -261,7 +261,7 @@ module Skylab::Autonomous_Component_System
       def ___resolve_formalesque_for_transitive
 
         _qk = remove_instance_variable :@_deliveree_qk
-        @_deliverabler = Here_::Method_based_Implementation___.begin__ _qk
+        @_deliverabler = Here_::NormalRepresentation_for_Method___.begin__ _qk
         ACHIEVED_
       end
 

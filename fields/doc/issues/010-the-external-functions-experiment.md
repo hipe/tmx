@@ -59,7 +59,7 @@ instead, they both depend on this abstraction.
 ## derivatives of the two arities
 
 • there is a huge treatment on the subject (some of which is modalities-
-  specific) at [#br-090]. it's a relatively huge document (~600 of these
+  specific) at [#fi-014]. it's a relatively huge document (~600 of these
   lines).
 
 • maybe one day we will move that document to the subject's sidesystem

@@ -18,7 +18,7 @@ module Skylab::Fields
 
     class Extra_Value_Event::Articulation___
 
-      # (experiment, like something similar at [#br-035]..)
+      # (experiment, like something similar at [#ac-007]..)
 
       def initialize y, o, ex
         @line_yielder = y

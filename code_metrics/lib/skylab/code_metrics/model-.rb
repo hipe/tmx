@@ -1,7 +1,7 @@
 module Skylab::CodeMetrics
 
   Model_ = ::Module.new
-  module Model_::Support  # ( [#008]note-A is about this scope stack trick )
+  module Model_::Support  # #[#sl-155] scope stack trick
 
     My_Entity__ = Brazen_::Modelesque::Entity
 

@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Proc_based_Implementation___
+    class NormalRepresentation_for_Proc___
 
       def initialize p, fo
         @formal = fo
@@ -15,7 +15,7 @@ module Skylab::Autonomous_Component_System
 
         _fo_st = ___build_formals_stream
 
-        o = Home_::Parameter::Normalize.new ss, _fo_st
+        o = Home_::Parameter::Normalization.new ss, _fo_st
         p = @formal.parameters_from_proc_
         if p
           self._NEVER_BEEN_NEEDED

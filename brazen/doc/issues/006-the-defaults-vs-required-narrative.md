@@ -33,7 +33,7 @@ entity:
      any one of these procs itself issues a stop signal (by resulting
      in false-ish probably).
 
-  3) of the list of formal properties that have a [#090] nonzero
+  3) of the list of formal properties that have a [#fi-014] nonzero
      parameter arity (the list may have a zero length), reduce a list
      of those formal properties whose corresponding actual value is nil
      (not false). this (possibly zero length) list is the list of missing

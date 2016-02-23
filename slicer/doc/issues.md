@@ -1,3 +1,25 @@
+[#156]       codepoints tagged with this tag exhibit this pattern:
+
+             besides just memoing what the particular value was we also memo
+             that this method called at all. this allows us to differentiate
+             between it having been set explicitly to false-ish vs. it having
+             not been set at all.
+
+             (the same could be achieved thru `instance_variable_defined?`,
+             but such a way introduces more risk for hard-to-trace failure
+             though typos. alternately we could have two variables
+             instead of one, but it deemed too noisy.)
+
+             setting it to false-ish says explicitly "i don't want an X".
+             when it is not set at all, the receiver can detect this
+             case lazily and effect whatever it deems as default at
+             whatever future point.
+
+[#155]       scope stack trick..
+[#154]       #bibliographic-reference:
+             _Crow's Foot Notation_ (short document for coure material),
+             G Benoït, Ph.D; Simmons University
+             http://web.simmons.edu/~benoit/lis458/CrowsFootNotation.pdf
 [#153]       [ example ]
 [#152]       ([sl] code wormhole #in-situ)
 [#151]       heavy models .. wired models [..]

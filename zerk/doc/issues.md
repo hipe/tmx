@@ -14,7 +14,7 @@
 [#016]     #track operation-specific parameters (as they pertain to niCLI)
 [#015]       option parsing..
 [#014]       [ flowcharts for CLI syntax ]
-[#013] #hole
+[#013]       [ index ]
 [#012]       [ flowcharts for API syntax ]
 [#011]     #track whether/how to share across 3 CLI client classes
 [#010]       custom view controllers

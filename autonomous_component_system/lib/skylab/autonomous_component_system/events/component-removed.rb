@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Autonomous_Component_System
 
-  module Event_Support_  # [#cm-008]#Scope-stack-trick
+  module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events_::Component_Removed = Callback_::Event.prototype_with(  # [#035]:B
+    Events::Component_Removed = Callback_::Event.prototype_with(  # [#007]:B
 
       :component_removed,
       :component, nil,
@@ -16,7 +16,7 @@ module Skylab::Brazen
 
       o = Event_Support_::Expresser[ self, o ]
 
-      o << 'removed'  # one day [#035]:WISH-A
+      o << 'removed'  # one day [#007]:WISH-A
       o.express_component_via_members or accept_sentence_part 'component'
       o << 'from'
       o.express_collection_via_members or accept_sentence_part 'collection'

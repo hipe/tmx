@@ -22,7 +22,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         o.execute
       end
 
-      def interpret arg_st, acs, & oes_p_p  # :+Tenet6, [#003]:hb-again
+      def interpret arg_st, acs, & oes_p_p  # #Tenet6, [#003]:hb-again
 
         o = _Mutation_Session.new( & oes_p_p )
         o.ACS = acs

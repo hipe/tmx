@@ -107,7 +107,7 @@ module Skylab::Git
         UNABLE_
       end
 
-      # ~ for [#br-035] expressive events
+      # ~ for [#ac-007] expressive events
 
       def description_under expag
 

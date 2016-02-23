@@ -1,14 +1,14 @@
-module Skylab::Zerk
+module Skylab::Autonomous_Component_System
 
-  module API
+  module Events::Component_Not_Available
+
+    Require_field_library_[]
 
     # -
 
-      Require_field_library_[]
+      Build_event = -> ss, asc do
 
-      When_association_is_not_available___ = -> ss, asc do
-
-        o = Fields_::MetaMetaFields::Enum::Build_extra_value_event.new
+        o = Field_::MetaMetaFields::Enum::Build_extra_value_event.new
 
         o.adjective = nil  # override 'invalid'
 
@@ -30,8 +30,6 @@ module Skylab::Zerk
 
         o.execute
       end
-    # ->
+    # -
   end
 end
-
-

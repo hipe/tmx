@@ -10,7 +10,7 @@
              local name, or including a module statically in a class) and
              displaying its frequency over time. rename this project
              `meta-metrics`!
-[#008]       model support ..
+[#008] #hole ( #was: model suppport )
              ( #was: #wormhole )
 [#007]       #doc-point - during tests, we physically `cd` into (whererver)
                because although ugly, we *really* like the simplicity of
