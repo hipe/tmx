@@ -204,7 +204,7 @@ module Skylab::Callback
       end
 
       def to_exception  # #note-85
-        Event_::Unwrappers__::Exception[ self ]
+        Event_::To_exception[ self ]
       end
 
       def to_iambic
@@ -620,16 +620,16 @@ module Skylab::Callback
 
           def exception *x_a
             if x_a.length.zero?
-              Event_::Wrappers__::Exception
+              Event_::Via_exception
             else
               # implement an :+[#cb-057] ideal mixed syntax
               x_a[ 0, 0 ] = [ :exception ]
-              Event_::Wrappers__::Exception.call_via_iambic x_a
+              Event_::Via_exception.call_via_iambic x_a
             end
           end
 
           def file_utils_message s
-            Event_::Wrappers__::File_utils_message[ s ]
+            Event_::Via_file_utils_message[ s ]
           end
 
           def members
@@ -637,7 +637,7 @@ module Skylab::Callback
           end
 
           def signature * a
-            Event_::Wrappers__::Signature.call_via_arglist a
+            Event_::Via_signature.begin_via_arglist__ a
           end
         end
       end

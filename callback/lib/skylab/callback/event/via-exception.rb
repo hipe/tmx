@@ -1,8 +1,8 @@
 module Skylab::Callback
 
-    class Event
-
-      class Wrappers__::Exception
+  class Event
+    # -
+      class Via_exception < Home_::Actor::Dyadic
 
         Home_::Actor.methodic self, :properties,
           :exception,
@@ -196,5 +196,6 @@ module Skylab::Callback
           end
         end
       end
-    end
+    # -
+  end
 end

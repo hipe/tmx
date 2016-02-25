@@ -1,11 +1,8 @@
 module Skylab::Callback
 
-    class Event
-
-      class Wrappers__::File_utils_message
-
-        Home_::Actor.call self, :properties,
-          :msg
+  class Event
+    # -
+      class Via_file_utils_message < Home_::Actor::Monadic
 
         # WARNING - major hack alert
         #
@@ -45,6 +42,10 @@ module Skylab::Callback
         # when we fail to parse the output of file-utils entirely, this actor
         # produces false. but note that it may appear to have succeeded
         # when in fact it got tripped up by this issue.
+
+        def initialize msg
+          @msg = msg
+        end
 
         def execute
           @md = PATH_HACK_RX__.match @msg
@@ -130,5 +131,6 @@ module Skylab::Callback
           end
         end
       end
-    end
+    # -
+  end
 end

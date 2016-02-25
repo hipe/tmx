@@ -2,10 +2,11 @@ module Skylab::Callback
 
     class Event
 
-      class Unwrappers__::Exception
+      class To_exception < Home_::Actor::Monadic
 
-        Home_::Actor.call self, :properties,
-          :event
+        def initialize event
+          @event = event
+        end
 
         def execute
           resolve_exception_class

@@ -1,14 +1,15 @@
 module Skylab::Callback
 
   class Event
+    # -
+      class Via_signature  # #covered-only-by:[bs]
 
-    module Wrappers__
-
-      class Signature
-
-        def self.call_via_arglist a
-          new a
-        end
+        class << self
+          def begin_via_arglist__ a
+            new a
+          end
+          private :new
+        end  # >>
 
         def initialize a
           @nf, @ev = a
@@ -63,6 +64,6 @@ module Skylab::Callback
           @nf.noun_lexeme
         end
       end
-    end
+    # -
   end
 end

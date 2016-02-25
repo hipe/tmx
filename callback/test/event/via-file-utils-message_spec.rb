@@ -37,7 +37,7 @@ module Skylab::Callback::TestSupport
     end
 
     def _subject
-      Home_::Event::Wrappers__::File_utils_message::PATH_HACK_RX__
+      Home_::Event::Via_file_utils_message::PATH_HACK_RX__
     end
   end
 end
