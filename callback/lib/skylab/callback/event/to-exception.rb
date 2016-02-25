@@ -1,7 +1,7 @@
 module Skylab::Callback
 
-    class Event
-
+  class Event
+    # -
       class To_exception < Home_::Actor::Monadic
 
         def initialize event
@@ -18,13 +18,13 @@ module Skylab::Callback
 
         def resolve_exception_class
           @exception_class = if @event.has_member :error_category
-            ___exception_class_via_error_category @event.error_category
+            Class_via_symbol[ @event.error_category ]
           else
             ::RuntimeError
           end ; nil
         end
 
-        def ___exception_class_via_error_category sym
+        Class_via_symbol = -> sym, & els do
 
           first_guess_sym = Home_::Name.via_variegated_symbol( sym ).
             as_camelcase_const
@@ -33,9 +33,10 @@ module Skylab::Callback
 
             ::Object.const_get first_guess_sym
           else
+
             _s_a = sym.id2name.split UNDERSCORE_  # e.g `errno_enoent`
 
-            Home_::Autoloader.const_reduce _s_a, ::Object
+            Home_::Autoloader.const_reduce _s_a, ::Object, & els
           end
         end
 
@@ -54,5 +55,7 @@ module Skylab::Callback
           Home_.lib_.brazen::API.expression_agent_instance  # hard-coded "black and white" for now
         end
       end
-    end
+    # -
+    To_Exception = To_exception
+  end
 end

@@ -90,6 +90,11 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
+  module Invocation_
+    Autoloader_[ self ]
+    Here_ = self
+  end
+
   module View_Controllers_
     Autoloader_[ self ]
   end
@@ -98,6 +103,7 @@ module Skylab::Zerk  # intro in [#001] README
 
   ACHIEVED_ = true
   EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   FINISHED_ = nil
   GENERIC_ERROR_EXITSTATUS = 5

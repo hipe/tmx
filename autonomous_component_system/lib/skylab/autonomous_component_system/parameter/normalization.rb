@@ -2,172 +2,92 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Normalization  # much docs at [#028]
+    class Normalization  # [#028]
 
-      def initialize sel_stack, fo_st
+      class << self
+        alias_method :begin, :new
+        undef_method :new
+      end  # >>
 
-        @_formals_stream = fo_st
-        @selection_stack = sel_stack
+      def initialize ss
 
-        @_receive_parameter_value_source = -> m, x do
-          remove_instance_variable :@_receive_parameter_value_source
-          send m, x
+        @on_missing_required = nil
+        @selection_stack = ss  # used to enrich emissions & for receiver
+      end
+
+      attr_writer(
+        :bespoke_stream_once,  # see [#027]#bespoke
+        :expanse_stream_once,  # see [#027]#expanse
+        :on_missing_required,  # emission handler. if not set raises event ex.
+        :parameter_store,  # wrap e.g a session object or argument array
+        :parameter_value_source,
+      )
+
+      def execute
+
+        if @parameter_value_source.__is_not_known_to_be_empty
+          # respect [#]:#API-point-A - do bespokes IFF etc
+          ___interpret_any_bespokes
         end
 
-        @_output_operation = -> m do
-          remove_instance_variable :@_output_operation
-          send m
-        end
-
-        @on_missing_required = nil  # (remove this line during conflict resolution)
+        __common_normalize
       end
 
-      # -- asserted to happen only once
+      def ___interpret_any_bespokes  # see [#]:#"head parse"
 
-      def argument_stream= st
-        @_receive_parameter_value_source[ :__recv_arg_stream_once, st ] ; st
-      end
+        _st = remove_instance_variable( :@bespoke_stream_once ).call
+        _bx = _box_via_stream _st
 
-      def parameters_value_reader= rdr
-        @_receive_parameter_value_source[ :__recv_params_value_rdr_once, rdr ]
-        rdr
-      end
+        cont = @parameter_value_source.to_controller_against__ _bx
 
-      def to_flat_platform_arglist
-        @_output_operation[ :__flush_to_platform_arguments_once ]
-      end
-
-      def write_into o
-        @_parameter_value_recipient = o
-        @_output_operation[ :__flush_to_write_into_once ]
-      end
-
-      # -- only once's
-
-      def __recv_arg_stream_once arg_st
-        @_argument_shape = :Argument_Stream
-        @__argument_stream = arg_st ; nil
-      end
-
-      def __recv_params_value_rdr_once rdr
-        @_argument_shape = :Parameters_Reader
-        @__parameters_reader = rdr ; nil
-      end
-
-      def __flush_to_platform_arguments_once
-
-        _execute :Platform_Arglist
-      end
-
-      def __flush_to_write_into_once
-
-        _ent = remove_instance_variable :@_parameter_value_recipient
-
-        _execute _ent, :Write_Into
-      end
-
-      def _execute * args, target_sym
-
-        _const = :"#{ target_sym }__via__#{ @_argument_shape }___"
-
-        _x = Here_.const_get _const, false
-
-        _x.new( * args, self ).execute
-      end
-
-      # -- for subs
-
-      def flush_formals_stream_to_box_
-        bx = Callback_::Box.new
-        st = release_formals_stream_
+        st = cont.consuming_formal_parameter_stream
         begin
-          fo = st.gets
-          fo or break
-          bx.add fo.name_symbol, fo
+          par = st.gets
+          par or break
+
+          # reminder: we do *not* `ACS_::Interpretation::Build_value` here.
+
+          _x = cont.current_argument_stream.gets_one  # ..
+
+          @parameter_store.accept_parameter_value _x, par
+
           redo
         end while nil
-        bx
+
+        NIL_
       end
 
-      def release_formals_stream_
-        remove_instance_variable :@_formals_stream
-      end
-
-      def release_parameters_value_reader__
-        remove_instance_variable :@__parameters_reader
-      end
-
-      def parse_from_argument_stream_into_against_ h, fo_bx  # [#]"head parse"
-
-        st = @__argument_stream
-
-        if 1 == fo_bx.length
-          if st.no_unparsed_exists
-            self._COVER_ME_probably_fine_to_just_finish
-          else
-            _k = fo_bx.at_position( 0 ).name_symbol
-            h[ _k ] = st.gets_one
-          end
-        else
-          fo_h = fo_bx.h_
-          begin
-            if st.no_unparsed_exists
-              break
-            end
-            k = st.current_token
-            fo = fo_h[ k ]
-            fo or break
-            st.advance_one
-            h[ k ] = st.gets_one
-            redo
-          end while nil
-        end
-
-        h
-      end
-
-      def normalize_argument_hash_against_stream_ rdr_p, fo_st, & accept
+      def __common_normalize  # implement [#]:#API-point-B
 
         Require_field_library_[]
 
-        # in formal order but for only those entries that exist in the hash
-        # (where entries with false & nil values count as existing), the
-        # block will receive each value-formal pair
-
         miss_a = nil
 
+        fo_st = remove_instance_variable( :@expanse_stream_once ).call
+
+        rdr_p = @parameter_store.value_reader_proc
+
         begin
-          par = fo_st.gets
-          par or break
-          k = par.name_symbol
+          f = fo_st.gets
+          f or break
 
-          had = true
-          x = rdr_p.call k do
-            had = false ; nil
+          x = rdr_p.call f do
+            NIL_
           end
 
-          did = false
-          if x.nil? && Field_::Has_default[ par ]
-            x = par.default_proc.call
-            did = true
+          if x.nil? && Field_::Has_default[ f ]
+            x = f.default_proc.call
+            @parameter_store.accept_parameter_value x, f
           end
 
-          if x.nil? && Field_::Is_required[ par ]
-            ( miss_a ||= [] ).push par
-            redo
-          end
-
-          if had || did  # [#]"why we skip certain acceptances"
-            accept[ x, par ]
+          if x.nil? && Field_::Is_required[ f ]
+            ( miss_a ||= [] ).push f
           end
 
           redo
         end while nil
 
         if miss_a
-
-          # [#004]#exe explains why we raise here
-          # but this may change soon..
           ___when_missing_requireds miss_a
         else
           ACHIEVED_
@@ -183,6 +103,7 @@ module Skylab::Autonomous_Component_System
         )
 
         oes_p = @on_missing_required
+
         if oes_p
           oes_p.call :error, :missing_required_properties do
             ev
@@ -191,6 +112,12 @@ module Skylab::Autonomous_Component_System
         else
           raise ev.to_exception
         end
+      end  # (is mentor of #here-1)
+
+      # -- support
+
+      def _box_via_stream st
+        st.flush_to_box_keyed_to_method :name_symbol
       end
     end
   end

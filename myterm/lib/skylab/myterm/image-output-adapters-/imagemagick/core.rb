@@ -15,10 +15,10 @@ module Skylab::MyTerm
 
       yield :unavailability, @_unavailability
 
-      -> & pp do
+      -> & call_p do
 
         _sess = _begin_session
-        _sess.set_background_image__( & pp[ self ] )
+        _sess.set_background_image__( & call_p )
       end
     end
 
@@ -36,9 +36,9 @@ module Skylab::MyTerm
 
       yield :unavailability, @_unavailability
 
-      -> & pp do
+      -> & call_p do
         _sess = _begin_session
-        _sess.build_imagemagick_command_( & pp[ self ] )
+        _sess.build_imagemagick_command_( & call_p )
       end
     end
 

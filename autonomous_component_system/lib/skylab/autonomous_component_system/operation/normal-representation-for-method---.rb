@@ -4,6 +4,11 @@ module Skylab::Autonomous_Component_System
 
     class NormalRepresentation_for_Method___
 
+      # (code-notes in [#027])
+
+      # this is *like* a #[#027] "normal representation" of a formal
+      # operation, but read below.
+
       # implement what we now call "transitive operations" (in [#009]):
       #
       # operations like these are intended to implement collection-related
@@ -32,51 +37,49 @@ module Skylab::Autonomous_Component_System
       # as the others (and hopefully simplfiying the whole library), SO
       # this node may be "temporary".
 
-      class << self
-
-        def begin__ qk
-          new.__initial_init_via qk
-        end
-
-        def __method_for_symbol sym
-          :"__#{ sym }__component"
-        end
-
-        private :new
-      end  # >>
-
-      def __initial_init_via qk
+      def initialize qk
         @_single_argument_qk = qk
-        self
       end
 
-      def deliverable_ dreq  # look like formal not an implemenation
-
-        ss, modz, _, pp = dreq.to_a
-
-        qk = @_single_argument_qk
-
-        if modz
-          using_ = modz.using
-        end
+      def deliverable_for_imperative_phrase_ ip
 
         args = []
-        if using_
-          args.concat using_
+        modz = ip.modz_
+        ss = ip.selection_stack_
+
+        if modz
+          x = modz.using
+          if x
+            args.concat x
+          end
         end
-        args.push qk
 
-        _receiver = ss.fetch( -2 ).ACS
+        args.push @_single_argument_qk
 
-        _method_name = Self_.__method_for_symbol(
-          ss.fetch( -1 ).name.as_variegated_symbol )
+        oes_p = nil
+        oes_p_p = -> xx do
+          oes_p_p = -> _ do
+            oes_p
+          end
+          oes_p = ip.call_handler_
+          oes_p_p[ xx ]
+        end
 
-        _bc = Callback_::Bound_Call[ args, _receiver, _method_name, & pp ]
+        _oes_p_p = -> x_ do
+          oes_p_p[ x_ ]
+        end
+
+        _m = :"__#{ ss.fetch( -1 ).name.as_variegated_symbol }__component"
+
+        _bc = Callback_::Bound_Call[
+          args,
+          ss.fetch( -2 ).ACS,  # receiver
+          _m,
+          & _oes_p_p
+        ]
 
         Here_::Delivery_::Deliverable.new modz, ss, _bc
       end
-
-      Self_ = self
     end
   end
 end

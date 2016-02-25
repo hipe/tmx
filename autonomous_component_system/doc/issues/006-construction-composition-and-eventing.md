@@ -78,6 +78,7 @@ because they each have a distinct applicability.
 in the "cold" eventmodel, components are themselves not "bound" to a
 custodian. we might call such a component a "cold-entity", meaning
 it models business data and nothing else (no event bindings).
+(:#the-cold-eventmodel)
 
 if the cold component exposes itself to operations in some way
 (like an [#002] `edit` (mutation) method), it typically recognizes

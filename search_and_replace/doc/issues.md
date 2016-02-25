@@ -1,3 +1,5 @@
+[#021]       [ the interface model ]
+
 [#020] #if-you-like-pain (we first thought of this while implementing
              the last of all the "re-writes" where "hybrid" entities
              became plain old (and clean!) [#fi-007] sessions): for any

@@ -57,9 +57,9 @@ module Skylab::Zerk::TestSupport
 
     def __get_color__component_operation
 
-      -> & pp do  # [#006]#Event-models
+      -> & call_p do  # [#006]#Event-models
 
-        pp[ self ].call :info, :expression, :working do | y |
+        call_p.call :info, :expression, :working do | y |
           y << "retrieving #{ highlight 'color' }"
         end
 
@@ -69,9 +69,7 @@ module Skylab::Zerk::TestSupport
 
     def __set_length__component_operation
 
-      -> length, & pp do
-
-        use_p = pp[ self ]
+      -> length, & use_p do
 
         x = length
 

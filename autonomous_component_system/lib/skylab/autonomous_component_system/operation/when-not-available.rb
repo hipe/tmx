@@ -6,6 +6,36 @@ module Skylab::Autonomous_Component_System
 
       Require_field_library_[]
 
+      Act = -> oes_p, unava_p, fo do
+
+        # so many permutations. is mentee of #here-1
+
+        x = unava_p.call
+        if oes_p
+          # expected during #milestone-4
+          if x
+            self._A_should_be_fine__just_run_it
+            ( * sym_a, ev_p ) = x
+            oes_p.call( * sym_a, & ev_p )
+            UNABLE_
+          else
+            self._B
+          end
+        else
+          if x
+            # #covered-only-by:[my]
+            ( * sym_a, ev_p ) = x
+            o = Home_.lib_.human::NLP::EN::Contextualization.new
+            o.channel = sym_a
+            o.event_proc = ev_p
+            _ev = o.to_exception
+          else
+            _ev = Build_event[ fo ].to_exception
+          end
+          raise _ev
+        end
+      end
+
       Build_event = -> fo do
 
         o = Field_::MetaMetaFields::Enum::Build_extra_value_event.new

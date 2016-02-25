@@ -90,10 +90,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         def __set__component_operation
 
-          -> x, & oes_p_p do
+          -> x, & call_p do
 
-            if oes_p_p
-              use_p = oes_p_p[ nil ]
+            if call_p
+              use_p = call_p
             else
               self._COVER_ME  # use @oes_p_
             end

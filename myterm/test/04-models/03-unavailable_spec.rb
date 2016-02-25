@@ -10,23 +10,26 @@ module Skylab::MyTerm::TestSupport
     context "when neither is set" do
 
       call_by do
-        call :adapter, COMMON_ADAPTER_CONST_,
-          :imagemagick_command
-      end
 
-      it "fails" do
-        fails
-      end
-
-      it "emits explaining the missing pieces!" do
-
-        _be_this = be_emission_ending_with :remaining_required_fields do |y|
-          y.should eql([
-            "(still needed before we can produce an image: #{
-              }\"background font\" and \"label\")"])
+        begin
+          call :adapter, COMMON_ADAPTER_CONST_,
+            :imagemagick_command
+        rescue ::ArgumentError => e
         end
 
-        last_emission.should _be_this
+        e
+      end
+
+      it "raises argument error" do
+        root_ACS_state or fail
+      end
+
+      it "says which pieces are missing" do
+
+        _s = "(still needed before we can produce an image: #{
+          }\"background font\" and \"label\")"
+
+        root_ACS_state.message.should eql _s
       end
     end
   end

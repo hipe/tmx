@@ -1,0 +1,52 @@
+digraph g {
+
+  label="this is hand-made but one
+day might be generated."
+
+  rankdir=BT  // bottom-to-top
+
+  node [shape=record]
+
+  edge [labeldistance=1]  // try labeldistance=2
+
+  subgraph cluster_1 {
+
+    label="root frame"
+    ruby_rx [label="ruby rx"]
+    egrep_pat [label="egrep pat"]
+    paths
+    filename_pat [label="filename\npattern"]
+    search
+  }
+
+  subgraph cluster_2 {
+
+    label="second frame"
+    files_by_find [style=filled label="files\nby find"]
+    files_by_grep [style=filled label="files\nby grep"]
+    counts [style=filled]
+    matches [style=filled]
+    replacement_rx [label="replacement\nexpression"]
+    replace [style=filled]
+    functions_dir [label="functions\ndir"]
+
+    // arrowtail=M arrohead=N where M, N are in crowodot crowtee teeodot teetee
+
+    files_by_find->paths [dir=both arrowtail=none arrowhead=teetee]
+    files_by_find->filename_pat [dir=both arrowtail=none arrowhead=teeodot]
+
+    files_by_grep->files_by_find [dir=both arrowtail=none arrowhead=teetee]
+    files_by_grep->ruby_rx [dir=both arrowtail=none arrowhead=teetee]
+    files_by_grep->egrep_pat [dir=both arrowtail=none arrowhead=teeodot]
+
+    counts->files_by_grep [dir=both arrowtail=none arrowhead=teetee]
+
+    matches->files_by_grep [dir=both arrowtail=none arrowhead=teetee]
+    matches->ruby_rx [dir=both arrowtail=none arrowhead=teetee]
+    matches->egrep_pat [dir=both arrowtail=none arrowhead=teeodot]
+
+    replace->replacement_rx [dir=both arrowtail=none arrowhead=teetee]
+    replace->matches [dir=both arrowtail=none arrowhead=teetee]
+    replace->functions_dir [dir=both arrowtail=none arrowhead=teeodot]
+  }
+}

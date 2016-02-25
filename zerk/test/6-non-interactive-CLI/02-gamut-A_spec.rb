@@ -166,7 +166,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "money (#t11)" do
+    context "money (#t11)", wip: true do  # #milestone-4 (revisit)
 
       given do
         argv 'add', '--left-number', '5', '--right-number', '-2'

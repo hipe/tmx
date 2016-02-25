@@ -18,7 +18,7 @@ module Skylab::Autonomous_Component_System
       class << self ; def [] a, fo
 
         if a.length.nonzero? && :block == a.last.first
-          # a block (if utilized by the implementor) serves as an event
+          # a block (if utilized by the implementer) serves as an event
           # handler builder; and in any case receives no expression here.
           a.pop
         end
@@ -37,12 +37,17 @@ module Skylab::Autonomous_Component_System
           existing = use_bx[ sym ]
 
           if existing
-            existing.dup.instance_exec do
-              if edit
+            if edit
+              existing.dup_by_ do
                 instance_exec( & edit )
+                @parameter_arity ||= :one
               end
-              @parameter_arity ||= :one
-              self
+            elsif existing.parameter_arity
+              existing
+            else
+              existing.dup_by_ do
+                @parameter_arity = :one
+              end
             end
           else
             Here_.new_by_ do

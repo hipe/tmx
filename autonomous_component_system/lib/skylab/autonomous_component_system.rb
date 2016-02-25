@@ -243,19 +243,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       # ~ availability (mode client must implement)
 
       def accept__unavailability__meta_component x
-        @_unavailability_proc = x
+        @unavailability_proc = x
         NIL_
       end
 
-      attr_reader :_unavailability_proc
-
-      def unavailability
-        p = _unavailability_proc
-        if p
-          p[ self ]
-        end
-      end
-
+      attr_reader :unavailability_proc
 
       # ~ description
 
@@ -513,7 +505,6 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     module Operation
       Autoloader_[ self ]
       Here_ = self
-      Request_for_Deliverable_ = -> * a { a }
     end
 
     module Reflection

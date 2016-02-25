@@ -35,7 +35,7 @@ module Skylab::Autonomous_Component_System
                 end
 
                 _fo = new.___init_via m, ss
-                _fo.execute
+                _fo.__evaluate_definition_and_finish
               end
             end
           end
@@ -50,38 +50,7 @@ module Skylab::Autonomous_Component_System
         self
       end
 
-      # --
-
-      def deliverable_via_argument_stream arg_st, & pp
-        deliverable_ Request_for_Deliverable_[
-          @selection_stack,
-          nil,  # no modifiers for such a call
-          arg_st,
-          pp ]
-      end
-
-      def deliverable_as_is & oes_p  # for [#ac-027]
-
-        _pp = -> _ do
-          oes_p
-        end
-
-        _ = deliverable_ Request_for_Deliverable_[
-          @selection_stack,
-          nil,  # no modifiers
-          nil,  # no arg stream - the formal op must specify its params
-          _pp ]
-
-        _
-      end
-
-      def deliverable_ dreq
-        @_reifier.produce_deliverable_ dreq
-      end
-
-      # --
-
-      def execute
+      def __evaluate_definition_and_finish
 
         x = _ACS.send @_method_name do | * x_a |
 
@@ -95,13 +64,14 @@ module Skylab::Autonomous_Component_System
         end
 
         if x.respond_to? :call
-          @_reifier = Here_::NormalRepresentation_for_Proc___.new x, self
+          nr = Here_::NormalRepresentation_for_Proc___.new x, self
         else
 
           _pfoz = x::PARAMETERS  # NOTE - `respond_to?` :parameters whenever
-          @_reifier = Here_::NormalRepresentation_for_NonProc___.new _pfoz, x, self
+          nr = Here_::NormalRepresentation_for_NonProc___.new _pfoz, x, self
         end
 
+        @_normal_representation = nr
         self
       end
 
@@ -122,35 +92,45 @@ module Skylab::Autonomous_Component_System
 
       attr_reader :description_proc
 
+      # ~ availability (e.g required-ness), and parameter-level definition
+
       def __accept__unavailability__meta_component st
-        @_unavailability_proc = st.gets_one
-        NIL_
+        @unavailability_proc = st.gets_one ; nil
       end
 
-      attr_reader :_unavailability_proc
-
-      def unavailability
-        p = _unavailability_proc
-        if p
-          p[ self ]
-        end
-      end
+      attr_reader :unavailability_proc  # for mode-client to implement
 
       def __accept__parameter__meta_component st
 
-        @box ||= Callback_::Box.new
-        ACS_::Parameter.interpret_into_via_passively__ @box, st
+        ACS_::Parameter.interpret_into_via_passively__ _writable_param_box, st
         NIL_
+      end
+
+      def _writable_param_box
+        @box ||= Callback_::Box.new
       end
 
       attr_reader :box
 
-      def __accept__parameters_from__meta_component st
-        @parameters_from_proc_ = st.gets_one
-        NIL_
+      # ~ for [ze]
+
+      def begin_preparation & call_handler
+        @_normal_representation.begin_preparation_( & call_handler )
       end
 
-      attr_reader :parameters_from_proc_
+      def begin_parameter_store & call_handler
+        @_normal_representation.begin_parameter_store_( & call_handler )
+      end
+
+      def to_defined_formal_parameter_stream
+        @_normal_representation.to_defined_formal_parameter_stream_cached_
+      end
+
+      # ~
+
+      def normal_representation_
+        @_normal_representation
+      end
 
       def name_symbol  # [ze]
         @selection_stack.fetch( -1 ).as_variegated_symbol
@@ -162,12 +142,107 @@ module Skylab::Autonomous_Component_System
 
       attr_reader :selection_stack  # [ze]
 
-      def reifier  # for now, for [ze] to spy on module
-        @_reifier
-      end
-
       def associationesque_category
         :formal_operation
+      end
+    end
+
+    class Normal_Representation_
+
+      # abstract base for a #[#027] "normal representation" of a formal operation
+
+      def deliverable_for_imperative_phrase_ ip
+
+        ss = ip.selection_stack_ ; oes_p = ip.call_handler_
+
+        o = self.class::Preparation.new self, ss, & oes_p
+
+        o.bespoke_stream_once = -> do
+          to_defined_formal_parameter_stream_cached_
+        end
+
+        o.expanse_stream_once = -> do
+          to_defined_formal_parameter_stream_cached_
+        end
+
+        o.on_unavailable_ = NOTHING_  # raise exceptions
+
+        o.parameter_store = begin_parameter_store_( & oes_p )
+
+        o.parameter_value_source = ip.build_parameter_value_source_
+
+        bc = o.to_bound_call
+
+        bc and Here_::Delivery_::Deliverable.new( ip.modz_, ss, bc )
+      end
+
+      def begin_preparation_ & call_handler
+
+        self.class::Preparation.new self, @formal_.selection_stack, & call_handler
+      end
+
+      def to_defined_formal_parameter_stream_cached_
+
+        # (case in point is [#ze-028]<->[#032] - this is requested 3 times for one invocation?)
+
+        @__etc_ ||= to_defined_formal_parameter_stream_to_be_cached_.to_a
+        Callback_::Stream.via_nonsparse_array @__etc_
+      end
+
+      attr_reader(
+        :formal_,
+      )
+    end
+
+    class Preparation_  # #stowaway - see [#027]:"preparation"
+
+      def initialize nr, ss, & call_handler
+        @call_handler_ = call_handler  # [#ca-001] for the operation execution
+        @nr_ = nr
+        @_omr = nil
+        @ss_ = ss
+      end
+
+      attr_writer(
+        :bespoke_stream_once,
+        :expanse_stream_once,
+        :on_unavailable_,
+        :parameter_store,
+        :parameter_value_source,
+      )
+
+      def check_availability_
+        p = @nr_.formal_.unavailability_proc
+        if p
+          fo = @nr_.formal_
+          unava_p = p[ fo ]
+          if unava_p
+            Here_::When_Not_Available::Act[ @on_unavailable_, unava_p, fo ]
+          else
+            ACHIEVED_
+          end
+        else
+          ACHIEVED_
+        end
+      end
+
+      def normalize_
+
+        # (if any of the below ivars is not set you did not set a required attribute)
+
+        o = Home_::Parameter::Normalization.begin @ss_
+
+        o.bespoke_stream_once = @bespoke_stream_once
+
+        o.expanse_stream_once = @expanse_stream_once
+
+        o.on_missing_required = @on_unavailable_
+
+        o.parameter_store = @parameter_store
+
+        o.parameter_value_source = @parameter_value_source
+
+        o.execute
       end
     end
   end

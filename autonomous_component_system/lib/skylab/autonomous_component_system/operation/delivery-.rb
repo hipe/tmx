@@ -75,7 +75,7 @@ module Skylab::Autonomous_Component_System
 
           bc = @_bound_call
 
-          _yes = bc.receiver.send _m, * bc.args, & _event_handler
+          _yes = bc.receiver.send _m, * bc.args, & _emission_handler
 
           _yes
         end
@@ -93,7 +93,7 @@ module Skylab::Autonomous_Component_System
             end
 
             bc = @_bound_call
-            last_value = bc.receiver.send _m, * bc.args, & _event_handler
+            last_value = bc.receiver.send _m, * bc.args, & _emission_handler
 
             last_value or break
           end
@@ -145,7 +145,7 @@ module Skylab::Autonomous_Component_System
 
           ev = _ev_p[]
 
-          _event_handler.call( * ev.suggested_event_channel ) do
+          _emission_handler.call( * ev.suggested_event_channel ) do
             ev
           end
           NIL_
@@ -162,8 +162,18 @@ module Skylab::Autonomous_Component_System
 
         # --
 
-        def _event_handler
-          @___oes_p ||= @_bound_call.block[ @_bound_call.receiver ]
+        def _emission_handler
+          @___oes_p ||= ___carefully_determine_emission_handler
+        end
+
+        def ___carefully_determine_emission_handler
+
+          p = @_bound_call.block
+          if 1 == p.arity
+            p[ NOTHING_ ]  # EEW
+          else
+            p
+          end
         end
       end
 

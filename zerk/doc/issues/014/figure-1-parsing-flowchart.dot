@@ -4,7 +4,7 @@ label="
 figure 1. schematic (possibly not exactly literal) flowchart
 for how non-internactive CLI argument streams are parsed.
 handling of requests for help is not shown.
-handling unavailability is not accounted for (yet)."
+handling u-navailability is not accounted for (yet)."
 
 /* states */
 

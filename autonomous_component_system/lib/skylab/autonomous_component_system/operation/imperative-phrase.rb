@@ -17,7 +17,7 @@ module Skylab::Autonomous_Component_System
 
       def initialize as, rw, & pp
         @argument_stream = as
-        @pp_ = pp
+        @_pp = pp
         @_stack_base = [ rw ]
       end
 
@@ -46,16 +46,20 @@ module Skylab::Autonomous_Component_System
         __parse_zero_or_more_operands
         ok = __finish_selection_stack
         ok &&= __resolve_formalesque
-        ok && ___produce_deliverable
+        ok and @_normal_representation.deliverable_for_imperative_phrase_ self
       end
 
-      def ___produce_deliverable
+      def call_handler_  # for above..
 
-        @_deliverabler.deliverable_ Request_for_Deliverable_[
-          @_stack,
-          @modz_,
-          @argument_stream,
-          @pp_ ]
+        # ..per [#004]#exceptions we raise them when etc. but the custom
+        # implementation of operation is entitled to a plain old handler
+        # to emit arbitrary emissions.
+
+        @_pp[ NOTHING_ ]  # we *could* pass the receiver..
+      end
+
+      def build_parameter_value_source_
+        Home_::Parameter::ValueSource_for_ArgumentStream.new @argument_stream
       end
 
       def __parse_zero_or_more_modifiers  # we peek before loading the node
@@ -225,7 +229,7 @@ module Skylab::Autonomous_Component_System
 
       def ___build_via_via via, asc  # :[#002]:Tenet7.
         _x = @argument_stream.gets_one
-        comp_x = asc.component_model.send :"new_via__#{ via }__", _x, & @pp_
+        comp_x = asc.component_model.send :"new_via__#{ via }__", _x, & @_pp
         if comp_x
           Callback_::Qualified_Knownness[ comp_x, asc ]
         else
@@ -238,7 +242,7 @@ module Skylab::Autonomous_Component_System
         _ACS = @_stack.last.ACS
 
         ACS_::Interpretation::Build_value.call(
-          @argument_stream, asc, _ACS, & @pp_ )
+          @argument_stream, asc, _ACS, & @_pp )
       end
 
       def _push_operation_name_on_to_selection_stack
@@ -261,7 +265,7 @@ module Skylab::Autonomous_Component_System
       def ___resolve_formalesque_for_transitive
 
         _qk = remove_instance_variable :@_deliveree_qk
-        @_deliverabler = Here_::NormalRepresentation_for_Method___.begin__ _qk
+        @_normal_representation = Here_::NormalRepresentation_for_Method___.new _qk
         ACHIEVED_
       end
 
@@ -284,16 +288,22 @@ module Skylab::Autonomous_Component_System
           fo = _eek[ @_stack ]
         end
 
-        @_deliverabler = fo
+        @_normal_representation = fo.normal_representation_
 
         ACHIEVED_
       end
 
       # -- for sub-clients
 
+      def selection_stack_
+        @_stack
+      end
+
       attr_reader(
         :modz_,
       )
+
+      # --
 
       Build_frame_by_qk__ = -> qk do
         My_Frame___.new qk

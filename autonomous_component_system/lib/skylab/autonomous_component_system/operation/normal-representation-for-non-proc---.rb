@@ -2,51 +2,40 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class NormalRepresentation_for_NonProc___
+    class NormalRepresentation_for_NonProc___ < Normal_Representation_
 
       def initialize pfoz, x, fo
-        @formal = fo
-        @_implementor_x = x
-        @_pfoz = pfoz
+        @__classesque = x
+        @formal_ = fo
+        @__formals = pfoz
       end
 
-      def produce_deliverable_ dreq
+      class Preparation < Preparation_
 
-        ss, modz, arg_st, pp = dreq.to_a
+        def to_bound_call
 
-        _fo_st = ___build_formals_stream
-
-        o = Home_::Parameter::Normalization.new ss, _fo_st
-
-        p = @formal.parameters_from_proc_
-        if p
-          o.parameters_value_reader = p.call
-        else
-          o.argument_stream = arg_st
+          ok = check_availability_
+          ok &&= __normalize
+          ok && Callback_::Bound_Call[ NOTHING_, @_sess, :execute ]
         end
 
-        _receiver = ss.fetch( -2 )
-        _oes_p = pp[ _receiver ]  # TOTALLY up in the air, but look OK .. #at [#010]
-        sess = @_implementor_x.new( & _oes_p )
+        def __normalize
 
-        ok = o.write_into sess  # usu just throws, but might change [#028]#A
-
-        if ok
-          _bc = Callback_::Bound_Call[ nil, sess, :execute ]
-          Here_::Delivery_::Deliverable.new modz, ss, _bc
-        else
-          ok
+          store = @parameter_store
+          x = store.internal_store_substrate
+          x.class.const_get( :PARAMETERS, false )  # sanity
+          @_sess = x
+          normalize_
         end
       end
 
-      def ___build_formals_stream
+      def to_defined_formal_parameter_stream_to_be_cached_
 
-        # (if your parameters include a false-ish key, shame on you)
-
-        op_h = @_pfoz.optionals_hash
+        foz = @__formals
+        op_h = foz.optionals_hash
         op_h ||= MONADIC_EMPTINESS_
 
-        Callback_::Stream.via_nonsparse_array( @_pfoz.symbols ).map_by do |sym|
+        Callback_::Stream.via_nonsparse_array( foz.symbols ).map_by do |sym|
 
           Home_::Parameter.new_by_ do
             @name_symbol = sym
@@ -59,8 +48,53 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      def moduleish
-        @_implementor_x
+      def begin_parameter_store_ & call_handler
+
+        Store___.new @__classesque.new( & call_handler )
+      end
+
+      attr_reader(
+        :__classesque,
+      )
+
+      class Store___
+
+        def initialize sess
+          @_sess = sess
+        end
+
+        def accept_parameter_value x, par
+          @_sess.send :"#{ par.name_symbol }=", x
+          NIL_
+        end
+
+        def value_reader_proc
+
+          # all formals came from us, so we should (?) never not know a value
+
+          o = @_sess
+          -> par do
+            # experimental - we could require readers, but why?
+            ivar = par.name.as_ivar
+            if o.instance_variable_defined? ivar
+              o.instance_variable_get ivar
+            end
+          end
+        end
+
+        def knownness_for par
+
+          ivar = par.name.as_ivar
+          if @_sess.instance_variable_defined? ivar
+            Callback_::Known_Known[ @_sess.instance_variable_get ivar ]
+          else
+            Callback_::KNOWN_UNKNOWN
+          end
+        end
+
+        def internal_store_substrate
+          @_sess
+        end
       end
     end
   end

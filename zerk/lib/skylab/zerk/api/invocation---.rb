@@ -69,9 +69,12 @@ module Skylab::Zerk
         # (implementation of availiability is not reflected in [#012])
 
         @_memory.clear
-        p = asc.unavailability
+        p = asc.unavailability_proc
         if p
-          __when_association_is_not_available p, asc
+          unava_p = p[ asc ]
+        end
+        if unava_p
+          ACS_::Events::Component_Not_Available::Act[ unava_p, asc, @_stack ]  # raises
         else
           ___parse_this_component_association asc
         end
@@ -159,78 +162,29 @@ module Skylab::Zerk
 
         @_memory.clear
 
-        _sym = @_stream.current_token
-
-        _nf = Callback_::Name.via_variegated_symbol _sym
-
         ss = @_stack.dup  # ours always has compound on top
 
-        ss.push _nf
+        ss.push Callback_::Name.via_variegated_symbol @_stream.gets_one  # (e)
 
-        fo = fo_p[ ss ]
+        # as it does in the chart, here the (g)/(f) fork must happen
+        # *before* the (j)/(h) fork because of "bespoke"s.
 
-        p = fo.unavailability
-        if p
-          ___when_operation_not_available p, fo
-        else
-          __parse_available_formal_operation fo
-        end
-      end
+        _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.new @_stream
 
-      def ___when_operation_not_available p, fo
+        o = Home_::Invocation_::Procure_bound_call.begin _pvs, fo_p[ ss ], & @_pp
 
-        a = p.call
-        if a
-          _express_this a
-        else
-          _handler.call :error, :operation_is_not_available do
-            ACS_::Operation::When_Not_Available::Build_event[ fo ]
-          end
-        end
+        o.on_unavailable_ = NOTHING_  # throw exeptions
 
-        Stop_parsing_because_unable__[]
-      end
+        bc = o.execute
 
-      def __when_association_is_not_available p, asc
-
-        a = p.call
-        if a
-          _express_this a
-        else
-          _handler.call :error, :association_is_not_available do
-            ACS_::Events::Component_Not_Available::Build_event[ @_stack, asc ]
-          end
-        end
-
-        Stop_parsing_because_unable__[]
-      end
-
-      def _express_this a
-        ( * sym_a, ev_p ) = a
-        _handler.call( * sym_a, & ev_p )
-        NIL_
-      end
-
-      def __parse_available_formal_operation fo  # (e)
-
-        @_stream.advance_one
-
-        de = fo.deliverable_via_argument_stream @_stream, & @_pp
-
-        if de  # (g)
-
+        if bc  # (g)
           if @_stream.no_unparsed_exists  # (j)
-
-            # (we discard the sel.stack of the deliv. use only the b.c)
-
-            Result__[ de.bound_call ]
-
-          else  # (h)
-            ___stop_parsing_when_extra
+            Result__[ bc ]
+          else
+            __stop_parsing_when_extra  # (h)
           end
-
-        else  # (f)
-          Result__[ de ]
+        else
+          Stop_parsing_because_unable__[]  # (f)
         end
       end
 
@@ -257,7 +211,7 @@ module Skylab::Zerk
         Stop_parsing_because_unable__[]
       end
 
-      def ___stop_parsing_when_extra
+      def __stop_parsing_when_extra
 
         x = @_stream.current_token
         _handler.call(

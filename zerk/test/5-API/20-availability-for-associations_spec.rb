@@ -32,44 +32,51 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    _say_this = "association 'upper-color' is not available"
+
     context "read when unavailable" do
 
       call_by do
+
         @root_ACS = build_root_ACS
         @root_ACS.make_ucolor_unavailable_!
-        call :upper_color  # #test-07+avail
+
+        begin
+          call :upper_color  # #test-07+avail
+        rescue ::ArgumentError => e
+        end
+        e
       end
 
-      it "fails" do
-        fails
+      it "raises argument error" do
+        root_ACS_state or fail
       end
 
-      it "emits" do
-        only_emission.should _be_this
+      it "says.." do
+        root_ACS_state.message.should eql _say_this
       end
     end
 
     context "write when unavailable" do
 
       call_by do
+
         @root_ACS = build_root_ACS
         @root_ACS.make_ucolor_unavailable_!
-        call :upper_color, :red  # #test-11+avail
+
+        begin
+          call :upper_color, :red  # #test-11+avail
+        rescue ::ArgumentError => e
+        end
+        e
       end
 
-      it "fails" do
-        fails
+      it "raises argument error" do
+        root_ACS_state or fail
       end
 
-      it "emits" do
-        only_emission.should _be_this
-      end
-    end
-
-    def _be_this
-      be_emission_ending_with :association_is_not_available do |ev|
-        _ = black_and_white ev
-        _.should eql "association 'upper-color' is not available"
+      it "says.." do
+        root_ACS_state.message.should eql _say_this
       end
     end
 

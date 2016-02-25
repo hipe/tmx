@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] API - postfix intro" do
+  describe "[ze] API - operation intro" do
 
     TS_[ self ]
     use :API
@@ -114,6 +114,8 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    # note missing requireds is covered at #here-2
+
     context "write two items then add" do
 
       call_by do
@@ -123,6 +125,8 @@ module Skylab::Zerk::TestSupport
       it "result" do
         root_ACS_result.should eql 3
       end
+
+      # (exemplar of [#ac-032]<->[#028] - needs one stream 3 times..)
     end
 
     def subject_root_ACS_class

@@ -22,6 +22,31 @@ prerequisites:
 acceptable number of occurrences of actual parameters for it in actual
 request?"
 
+(sidebar: literature in the real world has used the terms "modality"
+and "cardinality" to describe a relationship in an ERD diagram [#sl-154],
+where they refer (respectively) to the minimum and maxium number of times
+an instance of the one entity can be associated with an instance of the
+other. although we acknowledge that our concept of "parameter arity"
+is probably equivalent to the tuple of these two concepts, we avoid use
+of those terms for those meanings for the following reasons:
+
+  • "modality" has become a very particular term of jargon in our
+    universe, with a meaning altogether separate from that meaning.
+    so to avoid local confusion, we stick with only one local meaning
+    for that term.
+
+  • "cardinality and modality" is a bit more of a mouthful than just
+    "parameter arity" (by three syllables). the latter sounds like more
+    of a conceptual unit -- one thing as opposed to two things.
+
+on the flip side, the subject treatment of the concept applies it to
+data modeling in general which for whatever reason feels like a superset
+of the more limited scope we carry here for this being only about
+"parmeters" (as they relate to {functions|actions|operations}), so it's
+food for thought..
+
+end sidebar)
+
 this concept is reinforced by the platform language's reflective
 `Method#parameters` method and the sorts of categorizations it applies
 to parameters: `opt`, `req`, `rest`. our treatment here acts as a more

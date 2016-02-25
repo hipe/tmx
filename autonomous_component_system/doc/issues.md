@@ -1,3 +1,5 @@
+[#032]       in-situ
+
 [#031]       a "selection stack" is effectively (when complete) a reference
              pointing to a "fully qualified" formal operation ("action" in
              [br]).

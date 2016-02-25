@@ -31,11 +31,19 @@ doesn't work and that's OK.
 
 
 
-## when to raise exceptions :#exe
+## when to raise :#exceptions
 
-it's the responsibility of the client to express validity in
-its own modality-appropriate way. if required parameters are
-not passed at this low level it is deemed a failure at using
-one's own internal API, and as such it is not appropriate to
-emit an event. to raise an exception is useful for debugging.
+
+
+
+for present applications of this library at least and perhaps in
+general, in error cases it is more useful for "an API call" to raise
+an exception rather than emit an emission for the straightforward reason
+that they are easier to trace. (the user of any API is (eponymously) the
+*programmer*, and stack traces contain a level of detail appropriate for
+such an audience.)
+
+code locations tagged with the subject tag may also be towards realizing
+[#006]#the-cold-eventmodel as the universal rule as opposed to just the
+norm..
 _

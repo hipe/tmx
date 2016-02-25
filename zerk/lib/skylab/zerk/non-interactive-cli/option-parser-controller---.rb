@@ -79,8 +79,11 @@ module Skylab::Zerk
 
       def ___receive_unsanitized_value s, asc, frame
 
-        p = asc.unavailability
+        p = asc.unavailability_proc
         if p
+          unava_p = p[ asc ]
+        end
+        if unava_p
           self._WAHOO_this_will_be_fun_for_open  # #open [#022]
         end
 

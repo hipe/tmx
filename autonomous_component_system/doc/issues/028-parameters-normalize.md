@@ -1,14 +1,13 @@
 # parameters normalization :[#028]
 
-this is a central "basin" for a family of distinct operations with
-similar sub-operations (and is part of the super-family of #[#br-087]
-normalization algorithms).
 
-shared sub-operations include:
-  • checking for missing requireds
+## overview
+
+yet another #[#br-087]. (but of course this one is the best yet.)
+
+  • check for missing requireds
   • defaulting
-
-at present this does no "soft" failures but this may change. :#A
+  • "soft" or "hard" failure in a modality adaptive way
 
 we prepare "actual" arguments
 
@@ -16,7 +15,7 @@ we prepare "actual" arguments
   • from a variety of input sources
 
 
-the possible target shapes:
+possible target shapes might be:
 
   1) produce an "actual parameters" list (array) for a plain-old
      "platform" proc or method.
@@ -24,10 +23,10 @@ the possible target shapes:
   2) write values "into" a session-like object using (what look
      like) `attr_writer`s.
 
-the possible input sources:
+possible input sources might be:
 
   1) an argument stream, off of which we will parse "passively"
-     (stopping error-lessly at any first unrecotnized token)
+     (stopping error-lessly at any first unrecognized token)
 
   2) a "parameters value reader" that allows random-access to
      "epistemic" meta-data about whether which values are known
@@ -36,40 +35,108 @@ the possible input sources:
 
 
 
-## :"head parse"
+## :"limited scope"
+
+the ACS has some fortuitous emergent characteristics that make *this*
+implementation of normalization simpler than previous efforts in this
+family thread:
+
+  • under [ac], if an ACS ("frame") *has* a component, then than
+    component is already valid. there is no need to "normalize" the
+    component itself further. (what is now deemed as a misfeature of
+    [br] was that it used the same store (the "entity") to hold unsanitized
+    modality values as it did to store these as the valid, ad-hoc
+    structures they became.)
+
+  • our responsibility is only to traverse over the "expanse set"
+    of formal *parameters* (not nodes, i.e not component associations
+    or formal operations); and validate their presence for those
+    parameters that are required. note that thus far we need never produce
+    new components during this work, we need only check the values of
+    existing components.
+
+  • because its in scope, "definition-based" defaults get effected here
+    too. (non-proc-based implementations may have their own form of
+    effectively defaulting component values.) HOWEVER, a corollary of
+    the above bullet and this one is that default values do NOT get
+    put through component models to derive a value - the default values
+    are accepted as-is.
+
+
+
+
+## approach
+
+this first major rewrite occurred because the subject node was not written
+in a way that was truly modality agnostic: although it was compartmentalized
+into different files, its implementation was not "injective". in this
+implementation, arbitrary new "parameter value sources" that have not yet
+been invented will hopefully still work down the road with this same old
+essential normalization axioms about defaulting and missing requireds.
+
+
+
+
+
+## :#"head parse"
 
 as long as the current head of the argument stream corresponds to
 the name of a formal parameter, shift that name and (assumed here
 to be present on the stream) value element off the stream and
-replace the value in the sparse hash with this value. (i.e continue
+store this value to the parameter value store. (i.e continue
 until no more stream or the head of the stream is not recognized.)
 
 having only one formal argument is a special case: in this
 arrangement we NEVER recognize named arguments, i.e the term
 in the argument stream MUST be not named (i.e "positional").
 
+NOTE we do *not* run these values through component association models -
+the are raw and unsanitized, passed as-is to the implementation. this is
+to make it easy for operations to add ad-hoc parameters to their
+signature, but there is typo danger here - if the user mistypes a
+parameter name in her formal operation signature, she may think she's
+working with a sanitized component value when actually she working with
+an unsanitized, "raw" value directly from the modality.
 
 
 
-## "why we skip certain acceptances"
 
-when we say "random access" below we mean: the operation is
-implemented as a class. for each would-be invocation of the
-operation we start with an instance of that class. each prepared
-value that we produce here is sent one-by-one (non-atomicly, mind
-you) to that instance through its corresponding plain-old
-(ostensibly) `attr_writer` method. (this is exactly [#fi-007]
-"session" pattern.) if we get to the end cleanly we can `execute`.
 
-with operations implemented in this way it is typical to
-initialize all non-required parameters in the `initialize`
-method. in its way this is the simplest implementation of
-"defaulting".
+## :#API-point-A
 
-now, we might or might not be in "random access" mode here. (we
-might just be building an arglist for a proc.) but if we are,
-we want to send the prepared value IFF it was provided or there
-was a default and the default was exercised (to any value). we
-must skip the acceptance of this nil value otherwise, lest we
-overwrite the kinds of defaults described above. whew!
+the subject session promises that it will request the bespoke stream IFF
+the parameter value source is not known to be empty.
+
+
+
+
+## improved distillation
+
+this is perhaps an improved distillation of [#br-087]:
+
+in the defined ("formal") order (:A), for each formal parameter:
+
+  • we treat as equivalent the value being unknown and the value
+    being known to be `nil`. this step was not designed per se but
+    rather has emerged naturally from the work, and seems to work
+    fine. both in these docs and in the code we unify these two
+    cases into one that we refer to here as "effectively unknown".
+
+  • if the value is effectively unknown and there is a default
+    proc, produce a default value and use this as *the* value.
+    (NOTE this default value is *not* run through a component model.)
+
+  • if (at this point) the value is effectively unknown and it
+    is required, memo this as a missing required field.
+
+now, you have applied all defaulting that can be and needs to be
+applied. as well it is known if there are missing requireds.
+
+
+
+### :#API-point-B (that we must adhere to) maintains that:
+
+the "expase set" that was provided as an argument will be exercized in
+its entirety - there will not (for example )be short-circuiting on the
+first enountere derror.
 _

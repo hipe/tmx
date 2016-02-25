@@ -84,6 +84,8 @@ module Skylab::Zerk
         @___rw ||= ACS_::ReaderWriter.for_componentesque self.ACS
       end
 
+      alias_method :reader__, :reader_writer
+
       def ACS
         @qualified_knownness.value_x
       end

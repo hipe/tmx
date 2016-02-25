@@ -1,11 +1,15 @@
 module Skylab::Autonomous_Component_System
   # ->
-    class Parameter  # a fresh take on an old hat
+    class Parameter  # :[#020]. a fresh take on an old hat
 
       class << self
 
         def new_prototype
           new do end
+        end
+
+        def new_prototype_by__ & p
+          new( & p )
         end
 
         def interpret_into_via_passively__ bx, st
@@ -27,6 +31,14 @@ module Skylab::Autonomous_Component_System
         @argument_arity = :one
         instance_exec( & p )
       end
+
+      def dup_by_ & p
+        o = dup
+        o.instance_exec( & p )
+        o
+      end
+
+      private :dup
 
       def __init_via_argument_stream_passively st
 

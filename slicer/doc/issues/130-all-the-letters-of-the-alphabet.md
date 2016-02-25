@@ -12,6 +12,7 @@ d - integer! `i` is already taken, as will be explained; so we borrow this
 e - error, e.g exception. most often seen as `rescue ::RuntimeError => e` but
     often we see it also as a formal parameter in a error handling lambda.
 f - if you have to use it, use it for "float", not for "function" (see `p`)
+    or use it for "field" (as in [fi]), i.e "formal parameter"
 g - not used, unless it has business meaning
 h - hash! often used as suffix or standalone for an object we interact with
     in a hash-exact manner.

@@ -1,0 +1,3 @@
+lib/skylab/autonomous_component_system/parameter/platform-arglist--via--argument-stream---.rb
+lib/skylab/autonomous_component_system/parameter/write-into--via--argument-stream---.rb
+lib/skylab/autonomous_component_system/parameter/write-into--via--parameters-reader---.rb

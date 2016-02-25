@@ -87,7 +87,34 @@ module Skylab::Human
       define_method "#{ k }=", & _p
     end
 
-    # -- different forms expression
+    # -- different forms of expression
+
+    def to_exception  # #covered-only-by:[my]. mutates receiver.
+
+      if :expression == @channel.fetch( 1 )
+        ___exception_via_expression
+      else
+        self._EASY_just_build_the_event_and_call_to_exception_on_it
+      end
+    end
+
+    def ___exception_via_expression
+
+      @expression_agent ||= Home_.lib_.brazen::API.expression_agent_instance
+
+      _will_express_emission
+      s = express_into ""
+      s.chop!  # weee
+
+      _3rd = @channel[ 2 ]
+      if _3rd
+        cls = Callback_::Event::To_Exception::Class_via_symbol.call _3rd do
+          NOTHING_
+        end
+      end
+      cls ||= ::RuntimeError
+      cls.new s
+    end
 
     def to_emission_handler  # as referenced in [#043]
 
@@ -101,11 +128,15 @@ module Skylab::Human
       if @_solver
         self._COVER_ME
       end
-      Here_::Express_Emission___[ self ]
+      _will_express_emission
       @channel = i_a
       @event_proc = ev_p
       express_into @line_yielder
       UNRELIABLE_
+    end
+
+    def _will_express_emission
+      Here_::Express_Emission___[ self ] ; nil
     end
 
     def __emit_expression i_a, & ev_p

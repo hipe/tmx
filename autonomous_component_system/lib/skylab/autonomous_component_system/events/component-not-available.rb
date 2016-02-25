@@ -4,6 +4,18 @@ module Skylab::Autonomous_Component_System
 
     Require_field_library_[]
 
+    Act = -> unava_p, asc, ss do
+
+      x = unava_p[]
+      if false  # oes_p
+        # ..
+      elsif x
+        self._A
+      else
+        raise Build_event[ ss, asc ].to_exception
+      end
+    end
+
     # -
 
       Build_event = -> ss, asc do

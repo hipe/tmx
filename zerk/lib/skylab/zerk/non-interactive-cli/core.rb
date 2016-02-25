@@ -291,6 +291,8 @@ module Skylab::Zerk
 
       _oes_p = method :handle_ACS_emission_  # 2 of 2 (hm..)
 
+      self._REDO_at_milestone_four_revisited  # #milestone-4
+
       deliv = _fo.deliverable_via_argument_stream _st, & _oes_p
 
       if deliv

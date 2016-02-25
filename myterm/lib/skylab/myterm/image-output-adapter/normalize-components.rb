@@ -96,7 +96,7 @@ module Skylab::MyTerm
             y << "(still needed before we can produce an image: #{ and_ _s_a })"
           end
 
-          [ :info, :expression, :remaining_required_fields, _p ]
+          [ :info, :expression, :argument_error, :remaining_required_fields, _p ]
         end
 
         Result__.new _em_proc

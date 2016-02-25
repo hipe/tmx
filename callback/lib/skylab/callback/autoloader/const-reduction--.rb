@@ -30,8 +30,7 @@ module Skylab::Callback
           a = [ :const_path, a.fetch( 0 ), :from_module, a.fetch( 1 ) ]
         end
 
-        st = Polymorphic_Stream.via_array a
-        ___via_nonempty_parse_stream st
+        ___via_nonempty_parse_stream  Polymorphic_Stream.via_array a
       end
 
       def ___via_nonempty_parse_stream st

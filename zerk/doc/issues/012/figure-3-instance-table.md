@@ -23,7 +23,7 @@ so far tested and what remains to be tested.
 |"hashtag"  |num| path in graph | description
 |test-01     |2x| a             |the empty request
 |test-02     |3x| b cd          |unrecognized token from the top
-|test-03     |2x| bce f         |operation where args don't parse
+|test-03     |3x| bce f         |operation where args don't parse
 |test-04     |1x| bce g h       |op where args parse but there's more after
 |test-05     |4x| bce g j       |op where args parse and op can run
 |test-06     |1x| b km          |read primitive when it wasn't set

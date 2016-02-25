@@ -42,9 +42,10 @@ module Skylab::Autonomous_Component_System::TestSupport
         :assuming, :fun,
         :assuming, :good_times,
         :rattle, :jimmy
-      ) do | x |
+      ) do | * a |
+        1 == a.length or ::Kernel.raise
         @_ev_a ||= []
-        @_ev_a.push x
+        @_ev_a.push a.fetch 0
       end
     end
 

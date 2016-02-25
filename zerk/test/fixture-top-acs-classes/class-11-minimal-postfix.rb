@@ -22,12 +22,8 @@ module Skylab::Zerk::TestSupport
 
       def __add__component_operation
 
-        # yield :requires, :left_number, :right_number
-
-        -> do
-
-          # NOTE there is no validation of the numbers' existence..
-          @left_number + @right_number
+        -> left_number, right_number do
+          left_number + right_number
         end
       end
 
