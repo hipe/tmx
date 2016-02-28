@@ -1,10 +1,8 @@
 module Skylab::Human
 
-  class NLP::Expression_Frame
+  module Sexp
 
-    Actors_ = ::Module.new
-
-    module Actors_::Build_score_against_idea_of_frame
+    module Build_score_against_idea_of_frame___
 
       my_proc = -> idea, frame_mod do
 
@@ -79,7 +77,7 @@ module Skylab::Human
           end
         end
 
-        def to_expression_frame
+        def to_expression_session__
           @_frame_mod.new_via_idea @_idea
         end
 

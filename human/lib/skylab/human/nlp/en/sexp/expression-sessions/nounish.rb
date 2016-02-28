@@ -1,8 +1,11 @@
 module Skylab::Human
 
-  module NLP::EN::Idiomization_
+  module NLP::EN::Sexp
 
-    class Sessions::Nounish
+    class Expression_Sessions::Nounish
+
+      # (NOTE: we have *begun* to retrofit this into [##049] but it is not
+      # fully integrated..)
 
       # this is divorced from conception of subject vs object. its purpose
       # is to produce a starter noun-phrase given permutations of atom, list
@@ -79,7 +82,7 @@ module Skylab::Human
         :must_express_negativity
 
       def quad_count
-        NLP::Expression_Frame::Models::Quad_Count.fetch @_quad_count_category
+        Home_::Sexp::Quad_Count.fetch @_quad_count_category
       end
 
       def __when__none__list_only  # see previous method comment

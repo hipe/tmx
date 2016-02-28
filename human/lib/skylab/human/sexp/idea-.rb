@@ -1,8 +1,8 @@
 module Skylab::Human
 
-  class NLP::Expression_Frame
+  module Sexp
 
-    class Models_::Idea
+    class Idea_
 
       Callback_::Actor.methodic( self, :properties,
 
@@ -104,21 +104,21 @@ module Skylab::Human
 
         yield :can, :add
 
-        EF_::Models_::Argument_Adapter::Nounish::Object
+        Here_::Idea_Argument_Adapter_for_Nounish_::Object
       end
 
       def __subject_argument__component_association
 
         yield :can, :add
 
-        EF_::Models_::Argument_Adapter::Nounish::Subject
+        Here_::Idea_Argument_Adapter_for_Nounish_::Subject
       end
 
       def __verb__component_association
 
         yield :can, :add
 
-        EF_::Models_::Argument_Adapter::Verbish
+        Here_::Idea_Argument_Adapter_for_Verbish___
       end
 
       def __add__component qk, & _
@@ -130,6 +130,15 @@ module Skylab::Human
 
       def result_for_component_mutation_session_when_changed _, &__
         ACHIEVED_
+      end
+
+      class Argument_Adapter
+
+        undef_method :to_s
+
+        def initialize & edit_p
+          instance_exec( & edit_p )
+        end
       end
     end
   end

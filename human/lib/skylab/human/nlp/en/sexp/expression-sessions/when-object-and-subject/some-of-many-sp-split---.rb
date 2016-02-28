@@ -1,14 +1,13 @@
 module Skylab::Human
 
-  module NLP::EN::Idiomization_
+  module NLP::EN::Sexp
 
-    # 1x
+    class Expression_Sessions::When_Object_and_Subject
 
-    Actors::Some_of_many_sp_split = -> sp, si do  # assume two or more
+      Some_of_many_sp_split___ = -> sp, si do  # assume two or more
 
-      # before: "the 2 found items have no content after them"
-
-      # ->
+        # before: "the 2 found items have no content after them"
+        # after: "of the 2 found items, neither of them have content after them"
 
         _POS = EN_::POS
 
@@ -44,11 +43,7 @@ module Skylab::Human
         sp.prepend_early_modifier_clause _pp
 
         NIL_
-
-      # after: "of the 2 found items, neither of them have content after them"
-
-        # <-
-
+      end
     end
   end
 end

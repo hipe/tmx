@@ -1,40 +1,33 @@
-module Skylab::Human
+module Skylab::Human::TestSupport
 
-  # (we want to be able to see const defined here..)
+  module NLP::EN::Sexp::Magnetics
 
-  module TestSupport
-
-    # (..and here)
-
-    module NLP::EN::Expression_Frame_Support
-
-      class << self
-        def [] tcm
-          tcm.include Instance_Methods___
-          NIL_
-        end
-      end  # >>
-
-      module Instance_Methods___
-
-        def e_ expected_string  # "e_" = "expect_"
-
-          _exp_fr = __build_the_expression_frame
-
-          y = _exp_fr.express_into []
-
-          1 == y.length or fail "expression frames produce strings not arrays"
-
-          y.fetch( 0 ).should eql expected_string
-        end
-
-        def __build_the_expression_frame
-
-          _expr_fr_mod = frame_module_
-
-          _expr_fr_mod.new_via_iambic @the_iambic_for_the_request_
-        end
+    class << self
+      def [] tcm
+        tcm.include self ; nil
       end
-    end
+    end  # >>
+
+      def e_ expected_string  # "e_" = "expect_"
+
+        _exp_fr = __build_the_magnetic_expression_session
+
+        y = _exp_fr.express_into []
+
+        1 == y.length or fail "expression frames produce strings not arrays"
+
+        y.fetch( 0 ).should eql expected_string
+      end
+
+      def __build_the_magnetic_expression_session
+
+        _ = magnetic_module_
+        _.new_via_iambic @the_iambic_for_the_request_
+      end
+
+      def magnetic_module_for_ const
+        Home_::NLP::EN::Sexp::Expression_Sessions.const_get const, false
+      end
+    # -
   end
 end

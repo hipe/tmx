@@ -1,15 +1,9 @@
 module Skylab::Human
 
-  NLP.const_get :Expression_Frame
+  module NLP::EN::Sexp
 
-  class NLP::Expression_Frame
-
-    NLP::EN.const_get :Idiomization_
-
-    module NLP::EN::Idiomization_
-
-      class NLP::EN::Expression_Frames___::Count_and_Noun < EF_
-
+    class Expression_Sessions::When_Count_and_Noun < Home_::Sexp::Magnetic_Expression_Session
+      # ->
         REQUIRED_TERMS = [ :subject_atom, :subject_count ]
 
         OPTIONAL_TERMS = nil
@@ -51,7 +45,7 @@ module Skylab::Human
         end
 
         attr_reader :noun_phrase
-      end
+      # -
     end
   end
 end

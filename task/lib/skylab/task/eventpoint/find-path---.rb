@@ -67,8 +67,8 @@ class Skylab::Task
         def resolve_one_move_predicate ep
 
           if ! (( a = @t[ ep.node_id ] ))
-            add_goal_not_met_frames
-            add_expression_frame_ _express_agents, express_( :Got_passed, ep )
+            add_goal_not_met_expression
+            add_statementish_ _express_agents, express_( :Got_passed, ep )
             nil
           elsif 1 == a.length
             a.first
@@ -91,7 +91,7 @@ class Skylab::Task
             _ = express_ :Agents, :inclusive, same_a.map( & :sig )
             __ = express_ :Ambiguity, ep, same_a
 
-            add_expression_frame_ _, __
+            add_statementish_ _, __
 
             UNABLE_
           end
@@ -101,7 +101,7 @@ class Skylab::Task
           express_ :Agents, :exclusive, @sig_a
         end
 
-        def add_goal_not_met_frames
+        def add_goal_not_met_expression
 
           ep = @graph.fetch_eventpoint @after_symbol
 
@@ -109,7 +109,7 @@ class Skylab::Task
             __when_etc ep
           else
 
-            add_expression_frame_ _express_agents, express_( :Bring, ep )
+            add_statementish_ _express_agents, express_( :Bring, ep )
               # "none of the 3 agents brings the system to the FINISHED state"
           end
           NIL_
@@ -120,10 +120,10 @@ class Skylab::Task
           _ = express_ :Exist, :present
           __ = express_ :Agents, :inclusive, @sig_a
 
-          add_expression_frame_ _, __
+          add_statementish_ _, __
             # "there are no active agents"
 
-          add_expression_frame_(
+          add_statementish_(
             express_( :System ),
             express_( :Reach, ep ),
             express_( :So ))

@@ -20,21 +20,22 @@ module Skylab::Human
 
         # --
 
-        def expression_frame_for * x_a
-          expression_frame_via_iambic x_a
+        def expression_session_for_ * x_a
+          expression_session_via_sexp x_a
         end
 
-        def expression_frame_via_iambic x_a
-          __expression_frame_collection.expression_frame_via_iambic x_a
+        def expression_session_via_sexp x_a
+          ___magnetic_collection.expression_session_via_sexp__ x_a
         end
 
-        def __expression_frame_collection
-          @___exp_fr_col ||= __build_EFC
+        def ___magnetic_collection
+          @___mc ||= ___build_magnetic_collection
         end
 
-        def __build_EFC
-          NLP_::Expression_Frame::Models::Collection.new_via_module(
-            EN_::Expression_Frames___ )
+        def ___build_magnetic_collection
+
+          Home_::Sexp::Expression_Collection.new_via_multipurpose_module__(
+            EN_::Sexp::Expression_Sessions )
         end
 
         # --
@@ -45,10 +46,6 @@ module Skylab::Human
           else
             S__[ * a ]
           end
-        end
-
-        def sentence_string_head_via_words s_a
-          NLP::Expression_Frame.sentence_string_head_via_words s_a
         end
       end  # >>
 
@@ -198,45 +195,11 @@ module Skylab::Human
 
       end.call
 
-      module Sexp  # (hopefully at #interlude-2 this becomes that other thing)
-
-        class << self
-
-          def say * sexp
-            express_into "", sexp
-          end
-
-          def express_into y, sexp
-            _expression_session_for_sexp( sexp ).express_into y
-          end
-
-          def expression_session_for * sexp
-            _expression_session_for_sexp sexp
-          end
-
-          def _expression_session_for_sexp sexp
-            send sexp.first, sexp  # ..
-          end
-
-        private
-
-          def list sexp
-            Expression_Sessions::List.via_sexp__ sexp
-          end
-        end  # >>
-
-        Autoloader_[ Expression_Sessions = ::Module.new ]
-        Autoloader_[ self ]
-      end
-
       AND___ = ' and '.freeze
 
       COMMA___ = ', '.freeze
 
       EN_ = self
-
-      Autoloader_[ Expression_Frames___ = ::Module.new, :boxxy ]
-
     end  # EN
   end
 end

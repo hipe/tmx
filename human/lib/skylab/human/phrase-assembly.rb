@@ -179,6 +179,24 @@ module Skylab::Human
       [ _sym, md[ :body ] ]
     end
 
+    rx_ = nil
+    Sentence_string_head_via_words = -> s_a do
+
+      rx_ ||= /\A[:,]/  # etc  #open [#051]
+
+      st = Callback_::Polymorphic_Stream.via_array s_a
+
+      s_a_ = [ st.gets_one ]
+      while st.unparsed_exists
+        s = st.gets_one
+        if rx_ !~ s
+          s_a_.push SPACE_
+        end
+        s_a_.push s
+      end
+      s_a_ * EMPTY_S_
+    end
+
     followed_by_space = nil
     preceded_by_space = nil
 

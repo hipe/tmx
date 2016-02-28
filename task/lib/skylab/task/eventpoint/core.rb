@@ -210,7 +210,7 @@ class Skylab::Task
 
       module Worker_Methods_
 
-        def add_expression_frame_ agent, predicate, any_conj=nil
+        def add_statementish_ agent, predicate, any_conj=nil
 
           eg = @expression_grid
           if ! eg

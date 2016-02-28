@@ -1,11 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../../../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP en expression-frames - O & S (cross-product)" do
+  describe "[hu] [..] expression sessions - O&S cross-product" do
 
     extend TS_
-    use :NLP_EN_expression_frame_support
+    use :NLP_EN_sexp_magnetics
 
     if false  # the mentor-case, here for refernce:
 
@@ -88,8 +88,8 @@ module Skylab::Human::TestSupport
         :object, 'subsystem' ]
     end
 
-    def frame_module_
-      Home_::NLP::EN::Expression_Frames___::Object_and_Subject
+    def magnetic_module_
+      magnetic_module_for_ :When_Object_and_Subject
     end
   end
 end

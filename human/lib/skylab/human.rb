@@ -19,6 +19,11 @@ module Skylab::Human  # :[#001].
     NLP_ = self
   end
 
+  module Sexp
+    Autoloader_[ self ]
+    Here_ = self
+  end
+
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
@@ -32,5 +37,4 @@ module Skylab::Human  # :[#001].
   NONE_ = nil
   KEEP_PARSING_ = true
   SPACE_ = ' '
-
 end

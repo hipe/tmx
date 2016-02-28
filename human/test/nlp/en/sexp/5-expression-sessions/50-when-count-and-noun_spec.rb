@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP en expression-frames - count and noun" do
+  describe "[hu] [..] expression sessions - count and noun" do
 
     extend TS_
-    use :NLP_EN_expression_frame_support
+    use :NLP_EN_sexp_magnetics
 
     if false  #  the mentor case, here for reference:
 
@@ -20,7 +20,7 @@ module Skylab::Human::TestSupport
 
     it "x." do
 
-      _ef = Home_::NLP::EN.expression_frame_for(
+      _ef = Home_::NLP::EN.expression_session_for_(
         :syntactic_category, :noun_phrase,
         :subject, 3, :subject, 'amigo' )
 
@@ -43,8 +43,8 @@ module Skylab::Human::TestSupport
       @the_iambic_for_the_request_ = [ :subject, d, :subject, s ]
     end
 
-    def frame_module_
-      Home_::NLP::EN::Expression_Frames___::Count_and_Noun
+    def magnetic_module_
+      magnetic_module_for_ :When_Count_and_Noun
     end
   end
 end

@@ -1,11 +1,9 @@
 module Skylab::Human
 
-  class NLP::Expression_Frame
+  module Sexp
 
-    class Models_::Argument_Adapter
-
-      class Nounish < self
-
+    class Idea_Argument_Adapter_for_Nounish_ < Here_::Idea_::Argument_Adapter
+      # -
         attr_reader :role_symbol
 
         module Object
@@ -13,7 +11,7 @@ module Skylab::Human
           class << self
 
             def new_via__polymorphic_upstream__ st
-              Nounish._new do
+              Self_._new do
                 @role_symbol = :object
                 _receive_etc st
               end
@@ -26,7 +24,7 @@ module Skylab::Human
           class << self
 
             def new_via__polymorphic_upstream__ st
-              Nounish._new do
+              Self_._new do
                 @role_symbol = :subject
                 _receive_etc st
               end
@@ -36,7 +34,7 @@ module Skylab::Human
 
         class << self
           def new_via_array a
-            Nounish._new do
+            Self_._new do
               @role_symbol = :_neither_
               _init_via_array a
             end
@@ -141,8 +139,8 @@ module Skylab::Human
           end
         end
 
-        Nounish_ = self
-      end
+        Self_ = self
+      # -
     end
   end
 end

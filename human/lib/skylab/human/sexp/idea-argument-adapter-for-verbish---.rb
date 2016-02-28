@@ -1,11 +1,9 @@
 module Skylab::Human
 
-  class NLP::Expression_Frame
+  module Sexp
 
-    class Models_::Argument_Adapter
-
-      class Verbish < self
-
+    class Idea_Argument_Adapter_for_Verbish___ < Here_::Idea_::Argument_Adapter
+      # -
         class << self
           def new_via__polymorphic_upstream__ st
 
@@ -21,10 +19,6 @@ module Skylab::Human
           end
         end  # >>
 
-        def initialize
-          super
-        end
-
         attr_reader :lemma_string
 
         def __init_via_string s
@@ -34,7 +28,7 @@ module Skylab::Human
         def slot_symbol
           :verb_argument
         end
-      end
+      # -
     end
   end
 end

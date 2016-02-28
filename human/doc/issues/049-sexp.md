@@ -1,5 +1,13 @@
 # sexp :[#049]
 
+## context
+
+this is working towards an assimilation and/or repackaging of [#034] and
+[#044], related to "expression frames" and "expression strategies"..
+
+
+
+
 ## catalyst, objective & scope
 
 this was prompted because
@@ -86,6 +94,7 @@ speech-type-thing we want to express.
 
      b) "nounish" ("wp")
 
-  2) phrase structure
+  2) expression frames
 
-  3) expression frames
+  3) phrase structure
+

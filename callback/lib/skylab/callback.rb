@@ -1881,7 +1881,11 @@ module Skylab::Callback
       end
 
       def name_for_lookup_
-        @nm ||= Name.via_slug ( @file_entry || @dir_entry ).corename
+        @nm ||= Name.via_slug corename
+      end
+
+      def corename
+        ( @file_entry || @dir_entry ).corename
       end
     end
 

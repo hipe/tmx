@@ -1,19 +1,9 @@
 module Skylab::Human
 
-  # be within this lexical scope:
+  module NLP::EN::Sexp
 
-  NLP.const_get :Expression_Frame
-
-  class NLP::Expression_Frame
-
-    # and this one:
-
-    NLP::EN.const_get :Idiomization_
-
-    module NLP::EN::Idiomization_
-
-      class NLP::EN::Expression_Frames___::Object_and_Subject < EF_
-
+    class Expression_Sessions::When_Object_and_Subject < Home_::Sexp::Magnetic_Expression_Session
+      # ->
         REQUIRED_TERMS = [ :subject, :object ]
 
         OPTIONAL_TERMS = [ :negative, :later_is_expected ]
@@ -22,7 +12,7 @@ module Skylab::Human
 
         def initialize idea
 
-          si = Idiomization_::Sessions::Nounish.begin
+          si = Expression_Sessions::Nounish.begin
 
           si.receive_count_and_list_and_atom( *
             idea.to_subject_count_and_list_and_atom )
@@ -54,7 +44,7 @@ module Skylab::Human
 
         def __will_express_something si, idea
 
-          oi = Idiomization_::Sessions::Nounish.begin
+          oi = Expression_Sessions::Nounish.begin
 
           oi.receive_count_and_list_and_atom( *
             idea.to_object_count_and_list_and_atom )
@@ -90,7 +80,7 @@ module Skylab::Human
           end
 
           if @_do_crazy_thing
-            Idiomization_::Actors::Some_of_many_sp_split[ sp, si ]
+            Self_::Some_of_many_sp_split___[ sp, si ]
           end
 
           @_sentence_phrase = sp
@@ -295,7 +285,9 @@ module Skylab::Human
 
           upstream_x << _s
         end
-      end
+      # -
+
+      Self_ = self
     end
   end
 end

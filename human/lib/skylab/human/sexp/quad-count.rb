@@ -1,8 +1,8 @@
 module Skylab::Human
 
-  class NLP::Expression_Frame
+  module Sexp
 
-    class Models::Quad_Count
+    class Quad_Count  # (1x in lib)
 
       # we find that a useful generalization of "count" is into these four
       # categories, the integer sets variously of 0, 1, 2 and

@@ -296,7 +296,7 @@ module Skylab
 
         x_a.push :syntactic_category, :sentence_phrase
 
-        _fr = Home_.lib_.human::NLP::EN.expression_frame_via_iambic x_a
+        _fr = Home_.lib_.human::NLP::EN.expression_session_via_sexp x_a
 
         _fr.express_into ""
       end

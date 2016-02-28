@@ -71,7 +71,7 @@ class Skylab::Task
             _ = express_ :Signature, sig
             __ = express_ :Unmet_Reliance, @graph.fetch_eventpoint( node_i )
 
-            add_expression_frame_ _, __
+            add_statementish_ _, __
           end
         end
 

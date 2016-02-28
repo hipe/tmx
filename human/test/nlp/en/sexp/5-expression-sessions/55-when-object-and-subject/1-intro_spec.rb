@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP en expression-frames - object (list) and subject" do
+  describe "[hu] [..] expression sessions - O&S intro" do
 
     extend TS_
-    use :NLP_EN_expression_frame_support
+    use :NLP_EN_sexp_magnetics
 
     if false  #  the mentor case, here for reference:
 
@@ -20,6 +20,10 @@ module Skylab::Human::TestSupport
     #       -ppositive --count none -cone -ctwo -cthree [ this file ]
 
     context "no items" do
+
+      it "loads" do
+        magnetic_module_
+      end
 
       it "future, negative, none - no double negative" do
 
@@ -168,8 +172,8 @@ module Skylab::Human::TestSupport
       ].freeze
     end
 
-    def frame_module_
-      Home_::NLP::EN::Expression_Frames___::Object_and_Subject
+    def magnetic_module_
+      magnetic_module_for_ :When_Object_and_Subject
     end
   end
 end

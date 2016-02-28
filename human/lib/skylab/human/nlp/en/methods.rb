@@ -143,7 +143,7 @@ module Skylab::Human
         o[ :noun_phrase ] = -> * x_a do
 
           x_a.push :syntactic_category, :noun_phrase
-          _fr = EN_.expression_frame_via_iambic x_a
+          _fr = EN_.expression_session_via_sexp x_a
           _fr.express_into ""
         end
 
@@ -188,7 +188,7 @@ module Skylab::Human
         o[ :sentence_phrase_via_mutable_iambic ] = -> x_a do
 
           x_a.push :syntactic_category, :sentence_phrase
-          _fr = EN_.expression_frame_via_iambic x_a
+          _fr = EN_.expression_session_via_sexp x_a
           _fr.express_into ""
         end
 
