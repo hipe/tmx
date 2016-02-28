@@ -60,12 +60,6 @@ module Skylab::GitViz
       ::OptionParser
     end
 
-    oxford = Callback_::Oxford
-
-    Oxford_or = oxford.curry[ ', ', '[none]', ' or ' ]
-
-    Oxford_and = oxford.curry[ ', ', '[none]', ' and ' ]
-
     Plugin = sidesys[ :Plugin ]
 
     Power_scanner = -> * x_a do

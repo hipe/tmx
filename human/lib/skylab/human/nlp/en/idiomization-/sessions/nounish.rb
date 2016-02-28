@@ -164,8 +164,9 @@ module Skylab::Human
       def _init_noun_phrase_plus_adjective_list
 
         _init_noun_phrase
-        _ = Models::Portable_List_Phrase.new_via_list_arg @_list_arg
-        @noun_phrase.prepend_adjective_phrase _
+        _st = @_list_arg.to_stream
+        _es = Home_::NLP::EN::Sexp.expression_session_for :list, _st
+        @noun_phrase.prepend_adjective_phrase _es
         NIL_
       end
 

@@ -165,7 +165,7 @@ module Skylab::Human
 
     def build_string
 
-      as = Here_::Phrase_Assembly.new
+      as = Home_::Phrase_Assembly.begin_phrase_builder
       so = bound_solver_
 
       _ic = so.solve_for_ :initial_phrase_conjunction
@@ -178,7 +178,7 @@ module Skylab::Human
       as.add_any_string _iv.value_x
       as.add_any_string _vo.value_x
 
-      as.build_string_
+      as.string_via_finish
     end
 
     def bound_solver_
@@ -249,7 +249,6 @@ module Skylab::Human
     NL_RX___ = /(?<!\n)\z/  # ..
 
     Here_ = self
-    Lazy_ = Callback_::Lazy
     NEWLINE_ = "\n"
     NOTHING_ = nil
     UNRELIABLE_ = :_UNRELIABLE_from_hu_c15n_

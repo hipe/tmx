@@ -110,7 +110,7 @@ module Skylab::Human
 
           # ==
 
-          as = Here_::Phrase_Assembly.new
+          as = Home_::Phrase_Assembly.begin_phrase_builder
 
           as.add_any_string ipc
 
@@ -130,7 +130,7 @@ module Skylab::Human
 
           as.add_lazy_space
 
-          _ = as.build_string_
+          _ = as.string_via_finish
 
           # ==
 

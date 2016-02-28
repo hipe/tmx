@@ -1,33 +1,6 @@
 require_relative '../../test-support'
 
-describe "[hu] NLP EN minitesimal" do
-
-  context "oxford_comma" do
-
-    o = -> s, *a do
-
-      h = ::Hash.try_convert a.last
-      if h
-        a.pop
-      end
-
-      it "#{ s || '(nothing)' }", * h do
-
-        _lib.oxford_comma( a ).should eql s
-      end
-    end
-
-    o[ 'four, three, two and one', * %w(four three two one) ]
-
-    o[ 'three, two and one', * %w(three two one) ]
-
-    o[ 'two and one', * %w(two one) ]
-
-    o[ 'one', 'one' ]
-
-    o[ nil ]
-
-  end
+describe "[hu] NLP EN minitesimal" do  # :#here-2
 
   context "s" do
 
@@ -54,7 +27,7 @@ describe "[hu] NLP EN minitesimal" do
     end
 
     def _and a
-      x = _lib.oxford_comma a
+      x = _lib::Oxford_and[ a ]
       x && " #{ x }"
     end
   end

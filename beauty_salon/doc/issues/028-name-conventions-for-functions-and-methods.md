@@ -7,15 +7,17 @@ its "API scope". here is a summary of the N tiers of scope:
 
     this_is_a_public_API_method   # #tier-0: no leading or trailing underscores
 
-    this_method_has_library_scope_  # #tier-1: one trailing underscore
+    this_method_is_only_called_from_this_library_  # #tier-1
 
-    this_method_is_called_only_once_outside_this_file__  # #tier-1.5
+    this_method_is_only_called_from_this_library_and_only__  # #tier-1.5
 
-    _we_call_this_cozy_scope  # #tier-2: one leading underscore
+    this_method_is_only_called_from_tests___  # (*three* trailing "_"'s)
 
-    __we_call_this_one_off_scope  # #tier-3: two leading underscores
+    _this_method_is_only_called_from_this_file  # #tier-2
 
-    ___one_off_scope_where_caller_is_immediately_above
+    __this_method_is_only_called_from_this_file_and_only_once  # #tier-3
+
+    ___as_above_and_also_the_call_is_in_the_method_immediately_above_this_one
 
     # ..
 

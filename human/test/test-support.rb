@@ -52,6 +52,10 @@ module Skylab::Human::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def common_expag_
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
   end
 
   # --
@@ -70,7 +74,7 @@ module Skylab::Human::TestSupport
 
   Callback_ = Home_::Callback_
   EMPTY_A_ = [].freeze
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Home_::Lazy_
   NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil

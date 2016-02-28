@@ -28,17 +28,15 @@ module Skylab::Human
             s_a.push s
           end
 
-          case 1 <=> s_a.length
-          when 0
+          if 1 == s_a.length  # #optimization
             @y << s_a.fetch( 0 )
-          when -1
-            @y << EN_.oxford_comma( s_a, OR___ )
+          else
+            # zero or many
+            EN_::Oxford_OR_prototype[].with_list( s_a ).express_words_into @y
           end
 
           @y
         end
-
-        OR___ = ' or '
 
         def __reduce_forms and_a, form_st
 

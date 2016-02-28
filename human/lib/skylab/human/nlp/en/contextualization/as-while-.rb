@@ -23,7 +23,7 @@ module Skylab::Human
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.progressive
 
-        as = Here_::Phrase_Assembly.new
+        as = Home_::Phrase_Assembly.begin_phrase_builder
         as.add_lazy_space
 
         one = looks_like_one_word_
@@ -40,7 +40,7 @@ module Skylab::Human
           as.add_string v_s
         end
 
-        gerund_phrase = as.build_string_
+        gerund_phrase = as.string_via_finish
 
         if one
           @content_.concat gerund_phrase

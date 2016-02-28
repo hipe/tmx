@@ -19,37 +19,23 @@ module Skylab::System
 
             _head = _PS::Noun_inflectee_via_string[ 'whose name matched' ]
 
-            tail = _EN.portable_list_phrase.new_via_array cmd.filename_array
+            o = _EN::Sexp.expression_session_for :list, cmd.filename_array
 
-            tail.inflect_words_into_against_noun_phrase_under =
-            -> y, np, expag, listp do
+            o.expression_agent_method_for_saying_item :val
 
-              listp = listp.dup
-              listp.final_separator = 'or'
-              listp.item_map = expag.method :val
-
-              listp.inflect_words_into_against_noun_phrase y, np
-            end
+            o.be_alternation
 
             _PS::Mutable_phrase_list_as_noun_inflectee.via_phrases(
-              _head, tail  )
+              _head, o )
           end
 
           def __path_phrase cmd
 
-            tail = _EN.portable_list_phrase.new_via_array cmd.path_array
+            o = _EN::Sexp.expression_session_for :list, cmd.path_array
 
-            tail.inflect_words_into_against_noun_phrase_under =
-            -> y, np, expag, listp do
+            o.expression_agent_method_for_saying_item :pth
 
-              listp = listp.dup
-              listp.final_separator = 'and'
-              listp.item_map = expag.method :pth
-
-              listp.inflect_words_into_against_noun_phrase y, np
-            end
-
-            _EN::POS::Preposition.phrase_via tail, 'in'
+            _EN::POS::Preposition.phrase_via o, 'in'
           end
 
           def _PS

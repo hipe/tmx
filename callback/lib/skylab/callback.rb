@@ -2737,47 +2737,33 @@ module Skylab::Callback
 
   define_singleton_method :memoize, Memoize
 
-  Oxford = -> separator, when_none_x, final_separator, a do
+  # --
 
-    y = Oxford_comma_into[ [], a, final_separator, separator ]
-    if y.length.zero?
-      when_none_x
-    else
-      y * EMPTY_S_
+  build_oxford = -> const do
+    o = Home_.lib_.human::NLP::EN.const_get( const, false ).call.dup
+    o.express_none_by { '[none]' }
+    -> a do
+      o.with_list( a ).say
     end
   end
 
-  Oxford_comma_into = -> y, a, final_separator, separator do
+  oxford_and = -> aa do
+    oxford_and = build_oxford[ :Oxford_AND_prototype ]
+    oxford_and[ aa ]
+  end
 
-    st = Polymorphic_Stream.via_array a
+  oxford_or = -> aa do
+    oxford_or = build_oxford[ :Oxford_OR_prototype ]
+    oxford_or[ aa ]
+  end
 
-    if st.unparsed_exists  # if there's a last one
+  Oxford_and = -> a do
+    oxford_and[ a ]
+  end
 
-      stack = []
-
-      last_x = st.pop_
-      stack.push -> do
-        y << last_x
-      end
-
-      if st.unparsed_exists  # if there's a second to last one
-        penult_x = st.pop_
-        stack.push -> do
-          y << penult_x
-          y << final_separator
-        end
-
-        while st.unparsed_exists  # with the any remaining at indexes 0 .. N-3
-          y << st.gets_one
-          y << separator
-        end
-      end
-
-      p = nil
-      p[] while p = stack.pop
-    end
-    y
-  end  # a storied history :#tombstone
+  Oxford_or = -> a do
+    oxford_or[ a ]
+  end
 
   class Scn < ::Proc  # see [#049]
 
@@ -2825,8 +2811,7 @@ module Skylab::Callback
   KEEP_PARSING_ = true
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
-  Oxford_or = Oxford.curry[ ', ', '[none]', ' or ' ]
-  Oxford_and = Oxford.curry[ ', ', '[none]', ' and ' ]
+
   PATH_SEP_ = ::File::SEPARATOR
   SPACE_ = ' '.freeze
   UNABLE_ = false

@@ -2,6 +2,8 @@ module Skylab::Human
 
   module NLP::EN::Idiomization_
 
+    # 1x
+
     Actors::Some_of_many_sp_split = -> sp, si do  # assume two or more
 
       # before: "the 2 found items have no content after them"

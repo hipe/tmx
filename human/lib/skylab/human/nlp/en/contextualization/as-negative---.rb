@@ -26,14 +26,14 @@ module Skylab::Human
 
         if v_s || n_s
 
-          as = Here_::Phrase_Assembly.new
+          as = Home_::Phrase_Assembly.begin_phrase_builder
           as.add_string "couldn't"
           as.add_any_string v_s
           as.add_any_string n_s
           as.add_string "because"
           as.add_lazy_space
 
-          @prefix_ = as.build_string_
+          @prefix_ = as.string_via_finish
         end
 
         NIL_

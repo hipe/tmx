@@ -18,7 +18,7 @@ module Skylab::Human
           Both__[ a ]
         end
 
-        # ~ begin
+        # --
 
         def expression_frame_for * x_a
           expression_frame_via_iambic x_a
@@ -37,20 +37,7 @@ module Skylab::Human
             EN_::Expression_Frames___ )
         end
 
-        # ~ end
-
-        def oxford_comma * a
-          d = a.length
-          if d.zero?
-            Oxford_comma__
-          else
-            @method[ :oxford_comma ][ * a ]
-          end
-        end
-
-        def portable_list_phrase
-          EN_::Idiomization_::Models::Portable_List_Phrase
-        end
+        # --
 
         def s * a
           if a.length.zero?
@@ -84,15 +71,38 @@ module Skylab::Human
         end
       end.call
 
-      Oxford_comma__ = -> sep, ult, a do
+      # ==
 
-        y = Callback_::Oxford_comma_into[ [], a, ult, sep ]
-        if y.length.nonzero?
-          y * EMPTY_S_
-        end
+      Oxford_and = -> s_a do
+        Oxford_AND_prototype[].with_list( s_a ).say
       end
 
-      S__ = -> do
+      Oxford_or = -> s_a do
+        Oxford_OR_prototype[].with_list( s_a ).say
+      end
+
+      oxford_comma_proto = Lazy_.call do
+        o = Home_::NLP::EN::Sexp.expression_session_for :list
+        o.express_none_by do
+          NIL_
+        end
+        o.separator = ', '
+        o.freeze
+      end
+
+      Oxford_AND_prototype = Lazy_.call do
+        o = oxford_comma_proto[].dup
+        o.final_separator = ' and '
+        o.freeze
+      end
+
+      Oxford_OR_prototype = Lazy_.call do
+        o = oxford_comma_proto[].dup
+        o.final_separator = ' or '
+        o.freeze
+      end
+
+      S__ = -> do  # tested #here-1
 
         it_them = [ 'them', 'it' ]
 
@@ -182,15 +192,42 @@ module Skylab::Human
           end
         end
 
-        o[ :oxford_comma ] = -> a, ult=AND___, sep=COMMA___ do
-          Oxford_comma__[ sep, ult, a ]
-        end
-
         o[ :s ] = S__
 
         @method = ::Struct.new( * i_a ).new( * p_a )
 
       end.call
+
+      module Sexp  # (hopefully at #interlude-2 this becomes that other thing)
+
+        class << self
+
+          def say * sexp
+            express_into "", sexp
+          end
+
+          def express_into y, sexp
+            _expression_session_for_sexp( sexp ).express_into y
+          end
+
+          def expression_session_for * sexp
+            _expression_session_for_sexp sexp
+          end
+
+          def _expression_session_for_sexp sexp
+            send sexp.first, sexp  # ..
+          end
+
+        private
+
+          def list sexp
+            Expression_Sessions::List.via_sexp__ sexp
+          end
+        end  # >>
+
+        Autoloader_[ Expression_Sessions = ::Module.new ]
+        Autoloader_[ self ]
+      end
 
       AND___ = ' and '.freeze
 

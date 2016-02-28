@@ -107,6 +107,10 @@ module Skylab::Human
             Quad_category_via_integer_[ @to_array.length ]
           end
 
+          def to_stream
+            Callback_::Stream.via_nonsparse_array @to_array
+          end
+
           attr_reader :to_array
         end
 

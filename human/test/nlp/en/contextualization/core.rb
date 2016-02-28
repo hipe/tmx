@@ -113,10 +113,6 @@ module Skylab::Human::TestSupport
       end.new
     end )
 
-    def common_expag_
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
     def subject_class_
       Home_::NLP::EN::Contextualization
     end

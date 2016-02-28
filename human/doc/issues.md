@@ -1,3 +1,9 @@
+[#051] #open in-situ
+
+[#050]       track redundancies with "oxford comma"
+
+[#049] #open redundancy with ANCIENT [#ba-033]
+
 [#048]       API point - assumes that the root frame might have a name
              ( in opposition to [#ac-031] which says it never does )
 

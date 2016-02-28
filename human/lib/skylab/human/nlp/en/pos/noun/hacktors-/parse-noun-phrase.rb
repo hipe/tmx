@@ -41,7 +41,7 @@ module Skylab::Human
         # in the former example, the lemma of the noun-phrase is the first
         # word, in the latter it is the last.
         #
-        # because the preopositions we care about fit in a very short list,
+        # because the prepositions we care about fit in a very short list,
         # we can hack implement the above for our needs, as a stand-in for
         # a future we might like to have.
 

@@ -18,20 +18,9 @@ module Skylab::Human
         alias_method :call, :_call
       end  # >>
 
-      -> fun do
+      define_method :an, EN_[ :an ]
 
-        # minimal case is that you get these stateless method-shaped functions:
-
-        [ :an, :oxford_comma, :s ].each do | sym |
-
-          define_method sym, fun[ sym ]
-        end
-
-        define_method :and_, fun.oxford_comma.curry[ ', ', ' and ' ]
-
-        define_method :or_, fun.oxford_comma.curry[ ', ', ' or ' ]
-
-      end.call EN_
+      define_method :s, EN_[ :s ]
 
       # this is its hacky power:
       #
@@ -204,34 +193,14 @@ module Skylab::Human
         end
 
         -> do
-
-          oc = -> sep do
-
-            p = -> s_a do
-              p = EN_::oxford_comma.curry[ ', ', sep ]
-              p[ s_a ]
-            end
-
-            -> s_a do
-              p[ s_a ]
-            end
+          o[ :and_ ] = _Memoize_length__.call do |a|
+            EN_::Oxford_and[ a ]
           end
 
-          and_ = oc[ ' and ' ]
-
-          or_ = oc[ ' or ' ]
-
-          o[ :and_ ] = _Memoize_length__.call do | a |
-
-            and_[ a ]
-          end
-
-          o[ :or_ ] = _Memoize_length__.call do | a |
-
-            or_[ a ]
+          o[ :or_ ] = _Memoize_length__.call do |a|
+            EN_::Oxford_or[ a ]
           end
         end.call
-
 
         ::Struct.new( * method_name_a ).new( * method_proc_a )
 

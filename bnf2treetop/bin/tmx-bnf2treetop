@@ -125,7 +125,7 @@ module Skylab::BNF2Treetop
       oxford_comma(list, ' or ')
     end
 
-    def oxford_comma items, last_glue = ' and ', rest_glue = ', '
+    def oxford_comma items, last_glue = ' and ', rest_glue = ', '  # #[#hu-050]
       items.zip(
         items.size < 2 ? [] :
           ( [last_glue] + ::Array.new(items.size - 2, rest_glue) ).reverse

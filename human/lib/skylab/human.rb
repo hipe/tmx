@@ -27,6 +27,7 @@ module Skylab::Human  # :[#001].
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }
+  Lazy_ = Callback_::Lazy
   NIL_ = nil
   NONE_ = nil
   KEEP_PARSING_ = true
