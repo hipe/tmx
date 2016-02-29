@@ -209,7 +209,8 @@ module Skylab::CodeMolester
         end
         x
       end
-      scn = Callback_::Scn.articulators.eventing(
+
+      scn = Home_.lib_.human::Sexp.express( :list,
         :gets_under, _scn_,
         :always_at_the_beginning, -> y do
           y << '['

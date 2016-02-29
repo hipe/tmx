@@ -260,7 +260,7 @@ module Skylab::CodeMolester
 
       _upstream_scan = Callback_::Stream.via_nonsparse_array predicate_s_a
 
-      scn = Callback_::Scn.articulators.eventing(
+      scn = Home_.lib_.human::Sexp.express( :list,
 
         :gets_under, _upstream_scan,
 

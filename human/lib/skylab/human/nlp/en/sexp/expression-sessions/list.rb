@@ -16,11 +16,17 @@ module Skylab::Human
       #
       # (coverd by the "proof of concept" test #here-1)
       #
-      # ancestors that are assimilation candidates are tracked with [#050]
+      # this underlying algorithm can be accomplished in about two lines
+      # (attested by the only remaining (ancient) cousin of this is one
+      # in [ba] at our [#050]). the bulk of this file, then, is as a proof-
+      # of-concept for [#049] the new "sexp" facility; as well as having
+      # robustified against the cousin in that it can produce streaming
+      # output from streaming input in either "word mode" or "flat" mode.
 
       class << self
-        def via_sexp__ x
-          new.__init_via_sexp x
+
+        def expression_via_sexp_stream_ st
+          new.__init_via_sexp_stream st
         end
         private :new
       end  # >>
@@ -32,21 +38,19 @@ module Skylab::Human
         @_sep_sexp = nil
       end
 
-      def __init_via_sexp sexp
+      def __init_via_sexp_stream st
 
-        d = sexp.length
-        if 1 < d
-          _accept_list_x sexp.fetch 1
-          if 2 < sexp.length
-            ___parse_inline_specification sexp
+        if st.unparsed_exists
+          _accept_list_x st.gets_one
+          if st.unparsed_exists
+            ___parse_inline_specification st
           end
         end
 
         self
       end
 
-      def ___parse_inline_specification sexp
-        st = Callback_::Polymorphic_Stream.via_start_index_and_array 2, sexp
+      def ___parse_inline_specification st
         begin
           send st.gets_one, st  # ..
         end until st.no_unparsed_exists

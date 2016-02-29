@@ -128,7 +128,9 @@ module Skylab::Basic
       arr = @a
       -> do
 
-        agg = Home_::Lib_::Scn_lib[].articulators.aggregating(
+        agg = Home_.lib_.human::Sexp.expression_session_for(
+
+          :list, :through, :columnar_aggregation,
 
           :template, "{{ longer }} covered by {{ shorter }}",
 

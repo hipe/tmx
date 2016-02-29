@@ -1,4 +1,4 @@
-# the aggregating articulator :[#050]
+# the aggregating articulator :[#055]
 
 ## introduction
 
@@ -8,6 +8,7 @@ particular forte centers around detecting and transforming repetition
 that comes in from the upstream in some way that typically makes the
 outstream variously more condensed, more explicit, more natural sounding,
 or just more fun; based on the transformation functions the user provides.
+
 
 
 ## theory
@@ -21,6 +22,7 @@ relevance in the message stream.
 in the other direction, when too little context is provided, or the
 information is too dense or otherwise not decipherable, communication
 falters just as well.
+
 
 
 
@@ -66,6 +68,7 @@ reduce the redundacy. we think of it as lossless information compression.
 the relative benefits and disadvantages to these two strategies has yet
 to be formalized here, but one thing is certain: aggregation is
 definitely the more difficult of the two to implement.
+
 
 
 

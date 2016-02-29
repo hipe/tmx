@@ -60,16 +60,16 @@ module Skylab::Human
 
       WHITE_RX___ = /\Awhen-/
 
-      def expression_session_via_sexp__ x_a
+      def expression_session_via_sexp_stream__ st
 
         best_match = nil
-        idea = Here_::Idea_.new_via_iambic x_a
+        idea = Here_::Idea_.new_via_sexp_stream__ st
 
         st = @_streamer[]
         begin
           x = st.gets
           x or break
-          match = x.match_for_idea idea
+          match = x.match_for_idea__ idea
           if match
             if best_match
               if best_match <= match

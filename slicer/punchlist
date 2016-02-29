@@ -34,8 +34,12 @@
 ./callback/test/bundles/test-support.rb
 ./callback/test/digraph/test-support.rb
 ./callback/test/name/test-support.rb
-./callback/test/scn/articulators/aggregating/test-support.rb
-./callback/test/scn/articulators/test-support.rb
-./callback/test/scn/test-support.rb
+
+# == ( has moved to [#hu-054] )
+# ./callback/test/scn/articulators/aggregating/test-support.rb
+# ./callback/test/scn/articulators/test-support.rb
+# ./callback/test/scn/test-support.rb
+# ==
+
 ./callback/test/selective-listener/test-support.rb
 ./callback/test/tree/test-support.rb

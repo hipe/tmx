@@ -490,7 +490,10 @@ module Skylab::TestSupport
 
       Build_common_marginated_line_downtream_ = -> _MARGIN do
 
-        Callback_::Scn.articulators.eventing(
+        Home_.lib_.human::Sexp.express(
+
+          :list, :through, :eventing,
+
           :any_first_item, -> y, x do
             if x.length.nonzero?
               y << x  # first margin is already there. no trailing delimiters

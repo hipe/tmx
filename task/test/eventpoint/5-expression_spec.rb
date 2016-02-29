@@ -65,7 +65,7 @@ module Skylab::Task::TestSupport
       p.articulation_proc[ * p.to_a ].should eql 'hi and lo'
     end
 
-    it "articulators have a stupid simple but powerful algorithm for inflection" do
+    it "expression sessions have a stupid simple but powerful algorithm for inflection" do
 
       o = _subject
 

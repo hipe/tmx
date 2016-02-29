@@ -42,7 +42,10 @@ module Skylab::CodeMetrics
       def ___build_and_explain_filter_array
 
         filter_a = []
-        o = Home_::Expression_Adapters_::Human::Conjuncter.new
+
+        o = Home_.lib_.human::NLP::EN::Sexp.expression_session_for(
+          :list, :through, :columnar_aggregation_of_statementishes,
+        )
 
         if @count_blank_lines
 
@@ -64,7 +67,7 @@ module Skylab::CodeMetrics
           filter_a << "grep -v '^[ \t]*#'"
         end
 
-        @on_event_selectively.call :info, :data, :linecount_NLP_frame do | y |
+        @on_event_selectively.call :info, :data, :linecount_NLP_frame do
           o
         end
 

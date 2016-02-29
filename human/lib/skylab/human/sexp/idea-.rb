@@ -9,6 +9,15 @@ module Skylab::Human
         :syntactic_category,
       )
 
+      class << self
+
+        alias_method :new_via_sexp_stream__, :new_via_polymorphic_stream
+
+        alias_method :new_via_sexp__, :new_via_iambic
+
+        # #itch [#ca-047] - it would be nice to get nothing from methodic..
+      end  # >>
+
       def initialize & edit_p
 
         @__slots = Callback_::Box.new
@@ -130,15 +139,6 @@ module Skylab::Human
 
       def result_for_component_mutation_session_when_changed _, &__
         ACHIEVED_
-      end
-
-      class Argument_Adapter
-
-        undef_method :to_s
-
-        def initialize & edit_p
-          instance_exec( & edit_p )
-        end
       end
     end
   end

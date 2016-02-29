@@ -2,7 +2,7 @@ module Skylab::Human
 
   module Sexp
 
-    class Idea_Argument_Adapter_for_Nounish_ < Here_::Idea_::Argument_Adapter
+    class Idea_Argument_Adapter_for_Nounish_ < Idea_Argument_Adapter_
       # -
         attr_reader :role_symbol
 

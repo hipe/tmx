@@ -140,10 +140,10 @@ module Skylab::Human
           end
         end
 
+        _NP = [ :when, :syntactic_category, :noun_phrase ]
         o[ :noun_phrase ] = -> * x_a do
-
-          x_a.push :syntactic_category, :noun_phrase
-          _fr = EN_.expression_session_via_sexp x_a
+          x_a[ 0, 0 ] = _NP
+          _fr = EN_::Sexp.expression_session_via_sexp x_a
           _fr.express_into ""
         end
 
@@ -185,10 +185,12 @@ module Skylab::Human
           end
         end
 
+        _SP = [ :when, :syntactic_category, :sentence_phrase ]
+
         o[ :sentence_phrase_via_mutable_iambic ] = -> x_a do
 
-          x_a.push :syntactic_category, :sentence_phrase
-          _fr = EN_.expression_session_via_sexp x_a
+          x_a[ 0, 0 ] = _SP
+          _fr = EN_::Sexp.expression_session_via_sexp x_a
           _fr.express_into ""
         end
 

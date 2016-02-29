@@ -22,7 +22,7 @@ module Skylab::Human::TestSupport
       def __build_the_magnetic_expression_session
 
         _ = magnetic_module_
-        _.new_via_iambic @the_iambic_for_the_request_
+        _.new_session_via_sexp__ @the_iambic_for_the_request_
       end
 
       def magnetic_module_for_ const

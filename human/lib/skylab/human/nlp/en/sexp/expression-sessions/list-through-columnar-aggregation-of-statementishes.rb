@@ -1,10 +1,20 @@
-module Skylab::CodeMetrics
+module Skylab::Human
 
-  module Expression_Adapters_
-    Human = ::Module.new
-  end
+  module NLP::EN::Sexp
 
-    class Expression_Adapters_::Human::Conjuncter  # see [#010]
+    class Expression_Sessions::List_through_Columnar_Aggregation_of_Statementishes  # docs in [#052]
+
+      # we are not sure how useful this will be outside of [cme] - here
+      # it almost stands more as a proof of concept for its dependencies
+
+      class << self
+
+        def expression_via_sexp_stream_ st
+          st.assert_emtpy
+          new
+        end
+        private :new
+      end  # >>
 
       def initialize
 
@@ -15,9 +25,7 @@ module Skylab::CodeMetrics
 
       def add verb_sym, noun_sym
 
-        @_bx.touch verb_sym do
-          []
-        end.push noun_sym
+        @_bx.touch( verb_sym ) { [] }.push noun_sym
         NIL_
       end
 
@@ -25,9 +33,7 @@ module Skylab::CodeMetrics
 
       def express_into_line_context line_y
 
-        @_Articulators = Callback_::Scn.articulators  # load it late
-
-        @_POS = Home_.lib_.human::NLP::EN::POS  # load it late
+        @_POS = EN_::POS  # load it late
 
         @_zero = -> y do
           y << "(none)"
@@ -35,7 +41,9 @@ module Skylab::CodeMetrics
 
         word_y = []
 
-        pair_y = @_Articulators.eventing(
+        pair_y = Home_::Sexp.express(
+
+          :list, :through, :eventing,
 
           :y, word_y,
 
@@ -64,7 +72,9 @@ module Skylab::CodeMetrics
 
       def _express_predicate word_y, pair
 
-        sym_y = @_Articulators.eventing(
+        sym_y = Home_::Sexp.express(
+
+          :list, :through, :eventing,
 
           :y, word_y,
 
@@ -125,9 +135,11 @@ module Skylab::CodeMetrics
         np << :plural
       end
 
-      define_method :_hack_lemma_via_symbol, Hack_lemma_via_symbol_
+      def _hack_lemma_via_symbol sym
+        @_POS::Hack_lemma_via_symbol[ sym ]
+      end
 
       AND__ = 'and'
     end
-  # -
+  end
 end

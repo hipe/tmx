@@ -4,7 +4,7 @@
 [#012]     #gotcha inline - flickering near helpscreens
 [#011]    #investigate how to pipe from one process to another from ruby
              not with this string command
-[#010]       conjuncter ..
+[#010] #hole (moved to [hu])
 [#009] #idea imagine a facility that let you see every occurence of a
              semantic construct (like initializing a class with a certain
              local name, or including a module statically in a class) and

@@ -130,7 +130,8 @@ module Skylab::CodeMetrics
             y = _o.express_into_line_context []
             y.fetch( 0 )[ 0, 0 ] = '('
             y.fetch( -1 ).concat ')'
-            y.each do | s |
+            y.each do |s|
+              # (this context is the CLI action eew)
               @resources.serr.puts s
             end
             NIL_

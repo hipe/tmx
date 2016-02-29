@@ -1,26 +1,31 @@
-require_relative 'test-support'
+require_relative '../../../test-support'
 
-module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
+module Skylab::Human::TestSupport
 
-  describe "[ca] scn articulators - aggregating (features)" do
+  describe "[hu] sexp - expression sessions - list thru c.agg. - features" do
 
-    extend TS_
+    TS_Joist_[ self ]
+    use :memoizer_methods
+    use :sexp_expression_sessions_list_through_columnar_aggregation
 
     context "expander (when no input)" do
 
-      before :all do
+      dangerous_memoize :subject do
 
-        FT_Exp = Subject_.call(
+        su = subject_call_(
 
           :on_zero_items, -> y do
             y << 'nerp'
           end,
 
-          :template, "{{ wazzah }}" )
-
+          :template, "{{ wazzah }}",
+        )
+        SESLtA_Exp = su
+        su
       end
 
       it "loads" do
+        subject
       end
 
       it "zero items" do
@@ -33,24 +38,26 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         expect_line 'wizzie'
         expect_no_more_lines
       end
-
-      def subject
-        FT_Exp
-      end
     end
 
     context "on fist mention" do
 
-      before :all do
-        FT_OFM = Subject_.call(
+      dangerous_memoize :subject do
+
+        su = subject_call_(
+
           :template, '{{ who-hah }} {{ nec }}',
 
           :'who-hah', :on_first_mention, -> y, x do
             y << ( x.gsub( /([aeiou])/ ) {  '%c' % ( $1.ord + 6 ) } ).upcase
-          end )
+          end,
+        )
+        SESLtA_OFM = su
+        su
       end
 
       it "loads" do
+        subject
       end
 
       it "works." do
@@ -60,26 +67,26 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         expect_line 'ding dong'
         expect_no_more_lines
       end
-
-      def subject
-        FT_OFM
-      end
     end
 
     context "derivative fields" do
 
-      before :all do
+      dangerous_memoize :subject do
 
-        FT_Of = Subject_.call(
+        su = subject_call_(
 
           :template, '{{ np }}{{ vp }}{{ adv }}',
 
           :adv, :on_subsequent_mentions_of, :field, :vp, -> y, _ do
             y << ' also'
-          end )
+          end,
+        )
+        SESLtA_Of = su
+        su
       end
 
       it "loads" do
+        subject
       end
 
       it "works" do
@@ -89,17 +96,13 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         expect_line 'you want candy also'
         expect_no_more_lines
       end
-
-      def subject
-        FT_Of
-      end
     end
 
     context "impetus example" do
 
-      before :all do
+      dangerous_memoize :subject do
 
-        Art = Subject_.call(
+        su = subject_call_(
 
           :on_zero_items, -> y do
             y << "nothing happened."
@@ -140,8 +143,10 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
             :adv2,
               :on_subsequent_mentions_of, :field, :store, -> y, _ do
                 y << ' too'
-              end )
-
+              end,
+        )
+        SESLtA_Art = su
+        su
       end
 
       it "loads" do
@@ -196,10 +201,6 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
           output_s = s_a.join Home_::EMPTY_S_
         end
         output_s.should eql expected_string
-      end
-
-      def subject
-        Art
       end
     end
   end

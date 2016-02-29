@@ -318,7 +318,7 @@ module Skylab::Brazen
       # separate each "section" (whatever "section" means to us), while
       # freeing us from having to track the cases of whether we are at the
       # very beginning or whether the preceding section(s) had no cotent.
-      # (a simple, hand-written form of a #[#ca-047] eventing articulator.)
+      # (a simple, hand-written form of a #[#hu-053] eventing expresser.)
 
       # it is very likely that you want the lifetime of this to coincide
       # exactly to the expression of one screen (or super-section, document,

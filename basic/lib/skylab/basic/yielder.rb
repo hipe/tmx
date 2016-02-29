@@ -5,7 +5,7 @@ module Skylab::Basic
     class Mapper  # :[#056].
 
       # see also [#hu-047] for a stream version
-      # see also [#ca-047] for more complex version
+      # see also [#hu-053] for more complex version
 
       def map_first_by & p
         @map_first = p

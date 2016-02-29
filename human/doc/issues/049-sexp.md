@@ -83,18 +83,4 @@ the "sexp expression agent" will be an at first massive, monolithic (and
 later configurable) filesystem tree with one node for every part-of-
 speech-type-thing we want to express.
 
-
-
-
-## notes on integration
-
-  (numerals are milestones, letters are waypoints)
-
-  1) idomization
-
-     b) "nounish" ("wp")
-
-  2) expression frames
-
-  3) phrase structure
-
+_

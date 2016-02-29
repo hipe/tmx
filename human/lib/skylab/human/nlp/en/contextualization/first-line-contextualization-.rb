@@ -152,8 +152,6 @@ module Skylab::Human
           end
         end
       end.call
-
-      UNDERSCORE_ = '_'
     end
   end
 end

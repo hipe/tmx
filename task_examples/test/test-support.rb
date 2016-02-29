@@ -97,7 +97,7 @@ module Skylab::TaskExamples::TestSupport
     end
 
     _path = FIXTURES_DIR
-    _PID_path = TestLib_::Tmpdir_path[]
+    _PID_path = TestLib_::Development_tmpdir_path[]
 
     _ok = TestSupport_::Servers::Static_File_Server.new(
       _path,
@@ -119,7 +119,7 @@ module Skylab::TaskExamples::TestSupport
   class LAZY_CONSTANTS___ < TestSupport_::Lazy_Constants
 
     def BUILD_DIR
-      ::File.join( TestLib_::Tmpdir_path[], '[te]' ).freeze
+      ::File.join( TestLib_::System_tmpdir_path[], '[te]' ).freeze
     end
 
     def FIXTURES_DIR
@@ -144,15 +144,19 @@ module Skylab::TaskExamples::TestSupport
 
     system_lib = sidesys[ :System ]
 
+    Development_tmpdir_path = -> do
+      System[].defaults.dev_tmpdir_path
+    end
+
     System = -> do
       system_lib[].services
     end
 
-    Task = sidesys[ :Task ]
-
-    Tmpdir_path = -> do
+    System_tmpdir_path = -> do
       System[].filesystem.tmpdir_path
     end
+
+    Task = sidesys[ :Task ]
   end
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]

@@ -92,7 +92,7 @@ module Skylab::CodeMetrics
           o_a.each do | o |
 
             y.push( if o.is_special
-              Hack_lemma_via_symbol_[ o.sym ]
+              Home_.lib_.human::NLP::EN::POS::Hack_lemma_via_symbol[ o.sym ]
             else
               "*#{ o.ext }"
             end )

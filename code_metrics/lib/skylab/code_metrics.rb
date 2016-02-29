@@ -47,12 +47,6 @@ module Skylab::CodeMetrics
     Home_.lib_.basic::Tree::Totaller
   end
 
-  Hack_lemma_via_symbol_ = -> sym do
-    s = sym.id2name
-    s.gsub! UNDERSCORE_, SPACE_
-    s
-  end
-
   Callback_ = ::Skylab::Callback
   Autoloader_ = Callback_::Autoloader
 
@@ -126,8 +120,6 @@ module Skylab::CodeMetrics
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
-  UNDERSCORE_ = '_'
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
-
 end

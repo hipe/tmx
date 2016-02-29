@@ -78,7 +78,7 @@ module Skylab::Human
         end
 
         def to_expression_session__
-          @_frame_mod.new_via_idea @_idea
+          @_frame_mod.new_via_idea_ @_idea
         end
 
       protected

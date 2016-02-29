@@ -1,6 +1,11 @@
-[#051] #open in-situ
+[#052]       conjuncter..
 
-[#050]       track redundancies with "oxford comma"
+[#051] #open word-mode must die :( in-situ, and: places where we bleed
+             because we aren't passing phrase-assembly sexp's around, but
+             rather word streams.
+
+[#050]       track redundancies with "oxford comma". this is maintained
+             only to contrast different implementations of the same algorithm.
 
 [#049] #open redundancy with ANCIENT [#ba-033]
 

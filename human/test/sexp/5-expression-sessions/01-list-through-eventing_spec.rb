@@ -1,20 +1,17 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
+module Skylab::Human::TestSupport
 
-  ::Skylab::Callback::TestSupport::Scn::Articulators[ self ]
+  describe "[hu] sexp - expression sessions - list thru eventing" do
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  describe "[ca] scn articulators - eventing" do
+    TS_Joist_[ self ]
+    use :memoizer_methods
 
     context "can operate in \"scanner\" mode or \"buffering\" mode" do
 
-      before :all do
+      dangerous_memoize :_subject do
 
-        EX1 = Subject_[].eventing(
+        su = _something_about_eventing(
           :always_at_the_beginning, -> y do
             y << '['
           end,
@@ -29,15 +26,18 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
           end,
           :at_the_end_iff_nonzero_items, -> y do
             y << "#{ NEWLINE_ }]"
-          end )
-
+          end,
+        )
+        SESLtE_EX1 = su
+        su
       end
 
       it "builds" do
+        _subject
       end
 
       it "\"pull\"-style: use `with` to get a dup, set `gets_under`, call `gets`" do
-        scn = EX1.new_with :gets_under, Home_::Stream.via_nonsparse_array( [ :A ] )
+        scn = _subject.new_with :gets_under, Callback_::Stream.via_nonsparse_array( [ :A ] )
         x = scn.gets
         x.should eql "[#{ NEWLINE_ } A"
         x = scn.gets
@@ -46,14 +46,14 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
       end
 
       it "when zero input items" do
-        scn = EX1.new_with :gets_under, Home_::Stream.the_empty_stream
+        scn = _subject.new_with :gets_under, Callback_::Stream.the_empty_stream
         x = scn.gets
         x.should eql '[ ]'
         scn.gets.should be_nil
       end
 
       it "will change to buffering mode with multiple `puts` and then `flush`" do
-        scn = EX1.dup
+        scn = _subject.dup
         scn.puts 'hi'
         scn.puts 'hej'
         scn.flush.should eql "[#{ NEWLINE_ } hi,#{ NEWLINE_ } hej#{ NEWLINE_ }]"
@@ -61,10 +61,16 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Eventing
       end
 
       it "when zero input items and buffering mode" do
-        scn = EX1.dup
+        scn = _subject.dup
         scn.flush.should eql "[ ]"
         scn.flush.should eql '[ ]'
       end
+    end
+
+    a = [ :list, :through, :eventing ]
+    define_method :_something_about_eventing do |*x_a|
+      x_a[ 0, 0 ] = a
+      Home_::Sexp.expression_session_for_sexp x_a
     end
   end
 end

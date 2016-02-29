@@ -634,10 +634,14 @@ module Skylab::Callback
 
     def gets_last_one
       x = gets_one
+      assert_emtpy
+      x
+    end
+
+    def assert_emtpy
       if unparsed_exists
         raise ::ArgumentError, ___say_unexpected
       end
-      x
     end
 
     def ___say_unexpected
@@ -2775,10 +2779,6 @@ module Skylab::Callback
 
       def aggregate * scn_a
         Home_::Scn__::Aggregate.new scn_a
-      end
-
-      def articulators
-        Home_::Scn__::Articulators
       end
 
       def the_empty_stream

@@ -1,12 +1,12 @@
-module Skylab::Callback
+module Skylab::Human
 
-  module Scn__
+  module Sexp
 
-    class Articulators::Eventing  # :[#047].
+    class Expression_Sessions::List_through_Eventing  # :[#053].
 
-      # (see also simplified version at [#ba-056])
+      # (see also a simpler form at [#ba-056])
 
-      Home_::Actor.call self, :properties,
+      Callback_::Actor.call( self, :properties,
         :gets_under,
         :always_at_the_beginning,
         :iff_zero_items,
@@ -14,21 +14,23 @@ module Skylab::Callback
         :any_subsequent_items,
         :at_the_end_iff_nonzero_items,
         :y,
-        :flush
+        :flush,
+      )
 
       class << self
-        def new_via_iambic x_a  # :+[#063]
-          new do
-            process_iambic_fully x_a
-          end
+        def expression_via_sexp_stream_ st
+          new.___init_and_produce_via_etc st
         end
-      end
+        private :new
+      end  # >>
 
-      def initialize
+      def ___init_and_produce_via_etc st
+        # (used to be #[#ca-063])
         init_ivars
-        super
+        process_polymorphic_stream_fully st
         sanity_checks
         defaults
+        self
       end
 
       attr_reader :count

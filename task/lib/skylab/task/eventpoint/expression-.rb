@@ -132,7 +132,7 @@ class Skylab::Task
       #     p.articulation_proc[ * p.to_a ]  # => 'hi and lo'
       #
 
-      # articulators have a stupid simple but powerful algorithm for inflection
+      # expression sessions have a stupid simple but powerful algorithm for inflection
       #
       #     _NP = Subject[ :a, -> a { a * ' and ' } ]
       #     _VP = Subject[ :tense, :a, -> t, a do

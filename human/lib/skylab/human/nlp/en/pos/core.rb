@@ -39,6 +39,14 @@ module Skylab::Human
         end
       end  # >>
 
+      # also this is allowed:
+
+      Hack_lemma_via_symbol = -> sym do
+        s = sym.id2name
+        s.gsub! UNDERSCORE_, SPACE_
+        s
+      end
+
       Autoloader_[ self ]
     end
   end

@@ -2,7 +2,7 @@ module Skylab::Human
 
   module Sexp
 
-    class Idea_Argument_Adapter_for_Verbish___ < Here_::Idea_::Argument_Adapter
+    class Idea_Argument_Adapter_for_Verbish___ < Idea_Argument_Adapter_
       # -
         class << self
           def new_via__polymorphic_upstream__ st

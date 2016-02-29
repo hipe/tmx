@@ -76,7 +76,7 @@ classifications we apply to expressions:
 
 ## context of implementation
 
-this is similar in spirit to [#ca-048] the articulators, but different
+this is similar in spirit to [#hu-054] list expression, but different
 enough in interface that we neither borrow from thar nor intend to merge
 that effort into this one (for now). it may be that some expression
 frames in this facility will use that one for their implementation, but

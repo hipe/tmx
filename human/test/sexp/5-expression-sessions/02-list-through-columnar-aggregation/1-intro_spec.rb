@@ -1,16 +1,18 @@
-require_relative 'aggregating/test-support'
+require_relative '../../../test-support'
 
-module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
+module Skylab::Human::TestSupport
 
-  describe "[ca] scn articulators - aggregating" do
+  describe "[hu] sexp - expression sessions - list thru c.agg. - intro" do
 
-    extend TS_
+    TS_Joist_[ self ]
+    use :memoizer_methods
+    use :sexp_expression_sessions_list_through_columnar_aggregation
 
     context "handling field-level repetition by redundancy acknowledgement" do
 
-      before :all do
+      dangerous_memoize :subject do
 
-        Min_Count = Subject_.call(
+        su = subject_call_(
 
           :template, "{{ noun }} likes {{ obj }}",
 
@@ -20,8 +22,14 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
           :obj, :on_subsequent_mentions, -> y, x do
             y << "#{ x } as well"
-          end )
+          end,
+        )
+        SESLtA_Min_Count = su
+        su
+      end
 
+      it "builds" do
+        subject
       end
 
       it "with zero frames, zero output" do
@@ -74,17 +82,13 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         expect_line "X also likes Z"
         expect_no_more_lines
       end
-
-      def subject
-        Min_Count
-      end
     end
 
     context "handling frame-level repetition by redundancy acknowledgement" do
 
-      before :all do
+      dangerous_memoize :subject do
 
-        Frame_Redundancy = Subject_.call(
+        su = subject_call_(
 
           :template, "{{ np }}{{ vp }}{{ adv }}",
 
@@ -98,7 +102,10 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
           :adv, :on_subsequent_mentions_of, :frame, -> y, x do
             y << " again"
-          end )
+          end,
+        )
+        SESLtA_Frame_Redundancy =  su
+        su
       end
 
       it "works - note that field-level redundancy handlers are not used" do
@@ -141,24 +148,22 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         expect_line 'the server was pinged again'
         expect_no_more_lines
       end
-
-      def subject
-        Frame_Redundancy
-      end
     end
 
     context "introduction to nested aggregation" do
 
-      before :all do
+      dangerous_memoize :subject do
 
-        J_and_J = Subject_.call(
+        su = subject_call_(
 
           :template, "{{ np }}{{ vp }}",
 
           :np, :aggregate, -> y, a do
             y << ( a * ' and ' )
-          end )
-
+          end,
+        )
+        SESLtA_J_and_J = su
+        su
       end
 
       it "with no input frames, yields nil by default" do
@@ -202,10 +207,6 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         expect_line 'A1'
         expect_line 'A2'
         expect_no_more_lines
-      end
-
-      def subject
-        J_and_J
       end
     end
   end

@@ -1,40 +1,27 @@
-module Skylab::Callback
+module Skylab::Human
 
-  module Scn__
+  module Sexp
 
-    module Articulators  # ~stowaway
+    class Expression_Sessions::List_through_Columnar_Aggregation < ::Module  # see [#055]
+
+      Callback_::Actor.methodic self
+
+      # Entity_.event.selective_builder_sender_receiver self
 
       class << self
 
-        def aggregating * x_a
-          if x_a.length.zero?
-            Aggregating
-          else
-            Aggregating.new_via_iambic x_a
-          end
+        def expression_via_sexp_stream_ st
+          new.__init_and_produce_via_etc st
         end
 
-        def eventing * x_a
-          Articulators::Eventing.new_via_iambic x_a
-        end
-
-        def marginating
-          Articulators::Marginating
-        end
-      end
-    end
-
-    class Articulators::Aggregating < ::Module  # see [#050]
-
-      Home_::Actor.methodic self
-
-      # Entity_.event.selective_builder_sender_receiver self
+        private :new
+      end  # >>
 
       def initialize
         @ok = true
         @nucleus = Nucleus__.new
-        super  # will run the block that was passed that passes an iambic array
       end
+
       Nucleus__ = ::Struct.new(
         :name_i_a,
         :field_box,
@@ -44,6 +31,12 @@ module Skylab::Callback
         :do_field_redundancy,
         :do_field_aggregation,
         :on_zero_items_p )
+
+      def __init_and_produce_via_etc st
+
+        _ok = process_polymorphic_stream_fully st
+        _ok && self
+      end
 
     private
 
@@ -61,7 +54,7 @@ module Skylab::Callback
       end
 
       def via_template_parse_remainder_of_polymorphic_stream st
-        bx = Box.new
+        bx = Callback_::Box.new
         @nucleus.template.to_formal_variable_stream.each do | param |
           bx.add param.name_symbol, Behaviors___.new( param )
         end
@@ -139,7 +132,7 @@ module Skylab::Callback
           nil
         end
 
-        include Home_::Actor::Methodic.polymorphic_processing_instance_methods
+        include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
 
       private
 
@@ -219,7 +212,7 @@ module Skylab::Callback
             aggregator.flush
           end
         end
-        Home_::Scn.new do
+        Callback_::Scn.new do
           p[]
         end
       end
@@ -657,8 +650,6 @@ module Skylab::Callback
           @subs_h[ @fld.name_symbol ] = nil   # substitute the mustache variable name
         end
       end
-
-      MONADIC_TRUTH_ = -> _ { true }
     end
   end
 end

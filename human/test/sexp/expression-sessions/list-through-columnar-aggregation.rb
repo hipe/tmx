@@ -1,16 +1,16 @@
-require_relative '../test-support'
+module Skylab::Human::TestSupport
 
-module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
+  module Sexp::Expression_Sessions::List_Through_Columnar_Aggregation
 
-  ::Skylab::Callback::TestSupport::Scn[ TS_ = self ]
+    def self.[] tcc
+      tcc.include self
+    end
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
-
-  module InstanceMethods
+    a = [ :list, :through, :columnar_aggregation ]
+    define_method :subject_call_ do |*sx|
+      sx[ 0, 0 ] = a
+      Home_::Sexp.expression_session_for_sexp sx
+    end
 
     def push * s_a
       i_a = subject.field_i_a
@@ -56,7 +56,7 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
 
     def bld_input_scn
       @a_a = []
-      Home_::Scn.new do
+      Callback_::Scn.new do
         @a_a.shift
       end
     end
@@ -72,11 +72,5 @@ module Skylab::Callback::TestSupport::Scn::Articulators::Aggregating
         io.puts "(no output)"
       end ; nil
     end
-  end
-
-  Subject_ = -> * x_a do
-
-    Home_::Scn.articulators.aggregating.new_via_iambic x_a
-
   end
 end

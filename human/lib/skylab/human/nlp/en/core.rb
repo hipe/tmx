@@ -18,28 +18,6 @@ module Skylab::Human
           Both__[ a ]
         end
 
-        # --
-
-        def expression_session_for_ * x_a
-          expression_session_via_sexp x_a
-        end
-
-        def expression_session_via_sexp x_a
-          ___magnetic_collection.expression_session_via_sexp__ x_a
-        end
-
-        def ___magnetic_collection
-          @___mc ||= ___build_magnetic_collection
-        end
-
-        def ___build_magnetic_collection
-
-          Home_::Sexp::Expression_Collection.new_via_multipurpose_module__(
-            EN_::Sexp::Expression_Sessions )
-        end
-
-        # --
-
         def s * a
           if a.length.zero?
             S__

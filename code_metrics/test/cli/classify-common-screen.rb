@@ -84,7 +84,7 @@ module Skylab::CodeMetrics::TestSupport
           if s_.length.zero?
             :_blank_header_
           else
-            s_.downcase.gsub( SPACE_, Home_::UNDERSCORE_ ).intern
+            s_.downcase.gsub( SPACE_, UNDERSCORE_ ).intern
           end
         end
 
@@ -243,5 +243,7 @@ module Skylab::CodeMetrics::TestSupport
         RX___ = /\A\++\z/
       end
     end
+
+    UNDERSCORE_ = '_'
   end
 end
