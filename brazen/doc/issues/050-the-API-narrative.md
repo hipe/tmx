@@ -26,7 +26,7 @@ in the latter code node itself, the discerning eye will see lots of
 isomorphicism and early conceptual ancestors of most of the main components
 we use today: there is one long running lightweight "daemon"-ish and then
 for each request a dedicated "invocation" instance has a short-ish lifespan.
-[#cb-046] "iambics" were quite formalized by then too, and used then as
+[#ca-046] "iambics" were quite formalized by then too, and used then as
 they are now as the lingua franca for API actions.
 
 in fact, we re-purposed descriptions from the now sunsetted [#!hl-017]

@@ -108,7 +108,7 @@ module Skylab::Parse
           end
         end
 
-        Home_::Output_Node_.new res_a
+        Home_::OutputNode.for res_a
       end
     end
     # <-

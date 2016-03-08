@@ -30,7 +30,7 @@ module Skylab::Parse::TestSupport
         One = subject_parse_module[].new_with(
           :functions,
             :proc, -> in_st do
-              Home_::Output_Node_.new nil
+              Home_::OutputNode.for nil
             end ).to_output_node_and_mutate_array_proc
       end
       it "is always the same output node" do

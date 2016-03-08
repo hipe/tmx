@@ -74,12 +74,11 @@ module Skylab::Brazen
       oes_p or raise ::ArgumentError
       kernel.respond_to? :reactive_tree_seed or raise ::ArgumentError, __say_not_kernel( kernel )
 
-
       @formal_properties = nil
       @preconditions = nil
       @kernel = kernel
 
-      accept_selective_listener_proc oes_p
+      __accept_selective_listener_proc oes_p
     end
 
     def __say_not_kernel k
@@ -346,18 +345,16 @@ module Skylab::Brazen
     end
 
     def set_polymorphic_upstream__ x
-      @polymorphic_upstream_ = x
+      @_polymorphic_upstream_ = x
     end
 
     def remove_polymorphic_upstream__
-      remove_instance_variable :@polymorphic_upstream_
+      remove_instance_variable :@_polymorphic_upstream_
     end
 
     def when_after_process_iambic_fully_stream_has_content st
 
-      _a = [ st.current_token ]
-
-      _ev = Callback_::Actor::Methodic::Build_extra_values_event[ _a ]
+      _ev = Home_.lib_.fields::Events::Extra.via_strange st.current_token
 
       receive_extra_values_event _ev
     end
@@ -445,7 +442,7 @@ module Skylab::Brazen
 
   public
 
-    def accept_selective_listener_proc oes_p  # name might change to expose [ca]
+    def __accept_selective_listener_proc oes_p  # ..
 
       @_upstream_event_handler = oes_p
 

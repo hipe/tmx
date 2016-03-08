@@ -14,7 +14,7 @@ it might define a module named:
 
     ::Wizzie::WazloTango
 
-as discussed obliquely in [#cb-029], #ismorphic-filenames are lossy
+as discussed obliquely in [#ca-029], #ismorphic-filenames are lossy
 (hence it is a bit of a misnomer): this file may define any or all of
 `Wazlo_Tango`, `WAZLO_TANGO`, `WazloTango`, and still be in accordance
 with #isomorphic-filenames.
@@ -78,7 +78,7 @@ we'll say the pathname is something like this:
     `/home/me/my-projects/deep-hax/my-app-module/my-other-class.rb`
 
 
-what we do is we use the [#cb-026] `distill` function on each of the
+what we do is we use the [#ca-026] `distill` function on each of the
 "tail names" of the leaf nodes, and of the basename of the file:
 
 

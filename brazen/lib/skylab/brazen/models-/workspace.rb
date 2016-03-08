@@ -276,7 +276,7 @@ module Skylab::Brazen
             _prp = Home_.lib_.basic::Minimal_Property.via_variegated_symbol(
               :workspace_path )
 
-            Home_::Property.build_missing_required_properties_event [ _prp ]
+            Home_.lib_.fields::Events::Missing.for_attribute _prp
           end
 
           UNABLE_

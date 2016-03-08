@@ -12,11 +12,11 @@ module Skylab::Basic
             @inst ||= new
           end
 
-          def new_with * a  # :+[#cb-063]
+          def new_with * a  # :+[#ca-063]
             new_via_arglist a
           end
 
-          def new_via_arglist a  # :+[#cb-063] used to have this, may again
+          def new_via_arglist a  # :+[#ca-063] used to have this, may again
             new do
               process_iambic_fully a
             end
@@ -76,7 +76,7 @@ module Skylab::Basic
               end
               if vw
                 in_st.advance_one
-                Home_.lib_.parse_lib::output_node.new vw.value_x
+                Home_.lib_.parse_lib::OutputNode.for vw.value_x
               else
                 vw
               end

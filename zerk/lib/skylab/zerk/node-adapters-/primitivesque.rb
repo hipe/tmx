@@ -127,10 +127,10 @@ module Skylab::Zerk
       if is_listy
         a = Home_::Interpretation_Adapters_::List[ s, & @UI_event_handler ]
         if a
-          st = ACS_::Interpretation::Value_Popper[ a ]
+          st = Home_.lib_.fields::Argument_stream_via_value[ a ]
         end  # else emitted
       else
-        st = ACS_::Interpretation::Value_Popper[ s ]
+        st = Home_.lib_.fields::Argument_stream_via_value[ s ]
       end
 
       if st

@@ -104,7 +104,7 @@ really, what we might like is something more like:
 
     @listener.password_authentication_failure Failure_Event.new( .. )
 
-but that won't work for us either becuase [#042] method names cannot
+but that won't work for us either because method names cannot
 simply be be channel names. so what we have chosen is the convention of:
 
     @listener.receive_password_authentication_failure ..

@@ -126,7 +126,7 @@ module Skylab::Brazen
 
             define_method wm do
 
-              mutate_entity_against_upstream[ self, @polymorphic_upstream_ ]
+              mutate_entity_against_upstream[ self, @_polymorphic_upstream_ ]
             end
 
             private wm

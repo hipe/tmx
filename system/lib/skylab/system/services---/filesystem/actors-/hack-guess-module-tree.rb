@@ -47,13 +47,10 @@ module Skylab::System
           end
         end  # >>
 
-        Callback_::Actor.methodic self, :simple, :properties,
-
-          :polymorphic_writer_method_to_be_provided, :property, :line_upstream,
-
-          :polymorphic_writer_method_to_be_provided, :property, :path
-
-        Callback_::Event.selective_builder_sender_receiver self
+        Attributes_actor_.call( self,
+          line_upstream: :custom_interpreter_method,
+          path: :custom_interpreter_method,
+        )
 
      private
 

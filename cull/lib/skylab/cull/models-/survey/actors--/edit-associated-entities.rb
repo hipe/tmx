@@ -41,8 +41,9 @@ module Skylab::Cull
       RX___ = /\A(?:(?<add>add_)|(?<remove>remove_))(?<stem>.+)/
 
       def via_associated_entity arg, verb_sym, ent_sym
-        @survey.touch_associated_entity_( ent_sym ).send(
-          verb_sym, arg, @arg_box )
+
+        _ = @survey.touch_associated_entity_ ent_sym
+        _.send verb_sym, arg, @arg_box
       end
     end
   end

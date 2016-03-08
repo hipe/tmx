@@ -2,7 +2,7 @@ module Skylab::Parse
 
   # ->
 
-    class Output_Node_
+    class OutputNode
 
       Callback_::Actor.methodic self, :properties, :try_next
 
@@ -72,6 +72,13 @@ module Skylab::Parse
       def mutate_try_next_ x
         @try_next = x ; nil
       end
-    end
-    # <-
+
+      attr_reader(
+        :constituent_index,
+        :function_is_spent,
+        :try_next,
+        :value_x,
+      )
+    # -
+  end
 end

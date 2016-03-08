@@ -18,7 +18,7 @@ module Skylab::Parse
         x = @p[ in_st.current_token_object.value_x ]
         if x
           in_st.advance_one
-          Home_::Output_Node_.new x
+          Home_::OutputNode.for x
         end
       end
     end

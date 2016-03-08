@@ -841,7 +841,7 @@ module Skylab::Brazen
     end
 
     GOPV_METHOD___ = -> do  # "gets one polymorphic value"
-      @polymorphic_upstream_.gets_one
+      @_polymorphic_upstream_.gets_one
     end
 
     # ~ models

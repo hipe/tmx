@@ -208,13 +208,13 @@ module Skylab::Brazen::TestSupport
       def process_iambic_fully x_a
 
         st = Callback_::Polymorphic_Stream.via_array x_a
-        @polymorphic_upstream_ = st
+        @_polymorphic_upstream_ = st
         begin
           _m = st.gets_one
           _kp = send :"#{ _m }="
           _kp or fail
         end until st.no_unparsed_exists
-        remove_instance_variable :@polymorphic_upstream_
+        remove_instance_variable :@_polymorphic_upstream_
         NIL_  # ..
       end
 
@@ -224,19 +224,19 @@ module Skylab::Brazen::TestSupport
       end
 
       def state=
-        state = @polymorphic_upstream_.gets_one
+        state = @_polymorphic_upstream_.gets_one
         @exitstatus = state.exitstatus
         @_build.emission_array = state.lines
         KEEP_PARSING_
       end
 
       def stream=
-        @_build.stream_symbol = @polymorphic_upstream_.gets_one
+        @_build.stream_symbol = @_polymorphic_upstream_.gets_one
         KEEP_PARSING_
       end
 
       def string=
-        @_build.one_big_string = @polymorphic_upstream_.gets_one
+        @_build.one_big_string = @_polymorphic_upstream_.gets_one
         KEEP_PARSING_
       end
 

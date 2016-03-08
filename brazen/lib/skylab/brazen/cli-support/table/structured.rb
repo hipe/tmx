@@ -27,7 +27,7 @@ module Skylab::Brazen
 
           fld_st = IG__.simple_stream_of_items_via_polymorpic_stream st
 
-          @polymorphic_upstream_ = st
+          @_polymorphic_upstream_ = st
 
           begin
 
@@ -88,7 +88,7 @@ module Skylab::Brazen
         end
 
         def gets_one_polymorphic_value
-          @polymorphic_upstream_.gets_one
+          @_polymorphic_upstream_.gets_one
         end
 
         IG__ = Home_.lib_.parse::Item_Grammar.new(

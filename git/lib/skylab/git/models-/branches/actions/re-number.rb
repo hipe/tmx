@@ -149,10 +149,7 @@ y << "target distance must be at a minimum N-1."
         begin
           item = st.gets
           item or break
-
-          bx.touch item.to_i do
-            []
-          end.push item
+          bx.touch_array_and_push item.to_i, item
           redo
         end while nil
 

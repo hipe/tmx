@@ -6,6 +6,9 @@ module Skylab::Parse
 
       class Field
 
+        Attributes_actor_[ self ]  # if you change this to add defined
+          # attributes, you will have to answer to [#fi-023] in this lib.)
+
         class << self
 
           # ~ narrative (not alpha) order
@@ -24,13 +27,12 @@ module Skylab::Parse
             :field
           end
 
+          private :new
         end  # >>
 
-        Callback_::Actor.methodic self
-
-        def initialize & edit_p  # necessary #hook-in when using [cb] methodic
+        def initialize
+          block_given? and self._MODERNIZE_ME
           @moniker_symbol = nil
-          instance_exec( & edit_p )
         end
 
       private

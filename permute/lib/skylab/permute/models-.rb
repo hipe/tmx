@@ -47,9 +47,7 @@ module Skylab::Permute
           gets_one_polymorphic_value,
           name_x )
 
-        @argument_box.touch :pair do
-          []
-        end.push _pair
+        @argument_box.touch_array_and_push :pair, _pair
 
         KEEP_PARSING_
       end

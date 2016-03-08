@@ -33,6 +33,10 @@ module Skylab::TanMan
     Autoloader_[ self ]
   end
 
+  Attributes_actor_ = -> cls, h=nil do
+    Home_.lib_.fields::Attributes::Actor[ cls, h ]
+  end
+
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
@@ -51,5 +55,4 @@ module Skylab::TanMan
   Home_ = self
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
 end

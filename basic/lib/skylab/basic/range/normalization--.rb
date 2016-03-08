@@ -4,7 +4,7 @@ module Skylab::Basic
 
     class Normalization__  # :+[#027]
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
       class << self
         def new_with * x_a, & x_p
@@ -69,6 +69,7 @@ module Skylab::Basic
         otr = dup
         otr._receive_value x
         if x_p
+          self._COVER_ME_and_complete_me  # the method is not written
           otr.accept_selective_listener_proc x_p
         end
         otr.execute
@@ -87,13 +88,14 @@ module Skylab::Basic
 
     private
 
-      protected def _receive_value x
+      def _receive_value x
 
         _kn = Callback_::Qualified_Knownness.via_value_and_association(
           x, Home_.default_property )
 
         _receive_arg _kn
       end
+      protected :_receive_value
 
       def _receive_arg arg
         @qualified_knownness = arg

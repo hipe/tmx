@@ -1248,7 +1248,7 @@ module Skylab::Brazen
       def build_property sym, * x_a  # [bs], [gi]
 
         ok = true
-        prp = Home_::Modelesque::Entity::Property.new do
+        prp = Home_::Modelesque::Entity::Property.new_by do
 
           @name = Callback_::Name.via_variegated_symbol sym
           ok = process_iambic_fully x_a
@@ -1564,7 +1564,7 @@ module Skylab::Brazen
 
       def handle_event_selectively  # :+#public-API #hook-in
 
-        # as it must it produces a [#cb-017] selective listener-style proc.
+        # as it must it produces a [#ca-017] selective listener-style proc.
         # this default implementation accepts and routes every event to our
         # friendly general-purpose behavior dispatcher, but some hookers-in
         # will for example first check if a special method is defined which

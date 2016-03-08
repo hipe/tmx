@@ -3,14 +3,14 @@
 ## point of history
 
 ownership of scanning (as the abstract idea) got "promoted" from here up
-to [#cb-044]. what remains of this file are those parts of scanning that
+to [#ca-044]. what remains of this file are those parts of scanning that
 still remain in this sidesystem.
 
 so the timeline of this document was cleaved, and the other sidesystem
 gets to keep the history because it formally owns the idea now. however
 what appears below what moved from "that" document back into this one.
 the point of all this is that if for whatever reason you are tracking
-the distant DNA of these contents, look there, in [#cb-022], where the
+the distant DNA of these contents, look there, in [#ca-022], where the
 bulk of this document moved to.
 
 

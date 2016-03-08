@@ -63,7 +63,7 @@ module Skylab::Basic
 
       end  # >>
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
       def initialize & edit_p
         instance_exec( & edit_p )

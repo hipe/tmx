@@ -4,7 +4,7 @@ module Skylab::System
 
     class Bridges_::Grep  # [#017] (presently no content in document)
 
-      PARAMS___ = Home_.lib_.fields::Parameters[
+      PARAMS___ = Attributes_actor_.call( self,
         do_ignore_case: [ :known_known, :optional ],
         freeform_options: :optional,
         grep_extended_regexp_string: :optional,
@@ -12,7 +12,7 @@ module Skylab::System
         path: [ :singular_of, :paths ],
         paths: :optional,
         ruby_regexp: :optional,
-      ]
+      )
 
       class << self
 

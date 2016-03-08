@@ -7,7 +7,7 @@ module Skylab::Callback
         alias_method :construct, :new
 
         def codifying_expression_agent_instance
-          Event_::Models_::Expression_Agent::INSTANCE
+          Event_::Expression_Agent___::INSTANCE
         end
 
         def data_event_class_maker
@@ -558,10 +558,6 @@ module Skylab::Callback
           @handle_event_selectively_via_channel_proc = x ; nil
         end
 
-        def accept_selective_listener_proc oes_p
-          @on_event_selectively = oes_p ; nil
-        end
-
         def accept_selective_listener_via_channel_proc hesvc_p
           @handle_event_selectively_via_channel_proc = hesvc_p ; nil
         end
@@ -622,7 +618,7 @@ module Skylab::Callback
             if x_a.length.zero?
               Event_::Via_exception
             else
-              # implement an :+[#cb-057] ideal mixed syntax
+              # implement an #[#ca-057] ideal mixed syntax
               x_a[ 0, 0 ] = [ :exception ]
               Event_::Via_exception.call_via_iambic x_a
             end

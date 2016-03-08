@@ -1,4 +1,4 @@
-# the formal attribute narrative :[#022]
+# the formal attribute narrative :[#002]
 
 FOREWORD: this puppy is very old. it was rewritten once then lost in the fire,
 and has since been obviated several times by other efforts. however, some time

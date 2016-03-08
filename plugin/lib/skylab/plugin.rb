@@ -21,6 +21,7 @@ module Skylab::Plugin
 
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
     Parse = sidesys[ :Parse ]
 
     Stdlib_option_parser = -> do

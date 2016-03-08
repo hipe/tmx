@@ -6,7 +6,7 @@ module Skylab::Basic
 
         # do not let this seep into the scope of [#sy-004]. do not use FS here
 
-        Callback_::Actor.methodic self
+        Attributes_actor_[ self ]
 
       private
 
@@ -209,7 +209,7 @@ module Skylab::Basic
 
         def add_bad d, i
           @bad_box ||= Callback_::Box.new
-          ( @bad_box.touch i do [] end ).push d
+          @bad_box.touch_array_and_push i, d
           nil
         end
 

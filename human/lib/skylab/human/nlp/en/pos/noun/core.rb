@@ -21,12 +21,12 @@ module Skylab::Human
 
         first: :person,
         second: :person,
-        third: :person
+        third: :person,
       }
 
       # ~ for the lexical categories in our lexicon (noun only for now):
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
       class << self
 
@@ -41,14 +41,20 @@ module Skylab::Human
           ok && lemma
 
         end
+
+        private :new
       end  # (..)
 
       attr_reader :is_mass_noun
 
-      private def mass_noun=
+     private
+
+      def mass_noun=
         @is_mass_noun = true
         KEEP_PARSING_
       end
+
+    public
 
       # ~ end
 

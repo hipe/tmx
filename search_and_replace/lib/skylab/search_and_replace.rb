@@ -97,10 +97,6 @@ module Skylab::SearchAndReplace
     end  # >>
   end
 
-  Parameters_ = -> h do
-    Home_.lib_.fields::Parameters[ h ]
-  end
-
   class Root_Autonomous_Component_System_  # 1x by CLI and 1x by API
 
     Xxx = -> y do
@@ -380,6 +376,10 @@ module Skylab::SearchAndReplace
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Lib_::ACS[] ; nil
+  end
+
+  Attributes_ = -> h do
+    Home_.lib_.fields::Attributes[ h ]
   end
 
   Require_Zerk_ = Lazy_.call do

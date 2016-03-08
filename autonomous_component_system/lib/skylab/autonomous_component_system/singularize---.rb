@@ -41,7 +41,7 @@ module Skylab::Autonomous_Component_System
         ok = true
         a.each_with_index do | x, d |
 
-          _st = Home_::Interpretation::Value_Popper[ x ]
+          _st = Home_.lib_.fields::Argument_stream_via_value[ x ]
 
           qk = Home_::Interpretation::Build_value.call(
             _st,

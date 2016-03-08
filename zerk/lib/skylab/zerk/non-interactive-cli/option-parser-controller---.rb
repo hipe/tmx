@@ -87,7 +87,7 @@ module Skylab::Zerk
           self._WAHOO_this_will_be_fun_for_open  # #open [#022]
         end
 
-        _value_popper = ACS_::Interpretation::Value_Popper[ s ]
+        _value_popper = Home_.lib_.fields::Argument_stream_via_value[ s ]
 
         _oes_pp = -> _ do
           # the model doesn't know the component's asssociation but we do:

@@ -73,7 +73,7 @@ we haven't explained what this is yet..
 
 ## the module as business collection isomorphicism :[#A]
 
-this is basically the same thing as the idea behind [#cb-030] "boxxy":
+this is basically the same thing as the idea behind [#ca-030] "boxxy":
 that a ruby module's full extent of constants defined within in (and
 necessarily the other ones it may have inherited via its ancestor chain),
 should in some way be treated as having some business value.

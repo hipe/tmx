@@ -8,7 +8,7 @@ module Skylab::TestSupport
 
       # if x is a valid (long or short, qualified or not) const name,
       # result is x. if x is not a valid const name, result depends on
-      # whether a [#cb-017] "selective-listener" block was passed: if
+      # whether a [#ca-017] "selective-listener" block was passed: if
       # yes, result is the result of the callback (whether or not the
       # would-be event was requested). if no, result is false.
 

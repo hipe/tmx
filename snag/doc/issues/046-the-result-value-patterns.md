@@ -11,7 +11,7 @@ result values as they pertain to the result values of callbacks.
 
 in particular we like the idea of *some* callbacks being able to
 determine the final result when it might be useful to do so. (this is a
-bit like [#cb-040] the callback pattern.)
+bit like [#ca-040] the callback pattern.)
 
 but as another side of the same coin, we must be sure that the results
 of callbacks don't affect our logic when we don't want them to.

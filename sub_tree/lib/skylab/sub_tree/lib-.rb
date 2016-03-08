@@ -21,9 +21,8 @@ module Skylab::SubTree
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
-
     Brazen = sidesys[ :Brazen ]
-
+    Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
 
     _System_lib = sidesys[ :System ]

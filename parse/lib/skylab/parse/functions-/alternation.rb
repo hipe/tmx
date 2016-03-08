@@ -39,7 +39,7 @@ module Skylab::Parse
 
           if on
 
-            break Home_::Output_Node_.new_with on.value_x,
+            break Home_::OutputNode.new_with on.value_x,
               :constituent_index, d
 
           end

@@ -264,9 +264,7 @@ module Skylab::Snag
 
       Properties___ =  Callback_.memoize do  # a sketch for front client integ.
         [
-          Callback_::Actor::Methodic::Property.new_via_name_symbol(
-            :name
-          )
+          Home_.lib_.fields::SimplifiedName.new( :name )
         ].freeze
       end
 

@@ -16,15 +16,15 @@ module Skylab::Snag
 
       # ~ models & like
 
-      Methodic_ = Callback_::Actor::Methodic
+      Attrs__ = Home_.lib_.fields::Attributes
 
       class Common_Adapter_
 
-        include Methodic_.polymorphic_processing_instance_methods
+        include Attrs__::Lib::Polymorphic_Processing_Instance_Methods
 
         def process_polymorphic_stream_fully st
           _ok = super
-          _ok && via_default_proc_and_is_required_normalize
+          _ok && Attrs__::Normalize_using_defaults_and_requireds[ self ]
         end
       end
 

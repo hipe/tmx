@@ -9,17 +9,25 @@ module Skylab::Parse
       # separator used (most of them), for example to discern between
       # an -OR- list and an -AND- list.
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
-      def initialize & edit_p
+      def initialize
+        # (hi.)
+      end
 
-        instance_exec( & edit_p )
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
+      end
+
+      def normalize
 
         @p = if @single_separator_mode
           __build_proc_for_one_separator
         else
           __build_proc_for_two_separators
         end
+
+        KEEP_PARSING_
       end
 
     private
@@ -86,7 +94,7 @@ module Skylab::Parse
           end while nil
 
           if a && 1 < a.length
-            Home_::Output_Node_.new a
+            Home_::OutputNode.for a
           else
             in_st.current_index = d
             NIL_
@@ -135,7 +143,7 @@ module Skylab::Parse
           end
 
           if a
-            Home_::Output_Node_.new a
+            Home_::OutputNode.for a
           else
             in_st.current_index = d
             NIL_

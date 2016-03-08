@@ -78,7 +78,7 @@ module Skylab::Parse
       end
 
       def __flush
-        Home_::Output_Node_.new @result_x_a
+        Home_::OutputNode.for @result_x_a
       end
 
       # ~ #hook-ins for adjunct facets

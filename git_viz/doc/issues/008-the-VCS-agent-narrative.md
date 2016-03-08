@@ -4,7 +4,7 @@
 ## :#storypoint-5 introduction
 
 (EDIT: this exact idea or one very much like it is what morphed into
-[#cb-042] actors. to reduce code duplication we use that for this. in
+[#fi-016] actors. to reduce code duplication we use that for this. in
 this document we have replaced occurrences of "agent" with "actor" to
 emphasize the lineage.)
 

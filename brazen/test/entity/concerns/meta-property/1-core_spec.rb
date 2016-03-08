@@ -4,7 +4,7 @@ Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
 
 module Skylab::Brazen::TestSupport::Entity_Sandbox
 
-  describe "[br] entity meta-properties" do
+  describe "[br] entity - concerns - meta-property - core" do
 
     it "(sneak ahead to an essential case)" do
 

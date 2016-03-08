@@ -80,11 +80,12 @@ module Skylab::Brazen
 
       class Guy___
 
-        Callback_::Actor.methodic self
+        Attributes_actor_[ self ]
 
         class << self
           alias_method :new_via_polymorphic_stream_passively, :new
-        end
+          private :new
+        end  # >>
 
         attr_reader(
           :fill,
@@ -101,15 +102,17 @@ module Skylab::Brazen
             try_again = true
           end
 
-          @fill = Field_Strategies_::Fill::Fill_Model.new do
-
-            process_iambic_fully [
+          fill = Field_Strategies_::Fill::Fill_Model.new_with(
               :background_glyph, DEFAULT_BACKGROUND_GLYPH___,
               :glyph, DEFAULT_GLYPH___
-            ]
+          )
 
-            process_polymorphic_stream_passively st
-          end
+          # #spot-1 while we don't normalize, this. near [#fi-022]
+
+          _kp = fill.send :process_polymorphic_stream_passively, st
+          _kp or self._FAIL
+
+          @fill = fill
 
           if try_again
             process_polymorphic_stream_passively st

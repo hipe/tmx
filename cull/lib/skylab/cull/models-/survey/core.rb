@@ -69,7 +69,7 @@ module Skylab::Cull
         _call :__edit_via_mutable_qualified_knownness_box_and_look_path, bx, path
       end
 
-      def edit_via_mutable_qualified_knownness_box bx
+      def edit_via_mutable_qualified_knownness_box__ bx
         _call :_edit_via_mutable_qualified_knownness_box, bx
       end
 
@@ -93,9 +93,12 @@ module Skylab::Cull
     end
 
     def __edit_via_mutable_qualified_knownness_box_and_look_path bx, path
+
       ok = _retrieve_via_workspace_path ::File.join( path, FILENAME_ )
-      ok and begin
+      if ok
         _edit_via_mutable_qualified_knownness_box bx
+      else
+        ok
       end
     end
 
@@ -395,7 +398,7 @@ module Skylab::Cull
 
       -> do
         _x = gets_one_polymorphic_value
-        ( @argument_box.touch _SYM do [] end ).push _x
+        @argument_box.touch_array_and_push _SYM, _x
         KEEP_PARSING_
       end
     end

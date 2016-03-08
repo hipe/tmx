@@ -51,6 +51,7 @@ module Skylab::Cull
             @bx,
             @argument_box.fetch( :path ) )
         end
+
         if x
           @_survey = x
           ___via_survey

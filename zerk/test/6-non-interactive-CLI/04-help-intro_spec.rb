@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - options intro" do  # (was in [ac])
+  describe "[ze] niCLI - help intro" do  # (was in [ac])
 
     TS_[ self ]
     use :non_interactive_CLI
@@ -146,4 +146,3 @@ module Skylab::Zerk::TestSupport
     end
   end
 end
-# #pending-rename: (..)

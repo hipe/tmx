@@ -94,6 +94,14 @@ module Skylab::System
     end.new
   end
 
+  Attributes_actor_ = -> cls, h=nil do
+    Home_.lib_.fields::Attributes::Actor[ cls, h ]
+  end
+
+  Attributes_ = -> h do
+    Home_.lib_.fields::Attributes[ h ]
+  end
+
   Autoloader_ = Callback_::Autoloader
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
@@ -111,7 +119,6 @@ module Skylab::System
   NILADIC_TRUTH_ = -> { true }
   SPACE_ = ' '.freeze
   UNABLE_ = false
-
 end
 
 # :#tombstone: failed to start service

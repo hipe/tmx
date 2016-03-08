@@ -18,17 +18,24 @@ module Skylab::System
         #     the latter is the default behavior for some forms of call.
         #     as well there exists (recommended) progressive streaming.
 
+      Attributes_actor_.call( self,
+        when_command: nil,
+      )
+
       class << self
 
-        def for_mutable_args_ x_a, & oes_p
+        def for_mutable_args_ x_a, & x_p
 
           if x_a.length.zero?
             self
           else
-            new do
-              @on_event_selectively = oes_p
-              process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-            end.__mixed_result
+            o = new( & x_p )
+            kp = o.send :process_iambic_fully, x_a
+            if kp
+              o.__mixed_result
+            else
+              kp
+            end
           end
         end
 
@@ -37,12 +44,9 @@ module Skylab::System
 
       # ->
 
-        Callback_::Actor.methodic self, :properties, :when_command
-          # (and see many iambic writers below)
+        def initialize & x_p
 
-        def initialize & edit_p
-
-          @on_event_selectively = DEFAULT_ON_EVENT_SELECTIVELY___
+          @on_event_selectively = x_p || DEFAULT_ON_EVENT_SELECTIVELY___
 
           @sanitized_freeform_query_infix_words = nil
           @sanitized_freeform_query_postfix_words = nil
@@ -51,10 +55,15 @@ module Skylab::System
           @unescaped_ignore_dir_a = []
           @unescaped_path_a = []
           @when_command = WHEN_COMMAND___
+        end
 
-          instance_exec( & edit_p )
+        def process_polymorphic_stream_passively st  # #[#fi-022]
+          super && normalize
+        end
+
+        def normalize
           _decide_if_curry_and_resolve_command_args
-          freeze
+          KEEP_PARSING_
         end
 
         WHEN_COMMAND___ = -> cmd do
@@ -79,25 +88,25 @@ module Skylab::System
 
         end
 
-      protected def __init_new x_a, & oes_p
+        def __init_new x_a, & oes_p
 
           # for now this is hand-written to allow only the paths to change:
 
           @unescaped_path_a = @unescaped_path_a.dup
 
-          oes_p and accept_selective_listener_proc oes_p
+          if oes_p
+            @on_event_selectively = oes_p
+          end
 
-          ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-
-          ok and begin
+          kp = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+          if kp
             _decide_if_curry_and_resolve_command_args
             freeze
+          else
+            kp
           end
         end
-
-        private def accept_selective_listener_proc p  # #hook-out for [ca]
-          @on_event_selectively = p ; nil
-        end
+        protected :__init_new
 
         def _decide_if_curry_and_resolve_command_args
           if @unescaped_path_a.length.zero?

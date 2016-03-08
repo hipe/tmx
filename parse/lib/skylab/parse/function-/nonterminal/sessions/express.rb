@@ -27,7 +27,7 @@ module Skylab::Parse
           nil
         end
 
-        Callback_::Actor.methodic self
+        Attributes_actor_[ self ]
 
       private
 
@@ -118,28 +118,29 @@ module Skylab::Parse
 
         class Expag__
 
-          a = [
-            :any_first_constituent_string,
-            :any_subsequent_constituent_string,
-            :constituent_string_via_constituent_badge,
-            :express_all_segments_into_under_of_constituent_reflective_function ]
+          attrs = Attributes_actor_.call( self,
+            any_first_constituent_string: nil,
+            any_subsequent_constituent_string: nil,
+            constituent_string_via_constituent_badge: nil,
+            express_all_segments_into_under_of_constituent_reflective_function: nil,
+          )
 
-          Callback_::Actor.methodic self, :property_list, a
+          attr_reader( * attrs.symbols )
 
-          attr_reader( * a )
+          def initialize
+            # (hi.)
+          end
 
-          def initialize & edit_p
-            instance_exec( & edit_p )
-            freeze
+          def process_polymorphic_stream_passively st
+            kp = super
+            kp && freeze
+            kp
           end
 
           def new_via_iambic x_a
-            ok = nil
-            x = dup.instance_exec do
-              ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-              self
-            end
-            ok && x.freeze
+            o = dup
+            _kp = o.send :process_iambic_fully, x_a
+            _kp && o.freeze
           end
         end
 

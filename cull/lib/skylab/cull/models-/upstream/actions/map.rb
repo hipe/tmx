@@ -27,10 +27,6 @@ module Skylab::Cull
 
       TABLE_NUMBER_PROPERTY = properties.fetch :table_number
 
-      def accept_selective_listener_proc p
-        @on_event_selectively = p ; nil
-      end
-
       def produce_result
         @upstream = @parent_node.edit do | o |
           o.mutable_qualified_knownness_box to_qualified_knownness_box_except__ :table_number

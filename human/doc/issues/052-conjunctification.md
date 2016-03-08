@@ -57,13 +57,13 @@ etc.
 this is a sandbox of experimentation whose ultimate home is some
 elsewhere.
 
-  • it is very near :+[#cb-050] aggregated articulation conceptually.
+  • it is very near #[#hu-055] aggregated articulation conceptually.
 
   • perhaps it belongs in the above mentioned box of expression frames.
 
   • it is the frontier driver of wishlist :+[#hu-041]
     conjuctive phrase logic, which perhaps me while overkilled by
-    [#cb-047] the eventing articulator it uses.
+    [#hu-053] the eventing articulator it uses.
     (EDIT: the above "sentence")
 
 

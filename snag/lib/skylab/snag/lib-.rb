@@ -2,10 +2,9 @@ module Skylab::Snag
 
   module Library_
 
-    stdlib, subsystem = Autoloader_.at :require_stdlib, :require_sidesystem
+    stdlib = Autoloader_.method :require_stdlib
 
     o = { }
-    o[ :Basic ] = subsystem
     o[ :DateTime ] = stdlib
     o[ :FileUtils ] = stdlib
     o[ :Open3 ] = stdlib
@@ -35,7 +34,7 @@ module Skylab::Snag
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
 
     Basic = sidesys[ :Basic ]
-
+    Fields = sidesys[ :Fields ]
     Brazen = sidesys[ :Brazen ]
 
     CLI_legacy_DSL = -> mod do

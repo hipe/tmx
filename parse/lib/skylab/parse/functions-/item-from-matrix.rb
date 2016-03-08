@@ -52,13 +52,14 @@ module Skylab::Parse
         dup.__init( in_st, & oes_p ).__parse
       end
 
-    protected def __init in_st, & oes_p
+      def __init in_st, & oes_p
         if oes_p
           @_oes_p = oes_p
         end
         @_in_st = in_st
         self
       end
+      protected :__init
 
       def __parse
 

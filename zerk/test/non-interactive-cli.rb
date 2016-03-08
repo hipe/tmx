@@ -213,5 +213,4 @@ module Skylab::Zerk::TestSupport
     # -
   end
 end
-# #pending-rename: b.u
 # #tombstone: we once built state \"manually\" with our own structure

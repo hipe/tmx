@@ -97,7 +97,7 @@ module Skylab::Callback
         _ok and execute
       end
 
-      include Home_::Actor::Methodic.polymorphic_processing_instance_methods
+      include Home_.lib_.fields::Attributes::Lib::Polymorphic_Processing_Instance_Methods
 
     private
 

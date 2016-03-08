@@ -6,9 +6,9 @@ module Skylab::SearchAndReplace
       "the grep --count option - \"Only a count of selected lines ..\""
     end
 
-    PARAMETERS = Parameters_[
+    PARAMETERS = Attributes_.call(
       files_by_grep: nil,
-    ]
+    )
     attr_writer( * PARAMETERS.symbols )
 
     def initialize & oes_p

@@ -111,8 +111,8 @@ module Skylab::Brazen
             if ! kn.is_effectively_known && Field_::Is_required[ model ]
 
               kn = @when_missing.call kn, MISSING___ do
-                Home_::Property.build_missing_required_properties_event(
-                  [ model ] )
+
+                Home_.lib_.fields::Events::Missing.for_attribute model
               end
             end
           end

@@ -54,12 +54,12 @@ module Skylab::Brazen
 
           end
 
-          act.remove_instance_variable :@polymorphic_upstream_
+          act.remove_instance_variable :@_polymorphic_upstream_
 
           kp
         end
 
-        class Value_as_Stream___  # #tracking :+[#ac-006]:VP redundancies
+        class Value_as_Stream___  # #tracking #[#fi-019]
 
           def current_token
             @p[]

@@ -2,7 +2,7 @@ module Skylab::Human
 
   module Sexp
 
-    class Expression_Sessions::List_through_Eventing  # :[#053].
+    class Expression_Sessions::List_through_Eventing  # :[#047].
 
       # (see also a simpler form at [#ba-056])
 

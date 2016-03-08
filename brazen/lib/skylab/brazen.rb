@@ -118,7 +118,7 @@ module Skylab::Brazen
 
       bx ||= MONADIC_EMPTINESS_
 
-      instance_variable_set :@polymorphic_upstream_, st
+      instance_variable_set :@_polymorphic_upstream_, st
 
       begin
 
@@ -145,7 +145,7 @@ module Skylab::Brazen
         break
       end while nil
 
-      remove_instance_variable :@polymorphic_upstream_
+      remove_instance_variable :@_polymorphic_upstream_
     end
     kp
   end

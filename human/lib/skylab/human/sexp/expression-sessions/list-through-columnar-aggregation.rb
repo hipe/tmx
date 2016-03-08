@@ -4,7 +4,7 @@ module Skylab::Human
 
     class Expression_Sessions::List_through_Columnar_Aggregation < ::Module  # see [#055]
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
       # Entity_.event.selective_builder_sender_receiver self
 
@@ -132,7 +132,7 @@ module Skylab::Human
           nil
         end
 
-        include Callback_::Actor::Methodic.polymorphic_processing_instance_methods
+        include Home_.lib_.fields::Attributes::Lib::Polymorphic_Processing_Instance_Methods
 
       private
 
@@ -170,7 +170,10 @@ module Skylab::Human
               @when_field_value_count_is_two_or_more_p = st.gets_one  # BE CAREFUL
               KEEP_PARSING_
             else
-              _ev = build_extra_values_event [ i ], [ :frame, :field ]
+
+              _ev = Home_.lib_.fields::Events::Extra.build(
+                [i], [:frame, :field] )
+
               receive_extra_values_event _ev  # #hook-in (local)
             end
           end

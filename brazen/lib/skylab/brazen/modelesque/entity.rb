@@ -314,10 +314,9 @@ module Skylab::Brazen
           end
         end
 
-        public def receive_missing_required_properties_array miss_prp_a  # :+#public-API #hook-in #universal
+        def receive_missing_required_properties_array miss_prp_a  # :+#public-API #hook-in #universal
 
-          ev = Home_::Property.
-            build_missing_required_properties_event miss_prp_a
+          ev = Home_.lib_.fields::Events::Missing.for_attributes miss_prp_a
 
           if respond_to? :receive_missing_required_properties_event
 
@@ -326,6 +325,7 @@ module Skylab::Brazen
             raise ev.to_exception
           end
         end
+        public :receive_missing_required_properties_array
 
         def receive_missing_required_properties_softly ev  # popular :+#hook-with
           # (was :+[#054] #tracking error count)
@@ -374,7 +374,7 @@ module Skylab::Brazen
           x_ = nil
         end
 
-        ivar = prp.as_ivar
+        ivar = prp.name.as_ivar
 
         _is_defined_and_not_nil = if instance_variable_defined? ivar
           x = instance_variable_get ivar

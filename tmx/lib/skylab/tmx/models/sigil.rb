@@ -137,9 +137,7 @@ module Skylab::TMX
 
       def __add_medallion meda
 
-        a = @_box.touch meda.sigil do
-          []
-        end
+        a = @_box.touch_array meda.sigil
         a.push meda
         if 2 == a.length
           _a_ = ( @_conflicts ||= [] )

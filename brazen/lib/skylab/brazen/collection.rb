@@ -53,7 +53,7 @@ module Skylab::Brazen
 
     Byte_downstream_identifier_via_mixed = -> x do
 
-      # the counterpart to [#cb-056]
+      # the counterpart to [#ca-056]
 
       if x.respond_to? :push
 
@@ -317,7 +317,7 @@ module Skylab::Brazen
             end
           end
 
-          Home_::Property.build_extra_values_event(
+          Home_.lib_.fields::Events::Extra.new_via(
             [ kn.value_x ],
             did_you_mean_s_a,
             kn.name.as_human )

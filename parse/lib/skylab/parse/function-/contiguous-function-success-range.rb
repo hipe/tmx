@@ -31,7 +31,6 @@ module Skylab::Parse
               if edit_p
                 class_exec( & edit_p )
               end
-
             end
           end
 
@@ -50,7 +49,7 @@ module Skylab::Parse
 
           # we need at least and at most one parse function.
 
-          f = Home_.function( st.gets_one ).new_via_polymorphic_stream_passively( st )
+          f = Home_.function( st.gets_one ).new_via_polymorphic_stream_passively st
           f and begin
             @f = f
             KEEP_PARSING_
@@ -94,7 +93,7 @@ module Skylab::Parse
 
             # a re-parse for the monadic function is always for the zero-width case
 
-            Home_::Output_Node_.the_empty_node
+            Home_::OutputNode.the_empty_node
           end
 
           def _flush  # assume num times succeeded satisifes min
@@ -106,7 +105,7 @@ module Skylab::Parse
               _try_next = self
             end
 
-            Home_::Output_Node_.new_with ov_x, :try_next, _try_next
+            Home_::OutputNode.new_with ov_x, :try_next, _try_next
           end
 
           def _become_first_next_try
@@ -126,7 +125,7 @@ module Skylab::Parse
           def _init_for_parse in_st
             super
 
-            @long_running_mutable_output_node = Home_::Output_Node_.new(
+            @long_running_mutable_output_node = Home_::OutputNode.for(
               @mutable_outout_value_x_a = [] )
 
             @num_times_succeeded_hit_MAX = if -1 == @max

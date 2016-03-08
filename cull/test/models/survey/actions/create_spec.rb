@@ -8,9 +8,7 @@ module Skylab::Cull::TestSupport
     use :expect_event
 
     it "loads" do
-
       Home_::API
-
     end
 
     it "ping the top" do
@@ -47,7 +45,6 @@ module Skylab::Cull::TestSupport
       ev.ok or fail
       ev.path or fail
       ev.is_completion or fail
-
     end
   end
 end

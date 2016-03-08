@@ -10,7 +10,7 @@ module Skylab::Human
       class << self
 
         def expression_via_sexp_stream_ st
-          st.assert_emtpy
+          st.assert_empty
           new
         end
         private :new
@@ -24,8 +24,7 @@ module Skylab::Human
       # ~ mutation
 
       def add verb_sym, noun_sym
-
-        @_bx.touch( verb_sym ) { [] }.push noun_sym
+        @_bx.touch_array_and_push verb_sym, noun_sym
         NIL_
       end
 

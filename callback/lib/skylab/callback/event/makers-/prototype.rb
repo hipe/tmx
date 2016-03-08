@@ -274,9 +274,9 @@ module Skylab::Callback
           once = -> do
             did = true
             at_end = -> do
-              remove_instance_variable :@polymorphic_upstream_
+              remove_instance_variable :@_polymorphic_upstream_
             end
-            @polymorphic_upstream_ = st
+            @_polymorphic_upstream_ = st
             NIL_
           end
 
@@ -331,7 +331,7 @@ module Skylab::Callback
         end
 
         def gets_one_polymorphic_value  # :+#cp
-          @polymorphic_upstream_.gets_one
+          @_polymorphic_upstream_.gets_one
         end
 
       protected

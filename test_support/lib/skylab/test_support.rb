@@ -131,6 +131,12 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
+  Attributes_actor_ = -> cls, h do
+    Home_.lib_.fields::Attributes::Actor[ cls, h ]
+  end
+
+  # --
+
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader
@@ -156,5 +162,4 @@ module Skylab::TestSupport  # :[#021].
   TEST_DIR_FILENAME_ = 'test'.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
 end

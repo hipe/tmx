@@ -6,11 +6,11 @@ module Skylab::SearchAndReplace
       'list the matching filenames (but not the strings)'
     end
 
-    PARAMETERS = Parameters_[
+    PARAMETERS = Attributes_.call(
       egrep_pattern: :optional,
       files_by_find: nil,
       ruby_regexp: nil,
-    ]
+    )
     attr_writer( * PARAMETERS.symbols )
 
     attr_writer(  # [#ac-027]#A - system-private API
@@ -28,7 +28,7 @@ module Skylab::SearchAndReplace
     def to_file_path_stream * x_a, & pp
       self._INTERESTING
       call = dup._init_as_hot( & pp )
-      Parameters_[ for: nil ].init call, x_a
+      Attributes_[ for: nil ].init call, x_a
       call._to_path_stream
     end
 

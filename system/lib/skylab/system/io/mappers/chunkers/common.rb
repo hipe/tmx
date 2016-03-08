@@ -6,7 +6,7 @@ module Skylab::System
 
       module Chunkers
 
-        class Common
+        class Common  # :[#030]. (has mentee in [ba])
 
           # map reduce/expand upstream chunks of data into downstream lines
 

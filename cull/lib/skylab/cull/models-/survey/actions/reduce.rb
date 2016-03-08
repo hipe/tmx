@@ -51,7 +51,7 @@ module Skylab::Cull
       def resolve_transient_survey
 
         @survey = @parent_node.edit do  | edit |
-          edit.edit_via_mutable_qualified_knownness_box to_qualified_knownness_box_proxy
+          edit.edit_via_mutable_qualified_knownness_box__ to_qualified_knownness_box_proxy
         end
 
         @survey ? ACHIEVED_ : UNABLE_

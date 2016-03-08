@@ -188,6 +188,10 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   # --
 
+  Attributes_ = -> h do
+    Home_.lib_.fields::Attributes[ h ]
+  end
+
   No_events_ = -> * i_a, & ev_p do
     fail "unexpected: #{ i_a.inspect }"
   end

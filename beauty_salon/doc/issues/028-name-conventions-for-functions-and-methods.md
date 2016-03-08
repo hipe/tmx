@@ -148,7 +148,7 @@ better this time.
   of some particular DSL or another. this method *may* have side effects.
   [#141] expression agents are exemplary of this.
 
-+ `call` - for proc-like objects (typically [#cb-045] actors or
++ `call` - for proc-like objects (typically [#fi-016] actors or
   [#br-001] entities), must do the same as `[]` for this object.
   in these kind of objects, arguments are a (non-iambic) (positional)
   arglist. must not be used for non-proc-like classes. :+[#.E]
@@ -161,7 +161,7 @@ better this time.
 
 + `execute` has a strict API meaning for a lot of our libraries as the
   one #hook-out method the client must supply. it must take no
-  arguments. [#cb-042] actors exemplify these semantics, as well as many
+  arguments. [#fi-016] actors exemplify these semantics, as well as many
   of the base-classes called something like "action" in many of our
   frameworks :+[#.E]
 
@@ -182,7 +182,7 @@ better this time.
   must have no side-effects.
 
 + `flush` is our "go-to" name for something that cannot fail and
-  produces the "payload result" of the [#cb-042], "actor-ish" perhaps
+  produces the "payload result" of the [#fi-016], "actor-ish" perhaps
   with some irreversable internal side-effects that make this method not
   idempotent (but perhaps yet idempotent).
 
@@ -204,7 +204,7 @@ better this time.
   compliment the platform-recognized `initialize_copy`). 2) `init_foo`
   should typically init the ivar `@foo` in a way that cannot fail. if it
   may fail (as would be evinced by a result value) use [#031] `resolve_`.
-  `init_ivars` is a popular method name employed in [#cb-042] actors for
+  `init_ivars` is a popular method name employed in [#fi-016] actors for
   initting those ivars that cannot in the current state fail to be
   initted.
 
@@ -306,7 +306,7 @@ better this time.
 + `with` - see the #iambic family of method name conventions below
 
 + `work` is our "go-to" name for the interesting body of ..er.. work
-  that is done in an [#cb-042] actor's `execute` methods after the
+  that is done in an [#fi-016] actor's `execute` methods after the
   un-interesting initting and validation is performed. a method with
   this bareword name must not accept any arguments. this is a lazy method
   name - it should only be used if the behavior that occurs in the method
@@ -463,7 +463,7 @@ for methods that sign the events they produce or transform.
 the meta-classification of "iambic" applies tautologically to method
 name conventions that apply to iambic methods. that is, if any method
 has a name that is covered by any of the below conventions, that method
-must accept [#cb-046] "iambic" arguments; conversely no method covered
+must accept [#ca-046] "iambic" arguments; conversely no method covered
 by any of the below conventions can accept anything other than iambic
 arguments (and perhaps a block pursuant to the particular method).
 
@@ -568,7 +568,7 @@ this is the comprehensive constituency of this family:
   natural language because of how much of a consistently natural-sounding
   fit it is in code-use.
 
-  the receiver must have [#cb-042] actor semantics (but may have other
+  the receiver must have [#fi-016] actor semantics (but may have other
   shapes as well). if the receiver (actor) supports this method then the
   receiver supports iambic calls and vice versa. since the receiver is
   an actor, whether the call has side-effects on the receiver itself is
@@ -720,7 +720,7 @@ while writing this manifesto something occured to us: keeping in mind
 that our end goal in this was to find the perfect name convention for a
 query-effecting method, we realized that we already have a strong
 candidate word for such a thing: "reduce". `reduce_by` (in the pantheon of
-[#cb-044] stream methods) has a strong, unambiguos meaning and syntax. the
+[#ca-044] stream methods) has a strong, unambiguos meaning and syntax. the
 kind of method we are describing here has the exact same semantics but a
 diffenent syntax: it takes an iambic literal instead of a block. hence
 we must follow suit with the existing word, so please see `reduce_with`.
@@ -1037,7 +1037,7 @@ if we try and change it.
 however, (and we aren't sure yet), this entire name convention may just
 be a bandaid over a deeper problem for which there is a simpler
 solution: in short the solution may be smaller nodes (classes and
-modules). [#cb-042] actors have proven useful to this end: when viewed
+modules). [#fi-016] actors have proven useful to this end: when viewed
 logically actors have no public methods -- they are interacted with like
 procs. actors have a single exitpoint method (`execute`) and so since no
 one outside of the actor can call the actor's methods anyway, there is no

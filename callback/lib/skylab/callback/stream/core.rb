@@ -208,7 +208,7 @@ module Skylab::Callback
       end
     end
 
-    # `limit_by` has an implementation at [#cb-016]
+    # `limit_by` has an implementation at [#ca-016]
 
     def take d, & map_reduce_p
 

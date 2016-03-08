@@ -110,7 +110,7 @@ module Skylab::Parse
                             tok_s[ @hotstring_length .. -1 ] )
 
                 in_st.advance_one
-                Home_::Output_Node_.new @moniker_symbol
+                Home_::OutputNode.for @moniker_symbol
 
               end
             end

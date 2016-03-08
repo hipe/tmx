@@ -128,33 +128,30 @@ module Skylab
             a = nil
             bx = Callback_::Box.new
 
-            @plugins.each do | de |
+            @plugins.each do |de|
 
               if de.respond_to? :process_ARGV
                 ( a ||= [] ).push de
               end
 
-              de.each_reaction do | tr |
+              de.each_reaction do |tr|
 
-                tr.each_catalyzing_formal do | fo |
+                tr.each_catalyzing_formal do |fo|
 
-                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, de ]
-
+                  bx.touch_array_and_push fo.local_identifier_x, [ fo, de ]
                 end
 
-                tr.each_ancillary_formal_option do | fo |
+                tr.each_ancillary_formal_option do |fo|
 
-                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, de ]
-
+                  bx.touch_array_and_push fo.local_identifier_x, [ fo, de ]
                 end
               end
 
-              de.each_capability do | tr |
+              de.each_capability do |tr|
 
-                tr.each_ancillary_formal_option do | fo |
+                tr.each_ancillary_formal_option do |fo|
 
-                  bx.touch( fo.local_identifier_x ) { [] }.push [ fo, de ]
-
+                  bx.touch_array_and_push fo.local_identifier_x, [ fo, de ]
                 end
               end
             end

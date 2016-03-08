@@ -408,9 +408,8 @@ module Skylab::Plugin
 
                 bx ||= Callback_::Box.new
 
-                bx.touch fo.local_identifier_x do
-                  []
-                end.push Unused___.new( de.plugin_index, fo )
+                bx.touch_array_and_push fo.local_identifier_x,
+                  Unused___.new( de.plugin_index, fo )
               end
             end
           end

@@ -249,7 +249,6 @@ module Skylab::Human
     NL_RX___ = /(?<!\n)\z/  # ..
 
     Here_ = self
-    NEWLINE_ = "\n"
     NOTHING_ = nil
     UNRELIABLE_ = :_UNRELIABLE_from_hu_c15n_
   end

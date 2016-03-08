@@ -80,12 +80,10 @@ module Skylab::Brazen
 
           else
 
-            pcls = Callback_::Actor::Methodic::Property
+            pcls = Home_.lib_.fields::SimplifiedName
 
-            @_prps = cls.members.map do | sym |
-              pcls.new do
-                @name = Callback_::Name.via_variegated_symbol sym
-              end
+            @_prps = cls.members.map do |k|
+              pcls.new k do end  # (no edit)
             end
 
             @_value_p = -> sym do
@@ -98,7 +96,7 @@ module Skylab::Brazen
 
         def property_value_format_string_via_props props
           d = props.reduce 0 do | m, prp |
-            d_ = prp.name.as_human.length
+            d_ = prp.name.as_human.length  # wormhole [#035]
             m < d_ ? d_ : m
           end
           "%#{ d }s"

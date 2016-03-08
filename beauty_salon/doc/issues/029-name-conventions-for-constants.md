@@ -160,7 +160,7 @@ that is all.
 
 for a proc when that proc is assigned to a const, or other proc-like
 objects (that is, an object that is interfaced with like a proc, like
-for e.g a [#cb-042] actor); we use a name where the first letter is
+for e.g a [#fi-016] actor); we use a name where the first letter is
 uppercase (as is mandated by the platform), and all subsequent letters
 are lowercase separated by underscores (with an exception noted
 below):

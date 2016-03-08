@@ -6,11 +6,11 @@ module Skylab::SearchAndReplace
       'see the matching strings (not just files)'
     end
 
-    PARAMETERS = Parameters_[
+    PARAMETERS = Attributes_.call(
       files_by_grep: nil,
       ruby_regexp: nil,
       egrep_pattern: :optional,
-    ]
+    )
     attr_writer( * PARAMETERS.symbols )
 
     def initialize & oes_p

@@ -250,7 +250,7 @@ module Skylab::Fields
 
     def _accept_polymorphic_upstream st, & edit_p
 
-      @polymorphic_upstream_ = st
+      @_polymorphic_upstream_ = st
 
       while st.unparsed_exists
         send :"when__#{ st.gets_one }__"
@@ -260,7 +260,7 @@ module Skylab::Fields
         instance_exec( & edit_p )
       end
 
-      remove_instance_variable :@polymorphic_upstream_
+      remove_instance_variable :@_polymorphic_upstream_
       NIL_
     end
 
@@ -270,7 +270,7 @@ module Skylab::Fields
 
     def when__monadic__
 
-      send :"when__#{ @polymorphic_upstream_.gets_one }__"
+      send :"when__#{ @_polymorphic_upstream_.gets_one }__"
     end
 
     ## ~~ boolean: reader_looks_like_this?, writer_looks_like_this! (legacy)
@@ -282,7 +282,7 @@ module Skylab::Fields
       mod = @entity_model
       sym = @name_symbol
 
-      st = @polymorphic_upstream_
+      st = @_polymorphic_upstream_
       if st.unparsed_exists &&
           :negated_boolean_reader_method_name == st.current_token
 
@@ -330,7 +330,7 @@ module Skylab::Fields
 
     def when__enum__
 
-      enum_list = @polymorphic_upstream_.gets_one
+      enum_list = @_polymorphic_upstream_.gets_one
       enum_box = nil  # built late
       init_box = -> do
         enum_box = Callback_::Box.new
@@ -426,7 +426,7 @@ module Skylab::Fields
     ## ~~ DSL (atom | list): the writer does not end in a '='
 
     def when__DSL__
-      send :"when_DSL__#{ @polymorphic_upstream_.gets_one }__"
+      send :"when_DSL__#{ @_polymorphic_upstream_.gets_one }__"
     end
 
     attr_reader :is_list
@@ -495,13 +495,11 @@ module Skylab::Fields
 
     def _maybe_do_DSL_reader
 
-      if @polymorphic_upstream_.unparsed_exists &&
-          :reader == @polymorphic_upstream_.current_token
+      st = @_polymorphic_upstream_
 
-        @polymorphic_upstream_.advance_one
-
+      if st.unparsed_exists && :reader == st.current_token
+        st.advance_one
         @normal_iambic.push :reader
-
         true
       end
     end
@@ -516,7 +514,7 @@ module Skylab::Fields
     end
 
     def when__default__  # when set by iambic
-      x = @polymorphic_upstream_.gets_one
+      x = @_polymorphic_upstream_.gets_one
       _accept_default_by do
         x
       end
@@ -538,10 +536,10 @@ module Skylab::Fields
 
     def when__hook__
 
-      if @polymorphic_upstream_.unparsed_exists &&
-          :reader == @polymorphic_upstream_.current_token
+      st = @_polymorphic_upstream_
 
-        @polymorphic_upstream_.advance_one
+      if st.unparsed_exists && :reader == st.current_token
+        st.advance_one
         do_reader = true
       end
 
@@ -594,7 +592,7 @@ module Skylab::Fields
 
     def when__builder__
 
-      builder_proc_reader_name = @polymorphic_upstream_.gets_one
+      builder_proc_reader_name = @_polymorphic_upstream_.gets_one
       sym = @name_symbol
 
       @entity_model.module_exec do

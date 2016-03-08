@@ -1,12 +1,10 @@
 module Skylab::Callback
 
-  # ->
+  class Event
 
-    class Event
+    class Expression_Agent___  # :[#010].
 
-      Models_ = ::Module.new
-
-      class Models_::Expression_Agent  # :[#010].
+      # ->
 
         # used for 'description' of events (typically for development & tests)
 
@@ -74,9 +72,7 @@ module Skylab::Callback
         end
 
         INSTANCE = new.freeze
-      end
+      # -
     end
-
-    # <-
+  end
 end
-# #pending-rename - this is not a model (but meh)

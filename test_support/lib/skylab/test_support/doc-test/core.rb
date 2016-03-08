@@ -230,8 +230,8 @@ module Skylab::TestSupport
     private
 
       def build_unrecognized_param_arg ok_x_a
-        Home_.lib_.brazen::Property::
-          build_extra_values_event(
+
+        Home_.lib_.fields::Events::Extra.build(
             [ @value_x ],
             ok_x_a,
             "parameter argument" )
@@ -254,7 +254,7 @@ module Skylab::TestSupport
             desc_p = x.description_proc  # might be nil
           end
 
-          prop_cls.new do
+          prop_cls.new_by do
 
             @name = Callback_::Name.via_const_symbol sym
             @argument_arity = argument_arity_symbol

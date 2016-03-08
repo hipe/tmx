@@ -43,12 +43,14 @@ module Skylab::Plugin
         def __build_argument_index
 
           bx = Callback_::Box.new
+
           self::ARGUMENTS.each_slice 4 do | kw, a_i, kw_, n_i |
             :argument_arity == kw or raise ::ArgumentError, Say_art___[ kw ]
             :property == kw_ or raise ::ArgumentError, Say_prp___[ kw_ ]
             prp = Formal_Argument___.new a_i, n_i
             bx.add prp.name_symbol, prp
           end
+
           bx.freeze
         end
       end
@@ -79,6 +81,8 @@ module Skylab::Plugin
 
         def execute  # algorithm explained at [#007.G]
 
+          # #todo - this runs at least 9 times for each test we run?
+
           kp = KEEP_PARSING_
           st = @upstream
 
@@ -108,7 +112,7 @@ module Skylab::Plugin
 
         def __build_exception_for_when_unparsed_exists
 
-          _ev = Home_.lib_.brazen::Property.build_extra_values_event(
+          _ev = Home_.lib_.fields::Events::Extra.build(
             [ @upstream.current_token ] )
 
           _ev.to_exception

@@ -6,15 +6,22 @@ module Skylab::Callback::TestSupport
       private :new
     end
 
-    Home_::Actor.methodic self, :properties,
-      :debug_IO,
-      :do_debug_proc
+    Home_.lib_.fields::Attributes::Actor.call( self,  # Attributes_actor_
+      debug_IO: nil,
+      do_debug_proc: nil,
+    )
 
-    def initialize & edit_p
-
+    def initialize
       @emission_a = []
-      instance_exec( & edit_p )
+    end
+
+    def process_polymorphic_stream_passively st  # #[#fi-022]
+      super && normalize
+    end
+
+    def normalize
       @do_debug_proc ||= EMPTY_P_
+      ACHIEVED_
     end
 
   private

@@ -297,7 +297,7 @@ module Skylab::Autonomous_Component_System
           # UOW any more: we are in the middle of a depth-first building
           # of a compound component.
 
-          _arg_st = ACS_::Interpretation::Value_Popper[ qk.value_x ]
+          _arg_st = Home_.lib_.fields::Argument_stream_via_value[ qk.value_x ]
 
           # using the "value popper" (a shortlived proxy that looks like
           # a stream but only wraps one value) is our way of leveraging

@@ -152,8 +152,7 @@ here is how it compares:
    on). actors embody an intentional simplification of entities.
 
  + [#fi-004] basic fields will nil out fields for you; this does not.
-   however this will probably replace that. (yes: with [#058] methodic
-   actors.)
+   however this will probably replace that. ( did: with [#fi-013] attributes )
 
 
 

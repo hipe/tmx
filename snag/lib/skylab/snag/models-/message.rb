@@ -31,14 +31,20 @@ module Skylab::Snag
 
     class Normalization___
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
-      def initialize & edit_p
-
+      def initialize
         @p_a = []
-        instance_exec( & edit_p )
+      end
+
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
+      end
+
+      def normalize
         @p_a.freeze
         freeze
+        KEEP_PARSING_
       end
 
     private

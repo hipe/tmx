@@ -2,7 +2,7 @@ require_relative '../../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] [..] expression sessions - list through columnar aggregatoin of statementishes" do
+  describe "[hu] [..] expression sessions - list through columnar aggregation of statementishes" do
 
     extend TS_
 

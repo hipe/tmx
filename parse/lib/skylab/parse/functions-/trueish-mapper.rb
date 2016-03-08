@@ -16,7 +16,7 @@ module Skylab::Parse
       def output_node_via_input_stream in_st
         x = @p[ in_st ]
         if x
-          Home_::Output_Node_.new x
+          Home_::OutputNode.for x
         end
       end
     end

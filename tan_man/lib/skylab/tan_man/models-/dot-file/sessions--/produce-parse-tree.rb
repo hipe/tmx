@@ -12,17 +12,14 @@ module Skylab::TanMan
 
         :byte_upstream_identifier
 
-      def initialize & edit_p
-        @on_event_selectively = nil
-        instance_exec( & edit_p )
+      def initialize & oes_p
+        if oes_p
+          @on_event_selectively = oes_p
+        end
       end
 
       DotFile_::SyntaxNodes.class
       DotFile_::Sexp::InstanceMethods.class
-
-      def accept_selective_listener_proc oes_p
-        @on_event_selectively = oes_p ; nil
-      end
 
       def execute
 

@@ -53,5 +53,5 @@ the #storypoint-30 iambic array.
 
 ## :#storypoint-30
 
-for reasons of simplicity, we use [#cb-046] "iambic" arrays as the request
+for reasons of simplicity, we use [#ca-046] "iambic" arrays as the request
 structure throughout this facility.

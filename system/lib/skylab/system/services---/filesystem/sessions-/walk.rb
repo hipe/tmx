@@ -31,30 +31,34 @@ module Skylab::System
           end
         end  # >>
 
-        Callback_::Actor.methodic( self, :properties,
-
-          :start_path,
-          :filename,
-          :ftype,
-          :max_num_dirs_to_look,
-          :prop,
-          :property_symbol,
-          :filesystem,
+        Attributes_actor_.call( self,
+          start_path: nil,
+          filename: nil,
+          ftype: nil,
+          max_num_dirs_to_look: nil,
+          prop: nil,
+          property_symbol: nil,
+          filesystem: nil,
         )
 
         Callback_::Event.selective_builder_sender_receiver self
 
-        def initialize & edit_p
+        def initialize & oes_p
 
           @argument_path_might_be_target_path = nil
           @ftype = nil
-          @on_event_selectively = nil
+          @on_event_selectively = oes_p
           @prop = nil
           @property_symbol = nil
+        end
 
-          instance_exec( & edit_p )
+        def process_polymorphic_stream_passively st  # #[#fi-022]
+          super && normalize
+        end
 
+        def normalize
           @filesystem ||= Home_.services.filesystem
+          KEEP_PARSING_
         end
 
       private
@@ -229,9 +233,7 @@ module Skylab::System
 
           sym = @property_symbol || :path
 
-          Callback_::Actor::Methodic::Property.new do
-            @name = Callback_::Name.via_variegated_symbol sym
-          end
+          Home_.lib_.fields::SimplifiedName.new sym do end
         end
 
         Build_resource_not_found_event__ = -> start_path, file_pattern_x, num_dirs_looked do

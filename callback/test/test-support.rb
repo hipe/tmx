@@ -76,6 +76,7 @@ module Skylab::Callback::TestSupport
 
   # ~ singles
 
+  ACHIEVED_ = Home_::ACHIEVED_
   EMPTY_A_ = Home_::EMPTY_A_
   KEEP_PARSING_ = true
   NEWLINE_ = "\n".freeze

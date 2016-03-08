@@ -51,8 +51,8 @@ module Skylab::TestSupport
 
       def against * x_a
         before_call
-        _ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-        _ok and execute
+        _kp = process_iambic_fully x_a
+        _kp and execute
       end
 
       Fields___ = Home_.lib_.fields
@@ -74,6 +74,7 @@ module Skylab::TestSupport
     private
 
       def before_call
+        NIL_
       end
 
       def when_no_nodes

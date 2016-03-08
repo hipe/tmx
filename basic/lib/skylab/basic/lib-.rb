@@ -26,6 +26,8 @@ module Skylab::Basic
       Plugin[]::Bundle::Enhance::Shell.new a
     end
 
+    Fields = sidesys[ :Fields ]
+
     Human = sidesys[ :Human ]
 
     IO_lib = -> do

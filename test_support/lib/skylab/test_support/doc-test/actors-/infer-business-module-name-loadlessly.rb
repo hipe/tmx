@@ -14,24 +14,27 @@ module Skylab::TestSupport
 
       class << self
 
-        def [] * a, & oes_p
-          if 1 == a.length
+        def _call * a, & oes_p
+          if 1 == a.length  # almost #[#ca-057]
             a.unshift :path
           end
           call_via_iambic a, & oes_p
         end
 
-        alias_method :call, :[]
-      end
+        alias_method :[], :_call
+        alias_method :call, :_call
 
-      def initialize
-        @line_upstream = @path = @on_event_selectively = nil
-        super
-      end
+        private :new
+      end  # >>
 
-      def accept_selective_listener_proc oes_p  # #hook-out [cb]
-        @on_event_selectively = oes_p
-        nil
+      def initialize & oes_p
+        @line_upstream = nil
+        @on_event_selectively = nil
+        @path = nil
+
+        if oes_p
+          @on_event_selectively = oes_p
+        end
       end
 
       def execute
@@ -66,7 +69,6 @@ module Skylab::TestSupport
       COREFILE_TAIL__ = "/#{ Autoloader_.default_core_file }"
 
       RANGE__ = - COREFILE_TAIL__.length .. -1
-
 
       def init_leaf_list
 

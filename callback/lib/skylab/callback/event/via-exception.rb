@@ -2,16 +2,16 @@ module Skylab::Callback
 
   class Event
     # -
-      class Via_exception < Home_::Actor::Dyadic
+      class Via_exception
 
-        Home_::Actor.methodic self, :properties,
-          :exception,
-          :terminal_channel_i
+        Home_.lib_.fields::Attributes::Actor.call( self,  # Attributes_actor_
+          exception: nil,
+          terminal_channel_i: nil,
+        )
 
-        def initialize & p
+        def initialize
           @_event_property_pairs = nil
           @_mutator_p_a = nil
-          instance_exec( & p )
         end
 
       private

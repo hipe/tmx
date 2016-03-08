@@ -9,11 +9,11 @@ module Skylab::Autonomous_Component_System::TestSupport
         @bar = :_yoohoo_
       end
 
-      PARAMETERS = Home_.lib_.fields::Parameters[
+      PARAMETERS = Home_::Attributes_.call(
         foo: nil,
         bar: :optional,
         quux: nil,
-      ]  # must respond to (only) `symbols`, `optionals_hash`
+      )
 
       attr_writer( * PARAMETERS.symbols )
 

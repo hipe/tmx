@@ -305,7 +305,6 @@ module Skylab::Human
         else
           y << "#{ s }ing"
         end
-        y
       end
 
       ENDS_IN_E_RX__ = /e\z/i

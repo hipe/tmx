@@ -45,17 +45,13 @@ module Skylab::CodeMetrics
         bx = remove_instance_variable :@_extension_box
         bx_ = Callback_::Box.new
 
-        bx.each_pair do | ext, d |
-          bx_.touch d do
-            []
-          end.push Extension___.new( ext )
+        bx.each_pair do |ext, d|
+          bx_.touch_array_and_push d, Extension___.new( ext )
         end
 
         if sp
-          sp.each_pair do | sym, d |
-            bx_.touch d do
-              []
-          end.push Special___.new( sym )
+          sp.each_pair do |sym, d|
+            bx_.touch_array_and_push d, Special___.new( sym )
           end
         end
         bx_

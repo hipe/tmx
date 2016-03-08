@@ -27,7 +27,7 @@ module Skylab::Basic
         "{{#{ s }}}"  # super duper non-robust for now
       end
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
       def initialize & edit_p
 

@@ -12,7 +12,7 @@ module Skylab::Parse
         if _RX =~ in_st.current_token_object.value_x
           tok_o = in_st.current_token_object
           in_st.advance_one
-          Home_::Output_Node_.new tok_o.value_x.to_i
+          Home_::OutputNode.for tok_o.value_x.to_i
         end
       end
 

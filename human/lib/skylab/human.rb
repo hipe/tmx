@@ -19,6 +19,10 @@ module Skylab::Human  # :[#001].
     NLP_ = self
   end
 
+  Attributes_actor_ = -> mod, h=nil do
+    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  end
+
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
@@ -28,6 +32,7 @@ module Skylab::Human  # :[#001].
   Home_ = self
   IDENTITY_ = -> x { x }
   Lazy_ = Callback_::Lazy
+  NEWLINE_ = "\n"
   NIL_ = nil
   NONE_ = nil
   KEEP_PARSING_ = true

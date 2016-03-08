@@ -46,21 +46,20 @@ module Skylab::System
 
           :system_conduit
 
-        def initialize & edit_p
-          @on_event_selectively = nil
+        def initialize & oes_p
+
+          if oes_p
+            -1 == oes_p.arity or self._MODERNIZE_ME
+            @on_event_selectively = oes_p
+          end
+
           @dry = nil
           @patch_method = nil
           @system_conduit = nil
           @target_method = nil
-          instance_exec( & edit_p )
         end
 
       private
-
-        def accept_selective_listener_proc p
-          @on_event_selectively = p
-          nil
-        end
 
         def is_dry_run=
           @dry = gets_one_polymorphic_value

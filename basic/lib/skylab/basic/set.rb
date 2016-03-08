@@ -318,7 +318,7 @@ module Skylab::Basic
       def missing
         @bork_p[ Missing[ @miss_k_a, @agent ] ]
       end
-      Missing = Bork__.new do |miss_k_a, agent|
+      Missing = Bork__.new do |miss_k_a, agent|  # #[#fi-015]
         "missing required parameter(s): (#{ miss_k_a.join ', ' }) for #{
           }#{ agent.class }"
       end

@@ -14,6 +14,8 @@ module Skylab::Human
 
     Brazen = sidesys[ :Brazen ]
 
+    Fields = sidesys[ :Fields ]
+
     Levenshtein = gemlib[ :Levenshtein ]
 
     Parse = sidesys[ :Parse ]

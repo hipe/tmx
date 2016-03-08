@@ -382,7 +382,7 @@ module Skylab::Brazen
             :path, @input_id.to_path,
             :is_dry, false,
             :document, self,
-            :on_event_selectively, ( oes_p || _handle_event_selectively )
+            & ( oes_p || _handle_event_selectively )
           ).edit_via_iambic( x_a ).execute
         end
 
@@ -392,7 +392,7 @@ module Skylab::Brazen
             :path, path,
             :is_dry, false,
             :document, self,
-            :on_event_selectively, ( oes_p || _handle_event_selectively )
+            & ( oes_p || _handle_event_selectively )
           ).edit_via_iambic( x_a ).execute
         end
 

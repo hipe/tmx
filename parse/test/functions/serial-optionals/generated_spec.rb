@@ -73,14 +73,14 @@ module Skylab::Parse::TestSupport
           if feet_rx =~ st.current_token_object.value_x
             tok = st.current_token_object
             st.advance_one
-            Home_::Output_Node_.new tok.value_x.to_i
+            Home_::OutputNode.for tok.value_x.to_i
           end
         end,
         :proc, -> st do
           if inch_rx =~ st.current_token_object.value_x
             tok = st.current_token_object
             st.advance_one
-            Home_::Output_Node_.new tok.value_x.to_f
+            Home_::OutputNode.for tok.value_x.to_f
           end
         end ).to_parse_array_fully_proc
 

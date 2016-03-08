@@ -40,7 +40,7 @@ module Skylab::Brazen
           :parts_float,
         )
 
-        Callback_::Actor.methodic self
+        Attributes_actor_[ self ]
 
         def initialize & edit_p
           @background_glyph = SPACE_

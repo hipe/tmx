@@ -61,13 +61,15 @@ module Skylab::GitViz
 
             _any_prp_class = fp.at_position( 0 ).class
 
-            fp.add_to_front :width, ( _any_prp_class.new do
+            _prp = _any_prp_class.new_by do
 
-              @name = Callback_::Name.via_variegated_symbol( :width )
+              @name = Callback_::Name.via_variegated_symbol :width
               @parameter_arity = :one
 
               add_normalizer_for_greater_than_or_equal_to_integer 1
-            end )
+            end
+
+            fp.add_to_front :width, _prp
 
             NIL_
           end

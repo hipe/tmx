@@ -82,7 +82,7 @@ module Skylab::Brazen
     end
 
     def _build_extra_properties_event xtra_a
-      Property.build_extra_values_event xtra_a
+      Home_.lib_.fields::Events::Extra.build xtra_a
     end
 
     def maybe_send_event * i_a, & ev_p

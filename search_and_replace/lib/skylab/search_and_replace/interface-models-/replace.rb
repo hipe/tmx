@@ -5,11 +5,11 @@ module Skylab::SearchAndReplace
     # the "replace" operation (from the perspective of what the API must do)
     # is not so different from the "matches" operation - ..
 
-    PARAMETERS = Parameters_[
+    PARAMETERS = Attributes_.call(
       matches: nil,
       replacement_expression: :_read,
       functions_directory: [ :optional, :_read ],
-    ]
+    )
 
     attr_writer( * PARAMETERS.symbols )
 

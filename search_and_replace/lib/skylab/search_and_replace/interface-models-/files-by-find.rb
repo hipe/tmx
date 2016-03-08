@@ -6,10 +6,10 @@ module Skylab::SearchAndReplace
       "previews all files matched by the `find` query"
     end
 
-    PARAMETERS = Parameters_[
+    PARAMETERS = Attributes_.call(
       filename_patterns: :optional,
       paths: nil,
-    ]
+    )
     attr_writer( * PARAMETERS.symbols )
 
     def initialize & oes_p

@@ -1094,7 +1094,6 @@ module Skylab::Callback::TestSupport
       }
     end
 
-    ACHIEVED_ = true
     UNRELIABLE_ = false
   end
 end

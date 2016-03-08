@@ -31,7 +31,7 @@ module Skylab::Brazen
         cls
       end
 
-      Callback_::Actor.methodic self
+      Attributes_actor_[ self ]
 
     private
 
@@ -43,7 +43,7 @@ module Skylab::Brazen
       def segment=
 
         seg = Formal_Segment___.new_via_polymorphic_stream_passively(
-          @polymorphic_upstream_ )
+          @_polymorphic_upstream_ )
 
         ( @_seg_a ||= [] ).push seg
 
@@ -98,22 +98,22 @@ module Skylab::Brazen
         end
 
         def new_expressor_with * x_a
-
-          new do
+          _ = new do
             process_iambic_fully x_a
-          end._to_proc
+          end
+          _._to_proc
         end
 
         private :new
       end  # >>
 
-      def initialize & edit_p
-
+      def initialize & _
         @expression_width = nil
+        super( & _ )
+        normalize   # would be #[#fi-022] (but this is actor not m-ethodic)
+      end
 
-        if block_given?
-          instance_exec( & edit_p )
-        end
+      def normalize
 
         cls = self.class
 
@@ -122,6 +122,8 @@ module Skylab::Brazen
         @segments ||= cls::SEGMENTS
 
         @_number_of_segments = @segments.length
+
+        KEEP_PARSING_
       end
 
       Callback_::Actor.call( self, :properties,

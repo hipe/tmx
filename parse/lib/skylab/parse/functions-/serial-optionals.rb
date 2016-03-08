@@ -150,7 +150,7 @@ module Skylab::Parse
           end
         end
 
-        Home_::Output_Node_.new output_a
+        Home_::OutputNode.for output_a
       end
 
       # #hook-out for adjunct facet: syntax expression
@@ -171,14 +171,14 @@ module Skylab::Parse
     #         if feet_rx =~ st.current_token_object.value_x
     #           tok = st.current_token_object
     #           st.advance_one
-    #           Parse_lib_[]::Output_Node_.new tok.value_x.to_i
+    #           Parse_lib_[]::OutputNode.for tok.value_x.to_i
     #         end
     #       end,
     #       :proc, -> st do
     #         if inch_rx =~ st.current_token_object.value_x
     #           tok = st.current_token_object
     #           st.advance_one
-    #           Parse_lib_[]::Output_Node_.new tok.value_x.to_f
+    #           Parse_lib_[]::OutputNode.for tok.value_x.to_f
     #         end
     #       end ).to_parse_array_fully_proc
     #

@@ -520,8 +520,6 @@ module Skylab::TestSupport
 
     SIMPLE_STYLE_RX__ = Home_.lib_.brazen::CLI_Support::Styling::SIMPLE_STYLE_RX
 
-    METHODIC_ = Callback_::Actor::Methodic
-
     class Expectation  # [br], [te]
 
       class << self
@@ -537,7 +535,7 @@ module Skylab::TestSupport
         private :new
       end  # >>
 
-      include METHODIC_.polymorphic_processing_instance_methods
+      include Home_.lib_.fields::Attributes::Lib::Polymorphic_Processing_Instance_Methods
 
       def initialize st, & p
 
@@ -597,8 +595,6 @@ module Skylab::TestSupport
         :receive_unstyled_string,
         :stream_symbol,
       )
-
-      METHODIC_.cache_polymorphic_writer_methods self
     end
 
     # -- this is the "newschool" experiment ..

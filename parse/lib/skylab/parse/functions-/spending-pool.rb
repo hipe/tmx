@@ -39,7 +39,7 @@ module Skylab::Parse
     #     One = Subject_[].new_with(
     #       :functions,
     #         :proc, -> in_st do
-    #           Parse_lib_[]::Output_Node_.new nil
+    #           Parse_lib_[]::OutputNode.for nil
     #         end ).to_output_node_and_mutate_array_proc
     #
     # is always the same output node:
@@ -212,7 +212,7 @@ module Skylab::Parse
 
         if did_parse_any
 
-          Home_::Output_Node_.new_with res_a, :did_spend_function, did_spend_all
+          Home_::OutputNode.new_with res_a, :did_spend_function, did_spend_all
 
         end
       end

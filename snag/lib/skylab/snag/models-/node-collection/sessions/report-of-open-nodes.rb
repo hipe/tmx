@@ -64,7 +64,7 @@ module Skylab::Snag
         end
       end
 
-      def __wrap_this_in_number_limiter st  # (would-be `limit_by` :[#cb-016])
+      def __wrap_this_in_number_limiter st  # (would-be `limit_by` :[#ca-016])
 
         d = @number_limit
         d ||= -1

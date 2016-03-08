@@ -45,11 +45,19 @@ module Skylab::Fields
 
     class << Events::Missing
 
-      def new_via_arglist a
-        __new_via( * a )
+      def for_attribute x
+        via [ x ]
       end
 
-      def __new_via miss_a, lemma=nil
+      def for_attributes a
+        via a
+      end
+
+      def new_via_arglist a
+        via( * a )
+      end
+
+      def via miss_a, lemma=nil
 
         miss_a.first.respond_to?( :id2name ) and raise ::ArgumentError
 

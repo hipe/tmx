@@ -5,6 +5,8 @@ module Skylab::System
     class Normalizations_::Path_Based  # read [#004.G] near states
     private
 
+      Attributes_actor_[ self ]
+
       class << self
 
         def begin_ filesystem
@@ -14,8 +16,6 @@ module Skylab::System
 
         private :new  # all n11ns must begin by being begun (formally)
       end  # >>
-
-      Callback_::Actor.methodic self
 
       def initialize filesystem
 

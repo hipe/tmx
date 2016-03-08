@@ -88,7 +88,7 @@ module Skylab::TestSupport
         # max once per runtime do we build the parser here knowing this
 
         _Parse = Home_.lib_.parse
-        opn = _Parse.output_node
+        opn = _Parse::OutputNode
         pair = -> x, sym do
           Callback_::Pair.via_value_and_name x, sym
         end
@@ -113,7 +113,7 @@ module Skylab::TestSupport
           end
           if d
             st.advance_one
-            opn.new pair[ d, :num ]
+            opn.for pair[ d, :num ]
           end
         end
 
@@ -137,7 +137,7 @@ module Skylab::TestSupport
           end
           if d
             st.advance_one
-            opn.new pair[ d, :ord ]
+            opn.for pair[ d, :ord ]
           end
         end
 

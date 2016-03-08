@@ -137,15 +137,14 @@ module Skylab::Basic
               raise ::NoMethodError, opt_req_rest
             end
 
-            bx.add( name_symbol,
-
-            ::Skylab::Brazen::Modelesque::Entity::Property.new do
+            _prp = ::Skylab::Brazen::Modelesque::Entity::Property.new_by do
 
               @argument_arity = argument_arity
               @name = Callback_::Name.via_variegated_symbol name_symbol
               @parameter_arity = parameter_arity
+            end
 
-            end )
+            bx.add name_symbol, _prp
           end
 
           bx
@@ -214,8 +213,10 @@ module Skylab::Basic
 
         def __build_when_extra_arguments_event extra_sym_a
 
-          _sign_event ::Skylab::Brazen::Property.
-            build_extra_values_event extra_sym_a, nil, 'argument', 'unexpected'
+          _ev = Home_.lib_.fields::Events::Extra.
+            new_via extra_sym_a, nil, 'argument', 'unexpected'
+
+          _sign_event _ev
         end
 
         def __bc_when_miss miss_prp_a
@@ -229,8 +230,9 @@ module Skylab::Basic
 
         def __build_missing_arguments_event miss_prp_a
 
-          _sign_event ::Skylab::Brazen::Property.
-            build_missing_required_properties_event miss_prp_a, 'argument'
+          _ev = Home_.lib_.fields::Events::Missing.via miss_prp_a, 'argument'
+
+          _sign_event _ev
         end
 
         def __bc_via_arglist arglist

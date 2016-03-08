@@ -347,7 +347,6 @@ module Skylab::Basic
 
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
-    NEWLINE_ = "\n".freeze
     String_ = self
   end
 end

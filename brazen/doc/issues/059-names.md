@@ -52,7 +52,7 @@ alongside "pairs" and "unqualified knownnesses".
 
 
 
-## a pair :[#cb-055]
+## a pair :[#ca-055]
 
 when we group a name and a value in a general way we call this a "pair."
 always the means of accessing this pair's constituents must be with the

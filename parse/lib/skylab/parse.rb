@@ -36,10 +36,6 @@ module Skylab::Parse  # see [#001]
           Lib___, self )
       end
 
-      def output_node
-        Home_::Output_Node_
-      end
-
       def parse_serial_optionals * a
         Home_::Functions_::Serial_Optionals.parse_via_highlevel_arglist a
       end
@@ -84,9 +80,20 @@ module Skylab::Parse  # see [#001]
       Autoloader_[ self ]
     end
 
+    Attributes_ = -> h do
+      Home_.lib_.fields::Attributes[ h ]
+    end
+
+    Attributes_actor_ = -> mod, h=nil do
+      Home_.lib_.fields::Attributes::Actor[ mod, h ]
+    end
+
     module Lib___
 
-      Basic = Autoloader_.build_require_sidesystem_proc[ :Basic ]
+      sidesys = Autoloader_.build_require_sidesystem_proc
+
+      Basic = sidesys[ :Basic ]
+      Fields = sidesys[ :Fields ]
 
       Stdlib_set = Autoloader_.build_require_stdlib_proc[ :Set ]
     end

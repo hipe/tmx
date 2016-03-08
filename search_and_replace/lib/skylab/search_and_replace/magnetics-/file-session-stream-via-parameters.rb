@@ -6,14 +6,14 @@ module Skylab::SearchAndReplace
       @_oes_p = oes_p
     end
 
-    o = Parameters_[
+    o = Attributes_.call(
       for: nil,  # { read_only | for_interactive_search_and_replace }
       grep_extended_regexp_string: :_read,
       max_file_size_for_multiline_mode: :_read,
       replacement_parameters: :_read,
       ruby_regexp: :_read,
       upstream_path_stream: nil,
-    ]
+    )
 
     attr_writer( * o.symbols )
 

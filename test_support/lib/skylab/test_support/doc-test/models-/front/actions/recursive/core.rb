@@ -106,11 +106,14 @@ module Skylab::TestSupport
           @sub_action ||= :none
 
           if :preview == @sub_action && ! @downstream
+
             maybe_send_event :error, :missing_required_properties do
-              Home_.lib_.brazen::Property.
-                build_missing_required_properties_event(
-                  [ self.class.properties.fetch( :downstream ) ] )
+
+              _prp = self.class.properties.fetch :downstream
+
+              Home_.lib_.fields::Events::Missing.for_attribute _prp
             end
+
             UNABLE_
           else
             ACHIEVED_

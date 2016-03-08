@@ -4,23 +4,28 @@ module Skylab::SubTree
 
     class Traversal
 
-      Callback_::Actor.methodic self, :properties,
-        :sep,
-        :do_verbose_lines
+      Attributes_actor_ = Home_.lib_.fields::Attributes::Actor
 
-      def initialize & edit_p
+      Attributes_actor_.call( self,
+        do_verbose_lines: nil,
+        sep: nil,
+      )
+
+      def initialize
+
         @curr_a = []
         @do_verbose_lines = false
         @matrix_a = []
-
-        instance_exec( & edit_p )
-
-        @glyph_set ||= Home_.lib_.basic::Tree.unicode::GlyphSets::WIDE
-        @sep ||= SEP_
       end
 
-      def accept_selective_listener_proc oes_p
-        @on_event_selectively = oes_p ; nil
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
+      end
+
+      def normalize
+        @glyph_set ||= Home_.lib_.basic::Tree.unicode::GlyphSets::WIDE
+        @sep ||= SEP_
+        KEEP_PARSING_
       end
 
     private

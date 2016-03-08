@@ -218,6 +218,10 @@ module Skylab::Basic  # introduction at [#020]
     NIL_
   end
 
+  Attributes_actor_ = -> mod, h=nil do
+    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  end
+
   ACHIEVED_ = true
   CLI = nil  # for host
   CONST_SEP_ = '::'.freeze
@@ -230,6 +234,7 @@ module Skylab::Basic  # introduction at [#020]
   KEEP_PARSING_ = true
   MONADIC_EMPTINESS_ = -> _ {}
   MONADIC_TRUTH_ = -> _ { true }
+  NEWLINE_ = "\n".freeze
   NIL_ = nil
   NILADIC_FALSEHOOD_ = -> { false }
   PROCEDE_ = true

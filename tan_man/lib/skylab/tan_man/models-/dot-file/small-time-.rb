@@ -13,12 +13,15 @@ module Skylab::TanMan
       Callback_::Actor.methodic self, :properties, :is_dry
 
       def initialize id, gsp, x_a, & oes_p
+
         @byte_downstream_identifier = id
         @graph_sexp = gsp
         @is_dry = false
         @on_event_selectively = oes_p
+
         if x_a.length.nonzero?
-          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+          _kp = process_iambic_fully x_a
+          _kp or self._FAILED
         end
       end
 
