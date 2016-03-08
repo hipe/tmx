@@ -23,6 +23,9 @@ its "API scope". here is a summary of the N tiers of scope:
 
     this_method_has_a__generated_portion__  # see #A
 
+    _a_method_like_this_  # ..is for when the other is a business namespace
+
+
 
 
 ## introducion through a quick example

@@ -16,15 +16,10 @@ module Skylab::Basic
         end
       end  # >>
 
-      def initialize & edit_p
+      def initialize & oes_p
 
-        @on_event_selectively = nil  # none will be supported
+        @on_event_selectively = oes_p
         @qualified_knownness = nil
-        instance_exec( & edit_p )
-      end
-
-      def accept_selective_listener_proc p
-        @on_event_selectively = p
       end
 
     private

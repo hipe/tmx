@@ -4,12 +4,22 @@ module Skylab::Cull
 
     class Actors__::Create
 
-      Callback_::Actor.methodic self, :simple, :properties, :properties,
+      ATTRIBUTES = Attributes_.call(
+        survey: nil,  # order - this one first :(
+        dry_run: nil,
+      )
 
-        :survey,
-        :dry_run
+      class << self
+        define_method :_call, HARD_CALL_METHOD_
+        alias_method :[], :_call
+        alias_method :call, :_call
+        alias_method :begin_session__, :new
+        undef_method :new
+      end  # >>
 
-      define_singleton_method :[], HARD_CALL_METHOD_
+      def initialize & oes_p
+        @on_event_selectively = oes_p
+      end
 
       def execute
 

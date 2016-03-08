@@ -4,39 +4,40 @@ module Skylab::Parse
 
     class Functions_::Keyword < Home_::Function_::Field
 
-      class << self
+      _ = self::ATTRIBUTES
+      _ and self._DO_fi_023  # [#fi-023]:
 
-        def new_via_polymorphic_stream st
-          new do
-            _custom_syntax( st ) and process_polymorphic_stream_fully( st )
-          end
-        end
+      # only because all of our attributes are defined by methods can we
+      # do this:
 
-        def new_via_polymorphic_stream_passively st
-          new do
-            _custom_syntax( st ) and process_polymorphic_stream_passively( st )
-          end
-        end
-      end  # >>
+      ATTRIBUTES = Attributes_.call(
+        minimum_number_of_characters: nil,
+      )
 
-      edit_actor_class :properties,
-        :minimum_number_of_characters
-
-      def initialize
-
+      def initialize & _
+        block_given? and self._MODERNIZE_ME
         @minimum_number_of_characters = nil
+      end
 
-        super
+      def process_polymorphic_stream_passively st  # #[#fi-022], [#ca-057]
 
+        @formal_string = st.gets_one
+
+        _kp = if st.no_unparsed_exists
+          KEEP_PARSING_
+        else
+          super
+        end
+
+        _kp && normalize
+      end
+
+      def normalize
         @moniker_symbol ||= @formal_string.intern
         @formal_length = @formal_string.length
         @does_need_hotstring = true
         @ss = nil
-      end
-
-      def _custom_syntax st
-        @formal_string = st.gets_one
-        st.unparsed_exists
+        KEEP_PARSING_
       end
 
       def receive_sibling_sandbox ss

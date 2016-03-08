@@ -6,14 +6,14 @@ module Skylab::Snag
 
       class Association_Adapter < Common_Adapter_
 
-        Methodic_.call self, :simple, :properties,
-          :required, :property, :verb_lemma_and_phrase_head_s_a
+        Attributes_actor_.call( self,
+          verb_lemma_and_phrase_head_s_a: nil,
+        )
 
         attr_reader :verb_lemma_and_phrase_head_s_a
 
         def initialize
           @model_identifier = nil
-          super
         end
 
       private

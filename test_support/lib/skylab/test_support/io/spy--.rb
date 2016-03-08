@@ -32,11 +32,12 @@ module Skylab::TestSupport
 
     class Shell___  # too hard to do this in a basic object
 
-      Callback_::Actor.methodic self, :simple, :properties, :properties,
-        :debug_IO,
-        :debug_prefix,
-        :do_debug_proc,
-        :puts_map_proc
+      attrs = Attributes_actor_.call( self,
+        debug_IO: nil,
+        debug_prefix: nil,
+        do_debug_proc: nil,
+        puts_map_proc: nil,
+      )
 
       private  # ->
 
@@ -60,7 +61,7 @@ module Skylab::TestSupport
 
     public
 
-      attr_reader( * properties.get_names )
+      attr_reader( * attrs.symbols )
 
       attr_reader :do_debug_value_was_passed, :do_debug_x, :is_standard
 

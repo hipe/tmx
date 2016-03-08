@@ -4,9 +4,8 @@ module Skylab::Human
 
     class Idea_
 
-      Callback_::Actor.methodic( self, :properties,
-
-        :syntactic_category,
+      Attributes_actor_.call( self,
+        syntactic_category: nil,
       )
 
       class << self
@@ -16,16 +15,24 @@ module Skylab::Human
         alias_method :new_via_sexp__, :new_via_iambic
 
         # #itch [#ca-047] - it would be nice to get nothing from methodic..
+
+        private :new
       end  # >>
 
-      def initialize & edit_p
-
+      def initialize
         @__slots = Callback_::Box.new
-        instance_exec( & edit_p )
+      end
+
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
+      end
+
+      def normalize
         h = remove_instance_variable( :@__slots ).h_
         h.each_pair do | sym, x |
           instance_variable_set :"@#{ sym }", x
         end
+        KEEP_PARSING_
       end
 
       attr_reader :syntactic_category
@@ -40,7 +47,7 @@ module Skylab::Human
 
       attr_reader :object_atom, :object_count, :object_list
 
-      private def object=
+      def object=
 
         _edit_self(
           :via, :polymorphic_upstream,
@@ -59,7 +66,7 @@ module Skylab::Human
 
       attr_reader :subject_atom, :subject_count, :subject_list
 
-      private def subject=
+      def subject=
 
         _edit_self(
           :via, :polymorphic_upstream,
@@ -68,7 +75,7 @@ module Skylab::Human
           polymorphic_upstream )
       end
 
-      private def verb=
+      def verb=
 
         _edit_self(
           :via, :polymorphic_upstream,
@@ -81,7 +88,7 @@ module Skylab::Human
 
       attr_reader :negative
 
-    private def negative=
+      def negative=
 
         @negative = true
         KEEP_PARSING_
@@ -89,7 +96,7 @@ module Skylab::Human
 
       attr_reader :later_is_expected
 
-    private def later_is_expected=
+      def later_is_expected=
 
         @later_is_expected = true
         KEEP_PARSING_
@@ -97,10 +104,19 @@ module Skylab::Human
 
       attr_reader :more_is_expected
 
-    private def more_is_expected=
+      def more_is_expected=
         @more_is_expected = true
         KEEP_PARSING_
       end
+
+      private(
+        :negative=,
+        :object=,
+        :subject=,
+        :verb=,
+        :later_is_expected=,
+        :more_is_expected=,
+      )
 
       # ~
 

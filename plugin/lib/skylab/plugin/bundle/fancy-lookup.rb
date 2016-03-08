@@ -4,16 +4,16 @@ module Skylab::Plugin
 
     # incomplete pseudocde for a [#.A] general & [#.B] particular algorithm
 
-    Callback_::Actor.methodic( self, :properties,
+    Attributes_actor_ = -> cls, h do
+      Home_.lib_.fields::Attributes::Actor[ cls, h ]
+    end
 
-      :stemname_filter,
+    Attributes_actor_.call( self,
+      stemname_filter: nil,
     )
 
-    def initialize & edit_p
-
+    def initialize
       @stemname_filter = nil
-
-      instance_exec( & edit_p )
     end
 
     def against sym, mod

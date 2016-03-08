@@ -43,12 +43,37 @@ module Skylab::System
         private :new
       end  # >>
 
+      def self.new_with * x_a
+        $stderr.puts "YOU WANT TO CHANGE ME"
+        o = super( * x_a )
+        o.__init_defaults
+        o
+      end
+
       # -- Construction arguments
 
-      Callback_::Actor.methodic self, :properties,
+      Attributes_actor_.call( self,
+        downstream_IO: nil,
+        niladic_pass_filter_proc: nil,
+      )
 
-        :downstream_IO,
-        :niladic_pass_filter_proc
+      # ~ construction internals
+
+      def initialize
+
+        @_do_check_for_line_boundaries = false
+
+        @_line_begin_p = @_line_end_p = nil
+
+        @niladic_pass_filter_proc = @_puts_map_p_a = nil
+
+        @_was_newline = true
+      end
+
+      def __init_defaults
+        @niladic_pass_filter_proc ||= NILADIC_TRUTH_
+        NIL_
+      end
 
     private
 
@@ -103,24 +128,6 @@ module Skylab::System
           ( @_puts_map_p_a ||= [] ).push p
         end
         KEEP_PARSING_
-      end
-
-      # ~ construction internals
-
-      def initialize( & edit_p )
-
-        @_do_check_for_line_boundaries = false
-
-        @_line_begin_p = @_line_end_p = nil
-
-        @niladic_pass_filter_proc = @_puts_map_p_a = nil
-
-        @_was_newline = true
-
-        instance_exec( & edit_p )
-
-        @niladic_pass_filter_proc ||= NILADIC_TRUTH_
-
       end
 
     public

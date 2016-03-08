@@ -18,8 +18,9 @@ module Skylab::Parse
         y << "unrecognized argument #{ ick o.x }"
       end
 
-      Callback_::Actor.methodic self, :simple, :properties,
-        :property, :input_stream
+      Attributes_actor_.call( self,
+        input_stream: nil,
+      )
 
       def initialize
 

@@ -4,16 +4,17 @@ module Skylab::Basic
 
     class Word_Wrappers__::Calm  # see [#033]
 
-      Callback_::Actor.methodic self, :properties,
+      Attributes_actor_.call( self,
 
-        :aspect_ratio,  # IFF this, we engage layout engine of same
-        :downstream_yielder,
-        :first_line_margin,
-        :first_line_margin_width,  # only when etc
-        :margin,
-        :width
+        aspect_ratio: nil,  # IFF this, we engage layout engine of same
+        downstream_yielder: nil,
+        first_line_margin: nil,
+        first_line_margin_width: nil,  # only when etc
+        margin: nil,
+        width: nil,
+      )
 
-      def initialize & edit_p
+      def initialize
 
         @aspect_ratio = nil
         @do_add_newlines = false
@@ -22,7 +23,13 @@ module Skylab::Basic
         @first_line_margin_width = nil
         @_input_shape = nil
         @margin = nil
-        instance_exec( & edit_p )
+      end
+
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
+      end
+
+      def normalize
 
         if @aspect_ratio
           extend String_::Fit_to_Aspect_Ratio_::Layout_Engine_Methods
@@ -31,6 +38,7 @@ module Skylab::Basic
         end
 
         init_layout_engine_
+        ACHIEVED_
       end
 
     private

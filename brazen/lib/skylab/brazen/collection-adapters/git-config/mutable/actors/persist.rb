@@ -6,66 +6,47 @@ module Skylab::Brazen
 
       class Actors::Persist
 
-        Callback_::Actor.methodic self
+        # ~ #[#081] experimental extensions to methodic actor
 
-        # ~ :+[081] experimental extensions to methodic actor
+        Attributes_actor_.call( self,
+          document: nil,
+          is_dry: nil,
+          path: nil,
+          write_to_tempfile_first:
+            [ :flag, :ivar, :"@do_write_to_tmpfile_first" ]
+        )
 
         class << self
 
-          def build_mutable_with * x_a
-            new_via_iambic x_a
+          def build_mutable_with * x_a, & x_p
+            new_via_iambic x_a, & x_p
           end
-        end
+
+          private :new
+        end  # >>
 
         def edit_via_iambic x_a
-          if x_a.length.nonzero?
+
+          _kp = if x_a.length.nonzero?
             process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
           else
             true
-          end and self
+          end
+
+          _kp && self
         end
 
         # ~ end experimental extensions
 
-        def initialize & edit_p
+        def initialize( & oes_p )
 
           @do_write_to_tmpfile_first = false
-
-          instance_exec( & edit_p )
+          if oes_p
+            @on_event_selectively = oes_p
+          else
+            self._WHERE
+          end
         end
-
-      private
-
-        def is_dry=
-          @is_dry = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def document=
-          @document = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def on_event_selectively=
-          @on_event_selectively = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def path=
-          @path = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def write_to_tempfile_first=
-          @do_write_to_tmpfile_first = true
-          KEEP_PARSING_
-        end
-
-        def accept_selective_listener_proc p  # #covered-by [tm]
-          @on_event_selectively = p ; nil
-        end
-
-      public
 
         def execute
 

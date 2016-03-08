@@ -4,11 +4,11 @@ module Skylab::TestSupport
 
     class Actors_::Infer_business_module_name_loadlessly  # introduction at [#027]
 
-      Callback_::Actor.methodic self, :simple, :properties,
-
-        :property, :line_upstream,
-        :property, :path,
-        :property, :on_event_selectively
+      Attributes_actor_.call( self,
+        line_upstream: nil,
+        path: nil,
+        property: nil,
+      )
 
       include Lazy_Selective_Event_Methods_
 

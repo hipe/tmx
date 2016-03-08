@@ -26,6 +26,8 @@ scope we adhere to when naming our instance variables:
 
     @public_instance_variable   # :#tier-0 - public API-ish
 
+    @_public_instance_variable_when_above_convention_is_business_namespace_
+
     @library_scope_  # #tier-1 - see
 
     @_cozy_scope  # :#tier-2: used only in this file

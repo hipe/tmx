@@ -59,54 +59,46 @@ module Skylab::Cull
     Brazen_::Entity::Apply_entity[ Brazen_::Modelesque::Entity, x_a, & x_p ]
   end
 
-  HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do
+  HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do  # 1x
 
-    seen = false
+    st = const_get( :ATTRIBUTES, false ).to_defined_attribute_stream
 
-    x = new do
-      seen = true
+    o = begin_session__( & oes_p )
 
-      st = self.class.properties.to_value_stream
-
-      values.length.times do | d |
-        instance_variable_set(
-          st.gets.name.as_ivar,
-          values.fetch( d ) )
-      end
-
-      prp = st.gets
-      while prp
-        instance_variable_set(
-          :"#{ prp.name.as_ivar }_arg",
-          arg_box.fetch( prp.name_symbol ) )
-        prp = st.gets
-      end
-
-      @on_event_selectively = oes_p
+    values.length.times do |d|
+      _atr = st.gets
+      o.instance_variable_set _atr.as_ivar, values.fetch( d )
     end
 
-    seen && x.execute
+    begin
+      atr = st.gets
+      atr or break
+      _ivar = :"#{ atr.as_ivar }_arg"
+      _x = arg_box.fetch atr.name_symbol
+      o.instance_variable_set _ivar, _x
+      redo
+    end while nil
+
+    o.execute
   end
 
-  VALUE_BOX_EXPLODER_CALL_METHOD_ = -> value_box, & oes_p do
+  VALUE_BOX_EXPLODER_CALL_METHOD_ = -> value_box, & oes_p do  # 1x
 
-    seen = false
+    # for every defined attribute (only the names matter), read the value
+    # from the value box and write it to the session as an ivar. then execute.
 
-    x = new do
-      seen = true
+    o = begin_session__( & oes_p )
 
-      st = self.class.properties.to_value_stream
+    st = const_get( :ATTRIBUTES, false ).to_defined_attribute_stream
 
-      prp = st.gets
-      while prp
-        instance_variable_set prp.name.as_ivar, value_box[ prp.name_symbol ]
-        prp = st.gets
-      end
+    begin
+      atr = st.gets
+      atr or break
+      o.instance_variable_set atr.as_ivar, value_box[ atr.name_symbol ]
+      redo
+    end while nil
 
-      @on_event_selectively = oes_p
-    end
-
-    seen && x.execute
+    o.execute
   end
 
   module Simple_Selective_Sender_Methods_
@@ -129,6 +121,10 @@ module Skylab::Cull
     end
   end
 
+  Attributes_ = -> h do
+    Home_.lib_.fields::Attributes[ h ]
+  end
+
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -136,6 +132,8 @@ module Skylab::Cull
     Basic = sidesys[ :Basic ]
 
     # = sidesys[ :Brazen ]  # for [sl]
+
+    Fields = sidesys[ :Fields ]
 
     Filesystem = -> do
       System[].filesystem

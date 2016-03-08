@@ -4,14 +4,24 @@ module Skylab::Cull
 
     class Actors__::Produce_adapter
 
-      Callback_::Actor.methodic self, :simple, :properties, :properties,
+      ATTRIBUTES = Attributes_.call(
+        derelativizer: nil,
+        table_number: nil,
+        upstream: nil,
+        upstream_adapter: nil,
+      )
 
-        :derelativizer,
-        :table_number,
-        :upstream,
-        :upstream_adapter
+      class << self
+        define_method :_call, VALUE_BOX_EXPLODER_CALL_METHOD_
+        alias_method :[], :_call
+        alias_method :call, :_call
+        alias_method :begin_session__, :new
+        undef_method :new
+      end  # >>
 
-      define_singleton_method :[], VALUE_BOX_EXPLODER_CALL_METHOD_
+      def initialize & oes_p
+        @on_event_selectively = oes_p
+      end
 
       def execute
 
@@ -48,12 +58,12 @@ module Skylab::Cull
       end
 
       def when_prefix
+
         maybe_send_event :error, :invalid_prefix do
 
-          Brazen_::Property.build_extra_values_event(
-            [ @prefix ],
-            get_available_prefixes,
-            'prefix' )
+          _s_a = get_available_prefixes
+
+          Home_.lib_.fields::Events::Extra.new_via [ @prefix ], _s_a, "prefix"
         end
       end
 
@@ -70,7 +80,7 @@ module Skylab::Cull
         end
       end
 
-      public def process_as_file_identifier_string str
+      def process_as_file_identifier_string str
         path = __via_derelativizer_absolutize_path str
         path and process_as_file_absolute_path path
       end
@@ -162,34 +172,30 @@ module Skylab::Cull
       end
 
       def when_bad_extension extname
+
         maybe_send_event :error, :invalid_extension do
 
           _s_a = get_upstream_adapters_names.map do | nm |
             ".#{ nm.as_slug }"
           end
 
-          Brazen_::Property.build_extra_values_event(
-            [ extname ],
-            _s_a,
-            'extension' )
-
+          Home_.lib_.fields::Events::Extra.new_via [ extname ], _s_a, "extension"
         end
+
         UNABLE_
       end
 
       def when_bad_adapter sym
+
         maybe_send_event :error, :invalid_adapter do
 
           _s_a = get_upstream_adapters_names.map do | nm |
             nm.as_lowercase_with_underscores_symbol
           end
 
-          Brazen_::Property.build_extra_values_event(
-            [ sym ],
-            _s_a,
-            'upstream adapter' )
-
+          Home_.lib_.fields::Events.build [ sym ], _s_a, "upstream adapter"
         end
+
         UNABLE_
       end
 

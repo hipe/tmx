@@ -91,10 +91,10 @@ module Skylab::Brazen
     kp = process_polymorphic_stream_passively st, & x_p
 
     if kp
+
       if st.unparsed_exists
 
-        ev = Callback_::Actor::Methodic::Build_extra_values_event[
-          [ st.current_token ] ]
+        ev = Home_.lib_.fields::Events::Extra.via_strange st.current_token
 
         if respond_to? :receive_extra_values_event
           receive_extra_values_event ev
@@ -192,6 +192,23 @@ module Skylab::Brazen
     Autoloader_[ self ]
   end
 
+  module Property
+
+    class << self
+
+      def build_ambiguous_property_event *a, & slug
+        Home_.lib_.fields::Events::Ambiguous.new_via_arglist a, & slug
+      end
+    end # >>
+
+    Property_ = self
+    Autoloader_[ self ]
+  end
+
+  Attributes_actor_ = -> mod, h=nil do
+    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  end
+
   # (was N_Lines_)
 
   module Lib_
@@ -287,5 +304,4 @@ module Skylab::Brazen
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
   UNRELIABLE_ = false
-
 end

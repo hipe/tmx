@@ -4,11 +4,15 @@ module Skylab::Callback
 
     class Methodic__  # :[#013]. quite similar to [#006]
 
-      Home_::Actor.methodic self, :simple, :properties, :properties,
-        :delegate,
-        :prefix
+      Home_.lib_.fields::Attributes::Actor.call( self,  # Attributes_actor_
+        delegate: nil,
+        prefix: nil,
+      )
 
       def initialize
+        @delegate = nil
+        @prefix = nil
+        self._K
         super
         nilify_uninitialized_ivars
       end

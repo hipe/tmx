@@ -4,39 +4,33 @@ module Skylab::Brazen
 
     module Concerns_::Property
 
-      Small_Time_Actors = ::Module.new
-      class Small_Time_Actors::Prop_desc_wonderhack
+      class Prop_desc_wonderhack < Callback_::Actor::Dyadic
 
-        Callback_::Actor.call self, :properties,
-
-          :expag,
-          :property
+        def initialize a, b
+          @expag = a
+          @property = b
+        end
 
         def execute
 
           # hack a description of a [meta] property that presumably has no
           # name yet based solely on this terrible hack of what we infer
-          # are the [meta] meta properties of interest (derived from
-          # set arithmetic on ivars and classes SO FRAGILE SO FUN)
+          # are the [meta] meta properties of interest.
 
           prp = @property
 
-          mine = _of prp.class
+          _expanse = ___property_symbols_of prp.class
 
-          base = _of Callback_::Actor::Methodic::Property
-
-          uniq = mine - base
-
-          ivars = prp.instance_variables.map do | ivar |
+          particular = prp.instance_variables.map do |ivar|
             ivar.id2name[ 1 .. -1 ].intern
           end
 
-          set = ivars & uniq
+          intersect = _expanse & particular
 
-          use = if set.length.nonzero?
-            set
-          elsif ivars.length.nonzero?
-            ivars
+          use = if intersect.length.nonzero?
+            intersect
+          elsif particular.length.nonzero?
+            particular
           end
 
           if use
@@ -52,9 +46,9 @@ module Skylab::Brazen
           end
         end
 
-        def _of cls
+        def ___property_symbols_of cls  # this is :[#fi-021]
           a = []
-          cls.private_instance_methods.each do | sym |
+          cls.private_instance_methods.each do |sym|
             md = RX__.match sym
             md or next
             a.push md[ 0 ].intern
@@ -67,3 +61,4 @@ module Skylab::Brazen
     end
   end
 end
+# #tombstone: used to do set math on the parent class

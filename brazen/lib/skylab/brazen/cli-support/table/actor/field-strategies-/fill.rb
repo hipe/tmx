@@ -33,36 +33,26 @@ module Skylab::Brazen
 
       class Fill_Model  # (this is so great how simple it is)
 
-        attr_reader(
-          :background_glyph,
-          :do_from_right,
-          :glyph,
-          :parts_float,
+        Attributes_actor_.call( self,
+          background_glyph: nil,
+          from_right: [ :flag, :ivar, :@do_from_right ],
+          glyph: nil,
+          parts: :custom_interpreter_method,
         )
 
-        Attributes_actor_[ self ]
+        class << self
+          private :new
+        end  # >>
 
-        def initialize & edit_p
+        def initialize
           @background_glyph = SPACE_
-          instance_exec( & edit_p )
+        end
+
+        def normalize
+          self._NEVER  # because #spot-1
         end
 
       private
-
-        def background_glyph=
-          @background_glyph = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def glyph=
-          @glyph = gets_one_polymorphic_value
-          KEEP_PARSING_
-        end
-
-        def from_right=
-          @do_from_right = true
-          KEEP_PARSING_
-        end
 
         def parts=
           x = gets_one_polymorphic_value
@@ -71,6 +61,15 @@ module Skylab::Brazen
           end
           KEEP_PARSING_
         end
+
+      public
+
+        attr_reader(
+          :background_glyph,
+          :do_from_right,
+          :glyph,
+          :parts_float,
+        )
       end
 
       class Dynamic_Dependency  # adapt to [pl]

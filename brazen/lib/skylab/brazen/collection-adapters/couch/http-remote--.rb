@@ -50,12 +50,14 @@ module Skylab::Brazen
           @need_to_prepare_URI = true
         end
 
-        Callback_::Actor.methodic self, :properties,
-          :body_s,
-          :native_entity_identifier_s,
-          :entity_identifier_strategy,
-          :URI_tail,
-          :response_receiver
+        Attributes_actor_.call( self,
+          add_HTTP_parameter: :custom_interpreter_method,
+          body_s: nil,
+          entity_identifier_strategy: nil,
+          native_entity_identifier_s: nil,
+          response_receiver: nil,
+          URI_tail: nil,
+        )
 
       private
 

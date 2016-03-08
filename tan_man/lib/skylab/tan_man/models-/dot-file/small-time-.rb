@@ -10,7 +10,9 @@ module Skylab::TanMan
 
     class Small_Time_::Actors::Persist
 
-      Callback_::Actor.methodic self, :properties, :is_dry
+      Attributes_actor_.call( self,
+        is_dry: nil,
+      )
 
       def initialize id, gsp, x_a, & oes_p
 

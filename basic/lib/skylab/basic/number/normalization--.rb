@@ -12,40 +12,50 @@ module Skylab::Basic
             @inst ||= new
           end
 
-          def new_with * a  # :+[#ca-063]
-            new_via_arglist a
+          def new_with * a, & x_p  # #[#ca-063]
+            new_via_iambic a, & x_p
           end
 
-          def new_via_arglist a  # :+[#ca-063] used to have this, may again
-            new do
-              process_iambic_fully a
-            end
+          def new_via_arglist a, & x_p  # #[#ca-063] used to have this, may again..
+            # (hi.)
+            new_via_iambic a, & x_p
           end
 
-          include Simple_Selective_Sender_Methods_  # ick/meh
+          # include Simple_Selective_Sender_Methods_  # ick/meh
+
+          private :new
         end  # >>
 
-        Callback_::Actor.methodic self, :properties,
-          :qualified_knownness,
-          :knownness,
-          :number_set,  # symbol
-          :minimum
+        Attributes_actor_.call( self,
+          qualified_knownness: nil,
+          knownness: nil,
+          number_set: nil,  # symbol
+          minimum: nil,
+        )
 
-        def initialize & edit_p
+        def initialize & oes_p
+
+          if oes_p
+            -1 == oes_p.arity or self._MODERNIZE_ME  # #todo
+            @on_event_selectively = oes_p
+          end
 
           @qualified_knownness = nil
           @_do_recognize_positive_sign = false
           @knownness = nil
           @minimum = nil
-          instance_exec( & edit_p )
+        end
+
+        def process_iambic_passively st  # #[#fi-022]
+          super && normalize
+        end
+
+        def normalize
           _normalize_self
           if ! @qualified_knownness
             freeze
           end
-        end
-
-        def accept_selective_listener_proc p
-          @on_event_selectively = p
+          KEEP_PARSING_
         end
 
       private
@@ -96,13 +106,13 @@ module Skylab::Basic
           otr.execute
         end
 
-        protected def _init_copy_with * x_a, & oes_p
+        def _init_copy_with * x_a, & oes_p
           oes_p and @on_event_selectively = oes_p
           process_iambic_fully x_a
           _normalize_self
         end
 
-        private def _normalize_self
+        def _normalize_self
           @number_set ||= :integer
           NIL_
         end

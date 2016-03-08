@@ -6,11 +6,10 @@ module Skylab::TanMan
 
     class Sessions__::Produce_Parse_Tree
 
-      Callback_::Actor.methodic self, :properties,
-
-        :generated_grammar_dir_path,
-
-        :byte_upstream_identifier
+      Attributes_actor_.call( self,
+        byte_upstream_identifier: nil,
+        generated_grammar_dir_path: nil,
+      )
 
       def initialize & oes_p
         if oes_p

@@ -6,15 +6,12 @@ module Skylab::Basic
 
       # three laws compliant
 
-      Callback_::Actor.methodic self, :simple, :properties,
-
-         :property, :beginning_number,
-         :property, :beginning_width,
-
-         :argument_arity, :zero, :property, :first_item_does_not_use_number,
-
-         :polymorphic_writer_method_to_be_provided, :property, :template
-
+      Attributes_actor_.call( self,
+        beginning_number: nil,
+        beginning_width: nil,
+        first_item_does_not_use_number: :flag,
+        template: :custom_interpreter_method,
+      )
 
       def initialize
         @first_item_does_not_use_number = false

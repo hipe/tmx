@@ -18,14 +18,14 @@ module Skylab::TestSupport
         private :new
       end
 
-      Callback_::Actor.methodic self, :simple, :properties,
-
-        :property, :business_module_name,
-        :property, :line_downstream,
-        :property, :node_upstream,
-        :property, :on_shared_resources_created,
-        :polymorphic_writer_method_to_be_provided, :property, :arbitrary_proc_array,
-        :property, :shared_resources
+      Attributes_actor_.call( self,
+        arbitrary_proc_array: :custom_writer,
+        business_module_name: nil,
+        line_downstream: nil,
+        node_upstream: nil,
+        on_shared_resources_created: nil,
+        property: :shared_resources,
+      )
 
       def initialize
         @arbitrary_proc_array = nil

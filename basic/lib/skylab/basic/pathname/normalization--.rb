@@ -35,13 +35,15 @@ module Skylab::Basic
           KEEP_PARSING_
         end
 
-        def initialize & edit_p
+        def initialize
           @content_validation_is_required = false
           @content_validation_is_activated = false
           @disallow_h = nil
           @absolute_is_OK = @relative_is_OK = true
-          instance_exec( & edit_p )
-          freeze
+        end
+
+        def process_polymorphic_stream_passively st  # #[#fi-022]
+          super && freeze
         end
 
         def initialize_copy _otr_

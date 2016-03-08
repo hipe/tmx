@@ -29,11 +29,10 @@ module Skylab::Basic
 
       Attributes_actor_[ self ]
 
-      def initialize & edit_p
+      def initialize
 
-        @surface_pair_mapper = nil
         @is_not_parsed = true
-        instance_exec( & edit_p )
+        @surface_pair_mapper = nil
       end
 
       def members

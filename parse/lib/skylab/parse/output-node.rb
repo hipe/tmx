@@ -4,63 +4,57 @@ module Skylab::Parse
 
     class OutputNode
 
-      Callback_::Actor.methodic self, :properties, :try_next
+      Attributes_actor_.call( self,
+        constituent_index: nil,
+        did_spend_function: [ :ivar, :@function_is_spent ],
+        try_next: nil,
+      )
+
+      # == begin retrofitting for nasty old syntax:
+      #    when built with atom, init as atom as we do (A)
+      #    when building a new one, do [#ca-057] an "ideal mixed syntax" (B)
+      #    when duping & modifying, use plain-old iambic syntax (C)
 
       class << self
-        def new_with * x_a
-          ok = nil
-          x = new do
-            ok = __init_with_magic_syntax_via_polymorphic_stream(
-              polymorphic_stream_via_iambic x_a )
-          end
-          ok && x
+
+        def for x
+          new.__init_for_atom x
         end
 
         attr_reader :the_empty_node
+        private :new
+      end  # >>
+
+      def initialize
+        # (hi.)
       end
 
-      def initialize * a, & edit_p  # value | block
-        if a.length.zero?
-          instance_exec( & edit_p )  # comport to [cb] actor
-        else
-          @function_is_spent = true
-          @value_x = a.fetch( a.length - 1 << 2 )
-        end
+      def __init_for_atom x  # :(A)
+        @function_is_spent = true
+        @value_x = x
+        self
       end
 
-      @the_empty_node = new( nil ).freeze
+      @the_empty_node = self.for( nil ).freeze
 
-      def members
-        [ :constituent_index, :function_is_spent, :try_next, :value_x ]
+      def new_with * x_a  # :(C)
+        o = dup
+        _st = polymorphic_stream_via_iambic x_a
+        _kp = o.send :___eek_orig_etc, _st
+        _kp && o
       end
 
-      attr_reader :constituent_index, :function_is_spent, :try_next, :value_x
+      alias_method :___eek_orig_etc, :process_polymorphic_stream_passively
 
-      def new_with * x_a
-        otr = dup
-        ok = nil
-        otr.instance_exec do
-          ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-        end
-        ok && otr
+      def process_polymorphic_stream_passively st  # :(B)
+        # implement a [#ca-057] "ideal mixed syntax"
+        @value_x = st.gets_one
+        super
       end
+
+      # == end prickly syntax
 
     private
-
-      def __init_with_magic_syntax_via_polymorphic_stream st
-        @value_x = st.gets_one
-        process_polymorphic_stream_fully st
-      end
-
-      def constituent_index=
-        @constituent_index = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def did_spend_function=
-        @function_is_spent = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
 
       def function_is_not_spent=
         @function_is_spent = false
@@ -79,6 +73,7 @@ module Skylab::Parse
         :try_next,
         :value_x,
       )
-    # -
-  end
+    end
+    # <-
 end
+# #pending-rename: publicize

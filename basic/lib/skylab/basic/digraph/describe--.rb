@@ -4,15 +4,17 @@ module Skylab::Basic
 
     class Describe__
 
-      Callback_::Actor.methodic self, :simple, :properties,
-        :property, :IO,
-        :argument_arity, :zero, :ivar, :@do_solos, :property, :with_solos,
-        :argument_arity, :zero, :ivar, :@do_spaces, :property, :with_spaces
-
+      Attributes_actor_.call( self,
+        IO: nil,
+        with_solos: [ :flag, :ivar, :@do_solos ],
+        with_spaces: [ :flag, :ivar, :@do_spaces ],
+      )
 
       def initialize g, x_a
+        @do_solos = nil
+        @do_spaces = nil
+        @IO = nil
         process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-        nilify_uninitialized_ivars
         @association_st = g.to_node_edge_stream_
         init_IO
         @is_first_line = true  # (write the newlines at the beginning not end for reasons)

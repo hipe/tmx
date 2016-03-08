@@ -8,19 +8,26 @@ module Skylab::Brazen
 
       class Actors_::Define_process_method  # rewrite of [#fi-008]
 
-        Callback_::Actor.methodic self, :properties, :sess
+        Attributes_actor_.call( self,
+          globbing: :custom_interpreter_method,
+          # processor: :custom_interpreter_method, for now, can't because stop parsing
+          sess: nil,
+        )
 
         class << self
-          def [] * a, & x_p
-            call_via_arglist a, & x_p
+
+          def _call sess, & x_p
+            with :sess, sess, & x_p
           end
+
+          alias_method :[], :_call
+
+          private :new
         end  # >>
 
-        def initialize & edit_p
-
+        def initialize
           @_is_complete = false
           @_is_globbing = false
-          instance_exec( & edit_p )
         end
 
         def execute

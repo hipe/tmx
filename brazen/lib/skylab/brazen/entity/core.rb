@@ -622,7 +622,7 @@ module Skylab::Brazen
             freeze
           end
         else
-          prp = property_class.new do
+          prp = property_class.new_by do
             instance_exec( & same )
           end
         end
@@ -633,7 +633,7 @@ module Skylab::Brazen
       def add_property_with_variegated_name sym
 
         sess = self
-        _prp = property_class.new do
+        _prp = property_class.new_by do
 
           @name = Callback_::Name.via_variegated_symbol sym
           sess._shake_it_up self
@@ -726,7 +726,7 @@ module Skylab::Brazen
       end
 
       def __say_floating
-        _s = Concerns_::Property::Small_Time_Actors::Prop_desc_wonderhack[
+        _s = Concerns_::Property::Prop_desc_wonderhack[
           Home_::API.expression_agent_instance, @_floating ]
         "property or metaproperty never received a name - #{ _s }"
       end
@@ -1011,24 +1011,51 @@ module Skylab::Brazen
       end
     end
 
-    class Property < Callback_::Actor::Methodic::Property
+    class Property  # < Home_.lib_.fields::SimplifiedName (no reason to)
 
       class << self
+
+        def new_with * x_a
+          # (rather than bring in the m.m of [#fi-016] whole hog, cherry-pick)
+          kp = true
+          prp = new_by do
+            kp = process_iambic_fully x_a
+            kp &&= normalize_property
+          end
+          if kp
+            prp
+          else
+            self._BUILD_FAILED
+          end
+        end
 
         def __consume_from sess
 
           # don't propagate kp here - it is used to stop when
           # the name is reached, not to signal an error state
 
-          new do
+          new_by do
             process_polymorphic_stream_passively sess.upstream
             sess._shake_it_up self
             normalize_property
           end
         end
+
+        alias_method :new_by, :new  # [ba]
+        undef_method :new
       end  # >>
 
-      # ~ description (for [#cb-010])
+      def initialize & edit_p
+        @argument_arity = :one
+        @name = nil
+        @parameter_arity = :zero_or_one  # in contrast to [#fi-016]
+        instance_exec( & edit_p )
+        freeze
+      end
+
+      include Home_.lib_.fields::Attributes::Actor::InstanceMethods
+
+      # ~ description (for [#ca-010])
 
       def description
         if @name
@@ -1045,7 +1072,7 @@ module Skylab::Brazen
             code nm.as_variegated_symbol
           end
         else
-          Concerns_::Property::Small_Time_Actors::Prop_desc_wonderhack[
+          Concerns_::Property::Prop_desc_wonderhack[
             expag, self ]
         end
       end
@@ -1079,7 +1106,7 @@ module Skylab::Brazen
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Home_::Home_::Normalization::Against_model[ qkn, self, & x_p ]
+        Home_::Normalization::Against_model[ qkn, self, & x_p ]
       end
 
       def is_normalizable__
@@ -1116,7 +1143,7 @@ module Skylab::Brazen
         @ad_hoc_normalizer_box ||= Callback_::Box.new
       end
 
-      public def set_value_of_formal_property_ x, prp
+      def set_value_of_formal_property_ x, prp
 
         # this is actually for setting a *meta*property value on the property!
 
@@ -1170,6 +1197,8 @@ module Skylab::Brazen
         KEEP_PARSING_
       end
 
+      attr_reader :default_proc
+
       ## ~~ enum (a meta-meta-property & indirectly part of the normalization API)
 
       attr_reader :enum_box
@@ -1205,30 +1234,56 @@ module Skylab::Brazen
 
       ## ~~ parameter arity (a meta-meta property & part of the n11n API)
 
-      def __parameter_arity_object
-        __parameter_arity_space.fetch @parameter_arity
+      def required=
+        @parameter_arity = :one
+        KEEP_PARSING_
       end
 
-      define_method :__parameter_arity_space, ( -> do
+      def parameter_arity=
+        @parameter_arity = gets_one_polymorphic_value
+        KEEP_PARSING_
+      end
+
+      def __parameter_arity_object
+        Parameter_arity_space___[].fetch @parameter_arity
+      end
+
+      Parameter_arity_space___ = Lazy_.call do
 
         # (for better regressions we load this late)
 
-        build_the_space = -> do
-
-          Parameter_Arity_Space___ =
-              Entity_::Meta_Meta_Meta_Properties::Arity::Space.create do
-
-            self::ZERO_OR_ONE = new 0, 1
-            self::ONE = new 1, 1
-          end
+        x = Entity_::Meta_Meta_Meta_Properties::Arity::Space.create do
+          self::ZERO_OR_ONE = new 0, 1
+          self::ONE = new 1, 1
         end
+        Parameter_Arity_Space____ = x
+        x
+      end
 
-        x = nil
+      def parameter_arity
+        @parameter_arity  # (hi.)
+      end
 
-        -> do
-          x ||= build_the_space[]
+      # ~~ argument arity
+
+      def argument_arity=
+        x = gets_one_polymorphic_value
+        if :custom == x
+          @has_custom_polymorphic_writer_method = true
+          @polymorphic_writer_method_proc_proc = nil
         end
-      end.call )
+        @argument_arity = x
+        KEEP_PARSING_
+      end
+
+      def argument_arity
+        @argument_arity  # (hi.)
+      end
+
+      attr_reader(
+        :has_custom_polymorphic_writer_method,
+        :polymorphic_writer_method_proc_proc,
+      )
 
       # ~~ syntactic finishing of the parse
 
@@ -1237,8 +1292,6 @@ module Skylab::Brazen
         @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
         STOP_PARSING_
       end
-
-      attr_reader :_is_meta_property
 
       def meta_property=
 
@@ -1250,17 +1303,30 @@ module Skylab::Brazen
         STOP_PARSING_
       end
 
+      attr_reader :_is_meta_property
+
       def normalize_property  # ~ your last hookpoint before freezing
         ACHIEVED_
       end
 
+      def name_symbol
+        @name.as_variegated_symbol
+      end
+
+      def name
+        @name  # can be nil; (hi.)
+      end
+
       private(
+        :argument_arity=,
         :default=,
         :default_proc=,
         :enum=,
         :meta_property=,
         :mutate_entity=,
+        :parameter_arity=,
         :property=,
+        :required=,
       )
     end
 

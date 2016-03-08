@@ -42,9 +42,9 @@ module Skylab::System
 
       class Curry___
 
-        Callback_::Actor.methodic self, :properties,
-
-          :system_conduit
+        Attributes_actor_.call( self,
+          system_conduit: nil,
+        )
 
         def initialize & oes_p
 

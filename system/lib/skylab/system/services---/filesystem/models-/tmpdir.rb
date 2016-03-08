@@ -20,8 +20,50 @@ module Skylab::System
           end
         end
 
-        private :new
+        def new_with * x_a  # we would use la la but for #here
+          new_via_iambic x_a
+        end
+
+        alias_method :new_via_iambic, :new
+        undef_method :new
       end  # >>
+
+      # --
+
+      #   • near [#fi-022], we do defaulting "by hand"
+      #
+      #   • we can't implement as plain old actor because of the call to
+      #     super below that must happen after all args are processed (:#here)
+      #     which is a reminder of why inheritence is bad.
+
+      ATTRIBUTES__ = Attributes_.call(
+        be_verbose: nil,
+        debug_IO: nil,
+        max_mkdirs: nil,
+        noop: [ :flag, :ivar, :@is_noop ],
+        path: [ :ivar, :@_path_x ],
+        verbose: [ :flag_of, :be_verbose ],
+      )
+
+      alias_method :__init_pathname, :initialize
+
+      def initialize x_a
+
+        block_given? and self._NO  # #todo
+
+        @is_noop = false
+        @be_verbose = false
+
+        _kp = ATTRIBUTES__.init self, x_a
+        _kp or self._FAIL
+
+        @debug_IO ||= Home_.services.IO.some_stderr_IO
+        @max_mkdirs ||= 1
+        @_path_x ||= Home_.services.filesystem.tmpdir_path
+        super @_path_x
+        _init_path_derivatives
+        freeze
+      end
 
       # -- Simple readers
 
@@ -44,49 +86,6 @@ module Skylab::System
       end
 
       attr_reader :to_pathname
-
-      # -- Simple writers
-
-      Callback_::Actor.methodic self, :properties,
-        :be_verbose,
-        :debug_IO,
-        :max_mkdirs
-
-    private
-
-      def noop=
-        @is_noop = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def path=
-        @_path_x = gets_one_polymorphic_value
-        KEEP_PARSING_
-      end
-
-      def verbose=
-        @be_verbose = true
-        KEEP_PARSING_
-      end
-
-      # -- Construction & related producers
-
-      alias_method :__init_pathname, :initialize
-
-      def initialize & edit_p
-
-        @is_noop = false
-        @be_verbose = false
-
-        instance_exec( & edit_p )
-
-        @debug_IO ||= Home_.services.IO.some_stderr_IO
-        @max_mkdirs ||= 1
-        @_path_x ||= Home_.services.filesystem.tmpdir_path
-        super @_path_x do end
-        _init_path_derivatives
-        freeze
-      end
 
     public
 
@@ -142,9 +141,9 @@ module Skylab::System
         otr
       end
 
-    protected def _init_copy_via_iambic x_a
+      def _init_copy_via_iambic x_a
 
-        _kp = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+        _kp = ATTRIBUTES__.init self, x_a
         _kp or self._SANITY
 
         if @_path_x

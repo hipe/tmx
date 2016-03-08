@@ -257,9 +257,13 @@ module Skylab::Brazen
             end
           end
 
-        public  # ~ internal
+        public
 
-          attr_reader :_against_EC_p_a
+          def as_ivar  # #todo ..
+            @name.as_ivar
+          end
+
+          # ~ internal
 
           def _during_apply & p
             ( @_against_EC_p_a ||= [] ).push p ; nil
@@ -268,8 +272,6 @@ module Skylab::Brazen
           def __set_argument_arity x
             @argument_arity = x ; nil
           end
-
-          attr_reader :external_read_proc
 
           def __external_read & p
             @external_read_proc = p ; nil
@@ -285,15 +287,15 @@ module Skylab::Brazen
             @internal_read_proc = p ; nil
           end
 
-          attr_reader :internal_read_proc
-
-          attr_reader :is_memoized
-
-          attr_reader :literal_proc
-
-          attr_reader :reader_classification
-
-        end  # end of the properry class
+          attr_reader(
+            :_against_EC_p_a,
+            :external_read_proc,
+            :internal_read_proc,
+            :is_memoized,
+            :literal_proc,
+            :reader_classification,
+          )
+        end  # end of the properry class,
 
 
     # [ `required` ] `field`s -
