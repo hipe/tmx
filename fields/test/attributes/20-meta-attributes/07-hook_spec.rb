@@ -1,10 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe '[fi] given "object" with parameter "foo"' do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
-
+  if false
   context 'with a `hook` modifier' do
 
     with do
@@ -54,5 +52,6 @@ describe '[fi] given "object" with parameter "foo"' do
       object.handle_error.call
       canary.should eql(:blue)
     end
+  end
   end
 end

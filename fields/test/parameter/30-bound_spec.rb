@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-describe "[fi] P - bound" do
+describe "[fi] P - bound", wip: true do
 
   extend Skylab::Fields::TestSupport
   use :parameter

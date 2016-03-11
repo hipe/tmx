@@ -36,38 +36,58 @@ in.)
 
 ## a cursory overview
 
-first, a quick history (most recent at top):
+first, a quick history (most recent at top). "OK" means "here to stay"
+(as far as we know now). "WAS" means it has been sunsetted or
+assimilated.
 
-       [#013] currently "attributes" (was: "parameters"..)    2015-12-23
+       [#013] currently "attributes" (was: "parameters"..)    2015-12-23  OK
 
-    [#ac-001] the autonomous component system                 2015-04-23
+    [#ac-001] the autonomous component system                 2015-04-23  OK
 
-       [#016] actors                                          2014-08-00
+       [#016] actors                                          2014-08-00 WIP <-
 
-    [#br-001] the entity library                              2014-07-22
+    [#br-001] the entity library                              2014-07-22  OK
 
-    [#gv-030] the isomorphic interface parameter              2014-01-20
+    [#gv-030] the isomorphic interface parameter              2014-01-20 WAS
 
-       [#013] methodic actors (assimilated to here from [ca]) 2013-12-19
+       [#013] methodic actors (assimilated to here from [ca]) 2013-12-19  OK
 
-    [#tm-081] the "config shell" (working title) (lost)       2013-10-11
+    [#tm-081] the "config shell" (working title) (lost)       2013-10-11 WAS
 
-    [#ba-030] the basic struct                                2013-07-21
+    [#ba-030] the basic struct                                2013-07-21 WIP <-
 
-    [#br-058] Home_ DSL --> "contoured fields" --> [br]       2013-07-18
+     [#br-058] Home_ DSL --> "contoured fields" --> [br]      2013-07-18 WIP <-
 
-       [#004] basic fields                                    2013-07-05
+       [#004] basic fields                                    2013-07-05 WIP <-
 
-    [#ba-003] the basic field                                 2013-04-11
+    [#ba-003] the basic field                                 2013-04-11 WIP <-
 
-    [#009] the headless parameter                             2012-08-29
+       [#009] the headless parameter                          2012-08-29 WIP <-
 
-       [#002] the metahell formal attributes                  2011-09-11
+       [#002] the metahell formal attributes                  2011-09-11 WAS <=
+
+
+### the unification plan
+
+  • [#002] is the oldest, so let's keep its DNA and hijack what we just did
+
+  • [#004] we need to investiage
+
+  • [#ba-003] field eliminate it whole hog
+
+  • [#br-058] seems OK? ..
+
+  • [#ba-030] the basic struct will assimiliate nicely into [#013]
+
+  • [#016]  (basic actors) we can do last..
+
+
+
 
 
 annotation (most recent at top, start at bottom for a narrative):
   • [#013] is the lightest weight
-  • [cb] actor is and always will be minimal.
+  • [cb] actor is about to be assimilated into the above.
   • [br] entity started out clean, got heavy, is most popular for bus. model
   • [gv]'s is a clean rewrite of the below meant to be rbx-compatible
   • borrowing from that but as a small standalone rewrite was [hl] API params

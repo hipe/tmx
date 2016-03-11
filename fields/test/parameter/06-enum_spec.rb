@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-describe '[fi] P - enum: given "object" with parameter "foo"' do
+describe '[fi] P - enum: given "object" with parameter "foo"', wip: true do
 
   extend Skylab::Fields::TestSupport
   use :parameter

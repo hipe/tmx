@@ -1,30 +1,13 @@
-# the parameter narrative :[#009]
+# meta-attributes :[#009]
 
-## introduction
+# brief history
 
-this is an ancient legacy library, transplanted at least once (from [hl]
-to [fi]). this is one of the eariest parameter libraries.
-
-included in this node is the "worst thing i've ever done",
-at #storypoint-280. we intend to kill this with fire.
-
-the fate of this node is discussed at [#001] "discussion of the [..]". be
-sure to read that before investing in this at all. and then no matter what,
-don't invest in this at all.
+this used to be "the parameter narrative". it is one of the earliest
+still-living strains of attribute library in this universe. see the
+history appendix at the end of this file for interesting historical
+milestones.
 
 
-## :[#.A]  (was explanation of meta-params)
-
-
-
-## :[#.B]
-Experimentally let a formal parameter be defined as a name (symbol)
-and an unordered set of zero or more properties, each defined as a
-name-value pair (with Symbols for names, values as as-yet undefined.)
-A parameter definition is always created in association with one host
-(class or module), but in theory any existing parameter definition
-should be able to be deep-copy applied over to to another host, or for
-example a child class of a parent class that has parameter definitions.
 
 
 
@@ -47,9 +30,7 @@ in an abstract, perhaps arbitrary sense:
 
 ## :[#.D]  (now a tombstone)
 
-
-
-
-## dogfood :[#.E]
-
-"now we use our own hands to hit ourself with our own dogfood"
+# #tombstone once had #storypoint-280 "worst thing i've ever done"
+# #tombstone :[#.A] was an explanation of "meta-params"
+# #tombstone :[#.B] was a definition of a formal parameter
+# #tombstone "dogfood" :[#.E] "now we use our own hands to hit ourself with our own dogfood"

@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-describe "[fi] P - reader-writer-accessor (with param 'foo'..)" do
+describe "[fi] P - reader-writer-accessor (with param 'foo'..)", wip: true do
 
   extend Skylab::Fields::TestSupport
   use :parameter

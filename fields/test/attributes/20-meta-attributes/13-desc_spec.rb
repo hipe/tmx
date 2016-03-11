@@ -1,10 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe '[fi] P - desc: given "object" with parameter "foo"' do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
-
+  if false
   let :lovely do
     the_class_.parameters.fetch :lovely
   end
@@ -41,5 +39,6 @@ describe '[fi] P - desc: given "object" with parameter "foo"' do
         lovely.desc_array.should be_nil
       end
     end
+  end
   end
 end

@@ -1,6 +1,131 @@
 module Skylab::Fields
 
-  class Parameter  # *read* [#009]
+  class Attributes
+
+    class MetaAttributes < ::BasicObject  # 1x (this lib only). [#009]..
+
+      def initialize build
+        @_ = build
+      end
+
+      # -- the default meta-attributes in alphabetical order.
+
+      def component  # #experimental:
+        # avoid dependency on [ac] for now. this is a microscopic ersatz of
+        # it, to let the work form its own upgrade path..
+
+        ca = @_.current_attribute
+
+        # ca.is_defined_component = true  # #todo-soon
+
+        ca.read_by do
+
+          _m = :"__#{ formal_attribute.name_symbol }__component_association"
+          _c = session.send _m  # no yield for now - if you need it, use [ac]
+          _c.interpret_component argument_stream, formal_attribute
+        end
+      end
+
+      def custom_interpreter_method
+
+        # created to facilitate custom aliases [hu].
+        # also bolsters readability for hybrid actors.
+
+        ca = @_.current_attribute
+
+        # ca.is_defined_component = true  # #todo-soon
+
+        ca.read_and_write_by do
+
+          _m = Classic_writer_method_[ formal_attribute.name_symbol ]
+
+          sess = session
+
+          if ! sess.instance_variable_defined? ARG_STREAM_IVAR_
+            sess.instance_variable_set ARG_STREAM_IVAR_, argument_stream
+            did = true
+          end
+
+          x = sess.send _m
+
+          if did
+            sess.remove_instance_variable ARG_STREAM_IVAR_
+          end
+
+          if ACHIEVED_ == x
+            KEEP_PARSING_
+          else
+            raise ::ArgumentError, Say_expected_achieved___[ x ]
+          end
+        end
+      end
+
+      Say_expected_achieved___ = -> x do
+        "expected #{ ACHIEVED_ } had #{ Home_.lib_.basic::String.via_mixed x }"
+      end
+
+      def flag
+        @_.current_attribute.read_by do
+          true
+        end
+      end
+
+      def flag_of
+
+        sym = @_._gets_one
+        ca = @_.current_attribute
+
+        ca.read_by do
+          true
+        end
+
+        ca.write_by do |x|
+
+          # "flag of" must have the *full* pipeline of the referrant -
+          # read *and* write.
+
+          atr = index._lookup_attribute sym
+          _mutate_for_redirect x, atr
+          atr._read_and_write self  # result is kp
+        end
+      end
+
+      def ivar
+        @_.current_attribute.as_ivar = @_._gets_one
+      end
+
+      def known_known
+
+        @_.current_attribute.read_by do
+          Callback_::Known_Known[ argument_stream.gets_one ]
+        end
+      end
+
+      def optional
+        @_.__add_to_static_index :optionals ; nil
+      end
+
+      def singular_of
+
+        sym = @_._gets_one
+
+        ca = @_.current_attribute
+
+        ca.read_by do
+          [ argument_stream.gets_one ]
+        end
+
+        ca.write_by do |x|
+
+          atr = index._lookup_attribute sym
+          _mutate_for_redirect x, atr
+          atr._read_and_write self  # result is kp
+        end
+      end
+
+      if false  # to #here
+
+      # <-
 
     Definer = -> mod do
 
@@ -675,8 +800,10 @@ module Skylab::Fields
     def name
       @___nm ||= Callback_::Name.via_variegated_symbol @name_symbol
     end
-
-  end
-end
+  # ->
+      end  # :#here
+    end  # meta-attributes
+  end  # attributes
+end  # fields
 
 # :+#tombstone: [#009.D] 'Actual_Parameters_Ivar_Instance_Methods' un-abstacted

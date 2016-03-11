@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] P - controller" do
+  describe "[fi] P - controller", wip: true do
 
     extend TS_
     use :parameter

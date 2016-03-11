@@ -1,10 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe '[fi] P - default: given "object" with parameter "foo"' do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
-
+  if false
   context 'and "foo" either does or doesn\'t have "default: \'anything\'"' do
 
     let :foo do
@@ -69,5 +67,6 @@ describe '[fi] P - default: given "object" with parameter "foo"' do
         end
       end
     end
+  end
   end
 end

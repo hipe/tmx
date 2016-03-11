@@ -1,10 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe '[fi] P - boolean: given "object" with parameter "foo"' do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
-
+  if false
   context 'and "foo" is boolean' do
 
     with do
@@ -56,5 +54,6 @@ describe '[fi] P - boolean: given "object" with parameter "foo"' do
         e or fail
       end
     end
+  end
   end
 end

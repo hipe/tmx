@@ -62,7 +62,7 @@ module Skylab::Fields
     def index_
 
       Here_::Lib::Index_of_Definition___.new( @_h,
-        ( @meta_attributes || Here_::Lib::MetaAttributes ),
+        ( @meta_attributes || Here_::MetaAttributes ),
         ( @attribute_class || Here_::Lib::DefinedAttribute ),
       )
     end
@@ -222,7 +222,17 @@ module Skylab::Fields
       end
     end
 
+    # --
+
+    Classic_writer_method_ = -> name_symbol do
+      :"#{ name_symbol }="
+    end
+
+    # --
+
     Autoloader_[ self ]
+
+    ARG_STREAM_IVAR_ = :@_polymorphic_upstream_
     Here_ = self
   end
 

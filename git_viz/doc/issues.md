@@ -12,7 +12,10 @@
                sockets across memory barriers? )
 [#031] #hole  ( #was: detect renames )
                (was: the plugin narrative, moved to [hl])
-[#030]       #parent-node:[#018] what is meant by isomorphic interface? ..
+
+[#030]       #historical - document moved to [#ze-029].
+             (was this a #[#fi-001]? did it sunset or did it assimilate?)
+
 [#029]       the scale time algorithm ..
              ( #was: shutdown/fail more gracefully when manifest parse errors )
 [#028]       #parent-node:[#017] fixtures scripts in detail ..

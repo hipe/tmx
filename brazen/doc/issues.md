@@ -98,7 +98,7 @@
              the syntax smarter without bloating it. )
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]
-               [fa] near [ CLI revelation gone ], [#gv-030] sets the stage nicely)
+               [fa] near [ CLI revelation gone ], [#ze-029] sets the stage nicely)
 [#062]       #parent-node: [#002] custom reactive node adaptations ..
              ( #moved-to: [#ze-001] )
 [#061]       #tracking-tag `members` as a universal thing

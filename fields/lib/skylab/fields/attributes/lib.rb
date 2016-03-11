@@ -69,7 +69,7 @@ module Skylab::Fields
 
       Process_polymorphic_stream_passively_ = -> st, sess, formals, meths, & x_p do
 
-        sess.instance_variable_set ARG_STREAM_IVAR__, st  # as we do
+        sess.instance_variable_set ARG_STREAM_IVAR_, st  # as we do
 
         if formals
           _idx = formals.index_
@@ -91,7 +91,7 @@ module Skylab::Fields
 
         kp = o.execute
 
-        sess.remove_instance_variable ARG_STREAM_IVAR__
+        sess.remove_instance_variable ARG_STREAM_IVAR_
 
         kp
       end
@@ -100,7 +100,7 @@ module Skylab::Fields
 
         -> name_symbol do
 
-          m = Classic_writer_method__[ name_symbol ]
+          m = Classic_writer_method_[ name_symbol ]
 
           if cls.private_method_defined? m
             m
@@ -398,138 +398,6 @@ module Skylab::Fields
 
       # ==
 
-      class MetaAttributes < ::BasicObject
-
-        def initialize build
-          @_ = build
-        end
-
-        def component  # #experimental:
-          # avoid dependency on [ac] for now. this is a microscopic ersatz of
-          # it, to let the work form its own upgrade path..
-
-          ca = @_.current_attribute
-
-          # ca.is_defined_component = true  # #todo-soon
-
-          ca.read_by do
-
-            _m = :"__#{ formal_attribute.name_symbol }__component_association"
-            _c = session.send _m  # no yield for now - if you need it, use [ac]
-            _c.interpret_component argument_stream, formal_attribute
-          end
-        end
-
-        def custom_interpreter_method
-
-          # created to facilitate custom aliases [hu].
-          # also bolsters readability for hybrid actors.
-
-          ca = @_.current_attribute
-
-          # ca.is_defined_component = true  # #todo-soon
-
-          ca.read_and_write_by do
-
-            _m = Classic_writer_method__[ formal_attribute.name_symbol ]
-
-            sess = session
-
-            if ! sess.instance_variable_defined? ARG_STREAM_IVAR__
-              sess.instance_variable_set ARG_STREAM_IVAR__, argument_stream
-              did = true
-            end
-
-            x = sess.send _m
-
-            if did
-              sess.remove_instance_variable ARG_STREAM_IVAR__
-            end
-
-            if ACHIEVED_ == x
-              KEEP_PARSING_
-            else
-              raise ::ArgumentError, Say_expected_achieved___[ x ]
-            end
-          end
-        end
-
-        Say_expected_achieved___ = -> x do
-          "expected #{ ACHIEVED_ } had #{ Home_.lib_.basic::String.via_mixed x }"
-        end
-
-        def flag
-          @_.current_attribute.read_by do
-            true
-          end
-        end
-
-        def flag_of
-
-          sym = @_._gets_one
-          ca = @_.current_attribute
-
-          ca.read_by do
-            true
-          end
-
-          ca.write_by do |x|
-
-            # "flag of" must have the *full* pipeline of the referrant -
-            # read *and* write.
-
-            atr = index._lookup_attribute sym
-            _mutate_for_redirect x, atr
-            atr._read_and_write self  # result is kp
-          end
-        end
-
-        True_knownness__ = Lazy_.call do
-          Callback_::Known_Known[ ACHIEVED_ ]
-        end
-
-        def ivar
-          @_.current_attribute.as_ivar = @_._gets_one
-        end
-
-        def known_known
-
-          @_.current_attribute.read_by do
-            Callback_::Known_Known[ argument_stream.gets_one ]
-          end
-        end
-
-        def optional
-          @_.__add_to_static_index :optionals ; nil
-        end
-
-        def singular_of
-
-          sym = @_._gets_one
-
-          ca = @_.current_attribute
-
-          ca.read_by do
-            [ argument_stream.gets_one ]
-          end
-
-          ca.write_by do |x|
-
-            atr = index._lookup_attribute sym
-            _mutate_for_redirect x, atr
-            atr._read_and_write self  # result is kp
-          end
-        end
-      end
-
-      # ==
-
-      Classic_writer_method__ = -> name_symbol do
-        :"#{ name_symbol }="
-      end
-
-      # ==
-
       class MethodBased_Attribute___
 
         # (we don't subclass simplified name because we are one-off
@@ -682,8 +550,6 @@ module Skylab::Fields
           @_parse.session
         end
       end
-
-      ARG_STREAM_IVAR__ = :@_polymorphic_upstream_
 
       # ==
     end

@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-describe "[fi] P - meta-parameters" do
+describe "[fi] P - meta-parameters", wip: true do
 
   extend Skylab::Fields::TestSupport
   use :parameter
