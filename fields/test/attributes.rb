@@ -30,6 +30,12 @@ module Skylab::Fields::TestSupport
       Home_::Attributes
     end
 
+    module Meta_Attributes
+      # (for now just a sandbox namespace)
+
+      Subject_module_ = Subject_module_
+    end
+
     module Actor  # (NOTE sandbox namespace)
 
       def self.[] tcc

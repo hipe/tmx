@@ -101,8 +101,31 @@ module Skylab::Fields
         end
       end
 
+      def list
+
+        @_.touchpush_to_static_index__ :method_definers
+
+        ca = @_.current_attribute
+
+        ca.define_methods_by do |mod, atr|
+
+          mod.send :define_method, atr.name_symbol do |x|
+            ivar = atr.as_ivar
+            if instance_variable_defined? ivar
+              a = instance_variable_get ivar
+            end
+            if a
+              a.push x
+            else
+              instance_variable_set ivar, [ x ]
+            end
+            NIL_
+          end
+        end
+      end
+
       def optional
-        @_.__add_to_static_index :optionals ; nil
+        @_.add_to_static_index__ :optionals ; nil
       end
 
       def singular_of
@@ -552,44 +575,6 @@ module Skylab::Fields
 
     def when__DSL__
       send :"when_DSL__#{ @_polymorphic_upstream_.gets_one }__"
-    end
-
-    attr_reader :is_list
-
-    def when_DSL__list__
-
-      @normal_iambic.push :DSL, :list
-      do_reader = _maybe_do_DSL_reader
-      sym = @name_symbol
-      @writer_method_name = sym
-      @is_list = true
-
-      @entity_model.module_exec do
-
-        define_method sym do | x |
-
-          a = fetch sym do end
-
-          if ! a
-            a = []
-            self[ sym ] = a
-          end
-
-          a.push x
-
-          NIL_
-        end
-
-        if do_reader
-
-          define_method :"#{ sym }_array" do
-
-            fetch sym do end
-          end
-        end
-      end
-
-      KEEP_PARSING_
     end
 
     def when_DSL__atom__

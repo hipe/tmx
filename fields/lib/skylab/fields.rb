@@ -47,6 +47,10 @@ module Skylab::Fields
       ( @index_ ||= index_ ).optionals_hash__
     end
 
+    def define_methods mod
+      ( @index_ ||= index_ ).define_methods__ mod
+    end
+
     def symbols * sym
       if sym.length.zero?
         @_h.keys

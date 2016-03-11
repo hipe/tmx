@@ -32,15 +32,25 @@ module Skylab::Fields
 
         # --
 
-        def _lookup_attribute k
-          @_h.fetch k
-        end
-
         def optionals_hash__
           si = @_static_index
           if si
             si.optionals
           end
+        end
+
+        def define_methods__ mod
+
+          st = @_static_index.method_definers.to_name_stream
+          begin
+            k = st.gets
+            k or break
+            atr = @_h.fetch k
+            atr._deffers.each do |p|
+              p[ mod, atr ]
+            end
+          end while nil
+          NIL_
         end
 
         def lookup_particular__ meta_k
@@ -57,6 +67,11 @@ module Skylab::Fields
             end
           end
         end
+
+        def _lookup_attribute k
+          @_h.fetch k
+        end
+
 
         # --
 
@@ -368,14 +383,25 @@ module Skylab::Fields
           _a.push @_current_attribute_name_symbol ; nil
         end
 
-        def __add_to_static_index meta_k
+        def touchpush_to_static_index__ meta_k
 
-          _idx = ( @_static_index ||= Static_Index___.new )
+          _idx = _static_index
+          _bx = _idx[ meta_k ] ||= Callback_::Box.new
+          _bx.touch @_current_attribute_name_symbol do NOTHING_ end ; nil
+        end
+
+        def add_to_static_index__ meta_k
+
+          _idx = _static_index
           _h = ( _idx[ meta_k ] ||= {} )
           _h[ @_current_attribute_name_symbol ] = true ; nil
         end
 
-        Static_Index___ = ::Struct.new :optionals
+        def _static_index
+          @_static_index ||= Static_Index___.new
+        end
+
+        Static_Index___ = ::Struct.new :method_definers, :optionals
 
         def _gets_one
           @_sexp_stream_for_current_attribute.gets_one
@@ -454,6 +480,12 @@ module Skylab::Fields
 
           super
         end
+
+        def define_methods_by & p
+          ( @_deffers ||= [] ).push p ; nil
+        end
+
+        attr_reader :_deffers
 
         def read_by & p
           send @_read_m, p

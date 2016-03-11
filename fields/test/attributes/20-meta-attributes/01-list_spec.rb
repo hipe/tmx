@@ -2,40 +2,54 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  if false
-  context 'and "foo" is DSL (list)' do
+  TS_.require_ :attributes_meta_attributes
 
-    with do
-      param :topping, :DSL, :list
+  module Attributes::Meta_Attributes
+
+    TS_.describe "[fi] attributes - meta-attributes - list" do
+
+      TS_[ self ]
+      use :memoizer_methods
+
+      context "(context)" do
+
+        shared_subject :_class do
+
+          class X_List_A
+
+            attrs = Subject_module_[].call(
+              topping: :list,
+            )
+
+            attrs.define_methods self
+
+            ATTRIBUTES = attrs
+
+            self
+          end
+        end
+
+        it "loads" do
+          _class
+        end
+
+        it "you don't get a reader - keep it orthoganal and simple" do
+
+          _class.instance_method( :topping ).arity.should eql 1
+        end
+
+        it "ok" do
+
+          o = _build_empty
+          o.topping :sprinkles
+          o.topping :sparkles
+          o.instance_variable_get( :@topping ).should eql [ :sprinkles, :sparkles ]
+        end
+      end
+
+      def _build_empty
+        _class.new
+      end
     end
-
-    frame do
-
-      it '"object.foo" should not be a reader because it is a writer ' <<
-          '(keep it orthoganal and "simple")' do
-
-        object = object_
-
-        -> { object.topping }.should raise_error( ::ArgumentError,
-          /\Awrong number of arguments \(0 for 1/ )
-      end
-
-      it '(access "foo" internally to see that it starts out as nil ' <<
-          'and not an array)' do
-
-        expect_unknown_ :topping, object_
-      end
-
-      it '"object.foo "x" adds "x" to the foo list and so on ' <<
-          'in the "overloaded (reader)/writer" way (hence dsl)' do
-
-        object = object_
-        object.topping :sprinkles
-        object.instance_variable_get('@topping').should eql([:sprinkles])
-        object.topping :sparkles
-        force_read_( :topping, object ).should eql [ :sprinkles, :sparkles ]
-      end
-    end
-  end
   end
 end
