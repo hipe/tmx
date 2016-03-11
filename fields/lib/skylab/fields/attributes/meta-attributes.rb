@@ -10,6 +10,40 @@ module Skylab::Fields
 
       # -- the default meta-attributes in alphabetical order.
 
+      def boolean  # for ancient DSL-controller. see also `flag`
+
+        ca = @_.current_attribute
+        st = @_.sexp_stream_for_current_attribute
+
+        defs = Here_::MetaAttributes_::Boolean::MethodsDefiner.new
+
+        begin
+          st.no_unparsed_exists and break
+          p = Here_::MetaAttributes_::Boolean::MODIFIERS[ st.current_token ]
+          p or break
+          st.advance_one
+          p[ defs, st ]
+          redo
+        end while nil
+
+        defs.finish
+
+        @_.touchpush_to_static_index_ :method_definers
+
+        ca.define_methods_by do |mod, atr|
+
+          mod.module_exec do
+            st = defs.stream_for atr
+            begin
+              defn = st.gets
+              defn or break
+              define_method defn.name_x, & defn.value_x
+              redo
+            end while nil
+          end
+        end
+      end
+
       def component  # #experimental:
         # avoid dependency on [ac] for now. this is a microscopic ersatz of
         # it, to let the work form its own upgrade path..
@@ -72,7 +106,7 @@ module Skylab::Fields
 
       def flag_of
 
-        sym = @_._gets_one
+        sym = @_.sexp_stream_for_current_attribute.gets_one
         ca = @_.current_attribute
 
         ca.read_by do
@@ -91,7 +125,7 @@ module Skylab::Fields
       end
 
       def ivar
-        @_.current_attribute.as_ivar = @_._gets_one
+        @_.current_attribute.as_ivar = @_.sexp_stream_for_current_attribute.gets_one
       end
 
       def known_known
@@ -103,9 +137,9 @@ module Skylab::Fields
 
       def list
 
-        @_.touchpush_to_static_index__ :method_definers
-
         ca = @_.current_attribute
+
+        @_.touchpush_to_static_index_ :method_definers
 
         ca.define_methods_by do |mod, atr|
 
@@ -130,7 +164,7 @@ module Skylab::Fields
 
       def singular_of
 
-        sym = @_._gets_one
+        sym = @_.sexp_stream_for_current_attribute.gets_one
 
         ca = @_.current_attribute
 
@@ -419,59 +453,6 @@ module Skylab::Fields
     def when__monadic__
 
       send :"when__#{ @_polymorphic_upstream_.gets_one }__"
-    end
-
-    ## ~~ boolean: reader_looks_like_this?, writer_looks_like_this! (legacy)
-
-    def when__boolean__
-
-      @normal_iambic.push :monadic, :boolean
-
-      mod = @entity_model
-      sym = @name_symbol
-
-      st = @_polymorphic_upstream_
-      if st.unparsed_exists &&
-          :negated_boolean_reader_method_name == st.current_token
-
-        st.advance_one
-        neg = st.gets_one
-      else
-        neg = :"not_#{ sym }"
-      end
-
-      mod.module_exec do
-
-        define_method :"#{ sym }?" do
-
-          fetch sym do
-            NIL_  # (was once false)
-          end
-        end
-
-        define_method :"#{ neg }?" do
-
-          ! fetch sym do
-            false
-          end
-        end
-
-        define_method :"#{ sym }!" do
-          self[ sym ] = true
-          NIL_
-        end
-
-        define_method :"#{ neg }!" do
-          self[ sym ] = false
-          NIL_
-        end
-
-        define_method :"when__#{ sym }__" do
-          self[ sym ] = true
-          KEEP_PARSING_
-        end
-      end
-      KEEP_PARSING_
     end
 
     ## ~~ enum: validation on write. assumes selective event handler.

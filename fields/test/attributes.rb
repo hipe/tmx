@@ -30,8 +30,15 @@ module Skylab::Fields::TestSupport
       Home_::Attributes
     end
 
-    module Meta_Attributes
-      # (for now just a sandbox namespace)
+    module Meta_Attributes  # (NOTE sandbox namespace)
+
+      def self.[] tcc
+        tcc.include self
+      end
+
+      def build_empty_entity_
+        entity_class_.new
+      end
 
       Subject_module_ = Subject_module_
     end

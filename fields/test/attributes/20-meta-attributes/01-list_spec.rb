@@ -10,10 +10,11 @@ module Skylab::Fields::TestSupport
 
       TS_[ self ]
       use :memoizer_methods
+      Attributes::Meta_Attributes[ self ]
 
       context "(context)" do
 
-        shared_subject :_class do
+        shared_subject :entity_class_ do
 
           class X_List_A
 
@@ -23,32 +24,26 @@ module Skylab::Fields::TestSupport
 
             attrs.define_methods self
 
-            ATTRIBUTES = attrs
-
             self
           end
         end
 
         it "loads" do
-          _class
+          entity_class_
         end
 
         it "you don't get a reader - keep it orthoganal and simple" do
 
-          _class.instance_method( :topping ).arity.should eql 1
+          entity_class_.instance_method( :topping ).arity.should eql 1
         end
 
         it "ok" do
 
-          o = _build_empty
+          o = build_empty_entity_
           o.topping :sprinkles
           o.topping :sparkles
           o.instance_variable_get( :@topping ).should eql [ :sprinkles, :sparkles ]
         end
-      end
-
-      def _build_empty
-        _class.new
       end
     end
   end

@@ -341,7 +341,7 @@ module Skylab::Fields
           _a = ::Array.try_convert( x ) || [ x ]
           st = Callback_::Polymorphic_Stream.via_array _a
 
-          @_sexp_stream_for_current_attribute = st
+          @sexp_stream_for_current_attribute = st
 
           p = @_process_meta_attribute
           begin
@@ -383,7 +383,7 @@ module Skylab::Fields
           _a.push @_current_attribute_name_symbol ; nil
         end
 
-        def touchpush_to_static_index__ meta_k
+        def touchpush_to_static_index_ meta_k
 
           _idx = _static_index
           _bx = _idx[ meta_k ] ||= Callback_::Box.new
@@ -403,10 +403,6 @@ module Skylab::Fields
 
         Static_Index___ = ::Struct.new :method_definers, :optionals
 
-        def _gets_one
-          @_sexp_stream_for_current_attribute.gets_one
-        end
-
         def current_attribute
           @_current_attribute
         end
@@ -420,6 +416,10 @@ module Skylab::Fields
         def __release_thing_ding_two
           remove_instance_variable :@_static_index
         end
+
+        attr_reader(
+          :sexp_stream_for_current_attribute,
+        )
       end
 
       # ==
