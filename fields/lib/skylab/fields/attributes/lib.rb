@@ -45,9 +45,8 @@ module Skylab::Fields
           begin
             k = st.gets
             k or break
-            atr = @_h.fetch k
-            atr._deffers.each do |p|
-              p[ mod, atr ]
+            @_h.fetch( k )._deffers.each do |p|
+              p[ mod ]
             end
           end while nil
           NIL_
@@ -376,6 +375,13 @@ module Skylab::Fields
 
         # --
 
+        def add_methods_definer_by & atr_p
+
+          __touchpush_to_static_index :method_definers
+
+          @_current_attribute.__add_methods_definer atr_p ; nil
+        end
+
         def ___add_to_custom_index meta_k
 
           _idx = ( @_custom_index ||= {} )
@@ -383,7 +389,7 @@ module Skylab::Fields
           _a.push @_current_attribute_name_symbol ; nil
         end
 
-        def touchpush_to_static_index_ meta_k
+        def __touchpush_to_static_index meta_k
 
           _idx = _static_index
           _bx = _idx[ meta_k ] ||= Callback_::Box.new
@@ -446,6 +452,8 @@ module Skylab::Fields
 
         def initialize k, & edit_p
 
+          @_pending_meths_definers = nil
+
           @_read_m = :__receive_first_read_proc
           @_RW_m = :__receive_first_read_and_write_proc
           @_write_m = :__receive_first_write_proc
@@ -478,14 +486,19 @@ module Skylab::Fields
             @_interpret_m = :__common_interpret
           end
 
+          p_a = remove_instance_variable :@_pending_meths_definers
+          if p_a
+            @_deffers = p_a.map do | p |
+              p[ self ]
+            end.freeze
+          end
+
           super
         end
 
-        def define_methods_by & p
-          ( @_deffers ||= [] ).push p ; nil
+        def __add_methods_definer atr_p
+          ( @_pending_meths_definers ||= [] ).push atr_p ; nil
         end
-
-        attr_reader :_deffers
 
         def read_by & p
           send @_read_m, p
@@ -537,6 +550,10 @@ module Skylab::Fields
 
           args.calculate( & @__rw )  # result is k.p
         end
+
+        attr_reader(
+          :_deffers,
+        )
       end
 
       Read___ = -> do

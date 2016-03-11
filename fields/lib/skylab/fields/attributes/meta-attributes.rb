@@ -12,7 +12,6 @@ module Skylab::Fields
 
       def boolean  # for ancient DSL-controller. see also `flag`
 
-        ca = @_.current_attribute
         st = @_.sexp_stream_for_current_attribute
 
         defs = Here_::MetaAttributes_::Boolean::MethodsDefiner.new
@@ -28,18 +27,20 @@ module Skylab::Fields
 
         defs.finish
 
-        @_.touchpush_to_static_index_ :method_definers
+        @_.add_methods_definer_by do |atr|
 
-        ca.define_methods_by do |mod, atr|
+          a = defs.stream_for( atr ).to_a
 
-          mod.module_exec do
-            st = defs.stream_for atr
-            begin
-              defn = st.gets
-              defn or break
-              define_method defn.name_x, & defn.value_x
-              redo
-            end while nil
+          -> mod do
+            mod.module_exec do
+              st = Callback_::Stream.via_nonsparse_array a
+              begin
+                defn = st.gets
+                defn or break
+                define_method defn.name_x, & defn.value_x
+                redo
+              end while nil
+            end
           end
         end
       end
@@ -124,6 +125,29 @@ module Skylab::Fields
         end
       end
 
+      def hook
+
+        @_.add_methods_definer_by do |atr|
+
+          ivar = atr.as_ivar ; k = atr.name_symbol
+
+          -> mod do
+
+            mod.module_exec do
+
+              define_method :"on__#{ k }__" do | & p |
+                instance_variable_set ivar, p ; nil
+              end
+
+              define_method :"receive__#{ k }__" do | * a, & p |
+                instance_variable_get( ivar )[ * a, & p ]
+                NOTHING_  # discourage bad design
+              end
+            end
+          end
+        end
+      end
+
       def ivar
         @_.current_attribute.as_ivar = @_.sexp_stream_for_current_attribute.gets_one
       end
@@ -137,23 +161,21 @@ module Skylab::Fields
 
       def list
 
-        ca = @_.current_attribute
+        @_.add_methods_definer_by do |atr|
 
-        @_.touchpush_to_static_index_ :method_definers
-
-        ca.define_methods_by do |mod, atr|
-
-          mod.send :define_method, atr.name_symbol do |x|
-            ivar = atr.as_ivar
-            if instance_variable_defined? ivar
-              a = instance_variable_get ivar
+          -> mod do
+            mod.send :define_method, atr.name_symbol do |x|
+              ivar = atr.as_ivar
+              if instance_variable_defined? ivar
+                a = instance_variable_get ivar
+              end
+              if a
+                a.push x
+              else
+                instance_variable_set ivar, [ x ]
+              end
+              NIL_
             end
-            if a
-              a.push x
-            else
-              instance_variable_set ivar, [ x ]
-            end
-            NIL_
           end
         end
       end
@@ -622,62 +644,6 @@ module Skylab::Fields
       @_default_proc = p
       NIL_
     end
-
-    ## ~~ hook: an accessor sugared for being a proc
-
-    def when__hook__
-
-      st = @_polymorphic_upstream_
-
-      if st.unparsed_exists && :reader == st.current_token
-        st.advance_one
-        do_reader = true
-      end
-
-      sym = @name_symbol
-
-      md = HOOK_METHOD_NAME_RX___.match sym
-      if md
-        stem = md[ 0 ]
-        read_write_key = stem
-        on_like_method_name = sym
-        if do_reader
-          reader_method_name = :"handle_#{ stem }"
-        end
-      else
-        read_write_key = sym
-        on_like_method_name = :"on_#{ sym }"
-        if do_reader
-          reader_method_name = :"handle_#{ sym }"
-        end
-      end
-
-      handle_like_method_name = :"handle_#{ read_write_key }"
-      normal_writer_method_name = :"#{ handle_like_method_name }="
-
-      @entity_model.module_exec do
-
-        if reader_method_name
-
-          define_method reader_method_name do
-
-            fetch read_write_key do end
-          end
-        end
-
-        define_method on_like_method_name do | & p |
-          p or raise ::ArgumentError, '[past-proofing]'  # past-proof
-          self[ read_write_key ] = p
-        end
-
-        define_method normal_writer_method_name do | p |
-          self[ read_write_key ] = p
-        end
-      end
-      KEEP_PARSING_
-    end
-
-    HOOK_METHOD_NAME_RX___ = /(?<=\Aon_).+/
 
     ## ~~ builder: a reader that initializes with a proc (named thru reader)
 

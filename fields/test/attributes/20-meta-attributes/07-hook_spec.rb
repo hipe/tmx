@@ -2,56 +2,57 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  if false
-  context 'with a `hook` modifier' do
+  TS_.require_ :attributes_meta_attributes
 
-    with do
-      param :on_error, :hook
-    end
+  module Attributes::Meta_Attributes
 
-    frame do
+    TS_.describe "[fi] attributes - meta-attributes - hook" do
 
-      it "`object.on_foo { .. }` acts as a writer" do
+      TS_[ self ]
+      use :memoizer_methods
+      Attributes::Meta_Attributes[ self ]
 
-        o = object_
-        o.on_error { :x }
-        force_read_( :error, o ).call.should eql :x
-      end
+      context "intro" do
 
-      it "but out of the box there's no reader" do
+        shared_subject :entity_class_ do
 
-        o = object_
-        o.on_error { :x }
-        o.respond_to?( :handle_error ).should eql false
-      end
+          class X_Hook_A
 
-      it "also, we protect against misuse" do
+            attrs = Subject_module_[].call(
+              error: :hook,
+            )
 
-        object = object_
-        begin
-          object.on_error
-        rescue ::ArgumentError => e
+            attrs.define_methods self
+
+            self
+          end
         end
-        e.message.should eql '[past-proofing]'
+
+        it "write with `on__x__`" do
+
+          o = build_empty_entity_
+          o.on__error__
+
+          o.instance_variable_defined?( :@error ) or fail
+          o.instance_variable_get( :@error ) and fail
+        end
+
+        it "\"read\" with `receive__x__`" do
+
+          o = build_empty_entity_
+
+          yes = nil
+          o.on__error__ do |k|
+            yes = k
+          end
+
+          x = o.receive__error__ :_hi_
+
+          x.should be_nil
+
+          yes.should eql :_hi_
+        end
       end
     end
-  end
-
-  context "with a `hook` modifier with a `reader` modifier" do
-
-    with do
-      param :on_error, :hook, :reader
-    end
-
-    it "is useful if the client is to behave like an argument struct" do
-
-      object = object_
-      canary = :red
-      object.on_error { canary = :blue }
-      canary.should eql(:red)
-      object.handle_error.call
-      canary.should eql(:blue)
-    end
-  end
   end
 end
