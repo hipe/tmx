@@ -4,10 +4,7 @@ module Skylab::SubTree
 
     class Traversal
 
-      Attributes_actor_.call( self,
-        do_verbose_lines: nil,
-        sep: nil,
-      )
+      Attributes_actor_ = Home_.lib_.fields::Attributes::Actor
 
       Attributes_actor_.call( self,
         do_verbose_lines: nil,

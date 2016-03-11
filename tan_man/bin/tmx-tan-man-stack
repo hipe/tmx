@@ -179,6 +179,13 @@ class Skylab::Stack
       -> do
         io = _read_writable_IO
         if io
+          ___do_pop io
+        end
+      end
+    end
+
+    def ___do_pop io
+      # - -
           line_before_that = nil
           last_line = nil
           last_bytes = 0
@@ -193,9 +200,12 @@ class Skylab::Stack
             redo
           end while nil
 
-          if last_line
-            @_oes_p.call :info, :expression, :popping do | y |
-              y << "popped: #{ last_line }"
+          express_popped = -> do
+            if last_line
+              last_line.chop!  # EEK
+              @_oes_p.call :info, :expression, :popping do | y |
+                y << "(popped: #{ last_line })"
+              end
             end
           end
 
@@ -204,6 +214,8 @@ class Skylab::Stack
             @_oes_p.call :info, :expression, :removing_file do | y |
               y << "(stack cleared. removing file.)"
             end
+
+            express_popped[]
 
             io.close
 
@@ -217,12 +229,13 @@ class Skylab::Stack
               y << "top: #{ line_before_that }"
             end
 
+            express_popped[]
+
             io.truncate last_bytes
             io.close
             ACHIEVED_
           end
-        end
-      end
+      # - -
     end
 
     def __list__component_operation

@@ -1,35 +1,80 @@
-require_relative '../test-support'
+module Skylab::Fields::TestSupport
 
-module Skylab::Callback::TestSupport::Actor::Methodic
+  module Attributes
 
-  Parent_TS_ = ::Skylab::Callback::TestSupport::Actor
+    def self.[] tcc
 
-  Parent_TS_[ self ]
+      tcc.send :define_singleton_method, :given_the_attributes_ do | & p |
 
-  include Constants
+        shared_subject :the_attributes_ do
 
-  extend TestSupport_::Quickie
-
-  Enhance_for_test_ = -> mod do
-
-    mod.module_exec do
-
-      public :polymorphic_stream_via_iambic, :process_polymorphic_stream_passively
-
-      def process_passively * x_a
-        process_polymorphic_stream_passively polymorphic_stream_via_iambic x_a
+          instance_exec( & p )
+        end
       end
 
-      def process_fully * x_a
-        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
-      end
+      tcc.include self
     end
 
-    nil
+    def attributes_ h
+      Home_::Attributes[ h ]
+    end
+
+    def against_ * x_a
+
+      _ = the_attributes_
+      _x = _.init self, x_a  # EGAGS
+      _x.object_id == object_id or fail
+    end
+
+    Subject_module_ = -> do
+      Home_::Attributes
+    end
+
+    module Actor  # (NOTE sandbox namespace)
+
+      def self.[] tcc
+        tcc.send :define_singleton_method, :given_subject_class_ do |&p|
+          define_method :subject_class_, Lazy_.call( & p )
+        end
+        tcc.include self
+      end
+
+      def new_with_ * x_a
+        sess = @class_.new
+        _st = polymorphic_stream_via_iambic_ x_a
+        kp = sess.send :process_polymorphic_stream_fully, _st
+        kp or ::Kernel.fail
+        @session_ = sess ; nil
+      end
+
+      def process_polymorphic_stream_fully_via_ * x_a
+        _st = polymorphic_stream_via_iambic_ x_a
+        @session_.send :process_polymorphic_stream_fully, _st
+      end
+
+      def process_polymorphic_stream_passively_ st
+        @session_.send :process_polymorphic_stream_passively, st
+      end
+
+      def the_empty_polymorphic_stream_
+        Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
+      end
+
+      def polymorphic_stream_via_ * x_a
+        polymorphic_stream_via_iambic_ x_a
+      end
+
+      def polymorphic_stream_via_iambic_ x_a
+        Callback_::Polymorphic_Stream.via_array x_a
+      end
+
+      Subject_proc_ = -> do
+        Home_::Attributes::Actor
+      end
+
+      Subject_module_ = Subject_module_
+
+      Here_ = self
+    end
   end
-
-  Constants::Enhance_for_test_ = Enhance_for_test_
-
-  Parent_subject_ = Parent_TS_::Subject_
-
 end

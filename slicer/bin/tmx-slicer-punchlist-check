@@ -1,0 +1,200 @@
+#!/usr/bin/env ruby -w
+
+module Skylab
+
+end
+
+module Skylab::Slicer
+
+  module PunchlistCheck
+
+    Wizzie_path___ = -> do
+      ::File.expand_path '../../doc/punchlist.template.txt', __FILE__
+    end
+
+    Wozzie_path___ = -> do
+      ::File.expand_path '../../..', __FILE__
+    end
+
+    ACTIONS__ = %w( names-in-list names-in-FS diff )
+
+    class CLI
+
+      def initialize sin, sout, serr
+        @sout = sout
+        @serr = serr
+      end
+
+      def invoke argv
+        case 1 <=> argv.length
+        when 0
+          tok = argv.fetch 0
+          if /\A(?:-h|--help\z)/ =~ tok
+            _usage
+          elsif ACTIONS__.include? tok
+            send "__#{ tok.gsub '-', '_' }__component_operation"
+          else
+            @serr.puts "unrecognized action '#{ tok }'"
+            _usage
+          end
+        when -1
+          @serr.puts "unexpected argument - '#{ argv.fetch 1 }'"
+          _usage
+        when 1
+          @serr.puts "expecting <action>"
+          _usage
+        end
+      end
+
+      def _usage
+        @serr.puts "usage: '#{ __program_name } #{ ___la_la }'"
+      end
+
+      def ___la_la
+        "{ #{ ACTIONS__.join ' | ' } }"
+      end
+
+      def __program_name
+        ::File.basename $PROGRAM_NAME
+      end
+
+      # --
+
+      def __names_in_list__component_operation
+        _output_stream _build_list_stream
+      end
+
+      def __names_in_FS__component_operation
+        _output_stream _build_dir_stream
+      end
+
+      def __diff__component_operation
+        a, a_ = Diff___[ _build_list_stream, _build_dir_stream ]
+        hdr = -> do
+          @sout.puts "# only in filesystem:"
+        end
+        if a
+          @sout.puts "# only in list:"
+          _output_array a
+          if a_
+            hdr[]
+            _output_array a_
+          end
+        elsif a_
+          hdr[]
+          _output_array a_
+        else
+          @serr.puts "(no difference)"
+        end
+        nil
+      end
+
+      def _output_array a
+        @sout.puts a
+      end
+
+      def _output_stream st
+        begin
+          s = st.call
+          s or break
+          @sout.puts s
+          redo
+        end while nil
+      end
+
+      def _build_list_stream
+        Build_list_stream___[ ::File.open Wizzie_path___[] ]
+      end
+
+      def _build_dir_stream
+        Build_dir_stream___[ Wozzie_path___[] ]
+      end
+
+      Diff___ = -> list_st, dir_st do
+
+        h = {}
+
+        while s = list_st.call
+          h[ s ] = :left
+        end
+
+        while s = dir_st.call
+          had = true
+          h.fetch s do
+            had = false
+            h[ s ] = :right ; nil
+          end
+          if had
+            h.delete s
+          end
+        end
+
+        a = nil ; a_ = nil
+
+        op_h = nil
+
+        op_h = {
+          left: -> ss do
+            a = []
+            p = -> s_ { a.push s_ }
+            op_h[ :left ] = p
+            p[ ss ]
+          end,
+          right: -> ss do
+            a_ = []
+            p = -> s_ { a_.push s_ }
+            op_h[ :right ] = p
+            p[ ss ]
+          end,
+        }
+
+        h.each_pair do |k, x|
+          op_h.fetch( x )[ k ]
+        end
+
+        [ a, a_ ]
+      end
+
+      Build_list_stream___ = -> io do
+
+        skip_rx = /\A  [ \t]*  (?:\#|$)  /x
+        norm_rx = /\A[^ ]+/
+
+        -> do
+
+          begin
+            line = io.gets
+            line or break
+            if skip_rx =~ line
+              redo
+            end
+            x = norm_rx.match( line )[ 0 ]
+            break
+          end while nil
+          x
+        end
+      end
+
+      Build_dir_stream___ = -> path do
+
+        a =  ::Dir[ "#{ path }/*" ]
+        d = 0
+        last = a.length
+        p = -> do
+          if last == d
+            p = -> { } ; nil
+          else
+            s = a.fetch d
+            d += 1
+            ::File.basename s
+          end
+        end
+        -> do
+          p[]
+        end
+      end
+    end
+  end
+end
+
+Skylab::Slicer::PunchlistCheck::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

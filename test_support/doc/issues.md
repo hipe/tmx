@@ -1,3 +1,5 @@
+[#048]       described in [#001], this tracks "sandbox" module implementations
+
 [#047] #open subscribers to quickie ever supporting a negate operator
              ("should not")
 [#046] #open when doc-test rewrite, see subscribers
@@ -73,4 +75,6 @@
 [#004] #open quickie: module names into fashion (and now narrative)
 [#002]       coverage is a no fun zone ..
              ( #was: #done Constants too )
+
 [#001]       test-suite architecture and conventions..
+             (namespaces, modules) (also, cross-reference to [#fi-017])

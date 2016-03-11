@@ -1,42 +1,62 @@
-myterm              q [ ]
-slicer              q [ ]
-permute             q [ ]
-flex2treetop        q [ ]
-yacc2treetop        q [ ]
-bnf2treetop         q [ ]
-css_convert         q [ ]
+# in conceptual dependency order
 
-code_molester       q [ ]
+# == apps
+
+# -- synthesize everything
+
+tmx                 q [ ]
+
+# -- actually useful
+
+tan_man             q [ ]
+search_and_replace  q [ ]
+myterm              q [ ]
+snag                q [ ]
+git_viz             q [ ]
+
+# -- bigger
+
+cull                q [ ]
+code_metrics        q [ ]
+
+# -- these
 
 task_examples       q [ ]
 task                q [ ]
-treemap             q [ ]
 
-code_metrics        q [ ]
-git                 q [ ]
+# -- legacy utils & coverers
+
+css_convert         q [ ]
+bnf2treetop         q [ ]
+flex2treetop        q [ ]
+yacc2treetop        q [ ]
+
 beauty_salon        q [ ]
-cull                q [ ]
-snag                q [ ]
+
+# -- toy (legacy & modern, alpha)
+
+treemap             q [ ]
+permute             q [ ]
+slicer              q [ ]
+
+# == libs
+
+# -- ad-hoc libs
+
+git                 q [ ]
+
+# -- more general libs
+
 test_support        q [ ]
-
-tan_man             q [ ]
-git_viz             q [ ]
-
-# libs
-
-plugin              q [ ]
-fields              q [ ]
-
 sub_tree            q [ ]
-
-basic               q [ ]
-
-autonomous[..]      q [ ]
-brazen              q [ ]
-callback            q [ ]
-
-parse               q [ ]
+code_molester       q [ ]
 system              q [ ]
+zerk                q [ ]
 human               q [ ]
-
-tmx                 q [ ]
+brazen              q [ ]
+autonomous_component_system q [ ]
+parse               q [ ]
+plugin              q [ ]
+basic               q [ ]
+fields              q [ ]
+callback            q [ ]

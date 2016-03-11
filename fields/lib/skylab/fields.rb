@@ -16,314 +16,282 @@ module Skylab::Fields
     end
   end  # >>
 
-  class Parameters  # :[#013].
+  Callback_ = ::Skylab::Callback
+
+  Autoloader_ = Callback_::Autoloader
+
+  class Attributes
+
+    class << self
+      alias_method :[], :new
+      alias_method :call, :new
+      undef_method :new
+    end  # >>
+
+    def initialize h
+      @attribute_class = nil
+      @_h = h
+      @meta_attributes = nil
+    end
+
+    attr_writer(
+      :attribute_class,
+      :meta_attributes,
+    )
+
+    def init o, x_a
+      ( @index_ ||= index_ ).init__ o, x_a
+    end
+
+    def optionals_hash
+      ( @index_ ||= index_ ).optionals_hash__
+    end
+
+    def symbols * sym
+      if sym.length.zero?
+        @_h.keys
+      else
+        ( @index_ ||= index_ ).lookup_particular__( * sym )
+      end
+    end
+
+    def to_defined_attribute_stream
+      ( @index_ ||= index_ ).to_defined_attribute_stream__
+    end
+
+    def index_
+
+      Here_::Lib::Index_of_Definition___.new( @_h,
+        ( @meta_attributes || Here_::Lib::MetaAttributes ),
+        ( @attribute_class || Here_::Lib::DefinedAttribute ),
+      )
+    end
+
+    module Actor
+
+      class << self
+
+        def _call cls, h=nil
+
+          if h
+            attrs = Here_[ h ]
+            cls.const_set :ATTRIBUTES, attrs
+          else
+            cls.const_set :ATTRIBUTES, nil
+          end
+
+          cls.extend Module_Methods___
+          cls.include InstanceMethods
+          attrs  # as covered..
+        end
+
+        alias_method :[], :_call
+        alias_method :call, :_call
+      end  # >>
+
+      module Module_Methods___
+
+        # ~ ways to call your actor (pursuant to [#bs-028.A] name conventions)
+
+        def with * x_a, & x_p  # 1
+          call_via_iambic x_a, & x_p
+        end
+
+        def call_via_iambic x_a, & x_p
+          sess = new_via_iambic x_a, & x_p
+          if sess
+            sess.execute
+          else
+            sess
+          end
+        end
+
+        def new_with * x_a, & x_p  # 6
+          new_via_iambic x_a, & x_p
+        end
+
+        def new_via_iambic x_a, & x_p  # 7
+
+          _st = Callback_::Polymorphic_Stream.via_array x_a
+          New_via__[ :process_polymorphic_stream_fully, _st, self, & x_p ]
+        end
+
+        def new_via_polymorphic_stream st, & x_p
+          New_via__[ :process_polymorphic_stream_fully, st, self, & x_p ]
+        end
+
+        def new_via_polymorphic_stream_passively st, & x_p  # 9
+          New_via__[ :process_polymorphic_stream_passively, st, self, & x_p ]
+        end
+
+        def polymorphic_stream_via_iambic x_a
+          Callback_::Polymorphic_Stream.via_array x_a
+        end
+      end
+
+      New_via__ = -> m, st, cls, & x_p do
+
+        sess = cls.send :new, & x_p
+        kp = sess.send m, st
+        if kp
+          sess
+        else
+          kp
+        end
+      end
+
+      module InstanceMethods
+
+        def new_with * x_a, & x_p
+          x_p and self._DESIGN_ME
+          otr = dup
+          kp = otr.send :process_iambic_fully, x_a
+          if kp
+            otr
+          else
+            self._COVER_ME
+          end
+        end
+
+      private
+
+        # 2
+        def process_iambic_fully x_a
+          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+        end
+
+        # 3
+        def polymorphic_stream_via_iambic x_a
+          Callback_::Polymorphic_Stream.via_array x_a
+        end
+
+        # 4
+        def process_polymorphic_stream_fully st, & x_p
+          kp = process_polymorphic_stream_passively st, & x_p
+          if kp
+            if st.no_unparsed_exists
+              kp
+            elsif x_p
+              self._K
+            else
+              when_after_process_iambic_fully_stream_has_content st
+            end
+          else
+            kp
+          end
+        end
+
+        # 6
+        def process_polymorphic_stream_passively st, & x_p
+
+          cls = self.class
+          if cls.const_defined? :ATTRIBUTES, false
+            _atrs = cls.const_get :ATTRIBUTES
+          end
+
+          Here_::Lib::Process_polymorphic_stream_passively_.call(
+            st, self, _atrs,
+            polymorphic_writer_method_name_passive_lookup_proc,
+            & x_p )
+        end
+
+        # 9
+        def gets_one_polymorphic_value  # #public-API #hook-in
+          @_polymorphic_upstream_.gets_one
+        end
+
+        def polymorphic_upstream  # n.c
+          @_polymorphic_upstream_
+        end
+
+        # 10
+        def polymorphic_writer_method_name_passive_lookup_proc  # #public-API #hook-in
+          Here_::Lib::Writer_method_reader___[ self.class ]
+        end
+
+        # 11
+        def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
+          _ev = Home_::Events::Extra.via_strange stream.current_token
+          receive_extra_values_event _ev
+        end  # :#spot-1
+
+        # 14
+        def receive_extra_values_event ev  # :+#public-API (name) :+#hook-in
+          raise ev.to_exception
+        end
+      end
+    end
+
+    Autoloader_[ self ]
+    Here_ = self
+  end
+
+  class SimplifiedName
+
+    def initialize k
+      @cache_ = {}
+      yield self
+      @name_symbol = k
+      freeze
+    end
+
+    def as_ivar= x
+      @cache_[ :_as_ivar_ ] = x
+    end
+
+    def as_ivar
+      @cache_.fetch :_as_ivar_ do
+        x = :"@#{ @name_symbol }"
+        @cache_[ :_as_ivar_ ] = x
+        x
+      end
+    end
+
+    def name  # for [#br-035] (wormhole). also covered here
+      @cache_.fetch :_name_ do
+        x = Callback_::Name.via_variegated_symbol @name_symbol
+        @cache_[ :_name_ ] = x
+        x
+      end
+    end
+
+    attr_reader :name_symbol
+  end
+
+  class Argument_stream_via_value  # :[#019] (2x similar)
 
     class << self
       alias_method :[], :new
       private :new
     end  # >>
 
-    def initialize h
-      @_is_parsed = nil
-      @_indexes = nil
-      @_unparsed_h = h
+    def initialize x
+      @_done = false
+      @_kn = Callback_::Known_Known[ x ]
     end
 
-    def init o, x_a
-      @_is_parsed || _parse
-      Parse___.new( o, x_a, self ).execute
+    def gets_one
+      x = current_token
+      advance_one
+      x
     end
 
-    def to_required_symbol_stream
-      h = optionals_hash
-      st = Callback_::Stream.via_nonsparse_array @_h.keys
-      if h
-        st.reduce_by do |sym|
-          ! h[ sym ]
-        end
-      else
-        st
-      end
+    def current_token
+      @_kn.value_x
     end
 
-    def optionals_hash
-      @_is_parsed || _parse
-      if @_indexes
-        @_indexes.optionals
-      end
+    def advance_one
+      remove_instance_variable :@_kn
+      @_done = true ; nil
     end
 
-    def symbols * sym
-      if sym.length.zero?
-        if @_is_parsed
-          @_h.keys
-        else
-          @_unparsed_h.keys
-        end
-      else
-        ___fetch_particular( * sym )
-      end
+    def unparsed_exists
+      ! @_done
     end
 
-    def ___fetch_particular sym
-      @_is_parsed || _parse
-      @_custom_indexes.fetch sym
+    def no_unparsed_exists
+      @_done
     end
-
-    def [] k
-      @_h.fetch k
-    end
-
-    def _parse
-
-      @_is_parsed = true
-
-      op_h = PARAM_INTERP___
-      h = {}
-
-      _h = remove_instance_variable :@_unparsed_h
-      _h.each_pair do | k, x |
-        o = Param___.new k, self
-        h[ k ] = o
-        if x
-          if ::Array.try_convert x
-            st = Callback_::Polymorphic_Stream.via_array x
-            o._st = st
-            begin
-              _p = op_h[ st.gets_one ]
-              o.instance_exec( & _p )
-            end until st.no_unparsed_exists
-          else
-            _p = op_h[ x ]
-            o.instance_exec( & _p )
-          end
-        end
-        o.close
-      end
-
-      @_h = h
-      @build_param_getser = __build_param_getser_builder
-      NIL_
-    end
-
-    def __index_under_custom par, sym
-      ( ( @_custom_indexes ||= {} )[ sym ] ||= [] ).push par.name_symbol ; nil
-    end
-
-    def __index_under par, sym
-      _idx = ( @_indexes ||= Indexes___.new )
-      ( _idx[ sym ] ||= {} )[ par.name_symbol ] = true
-      NIL_
-    end
-
-    Indexes___ = ::Struct.new :optionals
-
-    def __build_param_getser_builder
-
-      h = @_h
-
-      orig = -> parse do
-        st = parse.st
-        -> do
-          h.fetch st.gets_one
-        end
-      end
-
-      if @_indexes
-        opts = @_indexes.optionals
-      end
-
-      if opts
-        -> parse do
-          gets_one = orig[ parse ]
-          pool = opts.dup
-          parse.normalize = Nilify___[ pool ]
-          -> do
-            par = gets_one[]
-            pool.delete par.name_symbol
-            par
-          end
-        end
-      else
-        orig
-      end
-    end
-
-    attr_reader(
-      :build_param_getser,
-    )
-  end
-
-  Nilify___ = -> pool do
-    -> do
-      pool.keys.each do |k|
-        ivar = @pars[ k ].as_ivar
-        if ! @o.instance_variable_defined? ivar
-          @o.instance_variable_set ivar, nil
-        end
-      end
-      NIL_
-    end
-  end
-
-  # ~ parse
-
-  class Parse___
-
-    def initialize o, x_a, pars
-      @normalize = nil
-      @o = o
-      @pars = pars
-      @st = Callback_::Polymorphic_Stream.via_array x_a
-    end
-
-    def execute
-      st = @st
-      gets_one_param = @pars.build_param_getser[ self ]
-      until st.no_unparsed_exists
-        _par = gets_one_param[]
-        Assignment___.new( @o, @st, _par, @pars ).execute
-      end
-      if @normalize
-        instance_exec( & @normalize )
-      end
-      NIL_
-    end
-
-    attr_accessor(
-      :normalize,
-    )
-
-    attr_reader(
-      :st,
-    )
-  end
-
-  # ~ the meta-parameters
-
-  Value_Proxy__ = ::Struct.new :gets_one
-  fake_yes = Value_Proxy__.new true
-
-  flag = -> do
-    @x = true ; NIL_
-  end
-
-  flag_of = -> k do
-    -> do
-      @pars[ k ][ @o, fake_yes, @pars ]
-      NIL_
-    end
-  end
-
-  kn_kn = -> do
-    _x = @st.gets_one
-    @x = Callback_::Known_Known[ _x ]
-    NIL_
-  end
-
-  singular_of = -> k do
-    -> do
-      _st = Value_Proxy__.new [ @st.gets_one ]
-      @pars[ k ][ @o, _st, @pars ]
-      NIL_
-    end
-  end
-
-  PARAM_INTERP___ = {
-    flag: -> do
-      @stack[ 1 ] = flag
-    end,
-    flag_of: -> do
-      @stack[ 0 ] = flag_of[ @_st.gets_one ]
-    end,
-    known_known: -> do
-      @stack[ 0 ] = kn_kn
-    end,
-    optional: -> do
-      @_index.__index_under self, :optionals ; nil
-    end,
-    singular_of: -> do
-      @stack[ 0 ] = singular_of[ @_st.gets_one ]
-    end
-  }.tap do |h|
-    h.default_proc = -> _, k { -> { @_index.__index_under_custom self, k } }
-  end
-
-  # ~
-
-  class Assignment___
-
-    # the way the "stack" works is that when you get to the bottom of it,
-    # IFF @x is set you assign that into the ivar of the client instance
-
-    def initialize o, st, par, pars
-      @o = o
-      @par = par
-      @pars = pars
-      @st = st
-    end
-
-    def execute
-      stack = @par.stack
-      d = stack.length
-      if d.zero?
-        @x = @st.gets_one
-      else
-        begin
-          d -= 1
-          _p = stack.fetch d
-          instance_exec( & _p )
-          if d.zero?
-            break
-          end
-          redo
-        end while nil
-      end
-
-      if instance_variable_defined? :@x
-        @o.instance_variable_set @par.as_ivar, @x
-      end
-      NIL_
-    end
-  end
-
-  class Param___
-
-    def initialize k, indxr
-
-      @_index = indxr
-      @stack = []
-      @_st = nil
-      @name_symbol = k
-    end
-
-    def [] o, st, pars
-      Assignment___.new( o, st, self, pars ).execute
-      NIL_
-    end
-
-    attr_writer(
-      :_st,
-    )
-
-    def __become_singular_of sym
-      $stderr.puts "SOMETHING"
-    end
-
-    def close
-      @stack.compact!
-      remove_instance_variable :@_index
-      remove_instance_variable :@_st ; nil
-    end
-
-    def as_ivar
-      @___as_ivar ||= :"@#{ @name_symbol }"
-    end
-
-    attr_reader(
-      :name_symbol,
-      :stack,
-    )
   end
 
   # -- the external functions experiment ..
@@ -436,10 +404,6 @@ module Skylab::Fields
 
   # --
 
-  Callback_ = ::Skylab::Callback
-
-  Autoloader_ = Callback_::Autoloader
-
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -458,7 +422,11 @@ module Skylab::Fields
   EMPTY_A_ = []
   EMPTY_S_ = ""
   Home_ = self
+  KEEP_PARSING_ = true
+  Lazy_ = Callback_::Lazy
+  MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = ' '
   UNABLE_ = false
 end

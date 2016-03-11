@@ -32,32 +32,19 @@ module Skylab::System
       # intercept write-like messages intended for an ::IO, but do something
       # magical with the content. Don't forget to call `flush!` at the end.
 
-      # -- Invocation alternatives
-
-      class << self
-
-        def [] x
-          new_with :downstream_IO, x
-        end
-
-        private :new
-      end  # >>
-
-      def self.new_with * x_a
-        $stderr.puts "YOU WANT TO CHANGE ME"
-        o = super( * x_a )
-        o.__init_defaults
-        o
-      end
-
-      # -- Construction arguments
-
       Attributes_actor_.call( self,
         downstream_IO: nil,
         niladic_pass_filter_proc: nil,
       )
 
-      # ~ construction internals
+      class << self
+
+        def [] x  # sort of like #[#ca-057]
+          new_with :downstream_IO, x
+        end
+
+        private :new
+      end  # >>
 
       def initialize
 
@@ -70,9 +57,13 @@ module Skylab::System
         @_was_newline = true
       end
 
-      def __init_defaults
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
+      end
+
+      def normalize
         @niladic_pass_filter_proc ||= NILADIC_TRUTH_
-        NIL_
+        KEEP_PARSING_
       end
 
     private

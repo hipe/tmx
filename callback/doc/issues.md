@@ -9,8 +9,10 @@
 [#060]       the name narrative ..
 [#059]       [ bound call ]
              ( #was: #done #parent-node: [#044] "signal processing scans.." ) )
-[#058]       #parent-node: [#042] methodic actor (was: [#sy-009]) :+[#sl-148]..
-[#057]       #parent-node: [#046] "the ideal mixed syntax.."
+
+[#058] #hole ( moved to [#fi-013] )
+
+[#057]       "the ideal mixed syntax.." (in [#046])
 [#056]       track similar "try convert" for stream-likes
              ( #was: track similar things under number 050 )
 [#055]       #parent-node: [#br-059]  the "pair" structure.
@@ -36,7 +38,9 @@
 [#045]       #parent-node: [#042] actor patterns
 [#044]       #parent-node: [#049] the stream narrative ..
 [#043]       #doc-node: the subscriptions narrative ..
-[#042]       #doc-node: the actor narrative ..
+
+[#042] #hole ( #moved-to [#fi-016] )
+
 [#041]       #parent-node: [#024] what are hybrid boxxy nodes?
 [#040]       #parent-node: [#023] the callback pattern
 [#039]       #parent-node: [#037] #in-situ the cb method naming conventions

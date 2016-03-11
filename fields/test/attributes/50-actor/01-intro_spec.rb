@@ -1,295 +1,270 @@
-require_relative 'methodic/test-support'
+require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport::Actor::Methodic
+module Skylab::Fields::TestSupport
 
-  describe "[ca] actors - methodic" do
+  TS_.require_ :attributes_actor  # namespace antics #[#017] justified
 
-    context "with three" do
+  module Attributes::Actor
 
-      before :all do
+    TS_.describe "[fi] attributes - actor" do
 
-        class Foo_Basic
+      TS_[ self ]
+      use :memoizer_methods
+      Here_[ self ]
 
-          Parent_subject_[].methodic self, :properties,
-            :jiang, :xiao, :qing
+      it "left loads" do
+        _left_class
+      end
 
-          attr_reader :jiang, :xiao, :qing, :x_a
+      it "this i.m loads" do
+        Subject_module_[]::Lib::Polymorphic_Processing_Instance_Methods
+      end
 
-          Enhance_for_test_[ self ]
+      it "i.m only loads" do
+        _instance_methods_only_class
+      end
+
+      it "right loads" do
+        _right_class
+      end
+
+      it "hybrid loads" do
+        _hybrid_class
+      end
+
+      it "left writes" do
+        _given :_left_class
+        new_with_ :jiang, :J
+        @session_.jiang.should eql :J
+      end
+
+      it "i.m only writes" do
+        _given :_instance_methods_only_class
+        new_with_ :foo, :F
+        @session_.foo.should eql :F
+      end
+
+      it "right writes" do
+        _given :_right_class
+        new_with_ :foo, :F
+        @session_.foo.should eql :F
+      end
+
+      it "hybrid writes" do
+        _given :_hybrid_class
+        new_with_ :bar, :B, :qing, :Q
+        [ @session_.bar, @session_.qing ].should eql [ :B, :Q ]
+      end
+
+      it "unrec left" do
+        _given :_left_class
+        _unrec
+      end
+
+      it "unrec right" do
+        _given :_right_class
+        _unrec
+      end
+
+      it "unrec hybrid" do
+        _given :_hybrid_class
+        _unrec
+      end
+
+      def _unrec
+        @session_ = @class_.new
+        begin
+          process_polymorphic_stream_fully_via_ :zoik
+        rescue ::ArgumentError => e
+        end
+        e.message.should eql "unrecognized property 'zoik'"
+      end
+
+      it "im - `process_iambic_fully`" do
+        sess = _hybrid_class.new
+        sess.send :process_iambic_fully, [ :qing, :Q ]
+        sess.qing.should eql :Q
+      end
+
+      it "mm - `new_with`, `new_via_iambic`" do
+        _given :_hybrid_class
+        @session_ = @class_.new_with :jiang, :J, :bar, :B
+        _this.should eql [ :J, :B ]
+      end
+
+      it "i.m - `new_with` (makes a dup)" do
+
+        @session_ = _hybrid_class.new_with :jiang, :J, :bar, :B
+        otr = @session_.send :new_with, :jiang, :K
+        _this.should eql [ :J, :B ]
+        @session_ = otr
+        _this.should eql [ :K, :B ]
+      end
+
+      def _this
+        [ @session_.jiang, @session_.bar ]
+      end
+
+      context "mm - `new_via_polymorphic_stream_passively`" do
+
+        shared_subject :_tuple do
+
+          st = _build_this_polymorphic_stream
+          sess = _hybrid_class.new_via_polymorphic_stream_passively st
+          [ st.current_token, sess.jiang, sess.bar ]
+        end
+
+        it "writes" do
+          _tuple[ 1, 2 ].should eql [ :J, :B ]
+        end
+
+        it "stream" do
+          _tuple[ 0 ].should eql :Z
         end
       end
 
-      it "loads" do
+      it "mm - `with`" do
+        _given :_hybrid_class
+        _ = @class_.with :jiang, :J, :bar, :B
+        _.should eql [ :JIANG, :J, :BAR, :B ]
       end
 
-      it "passive - ok on empty array. when no iambic remainder, result is true" do
-        x = foo.process_passively
+      it "passive - none" do
+
+        @session_ = _hybrid_class.new
+        x = process_polymorphic_stream_passively_ the_empty_polymorphic_stream_
         x.should eql true
       end
 
-      it "passive - parses a subset ('fully')" do
-        foo = self.foo
-        x = foo.process_passively :jiang, :J, :qing, :Q
-        foo.jiang.should eql :J
-        foo.qing.should eql :Q
-        x.should eql true
-      end
+      context "passive - some" do
 
-      it "order does not matter (for contiguous recognized terms)" do
-        foo = self.foo
-        x = foo.process_passively :qing, :Q, :xiao, :X
-        foo.qing.should eql :Q
-        foo.xiao.should eql :X
-        x.should eql true
-      end
+        shared_subject :_tuple do
+          @session_ = _hybrid_class.new
+          st = _build_this_polymorphic_stream
+          x = process_polymorphic_stream_passively_ st
+          [ x, st.current_token, @session_.jiang, @session_.bar ]
+        end
 
-      it "passive - succeeds but stops at first unrec arg. stream reflects this" do
-        foo = self.foo
-        st = foo.polymorphic_stream_via_iambic [ :xiao, :X, :wuu, :jiang, :J ]
-        x = foo.process_polymorphic_stream_passively st
-        x.should eql true
-        foo.xiao.should eql :X
-        foo.jiang.should be_nil
-        st.current_index.should eql 2
-      end
+        it "writes" do
+          _tuple[ 2, 2 ].should eql [ :J, :B ]
+        end
 
-      let :foo do
-        Foo_Basic.new
-      end
+        it "result" do
+          _tuple.fetch( 0 ).should eql true
+        end
 
-      it "when 'fully' - works with subset" do
-        foo = self.foo
-        x = foo.process_fully :jiang, :J, :xiao, :X
-        foo.jiang.should eql :J
-        foo.xiao.should eql :X
-        x.should eql true
-      end
-
-      it "when 'fully' - unrecognzied term results in argument error" do
-        foo = self.foo
-        _rx = %r(\Aunrecognized property 'leung')
-        -> do
-          foo.process_fully :xiao, :X, :leung, :_never_see_
-        end.should raise_error ::ArgumentError, _rx
-      end
-    end
-
-    context "simple properties" do
-
-      before :all do
-        class X
-          Parent_subject_[].methodic self, :simple, :properties,
-            :argument_arity, :zero, :ivar, :@fz, :property, :foozie,
-            :argument_arity, :one, :ivar, :@hh, :property, :he_he
-
-          Enhance_for_test_[ self ]
+        it "leaves parse at first unrec" do
+          _tuple.fetch( 1 ).should eql :Z
         end
       end
 
-      it "loads" do
+      def _build_this_polymorphic_stream
+        polymorphic_stream_via_ :jiang, :J, :bar, :B, :Z
       end
 
-      it "normal" do
-        x = X.new
-        x.process_fully :foozie, :he_he, :hi
-        x.instance_variable_get( :@hh ).should eql :hi
-        x.instance_variable_get( :@fz ).should eql true
+      def _given m
+        @class_ = send m ; nil
       end
 
-      it "nilifies" do
-        x = X.new do
-          nilify_uninitialized_ivars
-        end
-        x.instance_variable_defined?( :@hh ).should eql true
-        x.instance_variable_defined?( :@fz ).should eql true
-      end
-    end
+      shared_subject :_left_class do
 
-    context "`ignore`" do
+        class Intro_Left
 
-      before :all do
-        class X_2
-          Parent_subject_[].methodic self, :simple, :properties,
-            :ignore, :property, :foo,
-            :property, :bar
+          attrs = Subject_proc_[].call( self,
+            jiang: nil,
+            xiao: nil,
+            qing: nil,
+          )
 
-          Enhance_for_test_[ self ]
+          attr_reader( * attrs.symbols )
+
+          self
         end
       end
 
-      it "ignores" do
-        x = X_2.new do
-          process_fully :foo, :_no_see_, :bar, :BAR
-        end
-        x.instance_variables.include?( :@foo ).should eql false
-        x.instance_variable_get( :@bar ).should eql :BAR
-      end
-    end
+      shared_subject :_instance_methods_only_class do
 
-    context "`properties` (again) works like elsewhere, a flat list" do
+        class Intro_IM_Only
 
-      before :all do
-        class Y
-          Parent_subject_[].methodic self, :simple, :properties,
-            :properties, :One, :t_w_o, :three
+          include Subject_module_[]::Lib::Polymorphic_Processing_Instance_Methods
 
-        end
-      end
+        private
 
-      it "the remaining symbols in the input are each treated as 1 name" do
-        _i_a = Y.properties.get_names
-        _i_a.should eql [ :One, :t_w_o, :three ]
-      end
-    end
-
-    context "`properties` works even if you use keywords for names" do
-
-      before :all do
-        class Y_2
-          Parent_subject_[].methodic self, :simple, :properties,
-            :properties, :argument_artiy, :parameter_arity
-        end
-      end
-
-      it "ok" do
-        _i_a = Y_2.properties.get_names
-        _i_a.should eql [ :argument_artiy, :parameter_arity ]
-      end
-    end
-
-    context "you can use keywords as field names b.c of mandatory `property` keyword" do
-
-      before :all do
-        class Z
-          Parent_subject_[].methodic self, :simple, :properties,
-            :property, :wizzie,
-            :argument_arity, :zero, :property, :wazzie,
-            :argument_arity, :one, :property, :argument_arity
-        end
-      end
-
-      it "this future-proofs you from meta-properties you haven't written yet " do
-        _i_a = Z.properties.get_names
-        _i_a.should eql [ :wizzie, :wazzie, :argument_arity ]
-        _prop = Z.properties.fetch( :argument_arity )
-        _prop.argument_arity.should eql :one
-      end
-    end
-
-    context "with minimal (NOT simple) - bridging the inheritence divide" do
-
-      before :all do
-
-        module A_1
-          Parent_subject_[].methodic self, :properties, :property, :x
-        end
-
-        class A_2
-          include A_1
-          Enhance_for_test_[ self ]
-        end
-      end
-
-      it "a class can mix-in moodules which gives it the private foo= methods" do
-        a2 = A_2.new
-        a2.process_fully :x, :hi
-        a2.instance_variable_get( :@x ).should eql :hi
-      end
-    end
-
-    context "with `simple`, AMAZINGLY bridging the module inheritence half-works:" do
-
-      before :all do
-
-        module B_1
-          Parent_subject_[].methodic self, :simple, :properties, :property, :x
-        end
-
-        class B_2
-          include B_1
-          Enhance_for_test_[ self ]
-        end
-      end
-
-      it "just using it to parse instance iambic will work" do
-        b = B_2.new
-        b.process_fully :x, :y
-        b.instance_variable_get( :"@x" ).should eql :y
-      end
-
-      it "but it will bork if you try to do something that needs reflection" do
-        -> do
-          B_2.new do
-            nilify_uninitialized_ivars
+          def foo=
+            @foo = gets_one_polymorphic_value ; true
           end
-        end.should raise_error ::NoMethodError, %r(\Aundefined method `properties')
+
+          def bar=
+            @bar = gets_one_polymorphic_value ; true
+          end
+
+        public
+
+          attr_reader :foo, :bar
+
+          self
+        end
       end
+
+      shared_subject :_right_class do
+
+        class Intro_Right
+
+          Subject_proc_[].call self
+
+        private
+
+          def foo=
+            @foo = gets_one_polymorphic_value ; true
+          end
+
+          def bar=
+            @bar = gets_one_polymorphic_value ; true
+          end
+
+        public
+
+          attr_reader :foo, :bar
+
+          self
+        end
+      end
+
+      shared_subject :_hybrid_class do
+
+        class Intro_Hybrid
+
+          attrs = Subject_proc_[].call( self,
+            jiang: nil,
+            xiao: nil,
+            qing: nil,
+          )
+
+          attr_reader( * attrs.symbols )
+
+        private
+
+          def foo=
+            @foo = gets_one_polymorphic_value ; true
+          end
+
+          def bar=
+            @bar = gets_one_polymorphic_value ; true
+          end
+        public
+
+          def execute
+            [ :JIANG, @jiang, :BAR, @bar ]
+          end
+
+          attr_reader :foo, :bar
+
+          self
+        end
+      end
+
     end
-
-    context "with `simple` in a class chain, inheritence works as expected" do
-
-      before :all do
-
-        class C_1
-          Parent_subject_[].methodic self, :simple, :properties, :property, :x
-        end
-
-        class C_2 < C_1
-          Enhance_for_test_[ self ]
-        end
-      end
-
-      it "(in this context the child class adds nothing)" do
-        x = C_2.new
-        x.process_fully :x, :y
-        x.instance_variable_get( :"@x" ).should eql :y
-      end
-
-      it "things that require reflection also work" do
-        o = C_2.new do
-          nilify_uninitialized_ivars
-        end
-        o.instance_variable_defined?( :"@x" ).should eql true
-      end
-    end
-
-    context "add NEW properties to the child class" do
-
-      before :all do
-
-        class D_1
-          Parent_subject_[].methodic self, :simple, :properties, :property, :x
-        end
-
-        class D_2 < D_1
-          Parent_subject_[].methodic self, :simple, :properties, :property, :z
-          Enhance_for_test_[ self ]
-        end
-      end
-
-      it "(in this case the child class adds one property)" do
-        o = D_2.new
-        o.process_fully :x, :y, :z, :A
-        o.instance_variable_get( :"@x" ).should eql :y
-        o.instance_variable_get( :"@z" ).should eql :A
-      end
-
-      it "reflection works" do
-        D_2.properties.get_names.should eql [ :x, :z ]
-      end
-
-      it "so things that require reflection also work" do
-        o = D_2.new do
-          nilify_uninitialized_ivars
-        end
-        o.instance_variable_defined?( :"@x" ).should eql true
-        o.instance_variable_defined?( :"@z" ).should eql true
-      end
-    end
-
-    # it "if you try to re-open an existing property, for now it breaks"
-
-    # context "minimal methodic actor modules can mash up in big graphs"
-
   end
 end
+# #tombstone - `ignore` keyword
+# #tombstone - `properties` keyword

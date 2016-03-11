@@ -7,8 +7,11 @@ with modeling { properties | fields | attributes } of entity models.
 (but note currently one of the main such libraries lives in [br] under
 "entity".)
 
-currently its flagship contribution is the "external functions"
-described in [#010].
+currently its most significant facilities include:
+
+  • unofficial home of [#016] "actors" (still lives in [ca] for now)
+  • "attributes" (formerly "methodic actors")
+  • the "external functions" that reveal meta-data about associations.
 
 
 
@@ -20,8 +23,13 @@ created; *only* as an intermediate step to help gather many of them into
 one place ("pre-unification"), towards the effort of full unification.
 that is, just because [fi] is relatively modern in terms of when it was
 created as a sidesystem, this does *not* mean it contains the latest and
-greatest property modeling facilities. in fact, the opposite is true:
-at writing, [br] is that place, and subject has all the ancient stuff.
+greatest property modeling facilities.
+
+at the moment, the implementations for the actively-used concerns
+discussed here are in somewhat of a diaspora dispersed throughout here
+and [br] and [ca].  (often, the case is that this sidesystem has the
+most ancient implements, but we are trying to draw the more current ones
+in.)
 
 
 
@@ -30,17 +38,17 @@ at writing, [br] is that place, and subject has all the ancient stuff.
 
 first, a quick history (most recent at top):
 
-       [#013] parameters                                      2015-12-23
+       [#013] currently "attributes" (was: "parameters"..)    2015-12-23
 
     [#ac-001] the autonomous component system                 2015-04-23
 
-    [#cb-042] actors                                          2014-08-00
+       [#016] actors                                          2014-08-00
 
     [#br-001] the entity library                              2014-07-22
 
     [#gv-030] the isomorphic interface parameter              2014-01-20
 
-    [#cb-058] methodic actors                                 2013-12-19
+       [#013] methodic actors (assimilated to here from [ca]) 2013-12-19
 
     [#tm-081] the "config shell" (working title) (lost)       2013-10-11
 
@@ -175,7 +183,7 @@ as an afterthought for our interface specs.
 
 
 
-### [#cb-058] methodic actors (was "the headless API parameter library")
+### [#013] methodic actors (was "the headless API parameter library")
 
 this was a small, standalone, clean ground-up rewrite of a parameter library
 for the pursposes of this re-imagined headless API (it was abstracted out

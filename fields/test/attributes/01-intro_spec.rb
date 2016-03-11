@@ -2,35 +2,42 @@ require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] parameters" do
+  describe "[fi] attributes" do
 
     TS_[ self ]
     use :memoizer_methods
+    use :attributes
 
     context "five fields of [ `foo` | `flag` ][..]" do
 
-      shared_subject :_params do
+      given_the_attributes_ do
 
-        _subject[
+        attributes_(
           one: nil,
-          two: [ :foo, :flag ],
+          two: [ :_foo, :flag ],
           three: :flag,
-          four: :foo,
-          five: [ :zazzle, :optional ],
-        ]
+          four: :_foo,
+          five: [ :_zazzle, :optional ],
+        )
       end
 
       it "you can request those of a custom symbol" do
 
-        o = _params
-        o.symbols( :foo ).should eql %i( two four )
-        o.symbols( :zazzle ).should eql %i( five )
+        o = the_attributes_
+        o.symbols( :_foo ).should eql %i( two four )
+        o.symbols( :_zazzle ).should eql %i( five )
       end
 
       it "you can request those fields of no symbol" do
 
-        _ = _params.symbols
+        _ = the_attributes_.symbols
         _.should eql [ :one, :two, :three, :four, :five ]  # eek depends on hash order
+      end
+
+      it "`optionals_hash`" do
+        _ = the_attributes_
+        _h = _.optionals_hash
+        _h.should eql( five: true )
       end
 
       context "set ivar" do
@@ -40,7 +47,7 @@ module Skylab::Fields::TestSupport
           _x_a = [ :one, :ONE, :two, :three, :four, :FOUR ]
 
           o = ::Object.new
-          _params.init o, _x_a
+          the_attributes_.init o, _x_a
           a = []
           o.instance_exec do
             a.push @one, @two, @three, @four
@@ -68,10 +75,5 @@ module Skylab::Fields::TestSupport
         end
       end
     end
-
-    def _subject
-      Home_::Parameters
-    end
   end
 end
-# #pending-rename: branch down

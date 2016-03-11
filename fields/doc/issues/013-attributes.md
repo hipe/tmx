@@ -1,10 +1,55 @@
-# the methodic narrative :[#058]
+# the methodic narrative :[#013]
 
 
-## introduction by way of an explanation of the mechanics
+## new notes
 
-who cares about history. it's the hero we deserve, and the one we need
-right now.
+in the normalest case:
+
+  1) a next value (assumed) is read from the argument stream.
+
+  2) that value is written to the ivar derived from the attribute name.
+
+some regularly required variations on the above normal case are:
+
+  • the value might be arrived at through some other means.
+
+  • the ivar might be some ivar other than the one that is derived
+    from the attribute name.
+
+  • the value that would have normally been used might be mapped in
+    some arbitrary way.
+
+  • it may be that (in conjunction with some of the operations above)
+    another formal attribute should be used to fulfill some remainder
+    of the interpretation operation.
+
+examples (in alpha):
+
+  • `component` is an ad-hoc, particular way to arrive at a value.
+    to implement it will require aspects of the interpretation runtime.
+
+  • a `custom_interpreter_method` is a full replacement for the entire process
+    of interpreting the attribute value. it asssumes that some one-time
+    preparations have been done on the "session".
+
+  • a `flag` is an interpretation where the value to be used is `true`.
+
+  • `flag_of` is to say "use this other formal attribute" but give it
+    a value of `true`.
+
+  • `ivar` indicates a non-normal ivar name to use.
+
+  • `known_known` wraps the value that would have been used
+
+  • (`optional` is out of this scope)
+
+  • `singular_of` is a value map plus a formal-attribute swap.
+
+
+
+
+
+## introduction to the legacy "iambic writers"
 
 the simplest iambic parsing mechanism we have yet come up with to allow
 for writing arbitrary methods to parse arbitrary symbols is this: at
@@ -43,22 +88,3 @@ requireds), but the alternative (so far) has been the bloated and obtuse
 hand-writing these 20 lines each time may just be worth the cost savings.
 
 also we could just push this method itself upwards..
-
-
-
-
-## experimental extension to the "simple" iambic parsing (:#note-650)
-
-for this extension here, rather than checking for the existence of
-private methods that end in `=` at parse time, we cache these name
-mappings at code file load time, which a) will perhaps speed things up
-for certain of our parsing use-cases and b) allow us to edit this cache
-itself to reduce or modify syntax from that which is defined by those
-"magic methods" that are private and end in `=`.
-
-to do this the syntax must reside in classes and not just (as with
-upstream library) modules, because from the instance methods, the
-memoization container must be reachable, which in this case is the ivar
-namespace of the class. this is why we have decided to keep this
-extension out of the out of the box extension panoply, because while
-this mechanism here may be more efficient, is decidedly no longer simple.

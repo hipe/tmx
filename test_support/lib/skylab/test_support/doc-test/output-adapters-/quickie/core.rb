@@ -6,26 +6,23 @@ module Skylab::TestSupport
 
       include Lazy_Selective_Event_Methods_
 
-      class << self
-
-        def output_adapter is_known_dry, & oes_p  # #hook-out
-          new do
-            @is_known_dry = is_known_dry  # cosmetic only!
-            @on_event_selectively = oes_p
-          end
-        end
-
-        private :new
-      end
-
       Attributes_actor_.call( self,
-        arbitrary_proc_array: :custom_writer,
+        arbitrary_proc_array: :custom_interpreter_method,
         business_module_name: nil,
         line_downstream: nil,
         node_upstream: nil,
         on_shared_resources_created: nil,
-        property: :shared_resources,
+        shared_resources: nil,
       )
+
+      class << self
+
+        def output_adapter is_known_dry, & oes_p  # #hook-out
+          new.__init is_known_dry, & oes_p
+        end
+
+        private :new
+      end  # >>
 
       def initialize
         @arbitrary_proc_array = nil
@@ -35,7 +32,14 @@ module Skylab::TestSupport
         @subsystem_index = 1
         @num_subsystem_parts = @subsystem_index + 1
         @template_var_bx = nil
-        super
+      end
+
+      def __init x, & oes_p
+        @is_known_dry = x  # cosmetic only!
+        if oes_p
+          @on_event_selectively = oes_p
+        end
+        self
       end
 
       def initialize_copy _

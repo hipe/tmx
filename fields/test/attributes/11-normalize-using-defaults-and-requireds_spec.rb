@@ -1,52 +1,49 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Actor::Methodic::PR
+module Skylab::Fields::TestSupport
 
-  Parent_TS_ = Skylab::Callback::TestSupport::Actor::Methodic
+  TS_.require_ :attributes   # #[#017]
 
-  Parent_TS_[ self ]
+  module Attributes
 
-  include Constants
+    TS_.describe "[fi] attributes - normailze using defaults & requireds" do
 
-  extend TestSupport_::Quickie
+      TS_[ self ]
+      use :memoizer_methods
 
-  Grandparent_Subject_ = Parent_TS_::Parent_subject_
+      context "(those that are not optional are required.)" do
 
-  describe "[ca] actor - methodic - property reflection" do
+        shared_subject :_guy do
+          class XNuDR_A
 
-    context "two unadorned monadic properties" do
+            ATTRIBUTES = Subject_module_[].call(
+              alpha: :optional,
+              beta: nil,
+              gamma: :optional,
+              delta: nil,
+            )
 
-      before :all do
+            attr_writer( * ATTRIBUTES.symbols )
 
-        class A
-          Grandparent_Subject_[].methodic self, :simple, :properties,
-            :properties, :one, :two
+            self
+          end
+        end
+
+        it "raises argument error" do
+          _msg = "missing required properties 'beta' and 'delta'"
+
+          o = _guy.new
+          begin
+            _subject[ o ]
+          rescue ::ArgumentError => e
+          end
+
+          e.message.should eql _msg
         end
       end
 
-      it "loads" do
-      end
-
-      it "`<actor>.properties.fetch` with a symbol name, against a good name" do
-        prop = A.properties.fetch :two
-        prop.name_symbol.should eql :two
-      end
-
-      it "with an else block has no effect, same result as above" do
-        prop = A.properties.fetch :one do :_no_see_ end
-        prop.name_symbol.should eql :one
-      end
-
-      it "fetch nonexistent term without an else block - key error" do
-        _rx = %r(\Akey not found: :three\b)
-        -> do
-          A.properties.fetch :three
-        end.should raise_error ::KeyError, _rx
-      end
-
-      it "fetch a nonexistent term with an else block - your block is called" do
-        prop = A.properties.fetch :four do :_see_ end
-        prop.should eql :_see_
+      def _subject
+        Subject_module_[]::Normalize_using_defaults_and_requireds
       end
     end
   end

@@ -47,41 +47,44 @@ module Skylab::Basic
       )
     end
 
-    # <-
+    class LineFlusher < ::Enumerator::Yielder
 
-  class Counting < ::Enumerator::Yielder
+      class << self
+        alias_method :[], :new
+        private :new
+      end  # >>
 
-    # do what ::Enumerator::Yielder does but maintain an internal count of
-    # how many times either `<<` or `yield` was called.
+      def initialize y, & p
 
-    def initialize
-      super
-      @count = 0
+        scn = Home_.lib_.empty_string_scanner
+        buffer = scn.string
+
+        super() do |s|
+          buffer.concat s
+          begin
+            line = scn.scan RX___
+            line or break
+            y << line
+            redo
+          end while nil
+        end
+
+        @__flush = -> do
+          s = scn.rest
+          if s.length.nonzero?
+            y << s
+          end
+          buffer = nil ; scn = nil
+          y
+        end
+      end
+
+      RX___ = /[^\r\n]*(?:\r?\n|\r)/
+
+      def flush
+        @__flush[]
+      end
     end
-
-    attr_reader :count  # after above
-
-    i_a = %i| yield << |
-    i_a_ = ancestors[ 1 ].public_instance_methods( false )
-
-    i_a != i_a_ and fail "greetings from the past - please update me to #{
-      }accomodate these new Yielder methods - #{ ( i_a_ - i_a ).inspect }"
-
-    # LOOK we write the below literally just for whatever, readability,
-    # but be careful! the below should parallel i_a above
-
-    def yield( * )
-      @count += 1
-      super
-    end
-
-    def <<( * )
-      @count += 1
-      super
-    end
-  end
-
-  # ->
 
     class Byte_Downstream_Identifier  # :+[#br-019.D]
 

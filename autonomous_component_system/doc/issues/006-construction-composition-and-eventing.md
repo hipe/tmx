@@ -232,13 +232,3 @@ or to serialize.
 ### `event_and_mutated`
 
 (experimental, in [mt])
-
-
-
-
-## universal trackings
-
-### :#VP (1x)
-
-this tag tracks the various similar (but never the same) implementations
-of something like a polymorphic stream for one value.

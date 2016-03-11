@@ -46,7 +46,7 @@ module Skylab::Callback
     end
   end  # >>
 
-  module Actor  # see [#042] the actor narrative
+  module Actor  # see [#fi-016] the actor narrative
 
     class Dyadic
       class << self
@@ -78,10 +78,6 @@ module Skylab::Callback
 
       def call cls, * i_a
         edit_module_via_mutable_iambic cls, i_a
-      end
-
-      def methodic cls, * i_a
-        Actor::Methodic.edit_module_via_iambic cls, i_a
       end
 
       def edit_module_via_mutable_iambic cls, i_a
@@ -392,6 +388,14 @@ module Skylab::Callback
       @h[ k ] = x ; nil
     end
 
+    def touch_array_and_push k, x
+      touch_array( k ).push x ; nil
+    end
+
+    def touch_array k
+      touch( k ) { [] }
+    end
+
     def touch k, & p
       @h.fetch k do
         @a.push k
@@ -564,7 +568,7 @@ module Skylab::Callback
     end
   end
 
-  class Polymorphic_Stream  # :[#046]
+  class Polymorphic_Stream  # see [#046]
 
     class << self
 
@@ -634,11 +638,11 @@ module Skylab::Callback
 
     def gets_last_one
       x = gets_one
-      assert_emtpy
+      assert_empty
       x
     end
 
-    def assert_emtpy
+    def assert_empty
       if unparsed_exists
         raise ::ArgumentError, ___say_unexpected
       end
@@ -697,7 +701,7 @@ module Skylab::Callback
 
     # ~ hax (for "collaborators")
 
-    # ~~ experimental "from end" parsing for [#cb-047]
+    # ~~ experimental "from end" parsing for [#hu-053]
 
     def random_access_ d  # negative only for now
       if d < 0
@@ -734,7 +738,7 @@ module Skylab::Callback
 
   # knownnesses (see [#004])
 
-  module KNOWN_UNKNOWN ; class << self
+  class Known_Unknown
 
     def to_qualified_known_around asc
       Qualified_Knownness.via_association asc
@@ -748,6 +752,10 @@ module Skylab::Callback
       Known_Known[ x ]
     end
 
+    attr_reader(
+      :reason_object,
+    )
+
     def is_effectively_known
       false
     end
@@ -759,8 +767,9 @@ module Skylab::Callback
     def is_qualified
       false
     end
+  end
 
-  end ; end
+  KNOWN_UNKNOWN = Known_Unknown.new
 
   class Known_Known
 
@@ -791,6 +800,10 @@ module Skylab::Callback
     end
 
     attr_reader :value_x
+
+    def reason_object
+      NIL_  # NOTHING_
+    end
 
     def is_known_known
       true

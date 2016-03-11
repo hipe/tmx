@@ -13,28 +13,38 @@ module Skylab::Fields::TestSupport
 
   extend TestSupport_::Quickie
 
+  -> do
+
+    cache = {}
+
+    lookup = -> k do
+
+      const = Callback_::Name.via_variegated_symbol( k ).as_const
+
+      if TS_.const_defined? const, false
+        TS_.const_get const
+      else
+        TestSupport_.fancy_lookup k, TS_
+      end
+    end
+
+    define_singleton_method :require_ do |k|
+      cache.fetch k do
+        x = lookup[ k ]
+        cache[ k ] = x
+        x
+      end
+    end
+
+  end.call
+
+  Use_method__ = -> k do
+    TS_.require_( k )[ self ]
+  end
+
   module ModuleMethods
 
-    define_method :use, -> do
-
-      cache_h = {}
-
-      -> sym do
-
-        ( cache_h.fetch sym do
-
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
-
-          x = if TS_.const_defined? const, false
-            TS_.const_get( const )
-          else
-            TestSupport_.fancy_lookup sym, TS_
-          end
-          cache_h[ sym ] = x
-          x
-        end )[ self ]
-      end
-    end.call
+    define_method :use, Use_method__
 
     def subject & p
       memoize_ :subject, & p
@@ -71,6 +81,10 @@ module Skylab::Fields::TestSupport
     end
   end
 
+  Home_ = ::Skylab::Fields
+
+  Callback_ = Home_::Callback_
+
   Expect_Event = -> tcm do
 
     Callback_.test_support::Expect_Event[ tcm ]
@@ -81,9 +95,7 @@ module Skylab::Fields::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  Home_ = ::Skylab::Fields
-
-  Callback_ = Home_::Callback_
+  Lazy_ = Home_::Lazy_
   NIL_ = nil
 end
 

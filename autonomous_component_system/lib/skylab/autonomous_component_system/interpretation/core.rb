@@ -54,42 +54,6 @@ module Skylab::Autonomous_Component_System
       m
     end
 
-    class Value_Popper  # 2x here 3-N [ze] [#006]#VP
-
-      class << self
-        alias_method :[], :new
-        private :new
-      end  # >>
-
-      def initialize x
-        @_done = false
-        @_kn = Callback_::Known_Known[ x ]
-      end
-
-      def gets_one
-        x = current_token
-        advance_one
-        x
-      end
-
-      def current_token
-        @_kn.value_x
-      end
-
-      def advance_one
-        remove_instance_variable :@_kn
-        @_done = true ; nil
-      end
-
-      def unparsed_exists
-        ! @_done
-      end
-
-      def no_unparsed_exists
-        @_done
-      end
-    end
-
     IDENTITY_ = -> x { x }
   end
 end

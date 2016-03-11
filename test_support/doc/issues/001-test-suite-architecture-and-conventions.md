@@ -58,6 +58,12 @@ negligible impact on the clients of the test support nodes.
 
 
 
+### but sometimes you want sandbox modules..  :[#048]
+
+(this is only being tracked for now. later we may explain it..)
+
+
+
 
 ## numbering test files [#.C], and regressability in general
 

@@ -1,28 +1,26 @@
 require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::Yielder
+module Skylab::Basic::TestSupport
 
-  ::Skylab::Basic::TestSupport[ self ]
+  describe "[ba] yielder - line flusher" do
 
-  include Constants
+    it "x." do
 
-  extend TestSupport_::Quickie
+      a = []
+      y = _subject[ a ]
 
-  describe "[ba] yielder counting" do
+      y << "one"
+      y << "two\nthr"
 
-    it "counts" do
-      yes = nil
-      y = Home_::Yielder::Counting.new do |msg|
-        yes = msg
-      end
+      a.should eql [ "onetwo\n" ]
 
-      y.count.should eql( 0 )
-      y << "hi"
-      y.count.should eql( 1 )
-      yes.should eql( 'hi' )
-      y.yield 'a', 'b', 'c'
-      yes.should eql( 'a' )  # LOOK fun fact
-      y.count.should eql( 2 )
+      y << "ee"
+
+      _hi = y.flush
+    end
+
+    def _subject
+      Home_::Yielder::LineFlusher
     end
   end
 end
