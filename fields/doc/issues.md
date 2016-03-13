@@ -1,3 +1,5 @@
+[#026] #open struct vs. actor - one is cold one is hot
+
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."
 
 [#023]       #wish - when the time comes - track inheritence merging
@@ -39,17 +41,41 @@
 
 
 [#016]       [ actor ]  (will move from [ca])
+
 [#015]       track assimiliation targets "missing"
+
 [#014]       "the arity exegesis .." (:"parameter arity" & :"argument arity")
-[#013]       p8r
-[#012]       #done redesign this `with_client` nonsense
+
+[#013]       the unification of methodic actors into (here) "attributes"
+
+[#012]       now the "normal normalization" algorithm (and its variants)..
+
+             (from the original [sl] description:)
+             this tag tracks code instances of the general algorithm
+             (and variant algorithms towards the same end) of
+             implementing behavior that implements the validation &
+             normalization of actual
+             { arguments | attributes | parameters | properties };
+             #normalization #algorithm
+
+             ( #was: #done redesign this `with_client` nonsense )
+
 [#010]       the external functions experiment ..
-[#009]       transplant "parameters" from [hl]
+
+[#009]       meta-attributes ..
+             ( #was: transplant "parameters" from [hl] )
+
 [#008]       #in-situ [ the absorber method maker ]
+
 [#007]       [ SESSION PATTERN ]
-[#006]       for retrospective ..
+
+[#006]       old reference code from [ta] for for retrospective ..
+
 [#005]       [ from ]
+
 [#004]       [ basic fields ]
-[#003]       the declared fields narrative ..
+
+[#003]       the declared fields narrative .. (this will assimilate to [#013])
+
 [#002]       the attribute narrative ..
 [#001]       discussion of all the property libs ..

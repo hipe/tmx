@@ -42,7 +42,7 @@ the work.
 (do NOT erase this whole hog! the theory it brings up is important.)
 
 we don't call this step `normalize` (despite the strong gravity from
-the [#br-087] normal normalizer) because (quite interestingly) under the
+the [#fi-012] normal normalizer) because (quite interestingly) under the
 ACS it is perhaps meaningless to speak of a "normalizer" in the old
 sense. or more accurately, the scope of responsibility for a
 normalization step is smaller under ACS:

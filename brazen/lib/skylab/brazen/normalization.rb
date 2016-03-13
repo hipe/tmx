@@ -1,8 +1,8 @@
 module Skylab::Brazen
 
-  module Home_::Normalization  # see [#087]
+  module Home_::Normalization  # see #[#fi-012]
 
-    Against_model_stream = -> entity_x, formal_prp_st, & oes_p do  # see [#087]
+    Against_model_stream = -> entity_x, formal_prp_st, & oes_p do
 
       miss_prp_a = nil
 
@@ -73,7 +73,7 @@ module Skylab::Brazen
       end
     end
 
-    class Build_Knownness_Normalizer__  # #[#087].
+    class Build_Knownness_Normalizer__
 
       attr_writer(
         :apply_default,

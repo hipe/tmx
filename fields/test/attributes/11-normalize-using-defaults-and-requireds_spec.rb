@@ -30,7 +30,7 @@ module Skylab::Fields::TestSupport
         end
 
         it "raises argument error" do
-          _msg = "missing required properties 'beta' and 'delta'"
+          _msg = "missing required attributes 'beta' and 'delta'"
 
           o = _guy.new
           begin
@@ -43,7 +43,7 @@ module Skylab::Fields::TestSupport
       end
 
       def _subject
-        Subject_module_[]::Normalize_using_defaults_and_requireds
+        Subject_module_[]::Lib::Normalize_using_defaults_and_requireds
       end
     end
   end

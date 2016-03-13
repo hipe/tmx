@@ -31,6 +31,11 @@ module Skylab::Autonomous_Component_System
 
       def to_defined_formal_parameter_stream_to_be_cached_
 
+        self._TODO_easy_during_integration_README___
+
+        # none of this is necessary anymore: [fi] formal attributes
+        # look like this natively now..
+
         foz = @__formals
         op_h = foz.optionals_hash
         op_h ||= MONADIC_EMPTINESS_

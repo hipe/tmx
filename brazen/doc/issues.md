@@ -49,7 +49,10 @@
 [#089] #hole ( #was: unify with [#hu-043]  (unify contextualization) )
              ( became the ACS )
 [#088]       the meta-meta-properties justification ..
-[#087]       #track similar normalization logics
+
+[#087] #hole ( #moved-to: [#fi-012] )
+             ( #was: #track similar normalization logics )
+
 [#086]       #track cases where failure is "fuzzy" (i.e non-atomic),
                ignored for the greater good, for usability
 [#085] #hole (#was: (#moved-to: [#ba-052]))

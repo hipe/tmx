@@ -20,8 +20,8 @@ module Skylab::TanMan
     meta_attribute :default
   end
 
-  module Core::MetaAttributes::Default::InstanceMethods
-                                  # also we are calling this [#sl-116] ..
+  module Core::MetaAttributes::Default::InstanceMethods  # ~#[#fi-012]
+
     def set_defaults_if_nil!      # #pattern [#sl-117] (prev is [#bs-010])
       attrs = attribute_definer.attributes.each.select do |k, attr|
         attr.has? :default
@@ -112,8 +112,8 @@ module Skylab::TanMan
     meta_attribute :required
   end
 
-  module Core::MetaAttributes::Required::InstanceMethods
-                                  # (these are tracked with [#sl-116] maybe..)
+  module Core::MetaAttributes::Required::InstanceMethods  # ~#[#fi-012]
+
     def required_ok?
       a = attribute_definer.attributes.each.reduce( [] ) do |m, (k, v)|
         if v.has? :required and v[:required] and send( k ).nil?

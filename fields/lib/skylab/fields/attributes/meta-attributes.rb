@@ -99,6 +99,18 @@ module Skylab::Fields
         "expected #{ ACHIEVED_ } had #{ Home_.lib_.basic::String.via_mixed x }"
       end
 
+      def default
+
+        x = @_.sexp_stream_for_current_attribute.gets_one
+        if x.nil?
+          self._COVER_ME_dont_use_nil_use_optional
+        end
+
+        @_.current_attribute.be_defaultant_by_value__ x
+
+        @_.add_to_static_index_ :effectively_defaultants ; nil
+      end
+
       def flag
         @_.current_attribute.read_by do
           true
@@ -181,7 +193,9 @@ module Skylab::Fields
       end
 
       def optional
-        @_.add_to_static_index__ :optionals ; nil
+
+        @_.current_attribute.be_optional__
+        @_.add_to_static_index_ :effectively_defaultants ; nil
       end
 
       def singular_of
@@ -615,34 +629,6 @@ module Skylab::Fields
         @normal_iambic.push :reader
         true
       end
-    end
-
-    ## ~~ default: needs special processing by client
-
-    attr_reader :has_default
-    alias_method :has_default?, :has_default  # #todo
-
-    def default_value  # the one reader
-      @_default_proc.call
-    end
-
-    def when__default__  # when set by iambic
-      x = @_polymorphic_upstream_.gets_one
-      _accept_default_by do
-        x
-      end
-      KEEP_PARSING_
-    end
-
-    def default & p  # when set by definition block (only way to write proc)
-      _accept_default_by( & p )
-    end
-
-    def _accept_default_by & p
-      @normal_iambic.push :default_proc, p
-      @has_default = true
-      @_default_proc = p
-      NIL_
     end
 
     ## ~~ builder: a reader that initializes with a proc (named thru reader)

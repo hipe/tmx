@@ -6,7 +6,7 @@ module Skylab::Fields::TestSupport
 
   module Attributes::Actor
 
-    TS_.describe "[fi] attributes - actor" do
+    TS_.describe "[fi] attributes - actor - intro" do
 
       TS_[ self ]
       use :memoizer_methods

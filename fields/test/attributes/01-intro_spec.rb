@@ -34,12 +34,6 @@ module Skylab::Fields::TestSupport
         _.should eql [ :one, :two, :three, :four, :five ]  # eek depends on hash order
       end
 
-      it "`optionals_hash`" do
-        _ = the_attributes_
-        _h = _.optionals_hash
-        _h.should eql( five: true )
-      end
-
       context "set ivar" do
 
         shared_subject :_state do

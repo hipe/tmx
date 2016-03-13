@@ -66,14 +66,9 @@
 [#118]       #track everywhere that you determine sidesystem composition
              ( #was: unify find command in multiple places (moved to [#sy-016]))
 [#117]       #pattern of defaults (if not nil, etc) (near [#116])
-[#116]       this tag tracks code instances of the general algorithm
-             (and variant algorithms towards the same end) of
-             implementing behavior that implements the validation &
-             normalization of actual
-             { arguments | attributes | parameters | properties };
-             at various ancient times called `set!`, `update_attributes!`,
-             and at one time setting an `@error_count`)
-             #normalization #algorithm
+
+[#116] #hole ( #moved-to: [#fi-012]. #was: normal normalization )
+
 [#115]       #pattern of functionalizing things
 [#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
 [#113]       #pattern of PIE standard

@@ -62,9 +62,9 @@ assimilated.
 
     [#ba-003] the basic field                                 2013-04-11 WIP <-
 
-       [#009] the headless parameter                          2012-08-29 WIP <-
+       [#009] the headless parameter (assim'd into [#002]     2012-08-29 WIP <-
 
-       [#002] the metahell formal attributes                  2011-09-11 WAS <=
+       [#002] metahell formal attributed (assim'd to here)    2011-09-11 WAS <=
 
 
 ### the unification plan

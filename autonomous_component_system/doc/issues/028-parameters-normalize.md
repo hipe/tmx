@@ -3,7 +3,7 @@
 
 ## overview
 
-yet another #[#br-087]. (but of course this one is the best yet.)
+yet another #[#fi-012]. (but of course this one is the best yet.)
 
   • check for missing requireds
   • defaulting
@@ -112,7 +112,8 @@ the parameter value source is not known to be empty.
 
 ## improved distillation
 
-this is perhaps an improved distillation of [#br-087]:
+this is perhaps an improved distillation of the algorithm referenced in
+the introduction:
 
 in the defined ("formal") order (:A), for each formal parameter:
 

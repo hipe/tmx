@@ -1,3 +1,5 @@
+[#049] #open change `state_` to something more appropriate in expect event
+
 [#048]       described in [#001], this tracks "sandbox" module implementations
 
 [#047] #open subscribers to quickie ever supporting a negate operator

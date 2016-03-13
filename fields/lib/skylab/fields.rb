@@ -40,31 +40,32 @@ module Skylab::Fields
     )
 
     def init o, x_a
-      ( @index_ ||= index_ ).init__ o, x_a
-    end
-
-    def optionals_hash
-      ( @index_ ||= index_ ).optionals_hash__
+      _index.init__ o, x_a
     end
 
     def define_methods mod
-      ( @index_ ||= index_ ).define_methods__ mod
+      _index.define_methods__ mod
     end
 
     def symbols * sym
       if sym.length.zero?
         @_h.keys
       else
-        ( @index_ ||= index_ ).lookup_particular__( * sym )
+        _index.lookup_particular__( * sym )
       end
     end
 
     def to_defined_attribute_stream
-      ( @index_ ||= index_ ).to_defined_attribute_stream__
+      _index.to_defined_attribute_stream__
     end
 
-    def index_
+    def _index
+      @___index ||= ___build_index
+    end
 
+    alias_method :index_, :_index
+
+    def ___build_index
       Here_::Lib::Index_of_Definition___.new( @_h,
         ( @meta_attributes || Here_::MetaAttributes ),
         ( @attribute_class || Here_::Lib::DefinedAttribute ),
@@ -110,11 +111,11 @@ module Skylab::Fields
           end
         end
 
-        def new_with * x_a, & x_p  # 6
+        def new_with * x_a, & x_p
           new_via_iambic x_a, & x_p
         end
 
-        def new_via_iambic x_a, & x_p  # 7
+        def new_via_iambic x_a, & x_p
 
           _st = Callback_::Polymorphic_Stream.via_array x_a
           New_via__[ :process_polymorphic_stream_fully, _st, self, & x_p ]
@@ -124,7 +125,7 @@ module Skylab::Fields
           New_via__[ :process_polymorphic_stream_fully, st, self, & x_p ]
         end
 
-        def new_via_polymorphic_stream_passively st, & x_p  # 9
+        def new_via_polymorphic_stream_passively st, & x_p
           New_via__[ :process_polymorphic_stream_passively, st, self, & x_p ]
         end
 
@@ -133,10 +134,10 @@ module Skylab::Fields
         end
       end
 
-      New_via__ = -> m, st, cls, & x_p do
+      New_via__ = -> m, st, cls, & x_p do  # near #open [#026]
 
-        sess = cls.send :new, & x_p
-        kp = sess.send m, st
+        sess = cls.send :new
+        kp = sess.send m, st, & x_p
         if kp
           sess
         else
@@ -159,17 +160,14 @@ module Skylab::Fields
 
       private
 
-        # 2
         def process_iambic_fully x_a
           process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
         end
 
-        # 3
         def polymorphic_stream_via_iambic x_a
           Callback_::Polymorphic_Stream.via_array x_a
         end
 
-        # 4
         def process_polymorphic_stream_fully st, & x_p
           kp = process_polymorphic_stream_passively st, & x_p
           if kp
@@ -185,7 +183,6 @@ module Skylab::Fields
           end
         end
 
-        # 6
         def process_polymorphic_stream_passively st, & x_p
 
           cls = self.class
@@ -199,7 +196,6 @@ module Skylab::Fields
             & x_p )
         end
 
-        # 9
         def gets_one_polymorphic_value  # #public-API #hook-in
           @_polymorphic_upstream_.gets_one
         end
@@ -208,18 +204,15 @@ module Skylab::Fields
           @_polymorphic_upstream_
         end
 
-        # 10
         def polymorphic_writer_method_name_passive_lookup_proc  # #public-API #hook-in
           Here_::Lib::Writer_method_reader___[ self.class ]
         end
 
-        # 11
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
           _ev = Home_::Events::Extra.via_strange stream.current_token
           receive_extra_values_event _ev
         end  # :#spot-1
 
-        # 14
         def receive_extra_values_event ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception
         end

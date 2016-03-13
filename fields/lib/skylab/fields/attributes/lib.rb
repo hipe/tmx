@@ -4,6 +4,10 @@ module Skylab::Fields
 
     module Lib
 
+      Normalize_using_defaults_and_requireds = -> sess do
+        Here_::Normalization::Normalize_using_defaults_and_requireds[ sess ]
+      end
+
       Polymorphic_Processing_Instance_Methods = Here_::Actor::InstanceMethods
 
       class Index_of_Definition___
@@ -15,7 +19,7 @@ module Skylab::Fields
           h = {}
           unparsed_h.each_pair do |k, x|
 
-            h[ k ] = ab.__build_attribute k, x
+            h[ k ] = ab.__build_and_index_attribute k, x
           end
 
           @_custom_index = ab.__release_thing_ding_one
@@ -31,13 +35,6 @@ module Skylab::Fields
         end
 
         # --
-
-        def optionals_hash__
-          si = @_static_index
-          if si
-            si.optionals
-          end
-        end
 
         def define_methods__ mod
 
@@ -71,6 +68,9 @@ module Skylab::Fields
           @_h.fetch k
         end
 
+        def lookup_attribute_proc_
+          @_h.method :fetch
+        end
 
         # --
 
@@ -89,7 +89,7 @@ module Skylab::Fields
           _idx = formals.index_
         end
 
-        o = Parse__.new sess, _idx
+        o = Parse__.new sess, _idx, & x_p
 
         o.argument_stream = st
 
@@ -124,10 +124,12 @@ module Skylab::Fields
 
       class Parse__
 
-        def initialize sess, index
-          @index = index  # can be nil
-          @session = sess
+        def initialize sess, index, & oes_p
+
           @_formal_reader_stack = []
+          @index = index  # can be nil
+          @_oes_p = oes_p  # can be nil
+          @session = sess
         end
 
         def __push_formal_reader_by & p
@@ -154,7 +156,7 @@ module Skylab::Fields
 
         def execute
 
-          __given_any_definitions_index_push_to_stack_and_see_optionals
+          __given_any_static_indexes_do_ZA_ZA
 
           __init_the_normalize_and_see_formal_attribute_procs
 
@@ -176,8 +178,8 @@ module Skylab::Fields
             break
           end
 
-          if kp && @_normalize
-            instance_exec( & @_normalize )
+          if kp && @_normalize_method
+            kp = send @_normalize_method
           end
 
           kp
@@ -199,14 +201,15 @@ module Skylab::Fields
           raise _ev.to_exception
         end
 
-        def __given_any_definitions_index_push_to_stack_and_see_optionals
+        def __given_any_static_indexes_do_ZA_ZA
 
           idx = @index
           if idx
 
-            idxs = idx._static_index
-            if idxs
-              opts = idxs.optionals
+            sidx = idx._static_index
+            loo_loo = sidx.effectively_defaultants
+            if loo_loo  # [#012] #spot-2
+              yes = true
             end
 
             atr_h = idx._h
@@ -216,38 +219,32 @@ module Skylab::Fields
             end )
           end
 
-          @_optionals = opts
+          @_yes = yes
           NIL_
         end
 
         def __init_the_normalize_and_see_formal_attribute_procs
 
-          opts = remove_instance_variable :@_optionals
-          if opts
-            ___init_the_etc_when_opts opts
-          else
-            @_normalize = nil
-            @_see_formal_attribute = @argument_stream.method :advance_one
+          if @_yes  # for now..
+            m = :___do_normalize
           end
+
+          @_normalize_method = m
+          @_see_formal_attribute = @argument_stream.method :advance_one  # ..
           NIL_
         end
 
-        def ___init_the_etc_when_opts opts
+        def ___do_normalize
 
-          # we nilify IFF you had optionals AND we're in `fully` mode..
+          o = Here_::Normalization.begin( & @_oes_p )
 
-          pool = opts.dup
-          st = @argument_stream
+          sidx = @index._static_index
+          o.effectively_defaultants = sidx.effectively_defaultants
+          o.lookup = @index.lookup_attribute_proc_
+          o.requireds = sidx.requireds
+          o.store = @session
 
-          @_normalize = Nilify___[ pool ]
-
-          @_see_formal_attribute = -> do
-            pool.delete @_attribute.name_symbol
-            st.advance_one
-            NIL_
-          end
-
-          NIL_
+          o.execute
         end
 
         def __formal_attribute_reader
@@ -301,41 +298,35 @@ module Skylab::Fields
         )
       end
 
-      Nilify___ = -> pool do
-        -> do
-          pool.keys.each do |k|
-            ivar = @index._lookup_attribute( k ).as_ivar
-            if ! @session.instance_variable_defined? ivar
-              @session.instance_variable_set ivar, nil
-            end
-          end
-          KEEP_PARSING_
-        end
-      end
-
       class Build_Index_of_Definition___
 
         def initialize ma_cls, atr_cls
 
           @_attribute_class = atr_cls
           @_custom_index = nil
-          @_static_index = nil
           @_meta_attributes_class = ma_cls
           @_process_meta_attribute = __process_meta_attribute
+          @_static_index = Static_Index___.new
         end
 
-        def __build_attribute k, x
+        def __build_and_index_attribute k, x
+
+          @_current_attribute_name_symbol = k
 
           @_attribute_class.new k do |atr|
-            x and ___edit_attribute atr, x, k
+
+            x and ___edit_attribute atr, x
+
+            if ! atr.parameter_arity
+              add_to_static_index_ :requireds
+            end
             NIL_
           end
         end
 
-        def ___edit_attribute atr, x, k
+        def ___edit_attribute atr, x
 
           @_current_attribute = atr
-          @_current_attribute_name_symbol = k
 
           _a = ::Array.try_convert( x ) || [ x ]
           st = Callback_::Polymorphic_Stream.via_array _a
@@ -366,7 +357,7 @@ module Skylab::Fields
               NIL_
             else
               SANITY_RX___ =~ k or self._SANITY
-              ___add_to_custom_index k
+              __add_to_custom_index k
               NIL_
             end
           end
@@ -377,37 +368,44 @@ module Skylab::Fields
 
         def add_methods_definer_by & atr_p
 
-          __touchpush_to_static_index :method_definers
+          add_to_static_index_ :method_definers
 
           @_current_attribute.__add_methods_definer atr_p ; nil
         end
 
-        def ___add_to_custom_index meta_k
+        def __add_to_custom_index meta_k
 
           _idx = ( @_custom_index ||= {} )
           _a = _idx[ meta_k ] ||= []
           _a.push @_current_attribute_name_symbol ; nil
         end
 
-        def __touchpush_to_static_index meta_k
+        def add_to_static_index_ meta_k
 
-          _idx = _static_index
-          _bx = _idx[ meta_k ] ||= Callback_::Box.new
-          _bx.touch @_current_attribute_name_symbol do NOTHING_ end ; nil
+          send These___.fetch( meta_k ), meta_k
         end
 
-        def add_to_static_index__ meta_k
+        Static_Index___ = ::Struct.new(
+          :effectively_defaultants, :method_definers, :requireds )
 
-          _idx = _static_index
-          _h = ( _idx[ meta_k ] ||= {} )
-          _h[ @_current_attribute_name_symbol ] = true ; nil
+        These___ = {
+          effectively_defaultants: :_la_la_array,
+          method_definers: :__la_la_box,
+          requireds: :_la_la_array,
+        }
+
+        def _la_la_array meta_k
+
+          ( @_static_index[ meta_k ] ||= [] ).
+            push @_current_attribute_name_symbol ;
+          NIL_
         end
 
-        def _static_index
-          @_static_index ||= Static_Index___.new
-        end
+        def __la_la_box meta_k
 
-        Static_Index___ = ::Struct.new :method_definers, :optionals
+          ( @_static_index[ meta_k ] ||= Callback_::Box.new ).
+            add @_current_attribute_name_symbol, nil
+        end
 
         def current_attribute
           @_current_attribute
@@ -452,13 +450,14 @@ module Skylab::Fields
 
         def initialize k, & edit_p
 
+          @_parameter_arity_canary = nil
           @_pending_meths_definers = nil
 
-          @_read_m = :__receive_first_read_proc
           @_RW_m = :__receive_first_read_and_write_proc
-          @_write_m = :__receive_first_write_proc
-          @_read_p_kn = nil
           @_RW_p_kn = nil
+          @_read_m = :__receive_first_read_proc
+          @_read_p_kn = nil
+          @_write_m = :__receive_first_write_proc
           @_write_p_kn = nil
 
           super k do |me|
@@ -466,7 +465,74 @@ module Skylab::Fields
           end
         end
 
+        # -- be normalizant
+
+        def be_optional__
+          remove_instance_variable :@_parameter_arity_canary
+          @parameter_arity = :zero_or_one
+          NIL_
+        end
+
+        def be_defaultant_by_value__ x
+          remove_instance_variable :@_parameter_arity_canary
+          @parameter_arity = :zero_or_one
+          # ..
+          @default_proc = -> do
+            x
+          end
+          NIL_
+        end
+
+        # --
+
+        def __add_methods_definer atr_p
+          ( @_pending_meths_definers ||= [] ).push atr_p ; nil
+        end
+
+        def read_and_write_by & p
+          send @_RW_m, p
+        end
+
+        def read_by & p
+          send @_read_m, p
+        end
+
+        def write_by & p
+          send @_write_m, p
+        end
+
+        def __receive_first_read_and_write_proc p
+          @_read_m = :_locked
+          @_RW_m = :_locked
+          @_write_m = :_locked
+          @_RW_p_kn = Callback_::Known_Known[ p ] ; nil
+        end
+
+        def __receive_first_read_proc p
+          @_read_m = :_locked
+          @_RW_m = :_locked
+          @_read_p_kn = Callback_::Known_Known[ p ] ; nil
+        end
+
+        def __receive_first_write_proc p
+          @_write_m = :_locked
+          @_RW_m = :_locked
+          @_write_p_kn = Callback_::Known_Known[ p ] ; nil
+        end
+
         def freeze
+
+          if instance_variable_defined? :@_parameter_arity_canary
+            remove_instance_variable :@_parameter_arity_canary
+            @parameter_arity = :one
+          end
+
+          p_a = remove_instance_variable :@_pending_meths_definers
+          if p_a
+            @_deffers = p_a.map do | p |
+              p[ self ]
+            end.freeze
+          end
 
           remove_instance_variable :@_read_m
           remove_instance_variable :@_RW_m
@@ -486,54 +552,14 @@ module Skylab::Fields
             @_interpret_m = :__common_interpret
           end
 
-          p_a = remove_instance_variable :@_pending_meths_definers
-          if p_a
-            @_deffers = p_a.map do | p |
-              p[ self ]
-            end.freeze
-          end
-
           super
         end
 
-        def __add_methods_definer atr_p
-          ( @_pending_meths_definers ||= [] ).push atr_p ; nil
-        end
-
-        def read_by & p
-          send @_read_m, p
-        end
-
-        def __receive_first_read_proc p
-          @_read_m = :_locked
-          @_RW_m = :_locked
-          @_read_p_kn = Callback_::Known_Known[ p ] ; nil
-        end
+        # --
 
         def _interpret parse
           _args = Interpretation_Arguments___.new self, parse
           _read_and_write _args
-        end
-
-        def read_and_write_by & p
-          send @_RW_m, p
-        end
-
-        def __receive_first_read_and_write_proc p
-          @_read_m = :_locked
-          @_RW_m = :_locked
-          @_write_m = :_locked
-          @_RW_p_kn = Callback_::Known_Known[ p ] ; nil
-        end
-
-        def write_by & p
-          send @_write_m, p
-        end
-
-        def __receive_first_write_proc p
-          @_write_m = :_locked
-          @_RW_m = :_locked
-          @_write_p_kn = Callback_::Known_Known[ p ] ; nil
         end
 
         def _read_and_write args  # at least 2x here
@@ -553,6 +579,8 @@ module Skylab::Fields
 
         attr_reader(
           :_deffers,
+          :default_proc,
+          :parameter_arity,
         )
       end
 

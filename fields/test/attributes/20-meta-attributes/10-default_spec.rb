@@ -2,71 +2,68 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  if false
-  context 'and "foo" either does or doesn\'t have "default: \'anything\'"' do
+  TS_.require_ :attributes_meta_attributes
 
-    let :foo do
-      the_class_.parameters.fetch :foo
-    end
+  module Attributes::Meta_Attributes
 
-    context 'if you gave "foo" the property "default: :wazoo"' do
+    TS_.describe "[fi] attributes - meta-attributes - hook" do
 
-      with do
-        param :foo, :default, :wazoo
-      end
+      TS_[ self ]
+      use :memoizer_methods
+      Attributes::Meta_Attributes[ self ]
 
-      frame do
+      context "intro" do
 
-        it '"foo.has_default?" is true' do
-          foo.has_default?.should eql(true)
+        shared_subject :entity_class_ do
+
+          class X_Default_A
+
+            attrs = Subject_module_[].call(
+              starts_as_true: [ :default, true ],
+            )
+
+            ATTRIBUTES = attrs
+
+            attr_reader :starts_as_true
+
+            self
+          end
         end
 
-        it '"foo.default_value" is :wazoo' do
-          foo.default_value.should eql(:wazoo)
-        end
-      end
-    end
-
-    context "if you did not give it any default assignment" do
-
-      with do
-        param :foo
-      end
-
-      frame do
-
-        it '"foo.has_default?" is false-ish' do
-          foo.has_default?.should be_nil
+        it "has `default_proc`" do
+          _attr.default_proc or fail
         end
 
-        it '"foo.default_value" raises a NoMethodError' do
-
-          foo = send :foo
-          foo.instance_variable_defined? :@_default_proc and fail  # avoid warning
-          foo.instance_variable_set :@_default_proc, nil
-
-          -> { foo.default_value }.should raise_error(::NoMethodError)
-        end
-      end
-    end
-
-    context "if you give it a false-ish (nil or false) default value" do
-
-      with do
-        param :foo, :default, nil
-      end
-
-      frame do
-
-        it '"foo.has_default?" is true' do
-          foo.has_default?.should eql(true)
+        it "..which produces the value" do
+          true == _attr.default_proc.call or fail
         end
 
-        it '"foo.default_value" is accurate' do
-          foo.default_value.should be_nil
+        it "in a call to `init` without the value, it is set" do
+
+          _against_expect Home_::EMPTY_A_, true
+        end
+
+        it "in a call to `init` with the value as false, default is NOT applied" do
+
+          _against_expect [ :starts_as_true, false ], false
+        end
+
+        it "but if you set the thing to nil, the default is still applied.." do
+
+          _against_expect [ :starts_as_true, nil ], true
+        end
+
+        def _against_expect a, x
+          o = build_empty_entity_
+          o_ = entity_class_::ATTRIBUTES.init o, a
+          o.object_id == o_.object_id or fail
+          o_.starts_as_true.should eql x
+        end
+
+        def _attr
+          entity_class_::ATTRIBUTES._index._lookup_attribute :starts_as_true
         end
       end
     end
-  end
   end
 end

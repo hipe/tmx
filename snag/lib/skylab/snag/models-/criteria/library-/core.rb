@@ -24,7 +24,7 @@ module Skylab::Snag
 
         def process_polymorphic_stream_fully st
           _ok = super
-          _ok && Attrs__::Normalize_using_defaults_and_requireds[ self ]
+          _ok && Attrs__::Lib::Normalize_using_defaults_and_requireds[ self ]
         end
       end
 

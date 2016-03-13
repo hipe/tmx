@@ -171,7 +171,7 @@ module Skylab::TanMan
       # found in some collecion (fuzzily) using natural keys. we use this
       # process to normalize the name, too.
       #
-      # #[#br-087] abstraction candidate for entity normalization
+      # #[#fi-012] abstraction candidate for entity normalization
       # :+#CC-abstraction-candidate
 
       def initialize & oes_p

@@ -1,82 +1,134 @@
 module Skylab::Fields
 
-  class Parameter
+  class Attributes
 
-    module Controller
+    class Normalization  # see [#012]
 
-      # (this will become `Controller` at next moves commit)
+      Normalize_using_defaults_and_requireds = -> sess, & oes_p do
 
-      # this (yet another (but perhaps the first)) :+[#sl-116] common
-      # normalization implementation has been modified at this writing
-      # to be more straightforward: all concerns are evaluated (rigidly)
-      # at each step of one pass, as opposed to doing several passes.
-      #
-      # in addition to being a parameter container, your client must have:
-      #
-      #
-      #   • the boolean meta-parameter `required`
-      #
-      #   • `@on_event_selectively` - this is the only means thru which the
-      #      client may hook into the behavior from this method.
-      #
-      # if your client does not have `@formal_parameters` already true-ish,
-      # it will get set by "the usual means"
-
-      NORMALIZE_METHOD = -> do
-
-        miss_a = nil
-
-        _foz = ( @formal_parameters ||= self.class.parameters )
-
-        _foz.to_value_stream.each do | prp |
-
-          had = true
-          x = fetch prp.name_symbol do
-            had = false
-            NIL_
-          end
-
-          if x.nil? && prp.has_default
-            x = prp.default_value
-            self[ prp.name_symbol ] = x
-          end
-
-          if prp.required? && x.nil?
-            ( miss_a ||= [] ).push prp
-          end
-        end
-
-        if miss_a
-
-          @on_event_selectively.call :error, :missing_required_properties do
-
-            Events___::Missing[ miss_a, self, false ]
-          end
+        attrs = sess.class::ATTRIBUTES
+        if attrs
+          o = self.begin( & oes_p )
+          idx = attrs._index
+          sidx = idx._static_index
+          o.effectively_defaultants = sidx.effectively_defaultants
+          o.lookup = idx.lookup_attribute_proc_
+          o.requireds = sidx.requireds
+          o.store = sess
+          _ = o.execute
+          _
         else
           ACHIEVED_
         end
       end
 
-      Events___ = ::Module.new
-      Expression___ = Callback_::Event.structured_expressive.method :new
+      class << self
 
-      Events___::Missing = Expression___.call do | parameters, entity, ok |
+        alias_method :begin, :new
+        undef_method :new
+      end  # >>
 
-        a = parameters.map do | prp |
-          par prp
-        end
-
-        _moniker = if false
-          # (#todo probably '.name'
-        else
-          Actors___::Get_parameter_controller_moniker[ entity ]
-        end
-
-        "#{ _moniker } missing the required parameter#{ s a } #{ and_ a }"
+      def initialize & oes_p
+        @_oes_p = oes_p  # can be nil
       end
 
-      Actors___ = ::Module.new
-      Actors___::Get_parameter_controller_moniker = -> ent do  # legacy
+      attr_writer(
+        :effectively_defaultants,
+        :lookup,
+        :requireds,
+        :store,
+      )
+
+      def execute
+
+        _ok = __maybe_check_for_missing_requireds
+        _ok && ___maybe_apply_defaulting
+      end
+
+      def ___maybe_apply_defaulting
+        # (per #spot-2 this will always occur but in case that changes..)
+        if @effectively_defaultants
+          ___do_apply_defaulting
+        else
+          ACHIEVED_
+        end
+      end
+
+      def ___do_apply_defaulting
+
+        @effectively_defaultants.each do |k|
+          attr = @lookup[ k ]
+          # experimental (ick) "optimization ..
+          ivar = attr.as_ivar
+          if @store.instance_variable_defined? ivar
+            was_defined = true
+            x = @store.instance_variable_get ivar
+          end
+
+          if x.nil?
+            p = attr.default_proc
+            if p
+              @store.instance_variable_set ivar, p[]
+            elsif ! was_defined
+              @store.instance_variable_set ivar, nil
+            end
+          end
+        end
+
+        ACHIEVED_
+      end
+
+      def __maybe_check_for_missing_requireds
+        if @requireds
+          ___check_for_missing_requireds
+        else
+          ACHIEVED_
+        end
+      end
+
+      def ___check_for_missing_requireds
+
+        miss_a = nil
+
+        @requireds.each do |k|
+
+          attr = @lookup[ k ]
+          ivar = attr.as_ivar
+
+          if @store.instance_variable_defined? ivar
+            x = @store.instance_variable_get ivar
+          end
+
+          if x.nil?
+            ( miss_a ||= [] ).push attr
+          end
+        end
+
+        if miss_a
+          ___when_missing_requireds miss_a
+        else
+          ACHIEVED_
+        end
+      end
+
+      def ___when_missing_requireds miss_a
+
+        build_event = -> do
+          Home_::Events::Missing.via miss_a, 'attribute'
+        end
+
+        if @_oes_p
+          @_oes_p.call :error, :missing_required_attributes do
+            build_event[]
+          end
+          UNABLE_
+        else
+          _ev = build_event[]
+          raise _ev.to_exception
+        end
+      end
+
+      Get_parameter_controller_moniker = -> ent do  # legacy
 
         s_a = ent.class.name.split CONST_SEP_
 

@@ -30,7 +30,7 @@ module Skylab::TaskExamples
       NIL_
     end
 
-    def valid?   # :+#[#sl-116]
+    def valid?   # #[#fi-012]
 
       _req_i_a = self.class.attributes.each_pair.reduce [] do | m, (k, atr) |
         if atr[ :required ]

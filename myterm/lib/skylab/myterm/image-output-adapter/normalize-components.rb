@@ -4,7 +4,7 @@ module Skylab::MyTerm
 
     class Normalize_Components < Callback_::Actor::Dyadic
 
-      # the logical essence of this is just a plain old #[#br-087]-style
+      # the logical essence of this is just a plain old #[#fi-112]-style
       # missing-required's-check. it's noisy because it needs a lot of
       # custom fittings inbound & out.
 
