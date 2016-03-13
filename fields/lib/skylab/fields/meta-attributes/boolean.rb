@@ -1,8 +1,8 @@
 module Skylab::Fields
 
-  class Attributes
+  module MetaAttributes::Boolean
 
-    module MetaAttributes_::Boolean
+    # ->
 
       # the conceptual logic ("DNA") predates the earliest code in this file
       # by about four years. this is for ancient "DSL-controllers".
@@ -162,6 +162,6 @@ module Skylab::Fields
           end
         end
       end
-    end
+    # -
   end
 end

@@ -2,11 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes
-
+  TS_.require_ :attributes_meta_attributes  # #[#017]
   module Attributes::Meta_Attributes
 
-    TS_.describe "[fi] attributes - meta-attributes - hook" do
+    TS_.describe "[fi] attributes - meta-attributes - default" do
 
       TS_[ self ]
       use :memoizer_methods

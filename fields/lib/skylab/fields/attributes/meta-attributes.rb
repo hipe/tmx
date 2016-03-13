@@ -14,11 +14,11 @@ module Skylab::Fields
 
         st = @_.sexp_stream_for_current_attribute
 
-        defs = Here_::MetaAttributes_::Boolean::MethodsDefiner.new
+        defs = Home_::MetaAttributes::Boolean::MethodsDefiner.new
 
         begin
           st.no_unparsed_exists and break
-          p = Here_::MetaAttributes_::Boolean::MODIFIERS[ st.current_token ]
+          p = Home_::MetaAttributes::Boolean::MODIFIERS[ st.current_token ]
           p or break
           st.advance_one
           p[ defs, st ]
@@ -655,55 +655,6 @@ module Skylab::Fields
       end
       KEEP_PARSING_
     end
-
-    ## ~~ accesssor: like `attr_accessor`
-
-    def when__accessor__
-
-      when__reader__
-      when__writer__
-    end
-
-    ## ~~ reader: like `attr_reader`
-
-    def when__reader__
-
-      @normal_iambic.push :reader
-      sym = @name_symbol
-
-      @entity_model.module_exec do
-
-        define_method sym do
-          fetch sym do end
-        end
-      end
-
-      KEEP_PARSING_
-    end
-
-    ## ~~ writer: like `attr_writer`
-
-    def when__writer__
-
-      @normal_iambic.push :writer
-
-      sym = @name_symbol
-      wm = :"#{ sym }="
-      @writer_method_name = wm
-
-      @entity_model.module_exec do
-
-        define_method wm do | x |
-          self[ sym ] = x
-        end
-      end
-
-      KEEP_PARSING_
-    end
-
-    # ~ constants
-
-    KEEP_PARSING_ = true
 
     # ~ DOGFOOD [#.E] - the below are implemented with the the above facilities
 

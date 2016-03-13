@@ -1,12 +1,13 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe '[fi] P - builder - given "object" with parameter "foo"', wip: true do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
+  TS_.require_ :attributes_meta_attributes  # #[#017]
+  module Attributes::Meta_Attributes
 
-  context 'and "foo" has the property of e.g. "builder: :foo_p"' do
+    TS_.describe "[fi] attributes - meta-attributes - component" do
 
+      if false
     with do
       param :roland_808, :builder, :roland_808_p
       attr_accessor :roland_808_p
@@ -49,6 +50,8 @@ describe '[fi] P - builder - given "object" with parameter "foo"', wip: true do
           object.roland_808.should eql(:tha_synth)
           @num_times.should eql(0)
         end
+      end
+    end
       end
     end
   end

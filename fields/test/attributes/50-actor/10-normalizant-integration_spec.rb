@@ -3,7 +3,6 @@ require_relative '../../test-support'
 module Skylab::Fields::TestSupport
 
   TS_.require_ :attributes_actor  # #[#017]
-
   module Attributes::Actor
 
     TS_.describe "[fi] attributes - actor - normalizant integration" do

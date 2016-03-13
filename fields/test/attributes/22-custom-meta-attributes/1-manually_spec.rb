@@ -1,16 +1,15 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
   TS_.require_ :attributes  # #[#017]
-
   module Attributes
 
-    TS_.describe "[fi] attributes - custom meta attribute example " do
+    TS_.describe "[fi] attributes - custom meta attributes - manually" do
 
       TS_[ self ]
       use :memoizer_methods
-      # Attributes[ self ]
+      Attributes[ self ]
 
       context "for example if you wanted a \"list\"-style (`argument_arity` many)" do
 

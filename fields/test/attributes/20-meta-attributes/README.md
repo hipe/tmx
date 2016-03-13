@@ -1,10 +1,20 @@
 # numbering scheme
 
-the first five files in this directory were assigned numbers on the
-three's (01, 04, 07..) to leave some room to add a few semantically
-nearby files in between them in the future.
+• a high-level overview is earliest because it is a common use-case
+  (alghouth this as a rationale contradicts other rationale..)
 
-the order they were given reflects the "feeling" of either how complex
-they are (least complex first) or how "high-level" they are
-(higher-level later). but, as these five nodes are independent of each
-other, the order is largely cosmetic.
+• `list` is earlier because it is a frequently used meta-parameter
+
+• `enum` is before { would-be `flag` and } `boolean` because it is
+   conceptually a dependant of [them]. (although in practice it is
+   not implemented this way.)
+
+• { would-be `flag` } is before `boolean` because it is lower-level
+  and would be a dependant of flag conceptually.
+
+• `custom_interpreter_method` before `component` b.c dependency
+
+• `hook`, `default`, and `desc` are legacy, so last.
+
+• `desc` is a high-level meta-attribute being that it pertains only
+  to generated interfaces and not in interpretation logic.

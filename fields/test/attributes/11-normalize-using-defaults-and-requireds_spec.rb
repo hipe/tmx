@@ -3,10 +3,9 @@ require_relative '../test-support'
 module Skylab::Fields::TestSupport
 
   TS_.require_ :attributes   # #[#017]
-
   module Attributes
 
-    TS_.describe "[fi] attributes - normailze using defaults & requireds" do
+    TS_.describe "[fi] attributes - normalize using defaults & requireds" do
 
       TS_[ self ]
       use :memoizer_methods

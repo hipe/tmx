@@ -1,10 +1,13 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe "[fi] P - meta-parameters", wip: true do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
+  TS_.require_ :attributes  # #[#017]
+  module Attributes
 
+    TS_.describe "[fi] attributes - meta-attributes - DSL experiment" do
+
+      if false
   context "some built-in meta-meta-parameters can modify meta-parameters." do
 
     with do
@@ -39,4 +42,8 @@ describe "[fi] P - meta-parameters", wip: true do
       end
     end
   end
+      end
+    end
+  end
 end
+

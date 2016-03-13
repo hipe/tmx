@@ -2,8 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_actor  # namespace antics #[#017] justified
-
+  TS_.require_ :attributes_actor  # #[#017]
   module Attributes::Actor
 
     TS_.describe "[fi] attributes - actor - intro" do

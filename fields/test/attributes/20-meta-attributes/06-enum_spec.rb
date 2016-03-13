@@ -1,12 +1,13 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-describe '[fi] P - enum: given "object" with parameter "foo"', wip: true do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
+  TS_.require_ :attributes_meta_attributes
+  module Attributes::Meta_Attributes
 
-  context 'and "foo" has the property of e.g. "enum: [:alpha, :beta]"' do
+    TS_.describe "[fi] attributes - meta-attributes - enum" do
 
+      if false
     context 'you get no readers or writers out of the box so..' do
 
       with do
@@ -56,6 +57,8 @@ describe '[fi] P - enum: given "object" with parameter "foo"', wip: true do
 
           expect_unknown_ :orange, object
         end
+      end
+    end
       end
     end
   end

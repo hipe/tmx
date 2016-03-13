@@ -2,11 +2,12 @@ require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  describe "[fi] P - controller", wip: true do
+  TS_.require_ :attributes   # #[#017]
+  module Attributes
 
-    extend TS_
-    use :parameter
-    use :expect_event
+    TS_.describe "[fi] attributes - normalization" do
+
+      if false
 
     it "loads" do
       Home_::Parameter::Controller
@@ -171,6 +172,8 @@ module Skylab::Fields::TestSupport
 
     def expression_agent_for_expect_event
       Home_.lib_.brazen::API.expression_agent_instance
+    end
+      end
     end
   end
 end

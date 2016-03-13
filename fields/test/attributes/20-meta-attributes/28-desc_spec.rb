@@ -2,6 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
+  TS_.require_ :attributes_meta_attributes  # #[#017]
+  module Attributes::Meta_Attributes
+
+    TS_.describe "[fi] attributes - meta-attributes - desc" do
+
   if false
   let :lovely do
     the_class_.parameters.fetch :lovely
@@ -40,5 +45,7 @@ module Skylab::Fields::TestSupport
       end
     end
   end
+  end
+    end
   end
 end

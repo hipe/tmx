@@ -1,10 +1,13 @@
 require_relative '../test-support'
 
-describe "[fi] P - bound", wip: true do
+module Skylab::Fields::TestSupport
 
-  extend Skylab::Fields::TestSupport
-  use :parameter
+  TS_.require_ :attributes   # #[#017]
+  module Attributes
 
+    TS_.describe "[fi] attributes - bounders" do
+
+      if false
   it "loads" do
     Skylab::Fields::Parameter::Bound
   end
@@ -146,6 +149,9 @@ describe "[fi] P - bound", wip: true do
         o.path = 'pathos'
         o.herkemer = 'the herkemer'
         o
+      end
+    end
+  end
       end
     end
   end

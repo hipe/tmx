@@ -1,9 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
   TS_.require_ :attributes  # namespace antics #[#017] justified
-
   module Attributes
 
     TS_.describe "[fi] attributes - misc meta attributes one" do
