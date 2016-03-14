@@ -158,8 +158,10 @@ module Skylab::Fields
 
       New_via__ = -> m, st, cls, & x_p do  # near #open [#026]
 
-        sess = cls.send :new
-        kp = sess.send m, st, & x_p
+        sess = cls.send :new, & x_p  # actors reasonably expect the handler here [br]
+
+        kp = sess.send m, st, & x_p  # but this here is for all non-actors
+
         if kp
           sess
         else

@@ -23,6 +23,8 @@ module Skylab::Fields::TestSupport
 
             attrs.define_methods self
 
+            attr_accessor :_hello_
+
             self
           end
         end
@@ -36,20 +38,43 @@ module Skylab::Fields::TestSupport
           o.instance_variable_get( :@error ) and fail
         end
 
-        it "\"read\" with `receive__x__`" do
+        context "when is written" do
 
-          o = build_empty_entity_
+          it "call the proc directly with `receive__x__`" do
 
-          yes = nil
-          o.on__error__ do |k|
-            yes = k
+            o = _build_one_such_entity
+
+            x = o.receive__error__ :_hi_
+
+            x.should eql "hi: _hi_"
+
+            o._hello_.should eql :_hi_
           end
 
-          x = o.receive__error__ :_hi_
+          it "read back the proc itself with `__x__handler`" do
 
-          x.should be_nil
+            o = _build_one_such_entity
 
-          yes.should eql :_hi_
+            p = o.__error__handler
+
+            _x = p[ :_hey_ ]
+
+            _x.should eql "hi: _hey_"
+
+            o._hello_.should eql :_hey_
+          end
+
+          def _build_one_such_entity
+
+            o = build_empty_entity_
+
+            o.on__error__ do |k|
+              o._hello_ = k
+              "hi: #{ k }"
+            end
+
+            o
+          end
         end
       end
     end

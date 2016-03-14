@@ -133,8 +133,15 @@ module Skylab::Fields
               end
 
               define_method :"receive__#{ k }__" do | * a, & p |
-                instance_variable_get( ivar )[ * a, & p ]
-                NOTHING_  # discourage bad design
+                _ = instance_variable_get( ivar )[ * a, & p ]
+                _  # use with caution - coupling to callbacks can be ick
+              end
+
+              define_method :"__#{ k }__handler" do
+                # (no by-name reader. enforce consistency)
+                if instance_variable_defined? ivar
+                  instance_variable_get ivar
+                end
               end
             end
           end

@@ -1215,7 +1215,7 @@ module Skylab::Brazen
         @enum_box = bx.freeze
 
         _touch_AHN_box.touch :__enum__ do
-          Home_.lib_.fields::MetaMetaFields::Enum::Normalize_via_qualified_known
+          Home_.lib_.fields::MetaAttributes::Enum::Normalize_via_qualified_known
         end
 
         KEEP_PARSING_

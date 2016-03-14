@@ -127,29 +127,36 @@ module Skylab::Brazen
           @hooks = My_hooks___[].new( & wiring_p )
         end
 
-        My_hooks___ = Callback_.memoize do  # fail late
+        My_hooks___ = Lazy_.call do
 
-          _Parameter = Home_.lib_.fields::Parameter
+          class My_Hooks____
 
-          My_Hooks____ = _Parameter::Definer.new do
+            _attrs = Attributes_actor_.call( self,
+              missing: :hook,
+              extra: :hook,
+              success: :hook,
+            )
 
-            param :on_missing, :hook, :reader
+            _attrs.define_methods self  # ..
 
-            param :on_extra, :hook, :reader
+            def initialize & wiring_p
+              wiring_p[ self ]
+            end
 
-            param :on_success, :hook, :reader
-          end  # result
+            self
+          end
         end
 
         def execute
 
           __init_valid_range
+
           __init_relationship_of_actual_arguments_to_valid_range
 
           if @_range_failure_method_name
             send @_range_failure_method_name
           else
-            p = @hooks.handle_success
+            p = @hooks.__success__handler
             if p
               p[]
             else
@@ -190,14 +197,14 @@ module Skylab::Brazen
 
           _stx = Models_::Base_Syntax.new _farg_a
           _ev = Events_::Missing[ :vertical, _stx, nil, @syntax ]
-          @hooks.handle_missing[ _ev ]
+          @hooks.receive__missing__ _ev
         end
 
         def __when_extra
 
           _s_a = @actual_arguments[ @_end_d .. -1 ]
           _ev = Events_::Extra[ _s_a ]
-          @hooks.handle_extra[ _ev ]
+          @hooks.receive__extra__ _ev
         end
       end
 

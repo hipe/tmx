@@ -58,12 +58,14 @@ module Skylab::Brazen::TestSupport
 
       _stx.validate_against_args @actual_i_a do |o|
 
-        o.on_missing do |ev|
-          @m = ev ; false
+        o.on__missing__ do |ev|
+          @m = ev
+          :_unreliable_ # UNRELIABLE_
         end
 
-        o.on_extra do |ev|
-          @x = ev ; false
+        o.on__extra__ do |ev|
+          @x = ev
+          :_unreliable_ # UNRELIABLE_
         end
       end
       NIL_

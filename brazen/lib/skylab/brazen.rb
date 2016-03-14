@@ -209,6 +209,10 @@ module Skylab::Brazen
     Home_.lib_.fields::Attributes::Actor[ mod, h ]
   end
 
+  Attributes_ = -> h do
+    Home_.lib_.fields::Attributes[ h ]
+  end
+
   # (was N_Lines_)
 
   module Lib_

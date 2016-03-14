@@ -45,6 +45,7 @@ module Skylab::Fields
             @_h.fetch( k ).deffers_.each do |p|
               p[ mod ]
             end
+            redo
           end while nil
           NIL_
         end

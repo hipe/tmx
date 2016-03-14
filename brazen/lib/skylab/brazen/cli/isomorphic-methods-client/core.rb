@@ -310,17 +310,17 @@ module Skylab::Brazen
 
         bc = @_stx.validate_against_args argv do |o|
 
-          o.on_missing do | miss_ev |
+          o.on__missing__ do |miss_ev|
 
             When_[]::Missing_Arguments_Fancy.new miss_ev, expression_
           end
 
-          o.on_extra do | xtra_ev |
+          o.on__extra__ do |xtra_ev|
 
             When_[]::Extra_Arguments.new xtra_ev.x, expression_
           end
 
-          o.on_success do
+          o.on__success__ do
 
             NIL_  # invert the usual T/F for succeed/fail
           end
