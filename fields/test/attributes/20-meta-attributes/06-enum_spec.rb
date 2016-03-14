@@ -10,6 +10,7 @@ module Skylab::Fields::TestSupport
       TS_[ self ]
       use :memoizer_methods
       use :expect_event
+      Attributes::Meta_Attributes[ self ]
 
       context "(context)" do
 
@@ -31,7 +32,7 @@ module Skylab::Fields::TestSupport
         context "nope" do
 
           shared_subject :state_ do
-            _where :color, :green
+            where_ :color, :green
           end
 
           it "fails" do
@@ -54,26 +55,13 @@ module Skylab::Fields::TestSupport
         context "yep" do
 
           shared_subject :state_ do
-            _where :color, :red
+            where_ :color, :red
           end
 
           it "wins" do
             _x = state_.result
             :red == _x.color or fail
           end
-        end
-
-        def _where * x_a
-
-          cls = entity_class_
-
-          _ent = cls.new
-
-          _ = event_log.handle_event_selectively
-
-          _x = cls::ATTRIBUTES.init _ent, x_a, & _
-
-          flush_event_log_and_result_to_state _x
         end
       end
     end

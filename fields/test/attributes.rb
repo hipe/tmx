@@ -36,6 +36,19 @@ module Skylab::Fields::TestSupport
         tcc.include self
       end
 
+      def where_ * x_a
+
+        cls = entity_class_
+
+        _ent = cls.new
+
+        _ = event_log.handle_event_selectively
+
+        _x = cls::ATTRIBUTES.init _ent, x_a, & _
+
+        flush_event_log_and_result_to_state _x
+      end
+
       def build_empty_entity_
         entity_class_.new
       end

@@ -475,31 +475,6 @@ module Skylab::Fields
       end
     end
 
-    ## ~~ builder: a reader that initializes with a proc (named thru reader)
-
-    def when__builder__
-
-      builder_proc_reader_name = @_polymorphic_upstream_.gets_one
-      sym = @name_symbol
-
-      @entity_model.module_exec do
-
-        define_method sym do
-
-          yes = nil
-          x = fetch sym do
-            yes = true
-          end
-          if yes
-            x = send( builder_proc_reader_name ).call
-            self[ sym ] = x
-          end
-          x
-        end
-      end
-      KEEP_PARSING_
-    end
-
     # ~ DOGFOOD [#.E] - the below are implemented with the the above facilities
 
     Definer[ self ]
