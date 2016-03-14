@@ -7,45 +7,64 @@ module Skylab::Fields::TestSupport
 
     TS_.describe "[fi] attributes - meta-attributes - desc" do
 
-  if false
-  let :lovely do
-    the_class_.parameters.fetch :lovely
-  end
+      TS_[ self ]
+      use :memoizer_methods
+      Attributes::Meta_Attributes[ self ]
 
-  context 'and "foo" assigns a desc using the DSL' do
+      context "(context)" do
 
-    with do
+        shared_subject :entity_class_ do
 
-      param(:lovely) do
+          class X_Desc_A
 
-        desc 'this is a lovely parameter'
+            attrs = Subject_module_[].call(
+              wazlow: [ :desc, -> y { y << "line 1: #{ self._hi }" ; y << "line 2" } ],
+              pazlow: [ :desc, -> { "this way #{ self._hi }" } ],
+            )
+
+            ATTRIBUTES = attrs
+
+            self
+          end
+        end
+
+        it "multi line form" do
+
+          _desc_lines_for( :wazlow ).should eql [ "line 1: _hello_", "line 2" ]
+        end
+
+        it "single line form" do
+
+          _desc_lines_for( :pazlow ).should eql [ "this way _hello_" ]
+        end
       end
-    end
 
-    frame do
+      def _desc_lines_for k
 
-      it '"foo.desc" is an array with the description' do
+        desc_p = attribute_( k ).description_proc
 
-        lovely.desc_array.should eql [ 'this is a lovely parameter' ]
+        if desc_p.arity.zero?
+          [ _would_be_expression_agent.calculate( & desc_p ) ]
+        else
+          _would_be_expression_agent.calculate [], & desc_p
+        end
       end
-    end
-  end
 
-  context 'and "foo" does not assign a desc using the DSL' do
+      memoize :_would_be_expression_agent do
 
-    with do
-      param :lovely
-    end
+        cls = class X_Desc_Expag
 
-    frame do
+          alias_method :calculate, :instance_exec
 
-      it '"foo.desc" will be nil (not an empty array' do
+          def _hi
+            :_hello_
+          end
 
-        lovely.desc_array.should be_nil
+          self
+        end
+
+        cls.new
       end
-    end
-  end
-  end
     end
   end
 end

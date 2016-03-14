@@ -15,6 +15,12 @@ module Skylab::Fields::TestSupport
       tcc.include self
     end
 
+    Attribute_method__ = -> k do
+      entity_class_.const_get( :ATTRIBUTES, false ).attribute k
+    end
+
+    define_method :attribute_, Attribute_method__
+
     def attributes_ h
       Home_::Attributes[ h ]
     end
@@ -52,6 +58,8 @@ module Skylab::Fields::TestSupport
       def build_empty_entity_
         entity_class_.new
       end
+
+      define_method :attribute_, Attribute_method__
 
       Subject_module_ = Subject_module_
     end

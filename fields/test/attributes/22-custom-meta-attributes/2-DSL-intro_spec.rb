@@ -9,6 +9,7 @@ module Skylab::Fields::TestSupport
 
       TS_[ self ]
       use :memoizer_methods
+      Attributes[ self ]
 
       context "flag-based meta-attribute" do
 
@@ -34,19 +35,15 @@ module Skylab::Fields::TestSupport
         end
 
         it "is is" do
-          _attrs.attribute( :social_security_number ).is_highly_sensitive or fail
+          attribute_( :social_security_number ).is_highly_sensitive or fail
         end
 
         it "isn't isn't" do
-          _attrs.attribute( :last_name ).is_highly_sensitive and fail
+          attribute_( :last_name ).is_highly_sensitive and fail
         end
       end
 
       # (we will also likely implement & test a plain old valued meta-attribute)
-
-      def _attrs
-        entity_class_.const_get( :ATTRIBUTES, false )
-      end
     end
   end
 end

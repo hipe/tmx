@@ -458,14 +458,31 @@ module Skylab::Fields
         mattrs = ma_cls.new build
 
         -> k do
+
           if ma_cls.method_defined? k
             mattrs.__send__ k
-          else
-            _SANITY_RX =~ k or self._SANITY
+            NIL_
+
+          elsif _SANITY_RX =~ k
             build.__add_to_custom_index k
+            NIL_
+
+          else
+            When_etc___[ k, ma_cls ]
           end
-          NIL_
         end
+      end
+
+      When_etc___ = -> k, ma_cls do
+
+        _m_a = ma_cls.instance_methods false
+
+        _nf = Callback_::Name.via_variegated_symbol :meta_attribute
+
+        _ev = Home_::MetaAttributes::Enum::Build_extra_value_event.call(
+          k, _m_a, _nf )
+
+        raise _ev.to_exception
       end
 
       Finish_attribute___ = -> build do
@@ -535,6 +552,16 @@ module Skylab::Fields
         end
 
         # --
+
+
+        def accept_description_proc__ p
+
+          if instance_variable_defined? :@description_proc
+            self._MULTIPLE_DESCRIPTIONS
+          end
+
+          @description_proc = p ; nil
+        end
 
         def __add_methods_definer atr_p
           ( @_pending_meths_definers ||= [] ).push atr_p ; nil
@@ -633,6 +660,7 @@ module Skylab::Fields
         attr_reader(
           :deffers_,
           :default_proc,
+          :description_proc,
           :parameter_arity,
         )
       end

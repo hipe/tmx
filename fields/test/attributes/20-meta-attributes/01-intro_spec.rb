@@ -73,5 +73,34 @@ module Skylab::Fields::TestSupport
         @ruby_regexp.should be_nil
       end
     end
+
+    context "an unrecognized meta-attribute" do
+
+      given_the_attributes_ do
+
+        attributes_(
+          zoozie: :floozie_poozie,
+        )
+      end
+
+      it "does not fail at definition time" do
+        the_attributes_
+      end
+
+      it "does fail (raises exception) at definition parsing time" do
+
+        attrs = the_attributes_
+
+        _rx = /\Ainvalid meta attribute 'floozie_poozie', expecting \{ #{
+          }[a-z_]+(?: \| [a-z_]+){3,20} \}\z/
+
+        begin
+          attrs._index
+        rescue ::ArgumentError => e
+        end
+
+        e.message.should match _rx
+      end
+    end
   end
 end

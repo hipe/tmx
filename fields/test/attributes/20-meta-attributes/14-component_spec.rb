@@ -18,7 +18,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_MA_Component_A
+          class X_Component_A
 
             attrs = Subject_module_[].call(
               roland_808: :component

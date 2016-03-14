@@ -15,7 +15,7 @@ module Skylab::Fields::TestSupport
       context "(context)" do
 
         shared_subject :entity_class_ do
-          class X_MA_Enum_A
+          class X_Enum_A
 
             attrs = Subject_module_[].call(
               color: [ :enum, [ :red, :blue ] ],
