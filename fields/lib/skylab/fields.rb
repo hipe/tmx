@@ -20,7 +20,7 @@ module Skylab::Fields
 
   Autoloader_ = Callback_::Autoloader
 
-  class Attributes
+  class Attributes < ::Module
 
     class << self
       alias_method :[], :new
@@ -34,10 +34,26 @@ module Skylab::Fields
       @meta_attributes = nil
     end
 
+    # --
+
+    def define_meta_attribute * x_a, & x_p
+      Here_::DSL.new( self, x_a, & x_p ).execute
+    end
+
     attr_writer(
       :attribute_class,
       :meta_attributes,
     )
+
+    def attribute_class__
+      @attribute_class
+    end
+
+    def meta_attributes__
+      @meta_attributes
+    end
+
+    # --
 
     def init o, x_a
       _index.init__ o, x_a
@@ -46,6 +62,8 @@ module Skylab::Fields
     def define_methods mod
       _index.define_methods__ mod
     end
+
+    # --
 
     def symbols * sym
       if sym.length.zero?
@@ -57,6 +75,10 @@ module Skylab::Fields
 
     def to_defined_attribute_stream
       _index.to_defined_attribute_stream__
+    end
+
+    def attribute k
+      _index.lookup_attribute_ k
     end
 
     def _index

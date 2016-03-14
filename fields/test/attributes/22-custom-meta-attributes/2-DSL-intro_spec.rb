@@ -5,45 +5,48 @@ module Skylab::Fields::TestSupport
   TS_.require_ :attributes  # #[#017]
   module Attributes
 
-    TS_.describe "[fi] attributes - meta-attributes - DSL experiment" do
+    TS_.describe "[fi] attributes - meta-attributes - DSL experiment (P.o.C)" do
 
-      if false
-  context "some built-in meta-meta-parameters can modify meta-parameters." do
+      TS_[ self ]
+      use :memoizer_methods
 
-    with do
+      context "flag-based meta-attribute" do
 
-      param :first_name
+        shared_subject :entity_class_ do
 
-      meta_param :highly_sensitive, :boolean
+          class X_MA_DSL_E_A
 
-      param :social_security_number, :highly_sensitive
+            attrs = Subject_module_[].call(
+              social_security_number: :highly_sensitive,
+              last_name: nil,
+            )
 
-      param :last_name
-    end
+            attrs.define_meta_attribute :flag, :highly_sensitive
 
-    frame do
+            ATTRIBUTES = attrs
 
-      it "a parameter that *was* modified with the meta-parameter says so" do
+            self
+          end
+        end
 
-        _param = the_class_.parameters.fetch :social_security_number
-        _param.highly_sensitive?.should eql true
+        it "loads" do
+          entity_class_
+        end
+
+        it "is is" do
+          _attrs.attribute( :social_security_number ).is_highly_sensitive or fail
+        end
+
+        it "isn't isn't" do
+          _attrs.attribute( :last_name ).is_highly_sensitive and fail
+        end
       end
 
-      it "a parameter that was not modified with the meta-parameter says so" do
+      # (we will also likely implement & test a plain old valued meta-attribute)
 
-        _param = the_class_.parameters.fetch :last_name
-        _param.highly_sensitive?.should eql nil
-      end
-
-      it "but what of a parameter created before the meta-parameter existed?" do
-
-        _param = the_class_.parameters.fetch :first_name
-        _param.respond_to?( :highly_sensitive? ).should eql false
-      end
-    end
-  end
+      def _attrs
+        entity_class_.const_get( :ATTRIBUTES, false )
       end
     end
   end
 end
-

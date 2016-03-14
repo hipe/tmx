@@ -27,7 +27,7 @@ module Skylab::Fields
 
         defs.finish
 
-        @_.add_methods_definer_by do |atr|
+        @_.add_methods_definer_by_ do |atr|
 
           a = defs.stream_for( atr ).to_a
 
@@ -131,7 +131,7 @@ module Skylab::Fields
           # "flag of" must have the *full* pipeline of the referrant -
           # read *and* write.
 
-          atr = index._lookup_attribute sym
+          atr = index.lookup_attribute_ sym
           _mutate_for_redirect x, atr
           atr._read_and_write self  # result is kp
         end
@@ -139,7 +139,7 @@ module Skylab::Fields
 
       def hook
 
-        @_.add_methods_definer_by do |atr|
+        @_.add_methods_definer_by_ do |atr|
 
           ivar = atr.as_ivar ; k = atr.name_symbol
 
@@ -173,7 +173,7 @@ module Skylab::Fields
 
       def list
 
-        @_.add_methods_definer_by do |atr|
+        @_.add_methods_definer_by_ do |atr|
 
           -> mod do
             mod.send :define_method, atr.name_symbol do |x|
@@ -210,7 +210,7 @@ module Skylab::Fields
 
         ca.write_by do |x|
 
-          atr = index._lookup_attribute sym
+          atr = index.lookup_attribute_ sym
           _mutate_for_redirect x, atr
           atr._read_and_write self  # result is kp
         end
@@ -242,10 +242,6 @@ module Skylab::Fields
     module Definer_Module_Methods  # :+#public-API ([tm])
 
       attr_reader :parameters_p
-
-      def meta_param sym, * x_a, & x_p
-        parameters.__touch_meta_parameter( sym )._accept_iambic x_a, & x_p
-      end
 
       def param sym, * x_a, & x_p
         parameters._touch_parameter( sym )._accept_iambic x_a, & x_p
@@ -405,35 +401,6 @@ module Skylab::Fields
           redo
         end while nil
         NIL_
-      end
-
-      def __touch_meta_parameter sym
-
-        _mp = __meta_collection._touch_parameter sym
-        _mp
-      end
-
-    private
-
-      def __meta_collection
-        @___mc ||= __build_meta_collection
-      end
-
-      def __build_meta_collection  # [#.A]
-
-        # always makes a dedicated class in the entity model for now
-
-        entity_model = @_entity_model
-
-        if entity_model.const_defined? CONST__, false
-          self._COVER_ME
-          cls = entity_model.const_get CONST__
-        else
-          cls = ::Class.new entity_model.const_get CONST__
-          entity_model.const_set CONST__, cls
-        end
-
-        cls.parameters
       end
     end
 
@@ -676,3 +643,4 @@ module Skylab::Fields
 end  # fields
 
 # :+#tombstone: [#009.D] 'Actual_Parameters_Ivar_Instance_Methods' un-abstacted
+# #tombstone: we broke out ANCIENT meta-params DSL at #spot-3

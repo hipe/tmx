@@ -2,43 +2,9 @@
 
 ## objective & scope
 
-this "fields" sidesystem is an umbrella-libary for facilities dealing
-with modeling { properties | fields | attributes } of entity models.
-(but note currently one of the main such libraries lives in [br] under
-"entity".)
-
-currently its most significant facilities include:
-
-  • unofficial home of [#016] "actors" (still lives in [ca] for now)
-  • "attributes" (formerly "methodic actors")
-  • the "external functions" that reveal meta-data about associations.
-
-
-
-
-## historical context
-
-this sidesystem was created long after all the below facilities were
-created; *only* as an intermediate step to help gather many of them into
-one place ("pre-unification"), towards the effort of full unification.
-that is, just because [fi] is relatively modern in terms of when it was
-created as a sidesystem, this does *not* mean it contains the latest and
-greatest property modeling facilities.
-
-at the moment, the implementations for the actively-used concerns
-discussed here are in somewhat of a diaspora dispersed throughout here
-and [br] and [ca].  (often, the case is that this sidesystem has the
-most ancient implements, but we are trying to draw the more current ones
-in.)
-
-
-
-
-## a cursory overview
-
-first, a quick history (most recent at top). "OK" means "here to stay"
-(as far as we know now). "WAS" means it has been sunsetted or
-assimilated.
+this sidesystem was formed under the mandate to unify universally all
+significant efforts at libraries dealing with modeling
+{ arguments | attributes | parameters | properties }.
 
        [#013] currently "attributes" (was: "parameters"..)    2015-12-23  OK
 
@@ -65,22 +31,6 @@ assimilated.
        [#009] the headless parameter (assim'd into [#002]     2012-08-29 WIP <-
 
        [#002] metahell formal attributed (assim'd to here)    2011-09-11 WAS <=
-
-
-### the unification plan
-
-  • [#002] is the oldest, so let's keep its DNA and hijack what we just did
-
-  • [#004] we need to investiage
-
-  • [#ba-003] field eliminate it whole hog
-
-  • [#br-058] seems OK? ..
-
-  • [#ba-030] the basic struct will assimiliate nicely into [#013]
-
-  • [#016]  (basic actors) we can do last..
-
 
 
 

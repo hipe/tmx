@@ -60,7 +60,7 @@ module Skylab::Fields::TestSupport
         end
 
         def _attr
-          entity_class_::ATTRIBUTES._index._lookup_attribute :starts_as_true
+          entity_class_::ATTRIBUTES.attribute :starts_as_true
         end
       end
     end

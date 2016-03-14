@@ -14,16 +14,16 @@ module Skylab::Fields
 
         def initialize unparsed_h, ma_cls, atr_cls
 
-          ab = Build_Index_of_Definition___.new ma_cls, atr_cls
+          o = Build_Index_of_Definition___.new ma_cls, atr_cls
 
           h = {}
           unparsed_h.each_pair do |k, x|
 
-            h[ k ] = ab.__build_and_index_attribute k, x
+            h[ k ] = o.__build_and_index_attribute k, x
           end
 
-          @_custom_index = ab.__release_thing_ding_one
-          @_static_index = ab.__release_thing_ding_two
+          @_custom_index = o.__release_thing_ding_one
+          @_static_index = o.__release_thing_ding_two
 
           @_h = h
         end
@@ -42,7 +42,7 @@ module Skylab::Fields
           begin
             k = st.gets
             k or break
-            @_h.fetch( k )._deffers.each do |p|
+            @_h.fetch( k ).deffers_.each do |p|
               p[ mod ]
             end
           end while nil
@@ -64,7 +64,7 @@ module Skylab::Fields
           end
         end
 
-        def _lookup_attribute k
+        def lookup_attribute_ k
           @_h.fetch k
         end
 
@@ -302,116 +302,70 @@ module Skylab::Fields
 
         def initialize ma_cls, atr_cls
 
-          @_attribute_class = atr_cls
+          @_p = -> kk, xx do
+
+            n_meta_prototype = Build_N_Meta_Attribute.new ma_cls, atr_cls
+
+            n_meta_prototype.attribute_services = self
+
+            n_meta_prototype.build_N_plus_one_interpreter = Common_build_N_plus_one_interpreter___
+
+            n_meta_prototype.finish_attribute = Finish_attribute___
+
+            @_p = -> k, x do
+              n_meta_prototype.__build_and_process_attribute k, x
+            end
+
+            @_p[ kk, xx ]
+          end
+
           @_custom_index = nil
-          @_meta_attributes_class = ma_cls
-          @_process_meta_attribute = __process_meta_attribute
-          @_static_index = Static_Index___.new
+          @_static_index = StaticIndex___.new
         end
 
         def __build_and_index_attribute k, x
+          @_p[ k, x ]
+        end
 
-          @_current_attribute_name_symbol = k
+        # -- exposures
 
-          @_attribute_class.new k do |atr|
+        def add_to_the_custom_index_ k, meta_k
 
-            x and ___edit_attribute atr, x
+          _idx = ( @_custom_index ||= {} )
+          _a = _idx[ meta_k ] ||= []
+          _a.push k ; nil
+        end
 
-            if ! atr.parameter_arity
-              add_to_static_index_ :requireds
-            end
+        def add_to_the_static_index_ k, meta_k
+          @_static_index.add_ k, meta_k
+        end
+
+        SI_OP_H__ = {
+          effectively_defaultants: :_push_to_array,
+          method_definers: :__add_to_box,
+          requireds: :_push_to_array,
+        }
+
+        StaticIndex___ = ::Struct.new( * SI_OP_H__.keys ) do
+
+          def add_ k, meta_k
+            send SI_OP_H__.fetch( meta_k ), k, meta_k
+          end
+
+          def __add_to_box k, meta_k
+
+            ( self[ meta_k ] ||= Callback_::Box.new ).add k, nil
+            NIL_
+          end
+
+          def _push_to_array k, meta_k
+
+            ( self[ meta_k ] ||= [] ).push k
             NIL_
           end
         end
 
-        def ___edit_attribute atr, x
-
-          @_current_attribute = atr
-
-          _a = ::Array.try_convert( x ) || [ x ]
-          st = Callback_::Polymorphic_Stream.via_array _a
-
-          @sexp_stream_for_current_attribute = st
-
-          p = @_process_meta_attribute
-          begin
-            p[ st.gets_one ]
-          end until st.no_unparsed_exists
-
-          NIL_
-        end
-
-        def __process_meta_attribute
-
-          ma_cls = @_meta_attributes_class
-
-          ma = -> do
-            x = ma_cls.new self
-            ma = -> { x }
-            x
-          end
-
-          -> k do
-            if ma_cls.method_defined? k
-              ma[].__send__ k
-              NIL_
-            else
-              SANITY_RX___ =~ k or self._SANITY
-              __add_to_custom_index k
-              NIL_
-            end
-          end
-        end
-        SANITY_RX___ = /\A_/  # for now - catch typos & API mismatches
-
-        # --
-
-        def add_methods_definer_by & atr_p
-
-          add_to_static_index_ :method_definers
-
-          @_current_attribute.__add_methods_definer atr_p ; nil
-        end
-
-        def __add_to_custom_index meta_k
-
-          _idx = ( @_custom_index ||= {} )
-          _a = _idx[ meta_k ] ||= []
-          _a.push @_current_attribute_name_symbol ; nil
-        end
-
-        def add_to_static_index_ meta_k
-
-          send These___.fetch( meta_k ), meta_k
-        end
-
-        Static_Index___ = ::Struct.new(
-          :effectively_defaultants, :method_definers, :requireds )
-
-        These___ = {
-          effectively_defaultants: :_la_la_array,
-          method_definers: :__la_la_box,
-          requireds: :_la_la_array,
-        }
-
-        def _la_la_array meta_k
-
-          ( @_static_index[ meta_k ] ||= [] ).
-            push @_current_attribute_name_symbol ;
-          NIL_
-        end
-
-        def __la_la_box meta_k
-
-          ( @_static_index[ meta_k ] ||= Callback_::Box.new ).
-            add @_current_attribute_name_symbol, nil
-        end
-
-        def current_attribute
-          @_current_attribute
-        end
-
-        # --
+        # -- for client
 
         def __release_thing_ding_one
           remove_instance_variable :@_custom_index
@@ -420,10 +374,105 @@ module Skylab::Fields
         def __release_thing_ding_two
           remove_instance_variable :@_static_index
         end
+      end
+
+      # --
+
+      class Build_N_Meta_Attribute
+
+        def initialize ma_cls, atr_cls
+          @_attribute_class = atr_cls
+          @meta_attributes_class = ma_cls
+        end
+
+        attr_writer(
+          :attribute_services,
+          :build_N_plus_one_interpreter,
+          :finish_attribute,
+        )
+
+        def __build_and_process_attribute k, x  # AS PROTOTYPE
+          dup.flush_for_build_and_process_attribute_ k, x
+        end
+
+        def flush_for_build_and_process_attribute_ k, x
+
+          remove_instance_variable( :@_attribute_class ).new k do |atr|
+
+            @current_attribute = atr
+            @_name_symbol = k
+
+            if x
+              _ = ::Array.try_convert( x ) || [ x ]
+              st = Callback_::Polymorphic_Stream.via_array _
+              @sexp_stream_for_current_attribute = st
+
+              p = @build_N_plus_one_interpreter[ self ]
+              begin
+                p[ st.gets_one ]
+              end until st.no_unparsed_exists
+            end
+
+            @finish_attribute[ self ]
+
+            NIL_
+          end
+        end
+
+        # -- look like a parse (..)
+
+        def session
+          @current_attribute
+        end
+
+        # -- exposures
+
+        def add_methods_definer_by_ & atr_p
+
+          add_to_static_index_ :method_definers
+          @current_attribute.__add_methods_definer atr_p ; nil
+        end
+
+        def __add_to_custom_index meta_k
+          @attribute_services.add_to_the_custom_index_ @_name_symbol, meta_k
+        end
+
+        def add_to_static_index_ meta_k
+          @attribute_services.add_to_the_static_index_ @_name_symbol, meta_k
+        end
 
         attr_reader(
+          :current_attribute,
+          :meta_attributes_class,
           :sexp_stream_for_current_attribute,
         )
+      end
+
+      _SANITY_RX = /\A_/  # for now - catch typos & API mismatches
+
+      Common_build_N_plus_one_interpreter___ = -> build do
+
+        ma_cls = build.meta_attributes_class
+        mattrs = ma_cls.new build
+
+        -> k do
+          if ma_cls.method_defined? k
+            mattrs.__send__ k
+          else
+            _SANITY_RX =~ k or self._SANITY
+            build.__add_to_custom_index k
+          end
+          NIL_
+        end
+      end
+
+      Finish_attribute___ = -> build do
+
+        if ! build.current_attribute.parameter_arity
+          build.add_to_static_index_ :requireds
+        end
+
+        NIL_
       end
 
       # ==
@@ -529,7 +578,7 @@ module Skylab::Fields
 
           p_a = remove_instance_variable :@_pending_meths_definers
           if p_a
-            @_deffers = p_a.map do | p |
+            @deffers_ = p_a.map do | p |
               p[ self ]
             end.freeze
           end
@@ -578,7 +627,7 @@ module Skylab::Fields
         end
 
         attr_reader(
-          :_deffers,
+          :deffers_,
           :default_proc,
           :parameter_arity,
         )
