@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module MetaMetaFields::Enum
+  module MetaAttributes::Enum
 
     Extra_Value_Event = Callback_::Event.prototype_with(
       :invalid_property_value,

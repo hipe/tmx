@@ -27,7 +27,7 @@ module Skylab::TestSupport
 
           maybe_send_event :error, :invalid_property_value do
 
-            Home_.lib_.fields::MetaMetaFields::Enum::
+            Home_.lib_.fields::MetaAttributes::Enum::
               Build_extra_value_event[ x, enum_box.get_names, prp_name ]
           end
         end

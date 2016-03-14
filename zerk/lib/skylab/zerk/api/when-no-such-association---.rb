@@ -16,7 +16,7 @@ module Skylab::Zerk
 
         _st__ = _st_.flush_to_polymorphic_stream
 
-        o = Fields_::MetaMetaFields::Enum::Build_extra_value_event.new
+        o = Fields_::MetaAttributes::Enum::Build_extra_value_event.new
 
         o.invalid_value = arg_st.current_token
 

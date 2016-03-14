@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module MetaMetaFields::Enum
+  module MetaAttributes::Enum
 
     class Build_extra_value_event
 

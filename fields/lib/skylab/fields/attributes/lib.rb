@@ -28,8 +28,8 @@ module Skylab::Fields
           @_h = h
         end
 
-        def init__ sess, x_a
-          o = Parse__.new sess, self
+        def init__ sess, x_a, & x_p
+          o = Parse__.new sess, self, & x_p
           o.sexp = x_a
           o.__execute_as_init
         end
@@ -161,8 +161,10 @@ module Skylab::Fields
           __init_the_normalize_and_see_formal_attribute_procs
 
           kp = KEEP_PARSING_
+          oes_p = @_oes_p   # can be nil
           read = __formal_attribute_reader
           see_formal_attr = remove_instance_variable :@_see_formal_attribute
+
           st = @argument_stream
 
           until st.no_unparsed_exists
@@ -170,7 +172,7 @@ module Skylab::Fields
             @_attribute = read[]
             if @_attribute
               see_formal_attr[]
-              kp = @_attribute._interpret self  # result is "keep parsing"
+              kp = @_attribute._interpret self, & oes_p  # result is "keep parsing"
               kp and next
               break
             end
@@ -488,8 +490,8 @@ module Skylab::Fields
           @__m = m
         end
 
-        def _interpret parse
-          parse.session.send @__m
+        def _interpret parse, & x_p
+          parse.session.send @__m, & x_p
         end
       end
 
@@ -606,19 +608,21 @@ module Skylab::Fields
 
         # --
 
-        def _interpret parse
-          _args = Interpretation_Arguments___.new self, parse
-          _read_and_write _args
+        def _interpret parse, & x_p
+
+          _args = Interpretation_Services___.new self, parse
+          read_and_write_ _args, & x_p
         end
 
-        def _read_and_write args  # at least 2x here
-          send @_interpret_m, args
+        def read_and_write_ args, & x_p # at least 2x here
+
+          send @_interpret_m, args, & x_p
         end
 
-        def __common_interpret args
+        def __common_interpret args, & x_p
 
           _x = args.calculate( & @_read )
-          args.calculate _x, & @_write  # result is k.p
+          args.calculate _x, x_p, & @_write  # result is k.p
         end
 
         def __custom_interpret args
@@ -637,14 +641,14 @@ module Skylab::Fields
         argument_stream.gets_one
       end
 
-      Write___ = -> x do
-        session.instance_variable_set formal_attribute.as_ivar, x
+      Write___ = -> x, _ do
+        accept_attribute_value x
         KEEP_PARSING_
       end
 
       # ==
 
-      class Interpretation_Arguments___
+      class Interpretation_Services___
 
         def initialize attr, parse
           @_arg_st = nil
@@ -659,6 +663,11 @@ module Skylab::Fields
         end
 
         alias_method :calculate, :instance_exec
+
+        def accept_attribute_value x
+          @_parse.session.instance_variable_set @_formal_attribute.as_ivar, x
+          NIL_
+        end
 
         def argument_stream
           @_arg_st || @_parse.argument_stream

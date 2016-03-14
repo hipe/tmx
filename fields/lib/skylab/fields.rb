@@ -55,8 +55,8 @@ module Skylab::Fields
 
     # --
 
-    def init o, x_a
-      _index.init__ o, x_a
+    def init o, x_a, & x_p
+      _index.init__ o, x_a, & x_p
     end
 
     def define_methods mod

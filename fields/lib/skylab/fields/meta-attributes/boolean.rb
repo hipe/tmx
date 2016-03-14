@@ -2,15 +2,50 @@ module Skylab::Fields
 
   module MetaAttributes::Boolean
 
-    # ->
-
       # the conceptual logic ("DNA") predates the earliest code in this file
       # by about four years. this is for ancient "DSL-controllers".
       #
       # as an exercise, in this latest rewrite we are playing with this
       # would-be "method definer" pattern..
 
-      MODIFIERS = {
+    Parse = -> build do
+
+      st = build.sexp_stream_for_current_attribute
+
+      defs = MethodsDefiner___.new
+
+      begin
+        st.no_unparsed_exists and break
+        p = MODIFIERS___[ st.current_token ]
+        p or break
+        st.advance_one
+        p[ defs, st ]
+        redo
+      end while nil
+
+      defs.finish
+
+      build.add_methods_definer_by_ do |atr|
+
+        a = defs.stream_for( atr ).to_a
+
+        -> mod do
+          mod.module_exec do
+            st = Callback_::Stream.via_nonsparse_array a
+            begin
+              defn = st.gets
+              defn or break
+              define_method defn.name_x, & defn.value_x
+              redo
+            end while nil
+          end
+        end
+      end
+    end
+
+    # ->
+
+      MODIFIERS___ = {
 
         negative_stem: -> defs, st do
 
@@ -29,7 +64,7 @@ module Skylab::Fields
         # (etc)
       }
 
-      class MethodsDefiner
+      class MethodsDefiner___
 
         def initialize
           @_neg_write = nil

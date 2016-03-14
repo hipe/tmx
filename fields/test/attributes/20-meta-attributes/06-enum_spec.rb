@@ -7,58 +7,74 @@ module Skylab::Fields::TestSupport
 
     TS_.describe "[fi] attributes - meta-attributes - enum" do
 
-      if false
-    context 'you get no readers or writers out of the box so..' do
+      TS_[ self ]
+      use :memoizer_methods
+      use :expect_event
 
-      with do
-        param :color, :enum, [ :red, :blue ]
-      end
+      context "(context)" do
 
-      frame do
+        shared_subject :entity_class_ do
+          class X_MA_Enum_A
 
-        it "at declaration time, it will complain that there is no writer" do
-          begin
-            the_class_
-          rescue ::ArgumentError => e
+            attrs = Subject_module_[].call(
+              color: [ :enum, [ :red, :blue ] ],
+            )
+
+            ATTRIBUTES = attrs
+
+            attr_reader :color
+
+            self
           end
-          e.message.should eql "`enum` modifier #{
-            }must come after a modification that establishes a writer method"
-        end
-      end
-    end
-
-    context 'but if "foo" is a regular writer' do
-
-      with do
-        param :color, :writer, :enum, [ :red, :blue ]
-      end
-
-      spy_on_events_
-
-      frame do
-
-        it '"object.foo = :beta" (a valid value) changes the parameter value' do
-
-          object = object_
-
-          expect_unknown_ :color, object
-
-          object.color = :blue
-
-          force_read_( :color, object ).should eql :blue
         end
 
-        it "`object.foo = :gamma` will emit an error event" do
+        context "nope" do
 
-          object = object_
-          object.color = :orange
-          expect_not_OK_event :invalid_property_value,
-            "invalid color (ick :orange), expecting { red | blue }"
+          shared_subject :state_ do
+            _where :color, :green
+          end
 
-          expect_unknown_ :orange, object
+          it "fails" do
+            state_.result.should eql false
+          end
+
+          it "emits" do
+
+            _msg = "invalid attribute value 'green', expecting { red | blue }"
+
+            _be_this = be_emission :error, :invalid_attribute_value do |ev|
+              _ = black_and_white ev
+              _.should eql _msg
+            end
+
+            only_emission.should _be_this
+          end
         end
-      end
-    end
+
+        context "yep" do
+
+          shared_subject :state_ do
+            _where :color, :red
+          end
+
+          it "wins" do
+            _x = state_.result
+            :red == _x.color or fail
+          end
+        end
+
+        def _where * x_a
+
+          cls = entity_class_
+
+          _ent = cls.new
+
+          _ = event_log.handle_event_selectively
+
+          _x = cls::ATTRIBUTES.init _ent, x_a, & _
+
+          flush_event_log_and_result_to_state _x
+        end
       end
     end
   end

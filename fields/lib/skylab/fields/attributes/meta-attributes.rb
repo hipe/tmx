@@ -12,37 +12,7 @@ module Skylab::Fields
 
       def boolean  # for ancient DSL-controller. see also `flag`
 
-        st = @_.sexp_stream_for_current_attribute
-
-        defs = Home_::MetaAttributes::Boolean::MethodsDefiner.new
-
-        begin
-          st.no_unparsed_exists and break
-          p = Home_::MetaAttributes::Boolean::MODIFIERS[ st.current_token ]
-          p or break
-          st.advance_one
-          p[ defs, st ]
-          redo
-        end while nil
-
-        defs.finish
-
-        @_.add_methods_definer_by_ do |atr|
-
-          a = defs.stream_for( atr ).to_a
-
-          -> mod do
-            mod.module_exec do
-              st = Callback_::Stream.via_nonsparse_array a
-              begin
-                defn = st.gets
-                defn or break
-                define_method defn.name_x, & defn.value_x
-                redo
-              end while nil
-            end
-          end
-        end
+        Home_::MetaAttributes::Boolean::Parse[ @_ ]
       end
 
       def component  # #experimental:
@@ -111,6 +81,10 @@ module Skylab::Fields
         @_.add_to_static_index_ :effectively_defaultants ; nil
       end
 
+      def enum
+        Home_::MetaAttributes::Enum::Parse[ @_ ]
+      end
+
       def flag
         @_.current_attribute.read_by do
           true
@@ -133,7 +107,7 @@ module Skylab::Fields
 
           atr = index.lookup_attribute_ sym
           _mutate_for_redirect x, atr
-          atr._read_and_write self  # result is kp
+          atr.read_and_write_ self  # result is kp
         end
       end
 
@@ -212,7 +186,7 @@ module Skylab::Fields
 
           atr = index.lookup_attribute_ sym
           _mutate_for_redirect x, atr
-          atr._read_and_write self  # result is kp
+          atr.read_and_write_ self  # result is kp
         end
       end
 
@@ -456,103 +430,6 @@ module Skylab::Fields
     def when__monadic__
 
       send :"when__#{ @_polymorphic_upstream_.gets_one }__"
-    end
-
-    ## ~~ enum: validation on write. assumes selective event handler.
-
-    def when__enum__
-
-      enum_list = @_polymorphic_upstream_.gets_one
-      enum_box = nil  # built late
-      init_box = -> do
-        enum_box = Callback_::Box.new
-        enum_list.each do | x |
-          enum_box.add x, true
-        end
-        NIL_
-      end
-
-      me = self
-      sym = @name_symbol
-      wm = writer_method_name or raise ::ArgumentError, __say_enum
-
-      is_writer = EQUALS_BYTE__ == wm.id2name.getbyte( -1 )
-
-      @entity_model.module_exec do
-
-        if is_writer
-
-          downstream_method = :"accept__#{ sym }__after_enum"
-
-          alias_method downstream_method, wm
-
-          accept_bad_enum = :"accept_bad_enum_value_for__#{ sym }__"
-
-          define_method wm do | x |
-
-            enum_box || init_box[]
-            if enum_box.has_name x
-              send downstream_method, x
-            else
-              send accept_bad_enum, x, enum_box, me
-            end
-            x
-          end
-
-          define_method accept_bad_enum, ACCEPT_BAD_ENUM_VALUE__
-        else
-
-          downstream_method = :"receive__#{ sym }__after_enum"
-
-          alias_method downstream_method, wm
-
-          receive_bad_enum = :"receive_bad_enum_value_for__#{ sym }__"
-
-          define_method wm do | x |
-
-            enum_box || init_box[]
-            if enum_box.has_name x
-              send downstream_method, x
-            else
-              send receive_bad_enum, x, enum_box, me
-            end
-          end
-
-          define_method receive_bad_enum, RECEIVE_BAD_ENUM_VALUE___
-        end
-      end
-      KEEP_PARSING_
-    end
-
-    attr_reader :writer_method_name
-
-    def __say_enum
-      "`enum` modifier must come after #{
-        }a modification that establishes a writer method"
-    end
-
-    build_extra_value_event_proc = -> do
-
-      Home_::MetaMetaFields::Enum::Build_extra_value_event
-    end
-
-    EQUALS_BYTE__ = '='.getbyte 0
-
-    RECEIVE_BAD_ENUM_VALUE___ = -> x, bx, prp do
-
-      @on_event_selectively.call :error, :invalid_property_value do
-
-        build_extra_value_event_proc[][ x, bx.get_names, prp.name ]
-      end
-    end
-
-    ACCEPT_BAD_ENUM_VALUE__ = -> x, bx, prp do
-
-      @on_event_selectively.call :error, :invalid_property_value do
-
-        build_extra_value_event_proc[][ x, bx.get_names, prp.name ]
-      end
-      NIL_
     end
 
     ## ~~ DSL (atom | list): the writer does not end in a '='

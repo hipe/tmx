@@ -1,64 +1,83 @@
 module Skylab::Fields
 
-  MetaMetaFields = ::Module.new
+  module MetaAttributes::Enum
 
-  module MetaMetaFields::Enum
-    # ->
-      module Normalize_via_qualified_known ; class << self
+    when_failed = nil
 
-        # assumes `enum_box` (values ignored) as part of the qkn assoc.
+    Parse = -> build do
 
-        def _call qkn, & oes_p
+      ary = build.sexp_stream_for_current_attribute.gets_one
 
-          if qkn.is_known_known
-            ___against_known_known qkn, & oes_p
-          else
-            # if this field is not required, no one wants its absence to
-            # trigger enumeration membership failure. so we pass it on..
-            qkn.to_knownness
-          end
+      box = Lazy_.call do
+        bx = Callback_::Box.new
+        ary.each do |x|
+          bx.add x, nil
         end
-        alias_method :[], :_call
-        alias_method :call, :_call
+        bx
+      end
 
-        def ___against_known_known qkn, & oes_p
+      _ca = build.current_attribute
 
-          enum_bx = qkn.association.enum_box
+      _ca.write_by do |x, oes_p|
 
-          if enum_bx.has_name qkn.value_x
-            qkn.to_knownness
-          else
-            ___when_failed qkn, enum_bx, & oes_p
-          end
+        bx = box[]
+        if bx.has_name x  # as #here
+
+          accept_attribute_value x
+          KEEP_PARSING_
+        else
+
+          _qkn = Callback_::Qualified_Knownness.via_value_and_symbol x, :attribute_value
+
+          when_failed[ _qkn, bx, & oes_p ]
         end
+      end
+    end
 
-        def ___when_failed qkn, enum_bx, & oes_p
+    Normalize_via_qualified_known = -> qkn, & oes_p do
 
-          p = -> { ___build_event qkn, enum_bx }
+      # assumes `enum_box` (values ignored) as part of the qkn assoc.
 
-          if oes_p
+      if qkn.is_known_known
 
-            _unreliable = oes_p.call :error, :invalid_property_value do
-              p[]
-            end
+        bx = qkn.association.enum_box
 
-            UNABLE_
-          else
-            raise p[].to_exception
-          end
+        if bx.has_name qkn.value_x  # as #here
+          qkn.to_knownness
+        else
+          when_failed[ qkn, bx, & oes_p ]
         end
+      else
 
-        def ___build_event qkn, bx
+        # if this field is not required, no one wants its absence to
+        # trigger enumeration membership failure. so we pass it on..
 
-          _ = Here_::Build_extra_value_event[
-            qkn.value_x,
-            bx.get_names,
-            qkn.association.name_function,
-          ]
-          _
-        end
-      end ; end
-    # <-
+        qkn.to_knownness
+      end
+    end
+
+    when_failed = -> qkn, bx, & oes_p do
+
+      build_the_event = -> do
+        Here_::Build_extra_value_event.call(
+          qkn.value_x,
+          bx.get_names,
+          qkn.association.name,
+        )
+      end
+
+      if oes_p
+
+        oes_p.call :error, :invalid_attribute_value do
+          build_the_event[]
+        end  # result is unreliable
+
+        UNABLE_
+      else
+        raise build_the_event[].to_exception
+      end
+    end
+
     Here_ = self
   end
 end
