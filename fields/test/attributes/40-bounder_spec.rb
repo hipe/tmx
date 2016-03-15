@@ -5,153 +5,75 @@ module Skylab::Fields::TestSupport
   TS_.require_ :attributes   # #[#017]
   module Attributes
 
-    TS_.describe "[fi] attributes - bounders" do
+    TS_.describe "[fi] attributes - bounder" do
 
-      if false
-  it "loads" do
-    Skylab::Fields::Parameter::Bound
-  end
+      TS_[ self ]
+      use :memoizer_methods
+      Attributes[ self ]
 
-  def self._with & edit_p
+      context "(context)" do
 
-    with do
+        shared_subject :entity_class_ do
 
-      define_method :bound_parameters,
-        Skylab::Fields::Parameter::Bound::PARAMETERS_METHOD
+          class X_A_Bounder_A
 
-      class_exec( & edit_p )
-    end
-  end
+            attrs = Subject_module_[].call(
+              age: :_write,
+              pet: :list,
+              hobby: :_write,
+            )
 
-  context "lets you do questionable parameter reflection and manipulation" do
+            attrs.define_methods self
 
-    _with do
+            attr_writer( * attrs.symbols( :_write ) )
 
-      param :age, :DSL, :atom, :reader
-      param :pet, :DSL, :list, :reader
-      param :hobby, :accessor
-    end
+            ATTRIBUTES = attrs
 
-    frame do
-
-      before :each do  # (is modified in one test, not in another)
-
-        object = object_
-        object.age 'fifty one'
-        object.hobby = 'spelunk-fishing'
-        object.pet 'goldfish'
-        object.pet 'llama'
-      end
-
-      it "like iterate over names & values" do
-
-        names = []
-        values = []
-
-        object_.bound_parameters.each do |p|
-          names.push p.name.as_variegated_symbol
-          values.push p.value
-        end
-
-        names.should eql [ :age, :pet, :hobby ]
-
-        values.should eql(
-          [ "fifty one", [ "goldfish", "llama" ], "spelunk-fishing" ] )
-      end
-
-      it "search through all values and change values procedurally" do
-
-        object = object_
-
-        _st = object.bound_parameters.to_value_stream.expand_by do | bnd |  # mentor
-
-          if bnd.parameter.is_list
-            bnd.to_stream
-          else
-            Skylab::Callback::Stream.via_item bnd
+            self
           end
         end
 
-        rx = /fish/
-
-        _st.each do | bnd |
-          if rx =~ bnd.value
-            bnd.value = bnd.value.gsub rx, 'POTATO'
-          end
+        it "loads" do
+          _subject_module
         end
 
-        o = object.instance_variable_get('@pet')
-        o.should be_kind_of(::Array)
-        o.join.should eql('goldPOTATOllama')
-        object.hobby.should eql('spelunk-POTATOing')
-      end
-    end
-  end
+        it "builds" do
+          _the_bounder or fail
+        end
 
-  context 'where clauses!' do
+        it "value of list" do
+          _bnd = _of_list_attribute
+          _a = _bnd.value_x
+          _a.should eql %w( goldfish llama )
+        end
 
-    _with do
+        def _of_list_attribute
+          _the_bounder.lookup :pet
+        end
 
-      meta_param :this_one, :boolean
-      param :noun, :DSL, :list, :reader, :enum, [ :run, :walk ], :this_one
-      param :path, :accessor, :this_one
-      param :herkemer, :accessor
-      param :derkemer, :reader
-    end
+        shared_subject :_the_bounder do
 
-    frame do
+          _o = _this_entity
+          _mod = _subject_module
+          _guy = _mod[ _o ]
+        end
 
-      it "`to_bound_item_stream`" do
+        shared_subject :_this_entity do
+          _build_guy
+        end
 
-        object = _read_only_object
-
-        object.noun_array.should eql [ :walk, :walk, :run ]
-
-        object.path.should eql 'pathos'
-
-        a = object.bound_parameters.to_bound_item_stream.reduce_by do | bp |
-          bp.parameter.this_one?
-        end.to_a
-
-        a.length.should eql 4
-
-        a.map( & :value ).should eql [ :walk, :walk, :run, 'pathos' ]
+        def _build_guy
+          o = build_empty_entity_
+          o.age = 'fifty one'
+          o.hobby = 'spelunk-fishing'
+          o.pet 'goldfish'
+          o.pet 'llama'
+          o
+        end
       end
 
-      it "`at`" do
-
-        d, h = _read_only_bound_parameters.at :derkemer, :herkemer
-
-        d.name_symbol.should eql :derkemer
-        d.value.should be_nil
-        h.name_symbol.should eql :herkemer
-        h.value.should eql('the herkemer')
-      end
-
-      it "`fetch`" do
-
-        _bp = _read_only_bound_parameters.fetch :noun
-
-        _bp.value.should eql [ :walk, :walk, :run ]
-      end
-
-      dangerous_memoize_ :_read_only_bound_parameters do
-
-        _read_only_object.bound_parameters
-      end
-
-      dangerous_memoize_ :_read_only_object do
-
-        o = object_
-        o.noun :walk
-        o.noun :walk
-        o.noun :run
-        o.path = 'pathos'
-        o.herkemer = 'the herkemer'
-        o
-      end
-    end
-  end
+      def _subject_module
+        Home_::Attributes::Bounder
       end
     end
   end

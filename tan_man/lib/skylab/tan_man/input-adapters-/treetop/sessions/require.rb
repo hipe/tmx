@@ -4,30 +4,30 @@ module Skylab::TanMan
 
     class Sessions::Require  # see [#008]
 
-      _Parameter = Home_.lib_.fields::Parameter
+      Attributes_ = -> h do
+        Home_.lib_.fields::Attributes[ h ]
+      end
 
-      _Parameter::Definer[ self ]
+      attrs = Attributes_.call(
 
-      meta_param :required, :boolean
+        add_parser_enhancer_module: [ :list, :optional, ],
 
-      param :add_parser_enhancer_module, :DSL, :list, :default, nil
+        add_treetop_grammar: [ :list, ],
 
-      param :add_treetop_grammar, :DSL, :list, :required
+        force_overwrite: [ :boolean, :default, false ],
 
-      param :force_overwrite, :boolean, :default, false
+        input_path_head_for_relative_paths: [ :_write, :optional ],
 
-      param :input_path_head_for_relative_paths, :writer
+        output_path_head_for_relative_paths: [ :_write, :optional ],
+      )
 
-      param :output_path_head_for_relative_paths, :writer
+      attrs.define_methods self
 
-      # ~ internally we use the below against the above
+      attr_writer( * attrs.symbols( :_write ) )
 
-      define_method :normalize, _Parameter::Controller::NORMALIZE_METHOD
+      ATTRIBUTES = attrs
 
-      define_method :bound_parameters, _Parameter::Bound::PARAMETERS_METHOD
-
-      def initialize( & oes_p )
-
+      def initialize & oes_p
         @on_event_selectively = oes_p
       end
 
@@ -59,8 +59,6 @@ module Skylab::TanMan
 
         @_filesystem = Home_.lib_.system.filesystem  # mkdir_p
 
-        @formal_parameters = self.class.parameters
-
         ok = normalize
         ok &&= __resolve_units_of_work
         ok && Home_.lib_.TT  # either for compiling or for loading
@@ -71,10 +69,17 @@ module Skylab::TanMan
 
     private
 
+      def normalize  # near but not really the same as #[#fi-022] ..
+
+        self.class::ATTRIBUTES.normalize_session self  # handler?..
+      end
+
       def __resolve_units_of_work
 
+        _bound_attributes = Home_.lib_.fields::Attributes::Bounder[ self ]
+
         uow_a = Treetop_::Actors_::Build_units_of_work.call(
-          bound_parameters,
+          _bound_attributes,
           @_filesystem,
           & @on_event_selectively )
 

@@ -60,7 +60,7 @@ module Skylab::TanMan
           end
         end
 
-        # o.force_overwrite!  will re-write generated parser files
+        # o.force_overwrite!  # re-writes generated parser files - use only when syntax changes
 
         _path = Models_::DotFile.dir_pathname.to_path
 

@@ -1,188 +1,61 @@
-# encoding: UTF-8
-
 module Skylab::Fields
 
-  class Parameter
+  class Attributes
 
-    class Bound
+    class Bounder  # ANCIENT
 
-      PARAMETERS_METHOD = -> do  # typically `bound_parameters`
+      class << self
 
-        @formal_parameters ||= self.class.parameters
+        def _call sess
 
-        Models_::Collection.new self, @formal_parameters
+          _attrs = sess.class::ATTRIBUTES
+          new sess, _attrs
+        end
+
+        alias_method :[], :_call
+        alias_method :call, :_call
+        remove_method :_call
+
+        private :new
       end
 
-      Models_ = ::Module.new
+      def initialize sess, attrs
+        @attributes = attrs
+        @session = sess
+      end
 
-      class Models_::Collection
+      def lookup k
 
-        def initialize ent, foz
+        _attr = @attributes.attribute k
 
-          @_entity = ent
-          @_formal_parameters = foz
-        end
+        Bound___.new @session, _attr
+      end
 
-        def at * sym_a
+      class Bound___  # much like a writable [#ca-004] qkn
 
-          foz = @_formal_parameters
-          proto = _build_bound_prototype
+        # (note we scrapped TONS of blah blah because it wasn't covered..)
 
-          sym_a.map do | sym |
+        def initialize sess, attr
 
-            proto.dup._init foz.fetch sym
-          end
-        end
-
-        def fetch sym, & else_p
-
-          if else_p
-            no = nil
-            prp = @_formal_parameters.fetch sym do
-              no = true
-            end
-          else
-            prp = @_formal_parameters.fetch sym
-          end
-
-          if no
-            else_p[]
-          else
-            _build_bound_prototype._init prp
-          end
-        end
-
-        def each
-          st = to_value_stream
-          begin
-            bp = st.gets
-            bp or break
-            yield bp
-            redo
-          end while nil
-        end
-
-        def to_bound_item_stream  # like the next method, but flattens lists
-
-          to_value_stream.expand_by do | bnd |  # mentor is in spec
-
-            if bnd.parameter.is_list
-              bnd.to_stream
+          ivar = attr.as_ivar
+          @_read = -> do
+            if sess.instance_variable_defined? ivar
+              sess.instance_variable_get ivar
             else
-              Callback_::Stream.via_item bnd
+              raise __say_not_set ivar
             end
           end
         end
 
-        def to_value_stream
-
-          proto = _build_bound_prototype
-
-          @_formal_parameters.to_value_stream.map_by do | prp |
-
-            proto.dup._init prp
-          end
+        def value_x
+          @_read[]
         end
 
-        def _build_bound_prototype
-          Here_.new @_entity
-        end
-      end
-
-      Here_ = self
-      class Here_
-
-        # ~ as bound parameter model
-
-        attr_reader(
-          :parameter,
-        )
-
-        def initialize ent
-          @_ent = ent
-        end
-
-        # ~ special for (assume) list
-
-        def to_stream
-
-          a = value
-          if a
-            proto = Models_::For_Item.new a, @parameter
-
-            Callback_::Stream.via_times a.length do | d |
-              proto.dup.__init d
-            end
-          else
-            Callback_::Stream.the_empty_stream
-          end
-        end
-
-        # ~ normal
-
-        def _init prp
-          @parameter = prp
-          self
-        end
-
-        def value
-          @_ent.send :fetch, @parameter.name_symbol do
-            NIL_
-          end
-        end
-
-        def value= x
-          @_ent.send @parameter.writer_method_name, x
-          x
-        end
-
-        def name_symbol
-          @parameter.name_symbol
-        end
-
-        def name
-          @parameter.name
-        end
-
-        def is_item
-          false
-        end
-      end
-
-      class Models_::For_Item
-
-        attr_reader :parameter
-
-        def initialize a, para
-          @_a = a
-          @parameter = para
-        end
-
-        def __init d
-          @_d = d
-          self
-        end
-
-        def value
-          @_a.fetch @_d
-        end
-
-        def value= x  # ..
-          @_a[ @_d ] = x
-        end
-
-        def name_symbol
-          @parameter.name_symbol
-        end
-
-        def name
-          @parameter.name
-        end
-
-        def is_item
-          true
+        def __say_not_set ivar
+          "cannot read, is known unknown - #{ ivar }"
         end
       end
     end
   end
 end
+# #tombsone: rewrote from ANCIENT. not-covered behavior was archived.

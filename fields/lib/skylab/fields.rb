@@ -59,6 +59,10 @@ module Skylab::Fields
       _index.init__ o, x_a, & x_p
     end
 
+    def normalize_session o, & x_p
+      _index.normalize_session__ o, & x_p
+    end
+
     def define_methods mod
       _index.define_methods__ mod
     end

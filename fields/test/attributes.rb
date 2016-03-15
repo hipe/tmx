@@ -15,9 +15,15 @@ module Skylab::Fields::TestSupport
       tcc.include self
     end
 
+    Build_emp_ent_meth__ = -> do
+      entity_class_.new
+    end
+
     Attribute_method__ = -> k do
       entity_class_.const_get( :ATTRIBUTES, false ).attribute k
     end
+
+    define_method :build_empty_entity_, Build_emp_ent_meth__
 
     define_method :attribute_, Attribute_method__
 
@@ -30,6 +36,10 @@ module Skylab::Fields::TestSupport
       _ = the_attributes_
       _x = _.init self, x_a  # EGAGS
       _x.object_id == object_id or fail
+    end
+
+    def fails_
+      false == state_.result or fail
     end
 
     Subject_module_ = -> do
@@ -55,9 +65,7 @@ module Skylab::Fields::TestSupport
         flush_event_log_and_result_to_state _x
       end
 
-      def build_empty_entity_
-        entity_class_.new
-      end
+      define_method :build_empty_entity_, Build_emp_ent_meth__
 
       define_method :attribute_, Attribute_method__
 

@@ -12,7 +12,7 @@ module Skylab::TanMan
       #   • this once looked like a :+[#sy-004] normalizer. but no longer.
 
       Callback_::Actor.call( self, :properties,
-        :bound_parameters,
+        :bound_attributes,
         :filesystem,
       )
 
@@ -22,8 +22,9 @@ module Skylab::TanMan
 
         out_a = []
 
-        @_gx_bp = @bound_parameters.fetch :add_treetop_grammar  # a "list" b.p
-        @_gx_bp.value.each_with_index do | grammar_path, d |
+        @_gx_qkn = @bound_attributes.lookup :add_treetop_grammar  # a "list" b.p
+
+        @_gx_qkn.value_x.each_with_index do | grammar_path, d |
 
           @_grammar_path = grammar_path
           @_item_index = d
@@ -73,8 +74,8 @@ module Skylab::TanMan
 
       def _check_dir sym  # must assert is (existent) directory
 
-        bp = @bound_parameters.fetch sym
-        dir = bp.value
+        ba = @bound_attributes.lookup sym
+        dir = ba.value_x
 
         ok = if dir
 
@@ -82,10 +83,10 @@ module Skylab::TanMan
             instance_variable_set :"@__#{ sym }__", dir
             ACHIEVED_
           else
-            maybe_send_error :__build_not_directory_error, bp
+            maybe_send_error :__build_not_directory_error, ba
           end
         else
-          maybe_send_error :__build_no_anchor_path_event, :xx, bp
+          maybe_send_error :__build_no_anchor_path_event, :xx, ba
         end
 
         if ! ok
@@ -166,35 +167,38 @@ module Skylab::TanMan
         end
       end
 
-      def __build_not_abspath_event prp, prp_
+      def __build_not_abspath_event qkn, qkn_
 
-        build_not_OK_event_with :not_absolute_path, :prop, prp do |y, o|
+        build_not_OK_event_with :not_absolute_path do |y, _|
 
-          y << "#{ prp_.name_symbol } must be an absolute #{
-            }path in order to expand paths like #{ prp.label }"
+          y << "#{ nm qkn_.name } must be an absolute #{
+            }path in order to expand paths like #{ nm qkn.name } #{
+              }(path: #{ pth qkn.value_x })"
         end
       end
 
-      def __build_no_anchor_path_event prp, prp_
+      def __build_no_anchor_path_event qkn, qkn_
 
-        build_not_OK_event_with :no_anchor_path do |y, o|
+        build_not_OK_event_with :no_anchor_path do |y, _|
 
-          y << "#{ prp_.name_symbol } must be set #{
-            }in order to support a relative path like #{ prp.label }!"
+          y << "#{ nm qkn_.name } must be set #{
+            }in order to support a relative path like #{ o.qkn.label }!"
         end
       end
 
-      def __build_not_directory_error prop
+      def __build_not_directory_error qkn
 
-        build_not_OK_event_with :not_a_directory, :prop, prop do |y, o|
-          y << "#{ o.prop.label } is not a directory: #{ pth prop.value }"
+        build_not_OK_event_with :not_a_directory do |y, _|
+
+          y << "#{ nm qkn.name } is not a directory: #{ pth qkn.value_x }"
         end
       end
 
-      def __build_not_found_error prop
+      def __build_not_found_error qkn
 
-        build_not_OK_event_with :not_found, :prop, prop do |y, o|
-          y << "#{ prop.label } not found: #{ pth prop.value }"
+        build_not_OK_event_with :not_found do |y, _|
+
+          y << "#{ nm qkn.name } not found: #{ pth qkn.value_x }"
         end
       end
     end

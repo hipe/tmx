@@ -29,9 +29,14 @@ module Skylab::Fields
         end
 
         def init__ sess, x_a, & x_p
-          o = Parse__.new sess, self, & x_p
+          o = Parse_and_or_Normalize__.new sess, self, & x_p
           o.sexp = x_a
           o.__execute_as_init
+        end
+
+        def normalize_session__ sess, & x_p
+          _ = Parse_and_or_Normalize__.new sess, self, & x_p
+          _.execute
         end
 
         # --
@@ -90,7 +95,7 @@ module Skylab::Fields
           _idx = formals.index_
         end
 
-        o = Parse__.new sess, _idx, & x_p
+        o = Parse_and_or_Normalize__.new sess, _idx, & x_p
 
         o.argument_stream = st
 
@@ -123,10 +128,11 @@ module Skylab::Fields
         end
       end
 
-      class Parse__
+      class Parse_and_or_Normalize__
 
         def initialize sess, index, & oes_p
 
+          @argument_stream = nil
           @_formal_reader_stack = []
           @index = index  # can be nil
           @_oes_p = oes_p  # can be nil
@@ -157,14 +163,34 @@ module Skylab::Fields
 
         def execute
 
-          __given_any_static_indexes_do_ZA_ZA
+          __given_any_static_indexes_push_to_formal_reader_stack
 
-          __init_the_normalize_and_see_formal_attribute_procs
+          if @_do_normalize  # for now..
+            normalize_m = :__do_normalize
+          end
+
+          if @argument_stream
+            kp = ___process_argument_stream
+          else
+            kp = KEEP_PARSING_
+          end
+
+          if kp && normalize_m
+            kp = send normalize_m
+          end
+
+          kp
+        end
+
+        def ___process_argument_stream
 
           kp = KEEP_PARSING_
+
           oes_p = @_oes_p   # can be nil
+
           read = __formal_attribute_reader
-          see_formal_attr = remove_instance_variable :@_see_formal_attribute
+
+          see_formal_attr = @argument_stream.method :advance_one  # ..
 
           st = @argument_stream
 
@@ -180,11 +206,6 @@ module Skylab::Fields
             kp = ___at_extra
             break
           end
-
-          if kp && @_normalize_method
-            kp = send @_normalize_method
-          end
-
           kp
         end
 
@@ -204,14 +225,13 @@ module Skylab::Fields
           raise _ev.to_exception
         end
 
-        def __given_any_static_indexes_do_ZA_ZA
+        def __given_any_static_indexes_push_to_formal_reader_stack
 
           idx = @index
           if idx
 
             sidx = idx._static_index
-            loo_loo = sidx.effectively_defaultants
-            if loo_loo  # [#012] #spot-2
+            if sidx.effectively_defaultants  # [#012] #spot-2
               yes = true
             end
 
@@ -222,22 +242,11 @@ module Skylab::Fields
             end )
           end
 
-          @_yes = yes
+          @_do_normalize = yes
           NIL_
         end
 
-        def __init_the_normalize_and_see_formal_attribute_procs
-
-          if @_yes  # for now..
-            m = :___do_normalize
-          end
-
-          @_normalize_method = m
-          @_see_formal_attribute = @argument_stream.method :advance_one  # ..
-          NIL_
-        end
-
-        def ___do_normalize
+        def __do_normalize
 
           o = Here_::Normalization.begin( & @_oes_p )
 
@@ -519,7 +528,7 @@ module Skylab::Fields
 
         def initialize k, & edit_p
 
-          @_parameter_arity_canary = nil
+          @_become_optional_m = :_change_parameter_arity_to_be_optional_once
           @_pending_meths_definers = nil
 
           @_RW_m = :__receive_first_read_and_write_proc
@@ -537,14 +546,12 @@ module Skylab::Fields
         # -- be normalizant
 
         def be_optional__
-          remove_instance_variable :@_parameter_arity_canary
-          @parameter_arity = :zero_or_one
+          send @_become_optional_m
           NIL_
         end
 
         def be_defaultant_by_value__ x
-          remove_instance_variable :@_parameter_arity_canary
-          @parameter_arity = :zero_or_one
+          send @_become_optional_m
           # ..
           @default_proc = -> do
             x
@@ -552,8 +559,13 @@ module Skylab::Fields
           NIL_
         end
 
-        # --
+        def _change_parameter_arity_to_be_optional_once
 
+          @_become_optional_m = :___optionality_is_locked__is_already_optional
+          @parameter_arity = :zero_or_one ; nil
+        end
+
+        # --
 
         def accept_description_proc__ p
 
@@ -601,8 +613,8 @@ module Skylab::Fields
 
         def freeze
 
-          if instance_variable_defined? :@_parameter_arity_canary
-            remove_instance_variable :@_parameter_arity_canary
+          if :_change_parameter_arity_to_be_optional_once ==  # eek
+              remove_instance_variable( :@_become_optional_m )
             @parameter_arity = :one
           end
 

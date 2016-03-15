@@ -5,174 +5,235 @@ module Skylab::Fields::TestSupport
   TS_.require_ :attributes   # #[#017]
   module Attributes
 
-    TS_.describe "[fi] attributes - normalization" do
+    TS_.describe "[fi] attributes - normalization (progressive edit sessions)" do
 
-      if false
+      TS_[ self ]
+      use :memoizer_methods
+      use :expect_event
+      Attributes[ self ]
 
-    it "loads" do
-      Home_::Parameter::Controller
-    end
+      context "for requireds" do
 
-    _COMMON_SETUP = -> do
+        shared_subject :entity_class_ do
 
-      meta_param :required, :boolean
+          class X_A_N11n_A
 
-      define_method :normulize,
-        Home_::Parameter::Controller::NORMALIZE_METHOD
+            attrs = Subject_module_[].call(
+              first_name: :optional,
+              last_name: nil,
+              soc: nil,
+            )
 
-      attr_accessor :on_event_selectively
-    end
+            attr_writer( * attrs.symbols )
 
-    context "missing requireds" do
+            ATTRIBUTES = attrs
 
-      with do
-
-        module_exec( & _COMMON_SETUP )
-
-        param :first_name, :writer
-        param :last_name, :writer, :required
-        param :soc, :writer, :required
-      end
-
-      frame do
-
-        it "when missing" do
-
-          o = _object
-          _x = o.normulize
-
-          expect_not_OK_event :missing_required_properties,
-            /\Aguy-\d+ parameter missing the required parameters #{
-              }'last-name' and 'soc'\z/
-
-          expect_no_more_events
-
-          _x.should eql false
+            self
+          end
         end
 
-        it "when none missing" do
+        context "when some missing" do
 
-          o = _object
+          shared_subject :state_ do
+
+            _ = build_empty_entity_
+
+            _against_this_entity _
+          end
+
+          it "fails" do
+            fails_
+          end
+
+          it "emits" do
+
+            _rx = /\bmissing required attributes 'last-name' and 'soc'/
+
+            _be_this = be_emission :error, :missing_required_attributes do |ev|
+              _msg = black_and_white ev
+              _msg.should match _rx
+            end
+
+            only_emission.should _be_this
+          end
+        end
+
+        it "when none missing oK" do
+
+          o = build_empty_entity_
           o.last_name = false  # treated as required
           o.soc = :yeah
-          _x = o.normulize
-
-          expect_no_events
-
-          _x.should eql true
+          _against_this_entity_expect_OK_normalization o
         end
       end
-    end
 
-    context "defaulting" do
+      context "defaulting" do
 
-      with do
+        shared_subject :entity_class_ do
 
-        module_exec( & _COMMON_SETUP )
+          class X_A_N11n_B
 
-        param :a, :writer, :default, :one
-        param :b, :writer
-        param :c, :writer, :default, :three
+            attrs = Subject_module_[].call(
+              a: [ :default, :one ],
+              b: nil,
+              c: [ :default, :three, ],
+            )
 
+            attr_writer( * attrs.symbols )
+            attr_reader( * attrs.symbols )
+
+            ATTRIBUTES = attrs
+
+            self
+          end
+        end
+
+        it "doesn't overwrite already provided (non-nil) values" do
+
+          o = build_empty_entity_
+          o.a = false
+          o.b = false
+          o.c = :hi
+
+          _against_this_entity_expect_OK_normalization o
+
+          false == o.a or fail
+          :hi == o.c or fail
+        end
+
+        it "does default only one nil value" do
+
+          o = build_empty_entity_
+          o.a = :hello
+          o.b = :howdy
+
+          o.instance_variable_defined?( :@c ).should eql false
+
+          _against_this_entity_expect_OK_normalization o
+
+          :hello == o.a or fail
+          :howdy == o.b or fail
+          :three == o.c or fail
+        end
+
+        it "does default all nil values" do
+
+          o = build_empty_entity_
+          o.a = nil
+          o.b = false
+          _against_this_entity_expect_OK_normalization o
+          :one == o.a or fail
+          :three == o.c or fail
+        end
       end
 
-      it "doesn't overwrite already provided (non-nil) values" do
+      context "(synthesis)" do
 
-        o = _object
-        o.a = false
-        o.c = :hi
+        shared_subject :entity_class_ do
 
-        o.normulize.should eql true
-        expect_no_events
+          class X_A_N11n_C
 
-        force_read_( :a, o ).should eql false
-        force_read_( :c, o ).should eql :hi
+            attrs = Subject_module_[].call(
+
+              a: :optional,
+              b: nil,
+              c: [ :default, :three ],
+              d: [ :default, :four ],
+            )
+
+            attr_writer( * attrs.symbols )
+            attr_reader( * attrs.symbols )
+
+            ATTRIBUTES = attrs
+
+            self
+          end
+        end
+
+        it "when ok" do
+
+          o = build_empty_entity_
+
+          o.instance_variable_set :@b, true
+
+          _against_this_entity_expect_OK_normalization o
+
+          :three == o.c or fail
+          :four == o.d or fail
+        end
+
+        context "when missing (note all defaulting is effected regardless)" do
+
+          shared_subject :_state_tuple do
+
+            o = build_empty_entity_
+
+            _ = event_log.handle_event_selectively
+
+            x = entity_class_::ATTRIBUTES.normalize_session o, & _
+
+            a = remove_instance_variable( :@event_log ).flush_to_array
+
+            [ x, a, o ]
+          end
+
+          it "fails" do
+            false == _state_tuple.fetch( 0 ) or fail
+          end
+
+          it "emits" do
+
+            _rx = /\Amissing required attribute 'b'\z/
+
+            _be_this = be_emission :error, :missing_required_attributes do |ev|
+
+              black_and_white( ev ).should match _rx
+
+            end
+
+            only_emission.should _be_this
+          end
+
+          it "event has details" do
+
+            _em = emission_array.fetch( 0 )
+
+            _ev = _em.cached_event_value
+
+            a = _ev.miss_a
+
+            a.length.should eql 1
+
+            a.first.name_symbol.should eql :b
+          end
+
+          it "did NOT write defaults!" do
+
+            o = _state_tuple.fetch 2
+
+            o.instance_variable_defined?( :@c ) and fail
+            o.instance_variable_defined?( :@d ) and fail
+          end
+
+          def emission_array
+            _state_tuple.fetch 1
+          end
+        end
       end
 
-      it "does default only one nil value" do
+      def _against_this_entity_expect_OK_normalization o
 
-        o = _object
-        o.a = :hello
-        o.b = :howdy
-
-        o.instance_variable_defined?( :@c ).should eql false
-
-        o.normulize.should eql true
-        expect_no_events
-
-        force_read_( :a, o ).should eql :hello
-        force_read_( :b, o ).should eql :howdy
-        force_read_( :c, o ).should eql :three
+        _x = entity_class_::ATTRIBUTES.normalize_session o
+        true == _x or fail
       end
 
-      it "does default all nil values" do
+      def _against_this_entity o
 
-        o = _object
-        o.a = nil
+        _ = event_log.handle_event_selectively
 
-        o.normulize.should eql true
-        expect_no_events
+        _x = entity_class_::ATTRIBUTES.normalize_session o, & _
 
-        force_read_( :a, o ).should eql :one
-        force_read_( :c, o ).should eql :three
-      end
-    end
-
-    context "synthesis" do
-
-      with do
-
-        module_exec( & _COMMON_SETUP )
-
-        param :a
-        param :b, :required
-        param :c, :default, :three
-        param :d, :required, :default, :four
-
-      end
-
-      it "when ok" do
-
-        o = _object
-        o.instance_variable_set :@b, true
-
-        o.normulize.should eql true
-        expect_no_events
-
-        o.instance_variable_get( :@c ).should eql :three
-        o.instance_variable_get( :@d ).should eql :four
-      end
-
-      it "when missing (note all defaulting is effected regardless)" do
-
-        o = _object
-
-        o.normulize.should eql false
-
-        _em = expect_not_OK_event :missing_required_properties
-
-        a = _em.cached_event_value.parameters
-
-        a.length.should eql 1
-        a.first.name_symbol.should eql :b
-
-        expect_no_more_events
-
-        o.instance_variable_get( :@c ).should eql :three
-        o.instance_variable_get( :@d ).should eql :four
-      end
-    end
-
-    def _object
-
-      o = object_
-      o.on_event_selectively = handle_event_selectively_
-      o
-    end
-
-    def expression_agent_for_expect_event
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
+        flush_event_log_and_result_to_state _x
       end
     end
   end
