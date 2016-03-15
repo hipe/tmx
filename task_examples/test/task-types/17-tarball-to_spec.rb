@@ -5,6 +5,7 @@ module Skylab::TaskExamples::TestSupport
   describe "[te] task-types - tarball to", wip: true do
 
     TS_[ self ]
+    use :memoizer_methods
     use :task_types
 
     def subject_class_
@@ -21,7 +22,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def build_arguments_
-        EMPTY_H_
+        NOTHING_
       end
     end
 
@@ -44,17 +45,17 @@ module Skylab::TaskExamples::TestSupport
         NIL_
       end
 
-      def tarball_to
+      def _tarball_to
         ::File.join BUILD_DIR, 'ohai'
       end
 
       _URL = 'http://localhost:1324/mginy-0.0.1.tar.gz'.freeze
 
       define_method :build_arguments_ do
-        {
-          from: _URL,
-          tarball_to: tarball_to,
-        }
+        [
+          :from, _URL,
+          :tarball_to, _tarball_to,
+        ]
       end
     end
 

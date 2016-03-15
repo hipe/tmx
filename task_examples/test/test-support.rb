@@ -175,5 +175,6 @@ module Skylab::TaskExamples::TestSupport
   DOT_BYTE_ = '.'.getbyte 0
   EMPTY_H_ = {}.freeze
   NIL_ = nil
+  NOTHING_ = nil
   TS_ = self
 end

@@ -6,16 +6,24 @@ module Skylab::TaskExamples::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_event
     use :task_types
 
     def subject_class_
       Task_types_[]::VersionFrom
     end
 
+    context "essential" do
+
+      it "loads" do
+        subject_class_
+      end
+    end
+
     context "when reporting a version" do
 
-      memoize :context_ do
-        { show_version: true }.freeze
+      def _do_show_version
+        true
       end
 
       context 'without using a regex' do
@@ -31,7 +39,7 @@ module Skylab::TaskExamples::TestSupport
           _expect_only_string 'version 1.2.34 is the version'
         end
 
-        def parse_with
+        def _parse_with
           NIL_
         end
       end
@@ -47,10 +55,10 @@ module Skylab::TaskExamples::TestSupport
           end
 
           it "shows the matched portion of the output" do
-            _expect_only_version '1.3.78'
+            __expect_only_version '1.3.78'
           end
 
-          def version_from
+          def _version_from
             'echo "ver 1.3.78 is it"'
           end
         end
@@ -67,7 +75,7 @@ module Skylab::TaskExamples::TestSupport
             _expect_only_string 'ver A.B.foo'
           end
 
-          def version_from
+          def _version_from
             'echo "ver A.B.foo"'
           end
         end
@@ -86,11 +94,11 @@ module Skylab::TaskExamples::TestSupport
           expect_strong_failure_with_message_ _rx
         end
 
-        def version_from
+        def _version_from
           '1.2+'
         end
 
-        def must_be_in_range
+        def _must_be_in_range
           '~> 1.2'
         end
       end
@@ -107,7 +115,7 @@ module Skylab::TaskExamples::TestSupport
           expect_strong_failure_with_message_ _rx
         end
 
-        def must_be_in_range
+        def _must_be_in_range
           NIL_
         end
       end
@@ -124,10 +132,10 @@ module Skylab::TaskExamples::TestSupport
 
           it "says that it matches" do
 
-            _expect_OK 'version 1.2.1 is in range 1.2+'
+            __expect_OK 'version 1.2.1 is in range 1.2+'
           end
 
-          def version_from
+          def _version_from
             'echo "ver 1.2.1"'
           end
         end
@@ -145,7 +153,7 @@ module Skylab::TaskExamples::TestSupport
             _expect_version_mismatch_against '0.0.1'
           end
 
-          def version_from
+          def _version_from
             'echo "version 0.0.1"'
           end
         end
@@ -168,7 +176,7 @@ module Skylab::TaskExamples::TestSupport
           _expect_version_mismatch_against "version A.B.C"
         end
 
-        def version_from
+        def _version_from
           'echo "version A.B.C"'
         end
       end
@@ -177,8 +185,8 @@ module Skylab::TaskExamples::TestSupport
         EMPTY_H_
       end
 
-      memoize :must_be_in_range do
-        '1.2+'.freeze
+      def _must_be_in_range
+        '1.2+'
       end
 
       def _expect_version_mismatch_against s
@@ -190,38 +198,45 @@ module Skylab::TaskExamples::TestSupport
     end
 
     def build_arguments_
-      {
-        must_be_in_range: must_be_in_range,
-        parse_with: parse_with,
-        version_from: version_from,
-      }
+      [
+        :must_be_in_range, _must_be_in_range,
+        :parse_with, _parse_with,
+        :show_version, _do_show_version,
+        :version_from, _version_from,
+      ]
     end
 
-    def must_be_in_range
+    def _do_show_version
+      false
+    end
+
+    def _must_be_in_range
       NIL_
     end
 
-    memoize :parse_with do
-      '/(\d+\.\d+\.\d+)/'.freeze
+    def _parse_with
+      '/(\d+\.\d+\.\d+)/'
     end
 
-    memoize :version_from do
-      'echo "version 1.2.34 is the version"'.freeze
+    def _version_from
+      'echo "version 1.2.34 is the version"'
     end
 
-    def _expect_only_version s
+    def __expect_only_version s
 
-      expect_only_ :styled, :payload, /\Aversion: #{ ::Regexp.escape s }\z/
+      _rx = /\Aversion: #{ ::Regexp.escape s }\z/
+
+      payload_expression_message_.should match _rx
     end
 
     def _expect_only_string s
 
-      expect_only_ :styled, :payload, "version: #{ s }"
+      payload_expression_message_.should eql "version: #{ s }"
     end
 
-    def _expect_OK s
+    def __expect_OK s
 
-      expect_only_ :styled, :info, "version ok: #{ s }"
+      info_expression_message_.should eql "version ok: #{ s }"
     end
   end
 end

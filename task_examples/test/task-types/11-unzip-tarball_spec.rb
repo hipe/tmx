@@ -20,7 +20,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def build_arguments_
-        EMPTY_H_
+        NOTHING_
       end
 
       def context_
@@ -80,7 +80,7 @@ module Skylab::TaskExamples::TestSupport
           it "expresses" do
 
             _rx = /exists, won't tar extract: .*mginy/
-            expect_only_ :info, _rx
+            info_expression_message_.should match  _rx
           end
 
           def _this_ o
@@ -138,9 +138,9 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def build_arguments_
-        {
-          unzip_tarball: unzip_tarball,
-        }
+        [
+          :unzip_tarball, _unzip_tarball,
+        ]
       end
 
       memoize :context_ do

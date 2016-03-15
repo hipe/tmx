@@ -6,8 +6,8 @@ module Skylab::TaskExamples::TestSupport
 
       def [] tcc
 
-        tcc.send :define_singleton_method, :shared_state_ do  # #todo
-          NIL_
+        tcc.send :define_singleton_method, :shared_state_ do
+          Establish_shared_state_scope___[ self ]
         end
 
         tcc.include Instance_Methods__
@@ -15,11 +15,23 @@ module Skylab::TaskExamples::TestSupport
       end
     end  # >>
 
+    Establish_shared_state_scope___ = -> tcc do
+
+      tcc.shared_subject :state_ do
+        _x_a = build_arguments_
+        _state_where_emission_is_expected_via_even_iambic _x_a
+      end
+    end
+
     module Instance_Methods__
 
       # -- general emission assertion
 
       def state_where_emission_is_expected_ * x_a
+        _state_where_emission_is_expected_via_even_iambic x_a
+      end
+
+      def _state_where_emission_is_expected_via_even_iambic x_a
 
         _cls = subject_class_
 
@@ -37,9 +49,21 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def error_expression_message_
+        _expression_message ERROR_EXPRESSION_CHANNEL___
+      end
+
+      def info_expression_message_
+        _expression_message INFO_EXPRESSION_CHANNEL___
+      end
+
+      def payload_expression_message_
+        _expression_message PAYLOAD_EXPRESSION_CHANNEL___
+      end
+
+      def _expression_message chan
 
         y = nil
-        _be_this = be_emission :error, :expression do |y_|
+        _be_this = be_emission_via_array  chan do |y_|
           y = y_
         end
 
@@ -48,17 +72,9 @@ module Skylab::TaskExamples::TestSupport
         y.fetch 0
       end
 
-      def success_expression_message_
-
-        y = nil
-        _be_this = be_emission :info, :expression do |y_|
-          y = y_
-        end
-
-        only_emission.should _be_this
-
-        y.fetch 0
-      end
+      ERROR_EXPRESSION_CHANNEL___ = [ :error, :expression ]
+      INFO_EXPRESSION_CHANNEL___ = [ :info, :expression ]
+      PAYLOAD_EXPRESSION_CHANNEL___ = [ :payload, :expression ]
 
       def fails_
         _x = state_.result

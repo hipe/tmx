@@ -398,6 +398,10 @@ module Skylab::Callback::TestSupport
       end
 
       def be_emission * x_a, & x_p
+        be_emission_via_array x_a, & x_p
+      end
+
+      def be_emission_via_array x_a, & x_p
 
         _expev_matcher_by do
 

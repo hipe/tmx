@@ -32,7 +32,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def build_arguments_
-        NIL_
+        NOTHING_
       end
     end
 
@@ -48,7 +48,7 @@ module Skylab::TaskExamples::TestSupport
             _task.dry_run?.should eql false
           end
 
-          def mkdir_p
+          def _mkdir_p
             :hello
           end
 
@@ -75,10 +75,11 @@ module Skylab::TaskExamples::TestSupport
             end
 
             it "expresses" do
-              expect_only_ :info, /\bmore than 1 levels deep\b/i
+              _rx = /\bmore than 1 levels deep\b/i
+              error_expression_message_.should match _rx
             end
 
-            def max_depth
+            def _max_depth
               1
             end
           end
@@ -98,10 +99,10 @@ module Skylab::TaskExamples::TestSupport
 
             it "expresses" do
               _rx = %r(mkdir .*foo/bar)
-              expect_only_ :info, _rx
+              info_expression_message_.should match  _rx
             end
 
-            def max_depth
+            def _max_depth
               2
             end
           end
@@ -111,17 +112,17 @@ module Skylab::TaskExamples::TestSupport
           end
 
           def build_arguments_
-            {
-              mkdir_p: mkdir_p,
-              max_depth: max_depth,
-            }
+            [
+              :mkdir_p, _mkdir_p,
+              :max_depth, _max_depth,
+            ]
           end
 
-          def max_depth
+          def _max_depth
             0
           end
 
-          memoize :mkdir_p do
+          memoize :_mkdir_p do
 
             _ = TestSupport_::Fixtures.dir :empty_esque_directory
             ::File.join( _, 'foo/bar' ).freeze
@@ -131,7 +132,7 @@ module Skylab::TaskExamples::TestSupport
     end
 
     def build_arguments_
-      { mkdir_p: mkdir_p }
+      [ :mkdir_p, _mkdir_p ]
     end
 
     def context_

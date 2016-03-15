@@ -1,3 +1,8 @@
+[#023] #when-etc use (or don't) for all occurrences of old memoize
+             (after benchmarking it)
+
+[#022] #when-etc use (or don't) for all occurrences of `return`
+
 [#021]       [ the interface model ]
 
 [#020] #if-you-like-pain (we first thought of this while implementing

@@ -2,24 +2,21 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types - executable", wip: true do
+  describe "[te] task-types - executable" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
     use :task_types
 
     def subject_class_
       Task_types_[]::Executable
     end
 
-    context "requires some things" do
+    context "essential" do
 
-      it "and raises hell when it doesn't have them" do
-
-        expect_missing_required_attributes_are_ :executable
-      end
-
-      def executable
-        NIL_
+      it "loads" do
+        subject_class_
       end
     end
 
@@ -32,11 +29,11 @@ module Skylab::TaskExamples::TestSupport
       end
 
       it "expresses" do
-        _rx = /not in PATH: not-an-executable/
-        expect_only_ :styled, :info, _rx
+        _rx = /\Anot in PATH: not-an-executable\z/
+        error_expression_message_.should match _rx
       end
 
-      def executable
+      def _executable
         'not-an-executable'
       end
     end
@@ -51,21 +48,17 @@ module Skylab::TaskExamples::TestSupport
 
       it "expresses" do
 
-        _rx = /\bruby$/
-        expect_only_ :info, _rx
+        _rx = /\bruby\z/
+        info_expression_message_.should match _rx
       end
 
-      def executable
+      def _executable
         'ruby'
       end
     end
 
     def build_arguments_
-      { executable: executable }
-    end
-
-    def context_
-      NIL_
+      [ :executable, _executable ]
     end
   end
 end

@@ -1,26 +1,39 @@
 module Skylab::TaskExamples
 
-  class TaskTypes::Executable < Home_::Task
+  class TaskTypes::Executable < Common_task_[]
 
-    attribute :executable, :required => true
+    # succeeds if the given executable name is in the system's PATH
+    # environment variable. reports its findings either way.
 
-    listeners_digraph  :all, :info => :all
+    depends_on_parameters(
+      :executable,
+    )
 
-    def execute context
+    def execute
 
-      @context ||= (context[:args] || {})
+      path = Home_.lib_.system.open2 [ 'which', @executable ]  # ??
 
-      valid? or fail invalid_reason
-
-      path = Home_.lib_.system.open2 [ 'which', executable ]
-      path.strip!
+      path.strip!  # necessary IFF nonzero length
       if path.length.zero?
-        call_digraph_listeners(:info, "#{no 'not in PATH:'} #{executable}")
-        false
+        ___when_not_in_PATH
       else
-        call_digraph_listeners(:info, path)
-        true
+        __when_in_PATH path
       end
+    end
+
+    def ___when_not_in_PATH
+      x = @executable
+      @_oes_p_.call :error, :expression do |y|
+        y << "not in PATH: #{ x }"
+      end
+      UNABLE_
+    end
+
+    def __when_in_PATH path
+      @_oes_p_.call :info, :expression do |y|
+        y << "#{ path }"
+      end
+      ACHIEVED_
     end
   end
 end

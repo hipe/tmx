@@ -58,7 +58,7 @@ module Skylab::TaskExamples::TestSupport
         end
       end
 
-      def from
+      def _from
         NIL_
       end
 
@@ -66,7 +66,7 @@ module Skylab::TaskExamples::TestSupport
         @___source_file_path ||= ::File.join FIXTURES_DIR, uri
       end
 
-      def get
+      def _get
         ::File.join host, uri
       end
 
@@ -94,11 +94,11 @@ module Skylab::TaskExamples::TestSupport
           expect_only_ :shell, %r(./another-file\.txt\z)
         end
 
-        def from
+        def _from
           host
         end
 
-        def get
+        def _get
           %w(some-file.txt another-file.txt)
         end
       end
@@ -122,11 +122,11 @@ module Skylab::TaskExamples::TestSupport
           _dir_files.should eql %w( another-file.txt )
         end
 
-        def from
+        def _from
           host
         end
 
-        def get
+        def _get
           %w(not-there.txt another-file.txt)
         end
       end
@@ -152,10 +152,10 @@ module Skylab::TaskExamples::TestSupport
     end
 
     def build_arguments_
-      {
-        from: from,
-        get: get,
-      }
+      [
+        :from, _from,
+        :get, _get,
+      ]
     end
 
     def build_dir

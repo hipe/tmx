@@ -13,7 +13,7 @@ module Skylab::TaskExamples::TestSupport
       Task_types_[]::MoveTo
     end
 
-    context "basics" do
+    context "essential" do
 
       it "loads" do
         subject_class_
@@ -78,7 +78,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       it "emits" do
-        success_expression_message_.should match %r(\Amv )
+        info_expression_message_.should match %r(\Amv )
       end
     end
 
