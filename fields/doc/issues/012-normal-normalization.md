@@ -28,6 +28,8 @@ as a "normalization point" at at that time iterating through the formal
 attributes with defaults and by some criteria deciding whether to set
 the default value in the attribute store.
 
+(we reference these points in time as :#idea-1).
+
 keep this in mind as we present the below points, because we'll come
 back to it. for this latest treatment, we propose that:
 

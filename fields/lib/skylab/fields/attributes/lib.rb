@@ -528,6 +528,8 @@ module Skylab::Fields
 
         def initialize k, & edit_p
 
+          @argument_arity = :one
+
           @_become_optional_m = :_change_parameter_arity_to_be_optional_once
           @_pending_meths_definers = nil
 
@@ -551,11 +553,15 @@ module Skylab::Fields
         end
 
         def be_defaultant_by_value__ x
-          send @_become_optional_m
           # ..
-          @default_proc = -> do
+          be_defaultant_by_ do
             x
           end
+        end
+
+        def be_defaultant_by_ & p
+          _change_parameter_arity_to_be_optional_once
+          @default_proc = p
           NIL_
         end
 
@@ -669,6 +675,10 @@ module Skylab::Fields
 
           args.calculate( & @__rw )  # result is k.p
         end
+
+        attr_accessor(
+          :argument_arity,
+        )
 
         attr_reader(
           :deffers_,

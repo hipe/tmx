@@ -445,7 +445,14 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     -> * x_a, & oes_p do
 
       _cls = cls_p.call
-      _cls.new_via_iambic( x_a, & oes_p ).procede_until_endpoint_
+
+      sess = _cls.new_via_iambic x_a, & oes_p
+
+      if sess
+        sess.procede_until_endpoint_
+      else
+        self._K
+      end
     end
   end
 
@@ -742,7 +749,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
       byte_downstream: nil,
       byte_upstream: nil,
       do_show_sexp_only: :optional,
-      wrap_in_grammar_s: nil,
+      wrap_in_grammar_s: :optional,
       resources: nil,
     )
 
@@ -898,7 +905,8 @@ Translate___ = Deferred_actor__[ -> do class Translate____
         :builder,
         :grammar_s,
         :on_event_selectively,
-        :wrap_in_grammar_s )
+        :wrap_in_grammar_s,
+      )
 
       def initialize
         @_current_rule_name = nil

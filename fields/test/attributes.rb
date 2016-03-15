@@ -52,6 +52,19 @@ module Skylab::Fields::TestSupport
         tcc.include self
       end
 
+      def build_by_init_ * x_a
+        build_by_init_via_sexp_ x_a
+      end
+
+      def build_by_init_via_sexp_ x_a
+
+        cls = entity_class_
+        o = cls.new
+        o = build_empty_entity_
+        _kp = cls::ATTRIBUTES.init o, x_a
+        _kp && o
+      end
+
       def where_ * x_a
 
         cls = entity_class_

@@ -17,7 +17,7 @@ module Skylab::Snag::TestSupport
         subject_module_::Association_Adapter.new_with
       rescue ::ArgumentError => e
       end
-      e.message.should match %r(\Amissing required property 'verb-lemma-and-phrase-head-s-a')
+      e.message.should match %r(\Amissing required (?:property|attribute) 'verb-lemma-and-phrase-head-s-a')
     end
 
     it "make a minimal association adapter" do

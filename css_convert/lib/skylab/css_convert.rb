@@ -63,42 +63,50 @@ module Skylab::CSS_Convert
   end
 
   Brazen_ = Autoloader_.require_sidesystem :Brazen
+  Lazy_ = Callback_::Lazy
   Home_ = self
 
-  Param_Lib_ = Home_.lib_.fields::Parameter
+  Conversion_parameters_class___ = Lazy_.call do
 
-  class Conversion_Parameters___ < ::Hash
+    class Conversion_Parameters____
 
-    Param_Lib_::Definer[ self ]
+      Attributes_ = Home_.lib_.fields::Attributes
 
-    meta_param :required, :boolean
+      attrs = Attributes_.call(
 
-    param :directives_file, :writer do
-      desc 'A file with directives in it.'  # (not used yet)
-    end
+        directives_file: [ :_write, :optional,
+          :desc, -> { "a file with directives in it" } ],
 
-    param :dump_CSS, :boolean
+        dump_CSS: [ :boolean, :optional ],
 
-    param :dump_directives, :boolean
+        dump_directives: [ :boolean, :optional ],
 
-    param :dump_then_finish, :boolean
+        dump_then_finish: [ :boolean, :optional ],
 
-    param :force_overwrite, :boolean
+        force_overwrite: [ :boolean, :optional ],
 
-    param :tmpdir_absolute, :accessor do
+        tmpdir_absolute: [ :_read, :_write, :default_proc, -> do
+          Home_.lib_.my_sufficiently_existent_tmpdir
+        end, ],
+      )
 
-      default do
-        Home_.lib_.my_sufficiently_existent_tmpdir
+      attr_writer( * attrs.symbols( :_write ) )
+      attr_reader( * attrs.symbols( :_read ) )
+
+      attrs.define_methods self
+
+      ATTRIBUTES = attrs  # hotdog it for transparency
+
+      def initialize & oes_p
+        @on_event_selectively = oes_p
       end
-    end
 
-    # ~ because parameter controller
-    #   (we are torn as to whether this or a proper client should be it)
+      def normalize  # near #[#fi-022]
+        # all this does is defaulting so we don't want to bother wiring it
+        self.class::ATTRIBUTES.normalize_session self
+      end
 
-    define_method :normalize, Param_Lib_::Controller::NORMALIZE_METHOD
-
-    def initialize & oes_p
-      @on_event_selectively = oes_p
+      self
     end
   end
 
@@ -113,7 +121,7 @@ module Skylab::CSS_Convert
 
       o.on('-f', '--force', 'overwrite existing generated grammars') do
 
-        actual_parameters.force_overwrite!
+        _attribute_values.force_overwrite!
       end
 
       o.on('-d', '--dump={d|c}',
@@ -141,7 +149,7 @@ module Skylab::CSS_Convert
 
       @_directives_path = directives_file
 
-      ok = actual_parameters.normalize
+      ok = _attribute_values.normalize
       ok &&= __resolve_directives
       ok &&= __via_directives
       ok || @_result
@@ -266,7 +274,7 @@ module Skylab::CSS_Convert
 
     def __dump__CSS__
 
-      o = actual_parameters
+      o = _attribute_values
       if o.dump_CSS?
         o.dump_then_finish!
       else
@@ -277,7 +285,7 @@ module Skylab::CSS_Convert
 
     def __dump__directives__
 
-      o = actual_parameters
+      o = _attribute_values
       if o.dump_directives?
         o.dump_then_finish!
       else
@@ -298,7 +306,7 @@ module Skylab::CSS_Convert
 
     def __resolve_directives
 
-      _out_dir_base = @_parameters.fetch :tmpdir_absolute
+      _out_dir_base = @_attribute_values.tmpdir_absolute
 
       _directive_parser = Home_::Directive__::Parser.new(
         _out_dir_base,
@@ -317,7 +325,8 @@ module Skylab::CSS_Convert
 
     def __when_directives
 
-      px = @_parameters
+      px = @_attribute_values
+
       if px.dump_directives?
         require 'pp'     # possible future fun with [#tm-043] svc # #todo
         ::PP.pp sexp, request_client.io_adapter.errstream
@@ -341,12 +350,12 @@ module Skylab::CSS_Convert
 
     # ~ params (boilerplate adaptation, legacy names)
 
-    def actual_parameters
-      @_parameters ||= __build_parameters
+    def _attribute_values
+      @_attribute_values ||= __build_attribute_values_store
     end
 
-    def __build_parameters
-      Conversion_Parameters___.new( & @on_event_selectively )
+    def __build_attribute_values_store
+      Conversion_parameters_class___[].new( & @on_event_selectively )
     end
 
     # ~ queue (somewhat boilerplate adaptation to agent)

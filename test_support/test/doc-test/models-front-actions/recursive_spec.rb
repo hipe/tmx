@@ -24,7 +24,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       call_API :recursive, :path, 'not-there', :sub_action, :no_wai
 
-      expect_not_OK_event :invalid_property_value,
+      expect_not_OK_event :invalid_attribute_value,
         "invalid sub action (ick :no_wai), expecting { list | preview }"
 
       expect_failed

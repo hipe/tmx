@@ -4,14 +4,23 @@
 
 [#023]       #wish - when the time comes - track inheritence merging
 
-[#022]       #track - the workaround for the change .. (in situ in universe)
-             more generally this also tracks the prickly problem of
-             how/when we should "normalize" vis-a-vis the main method
-             of `process_polymorphic_stream_passively`
+[#022]       #track - this tracks two related phenomena, both typically
+             marked by the implementation of a `normalize` method:
+
+             1) the workaround (perhaps temporary perhaps not) for the
+             change when methodic actor was assimilated by [fi] attributes.
+             this is the the prickly problem of how/when we should
+             "normalize" vis-a-vis the main method of
+             `process_polymorphic_stream_passively`.
+
+             2) more generally it may also be used to track "sessions"
+             that do not have enclosed edit sessions, so they need to
+             have this `normalize` called at user-determined times..
+             (more on this at [#012]:#idea-1.)
 
 [#021] #watch future redundancy - reflect all method-based attributes (in [br])
 
-[#020] #open in-situ
+[#020]       #watch or not to memoize method-based attributes (they are so light)
 
 [#019]       similar implementations
 

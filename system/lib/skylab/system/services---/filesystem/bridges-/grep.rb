@@ -8,8 +8,8 @@ module Skylab::System
         do_ignore_case: [ :known_known, :optional ],
         freeform_options: :optional,
         grep_extended_regexp_string: :optional,
-        ignore_case: [ :flag_of, :do_ignore_case ],
-        path: [ :singular_of, :paths ],
+        ignore_case: [ :flag_of, :do_ignore_case, :optional, ],
+        path: [ :singular_of, :paths, :optional, ],
         paths: :optional,
         ruby_regexp: :optional,
       )

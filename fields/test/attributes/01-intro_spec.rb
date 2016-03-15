@@ -34,6 +34,14 @@ module Skylab::Fields::TestSupport
         _.should eql [ :one, :two, :three, :four, :five ]  # eek depends on hash order
       end
 
+      it "you can request an individual formal attribute" do
+        :one == the_attributes_.attribute( :one ).argument_arity or fail
+      end
+
+      it "(argument arity of flag)" do
+        :zero == the_attributes_.attribute( :two ).argument_arity or fail
+      end
+
       context "set ivar" do
 
         shared_subject :_state do

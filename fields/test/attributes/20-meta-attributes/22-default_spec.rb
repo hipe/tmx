@@ -52,15 +52,49 @@ module Skylab::Fields::TestSupport
           _against_expect [ :starts_as_true, nil ], true
         end
 
-        def _against_expect a, x
-          o = build_empty_entity_
-          o_ = entity_class_::ATTRIBUTES.init o, a
-          o.object_id == o_.object_id or fail
-          o_.starts_as_true.should eql x
-        end
-
         def _attr
           entity_class_::ATTRIBUTES.attribute :starts_as_true
+        end
+
+        def _against_expect a, x
+
+          _ = build_by_init_via_sexp_ a
+          _.starts_as_true.should eql x
+        end
+      end
+
+      context "`default_proc` is also a thing (more low-level, same effect)" do
+
+        shared_subject :entity_class_ do
+
+          class X_Default_B
+
+            d = 0
+
+            attrs = Subject_module_[].call(
+              wahoo: [ :default_proc, -> { "wahootie: #{ d += 1 }" } ],
+              other: nil,
+            )
+
+            ATTRIBUTES = attrs
+
+            attr_reader( * attrs.symbols )
+
+            self
+          end
+        end
+
+        it "don't" do
+
+          o = build_by_init_ :wahoo, :xx, :other, :hi
+          :hi == o.other or fail
+          :xx == o.wahoo or fail
+        end
+
+        it "do" do
+          o = build_by_init_ :other, :hi
+          :hi == o.other or fail
+          "wahootie: 1" == o.wahoo or fail
         end
       end
     end
