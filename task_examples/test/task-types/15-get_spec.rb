@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types - get" do
+  describe "[te] task-types - get", wip: true do
 
     TS_[ self ]
     use :task_types

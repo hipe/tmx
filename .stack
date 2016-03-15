@@ -6,4 +6,3 @@
 1) test-by-test, restore task examples
 (that was M-series)
 4) test-by-test, restore legacy (with new API)
-3) wip all tests (but get top file to look modern save for legacy code)

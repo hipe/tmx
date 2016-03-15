@@ -2,10 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Task::TestSupport  # [#ts-010]
 
-  TestSupport_::Quickie.enable_kernel_describe
-
-# ..
-describe "[ta] task" do
+describe "[ta] task", wip: true do
 
   it "descends from Rake::Task (fyi)" do
     Home_::LegacyTask.new.should be_kind_of ::Rake::Task
@@ -23,13 +20,18 @@ describe "[ta] task" do
   end
 
   describe "has different ways of describing its actions:" do
+
     describe "When it overrides the execute() method of rake parent" do
+
+      if false
       class SomeTask < Home_::LegacyTask
         def execute args
           @touched = true
         end
         attr_accessor :touched
       end
+      end
+
       it "it will run that badboy when it is invoked" do
         t = SomeTask.new
         t.touched.should eql(nil)
@@ -117,5 +119,4 @@ describe "[ta] task" do
     end
   end
 end
-# ..
 end

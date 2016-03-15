@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] version" do
+  describe "[te] version", wip: true do
 
     it "parses the minimal case" do
       _parse "1.2"

@@ -1,12 +1,8 @@
 require_relative 'test-support'
 
-module Skylab  # [#ts-010]
-
-  TestSupport::Quickie.enable_kernel_describe
-
-# ..
-
-describe "[ta] graph" do
+module Skylab::Task::TestSupport
+  # <-
+describe "[ta] graph", wip: true do
 
   let( :graph ) { Task::Sessions::Execute_Graph.new }
   describe "when built empty" do
@@ -100,5 +96,5 @@ describe "[ta] graph" do
     end
   end
 end
-# ..
+# ->
 end

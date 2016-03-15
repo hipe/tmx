@@ -2,6 +2,21 @@ require 'skylab/callback'
 
 class Skylab::Task
 
+  class << self
+
+    def test_support  # #[#ts-035]
+      if ! Home_.const_defined? :TestSupport
+        require_relative '../../test/test-support'
+      end
+      Home_::TestSupport
+    end
+
+    def lib_
+      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+    end
+  end  # >>
+
+
      # ~ as class
 
      # this is a blind, 4 years later rewrite of our task library.
@@ -143,22 +158,6 @@ class Skylab::Task
         end
       end
 
-  # ~ as sidesystem
-
-  class << self
-
-    def test_support  # #[#ts-035]
-      if ! Home_.const_defined? :TestSupport
-        require_relative '../../test/test-support'
-      end
-      Home_::TestSupport
-    end
-
-    def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
-    end
-  end  # >>
-
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader
@@ -190,10 +189,9 @@ class Skylab::Task
   NIL_ = nil
   UNABLE_ = false
 
-end
-require 'rake' # for fun and as an implementation detail we use it
+  if false
 
-class Skylab::Task
+require 'rake' # for fun and as an implementation detail we use it
 
   module TaskClassMethods
     def task_type_name
@@ -267,5 +265,6 @@ class Skylab::Task
     def rake_application
       ::Rake.application
     end
+  end
   end
 end

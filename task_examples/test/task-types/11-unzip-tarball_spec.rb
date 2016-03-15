@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types unzip tarball" do
+  describe "[te] task-types unzip tarball", wip: true do
 
     TS_[ self ]
     use :task_types

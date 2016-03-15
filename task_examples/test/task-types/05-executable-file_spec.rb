@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types - executable file" do
+  describe "[te] task-types - executable file", wip: true do
 
     TS_[ self ]
     use :task_types

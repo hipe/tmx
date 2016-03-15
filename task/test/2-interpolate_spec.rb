@@ -1,12 +1,9 @@
 require_relative 'test-support'
 
-Skylab::TestSupport::Quickie.enable_kernel_describe
+module Skylab::Task::TestSupport
 
-class Skylab::Task  # [#ts-010]
-# ..
-describe "[sla] interpolate" do
-  # include ::Skylab::Task
-
+  describe "[ta] interpolate", wip: true do
+    # <-
   it "works" do
     src = ::Struct.new(:a, :b).new('one', 'two')
     Home_::Interpolate.interpolate( '{a}AND{b}', src ).
@@ -40,6 +37,6 @@ describe "[sla] interpolate" do
       end.should raise_error( ::RuntimeError, 'circular depdendency: Foo#two' )
     end
   end
-end
-# ..
+# ->
+  end
 end
