@@ -6,62 +6,74 @@ module Skylab::TaskExamples::TestSupport
 
       def [] tcc
 
-        tcc.extend Module_Methods___
-        tcc.include Instance_Methods___
+        tcc.send :define_singleton_method, :shared_state_ do  # #todo
+          NIL_
+        end
+
+        tcc.include Instance_Methods__
         NIL_
       end
     end  # >>
 
-    module Module_Methods___
+    module Instance_Methods__
 
-      def shared_state_  # "dangerous memoize" the state. (see [#ts-042])
-        x = nil
-        define_method :state_ do
-          if ! x
-            x = __build_state
-          end
-          x
+      # -- general emission assertion
+
+      def state_where_emission_is_expected_ * x_a
+
+        _cls = subject_class_
+
+        _ = event_log.handle_event_selectively
+
+        task = _cls.new( & _ )
+
+        x_a.each_slice( 2 ) do |k, x|
+          task.add_parameter k, x
         end
+
+        _x = task.execute_as_front_task
+
+        flush_event_log_and_result_to_state _x
       end
 
-      def memoize_ sym, & p
-        define_method sym, Callback_::Memoize[ & p ]
+      def error_expression_message_
+
+        y = nil
+        _be_this = be_emission :error, :expression do |y_|
+          y = y_
+        end
+
+        only_emission.should _be_this
+
+        y.fetch 0
+      end
+
+      def success_expression_message_
+
+        y = nil
+        _be_this = be_emission :info, :expression do |y_|
+          y = y_
+        end
+
+        only_emission.should _be_this
+
+        y.fetch 0
+      end
+
+      def fails_
+        _x = state_.result
+        false == _x or fail
+      end
+
+      def succeeds_
+        _x = state_.result
+        true == _x or fail
       end
     end
 
-    module Instance_Methods___
+    # -- static fileserver
 
-      # ~
-
-      td = nil
-
-      define_method :prepare_build_directory_ do
-
-        if td
-          if ( ! td.be_verbose ) != ( ! do_debug )
-            td = td.new_with :be_verbose, do_debug
-          end
-        else
-          td = build_build_directory_controller_
-        end
-
-        td.prepare
-
-        NIL_
-      end
-
-      def build_build_directory_controller_
-
-        _path = BUILD_DIR
-
-        TestSupport_.tmpdir.new_with(
-          :path, _path,
-          :be_verbose, do_debug,
-          :debug_IO, debug_IO,
-        )
-      end
-
-      # ~
+    module Instance_Methods__
 
       def run_file_server_if_not_running_
 
@@ -69,8 +81,70 @@ module Skylab::TaskExamples::TestSupport
           [ do_debug, debug_IO ]
         end
       end
+    end
 
-      # ~
+    # -- tmpdir
+
+    module Instance_Methods__
+
+      def empty_tmpdir_
+        ___tmpdir.clear
+      end
+
+      def ___tmpdir
+        tdr = Tmpdirer___[]
+        if tdr
+          tdr.for self
+        else
+          Memoize_tmpdirer_and_etc_for___[ self ]
+        end
+      end
+
+      def tmpdir_path_for_memoized_tmpdir
+        TestLib_::Development_tmpdir_path[]
+      end
+    end
+
+    tdr = nil
+    Tmpdirer___ = -> do
+      tdr
+    end
+
+    Memoize_tmpdirer_and_etc_for___ = -> tc do
+
+      _ = Home_.lib_.system.filesystem.tmpdir
+      tdr = _.memoizer_for tc, '[te]'
+      tdr.instance
+    end
+
+    # -- filesystem
+
+    module Instance_Methods__
+
+      # -- setup
+
+      x = nil
+      define_method :other_non_existent_file_path_ do
+        x ||= "#{ non_existent_file_path_ }2"
+      end
+
+      def non_existent_file_path_
+        TestSupport_::Fixtures.file :not_here
+      end
+
+      def one_existent_file_path_
+        TestSupport_::Fixtures.file :one_line
+      end
+
+      def other_existent_file_path_
+        TestSupport_::Fixtures.file :three_lines
+      end
+
+      def real_filesystem_
+        ::File
+      end
+
+      # -- assertion
 
       def file_exists_ path
         ::File.exist? path
@@ -79,240 +153,6 @@ module Skylab::TaskExamples::TestSupport
       def read_file_ path
         ::File.read path
       end
-
-      # ~ assert about "hard failure" (which means exceptions raised (for now))
-
-      def expect_missing_required_attributes_are_ * sym_a
-
-        begin
-          execute_
-        rescue ::RuntimeError => e
-        end
-
-        if 1 < sym_a.length
-          _s = 's'
-        end
-
-        _s_ = sym_a.map do | sym |
-          ::Regexp.escape sym.id2name
-        end.join ', '
-
-        _rx = /\A[a-z ]+ task missing required attribute#{ _s }: #{ _s_ }\z/
-
-        e.message.should match _rx
-      end
-
-      def expect_strong_failure_with_message_ x
-
-        expect_strong_failure_with_message_by_ x do
-          execute_
-        end
-      end
-
-      def expect_strong_failure_with_message_by_ x
-
-        begin
-          yield
-        rescue ::RuntimeError => e
-        end
-
-        if x.respond_to? :named_captures
-          e.message.should match x
-        else
-          e.message.should eql x
-        end
-      end
-
-      # ~
-
-      def fails_
-        state_.result_x.should eql false
-      end
-
-      def succeeds_
-        state_.result_x.should eql true
-      end
-
-      def expect_ * x_a
-        _expect x_a
-      end
-
-      def expect_only_ * x_a
-
-        _expect x_a
-
-        if @_emission_stream_controller.unparsed_exists
-          fail ___say_had_more
-        end
-      end
-
-      def expect_eventually_ * x_a
-        sym = x_a.first
-
-        st = emission_stream_controller_
-        begin
-          if sym == st.current_token.stream_symbol
-            break
-          end
-          st.advance_one
-          redo
-        end while nil
-        _expect x_a
-      end
-
-      def ___say_had_more
-        "had more"
-      end
-
-      def _expect x_a
-
-        if emission_stream_controller_.unparsed_exists
-
-          __expect_when_one x_a
-        else
-          fail ___say_had_none x_a
-        end
-      end
-
-      def ___say_had_none x_a
-        "had none, expected #{ x_a.inspect }"
-      end
-
-      def __expect_when_one x_a
-
-        exp = TestSupport_::Expect_Stdout_Stderr::Expectation.via_args x_a
-
-        em = @_emission_stream_controller.gets_one
-
-        sym = exp.stream_symbol
-        if sym
-          em.stream_symbol.should eql sym
-        end
-
-        s = em.text
-        if exp.expect_is_styled
-          s = ___unstyle_styled s
-          if ! s
-            self._WAS_NOT_STYLED
-          end
-        end
-
-        s.chomp!  # read all about it in [#ts-029]
-        send exp.method_name, s, exp.pattern_x
-
-        NIL_
-      end
-
-      def ___unstyle_styled s
-        TestLib_::Brazen[]::CLI_Support::Styling::Unstyle_styled[ s ]
-      end
-
-      def emission_stream_controller_
-        @_emission_stream_controller ||= ___build_ESC
-      end
-
-      def ___build_ESC
-
-        ESC___.via_array state_.emission_array
-      end
-
-      def sout_serr_expect_given_string act_s, exp_s
-        act_s.should eql exp_s
-      end
-
-      def sout_serr_expect_given_regex act_s, rx
-        act_s.should match rx
-      end
-
-      def __build_state
-
-        emissions = []
-
-        x = __execute_into emissions
-
-        Result_State___.new emissions.freeze, x
-      end
-
-      def execute_
-
-        __execute_into NIL_
-      end
-
-      def __execute_into emissions
-
-        _ctx = context_
-
-        task = build_task_ emissions
-
-        before_execution_
-
-        task.invoke _ctx
-
-      end
-
-      def build_task_with_context_
-
-        task = build_task_
-        task.context = context_
-        task
-      end
-
-      def build_task_ emissions=nil
-
-        _cls = subject_class_
-
-        _args = build_arguments_
-
-        _cls.new _args do | t |
-
-          t.on_all do | ev |
-
-            if do_debug
-              debug_IO.puts [ ev.stream_symbol, ev.text ].inspect
-            end
-
-            emissions.push Emission___.new( ev.text, ev.stream_symbol )
-
-            NIL_
-          end
-        end
-      end
-
-      def before_execution_
-        NIL_
-      end
-    end
-
-    class ESC___ < Callback_::Polymorphic_Stream
-
-      def advance_to_first sym
-
-        begin
-          guy = current_token
-          if sym == guy.stream_symbol
-            break
-          end
-          advance_one
-          redo
-        end while nil
-        NIL_
-      end
-    end
-
-    Emission___ = ::Struct.new :text, :stream_symbol
-
-    class Result_State___
-
-      def initialize em_a, x
-        @emission_array = em_a
-        @result_x = x
-        freeze
-      end
-
-      attr_reader(
-        :emission_array,
-        :result_x,
-      )
     end
   end
 end

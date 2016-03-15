@@ -29,7 +29,7 @@ class Skylab::Task
     # graph.
 
     def initialize & p
-      @on_event_selectively = p
+      @_oes_p = p
     end
 
     attr_writer(

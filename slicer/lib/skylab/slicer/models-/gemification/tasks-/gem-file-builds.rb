@@ -10,7 +10,7 @@ module Skylab::Slicer
 
         name = @name
 
-        @on_event_selectively.call :info, :expression do | y |
+        @_oes_p_.call :info, :expression do | y |
           y << "(\"#{ name.as_const }\" not yet implemented as task..)"
         end
 

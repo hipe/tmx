@@ -36,8 +36,8 @@ class Skylab::Task
       def initialize sym_, sym, & p
 
         @name_symbol = sym_
+        @_oes_p = p
         @_parameter_symbol = sym
-        @on_event_selectively = p
       end
 
       attr_reader :name_symbol
@@ -69,9 +69,18 @@ class Skylab::Task
 
       def execute
 
-        x = @_PARAMETERS_.parameter_box[ @_parameter_symbol ]
+        bx = @_PARAMETERS_.parameter_box
+        if bx
+          ___execute_when_params bx
+        else
+          raise ::ArgumentError, __say_no_parameters
+        end
+      end
+
+      def ___execute_when_params bx
+        x = bx[ @_parameter_symbol ]
         if x.nil?
-          raise ::ArgumentError, __say_required_param_missing
+          raise ::ArgumentError, _say_required_param_missing
         else
           @_value_x = x
           ACHIEVED_
@@ -82,7 +91,11 @@ class Skylab::Task
         @___derived_ivar ||= :"@#{ @_parameter_symbol }"
       end
 
-      def __say_required_param_missing
+      def __say_no_parameters
+        "#{ _say_required_param_missing } (had no parameters at all)"
+      end
+
+      def _say_required_param_missing
         "missing required parameter '#{ @_parameter_symbol }'"
       end
     end

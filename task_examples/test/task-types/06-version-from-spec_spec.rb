@@ -5,6 +5,7 @@ module Skylab::TaskExamples::TestSupport
   describe "[te] task-types version from spec", wip: true do
 
     TS_[ self ]
+    use :memoizer_methods
     use :task_types
 
     def subject_class_
@@ -13,7 +14,7 @@ module Skylab::TaskExamples::TestSupport
 
     context "when reporting a version" do
 
-      memoize_ :context_ do
+      memoize :context_ do
         { show_version: true }.freeze
       end
 
@@ -176,7 +177,7 @@ module Skylab::TaskExamples::TestSupport
         EMPTY_H_
       end
 
-      memoize_ :must_be_in_range do
+      memoize :must_be_in_range do
         '1.2+'.freeze
       end
 
@@ -200,11 +201,11 @@ module Skylab::TaskExamples::TestSupport
       NIL_
     end
 
-    memoize_ :parse_with do
+    memoize :parse_with do
       '/(\d+\.\d+\.\d+)/'.freeze
     end
 
-    memoize_ :version_from do
+    memoize :version_from do
       'echo "version 1.2.34 is the version"'.freeze
     end
 

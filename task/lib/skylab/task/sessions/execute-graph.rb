@@ -71,7 +71,7 @@ class Skylab::Task
   class Newschool
 
     def initialize & oes_p
-      @on_event_selectively = oes_p
+      @_oes_p = oes_p
       @parameter_box = nil
     end
 
@@ -94,7 +94,7 @@ class Skylab::Task
 
     def __resolve_index
 
-      o = Home_::Actors_::Build_Index.new( & @on_event_selectively )
+      o = Home_::Actors_::Build_Index.new( & @_oes_p )
       o.parameter_box = @parameter_box
       o.target_task = @target_task
       index = o.execute
@@ -108,7 +108,7 @@ class Skylab::Task
 
     def __resolve_plan
 
-      o = Home_::Actors_::Build_Plan.new( & @on_event_selectively )
+      o = Home_::Actors_::Build_Plan.new( & @_oes_p )
       o.index = remove_instance_variable :@_index
       plan = o.execute
       if plan

@@ -18,7 +18,7 @@ module Skylab::Slicer
 
         if @_fs.exist? @path
 
-          @on_event_selectively.call :info, :expression do | y |
+          @_oes_p_.call :info, :expression do | y |
             y << "no [cm] for this yet! exists - #{ path }"
           end
           ACHIEVED_
@@ -64,7 +64,7 @@ module Skylab::Slicer
         bytes = io.write _output
         io.close
 
-        @on_event_selectively.call :info, :expression do | y |
+        @_oes_p_.call :info, :expression do | y |
           y << "wrote #{ path } (#{ bytes } bytes)"
         end
 

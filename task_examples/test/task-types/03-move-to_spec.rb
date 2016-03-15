@@ -2,146 +2,93 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types - move to", wip: true do
+  describe "[de] task-types - move to" do
 
     TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
     use :task_types
 
     def subject_class_
       Task_types_[]::MoveTo
     end
 
-    context "requires move_to and from" do
+    context "basics" do
 
-      it "and fails without it" do
-
-        expect_missing_required_attributes_are_ :move_to, :from
-      end
-
-      def build_arguments_
-        EMPTY_H_
+      it "loads" do
+        subject_class_
       end
     end
 
-    context "when moving an existing file" do
+    context "from doesn't exist" do
 
-      def before_execution_
+      shared_subject :state_ do
 
-        _fuc = TestLib_::System[].filesystem.file_utils_controller do | msg |
-          if do_debug
-            debug_IO.puts "(#{ msg })"
-          end
-        end
-
-        prepare_build_directory_
-
-        _from = ::File.join FIXTURES_DIR, 'some-file.txt'
-        _to = ::File.join BUILD_DIR, 'some-file.txt'
-
-        _fuc.cp _from, _to
-
-        NIL_
+        _from = non_existent_file_path_
+        _to = other_non_existent_file_path_
+        _expect_emission _from, _to
       end
-
-      context "to an available location" do
-
-        shared_state_
-
-        it "content is moved to new location (ORDER SENSITIVE)" do
-
-          content = nil
-          exists = nil
-          @__TERRIBLE = -> do
-            content = read_file_ from
-            exists = file_exists_ move_to
-            NIL_
-          end
-
-          state_
-
-          exists.should eql false
-
-          file_exists_( from ).should eql false
-          read_file_( move_to ).should eql content
-        end
-
-        it "succeeds" do
-          succeeds_
-        end
-
-        it "emits a `shell` emission" do
-
-          _rx = /mv .*some-file.txt .*move-worked.txt/
-          expect_only_ :shell, _rx
-        end
-
-        def before_execution_
-          super()
-          remove_instance_variable( :@__TERRIBLE )[]
-          NIL_
-        end
-
-        memoize_ :move_to do
-          ::File.join BUILD_DIR, 'move-worked.txt'
-        end
-      end
-
-      context "to an unavailable location" do
-
-        shared_state_
-
-        it "fails" do
-          fails_
-        end
-
-        it "expreses the error" do
-
-          _rx = /\bfile exists.*another-file/
-          expect_only_ :error, _rx
-        end
-
-        def move_to
-          ::File.join FIXTURES_DIR, 'another-file.txt'
-        end
-      end
-
-      memoize_ :from do
-        ::File.join BUILD_DIR, 'some-file.txt'
-      end
-    end
-
-    context "when moving a nonexitant file" do
-
-      shared_state_
 
       it "fails" do
         fails_
       end
 
-      it "expresses the error" do
+      it "emits" do
 
-        _rx = /\bfile not found.*not-there\b/
-        expect_only_ :error, _rx
-      end
+        _rx = %r<\Afile not found - \(pth "/[^ ]+not-here\.file"\)\z>
 
-      def from
-        ::File.join FIXTURES_DIR, 'not-there'
-      end
-
-      def move_to
-        ::File.join BUILD_DIR, 'wherever'
+        error_expression_message_.should match _rx
       end
     end
 
-    def build_arguments_
-      {
-        move_to: move_to,
-        from: from,
-      }
+    context "'move to' exists" do
+
+      shared_subject :state_ do
+
+        _from = one_existent_file_path_
+        _to = other_existent_file_path_
+        _expect_emission _from, _to
+      end
+
+      it "fails" do
+        fails_
+      end
+
+      it "emits" do
+
+        _rx = %r(\Afile exists - \(pth "/[^ ]+three-lines\.txt"\)\z)
+
+        error_expression_message_.should match _rx
+      end
     end
 
-    def context_
-      NIL_
+    context "move OK" do
+
+      shared_subject :state_ do
+
+        td = empty_tmpdir_
+        _from = td.touch 'za-za'
+        _to = ::File.join( td.path, 'foo-foo' )
+
+        _expect_emission _from, _to
+      end
+
+      it "succeeds" do
+        succeeds_
+      end
+
+      it "emits" do
+        success_expression_message_.should match %r(\Amv )
+      end
+    end
+
+    def _expect_emission from, to
+
+      state_where_emission_is_expected_(
+        :filesystem, real_filesystem_,
+        :from, from,
+        :move_to, to,
+      )
     end
   end
 end

@@ -3,7 +3,7 @@ class Skylab::Task
   class Actors_::Build_Index
 
     def initialize & oes_p
-      @on_event_selectively = oes_p
+      @_oes_p = oes_p
     end
 
     attr_writer(
@@ -13,7 +13,7 @@ class Skylab::Task
 
     def execute
 
-      index = Index___.new @target_task, & @on_event_selectively
+      index = Index___.new @target_task, & @_oes_p
 
       state_h = {}
 
@@ -70,16 +70,6 @@ class Skylab::Task
 
     class Index___
 
-      attr_reader(
-        :box,
-        :box_module,
-
-        :dependants_on,
-        :dependees_of,
-
-        :on_event_selectively,
-      )
-
       def initialize tsk, & p
 
         @box = Callback_::Box.new
@@ -88,7 +78,7 @@ class Skylab::Task
         @box_module = Home_.lib_.basic::Module.
           value_via_relative_path( tsk.class, '..' )  # DOT_DOT_
 
-        @on_event_selectively = p
+        @_oes_p = p
 
         @dependants_on = ::Hash.new { |h, k| h[k] = [] }
         @dependees_of = ::Hash.new { |h, k| h[k] = [] }
@@ -118,6 +108,18 @@ class Skylab::Task
 
         self
       end
+
+      def on_event_selectively
+        @_oes_p
+      end
+
+      attr_reader(
+        :box,
+        :box_module,
+
+        :dependants_on,
+        :dependees_of,
+      )
     end
   end
 end

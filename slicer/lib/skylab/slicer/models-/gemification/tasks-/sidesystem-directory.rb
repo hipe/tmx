@@ -16,7 +16,7 @@ module Skylab::Slicer
         end
 
         if e
-          @on_event_selectively.call :error, :expression do | y |
+          @_oes_p_.call :error, :expression do | y |
             s = e.message
             md = /\A(.+) @ [^-]+ - (.+)\z/.match s
             if md
@@ -31,7 +31,7 @@ module Skylab::Slicer
           @path = remove_instance_variable :@sidesystem_path
           ACHIEVED_
         else
-          @on_event_selectively.call :error, :expression do | y |
+          @_oes_p_.call :error, :expression do | y |
             y << "needed directory had #{ stat.ftype } - #{ path }"
           end
           UNABLE_

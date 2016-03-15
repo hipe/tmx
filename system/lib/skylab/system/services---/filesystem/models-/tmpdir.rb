@@ -8,8 +8,8 @@ module Skylab::System
 
       class << self
 
-        def memoizer_for td, slug
-          Memoizer___.new td, slug
+        def memoizer_for tc, slug
+          Memoizer___.new tc, slug
         end
 
         def for_mutable_args_ x_a, & x_p

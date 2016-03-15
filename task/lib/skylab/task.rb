@@ -22,40 +22,39 @@ class Skylab::Task
      # this is a blind, 4 years later rewrite of our task library.
      # it is not yet integrated with the legacy code
 
-      def self.depends_on * sym_a
+      class << self
 
-        deps = sym_a.map do | sym |
-          User_Defined_Dependee_Reference___.new sym
-        end.freeze
+        def depends_on * sym_a
 
-        define_singleton_method :_dependee_references do
-          deps
-        end
-        NIL_
-      end
+          _nu = sym_a.map do |sym|
+            User_Defined_Dependee_Reference___.new sym
+          end
 
-      def self.depends_on_parameters * sym_a
-
-        _deps = sym_a.map do | sym |
-          Home_::Models_::Parameter::Dependee_Reference.new( sym )
+          _writable_dependee_references_array.concat _nu ; nil
         end
 
-        deps_ = _dependee_references.dup
-        deps_.concat _deps
-        deps_.freeze
+        def depends_on_parameters * sym_a
 
-        define_singleton_method :_dependee_references do  # etc
-          deps_
+          _nu = sym_a.map do |sym|
+            Home_::Models_::Parameter::Dependee_Reference.new sym
+          end
+
+          _writable_dependee_references_array.concat _nu ; nil
         end
-        NIL_
-      end
+
+        def _writable_dependee_references_array
+          @_dependee_references ||= []
+        end
+
+        attr_reader :_dependee_references
+      end  # >>
 
       def initialize & oes_p
 
         @name = Callback_::Name.via_module self.class
         @name_symbol = @name.as_const  # be careful
 
-        @on_event_selectively = oes_p
+        @_oes_p_ = oes_p
       end
 
       # ~ behavior
@@ -64,7 +63,7 @@ class Skylab::Task
 
         # not for every task in the graph, only the "front" one
 
-        o = Home_::Sessions::Execute_Graph::Newschool.new( & @on_event_selectively )
+        o = Home_::Sessions::Execute_Graph::Newschool.new( & @_oes_p_ )
 
         if instance_variable_defined? :@_params
           o.parameter_box = remove_instance_variable :@_params
@@ -118,10 +117,6 @@ class Skylab::Task
 
       def dependee_references
         self.class._dependee_references
-      end
-
-      def self._dependee_references
-        EMPTY_A_
       end
 
       def add_parameter sym, x

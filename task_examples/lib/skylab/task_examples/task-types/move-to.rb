@@ -1,58 +1,77 @@
 module Skylab::TaskExamples
 
-  class TaskTypes::MoveTo < Home_::Task
+  class TaskTypes::MoveTo < Common_task_[]
 
-    include Home_.lib_.path_tools.instance_methods_module
-    include Home_::Library_::FileUtils
+    depends_on_parameters(
+      :filesystem,
+      :from,
+      :move_to,
+    )
 
-    # @todo look below etc
-    attribute :move_to, :required => true
-    attribute :from, :required => true
+    def execute
+      ok = __from_exists
+      ok &&= __to_exists
+      ok && ___work
+    end
 
-    listeners_digraph  :all, :error => :all, :shell => :all
+    def ___work
 
-    def fu_output_message msg
-      md = /\Amv ([^ ]+) ([^ ]+)\z/.match msg # #cosmetic-shell wat hack
-      if md
-        msg = "mv #{ pretty_path md[1] } #{ pretty_path md[2] }"
+      from = @from ; to = @move_to
+
+      @_oes_p_.call :info, :expression do |y|
+        y << "mv #{ pth from } #{ pth to }"
       end
-      call_digraph_listeners :shell, msg
-    end
 
-    remove_method :from= # -w, #todo
-    def from= p
-      _set_path :from, p
-    end
-
-    def execute args
-      @context ||= (args[:context] || {})
-      valid? or fail(invalid_reason)
-      if ! from.exist?
-        call_digraph_listeners(:error, "file not found: #{pretty_path from.to_s}")
-        return false
+      d = @filesystem.rename @from, @move_to
+      if d.zero?
+        ACHIEVED_
+      else
+        self._COVER_ME
       end
-      if move_to.exist?
-        call_digraph_listeners(:error, "file exists: #{pretty_path move_to.to_s}")
-        return false
+    end
+
+    def __from_exists
+      __exists @from
+    end
+
+    def __to_exists
+      __not_exists @move_to
+    end
+
+    def __exists path
+
+      if @filesystem.exist? path
+        ACHIEVED_
+      else
+        __when_not_exist path
       end
-      status = mv from, move_to, :verbose => true
-      0 == status
     end
 
-    remove_method :move_to= # -w, #todo
-    def move_to= p
-      _set_path :move_to, p
+    def __not_exists path
+      if @filesystem.exist? path
+        __when_exist path
+      else
+        ACHIEVED_
+      end
     end
 
-    def _set_path name, path
-      val = case path
-            when ::NilClass ; nil
-            when ::String   ; ::Pathname.new(path)
-            when ::Pathname ; path
-            else          ; raise ::ArgumentError.new("no: #{path}")
-            end
-      instance_variable_set("@#{name}", val)
-      path
+    def __when_not_exist path
+
+      @_oes_p_.call :error, :expression do |y|
+        y << "file not found - #{ pth path }"
+      end
+
+      UNABLE_
+    end
+
+    def __when_exist path
+
+      @_oes_p_.call :error, :expression do |y|
+        y << "file exists - #{ pth path }"
+      end
+
+      UNABLE_
     end
   end
 end
+# #tombstone: [#005] was where we first did file utils message parsing hacks

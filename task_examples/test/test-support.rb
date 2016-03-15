@@ -114,6 +114,16 @@ module Skylab::TaskExamples::TestSupport
     Home_::TaskTypes
   end
 
+  # ~ these
+
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_Event[ tcc ]
+  end
+
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
   # ~ library-like
 
   class LAZY_CONSTANTS___ < TestSupport_::Lazy_Constants

@@ -5,6 +5,7 @@ module Skylab::TaskExamples::TestSupport
   describe "[te] task-types - mkdir p", wip: true do
 
     TS_[ self ]
+    use :memoizer_methods
     use :task_types
 
     def subject_class_
@@ -120,7 +121,7 @@ module Skylab::TaskExamples::TestSupport
             0
           end
 
-          memoize_ :mkdir_p do
+          memoize :mkdir_p do
 
             _ = TestSupport_::Fixtures.dir :empty_esque_directory
             ::File.join( _, 'foo/bar' ).freeze

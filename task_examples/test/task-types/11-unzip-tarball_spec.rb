@@ -5,6 +5,7 @@ module Skylab::TaskExamples::TestSupport
   describe "[te] task-types unzip tarball", wip: true do
 
     TS_[ self ]
+    use :memoizer_methods
     use :task_types
 
     def subject_class_
@@ -64,7 +65,7 @@ module Skylab::TaskExamples::TestSupport
           NIL_
         end
 
-        memoize_ :unzip_tarball do
+        memoize :unzip_tarball do
           ::File.join( FIXTURES_DIR, 'mginy-0.0.1.tar.gz' ).freeze
         end
 
@@ -142,7 +143,7 @@ module Skylab::TaskExamples::TestSupport
         }
       end
 
-      memoize_ :context_ do
+      memoize :context_ do
         {
           build_dir: BUILD_DIR,
         }.freeze

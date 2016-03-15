@@ -20,7 +20,7 @@ module Skylab::Slicer
           ACHIEVED_
         else
 
-          @on_event_selectively.call :error, :expression do | y |
+          @_oes_p_.call :error, :expression do | y |
             y << "this file must exist before we can continue - #{ path }"
             y << "create that file in markdown with a first paragraph"
             y << "with two sentences and try again"

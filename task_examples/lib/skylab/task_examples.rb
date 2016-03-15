@@ -14,6 +14,10 @@ module Skylab::TaskExamples
     end
   end  # >>
 
+  Common_task_ = -> do
+    Home_.lib_.task
+  end
+
   Callback_ = ::Skylab::Callback
 
   Autoloader_ = Callback_::Autoloader

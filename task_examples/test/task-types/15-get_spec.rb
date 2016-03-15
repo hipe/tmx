@@ -5,6 +5,7 @@ module Skylab::TaskExamples::TestSupport
   describe "[te] task-types - get", wip: true do
 
     TS_[ self ]
+    use :memoizer_methods
     use :task_types
 
     def subject_class_
@@ -161,7 +162,7 @@ module Skylab::TaskExamples::TestSupport
       BUILD_DIR
     end
 
-    memoize_ :host do
+    memoize :host do
       'http://localhost:1324/'
     end
 
