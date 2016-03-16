@@ -32,6 +32,45 @@ module Skylab::Fields::TestSupport
           end
         end
 
+        context "lowlevel normalization session" do
+
+          it "using box instead of the default ivar-based store" do
+
+            o = _common_begin
+            bx = Callback_::Box.new
+            bx.add :_strange_, :_no_see_
+            bx.add :soc, false  # not nil, i.e is provided
+            o.box_store = bx
+            _ = o.execute
+            false == _ or fail
+
+            _rx = %r(\Amissing required \w+ 'last-name')i
+
+            expect_event :missing_required_attributes do |ev|
+              black_and_white( ev ).should match _rx
+            end
+          end
+
+          it "using the empty store" do
+
+            o = _common_begin
+            o.use_empty_store
+            _ = o.execute
+            false == _ or fail
+
+            _rx = %r(\Amissing required \w+s 'last-name' and 'soc')i
+
+            expect_event :missing_required_attributes do |ev|
+              black_and_white( ev ).should match _rx
+            end
+          end
+
+          def _common_begin
+            _ = event_log.handle_event_selectively
+            entity_class_::ATTRIBUTES.begin_normalization( & _ )
+          end
+        end
+
         context "when some missing" do
 
           shared_subject :state_ do

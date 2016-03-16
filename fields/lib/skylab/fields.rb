@@ -55,12 +55,24 @@ module Skylab::Fields
 
     # --
 
-    def init o, x_a, & x_p
-      _index.init__ o, x_a, & x_p
+    def init sess, x_a, & x_p
+
+      o = _begin_parse_and_normalize_for sess, & x_p
+      o.sexp = x_a
+      o.execute_as_init__
     end
 
-    def normalize_session o, & x_p
-      _index.normalize_session__ o, & x_p
+    def normalize_session sess, & x_p
+      _ = _begin_parse_and_normalize_for sess, & x_p
+      _.execute
+    end
+
+    def _begin_parse_and_normalize_for sess, & x_p
+      _index.begin_parse_and_normalize_for__ sess, & x_p
+    end
+
+    def begin_normalization & x_p
+      _index.begin_normalization_( & x_p )
     end
 
     def define_methods mod

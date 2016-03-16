@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[de] task-types - move to" do
+  describe "[te] task-types - move to" do
 
     TS_[ self ]
     use :memoizer_methods

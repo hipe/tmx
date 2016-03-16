@@ -9,14 +9,13 @@ module Skylab::Fields
         attrs = sess.class::ATTRIBUTES
         if attrs
           o = self.begin( & oes_p )
-          idx = attrs._index
-          sidx = idx._static_index
+          idx = attrs.index_
+          sidx = idx.static_index_
           o.effectively_defaultants = sidx.effectively_defaultants
+          o.ivar_store = sess
           o.lookup = idx.lookup_attribute_proc_
           o.requireds = sidx.requireds
-          o.store = sess
-          _ = o.execute
-          _
+          o.execute
         else
           ACHIEVED_
         end
@@ -32,21 +31,34 @@ module Skylab::Fields
         @_oes_p = oes_p  # can be nil
       end
 
-      attr_writer(
+      def ivar_store= ivar_store
+        @store = Ivar_based_Store.new ivar_store
+        ivar_store
+      end
+
+      def box_store= bx
+        @store = Box_based_Store___.new bx
+        bx
+      end
+
+      def use_empty_store
+        @store = The_empty_store___[]
+        NIL_
+      end
+
+      attr_accessor(
         :effectively_defaultants,
         :lookup,
         :requireds,
-        :store,
       )
 
       def execute
 
-        _ok = __maybe_check_for_missing_requireds
-        _ok && ___maybe_apply_defaulting
+        _ok = check_for_missing_requireds
+        _ok && ___apply_defaulting
       end
 
-      def ___maybe_apply_defaulting
-        # (per #spot-2 this will always occur but in case that changes..)
+      def ___apply_defaulting  # near #spot-2. sometimes always, but maybe not.
         if @effectively_defaultants
           ___do_apply_defaulting
         else
@@ -57,20 +69,20 @@ module Skylab::Fields
       def ___do_apply_defaulting
 
         @effectively_defaultants.each do |k|
-          attr = @lookup[ k ]
-          # experimental (ick) "optimization ..
-          ivar = attr.as_ivar
-          if @store.instance_variable_defined? ivar
+
+          atr = @lookup[ k ]
+
+          if @store.knows atr
             was_defined = true
-            x = @store.instance_variable_get ivar
+            x = @store.retrieve atr
           end
 
           if x.nil?
-            p = attr.default_proc
+            p = atr.default_proc
             if p
-              @store.instance_variable_set ivar, p[]
+              @store.set p[], atr
             elsif ! was_defined
-              @store.instance_variable_set ivar, nil
+              @store.set nil, atr
             end
           end
         end
@@ -78,29 +90,28 @@ module Skylab::Fields
         ACHIEVED_
       end
 
-      def __maybe_check_for_missing_requireds
+      def check_for_missing_requireds
         if @requireds
-          ___check_for_missing_requireds
+          ___do_check_for_missing_requireds
         else
           ACHIEVED_
         end
       end
 
-      def ___check_for_missing_requireds
+      def ___do_check_for_missing_requireds
 
         miss_a = nil
 
         @requireds.each do |k|
 
-          attr = @lookup[ k ]
-          ivar = attr.as_ivar
+          atr = @lookup[ k ]
 
-          if @store.instance_variable_defined? ivar
-            x = @store.instance_variable_get ivar
+          if @store.knows atr
+            x = @store.retrieve atr
           end
 
           if x.nil?
-            ( miss_a ||= [] ).push attr
+            ( miss_a ||= [] ).push atr
           end
         end
 
@@ -128,6 +139,10 @@ module Skylab::Fields
         end
       end
 
+      attr_reader(
+        :store,
+      )
+
       Get_parameter_controller_moniker = -> ent do  # legacy
 
         s_a = ent.class.name.split CONST_SEP_
@@ -152,6 +167,51 @@ module Skylab::Fields
         s_a.map do | s |
           p[ s ]
         end * SPACE_
+      end
+
+      class Ivar_based_Store < ::BasicObject
+
+        def initialize o
+          @_store = o
+        end
+
+        def set x, atr
+          @_store.instance_variable_set atr.as_ivar, x
+          NIL_
+        end
+
+        def knows atr
+          @_store.instance_variable_defined? atr.as_ivar
+        end
+
+        def retrieve atr
+          @_store.instance_variable_get atr.as_ivar
+        end
+      end
+
+      class Box_based_Store___ < ::BasicObject
+
+        def initialize bx
+          @_box = bx
+        end
+
+        def knows atr
+          @_box.has_name atr.name_symbol
+        end
+
+        def retrieve atr
+          @_box.fetch atr.name_symbol
+        end
+      end
+
+      The_empty_store___ = Lazy_.call do
+
+        class The_Empty_Store____ < ::BasicObject
+          def knows _
+            false
+          end
+          new
+        end
       end
 
       CONST_SEP_ = '::'

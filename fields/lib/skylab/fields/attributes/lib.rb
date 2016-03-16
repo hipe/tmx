@@ -23,27 +23,31 @@ module Skylab::Fields
           end
 
           @_custom_index = o.__release_thing_ding_one
-          @_static_index = o.__release_thing_ding_two
+          @static_index_ = o.__release_thing_ding_two
 
           @_h = h
         end
 
-        def init__ sess, x_a, & x_p
-          o = Parse_and_or_Normalize__.new sess, self, & x_p
-          o.sexp = x_a
-          o.__execute_as_init
+        def begin_parse_and_normalize_for__ sess, & x_p
+          Parse_and_or_Normalize__.new sess, self, & x_p
         end
 
-        def normalize_session__ sess, & x_p
-          _ = Parse_and_or_Normalize__.new sess, self, & x_p
-          _.execute
+        def begin_normalization_ & x_p
+
+          o = Here_::Normalization.begin( & x_p )
+
+          sidx = static_index_
+          o.effectively_defaultants = sidx.effectively_defaultants
+          o.lookup = lookup_attribute_proc_
+          o.requireds = sidx.requireds
+          o
         end
 
         # --
 
         def define_methods__ mod
 
-          st = @_static_index.method_definers.to_name_stream
+          st = @static_index_.method_definers.to_name_stream
           begin
             k = st.gets
             k or break
@@ -83,7 +87,7 @@ module Skylab::Fields
         attr_reader(
           :_custom_index,
           :_h,
-          :_static_index,
+          :static_index_,
         )
       end
 
@@ -155,7 +159,7 @@ module Skylab::Fields
           :at_extra_token,
         )
 
-        def __execute_as_init
+        def execute_as_init__
 
           _ok = execute
           _ok && @session
@@ -230,7 +234,7 @@ module Skylab::Fields
           idx = @index
           if idx
 
-            sidx = idx._static_index
+            sidx = idx.static_index_
             if sidx.effectively_defaultants  # [#012] #spot-2
               yes = true
             end
@@ -248,14 +252,8 @@ module Skylab::Fields
 
         def __do_normalize
 
-          o = Here_::Normalization.begin( & @_oes_p )
-
-          sidx = @index._static_index
-          o.effectively_defaultants = sidx.effectively_defaultants
-          o.lookup = @index.lookup_attribute_proc_
-          o.requireds = sidx.requireds
-          o.store = @session
-
+          o = @index.begin_normalization_( & @_oes_p )
+          o.ivar_store = @session
           o.execute
         end
 

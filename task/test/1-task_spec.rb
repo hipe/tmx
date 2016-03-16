@@ -74,10 +74,9 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
         it "emits" do
 
-          _message = _same_message_around '(par bread)'
+          _be_this = be_emission :error, :missing_required_attributes do |ev|
 
-          _be_this = be_emission :error, :expression do |y|
-            y.first.should eql _message
+            black_and_white( ev ).should _be_same_message
           end
 
           only_emission.should _be_this
@@ -103,8 +102,8 @@ module Skylab::Task::TestSupport  # [#ts-010]
         end
 
         it "emits same message" do
-          _msg = _same_message_around "'bread'"
-          exception_message_.should eql _msg
+
+          exception_message_.should _be_same_message
         end
       end
 
@@ -177,8 +176,8 @@ if false
   end
 end  # if false
 
-    def _same_message_around s
-      "missing required parameter #{ s } (had no parameters at all)"
+    def _be_same_message
+      eql "missing required attributes 'bread' and 'inside'"
     end
   end
 end

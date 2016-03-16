@@ -23,6 +23,10 @@ class Skylab::Task
 
       class << self
 
+        def depends_on_parameters * x_a
+          __writable_parameter_collection.__add_args x_a
+        end
+
         def depends_on * sym_a
 
           col = _writable_dependee_references_collection
@@ -34,39 +38,28 @@ class Skylab::Task
           NIL_
         end
 
-        def depends_on_parameters * x_a
-
-          col = _writable_dependee_references_collection
-
-          cls = Home_::Models_::Parameter::DependeeReference
-
-          if 1 == x_a.length
-            x = x_a.fetch 0
-            if x.respond_to? :each_with_index
-              col.__add_unparsed x
-            else
-              col._add cls.new x
-            end
-          else
-            x_a.each do |sym|
-              col._add cls.new sym
-            end
+        def __writable_parameter_collection
+          @___wpc ||= begin
+            o = Unparsed_Parameter_Collection_as_Dependee_Reference___.new self
+            _writable_dependee_references_collection._add o
+            o
           end
-          NIL_
         end
 
         def _writable_dependee_references_collection
           @_dependee_references ||= References___.new
         end
 
-        attr_reader :_dependee_references
+        attr_reader(
+          :_dependee_references,
+        )
+
+        def _task_name
+          @___task_name ||= Callback_::Name.via_module self
+        end
       end  # >>
 
       def initialize & oes_p
-
-        @_name_ = Callback_::Name.via_module self.class
-        @_name_symbol_ = @_name_.as_const  # be careful
-
         @_oes_p_ = oes_p
       end
 
@@ -124,7 +117,7 @@ class Skylab::Task
 
       def derived_ivar_
 
-        @___derived_ivar ||= :"@#{ @_name_.as_const }"  # ! .as_ivar (downcases)
+        @___derived_ivar ||= :"@#{ name.as_const }"  # ! .as_ivar (downcases)
       end
 
       def add_parameter sym, x
@@ -133,23 +126,17 @@ class Skylab::Task
       end
 
       def name_symbol  # see #note-1 about these method names
-        @_name_symbol_
+        self.class._task_name.as_const
       end
 
       def name
-        @_name_
+        self.class._task_name
       end
 
       class References___
 
         def initialize
-          @_unparsed_indexes = nil
           @_a = []
-        end
-
-        def __add_unparsed x
-          ( @_unparsed_indexes ||= [] ).push @_a.length
-          @_a.push x ; nil
         end
 
         def _add o
@@ -159,46 +146,7 @@ class Skylab::Task
         # --
 
         def to_stream
-          if @_unparsed_indexes
-            ___parse
-          end
           Callback_::Stream.via_nonsparse_array @_a
-        end
-
-        def ___parse
-
-          # for every position in the array that was an unparsed hash (in
-          # reverse order because etc.) parse it using the dependency lib,
-          # then wrap each such formal attribute in its adapter
-
-          Require_field_library_[]
-
-          d_a = @_unparsed_indexes
-          @_unparsed_indexes = nil
-
-          cls = Home_::Models_::Parameter::DependeeReference_via_Attribute
-          begin
-            d = d_a.pop
-            d or break
-
-            _h = @_a.fetch d
-            _attrs = Field_::Attributes[ _h ]
-            st = _attrs.to_defined_attribute_stream
-
-            a = []
-            begin
-              atr = st.gets
-              atr or break
-              a.push cls.new atr
-              redo
-            end while nil
-
-            @_a[ d, 1 ] = a
-
-            redo
-          end while nil
-
-          NIL_
         end
       end
 
@@ -207,6 +155,35 @@ class Skylab::Task
         def initialize sym
           @sym = sym
           freeze
+        end
+      end
+
+      class Unparsed_Parameter_Collection_as_Dependee_Reference___
+
+        # subject is one-to-one with a task that has parameters in the
+        # *static*, formal graph. we generate a "unique" name which it
+        # will use etc..
+
+        def initialize cls
+          @_a = []
+          @_sym = :"_#{ cls._task_name.as_const }_Parameters_"
+        end
+
+        def __add_args args  # this method's availability is volatile
+          @_a.push args ; nil
+        end
+
+        def dereference_against_ index
+
+          index.cache_box.touch @_sym do
+            ___build_dereference index
+          end
+        end
+
+        def ___build_dereference index
+
+          _ = index.on_event_selectively
+          Models_::Parameter::Collection_as_Dependency.new @_sym, @_a, & _
         end
       end
 
@@ -235,11 +212,6 @@ class Skylab::Task
 
   Callback_ = ::Skylab::Callback
   Lazy_ = Callback_::Lazy
-
-  Require_field_library_ = Lazy_.call do
-    Field_ = Home_.lib_.fields  # idiomatic name
-    NIL_
-  end
 
   # -- these
 

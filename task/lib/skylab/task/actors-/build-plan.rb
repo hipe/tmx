@@ -49,7 +49,7 @@ class Skylab::Task
       sequence = []
       memo_stack = []
 
-      nothing_stack = innie.fetch( :_NOTHING_ )
+      nothing_stack = innie.fetch :_NOTHING_
 
       begin
 

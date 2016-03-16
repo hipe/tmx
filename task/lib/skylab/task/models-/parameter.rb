@@ -2,81 +2,22 @@ class Skylab::Task
 
   module Models_::Parameter
 
-    class DependeeReference
+    class Collection_as_Dependency
 
-      def initialize sym
-        @sym = sym
-        @_sym = :"__#{ sym }__Parameter__"
+      # when de-referencing its sole custodian, this is the result: it
+      # represents all the parameters that a particular node requires/
+      # honors.
+
+      def initialize sym, a, & oes_p
+        @_a = a
+        @_name_symbol = sym
+        @_oes_p = oes_p
       end
-
-      def dereference_against_ index
-
-        index.cache_box.touch @_sym do
-          ___build_against index
-        end
-      end
-
-      def ___build_against index
-
-        Parameter_Task__.new @_sym, @sym, & index.on_event_selectively
-      end
-    end
-
-    class DependeeReference_via_Attribute
-
-      def initialize atr
-        @_atr = atr
-      end
-
-      def dereference_against_ index
-
-        k = :"__#{ @_atr.name_symbol }__Parameter__"
-
-        index.cache_box.touch k do
-          ___build_against k, index
-        end
-      end
-
-      def ___build_against k, index
-
-        pt = Parameter_Task__.new k, @_atr.name_symbol, & index.on_event_selectively
-        pt._FORMAL_ATTRIBUTE_ = @_atr
-        pt
-      end
-    end
-
-    class Parameter_Task__
-
-      # a parameter task is a custom task that models the resolution of a
-      # single parameter that is { required -OR- merely accepted } by a
-      # node or nodes somewhere in the task graph.
-      #
-      # (since different nodes can accept the same parameter but some may
-      # require it and other may not; each node-parameter requiredmet gets
-      # its own subject instance.)
-      #
-      # like how a common task tries to execute and then succeeds or fails;
-      # this task executes and succeeds or fails based on a function of
-      # whether the parameter value is effectively known and whether it is
-      # required.
-      #
-      # this class is hard-coded to have a single dependee: the magic
-      # task defined next below.
-
-      def initialize sym_, sym, & p
-
-        @_FORMAL_ATTRIBUTE_ = nil
-
-        @name_symbol = sym_
-        @_oes_p = p
-        @_parameter_symbol = sym
-      end
-
-      attr_writer(
-        :_FORMAL_ATTRIBUTE_,
-      )
 
       def accept index, & visit
+
+        # in effect tell the index that we have this one dependency,
+        # which is shared throughout the graph..
 
         visit.call self do
 
@@ -88,95 +29,159 @@ class Skylab::Task
         end
       end
 
-      def visit_dependant_as_completed_ dep, dc
-
-        dep.receive_dependency_completion_value @_value_x, dc
-        NIL_
-      end
-
       def receive_dependency_completion o
         instance_variable_set o.derived_ivar, o.task
         NIL_
       end
 
+      # ..then..
+
       def execute
+
+        # there is only one parameter box to be shared by the whole graph
+        # (as there is only one set of parameters provided by the user at
+        # the front). but each individual parameter-involved node may have
+        # its own set of formal parameters that are required, allowed,
+        # **and particular defaultings**.
+        #
+        # as such we must not write the defaultings back into the original
+        # shared parameter value source because for any given formal
+        # parameter these defaultings can vary from node to node; i.e, one
+        # node might default it to one value while another might another
+        # while a third might not default it at all.
+        #
+        # SO we check if requireds are satisfied first, and then ..
+
+        _formals_box = ___flush_intermediate_box_via_etc
+
+        _attrs = Home_.lib_.fields::Attributes[ _formals_box.h_ ]
+
+        o = _attrs.begin_normalization( & @_oes_p )
 
         bx = @_PARAMETERS_.parameter_box  # can be nil
         if bx
-          had_box = true
-          x = bx[ @_parameter_symbol ]
-        end
-
-        atr = @_FORMAL_ATTRIBUTE_  # can be nil
-        if atr
-          if ! Field_::Is_required[ atr ]
-            is_optional = true
-          end
-        end
-
-        # --
-
-        if x.nil?
-          if is_optional
-            @_value_x = x ; ACHIEVED_  # even when known unknown
-          else
-            ___when_missing_required had_box, atr
-          end
+          o.box_store = bx
         else
-          @_value_x = x ; ACHIEVED_
+          o.use_empty_store
         end
+
+        ok = o.check_for_missing_requireds
+        if ok
+          @_normalization = o
+        end
+        ok
       end
 
-      def ___when_missing_required had_box, atr
+      def ___flush_intermediate_box_via_etc
 
-        # (this could be tighter if we used etc.. [#006])
+        # the DSL method could have been called multiple times, and at each
+        # call it could have been called with a glob of symbols or with a
+        # single hash. by merging all of these arguments into one box we
+        # a) normalize their shape while b) sanity checking the uniqueness
+        # of each name symbol.
 
-        name = -> do
-          if atr
-            atr.name
+        intermediate_box = Callback_::Box.new  # catch name collisions
+
+        remove_instance_variable( :@_a ).each do |args|
+
+          if 1 == args.length and ! args.fetch( 0 ).respond_to? :id2name
+            args.fetch( 0 ).each_pair do |k, x_|
+              intermediate_box.add k, x_
+            end
           else
-            Callback_::Name.via_variegated_symbol @_parameter_symbol
+            args.each do |sym|
+              intermediate_box.add sym, nil
+            end
           end
         end
-
-        express = -> do
-          if ! had_box
-            _and = " (had no parameters at all)"
-          end
-          "missing required parameter #{ par name[] }#{ _and }"
-        end
-
-        oes_p = @_oes_p
-        if oes_p
-          oes_p.call :error, :expression do |y|
-            y << calculate( & express )
-          end
-          UNABLE_
-        else
-          _expag = Home_.lib_.brazen::API.expression_agent_instance
-          _s = _expag.calculate( & express )
-          raise ::ArgumentError, _s
-        end
+        intermediate_box
       end
 
-      def derived_ivar_
-        @___derived_ivar ||= :"@#{ @_parameter_symbol }"
+      # ..then..
+
+      def visit_dependant_as_completed_ dep, _dep_completion
+
+        # assume the normalization has passed its requireds check. but note
+        # we have done nothing to the "session" (the node, the task) yet - it
+        # needs to be able to access the requisite parameter values somehow.
+        #
+        # for now we accomplish this by A) writing values to the session's
+        # ivar space, and B) writing something for *every* associated formal
+        # parameter (nil when unknown), i.e we "nilify".
+        #
+        # as a reminder, all formal attributes under this normalization model
+        # are either required or effectively "defaultant".
+        #
+        # SO: for each of the requireds, write the value that is in the box
+        # to the session.
+        #
+        # then, for every of the effectively defaultants, write values as
+        # appropriate..
+
+        o = remove_instance_variable :@_normalization
+
+        lu = o.lookup
+        rs = o.store
+        ws = o.class::Ivar_based_Store.new dep
+
+        req_a = o.requireds
+        if req_a
+          req_a.each do |k|
+            atr = lu[ k ]
+            _x = rs.retrieve atr  # you know it's known
+            ws.set _x, atr
+          end
+        end
+
+        df_a = o.effectively_defaultants
+
+        if df_a
+          df_a.each do |k|
+            atr = lu[ k ]
+
+            if rs.knows atr
+              x = rs.retrieve atr
+            end
+
+            if x.nil?
+
+              if ws.knows( atr ) && ! ws.retrieve( atr ).nil?
+                # if the value from the parameter value store is effectively
+                # unknown and the session has an effectively known value,
+                # don't write a default and don't write nil. skip.
+                next
+              end
+
+              p = atr.default_proc
+              if p
+                x = p[]
+              end
+            end
+
+            ws.set x, atr  # is the PVS value or a default value or nil
+          end
+        end
+
+        NIL_
       end
 
-      attr_reader(
-        :_FORMAL_ATTRIBUTE_,
-        :name_symbol,
-      )
+      def name_symbol
+        @_name_symbol
+      end
     end
 
     class Parameters_Source_Proxy___
+
+      # to the one type of node hard-coded to depend it, this node will
+      # appear in that node under the magic name _PARAMETERS_, and gives
+      # access to whatever parameters (an open-ended set) the user passed.
 
       def name_symbol
         MAGIC_SYMBOL__
       end
 
       def accept index, & visit
-        visit.call self
+        visit[ self ]
       end
 
       def accept_execution_graph__ eg
@@ -185,12 +190,14 @@ class Skylab::Task
         NIL_
       end
 
-      attr_reader :parameter_box
-
       def execute
         # (it is our immediate downstream that does the work)
         ACHIEVED_
       end
+
+      attr_reader(
+        :parameter_box,
+      )
 
       def derived_ivar_
         IVAR___

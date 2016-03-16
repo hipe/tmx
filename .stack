@@ -3,4 +3,3 @@
 1) move old attributes to defined attributes
 -- (that was M-series)
 1) test-by-test, restore task examples
-rework the handling of parameters in [ta]

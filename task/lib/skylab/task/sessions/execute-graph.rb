@@ -137,9 +137,8 @@ class Skylab::Task
         if tsk.respond_to? :accept_execution_graph__
           tsk.accept_execution_graph__ self
           redo
-        else
-          break
         end
+        break
       end while nil
 
       ACHIEVED_
@@ -165,7 +164,7 @@ class Skylab::Task
         a = subscribers[ sym ]
 
         if a
-          dc = Dependency_Completion___.new( task )
+          dc = Dependency_Completion___.new task
           a.each do | sym_ |
             cache.fetch( sym_ ).receive_dependency_completion dc
           end
