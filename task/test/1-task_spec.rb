@@ -175,21 +175,6 @@ if false
       end
     end
   end
-
-  describe "can define attributes as being interpolated" do
-    it "and can then make references to other attributes" do
-      klass = ::Class.new( Home_::LegacyTask ).class_eval do
-        attribute :foo, :interpolated => true
-        attribute :bar
-        self
-      end
-      t = klass.new(
-        :foo => 'ABC{bar}GHI',
-        :bar => 'DEF'
-      )
-      t.foo.should eql('ABCDEFGHI')
-    end
-  end
 end  # if false
 
     def _same_message_around s
