@@ -72,8 +72,8 @@ class Skylab::Task
 
       def initialize tsk, & p
 
-        @box = Callback_::Box.new
-        @box.add tsk.name_symbol, tsk
+        @cache_box = Callback_::Box.new
+        @cache_box.add tsk.name_symbol, tsk
 
         @box_module = Home_.lib_.basic::Module.
           value_via_relative_path( tsk.class, '..' )  # DOT_DOT_
@@ -114,7 +114,7 @@ class Skylab::Task
       end
 
       attr_reader(
-        :box,
+        :cache_box,
         :box_module,
 
         :dependants_on,

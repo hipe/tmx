@@ -97,7 +97,7 @@ class Skylab::Task
       Plan___.new(
         sequence,
         subscribers,
-        @index.box.h_ )
+        @index.cache_box.h_ )
     end
 
     Plan___ = ::Struct.new :queue, :subscribers, :cache

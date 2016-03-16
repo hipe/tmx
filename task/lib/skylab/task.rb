@@ -17,7 +17,7 @@ class Skylab::Task
   end  # >>
 
 
-     # ~ as class
+     # ~ as class (code notes in [#003])
 
      # this is a blind, 4 years later rewrite of our task library.
      # it is not yet integrated with the legacy code
@@ -26,24 +26,38 @@ class Skylab::Task
 
         def depends_on * sym_a
 
-          _nu = sym_a.map do |sym|
-            User_Defined_Dependee_Reference___.new sym
+          col = _writable_dependee_references_collection
+
+          sym_a.each do |sym|
+            col._add User_Defined_Dependee_Reference___.new sym
           end
 
-          _writable_dependee_references_array.concat _nu ; nil
+          NIL_
         end
 
-        def depends_on_parameters * sym_a
+        def depends_on_parameters * x_a
 
-          _nu = sym_a.map do |sym|
-            Home_::Models_::Parameter::Dependee_Reference.new sym
+          col = _writable_dependee_references_collection
+
+          cls = Home_::Models_::Parameter::DependeeReference
+
+          if 1 == x_a.length
+            x = x_a.fetch 0
+            if x.respond_to? :each_with_index
+              col.__add_unparsed x
+            else
+              col._add cls.new x
+            end
+          else
+            x_a.each do |sym|
+              col._add cls.new sym
+            end
           end
-
-          _writable_dependee_references_array.concat _nu ; nil
+          NIL_
         end
 
-        def _writable_dependee_references_array
-          @_dependee_references ||= []
+        def _writable_dependee_references_collection
+          @_dependee_references ||= References___.new
         end
 
         attr_reader :_dependee_references
@@ -51,8 +65,8 @@ class Skylab::Task
 
       def initialize & oes_p
 
-        @name = Callback_::Name.via_module self.class
-        @name_symbol = @name.as_const  # be careful
+        @_name_ = Callback_::Name.via_module self.class
+        @_name_symbol_ = @_name_.as_const  # be careful
 
         @_oes_p_ = oes_p
       end
@@ -75,16 +89,22 @@ class Skylab::Task
       def accept index, & visit
 
         visit.call self do
-          __to_dependee_stream_around index
+          ___to_dependee_stream_around index
         end
       end
 
-      def __to_dependee_stream_around index
+      def ___to_dependee_stream_around index
 
-        Callback_::Stream.via_nonsparse_array dependee_references do | dref |
-
+        _ = ___dependee_references
+        _st = _.to_stream
+        _st_ = _st.map_by do |dref|
           dref.dereference_against_ index
         end
+        _st_
+      end
+
+      def ___dependee_references
+        self.class._dependee_references
       end
 
       def receive_dependency_completion dc
@@ -105,23 +125,82 @@ class Skylab::Task
 
       def derived_ivar_
 
-        @___derived_ivar ||= :"@#{ @name.as_const }"  # ! .as_ivar (downcases)
-      end
-
-      # ~ readers
-
-      attr_reader(
-        :name,
-        :name_symbol
-      )
-
-      def dependee_references
-        self.class._dependee_references
+        @___derived_ivar ||= :"@#{ @_name_.as_const }"  # ! .as_ivar (downcases)
       end
 
       def add_parameter sym, x
         ( @_params ||= Callback_::Box.new ).add sym, x
         NIL_
+      end
+
+      def name_symbol  # see #note-1 about these method names
+        @_name_symbol_
+      end
+
+      def name
+        @_name_
+      end
+
+      class References___
+
+        def initialize
+          @_unparsed_indexes = nil
+          @_a = []
+        end
+
+        def __add_unparsed x
+          ( @_unparsed_indexes ||= [] ).push @_a.length
+          @_a.push x ; nil
+        end
+
+        def _add o
+          @_a.push o ; nil
+        end
+
+        # --
+
+        def to_stream
+          if @_unparsed_indexes
+            ___parse
+          end
+          Callback_::Stream.via_nonsparse_array @_a
+        end
+
+        def ___parse
+
+          # for every position in the array that was an unparsed hash (in
+          # reverse order because etc.) parse it using the dependency lib,
+          # then wrap each such formal attribute in its adapter
+
+          Require_field_library_[]
+
+          d_a = @_unparsed_indexes
+          @_unparsed_indexes = nil
+
+          cls = Home_::Models_::Parameter::DependeeReference_via_Attribute
+          begin
+            d = d_a.pop
+            d or break
+
+            _h = @_a.fetch d
+            _attrs = Field_::Attributes[ _h ]
+            st = _attrs.to_defined_attribute_stream
+
+            a = []
+            begin
+              atr = st.gets
+              atr or break
+              a.push cls.new atr
+              redo
+            end while nil
+
+            @_a[ d, 1 ] = a
+
+            redo
+          end while nil
+
+          NIL_
+        end
       end
 
       class Dependee_Reference_
@@ -153,7 +232,17 @@ class Skylab::Task
         end
       end
 
+  # -- these
+
   Callback_ = ::Skylab::Callback
+  Lazy_ = Callback_::Lazy
+
+  Require_field_library_ = Lazy_.call do
+    Field_ = Home_.lib_.fields  # idiomatic name
+    NIL_
+  end
+
+  # -- these
 
   Autoloader_ = Callback_::Autoloader
 
@@ -186,21 +275,16 @@ class Skylab::Task
 
   if false
 
-require 'rake' # for fun and as an implementation detail we use it
-
   module TaskClassMethods
     def task_type_name
        to_s.match(/([^:]+)\z/)[1].gsub(/([a-z])([A-Z])/){ "#{$1} #{$2}" }.downcase
     end
   end
 
-  class LegacyTask < ::Rake::Task
-
-    Home_.lib_.fields::Attribute::DSL[ self ]
+  # was class
 
     extend Home_::Interpolate
     extend TaskClassMethods
-    include Home_::Parenthood
     def action= action
       @actions.push action
     end
@@ -257,9 +341,9 @@ require 'rake' # for fun and as an implementation detail we use it
       @prerequisites.concat arr
       arr
     end
-    def rake_application
-      ::Rake.application
-    end
-  end
-  end
+  end  # if false
 end
+
+# #tombstone: we no longer subclass rake task
+# #tombstone: (temporary) Home_.lib_.fields::Attribute::DSL[ self ]
+# #tombstone: we no longer associate parenthood strongly to nodes

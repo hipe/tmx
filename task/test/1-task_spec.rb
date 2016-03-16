@@ -2,34 +2,154 @@ require_relative 'test-support'
 
 module Skylab::Task::TestSupport  # [#ts-010]
 
-describe "[ta] task", wip: true do
+  describe "[ta] task" do
 
-  it "descends from Rake::Task (fyi)" do
-    Home_::LegacyTask.new.should be_kind_of ::Rake::Task
-  end
+    TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
 
-  it "defines settable/gettable attributes in the class" do
-    klass = ::Class.new( Home_::LegacyTask ).class_eval do
-      attribute :some_val
-      self
+    context "parameters - as [fi]-style hash.." do
+
+      shared_subject :task_class_ do
+
+        class X_Intro_1_Sandwich < Subject_class_[]
+
+          depends_on_parameters(
+            bread: nil,
+            topping: :optional,
+            inside: nil,
+          )
+
+          def execute
+
+            @_oes_p_.call :payload, :data do
+              [ @topping, @inside, @bread ]
+            end
+
+            ACHIEVED_
+          end
+
+          self
+        end
+      end
+
+      context "essential" do
+
+        it "loads" do
+          task_class_
+        end
+
+        it "knows own name symbol" do
+
+          _build_empty_task.name_symbol.should eql :X_Intro_1_Sandwich
+        end
+
+        it "knows own name" do
+
+          _build_empty_task.name.as_variegated_symbol.should eql :X_intro_1_sandwich
+        end
+
+        def _build_empty_task
+          task_class_.new
+        end
+      end
+
+      context "with no parameters provided and with handler" do
+
+        shared_subject :state_ do
+          build_state_
+        end
+
+        def handler_
+          common_handler_
+        end
+
+        def add_parameters_into_ _
+          NOTHING_
+        end
+
+        it "fails" do
+          fails_
+        end
+
+        it "emits" do
+
+          _message = _same_message_around '(par bread)'
+
+          _be_this = be_emission :error, :expression do |y|
+            y.first.should eql _message
+          end
+
+          only_emission.should _be_this
+        end
+      end
+
+      context "with no parameters and without handler" do
+
+        shared_subject :state_ do
+          build_exception_throwing_state_
+        end
+
+        def handler_
+          NOTHING_
+        end
+
+        def add_parameters_into_ _
+          NOTHING_
+        end
+
+        it "throws" do
+          threw_
+        end
+
+        it "emits same message" do
+          _msg = _same_message_around "'bread'"
+          exception_message_.should eql _msg
+        end
+      end
+
+      context "with required parameters" do
+
+        shared_subject :state_ do
+          build_state_
+        end
+
+        def add_parameters_into_ o
+          o.add_parameter :bread, :x
+          o.add_parameter :inside, :y
+          NIL_
+        end
+
+        def handler_
+          common_handler_
+        end
+
+        it "succeeds" do
+          succeeds_
+        end
+
+        it "emitted data" do
+
+          _be_this = be_emission :payload, :data do |x|
+            x.should eql [ nil, :y, :x ]
+          end
+
+          only_emission.should _be_this
+        end
+      end
     end
-    t = klass.new
-    t.some_val.should eql(nil)
-    t.some_val = 'foo'
-    t.some_val.should eql('foo')
-  end
+
+if false
 
   describe "has different ways of describing its actions:" do
 
     describe "When it overrides the execute() method of rake parent" do
 
-      if false
       class SomeTask < Home_::LegacyTask
         def execute args
           @touched = true
         end
         attr_accessor :touched
-      end
       end
 
       it "it will run that badboy when it is invoked" do
@@ -56,25 +176,6 @@ describe "[ta] task", wip: true do
     end
   end
 
-  describe "with regards to passing arguments to the task" do
-    let(:str) { "" }
-    let(:t) do
-      Home_::LegacyTask.new(:action => ->(t, args) { str.replace "args: #{args.inspect}" })
-    end
-    it "if you pass zero arguments to invoke(), it will have an empty args hash" do
-      t.invoke()
-      str.should eql('args: {}')
-    end
-    it "if you pass it one argument, it will use the default value of its arg_names attribute, [:context]" do
-      t.invoke('a')
-      str.should eql('args: {:context=>"a"}')
-    end
-    it "if you pass more than one argument to invoke(), by default they are ignored" do
-      t.invoke('a', 'b')
-      str.should eql('args: {:context=>"a"}')
-    end
-  end
-
   describe "can define attributes as being interpolated" do
     it "and can then make references to other attributes" do
       klass = ::Class.new( Home_::LegacyTask ).class_eval do
@@ -89,34 +190,10 @@ describe "[ta] task", wip: true do
       t.foo.should eql('ABCDEFGHI')
     end
   end
+end  # if false
 
-  describe "when it comes to parents, it" do
-    FakeParent = ::Class.new.class_eval do
-      self
-    end.new
-
-    let(:task) { Home_::LegacyTask.new }
-    it "has no parent by default (of course!)" do
-      task.parent?.should eql(false)
-      task.parent.should eql(nil)
-    end
-    it "can be given a parent" do
-      task.parent = FakeParent
-      task.parent?.should eql(true)
-      task.parent.should eql(FakeParent)
+    def _same_message_around s
+      "missing required parameter #{ s } (had no parameters at all)"
     end
   end
-
-  describe "with regards to its name, the rake parent stringifies all names so" do
-    it "a minimal Task object has \"\" for a name" do
-      Home_::LegacyTask.new.name.should eql('')
-    end
-    it "if you set it explicitly to nil it will still be \"\"" do
-      Home_::LegacyTask.new(:name => nil).name.should eql('')
-    end
-    it "and will call to_s on whatever name you give it (like false)" do
-      Home_::LegacyTask.new(:name => false).name.should eql('false')
-    end
-  end
-end
 end

@@ -42,7 +42,80 @@ module Skylab::Task::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    # -- SETUP
+
+    def build_exception_throwing_state_
+
+      o = _setup_state
+      begin
+        o.execute_as_front_task
+      rescue ::ArgumentError => e
+      end
+
+      if e
+        e
+      else
+        fail
+      end
+    end
+
+    def build_state_
+
+      o = _setup_state
+      _x = o.execute_as_front_task
+      flush_event_log_and_result_to_state _x
+    end
+
+    def _setup_state
+
+      _ = handler_
+      _cls = task_class_
+      o = _cls.new( & _ )
+      add_parameters_into_ o
+      o
+    end
+
+    def common_handler_
+      event_log.handle_event_selectively
+    end
+
+    # -- ASSERTION
+
+    def fails_
+      false == state_.result or fail
+    end
+
+    def succeeds_
+      true == state_.result or fail
+    end
+
+    def threw_
+      state_ or fail
+    end
+
+    def exception_message_
+      state_.message
+    end
   end
+
+  # -- these
+
+  Subject_class_ = -> do
+    Home_  # one to rule them all
+  end
+
+  # -- these
+
+  Expect_Event = -> tcc do
+    Callback_.test_support::Expect_Event[ tcc ]
+  end
+
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
+  # --
 
   Home_ = ::Skylab::Task
   Autoloader__ = Home_::Autoloader_
@@ -62,5 +135,8 @@ module Skylab::Task::TestSupport
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
+  Callback_ = Home_::Callback_
+  NIL_ = nil
+  NOTHING_ = nil
   TS_ = self
 end
