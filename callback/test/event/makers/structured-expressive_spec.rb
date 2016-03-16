@@ -48,7 +48,7 @@ module Skylab::Callback::TestSupport
 
       _y = o.express_into_under [], _expag
 
-      _y.should eql [ "'ONE', 'TWO'" ]
+      _y.should eql [ '"ONE", "TWO"' ]
     end
 
     dangerous_memoize_ :_expressive_class do

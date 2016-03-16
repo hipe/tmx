@@ -16,21 +16,30 @@ significant efforts at libraries dealing with modeling
 
     [#gv-030] the isomorphic interface parameter              2014-01-20 WAS
 
-       [#013] methodic actors (assimilated to here from [ca]) 2013-12-19  OK
+       [#013] methodic actors (assimilated to here from [ca]) 2013-12-19 WAS
 
     [#tm-081] the "config shell" (working title) (lost)       2013-10-11 WAS
 
-    [#ba-030] the basic struct                                2013-07-21 WIP <-
+    [#ba-030] the basic struct                                2013-07-21 WIP <- [ca], [ba]
 
-     [#br-058] Home_ DSL --> "contoured fields" --> [br]      2013-07-18 WIP <-
+     [#br-058] Home_ DSL --> "contoured fields" --> [br]      2013-07-18 HMM <-
 
-       [#004] basic fields                                    2013-07-05 WIP <-
+       [#004] basic fields                                    2013-07-05 WIP <- NOT USED ANYWHERE (feature island)
 
-    [#ba-003] the basic field                                 2013-04-11 WIP <-
+    [#ba-003] the basic field                                 2013-04-11 WIP <- (heavily by [cm]. has lots of history)
 
        [#009] the headless parameter (assim'd into [#002]     2012-08-29 WAS
 
        [#002] metahell formal attribute (assim'd to here)     2011-09-11 WIP <=
+
+
+PUNCHLIST:
+  • assimilate "attribute" (now). become home for attribute base class.
+  • sunset [#004] basic fields
+  • survey & assimilate [#ba-003] the basic field - become home for `N_Meta`
+  • survey [#br-058] property stacks
+  • [ba] struct is quite light. how is it used?
+  • actors
 
 
 

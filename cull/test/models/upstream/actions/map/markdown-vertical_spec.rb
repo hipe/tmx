@@ -67,7 +67,7 @@ module Skylab::Cull::TestSupport
       _em = expect_not_OK_event_ :number_too_small
 
       black_and_white( _em.cached_event_value ).should match(
-        /\A'table-number' must be greater than or equal to 1, had '0'/ )
+        /\A'table-number' must be greater than or equal to 1, had 0/ )
 
       expect_failed
     end

@@ -154,7 +154,7 @@ module Skylab::Parse::TestSupport
     end
 
     def _uninterpretable s
-      "uninterpretable token \'#{ s }\'. "
+      "uninterpretable token #{ s.inspect }. "
     end
 
     def _at_end_expecting * s_a

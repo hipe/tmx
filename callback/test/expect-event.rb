@@ -659,8 +659,10 @@ module Skylab::Callback::TestSupport
           _expag = @_test_context._expev_lower_level_expression_agent
 
           em.reify_by do | ev_p |
-
-            _expag.calculate( [], & ev_p ).freeze
+            y = []
+            _expag.calculate y, & ev_p  # don't let the use block determine
+            # the result here - the result of those is formally unreliable.
+            y.freeze
           end
         end
 

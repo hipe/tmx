@@ -57,7 +57,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         it "the predicate as expressed by the component is intact" do
 
           _s = _first_line
-          _s.should be_include "must be a lowercase word (had: 'CHOCOLATE')"
+          _s.should be_include 'must be a lowercase word (had: "CHOCOLATE")'
         end
 
         it "any subsequent lines are expressed as-is" do
@@ -81,7 +81,7 @@ module Skylab::Autonomous_Component_System::TestSupport
         it "we add the trailing context as a chain of prepositional phrases" do
 
           _s = _first_line
-          _s.should match %r( in 'verb_phrase' in input JSON[^[:alpha:]]*\z)
+          _s.should match %r( in "verb_phrase" in input JSON[^[:alpha:]]*\z)
         end
 
         def _first_line

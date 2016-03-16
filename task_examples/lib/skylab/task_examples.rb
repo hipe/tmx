@@ -27,8 +27,10 @@ module Skylab::TaskExamples
   CLI = nil  # for host
   Home_ = self
   stowaway :Library_, 'lib-'
+  NEWLINE_ = "\n"
   NIL_ = nil
   Autoloader_[ TaskTypes = ::Module.new ]
   Textual_Old_Event_ = ::Struct.new :text, :stream_symbol
   UNABLE_ = false
+  UNRELIABLE_ = :_unreliable_from_te_
 end

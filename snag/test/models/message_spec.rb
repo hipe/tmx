@@ -10,13 +10,13 @@ module Skylab::Snag::TestSupport
     it "no false-ish'es (false)" do
 
       _against false
-      _expect :not_a_string, "need string, had 'false'"
+      _expect :not_a_string, "need string, had false"
     end
 
     it "no blanks" do
 
       _against SPACE_
-      _expect :string_has_extraordinary_features, "message was blank.: ' '"
+      _expect :string_has_extraordinary_features, 'message was blank.: " "'
     end
 
     it "no real newlines" do
@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
       _against "x\n"
 
       ev = _expect :string_has_extraordinary_features,
-        "message cannot contain newlines: 'x\n'"
+        'message cannot contain newlines: "x\n"'
 
       ev.x.should eql "x\n"
       ev.string_proc
@@ -37,7 +37,8 @@ module Skylab::Snag::TestSupport
       _against "x\\n"
 
       _expect :string_has_extraordinary_features,
-        "message cannot contain escaped newlines: 'x\\n'"
+        'message cannot contain escaped newlines: "x\\\\n"'
+        # (that's two real bytes to express two real backslashes)
     end
 
     def _against s

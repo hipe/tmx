@@ -20,7 +20,7 @@ module Skylab::Cull::TestSupport
       _em = expect_not_OK_event_ :extra_properties
 
       black_and_white_lines( _em.cached_event_value ).should eql(
-        [ "unrecognized prefix 'zoidberg'", "did you mean 'file'?" ] )
+        [ 'unrecognized prefix "zoidberg"', 'did you mean "file"?' ] )
 
       expect_failed
     end
@@ -49,8 +49,8 @@ module Skylab::Cull::TestSupport
 
       s_a = black_and_white_lines _em.cached_event_value
 
-      s_a.first.should eql "unrecognized extension '.beefer'"
-      s_a.last.should eql "did you mean '.json' or '.markdown'?"
+      s_a.first.should eql 'unrecognized extension ".beefer"'
+      s_a.last.should eql 'did you mean ".json" or ".markdown"?'
 
       expect_no_more_events
     end

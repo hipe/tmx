@@ -24,7 +24,7 @@ module Skylab::CodeMetrics::TestSupport
 
       _ = black_and_white _em.cached_event_value
 
-      _.should match %r(\Ainvalid pattern, must look [a-z ]+: '\[#foo-999\]'\z)
+      _.should match %r(\Ainvalid pattern, must look [a-z ]+: "\[#foo-999\]"\z)
     end
 
     it "but money is money" do

@@ -78,7 +78,7 @@ module Skylab::Cull::TestSupport
       black_and_white( _em.cached_event_value ).should match(
 
         %r(\bJSON files are always exactly one entity #{
-         }collection.+table '3' was requested, but had only 1 table\b) )
+         }collection.+table 3 was requested, but had only 1 table\b) )
 
       expect_failed
     end

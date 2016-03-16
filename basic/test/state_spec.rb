@@ -111,7 +111,7 @@ module Skylab::Basic::TestSupport
 
       st = _upstream '-foo', 'bar'
       _against st
-      _expect_failed_with "expecting long switch at '-foo'"
+      _expect_failed_with 'expecting long switch at "-foo"'
       st.current_index.should be_zero
     end
 

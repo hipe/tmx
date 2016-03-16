@@ -19,7 +19,7 @@ module Skylab::Snag::TestSupport
         _em = expect_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should match(
-          /\Athere is no node '\[#10\]' in [^ ]+sutherlands\./ )
+          /\Athere is no node "\[#10\]" in [^ ]+sutherlands\./ )
 
         expect_failed
       end
@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
         _em = expect_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should eql(
-          "node [#1] does not have tag '#three'" )  # :+[#015]
+          "node [#1] does not have tag \"#three\"" )  # :+[#015]
 
         expect_failed
       end

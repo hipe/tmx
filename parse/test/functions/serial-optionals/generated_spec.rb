@@ -59,7 +59,7 @@ module Skylab::Parse::TestSupport
         -> do
           P[ argv ]
         end.should raise_error( ArgumentError,
-                     ::Regexp.new( "\\Aunrecognized\\ argument\\ 'Mom's" ) )
+                     ::Regexp.new( "\\Aunrecognized\\ argument\\ \"Mom's" ) )
       end
     end
 

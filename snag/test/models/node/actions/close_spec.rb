@@ -26,7 +26,7 @@ module Skylab::Snag::TestSupport
       _against '002'
 
       expect_not_OK_event :component_not_found,
-        "node [#2] does not have tag '#open'"
+        "node [#2] does not have tag \"#open\""
 
       _expect :component_already_added, "node [#2] already has tag #done"
 
@@ -46,7 +46,7 @@ module Skylab::Snag::TestSupport
       _em = expect_not_OK_event :component_not_found
 
       black_and_white( _em.cached_event_value ).should eql(
-        "node [#1] does not have tag '#open'" )
+        "node [#1] does not have tag \"#open\"" )
 
       expect_noded_ 1
 

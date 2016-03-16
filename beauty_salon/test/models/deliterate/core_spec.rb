@@ -28,7 +28,7 @@ module Skylab::BeautySalon::TestSupport
       _em = expect_not_OK_event_ :number_too_small
 
       black_and_white( _em.cached_event_value ).should eql(
-        "'from-line' must be greater than or equal to 1, had '-1'" )
+        "'from-line' must be greater than or equal to 1, had -1" )
 
       expect_failed
     end
@@ -41,7 +41,7 @@ module Skylab::BeautySalon::TestSupport
         :actual_property_is_outside_of_formal_property_set )
 
       black_and_white( _em.cached_event_value ).should eql(
-        "'to-line' must be -1 or greater than or equal to 1. had '-2'" )
+        "'to-line' must be -1 or greater than or equal to 1. had -2" )
 
       expect_failed
     end

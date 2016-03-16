@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types version from spec", wip: true do
+  describe "[te] task-types version from spec" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -35,8 +35,7 @@ module Skylab::TaskExamples::TestSupport
         end
 
         it "just reports the output" do
-
-          _expect_only_string 'version 1.2.34 is the version'
+          _expect_labelled_as_version 'version 1.2.34 is the version'
         end
 
         def _parse_with
@@ -55,7 +54,7 @@ module Skylab::TaskExamples::TestSupport
           end
 
           it "shows the matched portion of the output" do
-            __expect_only_version '1.3.78'
+            _expect_labelled_as_version '1.3.78'
           end
 
           def _version_from
@@ -67,12 +66,13 @@ module Skylab::TaskExamples::TestSupport
 
           shared_state_
 
-          it "succeeds" do
-            succeeds_
+          it "fails" do
+            fails_
           end
 
-          it "shows all of the output" do
-            _expect_only_string 'ver A.B.foo'
+          it "explains that it can't parse" do
+            _be_this = _be_couldnt_parse "ver A.B.foo\n"
+            error_expression_message_.should _be_this
           end
 
           def _version_from
@@ -88,10 +88,13 @@ module Skylab::TaskExamples::TestSupport
 
         shared_state_
 
-        it "fails with message (LOOK)" do
+        it "fails with message" do
 
-          _rx = %r(\A Bad range assertion)
-          expect_strong_failure_with_message_ _rx
+          _ = error_expression_message_
+
+          _rx = %r(\ABad range assertion)
+
+          _.should match _rx
         end
 
         def _version_from
@@ -108,11 +111,15 @@ module Skylab::TaskExamples::TestSupport
         shared_state_
 
         it "fails" do
+          fails_
+        end
+
+        it "emits" do
 
           _rx = %r(\ADo not use "[^"]+" as a target #{
             }without a "must be in range" assertion\b)
 
-          expect_strong_failure_with_message_ _rx
+          error_expression_message_.should match _rx
         end
 
         def _must_be_in_range
@@ -150,7 +157,8 @@ module Skylab::TaskExamples::TestSupport
 
           it "says that is doesn't match" do
 
-            _expect_version_mismatch_against '0.0.1'
+            _be_this = _be_version_mismatch_against '0.0.1'
+            error_expression_message_.should _be_this
           end
 
           def _version_from
@@ -171,9 +179,11 @@ module Skylab::TaskExamples::TestSupport
           fails_
         end
 
-        it "reports a failure (SMALL ISSUE HERE)" do
+        it "reports a failure" do
 
-          _expect_version_mismatch_against "version A.B.C"
+          _be_this_message = _be_couldnt_parse "version A.B.C\n"
+
+          error_expression_message_.should _be_this_message
         end
 
         def _version_from
@@ -189,11 +199,9 @@ module Skylab::TaskExamples::TestSupport
         '1.2+'
       end
 
-      def _expect_version_mismatch_against s
+      def _be_version_mismatch_against s
 
-        _s_ = "version mismatch: needed 1.2+ had #{ s }"
-
-        expect_only_ :styled, :info, _s_
+        eql "version mismatch: needed 1.2+ had #{ s.inspect }"
       end
     end
 
@@ -222,14 +230,12 @@ module Skylab::TaskExamples::TestSupport
       'echo "version 1.2.34 is the version"'
     end
 
-    def __expect_only_version s
-
-      _rx = /\Aversion: #{ ::Regexp.escape s }\z/
-
-      payload_expression_message_.should match _rx
+    def _be_couldnt_parse s
+      _ = s.inspect
+      eql "using provided regex, couldn't parse version from #{ _ }"
     end
 
-    def _expect_only_string s
+    def _expect_labelled_as_version s
 
       payload_expression_message_.should eql "version: #{ s }"
     end
@@ -237,6 +243,10 @@ module Skylab::TaskExamples::TestSupport
     def __expect_OK s
 
       info_expression_message_.should eql "version ok: #{ s }"
+    end
+
+    def expression_agent_for_expect_event
+      common_expression_agent_for_expect_event_
     end
   end
 end

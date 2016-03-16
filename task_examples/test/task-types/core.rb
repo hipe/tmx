@@ -63,7 +63,7 @@ module Skylab::TaskExamples::TestSupport
       def _expression_message chan
 
         y = nil
-        _be_this = be_emission_via_array  chan do |y_|
+        _be_this = be_emission_via_array chan do |y_|
           y = y_
         end
 
@@ -168,6 +168,15 @@ module Skylab::TaskExamples::TestSupport
 
       def read_file_ path
         ::File.read path
+      end
+    end
+
+    # -- other
+
+    module Instance_Methods__
+
+      def common_expression_agent_for_expect_event_
+        Home_.lib_.brazen::API.expression_agent_instance
       end
     end
   end

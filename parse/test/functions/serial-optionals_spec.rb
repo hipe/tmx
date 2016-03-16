@@ -69,7 +69,7 @@ describe "[pa] fuctions - serial optionals" do
       end
 
       it "against one invalid input token - no" do
-        _rx = /\bunrecognized argument 'blah'/
+        _rx = /\bunrecognized argument "blah"/
         -> do
           _parse 'blah'
         end.should raise_error( ::ArgumentError, _rx )
@@ -105,7 +105,7 @@ describe "[pa] fuctions - serial optionals" do
       it "if the \"valid\" input tokens are in the wrong order - no" do
         -> do
           _parse :m, 12
-        end.should raise_error( ::ArgumentError, /unrecognized argument '12'/ )
+        end.should raise_error( ::ArgumentError, /unrecognized argument 12/ )
       end
     end
   end

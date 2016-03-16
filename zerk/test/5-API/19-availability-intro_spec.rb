@@ -25,7 +25,7 @@ module Skylab::Zerk::TestSupport
 
       it "says.." do
 
-        _s = "operation 'flickerer' is not available"
+        _s = 'operation "flickerer" is not available'
 
         root_ACS_state.message.should eql _s
       end

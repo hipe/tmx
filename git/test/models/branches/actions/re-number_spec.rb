@@ -14,7 +14,7 @@ module Skylab::Git::TestSupport
       _em = expect_not_OK_event :strange_items
 
       black_and_white( _em.cached_event_value ).should eql(
-        "'2' and '4' must be in the collection" )
+        "2 and 4 must be in the collection" )
 
       expect_failed
     end

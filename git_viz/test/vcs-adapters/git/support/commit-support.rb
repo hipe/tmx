@@ -26,7 +26,7 @@ module Skylab::GitViz::TestSupport
           ev.exitstatus.should eql GENERAL_ERROR___
 
           black_and_white( ev ).should eql(
-            "unrecognized revision '#{ sha_s }'" )
+            "unrecognized revision \"#{ sha_s }\"" )
         end
       end
 

@@ -2,21 +2,12 @@ module Skylab::TaskExamples
 
   class TaskTypes::VersionFrom < Common_task_[]
 
-    _etc = {
+    depends_on_parameters(
       must_be_in_range: :optional,
       parse_with: :optional,
       show_version: [ :_from_context, :flag, :optional ],
       version_from: nil,
-    }
-
-    depends_on_parameters( * _etc.keys )
-
-    def initialize
-      @must_be_in_range = nil
-      @parse_with = nil
-      @show_version = false
-      super
-    end
+    )
 
     def execute
       if @show_version
@@ -28,14 +19,22 @@ module Skylab::TaskExamples
 
     # -- check version
 
-    def check_version
+    def ___check_version
 
       ver_r = __build_version_range
+      if ver_r
+        ___check_vesion_against_range ver_r
+      else
+        ver_r
+      end
+    end
+
+    def ___check_vesion_against_range ver_r
 
       ver_s = __procure_version_string
 
       if ver_s
-        if ver_r.match version_s
+        if ver_r.match ver_s
           __when_version_yes ver_s, ver_r
         else
           ___when_version_no ver_s, ver_r
@@ -58,7 +57,7 @@ module Skylab::TaskExamples
 
       @_oes_p_.call :info, :expression do |y|
 
-        y << "version ok: version #{ val ver_s } is in range #{ ver_r }"
+        y << "version ok: version #{ ver_s } is in range #{ ver_r }"
       end
       ACHIEVED_
     end
@@ -67,10 +66,18 @@ module Skylab::TaskExamples
 
       s = @must_be_in_range
       if s
-        Home_::VersionRange.build s
+        Home_::VersionRange.build s, & @_oes_p_
       else
-        fail ___say_no_term
+        ___when_no_range_term
       end
+    end
+
+    def ___when_no_range_term
+      msg = ___say_no_term
+      @_oes_p_.call :error, :expression do |y|
+        y << msg
+      end
+      UNABLE_
     end
 
     def ___say_no_term
@@ -88,12 +95,34 @@ module Skylab::TaskExamples
 
     def __show_version
 
-      version, used_regex = _parse_version_string
-
-      (used_regex ? [version] : version.split("\n")).each do |line|
-        call_digraph_listeners :payload, "#{hi 'version:'} #{line}"
+      ver_s, did_use_regex = _parse_version_string
+      if ver_s
+        __do_show_version ver_s, did_use_regex
+      else
+        ver_s
       end
-      true
+    end
+
+    def __do_show_version ver_s, did_use_regex
+
+      @_oes_p_.call :payload, :expression do |y|
+
+        headerize = -> s do
+          "#{ hdr 'version' } #{ s }"
+        end
+
+        if did_use_regex
+          y << headerize[ ver_s ]
+        else
+          _s_a = ver_s.split NEWLINE_
+          _s_a.each do |s|
+            y << headerize[ s ]
+          end
+        end
+        UNRELIABLE_
+      end
+
+      ACHIEVED_
     end
 
     # -- support
@@ -107,7 +136,7 @@ module Skylab::TaskExamples
       buffer = Home_::Library_::StringIO.new
       read = lambda { |s| buffer.write(s) }
 
-      Home_.lib_.system.open2 version_from do | o |
+      Home_.lib_.system.open2 @version_from do | o |
         o.out( & read )
         o.err( & read )
       end
@@ -117,10 +146,14 @@ module Skylab::TaskExamples
 
       if rx
         md = rx.match s
-      end
-
-      if md
-        [ md[ 1 ], true ]
+        if md
+          [ md[ 1 ], true ]
+        else
+          @_oes_p_.call :error, :expression do |y|
+            y << "using provided regex, couldn't parse version from #{ ick s }"
+          end
+          UNABLE_
+        end
       else
         [ s, false ]
       end
@@ -133,7 +166,7 @@ module Skylab::TaskExamples
       if md
         body, modifiers = md.captures
 
-        if MODIFIER_RX__ =~ modifiers
+        if MODIFIER_RX___ =~ modifiers
           ::Regexp.new body, modifiers
         else
           raise __say_when_bad_modifiers modifiers

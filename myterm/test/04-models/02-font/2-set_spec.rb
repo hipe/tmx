@@ -58,13 +58,14 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "says that your font wasn't recognized (NOTE contextualiztion removed)" do
-        _msg_a.fetch( 0 ).should eql "unrecognized font path 'NOTAFONT'"
+        _msg_a.fetch( 0 ).should eql 'unrecognized font path "NOTAFONT"'
       end
 
       it "offers 3 levenshtein-based suggestions" do
-        _ = _msg_a.fetch( -1 )
-        _rx = %r(\Adid you mean '[^']+', '[^']+' or '[^']+'\?\z)
-        _.should match _rx
+        _msg = _msg_a.fetch( -1 )
+        _ = '"[^"]+"'
+        _rx = %r(\Adid you mean #{ _ }, #{ _ } or #{ _ }\?\z)
+        _msg.should match _rx
       end
     end
 

@@ -38,7 +38,7 @@ module Skylab::Brazen
       end
 
       def ick x
-        "'#{ x }'"
+        Home_.lib_.basic::String.via_mixed x
       end
 
       def indefinite_noun lemma_s

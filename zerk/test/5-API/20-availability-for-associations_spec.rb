@@ -32,7 +32,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    _say_this = "association 'upper-color' is not available"
+    _say_this = 'association "upper-color" is not available'
 
     context "read when unavailable" do
 

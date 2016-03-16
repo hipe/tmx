@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - criteria - library (02)" do
+  describe "[sg] models - criteria - library - disambiguation" do
 
     extend TS_
     use :expect_event
@@ -28,7 +28,7 @@ module Skylab::Snag::TestSupport
       _em = expect_not_OK_event :ambiguity
 
       black_and_white( _em.cached_event_value ).should eql(
-        "'or' is ambiguous here because of a previous \"and\"" )
+        "\"or\" is ambiguous here because of a previous \"and\"" )
 
       st.current_index.should eql 0
     end

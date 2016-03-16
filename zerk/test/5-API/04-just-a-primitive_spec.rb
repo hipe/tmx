@@ -88,7 +88,7 @@ module Skylab::Zerk::TestSupport
         only_emission.should ( be_emission(
           :error, :expression, :invalid_value
         ) do |y|
-          y.should eql [ "paths can't be absolute - '/'" ]
+          y.should eql [ "paths can't be absolute - \"/\"" ]
         end )
       end
     end

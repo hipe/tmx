@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - criteria - library (05 - \"target ersatz\")" do
+  describe "[sg] models - criteria - library - target ersatz" do
 
     extend TS_
     use :criteria_library_support

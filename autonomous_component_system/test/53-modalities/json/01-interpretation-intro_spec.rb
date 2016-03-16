@@ -73,7 +73,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           _ = be_emission :error, :extra_properties do |ev|
 
             _s = black_and_white ev
-            _s.should eql "unrecognized element 'middle_initial' in 'someplace'"
+            _s.should eql 'unrecognized element \'middle_initial\' in "someplace"'
           end
 
           only_emission.should _
@@ -94,7 +94,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           _ = be_emission :error, :empty_object do |ev|
             _s = black_and_white ev
-            _s.should eql "for now, will not parse empty JSON object for 'someplace'"
+            _s.should eql 'for now, will not parse empty JSON object for "someplace"'
           end
 
           only_emission.should _
@@ -136,8 +136,8 @@ module Skylab::Autonomous_Component_System::TestSupport
 
             _s = black_and_white ev
 
-            _s.should eql "for 'simple_name' expected hash,#{
-              } had '[]' (in 'someplace')"
+            _s.should eql "for \"simple_name\" expected hash,#{
+              } had < a Array > (in \"someplace\")"
           end
 
           only_emission.should _

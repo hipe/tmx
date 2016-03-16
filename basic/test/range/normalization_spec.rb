@@ -11,13 +11,13 @@ module Skylab::Basic::TestSupport
 
       _against( -2 )
       _expect_common_failure(
-        "'argument' must be between -1 and 2 inclusive. had '-2'" )
+        "'argument' must be between -1 and 2 inclusive. had -2" )
     end
 
     it "outside right" do
 
       _against 3
-      _expect_common_failure %r(inclusive\. had '3'\z)
+      _expect_common_failure %r(inclusive\. had 3\z)
     end
 
     it "inside" do

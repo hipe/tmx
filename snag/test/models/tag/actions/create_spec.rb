@@ -19,7 +19,7 @@ module Skylab::Snag::TestSupport
 
         black_and_white( _em.cached_event_value ).should eql(
           "'node-identifier-number-component' #{
-            }must be a non-negative integer, had 'ziffy'" )
+            }must be a non-negative integer, had \"ziffy\"" )
 
         expect_failed
       end
@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
         _em = expect_not_OK_event :component_not_found
 
         black_and_white( _em.cached_event_value ).should match(
-          %r(\Athere is no node '\[#2\]') )
+          %r(\Athere is no node "\[#2\]") )
 
         expect_failed
       end
@@ -44,7 +44,7 @@ module Skylab::Snag::TestSupport
 
         black_and_white( _em.cached_event_value ).should eql(
           "tag must be alphanumeric separated with dashes - #{
-            }invalid tag name: '#foo bar'" )
+            }invalid tag name: \"#foo bar\"" )
 
         expect_failed
       end

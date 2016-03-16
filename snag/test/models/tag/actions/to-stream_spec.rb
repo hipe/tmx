@@ -20,7 +20,7 @@ module Skylab::Snag::TestSupport
 
         black_and_white( _em.cached_event_value ).should eql(
           "'node-identifier-number-component' #{
-           }must be a non-negative integer, had 'Xxx'" )
+           }must be a non-negative integer, had \"Xxx\"" )
 
         expect_failed
       end

@@ -22,8 +22,8 @@ module Skylab::MyTerm::TestSupport
         _be_this = be_emission :error, :extra_properties do |ev|
 
           s_a = black_and_white_lines ev
-          s_a.first.should eql "unrecognized adapter name 'whonani'"
-          s_a.last.should match %r(\Adid you mean .*'imagemagick'\?\z)
+          s_a.first.should eql 'unrecognized adapter name "whonani"'
+          s_a.last.should match %r(\Adid you mean .*"imagemagick"\?\z)
         end
 
         only_emission.should _be_this
