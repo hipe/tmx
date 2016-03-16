@@ -2,37 +2,56 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types unzip tarball", wip: true do
+  describe "[te] task-types unzip tarball" do
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_event
     use :task_types
 
     def subject_class_
       Task_types_[]::UnzipTarball
     end
 
-    context "with no build args" do
+    context "with missing requireds" do
+
+      shared_state_
+
+      it "(loads)" do
+        subject_class_
+      end
 
       it "whines about missing required fields" do
 
-        expect_missing_required_attributes_are_ :unzip_tarball, :build_dir
+        expect_missing_required_attributes_are_ :build_dir, :filesystem, :unzip_tarball
       end
 
       def build_arguments_
-        NOTHING_
-      end
-
-      def context_
-        EMPTY_H_
+        EMPTY_A_
       end
     end
 
-    context "with good build args" do
+    context "with required parameters" do
+
+      def build_arguments_
+        [
+          :build_dir, _build_dir,
+          :filesystem, real_filesystem_,
+          :unzip_tarball, _unzip_tarball,
+        ]
+      end
 
       context "when tarball does not exist" do
 
         shared_state_
+
+        def _build_dir
+          :_something_trueish_
+        end
+
+        def _unzip_tarball
+          __tarball_that_does_not_exist
+        end
 
         it "fails" do
           fails_
@@ -40,114 +59,117 @@ module Skylab::TaskExamples::TestSupport
 
         it "whines (returns false, emits error)" do
 
-          _rx = /tarball not found.*not-there/
-          expect_only_ :error, _rx
-        end
+          _be_this = match %r(\bNo such file or directory - \(pth .+not-there\b)
 
-        def unzip_tarball
-          "#{ FIXTURES_DIR }/not-there.tar.gz"
+          error_expression_message_.should _be_this
         end
       end
 
-      context "when the tarball exists" do
+      context "tarball exists and target directory exists (i.e skip)" do
 
         shared_state_
 
-        def before_execution_
-
-          _this_ build_build_directory_controller_
+        def _build_dir
+          td = empty_tmpdir_
+          td.mkdir "mginy"
+          td
         end
 
-        def _this_ o
-
-          o.prepare
-          o.copy unzip_tarball
-          NIL_
+        def _unzip_tarball
+          _tarball_that_is_proper
         end
 
-        memoize :unzip_tarball do
-          ::File.join( FIXTURES_DIR, 'mginy-0.0.1.tar.gz' ).freeze
+        it "succeeds" do
+          succeeds_
         end
 
-        context "when the target directery exists" do
+        it "expresses" do
 
-          shared_state_
+          _be_this = match %r(\bexists, won't tar extract: .*mginy\b)
 
-          it "succeeds" do
-            succeeds_
-          end
+          info_expression_message_.should _be_this
+        end
+      end
 
-          it "expresses" do
+      context "tarball path exists and it's not a tarball" do
 
-            _rx = /exists, won't tar extract: .*mginy/
-            info_expression_message_.should match  _rx
-          end
+        shared_state_
 
-          def _this_ o
-            super
-            o.mkdir "#{ BUILD_DIR }/mginy"
-            NIL_
-          end
+        def _build_dir
+          TestSupport_::Fixtures.dir :empty_esque_directory
         end
 
-        context "when it's not a tarball" do
-
-          shared_state_
-
-          it "fails" do
-            fails_
-          end
-
-          it "expresses" do
-            _rx = /failed to unzip.*unrecognized archive format/i
-            expect_eventually_ :error, _rx
-         end
-
-          def unzip_tarball
-            ::File.join FIXTURES_DIR, 'not-a-tarball.tar.gz'
-          end
+        def _unzip_tarball
+          __tarball_that_is_not_a_tarball
         end
 
-        context "when it is a tarball and the target directory does not exist" do
+        it "fails" do
+          fails_
+        end
 
-          shared_state_
+        it "expresses" do
 
-          it "succeeds" do
-            succeeds_
-          end
+          _be_msg = match %r(\bfailed to unzip.*unrecognized archive format)i
 
-          it "expresses shell" do
-
-            _rx = /cd [^ ]+\[te\]; tar -xzvf mginy/
-            expect_eventually_ :shell, _rx
-          end
-
-          it "errput lists etc" do
-
-            st = emission_stream_controller_
-            st.advance_to_first :err
-
-            expect_ :err, "x mginy/"
-            expect_ :err, "\nx mginy/README"
-
-            if st.unparsed_exists
-              :err == st.current_token.stream_symbol and fail
-            end
+          _be_this = be_emission :error, :expression do |y|
+            y.fetch( 0 ).should _be_msg
           end
         end
       end
 
-      def build_arguments_
-        [
-          :unzip_tarball, _unzip_tarball,
-        ]
-      end
+      context "when it is a tarball and the target directory does not exist" do
 
-      memoize :context_ do
-        {
-          build_dir: BUILD_DIR,
-        }.freeze
+        shared_state_
+
+        def _build_dir
+          empty_tmpdir_
+        end
+
+        def _unzip_tarball
+          _tarball_that_is_proper
+        end
+
+        it "succeeds" do
+          succeeds_
+        end
+
+        it "expresses shell" do
+
+          _be_this_message = match %r(\bcd [^ ]+\\\[te\\\]; tar -xzvf /.+/mginy\b)
+
+          _be_this = be_emission :info, :expression, :system_command do |y|
+            y.fetch( 0 ).should _be_this_message
+          end
+
+          first_emission.should _be_this
+        end
+
+        it "errput lists etc" do
+
+          expag = common_expression_agent_for_expect_event_
+
+          s_a = []
+          emission_array[ 1 .. -1 ].each do |em|
+            em.cached_event_value.express_into_under s_a, expag
+          end
+
+          s_a.fetch( 0 ).should eql "x mginy/"
+          s_a.fetch( 1 ).should eql "\nx mginy/README\n"  # weird chunking
+          2 == s_a.length or fail
+        end
       end
+    end
+
+    def __tarball_that_is_not_a_tarball
+      ::File.join FIXTURES_DIR, 'not-a-tarball.tar.gz'
+    end
+
+    def __tarball_that_does_not_exist
+      ::File.join FIXTURES_DIR, 'not-there.tar.gz'
+    end
+
+    def _tarball_that_is_proper
+      ::File.join FIXTURES_DIR, 'mginy-0.0.1.tar.gz'
     end
   end
 end

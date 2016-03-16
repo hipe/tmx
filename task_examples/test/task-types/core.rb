@@ -85,6 +85,26 @@ module Skylab::TaskExamples::TestSupport
         _x = state_.result
         true == _x or fail
       end
+
+      # -- parametrically structural assertion
+
+      def expect_missing_required_attributes_are_ * sym_a
+
+        o = state_
+        false == o.result or fail
+        a = o.emission_array
+        1 == a.length or fail
+        _em = a.fetch 0
+
+        actual_sym_a = nil
+        _be_this = be_emission :error, :missing_required_attributes do |ev|
+          actual_sym_a = ev.miss_a.map( & :name_symbol )
+        end
+
+        _em.should _be_this
+
+        actual_sym_a.should eql sym_a
+      end
     end
 
     # -- static fileserver

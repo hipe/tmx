@@ -25,10 +25,12 @@ module Skylab::TaskExamples
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   CLI = nil  # for host
+  EMPTY_S_ = ''
   Home_ = self
   stowaway :Library_, 'lib-'
   NEWLINE_ = "\n"
   NIL_ = nil
+  SPACE_ = ' '
   Autoloader_[ TaskTypes = ::Module.new ]
   Textual_Old_Event_ = ::Struct.new :text, :stream_symbol
   UNABLE_ = false

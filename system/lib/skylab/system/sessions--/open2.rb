@@ -5,6 +5,7 @@ module Skylab::System
   class Sessions__::Open2  # :[#025].
 
     # ancient thing that's too simple to throw out, but not yet reconciled
+    # #todo - if this stays change it to session interface
 
   # read both stdout and stderr of a system command without blocking
   # (this is superseded by [#sy-006] IO select,
@@ -21,9 +22,10 @@ module Skylab::System
 
     NUM_BYTES = 4096
 
-    def initialize cmd_s_a, any_sout, any_serr, & x_p
+    def initialize cmd_s_a, any_sout, any_serr, opt_h, & x_p
 
       @cmd_s_a = cmd_s_a
+      @opt_h = opt_h
       @serr = any_serr
       @sout = any_sout
       @x_p = x_p
@@ -57,7 +59,8 @@ module Skylab::System
 
       bytes = 0
       time = ::Time.now
-      ::Open3.popen3( * @cmd_s_a ) do |sin, _sout, _serr|
+
+      ::Open3.popen3( * @cmd_s_a, * [ @opt_h ].compact ) do |sin, _sout, _serr|
         open = [ { :in => _serr, :out => :_err }, { :in => _sout, :out => :_out } ]
         loop do
           open.each_with_index do |s, idx|

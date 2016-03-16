@@ -173,6 +173,7 @@ module Skylab::TaskExamples::TestSupport
 
   Callback_ = Home_::Callback_
   DOT_BYTE_ = '.'.getbyte 0
+  EMPTY_A_ = []
   EMPTY_H_ = {}.freeze
   NIL_ = nil
   NOTHING_ = nil

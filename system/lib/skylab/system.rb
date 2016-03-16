@@ -59,8 +59,8 @@ module Skylab::System
         _common( :IO )
       end
 
-      def open2 cmd_s_a, sout=nil, serr=nil, & x_p
-        Home_::Sessions__::Open2.new( cmd_s_a, sout, serr, & x_p ).execute
+      def open2 cmd_s_a, sout=nil, serr=nil, opt_h=nil, & x_p
+        Home_::Sessions__::Open2.new( cmd_s_a, sout, serr, opt_h, & x_p ).execute
       end
 
       def popen3 * cmd_s_a, & please_not_this_way

@@ -38,6 +38,8 @@ module Skylab::TaskExamples
 
   module Library_  # :+[#su-001]
 
+    # #todo etc
+
     class << self
 
       cache = {}
@@ -55,6 +57,11 @@ module Skylab::TaskExamples
     o :FileUtils do
       require 'fileutils'
       ::FileUtils
+    end
+
+    o :Shellwords do
+      require 'shellwords'
+      ::Shellwords
     end
 
     o :StringIO do
