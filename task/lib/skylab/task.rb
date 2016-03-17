@@ -69,7 +69,7 @@ class Skylab::Task
 
         # not for every task in the graph, only the "front" one
 
-        o = Home_::Sessions::Execute_Graph::Newschool.new( & @_oes_p_ )
+        o = Home_::Sessions::Execute_Graph.new( & @_oes_p_ )
 
         if instance_variable_defined? :@_params
           o.parameter_box = remove_instance_variable :@_params
@@ -80,23 +80,28 @@ class Skylab::Task
 
       def accept index, & visit
 
-        visit.call self do
-          ___to_dependee_stream_around index
+        dr = ___dependee_references
+        if dr
+          visit.call self do
+            __to_dependee_stream_around dr, index
+          end
+        else
+          visit[ self ]
         end
       end
+      # ___to_dependee_stream_around index
 
-      def ___to_dependee_stream_around index
+      def ___dependee_references
+        self.class._dependee_references
+      end
 
-        _ = ___dependee_references
-        _st = _.to_stream
+      def __to_dependee_stream_around dr, index
+
+        _st = dr.to_stream
         _st_ = _st.map_by do |dref|
           dref.dereference_against_ index
         end
         _st_
-      end
-
-      def ___dependee_references
-        self.class._dependee_references
       end
 
       def receive_dependency_completion dc
@@ -191,16 +196,12 @@ class Skylab::Task
 
         def dereference_against_ index
 
-          bx = index.box
-
-          bx.fetch @sym do
-            x = __build_against index
-            bx.add @sym, x
-            x
+          index.cache_box.touch @sym do
+            ___build_against index
           end
         end
 
-        def __build_against index
+        def ___build_against index
 
           _cls = index.box_module.const_get @sym, false
 
@@ -242,6 +243,7 @@ class Skylab::Task
   EMPTY_A_ = [].freeze
   Home_ = self
   NIL_ = nil
+  NOTHING_ = nil
   UNABLE_ = false
 end
 # #tombstone: we no longer subclass rake task

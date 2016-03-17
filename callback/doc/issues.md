@@ -1,5 +1,6 @@
 [#066]       #track emission conversion (this tag is semantically
              redundanty with something somewhere..)
+             also track flip-flop emitting ..
 
 [#065]       when expect-event is rewritten.. (notify these guys)
 [#064]    #to-explore imagine threads, etc

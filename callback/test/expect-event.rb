@@ -216,7 +216,7 @@ module Skylab::Callback::TestSupport
 
       def build_event_log
 
-        log = Event_Log___.new
+        log = Event_Log.new
 
         if do_debug
           log.set_auxiliary_listener_by( & __build_expev_debug_auxil_proc )
@@ -795,7 +795,7 @@ module Skylab::Callback::TestSupport
       )
     end
 
-    class Event_Log___
+    class Event_Log  # [ta]
 
       # at present this wraps multiple concerns and implements them with
       # function soup.

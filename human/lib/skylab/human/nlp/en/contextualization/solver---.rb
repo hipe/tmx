@@ -181,7 +181,7 @@ module Skylab::Human
               @_seen[ k ] = true ; false
             end
             if _did
-              self._COVER_ME_circular_dependency
+              self._COVER_ME_circular_dependency  # and see #[#ta-007]
             end
 
             _new_brosef = Solve__.new stack, @_seen, @_reader

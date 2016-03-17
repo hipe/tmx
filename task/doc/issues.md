@@ -1,3 +1,6 @@
+[#007]       for tracking - we have a circular dependency expression
+             logic, so do areas marked with this tag.
+
 [#006]       where's that one thing (in situ)
 [#005]       [magnetics viz]  (in branch at writing) (has subscribers)
 [#004]       [eventpoint]

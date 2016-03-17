@@ -8,7 +8,7 @@ class Skylab::Task
     # guaranteed to have all its dependencies met.
     #
     # (this algorithm is not concerned with whether the nodes themselves
-    # will complte their particular tasks; for the sake of the algorithm,
+    # will complete their particular tasks; for the sake of the algorithm,
     # imagine that they all do.)
     #
     # it is assumed that if the graph succeeded in being indexed, that
@@ -38,7 +38,7 @@ class Skylab::Task
 
     def execute
 
-      outie = @index.dependees_of
+      outie = @index.dependees_of_box_.h_
       innie = @index.dependants_on
 
       subscribers = {}

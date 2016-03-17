@@ -28,18 +28,17 @@ class Skylab::Task
           ACHIEVED_  # the task is already resolved, do not descend
 
         elsif false == x
-          self._COVER_ME_cycle
+
+          ___on_cycle task, index
+          UNABLE_
 
         else
 
-          st = if dependees
-            dependees[]
-          else
-            Callback_::Stream.the_empty_stream
+          if dependees
+            st = dependees[]
+            de = st.gets
           end
-
           ok = true
-          de = st.gets
           if de
             begin
               index.add_subscription task.name_symbol, de.name_symbol
@@ -66,6 +65,26 @@ class Skylab::Task
       end
     end
 
+    def ___on_cycle task, index  # assume the last dootily is frootily
+
+      build = -> do
+        Home_::Events::CircularDependency.build_via__ task, index
+      end
+
+      oes_p = @_oes_p
+      if oes_p  # #[#ca-066]
+        oes_p.call :error, :circular_dependency do
+          _ = build[]
+          _
+        end
+        NIL_
+      else
+        _ev = build[]
+        _ex = _ev.to_exception
+        raise _ev
+      end
+    end
+
     # ~
 
     class Index___
@@ -81,13 +100,15 @@ class Skylab::Task
         @_oes_p = p
 
         @dependants_on = ::Hash.new { |h, k| h[k] = [] }
-        @dependees_of = ::Hash.new { |h, k| h[k] = [] }
+
+        @_dependees_of_box = Callback_::Box.new
       end
 
       def add_subscription dependant_sym, dependee_sym
 
         @dependants_on[ dependee_sym ].push dependant_sym
-        @dependees_of[ dependant_sym ].push dependee_sym
+
+        @_dependees_of_box.touch_array_and_push dependant_sym, dependee_sym
 
         NIL_
       end
@@ -95,7 +116,7 @@ class Skylab::Task
       def receive_one_base_case_task_symbol sym
 
         @dependants_on[ :_NOTHING_ ].push sym
-        @dependees_of[ sym ]
+        @_dependees_of_box.touch_array sym
         NIL_
       end
 
@@ -104,7 +125,6 @@ class Skylab::Task
         remove_instance_variable :@box_module
 
         @dependants_on.default_proc = nil
-        @dependees_of.default_proc = nil
 
         self
       end
@@ -113,12 +133,15 @@ class Skylab::Task
         @_oes_p
       end
 
+      def dependees_of_box_
+        @_dependees_of_box
+      end
+
       attr_reader(
         :cache_box,
         :box_module,
 
         :dependants_on,
-        :dependees_of,
       )
     end
   end

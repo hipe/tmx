@@ -125,8 +125,13 @@ module Skylab::TanMan
       y << stack_a.reverse.join( EMPTY_S_ )
     end
 
-    Circular__ = Callback_::Event.prototype_with :circular,
-        :trail_a, nil, :reason, :circular, :ok, false do | y, o |
+    Circular__ = Callback_::Event.prototype_with(  # #[#ta-007]
+      :circular,
+      :trail_a, nil,
+      :reason, :circular,
+      :ok, false,
+
+    ) do | y, o |
 
       self._RIDE_ME
 

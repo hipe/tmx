@@ -67,6 +67,12 @@ module Skylab::Task::TestSupport
       flush_event_log_and_result_to_state _x
     end
 
+    def build_my_state_via_ result, emissions=nil, task
+      State___.new result, emissions, task
+    end
+
+    State___ = ::Struct.new :result, :emission_x_a, :task
+
     def _setup_state
 
       _ = handler_
@@ -74,6 +80,10 @@ module Skylab::Task::TestSupport
       o = _cls.new( & _ )
       add_parameters_into_ o
       o
+    end
+
+    def common_expression_agent_for_expect_event_
+      Home_.lib_.brazen::API.expression_agent_instance
     end
 
     def common_handler_
