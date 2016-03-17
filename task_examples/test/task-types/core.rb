@@ -45,8 +45,12 @@ module Skylab::TaskExamples::TestSupport
 
         _x = task.execute_as_front_task
 
-        flush_event_log_and_result_to_state _x
+        _a = remove_instance_variable( :@event_log ).flush_to_array
+
+        State___[ _x, _a, task ]
       end
+
+      State___ = ::Struct.new :result, :emission_array, :task
 
       def error_expression_message_
         _expression_message ERROR_EXPRESSION_CHANNEL___

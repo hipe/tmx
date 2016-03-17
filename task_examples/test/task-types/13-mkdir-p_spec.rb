@@ -2,141 +2,122 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types - mkdir p", wip: true do
+  describe "[te] task-types - mkdir p" do
+
+    # #signficance: tasks no longer result in data payloads..
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_event
     use :task_types
 
     def subject_class_
       Task_types_[]::MkdirP
     end
 
-    it "whines about unhandled event channels" do
-
-      _rx = /unhandled event streams?.+all.+info/
-      _cls = subject_class_
-
-      expect_strong_failure_with_message_by_ _rx do
-        _cls.new
-      end
+    def build_arguments_
+      [
+        :dry_run, _dry_run,
+        :max_depth, _max_depth,
+        :mkdir_p, _mkdir_p,
+      ]
     end
 
-    context "as empty" do
+    context "essential" do
+
+      shared_state_
+
+      it "loads" do
+        subject_class_
+      end
 
       it "whines about required arg missing if you try to run it" do
 
-        _rx = /missing required attributes?: .*mkdir_p/
-
-        expect_strong_failure_with_message_ _rx
+        expect_missing_required_attributes_are_ :mkdir_p
       end
 
       def build_arguments_
-        NOTHING_
+        EMPTY_A_
       end
     end
 
-    context "when the required parameters are present" do
+    context "dry run, max depth is exceeded" do
 
-      context "with regards to dry_run" do
+      shared_state_
 
-        context "it is off (hot) by default" do
+      def _max_depth
+        1
+      end
 
-          it "like so" do
+      def _mkdir_p
+        _mkdir_p_where_two_directories_would_have_to_be_created
+      end
 
-            _task = build_task_with_context_
-            _task.dry_run?.should eql false
-          end
+      it "fails" do
+        fails_
+      end
 
-          def _mkdir_p
-            :hello
-          end
+      it "expresses" do
 
-          def context_
-            EMPTY_H_
-          end
+        _be_msg = be_include "would have to create at least 2 directories, #{
+          }only allowed to make 1"
+
+        _be = be_emission :error, :path_too_deep do |ev|
+          _ = black_and_white ev
+          _.should _be_msg
         end
 
-        context "with dry run in context" do
-
-          it "registers that dry run is on" do
-
-            _task = build_task_with_context_
-            _task.should be_dry_run
-          end
-
-          context "when `max_depth` would be exceeded" do
-
-            shared_state_
-
-            it "fails (NOTE is nil)" do
-              state_.result_x.should be_nil
-              # fails_
-            end
-
-            it "expresses" do
-              _rx = /\bmore than 1 levels deep\b/i
-              error_expression_message_.should match _rx
-            end
-
-            def _max_depth
-              1
-            end
-          end
-
-          context "when `max_depth` is satisfied" do
-
-            shared_state_
-
-            it "succeeds (NOTE is n11n!)" do
-
-              _x = state_.result_x
-
-              ::Skylab::System::Services___::
-                Filesystem::Normalizations_::
-                 Existent_Directory::Mock_Dir__ == _x.class or self._WHEW
-            end
-
-            it "expresses" do
-              _rx = %r(mkdir .*foo/bar)
-              info_expression_message_.should match  _rx
-            end
-
-            def _max_depth
-              2
-            end
-          end
-
-          def context_
-            { dry_run: true }
-          end
-
-          def build_arguments_
-            [
-              :mkdir_p, _mkdir_p,
-              :max_depth, _max_depth,
-            ]
-          end
-
-          def _max_depth
-            0
-          end
-
-          memoize :_mkdir_p do
-
-            _ = TestSupport_::Fixtures.dir :empty_esque_directory
-            ::File.join( _, 'foo/bar' ).freeze
-          end
-        end
+        only_emission.should _be
       end
     end
 
-    def build_arguments_
-      [ :mkdir_p, _mkdir_p ]
+    context "dry run when `max_depth` is satisfied" do
+
+      shared_state_
+
+      def _max_depth
+        2
+      end
+
+      def _mkdir_p
+        _mkdir_p_where_two_directories_would_have_to_be_created
+      end
+
+      it "succeeds" do
+        succeeds_
+      end
+
+      it "emits" do
+
+        _be_msg = match %r(\Acreating directory - «.+/foo/bar»\z)
+
+        _be_this = be_emission :info, :creating_directory do |ev|
+          _ = black_and_white ev
+          _.should _be_msg
+        end
+
+        only_emission.should _be_this
+      end
+
+      it "side-effects are written to the task itself" do
+
+        _task = state_.task
+
+        _x = _task.created_directory
+
+        _x.is_mock_directory or fail
+      end
     end
 
-    def context_
-      NIL_
+    def _dry_run
+      true
+    end
+
+    def _mkdir_p_where_two_directories_would_have_to_be_created
+
+      _ = TestSupport_::Fixtures.dir :empty_esque_directory
+      ::File.join _, 'foo/bar'
     end
   end
 end
+# #tombstone: unhandled event streams

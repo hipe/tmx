@@ -1,59 +1,72 @@
 module Skylab::TaskExamples
 
-  class TaskTypes::MkdirP < Home_::Task
+  class TaskTypes::MkdirP < Common_task_[]
 
-    include Home_::Library_::FileUtils
+    depends_on_parameters(
 
-    alias_method :fu_mkdir_p, :mkdir_p
-    attribute :dry_run, :boolean => true, :from_context => true, :default => false
-    attribute :max_depth, :from_context => true, :default => 1
-    attribute :mkdir_p, :required => true
-    attribute :verbose, :boolean => true, :from_context => true, :default => true
-    listeners_digraph  :all, :info => :all
+      dry_run: [ :_from_context, :flag, :default, false ],
 
-    def execute args
+      max_depth: [ :_from_context, :default, 1 ],
 
-      @context ||= (args[:context] || {})
+      mkdir_p: nil,
 
-      valid? or fail(invalid_reason)
+      verbose: [ :_from_context, :flag, :default, true, ],
+    )
+
+    def execute
 
       did_send_event = nil
 
       kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
-        :path, mkdir_p,
-        :is_dry_run, dry_run?,
-        :max_mkdirs, max_depth,
-        :create_if_not_exist
+        :path, @mkdir_p,
+        :is_dry_run, @dry_run,
+        :max_mkdirs, @max_depth,
+        :create_if_not_exist,
 
       ) do | * i_a, & ev_p |
-          did_send_event = true
-          send :"receive_#{ i_a.last }", ev_p[]
-          UNABLE_
-        end
+        did_send_event = true
+        send :"__on__#{ i_a.last }__", ev_p[]
+        UNRELIABLE_
+      end
 
       if kn
-        kn.value_x
-      elsif ! did_send_event
-        call_digraph_listeners :info, "directory exists: #{ mkdir_p }"
-        kn
+        @created_directory = kn.value_x
+        ACHIEVED_
+      else
+        remove_instance_variable :@_result
       end
     end
 
-    def receive_path_too_deep o
+    def __on__path_too_deep__ ev
 
-      _msg = "won't mkdir more than #{ o.max_mkdirs } levels deep #{
-        }(#{ pretty_path o.path } requires at least #{ o.necessary_mkdirs } levels)"
+      @_result = UNABLE_
+
+      @_oes_p_.call :error, :path_too_deep do
+        ev
+      end
+      NIL_
+    end
+
+    def _WASABOVE
+
+      _msg = "won't mkdir more than #{ ev.max_mkdirs } levels deep #{
+        }(#{ pretty_path ev.path } requires at least #{ ev.necessary_mkdirs } levels)"
 
       call_digraph_listeners :info, _msg
 
-      UNABLE_
-    end
-
-    def receive_creating_directory o
-
-      call_digraph_listeners :info, "mkdir #{ o.path }"
-
       NIL_
     end
+
+    def __on__creating_directory__ ev
+
+      @_oes_p_.call :info, :creating_directory do
+        ev
+      end
+      NIL_
+    end
+
+    attr_reader(
+      :created_directory,
+    )
   end
 end

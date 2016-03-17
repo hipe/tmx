@@ -262,7 +262,12 @@ module Skylab::System
         ]
       end
 
-      Mock_Dir__ = ::Struct.new :to_path
+      Mock_Dir__ = ::Struct.new :to_path do
+
+        def is_mock_directory
+          true
+        end
+      end
 
       NILADIC_FALSEHOOD_ = -> { false }
     end

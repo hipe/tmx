@@ -29,11 +29,11 @@ module Skylab::TaskExamples
 
     Task = sidesys[ :Task ]
 
-    _System = sidesys[ :System ]
-
     System = -> do
-      _System[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
   end
 
   module Library_  # :+[#su-001]
