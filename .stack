@@ -1,5 +1,3 @@
 3) splice in all new content
 2) will rewrite, search & remove all legacy files with `meta_attribute` in them
 1) move old attributes to defined attributes
--- (that was M-series)
-1) test-by-test, restore task examples

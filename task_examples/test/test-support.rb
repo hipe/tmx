@@ -46,7 +46,22 @@ module Skylab::TaskExamples::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    # -- setup
+
+    def build_common_state_ result_x, em_a, task=nil
+      State___[ result_x, em_a, task ]
+    end
+
+    # -- assertion
+
+    def fails_
+      _x = state_.result
+      false == _x or fail
+    end
   end
+
+  State___ = ::Struct.new :result, :emission_array, :task
 
   # ~ function-like
 

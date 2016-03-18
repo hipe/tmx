@@ -47,10 +47,8 @@ module Skylab::TaskExamples::TestSupport
 
         _a = remove_instance_variable( :@event_log ).flush_to_array
 
-        State___[ _x, _a, task ]
+        build_common_state_ _x, _a, task
       end
-
-      State___ = ::Struct.new :result, :emission_array, :task
 
       def error_expression_message_
         _expression_message ERROR_EXPRESSION_CHANNEL___
@@ -79,11 +77,6 @@ module Skylab::TaskExamples::TestSupport
       ERROR_EXPRESSION_CHANNEL___ = [ :error, :expression ]
       INFO_EXPRESSION_CHANNEL___ = [ :info, :expression ]
       PAYLOAD_EXPRESSION_CHANNEL___ = [ :payload, :expression ]
-
-      def fails_
-        _x = state_.result
-        false == _x or fail
-      end
 
       def succeeds_
         _x = state_.result

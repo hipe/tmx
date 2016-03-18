@@ -1,4 +1,8 @@
-[#007]       (will annotate this example..)
+[#008]       tracks NOT USED files that we are keeping around for now
+             for whatever reason..
+
+[#007]       is in-situ example of something referenced outside of lib
+
 [#006] #open no more @name and `@name_symbol` - this is wrong namespace
 [#005]       in-situ reference to outside world (1st occurrence of s/thing)
 [#004] #open refactor to swap out F-ace::Open2 for  [hl] IO select

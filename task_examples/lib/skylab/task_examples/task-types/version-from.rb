@@ -5,7 +5,7 @@ module Skylab::TaskExamples
     depends_on_parameters(
       must_be_in_range: :optional,
       parse_with: :optional,
-      show_version: [ :_from_context, :flag, :optional ],
+      show_version: [ :flag, :optional ],
       version_from: nil,
     )
 

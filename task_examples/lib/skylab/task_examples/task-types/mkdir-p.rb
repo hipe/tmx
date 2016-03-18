@@ -4,13 +4,13 @@ module Skylab::TaskExamples
 
     depends_on_parameters(
 
-      dry_run: [ :_from_context, :flag, :default, false ],
+      dry_run: [ :flag, :default, false ],
 
-      max_depth: [ :_from_context, :default, 1 ],
+      max_depth: [ :default, 1 ],
 
       mkdir_p: nil,
 
-      verbose: [ :_from_context, :flag, :default, true, ],
+      verbose: [ :flag, :default, true, ],
     )
 
     def execute

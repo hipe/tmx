@@ -1,3 +1,5 @@
+self._NOT_USED  # but [#008] keeping it around for now..
+
 module Skylab::TaskExamples
 
   module Interface

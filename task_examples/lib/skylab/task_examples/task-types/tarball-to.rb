@@ -4,13 +4,15 @@ module Skylab::TaskExamples
 
     depends_on_parameters(
 
-      build_dir: :_from_context,
+      build_dir: nil,
       filesystem: nil,
       tarball_to: nil,
       url: nil,
     )
 
     depends_on_call :Get, :parameter, :get, :via_parameter, :url
+
+    # (here is [#007] the first "real-world" example of the above..)
 
     def execute
 

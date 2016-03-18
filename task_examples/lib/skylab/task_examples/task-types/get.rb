@@ -5,8 +5,8 @@ module Skylab::TaskExamples
 
     depends_on_parameters(
 
-      build_dir: :_from_context,
-      dry_run: [ :flag, :_from_context, :optional ],
+      build_dir: nil,
+      dry_run: [ :flag, :optional ],  # ..
       from: :optional,
       get: nil,
     )

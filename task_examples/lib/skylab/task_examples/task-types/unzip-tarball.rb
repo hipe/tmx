@@ -3,7 +3,7 @@ module Skylab::TaskExamples
   class TaskTypes::UnzipTarball < Common_task_[]
 
     depends_on_parameters(
-      build_dir: [ :_from_context ],
+      build_dir: nil,
       filesystem: nil,
       output_dir: :optional,
       unzip_tarball: nil,
@@ -196,7 +196,7 @@ module Skylab::TaskExamples
     end
 
     Version_rx___ = Lazy_.call do
-      /-#{ Home_::Version::REGEX.source }/
+      /-#{ Home_::Version::REGEX.source }/x
     end
   end
 end

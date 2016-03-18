@@ -4,7 +4,7 @@ module Skylab::TaskExamples
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Ba___ = sidesys[ :Basic ]
+    Basic = sidesys[ :Basic ]
 
     Brazen = sidesys[ :Brazen ]
 
@@ -21,10 +21,6 @@ module Skylab::TaskExamples
 
     Path_tools = -> do
       System[].filesystem.path_tools
-    end
-
-    Sexp = -> do
-      Ba___[]::Sexp
     end
 
     Task = sidesys[ :Task ]

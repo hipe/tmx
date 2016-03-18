@@ -24,9 +24,11 @@ module Skylab::TaskExamples
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
+  ACHIEVED_ = true
   CLI = nil  # for host
   EMPTY_S_ = ''
   Home_ = self
+  Lazy_ = Callback_::Lazy
   stowaway :Library_, 'lib-'
   NEWLINE_ = "\n"
   NIL_ = nil

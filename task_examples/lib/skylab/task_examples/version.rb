@@ -1,76 +1,176 @@
 module Skylab::TaskExamples
 
-  class Version < Home_.lib_.sexp
+  class Version
 
-    REGEX      = /(\d+)\.(\d+)(?:\.(\d+))?/ # #bound
+    class << self
 
-    split_rx = /\A(?<prefix>.*[^\.\d])?(?<scalar>#{REGEX.source})\z/
-
-    s = ->(* a) { Home_.lib_.sexp.new a }
-
-    define_singleton_method :parse_string_with_version do |str, &err|
-      res = nil
-      error = -> msg do
-        shell = if err then Parse.new( err ) else Parse.loude_singleton end
-        res = shell.error msg
+      def parse str, & oes_p
+        Parse___[ str,  self, & oes_p ]
       end
-      begin
-        scn = Home_::Library_::StringScanner.new str
-        capture = scn.scan_until REGEX
-        capture or break error[
-          "version pattern not matched anywhere in string: #{ str.inspect }" ]
-        if scn.rest =~ REGEX
-          break error[
-            "multiple version strings matched in string: #{ str.inspect }" ]
+
+      alias_method :__new, :new
+      undef_method :new
+    end  # >>
+
+    REGEX = / (?<major>\d+) \. (?<minor>\d+) (?:\. (?<patch>\d+) )? /x
+
+    NOT_VERSION__ = /(?:(?!#{ REGEX.source }).)+/x
+
+    class Parse___ < Callback_::Actor::Dyadic
+
+      def initialize str, base_cls, & oes_p
+        @string = str
+        @base_class = base_cls
+        @_oes_p = oes_p
+      end
+
+      def execute
+
+        @_scan = Home_::Library_::StringScanner.new remove_instance_variable :@string
+
+        ok = __match_one_match
+        ok &&= __do_not_match_another_match
+        ok && ___finish
+      end
+
+      def ___finish
+
+        lc = remove_instance_variable :@_leading_chaff
+        tc = remove_instance_variable :@_trailing_chaff
+        _md = remove_instance_variable :@_matchdata
+
+        _Sexp = Home_.lib_.basic::Sexp
+
+        o = -> * a do
+          _Sexp.new a
         end
-        md = split_rx.match capture # look at the regexes, should never fail
-        sexp = s[ :version_string ]
-        sexp.push s[ :string, md[:prefix] ] if md[:prefix]
-        sexp.push new(md[:scalar])
-        sexp.push s[ :string, scn.rest ] if ! scn.eos?
-        res = sexp
-      end while nil
-      res
-    end
 
-    def bump! which
-      node = child(which) or fail("no such node: #{ which.inspect }")
-      node[1] += 1
-    end
-
-    def has_minor_version? ; !! child(:minor) end
-
-    def has_patch_version? ; !! child(:patch) end
-
-  private
-
-    def initialize str
-      replace str
-    end
-
-    define_method :replace do |str|
-      clear
-      md = REGEX.match(str) or fail("invalid version string: #{ str.inspect }")
-      push :version
-      concat [ s[:major, md[1].to_i], s[:separator, '.'], s[:minor, md[2].to_i] ]
-      md[3] and concat( [ s[:separator, '.'], s[:patch, md[3].to_i] ] )
-    end
-  end
-
-  Version::Parse = Callback_::Digraph.new :informational, error: :informational
-
-  class Version::Parse
-
-    def self.loud_singleton
-      @loud ||= Home_::Version::Parse.new( -> o do
-        o.on_informational do |e|
-          fail "find me an outstream"  # #todo
+        sexp = o[ :version_string ]
+        if lc
+          sexp.push o[ :string, lc ]
         end
-      end )
+
+        sexp.push o[ :version_object, @base_class.__new( _md ) ]
+
+        if tc
+          sexp.push o[ :string, tc ]
+        end
+
+        sexp
+      end
+
+      def __match_one_match
+
+        chaff = @_scan.scan NOT_VERSION__
+        match = @_scan.scan REGEX
+        if match
+          @_leading_chaff = chaff
+          @_matchdata = REGEX.match match  # because strscan don't play that
+          ACHIEVED_
+        else
+          ___when_etc
+        end
+      end
+
+      def ___when_etc
+        s = @_scan.string
+        _oes_p.call :error, :expression do |y|
+          y << "version pattern not matched anywhere in string: #{ ick s }"
+        end
+        UNABLE_
+      end
+
+      def __do_not_match_another_match
+
+        trailing_chaff = @_scan.scan NOT_VERSION__
+        again = @_scan.scan REGEX
+        if again
+          ___when_oh_noes
+        else
+          @_scan.eos? or self._REGEX_SANITY
+          @_trailing_chaff = trailing_chaff
+          ACHIEVED_
+        end
+      end
+
+      def ___when_oh_noes
+        s = @_scan.string
+        _oes_p.call :error, :expression, :ambiguous do |y|
+          y << "multiple version strings matched in string: #{ ick s }"
+        end
+        UNABLE_
+      end
+
+      def _oes_p
+        if @_oes_p
+          @_oes_p
+        else
+          Default_on_event_selectively___
+        end
+      end
     end
 
-    def build_digraph_event x, i, _esg
-      Textual_Old_Event_.new x, i
+    # -
+
+      def initialize md  # ..
+
+        s = md[ :major ]
+        s_ = md[ :minor ]
+
+        s__ = md[ :patch ]
+
+        if s__
+          patch = s__.to_i
+        end
+
+        @major = s.to_i
+        @minor = s_.to_i
+
+        @patch = patch
+      end
+
+      def bump! sym
+        ivar = :"@#{ sym }"
+        d = remove_instance_variable( ivar ) || 0  # sanity checks name  BE CAREFUL
+        d += 1
+        instance_variable_set ivar, d
+        d
+      end
+
+      def unparse_to io
+        s = "#{ @major }.#{ @minor }"
+        d = @patch
+        if d
+          s.concat ".#{ d }"
+        end
+        io << s
+      end
+
+      def has_minor_version?
+        @minor
+      end
+
+      def has_patch_version
+        @patch
+      end
+
+    # -
+
+    Default_on_event_selectively___ = -> * i_a, & ev_p do  # #[#ca-066]
+
+      if :info == i_a.first
+        UNRELIABLE_
+      elsif :expression == i_a[ 1 ]
+
+        _expag = Home_.lib_.brazen::API.expression_agent_instance
+        _msg = _expag.calculate "", & ev_p
+        raise ::ArgumentError, _msg
+
+      else
+        self._UNIFY_ME
+      end
     end
+
+    Here_ = self
   end
 end
