@@ -32,7 +32,7 @@ module Skylab::Fields
 
         sexp = remove_instance_variable :@sexpesque
 
-        o = Here_::Lib::Build_N_Meta_Attribute.new mattrs_cls, Meta_Attribute___
+        o = Here_::N_Meta_Attribute::Build.new mattrs_cls, Meta_Attribute___
 
         o.build_N_plus_one_interpreter = method :__build_interpreter
 

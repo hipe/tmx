@@ -26,7 +26,7 @@ significant efforts at libraries dealing with modeling
 
        [#004] basic fields                                    2013-07-05 WAS
 
-    [#ba-003] the basic field                                 2013-04-11 NOW <- (heavily by [cm]. has lots of history)
+    [#ba-003] the basic field                                 2013-04-11 WAS
 
        [#009] the headless parameter (assim'd into [#002]     2012-08-29 WAS
 
@@ -34,8 +34,6 @@ significant efforts at libraries dealing with modeling
 
 
 PUNCHLIST:
-  • survey & assimilate [#ba-003] the basic field - become home for `N_Meta`
-  • survey [#br-058] property stacks
   • actors
 
 
