@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  class Property::Stack
+  class Attributes::Stack
 
       # enhance a class as a `common_frame`
       # you can define [non-]memoized { proc | inline } methods
@@ -50,7 +50,7 @@ module Skylab::Brazen
       #     foo.baz  # => "<5>"
       #     foo.baz.object_id  # => foo.baz.object_id
 
-      Models_::Common_Frame = Home_::Entity.call do
+      Common_Frame = Home_.lib_.brazen::Entity.call do
 
         # (really we want the below thing to be its own nonterminal mixed
         # in with the other nonterminals of the session, but we don't have
@@ -59,19 +59,25 @@ module Skylab::Brazen
         o(
           :ad_hoc_processor, :globbing, -> sess do
             sess.upstream.backtrack_one
-            Pstack_::Actors_::Define_process_method[ sess ]
+            Here_::Define_process_method__[ sess ]
           end,
 
           :ad_hoc_processor, :processor, -> sess do
             sess.upstream.backtrack_one
-            Pstack_::Actors_::Define_process_method[ sess ]
+            Here_::Define_process_method__[ sess ]
           end
         )
       end
 
-      module Models_::Common_Frame
+      module Common_Frame
+
+        Legacy_ = ::Skylab::Brazen::Entity
 
         class << self
+
+          def call * a  # EEK override something from [br]
+            call_via_arglist a
+          end
 
           def call_via_arglist x_a
 
@@ -89,14 +95,14 @@ module Skylab::Brazen
                 RMRP_METH___
             end
 
-            Entity::Edit_client_class_via_polymorphic_stream_over_extmod[
+            Legacy_::Edit_client_class_via_polymorphic_stream_over_extmod[
               cls, st, self ]
 
             NIL_
           end
         end  # >>
 
-        self::Property = ::Class.new Home_::Entity::Property
+        self::Property = ::Class.new Legacy_::Property
 
         RP_METH___ = -> prp do
 
@@ -155,7 +161,16 @@ module Skylab::Brazen
           end
         end
 
-        define_method :knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
+        def knownness_via_association_ atr  # :[#028]. (has 1x redund)
+
+          ivar = atr.ivar
+
+          if instance_variable_defined? ivar
+            Callback_::Known_Known[ instance_variable_get ivar ]
+          else
+            Callback_::KNOWN_UNKNOWN
+          end
+        end
 
         def _set_value_of_property x, prp
           instance_variable_set prp.as_ivar, x
@@ -295,7 +310,7 @@ module Skylab::Brazen
             :literal_proc,
             :reader_classification,
           )
-        end  # end of the properry class,
+        end  # end of the property class,
 
 
     # [ `required` ] `field`s -
@@ -456,7 +471,7 @@ module Skylab::Brazen
 
             define_method prp_.name_symbol do
 
-              kn = self.knowness_via_association_ prp_
+              kn = self.knownness_via_association_ prp_
 
               if kn.is_known_known
                 kn.value_x
@@ -481,7 +496,7 @@ module Skylab::Brazen
 
           prp.__set_internal_read_proc do | entity, prp_ |
 
-            kn = entity.knowness_via_association_ prp
+            kn = entity.knownness_via_association_ prp
 
             if kn.is_known_known
               known.value_x
@@ -533,16 +548,14 @@ module Skylab::Brazen
 
         Check_for_missing_requireds___ = -> entity do  # near [#fi-012]
 
-          Require_fields_lib_[]
-
           miss_a = nil
 
           entity.class.properties.each_value do | prp |
 
-            _is = Field_::Is_required[ prp ]
+            _is = Home_::Is_required[ prp ]
             _is or next
 
-            kn = entity.knowness_via_association_ prp
+            kn = entity.knownness_via_association_ prp
 
             __is_unknown = if kn.is_known_known
               kn.value_x.nil?
@@ -569,7 +582,7 @@ module Skylab::Brazen
           # maybe_send_event # :error, :missing_required_properties do
         end
 
-        Build_missing_requireds_event___ = -> miss_prp_a do
+        Build_missing_requireds_event___ = -> miss_prp_a do   # #open [#030] dedund this
 
           Callback_::Event.inline_not_OK_with(
 
@@ -597,7 +610,6 @@ module Skylab::Brazen
 
         CF_ = self
       end
-
       # <-
   end
 end

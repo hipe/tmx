@@ -1,25 +1,24 @@
 require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
+module Skylab::Fields::TestSupport
 
-  ::Skylab::Brazen::TestSupport.lib_(
-    :property_stack_models_common_frame
-  ).prepare_sandbox self
+  TS_.require_ :attributes_stack_common_frame
+  module Attributes::Stack::Common_Frame
 
-  describe "[br] property - stack - common frame" do
+    TS_.describe "[br] property - stack - common frame" do
 
-    it "loads." do
+      Here_[ self ]
 
-      Subject_[]
-
-    end
+      it "loads." do
+        Subject_module_[]
+      end
 
     it "whines on weirdness" do
 
       _rx = /\bunrecognized property 'weirdness'/
 
       begin
-        class Foo_Thing
+        class X_Intro_A
           Subject_[ self, :weirdness ]
         end
       rescue ::ArgumentError => e
@@ -32,10 +31,11 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_One_Property
+        class X_Intro_B
 
-          Home_::Property::Stack.common_frame self,
-            :method, :foo_diddle
+          Subject_module_[].call( self,
+            :method, :foo_diddle,
+          )
 
           def foo_diddle
             ( @d ||= 0 )
@@ -50,7 +50,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       it "we have full reflection on these properties" do
 
-        prop = CF_One_Property.properties.fetch :foo_diddle
+        prop = X_Intro_B.properties.fetch :foo_diddle
         prop.reader_classification.should eql :method
         prop.parameter_arity.should eql :zero_or_one
 
@@ -58,7 +58,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       it "and then with an object of this class, call the method by `property_value_via_symbol`" do
 
-        frame = CF_One_Property.new { }
+        frame = X_Intro_B.new { }
         frame.property_value_via_symbol( :foo_diddle ).should eql "foo diddle: 1"
 
       end
@@ -68,7 +68,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Prop_Simple
+        class X_Intro_C
 
           Subject_.call self,
 
@@ -85,7 +85,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "reads (fresh call each time), makes reader methods too", f:true do
-        entity = CF_Prop_Simple.new { }
+        entity = X_Intro_C.new { }
         entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 1"
         entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 2"
         entity.wiz_waz.should eql 'wiz waz: 3'
@@ -97,7 +97,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Prop_Memoized
+        class X_Intro_D
 
           Subject_.call self,
 
@@ -115,7 +115,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "reaads (fresh call first time, subsequently memoized)" do
-        entity = CF_Prop_Memoized.new { }
+        entity = X_Intro_D.new { }
         entity.property_value_via_symbol( :wiz_wuz ).should eql "wiz wuz: 1"
         entity.property_value_via_symbol( :wiz_wuz ).should eql "wiz wuz: 1"
       end
@@ -142,7 +142,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Inline_Method
+        class X_Intro_E
 
           Subject_.call self,
 
@@ -160,7 +160,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "works (both ways)" do
-        ent = CF_Inline_Method.new { }
+        ent = X_Intro_E.new { }
         ent.dozer.should eql 'zack braff'
         ent.property_value_via_symbol( :dozer ).should eql 'zack braff'
       end
@@ -170,7 +170,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Inline_Method_Memoized
+        class X_Intro_F
 
           d = 0
 
@@ -190,7 +190,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "works (both ways)" do
-        ent = CF_Inline_Method_Memoized.new { }
+        ent = X_Intro_F.new { }
         ent.wowzaa.should eql "1 1"
         ent.wowzaa.should eql "1 1"
         ent.property_value_via_symbol( :wowzaa ).should eql "1 1"
@@ -202,7 +202,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Field_Minimal
+        class X_Intro_G
 
           Subject_.call self, :readable, :field, :dingle_woofer,
 
@@ -216,7 +216,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       it "constructs iambicly" do
 
-        entity = CF_Field_Minimal.new :dingle_woofer, :toofer
+        entity = X_Intro_G.new :dingle_woofer, :toofer
 
         x = entity.dingle_woofer
         x.should eql :toofer
@@ -231,7 +231,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Field_Required
+        class X_Intro_H
 
           Subject_.call self,
             :readable, :field, :foo,
@@ -246,7 +246,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "when provide all properties" do
-        entity = CF_Field_Required.new :foo, :FO, :bar, :BR, :baz, :BZ
+        entity = X_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
         entity.foo.should eql :FO
         entity.baz.should eql :BZ
         entity.property_value_via_symbol( :baz ).should eql :BZ
@@ -261,7 +261,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "when non-required fields missing" do
-        entity = CF_Field_Required.new :baz, :hi
+        entity = X_Intro_H.new :baz, :hi
         entity.baz.should eql :hi
         entity.foo.should be_nil
       end
@@ -271,7 +271,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
         _rx = /\Amissing required field - 'baz'\z/
 
         begin
-          CF_Field_Required.new
+          X_Intro_H.new
         rescue ::ArgumentError => e
         end
 
@@ -283,7 +283,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
 
       before :all do
 
-        class CF_Field_Required_
+        class X_Intro_I
 
           Subject_.call self,
             :required, :field, :foo,
@@ -292,7 +292,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
       end
 
       it "when yes" do
-        x = CF_Field_Required_.new :foo, :F
+        x = X_Intro_I.new :foo, :F
         x.instance_variable_get( :@foo ).should eql :F
       end
 
@@ -301,12 +301,13 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_0____
         _rx = /\Amissing required field - 'foo'\z/
 
         begin
-          CF_Field_Required_.new
+          X_Intro_I.new
         rescue ::ArgumentError => e
         end
 
         e.message.should match _rx
       end
+    end
     end
   end
 end

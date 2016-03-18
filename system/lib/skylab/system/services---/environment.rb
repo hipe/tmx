@@ -6,7 +6,7 @@ module Skylab::System
       def initialize _
       end
 
-      Home_.lib_.properties_stack_frame self,
+      Home_.lib_.attributes_stack_frame self,
 
         :memoized, :proc, :any_home_directory_path, -> do
           ::ENV[ 'HOME' ]

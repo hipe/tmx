@@ -281,7 +281,7 @@ module Skylab::Brazen
       def ___ambiguous a
 
         @on_event_selectively.call :error, :ambiguous_property do
-          Home_::Property.build_ambiguous_property_event(
+          Home_.lib_.fields::Events::Ambiguous.new_via(
             a,
             @qualified_knownness.value_x,
             @qualified_knownness.name,

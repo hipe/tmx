@@ -7,9 +7,12 @@ module Skylab::Fields::TestSupport
 
   TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
-  def self.[] tcc  # until etc
-    tcc.extend self
-  end
+  class << self
+
+    def [] tcc  # until etc
+      tcc.extend self
+    end
+  end  # >>
 
   extend TestSupport_::Quickie
 

@@ -1,11 +1,15 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Fields::TestSupport
 
-  describe "[br] property - stack" do
+  describe "[fi] attributes - stack" do
 
     TS_[ self ]
     use :expect_event
+
+    it "loads" do
+      _subject
+    end
 
     it "the empty stack will never find anything" do
       stack = _subject.new
@@ -64,7 +68,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _subject
-      Home_::Property::Stack
+      Home_::Attributes::Stack
     end
   end
 end

@@ -70,7 +70,7 @@ module Skylab::Snag
 
         _mutate_upstream_adapter_in @_hy.moz
 
-        o = Brazen_::Property::Sessions::Value_Processing.new
+        o = Home_.lib_.fields::Attributes::Value_Processing.new
 
         bx = Callback_::Box.new
 

@@ -1,17 +1,18 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport::PropertyStack_Namespace_1____
+module Skylab::Fields::TestSupport
 
-  ::Skylab::Brazen::TestSupport.lib_(
-    :property_stack_models_common_frame
-  ).prepare_sandbox self
+  TS_.require_ :attributes_stack_common_frame
+  module Attributes::Stack::Common_Frame
 
-  describe "[br] property - stack - common frame" do
+    TS_.describe "[br] property - stack - common frame" do
+
+      Here_[ self ]
 
     context "you can define [non-]memoized { proc | inline } methods" do
 
       before :all do
-        class Foo
+        class X_Core_A
           Subject_.call self,
             :proc, :foo, -> do
                d = 0
@@ -30,7 +31,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_1____
         end
       end
       let :foo do
-        Foo.new { }
+        X_Core_A.new { }
       end
       it "accessing a field's value when it is an ordinary proc" do
         foo.foo.should eql 1
@@ -53,11 +54,14 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_1____
     context "[ `required` ] `field`s -" do
 
       before :all do
-        class Bar
-          Home_::Property::Stack.common_frame self,
+
+        class X_Core_B
+
+          Subject_module_[].call( self,
             :globbing, :processor, :initialize,
             :required, :readable, :field, :foo,
-            :readable, :field, :bar
+            :readable, :field, :bar,
+          )
         end
       end
 
@@ -65,7 +69,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_1____
 
         _rx = ::Regexp.new "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z"
         begin
-          Bar.new
+          X_Core_B.new
         rescue ::ArgumentError => e
         end
         e.message.should match _rx
@@ -76,7 +80,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_1____
         _rx = ::Regexp.new "\\Amissing\\ required\\ field\\ \\-\\ 'foo'\\z"
 
         begin
-          Bar.new :foo, nil
+          X_Core_B.new :foo, nil
         rescue ::ArgumentError => e
         end
 
@@ -84,11 +88,12 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_1____
       end
 
       it "passing false is not the same as passing nil, passing false is valid." do
-        Bar.new( :foo, false ).foo.should eql false
+        X_Core_B.new( :foo, false ).foo.should eql false
       end
       it "you can of course pass nil as the value for a non-required field" do
-        Bar.new( :foo, :x, :bar, nil ).bar.should eql nil
+        X_Core_B.new( :foo, :x, :bar, nil ).bar.should eql nil
       end
+    end
     end
   end
 end

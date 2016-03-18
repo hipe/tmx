@@ -1,13 +1,13 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  class Property::Stack  # :[#057].
+  class Attributes::Stack  # :[#028].
 
     class << self
       def common_frame * a
         if a.length.zero?
-          Pstack_::Models_::Common_Frame
+          Here_::Common_Frame
         else
-          Pstack_::Models_::Common_Frame.call_via_arglist a
+          Here_::Common_Frame.call_via_arglist a
         end
       end
     end  # >>
@@ -17,7 +17,7 @@ module Skylab::Brazen
       @d = -1
       @on_event_selectively = oes_p
       if namelist
-        push_frame Pstack_::Models_::Name_frame_via_namelist[ namelist ]
+        push_frame Here_::Lib_::Name_frame_via_namelist[ namelist ]
       end
     end
 
@@ -47,11 +47,11 @@ module Skylab::Brazen
     end
 
     def push_frame_with * x_a
-      push_frame Pstack_::Models_::Frame_via_iambic[ x_a ]
+      push_frame Here_::Lib_::Frame_via_iambic[ x_a ]
     end
 
     def push_frame_via_box bx
-      push_frame Pstack_::Models_::Frame_via_box[ bx ]
+      push_frame Here_::Lib_::Frame_via_box[ bx ]
     end
 
     def push_frame x
@@ -82,10 +82,10 @@ module Skylab::Brazen
     end
 
     def _build_extra_properties_event xtra_a
-      Home_.lib_.fields::Events::Extra.build xtra_a
+      Home_::Events::Extra.build xtra_a
     end
 
-    def maybe_send_event * i_a, & ev_p
+    def maybe_send_event * i_a, & ev_p  # #[#ca-066]
       if @on_event_selectively
         @on_event_selectively.call( * i_a, & ev_p )
       elsif :error == i_a.first
@@ -93,6 +93,7 @@ module Skylab::Brazen
       end
     end
 
-    Pstack_ = self
+    Here_ = self
+    STOP_PARSING_ = false
   end
 end

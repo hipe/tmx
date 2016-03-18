@@ -150,19 +150,6 @@ module Skylab::Brazen
     kp
   end
 
-  KNOWNNESS_VIA_IVAR_METHOD_ = -> prp do
-
-    ivar = prp.ivar
-
-    if instance_variable_defined? ivar
-
-      Callback_::Known_Known[ instance_variable_get ivar ]
-    else
-      Callback_::KNOWN_UNKNOWN
-      # raise ::NameError, __say_no_ivar( ivar )
-    end
-  end
-
   Lazy_ = Callback_::Lazy
 
   Require_fields_lib_ = Lazy_.call do  # ..
@@ -189,19 +176,6 @@ module Skylab::Brazen
       Home_::Entity::Apply_entity[ self::Entity, a, & edit_p ]
     end
 
-    Autoloader_[ self ]
-  end
-
-  module Property
-
-    class << self
-
-      def build_ambiguous_property_event *a, & slug
-        Home_.lib_.fields::Events::Ambiguous.new_via_arglist a, & slug
-      end
-    end # >>
-
-    Property_ = self
     Autoloader_[ self ]
   end
 

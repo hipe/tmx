@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  class Property::Stack
+  class Attributes::Stack
 
-    module Models_
+    module Lib_
 
       Frame_via_Box__ = ::Class.new
 

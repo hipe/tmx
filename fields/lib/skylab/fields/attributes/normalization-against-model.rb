@@ -1,8 +1,10 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  module Home_::Normalization  # see #[#fi-012]
+  class Attributes
 
-    Against_model_stream = -> entity_x, formal_prp_st, & oes_p do
+    module Normalization_against_Model
+      # <-
+    Stream = -> entity_x, formal_prp_st, & oes_p do
 
       miss_prp_a = nil
 
@@ -29,7 +31,7 @@ module Skylab::Brazen
         prp = formal_prp_st.gets
         prp or break
 
-        kn = entity_x.knowness_via_association_ prp
+        kn = entity_x.knownness_via_association_ prp
 
         if kn.is_known_known
           was_known = true
@@ -83,13 +85,11 @@ module Skylab::Brazen
 
       def flush
 
-        Require_fields_lib_[]
-
         -> kn, model, & x_p do
 
           # 1. if value is unknown and defaulting is available, apply it.
 
-          if ! kn.is_effectively_known && Field_::Has_default[ model ]
+          if ! kn.is_effectively_known && Home_::Has_default[ model ]
 
             kn = kn.new_with_value @apply_default[ model ]
           end
@@ -108,11 +108,11 @@ module Skylab::Brazen
 
           if kn
 
-            if ! kn.is_effectively_known && Field_::Is_required[ model ]
+            if ! kn.is_effectively_known && Home_::Is_required[ model ]
 
               kn = @when_missing.call kn, MISSING___ do
 
-                Home_.lib_.fields::Events::Missing.for_attribute model
+                Home_::Events::Missing.for_attribute model
               end
             end
           end
@@ -160,6 +160,17 @@ module Skylab::Brazen
     end
 
     o.on_event_selectively = nil
-    Against_model = o.flush
+
+    _the_proc = o.flush
+
+    define_singleton_method :_call, _the_proc
+
+    class << self
+      alias_method :[], :_call
+      alias_method :call, :_call
+      remove_method :_call
+    end  # >>
+  # ->
+    end
   end
 end

@@ -9,7 +9,7 @@ module Skylab::System
         @__system_services = svx
       end
 
-      Home_.lib_.properties_stack_frame( self,
+      Home_.lib_.attributes_stack_frame( self,
 
         :memoized, :inline_method, :cache_path, -> do
 

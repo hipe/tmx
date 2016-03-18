@@ -1,12 +1,10 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  module Property
+  class Attributes
 
-    Sessions = ::Module.new
+    class Value_Processing
 
-    class Sessions::Value_Processing
-
-      # sadly, the two main other implementations of this (in [ca] and here)
+      # sadly, the two main other implementations of this (in [ca] and [br])
       # were not flexible enough to accomodate this kind of thing ..
 
       # this accommodates neither soft event handling nor "value collection
@@ -73,12 +71,13 @@ module Skylab::Brazen
 
       def normalize  # compare to [#047.B]
 
-        Home_::Normalization::Against_model_stream[
+        Here_::Normalization_against_Model::Stream.call(
           self,
-          @value_models.to_value_stream ]
+          @value_models.to_value_stream,
+        )
       end
 
-      def knowness_via_association_ prp
+      def knownness_via_association_ prp
 
         had = true
         x = @value_collection.fetch prp.name_symbol do

@@ -1102,11 +1102,21 @@ module Skylab::Brazen
 
       # ~~ normalization API
 
-      define_method :knowness_via_association_, KNOWNNESS_VIA_IVAR_METHOD_
+      def knownness_via_association_ prp  # #[#fi-029]
+
+        ivar = prp.ivar
+
+        if instance_variable_defined? ivar
+          Callback_::Known_Known[ instance_variable_get ivar ]
+        else
+          Callback_::KNOWN_UNKNOWN
+          # raise ::NameError, __say_no_ivar( ivar )
+        end
+      end
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Home_::Normalization::Against_model[ qkn, self, & x_p ]
+        Home_.lib_.fields::Attributes::Normalization_Against_Model[ qkn, self, & x_p ]
       end
 
       def is_normalizable__

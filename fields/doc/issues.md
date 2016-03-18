@@ -1,3 +1,11 @@
+[#030] #open dedund this
+
+[#029]       in situ track universal redundancy
+
+[#028] #open do *not* implement with [br] - break this tie..
+             ( and [stack] )
+
+
 [#027]       [store]  (ivar-based, mostly)
 
 [#026] #open struct vs. actor - one is cold one is hot

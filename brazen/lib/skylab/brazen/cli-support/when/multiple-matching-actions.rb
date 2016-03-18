@@ -15,7 +15,7 @@ module Skylab::Brazen
 
         ae = @_expression
 
-        _ev = Home_::Property.build_ambiguous_property_event(
+        _ev = Home_.lib_.fields::Events::Ambiguous.new_via(
           @_adapter_array, @_token, :action )
 
         _ev.express_into_under ae.line_yielder, ae.expression_agent

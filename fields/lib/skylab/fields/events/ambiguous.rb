@@ -26,10 +26,10 @@ module Skylab::Fields
     class << Events::Ambiguous
 
       def new_via_arglist a, & slug
-        __new_via( * a, & slug )
+        new_via( * a, & slug )
       end
 
-      def __new_via ent_a, x, lemma_x=nil, & slug
+      def new_via ent_a, x, lemma_x=nil, & slug
 
         if ! slug
           slug = -> ent do

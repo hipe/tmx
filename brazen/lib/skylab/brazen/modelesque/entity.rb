@@ -107,18 +107,19 @@ module Skylab::Brazen
         # since we have reached ths method at all it is safe to
         # assume that the entity has some formal properties.
 
-        Home_::Normalization::Against_model_stream.call(
+        Home_.lib_.fields::Attributes::Normalization_against_Model::Stream.call(
 
           self,
           formal_properties.to_value_stream,
           & handle_event_selectively )
       end
 
-      public def set_value_of_formal_property_ x, prp
+      def set_value_of_formal_property_ x, prp
 
         as_entity_actual_property_box_.set prp.name_symbol, x  # (changed from `add`)
         KEEP_PARSING_
       end
+      public :set_value_of_formal_property_
 
       if const_defined? :Property
         # ok. it means we defined meta-properties above
@@ -176,7 +177,7 @@ module Skylab::Brazen
 
           # ~ :*#public-API
 
-          private def default=
+          def default=
 
             # when the default is expressed as a simple primitive-ish
             # value, we want to be able to just have it back
@@ -187,6 +188,7 @@ module Skylab::Brazen
             end
             KEEP_PARSING_
           end
+          private :default=
 
           def has_primitive_default
             if @default_proc
@@ -354,7 +356,7 @@ module Skylab::Brazen
       formals = self.formal_properties
 
       st = formals.to_value_stream
-      stack = Home_::Property::Stack.new formals.get_names  # could pass oes
+      stack = Home_.lib_.fields::Attributes::Stack.new formals.get_names  # could pass oes
 
       bx = any_secondary_box__
       bx and stack.push_frame_via_box bx

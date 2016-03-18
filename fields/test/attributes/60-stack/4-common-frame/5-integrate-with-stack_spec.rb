@@ -1,16 +1,17 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Brazen::TestSupport::PropertyStack_Namespace_2____
+module Skylab::Fields::TestSupport
 
-  ::Skylab::Brazen::TestSupport.lib_(
-    :property_stack_models_common_frame
-  ).prepare_sandbox self
+  TS_.require_ :attributes_stack_common_frame
+  module Attributes::Stack::Common_Frame
 
-  describe "[br] property - stack - common frame - integrate with pstack" do
+    TS_.describe "[br] property - stack - common frame - integrate with pstack" do
+
+      Here_[ self ]
 
     before :all do
 
-      class Base_Frame
+      class X_IAS_A
 
         Subject_.call self,
 
@@ -44,8 +45,8 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_2____
     end
 
     it "ok" do
-      frame = Base_Frame.new {}
-      stack = Home_::Property::Stack.new
+      frame = X_IAS_A.new {}
+      stack = Home_::Attributes::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
       stack.property_value_via_symbol( :foo ).should eql :FOO
@@ -54,6 +55,7 @@ module Skylab::Brazen::TestSupport::PropertyStack_Namespace_2____
 
       stack.property_value_via_symbol( :baz ).should eql 'baz.'
       stack.property_value_via_symbol( :boffo ).should eql "Foo: 1"
+    end
     end
   end
 end

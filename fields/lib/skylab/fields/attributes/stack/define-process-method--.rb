@@ -1,14 +1,10 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  class Property::Stack
+  class Attributes::Stack
 
-    Actors_ = ::Module.new
-
-    # ->
-
-      class Actors_::Define_process_method  # rewrite of [#fi-008]
-
-        Attributes_actor_.call( self,
+    class Define_process_method__   # near (marked for removal) [#008]..
+      # -
+        Attributes::Actor.call( self,
           globbing: :custom_interpreter_method,
           # processor: :custom_interpreter_method, for now, can't because stop parsing
           sess: nil,
@@ -94,7 +90,7 @@ module Skylab::Brazen
           end
           ACHIEVED_
         end
-      end
-      # <-
+      # -
+    end
   end
 end

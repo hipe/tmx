@@ -1,28 +1,24 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Fields::TestSupport
 
-  module Property::Stack::Models::Common_Frame
+  module Attributes::Stack
 
-    subject = -> * a do
+    module Common_Frame
 
-      if a.length.zero?
-        Home_::Property::Stack.common_frame
+      class << self
+        def [] tcc
+          tcc.include self
+        end
+      end  # >>
 
-      else
-        Home_::Property::Stack.common_frame.call_via_arglist a
+      Subject_ = -> * a do
+        Subject_module_[].call_via_arglist a
       end
-    end
 
-    define_singleton_method :prepare_sandbox do | mod |
+      Subject_module_ = -> do
+        Home_::Attributes::Stack::Common_Frame
+      end
 
-      # (we have to set these explicitly, we can't just include one
-      # single constants module into the module, because #[#ts-044].)
-
-      mod.const_set :Home_, Home_
-      mod.const_set :Subject_, subject
-
-      mod.extend TestSupport_::Quickie
-
-      NIL_
+      Here_ = self
     end
   end
 end
