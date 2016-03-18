@@ -122,7 +122,9 @@
 [#052]       #feature-tracker `path_hack`
 [#051]       #parent-node: [#050]
 [#050]       #doc-node the API narrative ..
-[#049]       #parent-node: [#ca-046] case study: iambic ordering hacks
+
+[#049]       #parent-node: [#fi-033] case study: iambic ordering hacks
+
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..

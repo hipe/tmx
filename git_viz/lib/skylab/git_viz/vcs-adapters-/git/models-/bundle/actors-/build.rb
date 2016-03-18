@@ -6,12 +6,16 @@ module Skylab::GitViz
 
       class Actors_::Build
 
-        Callback_::Actor.call( self, :properties,
+        Attributes_actor_.call( self,
           :path,
           :repo,
           :rsx,
           :filesystem,
         )
+
+        def initialize & p
+          @on_event_selectively = p
+        end
 
         def execute
 

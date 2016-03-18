@@ -144,11 +144,12 @@ module Skylab::Basic
       end
     end
 
-    class Mutex__  #storypoint-55
+    class Mutex__  # #storypoint-55
 
-      Callback_::Actor.call self, :properties,
+      Attributes_actor_.call( self,
         :method_name,
-        :proc
+        :proc,
+      )
 
       def process_arglist_fully a
         process_arglist_fully_with_args( * a )
@@ -156,7 +157,8 @@ module Skylab::Basic
 
       def process_arglist_fully_with_args method_name=nil, p
         @method_name = method_name
-        @proc = p ; nil
+        @proc = p
+        ACHIEVED_
       end
 
       def execute

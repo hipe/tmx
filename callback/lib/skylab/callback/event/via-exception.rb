@@ -4,7 +4,7 @@ module Skylab::Callback
     # -
       class Via_exception
 
-        Home_.lib_.fields::Attributes::Actor.call( self,  # Attributes_actor_
+        Attributes_actor_.call( self,
           exception: nil,
           terminal_channel_i: nil,
         )

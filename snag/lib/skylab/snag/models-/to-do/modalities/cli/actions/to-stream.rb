@@ -147,14 +147,14 @@ module Skylab::Snag
 
     class Actors_::Express_tree
 
-      Callback_::Actor.call self, :properties,
+      Attributes_actor_.call( self,
         :item_stream,
         :glyphset_category_symbol,
         :do_pretty,
         :skip_match_count_proc,
         :info_byte_downstream,
-        :payload_byte_downstream
-
+        :payload_byte_downstream,
+      )
 
       def execute
 
@@ -249,14 +249,12 @@ module Skylab::Snag
       end
     end
 
-    class Build_basic_tree_lines_stream___
+    class Build_basic_tree_lines_stream___ < Callback_::Actor::Dyadic
 
-      Callback_::Actor.call self, :properties,
-        :tree, :glyphset
-
-      def initialize( * )
-        super
-        @glyphset_category_symbol ||= :wide  # wide or narrow
+      def initialize t, gs
+        @glyphset = gs
+        @tree = t
+        @glyphset_category_symbol = :wide  # wide or narrow ..
       end
 
       def execute
@@ -287,13 +285,13 @@ module Skylab::Snag
       end
     end
 
-    class Build_pretty_tree_lines_stream___
+    class Build_pretty_tree_lines_stream___ < Callback_::Actor::Dyadic
 
-      Callback_::Actor.call self, :properties,
-        :tree, :glyphset
+      def initialize t, gs
 
-      def initialize( * )
-        super
+        @glyphset = gs
+        @tree = t
+
         @glyphset_category_symbol ||= :wide  # wide or narrow
         @line_num_style_a = [ :strong, :yellow ].freeze
         @path_style_a = [ :strong, :green ].freeze

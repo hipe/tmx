@@ -167,7 +167,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_left_class do
 
-        class Intro_Left
+        class X_Intro_Left
 
           attrs = Subject_proc_[].call( self,
             jiang: nil,
@@ -183,7 +183,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_instance_methods_only_class do
 
-        class Intro_IM_Only
+        class X_Intro_IM_Only
 
           include Subject_module_[]::Lib::Polymorphic_Processing_Instance_Methods
 
@@ -207,7 +207,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_right_class do
 
-        class Intro_Right
+        class X_Intro_Right
 
           Subject_proc_[].call self
 
@@ -231,7 +231,7 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_hybrid_class do
 
-        class Intro_Hybrid
+        class X_Intro_Hybrid
 
           attrs = Subject_proc_[].call( self,
             jiang: nil,

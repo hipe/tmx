@@ -6,7 +6,7 @@ module Skylab::Human
 
       # (see also a simpler form at [#ba-056])
 
-      Callback_::Actor.call( self, :properties,
+      Attributes_actor_.call( self,
         :gets_under,
         :always_at_the_beginning,
         :iff_zero_items,
@@ -24,8 +24,7 @@ module Skylab::Human
         private :new
       end  # >>
 
-      def ___init_and_produce_via_etc st
-        # (used to be #[#ca-063])
+      def ___init_and_produce_via_etc st  # (used to be #[#ca-063])
         init_ivars
         process_polymorphic_stream_fully st
         sanity_checks

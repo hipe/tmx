@@ -3,6 +3,8 @@
 
 ## introduction
 
+(EDIT: say something about keyword arguments..)
+
 in keeping with the tradition of wacky experiments in this universe,
 the iambic experiment is one of the grandest and wackiest of them all.
 it has so far yielded a spectrum of phenomena ranging from smelly to

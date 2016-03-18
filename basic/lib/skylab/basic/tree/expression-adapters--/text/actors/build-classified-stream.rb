@@ -8,11 +8,11 @@ module Skylab::Basic
 
       class Actors::Build_classified_stream
 
-        Callback_::Actor.call self, :properties,
-
+        Attributes_actor_.call( self,
           :node,
           :glyphset_identifier_x,
-          :glyphset
+          :glyphset,
+        )
 
         def initialize
           @glyphset = @glyphset_identifier_x = nil

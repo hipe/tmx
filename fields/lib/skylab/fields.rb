@@ -119,29 +119,46 @@ module Skylab::Fields
 
       class << self
 
-        def _call cls, h=nil
-
-          if h
-            attrs = Here_[ h ]
-            cls.const_set :ATTRIBUTES, attrs
-          else
-            cls.const_set :ATTRIBUTES, nil
-          end
-
-          cls.extend Module_Methods___
-          cls.include InstanceMethods
-          attrs  # as covered..
+        def _call cls, * a
+          via cls, a
         end
-
         alias_method :[], :_call
         alias_method :call, :_call
+        remove_method :_call
+
+        def via cls, a  # (transitional implementation..)
+
+          if a.length.zero?
+
+            cls.extend Module_Methods__
+            cls.include InstanceMethods
+            cls.const_set :ATTRIBUTES, nil
+            NIL_
+
+          elsif 1 == a.length and a.first.respond_to? :each_pair
+
+            cls.extend Module_Methods__
+            cls.include InstanceMethods
+            attrs = Here_[ a.first ]
+            cls.const_set :ATTRIBUTES, attrs
+            attrs  # as covered
+
+          else
+
+            cls.const_set :ATTRIBUTES, Flat_Attributes___.new( a )
+
+            cls.extend Flat_Actor_MMs___
+            cls.include Flat_Actor_IMs___
+            NIL_
+          end
+        end
       end  # >>
 
-      module Module_Methods___
+      module Module_Methods__
 
         # ~ ways to call your actor (pursuant to [#bs-028.A] name conventions)
 
-        def with * x_a, & x_p  # 1
+        def with * x_a, & x_p  # #[#bs-028] reserved method name.
           call_via_iambic x_a, & x_p
         end
 
@@ -189,6 +206,8 @@ module Skylab::Fields
           kp
         end
       end
+
+      # ==
 
       module InstanceMethods
 
@@ -262,6 +281,99 @@ module Skylab::Fields
           raise ev.to_exception
         end
       end
+
+      # ==
+
+      module Flat_Actor_MMs___
+
+        include Module_Methods__
+
+        def backwards_curry  # eek
+          -> * x_a, & oes_p do
+            Actor::Curried.backwards_curry__ self, x_a, & oes_p
+          end
+        end
+
+        def curry_with * x_a, & oes_p
+          Actor::Curried.curry__ self, x_a, & oes_p
+        end
+
+        def [] * a, & oes_p
+          call_via_arglist a, & oes_p
+        end
+
+        def call * a, & oes_p
+          call_via_arglist a, & oes_p
+        end
+
+        def call_via_arglist a, & x_p
+
+          sess = new( & x_p )
+          _ok = sess.process_arglist_fully a
+          _ok && sess.execute
+        end
+      end
+
+      module Flat_Actor_IMs___
+
+        include InstanceMethods
+
+        def process_polymorphic_stream_passively st
+
+          bx = self.class::ATTRIBUTES.ivars_box_
+
+          while st.unparsed_exists
+            ivar = bx[ st.current_token ]
+            ivar or break
+            st.advance_one
+            instance_variable_set ivar, st.gets_one
+          end
+
+          KEEP_PARSING_  # we never fail softly
+        end
+
+        def process_arglist_fully a
+
+          bx = self.class::ATTRIBUTES.ivars_box_
+
+          a.length.times do |d|
+            instance_variable_set bx.at_position( d ), a.fetch( d )
+          end
+
+          KEEP_PARSING_
+        end
+      end
+
+      # ==
+
+      class Flat_Attributes___
+
+        def initialize sym_a
+          @_do = true
+          @_sym_a = sym_a
+        end
+
+        def ivars_box_
+          if @_do
+            _parse
+          end
+          @__ivars_box
+        end
+
+        def _parse
+          @_do = false
+          bx = Callback_::Box.new
+          remove_instance_variable( :@_sym_a ).each do |sym|
+            bx.add sym, :"@#{ sym }"
+          end
+          @__ivars_box = bx
+          NIL_
+        end
+      end
+
+      # =
+
+      Autoloader_[ self ]
     end
 
     # --
@@ -484,7 +596,6 @@ module Skylab::Fields
     Brazen = sidesys[ :Brazen ]
     Human = sidesys[ :Human ]
     Plugin = sidesys[ :Plugin ]
-
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
@@ -502,3 +613,4 @@ module Skylab::Fields
   SPACE_ = ' '
   UNABLE_ = false
 end
+# #history - backwards_curry moved

@@ -4,10 +4,15 @@ module Skylab::TanMan
 
       class Actors__::Persist
 
-        Actor_.call self, :properties,
+        Actor_.call( self,
           :session,
           :change_is_OK,
-          :entity
+          :entity,
+        )
+
+        def initialize & p
+          @on_event_selectively = p
+        end
 
         def execute
           init_ivars

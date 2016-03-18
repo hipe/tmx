@@ -8,17 +8,14 @@ module Skylab::SubTree
 
       class Small_Time_Sessions_::Perform_aggregate_find
 
-        Callback_::Actor.call self, :properties,
-          :paths, :pattern
+        Attributes_actor_.call( self,
+          :paths,
+          :pattern,
+        )
 
-        class << self
-          def new_with * x_a, & oes_p  # :+[#ca-063]
-            new do
-              @on_event_selectively = oes_p
-              process_iambic_fully x_a
-            end
-          end
-        end  # >>
+        def initialize & p
+          @on_event_selectively = p
+        end
 
         def produce_upstream
           _ok = __resolve_command

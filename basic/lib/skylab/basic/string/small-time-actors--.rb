@@ -37,10 +37,11 @@ module Skylab::Basic
 
       class Ellipsify  # :[#032].
 
-        Callback_::Actor.call self, :properties,
+        Attributes_actor_.call( self,
           :input_string,
           :max_width,
-          :glyph
+          :glyph,
+        )
 
         class << self
 

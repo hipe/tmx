@@ -6,7 +6,10 @@ module Skylab::Callback
 
     class Stowaway_Actors__::Produce_x
 
-      Actor[ self, :properties, :const_missing, :core_relpath ]
+      Attributes_actor_.call( self,
+        :const_missing,
+        :core_relpath,
+      )
 
       def execute
         init_ivars
@@ -207,7 +210,10 @@ module Skylab::Callback
 
     class Stowaway_Actors__::Resolve_relpath__
 
-      Actor[ self, :properties, :mod, :dpn ]
+      Attributes_actor_.call( self,
+        :mod,
+        :dpn,
+      )
 
       def execute
         init_ivars

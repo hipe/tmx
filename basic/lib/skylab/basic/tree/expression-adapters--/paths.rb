@@ -8,14 +8,13 @@ module Skylab::Basic
 
         class Build_stream
 
-          Callback_::Actor.call( self, :properties,
+          Attributes_actor_.call( self,
             :do_branches,
             :node,
           )
 
           def initialize
             @do_branches = true
-            super
           end
 
           def execute

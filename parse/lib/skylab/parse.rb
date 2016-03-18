@@ -84,8 +84,8 @@ module Skylab::Parse  # see [#001]
       Home_.lib_.fields::Attributes[ h ]
     end
 
-    Attributes_actor_ = -> mod, h=nil do
-      Home_.lib_.fields::Attributes::Actor[ mod, h ]
+    Attributes_actor_ = -> cls, * a do
+      Home_.lib_.fields::Attributes::Actor.via cls, a
     end
 
     module Lib___

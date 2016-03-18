@@ -4,10 +4,11 @@ module Skylab::Brazen
 
     class Actors__::Persist < Couch_Actor_
 
-      Actor_.call self, :properties,
+      Attributes_actor_.call( self,
         :is_dry,
         :entity,
-        :collection
+        :collection,
+      )
 
       def execute
         init_ivars

@@ -4,7 +4,7 @@ module Skylab::Parse
 
     class Input_Streams_::Array
 
-      # largely redundant with [#ca-046] but some important differences.
+      # largely redundant with #[#fi-034] but some important differences.
       # it is less confusing and less room for error if we just rewrite
       # the commonalities and keep the graphs separate (for now).
 

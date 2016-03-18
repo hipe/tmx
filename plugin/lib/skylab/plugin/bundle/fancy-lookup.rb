@@ -4,8 +4,8 @@ module Skylab::Plugin
 
     # incomplete pseudocde for a [#.A] general & [#.B] particular algorithm
 
-    Attributes_actor_ = -> cls, h do
-      Home_.lib_.fields::Attributes::Actor[ cls, h ]
+    Attributes_actor_ = -> cls, * a do
+      Home_.lib_.fields::Attributes::Actor.via cls, a
     end
 
     Attributes_actor_.call( self,

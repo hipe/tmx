@@ -18,7 +18,7 @@ module Skylab::Snag
             if :Byte_Stream == body.modality_const
               BS_::Sessions_::Delineate[ d, y, expag, node ]
             else
-              BS_::Sessions_::Delineate.new_with( d, y, expag, node ).execute_agnostic
+              BS_::Sessions_::Delineate.new_via( d, y, expag, node ).execute_agnostic
             end
           else
             body.express_N_units_into_under_ d, y, expag

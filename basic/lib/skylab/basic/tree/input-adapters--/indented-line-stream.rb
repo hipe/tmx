@@ -4,22 +4,23 @@ module Skylab::Basic
 
     class Input_Adapters__::Indented_Line_Stream  # :[#043].
 
-      Callback_::Actor.call self, :properties,
-
+      Attributes_actor_.call( self,
         :upstream_x,
         :build_using,
-        :glyph
+        :glyph,
+      )
 
       include Simple_Selective_Sender_Methods_
 
-      def initialize
-
-        super
-        @build_using ||= -> _, * do _ end
-        @glyph_regex = /\A([[:space:]]*)#{ ::Regexp.escape @glyph }/
+      def initialize & oes_p
+        @on_event_selectively = oes_p
       end
 
       def execute
+
+        @build_using ||= -> _, * do _ end
+        @glyph_regex = /\A([[:space:]]*)#{ ::Regexp.escape @glyph }/
+
         ok, has = pair_for_next_frame
         ok and ( via_first_frame if has )
       end

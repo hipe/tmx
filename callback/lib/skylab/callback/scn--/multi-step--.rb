@@ -4,20 +4,16 @@ module Skylab::Callback
 
     class Multi_Step__
 
+      Attributes_actor_.call( self,
+        :init,
+        :gets,
+      )
+
       class << self
-        def new_via_iambic x_a  # :+[#063]
-          new do
-            process_iambic_fully x_a
-          end
-        end
+        private :new
       end  # >>
 
-      Home_::Actor.call self, :properties,
-        :init,
-        :gets
-
       def initialize
-        super
         @p = -> do
           @init.call
           @p = @gets

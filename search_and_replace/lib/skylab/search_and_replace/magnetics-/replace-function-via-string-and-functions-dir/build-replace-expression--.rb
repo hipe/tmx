@@ -4,8 +4,7 @@ module Skylab::SearchAndReplace
 
       class Build_replace_expression__
 
-        Callback_::Actor.call( self, :properties,
-
+        Attributes_actor_.call( self,
           :capture_identifier,
           :functions_dir,
           :method_call_chain,

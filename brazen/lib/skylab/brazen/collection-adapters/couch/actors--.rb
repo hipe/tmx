@@ -8,10 +8,11 @@ module Skylab::Brazen
 
       class Retrieve_collection_entity < Couch_Actor_
 
-        Actor_.call self, :properties,
+        Attributes_actor_.call( self,
           :entity_identifier,
           :collection,
-          :kernel
+          :kernel,
+        )
 
         def execute
           init_ivars

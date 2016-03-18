@@ -4,12 +4,17 @@ module Skylab::TanMan
 
     class Actors__::Touch  # ~:+[#049] algo family
 
-      Actor_.call self, :properties,
+      Actor_.call( self,
         :is_dry_run,
         :entity,
         :template_values_provider,
         :workspace,
-        :kernel
+        :kernel,
+      )
+
+      def initialize & p
+        @on_event_selectively = p
+      end
 
       def execute
         __init_downstream_identifier

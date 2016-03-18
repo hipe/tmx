@@ -6,12 +6,17 @@ module Skylab::Brazen
 
       # :+#non-atomic with regards to filesystem interaction.
 
-      Actor_.call self, :properties,
+      Attributes_actor_.call( self,
         :is_dry,
         :surrounding_path,
         :config_filename,
         :prop,
-        :app_name
+        :app_name,
+      )
+
+      def initialize & _
+        @on_event_selectively = _
+      end
 
       def execute
 

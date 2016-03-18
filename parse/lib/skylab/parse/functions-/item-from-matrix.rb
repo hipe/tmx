@@ -18,34 +18,18 @@ module Skylab::Parse
       #
       # how this behaves with items with non-unique names may be undefined.
 
+      Attributes_actor_.call( self,
+        :item_stream_proc,
+      )
+
       class << self
 
-        def new_with * x_a, & x_p
-          new do
-            if x_p
-              @_oes_p = x_p
-            end
-            process_iambic_fully x_a
-          end
-        end
-
         def new_via_item_stream_proc & p
-          new do
-            @item_stream_proc = p
-          end
+          new_with :item_stream_proc, p
         end
 
         private :new
       end  # >>
-
-      Callback_::Actor.call self, :properties,
-
-        :item_stream_proc
-
-      def initialize & edit_p
-        instance_exec( & edit_p )
-        freeze
-      end
 
       def output_node_via_input_stream in_st, & oes_p
 

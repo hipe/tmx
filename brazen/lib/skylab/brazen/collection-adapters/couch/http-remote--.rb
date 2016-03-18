@@ -278,7 +278,9 @@ module Skylab::Brazen
 
       class Respose_Receiver__
 
-        Actor_[ self, :properties, :channel ]
+        Attributes_actor_.call( self,
+          :channel,
+        )
 
         class << self
 
@@ -290,7 +292,9 @@ module Skylab::Brazen
             else     new x_a.pop, x_a
             end
           end
-        end
+
+          private :new
+        end  # >>
 
         def initialize delegate, x_a=nil
           @channel = nil

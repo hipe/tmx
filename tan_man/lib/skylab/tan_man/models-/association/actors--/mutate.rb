@@ -4,18 +4,19 @@ module Skylab::TanMan
 
     class Actors__::Mutate
 
-      Actor_.call self, :properties,
+      Actor_.call( self,
        :verb,  # 'touch' | 'delete'
        :attrs,
        :prototype_i,
        :from_node_label, :to_node_label,
        :from_node_ID, :to_node_ID,
        :document,
-       :kernel
+       :kernel,
+      )
 
-      def initialize
+      def initialize & p
         @from_node_label = nil  # used as a canary
-        super
+        @on_event_selectively = p
       end
 
       def execute

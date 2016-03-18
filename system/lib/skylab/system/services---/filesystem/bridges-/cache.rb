@@ -115,7 +115,7 @@ module Skylab::System
 
         class Actor___
 
-          Callback_::Actor.call( self, :properties,
+          Attributes_actor_.call( self,
             :mod,
             :abbrev,
             :filesystem,
@@ -125,7 +125,12 @@ module Skylab::System
 
           def initialize
             @abbrev = nil
-            super
+          end
+
+          def call_via_iambic x_a
+            otr = dup
+            otr.send :process_iambic_fully, x_a
+            otr.execute
           end
 
           def execute

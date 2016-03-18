@@ -8,11 +8,11 @@ module Skylab::TestSupport
 
         class Actors__::Produce_manifest_entry_stream
 
-          Callback_::Actor.call self, :properties,
-
+          Attributes_actor_.call( self,
             :path,
             :doc_test_files_file,
             :path_prop,
+          )
 
           def initialize
             @filesystem = Home_.lib_.system.filesystem

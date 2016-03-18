@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    class Actors_::Build_units_of_work
+    class Actors_::Build_units_of_work < Callback_::Actor::Dyadic
 
       # build the array of units of work, necessarily in one batch so we
       # memoize the existential state of the various dirs involved, only
@@ -11,10 +11,11 @@ module Skylab::TanMan
       #   • this used to be over-generalized. we have since parsimonized it.
       #   • this once looked like a :+[#sy-004] normalizer. but no longer.
 
-      Callback_::Actor.call( self, :properties,
-        :bound_attributes,
-        :filesystem,
-      )
+      def initialize batrs, fs, & p
+        @bound_attributes = batrs
+        @filesystem = fs
+        @on_event_selectively = p
+      end
 
       Callback_::Event.selective_builder_sender_receiver self
 

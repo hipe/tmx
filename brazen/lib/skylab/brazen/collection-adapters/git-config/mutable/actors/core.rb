@@ -10,10 +10,14 @@ module Skylab::Brazen
 
       class Actors::Delete < Git_Config_Actor_
 
-        Actor_[ self, :properties,
+        Attributes_actor_.call( self,
           :entity,
           :document,
-          :on_event_selectively ]
+        )
+
+        def initialize & oes_p
+          @on_event_selectively = oes_p
+        end
 
         def execute
           ok = via_entity_resolve_subsection_id__

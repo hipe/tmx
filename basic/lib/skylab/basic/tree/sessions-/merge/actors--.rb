@@ -11,10 +11,11 @@ module Skylab::Basic
           # get concatted, an int onto a list gets pushed, a list onto an
           # int is not supported, etc.
 
-          Callback_::Actor.call self, :properties,
+          Attributes_actor_.call( self,
             :x,
             :x_,
-            :merge_category_symbol
+            :merge_category_symbol,
+          )
 
           def execute
             @mo = produce_modus_for_mixed @x
@@ -77,13 +78,14 @@ module Skylab::Basic
 
           class Modus_Operandus___
 
-            Callback_::Actor.call self, :properties,
+            Attributes_actor_.call( self,
               :shape_i,
               :match,
               :dupe,
               :merge_atomic,
               :merge_one_dimensional,
-              :merge_union
+              :merge_union,
+            )
 
             attr_reader :shape_i, :match, :dupe, :merge_atomic,
               :merge_one_dimensional, :merge_union

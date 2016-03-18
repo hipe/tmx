@@ -2,12 +2,13 @@ module Skylab::SubTree
 
   class Models_::File_Coverage
 
-    class Actors_::Classify_the_path
+    class Actors_::Classify_the_path < Callback_::Actor::Dyadic
 
-      Callback_::Actor.call self, :properties,
-
-        :test_dir,
-        :path
+      def initialize td, path, & p
+        @on_event_selectively = p
+        @path = path
+        @test_dir = td
+      end
 
       def execute
         ok = __resolve_stat

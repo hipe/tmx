@@ -79,13 +79,6 @@ module Skylab::Brazen
     end
   end  # >>
 
-  Actor_ = -> cls, * i_a, & x_p do
-
-    # buffer ourselves from our past and our future
-
-    Callback_::Actor.edit_module_via_mutable_iambic cls, i_a, & x_p
-  end
-
   PPSF_METHOD_ = -> st, & x_p do  # "process polymorphic stream fully"
 
     kp = process_polymorphic_stream_passively st, & x_p
@@ -179,8 +172,8 @@ module Skylab::Brazen
     Autoloader_[ self ]
   end
 
-  Attributes_actor_ = -> mod, h=nil do
-    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
   Attributes_ = -> h do

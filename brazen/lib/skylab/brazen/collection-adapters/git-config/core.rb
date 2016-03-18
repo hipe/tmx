@@ -158,7 +158,7 @@ module Skylab::Brazen
         & oes_p )
     end
 
-    class Parse_  # the [#ca-046] "any result" pattern is employed.
+    class Parse_  # the [#fi-016] "any result" pattern is employed.
 
       class << self
         def [] *a, & oes_p

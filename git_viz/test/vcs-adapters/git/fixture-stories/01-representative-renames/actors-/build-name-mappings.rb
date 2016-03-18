@@ -2,9 +2,11 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   module Story_01
 
-    class Actors_::Build_name_mappings
+    class Actors_::Build_name_mappings < Callback_::Actor::Monadic
 
-      Callback_::Actor.call self, :properties, :tmpdir
+      def initialize o
+        @tmpdir = o
+      end
 
       def execute
 

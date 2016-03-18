@@ -8,23 +8,27 @@ module Skylab::Snag
 
         # try and keep the formatting intact of lines we don't mutate..
 
-        Callback_::Actor.call self, :properties,
-          :N_units, :y, :expag, :node
+        Attributes_actor_.call( self,
+          :N_units,
+          :y,
+          :expag,
+          :node,
+        )
 
         class << self
-          def new_with * a, & oes_p
-            new do
-              @on_event_selectively = oes_p
-              process_arglist_fully a
-            end
+
+          def new_via * a
+            sess = new
+            _kp = sess.process_arglist_fully a
+            _kp && sess
           end
+
+          private :new
         end  # >>
 
-        def initialize( * )
-
+        def initialize
           @did_flush = false
           @done = false
-          super
         end
 
         def execute

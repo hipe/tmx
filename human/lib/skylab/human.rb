@@ -19,8 +19,8 @@ module Skylab::Human  # :[#001].
     NLP_ = self
   end
 
-  Attributes_actor_ = -> mod, h=nil do
-    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]

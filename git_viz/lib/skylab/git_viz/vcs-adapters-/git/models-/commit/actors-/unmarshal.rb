@@ -4,11 +4,14 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Actors_::Unmarshal  # broad algorithm narrated in [#012], storypoints in [#009]
+      class Actors_::Unmarshal < Callback_::Actor::Dyadic
 
-        Callback_::Actor.call self, :properties,
+        # broad algorithm narrated in [#012], storypoints in [#009]
 
-          :ci, :upstream
+        def initialize ci, us
+          @ci = ci
+          @upstream = us
+        end
 
         def execute
 

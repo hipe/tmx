@@ -2,19 +2,20 @@ module Skylab::TestSupport
 
   module DocTest
 
-    class Intermediate_Streams_::Node_stream_via_comment_block_stream::Span_stream_via_comment_block__
+    class Intermediate_Streams_::
+        Node_stream_via_comment_block_stream::Span_stream_via_comment_block__ <
+            Callback_::Actor::Monadic
 
-      Callback_::Actor.call self, :properties,
-        :comment_block
+      def initialize cb
 
-      def initialize
+        @comment_block = cb
+
         @current_flush_method_name = @next_flush_method_name = nil
         @state = STATE_MACHINE__.fetch :beginning_state
         @local_margin_d = 0
           # the number of spaces in from beginning of of the comment content
           # line - is sticky from text span to code span
         @is_reading = true
-        super
       end
 
       def execute

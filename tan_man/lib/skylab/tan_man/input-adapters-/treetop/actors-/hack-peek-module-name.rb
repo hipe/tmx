@@ -2,12 +2,12 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
     # <-
-  class Actors_::Hack_peek_module_name  # READ [#011]
+  class Actors_::Hack_peek_module_name < Callback_::Actor::Dyadic  # READ [#011]
 
-    Callback_::Actor.call( self, :properties,
-      :path,
-      :filesystem,
-    )
+    def initialize path, fs
+      @filesystem = fs
+      @path = path
+    end
 
     def execute
 

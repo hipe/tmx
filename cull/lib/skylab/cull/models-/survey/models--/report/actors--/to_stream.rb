@@ -4,11 +4,15 @@ module Skylab::Cull
 
     class Models__::Report
 
-      class Actors__::To_stream  # narrative in [#006]:#note-007
+      class Actors__::To_stream < Callback_::Actor::Dyadic
 
-        Callback_::Actor.call self, :properties,
+        # narrative in [#006]:#note-007
 
-          :entity_stream, :call_a
+        def initialize es, a, & p
+          @call_a = a
+          @entity_stream = es
+          @on_event_selectively = p
+        end
 
         def execute
           if @call_a.length.zero?

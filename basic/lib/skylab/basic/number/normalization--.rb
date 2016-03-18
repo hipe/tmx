@@ -12,10 +12,6 @@ module Skylab::Basic
             @inst ||= new
           end
 
-          def new_with * a, & x_p  # #[#ca-063]
-            new_via_iambic a, & x_p
-          end
-
           def new_via_arglist a, & x_p  # #[#ca-063] used to have this, may again..
             # (hi.)
             new_via_iambic a, & x_p

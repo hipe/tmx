@@ -4,10 +4,7 @@ module Skylab::Cull
 
     class Adapters__::Markdown
 
-      class Table_scanner_via_line_stream__
-
-        Callback_::Actor.call self, :properties,
-          :line_stream
+      class Table_scanner_via_line_stream__ < Callback_::Actor::Monadic
 
         # our "grammar" for what constitutes a github-flavored markdown table
         # is probably not a perfect subset nor superset of the emergent
@@ -53,10 +50,11 @@ module Skylab::Cull
         #  have their own optimality.)
         #
 
-        def initialize
-          @strscn = nil
+        def initialize ls, & p
           @is_inside_of_a_table = false
-          super
+          @line_stream = ls
+          @on_event_selectively = p
+          @strscn = nil
         end
 
         def execute

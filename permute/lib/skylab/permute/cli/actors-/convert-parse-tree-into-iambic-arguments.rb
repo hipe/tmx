@@ -2,10 +2,13 @@ module Skylab::Permute
 
   class CLI
 
-    class Actors_::Convert_parse_tree_into_iambic_arguments
+    class Actors_::Convert_parse_tree_into_iambic_arguments < Callback_::Actor::Dyadic
 
-      Callback_::Actor.call self, :properties,
-        :x_a, :o_a
+      def initialize x_a, o_a, & p
+        @o_a = o_a
+        @on_event_selectively = p
+        @x_a = x_a
+      end
 
       def execute
 

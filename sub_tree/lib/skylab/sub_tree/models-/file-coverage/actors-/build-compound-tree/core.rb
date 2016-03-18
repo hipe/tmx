@@ -4,13 +4,13 @@ module Skylab::SubTree
 
     class Actors_::Build_compound_tree
 
-      Callback_::Actor.call self, :properties,
-
+      Attributes_actor_.call( self,
         :cx, # classifications
         :path,
         :test_dir,
         :name_conventions,
-        :fs
+        :fs,
+      )
 
       def execute
 

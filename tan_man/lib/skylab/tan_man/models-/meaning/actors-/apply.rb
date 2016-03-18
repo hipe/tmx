@@ -6,11 +6,16 @@ module Skylab::TanMan
 
     class Actors_::Apply
 
-      Callback_::Actor.call self, :properties,
+      Attributes_actor_.call( self,
         :meaning,
         :node,
         :meaning_stream,
-        :dot_file
+        :dot_file,
+      )
+
+      def initialize & p
+        @on_event_selectively = p
+      end
 
       def execute
 

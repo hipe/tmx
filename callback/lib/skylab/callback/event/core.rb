@@ -325,6 +325,12 @@ module Skylab::Callback
 
       class Inferred_Message  # #experimental - you hate me now
 
+        Attributes_actor_.call( self,
+          :y,
+          :expression_agent,
+          :o,
+        )
+
         class << self
           def to_proc  # a message proc
             _CLS_ = self
@@ -333,11 +339,6 @@ module Skylab::Callback
             end
           end
         end  # >>
-
-        Home_::Actor[ self, :properties,
-          :y,
-          :expression_agent,
-          :o ]
 
         def execute
 

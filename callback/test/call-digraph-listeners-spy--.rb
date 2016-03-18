@@ -6,8 +6,6 @@ module Skylab::Callback::TestSupport
       private :new
     end
 
-    Attributes_actor_ = Home_.lib_.fields::Attributes::Actor
-
     Attributes_actor_.call( self,
       debug_IO: nil,
       do_debug_proc: nil,

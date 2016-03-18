@@ -466,7 +466,7 @@ for methods that sign the events they produce or transform.
 the meta-classification of "iambic" applies tautologically to method
 name conventions that apply to iambic methods. that is, if any method
 has a name that is covered by any of the below conventions, that method
-must accept [#ca-046] "iambic" arguments; conversely no method covered
+must accept [#fi-033] "iambic" arguments; conversely no method covered
 by any of the below conventions can accept anything other than iambic
 arguments (and perhaps a block pursuant to the particular method).
 

@@ -8,20 +8,20 @@ actor's purpose is to make small classes easy to implement, when that
 small class's purpose is to produce a single result (and perhaps numerous
 side effects) through an interface that is essentially proc-like, being
 called with (a usually nonzero number of) arguments passed typically in
-a single positional arglist or [#046] iambic.
+a single positional arglist or [#fi-033] iambic.
 
 that is, an actor has a single point of interface (its call method) and
 a single result (the result of the method). whether this call has
 side-effects on the actor itself is unknowable and inconsequential.
 
 ideally all actors will be indiscernable from procs, and all procs (by
-our defintion here) can be classifed as actors (sidestepping all the other
+our defintion here) can be classified as actors (sidestepping all the other
 things you can do with procs, like currying, which we will ignore for now,
 but hold that thought..)
 
 this can probably serve as a replacement for every similar library that
 came before it that does *not* support meta-properties. as such it is
-among the top three most important entries in :+[#fi-001] the parameter
+among the top three most important entries in #[#001] the parameter
 library pantheon (and see "compared to the others" below).
 
 we borrow the term from the 'actor' pattern, to which this is currently
@@ -142,7 +142,7 @@ namespace to make as many private support methods as you need.
 
 ## actors compared to the others
 
-see [#fi-001] the comprehensive list of libraries like this.
+see [#001] the comprehensive list of libraries like this.
 
 
 here is how it compares:
@@ -167,7 +167,7 @@ named like local procs, that is:
 
 
 
-## actor patterns :[#045]
+## actor patterns :[#ca-045]
 
 sometimes only a name and some documentation makes the difference
 between a perceived smell and a local design pattern. we have
@@ -184,7 +184,12 @@ related but separate points.
 
 
 
-### the "any result" pattern :[#046]
+### the "any result" pattern
+
+(EDIT: this pattern may become deprecated. anytime we let the result of
+a callback effect program flow of any agent, we generally end up
+regretting it. (e.g why should a testing library have to know what kind
+of results to result for particular callbacks..))
 
 if you specify (or are specified) that you follow the "any result"
 pattern then you must result in either your payload or the result of

@@ -4,7 +4,7 @@ module Skylab::Callback
 
     class Methodic__  # :[#013]. quite similar to [#006]
 
-      Home_.lib_.fields::Attributes::Actor.call( self,  # Attributes_actor_
+      Attributes_actor_.call( self,
         delegate: nil,
         prefix: nil,
       )

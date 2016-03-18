@@ -13,12 +13,16 @@ module Skylab::SubTree
       #
       # if ever this is needed elsewhere, push it up to [#sy-018]
 
-      Callback_::Actor.call self, :properties,
-
+      Attributes_actor_.call( self,
         :filenames,
         :start_path,
         :be_verbose,
-        :max_num_dirs_to_look
+        :max_num_dirs_to_look,
+      )
+
+      def initialize & p
+        @on_event_selectively = p
+      end
 
       def execute
         __init_find

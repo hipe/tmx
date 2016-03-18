@@ -378,6 +378,10 @@ module Skylab::SearchAndReplace
     ACS_ = Lib_::ACS[] ; nil
   end
 
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
   Attributes_ = -> h do
     Home_.lib_.fields::Attributes[ h ]
   end

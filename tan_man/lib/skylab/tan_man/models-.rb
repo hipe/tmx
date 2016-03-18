@@ -215,7 +215,7 @@ module Skylab::TanMan
 
   Actor_ = -> cls, * a do
 
-    Callback_::Actor.edit_module_via_mutable_iambic cls, a
+    Home_.lib_.fields::Attributes::Actor.via cls, a
 
     Callback_::Event.selective_builder_sender_receiver cls ; nil
   end

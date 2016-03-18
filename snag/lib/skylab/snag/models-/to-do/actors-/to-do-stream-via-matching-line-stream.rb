@@ -2,9 +2,13 @@ module Skylab::Snag
 
   class Models_::To_Do
 
-    class Actors_::To_do_stream_via_matching_line_stream
+    class Actors_::To_do_stream_via_matching_line_stream < Callback_::Actor::Dyadic
 
-      Callback_::Actor.call self, :properties, :st, :pattern_s_a
+      def initialize st, psa, & p
+        @on_event_selectively = p
+        @pattern_s_a = psa
+        @st = st
+      end
 
       def execute
 

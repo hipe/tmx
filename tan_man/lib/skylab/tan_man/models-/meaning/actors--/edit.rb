@@ -8,7 +8,9 @@ module Skylab::TanMan
 
       class Edit::Normalize_name
 
-        Actor_.call self, :properties, :qualified_knownness
+        Actor_.call( self,
+          :qualified_knownness,
+        )
 
         def execute
 
@@ -34,7 +36,9 @@ module Skylab::TanMan
 
       class Edit::Normalize_value
 
-        Actor_.call self, :properties, :qualified_knownness
+        Actor_.call( self,
+          :qualified_knownness,
+        )
 
         def execute
           @x = @qualified_knownness.value_x

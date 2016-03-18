@@ -2,10 +2,13 @@ module Skylab::TestSupport
 
   module DocTest
 
-    class Intermediate_Streams_::Node_stream_via_comment_block_stream::Node_stream_via_span_stream__
+    class Intermediate_Streams_::
+        Node_stream_via_comment_block_stream::Node_stream_via_span_stream__ <
+            Callback_::Actor::Monadic
 
-      Callback_::Actor.call self, :properties,
-        :span_stream
+     def initialize x
+       @span_stream = x
+     end
 
       def execute
         @state_machine = STATE_MACHINE__

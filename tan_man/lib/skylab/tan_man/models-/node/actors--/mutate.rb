@@ -8,11 +8,16 @@ module Skylab::TanMan
 
         class Touch < self
 
-          Callback_::Actor.call self, :properties,
+          Attributes_actor_.call( self,
             :name,
             :verb,  # 'create' | 'retrieve' | 'touch'
             :document,
-            :kernel
+            :kernel,
+          )
+
+          def initialize & p
+            @on_event_selectively = p
+          end
 
           def init_name_string_
             @name_s = @name ; @name = nil ; nil
@@ -30,11 +35,16 @@ module Skylab::TanMan
 
         class Via_entity < self
 
-          Callback_::Actor.call self, :properties,
+          Attributes_actor_.call( self,
             :verb,
             :entity,
             :document,
-            :kernel
+            :kernel,
+          )
+
+          def initialize & p
+            @on_event_selectively = p
+          end
 
           def init_name_string_
             @name_s = @entity.property_value_via_symbol :name ; nil

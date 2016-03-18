@@ -4,9 +4,13 @@ module Skylab::Brazen
 
     class Expression_Agent
 
-      class Pretty_Path  # re-write [#sy-005]
+      class Pretty_Path < Callback_::Actor::Monadic
 
-        Callback_::Actor[ self, :properties, :path ]
+        # re-write [#sy-005]
+
+        def initialize path
+          @path = path
+        end
 
         def execute
           @path_length = @path.length

@@ -4,11 +4,13 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Actors_::Fetch
+      class Actors_::Fetch < Callback_::Actor::Dyadic
 
-        Callback_::Actor.call self, :properties,
-
-          :id_s, :repo
+        def initialize s, o, & p
+          @id_s = s
+          @on_event_selectively = p
+          @repo = o
+        end
 
         def execute
 

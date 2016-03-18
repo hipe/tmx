@@ -53,21 +53,22 @@ module Skylab::Brazen
 
     class Formal_Segment___
 
-      same = :color, :glyph
+      Attributes_actor_.call( self,
+        :color,
+        :glyph,
+      )
 
-      attr_reader( * same )
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        _k = super
+        _k && normalize
+      end
 
-      Callback_::Actor.call self, :properties, * same
-
-      def initialize
-
-        @color = nil
-
-        super
-
+      def normalize
         @glyph ||= GLYPH___
 
-        if 1 != @glyph.length
+        if 1 == @glyph.length
+          KEEP_PARSING_
+        else
           raise ::ArgumentError, __say_glyph_width
         end
       end
@@ -83,6 +84,11 @@ module Skylab::Brazen
           IDENTITY_
         end
       end
+
+      attr_reader(
+        :color,
+        :glyph,
+      )
     end
 
     # ~ phase 2: building the proc
@@ -91,26 +97,32 @@ module Skylab::Brazen
 
       # assume these consts: `EXPRESSION_WIDTH_PROC`, `SEGMENTS`
 
+      Attributes_actor_.call( self,
+        :expression_width,
+      )
+
       class << self
 
         def new_expressor
-          new._to_proc
+          sess = new
+          sess.normalize && sess._to_proc
         end
 
         def new_expressor_with * x_a
-          _ = new do
-            process_iambic_fully x_a
-          end
-          _._to_proc
+          sess = new
+          _k = sess.send :process_iambic_fully, x_a
+          _k && sess._to_proc
         end
 
         private :new
       end  # >>
 
-      def initialize & _
+      def initialize
         @expression_width = nil
-        super( & _ )
-        normalize   # would be #[#fi-022] (but this is actor not m-ethodic)
+      end
+
+      def process_polymorphic_stream_passively st  # #[#fi-022]
+        super && normalize
       end
 
       def normalize
@@ -125,11 +137,6 @@ module Skylab::Brazen
 
         KEEP_PARSING_
       end
-
-      Callback_::Actor.call( self, :properties,
-
-        :expression_width,
-      )
 
       def _to_proc
 

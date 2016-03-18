@@ -50,10 +50,11 @@ module Skylab::TanMan
 
     class Set_label_of_new_node_made_from_prototype__
 
-      Callback_::Actor[ self, :properties,
+      Attributes_actor_.call( self,
         :label,
         :node,
-        :on_event_selectively ]
+        :on_event_selectively,
+      )
 
       def execute
         @equals = @node._label_sexp[ :content ][ :equals ]

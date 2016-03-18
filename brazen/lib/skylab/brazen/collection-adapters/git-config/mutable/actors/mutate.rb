@@ -8,9 +8,10 @@ module Skylab::Brazen
 
       class Mutate < Git_Config_Actor_
 
-        Actor_.call self, :properties,
+        Attributes_actor_.call( self,
           :entity,
           :mutable_document
+        )
 
         def execute
           ok = __look_at_entity

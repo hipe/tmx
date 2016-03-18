@@ -8,9 +8,12 @@ module Skylab::System
 
     Actors_ = ::Module.new
 
-    class Actors_::Build_path_stream
+    class Actors_::Build_path_stream < Callback_::Actor::Monadic
 
-      Callback_::Actor.call self, :properties, :args
+      def initialize x, & p
+        @args = x
+        @on_event_selectively = p
+      end
 
       # try to read from the process's STDOUT *first* before seeing if
       # there's STDERR to read. if you read from STDERR it might block

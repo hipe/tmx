@@ -6,11 +6,15 @@ module Skylab::Cull
 
       Actors__ = ::Module.new
 
-      class Actors__::Persist_calls  # [#005] algorithm decribed in full
+      class Actors__::Persist_calls < Callback_::Actor::Dyadic
 
-        Callback_::Actor.call self, :properties,
+        # [#005] algorithm decribed in full
 
-          :call_a, :section
+        def initialize a, o, & p
+          @call_a = a
+          @on_event_selectively = p
+          @section = o
+        end
 
         def execute
           __partition_existing

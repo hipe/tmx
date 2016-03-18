@@ -4,11 +4,12 @@ module Skylab::Brazen
 
     class Actors__::Delete_collection < Couch_Actor_
 
-      Actor_.call self, :properties,
+      Attributes_actor_.call( self,
         :dry_run_arg,
         :force_arg,
         :entity,
-        :remote
+        :remote,
+      )
 
       def execute
         init_ivars

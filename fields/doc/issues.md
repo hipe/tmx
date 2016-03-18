@@ -1,3 +1,15 @@
+[#035] #itch 1x (in situ in [hu]) it would be nice to get nothing from
+             the actor at all to pollute the namespace of builder
+             methods. (edit: probably throu using attrs alone, no actor)
+
+[#034]       track redundant or near-redudnant polymorphic stream
+
+[#033]       iambics..
+
+[#032]       any result path (in [#016])
+
+[#031] #open move [#ca-04[56]] to here
+
 [#030] #open dedund this
 
 [#029]       in situ track universal redundancy

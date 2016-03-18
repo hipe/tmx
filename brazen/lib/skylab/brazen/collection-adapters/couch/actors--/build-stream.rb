@@ -4,10 +4,15 @@ module Skylab::Brazen
 
     class Actors__::Build_stream < Couch_Actor_
 
-      Actor_[ self, :properties,
+      Attributes_actor_.call( self,
         :model_class,
         :collection,
-        :kernel, :on_event_selectively ]
+        :kernel,
+      )
+
+      def initialize & p
+        @on_event_selectively = p
+      end
 
       def execute
         init_ivars

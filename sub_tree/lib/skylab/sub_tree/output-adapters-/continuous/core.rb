@@ -4,12 +4,12 @@ module Skylab::SubTree
 
   class Output_Adapters_::Continuous
 
-    Callback_::Actor.call self, :properties,
-
+    Attributes_actor_.call( self,
       :upstream_tree,
       :output_line_downstream_yielder,
       :info_line_downstream_yielder,
-      :do_verbose_lines
+      :do_verbose_lines,
+    )
 
     def initialize
       @do_verbose_lines = false

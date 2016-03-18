@@ -37,8 +37,11 @@ module Skylab::Basic
 
       class Make___
 
-        Callback_::Actor.call self, :properties,
-          :i_a, :p, :base_class
+        Attributes_actor_.call( self,
+          :i_a,
+          :p,
+          :base_class,
+        )
 
         def execute
           begin_class

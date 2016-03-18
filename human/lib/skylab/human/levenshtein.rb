@@ -13,12 +13,13 @@ module Skylab::Human
 
   class Levenshtein
 
-    Callback_::Actor.call self, :properties,
+    Attributes_actor_.call( self,
       :item,
       :items,
       :closest_N_items,
       :aggregation_proc,
-      :item_proc
+      :item_proc,
+    )
 
     def initialize
       super

@@ -16,7 +16,8 @@
 
 [#058] #hole ( moved to [#fi-013] )
 
-[#057]       "the ideal mixed syntax.." (in [#046])
+[#057]       "the ideal mixed syntax.." (in [#fi-016] )
+
 [#056]       track similar "try convert" for stream-likes
              ( #was: track similar things under number 050 )
 [#055]       #parent-node: [#br-059]  the "pair" structure.
@@ -32,14 +33,12 @@
 
 [#048] #hole ( #was parent node. #moved-to: [#hu-054] )
 
-[#047] #itch methodic actors should work without polluting the namespace
-             of builder methods
+[#047] #hole ( #was: eventing .. #moved-to: [#hu-053] )
 
-             ( #was: eventing .. #moved-to: [#hu-053] )
+[#046] #hole ( #moved to [#fi-033] )
 
-[#046]       #doc-node the-iambics-narrative ..
-[#046]       #parent-node: [#045] the "any result" pattern
-[#045]       #parent-node: [#042] actor patterns
+[#045] #hole ( #was: actor patterns. moved to [#fi-016] )
+
 [#044]       #parent-node: [#049] the stream narrative ..
 [#043]       #doc-node: the subscriptions narrative ..
 

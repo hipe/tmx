@@ -6,13 +6,14 @@ module Skylab::TestSupport
 
       class Actions::Generate
 
-        class Actors__::Infer_output_path
+        class Actors__::Infer_output_path < Callback_::Actor::Monadic
 
-          Callback_::Actor.call self, :properties,
-
-            :input_path,
-            :on_event_selectively
-
+          def initialize input_path, & oes_p
+            @input_path = input_path
+            if oes_p
+              @on_event_selectively = oes_p
+            end
+          end
 
           def execute
             via_manifest_entry_absolute_path_resolve_test_dir_pathname &&

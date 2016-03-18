@@ -8,11 +8,11 @@ module Skylab::Human
 
       class Actors_::Inflect  # [#039]
 
-        Callback_::Actor.call self, :properties,
-
+        Attributes_actor_.call( self,
           :y,
           :exponent_state,
-          :irregular_form_stream
+          :irregular_form_stream,
+        )
 
         def execute
 

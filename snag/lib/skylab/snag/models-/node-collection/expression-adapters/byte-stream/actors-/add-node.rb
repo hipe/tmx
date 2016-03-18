@@ -4,10 +4,12 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Actors_::Add_node
+      class Actors_::Add_node < Callback_::Actor::Monadic
 
-        Callback_::Actor.call self, :properties,
-          :session
+        def initialize o, & p
+          @on_event_selectively = p
+          @session = o
+        end
 
         def execute
 

@@ -10,13 +10,17 @@ module Skylab::TanMan
       # a plain old actor implementing an action internally whose surface
       # form is a proc with corresponding parameters as the below four.
 
-      Callback_::Actor.call self, :properties,
-
+      Attributes_actor_.call( self,
         :path_x,
         :verb_x,
-        :call
+        :call,
+      )
 
       Callback_::Event.selective_builder_sender_receiver self
+
+      def initialize & p
+        @on_event_selectively = p
+      end
 
       def execute
 

@@ -34,6 +34,10 @@ module Skylab::SubTree
     end
   end  # >>
 
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
   Autoloader_ = Callback_::Autoloader
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]

@@ -4,10 +4,12 @@ module Skylab::Snag
 
     Actors_ = ::Module.new
 
-    class Actors_::Normalize_stem  # 1x
+    class Actors_::Normalize_stem < Callback_::Actor::Monadic  # 1x <
 
-      Callback_::Actor.call self, :properties,
-        :x
+      def initialize x, & p
+        @on_event_selectively = p
+        @x = x
+      end
 
       def execute
 

@@ -71,6 +71,10 @@ module Skylab::GitViz
     end
   end
 
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
   ACHIEVED_ = true
   Callback_Tree_ = Callback_::Tree
   CONTINUE_ = nil

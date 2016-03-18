@@ -4,8 +4,9 @@ module Skylab::Basic
 
     Actors__ = ::Module.new
 
-    class Actors__::Platform_string_via_grep_string  # currently covered..
+    class Actors__::Platform_string_via_grep_string < Callback_::Actor::Monadic
 
+      # currently covered..
       # only by [sg]: seems like [bs] should use this too but where?
 
       # a hack/placeholder for this idea: try to convert a grep pattern
@@ -30,8 +31,9 @@ module Skylab::Basic
       # ONIGURUMA's '\b' - the former have directional polarity. to
       # achieve them in the latter we use zero-width assertions.
 
-      Callback_::Actor.call self, :properties,
-        :pattern_s
+      def initialize s
+        @pattern_s = s
+      end
 
       def execute
 

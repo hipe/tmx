@@ -8,15 +8,15 @@ module Skylab::Snag
 
         # parse the manifest file syntax: identifiers that start at column 1
 
-        Callback_::Actor.call self, :properties,
-
+        Attributes_actor_.call( self,
           :extended_content_adapter,
           :byte_upstream_ID,
-            :simple_line_upstream  # (if set, will shadow any `byte_upstream_ID`)
+          :simple_line_upstream,  # (if set, will shadow any `byte_upstream_ID`)
+        )
 
-        def initialize
+        def initialize & p
+          @on_event_selectively = p
           @simple_line_upstream = nil
-          super
         end
 
         def execute

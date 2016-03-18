@@ -30,16 +30,17 @@ module Skylab::Snag
 
       class Grammatical_Context_
 
-        extend Actor_as_Model_Module_Methods_
+        # see the top of Pos::Verb
 
-        Callback_::Actor.call self, :properties, :subject_number  # see the top of Pos::Verb
+        Attributes_actor_.call( self,
+          :subject_number,
+        )
+
+        def process_polymorphic_stream_passively st  # variant of #[#fi-022]
+          super && freeze
+        end
 
         attr_reader :subject_number
-
-        def initialize
-          super
-          freeze
-        end
       end
 
       # ~ parse functions

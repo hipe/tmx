@@ -14,7 +14,7 @@ module Skylab::Human
 
         alias_method :new_via_sexp__, :new_via_iambic
 
-        # #itch [#ca-047] - it would be nice to get nothing from methodic..
+        # #itch [#fi-035] - it would be nice to get nothing from methodic..
 
         private :new
       end  # >>

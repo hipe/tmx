@@ -25,6 +25,8 @@ module Skylab::GitViz
       ::DateTime
     end
 
+    Fields = sidesys[ :Fields ]
+
     Grit = _memoize do
       require 'grit'
       ::Grit

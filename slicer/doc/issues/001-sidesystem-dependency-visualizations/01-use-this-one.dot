@@ -5,6 +5,7 @@ digraph {
   b2 [ label="BNF2Treetop" ]
   br [ label="Brazen" ]
   ca [ label="Callback" ]
+  cm [ label="CodeMetrics" ]
   cc [ label="CSS_Convert" ]
   cu [ label="Cull" ]
   fi [ label="Fields" ]
@@ -16,6 +17,7 @@ digraph {
   pa [ label="Parse" ]
   pe [ label="Permute" ]
   pl [ label="Plugin" ]
+  sa [ label="SearchAndReplace" ]
   sl [ label="Slicer" ]
   sn [ label="Snag" ]
   st [ label="SubTree" ]
@@ -26,16 +28,16 @@ digraph {
   tr [ label="Treemap" ]
   y2 [ label="Yacc2Treetop" ]
   ze [ label="Zerk" ]
-  cme [ label="CodeMetrics" ]
-  cmo [ label="CodeMolester" ]
   tm [ label="TanMan" ]
   tmx [ label="TMX" ]
   ac -> ba
   ac -> br
   ac -> fi
+  ac -> hu
   ac -> sy
   ba -> ac
   ba -> br
+  ba -> fi
   ba -> hu
   ba -> pa
   ba -> pl
@@ -46,6 +48,7 @@ digraph {
   bs -> st
   bs -> sy
   bs -> ze
+  br -> ac
   br -> ba
   br -> fi
   br -> hu
@@ -60,18 +63,12 @@ digraph {
   ca -> pl
   ca -> sy
   ca -> ts
-  cme -> br
-  cme -> ba
-  cme -> hu
-  cme -> pa
-  cme -> sy
-  cme -> ts
-  cmo -> ba
-  cmo -> br
-  cmo -> hu
-  cmo -> pa
-  cmo -> pl
-  cmo -> sy
+  cm -> br
+  cm -> ba
+  cm -> hu
+  cm -> pa
+  cm -> sy
+  cm -> ts
   cc -> ba
   cc -> br
   cc -> fi
@@ -81,12 +78,14 @@ digraph {
   cc -> y2
   cu -> ba
   cu -> br
+  cu -> fi
   cu -> sy
   fi -> ba
   fi -> br
   fi -> hu
   fi -> pl
   f2 -> ba
+  f2 -> fi
   f2 -> br
   f2 -> sy
   gi -> ba
@@ -97,39 +96,53 @@ digraph {
   gi -> sy
   gv -> br
   gv -> ba
+  gv -> fi
   gv -> hu
   gv -> pl
   gv -> sy
   hu -> ac
   hu -> ba
   hu -> br
+  hu -> fi
   hu -> pa
   hu -> pl
   my -> ac
   my -> ba
+  my -> br
   my -> sy
+  my -> ze
   pe -> ba
   pe -> br
   pl -> ba
   pl -> br
+  pl -> fi
   pl -> pa
+  sa -> ac
+  sa -> ba
+  sa -> br
+  sa -> fi
+  sa -> sy
+  sa -> ze
   sl -> ba
   sl -> ta
   sl -> tmx
   sn -> ac
   sn -> ba
+  sn -> fi
   sn -> br
   sn -> hu
   sn -> pa
   sn -> sy
   st -> ba
   st -> br
+  st -> fi
   st -> hu
   st -> sy
   st -> ts
   sy -> ac
   sy -> ba
   sy -> br
+  sy -> fi
   sy -> hu
   sy -> pa
   sy -> pl
@@ -144,7 +157,6 @@ digraph {
   ta -> fi
   te -> ba
   te -> br
-  te -> cmo
   te -> ta
   te -> sy
   ts -> ba
@@ -163,7 +175,10 @@ digraph {
   tr -> ba
   tr -> br
   tr -> sy
+  ze -> ac
   ze -> ba
   ze -> br
+  ze -> fi
+  ze -> hu
   ze -> sy
 }

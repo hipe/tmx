@@ -3,12 +3,14 @@ module Skylab::Snag
   class Models_::Node_Collection
 
     Actors_ = ::Module.new
-    class Actors_::Find_reappropriablest_node
+    class Actors_::Find_reappropriablest_node < Callback_::Actor::Monadic
 
       # as an exercise we are sticking as close as is reasonable to a line-
       # by line transformation of the relevant "proto-sudocode" in [#038]
 
-      Callback_::Actor.call self, :properties, :node_upstream
+      def initialize nu
+        @node_upstream = nu
+      end
 
       def execute
 

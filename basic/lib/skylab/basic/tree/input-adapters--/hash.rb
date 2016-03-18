@@ -2,11 +2,11 @@ module Skylab::Basic
 
   module Tree
 
-    class Input_Adapters__::Hash
+    class Input_Adapters__::Hash < Callback_::Actor::Monadic
 
-      Callback_::Actor.call self, :properties,
-
-        :upstream_x
+      def initialize x
+        @upstream_x = x
+      end
 
       def execute
 

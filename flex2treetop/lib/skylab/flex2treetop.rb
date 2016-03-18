@@ -434,8 +434,8 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   Home_ = self
 
-  Attributes_actor_ = -> mod, h=nil do
-    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
   Deferred_actor__ = -> p do  # why deferred? [#.B]

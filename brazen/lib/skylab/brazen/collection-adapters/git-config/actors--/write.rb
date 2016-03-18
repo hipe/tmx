@@ -4,12 +4,12 @@ module Skylab::Brazen
 
     class Actors__::Write
 
-      Callback_::Actor.call self, :properties,
-
+      Attributes_actor_.call( self,
         :downstream_IO,
         :assignment_scan,
         :subsection_name,
-        :section_name
+        :section_name,
+      )
 
       def execute
         ok = resolve_section

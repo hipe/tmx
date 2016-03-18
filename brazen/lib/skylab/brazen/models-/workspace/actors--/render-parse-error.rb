@@ -4,7 +4,12 @@ module Skylab::Brazen
 
     class Actors__::Render_parse_error
 
-      Actor_[ self, :properties, :y, :ev, :expag ]
+      Attributes_actor_.call( self,
+        :properties,
+        :y,
+        :ev,
+        :expag,
+      )
 
       def execute
 

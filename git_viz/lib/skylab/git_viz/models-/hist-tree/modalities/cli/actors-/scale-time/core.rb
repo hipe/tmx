@@ -8,14 +8,14 @@ module Skylab::GitViz
 
       class Actors_::Scale_time  # algorithm in [#029]
 
-        Callback_::Actor.call self, :properties,
-
+        Attributes_actor_.call( self,
           :column_B_rows,
           :column_A_max_width,
           :column_A,
           :width,
           :glyph_mapper,
-          :text_downstream
+          :text_downstream,
+        )
 
         def execute
 

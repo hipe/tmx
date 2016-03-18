@@ -4,10 +4,15 @@ module Skylab::Cull
 
     class Actors__::Edit_associated_entities
 
-      Callback_::Actor.call self, :properties,
+      Attributes_actor_ = -> cls, * a do
+        Home_.lib_.fields::Attributes::Actor.via cls, a
+      end
+
+      Attributes_actor_.call( self,
         :passed_arg_a,
         :arg_box,
-        :survey
+        :survey,
+      )
 
       def execute
         ok = ACHIEVED_

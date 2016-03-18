@@ -8,10 +8,11 @@ module Skylab::Brazen
 
     class Actors__::Retrieve < Git_Config_Actor_
 
-      Actor_.call self, :properties,
+      Attributes_actor_.call( self,
         :entity_identifier,
         :document,
-        :kernel
+        :kernel,
+      )
 
       def execute
         ok = via_entity_identifier_resolve_subsection_id
@@ -22,10 +23,15 @@ module Skylab::Brazen
 
     class Actors__::Build_stream < Git_Config_Actor_
 
-      Actor_.call self, :properties,
+      Attributes_actor_.call( self,
         :model_class,
         :document,
-        :kernel
+        :kernel,
+      )
+
+      def initialize & p
+        @on_event_selectively = p
+      end
 
       def execute
         rslv_subsection_name_query

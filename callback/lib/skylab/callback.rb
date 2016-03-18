@@ -69,204 +69,6 @@ module Skylab::Callback
         private :new
       end  # >>
     end
-
-    class << self
-
-      def [] cls, * i_a
-        edit_module_via_mutable_iambic cls, i_a
-      end
-
-      def call cls, * i_a
-        edit_module_via_mutable_iambic cls, i_a
-      end
-
-      def edit_module_via_mutable_iambic cls, i_a
-
-        cls.extend MM___
-        cls.include self
-
-        while i_a.length.nonzero?
-          case i_a.first
-          when :properties
-            i_a.shift
-            __absorb_fields i_a, cls
-            break
-          else
-            raise ::ArgumentError, i_a.first
-          end
-        end ; nil
-      end
-
-    private
-
-      def __absorb_fields i_a, cls
-
-        bx = cls.__formal_fields_ivar_box_for_write
-
-        d = -1 ; last = i_a.length - 1
-
-        while d < last
-          sym = i_a.fetch d += 1
-          bx.add sym, :"@#{ sym }"
-        end
-      end
-    end
-
-    BX_ = :ACTOR_PROPERTY_BOX___
-
-    module Call_Methods_
-
-      def [] * a, & oes_p
-        call_via_arglist a, & oes_p
-      end
-
-      def call * a, & oes_p
-        call_via_arglist a, & oes_p
-      end
-
-      def with * x_a, & oes_p  # :+[#bs-028] reserved method name
-        call_via_iambic x_a, & oes_p
-      end
-
-      def call_via_arglist a, & oes_p
-        new do
-          @on_event_selectively ||= oes_p
-          process_arglist_fully a
-        end.execute
-      end
-
-      def call_via_iambic x_a, & oes_p
-        new do
-          @on_event_selectively ||= oes_p
-          process_iambic_fully x_a
-        end.execute
-      end
-
-      def backwards_curry
-        -> * xx_a do
-          new do
-            _init_instance_as_curry
-            process_arglist_fully_as_rcurry_ xx_a
-          end
-        end
-      end
-
-      def curry_with * x_a, & oes_p
-        new do
-          oes_p and @on_event_selectively ||= oes_p
-          _init_instance_as_curry
-          process_iambic_fully_as_curry_ x_a
-        end
-      end
-
-      def new_via_polymorphic_stream_passively st
-        new do
-          bx = formal_fields_ivar_box_for_read_
-          begin
-            ivar = bx.fetch st.current_token do end
-            ivar or break
-            st.advance_one
-            instance_variable_set ivar, st.gets_one
-            if st.no_unparsed_exists
-              break
-            end
-            redo
-          end while nil
-        end
-      end
-    end
-
-    module MM___
-
-      include Call_Methods_
-
-      def members
-        const_get( BX_ ).get_names
-      end
-
-      def __formal_fields_ivar_box_for_write
-        if const_defined? BX_
-          if const_defined? BX_, false
-            self._COVER_ME  # re-opening. should be ok, but we never do it
-            const_get BX_, false
-          else
-            const_set BX_, const_get( BX_ ).dup
-          end
-        else
-          const_set BX_, Box.new
-        end
-      end
-    end
-
-    def initialize & edit_p
-      super( & nil )
-      if edit_p
-        instance_exec( & edit_p )
-      end
-    end
-
-  private
-
-    def _init_instance_as_curry
-
-      _REMAINDER_BOX = formal_fields_ivar_box_for_read_.dup
-
-      define_singleton_method :remainder_box_ do
-        _REMAINDER_BOX
-      end
-      extend Actor::Curried__::Instance_Methods
-      nil
-    end
-
-    def process_arglist_fully a
-      bx = formal_fields_ivar_box_for_read_
-      a.length.times do |d|
-        instance_variable_set bx.at_position( d ), a.fetch( d )
-      end
-      NIL_
-    end
-
-    def process_iambic_fully x_a
-
-      bx = formal_fields_ivar_box_for_read_
-
-      x_a.each_slice 2 do |i, x|
-        instance_variable_set bx.fetch( i ), x
-      end
-
-      NIL_
-    end
-
-    def process_polymorphic_stream_fully st
-      bx = formal_fields_ivar_box_for_read_
-      while st.unparsed_exists
-        instance_variable_set bx.fetch( st.gets_one ), st.gets_one
-      end
-      KEEP_PARSING_
-    end
-
-    def process_iambic_passively x_a
-      process_polymorphic_stream_passively polymorphic_stream_via_iambic x_a
-    end
-
-    def process_polymorphic_stream_passively st
-      bx = formal_fields_ivar_box_for_read_
-      while st.unparsed_exists
-        ivar = bx[ st.current_token ]
-        ivar or break
-        st.advance_one
-        instance_variable_set ivar, st.gets_one
-      end
-      KEEP_PARSING_  # we never fail softly
-    end
-
-    def polymorphic_stream_via_iambic x_a
-      Polymorphic_Stream.via_array x_a
-    end
-
-    def formal_fields_ivar_box_for_read_
-      self.class.const_get BX_
-    end
   end
 
   Home_ = self
@@ -430,10 +232,10 @@ module Skylab::Callback
     # ~ ..given a position
 
     def at_position d
-      @h.fetch name_at_position_ d
+      @h.fetch name_at_position d
     end
 
-    def name_at_position_ d
+    def name_at_position d
       @a.fetch d
     end
 
@@ -476,7 +278,7 @@ module Skylab::Callback
     end
 
     def algorithms  # bridge to legacy
-      @_alogrithms ||= Box::Algorithms__.new( @a, @h, self )
+      @_algorithms ||= Box::Algorithms__.new( @a, @h, self )
     end
 
     # ~ ..of names
@@ -568,7 +370,7 @@ module Skylab::Callback
     end
   end
 
-  class Polymorphic_Stream  # see [#046]
+  class Polymorphic_Stream  # mentor :[#fi-034]
 
     class << self
 
@@ -1520,13 +1322,13 @@ module Skylab::Callback
             # [#032] document why & when this gets here (e.g via the [sg] client)
           else
             # when dir exists but no file, WTF
-            x.__set_entry_tree np
+            x.___set_entry_tree np
           end
         end
         NIL_
       end
 
-    protected def __set_entry_tree x
+      def ___set_entry_tree x
         entry_tree_is_known_is_known_ and self._SANITY
         @entry_tree_is_known_is_known_ = true
         @any_built_entry_tree_ = x ; nil
@@ -2713,6 +2515,10 @@ module Skylab::Callback
 
   # -- done
 
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
   Const_value_via_parts = -> x_a do  # :+[#ba-034]
     x_a.reduce ::Object do |mod, x|
       mod.const_get x, false
@@ -2802,9 +2608,7 @@ module Skylab::Callback
         if x_a.length.zero?
           Home_::Scn__::Multi_Step__
         else
-          Home_::Scn__::Multi_Step__.new do
-            process_iambic_fully x_a
-          end
+          Home_::Scn__::Multi_Step__.new_via_iambic x_a
         end
       end
 

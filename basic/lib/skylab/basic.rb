@@ -218,8 +218,8 @@ module Skylab::Basic  # introduction at [#020]
     NIL_
   end
 
-  Attributes_actor_ = -> mod, h=nil do
-    Home_.lib_.fields::Attributes::Actor[ mod, h ]
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
   ACHIEVED_ = true

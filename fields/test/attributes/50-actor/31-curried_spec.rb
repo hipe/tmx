@@ -1,65 +1,84 @@
-require_relative 'test-support'
+require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport::Actor
+module Skylab::Fields::TestSupport
 
-  describe "[ca] actor" do
+  TS_.require_ :attributes_actor  # #[#017]
+  module Attributes::Actor
 
-    before :all do
+    TS_.describe "[fi] attributes - actor - curried" do
 
-      class Make_sandwich
+      TS_[ self ]
+      use :memoizer_methods
+      Here_[ self ]
 
-        Subject_[].call self, :properties,
-          :top_slice,
-          :inside,
-          :bottom_slice
+      context "(context 1)" do
 
-        def initialize
-          @bottom_slice = @top_slice = nil
-          super
+        shared_subject :_class do
+
+          class X_Curried_A
+
+            Subject_proc_[].call( self,
+              :top_slice,
+              :inside,
+              :bottom_slice,
+            )
+
+            def initialize
+              # @top_slice = nil
+              # @bottom_slice = nil
+            end
+
+            def execute
+              @_number_of_times ||= 0
+              @_number_of_times += 1
+              [ @top_slice, @inside, @bottom_slice ]
+            end
+
+            attr_reader :_number_of_times
+
+            self
+          end
         end
 
-        def execute
-          @_number_of_times ||= 0
-          @_number_of_times += 1
-          [ @top_slice, @inside, @bottom_slice ]
+        shared_subject :_curried_actor do
+
+          o =  _class.curry_with :inside, :Pastrami
+          # X_Curried_B_Make_pastrami_sandwich = o  # it's not a class
+          o
         end
 
-        attr_reader :_number_of_times
-      end
+        it "the curried actor executes when given iambic arguments" do
 
-      Make_pastrami_sandwich = Make_sandwich.curry_with :inside, :Pastrami
+          ca = _curried_actor
 
-    end
+          _ = ca.with :top_slice, :A, :bottom_slice, :B
 
-    context "`curry_with`" do
+          _.should eql [ :A, :Pastrami, :B ]
 
-      it "the curried actor executes when given iambic arguments" do
+          ca._number_of_times.nil? or fail
+        end
 
-        Make_pastrami_sandwich.with( :top_slice, :A, :bottom_slice, :B ).
-          should eql [ :A, :Pastrami, :B ]
+        it "and this weird thing with positional args" do
 
-        Make_pastrami_sandwich._number_of_times.should be_nil
+          ca = _curried_actor
 
-      end
+          _ = ca[ :A_, :B_ ]
 
-      it "and this weird thing with positional args" do
+          _.should eql [ :A_, :Pastrami, :B_ ]
 
-        Make_pastrami_sandwich[ :A_, :B_ ].should eql [ :A_, :Pastrami, :B_ ]
+          ca._number_of_times.nil? or fail
+        end
 
-        Make_pastrami_sandwich._number_of_times.should be_nil
-      end
-    end
+        it "`backwards_curry`" do
 
-    context "`backwards_curry`" do
+          ca = _class.backwards_curry[ :wheat ]
 
-      it "minimal" do
+          _ = ca.call :sourdough, :tofu
 
-        curried = Make_sandwich.backwards_curry[ :wheat ]
+          _.should eql [ :sourdough, :tofu, :wheat ]
 
-        curried.call( :sourdough, :tofu ).should eql [ :sourdough, :tofu, :wheat ]
-
-        curried._number_of_times.should be_nil
-
+          ca._number_of_times.nil? or fail
+        end
       end
     end
   end
