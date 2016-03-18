@@ -20,13 +20,13 @@ significant efforts at libraries dealing with modeling
 
     [#tm-081] the "config shell" (working title) (lost)       2013-10-11 WAS
 
-    [#ba-030] the basic struct                                2013-07-21 WIP <- [ca], [ba]
+    [#ba-030] the basic struct                                2013-07-21 WAS
 
      [#br-058] Home_ DSL --> "contoured fields" --> [br]      2013-07-18 HMM <-
 
-       [#004] basic fields                                    2013-07-05 WIP <- NOT USED ANYWHERE (feature island)
+       [#004] basic fields                                    2013-07-05 WAS
 
-    [#ba-003] the basic field                                 2013-04-11 WIP <- (heavily by [cm]. has lots of history)
+    [#ba-003] the basic field                                 2013-04-11 NOW <- (heavily by [cm]. has lots of history)
 
        [#009] the headless parameter (assim'd into [#002]     2012-08-29 WAS
 
@@ -34,10 +34,8 @@ significant efforts at libraries dealing with modeling
 
 
 PUNCHLIST:
-  • sunset [#004] basic fields
   • survey & assimilate [#ba-003] the basic field - become home for `N_Meta`
   • survey [#br-058] property stacks
-  • [ba] struct is quite light. how is it used?
   • actors
 
 

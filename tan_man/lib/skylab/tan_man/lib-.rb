@@ -6,10 +6,6 @@ module Skylab::TanMan
 
     Basic = sidesys[ :Basic ]
 
-    Basic_struct = -> * i_a, & p do
-      Basic[]::Struct.make_via_arglist i_a, & p
-    end
-
     # = sidesys[ :Brazen ]  # for [sl]
 
     Dev_tmpdir_path = -> do

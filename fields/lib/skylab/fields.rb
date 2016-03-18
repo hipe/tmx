@@ -23,9 +23,14 @@ module Skylab::Fields
   class Attributes < ::Module
 
     class << self
+
       alias_method :[], :new
       alias_method :call, :new
       undef_method :new
+
+      def struct_class
+        const_get :Struct, false  # because there is a toplevel such name, and etc
+      end
     end  # >>
 
     def initialize h

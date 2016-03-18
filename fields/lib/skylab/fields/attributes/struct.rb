@@ -1,6 +1,11 @@
-module Skylab::Basic
+module Skylab::Fields
 
-  module Struct  # [#030].
+  class Attributes
+    # <-
+  module Struct  # [#006].
+
+    # (this is in effect a #feature-island because its only client is
+    # [ba] class/module creator and that thing is to be sunsetted..)
 
     # (if you are looking for guys that generate structs from lists of
     # names, [#sy-028] has the latest..)
@@ -152,7 +157,7 @@ module Skylab::Basic
       # CAVEAT - we might change the below to reader / writer calls rather than ivar accessions
 
       def to_a
-        mmbrs.map( & method( :[] ) )
+        _members.map( & method( :[] ) )
       end
 
       def to_json state=nil
@@ -173,7 +178,7 @@ module Skylab::Basic
 
       def each_pair
         if block_given?
-          mmbrs.each do |i|
+          _members.each do |i|
             yield [ i, self[ i ] ]
           end ; nil
         else
@@ -185,7 +190,7 @@ module Skylab::Basic
         self.class.members
       end
 
-      private def mmbrs
+      def _members
         __basic_struct_box__.send :a
       end
 
@@ -213,5 +218,7 @@ module Skylab::Basic
 
     THE_EMPTY_STRUCT__ = new.freeze
 
+  end
+# ->
   end
 end

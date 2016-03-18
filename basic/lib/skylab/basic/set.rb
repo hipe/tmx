@@ -286,7 +286,7 @@ module Skylab::Basic
 
       class Memberhood_Unit_of_Work__
 
-        # "memberhood" the made-up term is tracke by [#ba-030.A]
+        # "memberhood" the made-up term is tracked by [#fi-006]:A
 
         def replace k, x=nil
           @ivar = nil ; @k = k ; @writer_i = :"#{ k }=" ; @x = x ; nil

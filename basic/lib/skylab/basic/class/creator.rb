@@ -67,7 +67,7 @@ module Skylab::Basic
       [create, update]
     end
 
-    K = Home_::Struct.via_hash o
+    K = Home_.lib_.fields::Attributes.struct_class.via_hash o
 
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.

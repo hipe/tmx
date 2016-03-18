@@ -80,7 +80,8 @@
 
 [#007]       [ SESSION PATTERN ]
 
-[#006] #hole ( #was: old reference code from [ta] for for retrospective )
+[#006]       [ struct ]
+             ( #was: old reference code from [ta] for for retrospective )
 
 [#005]       [ from ]
 
