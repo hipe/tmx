@@ -22,7 +22,7 @@ significant efforts at libraries dealing with modeling
 
     [#ba-030] the basic struct                                2013-07-21 WAS
 
-     [#br-058] Home_ DSL --> "contoured fields" --> [br]      2013-07-18 HMM <-
+     [#br-058] Home_ DSL --> "contoured fields" --> [br]      2013-07-18 WAS
 
        [#004] basic fields                                    2013-07-05 WAS
 
@@ -34,7 +34,6 @@ significant efforts at libraries dealing with modeling
 
 
 PUNCHLIST:
-  • [#008]
   • actors
 
 
