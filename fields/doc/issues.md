@@ -80,7 +80,7 @@
 
 [#007]       [ SESSION PATTERN ]
 
-[#006]       old reference code from [ta] for for retrospective ..
+[#006] #hole ( #was: old reference code from [ta] for for retrospective )
 
 [#005]       [ from ]
 

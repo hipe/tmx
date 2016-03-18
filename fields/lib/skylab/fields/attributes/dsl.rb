@@ -167,7 +167,7 @@ module Skylab::Fields
         end
       end
 
-      class Meta_Attribute___ < Here_::Lib::DefinedAttribute
+      class Meta_Attribute___ < Here_::DefinedAttribute
         # (hi.)
       end
     end

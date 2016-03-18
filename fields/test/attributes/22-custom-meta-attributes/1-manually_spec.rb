@@ -21,7 +21,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_cls do
 
-          class X_CMAE_Attr < Subject_module_[]::Lib::DefinedAttribute
+          class X_CMAE_Attr < Subject_module_[]::DefinedAttribute
             # oh. nothing, i guess
 
             def __hello

@@ -106,7 +106,7 @@ module Skylab::Fields
     def ___build_index
       Here_::Lib::Index_of_Definition___.new( @_h,
         ( @meta_attributes || Here_::MetaAttributes ),
-        ( @attribute_class || Here_::Lib::DefinedAttribute ),
+        ( @attribute_class || Here_::DefinedAttribute ),
       )
     end
 

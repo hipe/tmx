@@ -30,11 +30,10 @@ significant efforts at libraries dealing with modeling
 
        [#009] the headless parameter (assim'd into [#002]     2012-08-29 WAS
 
-       [#002] metahell formal attribute (assim'd to here)     2011-09-11 WIP <=
+       [#002] metahell formal attribute (assim'd to here)     2011-09-11 WAS
 
 
 PUNCHLIST:
-  • assimilate "attribute" (now). become home for attribute base class.
   • sunset [#004] basic fields
   • survey & assimilate [#ba-003] the basic field - become home for `N_Meta`
   • survey [#br-058] property stacks
