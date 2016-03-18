@@ -5,8 +5,8 @@ module Skylab::TaskExamples
 
     depends_on_parameters(
 
-      build_dir: [ :flag, :_from_context ],
-      dry_run: [ :_from_context, :optional ],
+      build_dir: :_from_context,
+      dry_run: [ :flag, :_from_context, :optional ],
       from: :optional,
       get: nil,
     )
@@ -20,7 +20,7 @@ module Skylab::TaskExamples
 
     def ___execute_units_of_work
 
-      if @_units_of_work.length.zero?
+      if @units_of_work.length.zero?
         self._COVER_ME_nothing_to_do
       else
         ___execute_nonzero_units_of_work
@@ -33,7 +33,7 @@ module Skylab::TaskExamples
       @_shellescape = Home_::Library_::Shellwords.method :shellescape
 
       ok = ACHIEVED_
-      @_units_of_work.each do |unit|
+      @units_of_work.each do |unit|
         ok_ = ___execute_unit unit
         if ! ok_
           ok = false
@@ -103,7 +103,7 @@ module Skylab::TaskExamples
         end
       end
 
-      @_units_of_work = unit_a ; nil
+      @units_of_work = unit_a ; nil
     end
 
     def ___unit_does_procure unit
@@ -161,6 +161,10 @@ module Skylab::TaskExamples
       end
       NIL_
     end
+
+    attr_reader(
+      :units_of_work,
+    )
 
     NO_ = false
     Unit___ = ::Struct.new :url, :destination_path

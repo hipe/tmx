@@ -2,68 +2,77 @@ require_relative '../test-support'
 
 module Skylab::TaskExamples::TestSupport
 
-  describe "[te] task-types - tarball to", wip: true do
+  describe "[te] task-types - tarball to" do
+
+    # #significance: the first "real world" use of the "synthesis" dependency
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_event
     use :task_types
 
     def subject_class_
       Task_types_[]::TarballTo
     end
 
-    context "with bad build args" do
+    context "essential" do
 
-      it "throws an exception about what it needs" do
+      shared_state_
 
-        _rx = /missing required attributes:? from, tarball_to/
+      it "loads" do
+        subject_class_
+      end
 
-        expect_strong_failure_with_message_ _rx
+      it "missung requireds" do
+        expect_missing_required_attributes_are_(
+          :build_dir, :filesystem, :tarball_to, :url )
       end
 
       def build_arguments_
-        NOTHING_
+        EMPTY_A_
       end
     end
 
-    context "with good build args (no interpolation)" do
+    context "with good build args" do
 
       shared_state_
+
+      def build_arguments_
+
+        # run_file_server_if_not_running_  # NOTE etc
+
+        build_dir = BUILD_DIR
+        _tarball_to = ::File.join build_dir, 'ohai'
+        _URL = 'http://localhost:1324/mginy-0.0.1.tar.gz'
+
+        [
+          :build_dir, build_dir,
+          :filesystem, real_filesystem_,
+          :tarball_to, _tarball_to,
+          :url, _URL,
+        ]
+      end
 
       it "succeeds" do
         succeeds_
       end
 
+      it "moved file" do
+        state_
+        _hi = ::File.join BUILD_DIR, 'ohai'
+        file_exists_ _hi or fail
+      end
+
       it "expresses" do
-        expect_only_ :shell, /curl -o.*tar\.gz.*tar\.gz/
+
+        _be_msg = match %r(\Amv [^ ]+tar\.gz [^ ]+/ohai\z)
+
+        _be_this = be_emission_ending_with :fake_shell do |y|
+          y.fetch( 0 ).should _be_msg
+        end
+
+        last_emission.should _be_this
       end
-
-      def before_execution_
-
-        run_file_server_if_not_running_
-        prepare_build_directory_
-        NIL_
-      end
-
-      def _tarball_to
-        ::File.join BUILD_DIR, 'ohai'
-      end
-
-      _URL = 'http://localhost:1324/mginy-0.0.1.tar.gz'.freeze
-
-      define_method :build_arguments_ do
-        [
-          :from, _URL,
-          :tarball_to, _tarball_to,
-        ]
-      end
-    end
-
-    h = nil
-    define_method :context_ do
-      h ||= {
-        build_dir: BUILD_DIR,
-      }.freeze
     end
   end
 end
