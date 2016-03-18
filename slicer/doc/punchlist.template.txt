@@ -49,7 +49,6 @@ git                 q [ ]
 
 test_support        q [ ]
 sub_tree            q [ ]
-code_molester       q [ ]
 system              q [ ]
 zerk                q [ ]
 human               q [ ]

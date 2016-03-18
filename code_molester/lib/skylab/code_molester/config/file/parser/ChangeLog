@@ -1,8 +1,0 @@
-Sun Apr 14 05:28:00 2013
-
-  * VERSION (VERSION): Changed from 0.1.0 to 0.1.1. Assignment names may now
-    contain dashes ('-').
-
-Sun Apr 14 05:16:45 2013
-
-  * VERSION (VERSION): Changed from (none) to 0.1.0. is the first version.

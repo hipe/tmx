@@ -56,7 +56,7 @@
 [#015] #open this tracks the rewrite (nodes waiting on it)
              #doc-node the doc-test narrative ..
 [#014]       #parent-node: [#015] how nodes are generated ..
-[#013]       #historical #done #inquiry-point choke point etc
+[#013] #hole ( #was: #historical #done #inquiry-point choke point etc )
                (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
 [#012]       #doc-point #in-situ (the particular importance of result values)

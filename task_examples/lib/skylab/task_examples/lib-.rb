@@ -8,8 +8,6 @@ module Skylab::TaskExamples
 
     Brazen = sidesys[ :Brazen ]
 
-    CodeMolester__ = sidesys[ :CodeMolester ]
-
     Home_dir_pn = -> do
       System_lib___[].services.environment.any_home_directory_pathname
     end

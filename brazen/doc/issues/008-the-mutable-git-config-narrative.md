@@ -4,7 +4,7 @@
 ## introduction
 
 this is a rewrite and intended replacement for the stuff near (but not
-at) [#cm-005] code molester's config file.
+at) [#!cm-005] code molester's config file.
 
 (the introduction in the parent document node to this node is also
 relevant here.)

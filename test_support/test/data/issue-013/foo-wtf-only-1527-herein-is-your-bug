@@ -1,4 +1,0 @@
-./test/all yacc2treetop test-support basic treemap semantic cov-tree git-stash-untracked
-./test/all git-stash-untracked my-tree bnf2treetop face code-molester file-metrics slake
-./test/all permute treetop-tools tan-man headless snag tmx dependency
-./test/all slicer flex2treetop information-tactics beauty-salon css-convert porcelain cull
