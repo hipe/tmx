@@ -115,7 +115,7 @@ module Skylab::TaskExamples::TestSupport
 
     def _mkdir_p_where_two_directories_would_have_to_be_created
 
-      _ = TestSupport_::Fixtures.dir :empty_esque_directory
+      _ = the_empty_directory_
       ::File.join _, 'foo/bar'
     end
   end

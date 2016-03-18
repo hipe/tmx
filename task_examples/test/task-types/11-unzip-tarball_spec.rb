@@ -96,7 +96,7 @@ module Skylab::TaskExamples::TestSupport
         shared_state_
 
         def _build_dir
-          TestSupport_::Fixtures.dir :empty_esque_directory
+          the_empty_directory_
         end
 
         def _unzip_tarball

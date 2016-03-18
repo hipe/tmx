@@ -1,80 +1,169 @@
-require 'net/http'
 
 module Skylab::TaskExamples
 
-  class TaskTypes::Get < Home_::Task
+  class TaskTypes::Get < Common_task_[]
 
-    include Home_.lib_.path_tools.instance_methods_module
+    depends_on_parameters(
 
-    attribute :from
-    attribute :get, :required => true
+      build_dir: [ :flag, :_from_context ],
+      dry_run: [ :_from_context, :optional ],
+      from: :optional,
+      get: nil,
+    )
 
-    attribute :build_dir, :required => true, :from_context => true
-    attribute :dry_run, :boolean => true, :from_context => true
+    def execute
 
-    listeners_digraph :all,
-      :info => :all,
-      :error => :all,
-      :shell => :all,
-      :stdout => :all,
-      :stderr => :all
-
-    def bytes path
-      ::File.stat(path).size if ::File.exist?(path)
+      __normalize_from_and_get
+      __init_units_of_work
+      ___execute_units_of_work
     end
 
-    def execute args
-      @context ||= (args[:context] || {})
-      valid? or raise(invalid_reason)
-      workunits = []
-      pairs.each do |from_url, to_file|
-        case self.bytes( to_file )
-        when nil
-          workunits.push [from_url, to_file]
-        when 0
-          call_digraph_listeners :info, "had zero byte file (strange), overwriting: #{pretty_path to_file}"
-          workunits.push [from_url, to_file]
-        else
-          call_digraph_listeners :info, "assuming already downloaded b/c exists " <<
-            "(erase/move to re-download): #{pretty_path to_file}"
+    def ___execute_units_of_work
+
+      if @_units_of_work.length.zero?
+        self._COVER_ME_nothing_to_do
+      else
+        ___execute_nonzero_units_of_work
+      end
+    end
+
+    def ___execute_nonzero_units_of_work
+
+      require 'net/http'
+      @_shellescape = Home_::Library_::Shellwords.method :shellescape
+
+      ok = ACHIEVED_
+      @_units_of_work.each do |unit|
+        ok_ = ___execute_unit unit
+        if ! ok_
+          ok = false
         end
       end
-      ! workunits.map do |from_file, to_file|
-        curl_or_wget from_file, to_file
-      end.index{ |b| ! b }
+      ok
     end
 
-    def pairs
-      if @from.nil?
-        ::Pathname.new(@get).tap { |pn| @from = pn.dirname.to_s; @get = pn.basename.to_s }
-      end
-      get_these = @get.kind_of?(::Array)?  @get : [@get]
-      get_these.map do |tail|
-        [::File.join(@from, tail), ::File.join(build_dir, tail)]
-      end
-    end
+    def ___execute_unit unit
 
-    def curl_or_wget from_url, to_file
-      cmd = "curl -o #{escape_path(pretty_path to_file.to_s)} #{from_url}"
-      # cmd = "wget -O #{escape_path to_file} #{from_url}"
-      call_digraph_listeners(:shell, cmd)
-      uri = URI.parse(from_url)
-      response = nil
-      ::Net::HTTP.start(uri.host, uri.port) do |h|
-        req = ::Net::HTTP::Get.new(uri.request_uri)
-        response = h.request req
+      url, dest_path = unit.to_a
+
+      @_oes_p_.call :info, :expression, :fake_shell do |y|
+        _ = Home_::Library_::Shellwords.shellescape dest_path
+        y << "curl -o #{ _ } #{ url }"  # or "wget -O .."
       end
+
+      uri = ::URI.parse url
+
+      resp = ::Net::HTTP.start uri.host, uri.port do |nh|
+
+        _request = ::Net::HTTP::Get.new uri.request_uri
+        nh.request _request
+      end
+
       # the *only* distinguishing thing that adsf does in lieu of a 404 is
       # that it does not send a "last-modified" header (and writes a message in the body)
-      if response.to_hash.key?('last-modified')
-        ::File.open to_file, ::File::CREAT | ::File::WRONLY do |fh|
-          fh.write response.body
+
+      h = resp.to_hash
+      if h.key? THIS_KEY___
+        ::File.open dest_path, FLAGS___ do |fh|
+          fh.write resp.body
         end
-        true
+        ACHIEVED_
       else
-        call_digraph_listeners(:error, "File not found: #{from_url}")
-        false
+        ___when_etc h, unit
+        UNABLE_
       end
     end
+
+    FLAGS___ = ::File::CREAT | ::File::WRONLY
+    THIS_KEY___ = 'last-modified'
+
+    def ___when_etc h, unit
+      @_oes_p_.call :error, :expression, :"404" do |y|
+        y << "File not found: #{ unit.url }"  # look sort of like adsf
+      end
+    end
+
+    def __init_units_of_work
+
+      _tail_a = remove_instance_variable :@get
+      from = remove_instance_variable :@from
+      build_dir = @build_dir
+
+      unit_a = []
+
+      _tail_a.each do |tail|
+
+        _url = ::File.join from, tail
+        _destination_path = ::File.join build_dir, tail
+        unit = Unit___.new _url, _destination_path
+
+        _ok = ___unit_does_procure unit
+        if _ok
+          unit_a.push unit
+        end
+      end
+
+      @_units_of_work = unit_a ; nil
+    end
+
+    def ___unit_does_procure unit
+
+      begin
+        stat = ::File.stat unit.destination_path
+      rescue ::Errno::ENOENT
+      end
+
+      if stat
+        if stat.size.zero?
+          __express_zero_length_file unit
+          YES_  # overwrite empty files
+        else
+          ___express_nonzero_length_file unit
+          NO_  # don't overwrite a local version
+        end
+      else
+        YES_  # this is "normal" so don't report anything
+      end
+    end
+
+    def ___express_nonzero_length_file unit
+      @_oes_p.call :info, :expression, :wont_overwrite_file do |y|
+        y << "assuming already downloaded b/c exists #{
+          }(erase/move to re-download) - #{ pth unit.destination_path }"
+      end
+    end
+
+    def __express_zero_length_file unit
+      @_oes_p_.call :info, :expression, :overwriting_empty_file do |y|
+        y << "had zero byte file (strange), overwriting - #{
+          }#{ pth unit.destination_path }"
+      end
+    end
+
+    def __normalize_from_and_get
+      if @from
+        _when_from
+      else
+        ___when_no_from
+      end
+    end
+
+    def ___when_no_from
+      @from = ::File.dirname @get
+      @get = ::File.basename @get
+      _when_from
+    end
+
+    def _when_from
+
+      if ! ::Array.try_convert @get
+        @get = [ @get ]
+      end
+      NIL_
+    end
+
+    NO_ = false
+    Unit___ = ::Struct.new :url, :destination_path
+    YES_ = true
   end
 end

@@ -129,7 +129,8 @@ module Skylab::TaskExamples::TestSupport
   class LAZY_CONSTANTS___ < TestSupport_::Lazy_Constants
 
     def BUILD_DIR
-      ::File.join( TestLib_::System_tmpdir_path[], '[te]' ).freeze
+      # ::File.join TestLib_::System_tmpdir_path[], '[te]'
+      ::File.join TestLib_::Development_tmpdir_path[], '[te]'
     end
 
     def FIXTURES_DIR

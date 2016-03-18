@@ -141,7 +141,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def tmpdir_path_for_memoized_tmpdir
-        TestLib_::Development_tmpdir_path[]
+        ::File.dirname BUILD_DIR
       end
     end
 
@@ -153,7 +153,9 @@ module Skylab::TaskExamples::TestSupport
     Memoize_tmpdirer_and_etc_for___ = -> tc do
 
       _ = Home_.lib_.system.filesystem.tmpdir
-      tdr = _.memoizer_for tc, '[te]'
+      __ = ::File.basename TS_::BUILD_DIR
+
+      tdr = _.memoizer_for tc, __
       tdr.instance
     end
 
@@ -178,6 +180,10 @@ module Skylab::TaskExamples::TestSupport
 
       def other_existent_file_path_
         TestSupport_::Fixtures.file :three_lines
+      end
+
+      def the_empty_directory_
+        TestSupport_::Fixtures.dir :empty_esque_directory
       end
 
       def real_filesystem_
