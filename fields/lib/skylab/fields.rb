@@ -341,6 +341,26 @@ module Skylab::Fields
     end
   end
 
+  class Ivar_based_Store < ::BasicObject  # :[#027].
+
+    def initialize o
+      @_store = o
+    end
+
+    def set x, atr
+      @_store.instance_variable_set atr.as_ivar, x
+      NIL_
+    end
+
+    def knows atr
+      @_store.instance_variable_defined? atr.as_ivar
+    end
+
+    def retrieve atr
+      @_store.instance_variable_get atr.as_ivar
+    end
+  end
+
   # -- the external functions experiment ..
 
   # ~ description & name

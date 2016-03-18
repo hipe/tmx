@@ -1,3 +1,4 @@
+[#007]       (will annotate this example..)
 [#006] #open no more @name and `@name_symbol` - this is wrong namespace
 [#005]       in-situ reference to outside world (1st occurrence of s/thing)
 [#004] #open refactor to swap out F-ace::Open2 for  [hl] IO select

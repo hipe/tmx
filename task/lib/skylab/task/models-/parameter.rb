@@ -2,14 +2,42 @@ class Skylab::Task
 
   module Models_::Parameter
 
+    Parse = -> a do
+
+      # for now, we prefer the universality of [fi] attributes structure
+      # but we don't incur it as a dependency until it is needed.
+      # the DSL method could have been called multiple times, and at each
+      # call it could have been called with a glob of symbols or with a
+      # single hash. by merging all of these arguments into one box we
+      # a) normalize their shape while b) sanity checking the uniqueness
+      # of each name symbol.
+
+      intermediate_box = Callback_::Box.new  # catch name collisions
+
+      a.each do |args|
+
+        if 1 == args.length and ! args.fetch( 0 ).respond_to? :id2name
+          args.fetch( 0 ).each_pair do |k, x_|
+            intermediate_box.add k, x_
+          end
+        else
+          args.each do |sym|
+            intermediate_box.add sym, nil
+          end
+        end
+      end
+
+      Home_.lib_.fields::Attributes[ intermediate_box.h_ ]
+    end
+
     class Collection_as_Dependency
 
       # when de-referencing its sole custodian, this is the result: it
       # represents all the parameters that a particular node requires/
       # honors.
 
-      def initialize sym, a, & oes_p
-        @_a = a
+      def initialize sym, attrs, & oes_p
+        @_attrs = attrs
         @_name_symbol = sym
         @_oes_p = oes_p
       end
@@ -30,7 +58,7 @@ class Skylab::Task
       end
 
       def receive_dependency_completion o
-        instance_variable_set o.derived_ivar, o.task
+        instance_variable_set o.name_for_storing.as_ivar, o.task  # near [#fi-027] store
         NIL_
       end
 
@@ -52,11 +80,7 @@ class Skylab::Task
         #
         # SO we check if requireds are satisfied first, and then ..
 
-        _formals_box = ___flush_intermediate_box_via_etc
-
-        _attrs = Home_.lib_.fields::Attributes[ _formals_box.h_ ]
-
-        o = _attrs.begin_normalization( & @_oes_p )
+        o = @_attrs.begin_normalization( & @_oes_p )
 
         bx = @_PARAMETERS_.parameter_box  # can be nil
         if bx
@@ -70,31 +94,6 @@ class Skylab::Task
           @_normalization = o
         end
         ok
-      end
-
-      def ___flush_intermediate_box_via_etc
-
-        # the DSL method could have been called multiple times, and at each
-        # call it could have been called with a glob of symbols or with a
-        # single hash. by merging all of these arguments into one box we
-        # a) normalize their shape while b) sanity checking the uniqueness
-        # of each name symbol.
-
-        intermediate_box = Callback_::Box.new  # catch name collisions
-
-        remove_instance_variable( :@_a ).each do |args|
-
-          if 1 == args.length and ! args.fetch( 0 ).respond_to? :id2name
-            args.fetch( 0 ).each_pair do |k, x_|
-              intermediate_box.add k, x_
-            end
-          else
-            args.each do |sym|
-              intermediate_box.add sym, nil
-            end
-          end
-        end
-        intermediate_box
       end
 
       # ..then..
@@ -122,7 +121,7 @@ class Skylab::Task
 
         lu = o.lookup
         rs = o.store
-        ws = o.class::Ivar_based_Store.new dep
+        ws = Home_.lib_.fields::Ivar_based_Store.new dep
 
         req_a = o.requireds
         if req_a
@@ -168,6 +167,10 @@ class Skylab::Task
       def name_symbol
         @_name_symbol
       end
+
+      def synthies_
+        NOTHING_
+      end
     end
 
     class Parameters_Source_Proxy___
@@ -199,12 +202,15 @@ class Skylab::Task
         :parameter_box,
       )
 
-      def derived_ivar_
-        IVAR___
+      def name_symbol_for_storage_
+        MAGIC_SYMBOL__
+      end
+
+      def synthies_
+        NOTHING_
       end
     end
 
-    IVAR___  = :"@_PARAMETERS_"
     MAGIC_SYMBOL__ = :_PARAMETERS_
   end
 end

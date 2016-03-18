@@ -169,26 +169,6 @@ module Skylab::Fields
         end * SPACE_
       end
 
-      class Ivar_based_Store < ::BasicObject
-
-        def initialize o
-          @_store = o
-        end
-
-        def set x, atr
-          @_store.instance_variable_set atr.as_ivar, x
-          NIL_
-        end
-
-        def knows atr
-          @_store.instance_variable_defined? atr.as_ivar
-        end
-
-        def retrieve atr
-          @_store.instance_variable_get atr.as_ivar
-        end
-      end
-
       class Box_based_Store___ < ::BasicObject
 
         def initialize bx

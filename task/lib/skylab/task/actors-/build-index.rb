@@ -122,10 +122,8 @@ class Skylab::Task
 
       def finish
 
-        remove_instance_variable :@box_module
-
+        # remove_instance_variable :@box_module
         @dependants_on.default_proc = nil
-
         self
       end
 

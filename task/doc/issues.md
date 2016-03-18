@@ -1,3 +1,7 @@
+[#009]       this needs comparative analysis
+
+[#008]       synthesis dependencies..
+
 [#007]       for tracking - we have a circular dependency expression
              logic, so do areas marked with this tag.
 

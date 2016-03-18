@@ -1,3 +1,5 @@
+[#027]       [store]  (ivar-based, mostly)
+
 [#026] #open struct vs. actor - one is cold one is hot
 
 [#025]       #parent-node: [#002] "formal vs. actual attributes.."

@@ -16,11 +16,14 @@ class Skylab::Task
     end
   end  # >>
 
-     # ~ as class (code notes in [#003])
+  # this file is meant to contain all of the code necessary to load the
+  # definition of a task (that is, the task class and its use of the static
+  # dependency DSL); but none of the code used in resolving its dependencies
+  # or executing the task itself. code notes in [#008]. more about types of
+  # dependencies in [#008].
 
-     # this is a blind, 4 years later rewrite of our task library.
-     # it is not yet integrated with the legacy code
-
+  # - (the task base class *is* the toplevel node of this lib FOR NOW)
+    # -
       class << self
 
         def depends_on_parameters * x_a
@@ -38,8 +41,16 @@ class Skylab::Task
           NIL_
         end
 
+        def depends_on_call * x_a
+          __writable_synthesis_dependency_collection.__add_args x_a
+        end
+
+        def __writable_synthesis_dependency_collection
+          @__synthies ||= Unparsed_Synthesis_Dependency_Collection___.new
+        end
+
         def __writable_parameter_collection
-          @___wpc ||= begin
+          @__formal_parameter_collection ||= begin
             o = Unparsed_Parameter_Collection_as_Dependee_Reference___.new self
             _writable_dependee_references_collection._add o
             o
@@ -47,11 +58,13 @@ class Skylab::Task
         end
 
         def _writable_dependee_references_collection
-          @_dependee_references ||= References___.new
+          @_dependee_references ||= DependencyReferences___.new
         end
 
         attr_reader(
           :_dependee_references,
+          :__formal_parameter_collection,
+          :__synthies,
         )
 
         def _task_name
@@ -89,7 +102,6 @@ class Skylab::Task
           visit[ self ]
         end
       end
-      # ___to_dependee_stream_around index
 
       def ___dependee_references
         self.class._dependee_references
@@ -99,7 +111,7 @@ class Skylab::Task
 
         _st = dr.to_stream
         _st_ = _st.map_by do |dref|
-          dref.dereference_against_ index
+          dref._dereference_against index
         end
         _st_
       end
@@ -109,25 +121,33 @@ class Skylab::Task
         dc.task.visit_dependant_as_completed_ self, dc
       end
 
-      def visit_dependant_as_completed_ dep, dref
+      def visit_dependant_as_completed_ dep, dc
 
-        dep.receive_dependency_completion_value self, dref
+        dep.receive_dependency_completion_value_and_name_(
+          self, dc.name_for_storing )
       end
 
-      def receive_dependency_completion_value x, dc
+      def receive_dependency_completion_value_and_name_ x, name  # near [#fi-027]
 
-        instance_variable_set dc.derived_ivar, x
+        instance_variable_set name.as_ivar, x
         NIL_
       end
 
-      def derived_ivar_
-
-        @___derived_ivar ||= :"@#{ name.as_const }"  # ! .as_ivar (downcases)
+      def name_symbol_for_storage_
+        name.as_const
       end
 
       def add_parameter sym, x
         ( @_params ||= Callback_::Box.new ).add sym, x
         NIL_
+      end
+
+      def synthies_
+        self.class.__synthies
+      end
+
+      def formal_parameters__
+        self.class.__formal_parameter_collection
       end
 
       def name_symbol  # see #note-1 about these method names
@@ -137,77 +157,139 @@ class Skylab::Task
       def name
         self.class._task_name
       end
+    # -
+  # -
 
-      class References___
+  # -- when a task is completed
 
-        def initialize
-          @_a = []
-        end
+  class Dependency_Completion_  # a task receives its completed dependee thru
 
-        def _add o
-          @_a.push o ; nil
-        end
+    def initialize task
+      @task = task
+    end
 
-        # --
+    # (names not ivars so that depender tasks can use any kind of store)
 
-        def to_stream
-          Callback_::Stream.via_nonsparse_array @_a
-        end
+    def name_for_storing
+      @_NfS ||= ___derive_name_function
+    end
+
+    def ___derive_name_function
+      sym = @task.name_symbol_for_storage_
+      nf = Callback_::Name.via_variegated_symbol sym
+      nf.as_ivar = :"@#{ sym }"  # don't lowercase it, [#003]:#note-1
+      nf
+    end
+
+    attr_reader(
+      :task,
+    )
+  end
+
+  # -- shared support for converting a reference to a referrant
+
+  class Dereference_
+
+    def initialize sym, index
+      @sym = sym
+      @index = index
+    end
+
+    def to_task_
+
+      _cls = @index.box_module.const_get @sym, false
+
+      _cls.new( & @index.on_event_selectively )
+    end
+  end
+
+  # -- collections of un-parsed references to dependencies
+
+  class DependencyReferences___
+
+    def initialize
+      @_a = []
+    end
+
+    def _add o
+      @_a.push o ; nil
+    end
+
+    # --
+
+    def to_stream
+      Callback_::Stream.via_nonsparse_array @_a
+    end
+  end
+
+  class Unparsed_Synthesis_Dependency_Collection___
+
+    def initialize
+      @_a = []
+    end
+
+    def __add_args args
+      @_a.push args ; nil
+    end
+
+    def execute_task__ task, index
+      Home_::Synthesis_Dependencies___[ task, @_a, index ]
+    end
+  end
+
+  class Unparsed_Parameter_Collection_as_Dependee_Reference___
+
+    # subject is one-to-one with a task that has parameters in the
+    # *static*, formal graph. we generate a "unique" name which it
+    # will use etc..
+
+    def initialize cls
+      @_a = []
+      @_sym = :"_#{ cls._task_name.as_const }_Parameters_"
+    end
+
+    def __add_args args  # availability is volatile
+      @_a.push args ; nil
+    end
+
+    def _dereference_against index
+
+      index.cache_box.touch @_sym do
+        ___build_dereference index
       end
+    end
 
-      class Dependee_Reference_
+    def ___build_dereference index
 
-        def initialize sym
-          @sym = sym
-          freeze
-        end
+      _attrs = as_attributes_
+      _ = index.on_event_selectively
+      Models_::Parameter::Collection_as_Dependency.new @_sym, _attrs, & _
+    end
+
+    def as_attributes_
+      @___attrs ||= Models_::Parameter::Parse[ remove_instance_variable( :@_a ) ]
+    end
+  end
+
+  # -- unparsed references
+
+  class Dependee_Reference_
+
+    def initialize sym
+      @sym = sym
+      freeze
+    end
+  end
+
+  class User_Defined_Dependee_Reference___ < Dependee_Reference_
+
+    def _dereference_against index
+
+      index.cache_box.touch @sym do
+        Dereference_.new( @sym, index ).to_task_
       end
-
-      class Unparsed_Parameter_Collection_as_Dependee_Reference___
-
-        # subject is one-to-one with a task that has parameters in the
-        # *static*, formal graph. we generate a "unique" name which it
-        # will use etc..
-
-        def initialize cls
-          @_a = []
-          @_sym = :"_#{ cls._task_name.as_const }_Parameters_"
-        end
-
-        def __add_args args  # this method's availability is volatile
-          @_a.push args ; nil
-        end
-
-        def dereference_against_ index
-
-          index.cache_box.touch @_sym do
-            ___build_dereference index
-          end
-        end
-
-        def ___build_dereference index
-
-          _ = index.on_event_selectively
-          Models_::Parameter::Collection_as_Dependency.new @_sym, @_a, & _
-        end
-      end
-
-      class User_Defined_Dependee_Reference___ < Dependee_Reference_
-
-        def dereference_against_ index
-
-          index.cache_box.touch @sym do
-            ___build_against index
-          end
-        end
-
-        def ___build_against index
-
-          _cls = index.box_module.const_get @sym, false
-
-          _cls.new( & index.on_event_selectively )
-        end
-      end
+    end
+  end
 
   # -- these
 

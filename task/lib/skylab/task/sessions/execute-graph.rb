@@ -43,7 +43,7 @@ class Skylab::Task
     def __resolve_plan
 
       o = Home_::Actors_::Build_Plan.new( & @_oes_p )
-      o.index = remove_instance_variable :@_index
+      o.index = @_index  # remove_instance_variable :@_index
       plan = o.execute
       if plan
         @_plan = plan
@@ -60,7 +60,7 @@ class Skylab::Task
       cache = @_plan.cache
       queue = @_plan.queue
 
-      st = Callback_::Stream.via_times queue.length do | d |
+      st = Callback_::Stream.via_times queue.length do |d|
         cache.fetch queue.fetch d
       end
 
@@ -91,13 +91,13 @@ class Skylab::Task
 
         task = cache.fetch sym
 
-        ok = task.execute
+        ok = ___execute_task task
         ok or break
 
         a = subscribers[ sym ]
 
         if a
-          dc = Dependency_Completion___.new task
+          dc = Dependency_Completion_.new task
           a.each do | sym_ |
             cache.fetch( sym_ ).receive_dependency_completion dc
           end
@@ -108,18 +108,12 @@ class Skylab::Task
       ok
     end
 
-    class Dependency_Completion___
-
-      attr_reader(
-        :task,
-      )
-
-      def initialize task
-        @task = task
-      end
-
-      def derived_ivar
-        @task.derived_ivar_
+    def ___execute_task task
+      x = task.synthies_
+      if x
+        x.execute_task__ task, @_index
+      else
+        task.execute
       end
     end
   end
