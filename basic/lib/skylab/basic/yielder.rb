@@ -4,8 +4,7 @@ module Skylab::Basic
 
     class Mapper  # :[#056].
 
-      # see also [#hu-047] for a stream version
-      # see also [#hu-053] for more complex version
+      # see also [#hu-047] for a more complex stream version
 
       def map_first_by & p
         @map_first = p
@@ -49,12 +48,22 @@ module Skylab::Basic
 
     class LineFlusher < ::Enumerator::Yielder
 
+      # a session that effects a map expand/reduce: it receives input strings
+      # (of any structure) through the interface of a yielder (hence its
+      # parent class); and outputs strings progressively to another yielder
+      # (the argument). the bytes that will be output will be the same
+      # sequence of bytes that were in the input, but they will be buffered
+      # and chunked such that every item of output is a newline-sequence-
+      # terminated string; except for any item output through a `flush` which
+      # outputs any string in the buffer (which, if one is there does not
+      # have a terminating sequence).
+
       class << self
         alias_method :[], :new
         private :new
       end  # >>
 
-      def initialize y, & p
+      def initialize y
 
         scn = Home_.lib_.empty_string_scanner
         buffer = scn.string

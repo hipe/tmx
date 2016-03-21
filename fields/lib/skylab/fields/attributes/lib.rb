@@ -29,7 +29,7 @@ module Skylab::Fields
         end
 
         def begin_parse_and_normalize_for__ sess, & x_p
-          Parse_and_or_Normalize__.new sess, self, & x_p
+          Parse_and_or_Normalize.new sess, self, & x_p
         end
 
         def begin_normalization_ & x_p
@@ -59,8 +59,18 @@ module Skylab::Fields
           NIL_
         end
 
-        def lookup_particular__ meta_k
-          @_custom_index.fetch meta_k
+        def is_X__ meta_k  # read-only
+          ci = @_custom_index
+          if ci
+            bx = ci[ meta_k ]
+            if bx
+              bx.h_
+            end
+          end
+        end
+
+        def lookup_particular__ meta_k  # assumes some. read-only
+          @_custom_index.fetch( meta_k ).a_
         end
 
         def to_defined_attribute_stream__
@@ -99,7 +109,7 @@ module Skylab::Fields
           _idx = formals.index_
         end
 
-        o = Parse_and_or_Normalize__.new sess, _idx, & x_p
+        o = Parse_and_or_Normalize.new sess, _idx, & x_p
 
         o.argument_stream = st
 
@@ -132,9 +142,9 @@ module Skylab::Fields
         end
       end
 
-      class Parse_and_or_Normalize__
+      class Parse_and_or_Normalize  # this lib only
 
-        def initialize sess, index, & oes_p
+        def initialize sess, index=nil, & oes_p
 
           @argument_stream = nil
           @_formal_reader_stack = []
@@ -343,8 +353,8 @@ module Skylab::Fields
         def add_to_the_custom_index_ k, meta_k
 
           _idx = ( @_custom_index ||= {} )
-          _a = _idx[ meta_k ] ||= []
-          _a.push k ; nil
+          _bx = _idx[ meta_k ] ||= Callback_::Box.new
+          _bx.add k, true  # so we can h[k] with a transparent h
         end
 
         def add_to_the_static_index_ k, meta_k

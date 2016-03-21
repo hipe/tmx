@@ -25,9 +25,19 @@ module Skylab::Human
 
       class << self
 
+        def via_ * x_a
+          _st = Callback_::Polymorphic_Stream.via_array x_a
+          expression_via_sexp_stream_ _st
+        end
+
         def expression_via_sexp_stream_ st
           new.__init_via_sexp_stream st
         end
+
+        def interpret_component st, asc
+          new.__init_as_componet st, asc
+        end
+
         private :new
       end  # >>
 
@@ -38,10 +48,17 @@ module Skylab::Human
         @_sep_sexp = nil
       end
 
+      def __init_as_componet st, asc
+
+        _init_constituency_via_mixed st.gets_one
+        @_association_symbol = asc.name_symbol
+        self
+      end
+
       def __init_via_sexp_stream st
 
         if st.unparsed_exists
-          _accept_list_x st.gets_one
+          _init_constituency_via_mixed st.gets_one
           if st.unparsed_exists
             ___parse_inline_specification st
           end
@@ -59,27 +76,18 @@ module Skylab::Human
       def with_list x
 
         o = dup
-        o._accept_list_x x
+        o._init_constituency_via_mixed x
         o
-      end
-
-      def _accept_list_x x
-
-        @_build_stream_once = if ::Array.try_convert x
-          -> do
-            Callback_::Polymorphic_Stream.via_array x
-          end
-        else
-          pst = x.flush_to_polymorphic_stream  # fail early
-          -> { pst }
-        end
-        NIL_
       end
 
     private  # (all for the interpretation of "flags" in the sexp (for now))
 
       def alternation _
         be_alternation
+      end
+
+      def association_symbol st
+        @_association_symbol = st.gets_one ; nil
       end
 
       def none _
@@ -97,7 +105,7 @@ module Skylab::Human
       end
 
       def expression_agent_method_for_saying_item m
-        @__eemfsi = m ; nil
+        @_eemfsi = m ; nil
       end
 
       def express_none_by & p
@@ -137,9 +145,31 @@ module Skylab::Human
         end
       end
 
+      def express_into_under y, expag
+
+        # -- eek map each expression to string
+
+        a = _read_only_array
+        x = a.fetch 0
+        if ! x.respond_to? :ascii_only?
+          aa = []
+          a.each do |x_|
+            _ = x_.express_into_under "", expag
+            aa.push _
+          end
+          @_top_secret_array = aa  # EEK
+        end
+
+        # --
+
+        @_eemfsi ||= nil
+        @_expag = expag
+        express_into y
+      end
+
       def express_into y
-        _st = _sexp_stream_via_finish
-        _st_ = Progressive_string_stream_via_sexp_stream___[ _st ]
+        _st = _assembly_sexp_stream_via_finish
+        _st_ = Progressive_string_stream_via_assembly_sexp_stream___[ _st ]
         Flush_string_stream_into__[ y, _st_ ]
       end
 
@@ -167,15 +197,15 @@ module Skylab::Human
       end
 
       def flush_to_word_string_stream___
-        _st = _sexp_stream_via_finish
+        _st = _assembly_sexp_stream_via_finish
         Home_::Phrase_Assembly::Word_string_stream_via_sexp_stream[ _st ]
       end
 
       # --
 
-      def _sexp_stream_via_finish  # #todo functional spaghetti - cleanup after lockdown
+      def _assembly_sexp_stream_via_finish  # #todo functional spaghetti - cleanup after lockdown
 
-        st = ___item_stream_via_finish
+        st = __item_stream_via_finish
 
         p = -> do
 
@@ -254,33 +284,34 @@ module Skylab::Human
         end
       end
 
-      def ___item_stream_via_finish
-
-        expag = remove_instance_variable :@_expag
-        if expag
-
-          _m = remove_instance_variable :@__eemfsi  # ..
-
-          _p = expag.method _m
-
-          orig_strmr = @_build_stream_once
-
-          @_build_stream_once = -> do
-
-            _st = orig_strmr[].flush_to_stream
-            _st_ = _st.map_by( & _p )
-            _st_.flush_to_polymorphic_stream
-          end
-        end
-
-        remove_instance_variable( :@_build_stream_once )[]
-      end
-
       def ___any_sexp_when_none
         p = @_none_sexp_proc
         if p
           p[]
         end
+      end
+
+      def __item_stream_via_finish
+
+        expag = remove_instance_variable :@_expag
+        if expag
+          m = remove_instance_variable :@_eemfsi
+        end
+
+        if m
+          ___flush_stream_under_expag m, expag
+        else
+          send @_build_stream_method
+        end
+      end
+
+      def ___flush_stream_under_expag m, expag
+
+        _p = expag.method m
+        _pst = send @_build_stream_method
+        _st = _pst.flush_to_stream
+        _st_ = _st.map_by( & _p )
+        _st_.flush_to_polymorphic_stream
       end
 
       def __final_separator_sexp
@@ -293,7 +324,102 @@ module Skylab::Human
         @_sep_sexp ? @_sep_sexp.value_x : SEPARATOR___
       end
 
-      Progressive_string_stream_via_sexp_stream___ = -> st do
+      # --
+
+      def _is_equivalent_to_counterpart_ bruh
+
+        # is one list the same as another? we are doing this the long way..
+        # assume that you are the "outside" one
+        # aspects of this have an involved explanation at [#050]:#flatten
+
+        a = bruh._read_only_array  # inside
+        a_ = self._read_only_array  # outside
+
+        if a.length == a_.length
+
+          if a.fetch( 0 ).respond_to? :_aggregate_
+            self._EEW
+          end
+
+          m = :==  # #equivalence: NOT `equal?`. NOT `===`. `eql?` is "strict"
+
+          is_same = true
+
+          a.length.times do |d|
+
+            _x = a.fetch 0  # inside
+            _x_ = a_.fetch 0  # outside
+
+            _is_equivalent = _x_.send m, _x  # let outsider chose impl.
+
+            if _is_equivalent
+              next
+            end
+
+            is_same = false ; break
+          end
+
+          is_same
+        else
+          false
+        end
+      end
+
+      # -- constituency writing / reading  (see [#050]:#flatten)
+
+      def _init_constituency_via_mixed x
+
+        if ::Array.try_convert x
+          @_build_stream_method = :__build_stream_via_array
+          @_read_read_only_array_method = :__top_secret_array
+          @_top_secret_array = x
+        else
+          @_build_stream_method = :__release_one_time_use_PST
+          @_read_read_only_array_method = :_CHA_CHA
+          @__one_time_use_PST = x.flush_to_polymorphic_stream
+        end
+        NIL_
+      end
+
+      def __build_stream_via_array
+        Callback_::Polymorphic_Stream.via_array @_top_secret_array
+      end
+
+      def __release_one_time_use_PST
+        remove_instance_variable :@__one_time_use_PST
+      end
+
+      # --
+
+      def number_exponent_symbol_
+        if 1 == @_top_secret_array.length  # ..
+          :singular
+        else
+          :plural
+        end
+      end
+
+      def _read_only_array
+        send @_read_read_only_array_method
+      end
+
+      def __top_secret_array
+        @_top_secret_array
+      end
+
+      def association_symbol_
+        @_association_symbol
+      end
+
+      def category_symbol_
+        :list
+      end
+
+      def _can_aggregate_
+        true
+      end
+
+      Progressive_string_stream_via_assembly_sexp_stream___ = -> st do
 
         # "normally" (i.e not in "word mode") the onus is on us to add
         # spaces to the beginnings of subsequent "phrases" ..

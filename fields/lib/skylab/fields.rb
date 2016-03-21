@@ -62,17 +62,17 @@ module Skylab::Fields
 
     def init sess, x_a, & x_p
 
-      o = _begin_parse_and_normalize_for sess, & x_p
+      o = begin_parse_and_normalize_for sess, & x_p
       o.sexp = x_a
       o.execute_as_init__
     end
 
     def normalize_session sess, & x_p
-      _ = _begin_parse_and_normalize_for sess, & x_p
+      _ = begin_parse_and_normalize_for sess, & x_p
       _.execute
     end
 
-    def _begin_parse_and_normalize_for sess, & x_p
+    def begin_parse_and_normalize_for sess, & x_p  # [hu]
       _index.begin_parse_and_normalize_for__ sess, & x_p
     end
 
@@ -80,11 +80,11 @@ module Skylab::Fields
       _index.begin_normalization_( & x_p )
     end
 
+    # --
+
     def define_methods mod
       _index.define_methods__ mod
     end
-
-    # --
 
     def symbols * sym
       if sym.length.zero?
@@ -92,6 +92,10 @@ module Skylab::Fields
       else
         _index.lookup_particular__( * sym )
       end
+    end
+
+    def is_X meta_k  # might be nil
+      _index.is_X__ meta_k
     end
 
     def to_defined_attribute_stream
@@ -399,22 +403,38 @@ module Skylab::Fields
       freeze
     end
 
+    def attr_writer_method_name  # #n.c [hu]
+      _cached :___awmn
+    end
+
+    def ___awmn
+      :"#{ @name_symbol }="
+    end
+
     def as_ivar= x
-      @cache_[ :_as_ivar_ ] = x
+      @cache_[ :_as_ivar ] = x
     end
 
     def as_ivar
-      @cache_.fetch :_as_ivar_ do
-        x = :"@#{ @name_symbol }"
-        @cache_[ :_as_ivar_ ] = x
-        x
-      end
+      _cached :_as_ivar
+    end
+
+    def _as_ivar
+      :"@#{ @name_symbol }"
     end
 
     def name  # for [#br-035] (wormhole). also covered here
-      @cache_.fetch :_name_ do
-        x = Callback_::Name.via_variegated_symbol @name_symbol
-        @cache_[ :_name_ ] = x
+      _cached :___name_function
+    end
+
+    def ___name_function
+      Callback_::Name.via_variegated_symbol @name_symbol
+    end
+
+    def _cached m
+      @cache_.fetch m do
+        x = send m
+        @cache_[ m ] = x
         x
       end
     end

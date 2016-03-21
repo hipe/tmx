@@ -70,7 +70,7 @@ module Skylab::Human::TestSupport
     a = [ :list, :through, :eventing ]
     define_method :_something_about_eventing do |*x_a|
       x_a[ 0, 0 ] = a
-      Home_::Sexp.expression_session_for_sexp x_a
+      Home_::Sexp.expression_session_via_sexp x_a
     end
   end
 end

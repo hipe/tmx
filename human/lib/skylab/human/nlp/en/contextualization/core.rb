@@ -194,34 +194,6 @@ module Skylab::Human
       NIL_
     end
 
-    class Streamer_
-
-      attr_writer(
-        :on_first,
-        :on_subsequent,
-      )
-
-      def to_stream_around st
-
-        p = -> do
-          s = st.gets
-          if s
-            p = -> do
-              s_ = st.gets
-              if s_
-                @on_subsequent[ s_ ]
-              end
-            end
-            @on_first[ s ]
-          end
-        end
-
-        Callback_.stream do
-          p[]
-        end
-      end
-    end
-
     class Newline_Adder_
 
       def initialize

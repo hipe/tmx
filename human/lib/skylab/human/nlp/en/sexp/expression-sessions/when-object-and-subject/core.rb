@@ -12,7 +12,7 @@ module Skylab::Human
 
         def initialize idea
 
-          si = Expression_Sessions::Nounish.begin
+          si = Siblings_::Nounish.begin
 
           si.receive_count_and_list_and_atom( *
             idea.to_subject_count_and_list_and_atom )
@@ -44,7 +44,7 @@ module Skylab::Human
 
         def __will_express_something si, idea
 
-          oi = Expression_Sessions::Nounish.begin
+          oi = Siblings_::Nounish.begin
 
           oi.receive_count_and_list_and_atom( *
             idea.to_object_count_and_list_and_atom )

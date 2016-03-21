@@ -2,23 +2,220 @@ module Skylab::Human
 
   module NLP::EN::Sexp
 
-    class Expression_Sessions::Nounish
+    class Expression_Sessions::Nounish  # actually noun phraseish
 
-      # (NOTE: we have *begun* to retrofit this into [##049] but it is not
-      # fully integrated..)
+      # (NOTE: we have *begun* to retrofit this into [#049] for now the two
+      # are grafted together into one file without being integrated at all..)
 
       # this is divorced from conception of subject vs object. its purpose
       # is to produce a starter noun-phrase given permutations of atom, list
-      # and negatively, one that may be mutated further by a coodinator.
+      # and negatively, one that may be mutated further by a coordinator.
       #
       # it is a session and not an actor because it will keep pertinent
       # metadata around to be used by the coordinator (e.g an "expression
       # frame") for final expression.
 
       class << self
+
+        def interpret_component host_st, asc
+          x = host_st.gets_one
+          if x.respond_to? :ascii_only?
+            Word_as_Nounish_Expression___.new x, asc
+          else
+            Here_.expression_via_these_ x, asc
+          end
+        end
+
+        def interpret_component_with_own_stream_ st, asc
+          Phraseish_Redux___.new st, asc
+        end
+
         alias_method :begin, :new
         private :new
+      end  # >>
+
+    # == begin redux
+
+    Redux_Abstract_Base = ::Class.new  # abstract
+
+    class Word_as_Nounish_Expression___ < Redux_Abstract_Base
+
+      def initialize s, asc
+        @__word = s
+        super asc
       end
+
+      def _aggregate_ exp
+        if exp._is_mutable_list_
+          self._FUN_read_this
+          # make sure to give the outside expression a chance to reject the
+          # aggregation if for example the aggregation category is wrong
+        else
+          Siblings_::List.via_(
+            [ self, exp ],
+            :association_symbol, @association_symbol_,
+          )
+        end
+      end
+
+      def express_into_under y, _expage
+        y << @__word
+      end
+
+      def _can_aggregate_
+        true
+      end
+    end
+
+    class Phraseish_Redux___ < Redux_Abstract_Base
+
+      COMPONENTS = Attributes_[
+        lemma: :_atomic_,
+        modifier_word_list: :component,
+        proper_noun: [ :custom_interpreter_method, :_effectively_an_alias_ ],
+        suffixed_proper_constituency: :component,
+        suffixed_modifier_phrase: :component,
+      ]
+
+      attr_reader( * COMPONENTS.symbols )
+
+      def initialize st, asc
+
+        o = COMPONENTS.begin_parse_and_normalize_for self
+        o.argument_stream = st
+        _ok = o.execute
+        _ok and super asc
+      end
+
+      def __modifier_word_list__component_association
+        Siblings_::WordList
+      end
+
+      def proper_noun=
+
+        # this is just a plain old alias to the other,
+        # but it makes for more readable sexp's
+
+        _atr = COMPONENTS.attribute :suffixed_proper_constituency
+        _atr.write self, @_polymorphic_upstream_
+      end
+
+      def __suffixed_modifier_phrase__component_association
+        EN_::Sexp::AnyExpression
+      end
+
+      def __suffixed_proper_constituency__component_association
+        Siblings_::Listifiable
+      end
+
+      # --
+
+      def express_into_under y, expag
+
+        # -- this won't stay here..
+
+        sr = nil  # space is required
+        space_if_necessary = -> do
+          if sr
+            y << SPACE_
+          else
+            sr = true
+          end
+        end
+
+        # --
+
+        wl = self.modifier_word_list
+        if wl
+          wl.express_into_under y, expag
+          sr = true
+        end
+
+        if self.lemma
+          space_if_necessary[]
+          ___express_inflected_lemma_into y
+        end
+
+        co = self.suffixed_proper_constituency
+        if co
+          space_if_necessary[]
+          co.express_into_under y, expag
+        end
+
+        mp = self.suffixed_modifier_phrase
+        if mp
+          space_if_necessary[]
+          mp.express_into_under y, expag
+        end
+
+        y
+      end
+
+      def ___express_inflected_lemma_into y
+
+        if self.suffixed_proper_constituency
+          m = number
+        else
+          m = :singular  # ??
+        end
+
+        _hi = EN_::POS::Noun[ @lemma.id2name ]
+
+        _hey = _hi.send m
+        y << _hey
+        NIL_
+      end
+
+      # --
+
+      def assimilate_with_same_type_ exp
+        Siblings_::List_through_Treeish_Aggregation::Assimilate[ self, exp ]
+      end
+
+      def number
+        @suffixed_proper_constituency.number_exponent_symbol_
+      end
+
+      def person
+        @suffixed_proper_constituency.person_exponent_symbol__
+      end
+
+      def _can_aggregate_
+        true
+      end
+
+      def category_symbol_
+        :_noun_phraseish_
+      end
+    end
+
+    class Redux_Abstract_Base
+
+      def initialize asc
+        @association_symbol_ = asc.name_symbol
+      end
+
+      def association_symbol_
+        @association_symbol_
+      end
+
+      def _aggregate_ exp
+        if self.category_symbol_ == exp.category_symbol_
+          yes = assimilate_with_same_type_ exp
+          if yes
+            self
+          else
+            yes
+          end
+        end
+      end
+
+      def _is_mutable_list_
+        false
+      end
+    end
+
+    # ==
 
       attr_reader :atom_was_provided, :count_was_provided, :list_was_provided
 
@@ -168,7 +365,7 @@ module Skylab::Human
 
         _init_noun_phrase
         _st = @_list_arg.to_stream
-        _es = Home_::NLP::EN::Sexp.expression_session_for :list, _st
+        _es = Siblings_::List.via_ _st
         @noun_phrase.prepend_adjective_phrase _es
         NIL_
       end

@@ -4,7 +4,39 @@ module Skylab::Human
 
     class Expression_Sessions::List_through_Eventing  # :[#047].
 
-      # (see also a simpler form at [#ba-056])
+      # (see also a simpler yielder-based form at [#ba-056])
+
+      # ==
+
+      class Simple
+
+        attr_writer(
+          :on_first,
+          :on_subsequent,
+        )
+
+        def to_stream_around st
+
+          p = -> do
+            x = st.gets
+            if x
+              p = -> do
+                x = st.gets
+                if x
+                  @on_subsequent[ x ]
+                end
+              end
+              @on_first[ x ]
+            end
+          end
+
+          Callback_.stream do
+            p[]
+          end
+        end
+      end
+
+      # ==
 
       Attributes_actor_.call( self,
         :gets_under,

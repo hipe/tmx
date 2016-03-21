@@ -9,7 +9,7 @@ module Skylab::Human::TestSupport
     a = [ :list, :through, :columnar_aggregation ]
     define_method :subject_call_ do |*sx|
       sx[ 0, 0 ] = a
-      Home_::Sexp.expression_session_for_sexp sx
+      Home_::Sexp.expression_session_via_sexp sx
     end
 
     def push * s_a

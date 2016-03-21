@@ -91,6 +91,14 @@ module Skylab::Human
       _add Comma___[]
     end
 
+    def add_period
+      _add [ :trailing, '.' ]
+    end
+
+    def add_newline
+      _add [ :as_is, NEWLINE_ ]
+    end
+
     def _add trueish_x
       send @_add_m, trueish_x
     end

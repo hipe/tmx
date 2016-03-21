@@ -63,7 +63,7 @@ elsewhere.
 
   • it is the frontier driver of wishlist :+[#hu-041]
     conjuctive phrase logic, which perhaps me while overkilled by
-    [#hu-053] the eventing articulator it uses.
+    [#hu-047] the eventing articulator it uses.
     (EDIT: the above "sentence")
 
 

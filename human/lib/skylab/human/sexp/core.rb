@@ -5,14 +5,14 @@ module Skylab::Human
     class << self
 
       def express * sx
-        expression_session_for_sexp sx
+        expression_session_via_sexp sx
       end
 
       def expression_session_for * sx
-        expression_session_for_sexp sx
+        expression_session_via_sexp sx
       end
 
-      def expression_session_for_sexp sx
+      def expression_session_via_sexp sx
 
         st = Callback_::Polymorphic_Stream.via_array sx
         _const = Parse_expression_session_name[ st ]
@@ -39,7 +39,7 @@ module Skylab::Human
 
         s.split( UNDERSCORE_ ).map do |s_|
           prep[ s_ ] ? s_ : ucfirst[ s_ ]
-        end.join( UNDERSCORE_ ).intern
+        end.join( EMPTY_S_ ).intern
 
       else
         ucfirst[ s ].intern
@@ -58,7 +58,8 @@ module Skylab::Human
         a.push cache[ st.gets_one ]
       end
 
-      a.join UNDERSCORE_
+      # a.join UNDERSCORE_  # nah..
+      a.join EMPTY_S_
     end
 
     # --

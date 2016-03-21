@@ -56,7 +56,8 @@ module Skylab::Human
           nla = Newline_Adder_.new
           kns.expression_agent.calculate nla.y, & kns.expression_proc
 
-          o = Streamer_.new
+          _ = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple
+          o = _.new
 
           o.on_first = method :___map_first_line
 

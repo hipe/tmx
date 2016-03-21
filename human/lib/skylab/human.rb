@@ -12,6 +12,35 @@ module Skylab::Human  # :[#001].
 
   Callback_ = ::Skylab::Callback
 
+  Lazy_ = Callback_::Lazy
+
+  # -- proc-like support methods
+
+  atrs = attrs = nil
+
+  Attributes_actor_ = -> cls, * a do
+    ( atrs || attrs[] )::Actor.via cls, a
+  end
+
+  Attributes_ = -> h do
+    ( atrs || attrs[] )[ h ]
+  end
+
+  attrs = -> do
+    Require_fields_lib_[]
+    atrs
+  end
+
+  Require_fields_lib_ = Lazy_.call do
+    attrs = nil
+    Field_ = Home_.lib_.fields
+    atrs = Field_::Attributes
+    NIL_
+  end
+
+  # -- would-be orphanic stowaways
+
+
   Autoloader_ = Callback_::Autoloader
 
   module NLP
@@ -19,9 +48,7 @@ module Skylab::Human  # :[#001].
     NLP_ = self
   end
 
-  Attributes_actor_ = -> cls, * a do
-    Home_.lib_.fields::Attributes::Actor.via cls, a
-  end
+  # --
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
@@ -31,8 +58,8 @@ module Skylab::Human  # :[#001].
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }
-  Lazy_ = Callback_::Lazy
   NEWLINE_ = "\n"
+  NOTHING_ = nil
   NIL_ = nil
   NONE_ = nil
   KEEP_PARSING_ = true

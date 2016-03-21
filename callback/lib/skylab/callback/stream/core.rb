@@ -34,6 +34,16 @@ module Skylab::Callback
         st
       end
 
+      def once & p
+        use_p = -> do
+          use_p = EMPTY_P_
+          p[]
+        end
+        new do
+          use_p[]
+        end
+      end
+
       def via_nonsparse_array a, & p
 
         d = -1 ; last = a.length - 1

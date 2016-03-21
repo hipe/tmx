@@ -51,7 +51,9 @@ module Skylab::Human
 
     Line_Downstream_via_Line_Stream___ = -> kns do
 
-      str = Streamer_.new
+      _ = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple
+
+      str = _.new
 
       str.on_first = -> s do
         o = Here_::First_Line_Contextualization_[ kns ]

@@ -132,13 +132,20 @@ module Skylab::Fields
 
       # --
 
+      def write sess, st  # #EXPERIMENTAL #cover-me #todo
+
+        pa = Here_::Lib::Parse_and_or_Normalize.new sess
+        pa.argument_stream = st
+        _interpret pa  # result is k.p
+      end
+
       def _interpret parse, & x_p
 
         _args = Interpretation_Services___.new self, parse
         read_and_write_ _args, & x_p
       end
 
-      def read_and_write_ args, & x_p # at least 2x here
+      def read_and_write_ args, & x_p  # at least 2x here
 
         send @_interpret_m, args, & x_p
       end
