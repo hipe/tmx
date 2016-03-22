@@ -6,6 +6,19 @@ module Skylab::Basic
 
       # see also [#hu-047] for a more complex stream version
 
+      class << self
+
+        def joiner y, separator_s
+          o = new
+          o.downstream_yielder = y
+          o.map_first = IDENTITY_
+          o.map_subsequent_by do |s|
+            "#{ separator_s }#{ s }"
+          end
+          o
+        end
+      end  # >>
+
       def map_first_by & p
         @map_first = p
       end
@@ -26,6 +39,10 @@ module Skylab::Basic
         @downstream_yielder = y
       end
 
+      attr_writer(
+        :map_first,
+      )
+
       def reset
         @_m = :___receive_first_item ; nil
       end
@@ -42,6 +59,7 @@ module Skylab::Basic
       end
 
       attr_reader(
+        :downstream_yielder,
         :y,
       )
     end

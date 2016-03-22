@@ -71,7 +71,14 @@ module Skylab::Human
         attr_reader :lexeme
 
         def to_string
-          express_words_into( [] ) * SPACE_
+          express_into ""
+        end
+
+        def express_into y
+
+          _use_y = Home_.lib_.basic::Yielder::Mapper.joiner( y, SPACE_ ).y
+          express_words_into _use_y
+          y
         end
 
         def inflect_words_into_against_sentence_phrase y, _

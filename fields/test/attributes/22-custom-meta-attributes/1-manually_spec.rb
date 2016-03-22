@@ -39,19 +39,20 @@ module Skylab::Fields::TestSupport
 
               ca = @_build.current_attribute
 
-              ca.write_by do |x|
-                atr = formal_attribute
+              ca.writer_by_ do |atr|
                 atr.__hello or ::Kernel.fail
-                ivar = atr.as_ivar
-                sess = session
-                if sess.instance_variable_defined? ivar
-                  a = sess.instance_variable_get ivar
-                else
-                  a = []
-                  sess.instance_variable_set ivar, a
+                -> x, _oes_p do
+                  ivar = atr.as_ivar
+                  sess = session
+                  if sess.instance_variable_defined? ivar
+                    a = sess.instance_variable_get ivar
+                  else
+                    a = []
+                    sess.instance_variable_set ivar, a
+                  end
+                  a.push x
+                  true  # KEEP_PARSING_
                 end
-                a.push x
-                true  # KEEP_PARSING_
               end
             end
           end

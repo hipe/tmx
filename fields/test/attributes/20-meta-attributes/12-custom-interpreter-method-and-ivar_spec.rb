@@ -2,16 +2,17 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes  # namespace antics #[#017] justified
-  module Attributes
+  TS_.require_ :attributes_meta_attributes  # #[#017]
+  module Attributes::Meta_Attributes
 
     TS_.describe "[fi] attributes - misc meta attributes one" do
 
       TS_[ self ]
       use :memoizer_methods
-      Attributes[ self ]
 
       context "`ivar`" do
+
+        Attributes[ self ]
 
         given_the_attributes_ do
           attributes_(
@@ -26,6 +27,8 @@ module Skylab::Fields::TestSupport
       end
 
       context "`custom_interpreter_method`" do
+
+        Attributes[ self ]
 
         given_the_attributes_ do
 
@@ -70,6 +73,39 @@ module Skylab::Fields::TestSupport
           end
 
           e.message.should match %r(\Aundefined method `zozlow=')
+        end
+      end
+
+      context "`custom_interpreter_method_of`" do
+
+        Attributes::Meta_Attributes[ self ]
+
+        shared_subject :entity_class_ do
+
+          class X_MA_CIMO_A
+
+            ATTRIBUTES = Subject_module_[].call(
+              zing: [ :custom_interpreter_method_of, :zung ],
+            )
+
+            def zung st
+              @_a_ = st.gets_one
+              @_b_ = st.gets_one
+              true  # ACHIEVED_
+            end
+
+            def _hi
+              [ @_a_, @_b_ ]
+            end
+
+            self
+          end
+        end
+
+        it "x." do
+
+          _o = build_by_init_ :zing, :la, :lah
+          _o._hi.should eql [ :la, :lah ]
         end
       end
     end

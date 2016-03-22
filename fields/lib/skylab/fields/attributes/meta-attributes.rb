@@ -8,7 +8,7 @@ module Skylab::Fields
         @_ = build
       end
 
-      # -- the 15 default meta-attributes in alphabetical order.
+      # -- the 16 default meta-attributes in alphabetical order.
 
       def boolean  # for ancient DSL-controller. see also `flag`
 
@@ -19,15 +19,14 @@ module Skylab::Fields
         # avoid dependency on [ac] for now. this is a microscopic ersatz of
         # it, to let the work form its own upgrade path..
 
-        ca = @_.current_attribute
+        @_.current_attribute.reader_by_ do |atr|
 
-        # ca.is_defined_component = true  # #todo-soon
+          m = :"__#{ atr.name_symbol }__component_association"
 
-        ca.read_by do
-
-          _m = :"__#{ formal_attribute.name_symbol }__component_association"
-          _c = session.send _m  # no yield for now - if you need it, use [ac]
-          _c.interpret_component argument_stream, formal_attribute
+          -> do
+            _c = session.send m  # no yield for now - if you need it, use [ac]
+            _c.interpret_component argument_stream, formal_attribute
+          end
         end
       end
 
@@ -36,13 +35,37 @@ module Skylab::Fields
         # created to facilitate custom aliases [hu].
         # also bolsters readability for hybrid actors.
 
-        ca = @_.current_attribute
+        @_.current_attribute.read_and_writer_by__ do |atr|
 
-        # ca.is_defined_component = true  # #todo-soon
+          __oldschool_custom_interpreter_as Classic_writer_method_[ atr.name_symbol ]
+        end
+      end
 
-        ca.read_and_write_by do
+      def custom_interpreter_method_of
 
-          _m = Classic_writer_method_[ formal_attribute.name_symbol ]
+        m = @_.sexp_stream_for_current_attribute.gets_one
+
+        @_.current_attribute.read_and_writer_by__ do |_atr|
+
+          __newschool_custom_interpreter_as m
+        end
+      end
+
+      def __newschool_custom_interpreter_as m
+
+        -> do
+          x = session.send m, argument_stream
+          if ACHIEVED_ == x
+            KEEP_PARSING_
+          else
+            raise ::ArgumentError, Say_expected_achieved__[ x ]
+          end
+        end
+      end
+
+      def __oldschool_custom_interpreter_as m
+
+        -> do
 
           sess = session
 
@@ -51,7 +74,7 @@ module Skylab::Fields
             did = true
           end
 
-          x = sess.send _m
+          x = sess.send m
 
           if did
             sess.remove_instance_variable ARG_STREAM_IVAR_
@@ -60,12 +83,12 @@ module Skylab::Fields
           if ACHIEVED_ == x
             KEEP_PARSING_
           else
-            raise ::ArgumentError, Say_expected_achieved___[ x ]
+            raise ::ArgumentError, Say_expected_achieved__[ x ]
           end
         end
       end
 
-      Say_expected_achieved___ = -> x do
+      Say_expected_achieved__ = -> x do
         "expected #{ ACHIEVED_ } had #{ Home_.lib_.basic::String.via_mixed x }"
       end
 
@@ -104,9 +127,11 @@ module Skylab::Fields
       def flag
 
         ca = @_.current_attribute
+
         ca.argument_arity = :zero
-        ca.read_by do
-          true
+
+        ca.reader_by_ do
+          NILADIC_TRUTH_
         end
       end
 
@@ -115,18 +140,21 @@ module Skylab::Fields
         sym = @_.sexp_stream_for_current_attribute.gets_one
         ca = @_.current_attribute
 
-        ca.read_by do
-          true
+        ca.reader_by_ do
+          NILADIC_TRUTH_
         end
 
-        ca.write_by do |x|
+        ca.writer_by_ do |_atr|
 
-          # "flag of" must have the *full* pipeline of the referrant -
-          # read *and* write.
+          -> x, _oes_p do
 
-          atr = index.lookup_attribute_ sym
-          _mutate_for_redirect x, atr
-          atr.read_and_write_ self  # result is kp
+            # "flag of" must have the *full* pipeline of the referrant -
+            # read *and* write.
+
+            atr = index.lookup_attribute_ sym
+            _mutate_for_redirect x, atr
+            atr.read_and_write_ self  # result is kp
+          end
         end
       end
 
@@ -166,8 +194,10 @@ module Skylab::Fields
 
       def known_known
 
-        @_.current_attribute.read_by do
-          Callback_::Known_Known[ argument_stream.gets_one ]
+        @_.current_attribute.reader_by_ do
+          -> do
+            Callback_::Known_Known[ argument_stream.gets_one ]
+          end
         end
       end
 
@@ -204,15 +234,19 @@ module Skylab::Fields
 
         ca = @_.current_attribute
 
-        ca.read_by do
-          [ argument_stream.gets_one ]
+        ca.reader_by_ do
+          -> do
+            [ argument_stream.gets_one ]
+          end
         end
 
-        ca.write_by do |x|
+        ca.writer_by_ do |_atr|
 
-          atr = index.lookup_attribute_ sym
-          _mutate_for_redirect x, atr
-          atr.read_and_write_ self  # result is kp
+          -> x, _oes_p do
+            atr = index.lookup_attribute_ sym
+            _mutate_for_redirect x, atr
+            atr.read_and_write_ self  # result is kp
+          end
         end
       end
     end  # meta-attributes

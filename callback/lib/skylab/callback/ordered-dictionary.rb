@@ -66,7 +66,7 @@ module Skylab::Callback
         self.class.ordered_dictionary
       end
 
-      class Callback_Slot__
+      class Callback_Slot__  # #open [#042] use [fi] simplified name instead
         def initialize i
           @name_symbol = i
         end

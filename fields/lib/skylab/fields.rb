@@ -629,6 +629,9 @@ module Skylab::Fields
   Lazy_ = Callback_::Lazy
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
+  NILADIC_TRUTH_ = -> do
+    true
+  end
   NOTHING_ = nil
   SPACE_ = ' '
   UNABLE_ = false

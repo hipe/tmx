@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      def __is_not_known_to_be_empty
+      def is_not_known_to_be_empty__
         ! is_known_to_be_empty
       end
 

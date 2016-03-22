@@ -12,11 +12,11 @@ module Skylab::Fields
         @_pending_meths_definers = nil
 
         @_RW_m = :__receive_first_read_and_write_proc
-        @_RW_p_kn = nil
         @_read_m = :__receive_first_read_proc
-        @_read_p_kn = nil
         @_write_m = :__receive_first_write_proc
-        @_write_p_kn = nil
+        @_reader_p = nil
+        @_writer_p = nil
+        @_read_writer_p = nil
 
         super k do |me|
           edit_p[ me ]
@@ -64,15 +64,15 @@ module Skylab::Fields
         ( @_pending_meths_definers ||= [] ).push atr_p ; nil
       end
 
-      def read_and_write_by & p
+      def read_and_writer_by__ & p
         send @_RW_m, p
       end
 
-      def read_by & p
+      def reader_by_ & p
         send @_read_m, p
       end
 
-      def write_by & p
+      def writer_by_ & p
         send @_write_m, p
       end
 
@@ -80,19 +80,19 @@ module Skylab::Fields
         @_read_m = :_locked
         @_RW_m = :_locked
         @_write_m = :_locked
-        @_RW_p_kn = Callback_::Known_Known[ p ] ; nil
+        @_read_writer_p = p ; nil
       end
 
       def __receive_first_read_proc p
         @_read_m = :_locked
         @_RW_m = :_locked
-        @_read_p_kn = Callback_::Known_Known[ p ] ; nil
+        @_reader_p = p ; nil
       end
 
       def __receive_first_write_proc p
         @_write_m = :_locked
         @_RW_m = :_locked
-        @_write_p_kn = Callback_::Known_Known[ p ] ; nil
+        @_writer_p = p ; nil
       end
 
       def freeze
@@ -113,18 +113,17 @@ module Skylab::Fields
         remove_instance_variable :@_RW_m
         remove_instance_variable :@_write_m
 
-        r_kn = remove_instance_variable :@_read_p_kn
-        rw_kn = remove_instance_variable :@_RW_p_kn
-        w_kn = remove_instance_variable :@_write_p_kn
+        rw_p = remove_instance_variable :@_read_writer_p
+        r_p = remove_instance_variable :@_reader_p
+        w_p = remove_instance_variable :@_writer_p
 
-        if rw_kn
-          # then our state machine "ensures" that the others were not
-          @__rw = rw_kn.value_x
+        if rw_p
           @_interpret_m = :__custom_interpret
+          @__rw = rw_p[ self ]
         else
-          @_read = r_kn ? r_kn.value_x : Read___
-          @_write = w_kn ? w_kn.value_x : Write___
           @_interpret_m = :__common_interpret
+          @_read = r_p ? r_p[ self ] : Read___
+          @_write = w_p ? w_p[ self ] : Write___
         end
 
         super

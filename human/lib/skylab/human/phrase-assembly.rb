@@ -122,7 +122,15 @@ module Skylab::Human
     # --
 
     def string_via_finish
-      sexp_via_finish.fetch 1
+      express_into ""
+    end
+
+    def express_into y
+      sx = sexp_via_finish
+      if sx
+        y << sx.fetch( 1 )
+      end
+      y
     end
 
     def sexp_via_finish  # might be nil

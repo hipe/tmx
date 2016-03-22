@@ -53,7 +53,8 @@
 
 [#022]       [ reader-writer ] AND theory..
 
-[#021] #hole ( assimilated c15n into [hu] )
+[#021] #open our n11n partially duplicates the n11n in [fi]
+             ( #was: assimilated c15n into [hu] )
 
 [#020]       [ parameter ]
              ( #was: assimilated c15n into [hu] )

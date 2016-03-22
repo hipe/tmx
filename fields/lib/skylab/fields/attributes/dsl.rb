@@ -135,8 +135,8 @@ module Skylab::Fields
             m = st.gets_one
           end
 
-          ca.read_by do
-            true
+          ca.reader_by_ do
+            NILADIC_TRUTH_
           end
 
           @_.add_methods_definer_by_ do |atr|

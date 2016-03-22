@@ -25,8 +25,8 @@ module Skylab::Autonomous_Component_System
 
       def execute
 
-        if @parameter_value_source.__is_not_known_to_be_empty
-          # respect [#]:#API-point-A - do bespokes IFF etc
+        if @parameter_value_source.is_not_known_to_be_empty__
+          # adhere to [#]:#API-point-A - do bespokes IFF etc
           ___interpret_any_bespokes
         end
 

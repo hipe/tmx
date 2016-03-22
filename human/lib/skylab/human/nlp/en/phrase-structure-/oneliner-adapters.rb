@@ -127,6 +127,27 @@ module Skylab::Human
             @_vp.to_string
           end
 
+          def << sym
+            _ = instance_variable_get DUPLICATED___.fetch sym
+            _ << sym
+            self
+          end
+
+          DUPLICATED___ = {
+            first: :@_np,
+            plural: :@_np,
+            present: :@_vp,
+            preterite: :@_vp,
+            progressive: :@_vp,
+            second: :@_np,
+            singular: :@_np,
+            third: :@_np,
+          }
+
+          def express_into y
+            @_vp.express_into y
+          end
+
           module NOUN_PHRASE_SINGLETON___
             class << self
               def number

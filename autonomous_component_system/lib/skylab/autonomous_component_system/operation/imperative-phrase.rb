@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    class Imperative_Phrase
+    class Imperative_Phrase  # 1x
 
       # required reading: algorithm in :[#014]
 

@@ -59,8 +59,7 @@ module Skylab::Fields::TestSupport
       def build_by_init_via_sexp_ x_a
 
         cls = entity_class_
-        o = cls.new
-        o = build_empty_entity_
+        o = cls.new  # `build_empty_entity_`
         _kp = cls::ATTRIBUTES.init o, x_a
         _kp && o
       end

@@ -88,6 +88,17 @@ module Skylab::Human::TestSupport
       _subject_module[ 'miss' ].singular_third_present.should eql 'misses'
     end
 
+    it "(more granular interface)" do
+
+      v_o = _subject_module[ 'have' ]
+
+      v_o << :singular << :third << :present
+
+      _ = v_o.express_into ""
+
+      _.should eql "has"
+    end
+
     def _subject_module
       _POS::Verb
     end

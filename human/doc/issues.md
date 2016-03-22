@@ -1,3 +1,5 @@
+[#053]       externally referenced test
+
 [#052]       conjuncter..
 
 [#051] #open word-mode must die :( in-situ, and: places where we bleed

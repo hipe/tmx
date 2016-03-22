@@ -18,18 +18,21 @@ module Skylab::Fields
 
       _ca = build.current_attribute
 
-      _ca.write_by do |x, oes_p|
+      _ca.writer_by_ do |_atr|
 
-        bx = box[]
-        if bx.has_name x  # as #here
+        -> x, oes_p do
 
-          accept_attribute_value x
-          KEEP_PARSING_
-        else
+          bx = box[]
+          if bx.has_name x  # as #here
 
-          _qkn = Callback_::Qualified_Knownness.via_value_and_symbol x, :attribute_value
+            accept_attribute_value x
+            KEEP_PARSING_
+          else
 
-          when_failed[ _qkn, bx, & oes_p ]
+            _qkn = Callback_::Qualified_Knownness.via_value_and_symbol x, :attribute_value
+
+            when_failed[ _qkn, bx, & oes_p ]
+          end
         end
       end
     end
