@@ -137,9 +137,9 @@ module Skylab::Human
           to_string
         end
 
-        def lemma
+        def lemma_string
 
-          @lexeme.to_lemma_string
+          @lexeme.as_lemma_string_
         end
 
         def plural
@@ -151,7 +151,7 @@ module Skylab::Human
         def singular
 
           self << :singular
-          @lexeme.to_lemma_string
+          @lexeme.as_lemma_string_
         end
 
         # ~ end
@@ -353,7 +353,7 @@ module Skylab::Human
             def inflect_words_into_against_noun_phrase y, phrase
 
               if :singular == phrase.number.intern
-                y << __money( phrase.lexeme.to_lemma_string )
+                y << __money( phrase.lexeme.as_lemma_string_ )
               end
               y
             end
@@ -434,7 +434,7 @@ module Skylab::Human
 
       def inflect_words_into_against_noun_phrase y, noun_phrase
 
-        s = @to_lemma_string
+        s = @as_lemma_string_
 
         if :singular == noun_phrase.number.intern
           y << s

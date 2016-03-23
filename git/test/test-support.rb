@@ -93,7 +93,7 @@ module Skylab::Git::TestSupport
 
   Expect_Event = -> tcc do
 
-    Callback_.test_support::Expect_event[ tcc ]
+    Callback_.test_support::Expect_Event[ tcc ]
   end
 
   Fixture_tree_ = -> sym do

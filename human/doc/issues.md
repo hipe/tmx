@@ -1,3 +1,18 @@
+[#059]       #track (1x) places where we convert from a progressive stream
+             of strings to mapping it into full statementish strings
+             only for consistency (and to meet the spec) at the expense
+             of streaminger streams.
+
+[#058]       statementish theory ..
+
+[#057] #open cleanup in aisle noun-phrase
+
+[#056]       predicateish theory ..
+
+[#055]       #wish #past-participle (internal to this lib)
+
+[#054]       :#antecedent-distance  (theory in our minds yet to be written)
+
 [#053]       externally referenced test
 
 [#052]       conjuncter..

@@ -40,7 +40,7 @@ module Skylab::Human
 
       def initialize lemma_form_string, & edit_p
 
-        @to_lemma_string = lemma_form_string
+        @as_lemma_string_ = lemma_form_string
 
         if edit_p
           instance_exec( & edit_p )
@@ -54,10 +54,14 @@ module Skylab::Human
         # this form is compatible with e.g irregular lexemes that don't
         # have a stringular lemma of their own, for e.g The Pronoun
 
-        to_lemma_string
+        as_lemma_string_
       end
 
-      attr_reader :to_lemma_string
+      def as_lemma_symbol_if_possible_
+        @as_lemma_string_.intern
+      end
+
+      attr_reader :as_lemma_string_
 
       # ~ that's the end of it
 

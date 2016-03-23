@@ -58,6 +58,18 @@ module Skylab::Human
 
       def _is_equivalent_to_counterpart_ o
 
+        if :__listifiable  == o.category_symbol_
+          ___is_equiv_to_other_listifiable o
+        else
+          # for now we're going to be dirty and assume that the other is a
+          # List and that it is nonzero in length (since it exists as a list)
+          # and we, always being one in length (when imagined as a list):
+          false
+        end
+      end
+
+      def ___is_equiv_to_other_listifiable o
+
         inner = o._inner_expression
         if inner.category_symbol_ == @_inner_expression.category_symbol_
           inner._is_equivalent_to_counterpart_ @_inner_expression
@@ -69,6 +81,10 @@ module Skylab::Human
         Siblings_::List.via_ _a, :association_symbol, @_ASC.name_symbol
       end
 
+      def to_read_only_array__
+        [ @_inner_expression ]
+      end
+
       attr_reader :_inner_expression
       protected :_inner_expression
 
@@ -78,11 +94,19 @@ module Skylab::Human
         :singular
       end
 
-      def person_exponent_symbol__
+      def person_exponent_symbol_
         :third  # ..
       end
 
+      def category_symbol_
+        :__listifiable
+      end
+
       def _can_aggregate_
+        true
+      end
+
+      def has_content_
         true
       end
     end

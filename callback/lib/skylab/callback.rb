@@ -1068,7 +1068,9 @@ module Skylab::Callback
 
       def _load_normpath
 
-        @normpath.value_is_known and self._HOLE  # probably just do it, yeah?
+        if @normpath.value_is_known
+          self._README  # (see commit)
+        end
         @normpath.change_state_to :loaded  # no autoviv. for this last one
         @load_file_path = @normpath.get_load_file_path
         load @load_file_path

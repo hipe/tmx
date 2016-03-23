@@ -60,6 +60,12 @@ module Skylab::Human::TestSupport
 
   # --
 
+  NLP_EN_Sexp_ = -> do
+    Home_::NLP::EN::Sexp
+  end
+
+  # --
+
   Expect_Event = -> tcc do
     Callback_.test_support::Expect_Event[ tcc ]
   end

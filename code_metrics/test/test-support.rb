@@ -114,7 +114,7 @@ module Skylab::CodeMetrics::TestSupport
   end
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_event[ tcc ]
+    Callback_.test_support::Expect_Event[ tcc ]
   end
 
   Expect_Stdout_Stderr = -> tcc do

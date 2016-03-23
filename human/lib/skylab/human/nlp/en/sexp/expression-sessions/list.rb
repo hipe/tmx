@@ -14,7 +14,7 @@ module Skylab::Human
       #
       # internally it requires *two* items of lookahead.
       #
-      # (coverd by the "proof of concept" test #here-1)
+      # (coverd by the "proof of concept" test at #spot-1)
       #
       # this underlying algorithm can be accomplished in about two lines
       # (attested by the only remaining (ancient) cousin of this is one
@@ -365,6 +365,24 @@ module Skylab::Human
         end
       end
 
+      def _aggregate_ o
+
+        if :list == o.category_symbol_
+          self._COVER_AND_WRITE_ME_list_on_list_concatenation
+        else
+          ___aggregate_non_list o
+        end
+      end
+
+      def ___aggregate_non_list o
+
+        _a = o.to_read_only_array__
+
+        @_top_secret_array.concat _a  # mutate self or don't..
+
+        self
+      end
+
       # -- constituency writing / reading  (see [#050]:#flatten)
 
       def _init_constituency_via_mixed x
@@ -399,8 +417,16 @@ module Skylab::Human
         end
       end
 
+      def person_exponent_symbol_
+        :third  # ..
+      end
+
       def _read_only_array
         send @_read_read_only_array_method
+      end
+
+      def has_content_
+        @_top_secret_array.length.nonzero?
       end
 
       def __top_secret_array

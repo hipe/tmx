@@ -14,13 +14,13 @@ module Skylab::Human
 
         vl = @event_.verb_lexeme
         if vl
-          v_s = vl.lemma
+          v_s = vl.lemma_string
         end
 
         if @event_.respond_to? :noun_lexeme
           nl = @event_.noun_lexeme
           if nl
-            n_s = nl.lemma
+            n_s = nl.lemma_string
           end
         end
 

@@ -110,7 +110,7 @@ module Skylab::Human
 
             atrs = exp.class::COMPONENTS  # ..
 
-            is_alias = atrs.is_X( :_effectively_an_alias_ ) || MONADIC_EMPTINESS_
+            is_alias = atrs.is_X( :_referrant_ ) || MONADIC_EMPTINESS_
             is_atomic = atrs.is_X( :_atomic_ ) || MONADIC_EMPTINESS_
 
             st = atrs.to_defined_attribute_stream
@@ -132,7 +132,7 @@ module Skylab::Human
                 exp.send k
               end
 
-              x_ = exp_.send k
+              x_ = exp_.send k  # :#spot-3
 
               if is_atomic[ k ]
 

@@ -2,7 +2,26 @@ module Skylab::Human
 
   module NLP::EN::Sexp
 
-    class Expression_Sessions::Predicateish
+    class Expression_Sessions::Predicateish  # important theory at :[#056].
+
+      COMPONENTS = Attributes_[
+
+        object_noun_phrase: [ :component, :_read, :_write ],
+
+        lemma: [ :_atomic_, :ivar, :@lemma_symbol ],
+
+        # (etc other grammatical categories #here-1)
+
+        tense: [ :_atomic_, :_read,
+                 :custom_interpreter_method_of, :__interpret_tense, ],
+
+      ]
+
+      attr_writer( * COMPONENTS.symbols( :_write ) )
+
+      attr_reader( * COMPONENTS.symbols( :_read ) )
+
+      attr_accessor :lemma_symbol
 
       class << self
 
@@ -10,44 +29,48 @@ module Skylab::Human
           new.__init_via_sexp_stream st
         end
 
+        alias_method :begin_, :new
         private :new
       end  # >>
 
-      COMPONENTS = Attributes_[
-        object_noun_phrase: :component,
-        verb_lemma: :_atomic_,
-      ]
+      def initialize
+        @tense = nil
+      end
 
-      attr_reader( * COMPONENTS.symbols )
+      def initialize_copy _
+        NOTHING_   # (hi.)
+      end
 
       def __init_via_sexp_stream st
 
-        o = COMPONENTS.begin_parse_and_normalize_for self
-        o.argument_stream = st
-        _ok = o.execute
-        _ok && self
+        COMPONENTS.init_via_stream self, st
       end
 
       def __object_noun_phrase__component_association
         Siblings_::Nounish
       end
 
+      def nilify_object__
+        @object_noun_phrase = nil
+      end
+
+      def << sym
+        instance_variable_set REDUCED_REDUNDANCY___.fetch( sym ), sym
+        self
+      end
+
+      REDUCED_REDUNDANCY___ = {
+        # (we rewrite a swath of this rather than depend on the other guy)
+
+        # (etc other grammatical categories #here-1)
+
+        present: :@tense,
+        preterite: :@tense,
+      }
+
       # --
 
-      def express_into_under_for_subject__ y, expag, subj
-
-        # `inflect_words_into_against_sentence_phrase`
-
-        vp = EN_::POS::Verb[ subj, @verb_lemma.id2name ]
-
-        # vp << :present  # ..
-
-        y << vp.to_string
-
-        y << SPACE_
-
-        @object_noun_phrase.express_into_under y, expag
-      end
+      # ~
 
       def to_statementish_stream_for_subject * sexp
 
@@ -63,6 +86,69 @@ module Skylab::Human
         end
       end
 
+      def to_statementish_stream_without_subject  # #spot-1
+
+        Callback_::Stream.once do
+          o = Siblings_::Statementish.begin_
+          o.verb_phrase = self
+          o
+        end
+      end
+
+      # ~
+
+      def express_into_under_for_subject__ y, expag, subj
+
+        # near `inflect_words_into_against_sentence_phrase`
+        # [#].2 explains why we do this anew at each expression
+
+        ph = Skylab::Human::NLP::EN::POS::Verb[ subj, @lemma_symbol.id2name ]
+
+        ph << ( @tense || :present )
+
+        # (etc other grammatical categories #here-1)
+
+        ph.express_into y
+
+        _express_any_object y, expag
+      end
+
+      def express_into_under y, expag  # NOTE -
+
+        # only for above, for passive voice. normally a verb-phrase cannnot
+        # express without knowing its subject. if these semantics for this
+        # method are ever a problem, make an adapter class "past participle"
+
+        _ = Siblings_::Nounish::Natural_defaults[]  # for now it is necessary
+        # that these hardcoded values are passed explicitly b.c the POS lib
+        # does not know of our hackery..
+
+        ph = Skylab::Human::NLP::EN::POS::Verb[ _, @lemma_symbol.id2name ]
+
+        ph << ( @tense || :present )
+
+        ph.express_into y
+
+        @object_noun_phrase and self._SANITY
+        y
+      end
+      protected :express_into_under
+
+      def _express_any_object y, expag
+
+        o = @object_noun_phrase
+        if o
+          y << SPACE_
+          @object_noun_phrase.express_into_under y, expag
+        else
+          y
+        end
+      end
+
+      def lemma  # only for use by #spot-3 (machine reading)
+        @lemma_symbol
+      end
+
       def association_symbol_  # ..
         :_predicateish_
       end
@@ -72,6 +158,11 @@ module Skylab::Human
       end
 
       class List
+
+        # map the same subject on to several sequential predicates.
+        # currently, adds "also" in "foo is bar. also foo has baz."
+        # in the future we might add production of use of pronouns
+        # with #antecedent-distance.
 
         class << self
           alias_method :via_, :new

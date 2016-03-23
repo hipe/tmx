@@ -8,7 +8,7 @@ module Skylab::Human::TestSupport
 
     it "(cute)" do
 
-      o = Home_::NLP::EN::Sexp.expression_session_for(
+      o = NLP_EN_Sexp_[].expression_session_for(
         :list, :through, :columnar_aggregation_of_statementishes,
       )
 

@@ -71,30 +71,28 @@ module Skylab::Human
           Third = method :__third
         end
 
-        class For_Verb
+        class For_Verb  # (screen starting from here is example in #[#bs-028])
 
-          def initialize lexeme
+          class << self
 
-            lib = POS__[]
-
-            @_np = lib::Noun[]  # yes it's ok: a noun phrase without a lexeme
-
-            @_vp = lib::Verb::Omni_Phrase.new @_np, lexeme
-          end
-
-          def lemma
-            lxm = @_vp.lexeme
-            if lxm.is_regular
-              lxm.to_lemma_string
-            else
-              lxm.lemma_x  # as long as it works?
+            def via_lexeme__ lxm
+              ___begin.__init_via_lexeme lxm
             end
+
+            alias_method :___begin, :new
+            undef_method :new
+          end  # >>
+
+          def initialize
+            @_np = POS__[]::Noun[]  # build a noun phrase without a lexeme
           end
 
-          def lexeme
-
-            @_vp.lexeme
+          def __init_via_lexeme lxm
+            @_vp = POS__[]::Verb::Omni_Phrase.new @_np, lxm
+            self
           end
+
+          # --
 
           def preterite
 
@@ -146,6 +144,23 @@ module Skylab::Human
 
           def express_into y
             @_vp.express_into y
+          end
+
+          def lemma_symbol
+            @_vp.lexeme.as_lemma_symbol_if_possible_
+          end
+
+          def lemma_string
+            lxm = @_vp.lexeme
+            if lxm.is_regular
+              lxm.as_lemma_string_
+            else
+              lxm.lemma_x  # as long as it works?
+            end
+          end
+
+          def lexeme
+            @_vp.lexeme
           end
 
           module NOUN_PHRASE_SINGLETON___

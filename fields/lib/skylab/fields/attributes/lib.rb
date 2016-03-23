@@ -169,7 +169,7 @@ module Skylab::Fields
           :at_extra_token,
         )
 
-        def execute_as_init__
+        def execute_as_init_
 
           _ok = execute
           _ok && @session

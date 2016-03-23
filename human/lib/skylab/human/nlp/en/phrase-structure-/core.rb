@@ -8,14 +8,16 @@ module Skylab::Human
 
       # ~ model-ish
 
-      class Sentence_Phrase_Constituency_
+      class Sentence_Phrase_Constituency_  # (from one file)
 
         def initialize np, vp
           @noun_phrase = np
           @_verb_phrase = vp
         end
 
-        attr_reader :noun_phrase
+        def initialize_copy _
+          self._NO
+        end
 
         def number
           @noun_phrase.number
@@ -28,6 +30,10 @@ module Skylab::Human
         def tense
           @_verb_phrase.tense
         end
+
+        attr_reader(
+          :noun_phrase,
+        )
       end
 
       # ~ for irregulars
@@ -43,10 +49,10 @@ module Skylab::Human
           @_mod = mod
         end
 
-        def touch lemma_string, & edit_p
+        def touch lemma_s, & edit_p
 
           @_bx ||= _build_box
-          @_bx.touch lemma_string, & edit_p
+          @_bx.touch lemma_s, & edit_p
         end
 
         def _build_box

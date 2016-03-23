@@ -1,6 +1,6 @@
 require_relative '../../test-support'
 
-describe "[hu] NLP EN minitesimal" do  # :#here-2
+describe "[hu] NLP EN minitesimal" do  # :#spot-2
 
   context "s" do
 

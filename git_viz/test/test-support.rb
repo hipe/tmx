@@ -128,7 +128,7 @@ module Skylab::GitViz::TestSupport
   Expect_Event = -> tcc do  # `tcc` = test context class
 
     tcc.include(
-      Home_::Callback_.test_support::Expect_event::Test_Context_Instance_Methods )
+      Home_::Callback_.test_support::Expect_Event::Test_Context_Instance_Methods )
 
     NIL_
   end

@@ -32,7 +32,7 @@ module Skylab::Human
 
           lexeme = yield
 
-          # $stderr.puts "ADDING REULGAR NOUN: \"#{ lexeme.to_lemma_string }\""
+          # $stderr.puts "ADDING REULGAR NOUN: \"#{ lexeme.as_lemma_string_ }\""
 
           @_is_initialized[ lemma_x ] = true
           @_h[ lemma_x ] = lexeme

@@ -64,7 +64,14 @@ module Skylab::Fields
 
       o = begin_parse_and_normalize_for sess, & x_p
       o.sexp = x_a
-      o.execute_as_init__
+      o.execute_as_init_
+    end
+
+    def init_via_stream sess, st, & x_p  # [hu]
+
+      o = begin_parse_and_normalize_for sess, & x_p
+      o.argument_stream = st
+      o.execute_as_init_
     end
 
     def normalize_session sess, & x_p

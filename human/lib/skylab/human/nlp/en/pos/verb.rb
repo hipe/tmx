@@ -71,7 +71,7 @@ module Skylab::Human
 
           else
 
-            EN_::Phrase_Structure_::Oneliner_Adapters::For_Verb.new lexeme
+            EN_::Phrase_Structure_::Oneliner_Adapters::For_Verb.via_lexeme__ lexeme
           end
         end
       end  # >>
@@ -115,6 +115,17 @@ module Skylab::Human
           @_tense = nil
         end
 
+        def dup_for_subject_ x_o
+          dup.__init_for_subject x_o
+        end
+
+        private :dup
+
+        def __init_for_subject x_o
+          @_spc = Sentence_Phrase_Constituency_.new x_o, self
+          self
+        end
+
         def << exponent_symbol
 
           _cat_sym = self.class::UNIQUE_EXPONENTS.fetch exponent_symbol
@@ -149,6 +160,16 @@ module Skylab::Human
             s
           end
           NIL_
+        end
+
+        def lemma_symbol= sym
+          _lxm = Verb_.in_lexicon_touch_lemma_via_string sym.id2name
+          @lexeme = _lxm
+          sym
+        end
+
+        def lemma_symbol
+          @lexeme.as_lemma_symbol_if_possible_
         end
 
         # ~ m
@@ -267,7 +288,7 @@ module Skylab::Human
 
       def __inflect_for__preterite__tense y, _sp=nil
 
-        s = @to_lemma_string
+        s = @as_lemma_string_
         md = ENDS_IN_E_RX__.match s
         if md
           s = md.pre_match
@@ -279,9 +300,9 @@ module Skylab::Human
 
         if :singular == sp.number.intern && :third == sp.person.intern
 
-          y << Add_S_ending_[ @to_lemma_string ]
+          y << Add_S_ending_[ @as_lemma_string_ ]
         else
-          y << @to_lemma_string
+          y << @as_lemma_string_
         end
       end
 
@@ -291,7 +312,7 @@ module Skylab::Human
 
       def inflect_for_progressive_tense_ y
 
-        s = @to_lemma_string
+        s = @as_lemma_string_
 
         case s
         when ENDS_IN_E_RX__

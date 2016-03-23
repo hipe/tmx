@@ -36,15 +36,17 @@ module Skylab::Human::TestSupport
 
       class TS_::Fake_Lexeme_EEK
         def initialize s
-          @lemma = s
+          @_s = s
         end
         def progressive
-          "#{ @lemma }ing"
+          "#{ @_s }ing"
         end
         def preterite
-          "#{ @lemma }ed"
+          "#{ @_s }ed"
         end
-        attr_reader :lemma
+        def lemma_string
+          @_s
+        end
       end
       _Fake_lexeme = TS_::Fake_Lexeme_EEK.method :new
       _Fake_lexeme[ x ]

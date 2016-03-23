@@ -13,9 +13,9 @@ module Skylab::Human::TestSupport
 
         o = _begin
 
-        o.add_sexp [ :predicateish, :verb_lemma, :be, :object_noun_phrase, "x" ]
+        o.add_sexp [ :predicateish, :lemma, :be, :object_noun_phrase, "x" ]
 
-        o.add_sexp [ :predicateish, :verb_lemma, :be, :object_noun_phrase, "y" ]
+        o.add_sexp [ :predicateish, :lemma, :be, :object_noun_phrase, "y" ]
 
         o.expression_via_finish
       end
@@ -25,7 +25,7 @@ module Skylab::Human::TestSupport
       end
 
       it "the result expression's verb lemma is the same" do
-        _expression.verb_lemma.should eql :be
+        _expression.lemma_symbol.should eql :be
       end
 
       it "the result expression's object noun phrase became the list" do
@@ -42,9 +42,8 @@ module Skylab::Human::TestSupport
 
       it "wahoo expression one" do
 
-        a = _jimmy_is
-        1 == a.length or fail
-        a.fetch( 0 ).should match %r(\AJimmy is x and y\b)
+        _a = _jimmy_is
+        _one_line( _a ).should match %r(\AJimmy is x and y\b)
       end
     end
 
@@ -59,11 +58,11 @@ module Skylab::Human::TestSupport
       end
 
       it "these things are normal" do
-        _expression.verb_lemma.should eql :be
+        _expression.lemma_symbol.should eql :be
         o = _expression.object_noun_phrase
         o.verb_lemma.should eql :miss
         oo = o.object_noun_phrase
-        oo.lemma.should eql :property
+        oo.lemma_symbol.should eql :property
         oo.modifier_word_list.send( :_s_a ).should eql [ 'required' ]
       end
 
@@ -82,9 +81,8 @@ module Skylab::Human::TestSupport
 
       it "wahoo expression two" do
 
-        a = _jimmy_is
-        1 == a.length or fail
-        a.fetch( 0 ).should match(
+        _a = _jimmy_is
+        _one_line( _a ).should match(
           %r(\AJimmy is missing required properties 'par-1' and 'par-2') )
       end
     end
@@ -97,11 +95,16 @@ module Skylab::Human::TestSupport
         o.expression_via_finish
       end
 
-      it "(expresses OK)" do
-        a = _jimmy_is
-        1 == a.length or fail
-        a.fetch( 0 ).should match (
+      it "(express three)" do
+
+        _a = _jimmy_is
+        _one_line( _a ).should match(
           %r(\AJimmy is missing required property 'par-1') )
+      end
+
+      it "(no subject three)" do
+        _a = _when_wo_subject
+        _a.should eql [ "missing required property 'par-1'\n" ]
       end
     end
 
@@ -118,7 +121,7 @@ module Skylab::Human::TestSupport
       it "these things are normal" do
 
         o = _expression
-        o.verb_lemma.should eql :require
+        o.lemma_symbol.should eql :require
 
         oo = o.object_noun_phrase
 
@@ -136,12 +139,19 @@ module Skylab::Human::TestSupport
         _a.fetch( 1 ).send( :_x ).as_variegated_symbol.should eql :par_2
       end
 
-      it "express!" do
+      it "express four!" do
 
-        a = _jimmy_is
-        1 == a.length or fail
-        a.fetch( 0 ).should match(
+        _a = _jimmy_is
+        _one_line( _a ).should match(
           %r(\AJimmy requires 'par-1' and 'par-2' which failed to load\b) )
+      end
+
+      it "(no subject four)" do
+
+        _a = _when_wo_subject
+
+        _one_line( _a ).should match(
+          %r(\A'par-1' and 'par-2' which failed to load are required\b) )
       end
     end
 
@@ -162,12 +172,12 @@ module Skylab::Human::TestSupport
 
       it "first of two (rough)" do
         _ = _first_of_two
-        _.verb_lemma.should eql :be
+        _.lemma_symbol.should eql :be
       end
 
       it "second of two (rough)" do
         _ = _second_of_two
-        _.verb_lemma.should eql :require
+        _.lemma_symbol.should eql :require
       end
 
       def _first_of_two
@@ -232,10 +242,10 @@ module Skylab::Human::TestSupport
       end
     end
 
-    def _build_big_pred_with guy
+    def _build_big_pred_with guy  # externally referenced as :[#053].
 
       [ :predicateish,
-        :verb_lemma, :be,
+        :lemma, :be,
         :object_noun_phrase, [
           :gerund_phraseish,
           :verb_lemma, :miss,
@@ -252,7 +262,7 @@ module Skylab::Human::TestSupport
     def _build_other_big_pred_with guy
 
       [ :predicateish,
-        :verb_lemma, :require,
+        :lemma, :require,
         :object_noun_phrase, [
           :nounish,
           :suffixed_modifier_phrase, [ :word_list, %w( which failed to load ) ],
@@ -280,7 +290,7 @@ module Skylab::Human::TestSupport
       if o
         o.dup
       else
-        o = Home_::NLP::EN::Sexp.expression_session_for(
+        o = NLP_EN_Sexp_[].expression_session_for(
           :list, :through, :treeish_aggregation,
         )
         o
@@ -307,6 +317,13 @@ module Skylab::Human::TestSupport
       Callback_::Name.via_variegated_symbol sym
     end
 
+    def _when_wo_subject
+
+      _exp = _expression
+      _st = _exp.to_statementish_stream_without_subject
+      _lines_via_statement_stream _st
+    end
+
     _JIMMY = 'Jimmy'
 
     define_method :_jimmy_is do
@@ -317,6 +334,11 @@ module Skylab::Human::TestSupport
         :nounish, :proper_noun, _JIMMY )
 
       _lines_via_statement_stream _st
+    end
+
+    def _one_line a
+      1 == a.length or fail
+      a.fetch 0
     end
   end
 end

@@ -11,7 +11,7 @@ module Skylab::Brazen
         y << "this is the second line of the init description"
       end,
 
-      :inflect, :noun, :lemma, :with_lemma, 'workspace',
+      :inflect, :noun, :lemma_string, :with_lemma, 'workspace',
         # the above gives us "inited workspace" instead of ".. *a* workspace"
 
       :promote_action,

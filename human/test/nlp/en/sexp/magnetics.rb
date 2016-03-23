@@ -26,7 +26,7 @@ module Skylab::Human::TestSupport
       end
 
       def magnetic_module_for_ const
-        Home_::NLP::EN::Sexp::Expression_Sessions.const_get const, false
+        NLP_EN_Sexp_[]::Expression_Sessions.const_get const, false
       end
     # -
   end

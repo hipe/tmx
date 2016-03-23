@@ -30,6 +30,10 @@ module Skylab::Human
           Phraseish_Redux___.new st, asc
         end
 
+        def expression_via_sexp_stream_ st  # #test-only
+          Phraseish_Redux___.new st, nil
+        end
+
         alias_method :begin, :new
         private :new
       end  # >>
@@ -70,21 +74,27 @@ module Skylab::Human
     class Phraseish_Redux___ < Redux_Abstract_Base
 
       COMPONENTS = Attributes_[
-        lemma: :_atomic_,
-        modifier_word_list: :component,
-        proper_noun: [ :custom_interpreter_method, :_effectively_an_alias_ ],
-        suffixed_proper_constituency: :component,
-        suffixed_modifier_phrase: :component,
+
+        lemma: [ :_atomic_, :ivar, :@lemma_symbol ],
+
+        modifier_word_list: [ :component, :_read ],
+
+        proper_noun: [ :custom_interpreter_method, :_referrant_, :_read ],
+
+        suffixed_proper_constituency: [ :component, :_read, ],
+
+        suffixed_modifier_phrase: [ :component, :_read ],
       ]
 
-      attr_reader( * COMPONENTS.symbols )
+      attr_reader( * COMPONENTS.symbols( :_read ) )
 
       def initialize st, asc
 
-        o = COMPONENTS.begin_parse_and_normalize_for self
-        o.argument_stream = st
-        _ok = o.execute
-        _ok and super asc
+        @lemma_symbol = nil
+        ok = COMPONENTS.init_via_stream self, st
+        ok or fail
+        @suffixed_proper_constituency ||= Natural_defaults___[]
+        super asc
       end
 
       def __modifier_word_list__component_association
@@ -112,7 +122,7 @@ module Skylab::Human
 
       def express_into_under y, expag
 
-        # -- this won't stay here..
+        # -- this won't stay here..  #open [#057]
 
         sr = nil  # space is required
         space_if_necessary = -> do
@@ -131,13 +141,13 @@ module Skylab::Human
           sr = true
         end
 
-        if self.lemma
+        if @lemma_symbol
           space_if_necessary[]
           ___express_inflected_lemma_into y
         end
 
-        co = self.suffixed_proper_constituency
-        if co
+        co = @suffixed_proper_constituency
+        if co.has_content_
           space_if_necessary[]
           co.express_into_under y, expag
         end
@@ -153,15 +163,11 @@ module Skylab::Human
 
       def ___express_inflected_lemma_into y
 
-        if self.suffixed_proper_constituency
-          m = number
-        else
-          m = :singular  # ??
-        end
+        _m = number
 
-        _hi = EN_::POS::Noun[ @lemma.id2name ]
+        _hi = EN_::POS::Noun[ @lemma_symbol.id2name ]
 
-        _hey = _hi.send m
+        _hey = _hi.send _m
         y << _hey
         NIL_
       end
@@ -177,7 +183,15 @@ module Skylab::Human
       end
 
       def person
-        @suffixed_proper_constituency.person_exponent_symbol__
+        @suffixed_proper_constituency.person_exponent_symbol_
+      end
+
+      def lemma  # only for use by #spot-3 (machine reading)
+        @lemma_symbol
+      end
+
+      def lemma_symbol
+        @lemma_symbol
       end
 
       def _can_aggregate_
@@ -189,10 +203,12 @@ module Skylab::Human
       end
     end
 
-    class Redux_Abstract_Base
+    class Redux_Abstract_Base  # this lib only
 
       def initialize asc
-        @association_symbol_ = asc.name_symbol
+        if asc
+          @association_symbol_ = asc.name_symbol
+        end
       end
 
       def association_symbol_
@@ -212,6 +228,50 @@ module Skylab::Human
 
       def _is_mutable_list_
         false
+      end
+    end
+
+    Natural_defaults___ = Lazy_.call do
+
+      class Natural_Defaults____  # natural defaults
+
+        class << self
+          private :new
+        end
+
+        def number_exponent_symbol_
+          :singular
+        end
+
+        def person_exponent_symbol_
+          :third
+        end
+
+        def has_content_
+          false
+        end
+
+        new
+      end
+    end
+
+    Natural_defaults = Lazy_.call do
+
+      class These_Natural_Defaults___
+
+        class << self
+          private :new
+        end
+
+        def number
+          :singular
+        end
+
+        def person
+          :third
+        end
+
+        new
       end
     end
 

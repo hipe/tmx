@@ -18,10 +18,9 @@ module Skylab::Human
 
       def initialize st, asc
 
-        o = COMPONENTS.begin_parse_and_normalize_for self
-        o.argument_stream = st
-        _ok = o.execute
-        _ok and super asc
+        _ok = COMPONENTS.init_via_stream self, st
+        _ok or fail
+        super asc
       end
 
       def __object_noun_phrase__component_association

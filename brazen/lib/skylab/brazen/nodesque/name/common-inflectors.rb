@@ -152,7 +152,6 @@ module Skylab::Brazen
       end
 
       TRAILING_LETTER_S_RX___ = /s\z/
-
     end
 
     class Inflector_for_Action < Inflector_for_Model
@@ -236,7 +235,7 @@ module Skylab::Brazen
           end
         end
 
-        _sym || :lemma  # i.e do not inflect, just use the "dictionary entry" word
+        _sym || :lemma_string  # i.e do not inflect, just use the "dictionary entry" word
       end
 
       def __infer_noun_stem  # #to-determine-a-noun

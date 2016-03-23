@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP EN Sexp - proof of concept" do  # (this is test :#here-1)
+  describe "[hu] NLP EN Sexp - proof of concept" do  # (:#spot-2)
 
     extend TS_
 
@@ -147,7 +147,7 @@ module Skylab::Human::TestSupport
     end
 
     def _lib_node
-      Home_::NLP::EN::Sexp
+      NLP_EN_Sexp_[]
     end
   end
 end

@@ -11,7 +11,7 @@ module Skylab::Fields
       :prefixed_conjunctive_phrase_context_proc, nil,
       :prefixed_conjunctive_phrase_context_stack, nil,
       :suffixed_prepositional_phrase_context_proc, nil,
-      :lemma, nil,
+      :lemma, nil,  # string or symbol OK
       :adj, nil,
       :invite_to_action, nil,
       :error_category, :argument_error,

@@ -39,7 +39,7 @@ module Skylab::Human
         def new_ kns
           new.__init kns
         end
-        alias_method :new_empty__, :new
+        alias_method :new_empty_c15n__, :new
         private :new
       end  # >>
 
@@ -123,7 +123,7 @@ module Skylab::Human
 
       def do_as__ m, cls  # ick/wow
 
-        o = cls.new_empty__
+        o = cls.new_empty_c15n__
         instance_variables.each do |i|
           UNDERSCORE_ == i[ 1 ] and next  # experiment
           o.instance_variable_set i, instance_variable_get( i )

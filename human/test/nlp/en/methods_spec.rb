@@ -73,7 +73,7 @@ module Skylab::Human::TestSupport
 
     define_method :_expect, -> do
 
-      # ( has a counterpart test in #here-2 )
+      # ( has a counterpart test in #spot-2 )
       # ( note the example is somewhat un-realistic because we are using the
       # same count-variable referrant for two different noun phrases. )
 

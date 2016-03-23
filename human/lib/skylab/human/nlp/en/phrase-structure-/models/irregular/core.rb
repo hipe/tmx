@@ -129,8 +129,6 @@ module Skylab::Human
           @_module = mod
         end
 
-        attr_reader :lemma_x
-
         def inflect_words_into_against_sentence_phrase y, sp
 
           _and_a = __to_grammatical_category_state_around_ sp
@@ -157,6 +155,17 @@ module Skylab::Human
 
           Irregular_::Actors_::Inflect[ y, and_a, _st ]
         end
+
+        def as_lemma_symbol_if_possible_
+
+          # (name leaves room for irregular lexemes w/o lemma (The Pronoun))
+
+          @lemma_x.intern  # no need to memoize symbols, right?
+        end
+
+        attr_reader(
+          :lemma_x,
+        )
 
         def is_regular  # ..
           false

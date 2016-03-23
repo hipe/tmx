@@ -75,6 +75,10 @@ module Skylab::Fields::TestSupport
     def handle_event_selectively_
       event_log.handle_event_selectively
     end
+
+    def common_expression_agent_
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
   end
 
   Build_next_integer_generator_starting_after = -> d do

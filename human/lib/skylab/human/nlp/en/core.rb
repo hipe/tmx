@@ -77,7 +77,7 @@ module Skylab::Human
         o.freeze
       end
 
-      S__ = -> do  # tested #here-1
+      S__ = -> do  # tested at #spot-1
 
         it_them = [ 'them', 'it' ]
 

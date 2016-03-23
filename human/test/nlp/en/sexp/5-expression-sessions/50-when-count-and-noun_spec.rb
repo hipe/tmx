@@ -20,7 +20,7 @@ module Skylab::Human::TestSupport
 
     it "x." do
 
-      _ef = Home_::NLP::EN::Sexp.expression_session_for(
+      _ef = NLP_EN_Sexp_[].expression_session_for(
         :when,
         :syntactic_category, :noun_phrase,
         :subject, 3, :subject, 'amigo' )
