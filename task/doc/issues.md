@@ -1,4 +1,4 @@
-[#009]       this needs comparative analysis
+[#009]       this needs comparative analysis (has subscribers)
 
 [#008]       synthesis dependencies..
 

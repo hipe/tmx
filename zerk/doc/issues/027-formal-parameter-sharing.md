@@ -13,7 +13,7 @@ define the specification of our API that can effect them in concert.
 
 the "socialist" (as we use the term here) model is the theoretical
 underpinning of [ze] in how it expresses an [ac] for its three bundled
-modalities.
+modalities (API, non-interactive command-line interface (nCLI), and CLI).
 
 (our "socialism" is related to *actual* socialism only in that both
 concepts employ *sharing* more than their sibling models. we adopt the
@@ -69,7 +69,7 @@ with all of this here..)
 whereas [ac] has its own facilty for interpreting/inferring formal
 parameters, the [ze] will do so in this way:
 
-  1) every formal operation defines a "scope set".
+  1) every formal operation defines a :#scope-set.
 
      regardless of which "bundled modality" we are in, any formal
      operation defines a [#031] "selection stack". from this stack
@@ -78,6 +78,9 @@ parameters, the [ze] will do so in this way:
      of nodes as the "scope set" below.
 
      (this concept is perhaps explored further in [#015].)
+
+     (for ease of implementation we may simply derive the scope set as
+     all node names in the selection stack.)
 
      B) a formal operation cannot "subtract" nodes from its scope-set.
 
@@ -92,7 +95,7 @@ parameters, the [ze] will do so in this way:
 
 
 
-  2) every formal operation defines a :"stated set"
+  2) every formal operation defines a :#stated-set
 
      the stated-set for a given formal operation is:
 
@@ -108,7 +111,7 @@ parameters, the [ze] will do so in this way:
 
 
 
-  3) the "socialist set" is:
+  3) the :#socialist-set is:
 
          (2) ∩ (1)
 
@@ -116,7 +119,7 @@ parameters, the [ze] will do so in this way:
 
 
 
-  4) the :"bespoke set" is:
+  4) the :#bespoke-set is:
 
          (2) ∖ (1)
 
@@ -163,7 +166,7 @@ parameters, the [ze] will do so in this way:
 
 
 
-## for "procure bound call"
+## for :"procure bound call"
 
 when we have a formal operation we can derive all of this:
 
@@ -210,4 +213,151 @@ calculate (3) and (4).
 
 
 
-## (this is the future home of :"Crazytimes".. (stashed away))
+
+
+## :"Crazytimes"
+
+this is a first stab at at algorithm for how we can assemble the kinds
+of expressions we want to express when there are "deep unavailabilities":
+
+1) each time we "enter into" the act of trying to "solve" a formal
+   operation (either that of the top of the selection stack or any one of
+   its dependencies, recursively); we push a special kind of new frame on
+   to what we will call the :"trouble stack".
+
+   • assumptions: all dependency graphs from all well-formed ACS's don't
+     cycle. all branch nodes of such graphs correspond to operations
+     (and vice-versa). all leaf nodes of such graphs correspond to
+     atom-esque nodes (and let's just say vice-versa for now).
+
+   • terminology: we'll call every branch node / formal operation that
+     is *not* the "entrypoint formal operation" an "ancillary operation"
+     (or just "ancillary" for short).
+
+
+
+
+2) (this algorithm is a specialized variant of the [#ac-028]#Algorithm,
+   which in turn is specialized variant of #[#fi-012] normal normalization.
+   participants along this whole trail are all tagged as candidates for
+   a possible future unification when all the dust settles (say, when
+   #milestone-9). at writing this *seems* to be the most formally documented
+   of the algorithms..)
+
+   the resolution of any formal operation as far as we're concerned is
+   in the act of resolving its 0-N defined parameters, and then (if this
+   works) the act of executing the operation.
+
+   each formal parameter is either a formal operation (a.k.a branch node,
+   a.k.a "operation-dependency") or an atom-esque (a leaf node0.
+   as a distinct classification, each formal parameter is either required
+   or optional.
+
+   what we'll refer to as "solving" is the general act of resolving a value
+   for the parameter. in the case of formal operations, "solving" such a node
+   means solving (recursively) each of its 0-N defined parameters, and then
+   executing the operation without failing.
+
+   for atom-esques, what we'll refer to as "solving" is the case of the
+   parameter having a known value that is non-nil.
+
+   for what we'll call "operation-dependencies", how we evaluate them
+   is the subject of the next numbered section after this one; however
+   what we do with their classification is referenced here:
+
+   in pseudocode,
+       autovivify a "reason list" as needed.
+       this operation will have failed to solve IFF
+       the reason list was created (i.e is nonzero in length).
+
+       for each node in the "stated set" (actually a list),
+
+         classify this node accoding to the logic in the next
+         numbered section (extrapolate treatment of atomic nodes
+         from what is described for operation-dependencies) and:
+
+           when failed
+             add an appropriate reason to the reason list
+           when skip
+             do nothing
+           since solved
+             add { this evaluation or its value } to "the store"
+
+        now that we have gone through every node,
+        if the reason list was created
+          we have failed. the reason list is our significant result.
+        otherwise
+          we have succeeded. "the store" is our significant result.
+        end
+
+
+
+
+
+3) evaluating operation-dependencies
+
+   (this is very similar to [#ta-009] general task-graph resolution, and is
+   a candidate for a future unification of that trail.)
+
+   what do in the case of failure *of* an ancillary operation
+   was an area of mystery for a while, now has this theoretical answer.
+
+   all relevant in-conditions to this problem are in terms of categories
+   describing the classification and evaluation of the (operation-)
+   dependency:
+
+     • the dependency itself is either required or optional (exactly one).
+
+     • the dependency either does or doesn't have its own requirements met.
+
+     • the dependency that can execute either succeeds or fails execution.
+
+   all possible relevant out-conditions to this problem are:
+
+     • you can WIN (you may procede),
+     • you can SKIP (you may also procede) or
+     • you FAIL
+
+   here is how we arrive at all possible out-conditions from all
+   possible in-conditions:
+
+     • you FAIL IFF ANY OF:
+
+       • the dependency is required and it had missing dependencies
+
+       • the dependency (required or optional) met its
+         dependencies but failed on execution.
+
+     • you SKIP IFF:
+
+       • the dependency is optional and does not meet its dependencies.
+
+     • you WIN IFF:
+
+       • the dependency (required or optional) met its dependencies
+         and succeeded on execution.
+
+    as a "guarantee" that all relevant cases are covered correctly, we
+    re-arrange the above as a permutations table (like a rule table):
+
+        if..          | and..                   | then:
+        deps not met  |      was required       |  FAIL
+        deps not met  |  was not required       |  SKIP
+            deps met  |     its execution fails |  FAIL
+            deps met  |  its execution succeeds |  WIN
+
+   the main things to note here are:
+
+     • an optional dependency *can* cause the whole thing to fail IFF its
+       own execution fails (provided that it gets to the point of executing).
+
+     • there are two distinct kinds of failure. we may make a dedicated
+       event class for one or both of them, one that is expressive.
+
+
+
+
+
+4) the final result of the entrypoint formal operation (WHEN REASON)
+   is hopefully some kind of tree..
+_

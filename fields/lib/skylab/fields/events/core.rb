@@ -13,7 +13,7 @@ module Skylab::Fields
 
     Events::Missing = Callback_::Event.prototype_with(
 
-      # NOTE this is being bent to serve [#ze-027]:#Crazytimes (coming)
+      # NOTE this is being bent to serve [#ze-027]:#Crazytimes
 
       :missing_required_attributes,
 

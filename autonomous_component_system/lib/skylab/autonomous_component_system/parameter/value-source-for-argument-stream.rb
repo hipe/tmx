@@ -20,6 +20,10 @@ module Skylab::Autonomous_Component_System
         end
       end
 
+      def to_empty
+        Empty___[]
+      end
+
       def is_not_known_to_be_empty__
         ! is_known_to_be_empty
       end
@@ -91,6 +95,21 @@ module Skylab::Autonomous_Component_System
           end
           super st
         end
+      end
+
+      Empty___ = Lazy_.call do
+
+        module EMPTY____ ; class << self
+
+          def is_not_known_to_be_empty_
+            false  # i.e is known to be empty
+          end
+
+          def to_empty
+            self
+          end
+
+        end ; self end
       end
     end
   end

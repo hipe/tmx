@@ -3,7 +3,8 @@
 
 ## overview
 
-yet another #[#fi-012]. (but of course this one is the best yet.)
+yet another #[#fi-012] normal normalization. needed to be developed
+on its own; is candidate for unification.
 
   • check for missing requireds
   • defaulting
@@ -110,10 +111,11 @@ the parameter value source is not known to be empty.
 
 
 
-## improved distillation :#Algorithm
+## normal normalization :#Algorithm
 
-this is perhaps an improved distillation of the algorithm referenced in
-the introduction:
+(as stated in the intro, this is a specialized form of the referenced
+normal normalization, and is tagged as a candidate participant of a
+future unification.)
 
 in the defined ("formal") order, for each formal parameter:
 

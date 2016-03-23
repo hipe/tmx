@@ -29,7 +29,7 @@ module Skylab::Callback
           delta = bx_.length - 1
 
           xx_a.each_with_index do | x, d |
-            sym = bx_.name_at_position_ delta - d
+            sym = bx_.name_at_position delta - d
             del_i_a.push sym
             instance_variable_set bx_.fetch( sym ), x
           end

@@ -31,6 +31,14 @@ module Skylab::Zerk::TestSupport
         root_ACS_result.should eql Home_::UNABLE_
       end
 
+      def message_  # must be used in conjuction with #this
+        root_ACS_state.message
+      end
+
+      def raises_argument_error_  # must be used in conjuction with #this
+        root_ACS_state or fail
+      end
+
       # -- assertion for emission language
 
       def look_like_did_you_mean_for_ s_a
@@ -57,6 +65,14 @@ module Skylab::Zerk::TestSupport
       end
 
       # -- effecting the state
+
+      def rescue_argument_error_ & p  # is :#this
+        begin
+          instance_exec( & p )
+        rescue ::ArgumentError => e
+        end
+        e
+      end
 
       def call * x_a
 

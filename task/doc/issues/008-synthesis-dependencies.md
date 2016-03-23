@@ -7,7 +7,7 @@ is largely (but not entirely) emerging from our imagination, as opposed
 to having been abstracted from the real world. that is to say, it is
 precisely experimental.
 
-(*and* we would like to use it for [#ta-007] at least.)
+(*and* we would like to use it for [#007] at least.)
 
 
 

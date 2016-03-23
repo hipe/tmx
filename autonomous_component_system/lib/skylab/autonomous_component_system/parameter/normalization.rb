@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   class Parameter
 
-    class Normalization  # [#028]
+    class Normalization  # [#028] (and see open tag below)
 
       class << self
         alias_method :begin, :new
@@ -60,7 +60,12 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      def __common_normalize  # implement [#]:#API-point-B - read every formal
+      def __common_normalize
+
+        # implement the [#]:#Algorithm
+        # implement [#]:#API-point-B - (evaluate every formal in formal order)
+        # generalize to work with [#ze-027]:#Crazytimes.3.A
+        # this partially duplicates something in [fi] #open [#021]
 
         Require_field_library_[]
 
@@ -126,7 +131,7 @@ module Skylab::Autonomous_Component_System
         oes_p = @on_missing_required
 
         if oes_p
-          oes_p.call :error, :missing_required_properties do
+          oes_p.call :error, :missing_required_parameters do
             ev
           end
           UNABLE_

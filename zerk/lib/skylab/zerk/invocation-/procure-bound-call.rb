@@ -4,122 +4,107 @@ module Skylab::Zerk
 
     class Procure_bound_call
 
-      # [#027]:"procure bound call"
+      # the entirety of [#027] documents this excessively, as referenced.
 
       class << self
-        alias_method :begin, :new
+
+        def begin__ pvs, fo, & pp
+          __begin_empty.__init_initial pvs, fo, & pp
+        end
+
+        alias_method :__begin_empty, :new
         undef_method :new
       end  # >>
 
-      def initialize pvs, fo, & pp
-        @_formal = fo
-        @_on_u = nil
-        @_pp = pp
-        @PVS = pvs
-        @_value_reader_proc = nil
-      end
+      # -- initialization
 
-      Require_ACS_[]
+      def __init_initial pvs, fo, & pp
+
+        @formal_operation = fo
+        @parameter_value_source = pvs
+        @_pp = pp
+
+        @_did_index_big = false
+        @_on_unavailable_kn = nil
+        @__once_ES = nil
+        self
+      end
 
       def on_unavailable_= x
-        @_on_u = Callback_::Known_Known[ x ] ; x  # #[#sl-156]
+        @_on_unavailable_kn = Callback_::Known_Known[ x ] ; x
       end
+
+      # --
 
       def execute
 
-        omni_handler = -> * i_a, & ev_p do
-          omni_handler = @_pp[ NOTHING_ ]  # there might be a cost?
-          omni_handler.call( * i_a, & ev_p )
-          UNRELIABLE_
-        end
+        ___prepare
 
-        o = @_formal.begin_preparation( & omni_handler )
+        o = @formal_operation.begin_preparation( & @_oes_p )
 
-        @_index_everything_once = -> do
-          remove_instance_variable :@_index_everything_once
-          __index_everything_which_is_a_heavy_lift
-        end
+        o.bespoke_stream_once = method :__bespoke_stream_once
 
-        @_bespoke_stream_once = -> do
-          remove_instance_variable :@_bespoke_stream_once  # sanity
-          @_index_everything_once[]
-          @__bespoke_stream
-        end
+        o.expanse_stream_once = method :__expanse_stream_once
 
-        @_expanse_stream_once = -> do
-          remove_instance_variable :@_expanse_stream_once
-          __expanse_stream_without_having_built_bespoke_stream
-        end
-
-        o.bespoke_stream_once = -> do
-          @_bespoke_stream_once[]
-        end
-
-        o.expanse_stream_once = -> do
-          @_expanse_stream_once[]
-        end
-
-        o.on_unavailable_ = @_on_u ? @_on_u.value_x : omni_handler
+        o.on_unavailable_ = __on_unavailable
 
         o.parameter_store = self  # so "as parameter store" below
 
-        o.parameter_value_source = @PVS
-
-        @_real_store = @_formal.begin_parameter_store( & omni_handler )
-        @_accept_to_real_store = @_real_store.method( :accept_parameter_value )
+        o.parameter_value_source = @parameter_value_source
 
         o.to_bound_call
       end
 
-      # multiple of the below methods may rely on:
-      #
-      #   • [#ac-028]:#API-point-A, which stipulates that bespoke parameters
-      #     will NOT be requested if the parameter value source is known
-      #     to be empty.
-      #
-      #   • [#ac-028]:#API-point-B, which stipulates that every of the
-      #     "expanse set" parameters will be read from during the
-      #     normalization step.
+      def ___prepare
 
-      def __expanse_stream_without_having_built_bespoke_stream
-
-        # more backflips to avoid the "heavy lift": assume we are here
-        # because the parameter value source was empty. if also the formal
-        # operation has no stated parameters, then we can procede without
-        # the "heavy lift". otherwise do..
-
-        st = @_formal.to_defined_formal_parameter_stream
-        x = st.gets
-        if x
-          @_expanse_stream_once = nil
-          @_index_everything_once[]
-          p = -> do
-            p = st
-            x
-          end
-          Callback_.stream do
-            p[]
-          end
-        else
-          @_value_reader_proc = :_NEVER_CALLED_
-          Callback_::Stream.the_empty_stream
-        end
+        @_oes_p = method :__on_emission
+        @_real_store = @formal_operation.begin_parameter_store( & @_oes_p )
+        @_accept_to_real_store = @_real_store.method :accept_parameter_value
+        NIL_
       end
 
-      def __index_everything_which_is_a_heavy_lift
+      # -- execution support
 
-        # since it is a "heavy lift" to derive the bespoke stream (because
-        # we have to index every frame), we do this only when we have to.
+      def _index_big  # (its callers are defined below it for reasons)
 
-        means_h = {}
+        # since it is a relatively "heavy lift" to build this [#]#scope-set
+        # (yet we can't cache it because [#ac-002]#DT3 everything is dynamic),
+        # we try to do this only when it is certain that we need to know it
+        # (e.g any of its derivatives, i.e #socialist-set or #bespoke-set)
+        #
+        # create a "diminishing pool" that starts off as the set of all
+        # names in the #stated-set.
+        #
+        # stream along the one or more compound frames that stand below the
+        # top item (the formal operation), (in some direction?), and in
+        # each such frame, stream along every node of that frame. for this
+        # stream of all nodes selected in this manner, do this with each node:
+        #
+        #   memo which frame you found this node in, and memo that such
+        #   a node's values is resolved through a "socialist" means
+        #   (that is, that the name references a known node in the selection
+        #   stack.)
+        #
+        #   if that node *is* in the pool (it "usually" is not), "tick off"
+        #   the item from the pool (explained next).
+        #
+        # when you get to the end, any names that remain in the pool are
+        # your #bespoke-set. associate with each of these names the fact that
+        # the value of such nodes will be resolved through arguments only.
 
-        stated_bx = @_formal.to_defined_formal_parameter_stream.
-          flush_to_box_keyed_to_method :name_symbol
+        @_did_index_big = true
+
+        means_h = {}  # to build the evaluator (proc)
+
+        _ = @formal_operation.to_defined_formal_parameter_stream
+        stated_bx = _.flush_to_box_keyed_to_method :name_symbol
 
         pool = stated_bx.a_.dup
         pool_h = ::Hash[ pool.each_with_index.map { |*a| a } ]
 
-        # --
+        __init_expanse_stream stated_bx
+
+        # -- (keep track of what frame every node appears in)
 
         frame_index_via_name_symbol = Callback_::Box.new
         my_stack = []
@@ -127,17 +112,17 @@ module Skylab::Zerk
         frame_d = 0
         parent_index = nil
 
-        st = ___to_frame_stream
+        st = ___to_below_frames_stream
         fr = st.gets
         begin
 
-          idx = Here_::Frame_Index___.new fr, parent_index do |no|
+          idx = Here_::Frame_Index___.new fr, parent_index, self do |no|
 
             k = no.name_symbol
             frame_index_via_name_symbol.add k, frame_d
             d = pool_h[ k ]
             if d
-              means_h[ k ] = :__lookup_knownness_socialistically_and_write_to_real_store
+              means_h[ k ] = :__touch_knownness_for_shared_parameter
               pool[ d ] = nil
             end
           end
@@ -150,87 +135,224 @@ module Skylab::Zerk
           redo
         end while nil
 
-        @_index_stack = my_stack
-        @_soc_h = frame_index_via_name_symbol.h_
+        @__indices = Indices___.new frame_index_via_name_symbol.h_, my_stack
 
         # --
 
-        remove_instance_variable :@_expanse_stream_once  # assert it wasn't called yet
-        @_expanse_stream_once = -> do
-          remove_instance_variable :@_expanse_stream_once
-          _ = stated_bx.to_value_stream
-          _
-        end
-
         pool.compact!
-        pool.each do |k_|
-          means_h[ k_ ] = :__lookup_knownness_for_bespoke_parameter
-        end
-        _st = Callback_::Stream.via_nonsparse_array pool
-        @__bespoke_stream = _st.map_by do |k_|
-          stated_bx.fetch k_
+        pool.each do |k|
+          means_h[ k ] = :__lookup_knownness_for_bespoke_parameter
         end
 
-        @_value_reader_proc = -> par, & no do
+        __init_bespoke_stream pool, stated_bx
 
-          if no
-            self._FUTURIZE_ME
-          end
-
-          _m = means_h.fetch par.name_symbol
-          _evl = send _m, par
-          _evl
-        end
+        __init_evaluator means_h
 
         NIL_
       end
 
-      def ___to_frame_stream
+      def ___to_below_frames_stream
 
-        ss = @_formal.selection_stack
-        Callback_::Stream.via_range( 0 .. ss.length - 2 ) do |d|
+        ss = @formal_operation.selection_stack
+        Callback_::Stream.via_range( 0 ... ss.length - 1 ) do |d|
           ss.fetch d
         end
       end
 
-      def __lookup_knownness_for_bespoke_parameter par
-        @_real_store.evaluation_of par
-      end
-
-      def __lookup_knownness_socialistically_and_write_to_real_store par
-
-        # very tricky -  whether the formal is proc-implemented or non-proc-
-        # implemented; of the parameters in the "stated set" that are known
-        # in our "scope stack", each of these parameter values needs to be
-        # written to the real store for the actual invocation.
-        #
-        # per [#ac-028]:#API-point-B we are being called once for each
-        # parameter of the "stated set" ("expanse" there) in order to apply
-        # defaults and find missing required parameters.
-        #
-        # here we piggy back on that loop to accomplish this first part too!
-
-        _idx = @_index_stack.fetch @_soc_h.fetch par.name_symbol
-        kn = _idx.lookup_knownness__ par
-
-        if kn.is_known_known
-          @_accept_to_real_store[ kn.value_x, par ]
-        end
-        kn
-      end
-
-      # -- "as parameter store"
+      # -- :"as parameter store"
 
       def accept_parameter_value x, par
         @_accept_to_real_store[ x, par ]
       end
 
       def evaluation_proc
-        @_value_reader_proc
+        send @_EVP_via
+      end
+
+      def _EVP_when_heavy
+        @_did_index_big || _index_big
+        @__evaluate
+      end
+
+      def __EVP_when_light
+        :_NEVER_CALLED_
       end
 
       def internal_store_substrate
         @_real_store.internal_store_substrate
+      end
+
+      # -- expanse stream (write, read)
+
+      def __init_expanse_stream stated_bx
+
+        @__build_expanse_stream_once = -> do  # or many times, even
+          stated_bx.to_value_stream
+        end ; nil
+      end
+
+      def __expanse_stream_once
+
+        remove_instance_variable :@__once_ES
+
+        # assume [#ac-028]:#API-point-A: bespoke parameters will NOT be
+        # requested if the parameter value source is known to be empty.
+        # (so avoid the heavy lift when we can)..
+
+        if @parameter_value_source.is_known_to_be_empty
+          __maybe_expanse_stream_lightly_because_PVS_is_known_to_be_empty
+        else
+          @_EVP_via = :_EVP_when_heavy
+          ___expanse_stream_heavily
+        end
+      end
+
+      def ___expanse_stream_heavily
+
+        @_did_index_big ||= _index_big
+        _ = remove_instance_variable :@__build_expanse_stream_once
+        _.call
+      end
+
+      def __maybe_expanse_stream_lightly_because_PVS_is_known_to_be_empty
+
+        # assume PVS is known to be empty. if also the formal operation has
+        # no stated parameters, then we can procede without "heavy lift"
+
+        st = @formal_operation.to_defined_formal_parameter_stream
+        par = st.gets
+        if par
+          @_EVP_via = :_EVP_when_heavy
+          p = -> { p = st ; par }  # recycle the stream you just started eew
+          Callback_.stream { p[] }
+        else
+          @_EVP_via = :__EVP_when_light
+          Callback_::Stream.the_empty_stream
+        end
+      end
+
+      # -- bespoke stream (write, read):73
+
+      def __init_bespoke_stream pool, stated_bx
+
+        # the #bespoke-stream is whatever is left over in the pool at this
+        # point (i.e those in the #stated-set that were not in the #scope-set.)
+
+        _ = Callback_::Stream.via_nonsparse_array pool
+        @__bespoke_stream = _.map_by do |k_|
+          stated_bx.fetch k_
+        end ; nil
+      end
+
+      def __bespoke_stream_once
+
+        @_did_index_big || _index_big
+        remove_instance_variable :@__bespoke_stream
+      end
+
+      # -- evaluation
+
+      def __init_evaluator means_h
+
+        @__evaluate = -> par, & no do
+
+          if no
+            self._MODERNIZE_ME_dont_pass_else_block
+          end
+
+          _ = means_h.fetch par.name_symbol
+          _evl = send _, par
+          _evl
+        end
+      end
+
+      def __lookup_knownness_for_bespoke_parameter par
+
+        # for these, just pass through. stay out of the way of the real store
+
+        @_real_store.evaluation_of par
+      end
+
+      def __touch_knownness_for_shared_parameter par
+
+        # shared parameters such as these have actual values that exist
+        # either directly in the zerk tree already as ivars, or they exist
+        # latently as the results of would-be operation calls.
+        #
+        # whether the formal is proc-implemented or non-proc-implemented,
+        # we need to transfer these values to the actual (intermediate)
+        # store that will ultimately be used to execute the operation.
+        #
+        # assuming [#ac-028]:#API-point-B, we are being called once for each
+        # parameter of the "stated set" ("expanse" there) in order to apply
+        # defaults and find missing required parameters.
+        #
+        # so we piggy-back onto this second fulfillment fulfillment of this
+        # first need too EEK
+
+        _sta = @__indices._touch_state par
+        evl = _sta.cached_evaluation_
+
+        if evl.is_known_known
+          @_accept_to_real_store[ evl.value_x, par ]
+        end
+
+        evl
+      end
+
+      # -- handle events
+
+      def __on_unavailable
+        kn = remove_instance_variable :@_on_unavailable_kn
+        if kn
+          kn.value_x  # can be nil
+        else
+          @_oes_p
+        end
+      end
+
+      def __on_emission * x_a, & x_p
+        @___some_handler ||= ___determine_some_handler
+        @___some_handler[ x_a, & x_p ]
+        UNRELIABLE_
+      end
+
+      def ___determine_some_handler
+
+        oes_p = @_pp[ :_not_sure_ ]
+        if oes_p
+          -> i_a, & ev_p do
+            oes_p[ * i_a, & ev_p ]
+          end
+        else
+          method :___handle_emission
+        end
+      end
+
+      def ___handle_emission i_a, & ev_p  # #[#ca-066]
+
+        if :error == i_a.first
+          self._A
+        else
+          self._B
+        end
+      end
+
+      # ==
+
+      class Indices___
+
+        def initialize h, a
+          @_index_stack = a
+          @_soc_h = h
+        end
+
+        def _touch_state par
+
+          _ = @_soc_h.fetch par.name_symbol
+          _frame_index = @_index_stack.fetch _
+          _frame_index.touch_state__ par
+        end
       end
     end
   end

@@ -4,8 +4,9 @@ module Skylab::Zerk
 
     class Frame_Index___  # see [#013]
 
-      def initialize frame, parent_index=nil, & node
+      def initialize frame, parent_index, xxx, & node
 
+        @_xxx = xxx
         @frame_ = frame
         @_my_bx = Callback_::Box.new
         @_next = parent_index
@@ -53,12 +54,7 @@ module Skylab::Zerk
 
     public
 
-      def lookup_knownness__ par
-        _sta = ___touch_state par
-        _sta.knownness_
-      end
-
-      def ___touch_state par
+      def touch_state__ par
         k = par.name_symbol
         en = @_cache[k]
         if en
@@ -66,7 +62,7 @@ module Skylab::Zerk
             self._NO
           end
         else
-          bs = Here_::Build_state___.new @_my_bx.h_.fetch( k ), self
+          bs = Here_::Build_state___.new @_my_bx.h_.fetch( k ), self, @_xxx
           @_cache[ k ] = bs
           en = bs.execute
           @_cache[ k ] = en
