@@ -22,9 +22,9 @@ module Skylab::TanMan::TestSupport
 
       call_API :ping, :wahootey
 
-      _ = 'unrecognized (plural_noun [1, "property"]) (and_ ["(ick :wahootey)"])'
+      _ = 'unrecognized (plural_noun [1, :attribute]) (and_ ["(ick :wahootey)"])'
 
-      __ = "unrecognized property :wahootey"
+      __ = "unrecognized attribute :wahootey"
 
       _em = expect_not_OK_event :error, _
 

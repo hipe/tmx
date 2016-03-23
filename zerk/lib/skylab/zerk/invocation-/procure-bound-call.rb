@@ -16,6 +16,7 @@ module Skylab::Zerk
         @_on_u = nil
         @_pp = pp
         @PVS = pvs
+        @_value_reader_proc = nil
       end
 
       Require_ACS_[]
@@ -170,15 +171,15 @@ module Skylab::Zerk
           stated_bx.fetch k_
         end
 
-        @_value_reader_proc = -> par, & els do
+        @_value_reader_proc = -> par, & no do
 
-          kn = send means_h.fetch( par.name_symbol ), par
-
-          if kn.is_known_known
-            kn.value_x
-          else
-            els[]
+          if no
+            self._FUTURIZE_ME
           end
+
+          _m = means_h.fetch par.name_symbol
+          _evl = send _m, par
+          _evl
         end
 
         NIL_
@@ -193,7 +194,7 @@ module Skylab::Zerk
       end
 
       def __lookup_knownness_for_bespoke_parameter par
-        @_real_store.knownness_for par
+        @_real_store.evaluation_of par
       end
 
       def __lookup_knownness_socialistically_and_write_to_real_store par
@@ -224,7 +225,7 @@ module Skylab::Zerk
         @_accept_to_real_store[ x, par ]
       end
 
-      def value_reader_proc
+      def evaluation_proc
         @_value_reader_proc
       end
 

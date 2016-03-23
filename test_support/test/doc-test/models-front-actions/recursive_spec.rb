@@ -10,7 +10,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     it "path is required" do
 
-      _rx = /\Amissing required property 'path'\z/
+      _rx = /\Amissing required attribute 'path'\z/
 
       begin
         call_API :recursive
@@ -52,7 +52,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       _em = expect_not_OK_event :missing_required_properties
 
       black_and_white( _em.cached_event_value ).should eql(
-        "missing required property 'downstream'" )
+        "missing required attribute 'downstream'\n" )
 
       expect_failed
     end

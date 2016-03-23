@@ -15,7 +15,7 @@ module Skylab::SubTree::TestSupport
       rescue ::ArgumentError => e
       end
 
-      e.message.should match %r(\Amissing required property 'path')
+      e.message.should match %r(\Amissing required attribute 'path')
     end
 
     it "easy boogie against the project tree" do

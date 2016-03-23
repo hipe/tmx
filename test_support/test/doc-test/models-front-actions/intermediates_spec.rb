@@ -14,7 +14,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       rescue ::ArgumentError => e
       end
 
-      e.message.should eql "missing required property 'path'"
+      e.message.should eql "missing required attribute 'path'"
     end
 
     it "path must be absolute" do

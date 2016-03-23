@@ -162,7 +162,7 @@ module Skylab::Plugin::TestSupport
         rescue ::ArgumentError => e
         end
 
-        e.message.should eql "unrecognized property 'howzaa'"
+        e.message.should eql "unrecognized attribute 'howzaa'"
       end
     end
 

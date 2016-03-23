@@ -76,7 +76,7 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
           _be_this = be_emission :error, :missing_required_attributes do |ev|
 
-            black_and_white( ev ).should _be_same_message
+            black_and_white( ev ).should eql _message_expected_for_emit
           end
 
           only_emission.should _be_this
@@ -103,7 +103,9 @@ module Skylab::Task::TestSupport  # [#ts-010]
 
         it "emits same message" do
 
-          exception_message_.should _be_same_message
+          s = _message_expected_for_emit
+          s.chop!
+          exception_message_.should eql s
         end
       end
 
@@ -176,8 +178,8 @@ if false
   end
 end  # if false
 
-    def _be_same_message
-      eql "missing required attributes 'bread' and 'inside'"
+    def _message_expected_for_emit
+      "missing required attributes 'bread' and 'inside'\n"
     end
   end
 end

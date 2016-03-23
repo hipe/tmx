@@ -53,11 +53,11 @@ module Skylab::Fields::TestSupport
 
         it "expresses" do
 
-          _exp = "missing required attribute 'other'"
+          _be_this_msg = match %r(\Amissing required attribute 'other'$)
 
           _be_this = be_emission :error, :missing_required_attributes do |ev|
             _ = black_and_white ev
-            _.should eql _exp
+            _.should _be_this_msg
           end
 
           only_emission.should _be_this

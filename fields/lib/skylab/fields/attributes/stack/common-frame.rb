@@ -152,7 +152,7 @@ module Skylab::Fields
 
         def __property_value_when_property_not_readable prp
 
-          maybe_send_event :error, :property_is_not_readable do
+          maybe_send_event :error, :property_is_not_readable do  # for "property is not readable"
 
             Callback_::Event.inline_not_OK_with(
               :property_is_not_readable,

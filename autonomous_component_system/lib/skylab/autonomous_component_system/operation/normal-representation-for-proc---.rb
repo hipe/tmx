@@ -83,16 +83,14 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
 
-        def value_reader_proc
-          -> par, & els do
-            @_h.fetch par.name_symbol, & els
-          end
+        def evaluation_proc
+          method :evaluation_of
         end
 
-        def knownness_for par
+        def evaluation_of par
           had = true
           x = @_h.fetch par.name_symbol do
-            had = false ; nil
+            had = false
           end
           if had
             Callback_::Known_Known[ x ]

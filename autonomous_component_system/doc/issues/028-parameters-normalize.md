@@ -110,12 +110,12 @@ the parameter value source is not known to be empty.
 
 
 
-## improved distillation
+## improved distillation :#Algorithm
 
 this is perhaps an improved distillation of the algorithm referenced in
 the introduction:
 
-in the defined ("formal") order (:A), for each formal parameter:
+in the defined ("formal") order, for each formal parameter:
 
   • we treat as equivalent the value being unknown and the value
     being known to be `nil`. this step was not designed per se but
@@ -135,9 +135,14 @@ applied. as well it is known if there are missing requireds.
 
 
 
+
 ### :#API-point-B (that we must adhere to) maintains that:
 
-the "expase set" that was provided as an argument will be exercized in
-its entirety - there will not (for example )be short-circuiting on the
-first enountere derror.
+the "expanse set" that was provided as an argument will be exercized in
+its entirety - there will not (for example) be short-circuiting on the
+first enountered error.
+
+the "expanse set" is always held has a stream, and the #Algorithm
+is always performed on each node in this stream in the order the
+stream produces the items.
 _

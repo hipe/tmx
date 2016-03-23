@@ -37,7 +37,7 @@ module Skylab::Fields
 
         @_.current_attribute.read_and_writer_by__ do |atr|
 
-          __oldschool_custom_interpreter_as Classic_writer_method_[ atr.name_symbol ]
+          Oldschool_custom_interpreter_as___[ Classic_writer_method_[ atr.name_symbol ] ]
         end
       end
 
@@ -47,11 +47,11 @@ module Skylab::Fields
 
         @_.current_attribute.read_and_writer_by__ do |_atr|
 
-          __newschool_custom_interpreter_as m
+          Newschool_custom_interpreter_as___[ m ]
         end
       end
 
-      def __newschool_custom_interpreter_as m
+      Newschool_custom_interpreter_as___ = -> m do
 
         -> do
           x = session.send m, argument_stream
@@ -63,7 +63,7 @@ module Skylab::Fields
         end
       end
 
-      def __oldschool_custom_interpreter_as m
+      Oldschool_custom_interpreter_as___ = -> m do
 
         -> do
 

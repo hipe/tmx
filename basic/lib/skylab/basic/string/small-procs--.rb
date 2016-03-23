@@ -69,20 +69,38 @@ module Skylab::Basic
         end
       end.call
 
-      Paragraph_string_via_message_lines = -> s_a do
-        scan = Callback_::Stream.via_nonsparse_array s_a
-        s = scan.gets
-        s and begin
-          y = [ s ]
-          while s = scan.gets
-            if String_.looks_like_sentence y.last
-              y.push SPACE_
-            else
-              y.push ". "
-            end
-            y.push s
+      class Paragraph_string_via_message_lines < Callback_::Actor::Monadic
+
+        def initialize s_a
+          @st = Callback_::Polymorphic_Stream.via_array s_a
+        end
+
+        def execute
+          if @st.no_unparsed_exists
+            NOTHING_
+          else
+            ___when_at_least_one
           end
-          y.join EMPTY_S_
+        end
+
+        def ___when_at_least_one
+          @_s = @st.gets_one
+          if @st.no_unparsed_exists
+            ___when_exactly_one
+          else
+            __when_more_than_one
+          end
+        end
+
+        def ___when_exactly_one
+
+          @_s.chomp!
+          @_s
+        end
+
+        def __when_more_than_one
+          self._COVER_ME_EASY
+          Looks_like_sentence
         end
       end
     end

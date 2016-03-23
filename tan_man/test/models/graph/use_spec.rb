@@ -14,10 +14,10 @@ module Skylab::TanMan::TestSupport
 
         call_API :graph, :use
 
-        expect_not_OK_event :missing_required_properties do | ev |
+        expect_not_OK_event COMMON_MISS_ do | ev |
 
           [ :digraph_path, :workspace_path ].should be_include(
-            ev.to_event.miss_a.first.name_symbol
+            ev.to_event.reasons.first.name_symbol
           )
         end
 
@@ -32,7 +32,7 @@ module Skylab::TanMan::TestSupport
         _em = expect_not_OK_event :missing_required_properties
 
         black_and_white( _em.cached_event_value ).should eql(
-          "missing required property 'workspace_path'" )
+          "missing required attribute 'workspace_path'\n" )
 
         expect_failed
       end

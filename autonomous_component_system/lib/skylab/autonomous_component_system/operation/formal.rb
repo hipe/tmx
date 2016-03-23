@@ -236,7 +236,7 @@ module Skylab::Autonomous_Component_System
 
         o.expanse_stream_once = @expanse_stream_once
 
-        o.on_missing_required = @on_unavailable_
+        o.on_reasons = @on_unavailable_
 
         o.parameter_store = @parameter_store
 

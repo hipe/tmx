@@ -54,24 +54,16 @@ module Skylab::Autonomous_Component_System
           NIL_
         end
 
-        def value_reader_proc
-
-          # all formals came from us, so we should (?) never not know a value
-
-          o = @_sess
-          -> par do
-            # experimental - we could require readers, but why?
-            ivar = par.name.as_ivar
-            if o.instance_variable_defined? ivar
-              o.instance_variable_get ivar
-            end
-          end
+        def evaluation_proc
+          method :evaluation_of
         end
 
-        def knownness_for par
+        def evaluation_of par
 
           ivar = par.name.as_ivar
+
           if @_sess.instance_variable_defined? ivar
+
             Callback_::Known_Known[ @_sess.instance_variable_get ivar ]
           else
             Callback_::KNOWN_UNKNOWN

@@ -4,7 +4,7 @@ Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
 
 module Skylab::Brazen::TestSupport::Entity_Sandbox
 
-  describe "[br] entity - 2. processing the polymorphic upstrem" do
+  describe "[br] entity - processing the polymorphic upstrem" do
 
     context "basics" do
 
@@ -42,12 +42,14 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
       it "do parse strange does not work" do
 
+        _be_this_msg = match %r(\Aunrecognized attribute 'wiz')
+
         begin
           Foo_Iamb.with :wiz
         rescue ::ArgumentError => e
         end
 
-        e.message.should match unrec_rx( :wiz )
+        e.message.should _be_this_msg
       end
 
       it "do parse none does work" do
@@ -57,6 +59,8 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
     it "DSL syntax fail - strange name" do
 
+      _be_this_msg = match %r(\Aunrecognized property 'VAG_rounded')
+
       begin
         class FooI_Pity
           Subject_[][ self, :VAG_rounded ]
@@ -64,7 +68,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       rescue ::ArgumentError => e
       end
 
-      e.message.should match unrec_rx :VAG_rounded
+      e.message.should _be_this_msg
     end
 
     it "DSL syntax fail - strange value" do
@@ -108,10 +112,6 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         end
         end.should raise_error ::NameError, _rx
       end
-    end
-
-    def unrec_rx x
-      /\bunrecognized property '#{ ::Regexp.escape( x.to_s ) }'/
     end
   end
 end

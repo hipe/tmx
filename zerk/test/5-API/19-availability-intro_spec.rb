@@ -49,7 +49,7 @@ module Skylab::Zerk::TestSupport
 
       it "says.." do
 
-        _s = "'add' was missing required parameter 'right-number'"
+        _s = "'add' is missing required parameter 'right-number'."
         root_ACS_state.message.should eql _s
       end
 

@@ -42,7 +42,8 @@
 [#044]       #parent-node: [#049] the stream narrative ..
 [#043]       #doc-node: the subscriptions narrative ..
 
-[#042] #hole ( #moved-to [#fi-016] )
+[#042] #open easy refactor (see)
+             ( #was: #moved-to [#fi-016] )
 
 [#041]       #parent-node: [#024] what are hybrid boxxy nodes?
 [#040]       #parent-node: [#023] the callback pattern

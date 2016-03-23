@@ -17,7 +17,7 @@ module Skylab::Fields
       o.when_missing = -> kn, _, & ev_p do
 
         # don't stop cold on these - aggregate and procede.
-        ( miss_prp_a ||= [] ).concat ev_p[].miss_a
+        ( miss_prp_a ||= [] ).concat ev_p[].reasons
         kn
       end
 

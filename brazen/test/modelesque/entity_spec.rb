@@ -152,7 +152,7 @@ module Skylab::Brazen::TestSupport
         rescue ::ArgumentError => e
         end
 
-        e.message.should eql "missing required properties 'foo' and 'bar'"
+        e.message.should eql "missing required attributes 'foo' and 'bar'"
       end
     end
 

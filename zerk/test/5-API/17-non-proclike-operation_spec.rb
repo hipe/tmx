@@ -9,7 +9,7 @@ module Skylab::Zerk::TestSupport
 
     it "missing required args - raises arg. error (cp)" do
 
-      _s = "'zoof' was missing required parameters 'foo' and 'quux'"
+      _s = "'zoof' is missing required parameters 'foo' and 'quux'."
 
       begin
         call :zoof  # #test-03

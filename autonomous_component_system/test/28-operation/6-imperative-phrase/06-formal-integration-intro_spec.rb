@@ -67,8 +67,9 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "missing multiple required args - raises argument error" do
 
-      _s = "'set-color-of-upper' was missing required parameters #{
-        }'red', 'green' and 'blue'"
+      _be_this_msg = match %r(\A'set-color-of-upper' #{
+        }is missing required parameters #{
+          }'red', 'green' and 'blue')
 
       shoe = _new_shoe
 
@@ -77,7 +78,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       rescue ::ArgumentError => e
       end
 
-      e.message.should eql _s
+      e.message.should _be_this_msg
     end
 
     it "pass all requireds and one optional USES FORMAL DEFAULT" do

@@ -41,11 +41,11 @@ module Skylab::Human
         if @subject
           __express_into_under_as_normal y, expag
         else
-          ___express_into_under_without_subject y, expag
+          ___express_into_under_for_no_subject y, expag
         end
       end
 
-      def ___express_into_under_without_subject y, expag
+      def ___express_into_under_for_no_subject y, expag
 
         # this is where we put the "ish" in statement-ISH:
 
@@ -119,3 +119,4 @@ module Skylab::Human
     end
   end
 end
+# #pending-rename

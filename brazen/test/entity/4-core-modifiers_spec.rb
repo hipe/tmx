@@ -4,7 +4,7 @@ Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
 
 module Skylab::Brazen::TestSupport::Entity_Sandbox
 
-  describe "[br] entity - 4. core modifiers" do
+  describe "[br] entity - core modifiers" do
 
     it "minimal" do
 

@@ -11,7 +11,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     it "missing required args raises semantic arg error" do
 
-      _s = "'zoof' was missing required parameters 'foo' and 'quux'"
+      _s = "'zoof' is missing required parameters 'foo' and 'quux'."
 
       begin
         call_ :zoof

@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport
 
         ev = _em.cached_event_value.to_event
 
-        :missing_required_properties == ev.terminal_channel_symbol or fail
+        COMMON_MISS_ == ev.terminal_channel_symbol or fail
 
         black_and_white( ev ).should match(
           %r(\bmissing required arguments 'path' and 'verb') )

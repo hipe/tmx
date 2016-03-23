@@ -86,7 +86,7 @@ module Skylab::Human
         end
       end
 
-      def to_statementish_stream_without_subject  # #spot-1
+      def to_statementish_stream_for_no_subject  # #spot-1
 
         Callback_::Stream.once do
           o = Siblings_::Statementish.begin_

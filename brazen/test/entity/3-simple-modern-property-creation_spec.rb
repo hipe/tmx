@@ -4,7 +4,7 @@ Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
 
 module Skylab::Brazen::TestSupport::Entity_Sandbox
 
-  describe "[br] entity 3. simple modern property creation" do
+  describe "[br] entity - simple modern property creation" do
 
     context "there are at least 5 ways of creating monadic iambic props" do
 

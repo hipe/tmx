@@ -4,7 +4,7 @@ Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
 
 module Skylab::Brazen::TestSupport::Entity_Sandbox
 
-  describe "[br] entity - 6. re-editing" do
+  describe "[br] entity - re-editing" do
 
     # (one context) ->
 

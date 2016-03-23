@@ -34,6 +34,8 @@ although we haven't explained what they all mean yet, a good example of
 that employs several of the above name conventions is a file in [sa] that
 is taggged with [#]  (the subject doc node).
 
+(another good example is [#hu-037], also cross-tagged to here.)
+
 the "trained eye" can see immediately that it has it has (at writing)
 several methods that part of its public API (or hook-outs/hooks-ins to
 some public API elsewhere); one method that has "library" (in this case

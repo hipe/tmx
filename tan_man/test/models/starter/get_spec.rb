@@ -9,8 +9,8 @@ module Skylab::TanMan::TestSupport
 
     it "'workspace_path' is required (currently)" do
       call_API :starter, :get
-      expect_event :missing_required_properties do |ev|
-        ev.to_event.miss_a.first.name_symbol.should eql :workspace_path
+      expect_event COMMON_MISS_ do |ev|
+        ev.to_event.reasons.first.name_symbol.should eql :workspace_path
       end
       expect_failed
     end

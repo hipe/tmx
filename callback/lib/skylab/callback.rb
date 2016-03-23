@@ -603,10 +603,6 @@ module Skylab::Callback
 
     attr_reader :value_x
 
-    def reason_object
-      NIL_  # NOTHING_
-    end
-
     def is_known_known
       true
     end
@@ -2380,6 +2376,10 @@ module Skylab::Callback
 
       def as_variegated_string
         _vari.as_variegated_string
+      end
+
+      def name_symbol  # work with [fi] events
+        as_variegated_symbol
       end
 
       def as_variegated_symbol

@@ -76,7 +76,7 @@ module Skylab::Fields::TestSupport
           process_polymorphic_stream_fully_via_ :zoik
         rescue ::ArgumentError => e
         end
-        e.message.should eql "unrecognized property 'zoik'"
+        e.message.should eql "unrecognized attribute 'zoik'"
       end
 
       it "im - `process_iambic_fully`" do

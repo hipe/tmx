@@ -95,7 +95,7 @@ module Skylab::TaskExamples::TestSupport
 
         actual_sym_a = nil
         _be_this = be_emission :error, :missing_required_attributes do |ev|
-          actual_sym_a = ev.miss_a.map( & :name_symbol )
+          actual_sym_a = ev.reasons.map( & :name_symbol )
         end
 
         _em.should _be_this

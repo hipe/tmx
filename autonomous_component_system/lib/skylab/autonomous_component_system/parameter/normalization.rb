@@ -15,10 +15,13 @@ module Skylab::Autonomous_Component_System
         @selection_stack = ss  # used to enrich emissions & for receiver
       end
 
+      def on_reasons= x
+        @on_missing_required = x  # emission handler. if not set raises event ex.
+      end
+
       attr_writer(
         :bespoke_stream_once,  # see [#027]#bespoke
         :expanse_stream_once,  # see [#027]#expanse
-        :on_missing_required,  # emission handler. if not set raises event ex.
         :parameter_store,  # wrap e.g a session object or argument array
         :parameter_value_source,
       )
@@ -57,7 +60,7 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      def __common_normalize  # implement [#]:#API-point-B
+      def __common_normalize  # implement [#]:#API-point-B - read every formal
 
         Require_field_library_[]
 
@@ -65,19 +68,37 @@ module Skylab::Autonomous_Component_System
 
         fo_st = remove_instance_variable( :@expanse_stream_once ).call
 
-        rdr_p = @parameter_store.value_reader_proc
+        rdr_p = @parameter_store.evaluation_proc
+        rdr_p or self._WHERE
 
         begin
           f = fo_st.gets
           f or break
 
-          x = rdr_p.call f do
-            NIL_
+          evl = rdr_p[ f ]
+          if evl.is_effectively_known
+            redo
           end
 
-          if x.nil? && Field_::Has_default[ f ]
+          # now it's either known to be nil or known unknown
+
+          if ! evl.is_known_known
+            # if it was known unknown for some *reason* (like a failure
+            # to establish dependencies), then this:
+            rsn = evl.reason_object
+            if rsn
+              ( miss_a ||= [] ).push rsn
+              redo
+            end
+          end
+
+          # even if errors have occurred prior, we go through with it
+
+          if Field_::Has_default[ f ]
             x = f.default_proc.call
             @parameter_store.accept_parameter_value x, f
+          else
+            x = nil
           end
 
           if x.nil? && Field_::Is_required[ f ]
@@ -97,7 +118,7 @@ module Skylab::Autonomous_Component_System
       def ___when_missing_requireds miss_a
 
         ev = Field_::Events::Missing.new_with(
-          :miss_a, miss_a,
+          :reasons, miss_a,
           :selection_stack, @selection_stack,
           :lemma, :parameter,
         )

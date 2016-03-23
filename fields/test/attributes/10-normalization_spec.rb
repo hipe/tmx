@@ -222,7 +222,7 @@ module Skylab::Fields::TestSupport
 
           it "emits" do
 
-            _rx = /\Amissing required attribute 'b'\z/
+            _rx = /\Amissing required attribute 'b'$/
 
             _be_this = be_emission :error, :missing_required_attributes do |ev|
 
@@ -239,7 +239,7 @@ module Skylab::Fields::TestSupport
 
             _ev = _em.cached_event_value
 
-            a = _ev.miss_a
+            a = _ev.reasons
 
             a.length.should eql 1
 

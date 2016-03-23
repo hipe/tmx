@@ -4,7 +4,7 @@ Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
 
 module Skylab::Brazen::TestSupport::Entity_Sandbox
 
-  describe "[br] entity - 1. classic property creation" do
+  describe "[br] entity - classic property creation" do
 
     context "minimal non-empty" do
 

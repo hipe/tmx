@@ -41,7 +41,7 @@ module Skylab::Fields::TestSupport
         stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
       rescue ::ArgumentError => e
       end
-      e.message.should match %r(\Aunrecognized properties 'derp' and 'nerp')
+      e.message.should match %r(\Aunrecognized attributes 'derp' and 'nerp')
     end
 
     it "topmost frame wins" do

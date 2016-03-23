@@ -37,7 +37,7 @@ module Skylab::TanMan::TestSupport
 
     it "good name, no workspace path" do
       call_API :starter, :set, :name, 'digr'
-      expect_not_OK_event :missing_required_properties
+      expect_not_OK_event COMMON_MISS_
       expect_failed
     end
 

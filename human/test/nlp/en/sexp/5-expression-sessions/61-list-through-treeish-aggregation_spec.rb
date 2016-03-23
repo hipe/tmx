@@ -320,7 +320,7 @@ module Skylab::Human::TestSupport
     def _when_wo_subject
 
       _exp = _expression
-      _st = _exp.to_statementish_stream_without_subject
+      _st = _exp.to_statementish_stream_for_no_subject
       _lines_via_statement_stream _st
     end
 

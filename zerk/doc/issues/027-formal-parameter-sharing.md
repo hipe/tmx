@@ -3,8 +3,8 @@
 we have run into the issue where old tests we made and stashed
 pre-mid-january use what we now call the "isolationist" model, and the
 mid-january we semi-formalized what we now call the "socialist" model.
-here we define these models and explore the differences, in hopes of
-arriving at a specification for the API for defining them.
+here we define these two models, explore their differences, and finally
+define the specification of our API that can effect them in concert.
 
 
 
@@ -123,7 +123,7 @@ parameters, the [ze] will do so in this way:
      that is, it is any names from (2) not in (1).
      we have flip-flopped on this at least twice. it may be a
      misfeature: this is a parameter without a model, so you will have
-     to do your own validation.
+     to do your own validation. (more on this below and elsewhere.)
 
 
 
@@ -174,7 +174,7 @@ when we have a formal operation we can derive all of this:
 
 when both:
 
-  • there is a non-empty argument value source
+  • there is a non-empty argument value source and
   • there is a non-empty bespoke set
 
 then we need to parse any values "passively" out of the one using the other.
@@ -196,6 +196,18 @@ box: the one box will add one item for every indexable node expressed by
 the frame. this way we have a shorcut index to where each node is
 defined.
 
+(sidebar: an intentional side-effect of the above is that the name of an
+atom-esque node must be unique in the context every selection stack
+it could be in. i.e.: from any stack frame (compound node), take the
+1-N frames that include it and each of its parent frames up to the root
+frame. every atom-esque node in this set of frames must have a name that
+is distinct from every other atom-esque node in the set of atom-esque
+nodes in this stack of frames.)
+
 with such an index we can look up parameter value knownness from the
 scope set. also we can known the scope set at all, which lets us
 calculate (3) and (4).
+
+
+
+## (this is the future home of :"Crazytimes".. (stashed away))
