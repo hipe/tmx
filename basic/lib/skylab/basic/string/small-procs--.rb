@@ -60,16 +60,23 @@ module Skylab::Basic
         end
       end
 
-      Looks_like_sentence = -> do
-
-        _RX = /[.?!]\z/
-
-        -> str do
-          _RX =~ str
-        end
-      end.call
-
       class Paragraph_string_via_message_lines < Callback_::Actor::Monadic
+
+        # transform an array of strings into one "paragraph" string that
+        # "looks normal" pursuant to these rules:
+        #
+        # this string never ends with any provided trailing line separator.
+        #
+        # if you have multiple trailing newlines in any of your items, what
+        # happens is undefined.
+        #
+        # IFF multiple items:
+        #
+        #   • each item will have a period added IFF certain criteria
+        #     are met (see code).
+        #
+        #   • each item will be *separatated* (not terminated)
+        #     by a newline (added as necessary).
 
         def initialize s_a
           @st = Callback_::Polymorphic_Stream.via_array s_a
@@ -93,16 +100,61 @@ module Skylab::Basic
         end
 
         def ___when_exactly_one
-
           @_s.chomp!
           @_s
         end
 
         def __when_more_than_one
-          self._COVER_ME_EASY
-          Looks_like_sentence
+
+          buffer = ""
+
+          s = remove_instance_variable :@_s
+
+          begin
+            md = Classify_termination___[ s ]
+            is_last = @st.no_unparsed_exists
+
+            if md[ :line_terminator ]
+
+              # when the received item has a terminating newline,
+              # assume the client manages its own punctuation.
+
+              if is_last
+                s.chomp!  # final lines never have these
+                buffer << s
+                break
+              end
+              buffer << s
+            else
+
+              buffer << s
+              if ! md[ :punctuation ]
+                buffer << PERIOD_
+              end
+              if is_last
+                break
+              end
+              buffer << NEWLINE_
+            end
+            s = @st.gets_one
+            redo
+          end while nil
+
+          buffer
         end
       end
+
+      rx = /(?<punctuation>[.?!])?(?<line_terminator>\r?\n)?\z/
+
+      Looks_like_sentence = -> s do
+        rx.match( s )[ :punctuation ]
+      end
+
+      Classify_termination___ = -> s do
+        rx.match s
+      end
+
+      PERIOD_ = '.'
     end
   end
 end

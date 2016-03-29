@@ -207,8 +207,21 @@ module Skylab::Fields
         if 1 < em_a.length
           self._DESIGN_ME  # #open [#ze-030]:#A
         end
+
         em = em_a.fetch 0
-        # ..
+
+        if :expression == em.channel.fetch( 1 )
+
+          @expression_agent_.calculate @_downstream_yielder, & em.mixed_event_proc
+          NIL_
+        else
+          ___express_event em
+          NIL_
+        end
+      end
+
+      def ___express_event em
+
         _ev = em.mixed_event_proc.call
 
         o = _ev._begin_expression_session_for(

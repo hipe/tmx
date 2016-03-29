@@ -26,10 +26,14 @@ module Skylab::Zerk
         @_scope_index = si
         @_trouble_stack = ts
 
+        @_did_emit = false
+
         @_on_unavailable_kn = Callback_::Known_Known[ -> * i_a, & ev_p do
 
+          @_did_emit = true
+
           # (be *the* contributor of [#fi-036]:"Storypoint-1":)
-          _reasoning = ( @__OHAI ||= Reasoning___.new( fo ) )
+          _reasoning = ( @_reasoning ||= Reasoning___.new( fo ) )
           _reasoning.__add i_a, & ev_p
 
           UNRELIABLE_
@@ -75,11 +79,33 @@ module Skylab::Zerk
       end
 
       def evaluate_recursion__  # result in an "evaluation" struct
+
         bc = execute
         if bc
-          self._A
+
+          # this is at the behest of etc meh. just do it now:
+
+          _oes_p = @_on_unavailable_kn.value_x
+
+          ok_x = bc.receiver.send bc.method_name, * bc.args, & _oes_p
+          if ok_x
+
+            if @_did_emit
+              self._WEEE  # maybe emit the events back into the bc block # #todo
+            end
+
+            Callback_::Known_Known[ ok_x ]
+          else
+
+            _ = remove_instance_variable :@_reasoning
+
+            # (when the above fails, design something. hopefully all failure
+            #  of dependee operations will have client-provided emission.)
+
+            Callback_::Known_Unknown.via_reasoning _
+          end
         else
-          _ = remove_instance_variable :@__OHAI
+          _ = remove_instance_variable :@_reasoning
           Callback_::Known_Unknown.via_reasoning _
         end
       end
@@ -353,7 +379,7 @@ module Skylab::Zerk
       # -- handle events
 
       def __on_unavailable
-        kn = remove_instance_variable :@_on_unavailable_kn
+        kn = @_on_unavailable_kn  # used 1x more later..
         if kn
           kn.value_x  # can be nil
         else

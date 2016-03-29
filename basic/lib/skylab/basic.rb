@@ -236,6 +236,7 @@ module Skylab::Basic  # introduction at [#020]
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NOTHING_ = nil
   NILADIC_FALSEHOOD_ = -> { false }
   PROCEDE_ = true
   SPACE_ = ' '.freeze

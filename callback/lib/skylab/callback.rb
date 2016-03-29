@@ -1,9 +1,3 @@
-
-$stderr.puts "HACKING KERNEL FOR DEBUGGING"
-module Kernel
-  alias_method :ivars, :instance_variables
-end
-
 module Skylab ; end
 
 module Skylab::Callback

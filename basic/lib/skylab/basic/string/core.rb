@@ -183,7 +183,7 @@ module Skylab::Basic
       end  # >>
 
       def initialize
-        NIL_  # (hi.)
+        NOTHING_  # (hi.)
       end
 
       attr_writer(

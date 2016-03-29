@@ -296,7 +296,7 @@ of expressions we want to express when there are "deep unavailabilities":
 
 
 
-### :#"C3", :#C3 evaluating operation-dependencies
+### evaluating operation-dependencies :#C3
 
    (this is very similar to [#ta-009] general task-graph resolution, and is
    a candidate for a future unification of that trail. but currently there

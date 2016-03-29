@@ -100,6 +100,12 @@ module Skylab::Fields::TestSupport
         :mixed_event_proc,
       )
 
+      def channel
+        SAME___
+      end
+
+      SAME___ = [ :_hact_, :_anything_but_emission_ ]
+
       nil
     end
   end

@@ -1,0 +1,30 @@
+digraph g {
+
+  label="(one day could be generated)
+is of subnode 01"
+
+  subgraph cluster_b {
+
+    label="root ACS"
+
+    get_card
+    money
+    take_subway
+  }
+
+  subgraph cluster_a {
+
+    label="second level"
+
+    have_dinner
+  }
+
+  get_card [label="get\nventra card"]
+  have_dinner [label="have\ndinner"]
+  take_subway [label="take\nsubway"]
+
+  take_subway->have_dinner [dir=both arrowhead=none arrowtail=teetee]
+  money->have_dinner [dir=both arrowhead=none arrowtail=teetee]
+  get_card->take_subway [dir=both arrowhead=none arrowtail=teetee]
+  money->get_card [dir=both arrowhead=none arrowtail=teetee]
+}

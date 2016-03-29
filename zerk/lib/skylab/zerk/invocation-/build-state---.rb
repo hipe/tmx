@@ -65,44 +65,38 @@ module Skylab::Zerk
 
       def __atomesque
 
-        # here's how we evaluate such association: simply determine if it's
-        # effectively known or not based solely on its value knownness in
-        # The Store plus the smarts we add here about list-based nodes.
+        # here's how we evaluate such an association: simply determine if
+        # it's effectively known or not based solely on its value knownness
+        # in The Store plus the smarts we add here about list-based nodes.
 
         kn = @_frame_index.frame_.reader__.read_value @_asc
 
-        # we add an extra detail to determine knownness:
+        # we add an extra detail to determine knownness - if it is a list-
+        # type field and its array is zero length, downgrade it so it
+        # appears as known unknown at normalization algorithms..
 
         if kn.is_effectively_known  # if it is set and not nil
           Require_field_library_[]
           if Field_::Takes_many_arguments[ @_asc ]
-            is_effectively_known = kn.value_x.length.nonzero?
-          else
-            is_effectively_known = true
+            if kn.value_x.length.nonzero?
+              kn = Callback_::KNOWN_UNKNOWN
+            end
           end
         end
 
-        if is_effectively_known
-          State_of_Association_with_Value_Effectively_Known___.new kn
-        else
-          State_of_Association_with_Value_Effectively_Unknown___.new @_asc
-        end
+        State__.new kn
       end
     end
 
     module For_Operation___
 
-      # models are cold [#ac-006]. readers (which need merely to produce
-      # a "no" or a "yes-and-value") are then cold too. but to implement
-      # [#ac-027] zerk-like operations, the act of "reading values" can
-      # potentially involve executing operations which requires hotness.
-
       def execute
 
-        # if we are here than this is the dependency operation being
-        # evaluated for a depender operation (and whether succueed or fail,
-        # this evaluation will be cached for reuse by others in this whole
-        # full-stack execution.)
+        # if we are here than this is a dependency operation being evaluated
+        # for one particular depender operation (of possibly several).
+        #
+        # whether it succeeds or fails, this evalution will be cached for
+        # reuse by other nodes in this whole full-stack execution.
 
         @_fo = @_node.formal
         p = @_fo.unavailability_proc
@@ -122,26 +116,17 @@ module Skylab::Zerk
 
         _o = @__recurser.begin_recursion__ @_fo
 
-        evl = _o.evaluate_recursion__
+        _kn = _o.evaluate_recursion__
 
-        # (the rest of this is near [#027]#"C3")
+        # (might be knkn, might be knuk. both ways are covered.)
 
-        if evl.is_known_known
-          self._A
-        else
-          self._REVIEW
-          State_of_Operation_with_Value_Effectively_Unknown___.new evl
-        end
+        # (the rest of this is near [#027]#C3)
+
+        State__.new _kn
       end
     end
 
-    class State__
-      def in_progress
-        false
-      end
-    end
-
-    class State_of_Operation_with_Value_Effectively_Unknown___ < State__
+    class State__  # as described in [#030]
 
       def initialize evl
 
@@ -157,31 +142,9 @@ module Skylab::Zerk
       def cached_evaluation_
         @__cached_evl
       end
-    end
 
-    class State_of_Association_with_Value_Effectively_Unknown___ < State__
-
-      def initialize asc
-        @_asc = asc
-      end
-
-      def unava_p_
-        self._K
-      end
-
-      def cached_evaluation_
-        Callback_::KNOWN_UNKNOWN
-      end
-    end
-
-    class State_of_Association_with_Value_Effectively_Known___ < State__
-
-      def initialize evl
-        @__cached_evl = evl
-      end
-
-      def cached_evaluation_
-        @__cached_evl
+      def in_progress
+        false
       end
     end
   end
