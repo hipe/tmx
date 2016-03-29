@@ -4,55 +4,37 @@ module Skylab::Zerk
 
     class Frame_Index___  # see [#013]
 
-      def initialize frame, parent_index, xxx, & node
+      def initialize frame, _NOT_USED_parent_index, xxx
 
         @_xxx = xxx
         @frame_ = frame
-        @_my_bx = Callback_::Box.new
-        @_next = parent_index
-        @_node = node
+        # @_next = parent_index
+        @__once = nil
+      end
 
-        st = frame.to_node_stream_
-        begin
+      def to_node_stream__
+
+        remove_instance_variable :@__once
+
+        h = {}
+        st = @frame_.to_node_stream_
+
+        p = -> do
           no = st.gets
-          no or break
-          send no.category, no
-          redo
-        end while nil
+          if no
+            h[ no.name_symbol ] = no
+            no
+          else
+            @_h = h
+            @_cache = {}
+            p = EMPTY_P_ ; no
+          end
+        end
 
-        @_cache = {}
+        Callback_.stream do
+          p[]
+        end
       end
-
-      # --
-    private
-
-      def compound no
-        # (hi.)
-        _index_this_node no
-      end
-
-      def operation no
-        # (hi.)
-        _index_this_node no
-      end
-
-      def association no
-        send no.association.model_classifications.category_symbol, no
-      end
-
-      def primitivesque no
-        # (hi.)
-        _index_this_node no
-      end
-
-      def _index_this_node no
-
-        @_node[ no ]
-        @_my_bx.add no.name_symbol, no
-        NIL_
-      end
-
-    public
 
       def touch_state__ par
         k = par.name_symbol
@@ -62,7 +44,8 @@ module Skylab::Zerk
             self._NO
           end
         else
-          bs = Here_::Build_state___.new @_my_bx.h_.fetch( k ), self, @_xxx
+          _no = @_h.fetch k
+          bs = Here_::Build_state___.new _no, self, @_xxx
           @_cache[ k ] = bs
           en = bs.execute
           @_cache[ k ] = en
@@ -77,3 +60,4 @@ module Skylab::Zerk
   end
 end
 # #history - broke out of the sibling file that builds the state structure
+# #tombstone - no more early ..

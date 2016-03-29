@@ -1,3 +1,9 @@
+
+$stderr.puts "HACKING KERNEL FOR DEBUGGING"
+module Kernel
+  alias_method :ivars, :instance_variables
+end
+
 module Skylab ; end
 
 module Skylab::Callback
@@ -542,6 +548,15 @@ module Skylab::Callback
 
   class Known_Unknown
 
+    class << self
+      alias_method :via_reasoning, :new
+      undef_method :new
+    end  # >>
+
+    def initialize x_o
+      @reasoning = x_o
+    end
+
     def to_qualified_known_around asc
       Qualified_Knownness.via_association asc
     end
@@ -555,7 +570,7 @@ module Skylab::Callback
     end
 
     attr_reader(
-      :reason_object,
+      :reasoning,  # #[#ze-030]#A
     )
 
     def is_effectively_known
@@ -571,7 +586,7 @@ module Skylab::Callback
     end
   end
 
-  KNOWN_UNKNOWN = Known_Unknown.new
+  KNOWN_UNKNOWN = Known_Unknown.via_reasoning nil
 
   class Known_Known
 

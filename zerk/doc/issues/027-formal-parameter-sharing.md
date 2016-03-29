@@ -1,5 +1,7 @@
 # formal parameter sharing :[#027]
 
+([#013] is an introduction to the ideas explored in-depth here.)
+
 we have run into the issue where old tests we made and stashed
 pre-mid-january use what we now call the "isolationist" model, and the
 mid-january we semi-formalized what we now call the "socialist" model.
@@ -294,13 +296,14 @@ of expressions we want to express when there are "deep unavailabilities":
 
 
 
-3) evaluating operation-dependencies
+### :#"C3", :#C3 evaluating operation-dependencies
 
    (this is very similar to [#ta-009] general task-graph resolution, and is
-   a candidate for a future unification of that trail.)
+   a candidate for a future unification of that trail. but currently there
+   is so much specialization that that prospect is daunting.)
 
-   what do in the case of failure *of* an ancillary operation
-   was an area of mystery for a while, now has this theoretical answer.
+   what to do in the case of failure *of* an ancillary operation was an
+   area of mystery for a while. now we have this theoretical answer:
 
    all relevant in-conditions to this problem are in terms of categories
    describing the classification and evaluation of the (operation-)
@@ -360,4 +363,102 @@ of expressions we want to express when there are "deep unavailabilities":
 
 4) the final result of the entrypoint formal operation (WHEN REASON)
    is hopefully some kind of tree..
+
+
+
+
+## (disjoint comments)
+
+### :#"c1"
+
+here in the recursive session we decide to emit into the selfsame
+emission handler that "belongs to" the originating session. in the past
+in similar sitations we have tried to do clever tricks by building
+handlers that "contextualize" the emitted events at each step to that
+the session can emit in the same manner, unaware of whether or not it is
+a recursive session. but our experience is that such a setup is
+confusing and is more trouble than it is worth..
+
+..so here we allow that the handler is already set and recognize what it
+is.
+
+
+
+### :#"c2"
+
+the callers are defined below this method for reasons.
+
+since it is a relatively :#"heavy lift" to build this [#]#scope-set
+(yet we can't cache it because [#ac-002]#DT3 everything is dynamic),
+we try to do this only when it is certain that we need to know it
+(e.g any of its derivatives, i.e #socialist-set or #bespoke-set)
+
+this :#"means" hash is a means to resolve every node in the scope set:
+either through sharing or as a bespoke parameter. this is the backbone
+of the evaluator (proc) that we will build below.
+
+we create a :#"diminishing pool" that starts off as the set of all
+names in the #stated-set.
+
+for just a second, ignore how we get this stream - :#"as a stream" we
+stream over every node name in the scope set, subtracting it from the
+pool IFF it's in the pool (and it "usually" isn't - "usually" there are
+more nodes in the scope set than there are in the stated set).
+
+this stream, on the ground floor session the stream is produced at
+this time. while we are producing each next node name we are also
+indexing which frame each node name is found in. (doing this has the
+side effect of ensuring name uniqueness in this scope stack.)
+(more on what we do when we do this in #c3 below.)
+
+if there are any subsequent recursive sessions, **WE REUSE** this same
+work of indexing: as a useful (and unintended) property of scope
+stacks, because a selected formal operation can only ever depend on
+other operations that are in its scope stack, (and so on recursively),
+all formal operations that could ever be in the dependency graph
+(recursively) of the ground-floor formal operation will be in its
+scope stack.
+
+we :#"could optimize" this for recursive sessions - in those cases we
+already have a plain old box for all the nodes in the scope stack,
+and we could just use the set operators ( `Array#&` or whatever )
+rather that iterating over items in a stream; but really: meh.
+
+
+
+
+## :#"c3", :#c3
+
+stream along the one or more compound frames that stand below the
+top item (the formal operation), (in some direction?), and in
+each such frame, stream along every node of that frame. for this
+stream of all nodes selected in this manner, memo which frame you
+found this node in.
+
+the reasons :#"this box" is a box and not a hash are two
+
+  • it verifies the uniqueness of all names in the scope stack
+
+  • later, if we re-use it in a recursive session we will want
+    its ordered-ness (yes hashes have ordered keys but meh)
+
+
+
+
+## :"c5"
+
+shared parameters such as these have actual values that exist
+either directly in the zerk tree already as ivars, or they exist
+latently as the results of would-be operation calls.
+
+whether the formal is proc-implemented or non-proc-implemented,
+we need to transfer these values to the actual (intermediate)
+store that will ultimately be used to execute the operation.
+
+assuming [#ac-028]:#API-point-B, we are being called once for each
+parameter of the "stated set" ("expanse" there) in order to apply
+defaults and find missing required parameters.
+
+so we piggy-back onto this second fulfillment fulfillment of this
+first need too EEK
 _

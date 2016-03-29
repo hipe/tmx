@@ -2,7 +2,8 @@
              redundanty with something somewhere..)
              also track flip-flop emitting ..
 
-[#065]       when expect-event is rewritten.. (notify these guys)
+[#065]       [expect event]
+
 [#064]    #to-explore imagine threads, etc
 [#063]       #tracking in-situ, also, wishlist: "struct-like". imagine:
                Args = Home_::Actor.struct :foo, :bar
@@ -37,7 +38,8 @@
 
 [#046] #hole ( #moved to [#fi-033] )
 
-[#045] #hole ( #was: actor patterns. moved to [#fi-016] )
+[#045]       the "emission" structure (has mentees)
+             ( #was: actor patterns. moved to [#fi-016] )
 
 [#044]       #parent-node: [#049] the stream narrative ..
 [#043]       #doc-node: the subscriptions narrative ..

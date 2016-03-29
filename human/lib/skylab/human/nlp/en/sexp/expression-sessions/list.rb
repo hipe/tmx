@@ -326,7 +326,7 @@ module Skylab::Human
 
       # --
 
-      def _is_equivalent_to_counterpart_ bruh
+      def _difference_against_counterpart_ bruh
 
         # is one list the same as another? we are doing this the long way..
         # assume that you are the "outside" one
@@ -343,7 +343,7 @@ module Skylab::Human
 
           m = :==  # #equivalence: NOT `equal?`. NOT `===`. `eql?` is "strict"
 
-          is_same = true
+          diff_x = NOTHING_
 
           a.length.times do |d|
 
@@ -356,12 +356,13 @@ module Skylab::Human
               next
             end
 
-            is_same = false ; break
+            diff_x = d
+            break
           end
 
-          is_same
+          diff_x
         else
-          false
+          true
         end
       end
 

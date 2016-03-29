@@ -39,7 +39,7 @@ module Skylab::Snag::TestSupport
 
     it "yes" do
 
-      fn = 'xyzzy1-tmp-for-test'
+      fn = 'xozzo1-tmp-for-test'
       path = ::File.join criteria_directory_, fn
 
       require 'fileutils'

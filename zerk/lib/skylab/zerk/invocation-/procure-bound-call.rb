@@ -9,23 +9,48 @@ module Skylab::Zerk
       class << self
 
         def begin__ pvs, fo, & pp
-          __begin_empty.__init_initial pvs, fo, & pp
+          _begin_empty.__init_initial pvs, fo, & pp
         end
 
-        alias_method :__begin_empty, :new
+        alias_method :_begin_empty, :new
         undef_method :new
       end  # >>
 
       # -- initialization
 
+      def __init_for_recursion fo, ts, si, & oes_p
+
+        @formal_operation = fo
+        @parameter_value_source = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
+        @_oes_p = oes_p
+        @_scope_index = si
+        @_trouble_stack = ts
+
+        @_on_unavailable_kn = Callback_::Known_Known[ -> * i_a, & ev_p do
+
+          # (be *the* contributor of [#fi-036]:"Storypoint-1":)
+          _reasoning = ( @__OHAI ||= Reasoning___.new( fo ) )
+          _reasoning.__add i_a, & ev_p
+
+          UNRELIABLE_
+        end ]
+
+        _common_init
+      end
+
       def __init_initial pvs, fo, & pp
 
         @formal_operation = fo
+        @_on_unavailable_kn = nil
         @parameter_value_source = pvs
         @_pp = pp
+        @_trouble_stack = nil
+        _common_init
+      end
+
+      def _common_init
 
         @_did_index_big = false
-        @_on_unavailable_kn = nil
         @__once_ES = nil
         self
       end
@@ -35,6 +60,29 @@ module Skylab::Zerk
       end
 
       # --
+
+      def begin_recursion__ fo
+
+        ts = @_trouble_stack
+        if ts
+          self._A
+        else
+          ts = [ self ]
+        end
+
+        _otr = self.class._begin_empty
+        _otr.__init_for_recursion fo, ts, @_scope_index, & @_oes_p
+      end
+
+      def evaluate_recursion__  # result in an "evaluation" struct
+        bc = execute
+        if bc
+          self._A
+        else
+          _ = remove_instance_variable :@__OHAI
+          Callback_::Known_Unknown.via_reasoning _
+        end
+      end
 
       def execute
 
@@ -46,7 +94,7 @@ module Skylab::Zerk
 
         o.expanse_stream_once = method :__expanse_stream_once
 
-        o.on_unavailable_ = __on_unavailable
+        o.on_unavailable = __on_unavailable
 
         o.parameter_store = self  # so "as parameter store" below
 
@@ -57,7 +105,7 @@ module Skylab::Zerk
 
       def ___prepare
 
-        @_oes_p = method :__on_emission
+        @_oes_p ||= method :__on_emission  # already set #IFF-recursion (see #"c1")
         @_real_store = @formal_operation.begin_parameter_store( & @_oes_p )
         @_accept_to_real_store = @_real_store.method :accept_parameter_value
         NIL_
@@ -65,83 +113,35 @@ module Skylab::Zerk
 
       # -- execution support
 
-      def _index_big  # (its callers are defined below it for reasons)
+      def _index_big  # all note continuations are under #"c2"
 
-        # since it is a relatively "heavy lift" to build this [#]#scope-set
-        # (yet we can't cache it because [#ac-002]#DT3 everything is dynamic),
-        # we try to do this only when it is certain that we need to know it
-        # (e.g any of its derivatives, i.e #socialist-set or #bespoke-set)
-        #
-        # create a "diminishing pool" that starts off as the set of all
-        # names in the #stated-set.
-        #
-        # stream along the one or more compound frames that stand below the
-        # top item (the formal operation), (in some direction?), and in
-        # each such frame, stream along every node of that frame. for this
-        # stream of all nodes selected in this manner, do this with each node:
-        #
-        #   memo which frame you found this node in, and memo that such
-        #   a node's values is resolved through a "socialist" means
-        #   (that is, that the name references a known node in the selection
-        #   stack.)
-        #
-        #   if that node *is* in the pool (it "usually" is not), "tick off"
-        #   the item from the pool (explained next).
-        #
-        # when you get to the end, any names that remain in the pool are
-        # your #bespoke-set. associate with each of these names the fact that
-        # the value of such nodes will be resolved through arguments only.
+        # avoid this #"heavy lift" whenver possible..
 
         @_did_index_big = true
 
-        means_h = {}  # to build the evaluator (proc)
+        means_h = {}  # to build the evaluator proc, a #"means" for every..
 
-        _ = @formal_operation.to_defined_formal_parameter_stream
-        stated_bx = _.flush_to_box_keyed_to_method :name_symbol
-
-        pool = stated_bx.a_.dup
+        stated_bx = __build_and_etc_stated_box
+        pool = stated_bx.a_.dup  # a #"diminishing pool"
         pool_h = ::Hash[ pool.each_with_index.map { |*a| a } ]
 
-        __init_expanse_stream stated_bx
+        # iterate over every node name in the scope #"as a stream" because..
 
-        # -- (keep track of what frame every node appears in)
-
-        frame_index_via_name_symbol = Callback_::Box.new
-        my_stack = []
-
-        frame_d = 0
-        parent_index = nil
-
-        st = ___to_below_frames_stream
-        fr = st.gets
+        st = __scope_node_name_symbol_stream  # we #"could optimize"..
         begin
-
-          idx = Here_::Frame_Index___.new fr, parent_index, self do |no|
-
-            k = no.name_symbol
-            frame_index_via_name_symbol.add k, frame_d
-            d = pool_h[ k ]
-            if d
-              means_h[ k ] = :__touch_knownness_for_shared_parameter
-              pool[ d ] = nil
-            end
+          k = st.gets
+          k or break
+          d = pool_h[ k ]
+          if d
+            pool[ d ] = nil
+            means_h[ k ] = :__touch_knownness_for_shared_parameter
           end
-
-          my_stack.push idx
-          fr = st.gets
-          fr or break
-          parent_index = idx
-          frame_d += 1
           redo
         end while nil
 
-        @__indices = Indices___.new frame_index_via_name_symbol.h_, my_stack
-
-        # --
-
         pool.compact!
-        pool.each do |k|
-          means_h[ k ] = :__lookup_knownness_for_bespoke_parameter
+        pool.each do |k_|
+          means_h[ k_ ] = :__lookup_knownness_for_bespoke_parameter
         end
 
         __init_bespoke_stream pool, stated_bx
@@ -149,6 +149,78 @@ module Skylab::Zerk
         __init_evaluator means_h
 
         NIL_
+      end
+
+      def __build_and_etc_stated_box
+
+        _ = @formal_operation.to_defined_formal_parameter_stream
+        stated_bx = _.flush_to_box_keyed_to_method :name_symbol
+
+        @__build_expanse_stream_once = -> do  # or many times, even
+          stated_bx.to_value_stream
+        end
+
+        stated_bx
+      end
+
+      def __scope_node_name_symbol_stream
+        if @_trouble_stack
+          @_scope_index.__to_name_symbol_stream
+        else
+          ___scope_node_name_symbol_stream_from_ground_floor
+        end
+      end
+
+      def ___scope_node_name_symbol_stream_from_ground_floor
+
+        # intro & continuations at #"c3"
+
+        current_frame_node_stream = nil
+        current_frame_index = nil
+        my_stack = []
+        frame_d = 0
+        frame_index_via_name_symbol = Callback_::Box.new
+        parent_index = nil
+
+        st = ___to_below_frames_stream
+        fr = st.gets
+
+        on_frame = -> do
+          current_frame_index = Here_::Frame_Index___.new fr, parent_index, self
+          current_frame_node_stream = current_frame_index.to_node_stream__
+        end
+
+        on_frame[]
+
+        p = -> do
+
+          begin
+            no = current_frame_node_stream.gets
+            if no
+              x = no.name_symbol
+              frame_index_via_name_symbol.add x, frame_d
+              break
+            end
+            my_stack.push current_frame_index
+            fr = st.gets
+            if fr
+              parent_index = current_frame_index
+              frame_d += 1
+              on_frame[]
+              redo
+            end
+
+            @_scope_index = Scope_Index___.new frame_index_via_name_symbol, my_stack
+
+            p = EMPTY_P_
+            break
+          end while nil
+          x
+        end
+
+        Callback_.stream do
+          p[]
+        end
       end
 
       def ___to_below_frames_stream
@@ -183,13 +255,6 @@ module Skylab::Zerk
       end
 
       # -- expanse stream (write, read)
-
-      def __init_expanse_stream stated_bx
-
-        @__build_expanse_stream_once = -> do  # or many times, even
-          stated_bx.to_value_stream
-        end ; nil
-      end
 
       def __expanse_stream_once
 
@@ -273,24 +338,9 @@ module Skylab::Zerk
         @_real_store.evaluation_of par
       end
 
-      def __touch_knownness_for_shared_parameter par
+      def __touch_knownness_for_shared_parameter par  # :"c5"
 
-        # shared parameters such as these have actual values that exist
-        # either directly in the zerk tree already as ivars, or they exist
-        # latently as the results of would-be operation calls.
-        #
-        # whether the formal is proc-implemented or non-proc-implemented,
-        # we need to transfer these values to the actual (intermediate)
-        # store that will ultimately be used to execute the operation.
-        #
-        # assuming [#ac-028]:#API-point-B, we are being called once for each
-        # parameter of the "stated set" ("expanse" there) in order to apply
-        # defaults and find missing required parameters.
-        #
-        # so we piggy-back onto this second fulfillment fulfillment of this
-        # first need too EEK
-
-        _sta = @__indices._touch_state par
+        _sta = @_scope_index._touch_state par
         evl = _sta.cached_evaluation_
 
         if evl.is_known_known
@@ -340,18 +390,52 @@ module Skylab::Zerk
 
       # ==
 
-      class Indices___
+      class Reasoning___  # a member of our [#030] unified language
 
-        def initialize h, a
+        def initialize fo
+          @compound_formal_attribute = fo  # experimental name
+          @emissions = []
+        end
+
+        def __add i_a, & ev_p
+          @emissions.push Emission___.new( i_a, ev_p ) ; nil
+        end
+
+        attr_reader(
+          :compound_formal_attribute,
+          :emissions,
+        )
+      end
+
+      class Emission___  # a member of our [#030] unified language
+
+        def initialize i_a, x_p
+          @channel = i_a
+          @mixed_event_proc = x_p
+        end
+
+        attr_reader(
+          :channel,
+          :mixed_event_proc,
+        )
+      end
+
+      class Scope_Index___
+
+        def initialize bx, a
           @_index_stack = a
-          @_soc_h = h
+          @_lookup_box = bx
         end
 
         def _touch_state par
 
-          _ = @_soc_h.fetch par.name_symbol
+          _ = @_lookup_box.fetch par.name_symbol
           _frame_index = @_index_stack.fetch _
           _frame_index.touch_state__ par
+        end
+
+        def __to_name_symbol_stream
+          @_lookup_box.to_name_stream
         end
       end
     end

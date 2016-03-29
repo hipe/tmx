@@ -375,6 +375,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # --
 
+      say_etc = nil
+
       Classify_model___ = -> mdl do
 
         m = CONSTRUCTOR_METHODS__.detect { | m_ | mdl.respond_to? m_ }
@@ -385,8 +387,17 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         elsif mdl.respond_to? :[]
           LOOKS_LIKE_PROC___
         else
-          self._COVER_ME_model_has_unrecognized_shape
+          self._SEE_ME  # #todo -  this is not yet covered but is v. useful
+          raise ::ArgumentError, say_etc[ mdl ]
         end
+      end
+
+      say_etc = -> mdl do
+
+        _ = CONSTRUCTOR_METHODS__.map { |sym| "`#{ sym }`" }.join ', '
+        _ << " or `[]`"
+        __ = Home_.lib_.basic::String.via_mixed mdl
+        "model is expected to respond to #{ _ } - #{ __ }"
       end
 
       ENTITESQUE_CONSTRUCTOR_METHOD__ = :interpret_component

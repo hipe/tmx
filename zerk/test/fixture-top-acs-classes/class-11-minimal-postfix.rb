@@ -12,12 +12,12 @@ module Skylab::Zerk::TestSupport
 
       def __left_number__component_association
 
-        Here_::Class_71_Number
+        Sibling_::Class_71_Number
       end
 
       def __right_number__component_association
 
-        Here_::Class_71_Number
+        Sibling_::Class_71_Number
       end
 
       def __add__component_operation

@@ -165,7 +165,7 @@ module Skylab::Autonomous_Component_System
           to_defined_formal_parameter_stream_cached_
         end
 
-        o.on_unavailable_ = NOTHING_  # raise exceptions
+        o.on_unavailable = NOTHING_  # raise exceptions
 
         o.parameter_store = begin_parameter_store_( & oes_p )
 
@@ -206,7 +206,7 @@ module Skylab::Autonomous_Component_System
       attr_writer(
         :bespoke_stream_once,
         :expanse_stream_once,
-        :on_unavailable_,
+        :on_unavailable,
         :parameter_store,
         :parameter_value_source,
       )
@@ -217,7 +217,7 @@ module Skylab::Autonomous_Component_System
           fo = @nr_.formal_
           unava_p = p[ fo ]
           if unava_p
-            Here_::When_Not_Available::Act[ @on_unavailable_, unava_p, fo ]
+            Here_::When_Not_Available::Act[ @on_unavailable, unava_p, fo ]
           else
             ACHIEVED_
           end
@@ -236,7 +236,7 @@ module Skylab::Autonomous_Component_System
 
         o.expanse_stream_once = @expanse_stream_once
 
-        o.on_reasons = @on_unavailable_
+        o.on_reasons = @on_unavailable
 
         o.parameter_store = @parameter_store
 

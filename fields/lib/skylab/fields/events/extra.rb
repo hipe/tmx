@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module Events_Support_
+  module Event_
 
     Home_::Events::Extra = Callback_::Event.prototype_with(
 

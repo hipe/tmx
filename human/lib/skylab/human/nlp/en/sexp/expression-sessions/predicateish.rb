@@ -8,13 +8,18 @@ module Skylab::Human
 
         object_noun_phrase: [ :component, :_read, :_write ],
 
+        auxiliary: [ :_atomic_, :_read, ],
+
+        early_adverbial_phrase: [ :component, :_read ],
+
         lemma: [ :_atomic_, :ivar, :@lemma_symbol ],
+
+        surface_verb: [ :_atomic_, :_read, ],
 
         # (etc other grammatical categories #here-1)
 
         tense: [ :_atomic_, :_read,
                  :custom_interpreter_method_of, :__interpret_tense, ],
-
       ]
 
       attr_writer( * COMPONENTS.symbols( :_write ) )
@@ -25,8 +30,16 @@ module Skylab::Human
 
       class << self
 
+        def interpret_component st, asc
+          Here_.expression_via_these_ st.gets_one, asc
+        end
+
+        def interpret_component_with_own_stream_ st, _asc
+          expression_via_sexp_stream_ st
+        end
+
         def expression_via_sexp_stream_ st
-          new.__init_via_sexp_stream st
+          new._init_via_sexp_stream st
         end
 
         alias_method :begin_, :new
@@ -34,6 +47,10 @@ module Skylab::Human
       end  # >>
 
       def initialize
+        @auxiliary = nil
+        @early_adverbial_phrase = nil
+        @lemma_symbol = nil
+        @object_noun_phrase = nil
         @tense = nil
       end
 
@@ -41,9 +58,13 @@ module Skylab::Human
         NOTHING_   # (hi.)
       end
 
-      def __init_via_sexp_stream st
+      def _init_via_sexp_stream st
 
         COMPONENTS.init_via_stream self, st
+      end
+
+      def __early_adverbial_phrase__component_association
+        Siblings_::Freeform_Phrase
       end
 
       def __object_noun_phrase__component_association
@@ -72,6 +93,34 @@ module Skylab::Human
 
       # ~
 
+      def _difference_against_counterpart_ x
+
+        Siblings_::List_through_Treeish_Aggregation::Phrase_diff[ self, x ]
+      end
+
+      def _aggregate_ diff_x, otr
+
+        if ! diff_x
+          self._WHERE
+        end
+
+        if 1 == diff_x.length
+          k = diff_x.first
+          x = send k
+          x_ = otr.send k
+          send :"__aggregate__#{ k }__", x, x_
+        else
+          NOTHING_
+        end
+      end
+
+      def __aggregate__surface_verb__ x, x_
+        @surface_verb = "#{ x } and #{ x_ }"  # meh
+        self
+      end
+
+      # ~
+
       def to_statementish_stream_for_subject * sexp
 
         # in EN there is of course conjugation of verbs with their subjects
@@ -97,49 +146,94 @@ module Skylab::Human
 
       # ~
 
-      def express_into_under_for_subject__ y, expag, subj
+      def express_into_under_for_subject_ y, expag, subj
+
+        if @auxiliary
+          __etc_when_auxiliary y, expag, subj
+        else
+          __etc_when_normal y, expag, subj
+        end
+      end
+
+      def __etc_when_auxiliary y, expag, subj
+
+        if @tense
+          self._WAHOO  # e.g "must have made"
+        end
+        y << @auxiliary.id2name
+        y << SPACE_
+        _express_any_early_adverbial_phrase y
+        __express_verb_stem y
+        _express_any_object y, expag
+      end
+
+      def __etc_when_normal y, expag, subj
 
         # near `inflect_words_into_against_sentence_phrase`
         # [#].2 explains why we do this anew at each expression
 
-        ph = Skylab::Human::NLP::EN::POS::Verb[ subj, @lemma_symbol.id2name ]
-
-        ph << ( @tense || :present )
-
-        # (etc other grammatical categories #here-1)
-
-        ph.express_into y
-
+        _express_verb_agreeing_with y, subj
         _express_any_object y, expag
       end
 
       def express_into_under y, expag  # NOTE -
 
+        if @auxiliary
+          self._EEK
+        end
+
         # only for above, for passive voice. normally a verb-phrase cannnot
         # express without knowing its subject. if these semantics for this
         # method are ever a problem, make an adapter class "past participle"
 
-        _ = Siblings_::Nounish::Natural_defaults[]  # for now it is necessary
-        # that these hardcoded values are passed explicitly b.c the POS lib
-        # does not know of our hackery..
-
-        ph = Skylab::Human::NLP::EN::POS::Verb[ _, @lemma_symbol.id2name ]
-
-        ph << ( @tense || :present )
-
-        ph.express_into y
-
+        _express_verb_agreeing_with_natural_default_subject y
         @object_noun_phrase and self._SANITY
         y
       end
       protected :express_into_under
+
+      def __express_verb_stem y
+        sym = @lemma_symbol
+        if sym
+          y << sym.id2name
+        else
+          @surface_verb or self._SANITY
+          y << @surface_verb
+        end
+      end
+
+      def _express_verb_agreeing_with_natural_default_subject y
+
+        _ = Siblings_::Nounish::Natural_defaults[]
+        _express_verb_agreeing_with y, _
+      end
+
+      def _express_verb_agreeing_with y, subj
+
+        _express_any_early_adverbial_phrase y
+
+        ph = Skylab::Human::NLP::EN::POS::Verb[ subj, @lemma_symbol.id2name ]
+
+        ph << ( @tense || :present )
+        # (etc other grammatical categories #here-1)
+        ph.express_into y
+      end
+
+      def _express_any_early_adverbial_phrase y
+        x = @early_adverbial_phrase
+        if x
+          x.express_into_under y, :_EEK_
+          y << SPACE_
+        end
+        NIL_
+      end
 
       def _express_any_object y, expag
 
         o = @object_noun_phrase
         if o
           y << SPACE_
-          @object_noun_phrase.express_into_under y, expag
+          o.express_into_under y, expag
         else
           y
         end
@@ -157,6 +251,10 @@ module Skylab::Human
         :predicateish
       end
 
+      def _can_aggregate_
+        true
+      end
+
       class List
 
         # map the same subject on to several sequential predicates.
@@ -165,8 +263,8 @@ module Skylab::Human
         # with #antecedent-distance.
 
         class << self
-          alias_method :via_, :new
-          private :new
+          alias_method :via_array_, :new
+          undef_method :new
         end  # >>
 
         def initialize a

@@ -1,4 +1,6 @@
-[#032]       in-situ
+[#033] #open edge case not covered (see)
+
+[#032]       in-situ - formal parameter stream requested 3 times?
 
 [#031]       a "selection stack" is effectively (when complete) a reference
              pointing to a "fully qualified" formal operation ("action" in
@@ -52,6 +54,7 @@
              application, these are areas that make calculations redudantly.
 
 [#022]       [ reader-writer ] AND theory..
+             ( piggy-back a not-yet-defined definition of :"compoundesque" here too)
 
 [#021] #open our n11n partially duplicates the n11n in [fi]
              ( #was: assimilated c15n into [hu] )

@@ -75,7 +75,8 @@ module Skylab::Human
 
       COMPONENTS = Attributes_[
 
-        lemma: [ :_atomic_, :ivar, :@lemma_symbol ],
+        lemma: [ :_atomic_, :ivar, :@lemma_symbol,
+                 :custom_interpreter_method_of, :__interpret_lemma ],
 
         modifier_word_list: [ :component, :_read ],
 
@@ -95,6 +96,15 @@ module Skylab::Human
         ok or fail
         @suffixed_proper_constituency ||= Natural_defaults___[]
         super asc
+      end
+
+      def __interpret_lemma st  # whether lemmata are symbols or strings is in transition
+        x = st.gets_one
+        if x.respond_to? :ascii_only?
+          x = x.intern
+        end
+        @lemma_symbol = x
+        KEEP_PARSING_
       end
 
       def __modifier_word_list__component_association
@@ -194,12 +204,12 @@ module Skylab::Human
         @lemma_symbol
       end
 
-      def _can_aggregate_
-        true
-      end
-
       def category_symbol_
         :_noun_phraseish_
+      end
+
+      def _can_aggregate_
+        true
       end
     end
 
@@ -233,7 +243,7 @@ module Skylab::Human
 
     Natural_defaults___ = Lazy_.call do
 
-      class Natural_Defaults____  # natural defaults
+      class Natural_Defaults____
 
         class << self
           private :new

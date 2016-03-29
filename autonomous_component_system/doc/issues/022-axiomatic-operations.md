@@ -12,7 +12,7 @@ are upwards of N "axiomatic operations" that we may have to execute
 (where N is 4).
 
 a bit like a "RISC" architecture (1990's!), from these axiomatic
-operations we define other, highter level operations (namely, the
+operations we define other, higher-level operations (namely, the
 performers that make up the bulk of this library).
 
 

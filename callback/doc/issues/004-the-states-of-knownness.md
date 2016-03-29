@@ -10,11 +10,11 @@
 • a "known known" has the important side-effect that it itself is always
   true-ish (because it is an instance of a class we created).
 
-• a "known known" can be qualified or unqualified.
+• a "known known" can be "qualified" or "unqualified".
 
 • the qualified variety of "known known" has an `association` field that
   must produce an assocation structure of any shape provided that it has
-  a `name` field that produces a [#ca-060] name *function*.
+  a `name` field that produces a [#060] name *function*.
 
 • the unqualified "known known" has no `association` field (and to
   request one should raise a no method exception).
@@ -22,6 +22,9 @@
 • a "known unknown" itself does not have a value field. (however it is
   still true-ish like all "knownnesses"). because an unqualified known
   unknown has no internal state to maintain, it is a singleton object.
+
+  EDIT: we can now construct a known unknown with a
+  [#ze-030]#A "reasoning" object.
 
 
 

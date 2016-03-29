@@ -1,6 +1,6 @@
 module Skylab::Callback::TestSupport
 
-  module Expect_Event  # [#065] (has subscribers to the rewrite)
+  module Expect_Event  # :[#065].
 
     # per name conventions, all method *and ivar* names with neither leading
     # nor trailing underscores are part of the [sub-]subject's public API.
@@ -1006,7 +1006,7 @@ module Skylab::Callback::TestSupport
       end
     end
 
-    class Emission___
+    class Emission___  # :[#045]. (has mentees)
 
       def initialize event_proc, channel_symbol_array
 

@@ -1,0 +1,34 @@
+digraph G {
+ label="(from the documentation)
+a failure graph with some complexity:
+five atom nodes, three compound.
+
+the nodes that have more than one depender
+(there are two of them) are of interest:
+
+G (a compound with multiple dependers)
+must be mentioned multiple times but
+must be descended into only once.
+
+as for J (an atom with multiple dependers),
+depending on the surface expression templates
+it may or may not expose itself to a risk
+of redundant expression of its predicate..
+
+"
+ A [bgcolor=grey style=filled]
+ B [bgcolor=grey style=filled]
+ F [bgcolor=grey style=filled]
+ H [bgcolor=grey style=filled]
+ J [bgcolor=grey style=filled]
+ root -> A
+ root -> B
+ root -> D
+ root -> E
+ D -> F
+ D -> G
+ E -> G
+ E -> H
+ E -> J
+ G -> J
+}

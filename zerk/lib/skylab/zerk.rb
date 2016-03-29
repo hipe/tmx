@@ -39,9 +39,9 @@ module Skylab::Zerk  # intro in [#001] README
 
   Callback_ = ::Skylab::Callback
 
-  Is_listy_ = -> sym do  # assume Fields_
+  Is_listy_ = -> sym do  # assume Field_
     if sym
-      Fields_::Can_be_more_than_zero[ sym ]
+      Field_::Can_be_more_than_zero[ sym ]
     else
       false  # the default is not listy
     end
@@ -55,7 +55,7 @@ module Skylab::Zerk  # intro in [#001] README
   end
 
   Require_field_library_ = Lazy_.call do
-    Fields_ = Home_.lib_.fields
+    Field_ = Home_.lib_.fields
     NIL_
   end
 

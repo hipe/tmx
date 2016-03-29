@@ -83,8 +83,8 @@ module Skylab::Human
         y << @_x
       end
 
-      def _is_equivalent_to_counterpart_ otr
-        otr._x == @_x  # #equivalence
+      def _difference_against_counterpart_ otr
+        otr._x != @_x  # #equivalence
       end
 
       attr_reader :_x
@@ -117,8 +117,16 @@ module Skylab::Human
           y << expag.send( @_m, @_x )
         end
 
-        def _is_equivalent_to_counterpart_ otr
-          otr._m == @_m && otr._x == @_x
+        def _difference_against_counterpart_ otr
+          if otr._m == @_m
+            if otr._x == @_x
+              NOTHING_
+            else
+              :_x_
+            end
+          else
+            :_m_
+          end
         end
 
         attr_reader :_m, :_x
@@ -177,14 +185,89 @@ module Skylab::Human
           true
         end
 
-        def _is_equivalent_to_counterpart_ otr
-          otr._s_a == @_s_a  # #equivalence
+        def _difference_against_counterpart_ otr
+          otr._s_a != @_s_a  # #equivalence
         end
 
         attr_reader :_s_a
         protected :_s_a
 
         # --
+      end
+
+      class Freeform_Phrase
+
+        class << self
+
+          def interpret_component st, _asc
+            x = st.gets_one
+            if x
+              via_ x
+            else
+              x  # life is easier to allow the client to pass nils
+            end
+          end
+
+          def via_ x
+            if x.respond_to? :ascii_only?
+              String_as_Freeform_Phrase___.new x
+            elsif x.respond_to? :id2name
+              Symbol_as_Freeform_Phrase.new x
+            else
+              self._K
+            end
+          end
+        end
+      end
+
+      class String_as_Freeform_Phrase___ < Freeform_Phrase
+
+        def initialize s
+          @_s = s
+        end
+
+        def _as_string
+          @_s
+        end
+
+        def _inner_x
+          @_s
+        end
+      end
+
+      class Symbol_as_Freeform_Phrase < Freeform_Phrase
+
+        def initialize sym
+          @_sym = sym
+        end
+
+        def _as_string
+          @_sym.id2name
+        end
+
+        def _inner_x
+          @_sym
+        end
+      end
+
+      class Freeform_Phrase  # (re-open)
+
+        def express_into_phrase_builder__ pb
+          pb.add_string _as_string
+          NIL_
+        end
+
+        def express_into_under y, _
+          y << _as_string
+        end
+
+        def _can_aggregate_
+          true
+        end
+
+        def _difference_against_counterpart_ x
+          _inner_x != x._inner_x
+        end
       end
 
       Autoloader_[ self ]

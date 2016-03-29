@@ -1,5 +1,18 @@
 # the "scope stack trick" :[#155]
 
+
+## synopsis
+
+this refers to the trick of when you open up and write code "inside" a
+module but you are not setting constants into that model but rather some
+other module. you are "inside" the first module only so that constants
+that live within it are visible to you.
+
+
+
+
+## original description (still here for postierity for now)
+
 at writing there is a module called `Model_`. the purpose of this node
 is to provide opt-in support for nodes in our reactive tree. this
 would-be base class is no class at all but module, because we have no use

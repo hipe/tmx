@@ -6,18 +6,13 @@ module Skylab::Fields::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :event_failure_graph_expression
 
     context "(with no subject)" do
 
-      shared_subject :__ev do
+      shared_subject :event_ do
 
-        a = []
-        a.push Callback_::Name.via_variegated_symbol :foo_bar
-        a.push Callback_::Name.via_variegated_symbol :quux_grault
-
-        Home_::Events::Missing.new_with(
-          :reasons, a,
-        )
+        new_with_reasons_ name_( :foo_bar ), name_( :quux_grault )
       end
 
       it "(uses \"invariant be\" form)" do
@@ -25,11 +20,78 @@ module Skylab::Fields::TestSupport
         _be_this_message = eql(
           "missing required attributes 'foo-bar' and 'quux-grault'\n" )
 
-        _expag = common_expression_agent_
-        _ev = __ev
-        _ = _ev.express_into_under "", _expag
+        event_message_as_string_.should _be_this_message
+      end
+    end
 
-        _.should _be_this_message
+    context "(oh mah guh baybuh) (see [#036]/figure-1.dot)" do
+
+      shared_subject :event_ do
+
+        a = [ name_( :A ), name_( :B ) ]
+        @_J = name_ :J
+        @_G = __build_G
+        a.push __build_D
+        a.push __build_E
+        remove_instance_variable :@_G
+        new_with_reasons_array_ a
+      end
+
+      it "the toplevel attributes get aggregated (again)" do
+        _(0) == "missing required attributes 'a' and 'b'\n" or fail
+      end
+
+      it "the toplevel branch nodes are aggregated, note the expression template" do
+        _(1) == "must 'd' and 'e'\n" or fail
+      end
+
+      it "we descend one level and list all (one) missingattributes of that" do
+        _(2) == "'d' is missing required attribute 'f'.\n" or fail
+      end
+
+      it "it is 'd' that introduces 'g'" do
+        _(3) == "to 'd', must 'g'\n" or fail
+      end
+
+      it "it is 'g' that introduces 'j'" do
+        _(4) == "'g' is missing required attribute 'j'.\n" or fail
+      end
+
+      it "'e' is free to reference attribute 'j' (that is descended already)" do
+        _(5) == "'e' is missing required attributes 'h' and 'j'.\n" or fail
+      end
+
+      it "'e' when referencing the visited branch 'g' says \"also\"" do
+        _(6) == "to 'e', must also 'g'\n" or fail
+      end
+
+      def _ d
+        _ary.fetch d
+      end
+
+      shared_subject :_ary do
+        event_message_as_line_array_
+      end
+
+      def __build_D
+        o = begin_stub_ :D
+        o._add_reason name_ :F
+        o._add_reason @_G
+        o
+      end
+
+      def __build_E
+        o = begin_stub_ :E
+        o._add_reason @_G
+        o._add_reason name_ :H
+        o._add_reason @_J
+        o
+      end
+
+      def __build_G
+        o = begin_stub_ :G
+        o._add_reason @_J
+        o
       end
     end
   end

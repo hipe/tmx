@@ -31,7 +31,7 @@ it, [ze] supports both "bespoke" and "socialist" parameters. (we flip-
 flopped on this choice *twice*.)
 
 as that document's treatment of "socialism" theorizes and
-[#sa-027]/generate-me.dot exemplifies, any operation may prerequisite
+[..]/subnode-01.dot exemplifies, any operation may prerequisite
 
   • any "atom-esques" and
   • any other operations
@@ -55,6 +55,12 @@ these are the main challenges of implementing the above:
     where A needs B and B needs C and A needs C, we do not want to
     evaluate the availability of C more than once. the exemplar graph
     holds cases like these.)
+
+
+        A ---------> B
+        \           /
+         \         /
+          +-> C <-+
 
   • we don't want to cache "too much": in a [#ac-023] fantastical world
     where a root ACS outlives the fulfillment of *one* user-requested

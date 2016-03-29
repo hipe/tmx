@@ -7,6 +7,17 @@ module Skylab::Autonomous_Component_System
       # NOTE  - this means "argument stream" as in the API modality ..
       # notes in [#028].
 
+      class << self
+
+        def the_empty_value_source  # 1x, [ze]
+
+          # (the singleton is found here (and is here for now) only because
+          # of the prominence of this node. the singleton is no-modality.)
+
+          Empty___[]
+        end
+      end  # >>
+
       def initialize st
         @argument_stream = st
       end
@@ -20,11 +31,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      def to_empty
-        Empty___[]
-      end
-
-      def is_not_known_to_be_empty__
+      def is_not_known_to_be_empty_
         ! is_known_to_be_empty
       end
 
@@ -102,7 +109,11 @@ module Skylab::Autonomous_Component_System
         module EMPTY____ ; class << self
 
           def is_not_known_to_be_empty_
-            false  # i.e is known to be empty
+            false
+          end
+
+          def is_known_to_be_empty
+            true
           end
 
           def to_empty

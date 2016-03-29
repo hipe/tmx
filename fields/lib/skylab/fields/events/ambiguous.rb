@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module Events_Support_
+  module Event_  # #[#sl-0155]
 
     Home_::Events::Ambiguous = Callback_::Event.prototype_with(
 

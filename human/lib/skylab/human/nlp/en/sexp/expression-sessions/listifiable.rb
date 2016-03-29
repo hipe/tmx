@@ -56,23 +56,23 @@ module Skylab::Human
 
       # --
 
-      def _is_equivalent_to_counterpart_ o
+      def _difference_against_counterpart_ o
 
         if :__listifiable  == o.category_symbol_
-          ___is_equiv_to_other_listifiable o
+          ___diff_against_other_listifiable o
         else
           # for now we're going to be dirty and assume that the other is a
           # List and that it is nonzero in length (since it exists as a list)
           # and we, always being one in length (when imagined as a list):
-          false
+          true
         end
       end
 
-      def ___is_equiv_to_other_listifiable o
+      def ___diff_against_other_listifiable o
 
         inner = o._inner_expression
         if inner.category_symbol_ == @_inner_expression.category_symbol_
-          inner._is_equivalent_to_counterpart_ @_inner_expression
+          inner._difference_against_counterpart_ @_inner_expression
         end
       end
 

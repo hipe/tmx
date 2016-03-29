@@ -190,6 +190,8 @@ module Skylab::Callback
             end
           end
 
+          # (subscriptions to a non-globbed from of above: :[#]:#A.)
+
           def inline_with__EXPERIMENTAL__ * x_a
             construct do
               __hack_a_different_term_chan_sym x_a

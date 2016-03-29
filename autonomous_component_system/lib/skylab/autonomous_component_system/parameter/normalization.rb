@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
 
       def execute
 
-        if @parameter_value_source.is_not_known_to_be_empty__
+        if @parameter_value_source.is_not_known_to_be_empty_
           # adhere to [#]:#API-point-A - do bespokes IFF etc
           ___interpret_any_bespokes
         end
@@ -62,14 +62,17 @@ module Skylab::Autonomous_Component_System
 
       def __common_normalize
 
-        # implement the [#]:#Algorithm
-        # implement [#]:#API-point-B - (evaluate every formal in formal order)
-        # generalize to work with [#ze-027]:#Crazytimes.3.A
-        # this partially duplicates something in [fi] #open [#021]
+        # • implement the [#]:#Algorithm
+        # • honor [#]:#API-point-B: evaluate every formal in formal order
+        # • generalize to work with [#ze-027]:#C3
+        # • partially duplicate something in [fi] #open [#021]
 
         Require_field_library_[]
 
         miss_a = nil
+        add_mixed_failure_object = -> x_o do
+          ( miss_a ||= [] ).push x_o
+        end
 
         fo_st = remove_instance_variable( :@expanse_stream_once ).call
 
@@ -80,21 +83,39 @@ module Skylab::Autonomous_Component_System
           f = fo_st.gets
           f or break
 
-          evl = rdr_p[ f ]
+          evl = rdr_p[ f ]  # honor the above mentioned API point.
           if evl.is_effectively_known
             redo
           end
 
-          # now it's either known to be nil or known unknown
+          # assume it is not effectively known. it must be either known
+          # unknown or known to be nil (right?). IFF the former it may have
+          # some "reasoning" attached to it. if it does then this constitutes
+          # *the* implementation of [#fi-036]#"Storypoint-2". otherwise munge
+          # these two cases with one behavior.
 
-          if ! evl.is_known_known
-            # if it was known unknown for some *reason* (like a failure
-            # to establish dependencies), then this:
-            rsn = evl.reason_object
-            if rsn
-              ( miss_a ||= [] ).push rsn
+          if evl.is_known_known
+            evl.value_x.nil? or self._SANITY
+            reasoning_x = nil
+          else
+            reasoning_x = evl.reasoning
+          end
+
+          if reasoning_x
+
+            if Field_::Is_required[ f ]
+              add_mixed_failure_object[ reasoning_x ]
               redo
             end
+
+            # when reasons were given but the field is not required:
+
+            self._COVER_ME_design_me_read_this  # ..what we do here might
+            # should depend on the category of failure. if merely it couldn't
+            # meet its dependencies (however no executions failed), then we
+            # might want to skip. on the other hand, if executions failed
+            # (somewhere), then we might want to express and behave around
+            # the failure. this is exactly [#ze-027]#C3.  #open [#033].
           end
 
           # even if errors have occurred prior, we go through with it
@@ -107,20 +128,20 @@ module Skylab::Autonomous_Component_System
           end
 
           if x.nil? && Field_::Is_required[ f ]
-            ( miss_a ||= [] ).push f
+            add_mixed_failure_object[ f ]
           end
 
           redo
         end while nil
 
         if miss_a
-          ___when_missing_requireds miss_a
+          ___when_failures_and_or_missing_requireds miss_a
         else
           ACHIEVED_
         end
       end
 
-      def ___when_missing_requireds miss_a
+      def ___when_failures_and_or_missing_requireds miss_a
 
         ev = Field_::Events::Missing.new_with(
           :reasons, miss_a,

@@ -84,11 +84,50 @@ module Skylab::Human
 
         # (we don't actually mutate but the method name is future-proofed towards this)
 
+        first = @_a.fetch 0
         if 1 == @_a.length
-          @_a.fetch 0
+          first
         else
-          Siblings_::Predicateish::List.via_ @_a
+          first.class.const_get( :List, false ).via_array_ @_a  # hm..
         end
+      end
+
+      Phrase_diff = -> left, right do
+
+        atrs = right.class::COMPONENTS
+        is_alias = atrs.is_X( :_referrant_ ) || MONADIC_EMPTINESS_
+        is_atomic = atrs.is_X( :_atomic_ ) || MONADIC_EMPTINESS_
+        st = atrs.to_defined_attribute_stream
+        diff_x = nil
+        begin
+          atr = st.gets
+          atr or break
+          k = atr.name_symbol
+          if is_alias[ k ]
+            redo
+          end
+          x = left.send k  # ..
+          x_ = right.send k
+          if is_atomic[ k ]
+            if x_ != x
+              ( diff_x ||= [] ).push k
+            end
+            redo
+          end
+          if x
+            if x_
+              diff_x_ = x._difference_against_counterpart_ x_
+              if diff_x_
+                ( diff_x ||= [] ).push [ k, :deep, diff_x_ ]
+              end
+            end
+            ( diff_x ||= [] ).push [ k, :left_not_right ]
+          elsif x_
+            ( diff_x ||= [] ).push [ k, :right_not_left ]
+          end
+          redo
+        end while nil
+        diff_x
       end
 
       class Assimilate
@@ -122,11 +161,11 @@ module Skylab::Human
               atr = st.gets
               atr or break
 
-              if is_alias[ atr ]  # skip assocs that are aliases for other assocs
+              k = atr.name_symbol
+
+              if is_alias[ k ]  # skip assocs that are aliases for other assocs
                 redo
               end
-
-              k = atr.name_symbol
 
               x = if exp.respond_to? k  # allow inside to be structural subset
                 exp.send k
@@ -194,7 +233,9 @@ module Skylab::Human
         def execute
 
           if 1 == @_compare_a.length
-            _maybe_assimilate( * remove_instance_variable( :@_compare_a ).fetch( 0 ) )
+
+            _a = remove_instance_variable :@_compare_a
+            _maybe_assimilate nil, * _a.fetch( 0 )
           else
             ___tiebreak
           end
@@ -213,8 +254,8 @@ module Skylab::Human
             # we let the outside one be the custodian of the method, for
             # shenanigans
 
-            _is_same = ex_._is_equivalent_to_counterpart_ ex
-            if _is_same
+            diff_x = ex_._difference_against_counterpart_ ex
+            if ! diff_x
               next
             end
 
@@ -223,7 +264,7 @@ module Skylab::Human
             end
 
             found_only_one_that_is_different = true
-            the_one = [ ex_, ex, asc ]
+            the_one = [ diff_x, ex_, ex, asc ]
           end
 
           if found_only_one_that_is_different
@@ -235,9 +276,20 @@ module Skylab::Human
           end
         end
 
-        def _maybe_assimilate subex_, subex, asc
+        def _maybe_assimilate diff_x, subex_, subex, asc
 
-          noof = subex._aggregate_ subex_
+          d = subex.method( :_aggregate_ ).arity
+          if 2 == d
+
+            if ! diff_x
+              diff_x = subex._difference_against_counterpart_ subex_
+            end
+
+            noof = subex._aggregate_ diff_x, subex_
+          else
+            noof = subex._aggregate_ subex_
+          end
+
           if noof
 
             # we know *something* happened. did receiver mutate or did it

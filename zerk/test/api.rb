@@ -31,11 +31,11 @@ module Skylab::Zerk::TestSupport
         root_ACS_result.should eql Home_::UNABLE_
       end
 
-      def message_  # must be used in conjuction with #this
+      def message_  # must be used in conjuction with #here
         root_ACS_state.message
       end
 
-      def raises_argument_error_  # must be used in conjuction with #this
+      def raises_argument_error_  # must be used in conjuction with #here
         root_ACS_state or fail
       end
 
@@ -66,7 +66,7 @@ module Skylab::Zerk::TestSupport
 
       # -- effecting the state
 
-      def rescue_argument_error_ & p  # is :#this
+      def rescue_argument_error_ & p  # is :#here
         begin
           instance_exec( & p )
         rescue ::ArgumentError => e

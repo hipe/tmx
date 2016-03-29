@@ -43,7 +43,7 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      Here_::Class_72_Color
+      Sibling_::Class_72_Color
     end
 
     def make_ucolor_unavailable_!

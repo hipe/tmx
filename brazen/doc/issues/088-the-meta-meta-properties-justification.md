@@ -30,3 +30,4 @@ formal properties are, then think of it this way: the above list is the
 out-of-the-box recognized list of formal properties that you can use to
 define your formal properties. that probably doesn't make sense either.
 _
+(#pending-rename: move to [fi])

@@ -1,6 +1,6 @@
 module Skylab::Callback
 
-    class Event  # see [#011]
+    class Event  # see [#003]
 
       class << self
 
