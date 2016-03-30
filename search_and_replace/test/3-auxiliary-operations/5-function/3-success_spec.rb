@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - success", wip: true do
+  describe "[sa] auxiliaries - function - success" do
 
     TS_[ self ]
     use :my_API

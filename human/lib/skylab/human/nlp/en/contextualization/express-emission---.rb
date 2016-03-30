@@ -72,6 +72,8 @@ module Skylab::Human
 
     Line_Stream_via_Channel___  = -> kns do  # #stowaway
 
+      # (this is near a solution for #[#ca-046] emission handling pattern)
+
       # side-effect is to resolve a trilean (shh)
 
       if ! kns.event_proc

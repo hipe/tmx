@@ -91,6 +91,8 @@ module Skylab::Human
 
     def to_exception  # #covered-only-by:[my]. mutates receiver.
 
+      # (looks like #[#ca-066] emission-to-exception pattern)
+
       if :expression == @channel.fetch( 1 )
         ___exception_via_expression
       else

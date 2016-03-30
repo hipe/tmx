@@ -1,3 +1,5 @@
+[#024] #track complicated client interface
+
 [#023] #when-etc use (or don't) for all occurrences of old memoize
              (after benchmarking it)
 
@@ -96,5 +98,8 @@
                instead of three buttons )
 [#004]       #feature should check mtime before write, abort for that file if stale
 [#003]       [ track a historic node ]
-[#002]       -wip-them-all (in [ts]) *uses* this guy..
+
+[#002] #open -wip-them-all (in [ts]) *uses* this guy..
+             we need to decide how to cover..
+
 [#001]       [ the readme ]

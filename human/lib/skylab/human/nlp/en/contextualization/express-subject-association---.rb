@@ -52,6 +52,8 @@ module Skylab::Human
           # call the downhandler first before you do any more work because
           # maybe the client doesn't event want the event or expression
 
+          # (this feels like #[#ca-046] emission handling pattern but isn't.)
+
           kns = @knowns_
           me = self
           if :expression == i_a[ 1 ]

@@ -36,7 +36,11 @@
 
 [#047] #hole ( #was: eventing .. #moved-to: [#hu-053] )
 
-[#046] #hole ( #moved to [#fi-033] )
+[#046] #track similar emission handlers (this is very near [#066] but is
+              for those that do not convert to exceptions but rather
+              write to something like a line context..)
+
+             ( #was: #moved to [#fi-033] )
 
 [#045]       the "emission" structure (has mentees)
              ( #was: actor patterns. moved to [#fi-016] )

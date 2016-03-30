@@ -203,6 +203,8 @@ module Skylab::Fields
 
       def ___recurse reason_x
 
+        # (a custom #[#ca-046] emission handling pattern.)
+
         em_a = reason_x.emissions
         if 1 < em_a.length
           self._DESIGN_ME  # #open [#ze-030]:#A

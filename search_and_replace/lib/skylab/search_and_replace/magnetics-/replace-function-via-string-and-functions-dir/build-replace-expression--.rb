@@ -10,6 +10,10 @@ module Skylab::SearchAndReplace
           :method_call_chain,
         )
 
+        def initialize & x_p
+          @_oes_p = x_p
+        end
+
         def execute
 
           @method_call_chain = @method_call_chain.map( & :intern )
@@ -31,7 +35,7 @@ module Skylab::SearchAndReplace
             fu = Build_fulfiller___.call(
               @custom_i_a,
               @functions_dir,
-              & @on_event_selectively )
+              & @_oes_p )
 
           else
             fu = ___when_no_functions_directory
@@ -48,7 +52,7 @@ module Skylab::SearchAndReplace
 
           sym_a = @custom_i_a
 
-          @on_event_selectively.call(
+          @_oes_p.call(
 
             :error, :expression, :functions_directory_required
 

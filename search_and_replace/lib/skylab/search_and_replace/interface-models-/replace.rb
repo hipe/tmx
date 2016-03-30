@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace
       @_oes_p = oes_p
     end
 
-    def with__matches__ o
+    def finish__matches__by o
 
       # with this what we're saying is "don't call `execute` (or anything
       # else) on the matches session (if you get as far as resolving it).

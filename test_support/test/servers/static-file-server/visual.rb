@@ -18,6 +18,8 @@ _guy = _cls.new _path, :PID_path, '.' do | * i_a, & ev_p |
 
   expag ||= ::Skylab::TestSupport.lib_.brazen::API.expression_agent_instance
 
+  # (#[#ca-046] emission handling pattern)
+
   if :expression == i_a[ 1 ]
 
     yld ||= ::Enumerator::Yielder.new( & serr.method( :puts ) )

@@ -34,8 +34,6 @@ module Skylab::TestSupport
 
       def culled_test_files_eventpoint_notify
 
-        @BS = Autoloader_.require_sidesystem :BeautySalon
-
         @pwd = ::Dir.pwd
         @y = @adapter.y
 
@@ -58,23 +56,29 @@ module Skylab::TestSupport
 
       def __via_VCS_session
 
+        @_white = []
         path = @first_path
         begin
-          __process_path path
+          ___categorize_path path
           path = @st.gets
           path or break
           redo
         end while nil
+        if @_white.length.zero?
+          @y << "(nothing to do.)"
+        else
+          __work remove_instance_variable :@_white
+        end
       end
 
-      def __process_path path
+      def ___categorize_path path
 
         stat = @sess.VCS_stat ::File.expand_path path, @pwd
         if stat
           if stat.is_modified
             @y << "won't modify already modified file, skipping: #{ path }"
           else
-            __work path
+            @_white.push path
           end
         else
           @y << "not tracked by #{ @sess.base_name_string }, skipping: #{ path }"
@@ -82,35 +86,71 @@ module Skylab::TestSupport
         NIL_
       end
 
-      def __work path
+      def __work paths
 
-        expag = Home_.lib_.brazen::API.expression_agent_instance
-        ok = true
+        _RX = /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/
 
-        st = @BS.search_and_replace::API.call(
-            :search, /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/m,
-            :path, path,
-            :replace, -> ws, inside do
-              "#{ ws }describe \"#{ inside }\", wip: true do"
-            end,
-            :preview,
-            :matches,
-            :replace
-        ) do | sym, & ev_p |
+        _repl = '{{ $1 }}describe "{{ $2 }}", wip: true do'
 
-          ev_p[].express_into_under @y, expag
-          if :error == sym
-            ok = false
-          end
+        he = nil
+        init_handler_expresser = -> do
+          he = Home_.lib_.brazen::CLI_Support::Expression_Agent.instance.begin_handler_expresser
+          he.downstream_yielder = @y
+          he.ignore_ending_with :set_leaf_component ; nil
         end
 
-        begin
-          match = st.gets
-          match or break
-          redo
-        end while nil
+        oes_p = -> * i_a, & ev_p do
+          he || init_handler_expresser[]
+          he.handle i_a, & ev_p
+        end
 
-        ok
+        _sa = Autoloader_.require_sidesystem :SearchAndReplace
+
+        st = _sa::API.call(
+          :ruby_regexp, _RX,
+          :paths, paths,
+          :search,
+          :replacement_expression, _repl,
+          :replace,
+          & oes_p )
+
+        count = 0
+        if st  # #tracked [#sa-024] complicated client interface
+          begin
+            es = st.gets
+            es or break
+            count += 1
+            mc = es.first_match_controller
+            d = 0
+            begin
+              _ = mc.engage_replacement( & oes_p )
+              _ or self._SANITY
+              d += 1
+              mc = mc.next_match_controller
+            end while mc
+
+            path = es.path
+
+            fh = ::File.open path, ::File::WRONLY
+
+            es.write_output_lines_into fh do | * _, & ev_p |
+              _bytes = ev_p[]
+              oes_p.call :_, :expression do |y|
+                y << "wrote #{ d } change(s) (#{ _bytes } bytes) - #{ path }"
+              end
+            end
+
+            fh.close
+
+            redo
+          end while nil
+
+          @y << "(done with #{ count } file(s) total.)"
+          ACHIEVED_
+        else
+          @y << "(had errors.)"
+          UNABLE_
+        end
       end
 
       class VCS_Session____  # this will definitely move to etc.

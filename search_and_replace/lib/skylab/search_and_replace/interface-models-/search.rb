@@ -33,9 +33,6 @@ module Skylab::SearchAndReplace
 
     def __matches__component_operation
 
-      yield :unavailability, @_zerk_index_.unavailability_proc
-      yield :parameters_from, @_zerk_index_.reader_proc
-
       Interface_Models_::Matches
     end
 
@@ -48,9 +45,6 @@ module Skylab::SearchAndReplace
     end
 
     def __replace__component_operation
-
-      yield :unavailability, @_zerk_index_.unavailability_proc
-      yield :parameters_from, @_zerk_index_.reader_proc
 
       Home_::Interface_Models_::Replace
     end
@@ -67,3 +61,4 @@ module Skylab::SearchAndReplace
     end
   end
 end
+# #tombstone: old `unavailability`, `parameters_from` rigging

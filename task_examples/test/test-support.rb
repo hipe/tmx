@@ -82,6 +82,8 @@ module Skylab::TaskExamples::TestSupport
 
     emit = -> x, & p do
 
+      # (#[#ca-046] emission handling pattern)
+
       expag = Home_.lib_.brazen::API.expression_agent_instance
       y = ::Enumerator::Yielder.new do | s |
         debug_IO.puts s

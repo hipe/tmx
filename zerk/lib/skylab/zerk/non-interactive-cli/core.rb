@@ -452,7 +452,7 @@ module Skylab::Zerk
 
     # -- emission handing mechanisms
 
-    def handle_ACS_emission_ * i_a, & ev_p
+    def handle_ACS_emission_ * i_a, & ev_p  # #[#ca-046] family
 
       if :error == i_a.first
         @__did_emit_error = true

@@ -147,6 +147,8 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
         w.path = @_upstream_path
         w.on_event_selectively = -> i_or_e, expr, _, & s_p do
 
+          # (this is like a [#ca-046] but highly customized..)
+
           :expression == expr or fail
           case i_or_e
           when :info
