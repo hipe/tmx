@@ -110,6 +110,18 @@ module Skylab::Zerk
         end
       end
 
+      def begin_customizable_session__
+        bc = execute
+        if bc
+          # take a leap of faith and discard the args, block and method name
+          bc.receiver
+        else
+          self._COVER_ME_when_did_not_procure_bound_call_look_around
+          # (make sure you emit everything.)
+          # (you should be fine to result in false from here..)
+        end
+      end
+
       def execute
 
         ___prepare
@@ -366,6 +378,23 @@ module Skylab::Zerk
 
       def __touch_knownness_for_shared_parameter par  # :"c5"
 
+        # --
+
+        if @_real_store.is_classesque
+          m = :"finish__#{ par.name_symbol }__by"
+          yes = @_real_store.internal_store_substrate.respond_to? m
+        end
+
+        if yes
+          _ = __custom_operation_dependency m, par
+          _
+        else
+          __touch_knownness_for_shared_parameter_normally par
+        end
+      end
+
+      def __touch_knownness_for_shared_parameter_normally par
+
         _sta = @_scope_index._touch_state par
         evl = _sta.cached_evaluation_
 
@@ -374,6 +403,25 @@ module Skylab::Zerk
         end
 
         evl
+      end
+
+      def __custom_operation_dependency m, par
+
+        sub_sess = @_scope_index.__begun_session_for par
+
+        if sub_sess
+
+          sess = @_real_store.internal_store_substrate
+
+          ok_x = sess.send m, sub_sess
+
+          @_real_store.accept_parameter_value ok_x, par  # for now, always..
+
+        else
+          ok_x = sub_sess
+        end
+
+        Callback_::Known_Known[ ok_x ]
       end
 
       # -- handle events
@@ -453,11 +501,21 @@ module Skylab::Zerk
           @_lookup_box = bx
         end
 
+        def __begun_session_for par
+
+          _ = _frame_index_for par
+          _.begun_session_for__ par
+        end
+
         def _touch_state par
 
-          _ = @_lookup_box.fetch par.name_symbol
-          _frame_index = @_index_stack.fetch _
-          _frame_index.touch_state__ par
+          _ = _frame_index_for par
+          _.touch_state__ par
+        end
+
+        def _frame_index_for par
+
+          @_index_stack.fetch @_lookup_box.fetch par.name_symbol
         end
 
         def __to_name_symbol_stream

@@ -15,7 +15,7 @@ module Skylab::SearchAndReplace
       @_oes_p = oes_p
     end
 
-    def with__files_by_grep__ o  # [#ac-027]#A (synax might change)
+    def finish__files_by_grep__by o  # #[#ze-031]
       o.for = :counts
       o.execute
     end

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - counts", wip: true do
+  describe "[sa] core operations - counts" do
 
     TS_[ self ]
     use :my_API
@@ -24,7 +24,7 @@ module Skylab::SearchAndReplace::TestSupport
         # eek sort of normalize the result we get back from `find` in a way
         # that hopefully won't break when files are added in the future ..
 
-        h = { 'one': 0, 'three': 1 }
+        h = { 'one' => 0, 'three' => 1 }
         other = h.length - 1
         rx = /\A[a-z]+(?=-)/
         a.sort_by! do | sct |

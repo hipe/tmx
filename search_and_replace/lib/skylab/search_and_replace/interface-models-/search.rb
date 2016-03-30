@@ -23,16 +23,10 @@ module Skylab::SearchAndReplace
 
     def __files_by_grep__component_operation
 
-      yield :unavailability, @_zerk_index_.unavailability_proc
-      yield :parameters_from, @_zerk_index_.reader_proc
-
       Interface_Models_::Files_by_Grep
     end
 
     def __counts__component_operation
-
-      yield :unavailability, @_zerk_index_.unavailability_proc
-      yield :parameters_from, @_zerk_index_.reader_proc
 
       Interface_Models_::Counts
     end

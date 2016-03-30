@@ -39,10 +39,6 @@ module Skylab::Autonomous_Component_System
         Store___.new @__classesque.new( & call_handler )
       end
 
-      attr_reader(
-        :__classesque,
-      )
-
       class Store___
 
         def initialize sess
@@ -72,6 +68,10 @@ module Skylab::Autonomous_Component_System
 
         def internal_store_substrate
           @_sess
+        end
+
+        def is_classesque
+          true
         end
       end
     end

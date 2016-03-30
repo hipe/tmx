@@ -91,6 +91,15 @@ module Skylab::Zerk::TestSupport
           instance_exec( & p )
         rescue ::ArgumentError => e
         end
+
+        if do_debug
+          if e
+            debug_IO.puts e.inspect
+          else
+            debug_IO.puts '(no argument error when one was expected)'
+          end
+        end
+
         e
       end
 

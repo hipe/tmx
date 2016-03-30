@@ -105,34 +105,33 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    context "unavailability.. (note we pass a nil ruby regexp explicitly)", wip: true do
+    context "(deep missing required)" do
 
-      call_by do
+      shared_subject :exception_message_lines do
 
-        call(
-          :ruby_regexp, nil,
-          :path, common_haystack_directory_,
-          :search,
-          :files_by_grep,
-        )
-      end
+        argument_error_lines do
 
-      it "fails" do
-        fails
-      end
-
-      it "emits non-contexutalized" do
-
-        _be_this = be_emission_ending_with :required_component_not_present do |y|
-
-          y.should eql [ "required component not present: 'ruby-regexp'" ]
+          call(
+            :ruby_regexp, 'xx',
+            :paths, EMPTY_A_,
+            :search,
+            :files_by_grep,
+          )
         end
+      end
 
-        last_emission.should _be_this
+      it "first line - synopsis" do
+        _exp = "to 'search' 'files-by-grep', must 'files-by-find'\n"
+        _exp == first_line or fail
+      end
+
+      it "second line - deeper" do
+        _exp = "'files-by-find' is missing required parameter 'paths'."
+        _exp == second_line or fail
       end
     end
 
-    context "see the files matched by grep", wip: true do
+    context "see the files matched by grep" do
 
       call_by do
 

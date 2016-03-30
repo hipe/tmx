@@ -14,18 +14,22 @@ module Skylab::Zerk
 
     def execute
       send @_node.category
+      particular_execute_
+    end
+
+    def begin_session__
+      send @_node.category
+      __particular_begin_customizable_session
     end
 
   private
 
      def association
        extend For_Association___
-       execute
      end
 
      def operation
        extend For_Operation___
-       execute
      end
 
   public
@@ -36,7 +40,7 @@ module Skylab::Zerk
 
     module For_Association___
 
-      def execute
+      def particular_execute_
 
         # if we are at this point (and the association is being evaluated),
         # assume some operation's "stated" set refers to it. it is only at
@@ -90,7 +94,7 @@ module Skylab::Zerk
 
     module For_Operation___
 
-      def execute
+      def particular_execute_
 
         # if we are here than this is a dependency operation being evaluated
         # for one particular depender operation (of possibly several).
@@ -98,11 +102,7 @@ module Skylab::Zerk
         # whether it succeeds or fails, this evalution will be cached for
         # reuse by other nodes in this whole full-stack execution.
 
-        @_fo = @_node.formal
-        p = @_fo.unavailability_proc
-        if p
-          unava_p = p[ @_fo ]
-        end
+        unava_p = _unavailability_proc
 
         if unava_p
           self._COVER_AND_RETROFIT
@@ -112,17 +112,40 @@ module Skylab::Zerk
         end
       end
 
+      def __particular_begin_customizable_session
+
+        unava_p = _unavailability_proc
+        if unava_p
+          self._WEE
+        else
+
+          _o = _begin_recursion
+          _o.begin_customizable_session__
+        end
+      end
+
       def ___recurse
-
-        _o = @__recurser.begin_recursion__ @_fo
-
-        _kn = _o.evaluate_recursion__
 
         # (might be knkn, might be knuk. both ways are covered.)
 
         # (the rest of this is near [#027]#C3)
-
+        _o = _begin_recursion
+        _kn = _o.evaluate_recursion__
         State__.new _kn
+      end
+
+      def _unavailability_proc
+
+        @_fo = @_node.formal
+        p = @_fo.unavailability_proc
+        if p
+          p[ @_fo ]
+        end
+      end
+
+      def _begin_recursion
+
+        @__recurser.begin_recursion__ @_fo
       end
     end
 

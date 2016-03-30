@@ -76,6 +76,10 @@ module Skylab::Zerk::TestSupport
     end
   end
 
+  Field_lib_for_testing_ = -> do
+    Home_.lib_.fields
+  end
+
   module Fixture_Top_ACS_Classes
     Autoloader__[ self ]
     Sibling_ = self

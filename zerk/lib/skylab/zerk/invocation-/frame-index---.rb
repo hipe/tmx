@@ -44,13 +44,23 @@ module Skylab::Zerk
             self._NO
           end
         else
-          _no = @_h.fetch k
-          bs = Here_::Build_state___.new _no, self, @_xxx
+          bs = _begin_build_state k
           @_cache[ k ] = bs
           en = bs.execute
           @_cache[ k ] = en
         end
         en
+      end
+
+      def begun_session_for__ par
+
+        _bs = _begin_build_state par.name_symbol
+        _bs.begin_session__
+      end
+
+      def _begin_build_state k
+        _no = @_h.fetch k
+        Here_::Build_state___.new _no, self, @_xxx
       end
 
       attr_reader(

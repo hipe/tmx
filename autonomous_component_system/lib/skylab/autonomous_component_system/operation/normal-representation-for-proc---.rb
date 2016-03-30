@@ -103,6 +103,10 @@ module Skylab::Autonomous_Component_System
           @_h
         end
 
+        def is_classesque
+          false
+        end
+
         # #history: assimilated to here from a dedicated file
       end
     end
