@@ -4,8 +4,8 @@ module Skylab::Autonomous_Component_System
 
     class Formal  # 1x [mt] 1x here
 
-      # the "formal" part of the operation is that which is defined by the
-      # association-like DSL expression. this data is wrapped by this node
+      # this is a representation of whatever is expressed by the DSL in the
+      # definition of an operation. this data is wrapped by this node
       # only in the interest of compartmentalization - it (as associations)
       # is [#002]:DT3 ephemeral. more in [#009].
 

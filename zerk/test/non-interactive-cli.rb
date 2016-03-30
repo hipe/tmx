@@ -62,6 +62,10 @@ module Skylab::Zerk::TestSupport
         be_line :styled, :e, "usage: '#{ _build_pn } <compound-or-operation> [..]'"
       end
 
+      def be_invite_with_no_focus
+        be_line :styled, :e, "see '#{ _build_pn } -h' for more."
+      end
+
       def be_invite_with_option_focus
         _niCLI_be_invite 'options'
       end

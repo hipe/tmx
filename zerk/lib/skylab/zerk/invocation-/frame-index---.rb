@@ -4,12 +4,12 @@ module Skylab::Zerk
 
     class Frame_Index___  # see [#013]
 
-      def initialize frame, _NOT_USED_parent_index, xxx
+      def initialize frame, _NOT_USED_parent_index, resource_x
 
-        @_xxx = xxx
         @frame_ = frame
         # @_next = parent_index
         @__once = nil
+        @__resource_x = resource_x
       end
 
       def to_node_stream__
@@ -17,7 +17,7 @@ module Skylab::Zerk
         remove_instance_variable :@__once
 
         h = {}
-        st = @frame_.to_node_stream_
+        st = @frame_.to_node_stream_for_invocation_
 
         p = -> do
           no = st.gets
@@ -60,7 +60,7 @@ module Skylab::Zerk
 
       def _begin_build_state k
         _no = @_h.fetch k
-        Here_::Build_state___.new _no, self, @_xxx
+        Here_::Build_state___.new _no, self, @__resource_x
       end
 
       attr_reader(

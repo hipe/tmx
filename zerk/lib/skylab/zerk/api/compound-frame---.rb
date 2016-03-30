@@ -32,7 +32,7 @@ module Skylab::Zerk
 
       # -- read
 
-      def to_node_stream_
+      def to_node_stream_for_invocation_
 
         _rw = reader_writer
 
@@ -77,14 +77,16 @@ module Skylab::Zerk
 
       # --
 
+      def for_invocation_read_atomesque_value_ asc
+        reader_writer.read_value asc
+      end
+
       def reader_writer
 
         # (this one spot is the crux of the whole redesign near r/w)
 
         @___rw ||= ACS_::ReaderWriter.for_componentesque self.ACS
       end
-
-      alias_method :reader__, :reader_writer
 
       def ACS
         @qualified_knownness.value_x

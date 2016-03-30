@@ -1,10 +1,14 @@
 # instance table
 
-see sibling table under [#012] for an explanation of what this is for
-and how it is used. synopsis: the edges that are named with `t1`, `t2`
-etc in the graph indicate "significant paths" that we came up with
-(somehow) that represent paths we belive it is important to test.
-the below table tracks whether and where they are covered.
+synopsis: some of the edges in the sibling graph are marked with tags
+like `t1`, `t2` etc. such a tagging indictates that that arc represents
+a "significant path"; one that (for some reason) we believe is important
+to test.
+
+the below table tracks whether and where each such path is covered.
+
+see the counterpart table under [#012] for a deeper description of what
+this is and how it is used.
 
 this whole file hypothetically should probably not be in version
 control because the below could hypothetically generated. but meh.

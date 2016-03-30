@@ -56,11 +56,11 @@ but [ac]'s native relationship with the formal parameters of operations
 is a perhaps counter-intuitive break from the above theme: it its native
 treatment of formal parameters, there is no built-in DRY-ness; there
 is no built-in re-use: the formal parameters of an operation are
-interpreted or infered by a wholly separate facility; one that does not
+interpreted or inferred by a wholly separate facility; one that does not
 provide re-use.
 
 (writing this leads us to consider that maybe a formal operation "wants
-to be" a compound node.. pehaps that is the unseen forcing pulling at us
+to be" a compound node.. pehaps that is the unseen force pulling at us
 with all of this here..)
 
 
@@ -97,7 +97,7 @@ parameters, the [ze] will do so in this way:
 
 
 
-  2) every formal operation defines a :#stated-set
+  2) every formal operation defines a :#stated-set.
 
      the stated-set for a given formal operation is:
 

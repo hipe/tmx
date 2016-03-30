@@ -8,7 +8,8 @@ module Skylab::Zerk
 
       class << self
 
-        def begin__ pvs, fo, & pp
+        def begin_ pvs, fo, & pp
+          1 == pp.arity or raise ::ArgumentError
           _begin_empty.__init_initial pvs, fo, & pp
         end
 

@@ -171,7 +171,7 @@ module Skylab::Zerk
 
         _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.new @_stream
 
-        o = Home_::Invocation_::Procure_bound_call.begin__ _pvs, fo_p[ ss ], & @_pp
+        o = Home_::Invocation_::Procure_bound_call.begin_ _pvs, fo_p[ ss ], & @_pp
 
         o.on_unavailable_ = NOTHING_  # throw exeptions
 

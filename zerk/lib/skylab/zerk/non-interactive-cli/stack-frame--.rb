@@ -11,9 +11,9 @@ module Skylab::Zerk
       #
       #     ROOT [ NON-ROOT-COMPOUND [..]] FORMAL-OPERATION
 
-      Abstract_Compound_Frame__ = ::Class.new self
+      Compound_Frame__ = ::Class.new self
 
-      class Root < Abstract_Compound_Frame__
+      class Root < Compound_Frame__
 
         def initialize cli, acs
           @CLI = cli
@@ -34,7 +34,7 @@ module Skylab::Zerk
         end
       end
 
-      class NonRootCompound < Abstract_Compound_Frame__
+      class NonRootCompound < Compound_Frame__
 
         def initialize former_top, qk
 
@@ -70,11 +70,15 @@ module Skylab::Zerk
 
       # --
 
-      class Abstract_Compound_Frame__
+      class Compound_Frame__
 
         def initialize acs
           @ACS = acs
           @_did_comprehensive_index = false
+        end
+
+        def for_invocation_read_atomesque_value_ asc
+          _reader.read_value asc
         end
 
         # a lookup:
@@ -134,9 +138,9 @@ module Skylab::Zerk
 
           if @_did_comprehensive_index
             self._SANITY
+          else
+            _do_comprehensive_index
           end
-
-          @_did_comprehensive_index = _do_comprehensive_index
 
           -> do
             Callback_::Stream.via_nonsparse_array @_cached_nodes_for_fuzzy
@@ -171,12 +175,32 @@ module Skylab::Zerk
           :compound != asc.model_classifications.category_symbol
         end
 
+        def to_node_stream_for_invocation_
+
+          # for the *agnostic* frame index, for procure bound call.
+          # we *think* we want only the atoms here, that for the above
+          # purpose we *not* use operations, that we do *not* use compounds..
+
+          # the fact that this has a similar but not the same implementation
+          # as its counterpart forbear in API is testament to the work we
+          # do that is specific to CLI regarding how every association in the
+          # selection stack must be realized up front to know its shape.
+
+          if @_did_comprehensive_index
+            self._HELLO
+          else
+            _do_comprehensive_index
+          end
+
+          Callback_::Stream.via_nonsparse_array @_cached_nodes_for_option_parser
+        end
+
         def _do_comprehensive_index
 
           # the fact that we index lazily is just wishful thinking and is not
           # actually conservative for normal use. see "on avoiding wastefulness"
 
-          stmr = _reader.to_node_streamer
+          @_did_comprehensive_index = ACHIEVED_
 
           # will #mask
 
@@ -202,7 +226,8 @@ module Skylab::Zerk
             end
           }
 
-          st = stmr.execute
+          _stmr = _reader.to_node_streamer
+          st = _stmr.execute
           begin
             no = st.gets
             no or break
@@ -213,7 +238,7 @@ module Skylab::Zerk
           @_cached_nodes_for_fuzzy = for_ss || EMPTY_A_
           @_cached_nodes_for_option_parser = for_op || EMPTY_A_
 
-          ACHIEVED_
+          NIL_
         end
 
         # --

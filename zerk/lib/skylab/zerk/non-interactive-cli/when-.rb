@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     const_get :When_Support_, false
 
-    module When_Support_
+    module When_Support_  # #[#sl-155]
 
       class Here_::When_ < Callback_::Actor::Monadic
 
@@ -26,6 +26,46 @@ module Skylab::Zerk
               y << "options cannot occur immediately after compound nodes (option: #{ ick s })"
               y << me.say_expecting_
             end
+          end
+        end
+
+        class Unavailable < self  # 1x
+
+          # this also encompases cases like missing required parameters.
+          # has experimental sesssion-type pattern that uses each incoming
+          # emission to help guage what exitstatus to use.
+
+          def initialize( * )
+            @_greatest_exitstatus = nil
+            super
+          end
+
+          def execute
+            self  # it's a long-running session (yeah kinda ick)
+          end
+
+          def on_unavailable__ i_a, & ev_p
+
+            d = @CLI.exitstatus_for_ i_a.last
+            if d
+              if ! @_greatest_exitstatus || d > @_greatest_exitstatus
+                @_greatest_exitstatus = d
+              end
+            end
+
+            @CLI.handle_ACS_emission_ i_a, & ev_p  # result is unreliable
+          end
+
+          def finish
+
+            @CLI.express_stack_invite_ :for_more
+
+            if @_greatest_exitstatus
+              @CLI.init_exitstatus_ @_greatest_exitstatus
+            else
+              self._COVER_ME  # you should set it to something
+            end
+            NIL_
           end
         end
 

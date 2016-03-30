@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "compound then operation (#t11)", wip: true do  # #milestone-4
+    context "compound then operation (#t11)" do
 
       given do
         argv 'compo2', 'ope2'
@@ -65,7 +65,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "compound then operation then good options (#t5, #t11)", wip: true do  # #milestone-4
+    context "compound then operation then good options (#t5, #t11)" do
 
       given do
         argv 'compo2', 'compo3', 'ope3', '--primi2', 'p2val', '--primi3', 'p3val'

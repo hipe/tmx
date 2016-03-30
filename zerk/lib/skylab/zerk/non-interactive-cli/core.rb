@@ -61,8 +61,9 @@ module Skylab::Zerk
       # the second is for any operation when resolved. let's see if we can
       # forego passing it this first time ..
 
+      @_oes_p = method :on_ACS_emission_  # (only do this in 1 place)
+
       _p = remove_instance_variable :@_root_ACS_proc
-      @_oes_p = method :handle_ACS_emission_  # (1 of 2 hm..)
       _acs = _p.call( & @_oes_p )
       @_top = Here_::Stack_Frame__::Root.new self, _acs
       self
@@ -81,13 +82,13 @@ module Skylab::Zerk
         @__did_emit_error = false
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
         if @__did_emit_error
-          _exitstatus_for :_component_rejected_request_  # observe [#026]
+          exitstatus_for_ :_component_rejected_request_  # observe [#026]
         else
           Here_::Express_Result___[ x, self ]  # see
           0  # SUCCESS_EXITSTATUS
         end
       else
-        @_exitstatus  # assume syntax error occurred (somewhere in this file)
+        @_exitstatus  # e.g syntax error somewhere in this file, missing req's
       end
     end
 
@@ -280,25 +281,45 @@ module Skylab::Zerk
 
     def _parsed_OK
 
-      _fo = @_fo_frame.formal_operation_
-
       # NOTE that we do not pass the real argument stream to parse, but
       # rather only an empty stream. this is because the [#014] premise
       # is that parameters are only ever parsed by the whole tree.
-      # this would change near [#016] operation-specific parameters.
+      #
+      # were it for [#016] operation-specific parameters, maybe they should
+      # have already been parsed by now by the o.p. we could get crazy with
+      # the syntax of those, but why.
 
-      _st = Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
+      _fo = @_fo_frame.formal_operation_
 
-      _oes_p = method :handle_ACS_emission_  # 2 of 2 (hm..)
+      _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
 
-      self._REDO_at_milestone_four_revisited  # #milestone-4
+      call_oes_p = -> * i_a, & ev_p do
+        :error == i_a.first and self._RECONSIDER_readme
+          # maybe use whenner insted of @__did_emit_error and the rest
+        handle_ACS_emission_ i_a, & ev_p
+      end
 
-      deliv = _fo.deliverable_via_argument_stream _st, & _oes_p
+      _pp = -> _ do
+        call_oes_p
+      end
 
-      if deliv
-        Result__.new deliv.bound_call
+      o = Home_::Invocation_::Procure_bound_call.begin_ _pvs, _fo, & _pp
+
+      whenner = nil
+
+      o.on_unavailable_ = -> * i_a, & ev_p do
+
+        whenner ||= Here_::When_::Unavailable[ self ]
+        whenner.on_unavailable__ i_a, & ev_p
+      end
+
+      bc = o.execute
+
+      if bc
+        Result___.new bc
       else
-        self._B
+        whenner.finish
+        bc
       end
     end
 
@@ -344,7 +365,7 @@ module Skylab::Zerk
       # [br]'s "when's" are shaped like a bc & always result in an exitstatus.
 
       _x = whn.receiver.send whn.method_name, * whn.args, & whn.block
-      _init_exitstatus _x
+      init_exitstatus_ _x
       STOP_PARSING_
     end
 
@@ -354,7 +375,7 @@ module Skylab::Zerk
       end
     end ; end
 
-    class Result__
+    class Result___
 
       def initialize x
         @parse_result = x
@@ -373,28 +394,48 @@ module Skylab::Zerk
 
     def express_stack_invite_ * x_a
 
+      @_for_what_kn = nil
+
       if x_a.length.nonzero?
-        o = { because: nil }
-        Home_.lib_.basic::Hash.write_even_iambic_subset_into_via o, x_a
-        s = o[ :because ]
-        if s
-          for_what = "for more about #{ s }s"
-        end
+        st = Callback_::Polymorphic_Stream.via_array x_a
+        begin
+          send :"__invite_will_express__#{ st.gets_one }__", st
+        end until st.no_unparsed_exists
       end
 
-      for_what ||= "for help"
+      kn = remove_instance_variable :@_for_what_kn
+      if kn
+        for_what = kn.value_x
+      else
+        for_what = " for help"
+      end
 
       s_a = _expressable_stack_aware_program_name_string_array.dup
       s_a.push HELP_OPTION__
 
       express_ do |y|
-        y << "see #{ code s_a.join SPACE_ } #{ for_what }"
+        y << "see #{ code s_a.join SPACE_ }#{ for_what }"
       end
       NIL_
     end
 
     alias_method :express_invite_to_general_help,  # [br]
       :express_stack_invite_
+
+    def __invite_will_express__because__ st
+
+      sym = st.gets_one
+      if sym
+        use_x = " for more about #{ sym }s"  # meh
+      end
+
+      @_for_what_kn = Callback_::Known_Known[ use_x ] ; nil
+    end
+
+    def __invite_will_express__for_more__ _
+
+      @_for_what_kn = Callback_::Known_Known[ " for more." ] ; nil
+    end
 
     def expression_strategy_for_property prp  # for expag
       if Home_.lib_.fields::Is_required[ prp ]
@@ -450,21 +491,28 @@ module Skylab::Zerk
       Here_::When_Support_::Node_formal_property[]
     end
 
-    # -- emission handing mechanisms
+    # -- emission handing support
 
-    def handle_ACS_emission_ * i_a, & ev_p  # #[#ca-046] family
+    def on_ACS_emission_ * i_a, & ev_p
+      handle_ACS_emission_ i_a, & ev_p
+    end
+
+    def handle_ACS_emission_ i_a, & ev_p
 
       if :error == i_a.first
         @__did_emit_error = true
       end
 
-      if :expression == i_a.fetch( 1 )
-        expression_agent.calculate line_yielder, & ev_p
-      else
-        _ev = ev_p[]
-        _ev.express_into_under line_yielder, expression_agent
-        UNRELIABLE_
-      end
+      @___HE ||= ___build_handler_expresser
+      @___HE.handle i_a, & ev_p  # result is unreliable
+    end
+
+    def ___build_handler_expresser
+
+      # (was #[#ca-046] but now we "do it right":)
+      he = expression_agent.begin_handler_expresser
+      he.downstream_yielder = line_yielder
+      he
     end
 
    # -- expression mechanisms
@@ -491,24 +539,31 @@ module Skylab::Zerk
     # -- exit statii
 
     def init_exitstatus_for_ k
-      _init_exitstatus _exitstatus_for k
+      init_exitstatus_ exitstatus_for_ k
     end
 
-    def _init_exitstatus d
-      @_exitstatus =  d ; nil
+    def init_exitstatus_ d
+      @_exitstatus = d ; nil
     end
 
-    def _exitstatus_for _sym_
+    def exitstatus_for_ _sym_
       Exit_status_for___[ _sym_ ]
     end
 
     Exit_status_for___ = -> do
       _OFFSET = 6  # generic erorr (5) + 1
       p = -> kk do
-        a = %i( _parse_error_ _component_rejected_request_ )
+        a = %i(
+          _parse_error_
+          _component_rejected_request_
+          missing_required_parameters
+        )
         p = -> k do
           # (we would cache but it's niCLI)
-          a.index( k ) + _OFFSET
+          d = a.index k
+          if d
+            d + _OFFSET
+          end
         end
         p[ kk ]
       end

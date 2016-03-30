@@ -147,7 +147,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "required args missing (#t10)", wip: true do
+    context "required args missing (#t10)" do
 
       given do
         argv 'add', '--left-number', '1'
@@ -157,16 +157,24 @@ module Skylab::Zerk::TestSupport
         fails
       end
 
-      it "whines" do
-        first_line_content.should self._BLAH
+      it "whines (NOTE currently not styled as option.. #wish [#032])" do
+
+        _msg = "'add' is missing required parameter <right-number>."
+
+        _be_this = match_ expectation( :styled, :e, _msg )
+
+        first_line.should _be_this
       end
 
       it "invites" do
-        second_line.should be_invite_with_option_focus
+
+        _be_this = be_invite_with_no_focus
+
+        second_line.should _be_this
       end
     end
 
-    context "money (#t11)", wip: true do  # #milestone-4 (revisit)
+    context "money (#t11)" do
 
       given do
         argv 'add', '--left-number', '5', '--right-number', '-2'

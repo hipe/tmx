@@ -73,7 +73,7 @@ module Skylab::Zerk
         # it's effectively known or not based solely on its value knownness
         # in The Store plus the smarts we add here about list-based nodes.
 
-        kn = @_frame_index.frame_.reader__.read_value @_asc
+        kn = @_frame_index.frame_.for_invocation_read_atomesque_value_ @_asc
 
         # we add an extra detail to determine knownness - if it is a list-
         # type field and its array is zero length, downgrade it so it

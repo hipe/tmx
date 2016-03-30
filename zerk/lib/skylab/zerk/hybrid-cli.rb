@@ -13,7 +13,7 @@ module Skylab::Zerk
 
     # -- expression
 
-    def handle_ACS_emission_ * i_a, & ev_p
+    def handle_ACS_emission_ i_a, & ev_p
       if @_is_interactive
         @__interactive_event_handler[ * i_a, & ev_p ]
       else

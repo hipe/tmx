@@ -1,3 +1,5 @@
+[#032] #wish maybe one day in niCLI style `<foo-bar>` as `--foo-bar`
+
 [#031]       [ track operation dependency customization as a feature ]
 
 [#030]       unified language ..
