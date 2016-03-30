@@ -8,7 +8,7 @@ module Skylab::Fields
         @_ = build
       end
 
-      # -- the 16 default meta-attributes in alphabetical order.
+      # -- the 17 default meta-attributes in alphabetical order.
 
       def boolean  # for ancient DSL-controller. see also `flag`
 
@@ -226,6 +226,11 @@ module Skylab::Fields
 
         @_.current_attribute.be_optional__
         @_.add_to_static_index_ :effectively_defaultants ; nil
+      end
+
+      def plural  # #experimental - ..
+
+        @_.current_attribute.argument_arity = :zero_or_more
       end
 
       def singular_of

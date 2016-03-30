@@ -7,8 +7,8 @@ module Skylab::SearchAndReplace
     end
 
     PARAMETERS = Attributes_.call(
-      filename_patterns: :optional,
-      paths: nil,
+      filename_patterns: [ :optional, :plural ],
+      paths: :plural,
     )
     attr_writer( * PARAMETERS.symbols )
 

@@ -14,16 +14,9 @@ module Skylab::SearchAndReplace
 
       @functions_directory = nil
       @replacement_expression = nil
-
-      _ = acs.instance_variable_get :@_zerk_index_  # ..
-      @_zerk_index_ = Zerk_::Index.new self, _
     end
 
     def __files_by_find__component_operation
-
-      # (assuming that to get to this host node, nonzero paths)
-
-      yield :parameters_from, @_zerk_index_.parent_frame.reader_proc
 
       Interface_Models_::Files_by_Find
     end

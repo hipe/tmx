@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - (1) files", wip: true do
+  describe "[sa] core operations - files" do
 
     TS_[ self ]
     use :my_API
@@ -54,28 +54,26 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    context "as for subject (intentionally give empty arys for dootilyhahs)" do
+    context "required list args are empty arrays" do
 
-      call_by do
-        call(
-          :paths, EMPTY_A_,
-          :filename_patterns, EMPTY_A_,
-          :search, :files_by_find,
-        )
-      end
-
-      it "fails" do
-        fails
-      end
-
-      it "emits multi-line emission" do
-
-        _be_this = be_emission_ending_with :required_component_not_present do |y|
-          y.fetch(0).should eql "'search' is not available because:"
-          y.fetch(1).should eql "  • required component not present: 'paths'"
+      shared_subject :exception_message_lines do
+        argument_error_lines do
+          call(
+            :paths, EMPTY_A_,
+            :filename_patterns, EMPTY_A_,
+            :search, :files_by_find,
+          )
         end
+      end
 
-        last_emission.should _be_this
+      it "one line" do
+        1 == exception_message_lines.length or fail
+      end
+
+      it "first line" do
+        _ex = "'search' 'files-by-find' is missing required parameter 'paths'." or fail
+        _ = first_line
+        _ == _ex or fail
       end
     end
 
@@ -107,7 +105,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    context "unavailability.. (note we pass a nil ruby regexp explicitly)" do
+    context "unavailability.. (note we pass a nil ruby regexp explicitly)", wip: true do
 
       call_by do
 
@@ -134,7 +132,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    context "see the files matched by grep" do
+    context "see the files matched by grep", wip: true do
 
       call_by do
 

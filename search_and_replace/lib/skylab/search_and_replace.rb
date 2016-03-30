@@ -136,10 +136,7 @@ module Skylab::SearchAndReplace
       @egrep_pattern = nil
       @ruby_regexp = nil
 
-      @_oes_p = oes_p
-
-      Require_Zerk_[]
-      @_zerk_index_ = Zerk_::Index.new self
+      @_oes_p = oes_p  # #hot-model
     end
 
     def _init_with_defaults
@@ -264,10 +261,6 @@ module Skylab::SearchAndReplace
     end
 
     def __search__component_association
-
-      yield :unavailability, -> asc do
-        @_zerk_index_.unavailability_by_stated_dependency asc, :paths
-      end
 
       Home_::Interface_Models_::Search
     end
@@ -440,4 +433,5 @@ module Skylab::SearchAndReplace
   UNABLE_ = false
 end
 
+# #tombstone: removed some unavailability rigging
 # #tombstone: [#br-043] the frontier example of a back-less front..

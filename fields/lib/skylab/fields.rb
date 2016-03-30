@@ -557,16 +557,12 @@ module Skylab::Fields
   end
 
   Is_required = -> prp do
-    if includes_zero[ prp.parameter_arity ]
-      false
-    else
-      # (hi.)
-      if includes_zero[ prp.argument_arity ]
-        :zero == prp.argument_arity  # the "required flag"
-      else
-        true
-      end
-    end
+
+    # this is only a function of the `parameter_arity` (not the argument
+    # arity). the normalizing agent must handle cases like lists and flags
+    # itself..
+
+    ! includes_zero[ prp.parameter_arity ]
   end
 
   # ~ argument arity derivations

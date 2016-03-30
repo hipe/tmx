@@ -35,7 +35,7 @@ module Skylab::Zerk::TestSupport
         root_ACS_state.message
       end
 
-      def raises_argument_error_  # must be used in conjuction with #here
+      def raises_argument_error  # must be used in conjuction with #here
         root_ACS_state or fail
       end
 
@@ -64,9 +64,29 @@ module Skylab::Zerk::TestSupport
         :set_leaf_component
       end
 
+      # -- assertion for exceptions
+
+      def first_line
+        line 0
+      end
+
+      def second_line
+        line 1
+      end
+
+      def line d
+        exception_message_lines.fetch d
+      end
+
+      def argument_error_lines & p
+
+        _ev = rescue_argument_error( & p )
+        _ev.message.split %r((?<=\n))
+      end
+
       # -- effecting the state
 
-      def rescue_argument_error_ & p  # is :#here
+      def rescue_argument_error & p  # is :#here
         begin
           instance_exec( & p )
         rescue ::ArgumentError => e

@@ -10,13 +10,13 @@ module Skylab::Zerk::TestSupport
     context "(exposition) try to get a card without money" do
 
       call_by do
-        rescue_argument_error_ do
+        rescue_argument_error do
           call :get_card
         end
       end
 
       it "raises argument error" do
-        raises_argument_error_
+        raises_argument_error
       end
 
       it "message" do
@@ -84,67 +84,67 @@ module Skylab::Zerk::TestSupport
 
     context "unmet dependency one level deep - argument error has two lines" do
 
-      shared_subject :_lines do
+      shared_subject :exception_message_lines do
 
-        _argument_error_lines do
+        argument_error_lines do
           call :take_subway
         end
       end
 
       it "two lines" do
-        2 == _lines.length or fail
+        2 == exception_message_lines.length or fail
       end
 
       it "first line" do
-        _first_line == "to 'take-subway', must 'get-card'\n" or fail
+        first_line == "to 'take-subway', must 'get-card'\n" or fail
       end
 
       it "second line (note no trailing newline)" do
-        _second_line == "'get-card' is missing required parameter 'money'." or fail
+        second_line == "'get-card' is missing required parameter 'money'." or fail
       end
     end
 
     context "failure (of an operation) one step removed - still raises" do
 
-      shared_subject :_lines do
+      shared_subject :exception_message_lines do
 
-        _argument_error_lines do
+        argument_error_lines do
           call :money, "4", :take_subway
         end
       end
 
       it "first line - synopsis" do
-        _first_line == "to 'take-subway', must 'get-card'\n" or fail
+        first_line == "to 'take-subway', must 'get-card'\n" or fail
       end
 
       it "second line is messaging from the ad-hoc expression" do
-        _second_line == "insufficient funds: need 5 had 4." or fail
+        second_line == "insufficient funds: need 5 had 4." or fail
       end
     end
 
     context "unmet dependency several levels deep" do
 
-      shared_subject :_lines do
+      shared_subject :exception_message_lines do
 
-        _argument_error_lines do
+        argument_error_lines do
           call :next_level, :have_dinner
         end
       end
 
       it "first line is synopsis of missing required parameters" do
-        _first_line == "'next-level' 'have-dinner' is missing required parameter 'money'.\n" or fail
+        first_line == "'next-level' 'have-dinner' is missing required parameter 'money'.\n" or fail
       end
 
       it "second line is synopsis of unmet dependencies" do
-        _second_line == "to 'next-level' 'have-dinner', must 'take-subway'\n" or fail
+        second_line == "to 'next-level' 'have-dinner', must 'take-subway'\n" or fail
       end
 
       it "third line explains unmet dependency of above" do
-        _line( 2 ) == "to 'take-subway', must 'get-card'\n" or fail
+        line( 2 ) == "to 'take-subway', must 'get-card'\n" or fail
       end
 
       it "final line explains missing paramter (again) of this noe" do
-        _line( 3 ) == "'get-card' is missing required parameter 'money'." or fail
+        line( 3 ) == "'get-card' is missing required parameter 'money'." or fail
       end
     end
 
@@ -165,24 +165,6 @@ module Skylab::Zerk::TestSupport
       end
 
       # (emitted `set_leaf_component`)
-    end
-
-    def _first_line
-      _line 0
-    end
-
-    def _second_line
-      _line 1
-    end
-
-    def _line d
-      _lines.fetch d
-    end
-
-    def _argument_error_lines & p
-
-      _ev = rescue_argument_error_( & p )
-      _ev.message.split %r((?<=\n))
     end
 
     def subject_root_ACS_class

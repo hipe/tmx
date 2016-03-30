@@ -78,7 +78,7 @@ module Skylab::Zerk
         if kn.is_effectively_known  # if it is set and not nil
           Require_field_library_[]
           if Field_::Takes_many_arguments[ @_asc ]
-            if kn.value_x.length.nonzero?
+            if kn.value_x.length.zero?
               kn = Callback_::KNOWN_UNKNOWN
             end
           end
