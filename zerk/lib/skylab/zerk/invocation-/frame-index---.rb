@@ -12,22 +12,22 @@ module Skylab::Zerk
         @__resource_x = resource_x
       end
 
-      def to_node_stream__
+      def to_node_ticket_stream__
 
         remove_instance_variable :@__once
 
         h = {}
-        st = @frame_.to_node_stream_for_invocation_
+        st = @frame_.to_invocative_node_ticket_stream_
 
         p = -> do
-          no = st.gets
-          if no
-            h[ no.name_symbol ] = no
-            no
+          nt = st.gets
+          if nt
+            h[ nt.name_symbol ] = nt
+            nt
           else
             @_h = h
             @_cache = {}
-            p = EMPTY_P_ ; no
+            p = EMPTY_P_ ; nt
           end
         end
 

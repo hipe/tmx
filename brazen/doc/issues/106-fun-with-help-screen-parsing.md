@@ -6,16 +6,17 @@ this tag both documents the subject asset node and tracks other similar
 implementations elsewhere in this universe that do something like parse
 help screens.
 
-at writing we know of at least three:
+at writing we know of at least four:
   • [#045] the "expect section" help screen parse tree (2 parsers)
   • the asset node tracked by the subject identifier
   • one in [tmx]
+  • a bespoke one in [ze]
 
 
 despite this, this node was preserved during the sunsetting [hl] largely
 because its state-machine-based implementation -- while being redundant
 with both the aforementioned work *and* the [ba] state machine --
-is small, lightweight, and relatively easy to undestand even after all
+is small, lightweight, and relatively easy to understand even after all
 this time. so we are carrying it with us as a memento of [hl] and
 perhaps as a reference for future work.
 

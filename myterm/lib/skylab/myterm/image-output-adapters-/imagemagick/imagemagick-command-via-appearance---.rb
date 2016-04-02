@@ -72,7 +72,7 @@ module Skylab::MyTerm
 
         _rw = ACS_::ReaderWriter.for_componentesque acs  # meh
 
-        _o = _rw.to_non_operation_node_streamer
+        _o = _rw.to_non_operation_node_ticket_streamer
 
         _st = _o.execute
 

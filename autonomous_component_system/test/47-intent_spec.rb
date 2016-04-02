@@ -48,9 +48,9 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       a = []
       begin
-        no = st.gets
-        no or break
-        a.push no.name_symbol
+        nt = st.gets  # [#035]
+        nt or break
+        a.push nt.name_symbol
         redo
       end while nil
       a

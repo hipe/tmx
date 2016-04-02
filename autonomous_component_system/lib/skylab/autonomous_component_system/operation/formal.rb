@@ -142,7 +142,7 @@ module Skylab::Autonomous_Component_System
 
       attr_reader :selection_stack  # [ze]
 
-      def associationesque_category
+      def formal_node_category
         :formal_operation
       end
     end

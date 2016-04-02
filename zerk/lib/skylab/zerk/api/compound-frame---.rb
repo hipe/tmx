@@ -32,11 +32,11 @@ module Skylab::Zerk
 
       # -- read
 
-      def to_node_stream_for_invocation_
+      def to_invocative_node_ticket_stream_
 
         _rw = reader_writer
 
-        sr = _rw.to_node_streamer
+        sr = _rw.to_node_ticket_streamer
 
         x = __mask__
         if x

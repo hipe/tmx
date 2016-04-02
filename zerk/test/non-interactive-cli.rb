@@ -107,6 +107,10 @@ module Skylab::Zerk::TestSupport
         a.fetch 0
       end
 
+      def first_line_content
+        __line_content_hack 0
+      end
+
       def first_line_string
         first_line.string
       end
@@ -129,6 +133,18 @@ module Skylab::Zerk::TestSupport
         a.fetch 2
       end
 
+      def __line_content_hack d
+        a = _lines_tuple
+        s = a.fetch( d ).string
+        s.chomp!
+        a[ d ] = :_used_
+        s
+      end
+
+      def number_of_lines
+        _lines_tuple.length
+      end
+
       def _lines_tuple
         niCLI_state.lines
       end
@@ -139,7 +155,7 @@ module Skylab::Zerk::TestSupport
         exitstatus.should be_nonzero
       end
 
-      def expect_existatus_for k
+      def expect_exitstatus_for k
         _d = Home_::Non_Interactive_CLI::Exit_status_for___[ k ]
         exitstatus.should eql _d
       end
@@ -153,6 +169,12 @@ module Skylab::Zerk::TestSupport
       end
 
       # -- invocation
+
+      def invoke__ * s_a  # #experimental
+
+        using_expect_stdout_stderr_invoke_via_argv s_a
+        # (result is nil. ivars are set.)
+      end
 
       def __build_state_for_niCLI_by & p
 
@@ -215,6 +237,8 @@ module Skylab::Zerk::TestSupport
         Home_::GENERIC_ERROR_EXITSTATUS
       end
     # -
+
+    Here_ = self
   end
 end
 # #tombstone: we once built state \"manually\" with our own structure

@@ -1,3 +1,7 @@
+[#157]       #bibliographic-reference:
+             _Patterns, Principles and Practices of Domain-Driven Design_,
+             Scott Millet et guy, Wiley, 2015
+
 [#156]       codepoints tagged with this tag exhibit this pattern:
 
              besides just memoing what the particular value was we also memo

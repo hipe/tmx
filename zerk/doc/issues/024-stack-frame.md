@@ -23,58 +23,69 @@ safeguard if we change our minds back and attempt this again.
 
 
 
-## "on avoiding wastefulness"
+## on indexing, and avoiding the :#"heavy lift"
 
-TL;DR: you have to index every frame of your selection stack eventually.
+(for unrecognized terms below, consult [#030].)
 
-to understand where the below discussion is coming from, assume that
-to build an association structure that you end up not using is wasteful
-and bad. now:
 
-assume you have provided meaningful and full names that select a
-selection stack that is N frames tall. (N is always at least 2.)
+### on avoiding the heavy lift
 
-frame 1 is always the frame representing the root ACS. (this frame was
-not resolved by names present in the argument array. this frame is
-always a given.)
+refer to [#ac-035] for the 4 (four) stage lifecycle of a node.
+generally if we can keep a node in its earlier stages, less
+resources are needed at the cost of having less detail about
+the node. more detail costs more resources.
 
-frame N is the frame representing the formal operation.
+to index every node of every frame in a selection stack can be
+a "heavy lift": the 3-normal shape is needed for each association
+in the stack which requires that each of their formal nodes is
+built which in turn involves loading each of their component
+models, which may involve loading extraneous files. all of this
+is resource-consuming work that can be avoided in some cases:
 
-what remains are zero or more "non-root compound" frames.
+hypothetically for an invocation whose argument stream does not
+appear to have options but only a trail to a formal operation,
+*and* that formal operation does not have a "stated set", we
+*can* avoid this heavy lift.
 
-because of how the [#ac-022] reader works, if a meaningful and full name
-was provided for each of the frames that needed resolving (i.e 2-N), then
-the reader was able to use its "random access" function, and so we only
-built associationesques that would end up going towards the selection
-stack. i.e none were "wasted".
+but are are some of the times we *do* need to:
 
-now imagine that instead, only partially matching names were provided
-for one or more of the frames 2-N. (we might say it has "dropped-in"
-to "fuzzy mode".) because the streamer produces streams that produce
-*nodes* (and nodes are not associations, they are more like [#ac-018]
-"load tickets"), again we don't necessarily have to build associations
-that are "wasted" because we can use the isomorphic name functions of
-the the nodes without having to touch the association.
+  • when this invocation thinks it needs any option parser.
 
-HOWEVER (and here's the rub): once you have a complete selection stack
-then you will need to "go back over" each compound frame of this stack
-to build the option parser for the "scope" it creates (as to be described
-in [#015]).
+  • when the current token in ARGV does not resolve directly to
+    one node, engaging the fuzzy matching facility.
 
-option parsers are derived from primitivesque associations. to figure
-out whether an association's model is primitivesque, you have to build
-the association (not the same as building the component). that is, the
-method that defines the association has to be called. you can't infer
-the shape of the model from the name of the method defining the
-association (yet)).
+for each of the above, here are the kinds of nodes they need:
 
-as such, assuming an optimistic model where requests (whether fuzzy or
-not) tend to result in complete selection stacks, for such cases you
-will end up doing the work of indexing every frame in your stack anyway.
+  • option parser: the primitivesques.
 
-(the reason this challenge exists at all is in the inherent
-interplay between the design tenets of [#ac-002]#DT3 "dynamicism"
-and [#ac-002]#DT4 "conservatism", both of which are important.)
+  • fuzzy matching: operations, compounds.
 
-also this will all be effected by #mask'ing and [#017] tailor-made
-option parsers.
+(this may be effected further when we #mask.)
+
+
+
+### on normal streams and the assymetry
+
+to know the 3-normal category of an association involves getting it
+to the third stage in the lifecycle (formal node). however; when we
+have a formal operation, when it is only in its first stage we already
+know its 3-normal category.
+
+this means that while we *do* need to load the component models of
+associations to "big index" them, we do *not* need to load the
+implementing resource of a formal operation (e.g a proc or a session
+class). this is yet another potentially "heavy lift" that we can avoid.
+
+an earlier go at this indexing involved having assymetrical streams of
+these nodes: the formal operations in these streams where in stage 2
+(they were node tickets), but the association nodes were in stage 3
+(they were "associations"). however this approach gave us downstream
+pain having to account for this assymetry in code, what with the
+irregular meta-shapes of nodes.
+
+fortunately the stage-2 node allows you to "touch" the stage-3 node,
+which it cached. so to have the best of both worlds, we use as currency
+this lowest common denominator of stage-2 nodes. when the downstream
+client wants the stage-3 nodes of the associations, it will already
+have it because the one is cached in the other, and we will have already
+built them, having made this big index. WHEW!!

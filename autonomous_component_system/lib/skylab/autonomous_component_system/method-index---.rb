@@ -54,8 +54,8 @@ module Skylab::Autonomous_Component_System
         def _to_nonzero ivar, sym
           @_indexed || _index
           if instance_variable_get( ivar )
-            to_entry_stream.reduce_by do | ent |
-              sym == ent.category
+            to_entry_stream.reduce_by do |nt|
+              sym == nt.node_ticket_category
             end
           end
         end
@@ -100,8 +100,8 @@ module Skylab::Autonomous_Component_System
           o[ :@_operation_symbols, :operation ]
 
           st = @_entry_stream[]
-          while entry = st.gets
-            h.fetch( entry.category ).call
+          while nt = st.gets
+            h.fetch( nt.node_ticket_category ).call
           end
 
           freeze_me.each( & :freeze )
@@ -114,16 +114,16 @@ module Skylab::Autonomous_Component_System
       class Entry__  # entries are build by m.i and to entry stream
 
         def initialize name_symbol, cat_sym
-          @category = cat_sym
+          @entry_category = cat_sym
           @name_symbol = name_symbol
         end
 
         def is_association
-          :association == @category  # etc
+          :association == @entry_category  # etc
         end
 
         attr_reader(
-          :category,
+          :entry_category,
           :name_symbol,
         )
       end

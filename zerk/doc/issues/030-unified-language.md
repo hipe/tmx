@@ -1,5 +1,41 @@
 # unified language :[#030]
 
+## (for perahps all 3 bundled modalities)
+
+  • "stated set" / "bespoke set" - see [#027]
+
+
+
+
+## (for niCLI)
+
+  • *all* unified language in [#ac-030] is inherited to this sidesystem!
+    (this may change if it becomes difficult to maintain.)
+
+  • "node" should mean "association" or "formal operation". this is in
+    contrast to a "component" which is an instance of the former.
+
+  • compound. (don't say "branch" here.)
+
+  • primitivesque. (don't say "leaf", "atom" here.)
+
+  • "navigational" nodes are the compounds and the operations.
+
+  • "non-compound" are primitivesque and operations. (don't say "leaf".)
+
+  • "3-normal shape category" - this unfortunate name is a conceptual
+    reduction and flattening of the categorical taxonomy of nodes down
+    to simply `operation`, `compound`, `primitivesque`.
+
+
+
+### "frame"
+
+in niCLI the (selection stack) frame holds a lot of responsibility..
+
+
+
+
 ## evaluations, reasonings, emissions, and states
 
   • a "reasoning" (:#A) is structure that can be used to help explain
@@ -28,8 +64,8 @@
 
     it is called "reasoning" and not "reason" for the general reason
     that "reasonsing" is more vague than "reason" and the specific
-    reason that "reason" is singuar, wheras a "reasoning" could perhaps
-    hold mulitple reasons why a node is unavailable.)
+    reason that "reason" is singuar, whereas a "reasoning" could perhaps
+    hold mulitple reasons why a node is unavailable.
 
 
 
@@ -75,4 +111,3 @@
 
   • "significant unavailability reason" is defined in [#030].
 _
-

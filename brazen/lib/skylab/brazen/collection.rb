@@ -196,6 +196,7 @@ module Skylab::Brazen
         @name_map = nil
         @on_event_selectively = oes_p
         @success_map = nil
+        @suffixed_contextualization_message_proc = nil
         @target_map = nil
       end
 
@@ -232,6 +233,9 @@ module Skylab::Brazen
 
         :target_map,  # for the purposes of matching each candidate against
         # the target value (in the qkn), alter the target in this way
+
+
+        :suffixed_contextualization_message_proc,
       )
 
       def set_qualified_knownness_value_and_symbol x, sym
@@ -317,10 +321,13 @@ module Skylab::Brazen
             end
           end
 
-          Home_.lib_.fields::Events::Extra.new_via(
-            [ kn.value_x ],
-            did_you_mean_s_a,
-            kn.name.as_human )
+          Home_.lib_.fields::Events::Extra.new_with(
+            :name_x_a, [ kn.value_x ],
+            :did_you_mean_i_a, did_you_mean_s_a,
+            :lemma, kn.name.as_human,
+            :suffixed_prepositional_phrase_context_proc,
+              @suffixed_contextualization_message_proc,
+          )
         end
 
         UNABLE_

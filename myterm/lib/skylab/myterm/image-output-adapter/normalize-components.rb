@@ -42,7 +42,7 @@ module Skylab::MyTerm
 
       def ___build_node_stream
 
-        _o = @_rw.to_non_operation_node_streamer
+        _o = @_rw.to_non_operation_node_ticket_streamer
         _o.execute
       end
 

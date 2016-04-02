@@ -65,7 +65,7 @@ module Skylab::Zerk
 
       _p = remove_instance_variable :@_root_ACS_proc
       _acs = _p.call( & @_oes_p )
-      @_top = Here_::Stack_Frame__::Root.new self, _acs
+      @_top = Here_::Stack_Frame__::Root___.new self, _acs
       self
     end
 
@@ -112,11 +112,12 @@ module Skylab::Zerk
 
     def __when_head_argument_looks_like_option
 
-      if /\A-h|--h(?:e(?:l(?:p)?)?)?/ =~ current_token_
-        self._HELP_is_next_step
+      md = Help_rx__[].match current_token_
+      if md
+        _when_help md
       else
-        _m = "request cannot start with options. (had: \"#{ current_token_ }\")"
-        _done_because _m, :argument
+        _ = "request cannot start with options. (had: \"#{ current_token_ }\")"
+        _done_because _, :argument
       end
     end
 
@@ -124,10 +125,10 @@ module Skylab::Zerk
 
     def __when_head_argument_looks_like_action
       begin
-        x = ___procure_current_association
+        x = ___procure_current_navigational_formal_node
         x or break
 
-        x = send WHICH_1___.fetch( x.associationesque_category ), x
+        x = send PARSE___.fetch( Normal_category_of_formal_node_[ x ] ), x
         x or break
 
         if x.loop_again
@@ -139,41 +140,24 @@ module Skylab::Zerk
       x
     end
 
-    def ___procure_current_association
-
-      asq = @_top.lookup_straight_then_fuzzy__ current_token_, & @_oes_p
-      if ! asq  # t3 (emitted about above)
-        _done_because :argument
-      end
-      asq
-    end
-
-    WHICH_1___ = {
-      association: :__parse_found_association,
+    PARSE___ = {
+      compound: :__parse_found_compound,
       formal_operation: :__parse_found_operation,
     }
 
-    def __parse_found_association asc
+    def ___procure_current_navigational_formal_node
 
-      send WHICH_2___.fetch( asc.model_classifications.category_symbol ), asc
-    end
-
-    WHICH_2___ = {
-      primitivesque: :___when_assoc_is_not_compound,
-      compound: :__parse_found_compound,
-    }
-
-    def ___when_assoc_is_not_compound asc  # t4
-
-      _k = asc.model_classifications.category_symbol
-      _msg = "\"#{ asc.name.as_slug }\" is not accessed with that syntax (#{_k})"
-      _done_because _msg, :argument
+      fn = @_top.lookup_formal_node__ current_token_, :navigational, & @_oes_p
+      if ! fn  # probably the above emitted t3 or t4
+        _done_because :argument
+      end
+      fn
     end
 
     def __parse_found_compound asc
 
-      _qk = ACS_::Interpretation::Touch[ asc, @_top.reader_writer_ ]
-      _push _qk, :NonRootCompound
+      @_top = @_top.attach_compound_frame_via_association_ asc  # #push
+      @_fo_frame = nil
       @_arg_st.advance_one
 
       # note - if we wanted to we could forestall the `push` until after we
@@ -182,18 +166,33 @@ module Skylab::Zerk
       # fullest context of what we were able to build before we had to stop.
 
       if @_arg_st.no_unparsed_exists
+
         Here_::When_::Ended_at_Compound[ self ]  # t6
+
       elsif _head_token_starts_with_dash
-        Here_::When_::Compound_followed_by_Dash[ self ]  # t7
+
+        md = Help_rx__[].match current_token_
+        if md
+          _when_help md
+        else
+          Here_::When_::Compound_followed_by_Dash[ self ]  # t7
+        end
       else
         LOOP_AGAIN___  # t5
       end
     end
 
+    def _when_help md
+      @_arg_st.advance_one
+      Here_::When_Help_[ md, self ]
+      STOP_PARSING_
+    end
+
     def __parse_found_operation fo
 
+      @_top = @_top.attach_operation_frame_via_formal_operation_ fo  # #push
+      @_fo_frame = @_top
       @_arg_st.advance_one
-      _push fo, :Operation
 
       if @_arg_st.no_unparsed_exists
         _parsed_OK
@@ -323,17 +322,12 @@ module Skylab::Zerk
       end
     end
 
-    def _push x, const
-      _cls = Here_::Stack_Frame__.const_get const, false
-      frame = _cls.new @_top, x
-      if frame.wraps_operation
-        @_fo_frame = frame
-      end
-      @_top = frame ; nil
-    end
-
     def operation_frame_
       @_fo_frame
+    end
+
+    def release_selection_stack__
+      remove_instance_variable :@_top
     end
 
     def top_frame_
@@ -341,11 +335,15 @@ module Skylab::Zerk
     end
 
     def _head_token_starts_with_dash  # assume non-empty stream
-      DASH_BYTE_ == @_arg_st.current_token.getbyte( 0 )
+      Begins_with_dash_[ @_arg_st.current_token ]
     end
 
     def current_token_
       @_arg_st.current_token
+    end
+
+    def release_argument_stream__
+      remove_instance_variable :@_arg_st
     end
 
     # -- finishing behavior & loop control constants
@@ -515,7 +513,17 @@ module Skylab::Zerk
       he
     end
 
-   # -- expression mechanisms
+    # -- expression mechanisms
+
+    def express_section_via__ x_a, & p
+      @___SE ||= ___build_SE
+      @___SE.express_section_via x_a, & p
+    end
+
+    def ___build_SE
+      Home_.lib_.brazen::CLI_Support::Section::Expression.new(
+        line_yielder, expression_agent )
+    end
 
     def expression_agent
       @___expag ||= Remote_CLI_lib_[]::Expression_Agent.new self
@@ -557,6 +565,7 @@ module Skylab::Zerk
           _parse_error_
           _component_rejected_request_
           missing_required_parameters
+          _referent_not_found_
         )
         p = -> k do
           # (we would cache but it's niCLI)
@@ -573,6 +582,23 @@ module Skylab::Zerk
     end.call
 
     # --
+
+    Normal_category_of_formal_node_ = -> fn do  # might become :[#ac-034].
+
+      if :formal_operation == fn.formal_node_category
+        :formal_operation
+      else
+        fn.model_classifications.category_symbol
+      end
+    end
+
+    Help_rx__ = Lazy_.call do
+      %r(\A(?:-h|--h(?:e(?:l(?:p)?)?)?(?:=(?<eql>.+))?)\z)
+    end
+
+    Begins_with_dash_ = -> s do
+      DASH_BYTE_ == s.getbyte( 0 )
+    end
 
     Remote_when_ = -> do
       Remote_CLI_lib_[]::When

@@ -5,14 +5,14 @@ module Skylab::Zerk::TestSupport
   describe "[ze] niCLI - help intro" do  # (was in [ac])
 
     TS_[ self ]
+    use :memoizer_methods
     use :non_interactive_CLI
 
-    it "1.4)   operation has description", wip: true do  # #waypoint-H
+    it "1.4)   topmost help screen shows desc of op that is in frame 1" do
 
-      _top_help_screen.should match %r(^ +wazoozie-foozie +have 'fun'\n)
+      _rx = %r(^ +wazoozie-foozie +have 'fun'\n)
+      _top_help_screen.section( :actions ).must_have_styled_line_matching _rx
     end
-
-    # == FROM HERE  # #waypoint-3
 
     context "2.0)   missing a required argument", wip: true do
 
@@ -44,10 +44,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    # == END
-    # == BEGIN #waypoint-H
-
-    context "(help screen)", wip: true do
+    context "(help screen for operation, option postfixed)", wip: true do
 
       given do
         argv 'waz', '-h'
@@ -74,11 +71,17 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "+1  1.4.B) has description in first help screen", wip: true do
+    it "1.4.B) first help screen shows classic desc of asc in frame 1" do
 
-      it "x." do
-        _top_help_screen.should match %r(^ +fantazzle-dazzle +'yay'$)
-      end
+      _rx = %r(^[ ]{2,}fantazzle-dazzle[ ]{2,}'yay'$)
+      _top_help_screen.section( :actions ).must_have_styled_line_matching _rx
+    end
+
+    it "1.4.C) first help screen shows classic desc of frame 1 itself" do
+
+      _rx = %r(\bwrites files\b)
+      _ = _top_help_screen.section( :description ).first_line.unstyled_styled
+      _ =~ _rx or fail
     end
 
     context "+1  3.4)   request help on its action", wip: true do
@@ -116,9 +119,6 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    ## == END
-    ## == FROM HERE #waypoint-3
-
     context "3.3)   money", wip: true do
 
       given do
@@ -134,11 +134,11 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    if false
     dangerous_memoize :_top_help_screen do
-      invoke '-h'
-      flush_to_unstyled_string_contiguous_lines_on_stream :e
-    end
+
+      invoke__ '-h'
+      _lines = release_lines_for_expect_stdout_stderr
+      TS_::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _lines
     end
 
     def subject_root_ACS_class

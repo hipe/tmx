@@ -369,7 +369,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # ~ constants
 
-      def associationesque_category
+      def formal_node_category
         :association
       end
 

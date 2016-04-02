@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       context "injected association" do
 
         it "knowns its own category" do
-          _node.category.should eql :association
+          :association == _node.node_ticket_category or fail
         end
 
         it "reaches a name" do
@@ -47,7 +47,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       context "injected operation (perhaps useless without more hacking)" do
 
         it "knows its own category" do
-          _node.category.should eql :operation
+          :operation == _node.node_ticket_category or fail
         end
 
         it "reaches a name" do

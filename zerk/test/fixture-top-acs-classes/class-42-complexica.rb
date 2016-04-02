@@ -15,16 +15,23 @@ module Skylab::Zerk::TestSupport
       end  # >>
 
       def __compo2__component_association
+
+        yield :description, -> y do
+          y << highlight( 'C2' )
+        end
+
         Compound_2
       end
 
       def __ope1__component_operation
-        self._NOT_called
+        -> _ do
+          self._NOT_called
+        end
       end
 
       def __primi1__component_association
-        -> st do
-          self._ZANG
+        -> _ do
+          self._NOT_called_2
         end
       end
 
@@ -78,6 +85,12 @@ module Skylab::Zerk::TestSupport
 
           private :new  # for sanity
         end  # >>
+
+        def describe_into_under y, expag
+          expag.calculate do
+            y << highlight( 'C3' )
+          end
+        end
 
         def initialize parent
           @_parent = parent

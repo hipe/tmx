@@ -1,11 +1,15 @@
-module Skylab::Autonomous_Component_System  # notes in [#002]
+module Skylab::Autonomous_Component_System
 
   module Reflection
 
-    class Node_Streamer
+    class Node_Streamer  # :[#036]
 
-      # a "streamer" is a performer for producing a stream (re-entrantly).
-      # "node" (in our usage here):
+      # a "streamer" generally is a performer that produces a stream
+      # (re-entrantly): it's like a proc that you can call multiple times,
+      # each time producing a new same-ish stream.
+      #
+      # the subject streamer produces streams of what we now call
+      # "node tickets". the "node ticket":
       #
       #   • munges generally operations and components (and whatever else
       #     similar we might come up with).
@@ -23,7 +27,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       #     upstream for clients that *do* reduce in this manner.)
       #
       #   • has a name that is or isn't mutated by its definition
-      #     based on whether the definition has been loaded yet.
+      #     based on whether the definition has been loaded yet EEK
 
       class << self
 
@@ -37,7 +41,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         end
 
         def ___via_reader rdr
-          rdr.to_node_streamer
+          rdr.to_node_ticket_streamer
         end
 
         def via_reader__ x
@@ -66,9 +70,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         st = @_reader.to_entry_stream__
         Callback_.stream do
           begin
-            en = st.gets
+            en = st.gets  # [#035]
             en or break
-            x = instance_variable_get( IVARS___.fetch( en.category ) ).call en
+            _ivar = IVARS___.fetch en.entry_category
+            x = instance_variable_get( _ivar ).call en
             x and break
             redo
           end while nil
@@ -88,7 +93,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
         # the below is initted lazily once per stream
 
-        node = Node_for_Assoc___.new @_reader
+        node = NodeTicket_for_Assoc___.new @_reader
         p = -> en do
           node.new en
         end
@@ -98,7 +103,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def __node_for_first_operation first_en
 
-        node = Node_for_Operation___.new @_reader
+        node = NodeTicket_for_Operation___.new @_reader
         p = -> en do
           node.new en
         end
@@ -108,7 +113,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       # <-
 
-    class Node_for_Assoc___
+    class NodeTicket_for_Assoc___
 
       def initialize rdr
         @__reader = rdr
@@ -161,6 +166,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @_qk[]
       end
 
+      def formal_node  # as in [#035]
+        association
+      end
+
       def association
         @_asc[]
       end
@@ -173,12 +182,12 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         :name_symbol,
       )
 
-      def category
+      def node_ticket_category
         :association
       end
     end
 
-    class Node_for_Operation___
+    class NodeTicket_for_Operation___
 
       # NOTE will have short selection stack
 
@@ -195,6 +204,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       def ___init en
         @_entry = en
         self
+      end
+
+      def formal_node
+        formal
       end
 
       def formal
@@ -226,7 +239,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @_entry.name_symbol
       end
 
-      def category
+      def node_ticket_category
         :operation
       end
     end
@@ -234,4 +247,5 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     end
   end
 end
+# #pending-rename: probably to something like "node ticket streamer"
 # #tombstone - older streamers

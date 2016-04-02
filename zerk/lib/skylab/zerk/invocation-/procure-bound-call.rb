@@ -226,7 +226,7 @@ module Skylab::Zerk
 
         on_frame = -> do
           current_frame_index = Here_::Frame_Index___.new fr, parent_index, self
-          current_frame_node_stream = current_frame_index.to_node_stream__
+          current_frame_node_stream = current_frame_index.to_node_ticket_stream__
         end
 
         on_frame[]
@@ -234,9 +234,9 @@ module Skylab::Zerk
         p = -> do
 
           begin
-            no = current_frame_node_stream.gets
-            if no
-              x = no.name_symbol
+            nt = current_frame_node_stream.gets
+            if nt
+              x = nt.name_symbol
               frame_index_via_name_symbol.add x, frame_d
               break
             end

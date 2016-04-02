@@ -7,6 +7,12 @@ module Skylab::Zerk::TestSupport
       private :new
     end  # >>
 
+      def describe_into_under y, expag
+        expag.calculate do
+          y << "#{ highlight 'writes' } files"
+        end
+      end
+
       def __wazoozie_foozie__component_operation
 
         yield :description, -> y do
@@ -42,8 +48,9 @@ module Skylab::Zerk::TestSupport
     class Faz_Daz
 
       class << self
-        def interpret_compound_component _asc, _ACS, & pp
-          self._K
+
+        def interpret_compound_component p
+          p[ new ]
         end
       end  # >>
 

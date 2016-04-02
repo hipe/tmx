@@ -9,8 +9,8 @@ module Skylab::Autonomous_Component_System
         private :new
       end  # >>
 
-      def initialize str
-        @node_streamer = str
+      def initialize smr
+        @node_ticket_streamer = smr
       end
 
       def exclude name_sym
@@ -40,22 +40,22 @@ module Skylab::Autonomous_Component_System
 
         h = ::Hash[ @_black_name_symbols.map { |i| [ i, true ] } ]
 
-        st = @node_streamer.call
+        st = @node_ticket_streamer.call
 
         p = -> do
           begin
-            no = st.gets
-            no or break
-            _is_black = h.delete no.name_symbol
+            nt = st.gets
+            nt or break
+            _is_black = h.delete nt.name_symbol
             _is_black or break
             if h.length.zero?
               p = st.method :gets
-              no = p[]
+              nt = p[]
               break
             end
             redo
           end while nil
-          no
+          nt
         end
 
         Callback_.stream do
@@ -67,7 +67,7 @@ module Skylab::Autonomous_Component_System
 
         p = @_include_if
 
-        _st = @node_streamer.call
+        _st = @node_ticket_streamer.call
 
         _st.map_reduce_by do |no|
 

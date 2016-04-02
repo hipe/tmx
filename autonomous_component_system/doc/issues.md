@@ -1,3 +1,9 @@
+[#036]       [ the node ticket streamer ]
+
+[#035]       unified language ..
+
+[#034] #wish "normal category" (currently in [ze])
+
 [#033] #open edge case not covered (see)
 
 [#032]       in-situ - formal parameter stream requested 3 times?

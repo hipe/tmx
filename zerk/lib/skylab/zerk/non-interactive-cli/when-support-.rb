@@ -10,10 +10,10 @@ module Skylab::Zerk
 
       Node_monikizer_ = -> expag do
 
-        -> no do
+        -> fn do
 
           expag.calculate do
-            code no.name.as_slug
+            code fn.name.as_slug
           end
         end
       end

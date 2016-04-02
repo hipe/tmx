@@ -1,3 +1,7 @@
+[#033]       #API-point the expression of order of nodes for any one UI
+             (A) isomorphed directly from the deep order and (for now)
+             (B) must be the same order for all modalities (for now)
+
 [#032] #wish maybe one day in niCLI style `<foo-bar>` as `--foo-bar`
 
 [#031]       [ track operation dependency customization as a feature ]
@@ -11,7 +15,10 @@
              during operation means your result will be disreagarded.
 
 [#025]       the result shape of operations ..
-[#024]       stack frame..  (mostly lengthy code notes)
+
+[#024]       stack frame ..  (mostly lengthy code notes) and..
+       #open (opps clobbered this number) redundancy in two contextualizers
+
 [#023] #open de-generalize the invites
 [#022] #open availability is not implemented (under niCLI)
 [#021]     #track what to do about entitesque ..

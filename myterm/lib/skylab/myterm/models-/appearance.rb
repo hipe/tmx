@@ -62,7 +62,7 @@ module Skylab::MyTerm
       end
     end
 
-    def to_component_node_streamer
+    def to_component_node_ticket_streamer
       self._K  # probably in #during #milestone-5
     end
 

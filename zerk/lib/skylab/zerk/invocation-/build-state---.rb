@@ -4,22 +4,26 @@ module Skylab::Zerk
 
     # [#013] has an introduction to why & how we cache graph node solutions
 
-    def initialize node, findex, stack=nil, x_o
+    def initialize nt, findex, stack=nil, x_o
 
       @_frame_index = findex
-      @_node = node
+      @_node_ticket = nt
       @__recurser = x_o
-      @_trace_stack = [ * stack, node.name_symbol ]
+      @_trace_stack = [ * stack, nt.name_symbol ]
     end
 
     def execute
-      send @_node.category
+      _specialize
       particular_execute_
     end
 
     def begin_session__
-      send @_node.category
+      _specialize
       __particular_begin_customizable_session
+    end
+
+    def _specialize
+      send @_node_ticket.node_ticket_category ; nil
     end
 
   private
@@ -48,7 +52,7 @@ module Skylab::Zerk
         # (if there is such a thing) to be an association that is depended
         # upon for the purposes of sharing.
 
-        @_asc = @_node.association
+        @_asc = remove_instance_variable( :@_node_ticket ).association
         send @_asc.model_classifications.category_symbol
       end
 
@@ -136,7 +140,7 @@ module Skylab::Zerk
 
       def _unavailability_proc
 
-        @_fo = @_node.formal
+        @_fo = remove_instance_variable( :@_node_ticket ).formal
         p = @_fo.unavailability_proc
         if p
           p[ @_fo ]

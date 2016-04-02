@@ -11,9 +11,13 @@ module Skylab::Zerk
       #
       #     ROOT [ NON-ROOT-COMPOUND [..]] FORMAL-OPERATION
 
+      # this sub-sub-system is the owner of behavior near parsing and adding
+      # frames to the stack, so that the main parser and the help subsystem
+      # can both share its facilities with the same interface and behavior.
+
       Compound_Frame__ = ::Class.new self
 
-      class Root < Compound_Frame__
+      class Root___ < Compound_Frame__
 
         def initialize cli, acs
           @CLI = cli
@@ -21,12 +25,28 @@ module Skylab::Zerk
           super acs
         end
 
-        def name
-          NOTHING_
+        def description_proc_
+          _any_description_proc_thru_ACS_class_method
         end
 
-        def build_PNSA_
+        def _suffixed_context_into_under y, _expag
+          y
+        end
+
+        def _suffixed_context_into_string_under s, _expag
+          s
+        end
+
+        def get_program_name_string__
+          build_program_name_string_array_.join SPACE_
+        end
+
+        def build_program_name_string_array_
           @CLI.build_expressible_program_name_string_array__
+        end
+
+        def name
+          NOTHING_
         end
 
         def is_root
@@ -34,25 +54,63 @@ module Skylab::Zerk
         end
       end
 
-      class NonRootCompound < Compound_Frame__
+      class NonRootCompound___ < Compound_Frame__
 
         def initialize former_top, qk
 
-          @__association = qk.association
+          @_association = qk.association
           @next_frame_ = former_top
           super qk.value_x
         end
 
+        def description_proc_
+          p = @_association.description_proc
+          if p
+            p
+          else
+            _any_description_proc_thru_ACS_class_method
+          end
+        end
+
+        def _suffixed_context_into_under y, expag
+          s = "in"
+          _suffixed_context_into_string_under s, expag
+          y << s
+        end
+
+        def _suffixed_context_into_string_under s, expag
+          @next_frame_._suffixed_context_into_string_under s, expag
+          s << SPACE_
+          nf = name
+          expag.calculate do
+            s << nm( nf )
+          end
+          s
+        end
+
+        def subprogram_name_slug_  # :#here
+          name.as_slug
+        end
+
         def name
-          @__association.name
+          @_association.name
         end
       end
 
-      class Operation < self
+      class Operation___ < self
 
         def initialize former_top, fo
           @formal_operation_ = fo
           @next_frame_ = former_top
+        end
+
+        def description_proc_
+          @formal_operation_.description_proc
+        end
+
+        def subprogram_name_slug_
+          # (copy-pasted from #here rather than have a "non-root" module)
+          name.as_slug
         end
 
         def name
@@ -62,10 +120,6 @@ module Skylab::Zerk
         attr_reader(
           :formal_operation_,  # 2x
         )
-
-        def wraps_operation
-          true
-        end
       end
 
       # --
@@ -74,77 +128,104 @@ module Skylab::Zerk
 
         def initialize acs
           @ACS = acs
-          @_did_comprehensive_index = false
+          @_did_big_index = false
+        end
+
+        # --
+
+        def _any_description_proc_thru_ACS_class_method
+
+          if @ACS.respond_to? :describe_into_under
+            acs = @ACS
+            -> y do
+              acs.describe_into_under y, self
+            end
+          end
+        end
+
+        # --
+
+        def compound_option_parser__
+          @___COP ||= ___build_compound_option_parser
+        end
+
+        def ___build_compound_option_parser
+
+          # this serves 2-ish purposes:
+          #
+          # 1) be something trueish for the section renderer #over-here so we
+          #    can have 2-column layout when rendering help screens for
+          #    compound nodes. provide the 2 metrics needed for this: `summary_indent` & `summary_width`.
+          #
+          # 2) maybe actually parse something..
+
+          op = Home_.lib_.stdlib_option_parser.new
+
+          op.on '-h', '--help [<action>]',
+              'this screen (or help for that action)' do |s|
+
+            self._K_readme  # send to a bespoke, mutable callback here :(
+          end
+
+          op
+        end
+
+        # --
+
+        def lookup_and_attach_frame__ token, set_sym, & oes_p
+          fn = Lookup__[ token, set_sym, self, & oes_p ]
+          if fn
+            send ATTACH_FOR___.fetch( fn.formal_node_category ), fn
+          else
+            fn
+          end
+        end
+
+        def lookup_formal_node__ token, set_sym, & oes_p
+          Lookup__[ token, set_sym, self, & oes_p ]
+        end
+
+        ATTACH_FOR___ = {
+          association: :__attach_frame_via_association,
+          formal_operation: :attach_operation_frame_via_formal_operation_,
+        }
+
+        def __attach_frame_via_association asc
+          _m = ATTACH_ASC_FOR___.fetch asc.model_classifications.category_symbol
+          send _m, asc
+        end
+
+        ATTACH_ASC_FOR___ = {
+          compound: :attach_compound_frame_via_association_,
+        }
+
+        def attach_operation_frame_via_formal_operation_ fo
+          Operation___.new self, fo
+        end
+
+        def attach_compound_frame_via_association_ asc
+          _qk = qualified_knownness_of_touched_via_association_ asc
+          NonRootCompound___.new self, _qk
+        end
+
+        def qualified_knownness_of_touched_via_association_ asc
+          ACS_::Interpretation::Touch[ asc, _reader ]
         end
 
         def for_invocation_read_atomesque_value_ asc
           _reader.read_value asc
         end
 
-        # a lookup:
-        #   • side-effects an emission IFF not found/ambiguous.
-        #   • side-effects the auto-vivification of compound nodes.
-        #   • result is:
-        #     - false IFF not found
-        #     - component association IFF that was resolved
-        #     - otherwise the formal operation
+        def streamer_for_navigational_nodes_  # [#030] defines "navigational"
 
-        def lookup_straight_then_fuzzy__ token, & oes_p
-          rdr = _reader
-          k = token.gsub( DASH_, UNDERSCORE_ ).intern
-          asc = rdr.read_association k
-          if asc
-            asc
-          else
-            fo_p = rdr.read_formal_operation k
-            if fo_p
-              _build_formal_operation fo_p
-            else
-              ___lookup_fuzzy token, & oes_p
-            end
-          end
+          method :to_navigational_node_ticket_stream_
         end
 
-        def ___lookup_fuzzy token, & oes_p  # result in fo
+        def to_navigational_node_ticket_stream_
 
-          # try to match the token fuzzily (but unambiguously) to one of
-          # the nodes directly under this frame. if none found, emit a
-          # "did you mean (..)"-style emission. result is the found nerp
-          # or false.
+          @_did_big_index || _do_big_index
 
-          o = Begin_fuzzy_retrieve_[ & oes_p ]
-
-          o.stream_builder = streamer_for_lookupable_non_primitives_
-
-          o.name_map = -> qk do
-            qk.name.as_slug
-          end
-
-          o.set_qualified_knownness_value_and_name token, Name___[]
-
-          no = o.execute
-          if no
-            no.formal
-          else
-            no
-          end
-        end
-
-        def streamer_for_lookupable_non_primitives_
-
-          # we know that with a successful parse we will end up going back
-          # over the nodes at this frame to build the option parser. so we
-          # do both at once.
-
-          if @_did_comprehensive_index
-            self._SANITY
-          else
-            _do_comprehensive_index
-          end
-
-          -> do
-            Callback_::Stream.via_nonsparse_array @_cached_nodes_for_fuzzy
-          end
+          Callback_::Stream.via_nonsparse_array @__cached_navigational_nodes
         end
 
         def to_association_stream_for_option_parser___
@@ -152,16 +233,16 @@ module Skylab::Zerk
           # if we went over this once before for a fuzzy lookup then use the
           # cached array. otherwise build it fresh BE CAREFUL!
 
-          if @_did_comprehensive_index
+          if @_did_big_index
             self._A
-          else
-            o = @_reader.to_non_operation_node_streamer
-            # will #mask
-            o.execute.map_reduce_by do |no|
-              asc = no.association
-              if Association_qualified_for_OP___[ asc ]
-                asc
-              end
+          end
+
+          o = @_reader.to_non_operation_node_ticket_streamer
+          # will #mask
+          o.execute.map_reduce_by do |fn|
+            asc = fn.association
+            if Association_qualified_for_OP___[ asc ]
+              asc
             end
           end
         end
@@ -175,92 +256,60 @@ module Skylab::Zerk
           :compound != asc.model_classifications.category_symbol
         end
 
-        def to_node_stream_for_invocation_
+        def to_invocative_node_ticket_stream_
 
-          # for the *agnostic* frame index, for procure bound call.
-          # we *think* we want only the atoms here, that for the above
-          # purpose we *not* use operations, that we do *not* use compounds..
+          # a #hook-in for the agnostic invocation facility, when you're a
+          # compound frame and it is trying to index you, what do you give
+          # it?
 
-          # the fact that this has a similar but not the same implementation
-          # as its counterpart forbear in API is testament to the work we
-          # do that is specific to CLI regarding how every association in the
-          # selection stack must be realized up front to know its shape.
-
-          if @_did_comprehensive_index
-            self._HELLO
-          else
-            _do_comprehensive_index
-          end
-
-          Callback_::Stream.via_nonsparse_array @_cached_nodes_for_option_parser
+          @_did_big_index || _do_big_index
+          Callback_::Stream.via_nonsparse_array @__cached_primitivesque_nodes
         end
 
-        def _do_comprehensive_index
+        def _do_big_index  # we avoid this #"heavy lift" when possible..
 
-          # the fact that we index lazily is just wishful thinking and is not
-          # actually conservative for normal use. see "on avoiding wastefulness"
-
-          @_did_comprehensive_index = ACHIEVED_
-
-          # will #mask
+          @_did_big_index = ACHIEVED_
 
           for_op = nil
           for_ss = nil
-          no = nil
+
+          nt = nil  # [#030]
 
           which2 = {
-            primitivesque: -> do
-              ( for_op ||= [] ).push no
-            end,
             compound: -> do
-              ( for_ss ||= [] ).push no
-            end
+              ( for_ss ||= [] ).push nt
+            end,
+            primitivesque: -> do
+              ( for_op ||= [] ).push nt
+            end,
           }
 
           which = {
             operation: -> do
-              ( for_ss ||= [] ).push no
+              ( for_ss ||= [] ).push nt
             end,
             association: -> do
-              which2.fetch( no.association.model_classifications.category_symbol ).call
-            end
+              _ = nt.association.model_classifications.category_symbol
+              which2.fetch( _ ).call
+            end,
           }
 
-          _stmr = _reader.to_node_streamer
+          _stmr = _reader.to_node_ticket_streamer
           st = _stmr.execute
           begin
-            no = st.gets
-            no or break
-            which.fetch( no.category ).call
+            nt = st.gets
+            nt or break
+            which.fetch( nt.node_ticket_category ).call
             redo
           end while nil
 
-          @_cached_nodes_for_fuzzy = for_ss || EMPTY_A_
-          @_cached_nodes_for_option_parser = for_op || EMPTY_A_
+          @__cached_navigational_nodes = for_ss || EMPTY_A_
+          @__cached_primitivesque_nodes = for_op || EMPTY_A_
 
           NIL_
         end
 
         # --
-
-        def _build_formal_operation fo_p
-
-          cur = self
-          stack = []
-          begin
-            stack.push cur
-            cur = cur.next_frame_
-          end while cur
-          stack.reverse!  # so that the root is first element, top is last
-
-          stack.push NIL_  # rely on kind of nasty [#ac-030] to discover name
-
-          fo_p[ stack ]
-        end
-
-        Name___ = Lazy_.call do
-          Callback_::Name.via_human 'node name'
-        end
 
         def _reader
           @_reader ||= ___build_reader
@@ -277,33 +326,212 @@ module Skylab::Zerk
         attr_reader(
           :ACS,  # [ac] formal op reads it on construction
         )
+
+        def _3_normal_shape_category_
+          :compound
+        end
       end
 
       # -
 
         def expressible_program_name_string_array_
-          @___pnsa ||= build_PNSA_  # caching may not be useful
+          @___pnsa ||= build_program_name_string_array_  # caching may not be useful
         end
 
-        def build_PNSA_
+        def build_program_name_string_array_
 
           s_a = @next_frame_.expressible_program_name_string_array_
           s_a.push name.as_slug
           s_a
         end
 
+        def to_frame_stream_from_bottom__  # #experimental
+
+          a = _build_frame_stack_from_top
+
+          d = a.length
+          Callback_.stream do
+            if d.nonzero?
+              a.fetch( d -= 1 )
+            end
+          end
+        end
+
+        def __build_frame_stack_from_bottom
+          _build_frame_stack_from_top.reverse!
+        end
+
+        def _build_frame_stack_from_top
+          curr = self
+          a = [ self ]
+          begin
+            curr = curr.next_frame_
+            curr or break
+            a.push curr
+            redo
+          end while nil
+          a
+        end
+
         attr_reader(
           :next_frame_,
         )
-
-        def wraps_operation
-          false
-        end
 
         def is_root
           false
         end
       # -
+
+      # ==
+
+      class Lookup__
+
+        # attempt to resolve a [#030] formal node through a variety of means
+        # (association, operation, fuzzily) for a variety of target sets
+        # (navigational, ..):
+        #
+        #   • IFF any node is not found/ambiguous,
+        #     * side-effects an emission
+        #     * result is false
+        #   • otherwise (and found):
+        #     * side-effects any auto-vivification of any compound nodes.
+        #     * IFF actual shape matches target set
+        #       + result is the association or formal operation
+        #     * otherwise (and shape didn't match..)
+        #       + try to be helpful with an emission
+        #       + result is false
+
+        class << self
+          def [] token, set_sym, services, & oes_p
+            oes_p or self._PASS_A_HANDLER  # #todo
+            new( token, set_sym, services, & oes_p ).execute
+          end
+        end  # >>
+
+        def initialize token, set_sym, services, & oes_p
+          @services = services
+          @set_sym = set_sym
+          @token = token
+          @_oes_p = oes_p
+        end
+
+        def execute
+          did = __resolve_any_node_directly
+          did ||= __resolve_any_node_fuzzily
+          if did
+            if @_formal_node
+              send :"__#{ @set_sym }__and__#{ Normal_category_of_formal_node_[ @_formal_node ] }__"
+            else
+              self._COVER_ME  # because #here
+            end
+          else
+            did
+          end
+        end
+
+        # --
+
+        # (turn this into branch hashes when it gets ridiculous)
+
+        def __navigational__and__formal_operation__
+          @_formal_node
+        end
+
+        def __navigational__and__compound__
+          @_formal_node
+        end
+
+        def __navigational__and__primitivesque__  # t4
+
+          # (this wording gets pretty personal, exhibiting perhaps a design
+          # issue with the scope of this node v.s its client. might push up)
+
+          fn = @_formal_node
+          had = ' (was primitivesque).'
+          @_oes_p.call :error, :expression, :result_node_is_wrong_shape do |y|
+            y << "#{ nm fn.name } is not accessed with that syntax #{ had }"
+          end
+          UNABLE_
+        end
+
+        # -- fuzz
+
+        def __resolve_any_node_fuzzily
+
+          # try to match the token fuzzily (but unambiguously) to one of
+          # the nodes directly under this frame. if none found, emit a
+          # "did you mean (..)"-style emission. result is the found nerp
+          # or false.
+
+          o = Begin_fuzzy_retrieve_[ & @_oes_p ]
+
+          _m = APPROPRIATE_STREAMER___.fetch @set_sym
+
+          o.stream_builder = @services.send _m
+
+          o.name_map = -> qk do
+            qk.name.as_slug
+          end
+
+          o.set_qualified_knownness_value_and_name @token, Node_Name___[]
+
+          svcs = @services
+          o.suffixed_contextualization_message_proc = -> y, _o do
+            svcs._suffixed_context_into_under y, self
+          end
+
+          fn = o.execute
+          if fn
+            self._K
+            @_formal_node = fn
+            ACHIEVED_
+          else
+            fn
+          end
+        end
+
+        APPROPRIATE_STREAMER___ = {
+          navigational: :streamer_for_navigational_nodes_,
+        }
+
+        Node_Name___ = Lazy_.call do
+          Callback_::Name.via_human 'node name'
+        end
+
+        # -- direct lookups
+
+        def __resolve_any_node_directly
+
+          @_name_symbol = @token.gsub( DASH_, UNDERSCORE_ ).intern
+
+          _did = __lookup_as_association
+          _did || __lookup_as_operation
+        end
+
+        def __lookup_as_association
+          fn = @services._reader.read_association @_name_symbol
+          if fn
+            @_formal_node = fn
+            ACHIEVED_
+          else
+            fn
+          end
+        end
+
+        def __lookup_as_operation
+          fo_p = @services._reader.read_formal_operation @_name_symbol
+          if fo_p
+            a = @services.__build_frame_stack_from_bottom
+            a.push NIL_  # use [#as-030] to discover name
+            @_formal_node = fo_p[ a ]  # can be nil but ignore this fact for now.. :#here
+            ACHIEVED_
+          else
+            fo_p
+          end
+        end
+      end
+
+      # ==
     end
   end
 end

@@ -13,13 +13,13 @@ module Skylab::Autonomous_Component_System::TestSupport
         @_injector = Injector.new
       end
 
-      def to_component_node_streamer
-        @_injector.__to_comp_node_streamer
+      def to_component_node_ticket_streamer
+        @_injector.__to_comp_node_ticket_streamer
       end
 
       class Injector
 
-        def __to_comp_node_streamer
+        def __to_comp_node_ticket_streamer
           Home_::Reflection::Node_Streamer.via_ACS self
         end
 

@@ -46,14 +46,16 @@ module Skylab::TestSupport
       end
 
       def release_lines_for_expect_stdout_stderr
-        _gr = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
-        _gr.release_lines
+        _expect_sout_serr_release_lines_same
       end
 
       def flush_baked_emission_array  # :+#hook-near #universal
+        _expect_sout_serr_release_lines_same
+      end
 
-        sg = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
-        sg.release_lines
+      def _expect_sout_serr_release_lines_same
+        _ = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
+        _.release_lines
       end
 
       # -- optional support for "full stack" CLI testing
@@ -314,17 +316,17 @@ module Skylab::TestSupport
 
         @__sout_serr_is_baked__ ||= _bake_sout_serr
 
-        io = Home_::Library_::StringIO.new
+        s = ""
         st = _sout_serr_stream_for_contiguous_lines_on_stream sym
 
         begin
           em = st.gets
           em or break
-          io.write yield em.string
+          s.concat yield em.string
           redo
         end while nil
 
-        io.string
+        s
       end
 
       def flush_to_expect_stdout_stderr_emission_summary_expecter

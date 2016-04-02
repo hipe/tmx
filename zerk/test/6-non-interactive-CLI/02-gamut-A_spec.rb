@@ -83,7 +83,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "whines" do
-        first_line_string.should match %r(\A\"left-number" is not accessed wi)
+        first_line_string.should match %r(\A'left-number' is not accessed wi)
       end
 
       it "invite with argument focus" do
@@ -117,7 +117,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails with specific exitstaus" do
-        expect_existatus_for :_component_rejected_request_
+        expect_exitstatus_for :_component_rejected_request_
       end
 
       it "treats operation name as verb and message as predicate" do
