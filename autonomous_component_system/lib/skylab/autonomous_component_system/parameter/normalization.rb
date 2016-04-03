@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
 
       def execute
 
-        if @parameter_value_source.is_not_known_to_be_empty_
+        if ! @parameter_value_source.is_known_to_be_empty
           # adhere to [#]:#API-point-A - do bespokes IFF etc
           ___interpret_any_bespokes
         end
@@ -41,7 +41,7 @@ module Skylab::Autonomous_Component_System
         _st = remove_instance_variable( :@bespoke_stream_once ).call
         _bx = _box_via_stream _st
 
-        cont = @parameter_value_source.to_controller_against__ _bx
+        cont = @parameter_value_source.to_controller_against _bx
 
         st = cont.consuming_formal_parameter_stream
         begin
@@ -64,7 +64,7 @@ module Skylab::Autonomous_Component_System
 
         # • implement the [#]:#Algorithm
         # • honor [#]:#API-point-B: evaluate every formal in formal order
-        # • generalize to work with [#ze-027]:#C3
+        # • generalize to work with [#ze-027]:#Operational-dependencies
         # • partially duplicate something in [fi] #open [#021]
 
         Require_field_library_[]
@@ -115,7 +115,7 @@ module Skylab::Autonomous_Component_System
             # meet its dependencies (however no executions failed), then we
             # might want to skip. on the other hand, if executions failed
             # (somewhere), then we might want to express and behave around
-            # the failure. this is exactly [#ze-027]#C3.  #open [#033].
+            # the failure. this is exactly [#ze-027]#Operational-dependencies.  #open [#033].
           end
 
           # even if errors have occurred prior, we go through with it

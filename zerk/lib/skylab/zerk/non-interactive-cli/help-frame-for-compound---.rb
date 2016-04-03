@@ -46,28 +46,11 @@ module Skylab::Zerk
 
         # ==
 
-        class Vendor_Adapter___
-
-          # (we want that a lot of this goes up to a shared base class, but it's too early yet)
-
-          def initialize mf, cli
-            @CLI = cli
-            @modality_frame_ = mf
-          end
+        class Vendor_Adapter___ < Vendor_Adapter_
 
           # -- usage section
 
-          def express_usage_section
-            express_section(
-              :header, 'usage',
-              :tight,
-            ) do |y|
-              ___write_syntax_strings y
-            end  # result is whether or not did any output
-            NIL_
-          end
-
-          def ___write_syntax_strings y
+          def write_syntax_strings_ y
 
             head = subprogram_name_string
 
@@ -89,24 +72,6 @@ module Skylab::Zerk
           end
 
           # -- description section
-
-          def express_description
-            p = @modality_frame_.description_proc_
-            if p
-              ___expresss_this_description p
-            end
-          end
-
-          def ___expresss_this_description p
-
-            express_section(
-              :header, 'description',
-              :tight,
-            ) do |y|
-              expression_agent.calculate y, & p
-            end  # result is whether or not did any
-            NIL_
-          end
 
           # -- o.p
 
@@ -149,37 +114,7 @@ module Skylab::Zerk
             "[named args]"
           end
 
-          def subprogram_name_string
-            @___sns ||= ___build_subprogram_name_string
-          end
-
-          def ___build_subprogram_name_string
-
-            st = @modality_frame_.to_frame_stream_from_bottom__
-
-            s = st.gets.get_program_name_string__
-
-            begin
-              fr = st.gets
-              fr or break
-              s << SPACE_
-              s << fr.subprogram_name_slug_
-              redo
-            end while nil
-
-            s
-          end
-
           # -- support
-
-          def express_section * x_a, & p  # by [br] sub-client and here
-            _ = @CLI.express_section_via__ x_a, & p
-            _  # whether or not it did some
-          end
-
-          def expression_agent
-            @CLI.expression_agent
-          end
 
           def properties  # only to say '<action>'. sub-client and here
             Remote_CLI_lib_[].standard_branch_property_box

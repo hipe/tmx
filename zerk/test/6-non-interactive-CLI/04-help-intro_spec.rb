@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - help intro" do  # (was in [ac])
+  describe "[ze] niCLI - help intro", wip: true do  # (was in [ac])
 
     TS_[ self ]
     use :memoizer_methods
@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
       _top_help_screen.section( :actions ).must_have_styled_line_matching _rx
     end
 
-    context "2.0)   missing a required argument", wip: true do
+    context "2.0)   missing a required argument" do
 
       given do
         argv 'waz'
@@ -29,7 +29,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "2.3)   with one arg", wip: true do
+    context "2.3)   with one arg" do
 
       given do
         argv 'waz', 'ziz'
@@ -44,7 +44,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "(help screen for operation, option postfixed)", wip: true do
+    context "(help screen for operation, option postfixed)" do
 
       given do
         argv 'waz', '-h'
@@ -84,7 +84,7 @@ module Skylab::Zerk::TestSupport
       _ =~ _rx or fail
     end
 
-    context "+1  3.4)   request help on its action", wip: true do
+    context "+1  3.4)   request help on its action" do
 
       given do
         argv 'fantaz', 'open', '-h'
@@ -119,7 +119,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "3.3)   money", wip: true do
+    context "3.3)   money" do
 
       given do
         argv  'fantaz', 'open', '-v', 'zang'

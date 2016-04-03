@@ -120,6 +120,10 @@ module Skylab::Zerk
         attr_reader(
           :formal_operation_,  # 2x
         )
+
+        def _3_normal_shape_category_
+          :operation
+        end
       end
 
       # --
@@ -128,7 +132,7 @@ module Skylab::Zerk
 
         def initialize acs
           @ACS = acs
-          @_did_big_index = false
+          @_did_operation_index = false
         end
 
         # --
@@ -223,7 +227,7 @@ module Skylab::Zerk
 
         def to_navigational_node_ticket_stream_
 
-          @_did_big_index || _do_big_index
+          @_did_operation_index || _do_operation_index
 
           Callback_::Stream.via_nonsparse_array @__cached_navigational_nodes
         end
@@ -233,7 +237,7 @@ module Skylab::Zerk
           # if we went over this once before for a fuzzy lookup then use the
           # cached array. otherwise build it fresh BE CAREFUL!
 
-          if @_did_big_index
+          if @_did_operation_index
             self._A
           end
 
@@ -262,13 +266,13 @@ module Skylab::Zerk
           # compound frame and it is trying to index you, what do you give
           # it?
 
-          @_did_big_index || _do_big_index
+          @_did_operation_index || _do_operation_index
           Callback_::Stream.via_nonsparse_array @__cached_primitivesque_nodes
         end
 
-        def _do_big_index  # we avoid this #"heavy lift" when possible..
+        def _do_operation_index  # we avoid this #"heavy lift" when possible..
 
-          @_did_big_index = ACHIEVED_
+          @_did_operation_index = ACHIEVED_
 
           for_op = nil
           for_ss = nil
@@ -334,6 +338,27 @@ module Skylab::Zerk
 
       # -
 
+        def subprogram_name_string_  # (at writing, for help only)
+          @___sns ||= ___assemble_subprogram_name_string
+        end
+
+        def ___assemble_subprogram_name_string
+
+          st = __to_frame_stream_from_bottom
+
+          s = st.gets.get_program_name_string__
+
+          begin
+            fr = st.gets
+            fr or break
+            s << SPACE_
+            s << fr.subprogram_name_slug_
+            redo
+          end while nil
+
+          s
+        end
+
         def expressible_program_name_string_array_
           @___pnsa ||= build_program_name_string_array_  # caching may not be useful
         end
@@ -345,33 +370,39 @@ module Skylab::Zerk
           s_a
         end
 
-        def to_frame_stream_from_bottom__  # #experimental
+        # --
 
-          a = _build_frame_stack_from_top
+        def __to_frame_stream_from_bottom
 
-          d = a.length
-          Callback_.stream do
-            if d.nonzero?
-              a.fetch( d -= 1 )
+          _a = _build_frame_stack_from_bottom
+          Callback_::Stream.via_nonsparse_array _a
+        end
+
+        def _build_frame_stack_from_bottom
+          to_frame_stream_from_top_.to_a.reverse  # hm.. [#bm-011]
+        end
+
+        def to_frame_stream_from_top_
+
+          cur = self
+          p = -> do
+            nxt = cur.next_frame_
+            if nxt
+              x = cur
+              cur = nxt
+              x
+            else
+              p = EMPTY_P_
+              cur
             end
+          end
+
+          Callback_.stream do
+            p[]
           end
         end
 
-        def __build_frame_stack_from_bottom
-          _build_frame_stack_from_top.reverse!
-        end
-
-        def _build_frame_stack_from_top
-          curr = self
-          a = [ self ]
-          begin
-            curr = curr.next_frame_
-            curr or break
-            a.push curr
-            redo
-          end while nil
-          a
-        end
+        # --
 
         attr_reader(
           :next_frame_,
@@ -521,7 +552,7 @@ module Skylab::Zerk
         def __lookup_as_operation
           fo_p = @services._reader.read_formal_operation @_name_symbol
           if fo_p
-            a = @services.__build_frame_stack_from_bottom
+            a = @services._build_frame_stack_from_bottom
             a.push NIL_  # use [#as-030] to discover name
             @_formal_node = fo_p[ a ]  # can be nil but ignore this fact for now.. :#here
             ACHIEVED_

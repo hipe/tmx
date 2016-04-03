@@ -166,10 +166,6 @@ module Skylab::Autonomous_Component_System
         @_qk[]
       end
 
-      def formal_node  # as in [#035]
-        association
-      end
-
       def association
         @_asc[]
       end
@@ -189,12 +185,8 @@ module Skylab::Autonomous_Component_System
 
     class NodeTicket_for_Operation___
 
-      # NOTE will have short selection stack
-
       def initialize reader
-
-        @_selection_stack_base = [ reader ]
-        @_init_formal = true
+        @_reader = reader
       end
 
       def new en
@@ -206,29 +198,8 @@ module Skylab::Autonomous_Component_System
         self
       end
 
-      def formal_node
-        formal
-      end
-
-      def formal
-        if @_init_formal
-          ___init_formal
-        end
-        @_formal
-      end
-
-      def ___init_formal
-
-        @_init_formal = false
-
-        a = remove_instance_variable( :@_selection_stack_base ).dup
-
-        fo = a.last.read_formal_operation @_entry.name_symbol
-        _nf = name
-        a.push _nf
-        @_formal = fo[ a ]
-
-        NIL_
+      def proc_to_build_formal_operation
+        @_reader.read_formal_operation @_entry.name_symbol
       end
 
       def name

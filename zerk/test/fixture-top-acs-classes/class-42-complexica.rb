@@ -24,6 +24,12 @@ module Skylab::Zerk::TestSupport
       end
 
       def __ope1__component_operation
+
+        yield :description, -> y do
+          y << highlight( 'OPE1' )
+          y << '(second line)'
+        end
+
         -> _ do
           self._NOT_called
         end

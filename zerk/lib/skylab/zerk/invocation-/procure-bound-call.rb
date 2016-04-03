@@ -19,19 +19,30 @@ module Skylab::Zerk
 
       # -- initialization
 
-      def __init_for_recursion fo, ts, si, & oes_p
+      def begin_recursion__ fo
 
+        ts = @_trouble_stack
+        if ts
+          ts = [ * ts, self ]
+        else
+          ts = [ self ]
+        end
+
+        _otr = self.class._begin_empty
+        _otr.__init_for_recursion fo, ts, @_operation_index, & @_oes_p
+      end
+
+      def __init_for_recursion fo, ts, bi, & oes_p
+
+        @did_emit_ = false
         @formal_operation = fo
-        @parameter_value_source = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
         @_oes_p = oes_p
-        @_scope_index = si
+        @parameter_value_source = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
         @_trouble_stack = ts
 
-        @_did_emit = false
+        @on_unavailable_kn_ = Callback_::Known_Known[ -> * i_a, & ev_p do
 
-        @_on_unavailable_kn = Callback_::Known_Known[ -> * i_a, & ev_p do
-
-          @_did_emit = true
+          @did_emit_ = true
 
           # (be *the* contributor of [#fi-036]:"Storypoint-1":)
           _reasoning = ( @_reasoning ||= Reasoning___.new( fo ) )
@@ -40,13 +51,25 @@ module Skylab::Zerk
           UNRELIABLE_
         end ]
 
+        @_has_operation_index = true
+        @_operation_index = bi.dup_for_recursion__ self
+
         _common_init
       end
+
+      def release_reasoning_
+        remove_instance_variable :@_reasoning
+      end
+
+      attr_reader(
+        :did_emit_,
+      )
 
       def __init_initial pvs, fo, & pp
 
         @formal_operation = fo
-        @_on_unavailable_kn = nil
+        @_has_operation_index = false
+        @on_unavailable_kn_ = nil
         @parameter_value_source = pvs
         @_pp = pp
         @_trouble_stack = nil
@@ -54,62 +77,15 @@ module Skylab::Zerk
       end
 
       def _common_init
-
-        @_did_index_big = false
         @__once_ES = nil
         self
       end
 
       def on_unavailable_= x
-        @_on_unavailable_kn = Callback_::Known_Known[ x ] ; x
+        @on_unavailable_kn_ = Callback_::Known_Known[ x ] ; x
       end
 
       # --
-
-      def begin_recursion__ fo
-
-        ts = @_trouble_stack
-        if ts
-          self._A
-        else
-          ts = [ self ]
-        end
-
-        _otr = self.class._begin_empty
-        _otr.__init_for_recursion fo, ts, @_scope_index, & @_oes_p
-      end
-
-      def evaluate_recursion__  # result in an "evaluation" struct
-
-        bc = execute
-        if bc
-
-          # this is at the behest of etc meh. just do it now:
-
-          _oes_p = @_on_unavailable_kn.value_x
-
-          ok_x = bc.receiver.send bc.method_name, * bc.args, & _oes_p
-          if ok_x
-
-            if @_did_emit
-              self._WEEE  # maybe emit the events back into the bc block # #todo
-            end
-
-            Callback_::Known_Known[ ok_x ]
-          else
-
-            _ = remove_instance_variable :@_reasoning
-
-            # (when the above fails, design something. hopefully all failure
-            #  of dependee operations will have client-provided emission.)
-
-            Callback_::Known_Unknown.via_reasoning _
-          end
-        else
-          _ = remove_instance_variable :@_reasoning
-          Callback_::Known_Unknown.via_reasoning _
-        end
-      end
 
       def begin_customizable_session__
         bc = execute
@@ -125,7 +101,11 @@ module Skylab::Zerk
 
       def execute
 
-        ___prepare
+        @_oes_p ||= method :__on_emission  # already set #IFF-recursion (see #"c1")
+        @real_store_ = @formal_operation.begin_parameter_store( & @_oes_p )
+        @_accept_to_real_store = @real_store_.method :accept_parameter_value
+        @_stated_box = @formal_operation.to_defined_formal_parameter_stream.
+          flush_to_box_keyed_to_method :name_symbol
 
         o = @formal_operation.begin_preparation( & @_oes_p )
 
@@ -142,293 +122,96 @@ module Skylab::Zerk
         o.to_bound_call
       end
 
-      def ___prepare
+      # -- WEEPOLY DOPOLY DOOPOLY BOPOLY
 
-        @_oes_p ||= method :__on_emission  # already set #IFF-recursion (see #"c1")
-        @_real_store = @formal_operation.begin_parameter_store( & @_oes_p )
-        @_accept_to_real_store = @_real_store.method :accept_parameter_value
-        NIL_
-      end
+      # from [#027] recall the difference between stateds and bespokes.
+      # to determine which of the stateds are bespokes (and which are
+      # appropriateds) we have to make the opeation index. but this index
+      # is a heavy lift that we want to avoid if we can.
+      #
+      # we introduce this twist that allows us to avoid this heavy lift for
+      # some cases, leading to some snappier invocations and more robust
+      # regressions. the cost is in mental overhead. the twist is this: the
+      # bespokes are requested IFF the parameter value source is not known
+      # to be empty. that is, if the PVS is known to be empty the parser
+      # will not request the bespokes. #[#ac-028]:#API-point-A.
+      #
+      # note however that if we have any stateds, we have to do the heavy
+      # lift to determine how to evaluate them..
 
-      # -- execution support
+      def __expanse_stream_once  # first,
 
-      def _index_big  # all note continuations are under #"c2"
+        # what is the expanse of all parameters you use to
+        # effect defaulting and checking for missing requireds?
 
-        # avoid this #"heavy lift" whenver possible..
-
-        @_did_index_big = true
-
-        means_h = {}  # to build the evaluator proc, a #"means" for every..
-
-        stated_bx = __build_and_etc_stated_box
-        pool = stated_bx.a_.dup  # a #"diminishing pool"
-        pool_h = ::Hash[ pool.each_with_index.map { |*a| a } ]
-
-        # iterate over every node name in the scope #"as a stream" because..
-
-        st = __scope_node_name_symbol_stream  # we #"could optimize"..
-        begin
-          k = st.gets
-          k or break
-          d = pool_h[ k ]
-          if d
-            pool[ d ] = nil
-            means_h[ k ] = :__touch_knownness_for_shared_parameter
-          end
-          redo
-        end while nil
-
-        pool.compact!
-        pool.each do |k_|
-          means_h[ k_ ] = :__lookup_knownness_for_bespoke_parameter
-        end
-
-        __init_bespoke_stream pool, stated_bx
-
-        __init_evaluator means_h
-
-        NIL_
-      end
-
-      def __build_and_etc_stated_box
-
-        _ = @formal_operation.to_defined_formal_parameter_stream
-        stated_bx = _.flush_to_box_keyed_to_method :name_symbol
-
-        @__build_expanse_stream_once = -> do  # or many times, even
-          stated_bx.to_value_stream
-        end
-
-        stated_bx
-      end
-
-      def __scope_node_name_symbol_stream
-        if @_trouble_stack
-          @_scope_index.__to_name_symbol_stream
+        if @_stated_box.length.zero?
+          @_evaluation_proc = :__evaluation_proc_which_is_never_called
+          Callback_::Stream.the_empty_stream
         else
-          ___scope_node_name_symbol_stream_from_ground_floor
+          @_has_operation_index || _init_operation_index
+          @_evaluation_proc = :__real_evaluation_proc
+          @_stated_box.to_value_stream
         end
       end
 
-      def ___scope_node_name_symbol_stream_from_ground_floor
+      def evaluation_proc  # then,
+        send @_evaluation_proc
+      end
 
-        # intro & continuations at #"c3"
+      def __evaluation_proc_which_is_never_called
+        :_NEVER_CALLED_ # must be true-ish
+      end
 
-        current_frame_node_stream = nil
-        current_frame_index = nil
-        my_stack = []
-        frame_d = 0
-        frame_index_via_name_symbol = Callback_::Box.new
-        parent_index = nil
+      def __real_evaluation_proc  # then, with whatever was set above, we do
+        # THE MAIN THING which is that [ze] suppports (encourages even)
+        # "appropriateds" but [ac] doesn't have any built-in sense for what
+        # those even are. so here is where we transfer those values from the
+        # ACS tree to the parameter store for the operation implementation.
 
-        st = ___to_below_frames_stream
-        fr = st.gets
+        p = @_operation_index.evaluation_proc__
 
-        on_frame = -> do
-          current_frame_index = Here_::Frame_Index___.new fr, parent_index, self
-          current_frame_node_stream = current_frame_index.to_node_ticket_stream__
-        end
-
-        on_frame[]
-
-        p = -> do
-
-          begin
-            nt = current_frame_node_stream.gets
-            if nt
-              x = nt.name_symbol
-              frame_index_via_name_symbol.add x, frame_d
-              break
-            end
-            my_stack.push current_frame_index
-            fr = st.gets
-            if fr
-              parent_index = current_frame_index
-              frame_d += 1
-              on_frame[]
-              redo
-            end
-
-            @_scope_index = Scope_Index___.new frame_index_via_name_symbol, my_stack
-
-            p = EMPTY_P_
-            break
-          end while nil
-          x
-        end
-
-        Callback_.stream do
-          p[]
+        -> par do
+          kn = p[ par ]
+          if kn.is_known_known && @_operation_index.is_appropriated__( par.name_symbol )
+            @real_store_.accept_parameter_value kn.value_x, par
+          end
+          kn
         end
       end
 
-      def ___to_below_frames_stream
+      def __bespoke_stream_once  # so you know you've got non-empty PVS
 
-        ss = @formal_operation.selection_stack
-        Callback_::Stream.via_range( 0 ... ss.length - 1 ) do |d|
-          ss.fetch d
-        end
+        @_has_operation_index || _init_operation_index
+        @_operation_index.to_bespoke_stream__
       end
 
-      # -- :"as parameter store"
+      # -- as parameter store ( & nearby )
 
       def accept_parameter_value x, par
         @_accept_to_real_store[ x, par ]
       end
 
-      def evaluation_proc
-        send @_EVP_via
-      end
-
-      def _EVP_when_heavy
-        @_did_index_big || _index_big
-        @__evaluate
-      end
-
-      def __EVP_when_light
-        :_NEVER_CALLED_
+      def evaluate_bespoke_parameter__ par
+        # for these, just pass through. stay out of the way of the real store
+        @real_store_.evaluation_of par
       end
 
       def internal_store_substrate
-        @_real_store.internal_store_substrate
+        @real_store_.internal_store_substrate
       end
 
-      # -- expanse stream (write, read)
+      # -- this
 
-      def __expanse_stream_once
-
-        remove_instance_variable :@__once_ES
-
-        # assume [#ac-028]:#API-point-A: bespoke parameters will NOT be
-        # requested if the parameter value source is known to be empty.
-        # (so avoid the heavy lift when we can)..
-
-        if @parameter_value_source.is_known_to_be_empty
-          __maybe_expanse_stream_lightly_because_PVS_is_known_to_be_empty
-        else
-          @_EVP_via = :_EVP_when_heavy
-          ___expanse_stream_heavily
-        end
-      end
-
-      def ___expanse_stream_heavily
-
-        @_did_index_big ||= _index_big
-        _ = remove_instance_variable :@__build_expanse_stream_once
-        _.call
-      end
-
-      def __maybe_expanse_stream_lightly_because_PVS_is_known_to_be_empty
-
-        # assume PVS is known to be empty. if also the formal operation has
-        # no stated parameters, then we can procede without "heavy lift"
-
-        st = @formal_operation.to_defined_formal_parameter_stream
-        par = st.gets
-        if par
-          @_EVP_via = :_EVP_when_heavy
-          p = -> { p = st ; par }  # recycle the stream you just started eew
-          Callback_.stream { p[] }
-        else
-          @_EVP_via = :__EVP_when_light
-          Callback_::Stream.the_empty_stream
-        end
-      end
-
-      # -- bespoke stream (write, read):73
-
-      def __init_bespoke_stream pool, stated_bx
-
-        # the #bespoke-stream is whatever is left over in the pool at this
-        # point (i.e those in the #stated-set that were not in the #scope-set.)
-
-        _ = Callback_::Stream.via_nonsparse_array pool
-        @__bespoke_stream = _.map_by do |k_|
-          stated_bx.fetch k_
-        end ; nil
-      end
-
-      def __bespoke_stream_once
-
-        @_did_index_big || _index_big
-        remove_instance_variable :@__bespoke_stream
-      end
-
-      # -- evaluation
-
-      def __init_evaluator means_h
-
-        @__evaluate = -> par, & no do
-
-          if no
-            self._MODERNIZE_ME_dont_pass_else_block
-          end
-
-          _ = means_h.fetch par.name_symbol
-          _evl = send _, par
-          _evl
-        end
-      end
-
-      def __lookup_knownness_for_bespoke_parameter par
-
-        # for these, just pass through. stay out of the way of the real store
-
-        @_real_store.evaluation_of par
-      end
-
-      def __touch_knownness_for_shared_parameter par  # :"c5"
-
-        # --
-
-        if @_real_store.is_classesque
-          m = :"finish__#{ par.name_symbol }__by"
-          yes = @_real_store.internal_store_substrate.respond_to? m
-        end
-
-        if yes
-          _ = __custom_operation_dependency m, par
-          _
-        else
-          __touch_knownness_for_shared_parameter_normally par
-        end
-      end
-
-      def __touch_knownness_for_shared_parameter_normally par
-
-        _sta = @_scope_index._touch_state par
-        evl = _sta.cached_evaluation_
-
-        if evl.is_known_known
-          @_accept_to_real_store[ evl.value_x, par ]
-        end
-
-        evl
-      end
-
-      def __custom_operation_dependency m, par
-
-        sub_sess = @_scope_index.__begun_session_for par
-
-        if sub_sess
-
-          sess = @_real_store.internal_store_substrate
-
-          ok_x = sess.send m, sub_sess
-
-          @_real_store.accept_parameter_value ok_x, par  # for now, always..
-
-        else
-          ok_x = sub_sess
-        end
-
-        Callback_::Known_Known[ ok_x ]
+      def _init_operation_index
+        @_has_operation_index = true
+        @_operation_index = Here_::Operation_Index.for_top_ @_stated_box, self
+        NIL_
       end
 
       # -- handle events
 
       def __on_unavailable
-        kn = @_on_unavailable_kn  # used 1x more later..
+        kn = @on_unavailable_kn_  # used 1x more later..
         if kn
           kn.value_x  # can be nil
         else
@@ -463,6 +246,14 @@ module Skylab::Zerk
         end
       end
 
+      # -- all for dependencies:
+
+      attr_reader(
+        :formal_operation,  # 2x by op index
+        :on_unavailable_kn_,  # 1x by b.s
+        :real_store_,  # 2x. by b.s
+      )
+
       # ==
 
       class Reasoning___  # a member of our [#030] unified language
@@ -493,35 +284,6 @@ module Skylab::Zerk
           :channel,
           :mixed_event_proc,
         )
-      end
-
-      class Scope_Index___
-
-        def initialize bx, a
-          @_index_stack = a
-          @_lookup_box = bx
-        end
-
-        def __begun_session_for par
-
-          _ = _frame_index_for par
-          _.begun_session_for__ par
-        end
-
-        def _touch_state par
-
-          _ = _frame_index_for par
-          _.touch_state__ par
-        end
-
-        def _frame_index_for par
-
-          @_index_stack.fetch @_lookup_box.fetch par.name_symbol
-        end
-
-        def __to_name_symbol_stream
-          @_lookup_box.to_name_stream
-        end
       end
     end
   end

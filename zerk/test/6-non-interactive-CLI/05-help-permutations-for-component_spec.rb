@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        _expect_exitstatus_for_referent_not_found
+        expect_exitstatus_for_referent_not_found_
       end
 
       it "first line says unrec" do
@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        _expect_exitstatus_for_referent_not_found
+        expect_exitstatus_for_referent_not_found_
       end
 
       it "first line says unrec *contextualized*" do
@@ -53,7 +53,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound in first frame (as arg)" do
+    context "ask for help of compound in first frame (as arg)", wip: true do
 
       given_screen do
         argv '-h', 'compo2'
@@ -80,7 +80,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound in second frame (as arg)" do
+    context "ask for help of compound in second frame (as arg)", wip: true do
 
       given_screen do
         argv '-h', 'compo2', 'compo3'
@@ -103,7 +103,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound in first frame (not as arg)" do
+    context "ask for help of compound in first frame (not as arg)", wip: true do
 
       given_screen do
         argv 'compo2', '-h'
@@ -130,7 +130,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound at level 2 (not as arg)" do
+    context "ask for help of compound at level 2 (not as arg)", wip: true do
 
       given_screen do
         argv 'compo2', 'compo3', '-h'
@@ -153,7 +153,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound at level 2 (not as THEN as arg)" do
+    context "ask for help of compound at level 2 (not as THEN as arg)", wip: true do
 
       given_screen do
         argv 'compo2', '-h', 'compo3'
@@ -229,8 +229,22 @@ module Skylab::Zerk::TestSupport
       match_ expectation( :styled, :e, _rx )
     end
 
-    def _expect_exitstatus_for_referent_not_found
-      expect_exitstatus_for :_referent_not_found_
+    dangerous_memoize :be_first_usage_line_ do
+
+      o = begin_regex_based_matcher %r(\Ausage: xyzi ([^<]+) <action> \[named args\]$)
+      o.line_offset = 0
+      o.styled
+      o.subject_noun_phrase = "first usage line"
+      o
+    end
+
+    dangerous_memoize :be_second_usage_line_ do
+
+      o = begin_regex_based_matcher %r(\A[ ]{2,}xyzi ([^-]+) -h <action>$)
+      o.line_offset = 1
+      o.styled
+      o.subject_noun_phrase = "second usage line"
+      o
     end
 
     def subject_root_ACS_class

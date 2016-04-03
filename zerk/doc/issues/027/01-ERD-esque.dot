@@ -1,0 +1,11 @@
+digraph g {
+
+  pbc[label="procure\nbound call"]
+  bi[label="big\nindex"]
+  si[label="scope\nindex"]
+  bs[label="build\nstate"]
+
+  pbc->bi [label="needs and/or\nbuilds"]
+  bi->bs [label="builds"]
+  bi->si [label="needs and/or\nbuilds"]
+}

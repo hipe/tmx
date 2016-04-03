@@ -22,17 +22,13 @@ module Skylab::Autonomous_Component_System
         @argument_stream = st
       end
 
-      def to_controller_against__ fo_bx  # [#]:#"head parse"
+      def to_controller_against fo_bx  # [#]:#"head parse". [ze]
 
         if 1 == fo_bx.length
           When_Single_Formal___.new fo_bx.at_position( 0 ), @argument_stream
         else
           When_Not_Single_Formal___.new fo_bx, @argument_stream
         end
-      end
-
-      def is_not_known_to_be_empty_
-        ! is_known_to_be_empty
       end
 
       def is_known_to_be_empty
@@ -107,10 +103,6 @@ module Skylab::Autonomous_Component_System
       Empty___ = Lazy_.call do
 
         module EMPTY____ ; class << self
-
-          def is_not_known_to_be_empty_
-            false
-          end
 
           def is_known_to_be_empty
             true

@@ -27,7 +27,7 @@ operations in its "stack set" of nodes. we call this the "socialist" model
 explored further in [#027].
 
 for now, for backwards compatibility and *maybe* for the convenience of
-it, [ze] supports both "bespoke" and "socialist" parameters. (we flip-
+it, [ze] supports *both* "bespoke" *and* "socialist" parameters. (we flip-
 flopped on this choice *twice*.)
 
 as that document's treatment of "socialism" theorizes and
@@ -70,11 +70,15 @@ these are the main challenges of implementing the above:
   • this general problem (that we refer to as [#027] "parameter sharing")
     is one that supercedes the three "bundled modalities" - whatever
     solution we come up with here must serve each of these modalities
-    equally well with nominal integration work for each modality.
+    equally well after the per-modality work required to implement their
+    own particular syntaxes or equivalent interpreting facilities.
 
 
 
 
-## a solution
+## proposed solution - the "operation index"
 
-every of the three implementations of "bundled modalities" will ETC..
+since it is a relatively :#"heavy lift" to build this [#027] #scope-set
+(yet we can't cache it because [#ac-002]#DT3 everything is dynamic),
+we try to do this only when it is certain that we need to know it
+(e.g any of its derivatives, i.e #socialist-set or #bespoke-set).

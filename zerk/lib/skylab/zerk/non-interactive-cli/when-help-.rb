@@ -113,10 +113,16 @@ module Skylab::Zerk
 
       H___ = {
         compound: :Help_Frame_for_Compound___,
+        operation: :Help_Frame_for_Operation__,
       }
 
       def init_exitstatus_for_ sym
         @CLI.init_exitstatus_for_ sym
+      end
+
+      def handle_ * i_a, & ev_p
+
+        @CLI.handle_ACS_emission_ i_a, & ev_p  # unreliable
       end
 
       def CLI_
@@ -125,6 +131,71 @@ module Skylab::Zerk
 
       def upstream_
         @_upstream
+      end
+
+      # ==
+
+      class Vendor_Adapter_
+
+        # until the tail wags the dog we use outside help for our .. help
+
+        def initialize mf, cli
+          @CLI = cli
+          @modality_frame_ = mf
+        end
+
+        # -- usage section
+
+        def express_usage_section
+          express_section(
+            :header, 'usage',
+            :tight,
+          ) do |y|
+            write_syntax_strings_ y
+          end  # result is whether or not did any output
+          NIL_
+        end
+
+        # -- description section
+
+        def express_description
+          p = @modality_frame_.description_proc_
+          if p
+            ___expresss_this_description p
+          end
+        end
+
+        def ___expresss_this_description p
+
+          express_section(
+            :header, 'description',
+            :tight,
+          ) do |y|
+            expression_agent.calculate y, & p
+          end  # result is whether or not did any
+          NIL_
+        end
+
+        # -- o.p
+
+        # -- items section
+
+        # -- name & nearby
+
+        def subprogram_name_string
+          @modality_frame_.subprogram_name_string_
+        end
+
+        # -- support
+
+        def express_section * x_a, & p  # by [br] sub-client and here
+          _ = @CLI.express_section_via__ x_a, & p
+          _  # whether or not it did some
+        end
+
+        def expression_agent
+          @CLI.expression_agent
+        end
       end
     end
   end

@@ -7,7 +7,8 @@
 [#031]       [ track operation dependency customization as a feature ]
 
 [#030]       unified language ..
-       #open [#]:#A (see)
+       #open [#]:#A is about whether a "reasoning" is always exactly one event
+
 [#029]       introducing isomorphic interfaces ..
 [#028]       in-situ
 [#027]       formal parameter sharing ..

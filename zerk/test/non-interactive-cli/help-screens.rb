@@ -5,6 +5,7 @@ module Skylab::Zerk::TestSupport
     # [#br-045] / #[#br-106] blind rewrite!
 
     def self.[] tcc
+      Memoizer_Methods[ tcc ]
       Non_Interactive_CLI[ tcc ]
       tcc.send :define_singleton_method, :given_screen, Given_screen___
       tcc.include self
@@ -38,31 +39,15 @@ module Skylab::Zerk::TestSupport
         Coarse_Parse.new niCLI_state.lines
       end
 
-      # -- methods that produce predicates (matchers)
-
       def have_first_usage_line_of s
-        First_usage_line___[].for s, self
-      end
-
-      First_usage_line___ = Lazy_.call do
-        o = Regex_Based_Matcher__.new %r(\Ausage: xyzi ([^<]+) <action> \[named args\]$)
-        o.line_offset = 0
-        o.styled
-        o.subject_noun_phrase = "first usage line"
-        o
+        be_first_usage_line_.for s, self
       end
 
       def have_second_usage_line_of s
-        Second_usage_line___[].for s, self
+        be_second_usage_line_.for s, self
       end
 
-      Second_usage_line___ = Lazy_.call do
-        o = Regex_Based_Matcher__.new %r(\A[ ]{2,}xyzi ([^-]+) -h <action>$)
-        o.line_offset = 1
-        o.styled
-        o.subject_noun_phrase = "second usage line"
-        o
-      end
+      # -- methods that produce predicates (matchers)
 
       def be_description_line_of opt_sym=nil, exp_s
         o = Single_description_line___[].for exp_s, self
@@ -96,6 +81,10 @@ module Skylab::Zerk::TestSupport
         o.styled
         o.subject_noun_phrase = "invite line"
         o
+      end
+
+      def begin_regex_based_matcher rx
+        Regex_Based_Matcher__.new rx
       end
 
       # --
@@ -245,17 +234,18 @@ module Skylab::Zerk::TestSupport
     class Regex_Based_Matcher__
 
       def initialize rx
+        @_prepare_matchee = :__prepare_matchee_as_is
         @_rx = rx
         @subject_noun_phrase = nil
       end
 
       def styled  # so :#here
-        @_prepare_matchee_method = :__expect_styled
+        @_prepare_matchee = :__prepare_matchee_by_expecting_styled
         NIL_
       end
 
       def line_offset= d
-        @_matcher_method = :__match_line_by_offset
+        @_match = :__match_line_by_offset
         @line_offset = d
       end
 
@@ -277,12 +267,12 @@ module Skylab::Zerk::TestSupport
 
         # (this violates etc..)
         @_section = section
-        send @_matcher_method
+        send @_match
       end
 
       def __match_line_by_offset
         @_li = @_section.line_at_offset @line_offset
-        send @_prepare_matchee_method  # raises on failure
+        send @_prepare_matchee  # raises on failure
         @_md = @_rx.match @_s
         if @_md
           _actual_s = @_md[ 1 ]
@@ -315,8 +305,12 @@ module Skylab::Zerk::TestSupport
         @subject_noun_phrase || 'string'
       end
 
-      def __expect_styled
-        @_s = @_li.unstyled_styled  # raises
+      def __prepare_matchee_by_expecting_styled
+        @_s = @_li.unstyled_styled ; nil  # raises
+      end
+
+      def __prepare_matchee_as_is
+        @_s = @_li.string ; nil
       end
 
       def _fail

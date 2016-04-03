@@ -54,14 +54,6 @@ module Skylab::Autonomous_Component_System::TestSupport
           _node.name.as_variegated_symbol.should eql :opie
         end
 
-        it "reaches the formal (NOTE whose stack points to injector)" do
-          _fo = _node.formal
-          a = _fo.instance_variable_get :@selection_stack  # bad test
-          a.last.name.as_variegated_symbol.should eql :opie
-          _hi = a.first.ACS.hello
-          _hi.should eql :_i_am_from_injector_
-        end
-
         def _node
           _tuple.fetch 1
         end

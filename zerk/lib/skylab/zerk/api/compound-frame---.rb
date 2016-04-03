@@ -32,7 +32,7 @@ module Skylab::Zerk
 
       # -- read
 
-      def to_invocative_node_ticket_stream_
+      def to_every_node_ticket_stream_
 
         _rw = reader_writer
 
@@ -90,6 +90,13 @@ module Skylab::Zerk
 
       def ACS
         @qualified_knownness.value_x
+      end
+
+      def build_formal_operation_ nt
+
+        stack = [ self ]  # shallow stack for now ! meh
+        stack.push nt.name
+        nt.proc_to_build_formal_operation.call stack
       end
 
       # -- for sub-clients

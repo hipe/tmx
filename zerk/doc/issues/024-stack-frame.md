@@ -72,7 +72,7 @@ have a formal operation, when it is only in its first stage we already
 know its 3-normal category.
 
 this means that while we *do* need to load the component models of
-associations to "big index" them, we do *not* need to load the
+associations to "operation index" them, we do *not* need to load the
 implementing resource of a formal operation (e.g a proc or a session
 class). this is yet another potentially "heavy lift" that we can avoid.
 
@@ -88,4 +88,4 @@ which it cached. so to have the best of both worlds, we use as currency
 this lowest common denominator of stage-2 nodes. when the downstream
 client wants the stage-3 nodes of the associations, it will already
 have it because the one is cached in the other, and we will have already
-built them, having made this big index. WHEW!!
+built them, having made this operation index. WHEW!!

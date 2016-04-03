@@ -22,7 +22,7 @@ module Skylab::Zerk::TestSupport
 
       it "ok." do
         _ = root_ACS_result
-        "(coffee via (boiling 12 oz of H20 at 100˚))" == _ or fail
+        _ == "(coffee via (boiling 12 oz of H20 at 100˚))" or fail
       end
     end
 

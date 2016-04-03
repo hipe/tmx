@@ -16,6 +16,8 @@ deference to the seminal text-adventure, and "jerk" just because.
 as an unintended side-effect is has become an interesting alternative
 means to make non-interactive API's as well.
 
+also, non-interactive CLI's too.
+
 
 
 

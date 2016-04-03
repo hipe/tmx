@@ -1,3 +1,6 @@
+[#011] #open all this time we assumed `array.reverse!` was better
+             on resources, but perhaps not now that we think about it
+
 [#010] #open todo: multi-variate data vizualization ..
 [#009] #open #in-situ (in skylab.rb) finally get to benchmarking this thing
                "pn.relative? is expensive and bloaty"

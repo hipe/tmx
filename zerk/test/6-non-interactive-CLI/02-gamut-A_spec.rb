@@ -116,7 +116,7 @@ module Skylab::Zerk::TestSupport
         argv 'add', '--left-number', 'one'
       end
 
-      it "fails with specific exitstaus" do
+      it "fails with specific exitstatus" do
         expect_exitstatus_for :_component_rejected_request_
       end
 
@@ -147,7 +147,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "required args missing (#t10)" do
+    context "required args missing (#t10)", wip: true do
 
       given do
         argv 'add', '--left-number', '1'
@@ -174,7 +174,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "money (#t11)" do
+    context "money (#t11)", wip: true do
 
       given do
         argv 'add', '--left-number', '5', '--right-number', '-2'

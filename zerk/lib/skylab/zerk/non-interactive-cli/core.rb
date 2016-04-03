@@ -21,6 +21,9 @@ module Skylab::Zerk
         new.init_as_prototype_
       end
 
+      def option_parser_WIP_  # keep track
+      end
+
       private :new
     end  # >>
 
@@ -114,7 +117,7 @@ module Skylab::Zerk
 
       md = Help_rx__[].match current_token_
       if md
-        _when_help md
+        _when_head_argument_looks_like_help md
       else
         _ = "request cannot start with options. (had: \"#{ current_token_ }\")"
         _done_because _, :argument
@@ -173,7 +176,7 @@ module Skylab::Zerk
 
         md = Help_rx__[].match current_token_
         if md
-          _when_help md
+          _when_head_argument_looks_like_help md
         else
           Here_::When_::Compound_followed_by_Dash[ self ]  # t7
         end
@@ -182,7 +185,7 @@ module Skylab::Zerk
       end
     end
 
-    def _when_help md
+    def _when_head_argument_looks_like_help md
       @_arg_st.advance_one
       Here_::When_Help_[ md, self ]
       STOP_PARSING_
@@ -201,46 +204,51 @@ module Skylab::Zerk
       end
     end
 
+    # --
+
     def ___parse_using_option_parser
 
       _pp = -> asc do
         __build_emission_handler_contextualized_for_atomesque asc
       end
 
-      opc = Here_::Option_Parser_Controller___.new @_fo_frame, & _pp
-      op = opc.option_parser___
+      _opc = Here_::Option_Parser_Controller___.new @_fo_frame, self, & _pp
 
       argv = @_arg_st.flush_remaining_to_array
 
-      begin
-        op.parse! argv
-      rescue ::OptionParser::ParseError => e
-        ___when_option_parser_parse_error e  # t8
+      keep_parsing = _opc.parse__ argv
+      if keep_parsing
+        argv.length.zero? or self._SANITY
+        _parsed_OK  # t11
       else
-        if opc.ok__
-          if argv.length.zero?  # t11
-            _parsed_OK
-          else
-            __when_extra_args argv  # t9
-          end
-        else
-          _done_because :option
-          init_exitstatus_for_ :_component_rejected_request_
-        end
+        keep_parsing
       end
     end
 
-    def ___when_option_parser_parse_error e
+    def when_via_option_parser_parse_error__ e  # t8
       _done_because e.message, :option
     end
 
-    def __when_extra_args argv
+    def when_via_option_parser_component_rejected_request__
+      _done_because :option
+      init_exitstatus_for_ :_component_rejected_request_
+    end
+
+    def when_via_option_parser_extra_args__ argv  # t9
       if 1 < argv.length
         s = 's' ; dd  = ' [..]'
       end
       _msg = "unexpected argument#{ s }: \"#{ argv.first }\"#{ dd }"
       _done_because _msg, :argument
     end
+
+    def when_via_option_parser_help_was_requested__ any_s
+      _FAKE_MATCHDATA = { eql: any_s }  # ..
+      Here_::When_Help_[ _FAKE_MATCHDATA, self ]
+      STOP_PARSING_
+    end
+
+    # --
 
     def __build_emission_handler_contextualized_for_atomesque assoc
 

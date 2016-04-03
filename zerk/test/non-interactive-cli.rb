@@ -155,6 +155,10 @@ module Skylab::Zerk::TestSupport
         exitstatus.should be_nonzero
       end
 
+      def expect_exitstatus_for_referent_not_found_
+        expect_exitstatus_for :_referent_not_found_
+      end
+
       def expect_exitstatus_for k
         _d = Home_::Non_Interactive_CLI::Exit_status_for___[ k ]
         exitstatus.should eql _d

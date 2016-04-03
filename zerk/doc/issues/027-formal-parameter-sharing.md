@@ -296,7 +296,7 @@ of expressions we want to express when there are "deep unavailabilities":
 
 
 
-### evaluating operation-dependencies :#C3
+### evaluating :#Operation-dependencies (:"o.d")
 
    (this is very similar to [#ta-009] general task-graph resolution, and is
    a candidate for a future unification of that trail. but currently there
@@ -315,7 +315,7 @@ of expressions we want to express when there are "deep unavailabilities":
 
      • the dependency that can execute either succeeds or fails execution.
 
-   all possible relevant out-conditions to this problem are:
+   all possible relevant out-conditions to this problem (for a given o.d) are:
 
      • you can WIN (you may procede),
      • you can SKIP (you may also procede) or
@@ -382,65 +382,6 @@ confusing and is more trouble than it is worth..
 ..so here we allow that the handler is already set and recognize what it
 is.
 
-
-
-### :#"c2"
-
-the callers are defined below this method for reasons.
-
-since it is a relatively :#"heavy lift" to build this [#]#scope-set
-(yet we can't cache it because [#ac-002]#DT3 everything is dynamic),
-we try to do this only when it is certain that we need to know it
-(e.g any of its derivatives, i.e #socialist-set or #bespoke-set)
-
-this :#"means" hash is a means to resolve every node in the scope set:
-either through sharing or as a bespoke parameter. this is the backbone
-of the evaluator (proc) that we will build below.
-
-we create a :#"diminishing pool" that starts off as the set of all
-names in the #stated-set.
-
-for just a second, ignore how we get this stream - :#"as a stream" we
-stream over every node name in the scope set, subtracting it from the
-pool IFF it's in the pool (and it "usually" isn't - "usually" there are
-more nodes in the scope set than there are in the stated set).
-
-this stream, on the ground floor session the stream is produced at
-this time. while we are producing each next node name we are also
-indexing which frame each node name is found in. (doing this has the
-side effect of ensuring name uniqueness in this scope stack.)
-(more on what we do when we do this in #c3 below.)
-
-if there are any subsequent recursive sessions, **WE REUSE** this same
-work of indexing: as a useful (and unintended) property of scope
-stacks, because a selected formal operation can only ever depend on
-other operations that are in its scope stack, (and so on recursively),
-all formal operations that could ever be in the dependency graph
-(recursively) of the ground-floor formal operation will be in its
-scope stack.
-
-we :#"could optimize" this for recursive sessions - in those cases we
-already have a plain old box for all the nodes in the scope stack,
-and we could just use the set operators ( `Array#&` or whatever )
-rather that iterating over items in a stream; but really: meh.
-
-
-
-
-## :#"c3", :#c3
-
-stream along the one or more compound frames that stand below the
-top item (the formal operation), (in some direction?), and in
-each such frame, stream along every node of that frame. for this
-stream of all nodes selected in this manner, memo which frame you
-found this node in.
-
-the reasons :#"this box" is a box and not a hash are two
-
-  • it verifies the uniqueness of all names in the scope stack
-
-  • later, if we re-use it in a recursive session we will want
-    its ordered-ness (yes hashes have ordered keys but meh)
 
 
 
