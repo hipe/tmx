@@ -16,7 +16,7 @@ module Skylab::Zerk
         undef_method :new
       end  # >>
 
-      def dup_for_recursion__ fo
+      def dup_for_recursion_ fo
         self.class._begin_empty.___init_as_recurse fo, self
       end
 

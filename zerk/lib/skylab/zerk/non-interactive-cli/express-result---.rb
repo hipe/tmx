@@ -33,18 +33,24 @@ module Skylab::Zerk
       def execute
         x = @x
         if x
+
           if true == x
             # let's assume it's semantic true, so we want to output "yes" or etc.
             self._WHEN_TRUE
+
+          elsif x.respond_to? :ascii_only?
+            @cli.sout.puts x
+
           elsif x.respond_to? :bit_length
             @cli.sout.puts "#{ x }"
+
           else
-            self._TRUEISH_OTHER  # eventually we will want to call [#br-068]
+            self._COVER_ME_trueish_other  # eventually we will want to call [#br-068]
           end
         elsif x.nil?
           # it seems reasonable to interpret nil as "nothing"
         else
-          self._WHEN_FALSE
+          self._COVER_ME_when_false
         end
         NIL_
       end

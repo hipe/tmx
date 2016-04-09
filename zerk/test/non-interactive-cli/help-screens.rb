@@ -31,6 +31,22 @@ module Skylab::Zerk::TestSupport
 
       # -- methods that produce subjects
 
+      def build_usage_line_index_of_first_usage_line
+
+        # (experimental code sketch - use a rough regex to break the usage
+        # line into its parts, based on some axioms of character usage.)
+
+        s = section( :usage ).first_line.unstyled_styled
+        s.chomp!
+        _s_a = s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))  # #open [#bm-002] (benchmarks)
+
+        bx = Callback_::Box.new
+        _s_a.each do |s_|
+          bx.add s_, s_
+        end
+        bx
+      end
+
       def section sym
         _hsz_screen.section sym
       end

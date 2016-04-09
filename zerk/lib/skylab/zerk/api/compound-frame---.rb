@@ -92,7 +92,7 @@ module Skylab::Zerk
         @qualified_knownness.value_x
       end
 
-      def build_formal_operation_ nt
+      def build_formal_operation_via_node_ticket_ nt
 
         stack = [ self ]  # shallow stack for now ! meh
         stack.push nt.name

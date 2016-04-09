@@ -342,7 +342,7 @@ module Skylab::Zerk
           if nf
             a.push nf
           else
-            a.push NIL_  # use [#as-030] to discover name
+            a.push NOTHING_  # use [#as-030] to discover name
           end
           fo_p[ a ]  # can be nil but ignore this fact for now..
         end

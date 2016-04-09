@@ -7,12 +7,16 @@ module Skylab::Zerk
       class << self
 
         def new_from_top__ fo_frame
-          _new_empty.__init_for_top fo_frame
+          ___new_empty.__init_for_top fo_frame
         end
 
-        alias_method :_new_empty, :new
+        alias_method :___new_empty, :new
         undef_method :new
       end  # >>
+
+      def dup_for_recursion_ fo
+        Pared_Down_for_Recursion___.new fo, self
+      end
 
       def initialize
         NOTHING_  # (hi.)
@@ -107,7 +111,6 @@ module Skylab::Zerk
 
       def __when_operation_dependency  # [#] note C
 
-        self._CODE_SKETCH_might_work
         @_my_set_symbol_via_name_symbol[ @_k ] = :_operation_dependency_
         NIL_
       end
@@ -192,7 +195,7 @@ module Skylab::Zerk
       end
 
       def is_appropriated_ k
-        @_si.has__ k
+        @_si.has_ k
       end
 
       def scope_index_  # e.p #hook-out (and closer)
@@ -202,6 +205,53 @@ module Skylab::Zerk
       attr_reader(
         :node_ticket_index_via_argument_index__,
       )
+
+      # ==
+
+      class Pared_Down_for_Recursion___
+
+        # for now, if we don't need to let's not even bother indexing the
+        # operation dependencies at all. they must LA LA so LA LA
+
+        def initialize _fo, otr
+          @_si = otr.scope_index_
+        end
+
+        def dup_for_recursion_ _fo
+          self.class.new _fo, self
+        end
+
+        def evaluation_proc_for_ pbc
+          hi = Home_::Invocation_::Evaluation.proc_for_ pbc, self
+          -> par do
+            hi[ par ]
+          end
+        end
+
+        def fetcher_proc_for_set_symbol_via_name_symbol_
+          method :_set_symbol_via_name_symbol
+        end
+
+        def is_appropriated_ k
+          @_si.has_ k or self._SANITY
+          true
+        end
+
+        def _set_symbol_via_name_symbol k
+
+          _nt = @_si.node_ticket_via_node_name_symbol_ k
+          ETC___.fetch _nt.node_ticket_category
+        end
+
+        ETC___ = {
+          association: :_appropriated_,
+          operation: :_operation_dependency_,
+        }
+
+        def scope_index_
+          @_si
+        end
+      end
     end
   end
 end

@@ -118,7 +118,7 @@ module Skylab::Zerk
         @__root_frame
       end
 
-      def has__ k
+      def has_ k
         @_scope_node_identifier_via_name_symbol.key? k
       end
 

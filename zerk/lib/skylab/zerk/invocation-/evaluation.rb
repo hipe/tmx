@@ -20,6 +20,10 @@ module Skylab::Zerk
               # to evaluate bespokes is a concern of the pbc, not the index
               pbc.evaluate_bespoke_parameter__ par
             end,
+
+            _operation_dependency_: -> par do
+              new( par, pbc, oi ).execute  # (hi.)
+            end,
           }
 
           -> par do

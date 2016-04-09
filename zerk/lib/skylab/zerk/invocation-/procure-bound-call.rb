@@ -51,7 +51,7 @@ module Skylab::Zerk
         end ]
 
         @_has_operation_index = true
-        @_operation_index = bi.dup_for_recursion__ fo
+        @_operation_index = bi.dup_for_recursion_ fo
 
         _common_init
       end

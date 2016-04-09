@@ -201,7 +201,7 @@ module Skylab::Zerk
 
         _nt = remove_instance_variable :@_node_ticket
 
-        @_fo = @_modality_frame.build_formal_operation_ _nt
+        @_fo = @_modality_frame.build_formal_operation_via_node_ticket_ _nt
 
         p = @_fo.unavailability_proc
         if p

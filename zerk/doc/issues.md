@@ -24,9 +24,11 @@
 [#025]       the result shape of operations ..
 
 [#024]       stack frame ..  (mostly lengthy code notes) and..
-       #open (opps clobbered this number) redundancy in two contextualizers
+             ( #was: redundancy in two events. removed the other. )
 
-[#023] #open de-generalize the invites
+[#023] #hole
+             ( #was: #open de-generalize the invites )
+
 [#022] #open availability is not implemented (under niCLI)
 [#021]     #track what to do about entitesque ..
 [#020]     #track argument monikers

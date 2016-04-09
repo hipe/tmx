@@ -112,18 +112,7 @@ module Skylab::Zerk::TestSupport
 
       dangerous_memoize :_usage_index do
 
-        # (experimental code sketch - use a rough regex to break the usage
-        # line into its parts, based on some axioms of character usage.)
-
-        s = section( :usage ).first_line.unstyled_styled
-        s.chomp!
-        _s_a = s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))
-
-        bx = Callback_::Box.new
-        _s_a.each do |s_|
-          bx.add s_, s_
-        end
-        bx
+        build_usage_line_index_of_first_usage_line
       end
     end
 
