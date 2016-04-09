@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] non-interactive CLI - gamut A" do
+  describe "[ze] non-interactive CLI - gamut A (used to need o.p, now does not)" do
 
     TS_[ self ]
     use :non_interactive_CLI
@@ -113,7 +113,7 @@ module Skylab::Zerk::TestSupport
     context "an arg value is invalid (per model) (~#t8)" do
 
       given do
-        argv 'add', '--left-number', 'one'
+        argv 'add', '1', 'two'
       end
 
       it "fails with specific exitstatus" do
@@ -122,62 +122,63 @@ module Skylab::Zerk::TestSupport
 
       it "treats operation name as verb and message as predicate" do
 
-        _s = first_line_string
-        _s.should eql "couldn't add because #{
-          }left number didn't look like a simple number (had: \"one\")\n"
+        first_line_string == "couldn't add because right number #{
+          }didn't look like a simple number (had: \"two\")\n" or fail
       end
 
       it "invites" do
-        second_line.should be_invite_with_option_focus
+        second_line.should be_invite_with_argument_focus
       end
     end
 
-    context "built op and parsed and args remain (#t9)" do
+    context "args remain (#t9)" do
 
       given do
-        argv 'add', '--left-number', '1', 'zing'
+        argv 'add', '1', '2', 'three'
       end
 
       it "fails" do
-        fails
+        expect_exitstatus_for :_parse_error_
       end
 
       it "whines" do
-        first_line_string.should match %r(\Aunexpected argument: "zing")
+        first_line_string.should match %r(\Aunexpected argument: "three")
+      end
+
+      it "invites specifically" do
+        last_line.should be_invite_with_argument_focus
       end
     end
 
-    context "required args missing (#t10)", wip: true do
+    context "required args missing (#t10)" do
 
       given do
-        argv 'add', '--left-number', '1'
+        argv 'add', '1'
       end
 
       it "fails" do
-        fails
+        expect_exitstatus_for :missing_required_parameters
       end
 
-      it "whines (NOTE currently not styled as option.. #wish [#032])" do
+      it "whines about missing required argument (knows it is an argument)" do
 
-        _msg = "'add' is missing required parameter <right-number>."
+        _msg = "missing required argument <right-number>"
 
         _be_this = match_ expectation( :styled, :e, _msg )
 
         first_line.should _be_this
       end
 
-      it "invites" do
+      it "invites with argument focus" do
 
-        _be_this = be_invite_with_no_focus
-
-        second_line.should _be_this
+        second_line.should be_invite_with_argument_focus
       end
     end
 
-    context "money (#t11)", wip: true do
+    context "money (#t11)" do
 
       given do
-        argv 'add', '--left-number', '5', '--right-number', '-2'
+        argv 'add', '5', '--', '-2'
       end
 
       it "succeeds" do

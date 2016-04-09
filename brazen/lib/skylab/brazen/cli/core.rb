@@ -737,7 +737,7 @@ module Skylab::Brazen
           argument: -> prp do
             -> _expag do
               Home_::CLI_Support::Syntax_Assembly.
-                render_as_argument_uninflected_for_arity__ prp
+                render_as_argument_uninflected_for_arity prp
             end
           end,
           environment_variable: -> prp do
@@ -2158,7 +2158,6 @@ module Skylab::Brazen
     DASH_BYTE_ = DASH_.getbyte 0
     GENERIC_ERROR_EXITSTATUS = o::GENERIC_ERROR_EXITSTATUS
     Here_ = self
-    NOTHING_ = nil
     SUCCESS_EXITSTATUS = o::SUCCESS_EXITSTATUS
     When_ = -> { o::When }
   end

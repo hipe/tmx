@@ -4,6 +4,8 @@ module Skylab::Brazen
 
     class Models_::Isomorphic_Method_Parameters < ::Class.new  # see [#105]
 
+      # (this is similar to but more specialized than [#057])
+
       Models_ = ::Module.new
 
       # <-

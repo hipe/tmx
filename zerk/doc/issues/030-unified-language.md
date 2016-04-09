@@ -2,7 +2,9 @@
 
 ## (for perahps all 3 bundled modalities)
 
-  • "stated set" / "bespoke set" - see [#027]
+  • "stack frame" - a frame on the [#ac-031] "selection stack"
+
+  • "scope set" / "stated set" / "bespoke set" / "socialist set" - see [#027]
 
 
 
@@ -12,8 +14,12 @@
   • *all* unified language in [#ac-030] is inherited to this sidesystem!
     (this may change if it becomes difficult to maintain.)
 
-  • "node" should mean "association" or "formal operation". this is in
-    contrast to a "component" which is an instance of the former.
+  • we no longer say "node" in an unqualified way:
+    + if it's a component, say that.
+    + if it's a formal operation or an association, say that.
+      (to be indifferent to which one it is, say "formal node".)
+    + if it's a "node ticket", say that
+    + if it's a "node entry", say that (very low-level)
 
   • compound. (don't say "branch" here.)
 

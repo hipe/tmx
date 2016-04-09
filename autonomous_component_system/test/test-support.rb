@@ -206,10 +206,6 @@ module Skylab::Autonomous_Component_System::TestSupport
       Callback_.test_support::Expect_Event[ tcc ]
     end
 
-    Future_expect = -> tcc do
-      Callback_.test_support::Future_Expect[ tcc ]
-    end
-
     Memoizer_methods = -> tcc do
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end

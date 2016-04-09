@@ -9,7 +9,6 @@ module Skylab::Zerk
       class << self
 
         def begin_ pvs, fo, & pp
-          1 == pp.arity or raise ::ArgumentError
           _begin_empty.__init_initial pvs, fo, & pp
         end
 
@@ -52,7 +51,7 @@ module Skylab::Zerk
         end ]
 
         @_has_operation_index = true
-        @_operation_index = bi.dup_for_recursion__ self
+        @_operation_index = bi.dup_for_recursion__ fo
 
         _common_init
       end
@@ -81,6 +80,11 @@ module Skylab::Zerk
         self
       end
 
+      def operation_index= oi
+        @_has_operation_index = true
+        @_operation_index = oi
+      end
+
       def on_unavailable_= x
         @on_unavailable_kn_ = Callback_::Known_Known[ x ] ; x
       end
@@ -104,12 +108,12 @@ module Skylab::Zerk
         @_oes_p ||= method :__on_emission  # already set #IFF-recursion (see #"c1")
         @real_store_ = @formal_operation.begin_parameter_store( & @_oes_p )
         @_accept_to_real_store = @real_store_.method :accept_parameter_value
-        @_stated_box = @formal_operation.to_defined_formal_parameter_stream.
-          flush_to_box_keyed_to_method :name_symbol
+
+        ___init_stated_box
 
         o = @formal_operation.begin_preparation( & @_oes_p )
 
-        o.bespoke_stream_once = method :__bespoke_stream_once
+        o.PVS_parameter_stream_once = method :__PVS_parameter_stream_once
 
         o.expanse_stream_once = method :__expanse_stream_once
 
@@ -122,11 +126,19 @@ module Skylab::Zerk
         o.to_bound_call
       end
 
+      def ___init_stated_box
+
+        @_stated_box =
+          @formal_operation.to_defined_formal_parameter_stream.
+            flush_to_box_keyed_to_method :name_symbol
+        NIL_
+      end
+
       # -- WEEPOLY DOPOLY DOOPOLY BOPOLY
 
       # from [#027] recall the difference between stateds and bespokes.
       # to determine which of the stateds are bespokes (and which are
-      # appropriateds) we have to make the opeation index. but this index
+      # appropriateds) we have to make the operation index. but this index
       # is a heavy lift that we want to avoid if we can.
       #
       # we introduce this twist that allows us to avoid this heavy lift for
@@ -168,21 +180,21 @@ module Skylab::Zerk
         # those even are. so here is where we transfer those values from the
         # ACS tree to the parameter store for the operation implementation.
 
-        p = @_operation_index.evaluation_proc__
+        p = @_operation_index.evaluation_proc_for_ self
 
         -> par do
           kn = p[ par ]
-          if kn.is_known_known && @_operation_index.is_appropriated__( par.name_symbol )
+          if kn.is_known_known && @_operation_index.is_appropriated_( par.name_symbol )
             @real_store_.accept_parameter_value kn.value_x, par
           end
           kn
         end
       end
 
-      def __bespoke_stream_once  # so you know you've got non-empty PVS
+      def __PVS_parameter_stream_once  # so you know you've got non-empty PVS
 
         @_has_operation_index || _init_operation_index
-        @_operation_index.to_bespoke_stream__
+        @_operation_index.to_PVS_parameter_stream_
       end
 
       # -- as parameter store ( & nearby )
@@ -204,7 +216,8 @@ module Skylab::Zerk
 
       def _init_operation_index
         @_has_operation_index = true
-        @_operation_index = Here_::Operation_Index.for_top_ @_stated_box, self
+        @_operation_index = Here_::Operation_Index.for_top_(
+          @_stated_box, @formal_operation )
         NIL_
       end
 

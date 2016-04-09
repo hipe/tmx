@@ -164,7 +164,8 @@ module Skylab::Zerk
 
         class Operation_as_Item___ < Item__
 
-          def initialize nt, _frame
+          def initialize nt, frame
+            @_frame = frame
             @_node_ticket = nt
           end
 
@@ -182,7 +183,15 @@ module Skylab::Zerk
           end
 
           def description_proc
-            @_node_ticket.formal.description_proc
+            _formal.description_proc
+          end
+
+          def _formal
+            @___formal_op ||= ___build_formal_operation
+          end
+
+          def ___build_formal_operation
+            @_frame.build_formal_operation_via_node_ticket_ @_node_ticket
           end
 
           def name

@@ -101,7 +101,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def name
-        @_nf ||= Callback_::Name.via_variegated_symbol( @name_symbol )
+        @_nf ||= Callback_::Name.via_variegated_symbol @name_symbol
       end
 
       attr_reader(

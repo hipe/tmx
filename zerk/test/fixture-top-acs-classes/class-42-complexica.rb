@@ -30,13 +30,13 @@ module Skylab::Zerk::TestSupport
           y << '(second line)'
         end
 
-        -> _ do
+        -> do
           self._NOT_called
         end
       end
 
       def __primi1__component_association
-        -> _ do
+        -> do
           self._NOT_called_2
         end
       end

@@ -109,41 +109,6 @@ module Skylab::Zerk::TestSupport
     end
   end
 
-  class Future_Expect_ < ::Proc  # #todo probably away this
-
-    class << self
-
-      def _call * expected_sym_a
-
-        p = nil
-
-        o = new do | * sym_a, & ev_p |
-          p[ * sym_a, & ev_p ]
-        end
-
-        Callback_.test_support::Future_Expect[ o.singleton_class ]
-
-        o.add_future_expect expected_sym_a
-
-        p = o.fut_p
-
-        o
-      end
-
-      alias_method :[], :_call
-
-      alias_method :call, :_call
-    end  # >>
-
-    def do_debug
-      false
-    end
-
-    def done_
-      future_is_now
-    end
-  end
-
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end

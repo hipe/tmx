@@ -2,16 +2,16 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] niCLI - help intro", wip: true do  # (was in [ac])
+  describe "[ze] niCLI - help intro" do  # (was in [ac])
 
     TS_[ self ]
     use :memoizer_methods
-    use :non_interactive_CLI
+    use :non_interactive_CLI_help_screens
 
     it "1.4)   topmost help screen shows desc of op that is in frame 1" do
 
       _rx = %r(^ +wazoozie-foozie +have 'fun'\n)
-      _top_help_screen.section( :actions ).must_have_styled_line_matching _rx
+      _top_help_screen.section( :actions ).should have_styled_line_matching _rx
     end
 
     context "2.0)   missing a required argument" do
@@ -24,57 +24,113 @@ module Skylab::Zerk::TestSupport
         fails
       end
 
-      it "whines" do
-        first_line.should be_line( :styled, :e, "expecting <flim-flam>" )
+      it "whines in a modality-customized way (says \"argument\" not etc)" do
+
+        _s = "missing required argument <flim-flam>"
+
+        first_line.should be_line( :styled, :e, _s )
+      end
+
+      it "invite" do
+
+        second_line.should be_invite_with_argument_focus
       end
     end
 
-    context "2.3)   with one arg" do
+    context "2.3)   with both required args" do
 
       given do
-        argv 'waz', 'ziz'
+        argv 'waz', 'yiz', 'ziz'
       end
 
-      it "x." do
-        @exitstatus.should eql 12332
+      it "succeeds" do
+        succeeds
       end
 
-      it "x" do
-        expect :styled, :e, "hello 'ziz'"
+      it "one styled stderr line" do
+        first_line.should be_line( :styled, :e, "hello yiz ziz" )
+      end
+
+      it "the result is written to stdout" do
+        last_line.should be_line( :o, '12332' )
       end
     end
 
-    context "(help screen for operation, option postfixed)" do
+    context "2.4) help screen for operation, option postfixed" do
 
-      given do
+      given_screen do
         argv 'waz', '-h'
       end
 
-      it "2.4.A) operation help screen starts with usage" do
-
-        d = root_ACS_state.lookup_index 'usage'
-        d.should be_zero
-        _ = root_ACS_state.tree.children.fetch( d ).x.unstyled
-        _.should match %r(\Ausage: fam wazoozie-foozie <flim-flam>$)
+      it "succeeds" do
+        succeeds
       end
 
-      it "2.4.B) operation help screen has description of operation" do
+      it "the first words of the usage line look right" do
 
-        _node = root_ACS_state.lookup 'description'
-        _node.x.unstyled.should match %r(^description: have 'fun'$)
+        bx = _usage_index
+        bx.at_position( 1 ) == 'xyzi' or fail
+        bx.at_position( 2 ) == 'wazoozie-foozie' or fail
       end
 
-      it "2.4.C) operation help screen has description of parameter!" do
+      it "usage section is only one line long" do
 
-        _ = root_ACS_state.lookup( 'argument' ).to_string :unstyled
-        _.should match %r(^argument\n +<flim-flam> +'yes'$)
+        2 == section( :usage ).line_count or fail  # (one for the blank line)
+      end
+
+      it "the option appears in the usage section" do
+
+        _usage_index[ '[-s X]' ] or fail
+      end
+
+      it "the bespoke required parameter appears in the usage section" do
+
+        _usage_index[ '<flim-flam>' ] or fail
+      end
+
+      it "the appropriated required parameter appears in the usage section" do
+
+        _usage_index[ '<nim-nam>' ] or fail
+      end
+
+      it "description section is styled, has content" do
+
+        section( :description ).should be_description_line_of( :styled, "have 'fun'" )
+      end
+
+      it "the arguments section speaks of the bespoke parameter" do
+
+        _li = section( :arguments ).line_at_offset 1
+        _li.should be_item_pair( :styled, 'flim-flam', "f.f" )
+      end
+
+      it "the arguments section speaks of the appropriated parameter" do
+
+        _li = section( :arguments ).line_at_offset 2
+        _li.should be_item_pair( :styled, 'nim-nam', "n.n" )
+      end
+
+      dangerous_memoize :_usage_index do
+
+        # (experimental code sketch - use a rough regex to break the usage
+        # line into its parts, based on some axioms of character usage.)
+
+        s = section( :usage ).first_line.unstyled_styled
+        s.chomp!
+        _s_a = s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))
+
+        bx = Callback_::Box.new
+        _s_a.each do |s_|
+          bx.add s_, s_
+        end
+        bx
       end
     end
 
     it "1.4.B) first help screen shows classic desc of asc in frame 1" do
 
       _rx = %r(^[ ]{2,}fantazzle-dazzle[ ]{2,}'yay'$)
-      _top_help_screen.section( :actions ).must_have_styled_line_matching _rx
+      _top_help_screen.section( :actions ).should have_styled_line_matching _rx
     end
 
     it "1.4.C) first help screen shows classic desc of frame 1 itself" do
@@ -84,42 +140,28 @@ module Skylab::Zerk::TestSupport
       _ =~ _rx or fail
     end
 
-    context "+1  3.4)   request help on its action" do
+    context "+1  3.4)   request help on its action", wip: true do  # until flags #open [#019]
 
       given do
         argv 'fantaz', 'open', '-h'
       end
 
       it "succeeds" do
-        root_ACS_state.exitstatus.should match_successful_exitstatus
+        succeeds
       end
 
-      it "usage" do
+      it 'usage line - the leading 4 "solid pieces" look right'
 
-        a = root_ACS_state.lookup( 'usage' ).to_lines :unstyled
+      it "usage line - all the o.p pieces are there"
 
-        _1 = "usage: fam fantazzle-dazzle open [-v] [-d] <file>"
-        _2 = "       fam fantazzle-dazzle open -h"
+      it "usage line - the argument piece is there (as last piece)"
 
-        a[ 0 ].should eql _1
-        a[ 1 ].should eql _2
-        a.fetch( 2 ).should eql EMPTY_S_
-      end
+      it "the option parser section has 6 lines (etc)"
 
-      it "options" do
-
-        root_ACS_state.lookup( 'options' ).children.fetch( 0 ).
-          x.string.should match %r(\A  +-v, --verbose  +tha V$)
-      end
-
-      it "argument" do
-
-        root_ACS_state.lookup( 'argument' ).children.fetch( 0 ).
-          x.string.should match %r(\A  +<file>)
-      end
+      it "there is no arguments section because the arg has no desc"
     end
 
-    context "3.3)   money" do
+    context "3.3)   money", wip: true do  # until flags #open [#019]
 
       given do
         argv  'fantaz', 'open', '-v', 'zang'

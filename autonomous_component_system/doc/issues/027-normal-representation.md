@@ -77,17 +77,4 @@ the "expanse stream" is a stream of [#020]-like formal parameters.
   • the expanse stream is what is used to determined which parameters
     willl be run through [#028] our normalization routine. see
     "limited scope" there.
-
-
-
-## :#bespoke
-
-the "bespoke stream" is a stream of [#020]-like formal parameters.
-
-  • each such parameter is *not* associated with its (any) referrant
-    component association or formal operation.
-
-  • the bespoke stream is used to determine (for the API modality hrm..)
-    which parameters to use for any [#028]:#"head parse" phase of the
-    parsing.
 _

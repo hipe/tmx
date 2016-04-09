@@ -20,10 +20,10 @@ module Skylab::Zerk::TestSupport
         end
 
         yield :parameter, :flim_flam, :description, -> y do
-          y << code( 'yes' )
+          y << highlight( 'f.f' )
         end
 
-        -> flim_flam, & call_p do  # see [#006]#Event-models:#ick
+        -> flim_flam, nim_nam, & call_p do  # see [#006]#Event-models:#ick
 
           if call_p
             use_p = call_p
@@ -33,10 +33,32 @@ module Skylab::Zerk::TestSupport
           end
 
           use_p.call :info, :expression, :hello do | y |
-            y << "hello #{ code flim_flam }"
+            y << "hello #{ highlight flim_flam } #{ highlight nim_nam }"
           end
 
           12332
+        end
+      end
+
+      def __nim_nam__component_association
+
+        yield :description, -> y do
+          y << highlight( 'n.n' )
+        end
+
+        -> st do
+          Callback_::Known_Known[ st.gets_one ]
+        end
+      end
+
+      def __sashimi__component_association
+
+        yield :description, -> y do
+          y << code( 'sakana' )
+        end
+
+        -> do
+          self._K
         end
       end
 
@@ -62,16 +84,18 @@ module Skylab::Zerk::TestSupport
 
       def __open__component_operation
 
-        yield :parameters, :default, nil,
+        yield(
+          :parameter, :verbose, :is_flag,
+            :description, -> y { y << 'tha V' },
 
-              :parameter, :verbose, :is_flag,
-                :description, -> y { y << 'tha V' },
+          :parameter, :dry_run, :is_flag,
 
-              :parameter, :dry_run, :is_flag,
+          :end
+        )
 
-              :end
+        -> verbose, dry_run, file, & call_p do  # [#006]#Event-models:#ick
 
-        -> verbose=nil, dry_run=nil, file, & call_p do  # [#006]#Event-models:#ick
+          self._NEAT
 
           if call_p
             use_p = call_p

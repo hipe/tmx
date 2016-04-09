@@ -79,13 +79,15 @@ essential normalization axioms about defaulting and missing requireds.
 
 
 
-## :#"head parse"
+## :#"head parse" :#"Head parse"
 
-as long as the current head of the argument stream corresponds to
-the name of a formal parameter, shift that name and (assumed here
-to be present on the stream) value element off the stream and
-store this value to the parameter value store. (i.e continue
-until no more stream or the head of the stream is not recognized.)
+as long as the parameter value source is not empty and it "matches"
+one of the formal parameters from the dedicated collection, remove that
+value from the PVS and store it in the parameter store. this is
+continued until either the PVS is known to be empty or the PVS in
+its current state does not match any of the formals in the collection.
+
+for this modality (EDIT):
 
 having only one formal argument is a special case: in this
 arrangement we NEVER recognize named arguments, i.e the term
@@ -105,7 +107,7 @@ an unsanitized, "raw" value directly from the modality.
 
 ## :#API-point-A
 
-the subject session promises that it will request the bespoke stream IFF
+the subject session promises that it will request this sort of stream IFF
 the parameter value source is not known to be empty.
 
 

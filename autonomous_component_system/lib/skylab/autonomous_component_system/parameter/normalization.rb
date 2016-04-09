@@ -20,25 +20,25 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_writer(
-        :bespoke_stream_once,  # see [#027]#bespoke
         :expanse_stream_once,  # see [#027]#expanse
         :parameter_store,  # wrap e.g a session object or argument array
         :parameter_value_source,
+        :PVS_parameter_stream_once,  # see [#028]#"head parse"
       )
 
       def execute
 
         if ! @parameter_value_source.is_known_to_be_empty
-          # adhere to [#]:#API-point-A - do bespokes IFF etc
-          ___interpret_any_bespokes
+          # adhere to [#]:#API-point-A - do these IFF etc
+          ___interpret_non_empty_PVS
         end
 
         __common_normalize
       end
 
-      def ___interpret_any_bespokes  # see [#]:#"head parse"
+      def ___interpret_non_empty_PVS  # see [#]:#"head parse"
 
-        _st = remove_instance_variable( :@bespoke_stream_once ).call
+        _st = remove_instance_variable( :@PVS_parameter_stream_once ).call
         _bx = _box_via_stream _st
 
         cont = @parameter_value_source.to_controller_against _bx

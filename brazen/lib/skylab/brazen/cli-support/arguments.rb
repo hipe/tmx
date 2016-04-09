@@ -6,23 +6,49 @@ module Skylab::Brazen
 
         # (all "normalization")
 
-        class Normalization
+        class Normalization  # :[#057].
+
+          # NOTE this is similar to but not the same as [#105].
+          #
+          # given one array of formal parameters and one ARGV-like array,
+          # parse the arguments off the ARGV and into some kind of store
+          # (explained below) taking into account requireds, optionals,
+          # and globs. (parsing flags is adjacent to this scope).
+          #
+          # there are multiple kinds of "parameter store" we could
+          # potentially assemble for:
+          #
+          # 1) (the default, classic style for [br]): build an *iambic*
+          #    array suitible for a "backbound" call to a [br]-style API.
+          #
+          # 2) assemble them into a random-accessible box of qualified
+          #    knownness. (if you want a hash, use this).
+          #
+          # 3) if your args are being "assembled" for a proc-like call
+          #    *that has the appropriate syntax suggested by the formal
+          #     sytnax*, then you use use the argv as-is.
+          #
+          # (1) & (2) are implemented. (3) hasn't been needed yet.
 
           class << self
             alias_method :via_properties, :new
-            private :new
+            undef_method :new
           end  # >>
 
           def initialize prp_a
-            @arg_a = prp_a
-            @early_output_segment = @middle_output_segment =
-              @late_output_segment = nil
-            validate_indexes_of_optional_arguments
+
+            @_accept = :__accept_for_iambic
+
+            @formals = prp_a
+
+            @early_output_segment = nil
+            @late_output_segment = nil
+            @middle_output_segment = nil
+
+            ___validate_indexes_of_optional_arguments
           end
 
-        private
-
-          def validate_indexes_of_optional_arguments
+          def ___validate_indexes_of_optional_arguments
 
             # optional arguments (if any) may occur at the beginning, middle or
             # end of the formal argument list but they must be contiguous with
@@ -32,9 +58,9 @@ module Skylab::Brazen
 
             Require_fields_lib_[]
 
-            a = @arg_a.length.times.reduce [] do |m, d|
+            a = @formals.length.times.reduce [] do |m, d|
 
-              prp = @arg_a.fetch d
+              prp = @formals.fetch d
               if Field_::Is_effectively_optional[ prp ]
                 if m.length.nonzero?
                   if m.last != d - 1
@@ -48,12 +74,17 @@ module Skylab::Brazen
           end
 
           def ___say_bad_optional_indexes m, d
-            "optional argument '#{ @arg_a.fetch( d ).name_symbol }' must but did #{
+            "optional argument '#{ @formals.fetch( d ).name_symbol }' must but did #{
               }not occur immediately after optional argument #{
-            }'#{ @arg_a.fetch( m.last ).name_symbol }'"
+            }'#{ @formals.fetch( m.last ).name_symbol }'"
           end
 
-        public
+          def be_for_random_access
+            @_random_access_box = nil  # careful, this might be proto
+            @_accept = :__accept_for_random_access
+          end
+
+          # --
 
           def any_error_event_via_validate_x argv
             new_via_argv( argv ).execute
@@ -65,13 +96,10 @@ module Skylab::Brazen
             otr
           end
 
-        protected
-
           def init_copy_via_argv argv
             @argv = argv ; nil
           end
-
-        public
+          protected :init_copy_via_argv
 
           def execute
             prepare_streams
@@ -82,16 +110,18 @@ module Skylab::Brazen
             ev || finalize_success
           end
 
+        private
+
           def prepare_streams
-            @arg_a_scan = Crazy_Scanner__.via_array @arg_a
+            @arg_a_scan = Crazy_Scanner__.via_array @formals
             @argv_scan = Crazy_Scanner__.via_array @argv
           end
-        private
+
           def parse_any_required_arguments_off_beginning
             num_leading_required_args = if @indexes_of_optional_arguments
               @indexes_of_optional_arguments.first
             else
-              @arg_a.length
+              @formals.length
             end
             if num_leading_required_args.nonzero?
               @arg_a_scan.x_a_length = num_leading_required_args
@@ -101,13 +131,13 @@ module Skylab::Brazen
 
           def parse_any_required_arguments_off_ending
             @num_trailing_required_args = if @indexes_of_optional_arguments
-              @arg_a.length - @indexes_of_optional_arguments.last - 1
+              @formals.length - @indexes_of_optional_arguments.last - 1
             else
               0
             end
             if @num_trailing_required_args.nonzero?
-              @arg_a_scan.x_a_length = @arg_a.length
-              @arg_a_scan.d = @arg_a.length - @num_trailing_required_args
+              @arg_a_scan.x_a_length = @formals.length
+              @arg_a_scan.d = @formals.length - @num_trailing_required_args
               temporarily_advance_argv_stream_if_necessary
               parse_required_segment :'@late_output_segment'
             else
@@ -128,12 +158,12 @@ module Skylab::Brazen
           def parse_required_segment i
             begin
               if @argv_scan.unparsed_exists
-                accept_monadic_actual_property_value i
+                _accept i
               else
                 result = build_missing_required_event
                 break
               end
-            end while @arg_a_scan.unparsed_exists
+            end until @arg_a_scan.no_unparsed_exists
             result
           end
 
@@ -152,7 +182,7 @@ module Skylab::Brazen
               end
               while @argv_scan.unparsed_exists
                 if @arg_a_scan.unparsed_exists
-                  accept_monadic_actual_property_value :'@middle_output_segment'
+                  _accept :'@middle_output_segment'
                 else
                   break
                 end
@@ -160,10 +190,7 @@ module Skylab::Brazen
             end
           end
 
-          def accept_monadic_actual_property_value sym
-
-            a = instance_variable_get sym
-            a ||= instance_variable_set sym, []
+          def _accept sym
 
             prp = @arg_a_scan.gets_one
 
@@ -171,14 +198,33 @@ module Skylab::Brazen
               if @arg_a_scan.unparsed_exists
                 self._DO_ME
               end
-              # naive implementation:
-              a.push prp.name_symbol, @argv_scan.flush_remaining_to_array
+              _x = @argv_scan.flush_remaining_to_array  # naive implementation
+              send @_accept, _x, prp, sym
+
             else
-              a.push prp.name_symbol, @argv_scan.gets_one
+              send @_accept, @argv_scan.gets_one, prp, sym
             end
 
             NIL_
           end
+
+          # --
+
+          def __accept_for_iambic x, prp, sym
+
+            a = instance_variable_get sym
+            a ||= instance_variable_set sym, []
+            a.push prp.name_symbol, x ; nil
+          end
+
+          def __accept_for_random_access x, prp, _sym
+
+            _bx = ( @_random_access_box ||= Callback_::Box.new )
+            _qkn = Callback_::Qualified_Knownness.via_value_and_association( x, prp )
+            _bx.add prp.name_symbol, _qkn ; nil
+          end
+
+          # --
 
           def complain_about_any_extra_arguments
             if @argv_scan.unparsed_exists
@@ -188,17 +234,31 @@ module Skylab::Brazen
 
           def finalize_success
             @did_succeed = true
-            @final_output_iambic = [ * @early_output_segment,
-              * @middle_output_segment, * @late_output_segment ]
             NIL_  # CONTINUE_
           end
 
         public
+
           def release_result_iambic
+
             if @did_succeed
-              r = @final_output_iambic ; @final_output_iambic = nil ; r
+
+              _a = remove_instance_variable :@early_output_segment
+              _b = remove_instance_variable :@middle_output_segment
+              _c = remove_instance_variable :@late_output_segment
+              [ * _a, * _b, * _c ]
             end
           end
+
+          def release_random_access_box
+            remove_instance_variable :@_random_access_box
+          end
+
+          attr_reader(
+            :formals,
+          )
+
+          # ==
 
           class Missing_
             def initialize property

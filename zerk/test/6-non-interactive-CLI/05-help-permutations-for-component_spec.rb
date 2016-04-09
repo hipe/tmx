@@ -53,7 +53,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound in first frame (as arg)", wip: true do
+    context "ask for help of compound in first frame (as arg)" do
 
       given_screen do
         argv '-h', 'compo2'
@@ -80,7 +80,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound in second frame (as arg)", wip: true do
+    context "ask for help of compound in second frame (as arg)" do
 
       given_screen do
         argv '-h', 'compo2', 'compo3'
@@ -103,7 +103,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound in first frame (not as arg)", wip: true do
+    context "ask for help of compound in first frame (not as arg)" do
 
       given_screen do
         argv 'compo2', '-h'
@@ -130,7 +130,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound at level 2 (not as arg)", wip: true do
+    context "ask for help of compound at level 2 (not as arg)" do
 
       given_screen do
         argv 'compo2', 'compo3', '-h'
@@ -153,7 +153,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "ask for help of compound at level 2 (not as THEN as arg)", wip: true do
+    context "ask for help of compound at level 2 (not as THEN as arg)" do
 
       given_screen do
         argv 'compo2', '-h', 'compo3'
@@ -180,8 +180,8 @@ module Skylab::Zerk::TestSupport
 
       sect = section :usage
       same = 'compo2'
-      sect.should have_first_usage_line_of same
-      sect.should have_second_usage_line_of same
+      sect.should _have_first_usage_line_of same
+      sect.should _have_second_usage_line_of same
     end
 
     def _jawn_2_upper_desc_is_2
@@ -203,8 +203,8 @@ module Skylab::Zerk::TestSupport
 
       sect = section :usage
       same = 'compo2 compo3'
-      sect.should have_first_usage_line_of same
-      sect.should have_second_usage_line_of same
+      sect.should _have_first_usage_line_of same
+      sect.should _have_second_usage_line_of same
     end
 
     def _jawn_3_upper_desc_is_3
@@ -229,7 +229,11 @@ module Skylab::Zerk::TestSupport
       match_ expectation( :styled, :e, _rx )
     end
 
-    dangerous_memoize :be_first_usage_line_ do
+    def _have_first_usage_line_of s
+      ___be_first_usage_line.for s, self
+    end
+
+    dangerous_memoize :___be_first_usage_line do
 
       o = begin_regex_based_matcher %r(\Ausage: xyzi ([^<]+) <action> \[named args\]$)
       o.line_offset = 0
@@ -238,7 +242,11 @@ module Skylab::Zerk::TestSupport
       o
     end
 
-    dangerous_memoize :be_second_usage_line_ do
+    def _have_second_usage_line_of s
+      ___be_second_usage_line.for s, self
+    end
+
+    dangerous_memoize :___be_second_usage_line do
 
       o = begin_regex_based_matcher %r(\A[ ]{2,}xyzi ([^-]+) -h <action>$)
       o.line_offset = 1

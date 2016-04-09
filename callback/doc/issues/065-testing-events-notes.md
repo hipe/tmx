@@ -70,3 +70,44 @@ the received indentation of the block has been preserved (and some other
 formatting added) so that each still-intact method from this legacy section
 will have a declaration line that is identical to (and reaches back to)
 the received line through the VCS.
+
+
+
+
+## :"future expect vs. expect event"
+
+(this is written on the subject of "future expect")
+
+NOTE - this is "almost" deprecated but not quite: this was written as
+an experimental simplification and re-conception of "expect event"
+(but before "expect event" has its own excellent rewrite). the
+experiment was (and still is) this:
+
+  "what if we queue-up a list of expectations *first*, and then
+   run the test case? as each emission occurs, shift an expectation
+   off the queue and compare it then and there."
+
+this way, as soon as an expectation fails we can inspect the state
+of the SUT at that moment; as opposed to "expect event" which uses
+two other alroithms, the latter of which is:
+
+our favorite way to test emissions now is to run the whole test case
+first, then store all the emissions into a memoized structure that
+is shared across tests. each test tests a small part of the set of
+emissions. this leads to better faster smaller tests at the cost of
+not being able to do the thing explained in the previous paragraph.
+
+but because this is still an interesting question, we are keeping
+this around for now. but it bears mentioning that at writing it is
+used in only two test files (both in [br]).
+
+simplify event testing and (with "future") get immediate response
+
+(previously:)
+
+NOTE - before you do any feature adding or maintence to this file,
+look for ways to integrate it with 'expect-event'. as it is, it is
+so minimal that we have left it separate. but since its inception
+we have overhauled "expect event" so it is now fresher than this.
+(and there is certainly conceptual redundancy between the two.)
+_

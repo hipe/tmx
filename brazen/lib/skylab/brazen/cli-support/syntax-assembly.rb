@@ -5,14 +5,16 @@ module Skylab::Brazen
     class Syntax_Assembly
 
       # session.
+      # (mentee of [#hu-046], which in turn is mentee of s/thing in [ac])
+      #
 
       class << self
 
         def brackets_for_reqity_ opt_req_rest_sym
-          _singleton.__brackets_for_reqity opt_req_rest_sym
+          Brackets_of_arity__[ Arity_of_reqity___[ opt_req_rest_sym ] ]
         end
 
-        def render_as_argument_uninflected_for_arity__ prp  # (with default styling)
+        def render_as_argument_uninflected_for_arity prp  # 1x [ze], 1x here
           _singleton._render_moniker_for_property prp
         end
 
@@ -20,35 +22,35 @@ module Skylab::Brazen
           Singleton___[]
         end
 
+        def for o
+          via o.option_parser, o
+        end
+
         alias_method :via, :new
-        private :new
+        undef_method :new
       end  # >>
 
-      def initialize op, invocation_reflection
+      def initialize option_parser, invocation_reflection
 
-        @_reflection = invocation_reflection
-        @_option_parser = op
+        @formal_action = invocation_reflection
+        @option_parser = option_parser
       end
 
       def render_main_syntax_string_didactically
-
-        @_parts = []
-        ___add_invocation_string_parts
-        __add_parts_from_option_parser
-        __add_didactic_parts_for_arguments
-        s_a = remove_instance_variable :@_parts
-        if s_a.length.nonzero?
-          s_a.join SPACE_
-        end
+        s = ""
+        express_main_syntax_string_didactically_into s
+        s.length.nonzero? && s
       end
 
-      def ___add_invocation_string_parts
+      def express_main_syntax_string_didactically_into y
 
-        s = @_reflection.subprogram_name_string
-        if s
-          @_parts.push s
-        end
-        NIL_
+        @_add_word = :__add_first_word
+
+        @y = y
+        _add_any_word @formal_action.subprogram_name_string
+        __express_option_parser
+        __express_arguments
+        remove_instance_variable :@y
       end
 
       # -- from & of option-parser
@@ -57,7 +59,7 @@ module Skylab::Brazen
 
         look_for = "--#{ prp.name.as_slug }"
 
-        found = @_option_parser.top.list.detect do | sw |
+        found = @option_parser.top.list.detect do | sw |
           look_for == sw.long.first
         end
 
@@ -67,11 +69,11 @@ module Skylab::Brazen
         end
       end
 
-      def __add_parts_from_option_parser
+      def __express_option_parser
 
         # :+#experimental: :+#public-API-for-custom-option-parsers
 
-        op = @_option_parser
+        op = @option_parser
         if op
           if op.respond_to? :main_syntax_string_parts
             ___when_custom_option_parser
@@ -79,22 +81,31 @@ module Skylab::Brazen
             __when_standard_libraryesque_option_parser
           end
         end
-        remove_instance_variable :@_option_parser
+        remove_instance_variable :@option_parser
         NIL_
       end
 
       def ___when_custom_option_parser
 
-        s_a = @_option_parser.main_syntax_string_parts
+        s_a = @option_parser.main_syntax_string_parts
         if s_a
-          @_parts.concat s_a
+          s_a.each do |s|
+            send @_add_word, s
+          end
         end
         NIL_
       end
 
       def __when_standard_libraryesque_option_parser
 
-        @_option_parser.top.list.each do | sw |
+        ___each_stdlib_optparse_part do |s|
+          send @_add_word, s
+        end
+      end
+
+      def ___each_stdlib_optparse_part
+
+        @option_parser.top.list.each do | sw |
 
           s = sw.short.first
           if ! s
@@ -103,9 +114,9 @@ module Skylab::Brazen
           if SHORT_HELP == s
             next
           end
-          s_ = ___add_parts_for_option_parser_switch sw
-          if s_
-            @_parts.push s_
+          s = ___add_parts_for_option_parser_switch sw
+          if s
+            yield s
           end
         end
         NIL_
@@ -191,21 +202,18 @@ module Skylab::Brazen
 
       # -- arguments
 
-      def __add_didactic_parts_for_arguments
+      def __express_arguments
 
-        arg_a = @_reflection.didactic_argument_properties
+        arg_a = @formal_action.didactic_argument_properties
 
         if arg_a
           Require_fields_lib_[]
-          arg_a.each do | prp |
-            s = ___render_as_argument prp
-            if s
-              @_parts.push s
-            end
+          arg_a.each do |prp|
+            _add_any_word ___render_as_argument prp
           end
         end
 
-        remove_instance_variable :@_reflection
+        remove_instance_variable :@formal_action
 
         NIL_
       end
@@ -252,10 +260,25 @@ module Skylab::Brazen
         "#{ _ }#{ s }#{ __ }"
       end
 
-      def __brackets_for_reqity opt_req_rest_sym
+      # --
 
-        Brackets_of_arity__[ Arity_of_reqity___[ opt_req_rest_sym ] ]
+      def _add_any_word s
+        if s
+          send @_add_word, s
+        end
+        NIL_
       end
+
+      def __add_first_word s
+        @_add_word = :___add_subsequent_word
+        @y << s ; nil
+      end
+
+      def ___add_subsequent_word s
+        @y << SPACE_ << s ; nil
+      end
+
+      # ==
 
       Arity_of_reqity___ = {
         opt: :zero_or_one,

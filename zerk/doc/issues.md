@@ -1,8 +1,14 @@
+[#035] #oepn help screens for primitivesques??
+
+[#034]       niCLI is not long-running
+
 [#033]       #API-point the expression of order of nodes for any one UI
              (A) isomorphed directly from the deep order and (for now)
              (B) must be the same order for all modalities (for now)
 
 [#032] #wish maybe one day in niCLI style `<foo-bar>` as `--foo-bar`
+             (NOTE - this is have done. when it is an argument it
+             "knows" it is an argument. but as for option..)
 
 [#031]       [ track operation dependency customization as a feature ]
 
@@ -27,7 +33,9 @@
 [#019]     #track flags in o.p
 [#018]     #track if you really wanted duplicate names
 [#017]     #track the will to change this (in-situ) tailor-made option parsers
-[#016]     #track operation-specific parameters (as they pertain to niCLI)
+
+[#016]       "bespoke" explained in [#027]
+
 [#015]       option parsing..
 [#014]       [ flowcharts for CLI syntax ]
 [#013]       [ index ]

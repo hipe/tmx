@@ -4,6 +4,8 @@ module Skylab::Zerk
 
     class Stack_Frame__  # code-notes in [#024]
 
+      # properieter: only the core niCLI node, which builds only a Root.
+
       # for implementing the linked list as described at "why linked list",
       # 3 classes for the 3 kinds of stack frames: root, non-root compound,
       # and formal operation. a complete "selection stack" will always have
@@ -17,7 +19,7 @@ module Skylab::Zerk
 
       Compound_Frame__ = ::Class.new self
 
-      class Root___ < Compound_Frame__
+      class Root < Compound_Frame__
 
         def initialize cli, acs
           @CLI = cli
@@ -45,6 +47,10 @@ module Skylab::Zerk
           @CLI.build_expressible_program_name_string_array__
         end
 
+        attr_reader(
+          :CLI,  # #spot-1
+        )
+
         def name
           NOTHING_
         end
@@ -54,7 +60,11 @@ module Skylab::Zerk
         end
       end
 
+      NonRoot_Methods__ = ::Module.new
+
       class NonRootCompound___ < Compound_Frame__
+
+        include NonRoot_Methods__
 
         def initialize former_top, qk
 
@@ -88,10 +98,6 @@ module Skylab::Zerk
           s
         end
 
-        def subprogram_name_slug_  # :#here
-          name.as_slug
-        end
-
         def name
           @_association.name
         end
@@ -99,18 +105,35 @@ module Skylab::Zerk
 
       class Operation___ < self
 
+        include NonRoot_Methods__
+
         def initialize former_top, fo
+
           @formal_operation_ = fo
           @next_frame_ = former_top
+          @_sns = nil
         end
+
+        def operation_syntax_
+          @___os ||= Here_::Operation_Syntax___.new self
+        end
+
+        def syntax__  # assert-esque is already determined
+          @___os
+        end
+
+        def to_defined_formal_parameter_stream__
+          @formal_operation_.to_defined_formal_parameter_stream
+        end
+
+        def has_stated_parameters__
+          @formal_operation_.has_defined_formal_parameters
+        end
+
+        # --
 
         def description_proc_
           @formal_operation_.description_proc
-        end
-
-        def subprogram_name_slug_
-          # (copy-pasted from #here rather than have a "non-root" module)
-          name.as_slug
         end
 
         def name
@@ -126,13 +149,28 @@ module Skylab::Zerk
         end
       end
 
+      module NonRoot_Methods__
+
+        def build_program_name_string_array_
+
+          s_a = @next_frame_.expressible_program_name_string_array_
+          s_a.push subprogram_name_slug_
+          s_a
+        end
+
+        def subprogram_name_slug_
+          name.as_slug
+        end
+      end
+
       # --
 
       class Compound_Frame__
 
         def initialize acs
           @ACS = acs
-          @_did_operation_index = false
+          @_did_big_index = false
+          @_sns = nil
         end
 
         # --
@@ -177,7 +215,7 @@ module Skylab::Zerk
         # --
 
         def lookup_and_attach_frame__ token, set_sym, & oes_p
-          fn = Lookup__[ token, set_sym, self, & oes_p ]
+          fn = Lookup__.new( token, set_sym, self, & oes_p ).execute
           if fn
             send ATTACH_FOR___.fetch( fn.formal_node_category ), fn
           else
@@ -186,7 +224,7 @@ module Skylab::Zerk
         end
 
         def lookup_formal_node__ token, set_sym, & oes_p
-          Lookup__[ token, set_sym, self, & oes_p ]
+          Lookup__.new( token, set_sym, self, & oes_p ).execute
         end
 
         ATTACH_FOR___ = {
@@ -216,81 +254,47 @@ module Skylab::Zerk
           ACS_::Interpretation::Touch[ asc, _reader ]
         end
 
-        def for_invocation_read_atomesque_value_ asc
-          _reader.read_value asc
-        end
-
-        def streamer_for_navigational_nodes_  # [#030] defines "navigational"
+        def streamer_for_navigational_node_tickets_  # [#030] defines "navigational"
 
           method :to_navigational_node_ticket_stream_
         end
 
         def to_navigational_node_ticket_stream_
 
-          @_did_operation_index || _do_operation_index
+          @_did_big_index || _do_big_index
 
-          Callback_::Stream.via_nonsparse_array @__cached_navigational_nodes
+          Callback_::Stream.via_nonsparse_array @__navigational_NTs
         end
 
-        def to_association_stream_for_option_parser___
+        def to_referenceable_node_ticket_stream__
 
-          # if we went over this once before for a fuzzy lookup then use the
-          # cached array. otherwise build it fresh BE CAREFUL!
+          @_did_big_index || _do_big_index
 
-          if @_did_operation_index
-            self._A
-          end
-
-          o = @_reader.to_non_operation_node_ticket_streamer
-          # will #mask
-          o.execute.map_reduce_by do |fn|
-            asc = fn.association
-            if Association_qualified_for_OP___[ asc ]
-              asc
-            end
-          end
+          Callback_::Stream.via_nonsparse_array @__referenceable_NTs
         end
 
-        Association_qualified_for_OP___ = -> asc do
+        def _do_big_index  # we avoid this #"heavy lift" when possible..
 
-          # we want primitivesques (and when we get to them, entitesques mabye [#021])
-          # we do this blacklist-based instead of whitelist-based here,
-          # to keep this open at this point
+          @_did_big_index = ACHIEVED_
 
-          :compound != asc.model_classifications.category_symbol
-        end
-
-        def to_invocative_node_ticket_stream_
-
-          # a #hook-in for the agnostic invocation facility, when you're a
-          # compound frame and it is trying to index you, what do you give
-          # it?
-
-          @_did_operation_index || _do_operation_index
-          Callback_::Stream.via_nonsparse_array @__cached_primitivesque_nodes
-        end
-
-        def _do_operation_index  # we avoid this #"heavy lift" when possible..
-
-          @_did_operation_index = ACHIEVED_
-
-          for_op = nil
-          for_ss = nil
+          navs = nil
+          refs = nil
 
           nt = nil  # [#030]
 
           which2 = {
             compound: -> do
-              ( for_ss ||= [] ).push nt
+              ( navs ||= [] ).push nt
             end,
             primitivesque: -> do
-              ( for_op ||= [] ).push nt
+              ( refs ||= [] ).push nt
             end,
           }
 
           which = {
             operation: -> do
-              ( for_ss ||= [] ).push nt
+              ( navs ||= [] ).push nt
+              ( refs ||= [] ).push nt
             end,
             association: -> do
               _ = nt.association.model_classifications.category_symbol
@@ -298,8 +302,7 @@ module Skylab::Zerk
             end,
           }
 
-          _stmr = _reader.to_node_ticket_streamer
-          st = _stmr.execute
+          st = _reader.to_node_ticket_streamer.execute
           begin
             nt = st.gets
             nt or break
@@ -307,13 +310,48 @@ module Skylab::Zerk
             redo
           end while nil
 
-          @__cached_navigational_nodes = for_ss || EMPTY_A_
-          @__cached_primitivesque_nodes = for_op || EMPTY_A_
-
+          @__navigational_NTs = navs || EMPTY_A_
+          @__referenceable_NTs = refs || EMPTY_A_
           NIL_
         end
 
-        # --
+        # == simple reader interface
+
+        # ~ association - value / formal node
+
+        def for_invocation_read_atomesque_value_ asc
+          _reader.read_value asc
+        end
+
+        def __association_via_name_symbol sym
+          _reader.read_association sym
+        end
+
+        # ~ formal operation - formal node / proc
+
+        def build_formal_operation_via_node_ticket_ nt  # should be 2x, is 1 for nau
+
+          _fo_p = _fo_proc_via_name_symbol nt.name_symbol
+
+          _formal_operation_via_formal_operation_proc _fo_p, nt.name
+        end
+
+        def _formal_operation_via_formal_operation_proc fo_p, nf=nil
+
+          a = _build_frame_stack_from_bottom
+          if nf
+            a.push nf
+          else
+            a.push NIL_  # use [#as-030] to discover name
+          end
+          fo_p[ a ]  # can be nil but ignore this fact for now..
+        end
+
+        def _fo_proc_via_name_symbol sym
+          _reader.read_formal_operation sym
+        end
+
+        # ==
 
         def _reader
           @_reader ||= ___build_reader
@@ -338,11 +376,11 @@ module Skylab::Zerk
 
       # -
 
-        def subprogram_name_string_  # (at writing, for help only)
-          @___sns ||= ___assemble_subprogram_name_string
+        def subprogram_name_string_  # (at writing, only for help (2x))
+          @_sns ||= _assemble_subprogram_name_string
         end
 
-        def ___assemble_subprogram_name_string
+        def _assemble_subprogram_name_string
 
           st = __to_frame_stream_from_bottom
 
@@ -361,13 +399,6 @@ module Skylab::Zerk
 
         def expressible_program_name_string_array_
           @___pnsa ||= build_program_name_string_array_  # caching may not be useful
-        end
-
-        def build_program_name_string_array_
-
-          s_a = @next_frame_.expressible_program_name_string_array_
-          s_a.push name.as_slug
-          s_a
         end
 
         # --
@@ -432,13 +463,6 @@ module Skylab::Zerk
         #       + try to be helpful with an emission
         #       + result is false
 
-        class << self
-          def [] token, set_sym, services, & oes_p
-            oes_p or self._PASS_A_HANDLER  # #todo
-            new( token, set_sym, services, & oes_p ).execute
-          end
-        end  # >>
-
         def initialize token, set_sym, services, & oes_p
           @services = services
           @set_sym = set_sym
@@ -447,14 +471,10 @@ module Skylab::Zerk
         end
 
         def execute
-          did = __resolve_any_node_directly
-          did ||= __resolve_any_node_fuzzily
+          did = __resolve_any_formal_node_directly
+          did ||= __resolve_any_formal_node_fuzzily
           if did
-            if @_formal_node
-              send :"__#{ @set_sym }__and__#{ Normal_category_of_formal_node_[ @_formal_node ] }__"
-            else
-              self._COVER_ME  # because #here
-            end
+            send :"__#{ @set_sym }__and__#{ Formal_node_3_category_[ @_formal_node ] }__"
           else
             did
           end
@@ -487,7 +507,7 @@ module Skylab::Zerk
 
         # -- fuzz
 
-        def __resolve_any_node_fuzzily
+        def __resolve_any_formal_node_fuzzily  # (must init @_formal_node )
 
           # try to match the token fuzzily (but unambiguously) to one of
           # the nodes directly under this frame. if none found, emit a
@@ -511,27 +531,47 @@ module Skylab::Zerk
             svcs._suffixed_context_into_under y, self
           end
 
-          fn = o.execute
-          if fn
-            self._K
-            @_formal_node = fn
-            ACHIEVED_
+          nt = o.execute
+          if nt
+            send INIT_FORMAL_NODE___.fetch( nt.node_ticket_category ), nt
           else
-            fn
+            @_formal_node = nt
+            nt
           end
         end
 
         APPROPRIATE_STREAMER___ = {
-          navigational: :streamer_for_navigational_nodes_,
+          navigational: :streamer_for_navigational_node_tickets_,
+        }
+
+        INIT_FORMAL_NODE___ = {
+          association: :__resolve_formal_node_for_association,
+          operation: :__resolve_formal_node_for_operation,
         }
 
         Node_Name___ = Lazy_.call do
           Callback_::Name.via_human 'node name'
         end
 
+        def __resolve_formal_node_for_operation nt
+
+          _fo_p = nt.proc_to_build_formal_operation
+
+          @_formal_node = @services._formal_operation_via_formal_operation_proc _fo_p
+
+          ACHIEVED_
+        end
+
+        def __resolve_formal_node_for_association nt
+
+          @_formal_node = nt.association
+
+          ACHIEVED_
+        end
+
         # -- direct lookups
 
-        def __resolve_any_node_directly
+        def __resolve_any_formal_node_directly
 
           @_name_symbol = @token.gsub( DASH_, UNDERSCORE_ ).intern
 
@@ -540,7 +580,8 @@ module Skylab::Zerk
         end
 
         def __lookup_as_association
-          fn = @services._reader.read_association @_name_symbol
+
+          fn = @services.__association_via_name_symbol @_name_symbol
           if fn
             @_formal_node = fn
             ACHIEVED_
@@ -550,11 +591,9 @@ module Skylab::Zerk
         end
 
         def __lookup_as_operation
-          fo_p = @services._reader.read_formal_operation @_name_symbol
+          fo_p = @services._fo_proc_via_name_symbol @_name_symbol
           if fo_p
-            a = @services._build_frame_stack_from_bottom
-            a.push NIL_  # use [#as-030] to discover name
-            @_formal_node = fo_p[ a ]  # can be nil but ignore this fact for now.. :#here
+            @_formal_node = @services._formal_operation_via_formal_operation_proc fo_p
             ACHIEVED_
           else
             fo_p

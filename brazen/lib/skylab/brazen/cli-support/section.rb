@@ -154,7 +154,7 @@ module Skylab::Brazen
         @_message_yielder_callback[ _y ]
 
         if had_none
-          self._DECIDE_ME
+          NOTHING_  # don't display header. let client know there is none. [ze]
 
         elsif cached_tuple
 
@@ -309,6 +309,7 @@ module Skylab::Brazen
 
       HEADER_COLON__ = ': '
       HEADER_COLON_LENGTH___ = HEADER_COLON__.length
+      NOTHING_ = nil
     end
 
     class Section::Boundarizer

@@ -61,7 +61,7 @@ provide re-use.
 
 (writing this leads us to consider that maybe a formal operation "wants
 to be" a compound node.. pehaps that is the unseen force pulling at us
-with all of this here..)
+with all of this here.. :#here)
 
 
 
@@ -71,18 +71,41 @@ with all of this here..)
 whereas [ac] has its own facilty for interpreting/inferring formal
 parameters, the [ze] will do so in this way:
 
-  1) every formal operation defines a :#scope-set.
+  1) every formal operation belongs to one scope-set (defined here):
 
-     regardless of which "bundled modality" we are in, any formal
-     operation defines a [#031] "selection stack". from this stack
-     we can derive the set of all "atom-esque" component associations
-     and formal operations in those frames. we will refer to this set
-     of nodes as the "scope set" below.
+     every formal operation is (virtually if not actually) associated
+     with a particular kind of [#ac-031] selection stack:
 
-     (this concept is perhaps explored further in [#015].)
+     • there is always at least a root component node. such nodes are
+       always compound, so there is always at least this such frame on
+       the stack.
 
-     (for ease of implementation we may simply derive the scope set as
-     all node names in the selection stack.)
+     • virtually (and so far actually) there is always a top
+       frame that is a special kind of frame for the formal operation.
+       the details of this frame are a concern of the particular modality.
+
+     • as such, such selection stacks are always 2-N items tall.
+
+     • this stack is used for "indexing", and because [#ac-002]:DT3
+       ACS trees should be considered entirely dynamic, this selection
+       stack should be taken to represent an ephemeral "snapshot" of the
+       tree as it stands for the purpose of this invocation, and so
+       should not be memoized or cached beyond this scope.
+
+     as such, every such selection stack sits atop a virtual stack with
+     1-N frames, each frame being compound (i.e wrapping a compound formal
+     node). every such stack defines a scope-set:
+
+     a :#scope-set is a derivative of any all-compound stack. it is the
+     set of all formal nodes within it that are either formal operations
+     or (of the component associations) such nodes that are either
+     primitivesque or compound.
+
+       • an application of this concept becomes important in [#015]
+         niCLI option parsing.
+
+       • as decided by the modality we may simply derive the scope set
+         as being the set of all formal nodes in the selection stack.
 
      B) a formal operation cannot "subtract" nodes from its scope-set.
 
@@ -97,13 +120,21 @@ parameters, the [ze] will do so in this way:
 
 
 
-  2) every formal operation defines a :#stated-set.
+  2) every formal operation defines a :#stated-set:
 
      the stated-set for a given formal operation is:
 
      A) (for proc-implemented formal operations) the set of formal
         parameters as expressed directly by the platform parameters
         of the implementing proc or method of the formal operation.
+
+        for e.g, of this platform proc:
+
+            -> foo, bar { foo + bar }
+
+        the set of formal parameters inferred from it have the names
+        `foo` and `bar`.
+
 
      B) (for non-proc implemented formal operations) the set
         of formals defined by the set of names in its `PARAMETERS`
@@ -129,6 +160,12 @@ parameters, the [ze] will do so in this way:
      we have flip-flopped on this at least twice. it may be a
      misfeature: this is a parameter without a model, so you will have
      to do your own validation. (more on this below and elsewhere.)
+
+     NOTE if your model expresses bespokes, it not presently (nor
+     probably ever) elligible to be expressed under iCLI.
+
+     :[#016]
+
 
 
 
@@ -190,7 +227,7 @@ invocation to invocation the entire structure of the ACS can change, so
 there is little use in trying to preserve *anything* in between
 invocations.. (but just in case, we'll tag this sentiment with #[#ac-023].)
 
-*while* we are resolving nodes (operations or atom-esques) that are
+*while* we are resolving nodes (operations or primitivesques) that are
 requisites for this one invocation (and keep in mind we resolve these
 recursively), we will make sure we don't cycle while resolving them. so
 the index structure for one stack frame exists one-to-one with such a
@@ -202,11 +239,11 @@ the frame. this way we have a shorcut index to where each node is
 defined.
 
 (sidebar: an intentional side-effect of the above is that the name of an
-atom-esque node must be unique in the context every selection stack
+primitivesque node must be unique in the context every selection stack
 it could be in. i.e.: from any stack frame (compound node), take the
 1-N frames that include it and each of its parent frames up to the root
-frame. every atom-esque node in this set of frames must have a name that
-is distinct from every other atom-esque node in the set of atom-esque
+frame. every primitivesque node in this set of frames must have a name that
+is distinct from every other primitivesque node in the set of primitivesque
 nodes in this stack of frames.)
 
 with such an index we can look up parameter value knownness from the
@@ -220,7 +257,9 @@ calculate (3) and (4).
 ## :"Crazytimes"
 
 this is a first stab at at algorithm for how we can assemble the kinds
-of expressions we want to express when there are "deep unavailabilities":
+of expressions we want to express when there are "deep unavailabilities".
+
+(we now try to honor our [#030] unified language in the below.)
 
 1) each time we "enter into" the act of trying to "solve" a formal
    operation (either that of the top of the selection stack or any one of
@@ -230,11 +269,11 @@ of expressions we want to express when there are "deep unavailabilities":
    • assumptions: all dependency graphs from all well-formed ACS's don't
      cycle. all branch nodes of such graphs correspond to operations
      (and vice-versa). all leaf nodes of such graphs correspond to
-     atom-esque nodes (and let's just say vice-versa for now).
+     primitivesque nodes (and let's just say vice-versa for now).
 
    • terminology: we'll call every branch node / formal operation that
-     is *not* the "entrypoint formal operation" an "ancillary operation"
-     (or just "ancillary" for short).
+     is *not* the "entrypoint formal operation" is an
+     "operation-dependency".
 
 
 
@@ -247,36 +286,97 @@ of expressions we want to express when there are "deep unavailabilities":
    of the algorithms..)
 
    the resolution of any formal operation as far as we're concerned is
-   in the act of resolving its 0-N defined parameters, and then (if this
+   in the act of resolving its 0-N stated parameters, and then (if this
    works) the act of executing the operation.
 
-   each formal parameter is either a formal operation (a.k.a branch node,
-   a.k.a "operation-dependency") or an atom-esque (a leaf node0.
-   as a distinct classification, each formal parameter is either required
-   or optional.
+   each stated parameter has at least the following three axes of
+   categorization, the derivation of which may relate to each other but in
+   the end amount to exactly three ~[#hu-003] "exponents" that describe this
+   stated parameter, one for each of these three axes of categorization:
 
-   what we'll refer to as "solving" is the general act of resolving a value
-   for the parameter. in the case of formal operations, "solving" such a node
-   means solving (recursively) each of its 0-N defined parameters, and then
-   executing the operation without failing.
+   A) is the "sharedness" of this formal parameter:
 
-   for atom-esques, what we'll refer to as "solving" is the case of the
-   parameter having a known value that is non-nil.
+      as introduced above, the stated parameter is either in the
+      #socialist-set or the #bespoke-set. when latter, we will say that
+      the stated parameter is `bespoke`. when the former, this parameter
+      is in effect a reference to some formal node in the scope stack with
+      possibly some customization added. as such we call it an
+      "appropriation" (or say it's "appropriated" or "appropriative" as
+      linguistically (er..) appropriate.) the possibility of cusomtization
+      is why we don't just say "shared" or "socialist", as we will explore
+      further at (C) below.
 
-   for what we'll call "operation-dependencies", how we evaluate them
-   is the subject of the next numbered section after this one; however
-   what we do with their classification is referenced here:
+      so the exponents of this category are `appropriated` or `bespoke`.
+
+
+   B) is a categorization that we might call the "shape":
+
+      this set of exponents can be arrived at as being the unique set of
+      the non-distinct leaf node exponents of this taxonomic (and perhaps
+      logical) tree:
+
+      if the stated parameter is `appropriated` (per (A)),
+
+        • use its "formal node category"; that is, it's either a
+          "formal operation", a "compound" or a "primitivesque".
+
+          * if compound, see #"why we do not appropriate compound nodes" below
+
+      otherwise (and it's `bespoke`),
+        • treat this formal parameter as "primitivesque".
+
+      so the exponents of this category are "formal operation" and
+      "primitivesque".
+
+
+   C) is the "requiredness" of this formal parameter: it is either
+      required or optional.
+
+      the meaning, representation and handling of this meta-attribute is
+      perhaps identical to those in the other implementation in this family
+      strain of algorithms; namely that if an actual value is effectively
+      unknown for a required formal parameter, the operation is
+      effectively unavailable.
+
+      the value here comes from the formal operation itself: even if this
+      formal parameter is an "appropriated" formal node, its "requiredness"
+      is a characteristic that only has meaning in the scope of this
+      particular formal operation. i.e the "requiredness" of the same
+      appropriated formal node can vary from formal operation to formal
+      operation.
+
+   let "solving" mean the act of resolving a value for a parameter.
+   for each stated parameter,
+
+     assume we know its "sharedness", "shape", and "requiredness".
+
+     if the shape is "primitivesque",
+       an actual value is "solved" for this stated parameter if
+       it has a known value that is non-nil.
+       (for now we glossing over appropriated vs. bespoke..)
+
+     otherwise (and the shape is "formal operation"),
+
+       solving such a stated parameter means solving (recursively) each
+       of *its* 0-N stated parameters, and then executing the operation
+       without failing.
+
+   the second branch of the above IF-ELSE pseudocode is what we'll call
+   an "operation-dependency", that is it's when an operation depends on
+   another operation. how we evaluate these is the subject of (3),
+   however what we do with their classification is referenced here:
 
    in pseudocode,
-       autovivify a "reason list" as needed.
+
+       we will autovivify a "reason list" as needed:
        this operation will have failed to solve IFF
        the reason list was created (i.e is nonzero in length).
 
        for each node in the "stated set" (actually a list),
 
-         classify this node accoding to the logic in the next
-         numbered section (extrapolate treatment of atomic nodes
-         from what is described for operation-dependencies) and:
+         classify this node accoding to the pseudocode in (3)
+         (extrapolate treatment of primitivesque nodes from what is
+         described for operation-dependencies) and:
 
            when failed
              add an appropriate reason to the reason list
@@ -290,7 +390,7 @@ of expressions we want to express when there are "deep unavailabilities":
           we have failed. the reason list is our significant result.
         otherwise
           we have succeeded. "the store" is our significant result.
-        end
+        _
 
 
 
@@ -302,12 +402,11 @@ of expressions we want to express when there are "deep unavailabilities":
    a candidate for a future unification of that trail. but currently there
    is so much specialization that that prospect is daunting.)
 
-   what to do in the case of failure *of* an ancillary operation was an
+   what to do in the case of failure *of* an operation-dependency was an
    area of mystery for a while. now we have this theoretical answer:
 
    all relevant in-conditions to this problem are in terms of categories
-   describing the classification and evaluation of the (operation-)
-   dependency:
+   describing the classification and evaluation of the operation-depdency:
 
      • the dependency itself is either required or optional (exactly one).
 
@@ -326,7 +425,8 @@ of expressions we want to express when there are "deep unavailabilities":
 
      • you FAIL IFF ANY OF:
 
-       • the dependency is required and it had missing dependencies
+       • the dependency is required and it had missing
+         required dependencies of its own.
 
        • the dependency (required or optional) met its
          dependencies but failed on execution.
@@ -340,8 +440,7 @@ of expressions we want to express when there are "deep unavailabilities":
        • the dependency (required or optional) met its dependencies
          and succeeded on execution.
 
-    as a "guarantee" that all relevant cases are covered correctly, we
-    re-arrange the above as a permutations table (like a rule table):
+    to re-arrange the above as a permutations table (like a rule table):
 
         if..          | and..                   | then:
         deps not met  |      was required       |  FAIL
@@ -367,7 +466,27 @@ of expressions we want to express when there are "deep unavailabilities":
 
 
 
-## (disjoint comments)
+## :"why we do not appropriate compound nodes"
+
+to try and appropriate as formal parameter a formal node that is "compound",
+this is now and probably always will be undefined: this is the "wrong" way
+for an operation to reach a compound node (by this selfsame decree):
+
+the set of all compound nodes available to an operation is exactly its
+selection stack, and so in the interest of a streamlined API, access to
+an entire compound node should be in this manner. in practice, it is not
+something that we have wanted, probably because it doesn't "make sense"
+for an operation to need a compound node, probably because compound
+nodes are typically container objects that are just semantic groupings of
+operations and primitivesques that "seem related" as opposed to being a
+descrete, definite "thing" in themselves.
+
+(but note if we indludged this thought #here it would change all this.)
+
+
+
+
+## "continuations" (code-specific, disjoint with each other.)
 
 ### :#"c1"
 

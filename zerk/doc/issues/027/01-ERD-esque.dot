@@ -1,11 +1,13 @@
 digraph g {
 
-  pbc[label="procure\nbound call"]
-  bi[label="big\nindex"]
-  si[label="scope\nindex"]
-  bs[label="build\nstate"]
+  bs [label="build\nstate"]
+  ep [label="evaluation\nproc"]
+  oi [label="operation\nindex"]
+  pbc [label="procure\nbound call"]
 
-  pbc->bi [label="needs and/or\nbuilds"]
-  bi->bs [label="builds"]
-  bi->si [label="needs and/or\nbuilds"]
+  bs->oi [label="built\nwith"]
+  bs->ep [label="built\nsoley by"]
+  bs->pbc [label="built\nwith"]
+  ep->pbc [label="built\nwith"]
+  ep->oi [label="built\nwith"]
 }

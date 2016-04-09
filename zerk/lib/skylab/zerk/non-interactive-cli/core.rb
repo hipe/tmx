@@ -21,9 +21,6 @@ module Skylab::Zerk
         new.init_as_prototype_
       end
 
-      def option_parser_WIP_  # keep track
-      end
-
       private :new
     end  # >>
 
@@ -68,7 +65,7 @@ module Skylab::Zerk
 
       _p = remove_instance_variable :@_root_ACS_proc
       _acs = _p.call( & @_oes_p )
-      @_top = Here_::Stack_Frame__::Root___.new self, _acs
+      @_top = Here_::Stack_Frame__::Root.new self, _acs
       self
     end
 
@@ -131,7 +128,7 @@ module Skylab::Zerk
         x = ___procure_current_navigational_formal_node
         x or break
 
-        x = send PARSE___.fetch( Normal_category_of_formal_node_[ x ] ), x
+        x = send PARSE___.fetch( Formal_node_3_category_[ x ] ), x
         x or break
 
         if x.loop_again
@@ -193,36 +190,35 @@ module Skylab::Zerk
 
     def __parse_found_operation fo
 
-      @_top = @_top.attach_operation_frame_via_formal_operation_ fo  # #push
-      @_fo_frame = @_top
+      fo_frame = @_top.attach_operation_frame_via_formal_operation_ fo
+
+      @_fo_frame = fo_frame  # redundant ivar w/ below for sanity
+      @_operation_syntax = fo_frame.operation_syntax_
+      @_top = fo_frame  # #push
+
       @_arg_st.advance_one
 
-      if @_arg_st.no_unparsed_exists
-        _parsed_OK
-      else
-        ___parse_using_option_parser
-      end
+      kp = __maybe_parse_opts
+      kp &&= __maybe_parse_args
+      kp && _parsed_OK  # t11
     end
 
     # --
 
-    def ___parse_using_option_parser
+    def __maybe_parse_opts
 
-      _pp = -> asc do
-        __build_emission_handler_contextualized_for_atomesque asc
-      end
+      # if the argument stream is empty, avoid the heavy lift of building o.p
 
-      _opc = Here_::Option_Parser_Controller___.new @_fo_frame, self, & _pp
-
-      argv = @_arg_st.flush_remaining_to_array
-
-      keep_parsing = _opc.parse__ argv
-      if keep_parsing
-        argv.length.zero? or self._SANITY
-        _parsed_OK  # t11
+      if @_arg_st.no_unparsed_exists  # then is empty
+        KEEP_PARSING_
       else
-        keep_parsing
+        ___parse_opts
       end
+    end
+
+    def ___parse_opts
+
+      @_operation_syntax.parse_opts__ _ARGS_AS_ARGV, self, & _parse_pp
     end
 
     def when_via_option_parser_parse_error__ e  # t8
@@ -230,19 +226,12 @@ module Skylab::Zerk
     end
 
     def when_via_option_parser_component_rejected_request__
-      _done_because :option
-      init_exitstatus_for_ :_component_rejected_request_
-    end
-
-    def when_via_option_parser_extra_args__ argv  # t9
-      if 1 < argv.length
-        s = 's' ; dd  = ' [..]'
-      end
-      _msg = "unexpected argument#{ s }: \"#{ argv.first }\"#{ dd }"
-      _done_because _msg, :argument
+      _done_because :_component_rejected_request_, :option
     end
 
     def when_via_option_parser_help_was_requested__ any_s
+
+      _ARGS_AS_STREAM  # convert back, because help wants us in that state eew
       _FAKE_MATCHDATA = { eql: any_s }  # ..
       Here_::When_Help_[ _FAKE_MATCHDATA, self ]
       STOP_PARSING_
@@ -250,7 +239,101 @@ module Skylab::Zerk
 
     # --
 
-    def __build_emission_handler_contextualized_for_atomesque assoc
+    def __maybe_parse_args
+
+      @__bespoke_values_box = nil  # ivar must be set
+
+      os = @_operation_syntax
+
+      if os.has_formal_arguments__
+        _ARGS_AS_ARGV  # convert if necessary
+        _argv = remove_instance_variable :@_argv  # this is the end of the line
+        _ok = os.parse_arguments__ _argv, self, & _parse_pp
+        _ok
+      else
+        _ARGS_AS_STREAM  # convert it back, in case o.p converted it..
+        if @_arg_st.no_unparsed_exists
+          remove_instance_variable :@_arg_st
+          ACHIEVED_
+        else
+          __when_extra_args_native
+        end
+      end
+    end
+
+    def when_via_argument_parser_component_rejected_request__
+
+      _done_because :_component_rejected_request_, :argument
+    end
+
+    def when_via_argument_parser_extra__ ev
+
+      _when_extra_arg ev.x
+    end
+
+    def __when_extra_args_native  # t9
+
+      s = @_arg_st.gets_one
+
+      _yes = ! @_arg_st.no_unparsed_exists
+
+      _when_extra_arg s, _yes
+    end
+
+    def when_via_argument_parser_missing__ ev
+
+      _moniker = Remote_CLI_lib_[]::Syntax_Assembly.
+        render_as_argument_uninflected_for_arity ev.property
+
+      _msg = expression_agent.calculate do
+        "missing required argument #{ highlight _moniker }"
+      end
+
+      _done_because _msg, :missing_required_parameters, :argument
+    end
+
+    def _when_extra_arg extra_s, has_more=false
+
+      if has_more
+        ellipsis = ' [..]'
+        s = 's'
+      end
+
+      _msg = "unexpected argument#{ s }: \"#{ extra_s }\"#{ ellipsis }"
+      _done_because _msg, :argument
+    end
+
+    def store_bespoke_value__ qkn
+      _ = ( @__bespoke_values_box ||= Callback_::Box.new )
+      _.add qkn.name_symbol, qkn
+      NIL_
+    end
+
+    # --
+
+    # both stdlib o.p and our "classic" argument parser require a plain old
+    # array as input as opposed to the (superior) polymorphic stream we use
+    # internally. whether or not we engage one, the other, none or both o.p
+    # and args parsing depends on both formal syntax and actual arguments.
+    # so the "easiest" way to avoid extraneous flip-flops between array and
+    # stream is with this below nastiness which we hate, which is why it is
+    # in shoutcase (:#here):
+
+    def _ARGS_AS_STREAM
+      @_arg_st ||= Callback_::Polymorphic_Stream.via_array( remove_instance_variable :@_argv )
+    end
+
+    def _ARGS_AS_ARGV
+      @_argv ||= remove_instance_variable( :@_arg_st ).flush_remaining_to_array
+    end
+
+    def _parse_pp
+      @___ppp ||= method :___build_handler_contextualized_for_primitivesque
+    end
+
+    # --
+
+    def ___build_handler_contextualized_for_primitivesque assoc
 
       # (we like to hope that this is called IFF the component is sure
       # it's going to emit something.)
@@ -288,17 +371,23 @@ module Skylab::Zerk
 
     def _parsed_OK
 
-      # NOTE that we do not pass the real argument stream to parse, but
-      # rather only an empty stream. this is because the [#014] premise
-      # is that parameters are only ever parsed by the whole tree.
-      #
-      # were it for [#016] operation-specific parameters, maybe they should
-      # have already been parsed by now by the o.p. we could get crazy with
-      # the syntax of those, but why.
+      # way downstream, somehow a session will arrange one parameter value
+      # for every stated parameter (more or less) so that it can call the
+      # operation implementation (imagine a proc). for those values that live
+      # in the ACS tree ("appropriated"), this is managed elsewhere. but for
+      # those values that do not (because they are "bespoke"), here is where
+      # we pass them:
+
+      bx = remove_instance_variable :@__bespoke_values_box
+
+      if bx
+        _pvs = Here_::Argument_Parser_Controller_::Parameter_Value_Source_via_Box.new bx
+      else
+        _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
+        # (nothing more to add. everything went from options into the tree.)
+      end
 
       _fo = @_fo_frame.formal_operation_
-
-      _pvs = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
 
       call_oes_p = -> * i_a, & ev_p do
         :error == i_a.first and self._RECONSIDER_readme
@@ -311,6 +400,12 @@ module Skylab::Zerk
       end
 
       o = Home_::Invocation_::Procure_bound_call.begin_ _pvs, _fo, & _pp
+
+      _ = @_operation_syntax.existent_operation_index__
+      unless _
+        self._COVER_ME  # #todo
+      end
+      o.operation_index = _
 
       whenner = nil
 
@@ -328,10 +423,6 @@ module Skylab::Zerk
         whenner.finish
         bc
       end
-    end
-
-    def operation_frame_
-      @_fo_frame
     end
 
     def release_selection_stack__
@@ -356,13 +447,21 @@ module Skylab::Zerk
 
     # -- finishing behavior & loop control constants
 
-    def _done_because msg=nil, bc_sym
+    def _done_because msg=nil, es_sym=:_parse_error_, bc_sym
 
-      init_exitstatus_for_ :_parse_error_
+      if msg.respond_to? :id2name
+        es_sym = msg
+        msg = nil
+      end
+
       if msg
         line_yielder << msg
       end
-      express_stack_invite_( * ( [ :because, bc_sym ] if bc_sym ) )
+
+      express_stack_invite_ :because, bc_sym
+
+      init_exitstatus_for_ es_sym
+
       STOP_PARSING_
     end
 
@@ -499,6 +598,10 @@ module Skylab::Zerk
 
     # -- emission handing support
 
+    def on_event_selectively__
+      @_oes_p
+    end
+
     def on_ACS_emission_ * i_a, & ev_p
       handle_ACS_emission_ i_a, & ev_p
     end
@@ -566,6 +669,8 @@ module Skylab::Zerk
       Exit_status_for___[ _sym_ ]
     end
 
+    # ==
+
     Exit_status_for___ = -> do
       _OFFSET = 6  # generic erorr (5) + 1
       p = -> kk do
@@ -589,9 +694,18 @@ module Skylab::Zerk
       end
     end.call
 
-    # --
+    # ==
 
-    Normal_category_of_formal_node_ = -> fn do  # might become :[#ac-034].
+    Node_ticket_3_category_ = -> nt do  # see #here.
+
+      if :operation == nt.node_ticket_category
+        :operation
+      else
+        nt.association.model_classifications.category_symbol
+      end
+    end
+
+    Formal_node_3_category_ = -> fn do  # might become :[#ac-034]. also :#here
 
       if :formal_operation == fn.formal_node_category
         :formal_operation

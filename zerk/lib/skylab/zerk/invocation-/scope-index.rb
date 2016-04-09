@@ -69,12 +69,12 @@ module Skylab::Zerk
 
       # --
 
-      def node_ticket_via_node_name_symbol__ k
+      def node_ticket_via_node_name_symbol_ k
 
         @_all_NTs.fetch @_ntindex_via_name_symbol.fetch k
       end
 
-      def modality_frame_via_node_name_symbol__ k
+      def modality_frame_via_node_name_symbol_ k
 
         @_modality_frames.fetch @_findex_via_ntindex.fetch @_ntindex_via_name_symbol.fetch k
       end

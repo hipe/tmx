@@ -39,14 +39,6 @@ module Skylab::Zerk::TestSupport
         Coarse_Parse.new niCLI_state.lines
       end
 
-      def have_first_usage_line_of s
-        be_first_usage_line_.for s, self
-      end
-
-      def have_second_usage_line_of s
-        be_second_usage_line_.for s, self
-      end
-
       # -- methods that produce predicates (matchers)
 
       def be_description_line_of opt_sym=nil, exp_s
@@ -65,7 +57,13 @@ module Skylab::Zerk::TestSupport
       end
 
       def have_item_pair_of opt_sym=nil, a, b
-        Item_Pair_Matcher___.new opt_sym, a, b, self
+        Item_Pair_Matcher__.new opt_sym, a, b, self
+      end
+
+      def be_item_pair opt_sym=nil, a, b
+        ipm = Item_Pair_Matcher__.new opt_sym, a, b, self
+        ipm.match_line
+        ipm
       end
 
       def be_invite_line_of s
@@ -80,6 +78,16 @@ module Skylab::Zerk::TestSupport
         o.line_offset = 0
         o.styled
         o.subject_noun_phrase = "invite line"
+        o
+      end
+
+      # --
+
+      def have_styled_line_matching rx
+
+        o = Regex_Based_Matcher__.new( rx ).for self
+        o.styled
+        o.match_any_line  # must come after styled
         o
       end
 
@@ -112,49 +120,6 @@ module Skylab::Zerk::TestSupport
 
       def initialize a
         @_a = a
-      end
-
-      def must_have_styled_line_matching rx
-
-        found_non_styled = nil
-        whine = true
-
-        st = to_line_stream
-        begin
-          li = st.gets
-          li or break
-          if li.is_styled
-            if rx =~ li._unstyled_string
-              whine = false
-              break
-            end
-            redo
-          end
-          if rx =~ li.string
-            ( found_non_styled ||= [] ).push li
-          end
-          redo
-        end while nil
-
-        if whine
-          if found_non_styled
-            raise __say_was_not_styled found_non_styled
-          else
-            raise __say_no_line_matching rx
-          end
-        end
-      end
-
-      def __say_was_not_styled a
-        if 1 == a.length
-          "was not styled - #{ a[ 0 ].string.inspect }"
-        else
-          "#{ a.length } lines matched but were not styled"
-        end
-      end
-
-      def __say_no_line_matching rx
-        "no lined matched /#{ rx.source }/ (of #{ @_a.length } line(s))"
       end
 
       def first_line
@@ -227,6 +192,10 @@ module Skylab::Zerk::TestSupport
       def first_string
         @_a.fetch( 0 ).string
       end
+
+      def line_count
+        @_a.length
+      end
     end
 
     # ==
@@ -237,10 +206,12 @@ module Skylab::Zerk::TestSupport
         @_prepare_matchee = :__prepare_matchee_as_is
         @_rx = rx
         @subject_noun_phrase = nil
+        @styled = false
       end
 
       def styled  # so :#here
         @_prepare_matchee = :__prepare_matchee_by_expecting_styled
+        @styled = true
         NIL_
       end
 
@@ -249,11 +220,19 @@ module Skylab::Zerk::TestSupport
         @line_offset = d
       end
 
+      def match_any_line  # must come after styled
+
+        @_match = :__match_any_line
+        if @styled
+          @_prepare_matchee = :__prepare_matchee_by_unstyling_softly
+        end
+      end
+
       attr_writer(
         :subject_noun_phrase,
       )
 
-      def for s, ctx
+      def for s=nil, ctx
         dup.___init_for s, ctx
       end
 
@@ -270,11 +249,48 @@ module Skylab::Zerk::TestSupport
         send @_match
       end
 
+      def __match_any_line
+        d = 0
+        st = @_section.to_line_stream
+        begin
+          @_li = st.gets
+          @_li or break
+          d += 1
+          _attempt_match
+          if @_md
+            found = true
+            x = _result_via_matchdata
+            break
+          end
+          redo
+        end while nil
+        if found
+          x
+        else
+          @_line_count = d
+          @_failure_message_method = :__say_no_line_matching
+          _fail
+        end
+      end
+
       def __match_line_by_offset
         @_li = @_section.line_at_offset @line_offset
-        send @_prepare_matchee  # raises on failure
-        @_md = @_rx.match @_s
+        _attempt_match
         if @_md
+          _result_via_matchdata
+        else
+          @_failure_message_method = :__say_string_didnt_match
+          _fail
+        end
+      end
+
+      def _attempt_match
+        send @_prepare_matchee  # raises on failure
+        @_md = @_rx.match @_s ; nil
+      end
+
+      def _result_via_matchdata
+        if @_first_match_content
           _actual_s = @_md[ 1 ]
           if _actual_s == @_first_match_content
             ACHIEVED_
@@ -283,13 +299,16 @@ module Skylab::Zerk::TestSupport
             _fail
           end
         else
-          @_failure_message_method = :__say_string_didnt_match
-          _fail
+          ACHIEVED_
         end
       end
 
       def failure_message_for_should
         send @_failure_message_method
+      end
+
+      def __say_no_line_matching
+        "no lined matched /#{ @_rx.source }/ (of #{ @_line_count } line(s))"
       end
 
       def __say_string_didnt_match
@@ -307,6 +326,10 @@ module Skylab::Zerk::TestSupport
 
       def __prepare_matchee_by_expecting_styled
         @_s = @_li.unstyled_styled ; nil  # raises
+      end
+
+      def __prepare_matchee_by_unstyling_softly
+        @_s = @_li.unstyled ; nil
       end
 
       def __prepare_matchee_as_is
@@ -327,13 +350,14 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Item_Pair_Matcher___
+    class Item_Pair_Matcher__
 
       def initialize opt_sym, a, b, x
 
         @a_s = a
         @b_s = b
         @_context_x = x
+        @_match = :__match_section
 
         if opt_sym
           send opt_sym
@@ -343,12 +367,20 @@ module Skylab::Zerk::TestSupport
         end
       end
 
+      def match_line
+        @_match = :__match_line ; nil
+      end
+
       def styled
         @_styled = true
         @_init_string = :__init_string_when_maybe_styled ; nil
       end
 
-      def matches? section
+      def matches? x
+        send @_match, x
+      end
+
+      def __match_section section
 
         st = section.to_line_stream
         st.gets
@@ -357,19 +389,13 @@ module Skylab::Zerk::TestSupport
         begin
           @_li = st.gets
           if @_li
-            send @_init_string
-            @_md = PAIR___.match @_s
+            _init_matchdata
             s = @_md[ 1 ]
             if s
               content_line_count += 1
-              if @a_s == @_md[ 1 ]
-                if @b_s == @_md[ 2 ]
-                  found = true
-                  break
-                end
-                @_reason_m = :__say_second_one_didnt_match
-                break
-              end
+              found = _evaluate_content
+              found and break
+              @_reason_m and break
             end
             redo
           end
@@ -379,18 +405,54 @@ module Skylab::Zerk::TestSupport
         end while nil
 
         if found
-          if @_styled
-            if @_li.is_styled
-              true
-            else
-              @_reason_m = :__say_was_not_styled
-              _fail
-            end
-          else
-            true
-          end
+          _when_found_content
         else
           _fail
+        end
+      end
+
+      def __match_line li
+        @_li = li
+        _init_matchdata
+        _ok = _evaluate_content
+        if _ok
+          _when_found_content
+        else
+          @_reason_m ||= :__say_first_one_didnt_match
+          _fail
+        end
+      end
+
+      def _init_matchdata
+        send @_init_string
+        @_md = PAIR___.match @_s ;
+      end
+
+      def _evaluate_content
+        if @a_s == @_md[ 1 ]
+          if @b_s == @_md[ 2 ]
+            @_reason_m = nil
+            ACHIEVED_
+          else
+            @_reason_m = :__say_second_one_didnt_match
+            UNABLE_
+          end
+        else
+          @_reason_m = nil
+          UNABLE_
+        end
+      end
+
+      def _when_found_content
+        if @_styled
+          if @_li.is_styled
+            true
+          else
+            @_reason_m = :__say_was_not_styled
+            _fail
+          end
+        else
+          true
         end
       end
 
@@ -420,6 +482,10 @@ module Skylab::Zerk::TestSupport
 
       def __say_second_one_didnt_match
         "needed #{ @b_s.inspect }, had #{ @_md[ 2 ].inspect }"
+      end
+
+      def __say_first_one_didnt_match
+        "needed #{ @a_s.inspect }, had #{ @_md[ 1 ].inspect }"
       end
 
       def __say_not_found

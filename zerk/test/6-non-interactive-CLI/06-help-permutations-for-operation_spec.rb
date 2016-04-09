@@ -27,6 +27,8 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    # (:#here marks #open [#035] whether we invite after operation help screens)
+
     context "ask for help of operation that is in first frame (as arg)" do
 
       given_screen do
@@ -41,8 +43,8 @@ module Skylab::Zerk::TestSupport
         _jawn_1_first_usage_line
       end
 
-      it "second usage line" do
-        _jawn_1_second_usage_line
+      it "no second usage line" do
+        _no_second_usage_line
       end
 
       it "first description line" do
@@ -53,9 +55,11 @@ module Skylab::Zerk::TestSupport
         _jawn_1_second_description_line
       end
 
-      it "named arguments as items"
+      it "named arguments as items" do
+        _jawn_1_options_section
+      end
 
-      it "invite"
+      it "invite"  # #here
     end
 
     context "ask for help of operation that is at level 2 (as arg)" do
@@ -72,13 +76,15 @@ module Skylab::Zerk::TestSupport
         _jawn_2_first_usage_line
       end
 
-      it "second usage line" do
-        _jawn_2_second_usage_line
+      it "no second usage line" do
+        _no_second_usage_line
       end
 
-      it "named arguments as items"
+      it "named arguments as items" do
+        _jawn_2_options_section
+      end
 
-      it "invite"
+      it "invite"  # #here
     end
 
     context "ask for help of operation that is in first frame (not as arg)" do
@@ -96,7 +102,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "second usage line" do
-        _jawn_1_second_usage_line
+        _no_second_usage_line
       end
 
       it "first description line" do
@@ -106,6 +112,8 @@ module Skylab::Zerk::TestSupport
       it "second description line" do
         _jawn_1_second_description_line
       end
+
+      it "invite"  # #here
     end
 
     context "ask for help of operation that is at level 2 (not as arg)" do
@@ -122,21 +130,23 @@ module Skylab::Zerk::TestSupport
         _jawn_2_first_usage_line
       end
 
-      it "second usage line" do
-        _jawn_2_second_usage_line
+      it "no second usage line" do
+        _no_second_usage_line
       end
 
-      it "named arguments as items"
+      it "named arguments as items" do
+        _jawn_2_options_section
+      end
 
-      it "invite"
+      it "invite"  # #here
+    end
+
+    def _no_second_usage_line
+      2 == section( :usage ).line_count or fail
     end
 
     def _jawn_1_first_usage_line
-      section( :usage ).should have_first_usage_line_of 'ope1'
-    end
-
-    def _jawn_1_second_usage_line
-      section( :usage ).should have_second_usage_line_of 'ope1'
+      section( :usage ).should _have_first_usage_line 'ope1 [-p X]'
     end
 
     def _jawn_1_first_description_line
@@ -150,25 +160,53 @@ module Skylab::Zerk::TestSupport
     end
 
     def _jawn_2_first_usage_line
-      section( :usage ).should have_first_usage_line_of 'compo2 ope2'
+      section( :usage ).should _have_first_usage_line 'compo2 ope2 [-p X]'
     end
 
-    def _jawn_2_second_usage_line
-      section( :usage ).should have_second_usage_line_of 'compo2 ope2'
+    def _jawn_1_options_section
+      _sect = section :options
+      st = _sect.to_line_stream
+      st.gets
+      st.gets
+      _3rd = st.gets
+      _4th = st.gets
+      _3rd.string == "    -p, --primi1 X\n" or fail
+      _4th and fail
     end
 
-    dangerous_memoize :be_first_usage_line_ do
+    def _jawn_2_options_section
+      _sect = section :options
+      st = _sect.to_line_stream
+      st.gets
+      st.gets
+      _3rd = st.gets
+      _4th = st.gets
+      _5th = st.gets
+      _3rd.string == "    -p, --primi2 X\n" or fail
+      _4th.string == "        --primi1 X\n" or fail
+      _5th and fail
+    end
 
-      o = begin_regex_based_matcher %r(\Ausage: xyzi ([^«]+) «NAMED ARGS PLACEHOLDER»$)
+    def _have_first_usage_line s
+      ___be_first_usage_line.for s, self
+    end
+
+    dangerous_memoize :___be_first_usage_line do
+
+      o = begin_regex_based_matcher %r(\Ausage: xyzi (.+)$)
       o.line_offset = 0
       o.styled
       o.subject_noun_phrase = "first usage line"
       o
     end
 
-    dangerous_memoize :be_second_usage_line_ do
+    def _have_second_usage_line_argless_of s
+      ___be_second_usage_line_argless.for s, self
+    end
 
-      o = begin_regex_based_matcher %r(\A[ ]{2,}xyzi ([^-]+) -h <named-arg>$)
+    dangerous_memoize :___be_second_usage_line_argless do
+
+      o = begin_regex_based_matcher %r(\A[ ]{2,}xyzi ([^-]+) -h$)
       o.line_offset = 1
       o.subject_noun_phrase = "second usage line"
       o

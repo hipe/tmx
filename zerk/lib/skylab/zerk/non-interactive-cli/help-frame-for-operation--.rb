@@ -58,23 +58,27 @@ module Skylab::Zerk
 
           def write_syntax_strings_ y
 
-            head = subprogram_name_string
+            # write lines. (each `<<` sends one line.) we write only one
+            # line. (to write a second line explaing help is redundant
+            # because such an explanation appears in the options section.)
 
-            Here_.option_parser_WIP_
-            _args = " «NAMED ARGS PLACEHOLDER»"
+            _ = Remote_CLI_lib_[]::Syntax_Assembly.for self
 
-            expression_agent.calculate do
-              y << "#{ head }#{ _args }"
-              y << "#{ head } -h <named-arg>"
-            end
-            y
+            _ = _.express_main_syntax_string_didactically_into ""
+
+            y << _
+          end
+
+          # -- args (for syntax)
+
+          def didactic_argument_properties
+            @modality_frame_.operation_syntax_.any_argument_attributes_array__
           end
 
           # -- o.p
 
           def option_parser
-            Here_.option_parser_WIP_
-            NOTHING_
+            @modality_frame_.operation_syntax_.option_parser__
           end
 
           # -- items section
@@ -86,7 +90,16 @@ module Skylab::Zerk
           # -- ad-hoc sections
 
           def to_section_stream
-            NOTHING_  # but if you wanted to we could..
+
+            st = @modality_frame_.operation_syntax_.to_any_didactic_argument_item_stream__
+            if st
+
+              _nf = Callback_::Name.via_slug 'argument'
+
+              _section = Callback_::Pair.via_value_and_name st, _nf
+
+              Callback_::Stream.via_item _section
+            end
           end
         end
       end

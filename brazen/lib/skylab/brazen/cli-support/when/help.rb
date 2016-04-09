@@ -223,6 +223,9 @@ module Skylab::Brazen
 
       def __express_other_sections st
 
+        # implement the undocument [#058] - custom help screen section API
+        # (examples in universe are tagged with this identifier..)
+
         exp = @invocation_expression
 
         expag = exp.expression_agent

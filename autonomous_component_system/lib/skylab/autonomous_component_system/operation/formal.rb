@@ -110,6 +110,10 @@ module Skylab::Autonomous_Component_System
         @box ||= Callback_::Box.new
       end
 
+      def __accept__end__meta_component _
+        NOTHING_  # (this keyword exists only so we can have trailing commas)
+      end
+
       attr_reader :box
 
       # ~ for [ze]
@@ -120,6 +124,10 @@ module Skylab::Autonomous_Component_System
 
       def begin_parameter_store & call_handler
         @_normal_representation.begin_parameter_store_( & call_handler )
+      end
+
+      def has_defined_formal_parameters
+        @_normal_representation.__has_defined_formal_parameters
       end
 
       def to_defined_formal_parameter_stream
@@ -157,7 +165,7 @@ module Skylab::Autonomous_Component_System
 
         o = self.class::Preparation.new self, ss, & oes_p
 
-        o.bespoke_stream_once = -> do
+        o.PVS_parameter_stream_once = -> do
           to_defined_formal_parameter_stream_cached_
         end
 
@@ -185,8 +193,15 @@ module Skylab::Autonomous_Component_System
 
         # (case in point is [#ze-028]<->[#032] - this is requested 3 times for one invocation?)
 
-        @__etc_ ||= to_defined_formal_parameter_stream_to_be_cached_.to_a
-        Callback_::Stream.via_nonsparse_array @__etc_
+        Callback_::Stream.via_nonsparse_array _DFP_a
+      end
+
+      def __has_defined_formal_parameters
+        _DFP_a.length.nonzero?
+      end
+
+      def _DFP_a
+        @___etc ||= to_defined_formal_parameter_stream_to_be_cached_.to_a
       end
 
       attr_reader(
@@ -204,11 +219,11 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_writer(
-        :bespoke_stream_once,
         :expanse_stream_once,
         :on_unavailable,
         :parameter_store,
         :parameter_value_source,
+        :PVS_parameter_stream_once,
       )
 
       def check_availability_
@@ -232,7 +247,7 @@ module Skylab::Autonomous_Component_System
 
         o = Home_::Parameter::Normalization.begin @ss_
 
-        o.bespoke_stream_once = @bespoke_stream_once
+        o.PVS_parameter_stream_once = @PVS_parameter_stream_once
 
         o.expanse_stream_once = @expanse_stream_once
 

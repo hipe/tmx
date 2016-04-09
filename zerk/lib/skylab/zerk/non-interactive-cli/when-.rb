@@ -88,7 +88,7 @@ module Skylab::Zerk
 
           def say_expecting_
 
-            _strmr =  @CLI.top_frame_.streamer_for_navigational_nodes_
+            _strmr =  @CLI.top_frame_.streamer_for_navigational_node_tickets_
             @node_a_ = _strmr.call.to_a
 
             s = if MAX_SPLAY_AMOUNT_ >= @node_a_.length

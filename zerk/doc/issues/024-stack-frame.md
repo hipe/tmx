@@ -1,6 +1,12 @@
 # stack frame :[#024]
 
-(code notes/algorithms)
+## this document..
+
+.. corresponds to the niCLI code node of the same name. for the agnostic
+treatment of the concept, start at [#030].
+
+
+
 
 
 ## "why linked list"
@@ -83,9 +89,4 @@ these nodes: the formal operations in these streams where in stage 2
 pain having to account for this assymetry in code, what with the
 irregular meta-shapes of nodes.
 
-fortunately the stage-2 node allows you to "touch" the stage-3 node,
-which it cached. so to have the best of both worlds, we use as currency
-this lowest common denominator of stage-2 nodes. when the downstream
-client wants the stage-3 nodes of the associations, it will already
-have it because the one is cached in the other, and we will have already
-built them, having made this operation index. WHEW!!
+_

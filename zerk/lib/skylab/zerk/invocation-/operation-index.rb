@@ -8,31 +8,29 @@ module Skylab::Zerk
 
       class << self
 
-        def for_top_ sb, pbc
-          _begin_empty.__index_for_top sb, pbc
+        def for_top_ sb, fo
+          _begin_empty.__index_for_top sb, fo
         end
 
         alias_method :_begin_empty, :new
         undef_method :new
       end  # >>
 
-      def dup_for_recursion__ pbc
-        self.class._begin_empty.___init_as_recurse pbc, self
+      def dup_for_recursion__ fo
+        self.class._begin_empty.___init_as_recurse fo, self
       end
 
-      def ___init_as_recurse pbc, otr
+      def ___init_as_recurse fo, otr
 
-        @formal_operation = pbc.formal_operation
-        @procure_bound_call_ = pbc
+        @formal_operation = fo
         @scope_index_ = otr.scope_index_
         __partition_as_recurse
         self
       end
 
-      def __index_for_top sb, pbc
+      def __index_for_top sb, fo
 
-        @formal_operation = pbc.formal_operation
-        @procure_bound_call_ = pbc
+        @formal_operation = fo
         @scope_index_ = Here_::Scope_Index.new( @formal_operation ).execute
         @_stated_box = sb
         __partition
@@ -41,56 +39,8 @@ module Skylab::Zerk
 
       # -- evaluation
 
-      def evaluation_proc__
-
-        -> par do
-          send EVAL___.fetch( @_set_via_name_symbol.fetch( par.name_symbol ) ), par
-        end
-      end
-
-      EVAL___ = {
-        _appropriated_: :__evaluate_appropriated_parameter,
-        _bespoke_: :__evaluate_bespoke_parameter,
-      }
-
-      def __evaluate_bespoke_parameter par
-        @procure_bound_call_.evaluate_bespoke_parameter__ par
-      end
-
-      def __evaluate_appropriated_parameter par
-
-        k = par.name_symbol
-        h = @scope_index_.evaluations_cache_
-        sta = h[k]
-        if sta
-          sta.in_progress and self._CYCLIC
-        else
-          ___establish_state par
-          sta = h.fetch k
-        end
-        sta.cached_evaluation_
-      end
-
-      def ___establish_state par
-
-        k = par.name_symbol
-        h = @scope_index_.evaluations_cache_
-
-        bs = _create_session_for par
-
-        h[ k ] = bs  # so we can detect cycles
-        sta = bs.execute
-        h[ k ] = sta
-        NIL_
-      end
-
-      def begun_session_for_build_state_for__ par
-        self._WHEN
-        _create_session_for( par ).begin_session__
-      end
-
-      def _create_session_for par
-        Here_::Build_State___.new par, self
+      def evaluation_proc_for_ pbc
+        Here_::Evaluation.proc_for_ pbc, self
       end
 
       # -- indexing
@@ -135,7 +85,7 @@ module Skylab::Zerk
         end while nil
 
         @_bespoke_parameters = list_of_bespokes
-        @_set_via_name_symbol = set_via_name_symbol ; nil
+        @_set_symbol_via_name_symbol = set_via_name_symbol ; nil
       end
 
       def to_expanse_stream
@@ -143,16 +93,19 @@ module Skylab::Zerk
         @_stated_box.to_value_stream
       end
 
-      def is_appropriated__ k
-        :_appropriated_ == @_set_via_name_symbol.fetch( k )
+      def is_appropriated_ k
+        :_appropriated_ == @_set_symbol_via_name_symbol.fetch( k )
       end
 
-      def to_bespoke_stream__
+      def to_PVS_parameter_stream_
         Callback_::Stream.via_nonsparse_array @_bespoke_parameters
       end
 
+      def fetcher_proc_for_set_symbol_via_name_symbol_
+        @_set_symbol_via_name_symbol.method :fetch
+      end
+
       attr_reader(
-        :procure_bound_call_,
         :scope_index_,
       )
     end

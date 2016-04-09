@@ -4,14 +4,14 @@ module Skylab::Zerk
 
     # [#013] has an introduction to why & how we cache graph node solutions
 
-    def initialize par, oper_index
+    def initialize par, oper_index, pbc
 
       si = oper_index.scope_index_
       k = par.name_symbol
-      @_modality_frame = si.modality_frame_via_node_name_symbol__ k
-      @_node_ticket = si.node_ticket_via_node_name_symbol__ k
-      @_operation_index = oper_index
+      @_modality_frame = si.modality_frame_via_node_name_symbol_ k
+      @_node_ticket = si.node_ticket_via_node_name_symbol_ k
       @_parameter = par
+      @_pbc = pbc
     end
 
     def execute
@@ -68,9 +68,8 @@ module Skylab::Zerk
       end
 
       def compound
-        self._READ_THIS  # this is the wrong way for an operation to reach
-        # a compound node. the set of all compound nodes available to an
-        # operation is exactly its selection stack..
+        self._READ_027_why_we_do_not_approriate_compound_nodes
+        # [#027]#"why we do not appropriate compound nodes"
       end
 
       def __atomesque
@@ -155,7 +154,7 @@ module Skylab::Zerk
         rs = @_procure_bound_call.real_store_
         if rs.is_classesque
           @_m = :"finish__#{ @_name_symbol }__by"
-          @_sess = @_operation_index.procure_bound_call_.real_store_.internal_store_substrate
+          @_sess = @_pbc.real_store_.internal_store_substrate
           yes = @_sess.respond_to? @_m
         end
 
@@ -211,7 +210,7 @@ module Skylab::Zerk
       end
 
       def _init_procure_bound_call
-        @_procure_bound_call = @_operation_index.procure_bound_call_.begin_recursion__ @_fo
+        @_procure_bound_call = @_pbc.begin_recursion__ @_fo
         NIL_
       end
     end

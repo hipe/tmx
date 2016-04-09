@@ -110,9 +110,11 @@
              ( #was: #done issue with parsing properties )
 [#059]       #doc-node names
 
-[#058] #hole ( #was: #parent-node: [#057] the default frame )
+[#058]       [ specifically the custom help screen section API ]
+             ( #was: #parent-node: [#057] the default frame )
 
-[#057] #hole ( #was: parent-node: [#001] the properties stack )
+[#057]       [ arguments ]  (normalization)
+             ( #was: parent-node: [#001] the properties stack )
 
 [#056]       #doc-node re-usable silos
 [#055]       #parent-node: [#056] the workspace narrative ..
