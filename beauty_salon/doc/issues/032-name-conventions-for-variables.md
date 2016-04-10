@@ -32,14 +32,18 @@ scope we adhere to when naming our instance variables:
 
     @_cozy_scope  # :#tier-2: used only in this file
 
-    @__singleton_scope  # :#tier-3: only ever used for true-ish memoized ivars?
+    @__ad_hoc_scope  # :#Tier-3 - see
 
-    @___alternate_for_above  # is there a difference with above?
+    @___singleton_scope  # :#tier-4 - see
+
 
 the descriptions in the first mentioned source apply here.
 
 
-for :#tier-1:, first see the same tier over in [#028] the method name
+
+### :#tier-1 - "library scope"
+
+for this tier, first see the same tier over in [#028] the method name
 conventions. when used for an ivar, this convention has a related but
 very particular meaning: it means *either*:
 
@@ -53,6 +57,38 @@ very particular meaning: it means *either*:
     semantics, and as such this ivar is an abstraction candidate that
     may move into one of the above two categories.
 
+more generally (and easier to remember), an ivar with this name is
+expected to be accessed only within whatever sidesystem you're looking
+at.
+
+
+
+### :#Tier-3 - "ad hoc scope"
+
+an ivar with two leading underscores:
+
+  • has the same restrictions as #tier-2
+
+additionally, in the normalest of cases this ivar will appear exactly
+twice in the file: once where it is set to a value and once where it is
+accessed.
+
+more broadly we sometimes extend the semantics to indicate that although
+the ivar occurs more than twice in the file, its "output point" is
+restricted to one place (which is to say the cost of changing it is
+generally lower than for a #tier-2 ivar).
+
+
+
+### :#tier-4 - singleton scope
+
+an ivar with *three* leading underscores:
+
+  • has the same restrictions as #tier-2
+
+and furthermore the ivar is refered only ever once. in practice this is
+only ever useful for ivars that memoize some trueish value in
+conjunction with the `||=` operator.
 
 
 

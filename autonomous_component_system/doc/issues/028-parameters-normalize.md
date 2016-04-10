@@ -79,7 +79,7 @@ essential normalization axioms about defaulting and missing requireds.
 
 
 
-## :#"head parse" :#"Head parse"
+## :#"Head parse"
 
 as long as the parameter value source is not empty and it "matches"
 one of the formal parameters from the dedicated collection, remove that

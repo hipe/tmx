@@ -174,10 +174,12 @@ module Skylab::Zerk::TestSupport
 
       # -- invocation
 
-      def invoke__ * s_a  # #experimental
+      def coarse_parse_via_invoke * argv  # see also "help screens"
 
-        using_expect_stdout_stderr_invoke_via_argv s_a
+        using_expect_stdout_stderr_invoke_via_argv argv
         # (result is nil. ivars are set.)
+        _lines = release_lines_for_expect_stdout_stderr
+        TS_::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _lines
       end
 
       def __build_state_for_niCLI_by & p
@@ -186,9 +188,18 @@ module Skylab::Zerk::TestSupport
 
         instance_exec( & p )  # typically only `argv` is called
 
-        argv, = remove_instance_variable( :@_tmp_for_niCLI ).to_a
+        _argv, = remove_instance_variable( :@_tmp_for_niCLI ).to_a
 
           # (the above may grow when we test input beyond ARGV..)
+
+        _build_state_for_niCLI_via _argv
+      end
+
+      def build_state_for_niCLI_via_invoke__ * argv
+        _build_state_for_niCLI_via argv
+      end
+
+      def _build_state_for_niCLI_via argv
 
         using_expect_stdout_stderr_invoke_via_argv argv
 

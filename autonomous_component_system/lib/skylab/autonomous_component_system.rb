@@ -339,6 +339,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @is_singular_of = sym ; nil
       end
 
+      def accept__flag__meta_component
+        @argument_arity = :zero ; nil
+      end
+
       attr_reader(
         :argument_arity,
         :is_plural_of,

@@ -133,7 +133,7 @@ module Skylab::Zerk
       end
 
       def execute
-        send RECV___.fetch @_oi.set_symbol_via_name_symbol_ @_qkn.name_symbol
+        send RECV___.fetch @_oi.niCLI_reception_set_symbol_for_ @_qkn.name_symbol
       end
 
       RECV___ = {
@@ -144,7 +144,7 @@ module Skylab::Zerk
 
       def __when_bespoke_value
 
-        @__client.store_bespoke_value__ @_qkn  # guaranteed -
+        @__client.store_floaty_value_of_bespoke__ @_qkn  # guaranteed.
         # per [#016] it is not appropriate to allow validation here.
         ACHIEVED_
       end

@@ -22,7 +22,7 @@ module Skylab::Autonomous_Component_System
         @argument_stream = st
       end
 
-      def to_controller_against fo_bx  # [#]:#"head parse". [ze]
+      def to_controller_against fo_bx  # [#]:#"Head parse". [ze]
 
         if 1 == fo_bx.length
           When_Single_Formal___.new fo_bx.at_position( 0 ), @argument_stream

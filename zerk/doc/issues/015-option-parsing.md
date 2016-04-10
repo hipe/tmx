@@ -1,5 +1,20 @@
 # option parsing :[#015]
 
+## structure of this document
+
+  • introduction & context
+
+  • algorithm overview & objectives - understand the "why" of the algorithm
+
+  • the algorithm itself - in pseudocode with short notes
+
+  • algorithm support - important details in depth
+
+  • "continuations" - code notes (disjoint with each other)
+
+
+
+
 ## introduction & context
 
 building on the premises that a) every interaction with any application
@@ -37,6 +52,11 @@ will re-use there.
 
 ## algorithm overview & objectives
 
+here we introduce the key characters of the algorithm and discuss what we
+want out of it in plain language before we present it in pseudocode.
+
+
+
 ### the option parser
 
 the option parser is generally all the the primitives in the scope stack
@@ -71,25 +91,27 @@ the arguments array is:
 note that for now we do not ever express the trailing optional argument
 but we want to leave this door open for the future.
 
-we have not yet implemented the glob but intend to..
+we have not yet implemented the glob but intend to (tracked as [#023]).
 
 
 
-### the big index
+### the operation index
 
-we want to re-use this work by storing it in a "big index" that the
-invocation can use..
+formerly called the "big index", the work of sorting and arranging the
+nodes above (scope and stated alike) will be stored in an "operation
+index", inside of which is a "scope index" that will be re-used for any
+operation-dependencies.
 
 
 
 
 ## :#algorithm
 
-    traversing the the scope stack from top to bottom,
+    traversing the the scope stack from top to bottom (note :E),
     for each formal node in each stack frame,
       if the current node is an operation,
         index it as a potential referent
-      else if it's primitive (:A)
+      else if it's primitive (note :A)
         index it as a potential referent
         add this index to the option parser box
 
@@ -112,8 +134,10 @@ invocation can use..
     contributes to this being a "heavy lift" because it often loads
     external files (namely whatever the component model is).
 
-    note B: otherwise (and it's an appropriative primitivesque
-    optional), we ignore it so that it goes into the option parser.
+    note B: otherwise (and it's an appropriated primitivesque
+    optional), we ignore it so that it stays in the index it is
+    already in to go into the the option parser. there may be more
+    comments inline at the corresponding codepoint.
 
     note C: an appropriation that is not primitivesque must be of a
     formal operation (a [#027] operation-dependency). we ignore these
@@ -122,8 +146,35 @@ invocation can use..
     node D: blah blah without description (unless etc) and something
     about value store.
 
+    note E: top to bottom because we wan the more relevant entries
+    to appear "physically" higher up in the UI (and we associate
+    frame height with relevance as explained earlier).
 
 
+
+
+## algorithm support
+
+### "set" theory -
+
+let's focus on the "stated" set so that we can implement :#"stated values":
+
+  • any name that is in the stated set either is or isn't in the scope set.
+
+  • IFF it's in the scope set then it's appropriated.
+    based on the defintion it is then either "app'd req'd" or "app'd opt".
+    let's make sure and cover these two (#tB1 and #tB2).
+
+  • otherwise (and it's not in the scope set), IFF this then it is bespoke.
+    based on the definition it is then either "bes red'd" or "bes opt".
+    let's make sure and cover these two (#tB3 and #tB4).
+
+
+### storage
+
+we do *not* want parameter values to "live" in multiple places. if the
+value is of an appropriated parameter, then *the* correct place for this
+value to live is in the ACS tree..
 
 
 
@@ -138,7 +189,6 @@ although at first it's tempting to think that depending on how the
 operation is implemented (proc or session), we might want to cater the
 argument assembly for the particular shape; in fact we always want to
 assmeble the actuals into a "random access box":
-
 
 you would expect to want the random access box for the session, but the
 reason we used it for proc-based implementations too is because

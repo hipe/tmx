@@ -1,0 +1,126 @@
+#!/usr/bin/env ruby -w
+
+_TOP_PATH = 'zerk/test/fixture-top-acs-classes'
+
+sout = $stdout; serr = $stderr
+
+produce_paths = -> do
+
+  path = nil
+  paths = []
+  recurse = nil
+
+  op_h = {
+    "directory" => -> do
+      recurse[ path ]
+    end,
+    "file" => -> do
+      paths.push path
+    end,
+  }
+
+  recurse = -> dir do
+
+    a = ::Dir[ ::File.join( dir, '*' ) ]
+    if a.length.zero?
+      serr.puts "empty or nonexistent: #{ dir }"
+    else
+      a.each do |path_|
+        path = path_
+        _stat = ::File.stat path
+        op_h.fetch( _stat.ftype ).call
+      end
+    end
+  end
+
+  recurse[ _TOP_PATH ]
+  paths
+end
+
+produce_matching_lines = -> paths do
+
+  require 'open3'
+
+  _sin, up_sout, up_serr, _w = ::Open3.popen3(
+    'grep',
+    '--extended-regexp',
+    '--no-filename',
+    '^ +class (Fixture_Top_ACS_Classes::)?Class_', * paths,
+  )
+
+  -> do
+    s = up_sout.gets
+    if s
+      s
+    else
+      s = up_serr.gets
+      if s
+        fail s
+      end
+    end
+  end
+end
+
+build_final_command = -> next_line do
+
+  final_set = []
+
+  const = '[A-Z][A-Za-z0-9_]*'
+  rx = /\A +class (#{ const }(?:::#{ const })*)/
+
+  begin
+
+    line = next_line.call
+    line or break
+
+    _identifier = rx.match( line )[ 1 ]
+
+    _use = _identifier.split( '::' ).last
+
+    final_set.push _use
+
+    redo
+  end while nil
+
+  final_set
+end
+
+argv = ARGV
+
+if argv.length.nonzero?
+
+  if %r(\A--?h(?:e(?:l(?:p)?)?)?\z) =~ argv.first
+    show_usage = true
+    show_synopsis = true
+  else
+    serr.puts "unexpected argument: #{ argv.first.inspect }"
+    show_usage = true
+    show_invite = true
+  end
+end
+
+if show_usage || show_synopsis
+
+  if show_usage
+    serr.puts "usage: #{ $PROGRAM_NAME }"
+  end
+
+  if show_synopsis
+    serr.puts "synopsis: generate a report of which fixture classes are used in which test file"
+  end
+
+  if show_invite
+    serr.puts "'#{ $PROGRAM_NAME } -h' for synopsis."
+  end
+else
+
+  _paths = produce_paths[]
+
+  _next_line = produce_matching_lines[ _paths ]
+
+  set_a = build_final_command[ _next_line ]
+
+  serr.puts "(until we get a proper API, we're not running this ourselves. try running this:)"
+
+  sout.puts "./code_metrics/bin/tmx-code-metrics tally #{ set_a * ' ' } -- zerk/test"
+end

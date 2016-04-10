@@ -175,32 +175,46 @@ module Skylab::Zerk
           # you are a parsed structure; but imagine you yourself are an
           # argument stream as we might have in a [ze] API call..
 
-          a = value_bx.a_
-          h = value_bx.h_
-          st = Callback_::Stream.via_times a.length
-          @_is_empty = false
-
-          @current_argument_stream = Callback_.stream do
-            d = st.gets
-            if d
-              h.fetch( a.fetch( d ) ).value_x
-            else
-              @_is_empty = true ; NOTHING_
-            end
-          end.flush_to_polymorphic_stream
+          @_value_box = value_bx
         end
 
         def is_known_to_be_empty
-          @_is_empty
+          false  # eek not sure
         end
 
-        def to_controller_against bespoke_bx
+        def to_controller_against head_parsable_formal_bx
 
-          PVS_via_Box_Controller___[
-            bespoke_bx.to_value_stream,
-            @current_argument_stream,
-          ]
+          # NASTY - in lockstep, present each assignment that's in the value
+          # box as if it's being parsed off an argument stream or similar :(
+
+          ( @_value_box.a_ - head_parsable_formal_bx.a_ ).length.zero? or self._SANITY
+
+          # the above is #todo a sanity check but it is to emphasize that:
+          # we don't have to transfer all the stated values, only the
+          # bespokes, because #spot-4 does the appropriated values.
+
+          qkn_st = @_value_box.to_value_stream
+          cur = nil
+
+          _par_st = Callback_.stream do
+            cur = qkn_st.gets
+            if cur
+              cur.association
+            end
+          end
+
+          _x_st = Gets_one_proxy___.new do
+            cur.value_x
+          end
+
+          PVS_via_Box_Controller___[ _par_st, _x_st ]
         end
+      end
+
+      # ==
+
+      class Gets_one_proxy___ < ::Proc
+        alias_method :gets_one, :call
       end
 
       # ==

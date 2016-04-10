@@ -125,6 +125,11 @@ module Skylab::Autonomous_Component_System
         :default_proc,
       )
 
+      def __interpret__optional__ _
+        @parameter_arity = :zero_or_one
+        KEEP_PARSING_
+      end
+
       def __interpret__is_flag__ _
         @parameter_arity = :zero_or_one
         @argument_arity = :zero

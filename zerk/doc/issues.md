@@ -1,4 +1,4 @@
-[#035] #oepn help screens for primitivesques??
+[#035] #open help screens for primitivesques??
 
 [#034]       niCLI is not long-running
 
@@ -13,7 +13,7 @@
 [#031]       [ track operation dependency customization as a feature ]
 
 [#030]       unified language ..
-       #open [#]:#A is about whether a "reasoning" is always exactly one event
+         #track [#]:#A is about whether a "reasoning" is always exactly one event
 
 [#029]       introducing isomorphic interfaces ..
 [#028]       in-situ
@@ -26,7 +26,7 @@
 [#024]       stack frame ..  (mostly lengthy code notes) and..
              ( #was: redundancy in two events. removed the other. )
 
-[#023] #hole
+[#023]     #track glob in niCLI
              ( #was: #open de-generalize the invites )
 
 [#022] #open availability is not implemented (under niCLI)

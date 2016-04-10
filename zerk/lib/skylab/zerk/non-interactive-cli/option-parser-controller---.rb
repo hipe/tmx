@@ -87,8 +87,18 @@ module Skylab::Zerk
 
         slug, short = _slug_and_any_short_for nt.name
 
-        @_op.on( * short, "--#{ slug } X", * _s_a ) do |s|
-          Primitivesque_Invocation___.new s, nt
+        asc = nt.association
+
+        sym = asc.argument_arity
+        if sym && :zero == sym  # [ac] is agnostic, so we default this late,
+          # ..rather than Field_::Takes_argument[ asc ]
+          _long = "--#{ slug }"
+        else
+          _long = "--#{ slug } X"
+        end
+
+        @_op.on( * short, _long, * _s_a ) do |s|
+          Primitivesque_Invocation___.new s, asc
         end
         NIL_
       end
@@ -99,7 +109,13 @@ module Skylab::Zerk
 
         slug, short = _slug_and_any_short_for par.name
 
-        @_op.on( * short, "--#{ slug } X", * _s_a ) do |s|
+        if Field_::Takes_argument[ par ]
+          _long = "--#{ slug } X"
+        else
+          _long = "--#{ slug }"
+        end
+
+        @_op.on( * short, _long, * _s_a ) do |s|
           Bespoke_Invocation___.new s, par
         end
         NIL_
@@ -189,6 +205,7 @@ module Skylab::Zerk
           # at the cost of a greater chance of future pain.. #"c3"
 
           _setter = -> _normal_slug, invo do
+
             if invo.is_special
               send invo.method_name, invo.argument_string
             else
@@ -270,13 +287,13 @@ module Skylab::Zerk
 
       class Primitivesque_Invocation___
 
-        def initialize any_value_s, nt
+        def initialize any_value_s, asc
           @any_value_s = any_value_s
-          @node_ticket = nt
+          @association = asc
         end
 
         def _to_qkn
-          Callback_::Qualified_Knownness[ @any_value_s, @node_ticket ]
+          Callback_::Qualified_Knownness[ @any_value_s, @association ]
         end
 
         def is_special

@@ -23,7 +23,7 @@ module Skylab::Autonomous_Component_System
         :expanse_stream_once,  # see [#027]#expanse
         :parameter_store,  # wrap e.g a session object or argument array
         :parameter_value_source,
-        :PVS_parameter_stream_once,  # see [#028]#"head parse"
+        :PVS_parameter_stream_once,  # see [#028]#"Head parse"
       )
 
       def execute
@@ -36,7 +36,7 @@ module Skylab::Autonomous_Component_System
         __common_normalize
       end
 
-      def ___interpret_non_empty_PVS  # see [#]:#"head parse"
+      def ___interpret_non_empty_PVS  # see [#]:#"Head parse"
 
         _st = remove_instance_variable( :@PVS_parameter_stream_once ).call
         _bx = _box_via_stream _st

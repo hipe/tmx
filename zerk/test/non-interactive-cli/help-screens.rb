@@ -31,14 +31,21 @@ module Skylab::Zerk::TestSupport
 
       # -- methods that produce subjects
 
+      # ~ usage line
+
       def build_usage_line_index_of_first_usage_line
 
         # (experimental code sketch - use a rough regex to break the usage
         # line into its parts, based on some axioms of character usage.)
 
-        s = section( :usage ).first_line.unstyled_styled
-        s.chomp!
-        _s_a = s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))  # #open [#bm-002] (benchmarks)
+        _ = section( :usage ).first_line.unstyled_styled
+        build_usage_line_index_of_this_unstyled_line _
+      end
+
+      def build_usage_line_index_of_this_unstyled_line mutable_s
+
+        mutable_s.chomp!
+        _s_a = mutable_s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))  # #open [#bm-002] (benchmarks)
 
         bx = Callback_::Box.new
         _s_a.each do |s_|
@@ -46,6 +53,47 @@ module Skylab::Zerk::TestSupport
         end
         bx
       end
+
+      # ~ options
+
+      def build_index_of_option_section__ section
+
+        h = {}
+        parse_line = ___line_parser_for h
+        st = _help_screen.section( :options ).to_line_stream
+        st.gets  # skip header line
+        begin
+          line = st.gets
+          line or break
+          parse_line[ line ]
+          redo
+        end while nil
+        h
+      end
+
+      def ___line_parser_for h
+
+        rx = %r(\A
+          [ ]{2,}(?<short>-[a-z]),[ ]
+          (?<long>--(?:(?![ ][ ]).)+)
+          (?:[ ]{2,}(?<rest>[^ ].+))?
+        \n\z)x
+
+        -> line do
+          if line.is_styled
+            was_styled = true
+            s = line._unstyled_string  # VIOLATION
+          else
+            s = line.string
+          end
+          ol = Option_Line___.new was_styled, * rx.match( s ).captures
+          h[ ol.short ] = ol ; nil
+        end
+      end
+
+      Option_Line___ = ::Struct.new :was_styled, :short, :long, :desc
+
+      # ~
 
       def section sym
         _hsz_screen.section sym
@@ -72,6 +120,13 @@ module Skylab::Zerk::TestSupport
         o
       end
 
+      # ~ options
+
+      def have_option sw, long_plus, unstyled_desc
+
+        Option_Index_Matcher___.new sw, long_plus, unstyled_desc, self
+      end
+
       def have_item_pair_of opt_sym=nil, a, b
         Item_Pair_Matcher__.new opt_sym, a, b, self
       end
@@ -81,6 +136,8 @@ module Skylab::Zerk::TestSupport
         ipm.match_line
         ipm
       end
+
+      # ~
 
       def be_invite_line_of s
         Invite_line___[].for s, self
@@ -129,6 +186,10 @@ module Skylab::Zerk::TestSupport
           @_section_cache[ sym ] = x
           x
         end
+      end
+
+      def section_name_symbols
+        @_h.keys  # meh
       end
     end
 
@@ -361,6 +422,89 @@ module Skylab::Zerk::TestSupport
         else
           false
         end
+      end
+    end
+
+    # ==
+
+    class Option_Index_Matcher___
+
+      def initialize sw, long, desc, ctx
+        @ctx = ctx
+        @sw = sw
+        @long = long
+        @desc = desc
+      end
+
+      def matches? idx
+        @_index = idx  # eew/meh
+        ok = __short
+        ok &&= __long
+        ok &&= __desc
+        ok && __styled
+      end
+
+      def __short
+        @_ol = @_index[ @sw ]
+        if @_ol
+          ACHIEVED_
+        else
+          _fail_by :___say_no_short
+        end
+      end
+
+      def ___say_no_short
+        "no #{ @sw.inspect } - had #{ @_index.keys.inspect }"
+      end
+
+      def __long
+        if @_ol.long == @long
+          ACHIEVED_
+        else
+          _fail_by :___say_no_long
+        end
+      end
+
+      def ___say_no_long
+        "wanted #{ @long.inspect }, had #{ @_ol.long.inspect }"
+      end
+
+      def __desc
+        if @_ol.desc == @desc
+          ACHIEVED_
+        else
+          _fail_by :___say_no_desc
+        end
+      end
+
+      def ___say_no_desc
+        "desc didn't match. wanted #{ @desc.inspect }, had #{ @_ol.desc.inspect }"
+      end
+
+      def __styled
+        if @_ol.was_styled
+          ACHIEVED_
+        else
+          _fail_by :___say_no_styled
+        end
+      end
+
+      def ___say_no_styled
+        "was not styled - #{ @_ol.desc.inspect }"
+      end
+
+      def _fail_by m
+        if @ctx.respond_to? :quickie_fail_with_message_by
+          @ctx.quickie_fail_with_message_by( & method( m ) )
+          nil
+        else
+          @__m = m
+          UNABLE_
+        end
+      end
+
+      def failure_message_for_should
+        send @__m
       end
     end
 

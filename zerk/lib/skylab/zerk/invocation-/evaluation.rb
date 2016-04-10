@@ -8,7 +8,7 @@ module Skylab::Zerk
 
         def proc_for_ pbc, oi
 
-          fetch_set = oi.fetcher_proc_for_set_symbol_via_name_symbol_
+          fetch_set = oi.fetcher_proc_for_reception_set_symbol_via_name_symbol_
 
           proc_h = {
 

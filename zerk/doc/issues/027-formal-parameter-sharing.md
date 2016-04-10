@@ -68,6 +68,9 @@ with all of this here.. :#here)
 
 ## a middle-ground for today:
 
+([#015] is a subsidiary of the subject node, but its #"stated values"
+intro is a succinct summary of the below.)
+
 whereas [ac] has its own facilty for interpreting/inferring formal
 parameters, the [ze] will do so in this way:
 

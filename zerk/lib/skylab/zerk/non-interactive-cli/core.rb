@@ -198,6 +198,8 @@ module Skylab::Zerk
 
       @_arg_st.advance_one
 
+      @__bespoke_values_box = nil  # ivar must be set
+
       kp = __maybe_parse_opts
       kp &&= __maybe_parse_args
       kp && _parsed_OK  # t11
@@ -240,8 +242,6 @@ module Skylab::Zerk
     # --
 
     def __maybe_parse_args
-
-      @__bespoke_values_box = nil  # ivar must be set
 
       os = @_operation_syntax
 
@@ -303,8 +303,8 @@ module Skylab::Zerk
       _done_because _msg, :argument
     end
 
-    def store_bespoke_value__ qkn
-      _ = ( @__bespoke_values_box ||= Callback_::Box.new )
+    def store_floaty_value_of_bespoke__ qkn  # o.s
+      _ = ( @__bespoke_values_box ||= Callback_::Box.new )  # :"floaty structure"
       _.add qkn.name_symbol, qkn
       NIL_
     end

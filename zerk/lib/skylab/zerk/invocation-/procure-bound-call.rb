@@ -179,6 +179,7 @@ module Skylab::Zerk
         # "appropriateds" but [ac] doesn't have any built-in sense for what
         # those even are. so here is where we transfer those values from the
         # ACS tree to the parameter store for the operation implementation.
+        # (:#spot-4: write from ACS tree into parameter store.)
 
         p = @_operation_index.evaluation_proc_for_ self
 

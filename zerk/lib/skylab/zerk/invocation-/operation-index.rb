@@ -101,7 +101,7 @@ module Skylab::Zerk
         Callback_::Stream.via_nonsparse_array @_bespoke_parameters
       end
 
-      def fetcher_proc_for_set_symbol_via_name_symbol_
+      def fetcher_proc_for_reception_set_symbol_via_name_symbol_
         @_set_symbol_via_name_symbol.method :fetch
       end
 

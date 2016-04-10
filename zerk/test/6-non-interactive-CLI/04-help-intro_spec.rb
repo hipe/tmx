@@ -10,7 +10,7 @@ module Skylab::Zerk::TestSupport
 
     it "1.4)   topmost help screen shows desc of op that is in frame 1" do
 
-      _rx = %r(^ +wazoozie-foozie +have 'fun'\n)
+      _rx = %r(^ +wazoozie-foozie +have fun\n)
       _top_help_screen.section( :actions ).should have_styled_line_matching _rx
     end
 
@@ -47,11 +47,11 @@ module Skylab::Zerk::TestSupport
         succeeds
       end
 
-      it "one styled stderr line" do
-        first_line.should be_line( :styled, :e, "hello yiz ziz" )
+      it "one styled stderr line (1 req'd besoke, 1 req'd app'd)" do
+        first_line.should be_line( :styled, :e, "hello yiz (nn:ziz)" )
       end
 
-      it "the result is written to stdout" do
+      it "the result is written to stdout (covers ints as results)" do
         last_line.should be_line( :o, '12332' )
       end
     end
@@ -78,9 +78,9 @@ module Skylab::Zerk::TestSupport
         2 == section( :usage ).line_count or fail  # (one for the blank line)
       end
 
-      it "the option appears in the usage section" do
+      it "the option appears in the usage section (eek jumps ahead to flags)" do
 
-        _usage_index[ '[-s X]' ] or fail
+        _usage_index[ '[-d]' ] or fail
       end
 
       it "the bespoke required parameter appears in the usage section" do
@@ -95,7 +95,7 @@ module Skylab::Zerk::TestSupport
 
       it "description section is styled, has content" do
 
-        section( :description ).should be_description_line_of( :styled, "have 'fun'" )
+        section( :description ).should be_description_line_of( :styled, "have fun" )
       end
 
       it "the arguments section speaks of the bespoke parameter" do
@@ -118,7 +118,7 @@ module Skylab::Zerk::TestSupport
 
     it "1.4.B) first help screen shows classic desc of asc in frame 1" do
 
-      _rx = %r(^[ ]{2,}fantazzle-dazzle[ ]{2,}'yay'$)
+      _rx = %r(^[ ]{2,}fantazzle-dazzle[ ]{2,}yay$)
       _top_help_screen.section( :actions ).should have_styled_line_matching _rx
     end
 
@@ -129,47 +129,9 @@ module Skylab::Zerk::TestSupport
       _ =~ _rx or fail
     end
 
-    context "+1  3.4)   request help on its action", wip: true do  # until flags #open [#019]
-
-      given do
-        argv 'fantaz', 'open', '-h'
-      end
-
-      it "succeeds" do
-        succeeds
-      end
-
-      it 'usage line - the leading 4 "solid pieces" look right'
-
-      it "usage line - all the o.p pieces are there"
-
-      it "usage line - the argument piece is there (as last piece)"
-
-      it "the option parser section has 6 lines (etc)"
-
-      it "there is no arguments section because the arg has no desc"
-    end
-
-    context "3.3)   money", wip: true do  # until flags #open [#019]
-
-      given do
-        argv  'fantaz', 'open', '-v', 'zang'
-      end
-
-      it "x." do
-        @exitstatus.should eql :_neat_
-      end
-
-      it "works" do
-        expect :e, '[:file, "zang", :V]'
-      end
-    end
-
     dangerous_memoize :_top_help_screen do
 
-      invoke__ '-h'
-      _lines = release_lines_for_expect_stdout_stderr
-      TS_::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _lines
+      coarse_parse_via_invoke '-h'
     end
 
     def subject_root_ACS_class
