@@ -156,7 +156,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def expect_exitstatus_for_referent_not_found_
-        expect_exitstatus_for :_referent_not_found_
+        expect_exitstatus_for :referent_not_found
       end
 
       def expect_exitstatus_for k

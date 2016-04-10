@@ -98,6 +98,8 @@ module Skylab::MyTerm
 
       def express_into_under y, expag  # for modality clients
 
+        self._K
+
         # (not #until #milestone-5)
 
         nf = @_nf

@@ -286,6 +286,9 @@ module Skylab::Zerk
             compound: -> do
               ( navs ||= [] ).push nt
             end,
+            entitesque: -> do
+              ( refs ||= [] ).push nt
+            end,
             primitivesque: -> do
               ( refs ||= [] ).push nt
             end,

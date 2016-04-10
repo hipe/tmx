@@ -84,7 +84,7 @@ module Skylab::MyTerm::TestSupport
     end  # •cp1
 
     def build_root_ACS_
-      Home_.__build_root_ACS
+      Home_._build_root_ACS
     end
   end
 

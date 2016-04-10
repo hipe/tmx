@@ -27,8 +27,13 @@ module Skylab::Zerk
     # -- as prototype
 
     def init_as_prototype_
+      @when_head_argument_looks_like_option = nil
       self
     end
+
+    attr_writer(
+      :when_head_argument_looks_like_option,
+    )
 
     def root_ACS= p
       @_root_ACS_proc = p
@@ -94,6 +99,20 @@ module Skylab::Zerk
 
     def ___bound_call
 
+      begin
+        bc = ___bound_call_step
+        bc or break
+        if true == bc
+          redo  # EEK experiment [#my-009]
+        end
+        break
+      end while nil
+
+      bc
+    end
+
+    def ___bound_call_step
+
       if @_arg_st.no_unparsed_exists
 
         when_no_arguments_  # t1
@@ -112,11 +131,21 @@ module Skylab::Zerk
 
     def __when_head_argument_looks_like_option
 
-      md = Help_rx__[].match current_token_
-      if md
-        _when_head_argument_looks_like_help md
+      p = @when_head_argument_looks_like_option
+      if p
+        p[ * ( self if 1 == p.arity ) ]
       else
-        _ = "request cannot start with options. (had: \"#{ current_token_ }\")"
+        ___when_head_argument_looks_like_option_normally
+      end
+    end
+
+    def ___when_head_argument_looks_like_option_normally
+
+      md = head_token_starting_with_dash_match_help_request
+      if md
+        when_head_argument_looks_like_help md
+      else
+        _ = "request cannot start with options. (had: \"#{ current_token }\")"
         _done_because _, :argument
       end
     end
@@ -147,7 +176,7 @@ module Skylab::Zerk
 
     def ___procure_current_navigational_formal_node
 
-      fn = @_top.lookup_formal_node__ current_token_, :navigational, & @_oes_p
+      fn = @_top.lookup_formal_node__ current_token, :navigational, & @_oes_p
       if ! fn  # probably the above emitted t3 or t4
         _done_because :argument
       end
@@ -171,9 +200,9 @@ module Skylab::Zerk
 
       elsif _head_token_starts_with_dash
 
-        md = Help_rx__[].match current_token_
+        md = head_token_starting_with_dash_match_help_request
         if md
-          _when_head_argument_looks_like_help md
+          when_head_argument_looks_like_help md
         else
           Here_::When_::Compound_followed_by_Dash[ self ]  # t7
         end
@@ -182,7 +211,11 @@ module Skylab::Zerk
       end
     end
 
-    def _when_head_argument_looks_like_help md
+    def head_token_starting_with_dash_match_help_request
+      Help_rx___[].match current_token
+    end
+
+    def when_head_argument_looks_like_help md
       @_arg_st.advance_one
       Here_::When_Help_[ md, self ]
       STOP_PARSING_
@@ -437,12 +470,16 @@ module Skylab::Zerk
       Begins_with_dash_[ @_arg_st.current_token ]
     end
 
-    def current_token_
+    def current_token
       @_arg_st.current_token
     end
 
     def release_argument_stream__
       remove_instance_variable :@_arg_st
+    end
+
+    def argument_stream
+      @_arg_st
     end
 
     # -- finishing behavior & loop control constants
@@ -464,6 +501,7 @@ module Skylab::Zerk
 
       STOP_PARSING_
     end
+    alias_method :done_because, :_done_because
 
     def __remote_when whn
 
@@ -678,7 +716,7 @@ module Skylab::Zerk
           _parse_error_
           _component_rejected_request_
           missing_required_parameters
-          _referent_not_found_
+          referent_not_found
         )
         p = -> k do
           # (we would cache but it's niCLI)
@@ -714,7 +752,7 @@ module Skylab::Zerk
       end
     end
 
-    Help_rx__ = Lazy_.call do
+    Help_rx___ = Lazy_.call do
       %r(\A(?:-h|--h(?:e(?:l(?:p)?)?)?(?:=(?<eql>.+))?)\z)
     end
 

@@ -20,7 +20,7 @@ module Skylab::Zerk
 
           def sub_execute_
 
-            s = @CLI.current_token_ ; me = self
+            s = @CLI.current_token ; me = self
 
             @CLI.express_ do |y|
               y << "options cannot occur immediately after compound nodes (option: #{ ick s })"

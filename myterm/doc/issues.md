@@ -10,7 +10,7 @@
 [#011] #open this rewrite (i.e when #milestone-8)
 [#010] #open all silo daemons
 
-[#009] #hole
+[#009]       cross-reference experiment with [ze]
             ( #was: remove blocks tagged with `#eventually` )
 
 [#008] #wish info

@@ -14,13 +14,22 @@ module Skylab::MyTerm
         @_box_mod = single_mod
         @dir = nil
         @file = nil
-        @is_selected__ = false
+        @is_selected_ = false
         @stem = stem
 
         _recv_path path, category
       end
 
       # -- reading
+
+      def express_into_under y, expag  # (meh..)
+        _star = if @is_selected_
+          '* '
+        else
+          '  '
+        end
+        y << "#{ _star }#{ @stem }\n"
+      end
 
       def module  # (doesn't cache the require'ing)
 
@@ -61,7 +70,7 @@ module Skylab::MyTerm
       end
 
       def is_selected
-        @is_selected__
+        @is_selected_
       end
 
       # -- writing
@@ -108,7 +117,7 @@ module Skylab::MyTerm
       # -- egads
 
       attr_writer(
-        :is_selected__,
+        :is_selected_,
       )
     end
   end

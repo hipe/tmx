@@ -13,19 +13,22 @@ module Skylab::MyTerm
         # (for now, every API call starts with a new empty root ACS)
         # (but remember there is a kernel that is "long-running")
 
-        _ACS = Home_.__build_root_ACS
-        _ze = Home_.lib_.zerk
-
-        _x = _ze::API.call x_a, _ACS, & pp
-
-        _x
+        _ACS = Home_._build_root_ACS
+        Call_[ x_a, _ACS, & pp ]
       end  # :cp1
     end  # >>
   end
 
+  Call_ = -> x_a, acs, & pp do
+
+    Require_zerk_[]
+    _x = Zerk_::API.call x_a, acs, & pp
+    _x  # #todo
+  end
+
   class << self
 
-    def __build_root_ACS  # (break down as needed)
+    def _build_root_ACS  # (break down as needed)
 
       _cls = Home_::Models_::Appearance
       _k = ___custom_kernel
@@ -97,6 +100,10 @@ module Skylab::MyTerm
 
   Common_fuzzy_retrieve_ = -> do
     Home_.lib_.brazen::Collection::Common_fuzzy_retrieve
+  end
+
+  Require_zerk_ = Lazy_.call do
+    Zerk_ = Home_.lib_.zerk ; nil
   end
 
   Require_ACS_ = Lazy_.call do

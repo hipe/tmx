@@ -58,7 +58,7 @@ module Skylab::MyTerm
         if lt
           if const == lt.adapter_name_const
             p = st
-            lt.is_selected__ = true
+            lt.is_selected_ = true
             lt
           else
             lt

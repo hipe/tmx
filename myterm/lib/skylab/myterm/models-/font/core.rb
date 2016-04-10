@@ -51,7 +51,7 @@ module Skylab::MyTerm
     # -- Expressive event & modality hook-ins/hook-outs
 
     def describe_into_under y, _  # for #during #milestone-5 (or not..)
-
+      self._K
       y << "set font, list available fonts"
     end
 

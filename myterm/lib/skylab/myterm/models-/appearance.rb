@@ -63,7 +63,23 @@ module Skylab::MyTerm
     end
 
     def to_component_node_ticket_streamer
-      self._K  # probably in #during #milestone-5
+
+      if @adapter
+        self._WEE
+      else
+
+        Require_ACS_[]
+
+        _rw = ACS_::ReaderWriter.for_componentesque self  # just reads ivar
+
+        _hi = ACS_::Reflection::Node_Streamer.via_reader__ _rw  # #todo - change method name
+
+        _hi
+      end
+    end
+
+    class Temp_Proxy___ < ::Proc
+      alias_method :execute, :call
     end
 
     def component_value_reader

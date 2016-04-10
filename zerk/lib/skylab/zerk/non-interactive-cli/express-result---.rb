@@ -27,32 +27,81 @@ module Skylab::Zerk
 
       def initialize x, cli
         @x = x
-        @cli = cli
+        @CLI = cli
       end
 
       def execute
-        x = @x
+        _determine_strategy
+        _act
+        NIL_
+      end
+
+    private
+
+      def streamish
+        st = @x
+        x = st.gets
         if x
-
-          if true == x
-            # let's assume it's semantic true, so we want to output "yes" or etc.
-            self._WHEN_TRUE
-
-          elsif x.respond_to? :ascii_only?
-            @cli.sout.puts x
-
-          elsif x.respond_to? :bit_length
-            @cli.sout.puts "#{ x }"
-
-          else
-            self._COVER_ME_trueish_other  # eventually we will want to call [#br-068]
-          end
-        elsif x.nil?
-          # it seems reasonable to interpret nil as "nothing"
+          @x = x
+          _determine_strategy
+          begin
+            _act
+            @x = st.gets
+            @x or break
+            redo
+          end while nil
         else
-          self._COVER_ME_when_false
+          self._COVER_ME_empty_list
         end
         NIL_
+      end
+
+      def _determine_strategy
+        x = @x
+        @shape = if x
+
+          if x.respond_to? :express_into_under
+            :expressive
+
+          elsif x.respond_to? :gets
+            :streamish
+
+          elsif x.respond_to? :ascii_only?
+            :stringish
+
+          elsif x.respond_to? :bit_length
+            :intish
+          else
+
+            self._README
+            # when true, assume it's semantic, so output "yes" or "no" etc
+          end
+        elsif x.nil?
+          :nil
+        else
+          self._README
+        end
+        NIL_
+      end
+
+      def _act
+        send @shape ; nil
+      end
+
+      def expressive
+        @x.express_into_under @CLI.sout, @CLI.expression_agent ; nil
+      end
+
+      def stringish
+        @CLI.sout.puts @x ; nil
+      end
+
+      def intish
+        @CLI.sout.puts "#{ @x }" ; nil
+      end
+
+      def nil
+        NOTHING_
       end
     end
   end

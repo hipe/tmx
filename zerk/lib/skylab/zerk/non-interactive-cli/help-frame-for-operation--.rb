@@ -34,7 +34,7 @@ module Skylab::Zerk
               }#{ ick tok } here."
           end
 
-          @_session.init_exitstatus_for_ :_referent_not_found_
+          @_session.init_exitstatus_for_ :referent_not_found
 
           STOP_PARSING_
         end
