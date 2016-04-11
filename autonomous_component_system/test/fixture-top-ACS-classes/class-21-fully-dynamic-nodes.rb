@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       class Injector
 
         def __to_comp_node_ticket_streamer
-          Home_::Reflection::Node_Streamer.via_ACS self
+          Home_::Reflection::Node_Ticket_Streamer.via_ACS self
         end
 
         def __assokie__component_association

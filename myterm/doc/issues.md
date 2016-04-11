@@ -1,3 +1,7 @@
+[#016] #wish language production is amusingly bad
+
+[#015]       introduction to generated modality clients ..
+
 [#014]  #during #milestone-5 (maybe)
 
 [#013] #open if you rip out the flyweightism from font, ..
@@ -8,7 +12,9 @@
 
 
 [#011] #open this rewrite (i.e when #milestone-8)
-[#010] #open all silo daemons
+
+[#010] #open slightly customize help screen to show weird syntax
+             ( #was: all silo daemons )
 
 [#009]       cross-reference experiment with [ze]
             ( #was: remove blocks tagged with `#eventually` )

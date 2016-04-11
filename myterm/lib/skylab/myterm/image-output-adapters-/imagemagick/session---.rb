@@ -4,59 +4,59 @@ module Skylab::MyTerm
 
     class Session___
 
+      # (a stand-in for [#ta-005] the dream of magnetics..)
+
       class << self
-        alias_method :begin_cold_session__, :new
-        private :new
+        alias_method :begin_hot_session__, :new
+        undef_method :new
       end  # >>
 
-      def initialize acs
-        @ACS = acs
+      def initialize acs, & p
+        @appearance_ = acs
+        @_oes_p = p
       end
 
-      def set_background_image__ & oes_p
+      def build_imagemagick_command__
+        _ok = resolve_IM_command_
+        _ok && @IM_command_
+      end
 
-        osa_script = build_osa_script_( & oes_p )
+      # -- resolving the image
 
-        if osa_script
-          ___maybe_emit_info_about_the_osa_script osa_script, & oes_p
+      def resolve_image_
+        _init_if_necessary :@image_, Magnetics_::Image_via_Appearance
+      end
 
-          _sycond = @_kernel.silo( :Installation ).system_conduit
+      attr_reader :image_
 
-          osa_script.send_into_system_conduit_ _sycond, & oes_p
+      # -- resolving the IM command
+
+      def resolve_IM_command_
+        _init_if_necessary :@IM_command_, Magnetics_::Command_via_Appearance
+      end
+
+      # --
+
+      def _init_if_necessary ivar, p_ish
+
+        if instance_variable_defined? ivar
+          instance_variable_get( ivar ) ? ACHIEVED_ : UNABLE_
         else
-          osa_script
+          x = p_ish[ self, & @_oes_p ]
+          instance_variable_set ivar, x  # cache the work whether succeeded or failed
+          x ? ACHIEVED_ : UNABLE_
         end
       end
 
-      def ___maybe_emit_info_about_the_osa_script osa_script, & oes_p
-
-        @_oes_p.call :info, :expression, :command do |y|
-
-          y << "(attempting: #{ osa_script.thru_shellescape_ })"
-        end
-        NIL_
+      def system_conduit_
+        @appearance_.kernel_.silo( :Installation ).system_conduit
       end
 
-      def build_osa_script_ & oes_p
-
-        im_cmd = build_imagemagick_command_( & oes_p )
-        if im_cmd
-          _path = im_cmd.image_path
-          Home_::Terminal_Adapters_::Iterm::Osascript_via_Path[ _path, & oes_p ]
-        else
-          im_cmd
-        end
-      end
-
-      def build_imagemagick_command_ & oes_p
-
-        _installation = @ACS.kernel_.silo :Installation
-
-        o = Here_::Imagemagick_Command_via_Appearance___.new( & oes_p )
-        o.appearance = @ACS
-        o.image_output_path = _installation.get_volatile_image_path
-        o.execute
-      end
+      attr_reader(
+        :appearance_,
+        :IM_command_,
+      )
     end
   end
 end
+# #pending rename: rename this "magnetics session.."

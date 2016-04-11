@@ -717,6 +717,7 @@ module Skylab::Zerk
           _component_rejected_request_
           missing_required_parameters
           referent_not_found
+          _component_unavailable_
         )
         p = -> k do
           # (we would cache but it's niCLI)

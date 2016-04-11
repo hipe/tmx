@@ -1,84 +1,84 @@
 module Skylab::MyTerm
 
-  Terminal_Adapters_ = ::Module.new
-  Terminal_Adapters_::Iterm = ::Module.new
-  class Terminal_Adapters_::Iterm::Osascript_via_Path < Callback_::Actor::Monadic
+  class Terminal_Adapters_::Iterm
 
-    def initialize path, & oes_p
+    class Magnetics_::OSA_Script_via_Image < Callback_::Actor::Monadic
 
-      @_oes_p = oes_p
-      @_unsanitized_image_path = path
-    end
+      # (cold.)
 
-    def execute
+      def initialize mags, & oes_p
 
-      path = @_unsanitized_image_path
+        @_oes_p = oes_p
+        @_unsanitized_image_path = mags.image_
+      end
 
-      if /[\\" ]/ =~ path || path.length.zero?
-        self._COVER_ME_invalid_looking_path
-      else
+      def execute
+        _ok = __sanitize_image_path
+        _ok && __resolve_vendor_OSA_script
+      end
+
+      def express_into_under y, _
+        @_OSA_script.each_line( & y.method( :<< ) )
+        y
+      end
+
+      def send_into_system_conduit_ sycond, & oes_p
+
+        ok_x = @_OSA_script.send_into_system_conduit sycond, & oes_p
+        if ok_x
+
+          md = %r(\Ascript result: apparently set bg image to (.+)$).match ok_x
+          if md && md[ 1 ] == @image_path
+
+            ___when_apparently_succeeded( & oes_p )
+          else
+            self._COVER_ME_system_rejected_request
+          end
+        else
+          ok_x
+        end
+      end
+
+      def ___when_apparently_succeeded & oes_p
+
+        path = @image_path
+
+        oes_p.call :info, :expression, :success do |y|
+          y << "apparently set iTerm background image to #{ pth path }"
+        end
+
+        ACHIEVED_
+      end
+
+      # --
+
+      def __resolve_vendor_OSA_script
+
+        _ = <<-HERE.gsub( %r(^[ ]{10}), EMPTY_S_ ).freeze
+          tell application "iTerm2"
+            tell current session of current window
+              set background image to "#{ @image_path }"
+            end tell
+          end tell
+          return "script result: apparently set bg image to #{ @image_path }"
+        HERE
+
+        @_OSA_script = Home_::Terminal_Adapter_::OSA_Script.via_one_big_string _
+
         remove_instance_variable :@_oes_p
-        @image_path = remove_instance_variable :@_unsanitized_image_path
         freeze
       end
-    end
 
-    def send_into_system_conduit_ sycond, & oes_p
+      def __sanitize_image_path
+        path = @_unsanitized_image_path
 
-      s_a = ___get_string_array
-
-      _i, o, e, w = sycond.popen3( s_a )
-
-      s = e.gets
-      if s
-        self._COVER_ME_did_not_succeed
-      else
-
-        s = o.gets
-        s and self._COVER_ME_unexpected_stdout_output_easy_enough
-
-        if w.value.exitstatus.zero?
-          ACHIEVED_
+        if /[\\" ]/ =~ path || path.length.zero?
+          self._COVER_ME_invalid_looking_path
         else
-          self._COVER_ME_unexpected_result_value
+          @image_path = remove_instance_variable :@_unsanitized_image_path
+          ACHIEVED_
         end
       end
     end
-
-    def express_into_under y, _
-      _write_script_lines_into y
-    end
-
-    def ___get_string_array
-
-      s_a = 'osascript', '-e'
-      s_a.push ___get_script_string
-      s_a
-    end
-
-    def ___get_script_string
-      _write_script_lines_into ""
-    end
-
-    def _write_script_lines_into y
-
-      _path = @image_path
-
-      _big_s = <<-HERE.gsub %r(^[ ]{8}), EMPTY_S_
-        tell application "iTerm"
-          tell current session of current window
-            set background image to "#{ _path }"
-          end tell
-        end tell
-      HERE
-
-      _s_a = _big_s.split %r((?<=\n))
-      _s_a.each do |s|
-        y << s
-      end
-      y
-    end
-
-    NEWLINE_ = "\n"
   end
 end

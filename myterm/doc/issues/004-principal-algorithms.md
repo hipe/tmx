@@ -2,6 +2,8 @@
 
 ## :principal-algorithm-1
 
+(EDIT: this will likely have changed somewhat by #milestone-8)
+
 in summary: whenever there is a "state change" in the data stored under
 this particular adapter node, we try to build and "send" a new image.
 

@@ -26,8 +26,8 @@ module Skylab::MyTerm::TestSupport
 
       it "says which pieces are missing" do
 
-        _s = "(still needed before we can produce an image: #{
-          }\"background font\" and \"label\")"
+        _s = "can't produce an image without #{
+          }\"background font\" and \"label\""
 
         root_ACS_state.message.should eql _s
       end

@@ -16,7 +16,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       shared_subject :_tuple do
         _o = build_root_ACS
-        st = Home_::Reflection::Node_Streamer.via_ACS( _o ).call
+        st = Home_::Reflection::Node_Ticket_Streamer.via_ACS( _o ).call
         _x = st.gets
         _xx = st.gets
         _xxx = st.gets and fail

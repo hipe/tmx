@@ -82,7 +82,11 @@ module Skylab::MyTerm
 
       yield :internal_name, :font
 
-      -> st, & pp do
+      method :interpret_path_
+    end
+
+    def interpret_path_ st, & pp
+      # -
 
         path = st.current_token
 
@@ -96,7 +100,11 @@ module Skylab::MyTerm
         else
           x
         end
-      end
+      # -
+    end
+
+    def accept_path__ kn
+      @path = kn.value_x ; nil
     end
 
     def __list__component_operation

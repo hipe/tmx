@@ -4,8 +4,12 @@
 
 in effort to create an architecture that is as fun as possible to work
 with while not chaining ourselves to any one image producing backend
-we experiment with a new sort of implementation for our [br] "reactive
+we experiment with a new sort of implementation for our [ac] "reactive
 model".
+
+(EDIT: the below hasn't been updated to fit with [ac]/[ze] and is still
+in a [br] frame of mind. by #milestone-8 let's rework the language. the
+underlying ideas will probably still hold.)
 
 in a typical a [br] application the "models" node is simply a ruby
 module constant with different "reactive nodes" in it as other

@@ -62,6 +62,10 @@ module Skylab::MyTerm::TestSupport
 
       # --
 
+      def subject_CLI
+        Home_::CLI
+      end
+
     # -
 
     # ==
@@ -125,6 +129,14 @@ module Skylab::MyTerm::TestSupport
         _line_at_index 1
       end
 
+      def third_from_last_line
+        _line_at_index( -3 )
+      end
+
+      def penultimate_line
+        _line_at_index( -2 )
+      end
+
       def _line_at_index d
         extend Syntax_for_Line__
         @_line_offset = d
@@ -179,6 +191,7 @@ module Skylab::MyTerm::TestSupport
     module Syntax_for_Invite___
 
       def __expect_invite
+        @_about = nil
         NOTHING_
       end
 
@@ -191,7 +204,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       def about_arguments
-        @__about = "arguments"
+        @_about = "arguments"
       end
 
       def at_done_with_phrase_
@@ -203,12 +216,28 @@ module Skylab::MyTerm::TestSupport
           _extra = " #{ @_from }"
         end
 
-        _expect = "see 'mt#{ _extra } -h' for more about #{ @__about }"
+        ab_s = @_about
+        if ab_s
+          _tail = " about #{ ab_s }"
+        else
+          _tail = '.'  # DOT_
+        end
+
+        expect = "see 'mt#{ _extra } -h' for more#{ _tail }"
 
         s_ = s.gsub STYLE_RX_, EMPTY_S_
         s_.length < s.length or fail
 
-        s_ == _expect or fail
+        if s_ == expect
+          ACHIEVED_
+        else
+          @_act = s_ ; @_exp = expect
+          _fail_by :___say_etc
+        end
+      end
+
+      def ___say_etc
+        "needed #{ @_exp.inspect } had #{ @_act.inspect }"
       end
     end
 
@@ -283,8 +312,12 @@ module Skylab::MyTerm::TestSupport
         if @_matchee_regexp =~ @_use_s
           ACHIEVED_
         else
-          fail
+          _fail_by :__say_rx
         end
+      end
+
+      def __say_rx
+        "needed to match against /#{ @_matchee_regexp.source }/: #{ @_use_s.inspect }"
       end
 
       def __match_against_string

@@ -153,7 +153,7 @@ more specifically: we know we have code that we use to normalize an
 entity against its formal properties (in whatever arbitrary
 business-specific constituency they may assume). can we normalize
 incoming formal properties against the (again business-specific)
-meta-properties with this same code? (see [#br-001], [#br-022], [#br-044])
+meta-properties with this same code? (see [#br-001], [#br-022], [#fi-037])
 
 crazier still, can we normalize meta-properties against The meta-meta-
 properties again with the same code that we use to accomplish the above?

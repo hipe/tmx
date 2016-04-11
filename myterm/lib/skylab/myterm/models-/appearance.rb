@@ -53,7 +53,7 @@ module Skylab::MyTerm
         end
         if fo_p
           -> ss do
-            _ss_ = Crazy_swap___[ ss, @adapter.implementation__ ]
+            _ss_ = Crazy_swap___[ ss, @adapter ]
             fo_p[ _ss_ ]
           end
         else
@@ -64,15 +64,16 @@ module Skylab::MyTerm
 
     def to_component_node_ticket_streamer
 
-      if @adapter
-        self._WEE
-      else
+      Require_ACS_[]
 
-        Require_ACS_[]
+      if @adapter
+
+        ACS_::Reflection::Node_Ticket_Streamer.via_ACS @adapter.implementation_
+      else
 
         _rw = ACS_::ReaderWriter.for_componentesque self  # just reads ivar
 
-        _hi = ACS_::Reflection::Node_Streamer.via_reader__ _rw  # #todo - change method name
+        _hi = ACS_::Reflection::Node_Ticket_Streamer.via_reader__ _rw  # #todo - change method name
 
         _hi
       end
@@ -112,27 +113,30 @@ module Skylab::MyTerm
       end
     end
 
-    Crazy_swap___ = -> ss, impl do
+    Crazy_swap___ = -> orig_ss, adapter do
 
-      _receiver_frame = ss.fetch( -2 )
+      # so that when the operation expresses its qualified name it uses
+      # the particular adapter name and not whatever it would be otherwise
 
-      _qk = _receiver_frame.qualified_knownness
-      _qk_ = _qk.new_with_value impl
-      _receiver_frame_ = Simplified_Frame_for_Experiment___.new _qk_
+      new_ss = orig_ss.dup
 
-      ss_ = ss.dup
-      ss_[ -2 ] = _receiver_frame_
-      ss_
+      new_ss[ -2 ] = Simplified_Frame_for_Experiment___.new adapter
+
+      new_ss
     end
 
     class Simplified_Frame_for_Experiment___
 
-      def initialize qk
-        @_qk = qk
+      def initialize ada
+        @_ada_wrapper = ada
+      end
+
+      def name
+        @_ada_wrapper.name__
       end
 
       def ACS
-        @_qk.value_x
+        @_ada_wrapper.implementation_
       end
     end
 

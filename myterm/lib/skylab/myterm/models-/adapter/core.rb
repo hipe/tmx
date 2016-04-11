@@ -30,8 +30,6 @@ module Skylab::MyTerm
 
         _mod = lt.module
 
-        lt.adapter_name
-
         Adapter___.new _mod, lt.adapter_name, @kernel_
       end
 
@@ -168,7 +166,11 @@ module Skylab::MyTerm
         @_nf.as_const
       end
 
-      def implementation__
+      def name__
+        @_nf
+      end
+
+      def implementation_
         @_impl
       end
 

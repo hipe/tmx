@@ -9,6 +9,13 @@ module Skylab::MyTerm
       # model meta-components beyond what "ships" with the [ac] component
       # association; that pertain to producing images..
 
+
+      def initialize name_sym
+
+        @is_used_to_make_image__ = true
+        super name_sym
+      end
+
       def accept__internal_name__meta_component x
         @__internal_name_symbol = x
         NIL_
@@ -35,6 +42,12 @@ module Skylab::MyTerm
       end
 
       attr_reader :is_required_to_make_image_
+
+      def accept__is_used_to_make_image__meta_component b
+        @is_used_to_make_image__ = b ; nil
+      end
+
+      attr_reader :is_used_to_make_image__
     end
   end
 end

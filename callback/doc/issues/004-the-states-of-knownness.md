@@ -31,7 +31,7 @@
 
 ## prerequisites and side-reading
 
-this is perhaps one step after [#br-088] the meta-meta-properties
+this is perhaps one step after [#fi-038] the meta-meta-properties
 justification.
 
 an important application of this "theory" at [#ba-027] normal

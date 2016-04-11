@@ -63,7 +63,7 @@ module Skylab::Zerk
             if @_greatest_exitstatus
               @CLI.init_exitstatus_ @_greatest_exitstatus
             else
-              self._COVER_ME  # you should set it to something
+              @CLI.init_exitstatus_for_ :_component_unavailable_
             end
             NIL_
           end

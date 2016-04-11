@@ -497,13 +497,23 @@ module Skylab::Zerk
 
         def __navigational__and__primitivesque__  # t4
 
+          _cant_go_this_way 'a primitivesque'
+        end
+
+        def __navigational__and__entitesque__
+
+          _cant_go_this_way 'an entitesque'
+        end
+
+        def _cant_go_this_way which_s
+
           # (this wording gets pretty personal, exhibiting perhaps a design
           # issue with the scope of this node v.s its client. might push up)
 
           fn = @_formal_node
-          had = ' (was primitivesque).'
           @_oes_p.call :error, :expression, :result_node_is_wrong_shape do |y|
-            y << "#{ nm fn.name } is not accessed with that syntax #{ had }"
+            y << "#{ nm fn.name } (#{ which_s }) #{
+              }is not accessed with that syntax."
           end
           UNABLE_
         end

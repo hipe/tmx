@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Reflection
 
-    class Node_Streamer  # :[#036]
+    class Node_Ticket_Streamer  # :[#036]
 
       # a "streamer" generally is a performer that produces a stream
       # (re-entrantly): it's like a proc that you can call multiple times,

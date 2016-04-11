@@ -54,24 +54,50 @@ module Skylab::Human
 
           # (this feels like #[#ca-046] emission handling pattern but isn't.)
 
-          kns = @knowns_
-          me = self
           if :expression == i_a[ 1 ]
-            kns.emission_downhandler.call( * i_a ) do |y|
-              kns.channel = i_a
-              kns.expression_proc = ev_p
-              me.___express y
-              y
-            end
+            __receive_expression i_a, & ev_p
           else
-            @knowns_.emission_downhandler.call( * i_a ) do
-              self._YET_TO_WRITE_build_event
+            __receive_event i_a, & ev_p
+          end
+        end
+
+        def __receive_event i_a, & ev_p
+
+          # hacked together for [my] but hrm just a sketch for now:
+          # contextualize events by "casting" them to expressions
+
+          wicked = i_a.dup
+          wicked[ 1, 0 ] = [ :expression ]
+
+          kns = @knowns_ ; me = self
+
+          kns.emission_downhandler.call( * wicked ) do |y|
+
+            ev = ev_p[]
+
+            kns.channel = i_a
+            kns.expression_proc = -> y_ do
+              ev.express_into_under y_, self
             end
+            me._express_into y
           end
           NIL_
         end
 
-        def ___express y
+        def __receive_expression i_a, & ev_p
+
+          kns = @knowns_ ; me = self
+
+          kns.emission_downhandler.call( * i_a ) do |y|
+            kns.channel = i_a
+            kns.expression_proc = ev_p
+            me._express_into y
+          end
+
+          NIL_
+        end
+
+        def _express_into y
 
           ma = Home_.lib_.basic::Yielder::Mapper.new
 
@@ -83,7 +109,7 @@ module Skylab::Human
 
           @knowns_.expression_agent.calculate ma.y, & @knowns_.expression_proc
 
-          NIL_
+          y
         end
 
         def ___map_first_line line  # #cp

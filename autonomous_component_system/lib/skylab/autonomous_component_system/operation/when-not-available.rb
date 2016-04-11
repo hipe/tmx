@@ -12,9 +12,7 @@ module Skylab::Autonomous_Component_System
 
         x = unava_p.call
         if oes_p
-          # expected during #milestone-4
           if x
-            self._A_should_be_fine__just_run_it
             ( * sym_a, ev_p ) = x
             oes_p.call( * sym_a, & ev_p )
             UNABLE_

@@ -7,6 +7,7 @@ module Skylab::MyTerm
   end
 
   module API
+    # one of the [#015] "generated modality clients" (see)
     class << self
       def call * x_a, & pp
 
@@ -142,5 +143,6 @@ module Skylab::MyTerm
   Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
   Autoloader_[ Models_ = ::Module.new ]
   NIL_ = nil
+  NOTHING_ = nil
   UNABLE_ = false
 end

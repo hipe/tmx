@@ -18,7 +18,7 @@ module Skylab::TestSupport
         const_set :Property, ::Class.new( _base_cls )
         # ~~ )
 
-        def sub_action  # while #open [#br-088]
+        def sub_action  # while #open [#fi-038]
 
           @argument_box[ :sub_action ]  # often nil
         end

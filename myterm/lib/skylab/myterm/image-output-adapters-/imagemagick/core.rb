@@ -17,8 +17,9 @@ module Skylab::MyTerm
 
       -> & call_p do
 
-        _sess = _begin_session
-        _sess.set_background_image__( & call_p )
+        x = _begin_terminal_mutation_session( & call_p ).set_background_image__
+        ACHIEVED_ == x and x = NOTHING_
+        x
       end
     end
 
@@ -26,9 +27,13 @@ module Skylab::MyTerm
 
       yield :unavailability, @_unavailability
 
-      -> & pp do
-        _sess = _begin_session
-        _sess.build_osa_script_( & pp[ self ] )
+      -> & call_p do
+
+        if 1 == call_p.arity
+          self._MODERNIZE_ME_or_figure_this_out  # #todo
+        end
+
+        _begin_terminal_mutation_session( & call_p ).build_OSA_script__
       end
     end
 
@@ -37,14 +42,8 @@ module Skylab::MyTerm
       yield :unavailability, @_unavailability
 
       -> & call_p do
-        _sess = _begin_session
-        _sess.build_imagemagick_command_( & call_p )
+        _begin_IM_session( & call_p ).build_imagemagick_command__
       end
-    end
-
-    def _begin_session
-
-      Here_::Session___.begin_cold_session__ self
     end
 
     def __image_gen_related_component_unavailability _fo
@@ -69,7 +68,46 @@ module Skylab::MyTerm
       _o.to_unavailability
     end
 
+    def _begin_terminal_mutation_session & oes_p
+
+      _ = _begin_IM_session( & oes_p )
+      Home_::Terminal_Adapters_::Iterm.begin_terminal_mutation_session___( _, & oes_p )
+    end
+
+    def _begin_IM_session & oes_p
+      Here_::Session___.begin_hot_session__ self, & oes_p
+    end
+
     # -- Components
+
+    def __bg_font__component_association
+
+      # because we need it to be reachable in one go for niCLI (as an
+      # option), we semi-redundantly have to "hand write" this "alias"
+      # to the real operation. ignore this from API, mask this in iCLI.
+
+      # #todo three times!?
+
+      yield :description, -> do
+        "(the ability to set the font from this frame)"
+      end
+
+      yield :is_used_to_make_image, false
+
+      -> st, & pp do
+
+        @background_font ||= Home_::Models_::Font.interpret_compound_component IDENTITY_, nil, self
+
+        kn = @background_font.interpret_path_ st, & pp
+
+        if kn
+          @background_font.accept_path__ kn
+          Callback_::Known_Known[ :_was_written_ ]  # ick/meh
+        else
+          kn
+        end
+      end
+    end
 
     def __background_font__component_association
 
@@ -102,5 +140,9 @@ module Skylab::MyTerm
     end
 
     Here_ = self
+    IDENTITY_ = -> x { x }
+    module Magnetics_
+      Autoloader_[ self ]
+    end
   end
 end

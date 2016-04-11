@@ -76,9 +76,9 @@ module Skylab::MyTerm::TestSupport
 
         a = _.express_into_under [], :_not_used_
 
-        a.first.should eql "tell application \"iTerm\"\n"
+        a.first.should eql "tell application \"iTerm2\"\n"
 
-        a.last.should eql "end tell\n"
+        a.last.should match %r(return "script result:)
       end
     end
 

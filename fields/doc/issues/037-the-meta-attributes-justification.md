@@ -1,8 +1,10 @@
-# the meta-properties justification :[#044]
+# the meta-properties justification :[#037]
+
+(EDIT: the is a re-housing from [br] and some of the language is old.)
 
 ## intro
 
-before reading this, you should understand what [#022] formal properties
+before reading this, you should understand what [#br-022] formal properties
 are.
 
 the concept of meta-properties is all about tagging your formal
@@ -22,7 +24,7 @@ other formal properties.
 
 our pedagogical example of a meta-property is often "requiredness". but
 actually, that is becoming a poor example of a meta-property with the
-ideas we will formulate in [#088].
+ideas we will formulate in [#038].
 
 the defining characteristic of meta-properties is that they are
 business-specific. (and yes, what constitues "business logic" apart from
@@ -51,4 +53,3 @@ here)
 ## alternatives ( :.B )
 
 in practice it will sometimes be easier (ETC)
-(#pending-rename: move to [fi])

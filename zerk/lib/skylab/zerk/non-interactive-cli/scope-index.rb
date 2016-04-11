@@ -10,6 +10,8 @@ module Skylab::Zerk
         @_frame_index_via_node_identifier = []
         @_index_into_reverse_stack = 0
         @_primitivesque_appropriation_op_box = nil
+        @_scope_node_identifier = nil
+
         node_tickets = []
         snivns = {}
 

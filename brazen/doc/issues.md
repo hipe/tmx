@@ -48,7 +48,10 @@
 [#090] #hole ( #moved to [fi] )
 [#089] #hole ( #was: unify with [#hu-043]  (unify contextualization) )
              ( became the ACS )
-[#088]       the meta-meta-properties justification ..
+
+[#088] #hole ( #moved-to: [fi] )
+             ( #was: the meta-meta-properties justification .. )
+
 
 [#087] #hole ( #moved-to: [#fi-012] )
              ( #was: #track similar normalization logics )
@@ -132,7 +135,10 @@
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
 [#045]   #subscribed - :A - (see in asset node) [ expect section ]
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
-[#044]       #parent-node: [#001] the meta-properties justification ..
+
+[#044] #hole ( #moved-to: [fi] )
+             ( #was: #parent-node: [#001] the meta-properties justification .. )
+
 [#043]       the frontier of a back-less front action
              ( #moved-to: [#pa-008] was tracking abstraction cand. )
              ( #was: the fancy bundle lookup exegesis .. )

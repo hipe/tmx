@@ -2,6 +2,9 @@ module Skylab::MyTerm
 
   class CLI
 
+    # to review, [ze] will "generate" for us (#todo  [#015])
+    # we want to leverage the [ze] generated CLI to
+
     def initialize sin, sout, serr, pn_s_a
       @sin = sin ; @sout = sout ; @serr = serr ; @pn_s_a = pn_s_a
     end

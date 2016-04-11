@@ -2,20 +2,19 @@ module Skylab::MyTerm
 
   class Image_Output_Adapters_::Imagemagick
 
-    class Imagemagick_Command_via_Appearance___
+    class Magnetics_::Command_via_Appearance < Callback_::Actor::Monadic
 
-      def initialize & p
-        @_oes_p = p
+      def initialize o, & p
+        @_mags = o ; @_oes_p = p
       end
-
-      attr_writer(
-        :appearance,
-        :image_output_path,
-      )
 
       def execute
 
         @_a = [ 'convert' ]
+        @appearance = @_mags.appearance_
+        _ = @appearance.kernel_.silo :Installation
+        @image_output_path = _.get_volatile_image_path
+
         ok = __populate_options_recursively
         ok &&= __add_label
         ok &&= __add_output_file
@@ -49,6 +48,12 @@ module Skylab::MyTerm
           qk = st.gets
           qk or break
 
+          asc = qk.association
+
+          if ! asc.is_used_to_make_image__
+            redo
+          end
+
           if ! qk.is_effectively_known
             redo
           end
@@ -58,7 +63,7 @@ module Skylab::MyTerm
           if m
             ok = send m, qk
           else
-            _ = qk.association.model_classifications.category_symbol
+            _ = asc.model_classifications.category_symbol
             ok = send :"__add__#{ _ }__", qk
           end
 
@@ -134,12 +139,15 @@ module Skylab::MyTerm
       def __finish
 
         remove_instance_variable :@_oes_p
+        remove_instance_variable :@_mags
         remove_instance_variable :@_special
 
         path = remove_instance_variable :@image_output_path
         s_a = remove_instance_variable :@_a
 
-        instance_variables.length.nonzero? and self._FORGOT_THESE
+        if instance_variables.length.nonzero?
+          self._FORGOT_THESE
+        end
 
         @image_path = path.freeze
         @string_array = s_a.freeze

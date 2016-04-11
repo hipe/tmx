@@ -1,7 +1,9 @@
-# the meta-meta-properties justification [#088]
+# the meta-meta-properties justification [#038]
+
+(EDIT: langauge might be old. this is a re-housing from [br].)
 
 hopefully without needing to explain it here we know what "formal
-properties" are and that they are useful. but if not, see [#022].
+properties" are and that they are useful. but if not, see [#037].
 
 then, with formal properties understood, you should know what [#044]
 meta-properties are before you move on.
@@ -30,4 +32,3 @@ formal properties are, then think of it this way: the above list is the
 out-of-the-box recognized list of formal properties that you can use to
 define your formal properties. that probably doesn't make sense either.
 _
-(#pending-rename: move to [fi])

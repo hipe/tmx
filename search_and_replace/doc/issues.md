@@ -80,6 +80,7 @@
              require some redesign (either never use a const value for
              these or detect which was used and whether (ICK) the
              sequence changes.)
+             ([my] has the beginnings of a sketch for a solution to this..)
 
 
 [#010]       edit sessions

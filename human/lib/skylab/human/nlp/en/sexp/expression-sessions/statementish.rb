@@ -192,4 +192,3 @@ module Skylab::Human
     end
   end
 end
-# #pending-rename

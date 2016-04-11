@@ -56,7 +56,7 @@ module Skylab::MyTerm::TestSupport
         argv '-h'
       end
 
-      it ".."
+      it ".."  # #todo
     end
 
     context "ending on compound whines" do
@@ -119,10 +119,6 @@ module Skylab::MyTerm::TestSupport
       it "lists with star" do
         expect :second_line, :o, "* imagemagick"
       end
-    end
-
-    def subject_CLI
-      Home_::CLI
     end
   end
 end

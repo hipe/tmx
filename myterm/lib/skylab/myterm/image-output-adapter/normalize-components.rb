@@ -93,7 +93,7 @@ module Skylab::MyTerm
               val asc.name.as_human  # ..
             end
 
-            y << "(still needed before we can produce an image: #{ and_ _s_a })"
+            y << "can't produce an image without #{ and_ _s_a }"
           end
 
           [ :info, :expression, :argument_error, :remaining_required_fields, _p ]
