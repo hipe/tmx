@@ -20,10 +20,13 @@ module Skylab::MyTerm::TestSupport
 
       it "`redefine_as_memoized` - definition works" do
 
-        o = _inst
+        _ke = _kernel
 
-        o.fonts_dir.should eql '/talisker'
-        o.system_conduit.is_fake_ or fail
+        _inst = _ke.silo :Installation
+
+        _inst.fonts_dir.should eql '/talisker'
+
+        _inst.system_conduit.is_fake_ or fail
       end
 
       it "(same) - is memoized" do
@@ -42,10 +45,10 @@ module Skylab::MyTerm::TestSupport
       end
 
       def _inst
-        _ke.silo :Installation
+        _kernel.silo :Installation
       end
 
-      def _ke
+      def _kernel
         TS_::Stubs::Kernel_01_Hi.instance
       end
     end

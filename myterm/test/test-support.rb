@@ -33,6 +33,10 @@ module Skylab::MyTerm::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    def system_conduit
+      NOTHING_
+    end
   end
 
   class << self
@@ -105,5 +109,6 @@ module Skylab::MyTerm::TestSupport
   Lazy_ = Callback_::Lazy
   NIL_ = nil
   NONE_ = nil
+  NOTHING_ = nil
   TS_ = self
 end

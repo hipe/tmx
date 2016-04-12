@@ -28,9 +28,9 @@ module Skylab::MyTerm::TestSupport
         end
       end
 
-      o.redefine_as_memoized :system_conduit do
-        TS_::Stubs::System_Conduit_01_Hi.instance
-      end
+      _sc = TS_::Stubs::System_Conduit_01_Hi.instance
+
+      inst.system_conduit = _sc
 
       ke
     end

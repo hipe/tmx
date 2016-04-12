@@ -1,6 +1,7 @@
 module Skylab::System
 
-  module Doubles::Stubbed_System  # see [#007]
+  module Doubles::Stubbed_System  # see [#028]
+
     # ->
       class << self
 
@@ -13,6 +14,122 @@ module Skylab::System
           Here_::Recording_Session__.new( byte_downstream, & edit_p ).execute
         end
       end  # >>
+      # <-
+
+    # -- this section is a simplified rewrite
+
+    class Inline_Pool
+
+      def initialize
+        @_pool = []
+      end
+
+      def _add_entry_by_ & matcher_p
+        @_pool.push matcher_p ; nil
+      end
+
+      def popen3 * cmd_s_a
+
+        d = nil ; p = nil
+
+        @_pool.length.times do |d_|
+          p = @_pool.fetch( d_ ).call cmd_s_a
+          if p
+            d = d_
+            break
+          end
+        end
+
+        if d
+          @_pool[ d, 1 ] = EMPTY_A_
+
+          if @_pool.length.zero?
+            remove_instance_variable :@_pool  # for sanity
+          end
+
+          Stub_Sys_Result__.new( & p ).produce
+        else
+          fail ___say_not_found cmd_s_a
+        end
+      end
+
+      def ___say_not_found cmd_s_a
+        "not found - #{ cmd_s_a.inspect }"
+      end
+    end
+
+    class Inline_Static
+
+      def initialize
+        @_h = {}
+      end
+
+      def _add_entry_ chdir=nil, cmd_s_a, & three_p
+
+        _bx = @_h.fetch chdir do
+          @_h[ chdir ] = Callback_::Box.new
+        end
+
+        _bx.add cmd_s_a, Stub_Sys_Result__.new( & three_p )
+
+        NIL_
+      end
+
+      def popen3 * cmd_s_a
+
+        block_given? and raise ::ArgumentError  # no
+
+        if cmd_s_a.last.respond_to? :each_pair
+          _key = cmd_s_a.pop.fetch :chdir
+        end
+
+        _bx = @_h.fetch _key
+
+        _rslt = _bx.fetch cmd_s_a
+
+        _rslt.produce
+      end
+    end
+
+    class Stub_Sys_Result__
+
+      def initialize & three_p
+        @__three_p = three_p
+      end
+
+      def produce
+
+        sout_a = [] ; serr_a = []
+
+        d = @__three_p[ :_nothing_, sout_a, serr_a ]
+
+        _sout_st = Stubbed_IO_for_Read__.via_nonsparse_array sout_a
+        _serr_st = Stubbed_IO_for_Read__.via_nonsparse_array serr_a
+        _thread = Stubbed_Thread.new d
+
+        [ :_dont_, _sout_st, _serr_st, _thread ]
+      end
+    end
+
+    class Stubbed_IO_for_Read__ < Callback_::Stream
+
+      def read
+        s = gets
+        if s
+          buffer = s.dup
+          begin
+            s = gets
+            s or break
+            buffer << s
+            redo
+          end while nil
+          buffer
+        end
+      end
+    end
+
+    # --
+      # ->
 
       module Instance_Methods___
 
@@ -256,25 +373,27 @@ module Skylab::System
 
         def __to_mock_thread
           if @exitstatus
-            Mock_Thread.new @exitstatus
+            Stubbed_Thread.new @exitstatus
           end
         end
       end
 
-      class Mock_Thread
+      class Stubbed_Thread
 
         def initialize es
-          @value = Mock_Thread_Value___.new es
+          @value = Stubbed_Thread_Value___.new es
         end
 
-        attr_reader :value
+        attr_reader(
+          :value
+        )
 
         def exit
           self
         end
       end
 
-      Mock_Thread_Value___ = ::Struct.new :exitstatus
+      Stubbed_Thread_Value___ = ::Struct.new :exitstatus
 
       # ~ end
 
@@ -282,3 +401,4 @@ module Skylab::System
     # -
   end
 end
+# #history: nabbed simplified rewrite from [gv]

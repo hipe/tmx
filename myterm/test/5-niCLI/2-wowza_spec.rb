@@ -85,10 +85,20 @@ module Skylab::MyTerm::TestSupport
         )
       end
 
-      it "(fake the system)"
+      it "succeeds" do
+        expect :succeeds
+      end
+
+      it "emits as info the imagemagick command" do
+        expect :penultimate_line, %r(\(attempting: convert -font )
+      end
+
+      it "says that it set it" do
+        expect :last_line, %r(\Aapparently set iTerm background image to )
+      end
 
       def system_conduit
-        self._ETC
+        TS_::Stubs::System_Conduit_02_Yay.instance
       end
     end
   end

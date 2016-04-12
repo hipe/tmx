@@ -25,7 +25,7 @@ module Skylab::System
       end
 
       def successful_wait
-        @___sw ||= Home_::Doubles::Stubbed_System::Mock_Thread.new 0
+        @___sw ||= Home_::Doubles::Stubbed_System::Stubbed_Thread.new 0
       end
     end  # >>
 

@@ -47,7 +47,12 @@ module Skylab::MyTerm::TestSupport
           add_line[ [ :e, s ] ]
         end
 
-        _CLI = subject_CLI.new( nil, _sout, _serr, ['mt'] )
+        _CLI = subject_CLI.new nil, _sout, _serr, ['mt']
+
+        sc = system_conduit
+        if sc
+          _CLI.system_conduit = sc
+        end
 
         _es = _CLI.invoke argv
 
@@ -135,6 +140,10 @@ module Skylab::MyTerm::TestSupport
 
       def penultimate_line
         _line_at_index( -2 )
+      end
+
+      def last_line
+        _line_at_index( -1 )
       end
 
       def _line_at_index d

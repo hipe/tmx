@@ -52,8 +52,12 @@ module Skylab::MyTerm
         @___FS ||= Home_.lib_.system.filesystem
       end
 
+      def system_conduit= x
+        @__sc_qk = Callback_::Known_Known[ x ] ; x
+      end
+
       def system_conduit
-        Home_.lib_.open3
+        ( @__sc_qk ||= Callback_::Known_Known[ Home_.lib_.open3 ] ).value_x
       end
     end
   end

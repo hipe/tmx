@@ -6,13 +6,23 @@ module Skylab::MyTerm
     # we want to leverage the [ze] generated CLI to
 
     def initialize sin, sout, serr, pn_s_a
+      @_sc_qk = nil
       @sin = sin ; @sout = sout ; @serr = serr ; @pn_s_a = pn_s_a
     end
 
+    def system_conduit= x
+      @_sc_qk = Callback_::Known_Known[ x ] ; x
+    end
+
     def invoke argv
+
       Require_zerk_[]
 
       _ACS = Home_._build_root_ACS
+
+      if @_sc_qk
+        _ACS.system_conduit = @_sc_qk.value_x
+      end
 
       cli = Zerk_::NonInteractiveCLI.begin
 

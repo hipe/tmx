@@ -1,6 +1,9 @@
 module Skylab::MyTerm
 
-  class Models_::Appearance  # notes (were) in [#003]
+  class Models_::Appearance
+
+    # this toplevel component of the ACS tree implements the
+    # experimental plugin architecture described in [#003]
 
     def initialize ke
 
@@ -8,6 +11,10 @@ module Skylab::MyTerm
       @adapters = nil
 
       @kernel_ = ke
+    end
+
+    def system_conduit= sc
+      @kernel_.silo( :Installation ).system_conduit = sc
     end
 
     def __adapters__component_association

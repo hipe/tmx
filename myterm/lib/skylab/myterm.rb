@@ -128,10 +128,12 @@ module Skylab::MyTerm
 
     Shellwords = stdlib[ :Shellwords ]
 
-    system_lib = sidesys[ :System ]
     System = -> do
-      system_lib[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
+
     Zerk = sidesys[ :Zerk ]
   end
 

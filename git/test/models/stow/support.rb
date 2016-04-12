@@ -32,8 +32,8 @@ module Skylab::Git::TestSupport
 
       def mock_system_conduit_where_ chdir, cmd, & three_p
 
-        sy = Mock_System___.new
-        sy._add_entry chdir, cmd, & three_p
+        sy = Home_.lib_.system_lib::Doubles::Stubbed_System::Inline_Static.new
+        sy._add_entry_ chdir, cmd, & three_p
         sy
       end
 
@@ -41,65 +41,5 @@ module Skylab::Git::TestSupport
         Home_.lib_.open_3
       end
     end
-
-    class Mock_System___  # stay close to [#sy-028]
-
-      def initialize
-
-        @_h = {}
-      end
-
-      def popen3 * cmd_s_a, h
-
-        block_given? and raise ::ArgumentError  # no
-
-        _bx = @_h.fetch h.fetch :chdir
-
-        _rslt = _bx.fetch cmd_s_a
-
-        _rslt.produce
-      end
-
-      def _add_entry chdir, cmd_s_a, & three_p
-
-        _bx = @_h.fetch chdir do
-          @_h[ chdir ] = Callback_::Box.new
-        end
-
-        _bx.add cmd_s_a, Mock_Sys_Result___.new( & three_p )
-
-        NIL_
-      end
-    end
-
-    class Mock_Sys_Result___
-
-      def initialize & three_p
-        @_three_p = three_p
-      end
-
-      def produce
-
-        sout_a = [] ; serr_a = []
-        d = @_three_p[ :_nothing_, sout_a, serr_a ]
-
-        sout_st = Callback_::Stream.via_nonsparse_array sout_a
-        serr_st = Callback_::Stream.via_nonsparse_array serr_a
-        thread = Mock_Thread___.new d
-
-        [ :_dont_, sout_st, serr_st, thread ]
-      end
-    end
-
-    class Mock_Thread___
-
-      attr_reader :value
-
-      def initialize d
-        @value = Mock_Thread_Value___.new d
-      end
-    end
-
-    Mock_Thread_Value___ = ::Struct.new :exitstatus
   end
 end

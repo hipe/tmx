@@ -40,6 +40,8 @@ module Skylab::MyTerm
       _ok && _init_if_necessary( :@OSA_script_, Magnetics_::OSA_Script_via_Image )
     end
 
+    attr_reader :OSA_script_
+
     # -- resolving the image
 
     def _resolve_image

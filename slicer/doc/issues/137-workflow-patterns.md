@@ -17,6 +17,31 @@ with perhaps a retrospective analysis.
 
 
 
+## CHECKLISTS
+
+
+
+### when starting a new milestone:
+
+  • search for all tags of milestone N
+
+
+
+### before starting a new milestone:
+
+  • search of all tags of N-1 milestone
+
+
+
+### before committing:
+
+  • todo's
+  • turning on debugging lines in tests
+  • breakpoint statements
+
+
+
+
 ## a practical development order for CRUD [#.H]
 
 this is a fun one because it flies in the face of intuition. and like

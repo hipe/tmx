@@ -42,10 +42,10 @@ module Skylab::Git
       ::Shellwords
     end
 
-    _System_lib = sidesys[ :System ]
-
     System = -> do
-      _System_lib[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
   end
 end
