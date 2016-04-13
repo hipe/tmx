@@ -118,7 +118,7 @@ module Skylab::Zerk
 
       # the default expressive behavior is to flush the whole stream now.
 
-      o = Home_.lib_.brazen::CLI_Support::Express_Mixed.new
+      o = Remote_CLI_lib_[]::Express_Mixed.new
       o.expression_agent = @main_view_controller.expression_agent
       o.mixed_non_primitive_value = @_object_stream
       rsx = @event_loop

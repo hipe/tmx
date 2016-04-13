@@ -170,7 +170,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      # -- the newschool way (experimental)
+      # -- the newschool way
 
       def be_line * x_a, & x_p
 

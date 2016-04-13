@@ -21,16 +21,7 @@ module Skylab::MyTerm
       def execute
 
         _ok = __resolve_load_ticket_via_argument_stream
-        _ok &&= __adapter_via_load_ticket
-      end
-
-      def __adapter_via_load_ticket
-
-        lt = remove_instance_variable :@_load_ticket
-
-        _mod = lt.module
-
-        Adapter___.new _mod, lt.adapter_name, @kernel_
+        _ok and Instance.__via_selection_load_ticket @_load_ticket, @kernel_
       end
 
       def __resolve_load_ticket_via_argument_stream
@@ -65,43 +56,62 @@ module Skylab::MyTerm
       end
     end
 
-    class Adapter___
+    class Instance
 
-      # #experiment - adapters shouldn't "know" they are adapters
+      # yes, this name is perhaps awful #todo-maybe.
+      # read #spot-1 - this is the invocation-time-only instance of the
+      # adapter.
 
-      # KEEP:
-      # _mod.interpret_compound_component IDENTITY_, nf, @kernel_, & @_pp
+      class << self
 
-      def initialize mod, nf, k
+        def __via_selection_load_ticket lt, ke
+          new_prototype_( ke ).__init_as_selected lt
+        end
 
-        @is_selected = false
-        @kernel_ = k
-        @_nf = nf
+        alias_method :new_prototype_, :new
+        undef_method :new
+      end  # >>
 
-        @_impl = mod.new self
+      def initialize ke
+        @kernel_ = ke
+      end
+
+      # ~
+
+      def __init_as_selected lt
+        @_is_selected = true
+        _init_via_load_ticket lt
+      end
+
+      # ~
+
+      def new_not_selected_ lt
+        dup.___init_not_selected lt
+      end
+
+      def ___init_not_selected lt
+        @_is_selected = false
+        _init_via_load_ticket lt
+      end
+
+      # ~
+
+      def _init_via_load_ticket lt
+
+        @_impl = lt.module.new self
+        @_load_ticket = lt
         @_rw = ACS_::ReaderWriter.for_componentesque @_impl
+        self
       end
 
       # --
-
-      def mutate_by_becoming_selected_
-        @is_selected = true ; nil
-      end
-
-      def mutate_by_becoming_not_selected__
-        @is_selected = false ; nil
-      end
 
       # -- Expressive event hook-ines/hook-outs
 
       def express_into_under y, expag  # for modality clients
 
-        self._K
-
-        # (not #until #milestone-5)
-
-        nf = @_nf
-        yes = @is_selected
+        nf = name
+        yes = @_is_selected
 
         expag.calculate do
 
@@ -115,7 +125,7 @@ module Skylab::MyTerm
       GLYPH_FOR_IS_NOT_SELECTED___ = '  '
 
       def description_under expag  # for expressive events
-        nf = @_nf
+        nf = name
         expag.calculate do
           nm nf
         end
@@ -163,15 +173,19 @@ module Skylab::MyTerm
       # --
 
       def adapter_name_const
-        @_nf.as_const
+        name.as_const
       end
 
-      def name__
-        @_nf
+      def name
+        @_load_ticket.adapter_name
       end
 
       def implementation_
         @_impl
+      end
+
+      def path
+        @_load_ticket.path
       end
 
       def reader_writer__

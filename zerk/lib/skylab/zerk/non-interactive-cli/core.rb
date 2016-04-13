@@ -27,11 +27,16 @@ module Skylab::Zerk
     # -- as prototype
 
     def init_as_prototype_
+      @invite = nil
       @when_head_argument_looks_like_option = nil
       self
     end
 
     attr_writer(
+      :compound_custom_sections,
+      :compound_usage_strings,
+      :invite,
+      :operation_usage_string,  # #todo
       :when_head_argument_looks_like_option,
     )
 
@@ -462,7 +467,7 @@ module Skylab::Zerk
       remove_instance_variable :@_top
     end
 
-    def top_frame_
+    def top_frame  # [my]
       @_top
     end
 
@@ -537,48 +542,21 @@ module Skylab::Zerk
 
     def express_stack_invite_ * x_a
 
-      @_for_what_kn = nil
-
-      if x_a.length.nonzero?
-        st = Callback_::Polymorphic_Stream.via_array x_a
-        begin
-          send :"__invite_will_express__#{ st.gets_one }__", st
-        end until st.no_unparsed_exists
-      end
-
-      kn = remove_instance_variable :@_for_what_kn
-      if kn
-        for_what = kn.value_x
+      inv = Here_::Invitation___.new x_a, self
+      p = @invite
+      if p
+        s = p[ inv ]
+        if s
+          line_yielder << s
+        end
       else
-        for_what = " for help"
-      end
-
-      s_a = _expressable_stack_aware_program_name_string_array.dup
-      s_a.push HELP_OPTION__
-
-      express_ do |y|
-        y << "see #{ code s_a.join SPACE_ }#{ for_what }"
+        inv.express
       end
       NIL_
     end
 
     alias_method :express_invite_to_general_help,  # [br]
       :express_stack_invite_
-
-    def __invite_will_express__because__ st
-
-      sym = st.gets_one
-      if sym
-        use_x = " for more about #{ sym }s"  # meh
-      end
-
-      @_for_what_kn = Callback_::Known_Known[ use_x ] ; nil
-    end
-
-    def __invite_will_express__for_more__ _
-
-      @_for_what_kn = Callback_::Known_Known[ " for more." ] ; nil
-    end
 
     def expression_strategy_for_property prp  # for expag
       if Home_.lib_.fields::Is_required[ prp ]
@@ -590,9 +568,9 @@ module Skylab::Zerk
 
     def express_primary_usage_line
 
-      parts = _expressable_stack_aware_program_name_string_array.dup
+      parts = expressable_stack_aware_program_name_string_array_.dup
       ___express_arguments_into parts
-      parts.push ELLIPSIS_PART_
+      parts.push ELLIPSIS_PART
 
       express_ do |y|
         y << "usage: #{ code parts.join SPACE_ }"
@@ -609,12 +587,11 @@ module Skylab::Zerk
       NIL_
     end
 
-    def _expressable_stack_aware_program_name_string_array
+    def expressable_stack_aware_program_name_string_array_
       @_top.expressible_program_name_string_array_
     end
 
-    def build_expressible_program_name_string_array__
-
+    def build_program_name_string_array_as_root_stack_frame__
       s_a = @__program_name_string_array.dup
       s_a[ 0 ] = ::File.basename s_a.first
       s_a
@@ -665,13 +642,15 @@ module Skylab::Zerk
     # -- expression mechanisms
 
     def express_section_via__ x_a, & p
+      section_expression_.express_section_via x_a, & p
+    end
+
+    def section_expression_
       @___SE ||= ___build_SE
-      @___SE.express_section_via x_a, & p
     end
 
     def ___build_SE
-      Home_.lib_.brazen::CLI_Support::Section::Expression.new(
-        line_yielder, expression_agent )
+      Remote_CLI_lib_[]::Section::Expression.new line_yielder, expression_agent
     end
 
     def expression_agent
@@ -690,6 +669,9 @@ module Skylab::Zerk
     end
 
     attr_reader(
+      :compound_custom_sections,
+      :compound_usage_strings,
+      :operation_usage_string,
       :sout,
     )
 
@@ -771,9 +753,9 @@ module Skylab::Zerk
 
     DASH_ = '-'
     DASH_BYTE_ = DASH_.getbyte 0
-    ELLIPSIS_PART_ = '[..]'
-    HELP_OPTION__ = '-h'
+    ELLIPSIS_PART = '[..]'
     Here_ = self
+    SHORT_HELP_OPTION = '-h'
     STOP_PARSING_ = false
     UNDERSCORE_ = '_'
   end

@@ -62,17 +62,30 @@ module Skylab::Zerk
             # line. (to write a second line explaing help is redundant
             # because such an explanation appears in the options section.)
 
-            _ = Remote_CLI_lib_[]::Syntax_Assembly.for self
+            sa = Remote_CLI_lib_[]::Syntax_Assembly.for self
 
-            _ = _.express_main_syntax_string_didactically_into ""
-
-            y << _
+            p = @CLI.operation_usage_string
+            if p
+              s = p[ sa ]
+            else
+              s = sa.express_main_syntax_string_didactically_into ""
+            end
+            if s
+              y << s
+            end
+            y
           end
 
           # -- args (for syntax)
 
           def didactic_argument_properties
             @modality_frame_.operation_syntax_.any_argument_attributes_array__
+          end
+
+          # --
+
+          def express_custom_sections
+            NOTHING_  # (we haven't wanted these yet)
           end
 
           # -- o.p
@@ -83,7 +96,7 @@ module Skylab::Zerk
 
           # -- items section
 
-          def express_options_as_actions_for_help
+          def do_express_options_as_actions_for_help
             false
           end
 

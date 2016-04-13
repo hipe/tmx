@@ -13,7 +13,8 @@
 
 [#011] #open this rewrite (i.e when #milestone-8)
 
-[#010] #open slightly customize help screen to show weird syntax
+[#010] #hole
+             ( #was: slightly customize help screen to show weird syntax )
              ( #was: all silo daemons )
 
 [#009]       cross-reference experiment with [ze]

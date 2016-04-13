@@ -31,12 +31,11 @@ module Skylab::MyTerm
 
     def _build_root_ACS  # (break down as needed)
 
-      _cls = Home_::Models_::Appearance
-      _k = ___custom_kernel
-      _cls.new _k
+      Home_::Models_::Appearance.new ___custom_kernel
     end  # :cp3
 
     def ___custom_kernel
+
       @___custom_kernel ||= Custom_Kernel___.new Home_, :Models_
     end  # :cp2
 
@@ -146,5 +145,6 @@ module Skylab::MyTerm
   Autoloader_[ Models_ = ::Module.new ]
   NIL_ = nil
   NOTHING_ = nil
+  SPACE_ = ' '
   UNABLE_ = false
 end

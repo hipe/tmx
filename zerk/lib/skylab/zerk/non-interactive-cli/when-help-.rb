@@ -186,6 +186,10 @@ module Skylab::Zerk
           @modality_frame_.subprogram_name_string_
         end
 
+        def to_frame_stream_from_bottom
+          @modality_frame_.to_frame_stream_from_bottom
+        end
+
         # -- support
 
         def express_section * x_a, & p  # by [br] sub-client and here

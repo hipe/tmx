@@ -80,7 +80,7 @@ module Skylab::Zerk::TestSupport
 
       def _build_pn
 
-        curr = niCLI_state.invocation.top_frame_
+        curr = niCLI_state.invocation.top_frame
 
         s_a = []
         begin

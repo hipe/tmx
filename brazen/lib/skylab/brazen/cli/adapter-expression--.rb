@@ -66,11 +66,15 @@ module Skylab::Brazen
         NIL_
       end
 
+      def express_custom_sections
+        NOTHING_  # not for [br]
+      end
+
       def option_parser
         @_option_parser
       end
 
-      def express_options_as_actions_for_help
+      def do_express_options_as_actions_for_help
         true  # in [br] we always do it this way
       end
 

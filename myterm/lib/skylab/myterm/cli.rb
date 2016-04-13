@@ -26,12 +26,28 @@ module Skylab::MyTerm
 
       cli = Zerk_::NonInteractiveCLI.begin
 
-      cli.root_ACS = -> & _oes_p do
-        _ACS
+      cli.compound_custom_sections = -> hf do
+        Here_::Custom_::Compound_custom_sections[ hf ]
+      end
+
+      cli.compound_usage_strings = -> y, sa do
+        Here_::Custom_::Compound_usage_strings[ y, sa ]
+      end
+
+      cli.operation_usage_string = -> sa do
+        Here_::Custom_::Operation_usage_string[ sa ]
       end
 
       cli.when_head_argument_looks_like_option = -> do
         Attempt_parse_etc___.new( cli ).execute
+      end
+
+      cli.invite = -> x_a do
+        Here_::Custom_::Invite[ x_a ]
+      end
+
+      cli.root_ACS = -> & _oes_p do
+        _ACS
       end
 
       cli.universal_CLI_resources @sin, @sout, @serr, @pn_s_a
@@ -97,7 +113,7 @@ module Skylab::MyTerm
 
       def __when_adapter
 
-        _ACS = @CLI.top_frame_.ACS
+        _ACS = @CLI.top_frame.ACS
 
         ok = Call_.call [ :adapter, @_val ], _ACS do |_|
           @CLI.on_event_selectively__  # #todo
@@ -111,5 +127,7 @@ module Skylab::MyTerm
         end
       end
     end
+
+    Here_ = self
   end
 end

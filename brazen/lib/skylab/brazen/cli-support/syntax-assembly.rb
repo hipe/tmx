@@ -44,12 +44,19 @@ module Skylab::Brazen
 
       def express_main_syntax_string_didactically_into y
 
-        @_add_word = :__add_first_word
-
-        @y = y
+        begin_expression_into y
         _add_any_word @formal_action.subprogram_name_string
-        __express_option_parser
-        __express_arguments
+        express_option_parser
+        express_arguments
+        release
+      end
+
+      def begin_expression_into y  # [my]
+        @_add_word = :__add_first_word
+        @y = y ; nil
+      end
+
+      def release
         remove_instance_variable :@y
       end
 
@@ -69,7 +76,7 @@ module Skylab::Brazen
         end
       end
 
-      def __express_option_parser
+      def express_option_parser  # [my]
 
         # :+#experimental: :+#public-API-for-custom-option-parsers
 
@@ -202,7 +209,7 @@ module Skylab::Brazen
 
       # -- arguments
 
-      def __express_arguments
+      def express_arguments  # [my]
 
         arg_a = @formal_action.didactic_argument_properties
 
@@ -269,6 +276,12 @@ module Skylab::Brazen
         NIL_
       end
 
+      alias_method :add_any_word, :_add_any_word
+
+      def add_word s  # [my]
+        send @_add_word, s ; nil
+      end
+
       def __add_first_word s
         @_add_word = :___add_subsequent_word
         @y << s ; nil
@@ -277,6 +290,12 @@ module Skylab::Brazen
       def ___add_subsequent_word s
         @y << SPACE_ << s ; nil
       end
+
+      # --
+
+      attr_reader(
+        :formal_action,  # [my]
+      )
 
       # ==
 

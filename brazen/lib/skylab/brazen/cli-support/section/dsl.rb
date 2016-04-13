@@ -17,6 +17,10 @@ module Skylab::Brazen
         @_num_lines = Here_::MAX_DESC_LINES
       end
 
+      def yield * x_a
+        receive x_a
+      end
+
       def receive x_a
 
         st = Callback_::Polymorphic_Stream.via_array x_a
@@ -158,6 +162,15 @@ module Skylab::Brazen
           _atr = @_st.gets_one
           @description_proc = Field_::Has_description[ _atr ]  # ABUSE
           NIL_
+        end
+
+        def description=
+          @description_proc = @_st.gets_one ; nil
+        end
+
+        def moniker=
+          s = @_st.gets_one
+          @moniker_proc = -> _expag { s } ; nil
         end
 
         def moniker_proc=

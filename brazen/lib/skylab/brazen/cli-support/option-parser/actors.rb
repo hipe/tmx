@@ -28,7 +28,7 @@ module Skylab::Brazen
           build_proc_for_string_begins_with_string sw
 
         -> tok do
-          if CLI::DASH_BYTE_ == tok.getbyte( 0 )  # :[#074.B].
+          if DASH_BYTE_ == tok.getbyte( 0 )  # :[#074.B].
             short == tok or 3 < tok.length && long[ tok ]
           end
         end
@@ -41,5 +41,7 @@ module Skylab::Brazen
         end
       end
     end.call
+
+    DASH_BYTE_ = '-'.getbyte 0  # 2nd
   end
 end

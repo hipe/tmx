@@ -33,8 +33,9 @@ with perhaps a retrospective analysis.
 
 
 
-### before committing:
+### before/during committing:
 
+  • rename goofy names to better names
   • todo's
   • turning on debugging lines in tests
   • breakpoint statements

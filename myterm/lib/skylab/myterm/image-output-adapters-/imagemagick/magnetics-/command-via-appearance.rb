@@ -210,8 +210,6 @@ module Skylab::MyTerm
         :image_path,
         :string_array,
       )
-
-      SPACE_ = ' '
     end
   end
 end

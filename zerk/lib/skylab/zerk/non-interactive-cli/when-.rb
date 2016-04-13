@@ -88,7 +88,7 @@ module Skylab::Zerk
 
           def say_expecting_
 
-            _strmr =  @CLI.top_frame_.streamer_for_navigational_node_tickets_
+            _strmr =  @CLI.top_frame.streamer_for_navigational_node_tickets_
             @node_a_ = _strmr.call.to_a
 
             s = if MAX_SPLAY_AMOUNT_ >= @node_a_.length
@@ -116,7 +116,7 @@ module Skylab::Zerk
             prp = @CLI.node_formal_property_
 
             s_a = @node_a_[ 0 ... MAX_SPLAY_AMOUNT_ ].map( & _node_moniker )
-            s_a.push ELLIPSIS_PART_
+            s_a.push ELLIPSIS_PART
 
             @CLI.expression_agent.calculate do
               "expecting #{ par prp }: { #{ s_a * ' | ' } }"

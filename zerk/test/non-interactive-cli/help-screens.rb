@@ -228,6 +228,10 @@ module Skylab::Zerk::TestSupport
         line_at_offset 0
       end
 
+      def second_line
+        line_at_offset 1
+      end
+
       def line_at_offset d
         st = to_line_stream
         d_ = 0
@@ -295,6 +299,10 @@ module Skylab::Zerk::TestSupport
 
       def first_string
         @_a.fetch( 0 ).string
+      end
+
+      def raw_line d
+        @_a.fetch d
       end
 
       def line_count
@@ -735,7 +743,7 @@ module Skylab::Zerk::TestSupport
       end
 
       Styling___ = Lazy_.call do
-        Home_.lib_.brazen::CLI_Support::Styling
+        Remote_CLI_lib_[]::Styling
       end
 
       def string
@@ -882,15 +890,14 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    p = nil
     Unstyle_styled__ = -> s do
-      p ||= Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled
-      p[ s ]
+      Remote_CLI_lib_[]::Styling::Unstyle_styled[ s ]
     end
 
     BLANK_RX___ = %r(\A$)  # be indifferent to newlines
     E__ = "\e".getbyte 0
-    WORD_RX__ = /\A[a-z]+/
     Here_ = self
+    Remote_CLI_lib_ = Home_::Non_Interactive_CLI::Remote_CLI_lib_
+    WORD_RX__ = /\A[a-z]+/
   end
 end

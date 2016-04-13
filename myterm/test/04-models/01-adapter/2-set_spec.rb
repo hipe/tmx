@@ -75,7 +75,7 @@ module Skylab::MyTerm::TestSupport
         begin
           ada = st.gets
           ada or break
-          if ada.is_selected
+          if ada.instance_variable_get :@_is_selected  # ick/meh
             selected.push ada
           end
           redo

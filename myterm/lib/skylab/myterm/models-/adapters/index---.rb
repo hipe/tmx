@@ -4,9 +4,13 @@ module Skylab::MyTerm
 
     class Index___
 
-      def initialize paths, single_mod
+      # if you receive the entries from the filesystem in a non-deterministic
+      # order, you can't stream the list of adapter "load tickets", period.
+      # (because each load ticket needs to know which it has among directory
+      # and file.) but how many adapters will there ever be anyway!? sheesh
+      # (but we did try. see last line of file.)
 
-        # (see last line of file)
+      def initialize paths, single_mod
 
         cache_a = []
         cache_h = {}
@@ -16,7 +20,7 @@ module Skylab::MyTerm
 
           if d.zero?
             cache_a.each( & :close__ )
-            @_lta = cache_a.freeze
+            @array = cache_a.freeze
             break
           end
 
@@ -58,9 +62,9 @@ module Skylab::MyTerm
         end while nil
       end
 
-      def to_load_ticket_stream__
-        Callback_::Stream.via_nonsparse_array @_lta
-      end
+      attr_reader(
+        :array,
+      )
     end
   end
 end

@@ -122,7 +122,7 @@ module Skylab::Zerk
 
       # for now we don't care if there was one and if so what the old value
       # was; but if you did, that processing would happen here.
-      # what we *do* care about is if this is a dootily, then we footily.
+      # what we *do* care about is if this is processing lists as lists.
 
       if is_listy
         a = Home_::Interpretation_Adapters_::List[ s, & @UI_event_handler ]

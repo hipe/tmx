@@ -18,18 +18,7 @@ module Skylab::MyTerm
     def ___init p, asc, acs, & pp
 
       @kernel_ = acs.kernel_
-
-      # -- (might need to move this to be late)
-      ada = acs.adapter
-      if ada
-        @_an_adapter_is_selected = true
-        @_selected_adapter_name_const = ada.adapter_name_const
-      else
-        @_an_adapter_is_selected = false
-      end
-
-      # NOTE ETC
-
+      @__selected_adapter = acs.method :adapter
       p[ self ]
     end
 
@@ -40,34 +29,41 @@ module Skylab::MyTerm
 
     def ___list
 
-      st = @kernel_.silo( :Adapters ).to_load_ticket_stream
+      # produce a stream NOT of adapter "load ticket"s (see #spot-1)
+      # but of adapter instances..
 
-      if @_an_adapter_is_selected
-        ___do_the_thing_with_the_thing st
-      else
-        st
-      end
-    end
+      lt_st = @kernel_.silo( :Adapters ).to_load_ticket_stream
 
-    def ___do_the_thing_with_the_thing st
+      proto = Models_::Adapter::Instance.new_prototype_ @kernel_
 
-      const = @_selected_adapter_name_const
+      flush_the_rest_to_a_map_of_not_selected = -> do
 
-      p = -> do
-        lt = st.gets
-        if lt
-          if const == lt.adapter_name_const
-            p = st
-            lt.is_selected_ = true
-            lt
-          else
-            lt
-          end
+        x = lt_st
+        lt_st = nil
+        x.map_by do |lt|
+          proto.new_not_selected_ lt
         end
       end
 
-      Callback_.stream do
-        p[]
+      ada = @__selected_adapter.call
+      if ada
+        const = ada.adapter_name_const
+        p = -> do
+          lt = lt_st.gets
+          if lt
+            if const == lt.adapter_name_const
+              p = flush_the_rest_to_a_map_of_not_selected[]
+              ada
+            else
+              proto.new_not_selected_ lt
+            end
+          end
+        end
+        Callback_.stream do
+          p[]
+        end
+      else
+        flush_the_rest_to_a_map_of_not_selected[]
       end
     end
 
@@ -78,16 +74,21 @@ module Skylab::MyTerm
       end
 
       def to_load_ticket_stream
+        @___lt_a ||= ___build_index
+        Callback_::Stream.via_nonsparse_array @___lt_a
+      end
 
-        _fs = @kernel_.silo( :Installation ).filesystem
+      def ___build_index
 
         single_mod = Home_::Image_Output_Adapters_
 
         _ = "#{ single_mod.dir_pathname.to_path }/[a-z0-9]*"
 
+        _fs = @kernel_.silo( :Installation ).filesystem
+
         _paths = _fs.glob _
 
-        Here_::Index___.new( _paths, single_mod ).to_load_ticket_stream__
+        Here_::Index___.new( _paths, single_mod ).array
       end
     end
 

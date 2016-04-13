@@ -39,12 +39,12 @@ module Skylab::Zerk
           s
         end
 
-        def get_program_name_string__
+        def get_program_name_string
           build_program_name_string_array_.join SPACE_
         end
 
         def build_program_name_string_array_
-          @CLI.build_expressible_program_name_string_array__
+          @CLI.build_program_name_string_array_as_root_stack_frame__
         end
 
         attr_reader(
@@ -154,11 +154,11 @@ module Skylab::Zerk
         def build_program_name_string_array_
 
           s_a = @next_frame_.expressible_program_name_string_array_
-          s_a.push subprogram_name_slug_
+          s_a.push subprogram_name_slug
           s_a
         end
 
-        def subprogram_name_slug_
+        def subprogram_name_slug
           name.as_slug
         end
       end
@@ -385,15 +385,15 @@ module Skylab::Zerk
 
         def _assemble_subprogram_name_string
 
-          st = __to_frame_stream_from_bottom
+          st = to_frame_stream_from_bottom
 
-          s = st.gets.get_program_name_string__
+          s = st.gets.get_program_name_string
 
           begin
             fr = st.gets
             fr or break
             s << SPACE_
-            s << fr.subprogram_name_slug_
+            s << fr.subprogram_name_slug
             redo
           end while nil
 
@@ -406,7 +406,7 @@ module Skylab::Zerk
 
         # --
 
-        def __to_frame_stream_from_bottom
+        def to_frame_stream_from_bottom  # [my]
 
           _a = _build_frame_stack_from_bottom
           Callback_::Stream.via_nonsparse_array _a

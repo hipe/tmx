@@ -33,22 +33,10 @@ module Skylab::MyTerm::TestSupport
         expect :penultimate_line, 'can\'t produce an image without "background font" and "label"'
       end
 
-      it "invite" do
-        expect :invite, :from, "osa-script"
+      it "invite (about nothing in particular)" do
+
+        expect :invite, :when_adapter_activated, :from, 'osa-script'
       end
-    end
-
-    context "(help)" do
-
-      given do
-        argv '--ada=ima', 'OSA-script', '-h'
-      end
-
-      it "(readme)" # #until [#010]..
-        # the most important thing to test is already exhibited by this
-        # helpscreen, which is that the adapter-specific components are
-        # reflected in the o.p. but additionally it would be prudent to
-        # have the help screen actually reflect what is syntax really is..
     end
 
     context "(bad font)" do
@@ -72,7 +60,10 @@ module Skylab::MyTerm::TestSupport
         expect :penultimate_line, :styled, %r(\Adid you mean ['"]?[a-z])
       end
 
-      it "invite"  # #during [#010] maybe make this better
+      it "invite" do
+
+        expect :invite, :when_adapter_activated, :from, 'osa-script', :about_options
+      end
     end
 
     context "(ok!)" do

@@ -114,7 +114,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def unstyle_styled_ s
-        Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled[ s ]
+        Remote_CLI_lib_[]::Styling::Unstyle_styled[ s ]
       end
 
       # -- testing which frame you are on

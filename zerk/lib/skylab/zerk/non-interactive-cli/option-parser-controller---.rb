@@ -146,7 +146,7 @@ module Skylab::Zerk
 
         op = Home_.lib_.stdlib_option_parser.new
 
-        op.on '-h', '--help[=named-argument]' do |s|
+        op.on SHORT_HELP_OPTION, '--help[=named-argument]' do |s|
           Special_Invocation___.new s, :__receive_help
         end
 

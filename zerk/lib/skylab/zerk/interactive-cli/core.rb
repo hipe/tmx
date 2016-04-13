@@ -109,9 +109,7 @@ module Skylab::Zerk
 
     def ___bound_call_for_event_loop
 
-      @boundarizer =
-        Home_.lib_.brazen::CLI_Support::Section::Boundarizer.new(
-          line_yielder )
+      @boundarizer = Remote_CLI_lib_[]::Section::Boundarizer.new line_yielder
 
       vmm = Here_::View_Maker_Maker___.instance
 
@@ -158,7 +156,7 @@ module Skylab::Zerk
     end
 
     def _expression_agent
-      Home_.lib_.brazen::CLI.expression_agent_instance
+      Remote_CLI_lib_[]::Expression_Agent.instance
     end
 
     def line_yielder

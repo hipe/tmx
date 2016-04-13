@@ -4,6 +4,12 @@ module Skylab::MyTerm
 
     class Load_Ticket
 
+      # NOTE - this is cached and used by long-running ("silo-") daemons
+      # and so (for example) must NOT know whether or not it represents a
+      # "selected" adapter (because during the lifetime of the kernel and
+      # its daemons the same adapter WILL be variously selected then not).
+      # (:#spot-1)
+
       class << self
         alias_method :new_via__, :new
         private :new
@@ -14,22 +20,12 @@ module Skylab::MyTerm
         @_box_mod = single_mod
         @dir = nil
         @file = nil
-        @is_selected_ = false
         @stem = stem
 
         _recv_path path, category
       end
 
       # -- reading
-
-      def express_into_under y, expag  # (meh..)
-        _star = if @is_selected_
-          '* '
-        else
-          '  '
-        end
-        y << "#{ _star }#{ @stem }\n"
-      end
 
       def module  # (doesn't cache the require'ing)
 
@@ -46,7 +42,7 @@ module Skylab::MyTerm
       def ___load_and_autoloaderize_module const
 
         if @file
-          self._WORKED_THEN_BECAME_UNCOVERED
+          self._WORKS_or_worked_BUT_IS_NOT_COVERED
           load_path = @file[ 0 ... - Autoloader_::EXTNAME.length ]
         else
           load_path = ::File.join @dir, Autoloader_::CORE_  # #violation
@@ -67,10 +63,6 @@ module Skylab::MyTerm
 
       def adapter_name
         @___nf ||= Callback_::Name.via_slug @stem
-      end
-
-      def is_selected
-        @is_selected_
       end
 
       # -- writing
@@ -112,12 +104,6 @@ module Skylab::MyTerm
 
       attr_reader(
         :stem,
-      )
-
-      # -- egads
-
-      attr_writer(
-        :is_selected_,
       )
     end
   end

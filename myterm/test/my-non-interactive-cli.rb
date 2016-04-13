@@ -200,8 +200,13 @@ module Skylab::MyTerm::TestSupport
     module Syntax_for_Invite___
 
       def __expect_invite
+        @__expect_adapter_activated = false
         @_about = nil
         NOTHING_
+      end
+
+      def when_adapter_activated
+        @__expect_adapter_activated = true ; nil
       end
 
       def from_top
@@ -210,6 +215,10 @@ module Skylab::MyTerm::TestSupport
 
       def from
         @_from = @_st.gets_one ; nil
+      end
+
+      def about_options
+        @_about = "options"
       end
 
       def about_arguments
@@ -221,8 +230,14 @@ module Skylab::MyTerm::TestSupport
         sym, s = @_state.lines.last
         sym == :e or fail
 
+        buff = ""
+
+        if @__expect_adapter_activated
+          buff << " -ai"  # meh
+        end
+
         if @_from
-          _extra = " #{ @_from }"
+          buff << " #{ @_from }"
         end
 
         ab_s = @_about
@@ -232,7 +247,7 @@ module Skylab::MyTerm::TestSupport
           _tail = '.'  # DOT_
         end
 
-        expect = "see 'mt#{ _extra } -h' for more#{ _tail }"
+        expect = "see 'mt#{ buff } -h' for more#{ _tail }"
 
         s_ = s.gsub STYLE_RX_, EMPTY_S_
         s_.length < s.length or fail

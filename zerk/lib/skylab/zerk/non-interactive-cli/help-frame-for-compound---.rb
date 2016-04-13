@@ -52,6 +52,17 @@ module Skylab::Zerk
 
           def write_syntax_strings_ y
 
+            p = @CLI.compound_usage_strings
+            if p
+              _sa = Remote_CLI_lib_[]::Syntax_Assembly.for self
+              p[ y, _sa ]
+            else
+              ___write_common_syntax_strings y
+            end
+          end
+
+          def ___write_common_syntax_strings y
+
             head = subprogram_name_string
 
             _prp = properties.fetch :action
@@ -65,13 +76,27 @@ module Skylab::Zerk
             y
           end
 
-          def express_options_as_actions_for_help
+          def do_express_options_as_actions_for_help
             # (whether or not to treat options like actions, in the display)
             # (usually we do this IFF '--help' is the only option)
             true
           end
 
           # -- description section
+
+          def express_custom_sections
+            p = @CLI.compound_custom_sections
+            if p
+              p[ self ]
+            end
+          end
+
+          def express_sections_by  # for above
+
+            o = Remote_CLI_lib_[]::Section::DSL.new self
+            yield o
+            o.finish
+          end
 
           # -- o.p
 

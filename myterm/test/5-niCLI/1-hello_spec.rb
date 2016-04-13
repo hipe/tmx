@@ -50,15 +50,6 @@ module Skylab::MyTerm::TestSupport
       end
     end
 
-    context "HELP SCREEN NEEDS CUSTOMIZATION" do
-
-      given do
-        argv '-h'
-      end
-
-      it ".."  # #todo
-    end
-
     context "ending on compound whines" do
 
       given do
@@ -82,7 +73,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "no star" do
-        expect :only_line, :o, "  imagemagick"
+        expect :only_line, :o, "  'imagemagick'"
       end
     end
 
@@ -117,7 +108,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "lists with star" do
-        expect :second_line, :o, "* imagemagick"
+        expect :second_line, :o, "• 'imagemagick'"
       end
     end
   end

@@ -14,13 +14,15 @@ module Skylab::Brazen
         :invocation_reflection,
       )
 
-      def express_common_screen_
+      def _express_common_screen
 
         @invocation_expression.express_usage_section
 
         @invocation_expression.express_description
 
-        @_options_as_actions = @invocation_expression.express_options_as_actions_for_help
+        @invocation_expression.express_custom_sections
+
+        @_do_options_as_actions = @invocation_expression.do_express_options_as_actions_for_help
 
         express_items_
       end
@@ -33,7 +35,7 @@ module Skylab::Brazen
         if @command_string
           ___when_command_string
         else
-          express_common_screen_
+          _express_common_screen
         end
       end
 
@@ -66,7 +68,7 @@ module Skylab::Brazen
 
         es = ___express_actions
 
-        if ! @_options_as_actions
+        if ! @_do_options_as_actions
           __express_branch_options
         end
 
@@ -147,7 +149,7 @@ module Skylab::Brazen
         exp = @invocation_expression
         expag = exp.expression_agent
 
-        if @_options_as_actions
+        if @_do_options_as_actions
           # present the 'help' option (or whatever) as an action
           op = exp.option_parser
           if op
@@ -192,7 +194,7 @@ module Skylab::Brazen
     class When::Help::For_Action < When::Help
 
       def produce_result
-        express_common_screen_
+        _express_common_screen
       end
 
       def express_items_
