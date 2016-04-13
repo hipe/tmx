@@ -519,7 +519,7 @@ module Skylab::Fields
         expag.calculate [], & p
       end
     else
-      self._EASY_BUT_DESIGN_AND_COVER_ME
+      NOTHING_
     end
   end
 

@@ -113,7 +113,7 @@
              ( #was: #done issue with parsing properties )
 [#059]       #doc-node names
 
-[#058]       [ specifically the custom help screen section API ]
+[#058]       the help screen DSL - spec is only usage documentation
              ( #was: #parent-node: [#057] the default frame )
 
 [#057]       [ arguments ]  (normalization)

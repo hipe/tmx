@@ -246,6 +246,8 @@ module Skylab::Brazen
     Two_streams = -> do
       System[].IO.some_two_IOs
     end
+
+    Zerk = sidesys[ :Zerk ]  # for testing only
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
@@ -269,6 +271,7 @@ module Skylab::Brazen
   NAME_SYMBOL = :name
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = ' '.freeze
   STOP_PARSING_ = false
   stowaway :TestSupport, 'test/test-support'

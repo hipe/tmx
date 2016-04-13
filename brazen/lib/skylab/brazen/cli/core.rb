@@ -684,39 +684,46 @@ module Skylab::Brazen
         o.produce_result
       end
 
-      def to_section_stream  # not options. see [#]/figure-3
+      def custom_sections  # this is the frontier of burgeoning [#058]:
+
+        # for each category of item, and then for each item within each
+        # category, use the [#] DSL, *while* reducing over the catogories
+        # with no items.
 
         cp = @categorized_properties
         cat_st = ___to_relevant_category_stream
         category_renderers = __category_renderers
 
-        Callback_.stream do
+        once = -> do  # activate vendor interpreter IFF needed
+          once = nil
+          yield :allow_item_descriptions_to_have_N_lines, 2  # etc
+        end
+
+        begin
           begin
             cat = cat_st.gets
             cat or break
             prp_a = cp.for cat
             prp_a or redo
-            _nf = Callback_::Name.via_variegated_symbol cat.symbol
-            p = category_renderers.fetch cat.symbol
-
-            _st = Callback_::Stream.via_nonsparse_array prp_a do | prp |
-
-              _name_x = p[ prp ]
-
-              _desc_p = -> expag, n do
-                if Field_::Has_description[ prp ]
-                  Field_::N_lines[ n, expag, prp ]
-                end
-              end
-
-              Callback_::Pair.via_value_and_name( _desc_p, _name_x )
-            end
-
-            x = Callback_::Pair.via_value_and_name( _st, _nf )
             break
           end while nil
-          x
-        end
+          cat or break
+
+          once && once[]
+
+          # now you definitely have a section with nonzero items
+
+          sym = cat.symbol
+          yield :section, :name_symbol, sym
+          p = category_renderers.fetch cat.symbol
+
+          prp_a.each do |prp|
+            yield :item, :moniker_proc, p[ prp ], :descriptor, prp
+          end
+
+          redo
+        end while nil
+        NIL_
       end
 
       def ___to_relevant_category_stream
@@ -912,9 +919,9 @@ module Skylab::Brazen
       Autoloader_[ self ]
 
       public(
+        :custom_sections,
         :didactic_argument_properties,
         :receive_show_help,
-        :to_section_stream,
         :__view_controller_class_for__help__option,
       )
     end  # action adapter

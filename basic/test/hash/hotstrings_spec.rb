@@ -29,6 +29,12 @@ module Skylab::Basic::TestSupport::Hash
       x.last.hotstring.should eql 'myo'
     end
 
+    it "with stream" do
+      _st = Callback_::Stream.via_nonsparse_array [ 'imagema', 'imogen' ]
+      _have = subject _st
+      _have.map( & :hotstring ) == %w( ima imo ) or fail
+    end
+
     def with * s_a
       @result = subject s_a
     end

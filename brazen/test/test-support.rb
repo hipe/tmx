@@ -65,6 +65,10 @@ module Skylab::Brazen::TestSupport
       expag ||= Home_::API.expression_agent_class.new Home_.application_kernel_  # ..no..
     end
 
+    def common_expag_
+      Home_::API.expression_agent_instance
+    end
+
     def cfg_filename
       Home_::Models_::Workspace.default_config_filename
     end
@@ -76,15 +80,15 @@ module Skylab::Brazen::TestSupport
 
   Callback_ = ::Skylab::Callback
 
-  module TestLib_
+  Lazy_ = Callback_::Lazy
 
-    memoize = Callback_::Lazy
+  module TestLib_
 
     Expect_event = -> test_context_cls do
       Callback_.test_support::Expect_Event[ test_context_cls ]
     end
 
-    Fileutils = Callback_.memoize do
+    Fileutils = Lazy_.call do
       require 'fileutils'
       ::FileUtils
     end
@@ -93,13 +97,17 @@ module Skylab::Brazen::TestSupport
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end
 
-    Tmpdir = memoize.call do
+    Tmpdir = Lazy_.call do
 
       sys = Home_::LIB_.system
 
       _path = ::File.join sys.defaults.dev_tmpdir_path, 'brzn'
 
       sys.filesystem.tmpdir :path, _path
+    end
+
+    Zerk_test_support = -> do
+      Home_.lib_.zerk.test_support
     end
   end
 

@@ -199,10 +199,7 @@ module Skylab::Brazen
 
         ___express_options
 
-        st = @invocation_reflection.to_section_stream
-        if st
-          __express_other_sections st
-        end
+        express_any_custom_sections_  # result is t/f of any
 
         SUCCESS_EXITSTATUS
       end
@@ -220,49 +217,31 @@ module Skylab::Brazen
         end
         NIL_
       end
+    end
 
-      def __express_other_sections st
+    class When::Help
 
-        # implement the undocument [#058] - custom help screen section API
-        # (examples in universe are tagged with this identifier..)
+      def express_any_custom_sections_
 
-        exp = @invocation_expression
+        intr = nil
 
-        expag = exp.expression_agent
-        _NUM_LINES = Home_::CLI_Support::MAX_DESC_LINES
-
-        begin
-          section = st.gets
-          section or break
-
-          _section_name_function = section.name_x
-          item_stream = section.value_x
-
-          @invocation_expression.express_section(
-            :header, _section_name_function.as_human,
-            :pluralize,
-            :wrapped_second_column, exp.option_parser,
-          ) do | y |
-
-            begin
-              item = item_stream.gets
-              item or break
-
-              _item_moniker_p = item.name_x
-              _desc_lines_p = item.value_x
-
-              _name_as_slug = _item_moniker_p[ expag ]
-
-              _s_a = _desc_lines_p[ expag, _NUM_LINES ]
-
-              y.yield( _name_as_slug, ( _s_a || EMPTY_A_ ) )
-
-              redo
-            end while nil
+        p = -> xx_aa do
+          intr = Here_::Section::DSL.new @invocation_expression
+          p = -> x_a do
+            intr.receive x_a
           end
-          redo
-        end while nil
-        NIL_
+          p[ xx_aa ]
+        end
+
+        @invocation_reflection.custom_sections do |*x_a|
+          p[ x_a ]
+        end
+
+        if intr
+          intr.finish  # result is t/f of any
+        else
+          NOTHING_
+        end
       end
     end
   end

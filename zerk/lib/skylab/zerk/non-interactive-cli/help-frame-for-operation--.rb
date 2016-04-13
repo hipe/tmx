@@ -89,17 +89,9 @@ module Skylab::Zerk
 
           # -- ad-hoc sections
 
-          def to_section_stream
+          def custom_sections & p  # [#br-058]
 
-            st = @modality_frame_.operation_syntax_.to_any_didactic_argument_item_stream__
-            if st
-
-              _nf = Callback_::Name.via_slug 'argument'
-
-              _section = Callback_::Pair.via_value_and_name st, _nf
-
-              Callback_::Stream.via_item _section
-            end
+            @modality_frame_.operation_syntax_.custom_section__( & p )
           end
         end
       end

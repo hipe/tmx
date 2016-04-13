@@ -175,8 +175,14 @@ module Skylab::Zerk::TestSupport
     class Coarse_Parse
 
       def initialize lines
-        @_h = Coarse_pass__[ lines ]
+        bx = Coarse_pass___[ lines ]
+        @_a = bx.a_
+        @_h = bx.h_
         @_section_cache = {}
+      end
+
+      def section_at_index d
+        section @_a.fetch d
       end
 
       def section sym
@@ -191,6 +197,10 @@ module Skylab::Zerk::TestSupport
       def section_name_symbols
         @_h.keys  # meh
       end
+
+      def section_count
+        @_a.length
+      end
     end
 
     class Section___
@@ -198,6 +208,21 @@ module Skylab::Zerk::TestSupport
       def initialize a
         @_a = a
       end
+
+      def items
+        @___items ||= __recurse
+      end
+
+      def __recurse
+
+        _st = Callback_::Stream.via_range( 1 ... @_a.length ) do |d|
+          @_a.fetch d
+        end
+
+        Coarse_pass_recurse___[ _st ]
+      end
+
+      # --
 
       def first_line
         line_at_offset 0
@@ -265,6 +290,8 @@ module Skylab::Zerk::TestSupport
           cache_a[ d ] || cache[ d ]
         end
       end
+
+      # --
 
       def first_string
         @_a.fetch( 0 ).string
@@ -718,7 +745,7 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    Coarse_pass__ = -> lines do
+    Coarse_pass___ = -> lines do
 
       # this is a way dumbed-down, bespoke variant of aforementioned mentors:
       # the object is global infallibility with local fallibility: we parse
@@ -748,7 +775,7 @@ module Skylab::Zerk::TestSupport
       #
       #   • this does not hold the test context, so all fails are hard..
       # -
-        h = {}
+        bx = Callback_::Box.new
         st = Callback_::Polymorphic_Stream.via_array lines
 
         li = nil ; s = nil
@@ -770,7 +797,7 @@ module Skylab::Zerk::TestSupport
         end
         start_bucket[]
         finish_bucket = -> do
-          h[ word_s.intern ] = a
+          bx.add word_s.intern, a
           a = nil ; word_s = nil
         end
 
@@ -787,14 +814,71 @@ module Skylab::Zerk::TestSupport
             finish_bucket[]
             start_bucket[]
             word_s = md[ 0 ]
-            redo
           end
           redo
         end while nil
 
-        h
+        bx
       # -
     end
+
+    Coarse_pass_recurse___ = -> st do
+
+      # exactly a simplified [#ba-043]
+
+      # (regexen here are written with spaces only but to add support
+      #  for tabs "should be" trivial.)
+
+      sections = []
+      line = st.gets
+      begin
+        line or break
+
+        sect = Sub_Section___.new line, []
+        sections.push sect
+
+        _md = %r(\A[ ]+(?=[^ ])).match line.string  # sanity..
+
+        marginator_rx = %r(\A#{ ::Regexp.escape _md[ 0 ] }[ ]+)
+
+        line = st.gets
+        begin
+          line or break
+
+          # if the line is one level of indent **or more** deeper
+          # than the line, classify it as a body line.
+
+          if marginator_rx =~ line.string
+            sect.body_lines.push line
+            line = st.gets
+            redo
+          end
+
+          # any one or more contiguous blank lines are always included
+          # in the body and do not break the section (for now).
+
+          begin
+            if BLANK_RX___ =~ line.string
+              sect.body_lines.push line
+              line = st.gets
+              line or break
+              redo
+            end
+            break
+          end while nil
+
+          # if it's neither of the above then let's assume its superior..
+
+          break
+        end while nil
+
+        redo
+      end while nil
+
+      sections
+    end
+
+    Sub_Section___ = ::Struct.new :head_line, :body_lines
 
     # ==
 
@@ -804,10 +888,9 @@ module Skylab::Zerk::TestSupport
       p[ s ]
     end
 
+    BLANK_RX___ = %r(\A$)  # be indifferent to newlines
     E__ = "\e".getbyte 0
-
     WORD_RX__ = /\A[a-z]+/
-
     Here_ = self
   end
 end

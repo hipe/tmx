@@ -50,12 +50,12 @@ module Skylab::Zerk
         end
       end
 
-      def to_any_didactic_argument_item_stream__  # only for help
+      def custom_section__ & p  # only for help
 
         @_determine_APC && _determine_APC
 
         if @_has_APC
-          @_APC.to_didactic_item_stream__
+          @_APC.the_custom_section__( & p )
         end
       end
 

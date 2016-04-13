@@ -17,19 +17,40 @@ module Skylab::Zerk
         @_n11n.formals
       end
 
-      def to_didactic_item_stream__  # only for help
+      def the_custom_section__ & p  # only for help - use [#br-058]
 
-        # result is a stream of [ca] Pair objects where each such item is
-        # struct with name and value, where each such value is a special
-        # proc that makes desc lines, and each such name is a special proc
-        # that makes an "item moniker" string per [#br-058].
-        #
-        # we furthermore our would-be initial stream of all parameters down
-        # to being only those that have any description (because it's
-        # redundant to list the argument otherwise, being that it already
-        # appears in the usage line).
-        #
-        # we furthermore check for description in two places egads!
+        # IFF there is at least one item, start the section. otherwise
+        # don't write the header line (and don't invoke the interpreter).
+
+        pair_st = __to_descriptive_argument_tuple_stream
+        pair = pair_st.gets
+        if pair
+          ___render_argument_section pair, pair_st, & p
+        end
+      end
+
+      def ___render_argument_section pair, pair_st
+
+        yield :section, :name_symbol, :argument  # i.e "arguments:", "argument:"
+
+        begin
+          par, descriptor = pair
+
+          _moniker_proc = -> par_ do
+            -> _expag do
+              par_.name.as_slug
+            end
+          end.call par  # make a closure because it's called late
+
+          yield :item, :moniker_proc, _moniker_proc, :descriptor, descriptor
+
+          pair = pair_st.gets
+
+        end while pair
+        NIL_
+      end
+
+      def __to_descriptive_argument_tuple_stream
 
         oi = @_operation_index
 
@@ -37,57 +58,29 @@ module Skylab::Zerk
 
         nt_d_a = oi.node_ticket_index_via_argument_index__ || EMPTY_A_
 
-        par_d_st = Callback_::Stream.via_times par_a.length
+        _par_d_st = Callback_::Stream.via_times par_a.length
 
-        p = nil
-        par_d = nil
+        _par_d_st.map_reduce_by do |par_d|
 
-        advance = -> do
-          par_d = par_d_st.gets
-          if par_d
-            KEEP_PARSING_
+          # reduce over the stream of parameters reducing down to only those
+          # parameters with a description proc. look in 2 places for it:
+          # first in the parameter, then second in the component association.
+
+          par = par_a.fetch par_d
+          if Field_::Has_description[ par ]
+            descriptor = par
           else
-            p = EMPTY_P_
-            STOP_PARSING_
-          end
-        end
-
-        advance[] or self._SANITY  # *assert* nonzero length..
-
-        p = -> do
-          begin  # (DON'T FORGET - advance this loop at the end)
-            par = par_a.fetch par_d
-            desc_p = par.description_proc
-
-            unless desc_p
-              nt_d = nt_d_a[ par_d ]
-              if nt_d
-                _nt = oi.scope_index_.scope_node_ nt_d
-                desc_p = _nt.association.description_proc
+            nt_d = nt_d_a[ par_d ]
+            if nt_d
+              asc = oi.scope_index_.scope_node_( nt_d ).association
+              if Field_::Has_description[ asc ]
+                descriptor = asc
               end
             end
-
-            unless desc_p
-              advance[] ? redo : break
-            end
-
-            _item_moniker_p = -> expag do
-              par.name.as_slug
-            end
-
-            _desc_lines_p = -> expag, _ignore_num_lines_for_now do
-              expag.calculate [], & desc_p
-            end
-
-            x = Callback_::Pair.via_value_and_name _desc_lines_p, _item_moniker_p
-            advance[]
-            break
-          end while nil
-          x
-        end
-
-        Callback_.stream do
-          p[]
+          end
+          if descriptor
+            [ par, descriptor ]
+          end
         end
       end
 

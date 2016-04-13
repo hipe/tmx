@@ -309,7 +309,6 @@ module Skylab::Brazen
 
       HEADER_COLON__ = ': '
       HEADER_COLON_LENGTH___ = HEADER_COLON__.length
-      NOTHING_ = nil
     end
 
     class Section::Boundarizer
@@ -378,7 +377,7 @@ module Skylab::Brazen
             on_next_line_express_a_boundary = false  # regardless of below
 
             if has_visible_content[ s ]
-              y << nil  # output a blank line of our own IFF this. otherwise:
+              y << EMPTY_S_  # output a blank line of our own IFF this. otherwise:
             end
 
             # if the received string has no visible content, we assume both
@@ -408,3 +407,4 @@ module Skylab::Brazen
     end
   end
 end
+# #pending-rename

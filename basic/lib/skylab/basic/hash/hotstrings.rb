@@ -22,14 +22,38 @@ module Skylab::Basic
       end
 
       def execute
+        if @s_a.respond_to? :gets
+          __when_stream
+        else
+          __when_array
+        end
+        __finish
+      end
+
+      def __when_stream
+        @hotstring_a = []
+        st = remove_instance_variable :@s_a
+        @index = -1
+        @s_a = []
+        begin
+          @string = st.gets
+          @string or break
+          @index += 1
+          @s_a[ @index ] = @string
+          via_index_and_string_create_hotstring
+          redo
+        end while nil
+        NIL_
+      end
+
+      def __when_array
         @hotstring_a = ::Array.new @s_a.length
         @s_a.each_with_index do |s, d|
           @index = d
           @string = s
           via_index_and_string_create_hotstring
         end
-        flush_rest
-        @hotstring_a
+        NIL_
       end
 
       def via_index_and_string_create_hotstring
@@ -61,7 +85,7 @@ module Skylab::Basic
         @was_occupied[ @candidate_s ] = true
         @is_occupied[ @candidate_s ] = @index
         @hotstring_a[ @index ] = Hotstring__.new @candidate_s
-        nil
+        NIL_
       end
 
       def adjust_other
@@ -76,17 +100,18 @@ module Skylab::Basic
           @is_occupied[ new_hotstring ] = d
           @hotstring_a[ d ].hotstring = new_hotstring
         end
-        nil
+        NIL_
       end
 
-      def flush_rest
+      def __finish
         d = @s_a.length
         while d.nonzero?
           d -= 1
           hs = @hotstring_a[ d ]
           hs or next
           hs.rest = @s_a[ d ][ hs.hotstring.length .. -1 ]
-        end ; nil
+        end
+        @hotstring_a
       end
 
       Hotstring__ = ::Struct.new :hotstring, :rest
