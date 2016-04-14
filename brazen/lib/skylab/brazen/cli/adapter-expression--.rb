@@ -92,6 +92,22 @@ module Skylab::Brazen
         NIL_
       end
 
+      def express_invite_to_help_as_compound_to invo_refl
+
+        _prp = invo_refl.properties.fetch :action
+        _s = invo_refl.subprogram_name_string
+
+        express_section do |y|
+
+          expression_agent.calculate do
+
+            y << "use #{ code "#{ _s } -h #{
+              }#{ par _prp }" } for help on that action."
+          end
+        end
+        NIL_
+      end
+
       def express_invite_to_general_help( * )
 
         _ = @_reflection.subprogram_name_string

@@ -133,6 +133,14 @@ module Skylab::Zerk
             st  # adhere to [#033] - we do no additional ordering of items
           end
 
+          # --
+
+          def express_invite_to_help_as_compound_to me
+
+            @CLI.express_stack_invite_ :as_compound_invite_to, me
+            NIL_
+          end
+
           # -- name & nearby
 
           def __named_args_part

@@ -17,10 +17,6 @@ module Skylab::MyTerm
       @kernel_.silo( :Installation ).system_conduit = sc
     end
 
-    def CLI_memo_  # see
-      @___CLI_memo ||= {}
-    end
-
     def __adapters__component_association
 
       Models_::Adapters

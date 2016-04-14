@@ -18,7 +18,7 @@ module Skylab::Zerk::TestSupport
         given( & p )
 
         yes = true ; x = nil
-        define_method :_hsz_screen do
+        define_method :niCLI_help_screen do
           if yes
             yes = false
             x = __build_hsz_screen
@@ -96,7 +96,7 @@ module Skylab::Zerk::TestSupport
       # ~
 
       def section sym
-        _hsz_screen.section sym
+        niCLI_help_screen.section sym
       end
 
       def __build_hsz_screen
@@ -200,6 +200,10 @@ module Skylab::Zerk::TestSupport
 
       def section_count
         @_a.length
+      end
+
+      def has_section sym
+        @_h.key? sym
       end
     end
 
@@ -842,7 +846,7 @@ module Skylab::Zerk::TestSupport
       begin
         line or break
 
-        sect = Sub_Section___.new line, []
+        sect = Sub_Section___.new line
         sections.push sect
 
         _md = %r(\A[ ]+(?=[^ ])).match line.string  # sanity..
@@ -857,7 +861,7 @@ module Skylab::Zerk::TestSupport
           # than the line, classify it as a body line.
 
           if marginator_rx =~ line.string
-            sect.body_lines.push line
+            sect._add_body_line line
             line = st.gets
             redo
           end
@@ -867,7 +871,7 @@ module Skylab::Zerk::TestSupport
 
           begin
             if BLANK_RX___ =~ line.string
-              sect.body_lines.push line
+              sect._add_body_line line
               line = st.gets
               line or break
               redo
@@ -886,7 +890,21 @@ module Skylab::Zerk::TestSupport
       sections
     end
 
-    Sub_Section___ = ::Struct.new :head_line, :body_lines
+    class Sub_Section___
+
+      def initialize o
+        @head_line = o
+      end
+
+      def _add_body_line o
+        ( @body_lines ||= [] ).push o ; nil
+      end
+
+      attr_reader(
+        :body_lines,
+        :head_line,
+      )
+    end
 
     # ==
 

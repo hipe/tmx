@@ -200,6 +200,12 @@ module Skylab::Zerk
         def expression_agent
           @CLI.expression_agent
         end
+
+        # -- exposures as [ze]
+
+        def modality_frame
+          @modality_frame_
+        end
       end
     end
   end

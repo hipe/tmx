@@ -58,29 +58,31 @@ module Skylab::Zerk
 
       def _determine_strategy
         x = @x
-        @shape = if x
+        if x
 
           if x.respond_to? :express_into_under
-            :expressive
+            __prepare_for_expressive
+            shape = :expressive
 
           elsif x.respond_to? :gets
-            :streamish
+            shape = :streamish
 
           elsif x.respond_to? :ascii_only?
-            :stringish
+            shape = :stringish
 
           elsif x.respond_to? :bit_length
-            :intish
+            shape = :intish
           else
 
             self._README
             # when true, assume it's semantic, so output "yes" or "no" etc
           end
         elsif x.nil?
-          :nil
+          shape = :nil
         else
           self._README
         end
+        @shape = shape
         NIL_
       end
 
@@ -88,8 +90,17 @@ module Skylab::Zerk
         send @shape ; nil
       end
 
+      def __prepare_for_expressive
+
+        @__y = ::Enumerator::Yielder.new do |s|
+          @CLI.sout.puts s
+        end
+
+        NIL_
+      end
+
       def expressive
-        @x.express_into_under @CLI.sout, @CLI.expression_agent ; nil
+        @x.express_into_under @__y, @CLI.expression_agent ; nil
       end
 
       def stringish

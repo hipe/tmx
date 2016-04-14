@@ -2,7 +2,7 @@
 
 [#015]       introduction to generated modality clients ..
 
-[#014]  #during #milestone-5 (maybe)
+[#014] #open (this unavailability hullabullooo)
 
 [#013] #open if you rip out the flyweightism from font, ..
 

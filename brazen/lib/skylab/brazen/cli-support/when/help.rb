@@ -137,7 +137,7 @@ module Skylab::Brazen
         end
 
         if did
-          __invite_to_more_help
+          @invocation_expression.express_invite_to_help_as_compound_to @invocation_reflection
           SUCCESS_EXITSTATUS
         else
           GENERIC_ERROR_EXITSTATUS  # ..
@@ -169,23 +169,6 @@ module Skylab::Brazen
           end
 
           y.yield ada.name.as_slug, ( _desc_lines || EMPTY_A_ )
-        end
-        NIL_
-      end
-
-      def __invite_to_more_help
-
-        exp = @invocation_expression
-        _prp = @invocation_reflection.properties.fetch :action
-        _s =  @invocation_reflection.subprogram_name_string
-
-        exp.express_section do | y |
-
-          exp.expression_agent.calculate do
-
-            y << "use #{ code "#{ _s } -h #{
-              }#{ par _prp }" } for help on that action."
-          end
         end
         NIL_
       end

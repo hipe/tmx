@@ -28,7 +28,50 @@ module Skylab::MyTerm::TestSupport
       it "options screen is customized" do
 
         _rx = %r(\A {2,}-a, --adapter=X {2,}[a-z])
-        _sect = section( :option ).raw_line( 1 ).string =~ _rx or fail
+        section( :option ).raw_line( 1 ).string =~ _rx or fail
+      end
+    end
+
+    context "(help screen from top with adapter selected)" do
+
+      given_screen do
+        argv '-ai', '-h'
+      end
+
+      it "first usage line is like above but shows adapter being selected" do
+
+        _be_this = be_line :styled, "usage: xyzi -ai <action> [..]"
+        section( :usage ).raw_line( 0 ).should _be_this
+      end
+
+      it "2nd usage is like above but (ditto)" do
+
+        _be_this = be_line :styled, %r(\A {2,}xyzi -ai -h <action>$)
+        section( :usage ).raw_line( 1 ).should _be_this
+      end
+
+      it "there does NOT appear the special custom section" do
+
+        niCLI_help_screen.has_section( :option ) and fail
+      end
+
+      it "actions show adapter-only actions" do
+
+        _hi = section( :actions ).items
+
+        rx = %r(\A {2,}background-font\b)
+        _found = _hi.detect do | item |
+          rx =~ item.head_line.string
+        end
+        _found or fail
+      end
+
+      it "invite should should DOOTILY FOR FOOTILY" do
+
+        _be_this = be_line :styled,
+          "use 'xyzi -ai -h <action>' for help on that action."
+
+        section( :use ).raw_line( 0 ).should _be_this
       end
     end
 

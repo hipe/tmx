@@ -51,7 +51,7 @@ module Skylab::MyTerm
       if @_use_cached_unavailability
         @_cached_unavailability
       else
-        @_use_cached_unavailability = true   # #during [#014] maybe use [ze] index instead
+        @_use_cached_unavailability = true   # #open [#014] - at #milestone-8 maybe use [ze] index instead
         x = ___determine_image_generational_unavailability
         @_cached_unavailability = x
         x

@@ -6,9 +6,10 @@ module Skylab::Zerk
 
       def initialize x_a, cli
 
+        @CLI = cli
         @didactic_ARGV_string = nil
         @_for_what_kn = nil
-        @CLI = cli
+        @method_name = :express_commonly
 
         if x_a.length.nonzero?
           @_st = Callback_::Polymorphic_Stream.via_array x_a
@@ -24,6 +25,12 @@ module Skylab::Zerk
       )
 
     private
+
+      def as_compound_invite_to
+
+        @invocation_reflection = @_st.gets_one
+        @method_name = :express_as_compound ; nil
+      end
 
       def because
 
@@ -42,6 +49,35 @@ module Skylab::Zerk
     public
 
       def express
+        send @method_name
+      end
+
+      def express_as_compound
+
+        # (at writing, by default, this is byte-per-byte what [br] does.)
+        # (otherwise we would probably DRY it w/ the other. might still.)
+
+        o = @invocation_reflection
+        prp = o.properties.fetch :action
+        s = @didactic_ARGV_string
+        if ! s
+          s = "#{ o.subprogram_name_string } -h"
+        end
+
+        # --
+
+        @CLI.section_expression_.express_section do |y|
+
+          @CLI.expression_agent.calculate do
+
+            y << "use #{ code "#{ s } #{
+              }#{ par prp }" } for help on that action."
+          end
+        end
+        NIL_
+      end
+
+      def express_commonly
 
         kn = remove_instance_variable :@_for_what_kn
         if kn
@@ -66,6 +102,8 @@ module Skylab::Zerk
 
       attr_reader(
         :CLI,
+        :invocation_reflection,
+        :method_name,
       )
     end
   end

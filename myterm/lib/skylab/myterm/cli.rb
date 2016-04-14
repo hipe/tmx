@@ -42,8 +42,8 @@ module Skylab::MyTerm
         Attempt_parse_etc___.new( cli ).execute
       end
 
-      cli.invite = -> x_a do
-        Here_::Custom_::Invite[ x_a ]
+      cli.invite = -> ze_invite do
+        Here_::Custom_::Invite[ ze_invite ]
       end
 
       cli.root_ACS = -> & _oes_p do

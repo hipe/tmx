@@ -438,6 +438,10 @@ module Skylab::Zerk
 
         # --
 
+        def all_purpose_cache  # crutch for [my]
+          @___APC ||= {}
+        end
+
         attr_reader(
           :next_frame_,
         )
