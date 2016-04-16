@@ -2,8 +2,8 @@ module Skylab::SearchAndReplace
 
   class Interface_Models_::Counts
 
-    def description
-      "the grep --count option - \"Only a count of selected lines ..\""
+    def self.describe_into_under y, _
+      y << "the grep --count option - \"Only a count of selected lines ..\""
     end
 
     PARAMETERS = Attributes_.call(
@@ -32,10 +32,10 @@ module Skylab::SearchAndReplace
           summarize = EMPTY_P_
           _oes_p.call :info, :expression, :summary do | y |
 
-            _ = plural_noun tot_matches, 'match'
+            _ = plural_noun tot_matches, 'line'
             __ = plural_noun tot_paths, 'path'
 
-            y << "(#{ tot_matches } #{ _ } in #{ tot_paths } #{ __ })"
+            y << "(#{ tot_matches } matching #{ _ } in #{ tot_paths } #{ __ })"
           end
           NIL_
         end

@@ -35,12 +35,11 @@ module Skylab::SearchAndReplace
       cmd = gr.to_command
       _command_string = cmd.command_string
 
-      @_oes_p.call :info, :grep_command_head do
+      @_oes_p.call :info, :expression, :grep_command_head do |y|
 
-        Callback_::Event.inline_neutral_with(
-          :grep_command_head,
-          :command_head, _command_string,
-        )
+        # (see tombstone for the beginnings of a structured event)
+
+        y << "grep command head: #{ _command_string.inspect }"
       end
 
       @_grep_runner = gr
@@ -58,7 +57,7 @@ module Skylab::SearchAndReplace
         if md
           d = md[ 2 ].to_i
           if d.nonzero?
-            Count_Item___.new md[ 1 ], md[ 2 ].to_i
+            Count_Item___.new md[ 1 ], d
           end
         else
           # (not covered)
@@ -72,7 +71,28 @@ module Skylab::SearchAndReplace
     end
 
     COUNT_LINE_RX___ = /\A(.+):(\d+)\z/
-    Count_Item___ = ::Struct.new :path, :count
+
+    class Count_Item___
+
+      def initialize path, count_d
+        @count = count_d
+        @path = path
+      end
+
+      def express_into_under y, expag
+
+        d = @count
+        path = @path
+        expag.calculate do
+          y << "#{ pth path } - #{ d } matching #{ plural_noun d, 'line' }"  # "N matches"
+        end
+      end
+
+      attr_reader(
+        :count,
+        :path,
+      )
+    end
 
     def _to_grep_result_path_stream
 
@@ -192,3 +212,4 @@ module Skylab::SearchAndReplace
     FILES_WITH_MATCHES_OPTION___ = '--files-with-matches'.freeze
   end
 end
+# #tombstone: grep command head as inline event

@@ -19,8 +19,6 @@ module Skylab::SearchAndReplace
 
     Prototype___ = Lazy_.call do
 
-      self._NOT_YET  # #during #milestone-6
-
       # _ = rsx.bridge_for( :filesystem ).pwd
 
       Require_Zerk_[]

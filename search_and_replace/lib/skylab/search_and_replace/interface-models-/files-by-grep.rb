@@ -2,8 +2,8 @@ module Skylab::SearchAndReplace
 
   class Interface_Models_::Files_by_Grep
 
-    def description
-      'list the matching filenames (but not the strings)'
+    def self.describe_into_under y, _expag
+      y << 'list the matching filenames (but not the strings)'
     end
 
     PARAMETERS = Attributes_.call(

@@ -2,8 +2,8 @@ module Skylab::SearchAndReplace
 
   class Interface_Models_::Files_by_Find
 
-    def description
-      "previews all files matched by the `find` query"
+    def self.describe_into_under y, expag
+      y << "previews all files matched by the `find` query"
     end
 
     PARAMETERS = Attributes_.call(

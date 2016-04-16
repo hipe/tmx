@@ -60,8 +60,8 @@ module Skylab::Zerk::TestSupport
 
         section ||= self.section( :options )
 
-        h = {}
-        parse_line = ___line_parser_for h
+        bx = Callback_::Box.new
+        parse_line = ___line_parser_for bx
         st = section.to_line_stream
         st.gets  # skip header line
         begin
@@ -70,13 +70,14 @@ module Skylab::Zerk::TestSupport
           parse_line[ line ]
           redo
         end while nil
-        h
+        bx
       end
 
-      def ___line_parser_for h
+      def ___line_parser_for bx
 
         rx = %r(\A
-          [ ]{2,}(?<short>-[a-z]),[ ]
+          [ ]{2,}
+          (?: (?<short>-[a-z]),[ ] )?
           (?<long>--(?:(?![ ][ ]).)+)
           (?:[ ]{2,}(?<rest>[^ ].+))?
         \n\z)x
@@ -88,12 +89,43 @@ module Skylab::Zerk::TestSupport
           else
             s = line.string
           end
-          ol = Option_Line___.new was_styled, * rx.match( s ).captures
-          h[ ol.short ] = ol ; nil
+          md = rx.match s
+          if ! md
+            self._ROBUSTIFY_REXEP_maybe
+          end
+          ol = Option_Line___.new was_styled, * md.captures
+          s = ol.short
+          if s
+            bx.add s, ol
+          else
+            bx.add ol.long, ol
+          end
+          NIL_
         end
       end
 
-      Option_Line___ = ::Struct.new :was_styled, :short, :long, :desc
+      class Option_Line___
+
+        def initialize b, s, s_, s__
+          @desc = s__
+          @long = s_
+          @short = s
+          @was_styled = b
+        end
+
+        def long_stem
+          @long_stem ||= @long.match( RX___ )[ 0 ]
+        end
+
+        RX___ = %r([a-z]+(?:-[a-z]+)*)
+
+        attr_reader(
+          :desc,
+          :long,
+          :short,
+          :was_styled,
+        )
+      end
 
       # ~
 
@@ -506,7 +538,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def ___say_no_short
-        "no #{ @sw.inspect } - had #{ @_index.keys.inspect }"
+        "no #{ @sw.inspect } - had #{ @_index.a_.inspect }"
       end
 
       def __long

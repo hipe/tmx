@@ -2,8 +2,8 @@ module Skylab::SearchAndReplace
 
   class Interface_Models_::Matches
 
-    def description
-      'see the matching strings (not just files)'
+    def self.describe_into_under y, _expag
+      y << 'see the matching strings (not just files)'
     end
 
     PARAMETERS = Attributes_.call(

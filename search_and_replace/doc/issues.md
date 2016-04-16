@@ -1,3 +1,15 @@
+[#025] #flit drop-in from niCLI to CLI, if for e.g there are missing
+             required arguments. hypothetically this would be an amusing
+             way to "store settings" of an S/R and bring them back up
+             for another session with different arguments. this might,
+             however, be a bad idea; and in any case should come post-
+             #milestone-9.
+
+             it is implemented there should be an option in niCLI that
+             prevents this drop-in from happening (or one that allows it
+             to) so that non-interactive sessions that are intended to
+             be so can stay that way.
+
 [#024] #track complicated client interface
 
 [#023] #when-etc use (or don't) for all occurrences of old memoize
