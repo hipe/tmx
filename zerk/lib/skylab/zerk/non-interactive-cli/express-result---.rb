@@ -33,6 +33,9 @@ module Skylab::Zerk
       def execute
         _determine_strategy
         _act
+        if @_do_set_exitstatus
+          @CLI.init_exitstatus_ 0
+        end
         NIL_
       end
 
@@ -57,6 +60,9 @@ module Skylab::Zerk
       end
 
       def _determine_strategy
+
+        @_do_set_exitstatus = true
+
         x = @x
         if x
 
@@ -77,24 +83,45 @@ module Skylab::Zerk
             self._README  # when true/false, assume it's semantic so
               # *output* "yes"/"no". this has far reaching impact because
               # now we can't result in ACHIEVED_ per our instinct. :#here
-          else
-            fail ___say_wahoo x
           end
+          # (else will try custom effection)
         elsif x.nil?
           shape = :nil
         else
           self._README  # :#here
         end
-        @shape = shape
+
+        if shape
+          @shape = shape
+        else
+          __custom_effection_or_bust x
+        end
         NIL_
       end
 
-      def ___say_wahoo x
-        "you probably want to implement `express_into_under` on #{ x.class }"
+      def __custom_effection_or_bust x
+
+        found = Here_::Custom_Effection___::Find.call x, @CLI
+
+        if found.ok
+          @_do_set_exitstatus = false
+          @shape = :__custom_effection
+          @_custom_effection = found
+        else
+          raise found.to_exception
+        end
       end
+
+      # --
 
       def _act
         send @shape ; nil
+      end
+
+      def __custom_effection
+
+        @_custom_effection.effect_for @x  # result is unreliable but [#037]:#"note 2"
+        NIL_
       end
 
       def __prepare_for_expressive

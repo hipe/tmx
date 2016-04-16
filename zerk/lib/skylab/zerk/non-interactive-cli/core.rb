@@ -36,6 +36,7 @@ module Skylab::Zerk
       :compound_custom_sections,
       :compound_usage_strings,
       :invite,
+      :location_module,
       :operation_usage_string,  # #todo
       :when_head_argument_looks_like_option,
     )
@@ -95,7 +96,7 @@ module Skylab::Zerk
           exitstatus_for_ :_component_rejected_request_  # observe [#026]
         else
           Here_::Express_Result___[ x, self ]  # see
-          0  # SUCCESS_EXITSTATUS
+          @_exitstatus
         end
       else
         @_exitstatus  # e.g syntax error somewhere in this file, missing req's
@@ -671,6 +672,7 @@ module Skylab::Zerk
     attr_reader(
       :compound_custom_sections,
       :compound_usage_strings,
+      :location_module,
       :operation_usage_string,
       :sout,
     )
@@ -679,6 +681,17 @@ module Skylab::Zerk
 
     def init_exitstatus_for_ k
       init_exitstatus_ exitstatus_for_ k
+    end
+
+    def maybe_upgrade_exitstatus d
+      if instance_variable_defined? :@_exitstatus
+        if @_exitstatus < d
+          @_exitstatus = d
+        end
+      else
+        @_exitstatus = d
+      end
+      NIL_
     end
 
     def init_exitstatus_ d

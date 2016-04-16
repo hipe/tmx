@@ -105,12 +105,23 @@ module Skylab::Zerk::TestSupport
         s_a_.join SPACE_
       end
 
+      def assemble_big_string_on e_or_o
+
+        buffer = ""
+        _niCLI_state_lines.each do |li|
+          if e_or_o == li.stream_symbol
+            buffer.concat li.string
+          end
+        end
+        buffer
+      end
+
       # REMINDER: `line` means emission-line (the structure). we don't
       # convert them this early because we often have to de-style them
       # and that is part of the assertion, not done here.
 
       def only_line
-        a = _lines_tuple
+        a = _niCLI_state_lines
         1 == a.length or fail
         a.fetch 0
       end
@@ -124,25 +135,25 @@ module Skylab::Zerk::TestSupport
       end
 
       def first_line
-        _lines_tuple.fetch 0
+        _niCLI_state_lines.fetch 0
       end
 
       def second_line
-        _lines_tuple.fetch 1
+        _niCLI_state_lines.fetch 1
       end
 
       def last_line
-        _lines_tuple.fetch( -1 )
+        _niCLI_state_lines.fetch( -1 )
       end
 
       def third_and_final_line
-        a = _lines_tuple
+        a = _niCLI_state_lines
         3 == a.length or fail
         a.fetch 2
       end
 
       def __line_content_hack d
-        a = _lines_tuple
+        a = _niCLI_state_lines
         s = a.fetch( d ).string
         s.chomp!
         a[ d ] = :_used_
@@ -150,10 +161,10 @@ module Skylab::Zerk::TestSupport
       end
 
       def number_of_lines
-        _lines_tuple.length
+        _niCLI_state_lines.length
       end
 
-      def _lines_tuple
+      def _niCLI_state_lines
         niCLI_state.lines
       end
 
