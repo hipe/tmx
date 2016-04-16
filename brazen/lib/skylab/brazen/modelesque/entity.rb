@@ -245,7 +245,7 @@ module Skylab::Brazen
           attr_reader :description_proc
 
           def argument_argument_moniker  # [gv], [cme]. for "didactics"..
-            NIL_
+            NOTHING_
           end
         end
 

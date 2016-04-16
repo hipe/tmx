@@ -72,18 +72,25 @@ module Skylab::Zerk
 
           elsif x.respond_to? :bit_length
             shape = :intish
-          else
 
-            self._README
-            # when true, assume it's semantic, so output "yes" or "no" etc
+          elsif true == x
+            self._README  # when true/false, assume it's semantic so
+              # *output* "yes"/"no". this has far reaching impact because
+              # now we can't result in ACHIEVED_ per our instinct. :#here
+          else
+            fail ___say_wahoo x
           end
         elsif x.nil?
           shape = :nil
         else
-          self._README
+          self._README  # :#here
         end
         @shape = shape
         NIL_
+      end
+
+      def ___say_wahoo x
+        "you probably want to implement `express_into_under` on #{ x.class }"
       end
 
       def _act

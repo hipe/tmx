@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
 
     module When_Not_Available
 
-      Require_field_library_[]
+      Require_fields_lib_[]
 
       Act = -> oes_p, unava_p, fo do
 

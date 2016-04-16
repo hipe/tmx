@@ -133,7 +133,13 @@ module Skylab::Zerk
         # --
 
         def description_proc_
-          @formal_operation_.description_proc
+
+          p = @formal_operation_.description_proc
+          if p
+            p
+          else
+            @formal_operation_.description_proc_thru_implementation
+          end
         end
 
         def name

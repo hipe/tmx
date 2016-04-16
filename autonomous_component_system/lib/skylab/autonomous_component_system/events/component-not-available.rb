@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Events::Component_Not_Available
 
-    Require_field_library_[]
+    Require_fields_lib_[]
 
     Act = -> unava_p, asc, ss do
 

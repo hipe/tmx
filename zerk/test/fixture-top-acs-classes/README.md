@@ -15,7 +15,7 @@ per what the test is testing.
 the first 10 (1-10) are for ACS's composed of
 a single sub-node only. (and if the sub-node is
 compound, it must be the empty compound node
-"dummy")
+"dummy".)
 
 the next 30 (11-40) are for any ACS's that go
 "wide" but not "deep", so none of these can

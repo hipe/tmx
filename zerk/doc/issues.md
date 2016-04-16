@@ -1,3 +1,5 @@
+[#036]       singular-plural across modalities..
+
 [#035] #open help screens for primitivesques??
 
 [#034]       niCLI is not long-running

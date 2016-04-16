@@ -37,7 +37,7 @@ module Skylab::Zerk
 
       def initialize params
 
-        Require_field_library_[]
+        Require_fields_lib_[]
 
         @main_view_controller = params.main_view_controller
         @expression_agent = params.expression_agent

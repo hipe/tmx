@@ -9,6 +9,10 @@ module Skylab::Autonomous_Component_System
         @_p = p
       end
 
+      def desc_proc_
+        NOTHING_
+      end
+
       class Preparation < Preparation_
 
         def to_bound_call

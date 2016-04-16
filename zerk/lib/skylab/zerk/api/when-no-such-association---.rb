@@ -6,7 +6,7 @@ module Skylab::Zerk
 
       When_no_such_association___ = -> ss, arg_st do
 
-        Require_field_library_[]
+        Require_fields_lib_[]
 
         _st = ss.last.to_every_node_ticket_stream_
 

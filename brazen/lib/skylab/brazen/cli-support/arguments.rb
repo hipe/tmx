@@ -36,6 +36,7 @@ module Skylab::Brazen
           end  # >>
 
           def initialize prp_a
+            prp_a or self._SANITY
 
             @_accept = :__accept_for_iambic
 

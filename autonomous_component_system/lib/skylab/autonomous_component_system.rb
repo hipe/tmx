@@ -112,6 +112,21 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     Reader_of_CAs_by_method_in___ = -> ca_class, acs do
 
+      read_association = nil
+
+      when_no_component_model = -> sym, ca do
+
+        if :plural_of == ca.singplur_category
+
+          ref_sym = ca.singplur_referent_symbol
+          _m = Method_name_via_name_symbol[ ref_sym ]
+          _sing_ca = read_association[ _m, ref_sym ]
+          Home_::Singularize___[ _sing_ca, sym, ca, acs ]
+        else
+          self._COVER_ME_no_component_model
+        end
+      end
+
       read_association = -> m, sym do
 
         ca = nil
@@ -134,14 +149,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
           if cm
             ca._finish_via cm, sym
           else
-            sym_ = ca.is_plural_of
-            if sym_
-              _m_ = Method_name_via_name_symbol[ sym_ ]
-              _sing_ca = read_association[ _m_, sym_ ]
-              Home_::Singularize___[ _sing_ca, sym, ca, acs ]
-            else
-              self._COVER_ME
-            end
+            when_no_component_model[ sym, ca ]
           end
 
         elsif cm
@@ -329,14 +337,16 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def accept__is_plural_of__meta_component sym
 
-        @argument_arity = :one_or_more
-        @is_plural_of = sym ; nil
+        @argument_arity = :one_or_more  # hold up [#026]:B
+        @singplur_referent_symbol = sym
+        @singplur_category = :plural_of ; nil
       end
 
       def accept__is_singular_of__meta_component sym
 
-        _name_as_ivar_will_be :"@#{ sym }"  # implement the one side of [#026]
-        @is_singular_of = sym ; nil
+        _name_as_ivar_will_be :"@#{ sym }"  # hold up [#026]:A (one side)
+        @singplur_referent_symbol = sym
+        @singplur_category = :singular_of ; nil
       end
 
       def accept__flag__meta_component
@@ -345,8 +355,8 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       attr_reader(
         :argument_arity,
-        :is_plural_of,
-        :is_singular_of,
+        :singplur_category,
+        :singplur_referent_symbol,
       )
 
       # ~
@@ -479,24 +489,32 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       end
     end
 
+
+
     module By_Ivars
 
+      write = -> x, asc, acs do
+        acs.instance_variable_set asc.name.as_ivar, x
+        NIL_
+      end
+
+      singplur = {
+        :plural_of => -> qk, acs do
+          x = qk.value_x
+          ::Array.try_convert( x ) or self._SANITY
+          write[ x, qk.association, acs ]
+        end,
+        :singular_of => -> qk, acs do
+          write[ [ qk.value_x ], qk.association, acs ]  # the other side of [#026]
+        end,
+        nil => -> qk, acs do
+          write[ qk.value_x, qk.association, acs ]
+        end
+      }
+
       Value_writer_in = -> acs do
-
         -> qk do
-
-          if qk.is_known_known
-            x = qk.value_x
-            asc = qk.association
-
-            if asc.is_singular_of  # the other side of [#026]
-              x = [ x ]
-            end
-
-            acs.instance_variable_set asc.name.as_ivar, x
-          else
-            self._NEVER_BEEN_NEEDED
-          end
+          singplur.fetch( qk.association.singplur_category )[ qk, acs ]
           NIL_
         end
       end
@@ -538,7 +556,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     Lazy_ = Callback_::Lazy
 
-    Require_field_library_ = Lazy_.call do
+    Require_fields_lib_ = Lazy_.call do
       Field_ = Home_.lib_.fields  # idiomatic name
       NIL_
     end

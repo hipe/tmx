@@ -38,14 +38,14 @@ module Skylab::Autonomous_Component_System
 
           if existing
             if edit
-              existing.dup_by_ do
+              existing.dup_by do
                 instance_exec( & edit )
                 @parameter_arity ||= :one
               end
             elsif existing.parameter_arity
               existing
             else
-              existing.dup_by_ do
+              existing.dup_by do
                 @parameter_arity = :one
               end
             end

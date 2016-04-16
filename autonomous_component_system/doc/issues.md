@@ -51,7 +51,10 @@
              association, *by the storage implementation* (ivars)
              the singular form of actual value is stored in the storage
              location of the plural variant, after this singular value
-             is "upgraded" to being one-length array.
+             is "upgraded" to being one-length array. :A
+
+             B) #API-point: all `is_plural_of` are automatically given
+                an argument arity of `one_or_more`.
 
 [#025]       #after: [#010]
 

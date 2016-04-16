@@ -5,9 +5,18 @@ module Skylab::Autonomous_Component_System
     class NormalRepresentation_for_NonProc___ < Normal_Representation_
 
       def initialize pfoz, x, fo
-        @__classesque = x
+        @_classesque = x
         @formal_ = fo
         @__formals = pfoz
+      end
+
+      def desc_proc_
+        if @_classesque.respond_to? :describe_into_under
+          cls = @_classesque
+          -> y do
+            cls.describe_into_under y, self
+          end
+        end
       end
 
       class Preparation < Preparation_
@@ -36,7 +45,7 @@ module Skylab::Autonomous_Component_System
 
       def begin_parameter_store_ & call_handler
 
-        Store___.new @__classesque.new( & call_handler )
+        Store___.new @_classesque.new( & call_handler )
       end
 
       class Store___

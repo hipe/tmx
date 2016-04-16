@@ -136,8 +136,8 @@ module Skylab::Autonomous_Component_System
 
       # ~
 
-      def normal_representation_
-        @_normal_representation
+      def description_proc_thru_implementation
+        @_normal_representation.desc_proc_
       end
 
       def name_symbol  # [ze]
@@ -149,6 +149,10 @@ module Skylab::Autonomous_Component_System
       end
 
       attr_reader :selection_stack  # [ze]
+
+      def normal_representation_
+        @_normal_representation
+      end
 
       def formal_node_category
         :formal_operation

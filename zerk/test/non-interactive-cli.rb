@@ -26,7 +26,7 @@ module Skylab::Zerk::TestSupport
         define_method :niCLI_state do
           if yes
             yes = false
-            x = __build_state_for_niCLI_by( & p )
+            x = instance_exec( & p )  # tombstone has DSL
           end
           x
         end
@@ -34,6 +34,14 @@ module Skylab::Zerk::TestSupport
     # -
 
     # -
+      # -- assertion for general state
+
+      def output line_content
+        o = Expectation_over_Whole_State___.new
+        o._expected_single_output_line_content = line_content
+        o.finish
+      end
+
       # -- assertion of line content
 
       def be_general_invite_line_from_root
@@ -182,24 +190,7 @@ module Skylab::Zerk::TestSupport
         TS_::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _lines
       end
 
-      def __build_state_for_niCLI_by & p
-
-        @_tmp_for_niCLI = DSL_Argument_Receiver___.new
-
-        instance_exec( & p )  # typically only `argv` is called
-
-        _argv, = remove_instance_variable( :@_tmp_for_niCLI ).to_a
-
-          # (the above may grow when we test input beyond ARGV..)
-
-        _build_state_for_niCLI_via _argv
-      end
-
-      def build_state_for_niCLI_via_invoke__ * argv
-        _build_state_for_niCLI_via argv
-      end
-
-      def _build_state_for_niCLI_via argv
+      def argv * argv  # see DSL tombstone
 
         using_expect_stdout_stderr_invoke_via_argv argv
 
@@ -235,11 +226,6 @@ module Skylab::Zerk::TestSupport
         cli.to_classesque
       end
 
-      DSL_Argument_Receiver___ = ::Struct.new :argv
-      def argv * argv
-        @_tmp_for_niCLI.argv = argv ; nil
-      end
-
       # TestSupport_::Memoization_and_subject_sharing[ self ]
 
       define_method :invocation_strings_for_expect_stdout_stderr, ( Lazy_.call do
@@ -253,7 +239,47 @@ module Skylab::Zerk::TestSupport
       end
     # -
 
+    # ==
+
+    class Expectation_over_Whole_State___
+
+      attr_writer(
+        :_expected_single_output_line_content,
+      )
+
+      def finish
+        self
+      end
+
+      def matches? state
+        state.exitstatus.zero? or fail
+        a = state.lines
+        a.length == 1 or fail
+        s = a.first.string
+        _yes = s.chomp!
+        if _yes
+          if s == @_expected_single_output_line_content
+            ACHIEVED_
+          else
+            @__had_s = s
+            _fail_by :__say_line_did_not_match
+          end
+        else
+          _fail_by :__say_line_did_not_end_with_newline  # not written
+        end
+      end
+
+      def _fail_by m
+        raise send m
+      end
+
+      def __say_line_did_not_match
+        "expected #{ @_expected_single_output_line_content.inspect }, had #{ @__had_s.inspect }"
+      end
+    end
+
     Here_ = self
   end
 end
+# #tombstone: we once had room for a more sophisticated DSL but didn't use it
 # #tombstone: we once built state \"manually\" with our own structure

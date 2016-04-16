@@ -37,7 +37,7 @@ module Skylab::Zerk
         bx = oi.release_primitivesque_appropriation_op_box__
 
         if bx && bx.length.zero?
-          bx = nil  # could have been emptied at #spot-3
+          bx = nil  # could have been emptied at #spot-3 :#here-1
         end
 
         if a || bx
@@ -53,8 +53,10 @@ module Skylab::Zerk
 
         if bx
           bx.each_value do |d|
-            __add_this_primitivesque_appropriation_to_op d
+            @_asc = @_scope_index.scope_node_( d ).association
+            send SINGPLUR___.fetch @_asc.singplur_category
           end
+          remove_instance_variable :@_asc  # hello #here-1
         end
 
         if a
@@ -67,6 +69,17 @@ module Skylab::Zerk
         remove_instance_variable :@_scope_index ; nil
       end
 
+      SINGPLUR___ = {
+        :singular_of => :__add_this_singular_primi_approp_to_op,
+        # (no :plural_of by design)
+        nil => :_add_this_primitivesque_appropriation_to_op,
+      }
+
+      def __add_this_singular_primi_approp_to_op
+        # (hi.)
+        _add_this_primitivesque_appropriation_to_op
+      end
+
       # == BEGIN:
       #
       # after the below issues, then de-dup the duplication happening..
@@ -77,24 +90,22 @@ module Skylab::Zerk
       # this comes at a cost to invocations that don't result in help,
       # but with  mental savings of having only one option parser.
 
-      def __add_this_primitivesque_appropriation_to_op d
+      def _add_this_primitivesque_appropriation_to_op
 
         # (this fulfills [#] note B in the algorithm)
 
-        nt = @_scope_index.scope_node_ d
+        asc = @_asc  # necessary - will close on it
 
-        _s_a = _any_desc_lines_for nt.association.description_proc  # help only
+        _s_a = _any_desc_lines_for asc.description_proc  # help only
 
-        slug, short = _slug_and_any_short_for nt.name
-
-        asc = nt.association
+        slug, short = _slug_and_any_short_for asc.name
 
         sym = asc.argument_arity
         if sym && :zero == sym  # [ac] is agnostic, so we default this late,
           # ..rather than Field_::Takes_argument[ asc ]
           _long = "--#{ slug }"
         else
-          _long = "--#{ slug } X"
+          _long = "--#{ slug } #{ OPTION_ARGUMENT_MONIKER__ }"
         end
 
         @_op.on( * short, _long, * _s_a ) do |s|
@@ -110,8 +121,12 @@ module Skylab::Zerk
         slug, short = _slug_and_any_short_for par.name
 
         if Field_::Takes_argument[ par ]
-          _long = "--#{ slug } X"
+
+          _ = par.argument_argument_moniker || OPTION_ARGUMENT_MONIKER__
+
+          _long = "--#{ slug } #{ _ }"
         else
+
           _long = "--#{ slug }"
         end
 
@@ -120,6 +135,8 @@ module Skylab::Zerk
         end
         NIL_
       end
+
+      OPTION_ARGUMENT_MONIKER__ = 'X'
 
       def _any_desc_lines_for desc_p
         if desc_p
@@ -227,7 +244,7 @@ module Skylab::Zerk
 
         def ___receive qk  # (thoughts on availability.. #"c4")
 
-          ok = Receive_ARGV_value_.new( qk, @__oi, @client, & @__oes_pp ).execute
+          ok = Receive_ARGV_value_.new( qk, @__oi, @client, :_TEMP_VIA_OPTS_, & @__oes_pp ).execute
 
           if ! ok
             # (because of the way o.p is, we can't elegantly signal a stop)

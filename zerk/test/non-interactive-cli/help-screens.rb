@@ -33,16 +33,16 @@ module Skylab::Zerk::TestSupport
 
       # ~ usage line
 
-      def build_usage_line_index_of_first_usage_line
+      def build_index_of_first_usage_line
 
         # (experimental code sketch - use a rough regex to break the usage
         # line into its parts, based on some axioms of character usage.)
 
         _ = section( :usage ).first_line.unstyled_styled
-        build_usage_line_index_of_this_unstyled_line _
+        build_index_of_this_unstyled_usage_line _
       end
 
-      def build_usage_line_index_of_this_unstyled_line mutable_s
+      def build_index_of_this_unstyled_usage_line mutable_s
 
         mutable_s.chomp!
         _s_a = mutable_s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))  # #open [#bm-002] (benchmarks)
@@ -56,11 +56,13 @@ module Skylab::Zerk::TestSupport
 
       # ~ options
 
-      def build_index_of_option_section__ section
+      def build_index_of_option_section section=nil
+
+        section ||= self.section( :options )
 
         h = {}
         parse_line = ___line_parser_for h
-        st = _help_screen.section( :options ).to_line_stream
+        st = section.to_line_stream
         st.gets  # skip header line
         begin
           line = st.gets
@@ -122,9 +124,14 @@ module Skylab::Zerk::TestSupport
 
       # ~ options
 
-      def have_option sw, long_plus, unstyled_desc
+      def have_option sw, long_plus, desc=nil
 
-        Option_Index_Matcher___.new sw, long_plus, unstyled_desc, self
+        oim = Option_Index_Matcher___.new sw, long_plus, self
+        if desc
+          oim.desc = desc
+          oim.expect_desc_was_styled = true  # ..
+        end
+        oim
       end
 
       def have_item_pair_of opt_sym=nil, a, b
@@ -468,12 +475,18 @@ module Skylab::Zerk::TestSupport
 
     class Option_Index_Matcher___
 
-      def initialize sw, long, desc, ctx
+      def initialize sw, long, ctx
         @ctx = ctx
+        @desc = nil
+        @expect_desc_was_styled = nil
         @sw = sw
         @long = long
-        @desc = desc
       end
+
+      attr_writer(
+        :expect_desc_was_styled,
+        :desc,
+      )
 
       def matches? idx
         @_index = idx  # eew/meh
@@ -521,10 +534,14 @@ module Skylab::Zerk::TestSupport
       end
 
       def __styled
-        if @_ol.was_styled
-          ACHIEVED_
+        if @expect_desc_was_styled
+          if @_ol.was_styled
+            ACHIEVED_
+          else
+            _fail_by :___say_no_styled
+          end
         else
-          _fail_by :___say_no_styled
+          ACHIEVED_
         end
       end
 

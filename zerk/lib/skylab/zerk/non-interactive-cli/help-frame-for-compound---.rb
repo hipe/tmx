@@ -216,7 +216,9 @@ module Skylab::Zerk
           end
 
           def description_proc
-            _formal.description_proc
+            fo = _formal
+            _p = fo.description_proc
+            _p || fo.description_proc_thru_implementation
           end
 
           def _formal

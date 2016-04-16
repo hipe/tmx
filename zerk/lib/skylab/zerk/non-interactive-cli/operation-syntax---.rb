@@ -14,6 +14,8 @@ module Skylab::Zerk
       #
       # these bullets correspond roughly to the sections in this document.
 
+      # #during #milestone-9 all these sanity checks..
+
       def initialize fo_frame
 
         @_determine_APC = true  # not all syntaxes will have these
@@ -85,8 +87,8 @@ module Skylab::Zerk
         if @_init_OI
 
           if @_fo_frame.has_stated_parameters__
-            yes = true
             _init_OI
+            yes = @_operation_index.arguments_
           else
             @_operation_index = :_NO_OPERATION_INDEX_
           end
@@ -123,17 +125,19 @@ module Skylab::Zerk
     class Receive_ARGV_value_
 
       # the distinction between option & argument parsing is a superficial
-      # & volatilve one - make sure they share the behavior effected here.
+      # & volatile one - make sure they share the behavior effected here.
 
-      def initialize qkn, oi, client, & pp
+      def initialize qkn, oi, client, tmp_sym, & pp
         @__client = client
         @__oes_pp = pp
         @_oi = oi
         @_qkn = qkn
+        @TEMP_SYM = tmp_sym
       end
 
       def execute
-        send RECV___.fetch @_oi.niCLI_reception_set_symbol_for_ @_qkn.name_symbol
+        @_k = @_qkn.association.name_symbol
+        send RECV___.fetch @_oi.niCLI_reception_set_symbol_for_ @_k
       end
 
       RECV___ = {
@@ -162,10 +166,8 @@ module Skylab::Zerk
 
       def _when_scope_value
 
-        @_name_symbol = @_qkn.name_symbol
-
         @_si = @_oi.scope_index_
-        @_asc = @_si.node_ticket_via_node_name_symbol_( @_name_symbol ).association
+        @_asc = @_si.node_ticket_via_node_name_symbol_( @_k ).association
 
         ok = __check_availability
         ok &&= __init_appropriated_component_value
@@ -174,7 +176,7 @@ module Skylab::Zerk
 
       def __init_appropriated_component_value
 
-        @_frame = @_si.modality_frame_via_node_name_symbol_ @_name_symbol
+        @_frame = @_si.modality_frame_via_node_name_symbol_ @_k
 
         _oes_pp = -> _ do
           # the model doesn't know the component's asssociation but we do:
@@ -190,14 +192,123 @@ module Skylab::Zerk
           & _oes_pp
         )
         if qk
-          @__component_qk = qk ; ACHIEVED_
+          @_component_qk = qk ; ACHIEVED_
         else
           qk
         end
       end
 
       def __write_value
-        @_frame.reader_writer_.write_value @__component_qk  # guaranteed
+
+        send SINGPLUR___.fetch @_asc.singplur_category
+      end
+
+      SINGPLUR___ = {
+        :singular_of => :__write_value_when_singof,
+        :plural_of => :__write_value_when_plurof,
+        nil => :__write_value_normally,
+      }
+
+      def __write_value_normally
+
+        sym = @_asc.argument_arity
+        if sym
+          :zero == sym or self._SANITY
+        end
+
+        _write_value
+      end
+
+      # contrary to [#ac-026] and as explained in [#036] we want these
+      # values to aggregate. (when writing to the single, the former would
+      # clobber the slot with a 1-length array each time.) see the latter
+      # about handling "inborn defaults", which we do here too. (so we
+      # corral the singles to the plural "slot" ourselves here.)
+
+      def __write_value_when_singof
+
+        :_TEMP_VIA_OPTS_ == @TEMP_SYM or self._SANITY
+
+        # remove all ivars that now have ambiguous allegiance
+
+        sing_asc = remove_instance_variable :@_asc
+        remove_instance_variable :@_k
+        sing_qkn = remove_instance_variable :@_qkn
+
+        # --
+
+        _value_x = sing_qkn.value_x
+        _plur_k = sing_asc.singplur_referent_symbol
+        _plur_asc = @_si.node_ticket_via_node_name_symbol_( _plur_k ).association
+
+        # --
+
+        __write_value_aggregatingly _value_x, _plur_asc
+      end
+
+      def __write_value_when_plurof
+
+        # for now there less work to do than with the above if these
+        # assumptions hold: assume appropriated thru argument. each such
+        # value is already assembled into an array by the parsing performer.
+        # each such array should always clobber any that is already there.
+
+        :_TEMP_VIA_ARGV_ == @TEMP_SYM or self._SANITY
+
+        remove_instance_variable :@_asc  # plur asc
+        plur_k = remove_instance_variable :@_k
+
+        # pristinity doesn't enter into our concerns (because we always
+        # clobber) but let's flip the bit for sanity and consistency
+
+        pristinity_h = @_si.pristinity_
+        _yes = pristinity_h.fetch plur_k  # sanity
+        _yes or self._SANITY
+        pristinity_h[ plur_k ] = false
+
+        # --
+
+        _write_value
+      end
+
+      def __write_value_aggregatingly x, plur_asc
+
+        plur_k = plur_asc.name_symbol
+
+        pristinity_h = @_si.pristinity_
+        is_pristine = pristinity_h.fetch plur_k  # sanity
+
+        kn = @_frame.reader_writer_.read_value plur_asc
+
+        if kn.is_known_known
+          existing_a = kn.value_x
+        end
+
+        if existing_a
+
+          if is_pristine
+
+            # then assume this is in an "inborn default" state - clobber
+            existing_a.clear
+            pristinity_h[ plur_k ] = false
+            existing_a.push x
+          else
+            # (hi.) then assume we already did the above or the below
+            existing_a.push x
+          end
+        else
+          # then probably no inborn default and this is the first invocation
+          # use the already existing handling of these .. or not
+
+          pristinity_h[ plur_k ] = false
+          _write_value
+        end
+
+        ACHIEVED_
+      end
+
+      def _write_value
+        @_frame.reader_writer_.write_value @_component_qk  # guaranteed
         ACHIEVED_
       end
 

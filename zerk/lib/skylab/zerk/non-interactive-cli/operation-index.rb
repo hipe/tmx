@@ -26,6 +26,8 @@ module Skylab::Zerk
 
       def __init_for_top fo_frame
 
+        Require_fields_lib_[]
+
         @__fo_frame = fo_frame
         @_si = Here_::Scope_Index.new fo_frame
         @_primitivesque_appropriation_op_box = @_si.__release_POOB
@@ -38,11 +40,10 @@ module Skylab::Zerk
 
         # this is where we partition into o.p vs arguments
 
-        Require_field_library_[]
-
         all = []
         @_arguments = nil
         @_bespokes_to_add_to_op = nil
+        @_did_one_glob = false
         @_k = nil
         @_my_set_symbol_via_name_symbol = {}
         @_scope_node_identifier = nil
@@ -71,6 +72,7 @@ module Skylab::Zerk
 
         @__all_stateds = ( all if all.length.nonzero? )
 
+        remove_instance_variable :@_did_one_glob
         remove_instance_variable :@_k
         remove_instance_variable :@_parameter
         remove_instance_variable :@_scope_node_identifier
@@ -83,7 +85,12 @@ module Skylab::Zerk
         @_my_set_symbol_via_name_symbol[ @_k ] = :_bespoke_
 
         if Field_::Is_required[ @_parameter ]
-          ( @_arguments ||= [] ).push @_parameter
+
+          if Field_::Can_be_more_than_one[ @_parameter.argument_arity ]
+            self._K
+          else
+            ( @_arguments ||= [] ).push @_parameter
+          end
         else
           ( @_bespokes_to_add_to_op ||= [] ).push @_parameter
         end
@@ -125,7 +132,9 @@ module Skylab::Zerk
 
         if Field_::Is_required[ @_parameter ]
 
-          __reindex_appropriated_as_argument
+          @_asc = @_scope_node_ticket.association
+          send SINGPLUR___.fetch @_asc.singplur_category
+          remove_instance_variable :@_asc
 
         else
 
@@ -140,16 +149,55 @@ module Skylab::Zerk
         NIL_
       end
 
-      def __reindex_appropriated_as_argument
+      SINGPLUR___ = {
+        :plural_of => :__maybe_reindex_plurof_as_argument,
+        nil => :__maybe_reindex_appropriated_as_argument,
+      }
 
-        @_primitivesque_appropriation_op_box.remove(  # :#spot-3
-          @_scope_node_ticket.name_symbol )
+      def __maybe_reindex_plurof_as_argument
 
-        a = ( @_arguments ||= [] )
-        _a_ = ( @node_ticket_index_via_argument_index__ ||= [] )
-        _a_[ a.length ] = @_scope_node_identifier
+        if @_did_one_glob
+          self._K
+        else
+          ___do_reindex_plurof_as_argument
+        end
+      end
 
-        a.push @_parameter ; nil
+      def ___do_reindex_plurof_as_argument
+
+        @_did_one_glob = true
+
+        sing_sym = @_asc.singplur_referent_symbol
+        d = @_si.scope_node_identifier_via_node_name_symbol__ sing_sym
+        nt = @_si.scope_node_ d
+
+        # although our tendency is to want to use the singular counterpart
+        # here, keep it as the plural so in the argument controller it makes
+        # more sense how it is being written.
+
+        @_parameter = @_parameter.dup_by do  # MY GOD BE CAREFUL (overwrite)
+          @name = nt.name
+          @argument_arity = :one_or_more
+        end
+
+        @_primitivesque_appropriation_op_box.remove sing_sym
+        _reindex_as_argument
+      end
+
+      def __maybe_reindex_appropriated_as_argument
+
+        @_primitivesque_appropriation_op_box.remove @_k  # :#spot-3
+        _reindex_as_argument
+      end
+
+      def _reindex_as_argument
+
+        _d = ( @_arguments ||= [] ).length
+
+        ( @node_ticket_index_via_argument_index__ ||= [] )[ _d ] =
+          @_scope_node_identifier
+
+        @_arguments.push @_parameter ; nil
       end
 
       # -- readers

@@ -16,15 +16,15 @@ module Skylab::Brazen
       # -- #[#fi-010]
 
       def description_proc
-        NIL_  # there is no isomorph from the substrate to this
+        NOTHING_  # there is no isomorph from the substrate to this
       end
 
       def option_argument_moniker  # this one [br] expansion
-        NIL_
+        NOTHING_
       end
 
       def argument_argument_moniker  # ditto
-        NIL_
+        NOTHING_
       end
 
       def name

@@ -67,7 +67,7 @@ module Skylab::Autonomous_Component_System
         # • generalize to work with [#ze-027]:#Operational-dependencies
         # • partially duplicate something in [fi] #open [#021]
 
-        Require_field_library_[]
+        Require_fields_lib_[]
 
         miss_a = nil
         add_mixed_failure_object = -> x_o do

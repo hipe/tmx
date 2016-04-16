@@ -22,8 +22,7 @@ module Skylab::Zerk
     end  # >>
 
     def initialize_copy _
-      # (hi.) (`dup` called below)
-      NIL_
+      NIL_  # (hi.) (`dup` called below)
     end
 
     def __init_as_beginning

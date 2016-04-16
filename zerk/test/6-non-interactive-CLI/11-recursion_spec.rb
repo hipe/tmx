@@ -20,7 +20,7 @@ module Skylab::Zerk::TestSupport
 
       it "usage line" do
 
-        _bx = build_usage_line_index_of_first_usage_line
+        _bx = build_index_of_first_usage_line
         _bx.a_[ 2..-1 ] == [ "next-level", "have-dinner", "<money>" ] or fail
       end
 

@@ -32,7 +32,7 @@ module Skylab::Autonomous_Component_System
         instance_exec( & p )
       end
 
-      def dup_by_ & p
+      def dup_by & p
         o = dup
         o.instance_exec( & p )
         o
@@ -96,17 +96,17 @@ module Skylab::Autonomous_Component_System
       end
 
       def __interpret__name__ st
-        @_nf = st.gets_one
+        @name = st.gets_one
         KEEP_PARSING_
       end
 
       def name
-        @_nf ||= Callback_::Name.via_variegated_symbol @name_symbol
+        @name ||= Callback_::Name.via_variegated_symbol @name_symbol
       end
 
-      attr_reader(
-        :name_symbol,
-      )
+      def name_symbol
+        @name_symbol
+      end
 
       def __interpret__default__ st
 

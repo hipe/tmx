@@ -92,7 +92,7 @@ module Skylab::Zerk::TestSupport
     shared_subject :_usage_line_box do
       _x = _help_screen
       _ = _x.section( :usage ).first_line.unstyled_styled
-      build_usage_line_index_of_this_unstyled_line _
+      build_index_of_this_unstyled_usage_line _
     end
 
     # -- options section related
@@ -104,7 +104,7 @@ module Skylab::Zerk::TestSupport
 
     shared_subject :___option_section_index do
 
-      build_index_of_option_section__ _help_screen.section :options
+      build_index_of_option_section _help_screen.section :options
     end
 
     # -- money
@@ -115,8 +115,7 @@ module Skylab::Zerk::TestSupport
 
       h = {}
 
-      sta = build_state_for_niCLI_via_invoke__(
-        'fantaz', 'open', '-d', '-mhi', 'puth', '-v', '-nNiNa' )
+      sta = argv 'fantaz', 'open', '-d', '-mhi', 'puth', '-v', '-nNiNa'
 
       sta.exitstatus.zero? or fail
 

@@ -29,12 +29,12 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       it "ok." do
-        _x = _something
+        _x = ___build_name_symbol_array
         _x.should eql %i( red_floof red_flingle )
       end
     end
 
-    def _something
+    def ___build_name_symbol_array
 
       _acs = _ACS
       _x = _cust_x
@@ -43,9 +43,9 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       a = []
       begin
-        x = st.gets
-        x or break
-        a.push x.name_symbol
+        qk = st.gets
+        qk or break
+        a.push qk.name_symbol
         redo
       end while nil
       a

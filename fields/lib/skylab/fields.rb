@@ -446,7 +446,9 @@ module Skylab::Fields
       end
     end
 
-    attr_reader :name_symbol
+    attr_reader(
+      :name_symbol,
+    )
   end
 
   class Argument_stream_via_value  # :[#019] (2x similar)

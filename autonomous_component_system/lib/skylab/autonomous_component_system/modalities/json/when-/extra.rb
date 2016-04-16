@@ -27,7 +27,7 @@ module Skylab::Autonomous_Component_System
               end
             end
 
-            Require_field_library_[]
+            Require_fields_lib_[]
 
             _ev = Field_::Events::Extra.new_with(
               :name_x_a, sym_a,

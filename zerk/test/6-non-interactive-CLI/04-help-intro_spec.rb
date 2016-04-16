@@ -112,7 +112,7 @@ module Skylab::Zerk::TestSupport
 
       dangerous_memoize :_usage_index do
 
-        build_usage_line_index_of_first_usage_line
+        build_index_of_first_usage_line
       end
     end
 

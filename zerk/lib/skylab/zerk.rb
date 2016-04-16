@@ -54,7 +54,7 @@ module Skylab::Zerk  # intro in [#001] README
     NIL_
   end
 
-  Require_field_library_ = Lazy_.call do
+  Require_fields_lib_ = Lazy_.call do
     Field_ = Home_.lib_.fields
     NIL_
   end

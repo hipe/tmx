@@ -171,6 +171,10 @@ module Skylab::Fields
         :parameter_arity,
       )
 
+      def argument_argument_moniker  # see [br]
+        NOTHING_
+      end
+
       Read___ = -> do
         argument_stream.gets_one
       end

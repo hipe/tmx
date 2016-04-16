@@ -717,7 +717,7 @@ module Skylab::Callback
     end
 
     def name_symbol
-      name.as_variegated_symbol
+      name.name_symbol
     end
 
     def name
