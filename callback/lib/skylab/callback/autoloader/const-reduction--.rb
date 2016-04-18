@@ -2,20 +2,16 @@ module Skylab::Callback
 
   module Autoloader
 
-    class Const_Reduction__  # read [#029] the const reduce narrative (sparse)
-
-      # (in the rewrite before this one, was:
-      # three laws compliant, 100% covered, test is doc)
+    class Const_Reduction__  # sed [#029]
 
       def initialize a, & p
 
-        @do_assume_is_defined = false
-        @do_result_in_n_and_v = false
-        @do_result_in_n_and_v_for_step = false
-        @did_require = false
-        @else_p = p
+        @do_correct_name = false
+        @do_result_in_name_and_value = false
+        @__did_require = false
+        @_else_p = p
         @final_path_to_load = nil
-        @try_these_const_method_i_a = ALL_CONST_METHOD_I_A___
+        @_try_these_const_method_i_a = ALL_CONST_METHOD_I_A___
 
         @__a = a
       end
@@ -23,410 +19,378 @@ module Skylab::Callback
       ALL_CONST_METHOD_I_A___ = %i( as_const as_camelcase_const ).freeze
 
       def execute
-
-        a = remove_instance_variable :@__a
-
-        if 2 == a.length
-          a = [ :const_path, a.fetch( 0 ), :from_module, a.fetch( 1 ) ]
-        end
-
-        ___via_nonempty_parse_stream  Polymorphic_Stream.via_array a
-      end
-
-      def ___via_nonempty_parse_stream st
-
-        @_st = st
-        begin
-          _ok = send :"#{ st.gets_one }="
-          _ok or self._COVER_ME
-          if st.no_unparsed_exists
-            break
-          end
-          redo
-        end while nil
-
+        __init_arguments
         __work
       end
 
       # --
 
-      def assume_is_defined=  # #assume-is-defined
-        @do_assume_is_defined = true ; KEEP_PARSING_
-      end
+      def __init_arguments
 
-      def core_basename=
-        x = @_st.gets_one
-        if x
-          if CORE_FILE_ == x
-            KEEP_PARSING_
-          else
-            self._IMPLEMENT_ME
-          end
+        a = remove_instance_variable :@__a
+        st = Polymorphic_Stream.via_array a
+        @_st = st
+
+        if 2 == a.length
+          path_x
+          from_module
         else
-          KEEP_PARSING_
+          begin
+            send st.gets_one
+          end until st.no_unparsed_exists
         end
+
+        remove_instance_variable :@_st
+        NIL_
       end
 
-      def const_path=
-        @const_path = @_st.gets_one ; KEEP_PARSING_
+    private
+
+      def correct_the_name  # see #correct-the-name
+        @do_correct_name = true ; nil
       end
 
-      def final_path_to_load=
-        @final_path_to_load = @_st.gets_one ; KEEP_PARSING_
+      def const_path
+        @const_x_a = @_st.gets_one ; nil
       end
 
-      def from_module=
-        @from_module = @_st.gets_one ; KEEP_PARSING_
+      def final_path_to_load  # hack to support filenames w/o extensions. [ta]
+        @final_path_to_load = @_st.gets_one ; nil
       end
 
-      def path_x=
+      def from_module
+        @from_module = @_st.gets_one ; nil
+      end
+
+      def path_x
         x = @_st.gets_one
-        @const_path = ::Array.try_convert( x ) || [ * x ]
-        KEEP_PARSING_
+        @const_x_a = ::Array.try_convert( x ) || [ x ] ; nil
       end
 
-      def result_in_name_and_value=
-        @do_result_in_n_and_v = true ; KEEP_PARSING_
+      def result_in_name_and_value
+        @do_result_in_name_and_value = true ; nil
       end
 
       # --
 
-      def __work
-        @mod = @from_module
-        _ok = ___steps
-        _ok && __resolve_result
-        @result
-      end
+      def __work  # see #"general algorithm"
 
-      def ___steps
-        @scn = ___build_any_step_stream
-        if @scn
-          nil while step
-          @step_OK
-        else
-          KEEP_PARSING_
-        end
-      end
+        _x_a = remove_instance_variable :@const_x_a  # assume 0 or more
 
-      def ___build_any_step_stream
-        if 1 < @const_path.length
-          d = -1 ; last = @const_path.length - 2
-          Scn.new do
-            d < last and @const_path.fetch( d += 1 )
-          end
-        end
-      end
+        st = Polymorphic_Stream.via_array _x_a
 
-      def step
-        const_x = @scn.gets
-        if const_x
-          @const_x = const_x
-          ___step_via_const_x
-        else
-          remove_instance_variable :@const_x
-          const_x
-        end
-      end
+        @_current_node = Value___[ remove_instance_variable( :@from_module ) ]
 
-      def ___step_via_const_x
-        ok = _procure_valid_name_from_const_x
-        ok &&= __step_with_valid_name
-        @step_OK = ok
-        ok
-      end
+        ok = true
 
-      def _procure_valid_name_from_const_x
+        unless st.no_unparsed_exists
 
-        x = @const_x
-        if x
+          begin
+            @__unsanitized_const_name_x = st.gets_one
 
-          nf = if x.respond_to? :ascii_only?
-            Name.via_slug x  # hazard a guess
-          else
-            Name.via_variegated_symbol x
-          end
+            @_is_last = st.no_unparsed_exists  # for 1 place in [tm] :(
 
-          const = nf.as_const
-          @name = nf  # needed for error reporting too
-        else
-          @name = Name.empty_name_for__ x
-        end
-
-        if const
-          const
-        else
-          ___cannot_construe_valid_const
-        end
-      end
-
-      def ___cannot_construe_valid_const
-
-        if @else_p && @else_p.arity.nonzero?  # covered
-          if 1 == @else_p.arity
-            @result = @else_p[ bld_wrong_const_name_exception ]
-          else
-            @result = @else_p.call :error, :wrong_const_name do
-              ___build_wrong_const_name_event
+            if @_is_last && @final_path_to_load
+              ::Kernel.load @final_path_to_load
             end
-          end
-        else
-          raise bld_wrong_const_name_exception
-        end
-        UNABLE_
-      end
 
-      def ___build_wrong_const_name_event
-
-        Home_::Event.inline_not_OK_with :wrong_const_name,
-            :name, @name.as_variegated_symbol,
-            :error_category, :name_error do |y, o|
-
-          y << "wrong constant name #{ ick o.name } for const reduce"
-        end
-      end
-
-      def bld_wrong_const_name_exception
-        ::NameError.new say_cannot_construe, @name.as_variegated_symbol
-      end
-
-      def say_cannot_construe
-        "wrong constant name #{ @name.as_variegated_symbol } for const reduce"
-      end
-
-      def __step_with_valid_name
-        _procede = _via_valid_name
-        if _procede
-          @mod = @result ; @result = nil ; KEEP_PARSING_
-        else
-          UNABLE_
-        end
-      end
-
-      # ~ final step (intermixed with support for pre-final step)
-
-      def __resolve_result
-
-        @const_x = @const_path.fetch( -1 )  # fail loudly if not there
-
-        path = @final_path_to_load  # hack to support filenames w/o extension
-        if path
-          ::Kernel.load path
+            ok = ___step
+            ok or break
+            @_is_last and break
+            redo
+          end while nil
         end
 
-        _ok = _procure_valid_name_from_const_x
-        if _ok
-          @do_result_in_n_and_v_for_step = @do_result_in_n_and_v
-          _via_valid_name
-        end
-      end
-
-      def _via_valid_name
-        if @do_assume_is_defined
-          ___when_assume_defined
-        else
-          __via_any_means
-        end
-      end
-
-      def ___when_assume_defined  # leverage whatever autoloading
-        # the node defines for itself with a fuzzy name that we assume it will
-        # resolve; and then after the node has loaded the value, if necessary
-        # we go back and resolve the correct casing/scheme for the fuzzy
-        # name.
-        @result = @mod.const_get @name.as_const, false
-        if @do_result_in_n_and_v_for_step
-          _via_fuzzy_lookup -> i { @result = [ i, @result, ] }
-        end
-        KEEP_PARSING_
-      end
-
-      def _via_fuzzy_lookup one_p=nil, many_p=nil, zero_p=nil
-
-        a = []
-        stem = @name.as_distilled_stem
-
-        @mod.constants.each do | const_sym |
-          if stem == Distill_[ const_sym ]
-            a.push const_sym
-          end
-        end
-
-        @result = case a.length <=> 1
-        when -1
-          if zero_p
-            zero_p[]
+        if ok
+          if @do_result_in_name_and_value
+            @_current_node
           else
-            _when_const_not_defined
+            @_current_node.value_x
           end
-        when 0
-          if one_p
-            one_p[ a.first ]
+        else
+          @_user_result_for_error
+        end
+      end
+
+      def ___step
+        _ok = __resolve_valid_const
+        _ok && __resolve_next_current_node_via_sanitized_const_name
+      end
+
+      # --
+
+      def __resolve_next_current_node_via_sanitized_const_name
+
+        # we are sure that we are using the current node as a module
+        # (and assuming it represents one) so..
+
+        @_current_module = remove_instance_variable( :@_current_node ).value_x
+
+        ks = ___maybe_seek_current_pair_because_const_defined
+        ks &&= _seek_current_pair_fuzzily
+        ks &&= __maybe_seek_current_pair_via_loading
+        if ks
+          __stop_when_zero
+        else
+          ACHIEVED_
+        end
+      end
+
+      def ___maybe_seek_current_pair_because_const_defined
+
+        if @_current_module.const_defined? @_valid_const, false
+
+          if @do_correct_name && @_is_last
+            ___correct_the_name
           else
-            _via_correct_const a.first
+            _seek_current_pair_when_one @_valid_const
           end
-        when 1
-          if many_p
-            many_p[ a ]
+        else
+          KEEP_SEEKING_
+        end
+      end
+
+      def ___correct_the_name  # see #correct-the-name
+
+        # the below `const_get` is meant to trigger (boxxy) or whatever to
+        # actually load the file. then fuzzy match to find the correct name.
+
+        _possibly_wrong_const = remove_instance_variable :@_valid_const
+
+        @_current_module.const_get _possibly_wrong_const, false
+
+        _keep_seeking = _seek_current_pair_fuzzily
+
+        _keep_seeking and self._SANITY  # someone already said it was defined
+
+        STOP_SEEKING_
+      end
+
+      # -- via loading
+
+      def __maybe_seek_current_pair_via_loading
+
+        if @_current_module.respond_to? :dir_pathname
+
+          tree = ___tree
+          if tree
+            _ = @_name.as_distilled_stem
+            np = tree.normpath_from_distilled _
+          end
+
+          if np
+            __maybe_seek_current_pair_via_loading_some_file_in_normpath np
           else
-            _when_ambiguous a
+            KEEP_SEEKING_
           end
-        end
-      end
-
-      def _via_correct_const i
-        x = @mod.const_get i, false
-        if @did_require
-          @did_require = false
-          if @mod.respond_to? :autoloaderize_with_normpath_value
-            @mod.autoloaderize_with_normpath_value @normpath_that_was_required, x
-          end
-        end
-        if @do_result_in_n_and_v_for_step
-          [ i, x ]
         else
-          x
-        end
-      end
-
-      # ~ the "by any means" strategy
-
-      def __via_any_means
-        if @mod.const_defined? @name.as_const, false
-          @result = _via_correct_const @name.as_const
-          KEEP_PARSING_
-        else
-          ___via_name_search_or_loading
-        end
-      end
-
-      def ___via_name_search_or_loading
-        found = false
-        x = _via_fuzzy_lookup(
-
-          -> i do  # when it is one stop now
-            found = true
-            _via_correct_const i
-          end,
-
-          -> a do  # when it is many fail/resolve now
-            found = true
-            _when_ambiguous a
-          end,
-
-          EMPTY_P_ )  # when it is zero do nothing
-        if found
-          @result = x
-          KEEP_PARSING_
-        elsif @mod.respond_to? :dir_pathname
-          @result = ___via_loading
-          KEEP_PARSING_
-        else
-          _when_const_not_defined
-        end
-      end
-
-      def ___via_loading
-
-        tree = ___tree
-        if tree
-          np = tree.normpath_from_distilled @name.as_distilled_stem
-        end
-
-        if np
-          __via_loading_some_file_in_normpath np
-        else
-          _when_const_not_defined
+          KEEP_SEEKING_
         end
       end
 
       def ___tree
-        if @mod.respond_to? :entry_tree
-          tree = @mod.entry_tree
+
+        if @_current_module.respond_to? :entry_tree
+          tree = @_current_module.entry_tree
         else
-          dpn = @mod.dir_pathname
-          dpn and tree = LOOKAHEAD_[ dpn ]
+          dpn = @_current_module.dir_pathname
+          if dpn
+            tree = LOOKAHEAD_[ dpn ]
+          end
         end
         tree
       end
 
-      def __via_loading_some_file_in_normpath np
-        file = np.can_produce_load_file_path && np
-        if file
-          ___via_loading_file_for_normpath file
+      def __maybe_seek_current_pair_via_loading_some_file_in_normpath np
+
+        if np.can_produce_load_file_path
+
+          ___seek_current_pair_via_loading_file_in_normpath np
+
         else
-          _when_const_not_defined
+          KEEP_SEEKING_
         end
       end
 
-      def ___via_loading_file_for_normpath file_normpath
-        file_normpath.change_state_to :loaded
-        @did_require = true
-        @normpath_that_was_required = file_normpath
-        _path = file_normpath.get_require_file_path
+      def ___seek_current_pair_via_loading_file_in_normpath file_np
+
+        file_np.change_state_to :loaded
+
+        _path = file_np.get_require_file_path
         require _path
-        _via_fuzzy_lookup
+
+        @__did_require = true
+        @__normpath_that_was_required = file_np
+
+        _ks = _seek_current_pair_fuzzily
+        _ks
       end
 
-      def _when_ambiguous a
-        idx = a.index @name.as_const
-        if ! idx
-          idx = 0  # MEH
+      # --
+
+      def _seek_current_pair_fuzzily
+
+        a = []
+        stem = @_name.as_distilled_stem
+
+        @_current_module.constants.each do |const|
+          if stem == Distill_[ const ]
+            a.push const
+          end
         end
+
+        case a.length <=> 1
+        when 0
+          _seek_current_pair_when_one a.first
+        when -1
+          KEEP_SEEKING_
+        when 1
+          ___seek_current_pair_when_many a
+        end
+      end
+
+      def ___seek_current_pair_when_many a
+
+        idx = a.index @_valid_const
+
+        if ! idx  # when there are multiple matches with
+          # the same stem, use the first one because meh
+          idx = 0
+        end
+
         const = a.fetch idx
-        x = @mod.const_get const, false
-        if @do_result_in_n_and_v_for_step
-          [ const, x ]
-        else
-          x
-        end
+
+        _x = @_current_module.const_get const, false
+        @_current_pair = Pair.via_value_and_name _x, const
+
+        STOP_SEEKING_
       end
 
-      def _when_const_not_defined
-        @result = ___result_for_when_const_not_defined
+      def __stop_when_zero
+
+        _express_this_error :___build_name_error_event, :uninitialized_constant
         UNABLE_
       end
 
-      def ___result_for_when_const_not_defined
-        if @else_p
-          p = @else_p
-          case p.arity
-          when 0
-            p[]
-          when 1
-            p[ _build_name_error ]
-          else
-            p.call :error, :uninitialized_constant do
-              ___build_name_error_event
-            end
-          end
-        else
-          raise _build_name_error
-        end
-      end
-
       def ___build_name_error_event
+
         Home_::Event.inline_not_OK_with(
-            :uninitialized_constant, :name, @name.as_variegated_symbol,
-              :mod, @mod ) do |y, o|
+
+          :uninitialized_constant,
+          :name, @_name.as_variegated_symbol,
+          :mod, @_current_module,
+          :error_category, :name_error,
+
+        ) do |y, o|
+
           y << "uninitialized constant #{ o.mod }::( ~ #{ o.name } )"
         end
       end
 
-      def _build_name_error
-        Name_Error__.new @mod, @name.as_variegated_symbol
+      def _seek_current_pair_when_one const
+
+        x = @_current_module.const_get const, false
+
+        if @__did_require
+          @__did_require = false
+          if @_current_module.respond_to? :autoloaderize_with_normpath_value
+            @_current_module.autoloaderize_with_normpath_value @__normpath_that_was_required, x
+          end
+        end
+
+        @_current_node = Pair.via_value_and_name x, const
+        STOP_SEEKING_
       end
 
-      class Name_Error__ < ::NameError
-        def initialize mod, received_name_i
-          @module = mod
-          super "uninitialized constant #{ mod }::( ~ #{
-            received_name_i } )", received_name_i
+      # -- sanitize const name
+
+      def __resolve_valid_const
+
+        # a lot of the below is "see what happens". it works out because in
+        # practice the kinds of names we used are of a small set of patterns
+        # but sadly this is not formally documented yet per se.
+
+        x = remove_instance_variable :@__unsanitized_const_name_x
+        if x
+
+          if VALID_CONST_RX_ =~ x  # assume it's string-ish
+
+            if x.respond_to? :id2name
+
+              valid_const = x
+              nf = Name.via_const_symbol x
+
+            else
+
+              # that it is a string not certain but "very likely" ick
+              valid_const = x.intern
+              nf = Name.via_const_string x
+
+            end
+          else
+
+            nf = if x.respond_to? :id2name
+              Name.via_variegated_symbol x
+            else
+              Name.via_slug x  # assume string; hazard a guess at its "shape"..
+            end
+            valid_const = nf.as_const  # nil if for eg "123foo"
+
+          end
+        else
+          nf = Name.empty_name_for__ x  # ..
         end
-        attr_reader :module
-        def members
-          [ :name, :module ]
+
+        @_name = nf
+
+        if valid_const
+          @_valid_const = valid_const
+          KEEP_PARSING_
+        else
+          _express_this_error :__build_wrong_const_name_event, :wrong_const_name
         end
       end
+
+      def __build_wrong_const_name_event
+
+        Home_::Event.inline_not_OK_with(
+          :wrong_const_name,
+          :name, @_name.as_variegated_symbol,
+          :error_category, :name_error,
+        ) do |y, o|
+          y << "wrong constant name #{ ick o.name } for const reduce"
+        end
+      end
+
+      # -- support
+
+      def _express_this_error build_event_m, second_channel_sym
+
+        p = @_else_p
+        if p
+          case 0 <=> p.arity
+          when 0
+            @_user_result_for_error = p[]
+          when -1
+            @_user_result_for_error = p[ send( build_event_m ) ]
+          when 1
+            @_user_result_for_error = p.call :error, second_channel_sym do
+              send build_event_m
+            end
+          end
+          UNABLE_
+        else
+          raise send( build_event_m ).to_exception
+        end
+      end
+
+      # ==
+
+      Value___ = ::Struct.new :value_x
+
+      KEEP_SEEKING_ = true
+      STOP_SEEKING_ = false
     end
   end
 end
+# #tombstone: assume_is_defined

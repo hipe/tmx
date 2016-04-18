@@ -15,75 +15,90 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it "normative use-case" do
-        Autoloader_.const_reduce( %i( bar_biff baz ), Foo1 ).should eql :some_x
+
+        _ = _subject %i( bar_biff baz ), Foo1
+        _ == :some_x or fail
       end
 
       it "& it has an explicit form of syntax (tight form, remote ctx)" do
 
-        _ = Autoloader_.const_reduce(
+        _ = _subject(
           :from_module, Foo1,
           :const_path, %i( bar_biff baz ),
         )
-
-        _.should eql :some_x
+        _ == :some_x or fail
       end
 
       it "& it is infinitely extensible (one day) (long form, local ctx)" do
 
-        s = Autoloader_.const_reduce(
+        _rx = %r(\Aname_error: uninitialized constant #{
+          }[A-Za-z:]+::Foo1::Bar_Biff::\( ~ cowabungaa \) \(cowabungaa\))
+
+        _ = _subject(
 
           :from_module, Foo1,
           :const_path, %i( bar_biff cowabungaa bowzer ),
 
-        ) do | name_error |
+        ) do | name_error_event |
+
+          name_error = name_error_event.to_exception
+
           "name_error: #{ name_error.message } (#{ name_error.name })"
         end
 
-        s.should match %r(\Aname_error: uninitialized constant #{
-          }[A-Za-z:]+::Foo1::Bar_Biff::\( ~ cowabungaa \) \(cowabungaa\))
+        _ =~ _rx or fail
       end
 
       it "invalid const name when just normal style - name error X" do
-        -> do
-          Autoloader_.const_reduce( %i( 123fml ), Foo1 )
-        end.should raise_name_error
+
+        begin
+          _subject %i( 123fml ), Foo1
+        rescue ::NameError => e
+        end
+
+        _expect_same_name_error e
       end
 
       it "invalid const name and your else block takes one arg - o" do
-        ex = nil
-        r = Autoloader_.const_reduce %i( 123fml ), Foo1 do |ne|
-          ex = ne ; :hi
+
+        ev = nil
+        _ = _subject %(123fml), Foo1 do |ev_|
+          ev = ev_ ; :hi
         end
-        r.should eql :hi
-        ex.name.should eql :'123fml'
-        ex.message.should eql "wrong constant name 123fml for const reduce"
+
+        _ == :hi or fail
+        _expect_same_name_error ev.to_exception
+      end
+
+      def _expect_same_name_error e
+
+        ( ::NameError === e ) or fail
+        e.message =~ %r(\Awrong constant name '123fml' for const reduce\z) or fail
       end
 
       it "invalid const name and your else block takes no args - X" do
-        -> do
-          Autoloader_.const_reduce %i( 123fml ), Foo1 do end
-        end.should raise_name_error
-      end
 
-      def raise_name_error
-        raise_error ::NameError,
-          %r(\Awrong constant name 123fml for const reduce\z)
+        _x = _subject %i( 123fml ), Foo1 do :x end
+
+        :x == _x or fail
       end
 
       it "const not found and your else block takes one arg - o" do
-        ex = nil
-        r = Autoloader_.const_reduce(
-            %i( bar_biff boon_doggle bizzle ), Foo1 ) do |ne|
-          ex = ne ; :hi
+
+        ev = nil
+        _ = _subject %i( bar_biff boon_doggle bizzle ), Foo1 do |ev_|
+          ev = ev_ ; :hi
         end
-        r.should eql :hi
-        ex.module.should eql Foo1::Bar_Biff
-        ex.name.should eql :boon_doggle
+
+        _ == :hi or fail
+        ev.mod == Foo1::Bar_Biff or fail
+        ev.name == :boon_doggle or fail
       end
 
       it "const not found and your else block takes no args - o" do
-        r = Autoloader_.const_reduce %i(who_hah), Foo1 do :x end
-        r.should eql :x
+
+        _ = _subject %i(who_hah), Foo1 do :x end
+        _ == :x or fail
       end
     end
 
@@ -98,12 +113,13 @@ module Skylab::Callback::TestSupport::Autoloader
       end
 
       it "and you have no say in the matter" do
-        _r = Autoloader_.const_reduce %i( bar_biff NCSA_spy ), Foo2
-        _r.should eql :some_y
+
+        _ = _subject %i( bar_biff NCSA_spy ), Foo2
+        _ == :some_y or fail
       end
     end
 
-    context "transitional hacks - result in name and value, assume const .." do
+    context "transitional hacks - result in name and value.." do
 
       before :all do
         module Foo3
@@ -112,17 +128,17 @@ module Skylab::Callback::TestSupport::Autoloader
         end
       end
 
-      it ".. which allows you to be unobtrusive but induce fuzzily" do
+      it ".. which allows you correct a name" do
 
-        n, x = Autoloader_.const_reduce(
+        pair = _subject(
 
-          :assume_is_defined,
-          :const_path, %i( NCSA_Spy ),
+          :const_path, %i( NCSASpy ),
           :from_module, Foo3,
           :result_in_name_and_value,
         )
 
-        n.should eql :NCSA_Spy ; x.should eql :x
+        pair.name_x == :NCSA_Spy or fail
+        pair.value_x == :x or fail
       end
     end
 
@@ -138,54 +154,75 @@ module Skylab::Callback::TestSupport::Autoloader
 
         mod = TS_::Const_Reduce::Fixtures::One_Skorlab
 
-        mod.singleton_class.ancestors[ 1 ].should eql ::Module
+        mod.singleton_class.ancestors[ 1 ] == ::Module or fail  # eew
 
-        _s = mod.dir_pathname.to_path
-        _s.should match %r(fixtures/one-skorlab\z)
+        _ = mod.dir_pathname.to_path
+        _ =~ %r(fixtures/one-skorlab\z) or fail
       end
 
-      it "with a node that does not autoload, also use iambic form" do
+      it "with a node that is not itself designed to autoload" do
 
-        n, x = Autoloader_.const_reduce(
-          :core_basename, nil,
+        pair = _subject(
           :result_in_name_and_value,
           :from_module, TS_::Const_Reduce::Fixtures::One_Skorlab,
           :path_x, :Infermation_Terktix,
         )
 
-        n.should eql :InfermationTerktix
-        x.name.should match %r(Fixtures::One_Skorlab::InfermationTerktix\z)
+        pair.name_x == :InfermationTerktix or fail
+        pair.value_x.name =~ %r(Fixtures::One_Skorlab::InfermationTerktix\z) or fail
       end
 
       it "the same as above but value only (name correction)" do
 
-        _x = Autoloader_.const_reduce(
-          :core_basename, nil,
+        _mod = _subject(
           :from_module, TS_::Const_Reduce::Fixtures::Two_Skorlab,
           :path_x, :Infermation_Terktix,
         )
-        _x.name.should match %r(Fixtures::Two_Skorlab::InfermationTerktix\z)
+
+        _mod.name =~ %r(Fixtures::Two_Skorlab::InfermationTerktix\z) or fail
       end
 
-      it "the same as above, but via loading" do
+      it "if you want name correction on a boxxy module, you need one option" do
 
-        _x = Autoloader_.const_reduce(
-          :core_basename, nil,
-          :from_module, TS_::Const_Reduce::Fixtures::Tre_Skorlab,
-          :path_x, :Infermation_Terktix
+        _a = TS_::Const_Reduce::Fixtures
+
+        _b = _a::Tre_Skorlab  # #spot-2
+
+        _pair = _subject(
+          :from_module, _b,
+          :path_x, :Infermation_Terktix,
+          :correct_the_name,
+          :result_in_name_and_value,
         )
-        _x.name.should match %r(Fixtures::Tre_Skorlab::InfermationTerktix\z)
+
+        _pair.name_x == :InfermationTerktix or fail
       end
     end
 
     it "(reproduction)" do
+
       # do not autoload this node, because we want the creation of its
       # entry tree to be its own and not its parent's
-      _load_me = TS_::Const_Reduce::Fixtures.
-        dir_pathname.join( 'for-skerlerb/core.rb' ).to_path
+
+      _path = TS_::Const_Reduce::Fixtures.dir_pathname.to_path
+
+      _load_me = ::File.join _path, 'for-skerlerb/core.rb'
+
       load _load_me
+
       _Skylab = TS_::Const_Reduce::Fixtures::For_Skerlerb
-      Autoloader_.const_reduce %i( Infermershern ), _Skylab
+
+      _hi = _subject %i( Infermershern ), _Skylab
+
+      _hi.name =~ %r(::Infermershern\z) or fail
+    end
+
+    def _subject * x_a, & x_p
+
+      # (all the testing in this file forgoes the surface entrypoint
+      # for the performer, but meh that's not the focus)
+
+      Home_::Autoloader::Const_Reduction__.new( x_a, & x_p ).execute
     end
   end
 end

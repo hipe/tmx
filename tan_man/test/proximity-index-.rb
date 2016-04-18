@@ -192,7 +192,6 @@ module Skylab::TanMan::TestSupport
       x = Autoloader_.const_reduce(
         :const_path, _x_a,
         :from_module, @from_module,
-        :assume_is_defined,
         :final_path_to_load, normpath,
       )
       x or self._COVER_ME

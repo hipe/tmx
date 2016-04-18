@@ -738,8 +738,8 @@ module Skylab::Callback
 
     class << self
       alias_method :via_value_and_name, :new
-      private :new
-      private :[]
+      undef_method :[]
+      undef_method :new
     end  # >>
 
     alias_method :name_symbol, :name_x  # as you like it
@@ -1295,7 +1295,7 @@ module Skylab::Callback
 
       def get_load_file_path
         if @h.key? CORE_FILE_
-          @norm_pathname.join( CORE_FILE_ ).to_path
+          @dir_pn.join( CORE_FILE_ ).to_path  # only covered at #spot-2
         else
           super
         end
@@ -1995,7 +1995,7 @@ module Skylab::Callback
 
       def require_quietly const_i_or_path_s
         without_warning do
-          if VALID_CONST_RX__ =~ const_i_or_path_s
+          if VALID_CONST_RX_ =~ const_i_or_path_s
             require_stdlib const_i_or_path_s
           else
             require const_i_or_path_s
@@ -2128,7 +2128,7 @@ module Skylab::Callback
 
         def via_const_string s
 
-          if VALID_CONST_RX__ =~ s
+          if VALID_CONST_RX_ =~ s
             Here_._via_normal_string_ s
           else
             raise ::NameError, ___say_wrong_const_name( s )
@@ -2180,7 +2180,7 @@ module Skylab::Callback
 
       # certainly not all names isomorph into valid consts (covered)
 
-      if VALID_CONST_RX__ !~ @x_
+      if VALID_CONST_RX_ !~ @x_
         @x_ = false
       end
     end
@@ -2233,7 +2233,7 @@ module Skylab::Callback
     UPCASER_RX___ = /\A[a-z]/
   end
 
-  VALID_CONST_RX__ = /\A[A-Z][A-Z_a-z0-9]*\z/
+  VALID_CONST_RX_ = /\A[A-Z][a-z_A-Z0-9]*\z/
 
   class Lowercase_with_Underscores____ < same
 

@@ -168,7 +168,7 @@ module Skylab::Cull
       end
 
       def __class_via_const_guess x
-        Autoloader_.const_reduce( [ x ], Upstream_::Adapters__ ) do  end
+        Autoloader_.const_reduce( x, Upstream_::Adapters__ ) do  end
       end
 
       def when_bad_extension extname

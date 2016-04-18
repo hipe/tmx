@@ -105,21 +105,14 @@ module Skylab::Cull
 
       def when_one const
 
-        x = Autoloader_.const_reduce(
+        pair = Autoloader_.const_reduce(
+          :path_x, const,
           :from_module, @box_mod,
-          :const_path, [ const ],
-          # :result_in_name_and_value  # name is not case-corrected
+          :correct_the_name,
+          :result_in_name_and_value,
         )
 
-        p = Callback_.distill
-
-        tgt_sym = p[ const ]
-
-        correct = @box_mod.constants.detect do | const_ |
-          tgt_sym == p[ const_ ]
-        end
-
-        const = correct
+        x, const = pair.to_a
 
         @defined_function = if x.respond_to? :name
           x

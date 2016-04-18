@@ -9,22 +9,40 @@ module Skylab::Callback
         end
 
         def execute
-          resolve_exception_class
-          resolve_message_string
-          @exception_class.new @message_s
-        end
 
-      private
+          __init_exception_class
+          __init_message_string
 
-        def resolve_exception_class
-          @exception_class = if @event.has_member :error_category
-            Class_via_symbol[ @event.error_category ]
+          if :name_error == @_error_category
+
+            # (a little hard-coded help to make the generated event
+            #  more appropriate. there is *no* way to automate this.)
+
+            if @event.has_member :name
+              _name = @event.name
+            end
+
+            @_exception_class.new @_message_s, _name
           else
-            ::RuntimeError
-          end ; nil
+            @_exception_class.new @_message_s
+          end
         end
 
-        Class_via_symbol = -> sym, & els do
+        def __init_exception_class
+
+          if @event.has_member :error_category
+
+            @_error_category = @event.error_category
+            @_exception_class = Class_via_symbol[ @_error_category ]
+
+          else
+            @_error_category = nil
+            @_exception_class = ::RuntimeError
+          end
+          NIL_
+        end
+
+        Class_via_symbol = -> sym, & els do  # [hu]
 
           first_guess_sym = Home_::Name.via_variegated_symbol( sym ).
             as_camelcase_const
@@ -40,18 +58,23 @@ module Skylab::Callback
           end
         end
 
-        def resolve_message_string
-          resolve_message_lines
-          @message_s = Home_.lib_.basic::String.
-            paragraph_string_via_message_lines @message_s_a ; nil
+        def __init_message_string
+
+          _s_a = ___assemble_message_lines
+
+          @_message_s =
+            Home_.lib_.basic::String.paragraph_string_via_message_lines _s_a
+
+          NIL_
         end
 
-        def resolve_message_lines
-          @event.express_into_under @message_s_a=[], expression_agent
-          nil
+        def ___assemble_message_lines
+
+          _expag = ___expression_agent
+          @event.express_into_under [], _expag
         end
 
-        def expression_agent
+        def ___expression_agent
           Home_.lib_.brazen::API.expression_agent_instance  # hard-coded "black and white" for now
         end
       end
