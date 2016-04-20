@@ -4,25 +4,21 @@ module Skylab::Git
 
     class << self
 
-      def line_oriented_via_arguments_ * a
-        if a.length.zero?
-          As_Line_Oriented_Actor__
-        else
-          st = Callback_::Polymorphic_Stream.via_array x_a
-          o = As_Line_Oriented_Actor__.begin
-          o.y = st.gets_one
-          o.file_a = st.gets_one
-          unless st.no_unparsed_exists
-            o._process st
-          end
-          o.execute
+      def line_oriented_via_arguments__ a
+        st = Callback_::Polymorphic_Stream.via_array a
+        o = As_Line_Oriented_Actor__.begin
+        o.y = st.gets_one
+        o.file_a = st.gets_one
+        unless st.no_unparsed_exists
+          o._process st
         end
+        o.execute
       end
     end  # >>
 
     # ==
 
-    class As_Line_Oriented_Actor___
+    class As_Line_Oriented_Actor__
 
       class << self
 
@@ -99,7 +95,9 @@ module Skylab::Git
         undef_method :new
       end  # >>
 
-      def initialize
+      def initialize( & p )
+
+        @_oes_p = p  # nil OK
         @system_conduit = nil
       end
 
@@ -115,7 +113,10 @@ module Skylab::Git
       # --
 
       def check path, & oes_p
-        Check___.new( path, @system_conduit, & oes_p ).execute
+
+        _oes_p = oes_p || @_oes_p  # nil OK
+
+        Check___.new( path, @system_conduit, & _oes_p ).execute
       end
     end
 

@@ -6,6 +6,10 @@ module Skylab::System
 
       def enhance_client_class tcc
 
+        if tcc.method_defined? :stubbed_system_conduit
+          self._WHERE
+        end
+
         tcc.send :define_method, :stubbed_system_conduit do
 
           cache = cache_hash_for_stubbed_system

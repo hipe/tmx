@@ -37,13 +37,13 @@ module Skylab::System::TestSupport
         _x and fail
       end
 
-      it "the stdout has the lines that were in the snapshot (NEWLINE ADDED)" do
+      it "the stdout has the lines that were in the snapshot" do
 
         _io = __stubbed_stdout
         _x = _io.gets
         _x_ = _io.gets
         _x_ and fail
-        _x == " M fazoozle/modified.file\u0000\n" or fail
+        _x == " M fazoozle/modified.file\u0000" or fail
       end
 
       it "the exitstatus (which (NOT TESTED) must be present in the snapshot)" do

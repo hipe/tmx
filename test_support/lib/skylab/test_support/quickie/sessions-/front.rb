@@ -173,22 +173,11 @@ module Skylab::TestSupport
 
         @_plugins and self._STATE_FAILURE
 
-        if Here_.const_defined? :Plugins, false
-
-          mod = Here_.const_get :Plugins
-
-        else
-
-          mod = ::Module.new
-          Here_.const_set :Plugins, mod  # :+#stowaway
-          Autoloader_[ mod, :boxxy ]
-        end
-
         o = Home_.lib_.plugin::BaselessCollection.new
         o.eventpoint_graph = POSSIBLE_GRAPH
         o.modality_const = :CLI
         o.plugin_services = self
-        o.plugin_tree_seed = mod
+        o.plugin_tree_seed = Here_::Plugins
 
         ok = o.load_all_plugins
         ok and begin @_plugins = o ; ACHIEVED_ end

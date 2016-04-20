@@ -36,6 +36,7 @@ module Skylab::TestSupport
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
+    Git = sidesys[ :Git ]
     Human = sidesys[ :Human ]
 
     Match_test_dir_proc = -> do

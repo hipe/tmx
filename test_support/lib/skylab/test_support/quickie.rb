@@ -1435,6 +1435,11 @@ module Skylab::TestSupport
     end
   end
 # -> (net: 0)
+
+    module Plugins  # ..
+      Autoloader_[ self, :boxxy ]
+    end
+
     Here_ = self
   end
 end

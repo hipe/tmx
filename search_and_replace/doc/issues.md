@@ -1,3 +1,5 @@
+[#026]       (integration test tests a vendor feature)
+
 [#025] #flit drop-in from niCLI to CLI, if for e.g there are missing
              required arguments. hypothetically this would be an amusing
              way to "store settings" of an S/R and bring them back up

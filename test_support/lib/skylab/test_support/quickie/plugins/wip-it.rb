@@ -4,6 +4,8 @@ module Skylab::TestSupport
 
     class Plugins::Wip_It
 
+      # (experimentally this is tested by the dependee library at [#sa-026])
+
       def initialize adapter
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -wip-them-all )
         @adapter = adapter
@@ -34,109 +36,102 @@ module Skylab::TestSupport
 
       def culled_test_files_eventpoint_notify
 
-        @pwd = ::Dir.pwd
         @y = @adapter.y
-
-        ok = __resolve_first_path
-        ok &&= __via_first_path_resolve_VCS_session
-        ok && __via_VCS_session
+        ___via_test_path_stream @adapter.services.to_test_path_stream
+        NIL_  # for now, ignore any failure from above..
       end
 
-      def __resolve_first_path
+      def ___via_test_path_stream st  # #testpoint
 
-        @st = @adapter.services.to_test_path_stream
-        @first_path = @st.gets
-        @first_path && ACHIEVED_
-      end
+        __define_constants
 
-      def __via_first_path_resolve_VCS_session
-        @sess = VCS_Session____.via_path ::File.expand_path @first_path, @pwd
-        @sess && ACHIEVED_
-      end
+        __init_emission_handlers
 
-      def __via_VCS_session
+        @_Search_and_Replace = Autoloader_.require_sidesystem :SearchAndReplace
 
-        @_white = []
-        path = @first_path
+        sess = Home_.lib_.git.check_SCM::Session.begin( & @_skip_oes_p ).finish
+
+        __init_counters
+
+        ok = true
         begin
-          ___categorize_path path
-          path = @st.gets
+          path = st.gets
           path or break
+
+          _ok_ = sess.check path
+          if ! _ok_
+            # even if one file can't be changed, keep going
+            @_skip_count += 1
+            redo
+          end
+
+          ok = ___replace_the_things_in_this_one_file path
+          # (but if something failed here, let's stop for now)
+          ok or break
+
           redo
         end while nil
-        if @_white.length.zero?
-          @y << "(nothing to do.)"
-        else
-          __work remove_instance_variable :@_white
-        end
-      end
 
-      def ___categorize_path path
+        if ok
 
-        stat = @sess.VCS_stat ::File.expand_path path, @pwd
-        if stat
-          if stat.is_modified
-            @y << "won't modify already modified file, skipping: #{ path }"
+          pcs = []
+          if @_skip_count.nonzero?
+            pcs.push "skipped #{ @_skip_count } file(s)"
+          end
+
+          if @_replacement_count.nonzero? || @_edit_session_count.nonzero?
+            pcs.push "made #{ @_replacement_count } change(s) in #{
+              }#{ @_edit_session_count } file(s)"
+          end
+
+          if pcs.length.zero?
+            @y << "(did nothing.)"
           else
-            @_white.push path
+            @y << "(#{ pcs.join ' and ' }.)"
           end
         else
-          @y << "not tracked by #{ @sess.base_name_string }, skipping: #{ path }"
+          @y << "(had errors.)"
         end
-        NIL_
+
+        ok
       end
 
-      def __work paths
+      def ___replace_the_things_in_this_one_file path
 
-        _RX = /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/
+        # (change `:path` to `:paths` for this to work on multiple files)
 
-        _repl = '{{ $1 }}describe "{{ $2 }}", wip: true do'
-
-        he = nil
-        init_handler_expresser = -> do
-          he = Home_.lib_.brazen::CLI_Support::Expression_Agent.instance.begin_handler_expresser
-          he.downstream_yielder = @y
-          he.ignore_ending_with :set_leaf_component ; nil
-        end
-
-        oes_p = -> * i_a, & ev_p do
-          he || init_handler_expresser[]
-          he.handle i_a, & ev_p
-        end
-
-        _sa = Autoloader_.require_sidesystem :SearchAndReplace
-
-        st = _sa::API.call(
-          :ruby_regexp, _RX,
-          :paths, paths,
+        st = @_Search_and_Replace::API.call(
+          :ruby_regexp, RX___,
+          :path, path,
           :search,
-          :replacement_expression, _repl,
+          :replacement_expression, REPLACEMENT_EXPRESSION___,
           :replace,
-          & oes_p )
+          & @_vendor_oes_p )
 
-        count = 0
         if st  # #tracked [#sa-024] complicated client interface
           begin
             es = st.gets
             es or break
-            count += 1
+            @_edit_session_count += 1
             mc = es.first_match_controller
             d = 0
             begin
-              _ = mc.engage_replacement( & oes_p )
+              _ = mc.engage_replacement( & @_vendor_oes_p )
               _ or self._SANITY
               d += 1
               mc = mc.next_match_controller
             end while mc
 
-            path = es.path
+            _add_number_of_replacements d
 
-            fh = ::File.open path, ::File::WRONLY
+            path_ = es.path
+
+            fh = ::File.open path_, ::File::WRONLY
 
             es.write_output_lines_into fh do | * _, & ev_p |
               _bytes = ev_p[]
-              oes_p.call :_, :expression do |y|
-                y << "wrote #{ d } change(s) (#{ _bytes } bytes) - #{ path }"
+              @_oes_p.call :_, :expression do |y|
+                y << "wrote #{ d } change(s) (#{ _bytes } bytes) - #{ path_ }"
               end
             end
 
@@ -144,15 +139,84 @@ module Skylab::TestSupport
 
             redo
           end while nil
-
-          @y << "(done with #{ count } file(s) total.)"
           ACHIEVED_
         else
-          @y << "(had errors.)"
-          UNABLE_
+          st
         end
+      end
+
+      def __init_counters
+        @_edit_session_count = 0
+        @_replacement_count = 0
+        @_skip_count = 0
+        NIL_
+      end
+
+      def _add_number_of_replacements d
+        @_replacement_count += d
+      end
+
+      def __init_emission_handlers
+
+        @_vendor_oes_p = -> * a, & p do
+          ( @__ves ||= __build_vendor_emission_handler ).handle a, & p
+        end
+
+        @_skip_oes_p = -> * a, & p do
+          ( @__seh ||= __build_skip_emission_handler ).handle a, & p
+        end
+
+        @_oes_p = -> * a, & p do
+          ( @___geh ||= __build_generic_emission_handler ).handle a, & p
+        end
+      end
+
+      def __build_vendor_emission_handler
+
+        he = _begin_handler_expresser
+
+        he.ignore_emissions_ending_with :set_leaf_component
+
+        # :#here - verbose would go here
+
+        he.maybe_ignore_emissions_ending_with :grep_command_head do
+          false  # #here
+        end
+
+        he.maybe_ignore_emissions_starting_with :info, :event, :find_command_args do
+          false  # #here
+        end
+
+        he.finish
+      end
+
+      def __build_skip_emission_handler
+        he = _begin_handler_expresser
+        he.prefix_first_expression_lines_with "skipping because "
+        he.finish
+      end
+
+      def __build_generic_emission_handler
+        _begin_handler_expresser.finish
+      end
+
+      def _begin_handler_expresser
+        he = Home_.lib_.brazen::CLI_Support::Expression_Agent.instance.begin_handler_expresser
+        he.downstream_yielder = @y
+        he
+      end
+
+      yes = true ; go = -> do
+        yes = false
+
+        RX___ = /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/
+
+        REPLACEMENT_EXPRESSION___ = '{{ $1 }}describe "{{ $2 }}", wip: true do'
+      end
+
+      define_method :__define_constants do
+        yes && go[]
       end
     end
   end
 end
-# #tombstone - TEMPORARY - intefacing with git status

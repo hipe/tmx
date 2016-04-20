@@ -636,7 +636,7 @@ module Skylab::Zerk
       # (was #[#ca-046] but now we "do it right":)
       he = expression_agent.begin_handler_expresser
       he.downstream_yielder = line_yielder
-      he
+      he.finish
     end
 
     # -- expression mechanisms

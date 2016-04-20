@@ -67,6 +67,8 @@ module Skylab::GitViz::TestSupport
       at_ :STORY_02_PATHS_
     end
 
+    undef_method :stubbed_system_conduit
+
     def stubbed_system_conduit
       :_none_used_here_
     end

@@ -151,7 +151,7 @@ module Skylab::Brazen
     public
 
       def begin_handler_expresser
-        Handler_Expresser___.new self
+        This_::Handler_Expresser.new self
       end
 
       def new_expression_context
@@ -185,53 +185,7 @@ module Skylab::Brazen
         new _action_reflection
       end
 
-      # ==
-
-      class Handler_Expresser___  # (move to own file if it gets big)
-
-        def initialize exp
-
-          @_blacklist_p_a = nil
-          @expression_agent = exp
-        end
-
-        def ignore_ending_with * i_a
-
-          r = ( -1 * i_a.length ) .. -1
-
-          ( @_blacklist_p_a ||= [] ).push -> channel do
-            i_a == channel[ r ]
-          end ; nil
-        end
-
-        def handle i_a, & ev_p
-
-          _yes = if @_blacklist_p_a
-            @_blacklist_p_a.reduce true do |_, p|
-              _do_skip = p[ i_a ]
-              if _do_skip
-                break false
-              end
-              true
-            end
-          else
-            true
-          end
-          if _yes
-            if :expression == i_a[ 1 ]
-              @expression_agent.calculate @downstream_yielder, & ev_p
-            else
-              _event = ev_p[]
-              _event.express_into_under @downstream_yielder, @expression_agent
-            end
-          end
-          :_unreliable_
-        end
-
-        attr_accessor(
-          :downstream_yielder,
-        )
-      end
+      This_ = self
     end
   end
 end

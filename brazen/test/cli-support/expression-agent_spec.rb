@@ -13,7 +13,8 @@ module Skylab::Brazen::TestSupport
       shared_subject :_lines do
 
         he = _common_begin
-        he.ignore_ending_with :la_la
+        he.ignore_emissions_ending_with :la_la
+        he.finish
         he.handle [ :shooomie, :doomie, :la_la ]
         he.downstream_yielder
       end
@@ -27,7 +28,7 @@ module Skylab::Brazen::TestSupport
 
       shared_subject :_tuple do
 
-        he = _common_begin
+        he = _common_begin.finish
 
         _ =  he.handle [ :info, :doozie ] do
           _fake_event do |y|
@@ -49,8 +50,9 @@ module Skylab::Brazen::TestSupport
     end
 
     context "(expression)" do
+
       shared_subject :_lines do
-        he = _common_begin
+        he = _common_begin.finish
         he.handle [ :info, :expression ] do |y|
           y << ick( 'yay' )
         end
