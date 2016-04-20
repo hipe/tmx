@@ -60,7 +60,7 @@ module Skylab::System::TestSupport
 
       _st = Home_.lib_.basic::String.line_stream s
 
-      @st = subject_::Models_::Command.unmarshalling_stream _st, :OGDL
+      @st = popen3_result_for_RW_.unmarshalling_stream _st, :OGDL
 
       NIL_
     end

@@ -97,12 +97,15 @@ module Skylab::System::TestSupport
   # -- test library nodes
 
   Expect_Event = -> tcc do
-
     Callback_.test_support::Expect_Event[ tcc ]
   end
 
   Expect_Line = -> tcc do
     TestSupport_::Expect_line[ tcc ]
+  end
+
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
   # --

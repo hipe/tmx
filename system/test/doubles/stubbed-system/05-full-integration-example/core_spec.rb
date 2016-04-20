@@ -41,7 +41,11 @@ module Skylab::System::TestSupport
     it "look a ping" do
 
       tc = _test_context_instance
-      _, o, e, t = tc.stubbed_system_conduit.popen3 'echo', 'hello'
+
+      _sc = tc.stubbed_system_conduit
+
+      _, o, e, t = _sc.popen3 'echo', 'hello'
+
       t.value.exitstatus.should be_zero
       e.should be_nil  # you get none because you had none
       o.gets.should eql "hello\n"

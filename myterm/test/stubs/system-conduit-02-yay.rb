@@ -6,7 +6,7 @@ module Skylab::MyTerm::TestSupport
       attr_reader :instance
     end
 
-    sc = Home_.lib_.system_lib::Doubles::Stubbed_System::Inline_Pool.new
+    sc = Home_.lib_.system_lib::Doubles::Stubbed_System::Inline_Pool_Based.new
 
     sc._add_entry_by_ do |cmd_s_a|
 

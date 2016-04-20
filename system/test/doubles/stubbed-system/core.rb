@@ -6,6 +6,14 @@ module Skylab::System::TestSupport
       tcc.include self
     end
 
+    def conduit_for_RW_  # ..
+      Subject[]::Readable_Writable_Based_
+    end
+
+    def popen3_result_for_RW_  # ..
+      Subject[]::Readable_Writable_Based_::Popen3_Result
+    end
+
     def new_string_IO_
       Home_.lib_.string_IO.new
     end

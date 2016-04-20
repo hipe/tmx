@@ -32,7 +32,7 @@ module Skylab::Git::TestSupport
 
       def mock_system_conduit_where_ chdir, cmd, & three_p
 
-        sy = Home_.lib_.system_lib::Doubles::Stubbed_System::Inline_Static.new
+        sy = Home_.lib_.system_lib::Doubles::Stubbed_System::Inline_Static_Based.new
         sy._add_entry_ chdir, cmd, & three_p
         sy
       end

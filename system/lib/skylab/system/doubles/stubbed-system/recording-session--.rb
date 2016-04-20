@@ -25,7 +25,7 @@ module Skylab::System
 
           _i, o, e, t = Home_.lib_.open3.popen3( * args )
 
-          co = Here_::Models_::Command.new
+          co = Here_::Readable_Writable_Based_::Popen3_Result.new
 
           co.receive_args args
 

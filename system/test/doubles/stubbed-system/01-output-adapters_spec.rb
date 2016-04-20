@@ -13,7 +13,7 @@ module Skylab::System::TestSupport
 
     it "writes one command" do
 
-      co = subject_::Models_::Command.new
+      co = popen3_result_for_RW_.new
       co.receive_args [ "echo", "it's", '"fun"' ]
       co.stdout_string = "it's \"fun\"\n"
       co.exitstatus = 0
@@ -35,7 +35,7 @@ module Skylab::System::TestSupport
 
     it "if options are provided, they get special treatment" do
 
-      co = subject_::Models_::Command.new
+      co = popen3_result_for_RW_.new
       co.receive_args [ 'hi', chdir: 'etc' ]
 
       io = new_string_IO_
@@ -49,3 +49,4 @@ module Skylab::System::TestSupport
     end
   end
 end
+# #pending-rename: maybe push 1, 2, 3, 4 & 5 down to its branch-specific

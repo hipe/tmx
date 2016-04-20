@@ -9,13 +9,12 @@ module Skylab::System::TestSupport
 
     it "a mock system conduit is built with a pathname (any string)" do
 
-      subject_::Conduit.new _no_ent_path
-
+      conduit_for_RW_.new _no_ent_path
     end
 
     it "doesn't read the FS until it is used" do
 
-      _cond = subject_::Conduit.new( _no_ent_path )
+      _cond = conduit_for_RW_.new( _no_ent_path )
       begin
         _cond.popen3 'no'
       rescue ::Errno::ENOENT => e
@@ -26,7 +25,8 @@ module Skylab::System::TestSupport
 
     it "OK (note STDIN mock is never created, other are IFF present)" do
 
-      cond = subject_::Conduit.new( _manifest_A )
+      cond = conduit_for_RW_.new( _manifest_A )
+
       i, o, e, w = cond.popen3 'echo', "it's", '"fun"'
 
       i.should be_nil

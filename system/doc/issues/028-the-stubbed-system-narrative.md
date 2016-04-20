@@ -1,6 +1,58 @@
-# the stubbed sys narrative :[#028]
+# the stubbed system narrative :[#028]
 
-## introduction
+## purpose & scope
+
+in one sentence, this facility is a means for "stubbing" the results of
+calls to `popen3` on a "system conduit" that is produced by this
+facility. the reason this is useful to us is that (by design) *all*
+system calls happen through this method, and if we can "stub" calls to
+it, then we can "stub" the system. stubbing the system, in turn, is
+useful to us for a couple of reasons:
+
+1) in unit tests it's generally accepted as good practice to stub
+interactions with outside system to a) reduce coupling to outside
+systems and b) to improve latency. i.e, unit tests should be able to run
+as a standalone "unit".
+
+2) with a featureful enough library we can do something we call "two-way
+assertion", something we won't cover here (for now), but is suggested by
+old body copy below.
+
+
+
+
+## expanse
+
+at writing there are or were *five* (5) mechanisms for creating a
+stubbed system.
+
+  1) the first (byzantine) stubbed system of [gv]. very deprecated,
+     if not sunsetted completely.
+
+  2) "readable-writable". ironically or not, a simplificaton of the
+     above but is now seen as too complicated and might deprecate too.
+
+  3) "inline static" based, which is so short and simple you can almost
+     understand its inteface by reading its code.
+
+  4) "inline pool" based, which is like above but diminishes and has
+     function-based resolution.
+
+  5) "snippet" based, which stores its "snapshots" in files but uses
+     a platform format rather than OGDL..
+
+
+
+
+## current state
+
+in asset code and in tests the taxonomy has not been fully rearranged to
+reflect the delineation of the 4 different facilities offered here.
+
+
+
+
+## readable-writable
 
 "stubbed-system" is a mechanism for writing the results of arbitrary system
 calls to disk and then later "playing them back" as if they were the results
@@ -46,7 +98,7 @@ for a sense of the byzantine scope of this stack, you may want to skim:
   • [#gv-023] the stubbed system narrative
   • [#gv-024] the manifest client narrative
   • [#gv-027] the freetags feature
-  • [#gv-028] the artbuilding scripts narrative
+  • [#gv-028] the partbuilding scripts narrative
 
 what it amounted to was an exercize in overdoing the architecture for
 what we told ourselves at the time was a "good" reason, but really we
