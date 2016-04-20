@@ -54,7 +54,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails" do
-        expect_exitstatus_for :_component_rejected_request_
+        expect_exitstatus_for :component_rejected_request
       end
 
       it "says elaborate thing (language a bit awkward per model)" do

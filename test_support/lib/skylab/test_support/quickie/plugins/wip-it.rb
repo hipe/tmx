@@ -5,6 +5,7 @@ module Skylab::TestSupport
     class Plugins::Wip_It
 
       # (experimentally this is tested by the dependee library at [#sa-026])
+      # (wormhole with [#sa-024])
 
       def initialize adapter
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -wip-them-all )

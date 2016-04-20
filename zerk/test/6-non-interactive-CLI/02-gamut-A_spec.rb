@@ -118,7 +118,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "fails with specific exitstatus" do
-        expect_exitstatus_for :_component_rejected_request_
+        expect_exitstatus_for :component_rejected_request
       end
 
       it "treats operation name as verb and message as predicate" do

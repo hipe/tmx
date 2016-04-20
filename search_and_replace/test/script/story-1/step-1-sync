@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+if [[ ! -d search_and_replace ]] ; then
+  echo "search and replace dir?"
+  exit 5
+fi
+
+if [[ ! -d test_support ]] ; then
+  echo "test support dir?"
+  exit 5
+fi
+
+for i in some-orange.orange some-blue.blue three-lines.txt ; do
+
+  source="test_support/fixture-files/$i"
+  dest="search_and_replace/test/fixture-trees/4-egads/$i"
+
+  echo -n "copying: $source -> $dest ."
+  cp "$source" "$dest"
+  echo ". done"
+
+done
+
+echo "done."

@@ -113,7 +113,7 @@ module Skylab::SearchAndReplace::TestSupport
 
           em_a = __emissions
           1 == em_a.length or fail
-          _ = em_a.fetch( 0 ).should be_emission :data, :number_of_bytes_written
+          _ = em_a.fetch( 0 ).should be_emission :info, :data, :number_of_bytes_written
 
           _.cached_event_value.should eql 34
         end

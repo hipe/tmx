@@ -13,6 +13,12 @@ module Skylab::Brazen
           @_expression_first_line_string_mapper = nil
         end
 
+        def initialize_copy otr
+          if @_filters_by_channel
+            self._WAHOO_write_me_by_deep_duping_this_array
+          end
+        end
+
         # -- content mapping
 
         def prefix_first_expression_lines_with s
@@ -86,30 +92,44 @@ module Skylab::Brazen
           self
         end
 
+        def on_event_selectively
+          # (if you memoize this you gotta clear it at the `dup`)
+          -> * i_a, & ev_p do
+            handle i_a, & ev_p
+          end
+        end
+
         def handle i_a, & ev_p
-          otr = dup
-          otr.extend Express_Emission___
-          otr.__handle i_a, & ev_p
+
+          Express_Emission___.new( i_a, ev_p, self ).execute
         end
 
         attr_reader(
+          :_determine_pass,
           :downstream_yielder,
+          :_express_expression,
+          :expression_agent,
+          :_expression_first_line_string_mapper,
+          :_filters_by_channel,
         )
 
         # ==
 
-        module Express_Emission___
+        class Express_Emission___
 
-          def __handle i_a, & ev_p
-
-            @i_a = i_a
+          def initialize i_a, ev_p, up
             @ev_p = ev_p
+            @i_a = i_a
+            @_ = up
+          end
 
-            send @_determine_pass
+          def execute
+
+            send @_._determine_pass
 
             if @_pass
               if :expression == @i_a[1]
-                send @_express_expression
+                send @_._express_expression
               else
                 __express_event
               end
@@ -125,7 +145,7 @@ module Skylab::Brazen
           def __determine_pass_via_etc
 
             p = nil
-            @_filters_by_channel.each do |p_|
+            @_._filters_by_channel.each do |p_|
               p = p_[ @i_a ]
               p and break
             end
@@ -140,23 +160,23 @@ module Skylab::Brazen
           def __express_event
 
             _event = @ev_p[]
-            _event.express_into_under @downstream_yielder, @expression_agent
+            _event.express_into_under @_.downstream_yielder, @_.expression_agent
             NIL_
           end
 
           def __express_expression_via_string_mapper
 
-            a = @expression_agent.calculate [], & @ev_p
-            a[ 0 ] = @_expression_first_line_string_mapper[ a[0] ]
+            a = @_.expression_agent.calculate [], & @ev_p
+            a[ 0 ] = @_._expression_first_line_string_mapper[ a[0] ]
             a.each do |s|
-              @downstream_yielder << s
+              @_.downstream_yielder << s
             end
             NIL_
           end
 
           def __express_expression_normally
 
-            @expression_agent.calculate @downstream_yielder, & @ev_p
+            @_.expression_agent.calculate @_.downstream_yielder, & @ev_p
 
             NIL_
           end

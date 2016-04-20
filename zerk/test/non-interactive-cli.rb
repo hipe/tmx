@@ -214,7 +214,12 @@ module Skylab::Zerk::TestSupport
         )
       end
 
-      My_State___ = ::Struct.new :exitstatus, :lines, :invocation
+      My_State___ = ::Struct.new(
+        :exitstatus,
+        :lines,
+        :invocation,
+        :freeform_x,  # [sa]
+      )
 
       def subject_CLI
 

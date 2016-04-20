@@ -38,8 +38,24 @@ module Skylab::SearchAndReplace
         vmm
       end
 
+      cli.location_module = CLI
+
       cli
     end
+
+    # ==
+
+    module NonInteractive
+      module CustomEffecters
+        module Search
+          Replace = -> x, cli do
+            CLI::NonInteractive_ViewEffecters::Replace_All_in_File.via__( x, cli ).execute
+          end
+        end
+      end
+    end
+
+    # ==
 
     class Highlighting_Expag___
 

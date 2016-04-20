@@ -1,4 +1,17 @@
-[#026]       (integration test tests a vendor feature)
+[#029] #open be the vanguard of a unification of pretty path (there's
+             one in [sy] and one in [br]), one that relies on a client
+             to tell it what the pwd and ENV['HOME'] is during one
+             "session", and one that is more testable.
+
+             as it is it is pretty nasty to (a) hit these without making
+             them testable and (b) they won't scale
+
+[#028] #open verbose (by default we should not express zoopie and doopie)
+
+[#027] #open niCLI won't be able to handle a replacement expression that
+             looks like an option (i.e starts with "--").
+
+[#026]       (integration test tests a vendor feature ([ts]))
 
 [#025] #flit drop-in from niCLI to CLI, if for e.g there are missing
              required arguments. hypothetically this would be an amusing
@@ -12,7 +25,7 @@
              to) so that non-interactive sessions that are intended to
              be so can stay that way.
 
-[#024] #track complicated client interface
+[#024] #track complicated client interface (used in [ts]) "wip them all"
 
 [#023] #when-etc use (or don't) for all occurrences of old memoize
              (after benchmarking it)
@@ -102,7 +115,7 @@
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline
 
-[#006] #during #milestone-6 descriptions
+[#006] #hole ( #was: #during #milestone-6 descriptions )
              ( #was: #done #feature support for spaces in list items )
 
 [#005] #open improve architecture so we can pass things like system
@@ -111,10 +124,16 @@
 
              ( #was: #feature make this one button with three labels
                instead of three buttons )
-[#004]       #feature should check mtime before write, abort for that file if stale
+
+[#004] #hole
+             ( #was: #feature should check mtime before write, abort for
+             that file if stale. #wontfix because VCS integration
+             obviates this. )
+
 [#003]       [ track a historic node ]
 
-[#002] #open -wip-them-all (in [ts]) *uses* this guy..
-             we need to decide how to cover..
+[#002] #hole
+             ( #was: -wip-them-all (in [ts]) *uses* this guy..
+             we need to decide how to cover.. )
 
 [#001]       [ the readme ]

@@ -49,7 +49,7 @@ module Skylab::SearchAndReplace
         end while nil
 
         if block_given?
-          oes_p.call :data, :number_of_bytes_written do
+          oes_p.call :info, :data, :number_of_bytes_written do
             bytes
           end
         end

@@ -20,16 +20,8 @@ module Skylab::SearchAndReplace
     [
       :children, {
 
-        path: -> do
-          # #milestone-6: this is API only
-        end,
-
-        filename_pattern: -> do
-          # #milestone-6: this is API only
-        end,
-
         egrep_pattern: -> do
-          # #milestone-6: this is supposed to "appear" IFF ruby regexp
+          # #milestone-9: this is supposed to "appear" IFF ruby regexp
         end,
 
         search: -> do
@@ -393,6 +385,7 @@ module Skylab::SearchAndReplace
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
+    Git = sidesys[ :Git ]
 
     Shellwords = -> do
       require 'shellwords'

@@ -37,7 +37,8 @@ module Skylab::Zerk
       :compound_usage_strings,
       :invite,
       :location_module,
-      :operation_usage_string,  # #todo
+      :operation_usage_string,
+      :system_conduit,
       :when_head_argument_looks_like_option,
     )
 
@@ -267,7 +268,7 @@ module Skylab::Zerk
     end
 
     def when_via_option_parser_component_rejected_request__
-      _done_because :_component_rejected_request_, :option
+      _done_because :component_rejected_request, :option
     end
 
     def when_via_option_parser_help_was_requested__ any_s
@@ -302,7 +303,7 @@ module Skylab::Zerk
 
     def when_via_argument_parser_component_rejected_request__
 
-      _done_because :_component_rejected_request_, :argument
+      _done_because :component_rejected_request, :argument
     end
 
     def when_via_argument_parser_extra__ ev
@@ -614,7 +615,7 @@ module Skylab::Zerk
 
     # -- emission handing support
 
-    def on_event_selectively__
+    def on_event_selectively  # [sa]
       @_oes_p
     end
 
@@ -641,6 +642,13 @@ module Skylab::Zerk
     end
 
     # -- expression mechanisms
+
+    def begin_niCLI_handler_expresser  # [sa]
+
+      he = expression_agent.begin_handler_expresser
+      he.downstream_yielder = line_yielder
+      he
+    end
 
     def express_section_via__ x_a, & p
       section_expression_.express_section_via x_a, & p
@@ -675,12 +683,17 @@ module Skylab::Zerk
       :location_module,
       :operation_usage_string,
       :sout,
+      :system_conduit,
     )
 
     # -- exit statii
 
     def init_exitstatus_for_ k
       init_exitstatus_ exitstatus_for_ k
+    end
+
+    def maybe_upgrade_exitstatus_for k
+      maybe_upgrade_exitstatus exitstatus_for_ k
     end
 
     def maybe_upgrade_exitstatus d
@@ -709,7 +722,7 @@ module Skylab::Zerk
       p = -> kk do
         a = %i(
           _parse_error_
-          _component_rejected_request_
+          component_rejected_request
           missing_required_parameters
           referent_not_found
           _component_unavailable_
