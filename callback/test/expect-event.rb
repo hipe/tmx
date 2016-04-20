@@ -385,6 +385,18 @@ module Skylab::Callback::TestSupport
         state_.emission_array
       end
 
+      def be_emission_beginning_with * x_a, & x_p
+
+        _expev_matcher_by do
+
+          channel_head_of x_a
+
+          if x_p
+            alternate_user_proc_of x_p
+          end
+        end
+      end
+
       def be_emission_ending_with * x_a, & x_p
 
         _expev_matcher_by do
@@ -551,15 +563,23 @@ module Skylab::Callback::TestSupport
 
       def check_full_channel
 
-        act = @_emission.channel_symbol_array
-        exp = @_expectation.full_channel
-
-        Require_basic__[]
-        good_d = Basic_::List.index_of_deepest_common_element act, exp
-
         # if the actual channel is deeper than the expected channel,
         # but the expect channel matches the head-anchored slice, it's still
         # a match (FOR NOW)..
+
+        _check_channel_head @_expectation.full_channel
+      end
+
+      def check_channel_head
+        _check_channel_head @_expectation.channel_head
+      end
+
+      def _check_channel_head exp
+
+        act = @_emission.channel_symbol_array
+
+        Require_basic__[]
+        good_d = Basic_::List.index_of_deepest_common_element act, exp
 
         bad_d = if good_d
           good_d + 1
@@ -738,6 +758,11 @@ module Skylab::Callback::TestSupport
         @terminal_channel_symbol = sym ; nil
       end
 
+      def channel_head_of x_a
+        @channel_method_name = :check_channel_head
+        @channel_head = x_a ; nil
+      end
+
       def channel_tail_of x_a
         @channel_method_name = :check_channel_tail
         @channel_tail = x_a ; nil
@@ -782,6 +807,7 @@ module Skylab::Callback::TestSupport
         # --
         :channel_method_name,
         :terminal_channel_symbol,
+        :channel_head,
         :channel_tail,
         :full_channel,
         # --

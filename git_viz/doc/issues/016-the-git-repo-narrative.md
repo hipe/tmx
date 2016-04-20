@@ -71,5 +71,5 @@ here's a summary of the PRO's of keeping SHA's as strings:
 
 
 this is an implementation detail anyway! if we force ourselves to stick
-with workin with SHA's only thru the class, we should be somewhat
+with working with SHA's only thru the class, we should be somewhat
 protected if we change our mind on this.

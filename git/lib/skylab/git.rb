@@ -49,12 +49,8 @@ module Skylab::Git
 
   class << Home_
 
-    def check_SCM * a
-      if a.length.zero?
-        Home_::Actors__::Check_SCM
-      else
-        Home_::Actors__::Check_SCM[ * a ]
-      end
+    def check_SCM * a, & x_p
+      Home_::Actors__::Check_SCM.line_oriented_via_arguments_ a, & x_p
     end
 
     def lib_

@@ -1,0 +1,115 @@
+#!/usr/bin/env ruby -w
+
+out = $stdout
+serr = $stderr
+argv = ::ARGV
+
+sidesys_path = ::File.expand_path '../../../..', __FILE__
+
+require ::File.join( sidesys_path, 'lib/skylab/git' )
+
+if argv.length.nonzero?
+  serr.puts "this script takes no arguments (had: #{ argv.first.inspect })"
+  exit 5
+end
+
+cmd_s_a_head = Skylab::Git::Actors__::Check_SCM::Check___::GIT_STATUS_HEAD___
+
+build_git_status_command_for = -> path do
+
+  s_a = cmd_s_a_head.dup
+  s_a.push path
+  s_a
+end
+
+these = %w( modified.file not-there.file unchanged.file unversioned-A.file )
+
+require 'open3'
+
+cd_to_here = ::File.expand_path 'MACDOUGAL/fazoozle'  # from pwd
+
+if ! ::File.directory? cd_to_here
+  serr.puts "did you run step 1? need directory: #{ cd_to_here }"
+  exit 5
+end
+
+output_any = -> a, sym do
+  if a
+    out.puts "    #{ sym }: ["
+    a.each do |s|
+      out.puts "      #{ s.inspect },"
+    end
+    out.puts "    ],"
+  end
+end
+
+output_command = -> _i, o, e, w, cmd_s_a do
+
+  out.puts "  {"
+
+  s = o.gets
+  if s
+    sout_a = [s]
+    while s = o.gets
+      sout_a.push s
+    end
+  end
+
+  s = e.gets
+  if s
+    serr_a = [s]
+    while s = e.gets
+      serr_a.push s
+    end
+  end
+
+  d = w.value.exitstatus
+
+  out.puts "    command: #{ cmd_s_a.inspect },"
+
+  out.puts "    exitstatus: #{ d },"
+
+  output_any[ sout_a, :stdout_lines ]
+
+  output_any[ serr_a, :stderr_lines ]
+
+  out.puts "  },"
+
+  nil
+end
+
+out.puts "["
+
+# --
+
+these.each do |path|
+
+  cmd_s_a = build_git_status_command_for[ path ]
+
+  four = ::Open3.popen3( * cmd_s_a, chdir: cd_to_here )
+
+  output_command[ * four, cmd_s_a ]
+
+end
+
+# --
+
+cmd_s_a = build_git_status_command_for[ 'unversioned-B.file' ]  # doesn't have to exit
+
+_four = ::Open3.popen3( * cmd_s_a, chdir: '/tmp' )
+
+output_command[ * _four, cmd_s_a ]
+
+# --
+
+out.puts "]"
+
+if out.tty?
+
+  _dest = ::File.join sidesys_path, 'test/fixture-data/story-1.snippet.rb'
+
+  serr.puts "(to \"run\" this, redirect its output to #{ _dest })"
+
+else
+  serr.puts "(done with step 2.)"
+end

@@ -87,9 +87,7 @@ module Skylab::System
 
         def _stream_via_array a
 
-          Stubbed_IO_for_Read_.via_nonsparse_array a do |s|
-            s.concat NEWLINE_  # WEEE
-          end
+          Stubbed_IO_for_Read_.via_nonsparse_array a
         end
 
         def exitstatus d

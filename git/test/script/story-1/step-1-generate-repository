@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+if [[ -e MACDOUGAL ]] ; then
+  echo "must not exist: MACDOUGAL"
+  exit 5
+fi
+
+mkdir MACDOUGAL
+
+cd MACDOUGAL
+
+git init .
+
+mkdir fazoozle
+
+cd fazoozle
+
+echo 'modified.file' > modified.file
+
+echo 'unchanged.file' > unchanged.file
+
+echo 'unversioned-A.file' > unversioned-A.file
+
+git add modified.file unchanged.file
+
+git ci -m '(first commit)'
+
+echo "some change" >> modified.file
+
+cd ..
+
+# now you're in the MACDOUGAL directory
+
+echo "(finishsed step 1.)"

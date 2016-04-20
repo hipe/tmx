@@ -11,25 +11,32 @@ module Skylab::Git::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  TS_transitional_ = -> tcc do
+    tcc.send :define_singleton_method, :use, USE_METHOD__
+    tcc.include InstanceMethods
+  end
 
-    define_method :use, -> do
-      cache = {}
-      -> sym do
-        ( cache.fetch sym do
+    cache = {}
+    USE_METHOD__ = -> sym do
 
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
+      _test_support_lib = cache.fetch sym do
 
-          x = if TS_.const_defined? const
-            TS_.const_get const
-          else
-            TestSupport_.fancy_lookup sym, TS_
-          end
-          cache[ sym ] = x
-          x
-        end )[ self  ]
+        const = Callback_::Name.via_variegated_symbol( sym ).as_const
+
+        x = if TS_.const_defined? const
+          TS_.const_get const
+        else
+          TestSupport_.fancy_lookup sym, TS_
+        end
+        cache[ sym ] = x
+        x
       end
-    end.call
+
+      _test_support_lib[ self ]
+    end
+
+  module ModuleMethods
+    define_method :use, USE_METHOD__
   end
 
   module InstanceMethods
@@ -91,19 +98,31 @@ module Skylab::Git::TestSupport
     end
   end
 
+  # --
+
   Expect_Event = -> tcc do
 
     Callback_.test_support::Expect_Event[ tcc ]
   end
 
-  Fixture_tree_ = -> sym do
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
 
+  # --
+
+  Lazy_ = Callback_::Lazy
+
+  Fixture_data_path_ = Lazy_.call do
+    ::File.join TS_.dir_pathname.to_path, 'fixture-data'
+  end
+
+  Fixture_tree_ = -> sym do
     ::File.join Fixture_trees_[], sym.to_s.gsub( UNDERSCORE_, DASH_ )
   end
 
-  Fixture_trees_ = Callback_.memoize do
-
-    TS_.dir_pathname.join( 'fixture-trees' ).to_path
+  Fixture_trees_ = Lazy_.call do
+    ::File.join TS_.dir_pathname.to_path, 'fixture-trees'
   end
 
   DASH_ = '-'
