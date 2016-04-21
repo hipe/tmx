@@ -180,6 +180,31 @@ module Skylab::Callback
 
     # ~ result in structures of lesser constituency (st's, ary's, bx's)
 
+    def join_into_with_using_by buff_o_x, separator_o_x, m, & p
+
+      # #experimental
+      # the simplest of the #[#047] - like Enumerator#join, but
+      # over-abstracted so as not to assume a string idiom
+
+      x = gets
+      if x
+        x_ = p[ x ]
+        if x_
+          buff_o_x.send m, x_
+        end
+        begin
+          x = gets
+          x or break
+          x_ = p[ x ]
+          x_ or redo  # might change..
+          buff_o_x.send m, separator_o_x
+          buff_o_x.send m, x_
+          redo
+        end while nil
+      end
+      buff_o_x
+    end
+
     def reduce_into_by m, & p  # comparable to platform `reduce`
       begin
         x = gets
@@ -412,9 +437,10 @@ module Skylab::Callback
       end
     end
 
-    private def new & p
+    def new & p
       self.class.new @upstream, & p
     end
+    private :new
 
     class Resource_Releaser < ::Proc
 

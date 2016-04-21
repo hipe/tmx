@@ -93,6 +93,14 @@ module Skylab::Zerk::TestSupport
     Callback_::Known_Known[ x ]
   end
 
+  # -- mode-specific
+
+  Remote_CLI_lib_ = Lazy_.call do
+    # (in the asset tree we keep mention of "CLI" out of the toplevel, but for
+    # the 2/3 of tests that need this, it's too annoying not to put it here)
+    Home_.lib_.brazen::CLI_Support
+  end
+
   # -- test lib nodes
 
   Expect_Event = -> tcc do

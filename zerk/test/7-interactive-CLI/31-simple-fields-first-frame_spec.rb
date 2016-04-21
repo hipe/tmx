@@ -2,15 +2,16 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] iCLI - simple fields first frame", wip: true do
+  describe "[ze] iCLI - simple fields first frame" do
 
     TS_[ self ]
     use :memoizer_methods
     use :expect_screens
 
     shared_subject :subject_CLI do
+      # #todo - think about pushing this up to `expect_screens` maybe?
 
-      _ACS_class = TS_.lib_ :examples_example_01_zombies
+      _ACS_class = subject_root_ACS_class
 
       cli = Home_::Interactive_CLI.begin
 
@@ -125,12 +126,12 @@ module Skylab::Zerk::TestSupport
     context "good button, then invalid value" do
 
       given do
-        input 'fo', '/x'
+        input 'fo', 'ZYXwv'
       end
 
       it "complains of invalid" do
 
-        first_line.should eql 'paths can\'t be absolute - "/x"'
+        first_line.should eql 'string must be in all caps (had: "w")'
       end
 
       it "goes back to the same prompt immediately after" do
@@ -146,7 +147,7 @@ module Skylab::Zerk::TestSupport
     context "good button then invalid value then cancel" do
 
       given do
-        input 'fo', '/x', false
+        input 'fo', 'ZYXab', false
       end
 
       it "leaves you at the first frame" do
@@ -158,11 +159,12 @@ module Skylab::Zerk::TestSupport
     context "good button, then valid value" do
 
       given do
-        input 'fo', 'xhi'
+        input 'fo', 'YXW'
       end
 
       it "first line confirms that it wrote" do
-        first_line.should eql 'set fozzer to "xhi"'
+
+        first_line.should eql 'set fozzer to "YXW"'
       end
 
       it "redisplays *all* buttons for first screen" do
@@ -177,7 +179,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def subject_root_ACS_class
-      My_fixture_top_ACS_class[ :Class_31_3_Prims_and_a_Transitive_Operation ]
+      My_fixture_top_ACS_class[ :Class_31_3_Prims_and_a_Transtive_Operation ]
     end
   end
 end

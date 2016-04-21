@@ -7,9 +7,27 @@ module Skylab::Zerk
     # the human-facing client that cannot be expressed or inferred by the
     # ACS, like special hotstrings or custom-made UI components.
     #
+    # (a note of history, this existed as a concept before "node ticket".)
+    #
     # "load ticket" replaces a role that was formerly served by
     # "qualified knownness" so there remains an amount of delegation that
     # is perhaps conspicuous.
+
+    class << self
+
+      def [] x, nt
+
+        _ = Node_ticket_3_category_[ nt ]
+        _cls = Here_.const_get NT3___.fetch _
+        _cls.new x, nt
+      end
+    end  # >>
+
+    NT3___ = {
+      primitivesque: :Prim___,
+    }
+
+    # ==
 
     class Primitive_Custom_View__
 
@@ -45,6 +63,8 @@ module Skylab::Zerk
       end
     end
 
+    # ==
+
     class Compound_Custom_View < Primitive_Custom_View__
 
       # -- DSL
@@ -65,21 +85,15 @@ module Skylab::Zerk
       )
     end
 
-    def self.[] x, qkn
-      if qkn.association.model_classifications.looks_primitivesque
-        Prim___.new x, qkn
-      else
-        Comp___.new x, qkn
-      end
-    end
+    # ==
 
-    def initialize qkn
+    def initialize nt
 
       @prepared_ = false
-      @_qkn = qkn
+      @_nt = nt
 
-      @association = qkn.association
-      @name = qkn.name
+      @association = nt.association
+      @name = nt.name
     end
 
     def custom_hotstring_structure
@@ -98,15 +112,15 @@ module Skylab::Zerk
     end
 
     def is_effectively_known
-      @_qkn.is_effectively_known
+      @_nt.is_effectively_known
     end
 
     def is_known_known
-      @_qkn.is_known_known
+      @_nt.is_known_known
     end
 
     def value_x
-      @_qkn.value_x
+      @_nt.value_x
     end
 
     attr_reader(
@@ -116,10 +130,10 @@ module Skylab::Zerk
 
     class Prim___ < self
 
-      def initialize customization_x, qkn
+      def initialize customization_x, nt
 
         @_customization_x = customization_x
-        super qkn
+        super nt
       end
 
       def prepare_
@@ -141,9 +155,9 @@ module Skylab::Zerk
 
     class Comp___ < self
 
-      def initialize customization_x, qkn
+      def initialize customization_x, nt
         @_customization_x = customization_x
-        super qkn
+        super nt
       end
 
       def compound_custom_view
@@ -177,5 +191,7 @@ module Skylab::Zerk
         false
       end
     end
+
+    Here_ = self
   end
 end

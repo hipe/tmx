@@ -169,6 +169,10 @@ module Skylab::Zerk
       end
     end
 
+    Remote_CLI_lib_ = Lazy_.call do  # 2nd
+      Home_.lib_.brazen::CLI_Support
+    end
+
     Here_ = self
   end
 end

@@ -964,7 +964,6 @@ module Skylab::Zerk::TestSupport
     BLANK_RX___ = %r(\A$)  # be indifferent to newlines
     E__ = "\e".getbyte 0
     Here_ = self
-    Remote_CLI_lib_ = Home_::Non_Interactive_CLI::Remote_CLI_lib_
     WORD_RX__ = /\A[a-z]+/
   end
 end

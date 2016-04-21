@@ -4,11 +4,11 @@ module Skylab::Human
 
     class Expression_Sessions::List_through_Eventing  # :[#047].
 
-      # (see also a simpler yielder-based form at [#ba-056])
-
       # ==
 
       class Simple
+
+        # see other (even simpler) similar facilities, tracked with #[#ca-047])
 
         attr_writer(
           :on_first,

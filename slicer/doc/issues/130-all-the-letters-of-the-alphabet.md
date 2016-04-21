@@ -22,7 +22,7 @@ i - symbol! with ruby 2.0's introduction of %i( .. ) we now make heavy use
 j - nope. (this isn't C - we don't have nested for-loops)
 k - *rarely* used, but sometimes it holds actual class object (from `klass`).
 l - no way - never use this because it looks like a one.
-m - sometimes used to hold a symbol method name, or an unbound or bound method.
+m - often used to hold a symbol method name.
     often used for the 'memo' term of a reduce operation.
 n - rarely used to hold an integer count of something ("number")
 o - as a standalone name, often used to look pretty for various DSL hacks.

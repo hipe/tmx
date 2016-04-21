@@ -4,7 +4,8 @@ module Skylab::Basic
 
     class Mapper  # :[#056].
 
-      # see also [#hu-047] for a more complex stream version
+      # there is at least 1 more complex (stream-based) and
+      # 1 simpler variant of this along #[#ca-047].
 
       class << self
 

@@ -743,16 +743,7 @@ module Skylab::Zerk
 
     # ==
 
-    Node_ticket_3_category_ = -> nt do  # see #here.
-
-      if :operation == nt.node_ticket_category
-        :operation
-      else
-        nt.association.model_classifications.category_symbol
-      end
-    end
-
-    Formal_node_3_category_ = -> fn do  # might become :[#ac-034]. also :#here
+    Formal_node_3_category_ = -> fn do  # see #spot-5
 
       if :formal_operation == fn.formal_node_category
         :formal_operation

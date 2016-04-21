@@ -8,7 +8,7 @@ module Skylab::Zerk
     def initialize qkn, rsx
 
       @_line_yielder = rsx.line_yielder
-      @_qkn = qkn
+      @_lt = qkn
 
       @event_loop = rsx.event_loop
       @UI_event_handler = rsx.UI_event_handler
@@ -35,8 +35,10 @@ module Skylab::Zerk
         NIL_
 
       else
-        bx = @_qkn.transitive_capabilities_box
+
+        bx = @_lt.association.transitive_capabilities_box
         if bx
+          self._REVIEW
           @_UI_frame_nodes = bx.a_.map do |sym|
             Callback_::Name.via_variegated_symbol sym
           end
@@ -100,7 +102,7 @@ module Skylab::Zerk
       # `set` (ick) will be effected through a "normal" mutation session:
 
       a = [ sym ]
-      a.push @_qkn.name.as_variegated_symbol
+      a.push @_lt.name.as_variegated_symbol
 
       _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
 
@@ -133,31 +135,31 @@ module Skylab::Zerk
         st = Home_.lib_.fields::Argument_stream_via_value[ s ]
       end
 
-      if st
-        wv = @_qkn.association.component_model.call st, & _handler_maker
-        if wv
-          ___assign_value wv
+      if st  # (otherwise, converting the input to a list may have failed)
+        kn = @_lt.association.component_model.call st, & _handler_maker
+        if kn
+          ___accept_value kn
         end
       end
       NIL_
     end
 
     def is_listy
-      Is_listy_[ @_qkn.association.argument_arity ]
+      Is_listy_[ @_lt.association.argument_arity ]
     end
 
-    def ___assign_value wv
+    def ___accept_value kn
 
-      # but wait: we do care..
+      # the topmost frame is a frame is the adapter for the primitivesque.
+      # write its new value into the compound node which is the frame below
+      # it..
 
-      _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
+      _rw = @event_loop.stack_penultimate.reader_writer_
 
-      self._REDO
-      p = ACS_::Interpretation::Accept_component_change[
-        wv.value_x,
-        @_qkn.association,
-        _ACS,
-      ]
+      _qkn = kn.to_qualified_known_around @_lt.association
+
+      p = ACS_::Interpretation::Accept_component_change.call _qkn, _rw
+      # (if we passed a block it would be for building a linked list of context)
 
       _handler.call :info, :set_leaf_component do
         p[]
@@ -200,7 +202,7 @@ module Skylab::Zerk
     # -- instrinsic constituency & shape reflection
 
     def name
-      @_qkn.name
+      @_lt.name
     end
 
     def shape_symbol

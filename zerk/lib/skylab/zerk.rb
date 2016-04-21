@@ -47,6 +47,15 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
+  Node_ticket_3_category_ = -> nt do  # might become :[#ac-034]. :#spot-5
+
+    if :operation == nt.node_ticket_category
+      :operation
+    else
+      nt.association.model_classifications.category_symbol
+    end
+  end
+
   Lazy_ = Callback_::Lazy
 
   Require_ACS_ = Lazy_.call do

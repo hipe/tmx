@@ -26,8 +26,12 @@ module Skylab::Zerk
 
     def __index_for_UI_frame
 
+      o = reader_writer_.to_node_ticket_streamer
+      o.on_association = nil  # (hi.) x2
+      o.on_operation = nil
+      st = o.execute
+
       load_tickets = []
-      st = UI_node_stream_for___[ @ACS ]
 
       # (during #description, use the above somehow ..)
 
@@ -40,14 +44,13 @@ module Skylab::Zerk
       end
 
       begin
-        qkn = st.gets
-        qkn or break
+        nt = st.gets
+        nt or break
 
-        _cust_x = h[ qkn.name.as_variegated_symbol ]
-        lt = Home_::Load_Ticket_[ _cust_x, qkn, ]
+        _cust_x = h[ nt.name_symbol ]
+        lt = Home_::Load_Ticket_[ _cust_x, nt, ]
 
         butz.add lt
-
         load_tickets.push lt
 
         redo
@@ -109,6 +112,12 @@ module Skylab::Zerk
       UNRELIABLE_
     end
 
+    # -- support and exposure
+
+    def reader_writer_
+      @___rw ||= ACS_::ReaderWriter.for_componentesque @ACS
+    end
+
     # -- as structure
 
     attr_reader(
@@ -120,7 +129,5 @@ module Skylab::Zerk
     def shape_symbol
       :branchesque
     end
-
-    UI_node_stream_for___ = Interface_stream_for_.curry[ :UI ]
   end
 end

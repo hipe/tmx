@@ -67,14 +67,15 @@ module Skylab::Zerk
 
     # -- for lower-level modules
 
-    def express_buttonesques button_frame
+    def express_buttonesques buttons
 
-      @line_yielder << ( button_frame.to_a.reduce [] do | m, sct |
+      _st = Callback_::Stream.via_nonsparse_array buttons  # while it works
 
-        m << "#{ sct.head }[#{ sct.hotstring_for_expression }]#{ sct.tail }"
+      _buff = _st.join_into_with_using_by "", SPACE_, :<< do |btn|
+        "#{ btn.head }[#{ btn.hotstring_for_expression }]#{ btn.tail }"
+      end
 
-      end ).join( SPACE_ )
-
+      @line_yielder << _buff
       NIL_
     end
 

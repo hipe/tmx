@@ -34,7 +34,8 @@
 
 [#048] #hole ( #was parent node. #moved-to: [#hu-054] )
 
-[#047] #hole ( #was: eventing .. #moved-to: [#hu-053] )
+[#047]       #strain the family-strain of facilities that are basically
+             `Enumerator#join`. ( #was: eventing .. #moved-to: [#hu-053] )
 
 [#046] #track similar emission handlers (this is very near [#066] but is
               for those that do not convert to exceptions but rather
