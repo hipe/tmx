@@ -17,12 +17,8 @@ module Skylab::Zerk::TestSupport
     # all other operations besides `set` need the ACS to define the operation
     # explicitly, as we have done here with `delete`.
 
-    def initialize & oes_p
-
-      # (we only emit events, we don't need e.g to write directly to stdout
-      # which is why we disreagard the first argument above.)
-
-      @_oes_p = oes_p
+    def initialize
+      # #cold-model (no more event handler inside)
     end
 
     def __fozzer__component_association
@@ -42,15 +38,14 @@ module Skylab::Zerk::TestSupport
       All_caps_primitivesque_
     end
 
-    def __delete__component asc, & _x_p
+    def __delete__component asc, & pp
 
-      # per #thread-one we are not passed an
-      # emission handler proc as an argument for now.
+      self._README  # all of this would change for #cold-model (and no transitive operations)
 
-      pd = "pretending to delete '#{ asc.name.as_slug }'"
+      _ = "pretending to delete '#{ asc.name.as_slug }'"
 
-      @_oes_p.call :info, :expression do |y|  # use #thread-one
-        y << "#{ pd } two"
+      pp[ nil ].call :info, :expression do |y|
+        y << "#{ _ } two"
       end
 
       :_yep_

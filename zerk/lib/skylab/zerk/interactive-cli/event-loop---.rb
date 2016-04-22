@@ -57,8 +57,7 @@ module Skylab::Zerk
 
       Require_ACS_[]
 
-      top_oes_p = -> * i_a, & ev_p do  # this is this. :#thread-one
-
+      @UI_event_handler = -> * i_a, & ev_p do
         receive_uncategorized_emission i_a, & ev_p
         UNRELIABLE_
       end
@@ -66,9 +65,8 @@ module Skylab::Zerk
       @line_yielder = @_resources.line_yielder
       @serr = @_resources.serr
       @sout = @_resources.sout
-      @UI_event_handler = top_oes_p
 
-      _top_ACS = @_build_top.call( & top_oes_p )
+      _top_ACS = @_build_top.call  # #cold-model, so do not pass @UI_event_handler
 
       x = @_view_maker_maker.custom_tree
       if x

@@ -142,14 +142,9 @@ module Skylab::Zerk
       UNRELIABLE_
     end
 
-    def receive_expression_emission i_a, & y_p
+    def receive_expression_emission _i_a, & y_p
 
-      # (came from #thread-one)
-
-      _y = line_yielder
-      _expag = _expression_agent
-
-      _expag.calculate _y, & y_p
+      _expression_agent.calculate line_yielder, & y_p
 
       UNRELIABLE_
     end

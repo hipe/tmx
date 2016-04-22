@@ -15,8 +15,9 @@ module Skylab::Zerk::TestSupport
 
       cli = Home_::Interactive_CLI.begin
 
-      cli.root_ACS = -> & top_oes_p do
-        _ACS_class.new( & top_oes_p )
+      cli.root_ACS = -> & p do
+        p and self._NO_MORE_HOT_MODEL  # #cold-model
+        _ACS_class.new
       end
 
       cli.to_classesque
@@ -183,3 +184,4 @@ module Skylab::Zerk::TestSupport
     end
   end
 end
+# #pending-rename: towards unified language, don't say "simple fields" say "primitivesque"

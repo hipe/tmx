@@ -53,7 +53,7 @@
 [#007]       "threads" (tracking tags for experimentals towards public API)
              #thread-three - nils vs. false
              #thread-two - `gets` resulting in `nil` == interrupt
-             #thread-one - the UI tree is internally wired
+             #!thread-one - used to be "hot model", now we use cold model
 [#006]       expect screens ..
 [#005]       [the view maker maker]
 [#004]       [the compound adapter]

@@ -98,18 +98,19 @@ module Skylab::Zerk
 
     def ___do_this_via_edit sym
 
+      self._README_needs_something_for_cold_model  # #cold-model
+
       # for user-defined single-symbol operations, all of them besides
       # `set` (ick) will be effected through a "normal" mutation session:
 
       a = [ sym ]
-      a.push @_lt.name.as_variegated_symbol
+      a.push @_lt.name_symbol
 
       _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
 
-      ok = ACS_.edit a, _ACS  # we could pass some arbitrary (oes_p_p)
-      # handler here, but instead we (for now) defer eventing to the
-      # argument ACS because they seem to be all internally wired.
-      # :#thread-one
+      _pp = self._SOMETHING
+
+      ok = ACS_.edit a, _ACS, & _pp
 
       # this is subject to change, but for now, if the edit succeeds
       # we'll jump up a level..
