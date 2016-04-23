@@ -1,18 +1,19 @@
 module Skylab::Zerk
 
-  class Node_Adapters_::Primitivesque  # :[#003]. (built in 1 place by event loop)
+  class InteractiveCLI
+
+  class Atomesque_Frame_  # :[#003]. (built in 1 place by event loop)
 
     # (watch for overlap with [#ac-003] the primitivesque for interface)
     # what belongs in here vs. in the view controller is some kind of thing
 
-    def initialize qkn, rsx
+    def initialize lt, el
 
-      @_line_yielder = rsx.line_yielder
-      @_lt = qkn
-
-      @event_loop = rsx.event_loop
-      @UI_event_handler = rsx.UI_event_handler
+      @event_loop = el
+      @_line_yielder = el.line_yielder
+      @_lt = lt
       @_prompt_once = false  # nasty
+      @UI_event_handler = el.UI_event_handler
     end
 
     # -- ..
@@ -80,7 +81,7 @@ module Skylab::Zerk
 
     def ___process_nonblank_string_as_button s
 
-      nf = Home_::Interpretation_Adapters_::Buttonesque[ s, self ]
+      nf = Here_::Buttonesque_Interpretation_Adapter_[ s, self ]
       if nf
         sym = nf.as_variegated_symbol
         if :set == sym  # #NASTY
@@ -128,7 +129,7 @@ module Skylab::Zerk
       # what we *do* care about is if this is processing lists as lists.
 
       if is_listy
-        a = Home_::Interpretation_Adapters_::List[ s, & @UI_event_handler ]
+        a = Here_::List_Interpretation_Adapter___[ s, & @UI_event_handler ]
         if a
           st = Home_.lib_.fields::Argument_stream_via_value[ a ]
         end  # else emitted
@@ -146,7 +147,11 @@ module Skylab::Zerk
     end
 
     def is_listy
-      Is_listy_[ @_lt.association.argument_arity ]
+      ( @___listy_kn ||= ___determine_listy_kn ).value_x
+    end
+
+    def ___determine_listy_kn
+      Callback_::Known_Known[ Is_listy_[ @_lt.association.argument_arity ] ]
     end
 
     def ___accept_value kn
@@ -209,5 +214,7 @@ module Skylab::Zerk
     def shape_symbol
       :primitivesque
     end
+  end
+
   end
 end

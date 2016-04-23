@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  module View_Controllers_::Primitive_Frame
+  class InteractiveCLI
+
+  module Atomesque_Frame_ViewController_
 
     class << self
 
@@ -29,7 +31,7 @@ module Skylab::Zerk
         freeze
       end
 
-      def call y
+      def call y  # imagine `express_primitive_frame_into_`
 
         ada = @stack.last
         x = ada.button_frame
@@ -67,5 +69,7 @@ module Skylab::Zerk
         y << NEWLINE_  # the line boundarizer won't help use here b.c `write`
       end
     end
+  end
+
   end
 end

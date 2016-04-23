@@ -41,7 +41,7 @@ module Skylab::Zerk
     )
 
     def to_classesque  # tracking #[#011]
-      Home_::CLI_Support_::Prototype_as_Classesque.new self
+      CLI_::Prototype_as_Classesque.new self
     end
 
     def universal_CLI_resources sin, sout, serr, pn_s_a

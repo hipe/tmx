@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  class View_Controllers::Buttonesque
+  class InteractiveCLI
+
+  class ButtonesqueViewController
 
     # specifically so that custom views can work with buttonesques in
     # a more straightforward way - no load tickets, just labels and
@@ -9,11 +11,11 @@ module Skylab::Zerk
     class << self
 
       def begin_frame
-        Home_::Expression_Adapters_::Buttonesque::Frame.begin
+        Here_::Buttonesque_Expression_Adapter_::Frame.begin
       end
 
       def interpret s, o
-        _ = Home_::Interpretation_Adapters_::Buttonesque[ s, o ]
+        _ = Here_::Buttonesque_Interpretation_Adapter_[ s, o ]
         _
       end
     end  # >>
@@ -33,7 +35,7 @@ module Skylab::Zerk
 
     def hotstring_delineation= st
       _s_a = st.gets_one
-      _ = Home_::Expression_Adapters_::Buttonesque.new( * _s_a, self )
+      _ = Here_::Buttonesque_Expression_Adapter_.new( * _s_a, self )
       @custom_hotstring_structure = _ ; nil
     end
 
@@ -89,5 +91,7 @@ module Skylab::Zerk
     )
 
     NILADIC_TRUTH_ = -> { true }
+  end
+
   end
 end

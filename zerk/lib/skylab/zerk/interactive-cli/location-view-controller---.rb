@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  module View_Controllers_::Location
+  class InteractiveCLI
+
+  module Location_ViewController___
 
     class << self
 
@@ -39,5 +41,7 @@ module Skylab::Zerk
         y << "«loco»"
       end
     end
+  end
+
   end
 end

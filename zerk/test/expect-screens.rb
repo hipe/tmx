@@ -2,16 +2,30 @@ module Skylab::Zerk::TestSupport
 
   module Expect_Screens  # objective & scope at [#006]
 
+    # (unofficially this node is sometimes associated with
+    # the name/prefix "iCLI" as well as "expect_screens")
+
     PUBLIC = true  # [sa]
 
     def self.[] tcc
 
       tcc.send :define_singleton_method, :given, Given___
+
+      # (rather than depend on etc, write our own memoizer)
+      yes = true ; x = nil
+      tcc.send :define_method, :subject_CLI do
+        if yes
+          yes = false
+          x = build_interactive_CLI_classeque
+        end
+        x
+      end
+
       tcc.include self
     end
 
       Given___ = -> & p do
-        Danger_Memo__.call self, :_expscr_session_state do
+        Danger_Memo__.call self, :iCLI_state do
 
           @_expscr_args = Args___.new
           instance_exec( & p )
@@ -26,6 +40,26 @@ module Skylab::Zerk::TestSupport
     Args___ = ::Struct.new :_CLI_x_a
 
     # -
+
+      def build_interactive_CLI_classeque
+
+        cli = Home_::Interactive_CLI.begin
+
+        cli.root_ACS = method :build_root_ACS_for_expect_screens
+
+        cli.to_classesque
+      end
+
+      def build_root_ACS_for_expect_screens
+
+        _ = subject_root_ACS_class
+        _.new  # #cold-model
+      end
+
+      def stdout_is_expected_to_be_written_to
+        false
+      end
+
       # -- specific whines
 
       def match_line_for_unrecognized_argument_ s
@@ -38,12 +72,12 @@ module Skylab::Zerk::TestSupport
         match RX_FOR_LINE_OF_BUTTONS___
       end
 
-      def hotstring_for_ slug
+      def hotstring_for slug
         buttonesques.hotstring_for slug
       end
 
       def buttonesques
-        _expscr_session_state.screens.last.buttonesques
+        iCLI_state.screens.last.buttonesques
       end
 
       def be_in_any_order_the_buttons_ * s_a
@@ -102,7 +136,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def screens
-        _expscr_session_state.screens
+        iCLI_state.screens
       end
 
       def _expscr_last_screen_stream_lines_stream
@@ -110,7 +144,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def _expscr_last_screen_stream_lines
-        _expscr_session_state.screens.fetch( -1 ).stream_lines
+        iCLI_state.screens.fetch( -1 ).stream_lines
       end
 
       def unstyle_styled_ s
@@ -123,7 +157,7 @@ module Skylab::Zerk::TestSupport
 
         # see #here
 
-        _expscr_session_state.event_loop_state.frame_stack_length
+        iCLI_state.event_loop_state.frame_stack_length
       end
 
       def be_at_frame_number d
@@ -137,7 +171,7 @@ module Skylab::Zerk::TestSupport
       # -- exitstatii
 
       def exitstatus_
-        _expscr_session_state.end_result_wrapped_value.value_x
+        iCLI_state.end_result_wrapped_value.value_x
       end
 
       def be_successful_exitstatus_

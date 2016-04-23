@@ -18,6 +18,10 @@ module Skylab::System::TestSupport
       Home_.lib_.string_IO.new
     end
 
+    def fixture_path_for__ x
+      Fixture_path_for[ x ]
+    end
+
     def path_for_ x
       Path_for[ x ]
     end
@@ -31,6 +35,10 @@ module Skylab::System::TestSupport
     end
 
     _Here = self
+
+    Fixture_path_for = -> x do
+      ::File.join Path_for[ 'fixture-data' ], x
+    end
 
     Path_for = -> do
 

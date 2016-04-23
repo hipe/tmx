@@ -51,9 +51,9 @@ module Skylab::Git
 
     def check_SCM * a
       if a.length.zero?
-        Home_::Actors__::Check_SCM
+        Home_::Check
       else
-        Home_::Actors__::Check_SCM.line_oriented_via_arguments__ a
+        Home_::Check.line_oriented_via_arguments__ a
       end
     end
 

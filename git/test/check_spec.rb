@@ -137,7 +137,7 @@ module Skylab::Git::TestSupport
     end
 
     def _subject_module
-      Home_::Actors__::Check_SCM
+      Home_::Check
     end
   end
 end

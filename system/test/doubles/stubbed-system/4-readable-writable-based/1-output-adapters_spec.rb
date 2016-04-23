@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] doubles - stubbed-system - 01: output-adapters" do
+  describe "[sy] doubles - stubbed-system - output-adapters" do
 
     TS_[ self ]
     use :doubles_stubbed_system
@@ -49,4 +49,3 @@ module Skylab::System::TestSupport
     end
   end
 end
-# #pending-rename: maybe push 1, 2, 3, 4 & 5 down to its branch-specific

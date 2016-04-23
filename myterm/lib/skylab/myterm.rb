@@ -2,9 +2,12 @@ require 'skylab/callback'
 
 module Skylab::MyTerm
 
-  def self.describe_into_under y, _expag
-    y << "for OS X and iTerm 2: identify terminals thru label as background image"
-  end
+  class << self
+
+    def describe_into_under y, _expag
+      y << "for OS X and iTerm 2: identify terminals thru label as background image"
+    end
+  end  # >>
 
   module API
     # one of the [#015] "generated modality clients" (see)
@@ -14,7 +17,7 @@ module Skylab::MyTerm
         # (for now, every API call starts with a new empty root ACS)
         # (but remember there is a kernel that is "long-running")
 
-        _ACS = Home_._build_root_ACS
+        _ACS = Home_.build_root_ACS_
         Call_[ x_a, _ACS, & pp ]
       end  # :cp1
     end  # >>
@@ -29,7 +32,7 @@ module Skylab::MyTerm
 
   class << self
 
-    def _build_root_ACS  # (break down as needed)
+    def build_root_ACS_  # (break down as needed)
 
       Home_::Models_::Appearance.new ___custom_kernel
     end  # :cp3

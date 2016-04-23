@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  class Fixture_Top_ACS_Classes::Class_31_3_Prims_and_a_Transtive_Operation
+  class Fixture_Top_ACS_Classes::Class_31_Some_Primitivesques  # 1x
 
     # NOTE - this was the 3rd-ish added fixture-graph. are we getting rid of
     # expression for for "transitive operations" in the iCLI? we want to. if
@@ -68,4 +68,3 @@ module Skylab::Zerk::TestSupport
     end
   end
 end
-# #pending-rename: see note in first comment in this file

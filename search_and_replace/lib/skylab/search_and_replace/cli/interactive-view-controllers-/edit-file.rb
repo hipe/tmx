@@ -336,7 +336,7 @@ module Skylab::SearchAndReplace
 
       def __init_all_buttonesques
 
-        butt = Zerk_::View_Controllers::Buttonesque
+        butt = Buttonesque_view_controller__[]
         a = []
 
         # p r y n f a A
@@ -406,7 +406,7 @@ module Skylab::SearchAndReplace
 
       def begin_UI_frame
 
-        butz = Zerk_::View_Controllers::Buttonesque.begin_frame
+        butz = Buttonesque_view_controller__[].begin_frame
 
         @_all_butz_a.each do |butt|
           if butt.is_available
@@ -433,7 +433,7 @@ module Skylab::SearchAndReplace
         if s.length.zero?
           @line_yielder << "(nothing entered.)"
         else
-          butt = Zerk_::View_Controllers::Buttonesque.interpret s, self
+          butt = Buttonesque_view_controller__[].interpret s, self
           if butt
             _ = butt.on_press.call
             _  # ignored
@@ -459,8 +459,11 @@ module Skylab::SearchAndReplace
         end
       end
 
+      Buttonesque_view_controller__ = -> do
+        ::Skylab::Zerk::NonInteractiveCLI::Buttonesque_ViewController
+      end
+
       Here_ = self
-      Zerk_ = ::Skylab::Zerk  # assume
 
     end
   end

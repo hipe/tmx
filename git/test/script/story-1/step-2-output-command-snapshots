@@ -13,7 +13,7 @@ if argv.length.nonzero?
   exit 5
 end
 
-cmd_s_a_head = Skylab::Git::Actors__::Check_SCM::Check___::GIT_STATUS_HEAD___
+cmd_s_a_head = Skylab::Git::Check::GIT_STATUS_HEAD___
 
 build_git_status_command_for = -> path do
 

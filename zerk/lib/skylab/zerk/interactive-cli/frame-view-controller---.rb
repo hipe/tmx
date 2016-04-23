@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  class View_Controllers_::Frame
+  class InteractiveCLI
+
+  class Frame_ViewController___
 
     # the top view controller. assembles and expresses the whole "screen"
     # as well as providing parameters to component view controllers.
@@ -16,24 +18,24 @@ module Skylab::Zerk
 
       h = {}
       h[ :branchesque ] = -> do
-        _ = @compound_frame.call @line_yielder
-        _
+        @compound_frame.call @line_yielder  # imagine `express_compound_frame_into__`
+        NIL_
       end
       h[ :entitesque ] = -> do
-        _ = stack.last.call  # has self as member
-        _
+        stack.last.express_entitesque_frame__  # has self as member
+        NIL_
       end
       h[ :primitivesque ] = -> do
-        _ = @primitive_frame.call @line_yielder
-        _
+        @primitive_frame.call @line_yielder  # imagine `express_primitive_frame_into_`
+        NIL_
       end
       @_op_h = h
 
-      _init comp_kn, :@compound_frame, :Compound_Frame
+      _init comp_kn, :@compound_frame, :Compound_Frame_ViewController___
 
-      _init loc_kn, :@location, :Location
+      _init loc_kn, :@location, :Location_ViewController___
 
-      _init prim_kn, :@primitive_frame, :Primitive_Frame
+      _init prim_kn, :@primitive_frame, :Atomesque_Frame_ViewController_
     end
 
     def _init kn, ivar, const
@@ -45,7 +47,7 @@ module Skylab::Zerk
       proto = if kn
         kn.value_x
       else
-        View_Controllers_.const_get( const, false ).default_instance
+        Here_.const_get( const, false ).default_instance
       end
 
       _x = if proto
@@ -97,6 +99,7 @@ module Skylab::Zerk
     attr_reader(
       :expression_agent,
       :line_yielder,  # [sa]
+      :primitive_frame,
       :serr,
       :stack,
     )
@@ -124,5 +127,7 @@ module Skylab::Zerk
     end
 
     EXPAG___ = Expag___.new
+  end
+
   end
 end

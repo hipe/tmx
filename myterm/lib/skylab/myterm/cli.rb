@@ -2,6 +2,8 @@ module Skylab::MyTerm
 
   class CLI
 
+    # (currently this is the non-interactive CLI. we want to merge the two)
+
     # to review, [ze] will "generate" for us (#todo  [#015])
     # we want to leverage the [ze] generated CLI to
 
@@ -18,7 +20,7 @@ module Skylab::MyTerm
 
       Require_zerk_[]
 
-      _ACS = Home_._build_root_ACS
+      _ACS = Home_.build_root_ACS_
 
       if @_sc_qk
         _ACS.system_conduit = @_sc_qk.value_x

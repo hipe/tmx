@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  module View_Controllers_::Compound_Frame
+  class InteractiveCLI
+
+  module Compound_Frame_ViewController___
 
     # mainly, the 2-column table
 
@@ -46,7 +48,7 @@ module Skylab::Zerk
         freeze
       end
 
-      def call y
+      def call y  # imagine `express_compound_frame_into__`
 
         _boundary  # after the prompt and what was entered
 
@@ -223,19 +225,21 @@ module Skylab::Zerk
 
       def __inferred_item_text_proc_for_primitivesque lt
 
-        _is_listy = Is_listy_[ lt.association.argument_arity ]
-        _is_known = lt.is_effectively_known
+        qkn = lt.to_qualified_knownness__
+
+        _is_listy = Is_listy_[ qkn.association.argument_arity ]
+        _is_known = qkn.is_effectively_known
 
         if _is_listy
           if _is_known
-            __inferred_item_text_proc_for_known_list lt
+            __inferred_item_text_proc_for_known_list qkn
           else
-            __inferred_item_text_proc_for_unknown_list lt
+            __inferred_item_text_proc_for_unknown_list qkn
           end
         elsif _is_known
-          __inferred_item_text_proc_for_known_atom lt
+          __inferred_item_text_proc_for_known_atom qkn
         else
-          __inferred_item_text_proc_for_unknown_atom lt
+          __inferred_item_text_proc_for_unknown_atom qkn
         end
       end
 
@@ -269,7 +273,7 @@ module Skylab::Zerk
         _ITEM_TEXT_FOR_EFFECTIVELY_UNKNOWN_ATOM
       end
 
-      def __inferred_item_text_proc_for_known_atom qkn
+      def __inferred_item_text_proc_for_known_atom
 
         p = _proc_for_item_text_via_known_atom_value_for qkn.association
 
@@ -312,4 +316,6 @@ module Skylab::Zerk
 
     end ; end  # end "item text proc for"
   end  # end file subject
+
+  end
 end

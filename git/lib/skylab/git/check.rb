@@ -1,6 +1,6 @@
 module Skylab::Git
 
-  module Actors__::Check_SCM
+  module Check
 
     class << self
 
@@ -425,4 +425,3 @@ module Skylab::Git
     end
   end
 end
-# #pending-rename: to "checker" or somesuch, at top level

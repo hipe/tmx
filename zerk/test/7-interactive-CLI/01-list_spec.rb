@@ -141,7 +141,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def _subject
-      Home_::Interpretation_Adapters_::List
+      Home_::InteractiveCLI::List_Interpretation_Adapter___
     end
   end
 end

@@ -218,5 +218,4 @@ module Skylab::Autonomous_Component_System
     end
   end
 end
-# #pending-rename: probably to something like "node ticket streamer"
 # #tombstone - older streamers

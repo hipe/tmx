@@ -1,11 +1,11 @@
 # numbering scheme
 
-1-3 - (reserved for pre-model-level experiments)
+(for the below that don't have corresponding directories
+in this project, think of them as "slots")
 
-4 - "models" *is* what tests the API. use of the API *is* what tests models.
-
-5 - non-interactive CLI (relates to Phase-2/Milestone-5)
-
-X - persistence
-
-X - iCLI (etc)
+1 - magnetics
+2 - models (tested thru API)
+3 - core opertions (tested thru API)
+4 - auxiliary operations (tested thru API)
+5 - non-interactive CLI
+6 - interactive CLI

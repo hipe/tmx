@@ -17,7 +17,7 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end  # >>
 
-  module CLI_Support_
+  module CLI_
 
     class Prototype_as_Classesque
 
@@ -102,10 +102,6 @@ module Skylab::Zerk  # intro in [#001] README
   module Invocation_
     Autoloader_[ self ]
     Here_ = self
-  end
-
-  module View_Controllers_
-    Autoloader_[ self ]
   end
 
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]

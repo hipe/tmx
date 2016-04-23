@@ -9,7 +9,7 @@ module Skylab::Zerk
       def initialize args, acs, & pp
 
         @_push_compound_qk = -> qk do
-          @_stack.push Here_::Compound_Frame___.new qk ; nil
+          @_stack.push Here_::CompoundFrame___.new qk ; nil
         end
 
         _qk = Callback_::Qualified_Knownness[ acs, ROOT_ASSOCIATION___ ]

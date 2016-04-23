@@ -7,6 +7,14 @@
   • "scope set" / "stated set" / "bespoke set" / "socialist set" - see [#027]
 
 
+## (for iCLI)
+
+  • most of niCLI terms too
+
+  • "atomesque" is both primitivesque and entitesque
+    (they get very similar expression here)
+
+
 
 
 ## (for niCLI)
@@ -23,7 +31,7 @@
 
   • compound. (don't say "branch" here.)
 
-  • primitivesque. (don't say "leaf", "atom" here.)
+  • primitivesque. (don't say "leaf".)
 
   • "navigational" nodes are the compounds and the operations.
 

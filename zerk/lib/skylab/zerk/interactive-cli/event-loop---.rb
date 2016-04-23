@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  class InteractiveCLI::Event_Loop___  # :[#002].
+  class InteractiveCLI
+
+  class Event_Loop___  # :[#002].
 
     def initialize vmm, rsx, & build_top
       @_build_top = build_top
@@ -70,7 +72,7 @@ module Skylab::Zerk
 
       x = @_view_maker_maker.custom_tree
       if x
-        _ccv = Home_::Load_Ticket_::Compound_Custom_View.new x
+        _ccv = Here_::Load_Ticket_::Compound_Custom_View.new x
       end
 
       @_stack = [ _build_compound_adapter( _top_ACS, _ccv ) ]
@@ -79,10 +81,6 @@ module Skylab::Zerk
     end
 
     # -- parameters for lower-level modules (used to be "frame resources")
-
-    def event_loop
-      self
-    end
 
     attr_reader(
       :line_yielder,
@@ -101,14 +99,20 @@ module Skylab::Zerk
 
     def __push_stack_frame_for_new__primitivesque__ lt
 
-      _new = Home_::Node_Adapters_::Primitivesque.new lt, self
-      @_stack.push _new
+      _new = Here_::Atomesque_Frame_.new lt, self
+
+      push_this_stack_frame_ _new
+      NIL_
+    end
+
+    def push_this_stack_frame_ fr
+      @_stack.push fr
       NIL_
     end
 
     def __push_stack_frame_for_new__entitesque__ lt
 
-      _new = Home_::Node_Adapters_::Entitesque.new(
+      _new = Here_::Entitesque_Frame___.new(
         lt, @__main_view_controller, self )
 
       @_stack.push _new
@@ -137,7 +141,7 @@ module Skylab::Zerk
 
     def _build_compound_adapter acs, ccv
 
-      Home_::Node_Adapters_::Compound.new acs, ccv, self
+      Here_::Compound_Frame___.new acs, ccv, self
     end
 
     # -- event handling
@@ -169,7 +173,7 @@ module Skylab::Zerk
 
     # -- API as view controller
 
-    def redo
+    def loop_again_
       @_do_redo = true ; nil
     end
 
@@ -204,5 +208,7 @@ module Skylab::Zerk
       @_running = false
       NIL_
     end
+  end
+
   end
 end

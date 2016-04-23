@@ -17,9 +17,9 @@ module Skylab::Zerk
       # frames to the stack, so that the main parser and the help subsystem
       # can both share its facilities with the same interface and behavior.
 
-      Compound_Frame__ = ::Class.new self
+      CompoundFrame__ = ::Class.new self
 
-      class Root < Compound_Frame__
+      class Root < CompoundFrame__
 
         def initialize cli, acs
           @CLI = cli
@@ -62,7 +62,7 @@ module Skylab::Zerk
 
       NonRoot_Methods__ = ::Module.new
 
-      class NonRootCompound___ < Compound_Frame__
+      class NonRootCompound___ < CompoundFrame__
 
         include NonRoot_Methods__
 
@@ -171,7 +171,7 @@ module Skylab::Zerk
 
       # --
 
-      class Compound_Frame__
+      class CompoundFrame__
 
         def initialize acs
           @ACS = acs

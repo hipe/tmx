@@ -62,10 +62,27 @@ module Skylab::MyTerm::TestSupport
 
   # --
 
+  module My_Interactive_CLI
+
+    def self.[] tcc
+
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
+      _ = Zerk_test_lib__[].lib :expect_screens
+      _[ tcc ]
+      tcc.include self
+    end
+
+    def build_interactive_CLI_classeque
+      Home_::CLI::Interactive.build_classesque__
+    end
+  end
+
+  # --
+
   module My_API
 
     def self.[] tcc
-      @_ ||= Home_.lib_.zerk.test_support.lib :API
+      @_ ||= Zerk_test_lib__[].lib :API
       @_[ tcc ]
       tcc.include self
     end
@@ -88,8 +105,14 @@ module Skylab::MyTerm::TestSupport
     end  # •cp1
 
     def build_root_ACS_
-      Home_._build_root_ACS
+      Home_.build_root_ACS_
     end
+  end
+
+  # --
+
+  Zerk_test_lib__ = -> do
+    Home_.lib_.zerk.test_support
   end
 
   Callback_ = ::Skylab::Callback

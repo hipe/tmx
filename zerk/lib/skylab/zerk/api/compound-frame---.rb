@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module API
 
-    class Compound_Frame___
+    class CompoundFrame___
 
       # our custom frame for our custom stack.
 

@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  Interpretation_Adapters_::Buttonesque = -> s, ada do
+  class InteractiveCLI
+
+  Buttonesque_Interpretation_Adapter_ = -> s, ada do
 
     oes_p = ada.UI_event_handler
 
@@ -50,5 +52,7 @@ module Skylab::Zerk
 
     _ = o.execute
     _
+  end
+
   end
 end

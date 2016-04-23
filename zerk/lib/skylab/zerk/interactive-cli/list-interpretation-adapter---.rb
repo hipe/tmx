@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  class Interpretation_Adapters_::List < Callback_::Actor::Monadic  # :[#008]..
+  class InteractiveCLI
+
+  class List_Interpretation_Adapter___ < Callback_::Actor::Monadic  # :[#008]..
 
     # #open after incubation (which will be after [#009]), de-dup this
     # with [#sy-029] OGDL which should be similar.. or don't
@@ -217,5 +219,7 @@ module Skylab::Zerk
     end
 
     WHITE_RX___ = /[ \t]/
+  end
+
   end
 end

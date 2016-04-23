@@ -7,11 +7,10 @@ module Skylab::System::TestSupport
     o = TS_.lib_ :doubles_stubbed_system
 
     Subject__ = o::Subject
-    Path_for__ = o::Path_for
 
     # <-
 
-  TS_.describe "[sy] doubles - stubbed-system - 05: full integration example" do
+  TS_.describe "[sy] doubles - stubbed-system - full integration example" do
 
     TS_[ self ]
     o[ self ]
@@ -20,7 +19,9 @@ module Skylab::System::TestSupport
 
       class MS_05_Fake_Test_Context
 
-        Subject__[].enhance_client_class self
+        lib = Doubles::Stubbed_System
+
+        lib::Subject[].enhance_client_class self
 
         define_method :cache_hash_for_stubbed_system, ( Callback_.memoize do
           {}
@@ -28,7 +29,7 @@ module Skylab::System::TestSupport
 
         define_method :manifest_path_for_stubbed_system, ( Callback_.memoize do
 
-          Path_for__[ '05-full-integration-example/fixtures/commands.ogdl' ]
+          lib::Fixture_path_for[ 'ogdl-commands-5.ogdl' ]
 
         end )
       end

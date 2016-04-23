@@ -1,5 +1,7 @@
 module Skylab::Zerk
 
+  class InteractiveCLI
+
   class Load_Ticket_
 
     # the load ticket (as a class) exists to implement custom views - it
@@ -15,16 +17,18 @@ module Skylab::Zerk
 
     class << self
 
-      def [] x, nt
+      def [] x, nt, moda_frame
 
         _ = Node_ticket_3_category_[ nt ]
-        _cls = Here_.const_get NT3___.fetch _
-        _cls.new x, nt
+        _cls = This_.const_get NT3___.fetch _
+        _cls.new x, nt, moda_frame
       end
     end  # >>
 
     NT3___ = {
-      primitivesque: :Prim___,
+      compound: :Compound___,
+      entitesque: :Entitesque___,
+      primitivesque: :Primitivesque___,
     }
 
     # ==
@@ -58,7 +62,7 @@ module Skylab::Zerk
         a = @_custom_hotstring_pieces
         if a
           @_custom_hotstring_pieces = :_used_  # etc..
-          Home_::Expression_Adapters_::Buttonesque.new( * a, lt )
+          Here_::Buttonesque_Expression_Adapter_.new( * a, lt )
         end
       end
     end
@@ -87,78 +91,7 @@ module Skylab::Zerk
 
     # ==
 
-    def initialize nt
-
-      @prepared_ = false
-      @_nt = nt
-
-      @association = nt.association
-      @name = nt.name
-    end
-
-    def custom_hotstring_structure
-      @prepared_ || prepare_
-      @_custom_hotstring_structure
-    end
-
-    # -- delegations
-
-    def category_symbol
-      @association.model_classifications.category_symbol
-    end
-
-    def description_proc
-      @association.description_proc
-    end
-
-    def is_effectively_known
-      @_nt.is_effectively_known
-    end
-
-    def is_known_known
-      @_nt.is_known_known
-    end
-
-    def value_x
-      @_nt.value_x
-    end
-
-    attr_reader(
-      :association,
-      :name,
-    )
-
-    class Prim___ < self
-
-      def initialize customization_x, nt
-
-        @_customization_x = customization_x
-        super nt
-      end
-
-      def prepare_
-
-        x = remove_instance_variable :@_customization_x
-        if x
-          pcv = Primitive_Custom_View__.new x
-          @_custom_hotstring_structure = pcv.custom_hotstring_structure_for self
-        else
-          @_custom_hotstring_structure = nil
-        end
-        NIL_
-      end
-
-      def looks_primitivesque
-        true
-      end
-    end
-
-    class Comp___ < self
-
-      def initialize customization_x, nt
-        @_customization_x = customization_x
-        super nt
-      end
+    class Compound___ < self
 
       def compound_custom_view
         @prepared_ or prepare_
@@ -192,6 +125,92 @@ module Skylab::Zerk
       end
     end
 
-    Here_ = self
+    class Entitesque___ < self
+
+      def prepare_
+        _prepare_by_processing_any_customization_as_primitivesque
+        NIL_
+      end
+
+      def looks_primitivesque
+        true
+      end
+    end
+
+    class Primitivesque___ < self
+
+      def prepare_
+        _prepare_by_processing_any_customization_as_primitivesque
+        NIL_
+      end
+
+      def looks_primitivesque
+        true
+      end
+    end
+
+    # ==
+    # -
+
+      def initialize cust_x, nt, moda_frame
+
+        @association = nt.association
+        @_customization_x = cust_x
+        @_moda_frame = moda_frame
+        @name = nt.name
+        @_nt = nt
+        @prepared_ = false
+      end
+
+      def custom_hotstring_structure
+        @prepared_ || prepare_
+        @_custom_hotstring_structure
+      end
+
+      def _prepare_by_processing_any_customization_as_primitivesque
+        x = remove_instance_variable :@_customization_x
+        if x
+          pcv = Primitive_Custom_View__.new x
+          @_custom_hotstring_structure = pcv.custom_hotstring_structure_for self
+        else
+          @_custom_hotstring_structure = nil
+        end
+        NIL_
+      end
+
+      #==== THREE THINGS
+
+      def to_qualified_knownness__
+        @_moda_frame.qualified_knownness_for__ @_nt
+      end
+
+      def to_knownness__
+        @_moda_frame.knownness_for__ @_nt
+      end
+
+      #====
+
+      # -- delegations
+
+      def category_symbol
+        @association.model_classifications.category_symbol
+      end
+
+      def description_proc
+        @association.description_proc
+      end
+
+      # --
+
+      attr_reader(
+        :association,
+        :name,
+      )
+    # -
+    # ==
+
+    This_ = self
+  end
+
   end
 end

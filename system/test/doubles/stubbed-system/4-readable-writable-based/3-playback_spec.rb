@@ -46,7 +46,7 @@ module Skylab::System::TestSupport
 
     dangerous_memoize :_manifest_A do
 
-      path_for_ '03-playback/fixtures/story-A.ogdl'
+      fixture_path_for__ 'ogdl-commands-3.ogdl'
     end
   end
 end

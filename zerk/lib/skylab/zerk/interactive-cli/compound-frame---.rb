@@ -1,15 +1,33 @@
 module Skylab::Zerk
 
-  class Node_Adapters_::Compound  # (built in 1 place by event loop)
+  class InteractiveCLI
 
-    def initialize acs, ccv, rsx
-      # (currently `rsx` is actually the event loop)
+  class Compound_Frame___  # (built in 1 place by event loop)
+
+    def initialize acs, ccv, el
       @ACS = acs
       @compound_custom_view = ccv
       @_indexed = nil
-      @line_yielder = rsx.line_yielder
-      @UI_event_handler = rsx.UI_event_handler
-      @event_loop = rsx.event_loop
+      @line_yielder = el.line_yielder
+      @UI_event_handler = el.UI_event_handler
+      @event_loop = el
+    end
+
+    # --
+
+    def accept_new_component_value__ qk
+      reader_writer_.write_value qk
+      NIL_
+    end
+
+    def qualified_knownness_for__ nt
+      _ = reader_writer_.qualified_knownness_of_association nt.association
+      _  # #todo
+    end
+
+    def knownness_for__ nt
+      _ = reader_writer_.read_value nt.association
+      _  # #todo
     end
 
     # -- ..
@@ -35,7 +53,7 @@ module Skylab::Zerk
 
       # (during #description, use the above somehow ..)
 
-      butz = Home_::Expression_Adapters_::Buttonesque::Frame.begin
+      butz = Here_::Buttonesque_Expression_Adapter_::Frame.begin
 
       h = if @compound_custom_view
         @compound_custom_view.custom_tree_for
@@ -48,7 +66,7 @@ module Skylab::Zerk
         nt or break
 
         _cust_x = h[ nt.name_symbol ]
-        lt = Home_::Load_Ticket_[ _cust_x, nt, ]
+        lt = Here_::Load_Ticket_[ _cust_x, nt, self ]
 
         butz.add lt
         load_tickets.push lt
@@ -83,7 +101,7 @@ module Skylab::Zerk
       if s.length.zero?
         @line_yielder << "(nothing entered.)"
       else
-        x = Home_::Interpretation_Adapters_::Buttonesque[ s, self ]
+        x = Here_::Buttonesque_Interpretation_Adapter_[ s, self ]
         if x
           @event_loop.push_stack_frame_for x
         end
@@ -129,5 +147,7 @@ module Skylab::Zerk
     def shape_symbol
       :branchesque
     end
+  end
+
   end
 end

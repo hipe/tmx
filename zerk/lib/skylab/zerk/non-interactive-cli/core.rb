@@ -47,7 +47,7 @@ module Skylab::Zerk
     end
 
     def to_classesque  # tracking #[#011]
-      Home_::CLI_Support_::Prototype_as_Classesque.new self
+      Home_::CLI_::Prototype_as_Classesque.new self
     end
 
     # -- as instance (initting)

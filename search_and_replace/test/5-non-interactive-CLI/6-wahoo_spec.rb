@@ -5,7 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] non-interactive CLI - wahoo" do
 
     TS_[ self ]
-    Require_Zerk_[]
+    Require_zerk_[]
     Zerk_.test_support::Non_Interactive_CLI::Help_Screens[ self ]
 
     # when faced with 3 extremes:

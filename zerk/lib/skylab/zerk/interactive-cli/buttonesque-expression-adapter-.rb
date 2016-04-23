@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  class Expression_Adapters_::Buttonesque
+  class InteractiveCLI
+
+  class Buttonesque_Expression_Adapter_
 
     # the constituency of each button in any particular frame is a function
     # of all the buttons that happen to be in that frame at the moment,
@@ -104,5 +106,7 @@ module Skylab::Zerk
         :hotstring_for_expression,
       )
     end
+  end
+
   end
 end

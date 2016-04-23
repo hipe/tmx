@@ -183,7 +183,7 @@ module Skylab::SearchAndReplace::TestSupport
   module My_API
 
     def self.[] tcc
-      Require_Zerk_[]
+      Require_zerk_[]
       Zerk_.test_support::API[ tcc ]
       tcc.include self
     end
@@ -207,13 +207,13 @@ module Skylab::SearchAndReplace::TestSupport
   end
 
   Expect_Screens = -> tcc do
-    Require_Zerk_[]
+    Require_zerk_[]
     Zerk_.test_support.lib( :expect_screens )[ tcc ]
   end
 
   # --
 
-  Require_Zerk_ = Callback_::Lazy.call do
+  Require_zerk_ = Callback_::Lazy.call do
     Zerk_ = Home_.lib_.zerk ; nil
   end
 

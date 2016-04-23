@@ -1,6 +1,8 @@
 module Skylab::Zerk
 
-  class InteractiveCLI::View_Maker_Maker___
+  class InteractiveCLI
+
+  class View_Maker_Maker___
 
     class << self
       private :new
@@ -21,7 +23,7 @@ module Skylab::Zerk
     end
 
     def common_compound_frame
-      View_Controllers_::Compound_Frame.common_instance
+      Here_::Compound_Frame_ViewController___.common_instance
     end
 
     def location= x
@@ -29,7 +31,7 @@ module Skylab::Zerk
     end
 
     def common_location
-      View_Controllers_::Location.common_instance
+      Here_::Location_ViewController___.common_instance
     end
 
     def primitive_frame= x
@@ -37,7 +39,7 @@ module Skylab::Zerk
     end
 
     def common_primitive_frame
-      View_Controllers_::Primitive_Frame.common_instance
+      Here_::Atomesque_Frame_ViewController_.common_instance
     end
 
     def _receive ivar, x
@@ -58,7 +60,7 @@ module Skylab::Zerk
     )
 
     def make_view_maker stack, rsx
-      View_Controllers_::Frame.new(
+      Here_::Frame_ViewController___.new(
         stack,
         rsx,
         @_compound_frame_view_controller,
@@ -66,5 +68,7 @@ module Skylab::Zerk
         @_primitive_frame_view_controller,
       )
     end
+  end
+
   end
 end

@@ -16,7 +16,7 @@ module Skylab::SearchAndReplace
 
   Lazy_ = Callback_::Lazy
 
-  CUSTOM_TREE_ = -> do  # accessed 1x
+  CUSTOM_TREE_ = -> do  # accessed 1x  #todo - move it
     [
       :children, {
 
@@ -83,7 +83,7 @@ module Skylab::SearchAndReplace
         root = Root_Autonomous_Component_System_.new( & oes_p )
         root._init_with_defaults
 
-        Require_Zerk_[]
+        Require_zerk_[]
         Zerk_::API.call x_a, root
       end  # :cp1
     end  # >>
@@ -371,7 +371,7 @@ module Skylab::SearchAndReplace
     Home_.lib_.fields::Attributes[ h ]
   end
 
-  Require_Zerk_ = Lazy_.call do
+  Require_zerk_ = Lazy_.call do
     Zerk_ = Home_.lib_.zerk ; nil
   end
 

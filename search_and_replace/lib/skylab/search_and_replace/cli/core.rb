@@ -21,7 +21,7 @@ module Skylab::SearchAndReplace
 
       # _ = rsx.bridge_for( :filesystem ).pwd
 
-      Require_Zerk_[]
+      Require_zerk_[]
       cli = Zerk_::HybridCLI.begin
 
       cli.root_ACS = -> & top_oes_p do

@@ -8,25 +8,6 @@ module Skylab::Zerk::TestSupport
     use :memoizer_methods
     use :expect_screens
 
-    shared_subject :subject_CLI do
-      # #todo - think about pushing this up to `expect_screens` maybe?
-
-      _ACS_class = subject_root_ACS_class
-
-      cli = Home_::Interactive_CLI.begin
-
-      cli.root_ACS = -> & p do
-        p and self._NO_MORE_HOT_MODEL  # #cold-model
-        _ACS_class.new
-      end
-
-      cli.to_classesque
-    end
-
-    def stdout_is_expected_to_be_written_to
-      false
-    end
-
     context "first screen" do
 
       given do
@@ -40,9 +21,9 @@ module Skylab::Zerk::TestSupport
 
       it "the button \"hotstrings\" are the shortest they need to be to etc." do
 
-        hotstring_for_( 'biz-nappe' ).should eql 'b'
-        hotstring_for_( 'fozzer' ).should eql 'fo'
-        hotstring_for_( 'fizzie-nizzie' ).should eql 'fi'
+        hotstring_for( 'biz-nappe' ).should eql 'b'
+        hotstring_for( 'fozzer' ).should eql 'fo'
+        hotstring_for( 'fizzie-nizzie' ).should eql 'fi'
       end
     end
 
@@ -61,7 +42,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    context "an unterpretable \"button\" from first frame" do
+    context "an uninterpretable \"button\" from first frame" do
 
       given do
         input 'montauk'
@@ -175,13 +156,8 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    def root_ACS_state  # muscle memory (for manually debugging only..)
-      _expscr_session_state
-    end
-
     def subject_root_ACS_class
-      My_fixture_top_ACS_class[ :Class_31_3_Prims_and_a_Transtive_Operation ]
+      My_fixture_top_ACS_class[ :Class_31_Some_Primitivesques ]
     end
   end
 end
-# #pending-rename: towards unified language, don't say "simple fields" say "primitivesque"
