@@ -93,11 +93,17 @@ module Skylab::Zerk
 
     def push_stack_frame_for lt
 
-      send :"__push_stack_frame_for_new__#{ lt.category_symbol }__", lt
+      send PUSH_FOR___.fetch( lt.category_symbol ), lt
       NIL_
     end
 
-    def __push_stack_frame_for_new__primitivesque__ lt
+    PUSH_FOR___ = {
+      # compound: __push_stack_frame_for_new_compound  # when covered
+      entitesque: :_push_stack_frame_for_new_atomesque,
+      primitivesque: :_push_stack_frame_for_new_atomesque,
+    }
+
+    def _push_stack_frame_for_new_atomesque lt
 
       _new = Here_::Atomesque_Frame_.new lt, self
 
@@ -105,21 +111,7 @@ module Skylab::Zerk
       NIL_
     end
 
-    def push_this_stack_frame_ fr
-      @_stack.push fr
-      NIL_
-    end
-
-    def __push_stack_frame_for_new__entitesque__ lt
-
-      _new = Here_::Entitesque_Frame___.new(
-        lt, @__main_view_controller, self )
-
-      @_stack.push _new
-      NIL_
-    end
-
-    def __push_stack_frame_for_new__compound__ lt
+    def __push_stack_frame_for_new_compound lt
 
       if lt.is_known_known
         self._K
@@ -133,7 +125,7 @@ module Skylab::Zerk
       if acs
         _ccv = lt.compound_custom_view
         _ = _build_compound_adapter acs, _ccv
-        @_stack.push _
+        push_this_stack_frame_ _
       end
 
       NIL_
@@ -143,6 +135,13 @@ module Skylab::Zerk
 
       Here_::Compound_Frame___.new acs, ccv, self
     end
+
+    def push_this_stack_frame_ fr
+      @_stack.push fr
+      NIL_
+    end
+
+
 
     # -- event handling
 

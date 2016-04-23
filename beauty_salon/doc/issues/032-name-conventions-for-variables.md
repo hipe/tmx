@@ -93,6 +93,23 @@ conjunction with the `||=` operator.
 
 
 
+### special names:
+
+#### `@_`
+
+the ivar `@_` is now being used for cases where there is a strong
+parent-child or client-performer relationship between a "client" node
+and an ancillary node. the subordinate node may chose to use this ivar
+to hold the client node. this obfuscatey, magical name is used for
+these reasons:
+
+  • in such scenarios the ivar is often used so often that its brevity
+    (and lack of all lexical content) actually improves readability by
+    not adding noise to the code.
+
+
+
+
 ## local variables - scope (:#D)
 
 we haved developed a bunch of weird idioms that help us read our code

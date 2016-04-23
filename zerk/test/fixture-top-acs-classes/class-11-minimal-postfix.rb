@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   module Fixture_Top_ACS_Classes
 
-    class Class_11_Minimal_Postfix
+    class Class_11_Minimal_Postfix  # 3x
 
       class << self
         alias_method :new_cold_root_ACS_for_niCLI_test, :new

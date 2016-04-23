@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  class Fixture_Top_ACS_Classes::Class_21_Another_Shoe
+  class Fixture_Top_ACS_Classes::Class_21_Another_Shoe  # 2x
 
     Require_ACS_for_testing_[]
 

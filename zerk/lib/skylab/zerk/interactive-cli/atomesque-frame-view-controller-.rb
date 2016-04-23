@@ -41,7 +41,7 @@ module Skylab::Zerk
         else
           ___express_longwinded_prompt y, ada
         end
-        y
+        y  # to follow convention. but may be ignored.
       end
 
       def ___express_longwinded_prompt y, ada

@@ -1,6 +1,9 @@
 module Skylab::Zerk::TestSupport
 
-  class Fixture_Top_ACS_Classes::Class_41_File_Writer
+  class Fixture_Top_ACS_Classes::Class_41_File_Writer  # 2x
+
+    # a 2-level structure. the first level has two primitivesques and one
+    # operation and the one compound. the second level adds an operation.
 
     class << self
       alias_method :new_cold_root_ACS_for_niCLI_test, :new

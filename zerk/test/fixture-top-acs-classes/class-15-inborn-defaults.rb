@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   module Fixture_Top_ACS_Classes
 
-    class Class_15_Inborn_Defaults
+    class Class_15_Inborn_Defaults  # 1x
 
       class << self
         alias_method :new_cold_root_ACS_for_niCLI_test, :new

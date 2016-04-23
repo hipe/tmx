@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   module Fixture_Top_ACS_Classes
 
-    class Class_22_Uggs
+    class Class_22_Uggs  # 3x
 
       class << self
         alias_method :new_cold_root_ACS_for_expect_root_ACS, :new

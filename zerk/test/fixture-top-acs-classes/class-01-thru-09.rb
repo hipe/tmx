@@ -4,7 +4,7 @@ module Skylab::Zerk::TestSupport
 
     module Class_01_thru_09
 
-      class Class_04_One_Atom
+      class Class_04_One_Atom  # 0x
 
         def __ww_xx__component_association
 
@@ -14,15 +14,58 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      class Class_06_One_Entity
-        def __xx_yy__component_association
-          Dummy_Entity_
+      class Class_06_One_Entitesque  # 1x
+
+        def __sample__component_association
+
+          Sample
         end
       end
 
-      class Class_07_One_Compound
+      class Class_07_One_Compound  # 0x
         def __yy_zz__component_association
           Dummy_Compound_
+        end
+      end
+
+      class Sample  # only used in this file (for now)
+
+        # an exemplar entitesque
+
+        class << self
+
+          def interpret_component st, & pp
+
+            s = st.current_token
+            md = %r(\Asample[- ]rate: ?(\d+(?:\.\d+)?) ?kHz\z).match s
+            if md
+              d = md[ 1 ].to_f
+              if 100 <= d
+                st.advance_one
+                new d
+              else
+                pp[ nil ].call :error, :expression do |y|
+                  y << "kHz can't be less that 100 (had #{ ick d })"
+                end
+                UNABLE_
+              end
+            else
+              pp[ nil ].call :error, :expression do |y|
+                y << "was unparseable: #{ ick s }"
+              end
+              UNABLE_
+            end
+          end
+
+          private :new
+        end  # >>
+
+        def initialize d
+          @_d = d
+        end
+
+        def description_under _expag  # for expressive events
+          "#{ @_d } kHz"
         end
       end
     end

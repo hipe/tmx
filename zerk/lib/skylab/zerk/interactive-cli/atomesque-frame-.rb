@@ -11,7 +11,7 @@ module Skylab::Zerk
 
       @event_loop = el
       @_line_yielder = el.line_yielder
-      @_lt = lt
+      @load_ticket = lt
       @_prompt_once = false  # nasty
       @UI_event_handler = el.UI_event_handler
     end
@@ -37,7 +37,7 @@ module Skylab::Zerk
 
       else
 
-        bx = @_lt.association.transitive_capabilities_box
+        bx = @load_ticket.association.transitive_capabilities_box
         if bx
           self._REVIEW
           @_UI_frame_nodes = bx.a_.map do |sym|
@@ -70,11 +70,7 @@ module Skylab::Zerk
           ___process_nonblank_string_as_button s
         end
       else
-
-        s.chomp!  # remove trailing newline entered that initiates a `gets`,
-        # but we leave any leading space intact for downstream to decide on.
-
-        __process_string_as_value s
+        Here_::Atomesque_Interpretation___.new( s, self ).execute
       end
       NIL_
     end
@@ -105,7 +101,7 @@ module Skylab::Zerk
       # `set` (ick) will be effected through a "normal" mutation session:
 
       a = [ sym ]
-      a.push @_lt.name_symbol
+      a.push @load_ticket.name_symbol
 
       _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
 
@@ -122,58 +118,12 @@ module Skylab::Zerk
       NIL_
     end
 
-    def __process_string_as_value s
-
-      # for now we don't care if there was one and if so what the old value
-      # was; but if you did, that processing would happen here.
-      # what we *do* care about is if this is processing lists as lists.
-
-      if is_listy
-        a = Here_::List_Interpretation_Adapter___[ s, & @UI_event_handler ]
-        if a
-          st = Home_.lib_.fields::Argument_stream_via_value[ a ]
-        end  # else emitted
-      else
-        st = Home_.lib_.fields::Argument_stream_via_value[ s ]
-      end
-
-      if st  # (otherwise, converting the input to a list may have failed)
-        kn = @_lt.association.component_model.call st, & _handler_maker
-        if kn
-          ___accept_value kn
-        end
-      end
-      NIL_
-    end
-
     def is_listy
       ( @___listy_kn ||= ___determine_listy_kn ).value_x
     end
 
     def ___determine_listy_kn
-      Callback_::Known_Known[ Is_listy_[ @_lt.association.argument_arity ] ]
-    end
-
-    def ___accept_value kn
-
-      # the topmost frame is a frame is the adapter for the primitivesque.
-      # write its new value into the compound node which is the frame below
-      # it..
-
-      _rw = @event_loop.stack_penultimate.reader_writer_
-
-      _qkn = kn.to_qualified_known_around @_lt.association
-
-      p = ACS_::Interpretation::Accept_component_change.call _qkn, _rw
-      # (if we passed a block it would be for building a linked list of context)
-
-      _handler.call :info, :set_leaf_component do
-        p[]
-      end
-
-      @event_loop.pop_me_off_of_the_stack self
-
-      NIL_
+      Callback_::Known_Known[ Is_listy_[ @load_ticket.association.argument_arity ] ]
     end
 
     # -- events
@@ -187,13 +137,7 @@ module Skylab::Zerk
       end
     end
 
-    def _handler_maker
-      -> _ do
-        _handler
-      end
-    end
-
-    def _handler
+    def model_emission_handler__
       @___oes_p ||= -> * i_a, & ev_p do
         receive_uncategorized_emission i_a, & ev_p
       end
@@ -208,8 +152,13 @@ module Skylab::Zerk
     # -- instrinsic constituency & shape reflection
 
     def name
-      @_lt.name
+      @load_ticket.name
     end
+
+    attr_reader(
+      :event_loop,
+      :load_ticket,
+    )
 
     def shape_symbol
       :primitivesque

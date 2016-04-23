@@ -1,18 +1,6 @@
 module Skylab::Zerk
 
-  class InteractiveCLI
-
-    # [#001] "interactive CLI" is zerk's main modality. as such most of
-    # the sidesystem is in service of this node. the tree doesn't reflect
-    # this fully because:
-    #
-    #   • aesthetics: it's a bit of a "bump" cramming this all into
-    #     the toplevel.
-    #
-    #   • putting all the tributary nodes "under" this one, then, makes the
-    #     tree "feel" too deep. if we want to "grow out" the other
-    #     modalities, it is *they* that should either grow downward
-    #     or be in a different library.
+  class InteractiveCLI  # see [#001].
 
     class << self
       def begin

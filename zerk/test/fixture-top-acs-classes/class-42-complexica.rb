@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   module Fixture_Top_ACS_Classes
 
-    class Class_42_Complexica
+    class Class_42_Complexica  # 3x
 
       # there are three compounds. each compound has one primitivesque
       # and one operation. the root compound has a next compound and that
