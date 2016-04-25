@@ -40,6 +40,8 @@
   • "3-normal shape category" - this unfortunate name is a conceptual
     reduction and flattening of the categorical taxonomy of nodes down
     to simply `operation`, `compound`, `primitivesque`.
+    (unfortunate indeed - you forgot "entitesque".)
+
 
 
 

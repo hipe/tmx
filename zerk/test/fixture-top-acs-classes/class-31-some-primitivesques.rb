@@ -17,6 +17,11 @@ module Skylab::Zerk::TestSupport
     # all other operations besides `set` need the ACS to define the operation
     # explicitly, as we have done here with `delete`.
 
+    class << self
+      alias_method :new_cold_root_ACS_for_iCLI_test, :new
+      undef_method :new
+    end  # >>
+
     def initialize
       # #cold-model (no more event handler inside)
     end

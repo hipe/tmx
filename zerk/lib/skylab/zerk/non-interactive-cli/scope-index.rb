@@ -38,7 +38,7 @@ module Skylab::Zerk
 
             node_tickets.push @_scope_node_ticket
 
-            m = VIA_3_CAT___.fetch Node_ticket_3_category_[ @_scope_node_ticket ]
+            m = INDEX___.fetch Node_ticket_4_category_[ @_scope_node_ticket ]
             # ..
             send m
 
@@ -65,7 +65,7 @@ module Skylab::Zerk
         NIL_
       end
 
-      VIA_3_CAT___ = {
+      INDEX___ = {
         operation: :__index_operation_node_ticket,
         primitivesque: :__index_primitivesque_node_ticket,
       }

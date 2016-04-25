@@ -10,7 +10,7 @@ module Skylab::Zerk
       # any operation-dependencies that will occur (recursively); all
       # nodes that will ever be depended upon exist in this first scope
       # stack. as such the subject facilitates its reuse from o.d to o.d
-      # during one invocation. (as described in [#027].)
+      # during one invocation (as described in [#027]).
 
       # we also carry (but do nothing with) a cache for the evaluations.
 

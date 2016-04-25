@@ -16,17 +16,17 @@ module Skylab::Zerk
     # --
 
     def accept_new_component_value__ qk
-      reader_writer_.write_value qk
+      reader_writer.write_value qk
       NIL_
     end
 
     def qualified_knownness_for__ nt
-      _ = reader_writer_.qualified_knownness_of_association nt.association
+      _ = reader_writer.qualified_knownness_of_association nt.association
       _  # #todo
     end
 
     def knownness_for__ nt
-      _ = reader_writer_.read_value nt.association
+      _ = reader_writer.read_value nt.association
       _  # #todo
     end
 
@@ -44,7 +44,11 @@ module Skylab::Zerk
 
     def __index_for_UI_frame
 
-      o = reader_writer_.to_node_ticket_streamer
+      # (when you get to [#021] availability, maybe here is where you would
+      # do some serious indexing to make some nodes (of various sorts)
+      # disabled (that is, not visible or accessible at all)..)
+
+      o = reader_writer.to_node_ticket_streamer
       o.on_association = nil  # (hi.) x2
       o.on_operation = nil
       st = o.execute
@@ -74,7 +78,7 @@ module Skylab::Zerk
         redo
       end while nil
 
-      @_button_frame = butz.finish
+      @button_frame = butz.finish
       @_UI_frame_nodes = load_tickets
       NIL_
     end
@@ -84,13 +88,7 @@ module Skylab::Zerk
     end
 
     def to_stream_for_resolving_buttonesque_selection
-      Callback_::Stream.via_nonsparse_array @_button_frame
-    end
-
-    # -- expression
-
-    def button_frame
-      @_button_frame
+      Callback_::Stream.via_nonsparse_array @button_frame
     end
 
     # -- user input
@@ -109,18 +107,26 @@ module Skylab::Zerk
       NIL_
     end
 
-    attr_reader(
-      :UI_event_handler,  # for buttonesque
-    )
+    def to_every_node_ticket_stream_  # near c.p w/ #spot-7
 
-    # -- events
+      sr = reader_writer.to_node_ticket_streamer
+      ccv = @compound_custom_view
+      if ccv
+        self._K
+      end
+      sr.call
+    end
 
-    def handler_for sym, *_
-      if :interrupt == sym
-        -> do
-          @event_loop.pop_me_off_of_the_stack self
-          NIL_
-        end
+    def for_invocation_read_atomesque_value_ asc
+      @___rw.read_value asc
+    end
+
+    # -- emissions (events)
+
+    def interruption_handler  # c.p w/ #spot-6
+      -> do
+        @event_loop.pop_me_off_of_the_stack self
+        NIL_
       end
     end
 
@@ -130,22 +136,20 @@ module Skylab::Zerk
       UNRELIABLE_
     end
 
-    # -- support and exposure
+    # --
 
-    def reader_writer_
+    def reader_writer
       @___rw ||= ACS_::ReaderWriter.for_componentesque @ACS
     end
 
-    # -- as structure
-
     attr_reader(
       :ACS,
+      :button_frame,
+      :UI_event_handler,  # for buttonesque
     )
 
-    # -- instrinsic shape reflection
-
-    def shape_symbol
-      :branchesque
+    def four_category_symbol
+      :compound
     end
   end
 

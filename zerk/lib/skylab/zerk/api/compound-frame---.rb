@@ -32,18 +32,16 @@ module Skylab::Zerk
 
       # -- read
 
-      def to_every_node_ticket_stream_
+      def to_every_node_ticket_stream_  # near c.p w/ #spot-7
 
-        _rw = reader_writer
-
-        sr = _rw.to_node_ticket_streamer
+        sr = reader_writer.to_node_ticket_streamer
 
         x = __mask__
         if x
           self._ETC
         end
-        _st = sr.call
-        _st
+
+        sr.call
       end
 
       def qualified_knownness_as_invocation_result__

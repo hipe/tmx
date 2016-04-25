@@ -105,7 +105,7 @@ module Skylab::Zerk
 
         @_scope_node_ticket = @_si.scope_node_ @_scope_node_identifier
 
-        _ = Node_ticket_3_category_[ @_scope_node_ticket ]
+        _ = Node_ticket_4_category_[ @_scope_node_ticket ]
 
         m = WHEN_APPROPRIATION___.fetch _
 

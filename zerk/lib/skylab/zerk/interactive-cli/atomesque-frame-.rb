@@ -128,12 +128,10 @@ module Skylab::Zerk
 
     # -- events
 
-    def handler_for sym, *_
-      if :interrupt == sym
-        -> do
-          @event_loop.pop_me_off_of_the_stack self
-          NIL_
-        end
+    def interruption_handler  # c.p w/ #spot-6
+      -> do
+        @event_loop.pop_me_off_of_the_stack self
+        NIL_
       end
     end
 
@@ -160,7 +158,7 @@ module Skylab::Zerk
       :load_ticket,
     )
 
-    def shape_symbol
+    def four_category_symbol
       :primitivesque
     end
   end

@@ -25,16 +25,27 @@ module Skylab::Zerk
       # assuming [#026] we can at least assume that no error was emitted
       # during the execution of the operation.
 
+      class << self
+        public :new  # for hax
+      end  # >>
+
       def initialize x, cli
-        @x = x
+        @init_exitstatus = nil
+        @puts = nil
         @CLI = cli
+        @x = x
       end
+
+      attr_writer(
+        :init_exitstatus,
+        :puts,
+      )
 
       def execute
         _determine_strategy
         _act
         if @_do_set_exitstatus
-          @CLI.init_exitstatus_ 0
+          __init_exitstatus 0
         end
         NIL_
       end
@@ -75,6 +86,9 @@ module Skylab::Zerk
 
           elsif x.respond_to? :ascii_only?
             shape = :stringish
+
+          elsif x.respond_to? :nan?
+            shape = :floatish
 
           elsif x.respond_to? :bit_length
             shape = :intish
@@ -127,7 +141,7 @@ module Skylab::Zerk
       def __prepare_for_expressive
 
         @__y = ::Enumerator::Yielder.new do |s|
-          @CLI.sout.puts s
+          _puts s
         end
 
         NIL_
@@ -138,16 +152,41 @@ module Skylab::Zerk
       end
 
       def stringish
-        @CLI.sout.puts @x ; nil
+        _puts @x ; nil
+      end
+
+      def floatish
+        _puts "#{ @x }" ; nil  # ..
       end
 
       def intish
-        @CLI.sout.puts "#{ @x }" ; nil
+        _puts "#{ @x }" ; nil
       end
 
       def nil
         NOTHING_
       end
+
+      def _puts s
+        p = @puts
+        if p
+          p[ s ]
+        else
+          @CLI.sout.puts s
+        end
+        NIL_
+      end
+
+      def __init_exitstatus d
+        p = @init_exitstatus
+        if p
+          p[ d ]
+        else
+          @CLI.init_exitstatus_ d
+        end
+        NIL_
+      end
     end
   end
 end
+# #pending-rename: promote up to CLI lib..

@@ -16,6 +16,11 @@ module Skylab::Zerk::TestSupport
 
       class Class_06_One_Entitesque  # 1x
 
+        class << self
+          alias_method :new_cold_root_ACS_for_iCLI_test, :new
+          undef_method :new
+        end  # >>
+
         def __sample__component_association
 
           Sample

@@ -96,6 +96,8 @@ module Skylab::Zerk
 
     def ___bound_call_for_event_loop
 
+      ___init_expression_agent
+
       @boundarizer = Remote_CLI_lib_[]::Section::Boundarizer.new line_yielder
 
       vmm = Here_::View_Maker_Maker___.instance
@@ -110,6 +112,21 @@ module Skylab::Zerk
       Callback_::Bound_Call.via_receiver_and_method_name _el, :run
     end
 
+    def ___init_expression_agent
+
+      expag = Remote_CLI_lib_[]::Expression_Agent.new_proc_based
+
+      expag.expression_strategy_for_property = -> _prp do
+        :render_property_in_black_and_white_customly
+      end
+
+      expag.render_property_in_black_and_white_customly = -> prp, _expag do
+        prp.name.as_human
+      end
+
+      @_expression_agent = expag ; nil
+    end
+
     def receive_uncategorized_emission i_a, & ev_p
 
       bc = Callback_::Emission::Interpreter.common[ i_a, & ev_p ]
@@ -121,9 +138,8 @@ module Skylab::Zerk
 
       _ev = ev_p[]
       _y = line_yielder
-      _expag = _expression_agent
 
-      _ev.express_into_under _y, _expag
+      _ev.express_into_under _y, @_expression_agent
 
       @boundarizer.touch_boundary
 
@@ -132,13 +148,9 @@ module Skylab::Zerk
 
     def receive_expression_emission _i_a, & y_p
 
-      _expression_agent.calculate line_yielder, & y_p
+      @_expression_agent.calculate line_yielder, & y_p
 
       UNRELIABLE_
-    end
-
-    def _expression_agent
-      Remote_CLI_lib_[]::Expression_Agent.instance
     end
 
     def line_yielder

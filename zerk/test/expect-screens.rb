@@ -53,7 +53,7 @@ module Skylab::Zerk::TestSupport
       def build_root_ACS_for_expect_screens
 
         _ = subject_root_ACS_class
-        _.new  # #cold-model
+        _.new_cold_root_ACS_for_iCLI_test  # #cold-model
       end
 
       def stdout_is_expected_to_be_written_to

@@ -34,7 +34,10 @@
              ( #was: #open de-generalize the invites )
 
 [#022] #open availability is not implemented (under niCLI)
-[#021]     #track what to do about entitesque ..
+
+[#021]       availability for iCLI will be added after #milestone-9
+             ( #was: #track what to do about entitesque .. )
+
 [#020]     #track argument monikers
 [#019]     #track flags in o.p
 [#018]     #track if you really wanted duplicate names

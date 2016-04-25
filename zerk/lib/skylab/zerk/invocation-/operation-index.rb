@@ -33,7 +33,7 @@ module Skylab::Zerk
         @formal_operation = fo
         @scope_index_ = Here_::Scope_Index.new( @formal_operation ).execute
         @_stated_box = sb
-        __partition
+        _partition @_stated_box.to_value_stream
         self
       end
 
@@ -57,11 +57,6 @@ module Skylab::Zerk
         _partition _
 
         @_stated_box = bx ; nil
-      end
-
-      def __partition
-        _partition @_stated_box.to_value_stream
-        NIL_
       end
 
       def _partition st

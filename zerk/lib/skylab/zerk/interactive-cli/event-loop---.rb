@@ -93,25 +93,20 @@ module Skylab::Zerk
 
     def push_stack_frame_for lt
 
-      send PUSH_FOR___.fetch( lt.category_symbol ), lt
+      send PUSH_FOR___.fetch( lt.four_category_symbol ), lt
       NIL_
     end
 
     PUSH_FOR___ = {
-      # compound: __push_stack_frame_for_new_compound  # when covered
-      entitesque: :_push_stack_frame_for_new_atomesque,
-      primitivesque: :_push_stack_frame_for_new_atomesque,
+      # compound: __push_stack_frame_for_compound  # when covered
+      entitesque: :_push_stack_frame_for_atomesque,
+      operation: :__push_stack_frame_for_operation,
+      primitivesque: :_push_stack_frame_for_atomesque,
     }
 
-    def _push_stack_frame_for_new_atomesque lt
+    # ~
 
-      _new = Here_::Atomesque_Frame_.new lt, self
-
-      push_this_stack_frame_ _new
-      NIL_
-    end
-
-    def __push_stack_frame_for_new_compound lt
+    def __push_stack_frame_for_compound lt
 
       if lt.is_known_known
         self._K
@@ -136,18 +131,32 @@ module Skylab::Zerk
       Here_::Compound_Frame___.new acs, ccv, self
     end
 
+    # ~
+
+    def __push_stack_frame_for_operation lt
+
+      push_this_stack_frame_ Here_::Operation_Frame___.new( lt, self )
+    end
+
+    # ~
+
+    def _push_stack_frame_for_atomesque lt
+
+      push_this_stack_frame_ Here_::Atomesque_Frame_.new( lt, self )
+    end
+
+    # ~
+
     def push_this_stack_frame_ fr
       @_stack.push fr
       NIL_
     end
 
-
-
     # -- event handling
 
     def __process_interrupt
 
-      p = @_stack.last.handler_for :interrupt
+      p = @_stack.last.interruption_handler
       if p
         p[]
       else
@@ -172,7 +181,7 @@ module Skylab::Zerk
 
     # -- API as view controller
 
-    def loop_again_
+    def loop_again
       @_do_redo = true ; nil
     end
 
@@ -198,6 +207,10 @@ module Skylab::Zerk
 
     def stack_penultimate
       @_stack[ -2 ]
+    end
+
+    def stack_as_array__
+      @_stack
     end
 
     def _clean_exit

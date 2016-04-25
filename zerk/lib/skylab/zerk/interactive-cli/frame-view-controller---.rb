@@ -16,21 +16,6 @@ module Skylab::Zerk
       @serr = resources.serr
       @stack = stack
 
-      h = {}
-      h[ :branchesque ] = -> do
-        @compound_frame.call @line_yielder  # imagine `express_compound_frame_into__`
-        NIL_
-      end
-      h[ :entitesque ] = -> do
-        stack.last.express_entitesque_frame__  # has self as member
-        NIL_
-      end
-      h[ :primitivesque ] = -> do
-        @primitive_frame.call @line_yielder  # imagine `express_primitive_frame_into_`
-        NIL_
-      end
-      @_op_h = h
-
       _init comp_kn, :@compound_frame, :Compound_Frame_ViewController___
 
       _init loc_kn, :@location, :Location_ViewController___
@@ -62,8 +47,35 @@ module Skylab::Zerk
 
       ada = @stack.last
       ada.begin_UI_frame
-      @_op_h.fetch( ada.shape_symbol ).call
+      send EXPRESS___.fetch ada.four_category_symbol
       ada.end_UI_frame
+      NIL_
+    end
+
+    EXPRESS___ = {
+      compound: :__express_compound,
+      entitesque: :__express_entitesque,
+      operation: :__express_operation,
+      primitivesque: :__express_primitivesque,
+    }
+
+    def __express_compound
+      @compound_frame.call @line_yielder  # imagine `express_compound_frame_into__`
+      NIL_
+    end
+
+    def __express_operation
+      @stack.last.express_operation_frame__  # ..
+      NIL_
+    end
+
+    def __express_entitesque
+      @stack.last.express_entitesque_frame__  # has self as member
+      NIL_
+    end
+
+    def __express_primitivesque
+      @primitive_frame.call @line_yielder  # imagine `express_primitive_frame_into_`
       NIL_
     end
 

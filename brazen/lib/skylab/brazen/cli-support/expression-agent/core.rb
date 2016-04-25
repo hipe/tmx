@@ -3,18 +3,35 @@ module Skylab::Brazen
   module CLI_Support
 
     class Expression_Agent
-    private
 
       class << self
 
         def instance  # see #note-br-10 in [#br-093]. this is for hacks
-          @inst ||= Singleton_instance___[]
+          @___instance ||= Singleton_instance___[]
+        end
+
+        def new_proc_based
+          new Procmun___.new
         end
       end  # >>
+
+      # --
 
       def initialize ar
         @_action_reflection = ar
       end
+
+      def expression_strategy_for_property= p
+        @_action_reflection._expression_strategy_for_property = p
+      end
+
+      def render_property_in_black_and_white_customly= p
+        @_action_reflection._etc_customly = p
+      end
+
+      # --
+
+    private
 
       alias_method :calculate, :instance_exec
 
@@ -105,6 +122,10 @@ module Skylab::Brazen
         end
       end
 
+      def render_property_in_black_and_white_customly prp
+        @_action_reflection._etc_customly[ prp, self ]
+      end
+
       def render_property_as__option__ prop
         "--#{ prop.name.as_slug }"
       end
@@ -165,6 +186,7 @@ module Skylab::Brazen
       def intern  # what expression adapter should be used?
         :Event
       end
+
     private
 
       # --
@@ -173,17 +195,40 @@ module Skylab::Brazen
         @_action_reflection
       end
 
-      Singleton_instance___ = Callback_.memoize do
+      # ==
 
-        _action_reflection = LIB_.basic::Proxy::Inline.new(
+      Singleton_instance___ = Lazy_.call do
 
-          :expression_strategy_for_property, -> prp do
-            :render_property_as_unknown
-          end,
+        el = new_proc_based
+
+        el.expression_strategy_for_property = -> _prp do
+          :render_property_as_unknown
+        end
+
+        el
+      end
+
+      # ==
+
+      class Procmun___
+
+        # instead of subclassing your expag..
+
+        attr_writer(
+          :_etc_customly,
+          :_expression_strategy_for_property,
         )
 
-        new _action_reflection
+        def _etc_customly
+          @_etc_customly
+        end
+
+        def expression_strategy_for_property prp
+          @_expression_strategy_for_property[ prp ]
+        end
       end
+
+      # ==
 
       This_ = self
     end
