@@ -2,7 +2,11 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  class Event_Loop___  # :[#002].
+    class Event_Loop___  # :[#002].
+
+      # (also services needed by many ancillaries)
+
+      # <-
 
     def initialize vmm, rsx, & build_top
       @_build_top = build_top
@@ -16,8 +20,7 @@ module Skylab::Zerk
 
       rsx = @_resources
 
-      view_maker = @_view_maker_maker.make_view_maker(
-        @_stack, rsx )
+      view_maker = @_view_maker_maker.make_view_maker__ self, rsx
 
       @__main_view_controller = view_maker
 
@@ -75,19 +78,10 @@ module Skylab::Zerk
         _ccv = Here_::Load_Ticket_::Compound_Custom_View.new x
       end
 
-      @_stack = [ _build_compound_adapter( _top_ACS, _ccv ) ]
+      @top_frame = _build_compound_adapter NOTHING_, _ccv, _top_ACS
 
       NIL_
     end
-
-    # -- parameters for lower-level modules (used to be "frame resources")
-
-    attr_reader(
-      :line_yielder,
-      :serr,
-      :sout,
-      :UI_event_handler,
-    )
 
     # --
 
@@ -119,36 +113,26 @@ module Skylab::Zerk
 
       if acs
         _ccv = lt.compound_custom_view
-        _ = _build_compound_adapter acs, _ccv
-        push_this_stack_frame_ _
+        @top_frame = _build_compound_adapter @top_frame, _ccv, acs
       end
 
       NIL_
     end
 
-    def _build_compound_adapter acs, ccv
+    def _build_compound_adapter below_frame, ccv, acs
 
-      Here_::Compound_Frame___.new acs, ccv, self
+      Here_::Compound_Frame___.new below_frame, ccv, acs, self
     end
-
-    # ~
 
     def __push_stack_frame_for_operation lt
 
-      push_this_stack_frame_ Here_::Operation_Frame___.new( lt, self )
+      @top_frame = Here_::Operation_Frame___.new @top_frame, lt, self
+      NIL_
     end
-
-    # ~
 
     def _push_stack_frame_for_atomesque lt
 
-      push_this_stack_frame_ Here_::Atomesque_Frame_.new( lt, self )
-    end
-
-    # ~
-
-    def push_this_stack_frame_ fr
-      @_stack.push fr
+      @top_frame = Here_::Atomesque_Frame_.new @top_frame, lt, self
       NIL_
     end
 
@@ -156,7 +140,7 @@ module Skylab::Zerk
 
     def __process_interrupt
 
-      p = @_stack.last.interruption_handler
+      p = @top_frame.interruption_handler
       if p
         p[]
       else
@@ -168,7 +152,7 @@ module Skylab::Zerk
 
     def __process_mutable_string_input s
 
-      @_stack.last.process_mutable_string_input s
+      @top_frame.process_mutable_string_input s
 
       NIL_
     end
@@ -179,7 +163,7 @@ module Skylab::Zerk
       UNRELIABLE_
     end
 
-    # -- API as view controller
+    # -- for ancillaries
 
     def loop_again
       @_do_redo = true ; nil
@@ -187,30 +171,18 @@ module Skylab::Zerk
 
     def pop_me_off_of_the_stack guy
 
-      top = @_stack.last
-
-      if top.object_id != guy.object_id
+      if @top_frame.object_id != guy.object_id
         self._COVER_ME
       end
 
-      @_stack.pop
-
-      if @_stack.length.zero?
+      below = @top_frame.below_frame
+      if below
+        @top_frame = below
+      else
+        remove_instance_variable :@top_frame
         _clean_exit
       end
       NIL_
-    end
-
-    def stack_top
-      @_stack.last
-    end
-
-    def stack_penultimate
-      @_stack[ -2 ]
-    end
-
-    def stack_as_array__
-      @_stack
     end
 
     def _clean_exit
@@ -220,7 +192,20 @@ module Skylab::Zerk
       @_running = false
       NIL_
     end
-  end
 
+    # ->
+
+      def penultimate_frame
+        @top_frame.below_frame
+      end
+
+      attr_reader(
+        :line_yielder,
+        :serr,
+        :sout,
+        :top_frame,
+        :UI_event_handler,
+      )
+    end
   end
 end

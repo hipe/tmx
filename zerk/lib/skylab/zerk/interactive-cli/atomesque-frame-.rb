@@ -7,8 +7,9 @@ module Skylab::Zerk
     # (watch for overlap with [#ac-003] the primitivesque for interface)
     # what belongs in here vs. in the view controller is some kind of thing
 
-    def initialize lt, el
+    def initialize bf, lt, el
 
+      @below_frame = bf
       @event_loop = el
       @_line_yielder = el.line_yielder
       @load_ticket = lt
@@ -103,7 +104,7 @@ module Skylab::Zerk
       a = [ sym ]
       a.push @load_ticket.name_symbol
 
-      _ACS = @event_loop.stack_penultimate.ACS  # #NASTY
+      _ACS = @event_loop.penultimate_frame.ACS
 
       _pp = self._SOMETHING
 
@@ -154,6 +155,7 @@ module Skylab::Zerk
     end
 
     attr_reader(
+      :below_frame,
       :event_loop,
       :load_ticket,
     )

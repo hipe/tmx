@@ -7,14 +7,14 @@ module Skylab::Zerk
     # the top view controller. assembles and expresses the whole "screen"
     # as well as providing parameters to component view controllers.
 
-    def initialize stack, resources, comp_kn, loc_kn, prim_kn
+    def initialize top_frame_p, resources, comp_kn, loc_kn, prim_kn
 
       b9r = resources.boundarizer
       @_boundarizer = b9r
       @line_yielder = b9r.line_yielder
       @expression_agent = EXPAG___  # etc
+      @produce_top_frame = top_frame_p
       @serr = resources.serr
-      @stack = stack
 
       _init comp_kn, :@compound_frame, :Compound_Frame_ViewController___
 
@@ -45,7 +45,8 @@ module Skylab::Zerk
 
     def express
 
-      ada = @stack.last
+      ada = @produce_top_frame.call
+      @_top_frame = ada
       ada.begin_UI_frame
       send EXPRESS___.fetch ada.four_category_symbol
       ada.end_UI_frame
@@ -65,12 +66,12 @@ module Skylab::Zerk
     end
 
     def __express_operation
-      @stack.last.express_operation_frame__  # ..
+      @_top_frame.express_operation_frame__  # ..
       NIL_
     end
 
     def __express_entitesque
-      @stack.last.express_entitesque_frame__  # has self as member
+      @_top_frame.express_entitesque_frame__  # has self as member
       NIL_
     end
 
@@ -104,6 +105,10 @@ module Skylab::Zerk
       NIL_
     end
 
+    def top_frame
+      @produce_top_frame.call
+    end
+
     def main_view_controller
       self
     end
@@ -113,7 +118,6 @@ module Skylab::Zerk
       :line_yielder,  # [sa]
       :primitive_frame,
       :serr,
-      :stack,
     )
 
     class Expag___  # < ::BasicObject

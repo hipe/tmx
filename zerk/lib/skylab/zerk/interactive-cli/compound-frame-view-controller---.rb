@@ -17,15 +17,15 @@ module Skylab::Zerk
       end
     end  # >>
 
-    Placeholder_instance___ = -> params do
+    Placeholder_instance___ = -> _ do
 
-      mvc = params.main_view_controller
-      stack = params.stack
+      mvc = _.main_view_controller
+      top_frame = _.top_frame
 
       -> y do
         y << "«compound placeholder»"
-        _ = stack.last.button_frame
-        mvc.express_buttonesques _
+        _bf = top_frame.button_frame
+        mvc.express_buttonesques _bf
         y
       end
     end
@@ -37,14 +37,14 @@ module Skylab::Zerk
         private :new
       end  # >>
 
-      def initialize params
+      def initialize _
 
         Require_fields_lib_[]
 
-        @main_view_controller = params.main_view_controller
-        @expression_agent = params.expression_agent
+        @main_view_controller = _.main_view_controller
+        @expression_agent = _.expression_agent
         @item_text_proc_for = Item_text_proc_for___
-        @stack = params.stack
+        @produce_top_frame = _.method :top_frame
         freeze
       end
 
@@ -58,7 +58,7 @@ module Skylab::Zerk
 
         _boundary
 
-        _button_frame = @stack.last.button_frame
+        _button_frame = @produce_top_frame.call.button_frame
 
         # (hypothetically there could be no buttons, and hypoth'ly s'OK)
 
@@ -71,6 +71,10 @@ module Skylab::Zerk
       end
 
       # --
+
+      def top_frame
+        @produce_top_frame.call
+      end
 
       attr_reader(
         :expression_agent,
@@ -109,14 +113,14 @@ module Skylab::Zerk
 
       # render a two-column table with names and "item text"  #[#br-096]
 
-      def initialize y, up
+      def initialize y, _
 
         @argument_to_pass_to_item_text_proc_for =
-          up.method :__argument_to_pass_to_item_text_proc_for
+          _.method :__argument_to_pass_to_item_text_proc_for
 
-        @expression_agent = up.expression_agent
-        @item_text_proc_for = up.item_text_proc_for
-        @stack = up.stack
+        @expression_agent = _.expression_agent
+        @item_text_proc_for = _.item_text_proc_for
+        @top_frame = _.top_frame
         @y = y
       end
 
@@ -148,7 +152,7 @@ module Skylab::Zerk
 
         col_A = [] ; col_B = [] ; max = 0
 
-        st = @stack.last.to_UI_frame_item_stream
+        st = @top_frame.to_UI_frame_item_stream
 
         begin
           qkn = st.gets

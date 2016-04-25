@@ -4,8 +4,9 @@ module Skylab::Zerk
 
   class Compound_Frame___  # (built in 1 place by event loop)
 
-    def initialize acs, ccv, el
+    def initialize below_frame, ccv, acs, el
       @ACS = acs
+      @below_frame = below_frame
       @compound_custom_view = ccv
       @_indexed = nil
       @line_yielder = el.line_yielder
@@ -144,6 +145,7 @@ module Skylab::Zerk
 
     attr_reader(
       :ACS,
+      :below_frame,
       :button_frame,
       :UI_event_handler,  # for buttonesque
     )

@@ -6,7 +6,8 @@ module Skylab::Zerk
 
       # ROUGH SKETCH
 
-      def initialize lt, client
+      def initialize below_frame, lt, client
+        @below_frame = below_frame
         @load_ticket = lt
         @_ = client
       end
@@ -73,11 +74,29 @@ module Skylab::Zerk
         # to build one, you need the full stack (because scope stack)
 
         _p = @load_ticket.node_ticket.proc_to_build_formal_operation
-
-        ss = @_.stack_as_array__
-
-        _p[ ss ]
+        _ss = ___build_selection_stack_as_array
+        _p[ _ss ]
       end
+
+      def ___build_selection_stack_as_array
+
+        link = Home_.lib_.basic::List::Linked
+        current_link = link[ NOTHING_, self ]
+        begin
+          fr = current_link.element_x.below_frame
+          fr or break
+          current_link = link[ current_link, fr ]
+          redo
+        end while nil
+        a = []
+        begin
+          a.push current_link.element_x
+          current_link = current_link.next
+        end while current_link
+        a
+      end
+
+      Reference__ = ::Struct.new :value_x
 
       def __build_handler_builder
 
@@ -97,6 +116,10 @@ module Skylab::Zerk
       def name
         @load_ticket.name
       end
+
+      attr_reader(
+        :below_frame,
+      )
 
       def four_category_symbol
         :operation

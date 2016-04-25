@@ -221,9 +221,14 @@ module Skylab::Zerk::TestSupport
 
       def ___expscr_grind_the_event_loop event_loop
 
-        _d = event_loop.instance_variable_get( :@_stack ).length
+        d = 0
+        tf = event_loop.top_frame
+        while tf
+          d += 1
+          tf = tf.below_frame
+        end
 
-        Event_Loop_State___.new _d
+        Event_Loop_State___.new d
       end
 
       def __expscr_build_CLI fake

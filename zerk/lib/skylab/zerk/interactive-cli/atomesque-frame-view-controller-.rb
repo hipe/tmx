@@ -22,18 +22,18 @@ module Skylab::Zerk
         private :new
       end  # >>
 
-      def initialize params
+      def initialize _
 
-        @expression_agent = params.expression_agent
-        @main_view_controller = params.main_view_controller
-        @serr = params.serr
-        @stack = params.stack
+        @expression_agent = _.expression_agent
+        @main_view_controller = _.main_view_controller
+        @produce_top_frame = _.method :top_frame
+        @serr = _.serr
         freeze
       end
 
       def call y  # imagine `express_primitive_frame_into_`
 
-        ada = @stack.last
+        ada = @produce_top_frame.call
         x = ada.button_frame
         if x
           self._K

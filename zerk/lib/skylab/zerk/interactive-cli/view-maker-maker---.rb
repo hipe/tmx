@@ -59,9 +59,9 @@ module Skylab::Zerk
       :custom_tree,
     )
 
-    def make_view_maker stack, rsx
+    def make_view_maker__ event_loop, rsx
       Here_::Frame_ViewController___.new(
-        stack,
+        event_loop.method( :top_frame ),
         rsx,
         @_compound_frame_view_controller,
         @_location_view_controller,

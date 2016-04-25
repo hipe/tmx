@@ -27,7 +27,7 @@ module Skylab::Zerk
         # new value into the compound node which is the frame below it..
 
         _qk = remove_instance_variable :@__qk
-        _rw = @_event_loop.stack_penultimate.reader_writer
+        _rw = @_event_loop.penultimate_frame.reader_writer
 
         p = ACS_::Interpretation::Accept_component_change.call _qk, _rw
 
@@ -55,7 +55,7 @@ module Skylab::Zerk
           @_model_oes_p
         end
 
-        _ACS = @_event_loop.stack_penultimate.ACS
+        _ACS = @_event_loop.penultimate_frame.ACS
         _asc = @_.load_ticket.association
         _st = remove_instance_variable :@__stream
 

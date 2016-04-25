@@ -15,13 +15,13 @@ module Skylab::Zerk
       end
     end  # >>
 
-    Placeholder_proc___ = -> params do
-      stack = params.stack
+    Placeholder_proc___ = -> _ do
+
       -> y do
-        if 1 == stack.length
-          y << '«at root of stack»'
-        else
+        if _.top_frame.below_frame
           y << '«at non-root of stack!»'
+        else
+          y << '«at root of stack»'
         end
       end
     end
