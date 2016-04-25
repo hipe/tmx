@@ -20,11 +20,11 @@ module Skylab::Zerk
     Placeholder_instance___ = -> _ do
 
       mvc = _.main_view_controller
-      top_frame = _.top_frame
+      produce_top_frame = _.method :top_frame
 
       -> y do
         y << "«compound placeholder»"
-        _bf = top_frame.button_frame
+        _bf = produce_top_frame.call.button_frame
         mvc.express_buttonesques _bf
         y
       end

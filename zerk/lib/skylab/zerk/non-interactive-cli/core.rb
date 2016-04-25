@@ -14,6 +14,8 @@ module Skylab::Zerk
     #   • `dup` is then sent to the prototype to produce the client instance.
     #
     # the bulk of this is an implementation of the syntax conceived at [#014].
+    #
+    # (if we had more generic notes about niCLI they would go in [#003].)
 
     class << self
 

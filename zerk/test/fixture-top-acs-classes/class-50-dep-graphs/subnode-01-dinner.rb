@@ -5,8 +5,9 @@ module Skylab::Zerk::TestSupport
     class Class_50_Dep_Graphs::Subnode_01_Dinner
 
       class << self
-        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
+        alias_method :new_cold_root_ACS_for_iCLI_test, :new
         alias_method :new_cold_root_ACS_for_niCLI_test, :new
+        alias_method :new_cold_root_ACS_for_expect_root_ACS, :new
         undef_method :new
       end  # >>
 

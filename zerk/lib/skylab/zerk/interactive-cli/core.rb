@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class InteractiveCLI  # see [#001].
+  class InteractiveCLI  # intro to local name convention in [#004]
 
     class << self
       def begin
@@ -163,6 +163,28 @@ module Skylab::Zerk
         io.puts string
       end
     end
+
+    # ==
+
+    Build_frame_stack_as_array_ = -> top_frame do
+
+      link = Home_.lib_.basic::List::Linked
+      current_link = link[ NOTHING_, top_frame ]
+      begin
+        fr = current_link.element_x.below_frame
+        fr or break
+        current_link = link[ current_link, fr ]
+        redo
+      end while nil
+      a = []
+      begin
+        a.push current_link.element_x
+        current_link = current_link.next
+      end while current_link
+      a
+    end
+
+    # ==
 
     Remote_CLI_lib_ = Lazy_.call do  # 2nd
       Home_.lib_.brazen::CLI_Support

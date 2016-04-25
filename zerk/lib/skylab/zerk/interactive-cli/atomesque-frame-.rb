@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  class Atomesque_Frame_  # :[#003]. (built in 1 place by event loop)
+  class Atomesque_Frame_  # (built in 1 place by event loop)
 
     # (watch for overlap with [#ac-003] the primitivesque for interface)
     # what belongs in here vs. in the view controller is some kind of thing

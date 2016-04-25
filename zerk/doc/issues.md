@@ -59,7 +59,14 @@
              #!thread-one - used to be "hot model", now we use cold model
 [#006]       expect screens ..
 [#005]       [the view maker maker]
-[#004]       [the compound adapter]
-[#003]       [the primitivesque adapter]
-[#002]       [the event loop]
+
+[#004]       iCLI (the bundled modality)..
+             ( #was: [the compound adapter] )
+
+[#003]       niCLI (the bundled modality)
+             ( #was: [the primitivesque adapter] )
+
+[#002]       API (the bundled modality)
+             ( #was: [the event loop] )
+
 [#001] #open the readme (needs freshening up)

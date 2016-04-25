@@ -21,6 +21,10 @@ module Skylab::Autonomous_Component_System
         # if unknown ent  then qk of created ent (1)
         # if unknown prim then (2)
 
+      class << self
+        # (see just above the `[]` instance method below.) (hi.)
+      end  # >>
+
       def initialize
           @do_attach = true
       end

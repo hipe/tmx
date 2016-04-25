@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-    class Event_Loop___  # :[#002].
+    class Event_Loop___
 
       # (also services needed by many ancillaries)
 
@@ -78,7 +78,7 @@ module Skylab::Zerk
         _ccv = Here_::Load_Ticket_::Compound_Custom_View.new x
       end
 
-      @top_frame = _build_compound_adapter NOTHING_, _ccv, _top_ACS
+      @top_frame = _build_compound_adapter NOTHING_, _ccv, NOTHING_, _top_ACS
 
       NIL_
     end
@@ -92,7 +92,7 @@ module Skylab::Zerk
     end
 
     PUSH_FOR___ = {
-      # compound: __push_stack_frame_for_compound  # when covered
+      compound: :__push_stack_frame_for_compound,
       entitesque: :_push_stack_frame_for_atomesque,
       operation: :__push_stack_frame_for_operation,
       primitivesque: :_push_stack_frame_for_atomesque,
@@ -102,26 +102,32 @@ module Skylab::Zerk
 
     def __push_stack_frame_for_compound lt
 
-      if lt.is_known_known
-        self._K
-      end
+      # we want the root frame and non-root compound frames to share as much
+      # of the same code as we can. with the root frame, the ACS is a given
+      # (it comes from the "outside") but here it is not..
 
-      # (we may have to do better event wiring than the below eventually..)
+      _ccv = lt.compound_custom_view
 
-      acs = lt.association.component_model.interpret_compound_component(
-        IDENTITY_ )
+      acs = ___attempt_to_touch_ACS_for lt
 
       if acs
-        _ccv = lt.compound_custom_view
-        @top_frame = _build_compound_adapter @top_frame, _ccv, acs
+        @top_frame = _build_compound_adapter @top_frame, _ccv, lt.name, acs
       end
 
       NIL_
     end
 
-    def _build_compound_adapter below_frame, ccv, acs
+    def ___attempt_to_touch_ACS_for lt
 
-      Here_::Compound_Frame___.new below_frame, ccv, acs, self
+      _asc = lt.node_ticket.association
+      _rw = @top_frame.reader_writer
+
+      ACS_::Interpretation::Touch[ _asc, _rw ].value_x  # result is ACS itself
+    end
+
+    def _build_compound_adapter below_frame, ccv, nf, acs
+
+      Here_::Compound_Frame___.new below_frame, ccv, nf, acs, self
     end
 
     def __push_stack_frame_for_operation lt

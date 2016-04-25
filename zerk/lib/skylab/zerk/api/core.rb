@@ -6,11 +6,13 @@ module Skylab::Zerk
     # its underlying operations can be invoked directly without needing to
     # go thru a UI.
     #
-    # this is intended to be useful if you want to expose your zerk-powered
+    # this is intended to be useful if you want to expose your zerk-assisted
     # application as a callable library.  this allows you (for example) to
     # test your application functionally by being able to invoke your
     # operations "more directly" without having the overhead, noise and
     # extra moving parts of a full UI.
+    #
+    # (more notes would go in [#002])
 
     Require_ACS_[]
 

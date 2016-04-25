@@ -4,7 +4,12 @@ module Skylab::Zerk
 
   class Compound_Frame___  # (built in 1 place by event loop)
 
-    def initialize below_frame, ccv, acs, el
+    def initialize below_frame, ccv, nf, acs, el
+
+      if nf  # (no name function for root frame)
+        @name = nf
+      end
+
       @ACS = acs
       @below_frame = below_frame
       @compound_custom_view = ccv
@@ -108,6 +113,16 @@ module Skylab::Zerk
       NIL_
     end
 
+    # -- reflection for ancilliaries
+
+    def build_formal_operation_via_node_ticket_ nt
+
+      ss = Build_frame_stack_as_array_[ self ]
+      ss.push nt.name
+      _fo = nt.proc_to_build_formal_operation.call ss
+      _fo  # #todo
+    end
+
     def to_every_node_ticket_stream_  # near c.p w/ #spot-7
 
       sr = reader_writer.to_node_ticket_streamer
@@ -141,6 +156,10 @@ module Skylab::Zerk
 
     def reader_writer
       @___rw ||= ACS_::ReaderWriter.for_componentesque @ACS
+    end
+
+    def name
+      @name
     end
 
     attr_reader(

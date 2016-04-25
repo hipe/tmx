@@ -27,30 +27,6 @@ also, non-interactive CLI's too.
 
 
 
-## name conventions (for development)
-
-this section applies only to the "iCLI" node (which was originally all
-that [ze] was).
-
-at writing this iCLI node is largely "self-contained": that is, it
-doesn't have a very large external API - the user simply applies it
-(with what little external API it *does* have) to an existing ACS tree,
-and if all goes well (and the tree follows the right conventions), we
-generate an interactive CLI client for that tree.
-
-as such, if we were to follow our conventional [#bs-028] method naming
-conventions to the tee, it might be an eyesore because almost every method
-that doesn't have one of the file-private scopes would have a "library"
-scope and end with (*end* with) one or two underscores.
-
-as such we are experimentally expressing methods of such scope with
-"normal" names (i.e names that neither begin nor end with underscores).
-(this justification came after the fact that we approached a codebase
-which began mostly before "library scope" gained widespread adoption,
-but we are experimenting with it as a "convention" now nonetheless.)
-
-
-
 
 ## the fundamentals
 

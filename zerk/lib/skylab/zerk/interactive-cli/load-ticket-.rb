@@ -134,6 +134,10 @@ module Skylab::Zerk
         :custom_view_controller_proc,
       )
 
+      def four_category_symbol
+        :compound
+      end
+
       def looks_primitivesque
         false
       end

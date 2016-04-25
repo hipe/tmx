@@ -2,22 +2,35 @@
 
 ## synopsis
 
-how a method is named with respect to the use of underscores expesses
-its "API scope". here is a summary of the N tiers of scope:
+at the highest level, in this universe we see every method that we
+define as having a scope that is either "public API", "library-scope",
+or "file-private". within these broad categories we make further, more
+fine-grained distinctions of scope. every method we define expresses its
+membership to the particular one of these categories through its use of
+leading or trailing underscores in its name. (it's typically one or the
+other or neither - the exception is described below.)
+
+the primary value of this (arguably convoluted) naming convention is
+that it produces code that is optimized for refactoring: we can know
+immedatiately the "cost of refactoring" a method only be looking at its
+name.
+
+here's the overview of all the categories. each one may be described in
+more detail as referenced.
 
     this_is_a_public_API_method   # #tier-0: no leading or trailing underscores
 
     this_method_is_only_called_from_this_library_  # #tier-1
 
-    this_method_is_only_called_from_this_library_and_only__  # #tier-1.5
+    as_above_and_it_is_only_ever_called_from_this_one_code_location__  # #tier-1.5
 
-    this_method_is_only_called_from_tests___  # (*three* trailing "_"'s)
+    this_method_is_only_called_from_tests___  # (*three* trailing "_"'s) DEPRECATED #todo (say #testpoint instead)
 
     _this_method_is_only_called_from_this_file  # #tier-2
 
-    __this_method_is_only_called_from_this_file_and_only_once  # #tier-3
+    __as_above_and_it_is_only_ever_called_from_this_one_code_location  # #tier-3
 
-    ___as_above_and_also_the_call_is_in_the_method_immediately_above_this_one
+    ___as_above_and_the_call_is_in_the_method_defined_immediately_above_this_one
 
     # ..
 
@@ -51,9 +64,10 @@ of this document.
 
 ### :#tier-0: "public API"
 
-this method is part of the public API of the node that defines it. to
-change this method in terms of signature or effective behavior is a
-viloation of semantic versioning (semver.org).
+this method is part of the public API of the node that defines it. as
+such, we *must not* change this method in terms of its name, signature
+or effective behavior without upgrading the major version number of the
+surrounding library (per our interpretation of semver.org).
 
 note that this scope is only with respect to the node itself. if there
 is a "public API" method defined on a node that is itself private to a
@@ -62,6 +76,8 @@ library. the scope of the node itself [#031] is a sort of "contract"
 between the node and its intended audience. the scope of the methods
 on the node is a sort of "sub-contract" with this same audience. this
 whole paragraph may change.
+
+(EDIT: the above should have an example if we stick with it.)
 
 
 
