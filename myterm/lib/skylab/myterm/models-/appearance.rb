@@ -13,8 +13,12 @@ module Skylab::MyTerm
       @kernel_ = ke
     end
 
-    def system_conduit= sc
-      @kernel_.silo( :Installation ).system_conduit = sc
+    def filesystem_knownness= kn
+      @kernel_.silo( :Installation ).filesystem_knownness = kn
+    end
+
+    def system_conduit_knownness= kn
+      @kernel_.silo( :Installation ).system_conduit_knownness = kn
     end
 
     def __adapters__component_association

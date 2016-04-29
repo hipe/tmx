@@ -15,6 +15,10 @@ module Skylab::MyTerm
 
       yield :unavailability, @_unavailability
 
+      yield :description, -> y do
+        y << "(the main thing of this whole thing)"
+      end
+
       -> & call_p do
 
         x = _begin_terminal_mutation_session( & call_p ).set_background_image__
@@ -94,11 +98,11 @@ module Skylab::MyTerm
 
       yield :is_used_to_make_image, false
 
-      -> st, & pp do
+      -> st, & oes_p do
 
         @background_font ||= Home_::Models_::Font.interpret_compound_component IDENTITY_, nil, self
 
-        kn = @background_font.interpret_path_ st, & pp
+        kn = @background_font.interpret_path_ st, & oes_p
 
         if kn
           @background_font.accept_path__ kn

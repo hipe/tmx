@@ -2,9 +2,11 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  module Compound_Frame_ViewController___
+    module Compound_Frame_ViewController___  # see [#038]
 
-    # mainly, the 2-column table
+      # mainly, the 2-column table. of this, mainly "item liner"
+
+      # <-
 
     class << self
 
@@ -43,7 +45,7 @@ module Skylab::Zerk
 
         @main_view_controller = _.main_view_controller
         @expression_agent = _.expression_agent
-        @item_text_proc_for = Item_text_proc_for___
+        @item_liner = Item_Liner___.new
         @produce_top_frame = _.method :top_frame
         freeze
       end
@@ -78,35 +80,9 @@ module Skylab::Zerk
 
       attr_reader(
         :expression_agent,
-        :item_text_proc_for,
+        :item_liner,
         :stack,
       )
-
-      def __argument_to_pass_to_item_text_proc_for qkn
-
-        # at writing the "for interface" stream that is our upstream wraps
-        # those values that are primitivesque (per the association) with
-        # a layer of wrapping so that modality-specific expression layers
-        # can send the same ACS API calls to this reflection object that
-        # they would to compound components.
-
-        # however for the typical zerk client what the typical subject
-        # callback would probably find least surprising is to receive a
-        # qualified knowness about the component value with no wrapping.
-
-        if qkn.association.model_classifications.looks_primitivesque
-
-          # (hi.)
-          if qkn.is_effectively_known
-
-            _wrapper = qkn.value_x
-            qkn = _wrapper.wrapped_qualified_knownness
-
-          end  # else it was not wrapped
-        end
-
-        qkn
-      end
     end
 
     class Express_as_table___
@@ -115,11 +91,8 @@ module Skylab::Zerk
 
       def initialize y, _
 
-        @argument_to_pass_to_item_text_proc_for =
-          _.method :__argument_to_pass_to_item_text_proc_for
-
         @expression_agent = _.expression_agent
-        @item_text_proc_for = _.item_text_proc_for
+        @item_liner = _.item_liner
         @top_frame = _.top_frame
         @y = y
       end
@@ -133,18 +106,35 @@ module Skylab::Zerk
       def ___express_columns
 
         col_A = @_col_A ; col_B = @_col_B
-        fmt = "  %#{ @_max }s  %s"
+        fmt = "  %#{ @_max }s  %s"  # :#here
 
-        col_A.length.times do | d |
+        st = Callback_::Stream.via_times col_A.length
+        begin
+
+          d = st.gets
+          d or break
+
           lines = col_B.fetch d
+
+          if lines.length.zero?
+            # when there is no column B content for this item, skip the
+            # above formating entirely (so there's no trailing whitespace)
+            # but make the leading whitespace the same as there (#here).
+
+            @y <<  "  #{ col_A.fetch( d ) }"
+            redo
+          end
+
           @y << ( fmt % [ col_A.fetch( d ), lines.fetch( 0 ) ] )
+
           if 1 < lines.length
             # (we could memoize a spacer thing)
             1.upto( lines.length - 1 ).each do | d_ |
               @y << ( fmt % [ EMPTY_S_, lines.fetch( d_ ) ] )
             end
           end
-        end
+          redo
+        end while nil
         NIL_
       end
 
@@ -152,23 +142,19 @@ module Skylab::Zerk
 
         col_A = [] ; col_B = [] ; max = 0
 
-        st = @top_frame.to_UI_frame_item_stream
+        st = @top_frame.to_load_ticket_stream_for_UI
+
+        item_liner = @item_liner.__for @top_frame, @expression_agent
 
         begin
-          qkn = st.gets
-          qkn or break
+          lt = st.gets
+          lt or break
 
-          p = @item_text_proc_for[ qkn ]
-          p or redo  # decision-A
+          lines = item_liner.__lines_for lt
+          lines or redo
+          col_B.push lines
 
-          _x = @argument_to_pass_to_item_text_proc_for[ qkn ]
-
-          line = @expression_agent.calculate _x, & p  # decision-B
-          line or redo  # decision-C
-
-          col_B.push [ line ]
-
-          s = qkn.name.as_slug
+          s = lt.name.as_slug
           len = s.length
           if max < len
             max = len
@@ -182,144 +168,65 @@ module Skylab::Zerk
       end
     end  # end "express table
 
-    module Item_text_proc_for___ ; class << self
+    # ->
 
-      def [] lt
+      class Item_Liner___
 
-        p = lt.description_proc
+        # a "liner" is a thing that makes lines. in this case it makes
+        # the *description* line(s) for *one* item in a list of items.
 
-        # :decision-A: at calltime the ACS can produce whatever it wants
-        # for the proc (because associations are dynamic). it can produce
-        # no proc at all, it can produce a proc that produces a false-ish
-        # value, it can produce a proc that produces the empty string..
-
-        # if we end up with a false-ish in the following logic, it means
-        # "don't display an entry for this node at all (either in name
-        # or item text)."
-
-        if p
-          p
-        else
-          ___inferred_item_text_proc_for lt
-        end
-      end
-
-      # --
-
-      def ___inferred_item_text_proc_for qkn
-
-        if qkn.looks_primitivesque
-          __inferred_item_text_proc_for_primitivesque qkn
-        else
-          ___inferred_item_text_proc_for_compoundesque qkn
-        end
-      end
-
-      def ___inferred_item_text_proc_for_compoundesque qkn
-
-        # in the "entity table" it doesn't "look right" to include an
-        # entry for compounds inline with the primitivesque properties.
-        # that's perhaps the defining feature of this interface: that
-        # the terminal nodes are always displayed in the 2-column table,
-        # and the non-terminal nodes (and operations) can be reached by
-        # "buttonesques" at the bottom of the screen.
-
-        NIL_
-      end
-
-      def __inferred_item_text_proc_for_primitivesque lt
-
-        qkn = lt.to_qualified_knownness__
-
-        _is_listy = Is_listy_[ qkn.association.argument_arity ]
-        _is_known = qkn.is_effectively_known
-
-        if _is_listy
-          if _is_known
-            __inferred_item_text_proc_for_known_list qkn
-          else
-            __inferred_item_text_proc_for_unknown_list qkn
-          end
-        elsif _is_known
-          __inferred_item_text_proc_for_known_atom qkn
-        else
-          __inferred_item_text_proc_for_unknown_atom qkn
-        end
-      end
-
-      def __inferred_item_text_proc_for_unknown_list _qkn
-        self._K
-      end
-
-      def __inferred_item_text_proc_for_known_list qkn
-
-        p = _proc_for_item_text_via_known_atom_value_for qkn.association
-
-        -> qkn_ do
-          _s_a = qkn_.value_x.reduce [] do | m, x |
-            s = calculate x, & p
-            if s
-              m << s
-            end
-            m
-          end
-          _s_a.join ', '  # ..
-        end
-      end
-
-      def __inferred_item_text_proc_for_unknown_atom _qkn
-        Inferred_item_text_proc_for_unknown_atom___
-      end
-
-      _ITEM_TEXT_FOR_EFFECTIVELY_UNKNOWN_ATOM = '(none)'
-
-      Inferred_item_text_proc_for_unknown_atom___ = -> _qkn do
-        _ITEM_TEXT_FOR_EFFECTIVELY_UNKNOWN_ATOM
-      end
-
-      def __inferred_item_text_proc_for_known_atom
-
-        p = _proc_for_item_text_via_known_atom_value_for qkn.association
-
-        -> qkn_ do
-          p[ qkn_.value_x ]
-        end
-      end
-
-      def _proc_for_item_text_via_known_atom_value_for _association
-        Say_known_atom___[]
-      end
-
-      Say_known_atom___ = Lazy_.call do
-
-        o = Home_.lib_.basic::String.via_mixed.dup
-
-        o.on_nonlong_stringish = -> s, _ do
-
-          if QUOTEWORTHY_RX___ =~ s
-            s.inspect
-          else
-            s
-          end
+        def initialize
+          @lines_for_atomesque = nil  # (might split)
+          @lines_for_compound = nil
+          @lines_for_operation = nil
         end
 
-        o.to_proc
+        def __for cframe, expag  # careful
+          @compound_frame = cframe
+          @expression_agent = expag
+          self
+        end
+
+        def __lines_for lt
+          send lt.four_category_symbol, lt
+        end
+
+      private
+
+        def compound lt
+          ( @lines_for_compound ||= Item_Lines_for_compound___ )[ lt, self ]
+        end
+
+        def operation lt
+          ( @lines_for_operation ||= Here_::Operation_Item_Liner___ )[ lt, self ]
+        end
+
+        def entitesque lt
+          ( @lines_for_atomesque ||= Here_::Atomesque_Item_Liner___ )[ lt, self ]
+        end
+
+        def primitivesque lt
+          ( @lines_for_atomesque ||= Here_::Atomesque_Item_Liner___ )[ lt, self ]
+        end
+
+      public
+
+        attr_reader(
+          :compound_frame,
+          :expression_agent,
+        )
       end
 
-      QUOTEWORTHY_RX___ = /[[:space:]'",]/
+      # ==
 
-      # :decision-B: we could support multiline item texts by detecting if
-      # the proc wants 2 parameters, but we haven't wanted it yet.
-      # if we do, maybe:
-      #
-      #     lines = Home_.lib_.fields::N_lines_via_proc[ 2, @_expag, p ]
+      Item_Lines_for_compound___ = -> * do
+        NOTHING_  # as explained in #"decision D"
+      end
 
-      # :decision-C: with this the association (the ACS) can decide whether
-      # or not to list the item at all, like for cases of effectively
-      # unknown
+      # ==
 
-    end ; end  # end "item text proc for"
-  end  # end file subject
-
+      This_ = self
+    end
   end
 end
+# #tombstone *temporary* list-related rendering, not covered, hovering..

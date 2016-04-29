@@ -4,19 +4,21 @@ module Skylab::Zerk
 
   class Compound_Frame___  # (built in 1 place by event loop)
 
-    def initialize below_frame, ccv, nf, acs, el
-
-      if nf  # (no name function for root frame)
-        @name = nf
-      end
+    def initialize below_frame, acs, lt, el
 
       @ACS = acs
       @below_frame = below_frame
-      @compound_custom_view = ccv
-      @_indexed = nil
+      @event_loop = el
       @line_yielder = el.line_yielder
       @UI_event_handler = el.UI_event_handler
-      @event_loop = el
+
+      if lt
+        @_load_ticket = lt
+        h = lt.custom_tree_hash__
+        # :#here also something about masking, at [#041]
+      end
+
+      @__any_custom_tree_hash = h
     end
 
     # --
@@ -44,7 +46,7 @@ module Skylab::Zerk
     end
 
     def end_UI_frame
-      # remove_instance_variable :@_UI_frame_nodes  # used again ..
+      # remove_instance_variable :@_load_tickets_for_UI  # used again ..
       NIL_
     end
 
@@ -65,11 +67,7 @@ module Skylab::Zerk
 
       butz = Here_::Buttonesque_Expression_Adapter_::Frame.begin
 
-      h = if @compound_custom_view
-        @compound_custom_view.custom_tree_for
-      else
-        MONADIC_EMPTINESS_
-      end
+      h = @__any_custom_tree_hash || MONADIC_EMPTINESS_
 
       begin
         nt = st.gets
@@ -85,12 +83,12 @@ module Skylab::Zerk
       end while nil
 
       @button_frame = butz.finish
-      @_UI_frame_nodes = load_tickets
+      @_load_tickets_for_UI = load_tickets
       NIL_
     end
 
-    def to_UI_frame_item_stream
-      Callback_::Stream.via_nonsparse_array @_UI_frame_nodes
+    def to_load_ticket_stream_for_UI
+      Callback_::Stream.via_nonsparse_array @_load_tickets_for_UI
     end
 
     def to_stream_for_resolving_buttonesque_selection
@@ -126,15 +124,14 @@ module Skylab::Zerk
     def to_every_node_ticket_stream_  # near c.p w/ #spot-7
 
       sr = reader_writer.to_node_ticket_streamer
-      ccv = @compound_custom_view
-      if ccv
-        self._K
-      end
+
+      # .. see #here
+
       sr.call
     end
 
     def for_invocation_read_atomesque_value_ asc
-      @___rw.read_value asc
+      @_rw.read_value asc
     end
 
     # -- emissions (events)
@@ -154,12 +151,19 @@ module Skylab::Zerk
 
     # --
 
-    def reader_writer
-      @___rw ||= ACS_::ReaderWriter.for_componentesque @ACS
+    def CHANGE_ACS x  # 1x [my] (EXPERIMENTAL)
+
+      @_rw.clear_cache  # note that inside this still has the old ACS
+      @ACS = x
+      NIL_
     end
 
-    def name
-      @name
+    def reader_writer
+      @_rw ||= ACS_::ReaderWriter.for_componentesque @ACS
+    end
+
+    def name  # will fail for root compound frame
+      @_load_ticket.name
     end
 
     attr_reader(

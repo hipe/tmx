@@ -1,3 +1,14 @@
+[#041] #pending what we call "masking" (eliminating a component entirely
+             from a given modality) after #milestone-9
+
+[#040] #open unify expression agent-ry between niCLI and iCLI
+             #after #milestone-9 AND
+             #after [#sy-005] unify pretty path
+
+[#039]       iCLI load tickets and customization DSL ..
+
+[#038]       [iCLI performer] ..
+
 [#037]       custom effection ..
 
 [#036]       singular-plural across modalities..

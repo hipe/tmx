@@ -2,23 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-    class Load_Ticket_
-
-      # the load ticket stands as an adapter between ACS component and the
-      # (mostly generated) human-facing client, for the exact purpose of
-      # interpreting, representing and delivering characteristics that the
-      # latter is concerned with that the former does not itself express,
-      # like special hotstrings or custom-made UI components.
-      #
-      # it is called "load ticket" because (like a ticket to see a movie at
-      # the movie theatre) it represents a means of getting to a particular
-      # thing, but it does not embody the thing itself; rather it will load
-      # the thing for you (perhaps lazily). (a movie ticket is the sole
-      # means through which you get to the movie, but it is not the case
-      # that the movie ticket *is* the movie.)
-      #
-      # (a note of history, this existed as a concept before "node ticket",
-      # but is almost indiscernably similar in its description.)
+    class Load_Ticket_  # read [#039]
 
       class << self
 
@@ -31,216 +15,212 @@ module Skylab::Zerk
       end  # >>
 
       NT3___ = {
-        compound: :Compound___,
+        compound: :NonRoot_Compound___,
         entitesque: :Entitesque___,
         operation: :Operation___,
         primitivesque: :Primitivesque___,
       }
 
-      # <-
+      Common_Customization_DSL__ = ::Class.new ::BasicObject
 
-    ## ==== the custom view implementors (they implemet that one DSL)
+      class Compound_Customization_DSL__ < Common_Customization_DSL__
+      private
 
-    # ==
+        def children x
+          @load_ticket.__receive_custom_tree_for x ; nil
+        end
 
-    class Common_Custom_View__
+        def custom_view_controller x
+          @load_ticket.__receive_custom_view_controller x ; nil
+        end
+      end
 
-      def initialize p
+      class Common_Customization_DSL__
 
-        @_custom_hotstring_pieces = nil
+        def initialize lt, a_p
+          @load_ticket = lt
+          @proc = a_p
+        end
 
-        _a = p[]
-        _a.each_slice 2 do | k, x |
-          if x.respond_to? :each_pair
-            send k, x
-          else
-            send k, * x
+        def execute
+          @proc.call.each_slice 2 do |k, x|
+            __send__ k, x
           end
+          NIL_
+        end
+
+      private  # DSL
+
+        def hotstring_delineation s_a
+          @load_ticket.__receive_custom_hotstring_pieces s_a ; nil
+        end
+
+        def on_change x
+          @load_ticket.__receive_on_change x ; nil
         end
       end
 
-    private  # DSL
-
-      def hotstring_delineation s, s_, s__
-        @_custom_hotstring_pieces = [ s, s_, s__ ]
-        NIL_
-      end
-
-    public
-
-      def custom_hotstring_structure_for lt
-        a = @_custom_hotstring_pieces
-        if a
-          @_custom_hotstring_pieces = :_used_  # etc..
-          Here_::Buttonesque_Expression_Adapter_.new( * a, lt )
-        end
-      end
-    end
-
-    # ==
-
-    class Compound_Custom_View < Common_Custom_View__
-
-      # -- DSL
-
-      def children x
-        @custom_tree_for = x ; nil
-      end
-
-      def custom_view_controller x
-        @_custom_view_controller_proc = x ; nil
-      end
-
-      # --
-
-      attr_reader(
-        :custom_tree_for,
-        :_custom_view_controller_proc,
-      )
-    end
-
-    ## ==== the subjects
-
-    class Compound___ < self
-
-      def compound_custom_view
-        @_prepare && _prepare
-        @_ccv
-      end
-
-      def _prepare
-
-        @_prepare = false
-
-        x = remove_instance_variable :@_customization_x
-        if x
-          ccv = Compound_Custom_View.new x
-          @_custom_hotstring_structure = ccv.custom_hotstring_structure_for self
-          @custom_view_controller_proc = ccv._custom_view_controller_proc
-          @_ccv = ccv
-        else
-          @_ccv = NIL_
-          @_custom_hotstring_structure = nil
-        end
-
-        NIL_
-      end
-
-      def description_proc  # as #here
-        @node_ticket.association.description_proc
-      end
-
-      attr_reader(
-        :custom_view_controller_proc,
-      )
-
-      def four_category_symbol
-        :compound
-      end
-
-      def looks_primitivesque
-        false
-      end
-    end
-
-    class Operation___ < self
-
-      def _prepare
-        _prepare_commonly
-      end
-
-      def four_category_symbol
-        :operation
-      end
-
-      def looks_primitivesque
-        false
-      end
-    end
-
-    Atomesque__ = ::Class.new self
-
-    class Entitesque___ < Atomesque__
-      # (hi.)
-    end
-
-    class Primitivesque___ < Atomesque__
-      # (hi.)
-    end
-
-    class Atomesque__
-
-      def initialize cust_x, nt, moda_frame
-        @association = nt.association
-        super
-      end
-
-      def _prepare
-        _prepare_commonly
-      end
-
-      def to_qualified_knownness__
-        @_moda_frame.qualified_knownness_for__ @node_ticket
-      end
-
-      def to_knownness__
-        @_moda_frame.knownness_for__ @node_ticket
-      end
-
-      def description_proc  # :#here
-        @association.description_proc
-      end
-
-      def four_category_symbol
-        @association.model_classifications.category_symbol
-      end
-
-      attr_reader(
-        :association,
-      )
-
-      def looks_primitivesque
-        true
-      end
-    end
-
-    # ==
-
-    # ->
-
-      def initialize cust_x, nt, moda_frame
-
-        @_customization_x = cust_x
-        @_moda_frame = moda_frame
-        @name = nt.name
-        @node_ticket = nt
+      COMMON_LEAF_INITIALIZE__ = -> cust_a_p, node_ticket, modality_frame do
+        @_customization_a_p = cust_a_p
+        @_moda_frame = modality_frame
+        @name = node_ticket.name
+        @node_ticket = node_ticket
         @_prepare = true
       end
 
-      def custom_hotstring_structure
-        @_prepare && _prepare
-        @_custom_hotstring_structure
-      end
+      NonRoot_Methods__ = ::Module.new
 
-      def _prepare_commonly
+      Compound__ = ::Class.new self
 
-        @_prepare = false
-        x = remove_instance_variable :@_customization_x
-        if x
-          _ = Common_Custom_View__.new x
-          @_custom_hotstring_structure = _.custom_hotstring_structure_for self
-        else
-          @_custom_hotstring_structure = nil
+      class NonRoot_Compound___ < Compound__
+
+        include NonRoot_Methods__
+
+        define_method :initialize, COMMON_LEAF_INITIALIZE__
+
+        def four_category_symbol
+          :compound
         end
-        NIL_
       end
 
-      # --
+      class Root < Compound__
 
-      attr_reader(
-        :name,
-        :node_ticket,
-      )
+        # (only for when customizations on root frame)
+
+        def initialize a_p
+          Compound_Customization_DSL__.new( self, a_p ).execute
+        end
+      end
+
+      class NonRoot_NonCompound__ < self
+
+        include NonRoot_Methods__
+
+        define_method :initialize, COMMON_LEAF_INITIALIZE__
+      end
+
+      module NonRoot_Methods__
+
+        def custom_hotstring_structure
+          @_prepare && _prepare
+          @_custom_hotstring_structure
+        end
+
+        def _prepare
+          @_custom_hotstring_structure = nil
+          super
+        end
+
+        def __receive_custom_hotstring_pieces a
+          @_custom_hotstring_structure = Here_::Buttonesque_Expression_Adapter_.new( * a, self )
+          NIL_
+        end
+
+        def node_ticket
+          @node_ticket  # (hi.)
+        end
+
+        def name
+          @name  # (hi.)
+        end
+      end
+
+      class Compound__
+
+        def __receive_custom_tree_for x
+          @custom_tree_hash__ = x ; nil
+        end
+
+        def _DSL_class
+          Compound_Customization_DSL__
+        end
+
+        attr_reader(
+          :custom_tree_hash__,
+        )
+      end
+
+      class Operation___ < NonRoot_NonCompound__
+
+        def _DSL_class
+          Common_Customization_DSL__
+        end
+
+        def four_category_symbol
+          :operation
+        end
+      end
+
+      Atomesque__ = ::Class.new NonRoot_NonCompound__
+
+      class Entitesque___ < Atomesque__
+
+        def four_category_symbol
+          :entitesque
+        end
+      end
+
+      class Primitivesque___ < Atomesque__
+
+        def four_category_symbol
+          :primitivesque
+        end
+      end
+
+      class Atomesque__
+
+        def initialize cust_x, nt, moda_frame
+          @association = nt.association
+          super
+        end
+
+        # --
+
+        def _DSL_class
+          Common_Customization_DSL__
+        end
+
+        def __receive_on_change p
+          @on_change__ = p ; nil
+        end
+
+        # --
+
+        def to_qualified_knownness__
+          @_moda_frame.qualified_knownness_for__ @node_ticket
+        end
+
+        def to_knownness__
+          @_moda_frame.knownness_for__ @node_ticket
+        end
+
+        attr_reader(
+          :association,
+          :on_change__,
+        )
+
+        def looks_primitivesque
+          true
+        end
+      end
+
+      # -
+
+        def _prepare
+
+          @_prepare = false  # definitely do this ALWAYS
+
+          _cls = _DSL_class
+          x = remove_instance_variable :@_customization_a_p
+
+          if x
+            _cls.new( self, x ).execute
+          end
+
+          NIL_
+        end
+
+      # -
 
       This_ = self
     end

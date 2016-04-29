@@ -23,7 +23,7 @@ module Skylab::MyTerm
       _ACS = Home_.build_root_ACS_
 
       if @_sc_qk
-        _ACS.system_conduit = @_sc_qk.value_x
+        _ACS.system_conduit_knownness = @_sc_qk
       end
 
       cli = Zerk_::NonInteractiveCLI.begin

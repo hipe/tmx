@@ -13,6 +13,12 @@ module Skylab::MyTerm
 
       def initialize k, & pp
 
+        1 == pp.arity or self._NEEDED_pp_probably_had_oes_p_README
+
+        # subject is produced to assist both opertions and associations
+        # (components) so we must use the lowest common denominator shape
+        # of handler here (the `pp` not the `oes_p`).
+
         @_do_summarize = true  # eew - e.g for "did you mean", don't repeat
 
         @_oes_p = pp[ nil ]

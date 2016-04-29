@@ -25,19 +25,16 @@ module Skylab::Zerk::TestSupport
     end
 
       Given___ = -> & p do
+
         Danger_Memo__.call self, :iCLI_state do
 
-          @_expscr_args = Args___.new
+          @_expscr_inputs = Inputs___.new
           instance_exec( & p )
-          _args = remove_instance_variable :@_expscr_args
-          _x_a, = _args.to_a
-          __expscr_build_state _x_a
+          __expscr_build_state remove_instance_variable :@_expscr_inputs
         end
       end
 
     Danger_Memo__ = TestSupport_::Define_dangerous_memoizer
-
-    Args___ = ::Struct.new :_CLI_x_a
 
     # -
 
@@ -98,6 +95,13 @@ module Skylab::Zerk::TestSupport
 
         o = Button_Set_Matcher__.new self
         o.slug_set = [ slug ]
+        o
+      end
+
+      def include_in_any_order_the_buttons * s_a
+
+        o = Button_Set_Matcher__.new self
+        o.slug_set = s_a
         o
       end
 
@@ -180,11 +184,27 @@ module Skylab::Zerk::TestSupport
 
       # -- support - build state
 
-      def input( * x_a )
-        @_expscr_args._CLI_x_a = x_a ; nil
+      def filesystem_conduit_of x
+        @_expscr_inputs.__filesystem_conduit = x ; nil
       end
 
-      def __expscr_build_state x_a
+      def system_conduit_of x
+        @_expscr_inputs.__system_conduit = x ; nil
+      end
+
+      def input( * x_a )
+        @_expscr_inputs.__CLI_x_a = x_a ; nil
+      end
+
+      Inputs___ = ::Struct.new(  # (here b.c used in next method)
+        :__CLI_x_a,
+        :__filesystem_conduit,
+        :__system_conduit,
+      )
+
+      def __expscr_build_state sct
+
+        x_a, fc, sc = sct.to_a
 
         fake = Custom_Fake___.new x_a, do_debug, debug_IO
 
@@ -195,6 +215,14 @@ module Skylab::Zerk::TestSupport
         end
 
         cli = __expscr_build_CLI fake
+
+        if fc
+          cli.filesystem_conduit = fc
+        end
+
+        if sc
+          cli.system_conduit = sc
+        end
 
         event_loop = nil
         x = nil

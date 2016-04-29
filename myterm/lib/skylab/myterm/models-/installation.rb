@@ -48,17 +48,32 @@ module Skylab::MyTerm
         @__data_path ||= ::File.join( ::ENV.fetch( 'HOME' ), '.myterm' )
       end
 
-      def filesystem
-        @___FS ||= Home_.lib_.system.filesystem
-      end
+      # -- the below two attributes are undergirded by knownness so that if
+      # they are explicitly set to a false-ish, it is preserved even against
+      # the below lazy initialization of default values. this preserves for
+      # us the option of asserting (for example in a test) that the
+      # particular conduit is not used, simply by setting it to false.
 
       def system_conduit= x
-        @__sc_qk = Callback_::Known_Known[ x ] ; x
+        @system_conduit_knownness = KK__[ x ] ; x
+      end
+
+      attr_writer(
+        :filesystem_knownness,
+        :system_conduit_knownness,
+      )
+
+      def filesystem
+        ( @filesystem_knownness ||= KK__[ Home_.lib_.system.filesystem ] ).value_x
       end
 
       def system_conduit
-        ( @__sc_qk ||= Callback_::Known_Known[ Home_.lib_.open3 ] ).value_x
+        ( @system_conduit_knownness ||= KK__[ Home_.lib_.open3 ] ).value_x
       end
+
+      KK__ = Callback_::Known_Known
+
+      # --
     end
   end
 end

@@ -22,8 +22,6 @@ module Skylab::Zerk
 
       view_maker = @_view_maker_maker.make_view_maker__ self, rsx
 
-      @__main_view_controller = view_maker
-
       @_running = true
       @_serr = rsx.serr
       sin = rsx.sin
@@ -71,14 +69,30 @@ module Skylab::Zerk
       @serr = @_resources.serr
       @sout = @_resources.sout
 
-      _top_ACS = @_build_top.call  # #cold-model, so do not pass @UI_event_handler
+      top_ACS = @_build_top.call  # #cold-model, so do not pass @UI_event_handler
 
-      x = @_view_maker_maker.custom_tree
-      if x
-        _ccv = Here_::Load_Ticket_::Compound_Custom_View.new x
+      # --
+      # for both of the following "conduits" (filesystem and system): IFF one
+      # was set then assume the top ACS has such a writer (otherwise don't).
+
+      kn = @_resources.filesystem_conduit_known_known
+      if kn
+        top_ACS.filesystem_knownness = kn
       end
 
-      @top_frame = _build_compound_adapter NOTHING_, _ccv, NOTHING_, _top_ACS
+      kn = @_resources.system_conduit_known_known
+      if kn
+        top_ACS.system_conduit_knownness = kn
+      end
+
+      # --
+
+      a_p = @_view_maker_maker.custom_tree_array_proc__
+      if a_p
+        _load_ticket = Here_::Load_Ticket_::Root.new a_p
+      end
+
+      @top_frame = _build_compound_adapter top_ACS, _load_ticket
 
       NIL_
     end
@@ -106,12 +120,10 @@ module Skylab::Zerk
       # of the same code as we can. with the root frame, the ACS is a given
       # (it comes from the "outside") but here it is not..
 
-      _ccv = lt.compound_custom_view
-
       acs = ___attempt_to_touch_ACS_for lt
 
       if acs
-        @top_frame = _build_compound_adapter @top_frame, _ccv, lt.name, acs
+        @top_frame = _build_compound_adapter @top_frame, acs, lt
       end
 
       NIL_
@@ -125,9 +137,9 @@ module Skylab::Zerk
       ACS_::Interpretation::Touch[ _asc, _rw ].value_x  # result is ACS itself
     end
 
-    def _build_compound_adapter below_frame, ccv, nf, acs
+    def _build_compound_adapter below_frame=nil, acs, lt
 
-      Here_::Compound_Frame___.new below_frame, ccv, nf, acs, self
+      Here_::Compound_Frame___.new below_frame, acs, lt, self
     end
 
     def __push_stack_frame_for_operation lt

@@ -3,8 +3,11 @@ module Skylab::MyTerm::TestSupport
   module Stubs::System_Conduit_02_Yay
 
     class << self
-      attr_reader :instance
-    end
+
+      def produce_new_instance
+        @__instance.dup
+      end
+    end  # >>
 
     sc = Home_.lib_.system_lib::Doubles::Stubbed_System::Inline_Pool_Based.new
 
@@ -41,6 +44,6 @@ module Skylab::MyTerm::TestSupport
       end
     end
 
-    @instance = sc
+    @__instance = sc
   end
 end

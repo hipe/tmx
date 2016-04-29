@@ -1,0 +1,36 @@
+digraph g {
+
+  label="\nfig 1. egads ten nodes?"
+
+  LT
+  compound->LT
+  NRNC->LT
+
+  atomesque->NRNC
+  primitivesque->atomesque
+  entitesque->atomesque
+
+  operation->NRNC
+
+  root->compound
+
+  NRC->compound
+
+  NRNC->NR
+  NRC->NR
+
+  /*labels*/
+
+  LT[label="load\nticket"]
+  NR[label="non-root\n(a mixin)" shape=rectangle]
+  NRC[label="non-root\ncompound"]
+  NRNC[label="non-root\nnon-compound"]
+
+  /* colors */
+
+  entitesque[style=filled]
+  NRC[style=filled]
+  operation[style=filled]
+  primitivesque[style=filled]
+  root[style=filled]
+}

@@ -8,6 +8,11 @@ module Skylab::System
         @_pool = []
       end
 
+      def initialize_copy _
+        # (e.g for "prototype"-based dup-and-diminish (happens from [my]))
+        @_pool = @_pool.dup
+      end
+
       def _add_entry_by_ & matcher_p
         @_pool.push matcher_p ; nil
       end

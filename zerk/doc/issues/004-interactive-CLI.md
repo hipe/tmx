@@ -18,6 +18,15 @@ the interactive CLI that this node offers is generally referred to as "iCLI".
 
 ## name conventions (for development)
 
+### the ivar name `@_`
+
+this iCLI codebase "frontiers" the use of `@_` as a non-commital but
+ubiquitous construction-time ivar (explained more at [#bs-032]).
+
+
+
+### method names
+
 at writing this iCLI node is largely "self-contained": that is, it
 doesn't have a very large external API - the user simply "applies" this
 library (with what little external API it *does* have) to an existing ACS

@@ -4,6 +4,8 @@ module Skylab::Zerk
 
   class Frame_ViewController___
 
+    # (built only by view maker maker. lives only in top client.)
+
     # the top view controller. assembles and expresses the whole "screen"
     # as well as providing parameters to component view controllers.
 
@@ -66,12 +68,12 @@ module Skylab::Zerk
     end
 
     def __express_operation
-      @_top_frame.express_operation_frame__  # ..
+      @_top_frame.express_operation_frame__ self
       NIL_
     end
 
     def __express_entitesque
-      @_top_frame.express_entitesque_frame__  # has self as member
+      @_top_frame.express_entitesque_frame__
       NIL_
     end
 
@@ -80,7 +82,19 @@ module Skylab::Zerk
       NIL_
     end
 
-    # -- for lower-level modules
+    # -- for ancillaries (that are proxies)
+
+    def expression_agent_for_niCLI_library__
+
+      # we will *very likely* need to change either this method or all of
+      # the code in iCLI involving producing an expression agent (all
+      # here): it's not right to pass our pared down expag off to niCLI
+      # and expect it to work under normal usage. #open (see) [#040]
+
+      @expression_agent
+    end
+
+    # -- for ancillaries
 
     def express_buttonesques buttons
 
@@ -147,3 +161,4 @@ module Skylab::Zerk
 
   end
 end
+# #pending-rename: POSSIBLY to "main view controller"

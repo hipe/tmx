@@ -203,7 +203,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def name
-        @___nf ||= Callback_::Name.via_variegated_symbol( @_entry.name_symbol )
+        @___nf ||= Callback_::Name.via_variegated_symbol @_entry.name_symbol
       end
 
       def name_symbol

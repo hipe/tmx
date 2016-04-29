@@ -39,6 +39,14 @@ module Skylab::Autonomous_Component_System
           x
         end
       end
+
+      @__clear_cache = -> do
+        cache.clear
+      end
+    end
+
+    def clear_cache  # 1x [ze]
+      @__clear_cache.call
     end
 
     BUILD_CACHED_ITEM___ = {

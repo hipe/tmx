@@ -50,14 +50,5 @@ module Skylab::MyTerm::TestSupport
         second_line == "did you mean '\e[32mimagemagick\e[0m'?" or fail
       end
     end
-
-    context "and then enter a good one" do
-
-      given do
-        input 'a', 'ima'
-      end
-
-      it "x"
-    end
   end
 end

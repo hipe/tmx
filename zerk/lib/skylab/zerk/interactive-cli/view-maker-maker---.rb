@@ -2,11 +2,16 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  class View_Maker_Maker___
+  class View_Maker_Maker___  # (built by top client)
 
     class << self
       private :new
     end  # >>
+
+    define_singleton_method :instance, ( Lazy_.call do
+      # (this is *not* singleton pattern - it's prototype pattern)
+      new.freeze
+    end )
 
     def initialize
       @_compound_frame_view_controller = nil
@@ -14,9 +19,9 @@ module Skylab::Zerk
       @_primitive_frame_view_controller = nil
     end
 
-    define_singleton_method :instance, ( Lazy_.call do
-      new.freeze
-    end )
+    def custom_tree_array_proc= x
+      @custom_tree_array_proc__ = x
+    end
 
     def compound_frame= x
       _receive :"@_compound_frame_view_controller", x
@@ -55,10 +60,6 @@ module Skylab::Zerk
       x
     end
 
-    attr_accessor(
-      :custom_tree,
-    )
-
     def make_view_maker__ event_loop, rsx
       Here_::Frame_ViewController___.new(
         event_loop.method( :top_frame ),
@@ -68,6 +69,10 @@ module Skylab::Zerk
         @_primitive_frame_view_controller,
       )
     end
+
+    attr_reader(
+      :custom_tree_array_proc__,
+    )
   end
 
   end

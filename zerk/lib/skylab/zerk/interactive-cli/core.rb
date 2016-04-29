@@ -19,8 +19,16 @@ module Skylab::Zerk
       self
     end
 
+    def filesystem_conduit= x
+      @filesystem_conduit_known_known = Callback_::Known_Known[ x ] ; nil
+    end
+
     def root_ACS= p
       @_root_ACS_proc = p
+    end
+
+    def system_conduit= x
+      @system_conduit_known_known = Callback_::Known_Known[ x ] ; nil
     end
 
     attr_writer(
@@ -53,10 +61,12 @@ module Skylab::Zerk
     attr_reader(
       :argv,
       :boundarizer,
+      :filesystem_conduit_known_known,
       :program_name_string_array,
       :serr,
       :sin,
       :sout,
+      :system_conduit_known_known,
     )
 
     def invoke argv
@@ -191,5 +201,6 @@ module Skylab::Zerk
     end
 
     Here_ = self
+    NUMBER_OF_LINES_PER_ITEM_ = 2
   end
 end

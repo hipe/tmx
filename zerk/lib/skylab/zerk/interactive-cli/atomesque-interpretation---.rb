@@ -7,7 +7,7 @@ module Skylab::Zerk
       # there is no result value, only behavior.
 
       def initialize mutable_s, frame
-        @_ = frame  # ivar name explained in #[#bs-032]
+        @_ = frame
         @_mutable_s = mutable_s
       end
 
@@ -42,6 +42,11 @@ module Skylab::Zerk
         end
 
         @_event_loop.pop_me_off_of_the_stack @_
+
+        p = @_.load_ticket.on_change__
+        if p
+          p[ @_ ]  # from the top modality frame you can reach almost anything
+        end
 
         NIL_
       end

@@ -85,6 +85,9 @@ module Skylab::MyTerm
     end
 
     def interpret_path_ st, & pp
+
+      1 == pp.arity or self._SANITY_this_is_assoc_not_operation
+
       # -
 
         path = st.current_token
@@ -112,9 +115,9 @@ module Skylab::MyTerm
         y << 'hackishly list the known fonts'
       end
 
-      -> & pp do
+      -> & oes_p do
 
-        _o = _build_new_collection_controller( & pp )
+        _o = _build_new_collection_controller { |_| oes_p }
 
         _st = _o.to_expressing_path_stream_
 

@@ -89,7 +89,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       def system_conduit
-        TS_::Stubs::System_Conduit_02_Yay.instance
+        TS_::Stubs::System_Conduit_02_Yay.produce_new_instance
       end
     end
   end

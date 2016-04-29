@@ -33,7 +33,7 @@ module Skylab::Zerk
 
       if @_prompt_once
         @_prompt_once = false
-        @_UI_frame_nodes = nil
+        @_load_tickets_for_UI = nil
         NIL_
 
       else
@@ -41,29 +41,28 @@ module Skylab::Zerk
         bx = @load_ticket.association.transitive_capabilities_box
         if bx
           self._REVIEW
-          @_UI_frame_nodes = bx.a_.map do |sym|
+          @_load_tickets_for_UI = bx.a_.map do |sym|
             Callback_::Name.via_variegated_symbol sym
           end
 
-          Callback_::Stream.via_nonsparse_array @_UI_frame_nodes
+          Callback_::Stream.via_nonsparse_array @_load_tickets_for_UI
         else
 
-          @_UI_frame_nodes = nil
+          @_load_tickets_for_UI = nil
           NIL_
         end
       end
     end
 
-    def to_UI_frame_item_stream
-
-      Callback_::Stream.via_nonsparse_array @_UI_frame_nodes
+    def to_load_ticket_stream_for_UI
+      Callback_::Stream.via_nonsparse_array @_load_tickets_for_UI
     end
 
     # -- user input
 
     def process_mutable_string_input s  # contrast with sibling
 
-      if @_UI_frame_nodes
+      if @_load_tickets_for_UI  # will probably go away
         s.strip!
         if s.length.zero?
           @_line_yielder << "(nothing entered.)"

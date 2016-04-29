@@ -6,10 +6,13 @@ module Skylab::Zerk
 
       # ROUGH SKETCH
 
-      def initialize below_frame, lt, client
+      def initialize below_frame, lt, el
+
         @below_frame = below_frame
+        @event_loop = el
         @load_ticket = lt
-        @_ = client
+        @serr = el.serr
+        @UI_event_handler = el.UI_event_handler
       end
 
       def begin_UI_frame
@@ -20,7 +23,7 @@ module Skylab::Zerk
         NIL_
       end
 
-      def express_operation_frame__
+      def express_operation_frame__ mvc
 
         _pp = __build_handler_builder
 
@@ -34,7 +37,7 @@ module Skylab::Zerk
 
         bc = o.execute
         if bc
-          __execute_this_or_bust bc
+          __execute_this_or_bust bc, mvc
         else
           # (reasoning for the failure should have been emitted.)
           NOTHING_  # (hi.)
@@ -43,10 +46,10 @@ module Skylab::Zerk
         __finish
       end
 
-      def __execute_this_or_bust bc
+      def __execute_this_or_bust bc, mvc
 
         # no matter what, we must pop this current (operation) frame off the
-        # stack and return to whatever the lower one is (a compound frame).
+        # stack to end on whatever the lower one is (a compound frame).
 
         # we're gonna wanna know if an error was triggered because otherwise
         # we will take the result as meaningful whatever it is..
@@ -54,10 +57,12 @@ module Skylab::Zerk
 
         _x = bc.receiver.send bc.method_name, * bc.args, & bc.block
 
-        o = Home_::NonInteractiveCLI::Express_Result___.new _x, @_
+        _pxy = CLI_Proxy___.new mvc
+
+        o = Home_::NonInteractiveCLI::Express_Result___.new _x, _pxy
 
         o.puts = -> s do
-          @_.serr.puts s
+          @serr.puts s
         end
 
         o.init_exitstatus = -> _ do  # MONADIC_EMPTINESS_
@@ -82,7 +87,7 @@ module Skylab::Zerk
 
       def __build_handler_builder
 
-        oes_p = @_.UI_event_handler
+        oes_p = @UI_event_handler
 
         -> _ do
           oes_p
@@ -90,8 +95,8 @@ module Skylab::Zerk
       end
 
       def __finish
-        @_.pop_me_off_of_the_stack self
-        @_.loop_again
+        @event_loop.pop_me_off_of_the_stack self
+        @event_loop.loop_again
         NIL_
       end
 
@@ -106,6 +111,21 @@ module Skylab::Zerk
       def four_category_symbol
         :operation
       end
+
+      # ==
+
+      class CLI_Proxy___
+
+        def initialize mvc
+          @MVC = mvc  # main view controller ("frame view controller")
+        end
+
+        def expression_agent
+          @MVC.expression_agent_for_niCLI_library__
+        end
+      end
+
+      # ==
     end
   end
 end

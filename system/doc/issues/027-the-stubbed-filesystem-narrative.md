@@ -1,5 +1,13 @@
 # the stubbed filesystem narrative :[#027]
 
+## (quick preface)
+
+alternative (simplified) implementations exist in the universe, tracked
+with [#032].
+
+
+
+
 ## the new introduction
 
 a stubbed filesystem is defined by an absolute (real filesystem) path to a

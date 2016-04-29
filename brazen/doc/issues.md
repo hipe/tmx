@@ -136,7 +136,10 @@
 [#045]   #subscribed - :A - (see in asset node) [ expect section ]
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 
-[#044] #hole ( #moved-to: [fi] )
+[#044] #open integrate new pretty path with all [br] CLI clients
+             #after [#sy-005] unify pretty path
+
+             ( #moved-to: [fi] )
              ( #was: #parent-node: [#001] the meta-properties justification .. )
 
 [#043]       the frontier of a back-less front action
