@@ -14,11 +14,8 @@ module Skylab::Zerk
     # -- expression
 
     def handle_ACS_emission_ i_a, & ev_p
-      if @_is_interactive
-        @__interactive_event_handler[ * i_a, & ev_p ]
-      else
-        super
-      end
+      # #cold-model (see tombstone) (hi.)
+      super
     end
 
     # -- invocation
@@ -29,22 +26,13 @@ module Skylab::Zerk
 
       ic = remove_instance_variable :@_interactive_CLI_in_progress
 
-      acs = @ACS_
-
-      once = -> p do
-        once = nil
-        @__interactive_event_handler = p
-      end
-
-      ic.root_ACS = -> & oes_p do
-        once[ oes_p ]
-        acs
+      ic.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
+        @ACS_
       end
 
       ic = ic.finish
 
       @interactive_CLI = ic
-      @_is_interactive = true
 
       _bc = Callback_::Bound_Call[ nil, ic, :invoke_when_zero_length_argv ]
       _bc
@@ -72,7 +60,7 @@ module Skylab::Zerk
     end
 
     def finish
-      @_is_interactive = false
+      # (hi.)
       super
     end
 
@@ -93,3 +81,4 @@ module Skylab::Zerk
     end
   end
 end
+# #tombstone: was #hot-model

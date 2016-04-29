@@ -71,15 +71,14 @@ module Skylab::Zerk
       # do this after any `dup` has been called so that the same CLI
       # *prototype* will not reuse the same ACS instance across its instances.
 
-      # #todo - this is the first of two places where we pass this handler.
-      # the second is for any operation when resolved. let's see if we can
-      # forego passing it this first time ..
-
       @_oes_p = method :on_ACS_emission_  # (only do this in 1 place)
 
       _p = remove_instance_variable :@_root_ACS_proc
-      _acs = _p.call( & @_oes_p )
+
+      _acs = _p.call  # #cold-model
+
       @_top = Here_::Stack_Frame__::Root.new self, _acs
+
       self
     end
 

@@ -16,53 +16,6 @@ module Skylab::SearchAndReplace
 
   Lazy_ = Callback_::Lazy
 
-  CUSTOM_TREE_ = -> do  # accessed 1x  #todo - move it
-    [
-      :children, {
-
-        egrep_pattern: -> do
-          # #milestone-9: this is supposed to "appear" IFF ruby regexp
-        end,
-
-        search: -> do
-          [
-            :children, {
-              files_by_find: -> do
-                [
-                  :hotstring_delineation, %w( files-by- f ind ),
-                ]
-              end,
-              files_by_grep: -> do
-                [
-                  :hotstring_delineation, %w( files-by- g rep ),
-                ]
-              end,
-              matches: -> do
-                [
-                  :custom_view_controller, -> * a do
-                    Home_::CLI::Interactive_View_Controllers_::Matches.new( * a )
-                  end,
-                ]
-              end,
-              replacement_expression: -> do
-                [
-                  :hotstring_delineation, %w( replacement- e xpression ),
-                ]
-              end,
-              replace: -> do
-                [
-                  :custom_view_controller, -> * a do
-                    Home_::CLI::Interactive_View_Controllers_::Edit_File.new( * a )
-                  end,
-                ]
-              end,
-            }
-          ]
-        end
-      }
-    ]
-  end
-
   rx = /(?:\r?\n|\r)\z/
   Mutate_by_my_chomp_ = -> mutable_s do
     md = rx.match mutable_s
@@ -80,11 +33,16 @@ module Skylab::SearchAndReplace
 
       def call * x_a, & oes_p
 
-        root = Root_Autonomous_Component_System_.new( & oes_p )
+        root = Root_Autonomous_Component_System_.new  # #cold-model
         root._init_with_defaults
 
+        _pp = -> _ do
+          oes_p
+        end
+
         Require_zerk_[]
-        Zerk_::API.call x_a, root
+
+        Zerk_::API.call x_a, root, & _pp
       end  # :cp1
     end  # >>
   end
@@ -123,12 +81,12 @@ module Skylab::SearchAndReplace
       y
     end
 
-    def initialize & oes_p
+    def initialize
+
+      block_given? and self._REFACTOR_do_not_use_hot_model_any_more
 
       @egrep_pattern = nil
       @ruby_regexp = nil
-
-      @_oes_p = oes_p  # #hot-model
     end
 
     def _init_with_defaults
@@ -138,10 +96,6 @@ module Skylab::SearchAndReplace
       @ruby_regexp = nil
 
       NIL_
-    end
-
-    def event_handler_for _  # for [ze]
-      @_oes_p
     end
 
     def __ruby_regexp__component_association

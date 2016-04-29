@@ -48,7 +48,7 @@ module Skylab::MyTerm
         Here_::Custom_::Invite[ ze_invite ]
       end
 
-      cli.root_ACS = -> & _oes_p do
+      cli.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
         _ACS
       end
 

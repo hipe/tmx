@@ -190,9 +190,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     def build_root_ACS
 
-      _oes_p = event_log.handle_event_selectively
+      # _oes_p = event_log.handle_event_selectively  # #cold-model
 
-      root = Home_::Root_Autonomous_Component_System_.new( & _oes_p )
+      root = Home_::Root_Autonomous_Component_System_.new
       root._init_with_defaults
       root
     end  # •cp1

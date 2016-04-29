@@ -6,8 +6,7 @@ module Skylab::SearchAndReplace
 
       def new sin, sout, serr, pn_s_a
 
-        _pr = Prototype___[]
-        inst = _pr.dup
+        inst = Hybrid_Prototype___[].dup
         inst.universal_CLI_resources sin, sout, serr, pn_s_a
         inst.finish
       end
@@ -17,15 +16,16 @@ module Skylab::SearchAndReplace
       end
     end  # >>
 
-    Prototype___ = Lazy_.call do
+    Hybrid_Prototype___ = Lazy_.call do
 
       # _ = rsx.bridge_for( :filesystem ).pwd
 
       Require_zerk_[]
+
       cli = Zerk_::HybridCLI.begin
 
-      cli.root_ACS = -> & top_oes_p do
-        acs = Root_Autonomous_Component_System_.new( & top_oes_p )
+      cli.root_ACS = -> & _ignore_oes_p do  # #cold-model
+        acs = Root_Autonomous_Component_System_.new
         acs._init_with_defaults
         acs
       end
@@ -77,5 +77,9 @@ module Skylab::SearchAndReplace
         end
       end
     end
+
+    # ==
+
+    Here_ = self
   end
 end

@@ -47,7 +47,7 @@ module Skylab::Zerk::TestSupport
         cli.to_classesque
       end
 
-      def build_root_ACS_for_expect_screens
+      def build_root_ACS_for_expect_screens  # ignore oes_p
 
         _ = subject_root_ACS_class
         _.new_cold_root_ACS_for_iCLI_test  # #cold-model

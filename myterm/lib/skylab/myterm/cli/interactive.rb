@@ -12,7 +12,7 @@ module Skylab::MyTerm
 
           cli = Zerk_::Interactive_CLI.begin
 
-          cli.root_ACS = -> do
+          cli.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
             Home_.build_root_ACS_
           end
 
