@@ -49,9 +49,9 @@ module Skylab::Zerk
 
       ada = @produce_top_frame.call
       @_top_frame = ada
-      ada.begin_UI_frame
+      ada.begin_UI_panel_expression
       send EXPRESS___.fetch ada.four_category_symbol
-      ada.end_UI_frame
+      ada.end_UI_panel_expression
       NIL_
     end
 

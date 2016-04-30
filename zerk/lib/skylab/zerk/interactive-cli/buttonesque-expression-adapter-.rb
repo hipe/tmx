@@ -27,7 +27,7 @@ module Skylab::Zerk
         @_slug_a = []
       end
 
-      def add lt
+      def add lt  # by compound frame
 
         d = @_load_tickets.length
         @_load_tickets.push lt

@@ -33,29 +33,46 @@ module Skylab::Zerk
       end
 
       def __when_unknown_list
-        self._COVER_ME_and_design_me
+        NONE__
       end
 
       def __when_known_list
-        self._LOOK_AT_NOTES
+
+        # now, an entity-item table *is* a two-dimensional thing, but nah..
+
+        _x_a = @_qk.value_x
+
+        long_s = ""
+        y = Home_.lib_.basic::Yielder::Mapper.joiner( long_s, ', ' ).y
+
+        _prepare_etc
+
+        _x_a.each do |x|
+
+          s = @_string_via_mixed[ x ]
+          s or self._COVER_ME
+          y << s
+        end
+
+        [ long_s ]
       end
 
       def __when_unknown_atom
-        NONE___
+        NONE__
       end
 
-      NONE___ = [ '(none)' ]
+      NONE__ = [ '(none)' ]
 
       def __when_known_atom
 
-        __prepare_dootily_hah
+        _prepare_etc
 
         _ = @_string_via_mixed[ @_qk.value_x ]
 
         [ _ ]
       end
 
-      def __prepare_dootily_hah
+      def _prepare_etc
 
         _QUOTEWORTHY_RX = /[[:space:]'",]/
 

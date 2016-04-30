@@ -14,6 +14,10 @@
   • "atomesque" is both primitivesque and entitesque
     (they get very similar expression here)
 
+  • what we used to call a "frame" (as in "UI frame") we now call a
+    "panel" so as to avoid cognitive collition with the all-important
+    stack frame.
+
 
 
 
@@ -112,7 +116,7 @@ in niCLI the (selection stack) frame holds a lot of responsibility..
   • an "evaluation" for now has the same conceptual structure as a
     [#ca-004] knownness, and in fact we use that very library to
     represent them. the "known unknown" from there has been modified
-    so that it can hold a resoning object optionally.
+    (in the remote) so that it can hold a reasoning object optionally.
 
 
 
@@ -121,9 +125,4 @@ in niCLI the (selection stack) frame holds a lot of responsibility..
     graphs while detecting cycles. once the graph is done being
     resolved, the "state" functions as little more than a wrapper
     around an evalution.
-
-
-
-
-  • "significant unavailability reason" is defined in [#030].
 _

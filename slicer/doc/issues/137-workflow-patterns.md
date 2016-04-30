@@ -232,6 +232,51 @@ get the first branch green, then rebase the second branch over the first
 
 
 
+## "joggle"-ing
+
+to "joggle" is our *triple* portmanteau of "jog", "toggle", and "juggle".
+
+it was conceived of years after plow-named techniques described in the
+next two sections after this one, and may or may not serve as a partial
+or full replacement for one or more of them, or is perhaps oblique to them,
+we are not sure which.
+
+joggling is a bit like the [#127] three laws of test-driven development,
+but instead of addressing the interplay between asset code and test
+code, joggling addresses the interplay between a "library" asset node
+and an "application" asset node.
+
+the primary risk of joggling is early abstraction. somewhere in distant
+commits and in one code location we speak of "perfect abstraction",
+being (we *think*) what we now call "unification", that is, when you
+distill a *similar* implementation of *two* or more application- or
+library-like asset nodes into one library node. we call this "perfect"
+because the redundancy of implementation stands as "proof" that the
+would-be library asset has value in its would-be reusability. but
+"waiting around" for this redundancy to occur when you are "almost
+ceratain" that it belongs in the library node has a cost of its own.
+
+joggling is an option for when you are integrating a library into an
+application towards some end (for example a modality client). when you hit
+a wall because of some feature you sort of assumed you would add to the
+library, you (in effect) stash the applicaion work and add the feature to
+the library node with its own coverage. this step gets its own commit with
+*full* universe integration (i.e make sure the library changes don't break
+anything).
+
+when you "joggle back" to the application node it's OK to make small
+changes to the library work too. (we have the luxury of allowing
+integration to be a two-way street.)
+
+one benefit here is the smaller steps you get of having commits that are
+focused on one feature (being added to the library and being integrated
+into the application (at whatever point in its story) variously). but
+again the big risk here is swaying your library node into different
+directions or adding complexity to it prematurely or extraneously.
+
+
+
+
 ## the golden two-step :[#136]  :+[#.A-F]
 
 this is an at-the-time-of-this-writing an imaginary maneuver consisiting of
@@ -304,7 +349,7 @@ one way this could be accomplished is by this:
 
 • for each commit from HEAD~1 to HEAD~N that has universe changes, do this:
   branch off of that commit, apply the universe changes patch in reverse,
-  and commit this reversal ** in its own commit **.
+  and commit this reversal *in its own commit*.
   then rebase your work branch on top of this temporary branch and discard
   the temporary branch. then, finally, rebase your work branch by squashing
   this reversal commit into the one before it.

@@ -9,7 +9,7 @@ module Skylab::Zerk::TestSupport
 
     def self.[] tcc
 
-      tcc.send :define_singleton_method, :given, Given___
+      tcc.extend Module_Methods___
 
       # (rather than depend on etc, write our own memoizer)
       yes = true ; x = nil
@@ -21,12 +21,14 @@ module Skylab::Zerk::TestSupport
         x
       end
 
-      tcc.include self
+      tcc.include Instance_Methods___
     end
 
-      Given___ = -> & p do
+    module Module_Methods___
 
-        Danger_Memo__.call self, :iCLI_state do
+      def given & p
+
+        TestSupport_::Define_dangerous_memoizer.call self, :iCLI_state do
 
           @_expscr_inputs = Inputs___.new
           instance_exec( & p )
@@ -34,9 +36,14 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-    Danger_Memo__ = TestSupport_::Define_dangerous_memoizer
+      def screen d
+        define_method :screen do
+          screens.fetch d
+        end
+      end
+    end
 
-    # -
+    module Instance_Methods___
 
       def build_interactive_CLI_classeque
 
@@ -155,6 +162,14 @@ module Skylab::Zerk::TestSupport
         Remote_CLI_lib_[]::Styling::Unstyle_styled[ s ]
       end
 
+      def entity_item_table_simple_regex
+        This_rx___[]
+      end
+
+      This_rx___ = Lazy_.call do
+        /\A +([^ ]+)(?:  +([^ ].*))?\z/
+      end
+
       # -- testing which frame you are on
 
       def stack
@@ -184,6 +199,10 @@ module Skylab::Zerk::TestSupport
 
       # -- support - build state
 
+      def cli & p
+        @_expscr_inputs.__freeform_mutation_proc = p ; nil
+      end
+
       def filesystem_conduit_of x
         @_expscr_inputs.__filesystem_conduit = x ; nil
       end
@@ -195,16 +214,20 @@ module Skylab::Zerk::TestSupport
       def input( * x_a )
         @_expscr_inputs.__CLI_x_a = x_a ; nil
       end
+    end
 
       Inputs___ = ::Struct.new(  # (here b.c used in next method)
         :__CLI_x_a,
         :__filesystem_conduit,
+        :__freeform_mutation_proc,
         :__system_conduit,
       )
 
+    module Instance_Methods___
+
       def __expscr_build_state sct
 
-        x_a, fc, sc = sct.to_a
+        x_a, fc, muta_p, sc = sct.to_a
 
         fake = Custom_Fake___.new x_a, do_debug, debug_IO
 
@@ -222,6 +245,10 @@ module Skylab::Zerk::TestSupport
 
         if sc
           cli.system_conduit = sc
+        end
+
+        if muta_p
+          muta_p[ cli ]
         end
 
         event_loop = nil
@@ -259,6 +286,8 @@ module Skylab::Zerk::TestSupport
         Event_Loop_State___.new d
       end
 
+      Event_Loop_State___ = ::Struct.new :frame_stack_length
+
       def __expscr_build_CLI fake
 
         _CLI_class = subject_CLI
@@ -266,10 +295,9 @@ module Skylab::Zerk::TestSupport
         _CLI_class.new fake.sin, fake.sout, fake.serr, PN_S_A___
       end
 
-      Event_Loop_State___ = ::Struct.new :frame_stack_length
-    # -
+      PN_S_A___ = [ 'ziz' ]  # no see
 
-    PN_S_A___ = [ 'ziz' ]  # no see
+    end
 
     class Session_State___
 
@@ -324,6 +352,10 @@ module Skylab::Zerk::TestSupport
 
       def _to_stream_line_stream & p
         Callback_::Stream.via_nonsparse_array( @_stream_lines, & p )
+      end
+
+      def first_line_content
+        @_stream_lines.fetch( 0 ).line_string
       end
 
       # ~

@@ -40,17 +40,17 @@ module Skylab::Zerk
 
     # -- ..
 
-    def begin_UI_frame
-      __index_for_UI_frame
+    def begin_UI_panel_expression
+      __index_for_UI_panel
       NIL_
     end
 
-    def end_UI_frame
+    def end_UI_panel_expression
       # remove_instance_variable :@_load_tickets_for_UI  # used again ..
       NIL_
     end
 
-    def __index_for_UI_frame
+    def __index_for_UI_panel
 
       # (when you get to [#021] availability, maybe here is where you would
       # do some serious indexing to make some nodes (of various sorts)
@@ -72,6 +72,10 @@ module Skylab::Zerk
       begin
         nt = st.gets
         nt or break
+
+        if nt.is_a_singular  # justification at #commit-A at end of file
+          redo
+        end
 
         _cust_x = h[ nt.name_symbol ]
         lt = Here_::Load_Ticket_[ _cust_x, nt, self ]
@@ -180,3 +184,4 @@ module Skylab::Zerk
 
   end
 end
+# #commit-A is where we add the spec that explains the justification of this

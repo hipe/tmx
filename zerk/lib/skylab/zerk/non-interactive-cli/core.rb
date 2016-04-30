@@ -470,7 +470,7 @@ module Skylab::Zerk
       remove_instance_variable :@_top
     end
 
-    def top_frame  # [my]
+    def top_frame  # [my], here
       @_top
     end
 

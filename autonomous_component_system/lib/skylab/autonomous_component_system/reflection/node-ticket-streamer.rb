@@ -166,6 +166,10 @@ module Skylab::Autonomous_Component_System
         @_qk[]
       end
 
+      def is_a_singular
+        :singular_of == @_asc[].singplur_category
+      end
+
       def association
         @_asc[]
       end
@@ -212,6 +216,10 @@ module Skylab::Autonomous_Component_System
 
       def node_ticket_category
         :operation
+      end
+
+      def is_a_singular
+        false
       end
     end
   # ->

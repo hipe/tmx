@@ -15,11 +15,11 @@ module Skylab::Zerk
         @UI_event_handler = el.UI_event_handler
       end
 
-      def begin_UI_frame
+      def begin_UI_panel_expression
         NIL_
       end
 
-      def end_UI_frame
+      def end_UI_panel_expression
         NIL_
       end
 

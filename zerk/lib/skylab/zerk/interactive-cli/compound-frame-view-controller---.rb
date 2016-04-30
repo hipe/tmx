@@ -106,7 +106,8 @@ module Skylab::Zerk
       def ___express_columns
 
         col_A = @_col_A ; col_B = @_col_B
-        fmt = "  %#{ @_max }s  %s"  # :#here
+
+        format = Formats___.new @_max
 
         st = Callback_::Stream.via_times col_A.length
         begin
@@ -121,16 +122,15 @@ module Skylab::Zerk
             # above formating entirely (so there's no trailing whitespace)
             # but make the leading whitespace the same as there (#here).
 
-            @y <<  "  #{ col_A.fetch( d ) }"
+            @y << ( format.for_one_column % col_A.fetch( d ) )
             redo
           end
 
-          @y << ( fmt % [ col_A.fetch( d ), lines.fetch( 0 ) ] )
+          @y << ( format.for_two_columns % [ col_A.fetch( d ), lines.fetch( 0 ) ] )
 
           if 1 < lines.length
-            # (we could memoize a spacer thing)
             1.upto( lines.length - 1 ).each do | d_ |
-              @y << ( fmt % [ EMPTY_S_, lines.fetch( d_ ) ] )
+              @y << ( format.for_second_column_only % lines.fetch( d_ ) )
             end
           end
           redo
@@ -169,6 +169,8 @@ module Skylab::Zerk
     end  # end "express table
 
     # ->
+
+      # ==
 
       class Item_Liner___
 
@@ -219,6 +221,27 @@ module Skylab::Zerk
 
       # ==
 
+      class Formats___  # :#here
+
+        def initialize d
+          @d = d
+        end
+
+        def for_second_column_only
+          @___2_ ||= "  #{ SPACE_ * @d }  %s"
+        end
+
+        def for_two_columns
+          @___2 ||= "#{ for_one_column }  %s"
+        end
+
+        def for_one_column
+          @___1 ||= "  %#{ @d }s"
+        end
+      end
+
+      # ==
+
       Item_Lines_for_compound___ = -> * do
         NOTHING_  # as explained in #"decision D"
       end
@@ -229,4 +252,3 @@ module Skylab::Zerk
     end
   end
 end
-# #tombstone *temporary* list-related rendering, not covered, hovering..

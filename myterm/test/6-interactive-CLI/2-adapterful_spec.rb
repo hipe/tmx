@@ -45,12 +45,6 @@ module Skylab::MyTerm::TestSupport
         )
       end
 
-      def self.screen d  # ..
-        define_method :screen do
-          screens.fetch d
-        end
-      end
-
       context "(first screen)" do
 
         screen 0

@@ -19,11 +19,11 @@ module Skylab::Zerk
 
     # -- ..
 
-    def begin_UI_frame
+    def begin_UI_panel_expression
       NIL_
     end
 
-    def end_UI_frame
+    def end_UI_panel_expression
       NIL_
     end
 

@@ -26,16 +26,17 @@ module Skylab::Zerk
 
       ic = remove_instance_variable :@_interactive_CLI_in_progress
 
+      _ACS = self.top_frame.ACS  # use own public API
+
       ic.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
-        @ACS_
+        _ACS
       end
 
       ic = ic.finish
 
       @interactive_CLI = ic
 
-      _bc = Callback_::Bound_Call[ nil, ic, :invoke_when_zero_length_argv ]
-      _bc
+      Callback_::Bound_Call[ nil, ic, :invoke_when_zero_length_argv ]
     end
 
     # -- as instance (before invoke)

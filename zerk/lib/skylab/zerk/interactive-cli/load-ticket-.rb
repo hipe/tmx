@@ -24,7 +24,6 @@ module Skylab::Zerk
       Common_Customization_DSL__ = ::Class.new ::BasicObject
 
       class Compound_Customization_DSL__ < Common_Customization_DSL__
-      private
 
         def children x
           @load_ticket.__receive_custom_tree_for x ; nil
@@ -43,13 +42,35 @@ module Skylab::Zerk
         end
 
         def execute
-          @proc.call.each_slice 2 do |k, x|
-            __send__ k, x
+
+          if 1 == @proc.arity
+            __when_newschool
+          else
+            __when_oldschool
+          end
+        end
+
+        def __when_newschool
+          @proc[ self ]  # wahoo
+          NIL_
+        end
+
+        def __when_oldschool
+
+          x = @proc.call
+          a = ::Array.try_convert x
+          a or ::Kernel.raise ___say( x )
+          a.each_slice 2 do |k, x_|
+            __send__ k, x_
           end
           NIL_
         end
 
-      private  # DSL
+        def ___say x
+          "needed array had #{ x.class } for '#{ @load_ticket.name.name_symbol }'"
+        end
+
+      # -- DSL
 
         def hotstring_delineation s_a
           @load_ticket.__receive_custom_hotstring_pieces s_a ; nil
