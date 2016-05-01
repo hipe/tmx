@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - integration with wip-it", slow: true do  # :[#026].
+  describe "[sa] core operations - integration with w#{}ip-it", slow: true do  # :[#026].
 
     # highly experimental - this tests a feature that is (a) housed in a
     # different sidesystem ([ts]) and (b) frontiers features of a facility
@@ -58,8 +58,8 @@ module Skylab::SearchAndReplace::TestSupport
       it "content looks right (note it is a regex hack)" do
 
         _ = ::File.read( _state.path_of_file_B )
-        _exp = "  describe \"wizzle\", wip: true do\nsome line\n#{
-          }  describe \"xx\", wip: true do\n"
+        _exp = "  describe \"wizzle\", w#{}ip: true do\nsome line\n#{
+          }  describe \"xx\", w#{}ip: true do\n"
 
         _ == _exp or fail
       end

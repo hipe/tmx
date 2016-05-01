@@ -49,11 +49,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     memoize :this_directory_that_exists_ do
 
-      _loc = caller_locations( 3 ).fetch 0
-      _ = ::File.dirname _loc.path
-      _ = ::File.expand_path _  # keep relative dirs out of tests
-      '4-interactive-CLI-integration' == ::File.basename( _ ) or fail
-      _
+      dir = ::File.join TS_.dir_pathname.to_path, '6-interactive-CLI'
+      ::File.directory? dir or fail
+      dir
     end
 
     dangerous_memoize :the_wazizzle_worktree_ do
@@ -147,15 +145,23 @@ module Skylab::SearchAndReplace::TestSupport
     # ~ [br] "expect interactive"
 
     memoize :interactive_bin_path do
-      self._REDO
+      self._REDO  # #open [#002] this whole thing gone
       ::File.join TS_._MY_BIN_PATH, 'tmx-beauty-salon search-and-r'
     end
 
   # -- test support lib nodes
 
-  module Interactive_CLI
+  module My_Interactive_CLI
 
-    def self.[] tcc ; tcc.include self end
+    class << self
+
+      def [] tcc
+        TestSupport_::Memoization_and_subject_sharing[ tcc ]
+        Require_zerk__[]
+        Zerk_.test_support::Expect_Screens[ tcc ]
+        tcc.include self ; nil
+      end
+    end  # >>
 
     # ~ setup
 
@@ -183,7 +189,7 @@ module Skylab::SearchAndReplace::TestSupport
   module My_API
 
     def self.[] tcc
-      Require_zerk_[]
+      Require_zerk__[]
       Zerk_.test_support::API[ tcc ]
       tcc.include self
     end
@@ -206,14 +212,14 @@ module Skylab::SearchAndReplace::TestSupport
     Callback_.test_support::Expect_Event[ tcc ]
   end
 
-  Expect_Screens = -> tcc do
-    Require_zerk_[]
-    Zerk_.test_support.lib( :expect_screens )[ tcc ]
+  Zerk_Help_Screens = -> tcc do
+    Require_zerk__[]
+    Zerk_.test_support::Non_Interactive_CLI::Help_Screens[ tcc ]
   end
 
   # --
 
-  Require_zerk_ = Callback_::Lazy.call do
+  Require_zerk__ = Callback_::Lazy.call do
     Zerk_ = Home_.lib_.zerk ; nil
   end
 

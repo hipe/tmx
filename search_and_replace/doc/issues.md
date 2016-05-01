@@ -1,3 +1,6 @@
+[#030] #open get regexp to display its source
+             ( #after-or-as-part-of custom view controllers )
+
 [#029] #open be the vanguard of a unification of pretty path (there's
              one in [sy] and one in [br]), one that relies on a client
              to tell it what the pwd and ENV['HOME'] is during one
@@ -125,14 +128,14 @@
              ( #was: #feature make this one button with three labels
                instead of three buttons )
 
-[#004] #hole
+[#004] #open re-integrate availability after #milestone-9 (is [#ze-021])
              ( #was: #feature should check mtime before write, abort for
              that file if stale. #wontfix because VCS integration
              obviates this. )
 
 [#003]       [ track a historic node ]
 
-[#002] #hole
+[#002] #open annihilate all traces of "expect interactive" and same
              ( #was: -wip-them-all (in [ts]) *uses* this guy..
              we need to decide how to cover.. )
 

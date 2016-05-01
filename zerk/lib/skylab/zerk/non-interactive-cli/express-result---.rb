@@ -4,6 +4,8 @@ module Skylab::Zerk
 
     class Express_Result___ < Callback_::Actor::Dyadic
 
+      # #tracked-by [#022]: we no longer display the count of items when stream..
+
       # implement (near) [#025] - a modality-specific result interpretation:
 
       # if you raise exceptions in your operation, that's on you. we do not

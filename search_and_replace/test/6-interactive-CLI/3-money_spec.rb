@@ -5,7 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] interactive CLI integration - money", wip: true do
 
     TS_[ self ]
-    # use :expect_interactive  # [ze]
+    use :my_interactive_CLI
 
     context "empty match on empty file"
 

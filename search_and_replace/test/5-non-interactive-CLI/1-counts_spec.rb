@@ -5,8 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] non-interactive CLI - counts" do
 
     TS_[ self ]
-    Require_zerk_[]
-    Zerk_.test_support::Non_Interactive_CLI::Help_Screens[ self ]
+    use :zerk_help_screens
 
     # for two reasons (boredom and necessity) some of the tests here are
     # perhaps unacceptably chunky. but see these tests as rough experiments

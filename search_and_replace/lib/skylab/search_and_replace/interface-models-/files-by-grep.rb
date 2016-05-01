@@ -38,7 +38,8 @@ module Skylab::SearchAndReplace
       o.for = @for
       o.ruby_regexp = @ruby_regexp
       o.upstream_path_stream = @files_by_find
-      o.execute
+      _x = o.execute
+      _x || NOTHING_  # #false-means-false-in-zerk
     end
 
     def handle_event_selectively_for_zerk  # because [#ac-027]

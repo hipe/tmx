@@ -23,17 +23,6 @@ module Skylab::Zerk
 
       Common_Customization_DSL__ = ::Class.new ::BasicObject
 
-      class Compound_Customization_DSL__ < Common_Customization_DSL__
-
-        def children x
-          @load_ticket.__receive_custom_tree_for x ; nil
-        end
-
-        def custom_view_controller x
-          @load_ticket.__receive_custom_view_controller x ; nil
-        end
-      end
-
       class Common_Customization_DSL__
 
         def initialize lt, a_p
@@ -146,6 +135,15 @@ module Skylab::Zerk
         end
       end
 
+      # --
+
+      class Compound_Customization_DSL__ < Common_Customization_DSL__
+
+        def children x
+          @load_ticket.__receive_custom_tree_for x ; nil
+        end
+      end
+
       class Compound__
 
         def __receive_custom_tree_for x
@@ -161,16 +159,35 @@ module Skylab::Zerk
         )
       end
 
+      # --
+
+      class Operation_Customization_DSL___ < Common_Customization_DSL__
+
+        def custom_view_controller x  # this form might deprecate
+          @load_ticket._receive_custom_view_controller_proc x ; nil
+        end
+
+        def custom_view_controller_by( & p )
+          @load_ticket._receive_custom_view_controller_proc p ; nil
+        end
+      end
+
       class Operation___ < NonRoot_NonCompound__
 
         def _DSL_class
-          Common_Customization_DSL__
+          Operation_Customization_DSL___
+        end
+
+        def _receive_custom_view_controller_proc p
+          @CUSTOM_VIEW_CONTROLLER_PROC = p ; nil
         end
 
         def four_category_symbol
           :operation
         end
       end
+
+      # --
 
       Atomesque__ = ::Class.new NonRoot_NonCompound__
 

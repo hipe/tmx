@@ -2,43 +2,43 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] interactive CLI integration - files", wip: true do
+  describe "[sa] interactive CLI integration - files" do
 
     TS_[ self ]
-    use :expect_screens
-    use :interactive_CLI
+    use :my_interactive_CLI
 
     context "out of the box you can get to the second screen" do
 
       given do
-        input 'sea'
+        input 's'  # [s]earch
       end
 
       context "first screen" do
 
+        screen 0
+
         it "includes line talking bout ruby regexp none" do
 
-          _x = lines
-          _x.detect( & /\A[ ]+ruby-regexp[ ]+\(none\)\z/.method( :=~ ) ) or fail
+          md = entity_item_table_simple_regex.match second_line
+          md[1] == 'ruby-regexp' or fail
+          md[2] == '(none)' or fail
         end
 
-        it "does NOT include line talking bout grep rx" do
+        it "does NOT include line talking bout grep rx", wip: true do  # #[#004]
           _screen_has_egrep_field and fail
-        end
-
-        def screen
-          first_screen
         end
       end
 
       context "second screen" do
 
-        it "there is NOT a buttonesque for (e.g) \"counts\"" do
+        screen 1
+
+        it "there is NOT a buttonesque for (e.g) \"counts\"", wip: true do  # #[#004]
           buttonesques.should not_have_button_for 'counts'
         end
 
         it "the custom hotstring is expressed" do
-          last_line.should be_include 'files-by-[f]ind'
+          last_line.include?( 'files-by-[f]ind' ) or fail
         end
       end
     end
@@ -46,19 +46,17 @@ module Skylab::SearchAndReplace::TestSupport
     context "when entered an invalid regexp" do
 
       given do
-        input(
-          'r', 'hi[foo',
-        )
+        input 'r', 'hi[foo'
       end
 
       context "second screen (after entered invalid regexp)" do
 
         it "says can't" do
-          first_line.should eql "premature end of char-class: /hi[foo/"
+          first_line == "premature end of char-class: /hi[foo/" or fail
         end
 
         it "asks again" do
-          last_line.should eql "enter ruby-regexp: "
+          last_line == "enter ruby-regexp: " or fail
         end
       end
     end
@@ -78,7 +76,7 @@ module Skylab::SearchAndReplace::TestSupport
         )
       end
 
-      it "writes to SOUT" do
+      it "finds three files" do
         __expect_basenames %w( one-file.txt three-file.txt four-file.txt )
       end
 
@@ -86,13 +84,7 @@ module Skylab::SearchAndReplace::TestSupport
         first_line.should match %r(\Agenerated `find` command: )
       end
 
-      it "says how many items found" do
-        second_line.should match %r(\A\(3 strings total\)\z)
-      end
-
-      def lines
-        screen.serr_lines
-      end
+      # (see tombstone about omitted test because of removed feature)
     end
 
     # --
@@ -106,8 +98,10 @@ module Skylab::SearchAndReplace::TestSupport
         )
       end
 
-      it "says it couldn't" do
-        lines[ 2 ].should match %r(\Acouldn't execute files-by-grep because )
+      it "says it couldn't" do  # #here
+
+        lines[ 1 ] == "non convertible regexp options - 'MULTILINE', 'EXTENDED'"
+        # lines[ 2 ].should match %r(\Acouldn't execute files-by-grep because )
       end
     end
 
@@ -127,6 +121,8 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "screen that is just after having set the regex" do
 
+        screen 2
+
         it "it reports that it was set" do
 
           first_line.should match %r(\Aset ruby regexp to /[^/]+/i\z)
@@ -135,27 +131,25 @@ module Skylab::SearchAndReplace::TestSupport
         it "includes line talkin bout grep rx" do
           _screen_has_egrep_field or fail
         end
-
-        def screen
-          screens.fetch 2
-        end
       end
 
       context "third screen (after having pressed `search`)" do
 
+        screen 3
+
         it "there IS a buttonesque for (e.g) counts" do
           buttonesques.should have_button_for 'counts'
-        end
-
-        def screen
-          screens.fetch 3
         end
       end
 
       context "last screen" do
 
-        it "results in two files" do
-          screen.count_lines_on( :sout ).should eql 2
+        it "results in two files" do  # #here
+
+          a = lines
+          a[ 2 ].include? 'files_spec' or fail
+          a[ 3 ].include? 'money_spec' or fail
+          a[ 4 ].length.zero? or fail
         end
 
         it "ends with buttons of the correct frame" do
@@ -181,23 +175,32 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    def __expect_basenames a  # mutates argument
+    def __expect_basenames a
 
-      # for when every STDOUT line (on the particular screen) is a path,
-      # assert that the set formed by the basenames of those paths is exactly
-      # the set expressed by the argument array. (order doesn't matter.)
-      # (undefined for the case of multiple lines with the same basename.)
+      st = screen.to_content_line_stream_on :serr
+      st.gets  # #here (only one for find. none for other)
+      a_ = []
+      begin
+        s = st.gets
+        s.length.zero? and break
+        a_.push ::File.basename s
+        redo
+      end while nil
 
-      screen.to_content_line_stream_on( :sout ).map_by do |s|
-        s = ::File.basename s
-        d = a.index s
-        d or fail
-        a[ d ] = nil
-        true
-      end.flush_to_last
+      extra = a_ - a
+      missing = a - a_
 
-      a.compact!
-      a.length.zero? or fail
+      if extra.length.nonzero?
+        fail "extra: #{ extra.inspect }"
+      end
+
+      if missing.length.nonzero?
+        fail "missing: #{ missing.inspect }"
+      end
     end
+
+    # :#here marks nasty hard-coded expectation of a certain number
+    # (1 or 2) of debugging lines before the main content lines
   end
 end
+# #tombstone: expression of number of items was lost near [#ze-022]

@@ -11,17 +11,12 @@ module Skylab::Zerk::TestSupport
 
       tcc.extend Module_Methods___
 
-      # (rather than depend on etc, write our own memoizer)
-      yes = true ; x = nil
-      tcc.send :define_method, :subject_CLI do
-        if yes
-          yes = false
-          x = build_interactive_CLI_classeque
-        end
-        x
-      end
-
       tcc.include Instance_Methods___
+
+      x = nil
+      tcc.send :define_method, :__expscr_test_suite_shared_resources do
+        x ||= {}
+      end
     end
 
     module Module_Methods___
@@ -44,6 +39,16 @@ module Skylab::Zerk::TestSupport
     end
 
     module Instance_Methods___
+
+      def subject_CLI
+
+        cache = __expscr_test_suite_shared_resources
+        cache.fetch :_subject_CLI do
+          x = build_interactive_CLI_classeque
+          cache[ :_subject_CLI ] = x
+          x
+        end
+      end
 
       def build_interactive_CLI_classeque
 

@@ -5,8 +5,7 @@ module Skylab::SearchAndReplace::TestSupport
   describe "[sa] interactive CLI integration - counts", wip: true do
 
     TS_[ self ]
-    use :expect_screens
-    use :interactive_CLI
+    use :my_interactive_CLI
 
     context "counts" do
 

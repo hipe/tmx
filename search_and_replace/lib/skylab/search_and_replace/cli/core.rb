@@ -32,7 +32,7 @@ module Skylab::SearchAndReplace
 
       cli.interactive_design = -> vmm do
         vmm.compound_frame = vmm.common_compound_frame
-        vmm.custom_tree = CUSTOM_TREE_
+        vmm.custom_tree_array_proc = CLI::Interactive::CUSTOM_TREE
         vmm.location = vmm.common_location
         vmm.primitive_frame = vmm.common_primitive_frame
         vmm

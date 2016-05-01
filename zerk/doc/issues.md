@@ -44,9 +44,17 @@
 [#023]     #track glob in niCLI
              ( #was: #open de-generalize the invites )
 
-[#022] #open availability is not implemented (under niCLI)
+[#022]       #track what was lost when we stopped doing summary info (here)
+             ( #was: duplicate of [#021] )
 
-[#021]       availability for iCLI will be added after #milestone-9
+[#021]       availability for iCLI will be added after #milestone-9 -
+             this was/is an "essential-seeming" usability mechanic of iCLI
+             but it is fact non-essential. it pains us to postpone it b.c it
+             was one of the main catalysts of the milestone "era" but alas
+             the generated messages convey the same information (less
+             elegantly) and there are more immediate concerns to get to
+             first.
+
              ( #was: #track what to do about entitesque .. )
 
 [#020]     #track argument monikers

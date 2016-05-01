@@ -9,34 +9,39 @@ module Skylab::SearchAndReplace
           :children, {
 
             egrep_pattern: -> do
+              EMPTY_A_
               # #milestone-9: this is supposed to "appear" IFF ruby regexp
             end,
 
             search: -> do
               [
                 :children, {
-                  files_by_find: -> do
-                    [
-                      :hotstring_delineation, %w( files-by- f ind ),
-                    ]
+
+                  files_by_find: -> o do
+
+                    # experimental syntax #grease here in contrast to next
+                    o.hotstring_delineation %w( files-by- f ind )
                   end,
+
                   files_by_grep: -> do
                     [
                       :hotstring_delineation, %w( files-by- g rep ),
                     ]
                   end,
-                  matches: -> do
-                    [
-                      :custom_view_controller, -> * a do
-                        Here_::Interactive_View_Controllers_::Matches.new( * a )
-                      end,
-                    ]
+
+                  matches: -> o do
+
+                    o.custom_view_controller_by do |x, y, z, etc|
+                      Here_::Interactive_View_Controllers_::Matches.new x, y, z, etc
+                    end
                   end,
+
                   replacement_expression: -> do
                     [
                       :hotstring_delineation, %w( replacement- e xpression ),
                     ]
                   end,
+
                   replace: -> do
                     [
                       :custom_view_controller, -> * a do
@@ -50,6 +55,8 @@ module Skylab::SearchAndReplace
           }
         ]
       end
+
+      EMPTY_A_ = []
     end
   end
 end
