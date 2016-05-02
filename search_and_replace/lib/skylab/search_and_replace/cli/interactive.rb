@@ -31,8 +31,8 @@ module Skylab::SearchAndReplace
 
                   matches: -> o do
 
-                    o.custom_view_controller_by do |x, y, z, etc|
-                      Here_::Interactive_View_Controllers_::Matches.new x, y, z, etc
+                    o.custom_view_controller_by do |x, svcs|
+                      Here_::Interactive_View_Controllers_::Matches.new x, svcs
                     end
                   end,
 

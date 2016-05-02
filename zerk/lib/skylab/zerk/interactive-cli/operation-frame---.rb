@@ -40,10 +40,8 @@ module Skylab::Zerk
           __execute_this_or_bust bc, mvc
         else
           # (reasoning for the failure should have been emitted.)
-          NOTHING_  # (hi.)
+          _finish
         end
-
-        __finish
       end
 
       def __execute_this_or_bust bc, mvc
@@ -55,11 +53,33 @@ module Skylab::Zerk
         # we will take the result as meaningful whatever it is..
         # ya know what, we'll just ignore that thought for now..
 
-        _x = bc.receiver.send bc.method_name, * bc.args, & bc.block
+        x = bc.receiver.send bc.method_name, * bc.args, & bc.block
+
+        p = @load_ticket.custom_view_controller_proc__
+
+        if p
+          __express_result_customly x, p
+        else
+          __express_result_commonly x, mvc
+        end
+      end
+
+      def __express_result_customly x, p
+
+        _ = Thing_Proxy___.new self
+
+        _custom_view_controller = p[ x, _ ]
+
+        _custom_view_controller.call
+
+        NIL_
+      end
+
+      def __express_result_commonly x, mvc
 
         _pxy = CLI_Proxy___.new mvc
 
-        o = Home_::NonInteractiveCLI::Express_Result___.new _x, _pxy
+        o = Home_::NonInteractiveCLI::Express_Result___.new x, _pxy
 
         o.puts = -> s do
           @serr.puts s
@@ -71,7 +91,7 @@ module Skylab::Zerk
 
         o.execute
 
-        NIL_
+        _finish
       end
 
       def __build_formal_operation
@@ -94,7 +114,11 @@ module Skylab::Zerk
         end
       end
 
-      def __finish
+      def _finish
+
+        # this gets called here but it does NOT get called when there is
+        # a custom view controller. that must call the below (or not) itself.
+
         @event_loop.pop_me_off_of_the_stack self
         @event_loop.loop_again
         NIL_
@@ -106,6 +130,8 @@ module Skylab::Zerk
 
       attr_reader(
         :below_frame,
+        :event_loop,  # #here
+        :serr,  # #here
       )
 
       def four_category_symbol
@@ -126,6 +152,25 @@ module Skylab::Zerk
       end
 
       # ==
+
+      class Thing_Proxy___  # :#here
+
+        def initialize _
+          @_ = _
+        end
+
+        def event_loop
+          @_.event_loop
+        end
+
+        def operation_frame
+          @_  # ONLY for poppping off the stack
+        end
+
+        def serr
+          @_.serr
+        end
+      end
     end
   end
 end

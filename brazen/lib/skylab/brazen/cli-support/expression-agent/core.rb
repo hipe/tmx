@@ -99,6 +99,12 @@ module Skylab::Brazen
         send m, prp, * a
       end
 
+      rx = nil
+      define_method :singularize do | s |  # #open [#hu-045]
+        rx ||= /\A.+(?=s\z)/
+        rx.match( s )[ 0 ]
+      end
+
       def plural_noun * a
         _NLP_agent.plural_noun( * a )
       end

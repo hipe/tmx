@@ -179,8 +179,12 @@ module Skylab::Zerk
         end
 
         def _receive_custom_view_controller_proc p
-          @CUSTOM_VIEW_CONTROLLER_PROC = p ; nil
+          @custom_view_controller_proc__ = p ; nil
         end
+
+        attr_reader(
+          :custom_view_controller_proc__,
+        )
 
         def four_category_symbol
           :operation

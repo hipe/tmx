@@ -98,7 +98,7 @@ module Skylab::SearchAndReplace::TestSupport
         )
       end
 
-      it "says it couldn't" do  # #here
+      it "says it couldn't" do  # #open [#006]
 
         lines[ 1 ] == "non convertible regexp options - 'MULTILINE', 'EXTENDED'"
         # lines[ 2 ].should match %r(\Acouldn't execute files-by-grep because )
@@ -144,7 +144,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "last screen" do
 
-        it "results in two files" do  # #here
+        it "results in two files" do  # #open [#006]
 
           a = lines
           a[ 2 ].include? 'files_spec' or fail
@@ -178,7 +178,7 @@ module Skylab::SearchAndReplace::TestSupport
     def __expect_basenames a
 
       st = screen.to_content_line_stream_on :serr
-      st.gets  # #here (only one for find. none for other)
+      st.gets  # #open [#006] (only one for find. none for other)
       a_ = []
       begin
         s = st.gets
@@ -199,7 +199,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-    # :#here marks nasty hard-coded expectation of a certain number
+    # :#open [#006] marks nasty hard-coded expectation of a certain number
     # (1 or 2) of debugging lines before the main content lines
   end
 end

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] interactive CLI integration - counts", wip: true do
+  describe "[sa] interactive CLI integration - counts" do
 
     TS_[ self ]
     use :my_interactive_CLI
@@ -18,25 +18,37 @@ module Skylab::SearchAndReplace::TestSupport
         )
       end
 
-      it "looks YAML-y (for now)" do
+      it "item lines look good" do
 
-        _st = screen.to_content_line_stream_on :sout
-
-        _act = _st.reduce_into_by "" do | m, x |
-          m << "#{ x }#{ NEWLINE_ }"
+        a = _lines
+        rx = %r(#{ ::Regexp.escape ::File::SEPARATOR }\d-[a-z0-9-]+_spec\.rb - [12] matching lines?\z)
+        2.times do |d|
+          a.fetch( d ) =~ rx or fail
         end
+      end
 
-        _rx_s = <<-HERE.gsub!( /^[ ]{10}/, EMPTY_S_ )
-           path: .+_spec\\.rb
-          count: [12]
-          ---
-           path: .+_spec\\.rb
-          count: [12]
-        HERE
+      it "there is a summary line" do
 
-        _rx = ::Regexp.new _rx_s
+        _lines.last == "(3 matching lines in 2 paths)" or fail
+      end
 
-        _act.should match _rx
+      it "there are 2 item lines" do
+
+        _lines.length == 3 or fail
+      end
+
+      shared_subject :_lines do
+
+        st = screen.to_content_line_stream_on :serr
+        st.gets ; st.gets  # #open [#006]
+        a = []
+        begin
+          s = st.gets
+          s.length.zero? and break
+          a.push s
+          redo
+        end while nil
+        a
       end
 
       it "ends with buttons of the correct frame" do
@@ -58,6 +70,8 @@ module Skylab::SearchAndReplace::TestSupport
       it "write *styled* lines to STDERR (not stdout b.c styled..) (#FRAGILE-TEST)" do
 
         st = screen.to_content_line_stream_on :serr
+
+        # while #open [#004]:
         st.gets  # find command EEW
         st.gets  # grep command EEW
 

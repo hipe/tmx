@@ -4,15 +4,16 @@ module Skylab::SearchAndReplace
 
     class Interactive_View_Controllers_::Matches
 
-      # (this is the frontier for [#ze-010] custom view controllers. an
-      #  alternative is discussed near this same tag elsewhere in sidesys.)
+      # (this is the frontier for [#ze-010] custom view controllers. a
+      # simpler but less compelling alternative is discussed at this
+      # same tag at one more location in this sidesystem.)
 
-      def initialize st, main_vc, ent_ada
+      def initialize st, _
 
-        event_loop = ent_ada.event_loop
+        event_loop = _.event_loop
+        serr = _.serr
+
         expag = Home_::CLI.highlighting_expression_agent_instance__
-        serr = main_vc.serr
-        _sout = event_loop.sout
 
         @_p = -> do
 
@@ -31,8 +32,8 @@ module Skylab::SearchAndReplace
             redo
           end while nil
 
-          event_loop.pop_me_off_of_the_stack ent_ada
-          event_loop.redo
+          event_loop.pop_me_off_of_the_stack _.operation_frame
+          event_loop.loop_again
 
           NIL_
         end
@@ -40,10 +41,6 @@ module Skylab::SearchAndReplace
 
       def call
         @_p.call
-      end
-
-      def end_UI_frame
-        NIL_
       end
     end
   end

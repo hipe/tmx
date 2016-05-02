@@ -423,10 +423,6 @@ module Skylab::SearchAndReplace
         NIL_
       end
 
-      def end_UI_frame
-        NIL_
-      end
-
       def process_mutable_string_input s  # (partially duplicate "compound" n.a)
 
         s.strip!

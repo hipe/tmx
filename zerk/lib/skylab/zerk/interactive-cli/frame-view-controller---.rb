@@ -14,7 +14,7 @@ module Skylab::Zerk
       b9r = resources.boundarizer
       @_boundarizer = b9r
       @line_yielder = b9r.line_yielder
-      @expression_agent = EXPAG___  # etc
+      @expression_agent = Remote_CLI_lib_[]::Expression_Agent.new :_ze_NO_  # ..
       @produce_top_frame = top_frame_p
       @serr = resources.serr
 
@@ -134,31 +134,7 @@ module Skylab::Zerk
       :serr,
     )
 
-    class Expag___  # < ::BasicObject
-
-      alias_method :calculate, :instance_exec
-
-      rx = nil
-      define_method :singularize do | s |  # #open [#hu-045]
-        rx ||= /\A.+(?=s\z)/
-        rx.match( s )[ 0 ]
-      end
-
-      def plural_noun count_d=nil, s
-        Home_.lib_.human::NLP::EN::POS.plural_noun count_d, s
-      end
-
-      def s d
-        if 1 != d
-          S___
-        end
-      end
-      S___ = 's'
-    end
-
-    EXPAG___ = Expag___.new
   end
-
   end
 end
 # #pending-rename: POSSIBLY to "main view controller"

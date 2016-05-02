@@ -118,7 +118,9 @@
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline
 
-[#006] #hole ( #was: #during #milestone-6 descriptions )
+[#006] #open tests nastily rely on number of lines of debugging output
+             (near [#028] verbose)
+             ( #was: #during #milestone-6 descriptions )
              ( #was: #done #feature support for spaces in list items )
 
 [#005] #open improve architecture so we can pass things like system
