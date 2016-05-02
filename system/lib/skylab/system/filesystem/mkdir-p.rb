@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Actors_::Mkdir_p < Callback_::Actor::Dyadic  # :[#026].
+    class Mkdir_p < Callback_::Actor::Dyadic  # :[#026].
 
       # we do this on our own instead of using the FileUtils method because
       # A) we don't like FileUtils's way of "emitting" "events" and B) this

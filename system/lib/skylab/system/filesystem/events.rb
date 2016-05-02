@@ -1,16 +1,10 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    Events_ = ::Module.new
+    Events = ::Module.new
 
-    # for now: although this module has library scope its only purpose is to
-    # hold generic, reusable event prototypes shared among sidesystems. the
-    # module has been given library scope (and is not public) to future-proof
-    # it so that we can turn it into a more sophisticated router if ever we
-    # need to expose event prototypes that may live deeper in the system.
-
-    Events_::Wrote = Callback_::Event.prototype_with(
+    Events::Wrote = Callback_::Event.prototype_with(
 
       :wrote,
 

@@ -31,14 +31,14 @@ module Skylab::MyTerm::TestSupport
     context "`imagemagick_command`" do
 
       call_by do
-        call_plus_ACS :adapter, COMMON_ADAPTER_CONST_,
+        call :adapter, COMMON_ADAPTER_CONST_,
           :label, 'welff',
           :background_font, :path, '/talisker/I_AM_a_font.dfont',
             # (the inceptionpoint was here for needing to pop frames)
           :imagemagick_command
       end
 
-      def build_root_ACS_
+      def build_root_ACS_for_testing_
         _this_ACS
       end
 
@@ -60,13 +60,13 @@ module Skylab::MyTerm::TestSupport
     context "`OSA_script`" do
 
       call_by do
-        call_plus_ACS :adapter, COMMON_ADAPTER_CONST_,
+        call :adapter, COMMON_ADAPTER_CONST_,
           :label, 'iota',
           :background_font, :path, 'wazoozle',
           :OSA_script
       end
 
-      def build_root_ACS_
+      def build_root_ACS_for_testing_
         _this_ACS
       end
 
@@ -82,7 +82,7 @@ module Skylab::MyTerm::TestSupport
       end
     end
 
-    def _this_ACS  # •cp3
+    def _this_ACS  # #spot-3
       _cls = Home_::Models_::Appearance
       _k = TS_::Stubs::Kernel_01_Hi.instance
       _cls.new _k

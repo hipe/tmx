@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Bridges_::File_Utils_Controller  # :[#011]
+    class File_Utils_Controller  # :[#011]
 
       # NOTE nowadays we want to deprecate this for the sorts of reasons
       # explained in [#009.A]. but nonetheless:

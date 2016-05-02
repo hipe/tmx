@@ -72,7 +72,7 @@ module Skylab::MyTerm::TestSupport
     context "set the font using a good name (FRAGILE)" do
 
       call_by do
-        call_plus_ACS :adapter, COMMON_ADAPTER_CONST_,
+        call :adapter, COMMON_ADAPTER_CONST_,
           :background_font, :path, 'monaco'
       end
 

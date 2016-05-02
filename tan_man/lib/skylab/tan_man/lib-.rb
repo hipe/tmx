@@ -38,10 +38,6 @@ module Skylab::TanMan
 
     Parse_lib = sidesys[ :Parse ]
 
-    Path_tools = -> do
-      System[].filesystem.path_tools
-    end
-
     Pretty_print = stdlib[ :PP ]
 
     Some_stderr = -> do

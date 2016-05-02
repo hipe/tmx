@@ -172,7 +172,7 @@ module Skylab::CodeMetrics
 
         h = @argument_box.h_
 
-        cmd = Home_.lib_.system.filesystem.find(
+        cmd = Home_.lib_.system.find(
 
           :path, h.fetch( :path ),
           :ignore_dirs, h.fetch( :exclude_dir ),

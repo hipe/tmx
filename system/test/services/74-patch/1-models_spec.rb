@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - filesystem - bridges - patch - model" do
+  describe "[sy] services - patch - models" do
 
     TS_[ self ]
 
@@ -129,7 +129,7 @@ module Skylab::System::TestSupport
 
     def _new_patch_via_file_content_before whole_file_s
 
-      real_filesystem_.patch.new_via_file_content_before whole_file_s
+      patch.new_via_file_content_before whole_file_s
     end
 
     def _to_s pa
@@ -137,7 +137,7 @@ module Skylab::System::TestSupport
     end
 
     def patch
-      services_.filesystem.patch
+      services_.patch
     end
   end
 end

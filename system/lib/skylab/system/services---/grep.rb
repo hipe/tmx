@@ -1,8 +1,6 @@
 module Skylab::System
-
-  class Services___::Filesystem
-
-    class Bridges_::Grep  # [#017] (presently no content in document)
+  # -
+    class Services___::Grep  # [#017] (presently no content in document)
 
       PARAMS___ = Attributes_actor_.call( self,
         do_ignore_case: [ :known_known, :optional ],
@@ -140,7 +138,7 @@ module Skylab::System
 
       def to_command
 
-        cmd = Home_::Sessions_::Janus_Command.begin
+        cmd = Home_::Command.begin
 
         cmd.push GREP___, E_OPTION___
 
@@ -224,5 +222,5 @@ module Skylab::System
         UNABLE_
       end
     end
-  end
+  # -
 end

@@ -1,13 +1,9 @@
 module Skylab::System
 
+  const_get :Filesystem, false
+  module Filesystem  # #[#sl-155]
+
   class Services___::Filesystem  # see [#009]
-
-    class << self  # experimental static lib interface
-
-      def event sym
-        FS_::Events_.const_get sym, false
-      end
-    end  # >>
 
     def initialize _svx
     end
@@ -16,71 +12,12 @@ module Skylab::System
 
     def flock_first_available_path * x_a, & x_p
 
-      FS_::Actors_::Flock_first_available_path.for_mutable_args_ x_a, & x_p
+      Home_::Filesystem::Flock_first_available_path.for_mutable_args_ x_a, & x_p
     end
 
     def hack_guess_module_tree * x_a, & x_p
 
-      FS_::Actors_::Hack_guess_module_tree.for_mutable_args_ x_a, & x_p
-    end
-
-    # ~ bridge exposures
-
-    def cache
-      @___cache_bridge ||= FS_::Bridges_::Cache.new self
-    end
-
-    def file_utils_controller & x_p
-
-      FS_::Bridges_::File_Utils_Controller.for_any_proc_( & x_p )
-    end
-
-    def find * x_a, & x_p
-
-      FS_::Bridges_::Find.for_mutable_args_ x_a, & x_p
-    end
-
-    def grep * x_a, & x_p
-
-      FS_::Bridges_::Grep.for_mutable_args_ x_a, & x_p
-    end
-
-    def patch * x_a, & x_p
-
-      @__cache ||= {}  # we haven't needed to memoize any other daemon yet
-
-      _service_controller = @__cache.fetch :patch do
-        @__cache[ :patch ] = FS_::Bridges_::Patch.new :_no_svx
-      end
-
-      _service_controller.call_via_arglist x_a, & x_p
-    end
-
-    def path_tools
-      FS_::Bridges_::Path_Tools
-    end
-
-    # ~ model exposures
-
-    ## ~~ dir as collection
-
-    def directory_as_collection & build
-
-      FS_::Models::Directory::As::Collection.new do | o |
-        o.filesystem = self  # as a default
-        build[ o ]
-      end
-    end
-
-    ## ~~ tmpdir
-
-    def tmpdir_path
-      @__tmpdir_path ||= Home_.lib_.tmpdir
-    end
-
-    def tmpdir * x_a, & x_p
-
-      FS_::Models_::Tmpdir.for_mutable_args_ x_a, & x_p
+      Home_::Filesystem::Hack_guess_module_tree.for_mutable_args_ x_a, & x_p
     end
 
     # ~ normalization exposures
@@ -94,38 +31,67 @@ module Skylab::System
       end
     end
 
+    # ~ bridge exposures
+
+    def cache
+      @___cache ||= Home_::Filesystem::Cache.new self
+    end
+
+    def file_utils_controller & x_p
+
+      Home_::Filesystem::File_Utils_Controller.for_any_proc_( & x_p )
+    end
+
+    # ~ model exposures
+
+    ## ~~ dir as collection
+
+    def directory_as_collection & build
+
+      Home_::Filesystem::Directory::As::Collection.new do |o|
+        o.filesystem = self  # as a default
+        build[ o ]
+      end
+    end
+
+    ## ~~ tmpdir
+
+    def tmpdir_path
+      @__tmpdir_path ||= Home_.lib_.tmpdir
+    end
+
+    def tmpdir * x_a, & x_p
+
+      Home_::Filesystem::Tmpdir.for_mutable_args_ x_a, & x_p
+    end
+
     def normalization sym  # [#]:note-C
 
-      _cls = Normalizations_.const_get sym, false
+      _cls = Home_::Filesystem::Normalizations.const_get sym, false
       _cls.begin_ self
     end
 
     # ~ session exposures
 
     def tmpfile_sessioner
-      FS_::Sessions_::Tmpfile_Sessioner
+      Home_::Filesystem::Tmpfile_Sessioner
     end
 
     def walk * x_a, & oes_p
-
-      FS_::Sessions_::Walk.for_mutable_args_ x_a, & oes_p
+      Home_::Filesystem::Walk.for_mutable_args_ x_a, & oes_p
     end
 
     # ~ hook-outs / internal / low-level
 
     def constants
-      FS_
-    end
-
-    def members
-      self.class.instance_methods false  # neat
+      Home_::Filesystem
     end
 
     def modality_const
       :Filesystem
     end
 
-    # ->
+    # - core services
 
       # ~ peripheral but nearby
 
@@ -156,7 +122,7 @@ module Skylab::System
 
           d += 1
 
-          if DOT_DOT__ == a[ d ]
+          if DOT_DOT_ == a[ d ]
             d += 1
           end
         end
@@ -202,7 +168,7 @@ module Skylab::System
       end
 
       def mkdir_p path, & oes_p  # experimental alternative to f.u
-        FS_::Actors_::Mkdir_p[ path, self, & oes_p ]
+        Home_::Filesystem::Mkdir_p[ path, self, & oes_p ]
       end
 
       def rmdir path
@@ -248,23 +214,7 @@ module Skylab::System
         FILE_SEPARATOR_BYTE == path.getbyte( 0 )
       end
 
-      # <-
-
-    Autoloader_[ Actors_ = ::Module.new ]
-    Autoloader_[ Bridges_ = ::Module.new ]
-    Autoloader_[ Normalizations_ = ::Module.new ]
-    Autoloader_[ Sessions_ = ::Module.new ]
-
-    ACHIEVED_ = true
-    CONST_SEP_ = '::'
-    DIRECTORY_FTYPE = 'directory'.freeze
-    DOT_ = '.'.freeze
-    DOT_DOT__ = '..'
-    FILE_FTYPE = 'file'
-    FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
-    FS_ = self
-    IDENTITY_ = -> x { x }
-    NIL_ = nil
-
+    # - end core services
+  end
   end
 end

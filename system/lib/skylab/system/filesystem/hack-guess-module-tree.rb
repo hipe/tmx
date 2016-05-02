@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Actors_::Hack_guess_module_tree  # :[#107].
+    class Hack_guess_module_tree  # :[#107].
 
       # ->
 
@@ -84,9 +84,10 @@ module Skylab::System
           KEEP_PARSING_
         end
 
-        public def execute
+        def execute
           normalize && work
         end
+        public :execute
 
         # ~ normalize
 
@@ -250,7 +251,7 @@ module Skylab::System
           end
         end
 
-        public def build_each_immutable_child item_a, parent
+        def build_each_immutable_child item_a, parent
           me = self
           ( item_a.each do |item|
             _node = Immu_Node__.new do
@@ -269,8 +270,9 @@ module Skylab::System
             end
             yield _node
           end )
-          nil
+          NIL_
         end
+        public :build_each_immutable_child
 
         Immu_Node__ = Home_.lib_.basic::Tree.immutable_node
 

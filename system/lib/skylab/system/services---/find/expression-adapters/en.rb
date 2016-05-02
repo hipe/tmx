@@ -1,8 +1,6 @@
 module Skylab::System
-
-  class Services___::Filesystem
-
-    class Bridges_::Find
+  # -
+    class Services___::Find
 
       module Expression_Adapters::EN
 
@@ -48,5 +46,5 @@ module Skylab::System
         end  # >>
       end
     end
-  end
+  # -
 end

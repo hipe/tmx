@@ -51,16 +51,36 @@ module Skylab::System
         _common( :Filesystem ).for_mutable_args_ x_a, & x_p
       end
 
-      def filesystem_lib
-        _lib :Filesystem
+      def find * x_a, & x_p
+
+        _lib( :Find ).for_mutable_args_ x_a, & x_p
+      end
+
+      def grep * x_a, & x_p
+
+        _lib( :Grep ).for_mutable_args_ x_a, & x_p
       end
 
       def IO
         _common( :IO )
       end
 
+      def new_pather
+
+        # this is a transitional, deprecated-at-once method. clients that
+        # use this should refactor to construct the pather by supplying
+        # values from conduits instead because the below is not test-friendly.
+
+        Home_::Filesystem::Pather.new ::ENV[ 'HOME' ], ::Dir.pwd
+      end
+
       def open2 cmd_s_a, sout=nil, serr=nil, opt_h=nil, & x_p
-        Home_::Sessions__::Open2.new( cmd_s_a, sout, serr, opt_h, & x_p ).execute
+        Home_::Open2.new( cmd_s_a, sout, serr, opt_h, & x_p ).execute
+      end
+
+      def patch * x_a, & x_p
+
+        _common( :Patch ).call_via_arglist x_a, & x_p
       end
 
       def popen3 * cmd_s_a, & please_not_this_way
@@ -94,6 +114,29 @@ module Skylab::System
     end.new
   end
 
+  # ==
+
+  Autoloader_ = Callback_::Autoloader
+
+  module Filesystem  # (stowaway)
+
+    module Normalizations
+
+      Autoloader_[ self ]
+    end
+
+    CONST_SEP_ = '::'
+    DIRECTORY_FTYPE = 'directory'
+    DOT_ = '.'
+    DOT_DOT_ = '..'
+    FILE_FTYPE = 'file'
+    FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
+
+    Autoloader_[ self ]
+  end
+
+  # ==
+
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
@@ -102,11 +145,9 @@ module Skylab::System
     Home_.lib_.fields::Attributes[ h ]
   end
 
-  Autoloader_ = Callback_::Autoloader
-
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
 
-  Autoloader_[ Services___ = ::Module.new, :boxxy ]
+  Autoloader_[ Services___ = ::Module.new ]
 
   ACHIEVED_ = true
   CLI = nil  # for host
@@ -117,6 +158,7 @@ module Skylab::System
   NEWLINE_ = "\n"
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
+  NOTHING_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
 end

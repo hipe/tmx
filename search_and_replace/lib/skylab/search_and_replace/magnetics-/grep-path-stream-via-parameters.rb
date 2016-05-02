@@ -177,7 +177,7 @@ module Skylab::SearchAndReplace
 
       send :"__write_grep_options_for__#{ @for }__", a
 
-      gr = Home_.lib_.system.filesystem.grep(
+      gr = Home_.lib_.system.grep(
         :grep_extended_regexp_string, @grep_extended_regexp_string,
         :ruby_regexp, @ruby_regexp,
         :freeform_options, a,

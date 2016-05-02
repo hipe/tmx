@@ -1,10 +1,6 @@
 module Skylab::System
 
-  class Services___::Filesystem
-
-    class Bridges_::Patch
-
-      # <- 2
+  class Services___::Patch
 
   class Models__::Chunk
 
@@ -80,8 +76,6 @@ module Skylab::System
       end
     end
 
-    # <-
-
   class Side__
 
     def << line
@@ -110,8 +104,7 @@ module Skylab::System
       @range = Range___.new
       @lines = []
     end
-
-    # <-
+  end
 
   class Range___
 
@@ -134,9 +127,6 @@ module Skylab::System
       @end = nil
     end
   end
-# -> 4 (etc)
   end
-  end
-    end
   end
 end

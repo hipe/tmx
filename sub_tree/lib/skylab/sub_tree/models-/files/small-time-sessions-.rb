@@ -28,7 +28,7 @@ module Skylab::SubTree
             _pattern_part = [ :filename, @pattern ]
           end
 
-          @cmd_o = Home_.lib_.system.filesystem.find(
+          @cmd_o = Home_.lib_.system.find(
             :paths, @paths,
             * _pattern_part,
             :freeform_query_infix_words, %w'-type file',

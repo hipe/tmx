@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Bridges_::Cache
+    class Cache
 
     # `cache_path_proc_via_module` -
     #

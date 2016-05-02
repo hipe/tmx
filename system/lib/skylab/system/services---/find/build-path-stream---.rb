@@ -1,14 +1,10 @@
 module Skylab::System
-
-  class Services___::Filesystem
-
-    class Bridges_::Find
+  # -
+    class Services___::Find
 
       # <-
 
-    Actors_ = ::Module.new
-
-    class Actors_::Build_path_stream < Callback_::Actor::Monadic
+    class Build_path_stream___ < Callback_::Actor::Monadic
 
       def initialize x, & p
         @args = x
@@ -71,5 +67,5 @@ module Skylab::System
     end
     # ->
     end
-  end
+  # -
 end

@@ -1,6 +1,6 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
     class Byte_Upstream_Identifier  # [#011].
 
@@ -41,7 +41,7 @@ module Skylab::System
       # ~ conversion, standard readers, reflection, etc
 
       def to_byte_downstream_identifier
-        FS_::Byte_Downstream_Identifier.new @path, & @on_event_selectively
+        Home_::Filesystem::Byte_Downstream_Identifier.new @path, & @on_event_selectively
       end
 
       def is_same_waypoint_as x

@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - filesystem - n11ns - file-related STUB" do
+  describe "[sy] filesystem - n11ns - file-related STUB" do
 
     TS_[ self ]
-    use :services_filesystem_normalizations
+    use :filesystem_normalizations
 
     it "(builds in edit mode) STUB" do
       subject_

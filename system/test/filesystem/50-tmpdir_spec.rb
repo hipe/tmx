@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - models - tmpdir" do
+  describe "[sy] - filesystem - tmpdir" do
 
     TS_[ self ]
     define_singleton_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE

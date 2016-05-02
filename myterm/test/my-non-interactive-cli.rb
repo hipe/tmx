@@ -4,7 +4,7 @@ module Skylab::MyTerm::TestSupport
 
     def self.[] tcc
       tcc.send :define_singleton_method, :given, Given___
-      tcc.include self
+      tcc.include InstanceMethods
     end
 
     Given___ = -> & p do
@@ -20,7 +20,7 @@ module Skylab::MyTerm::TestSupport
       end
     end
 
-    # -
+    module InstanceMethods
 
       def argv * argv
 
@@ -47,16 +47,28 @@ module Skylab::MyTerm::TestSupport
           add_line[ [ :e, s ] ]
         end
 
-        _CLI = subject_CLI.new nil, _sout, _serr, ['mt']
+        cli = subject_CLI.new nil, _sout, _serr, ['mt']
 
-        sc = system_conduit
-        if sc
-          _CLI.system_conduit = sc
-        end
+        prepare_CLI_for_niCLI_ cli
 
-        _es = _CLI.invoke argv
+        _es = cli.invoke argv
 
         State___.new _es, lines
+      end
+
+      def prepare_CLI_for_niCLI_ cli
+
+        cli.filesystem_conduit = filesystem_conduit_for_niCLI_
+        cli.system_conduit = system_conduit_for_niCLI_
+        NIL_
+      end
+
+      def filesystem_conduit_for_niCLI_
+        _OCD_filesystem_SINGLETON_
+      end
+
+      def system_conduit_for_niCLI_
+        NOTHING_
       end
 
       # --
@@ -70,8 +82,7 @@ module Skylab::MyTerm::TestSupport
       def subject_CLI
         Home_::CLI
       end
-
-    # -
+    end
 
     # ==
 

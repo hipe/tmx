@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - bridges - find" do
+  describe "[sy] - services - find" do
 
     TS_[ self ]
 
@@ -66,7 +66,8 @@ module Skylab::System::TestSupport
       _parent_subject.find(
         :paths, [ 'x', 'y' ],
         :filename, '*.code',
-        :when_command, _subject_module::IDENTITY_ )
+        :when_command, -> x { x },  # IDENTITY_
+      )
     end
 
     def _subject_module
@@ -74,7 +75,7 @@ module Skylab::System::TestSupport
     end
 
     def _parent_subject
-      services_.filesystem
+      services_
     end
   end
 end

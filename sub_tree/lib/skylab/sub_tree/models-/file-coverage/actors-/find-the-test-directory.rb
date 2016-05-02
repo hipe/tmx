@@ -80,7 +80,7 @@ module Skylab::SubTree
 
         @find_was_OK = true
 
-        _ = Home_.lib_.system.filesystem.find
+        _ = Home_.lib_.system.find
 
         @__find = _.new_with(
           :filenames, @filenames,  # "always safe"

@@ -232,7 +232,8 @@ module Skylab::Zerk::TestSupport
 
       def __expscr_build_state sct
 
-        x_a, fc, muta_p, sc = sct.to_a
+        x_a = sct.__CLI_x_a
+        muta_p = sct.__freeform_mutation_proc
 
         fake = Custom_Fake___.new x_a, do_debug, debug_IO
 
@@ -244,13 +245,8 @@ module Skylab::Zerk::TestSupport
 
         cli = __expscr_build_CLI fake
 
-        if fc
-          cli.filesystem_conduit = fc
-        end
-
-        if sc
-          cli.system_conduit = sc
-        end
+        prepare_CLI_for_expect_screens(
+          cli, sct.__filesystem_conduit, sct.__system_conduit )
 
         if muta_p
           muta_p[ cli ]
@@ -277,6 +273,19 @@ module Skylab::Zerk::TestSupport
         end
 
         fake.flush_to_state
+      end
+
+      def prepare_CLI_for_expect_screens cli, fc, sc
+
+        if fc
+          cli.filesystem_conduit = fc
+        end
+
+        if sc
+          cli.system_conduit = sc
+        end
+
+        NIL_
       end
 
       def ___expscr_grind_the_event_loop event_loop

@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - flock first avail[..]" do
+  describe "[sy] - filesystem - flock first avail[..]" do
 
     TS_[ self ]
 

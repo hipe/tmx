@@ -1,15 +1,15 @@
-require_relative '../../../../../test-support'
+require_relative '../../test-support'
 
 Skylab::TestSupport::Quickie.enable_kernel_describe
 
-describe "[sy] - serivces - filesystem - bridges - path-tools pretty-path" do
+describe "[sy] - filesystem - pather - synopsis" do
 
   Skylab::System::TestSupport[ self ]
-  use :services_filesystem_bridges_path_tools_pretty_path
+  use :filesystem_pather
 
-  frame do
+  context do
     home '/home/rms'
-    exemplifying "contracts home directories to '~' (home is #{home.inspect})" do
+    exemplifying "contracts home directories to '~'" do
       o '/home/rms/foo', '~/foo'
       o '/home/rms/foo/bar.txt', '~/foo/bar.txt'
       o 'home/rms/whatever', 'home/rms/whatever'
@@ -19,9 +19,9 @@ describe "[sy] - serivces - filesystem - bridges - path-tools pretty-path" do
     end
   end
 
-  frame do
+  context do
     pwd '/usr/local'
-    exemplifying "contracts present working directory to '.' (pwd is #{pwd.inspect})" do
+    exemplifying "contracts present working directory to '.'" do
       o '/usr/local/foo', './foo'
       o '/usr/local/foo/bar.txt', './foo/bar.txt'
       o 'usr/local/whatever', 'usr/local/whatever'
@@ -31,19 +31,20 @@ describe "[sy] - serivces - filesystem - bridges - path-tools pretty-path" do
     end
   end
 
-  frame do
-    home '/home/rms'
-    pwd home
-    exemplifying "and if pwd *is* home dir, home dir always wins" do
+  context do
+    same = '/home/rms'
+    home same
+    pwd same
+    exemplifying "when home and pwd are the same, home wins" do
       o '/home/rms', '~'
       o '/home/rms/foo', '~/foo'
     end
   end
 
-  frame do
+  context do
     home '/a/b/c'
     pwd  '/a/b'
-    exemplifying "and if home dir (#{home}) is inside pwd (#{pwd}), home dir wins (shortest wins)" do
+    exemplifying "when home is under pwd, whatever would be shortest wins" do
       o '/a/b/c/foo/bar', '~/foo/bar'
       o '/a/b/c/foo',     '~/foo'
       o '/a/b/c/',        '~/'
@@ -55,10 +56,10 @@ describe "[sy] - serivces - filesystem - bridges - path-tools pretty-path" do
     end
   end
 
-  frame do
+  context do
     home '/home/rms'
     pwd  '/home/rms/proj'
-    exemplifying "BUT if pwd (#{pwd}) is inside home (#{home}), PWD wins (shortest wins)" do
+    exemplifying "BUT if pwd is inside home, PWD wins (shortest wins)" do
       o '/home/rms/proj/emacs.c', './emacs.c'
       o '/home/rms/proj',         '.'
       o '/home/rms/pro',          '~/pro'
@@ -67,10 +68,10 @@ describe "[sy] - serivces - filesystem - bridges - path-tools pretty-path" do
     end
   end
 
-  frame do
+  context do
     home '/home/rms'
     pwd '/home/rms/proj/emacs'
-    exemplifying "pwd (#{ pwd }) is in home (#{ home }), relpath wins" do
+    exemplifying "pwd is in home, relpath wins" do
       o '/home/rms/proj/hurd',   '../hurd'
     end
   end

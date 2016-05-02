@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Actors_::Flock_first_available_path  # :[#002].
+    class Flock_first_available_path  # :[#002].
 
       class << self
 

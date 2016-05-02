@@ -6,53 +6,32 @@ module Skylab::MyTerm
 
       # a wrapper for system-specific things.
       # this is an earmark for future efforts at portability.
+      # decidedly not portable at present
 
       def initialize _k, _mod
       end
 
-      def any_existing_read_writable_IO
-
-        filesystem.open _appearance_persistence_path, ::File::RDWR
-      rescue ::Errno::ENOENT
-      end
-
-      def writable_IO * x_p
-
-        fs = filesystem
-        path = _appearance_persistence_path
-
-        dirname = ::File.dirname path
-        if ! fs.exist? dirname
-          fs.mkdir_p dirname, & x_p
-        end
-        fs.open path, ::File::CREAT | ::File::WRONLY
-      end
-
-      def _appearance_persistence_path
-        @___path ||= ::File.join _data_path, 'myterm.json'
-      end
-
-      def get_font_file_extensions
-        %w( dfont otf ttc ttf )
+      def font_file_extensions
+        Font_file_extensions___[]
       end
 
       def fonts_dir
-        @___fonts_dir ||= '/System/Library/Fonts'.freeze
+        FONTS_DIR___
       end
 
-      def get_volatile_image_path
-        ::File.join _data_path, 'volatile-image.png'
-      end
-
-      def _data_path
-        @__data_path ||= ::File.join( ::ENV.fetch( 'HOME' ), '.myterm' )
+      def volatile_image_path
+        Volatile_image_path___[]
       end
 
       # -- the below two attributes are undergirded by knownness so that if
-      # they are explicitly set to a false-ish, it is preserved even against
-      # the below lazy initialization of default values. this preserves for
-      # us the option of asserting (for example in a test) that the
-      # particular conduit is not used, simply by setting it to false.
+      # the property is set to false-ish it says set to that false-ish even
+      # over the below lazy initialization of default values. this way, to
+      # set one or both of them to false-ish could act as an assertion that
+      # they are not used (for example from a test).
+
+      def filesystem= x
+        @filesystem_knownness = KK__[ x ] ; x
+      end
 
       def system_conduit= x
         @system_conduit_knownness = KK__[ x ] ; x
@@ -71,9 +50,26 @@ module Skylab::MyTerm
         ( @system_conduit_knownness ||= KK__[ Home_.lib_.open3 ] ).value_x
       end
 
-      KK__ = Callback_::Known_Known
+      # --
+
+      Data_path___ = Lazy_.call do
+        ::File.join ::ENV.fetch( 'HOME' ), '.myterm'
+      end
+
+      Font_file_extensions___ = Lazy_.call do
+        %w( dfont otf ttc ttf )
+      end
+
+      FONTS_DIR___ = '/System/Library/Fonts'
+
+      Volatile_image_path___ = Lazy_.call do
+        ::File.join Data_path___[], 'volatile-image.png'
+      end
 
       # --
+
+      KK__ = Callback_::Known_Known
     end
   end
 end
+# #tombstone: persistence-related

@@ -148,7 +148,7 @@ module Skylab::TestSupport
 
       def __build_find_test_files_prototype
 
-        Lib_::System[].filesystem.find.new_with(
+        Lib_::System[].find.new_with(
           :freeform_query_infix_words, %w'-type f',
           :filename, '*_spec.rb',
         )

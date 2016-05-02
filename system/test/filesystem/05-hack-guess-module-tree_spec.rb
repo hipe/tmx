@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - hack guess module tree" do
+  describe "[sy] - filesystem - hack guess module tree" do
 
     TS_[ self ]
     use :expect_event

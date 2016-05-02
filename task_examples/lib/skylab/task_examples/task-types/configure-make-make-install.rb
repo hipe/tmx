@@ -2,7 +2,6 @@ module Skylab::TaskExamples
 
   class TaskTypes::ConfigureMakeMakeInstall < Home_::Task
 
-    include Home_.lib_.system.filesystem.path_tools.instance_methods_module
     include Home_::TaskTypes::TarballTo::Constants
     attribute :configure_make_make_install
     attribute :prefix

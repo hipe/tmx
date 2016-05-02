@@ -2,7 +2,7 @@ require 'open3'
 
 module Skylab::System
 
-  class Sessions__::Open2  # :[#025].
+  class Open2  # :[#025].
 
     # ancient thing that's too simple to throw out, but not yet reconciled
     # #todo - if this stays change it to session interface

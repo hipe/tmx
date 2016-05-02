@@ -39,7 +39,7 @@ module Skylab::Snag
       def new_via_path path, & oes_p
 
         _id = Home_.lib_.
-          system.filesystem.class::Byte_Upstream_Identifier.new path
+          system_lib::Filesystem::Byte_Upstream_Identifier.new path
 
         _new_via_upstream_identifier _id, & oes_p
       end

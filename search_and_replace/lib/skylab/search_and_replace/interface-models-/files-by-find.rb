@@ -19,7 +19,7 @@ module Skylab::SearchAndReplace
 
     def execute
 
-      cmd = Home_.lib_.system.filesystem.find(
+      cmd = Home_.lib_.system.find(
 
         :filenames, @filename_patterns,
         :paths, @paths,

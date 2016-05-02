@@ -1,10 +1,6 @@
 module Skylab::System
 
-  class Services___::Filesystem
-
-    class Bridges_::Patch
-
-      # <-
+  class Services___::Patch
 
     class Models__::Mutable_Progressive  # builds a patch progressively.
 
@@ -45,7 +41,7 @@ module Skylab::System
         x_a.push :system_conduit, system_conduit
         x_a.push :patch_lines, to_line_stream
 
-        Home_.services.filesystem.patch.call_via_arglist x_a, & x_p
+        Home_.services.patch.call_via_arglist x_a, & x_p
       end
 
       def to_patch_string
@@ -158,8 +154,6 @@ module Skylab::System
       def __say_four
         'range end too high'
       end
-    end
-    # ->
     end
   end
 end

@@ -5,7 +5,20 @@ module Skylab::MyTerm::TestSupport
   describe "[my] niCLI - help screens when adapters" do
 
     TS_[ self ]
-    Home_.lib_.zerk.test_support::Non_Interactive_CLI::Help_Screens[ self ]
+
+    # -- eek: vendor lib and our lib collide. vendor lib must trump ours
+
+    include TS_::My_Non_Interactive_CLI::InstanceMethods
+
+    _ = Home_.lib_.zerk.test_support::Non_Interactive_CLI::Help_Screens
+    _[ self ]
+
+    def for_expect_stdout_stderr_prepare_invocation invo
+      prepare_CLI_for_niCLI_ invo
+      NIL_
+    end
+
+    # --
 
     context "(help screen from top)" do
 

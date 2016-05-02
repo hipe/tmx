@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - FS - bridges - grep (a HACK)" do
+  describe "[sy] - services - grep (a HACK)" do
 
     TS_[ self ]
 
@@ -87,11 +87,12 @@ module Skylab::System::TestSupport
     end
 
     memoize :_here_path do
-      TS_.dir_pathname.join( 'services/filesystem/bridges/grep_spec.rb' ).to_path
+
+      ::File.join TS_.dir_pathname.to_path, 'services/71-grep_spec.rb'
     end
 
     def _parent_subject
-      services_.filesystem
+      services_
     end
   end
 end

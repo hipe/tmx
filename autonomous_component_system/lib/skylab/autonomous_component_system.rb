@@ -574,10 +574,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       JSON = stdlib[ :JSON ]
 
-      system_lib = sidesys[ :System ]
       System = -> do
-        system_lib[].services
+        System_lib[].services
       end
+
+      System_lib = sidesys[ :System ]
     end
 
     ACHIEVED_ = true

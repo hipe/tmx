@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - filesystem - sessions - tmpfile sessioner" do
+  describe "[sy] - filesystem - tmpfile sessioner" do
 
     TS_[ self ]
 
@@ -116,7 +116,7 @@ module Skylab::System::TestSupport
     end
 
     def _subject
-      Home_::Services___::Filesystem::Sessions_::Tmpfile_Sessioner
+      Home_::Filesystem::Tmpfile_Sessioner
     end
   end
 end

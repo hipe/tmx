@@ -22,7 +22,7 @@ module Skylab::MyTerm::TestSupport
 
   # -
 
-  module Instance_Methods___
+  module Instance_Methods___  # re-opens below
 
     def debug!
       @do_debug = true
@@ -32,10 +32,6 @@ module Skylab::MyTerm::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
-    end
-
-    def system_conduit
-      NOTHING_
     end
   end
 
@@ -72,6 +68,32 @@ module Skylab::MyTerm::TestSupport
       tcc.include self
     end
 
+    def prepare_CLI_for_expect_screens cli, fc, sc
+
+      # (if set, the last two above are from the `given` DSL)
+
+      if ! fc
+        fc = filesystem_conduit_for_iCLI_
+      end
+
+      if ! sc
+        sc = system_conduit_for_iCLI_
+      end
+
+      cli.filesystem_conduit = fc  # nil means assert none used
+      cli.system_conduit = sc  # nil means assert none used
+
+      NIL_
+    end
+
+    def filesystem_conduit_for_iCLI_
+      _OCD_filesystem_SINGLETON_
+    end
+
+    def system_conduit_for_iCLI_
+      NOTHING_
+    end
+
     def build_interactive_CLI_classeque
       Home_::CLI::Interactive.build_classesque__
     end
@@ -87,29 +109,70 @@ module Skylab::MyTerm::TestSupport
       tcc.include self
     end
 
-    def init_result_for_zerk_expect_API x_a, & pp
+    def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp  # #spot-2
 
-      @result = Home_::API.call( * x_a, & pp )
-      NIL_
-    end
-
-    def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
-
-      @root_ACS = build_root_ACS_
-
-      _ze = Home_.lib_.zerk
-
-      @result = _ze::API.call x_a, @root_ACS, & pp
+      @root_ACS = build_root_ACS_for_testing_
+      @result = Home_::Call_[ x_a, @root_ACS, & pp ]
 
       NIL_
-    end  # •cp1
-
-    def build_root_ACS_
-      Home_.build_root_ACS_
     end
   end
 
   # --
+
+  module Instance_Methods___
+
+    def build_root_ACS_for_testing_
+
+      # read [#010] and come back. this is how we satisfy our OCD.
+
+      acs = Home_.build_root_ACS_
+
+      kernel = acs.kernel_
+
+      inst = kernel.silo :Installation
+
+      inst.system_conduit = false  # never use real system conduit by default
+      # ACTUALLY - *do* use real system conduit (..
+
+      inst.filesystem = _OCD_filesystem_SINGLETON_
+
+      acs
+    end
+
+    yes = true ; x = nil
+    define_method :_OCD_filesystem_SINGLETON_ do
+      if yes
+        yes = false
+        x = OCD_Filesystem_Conduit___.new ::File, ::Dir
+      end
+      x
+    end
+  end
+
+  # ==
+
+  class OCD_Filesystem_Conduit___
+
+    # satisfy the "OCD" described in [#010] by having this be long-running
+    # (as in forever) and cache the filesystem hits. as we said, OCD
+
+    def initialize file_guy, dir_guy
+      @__upstream_dirsystem = dir_guy
+      @_upstream_filesystem = file_guy
+      @_globs = {}
+    end
+
+    def glob path
+      @_globs.fetch path do
+        x = @__upstream_dirsystem.glob path
+        @_globs[ path ] = x
+        x
+      end
+    end
+  end
+
+  # ==
 
   Zerk_test_lib__ = -> do
     Home_.lib_.zerk.test_support

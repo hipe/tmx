@@ -2,9 +2,9 @@
 
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Models_::Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
+    class Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
 
       class << self
 
@@ -426,7 +426,7 @@ module Skylab::System
 
       def _patch * x_a
 
-        Home_.services.filesystem.patch(
+        Home_.services.patch(
           :target_directory, to_path,
           :is_dry_run, @is_noop,
           * x_a
@@ -560,10 +560,11 @@ module Skylab::System
 
           _path = ::File.join tc.tmpdir_path_for_memoized_tmpdir, slug
 
-          @instance = Tmpdir_.new_with(
+          @instance = This___.new_with(
             :path, _path,
             :be_verbose, tc.do_debug,
-            :debug_IO, tc.debug_IO )
+            :debug_IO, tc.debug_IO,
+          )
         end
 
         def for tc
@@ -587,7 +588,7 @@ module Skylab::System
         end
       end
 
-      Tmpdir_ = self
+      This___ = self
     end
   end
 end

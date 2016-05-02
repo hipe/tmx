@@ -1,6 +1,6 @@
 module Skylab::System::TestSupport
 
-  Services::Filesystem::Normalizations = -> tcm do
+  Filesystem::Normalizations = -> tcm do
 
     Expect_Event[ tcm ]
 

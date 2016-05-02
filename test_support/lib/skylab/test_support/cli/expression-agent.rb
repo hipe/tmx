@@ -28,7 +28,8 @@ module Skylab::TestSupport
       end
 
       def escape_path path_x
-        Home_.lib_.system.filesystem.path_tools.pretty_path path_x
+        ( @___pather ||= Home_.lib_.system.new_pather )
+        @___pather.call path_x
       end
 
       def highlight s # [br]

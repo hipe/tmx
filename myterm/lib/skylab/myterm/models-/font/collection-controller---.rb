@@ -135,7 +135,7 @@ module Skylab::MyTerm
 
         _inst = _installation
 
-        _a = _inst.get_font_file_extensions
+        _a = _inst.font_file_extensions
 
         h = ::Hash[ _a.map { |s| [ ".#{ s }", true ] } ]
 

@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Sessions_::Walk  # :[#176]
+    class Walk  # :[#176]
 
       # was [#ts-019], then [#st-007]. was once tagged [#cu-003]
       # ->

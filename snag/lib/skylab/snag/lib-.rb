@@ -66,15 +66,7 @@ module Skylab::Snag
     Parse_lib = sidesys[ :Parse ]
 
     Patch_lib = -> do
-      System[].filesystem.patch
-    end
-
-    Path_tools = -> do
-      System[].filesystem.path_tools
-    end
-
-    Pretty_path = -> x do
-      Brazen[]::CLI.pretty_path x
+      System[].patch
     end
 
     Strange = -> * x_a do
@@ -85,11 +77,11 @@ module Skylab::Snag
       Basic[]::String
     end
 
-    system_lib = sidesys[ :System ]
-
     System = -> do
-      system_lib[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
 
     class << self
       attr_reader :instance

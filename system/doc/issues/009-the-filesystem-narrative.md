@@ -29,7 +29,7 @@ it:
 
 by modeling our access of the filesystem as though it is just another
 datastore client :[#.A], we diminish the cost of the two points above.
-as well, we may reap other architectural benefits as well, if we ever
+as well, we may reap other architectural benefits too, if we ever
 try to swap out the filesystem for another datastore for some particular
 "silo".
 

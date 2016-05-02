@@ -1,9 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
-
-    class Bridges_::Find  # see [#171].
-
+  class Services___::Find  # see [#171].
+    # -
+      # -
         # synopsis:
         #
         #   • this is a :+[#ba-027]:#normal-normalizer: once built this entity
@@ -264,7 +263,7 @@ module Skylab::System
 
         def to_path_stream
           @args and begin
-            Find_::Actors_::Build_path_stream[ @args, & @on_event_selectively ]
+            Find_::Build_path_stream___[ @args, & @on_event_selectively ]
           end
         end
 
@@ -395,9 +394,8 @@ module Skylab::System
         Autoloader_[ Expression_Adapters = ::Module.new ]
 
         Find_ = self
-
-        # <-
-    end
+      # -
+    # -
   end
 end
 # :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern

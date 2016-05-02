@@ -8,22 +8,31 @@ module Skylab::MyTerm
     # we want to leverage the [ze] generated CLI to
 
     def initialize sin, sout, serr, pn_s_a
-      @_sc_qk = nil
+      @_FS_qk = nil
+      @_SC_qk = nil
       @sin = sin ; @sout = sout ; @serr = serr ; @pn_s_a = pn_s_a
     end
 
+    def filesystem_conduit= x
+      @_FS_qk = Callback_::Known_Known[ x ] ; x
+    end
+
     def system_conduit= x
-      @_sc_qk = Callback_::Known_Known[ x ] ; x
+      @_SC_qk = Callback_::Known_Known[ x ] ; x
     end
 
     def invoke argv
 
       Require_zerk_[]
 
-      _ACS = Home_.build_root_ACS_
+      acs = Home_.build_root_ACS_
 
-      if @_sc_qk
-        _ACS.system_conduit_knownness = @_sc_qk
+      if @_FS_qk
+        acs.filesystem_knownness = @_FS_qk
+      end
+
+      if @_SC_qk
+        acs.system_conduit_knownness = @_SC_qk
       end
 
       cli = Zerk_::NonInteractiveCLI.begin
@@ -49,7 +58,7 @@ module Skylab::MyTerm
       end
 
       cli.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
-        _ACS
+        acs
       end
 
       cli.universal_CLI_resources @sin, @sout, @serr, @pn_s_a

@@ -197,7 +197,7 @@ module Skylab::Snag
 
     Directory_as_collection_class___ = Callback_.memoize do
 
-      class D_as_C____ < Home_.lib_.system.filesystem_lib::Models::Directory::As::Collection
+      class D_as_C____ < Home_.lib_.system_lib::Filesystem::Directory::As::Collection
 
         # -- Expressive event hook-ins  (near [#ac-007])
 

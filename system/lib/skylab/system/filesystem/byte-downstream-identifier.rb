@@ -1,6 +1,6 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
     class Byte_Downstream_Identifier  # :+[#br-019.D]
 

@@ -10,16 +10,20 @@ module Skylab::MyTerm
   end  # >>
 
   module API
+
     # one of the [#015] "generated modality clients" (see)
+
     class << self
+
       def call * x_a, & pp
 
-        # (for now, every API call starts with a new empty root ACS)
-        # (but remember there is a kernel that is "long-running")
+        # to the extent that tests don't test the live system, this method
+        # is not covered. so stay close to #spot-2.
+        # every API call needs its own empty root ACS.
 
         _ACS = Home_.build_root_ACS_
         Call_[ x_a, _ACS, & pp ]
-      end  # :cp1
+      end
     end  # >>
   end
 
@@ -32,15 +36,12 @@ module Skylab::MyTerm
 
   class << self
 
-    def build_root_ACS_  # (break down as needed)
+    def build_root_ACS_
 
-      Home_::Models_::Appearance.new ___custom_kernel
-    end  # :cp3
+      _k = Invocation_Kernel___.new Home_::Models_
 
-    def ___custom_kernel
-
-      @___custom_kernel ||= Custom_Kernel___.new Home_, :Models_
-    end  # :cp2
+      Home_::Models_::Appearance.new _k  # :#spot-3
+    end
 
     def lib_
 
@@ -49,36 +50,40 @@ module Skylab::MyTerm
     end
   end  # >>
 
-  class Custom_Kernel___
+  class Invocation_Kernel___  # #test-point
 
+    # although this exists one-to-one (in terms of lifetime) with an
+    # "appearance" component (which is the root ACS), we keep it separate
+    # for cognitive clarity and focus of scope.
     # this is a modified version of a relic from the [br] way.
     # ..maybe go away, maybe abstract upwards to [ze] or somewhere..
 
-    def initialize home_mod, models_const
-
+    def initialize models_mod
+      @models_module = models_mod
       cache = {}
-
-      @_p = -> k do
-
+      @__silo_p = -> k do
         cache.fetch k do
-
-          _Models = home_mod.const_get models_const, false
-
-          silo_mod = _Models.const_get k, false
-
-          _silo_daemon_class = silo_mod.const_get :Silo_Daemon, false
-
-          silo_daemon = _silo_daemon_class.new self, silo_mod
-
-          cache[ k ] = silo_daemon
-
-          silo_daemon
+          x = __start_silo k
+          cache[k] = x
+          x
         end
       end
     end
 
     def silo k
-      @_p[ k ]
+      @__silo_p[ k ]
+    end
+
+    def __start_silo k
+
+      silo_mod = @models_module.const_get k, false
+
+      silo_mod.const_get( :Silo_Daemon, false ).new self, silo_mod
+    end
+
+    eek = {}
+    define_method :FOREVER_CACHE do  # using this only after reading [#010]
+      eek
     end
 
     def kernel_  # so we ourselves can get passed as proxy for component

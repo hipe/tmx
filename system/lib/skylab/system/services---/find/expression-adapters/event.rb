@@ -1,8 +1,6 @@
 module Skylab::System
-
-  class Services___::Filesystem
-
-    class Bridges_::Find
+  # -
+    class Services___::Find
 
       Expression_Adapters::Event = Callback_::Event.prototype_with(
          :find_command_args,
@@ -31,5 +29,5 @@ module Skylab::System
         end  # >>
       end
     end
-  end
+  # -
 end

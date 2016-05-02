@@ -1,38 +1,60 @@
-require_relative '../../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] - services - filesystem - bridges - path-tools" do
+  describe "[sy] - filesystem - pather - abs. path hack (FEATURE ISLAND)" do
+
+    # #feature-island. (this is no longer connected to anything..) #open [#033]
 
     TS_[ self ]
 
-    define_singleton_method :o do |str, capture, *tags|
+    say = -> a do
 
-      vp = if capture
-        "sees #{ capture.inspect }"
+      in_s, out_x = a
+
+      _vp = if out_x
+        "sees #{ out_x.inspect }"
       else
         "doesn't see an absolute path"
       end
 
-      it "in '#{ str }' it #{ vp }", *tags do
-
-        md = services_.filesystem.path_tools.absolute_path_hack_rx.match str
-
-        if capture
-          md[0].should eql capture
-        else
-          md.should be_nil
-        end
-      end
+      "in '#{ in_s }' it #{ _vp }"
     end
 
-    o 'foo', nil
+    _1 = [ 'foo', nil ]
 
-    o 'foo/bar', nil
+    it say[ _1 ] do
+      _test _1
+    end
 
-    o '/foo/bar', '/foo/bar'
+    _2 = [ 'foo/bar', nil ]
 
-    o ' "/foo/bar" ', '/foo/bar'
+    it say[ _2 ] do
+      _test _2
+    end
 
+    _3 = [ '/foo/bar', '/foo/bar']
+
+    it say[ _3 ] do
+      _test _3
+    end
+
+    _4 = [ ' "/foo/bar" ', '/foo/bar' ]
+
+    it say[ _4 ] do
+      _test _4
+    end
+
+    rx = %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x
+
+    define_method :_test do |a|
+      md = rx.match a.first
+      capture = a.last
+      if capture
+        md[ 0 ] == capture or fail
+      else
+        md and fail
+      end
+    end
   end
 end

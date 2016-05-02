@@ -112,11 +112,15 @@ module Skylab::Brazen
       end
 
       def pth s
+
         if s.respond_to? :to_path
           s = s.to_path
         end
+
         if FILE_SEPARATOR_BYTE == s.getbyte( 0 )
-          CLI_Support::Expression_Agent::Pretty_Path[ s ]
+
+          @___pather ||= Home_.lib_.system.new_pather
+          @___pather.call s
         else
           s
         end

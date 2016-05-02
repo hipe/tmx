@@ -1,8 +1,6 @@
 module Skylab::System
-
-  class Services___::Filesystem
-
-    class Bridges_::Patch
+  # -
+    class Services___::Patch
 
       # using the host system's `patch` utility (whatever it is (if any)),
       # apply a patch specified in a string or via a path to the specified
@@ -121,7 +119,7 @@ module Skylab::System
           KEEP_PARSING_
         end
 
-        public def execute
+        def execute
 
           if @target_method
             wait_process
@@ -129,6 +127,7 @@ module Skylab::System
             freeze
           end
         end
+        public :execute
 
         def wait_process
 
@@ -289,5 +288,5 @@ module Skylab::System
 
       Patch_ = self
     end
-  end
+  # -
 end

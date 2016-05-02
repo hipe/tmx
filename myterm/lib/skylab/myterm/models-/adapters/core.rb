@@ -74,21 +74,31 @@ module Skylab::MyTerm
       end
 
       def to_load_ticket_stream
-        @___lt_a ||= ___build_index
-        Callback_::Stream.via_nonsparse_array @___lt_a
-      end
 
-      def ___build_index
-
-        single_mod = Home_::Image_Output_Adapters_
-
-        _ = "#{ single_mod.dir_pathname.to_path }/[a-z0-9]*"
+        # to address the PRO's *and* CON's in [#010], the below strikes a
+        # "good" compromise: assume that the filesystem can always change
+        # so every single time this is requested, hit it anew. but each
+        # time the filesystem results in the "same" glob result, only ever
+        # calculate the index of this result once.
+        # (for testing we can do a hack to cache this filessystem hit if OCD)
 
         _fs = @kernel_.silo( :Installation ).filesystem
 
-        _paths = _fs.glob _
+        single_mod = Home_::Image_Output_Adapters_
 
-        Here_::Index___.new( _paths, single_mod ).array
+        _glob_path = "#{ single_mod.dir_pathname.to_path }/[a-z0-9]*"
+
+        paths = _fs.glob _glob_path
+
+        cache = @kernel_.FOREVER_CACHE
+
+        a = cache.fetch paths do  # would not scale out per namespacing
+          x = Here_::Index___.new( paths, single_mod ).array
+          cache[ paths ] = x
+          x
+        end
+
+        Callback_::Stream.via_nonsparse_array a
       end
     end
 

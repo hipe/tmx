@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - filesystem - bridges - patch" do
+  describe "[sy] services - patch" do
 
     TS_[ self ]
     use :expect_event
@@ -78,8 +78,10 @@ module Skylab::System::TestSupport
 
     def produce_temporary_directory
 
-      @__last_tmpdir__ = prepared_tmpdir
-      @__last_tmpdir__.to_path
+      _td = prepared_tmpdir
+      path = _td.to_path
+      @_last_tmpdir_path = path
+      path
     end
 
     def prepared_tmpdir
@@ -97,22 +99,22 @@ module Skylab::System::TestSupport
     # ~ patches
 
     def patch_file_for_file
-      _my_fixtures_dirname.join( 'one-line.patch' ).to_path
+      ::File.join _my_fixtures_dirname, 'one-line.patch'
     end
 
     def patch_file_for_directory
-      _my_fixtures_dirname.join( 'minimal-deep.patch' ).to_path
+      ::File.join _my_fixtures_dirname, 'minimal-deep.patch'
     end
 
-    def _my_fixtures_dirname
-      TS_.dir_pathname.join 'services/filesystem/bridges/patch/fixtures'
-    end
+    define_method :_my_fixtures_dirname, ( Callback_::Lazy.call do
+      ::File.join TS_.dir_pathname.to_path, 'services/74-patch/fixtures'
+    end )
 
     # ~ execution
 
     def _against * x_a
 
-      @result = services_.filesystem.patch( * x_a, & handle_event_selectively_ )
+      @result = services_.patch( * x_a, & handle_event_selectively_ )
       nil
     end
 
@@ -131,7 +133,7 @@ module Skylab::System::TestSupport
     # ~ expected files
 
     def _expected_path_that_will_be_created
-      @__last_tmpdir__.join( 'make-this-dir/one-file' ).to_path
+      ::File.join @_last_tmpdir_path, 'make-this-dir/one-file'
     end
   end
 end

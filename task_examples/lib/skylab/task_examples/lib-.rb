@@ -17,10 +17,6 @@ module Skylab::TaskExamples
       Callback_::Name::Methodize[ sym ]
     end
 
-    Path_tools = -> do
-      System[].filesystem.path_tools
-    end
-
     Task = sidesys[ :Task ]
 
     System = -> do

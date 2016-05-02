@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Normalizations_::Path_Based  # read [#004.G] near states
+    class Normalizations::Path_Based  # read [#004.G] near states
     private
 
       Attributes_actor_[ self ]
@@ -118,12 +118,12 @@ module Skylab::System
 
       def __call_for__up__ st, & x_p
 
-        _call_this_guy Normalizations_::Upstream_IO, st, & x_p
+        _call_this_guy Sibling__::Upstream_IO, st, & x_p
       end
 
       def __call_for__down__ st, & x_p
 
-        _call_this_guy Normalizations_::Downstream_IO, st, & x_p
+        _call_this_guy Sibling__::Downstream_IO, st, & x_p
       end
 
       def _call_this_guy cls, st, & oes_p
@@ -325,6 +325,7 @@ module Skylab::System
 
       Callback_::Event.selective_builder_sender_receiver self
 
+      Sibling__ = Normalizations
     end
   end
 end

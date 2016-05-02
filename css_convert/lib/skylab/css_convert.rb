@@ -43,10 +43,6 @@ module Skylab::CSS_Convert
       path
     end
 
-    Path_tools = -> do
-      System[].filesystem.path_tools
-    end
-
     System = -> do
       System_lib[].services
     end

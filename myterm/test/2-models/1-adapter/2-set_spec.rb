@@ -33,7 +33,7 @@ module Skylab::MyTerm::TestSupport
     context "successful initial set" do
 
       call_by do
-        call_plus_ACS :adapter, "imagemag"
+        call :adapter, "imagemag"
       end
 
       it "result is the qk of the newly created adapter" do

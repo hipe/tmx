@@ -1,8 +1,13 @@
 module Skylab::System
 
-  class Services___::Filesystem
-    # <-
-  class Models::Directory::As::Collection
+  module Filesystem
+
+    module Directory
+
+      As = ::Module.new
+      class As::Collection
+
+        # <-x2
 
     # model a filesystem directory as *cold* entity that exposes an ACS
     # edit session. (hot/cold in [#ac-006]. sections are per [#ac-005].)
@@ -313,7 +318,8 @@ module Skylab::System
     end
 
     MONADIC_TRUTH_ = -> _ { true }
-  end
-# ->
+  # -> x2
+      end
+    end
   end
 end

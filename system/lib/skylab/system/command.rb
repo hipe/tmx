@@ -1,12 +1,10 @@
 module Skylab::System
 
-  Sessions_ = ::Module.new
-
-  module Sessions_::Janus_Command
+  module Command
 
     # a "janus command" is an abstraction that wraps an array of strings
     # intended to be used as a system command (that is, anything that you
-    # might enter at the shell) while hiding its particular soultion to
+    # might enter at the shell) while hiding its particular solution to
     # a general problem:
     #
     # for reasons we prefer to send system commands to the system as an

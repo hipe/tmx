@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Normalizations_::Upstream_IO < FS_::Normalizations_::Path_Based  # [#004.B].
+    class Normalizations::Upstream_IO < Normalizations::Path_Based  # [#004.B].
     private
 
       def initialize _fs
@@ -34,7 +34,7 @@ module Skylab::System
 
         x = gets_one_polymorphic_value
         if x.respond_to? :id2name
-          x = FS_.const_get x, false
+          x = Home_::Filesystem.const_get x, false
         end
 
         @_expected_ftype = x

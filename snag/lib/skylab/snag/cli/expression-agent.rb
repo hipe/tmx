@@ -71,10 +71,17 @@ module Skylab::Snag
       # ~~ )
 
       def pth x
+
         if x.respond_to? :to_path
           x = x.to_path
         end
-        Home_.lib_.pretty_path x
+
+        if ::File::SEPARATOR == x[ 0 ]
+          @___pather ||= Home_.lib_.system.new_pather
+          @___pather.call x
+        else
+          x
+        end
       end
 
       def val x

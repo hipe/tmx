@@ -4,7 +4,7 @@ module Skylab::MyTerm::TestSupport
 
     _build_faked_out_kernel = Lazy_.call do
 
-      ke = Home_::Custom_Kernel___.new Home_, :Models_  # •cp2
+      ke = Home_::Invocation_Kernel___.new Home_::Models_
 
       inst = ke.silo :Installation
 

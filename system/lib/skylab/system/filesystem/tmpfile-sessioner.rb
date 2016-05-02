@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Sessions_::Tmpfile_Sessioner
+    class Tmpfile_Sessioner
 
       # ->
 

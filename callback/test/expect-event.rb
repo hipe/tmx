@@ -236,11 +236,21 @@ module Skylab::Callback::TestSupport
 
       def __build_expev_debug_auxil_proc
 
+        # eek - this is a tradeoff. when an API call is resulting in the
+        # "wrong" event, this level of detail can be helpful but at the
+        # cost of a large library footprint .. see tombstone
+
         io = debug_IO
 
-        -> i_a, & _ev_p do
-          io.puts i_a.inspect
-          UNRELIABLE_
+        br = Home_.lib_.brazen
+        _expag = br::API.expression_agent_instance
+        o = br::CLI_Support::Expression_Agent::Handler_Expresser.new _expag
+        o.downstream_stream = io
+        o = o.finish
+
+        -> i_a, & ev_p do
+          io.write "#{ i_a.inspect } "
+          o.handle i_a, & ev_p
         end
       end
 
@@ -952,10 +962,13 @@ module Skylab::Callback::TestSupport
 
       def ___proc_for_when_ignored_under_mux aux_chan_p
 
+        # ignoring means ignoring BUT if debugging is on then we ignore the
+        # content but not thechanne
+
         -> sym_a, & ev_p do
 
-          aux_chan_p.call( [ :event_ignored, * sym_a ] ) do
-            self._DESIGN_ME
+          aux_chan_p.call [ :event_ignored, :expression, * sym_a ] do |y|
+            y << "(ignored this emission)"
           end
 
           UNRELIABLE_
@@ -999,9 +1012,9 @@ module Skylab::Callback::TestSupport
 
           _unreliable = record[ sym_a, & p ]
 
-          aux_chan_p.call sym_a do
-            self._DESIGN_ME
-          end
+          # DOUBLE-BUILDING
+
+          aux_chan_p.call sym_a, & p
 
           UNRELIABLE_
         end
@@ -1129,3 +1142,4 @@ module Skylab::Callback::TestSupport
     UNRELIABLE_ = false
   end
 end
+# #tombstone - simple debugging output

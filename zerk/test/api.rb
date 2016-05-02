@@ -105,10 +105,6 @@ module Skylab::Zerk::TestSupport
 
       def call * x_a
 
-        _zerk_expect_API_call :init_result_for_zerk_expect_API, x_a
-      end
-
-      def call_plus_ACS * x_a
         _zerk_expect_API_call :init_result_and_root_ACS_for_zerk_expect_API, x_a
       end
 
@@ -140,7 +136,7 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def init_result_for_zerk_expect_API x_a, & pp
+      def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
 
         @root_ACS ||= build_root_ACS  # build COLD root ACS
         @result = Home_::API.call x_a, @root_ACS, & pp

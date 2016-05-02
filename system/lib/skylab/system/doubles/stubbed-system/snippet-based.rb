@@ -94,8 +94,6 @@ module Skylab::System
           @__wait = Stubbed_Thread.new d ; nil
         end
       end
-
-      NOTHING_ = nil
     end
   end
 end

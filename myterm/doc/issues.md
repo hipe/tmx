@@ -13,7 +13,7 @@
 
 [#011] #open this rewrite (i.e when #milestone-8)
 
-[#010] #hole
+[#010]       caching pros, cons and a solution ..
              ( #was: slightly customize help screen to show weird syntax )
              ( #was: all silo daemons )
 

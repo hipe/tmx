@@ -1,3 +1,4 @@
+[#033] #open feature islands
 [#032]       alternative (simplified) implementations of [#027] stubbed FS
 [#031]       [ processes ]
 [#030]       chunker & related
@@ -17,8 +18,7 @@
 [#002]       [ flock etc ]
 [#003]       [ the FS byte upstream ID ]
 [#004]       #parent-node: [#010] the normalizers ..
-[#005] #open unify pretty path ..
-             the path tools narrative ..
+[#005]       the path tools narrative ..
 [#006]       #track universal uses of `select`-style operations
 [#007]       [ hack guess module tree ] #parent-node: [#009]
 [#008]       #in-situ hard-coded in-project tmpdir path!

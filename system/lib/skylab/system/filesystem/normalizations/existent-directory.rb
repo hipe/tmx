@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Normalizations_::Existent_Directory < Normalizations_::Path_Based
+    class Normalizations::Existent_Directory < Normalizations::Path_Based
     private
 
       def initialize _fs

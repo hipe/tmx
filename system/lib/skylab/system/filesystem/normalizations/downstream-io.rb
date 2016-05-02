@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Filesystem
+  module Filesystem
 
-    class Normalizations_::Downstream_IO < Normalizations_::Path_Based  # :[#004.D]
+    class Normalizations::Downstream_IO < Normalizations::Path_Based  # :[#004.D]
     private
 
       def initialize _fs

@@ -13,7 +13,7 @@ module Skylab::MyTerm
         @_a = [ 'convert' ]
         @appearance = @_mags.appearance_
         _ = @appearance.kernel_.silo :Installation
-        @image_output_path = _.get_volatile_image_path
+        @image_output_path = _.volatile_image_path
 
         ok = __populate_options_recursively
         ok &&= __add_label

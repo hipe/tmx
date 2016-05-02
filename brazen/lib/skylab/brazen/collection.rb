@@ -27,7 +27,7 @@ module Skylab::Brazen
       class << self
 
         def via_path s
-          Home_.lib_.system.filesystem.class::Byte_Upstream_Identifier.new s
+          Home_.lib_.system_lib::Filesystem::Byte_Upstream_Identifier.new s
         end
 
         def via_stream io
@@ -83,7 +83,7 @@ module Skylab::Brazen
         end
 
         def via_path s
-          Home_.lib_.system.filesystem.class::Byte_Downstream_Identifier.new s
+          Home_.lib_.system_lib::Filesystem::Byte_Downstream_Identifier.new s
         end
 
         def via_stream io

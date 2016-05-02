@@ -60,17 +60,37 @@ module Skylab::Callback::TestSupport
 
       # (no you can't turn debugging on for these..)
 
-      it "it reports the channel (only) of each logged event" do
+      it "when not expression, reports channel and expresses event" do
+
+        ev = -> y, expag do
+          expag.calculate do
+            y << "fake event #{ highlight 'hello' }"
+          end
+        end
+        ev.singleton_class.send :alias_method, :express_into_under, :call
 
         send_potential_event_ :x, :wazoo_wee do
-          :_no_see_
+          ev
         end
 
-        @debug_IO.string.should eql "[:x, :wazoo_wee]\n"
+        @debug_IO.string == "[:x, :wazoo_wee] fake event ** hello **\n" or fail
 
         _em = @event_log.gets
 
         _em.channel_symbol_array.fetch( 1 ) == :wazoo_wee or fail
+      end
+
+      it "when expression, reports channel and expresses expression" do
+
+        send_potential_event_ :x, :expression, :y do |y|
+          y << "hello #{ highlight 'hi' }"
+        end
+
+        @debug_IO.string == "[:x, :expression, :y] hello ** hi **\n" or fail
+
+        _em = @event_log.gets
+
+        _em.channel_symbol_array == [ :x, :expression, :y ] or fail
       end
 
       def do_debug
@@ -89,9 +109,9 @@ module Skylab::Callback::TestSupport
 
           io = @debug_IO
           io.rewind
-          io.gets.should eql "[:event_ignored, :zizzo]\n"
-          io.gets.should eql "[:zizzo, :zIZZo]\n"  # not ignored
-          io.gets.should eql "[:event_ignored, :hi, :zizzo]\n"
+          io.gets == "[:event_ignored, :expression, :zizzo] (ignored this emission)\n" or fail
+          io.gets == "[:zizzo, :expression, :zIZZo] ** zeez **\n" or fail  # not ignored
+          io.gets == "[:event_ignored, :expression, :hi, :zizzo] (ignored this emission)\n" or fail
           io.gets and fail
         end
 
@@ -109,15 +129,15 @@ module Skylab::Callback::TestSupport
         self._NEVER
       end
 
-      send_potential_event_ :zizzo, :zIZZo do
-        :_no_see_
+      send_potential_event_ :zizzo, :expression, :zIZZo do |y|
+        y << highlight( 'zeez' )
       end
 
       send_potential_event_ :hi, :zizzo do
         self._NEVER
       end
 
-      @event_log.gets.channel_symbol_array == [ :zizzo, :zIZZo ] or fail
+      @event_log.gets.channel_symbol_array == [ :zizzo, :expression, :zIZZo ] or fail
 
       @event_log.gets and fail
     end

@@ -88,7 +88,7 @@ module Skylab::MyTerm::TestSupport
         expect :last_line, %r(\Aapparently set iTerm background image to )
       end
 
-      def system_conduit
+      def system_conduit_for_niCLI_
         TS_::Stubs::System_Conduit_02_Yay.produce_new_instance
       end
     end

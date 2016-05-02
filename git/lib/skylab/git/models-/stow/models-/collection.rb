@@ -53,7 +53,7 @@ module Skylab::Git
 
       def to_entity_stream
 
-        _dac = Home_.lib_.system.filesystem_lib::Models::Directory::As::Collection.new do | o |
+        _dac = Home_.lib_.system_lib::Filesystem::Directory::As::Collection.new do |o|
 
           o.directory_path = @path
           o.directory_is_assumed_to_exist = true  # so it whines

@@ -369,7 +369,7 @@ module Skylab::Snag
 
           def __build_wrote_event d, path
 
-            Home_.lib_.system.filesystem_lib.event( :Wrote ).new_with(
+            Home_.lib_.system_lib::Filesystem::Events::Wrote.new_with(
               :preterite_verb, 'updated',
               :bytes, d,
               :path, path )

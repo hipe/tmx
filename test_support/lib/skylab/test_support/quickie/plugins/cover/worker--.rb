@@ -156,7 +156,7 @@ module Skylab::TestSupport
 
       def reprt_tried_these_paths tried_a
 
-        p = Home_.lib_.system.filesystem.path_tools.pretty_path
+        p = Home_.lib_.system.new_pather.method :call
 
         _a = tried_a.reduce [] do | m, x |
           m.push p[ x ]

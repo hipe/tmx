@@ -69,6 +69,13 @@ module Skylab::Brazen
           ( @_filters_by_channel ||= [] ).push p ; nil
         end
 
+        def downstream_stream= io
+          @downstream_yielder = ::Enumerator::Yielder.new do |s|
+            io.puts s
+          end
+          io
+        end
+
         attr_writer(
           :downstream_yielder,
         )
