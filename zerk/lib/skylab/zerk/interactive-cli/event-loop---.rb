@@ -89,7 +89,7 @@ module Skylab::Zerk
 
       a_p = @_view_maker_maker.custom_tree_array_proc__
       if a_p
-        _load_ticket = Here_::Load_Ticket_::Root.new a_p
+        _load_ticket = Here_::Load_Ticket_::Root.via_array_proc a_p
       end
 
       @top_frame = _build_compound_adapter top_ACS, _load_ticket

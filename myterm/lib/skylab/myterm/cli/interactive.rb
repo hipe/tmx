@@ -6,7 +6,13 @@ module Skylab::MyTerm
 
       class << self
 
-        def build_classesque__
+        def build_classesque__  # #test-point
+
+          _cli = begin_CLI_
+          _cli.to_classesque
+        end
+
+        def begin_CLI_
 
           Require_zerk_[]
 
@@ -24,7 +30,7 @@ module Skylab::MyTerm
             vmm
           end
 
-          cli.to_classesque
+          cli
         end
       end  # >>
 
@@ -49,8 +55,8 @@ module Skylab::MyTerm
               ]
             end,
 
-            bg_font: -> do
-              []  # [ :mask ]  # is [#ze-041]
+            bg_font: -> o do
+              o.mask nil
             end,
 
             eg_compound_1: -> do

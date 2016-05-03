@@ -10,7 +10,7 @@ module Skylab::Zerk
 
           _ = Node_ticket_4_category_[ nt ]
           _cls = This_.const_get NT3___.fetch _
-          _cls.new x, nt, moda_frame
+          _cls._via_three x, nt, moda_frame
         end
       end  # >>
 
@@ -21,9 +21,7 @@ module Skylab::Zerk
         primitivesque: :Primitivesque___,
       }
 
-      Common_Customization_DSL__ = ::Class.new ::BasicObject
-
-      class Common_Customization_DSL__
+      class Common_Customization_DSL__ < ::BasicObject
 
         def initialize lt, a_p
           @load_ticket = lt
@@ -36,6 +34,12 @@ module Skylab::Zerk
             __when_newschool
           else
             __when_oldschool
+          end
+
+          if @load_ticket.__is_masked
+            NOTHING_
+          else
+            @load_ticket
           end
         end
 
@@ -65,17 +69,19 @@ module Skylab::Zerk
           @load_ticket.__receive_custom_hotstring_pieces s_a ; nil
         end
 
+        def mask _
+          @load_ticket.__be_masked ; nil
+        end
+
         def on_change x
           @load_ticket.__receive_on_change x ; nil
         end
       end
 
-      COMMON_LEAF_INITIALIZE__ = -> cust_a_p, node_ticket, modality_frame do
-        @_customization_a_p = cust_a_p
+      COMMON_LEAF_INITIALIZE__ = -> node_ticket, modality_frame do
         @_moda_frame = modality_frame
         @name = node_ticket.name
         @node_ticket = node_ticket
-        @_prepare = true
       end
 
       NonRoot_Methods__ = ::Module.new
@@ -95,11 +101,13 @@ module Skylab::Zerk
 
       class Root < Compound__
 
-        # (only for when customizations on root frame)
+        class << self
+          def via_array_proc a_p
+            Compound_Customization_DSL__.new( new, a_p ).execute
+          end
+        end # >>
 
-        def initialize a_p
-          Compound_Customization_DSL__.new( self, a_p ).execute
-        end
+        # (only for when customizations on root frame)
       end
 
       class NonRoot_NonCompound__ < self
@@ -111,20 +119,12 @@ module Skylab::Zerk
 
       module NonRoot_Methods__
 
-        def custom_hotstring_structure
-          @_prepare && _prepare
-          @_custom_hotstring_structure
-        end
-
-        def _prepare
-          @_custom_hotstring_structure = nil
-          super
-        end
-
         def __receive_custom_hotstring_pieces a
-          @_custom_hotstring_structure = Here_::Buttonesque_Expression_Adapter_.new( * a, self )
+          @custom_hotstring_structure = Here_::Buttonesque_Expression_Adapter_.new( * a, self )
           NIL_
         end
+
+        attr_reader :custom_hotstring_structure
 
         def node_ticket
           @node_ticket  # (hi.)
@@ -211,7 +211,7 @@ module Skylab::Zerk
 
       class Atomesque__
 
-        def initialize cust_x, nt, moda_frame
+        def initialize nt, moda_frame
           @association = nt.association
           super
         end
@@ -226,6 +226,10 @@ module Skylab::Zerk
           @on_change__ = p ; nil
         end
 
+        def __be_masked
+          @__is_masked = true ; nil
+        end
+
         # --
 
         def to_qualified_knownness__
@@ -238,6 +242,7 @@ module Skylab::Zerk
 
         attr_reader(
           :association,
+          :__is_masked,
           :on_change__,
         )
 
@@ -247,19 +252,25 @@ module Skylab::Zerk
       end
 
       # -
+        class << self
 
-        def _prepare
-
-          @_prepare = false  # definitely do this ALWAYS
-
-          _cls = _DSL_class
-          x = remove_instance_variable :@_customization_a_p
-
-          if x
-            _cls.new( self, x ).execute
+          def _via_three x, nt, moda_frame
+            o = new nt, moda_frame
+            if x
+              _cls = o._DSL_class
+              _cls.new( o, x ).execute
+            else
+              o
+            end
           end
 
-          NIL_
+          private :new
+        end  # >>
+
+        # --
+
+        def __is_masked
+          false
         end
 
       # -

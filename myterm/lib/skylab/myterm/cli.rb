@@ -23,6 +23,20 @@ module Skylab::MyTerm
 
     def invoke argv
 
+      if argv.length.zero?
+
+        cli = Here_::Interactive.begin_CLI_
+        cli.universal_CLI_resources @sin, @sout, @serr, @pn_s_a
+        cli = cli.finish  # (does nothing at writing)
+
+        cli.invoke argv  # argv is empty. result is exitstatus
+      else
+        __invoke_non_interactive argv
+      end
+    end
+
+    def __invoke_non_interactive argv
+
       Require_zerk_[]
 
       acs = Home_.build_root_ACS_

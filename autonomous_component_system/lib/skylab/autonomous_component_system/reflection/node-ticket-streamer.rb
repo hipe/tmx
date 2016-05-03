@@ -62,8 +62,8 @@ module Skylab::Autonomous_Component_System
 
       def execute
 
-        @on_association ||= method :__node_for_first_association
-        @on_operation ||= method :__node_for_first_operation
+        @on_association ||= default_on_association
+        @on_operation ||= default_on_operation
 
         # hand-write a map-reduce for clarity
 
@@ -89,26 +89,35 @@ module Skylab::Autonomous_Component_System
         operation: :@on_operation,
       }
 
-      def __node_for_first_association first_en
+      # the below is initted lazily once per stream
 
-        # the below is initted lazily once per stream
+      def default_on_association
 
-        node = NodeTicket_for_Assoc___.new @_reader
-        p = -> en do
-          node.new en
+        p = -> first_en do
+          node = NodeTicket_for_Assoc___.new @_reader
+          p = -> en do
+            node.new en
+          end
+          p[ first_en ]
         end
-        @on_association = p
-        p[ first_en ]
+
+        -> first_en do
+          p[ first_en ]
+        end
       end
 
-      def __node_for_first_operation first_en
+      def default_on_operation
 
-        node = NodeTicket_for_Operation___.new @_reader
-        p = -> en do
-          node.new en
+        p = -> first_en do
+          node = NodeTicket_for_Operation___.new @_reader
+          p = -> en do
+            node.new en
+          end
+          p[ first_en ]
         end
-        @on_operation = p
-        p[ first_en ]
+        -> first_en do
+          p[ first_en ]
+        end
       end
 
       # <-

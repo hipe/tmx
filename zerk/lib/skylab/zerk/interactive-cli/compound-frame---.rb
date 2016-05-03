@@ -15,7 +15,6 @@ module Skylab::Zerk
       if lt
         @_load_ticket = lt
         h = lt.custom_tree_hash__
-        # :#here also something about masking, at [#041]
       end
 
       @__any_custom_tree_hash = h
@@ -50,16 +49,18 @@ module Skylab::Zerk
       NIL_
     end
 
+    def to_every_node_ticket_stream_  # near c.p w/ #spot-7
+
+      Callback_::Stream.via_nonsparse_array @_load_tickets_for_UI do |x|
+        x.node_ticket
+      end
+    end
+
     def __index_for_UI_panel
 
       # (when you get to [#021] availability, maybe here is where you would
       # do some serious indexing to make some nodes (of various sorts)
       # disabled (that is, not visible or accessible at all)..)
-
-      o = reader_writer.to_node_ticket_streamer
-      o.on_association = nil  # (hi.) x2
-      o.on_operation = nil
-      st = o.execute
 
       load_tickets = []
 
@@ -68,6 +69,8 @@ module Skylab::Zerk
       butz = Here_::Buttonesque_Expression_Adapter_::Frame.begin
 
       h = @__any_custom_tree_hash || MONADIC_EMPTINESS_
+
+      st = reader_writer.to_node_ticket_streamer.execute
 
       begin
         nt = st.gets
@@ -78,7 +81,9 @@ module Skylab::Zerk
         end
 
         _cust_x = h[ nt.name_symbol ]
+
         lt = Here_::Load_Ticket_[ _cust_x, nt, self ]
+        lt or redo
 
         butz.add lt
         load_tickets.push lt
@@ -123,15 +128,6 @@ module Skylab::Zerk
       ss.push nt.name
       _fo = nt.proc_to_build_formal_operation.call ss
       _fo  # #todo
-    end
-
-    def to_every_node_ticket_stream_  # near c.p w/ #spot-7
-
-      sr = reader_writer.to_node_ticket_streamer
-
-      # .. see #here
-
-      sr.call
     end
 
     def for_invocation_read_atomesque_value_ asc
