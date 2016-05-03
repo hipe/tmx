@@ -88,8 +88,11 @@ module Skylab::Brazen
       end
 
       def par prp  # referenced by :[#115].
-
-        highlight parameter_in_black_and_white prp
+        if prp
+          highlight parameter_in_black_and_white prp
+        else
+          prp
+        end
       end
 
       def parameter_in_black_and_white prp

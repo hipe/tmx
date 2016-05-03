@@ -69,7 +69,7 @@ module Skylab::Zerk
           @load_ticket.__receive_custom_hotstring_pieces s_a ; nil
         end
 
-        def mask _
+        def mask _=nil
           @load_ticket.__be_masked ; nil
         end
 

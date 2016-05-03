@@ -317,10 +317,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       attr_reader :transitive_capabilities_box
 
-      # ~ default
+      # ~ default - there is no implementation of this in [ac]. see [#ze-041]
 
       def accept__default__meta_component x
-        @default_proc = x ; nil
+        @default_proc = -> { x } ; nil
       end
 
       attr_reader :default_proc

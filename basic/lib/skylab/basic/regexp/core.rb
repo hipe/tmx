@@ -209,6 +209,7 @@ module Skylab::Basic
         def _failed & oes_p_p
           _oes_p = oes_p_p[ nil ]
           @on_failure_to_match[ :_reserved_, & _oes_p ]
+          UNABLE_
         end
 
         def [] arg_st, & x_p

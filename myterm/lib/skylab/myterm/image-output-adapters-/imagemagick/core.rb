@@ -6,7 +6,6 @@ module Skylab::MyTerm
 
       @_svc = svc
       @_unavailability = method :__image_gen_related_component_unavailability
-      @_use_cached_unavailability = false
     end
 
     # -- Operations
@@ -31,6 +30,10 @@ module Skylab::MyTerm
 
       yield :unavailability, @_unavailability
 
+      yield :description, -> y do
+        y << "just show the AppleScript that talks to iTerm (debugging)"
+      end
+
       -> & call_p do
 
         if 1 == call_p.arity
@@ -43,6 +46,10 @@ module Skylab::MyTerm
 
     def __imagemagick_command__component_operation
 
+      yield :description, -> y do
+        y << "just show the command-line `convert` arguments (debugging)"
+      end
+
       yield :unavailability, @_unavailability
 
       -> & call_p do
@@ -51,18 +58,6 @@ module Skylab::MyTerm
     end
 
     def __image_gen_related_component_unavailability _fo
-
-      if @_use_cached_unavailability
-        @_cached_unavailability
-      else
-        @_use_cached_unavailability = true   # #open [#014] - at #milestone-8 maybe use [ze] index instead
-        x = ___determine_image_generational_unavailability
-        @_cached_unavailability = x
-        x
-      end
-    end
-
-    def ___determine_image_generational_unavailability
 
       _rw = @_svc.reader_writer__
 
@@ -129,6 +124,95 @@ module Skylab::MyTerm
       yield :generate_description
 
       Home_.lib_.basic::String.component_model_for :NONBLANK
+    end
+
+    # ~ non-requireds below here
+
+    # (`default` does nothing presently)
+
+    def __pointsize__component_association
+
+      yield :description, -> y do
+        y << "in this context, larger pointsize means more pixels.."
+      end
+
+      # an aesthetically appropriate value depends on the (pixel) `size`
+      # of the image being generated.
+
+      # yield :default, 90  # this is annoying until [#ze-042] clearable
+
+      Home_.lib_.basic::Number.component_model_for :POSITIVE_INTEGER
+    end
+
+    def __fill_color__component_association
+
+      yield :description, -> y do
+        y << "sets the 'fill' (color) of the generated image (text)"
+      end
+
+      yield :default, :grey
+
+      yield :internal_name, :fill
+
+      Home_::Models_::Color
+    end
+
+    def __background_color__component_association
+
+      yield :description, -> y do
+        y << "sets the 'background' (color) of the generated image"
+      end
+
+      yield :default, :transparent
+
+      yield :internal_name, :background
+
+      Home_::Models_::Color
+    end
+
+    def __size__component_association
+
+      # (note, despite association caching the below beast might be built
+      # multiple times in one invocation - WHY)
+
+      yield :description, -> y do
+        y << "\"HxW\" in pixels"
+      end
+
+      yield :default, '720x720'
+
+      # (for reference, macbook air 13" screen resolution is 1440x900)
+      # (we don't understand this fully yet, but square dimensions seem
+      #  to be what you want.)
+
+      Home_.lib_.basic::Regexp.build_component_model do |o|
+
+        o.matcher = /\A(\d+)[xX](\d+)\z/
+
+        o.mapper = -> w_s, h_s do
+
+          # so that this is ready to be sent to the backend,
+          # we actually go and convert this back to a string
+
+          "#{ w_s }x#{ h_s }"
+        end
+
+        o.on_failure_to_match = -> _reserved, & oes_p do
+
+          oes_p.call :error, :expression, :is_not, :width_height do | y |
+            y << "must be of the form \"123x456\""
+          end
+        end
+      end
+    end
+
+    def __gravity__component_association
+
+      yield :generate_description
+
+      yield :default, :northeast
+
+      Home_.lib_.basic::String.component_model_for :NONBLANK_TOKEN
     end
 
     # --

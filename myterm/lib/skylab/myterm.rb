@@ -91,16 +91,30 @@ module Skylab::MyTerm
     end
   end
 
+  Callback_ = ::Skylab::Callback
+
+  Autoloader_ = Callback_::Autoloader
+
+  module Models_
+
+    Color = -> arg_st, & oes_p_p do  # stowaway
+
+      _String = Home_.lib_.basic::String
+
+      _ = _String.component_model_for :NONBLANK_TOKEN
+
+      _[ arg_st, & oes_p_p ]
+    end
+
+    Autoloader_[ self ]
+  end
+
   # -- context experiments..
 
   _LL = nil
   Linked_list_ = -> do
     _LL ||= Home_.lib_.basic::List::Linked
   end
-
-  Callback_ = ::Skylab::Callback
-
-  Autoloader_ = Callback_::Autoloader
 
   # -- Simple functionesques
 
@@ -150,7 +164,6 @@ module Skylab::MyTerm
   EMPTY_S_ = ''
   Home_ = self
   Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
-  Autoloader_[ Models_ = ::Module.new ]
   NIL_ = nil
   NOTHING_ = nil
   SPACE_ = ' '

@@ -40,7 +40,11 @@ module Skylab::Zerk
     # -- ..
 
     def begin_UI_panel_expression
-      __index_for_UI_panel
+
+      # you've got to index "every time" you come to this frame, in case
+      # (for example) an adapter has changed in your plugin architecture.
+
+      __reindex_everything
       NIL_
     end
 
@@ -56,7 +60,7 @@ module Skylab::Zerk
       end
     end
 
-    def __index_for_UI_panel
+    def __reindex_everything
 
       # (when you get to [#021] availability, maybe here is where you would
       # do some serious indexing to make some nodes (of various sorts)
@@ -83,11 +87,18 @@ module Skylab::Zerk
         _cust_x = h[ nt.name_symbol ]
 
         lt = Here_::Load_Ticket_[ _cust_x, nt, self ]
-        lt or redo
+        lt or redo  # #masking
 
         butz.add lt
         load_tickets.push lt
 
+        # (the remainder of this loop is for #defaults)
+
+        :association == nt.node_ticket_category or redo
+        asc = nt.association
+        p = asc.default_proc
+        p or redo
+        reader_writer.write_if_not_set Callback_::Qualified_Knownness[ p[], asc ]
         redo
       end while nil
 

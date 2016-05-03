@@ -2,9 +2,11 @@
 
 [#015]       introduction to generated modality clients ..
 
-[#014] #open (this unavailability hullabullooo)
+[#014] #wish when [#ze-043] niCLI defaults, this will be nice.
+             ( #was: this unavailability hullabullooo )
 
-[#013] #open if you rip out the flyweightism from font, ..
+[#013] #open roundrobin and related ..
+             ( #was: something about the flyweightism of font )
 
 [#012] #open specs are currently not faked so they're built assuming
              particular fonts are found.. (but given the scope of this
@@ -21,7 +23,9 @@
             ( #was: remove blocks tagged with `#eventually` )
 
 [#008] #wish info
-[#007] #wish clear
+
+[#007] #wish clear (workaround: Ctrl-+ and Ctrl--)
+
 [#006] #wish defaults
 [#005] #wish unicode
 [#004]       principal algorithms

@@ -36,7 +36,7 @@ module Skylab::MyTerm::TestSupport
 
         input(
           'a', 'ima',  # set the adapter
-          'ba',  # enter into the "background front" frame
+          'f',  # enter into the "background front" frame
           'li',  # list them (not necessary, just covering it)
           'p', 'lucida',  # set the background font via path
           nil,  # jump down one frame

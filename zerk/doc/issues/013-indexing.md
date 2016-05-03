@@ -62,9 +62,10 @@ these are the main challenges of implementing the above:
          \         /
           +-> C <-+
 
-  • we don't want to cache "too much": in a [#ac-023] fantastical world
-    where a root ACS outlives the fulfillment of *one* user-requested
-    operation, we don't want all this subject caching to mask the actual
+  • we don't want to cache "too much": in modalities or scenarios where
+    [#ac-023] the ACS outlives the the fulfillment of *one* user-requested
+    operation (for example iCLI, but maybe also a fantastical daemon);
+    we don't want all this subject caching to mask the actual
     state of the tree.
 
   • this general problem (that we refer to as [#027] "parameter sharing")

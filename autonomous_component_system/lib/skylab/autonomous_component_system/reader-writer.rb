@@ -56,6 +56,7 @@ module Skylab::Autonomous_Component_System
       _read_formal_operation_: :__build_read_formal_operation,
       _read_value_: :__build_value_reader,
       _to_node_ticket_streamer_: :__build_node_ticket_streamer,
+      _write_if_not_set_: :__build_write_if_not_set,
       _write_value_: :__build_value_writer,
     }
 
@@ -150,6 +151,27 @@ module Skylab::Autonomous_Component_System
     end
 
     # -
+
+    def write_if_not_set qk
+      @_cached[ :_write_if_not_set_ ][ qk ]
+    end
+
+    def __build_write_if_not_set
+
+      rv = @_cached[ :_read_value_ ]
+      wv = @_cached[ :_write_value_ ]
+
+      -> qk do
+
+        kn = rv[ qk ]
+        if kn.is_effectively_known
+          UNABLE_
+        else
+          wv[ qk ]
+          ACHIEVED_
+        end
+      end
+    end
 
     def touch_component asc  # #experimental [ze] 1x
       Home_::Interpretation::Touch[ asc, self ]  # qk

@@ -12,8 +12,8 @@ module Skylab::MyTerm
         p[ new.__init_as_entity acs ]
       end
 
-      def __new_flyweight k
-        new.__init_as_flyweight k
+      def __new_flyweight ke
+        new.__init_as_flyweight ke
       end
 
       private :new

@@ -4,6 +4,11 @@ module Skylab::MyTerm
 
     module Interactive
 
+      # for interactive CLI, the customization necessary mostly involves
+      # the usual needing to chose aesthetically appropriate "hotrings".
+      # also it is necessary to hook into something so we know when the
+      # adapter changes.
+
       class << self
 
         def build_classesque__  # #test-point
@@ -55,8 +60,20 @@ module Skylab::MyTerm
               ]
             end,
 
+            background_font: -> o do
+              o.hotstring_delineation %w(background- f ont)
+            end,
+
             bg_font: -> o do
-              o.mask nil
+              o.mask
+            end,
+
+            fill_color: -> o do
+              o.hotstring_delineation %w( fill- c olor )
+            end,
+
+            size: -> o do
+              o.hotstring_delineation %w( si z e )
             end,
 
             eg_compound_1: -> do

@@ -1,3 +1,12 @@
+[#043] #wish do something with the `default` for atomic components in
+             niCLI. (needs design.) has subscribers.
+
+[#042] #wish iCLI some idiom for clearing an atomic component
+             (like entering a blank string). perhaps a `clearable`
+             meta-component.
+
+[#041]       defaulting across the bundled modalities ..
+
 [#040] #open unify expression agent-ry between niCLI and iCLI
              #after #milestone-9 AND
              #after [#sy-005] unify pretty path

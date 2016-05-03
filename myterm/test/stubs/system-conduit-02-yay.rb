@@ -14,8 +14,8 @@ module Skylab::MyTerm::TestSupport
     sc._add_entry_by_ do |cmd_s_a|
 
       if 'convert' == cmd_s_a.first
-        cmd_s_a[ 1 ] == '-font' or fail
-        cmd_s_a[ 3 ] == 'label:djibouti' or fail
+        cmd_s_a.include? '-font' or fail
+        cmd_s_a.include? 'label:djibouti' or fail
         -> _, _, _ do
           0
         end

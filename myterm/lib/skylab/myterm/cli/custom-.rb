@@ -4,7 +4,8 @@ module Skylab::MyTerm
 
     module Custom_
 
-      # apparently darently
+      # the non-interactive CLI client requires work to accomodate
+      # our custom syntax for setting the adapter.
 
       class Compound_usage_strings < Callback_::Actor::Dyadic
 

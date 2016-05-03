@@ -177,6 +177,8 @@ module Skylab::Basic
 
             _new_invalid_event.did_not_match @x, _assoc, @number_set
           end
+
+          UNABLE_  # result from above is unreliable
         end
 
         include Simple_Selective_Sender_Methods_
@@ -219,6 +221,8 @@ module Skylab::Basic
             _new_invalid_event.number_too_small(
               @number, _assoc, @minimum )
           end
+
+          UNABLE_
         end
 
         def _assoc
