@@ -57,10 +57,16 @@ module Skylab::Zerk
 
     EXPRESS___ = {
       compound: :__express_compound,
+      custom: :__express_custom,
       entitesque: :__express_entitesque,
       operation: :__express_operation,
       primitivesque: :__express_primitivesque,
     }
+
+    def __express_custom
+      @_top_frame.call
+      NIL_
+    end
 
     def __express_compound
       @compound_frame.call @line_yielder  # imagine `express_compound_frame_into__`
@@ -84,7 +90,7 @@ module Skylab::Zerk
 
     # -- for ancillaries (that are proxies)
 
-    def expression_agent_for_niCLI_library__
+    def expression_agent_for_niCLI_library_
 
       # we will *very likely* need to change either this method or all of
       # the code in iCLI involving producing an expression agent (all

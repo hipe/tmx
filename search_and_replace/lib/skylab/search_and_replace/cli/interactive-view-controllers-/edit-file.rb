@@ -8,20 +8,32 @@ module Skylab::SearchAndReplace
       # namely, the *interative* parts of search & replace (and all
       # the UI & UI state that goes along with that).
 
-      def initialize st, main_vc, ent_ada
-
-        @FILE_WRITE_IS_ENABLED = false  # would-be dry run. for now, edited manually during dev  #open [#019] (this rewrite)
-
-        @entity_node_adapter = ent_ada
-        @expression_agent = main_vc.expression_agent
-        @event_loop = ent_ada.event_loop
-        @line_yielder = main_vc.line_yielder
-        @main_view_controller = main_vc
+      def initialize st, _
+        @_m = :__first_call
         @object_stream = st
-        @UI_event_handler = @event_loop.UI_event_handler
+        @services = _
+      end
 
-        @_eew = nil
-        @_p = method :__first_call
+      def call
+        send @_m
+        NIL_
+      end
+
+      def __first_call
+        if @object_stream
+          __init_ivars
+          @__first_item = @object_stream.gets
+          if @__first_item
+            __really_boogie
+            NIL_
+          else
+            @_line_yielder << "(no matches.)"
+            @_event_loop.pop_me_off_of_the_stack @_operation_frame
+            @_event_loop.loop_again
+          end
+        else
+          NOTHING_
+        end
       end
 
       # -- buttonesque visibility & reactions
@@ -30,14 +42,16 @@ module Skylab::SearchAndReplace
 
       def __all_remaining  # assume has next file
 
+        self._COVER_ME_might_be_OK
+
         o = Home_::Magnetics_::All_Remaining_via_Parameters.new( & @UI_event_handler )
-        o.expression_agent = @expression_agent
+        o.expression_agent = @__expression_agent
         o.file_UOW = @_file_UOW
         o.gets_one_next_file = -> do
           _move_to_next_file
           @_file_UOW
         end
-        o.serr = @main_view_controller.serr
+        o.serr = @_serr
         _ok = o.execute  # ignore the t/f of whether it succeeded
         _close_frame
         NIL_
@@ -81,10 +95,12 @@ module Skylab::SearchAndReplace
         # one-time hack so that you can review last summary and stay in frame
         remove_instance_variable :@object_stream
         @_file_UOW = Home_::Magnetics_::File_Unit_of_Work.the_empty_unit_of_work
-        @_p = -> do
-          @line_yielder << "(job finished. Ctrl-C to jump out of frame.)"
-          NIL_
-        end
+        @_m = :___say_job_finished
+        NIL_
+      end
+
+      def ___say_job_finished
+        @_line_yielder << "(job finished. Ctrl-C to jump out of frame.)"
         NIL_
       end
 
@@ -107,8 +123,8 @@ module Skylab::SearchAndReplace
 
       def __express_current_file_after_write  # no need to express path
 
-        _ = @_file_UOW.say_wrote_under @expression_agent
-        @line_yielder << _
+        _ = @_file_UOW.say_wrote_under @_expression_agent
+        @_line_yielder << _
         NIL_
       end
 
@@ -155,29 +171,51 @@ module Skylab::SearchAndReplace
         NIL_
       end
 
-      # -- expression
+      # -- boogey & expression
 
-      def __first_call
+      def __init_ivars
+
+        _ = remove_instance_variable :@services
+        @_event_loop = _.event_loop
+        @_expression_agent = _.expression_agent
+        @_line_yielder = _.line_yielder
+        @_main_view_controller = _.main_view_controller
+        @_operation_frame = _.operation_frame
+        @_serr = _.serr
+        @UI_event_handler = _.UI_event_handler
+
+        # --
+
+        @__file_write_is_enabled =
+          @_event_loop.to_root_frame.ACS.FILE_WRITE_IS_ENABLED  # near [#002]
+
+        NIL_
+      end
+
+      def __really_boogie
 
         __init_all_buttonesques
         __init_plain_expresser
         __init_file_UOW_prototype
 
-        _ = @object_stream.gets
+        _ = remove_instance_variable :@__first_item
         __ = @object_stream.gets
         _reinit_entity_via_two_sessions _, __
 
-        begin_UI_frame  # because we weren't here yet
-
-        @_p = method :___main_call
-        _ = @_p.call
+        @_event_loop.push_whatever_this_is_to_the_stack self
+        @_event_loop.loop_again
+        @_m = :___main_call
 
         NIL_
       end
 
+      def four_category_symbol
+        :custom
+      end
+
       def ___main_call
         _boundary
-        @main_view_controller.express_location_area
+        @_main_view_controller.express_location_area
         ___express_body
         __express_buttonesques
         NIL_
@@ -205,7 +243,7 @@ module Skylab::SearchAndReplace
         _eng = uow.replacement_is_engaged_of_current_match ? RE___ : RNE___
         _matchno = uow.ordinal_of_current_match
         _path = uow.path
-        _y = @line_yielder
+        _y = @_line_yielder
 
         _boundary
 
@@ -235,13 +273,13 @@ module Skylab::SearchAndReplace
       RNE___ = ' (before)'
 
       def __express_buttonesques
-        @main_view_controller.express_buttonesques @_available_butz_a
+        @_main_view_controller.express_buttonesques @_available_butz_a
         NIL_
       end
 
       def __init_plain_expresser
 
-        pe = Here_::Line_Expresser__.new @line_yielder
+        pe = Here_::Line_Expresser__.new @_line_yielder
 
         do_nothing = -> _d { }
 
@@ -264,7 +302,7 @@ module Skylab::SearchAndReplace
 
         stylify = Home_.lib_.brazen::CLI_Support::Styling::Stylify
 
-        se = Here_::Line_Expresser__.new @line_yielder
+        se = Here_::Line_Expresser__.new @_line_yielder
 
         is_inside_current_match = false
 
@@ -311,7 +349,7 @@ module Skylab::SearchAndReplace
       # ~ expression support
 
       def _boundary
-        @main_view_controller.touch_boundary
+        @_main_view_controller.touch_boundary
         NIL_
       end
 
@@ -326,7 +364,7 @@ module Skylab::SearchAndReplace
       def __init_file_UOW_prototype
 
         @_file_UOW_prototype = Home_::Magnetics_::File_Unit_of_Work.prototype(
-          @FILE_WRITE_IS_ENABLED,
+          @__file_write_is_enabled,
           & @UI_event_handler )
 
         NIL_
@@ -399,17 +437,20 @@ module Skylab::SearchAndReplace
 
       # -- boring hook-outs
 
-      def call
-        _ = @_p.call
-        _  # ignored
+      def below_frame  # used to grind state at end
+        @_operation_frame
       end
 
-      def begin_UI_frame
+      def end_UI_panel_expression
+        NOTHING_
+      end
+
+      def begin_UI_panel_expression
 
         butz = Buttonesque_view_controller__[].begin_frame
 
         @_all_butz_a.each do |butt|
-          if butt.is_available
+          if butt.button_is_available
             butz.add butt
           end
         end
@@ -427,7 +468,7 @@ module Skylab::SearchAndReplace
 
         s.strip!
         if s.length.zero?
-          @line_yielder << "(nothing entered.)"
+          @_line_yielder << "(nothing entered.)"
         else
           butt = Buttonesque_view_controller__[].interpret s, self
           if butt
@@ -449,18 +490,17 @@ module Skylab::SearchAndReplace
       def handler_for sym, *_  # e.g interrupt
         if :interrupt == sym
           -> do
-            _ = @event_loop.pop_me_off_of_the_stack @entity_node_adapter
+            _ = @_event_loop.pop_me_off_of_the_stack @_operation_frame
             NIL_
           end
         end
       end
 
       Buttonesque_view_controller__ = -> do
-        ::Skylab::Zerk::NonInteractiveCLI::Buttonesque_ViewController
+        Zerk_::InteractiveCLI::Buttonesque_ViewController
       end
 
       Here_ = self
-
     end
   end
 end

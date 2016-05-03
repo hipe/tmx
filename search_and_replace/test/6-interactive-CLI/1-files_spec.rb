@@ -113,7 +113,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         input(
           'r', hinkenloooper_regexp_string_,
-          'p', this_directory_that_exists_,
+          'p', this_test_directory_,
           'sea',
           'g'  # as in "files-by-[g]rep"
         )

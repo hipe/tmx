@@ -39,8 +39,7 @@ module Skylab::Zerk
       @custom_hotstring_structure = _ ; nil
     end
 
-    def is_available= st
-      self._CHANGED  # #during #milestone-7
+    def is_available= st  # #during #milestone-7 or..
       @_is_avaiable_proc = st.gets_one ; nil
     end
 
@@ -80,8 +79,7 @@ module Skylab::Zerk
       @_name_p.call
     end
 
-    def is_available
-      self._CHANGED  # #during #milestone-7
+    def button_is_available
       @_is_avaiable_proc.call
     end
 

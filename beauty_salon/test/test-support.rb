@@ -84,10 +84,6 @@ module Skylab::BeautySalon::TestSupport
     Callback_.test_support::Expect_Event[ tcc ]
   end
 
-  Expect_Interactive = -> tcc do
-    Home_.lib_.zerk.test_support.lib( :expect_interactive )[ tcc ]
-  end
-
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end

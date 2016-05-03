@@ -12,7 +12,7 @@ module Skylab::SearchAndReplace::TestSupport
       given do
         input(
           'r', hinkenloooper_regexp_string_,
-          'p', this_directory_that_exists_,
+          'p', this_test_directory_,
           'sea',
           'counts',
         )
@@ -61,7 +61,7 @@ module Skylab::SearchAndReplace::TestSupport
       given do
         input(
           'r', hinkenloooper_regexp_string_,
-          'p', this_directory_that_exists_,
+          'p', this_test_directory_,
           'sea',
           'ma',
         )

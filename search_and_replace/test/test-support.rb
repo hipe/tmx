@@ -47,7 +47,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- setup
 
-    memoize :this_directory_that_exists_ do
+    memoize :this_test_directory_ do
 
       dir = ::File.join TS_.dir_pathname.to_path, '6-interactive-CLI'
       ::File.directory? dir or fail

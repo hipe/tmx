@@ -154,6 +154,10 @@ module Skylab::Zerk
       NIL_
     end
 
+    def push_whatever_this_is_to_the_stack x  # you can really wreck things [sa]
+      @top_frame = x ; nil
+    end
+
     # -- event handling
 
     def __process_interrupt
@@ -212,6 +216,17 @@ module Skylab::Zerk
     end
 
     # ->
+
+      def to_root_frame  # [sa]
+        x = @top_frame
+        begin
+          x_ = x.below_frame
+          x_ or break
+          x = x_
+          redo
+        end while nil
+        x
+      end
 
       def penultimate_frame
         @top_frame.below_frame

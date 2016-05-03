@@ -137,7 +137,8 @@
 
 [#003]       [ track a historic node ]
 
-[#002] #open annihilate all traces of "expect interactive" and same
+[#002] #open dry run is currently hard-coded on (near `@FILE_WRITE_IS_ENABLED`)
+             ( #was: annihilate all traces of "expect interactive" )
              ( #was: -wip-them-all (in [ts]) *uses* this guy..
              we need to decide how to cover.. )
 

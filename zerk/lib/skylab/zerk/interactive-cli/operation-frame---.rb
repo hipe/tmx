@@ -57,27 +57,29 @@ module Skylab::Zerk
 
         p = @load_ticket.custom_view_controller_proc__
 
+        @main_view_controller = mvc
+
         if p
           __express_result_customly x, p
         else
-          __express_result_commonly x, mvc
+          __express_result_commonly x
         end
       end
 
       def __express_result_customly x, p
 
-        _ = Thing_Proxy___.new self
+        _ = Thing_Proxy___.new self  # could memoize ..
 
-        _custom_view_controller = p[ x, _ ]
+        @_custom_view_controller = p[ x, _ ]
 
-        _custom_view_controller.call
+        @_custom_view_controller.call
 
         NIL_
       end
 
-      def __express_result_commonly x, mvc
+      def __express_result_commonly x
 
-        _pxy = CLI_Proxy___.new mvc
+        _pxy = CLI_Proxy___.new @main_view_controller
 
         o = Home_::NonInteractiveCLI::Express_Result___.new x, _pxy
 
@@ -131,6 +133,7 @@ module Skylab::Zerk
       attr_reader(
         :below_frame,
         :event_loop,  # #here
+        :main_view_controller,
         :serr,  # #here
       )
 
@@ -147,7 +150,7 @@ module Skylab::Zerk
         end
 
         def expression_agent
-          @MVC.expression_agent_for_niCLI_library__
+          @MVC.expression_agent_for_niCLI_library_
         end
       end
 
@@ -163,12 +166,28 @@ module Skylab::Zerk
           @_.event_loop
         end
 
+        def expression_agent
+          @_.main_view_controller.expression_agent_for_niCLI_library_
+        end
+
+        def line_yielder
+          @_.event_loop.line_yielder
+        end
+
+        def main_view_controller
+          @_.main_view_controller
+        end
+
         def operation_frame
           @_  # ONLY for poppping off the stack
         end
 
         def serr
           @_.serr
+        end
+
+        def UI_event_handler
+          @_.event_loop.UI_event_handler
         end
       end
     end

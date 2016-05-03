@@ -347,7 +347,11 @@ module Skylab::Zerk::TestSupport
       end
 
       def serr_lines
-        @___serr_lines ||= to_content_line_stream_on( :serr ).to_a
+        @___serr_lines ||= to_serr_line_stream.to_a
+      end
+
+      def to_serr_line_stream
+        to_content_line_stream_on :serr
       end
 
       def __all_lines
@@ -990,3 +994,4 @@ module Skylab::Zerk::TestSupport
     STOPPED_ = false
   end
 end
+# #tombstone: sunsetted "expect interactive"

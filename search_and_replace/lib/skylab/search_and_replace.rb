@@ -86,6 +86,7 @@ module Skylab::SearchAndReplace
       block_given? and self._REFACTOR_do_not_use_hot_model_any_more
 
       @egrep_pattern = nil
+      @FILE_WRITE_IS_ENABLED = true  # would-be dry run. in at least one # place is hard-coded off. #open [#004]
       @ruby_regexp = nil
     end
 
@@ -210,6 +211,10 @@ module Skylab::SearchAndReplace
 
       Home_::Interface_Models_::Search
     end
+
+    attr_accessor(
+      :FILE_WRITE_IS_ENABLED,
+    )
   end
 
   if false  # #open [#006]
@@ -351,11 +356,11 @@ module Skylab::SearchAndReplace
       ::StringScanner
     end
 
-    system_lib = sidesys[ :System ]
-
     System = -> do
-      system_lib[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
 
     Tmpdir = Lazy_.call do
       require 'tmpdir'
