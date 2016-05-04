@@ -204,6 +204,16 @@ module Skylab::Zerk::TestSupport
 
       # -- support - build state
 
+      def common_compound_frame_for_design_
+        cli do |cli|
+          cli.design = -> vmm do
+            vmm.compound_frame = vmm.common_compound_frame
+            vmm
+          end
+        end
+        NIL_
+      end
+
       def cli & p
         @_expscr_inputs.__freeform_mutation_proc = p ; nil
       end

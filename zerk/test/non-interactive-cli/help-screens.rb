@@ -8,11 +8,10 @@ module Skylab::Zerk::TestSupport
       Memoizer_Methods[ tcc ]
       Non_Interactive_CLI[ tcc ]
       tcc.send :define_singleton_method, :given_screen, Given_screen___
-      tcc.include self
+      tcc.include Instance_Methods__
     end
 
     # -
-
       Given_screen___ = -> & p do
 
         given( & p )
@@ -26,8 +25,9 @@ module Skylab::Zerk::TestSupport
           x
         end
       end
-
     # -
+
+    module Instance_Methods__
 
       # -- methods that produce subjects
 
@@ -58,11 +58,19 @@ module Skylab::Zerk::TestSupport
 
       def build_index_of_option_section section=nil
 
-        section ||= self.section( :options )
+        ( section || self.section( :options ) ).to_option_index
+      end
+    end
+
+    # ==
+
+    class Section__
+
+      def to_option_index
 
         bx = Callback_::Box.new
-        parse_line = ___line_parser_for bx
-        st = section.to_line_stream
+        parse_line = Line_parser_for___[ bx ]
+        st = to_line_stream
         st.gets  # skip header line
         begin
           line = st.gets
@@ -73,7 +81,9 @@ module Skylab::Zerk::TestSupport
         bx
       end
 
-      def ___line_parser_for bx
+      # --
+
+      Line_parser_for___ = -> bx do
 
         rx = %r(\A
           [ ]{2,}
@@ -104,6 +114,8 @@ module Skylab::Zerk::TestSupport
         end
       end
 
+      # --
+
       class Option_Line___
 
         def initialize b, s, s_, s__
@@ -126,8 +138,11 @@ module Skylab::Zerk::TestSupport
           :was_styled,
         )
       end
+    end
 
-      # ~
+    # ==
+
+    module Instance_Methods__
 
       def section sym
         niCLI_help_screen.section sym
@@ -206,8 +221,7 @@ module Skylab::Zerk::TestSupport
       def begin_regex_based_matcher rx
         Regex_Based_Matcher__.new rx
       end
-
-      # --
+    end
 
     # ==
 
@@ -227,7 +241,7 @@ module Skylab::Zerk::TestSupport
       def section sym
         @_section_cache.fetch sym do
           _a = @_h.fetch sym
-          x = Section___.new _a
+          x = Section__.new _a
           @_section_cache[ sym ] = x
           x
         end
@@ -246,7 +260,9 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    class Section___
+    # ==
+
+    class Section__
 
       def initialize a
         @_a = a
@@ -883,6 +899,8 @@ module Skylab::Zerk::TestSupport
       # -
     end
 
+    # ==
+
     Coarse_pass_recurse___ = -> st do
 
       # exactly a simplified [#ba-043]
@@ -938,6 +956,8 @@ module Skylab::Zerk::TestSupport
 
       sections
     end
+
+    # ==
 
     class Sub_Section___
 

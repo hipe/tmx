@@ -4,6 +4,7 @@ module Skylab::Zerk
 
     class << self
       def begin
+        Require_fields_lib_[]  # or wherever
         new.__init_as_beginning
       end
       private :new

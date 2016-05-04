@@ -21,7 +21,7 @@ the next 30 (11-40) are for any ACS's that go
 "wide" but not "deep", so none of these can
 have compounds as children.
 
-at writing the exitsing nodes here have been
+at writing the existing nodes here have been
 placed "tightly" and in chronologesque order.
 
 the next 30 (41-70) can go deep and wide

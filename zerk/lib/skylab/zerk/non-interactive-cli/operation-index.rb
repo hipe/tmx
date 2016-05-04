@@ -30,7 +30,7 @@ module Skylab::Zerk
 
         @__fo_frame = fo_frame
         @_si = Here_::Scope_Index.new fo_frame
-        @_primitivesque_appropriation_op_box = @_si.__release_POOB
+        @_primitivesque_appropriation_op_box = @_si.release_POOB__
         ___index_stateds
         # (don't freeze because some parts are 'released')
         self
@@ -130,11 +130,23 @@ module Skylab::Zerk
 
         @_my_set_symbol_via_name_symbol[ @_k ] = :_appropriated_
 
-        if Field_::Is_required[ @_parameter ]
+        @_asc = @_scope_node_ticket.association
 
-          @_asc = @_scope_node_ticket.association
+        if :zero == @_asc.argument_arity
+
+          # for [#044] flags, we now say that it is meaningless to speak of
+          # the "requiredness" of a flag (in this modality). always o.p
+
+          _is_argumentish = false  # only for coverage
+
+        elsif Field_::Is_required[ @_parameter ]
+
+          _is_argumentish = true
+        end
+
+        if _is_argumentish
+
           send SINGPLUR___.fetch @_asc.singplur_category
-          remove_instance_variable :@_asc
 
         else
 
@@ -146,6 +158,8 @@ module Skylab::Zerk
 
           @_parameter.description_proc and self._CUSTOMIZED_DESC_NOT_IMPLEMENTED
         end
+
+        remove_instance_variable :@_asc
         NIL_
       end
 

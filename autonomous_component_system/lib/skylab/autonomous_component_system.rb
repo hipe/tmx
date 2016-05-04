@@ -148,6 +148,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
           if cm
             ca._finish_via cm, sym
+
+          elsif :zero == ca.argument_arity
+
+            ca._finish_via Flag___, sym
           else
             when_no_component_model[ sym, ca ]
           end
@@ -173,6 +177,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     Method_name_via_name_symbol = -> sym do
       :"__#{ sym }__component_association"
+    end
+
+    Flag___ = -> st, & _pp do  # is Any_value
+      # experimental, in cahoots with [#ze-044]
+      Callback_::Known_Known[ st.gets_one ]
     end
   end
   # ->

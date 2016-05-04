@@ -207,6 +207,39 @@ module Skylab::Zerk
         def four_category_symbol
           :primitivesque
         end
+
+        def on_load_ticket_pressed
+
+          # only because boolean is primitivesque, the main work for [#044]:
+
+          if :zero == @association.argument_arity
+            ___when_pressed_as_flag
+          else
+            super
+          end
+        end
+
+        def ___when_pressed_as_flag
+
+          # this is perhaps the only time in the 3 bundled modalities where
+          # we are going to implement a toggle:
+
+          rw = @_moda_frame.reader_writer
+
+          kn = rw.read_value @association
+
+          if kn.is_known_known
+            x = kn.value_x
+          end
+
+          _qkn = Callback_::Qualified_Knownness[ ( ! x ), @association ]
+
+          rw.write_value _qkn
+
+          # (we could give feedback but meh in the usual entity item table etc)
+
+          NIL_
+        end
       end
 
       class Atomesque__
@@ -268,6 +301,15 @@ module Skylab::Zerk
         end  # >>
 
         # --
+
+        def on_load_ticket_pressed
+
+          # the default reaction to having been "pressed" as a "buttonesque"
+          # is to build a new appropriate frame and push it on to the stack
+
+          @_moda_frame.event_loop.push_stack_frame_for self
+          NIL_
+        end
 
         def __is_masked
           false

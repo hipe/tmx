@@ -123,9 +123,9 @@ module Skylab::Zerk
       if s.length.zero?
         @line_yielder << "(nothing entered.)"
       else
-        x = Here_::Buttonesque_Interpretation_Adapter_[ s, self ]
-        if x
-          @event_loop.push_stack_frame_for x
+        lt = Here_::Buttonesque_Interpretation_Adapter_[ s, self ]
+        if lt
+          lt.on_load_ticket_pressed
         end
       end
       NIL_
@@ -181,6 +181,7 @@ module Skylab::Zerk
       :ACS,
       :below_frame,
       :button_frame,
+      :event_loop,
       :UI_event_handler,  # for buttonesque
     )
 

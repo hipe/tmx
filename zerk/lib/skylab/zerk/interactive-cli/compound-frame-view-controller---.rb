@@ -40,9 +40,6 @@ module Skylab::Zerk
       end  # >>
 
       def initialize _
-
-        Require_fields_lib_[]
-
         @main_view_controller = _.main_view_controller
         @expression_agent = _.expression_agent
         @item_liner = Item_Liner___.new

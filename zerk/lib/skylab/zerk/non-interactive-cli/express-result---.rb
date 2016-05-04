@@ -96,15 +96,13 @@ module Skylab::Zerk
             shape = :intish
 
           elsif true == x
-            self._README  # when true/false, assume it's semantic so
-              # *output* "yes"/"no". this has far reaching impact because
-              # now we can't result in ACHIEVED_ per our instinct. :#here
+            shape = :the_true_value
           end
           # (else will try custom effection)
         elsif x.nil?
           shape = :nil
-        else
-          self._README  # :#here
+        else  # assume false
+          shape = :the_false_value
         end
 
         if shape
@@ -163,6 +161,20 @@ module Skylab::Zerk
 
       def intish
         _puts "#{ @x }" ; nil
+      end
+
+      def the_true_value
+
+        # when true/false, assume it's semantic so *output* "yes"/"no".
+        # (we don't output "true"/"false" only so that we know what we
+        # are reading is not a mistake.) this has far reaching impact
+        # because now we can't result in ACHIEVED_ per our instinct.
+
+        _puts 'yes' ; nil
+      end
+
+      def the_false_value
+        _puts 'no' ; nil
       end
 
       def nil

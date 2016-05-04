@@ -124,7 +124,7 @@ module Skylab::Zerk
         :pristinity_,
       )
 
-      def __release_POOB
+      def release_POOB__
         remove_instance_variable :@_primitivesque_appropriation_op_box
       end
 

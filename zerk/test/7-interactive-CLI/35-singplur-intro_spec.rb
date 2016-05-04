@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
     use :expect_screens
 
     given do
-      __this_design
+      common_compound_frame_for_design_
       input 'f', 'doozie poozie', 'no-args', 'plur-as-arg'
     end
 
@@ -113,16 +113,6 @@ module Skylab::Zerk::TestSupport
         redo
       end while nil
       h
-    end
-
-    def __this_design
-      cli do |cli|
-        cli.design = -> vmm do
-          vmm.compound_frame = vmm.common_compound_frame
-          vmm
-        end
-      end
-      NIL_
     end
 
     def subject_root_ACS_class
