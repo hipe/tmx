@@ -179,22 +179,43 @@ module Skylab::Zerk
 
       def ___do_reindex_plurof_as_argument
 
+        # express a singplur pair as a "glob"-type trailing formal argument.
+        # use variously the singular AND plural surface form based on what
+        # we are doing: with the example singplur pair "path"/"paths",
+        #
+        #   • in the expression of syntax use the singular
+        #     ("<path> [<path> [..]]")
+        #
+        #   • internally when referencing this component in indexes
+        #     use the plural (`paths`)
+        #
+        #   • when writing to an ivar use the plural `@paths`
+
         @_did_one_glob = true
 
-        sing_sym = @_asc.singplur_referent_symbol
-        d = @_si.scope_node_identifier_via_node_name_symbol__ sing_sym
-        nt = @_si.scope_node_ d
+        asc = @_asc
 
-        # although our tendency is to want to use the singular counterpart
-        # here, keep it as the plural so in the argument controller it makes
-        # more sense how it is being written.
+        plur_sym = asc.name_symbol
+        sing_sym = asc.singplur_referent_symbol
 
-        @_parameter = @_parameter.dup_by do  # MY GOD BE CAREFUL (overwrite)
-          @name = nt.name
-          @argument_arity = :one_or_more
+        _d = @_si.scope_node_identifier_via_node_name_symbol__ sing_sym
+        mixed_name = @_si.scope_node_( _d ).name
+
+        @_parameter = @_parameter.dup_by do
+
+          plur_sym == @name_symbol or self._SANITY
+
+          self.name = mixed_name
+
+          if :one == @argument_arity
+            @argument_arity = :one_or_more
+          else
+            :zero_or_more == @argument_arity or self._COVER_ME
+          end
         end
 
         @_primitivesque_appropriation_op_box.remove sing_sym
+
         _reindex_as_argument
       end
 

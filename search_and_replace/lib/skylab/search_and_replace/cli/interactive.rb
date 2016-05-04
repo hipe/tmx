@@ -55,8 +55,6 @@ module Skylab::SearchAndReplace
           }
         ]
       end
-
-      EMPTY_A_ = []
     end
   end
 end

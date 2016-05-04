@@ -119,6 +119,19 @@ module Skylab::SearchAndReplace
         NIL_
       end
 
+      def interruption_handler  # based off of [#ze-045]
+
+        -> do
+          @_event_loop.pop_me_off_of_the_stack self
+
+          # (what is now on top is the operation frame.
+          # get that off too or we'll loop right back into it (somehow))
+
+          @_event_loop.pop_me_off_of_the_stack @_event_loop.top_frame
+          NIL_
+        end
+      end
+
       # ~ expression near matches & write
 
       def __express_current_file_after_write  # no need to express path
@@ -183,11 +196,6 @@ module Skylab::SearchAndReplace
         @_operation_frame = _.operation_frame
         @_serr = _.serr
         @UI_event_handler = _.UI_event_handler
-
-        # --
-
-        @__file_write_is_enabled =
-          @_event_loop.to_root_frame.ACS.FILE_WRITE_IS_ENABLED  # near [#002]
 
         NIL_
       end
@@ -364,7 +372,6 @@ module Skylab::SearchAndReplace
       def __init_file_UOW_prototype
 
         @_file_UOW_prototype = Home_::Magnetics_::File_Unit_of_Work.prototype(
-          @__file_write_is_enabled,
           & @UI_event_handler )
 
         NIL_

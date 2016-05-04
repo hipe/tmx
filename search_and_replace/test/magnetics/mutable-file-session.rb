@@ -96,7 +96,7 @@ module Skylab::SearchAndReplace::TestSupport
       Common_State___ = ::Struct.new :match_controller_array, :edit_session
 
       def build_edit_session_via_ s, rx
-        _string_edit_session.new s, nil, rx
+        _string_edit_session.new true, s, nil, nil, nil, rx
       end
 
       def __these

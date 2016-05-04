@@ -10,8 +10,9 @@ module Skylab::SearchAndReplace
       private :new
     end  # >>
 
-    def initialize acs  # assume ruby regexp
+    def initialize _acs
 
+      @dry_run = false
       @functions_directory = nil
       @replacement_expression = nil
     end
@@ -52,6 +53,15 @@ module Skylab::SearchAndReplace
     def __functions_directory__component_association
 
       Any_value_
+    end
+
+    def __dry_run__component_association
+
+      yield :description, -> y do
+        y << "(where relevant)"
+      end
+
+      yield :flag
     end
 
     Any_value_ = -> st, & _pp do

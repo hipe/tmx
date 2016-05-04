@@ -1,6 +1,6 @@
 module Skylab::Autonomous_Component_System
   # ->
-    class Parameter  # :[#020]. a fresh take on an old hat
+    class Parameter  # :[#020] (compare to and stay close to [#fi-039] defined attribute)
 
       class << self
 
@@ -32,6 +32,8 @@ module Skylab::Autonomous_Component_System
         instance_exec( & p )
       end
 
+      # --
+
       def dup_by & p
         o = dup
         o.instance_exec( & p )
@@ -39,6 +41,12 @@ module Skylab::Autonomous_Component_System
       end
 
       private :dup
+
+      def name= x
+        @name = x
+      end
+
+      # --
 
       def __init_via_argument_stream_passively st
 

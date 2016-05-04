@@ -32,7 +32,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _st = Callback_::Stream.via_range( 4 ... len )
 
-        rx = %r(\A\[-[a-z] X\]\z)  # "[-a X]", "[-b X]" etc
+        rx = %r(\A\[-[a-z](?: X)?\]\z)  # "[-a X]", "[-b X]" etc
 
         bad_a = _st.map_by do |d|
           bx.at_position d

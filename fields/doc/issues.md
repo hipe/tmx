@@ -1,3 +1,5 @@
+[#039]       [ defined attribute ]
+
 [#038]       meta-meta-attrirubtes justification ..
 
 [#037]       meta-attributes justification ..

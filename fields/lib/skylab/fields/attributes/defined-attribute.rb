@@ -2,11 +2,29 @@ module Skylab::Fields
 
   class Attributes
 
-    class DefinedAttribute < SimplifiedName
+    class DefinedAttribute < SimplifiedName  # :[#039].
 
       def initialize k, & edit_p
 
         @argument_arity = :one
+        __init_temporary_ivars
+        super k do |me|
+          edit_p[ me ]
+        end
+      end
+
+      def dup_by & edit_p
+
+        # NOTE is ad-hoc for "one place in [ze]" - VERY sketchy. the block
+        # idiom is different than above: here we are expected to write to
+        # ivars directly (FOR NOW) #experimental
+
+        otr = dup  # see super
+        otr.instance_exec( & edit_p )
+        otr.__orig_freeze
+      end
+
+      def __init_temporary_ivars
 
         @_become_optional_m = :_change_parameter_arity_to_be_optional_once
         @_pending_meths_definers = nil
@@ -14,13 +32,10 @@ module Skylab::Fields
         @_RW_m = :__receive_first_read_and_write_proc
         @_read_m = :__receive_first_read_proc
         @_write_m = :__receive_first_write_proc
+
         @_reader_p = nil
         @_writer_p = nil
         @_read_writer_p = nil
-
-        super k do |me|
-          edit_p[ me ]
-        end
       end
 
       # -- be normalizant
@@ -95,6 +110,7 @@ module Skylab::Fields
         @_writer_p = p ; nil
       end
 
+      alias_method :__orig_freeze, :freeze
       def freeze
 
         if :_change_parameter_arity_to_be_optional_once ==  # eek

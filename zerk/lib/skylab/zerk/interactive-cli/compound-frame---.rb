@@ -147,7 +147,7 @@ module Skylab::Zerk
 
     # -- emissions (events)
 
-    def interruption_handler  # c.p w/ #spot-6
+    def interruption_handler  # c.p w/ [#045]
       -> do
         @event_loop.pop_me_off_of_the_stack self
         NIL_

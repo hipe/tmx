@@ -142,13 +142,6 @@ module Skylab::SearchAndReplace::TestSupport
       Home_::API
     end
 
-    # ~ [br] "expect interactive"
-
-    memoize :interactive_bin_path do
-      self._REDO  # #open [#002] this whole thing gone
-      ::File.join TS_._MY_BIN_PATH, 'tmx-beauty-salon search-and-r'
-    end
-
   # -- test support lib nodes
 
   module My_Interactive_CLI

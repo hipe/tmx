@@ -25,6 +25,13 @@ module Skylab::SearchAndReplace
 
       def __init_values_via_dependency
 
+        rp = @_values.replacement_parameters
+        if rp
+          @__is_dry_run = rp.dry_run
+        else
+          @__is_dry_run = true  # just for sanity, but should not matter
+        end
+
         x = @_values.max_file_size_for_multiline_mode
         if ! x
           x = DEFAULT_MAX_FILE_SIZE_FOR_MULTIINE_MODE__
@@ -97,13 +104,14 @@ module Skylab::SearchAndReplace
         big_string = io.read
         io.close
 
-        es = Here___::String_Edit_Session___.new(
+        Here___::String_Edit_Session___.new(
+          @__is_dry_run,
           big_string,
+          d,
+          path,
           @_replacement_function,
           @ruby_regexp,
         )
-        es.set_path_and_ordinal path, d
-        es
       end
     end  # sessioner
 

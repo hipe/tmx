@@ -6,6 +6,7 @@ module Skylab::SearchAndReplace
     # is not so different from the "matches" operation - ..
 
     PARAMETERS = Attributes_.call(
+      dry_run: :_read,  # not optional means it can't be nil, must be false
       matches: nil,
       replacement_expression: :_read,
       functions_directory: [ :optional, :_read ],

@@ -2,9 +2,9 @@ module Skylab::SearchAndReplace
 
   module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
 
-    class String_Edit_Session___  # see [#010]
+    class String_Edit_Session___  # see [#010].  # #testpoint
 
-      def initialize s, repl_f, rx
+      def initialize is_dry, s, d, path, repl_f, rx
 
         _match_scanner = Here_::Match_Scanner___.new s, rx
 
@@ -14,6 +14,9 @@ module Skylab::SearchAndReplace
 
         @first_block = Here_::Block___.via_scanners _scanners
 
+        @is_dry_run = is_dry
+        @ordinal = d
+        @path = path
         @ruby_regexp = rx
         @string = s
       end
@@ -23,11 +26,6 @@ module Skylab::SearchAndReplace
         :line_scanner,
         :replacement_function,
       )
-
-      def set_path_and_ordinal path, d
-        @ordinal = d
-        @path = path ; nil
-      end
 
       def initialize_dup otr  # [#014] only for tests :/
         @first_block.next_block
@@ -79,6 +77,7 @@ module Skylab::SearchAndReplace
       alias_method :next_match_controller, :first_match_controller  # for stream algos only
 
       attr_reader(
+        :is_dry_run,
         :ordinal,
         :first_block,
         :path,

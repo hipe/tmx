@@ -35,6 +35,10 @@ module Skylab::System
       def puts *a
       end
 
+      def << _
+        self
+      end
+
       def truncate d
         d
       end

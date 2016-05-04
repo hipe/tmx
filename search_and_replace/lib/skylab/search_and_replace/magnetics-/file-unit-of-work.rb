@@ -23,8 +23,8 @@ module Skylab::SearchAndReplace
 
     class << self
 
-      def prototype write_is_enabled, & oes_p
-        new write_is_enabled, & oes_p
+      def prototype  & oes_p
+        new( & oes_p )
       end
 
       def the_empty_unit_of_work
@@ -34,9 +34,8 @@ module Skylab::SearchAndReplace
       private :new
     end
 
-    def initialize write_is_enabled, & oes_p
+    def initialize & oes_p
       @instance_count = 0
-      @write_is_enabled = write_is_enabled
       @_oes_p = oes_p
     end
 
@@ -108,8 +107,12 @@ module Skylab::SearchAndReplace
 
       o.line_stream = _st
       o.path = path
-      o.write_is_enabled = @write_is_enabled
-      @was_dry = ! @write_is_enabled
+
+      is_dry = @_file_session.is_dry_run
+
+      o.write_is_enabled = ! is_dry
+
+      @was_dry = is_dry
 
       wrote = o.execute
       if wrote

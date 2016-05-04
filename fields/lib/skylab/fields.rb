@@ -410,6 +410,10 @@ module Skylab::Fields
       freeze
     end
 
+    def initialize_copy _
+      @cache_ = @cache_.dup
+    end
+
     def attr_writer_method_name  # #n.c [hu]
       _cached :___awmn
     end
@@ -430,11 +434,15 @@ module Skylab::Fields
       :"@#{ @name_symbol }"
     end
 
-    def name  # for [#br-035] (wormhole). also covered here
-      _cached :___name_function
+    def name= x
+      @cache_[ :_name_function ] = x
     end
 
-    def ___name_function
+    def name  # for [#br-035] (wormhole). also covered here
+      _cached :_name_function
+    end
+
+    def _name_function
       Callback_::Name.via_variegated_symbol @name_symbol
     end
 

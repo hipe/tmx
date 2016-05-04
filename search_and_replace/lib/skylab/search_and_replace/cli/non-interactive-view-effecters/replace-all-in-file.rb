@@ -92,7 +92,13 @@ module Skylab::SearchAndReplace
         d = @__replacement_count
         path = @edit_session.path
 
-        fh = ::File.open path, ::File::WRONLY
+        is_dry = @edit_session.is_dry_run
+
+        if is_dry
+          fh = Home_.lib_.system_lib::IO.dry_stub_instance
+        else
+          fh = ::File.open path, ::File::WRONLY
+        end
 
         @edit_session.write_output_lines_into fh do | * _, & ev_p |
 
@@ -101,7 +107,7 @@ module Skylab::SearchAndReplace
           @_oes_p.call :_, :expression do |y|
 
             y << "wrote #{ d } change#{ s d } #{
-              }(#{ bytes } byte#{ s bytes }) - #{ pth path }"
+              }(#{ bytes }#{ ' dry' if is_dry } byte#{ s bytes }) - #{ pth path }"
           end
         end
 

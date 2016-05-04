@@ -11,12 +11,6 @@ module Skylab::SearchAndReplace::TestSupport
 
       given do
 
-        cli do |cli|
-          # comment the below line out and the changes should be written to
-          # our fixture fiels (WARNING - no undo. no VCS check.)
-          cli.top_frame.ACS.FILE_WRITE_IS_ENABLED = false
-        end
-
         _dir = my_fixture_tree_ '4-egads'  # TODO must change this to be a deep copy etc..
 
         input(
@@ -24,6 +18,7 @@ module Skylab::SearchAndReplace::TestSupport
           'filename-patterns', EMPTY_S_,  # 3 & 4
           'paths', _dir,  # 5 & 6
           'search',  # drop into the next frame (7)
+          'd', # DRY RUN!!!!
           'e', 'FANTABULOUS',  # for replacement-[e]xpression (8 & 9)
           'replace',  # creates (10)
           'n',  # [n]ext-match
@@ -35,9 +30,11 @@ module Skylab::SearchAndReplace::TestSupport
         )
       end
 
+      screen_d = 10
+
       context "(screen)" do
 
-        screen 10
+        screen (screen_d += 1)
 
         it "first line says filename" do
 
@@ -69,7 +66,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "(screen)" do
 
-        screen 11
+        screen (screen_d += 1)
 
         it "says it's the second match" do
           _lines.first =~ %r(\Afile 1 match 2\b) or fail
@@ -100,7 +97,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "(screen)" do
 
-        screen 12
+        screen (screen_d += 1)
 
         it "says that replacement is engaged" do
           _lines.first =~ %r(\Afile 1 match 2 \(replacement engaged\)) or fail
@@ -120,7 +117,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "(screen) now that you moved to the next file," do
 
-        screen 13
+        screen (screen_d += 1)
 
         it "confirms the write" do
 
@@ -144,7 +141,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "(screen) having skipped this entre screen," do
 
-        screen 14
+        screen (screen_d +=1)
 
         it "it says 0 replacements" do
 
@@ -167,7 +164,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "(screen) having said yes to all matches in this file," do
 
-        screen 15
+        screen (screen_d += 1)
 
         it "says N matches" do
 
@@ -190,7 +187,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "(screen) having said write," do
 
-        screen 16
+        screen (screen_d += 1)
 
         it "says it wrote." do
           _lines.first =~ %r(\Awrote file 3 \(3 replacements, \d+ dry bytes\))
