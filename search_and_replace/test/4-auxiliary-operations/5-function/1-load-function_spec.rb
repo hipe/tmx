@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] auxiliaries - function - (1) load" do
+  describe "[sa] auxiliaries - function - (1) load", wip: true do
 
     TS_[ self ]
 

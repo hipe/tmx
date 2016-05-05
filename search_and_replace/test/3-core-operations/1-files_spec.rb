@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - files" do
+  describe "[sa] core operations - files", wip: true do
 
     TS_[ self ]
     use :my_API

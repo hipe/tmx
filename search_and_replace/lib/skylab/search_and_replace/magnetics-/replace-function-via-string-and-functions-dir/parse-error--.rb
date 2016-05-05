@@ -24,6 +24,7 @@ module Skylab::SearchAndReplace
         class << self
 
           def [] * shorthand_things, scn
+            self._REVIEW_charpos
             pos = scn.pos
             str = scn.scan %r([^\n]*)
             scn.pos = pos  # eek

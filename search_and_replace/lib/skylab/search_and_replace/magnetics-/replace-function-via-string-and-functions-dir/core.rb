@@ -23,6 +23,8 @@ module Skylab::SearchAndReplace
 
       until scn.eos?
 
+        self._REVIEW_charpos
+
         d = scn.pos
         normal = scn.scan NORMAL_RX__
         open = scn.skip OPEN_RX__

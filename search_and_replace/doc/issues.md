@@ -123,9 +123,10 @@
              ( #was: #during #milestone-6 descriptions )
              ( #was: #done #feature support for spaces in list items )
 
-[#005] #open improve architecture so we can pass things like system
+[#005]       A-B partitioning
+             ( #was: improve architecture so we can pass things like system
              conduits in some way that does not disrupt the elegance of
-             the [#ac-027] relationships.
+             the [#ac-027] relationships. )
 
              ( #was: #feature make this one button with three labels
                instead of three buttons )
@@ -137,7 +138,7 @@
 
 [#003]       [ track a historic node ]
 
-[#002] #hole
+[#002]       unified language ..
              ( #was: dry run )
              ( #was: annihilate all traces of "expect interactive" )
              ( #was: -wip-them-all (in [ts]) *uses* this guy..

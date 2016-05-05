@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (40) context intro" do
+  describe "[sa] magnetics - (40) context intro", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

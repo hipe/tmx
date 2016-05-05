@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (43) context regression" do
+  describe "[sa] magnetics - (43) context regression", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

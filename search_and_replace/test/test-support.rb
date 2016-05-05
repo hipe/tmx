@@ -47,6 +47,20 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- setup
 
+    def build_my_tmpdir_controller_  # NOT prepared (emptied)
+
+      sys = Home_.lib_.system
+
+      _path = ::File.join sys.defaults.dev_tmpdir_path, '[sa]'
+
+      sys.filesystem.tmpdir.new_with(
+        :path, _path,
+        :be_verbose, do_debug,
+        :debug_IO, debug_IO,
+        :max_mkdirs, 2,
+      )
+    end
+
     memoize :this_test_directory_ do
 
       dir = ::File.join TS_.dir_pathname.to_path, '6-interactive-CLI'
@@ -141,8 +155,9 @@ module Skylab::SearchAndReplace::TestSupport
     def subject_API
       Home_::API
     end
+  # -
 
-  # -- test support lib nodes
+  # -- modality test support lib nodes (short stowaways)
 
   module My_Interactive_CLI
 
@@ -196,6 +211,10 @@ module Skylab::SearchAndReplace::TestSupport
       root
     end  # •cp1
   end
+
+  # --
+
+  # -- test support lib nodes (short)
 
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]

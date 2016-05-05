@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] non-interactive CLI - wahoo" do
+  describe "[sa] non-interactive CLI - wahoo", wip: true do
 
     TS_[ self ]
     use :zerk_help_screens

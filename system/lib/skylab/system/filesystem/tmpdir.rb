@@ -6,6 +6,8 @@ module Skylab::System
 
     class Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
 
+      # (if we were to write this again today we would *not* subclass pathname)
+
       class << self
 
         def memoizer_for tc, slug

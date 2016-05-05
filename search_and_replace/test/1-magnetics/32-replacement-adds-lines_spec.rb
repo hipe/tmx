@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (32) replacement adds lines" do
+  describe "[sa] magnetics - (32) replacement adds lines", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

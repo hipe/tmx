@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (10) read only file session stream" do
+  describe "[sa] magnetics - (10) read only file session stream", wip: true do
 
     TS_[ self ]
     use :memoizer_methods

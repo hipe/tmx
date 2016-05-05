@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] non-interactive CLI - counts" do
+  describe "[sa] non-interactive CLI - counts", wip: true do
 
     TS_[ self ]
     use :zerk_help_screens

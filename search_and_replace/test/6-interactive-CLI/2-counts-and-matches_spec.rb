@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] interactive CLI integration - counts" do
+  describe "[sa] interactive CLI integration - counts", wip: true do
 
     TS_[ self ]
     use :my_interactive_CLI

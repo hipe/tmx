@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - integration with w#{}ip-it", slow: true do  # :[#026].
+  describe "[sa] core operations - integration with w#{}ip-it", slow: true, wip: true do  # :[#026].
 
     # highly experimental - this tests a feature that is (a) housed in a
     # different sidesystem ([ts]) and (b) frontiers features of a facility
@@ -29,7 +29,7 @@ module Skylab::SearchAndReplace::TestSupport
         __produce_state
       end
 
-      it "succeeds", f: true do
+      it "succeeds" do
         _state.result == true or fail
       end
 
@@ -104,17 +104,8 @@ module Skylab::SearchAndReplace::TestSupport
 
       def __write_three_files
 
-        sys = Home_.lib_.system
-
-        @_path = ::File.join sys.defaults.dev_tmpdir_path, '[sa]'
-
-        td = sys.filesystem.tmpdir.new_with(
-          :path, @_path,
-          :be_verbose, do_debug,
-          :debug_IO, debug_IO,
-          :max_mkdirs, 2,
-        )
-
+        td = build_my_tmpdir_controller_
+        @_path = td.path
         td.prepare
 
         @_file_A = 'foo-diddle_spec.rb'
