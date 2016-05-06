@@ -212,6 +212,28 @@ module Skylab::SearchAndReplace::TestSupport
     end  # •cp1
   end
 
+  Autoloader_ = Callback_::Autoloader
+
+  module Magnetics
+
+    Build_match_scanner_ = -> s, rx do
+
+      Lib_[]::Match_Scanner___.new s, rx
+    end
+
+    Build_line_scanner_ = -> big_str do
+
+      Lib_[]::Line_Scanner_.new big_str
+    end
+
+    Lib_ = -> do
+      Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream::
+        String_Edit_Session___
+    end
+
+    Autoloader_[ self ]
+  end
+
   # --
 
   # -- test support lib nodes (short)
@@ -235,7 +257,7 @@ module Skylab::SearchAndReplace::TestSupport
     Zerk_ = Home_.lib_.zerk ; nil
   end
 
-  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   Home_ = ::Skylab::SearchAndReplace
 
   EMPTY_A_ = []  # Home_::EMPTY_A_
