@@ -9,6 +9,6 @@ graph viz pathfinding viz
 graph viz
 massive rename of [ca]
 multibyte string bug
-test the hell out of blocker (waypoint 3)
-that A/B partioner (waypoint 2)
-how we parse lines changes (waypoint 1)
+test the hell out of blocker (waypoint 4)
+that A/B partioner (waypoint 3)
+match stream (waypoint 2)

@@ -6,81 +6,63 @@ module Skylab::SearchAndReplace
 
       class Match_Scanner___
 
-        # each next match, with a memo of the current match
+        # each next match
 
         def initialize s, rx
+          @_charpos = 0
+          @_gets = :__gets_match_occurrence
+          @_last = s.length
+          @_rx = rx
+          @_string = s
+        end
 
-          pos = 0
-          done = nil ; something = nil
-          gets = -> do
-            md = rx.match s, pos
-            if md
-              something[ md ]
+        def gets
+          send @_gets
+        end
+
+        def __gets_match_occurrence
+
+          md = @_rx.match @_string, @_charpos
+          if md
+            cp = md.offset( 0 ).last
+            if @_last == cp
+              @_gets = :_nothing
+            elsif @_charpos == cp
+              @_charpos += 1  # covered - zero-width match. (else inf. loop)
             else
-              done[]
+              @_charpos = cp
             end
-          end
-
-          last = s.length
-          something = -> md do
-            pos_ = md.offset( 0 ).last
-            if last == pos_
-              done[]
-            elsif pos == pos_
-              pos = pos + 1  # covered - zero-width match. or inf. loop
-            else
-              pos = pos_
-            end
-            md
-          end
-
-          done = -> do
-            something = nil
-            gets = EMPTY_P_
+            Match_Occurrence___.new md
+          else
+            @_gets = :_nothing
             NOTHING_
           end
+        end
 
-          md = gets[]
-          if md
-            @has_current_matchdata = true
-            @_current_matchdata = -> do
-              md
-            end
-          else
-            @has_current_matchdata = false
+        def _nothing
+          NOTHING_
+        end
+
+        # ==
+
+        class Match_Occurrence___
+
+          def initialize md
+            @charpos, @end_charpos = md.offset 0
+            @WHOLE_MATCH_STRING = md[ 0 ]
           end
 
-          @_advance_one = -> do  # assume has current item
-            md = gets[]
-            if ! md
-              @has_current_matchdata = false
-              remove_instance_variable :@_current_matchdata
+          def contains_fully eg_newline
+            if @charpos <= eg_newline.charpos
+              @end_charpos >= eg_newline.end_charpos
             end
-            NIL_
           end
-        end
 
-        def gets_one_matchdata
-          x = @_current_matchdata[]
-          @_advance_one[]
-          x
+          attr_reader(
+            :charpos,
+            :end_charpos,
+          )
         end
-
-        def current_matchdata
-          @_current_matchdata[]
-        end
-
-        def advance_one
-          @_advance_one[]
-        end
-
-        def no_remaining_matchdata
-          ! @has_current_matchdata
-        end
-
-        attr_reader(
-          :has_current_matchdata,
-        )
       end
     end
   end
