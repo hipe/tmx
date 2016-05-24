@@ -100,7 +100,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def __these
-        _string_edit_session::Stream_Magnetics_
+        _string_edit_session::Magnetics_
       end
 
       def _string_edit_session

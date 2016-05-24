@@ -10,9 +10,11 @@ module Skylab::SearchAndReplace
 
         _line_scanner = Here_::Line_Scanner_.new s
 
-        _scanners = Scanners___.new _match_scanner, _line_scanner, repl_f
+        cls = Here_::Block__
 
-        @first_block = Here_::Block___.via_scanners _scanners
+        _ = cls::Ingredients.new _line_scanner, _match_scanner, repl_f
+
+        @first_block = cls.via_ingredients__ _
 
         @is_dry_run = is_dry
         @ordinal = d
@@ -20,12 +22,6 @@ module Skylab::SearchAndReplace
         @ruby_regexp = rx
         @string = s
       end
-
-      Scanners___ = ::Struct.new(
-        :match_scanner,
-        :line_scanner,
-        :replacement_function,
-      )
 
       def initialize_dup otr  # [#014] only for tests :/
         @first_block.next_block
@@ -57,11 +53,11 @@ module Skylab::SearchAndReplace
 
       def to_line_stream
         ___to_block_stream.expand_by do | block |
-          block.to_output_line_stream__
+          block.to_output_line_stream_
         end
       end
 
-      def ___to_block_stream
+      def ___to_block_stream  # #testpoint
 
         block = self
         Callback_.stream do
@@ -88,8 +84,12 @@ module Skylab::SearchAndReplace
       alias_method :next_block, :first_block
       protected :next_block
 
+      module Magnetics_
+        Autoloader_[ self ]
+      end
+
       Here_ = self
-      NEWLINE_SEXP_ = [ :newline_sequence, NEWLINE_ ].freeze
+      # NEWLINE_SEXP_ = [ :newline_sequence, NEWLINE_ ].freeze  gone for [#011]  # #todo
       NOTHING_ = nil  # in contrast with something
     end
   end

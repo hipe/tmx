@@ -43,13 +43,17 @@ module Skylab::SearchAndReplace
           NOTHING_
         end
 
+        def big_string__
+          @_string
+        end
+
         # ==
 
         class Match_Occurrence___
 
           def initialize md
             @charpos, @end_charpos = md.offset 0
-            @WHOLE_MATCH_STRING = md[ 0 ]
+            @matchdata = md
           end
 
           def contains_fully eg_newline
@@ -61,7 +65,12 @@ module Skylab::SearchAndReplace
           attr_reader(
             :charpos,
             :end_charpos,
+            :matchdata,
           )
+
+          def is_line_termination_sequence_
+            false
+          end
         end
       end
     end

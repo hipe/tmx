@@ -32,6 +32,7 @@ module Skylab::SearchAndReplace
         # that the last line is not well-formed (by the definition of line
         # as suggested by the unix `wc` utility (more at [#sn-020]) or see
         # `man git-log` near `tformat` & separator vs. terminator semantics).
+        # (this is :#decision-A).
         #
         # i.e, we still recognize "separator" semantics even though
         # "terminator" semantics may be more formally correct. note this
@@ -158,6 +159,10 @@ module Skylab::SearchAndReplace
 
           def sequence_width
             0
+          end
+
+          def string
+            EMPTY_S_
           end
         end
 

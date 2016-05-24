@@ -365,11 +365,15 @@ module Skylab::SearchAndReplace
     Zerk = sidesys[ :Zerk ]
   end
 
+  Autoloader_[ Magnetics_ = ::Module.new ]
+
+  Autoloader_[ Throughput_Magnetics_ = ::Module.new ]
+
   Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   EMPTY_A_ = []
-  EMPTY_P_ = -> { NIL_ }
+  EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self
   IDENTITY_ = -> x { x }

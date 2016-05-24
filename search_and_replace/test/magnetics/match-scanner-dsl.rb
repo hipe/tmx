@@ -46,8 +46,7 @@ module Skylab::SearchAndReplace::TestSupport
         _rx = remove_instance_variable :@__rx
         _s = remove_instance_variable :@__str
 
-        ms = Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream::
-          String_Edit_Session___::Match_Scanner___.new _s, _rx
+        ms = Magnetics::Build_match_scanner_[ _s, _rx ]
 
         a = []
         begin

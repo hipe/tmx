@@ -9,6 +9,5 @@ graph viz pathfinding viz
 graph viz
 massive rename of [ca]
 multibyte string bug
+re-integrate new tagged throughput
 test the hell out of blocker (waypoint 4)
-that A/B partioner (waypoint 3)
-match stream (waypoint 2)

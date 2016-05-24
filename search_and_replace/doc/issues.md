@@ -1,3 +1,5 @@
+[#031]       tagged throughput ..
+
 [#030] #open get regexp to display its source
              ( #after-or-as-part-of custom view controllers )
 
@@ -95,14 +97,9 @@
 
 [#013]       the context lines algorithm ..
 
-[#012]       a "tagged sexp node" node is (at writing) effectively a string
-             plus a symbolic tag that indicates which one of three categories
-             the string is (original, replacement, or newline sequence).
-             there can be no newline sequences in the strings of nodes
-             of the first two categories. streams of these nodes facilitate
-             modality clients rendering content with semantic styling.
+[#012]       blocks ..
 
-[#011] #during #milestone-8
+[#011]       #during #milestone-8
              this should be a step towards "releasing" this..
              #blocker this will CONVERT non-unixy newlines to unixy.
              this was an accident stemming from the "optimization" near
@@ -112,8 +109,12 @@
              sequence changes.)
              ([my] has the beginnings of a sketch for a solution to this..)
 
+             NOTE when the above closes, use this node identifier to
+             track the line scanner and "LTS" "theory" in general.
 
-[#010]       edit sessions
+
+[#010]       document structure ..
+
 [#009]   #investigate consider merging read-only rendering with edit session rendering
 [#008]       #feature have the multiple forms save to one file
 [#007]       #feature explicit choice of single line v. multiline

@@ -79,8 +79,8 @@ module Skylab::SearchAndReplace::TestSupport
       def _at_idx_expect d, beg, end_
 
         mc = match_controllers_.fetch d
-        mc.match_pos.should eql beg
-        mc.match_end.should eql end_
+        mc.match_charpos.should eql beg
+        mc.match_end_charpos.should eql end_
       end
     end
 

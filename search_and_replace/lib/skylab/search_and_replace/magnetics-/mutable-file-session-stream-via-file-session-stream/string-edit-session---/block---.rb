@@ -4,368 +4,215 @@ module Skylab::SearchAndReplace
 
     class String_Edit_Session___
 
-      class Block___
+      class Block___  # ( will rename to `Block_`. )
 
-        # (somehow "block" ends up doing most of the work of parsing.)
-        # delineation algorithm explained at [#010].
+        # implement exactly [#012] (over [#010] (over [#005])).
 
         class << self
-          alias_method :via_scanners, :new
-          private :new
+
+          def via_ingredients__ o
+
+            st = Build_block_stream___.new( o ).execute
+
+            block = st.gets
+
+            # (for now we'll just assume there is always at least one block,
+            # although maybe we'll decide that empty files get no blocks.)
+
+            block.__receive_big_string_as_first_block o.match_scanner.big_string__
+
+            block.receive_predecessor_etc_ st
+
+            block
+          end
         end  # >>
 
-        def initialize prev=nil, scanners
-          @previous_block = prev
-          @_open = -> do
-            __parse scanners
-            NIL_
+        Ingredients = ::Struct.new(
+          :line_scanner,
+          :match_scanner,
+          :replacement_function,
+        )
+
+        class Build_block_stream___ < Here_::A_B_Partitioner___
+
+          # customize the partitioner for our "peek-and-steal" behavior so
+          # that blocks are always "pure" but always demarcated by newlines.
+
+          def initialize o
+            @chunk = nil
+            @_ingredients = o
+            _line_stream, _match_stream, @REPLACEMENT_FUNCTION = o.to_a
+            super _line_stream, _match_stream  # A stream, B stream
           end
-        end
 
-        # -- only for tests [#014] (see)
-
-        def initialize_dup _otr  # assume closed
-          if @_has_matches
-            @_match_controllers = @_match_controllers.map do | mc |
-              mc.dup_for_ self
-            end
-          end ; nil
-        end
-
-        def init_dup_recursive_ prev  # assume closed
-
-          @previous_block = prev
-          if @_next_block
-            @_next_block.next_block
-            @_next_block = @_next_block.dup.init_dup_recursive_ self
+          def init_chunk_for_A
+            @chunk = Here_::Static_Block___.new ; nil
           end
-          self
-        end
 
-        # --
+          def init_chunk_for_B
+            @chunk = Here_::Matches_Block___.new ; nil
+          end
 
-        def _close
-          p = @_open
-          @_open = nil
-          p[]
-          NIL_
-        end
+          def release_chunk_which_is_for_A
+            @chunk.close_static_block__
+            super
+          end
 
-        def __parse scanners
+          def release_chunk_which_is_for_B
+            @chunk.close_matches_block_
+            super
+          end
 
-          @_scanners = scanners
-          @_md_scn, @_line_scn = scanners.to_a
+          # the next two are modeled after #spot-1 in the specs
 
-          @_pos = @_line_scn.pos
+          def chunk_when_touching_at_beginning rel
 
-          if @_md_scn.has_current_matchdata
+            # this means that at the start of the parse, the first newline
+            # and the first match are exhibiting one of the six kinds of
+            # touching (i.e kissing or 5 shapes of overlap). in such cases
+            # the parser has no good basis by which to decide which should
+            # be the first context (chunk) to build under, so intervention
+            # is required. (covered by #spot-2)
 
-            md = @_md_scn.current_matchdata
+            if rel.is_kissing && rel.is_forward
 
-            _beg = md.offset( 0 )[ 0 ]
+              # if the relationship is "kissing" (that is, touching but not
+              # overlapping) *and* "forward" ("A" before "B") then it means
+              # the newline is in front of and "kissing" the match, which
+              # means that actually the two are on separate, adjacent lines EEW
 
-            d_a = @_line_scn.advance_to_greatest_index_of_newline_less_than _beg
-
-            if d_a
-              __subdivide d_a
+              chunk_for_A_with_B  # newline as its own chunk.
             else
-              ___become_matches_plus
+              # otherwise, they're either kissing with the match in front or
+              # overlapping. if they're kissing in this manner it means the
+              # newline sequence ends the [first] line the match overlaps with.
+              # otherwise it's a match overlapping with a newline sequence,
+              # which certainly goes into a matches chunk.
+
+              chunk_for_B_with_A
             end
-          else
-            __become_static
           end
-          NIL_
-        end
 
-        def ___become_matches_plus
+          def on_boundary_between_B_and_A
 
-          # assume line scanner is still pointing to your beginning.
+            # despite 10 days of rewrites this is still inexplicably complex:
+            # this is [#012]:#the-conjecture and :#spot-4:
+            # you are in a "B" context (matches) and you have encountered a
+            # boundary event (a newline). whether or not you consume the LTS
+            # here determines whether we stay or "flip".
 
-          # the current matchdata is yours. as well take each next matchdata
-          # that is on the same line or the next line (implementing
-          # [#010]/figure-1)
+            if @chunk.block_is_closed
 
-          md = @_md_scn.current_matchdata
+              # whenever the block is already closed then this is how we
+              # "flip" to the other context, by doing nothing (which leaves
+              # the LTS there so the parser knowns we need to break).
 
-          accept = -> do
-            @_md_scn.advance_one
-            ___add_match_controller_for md
-            NIL_
-          end
-          @_match_controllers = []
-          accept[]
+              self._YAY
 
-          begin
+              NOTHING_
 
-            if @_md_scn.no_remaining_matchdata
-              __close_matches_when_no_more_matches
-              break
-            end
+            elsif @item
 
-            _last_end = md.offset( 0 )[ 1 ]
-            md = @_md_scn.current_matchdata
-            _this_begin, _this_end = md.offset( 0 )
+              if @relationship.is_forward
 
-            @_line_scn.pos = _last_end
+                # theorem: if ever the match starts before the LTS,
+                # the block definitiely wants them both (in order).
+                # (the LTS may or may not be clear of the match.)
+                # (the LTS may be same with the match #spot-5.)
 
-            # along the span of cels from the first cel after the last match
-            # to the first cel before this match; if you find one newline,
-            # that's OK - matches on adjacent lines stay in the same block.
-            # BUT as soon as you find a second newline, then that delineates
-            # a "static" line, which means you need to break appropriately.
+                @chunk.add_match_controller__ self
+                @chunk.add_LTS__ self
 
-            d = @_line_scn.next_newline_before _this_begin
-            if d
-              d_ = @_line_scn.next_newline_before _this_begin
-              if d_
-                # you have encountered the deadly second newline..
-                __close_matches_when_followed_by_static d
-                break
+              elsif @relationship.is_touching
+
+                # this is this "goofy" edge case where the match starts
+                # midway through an LTS. it is covered for both the first
+                # match in a block and midway through a block EXPERIMENTAL
+
+                @chunk.add_both_goofy__ self
               else
-                # there was one but not two newlines in the interceding cels
-                @_line_scn.pos = _this_end  # (maybe not used)
-                accept[]
-                redo
+
+                # the LTS is ahead of the match and clear of it. in such
+                # cases we don't even deal with the match here at all -
+                # leave the match there and the parser should do the right
+                # thing. we only want to give the block (the any last match
+                # there) a chance to maybe swallow the LTS.
+
+                @chunk.maybe_add_LTS_ self
               end
             else
-              # there were no newlines in the zero or more interceding cels
-              accept[]
-              redo
+
+              # when it's only an LTS and not an item, give the block
+              # the choice of whether or not to accept the LTS.
+
+              @chunk.maybe_add_LTS_ self
             end
-            break
-          end while nil
-          NIL_
-        end
-
-        def ___add_match_controller_for md
-
-          @_last_matchdata = md
-          d = @_match_controllers.length
-          _ = Here_::Match_Controller___.new d, md, self
-          @_match_controllers[ d ] = _
-          NIL_
-        end
-
-        def __subdivide d_a
-
-          # there is a current match and there are newlines before then.
-          # so you become static and ..
-
-          @_newlines = d_a
-          _end_at d_a.last + 1  # revisit when investigate #open [#011]
-          @_line_scn.pos = d_a.last + 1
-
-          _scanners = @_scanners
-          _clean
-
-          @_has_matches = false
-          @_next_block = Self__.via_scanners self, _scanners
-          NIL_
-        end
-
-        def __become_static
-
-          @_has_matches = false
-          @_next_block = nil
-
-          end_ = @_line_scn.string_length
-          _end_at end_
-
-          d_a = @_line_scn.advance_to_greatest_index_of_newline_less_than end_
-          _clean
-          if d_a
-            @_newlines = d_a
+            NIL_
           end
-          NIL_
+
+          def release_LTS_
+            x = @boundary_item
+            @boundary_item = nil
+            x
+          end
+
+          def clear_LTS_
+            @boundary_item = nil
+          end
+
+          def LTS_
+            @boundary_item
+          end
+
+          def release_match_
+            x = @item
+            @item = nil
+            x
+          end
+
+          def clear_match_
+            @item = nil
+          end
+
+          def match_
+            @item
+          end
         end
 
-        def __close_matches_when_no_more_matches
+        # ==
 
-          # you are a matches and you have found the last matchdata.
+        def __receive_big_string_as_first_block s
+          @big_string_ = s ; nil
+        end
 
-          md = remove_instance_variable :@_last_matchdata
-          @_line_scn.pos = md.offset( 0 )[ 1 ]
+        def receive_predecessor_etc_ st, previous_block=nil
 
-          d = @_line_scn.next_newline
-          if d
-            if @_line_scn.eos?
+          @_TEMP_st = st
+          @_unflushed = true
+          @previous_block = previous_block
 
-              # if the next found newline after your last match terminates
-              # the big string, include everything as part of your block.
-
-              _become_block_with_matches
-              _clean
-              @_next_block = nil
-              _end_at d + 1
-            else
-
-              # the next found newline did *not* end the big string.
-              # that means there is at least one static line after the last
-              # line of this block ..
-
-              _close_matches_that_is_followed_by_static d
-            end
+          if previous_block
+            @big_string_ = previous_block.big_string_
+            @block_charpos = previous_block.block_end_charpos
           else
-            # there is no newline anywhere after your last match..
-
-            _become_block_with_matches
-            @_next_block = nil
-            _end_at @_line_scn.string_length
-            _clean
+            @block_charpos = 0
           end
           NIL_
         end
 
-        def __close_matches_when_followed_by_static d
-
-          remove_instance_variable :@_last_matchdata
-          @_line_scn.pos = d + 1  # you keep the newline char
-          _close_matches_that_is_followed_by_static d
-          NIL_
+        def big_string_
+          @big_string_
         end
 
-        def _close_matches_that_is_followed_by_static my_final_newline_d
-
-          _scanners = @_scanners
-          _become_block_with_matches
-          _clean
-          @_next_block = Self__.via_scanners self, _scanners
-          _end_at my_final_newline_d + 1
-          NIL_
-        end
-
-        def _end_at d
-          @_end = d ; nil
-        end
-
-        def _become_block_with_matches
-
-          @_has_matches = true
-          @_replacement_function = @_scanners.replacement_function
-          NIL_
-        end
-
-        def _clean
-
-          remove_instance_variable :@_md_scn
-          remove_instance_variable :@_scanners
-
-          @_big_string = remove_instance_variable( :@_line_scn ).string
-
-          NIL_
+        def block_charpos
+          @block_charpos  # (hi.)
         end
 
         # --
 
-        def to_output_line_stream__
+        def COVER_write_the_next_N_line_sexp_arrays_into a, n
 
-          if has_matches
-            __to_line_stream_when_matches
-          else
-            __to_line_stream_when_static
-          end
-        end
-
-        def write_the_previous_N_line_sexp_arrays_in_front_of a, n
-
-          if has_matches
-            ___extend_backwards_when_has_matches a, n
-          else
-            __extend_backwards_when_static a, n
-          end
-          NIL_
-        end
-
-        def ___extend_backwards_when_has_matches a, n
-
-          # slice on to the BEGINNING of `a` up to N of our tail-anchored
-          # lines. because replacements can add or remove newlines, we can't
-          # know what our trailing N lines are without starting from our
-          # beginning. if we still have a deficit when we're done, try
-          # recursing backwards.
-
-          rb = Home_.lib_.basic::Rotating_Buffer[ n ]
-
-          st = to_inner_line_sexp_array_stream
-          begin
-            x = st.gets
-            x or break
-            rb << x
-            redo
-          end while nil
-
-          my_a = rb.to_a
-          deficit = n - my_a.length
-          a[ 0, 0 ] = my_a
-          if deficit.nonzero?
-            bl = @previous_block
-            if bl
-              self._PROBABLY_OK
-              bl.write_the_previous_N_line_sexp_arrays_in_front_of a, deficit
-            end
-          end
-          NIL_
-        end
-
-        def __extend_backwards_when_static a, n
-
-          # OCD optimizations for static blocks. we can use the newline index.
-
-          ___add_own_lines_to_backwards_extension_when_static a, n
-
-          my_d = @_newlines.length
-          deficit = n - my_d
-          if 0 < deficit  # then we have one
-            bl = @previous_block
-            if bl
-              bl.write_the_previous_N_line_sexp_arrays_in_front_of a, deficit
-            end
-          end
-          NIL_
-        end
-
-        def ___add_own_lines_to_backwards_extension_when_static a, n
-
-          # get the last N lines using your newline index
-
-          o = _stream_magnetics::Line_Sexp_Array_Stream_via_Newlines.new
-          d_a = @_newlines
-          len = d_a.length
-          last = len - 1
-          surplus = len - n
-          if 0 < surplus
-            # the number of lines requested is LESS THAN the number of
-            # lines in the block so we have some backwards work to do
-
-            d = surplus - 1
-            _st = Callback_.stream do
-              if d != last
-                d += 1
-                d_a.fetch d
-              end
-            end
-
-            _pos = d_a.fetch( d ) + 1  # change this at [#011]
-
-            o.newline_stream = _st
-            o.pos = _pos
-          else
-            # ASSUME the number of lines requested EQUALS
-            # the number of lines in the block.
-            o.pos = @_pos
-            o.newlines = d_a
-          end
-
-          o.string = @_big_string
-          _st = o.execute
-          _xa_a = _st.to_a
-          a[ 0, 0 ] = _xa_a
-          NIL_
-        end
-
-        def write_the_next_N_line_sexp_arrays_into a, n
-
-          st = to_inner_line_sexp_array_stream
+          st = to_line_atom_array_stream_
           d = 0
           stop = if -1 < n
             -> do
@@ -390,7 +237,7 @@ module Skylab::SearchAndReplace
           if done
             a
           else
-            nb = @_next_block
+            nb = next_block
             if nb
               _deficit = n - d
               nb.write_the_next_N_line_sexp_arrays_into a, _deficit
@@ -398,130 +245,28 @@ module Skylab::SearchAndReplace
           end
         end
 
-        def to_inner_line_sexp_array_stream
-          if has_matches
-            _to_line_sexp_array_stream_when_matches
-          else
-            _to_line_sexp_array_stream_when_static
-          end
-        end
-
-        def __to_line_stream_when_matches
-
-          _ = _to_line_sexp_array_stream_when_matches
-          o::Line_stream_via_line_sexp_array_stream[ _ ]
-        end
-
-        def _to_line_sexp_array_stream_when_matches
-
-          o = _stream_magnetics
-          _ = o::Sexp_stream_via_matches_block[ @_match_controllers, self, @_big_string ]
-              o::Line_sexp_array_stream_via_sexp_stream[ _ ]
-        end
-
-        def __to_line_stream_when_static
-
-          _ = _to_line_sexp_array_stream_when_static
-          o::Line_stream_via_line_sexp_array_stream[ _ ]
-        end
-
-        def _to_line_sexp_array_stream_when_static
-          o::Line_Sexp_Array_Stream_via_Newlines[ @_newlines, @_pos, @_big_string ]
-        end
-
-        def _stream_magnetics
-          Here_::Stream_Magnetics_
-        end
-
-        alias_method :o, :_stream_magnetics  # eek
-
-        def previous_match_controller_before__ d
-
-          if d.zero?
-            pb = @previous_block
-            if pb
-              pb.lastmost_match_controller_during_or_before
-            end
-          else
-            @_match_controllers.fetch( d - 1 )
-          end
-        end
-
-        def next_match_controller_after__ d
-
-          d_ = d + 1
-          if d_ == @_match_controllers.length
-            nb = @_next_block
-            if nb
-              nb.next_match_controller
-            else
-              NOTHING_
-            end
-          else
-            @_match_controllers.fetch d_
-          end
-        end
-
-        def lastmost_match_controller_during_or_before
-          if has_matches
-            @_match_controllers.last
-          elsif @previous_block
-            @previous_block.lastmost_match_controller_during_or_before
-          else
-            NOTHING_
-          end
-        end
-
-        def next_match_controller
-          if has_matches
-            @_match_controllers.fetch 0
-          elsif @_next_block
-            @_next_block.next_match_controller
-          else
-            NOTHING_
-          end
-        end
+        # --
 
         def next_block
-          if @_open
-            _close
+          if @_unflushed
+            @_unflushed = false
+            st = remove_instance_variable :@_TEMP_st
+            blk = st.gets
+            if blk
+              blk.receive_predecessor_etc_ st, self
+            end
+            @___next_block = blk
           end
-          @_next_block
-        end
-
-        def replacement_function_  # only to be called..
-
-          # ..by our own child match controllers so
-          # assume we are closed and have matches. (MAYBE?)
-
-          @_replacement_function
-        end
-
-        def has_matches
-          if @_open
-            _close
-          end
-          @_has_matches
-        end
-
-        def offsets
-          [ @_pos, @_end ]
-        end
-
-        def pos
-          @_pos
-        end
-
-        def end
-          @_end
+          @___next_block
         end
 
         attr_reader(
           :previous_block,
         )
 
-        Self__ = self
+        # ==
       end
     end
   end
 end
+# #pending-rename: promote to library scope.

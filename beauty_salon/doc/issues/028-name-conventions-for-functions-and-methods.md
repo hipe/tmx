@@ -24,7 +24,7 @@ more detail as referenced.
 
     as_above_and_it_is_only_ever_called_from_this_one_code_location__  # #tier-1.5
 
-    this_method_is_only_called_from_tests___  # (*three* trailing "_"'s) DEPRECATED #todo (say #testpoint instead)
+    this_method_is_only_called_from_tests___  # #tier-1.7 (see)
 
     _this_method_is_only_called_from_this_file  # #tier-2
 
@@ -121,6 +121,14 @@ it is only called from one location outside of this file. so it
 indicates that the cost of changing this method is lower than if it were
 tier-1.
 
+
+
+### :#tier-1.7:
+
+a method whose name has *three* trailing underscores is provisionally
+used ONLY in tests. also such a method definition *must* be tagged with
+`#testpoint`. it *may* be considered a smell to "litter" asset code with
+code desiged only for testing, so use this pattern judiciously.
 
 
 

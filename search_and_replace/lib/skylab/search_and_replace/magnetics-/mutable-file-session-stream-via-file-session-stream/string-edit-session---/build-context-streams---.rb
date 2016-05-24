@@ -41,7 +41,7 @@ module Skylab::SearchAndReplace
         # the underlying system is generally stream- and linked-list-based
         # but this operation is what we might call "output-document-
         # structure-based"; and from this stems the main challenge here,
-        # given the OCD premise of our approach..  (continued at [#013])
+        # given the OCD premise of our approach..  (continued at [#031])
 
         attr_writer(
           :block,
@@ -196,7 +196,7 @@ module Skylab::SearchAndReplace
 
         def __init_three_arrays
 
-          st = @block.to_inner_line_sexp_array_stream
+          st = @block.to_line_atom_array_stream_
           __consume_state :initial_state
           @_is_done = false
 

@@ -1,4 +1,4 @@
-# [x]
+# A-B partitioning :[#005]
 
 ## general introduction
 
@@ -20,7 +20,7 @@ with each other is the focus of the subject.
 the subject works over a "discrete 1-dimensional vector space" (like a
 matrix of pixels, but only one axis), and involves two streams each of
 which produces "spans" that lie on that vector space. each span occupies
-one or more cels in the vector space.
+one or more cels in the vector space. ([#010]:A challenges this langauge.)
 
 the two streams are referred to as the "A stream" and the "B stream",
 and are given treatment that is intended to be fully indifferent; that
@@ -93,7 +93,7 @@ categories of shape for overlap as expressed (tersely) by the table above.
 
 every asymmetric shape has two variants, one for "A" and one for "B".
 whichever span ("A" or "B") is suggested by the name we refer to as the
-"refernce span". (in all the above examples of asymmetric shapes we
+"reference span". (in all the above examples of asymmetric shapes we
 have show the "A-" variety. to see the "B-" variants you would simply
 substitute all A's for B's and all B's for A's (approrpiately).)
 
@@ -239,4 +239,10 @@ corollaries
 
     • the relationship is "touching" IFF it is not "cleanly apart"
       (and vice-versa)
-_
+
+
+
+
+## next
+
+the narrative successor to this is [#010] our document theory.
