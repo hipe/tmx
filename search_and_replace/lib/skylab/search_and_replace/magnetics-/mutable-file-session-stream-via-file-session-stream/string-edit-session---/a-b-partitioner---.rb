@@ -118,22 +118,33 @@ module Skylab::SearchAndReplace
             end
 
             # although the current stream is exhausted, we need to give
-            # the client a chance to peek and steal fthe boundary piece..
+            # the client a chance to peek and steal boundary piece*s*
 
-            @item = @chunk.last
-            _init_relationship_between_item_and_boundary_item
-            @item = nil  # EEK #here-1
+            was_last = @chunk.last
 
-            _ON_BOUNDARY  # give client a chance to peek and steal
+            begin
+              @item = was_last  # NOT SURE
+              _init_relationship_between_item_and_boundary_item
+              @item = nil  # EEK #here-1
 
-            # if the client took the boundary item, it's our job to
-            # replenish it (for now)
+              _ON_BOUNDARY  # give client a chance to peek and steal
 
-            @boundary_item ||= st_.gets
+              if ! @boundary_item  # then the client took it.
+                @boundary_item = st_.gets
+                if @boundary_item  # if there's another one, try again
+                  redo
+                end
+              end
+              break
+            end while nil
+
+            # the client may have "peeked" and taken 1-N boundary items.
+            # now either we are out of boundary items or the client didn't
+            # want this boundary item:
 
             _flip_or_end
-
             break
+
           end while nil
 
           # (client should have cleaned up @item and @boundary_item)

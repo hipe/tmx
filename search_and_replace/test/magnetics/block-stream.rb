@@ -72,12 +72,40 @@ module Skylab::SearchAndReplace::TestSupport
 
       # -- assertion
 
+      # ~
+
+      def begin_expect_atoms_for_ a
+        @atoms = a
+        @cursor = 0
+      end
+
+      def expect_atoms_ * a
+
+        len = a.length
+        a_ = @atoms[ @cursor, len ]
+        @cursor += len
+
+        if a_ != a  # eek
+          a_.should eql a
+        end
+      end
+
+      def end_expect_atoms_
+        @atoms.length == @cursor or fail
+      end
+
+      # ~
+
       def atoms_of_ block
         block.___to_throughput_atom_stream.to_a
       end
 
       def at_ d
         block_at_( d ).has_matches ? :M : :S  # S = "static"
+      end
+
+      def first_block_
+        block_array.fetch 0
       end
 
       def block_at_ d

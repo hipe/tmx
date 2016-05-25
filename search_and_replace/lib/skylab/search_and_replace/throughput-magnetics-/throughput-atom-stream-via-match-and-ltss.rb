@@ -3,6 +3,7 @@ module Skylab::SearchAndReplace
   class Throughput_Magnetics_::Throughput_Atom_Stream_via_Match_and_LTSs
 
     def initialize mc, ltss
+
       @LTS_stream = ltss
       @match = mc
     end
@@ -17,10 +18,37 @@ module Skylab::SearchAndReplace
       @_a = [ :match, @match.match_index, :orig ]
       @_cursor = @match.match_charpos
       @_big_string = @match.big_string__
+      @_match_end = @match.match_end_charpos
 
       _populate_cache
 
       Callback_.stream do
+        send @_state
+      end
+    end
+
+    def __maybe_populate_cache_again_then_gets
+
+      # you get here IFF you have expressed the end of an LTS without having
+      # yet expressed the end of the match. IFF there is a next LTS and it
+      # starts before the match ends, then repeat our main step method.
+      # otherwise just finish expressing the match and you're done.
+
+      if @LTS_stream.unparsed_exists
+        # (hi.)
+        if @LTS_stream.current_token.charpos < @_match_end
+          _yes = true
+        end
+      end
+
+      if _yes
+        @_a = []
+        _populate_cache
+        send @_state
+      else
+        @_a = []
+        _the_rest_of_the_match_content
+        _done
         send @_state
       end
     end
@@ -31,66 +59,61 @@ module Skylab::SearchAndReplace
 
       lts_begin = lts.charpos
       lts_end = lts.end_charpos
-      match_begin = @match.match_charpos
-      match_end = @match.match_end_charpos
 
-      case lts_begin <=> match_begin
+      # (each of the 9 below cases has a counterpart test indicated with
+      #  "case N" where N is 1-9, all in "#spot-6"-tagged test files.)
 
-      when -1  # the LTS begins before the match begins
-        case lts_end <=> match_end
+      case lts_begin <=> @_cursor
 
-        when -1  # the LTS ends before the match ends (1) ("L-skewed")
-          _LTS_last_half                 #   LL
-          __after_LTS_ends               #    MM
+      when -1  # the LTS begins before the cursor
+        case lts_end <=> @_match_end
 
-        when 0  # the LTS ends cleanly where the match ends (2) ("L-jutting")
-          ::Kernel._K
-          self._LTS_last_half            #   LL
-          self._done                     #    M
+        when -1  # (1) the LTS ends before the match ends ("L-skewed")
+          _LTS_last_half                    #   LL
+          _when_LTS_ends_before_match_ends  #    MM
 
-        when 1  # the LTS ends after the match ends WOAH (3) ("L-enveloping")
-          ::Kernel._K                    #     LL
-          self._done                     #    -><-
+        when 0  # (2) the LTS ends cleanly where the match ends ("L-jutting")
+          _LTS_last_half                    #   LL
+          _done                             #    M
+
+        when 1  # (3) the LTS ends after the match ends WOAH ("L-enveloping")
+             # (nothing at all per spec)    #   LL
+          _done                             #  -><-
         end
 
-      when 0  # the LTS and match begin at the same cel
-        case lts_end <=> match_end
+      when 0  # the LTS begins at the cursor
+        case lts_end <=> @_match_end
 
-        when -1  # the LTS ends before the match ends (4) ("M-lagging")
-          ::Kernel._K
-          self._whole_LTS                #    LL
-          self._again                    #    MMM
+        when -1  # (4) the LTS ends before the match ends ("M-lagging")
+          _whole_LTS                        #    LL
+          _maybe_again                      #    MMM
 
-        when 0  # the LTS ends cleanly where the match ends (5) ("same")
-          ::Kernel._K
-          self._whole_LTS                #    LL
-          self._done                     #    MM
+        when 0  # (5) the LTS ends cleanly where the match ends ("same")
+          _whole_LTS                        #    LL
+          _done                             #    MM
 
-        when 1  # the LTS ends after the match ends (6) ("L-lagging")
-          ::Kernel._K
-          self._LTS_first_half           #    LL
-          self._done                     #    M
+        when 1  # (6) the LTS ends after the match ends ("L-lagging")
+          _LTS_first_half                   #    LL
+          _done                             #    M
 
         end
-      when 1  # the LTS begins after the match begins
+      when 1  # the LTS begins after the cursor
 
         _content_until lts_begin
 
-        case lts_end <=> match_end
+        case lts_end <=> @_match_end
 
-        when -1  # the LTS ends before the match ends (7) ("M-enveloping")
-          ::Kernel._K
-          _whole_LTS                      #    LL
-          self._QUE                       #   MMMM
+        when -1  # (7) the LTS ends before the match ends ("M-enveloping")
+          _whole_LTS                         #    LL
+          _when_LTS_ends_before_match_ends   #   MMMM
 
-        when 0  # the LTS ends cleanly where the match ends (8) ("M-jutting")
-          ::Kernel._K
-          _whole_LTS                      #    LL
-          _done                           #   MMM
+        when 0  # (8) the LTS ends cleanly where the match ends ("M-jutting")
+          _whole_LTS                         #    LL
+          _done                              #   MMM
 
-        when 1  # the LTS ends after the match ends (9) ("L-lagging")
-          _LTS_first_half                 #    LL
-          _done                           #   MM
+        when 1  # (9) the LTS ends after the match ends ("L-lagging")
+          _LTS_first_half                    #    LL
+          _done                              #   MM
         end
       end
 
@@ -98,7 +121,7 @@ module Skylab::SearchAndReplace
     end
 
     def _LTS_first_half  # leave the LTS on the stream
-      d = @match.match_end_charpos
+      d = @_match_end
       @_a.push :LTS_begin, @_big_string[ @_cursor ... d ]
       @_cursor = d
     end
@@ -110,23 +133,30 @@ module Skylab::SearchAndReplace
       @_cursor = d
     end
 
-    def __after_LTS_ends
+    def _whole_LTS
+      lts = @LTS_stream.gets_one
+      d = lts.end_charpos
+      lts.string == @_big_string[ @_cursor ... d ] or self._SANITY  # #todo
+      @_a.push :LTS_begin, lts.string, :LTS_end
+      @_cursor = d
+    end
 
-      # NOTE for now we're assuming there's always another LTS
-      # per [#011] #decision-A
+    def _when_LTS_ends_before_match_ends
 
-      if @LTS_stream.current_token.charpos < @match.end_charpos
+      if @LTS_stream.current_token.charpos < @_match_end
         # if the next LTS begins before the match ends,
         # then it is our problem
 
-        ::Kernel._K
-        _transition_to_state_via_cache_stream
-        @_state_after = :_again
+        _maybe_again_AGAIN
       else
         # otherwise it is not our problem and we can just finish
-        _content_until @match.end_charpos
+        _the_rest_of_the_match_content
         _done
       end
+    end
+
+    def _the_rest_of_the_match_content
+      _content_until @_match_end
     end
 
     def _content_until d
@@ -134,8 +164,17 @@ module Skylab::SearchAndReplace
       @_cursor = d
     end
 
-    def _done
+    def _maybe_again_AGAIN  # #todo
+      _maybe_again
+    end
 
+    def _maybe_again
+      _transition_to_state_via_cache_stream
+      @_state_after = :__maybe_populate_cache_again_then_gets
+      NIL_
+    end
+
+    def _done
       _transition_to_state_via_cache_stream
       @_state_after = :__nothing
       NIL_

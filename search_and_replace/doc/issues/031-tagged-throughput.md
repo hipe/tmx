@@ -124,12 +124,19 @@ be that of this entire file) would be something very much like:
        `LTS_continuing` "\n" `LTS_end`
 
 
-`match` says we are about to see content of a match
-(or replacement). `0` means its the 0th match (in the block??)
+`match` says we are about to see content of a match (or replacement).
+
+`0` means its the 0th match. (the integer is an offset into which
+of the *block* it is, not which match in the entire document (as covered
+by #spot-6 case 11).)
+
 `repl` means we are about to see the replacement characters, not
-the original characters. `LTS_begin` mean a line termination
-sequence is starting, and the next atom is necessarily zero or
-more character(s) of that LTS
+the original characters. (if the replacement were not engaged and we
+were seeing the original characters, we would see `orig` here.)
+
+
+`LTS_begin` mean a line termination sequence is starting, and the next
+atom is necessarily zero or more character(s) of that LTS.
 
 when `static` then hits here, it tells us we are leaving the `match`
 portion of the tagged characters and entering a non-match portion of

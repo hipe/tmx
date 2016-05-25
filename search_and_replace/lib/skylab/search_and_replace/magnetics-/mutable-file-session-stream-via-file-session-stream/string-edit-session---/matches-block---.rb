@@ -87,7 +87,6 @@ module Skylab::SearchAndReplace
                 # then that previous LTS was not an endcap
                 add_it = true
               else
-                ::Kernel._K_probably_fine
                 add_it = false  # (hi.) is endcap
               end
             else

@@ -30,6 +30,11 @@ module Skylab::SearchAndReplace
       end
     end
 
+    def _reorient_then_gets_THIRD  # #todo
+      _reorient
+      send @_state
+    end
+
     def _reorient_then_gets_AGAIN  # #todo
       _reorient
       send @_state
@@ -44,7 +49,7 @@ module Skylab::SearchAndReplace
 
       remove_instance_variable :@_state
 
-      @_match = @_match_stream.gets
+      @_match ||= @_match_stream.gets  # leave it if it is there for #here
       if @_match
         if @_LTS_stream.unparsed_exists
           if @_LTS_stream.current_token.charpos < @_match.charpos
@@ -58,7 +63,7 @@ module Skylab::SearchAndReplace
       elsif @_LTS_stream.unparsed_exists
         _transition_to_remaining_LTSs_only
       else
-        self._done
+        @_state = :_nothing
       end
       NIL_
     end
@@ -97,6 +102,8 @@ module Skylab::SearchAndReplace
         Throughput_Atom_Stream_via_Match_and_LTSs.new(
           @_match, @_LTS_stream ).execute
 
+      @_match = nil  # for #here, you consumed it above
+
       @_in_static_mode = false
       @_state = :_via_atom_stream
       @_state_after = :_reorient_then_gets
@@ -106,37 +113,37 @@ module Skylab::SearchAndReplace
 
     def __transition_to_LTS_then_match
 
-      # the LTS starts before the match (and might also start before
-      # the cursor.) does it end before the match?
+      # the LTS starts before the match starts (and might also start before
+      # the cursor). does it also end before the match starts?
 
       @_a = nil
 
       lts = @_LTS_stream.current_token
 
       if lts.end_charpos <= @_match.match_charpos
-        @_state_after = :SOMETHING
-        self._A
+
+        # if the end boundary of the LTS is before or meets the beginning
+        # boundary of the match, express the some remaining fragment of the
+        # LTS in full then reorient on this SAME (#here) match again.
+
+        @_LTS_stream.advance_one
+        _any_content_before lts.charpos  # not sure if nec.
+        __the_rest_of_the_LTS lts
+        @_a or self._SANITY
+        _transition_to_cache
+        @_state_after = :_reorient_then_gets_THIRD
+
       else
         # then it starts before but ends after the match starts
 
         _any_content_before lts.charpos
-        _any_first_part_of_LTS
+        __any_first_part_of_LTS
         if @_a
           _transition_to_cache
           @_state_after = :_transition_to_match_and_LTS_then_gets
         else
           _transition_to_match_and_LTS
         end
-      end
-    end
-
-    def _any_first_part_of_LTS  # because cursor migth be after LTS begin
-
-      d = @_match.match_charpos
-
-      if d != @_cursor
-        _push_static :LTS_begin, @_big_string[ @_cursor ... d ]
-        @_cursor = d ; nil
       end
     end
 
@@ -153,13 +160,9 @@ module Skylab::SearchAndReplace
 
       when -1  # we are in the middle of the LTS
 
-        d = lts.end_charpos
-        _push_static :LTS_continuing, @_big_string[ @_cursor ... d ], :LTS_end
-
-        @_cursor = d
+        _finish_already_started_LTS lts
 
       when 0  # LTS starts where cursor starts
-        ::Kernel._K
 
         _full_LTS lts
 
@@ -177,6 +180,30 @@ module Skylab::SearchAndReplace
         _done
       end
       NIL_
+    end
+
+    def __any_first_part_of_LTS  # because cursor might be after LTS begin
+
+      d = @_match.match_charpos
+
+      if d != @_cursor
+        _push_static :LTS_begin, @_big_string[ @_cursor ... d ]
+        @_cursor = d ; nil
+      end
+    end
+
+    def __the_rest_of_the_LTS lts
+      if @_cursor == lts.charpos
+        _full_LTS lts
+      else
+        _finish_already_started_LTS lts  # case 10 of #spot-6
+      end
+    end
+
+    def _finish_already_started_LTS lts
+      d = lts.end_charpos
+      _push_static :LTS_continuing, @_big_string[ @_cursor ... d ], :LTS_end
+      @_cursor = d
     end
 
     def _full_LTS lts
@@ -227,10 +254,10 @@ module Skylab::SearchAndReplace
     end
 
     def _done
-      @_state_after = :___nothing
+      @_state_after = :_nothing
     end
 
-    def ___nothing
+    def _nothing
       NOTHING_
     end
   end

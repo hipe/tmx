@@ -48,7 +48,7 @@ module Skylab::SearchAndReplace::TestSupport
             :content, "44", :LTS_begin, "\n", :LTS_end ] or fail
       end
 
-      it "atoms for matches block (orig)" do
+      it "atoms for matches block (orig) " do  # (also case 9 of #spot-6)
 
         a = atoms_of_ block_at_ 1
 
@@ -95,7 +95,7 @@ module Skylab::SearchAndReplace::TestSupport
         only_block_.match_controllers_count___ == 1 or fail
       end
 
-      it "atoms for matchs block (orig)" do
+      it "atoms for matchs block (orig)" do  # also case 1 of #spot-6
 
         a = atoms_of_ only_block_
 
