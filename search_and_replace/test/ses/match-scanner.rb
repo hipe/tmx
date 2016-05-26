@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace::TestSupport
 
-  module Magnetics::Match_Scanner_DSL
+  module SES::Match_Scanner  # 1x
 
     def self.[] tcc
       tcc.send :define_singleton_method, :given, Given___
@@ -46,7 +46,7 @@ module Skylab::SearchAndReplace::TestSupport
         _rx = remove_instance_variable :@__rx
         _s = remove_instance_variable :@__str
 
-        ms = Magnetics::Build_match_scanner_[ _s, _rx ]
+        ms = SES::Build_match_scanner[ _s, _rx ]
 
         a = []
         begin

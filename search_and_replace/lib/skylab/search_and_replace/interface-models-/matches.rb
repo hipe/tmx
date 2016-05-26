@@ -51,7 +51,7 @@ module Skylab::SearchAndReplace
       o.execute
     end
 
-    def to_mutable_file_session_stream_for__ repl_params_x  # highlight eventually
+    def to_string_edit_session_stream_for__ repl_params_x  # highlight eventually
 
       o = _begin_common_file_session_stream
       o.for = :for_interactive_search_and_replace
@@ -61,7 +61,7 @@ module Skylab::SearchAndReplace
 
     def _begin_common_file_session_stream
 
-      o = Home_::Magnetics_::File_Session_Stream_via_Parameters.new( & @_oes_p )
+      o = Home_::Magnetics_::FileSession_Stream_via_Parameters.new( & @_oes_p )
       o.ruby_regexp = @ruby_regexp
       o.upstream_path_stream = @files_by_grep
       o.grep_extended_regexp_string = @egrep_pattern

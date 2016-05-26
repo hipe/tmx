@@ -11,7 +11,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     cache = {}
-    define_method :lib_ do | sym |
+    define_method :lib_ do |sym|
       cache.fetch sym do
         x = TestSupport_.fancy_lookup sym, TS_
         cache[ sym ] = x
@@ -212,30 +212,6 @@ module Skylab::SearchAndReplace::TestSupport
     end  # •cp1
   end
 
-  Autoloader_ = Callback_::Autoloader
-
-  module Magnetics
-
-    Build_match_scanner_ = -> s, rx do
-
-      Lib_[]::Match_Scanner___.new s, rx
-    end
-
-    Build_line_scanner_ = -> big_str do
-
-      Lib_[]::Line_Scanner_.new big_str
-    end
-
-    Lib_ = -> do
-      Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream::
-        String_Edit_Session___
-    end
-
-    Autoloader_[ self ]
-  end
-
-  # --
-
   # -- test support lib nodes (short)
 
   Memoizer_Methods = -> tcc do
@@ -257,6 +233,8 @@ module Skylab::SearchAndReplace::TestSupport
     Zerk_ = Home_.lib_.zerk ; nil
   end
 
+  Autoloader_ = Callback_::Autoloader
+
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   Home_ = ::Skylab::SearchAndReplace
 
@@ -264,5 +242,6 @@ module Skylab::SearchAndReplace::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NOTHING_ = nil
   TS_ = self
 end

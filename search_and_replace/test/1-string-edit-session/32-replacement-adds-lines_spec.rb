@@ -6,7 +6,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_mutable_file_session
+    use :SES
 
     # - performance
 

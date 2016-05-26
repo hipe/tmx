@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  module Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
+  module Magnetics_::ReadOnly_FileSession_Stream_via_FileSession_Stream  # 1x
 
     class << self
       def [] up, & p

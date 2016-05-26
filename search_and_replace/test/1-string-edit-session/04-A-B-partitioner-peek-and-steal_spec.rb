@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - A-B partitioner (more)" do
+  describe "[sa] SES - A-B partitioner (more)" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_A_B_partitioner
+    use :SES_A_B_partitioner
 
     context "try to catch those newlines" do
 

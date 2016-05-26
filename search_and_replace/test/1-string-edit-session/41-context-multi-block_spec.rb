@@ -6,13 +6,13 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_DSL
+    use :SES_context_lines
 
     context "several blocks, one match" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE
+        str unindent_ <<-HERE
           line 1
           line 2
           ohai
@@ -20,12 +20,12 @@ module Skylab::SearchAndReplace::TestSupport
           line 5
         HERE
 
-        regexp %r(^ohai$)
+        rx %r(^ohai$)
       end
 
       context "don't engage the replacement" do
 
-        shared_subject :edit_session_ do
+        shared_subject :mutated_edit_session_ do
 
           build_edit_session_
         end
@@ -43,8 +43,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for no leading and no trailing context" do
 
-          shared_subject :tuple_ do
-            _tuple_via 0, 0
+          shared_subject :context_lines_before_during_after_ do
+            context_lines_before_during_after_via_ 0, 0
           end
 
           it "before lines is none" do
@@ -62,8 +62,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for one trailing no leading" do
 
-          shared_subject :tuple_ do
-            _tuple_via 0, 1
+          shared_subject :context_lines_before_during_after_ do
+            context_lines_before_during_after_via_ 0, 1
           end
 
           it "before is none" do
@@ -81,8 +81,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for one leading no trailing" do
 
-          shared_subject :tuple_ do
-            _tuple_via 1, 0
+          shared_subject :context_lines_before_during_after_ do
+            context_lines_before_during_after_via_ 1, 0
           end
 
           it "before is legit" do
@@ -105,7 +105,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "do engage the replacement" do
 
-        shared_subject :edit_session_ do
+        shared_subject :mutated_edit_session_ do
 
           es = build_edit_session_
           mc = es.first_match_controller
@@ -126,8 +126,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for one leading and one trailing" do
 
-          shared_subject :tuple_ do
-            _tuple_via 1, 1
+          shared_subject :context_lines_before_during_after_ do
+            context_lines_before_during_after_via_ 1, 1
           end
 
           it "before is legit" do
@@ -162,13 +162,6 @@ module Skylab::SearchAndReplace::TestSupport
 
       def _after_is_legit
         one_line_( lines_after_ ).should eql "line 4\n"
-      end
-
-      def _tuple_via num_before, num_after
-
-        _es = edit_session_
-        _mc = _es.first_match_controller
-        _mc.to_contextualized_sexp_line_streams num_before, num_after
       end
     end
   end

@@ -2,17 +2,17 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (40) context intro", wip: true do
+  describe "[sa] SES - context intro", wip: true do
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_DSL
+    use :SES_context_lines
 
     context "one block, several matches" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE
+        str unindent_ <<-HERE
           bunny bunnny
           buny
           bunnny
@@ -20,23 +20,25 @@ module Skylab::SearchAndReplace::TestSupport
           bunny
         HERE
 
-        regexp %r(\bbun+y\b)
+        rx %r(\bbun+y\b)
       end
 
-      shared_mutated_edit_session_ :one do | es |
+      shared_subject :mutated_edit_session_ do
 
-        mc = match_controller_array_for_ es
+        cs = string_edit_session_begin_controllers_
+
+        mc = cs.match_controller_array
 
         mc[1].engage_replacement_via_string 'BUNER'
         mc[3].engage_replacement_via_string 'BONUS'
         mc[5].engage_replacement_via_string 'BONANZA'
 
-        NIL_
+        cs.string_edit_session
       end
 
       context "no lines of context - only the line of the match" do
 
-        shared_subject :tuple_ do
+        shared_subject :context_lines_before_during_after_ do
           _mc = _the_third_match_controller_of_shared_thing_one
           _mc.to_contextualized_sexp_line_streams 0, 0
         end
@@ -56,7 +58,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "one line before and one line after" do
 
-        shared_subject :tuple_ do
+        shared_subject :context_lines_before_during_after_ do
           _mc = _the_third_match_controller_of_shared_thing_one
           _mc.to_contextualized_sexp_line_streams 1, 1
         end
@@ -76,7 +78,9 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _the_third_match_controller_of_shared_thing_one
-      _es = the_shared_mutated_edit_session_ :one
+
+      _es = mutated_edit_session_
+
       match_controller_at_offset_ _es, 3  # the one on line three
     end
   end

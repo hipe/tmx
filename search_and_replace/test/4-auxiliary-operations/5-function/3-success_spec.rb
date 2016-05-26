@@ -6,11 +6,11 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :my_API
-    use :magnetics_mutable_file_session
+    use :SES
 
     context "(one file one match, good function stuff)" do
 
-      shared_subject :edit_session_ do
+      shared_subject :mutated_edit_session_ do
 
         _dir = the_wazizzle_worktree_
         _func_dir = common_functions_dir_
@@ -30,7 +30,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       shared_subject :_performance do
 
-        edit_session_.first_match_controller.engage_replacement
+        mutated_edit_session_.first_match_controller.engage_replacement
       end
 
       it "performance succeeds" do

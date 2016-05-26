@@ -6,22 +6,22 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_DSL
+    use :SES_context_lines
 
     context "(regression)" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE  # as may be seen in [ts]
+        str unindent_ <<-HERE  # as may be seen in [ts]
           wahootey41 hello41 wahootey42
           hello42
           wahootey43
         HERE
 
-        regexp %r(\bwahootey[0-9])  # NOTE only one digit!
+        rx %r(\bwahootey[0-9])  # NOTE only one digit!
       end
 
-      shared_subject :edit_session_ do
+      shared_subject :mutated_edit_session_ do
 
         _es = build_edit_session_
         # (hi. engage nothing.)
@@ -30,10 +30,9 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "from first match" do
 
-        shared_subject :tuple_ do
+        shared_subject :context_lines_before_during_after_ do
 
-          _mc = edit_session_.first_match_controller
-          _mc.to_contextualized_sexp_line_streams 2, 2
+          context_lines_before_during_after_via_ 2, 2
         end
 
         it "during" do
@@ -56,12 +55,9 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "from final (i.e third) match" do
 
-        shared_subject :tuple_ do
+        shared_subject :context_lines_before_during_after_ do
 
-          _mc = edit_session_.first_match_controller
-          _mc = _mc.next_match_controller
-          _mc = _mc.next_match_controller
-          _mc.to_contextualized_sexp_line_streams 2, 2
+          context_lines_before_during_after_via_ 2, 2, 2
         end
 
         it "before" do

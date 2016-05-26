@@ -6,14 +6,14 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_mutable_file_session
+    use :SES
 
     _GAK = /\bGAK\b/
 
     context "minimal normal - one replacement in middle line in middle of line" do
 
-      shared_subject :state_ do
-        build_common_state_ "a\nb-GAK-c\nd\n", _GAK
+      shared_subject :string_edit_session_controllers_ do
+        build_string_edit_session_controllers_ "a\nb-GAK-c\nd\n", _GAK
       end
 
       it "one match" do
@@ -22,7 +22,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "three blocks - traverse from begin to end and back again" do
 
-        _es = state_.edit_session
+        _es = string_edit_session_controllers_.string_edit_session
         bl1 = _es.first_block
         bl1 or fail
 
@@ -80,7 +80,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _STRING = "GAK\n__\n"
 
-      shared_subject :state_ do
+      shared_subject :_state do
 
         _es = _build_the_session
 
@@ -108,15 +108,15 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "two blocks" do
-        state_.length.should eql 2
+        _state.length.should eql 2
       end
 
       it "first block has matches" do
-        state_.fetch( 0 ).should eql true
+        _state.fetch( 0 ).should eql true
       end
 
       it "second block does not" do
-        state_.fetch( 1 ).should eql false
+        _state.fetch( 1 ).should eql false
       end
     end
 
@@ -124,7 +124,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _STRING = "GAK\n__\nGAK\n"
 
-      shared_subject :state_ do
+      shared_subject :_state do
 
         _es = _build_the_session
         a = []
@@ -142,11 +142,11 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       it "three blocks" do
-        state_.length.should eql 3
+        _state.length.should eql 3
       end
 
       it "matches look right" do
-        state_.should eql [ true, false, true ]
+        _state.should eql [ true, false, true ]
       end
     end
   end

@@ -1,16 +1,18 @@
 module Skylab::SearchAndReplace::TestSupport
 
-  module Magnetics::Mutable_File_Session
+  module SES  # string edit session
+
+    # assumes `mutated_edit_session_`
 
     def self.[] tcc
-      tcc.include self
+      tcc.include InstanceMethods
     end
 
-    # -
+    module InstanceMethods
 
       def expect_edit_session_output_ string
 
-        es = edit_session_
+        es = mutated_edit_session_
 
         exp_st = Home_.lib_.basic::String.line_stream string
         act_st = es.to_line_stream
@@ -83,17 +85,28 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def match_controllers_
-        state_.match_controller_array
+        string_edit_session_controllers_.match_controller_array
       end
 
-      def build_common_state_ s, rx
+      def string_edit_session_begin_controllers_
+
+        instance_exec( & common_DSL_given_proc )
+
+        _str = remove_instance_variable :@common_DSL_given_string
+
+        _rx = remove_instance_variable :@common_DSL_given_regex
+
+        build_string_edit_session_controllers_ _str, _rx
+      end
+
+      def build_string_edit_session_controllers_ s, rx
 
         es = build_edit_session_via_ s, rx
         _a = match_controller_array_for_ es
         Common_State___.new _a, es
       end
 
-      Common_State___ = ::Struct.new :match_controller_array, :edit_session
+      Common_State___ = ::Struct.new :match_controller_array, :string_edit_session
 
       def build_edit_session_via_ s, rx
         _string_edit_session.new true, s, nil, nil, nil, rx
@@ -104,11 +117,57 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def _string_edit_session
-        magnetics_::
-          Mutable_File_Session_Stream_via_File_Session_Stream::
-            String_Edit_Session___
+        Home_::StringEditSession_
+      end
+    end
+
+    # ==
+
+    module Common_DSL
+
+      module ModuleMethods
+
+        def given & p
+          common_DSL_when_givens_are_given
+          define_method :common_DSL_given_proc do
+            p
+          end ; nil
+        end
+
+        def common_DSL_when_givens_are_given
+          NOTHING_
+        end
       end
 
-    # -
+      module InstanceMethods
+
+        def str s
+          @common_DSL_given_string = s ; nil
+        end
+
+        def rx rx
+          @common_DSL_given_regex = rx ; nil
+        end
+      end
+
+    end
+
+    # ==
+
+    Build_match_scanner = -> s, rx do
+
+      Asset[]::Match_Scanner___.new s, rx
+    end
+
+    Build_line_scanner = -> big_str do
+
+      Asset[]::Line_Scanner_.new big_str
+    end
+
+    Asset = -> do
+      Home_::StringEditSession_
+    end
+
+    # ==
   end
 end

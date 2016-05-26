@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - block stream intro" do
+  describe "[sa] SES - block stream intro" do
 
     # introduce exactly [#031] throughput and [#012] blocks.
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_block_stream
+    use :SES_block_stream
 
     context "(ensure the immutabililty of the final LTS :#decision-B)" do
 
@@ -95,7 +95,7 @@ module Skylab::SearchAndReplace::TestSupport
         only_block_.match_controllers_count___ == 1 or fail
       end
 
-      it "atoms for matchs block (orig)" do  # also case 1 of #spot-6
+      it "atoms for matches block (orig)" do  # also case 1 of #spot-6
 
         a = atoms_of_ only_block_
 

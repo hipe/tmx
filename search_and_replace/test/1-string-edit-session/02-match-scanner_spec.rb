@@ -2,10 +2,10 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - match scanner (multibyte bugfix)" do
+  describe "[sa] SES - match scanner (multibyte bugfix)" do
 
     TS_[ self ]
-    use :magnetics_match_scanner_DSL
+    use :SES_match_scanner
 
     context "no match is OK" do
 

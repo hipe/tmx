@@ -26,12 +26,12 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _match_controller
-      edit_session_.first_match_controller
+      mutated_edit_session_.first_match_controller
     end
 
     context "when the replacement is *not* engaged" do
 
-      def edit_session_  # do NOT mutate
+      def mutated_edit_session_  # do NOT mutate
         _the_edit_session_prototype
       end
 
@@ -43,7 +43,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "when the replacement *is* engaged" do
 
-      def edit_session_
+      def mutated_edit_session_
         _performance_tuple.fetch 0
       end
 
@@ -97,7 +97,7 @@ module Skylab::SearchAndReplace::TestSupport
 
           _oes_p = el.handle_event_selectively
 
-          _x = edit_session_.write_output_lines_into "", & _oes_p
+          _x = mutated_edit_session_.write_output_lines_into "", & _oes_p
 
           _emissions = el.flush_to_array
 
@@ -123,7 +123,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         shared_subject :_tuple do
 
-          _es_proto = edit_session_
+          _es_proto = mutated_edit_session_
           _my_es = _es_proto.dup
           mc = _my_es.first_match_controller
           _x = mc.disengage_replacement

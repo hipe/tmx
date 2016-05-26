@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - A-B partitioner" do
+  describe "[sa] SES - A-B partitioner" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_A_B_partitioner
+    use :SES_A_B_partitioner
 
     # voluminous docs at [#005]
 

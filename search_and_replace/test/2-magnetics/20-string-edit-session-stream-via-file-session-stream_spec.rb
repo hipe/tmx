@@ -2,18 +2,18 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (20) mutable file session stream (intro)", wip: true do
+  describe "[sa] magnetics - string edit session stream via..", wip: true do
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_mutable_file_session
+    use :SES
 
     _EMPTY_RX = //
 
     context "empty regexp, empty string" do
 
-      shared_subject :state_ do
-        build_common_state_ EMPTY_S_, _EMPTY_RX
+      shared_subject :string_edit_session_controllers_ do
+        build_string_edit_session_controllers_ EMPTY_S_, _EMPTY_RX
       end
 
       it "has one match controller" do
@@ -23,8 +23,8 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "empty regexp, non-empty string (2 chars wide)" do
 
-      shared_subject :state_ do
-        build_common_state_ 'ab', _EMPTY_RX
+      shared_subject :string_edit_session_controllers_ do
+        build_string_edit_session_controllers_ 'ab', _EMPTY_RX
       end
 
       it "has three match controllers" do
@@ -36,8 +36,8 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "regexp that doesn't match string (empty string)" do
 
-      shared_subject :state_ do
-        build_common_state_ EMPTY_S_, _CHAR_RX
+      shared_subject :string_edit_session_controllers_ do
+        build_string_edit_session_controllers_ EMPTY_S_, _CHAR_RX
       end
 
       it "no matches" do
@@ -47,8 +47,8 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "regexp that doesn't match string (nonempty string)" do
 
-      shared_subject :state_ do
-        build_common_state_ 'a', /b/
+      shared_subject :string_edit_session_controllers_ do
+        build_string_edit_session_controllers_ 'a', /b/
       end
 
       it "no matches" do
@@ -58,8 +58,8 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "two matches one line no newline" do
 
-      shared_subject :state_ do
-        build_common_state_ '__XX__XX__', /XX/
+      shared_subject :string_edit_session_controllers_ do
+        build_string_edit_session_controllers_ '__XX__XX__', /XX/
       end
 
       it "two matches" do
@@ -89,7 +89,7 @@ module Skylab::SearchAndReplace::TestSupport
       _s = 'Fibble..XX..and faBBle, and Fopple and falafel fubbel'
       _rx = /\bf[a-z][bp]{2}(?:el|le)\b/i
 
-      _ = build_common_state_ _s, _rx
+      _ = build_string_edit_session_controllers_ _s, _rx
       a = _.match_controller_array
 
       d = -1

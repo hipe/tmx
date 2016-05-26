@@ -1,10 +1,8 @@
 module Skylab::SearchAndReplace
 
-  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+  class StringEditSession_
 
-    class String_Edit_Session___
-
-      class Static_Block___ < Block___  # Block_
+      class Static_Block___ < Block_
 
         def initialize
           @_LTSs = []  # line termination sequence (i.e "newline") occurrences
@@ -113,7 +111,6 @@ module Skylab::SearchAndReplace
           false
         end
       end
-    end
   end
 end
 # #history: distilled as a sub-class from "block"

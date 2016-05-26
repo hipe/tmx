@@ -29,12 +29,12 @@ module Skylab::SearchAndReplace
       # not-yet-executed session, rather than its result. (our main
       # dependency will do something special with it.)
 
-      o.respond_to? :to_mutable_file_session_stream_for__ or self._HI
+      o.respond_to? :to_string_edit_session_stream_for__ or self._HI
       o
     end
 
     def execute
-      @matches.to_mutable_file_session_stream_for__ self
+      @matches.to_string_edit_session_stream_for__ self
     end
 
     def handle_event_selectively_for_zerk

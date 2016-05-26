@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+  module Magnetics_::StringEditSession_Stream_via_FileSession_Stream
 
     class << self
       def [] up, & p
@@ -104,7 +104,7 @@ module Skylab::SearchAndReplace
         big_string = io.read
         io.close
 
-        Here___::String_Edit_Session___.new(
+        Home_::StringEditSession_.new(
           @__is_dry_run,
           big_string,
           d,

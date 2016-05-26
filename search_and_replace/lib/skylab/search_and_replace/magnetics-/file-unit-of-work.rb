@@ -102,7 +102,7 @@ module Skylab::SearchAndReplace
 
       _st = @_file_session.to_line_stream
 
-      o = Home_::Magnetics_::Write_changed_file_via_mutable_file_session.
+      o = Home_::Magnetics_::Write_changed_file_via_string_edit_session.
         new( & @_oes_p )  # misnomer
 
       o.line_stream = _st

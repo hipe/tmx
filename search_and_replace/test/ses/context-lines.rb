@@ -1,67 +1,15 @@
 module Skylab::SearchAndReplace::TestSupport
 
-  module Magnetics::DSL
+  module SES::Context_Lines
 
     def self.[] tcc
-      Magnetics::Mutable_File_Session[ tcc ]
-      tcc.extend Module_Methods___
-      tcc.include Instance_Methods___
+      tcc.extend SES::Common_DSL::ModuleMethods
+      tcc.include SES::Common_DSL::InstanceMethods
+      tcc.include SES::InstanceMethods
+      tcc.include self
     end
 
-    Danger_memo__ = TestSupport_::Define_dangerous_memoizer
-
-    module Module_Methods___
-
-      def shared_input_ & p
-
-        Danger_memo__.call self, :_input_tuple do
-
-          @_mag_DSL_SIS = Shared_Input_Struct___.new
-          instance_exec( & p )
-          remove_instance_variable :@_mag_DSL_SIS
-        end ; nil
-      end
-
-      def shared_mutated_edit_session_ sym, & p
-
-        _m = SMES_method_for__[ sym ]
-
-        Danger_memo__.call self, _m do
-
-          es = build_edit_session_
-          instance_exec es, & p
-          es
-        end
-      end
-    end
-
-    Shared_Input_Struct___ = ::Struct.new :s, :rx
-
-    SMES_method_for__ = -> sym do
-      :"_shared_mutated_edit_sesssion_called__#{ sym }__"
-    end
-
-    module Instance_Methods___
-
-      def input_string s
-        @_mag_DSL_SIS[ :s ] = s ; nil
-      end
-
-      def regexp rx
-        @_mag_DSL_SIS[ :rx ] = rx ; nil
-      end
-
-      def the_shared_mutated_edit_session_ sym
-        _m = SMES_method_for__[ sym ]
-        send _m
-      end
-
-      def build_edit_session_
-
-        _s, _rx = _input_tuple.to_a
-        build_edit_session_via_ _s, _rx
-      end
-
+    # -
       def match_controller_at_offset_ es, d
 
         0 > d and self._NO
@@ -74,7 +22,7 @@ module Skylab::SearchAndReplace::TestSupport
         x
       end
 
-      def for_ st
+      def _WOULD_BE_for_ st
 
         @_mag_dsl_st = st
         yield
@@ -85,13 +33,13 @@ module Skylab::SearchAndReplace::TestSupport
         end
       end
 
-      def nothing_for_ st
+      def _WOULD_BE_nothing_for_ st
         if st
           fail __for_say_stream
         end
       end
 
-      def _ line_without_newline
+      def _WOULD_BE_UNDERSCORE_ONLY_ line_without_newline
 
         x = @_mag_dsl_st.gets
         if x
@@ -112,7 +60,7 @@ module Skylab::SearchAndReplace::TestSupport
       def __for_say_no_newline s ; "did not have a newline: #{ s.inspect }" ; end
       def __for_say_miss s ; "missing expected line: #{ s.inspect }" ; end
 
-      def one_line_ st
+      def _WOULD_BE_one_line_ st
         _ = st.gets
         _2 = st.gets
         _2 and fail
@@ -120,16 +68,32 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def lines_before_
-        tuple_.fetch 0
+        context_lines_before_during_after_.fetch 0
       end
 
       def lines_during_
-        tuple_.fetch 1
+        context_lines_before_during_after_.fetch 1
       end
 
       def lines_after_
-        tuple_.fetch 2
+        context_lines_before_during_after_.fetch 2
       end
-    end
+
+      def context_lines_before_during_after_via_ num_before, num_after, mc_d=0
+
+        _es = mutated_edit_session_
+
+        mc = _es.first_match_controller
+
+        mc_d.times do
+          _mc_ = mc.next_match_controller
+          _mc_ or ::Kernel._SANITY  # #todo
+          mc = _mc_
+        end
+
+        mc.to_contextualized_sexp_line_streams num_before, num_after
+      end
+    # -
   end
 end
+# #history: splintered

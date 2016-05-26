@@ -6,7 +6,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :expect_event
-    use :magnetics_replace_function
+    use :SES_replace_function  # 1x
 
     it "a replace function can be used for oridnary string substitution" do
 

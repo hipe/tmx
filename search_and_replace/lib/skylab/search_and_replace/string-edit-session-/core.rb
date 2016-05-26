@@ -1,8 +1,6 @@
 module Skylab::SearchAndReplace
 
-  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
-
-    class String_Edit_Session___  # see [#010].  # #testpoint
+    class StringEditSession_  # see [#010].  # #testpoint
 
       def initialize is_dry, s, d, path, repl_f, rx
 
@@ -10,7 +8,7 @@ module Skylab::SearchAndReplace
 
         _line_scanner = Here_::Line_Scanner_.new s
 
-        cls = Here_::Block__
+        cls = Here_::Block_
 
         _ = cls::Ingredients.new _line_scanner, _match_scanner, repl_f
 
@@ -92,5 +90,4 @@ module Skylab::SearchAndReplace
       # NEWLINE_SEXP_ = [ :newline_sequence, NEWLINE_ ].freeze  gone for [#011]  # #todo
       NOTHING_ = nil  # in contrast with something
     end
-  end
 end

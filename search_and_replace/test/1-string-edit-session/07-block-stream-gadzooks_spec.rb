@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - block stream some edges" do
+  describe "[sa] SES - block stream some edges" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_block_stream
+    use :SES_block_stream
 
     context "gadzooks" do
 

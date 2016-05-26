@@ -6,13 +6,13 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_DSL
+    use :SES_context_lines
 
     context "many matches, many replacements, delimitation changed" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE
+        str unindent_ <<-HERE
           zero_then
           one_and
           two_and
@@ -25,10 +25,10 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "replace all three" do
 
-        shared_subject :edit_session_ do
+        shared_subject :mutated_edit_session_ do
 
-          es = build_edit_session_
-          mc = match_controller_array_for_ es
+          _cs = string_edit_session_begin_controllers_
+          mc = _cs.match_controller_array
 
           mc[ 0 ].engage_replacement_via_string "\nAND"
           mc[ 1 ].engage_replacement_via_string "_2_and"
@@ -49,7 +49,7 @@ module Skylab::SearchAndReplace::TestSupport
           HERE
         end
 
-        shared_subject :tuple_ do
+        shared_subject :context_lines_before_during_after_ do
           _build_same_tuple
         end
 
@@ -96,9 +96,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "repl has a repl before it, does not start at column 1, adds lines" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE
+        str unindent_ <<-HERE
           zip zonk zip
           zap zank zap
         HERE
@@ -106,7 +106,7 @@ module Skylab::SearchAndReplace::TestSupport
         regexp %r(\bz[aeiou]nk\b)i
       end
 
-      shared_subject :edit_session_ do
+      shared_subject :mutated_edit_session_ do
 
         es = build_edit_session_
 
@@ -121,7 +121,7 @@ module Skylab::SearchAndReplace::TestSupport
         es
       end
 
-      shared_subject :tuple_ do
+      shared_subject :context_lines_before_during_after_ do
         _build_same_tuple
       end
 
@@ -162,9 +162,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "when many matches on one line and actual context is low" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE
+        str unindent_ <<-HERE
           zo ZE zoo
           ZIM zam ZOM
           ziff ZUP zaff
@@ -173,16 +173,17 @@ module Skylab::SearchAndReplace::TestSupport
         regexp %r(\bZ[A-Z]+\b)
       end
 
-      shared_subject :edit_session_ do
+      shared_subject :mutated_edit_session_ do
 
-        es = build_edit_session_
+        cs = string_edit_session_begin_controllers_
+        mc = cs.match_controller_array
 
-        mc = match_controller_array_for_ es
         mc[0].engage_replacement_via_string 'JE'
         mc[1].engage_replacement_via_string 'JIM'
         mc[2].engage_replacement_via_string 'JOM'
         mc[3].engage_replacement_via_string 'JUP'
-        es
+
+        cs.string_edit_session
       end
 
       it "(content looks right)" do
@@ -194,7 +195,7 @@ module Skylab::SearchAndReplace::TestSupport
         HERE
       end
 
-      shared_subject :tuple_ do
+      shared_subject :context_lines_before_during_after_ do
         _build_same_tuple
       end
 
@@ -221,8 +222,8 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _build_same_tuple
-      _mc = edit_session_.first_match_controller.next_match_controller
-      _mc.to_contextualized_sexp_line_streams 2, 2
+
+      context_lines_before_during_after_via_ 2, 2, 1
     end
   end
 end

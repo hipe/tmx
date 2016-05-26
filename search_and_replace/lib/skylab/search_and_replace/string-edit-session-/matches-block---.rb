@@ -1,10 +1,8 @@
 module Skylab::SearchAndReplace
 
-  module Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+  class StringEditSession_
 
-    class String_Edit_Session___
-
-      class Matches_Block___ < Block___  # Block_
+      class Matches_Block___ < Block_
 
         # implement exactly [#012]
 
@@ -149,11 +147,11 @@ module Skylab::SearchAndReplace
           end
         end
 
-        def next_match_controller_after__ d
-          ::Kernel._K
+        def next_match_controller_after_match_index__ d
 
           d_ = d + 1
-          if d_ == @_MCs.length
+
+          if @MC_indexes.length == d_
             nb = next_block
             if nb
               nb.next_match_controller
@@ -161,7 +159,7 @@ module Skylab::SearchAndReplace
               NOTHING_
             end
           else
-            @_MCs.fetch d_
+            @all_things.fetch @MC_indexes.fetch d_
           end
         end
 
@@ -169,8 +167,8 @@ module Skylab::SearchAndReplace
           self._LOOKUP_last_match_controller
         end
 
-        def next_match_controller
-          self._GET_first_match_controller
+        def next_match_controller  # always the first match controller
+          @all_things.fetch @MC_indexes.first
         end
 
         def COVER_write_the_previous_N_line_sexp_arrays_in_front_of a, n
@@ -228,7 +226,6 @@ module Skylab::SearchAndReplace
           true
         end
       end
-    end
   end
 end
 # #history: distilled as a sub-class from "block"

@@ -6,13 +6,13 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_mutable_file_session  # (only for 1 assertion method)
+    use :SES  # (only for 1 assertion method)
 
     shared_subject :_edit_session_array do
 
       _st = build_stream_for_single_path_to_file_with_three_lines_
 
-      o = magnetics_::File_Session_Stream_via_Parameters.new( & no_events_ )
+      o = magnetics_::FileSession_Stream_via_Parameters.new( & no_events_ )
       o.upstream_path_stream = _st
       o.ruby_regexp = /e[\n!]/m
       o.for = :for_interactive_search_and_replace
@@ -48,10 +48,10 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     shared_subject :_match_controller_array do
-      match_controller_array_for_ edit_session_
+      match_controller_array_for_ mutated_edit_session_
     end
 
-    def edit_session_
+    def mutated_edit_session_
       _edit_session_array.fetch 0
     end
   end

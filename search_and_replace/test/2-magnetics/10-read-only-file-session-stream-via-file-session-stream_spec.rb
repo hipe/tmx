@@ -13,12 +13,12 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _subject
-      magnetics_::File_Session_Stream_via_Parameters
+      magnetics_::FileSession_Stream_via_Parameters
     end
 
     context "unlike grep we get one entry per match not one per line" do
 
-      shared_subject :state_ do
+      shared_subject :_state do
 
         _st = build_stream_for_single_path_to_file_with_three_lines_
 
@@ -58,21 +58,21 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "there was only one file" do
 
-        o = state_
+        o = _state
         o.one_file or fail
         o.another_file and fail
       end
 
       it "in the first file there are three matches" do
 
-        o = state_
+        o = _state
         o.third_match or fail
         o.fourth_match and fail
       end
 
       it "each match knows what line number it came from" do
 
-        o = state_
+        o = _state
         o.first_match.lineno.should eql 1
         o.second_match.lineno.should eql 3
         o.third_match.lineno.should eql 3
@@ -84,9 +84,9 @@ module Skylab::SearchAndReplace::TestSupport
         # third match are on the same line (the second line). it is these
         # two matches that we focus on below..
 
-        alias_method :super_, :state_
+        alias_method :super_, :_state
 
-        shared_subject :state_ do
+        shared_subject :_state do
 
           o = super_
 
@@ -103,7 +103,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "you can convert the match itself to a \"line\" stream" do
 
-          a = state_
+          a = _state
           a.fetch( 0 ).length.should eql 1
           a.fetch( 1 ).length.should eql 1
           a.length.should eql 2
@@ -111,7 +111,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "the match is highlighted within the full line" do
 
-          a = state_
+          a = _state
 
           mid_strings = _treat a.fetch 0
           last_strings = _treat a.fetch 1

@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace::TestSupport
 
-  module Magnetics::Replace_Function
+  module SES::Replace_Function  # 1x
 
     def self.[] tcc
       tcc.include self

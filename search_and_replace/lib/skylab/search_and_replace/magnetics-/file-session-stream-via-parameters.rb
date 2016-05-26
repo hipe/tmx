@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Magnetics_::File_Session_Stream_via_Parameters
+  class Magnetics_::FileSession_Stream_via_Parameters
 
     def initialize & oes_p
       @_oes_p = oes_p
@@ -51,11 +51,11 @@ module Skylab::SearchAndReplace
 
     FOR___ = {
       for_interactive_search_and_replace: -> do
-        Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream
+        Home_::Magnetics_::StringEditSession_Stream_via_FileSession_Stream
       end,
 
       read_only: -> do
-        Home_::Magnetics_::Read_Only_File_Session_Stream_via_File_Session_Stream
+        Home_::Magnetics_::ReadOnly_FileSession_Stream_via_FileSession_Stream  # 1x
       end,
     }
 

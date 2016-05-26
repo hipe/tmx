@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace::TestSupport
 
-  module Magnetics::A_B_Partitioner
+  module SES::A_B_Partitioner
 
     def self.[] tcc
       tcc.include self
@@ -88,8 +88,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def A_B_partitioner_base_class
-        Home_::Magnetics_::Mutable_File_Session_Stream_via_File_Session_Stream::
-          String_Edit_Session___::A_B_Partitioner___
+        Home_::StringEditSession_::A_B_Partitioner___
       end
 
     # -

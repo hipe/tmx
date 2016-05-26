@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - block stream some edges" do
+  describe "[sa] SES - block stream some edges" do
 
     # (this is the coverage counterpart to #spot-6)
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_block_stream
+    use :SES_block_stream
 
     # (case 1 is covered in the previous spec)
 

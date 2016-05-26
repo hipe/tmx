@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - line scanner (multibyte bugfix)" do
+  describe "[sa] SES - line scanner (multibyte bugfix)" do
 
     # all this time we've been happily trollomping along using *byte*
     # offsets when we should have be using *character* offsets. this never
@@ -98,7 +98,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     def _scan_proc_for big_string
 
-      o = Magnetics::Build_line_scanner_[ big_string ]
+      o = SES::Build_line_scanner[ big_string ]
 
       # (saying `method( :gets )` instead of the below might accidentally
       # hang blocking for IO, if we accidentally grab the private method)

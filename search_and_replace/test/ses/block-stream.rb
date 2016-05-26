@@ -1,16 +1,16 @@
 module Skylab::SearchAndReplace::TestSupport
 
-  module Magnetics::Block_Stream
+  module SES::Block_Stream
 
     def self.[] tcc
-      tcc.send :define_singleton_method, :given, Given___
-      tcc.include self
+      tcc.extend SES::Common_DSL::ModuleMethods
+      tcc.include SES::Common_DSL::InstanceMethods
+      tcc.send :define_singleton_method, :common_DSL_when_givens_are_given, This__
+      tcc.include Instance_Methods__
     end
 
     # -
-
-      Given___ = -> & p do
-
+      This__ = -> do
         yes = true ; a = nil
         define_method :block_array do
           if yes
@@ -24,33 +24,22 @@ module Skylab::SearchAndReplace::TestSupport
           end
           a
         end
-
-        define_method :build_first_block do  # public for debugging
-          instance_exec( & p )
-          __build_first_block
-        end
+        super()
       end
-
-    # -
     # -
 
-      # -- DSL (we intentionally mimic that other one)
+    module Instance_Methods__
 
-      def rx rx
-        @__rx = rx
+      def build_first_block  # public for debugging
+        instance_exec( & common_DSL_given_proc )
+        __build_first_block
       end
-
-      def str s
-        @__str = s
-      end
-
-      # --
 
       lib = -> do
         lib = nil
-        Build_match_stream__ = Magnetics::Build_match_scanner_
-        Build_line_stream__ = Magnetics::Build_line_scanner_
-        Block__ = Magnetics::Lib_[]::Block___  # Block_
+        Build_match_stream__ = SES::Build_match_scanner
+        Build_line_stream__ = SES::Build_line_scanner
+        Block__ = SES::Asset[]::Block_
         NIL_
       end
 
@@ -58,8 +47,8 @@ module Skylab::SearchAndReplace::TestSupport
 
         lib && lib[]
 
-        _rx = remove_instance_variable :@__rx
-        s = remove_instance_variable :@__str
+        _rx = remove_instance_variable :@common_DSL_given_regex
+        s = remove_instance_variable :@common_DSL_given_string
 
         _match_st = Build_match_stream__[ s, _rx ]
 
@@ -115,7 +104,6 @@ module Skylab::SearchAndReplace::TestSupport
       def block_count_
         block_array.length
       end
-
-    # -
+    end
   end
 end

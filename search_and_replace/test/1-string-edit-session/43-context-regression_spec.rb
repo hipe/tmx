@@ -6,21 +6,21 @@ module Skylab::SearchAndReplace::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :magnetics_DSL
+    use :SES_context_lines
 
     context "(regression)" do
 
-      shared_input_ do
+      given do
 
-        input_string unindent_ <<-HERE
+        str unindent_ <<-HERE
           ZE zoo
           ZIM
         HERE
 
-        regexp %r(\bZ[A-Z]+\b)
+        rx %r(\bZ[A-Z]+\b)
       end
 
-      shared_subject :edit_session_ do
+      shared_subject :mutated_edit_session_ do
 
         es = build_edit_session_
 
@@ -33,10 +33,8 @@ module Skylab::SearchAndReplace::TestSupport
         es
       end
 
-      shared_subject :tuple_ do
-
-        _mc = edit_session_.first_match_controller.next_match_controller
-        _mc.to_contextualized_sexp_line_streams 2, 2
+      shared_subject :context_lines_before_during_after_ do
+        context_lines_before_during_after_via_ 2, 2, 1
       end
 
       it "(the replacement looks good)" do
