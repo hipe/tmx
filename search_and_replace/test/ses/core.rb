@@ -90,11 +90,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       def string_edit_session_begin_controllers_
 
-        instance_exec( & common_DSL_given_proc )
-
-        _str = remove_instance_variable :@common_DSL_given_string
-
-        _rx = remove_instance_variable :@common_DSL_given_regex
+        _s, _rx = common_DSL_string_and_regex
 
         build_string_edit_session_controllers_ _str, _rx
       end
@@ -141,12 +137,25 @@ module Skylab::SearchAndReplace::TestSupport
 
       module InstanceMethods
 
+        # -- writing
+
         def str s
           @common_DSL_given_string = s ; nil
         end
 
         def rx rx
           @common_DSL_given_regex = rx ; nil
+        end
+
+        # -- reading
+
+        def common_DSL_string_and_regex
+
+          instance_exec( & common_DSL_given_proc )
+          a = []
+          a.push remove_instance_variable :@common_DSL_given_string
+          a.push remove_instance_variable :@common_DSL_given_regex
+          a
         end
       end
 

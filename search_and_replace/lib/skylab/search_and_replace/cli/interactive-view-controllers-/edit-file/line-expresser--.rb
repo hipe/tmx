@@ -28,11 +28,11 @@ module Skylab::SearchAndReplace
 
         def call any_st
           if any_st
-            ___on_line_sexp_stream any_st
+            ___on_throughput_line_stream any_st
           end
         end
 
-        def ___on_line_sexp_stream st
+        def ___on_throughput_line_stream st
 
           begin
             x = st.gets

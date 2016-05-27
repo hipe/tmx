@@ -9,7 +9,7 @@ module Skylab::SearchAndReplace
 
         def initialize d, mo, block
 
-          @_block = block
+          @block = block
           @match_charpos = mo.charpos
           @match_end_charpos = mo.end_charpos
           @match_index = d
@@ -25,7 +25,7 @@ module Skylab::SearchAndReplace
         end
 
         def ___init_dup block
-          @_block = block
+          @block = block
           self
         end
 
@@ -41,31 +41,20 @@ module Skylab::SearchAndReplace
 
         # -- c15n (contextualization)
 
-        def to_contextualized_sexp_line_streams num_lines_before, num_lines_after
+        def to_contexted_throughput_line_streams_ num_lines_before, num_lines_after
 
           o = Here_::Build_Context_Streams___.new
-          o.block = @_block
           o.match_controller = self
           o.num_lines_before = num_lines_before
           o.num_lines_after = num_lines_after
           o.execute
         end
 
-        def write_throughput_atoms_into__ a
-          # implement exactly [#031]
-          if @replacement_is_engaged
-            self._THIS_is_for_next_commit_not_this_one
-          else
-            Home_::Throughput_Magnetics_::
-              Write_Throughput_Atoms_of_Disengaged_Match.new( a, self ).execute
-          end
-        end
-
         # -- engagement
 
         def engage_replacement & oes_p
 
-          _proc_like = @_block.replacement_function_
+          _proc_like = @block.replacement_function_
 
           presumably_string = _proc_like.call(
             @matchdata,  # (#we-might pass a custom structure instead..)
@@ -102,18 +91,19 @@ module Skylab::SearchAndReplace
         # -- navigation & intrinsics
 
         def previous_match_controller
-          @_block.previous_match_controller_before__ @match_index
+          @block.previous_match_controller_before__ @match_index
         end
 
         def next_match_controller
-          @_block.next_match_controller_after_match_index__ @match_index
+          @block.next_match_controller_after_match_index__ @match_index
         end
 
         def big_string__  # for one actor
-          @_block.big_string_
+          @block.big_string_
         end
 
         attr_reader(
+          :block,
           :match_charpos,
           :match_index,
           :match_end_charpos,

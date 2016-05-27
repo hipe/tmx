@@ -142,6 +142,24 @@ module Skylab::SearchAndReplace::TestSupport
 
     # case 9 is covered in the previous file
 
+    context "case 10 - noverlap" do
+
+      given do
+        str "bunny bunnny\n"
+        rx %r(\bbun+y\b)
+      end
+
+      it "atoms for matches block" do
+
+        begin_expect_atoms_for_ atoms_of_ first_block_
+
+        o :match, 0, :orig, :content, "bunny"
+        o :static, :content, " "
+        o :match, 1, :orig, :content, "bunnny"
+        o :static, :LTS_begin, NEWLINE_, :LTS_end
+      end
+    end
+
     alias_method :o, :expect_atoms_
   end
 end

@@ -6,7 +6,7 @@ module Skylab::SearchAndReplace::TestSupport
       tcc.extend SES::Common_DSL::ModuleMethods
       tcc.include SES::Common_DSL::InstanceMethods
       tcc.send :define_singleton_method, :common_DSL_when_givens_are_given, This__
-      tcc.include Instance_Methods__
+      tcc.include InstanceMethods
     end
 
     # -
@@ -28,7 +28,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
     # -
 
-    module Instance_Methods__
+    module InstanceMethods
 
       def build_first_block  # public for debugging
         instance_exec( & common_DSL_given_proc )
@@ -70,6 +70,16 @@ module Skylab::SearchAndReplace::TestSupport
 
       def expect_atoms_ * a
 
+        _expect_atoms a
+      end
+
+      def expect_last_atoms_ * a
+        _expect_atoms a
+        end_expect_atoms_
+      end
+
+      def _expect_atoms a
+
         len = a.length
         a_ = @atoms[ @cursor, len ]
         @cursor += len
@@ -86,7 +96,7 @@ module Skylab::SearchAndReplace::TestSupport
       # ~
 
       def atoms_of_ block
-        block.___to_throughput_atom_stream.to_a
+        block.to_throughput_atom_stream_.to_a
       end
 
       def at_ d

@@ -22,7 +22,7 @@ module Skylab::SearchAndReplace
 
       _populate_cache
 
-      Callback_.stream do
+      Callback_.stream do  # #[#032]
         send @_state
       end
     end
@@ -99,6 +99,14 @@ module Skylab::SearchAndReplace
         end
       when 1  # the LTS begins after the cursor
 
+        if @_match_end <= lts_begin  # 10 (oops) the LTS begins after
+          # the match ends ("M-kissing", "M cleanly apart")
+
+          _content_until @_match_end
+          _done
+
+        else
+
         _content_until lts_begin
 
         case lts_end <=> @_match_end
@@ -115,7 +123,13 @@ module Skylab::SearchAndReplace
           _LTS_first_half                    #    LL
           _done                              #   MM
         end
+        end
       end
+
+      # (the above cases all have counterparts in [#005] (an API made for
+      #  modeling spatial relationships like this) but we aren't using it
+      #  experimentally because perhaps little would be gained (in codesize
+      #  reduction) and some is lost (in terms of readability)
 
       NIL_
     end

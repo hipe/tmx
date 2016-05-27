@@ -128,6 +128,19 @@ module Skylab::SearchAndReplace::TestSupport
       be_include _
     end
 
+    def _Nth_match_controller d, es
+
+      mc = es.first_match_controller
+
+      d.times do
+        _mc_ = mc.next_match_controller
+        _mc_ or ::Kernel._SANITY  # #todo
+        mc = _mc_
+      end
+
+      mc
+    end
+
     def match_controller_array_for_ es
       match_controller_stream_for_( es ).to_a
     end
@@ -140,6 +153,8 @@ module Skylab::SearchAndReplace::TestSupport
         curr
       end
     end
+
+
 
     # ~ string-related assertion assistance
 

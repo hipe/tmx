@@ -261,7 +261,7 @@ module Skylab::SearchAndReplace
 
         _cm = uow.current_match_controller
 
-        be_st, du_st, af_st = _cm.to_contextualized_sexp_line_streams(
+        be_st, du_st, af_st = _cm.context_throughput_lines_before_during_after_(
           NUM_LINES_BEFORE__,
           NUM_LINES_AFTER__,
         )

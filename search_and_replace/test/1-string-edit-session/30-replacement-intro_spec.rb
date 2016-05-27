@@ -2,41 +2,67 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (30) replacement intro", wip: true do
+  describe "[sa] magnetics - replacement intro" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :SES
+    use :SES_replacement
 
-    it "minimal performance" do
+    context "minimal performance" do
 
-      es = build_edit_session_via_ 'a', /a/
+      given do
+        str 'a'
+        rx %r(a)
+      end
 
-      _mc = es.first_match_controller
+      def apply_some_replacements_ es
 
-      _ = _mc.engage_replacement_via_string 'b'
+        _mc = _Nth_match_controller 0, es
+        _ = _mc.engage_replacement_via_string 'b'
+        _ and fail  # assert that there is no result
+      end
 
-      _.should be_nil
+      it "one line" do
+        number_of_lines_after_engaging_replacement_ == 1 or fail
+      end
 
-      st = es.to_line_stream
+      it "atoms" do
 
-      _ = st.gets
-      _.should eql 'b'
-      _ = st.gets
-      _.should be_nil
+        expect_atoms_after_having_replaced_for_Nth_line_ 0
+
+        expect_atoms_ :match, 0, :repl, :content, "b"
+
+        end_expect_atoms_
+      end
     end
 
-    it "replace the first of two" do
+    context "replace the first of two." do
 
-      es = build_edit_session_via_ "GAK and GAK\n", /\bgak\b/i
-      _mc = es.first_match_controller
-      _mc.engage_replacement_via_string 'wak'
+      given do
+        str "GAK and GAK\n"
+        rx %r(\bgak\b)i
+      end
 
-      st = es.to_line_stream
-      _ = st.gets
-      _.should eql "wak and GAK\n"
-      _ = st.gets
-      _.should be_nil
+      def apply_some_replacements_ es
+        _mc = _Nth_match_controller 0, es
+        _ = _mc.engage_replacement_via_string 'wak'
+        _ and fail  # assert that there is no result
+      end
+
+      it "one line" do
+        number_of_lines_after_engaging_replacement_ == 1 or fail
+      end
+
+      it "atoms" do
+
+        expect_atoms_after_having_replaced_for_Nth_line_ 0
+
+        expect_atoms_ :match, 0, :repl, :content, 'wak'
+        expect_atoms_ :static, :content, ' and '
+        expect_atoms_ :match, 1, :orig, :content, 'GAK'
+        expect_atoms_ :static, :LTS_begin, "\n", :LTS_end
+        end_expect_atoms_
+      end
     end
   end
 end

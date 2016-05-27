@@ -30,7 +30,7 @@ module Skylab::SearchAndReplace
         # that the last line is not well-formed (by the definition of line
         # as suggested by the unix `wc` utility (more at [#sn-020]) or see
         # `man git-log` near `tformat` & separator vs. terminator semantics).
-        # (this is :#decision-A).
+        # (this is :#decision-A, sometimes referred to as an "endcap".)
         #
         # i.e, we still recognize "separator" semantics even though
         # "terminator" semantics may be more formally correct. note this

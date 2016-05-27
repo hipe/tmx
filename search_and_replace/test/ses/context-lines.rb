@@ -83,13 +83,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         _es = mutated_edit_session_
 
-        mc = _es.first_match_controller
-
-        mc_d.times do
-          _mc_ = mc.next_match_controller
-          _mc_ or ::Kernel._SANITY  # #todo
-          mc = _mc_
-        end
+        mc = _Nth_match_controller mc_d, _es
 
         mc.to_contextualized_sexp_line_streams num_before, num_after
       end

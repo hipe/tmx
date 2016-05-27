@@ -1,3 +1,6 @@
+[#032]       track a commonly used and as-yet undistilled pattern
+             (a stream implemented by states implemented as method names)
+
 [#031]       tagged throughput ..
 
 [#030] #open get regexp to display its source

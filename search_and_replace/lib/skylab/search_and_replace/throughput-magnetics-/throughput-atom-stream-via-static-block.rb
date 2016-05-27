@@ -12,7 +12,7 @@ module Skylab::SearchAndReplace
 
       @_state = :__initial_atom
 
-      Callback_.stream do
+      Callback_.stream do  # #[#032]
         send @_state
       end
     end

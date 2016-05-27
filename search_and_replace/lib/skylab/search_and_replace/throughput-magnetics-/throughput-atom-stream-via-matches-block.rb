@@ -98,9 +98,13 @@ module Skylab::SearchAndReplace
 
       @_cursor = @_match.match_end_charpos
 
-      @_atom_stream = Home_::Throughput_Magnetics_::
-        Throughput_Atom_Stream_via_Match_and_LTSs.new(
-          @_match, @_LTS_stream ).execute
+      @_atom_stream = if @_match.replacement_is_engaged
+        Home_::Throughput_Magnetics_::Throughput_Atom_Stream_via_Replacement_and_LTSs.
+          new( @_match, @_LTS_stream ).execute
+      else
+        Home_::Throughput_Magnetics_::Throughput_Atom_Stream_via_Match_and_LTSs.
+          new( @_match, @_LTS_stream ).execute
+      end
 
       @_match = nil  # for #here, you consumed it above
 

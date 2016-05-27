@@ -96,7 +96,7 @@ module Skylab::SearchAndReplace
           NIL_
         end
 
-        def ___to_throughput_atom_stream  # #testpoint
+        def to_throughput_atom_stream_  # #testpoint
           Home_::Throughput_Magnetics_::Throughput_Atom_Stream_via_Static_Block.new(
             @block_charpos,
             @_LTSs,
