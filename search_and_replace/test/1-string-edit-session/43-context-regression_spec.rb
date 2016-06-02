@@ -20,9 +20,9 @@ module Skylab::SearchAndReplace::TestSupport
         rx %r(\bZ[A-Z]+\b)
       end
 
-      shared_subject :mutated_edit_session_ do
+      mutate_edit_session_for_context_lines_by do
 
-        es = build_edit_session_
+        es = string_edit_session_begin_
 
         mc1 = es.first_match_controller
         mc1.engage_replacement_via_string 'JE'

@@ -106,9 +106,9 @@ module Skylab::SearchAndReplace::TestSupport
         regexp %r(\bz[aeiou]nk\b)i
       end
 
-      shared_subject :mutated_edit_session_ do
+      mutate_edit_session_for_context_lines_by do
 
-        es = build_edit_session_
+        es = string_edit_session_begin_
 
         _mc1 = es.first_match_controller
         _mc1.engage_replacement_via_string "nourk 1\nnourk 2\nnourk 3"

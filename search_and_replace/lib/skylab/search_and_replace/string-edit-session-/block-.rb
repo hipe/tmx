@@ -208,43 +208,6 @@ module Skylab::SearchAndReplace
 
         # --
 
-        def COVER_write_the_next_N_line_sexp_arrays_into a, n
-
-          st = to_line_atom_array_stream_
-          d = 0
-          stop = if -1 < n
-            -> do
-              n == d
-            end
-          else
-            self._ETC
-          end
-
-          begin
-            if stop[]
-              done = true
-              break
-            end
-            x = st.gets
-            x or break
-            a.push x
-            d += 1
-            redo
-          end while nil
-
-          if done
-            a
-          else
-            nb = next_block
-            if nb
-              _deficit = n - d
-              nb.write_the_next_N_line_sexp_arrays_into a, _deficit
-            end
-          end
-        end
-
-        # --
-
         def next_block
           if @_unflushed
             @_unflushed = false
@@ -261,6 +224,14 @@ module Skylab::SearchAndReplace
         attr_reader(
           :previous_block,
         )
+
+        # --
+
+        def to_throughput_line_stream_
+          _ = to_throughput_atom_stream_
+          Home_::Throughput_Magnetics_::
+            Throughput_Line_Stream_via_Throughput_Atom_Stream.new( _ ).execute
+        end
 
         # ==
       end

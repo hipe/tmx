@@ -2,28 +2,51 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] SES - context intro", wip: true do
+  describe "[sa] SES - context intro" do
 
     TS_[ self ]
     use :memoizer_methods
     use :SES_context_lines
 
-    context "one block, several matches" do
+    given do
 
-      given do
+      # (one block, several matches)
 
-        str unindent_ <<-HERE
-          bunny bunnny
-          buny
-          bunnny
-          bunie bunny
-          bunny
-        HERE
+      str unindent_ <<-HERE
+        bunny bunnny
+        buny
+        bunnny
+        bunie bunny
+        bunny
+      HERE
 
-        rx %r(\bbun+y\b)
+      rx %r(\bbun+y\b)
+    end
+
+    num_lines_before 0
+    during_around_match_controller_at_index 3
+    num_lines_after 0
+
+    context "with nothing engaged" do
+
+      mutate_edit_session_for_context_lines_by do
+        string_edit_session_begin_
       end
 
-      shared_subject :mutated_edit_session_ do
+      shared_context_lines
+
+      it "first ever throughput line - atoms show match boundary before newline" do  # (it is)
+
+        for_context_stream_ during_throughput_line_stream_
+        for_first_and_only_line_
+        expect_last_atoms_ :match, 3, :orig, :content, "bunnny", :static, * _NL
+        end_expect_atoms_
+      end
+    end
+
+    context "with some things engaged" do
+
+      mutate_edit_session_for_context_lines_by do
 
         cs = string_edit_session_begin_controllers_
 
@@ -38,50 +61,55 @@ module Skylab::SearchAndReplace::TestSupport
 
       context "no lines of context - only the line of the match" do
 
-        shared_subject :context_lines_before_during_after_ do
-          _mc = _the_third_match_controller_of_shared_thing_one
-          _mc.to_contextualized_sexp_line_streams 0, 0
+        shared_context_lines
+
+        it "no before lines" do
+
+          expect_no_lines_in_ before_throughput_line_stream_
         end
 
-        it "the before is nil" do
-          lines_before_.should be_nil
+        it "no after lines" do
+
+          expect_no_lines_in_ after_throughput_line_stream_
         end
 
-        it "the after is nil" do
-          lines_after_.should be_nil
-        end
+        it "during - atoms show both replacement vs original characters" do
 
-        it "during" do
-          one_line_( lines_during_ ).should eql "BONUS\n"
+          for_context_stream_ during_throughput_line_stream_
+          for_first_and_only_line_
+          expect_last_atoms_ :match, 3, :repl, :content, "BONUS", :static, * _NL
         end
       end
 
       context "one line before and one line after" do
 
-        shared_subject :context_lines_before_during_after_ do
-          _mc = _the_third_match_controller_of_shared_thing_one
-          _mc.to_contextualized_sexp_line_streams 1, 1
-        end
+        num_lines_before 1
+        num_lines_after 1
+
+        shared_context_lines
 
         it "during" do
-          one_line_( lines_during_ ).should eql "BONUS\n"
+
+          for_context_stream_ during_throughput_line_stream_
+          for_first_and_only_line_
+          expect_last_atoms_ :match, 3, :repl, :content, "BONUS", :static, * _NL
+        end
+
+        it "after - one line - NOTE: continues the context of previous section" do
+
+          for_context_stream_ after_throughput_line_stream_
+          for_first_and_only_line_
+          expect_atoms_ :static_continuing, :content, "bunie "
+          expect_last_atoms_ :match, 4, :orig, :content, "bunny", :static, * _NL
         end
 
         it "before - one line" do
-          one_line_( lines_before_ ).should eql "buny\n"
-        end
 
-        it "after - one line" do
-          one_line_( lines_after_ ).should eql "bunie bunny\n"
+          for_context_stream_ before_throughput_line_stream_
+          for_first_and_only_line_
+          expect_last_atoms_ :match, 2, :orig, :content, "buny", :static, * _NL
         end
       end
-    end
-
-    def _the_third_match_controller_of_shared_thing_one
-
-      _es = mutated_edit_session_
-
-      match_controller_at_offset_ _es, 3  # the one on line three
     end
   end
 end

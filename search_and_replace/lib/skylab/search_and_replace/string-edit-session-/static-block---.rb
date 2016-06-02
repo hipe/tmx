@@ -38,62 +38,11 @@ module Skylab::SearchAndReplace
           end
         end
 
-        def COVER_write_the_previous_N_line_sexp_arrays_in_front_of a, n
-
-          # OCD optimizations for static blocks. we can use the newline index.
-
-          ___add_own_lines_to_backwards_extension_when_static a, n
-
-          my_d = @_LTSs.length
-          deficit = n - my_d
-          if 0 < deficit  # then we have one
-            bl = @previous_block
-            if bl
-              bl.write_the_previous_N_line_sexp_arrays_in_front_of a, deficit
-            end
-          end
-          NIL_
-        end
-
-        def ___add_own_lines_to_backwards_extension_when_static a, n
-
-          self._REVIEW_for_011
-
-          # get the last N lines using your newline index
-
-          o = _stream_magnetics::Line_Sexp_Array_Stream_via_Newlines.begin
-          d_a = @_LTSs
-          len = d_a.length
-          last = len - 1
-          surplus = len - n
-          if 0 < surplus
-            # the number of lines requested is LESS THAN the number of
-            # lines in the block so we have some backwards work to do
-
-            d = surplus - 1
-            _st = Callback_.stream do
-              if d != last
-                d += 1
-                d_a.fetch d
-              end
-            end
-
-            _pos = d_a.fetch( d ) + 1  # change this at ACTIVE [#011]
-
-            o.newline_stream = _st
-            o.charpos = _pos
-          else
-            # ASSUME the number of lines requested EQUALS
-            # the number of lines in the block.
-            o.charpos = @block_charpos
-            o.nexx = d_a
-          end
-
-          o.string = @big_string_
-          _st = o.execute
-          _xa_a = _st.to_a
-          a[ 0, 0 ] = _xa_a
-          NIL_
+        def to_backwards_throughput_line_stream_
+          Home_::Throughput_Magnetics_::Reverse_Throughput_Line_Stream_via_Static_Block.new(
+            @block_charpos,
+            @_LTSs,
+            @big_string_ ).execute
         end
 
         def to_throughput_atom_stream_  # #testpoint

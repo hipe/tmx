@@ -23,16 +23,23 @@ module Skylab::SearchAndReplace
 
       x = @atom_stream.gets
       if x
-        ___gets_line x
+        _gets_line x
       else
         _done
-        NOTHING_
       end
     end
 
-    def ___gets_line x
+    def _gets_line x
 
-      __begin_line
+      @_atom_array = []
+      @_atom_on_line_index = -1
+      @_matches_begun_on_this_line_h = {}
+      @_matches_ended_on_this_line_h = {}
+
+      unless :match == x || :static == x
+        @_atom_on_line_index += 1
+        @_atom_array.push CONTINUING___.fetch @_current_context
+      end
 
       begin
         @_atom_on_line_index += 1
@@ -55,13 +62,10 @@ module Skylab::SearchAndReplace
       __finish_line
     end
 
-    def __begin_line
-
-      @_atom_on_line_index = -1
-      @_matches_begun_on_this_line_h = {}
-      @_matches_ended_on_this_line_h = {}
-      @_atom_array = [] ; nil
-    end
+    CONTINUING___ = {
+      match: :match_continuing,
+      static: :static_continuing,
+    }
 
     def __finish_line
 
@@ -77,7 +81,8 @@ module Skylab::SearchAndReplace
 
     def _done
       remove_instance_variable :@atom_stream  # sanity
-      @_state = :___nothing ; nil
+      @_state = :___nothing
+      NOTHING_
     end
 
     def ___nothing
@@ -95,13 +100,16 @@ module Skylab::SearchAndReplace
 
       # --
 
-      @_matches_begun_on_this_line_h[ d ] = atom_on_line_index
+      @_current_context = :match
       @_current_match_index = d
+      @_matches_begun_on_this_line_h[ d ] = atom_on_line_index
       STAY__
     end
 
     def static
+
       _maybe_close_match
+      @_current_context = :static
       STAY__
     end
 
@@ -150,6 +158,11 @@ module Skylab::SearchAndReplace
         @a = a
         @_etc = h
         @_etc_ = h_
+      end
+
+      def to_unstyled_bytes_string__
+        Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
+          Callback_::Stream.via_nonsparse_array @a ).execute
       end
 
       def has_start_of_match d

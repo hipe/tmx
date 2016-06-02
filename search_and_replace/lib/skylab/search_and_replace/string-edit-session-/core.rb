@@ -50,14 +50,13 @@ module Skylab::SearchAndReplace
       end
 
       def to_line_stream
-        ::Kernel._K_code_sketch
         to_throughput_line_stream_.map_by do |tl|
           tl.to_unstyled_bytes_string__
         end
       end
 
       def to_throughput_line_stream_
-        ___to_block_stream.expand_by do | block |
+        ___to_block_stream.expand_by do |block|
           block.to_throughput_line_stream_
         end
       end

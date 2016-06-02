@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (41) context multi-block", wip: true do
+  describe "[sa] SES - context multi-block - several blocks, one match" do
 
     TS_[ self ]
     use :memoizer_methods
     use :SES_context_lines
 
-    context "several blocks, one match" do
+    # -
 
       given do
 
@@ -23,16 +23,17 @@ module Skylab::SearchAndReplace::TestSupport
         rx %r(^ohai$)
       end
 
+      during_around_match_controller_at_index 0
+
       context "don't engage the replacement" do
 
-        shared_subject :mutated_edit_session_ do
-
-          build_edit_session_
+        mutate_edit_session_for_context_lines_by do
+          string_edit_session_begin_
         end
 
         it "(the replacement looks good)" do
 
-          expect_edit_session_output_ unindent_( <<-HERE )
+          expect_edit_session_output_ unindent_ <<-HERE
             line 1
             line 2
             ohai
@@ -43,9 +44,9 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for no leading and no trailing context" do
 
-          shared_subject :context_lines_before_during_after_ do
-            context_lines_before_during_after_via_ 0, 0
-          end
+          num_lines_before 0
+          num_lines_after 0
+          shared_context_lines
 
           it "before lines is none" do
             _before_is_none
@@ -62,9 +63,9 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for one trailing no leading" do
 
-          shared_subject :context_lines_before_during_after_ do
-            context_lines_before_during_after_via_ 0, 1
-          end
+          num_lines_before 0
+          num_lines_after 1
+          shared_context_lines
 
           it "before is none" do
             _before_is_none
@@ -81,9 +82,9 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for one leading no trailing" do
 
-          shared_subject :context_lines_before_during_after_ do
-            context_lines_before_during_after_via_ 1, 0
-          end
+          num_lines_before 1
+          num_lines_after 0
+          shared_context_lines
 
           it "before is legit" do
             _before_is_legit
@@ -99,15 +100,18 @@ module Skylab::SearchAndReplace::TestSupport
         end
 
         def _during_is_legit
-          one_line_( lines_during_ ).should eql "ohai\n"
+
+          for_context_stream_ during_throughput_line_stream_
+          for_first_and_only_line_
+          expect_last_atoms_ :match, 0, :orig, :content, "ohai", :static, * _NL
         end
       end
 
       context "do engage the replacement" do
 
-        shared_subject :mutated_edit_session_ do
+        mutate_edit_session_for_context_lines_by do
 
-          es = build_edit_session_
+          es = string_edit_session_begin_
           mc = es.first_match_controller
           mc.engage_replacement_via_string 'yerp'
           es
@@ -115,7 +119,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "(the replacement looks good)" do
 
-          expect_edit_session_output_ unindent_( <<-HERE )
+          expect_edit_session_output_ unindent_ <<-HERE
             line 1
             line 2
             yerp
@@ -126,9 +130,9 @@ module Skylab::SearchAndReplace::TestSupport
 
         context "ask for one leading and one trailing" do
 
-          shared_subject :context_lines_before_during_after_ do
-            context_lines_before_during_after_via_ 1, 1
-          end
+          num_lines_before 1
+          num_lines_after 1
+          shared_context_lines
 
           it "before is legit" do
             _before_is_legit
@@ -144,25 +148,34 @@ module Skylab::SearchAndReplace::TestSupport
         end
 
         def _during_is_legit
-          one_line_( lines_during_ ).should eql "yerp\n"
+
+          for_context_stream_ during_throughput_line_stream_
+          for_first_and_only_line_
+          expect_last_atoms_ :match, 0, :repl, :content, "yerp", :static, * _NL
         end
       end
 
       def _before_is_none
-        lines_before_.should be_nil
+        expect_no_lines_in_ before_throughput_line_stream_
       end
 
       def _after_is_none
-        lines_after_.should be_nil
+        expect_no_lines_in_ after_throughput_line_stream_
       end
 
       def _before_is_legit
-        one_line_( lines_before_ ).should eql "line 2\n"
+
+        for_context_stream_ before_throughput_line_stream_
+        for_first_and_only_line_
+        expect_last_atoms_ :static_continuing, :content, "line 2", * _NL
       end
 
       def _after_is_legit
-        one_line_( lines_after_ ).should eql "line 4\n"
+
+        for_context_stream_ after_throughput_line_stream_
+        for_first_and_only_line_
+        expect_last_atoms_ :static, :content, "line 4", * _NL
       end
-    end
+    # -
   end
 end

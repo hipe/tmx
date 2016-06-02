@@ -154,8 +154,6 @@ module Skylab::SearchAndReplace::TestSupport
       end
     end
 
-
-
     # ~ string-related assertion assistance
 
     def unindent_ s  # mutates original! and results in it!

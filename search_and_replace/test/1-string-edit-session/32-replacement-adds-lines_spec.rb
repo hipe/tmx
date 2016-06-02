@@ -48,7 +48,7 @@ module Skylab::SearchAndReplace::TestSupport
       it "second line is from the first replacement" do
 
         expect_atoms_after_having_replaced_for_Nth_line_ 1
-        expect_last_atoms_ :content, "and PCRE are", * _NL
+        expect_last_atoms_ :match_continuing, :content, "and PCRE are", * _NL
       end
 
       it "third is same as orig" do

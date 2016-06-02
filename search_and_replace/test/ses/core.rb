@@ -53,12 +53,6 @@ module Skylab::SearchAndReplace::TestSupport
         fail "had no line #{ d }. (expecting #{ exp.inspect })"
       end
 
-      def assemble_ line_sexp_array
-
-        __these::Line_stream_via_line_sexp_array_stream::
-          Line_via_line_sexp_array___[ line_sexp_array ]
-      end
-
       def distill_ line_sexp_array
 
         line_sexp_array.map do | x |
@@ -92,7 +86,14 @@ module Skylab::SearchAndReplace::TestSupport
 
         _s, _rx = common_DSL_string_and_regex
 
-        build_string_edit_session_controllers_ _str, _rx
+        build_string_edit_session_controllers_ _s, _rx
+      end
+
+      def string_edit_session_begin_
+
+        _s, _rx = common_DSL_string_and_regex
+
+        build_edit_session_via_ _s, _rx
       end
 
       def build_string_edit_session_controllers_ s, rx

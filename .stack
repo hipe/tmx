@@ -12,4 +12,3 @@ multibyte string bug
 re-integrate new tagged throughput
 context (full re-integration)
 while context - go backwards over static (but not matches)
-when engaged, throughput atom stream
