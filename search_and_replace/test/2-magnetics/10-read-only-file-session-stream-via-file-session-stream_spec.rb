@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (10) read only file session stream", wip: true do
+  describe "[sa] magnetics - read only file session stream" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -52,7 +52,7 @@ module Skylab::SearchAndReplace::TestSupport
         x = ::Struct.new :one_file, :another_file,
           :first_match, :second_match, :third_match, :fourth_match
 
-        Struct_1_1_1_1 = x
+        Struct_Mags_ROFSS_etc = x
         x
       end
 

@@ -122,6 +122,12 @@ module Skylab::SearchAndReplace::TestSupport
 
     module Common_DSL
 
+      def self.[] tcc
+        tcc.extend ModuleMethods
+        tcc.include SES::InstanceMethods
+        tcc.include InstanceMethods
+      end
+
       module ModuleMethods
 
         def given & p
@@ -133,6 +139,26 @@ module Skylab::SearchAndReplace::TestSupport
 
         def common_DSL_when_givens_are_given
           NOTHING_
+        end
+
+        def string_edit_session_controllers_once_  # OCD - see next method
+          yes = true
+          define_method :string_edit_session_controllers_ do
+            if yes
+              yes = false
+              string_edit_session_begin_controllers_
+            else
+              fail
+            end
+          end
+        end
+
+        def shared_string_edit_session_controllers_with_no_mutation_
+
+          shared_subject :string_edit_session_controllers_ do
+
+            string_edit_session_begin_controllers_
+          end
         end
       end
 

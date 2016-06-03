@@ -24,8 +24,11 @@ module Skylab::SearchAndReplace
         class << self
 
           def [] * shorthand_things, scn
-            self._REVIEW_charpos
-            pos = scn.pos
+
+            pos = scn.pos  # we use `pos` and not `charpos` here only
+              # because string scanners allow you to assign the former
+              # but not the latter.
+
             str = scn.scan %r([^\n]*)
             scn.pos = pos  # eek
             _x_a = shorthand_things.map do |x|

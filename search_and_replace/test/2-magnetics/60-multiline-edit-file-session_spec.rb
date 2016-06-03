@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (60) multiline edit file session", wip: true do
+  describe "[sa] magnetics - multiline edit file session" do
 
     TS_[ self ]
     use :memoizer_methods

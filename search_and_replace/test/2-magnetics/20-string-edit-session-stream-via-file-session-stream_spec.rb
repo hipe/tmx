@@ -2,19 +2,22 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - string edit session stream via..", wip: true do
+  describe "[sa] magnetics - string edit session stream via.." do
 
     TS_[ self ]
     use :memoizer_methods
-    use :SES
+    use :SES_common_DSL
 
     _EMPTY_RX = //
 
     context "empty regexp, empty string" do
 
-      shared_subject :string_edit_session_controllers_ do
-        build_string_edit_session_controllers_ EMPTY_S_, _EMPTY_RX
+      given do
+        str EMPTY_S_
+        rx _EMPTY_RX
       end
+
+      string_edit_session_controllers_once_
 
       it "has one match controller" do
         expect_one_match_
@@ -23,9 +26,12 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "empty regexp, non-empty string (2 chars wide)" do
 
-      shared_subject :string_edit_session_controllers_ do
-        build_string_edit_session_controllers_ 'ab', _EMPTY_RX
+      given do
+        str 'ab'
+        rx _EMPTY_RX
       end
+
+      string_edit_session_controllers_once_
 
       it "has three match controllers" do
         number_of_match_controllers_.should eql 3
@@ -36,9 +42,12 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "regexp that doesn't match string (empty string)" do
 
-      shared_subject :string_edit_session_controllers_ do
-        build_string_edit_session_controllers_ EMPTY_S_, _CHAR_RX
+      given do
+        str EMPTY_S_
+        rx _CHAR_RX
       end
+
+      string_edit_session_controllers_once_
 
       it "no matches" do
         expect_no_matches_
@@ -47,9 +56,12 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "regexp that doesn't match string (nonempty string)" do
 
-      shared_subject :string_edit_session_controllers_ do
-        build_string_edit_session_controllers_ 'a', /b/
+      given do
+        str 'a'
+        rx %r(b)
       end
+
+      string_edit_session_controllers_once_
 
       it "no matches" do
         expect_no_matches_
@@ -58,9 +70,12 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "two matches one line no newline" do
 
-      shared_subject :string_edit_session_controllers_ do
-        build_string_edit_session_controllers_ '__XX__XX__', /XX/
+      given do
+        str '__XX__XX__'
+        rx %r(XX)
       end
+
+      shared_string_edit_session_controllers_with_no_mutation_
 
       it "two matches" do
         number_of_match_controllers_.should eql 2

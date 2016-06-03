@@ -2,19 +2,22 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (22) multiline intro", wip: true do
+  describe "[sa] SES - multiline intro" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :SES
+    use :SES_common_DSL
 
     _GAK = /\bGAK\b/
 
     context "minimal normal - one replacement in middle line in middle of line" do
 
-      shared_subject :string_edit_session_controllers_ do
-        build_string_edit_session_controllers_ "a\nb-GAK-c\nd\n", _GAK
+      given do
+        str "a\nb-GAK-c\nd\n"
+        rx _GAK
       end
+
+      shared_string_edit_session_controllers_with_no_mutation_
 
       it "one match" do
         expect_one_match_
@@ -51,10 +54,9 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "GAK//GAK" do
 
-      _STRING = "GAK\nGAK"
-
-      define_method :_build_the_session do
-        build_edit_session_via_ _STRING, _GAK
+      given do
+        str "GAK\nGAK"
+        rx _GAK
       end
 
       it "one block - matches blocks are greedy" do
@@ -78,7 +80,10 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "GAK//[ ]" do
 
-      _STRING = "GAK\n__\n"
+      given do
+        str "GAK\n__\n"
+        rx _GAK
+      end
 
       shared_subject :_state do
 
@@ -103,10 +108,6 @@ module Skylab::SearchAndReplace::TestSupport
         a
       end
 
-      define_method :_build_the_session do
-        build_edit_session_via_ _STRING, _GAK
-      end
-
       it "two blocks" do
         _state.length.should eql 2
       end
@@ -122,7 +123,10 @@ module Skylab::SearchAndReplace::TestSupport
 
     context "GAK//[ ]//GAK" do
 
-      _STRING = "GAK\n__\nGAK\n"
+      given do
+        str "GAK\n__\nGAK\n"
+        rx _GAK
+      end
 
       shared_subject :_state do
 
@@ -137,10 +141,6 @@ module Skylab::SearchAndReplace::TestSupport
         a
       end
 
-      define_method :_build_the_session do
-        build_edit_session_via_ _STRING, _GAK
-      end
-
       it "three blocks" do
         _state.length.should eql 3
       end
@@ -148,6 +148,11 @@ module Skylab::SearchAndReplace::TestSupport
       it "matches look right" do
         _state.should eql [ true, false, true ]
       end
+    end
+
+    def _build_the_session
+      # (hi.)
+      string_edit_session_begin_
     end
   end
 end

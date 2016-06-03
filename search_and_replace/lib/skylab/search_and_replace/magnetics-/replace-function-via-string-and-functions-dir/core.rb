@@ -23,12 +23,10 @@ module Skylab::SearchAndReplace
 
       until scn.eos?
 
-        self._REVIEW_charpos
-
-        d = scn.pos
+        d = scn.charpos  # (using `.pos` instead might be fine)
         normal = scn.scan NORMAL_RX__
         open = scn.skip OPEN_RX__
-        d == scn.pos and self._SANITY
+        d == scn.charpos and self._SANITY
 
         if normal
           ok = ___process_normal_mutable_string normal
@@ -80,9 +78,12 @@ module Skylab::SearchAndReplace
         'n'.getbyte( 0 ) => -> _ { "\n" },
         't'.getbyte( 0 ) => -> _ { "\t" } }
 
-    def ___when_invalid_escape_sequence s
+    def ___when_invalid_escape_sequence s ; self._COVER_ME
 
-      @_oes_p.call :error, :invalid_escape_sequence, s  # #open #[#br-066]
+      @_oes_p.call :error, :expression, :invalid_escape_sequence do |y|
+        y << s
+      end
+
       UNABLE_
     end
 
