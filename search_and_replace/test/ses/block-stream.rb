@@ -15,12 +15,7 @@ module Skylab::SearchAndReplace::TestSupport
         define_method :block_array do
           if yes
             yes = false
-            a = []
-            blk = self.build_first_block
-            begin
-              a.push blk
-              blk = blk.next_block
-            end while blk
+            a = build_block_array_via_first_block build_first_block
           end
           a
         end
@@ -29,6 +24,15 @@ module Skylab::SearchAndReplace::TestSupport
     # -
 
     module InstanceMethods
+
+      def build_block_array_via_first_block blk
+        a = []
+        begin
+          a.push blk
+          blk = blk.next_block
+        end while blk
+        a
+      end
 
       def build_first_block  # public for debugging
         instance_exec( & common_DSL_given_proc )
@@ -85,8 +89,43 @@ module Skylab::SearchAndReplace::TestSupport
         @cursor += len
 
         if a_ != a  # eek
-          a_.should eql a
+
+          raise ___say_arrays_not_equal a_, a
         end
+      end
+
+      def ___say_arrays_not_equal act_a, exp_a  # assume they are not equal.
+
+        act_st = Callback_::Polymorphic_Stream.via_array act_a
+        exp_st = Callback_::Polymorphic_Stream.via_array exp_a
+
+        begin
+
+          if exp_st.no_unparsed_exists
+            x = "array was longer than expected. expected no item at index #{
+             }#{ act_st.current_index }. (had #{
+              }#{ act_st.current_token.inspect }.)"
+            break
+          end
+
+          if exp_st.current_token == act_st.current_token
+            act_st.advance_one
+            exp_st.advance_one
+            if act_st.no_unparsed_exists
+              x = "array ended early. expected an item at index #{
+                } #{ exp_st.current_index }. (expected #{
+                 }#{ exp_st.current_token.inspect }.)"
+              break
+            end
+            redo
+          end
+
+          x = "at index #{ act_st.current_index } expected #{
+           }#{ exp_st.current_token.inspect }, had #{
+            }#{ act_st.current_token.inspect }."
+          break
+        end while nil
+        x
       end
 
       def end_expect_atoms_

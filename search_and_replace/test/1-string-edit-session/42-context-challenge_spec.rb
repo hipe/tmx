@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (42) context challenge", wip: true do
+  describe "[sa] SES - context challenge" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -20,25 +20,30 @@ module Skylab::SearchAndReplace::TestSupport
           four
         HERE
 
-        regexp %r(_and$)
+        rx %r(_and$)
       end
+
+      num_lines_before 2
+      num_lines_after 2
+      during_around_match_controller_at_index 1
 
       context "replace all three" do
 
-        shared_subject :mutated_edit_session_ do
+        mutate_edit_session_for_context_lines_by do
 
-          _cs = string_edit_session_begin_controllers_
-          mc = _cs.match_controller_array
+          cs = string_edit_session_begin_controllers_
+          mc = cs.match_controller_array
 
           mc[ 0 ].engage_replacement_via_string "\nAND"
           mc[ 1 ].engage_replacement_via_string "_2_and"
           mc[ 2 ].engage_replacement_via_string "\nAND"
-          es
+
+          cs.string_edit_session
         end
 
         it "(output looks right)" do
 
-          expect_edit_session_output_ unindent_( <<-HERE )
+          expect_edit_session_output_ unindent_ <<-HERE
             zero_then
             one
             AND
@@ -49,47 +54,50 @@ module Skylab::SearchAndReplace::TestSupport
           HERE
         end
 
-        shared_subject :context_lines_before_during_after_ do
-          _build_same_tuple
-        end
+        shared_context_lines
 
         it "the line of" do
 
-          st = lines_during_
-          _1 = st.gets
-          _ = st.gets
-          _ and fail
-
-          distill_( _1 ).should eql(
-            [ :orig_str, :replacement_begin, :repl_str,
-              :replacement_end, :newline_sequence ] )
+          for_context_stream_ during_throughput_line_stream_
+          for_first_and_only_line_
+          expect_last_atoms_ :static_continuing, :content, "two",
+            :match, 1, :repl, :content, "_2_and", :static, * _NL
         end
 
-        it "the two after (uses the replacement delineation)" do
-
-          st = lines_after_
-          _1 = st.gets
-          _2 = st.gets
-          st.gets and fail
-
-          assemble_( _1 ).should eql "three\n"
-          assemble_( _2 ).should eql "AND\n"
+        it "after - two lines" do
+          2 == _after_lines.length or fail
         end
 
-        it "the two before (note the previous replace seq. spans 2 lines)" do
+        it "after - first line" do
+          for_context_line_ _after_lines.fetch 0
+          expect_last_atoms_ :static_continuing, :content, "three", :match, 2, :repl, * _NL
+        end
 
-          st = lines_before_
-          one = st.gets
-          two = st.gets
-          st.gets and fail
+        it "after - second line (note replacement delineation is used)" do
+          for_context_line_ _after_lines.fetch 1
+          expect_last_atoms_ :match_continuing, :content, "AND", :static, * _NL
+        end
 
-          assemble_( one ).should eql "one\n"
-          distill_( one ).should eql(
-            [ :orig_str, :replacement_begin, :newline_sequence ] )
+        shared_subject :_after_lines do
+          after_throughput_line_stream_.to_a
+        end
 
-          assemble_( two ).should eql "AND\n"
-          distill_( two ).should eql(
-            [ :repl_str, :replacement_end, :newline_sequence ] )
+        it "before - two lines" do
+          2 == _before_lines.length or fail
+        end
+
+        it "before - first line" do
+          for_context_line_ _before_lines.fetch 0
+          expect_last_atoms_ :static, :content, "one", :match, 0, :repl, * _NL
+        end
+
+        it "before - second line" do
+          for_context_line_ _before_lines.fetch 1
+          expect_last_atoms_ :match_continuing, :content, "AND", :static, * _NL
+        end
+
+        shared_subject :_before_lines do
+          before_throughput_line_stream_.to_a
         end
       end
     end
@@ -103,31 +111,31 @@ module Skylab::SearchAndReplace::TestSupport
           zap zank zap
         HERE
 
-        regexp %r(\bz[aeiou]nk\b)i
+        rx %r(\bz[aeiou]nk\b)i
       end
+
+      num_lines_before 2
+      num_lines_after 2
+      during_around_match_controller_at_index 1
 
       mutate_edit_session_for_context_lines_by do
 
         es = string_edit_session_begin_
 
-        _mc1 = es.first_match_controller
-        _mc1.engage_replacement_via_string "nourk 1\nnourk 2\nnourk 3"
+        mc1 = es.first_match_controller
+        mc1.engage_replacement_via_string "nourk 1\nnourk 2\nnourk 3"
 
-        _mc2 = _mc1.next_match_controller
-        _mc2.engage_replacement_via_string "nelf 1\nnelf 2\nnelf 3"
+        mc2 = mc1.next_match_controller
+        mc2.engage_replacement_via_string "nelf 1\nnelf 2\nnelf 3"
 
-        _mc2.next_match_controller and fail
+        mc2.next_match_controller and fail
 
         es
       end
 
-      shared_subject :context_lines_before_during_after_ do
-        _build_same_tuple
-      end
-
       it "(output looks right)" do
 
-        expect_edit_session_output_ unindent_( <<-HERE )
+        expect_edit_session_output_ unindent_ <<-HERE
           zip nourk 1
           nourk 2
           nourk 3 zip
@@ -137,9 +145,11 @@ module Skylab::SearchAndReplace::TestSupport
         HERE
       end
 
+      shared_context_lines
+
       it "the line of - note it's three lines now. you get all three." do
 
-        for_ lines_during_ do
+        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'zap nelf 1'
           _ 'nelf 2'
           _ 'nelf 3 zap'
@@ -148,12 +158,12 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "there are no two after" do
 
-        nothing_for_ lines_after_
+        expect_no_lines_in_ after_throughput_line_stream_
       end
 
       it "the two before (ditto)" do
 
-        for_ lines_before_ do
+        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'nourk 2'
           _ 'nourk 3 zip'
         end
@@ -170,10 +180,14 @@ module Skylab::SearchAndReplace::TestSupport
           ziff ZUP zaff
         HERE
 
-        regexp %r(\bZ[A-Z]+\b)
+        rx %r(\bZ[A-Z]+\b)
       end
 
-      shared_subject :mutated_edit_session_ do
+      num_lines_before 2
+      num_lines_after 2
+      during_around_match_controller_at_index 1
+
+      mutate_edit_session_for_context_lines_by do
 
         cs = string_edit_session_begin_controllers_
         mc = cs.match_controller_array
@@ -188,42 +202,35 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "(content looks right)" do
 
-        expect_edit_session_output_ unindent_( <<-HERE )
+        expect_edit_session_output_ unindent_ <<-HERE
           zo JE zoo
           JIM zam JOM
           ziff JUP zaff
         HERE
       end
 
-      shared_subject :context_lines_before_during_after_ do
-        _build_same_tuple
-      end
+      shared_context_lines
 
       it "the line of" do
 
-        for_ lines_during_ do
+        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'JIM zam JOM'
         end
       end
 
       it "asked for two after, only got one" do
 
-        for_ lines_after_ do
+        expect_paragraph_for_context_stream_ after_throughput_line_stream_ do
           _ 'ziff JUP zaff'
         end
       end
 
       it "asked for two before, only got one" do
 
-        for_ lines_before_ do
+        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'zo JE zoo'
         end
       end
-    end
-
-    def _build_same_tuple
-
-      context_lines_before_during_after_via_ 2, 2, 1
     end
   end
 end

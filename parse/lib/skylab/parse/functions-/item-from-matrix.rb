@@ -31,6 +31,13 @@ module Skylab::Parse
         private :new
       end  # >>
 
+      def initialize & oes_p
+        # (one important external lib doesn't play nice with our above setup..)
+        if oes_p
+          @_oes_p = oes_p
+        end
+      end
+
       def output_node_via_input_stream in_st, & oes_p
 
         dup.__init( in_st, & oes_p ).__parse

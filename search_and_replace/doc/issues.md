@@ -1,3 +1,6 @@
+[#033] #track be *sure* you change this part too if you change the
+             throughput syntax for `match_continuing`
+
 [#032]       track a commonly used and as-yet undistilled pattern
              (a stream implemented by states implemented as method names)
 

@@ -51,7 +51,7 @@ module Skylab::SearchAndReplace
 
       def to_line_stream
         to_throughput_line_stream_.map_by do |tl|
-          tl.to_unstyled_bytes_string__
+          tl.to_unstyled_bytes_string_
         end
       end
 

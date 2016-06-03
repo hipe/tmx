@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] magnetics - (43) context regression", wip: true do
+  describe "[sa] SES - context regression" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -33,33 +33,35 @@ module Skylab::SearchAndReplace::TestSupport
         es
       end
 
-      shared_subject :context_lines_before_during_after_ do
-        context_lines_before_during_after_via_ 2, 2, 1
-      end
+      num_lines_before 2
+      num_lines_after 2
+      during_around_match_controller_at_index 1
 
       it "(the replacement looks good)" do
 
-        expect_edit_session_output_ unindent_( <<-HERE )
+        expect_edit_session_output_ unindent_ <<-HERE
           JE zoo
           JIM
         HERE
       end
 
+      shared_context_lines
+
       it "during looks good" do
 
-        for_ lines_during_ do
+        expect_paragraph_for_context_stream_ during_throughput_line_stream_ do
           _ 'JIM'
         end
       end
 
       it "after looks good" do
 
-        nothing_for_ lines_after_
+        expect_no_lines_in_ after_throughput_line_stream_
       end
 
       it "before looks good" do
 
-        for_ lines_before_ do
+        expect_paragraph_for_context_stream_ before_throughput_line_stream_ do
           _ 'JE zoo'
         end
       end

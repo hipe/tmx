@@ -126,6 +126,7 @@ kind.
 
 
 
+
 ## what is a block formally?
 
 any block may be seen as consisting of a series of one or more

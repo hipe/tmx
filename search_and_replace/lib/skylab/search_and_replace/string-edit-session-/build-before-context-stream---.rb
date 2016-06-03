@@ -92,7 +92,7 @@ module Skylab::SearchAndReplace
 
     # --
 
-    def _there_is_a_previous_block
+    def _there_is_a_previous_block  # changes state
 
       prev_blk = @_current_block.previous_block
       if prev_blk
@@ -106,8 +106,7 @@ module Skylab::SearchAndReplace
 
     def _init_backwards_stream
 
-      _cb = remove_instance_variable :@_current_block
-      @_stream = _cb.to_backwards_throughput_line_stream_
+      @_stream = @_current_block.to_backwards_throughput_line_stream_
       NIL_
     end
 
@@ -117,7 +116,7 @@ module Skylab::SearchAndReplace
         @_current_line = x
         true
       else
-        self._B
+        false
       end
     end
 

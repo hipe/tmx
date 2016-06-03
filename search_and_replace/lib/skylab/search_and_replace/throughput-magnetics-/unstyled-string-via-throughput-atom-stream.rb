@@ -20,8 +20,8 @@ module Skylab::SearchAndReplace
 
   private
 
-    def match_continuing
-      ::Kernel._K
+    def match_continuing  # #tracked by [#033]
+      send @stream.gets
     end
 
     def match

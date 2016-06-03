@@ -171,35 +171,15 @@ module Skylab::SearchAndReplace
           @all_things.fetch @MC_indexes.first
         end
 
-        def COVER_write_the_previous_N_line_sexp_arrays_in_front_of a, n
+        def to_backwards_throughput_line_stream_
 
-          # slice on to the BEGINNING of `a` up to N of our tail-anchored
-          # lines. because replacements can add or remove newlines, we can't
-          # know what our trailing N lines are without starting from our
-          # beginning. if we still have a deficit when we're done, try
-          # recursing backwards.
+          # [#013] "we reverse over matches blocks the expensive way, not the hard way"
 
-          rb = Home_.lib_.basic::Rotating_Buffer[ n ]
+          lt_a = to_throughput_line_stream_.to_a
 
-          st = to_line_atom_array_stream_
-          begin
-            x = st.gets
-            x or break
-            rb << x
-            redo
-          end while nil
-
-          my_a = rb.to_a
-          deficit = n - my_a.length
-          a[ 0, 0 ] = my_a
-          if deficit.nonzero?
-            bl = @previous_block
-            if bl
-              self._PROBABLY_OK
-              bl.write_the_previous_N_line_sexp_arrays_in_front_of a, deficit
-            end
+          Callback_::Stream.via_range( ( lt_a.length - 1 ) .. 0 ) do |d|
+            lt_a.fetch d
           end
-          NIL_
         end
 
         def to_throughput_atom_stream_  # #testpoint

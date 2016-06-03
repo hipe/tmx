@@ -41,7 +41,7 @@ module Skylab::SearchAndReplace::TestSupport
         # produce the context lines (memoized #here).
 
         yes = true ; x = nil
-        define_method :_CL_shared_edit_session do
+        define_method :shared_edit_session_for_context_lines do
           if yes
             yes = false
             x = instance_exec( & p )
@@ -70,10 +70,34 @@ module Skylab::SearchAndReplace::TestSupport
       # -- for compat with lower-level test lib nodes
 
       def mutated_edit_session_
-        _CL_shared_edit_session
+        shared_edit_session_for_context_lines
       end
 
       # --
+
+      def expect_paragraph_for_context_stream_ st, & p
+        @context_stream = st
+        instance_exec( & p )
+        remove_instance_variable :@context_stream
+      end
+
+      def _ s_content  # only access this thru the above method.
+
+        act_tl = @context_stream.gets
+        if act_tl
+          act_s = act_tl.to_unstyled_bytes_string_
+          act_s.chomp!
+          if act_s != s_content
+            act_s.should eql s_content
+          end
+        else
+          fail ___CL_say_etc s_content
+        end
+      end
+
+      def ___CL_say_etc s
+        "had no more lines in section. expected line content: #{ s.inspect }"
+      end
 
       def for_context_stream_ st
         @context_stream = st ; nil
@@ -96,6 +120,10 @@ module Skylab::SearchAndReplace::TestSupport
         tl = st.gets
         tl or fail
         st.gets and fail
+        for_context_line_ tl
+      end
+
+      def for_context_line_ tl
         begin_expect_atoms_for_ tl.a ; nil
       end
 
@@ -109,7 +137,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       def __CL_build_tuple
 
-        _edit_session = _CL_shared_edit_session
+        _edit_session = shared_edit_session_for_context_lines
 
         _bef = _CL_num_lines_before
         _aft = _CL_num_lines_after

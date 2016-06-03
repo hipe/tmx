@@ -9,7 +9,7 @@ the overwrought approach here is arrived at practically: the theoretical
 foundation that we build on achieves robustness through its simplicity.
 in the algorithms that we then place over this foundation, whenever they
 have holes these oversights invariably lead to bugs (manifest and dormant
-both). as as such towards the end we offer our verion of "proof" of
+both). as as such towards this end we offer our version of "proof" of
 completeness.
 
 "the reference" is [#005].

@@ -152,7 +152,7 @@ module Skylab::SearchAndReplace
 
     # ==
 
-    class Throughput_Line___
+    class Throughput_Line___  # has same-name counterpart
 
       def initialize h, h_, a
         @a = a
@@ -160,7 +160,7 @@ module Skylab::SearchAndReplace
         @_etc_ = h_
       end
 
-      def to_unstyled_bytes_string__
+      def to_unstyled_bytes_string_  # #testpoint
         Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
           Callback_::Stream.via_nonsparse_array @a ).execute
       end

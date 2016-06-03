@@ -31,33 +31,50 @@ module Skylab::SearchAndReplace
 
       lts = @_stream.gets
       if lts
-        lts_ = remove_instance_variable :@_current_LTS
-        cursor_d = lts.end_charpos
-        cursor_d_ = lts_.charpos
         a = [ :static_continuing ]
-        if cursor_d != cursor_d_
-          a.push :content, @big_string[ cursor_d ... cursor_d_ ]
-          cursor_d = cursor_d_
-        end
-
-        @big_string[ cursor_d ... lts_.end_charpos ] == lts_.string or self._SANITY  # #todo
-
-        a.push :LTS_begin, lts_.string, :LTS_end
-
-        @_current_LTS = lts
-
-        Etc__.new a
+        cursor_d = lts.end_charpos
       else
-        self._B
+        # once you are out of newlines from your reverse stream, then
+        # you are at the first line of the static block.
+        a = [ :static ]
+        cursor_d = @charpos
       end
+
+      lts_ = remove_instance_variable :@_current_LTS
+      cursor_d_ = lts_.charpos
+      if cursor_d != cursor_d_
+        a.push :content, @big_string[ cursor_d ... cursor_d_ ]
+        cursor_d = cursor_d_
+      end
+
+      @big_string[ cursor_d ... lts_.end_charpos ] == lts_.string or self._SANITY  # #todo
+
+      a.push :LTS_begin, lts_.string, :LTS_end
+
+      if lts
+        @_current_LTS = lts
+      else
+        @_state = :___done
+      end
+
+      Throughput_Line___.new a
+    end
+
+    def ___done
+      NOTHING_
     end
 
     # ==
 
-    class Etc__
+    class Throughput_Line___  # compare to same-name counterpart
 
       def initialize a
         @a = a
+      end
+
+      def to_unstyled_bytes_string_  # #testpoint
+        Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
+          Callback_::Stream.via_nonsparse_array @a ).execute
       end
 
       attr_reader(

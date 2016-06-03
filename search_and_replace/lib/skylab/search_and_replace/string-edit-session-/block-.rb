@@ -105,7 +105,7 @@ module Skylab::SearchAndReplace
               # "flip" to the other context, by doing nothing (which leaves
               # the LTS there so the parser knowns we need to break).
 
-              self._YAY
+              self._YAY  # #todo
 
               NOTHING_
 
@@ -121,22 +121,38 @@ module Skylab::SearchAndReplace
                 @chunk.add_match_controller__ self
                 @chunk.add_LTS__ self
 
-              elsif @relationship.is_touching
+              else  # (really spread out for literacy)
 
-                # this is this "goofy" edge case where the match starts
-                # midway through an LTS. it is covered for both the first
-                # match in a block and midway through a block EXPERIMENTAL
+                # assume the match starts at or after the start of the LTS.
 
-                @chunk.add_both_goofy__ self
-              else
+                if @relationship.is_touching
 
-                # the LTS is ahead of the match and clear of it. in such
-                # cases we don't even deal with the match here at all -
-                # leave the match there and the parser should do the right
-                # thing. we only want to give the block (the any last match
-                # there) a chance to maybe swallow the LTS.
+                  if @relationship.is_kissing  # :#spot-7
+                    # if here the match touches but does not overlap the LTS,
+                    # then classify it as starting cleanly after the LTS.
+                    NOTHING_
+                  else
+                    is_goofy = true
+                  end
+                end
 
-                @chunk.maybe_add_LTS_ self
+                if is_goofy
+
+                  # this is this "goofy" edge case where the match starts
+                  # midway through an LTS. it is covered for both the first
+                  # match in a block and midway through a block EXPERIMENTAL
+
+                  @chunk.add_both_goofy__ self
+                else
+
+                  # the LTS is ahead of the match and clear of it. in such
+                  # cases we don't even deal with the match here at all -
+                  # leave the match there and the parser should do the right
+                  # thing. we only want to give the block (the any last match
+                  # there) a chance to maybe swallow the LTS.
+
+                  @chunk.maybe_add_LTS_ self
+                end
               end
             else
 

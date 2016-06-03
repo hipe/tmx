@@ -57,7 +57,11 @@ module Skylab::Basic
     #
 
     def to_a
-      self[ - @virtual_buffer_length .. -1 ]
+      if @virtual_buffer_length.zero?
+        []  # #todo this is inelegant. cover the case
+      else
+        self[ - @virtual_buffer_length .. -1 ]
+      end
     end
 
     def << x
