@@ -186,6 +186,45 @@ module Skylab::TestSupport
 
   module Expect_Line
 
+    say_not_same = -> act_s, exp_s do
+      "expected, had: #{ exp_s.inspect }, #{ act_s.inspect }"
+    end
+    say_unexpected = -> s do
+      "unexpected extra line - #{ s.inspect }"
+    end
+    say_missing = -> s do
+      "missing expected line - #{ s.inspect }"
+    end
+
+    Expect_same_string = -> actual_s, expected_s, context do
+
+      lib = Home_.lib_.basic::String
+      exp_st = lib.line_stream expected_s
+      act_st = lib.line_stream actual_s
+
+      begin
+        act_s = act_st.gets
+        exp_s = exp_st.gets
+        if act_s
+          if exp_s
+            if exp_s == act_s
+              redo
+            else
+              fail say_not_same[ act_s, exp_s ]
+            end
+          else
+            fail say_unexpected[ act_s ]
+          end
+        elsif exp_s
+          fail say_missing[ exp_s ]
+        else
+          # (when they both end at the same moment, success)
+          break
+        end
+      end while nil
+      NIL_
+    end
+
     class Scanner
 
       class << self

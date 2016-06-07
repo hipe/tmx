@@ -30,19 +30,19 @@ module Skylab::SearchAndReplace
 
       def write_output_lines_into y, & oes_p  # convenience for the lazy..
 
-        bytes = 0  # maybe ..
+        bytesize = 0
         st = to_line_stream
         begin
           s = st.gets
           s or break
           y << s
-          bytes += s.length
+          bytesize += s.bytesize
           redo
         end while nil
 
         if block_given?
           oes_p.call :info, :data, :number_of_bytes_written do
-            bytes
+            bytesize
           end
         end
 

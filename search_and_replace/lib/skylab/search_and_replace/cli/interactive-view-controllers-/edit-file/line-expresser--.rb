@@ -56,6 +56,10 @@ module Skylab::SearchAndReplace
           @_is_in_a_match = false ; nil
         end
 
+        def static_continuing  # #not-covered
+          @_is_in_a_match = false ; nil
+        end
+
         def content
 
           _ = @_atom_stream.gets

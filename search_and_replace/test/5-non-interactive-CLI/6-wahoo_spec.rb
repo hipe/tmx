@@ -33,7 +33,7 @@ module Skylab::SearchAndReplace::TestSupport
           '--ruby-regexp', '/wazoozle/i',
           '-p', path,
           '--fil', '*.txt', '--filen', '*.orange',
-          'MAH-NOOZLE',
+          'MAZOO',
         )
 
         _path = ::File.join path, 'some-orange.orange'
@@ -72,7 +72,18 @@ module Skylab::SearchAndReplace::TestSupport
       it "wrote file that was under VCS with no changes" do
 
         _line = _interesting_lines[ :some_orange ]
-        _line.first_half == "wrote 2 changes (125 bytes)" or fail
+        _line.first_half == "wrote 2 changes (115 bytes)" or fail
+      end
+
+      it "content is correct (covers #spot-9)" do
+
+        _exp = unindent_ <<-HERE
+          "MAZOO" - add other lines to this file if you want, but "MAZOO"
+            must appear only on the above line, and only 2x.
+        HERE
+        _act = niCLI_state.freeform_x
+
+        TestSupport_::Expect_Line::Expect_same_string[ _act, _exp, self ]
       end
 
       it "skipped file that was under VCS with changes" do

@@ -66,14 +66,15 @@ module Skylab::SearchAndReplace
         d = 0
 
         mc = @edit_session.first_match_controller
+          # (having a file with no match (controller) is #spot-8 #not-covered)
 
         ok = true
-        begin
+        while mc
           ok = mc.engage_replacement( & @_oes_p )
           ok or break
           d += 1
           mc = mc.next_match_controller
-        end while mc
+        end
 
         if ok
           @__replacement_count = d
@@ -100,15 +101,18 @@ module Skylab::SearchAndReplace
           fh = ::File.open path, ::File::WRONLY
         end
 
-        @edit_session.write_output_lines_into fh do | * _, & ev_p |
+        data_proc = nil
+        @edit_session.write_output_lines_into fh do | * _, & data_p |
+          data_proc = data_p
+        end
+        bytesize = data_proc[]
 
-          bytes = ev_p[]
+        fh.truncate bytesize  # as covered by #spot-9
 
-          @_oes_p.call :_, :expression do |y|
+        @_oes_p.call :_, :expression do |y|
 
-            y << "wrote #{ d } change#{ s d } #{
-              }(#{ bytes }#{ ' dry' if is_dry } byte#{ s bytes }) - #{ pth path }"
-          end
+          y << "wrote #{ d } change#{ s d } #{
+            }(#{ bytesize }#{ ' dry' if is_dry } byte#{ s bytesize }) - #{ pth path }"
         end
 
         fh.close
