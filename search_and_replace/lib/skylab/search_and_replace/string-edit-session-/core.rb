@@ -22,8 +22,8 @@ module Skylab::SearchAndReplace
       end
 
       def initialize_dup otr  # [#014] only for tests :/
-        @first_block.next_block
-        @first_block = @first_block.dup.init_dup_recursive_ nil
+        @first_block = @first_block.duplicate_first_block__
+        NIL_
       end
 
       # --

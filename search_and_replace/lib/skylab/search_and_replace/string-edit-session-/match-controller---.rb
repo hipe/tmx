@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace
 
         # -- [#014] only for tests
 
-        def dup_for_ block
+        def dup_match_controller_for__ block
           dup.___init_dup block
         end
 
@@ -54,7 +54,7 @@ module Skylab::SearchAndReplace
 
         def engage_replacement & oes_p
 
-          _proc_like = @block.replacement_function_
+          _proc_like = @block.replacement_function__
 
           presumably_string = _proc_like.call(
             @matchdata,  # (#we-might pass a custom structure instead..)

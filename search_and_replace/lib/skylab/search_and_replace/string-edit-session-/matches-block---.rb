@@ -6,15 +6,27 @@ module Skylab::SearchAndReplace
 
         # implement exactly [#012]
 
-        def initialize
+        def initialize( * )
 
           @all_things = []
           @LTS_indexes = []
           @MC_indexes = []
+          super
         end
 
-        def initialize_dup _
-          self._EEK_revisit_see_notes
+        def init_duplicated_block_for_previous_block_ prev
+          a = @all_things
+          a_ = ::Array.new a.length
+          @MC_indexes.each do |d|
+            a_[ d ] = a[ d ].dup_match_controller_for__ self
+          end
+          @LTS_indexes.each do |d|
+            a_[ d ] = a[ d ]
+          end
+          a.frozen? or ::Kernel._SANITY
+          a_.freeze
+          @all_things = a_
+          super
         end
 
         # -- parsing

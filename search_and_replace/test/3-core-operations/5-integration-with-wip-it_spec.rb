@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SearchAndReplace::TestSupport
 
-  describe "[sa] core operations - integration with w#{}ip-it", slow: true, wip: true do  # :[#026].
+  describe "[sa] core operations - integration with w#{}ip-it", slow: true do  # :[#026].
 
     # highly experimental - this tests a feature that is (a) housed in a
     # different sidesystem ([ts]) and (b) frontiers features of a facility

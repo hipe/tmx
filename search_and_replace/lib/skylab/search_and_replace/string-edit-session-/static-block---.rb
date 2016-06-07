@@ -4,8 +4,13 @@ module Skylab::SearchAndReplace
 
       class Static_Block___ < Block_
 
-        def initialize
+        def initialize( * )
           @_LTSs = []  # line termination sequence (i.e "newline") occurrences
+          super
+        end
+
+        def init_duplicated_block_for_previous_block_ nxt
+          super  # (hi.)
         end
 
         def push x

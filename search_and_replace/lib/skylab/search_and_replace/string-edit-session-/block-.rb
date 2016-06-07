@@ -2,7 +2,7 @@ module Skylab::SearchAndReplace
 
   class StringEditSession_
 
-      class Block_
+    class Block_
 
         # implement exactly [#012] (over [#010] (over [#005])).
 
@@ -38,17 +38,17 @@ module Skylab::SearchAndReplace
 
           def initialize o
             @chunk = nil
-            @_ingredients = o
-            _line_stream, _match_stream, @REPLACEMENT_FUNCTION = o.to_a
+            _line_stream, _match_stream, replacement_function = o.to_a
+            @_services = Services___.new replacement_function
             super _line_stream, _match_stream  # A stream, B stream
           end
 
           def init_chunk_for_A
-            @chunk = Here_::Static_Block___.new ; nil
+            @chunk = Here_::Static_Block___.new @_services ; nil
           end
 
           def init_chunk_for_B
-            @chunk = Here_::Matches_Block___.new ; nil
+            @chunk = Here_::Matches_Block___.new @_services ; nil
           end
 
           def release_chunk_which_is_for_A
@@ -195,6 +195,33 @@ module Skylab::SearchAndReplace
 
         # ==
 
+        def initialize services
+          @__services = services
+        end
+
+        # ~
+
+        def duplicate_first_block__
+          duplicate_block_for_previous_block_ NOTHING_
+        end
+
+        def duplicate_block_for_previous_block_ prev
+          otr = dup
+          otr.next_block
+          otr.init_duplicated_block_for_previous_block_ prev
+        end
+
+        def init_duplicated_block_for_previous_block_ prev
+          @previous_block = prev
+          blk = @_next_block
+          if blk
+            @_next_block = blk.duplicate_block_for_previous_block_ self
+          end
+          self
+        end
+
+        # ~
+
         def __receive_big_string_as_first_block s
           @big_string_ = s ; nil
         end
@@ -232,9 +259,13 @@ module Skylab::SearchAndReplace
             if blk
               blk.receive_predecessor_etc_ st, self
             end
-            @___next_block = blk
+            @_next_block = blk
           end
-          @___next_block
+          @_next_block
+        end
+
+        def replacement_function__
+          @__services.replacement_function
         end
 
         attr_reader(
@@ -249,7 +280,10 @@ module Skylab::SearchAndReplace
             Throughput_Line_Stream_via_Throughput_Atom_Stream.new( _ ).execute
         end
 
-        # ==
-      end
+      # ==
+
+      Services___ = ::Struct.new :replacement_function
+
+    end
   end
 end

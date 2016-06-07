@@ -91,15 +91,42 @@
              conditions that got us into this mess - that of testing
              different scenarios on the selfsame object graph.
 
-             so what we were left with was to deep-dup some reasonable
-             part of the object graph (the edit session). this is seen
-             as the most "elegant" as it is by some order of magnitude
+             so the choice we left ourselves with was a sort of custom
+             "deep dup" that duplicates only those objects necessary to
+             support these alternative scenarios while exercizing that
+             "static" objects will be static across the scenarios.
+
+             we see this as not elegant per se, but still the best
+             alternative among those presented here, as it is by some
+             order of magnitude
              cheaper than calling the API again, and does not incur the
              above mentioned risks that a recursive `clear` would.
 
              the only problem with this is that it violates another
              testing rubric - we now have code in our asset tree that is
              only in service of our tests in this regard.
+
+             ## implementation
+
+             a string edit session (SES) can be duped for such purposes
+             by a plain old call to its `dup` method.
+
+             per [#010] a session only holds a reference to the first
+             block. the blocks are arranged as a linked list. recursively
+             each block must dup each next block and so on, taking care
+             that each node (block) points to the correct (new) node
+             in both the former's "previous" AND "next" references.
+             in this manner the whole chain is "deep" duped appropriately.
+
+             duping static blocks is trivial because for such purposes
+             the data remains the same. (but note we still have to make
+             the dup and with some care, because there is still a new
+             graph (list) to create.)
+
+             "matches" blocks are more complicated to dup because we
+             have to recurse selectively to some of its child nodes:
+             we want a deep dup again of the "match controller" nodes
+             because it is these we are varying between SES dups.
 
 [#013]       the context lines algorithm ..
 
