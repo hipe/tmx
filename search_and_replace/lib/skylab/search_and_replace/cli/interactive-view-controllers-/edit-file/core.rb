@@ -261,7 +261,7 @@ module Skylab::SearchAndReplace
 
         _cm = uow.current_match_controller
 
-        be_st, du_st, af_st = _cm.context_throughput_lines_before_during_after_(
+        be_st, du_st, af_st = _cm.to_contexted_throughput_line_streams_(
           NUM_LINES_BEFORE__,
           NUM_LINES_AFTER__,
         )
@@ -289,19 +289,17 @@ module Skylab::SearchAndReplace
 
         pe = Here_::Line_Expresser__.new @_line_yielder
 
-        do_nothing = -> _d { }
-
-        pe.on_disengaged_match_begin = do_nothing
-        pe.on_disengaged_match_end = do_nothing
-        pe.on_replacement_begin = do_nothing
-        pe.on_replacement_end = do_nothing
-
-        as_is = -> s do
-          pe.concat s
+        pe.render_static = -> s do
+          s
         end
 
-        pe.on_orig_str = as_is
-        pe.on_repl_str = as_is
+        pe.render_match_when_replacement_engaged = -> _d, s do
+          s
+        end
+
+        pe.render_match_when_replacement_not_engaged = -> _d, s do
+          s
+        end
 
         @_plain_expresser = pe ; nil
       end
@@ -312,39 +310,25 @@ module Skylab::SearchAndReplace
 
         se = Here_::Line_Expresser__.new @_line_yielder
 
-        is_inside_current_match = false
-
         match_d = @_file_UOW.current_match_controller.match_index  # eew - ..
 
-        se.on_disengaged_match_begin = -> d do
-          is_inside_current_match = match_d == d
+        se.render_static = -> s do
+          s
         end
 
-        se.on_disengaged_match_end = -> _d do
-          is_inside_current_match = false
-        end
-
-        se.on_replacement_begin = -> d do
-          is_inside_current_match = match_d == d
-        end
-
-        se.on_replacement_end = -> d do
-          is_inside_current_match = false
-        end
-
-        se.on_orig_str = -> s do
-          if is_inside_current_match
-            se.concat stylify[ ORIGINAL_STYLE__, s ]
+        se.render_match_when_replacement_engaged = -> d, s do
+          if match_d == d
+            stylify[ REPLACEMENT_STYLE__, s ]
           else
-            se.concat s
+            s
           end
         end
 
-        se.on_repl_str = -> s do
-          if is_inside_current_match
-            se.concat stylify[ REPLACEMENT_STYLE__, s ]
+        se.render_match_when_replacement_not_engaged = -> d, s do
+          if match_d == d
+            stylify[ ORIGINAL_STYLE__, s ]
           else
-            se.concat s
+            s
           end
         end
 

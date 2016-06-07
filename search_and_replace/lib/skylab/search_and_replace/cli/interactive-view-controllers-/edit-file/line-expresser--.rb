@@ -9,63 +9,94 @@ module Skylab::SearchAndReplace
         # event-based expression of lines: style the match of interest
 
         def initialize y
-
           @line_yielder = y
-
-          @on_newline_sequence = -> s do
-            @_buffer.concat s ; nil
-          end
         end
 
-        attr_accessor(
-          :on_orig_str,
-          :on_repl_str,
-          :on_disengaged_match_begin,
-          :on_disengaged_match_end,
-          :on_replacement_begin,
-          :on_replacement_end,
+        attr_writer(
+          :render_static,
+          :render_match_when_replacement_not_engaged,
+          :render_match_when_replacement_engaged,
         )
 
-        def call any_st
-          if any_st
-            ___on_throughput_line_stream any_st
-          end
-        end
-
-        def ___on_throughput_line_stream st
-
+        def call st
+          # CAUTION - we are messing with state in a long-running session
           begin
-            x = st.gets
-            x or break
-            @_buffer = ""  # allocate new memory for each line (for now)
-            x.each do | sym, * a |
-
-              if :zero_width == sym
-                sym = a.shift
-              end
-
-              instance_variable_get( OP_H___.fetch sym ).call( * a )
-            end
-            @line_yielder << @_buffer
+            tl = st.gets
+            tl or break
+            @_this_line_string = ""
+            @_atom_stream = Callback_::Stream.via_nonsparse_array tl.a
+            @_done_with_line = false
+            begin
+              _ = @_atom_stream.gets
+              send _
+            end until @_done_with_line
             redo
           end while nil
-          @_buffer = nil ; nil
+          NIL_
         end
 
-        OP_H___ = {
+      private
 
-          orig_str: :@on_orig_str,
-          repl_str: :@on_repl_str,
+        def match
+          @_is_in_a_match = true
+          @_match_d = @_atom_stream.gets
+          send @_atom_stream.gets
+          NIL_
+        end
 
-          disengaged_match_begin: :@on_disengaged_match_begin,
-          disengaged_match_end: :@on_disengaged_match_end,
-          newline_sequence: :@on_newline_sequence,
-          replacement_begin: :@on_replacement_begin,
-          replacement_end: :@on_replacement_end,
-        }
+        def repl
+          @_replacement_is_engaged = true
+        end
 
-        def concat x
-          @_buffer.concat x ; nil
+        def orig
+          @_replacement_is_engaged = false
+        end
+
+        def static
+          @_is_in_a_match = false ; nil
+        end
+
+        def content
+
+          _ = @_atom_stream.gets
+
+          __ = if @_is_in_a_match
+            if @_replacement_is_engaged
+              @render_match_when_replacement_engaged[ @_match_d, _ ]
+            else
+              @render_match_when_replacement_not_engaged[ @_match_d, _ ]
+            end
+          else
+            @render_static[ _ ]
+          end
+
+          @_this_line_string.concat __
+
+          NIL_
+        end
+
+        def LTS_begin
+          @_this_line_string.concat @_atom_stream.gets
+          NIL_
+        end
+
+        def LTS_continuing
+          ::Kernel._COVER_ME_code_sketch_README
+          # (decide me: you never wrap styling across lines despite etc..)
+          @_this_line_string.concat @_atom_stream.gets
+          NIL_
+        end
+
+        def LTS_end
+          @line_yielder << remove_instance_variable( :@_this_line_string )
+          @_done_with_line = true
+          NIL_
+        end
+
+      public
+
+        def concat s
+          @_this_line_string.concat s ; nil
         end
       end
     end

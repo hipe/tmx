@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-    class Magnetics_::Write_changed_file_via_string_edit_session
+    class Magnetics_::Write_changed_file_via_mutable_file_session
 
       # resolve a locked, writable filehandle to a tmpfile.
       # line by line, write the new file state to the tmpfile.

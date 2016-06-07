@@ -93,7 +93,6 @@ module Skylab::SearchAndReplace
       end
 
       Here_ = self
-      # NEWLINE_SEXP_ = [ :newline_sequence, NEWLINE_ ].freeze  gone for [#011]  # #todo
       NOTHING_ = nil  # in contrast with something
     end
 end
