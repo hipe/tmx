@@ -225,7 +225,7 @@ module Skylab
       def __build_adapter sym
 
         _cls = Tree_Runner_::Adapters_.const_get(
-          Callback_::Name.via_variegated_symbol( sym ).as_const, false )
+          Common_::Name.via_variegated_symbol( sym ).as_const, false )
 
         _cls.new @resources, & @on_event_selectively
       end
@@ -282,7 +282,7 @@ module Skylab
       def par x  # e.g divide
 
         _nm = if x.respond_to?( :ascii_only? ) || x.respond_to?( :id2name )
-          Callback_::Name.via_slug x
+          Common_::Name.via_slug x
         else
           x.name
         end
@@ -303,7 +303,7 @@ module Skylab
 
       def and_ s_a
         # #covered-by: in tree runner, list files and do counts
-        Callback_::Oxford_and[ s_a ]
+        Common_::Oxford_and[ s_a ]
       end
 
       def both x
@@ -317,7 +317,7 @@ module Skylab
       end
 
       def or_ s_a
-        Callback_::Oxford_or[ s_a ]
+        Common_::Oxford_or[ s_a ]
       end
 
       def progressive_verb s

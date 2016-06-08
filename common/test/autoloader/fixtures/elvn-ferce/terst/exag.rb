@@ -1,4 +1,4 @@
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
   module Autoloader::Fixtures::Elvn_Ferce
     module TertSerppert
       class Exag

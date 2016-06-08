@@ -57,7 +57,7 @@ module Skylab::TMX
 
       if _cli_class
 
-        _nf = Callback_::Name.via_module ss_mod
+        _nf = Common_::Name.via_module ss_mod
 
         Home_::Model_::Showcase_as_Unbound.new _nf, ss_mod
       else
@@ -86,7 +86,7 @@ module Skylab::TMX
 
       bx.replace_by :action do | prp |
         prp.dup_by do
-          @name = Callback_::Name.via_variegated_symbol :reactive_node
+          @name = Common_::Name.via_variegated_symbol :reactive_node
         end
       end
       @front_properties = bx
@@ -129,7 +129,7 @@ module Skylab::TMX
 
         _args = [ ada.resources.argv ]
 
-        Callback_::Bound_Call[ _args, _cli, :invoke ]
+        Common_::Bound_Call[ _args, _cli, :invoke ]
       end
 
       def _build_new_CLI_for_under ada

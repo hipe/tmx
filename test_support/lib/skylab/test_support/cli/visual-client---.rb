@@ -131,7 +131,7 @@ module Skylab::TestSupport
 
         s = @argv.shift
 
-        sym = Callback_::Name.via_slug( s ).as_const
+        sym = Common_::Name.via_slug( s ).as_const
 
         pn = the_dir_pathname_.join "#{ s }/visual"
 

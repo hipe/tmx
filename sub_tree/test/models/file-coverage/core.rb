@@ -7,7 +7,7 @@ module Skylab::SubTree::TestSupport
       tcc.include self
 
       x_a.each do | sym |
-        _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+        _const = Common_::Name.via_variegated_symbol( sym ).as_const
         Here_.const_get( _const, false )[ tcc ]
       end
 
@@ -176,7 +176,7 @@ module Skylab::SubTree::TestSupport
     tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
   end
 
-  Name_conventions__ = Callback_.memoize do
+  Name_conventions__ = Common_.memoize do
 
     Subject__[]::Models_::Name_Conventions.new %w( *_speg.rb *_spek.rb )
   end

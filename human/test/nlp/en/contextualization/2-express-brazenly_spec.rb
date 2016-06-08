@@ -55,7 +55,7 @@ module Skylab::Human::TestSupport
     it "all inline / event / negative - LOOK uses special members to inflect" do
 
       _a = _lines_via_emission :error, :wazzozie do
-        Callback_::Event.inline_not_OK_with(
+        Common_::Event.inline_not_OK_with(
           :wazoozicle,
           :noun_lexeme, _Fake_lexeme[ 'fish' ],
           :verb_lexeme, _Fake_lexeme[ 'eat' ],
@@ -75,7 +75,7 @@ module Skylab::Human::TestSupport
 
       _a = _lines_via_emission :"_anything?_", :_no_see_ do
 
-        Callback_::Event.inline_OK_with(
+        Common_::Event.inline_OK_with(
           :wazoozicle,
           :inflected_noun, 'fish',
           :verb_lexeme, _Fake_lexeme[ 'eat' ],
@@ -93,7 +93,7 @@ module Skylab::Human::TestSupport
 
       _a = _lines_via_emission :"_anything?_", :_no_see_ do
 
-        Callback_::Event.inline_OK_with(
+        Common_::Event.inline_OK_with(
           :wazoozicle,
           :inflected_noun, 'fish',
           :verb_lexeme, _Fake_lexeme[ 'eat' ],

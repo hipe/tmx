@@ -84,7 +84,7 @@ module Skylab::Brazen
       bx.freeze
     end
 
-    Standard_action_property_box___ = Callback_::Lazy.call do
+    Standard_action_property_box___ = Common_::Lazy.call do
 
       bx = Box_.new
 
@@ -124,7 +124,7 @@ module Skylab::Brazen
 
       def initialize name_sym, * x_a
 
-        @name = Callback_::Name.via_variegated_symbol name_sym
+        @name = Common_::Name.via_variegated_symbol name_sym
 
         @argument_arity = :one
 

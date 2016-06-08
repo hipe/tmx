@@ -25,14 +25,14 @@ module Skylab::Brazen
         cls = _current_editable_action_class
         if cls
           remove_instance_variable :@_current_editable_action_class
-          name = Callback_::Name.via_variegated_symbol m
-          _const = Callback_::Name.via_variegated_symbol( m ).as_const
+          name = Common_::Name.via_variegated_symbol m
+          _const = Common_::Name.via_variegated_symbol( m ).as_const
           __actions_module.const_set name.as_const, cls
           entry = Entry__.new name, self
         else
           entry = POSSIBLY_MINIMAL_ENTRY___
         end
-        ( @__raw_entries ||= Callback_::Box.new ).add m, entry
+        ( @__raw_entries ||= Common_::Box.new ).add m, entry
         NIL_
       end
 
@@ -130,7 +130,7 @@ module Skylab::Brazen
         end
 
         _bx = remove_instance_variable :@__raw_entries
-        bx_ = Callback_::Box.new
+        bx_ = Common_::Box.new
 
         amod = __actions_module
 
@@ -145,7 +145,7 @@ module Skylab::Brazen
             # this is just a public method with no option parser.
             # the below hack lets the top invocation find our custom class
 
-            nm = Callback_::Name.via_variegated_symbol k
+            nm = Common_::Name.via_variegated_symbol k
 
             amod.const_set nm.as_const, Action_Adapter__  # EEK
 
@@ -278,7 +278,7 @@ module Skylab::Brazen
         # unlike parent we do *not* need to use @mutable_backbound_iambic
         # so (for sanity) we do not init it here.
 
-        @seen = Callback_::Box.new  # but we use this (see next method)
+        @seen = Common_::Box.new  # but we use this (see next method)
 
         NIL_
       end
@@ -330,7 +330,7 @@ module Skylab::Brazen
           bc
         else
 
-          Callback_::Bound_Call[
+          Common_::Bound_Call[
             argv,
             @_custom_kernel._user_utility,
             @_nf.as_variegated_symbol

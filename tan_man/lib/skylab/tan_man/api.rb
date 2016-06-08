@@ -118,7 +118,7 @@ module Skylab::TanMan
         @NLP_agent ||= self.class.NLP_agent_class.new
       end
 
-      NLP_agent___ = Callback_.memoize do
+      NLP_agent___ = Common_.memoize do
         NLP_Agent____ = Brazen_.expression_agent_library.make_NLP_agent(
           :public,
           [ :and_, :indefinite_noun,

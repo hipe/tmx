@@ -87,7 +87,7 @@ module Skylab::Human
 
           d = -1 ; ks = @_raw_h.keys ; last = ks.length - 1
 
-          Callback_.stream do
+          Common_.stream do
             if d < last
               entry_for ks.fetch( d += 1 )
             end
@@ -151,7 +151,7 @@ module Skylab::Human
 
         def inflect_words_into_against_exponent_state y, and_a
 
-          _st = Callback_::Stream.via_nonsparse_array @form_array
+          _st = Common_::Stream.via_nonsparse_array @form_array
 
           Irregular_::Actors_::Inflect[ y, and_a, _st ]
         end

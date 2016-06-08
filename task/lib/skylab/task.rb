@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 class Skylab::Task
 
@@ -12,7 +12,7 @@ class Skylab::Task
     end
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
 
@@ -68,7 +68,7 @@ class Skylab::Task
         )
 
         def _task_name
-          @___task_name ||= Callback_::Name.via_module self
+          @___task_name ||= Common_::Name.via_module self
         end
       end  # >>
 
@@ -138,7 +138,7 @@ class Skylab::Task
       end
 
       def add_parameter sym, x
-        ( @_params ||= Callback_::Box.new ).add sym, x
+        ( @_params ||= Common_::Box.new ).add sym, x
         NIL_
       end
 
@@ -176,7 +176,7 @@ class Skylab::Task
 
     def ___derive_name_function
       sym = @task.name_symbol_for_storage_
-      nf = Callback_::Name.via_variegated_symbol sym
+      nf = Common_::Name.via_variegated_symbol sym
       nf.as_ivar = :"@#{ sym }"  # don't lowercase it, [#003]:#note-1
       nf
     end
@@ -218,7 +218,7 @@ class Skylab::Task
     # --
 
     def to_stream
-      Callback_::Stream.via_nonsparse_array @_a
+      Common_::Stream.via_nonsparse_array @_a
     end
   end
 
@@ -293,12 +293,12 @@ class Skylab::Task
 
   # -- these
 
-  Callback_ = ::Skylab::Callback
-  Lazy_ = Callback_::Lazy
+  Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
 
   # -- these
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -318,7 +318,7 @@ class Skylab::Task
     Autoloader_[ self ]
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   CLI = nil  # for host

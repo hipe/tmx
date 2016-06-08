@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Digraph
+module Skylab::Common::TestSupport::Digraph
 
-  describe "[ca] digraph params - when your handler takes" do
+  describe "[co] digraph params - when your handler takes" do
 
     extend Digraph_TestSupport
 

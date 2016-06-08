@@ -1,8 +1,8 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::BeautySalon
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   class << self
 
@@ -12,19 +12,19 @@ module Skylab::BeautySalon
       y << "word wrap, search & replace, and comment processing functions"
     end
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
   end  # >>
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
 
@@ -55,18 +55,18 @@ module Skylab::BeautySalon
 
     Brazen = sidesys[ :Brazen ]
 
-    File_utils = Callback_.memoize do
+    File_utils = Common_.memoize do
       require 'fileutils'
       ::FileUtils
     end
 
     List_scanner = -> x do
-      Callback_::Scn.try_convert x
+      Common_::Scn.try_convert x
     end
 
     ST__ = sidesys[ :SubTree ]
 
-    String_scanner = Callback_.memoize do
+    String_scanner = Common_.memoize do
       require 'strscan'
       ::StringScanner
     end

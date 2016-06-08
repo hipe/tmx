@@ -87,7 +87,7 @@ module Skylab::Snag
       attr_reader :instance
     end  # >>
 
-    @instance = Callback_.produce_library_shell_via_library_and_app_modules(
+    @instance = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )
   end
 

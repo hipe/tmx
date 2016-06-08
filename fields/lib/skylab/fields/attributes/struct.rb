@@ -98,7 +98,7 @@ module Skylab::Fields
             cls.const_set CONST__, cls.const_get( CONST__ ).dup
           end
         else
-          cls.const_set CONST__, Callback_::Box.new
+          cls.const_set CONST__, Common_::Box.new
         end
 
         member_i_a.each do |i|

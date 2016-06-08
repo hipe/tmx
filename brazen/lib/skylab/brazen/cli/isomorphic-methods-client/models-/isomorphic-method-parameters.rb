@@ -33,7 +33,7 @@ module Skylab::Brazen
       end
 
       def to_argument_stream
-        Callback_::Stream.via_nonsparse_array @farg_a
+        Common_::Stream.via_nonsparse_array @farg_a
       end
 
       def fetch_argument_at_index i, &p
@@ -210,7 +210,7 @@ module Skylab::Brazen
         end
       end
 
-      _Stru = Callback_::Event.structured_expressive.method :new
+      _Stru = Common_::Event.structured_expressive.method :new
 
       Events_ = ::Module.new
 

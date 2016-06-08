@@ -189,7 +189,7 @@ module Skylab::TestSupport
       # ~~ template variables
 
       def receive_template_variable sym, x
-        @template_var_bx ||= Callback_::Box.new
+        @template_var_bx ||= Common_::Box.new
         @template_var_bx.set sym, x
         ACHIEVED_
       end
@@ -412,7 +412,7 @@ module Skylab::TestSupport
           @line_downstream.puts line
         end
 
-        Callback_::Emission.of :success, :wrote do
+        Common_::Emission.of :success, :wrote do
           Event_for_Wrote_[ @is_known_dry, bytes, lines ]
         end
       end

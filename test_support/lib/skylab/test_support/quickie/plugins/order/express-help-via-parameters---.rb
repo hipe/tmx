@@ -47,7 +47,7 @@ module Skylab::TestSupport
             s
           end
 
-          @_paragraph_stream = Callback_.stream do
+          @_paragraph_stream = Common_.stream do
             p[]
           end
           NIL_

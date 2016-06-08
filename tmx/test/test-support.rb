@@ -16,7 +16,7 @@ module Skylab::TMX::TestSupport
       -> sym do
         ( cache.fetch sym do
 
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          const = Common_::Name.via_variegated_symbol( sym ).as_const
 
           x = if TS_.const_defined? const
             TS_.const_get const
@@ -32,7 +32,7 @@ module Skylab::TMX::TestSupport
     define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
     def memoize_ sym, & p
-      define_method sym, Callback_.memoize( & p )
+      define_method sym, Common_.memoize( & p )
     end
   end
 
@@ -49,7 +49,7 @@ module Skylab::TMX::TestSupport
     end
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
   Home_ = ::Skylab::TMX
   NIL_ = nil
 end

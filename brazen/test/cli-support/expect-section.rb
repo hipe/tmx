@@ -106,7 +106,7 @@ module Skylab::Brazen::TestSupport
 
       def to_emission_stream
 
-        Callback_::Stream.via_item @x
+        Common_::Stream.via_item @x
       end
     end
 
@@ -115,7 +115,7 @@ module Skylab::Brazen::TestSupport
     class Leaf_Node__
 
       def _to_full_pre_order_stream
-        Callback_::Stream.via_item self
+        Common_::Stream.via_item self
       end
     end
 
@@ -165,13 +165,13 @@ module Skylab::Brazen::TestSupport
           self
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
 
       def ___to_child_stream
-        Callback_::Stream.via_nonsparse_array @children
+        Common_::Stream.via_nonsparse_array @children
       end
     end
 
@@ -207,7 +207,7 @@ module Skylab::Brazen::TestSupport
 
       def process_iambic_fully x_a
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
         @_polymorphic_upstream_ = st
         begin
           _m = st.gets_one
@@ -249,7 +249,7 @@ module Skylab::Brazen::TestSupport
 
       def __index_section_titles
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         @tree.children.each_with_index do | node, d |
 
@@ -315,7 +315,7 @@ module Skylab::Brazen::TestSupport
       end
 
       def emission_array= a
-        _em_st = Callback_::Stream.via_nonsparse_array a
+        _em_st = Common_::Stream.via_nonsparse_array a
         _receive_upstream_emission_stream _em_st
         a
       end
@@ -324,7 +324,7 @@ module Skylab::Brazen::TestSupport
 
         scn = Home_.lib_.basic::String.line_stream s
 
-        _em_st = Callback_.stream do
+        _em_st = Common_.stream do
 
           line = scn.gets
           if line
@@ -365,7 +365,7 @@ module Skylab::Brazen::TestSupport
 
         em_st = remove_instance_variable :@_upstream_emission_stream
 
-        _my_st = Callback_.stream do
+        _my_st = Common_.stream do
           begin
             em = em_st.gets
             if em

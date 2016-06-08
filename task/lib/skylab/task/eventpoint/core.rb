@@ -286,7 +286,7 @@ class Skylab::Task
 
         Internen__ = -> mod_x do
 
-          Callback_::Name.via_module( mod_x ).as_const.to_s.
+          Common_::Name.via_module( mod_x ).as_const.to_s.
             gsub( /_+\z/, EMPTY_S_ ).downcase
         end
 

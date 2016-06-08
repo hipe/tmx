@@ -158,7 +158,7 @@ module Skylab::Parse
           # (but the same) on each successive call:
 
           p = -> do
-            Callback_::Stream.via_nonsparse_array @_last_partial_matches
+            Common_::Stream.via_nonsparse_array @_last_partial_matches
           end
 
           @_build_row_stream = -> do
@@ -222,7 +222,7 @@ module Skylab::Parse
 
       def _build_expecting_event was_token, p
 
-        Callback_::Event.inline_not_OK_with( :expecting,
+        Common_::Event.inline_not_OK_with( :expecting,
 
             :token, was_token,
             :column_index, @_current_column,

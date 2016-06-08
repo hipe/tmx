@@ -8,7 +8,7 @@ module Skylab::Treemap
     # upstream) "multiplex" (echo) that unit to the through stream as well
     # as delivering it to the downstream.
 
-    Callback_::Scn.new do
+    Common_::Scn.new do
       line = up_IO.gets
       if line
         thru_IO << line

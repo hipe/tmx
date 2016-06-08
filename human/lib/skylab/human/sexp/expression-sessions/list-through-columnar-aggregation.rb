@@ -54,7 +54,7 @@ module Skylab::Human
       end
 
       def via_template_parse_remainder_of_polymorphic_stream st
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         @nucleus.template.to_formal_variable_stream.each do | param |
           bx.add param.name_symbol, Behaviors___.new( param )
         end
@@ -215,7 +215,7 @@ module Skylab::Human
             aggregator.flush
           end
         end
-        Callback_::Scn.new do
+        Common_::Scn.new do
           p[]
         end
       end

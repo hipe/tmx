@@ -132,7 +132,7 @@ module Skylab::TestSupport
         eg_name, @example_ff, pred_cat, @predicate_ff = a
         @predicate_category_symbol = pred_cat.intern
         eg_name.gsub! NON_ALPHA_RX__, EMPTY_S_
-        @case_name_symbol = Callback_::Name.via_human( eg_name ).
+        @case_name_symbol = Common_::Name.via_human( eg_name ).
           as_lowercase_with_underscores_symbol
       end
 

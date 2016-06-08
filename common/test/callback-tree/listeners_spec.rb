@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Tree
+module Skylab::Common::TestSupport::CallbackTree
 
-  describe "[ca] tree - listeners" do
+  describe "[co] callback tree - listeners" do
 
     context "minimal normative example" do
 
@@ -28,7 +28,7 @@ module Skylab::Callback::TestSupport::Tree
       end
 
       let :callbacks do
-        Home_::Tree.new za_zang: :listeners
+        Home_::CallbackTree.new za_zang: :listeners
       end
     end
 
@@ -73,7 +73,7 @@ module Skylab::Callback::TestSupport::Tree
       end
 
       let :callbacks do
-        Home_::Tree.new error: { purple: { durple_error: :listeners } }
+        Home_::CallbackTree.new error: { purple: { durple_error: :listeners } }
       end
     end
   end

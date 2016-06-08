@@ -20,7 +20,7 @@ module Skylab::Human
       end  # >>
 
       def initialize
-        @__slots = Callback_::Box.new
+        @__slots = Common_::Box.new
       end
 
       def process_polymorphic_stream_passively st  # #[#fi-022]

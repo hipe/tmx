@@ -105,7 +105,7 @@ module Skylab::Brazen
           x
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -117,7 +117,7 @@ module Skylab::Brazen
         nf = if cls.respond_to? :name_function
           cls.name_function
         else
-          Callback_::Name.via_module cls
+          Common_::Name.via_module cls
         end
 
         s = nf.as_const.to_s

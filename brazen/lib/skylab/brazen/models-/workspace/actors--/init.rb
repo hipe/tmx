@@ -150,7 +150,7 @@ module Skylab::Brazen
 
         @on_event_selectively.call :error, :directory_already_has_config_file do
 
-          Callback_::Event.inline_not_OK_with(
+          Common_::Event.inline_not_OK_with(
             :directory_already_has_config_file,
            :config_path, @path,
            :prop, @prop )

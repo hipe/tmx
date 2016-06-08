@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System
 
           ok = check_availability_
           ok &&= __normalize
-          ok && Callback_::Bound_Call[ NOTHING_, @_sess, :execute ]
+          ok && Common_::Bound_Call[ NOTHING_, @_sess, :execute ]
         end
 
         def __normalize
@@ -69,9 +69,9 @@ module Skylab::Autonomous_Component_System
 
           if @_sess.instance_variable_defined? ivar
 
-            Callback_::Known_Known[ @_sess.instance_variable_get ivar ]
+            Common_::Known_Known[ @_sess.instance_variable_get ivar ]
           else
-            Callback_::KNOWN_UNKNOWN
+            Common_::KNOWN_UNKNOWN
           end
         end
 

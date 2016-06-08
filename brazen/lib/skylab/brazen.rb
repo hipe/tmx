@@ -1,8 +1,8 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Brazen
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   class << self
 
@@ -10,7 +10,7 @@ module Skylab::Brazen
       Home_::Nodesque::Methods::Actionesque_Defaults
     end
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Home_::Kernel.new Home_
     end )
 
@@ -64,7 +64,7 @@ module Skylab::Brazen
     end
 
     def name_function
-      @nf ||= Callback_::Name.via_module self
+      @nf ||= Common_::Name.via_module self
     end
 
     def node_identifier
@@ -143,14 +143,14 @@ module Skylab::Brazen
     kp
   end
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   Require_fields_lib_ = Lazy_.call do  # ..
     Field_ = Home_.lib_.fields
     NIL_
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Collection_Adapters
 
@@ -188,7 +188,7 @@ module Skylab::Brazen
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    define_singleton_method :_memoize, Callback_::Lazy
+    define_singleton_method :_memoize, Common_::Lazy
 
     The_ACS_lib = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
@@ -249,12 +249,12 @@ module Skylab::Brazen
     Zerk = sidesys[ :Zerk ]  # for testing only
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   ACTIONS_CONST = :Actions
-  Box_ = Callback_::Box
-  CONST_SEP_ = Callback_.const_sep
+  Box_ = Common_::Box
+  CONST_SEP_ = Common_.const_sep
   DASH_ = '-'.freeze
   DOT_DOT_ = '..'
   EMPTY_A_ = [].freeze
@@ -264,7 +264,7 @@ module Skylab::Brazen
   Home_ = self
   IDENTITY_ = -> x { x }
   KEEP_PARSING_ = true
-  LIB_ = Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+  LIB_ = Common_.produce_library_shell_via_library_and_app_modules Lib_, self
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
   MONADIC_EMPTINESS_ = -> _ { NIL_ }
   NAME_SYMBOL = :name

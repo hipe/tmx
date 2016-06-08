@@ -34,10 +34,10 @@ module Skylab::Brazen
       def ___build_name_function
 
         s = @_name_symbol.id2name
-        Callback_::Name::Modality_Functions::
+        Common_::Name::Modality_Functions::
           Mutate_string_by_chomping_any_trailing_name_convention_suffixes[ s ]
 
-        Callback_::Name.via_variegated_symbol s.downcase.intern
+        Common_::Name.via_variegated_symbol s.downcase.intern
       end
 
       def default_proc

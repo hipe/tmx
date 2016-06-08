@@ -45,7 +45,7 @@ module Skylab::SubTree
       Basic[]::Tree
     end
 
-    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+    INSTANCE = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )  # at the end
 
   end

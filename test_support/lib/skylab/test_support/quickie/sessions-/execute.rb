@@ -143,7 +143,7 @@ module Skylab::TestSupport
       end
 
       def via_client_produce_bound_call
-        Callback_::Bound_Call[ nil, @client, :execute_ ]
+        Common_::Bound_Call[ nil, @client, :execute_ ]
       end
 
       def build_client

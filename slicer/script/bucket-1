@@ -60,7 +60,7 @@ else
 
     _, o, _e, _w = system.popen3 'git', 'ls-files', '-m'
 
-    bx = ::Skylab::Callback::Box.new
+    bx = ::Skylab::Common::Box.new
 
     rx = /\A [^ #{::Regexp.escape ::File::SEPARATOR }]+ /x
 

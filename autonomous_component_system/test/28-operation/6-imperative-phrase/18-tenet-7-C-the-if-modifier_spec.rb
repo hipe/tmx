@@ -74,7 +74,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :add
 
           -> st do
-            Callback_::Known_Known[ st.gets_one ]
+            Common_::Known_Known[ st.gets_one ]
           end
         end
 

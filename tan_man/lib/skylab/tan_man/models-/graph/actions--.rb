@@ -61,7 +61,7 @@ module Skylab::TanMan
 
     def to_pair_stream_for_persist
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
 
       path = @property_box.fetch :digraph_path
       if path.respond_to? :path  # because of a :+[#br-021] hack

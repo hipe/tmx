@@ -68,7 +68,7 @@ module Skylab::Autonomous_Component_System
         # hand-write a map-reduce for clarity
 
         st = @_reader.to_entry_stream__
-        Callback_.stream do
+        Common_.stream do
           begin
             en = st.gets  # [#035]
             en or break
@@ -161,7 +161,7 @@ module Skylab::Autonomous_Component_System
           # there is a potential gotcha here - if the compasc would customize
           # the name ([sg]) it won't be represented here unless the caller has
           # requested the compasc any time before this request of the name.
-          nf = Callback_::Name.via_variegated_symbol name_sym
+          nf = Common_::Name.via_variegated_symbol name_sym
           @_name = -> { nf }
           nf
         end
@@ -216,7 +216,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def name
-        @___nf ||= Callback_::Name.via_variegated_symbol @_entry.name_symbol
+        @___nf ||= Common_::Name.via_variegated_symbol @_entry.name_symbol
       end
 
       def name_symbol

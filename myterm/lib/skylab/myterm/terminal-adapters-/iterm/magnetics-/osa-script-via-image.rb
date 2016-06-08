@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   class Terminal_Adapters_::Iterm
 
-    class Magnetics_::OSA_Script_via_Image < Callback_::Actor::Monadic
+    class Magnetics_::OSA_Script_via_Image < Common_::Actor::Monadic
 
       # (cold.)
 

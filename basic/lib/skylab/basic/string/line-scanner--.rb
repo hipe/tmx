@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Line_Scanner__ < Callback_::Stream.stream_class  # :[#024]
+    class Line_Scanner__ < Common_::Stream.stream_class  # :[#024]
 
       # represent a string as a stream of "lines", each produced successively
       # through the universal minimal stream interface of a method named

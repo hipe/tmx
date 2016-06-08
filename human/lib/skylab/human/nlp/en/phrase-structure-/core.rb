@@ -57,7 +57,7 @@ module Skylab::Human
 
         def _build_box
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
           st = @_mod.irregular_index.irregular_collection.to_entry_stream
 
           begin

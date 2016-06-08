@@ -1,4 +1,4 @@
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
   module Autoloader::Fixtures::Elvn_Ferce::TerstSerppert::CIL
 
     _dpn = Autoloader::Fixtures::Elvn_Ferce.dir_pathname.join 'terst/cil'

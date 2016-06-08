@@ -98,7 +98,7 @@ module Skylab::SearchAndReplace
         sym = :will_not_write_empty_file
 
         @on_event_selectively.call :error, sym do
-          Callback_::Event.inline_not_OK_with sym, :path, _path
+          Common_::Event.inline_not_OK_with sym, :path, _path
         end
         UNABLE_
       end

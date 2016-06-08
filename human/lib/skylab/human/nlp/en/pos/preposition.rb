@@ -59,7 +59,7 @@ module Skylab::Human
 
       def to_stream_of_pronouns
         if @_np.pronoun_is_active
-          Callback_::Stream.via_item @_np
+          Common_::Stream.via_item @_np
         end
       end
 

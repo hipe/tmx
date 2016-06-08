@@ -128,7 +128,7 @@ module Skylab::TestSupport
           end
         end
 
-        Callback_::Scn.new do
+        Common_::Scn.new do
           p[]
         end
       end
@@ -276,7 +276,7 @@ module Skylab::TestSupport
           redo
         end while nil
 
-        st = Callback_::Stream.via_nonsparse_array buff.to_a
+        st = Common_::Stream.via_nonsparse_array buff.to_a
 
         @line = st.gets
         @up = st
@@ -479,7 +479,7 @@ module Skylab::TestSupport
         end
 
         def fake_open
-          Callback_::Stream.via_nonsparse_array @a
+          Common_::Stream.via_nonsparse_array @a
         end
       end
     end

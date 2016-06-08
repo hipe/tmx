@@ -28,8 +28,8 @@ module Skylab::TMX::TestSupport
       _expect_succeeded
     end
 
-    it "callback" do
-      _against 'callback', _ARG
+    it "common" do
+      _against 'common', _ARG
       _expect_common
     end
 

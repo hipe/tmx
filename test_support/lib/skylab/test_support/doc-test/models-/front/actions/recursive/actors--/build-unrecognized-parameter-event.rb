@@ -14,7 +14,7 @@ module Skylab::TestSupport
 
             _item_s_a = mod.constants.map do | const_i |
 
-              Callback_::Name.via_const_symbol( const_i ).
+              Common_::Name.via_const_symbol( const_i ).
                 as_lowercase_with_underscores_symbol.id2name
 
             end

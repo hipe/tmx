@@ -85,7 +85,7 @@ module Skylab::Basic
 
       def _receive_value x
 
-        _kn = Callback_::Qualified_Knownness.via_value_and_association(
+        _kn = Common_::Qualified_Knownness.via_value_and_association(
           x, Home_.default_property )
 
         _receive_arg _kn
@@ -133,7 +133,7 @@ module Skylab::Basic
 
       QKN__ = :qualified_knownness
 
-      Explanation__ = Callback_::Event.prototype_with(
+      Explanation__ = Common_::Event.prototype_with(
 
         :actual_property_is_outside_of_formal_property_set,
         QKN__, nil,

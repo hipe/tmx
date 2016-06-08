@@ -61,7 +61,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     define_method :__build_permutation_stream, -> do
 
-      _Struct = ( Callback_.memoize do
+      _Struct = ( Common_.memoize do
         ::Struct.new :A, :B
       end )
 
@@ -72,7 +72,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         a.push struct.new( :two, :three )
         a.push struct.new( :one, :four )
         a.push struct.new( :two, :four )
-        Callback_::Stream.via_nonsparse_array a
+        Common_::Stream.via_nonsparse_array a
       end
     end.call
   end

@@ -74,7 +74,7 @@ module Skylab::Basic
 
               _x = in_st.current_token
 
-              _kn = Callback_::Known_Known[ in_st.current_token ]
+              _kn = Common_::Known_Known[ in_st.current_token ]
 
               vw = normalize_knownness _kn do | * i_a, & ev_p |
 
@@ -130,7 +130,7 @@ module Skylab::Basic
           end
 
           if ok
-            Callback_::Known_Known[ @number ]
+            Common_::Known_Known[ @number ]
           else
             @result
           end

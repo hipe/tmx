@@ -35,7 +35,7 @@ module Skylab::Basic
 
       Shell__ = Home_.lib_.enhancement_shell %i( with )
 
-  Kernel__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :flush do
+  Kernel__ = Common_::Session::Ivars_with_Procs_as_Methods.new :flush do
 
     def initialize target
       @host = nil
@@ -147,7 +147,7 @@ module Skylab::Basic
 
     attr_reader :field
 
-    Callback_::Session::Ivars_with_Procs_as_Methods[ self, :@value_p, :value ]
+    Common_::Session::Ivars_with_Procs_as_Methods[ self, :@value_p, :value ]
 
     def local_normal_name
       @field.local_normal_name

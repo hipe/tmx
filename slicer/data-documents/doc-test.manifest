@@ -10,10 +10,10 @@ lib/skylab/basic/struct.rb  #setup-for-regret  #subject-proc
 lib/skylab/brazen/entity/properties-stack--/common-frame--.rb  #branch-down-to-core  #look-for-ts
 
 
-lib/skylab/callback/proxy/inline--.rb  #branch-down-to-core  #setup-for-regret  #subject-proc
-lib/skylab/callback/proxy/functional--.rb  #branch-down-to-core
-lib/skylab/callback/scn--/peek--.rb  #chomp-module
-lib/skylab/callback/scn--/core.rb  #chomp-module
+lib/skylab/common/proxy/inline--.rb  #branch-down-to-core  #setup-for-regret  #subject-proc
+lib/skylab/common/proxy/functional--.rb  #branch-down-to-core
+lib/skylab/common/scn--/peek--.rb  #chomp-module
+lib/skylab/common/scn--/core.rb  #chomp-module
 
 
 lib/skylab/face/cli/lipstick.rb  #setup-for-regret

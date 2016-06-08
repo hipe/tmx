@@ -65,7 +65,7 @@ module Skylab::Cull
         ok = Survey_::Actors__::Create[ @_survey, @bx, & @on_event_selectively ]
         if ok
 
-          Callback_::Emission.of :info, :created_survey do
+          Common_::Emission.of :info, :created_survey do
             @_survey.to_event
           end
 

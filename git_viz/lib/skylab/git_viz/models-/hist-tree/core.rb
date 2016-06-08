@@ -72,7 +72,7 @@ module Skylab::GitViz
       def __resolve_VCS_adapter
 
         _VCS_mod = Home_::VCS_Adapters_.const_get(
-          Callback_::Name.via_slug(
+          Common_::Name.via_slug(
             @argument_box.fetch( :VCS_adapter_name ).to_s
           ).as_const, false )
 

@@ -106,7 +106,7 @@ module Skylab::System::TestSupport
       ::File.join _my_fixtures_dirname, 'minimal-deep.patch'
     end
 
-    define_method :_my_fixtures_dirname, ( Callback_::Lazy.call do
+    define_method :_my_fixtures_dirname, ( Common_::Lazy.call do
       ::File.join TS_.dir_pathname.to_path, 'services/74-patch/fixtures'
     end )
 

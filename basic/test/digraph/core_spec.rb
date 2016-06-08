@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
   extend TestSupport_::Quickie
 
-  Callback_ = Callback_
+  Common_ = Common_
 
   describe "[ba] digraph" do
 
@@ -222,7 +222,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
 
       define_singleton_method :digraph do | meth, arr |
 
-        define_method meth, ( Callback_.memoize do
+        define_method meth, ( Common_.memoize do
 
           Home_::Digraph[ * arr ]
         end )

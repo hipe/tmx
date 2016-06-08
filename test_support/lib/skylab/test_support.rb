@@ -7,7 +7,7 @@ class ::String  # :1:[#sl-131] [#022] "to extlib or not to extlib.."
   end
 end
 
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::TestSupport  # :[#021].
 
@@ -137,11 +137,11 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   CONST_SEP_ = '::'.freeze

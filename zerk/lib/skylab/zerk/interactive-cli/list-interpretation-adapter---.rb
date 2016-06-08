@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  class List_Interpretation_Adapter___ < Callback_::Actor::Monadic  # :[#008]..
+  class List_Interpretation_Adapter___ < Common_::Actor::Monadic  # :[#008]..
 
     # #open after incubation (which will be after [#009]), de-dup this
     # with [#sy-029] OGDL which should be similar.. or don't
@@ -77,7 +77,7 @@ module Skylab::Zerk
 
       s = _write_unquoted_content_to_buffer ""
       if s
-        Callback_::Known_Known[ s ]
+        Common_::Known_Known[ s ]
       else
         __error_unexpected_character_in_unquoted_string
       end
@@ -87,7 +87,7 @@ module Skylab::Zerk
       s = _write_quoted_content_to_buffer ""
       if s
         if ___close_quote
-          Callback_::Known_Known[ s ]
+          Common_::Known_Known[ s ]
         else
           _error_no_closing_quote
         end

@@ -59,7 +59,7 @@ module Skylab::SubTree
 
           @on_event_selectively.call :error, :find_error do
 
-            Callback_::Event.inline_not_OK_with :find_error,
+            Common_::Event.inline_not_OK_with :find_error,
 
                 :msg, s,
                 :exitstatus, @thread.value.exitstatus do | y, o |

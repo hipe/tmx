@@ -110,7 +110,7 @@ module Skylab::System
 
         def __when_too_many_noent_dirs dir
 
-          _ev = Callback_::Event.inline_not_OK_with(
+          _ev = Common_::Event.inline_not_OK_with(
               :must_exist,
               :directory, dir,
               :error_category, :errno_enoent )

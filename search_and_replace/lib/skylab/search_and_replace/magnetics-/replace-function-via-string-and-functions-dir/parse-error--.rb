@@ -2,7 +2,7 @@ module Skylab::SearchAndReplace
 
     class Magnetics_::Replace_Function_via_String_and_Functions_Dir
 
-      Parse_error__ = Callback_::Event.prototype_with(
+      Parse_error__ = Common_::Event.prototype_with(
 
         :replace_function_parse_error,
         :expecting, nil,
@@ -46,7 +46,7 @@ module Skylab::SearchAndReplace
         class Symbol__
 
           def initialize x
-            @name = Callback_::Name.via_variegated_symbol x
+            @name = Common_::Name.via_variegated_symbol x
           end
 
           def category

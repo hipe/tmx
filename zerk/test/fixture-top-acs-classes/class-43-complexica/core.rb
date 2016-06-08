@@ -36,7 +36,7 @@ module Skylab::Zerk::TestSupport
           -> do
 
             _a = [ Myterio_Effecter.new( nil, nil ) ]
-            Callback_::Stream.via_nonsparse_array _a
+            Common_::Stream.via_nonsparse_array _a
           end
         end
 
@@ -49,7 +49,7 @@ module Skylab::Zerk::TestSupport
             a.push Myterio_Effecter.new( 7, [ "wopeego" ] )
             a.push Myterio_Effecter.new( 6, [ "diligente" ] )
 
-            Callback_::Stream.via_nonsparse_array a
+            Common_::Stream.via_nonsparse_array a
           end
         end
       end

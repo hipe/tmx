@@ -21,8 +21,8 @@ module Skylab::Human::TestSupport
         _words a, EMPTY_A_
       end
 
-      it "([ca]'s Oxford_and - #{ s.inspect })" do
-        _ = Callback_::Oxford_and[ a ]
+      it "([co]'s Oxford_and - #{ s.inspect })" do
+        _ = Common_::Oxford_and[ a ]
         _.should eql s
       end
 
@@ -89,7 +89,7 @@ module Skylab::Human::TestSupport
       end
 
       it "\"#{ s }\"" do
-        _ = Callback_::Oxford_or[ a ]
+        _ = Common_::Oxford_or[ a ]
         _.should eql s
       end
     end
@@ -120,7 +120,7 @@ module Skylab::Human::TestSupport
 
       o.express_none_by { '[none]' }
 
-      _ = o.with_list( Callback_::Stream.the_empty_stream ).say
+      _ = o.with_list( Common_::Stream.the_empty_stream ).say
 
       _.should eql '[none]'
 

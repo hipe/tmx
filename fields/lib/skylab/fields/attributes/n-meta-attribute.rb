@@ -30,7 +30,7 @@ module Skylab::Fields
 
           if x
             _ = ::Array.try_convert( x ) || [ x ]
-            st = Callback_::Polymorphic_Stream.via_array _
+            st = Common_::Polymorphic_Stream.via_array _
             @sexp_stream_for_current_attribute = st
 
             p = @build_N_plus_one_interpreter[ self ]
@@ -103,7 +103,7 @@ module Skylab::Fields
 
       _m_a = ma_cls.instance_methods false
 
-      _nf = Callback_::Name.via_variegated_symbol :meta_attribute
+      _nf = Common_::Name.via_variegated_symbol :meta_attribute
 
       _ev = Home_::MetaAttributes::Enum::Build_extra_value_event.call(
         k, _m_a, _nf )

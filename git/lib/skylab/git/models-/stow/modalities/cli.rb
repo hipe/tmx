@@ -137,7 +137,7 @@ module Skylab::Git
         def knownness_for _
 
           # giving just unable here as opposed the singleton (
-          #     Callback_::Known::UNKNOWN
+          #     Common_::Known::UNKNOWN
           # ) short-circuits further normalization appropriately early
 
           UNABLE_
@@ -155,7 +155,7 @@ module Skylab::Git
 
         def knownness_for sym
 
-          Callback_::Known_Known[ instance_variable_get :"@__#{ sym }__" ]
+          Common_::Known_Known[ instance_variable_get :"@__#{ sym }__" ]
         end
       end
     end

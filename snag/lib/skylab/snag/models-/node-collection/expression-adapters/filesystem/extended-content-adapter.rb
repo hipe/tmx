@@ -30,11 +30,11 @@ module Skylab::Snag
 
           @index = -> do
 
-            bx = Callback_::Box.new
+            bx = Common_::Box.new
             st = begin
               fs.entry_stream dir
             rescue  ::Errno::ENOENT
-              Callback_::Stream.the_empty_stream
+              Common_::Stream.the_empty_stream
             end
 
             begin

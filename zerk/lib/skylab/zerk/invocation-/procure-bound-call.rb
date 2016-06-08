@@ -39,7 +39,7 @@ module Skylab::Zerk
         @parameter_value_source = ACS_::Parameter::ValueSource_for_ArgumentStream.the_empty_value_source
         @_trouble_stack = ts
 
-        @on_unavailable_kn_ = Callback_::Known_Known[ -> * i_a, & ev_p do
+        @on_unavailable_kn_ = Common_::Known_Known[ -> * i_a, & ev_p do
 
           @did_emit_ = true
 
@@ -86,7 +86,7 @@ module Skylab::Zerk
       end
 
       def on_unavailable_= x
-        @on_unavailable_kn_ = Callback_::Known_Known[ x ] ; x
+        @on_unavailable_kn_ = Common_::Known_Known[ x ] ; x
       end
 
       # --
@@ -158,7 +158,7 @@ module Skylab::Zerk
 
         if @_stated_box.length.zero?
           @_evaluation_proc = :__evaluation_proc_which_is_never_called
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         else
           @_has_operation_index || _init_operation_index
           @_evaluation_proc = :__real_evaluation_proc

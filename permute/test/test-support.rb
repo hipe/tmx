@@ -13,7 +13,7 @@ module Skylab::Permute::TestSupport
 
     def use sym
 
-      _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+      _const = Common_::Name.via_variegated_symbol( sym ).as_const
       TS_.const_get( _const, false )[ self ]
       NIL_
     end
@@ -63,13 +63,13 @@ module Skylab::Permute::TestSupport
   end
 
   Expect_Event = -> tcm do
-    Callback_.test_support::Expect_Event[ tcm ]
+    Common_.test_support::Expect_Event[ tcm ]
   end
 
   EMPTY_S_ = ''
   NIL_ = nil
   Home_ = ::Skylab::Permute
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
 end
 
 # :+#tombstone: was [#ts-010] dark hack "one weird old tr.."

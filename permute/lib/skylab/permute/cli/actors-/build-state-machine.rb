@@ -17,7 +17,7 @@ module Skylab::Permute
       \z/x
 
       pair = -> v_x=nil, n_x=nil do
-        Callback_::Pair.via_value_and_name v_x, n_x
+        Common_::Pair.via_value_and_name v_x, n_x
       end
 
       o = Home_.lib_.basic::State::Machine::Edit_Session.new

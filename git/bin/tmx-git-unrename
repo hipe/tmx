@@ -243,7 +243,7 @@ cls = class Skylab_Git_Models_Whatever_Unrename
 
           _FC = @_lib::VCS_Adapters_::Git::Models_::Filechange
 
-          @_filechange_stream = ::Skylab::Callback.stream do
+          @_filechange_stream = ::Skylab::Common.stream do
 
             begin
               line = @sin.gets

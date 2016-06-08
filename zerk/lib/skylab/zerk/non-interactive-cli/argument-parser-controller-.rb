@@ -58,7 +58,7 @@ module Skylab::Zerk
 
         nt_d_a = oi.node_ticket_index_via_argument_index__ || EMPTY_A_
 
-        _par_d_st = Callback_::Stream.via_times par_a.length
+        _par_d_st = Common_::Stream.via_times par_a.length
 
         _par_d_st.map_reduce_by do |par_d|
 
@@ -189,7 +189,7 @@ module Skylab::Zerk
           qkn_st = @_value_box.to_value_stream
           cur = nil
 
-          _par_st = Callback_.stream do
+          _par_st = Common_.stream do
             cur = qkn_st.gets
             if cur
               cur.association

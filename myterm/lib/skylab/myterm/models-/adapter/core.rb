@@ -10,7 +10,7 @@ module Skylab::MyTerm
       end
     end  # >>
 
-    class Adapter_via_Argument_Stream___ < Callback_::Actor::Dyadic
+    class Adapter_via_Argument_Stream___ < Common_::Actor::Dyadic
 
       def initialize st, k, & pp
         @_arg_st = st

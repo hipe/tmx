@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Actors_::Add_node < Callback_::Actor::Monadic
+      class Actors_::Add_node < Common_::Actor::Monadic
 
         def initialize o, & p
           @on_event_selectively = p

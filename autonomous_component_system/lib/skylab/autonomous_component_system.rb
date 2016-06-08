@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Autonomous_Component_System  # notes in [#002]
   # ->
@@ -103,7 +103,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def lib_
         @___lib ||=
-          Callback_.produce_library_shell_via_library_and_app_modules(
+          Common_.produce_library_shell_via_library_and_app_modules(
             Lib_, self )
       end
     end  # >>
@@ -181,7 +181,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
     Flag___ = -> st, & _pp do  # is Any_value
       # experimental, in cahoots with [#ze-044]
-      Callback_::Known_Known[ st.gets_one ]
+      Common_::Known_Known[ st.gets_one ]
     end
   end
   # ->
@@ -213,7 +213,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def _finish_via cm, sym
 
-        nf = Callback_::Name.via_variegated_symbol sym
+        nf = Common_::Name.via_variegated_symbol sym
 
         if @_name_mutation
           @_name_mutation[ nf ]  # *mutates*
@@ -244,7 +244,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         a = CONSTRUCTOR_METHODS__.dup
         a.push :[]
         _s_a = a.map { | sym | "`#{ sym }`" }
-        _or = Callback_::Oxford_or[ _s_a ]
+        _or = Common_::Oxford_or[ _s_a ]
 
         "must respond to #{ _or } - #{ @component_model.name }"
       end
@@ -281,7 +281,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
           _s_a = _st.reduce_into_by [] do | m, sym |
 
-            m << Callback_::Name.via_variegated_symbol( sym ).as_human
+            m << Common_::Name.via_variegated_symbol( sym ).as_human
           end
 
           y << "#{ and_ _s_a } #{ me.name.as_human }"  # ..
@@ -317,7 +317,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
       def accept__can__meta_component * i_a  # :Tenet8.
 
-        bx = ( @transitive_capabilities_box ||= Callback_::Box.new )
+        bx = ( @transitive_capabilities_box ||= Common_::Box.new )
         i_a.each do |sym|
           bx.add sym, :declared
         end
@@ -533,16 +533,16 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         -> asc do
           ivar = asc.name.as_ivar
           if acs.instance_variable_defined? ivar
-            Callback_::Known_Known[ acs.instance_variable_get ivar ]
+            Common_::Known_Known[ acs.instance_variable_get ivar ]
           else
-            Callback_::KNOWN_UNKNOWN
+            Common_::KNOWN_UNKNOWN
           end
         end
       end
     end
 
-    Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+    Common_ = ::Skylab::Common
+    Autoloader_ = Common_::Autoloader
 
     module Operation
       Autoloader_[ self ]
@@ -563,7 +563,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Autoloader_[ self ]
     end
 
-    Lazy_ = Callback_::Lazy
+    Lazy_ = Common_::Lazy
 
     Require_fields_lib_ = Lazy_.call do
       Field_ = Home_.lib_.fields  # idiomatic name
@@ -591,7 +591,7 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     end
 
     ACHIEVED_ = true
-    Autoloader_[ ( ACS_ = self ), Callback_::Without_extension[ __FILE__ ] ]
+    Autoloader_[ ( ACS_ = self ), Common_::Without_extension[ __FILE__ ] ]
     EMPTY_A_ = [].freeze
     EMPTY_P_ = -> { NIL_ }
     Home_ = self

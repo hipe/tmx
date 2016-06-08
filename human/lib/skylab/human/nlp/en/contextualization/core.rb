@@ -75,7 +75,7 @@ module Skylab::Human
       if :nilable == i
         # then because nil is a valid value, this.
         _p = -> x do
-          instance_variable_set ivar[ k ], Callback_::Known_Known[ x ]
+          instance_variable_set ivar[ k ], Common_::Known_Known[ x ]
           x
         end
       else
@@ -110,7 +110,7 @@ module Skylab::Human
 
       _3rd = @channel[ 2 ]
       if _3rd
-        cls = Callback_::Event::To_Exception::Class_via_symbol.call _3rd do
+        cls = Common_::Event::To_Exception::Class_via_symbol.call _3rd do
           NOTHING_
         end
       end
@@ -209,7 +209,7 @@ module Skylab::Human
       attr_reader :y
 
       def to_line_stream
-        Callback_::Stream.via_nonsparse_array @_a
+        Common_::Stream.via_nonsparse_array @_a
       end
     end
 

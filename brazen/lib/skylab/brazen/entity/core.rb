@@ -85,7 +85,7 @@ module Skylab::Brazen
       end
 
       def arglist= x_a
-        @upstream = Callback_::Polymorphic_Stream.via_array x_a
+        @upstream = Common_::Polymorphic_Stream.via_array x_a
         x_a
       end
 
@@ -387,7 +387,7 @@ module Skylab::Brazen
       def __receive_iambic x_a
 
         @upstream and self._SANITY
-        @upstream = Callback_::Polymorphic_Stream.via_array x_a
+        @upstream = Common_::Polymorphic_Stream.via_array x_a
         _process_remainder_of_upstream
         NIL_
       end
@@ -608,7 +608,7 @@ module Skylab::Brazen
 
         sess = self
         same = -> do
-          @name = Callback_::Name.via_variegated_symbol sym
+          @name = Common_::Name.via_variegated_symbol sym
           @custom_polymorphic_writer_method_name = m
           sess._shake_it_up self
           normalize_property
@@ -635,7 +635,7 @@ module Skylab::Brazen
         sess = self
         _prp = property_class.new_by do
 
-          @name = Callback_::Name.via_variegated_symbol sym
+          @name = Common_::Name.via_variegated_symbol sym
           sess._shake_it_up self
           normalize_property
         end
@@ -873,7 +873,7 @@ module Skylab::Brazen
 
       def to_new_mutable_box_like_proxy
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         to_value_stream.each do | prp |
           bx.add prp.name_symbol, prp
         end
@@ -957,7 +957,7 @@ module Skylab::Brazen
 
         a = @_a ; mod = @_rmod ; d = -1 ; h = @_h ; last = a.length - 1
 
-        Callback_.stream do
+        Common_.stream do
           if d != last
             d += 1
             mod.send h.fetch a.fetch d
@@ -1107,9 +1107,9 @@ module Skylab::Brazen
         ivar = prp.ivar
 
         if instance_variable_defined? ivar
-          Callback_::Known_Known[ instance_variable_get ivar ]
+          Common_::Known_Known[ instance_variable_get ivar ]
         else
-          Callback_::KNOWN_UNKNOWN
+          Common_::KNOWN_UNKNOWN
           # raise ::NameError, __say_no_ivar( ivar )
         end
       end
@@ -1150,7 +1150,7 @@ module Skylab::Brazen
 
       def _touch_AHN_box
 
-        @ad_hoc_normalizer_box ||= Callback_::Box.new
+        @ad_hoc_normalizer_box ||= Common_::Box.new
       end
 
       def set_value_of_formal_property_ x, prp
@@ -1215,7 +1215,7 @@ module Skylab::Brazen
 
       def enum=
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         _x_a = gets_one_polymorphic_value
 
         _x_a.each do | x |
@@ -1299,7 +1299,7 @@ module Skylab::Brazen
 
       def property=
 
-        @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
+        @name = Common_::Name.via_variegated_symbol gets_one_polymorphic_value
         STOP_PARSING_
       end
 
@@ -1308,7 +1308,7 @@ module Skylab::Brazen
         @_is_meta_property = true
 
         sym = gets_one_polymorphic_value
-        @name = Callback_::Name.via_variegated_symbol sym
+        @name = Common_::Name.via_variegated_symbol sym
 
         STOP_PARSING_
       end

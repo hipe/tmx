@@ -316,7 +316,7 @@ module Skylab::Brazen
         syntactic_group: %w( { } ),
       }.method :fetch
 
-      Singleton___ = Callback_::Lazy.call do
+      Singleton___ = Common_::Lazy.call do
         Here_.via( NIL_, NIL_ ).freeze
       end
 

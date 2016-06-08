@@ -95,7 +95,7 @@ module Skylab::Brazen
 
       block_given? and self._COVER_ME
 
-      @_argument_upstream = Callback_::Polymorphic_Stream.via_array x_a
+      @_argument_upstream = Common_::Polymorphic_Stream.via_array x_a
 
       NIL_
     end

@@ -4,7 +4,7 @@ module Skylab::Snag
 
     Events_ = ::Module.new
 
-    Events_::No_Matches = Callback_::Event.prototype_with( :no_matches,
+    Events_::No_Matches = Common_::Event.prototype_with( :no_matches,
 
       :command, nil,
       :patterns, nil,

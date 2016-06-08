@@ -37,7 +37,7 @@ module Skylab::Human::TestSupport
     define_method :use, Use_method__
 
     def memoize_ sym, & p
-      define_method sym, Callback_.memoize( & p )
+      define_method sym, Common_.memoize( & p )
     end
   end
 
@@ -67,7 +67,7 @@ module Skylab::Human::TestSupport
   # --
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -78,7 +78,7 @@ module Skylab::Human::TestSupport
 
   Home_ = ::Skylab::Human
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
   EMPTY_A_ = [].freeze
   Lazy_ = Home_::Lazy_
   NEWLINE_ = "\n"

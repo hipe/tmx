@@ -23,7 +23,7 @@ module Skylab::Snag::TestSupport
     end
 
     def memoize sym, & p
-      define_method sym, Callback_.memoize( & p )
+      define_method sym, Common_.memoize( & p )
     end
 
     define_method :dangerous_memoize, TestSupport_::DANGEROUS_MEMOIZE
@@ -177,7 +177,7 @@ module Skylab::Snag::TestSupport
 
     class << self
       def [] tcm, x_a=nil
-        Callback_.test_support::Expect_Event[ tcm, x_a ]
+        Common_.test_support::Expect_Event[ tcm, x_a ]
         tcm.include self
       end
     end  # >>
@@ -248,16 +248,16 @@ module Skylab::Snag::TestSupport
       h.fetch sym do
         h[ sym ] = ::File.join(
           Fixture_tree_dir___[],
-          Callback_::Name.via_variegated_symbol( sym ).as_slug )
+          Common_::Name.via_variegated_symbol( sym ).as_slug )
       end
     end
   end.call
 
   Home_ = ::Skylab::Snag
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
 
-  Fixture_tree_dir___ = Callback_.memoize do
+  Fixture_tree_dir___ = Common_.memoize do
 
     TS_.dir_pathname.join( 'fixture-trees' ).to_path
   end
@@ -306,7 +306,7 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  Path_alpha_ = Callback_.memoize do
+  Path_alpha_ = Common_.memoize do
 
     ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
   end

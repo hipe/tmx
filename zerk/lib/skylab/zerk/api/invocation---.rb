@@ -12,13 +12,13 @@ module Skylab::Zerk
           @_stack.push Here_::CompoundFrame___.new qk ; nil
         end
 
-        _qk = Callback_::Qualified_Knownness[ acs, ROOT_ASSOCIATION___ ]
+        _qk = Common_::Qualified_Knownness[ acs, ROOT_ASSOCIATION___ ]
 
         @_memory = []
         @_stack = []
         @_push_compound_qk[ _qk ]
 
-        @_stream = Callback_::Polymorphic_Stream.via_array args
+        @_stream = Common_::Polymorphic_Stream.via_array args
         @_pp = pp
       end
 
@@ -164,7 +164,7 @@ module Skylab::Zerk
 
         ss = @_stack.dup  # ours always has compound on top
 
-        ss.push Callback_::Name.via_variegated_symbol @_stream.gets_one  # (e)
+        ss.push Common_::Name.via_variegated_symbol @_stream.gets_one  # (e)
 
         # as it does in the chart, here the (g)/(f) fork must happen
         # *before* the (j)/(h) fork because of "bespoke"s.
@@ -232,7 +232,7 @@ module Skylab::Zerk
       end
 
       def _bound_call_for x
-        Callback_::Bound_Call.via_value x
+        Common_::Bound_Call.via_value x
       end
 
       # -- support

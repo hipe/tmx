@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Bundles
+module Skylab::Common::TestSupport::Bundles
 
-  describe "[ca] bundles - emit via simple IO manifold" do
+  describe "[co] bundles - emit via simple IO manifold" do
 
     extend TS__
 

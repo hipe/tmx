@@ -1,6 +1,6 @@
 module Skylab ; end
 
-module Skylab::Callback
+module Skylab::Common
 
   class << self
 
@@ -13,7 +13,7 @@ module Skylab::Callback
     end
 
     def describe_into_under y, expag
-      y << "(as a reactive node, [ca] is some ancient artifact..)"
+      y << "(as a reactive node, [co] is some ancient artifact..)"
     end
 
     def distill * a

@@ -22,7 +22,7 @@ module Skylab::Zerk
 
     def initialize * x_a
 
-      st = Callback_::Polymorphic_Stream.via_array x_a
+      st = Common_::Polymorphic_Stream.via_array x_a
       while st.unparsed_exists
         send :"#{ st.gets_one }=", st
       end
@@ -46,7 +46,7 @@ module Skylab::Zerk
     def name_symbol= st
       sym = st.gets_one
       @_name_p = -> do
-        nf = Callback_::Name.via_variegated_symbol sym
+        nf = Common_::Name.via_variegated_symbol sym
         @_name_p = -> do
           nf
         end
@@ -60,7 +60,7 @@ module Skylab::Zerk
       @_name_p = -> do
         sym = name_sym_p.call
         _ = cache.fetch sym do
-          x = Callback_::Name.via_variegated_symbol sym
+          x = Common_::Name.via_variegated_symbol sym
           cache[ sym ] = x
           x
         end

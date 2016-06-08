@@ -72,7 +72,7 @@ module Skylab::Snag
 
         o = Home_.lib_.fields::Attributes::Value_Processing.new
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         o.value_collection = bx
         o.iambic = x_a
@@ -203,7 +203,7 @@ module Skylab::Snag
 
         @_bc = @_up.bound_call_against_polymorphic_stream st
 
-        Callback_::Bound_Call.via_receiver_and_method_name self, :execute
+        Common_::Bound_Call.via_receiver_and_method_name self, :execute
       end
 
       def execute

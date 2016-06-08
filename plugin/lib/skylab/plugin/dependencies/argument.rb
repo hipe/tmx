@@ -42,7 +42,7 @@ module Skylab::Plugin
 
         def __build_argument_index
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
 
           self::ARGUMENTS.each_slice 4 do | kw, a_i, kw_, n_i |
             :argument_arity == kw or raise ::ArgumentError, Say_art___[ kw ]

@@ -2,7 +2,7 @@ module Skylab::SubTree
 
   class Models_::File_Coverage
 
-    class Actors_::Classify_the_path < Callback_::Actor::Dyadic
+    class Actors_::Classify_the_path < Common_::Actor::Dyadic
 
       def initialize td, path, & p
         @on_event_selectively = p
@@ -29,7 +29,7 @@ module Skylab::SubTree
 
         @on_event_selectively.call :error, :resource_not_found do
 
-          Callback_::Event.wrap.exception e,
+          Common_::Event.wrap.exception e,
             :path_hack, :terminal_channel_i, :resource_not_found
         end
       end

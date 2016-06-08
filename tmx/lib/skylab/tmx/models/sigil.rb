@@ -13,7 +13,7 @@ module Skylab::TMX
 
       def via_reflective_sidesystem_array_ a
 
-        _st = Callback_::Stream.via_nonsparse_array a
+        _st = Common_::Stream.via_nonsparse_array a
         via_stemish_stream _st
       end
 
@@ -89,7 +89,7 @@ module Skylab::TMX
           @stemish_stream = @stemish_box.to_value_stream
         end
 
-        @_box = Callback_::Box.new
+        @_box = Common_::Box.new
         @_conflicts = nil
 
         ___for_the_first_pass_use_the_two_initials_function

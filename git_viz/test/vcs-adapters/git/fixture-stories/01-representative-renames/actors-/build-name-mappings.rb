@@ -2,7 +2,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
   module Story_01
 
-    class Actors_::Build_name_mappings < Callback_::Actor::Monadic
+    class Actors_::Build_name_mappings < Common_::Actor::Monadic
 
       def initialize o
         @tmpdir = o

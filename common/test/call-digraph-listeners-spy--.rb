@@ -1,4 +1,4 @@
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   class Call_Digraph_Listeners_Spy__  # read [#022] the narrative  #storypoint-1
 

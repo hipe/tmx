@@ -82,7 +82,7 @@ module Skylab::Basic
     end
   end
 
-  Mock_arg__ = Callback_.memoize do
+  Mock_arg__ = Common_.memoize do
 
     module Mock_Arg__
 
@@ -99,12 +99,12 @@ module Skylab::Basic
         def via_3 value_x, actuals_has_name, any_name_i
 
           _prop = if any_name_i
-            Mock_Property__.new Callback_::Name.via_variegated_symbol name_i
+            Mock_Property__.new Common_::Name.via_variegated_symbol name_i
           else
             MOCK_PROPERTY__
           end
 
-          Callback_::Qualified_Knownness.via_value_and_had_and_association(
+          Common_::Qualified_Knownness.via_value_and_had_and_association(
             value_x, actuals_has_name, _prop )
         end
       end
@@ -127,7 +127,7 @@ module Skylab::Basic
         end
       end
 
-      MOCK_PROPERTY__ = Mock_Property__.new Callback_::Name.via_variegated_symbol :your_value
+      MOCK_PROPERTY__ = Mock_Property__.new Common_::Name.via_variegated_symbol :your_value
 
       self
     end

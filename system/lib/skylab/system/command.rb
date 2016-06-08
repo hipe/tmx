@@ -162,7 +162,7 @@ module Skylab::System
       end
     end
 
-    Lazy_ = Callback_::Lazy
+    Lazy_ = Common_::Lazy
 
     Require_shellwords_ = Lazy_.call do
       # (for all other uses in [sy] it "looks better" not to use this one..)

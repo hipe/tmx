@@ -15,11 +15,11 @@ module Skylab::GitViz::TestSupport
 
     module Instance_Methods___
 
-      define_method :manifest_path_for_stubbed_FS, ( Callback_.memoize do
+      define_method :manifest_path_for_stubbed_FS, ( Common_.memoize do
         ::File.join STORY__, 'paths.list'
       end )
 
-      define_method :manifest_path_for_stubbed_system, ( Callback_.memoize do
+      define_method :manifest_path_for_stubbed_system, ( Common_.memoize do
         ::File.join STORY__, 'commands.ogdl'
       end )
     end

@@ -309,7 +309,7 @@ module Skylab::Snag
       if @body
         @body.to_entity_stream_via_model Home_::Models_::Tag
       else
-        Callback_::Stream.the_empty_stream
+        Common_::Stream.the_empty_stream
       end
     end
 
@@ -344,9 +344,9 @@ module Skylab::Snag
       y
     end
 
-    define_method :formal_properties, ( Callback_.memoize do
+    define_method :formal_properties, ( Common_.memoize do
 
-      p = Callback_.lib_.basic::Minimal_Property.method :via_variegated_symbol
+      p = Common_.lib_.basic::Minimal_Property.method :via_variegated_symbol
 
       [ p[ :identifier ],
         p[ :message ],
@@ -545,7 +545,7 @@ module Skylab::Snag
         o = Home_::Models_::Node_Identifier.new_via_user_value_ x, & oes_p  # yes
 
         if o
-          Callback_::Known_Known[ o ]
+          Common_::Known_Known[ o ]
         else
           o
         end

@@ -11,7 +11,7 @@ module Skylab::Zerk::TestSupport
 
       def __ounces_of_water__component_association
         -> st do
-          Callback_::Known_Known[ st.gets_one ]
+          Common_::Known_Known[ st.gets_one ]
         end
       end
 

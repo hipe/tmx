@@ -1,8 +1,8 @@
 require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] event - makers - structured expressive" do
+  describe "[co] event - makers - structured expressive" do
 
     extend TS_
 

@@ -40,7 +40,7 @@ module Skylab::Cull
     end
 
     def _name
-      @nm ||= Callback_::Name.via_module @composition.defined_function
+      @nm ||= Common_::Name.via_module @composition.defined_function
     end
 
     def __any_args_string

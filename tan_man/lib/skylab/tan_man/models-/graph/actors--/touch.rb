@@ -140,7 +140,7 @@ module Skylab::TanMan
 
         def __build_adding_extension_event path_before
 
-          Callback_::Event.inline_neutral_with(
+          Common_::Event.inline_neutral_with(
 
             :adding_extension,
             :extension, @ext,
@@ -181,7 +181,7 @@ module Skylab::TanMan
           @__sys ||= Home_.lib_.system
         end
 
-        include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+        include Common_::Event::Selective_Builder_Receiver_Sender_Methods
       end
 
       def into_entity_write_digraph_path__ path
@@ -282,7 +282,7 @@ module Skylab::TanMan
         end
       end
 
-      include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+      include Common_::Event::Selective_Builder_Receiver_Sender_Methods
     end
   end
 end

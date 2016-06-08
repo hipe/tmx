@@ -48,7 +48,7 @@ module Skylab::GitViz
             end
           end
 
-          Directory_is_not_tracked___ = Callback_::Event.prototype_with(
+          Directory_is_not_tracked___ = Common_::Event.prototype_with(
 
               :directory_is_not_tracked,
               :path, nil,

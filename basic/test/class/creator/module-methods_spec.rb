@@ -8,7 +8,7 @@ module Skylab::Basic::TestSupport
 
   module MultipleDefiners_Scenario_One
 
-    Once__ = Callback_.memoize do
+    Once__ = Common_.memoize do
 
       module Dingle
 

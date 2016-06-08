@@ -19,7 +19,7 @@ module Skylab::Cull
       def unmarshal_via_call_expression_and_module s, box_mod
         @box_mod = box_mod
 
-        @prefix_name = Callback_::Name.via_module(
+        @prefix_name = Common_::Name.via_module(
           Home_.lib_.basic::Module.value_via_relative_path( box_mod, '..' ) )
 
         @scn = Home_.lib_.string_scanner s
@@ -54,7 +54,7 @@ module Skylab::Cull
 
       def resolve_box_module
 
-        @prefix_name = Callback_::Name.via_slug @prefix
+        @prefix_name = Common_::Name.via_slug @prefix
 
         @box_mod = Home_::Models_.const_get(
           @prefix_name.as_const,
@@ -81,7 +81,7 @@ module Skylab::Cull
 
       def resolve_function
 
-        nm = Callback_::Name.via_slug @function_name
+        nm = Common_::Name.via_slug @function_name
         i_a = @box_mod.constants
 
         found_a = Home_.lib_.basic::Fuzzy.reduce_array_against_string(

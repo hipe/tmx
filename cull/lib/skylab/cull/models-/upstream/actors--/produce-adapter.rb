@@ -157,7 +157,7 @@ module Skylab::Cull
 
       def via_upstream_adapter_via_path path
 
-        cls = __class_via_const_guess Callback_::Name.
+        cls = __class_via_const_guess Common_::Name.
           via_variegated_symbol( @upstream_adapter ).as_const
 
         if cls
@@ -202,7 +202,7 @@ module Skylab::Cull
       def get_upstream_adapters_names
 
         Upstream_::Adapters__.constants.reduce [] do | m, x |
-          m.push Callback_::Name.via_const_symbol x
+          m.push Common_::Name.via_const_symbol x
           m
         end
       end

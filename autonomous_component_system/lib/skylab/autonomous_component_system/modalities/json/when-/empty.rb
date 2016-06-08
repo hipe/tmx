@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
 
     module Modalities::JSON::When_
 
-      Empty = Callback_::Event.prototype_with(
+      Empty = Common_::Event.prototype_with(
 
         :empty_object,
         :context_linked_list, nil,

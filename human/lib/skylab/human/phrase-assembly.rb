@@ -151,7 +151,7 @@ module Skylab::Human
     end
 
     def _token_stream_via_finish
-      Callback_::Polymorphic_Stream.via_array remove_instance_variable :@_tokens
+      Common_::Polymorphic_Stream.via_array remove_instance_variable :@_tokens
     end
 
     Lazy_Space___ = Lazy_.call do
@@ -200,7 +200,7 @@ module Skylab::Human
 
       rx_ ||= /\A[:,]/  # etc  #open [#051]
 
-      st = Callback_::Polymorphic_Stream.via_array s_a
+      st = Common_::Polymorphic_Stream.via_array s_a
 
       s_a_ = [ st.gets_one ]
       while st.unparsed_exists
@@ -249,7 +249,7 @@ module Skylab::Human
       end
       peek = main_peek
 
-      Callback_.stream do
+      Common_.stream do
 
         galley = nil
         add = -> sx do
@@ -285,7 +285,7 @@ module Skylab::Human
 
     string_via_nonempty_chunk = -> ch do
 
-      _st = Callback_::Polymorphic_Stream.via_array ch
+      _st = Common_::Polymorphic_Stream.via_array ch
 
       _ = Sexp_via_non_empty_token_stream__[ Head_token___[], _st ]
 

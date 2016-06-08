@@ -16,7 +16,7 @@ module Skylab::Plugin
 
       def load_plugins_in_module mod
 
-        _st = Callback_::Stream.via_nonsparse_array mod.constants do | const |
+        _st = Common_::Stream.via_nonsparse_array mod.constants do | const |
 
           mod.const_get const, false
 
@@ -75,7 +75,7 @@ module Skylab::Plugin
         pu_d = @plugin_a.length
 
         de = Mutable___.new_via_name_and_plugin_identifier_and_resources(
-          Callback_::Name.via_variegated_symbol( name_symbol ),
+          Common_::Name.via_variegated_symbol( name_symbol ),
           pu_d,
           @resources )
 
@@ -223,7 +223,7 @@ module Skylab::Plugin
         attr_reader :transition_index, :from_symbol, :name_symbol, :to_symbol
 
         def name
-          @__name__ ||= Callback_::Name.via_variegated_symbol( @name_symbol )
+          @__name__ ||= Common_::Name.via_variegated_symbol( @name_symbol )
         end
       end
 
@@ -406,7 +406,7 @@ module Skylab::Plugin
 
                 @formals_used[ fo.local_identifier_x ] and next
 
-                bx ||= Callback_::Box.new
+                bx ||= Common_::Box.new
 
                 bx.touch_array_and_push fo.local_identifier_x,
                   Unused___.new( de.plugin_index, fo )
@@ -581,7 +581,7 @@ module Skylab::Plugin
     attr_reader :plugin_index
 
     def name
-      @nm ||= Callback_::Name.via_module self.class
+      @nm ||= Common_::Name.via_module self.class
     end
 
     def each_reaction & yld_p

@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     class Intermediate_Streams_::
         Node_stream_via_comment_block_stream::Node_stream_via_span_stream__ <
-            Callback_::Actor::Monadic
+            Common_::Actor::Monadic
 
      def initialize x
        @span_stream = x
@@ -13,7 +13,7 @@ module Skylab::TestSupport
       def execute
         @state_machine = STATE_MACHINE__
         @state = @state_machine.fetch :beginning_state
-        Callback_.stream do
+        Common_.stream do
           @do_stay = true
           @flush_method_name = nil
           @result = nil

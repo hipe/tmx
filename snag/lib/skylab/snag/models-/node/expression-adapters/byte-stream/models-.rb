@@ -143,14 +143,14 @@ module Skylab::Snag
 
           a = @_sstr_a
 
-          Callback_::Stream.via_range @_r do | d |
+          Common_::Stream.via_range @_r do | d |
             a.fetch d
           end
         end
 
         def to_row_stream_
 
-          Callback_::Stream.via_nonsparse_array @_sstr_a
+          Common_::Stream.via_nonsparse_array @_sstr_a
         end
 
         MONADIC_TRUTH_ = -> { true }

@@ -68,7 +68,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
   FAKE_PROGNAME_ = 'ts-dt'
 
-  Generic_error__ = Home_::Callback_.memoize do
+  Generic_error__ = Home_::Common_.memoize do
     Home_.lib_.brazen::API.exit_statii.fetch :generic_error
   end
 

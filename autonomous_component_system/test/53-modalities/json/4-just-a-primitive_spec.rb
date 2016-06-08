@@ -92,7 +92,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     def _fake_IO_via_json_lines * s_a
-      Callback_::Stream.via_nonsparse_array s_a
+      Common_::Stream.via_nonsparse_array s_a
     end
 
     def subject_root_ACS_class

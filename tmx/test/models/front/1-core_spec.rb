@@ -42,7 +42,7 @@ module Skylab::TMX::TestSupport
         o = subject_module_.new( & method( :fail ) )
         o.fast_lookup = -> _ do end  # MONADIC_EMPTINESS_
         o.unbound_stream_builder = -> do
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         end
         o
       end
@@ -73,7 +73,7 @@ module Skylab::TMX::TestSupport
 
       dangerous_memoize_ :front_ do
 
-        box = Callback_::Box.new
+        box = Common_::Box.new
         box.add :finkle_A, _unbound_A
         box.add :finkle_B, _unbound_B
 

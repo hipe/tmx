@@ -6,7 +6,7 @@ module Skylab
 
       Events_ = ::Module.new
 
-      _Ev = Callback_::Event
+      _Ev = Common_::Event
 
       Events_::Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
 
@@ -54,7 +54,7 @@ module Skylab
           [ fo, _or_s_a ]
         end
 
-        st = Callback_::Stream.via_nonsparse_array formal_and_plugins_matrix
+        st = Common_::Stream.via_nonsparse_array formal_and_plugins_matrix
 
         fo, or_s_a = st.gets
 
@@ -77,7 +77,7 @@ module Skylab
         end while nil
       end
 
-      class Events_::Express_Help < Callback_::Event
+      class Events_::Express_Help < Common_::Event
 
         class << self
           public :new
@@ -126,7 +126,7 @@ module Skylab
           def __init_args_list_and_options_box
 
             a = nil
-            bx = Callback_::Box.new
+            bx = Common_::Box.new
 
             @plugins.each do |de|
 

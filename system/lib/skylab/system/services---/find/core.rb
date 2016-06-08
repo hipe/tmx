@@ -202,7 +202,7 @@ module Skylab::System
           if s_a
             __normalze_trueish_unsanitized_freeform_string_array s_a
           else
-            Callback_::Known_Known[ s_a ]  # a false-ish value is valid
+            Common_::Known_Known[ s_a ]  # a false-ish value is valid
           end
         end
 
@@ -220,7 +220,7 @@ module Skylab::System
           if extra_a
             raise ::ArgumentError, "looks strange: #{ s_a.map( & :inspect ) } * ', ' }"
           else
-            Callback_::Known_Known[ s_a ]
+            Common_::Known_Known[ s_a ]
           end
         end
 
@@ -367,7 +367,7 @@ module Skylab::System
 
           def _add_OR_list_via_unescaped_value_array string_ary
 
-            st = Callback_::Stream.via_times string_ary.length do | d |
+            st = Common_::Stream.via_times string_ary.length do | d |
               [ NAME_OPERATOR__, string_ary.fetch( d ) ]  # ( we used to :+#escape here )
             end
 

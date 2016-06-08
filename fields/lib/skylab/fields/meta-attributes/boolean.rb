@@ -31,7 +31,7 @@ module Skylab::Fields
 
         -> mod do
           mod.module_exec do
-            st = Callback_::Stream.via_nonsparse_array a
+            st = Common_::Stream.via_nonsparse_array a
             begin
               defn = st.gets
               defn or break
@@ -90,7 +90,7 @@ module Skylab::Fields
         end
 
         def _set ivar, x
-          instance_variable_set ivar, Callback_::Known_Known[ x ] ; x
+          instance_variable_set ivar, Common_::Known_Known[ x ] ; x
         end
 
         def finish
@@ -171,7 +171,7 @@ module Skylab::Fields
         end
 
         def _define m, & p
-          Callback_::Pair.via_value_and_name p, m
+          Common_::Pair.via_value_and_name p, m
         end
 
         def _writer_for atr
@@ -192,7 +192,7 @@ module Skylab::Fields
 
         def stream_for atr
 
-          Callback_::Stream.via_nonsparse_array( @_a ).map_by do |p|
+          Common_::Stream.via_nonsparse_array( @_a ).map_by do |p|
             p[ atr ]
           end
         end

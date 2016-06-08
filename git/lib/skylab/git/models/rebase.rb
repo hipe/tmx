@@ -5,7 +5,7 @@ module Skylab::Git
     # semi-one-off .. more like a session than a proper model
 
     def initialize
-      @_line_box = Callback_::Box.new
+      @_line_box = Common_::Box.new
     end
 
     # ~ writing data into it:

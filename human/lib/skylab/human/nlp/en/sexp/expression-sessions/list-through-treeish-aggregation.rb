@@ -42,7 +42,7 @@ module Skylab::Human
 
         # (for dup safety, we don't initialize our main data til now)
         @_a = []
-        @_bx = Callback_::Box.new
+        @_bx = Common_::Box.new
         @_m = :___add_subsequent_expression
         _add_new_record_and_index exp
         NIL_

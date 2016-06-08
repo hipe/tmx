@@ -1,3 +1,3 @@
-module Skylab::Callback::TestSupport::Autoloader::Fixtures::Five
+module Skylab::Common::TestSupport::Autoloader::Fixtures::Five
   OHAI = :_hey_
 end

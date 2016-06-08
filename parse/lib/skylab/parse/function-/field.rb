@@ -20,7 +20,7 @@ module Skylab::Parse
           # ~ others
 
           def __function_category_symbol
-            @__fcs ||= Callback_::Name.via_module( self ).as_lowercase_with_underscores_symbol
+            @__fcs ||= Common_::Name.via_module( self ).as_lowercase_with_underscores_symbol
           end
 
           def __function_supercategory_symbol
@@ -47,7 +47,7 @@ module Skylab::Parse
         def moniker
           @__did_resolve_moniker_name_function ||= begin
             @__mnf = if @moniker_symbol
-              Callback_::Name.via_variegated_symbol @moniker_symbol
+              Common_::Name.via_variegated_symbol @moniker_symbol
             end
             true
           end

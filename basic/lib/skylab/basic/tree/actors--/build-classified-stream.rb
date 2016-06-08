@@ -52,7 +52,7 @@ module Skylab::Basic
 
         recurse[ [ @node ], 0, EMPTY_P_ ]
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

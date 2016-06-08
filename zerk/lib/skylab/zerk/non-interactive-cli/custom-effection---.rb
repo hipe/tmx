@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     module Custom_Effection___  # code notes in [#037]
 
-      class Find < Callback_::Actor::Dyadic
+      class Find < Common_::Actor::Dyadic
 
         def initialize x, cli
           @x = x
@@ -30,7 +30,7 @@ module Skylab::Zerk
 
           ev = nil
 
-          x = Callback_::Autoloader.const_reduce _a, _ do |ev_|
+          x = Common_::Autoloader.const_reduce _a, _ do |ev_|
             ev = ev_
             UNABLE_
           end

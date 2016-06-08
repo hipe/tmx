@@ -27,7 +27,7 @@ module Skylab::CodeMetrics::TestSupport
 
   Home_ = ::Skylab::CodeMetrics
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
 
   module Instance_Methods___
 
@@ -36,7 +36,7 @@ module Skylab::CodeMetrics::TestSupport
     _dangerous_memoize :toplevel_helpscreen_actions_ do
 
       _x = toplevel_help_screen_.lookup 'actions'
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       _x.children.each do | cx |
 
         # #gotacha :[#012]: this is nasty: what the treeifier does with blank
@@ -114,7 +114,7 @@ module Skylab::CodeMetrics::TestSupport
   end
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Expect_Stdout_Stderr = -> tcc do
@@ -132,17 +132,17 @@ module Skylab::CodeMetrics::TestSupport
     ::File.join Fixture_file_directory_[], s
   end
 
-  Fixture_file_directory_ = Callback_.memoize do
+  Fixture_file_directory_ = Common_.memoize do
 
     ::File.join Fixture_tree_directory_[], 'fixture-files-one'
   end
 
-  Fixture_tree_directory_ = Callback_.memoize do
+  Fixture_tree_directory_ = Common_.memoize do
 
     TS_.dir_pathname.join( 'fixture-trees/fixture-tree-one' ).to_path
   end
 
-  Fixture_tree_two_ = Callback_::Lazy.call do
+  Fixture_tree_two_ = Common_::Lazy.call do
 
     ::File.join TS_.dir_pathname.to_path, 'fixture-trees/fixture-tree-two'
   end
@@ -151,7 +151,7 @@ module Skylab::CodeMetrics::TestSupport
     TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
   end
 
-  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_

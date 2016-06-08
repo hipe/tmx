@@ -62,7 +62,7 @@ module Skylab::TestSupport
     Task = sidesys[ :Task ]
     TMX = sidesys[ :TMX ]
 
-    Callback_.produce_library_shell_via_library_and_app_modules(
+    Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )
   end
 

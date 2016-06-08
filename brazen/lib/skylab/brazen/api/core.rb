@@ -43,7 +43,7 @@ module Skylab::Brazen
       teea ||= build_the_empty_expression_agent[]
     end
 
-    Exit_statii___ = Callback_::Lazy.call do
+    Exit_statii___ = Common_::Lazy.call do
 
       class Exit_Statii____
 

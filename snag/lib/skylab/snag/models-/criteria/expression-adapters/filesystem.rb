@@ -53,9 +53,9 @@ module Skylab::Snag
 
       def __build_a_stream_of_marshalled_words
 
-        scn = Callback_::Polymorphic_Stream.via_array @word_array
+        scn = Common_::Polymorphic_Stream.via_array @word_array
 
-        Callback_.stream do
+        Common_.stream do
 
           if scn.unparsed_exists
 

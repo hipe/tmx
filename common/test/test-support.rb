@@ -1,6 +1,6 @@
-require 'skylab/callback'
+require 'skylab/common'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   class << self
 
@@ -20,7 +20,7 @@ module Skylab::Callback::TestSupport
     end
   end  # >>
 
-  Home_ = ::Skylab::Callback
+  Home_ = ::Skylab::Common
     Autoloader_ = Home_::Autoloader
 
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport

@@ -3,7 +3,7 @@ require 'skylab/test_support'
 
 module Skylab::Git::TestSupport
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   TestSupport_ = ::Skylab::TestSupport
 
@@ -21,7 +21,7 @@ module Skylab::Git::TestSupport
 
       _test_support_lib = cache.fetch sym do
 
-        const = Callback_::Name.via_variegated_symbol( sym ).as_const
+        const = Common_::Name.via_variegated_symbol( sym ).as_const
 
         x = if TS_.const_defined? const
           TS_.const_get const
@@ -77,12 +77,12 @@ module Skylab::Git::TestSupport
     end
 
     def dirs_in_ path
-      Callback_::Stream.via_nonsparse_array(
+      Common_::Stream.via_nonsparse_array(
         `cd #{ path } && find . -type d -mindepth 1`.split NEWLINE_ )
     end
 
     def files_in_ path
-      Callback_::Stream.via_nonsparse_array(
+      Common_::Stream.via_nonsparse_array(
         `cd #{ path } && find . -type f`.split NEWLINE_ )
     end
 
@@ -102,7 +102,7 @@ module Skylab::Git::TestSupport
 
   Expect_Event = -> tcc do
 
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -111,7 +111,7 @@ module Skylab::Git::TestSupport
 
   # --
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   Fixture_data_path_ = Lazy_.call do
     ::File.join TS_.dir_pathname.to_path, 'fixture-data'

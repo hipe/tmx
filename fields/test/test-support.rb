@@ -22,7 +22,7 @@ module Skylab::Fields::TestSupport
 
     lookup = -> k do
 
-      const = Callback_::Name.via_variegated_symbol( k ).as_const
+      const = Common_::Name.via_variegated_symbol( k ).as_const
 
       if TS_.const_defined? const, false
         TS_.const_get const
@@ -54,7 +54,7 @@ module Skylab::Fields::TestSupport
     end
 
     def memoize_ sym, & p
-      define_method sym, Callback_.memoize( & p )
+      define_method sym, Common_.memoize( & p )
     end
 
     define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
@@ -90,11 +90,11 @@ module Skylab::Fields::TestSupport
 
   Home_ = ::Skylab::Fields
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
 
   Expect_Event = -> tcm do
 
-    Callback_.test_support::Expect_Event[ tcm ]
+    Common_.test_support::Expect_Event[ tcm ]
   end
 
   Memoizer_Methods = -> tcc do

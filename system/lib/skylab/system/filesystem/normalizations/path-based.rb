@@ -108,7 +108,7 @@ module Skylab::System
 
         # :+#experiment: call on an undifferentiated base actor. by [tr]
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
         if :up_or_down != st.current_token
           raise ::ArgumentError, "required first term: `up_or_down`"
         end
@@ -196,7 +196,7 @@ module Skylab::System
       def _accept_path path
 
         if path
-          @qualified_knownness_of_path = Callback_::Qualified_Knownness.via_value_and_symbol path, :path
+          @qualified_knownness_of_path = Common_::Qualified_Knownness.via_value_and_symbol path, :path
           KEEP_PARSING_
         else
           self._COVER_ME_path_argument_was_falseish
@@ -310,20 +310,20 @@ module Skylab::System
 
       def wrap_exception_ e, * xtra
 
-        Callback_::Event.wrap.exception e, :path_hack,
+        Common_::Event.wrap.exception e, :path_hack,
           :event_property, :qualified_knownness_of_path, @qualified_knownness_of_path, * xtra
       end
 
       def produce_result_via_open_IO_ io
 
-        Callback_::Known_Known[ io ]
+        Common_::Known_Known[ io ]
       end
 
       def path_
         @qualified_knownness_of_path.value_x
       end
 
-      Callback_::Event.selective_builder_sender_receiver self
+      Common_::Event.selective_builder_sender_receiver self
 
       Sibling__ = Normalizations
     end

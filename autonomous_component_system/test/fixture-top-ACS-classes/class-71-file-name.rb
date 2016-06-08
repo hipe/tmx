@@ -7,7 +7,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
     if arg_st.no_unparsed_exists
       # experimental to use #![#002]Detail-one
-      Callback_::KNOWN_UNKNOWN
+      Common_::KNOWN_UNKNOWN
     else
       fnm[ arg_st, & oes_p_p ]
     end
@@ -19,7 +19,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     if x.length.zero?
       self._K
     elsif fn_rx =~ x
-      Callback_::Known_Known[ x ]
+      Common_::Known_Known[ x ]
     else
       _oes_p = oes_p_p[ nil ]
       _oes_p.call :error, :expression, :invalid_value do | y |

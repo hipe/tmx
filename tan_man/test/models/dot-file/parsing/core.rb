@@ -9,7 +9,7 @@ module Skylab::TanMan::TestSupport
       tcc.include self
     end
 
-    define_method :fixtures_path_, ( Callback_.memoize do
+    define_method :fixtures_path_, ( Common_.memoize do
 
       ::File.expand_path "../#{ FIXTURES_ENTRY_ }", __FILE__
     end )

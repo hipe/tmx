@@ -12,7 +12,7 @@ the client had to override an accessor method for that class to tell the
 lib to effectively trigger autoloading for that node.)
 
 the ugliest part of our emerging solution here is that we assume that
-the [ca] autoloader is being used on the participating modules (an
+the [co] autoloader is being used on the participating modules (an
 assumption that is however fair in this universe).
 
 

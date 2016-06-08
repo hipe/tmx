@@ -2,7 +2,7 @@ module Skylab::System
   # -
     class Services___::Find
 
-      Expression_Adapters::Event = Callback_::Event.prototype_with(
+      Expression_Adapters::Event = Common_::Event.prototype_with(
          :find_command_args,
          :find_command_args, nil,
          :ok, nil,

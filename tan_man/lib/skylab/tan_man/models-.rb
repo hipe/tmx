@@ -69,12 +69,12 @@ module Skylab::TanMan
 
     def build_unordered_index_stream
       # terminal nodes never expand beyond themselves
-      Callback_::Stream.via_item self
+      Common_::Stream.via_item self
     end
 
     def name_function
       @nf ||= begin
-        Callback_::Name.via_module self
+        Common_::Name.via_module self
       end
     end
 
@@ -131,7 +131,7 @@ module Skylab::TanMan
 
       def bound_call_for_ping_
 
-        Callback_::Bound_Call.by do
+        Common_::Bound_Call.by do
 
           sym = name.as_lowercase_with_underscores_symbol
 
@@ -177,12 +177,12 @@ module Skylab::TanMan
 
       def to_qualified_knownness_box__
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         fo = formal_properties
 
         ( @argument_box.each_pair do | k, x |
 
-          bx.add k, Callback_::Qualified_Knownness.via_value_and_association( x, fo.fetch( k ) )
+          bx.add k, Common_::Qualified_Knownness.via_value_and_association( x, fo.fetch( k ) )
 
         end )
         bx
@@ -217,7 +217,7 @@ module Skylab::TanMan
 
     Home_.lib_.fields::Attributes::Actor.via cls, a
 
-    Callback_::Event.selective_builder_sender_receiver cls ; nil
+    Common_::Event.selective_builder_sender_receiver cls ; nil
   end
 
   module Common_Collection_Controller_Methods_
@@ -521,7 +521,7 @@ module Skylab::TanMan
       if 1 == a.length
         super
       else
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         bx.add :name, a.fetch( 0 )
         bx.add :value, a.fetch( 1 )
         @property_box = bx

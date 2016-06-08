@@ -63,7 +63,7 @@ module Skylab::TanMan
 
         @on_event_selectively.call :error, :failed_to_parse_meaning_string do
 
-          Callback_::Event.inline_not_OK_with :failed_to_parse_meaning_string,
+          Common_::Event.inline_not_OK_with :failed_to_parse_meaning_string,
               :input_string, s,
               :failure_reason, @parser.failure_reason do | y, o |
 
@@ -118,7 +118,7 @@ module Skylab::TanMan
 
         @on_event_selectively.call :error, :unresolvable_conflicts_in_meaning do
 
-          Callback_::Event.inline_not_OK_with :unresolvable_conflicts_in_meaning,
+          Common_::Event.inline_not_OK_with :unresolvable_conflicts_in_meaning,
               :conflict_h, conflict_h,
               :asmt_a, @asmt_a do | y, o |
 

@@ -13,7 +13,7 @@ module Skylab::Plugin
 
       def edit_module_via_iambic mod, x_a
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
 
         if st.unparsed_exists
 
@@ -65,7 +65,7 @@ module Skylab::Plugin
 
       def delegate * x_a
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
 
         begin
 

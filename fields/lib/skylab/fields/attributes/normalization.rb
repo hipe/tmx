@@ -163,7 +163,7 @@ module Skylab::Fields
           end
         end
 
-        p = Callback_::Name::Conversion_Functions::Pathify
+        p = Common_::Name::Conversion_Functions::Pathify
         s_a.map do | s |
           p[ s ]
         end * SPACE_

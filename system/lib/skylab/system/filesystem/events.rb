@@ -4,7 +4,7 @@ module Skylab::System
 
     Events = ::Module.new
 
-    Events::Wrote = Callback_::Event.prototype_with(
+    Events::Wrote = Common_::Event.prototype_with(
 
       :wrote,
 

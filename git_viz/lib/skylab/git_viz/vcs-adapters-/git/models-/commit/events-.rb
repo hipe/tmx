@@ -27,7 +27,7 @@ module Skylab::GitViz
 
         FATAL_BAD_REVISION___ = /\Afatal: bad revision '(.+)'\n\z/
 
-        Bad_Revision___ = Callback_::Event.prototype_with :bad_revision,
+        Bad_Revision___ = Common_::Event.prototype_with :bad_revision,
 
             :revision_identifier, nil,
             :exitstatus, nil,

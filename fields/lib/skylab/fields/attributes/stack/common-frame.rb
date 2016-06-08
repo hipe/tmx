@@ -81,7 +81,7 @@ module Skylab::Fields
 
           def call_via_arglist x_a
 
-            st = Callback_::Polymorphic_Stream.via_array x_a
+            st = Common_::Polymorphic_Stream.via_array x_a
 
             cls = st.gets_one
 
@@ -154,7 +154,7 @@ module Skylab::Fields
 
           maybe_send_event :error, :property_is_not_readable do  # for "property is not readable"
 
-            Callback_::Event.inline_not_OK_with(
+            Common_::Event.inline_not_OK_with(
               :property_is_not_readable,
               :property, prp,
               :error_category, :name_error )
@@ -166,9 +166,9 @@ module Skylab::Fields
           ivar = atr.ivar
 
           if instance_variable_defined? ivar
-            Callback_::Known_Known[ instance_variable_get ivar ]
+            Common_::Known_Known[ instance_variable_get ivar ]
           else
-            Callback_::KNOWN_UNKNOWN
+            Common_::KNOWN_UNKNOWN
           end
         end
 
@@ -228,7 +228,7 @@ module Skylab::Fields
           end
 
           def _read_name
-            @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
+            @name = Common_::Name.via_variegated_symbol gets_one_polymorphic_value
             STOP_PARSING_
           end
 
@@ -250,7 +250,7 @@ module Skylab::Fields
                   const_set NORM_BOX__, nb.dup
                 end
               else
-                nb = Callback_::Box.new
+                nb = Common_::Box.new
                 const_set NORM_BOX__, nb
               end
 
@@ -446,7 +446,7 @@ module Skylab::Fields
           Edit_property_common__[ _PROP ]
 
           _MONADIC_P_ = if _PROP.is_memoized
-            Callback_.memoize( & _PROP.literal_proc )
+            Common_.memoize( & _PROP.literal_proc )
           else
             _PROP.literal_proc
           end
@@ -584,7 +584,7 @@ module Skylab::Fields
 
         Build_missing_requireds_event___ = -> miss_prp_a do   # #open [#030] dedund this
 
-          Callback_::Event.inline_not_OK_with(
+          Common_::Event.inline_not_OK_with(
 
             :missing_required_properties,
             :error_category, :argument_error,

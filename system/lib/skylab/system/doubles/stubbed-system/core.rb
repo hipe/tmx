@@ -49,7 +49,7 @@ module Skylab::System
       end
     end
 
-    class Stubbed_IO_for_Read_ < Callback_::Stream
+    class Stubbed_IO_for_Read_ < Common_::Stream
 
       def read
         s = gets

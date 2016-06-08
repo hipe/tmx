@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport
       tcc.include self
     end
 
-    define_method :fixtures_path_, ( Callback_.memoize do
+    define_method :fixtures_path_, ( Common_.memoize do
       _path = Models::Association.dir_pathname.to_path
       ::File.join _path, FIXTURES_ENTRY_
     end )

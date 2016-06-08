@@ -14,7 +14,7 @@ module Skylab::SearchAndReplace
 
       a = @LTSs
 
-      @_stream = Callback_::Stream.via_range( ( a.length - 1 ) .. 0 ) do |d|
+      @_stream = Common_::Stream.via_range( ( a.length - 1 ) .. 0 ) do |d|
         a.fetch d
       end
 
@@ -22,7 +22,7 @@ module Skylab::SearchAndReplace
 
       @_state = :__main
 
-      Callback_.stream do  # #[#035]
+      Common_.stream do  # #[#035]
         send @_state
       end
     end
@@ -74,7 +74,7 @@ module Skylab::SearchAndReplace
 
       def to_unstyled_bytes_string_  # #testpoint
         Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
-          Callback_::Stream.via_nonsparse_array @a ).execute
+          Common_::Stream.via_nonsparse_array @a ).execute
       end
 
       attr_reader(

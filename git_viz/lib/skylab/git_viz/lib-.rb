@@ -6,7 +6,7 @@ module Skylab::GitViz
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    define_singleton_method :_memoize, Callback_::Memoize
+    define_singleton_method :_memoize, Common_::Memoize
 
     gem = stdlib
 
@@ -37,7 +37,7 @@ module Skylab::GitViz
     Listen = gem[ :Listen ]
 
     Local_normal_name_from_module = -> x do
-      Callback_::Name.via_module( x ).as_lowercase_with_underscores_symbol
+      Common_::Name.via_module( x ).as_lowercase_with_underscores_symbol
     end
 
     MD5 = _memoize do
@@ -65,7 +65,7 @@ module Skylab::GitViz
     Plugin = sidesys[ :Plugin ]
 
     Power_scanner = -> * x_a do
-      Callback_::Scn.multi_step.new_via_iambic x_a
+      Common_::Scn.multi_step.new_via_iambic x_a
     end
 
     Set = stdlib[ :Set ]
@@ -76,7 +76,7 @@ module Skylab::GitViz
       System[].IO.some_stderr_IO
     end
 
-    strange = Callback_::Lazy.call do
+    strange = Common_::Lazy.call do
 
       o = Basic[]::String.via_mixed.instance.dup
       o.max_width = 120

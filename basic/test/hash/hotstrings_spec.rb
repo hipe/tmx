@@ -30,7 +30,7 @@ module Skylab::Basic::TestSupport::Hash
     end
 
     it "with stream" do
-      _st = Callback_::Stream.via_nonsparse_array [ 'imagema', 'imogen' ]
+      _st = Common_::Stream.via_nonsparse_array [ 'imagema', 'imogen' ]
       _have = subject _st
       _have.map( & :hotstring ) == %w( ima imo ) or fail
     end

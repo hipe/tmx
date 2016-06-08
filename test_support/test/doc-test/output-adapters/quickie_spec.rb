@@ -84,7 +84,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         _text_span = Omni_Mock_.new [ desc_line ]
 
-        _lines = Callback_::Stream.via_nonsparse_array code_line_a
+        _lines = Common_::Stream.via_nonsparse_array code_line_a
 
         _matchdata = DocTest_::
           Intermediate_Streams_::Models_::Example_Node::Matchdata.new(
@@ -93,7 +93,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         _x = Subject_[]::Intermediate_Streams_::Models_::Example_Node.new(
           _text_span, _matchdata )
 
-        Callback_::Stream.via_item _x
+        Common_::Stream.via_item _x
       end
     end
 
@@ -102,7 +102,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       it "omg." do
 
         _input_path = DocTest_.dir_pathname.join(
-          Callback_::Autoloader.default_core_file ).to_path
+          Common_::Autoloader.default_core_file ).to_path
 
         _output_path = TS_.dir_pathname.join(
           'integration/final/top_spec.rb' ).to_path

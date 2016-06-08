@@ -28,7 +28,7 @@ module Skylab::SubTree
         end
 
         def add_attribute k, x
-          @attribute_box ||= Callback_::Box.new
+          @attribute_box ||= Common_::Box.new
           @attribute_box.add k, x
           nil
         end
@@ -40,7 +40,7 @@ module Skylab::SubTree
 
         def initialize & oes_p
 
-          @bx = Callback_::Box.new
+          @bx = Common_::Box.new
 
           @collection_operation_i_a = nil
 

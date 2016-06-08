@@ -29,7 +29,7 @@ module Skylab::Basic::TestSupport::Tree_TS
 
   o = Home_
 
-  Callback_ = o::Callback_
+  Common_ = o::Common_
   EMPTY_A_ = o::EMPTY_A_
   EMPTY_P_ = o::EMPTY_P_
   EMPTY_S_ = o::EMPTY_S_

@@ -64,7 +64,7 @@ module Skylab::SearchAndReplace
       def ___to_block_stream  # #testpoint
 
         block = self
-        Callback_.stream do
+        Common_.stream do
           block = block.next_block
           block
         end

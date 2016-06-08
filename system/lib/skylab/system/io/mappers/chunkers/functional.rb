@@ -6,7 +6,7 @@ module Skylab::System
 
       module Chunkers
 
-        Functional = Callback_::Sesson::Ivars_with_Procs_as_Methods.
+        Functional = Common_::Sesson::Ivars_with_Procs_as_Methods.
             new :flush, :write do
 
           def << x

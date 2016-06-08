@@ -1,6 +1,6 @@
-require 'skylab/callback'
+require 'skylab/common'
 
-inf = Skylab::Callback::Sessions::Gemspec_Inference.new
+inf = Skylab::Common::Sessions::Gemspec_Inference.new
 
 inf.gemspec_path = __FILE__
 

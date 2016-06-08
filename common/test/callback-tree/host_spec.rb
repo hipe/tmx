@@ -1,15 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Tree
+module Skylab::Common::TestSupport::CallbackTree
 
-  describe "[ca] tree - host " do
+  describe "[co] callback tree - host " do
 
     context "one" do
 
       before :all do
 
         class Mazlo
-          Home_::Tree::Host[ self ]
+          Home_::CallbackTree::Host[ self ]
           spec = build_mutable_callback_tree_specification
           spec.default_pattern :listeners
           spec << :pow
@@ -30,7 +30,7 @@ module Skylab::Callback::TestSupport::Tree
       end
 
       it "creates the thing" do
-        Mazlo.should be_const_defined :Callback_Tree__
+        Mazlo.should be_const_defined :Common_Tree__
       end
 
       it "builds the thing" do

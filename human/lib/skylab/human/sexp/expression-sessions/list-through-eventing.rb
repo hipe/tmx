@@ -30,7 +30,7 @@ module Skylab::Human
             end
           end
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end

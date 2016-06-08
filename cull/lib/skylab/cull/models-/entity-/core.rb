@@ -90,7 +90,7 @@ module Skylab::Cull
     end
 
     def to_actual_property_stream
-      Callback_::Stream.via_nonsparse_array @actual_properties
+      Common_::Stream.via_nonsparse_array @actual_properties
     end
 
     def actual_property_via_name_symbol sym
@@ -157,7 +157,7 @@ module Skylab::Cull
       end
 
       def name
-        @nm ||= Callback_::Name.via_variegated_symbol @name_symbol
+        @nm ||= Common_::Name.via_variegated_symbol @name_symbol
       end
 
       attr_reader :value_x, :name_symbol

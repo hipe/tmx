@@ -268,7 +268,7 @@ module Skylab::BeautySalon
       end
 
       def produce_line
-        scn = Callback_::Stream.via_nonsparse_array @a
+        scn = Common_::Stream.via_nonsparse_array @a
         cs = scn.gets
         if cs
           s = cs.line_string

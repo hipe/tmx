@@ -4,7 +4,7 @@ module Skylab::TMX
 
     Events_ = ::Module.new
 
-    cls = Callback_::Event.prototype_with(
+    cls = Common_::Event.prototype_with(
 
       :missing_first_argument,
       :unbound_stream_builder, nil,
@@ -30,7 +30,7 @@ module Skylab::TMX
 
     Events_::Missing_First_Argument = cls
 
-    cls = Callback_::Event.prototype_with(
+    cls = Common_::Event.prototype_with(
 
       :no_such_reactive_node,
       :argument_x, nil,

@@ -275,7 +275,7 @@ module Skylab::TestSupport
             entry
           end
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -288,7 +288,7 @@ module Skylab::TestSupport
 
             & handle_event_selectively )
 
-          Callback_.stream do
+          Common_.stream do
             begin
               line = @lines.gets
               line or break

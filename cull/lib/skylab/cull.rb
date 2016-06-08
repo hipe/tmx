@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Cull
 
@@ -6,13 +6,13 @@ module Skylab::Cull
     y << "reduce a search space by a criteria - i.e helps make decisions"
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
     CLI = ::Class.new Brazen_::CLI
@@ -33,9 +33,9 @@ module Skylab::Cull
 
     oes_p.call :info, :ping do
 
-      Callback_::Event.wrap.signature(
+      Common_::Event.wrap.signature(
         bound.unbound.name_function,
-        ( Callback_::Event.inline_neutral_with :ping do | y, o |
+        ( Common_::Event.inline_neutral_with :ping do | y, o |
           y << "hello from #{ bound.kernel.app_name }."
         end ) )
     end
@@ -45,12 +45,12 @@ module Skylab::Cull
 
   class << self
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Brazen_::Kernel.new Home_
     end )
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
 
@@ -109,11 +109,11 @@ module Skylab::Cull
 
     def build_not_OK_event_with * i_a, & msg_p
       i_a.push :ok, false
-      Callback_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+      Common_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
     end
 
     def build_event_with * i_a, & msg_p
-      Callback_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+      Common_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
     end
 
     def handle_event_selectively

@@ -118,18 +118,18 @@ module Skylab::Cull::TestSupport
     end
   end
 
-  Callback__ = ::Skylab::Callback
+  Common__ = ::Skylab::Common
 
-  Config_filename___ = Callback__.memoize do
+  Config_filename___ = Common__.memoize do
     o = Home_::Models_::Survey
     ::File.join o::FILENAME_, o::CONFIG_FILENAME_
   end
 
   Expect_Event = -> test_context_class do
-    Callback__.test_support::Expect_Event[ test_context_class ]
+    Common__.test_support::Expect_Event[ test_context_class ]
   end
 
-  Callback__::Autoloader[ self,  ::File.dirname( __FILE__ ) ]
+  Common__::Autoloader[ self,  ::File.dirname( __FILE__ ) ]
 
   DASH_ = '-'
   Home_ = ::Skylab::Cull

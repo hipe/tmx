@@ -28,7 +28,7 @@ module Skylab::Plugin::TestSupport
         end
 
         def argument_stream_via_ * args
-          Callback_::Polymorphic_Stream.via_array args
+          Common_::Polymorphic_Stream.via_array args
         end
       end
     end

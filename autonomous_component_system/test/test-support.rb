@@ -109,12 +109,12 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     def codifying_expag_
-      Callback_::Event.codifying_expression_agent_instance
+      Common_::Event.codifying_expression_agent_instance
     end
   end
 
-  Callback_ = ::Skylab::Callback
-  Autoloader__ = Callback_::Autoloader
+  Common_ = ::Skylab::Common
+  Autoloader__ = Common_::Autoloader
 
   # -- fixtures & mocks
 
@@ -143,7 +143,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     Class_91_Trueish = -> st do
       x = st.gets_one
       if x
-        Callback_::Known_Known[ x ]
+        Common_::Known_Known[ x ]
       else
         self._NOT_NEEDED_YET
       end
@@ -155,7 +155,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       s = st.current_token
       if rx_92 =~ s
         st.advance_one
-        Callback_::Known_Known[ s ]
+        Common_::Known_Known[ s ]
       else
         _oes_p = pp[ nil ]
         _oes_p.call :error, :expression, :nope do |y|
@@ -203,7 +203,7 @@ module Skylab::Autonomous_Component_System::TestSupport
   module TestLib_
 
     Expect_event = -> tcc do
-      Callback_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Event[ tcc ]
     end
 
     Memoizer_methods = -> tcc do

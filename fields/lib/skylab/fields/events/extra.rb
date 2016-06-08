@@ -2,7 +2,7 @@ module Skylab::Fields
 
   module Event_
 
-    Home_::Events::Extra = Callback_::Event.prototype_with(
+    Home_::Events::Extra = Common_::Event.prototype_with(
 
       :extra_properties,
 

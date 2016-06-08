@@ -1,14 +1,14 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Digraph::Specificity
+module Skylab::Common::TestSupport::Digraph::Specificity
 
-  ::Skylab::Callback::TestSupport::Digraph[ Specificity_TestSupport = self ]
+  ::Skylab::Common::TestSupport::Digraph[ Specificity_TestSupport = self ]
 
   include Constants
 
   extend TestSupport_::Quickie
 
-  describe "[ca] digraph specificity" do
+  describe "[co] digraph specificity" do
 
     extend Specificity_TestSupport
 

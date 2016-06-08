@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   class Terminal_Adapters_::Iterm
 
-    class Magnetics_::Compatible_Version_of_Iterm < Callback_::Actor::Monadic
+    class Magnetics_::Compatible_Version_of_Iterm < Common_::Actor::Monadic
 
       THRESHOLD_ITERM2_VERSION___ = [ 2, 9, 20140903 ]
 
@@ -14,7 +14,7 @@ module Skylab::MyTerm
         ok = true
         ok &&= __resolve_version_string
         ok &&= __resolve_version_parts
-        ok && Callback_::Known_Known[ __check_iTerm2_version ]
+        ok && Common_::Known_Known[ __check_iTerm2_version ]
       end
 
       def __check_iTerm2_version

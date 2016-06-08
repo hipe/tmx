@@ -215,7 +215,7 @@ module Skylab::System
         end
       end
 
-      Callback_.stream do
+      Common_.stream do
         p[]
       end
     end
@@ -274,7 +274,7 @@ module Skylab::System
 
       pass = __produce_pass_proc
 
-      st = Callback_::Stream.via_nonsparse_array(
+      st = Common_::Stream.via_nonsparse_array(
         path_a
       ).map_reduce_by do | path_ |
 

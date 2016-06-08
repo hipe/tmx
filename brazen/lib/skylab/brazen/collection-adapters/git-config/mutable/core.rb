@@ -189,7 +189,7 @@ module Skylab::Brazen
         def to_body_line_stream
           nscn = to_node_stream
           lscn = nil
-          Callback_::Scn.new do
+          Common_::Scn.new do
             while true
               if lscn
                 x = lscn.gets
@@ -205,7 +205,7 @@ module Skylab::Brazen
         end
 
         def to_node_stream
-          Callback_::Stream.via_nonsparse_array @a
+          Common_::Stream.via_nonsparse_array @a
         end
 
         def count_number_of_nodes i
@@ -246,12 +246,12 @@ module Skylab::Brazen
         end
 
         def _to_node_stream_via_symbol sym
-          _to_node_streamish Callback_::Stream.stream_class, sym
+          _to_node_streamish Common_::Stream.stream_class, sym
 
         end
 
         def _to_node_scn_via_symbol sym
-          _to_node_streamish Callback_::Scn, sym
+          _to_node_streamish Common_::Scn, sym
         end
 
         def _to_node_streamish cls, i
@@ -989,7 +989,7 @@ module Skylab::Brazen
             end
             x
           end
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -1072,7 +1072,7 @@ module Skylab::Brazen
         end
 
         def to_node_stream
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         end
 
         def for_edit
@@ -1101,7 +1101,7 @@ module Skylab::Brazen
             p = EMPTY_P_
             line
           end
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -1682,7 +1682,7 @@ module Skylab::Brazen
       class Event_Sending_Node__
       private
 
-        Callback_::Event.selective_builder_sender_receiver self
+        Common_::Event.selective_builder_sender_receiver self
 
         def maybe_send_event * i_a, & ev_p
 
@@ -1722,7 +1722,7 @@ module Skylab::Brazen
       end
 
       Line_stream_via_single_line__ = -> line do
-        Callback_::Stream.via_item line
+        Common_::Stream.via_item line
       end
 
       SPACE_RX_ = /[ ]*/

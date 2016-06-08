@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] name - conversion functions" do
+  describe "[co] name - conversion functions" do
 
     # TS_[ self ]
 

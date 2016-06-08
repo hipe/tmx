@@ -12,7 +12,7 @@ module Skylab::TanMan
             node_collection_controller_via_document_controller(
               dc, & oes_p )  # :+#uncovered-failpoint
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
           bx.add :node, nc
           bx.add :dot_file, dc
 

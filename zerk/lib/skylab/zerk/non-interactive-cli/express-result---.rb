@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class NonInteractiveCLI
 
-    class Express_Result___ < Callback_::Actor::Dyadic
+    class Express_Result___ < Common_::Actor::Dyadic
 
       # #tracked-by [#022]: we no longer display the count of items when stream..
 

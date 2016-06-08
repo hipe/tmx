@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
     class Ordered_Dictionary  # read [#037]
 
@@ -35,7 +35,7 @@ module Skylab::Callback
               _BOX_
             end
             i_a.each do |i|
-              slot = Callback_Slot__.new i
+              slot = Common_Slot__.new i
 
               _BOX_.add i, slot
 
@@ -66,7 +66,7 @@ module Skylab::Callback
         self.class.ordered_dictionary
       end
 
-      class Callback_Slot__  # #open [#042] use [fi] simplified name instead
+      class Common_Slot__  # #open [#042] use [fi] simplified name instead
         def initialize i
           @name_symbol = i
         end
@@ -189,7 +189,7 @@ module Skylab::Callback
           while d < last
             d += 2
             i = x_a.fetch d
-            slot = Callback_Slot__.new i
+            slot = Common_Slot__.new i
             box.add i, slot
             sc.send :attr_reader, slot.attr_reader_method_name
             instance_variable_set slot.ivar, x_a.fetch( d + 1 )

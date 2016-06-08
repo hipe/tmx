@@ -68,7 +68,7 @@ module Skylab::Brazen
       end
 
       def index
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         constants.each do |c|
           ar = const_get c, false
           bx.add ar.name_symbol, ar
@@ -96,7 +96,7 @@ module Skylab::Brazen
     end
   private
     def bld_lnf
-      Callback_::Name.via_variegated_symbol name_symbol
+      Common_::Name.via_variegated_symbol name_symbol
     end
   public
 

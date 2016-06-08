@@ -42,7 +42,7 @@ module Skylab::TanMan::TestSupport
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   TestSupport_ = ::Skylab::TestSupport
 
@@ -50,7 +50,7 @@ module Skylab::TanMan::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  Expect_Event__ = Callback_.test_support::Expect_Event
+  Expect_Event__ = Common_.test_support::Expect_Event
 
   module Module_Methods___
 
@@ -232,7 +232,7 @@ module Skylab::TanMan::TestSupport
 
       rest_s = md[ :rest ]
       if rest_s
-        rest_s = "_#{ Callback_::Name::Conversion_Functions::Constantize[ rest_s ] }"
+        rest_s = "_#{ Common_::Name::Conversion_Functions::Constantize[ rest_s ] }"
       end
 
       :"Grammar#{ _number_part }#{ rest_s }"
@@ -397,7 +397,7 @@ module Skylab::TanMan::TestSupport
     TestSupport_::Expect_line[ tcc ]
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Fixtures
     Autoloader_[ self ]
@@ -424,7 +424,7 @@ module Skylab::TanMan::TestSupport
       :build_require_stdlib_proc,
     )
 
-    define_singleton_method :_memoize, Callback_::Memoize
+    define_singleton_method :_memoize, Common_::Memoize
 
     base_tmpdir = _memoize do
       Home_.lib_.system.filesystem.tmpdir(

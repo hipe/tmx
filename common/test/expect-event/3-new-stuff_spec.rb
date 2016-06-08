@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] expect event - (3) new stuff" do
+  describe "[co] expect event - (3) new stuff" do
 
     TS_.etc_ self
     use :memoizer_methods

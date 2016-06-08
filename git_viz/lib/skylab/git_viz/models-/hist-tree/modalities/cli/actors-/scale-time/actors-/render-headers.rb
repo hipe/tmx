@@ -95,7 +95,7 @@ module Skylab::GitViz
 
             has_content = @bucket_has_content_via_index
 
-            Callback_::Stream.via_times @bucket_count do | d |
+            Common_::Stream.via_times @bucket_count do | d |
 
               Bucket_ID__.new next_datetime[], has_content[ d ], d
             end

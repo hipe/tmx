@@ -37,7 +37,7 @@ module Skylab::Autonomous_Component_System
         end
       end
 
-      Callback_::Autoloader[ self ]
+      Common_::Autoloader[ self ]
     end
   # -
 end

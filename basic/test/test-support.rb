@@ -21,7 +21,7 @@ module Skylab::Basic
       define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
       def memoize_ sym, & p
-        define_method sym, ( Callback_.memoize do
+        define_method sym, ( Common_.memoize do
           p[]
         end )
       end
@@ -35,7 +35,7 @@ module Skylab::Basic
 
         ( cache_h.fetch sym do
 
-          const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          const = Common_::Name.via_variegated_symbol( sym ).as_const
 
           x = if TS_.const_defined? const, false
             TS_.const_get const, false
@@ -94,12 +94,12 @@ module Skylab::Basic
 
     Expect_Event = -> test_context_class do
 
-      Home_::Callback_.test_support::Expect_Event[ test_context_class ]
+      Home_::Common_.test_support::Expect_Event[ test_context_class ]
     end
 
     Future_Expect = -> tcc do
 
-      Home_::Callback_.test_support::Future_Expect[ tcc ]
+      Home_::Common_.test_support::Future_Expect[ tcc ]
     end
 
     String = -> tcc do  # :+#stowaway
@@ -109,14 +109,14 @@ module Skylab::Basic
     end
 
     Home_ = ::Skylab::Basic
-    Callback_ = Home_::Callback_
+    Common_ = Home_::Common_
     EMPTY_A_ = Home_::EMPTY_A_
     EMPTY_S_ = Home_::EMPTY_S_
     NIL_ = nil
 
     module Constants
       Home_ = Home_
-      Callback_ = Callback_
+      Common_ = Common_
       TestSupport_ = TestSupport_
     end
   end

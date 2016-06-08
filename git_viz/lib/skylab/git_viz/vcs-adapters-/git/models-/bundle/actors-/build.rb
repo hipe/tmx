@@ -127,7 +127,7 @@ module Skylab::GitViz
         def __flush
 
           o = @build_trail
-          bx = Callback_::Box.allocate
+          bx = Common_::Box.allocate
           bx.instance_exec do
             @a = o.ci_sha_a
             @h = o.ci_cache

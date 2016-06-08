@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::TMX
 
@@ -6,7 +6,7 @@ module Skylab::TMX
     y << "uh.."
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   class << self
 
@@ -18,7 +18,7 @@ module Skylab::TMX
       # if you are making it into a gem..
 
       st = to_sidesystem_load_ticket_stream
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       begin
         lt = st.gets
         bx.add lt.stem, lt
@@ -48,7 +48,7 @@ module Skylab::TMX
       installation_.to_sidesystem_load_ticket_stream
     end
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Home_.lib_.brazen::Kernel.new Home_
     end )
 
@@ -69,12 +69,12 @@ module Skylab::TMX
     end
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
   end  # >>
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -97,7 +97,7 @@ module Skylab::TMX
   end
 
   ACHIEVED_ = true
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
   EMPTY_S_ = ''
   NIL_ = nil

@@ -2,7 +2,7 @@ module Skylab::Fields
 
   module MetaAttributes::Enum
 
-    Extra_Value_Event = Callback_::Event.prototype_with(
+    Extra_Value_Event = Common_::Event.prototype_with(
       :invalid_property_value,
       :x, nil,
       :predicate_string, nil,

@@ -128,7 +128,7 @@ module Skylab::Snag
             end
           end
 
-          Glyphset___ = Callback_.memoize do
+          Glyphset___ = Common_.memoize do
 
             {     blank: '    ',
                   crook: ' •- ',

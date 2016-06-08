@@ -76,7 +76,7 @@ module Skylab::TMX::TestSupport
 
     dangerous_memoize_ :_front do  # c.p
 
-      box = Callback_::Box.new
+      box = Common_::Box.new
       box.add :zorpa_norpa, _unbound_Z
 
       o = subject_module_.new( & method( :fail ) )

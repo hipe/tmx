@@ -52,7 +52,7 @@ module Skylab::Basic
 
     def absorb_association name_i
       @has_associations ||= true
-      @associations ||= Callback_::Box.new
+      @associations ||= Common_::Box.new
       @associations.touch name_i do true end
       nil
     end
@@ -369,7 +369,7 @@ module Skylab::Basic
         p[]
       end
 
-      Callback_.stream do
+      Common_.stream do
         p[]
       end
     end

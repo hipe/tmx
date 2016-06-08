@@ -30,7 +30,7 @@ module Skylab::Brazen
         attr_reader :delta_box
 
         def _mutable_delta_box
-          @delta_box ||= Callback_::Box.new
+          @delta_box ||= Common_::Box.new
         end
       end
 
@@ -90,7 +90,7 @@ module Skylab::Brazen
 
           bx = @_tree._mutable_delta_box
           fo = @_formals
-          st = Callback_::Polymorphic_Stream.via_array x_a
+          st = Common_::Polymorphic_Stream.via_array x_a
           while st.unparsed_exists
             prp = fo.fetch st.gets_one
             if Field_::Takes_argument[ prp ]

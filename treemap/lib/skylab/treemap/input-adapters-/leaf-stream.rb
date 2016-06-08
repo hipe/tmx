@@ -178,7 +178,7 @@ module Skylab::Treemap
         end
       end
 
-      Callback_::Scn.new do
+      Common_::Scn.new do
         p[]
       end
     end

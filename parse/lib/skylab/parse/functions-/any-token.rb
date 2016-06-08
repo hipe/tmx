@@ -17,8 +17,8 @@ module Skylab::Parse
         super or Default_moniker__[]
       end
 
-      Default_moniker__ = Callback_.memoize do
-        Callback_::Name.via_variegated_symbol :any_token
+      Default_moniker__ = Common_.memoize do
+        Common_::Name.via_variegated_symbol :any_token
       end
     end
     # <-

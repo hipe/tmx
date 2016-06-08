@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] name" do
+  describe "[co] name" do
 
     context "const" do
 

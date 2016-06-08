@@ -108,7 +108,7 @@ module Skylab::Git
         p = nil
 
         p_ = -> do
-          p = Callback_::Stream.via_nonsparse_array( @_dirs_fwd ).map_by do |s|
+          p = Common_::Stream.via_nonsparse_array( @_dirs_fwd ).map_by do |s|
             ::File.join path, s
           end
           path
@@ -119,7 +119,7 @@ module Skylab::Git
           _stows_path
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -171,7 +171,7 @@ module Skylab::Git
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

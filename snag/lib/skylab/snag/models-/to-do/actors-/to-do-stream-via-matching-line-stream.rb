@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::To_Do
 
-    class Actors_::To_do_stream_via_matching_line_stream < Callback_::Actor::Dyadic
+    class Actors_::To_do_stream_via_matching_line_stream < Common_::Actor::Dyadic
 
       def initialize st, psa, & p
         @on_event_selectively = p
@@ -69,7 +69,7 @@ module Skylab::Snag
 
       def __build_did_not_match_event line_o
 
-        Callback_::Event.inline_neutral_with :did_not_match,
+        Common_::Event.inline_neutral_with :did_not_match,
             :line, line_o.full_source_line,
             :lineno, line_o.lineno,
             :path, line_o.path,
@@ -99,7 +99,7 @@ module Skylab::Snag
         # add each item that is built in the above to a stack. the reverse
         # of this stack (as a stream) is our result. whew!
 
-        st = Callback_::Stream.via_range( md_a.length - 1 .. 0 )
+        st = Common_::Stream.via_range( md_a.length - 1 .. 0 )
 
         item = __item_via_match md_a.fetch( st.gets ), shared_line_o
 
@@ -114,7 +114,7 @@ module Skylab::Snag
         end while nil
 
         stack.reverse!
-        Callback_::Stream.via_nonsparse_array stack
+        Common_::Stream.via_nonsparse_array stack
       end
 
       def __item_via_match greater_neighbor=nil, md, my_line_o

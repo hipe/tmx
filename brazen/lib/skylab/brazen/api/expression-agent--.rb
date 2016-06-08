@@ -136,7 +136,7 @@ module Skylab::Brazen
         end
       end  # >>
 
-      NLP_agent__ = Callback_.memoize do
+      NLP_agent__ = Common_.memoize do
 
         NLP_Agent__ = LIB.make_NLP_agent(
           :public, [

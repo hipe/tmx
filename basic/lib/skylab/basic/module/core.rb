@@ -43,7 +43,7 @@ module Skylab::Basic
           o.relative_path_parts = i_a
           o.execute
         else
-          Callback_::Const_value_via_parts[ i_a ]
+          Common_::Const_value_via_parts[ i_a ]
         end
       end
 
@@ -68,7 +68,7 @@ module Skylab::Basic
     end  # >>
 
     Chain_via_parts__ = -> s_a do
-      _Pair = Callback_::Pair
+      _Pair = Common_::Pair
 
       pair_a = ::Array.new s_a.length
       mod = ::Object

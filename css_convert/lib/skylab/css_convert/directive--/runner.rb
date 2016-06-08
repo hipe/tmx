@@ -9,7 +9,7 @@ module Skylab::CSS_Convert
 
     def invoke directive_sexp # #unwrap [#bs-109] prototypical example
 
-      _const = Callback_::Name.via_variegated_symbol(
+      _const = Common_::Name.via_variegated_symbol(
         directive_sexp.node_name
       ).as_const
 

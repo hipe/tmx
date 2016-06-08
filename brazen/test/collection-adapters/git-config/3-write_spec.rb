@@ -12,9 +12,9 @@ module Skylab::Brazen::TestSupport
       pn = td.join 'some-file.cfg'
       io = ::File.open pn.to_path, 'w+'
       a = []
-      a.push Callback_::Pair.via_value_and_name( 'x x', :Foo )
-      a.push Callback_::Pair.via_value_and_name( true, :zappo )
-      _scan = Callback_::Stream.via_nonsparse_array a
+      a.push Common_::Pair.via_value_and_name( 'x x', :Foo )
+      a.push Common_::Pair.via_value_and_name( true, :zappo )
+      _scan = Common_::Stream.via_nonsparse_array a
       x = subject.write io, _scan, 'sub sec.to', 'se-cto'
       x.should eql true
       io.rewind
@@ -28,8 +28,8 @@ module Skylab::Brazen::TestSupport
     end
 
     it "don't fall over on backslashes" do
-      _a = [ Callback_::Pair.via_value_and_name( '\b', :'two-characters' ) ]
-      _scan = Callback_::Stream.via_nonsparse_array _a
+      _a = [ Common_::Pair.via_value_and_name( '\b', :'two-characters' ) ]
+      _scan = Common_::Stream.via_nonsparse_array _a
       io = Home_::LIB_.string_IO.new
       x = subject.write io, _scan, 'sub.sect', 'se-ct'
       x.should eql true

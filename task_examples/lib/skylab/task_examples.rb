@@ -1,11 +1,11 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::TaskExamples
 
   class << self
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
 
@@ -18,17 +18,17 @@ module Skylab::TaskExamples
     Home_.lib_.task
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   CLI = nil  # for host
   EMPTY_S_ = ''
   Home_ = self
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
   stowaway :Library_, 'lib-'
   NEWLINE_ = "\n"
   NIL_ = nil

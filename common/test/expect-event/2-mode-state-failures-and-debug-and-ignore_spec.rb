@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] expect event - (2) mode state failure, debug, ignore" do
+  describe "[co] expect event - (2) mode state failure, debug, ignore" do
 
     TS_.etc_ self
     use :expect_event_meta

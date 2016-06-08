@@ -26,7 +26,7 @@ module Skylab::Human
       class << self
 
         def via_ * x_a
-          _st = Callback_::Polymorphic_Stream.via_array x_a
+          _st = Common_::Polymorphic_Stream.via_array x_a
           expression_via_sexp_stream_ _st
         end
 
@@ -100,7 +100,7 @@ module Skylab::Human
     public
 
       def be_alternation
-        @_fsep_sexp = Callback_::Known_Known[ FINAL_SEPARATOR_FOR_ALTERNATION___ ]
+        @_fsep_sexp = Common_::Known_Known[ FINAL_SEPARATOR_FOR_ALTERNATION___ ]
         NIL_
       end
 
@@ -125,7 +125,7 @@ module Skylab::Human
       end
 
       def final_separator_sexp= x
-        @_fsep_sexp = Callback_::Known_Known[ x ] ; nil
+        @_fsep_sexp = Common_::Known_Known[ x ] ; nil
       end
 
       def separator= x
@@ -133,7 +133,7 @@ module Skylab::Human
       end
 
       def separator_sexp= x
-        @_sep_sexp = Callback_::Known_Known[ x ] ; nil
+        @_sep_sexp = Common_::Known_Known[ x ] ; nil
       end
 
       # --
@@ -279,7 +279,7 @@ module Skylab::Human
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -401,7 +401,7 @@ module Skylab::Human
       end
 
       def __build_stream_via_array
-        Callback_::Polymorphic_Stream.via_array @_top_secret_array
+        Common_::Polymorphic_Stream.via_array @_top_secret_array
       end
 
       def __release_one_time_use_PST
@@ -488,7 +488,7 @@ module Skylab::Human
           s
         end
 
-        Callback_.stream { p[] }
+        Common_.stream { p[] }
       end
 
       Flush_string_stream_into__ = -> y, st do

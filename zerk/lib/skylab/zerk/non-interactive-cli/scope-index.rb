@@ -112,7 +112,7 @@ module Skylab::Zerk
         # name as a node in a farther frame (in effect re-defining it). as
         # a box, when such a clobber happens *for a primitive*, it raises.
 
-        _bx = ( @_primitivesque_appropriation_op_box ||= Callback_::Box.new )
+        _bx = ( @_primitivesque_appropriation_op_box ||= Common_::Box.new )
         _bx.add @_k, @_scope_node_identifier
       end
 

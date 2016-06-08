@@ -29,7 +29,7 @@ module Skylab::TanMan
     end
 
     List_scanner = -> x do
-      Callback_::Scn.try_convert x
+      Common_::Scn.try_convert x
     end
 
     Module_lib = -> do
@@ -50,7 +50,7 @@ module Skylab::TanMan
       Basic[]::String
     end
 
-    String_scanner = Callback_.memoize do
+    String_scanner = Common_.memoize do
       require 'strscan'
       ::StringScanner
     end
@@ -61,13 +61,13 @@ module Skylab::TanMan
 
     System_lib___ = sidesys[ :System ]
 
-    Tmpdir_stem = Callback_.memoize do
+    Tmpdir_stem = Common_.memoize do
       'tm-production-cache'.freeze
     end
 
     TT = stdlib[ :Treetop ]
 
-    INSTANCE = Callback_.produce_library_shell_via_library_and_app_modules(
+    INSTANCE = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )
   end
 

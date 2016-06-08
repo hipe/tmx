@@ -1,8 +1,8 @@
 module Skylab
 
-  module Callback
+  module Common
 
-    class Tree  # :[#033]
+    class CallbackTree  # :[#033]
 
       def initialize hash, identifier_x = self.class
 
@@ -54,14 +54,14 @@ module Skylab
         end
       end
 
-      module Symbolic_Callback_Methods_
+      module Symbolic_Common_Methods_
         attr_reader :callback_x_a
         def add_cb_x x
           ( @callback_x_a ||= [] ) << x ; nil
         end
       end
 
-      class Callback_Leaf__
+      class Common_Leaf__
         include Mono_Methods_
       end
 
@@ -76,7 +76,7 @@ module Skylab
       end
 
       class Listeners_Leaf__
-        include Symbolic_Callback_Methods_
+        include Symbolic_Common_Methods_
         include Poly_Methods_
         def retrieve_child i
           raise ::KeyError, "off the end: '#{ i }'"
@@ -84,11 +84,11 @@ module Skylab
       end
 
       class Shorters_Leaf__
-        include Symbolic_Callback_Methods_
+        include Symbolic_Common_Methods_
       end
 
       NODE_CLASS_H__ = {
-        callback: Callback_Leaf__,
+        callback: Common_Leaf__,
         handler: Handler_Leaf__,
         listeners: Listeners_Leaf__,
         shorters: Shorters_Leaf__
@@ -329,16 +329,16 @@ module Skylab
 
         def end
           _tree = flush
-          @host_module.const_set :Callback_Tree__, _tree ; nil
+          @host_module.const_set :Common_Tree__, _tree ; nil
         end
 
         def flush
           h = @h ; @h = nil
-          Specified_Callback_Tree_.new h
+          Specified_Common_Tree_.new h
         end
       end
 
-      class Specified_Callback_Tree_ < self
+      class Specified_Common_Tree_ < self
         class << self
           alias_method :orig_new, :new
           def new h
@@ -365,7 +365,7 @@ module Skylab
 
       # ~ mutable shells
 
-      class Specified_Callback_Tree_
+      class Specified_Common_Tree_
 
         def build_mutable_shell
           _cls = mtbl_shell_class
@@ -420,7 +420,7 @@ module Skylab
         end
       private
         def init_callback_tree
-          @callbacks = self.class.const_get( :Callback_Tree__, false ).new ; nil
+          @callbacks = self.class.const_get( :Common_Tree__, false ).new ; nil
         end
       end
 

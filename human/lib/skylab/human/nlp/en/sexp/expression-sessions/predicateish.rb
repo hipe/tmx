@@ -127,7 +127,7 @@ module Skylab::Human
         # so the predicate phrases have to "know" what their subjects are
         # to express themselves..
 
-        Callback_::Stream.once do
+        Common_::Stream.once do
           o = Siblings_::Statementish.begin_
           o.attach_sexp__ sexp, :subject
           o.verb_phrase = self
@@ -137,7 +137,7 @@ module Skylab::Human
 
       def to_statementish_stream_for_no_subject  # #spot-1
 
-        Callback_::Stream.once do
+        Common_::Stream.once do
           o = Siblings_::Statementish.begin_
           o.verb_phrase = self
           o
@@ -298,7 +298,7 @@ module Skylab::Human
             o
           end
 
-          stmr.to_stream_around Callback_::Stream.via_nonsparse_array @_a
+          stmr.to_stream_around Common_::Stream.via_nonsparse_array @_a
         end
 
         def read_only_array___

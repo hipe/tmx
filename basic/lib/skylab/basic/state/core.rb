@@ -11,7 +11,7 @@ module Skylab::Basic
           Home_.lib_.autonomous_component_system
           Assume_ACS_[]
 
-          @_bx = Callback_::Box.new
+          @_bx = Common_::Box.new
         end
 
         def add_state * x_a
@@ -58,7 +58,7 @@ module Skylab::Basic
             process_polymorphic_stream_passively st
           end
 
-          Callback_::Known_Known[ _o ]
+          Common_::Known_Known[ _o ]
         end
 
       end  # >>
@@ -77,7 +77,7 @@ module Skylab::Basic
 
       def description_under _expag
 
-        Callback_::Name.via_variegated_symbol( @name_symbol ).as_human
+        Common_::Name.via_variegated_symbol( @name_symbol ).as_human
       end
 
       attr_reader :name_symbol
@@ -202,7 +202,7 @@ module Skylab::Basic
 
         _receive_begin
 
-        st = Callback_.stream do
+        st = Common_.stream do
           @_step_p[]
         end
 
@@ -472,12 +472,12 @@ module Skylab::Basic
             sta.can_transition_to_state_symbol_array
           end
 
-          Callback_::Stream.via_nonsparse_array _sym_a do | sym |
+          Common_::Stream.via_nonsparse_array _sym_a do | sym |
             @box.fetch sym
           end
         else
 
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         end
       end
     end

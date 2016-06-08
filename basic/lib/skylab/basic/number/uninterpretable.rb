@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Number
 
-    Uninterpretable = Callback_::Event.prototype_with(
+    Uninterpretable = Common_::Event.prototype_with(
 
         :___terminal_channel_is_in_an_ivar___,  # sanity
         :x, nil,

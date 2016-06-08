@@ -104,7 +104,7 @@ module Skylab::Zerk
 
     def express_buttonesques buttons
 
-      _st = Callback_::Stream.via_nonsparse_array buttons  # while it works
+      _st = Common_::Stream.via_nonsparse_array buttons  # while it works
 
       _buff = _st.join_into_with_using_by "", SPACE_, :<< do |btn|
         "#{ btn.head }[#{ btn.hotstring_for_expression }]#{ btn.tail }"

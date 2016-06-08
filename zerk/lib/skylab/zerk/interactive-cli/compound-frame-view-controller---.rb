@@ -106,7 +106,7 @@ module Skylab::Zerk
 
         format = Formats___.new @_max
 
-        st = Callback_::Stream.via_times col_A.length
+        st = Common_::Stream.via_times col_A.length
         begin
 
           d = st.gets

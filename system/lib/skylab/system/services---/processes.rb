@@ -29,7 +29,7 @@ module Skylab::System
         d += md[ :M ].to_i * 60  # minutes
         d += md[ :S ].to_i  # seconds
 
-        Callback_::Known_Known[ epoch + d ]
+        Common_::Known_Known[ epoch + d ]
       end
     end
 
@@ -38,7 +38,7 @@ module Skylab::System
       fld.interpret = -> s, & oes_p do
 
         if s
-          Callback_::Known_Known[ s.to_i ]
+          Common_::Known_Known[ s.to_i ]
         end
       end
     end
@@ -47,7 +47,7 @@ module Skylab::System
 
       fld.interpret = -> s, & oes_p do
         if s
-          Callback_::Known_Known[ s ]
+          Common_::Known_Known[ s ]
         end
       end
     end
@@ -58,7 +58,7 @@ module Skylab::System
 
         _defn = o.fetch sym
 
-        _nf = Callback_::Name.via_lowercase_with_underscores_symbol sym
+        _nf = Common_::Name.via_lowercase_with_underscores_symbol sym
 
         fld = Field___.new _nf, & _defn
         cache[ sym ] = fld
@@ -187,7 +187,7 @@ module Skylab::System
 
           d = @_w.value.exitstatus
           if 1 == d
-            Callback_::KNOWN_UNKNOWN
+            Common_::KNOWN_UNKNOWN
           else
             self._COVER_ME_no_stdout_or_stderr_and_non_one_exitstatus
           end
@@ -206,7 +206,7 @@ module Skylab::System
 
           x = Record___[ @_first, @_header, @_struct_class, @_sorted_fields ]
           x or self._REDESIGN
-          Callback_::Known_Known[ x ]
+          Common_::Known_Known[ x ]
 
         else
           self.__ROLL
@@ -291,7 +291,7 @@ module Skylab::System
       ranges = []
 
       d = 0
-      field_st = Callback_::Stream.via_nonsparse_array fields
+      field_st = Common_::Stream.via_nonsparse_array fields
       scn = Home_.lib_.string_scanner header
 
       sep = -> do

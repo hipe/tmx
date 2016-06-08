@@ -43,7 +43,7 @@ module Skylab::TanMan
         st = @in_ID.to_simple_line_stream
         st and begin
           @in_ID = nil
-          @upstream_lines = Callback_::Scn.new do
+          @upstream_lines = Common_::Scn.new do
             line = st.gets
             if line
               @line_count += 1
@@ -217,7 +217,7 @@ module Skylab::TanMan
           closing_digraph_line: "}"
         }
 
-        Callback_::Event.inline_not_OK_with :input_parse_error,
+        Common_::Event.inline_not_OK_with :input_parse_error,
 
             :lineno, @line_count,
             :line, @line,

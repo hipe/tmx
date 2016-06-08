@@ -138,7 +138,7 @@ module Skylab::SubTree
       attr_reader :tree
 
       def name
-        @nm ||= Callback_::Name.via_variegated_symbol :file_coverage_tree
+        @nm ||= Common_::Name.via_variegated_symbol :file_coverage_tree
       end
 
       def express_into_under y, expag

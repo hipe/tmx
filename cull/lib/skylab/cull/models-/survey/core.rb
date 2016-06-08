@@ -268,7 +268,7 @@ module Skylab::Cull
           ACHIEVED_
         else
           box.each_pair do | sym, x |
-            asts.add_to_bag_mixed_value_and_name_function x, Callback_::Name.via_variegated_symbol( sym )
+            asts.add_to_bag_mixed_value_and_name_function x, Common_::Name.via_variegated_symbol( sym )
           end
           ACHIEVED_
         end
@@ -338,7 +338,7 @@ module Skylab::Cull
     end
 
     def to_event
-      Callback_::Event.inline_OK_with :survey,
+      Common_::Event.inline_OK_with :survey,
         :path, ::File.join( @_path, FILENAME_ ),
         :is_completion, true
     end
@@ -364,7 +364,7 @@ module Skylab::Cull
       if ! ent
 
         ent = Models__.const_get(
-          Callback_::Name.via_variegated_symbol( ent_sym ).as_const,
+          Common_::Name.via_variegated_symbol( ent_sym ).as_const,
           false
         ).new self, & handle_event_selectively
 

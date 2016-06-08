@@ -2,7 +2,7 @@ module Skylab::Fields
 
   module Event_  # #[#sl-0155]
 
-    Home_::Events::Ambiguous = Callback_::Event.prototype_with(
+    Home_::Events::Ambiguous = Common_::Event.prototype_with(
 
       :ambiguous_property,
 
@@ -17,7 +17,7 @@ module Skylab::Fields
       _s_a = o.name_s_a.map( & method( :val ) )
 
       name = o.name
-      name ||= Callback_::Name.via_variegated_symbol DEFAULT_PROPERTY_LEMMA_
+      name ||= Common_::Name.via_variegated_symbol DEFAULT_PROPERTY_LEMMA_
 
       y << "ambiguous #{ o.name.as_human } #{ ick o.x } - did you mean #{ or_ _s_a }?"
 
@@ -43,7 +43,7 @@ module Skylab::Fields
 
         _name = if lemma_x
           if lemma_x.respond_to? :id2name
-            Callback_::Name.via_variegated_symbol lemma_x
+            Common_::Name.via_variegated_symbol lemma_x
           else
             lemma_x
           end

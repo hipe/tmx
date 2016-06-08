@@ -1,8 +1,8 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::SubTree
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   def self.describe_into_under y, _
     y << "an umbrella node for varous operations on a filesystem tree.."
@@ -17,7 +17,7 @@ module Skylab::SubTree
         bc and bc.receiver.send bc.method_name, * bc.args
       end
 
-      define_method :application_kernel_, ( Callback_.memoize do
+      define_method :application_kernel_, ( Common_.memoize do
         Home_.lib_.brazen::Kernel.new Home_
       end )
 
@@ -38,9 +38,9 @@ module Skylab::SubTree
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   Autoloader_[ Models_ = ::Module.new, :boxxy ]
 

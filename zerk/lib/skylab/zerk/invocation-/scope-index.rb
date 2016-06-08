@@ -62,7 +62,7 @@ module Skylab::Zerk
         # bottom to top in case we decided we wwant to allow clobber ..
 
         ss = @formal_operation.selection_stack
-        Callback_::Stream.via_times( ss.length - 1 ) do |d|
+        Common_::Stream.via_times( ss.length - 1 ) do |d|
           ss.fetch d
         end
       end

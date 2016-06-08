@@ -1,8 +1,8 @@
 self._TODO  # add all files under tests - those guys need them
 
-require_relative 'lib/skylab/callback'
+require_relative 'lib/skylab/common'
 
-inf = Skylab::Callback::Sessions::Gemspec_Inference.new
+inf = Skylab::Common::Sessions::Gemspec_Inference.new
 
 inf.gemspec_path = __FILE__
 
@@ -20,7 +20,7 @@ Gem::Specification.new do | s |
 
   s.files = inf.to_stream_of_one_or_more_codefiles.to_a
 
-  s.homepage = 'http://localhost:8080/homepage-for-ca'
+  s.homepage = 'http://localhost:8080/homepage-for-co'
 
   s.license = 'MIT'
 
@@ -31,7 +31,7 @@ Gem::Specification.new do | s |
   s.version = inf.version_via_VERSION_file
 
   # s.add_runtime_dependency ..
-  # [ca] nominally depends on [sy] to pass its tests but this is conceptually ugly..
+  # [co] nominally depends on [sy] to pass its tests but this is conceptually ugly..
 
   # s.add_development_dependency ..
 

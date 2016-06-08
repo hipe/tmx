@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::CSS_Convert
 
@@ -9,13 +9,13 @@ module Skylab::CSS_Convert
     end
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -29,7 +29,7 @@ module Skylab::CSS_Convert
 
     Flex_to_treetop = sidesys[ :Flex2Treetop ]
 
-    My_sufficiently_existent_tmpdir = Callback_.memoize do
+    My_sufficiently_existent_tmpdir = Common_.memoize do
 
       dirname = Home_.lib_.system.defaults.dev_tmpdir_path
       if ! ::File.exist? dirname
@@ -59,7 +59,7 @@ module Skylab::CSS_Convert
   end
 
   Brazen_ = Autoloader_.require_sidesystem :Brazen
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
   Home_ = self
 
   Conversion_parameters_class___ = Lazy_.call do
@@ -183,13 +183,13 @@ module Skylab::CSS_Convert
 
               es = o.exitstatus
               es ||= Brazen_::CLI::SUCCESS_EXITSTATUS
-              Callback_::Bound_Call.via_value es
+              Common_::Bound_Call.via_value es
             else
               NIL_  # keep going if something said must stay
             end
           else
             express_invite_to_general_help
-            Callback_::Bound_Call.via_value d
+            Common_::Bound_Call.via_value d
           end
         else  # if no queue keep going
           NIL_
@@ -448,7 +448,7 @@ module Skylab::CSS_Convert
 
   # ~ visual tests, etc
 
-  Visual_tests__ = Callback_.memoize do
+  Visual_tests__ = Common_.memoize do
 
     Test___ = ::Struct.new :name_s, :desc_s, :method_name
     a = []
@@ -575,7 +575,7 @@ module Skylab::CSS_Convert
     end
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   EARLY_FINISH_ = nil

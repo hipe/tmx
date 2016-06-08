@@ -127,7 +127,7 @@ module Skylab::System
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
 
           if d < len
             x = a.fetch d
@@ -182,8 +182,8 @@ module Skylab::System
 
             x_p.call :info, :file_utils_message do
 
-              _ev = Callback_::Event.wrap.file_utils_message msg
-              _ev or Callback_::Event.inline_neutral_with( :fu_msg, :msg, msg )
+              _ev = Common_::Event.wrap.file_utils_message msg
+              _ev or Common_::Event.inline_neutral_with( :fu_msg, :msg, msg )
             end
             NIL_
           end.mv src, dst, * h

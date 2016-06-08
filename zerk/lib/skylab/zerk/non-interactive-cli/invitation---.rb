@@ -12,7 +12,7 @@ module Skylab::Zerk
         @method_name = :express_commonly
 
         if x_a.length.nonzero?
-          @_st = Callback_::Polymorphic_Stream.via_array x_a
+          @_st = Common_::Polymorphic_Stream.via_array x_a
           begin
             send @_st.gets_one
           end until @_st.no_unparsed_exists
@@ -39,11 +39,11 @@ module Skylab::Zerk
           use_x = " for more about #{ sym }s"  # meh
         end
 
-        @_for_what_kn = Callback_::Known_Known[ use_x ] ; nil
+        @_for_what_kn = Common_::Known_Known[ use_x ] ; nil
       end
 
       def for_more
-        @_for_what_kn = Callback_::Known_Known[ " for more." ] ; nil
+        @_for_what_kn = Common_::Known_Known[ " for more." ] ; nil
       end
 
     public

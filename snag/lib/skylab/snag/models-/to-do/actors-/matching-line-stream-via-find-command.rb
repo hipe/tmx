@@ -46,7 +46,7 @@ module Skylab::Snag
         p[]
       end
 
-      Callback_.stream do
+      Common_.stream do
         p[]
       end
     end

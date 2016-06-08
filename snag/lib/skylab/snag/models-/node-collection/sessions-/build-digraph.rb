@@ -174,7 +174,7 @@ module Skylab::Snag
         _send_info_string "none of the #{ @_total_count }#{
           } nodes in the collection are doc nodes."
 
-        Callback_::Scn.the_empty_stream
+        Common_::Scn.the_empty_stream
       end
 
       def _send_info_string  s
@@ -190,7 +190,7 @@ module Skylab::Snag
 
         @_p = @_advance  = method :__advance
 
-        Callback_.stream do
+        Common_.stream do
           @_p[]
         end
       end
@@ -245,9 +245,9 @@ module Skylab::Snag
 
       def __build_doc_child_node_stream
 
-        st = Callback_::Stream.via_nonsparse_array @_d_a
+        st = Common_::Stream.via_nonsparse_array @_d_a
 
-        Callback_.stream do
+        Common_.stream do
           begin
             d = st.gets
             d or break

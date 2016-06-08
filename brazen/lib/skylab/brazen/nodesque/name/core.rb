@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  Nodesque::Name = ::Class.new ::Class.new Callback_::Const_Name
+  Nodesque::Name = ::Class.new ::Class.new Common_::Const_Name
 
   class Nodesque::Name
 

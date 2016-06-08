@@ -65,7 +65,7 @@ module Skylab::Autonomous_Component_System
               fo
             end
           end
-          @consuming_formal_parameter_stream = Callback_.stream do
+          @consuming_formal_parameter_stream = Common_.stream do
             p[]
           end
           super st
@@ -93,7 +93,7 @@ module Skylab::Autonomous_Component_System
               end
             end
           end
-          @consuming_formal_parameter_stream = Callback_.stream do
+          @consuming_formal_parameter_stream = Common_.stream do
             p[]
           end
           super st

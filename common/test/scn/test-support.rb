@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Scn
+module Skylab::Common::TestSupport::Scn
 
-  ::Skylab::Callback::TestSupport[ self ]
+  ::Skylab::Common::TestSupport[ self ]
 
   include Constants
 

@@ -47,7 +47,7 @@ module Skylab::Zerk::TestSupport
         mutable_s.chomp!
         _s_a = mutable_s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))  # #open [#bm-002] (benchmarks)
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         _s_a.each do |s_|
           bx.add s_, s_
         end
@@ -68,7 +68,7 @@ module Skylab::Zerk::TestSupport
 
       def to_option_index
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         parse_line = Line_parser_for___[ bx ]
         st = to_line_stream
         st.gets  # skip header line
@@ -274,7 +274,7 @@ module Skylab::Zerk::TestSupport
 
       def __recurse
 
-        _st = Callback_::Stream.via_range( 1 ... @_a.length ) do |d|
+        _st = Common_::Stream.via_range( 1 ... @_a.length ) do |d|
           @_a.fetch d
         end
 
@@ -349,7 +349,7 @@ module Skylab::Zerk::TestSupport
           x
         end
 
-        Callback_::Stream.via_times @_a.length do |d|
+        Common_::Stream.via_times @_a.length do |d|
           cache_a[ d ] || cache[ d ]
         end
       end
@@ -852,8 +852,8 @@ module Skylab::Zerk::TestSupport
       #
       #   • this does not hold the test context, so all fails are hard..
       # -
-        bx = Callback_::Box.new
-        st = Callback_::Polymorphic_Stream.via_array lines
+        bx = Common_::Box.new
+        st = Common_::Polymorphic_Stream.via_array lines
 
         li = nil ; s = nil
 

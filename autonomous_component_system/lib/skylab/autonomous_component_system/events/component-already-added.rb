@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events::Component_Already_Added = Callback_::Event.prototype_with(  # [#007]:#C
+    Events::Component_Already_Added = Common_::Event.prototype_with(  # [#007]:#C
 
       :component_already_added,
 

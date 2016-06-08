@@ -67,7 +67,7 @@ module Skylab::System
         else
 
           if ! @do_ignore_case
-            @do_ignore_case = Callback_::Known_Known[ opts.is_ignorecase ]
+            @do_ignore_case = Common_::Known_Known[ opts.is_ignorecase ]
           end
 
           @_use_as_grep_extended_regexp = @ruby_regexp.source
@@ -81,7 +81,7 @@ module Skylab::System
         if p
           p.call :error, :regexp_option_not_supported do
 
-            Callback_::Event.inline_not_OK_with(
+            Common_::Event.inline_not_OK_with(
               :non_convertible_regexp_options,
               :option_symbols, i_a,
               :regexp, @ruby_regexp,
@@ -94,7 +94,7 @@ module Skylab::System
       def __resolve_regexp_via_egrep_string
 
         if ! @do_ignore_case
-          @do_ignore_case = Callback_::Known_Known[ false ]  # ..
+          @do_ignore_case = Common_::Known_Known[ false ]  # ..
         end
 
         s = @grep_extended_regexp_string
@@ -169,7 +169,7 @@ module Skylab::System
 
         _tokens = cmd.command_tokens ; cmd = nil
 
-        _Stream = Callback_::Stream
+        _Stream = Common_::Stream
         thread = nil
 
         _resource_releaser = _Stream::Resource_Releaser.new do
@@ -215,7 +215,7 @@ module Skylab::System
         p = @_any_oes_p
         if p
           p.call :error, :system_call_error do
-            Callback_::Event.inline_not_OK_with :system_call_error,
+            Common_::Event.inline_not_OK_with :system_call_error,
               :message, err_s, :error_category, :system_call_error
           end
         end

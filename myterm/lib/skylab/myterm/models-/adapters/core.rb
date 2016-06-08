@@ -59,7 +59,7 @@ module Skylab::MyTerm
             end
           end
         end
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       else
@@ -98,7 +98,7 @@ module Skylab::MyTerm
           x
         end
 
-        Callback_::Stream.via_nonsparse_array a
+        Common_::Stream.via_nonsparse_array a
       end
     end
 

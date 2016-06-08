@@ -149,7 +149,7 @@ module Skylab::TestSupport
             end
           end
 
-          _st = Callback_.stream do
+          _st = Common_.stream do
             p[]
           end
 
@@ -179,7 +179,7 @@ module Skylab::TestSupport
         def report_via_count d
 
           @on_event_selectively.call :info, :finished do
-            Callback_::Event.inline_with :finished,
+            Common_::Event.inline_with :finished,
                 :number_of_files, d,
                 :ok, ( d.nonzero? ? true : false ) do | y, o |
 
@@ -226,7 +226,7 @@ module Skylab::TestSupport
 
           def via_tree
             i_a = @tree.children.first.value_x.dup
-            const_sym = Callback_::Name.via_slug( @dir ).as_const
+            const_sym = Common_::Name.via_slug( @dir ).as_const
             i_a.push const_sym
             _lines = Self_::View_Controller__.new( i_a, @tmpl ).execute
             via_line_stream _lines
@@ -279,7 +279,7 @@ module Skylab::TestSupport
             else
 
               @on_event_selectively.call :info, :writing do
-                Callback_::Event.inline_neutral_with :writing,
+                Common_::Event.inline_neutral_with :writing,
                   :path, @desired_path
               end
 

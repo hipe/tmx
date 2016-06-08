@@ -13,7 +13,7 @@ module Skylab::Treemap::TestSupport
 
     def use sym
       :expect_event == sym or fail
-      Home_::Callback_.test_support::Expect_Event[ self ]
+      Home_::Common_.test_support::Expect_Event[ self ]
     end
   end
 

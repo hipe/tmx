@@ -41,7 +41,7 @@ module Skylab::System
           filesystem: nil,
         )
 
-        Callback_::Event.selective_builder_sender_receiver self
+        Common_::Event.selective_builder_sender_receiver self
 
         def initialize & oes_p
 
@@ -238,7 +238,7 @@ module Skylab::System
 
         Build_resource_not_found_event__ = -> start_path, file_pattern_x, num_dirs_looked do
 
-          Callback_::Event.inline_not_OK_with(
+          Common_::Event.inline_not_OK_with(
             :resource_not_found,
             :start_path, start_path,
             :file_pattern_x, file_pattern_x,

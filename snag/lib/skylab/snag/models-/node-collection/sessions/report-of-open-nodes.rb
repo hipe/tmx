@@ -23,7 +23,7 @@ module Skylab::Snag
 
         st.unparsed_exists and self._SANITY
 
-        Callback_::Bound_Call.via_receiver_and_method_name self, :execute
+        Common_::Bound_Call.via_receiver_and_method_name self, :execute
       end
 
       def execute
@@ -91,14 +91,14 @@ module Skylab::Snag
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
 
       class << self
         def name_function
-          @___nf ||= Callback_::Name.via_module( self )
+          @___nf ||= Common_::Name.via_module( self )
         end
       end  # >>
     end

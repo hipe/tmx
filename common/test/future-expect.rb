@@ -1,4 +1,4 @@
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   module Future_Expect  # READ [#065]:"future expect vs. expect event"
 
@@ -146,7 +146,7 @@ module Skylab::Callback::TestSupport
         end
       end
 
-      def mixed_for_description  # [ca]
+      def mixed_for_description  # [co]
         @_bx.a_
       end
     end

@@ -213,10 +213,10 @@ module Skylab::TanMan
 
       module IO_PROPERTIES__
 
-        define_singleton_method :output_stream, ( Callback_.memoize do  # hidden for now, for #feature [#037]
+        define_singleton_method :output_stream, ( Common_.memoize do  # hidden for now, for #feature [#037]
 
           self::Property.new do
-            @name = Callback_::Name.via_variegated_symbol :output_stream
+            @name = Common_::Name.via_variegated_symbol :output_stream
           end
         end )
       end
@@ -271,9 +271,9 @@ module Skylab::TanMan
 
           ok and begin
 
-            Callback_::Stream.via_times @direction_symbol_list.length do | d |
+            Common_::Stream.via_times @direction_symbol_list.length do | d |
 
-              Callback_::Pair.via_value_and_name(
+              Common_::Pair.via_value_and_name(
                 rest.fetch( d ),
                 @direction_symbol_list.fetch( d ) )
             end
@@ -408,7 +408,7 @@ module Skylab::TanMan
                 next
               end
 
-              yield Callback_::Qualified_Knownness.via_value_and_association( x, prp )
+              yield Common_::Qualified_Knownness.via_value_and_association( x, prp )
             end
           else
 
@@ -483,7 +483,7 @@ module Skylab::TanMan
 
         def __build_non_one_IO_event direction_sym, arg_a
 
-          Callback_::Event.inline_not_OK_with :non_one_IO,
+          Common_::Event.inline_not_OK_with :non_one_IO,
               :direction_i, direction_sym,
               :arg_a, arg_a,
               :formals, @formals do | y, o |
@@ -582,7 +582,7 @@ module Skylab::TanMan
           oes_p = @parent.oes_p_
 
           ws = kr.silo( :workspace ).workspace_via_qualified_knownness_box(
-            Callback_::Stream.via_nonsparse_array( @arglist ).
+            Common_::Stream.via_nonsparse_array( @arglist ).
               flush_to_box_keyed_to_method( :name_symbol ),
               & oes_p )
 
@@ -613,7 +613,7 @@ module Skylab::TanMan
 
         # frontier. this *is* a controller because it is coupled to the action.
 
-        include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+        include Common_::Event::Selective_Builder_Receiver_Sender_Methods
 
         def initialize act, bx, mc, k, & oes_p
 
@@ -646,7 +646,7 @@ module Skylab::TanMan
 
           maybe_send_event :info, :document_did_not_change do
 
-            Callback_::Event.inline_neutral_with(
+            Common_::Event.inline_neutral_with(
 
               :document_did_not_change
 

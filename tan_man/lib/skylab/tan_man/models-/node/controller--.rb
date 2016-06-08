@@ -52,7 +52,7 @@ module Skylab::TanMan
 
       end
 
-      Updated_Attributes___ = Callback_::Event.prototype_with :updated_attributes,
+      Updated_Attributes___ = Common_::Event.prototype_with :updated_attributes,
 
           :node_stmt, nil, :add_a, nil, :change_a, nil, :ok, true do | y, o |
 

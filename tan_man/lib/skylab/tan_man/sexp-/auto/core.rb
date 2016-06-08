@@ -44,7 +44,7 @@ module Skylab::TanMan
       _a = [
         :Sexp,
         :InstanceMethods,
-        Callback_::Name::Conversion_Functions::Constantize[ tree_cls.rule ] ]
+        Common_::Name::Conversion_Functions::Constantize[ tree_cls.rule ] ]
 
       im = _a.reduce(
         tree_cls.grammar.anchor_module

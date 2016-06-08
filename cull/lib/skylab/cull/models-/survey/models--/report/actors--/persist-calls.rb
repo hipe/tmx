@@ -6,7 +6,7 @@ module Skylab::Cull
 
       Actors__ = ::Module.new
 
-      class Actors__::Persist_calls < Callback_::Actor::Dyadic
+      class Actors__::Persist_calls < Common_::Actor::Dyadic
 
         # [#005] algorithm decribed in full
 
@@ -186,7 +186,7 @@ module Skylab::Cull
 
         include Simple_Selective_Sender_Methods_
 
-        NAME__ = Callback_::Name.via_variegated_symbol :function
+        NAME__ = Common_::Name.via_variegated_symbol :function
       end
     end
   end

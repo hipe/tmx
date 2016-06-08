@@ -79,7 +79,7 @@
                 (which is what `use` does, but we avoid the overhead..)
 
 
-[#016]       [ actor ]  (will move from [ca])
+[#016]       [ actor ]  (will move from [co])
 
 [#015]       track assimiliation targets "missing"
 

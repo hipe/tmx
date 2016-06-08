@@ -86,7 +86,7 @@ module Skylab::System
 
           elsif @_neither_is_OK
 
-            Callback_::KNOWN_UNKNOWN
+            Common_::KNOWN_UNKNOWN
           else
             maybe_emit_missing_required_properties_event_
           end
@@ -180,7 +180,7 @@ module Skylab::System
 
         if @_expected_ftype == @stat_.ftype
 
-          Callback_::Known_Known[ ACHIEVED_ ]
+          Common_::Known_Known[ ACHIEVED_ ]
         else
 
           maybe_send_event :error, :wrong_ftype do

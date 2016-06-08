@@ -1,4 +1,4 @@
-module Skylab::Callback::TestSupport::Autoloader
+module Skylab::Common::TestSupport::Autoloader
 
   module Const_Reduce::Fixtures::Tre_Skorlab
 

@@ -92,7 +92,7 @@ module Skylab::Basic
 
         def to_destructee_polymorphic_key_stream
 
-          Callback_::Stream.via_nonsparse_array( @ivars ).reduce_by do | k |
+          Common_::Stream.via_nonsparse_array( @ivars ).reduce_by do | k |
 
             @o.instance_variable_defined? k
 

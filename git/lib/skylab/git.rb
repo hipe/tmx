@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Git
 
@@ -6,11 +6,11 @@ module Skylab::Git
     y << "assorted novelties for manipulating reository content (versioned or not)"
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
 
@@ -40,7 +40,7 @@ module Skylab::Git
       end
     end
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Home_.lib_.brazen::Kernel.new Home_
     end )
   end  # >>
@@ -58,7 +58,7 @@ module Skylab::Git
     end
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
   end  # >>

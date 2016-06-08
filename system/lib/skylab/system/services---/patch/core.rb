@@ -210,7 +210,7 @@ module Skylab::System
 
         def __build_nonzero_event d, s_a
 
-          Callback_::Event.inline_not_OK_with(
+          Common_::Event.inline_not_OK_with(
 
             :nonzero_exitstatus,
             :exitstatus, d,
@@ -281,7 +281,7 @@ module Skylab::System
           Home_.lib_.shellwords.shellescape s
         end
 
-        Process_Line_ = Callback_::Event.message_class_maker.new :ok, nil do | line |
+        Process_Line_ = Common_::Event.message_class_maker.new :ok, nil do | line |
           line
         end
       end

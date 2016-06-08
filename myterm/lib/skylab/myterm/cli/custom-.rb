@@ -7,7 +7,7 @@ module Skylab::MyTerm
       # the non-interactive CLI client requires work to accomodate
       # our custom syntax for setting the adapter.
 
-      class Compound_usage_strings < Callback_::Actor::Dyadic
+      class Compound_usage_strings < Common_::Actor::Dyadic
 
         # ("sa" = "syntax assembly")
 
@@ -47,7 +47,7 @@ module Skylab::MyTerm
         end
       end
 
-      class Operation_usage_string < Callback_::Actor::Monadic
+      class Operation_usage_string < Common_::Actor::Monadic
 
         def initialize sa
           @_sa = sa
@@ -113,7 +113,7 @@ module Skylab::MyTerm
 
       # ==
 
-      class Invite < Callback_::Actor::Monadic
+      class Invite < Common_::Actor::Monadic
 
         # the same logic as the common invite line, plus one element
 
@@ -267,7 +267,7 @@ module Skylab::MyTerm
         end
 
         def to_non_root_frame_stream
-          Callback_::Stream.via_nonsparse_array @__non_root_frame_array
+          Common_::Stream.via_nonsparse_array @__non_root_frame_array
         end
 
         def word_for_option_selecting_selected_adapter

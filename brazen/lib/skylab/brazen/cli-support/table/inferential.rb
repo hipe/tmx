@@ -27,7 +27,7 @@ module Skylab::Brazen
     # to your call to render (or you can manipualte it directly in
     # the block).
 
-    Callback_[ self, :employ_DSL_for_digraph_emitter ]
+    Common_[ self, :employ_DSL_for_digraph_emitter ]
 
     listeners_digraph  row: :text,  # (contrast with `textual`, `on_text` reads better)
          info: :text,  # (:info is strictly a branch not a leaf)
@@ -35,7 +35,7 @@ module Skylab::Brazen
     row_count: :datapoint
 
     def initialize
-      @field_box = Callback_::Box.new
+      @field_box = Common_::Box.new
       @head = @separator = @tail = nil
     end
 
@@ -215,7 +215,7 @@ module Skylab::Brazen
 
     def ancestor_names_recursive
       @ancestor_names_recursive ||= begin
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         _ancestor_names_recursive bx
         bx.get_names
       end

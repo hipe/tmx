@@ -94,7 +94,7 @@ module Skylab::GitViz
 
             a = []
             begin_d = @first
-            st = Callback_::Stream.via_range( 1 .. @number_of_categories )
+            st = Common_::Stream.via_range( 1 .. @number_of_categories )
             start_d = @first
 
             begin

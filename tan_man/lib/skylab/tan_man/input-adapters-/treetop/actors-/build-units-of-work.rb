@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    class Actors_::Build_units_of_work < Callback_::Actor::Dyadic
+    class Actors_::Build_units_of_work < Common_::Actor::Dyadic
 
       # build the array of units of work, necessarily in one batch so we
       # memoize the existential state of the various dirs involved, only
@@ -17,7 +17,7 @@ module Skylab::TanMan
         @on_event_selectively = p
       end
 
-      Callback_::Event.selective_builder_sender_receiver self
+      Common_::Event.selective_builder_sender_receiver self
 
       def execute
 

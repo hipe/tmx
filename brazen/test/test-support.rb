@@ -78,14 +78,14 @@ module Skylab::Brazen::TestSupport
     end
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   module TestLib_
 
     Expect_event = -> test_context_cls do
-      Callback_.test_support::Expect_Event[ test_context_cls ]
+      Common_.test_support::Expect_Event[ test_context_cls ]
     end
 
     Fileutils = Lazy_.call do
@@ -121,7 +121,7 @@ module Skylab::Brazen::TestSupport
     ok = nil
     x = new do
       ok = process_polymorphic_stream_fully(
-        Callback_::Polymorphic_Stream.via_array x_a )
+        Common_::Polymorphic_Stream.via_array x_a )
     end
     ok && x
   end
@@ -144,9 +144,9 @@ module Skylab::Brazen::TestSupport
       end
 
       if had
-        Callback_::Known_Known[ x ]
+        Common_::Known_Known[ x ]
       else
-        Callback_::KNOWN_UNKNOWN
+        Common_::KNOWN_UNKNOWN
       end
     end
 
@@ -164,7 +164,7 @@ module Skylab::Brazen::TestSupport
 
     private def process_and_normalize_for_test_ * x_a
 
-      _st = Callback_::Polymorphic_Stream.via_array x_a
+      _st = Common_::Polymorphic_Stream.via_array x_a
       _ok = process_polymorphic_stream_fully _st
       _ok && normalize
     end
@@ -172,15 +172,15 @@ module Skylab::Brazen::TestSupport
     def process_fully_for_test_ * x_a
 
       process_polymorphic_stream_fully(
-        Callback_::Polymorphic_Stream.via_array x_a )
+        Common_::Polymorphic_Stream.via_array x_a )
     end
   end
 
   module Fixtures
-    Callback_::Autoloader[ self ]  # don't load fixture file when autoloading lib
+    Common_::Autoloader[ self ]  # don't load fixture file when autoloading lib
   end
 
-  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   Home_ = ::Skylab::Brazen
 

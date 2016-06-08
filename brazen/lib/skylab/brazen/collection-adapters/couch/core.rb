@@ -26,7 +26,7 @@ module Skylab::Brazen
 
         else
           oes_p.call :error, :invalid_property_value do
-            Callback_::Event.inline_not_OK_with(
+            Common_::Event.inline_not_OK_with(
               :name_must_be_lowercase_alphanumeric_with_dashes,
                 :name_s, qkn.value_x )
           end
@@ -64,7 +64,7 @@ module Skylab::Brazen
             qkn.to_knownness
           else
             oes_p.call :error, :invalid_property_value do
-              Callback_::Event.inline_not_OK_with(
+              Common_::Event.inline_not_OK_with(
                 :port_must_be_one_to_four_digits, :port_s, x )
             end
           end

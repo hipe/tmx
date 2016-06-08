@@ -18,7 +18,7 @@ module Skylab::Autonomous_Component_System
 
         _oes_p = oes_p_p[ nil ]  # there is no entity to link up with
 
-        _kn = Callback_::Known_Known[ arg_st.gets_one ]
+        _kn = Common_::Known_Known[ arg_st.gets_one ]
 
         _x = n11n.normalize_knownness _kn do | * i_a, & ev_p |
 

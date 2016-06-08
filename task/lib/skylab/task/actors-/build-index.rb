@@ -91,7 +91,7 @@ class Skylab::Task
 
       def initialize tsk, & p
 
-        @cache_box = Callback_::Box.new
+        @cache_box = Common_::Box.new
         @cache_box.add tsk.name_symbol, tsk
 
         @box_module = Home_.lib_.basic::Module.
@@ -101,7 +101,7 @@ class Skylab::Task
 
         @dependants_on = ::Hash.new { |h, k| h[k] = [] }
 
-        @_dependees_of_box = Callback_::Box.new
+        @_dependees_of_box = Common_::Box.new
       end
 
       def add_subscription dependant_sym, dependee_sym

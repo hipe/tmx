@@ -20,7 +20,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
   TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
@@ -85,7 +85,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _path = TestSupport_::Fixtures.file :three_lines
 
-      Callback_::Stream.via_item _path
+      Common_::Stream.via_item _path
     end
 
     def common_haystack_directory_
@@ -148,7 +148,7 @@ module Skylab::SearchAndReplace::TestSupport
     def match_controller_stream_for_ es
 
       curr = es
-      Callback_.stream do
+      Common_.stream do
         curr = curr.next_match_controller
         curr
       end
@@ -163,7 +163,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     # -- hook-ins/outs
 
-    # ~ [ca] "expect event"
+    # ~ [co] "expect event"
 
     def subject_API
       Home_::API
@@ -232,7 +232,7 @@ module Skylab::SearchAndReplace::TestSupport
   end
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Zerk_Help_Screens = -> tcc do
@@ -242,11 +242,11 @@ module Skylab::SearchAndReplace::TestSupport
 
   # --
 
-  Require_zerk__ = Callback_::Lazy.call do
+  Require_zerk__ = Common_::Lazy.call do
     Zerk_ = Home_.lib_.zerk ; nil
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   Home_ = ::Skylab::SearchAndReplace

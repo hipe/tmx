@@ -195,7 +195,7 @@ module Skylab::Snag
       end
     end
 
-    Directory_as_collection_class___ = Callback_.memoize do
+    Directory_as_collection_class___ = Common_.memoize do
 
       class D_as_C____ < Home_.lib_.system_lib::Filesystem::Directory::As::Collection
 
@@ -207,7 +207,7 @@ module Skylab::Snag
 
         nf = nil
         define_method :model_name do
-          nf ||= Callback_::Name.via_human 'persisted criteria collection'
+          nf ||= Common_::Name.via_human 'persisted criteria collection'
         end
 
         # -- Components
@@ -262,7 +262,7 @@ module Skylab::Snag
         private :new
       end  # >>
 
-      Properties___ =  Callback_.memoize do  # a sketch for front client integ.
+      Properties___ =  Common_.memoize do  # a sketch for front client integ.
         [
           Home_.lib_.fields::SimplifiedName.new( :name )
         ].freeze

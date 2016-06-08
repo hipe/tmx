@@ -11,7 +11,7 @@ module Skylab::Brazen
       def initialize ada_cls
 
         @_ada_cls = ada_cls
-        @name_function = Callback_::Name.via_module ada_cls
+        @name_function = Common_::Name.via_module ada_cls
       end
 
       attr_reader :name_function

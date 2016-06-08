@@ -23,11 +23,11 @@ module Skylab::System::TestSupport
 
         lib::Subject[].enhance_client_class self
 
-        define_method :cache_hash_for_stubbed_system, ( Callback_.memoize do
+        define_method :cache_hash_for_stubbed_system, ( Common_.memoize do
           {}
         end )
 
-        define_method :manifest_path_for_stubbed_system, ( Callback_.memoize do
+        define_method :manifest_path_for_stubbed_system, ( Common_.memoize do
 
           lib::Fixture_path_for[ 'ogdl-commands-5.ogdl' ]
 

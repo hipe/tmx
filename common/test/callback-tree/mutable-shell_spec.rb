@@ -1,15 +1,15 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Tree
+module Skylab::Common::TestSupport::CallbackTree
 
-  describe "[ca] tree - mutable shell" do
+  describe "[co] callback tree - mutable shell" do
 
     context "one" do
 
       before :all do
 
         class Wap_Zazzle
-          Home_::Tree::Host[ self ]
+          Home_::CallbackTree::Host[ self ]
           spec = build_mutable_callback_tree_specification
           spec.default_pattern :callback
           spec << :wiff

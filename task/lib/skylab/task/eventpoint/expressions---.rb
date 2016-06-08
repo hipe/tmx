@@ -76,7 +76,7 @@ class Skylab::Task
 
         Had_no_effect = o[ -> ep_a do
 
-          _ = Callback_::Oxford_or[ ep_a.map( & The_state_ ) ]
+          _ = Common_::Oxford_or[ ep_a.map( & The_state_ ) ]
 
           "will have no effect because the system does not reach #{ _ }"
         end ]
@@ -102,7 +102,7 @@ class Skylab::Task
           a = fep.to_a
           x = if a
 
-            _ = Callback_::Oxford_and[ a.map( & :node_symbol ) ]
+            _ = Common_::Oxford_and[ a.map( & :node_symbol ) ]
 
             " (#{ Ep__[ fep ] } goes to #{ _ })"
               else

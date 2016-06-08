@@ -229,7 +229,7 @@ module Skylab::Snag
 
           @on_event_selectively.call :error, :parse_error, :ambiguity do
 
-            Callback_::Event.inline_not_OK_with :ambiguous,
+            Common_::Event.inline_not_OK_with :ambiguous,
                 :x, @sym,
                 :symbol, sym,
                 :error_category, :argument_error do | y, o |

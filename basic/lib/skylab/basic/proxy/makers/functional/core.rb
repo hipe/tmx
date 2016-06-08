@@ -60,7 +60,7 @@ module Skylab::Basic
 
         def resolve_box
           resolve_members
-          @box = Callback_::Box.new
+          @box = Common_::Box.new
           @member_i_a.each do |i|
             @box.add i, i
           end
@@ -89,7 +89,7 @@ module Skylab::Basic
 
       CONST_ = :FUNCTIONAL_PROXY_PROPERTY_BOX__
 
-      const_set CONST_, Callback_::Box.the_empty_box
+      const_set CONST_, Common_::Box.the_empty_box
 
       def initialize * x_a
         @__proxy_kernel__ = Kernel_.new __functional_proxy_property_box__
@@ -132,9 +132,9 @@ module Skylab::Basic
 
         def __init_pair_stream_via_arglist p_a
 
-          @_pair_stream = Callback_::Stream.via_times p_a.length do | d |
+          @_pair_stream = Common_::Stream.via_times p_a.length do | d |
 
-            Callback_::Pair.via_value_and_name(
+            Common_::Pair.via_value_and_name(
               p_a.fetch( d ),
               @box.at_position( d ) )
           end

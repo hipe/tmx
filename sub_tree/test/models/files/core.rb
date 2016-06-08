@@ -34,7 +34,7 @@ module Skylab::SubTree::TestSupport
       Expag_for_tests[]
     end
 
-    Expag_for_tests = Callback_::Lazy.call do
+    Expag_for_tests = Common_::Lazy.call do
 
       expag = Home_::CLI::Expression_Agent.new :_dummy_reflection_
 

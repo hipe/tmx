@@ -22,7 +22,7 @@ module Skylab::Basic
       fly = Name_and_Module___.new
       mod = @_mod
 
-      Callback_::Stream.via_nonsparse_array( mod.constants ) do | const |
+      Common_::Stream.via_nonsparse_array( mod.constants ) do | const |
         fly.reinitialize mod.const_get( const, false )
         fly
       end
@@ -40,7 +40,7 @@ module Skylab::Basic
 
       def reinitialize mod
         @module = mod
-        @name = Callback_::Name.via_module mod
+        @name = Common_::Name.via_module mod
         NIL_
       end
 

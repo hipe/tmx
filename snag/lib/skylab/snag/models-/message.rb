@@ -6,13 +6,13 @@ module Skylab::Snag
 
       def normalize_value__ x, & x_p  # valid values are true-ish
 
-        _qkn_ = Callback_::Qualified_Knownness.via_value_and_symbol( x, :arg )
+        _qkn_ = Common_::Qualified_Knownness.via_value_and_symbol( x, :arg )
         qkn_ = N11n_instance___[].normalize_qualified_knownness _qkn_, & x_p
         qkn_ and qkn_.value_x
       end
     end  # >>
 
-    N11n_instance___ = Callback_.memoize do
+    N11n_instance___ = Common_.memoize do
 
         # we build this policy here but it could be anywhere. we memoize
         # a singleton "formal set" here but in the future this might be
@@ -144,7 +144,7 @@ module Skylab::Snag
 
         oes_p.call :error, :uninterpretable, term_chan_sym do
 
-          Callback_::Event.inline_not_OK_with(
+          Common_::Event.inline_not_OK_with(
 
             term_chan_sym,
             :x, arg.value_x,

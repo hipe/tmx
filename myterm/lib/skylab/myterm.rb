@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::MyTerm
 
@@ -45,7 +45,7 @@ module Skylab::MyTerm
 
     def lib_
 
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
   end  # >>
@@ -91,9 +91,9 @@ module Skylab::MyTerm
     end
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Models_
 
@@ -118,7 +118,7 @@ module Skylab::MyTerm
 
   # -- Simple functionesques
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   Common_fuzzy_retrieve_ = -> do
     Home_.lib_.brazen::Collection::Common_fuzzy_retrieve
@@ -158,7 +158,7 @@ module Skylab::MyTerm
     Zerk = sidesys[ :Zerk ]
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   EMPTY_S_ = ''

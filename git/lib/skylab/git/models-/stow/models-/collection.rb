@@ -119,7 +119,7 @@ module Skylab::Git
 
       nf = nil
       define_method :name do
-        nf ||= Callback_::Name.via_variegated_symbol :stows_collection
+        nf ||= Common_::Name.via_variegated_symbol :stows_collection
       end
     end
   end

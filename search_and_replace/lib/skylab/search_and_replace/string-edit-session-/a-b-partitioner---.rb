@@ -11,7 +11,7 @@ module Skylab::SearchAndReplace
 
         def execute
           @_state = :__any_first_chunk
-          Callback_.stream do
+          Common_.stream do
             send @_state
           end
         end

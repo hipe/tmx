@@ -121,7 +121,7 @@ module Skylab::System
             :filesystem,
           )
 
-          Callback_::Event.selective_builder_sender_receiver self
+          Common_::Event.selective_builder_sender_receiver self
 
           def initialize
             @abbrev = nil
@@ -233,7 +233,7 @@ module Skylab::System
             if @abbrev
               @filename = @abbrev
             else
-              @filename = Callback_::Name::Conversion_Functions::Pathify[
+              @filename = Common_::Name::Conversion_Functions::Pathify[
                 @const_a.last ]
             end
             via_filename_validate

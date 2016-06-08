@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::CodeMetrics
 
@@ -38,7 +38,7 @@ module Skylab::CodeMetrics
     end
 
     def lib_
-      @___lib ||= Callback_.
+      @___lib ||= Common_.
         produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
@@ -47,10 +47,10 @@ module Skylab::CodeMetrics
     Home_.lib_.basic::Tree::Totaller
   end
 
-  Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
 
-  Require_brazen_ = Callback_::Lazy.call do  # called only 2x
+  Require_brazen_ = Common_::Lazy.call do  # called only 2x
     Brazen_ = Home_.lib_.brazen ; NIL_
   end
 
@@ -93,7 +93,7 @@ module Skylab::CodeMetrics
       end
     end
 
-    String_scanner = Callback_::Lazy.call do
+    String_scanner = Common_::Lazy.call do
       require 'strscan'
       ::StringScanner
     end
@@ -121,5 +121,5 @@ module Skylab::CodeMetrics
   SPACE_ = ' '.freeze
   UNABLE_ = false
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 end

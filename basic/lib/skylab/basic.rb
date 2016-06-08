@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Basic  # introduction at [#020]
 
@@ -26,7 +26,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
 
@@ -35,9 +35,9 @@ module Skylab::Basic  # introduction at [#020]
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Default_property_instance__ = Callback_.memoize do
+  Default_property_instance__ = Common_.memoize do
     Minimal_Property.via_variegated_symbol :argument
   end
 
@@ -77,7 +77,7 @@ module Skylab::Basic  # introduction at [#020]
     def sparse_array= a
 
       _nonsparse_array = a.select( & IDENTITY_ ).to_a
-      @stream = Callback_::Stream.via_nonsparse_array _nonsparse_array
+      @stream = Common_::Stream.via_nonsparse_array _nonsparse_array
       a
     end
 
@@ -127,7 +127,7 @@ module Skylab::Basic  # introduction at [#020]
     class << self
 
       def via_variegated_symbol i
-        new Callback_::Name.via_variegated_symbol i
+        new Common_::Name.via_variegated_symbol i
       end
 
       alias_method :via_name_function, :new
@@ -150,7 +150,7 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
-  Normalizers_instance__ = Callback_.memoize do
+  Normalizers_instance__ = Common_.memoize do
 
     class Normalizers__
 
@@ -161,7 +161,7 @@ module Skylab::Basic  # introduction at [#020]
       end
 
       _MEMBERS.each do |i|
-        _CONST = Callback_::Name.via_variegated_symbol( i ).as_const
+        _CONST = Common_::Name.via_variegated_symbol( i ).as_const
         define_method i do | * a |
           if a.length.zero?
             Home_.const_get( _CONST, false ).normalization
@@ -199,7 +199,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def build_not_OK_event_via_mutable_iambic_and_message_proc x_a, msg_p
-      Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+      Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
     end
   end
 
@@ -211,7 +211,7 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   Assume_ACS_ = Lazy_.call do
     ACS_ = ::Skylab::Autonomous_Component_System
@@ -225,7 +225,7 @@ module Skylab::Basic  # introduction at [#020]
   ACHIEVED_ = true
   CLI = nil  # for host
   CONST_SEP_ = '::'.freeze
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
   Home_ = self
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
@@ -242,5 +242,5 @@ module Skylab::Basic  # introduction at [#020]
   SPACE_ = ' '.freeze
   UNABLE_ = false
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 end

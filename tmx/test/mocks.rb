@@ -20,7 +20,7 @@ module Skylab::TMX::TestSupport
       end
 
       def name_function
-        @__nf ||= Callback_::Name.via_variegated_symbol @sym
+        @__nf ||= Common_::Name.via_variegated_symbol @sym
       end
 
       def is_branch
@@ -35,7 +35,7 @@ module Skylab::TMX::TestSupport
 
         mod = const_get :Models_, false
         _const_a = mod.constants
-        _st = Callback_::Stream.via_nonsparse_array _const_a do | const |
+        _st = Common_::Stream.via_nonsparse_array _const_a do | const |
 
           mod.const_get const, false
         end
@@ -45,7 +45,7 @@ module Skylab::TMX::TestSupport
           mod_ = mdl.const_get :Actions, false
           _const_a_ = mod_.constants
 
-          Callback_::Stream.via_nonsparse_array _const_a_ do | const |
+          Common_::Stream.via_nonsparse_array _const_a_ do | const |
 
             mod_.const_get const, false
           end

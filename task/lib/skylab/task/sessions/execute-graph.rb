@@ -60,7 +60,7 @@ class Skylab::Task
       cache = @_plan.cache
       queue = @_plan.queue
 
-      st = Callback_::Stream.via_times queue.length do |d|
+      st = Common_::Stream.via_times queue.length do |d|
         cache.fetch queue.fetch d
       end
 
@@ -84,7 +84,7 @@ class Skylab::Task
       queue, subscribers, cache = plan.to_a
 
       ok = ACHIEVED_
-      st = Callback_::Stream.via_nonsparse_array queue
+      st = Common_::Stream.via_nonsparse_array queue
       begin
         sym = st.gets
         sym or break

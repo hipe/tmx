@@ -106,7 +106,7 @@ module Skylab::GitViz
 
             row = ::Array.new @order_box_length
 
-            st = Callback_::Stream.via_nonsparse_array trail.filechanges
+            st = Common_::Stream.via_nonsparse_array trail.filechanges
 
             bundle_filechange = st.gets
 

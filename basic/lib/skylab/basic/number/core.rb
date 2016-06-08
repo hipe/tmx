@@ -44,7 +44,7 @@ module Skylab::Basic
       end
     end
 
-    Require_component_support___ = Callback_.memoize do
+    Require_component_support___ = Common_.memoize do
 
       Assume_ACS_[]
 

@@ -28,7 +28,7 @@ module Skylab::TanMan
 
         bx = to_qualified_knownness_box__
 
-        bx.add :stdout, Callback_::Qualified_Knownness.
+        bx.add :stdout, Common_::Qualified_Knownness.
           via_value_and_symbol( stdout_, :stdout )
 
         bc = @kernel.silo( :hear_front ).__bound_call_via_qualified_knownness_box(
@@ -54,7 +54,7 @@ module Skylab::TanMan
 
         @k = k
 
-        _st = Callback_::Stream.ordered __to_definition_stream
+        _st = Common_::Stream.ordered __to_definition_stream
 
         @definition_collection =
           _st.flush_to_immutable_with_random_access_keyed_to_method(
@@ -90,7 +90,7 @@ module Skylab::TanMan
 
           bx = Home_::Models_.const_get( nm.as_const, false ).const_get( :Hear_Map, false )::Definitions
 
-          Callback_::Stream.via_nonsparse_array bx.constants do | const |
+          Common_::Stream.via_nonsparse_array bx.constants do | const |
 
             Definition__.new(
               bx.const_get( const, false ),
@@ -105,7 +105,7 @@ module Skylab::TanMan
 
       def __to_name_of_module_that_has_hear_map_stream
 
-        Callback_::Stream.via_nonsparse_array(
+        Common_::Stream.via_nonsparse_array(
 
           ::Dir[ "#{ Models_.dir_pathname }/*/hear-map#{ Autoloader_::EXTNAME }" ]
 
@@ -113,7 +113,7 @@ module Skylab::TanMan
 
         ) do | path |
 
-          Callback_::Name.via_slug( ::File.basename ::File.dirname path )
+          Common_::Name.via_slug( ::File.basename ::File.dirname path )
         end
       end
 
@@ -125,7 +125,7 @@ module Skylab::TanMan
             x.parse_function
           end.to_a
 
-          Callback_::Event.inline_not_OK_with :unrecognized_utterance,
+          Common_::Event.inline_not_OK_with :unrecognized_utterance,
               :words, words,
               :parse_functions, _f_a do | y, o |
 
@@ -148,7 +148,7 @@ module Skylab::TanMan
         @external_definition = cls.new
 
         @name_value_for_order = [ nm.as_lowercase_with_underscores_symbol,
-          Callback_::Name.via_const_symbol( const ).as_lowercase_with_underscores_symbol ]
+          Common_::Name.via_const_symbol( const ).as_lowercase_with_underscores_symbol ]
 
         @parse_function = Home_.lib_.parse_lib.function_via_definition_array(
           @external_definition.definition )

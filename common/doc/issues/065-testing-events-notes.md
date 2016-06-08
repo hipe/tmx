@@ -53,7 +53,7 @@ we assume that under typical oldschool usage the system-under-test API (or
 similar) was called with the event handler proc that came from the event
 log; ergo we assume that the event log ivar is initialized.
 
-using just `gets` allows the client to swap-in an ordinary [ca]
+using just `gets` allows the client to swap-in an ordinary [co]
 stream for the event log for more modern usage (experimentally).
 
 

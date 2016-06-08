@@ -48,7 +48,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         _path = ::File.join(
           DocTest_.dir_pathname.to_path,
-          Callback_::Autoloader.default_core_file )
+          Common_::Autoloader.default_core_file )
 
         call_API_against_path _path
 
@@ -66,7 +66,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       it "neutral event talkin bout current output path (none)" do
 
-        @event_log = Callback_::Stream.via_nonsparse_array _state.emission_array
+        @event_log = Common_::Stream.via_nonsparse_array _state.emission_array
 
         expect_neutral_event :current_output_path do | we |
           we.to_event.path and fail

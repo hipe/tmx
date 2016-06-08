@@ -37,7 +37,7 @@ module Skylab::Fields::TestSupport
           it "using box instead of the default ivar-based store" do
 
             o = _common_begin
-            bx = Callback_::Box.new
+            bx = Common_::Box.new
             bx.add :_strange_, :_no_see_
             bx.add :soc, false  # not nil, i.e is provided
             o.box_store = bx

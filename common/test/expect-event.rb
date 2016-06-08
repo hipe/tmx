@@ -1,4 +1,4 @@
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   module Expect_Event  # :[#065].
 
@@ -194,7 +194,7 @@ module Skylab::Callback::TestSupport
 
     # --
 
-    Callback_ = Home_  # b.c we keep forgetting ..
+    Common_ = Home_  # b.c we keep forgetting ..
 
     module Test_Context_Instance_Methods
 
@@ -448,7 +448,7 @@ module Skylab::Callback::TestSupport
         _expev_lower_level_expression_agent
       end
 
-      lazy = Callback_::Lazy
+      lazy = Common_::Lazy
 
       define_method :__expev_upper_level_expression_agent, -> do
 
@@ -606,7 +606,7 @@ module Skylab::Callback::TestSupport
         NIL_
       end
 
-      Require_basic__ = Callback_::Lazy.call do
+      Require_basic__ = Common_::Lazy.call do
         Basic_ = Home_.lib_.basic
         NIL_
       end
@@ -897,7 +897,7 @@ module Skylab::Callback::TestSupport
 
         @_flush_to_scanner = -> do
           close_options_and_readers[]
-          Callback_::Polymorphic_Stream.via_array a
+          Common_::Polymorphic_Stream.via_array a
         end
 
         @_flush_to_array = -> do
@@ -910,7 +910,7 @@ module Skylab::Callback::TestSupport
           # this ivar could be made to be immutable **but it is NOT currently**
 
           close_options_and_readers[]
-          @_gets_x = Callback_::Stream.via_nonsparse_array a
+          @_gets_x = Common_::Stream.via_nonsparse_array a
           @_gets_x.call
         end
       end
@@ -1131,7 +1131,7 @@ module Skylab::Callback::TestSupport
       Trilean_string_via_value___[].fetch x
     end
 
-    Trilean_string_via_value___ = Callback_::Lazy.call do
+    Trilean_string_via_value___ = Common_::Lazy.call do
       {
         nil => "neutral",
         false => "negative",

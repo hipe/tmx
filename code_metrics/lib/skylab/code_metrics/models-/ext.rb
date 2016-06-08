@@ -29,7 +29,7 @@ module Skylab::CodeMetrics
         _ok && __totaller_via_extension_count_box
       end
 
-      Totaller_class___ = Callback_.memoize do
+      Totaller_class___ = Common_.memoize do
         Totaller____ = Totaller_[].new
       end
 
@@ -43,7 +43,7 @@ module Skylab::CodeMetrics
 
         sp = remove_instance_variable :@_specials
         bx = remove_instance_variable :@_extension_box
-        bx_ = Callback_::Box.new
+        bx_ = Common_::Box.new
 
         bx.each_pair do |ext, d|
           bx_.touch_array_and_push d, Extension___.new( ext )
@@ -115,7 +115,7 @@ module Skylab::CodeMetrics
 
       def __via_file_stream_resolve_extension_count_box
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         specials = nil
 
         @_file_stream.each do | file |
@@ -128,7 +128,7 @@ module Skylab::CodeMetrics
             bn = ::File.basename file
             if DOT_BYTE___ == bn.getbyte( 0 )
 
-              specials ||= Callback_::Box.new
+              specials ||= Common_::Box.new
               specials.touch :dotfiles do
                 0
               end

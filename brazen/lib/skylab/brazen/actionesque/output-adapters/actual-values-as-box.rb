@@ -15,7 +15,7 @@ module Skylab::Brazen
         def any_trueish k
           x = @argument_box[ k ]
           x and begin
-            Callback_::Qualified_Knownness.via_value_and_association x, @fo.fetch( k )
+            Common_::Qualified_Knownness.via_value_and_association x, @fo.fetch( k )
           end
         end
 
@@ -40,7 +40,7 @@ module Skylab::Brazen
             end
 
             if had_f || had_x
-              Callback_::Qualified_Knownness.via_value_and_had_and_association x, had_x, f
+              Common_::Qualified_Knownness.via_value_and_had_and_association x, had_x, f
             elsif p
               p[]
             else
@@ -55,10 +55,10 @@ module Skylab::Brazen
           fo = @fo
           h = @argument_box.h_
 
-          Callback_::Stream.via_times a.length do | d |
+          Common_::Stream.via_times a.length do | d |
 
             k = a.fetch d
-            Callback_::Qualified_Knownness.via_value_and_association(
+            Common_::Qualified_Knownness.via_value_and_association(
               h.fetch( k ), fo.fetch( k ) )
           end
         end

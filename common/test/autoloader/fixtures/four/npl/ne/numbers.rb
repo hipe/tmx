@@ -1,3 +1,3 @@
-module Skylab::Callback::TestSupport::Autoloader::Fixtures::Four::NPL::NE
+module Skylab::Common::TestSupport::Autoloader::Fixtures::Four::NPL::NE
   Numbers = ::Class.new
 end

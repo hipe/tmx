@@ -6,11 +6,11 @@ module Skylab::TanMan
     y << "manage your tangents visually"
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   class << self
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Brazen_::Kernel.new Home_
     end )
 
@@ -19,7 +19,7 @@ module Skylab::TanMan
     end
 
     def name_function
-      @nf ||= Callback_::Name.via_module self
+      @nf ||= Common_::Name.via_module self
     end
 
     def sidesystem_path_
@@ -27,7 +27,7 @@ module Skylab::TanMan
     end
   end  # >>
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Input_Adapters_
     Autoloader_[ self ]
@@ -37,7 +37,7 @@ module Skylab::TanMan
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   Brazen_ = ::Skylab::Brazen

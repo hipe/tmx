@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby -w
 
-require 'skylab/callback'
+require 'skylab/common'
 
-_x = Skylab::Callback::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
+_x = Skylab::Common::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
   invoke ARGV
 
 $stderr.puts "(exitstatus: #{ _x })"

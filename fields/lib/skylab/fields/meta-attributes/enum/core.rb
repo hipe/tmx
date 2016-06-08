@@ -9,7 +9,7 @@ module Skylab::Fields
       ary = build.sexp_stream_for_current_attribute.gets_one
 
       box = Lazy_.call do
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         ary.each do |x|
           bx.add x, nil
         end
@@ -29,7 +29,7 @@ module Skylab::Fields
             KEEP_PARSING_
           else
 
-            _qkn = Callback_::Qualified_Knownness.via_value_and_symbol x, :attribute_value
+            _qkn = Common_::Qualified_Knownness.via_value_and_symbol x, :attribute_value
 
             when_failed[ _qkn, bx, & oes_p ]
           end

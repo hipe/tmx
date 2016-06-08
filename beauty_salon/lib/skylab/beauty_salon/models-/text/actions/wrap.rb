@@ -328,7 +328,7 @@ module Skylab::BeautySalon
           end while nil
 
           if @ok
-            Callback_::Known_Known[ @union.prune ]
+            Common_::Known_Known[ @union.prune ]
           else
             UNABLE_
           end
@@ -355,7 +355,7 @@ module Skylab::BeautySalon
           @on_event_selectively.call :error, :invalid_property_value, :lines do
 
 
-            Callback_::Event.inline_not_OK_with :invalid_range,
+            Common_::Event.inline_not_OK_with :invalid_range,
                 :x, x, :exp_a, exp_a do | y, o |
 
               _excerpt = ellipsulate__ o.x
@@ -378,7 +378,7 @@ module Skylab::BeautySalon
 
             @on_event_selectively.call :error, :invalid_property_value, :lines do
 
-              Callback_::Event.inline_not_OK_with :invalid_lines_identifier, :s, s do | y, o |
+              Common_::Event.inline_not_OK_with :invalid_lines_identifier, :s, s do | y, o |
 
                 y << "can't understand lines because #{ o.s }"
               end

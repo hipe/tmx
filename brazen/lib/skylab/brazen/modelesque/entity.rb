@@ -342,7 +342,7 @@ module Skylab::Brazen
         private
 
           def name_symbol=
-            @name = Callback_::Name.via_variegated_symbol gets_one_polymorphic_value
+            @name = Common_::Name.via_variegated_symbol gets_one_polymorphic_value
             KEEP_PARSING_
           end
         end

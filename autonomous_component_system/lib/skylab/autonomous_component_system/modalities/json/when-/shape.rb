@@ -4,7 +4,7 @@ module Skylab::Autonomous_Component_System
 
     module Modalities::JSON::When_
 
-      Shape = Callback_::Event.prototype_with(
+      Shape = Common_::Event.prototype_with(
 
         :bad_shape,
         :x, nil,

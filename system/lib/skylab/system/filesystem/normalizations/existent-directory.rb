@@ -62,7 +62,7 @@ module Skylab::System
 
             maybe_send_event :error, :enoent do
 
-              Callback_::Event.wrap.exception @exception_, :path_hack
+              Common_::Event.wrap.exception @exception_, :path_hack
 
             end
           end
@@ -76,13 +76,13 @@ module Skylab::System
 
       def __via_strange_stat_error_build_event
 
-        _ev = Callback_::Event.wrap.exception @exception_, :path_hack
+        _ev = Common_::Event.wrap.exception @exception_, :path_hack
 
         i_a = _ev.to_iambic
 
         # (we used to add more members here, now we don't)
 
-        Callback_::Event.inline_via_iambic_and_message_proc i_a, -> y, o do
+        Common_::Event.inline_via_iambic_and_message_proc i_a, -> y, o do
 
           y << "cannot create #{ pth o.pathname } because #{
             }some parent path in it is #{ o.message_head.downcase }"
@@ -253,7 +253,7 @@ module Skylab::System
 
       def _build_normal_result
 
-        Callback_::Known_Known[
+        Common_::Known_Known[
           if @_is_dry_run
             Mock_Dir__.new path_
           else

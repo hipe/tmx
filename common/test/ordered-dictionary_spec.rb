@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::OD__
+module Skylab::Common::TestSupport::OD__
 
-  ::Skylab::Callback::TestSupport[ self ]
+  ::Skylab::Common::TestSupport[ self ]
 
   include Constants
 
@@ -10,7 +10,7 @@ module Skylab::Callback::TestSupport::OD__
 
   Subject_ = -> { Home_::Ordered_Dictionary }
 
-  describe "[ca] ordered dictionary" do
+  describe "[co] ordered dictionary" do
 
     context "when you make a \"static\" listener class" do  # #needs-indent
 

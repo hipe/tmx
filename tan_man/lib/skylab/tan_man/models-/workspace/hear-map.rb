@@ -41,7 +41,7 @@ module Skylab::TanMan
               ::Dir.pwd
             end
             ok &&= sess.touch_graph
-            Callback_::Bound_Call.via_value ok
+            Common_::Bound_Call.via_value ok
           end
 
           class Custom_Session___
@@ -54,7 +54,7 @@ module Skylab::TanMan
 
             def touch_workspace & path_p
 
-              _pair = Callback_::Pair.via_value_and_name true, :just_looking
+              _pair = Common_::Pair.via_value_and_name true, :just_looking
               @bx.add :just_looking, _pair
 
               @ws = @kernel.silo( :workspace ).workspace_via_qualified_knownness_box(
@@ -78,7 +78,7 @@ module Skylab::TanMan
 
             def touch_graph
 
-              bx = Callback_::Box.new
+              bx = Common_::Box.new
               bx.add :workspace, @ws
 
               _f = __produce_some_graph_filehandle

@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport::Selective_Listener
 
-  describe "[ca] selective listener - emission matrix" do
+  describe "[co] selective listener - emission matrix" do
 
     extend TS__
 

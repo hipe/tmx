@@ -31,7 +31,7 @@ module Skylab::TMX
 
     def __receive_call x_a, & oes_p
 
-      @_in_st = Callback_::Polymorphic_Stream.via_array x_a
+      @_in_st = Common_::Polymorphic_Stream.via_array x_a
       if oes_p
         @on_event_selectively = oes_p
       end
@@ -60,7 +60,7 @@ module Skylab::TMX
 
       @first_argument = @_in_st.gets_one
 
-      _nf = Callback_::Name.via_variegated_symbol @first_argument
+      _nf = Common_::Name.via_variegated_symbol @first_argument
 
       @unbound = @fast_lookup[ _nf ]
 

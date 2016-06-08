@@ -33,7 +33,7 @@ module Skylab::Snag
         def initialize kr
 
           @_kernel = kr
-          @model_box_ = Callback_::Box.new
+          @model_box_ = Common_::Box.new
         end
 
 
@@ -139,7 +139,7 @@ module Skylab::Snag
 
           def initialize sym_a
 
-            @associated_models_box = Callback_::Box.new
+            @associated_models_box = Common_::Box.new
             @_sym_a = sym_a
           end
 
@@ -159,7 +159,7 @@ module Skylab::Snag
             s_a = _human_s_a
             s_a_ = s_a.dup
             s_a_[ -1 ] = Home_.lib_.NLP::EN::POS::Noun[ s_a.fetch( -1 ) ].plural
-            Callback_::Pair.via_value_and_name self, s_a_
+            Common_::Pair.via_value_and_name self, s_a_
           end
 
           def to_item_for_singular_name
@@ -169,7 +169,7 @@ module Skylab::Snag
 
           def __build_singular_item
 
-            Callback_::Pair.via_value_and_name self, _human_s_a
+            Common_::Pair.via_value_and_name self, _human_s_a
           end
 
           def _human_s_a
@@ -180,7 +180,7 @@ module Skylab::Snag
           def __build_human_s_a
 
             @_sym_a.map do | sym |
-              Callback_::Name.via_const_symbol( sym ).as_human
+              Common_::Name.via_const_symbol( sym ).as_human
             end
           end
 
@@ -189,11 +189,11 @@ module Skylab::Snag
           def __to_association_adapter_stream model_bx_
 
             h = model_bx_.h_
-            _st = Callback_::Stream.via_nonsparse_array @associated_models_box.a_
+            _st = Common_::Stream.via_nonsparse_array @associated_models_box.a_
 
             _st.expand_by do | id |
 
-              Callback_::Stream.via_nonsparse_array(
+              Common_::Stream.via_nonsparse_array(
                 h.fetch( id ).__association_adapters || fail )
             end
           end

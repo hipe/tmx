@@ -15,7 +15,7 @@ module Skylab::Brazen
           NIL_
         else
           # it's just you
-          Callback_::Stream.via_item self
+          Common_::Stream.via_item self
         end
       end
 
@@ -114,13 +114,13 @@ module Skylab::Brazen
 
     def _bound_call_after
 
-      @argument_box ||= Callback_::Box.new
+      @argument_box ||= Common_::Box.new
 
       ok = yield
       if ok
         via_arguments_produce_bound_call
       else
-        Callback_::Bound_Call.via_value ok
+        Common_::Bound_Call.via_value ok
       end
     end
 
@@ -145,7 +145,7 @@ module Skylab::Brazen
 
     def first_edit & edit_p  # :+#public-API [tm]. cannot fail
 
-      @argument_box = Callback_::Box.new
+      @argument_box = Common_::Box.new
 
       if edit_p
         edit_p[ es = Edit_Session___.new ]
@@ -188,9 +188,9 @@ module Skylab::Brazen
       ok = normalize
       ok &&= __resolve_preconditions
       if ok
-        Callback_::Bound_Call.via_receiver_and_method_name self, :produce_result
+        Common_::Bound_Call.via_receiver_and_method_name self, :produce_result
       else
-        Callback_::Bound_Call.via_value ok
+        Common_::Bound_Call.via_value ok
       end
     end
 
@@ -273,7 +273,7 @@ module Skylab::Brazen
 
     def to_full_qualified_knownness_box
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       h = @argument_box.h_
       st = formal_properties.to_value_stream
       prp = st.gets
@@ -286,7 +286,7 @@ module Skylab::Brazen
           nil
         end
 
-        bx.add sym, Callback_::Qualified_Knownness.
+        bx.add sym, Common_::Qualified_Knownness.
           via_value_and_had_and_association( x, had, prp )
 
         prp = st.gets
@@ -311,11 +311,11 @@ module Skylab::Brazen
 
       a_.each do | k |
 
-        h_[ k ] = Callback_::Qualified_Knownness.via_value_and_association(
+        h_[ k ] = Common_::Qualified_Knownness.via_value_and_association(
           h.fetch( k ), fo.fetch( k ) )
       end
 
-      Callback_::Box.via_integral_parts a_, h_
+      Common_::Box.via_integral_parts a_, h_
     end
 
     def qualified_knownness_of sym
@@ -325,7 +325,7 @@ module Skylab::Brazen
         had = false
       end
 
-      Callback_::Qualified_Knownness.via_value_and_had_and_association(
+      Common_::Qualified_Knownness.via_value_and_had_and_association(
         x, had, formal_properties.fetch( sym ) )
     end
 
@@ -430,12 +430,12 @@ module Skylab::Brazen
 
     def build_not_OK_event_with * x_a, & msg_p
 
-      Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+      Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
     end
 
     def build_OK_event_with * x_a, & msg_p
 
-      Callback_::Event.inline_OK_via_mutable_iambic_and_message_proc x_a, msg_p
+      Common_::Event.inline_OK_via_mutable_iambic_and_message_proc x_a, msg_p
     end
 
     # -- Event receiving --
@@ -464,7 +464,7 @@ module Skylab::Brazen
 
     Emission_interpreter___ = Lazy_.call do
 
-      class Emission_Interpreter____ < Callback_::Emission::Interpreter
+      class Emission_Interpreter____ < Common_::Emission::Interpreter
 
         def __expression__ i_a, & x_p  # this is [#023.A].
           _ :__receive_expression, i_a, & x_p
@@ -489,10 +489,10 @@ module Skylab::Brazen
         _ev = if ev_p
           ev_p[]
         else
-          Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+          Common_::Event.inline_via_normal_extended_mutable_channel i_a
         end
 
-        Callback_::Event.wrap.signature name, _ev
+        Common_::Event.wrap.signature name, _ev
       end
     end
 
@@ -543,7 +543,7 @@ module Skylab::Brazen
 
       _term_chan = _any_expr_chan( rest ) || :generic_info
 
-      Callback_::Event.inline_neutral_with _term_chan do | y, _o |
+      Common_::Event.inline_neutral_with _term_chan do | y, _o |
 
         calculate y, & msg_p
       end

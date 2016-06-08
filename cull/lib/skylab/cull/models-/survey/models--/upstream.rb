@@ -17,7 +17,7 @@ module Skylab::Cull
 
       def __unmarshal sect
 
-        @___ubox___ = Callback_::Box.new
+        @___ubox___ = Common_::Box.new
 
         if s = sect.subsect_name_s
           __unmarshal_id s

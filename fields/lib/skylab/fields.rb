@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Fields
 
@@ -11,14 +11,14 @@ module Skylab::Fields
     end
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   class Attributes < ::Module
 
@@ -188,7 +188,7 @@ module Skylab::Fields
 
         def new_via_iambic x_a, & x_p
 
-          _st = Callback_::Polymorphic_Stream.via_array x_a
+          _st = Common_::Polymorphic_Stream.via_array x_a
           New_via__[ :process_polymorphic_stream_fully, _st, self, & x_p ]
         end
 
@@ -201,7 +201,7 @@ module Skylab::Fields
         end
 
         def polymorphic_stream_via_iambic x_a
-          Callback_::Polymorphic_Stream.via_array x_a
+          Common_::Polymorphic_Stream.via_array x_a
         end
       end
 
@@ -240,7 +240,7 @@ module Skylab::Fields
         end
 
         def polymorphic_stream_via_iambic x_a
-          Callback_::Polymorphic_Stream.via_array x_a
+          Common_::Polymorphic_Stream.via_array x_a
         end
 
         def process_polymorphic_stream_fully st, & x_p
@@ -373,7 +373,7 @@ module Skylab::Fields
 
         def _parse
           @_do = false
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
           remove_instance_variable( :@_sym_a ).each do |sym|
             bx.add sym, :"@#{ sym }"
           end
@@ -443,7 +443,7 @@ module Skylab::Fields
     end
 
     def _name_function
-      Callback_::Name.via_variegated_symbol @name_symbol
+      Common_::Name.via_variegated_symbol @name_symbol
     end
 
     def _cached m
@@ -468,7 +468,7 @@ module Skylab::Fields
 
     def initialize x
       @_done = false
-      @_kn = Callback_::Known_Known[ x ]
+      @_kn = Common_::Known_Known[ x ]
     end
 
     def gets_one
@@ -631,7 +631,7 @@ module Skylab::Fields
     Plugin = sidesys[ :Plugin ]
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   CLI = nil  # for host
@@ -639,7 +639,7 @@ module Skylab::Fields
   EMPTY_S_ = ""
   Home_ = self
   KEEP_PARSING_ = true
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
   NILADIC_TRUTH_ = -> do

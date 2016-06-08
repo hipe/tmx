@@ -102,7 +102,7 @@ module Skylab::Basic
         end
       end
 
-      class Muxer___ < Callback_::Box
+      class Muxer___ < Common_::Box
 
         def initialize desc_p
           super()

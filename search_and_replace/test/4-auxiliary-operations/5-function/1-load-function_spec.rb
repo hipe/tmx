@@ -27,7 +27,7 @@ module Skylab::SearchAndReplace::TestSupport
           end ]
         end
 
-        o = Callback_::Stream.via_nonsparse_array s_a
+        o = Common_::Stream.via_nonsparse_array s_a
 
         o.gets.should eql "Jazzmatazz"
         o.gets.should eql "Jazzmatazz::Bizzo"

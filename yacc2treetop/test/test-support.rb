@@ -25,7 +25,7 @@ module Skylab::Yacc2Treetop::TestSupport
     end
 
     o[ :expect_event ] = -> tcc do
-      Callback_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Event[ tcc ]
     end
 
     o[ :memoizer_methods ] = -> tcc do
@@ -114,7 +114,7 @@ module Skylab::Yacc2Treetop::TestSupport
     end
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
   Home_ = ::Skylab::Yacc2Treetop
 
   _TEST_DIR = ::File.join( Home_.sidesys_path_, TestSupport_::TEST_DIR_FILENAME_ )

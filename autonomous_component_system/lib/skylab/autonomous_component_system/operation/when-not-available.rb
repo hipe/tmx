@@ -42,7 +42,7 @@ module Skylab::Autonomous_Component_System
 
         o.event_name_symbol = :operation_not_available
 
-        o.property_name = Callback_::Name.via_human 'operation'
+        o.property_name = Common_::Name.via_human 'operation'
 
         o.invalid_value = fo.name.as_slug
 

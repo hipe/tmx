@@ -125,7 +125,7 @@ module Skylab::Brazen::TestSupport
       o.expect_no_more_lines
     end
 
-    define_method :_common_tree, ( Callback_.memoize do
+    define_method :_common_tree, ( Common_.memoize do
 
       C_EF_T_S = Home_.lib_.basic::Tree::Totaller.new
       _T = C_EF_T_S
@@ -149,7 +149,7 @@ module Skylab::Brazen::TestSupport
         C_EF_T_S_Struct__.new( * s_a )
       end
 
-      Callback_::Stream.via_nonsparse_array _a
+      Common_::Stream.via_nonsparse_array _a
     end
 
     def _begin_table
@@ -158,7 +158,7 @@ module Skylab::Brazen::TestSupport
 
     def _line_expector_via_array y
 
-      _st = Callback_::Stream.via_nonsparse_array y
+      _st = Common_::Stream.via_nonsparse_array y
 
       TestSupport_::Expect_Line::Scanner.via_stream _st
     end

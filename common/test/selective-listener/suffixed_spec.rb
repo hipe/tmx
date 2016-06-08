@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport::Selective_Listener
 
-  describe "[ca] selective listener - suffixed" do
+  describe "[co] selective listener - suffixed" do
 
     extend TS__
 

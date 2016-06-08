@@ -28,7 +28,7 @@ module Skylab::Snag
 
           @p = method :__gets_first_node_ever
 
-          Callback_::Stream.new _pxy do
+          Common_::Stream.new _pxy do
             @p[]
           end
         end

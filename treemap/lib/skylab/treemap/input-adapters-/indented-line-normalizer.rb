@@ -62,7 +62,7 @@ module Skylab::Treemap
 
     Build_line_object_upstream_via_line_upstream___ = -> line_upstream do
 
-      Callback_::Scn.new do
+      Common_::Scn.new do
         line_s = line_upstream.gets
         if line_s
           Models_::Node.new line_s, line_upstream.lineno
@@ -157,7 +157,7 @@ module Skylab::Treemap
         o
       end
 
-      Callback_::Scn.new do
+      Common_::Scn.new do
         p[]
       end
     end

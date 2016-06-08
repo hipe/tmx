@@ -191,7 +191,7 @@ module Skylab::SubTree
 
         def __via_test_filename_to_final_directory_stream
 
-          st = Callback_::Stream.via_item ::File.dirname @test_dir
+          st = Common_::Stream.via_item ::File.dirname @test_dir
 
           @test_fn.to_dir_entry_stream.each do | entry |
 
@@ -210,7 +210,7 @@ module Skylab::SubTree
 
         def __to_N_tries_dir_stream dir, entry_s
 
-          Callback_::Stream.via_times ETC__.length do | d |
+          Common_::Stream.via_times ETC__.length do | d |
 
             ::File.join dir, "#{ entry_s }#{ ETC__.fetch d }"
           end
@@ -218,7 +218,7 @@ module Skylab::SubTree
 
         def __to_N_tries_file_stream dir, entry_s
 
-          Callback_::Stream.via_times ETC__.length do | d |
+          Common_::Stream.via_times ETC__.length do | d |
 
             ::File.join dir, "#{ entry_s }#{ ETC__.fetch d }#{ Autoloader_::EXTNAME }"
           end

@@ -17,7 +17,7 @@
 
 
 
-# -- sweep 6 ([ba], [ca]):
+# -- sweep 6 ([ba], [co]):
 
 ./basic/test/digraph/test-support.rb
 ./basic/test/field/test-support.rb
@@ -28,18 +28,18 @@
 ./basic/test/sexp/auto/test-support.rb
 ./basic/test/tree/test-support.rb
 
-./callback/test/actor/methodic/test-support.rb
-./callback/test/actor/test-support.rb
-./callback/test/autoloader/test-support.rb
-./callback/test/bundles/test-support.rb
-./callback/test/digraph/test-support.rb
-./callback/test/name/test-support.rb
+./common/test/actor/methodic/test-support.rb
+./common/test/actor/test-support.rb
+./common/test/autoloader/test-support.rb
+./common/test/bundles/test-support.rb
+./common/test/digraph/test-support.rb
+./common/test/name/test-support.rb
 
 # == ( has moved to [#hu-054] )
-# ./callback/test/scn/articulators/aggregating/test-support.rb
-# ./callback/test/scn/articulators/test-support.rb
-# ./callback/test/scn/test-support.rb
+# ./common/test/scn/articulators/aggregating/test-support.rb
+# ./common/test/scn/articulators/test-support.rb
+# ./common/test/scn/test-support.rb
 # ==
 
-./callback/test/selective-listener/test-support.rb
-./callback/test/tree/test-support.rb
+./common/test/selective-listener/test-support.rb
+./common/test/tree/test-support.rb

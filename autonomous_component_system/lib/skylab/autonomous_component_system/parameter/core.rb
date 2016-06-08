@@ -109,7 +109,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def name
-        @name ||= Callback_::Name.via_variegated_symbol @name_symbol
+        @name ||= Common_::Name.via_variegated_symbol @name_symbol
       end
 
       def name_symbol

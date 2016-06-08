@@ -96,8 +96,8 @@ module Skylab::SearchAndReplace::TestSupport
 
       def ___say_arrays_not_equal act_a, exp_a  # assume they are not equal.
 
-        act_st = Callback_::Polymorphic_Stream.via_array act_a
-        exp_st = Callback_::Polymorphic_Stream.via_array exp_a
+        act_st = Common_::Polymorphic_Stream.via_array act_a
+        exp_st = Common_::Polymorphic_Stream.via_array exp_a
 
         begin
 

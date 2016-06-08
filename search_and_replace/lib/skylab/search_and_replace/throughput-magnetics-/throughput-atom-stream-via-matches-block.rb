@@ -12,11 +12,11 @@ module Skylab::SearchAndReplace
 
       a = o.all_things
 
-      @_LTS_stream = Callback_::Stream.via_nonsparse_array o.LTS_indexes do |d|
+      @_LTS_stream = Common_::Stream.via_nonsparse_array o.LTS_indexes do |d|
         a.fetch d
       end.flush_to_polymorphic_stream
 
-      @_match_stream = Callback_::Stream.via_nonsparse_array o.MC_indexes do |d|
+      @_match_stream = Common_::Stream.via_nonsparse_array o.MC_indexes do |d|
         a.fetch d
       end
     end
@@ -25,7 +25,7 @@ module Skylab::SearchAndReplace
 
       _reorient
 
-      Callback_.stream do
+      Common_.stream do
         send @_state
       end
     end
@@ -242,7 +242,7 @@ module Skylab::SearchAndReplace
 
     def _transition_to_cache
 
-      @_atom_stream = Callback_::Stream.via_nonsparse_array @_a
+      @_atom_stream = Common_::Stream.via_nonsparse_array @_a
       @_a = nil
       @_state = :_via_atom_stream ; nil
     end

@@ -17,7 +17,7 @@ module Skylab::Cull
       def execute
         ok = ACHIEVED_
 
-        st = Callback_::Stream.via_nonsparse_array @passed_arg_a
+        st = Common_::Stream.via_nonsparse_array @passed_arg_a
 
         while arg = st.gets
 

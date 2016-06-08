@@ -2,7 +2,7 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Terms_via_string___ < Callback_::Actor::Dyadic
+      class Terms_via_string___ < Common_::Actor::Dyadic
 
         def initialize s, y
           @_s = s
@@ -98,7 +98,7 @@ module Skylab::TestSupport
           if rest.length.zero?
             a.push sym
           else
-            a.push Callback_::Pair.via_value_and_name( * rest, sym )
+            a.push Common_::Pair.via_value_and_name( * rest, sym )
           end
           NIL_
         end
@@ -115,7 +115,7 @@ module Skylab::TestSupport
                 x.inspect
               end
             end
-            Callback_::Oxford_or[ _s_a ]
+            Common_::Oxford_or[ _s_a ]
           end
 
           scn = @_strscan

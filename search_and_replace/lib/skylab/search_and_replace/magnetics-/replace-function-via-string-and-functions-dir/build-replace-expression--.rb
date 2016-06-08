@@ -118,9 +118,9 @@ module Skylab::SearchAndReplace
 
         # ~ custom functions
 
-        class Build_fulfiller___ < Callback_::Actor::Dyadic
+        class Build_fulfiller___ < Common_::Actor::Dyadic
 
-          Callback_::Event.selective_builder_sender_receiver self
+          Common_::Event.selective_builder_sender_receiver self
 
           def initialize sym_a, path, & oes_p
             @custom_i_a = sym_a
@@ -140,7 +140,7 @@ module Skylab::SearchAndReplace
 
             pn_a.each do |cx_file_pn|
               _stem = cx_file_pn.sub_ext( EMPTY_S_ ).to_path
-              meth_i = Callback_::Name.via_slug( _stem ).as_variegated_symbol
+              meth_i = Common_::Name.via_slug( _stem ).as_variegated_symbol
               set.delete meth_i  # OK if it didn't exist in set.
               @method_name_to_file[ meth_i ] = cx_file_pn.to_path
             end
@@ -164,8 +164,8 @@ module Skylab::SearchAndReplace
           def build_missing_function_definitions_event
 
             _file_s_a = @missing_i_a.map do |i|
-              "#{ Callback_::Name.via_variegated_symbol( i ).as_slug }#{
-                }#{ Callback_::Autoloader::EXTNAME }"
+              "#{ Common_::Name.via_variegated_symbol( i ).as_slug }#{
+                }#{ Common_::Autoloader::EXTNAME }"
             end
 
             _functions_dir = @functions_pn.to_path

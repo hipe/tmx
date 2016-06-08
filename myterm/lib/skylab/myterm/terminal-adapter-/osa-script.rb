@@ -57,7 +57,7 @@ module Skylab::MyTerm
         pos = 0
         rx = /\G[^\n\r]*(?:\n|\r\n?)?/
 
-        Callback_.stream do
+        Common_.stream do
           if len != pos
             md = rx.match big_s, pos
             pos = md.offset( 0 ).last

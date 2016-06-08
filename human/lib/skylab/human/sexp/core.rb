@@ -14,7 +14,7 @@ module Skylab::Human
 
       def expression_session_via_sexp sx
 
-        st = Callback_::Polymorphic_Stream.via_array sx
+        st = Common_::Polymorphic_Stream.via_array sx
         _const = Parse_expression_session_name[ st ]
         _cls = Expression_Sessions.const_get _const, false
         _cls.expression_via_sexp_stream_ st

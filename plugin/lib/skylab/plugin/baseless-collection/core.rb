@@ -75,7 +75,7 @@ module Skylab::Plugin
       end
 
       def to_stream
-        Callback_::Stream.via_nonsparse_array @_dependency_adapter_a
+        Common_::Stream.via_nonsparse_array @_dependency_adapter_a
       end
 
       # -- support

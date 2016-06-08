@@ -30,7 +30,7 @@ module Skylab::SearchAndReplace::TestSupport
         len = bx.length
         4 < len or fail
 
-        _st = Callback_::Stream.via_range( 4 ... len )
+        _st = Common_::Stream.via_range( 4 ... len )
 
         rx = %r(\A\[-[a-z](?: X)?\]\z)  # "[-a X]", "[-b X]" etc
 

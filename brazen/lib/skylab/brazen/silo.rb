@@ -9,7 +9,7 @@ module Skylab::Brazen
 
       def initialize unb_mod, k
 
-        @_bx = Callback_::Box.new
+        @_bx = Common_::Box.new
         @_h = @_bx.h_
         @_kernel = k
         @_unbound_modules = unb_mod
@@ -135,7 +135,7 @@ module Skylab::Brazen
 
       def _build_model_not_found_event id, s
 
-        Callback_::Event.inline_with :node_not_found,
+        Common_::Event.inline_with :node_not_found,
           :token, s, :identifier, id,
           :error_category, :name_error
       end
@@ -161,7 +161,7 @@ module Skylab::Brazen
         else
           @_mod_nf_h ||= {}
           @_mod_nf_h.fetch mod do
-            @_mod_nf_h[ mod ] = Callback_::Name.via_module mod
+            @_mod_nf_h[ mod ] = Common_::Name.via_module mod
           end
         end
       end
@@ -219,7 +219,7 @@ module Skylab::Brazen
 
         if @kernel.do_debug
           @kernel.debug_IO.puts(
-            ">>          MADE #{ Callback_::Name.via_module( @silo_module ).as_slug } SILO" )
+            ">>          MADE #{ Common_::Name.via_module( @silo_module ).as_slug } SILO" )
         end
       end
 

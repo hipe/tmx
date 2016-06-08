@@ -46,7 +46,7 @@ module Skylab::CodeMetrics
 
         # --
 
-        og_box = Callback_::Box.new
+        og_box = Common_::Box.new
 
         touch_occurrence_group_via_tuple = -> feat_sym, bucket_sym do
 
@@ -60,7 +60,7 @@ module Skylab::CodeMetrics
 
         # --
 
-        leaf_bucket_box = Callback_::Box.new
+        leaf_bucket_box = Common_::Box.new
         leaf_bucket_keys = leaf_bucket_box.a_
 
         t = Home_.lib_.basic::Tree.mutable_node.new
@@ -90,7 +90,7 @@ module Skylab::CodeMetrics
         #   other one starts at 1, the answer it here. but it's an arbitrary
         #   internal identifier, so meh
 
-        feature_box = Callback_::Box.new  # keyed to pattern string
+        feature_box = Common_::Box.new  # keyed to pattern string
         feature_keys = feature_box.a_
         feature_hash = feature_box.h_
 

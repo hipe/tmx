@@ -40,7 +40,7 @@ module Skylab::SearchAndReplace
           NIL_
         end
 
-        Callback_.stream do
+        Common_.stream do
           o = st.gets
           if o
             tot_matches += o.count

@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
   module Name::Modality_Functions  # see [#060]
 

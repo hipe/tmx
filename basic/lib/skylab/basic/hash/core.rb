@@ -10,9 +10,9 @@ module Skylab::Basic
 
       def pair_stream h
         a = h.keys
-        Callback_::Stream.via_times( a.length ).map_by do |d|
+        Common_::Stream.via_times( a.length ).map_by do |d|
           k = a.fetch d
-          Callback_::Pair.via_value_and_name h.fetch( k ), k
+          Common_::Pair.via_value_and_name h.fetch( k ), k
         end
       end
     end

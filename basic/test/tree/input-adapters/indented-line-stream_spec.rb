@@ -144,7 +144,7 @@ module Skylab::Basic::TestSupport::Tree_TS
       else
         Home_::EMPTY_A_
       end
-      @lines = Home_::Callback_::Stream.via_nonsparse_array _line_a
+      @lines = Home_::Common_::Stream.via_nonsparse_array _line_a
 
       build_tree
       NIL_

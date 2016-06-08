@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Digraph
+module Skylab::Common::TestSupport::Digraph
 
   # Quickie.
 
-  describe "[ca] digraph" do
+  describe "[co] digraph" do
 
     extend Digraph_TestSupport
 

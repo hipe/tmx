@@ -253,7 +253,7 @@ module Skylab::Brazen
         @silo_module = sm
         @on_event_selectively = oes_p
 
-        _ = Callback_::Event.produce_handle_event_selectively_through_methods
+        _ = Common_::Event.produce_handle_event_selectively_through_methods
 
         @oes_p = _.bookends self, :Workspace_via_qualified_knownness_boX do | * i_a, & ev_p |
           maybe_send_event_via_channel i_a, & ev_p
@@ -309,7 +309,7 @@ module Skylab::Brazen
 
             maybe_send_event :info, :verbose, :using_workspace do
 
-              Callback_::Event.inline_neutral_with(
+              Common_::Event.inline_neutral_with(
                 :using_workspace,
                 :config_path, @ws.existent_config_path
               )
@@ -353,7 +353,7 @@ module Skylab::Brazen
         build_event_via_iambic_and_message_proc x_a, ev.message_proc
       end
 
-      Callback_::Event.selective_builder_sender_receiver self
+      Common_::Event.selective_builder_sender_receiver self
     end
 
     Workspace_ = self

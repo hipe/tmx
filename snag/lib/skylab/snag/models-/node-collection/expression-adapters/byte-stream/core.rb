@@ -186,7 +186,7 @@ module Skylab::Snag
           end
         end
 
-        EC_Adapter_Dummy___ = Callback_.memoize do
+        EC_Adapter_Dummy___ = Common_.memoize do
           o = ::Object.new
           o.send :define_singleton_method,
               :node_has_extended_content_via_node_ID__ do | _ |

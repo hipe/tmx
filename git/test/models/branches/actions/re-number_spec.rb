@@ -73,7 +73,7 @@ module Skylab::Git::TestSupport
 
     def _d_a_to_st d_a
 
-      Callback_::Stream.via_nonsparse_array d_a do | d |
+      Common_::Stream.via_nonsparse_array d_a do | d |
         d.to_s
       end
     end

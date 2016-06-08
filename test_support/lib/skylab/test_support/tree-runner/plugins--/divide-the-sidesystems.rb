@@ -28,7 +28,7 @@ module Skylab::TestSupport
 
       def __normalize_number
 
-        _qkn = Callback_::Qualified_Knownness.via_value_and_symbol @N, :number
+        _qkn = Common_::Qualified_Knownness.via_value_and_symbol @N, :number
 
         qkn_ = Lib_::Basic[]::Number.normalization.with(
           :qualified_knownness, _qkn,

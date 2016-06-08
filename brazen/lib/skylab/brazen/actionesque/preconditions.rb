@@ -19,7 +19,7 @@ module Skylab::Brazen
           @box = if bx
             bx
           else
-            Callback_::Box.new
+            Common_::Box.new
           end
         end
 

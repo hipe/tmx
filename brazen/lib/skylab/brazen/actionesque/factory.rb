@@ -255,7 +255,7 @@ module Skylab::Brazen
 
         def __build_single_entity_resolved_with_ambiguity
 
-          Callback_::Event.inline_neutral_with(
+          Common_::Event.inline_neutral_with(
 
             :single_entity_resolved_with_ambiguity,
             :model, _model_class,
@@ -320,7 +320,7 @@ module Skylab::Brazen
 
         def __init_selective_listener_proc_for_delete
 
-          _ = Callback_::Event.produce_handle_event_selectively_through_methods
+          _ = Common_::Event.produce_handle_event_selectively_through_methods
 
           upstream_oes_p = @on_event_selectively
 

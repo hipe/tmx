@@ -35,7 +35,7 @@ module Skylab::Snag::TestSupport
 
     def __expect_these_line lines
 
-      st = Callback_::Stream.via_nonsparse_array lines
+      st = Common_::Stream.via_nonsparse_array lines
 
       st.gets.should eql "digraph {\n"
       st.gets[ 0, 8 ].should eql '  node ['

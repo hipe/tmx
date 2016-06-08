@@ -83,7 +83,7 @@ module Skylab::BNF2Treetop::TestSupport
 
   module CLI::TestLib__
 
-    sidesys = Callback_::Autoloader.build_require_sidesystem_proc
+    sidesys = Common_::Autoloader.build_require_sidesystem_proc
 
     Brazen = sidesys[ :Brazen ]
 

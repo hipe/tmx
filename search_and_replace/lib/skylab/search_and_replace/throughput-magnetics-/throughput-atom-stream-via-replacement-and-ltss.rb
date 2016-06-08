@@ -50,7 +50,7 @@ module Skylab::SearchAndReplace
 
       @_next_state = :___some_or_none_then_gets
 
-      Callback_.stream do  # #[#032]
+      Common_.stream do  # #[#032]
         send @_state
       end
     end
@@ -124,7 +124,7 @@ module Skylab::SearchAndReplace
 
     def _transition_to_cache a
 
-      @_atom_stream = Callback_::Stream.via_nonsparse_array a
+      @_atom_stream = Common_::Stream.via_nonsparse_array a
       @_state = :___gets_via_cache ; nil
     end
 

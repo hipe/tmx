@@ -18,7 +18,7 @@ module Skylab::Human
 
       def initialize
 
-        @_bx = Callback_::Box.new
+        @_bx = Common_::Box.new
       end
 
       # ~ mutation

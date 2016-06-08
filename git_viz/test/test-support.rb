@@ -10,7 +10,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_module___[], TS_ )
     end
   end  # >>
@@ -72,9 +72,9 @@ module Skylab::GitViz::TestSupport
     end
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Universal_cache___ = Callback_.memoize do
+  Universal_cache___ = Common_.memoize do
     {}
   end
 
@@ -84,7 +84,7 @@ module Skylab::GitViz::TestSupport
 
     memoize = -> sym, & p do
 
-      define_singleton_method sym, & Callback_.memoize( & p )
+      define_singleton_method sym, & Common_.memoize( & p )
 
       define_method sym do
 
@@ -128,7 +128,7 @@ module Skylab::GitViz::TestSupport
   Expect_Event = -> tcc do  # `tcc` = test context class
 
     tcc.include(
-      Home_::Callback_.test_support::Expect_Event::Test_Context_Instance_Methods )
+      Home_::Common_.test_support::Expect_Event::Test_Context_Instance_Methods )
 
     NIL_
   end
@@ -178,11 +178,11 @@ module Skylab::GitViz::TestSupport
 
   # ~ constant-ishes
 
-  Lib_module___ = Callback_.memoize do
+  Lib_module___ = Common_.memoize do
 
     module Lib____
 
-      stdlib = Callback_::Autoloader.build_require_stdlib_proc
+      stdlib = Common_::Autoloader.build_require_stdlib_proc
 
       String_IO = stdlib[ :StringIO ]
 

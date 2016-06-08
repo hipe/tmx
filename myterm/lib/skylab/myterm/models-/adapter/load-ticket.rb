@@ -62,7 +62,7 @@ module Skylab::MyTerm
       end
 
       def adapter_name
-        @___nf ||= Callback_::Name.via_slug @stem
+        @___nf ||= Common_::Name.via_slug @stem
       end
 
       # -- writing

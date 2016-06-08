@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Mutable_ < Callback_::Box
+    class Mutable_ < Common_::Box
 
       # experiment: a mutable tree based on "box".
 
@@ -177,7 +177,7 @@ module Skylab::Basic
         # because this object *will* be modified mid-scan,
         # we *must* use a duplicate array below.
 
-        Callback_::Polymorphic_Stream.via_array @a.dup
+        Common_::Polymorphic_Stream.via_array @a.dup
       end
 
       def touch_node path_x, * x_a, & node_payload_p

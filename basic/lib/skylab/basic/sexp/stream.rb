@@ -2,7 +2,7 @@ module Skylab::Basic
 
   class Sexp
 
-    class Stream < Callback_::Stream
+    class Stream < Common_::Stream
 
       class << self
 
@@ -17,7 +17,7 @@ module Skylab::Basic
         end
       end
 
-      Callback_::Memoization::Pool[ self ].
+      Common_::Memoization::Pool[ self ].
         instances_can_be_accessed_through_instance_sessions
 
       def initialize k

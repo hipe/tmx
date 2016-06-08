@@ -68,7 +68,7 @@ module Skylab::TestSupport
           end
         end
 
-        _st = Callback_.stream do
+        _st = Common_.stream do
           p[]
         end
 

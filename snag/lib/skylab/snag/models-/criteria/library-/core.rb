@@ -238,7 +238,7 @@ module Skylab::Snag
               when :keyword
                 if x_a.fetch( d + 2 ) == s
                   did_match = true
-                  x = Callback_::Pair.via_value_and_name true, x_a.fetch( d )
+                  x = Common_::Pair.via_value_and_name true, x_a.fetch( d )
                   break
                 end
 
@@ -246,7 +246,7 @@ module Skylab::Snag
                 md = x_a.fetch( d + 2 ).match s
                 if md
                   did_match = true
-                  x = Callback_::Pair.via_value_and_name md, x_a.fetch( d )
+                  x = Common_::Pair.via_value_and_name md, x_a.fetch( d )
                   break
                 end
               end
@@ -272,8 +272,8 @@ module Skylab::Snag
 
       Build_aggregated_expecting_event_ = -> pairs do
 
-        idx_bx = Callback_::Box.new
-        word_bx = Callback_::Box.new
+        idx_bx = Common_::Box.new
+        word_bx = Common_::Box.new
 
         pairs.each_slice 2 do | i_a, ev_p |
           :expecting == i_a.last or self._XX
@@ -296,7 +296,7 @@ module Skylab::Snag
 
         p = -> index_x, word_x, in_st do
 
-          Event_for_Expecting___ = Callback_::Event.prototype_with :expecting,
+          Event_for_Expecting___ = Common_::Event.prototype_with :expecting,
               :word_s_a, nil,
               :input_stream_indexes, nil,
               :input_stream, nil,

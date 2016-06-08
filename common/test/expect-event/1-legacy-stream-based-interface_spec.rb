@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] expect event - (1) legacy stream-based interface" do
+  describe "[co] expect event - (1) legacy stream-based interface" do
 
     # NOTE - reading tests that test libraries intended to be used for tests
     # is always confusing, but fortunately our naming conventions help

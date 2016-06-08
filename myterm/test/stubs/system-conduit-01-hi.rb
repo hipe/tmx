@@ -10,7 +10,7 @@ module Skylab::MyTerm::TestSupport
 
     _build_instance = -> do
 
-      empty = Callback_::Stream.the_empty_stream
+      empty = Common_::Stream.the_empty_stream
 
       _wait = Home_.lib_.system.test_support::MOCKS.successful_wait
 

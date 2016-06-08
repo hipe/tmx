@@ -71,7 +71,7 @@ module Skylab::Basic
         def normalize_value x, & oes_p
 
           normalize_qualified_knownness(
-            Callback_::Qualified_Knownness.via_value_and_symbol( x, :path ),
+            Common_::Qualified_Knownness.via_value_and_symbol( x, :path ),
             & oes_p )
         end
 
@@ -210,7 +210,7 @@ module Skylab::Basic
         )\z/x
 
         def add_bad d, i
-          @bad_box ||= Callback_::Box.new
+          @bad_box ||= Common_::Box.new
           @bad_box.touch_array_and_push i, d
           nil
         end

@@ -137,11 +137,11 @@ module Skylab::Brazen
 
         if @x.respond_to? :ascii_only?
 
-          Callback_::Bound_Call.via_args_and_method_name @x, :via_path
+          Common_::Bound_Call.via_args_and_method_name @x, :via_path
 
         elsif @x.respond_to? :each_with_index
 
-          Callback_::Bound_Call.via_args_and_method_name [ @x ], :via_line_array
+          Common_::Bound_Call.via_args_and_method_name [ @x ], :via_line_array
 
         else
           stream
@@ -149,11 +149,11 @@ module Skylab::Brazen
       end
 
       def stream
-        Callback_::Bound_Call.via_args_and_method_name @x, :via_stream
+        Common_::Bound_Call.via_args_and_method_name @x, :via_stream
       end
 
       def string
-        Callback_::Bound_Call.via_args_and_method_name @x, :via_string
+        Common_::Bound_Call.via_args_and_method_name @x, :via_string
       end
     end
 
@@ -240,13 +240,13 @@ module Skylab::Brazen
 
       def set_qualified_knownness_value_and_symbol x, sym
         @qualified_knownness =
-          Callback_::Qualified_Knownness.via_value_and_symbol x, sym
+          Common_::Qualified_Knownness.via_value_and_symbol x, sym
         NIL_
       end
 
       def set_qualified_knownness_value_and_name x, nf
         @qualified_knownness =
-          Callback_::Qualified_Knownness.via_value_and_association x, nf
+          Common_::Qualified_Knownness.via_value_and_association x, nf
       end
 
       def execute

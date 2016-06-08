@@ -97,7 +97,7 @@ module Skylab::SearchAndReplace
     def _to_grep_result_path_stream
 
       st = nil
-      _Stream = Callback_::Stream
+      _Stream = Common_::Stream
 
       _resource_releaser = _Stream::Resource_Releaser.new do
         if st

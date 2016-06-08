@@ -128,7 +128,7 @@ module Skylab::SearchAndReplace
     end
 
     def _done
-      Callback_::Stream.via_nonsparse_array remove_instance_variable :@_main_array
+      Common_::Stream.via_nonsparse_array remove_instance_variable :@_main_array
     end
   end
 end

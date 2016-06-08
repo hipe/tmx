@@ -120,7 +120,7 @@ module Skylab::Autonomous_Component_System
 
         elsif mdl.respond_to? :module_exec
 
-          Callback_::Name.via_module mdl
+          Common_::Name.via_module mdl
         end
 
         if nf
@@ -171,7 +171,7 @@ module Skylab::Autonomous_Component_System
             nf = if acs.respond_to? :name
               acs.name
             else
-              Callback_::Name.via_module acs.class
+              Common_::Name.via_module acs.class
             end
 
             if nf
@@ -314,9 +314,9 @@ module Skylab::Autonomous_Component_System
         #     "user", "super-user"        => "super-user"
         #   ~ "user", "superuser"
 
-        raw_st = Callback_::Polymorphic_Stream.via_array s_a
+        raw_st = Common_::Polymorphic_Stream.via_array s_a
 
-        st = Callback_.stream do  # ignore empties
+        st = Common_.stream do  # ignore empties
 
           begin
             raw_st.no_unparsed_exists and break

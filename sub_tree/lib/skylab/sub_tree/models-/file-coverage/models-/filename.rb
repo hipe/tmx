@@ -26,7 +26,7 @@ module Skylab::SubTree
 
       def to_dir_entry_stream
 
-        Callback_::Stream.via_nonsparse_array @__dir_ent_a
+        Common_::Stream.via_nonsparse_array @__dir_ent_a
       end
     end
   end

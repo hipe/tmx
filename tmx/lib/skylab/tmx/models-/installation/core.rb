@@ -72,7 +72,7 @@ module Skylab::TMX
         p[ path ]
       end
 
-      Callback_::Stream.via_nonsparse_array _wow do | path |
+      Common_::Stream.via_nonsparse_array _wow do | path |
         p[ path ]
       end
     end
@@ -164,7 +164,7 @@ module Skylab::TMX
       end
     end
 
-    Gem_name_tools_ = Callback_.memoize do
+    Gem_name_tools_ = Common_.memoize do
 
       # EGADS: it would be good to use whatever Gem does instead
 

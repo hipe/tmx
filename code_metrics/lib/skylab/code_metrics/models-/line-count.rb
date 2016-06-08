@@ -75,7 +75,7 @@ module Skylab::CodeMetrics
         o.execute
       end
 
-      Totaller_class___ = Callback_.memoize do
+      Totaller_class___ = Common_.memoize do
 
         Totaller____ = Totaller_[].new
       end

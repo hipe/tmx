@@ -8,7 +8,7 @@ module Skylab::Fields
   Home_.const_get :Event_, false
   module Event_  # #[#sl-155] scope stack trick
 
-    Events::Missing = Callback_::Event.prototype_with(  # see [#036]
+    Events::Missing = Common_::Event.prototype_with(  # see [#036]
 
       :missing_required_attributes,
 
@@ -76,7 +76,7 @@ module Skylab::Fields
         @_atoms = nil
         @_recurses = nil
 
-        st = Callback_::Stream.via_nonsparse_array remove_instance_variable :@reasons
+        st = Common_::Stream.via_nonsparse_array remove_instance_variable :@reasons
 
         reason_x = st.gets
 
@@ -142,7 +142,7 @@ module Skylab::Fields
 
       def __main_add_as_recurse reason_x
 
-        @_ff_pfx ||= Callback_::Known_Known[ __determine_any_prefix ]
+        @_ff_pfx ||= Common_::Known_Known[ __determine_any_prefix ]
 
         atr = reason_x.compound_formal_attribute
 
@@ -190,7 +190,7 @@ module Skylab::Fields
         _.express_into_under @_downstream_yielder, @expression_agent_
 
         _ = remove_instance_variable :@_recurse_queue
-        st = Callback_::Stream.via_nonsparse_array _
+        st = Common_::Stream.via_nonsparse_array _
         begin
           x = st.gets
           x or break

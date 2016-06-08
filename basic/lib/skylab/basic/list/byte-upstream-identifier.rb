@@ -43,7 +43,7 @@ module Skylab::Basic
       end
 
       def to_simple_line_stream
-        Callback_::Stream.via_nonsparse_array @s_a
+        Common_::Stream.via_nonsparse_array @s_a
       end
 
       # ~ fun etc.

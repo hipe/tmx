@@ -22,7 +22,7 @@ module Skylab::SearchAndReplace
 
       _populate_cache
 
-      Callback_.stream do  # #[#032]
+      Common_.stream do  # #[#032]
         send @_state
       end
     end
@@ -197,7 +197,7 @@ module Skylab::SearchAndReplace
     def _transition_to_state_via_cache_stream
 
       @_state = :__via_cache_stream
-      @_cache_stream = Callback_::Stream.via_nonsparse_array(
+      @_cache_stream = Common_::Stream.via_nonsparse_array(
         remove_instance_variable :@_a )
       NIL_
     end

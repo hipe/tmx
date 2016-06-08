@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   module Mmztn___  # :+#throwaway-module for constants created during tests
 
     # <-
 
-  TS_.describe "[ca] memoization" do
+  TS_.describe "[co] memoization" do
 
     extend TS_
 

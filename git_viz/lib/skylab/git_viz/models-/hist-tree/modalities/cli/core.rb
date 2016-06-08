@@ -63,7 +63,7 @@ module Skylab::GitViz
 
             _prp = _any_prp_class.new_by do
 
-              @name = Callback_::Name.via_variegated_symbol :width
+              @name = Common_::Name.via_variegated_symbol :width
               @parameter_arity = :one
 
               add_normalizer_for_greater_than_or_equal_to_integer 1
@@ -81,7 +81,7 @@ module Skylab::GitViz
 
             sym = x_a.fetch 0
 
-            _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
+            _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
               x_a.fetch( 1 ), sym
             )
 
@@ -106,7 +106,7 @@ module Skylab::GitViz
 
             @bound_call_from_back = bc
 
-            Callback_::Bound_Call.via_receiver_and_method_name self, :__render
+            Common_::Bound_Call.via_receiver_and_method_name self, :__render
           end
 
           def __render

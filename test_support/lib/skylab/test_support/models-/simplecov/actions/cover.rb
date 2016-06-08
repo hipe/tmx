@@ -65,7 +65,7 @@ module Skylab::TestSupport
           end
 
           def name_function
-            @__nf__ ||= Callback_::Name.via_module self
+            @__nf__ ||= Common_::Name.via_module self
           end
 
         end  # >>
@@ -117,7 +117,7 @@ module Skylab::TestSupport
 
           @argv = a
 
-          Callback_::Bound_Call.via_receiver_and_method_name self, :execute
+          Common_::Bound_Call.via_receiver_and_method_name self, :execute
         end
 
         attr_accessor :invocation_string_array, :serr, :sout

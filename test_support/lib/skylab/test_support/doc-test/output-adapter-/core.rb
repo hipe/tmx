@@ -171,7 +171,7 @@ module Skylab::TestSupport
 
         def view_controller_for_node_symbol i
 
-          _const_i = Callback_::Name.via_variegated_symbol( i ).as_const
+          _const_i = Common_::Name.via_variegated_symbol( i ).as_const
 
           _parent_mod = @shared_resources.fetch :view_controllers_parent_module
 
@@ -194,7 +194,7 @@ module Skylab::TestSupport
         end
       end
 
-      Event_for_Wrote_ = Callback_::Event.prototype_with :wrote,
+      Event_for_Wrote_ = Common_::Event.prototype_with :wrote,
 
         :is_known_to_be_dry, false,
         :bytes, nil,

@@ -39,7 +39,7 @@ module Skylab::Basic
     end
 
     Oxford_or = -> a do
-      Callback_::Oxford_or[ a ]
+      Common_::Oxford_or[ a ]
     end
 
     Parse_lib = sidesys[ :Parse ]
@@ -47,7 +47,7 @@ module Skylab::Basic
     Plugin = sidesys[ :Plugin ]
 
     Scn_lib = -> do
-      Callback_::Scn
+      Common_::Scn
     end
 
     Set = -> * a do
@@ -74,7 +74,7 @@ module Skylab::Basic
       StringScanner__[].new str
     end
 
-    StringScanner__ = Callback_.memoize do
+    StringScanner__ = Common_.memoize do
       require 'strscan'
       ::StringScanner
     end
@@ -85,7 +85,7 @@ module Skylab::Basic
 
     Time = stdlib[ :Time ]
 
-    Treetop = Callback_.memoize do
+    Treetop = Common_.memoize do
 
       require 'treetop'
       ::Treetop

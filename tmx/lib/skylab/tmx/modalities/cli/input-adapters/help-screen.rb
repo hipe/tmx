@@ -69,7 +69,7 @@ module Skylab::TMX
     def __init_box sym_a
 
       same = -> sym do
-        Callback_::Name.via_variegated_symbol( sym ).as_human
+        Common_::Name.via_variegated_symbol( sym ).as_human
       end
 
       p = if @_be_case_sensitive
@@ -82,7 +82,7 @@ module Skylab::TMX
         end
       end
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
 
       sym_a.each do | sym |
         bx.add sym, p[ sym ]
@@ -98,7 +98,7 @@ module Skylab::TMX
       ACHIEVED_
     end
 
-    Memoized_state_machine___ = Callback_.memoize do  # see [#003]
+    Memoized_state_machine___ = Common_.memoize do  # see [#003]
 
       o = Home_.lib_.basic::State::Machine::Edit_Session.new
 

@@ -178,9 +178,9 @@ module Skylab::MyTerm::TestSupport
     Home_.lib_.zerk.test_support
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader__ = Callback_::Autoloader
+  Autoloader__ = Common_::Autoloader
 
   module Stubs
     Autoloader__[ self ]
@@ -192,7 +192,7 @@ module Skylab::MyTerm::TestSupport
 
   COMMON_ADAPTER_CONST_ = :Imagemagick
   EMPTY_S_ = Home_::EMPTY_S_
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
   NIL_ = nil
   NONE_ = nil
   NOTHING_ = nil

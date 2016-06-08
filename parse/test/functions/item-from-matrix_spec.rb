@@ -9,7 +9,7 @@ module Skylab::Parse::TestSupport
 
     define_singleton_method :memoize_ do | sym, & p |
 
-      define_method sym, Callback_::Memoize[ & p ]
+      define_method sym, Common_::Memoize[ & p ]
     end
 
     context "(against first grammar)" do
@@ -178,9 +178,9 @@ module Skylab::Parse::TestSupport
 
       def _build_item_stream_via_string_matrix a_a
 
-        Callback_::Stream.via_nonsparse_array a_a do | row |
+        Common_::Stream.via_nonsparse_array a_a do | row |
 
-          Callback_::Pair.via_value_and_name(
+          Common_::Pair.via_value_and_name(
             :"__#{ row * UNDERSCORE_ }__",
             row )
 

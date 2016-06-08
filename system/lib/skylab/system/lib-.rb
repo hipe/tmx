@@ -6,7 +6,7 @@ module Skylab::System
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    define_singleton_method :_memoize, Callback_::Memoize
+    define_singleton_method :_memoize, Common_::Memoize
 
     Attributes_stack_frame = -> *a do
       Fields[]::Attributes::Stack::Common_Frame.call_via_arglist a

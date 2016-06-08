@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Actors_::Fetch < Callback_::Actor::Dyadic
+      class Actors_::Fetch < Common_::Actor::Dyadic
 
         def initialize s, o, & p
           @id_s = s

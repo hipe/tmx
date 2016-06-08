@@ -44,7 +44,7 @@ module Skylab::Plugin::TestSupport
 
   Expect_Event = -> tcc do
 
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
 
     NIL_
   end
@@ -55,9 +55,9 @@ module Skylab::Plugin::TestSupport
 
   Home_ = ::Skylab::Plugin
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
 
-  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
   NIL_ = nil

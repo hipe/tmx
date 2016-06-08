@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] event - wrappers file utils message" do
+  describe "[co] event - wrappers file utils message" do
 
     context 'mkdir -p' do
 

@@ -294,7 +294,7 @@ module Skylab::Zerk
         end
 
         def _to_qkn
-          Callback_::Qualified_Knownness[ @any_value_s, @parameter ]
+          Common_::Qualified_Knownness[ @any_value_s, @parameter ]
         end
 
         def is_special
@@ -310,7 +310,7 @@ module Skylab::Zerk
         end
 
         def _to_qkn
-          Callback_::Qualified_Knownness[ @any_value_s, @association ]
+          Common_::Qualified_Knownness[ @any_value_s, @association ]
         end
 
         def is_special

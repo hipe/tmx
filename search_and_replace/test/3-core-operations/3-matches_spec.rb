@@ -180,7 +180,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _Per_File = ___Per_File
 
-      matchbox = Callback_::Box.new
+      matchbox = Common_::Box.new
 
       for_ = -> path do
 

@@ -13,13 +13,13 @@ module Skylab::Parse::TestSupport
 
     def memoize_subject_parse_function_ & build_p
 
-      define_method :subject_parse_function_, Callback_::Memoize[ & build_p ]
+      define_method :subject_parse_function_, Common_::Memoize[ & build_p ]
       NIL_
     end
 
     def use sym
       Test_Support_Bundles___.const_get(
-        Callback_::Name.via_variegated_symbol( sym ).as_const,
+        Common_::Name.via_variegated_symbol( sym ).as_const,
         false
       )[ self ]
     end
@@ -64,14 +64,14 @@ module Skylab::Parse::TestSupport
 
     Expect_Event = -> tcm do
 
-      Callback_.test_support::Expect_Event[ tcm ]
+      Common_.test_support::Expect_Event[ tcm ]
     end
   end
 
   Home_ = ::Skylab::Parse
 
   Autoloader_ = Home_::Autoloader_
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
   EMPTY_A_ = Home_::EMPTY_A_
   IDENTITY_ = -> x { x }
   NIL_ = nil

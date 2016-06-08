@@ -90,7 +90,7 @@ module Skylab::TestSupport
         _Parse = Home_.lib_.parse
         opn = _Parse::OutputNode
         pair = -> x, sym do
-          Callback_::Pair.via_value_and_name x, sym
+          Common_::Pair.via_value_and_name x, sym
         end
 
         en_num_rx = /\A(?:
@@ -244,7 +244,7 @@ module Skylab::TestSupport
 
         @resources.serr.puts "(#{ s_a * SPACE_ })"
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         _TMX = Home_.lib_.TMX
 

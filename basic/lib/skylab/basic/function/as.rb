@@ -26,7 +26,7 @@ module Skylab::Basic
 
         def build_unordered_index_stream & _
 
-          Callback_::Stream.via_item self
+          Common_::Stream.via_item self
         end
 
         def name_function
@@ -118,7 +118,7 @@ module Skylab::Basic
 
         def __build_parameter_box
 
-          bx = Callback_::Stream::As_Mutable_Box.new [], {}
+          bx = Common_::Stream::As_Mutable_Box.new [], {}
 
           @signature_classifications.
               business_parameters.each do | opt_req_rest, name_symbol |
@@ -140,7 +140,7 @@ module Skylab::Basic
             _prp = ::Skylab::Brazen::Modelesque::Entity::Property.new_by do
 
               @argument_arity = argument_arity
-              @name = Callback_::Name.via_variegated_symbol name_symbol
+              @name = Common_::Name.via_variegated_symbol name_symbol
               @parameter_arity = parameter_arity
             end
 
@@ -208,7 +208,7 @@ module Skylab::Basic
             __build_when_extra_arguments_event extra_sym_a
           end
 
-          Callback_::Bound_Call.via_value _x
+          Common_::Bound_Call.via_value _x
         end
 
         def __build_when_extra_arguments_event extra_sym_a
@@ -225,7 +225,7 @@ module Skylab::Basic
             __build_missing_arguments_event miss_prp_a
           end
 
-          Callback_::Bound_Call.via_value _x
+          Common_::Bound_Call.via_value _x
         end
 
         def __build_missing_arguments_event miss_prp_a
@@ -249,7 +249,7 @@ module Skylab::Basic
             p = @on_event_selectively
           end
 
-          Callback_::Bound_Call[ arglist, @unbound._p, :call, & p ]
+          Common_::Bound_Call[ arglist, @unbound._p, :call, & p ]
         end
 
         def _maybe_send_event * i_a, & ev_p
@@ -259,7 +259,7 @@ module Skylab::Basic
 
         def _sign_event ev
           _nf = @unbound.name_function
-          Callback_::Event.wrap.signature _nf, ev
+          Common_::Event.wrap.signature _nf, ev
         end
       end
     # <-

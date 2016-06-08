@@ -32,7 +32,7 @@ module Skylab::Brazen
           @on_event_selectively = oes_p
         end
 
-        @argument_stream = Callback_::Polymorphic_Stream.via_array x_a
+        @argument_stream = Common_::Polymorphic_Stream.via_array x_a
         NIL_
       end
 
@@ -155,10 +155,10 @@ module Skylab::Brazen
       def _end_in_error_with * x_a
 
         _result = @on_event_selectively.call :error, x_a.first do
-          Callback_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, nil
+          Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, nil
         end
 
-        @bound_call = Callback_::Bound_Call.via_value _result
+        @bound_call = Common_::Bound_Call.via_value _result
 
         UNABLE_
       end
@@ -178,7 +178,7 @@ module Skylab::Brazen
             if ev_p
               ev_p[]
             else
-              Callback_::Event.inline_via_normal_extended_mutable_channel i_a
+              Common_::Event.inline_via_normal_extended_mutable_channel i_a
             end
           end
         end

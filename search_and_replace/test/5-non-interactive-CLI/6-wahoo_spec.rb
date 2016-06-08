@@ -101,7 +101,7 @@ module Skylab::SearchAndReplace::TestSupport
         rx = %r(\A(.+) - (.+)$)
         DASH_ = '-' ; UNDERSCORE_ = '_'
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         # while #open [#028] - manually ignore this verbose output - start at  2
 

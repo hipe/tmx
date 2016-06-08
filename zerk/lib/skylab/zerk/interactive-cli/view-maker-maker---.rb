@@ -56,7 +56,7 @@ module Skylab::Zerk
       # (if a value is known to be `nil` or known to be `false` it is still
       # a known known.) :#thread-three
 
-      instance_variable_set ivar, Callback_::Known_Known[ x ]
+      instance_variable_set ivar, Common_::Known_Known[ x ]
       x
     end
 

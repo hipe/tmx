@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::System
 
@@ -8,7 +8,7 @@ module Skylab::System
 
     def lib_
 
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
 
@@ -24,9 +24,9 @@ module Skylab::System
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Services_front___ = Callback_.memoize do  # #section-2 intro to the front
+  Services_front___ = Common_.memoize do  # #section-2 intro to the front
 
     class Front___ < ::BasicObject
 
@@ -116,7 +116,7 @@ module Skylab::System
 
   # ==
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Filesystem  # (stowaway)
 
@@ -145,7 +145,7 @@ module Skylab::System
     Home_.lib_.fields::Attributes[ h ]
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   Autoloader_[ Services___ = ::Module.new ]
 

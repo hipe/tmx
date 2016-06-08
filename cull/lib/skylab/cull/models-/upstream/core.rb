@@ -5,7 +5,7 @@ module Skylab::Cull
     class First_Edit
 
       def initialize
-        @bx = Callback_::Box.new
+        @bx = Common_::Box.new
       end
 
       def derelativizer x

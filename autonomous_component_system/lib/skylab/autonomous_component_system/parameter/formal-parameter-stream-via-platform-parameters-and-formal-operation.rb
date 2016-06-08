@@ -30,7 +30,7 @@ module Skylab::Autonomous_Component_System
           MONADIC_EMPTINESS_
         end
 
-        Callback_::Stream.via_nonsparse_array a do |(cat, sym)|
+        Common_::Stream.via_nonsparse_array a do |(cat, sym)|
 
           edit = PARAM_ARITY___.fetch cat
 

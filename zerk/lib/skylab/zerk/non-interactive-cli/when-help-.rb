@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class NonInteractiveCLI
 
-    class When_Help_ < Callback_::Actor::Dyadic
+    class When_Help_ < Common_::Actor::Dyadic
 
       # this help facility is engaged IFF the main interpreter has matched
       # (somehow) a token at the head of the argument stream that matches
@@ -47,7 +47,7 @@ module Skylab::Zerk
           __warn_about_ignored
         end
 
-        @_upstream = Callback_::Polymorphic_Stream.via s ; nil
+        @_upstream = Common_::Polymorphic_Stream.via s ; nil
       end
 
       # as such there are now zero or more tokens remaining in the argument

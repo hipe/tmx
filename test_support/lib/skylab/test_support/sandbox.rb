@@ -115,7 +115,7 @@ module Skylab::TestSupport
     :kiss_with, :produce_subclasses_of,
   )
 
-  Kernel_ = Callback_::Session::Ivars_with_Procs_as_Methods.new :flush do
+  Kernel_ = Common_::Session::Ivars_with_Procs_as_Methods.new :flush do
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -147,7 +147,7 @@ module Skylab::TestSupport
     end
   end
 
-  Host::Kernel_ = Callback_::Session::Ivars_with_Procs_as_Methods.new :flush do
+  Host::Kernel_ = Common_::Session::Ivars_with_Procs_as_Methods.new :flush do
 
     def initialize anchor_mod
 
@@ -210,7 +210,7 @@ module Skylab::TestSupport
       end
     end
 
-    Callback_::Session::Ivars_with_Procs_as_Methods[ self ].
+    Common_::Session::Ivars_with_Procs_as_Methods[ self ].
       as_public_getter :define_sandbox_constant_proc  # grease
 
   end

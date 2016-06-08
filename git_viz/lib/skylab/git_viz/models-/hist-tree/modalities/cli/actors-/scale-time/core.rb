@@ -131,7 +131,7 @@ module Skylab::GitViz
             def [] sym
               @h.fetch sym do
                 @h[ sym ] = const_get(
-                  Callback_::Name.via_variegated_symbol( sym ).as_const,
+                  Common_::Name.via_variegated_symbol( sym ).as_const,
                   false )
               end
             end

@@ -117,7 +117,7 @@ module Skylab::SubTree
 
           maybe_send_event :error, :irreconcilable_upstream do
 
-            Callback_::Event.inline_not_OK_with(
+            Common_::Event.inline_not_OK_with(
 
               :irreconcilable_upstream,
               :a, a,
@@ -145,7 +145,7 @@ module Skylab::SubTree
             x or next
             prp = @formal_properties[ k ]
             prp.is_extension or next
-            ok = __load_extension Callback_::Qualified_Knownness.via_value_and_association( x, prp )
+            ok = __load_extension Common_::Qualified_Knownness.via_value_and_association( x, prp )
             ok or break
           end
 
@@ -200,7 +200,7 @@ module Skylab::SubTree
 
           maybe_send_event :info, :find_command do
 
-            Callback_::Event.inline_neutral_with(
+            Common_::Event.inline_neutral_with(
               :find_command,
               :args, x_p[].args
 
@@ -309,7 +309,7 @@ module Skylab::SubTree
 
             _delimited_lines = _my_CLI::Render_table[ [], @node_array ]
 
-            Callback_::Stream.via_nonsparse_array _delimited_lines
+            Common_::Stream.via_nonsparse_array _delimited_lines
           end
 
           def _my_CLI

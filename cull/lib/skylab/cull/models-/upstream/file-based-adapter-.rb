@@ -20,7 +20,7 @@ module Skylab::Cull
 
         def to_mutable_marshal_box_for_survey_ survey
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
           bx.add :upstream, "file:#{ survey.maybe_relativize_path( @path ) }"
           bx.add :adapter, adapter_symbol
           bx

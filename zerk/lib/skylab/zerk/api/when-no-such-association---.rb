@@ -22,7 +22,7 @@ module Skylab::Zerk
 
         o.valid_collection = _st__
 
-        o.property_name = Callback_::Name.via_human 'association'
+        o.property_name = Common_::Name.via_human 'association'
 
         o.event_name_symbol = :no_such_association
 

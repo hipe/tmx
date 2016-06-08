@@ -1,6 +1,6 @@
 module Skylab::MyTerm::TestSupport
 
-  class Mess_With < Callback_::Actor::Monadic
+  class Mess_With < Common_::Actor::Monadic
 
     # -
 
@@ -33,7 +33,7 @@ module Skylab::MyTerm::TestSupport
       end
 
     # -
-    class Make_dynamic_stub_proxy < Callback_::Actor::Monadic
+    class Make_dynamic_stub_proxy < Common_::Actor::Monadic
 
       def initialize real_object, & edit
         if ! real_object

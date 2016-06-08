@@ -4,7 +4,7 @@ module Skylab::TanMan
 
       class Actors__::Mutate
 
-        Callback_::Event.selective_builder_sender_receiver self
+        Common_::Event.selective_builder_sender_receiver self
 
         class Touch < self
 
@@ -282,7 +282,7 @@ module Skylab::TanMan
 
           maybe_send_event :error, :node_not_found do
 
-            _as_componet = Callback_::Name.via_slug @name_s
+            _as_componet = Common_::Name.via_slug @name_s
             # this might give us "human" inflection. we could do better,
             # but it would invole heavy hacking of the node class
 

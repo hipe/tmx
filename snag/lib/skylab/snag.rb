@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Snag
 
@@ -18,11 +18,11 @@ module Skylab::Snag
     end  # >>
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   class << self
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Home_.lib_.brazen::Kernel.new Home_
     end )
 
@@ -32,7 +32,7 @@ module Skylab::Snag
 
   end  # >>
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Models_
 
@@ -135,7 +135,7 @@ module Skylab::Snag
 
             model_class = chain.last.value_x
 
-            _slug = Callback_::Name.via_const_symbol( first.name_symbol ).as_slug
+            _slug = Common_::Name.via_const_symbol( first.name_symbol ).as_slug
             _path = model_class.dir_pathname.join( 'actions', _slug ).to_path
 
             require _path
@@ -168,7 +168,7 @@ module Skylab::Snag
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_= true
   Bsc__ = Autoloader_.build_require_sidesystem_proc :Basic

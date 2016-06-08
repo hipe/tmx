@@ -1,8 +1,8 @@
 require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] event - makers - hooks" do
+  describe "[co] event - makers - hooks" do
 
     extend TS_
 

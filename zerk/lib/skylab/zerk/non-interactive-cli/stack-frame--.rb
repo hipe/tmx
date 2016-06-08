@@ -269,14 +269,14 @@ module Skylab::Zerk
 
           @_did_big_index || _do_big_index
 
-          Callback_::Stream.via_nonsparse_array @__navigational_NTs
+          Common_::Stream.via_nonsparse_array @__navigational_NTs
         end
 
         def to_referenceable_node_ticket_stream__
 
           @_did_big_index || _do_big_index
 
-          Callback_::Stream.via_nonsparse_array @__referenceable_NTs
+          Common_::Stream.via_nonsparse_array @__referenceable_NTs
         end
 
         def _do_big_index  # we avoid this #"heavy lift" when possible..
@@ -415,7 +415,7 @@ module Skylab::Zerk
         def to_frame_stream_from_bottom  # [my]
 
           _a = _build_frame_stack_from_bottom
-          Callback_::Stream.via_nonsparse_array _a
+          Common_::Stream.via_nonsparse_array _a
         end
 
         def _build_frame_stack_from_bottom
@@ -437,7 +437,7 @@ module Skylab::Zerk
             end
           end
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -573,7 +573,7 @@ module Skylab::Zerk
         }
 
         Node_Name___ = Lazy_.call do
-          Callback_::Name.via_human 'node name'
+          Common_::Name.via_human 'node name'
         end
 
         def __resolve_formal_node_for_operation nt

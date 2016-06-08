@@ -104,7 +104,7 @@ module Skylab::SearchAndReplace
               nil
             end
           end
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -115,7 +115,7 @@ module Skylab::SearchAndReplace
           io = ::File.open @path, ::File::CREAT | ::File::RDONLY
           line_number = 0
           rx = @ruby_regexp
-          Callback_.stream do
+          Common_.stream do
             while line = io.gets
               line_number += 1
               md = rx.match line
@@ -198,7 +198,7 @@ module Skylab::SearchAndReplace
             @_st = @expag.map_match_line_stream _st
             @_p = method :___gets_first_line
 
-            Callback_.stream do
+            Common_.stream do
               @_p.call
             end
           end

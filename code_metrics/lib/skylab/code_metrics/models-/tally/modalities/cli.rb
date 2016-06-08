@@ -153,7 +153,7 @@ module Skylab::CodeMetrics
 
       def _failed
         express_invite_to_general_help
-        Callback_::Bound_Call.via_value Brazen_::CLI_Support::GENERIC_ERROR_EXITSTATUS
+        Common_::Bound_Call.via_value Brazen_::CLI_Support::GENERIC_ERROR_EXITSTATUS
       end
     end
   end

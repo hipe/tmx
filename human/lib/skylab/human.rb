@@ -1,18 +1,18 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Human  # :[#001].
 
   class << self
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   # -- proc-like support methods
 
@@ -41,7 +41,7 @@ module Skylab::Human  # :[#001].
   # -- would-be orphanic stowaways
 
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module NLP
     Autoloader_[ self ]
@@ -50,7 +50,7 @@ module Skylab::Human  # :[#001].
 
   # --
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   CLI = nil  # for host

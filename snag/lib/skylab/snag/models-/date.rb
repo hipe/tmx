@@ -24,7 +24,7 @@ module Skylab::Snag
 
       def __build_invalid_date_event x
 
-        Callback_::Event.inline_not_OK_with :invalid_date, :x, x do | y, o |
+        Common_::Event.inline_not_OK_with :invalid_date, :x, x do | y, o |
           y << "invalid date: #{ ick o.x }"
         end
       end

@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Transition_ < Callback_::Actor::Monadic
+    class Transition_ < Common_::Actor::Monadic
 
       def initialize kns
         @knowns_ = kns
@@ -52,9 +52,9 @@ module Skylab::Human
 
         item_a = __selection_stack_as_array
 
-        Callback_::Stream.via_times item_a.length do |d|
+        Common_::Stream.via_times item_a.length do |d|
 
-          Callback_::Known_Known[ item_a.fetch d ]
+          Common_::Known_Known[ item_a.fetch d ]
         end
       end
 

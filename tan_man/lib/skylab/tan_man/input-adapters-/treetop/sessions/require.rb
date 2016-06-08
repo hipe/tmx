@@ -31,7 +31,7 @@ module Skylab::TanMan
         @on_event_selectively = oes_p
       end
 
-      LOADED__ = Callback_::Box.new
+      LOADED__ = Common_::Box.new
 
       def execute  # see [#.A]
 
@@ -141,7 +141,7 @@ module Skylab::TanMan
 
       def _build_grammar_event which_g_a, g_a, ing_sym
 
-        Callback_::Event.inline_neutral_with(
+        Common_::Event.inline_neutral_with(
           ing_sym,
           which_g_a, g_a,
 
@@ -222,12 +222,12 @@ module Skylab::TanMan
         uow = @_units_of_work.last
         sym_a = uow.module_name_i_a
         sym_a[ -1 ] = :"#{ sym_a.last }Parser"
-        cls = Callback_::Const_value_via_parts[ sym_a ]
+        cls = Common_::Const_value_via_parts[ sym_a ]
 
         if @add_parser_enhancer_module  # an array
 
           d = 0
-          ick = Callback_::Const_value_via_parts[ sym_a[ 0 ... -1 ] ]
+          ick = Common_::Const_value_via_parts[ sym_a[ 0 ... -1 ] ]
           stem = sym_a.last
 
           @add_parser_enhancer_module.each do | mod |  # legacy

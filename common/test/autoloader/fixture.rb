@@ -1,3 +1,3 @@
-module Skylab::Callback::TestSupport::Autoloader
+module Skylab::Common::TestSupport::Autoloader
   FIXTURE = :_yes_
 end

@@ -145,7 +145,7 @@ y << "target distance must be at a minimum N-1."
           end
         end
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         begin
           item = st.gets
           item or break
@@ -294,11 +294,11 @@ y << "target distance must be at a minimum N-1."
           a.reverse!
         end
 
-        Callback_::Stream.via_nonsparse_array( a ).expand_by do | (d, d_) |
+        Common_::Stream.via_nonsparse_array( a ).expand_by do | (d, d_) |
 
           _item_o_a = @_item_box.fetch d
 
-          Callback_::Stream.via_nonsparse_array _item_o_a do | item_o |
+          Common_::Stream.via_nonsparse_array _item_o_a do | item_o |
 
             Models_::Rename.new d_, item_o
           end

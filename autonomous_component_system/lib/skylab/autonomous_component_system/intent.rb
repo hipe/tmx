@@ -58,7 +58,7 @@ module Skylab::Autonomous_Component_System
           nt
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

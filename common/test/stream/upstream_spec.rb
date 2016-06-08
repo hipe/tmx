@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] stream - signals" do
+  describe "[co] stream - signals" do
 
     it "has it" do
 

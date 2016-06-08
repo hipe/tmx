@@ -71,7 +71,7 @@ module Skylab::Brazen
           _EMPTY_OPTS
         else
           opts = Opts__.new
-          st = Callback_::Polymorphic_Stream.via_array x_a
+          st = Common_::Polymorphic_Stream.via_array x_a
           begin
             k = st.gets_one
             _x = if _TAKES_ARG[ k ]
@@ -182,7 +182,7 @@ module Skylab::Brazen
         p = -> line do
           had_none = false
           if @_tight_IFF_one_line
-            tight_one = Callback_::Known_Known[ line ]
+            tight_one = Common_::Known_Known[ line ]
             p = -> line_ do
               tight_one = nil
               _express_lone_header_line

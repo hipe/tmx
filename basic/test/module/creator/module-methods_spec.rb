@@ -15,7 +15,7 @@ module Skylab::Basic::TestSupport
 
   module Scenario_One
 
-    Once__ = Callback_.memoize do  # we want something more explicit than before( :all ) for now
+    Once__ = Common_.memoize do  # we want something more explicit than before( :all ) for now
 
       module Some_Module_Definer_Methods
 
@@ -58,7 +58,7 @@ module Skylab::Basic::TestSupport
 
   module Scenario_Two
 
-      Once__ = Callback_.memoize do
+      Once__ = Common_.memoize do
 
         module OneGuy
 

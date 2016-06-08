@@ -29,7 +29,7 @@ module Skylab::Cull
             x
           end
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end

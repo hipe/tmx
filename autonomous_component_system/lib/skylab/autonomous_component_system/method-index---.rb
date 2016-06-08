@@ -9,9 +9,9 @@ module Skylab::Autonomous_Component_System
           @_entry_stream = -> do
 
             cache = []
-            st = Callback_::Stream.via_nonsparse_array meth_a
+            st = Common_::Stream.via_nonsparse_array meth_a
 
-            Callback_.stream do
+            Common_.stream do
 
               begin
 
@@ -31,7 +31,7 @@ module Skylab::Autonomous_Component_System
                 # the end was reached.
 
                 @_entry_stream = -> do
-                  Callback_::Stream.via_nonsparse_array cache
+                  Common_::Stream.via_nonsparse_array cache
                 end
 
                 break

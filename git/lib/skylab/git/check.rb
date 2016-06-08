@@ -5,7 +5,7 @@ module Skylab::Git
     class << self
 
       def line_oriented_via_arguments__ a
-        st = Callback_::Polymorphic_Stream.via_array a
+        st = Common_::Polymorphic_Stream.via_array a
         o = As_Line_Oriented_Actor__.begin
         o.y = st.gets_one
         o.file_a = st.gets_one
@@ -27,7 +27,7 @@ module Skylab::Git
           o.file_a = file_a
           o.y = y
           if x_a.length.nonzero?
-            o._process Callback_::Polymorphic_Stream.via_array x_a
+            o._process Common_::Polymorphic_Stream.via_array x_a
           end
           o.execute
         end

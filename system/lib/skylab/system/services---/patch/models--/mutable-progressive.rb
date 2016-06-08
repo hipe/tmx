@@ -30,7 +30,7 @@ module Skylab::System
         @_lines = if x.respond_to? :gets
           x
         else
-          Callback_::Scn.try_convert x
+          Common_::Scn.try_convert x
         end
         NIL_
       end
@@ -60,7 +60,7 @@ module Skylab::System
       end
 
       def __to_chunk_stream
-        Callback_::Stream.via_nonsparse_array @_chunks
+        Common_::Stream.via_nonsparse_array @_chunks
       end
 
 

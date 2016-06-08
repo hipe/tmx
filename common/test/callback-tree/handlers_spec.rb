@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Tree
+module Skylab::Common::TestSupport::CallbackTree
 
-  describe "[ca] tree - handlers" do
+  describe "[co] callback tree - handlers" do
 
     context "a typical handlers tree" do
 
@@ -57,7 +57,7 @@ module Skylab::Callback::TestSupport::Tree
     end
 
     let :hndlrs do
-      Home_::Tree.new( { error: { frobulation:
+      Home_::CallbackTree.new( { error: { frobulation:
         { trans_dermal: :handler, sub_cutaneous: :handler } } }, :wazlo )
     end
 

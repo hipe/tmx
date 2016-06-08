@@ -48,13 +48,13 @@ module Skylab::Basic
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
     end  # >>
 
-    class Marshal_load___ < Callback_::Actor::Monadic
+    class Marshal_load___ < Common_::Actor::Monadic
 
       def initialize s, & oes_p
         @on_event_selectively = oes_p
@@ -77,7 +77,7 @@ module Skylab::Basic
 
         @on_event_selectively.call :error, :not_parsable_as_regex do
 
-          Callback_::Event.inline_not_OK_with :not_parsable_as_regex,
+          Common_::Event.inline_not_OK_with :not_parsable_as_regex,
             :string, @string
         end
         UNABLE_
@@ -116,7 +116,7 @@ module Skylab::Basic
 
       def ___when_rx_e
 
-        ev = Callback_::Event.wrap.exception @e
+        ev = Common_::Event.wrap.exception @e
 
         @on_event_selectively.call :error, ev.terminal_channel_i do
           ev
@@ -138,7 +138,7 @@ module Skylab::Basic
       attr_reader :is_ignorecase, :is_multiline, :is_extended
     end
 
-    Require_component_model_support___ = Callback_.memoize do
+    Require_component_model_support___ = Common_.memoize do
 
       class Component_Model
 
@@ -181,7 +181,7 @@ module Skylab::Basic
             x = arg_st.gets_one
 
             if @matcher =~ x
-              Callback_::Known_Known[ x ]
+              Common_::Known_Known[ x ]
             else
               _failed( & x_p )
             end
@@ -198,7 +198,7 @@ module Skylab::Basic
 
             if md
               _x = @mapper[ * md.captures ]
-              Callback_::Known_Known[ _x ]
+              Common_::Known_Known[ _x ]
             else
               _failed( & x_p )
             end

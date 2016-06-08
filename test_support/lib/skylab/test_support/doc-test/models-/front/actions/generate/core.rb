@@ -261,7 +261,7 @@ module Skylab::TestSupport
 
         protected def _receive_dup_iambic x_a
 
-          _st = Callback_::Polymorphic_Stream.via_array x_a
+          _st = Common_::Polymorphic_Stream.via_array x_a
 
           _ok = process_polymorphic_stream_fully _st
 
@@ -274,7 +274,7 @@ module Skylab::TestSupport
 
         def execute  # no, this wasn't already implemented by the f.w!
 
-          @argument_box ||= Callback_::Box.the_empty_box # ick/meh
+          @argument_box ||= Common_::Box.the_empty_box # ick/meh
           bc = via_arguments_produce_bound_call  # will call normalize
           bc and begin
             bc.receiver.send bc.method_name, * bc.args  # result matters
@@ -400,9 +400,9 @@ module Skylab::TestSupport
             :name_symbol )
         end
 
-        Cached_dictionary_starter___ = Callback_.memoize do
+        Cached_dictionary_starter___ = Common_.memoize do
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
 
           st = properties.to_value_stream
 
@@ -521,7 +521,7 @@ module Skylab::TestSupport
 
         def _resolve_line_downstream_via_output_path
 
-          _force_arg = Callback_::Qualified_Knownness.via_value_and_association(
+          _force_arg = Common_::Qualified_Knownness.via_value_and_association(
             # because we use ivars and not property boxes, we must make this manually
             @force,
             self.class.properties.fetch( :force ) )
@@ -694,7 +694,7 @@ module Skylab::TestSupport
 
           maybe_send_event :info, :current_output_path do
 
-            Callback_::Event.inline_neutral_with(
+            Common_::Event.inline_neutral_with(
               :current_output_path,
               :path, @output_path,
             )
@@ -709,7 +709,7 @@ module Skylab::TestSupport
         end
 
         module Parameter_Functions_
-          Callback_::Autoloader[ self, :boxxy ]
+          Common_::Autoloader[ self, :boxxy ]
         end
 
         Self_ = self

@@ -25,7 +25,7 @@ module Skylab::Basic::TestSupport
       \z/x
 
       pair = -> v_x=nil, n_x=nil do
-        Callback_::Pair.via_value_and_name v_x, n_x
+        Common_::Pair.via_value_and_name v_x, n_x
       end
 
       o = Home_::State::Machine::Edit_Session.new
@@ -102,7 +102,7 @@ module Skylab::Basic::TestSupport
 
     it "no input" do
 
-      _against Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
+      _against Common_::Polymorphic_Stream.the_empty_polymorphic_stream
 
       _expect_failed_with "expecting long switch at end of input"
     end
@@ -158,7 +158,7 @@ module Skylab::Basic::TestSupport
 
     def _upstream * s_a
 
-      Callback_::Polymorphic_Stream.via_array s_a
+      Common_::Polymorphic_Stream.via_array s_a
     end
 
     define_method :_against do | st |

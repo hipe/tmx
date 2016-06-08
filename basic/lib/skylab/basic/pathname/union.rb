@@ -148,7 +148,7 @@ module Skylab::Basic
             y << a * ' and '
           end )
 
-        _upstream_producer = Callback_::Stream.via_nonsparse_array( arr ).map_by do |st|
+        _upstream_producer = Common_::Stream.via_nonsparse_array( arr ).map_by do |st|
           st.each_pair.reduce [] { |m, a| m.concat a ; m }
         end
 

@@ -8,7 +8,7 @@ module Skylab::Brazen
 
         def initialize
 
-          @_bx = Callback_::Box.new
+          @_bx = Common_::Box.new
 
           @_do_show_header_row = true
           @expression_width = nil
@@ -23,7 +23,7 @@ module Skylab::Brazen
 
         def edit_table * x_a
 
-          st = Callback_::Polymorphic_Stream.via_array x_a
+          st = Common_::Polymorphic_Stream.via_array x_a
 
           fld_st = IG__.simple_stream_of_items_via_polymorpic_stream st
 
@@ -225,7 +225,7 @@ module Skylab::Brazen
 
           def __build_some_inferred_label
 
-            s = Callback_::Name.via_variegated_symbol( @name_symbol ).as_human
+            s = Common_::Name.via_variegated_symbol( @name_symbol ).as_human
             if @_do_titlecase_generated_fields
               s = s.dup  # good job name class, you're frozen like u should be
               s[ 0 ] = s[ 0 ].upcase

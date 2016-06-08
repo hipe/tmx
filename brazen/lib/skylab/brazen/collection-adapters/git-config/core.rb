@@ -108,11 +108,11 @@ module Skylab::Brazen
       elsif oes_p
         oes_p.call :info, :property_not_found do
 
-          Callback_::Event.inline_neutral_with :property_not_found,
+          Common_::Event.inline_neutral_with :property_not_found,
               :property_symbol, sym,
               :input_identifier, _document.input_id do |y, o|
 
-            y << "no #{ nm Callback_::Name.via_variegated_symbol o.property_symbol } #{
+            y << "no #{ nm Common_::Name.via_variegated_symbol o.property_symbol } #{
               }property in #{ o.input_identifier.description_under self }"
           end
         end
@@ -166,7 +166,7 @@ module Skylab::Brazen
         end
       end  # >>
 
-      Callback_::Event.selective_builder_sender_receiver self
+      Common_::Event.selective_builder_sender_receiver self
 
       def initialize a, & oes_p
         input_method_i, input_x = a
@@ -357,7 +357,7 @@ module Skylab::Brazen
       end
 
       def to_value_stream
-        Callback_::Stream.via_nonsparse_array @a
+        Common_::Stream.via_nonsparse_array @a
       end
 
       def each_pair
@@ -450,12 +450,12 @@ module Skylab::Brazen
         d = -1
         last = @a.length - 1
 
-        Callback_.stream do
+        Common_.stream do
 
           if d < last
             d += 1
             ast = @a.fetch d
-            Callback_::Pair.via_value_and_name(
+            Common_::Pair.via_value_and_name(
               ast.value_x,
               ast.external_normal_name_symbol )
           end

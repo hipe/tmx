@@ -76,7 +76,7 @@ module Skylab::Fields
         def to_defined_attribute_stream__
 
           ea = @_h.each_value
-          Callback_.stream do
+          Common_.stream do
             begin
               ea.next
             rescue ::StopIteration
@@ -158,7 +158,7 @@ module Skylab::Fields
         end
 
         def sexp= sx
-          @argument_stream = Callback_::Polymorphic_Stream.via_array sx ; sx
+          @argument_stream = Common_::Polymorphic_Stream.via_array sx ; sx
         end
 
         attr_writer(
@@ -353,7 +353,7 @@ module Skylab::Fields
         def add_to_the_custom_index_ k, meta_k
 
           _idx = ( @_custom_index ||= {} )
-          _bx = _idx[ meta_k ] ||= Callback_::Box.new
+          _bx = _idx[ meta_k ] ||= Common_::Box.new
           _bx.add k, true  # so we can h[k] with a transparent h
         end
 
@@ -375,7 +375,7 @@ module Skylab::Fields
 
           def __add_to_box k, meta_k
 
-            ( self[ meta_k ] ||= Callback_::Box.new ).add k, nil
+            ( self[ meta_k ] ||= Common_::Box.new ).add k, nil
             NIL_
           end
 

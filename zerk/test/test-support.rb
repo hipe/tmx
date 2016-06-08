@@ -27,9 +27,9 @@ module Skylab::Zerk::TestSupport
   extend TestSupport_::Quickie
 
   Home_ = ::Skylab::Zerk
-  Callback_ = Home_::Callback_
-  Autoloader__ = Callback_::Autoloader
-  Lazy_ = Callback_::Lazy
+  Common_ = Home_::Common_
+  Autoloader__ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
 
   # -
     Use_method___ = -> sym do
@@ -90,7 +90,7 @@ module Skylab::Zerk::TestSupport
   Primitivesque_model_for_trueish_value_ = -> arg_st do
     x = arg_st.gets_one
     x or self._SANITY
-    Callback_::Known_Known[ x ]
+    Common_::Known_Known[ x ]
   end
 
   # -- mode-specific
@@ -104,7 +104,7 @@ module Skylab::Zerk::TestSupport
   # -- test lib nodes
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Expect_Stdout_Stderr = -> tcc do

@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Digraph
+module Skylab::Common::TestSupport::Digraph
 
-  ::Skylab::Callback::TestSupport[ Digraph_TestSupport = self ] # #regret
+  ::Skylab::Common::TestSupport[ Digraph_TestSupport = self ] # #regret
 
   include Constants
 
@@ -68,7 +68,7 @@ module Skylab::Callback::TestSupport::Digraph
     counter = 0
 
     let :klass do                 # working in conjunction w/ `inside` below,
-      blk = inside                # make a Callback empowered class and nerk it
+      blk = inside                # make a Common empowered class and nerk it
       kls = Digraph_TestSupport.const_set :"KLS_#{ counter += 1 }", ::Class.new
       kls.class_exec do
         Home_[ self, :employ_DSL_for_digraph_emitter ]

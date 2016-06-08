@@ -31,7 +31,7 @@ module Skylab::TestSupport
 
           a.each_with_index do | x, d |
             if :N == x.to_sym
-              a[ d ] = Callback_::Pair.via_value_and_name( len, :digit )
+              a[ d ] = Common_::Pair.via_value_and_name( len, :digit )
             end
           end
 

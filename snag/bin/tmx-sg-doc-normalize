@@ -7,8 +7,8 @@ program = -> sin, sout, serr, pn_s_a, argv do
 
   subsystem = -> i do
 
-    require 'skylab/callback'
-    Skylab::Callback::Autoloader.require_sidesystem i
+    require 'skylab/common'
+    Skylab::Common::Autoloader.require_sidesystem i
   end
 
   _Hi = hi = -> s do "\e[32m#{ s }\e[0m" end

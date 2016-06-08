@@ -97,7 +97,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
             s = in_st.gets_one
             if /\A[a-z]+\z/ =~ s
-              Callback_::Known_Known[ s ]
+              Common_::Known_Known[ s ]
             else
 
               if oes_p_p
@@ -117,7 +117,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           -> in_st do
             x = in_st.gets_one
             x.respond_to?( :bit_length ) or self._SANITY
-            Callback_::Known_Known[ x ]
+            Common_::Known_Known[ x ]
           end
         end
 

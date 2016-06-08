@@ -6,7 +6,7 @@ module Skylab::Zerk
 
     module When_Support_  # #[#sl-155]
 
-      class Here_::When_ < Callback_::Actor::Monadic
+      class Here_::When_ < Common_::Actor::Monadic
 
         class Ended_at_Compound < self  # for #t6
 

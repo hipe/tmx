@@ -1,8 +1,8 @@
 require_relative '../../../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] [..] fire" do
+  describe "[co] [..] fire" do
 
     extend TS_
     TS_::Expect_Event[ self ]
@@ -14,14 +14,14 @@ module Skylab::Callback::TestSupport
       call_API(
         :fire,
         :file, _path,
-        :const, 'Skylab::Callback::TestSupport::Fixtures::ZigZag',
+        :const, 'Skylab::Common::TestSupport::Fixtures::ZigZag',
         :channel, 'hacking'
       )
 
       _em = expect_event :event_event
 
       black_and_white( _em.cached_event_value ).should match(
-        %r(\Aevent: #<Skylab::Callback::TestSupport::.*\bMock_Old_Event) )
+        %r(\Aevent: #<Skylab::Common::TestSupport::.*\bMock_Old_Event) )
 
       expect_succeeded
     end

@@ -56,7 +56,7 @@ module Skylab::Human::TestSupport
 
     def bld_input_scn
       @a_a = []
-      Callback_::Scn.new do
+      Common_::Scn.new do
         @a_a.shift
       end
     end

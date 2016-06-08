@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Autoloader
+module Skylab::Common::TestSupport::Autoloader
 
-  ::Skylab::Callback::TestSupport[ TS_ = self ]
+  ::Skylab::Common::TestSupport[ TS_ = self ]
 
-  Home_ = ::Skylab::Callback
+  Home_ = ::Skylab::Common
 
   include Constants
 

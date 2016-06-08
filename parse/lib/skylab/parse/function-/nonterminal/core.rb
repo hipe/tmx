@@ -11,7 +11,7 @@ module Skylab::Parse
         end
 
         def to_reflective_function_stream
-          Callback_::Stream.via_nonsparse_array @_function_a
+          Common_::Stream.via_nonsparse_array @_function_a
         end
       end
     end

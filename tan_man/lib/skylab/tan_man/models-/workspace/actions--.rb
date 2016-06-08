@@ -51,7 +51,7 @@ module Skylab::TanMan
 
         an = @kernel.app_name.gsub DASH_, SPACE_
 
-        Callback_::Event.inline_neutral_with(
+        Common_::Event.inline_neutral_with(
           :ping
         ) do | y, o |
           y << "hello from #{ an }."

@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System
         dup.___build_value arg_st, & x_p
       end
 
-      nf = Callback_::Name.via_variegated_symbol @plural_symbol
+      nf = Common_::Name.via_variegated_symbol @plural_symbol
       nf.as_ivar = sca.name.as_ivar
       pca.name = nf
       pca
@@ -57,7 +57,7 @@ module Skylab::Autonomous_Component_System
           end
         end
         if ok
-          Callback_::Known_Known[ ok_value_a ]
+          Common_::Known_Known[ ok_value_a ]
         else
           # assume the callback was called
           ok

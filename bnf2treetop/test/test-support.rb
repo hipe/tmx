@@ -25,9 +25,9 @@ module Skylab::BNF2Treetop::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Callback_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   Home_ = ::Skylab::BNF2Treetop
   NEWLINE_ = Home_::NEWLINE_

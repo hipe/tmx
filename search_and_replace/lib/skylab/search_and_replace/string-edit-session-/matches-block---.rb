@@ -189,7 +189,7 @@ module Skylab::SearchAndReplace
 
           lt_a = to_throughput_line_stream_.to_a
 
-          Callback_::Stream.via_range( ( lt_a.length - 1 ) .. 0 ) do |d|
+          Common_::Stream.via_range( ( lt_a.length - 1 ) .. 0 ) do |d|
             lt_a.fetch d
           end
         end

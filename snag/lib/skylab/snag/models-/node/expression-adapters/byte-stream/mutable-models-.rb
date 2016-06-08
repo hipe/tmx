@@ -56,7 +56,7 @@ module Skylab::Snag
           ACHIEVED_
         end
 
-        Space_piece_singleton__ = Callback_.memoize do
+        Space_piece_singleton__ = Common_.memoize do
 
           Home_::Models::Hashtag::String_Piece.new_via_string SPACE_
         end
@@ -68,7 +68,7 @@ module Skylab::Snag
           x = nil
 
           d = 0 ; len = @row_a.length
-          row_st = Callback_.stream do
+          row_st = Common_.stream do
             if d < len
               x = @row_a.fetch d
               d += 1
@@ -113,7 +113,7 @@ module Skylab::Snag
         def __convert_to_mutable_row d, ss
 
           d_ = d ; last = @row_a.length - 1
-          _row_st = Callback_.stream do
+          _row_st = Common_.stream do
             if d_ != last
               d_ += 1
               @row_a.fetch d_
@@ -137,7 +137,7 @@ module Skylab::Snag
 
           a = @row_a
 
-          Callback_::Stream.via_range @r do | d |
+          Common_::Stream.via_range @r do | d |
             a.fetch d
           end
         end
@@ -171,7 +171,7 @@ module Skylab::Snag
           end
 
           def to_object_stream_ _
-            Callback_::Stream.via_nonsparse_array @o_a_
+            Common_::Stream.via_nonsparse_array @o_a_
           end
         end
       end

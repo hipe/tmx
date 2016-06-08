@@ -112,7 +112,7 @@ module Skylab::Snag::TestSupport
       NIL_
     end
 
-    Path__ = Callback_.memoize do
+    Path__ = Common_.memoize do
 
       Home_.dir_pathname.join(
         Home_::Models_::Criteria::PERSISTED_CRITERIA_FILENAME___

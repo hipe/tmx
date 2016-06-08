@@ -231,7 +231,7 @@ module Skylab::Autonomous_Component_System
         _x = @argument_stream.gets_one
         comp_x = asc.component_model.send :"new_via__#{ via }__", _x, & @_pp
         if comp_x
-          Callback_::Qualified_Knownness[ comp_x, asc ]
+          Common_::Qualified_Knownness[ comp_x, asc ]
         else
           comp_x
         end
@@ -247,7 +247,7 @@ module Skylab::Autonomous_Component_System
 
       def _push_operation_name_on_to_selection_stack
         _sym = remove_instance_variable :@_imperative_verb_symbol
-        @_stack.push Callback_::Name.via_variegated_symbol _sym
+        @_stack.push Common_::Name.via_variegated_symbol _sym
         NIL_
       end
 

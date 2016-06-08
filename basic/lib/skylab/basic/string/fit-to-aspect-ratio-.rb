@@ -365,7 +365,7 @@ module Skylab::Basic
           @tokens_ = []
           @row_array = []
 
-          _st = Callback_::Stream.via_nonsparse_array @_tox
+          _st = Common_::Stream.via_nonsparse_array @_tox
           remove_instance_variable :@_tox
 
           init_context_

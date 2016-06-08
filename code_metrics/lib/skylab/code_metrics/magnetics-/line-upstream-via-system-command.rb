@@ -23,7 +23,7 @@ module Skylab::CodeMetrics
           if s
             self._SQUAWK
           elsif w.value.exitstatus.zero?
-            Callback_::Stream.the_empty_stream
+            Common_::Stream.the_empty_stream
           else
             self._SQUAWK
           end
@@ -59,7 +59,7 @@ module Skylab::CodeMetrics
           s
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

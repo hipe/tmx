@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   module Image_Output_Adapter
 
-    class Normalize_Components < Callback_::Actor::Dyadic
+    class Normalize_Components < Common_::Actor::Dyadic
 
       # the logical essence of this is just a plain old #[#fi-112]-style
       # missing-required's-check. it's noisy because it needs a lot of

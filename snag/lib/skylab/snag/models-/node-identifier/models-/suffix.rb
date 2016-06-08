@@ -224,7 +224,7 @@ module Skylab::Snag
 
       Expecting___ = -> scn, sym do
 
-        Callback_::Event.inline_not_OK_with(
+        Common_::Event.inline_not_OK_with(
             :suffix_parse_error,
             :x, scn.rest,
             :expecting_symbol, sym,

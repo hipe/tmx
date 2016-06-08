@@ -90,7 +90,7 @@ module Skylab::MyTerm
           x
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -128,7 +128,7 @@ module Skylab::MyTerm
 
         _paths = _installation.filesystem.glob _glob_path
 
-        Callback_::Stream.via_nonsparse_array _paths
+        Common_::Stream.via_nonsparse_array _paths
       end
 
       def __build_pass_filter

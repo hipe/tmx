@@ -5,7 +5,7 @@ module Skylab::TestSupport
     class Output_Adapters_::Quickie
 
       module Parameter_Functions_
-        Callback_::Autoloader[ self, :boxxy ]  # for now
+        Common_::Autoloader[ self, :boxxy ]  # for now
       end
 
 

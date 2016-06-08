@@ -31,16 +31,16 @@ module Skylab::TMX
 
         ss_mod = _sidesys_mod
 
-        _nf = Callback_::Name.via_module ss_mod
+        _nf = Common_::Name.via_module ss_mod
 
         _unb = Home_::Model_::Showcase_as_Unbound.new _nf, ss_mod
 
-        Callback_::Stream.via_item _unb
+        Common_::Stream.via_item _unb
       end
 
       def __to_unboundish_stream_when_rogue_sidesystem
 
-        Callback_::Stream.via_item Rogue_as_Unbound.new self
+        Common_::Stream.via_item Rogue_as_Unbound.new self
       end
 
       def _sidesys_mod
@@ -58,7 +58,7 @@ module Skylab::TMX
         def initialize mani
 
           @_mani = mani
-          @_nf = Callback_::Name.via_module mani._sidesys_mod
+          @_nf = Common_::Name.via_module mani._sidesys_mod
         end
 
         def adapter_class_for _

@@ -70,7 +70,7 @@ module Skylab::TanMan
 
         rescue ::Errno::ENOENT => e
 
-          ev = Callback_::Event.wrap.exception e, :path_hack
+          ev = Common_::Event.wrap.exception e, :path_hack
 
           @on_event_selectively.call :error, ev.terminal_channel_symbol do
             ev

@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport
     # the smaller ad-hoc grammars we have in testing.
 
     def initialize oes_p
-      @bx = Home_::Callback_::Box.new
+      @bx = Home_::Common_::Box.new
       @on_event_selectively = oes_p
       yield self
     end

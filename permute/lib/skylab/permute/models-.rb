@@ -43,7 +43,7 @@ module Skylab::Permute
 
         name_x = gets_one_polymorphic_value
 
-        _pair = Callback_::Pair.via_value_and_name(
+        _pair = Common_::Pair.via_value_and_name(
           gets_one_polymorphic_value,
           name_x )
 
@@ -54,12 +54,12 @@ module Skylab::Permute
 
       def produce_result
 
-        cat_box = Callback_::Box.new
+        cat_box = Common_::Box.new
 
         @argument_box.fetch( :pair ).each do | pair |
 
           cat_box.touch pair.name_x do
-            Callback_::Pair.via_value_and_name [], pair.name_x
+            Common_::Pair.via_value_and_name [], pair.name_x
           end.value_x.push pair.value_x
         end
 
@@ -83,7 +83,7 @@ module Skylab::Permute
           pr.value_x.length
         end.reduce( & :* )
 
-        Callback_::Stream.via_times _number_of_permutations do | d |
+        Common_::Stream.via_times _number_of_permutations do | d |
 
           x = @_row_struct.new
           @_num_cats.times do | col_d |

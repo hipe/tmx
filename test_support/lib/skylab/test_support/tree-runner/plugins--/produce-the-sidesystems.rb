@@ -39,7 +39,7 @@ module Skylab::TestSupport
 
         @on_event_selectively.call :from_plugin, :sidesystem_box do
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
 
           st = p[]
           while lt = st.gets
@@ -113,7 +113,7 @@ module Skylab::TestSupport
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -315,7 +315,7 @@ module Skylab::TestSupport
 
         h = @bx.h_
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         match_a.each do | match |
 

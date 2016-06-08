@@ -1,12 +1,12 @@
 require_relative '../../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   module Evnt_Clss_Fctrs_Mssg___  # :+#throwaway-module for test consts
 
     # <-
 
-  TS_.describe "[ca] event - makers - message" do
+  TS_.describe "[co] event - makers - message" do
 
     subject = -> do
       Home_::Event.message_class_maker

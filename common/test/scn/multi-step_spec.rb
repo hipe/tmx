@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Scn
+module Skylab::Common::TestSupport::Scn
 
-  describe "[ca] scn - multi-step" do
+  describe "[co] scn - multi-step" do
 
     it "simply wraps an init-phase along with a 'gets' phase and enumerates" do
       a = d = last = nil

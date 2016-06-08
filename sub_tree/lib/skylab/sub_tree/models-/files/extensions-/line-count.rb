@@ -57,7 +57,7 @@ module Skylab::SubTree
 
         def __build_wordcount_command_event s_a
 
-          Callback_::Event.inline_neutral_with :wordcount_command,
+          Common_::Event.inline_neutral_with :wordcount_command,
 
               :s_a, s_a do | y, o |
 

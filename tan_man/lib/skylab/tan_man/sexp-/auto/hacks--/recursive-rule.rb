@@ -255,7 +255,7 @@ module Skylab::TanMan
               nil
             end
           end
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -310,7 +310,7 @@ module Skylab::TanMan
               nil
             end
           end
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end

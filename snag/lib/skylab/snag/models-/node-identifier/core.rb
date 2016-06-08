@@ -74,7 +74,7 @@ module Skylab::Snag
 
       def new_via_user_value_ x, & oes_p
 
-        # (oldschool handler b.c we bridge the gap between [br] and [ca] API)
+        # (oldschool handler b.c we bridge the gap between [br] and [co] API)
 
         oes_p_p = -> _ do
           oes_p
@@ -238,7 +238,7 @@ module Skylab::Snag
       Integer_component_model___[]
     end
 
-    Integer_component_model___ = Callback_.memoize do
+    Integer_component_model___ = Common_.memoize do
 
       # expirimental near :+[#ba-050]
       # ->

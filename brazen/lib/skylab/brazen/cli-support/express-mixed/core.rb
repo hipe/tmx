@@ -31,7 +31,7 @@ module Skylab::Brazen
         else
           @_is_single_item = true
           @_item = @mixed_non_primitive_value
-          @mixed_non_primitive_value = Callback_::Scn.the_empty_stream
+          @mixed_non_primitive_value = Common_::Scn.the_empty_stream
           _when_at_least_one_item
         end
       end
@@ -94,9 +94,9 @@ module Skylab::Brazen
 
           name_s = cls.name
           if name_s
-            Callback_::Name.via_module_name name_s
+            Common_::Name.via_module_name name_s
           else
-            Callback_::Name.via_module cls.superclass
+            Common_::Name.via_module cls.superclass
           end
         end
         NIL_

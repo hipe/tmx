@@ -12,7 +12,7 @@ module Skylab::Treemap
 
           maybe_send_event :info, :ping do
 
-            Callback_::Event.inline_neutral_with :ping do | y, o |
+            Common_::Event.inline_neutral_with :ping do | y, o |
               y << "hello from #{ app_name }."
             end
           end
@@ -188,7 +188,7 @@ module Skylab::Treemap
         def _build_upstream sym
 
           x = Input_Adapters_.const_get(
-            Callback_::Name.via_variegated_symbol( sym ).as_const, false )
+            Common_::Name.via_variegated_symbol( sym ).as_const, false )
 
           sym_ = x.required_stream
 

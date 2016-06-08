@@ -13,9 +13,9 @@ module Skylab::Autonomous_Component_System
 
         -> * i_a, & x_p do
 
-          qkn = Callback_::Qualified_Knownness[ cmp, asc ]
+          qkn = Common_::Qualified_Knownness[ cmp, asc ]
 
-          st = Callback_::Polymorphic_Stream.via_array i_a
+          st = Common_::Polymorphic_Stream.via_array i_a
 
           m = find_handler_method[ st, acs ]
 

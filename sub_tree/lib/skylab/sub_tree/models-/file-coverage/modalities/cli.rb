@@ -29,7 +29,7 @@ module Skylab::SubTree
 
               if path && ::File::SEPARATOR != path[ 0 ]
 
-                Callback_::Known_Known[ ::File.expand_pat path ]
+                Common_::Known_Known[ ::File.expand_pat path ]
               else
                 qkn.to_knownness
               end

@@ -36,7 +36,7 @@ module Skylab::Zerk
 
       @interactive_CLI = ic
 
-      Callback_::Bound_Call[ nil, ic, :invoke_when_zero_length_argv ]
+      Common_::Bound_Call[ nil, ic, :invoke_when_zero_length_argv ]
     end
 
     # -- as instance (before invoke)

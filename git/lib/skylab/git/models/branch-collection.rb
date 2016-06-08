@@ -35,7 +35,7 @@ module Skylab::Git
 
       def __via_these o, w, & oes_p
 
-        _st = Callback_.stream do
+        _st = Common_.stream do
           s = o.gets
           if s
             s[ 2 .. -2 ]
@@ -78,7 +78,7 @@ module Skylab::Git
     end
 
     def to_stream
-      Callback_::Stream.via_nonsparse_array @_o_a
+      Common_::Stream.via_nonsparse_array @_o_a
     end
   end
 end

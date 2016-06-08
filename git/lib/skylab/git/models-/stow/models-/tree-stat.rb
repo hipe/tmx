@@ -18,7 +18,7 @@ module Skylab::Git
       def to_styled_line_stream
 
         _line_a = __build_line_array :in_color
-        Callback_::Stream.via_nonsparse_array _line_a
+        Common_::Stream.via_nonsparse_array _line_a
       end
 
       def __build_line_array do_colorize
@@ -160,7 +160,7 @@ module Skylab::Git
           end
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

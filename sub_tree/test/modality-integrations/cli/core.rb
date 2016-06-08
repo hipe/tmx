@@ -10,7 +10,7 @@ module Skylab::SubTree::TestSupport
 
         x_a.each do | sym |
 
-          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          _const = Common_::Name.via_variegated_symbol( sym ).as_const
 
           Here_.const_get( _const, false )[ tcc ]
         end

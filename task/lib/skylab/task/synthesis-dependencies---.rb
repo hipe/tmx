@@ -30,7 +30,7 @@ class Skylab::Task
     def ___execute_chain
 
       ok = true
-      st = Callback_::Stream.via_times @_args_a.length
+      st = Common_::Stream.via_times @_args_a.length
       begin
         d = st.gets
         d or break
@@ -71,7 +71,7 @@ class Skylab::Task
         nf = @_dep.task_name_for_local_storage
         if ! nf
           _ = @_rtask.name_symbol_for_storage_
-          nf = Callback_::Name.via_variegated_symbol _
+          nf = Common_::Name.via_variegated_symbol _
         end
 
         @_task.receive_dependency_completion_value_and_name_ @_rtask, nf
@@ -119,7 +119,7 @@ class Skylab::Task
           k = remote_atr.name_symbol
           alt_k = @_alt_name_pool[ k ]
           local_atr = if alt_k
-            Callback_::Name.via_variegated_symbol alt_k
+            Common_::Name.via_variegated_symbol alt_k
           else
             remote_atr
           end
@@ -136,7 +136,7 @@ class Skylab::Task
     class Dependency___  # just parse
 
       def initialize args
-        @_st = Callback_::Polymorphic_Stream.via_array args
+        @_st = Common_::Polymorphic_Stream.via_array args
         @task_name_symbol = @_st.gets_one
         until @_st.no_unparsed_exists
           send SYNTAX___.fetch @_st.gets_one
@@ -150,7 +150,7 @@ class Skylab::Task
       }
 
       def __process_alias_of_task
-        _ = Callback_::Name.via_variegated_symbol @_st.gets_one
+        _ = Common_::Name.via_variegated_symbol @_st.gets_one
         @task_name_for_local_storage = _
         NIL_
       end
@@ -169,7 +169,7 @@ class Skylab::Task
         _remote_name_sym = remove_instance_variable :@_current_parameter_name
         _local_name_symbol = @_st.gets_one
 
-        ( @parameter_name_mappings ||= Callback_::Box.new ).add(
+        ( @parameter_name_mappings ||= Common_::Box.new ).add(
           _remote_name_sym, _local_name_symbol )
 
         NIL_

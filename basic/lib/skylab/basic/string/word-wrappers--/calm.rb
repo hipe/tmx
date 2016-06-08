@@ -598,7 +598,7 @@ module Skylab::Basic
           state = @_states.fetch :start
           string = scn.string
 
-          @step_stream = Callback_.stream do
+          @step_stream = Common_.stream do
 
             if scn.eos?
 
@@ -709,11 +709,11 @@ module Skylab::Basic
         end
       end
 
-      Newline_token___ = Callback_.memoize do
+      Newline_token___ = Common_.memoize do
         Token__.new NEWLINE_, :xx
       end
 
-      Space_token__ = Callback_.memoize do
+      Space_token__ = Common_.memoize do
         Token__.new SPACE_, :spaces
       end
     end

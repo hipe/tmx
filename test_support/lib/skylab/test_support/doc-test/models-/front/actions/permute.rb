@@ -64,7 +64,7 @@ module Skylab::TestSupport
 
           up = @_up
 
-          st = Callback_.stream do
+          st = Common_.stream do
             up.gets
           end.map_reduce_by do | line |
 

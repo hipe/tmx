@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-    class Operation_Item_Liner___ < Callback_::Actor::Dyadic  # references reference [#038]
+    class Operation_Item_Liner___ < Common_::Actor::Dyadic  # references reference [#038]
 
       def initialize lt, _
         @load_ticket = lt

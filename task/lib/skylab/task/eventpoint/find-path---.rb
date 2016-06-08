@@ -24,7 +24,7 @@ class Skylab::Task
         def work_
           ok = ___resolve_path
           if ok
-            Callback_::Known_Known[ @path ]
+            Common_::Known_Known[ @path ]
           else
             ok
           end
@@ -157,7 +157,7 @@ class Skylab::Task
         end
 
         def to_stream
-          Callback_::Stream.via_nonsparse_array @_a
+          Common_::Stream.via_nonsparse_array @_a
         end
 
         def << x

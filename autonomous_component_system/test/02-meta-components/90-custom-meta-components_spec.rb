@@ -33,7 +33,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
 
       def _the_stream
-        Callback_::Stream.via_nonsparse_array _the_memoized_array
+        Common_::Stream.via_nonsparse_array _the_memoized_array
       end
 
       dangerous_memoize :_the_memoized_array do
@@ -81,7 +81,7 @@ module Skylab::Autonomous_Component_System::TestSupport
             end
           end
 
-          Require_it___ = Callback_.memoize do
+          Require_it___ = Common_.memoize do
 
             class My_Comp_Assoc < ACS_::Component_Association
 

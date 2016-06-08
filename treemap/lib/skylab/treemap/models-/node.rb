@@ -114,7 +114,7 @@ module Skylab::Treemap
 
       current = self
 
-      Callback_.stream do
+      Common_.stream do
 
         if current.is_not_root
 

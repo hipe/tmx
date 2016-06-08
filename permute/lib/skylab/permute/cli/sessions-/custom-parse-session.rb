@@ -28,7 +28,7 @@ module Skylab::Permute
       def __via_some_arguments
 
         argv = @argument_array
-        st = Callback_::Polymorphic_Stream.via_array argv
+        st = Common_::Polymorphic_Stream.via_array argv
         @_st = st
 
         is_help = [ @short_help_switch, @long_help_switch ].method :include?

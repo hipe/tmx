@@ -27,7 +27,7 @@ module Skylab::CodeMetrics::TestSupport
 
       def __vendor_match_stream_stub_one
 
-        Callback_::Stream.via_nonsparse_array ___data_for_stub_one
+        Common_::Stream.via_nonsparse_array ___data_for_stub_one
       end
 
       define_method :___data_for_stub_one do

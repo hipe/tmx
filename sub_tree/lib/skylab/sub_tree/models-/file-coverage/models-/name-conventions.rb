@@ -49,7 +49,7 @@ module Skylab::SubTree
 
       def _without_trailing_dashes s
 
-        s.gsub Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_
+        s.gsub Common_::Name::TRAILING_DASHES_RX, EMPTY_S_
       end
 
       def _without_extension s
@@ -81,7 +81,7 @@ module Skylab::SubTree
 
       def _mutate_by_removing_trailing_dashes s
 
-        s.gsub! Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_
+        s.gsub! Common_::Name::TRAILING_DASHES_RX, EMPTY_S_
         NIL_
       end
     end

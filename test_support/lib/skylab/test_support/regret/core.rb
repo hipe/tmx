@@ -52,7 +52,7 @@ module Skylab::TestSupport
 
       def ___parse_parameters x_a, mod
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
 
         yes = _autoloading_maybe
 

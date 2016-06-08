@@ -2,7 +2,7 @@ module Skylab::Permute
 
   class CLI
 
-    class Actors_::Convert_parse_tree_into_iambic_arguments < Callback_::Actor::Dyadic
+    class Actors_::Convert_parse_tree_into_iambic_arguments < Common_::Actor::Dyadic
 
       def initialize x_a, o_a, & p
         @o_a = o_a
@@ -12,9 +12,9 @@ module Skylab::Permute
 
       def execute
 
-        cat_bx = Callback_::Box.new
+        cat_bx = Common_::Box.new
 
-        st = Callback_::Stream.via_nonsparse_array @o_a
+        st = Common_::Stream.via_nonsparse_array @o_a
 
         cat = Category__.new st.gets.value_x, st.gets.value_x
 
@@ -45,7 +45,7 @@ module Skylab::Permute
 
       def __on__short_switch__ value_s, short_category_s
 
-        _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
+        _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
           short_category_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
@@ -63,7 +63,7 @@ module Skylab::Permute
 
       def __on__long_switch__ value_s, long_partial_catgory_s
 
-        _qkn = Callback_::Qualified_Knownness.via_value_and_symbol(
+        _qkn = Common_::Qualified_Knownness.via_value_and_symbol(
           long_partial_catgory_s, :category_letter )
 
         cat_o = Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.call(
@@ -109,7 +109,7 @@ module Skylab::Permute
         end
 
         def name  # for fuzzy lookup
-          @___nm ||= Callback_::Name.via_slug @name_string
+          @___nm ||= Common_::Name.via_slug @name_string
         end
 
         attr_reader :name_string, :s_a

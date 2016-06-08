@@ -18,7 +18,7 @@ module Skylab::TMX::TestSupport
 
       dangerous_memoize_ :front_ do
 
-        box = Callback_::Box.new
+        box = Common_::Box.new
         box.add :wiznizzie, _unbound_W
 
         o = subject_module_.new( & method( :fail ) )

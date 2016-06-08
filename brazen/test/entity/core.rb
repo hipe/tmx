@@ -35,7 +35,7 @@ module Skylab::Brazen::TestSupport
 
     # -- Constants (we do X=X because [#ts-044])
 
-    Callback_ = Callback_
+    Common_ = Common_
     Enhance_for_test_ = Enhance_for_test_
     Home_ = Home_
     KEEP_PARSING_ = Home_::KEEP_PARSING_

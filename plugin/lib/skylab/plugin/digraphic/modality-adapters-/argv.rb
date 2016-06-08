@@ -164,7 +164,7 @@ module Skylab::Plugin
             @_short_d_a.last + 1  # etc
           end
 
-          Callback_::Stream.via_nonsparse_array @args[ _d .. -1 ]  # empty OK
+          Common_::Stream.via_nonsparse_array @args[ _d .. -1 ]  # empty OK
         end
 
         def barebones_arguments
@@ -202,7 +202,7 @@ module Skylab::Plugin
           #
 
           args = @args
-          st = Callback_::Stream.via_times args.length
+          st = Common_::Stream.via_times args.length
           d = nil ; s = nil
 
           gets = -> do
@@ -526,7 +526,7 @@ module Skylab::Plugin
 
         def __deliver_the_goods
 
-          Callback_::Bound_Call.via_receiver_and_method_name(
+          Common_::Bound_Call.via_receiver_and_method_name(
 
             Plan___.new(
               @argv_2, @input_x, @prcs_argv_meth_name,

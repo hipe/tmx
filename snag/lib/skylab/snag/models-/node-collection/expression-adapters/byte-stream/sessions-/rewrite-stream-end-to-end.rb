@@ -99,7 +99,7 @@ module Skylab::Snag
 
           @on_event_selectively.call :error, :resource_is_busy do
 
-            Callback_::Event.inline_not_OK_with( :resource_is_busy,
+            Common_::Event.inline_not_OK_with( :resource_is_busy,
               :resource, io
             ) do | y, o |
 

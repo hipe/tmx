@@ -50,7 +50,7 @@ module Skylab::TanMan
 
       def __build_event bytes
 
-        Callback_::Event.inline_OK_with :wrote_resource,
+        Common_::Event.inline_OK_with :wrote_resource,
 
             :byte_downstream_identifier, @byte_downstream_identifier,
             :bytes, bytes,

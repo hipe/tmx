@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
           ok = check_availability_
           ok &&= ___normalize
           ok && __init_args_via_h
-          ok && Callback_::Bound_Call[ @_args, @nr_._p, :call, & @call_handler_ ]
+          ok && Common_::Bound_Call[ @_args, @nr_._p, :call, & @call_handler_ ]
         end
 
         def ___normalize
@@ -97,9 +97,9 @@ module Skylab::Autonomous_Component_System
             had = false
           end
           if had
-            Callback_::Known_Known[ x ]
+            Common_::Known_Known[ x ]
           else
-            Callback_::KNOWN_UNKNOWN
+            Common_::KNOWN_UNKNOWN
           end
         end
 

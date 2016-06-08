@@ -1,10 +1,10 @@
-Skylab::Callback::TestSupport::Autoloader::Fixtures.class
+Skylab::Common::TestSupport::Autoloader::Fixtures.class
 
-Skylab::Callback::TestSupport::Autoloader::Fixtures::
+Skylab::Common::TestSupport::Autoloader::Fixtures::
 
   Eight_HERDLESS::CIL.const_defined?( :Erkshern, false ) and fail 'where'
 
-Skylab::Callback::TestSupport::Autoloader::Fixtures::
+Skylab::Common::TestSupport::Autoloader::Fixtures::
 
   Eight_HERDLESS::CIL::Erkshern = ::Class.new
 

@@ -104,7 +104,7 @@ module Skylab::TanMan
     CircleHash__ = Home_.lib_.basic::Proxy::Makers::Functional::Nice.new(
       :[], :[]=, :fetch )
 
-    Interminable__ = Callback_::Event.prototype_with :interminable,
+    Interminable__ = Common_::Event.prototype_with :interminable,
         :trail_a, nil, :reason, :interminal, :ok, false do | y, o |
 
       self._RIDE_ME
@@ -125,7 +125,7 @@ module Skylab::TanMan
       y << stack_a.reverse.join( EMPTY_S_ )
     end
 
-    Circular__ = Callback_::Event.prototype_with(  # #[#ta-007]
+    Circular__ = Common_::Event.prototype_with(  # #[#ta-007]
       :circular,
       :trail_a, nil,
       :reason, :circular,

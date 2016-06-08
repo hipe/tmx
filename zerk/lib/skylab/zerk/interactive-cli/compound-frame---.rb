@@ -55,7 +55,7 @@ module Skylab::Zerk
 
     def to_every_node_ticket_stream_  # near c.p w/ #spot-7
 
-      Callback_::Stream.via_nonsparse_array @_load_tickets_for_UI do |x|
+      Common_::Stream.via_nonsparse_array @_load_tickets_for_UI do |x|
         x.node_ticket
       end
     end
@@ -98,7 +98,7 @@ module Skylab::Zerk
         asc = nt.association
         p = asc.default_proc
         p or redo
-        reader_writer.write_if_not_set Callback_::Qualified_Knownness[ p[], asc ]
+        reader_writer.write_if_not_set Common_::Qualified_Knownness[ p[], asc ]
         redo
       end while nil
 
@@ -108,11 +108,11 @@ module Skylab::Zerk
     end
 
     def to_load_ticket_stream_for_UI
-      Callback_::Stream.via_nonsparse_array @_load_tickets_for_UI
+      Common_::Stream.via_nonsparse_array @_load_tickets_for_UI
     end
 
     def to_stream_for_resolving_buttonesque_selection
-      Callback_::Stream.via_nonsparse_array @button_frame
+      Common_::Stream.via_nonsparse_array @button_frame
     end
 
     # -- user input

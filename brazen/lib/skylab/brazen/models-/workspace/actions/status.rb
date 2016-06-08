@@ -87,7 +87,7 @@ module Skylab::Brazen
 
         push = -> i_a, & ev_p do
           em && emit_emission[]
-          em = Callback_::Emission.via_category i_a, & ev_p
+          em = Common_::Emission.via_category i_a, & ev_p
           NIL_
         end
 
@@ -137,7 +137,7 @@ module Skylab::Brazen
         # it might need access to our own expag so it has to be self-
         # expressive ..
 
-        Callback_::Emission.via_category em.category do
+        Common_::Emission.via_category em.category do
 
           @on_event_selectively[ * em.category, & em.emission_value_proc ]
 
@@ -147,7 +147,7 @@ module Skylab::Brazen
 
       def __when_found
 
-        Callback_::Emission.of :info, :resource_exists do
+        Common_::Emission.of :info, :resource_exists do
           ___build_event
         end
       end

@@ -72,7 +72,7 @@ module Skylab::Fields
               define_method m do | * x_a |
 
                 _kp = process_polymorphic_stream_fully(
-                  Callback_::Polymorphic_Stream.via_array x_a )
+                  Common_::Polymorphic_Stream.via_array x_a )
 
                 _kp && normalize
               end
@@ -82,7 +82,7 @@ module Skylab::Fields
               define_method m do | x_a |
 
                 _kp = process_polymorphic_stream_fully(
-                  Callback_::Polymorphic_Stream.via_array x_a )
+                  Common_::Polymorphic_Stream.via_array x_a )
 
                 _kp && normalize
               end

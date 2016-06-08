@@ -24,7 +24,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       def use sym
 
         Top_TS_.const_get(
-          Callback_::Name.via_variegated_symbol( sym ).as_const, false
+          Common_::Name.via_variegated_symbol( sym ).as_const, false
         )[ self ]
       end
     end
@@ -125,7 +125,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def [] tcm
 
-        tcm.include Callback_.test_support::Expect_Event::Test_Context_Instance_Methods
+        tcm.include Common_.test_support::Expect_Event::Test_Context_Instance_Methods
         tcm.include self
       end
     end  # >>
@@ -142,15 +142,15 @@ module Skylab::Flex2Treetop::MyTestSupport
     tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Mock_resources_ = Callback_.memoize do
+  Mock_resources_ = Common_.memoize do
     Mock_Resources_.new Mock_interactive_stdin_[]
   end
 
   Mock_Resources_ = ::Struct.new :sin, :sout, :serr
 
-  Mock_interactive_stdin_ = Callback_.memoize do
+  Mock_interactive_stdin_ = Common_.memoize do
     Home_.lib_.system.test_support.mocks.interactive_STDIN_instance
   end
 

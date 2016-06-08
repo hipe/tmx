@@ -19,7 +19,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       -> sym do
 
         ( cache_h.fetch sym do
-          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          _const = Common_::Name.via_variegated_symbol( sym ).as_const
           x = Bundles___.const_get _const, false
           cache_h[ sym ] = x
           x
@@ -316,7 +316,7 @@ module Skylab::TestSupport::TestSupport::DocTest
   module Bundles___
 
     Expect_Event = -> tcc do
-      Home_::Callback_.test_support::Expect_Event[ tcc ]
+      Home_::Common_.test_support::Expect_Event[ tcc ]
     end
 
     Expect_Line = -> tcc do
@@ -336,7 +336,7 @@ module Skylab::TestSupport::TestSupport::DocTest
   Home_ = Home_
 
   CACHE___ = {}
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
   DocTest_ = Home_::DocTest
 
 end

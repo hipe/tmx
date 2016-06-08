@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Autoloader
+module Skylab::Common::TestSupport::Autoloader
 
-  describe "[ca] autoloader \"boxxy\"" do
+  describe "[co] autoloader \"boxxy\"" do
 
     context "this is a live test, must happen in one big story" do
 

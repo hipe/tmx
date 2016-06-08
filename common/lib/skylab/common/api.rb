@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
   module API
     Looks_like_digraph_module_ = -> x do

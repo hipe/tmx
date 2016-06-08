@@ -48,7 +48,7 @@ module Skylab::GitViz
       end
 
       def to_filechange_stream
-        Callback_::Stream.via_nonsparse_array @filechanges
+        Common_::Stream.via_nonsparse_array @filechanges
       end
 
       Autoloader_[ Actors_ = ::Module.new ]

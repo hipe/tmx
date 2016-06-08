@@ -17,8 +17,8 @@
 
       def execute
 
-        require 'skylab/callback'
-        Me_.const_set :Callback_, ::Skylab::Callback  # etc
+        require 'skylab/common'
+        Me_.const_set :Common_, ::Skylab::Common  # etc
 
         ok = __parse_argv
         if ok
@@ -201,7 +201,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
 
         def work
 
-          @_bx = Callback_::Box.new
+          @_bx = Common_::Box.new
           @_io = ::File.open @path
           @_ok = true
 

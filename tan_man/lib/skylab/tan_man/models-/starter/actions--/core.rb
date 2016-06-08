@@ -101,7 +101,7 @@ module Skylab::TanMan
           # we already have and mutate its formals not to know about workspace
           # related arguments. all this ick bc we want to reuse action factory
 
-          bx = Callback_::Box.new
+          bx = Common_::Box.new
           bx.add :workspace, ws
 
           o.preconditions bx
@@ -129,7 +129,7 @@ module Skylab::TanMan
       # use the filesystem when reading the available collection,
       # use the workspace when writing the currently selected entity.
 
-      include Callback_::Event::Selective_Builder_Receiver_Sender_Methods
+      include Common_::Event::Selective_Builder_Receiver_Sender_Methods
 
       include Common_Collection_Controller_Methods_
 
@@ -234,7 +234,7 @@ module Skylab::TanMan
 
       def __build_normalized_value_event normal_x, mine_x, prp
 
-        Callback_::Event.inline_OK_with(
+        Common_::Event.inline_OK_with(
           :normalized_value,
           :prop, prp,
           :previous_x, mine_x,

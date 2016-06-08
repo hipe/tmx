@@ -118,7 +118,7 @@ module Skylab::Task::TestSupport
   # -- these
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -145,7 +145,7 @@ module Skylab::Task::TestSupport
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
   NIL_ = nil
   NOTHING_ = nil
   TS_ = self

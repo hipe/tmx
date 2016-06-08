@@ -314,7 +314,7 @@ module Skylab::Human::TestSupport
     end
 
     def _par sym
-      Callback_::Name.via_variegated_symbol sym
+      Common_::Name.via_variegated_symbol sym
     end
 
     def _when_wo_subject

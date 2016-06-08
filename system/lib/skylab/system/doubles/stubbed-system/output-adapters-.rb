@@ -32,13 +32,13 @@ module Skylab::System
         def __write__string__ s, name_sym
 
           _write_string_stream(
-            Callback_::Stream.via_item( s ), name_sym, INDENT__ )
+            Common_::Stream.via_item( s ), name_sym, INDENT__ )
         end
 
         def __write__string_array__ a, name_sym
 
           _write_string_stream(
-            Callback_::Stream.via_nonsparse_array( a ), name_sym, INDENT__ )
+            Common_::Stream.via_nonsparse_array( a ), name_sym, INDENT__ )
         end
 
         # ~ end

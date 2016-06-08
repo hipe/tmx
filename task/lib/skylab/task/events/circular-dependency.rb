@@ -1,8 +1,8 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 class Skylab::Task
 
-  Events::CircularDependency = Callback_::Event.prototype_with(
+  Events::CircularDependency = Common_::Event.prototype_with(
     :circular_dependency,
     :task_name, nil,
     :arc_streamer, nil,
@@ -32,23 +32,23 @@ class Skylab::Task
           a = bx.a_
           h = bx.h_
 
-          Callback_::Stream.via_times a.length do |d|
+          Common_::Stream.via_times a.length do |d|
 
             k = a.fetch d
 
-            _nf = Callback_::Name.via_variegated_symbol k  # ..
+            _nf = Common_::Name.via_variegated_symbol k  # ..
 
             _st_p = -> do
 
               sym_a = h.fetch k
 
-              Callback_::Stream.via_times sym_a.length do |d_|
+              Common_::Stream.via_times sym_a.length do |d_|
 
-                Callback_::Name.via_variegated_symbol sym_a.fetch d_  # ..
+                Common_::Name.via_variegated_symbol sym_a.fetch d_  # ..
               end
             end
 
-            Callback_::Pair.via_value_and_name _st_p, _nf
+            Common_::Pair.via_value_and_name _st_p, _nf
           end
         end
 

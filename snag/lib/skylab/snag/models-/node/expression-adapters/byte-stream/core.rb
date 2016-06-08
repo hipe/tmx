@@ -174,7 +174,7 @@ module Skylab::Snag
             NIL_
           end
 
-          Callback_::Stream.new _reinitializer do
+          Common_::Stream.new _reinitializer do
             p[]
           end
         end
@@ -225,7 +225,7 @@ module Skylab::Snag
 
           p = upper_mode
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end

@@ -17,7 +17,7 @@ module Skylab::Slicer
         io = ::File.open(
           ::Skylab.dir_pathname.join( '../../GREENLIST' ).to_path )
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         rx = /[[:space:]]+/
         begin
           line = io.gets
@@ -68,7 +68,7 @@ module Skylab::Slicer
           x
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

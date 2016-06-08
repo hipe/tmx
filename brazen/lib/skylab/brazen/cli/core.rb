@@ -284,7 +284,7 @@ module Skylab::Brazen
       def lookup_sidesystem_module  # for auxiliaries, :+#hook-in
 
         ( s_a = self.class.name.split CONST_SEP_ ).pop
-        Callback_::Const_value_via_parts[ s_a ]
+        Common_::Const_value_via_parts[ s_a ]
       end
 
       ## ~~ description & inflection
@@ -300,7 +300,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        Callback_::Name.via_module( @mod ).as_slug  # etc.
+        Common_::Name.via_module( @mod ).as_slug  # etc.
       end
 
       ## ~~ expag top-stopper
@@ -431,7 +431,7 @@ module Skylab::Brazen
 
       def _bound_action_via_normal_name i_a
         _bound_action_via_normal_name_symbol_stream(
-          Callback_::Polymorphic_Stream.via_array i_a )
+          Common_::Polymorphic_Stream.via_array i_a )
       end
 
       def _bound_action_via_normal_name_symbol_stream sym_st
@@ -503,7 +503,7 @@ module Skylab::Brazen
         # needing to load (perhaps) all constituents to resolve a name.
 
         if p
-          _nf = Callback_::Name.via_slug tok
+          _nf = Common_::Name.via_slug tok
           # WAS: tok.gsub( DASH_, UNDERSCORE_ ).intern
           cls = p[ _nf ]
         end
@@ -544,7 +544,7 @@ module Skylab::Brazen
       # --
 
       def wrap_adapter_stream_with_ordering_buffer st
-        Callback_::Stream.ordered st
+        Common_::Stream.ordered st
       end
 
       def _bound_call_for_unrecognized_via token
@@ -622,7 +622,7 @@ module Skylab::Brazen
         if respond_to? m
           send m
         else
-          _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+          _const = Common_::Name.via_variegated_symbol( sym ).as_const
           When_[].const_get _const, false
         end
       end
@@ -727,7 +727,7 @@ module Skylab::Brazen
       end
 
       def ___to_relevant_category_stream
-        Callback_::Stream.via_nonsparse_array Relevant_categories___[]
+        Common_::Stream.via_nonsparse_array Relevant_categories___[]
       end
 
       Relevant_categories___ = Lazy_.call do
@@ -771,7 +771,7 @@ module Skylab::Brazen
         if @front_properties
           @front_properties.to_value_stream
         else
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         end
       end
 
@@ -852,7 +852,7 @@ module Skylab::Brazen
         if ok
           bound_call_via_bound_action_and_mutated_backbound_iambic
         else
-          Callback_::Bound_Call.via_value ok  # failure is not an option
+          Common_::Bound_Call.via_value ok  # failure is not an option
         end
       end
 
@@ -890,7 +890,7 @@ module Skylab::Brazen
           x_a[ d, 2 ] = EMPTY_A_  # eew
         end
 
-        Callback_::Qualified_Knownness.via_value_and_had_and_association(
+        Common_::Qualified_Knownness.via_value_and_had_and_association(
           x,
           had,
           @front_properties.fetch( sym ),
@@ -904,7 +904,7 @@ module Skylab::Brazen
 
         bc = @bound.bound_call_against_polymorphic_stream(
 
-          Callback_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
+          Common_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
 
         bc and bound_call_via_bound_call_from_back bc
       end
@@ -1153,7 +1153,7 @@ module Skylab::Brazen
             if FILE_SEPARATOR_BYTE != path.getbyte( 0 )  # ick/meh
 
               _path_ = _filesystem.expand_path path, present_working_directory
-              kn = Callback_::Known_Known[ _path_ ]
+              kn = Common_::Known_Known[ _path_ ]
             end
           end
         end
@@ -1257,7 +1257,7 @@ module Skylab::Brazen
         ok = true
         prp = Home_::Modelesque::Entity::Property.new_by do
 
-          @name = Callback_::Name.via_variegated_symbol sym
+          @name = Common_::Name.via_variegated_symbol sym
           ok = process_iambic_fully x_a
         end
         ok or raise ::ArgumentError
@@ -1319,7 +1319,7 @@ module Skylab::Brazen
       def prepare_to_parse_parameters  # [ts]
 
         @mutable_backbound_iambic = []  # ivar name is #public-API
-        @seen = Callback_::Box.new  # ivar name is #public-API
+        @seen = Common_::Box.new  # ivar name is #public-API
         NIL_
       end
 
@@ -1596,7 +1596,7 @@ module Skylab::Brazen
 
         # NOTE this might become an overridable
 
-        class Emission_Interpreter____ < Callback_::Emission::Interpreter
+        class Emission_Interpreter____ < Common_::Emission::Interpreter
 
           def __expression__ i_a, & x_p
             _ :"___express_expression", i_a, & x_p
@@ -1808,7 +1808,7 @@ module Skylab::Brazen
 
           if respond_to? :entry_tree
 
-            _slug = Callback_::Name.via_const_symbol( const ).as_slug
+            _slug = Common_::Name.via_const_symbol( const ).as_slug
             et = entry_tree
             if et.has_directory and et.has_entry_for_slug _slug
               _definitely_there self, const
@@ -1818,7 +1818,7 @@ module Skylab::Brazen
 
         def _definitely_there mod, const
 
-          Callback_::Known_Known[ mod.const_get( const, false ) ]
+          Common_::Known_Known[ mod.const_get( const, false ) ]
         end
 
         def _cached sym
@@ -1863,9 +1863,9 @@ module Skylab::Brazen
 
       Require_fields_lib_[]
 
-      st = Callback_::Polymorphic_Stream.via_array mutable_backbound_iambic
+      st = Common_::Polymorphic_Stream.via_array mutable_backbound_iambic
 
-      Callback_.stream do
+      Common_.stream do
 
         if st.unparsed_exists
 
@@ -1884,7 +1884,7 @@ module Skylab::Brazen
             end
           end
 
-          Callback_::Qualified_Knownness.via_value_and_association x, prp
+          Common_::Qualified_Knownness.via_value_and_association x, prp
         end
       end
     end
@@ -1968,7 +1968,7 @@ module Skylab::Brazen
 
         if s_a
           if s_a.last.nil?
-            s_a[ -1 ] = Callback_::Name.via_module( @mod ).as_slug
+            s_a[ -1 ] = Common_::Name.via_module( @mod ).as_slug
           end
           s_a
         else
@@ -2017,7 +2017,7 @@ module Skylab::Brazen
 
       def knownness_for sym  # [gi]
 
-        Callback_::Known_Known[ bridge_for( sym ) ]
+        Common_::Known_Known[ bridge_for( sym ) ]
       end
 
       def bridge_for sym
@@ -2052,7 +2052,7 @@ module Skylab::Brazen
 
       def produce_result
 
-        st = Callback_::Stream.via_nonsparse_array @a
+        st = Common_::Stream.via_nonsparse_array @a
 
         begin
           bc = st.gets

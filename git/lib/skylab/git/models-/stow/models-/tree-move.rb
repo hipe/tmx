@@ -84,7 +84,7 @@ module Skylab::Git
 
       def _to_path_stream_around path
 
-        Callback_::Stream.via_nonsparse_array( @a ).map_by do | relpath |
+        Common_::Stream.via_nonsparse_array( @a ).map_by do | relpath |
 
           ::File.join path, relpath
         end

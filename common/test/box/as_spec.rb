@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] box - as" do
+  describe "[co] box - as" do
 
     extend TS_
     use :box_support

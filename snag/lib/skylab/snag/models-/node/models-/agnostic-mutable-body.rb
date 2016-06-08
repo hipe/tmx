@@ -42,14 +42,14 @@ module Skylab::Snag
           _row = Node_::Expression_Adapters::Byte_Stream::Models_::Substring.
             new( 0, s.length, s )  # :+#visibility-breach
 
-          Callback_::Stream.via_item _row
+          Common_::Stream.via_item _row
         else
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         end
       end
 
       def to_object_stream_
-        Callback_::Stream.via_nonsparse_array @_o_a
+        Common_::Stream.via_nonsparse_array @_o_a
       end
 
       def r_

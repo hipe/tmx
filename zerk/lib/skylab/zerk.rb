@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Zerk  # intro in [#001] README
 
@@ -12,7 +12,7 @@ module Skylab::Zerk  # intro in [#001] README
     end
 
     def lib_
-      @___lib ||= Callback_.
+      @___lib ||= Common_.
         produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
@@ -37,7 +37,7 @@ module Skylab::Zerk  # intro in [#001] README
     Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new( & any_oes_p )
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   Is_listy_ = -> sym do  # assume Field_
     if sym
@@ -56,7 +56,7 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS
@@ -68,7 +68,7 @@ module Skylab::Zerk  # intro in [#001] README
     NIL_
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -104,7 +104,7 @@ module Skylab::Zerk  # intro in [#001] README
     Here_ = self
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   EMPTY_A_ = [].freeze

@@ -41,7 +41,7 @@ module Skylab::Brazen
 
       def _same enum_x
 
-        row_st = Callback_::Polymorphic_Stream.try_convert enum_x
+        row_st = Common_::Polymorphic_Stream.try_convert enum_x
         if row_st
 
           @parent.receive_sanitized_user_row_upstream row_st

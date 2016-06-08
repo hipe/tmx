@@ -68,7 +68,7 @@ module Skylab::MyTerm
 
       # --
 
-      KK__ = Callback_::Known_Known
+      KK__ = Common_::Known_Known
     end
   end
 end

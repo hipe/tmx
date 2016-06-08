@@ -8,7 +8,7 @@ module Skylab::Zerk::TestSupport
     sym = st.current_token
     if h[ sym ]
       st.advance_one
-      Callback_::Known_Known[ sym ]
+      Common_::Known_Known[ sym ]
     else
       pp[ nil ].call :error, :bad_color
       UNABLE_

@@ -21,7 +21,7 @@ module Skylab::Zerk
     end
 
     def filesystem_conduit= x
-      @filesystem_conduit_known_known = Callback_::Known_Known[ x ] ; nil
+      @filesystem_conduit_known_known = Common_::Known_Known[ x ] ; nil
     end
 
     def root_ACS= p
@@ -29,7 +29,7 @@ module Skylab::Zerk
     end
 
     def system_conduit= x
-      @system_conduit_known_known = Callback_::Known_Known[ x ] ; nil
+      @system_conduit_known_known = Common_::Known_Known[ x ] ; nil
     end
 
     attr_writer(
@@ -120,7 +120,7 @@ module Skylab::Zerk
 
       _el = Here_::Event_Loop___.new vmm, self, & @_root_ACS_proc
 
-      Callback_::Bound_Call.via_receiver_and_method_name _el, :run
+      Common_::Bound_Call.via_receiver_and_method_name _el, :run
     end
 
     def ___init_expression_agent
@@ -140,7 +140,7 @@ module Skylab::Zerk
 
     def receive_uncategorized_emission i_a, & ev_p
 
-      bc = Callback_::Emission::Interpreter.common[ i_a, & ev_p ]
+      bc = Common_::Emission::Interpreter.common[ i_a, & ev_p ]
       _ = send bc.method_name, * bc.args, & bc.block
       UNRELIABLE_
     end

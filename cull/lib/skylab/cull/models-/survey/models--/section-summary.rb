@@ -8,7 +8,7 @@ module Skylab::Cull
 
       class << self
         def name_function
-          @nf ||= Callback_::Name.via_variegated_symbol :section
+          @nf ||= Common_::Name.via_variegated_symbol :section
         end
       end
 

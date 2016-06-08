@@ -11,7 +11,7 @@ module Skylab::System
       def _add_entry_ chdir=nil, cmd_s_a, & three_p
 
         _bx = @_h.fetch chdir do
-          @_h[ chdir ] = Callback_::Box.new
+          @_h[ chdir ] = Common_::Box.new
         end
 
         _bx.add cmd_s_a, Here_::Popen3_Result_via_Proc_.new( & three_p )

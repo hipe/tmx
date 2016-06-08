@@ -54,7 +54,7 @@ module Skylab::TestSupport
           DocTest::Input_Adapter_::Comment_block_via_single_line_matchdata_array[ cb_a ]
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end

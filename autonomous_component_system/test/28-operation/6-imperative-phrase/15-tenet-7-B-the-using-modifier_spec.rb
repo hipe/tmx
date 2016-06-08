@@ -38,7 +38,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           yield :can, :effect
 
           -> st do
-            Callback_::Known_Known[ st.gets_one ]
+            Common_::Known_Known[ st.gets_one ]
           end
         end
 

@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport
 
   module Instance_Methods___
 
-    define_method :fixtures_path_, ( Callback_.memoize do
+    define_method :fixtures_path_, ( Common_.memoize do
 
       _path = Models::Node.dir_pathname.to_path
 
@@ -87,7 +87,7 @@ module Skylab::TanMan::TestSupport
         send( :"__via__#{ input_mechanism_i }__build_byte_upstream_identifier" ),
         kr, & oes_p )
 
-      bx = Home_::Callback_::Box.new
+      bx = Home_::Common_::Box.new
       bx.add :dot_file,
         kr.silo( :dot_file ).precondition_for( action, id, :_no_box_, & oes_p )
 

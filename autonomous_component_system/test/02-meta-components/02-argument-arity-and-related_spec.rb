@@ -83,7 +83,7 @@ module Skylab::Autonomous_Component_System::TestSupport
               oes_p_p[ nil ].call :error, :expression, :cant_have_it
               UNABLE_
             else
-              Callback_::Known_Known[ s ]
+              Common_::Known_Known[ s ]
             end
           end
         end

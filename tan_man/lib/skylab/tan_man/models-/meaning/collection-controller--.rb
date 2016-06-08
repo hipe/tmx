@@ -94,7 +94,7 @@ module Skylab::TanMan
 
           special_line_st = nil
 
-          Callback_::Stream.via_nonsparse_array( @s_a ).expand_by do | mutable_s |
+          Common_::Stream.via_nonsparse_array( @s_a ).expand_by do | mutable_s |
 
             special_line_st = Models_::Comment::Line_Stream.of_mystery_string mutable_s
 

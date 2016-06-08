@@ -57,7 +57,7 @@ module Skylab::Brazen
 
         @box = bx
 
-        Callback_::Emission.of :info, :summary do
+        Common_::Emission.of :info, :summary do
           ___build_summary_event
         end
       end

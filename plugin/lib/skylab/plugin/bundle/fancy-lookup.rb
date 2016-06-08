@@ -207,7 +207,7 @@ module Skylab::Plugin
 
           st = et.to_stream
 
-          Callback_.stream do
+          Common_.stream do
 
             begin
               entry = st.gets
@@ -220,7 +220,7 @@ module Skylab::Plugin
 
             if entry
 
-              Callback_::Pair.via_value_and_name(
+              Common_::Pair.via_value_and_name(
                 entry,
                 entry.name.as_slug.split( DASH_ ) )
             end

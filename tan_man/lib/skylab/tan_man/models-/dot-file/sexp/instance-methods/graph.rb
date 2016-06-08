@@ -85,7 +85,7 @@ module Skylab::TanMan
       if sl
         sl.to_node_stream_
       else
-        Callback_::Stream.the_empty_stream
+        Common_::Stream.the_empty_stream
       end
     end
 

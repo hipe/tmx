@@ -37,7 +37,7 @@ module Skylab::Plugin::TestSupport
         o.emits = [ :argument_bid_for ]
         o.index_dependencies_in_module DeA_Mod1
 
-        st = Callback_::Polymorphic_Stream.via_array [ :is_diet ]
+        st = Common_::Polymorphic_Stream.via_array [ :is_diet ]
 
         begin
           o.process_polymorphic_stream_fully st

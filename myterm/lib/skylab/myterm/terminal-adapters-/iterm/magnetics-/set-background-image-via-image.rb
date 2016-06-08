@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   class Terminal_Adapters_::Iterm
 
-    class Magnetics_::Set_Background_Image_via_Image < Callback_::Actor::Monadic
+    class Magnetics_::Set_Background_Image_via_Image < Common_::Actor::Monadic
 
       # depends_on :OSA_Script, :Compatible_Version_of_Iterm (would be)
 

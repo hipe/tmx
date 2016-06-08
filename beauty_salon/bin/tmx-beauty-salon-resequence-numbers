@@ -11,8 +11,8 @@ program = -> sin, sout, serr, pn_s_a, argv do
   y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
 
   subsystem = -> sym do
-    require 'skylab/callback'
-    ::Skylab::Callback::Autoloader.require_sidesystem sym
+    require 'skylab/common'
+    ::Skylab::Common::Autoloader.require_sidesystem sym
   end
 
   pen = -> do

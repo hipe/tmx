@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] Scn__" do
+  describe "[co] Scn__" do
 
     it "aggregates other scanners, makes them behave as one sequence of scanners" do
 

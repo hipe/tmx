@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
       )
 
       def accept_argument_array x_a
-        @argument_stream = Callback_::Polymorphic_Stream.via_array x_a
+        @argument_stream = Common_::Polymorphic_Stream.via_array x_a
         NIL_
       end
 

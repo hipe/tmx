@@ -95,12 +95,12 @@ module Skylab::Brazen
         sym_a = foz.get_names
         sym_a.sort!
 
-        Callback_::Stream.via_nonsparse_array( sym_a ).map_by do | sym |
+        Common_::Stream.via_nonsparse_array( sym_a ).map_by do | sym |
 
           qualified_knownness sym
         end
       else
-        Callback_::Stream.the_empty_stream
+        Common_::Stream.the_empty_stream
       end
     end
 
@@ -127,7 +127,7 @@ module Skylab::Brazen
         had = false
       end
 
-      Callback_::Qualified_Knownness.via_value_and_had_and_association(
+      Common_::Qualified_Knownness.via_value_and_had_and_association(
         x, had, formal_properties.fetch( sym ) )
     end
 
@@ -139,9 +139,9 @@ module Skylab::Brazen
       end
 
       if had
-        Callback_::Known_Known[ x ]
+        Common_::Known_Known[ x ]
       else
-        Callback_::KNOWN_UNKNOWN
+        Common_::KNOWN_UNKNOWN
       end
     end
 

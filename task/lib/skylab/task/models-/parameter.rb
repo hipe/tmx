@@ -12,7 +12,7 @@ class Skylab::Task
       # a) normalize their shape while b) sanity checking the uniqueness
       # of each name symbol.
 
-      intermediate_box = Callback_::Box.new  # catch name collisions
+      intermediate_box = Common_::Box.new  # catch name collisions
 
       a.each do |args|
 
@@ -53,7 +53,7 @@ class Skylab::Task
             Parameters_Source_Proxy___.new
           end
 
-          Callback_::Stream.via_item _one
+          Common_::Stream.via_item _one
         end
       end
 

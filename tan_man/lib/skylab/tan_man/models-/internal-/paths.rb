@@ -16,7 +16,7 @@ module Skylab::TanMan
         :call,
       )
 
-      Callback_::Event.selective_builder_sender_receiver self
+      Common_::Event.selective_builder_sender_receiver self
 
       def initialize & p
         @on_event_selectively = p
@@ -74,7 +74,7 @@ module Skylab::TanMan
             ick x
           end
 
-          y << "#{ Callback_::Name.via_variegated_symbol( o.terminal_channel_i ).as_human } #{
+          y << "#{ Common_::Name.via_variegated_symbol( o.terminal_channel_i ).as_human } #{
             }#{ ick o.send( o.term ) }. did you mean #{ or_ _s_a }?"
         end
       end

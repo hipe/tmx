@@ -313,7 +313,7 @@ module Skylab::TanMan::TestSupport
       last_user_result = nil
 
       el = event_log
-      st = Callback_.stream do
+      st = Common_.stream do
         em = el.gets
         if em
           em.cached_event_value

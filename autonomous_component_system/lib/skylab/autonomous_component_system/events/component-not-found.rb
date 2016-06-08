@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] #Scope stack trick
 
-    Events::Component_Not_Found = Callback_::Event.prototype_with(
+    Events::Component_Not_Found = Common_::Event.prototype_with(
 
       :component_not_found,
 

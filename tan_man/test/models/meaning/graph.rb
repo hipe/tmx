@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
 
       Graph_from_method___ = -> * s_pair_a do
 
-        _st = Home_::Callback_::Stream.via_nonsparse_array s_pair_a do | s, s_ |
+        _st = Home_::Common_::Stream.via_nonsparse_array s_pair_a do | s, s_ |
           Home_::Models_::Meaning.new s, s_
         end
 

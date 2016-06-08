@@ -22,7 +22,7 @@ module Skylab::System
         end
 
         def execute
-          Callback_.stream do
+          Common_.stream do
             __gets
           end
         end

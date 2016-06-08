@@ -67,7 +67,7 @@ module Skylab::TestSupport
 
     class << self
 
-      define_method :application_kernel_, ( Callback_.memoize do
+      define_method :application_kernel_, ( Common_.memoize do
         Brazen_::Kernel.new DocTest_
       end )
 
@@ -178,12 +178,12 @@ module Skylab::TestSupport
     private
 
       def build_not_OK_event_with * x_a, & msg_p
-        Callback_::Event.
+        Common_::Event.
           inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
       end
 
       def build_neutral_event_with * x_a, & msg_p
-        Callback_::Event.
+        Common_::Event.
           inline_neutral_via_mutable_iambic_and_message_proc x_a, msg_p
       end
 
@@ -256,7 +256,7 @@ module Skylab::TestSupport
 
           prop_cls.new_by do
 
-            @name = Callback_::Name.via_const_symbol sym
+            @name = Common_::Name.via_const_symbol sym
             @argument_arity = argument_arity_symbol
             @origin_category = category
 
@@ -269,7 +269,7 @@ module Skylab::TestSupport
     end
 
     Mutate_string_by_removing_trailing_dashes_ = -> s do
-      s.gsub! Callback_::Name::TRAILING_DASHES_RX, EMPTY_S_  # ick/meh
+      s.gsub! Common_::Name::TRAILING_DASHES_RX, EMPTY_S_  # ick/meh
       nil
     end
 

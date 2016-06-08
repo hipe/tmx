@@ -3,7 +3,7 @@ module Skylab::TMX::TestSupport
   module Models
 
     Reactions = -> tcc do
-      Callback_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Event[ tcc ]
       Building[ tcc ]
     end
 

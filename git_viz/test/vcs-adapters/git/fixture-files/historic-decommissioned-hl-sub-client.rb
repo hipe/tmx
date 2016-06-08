@@ -182,7 +182,7 @@ end
     end
   end
 
-  NLP_EN_expression_agent_instance__ = Callback_.memoize do
+  NLP_EN_expression_agent_instance__ = Common_.memoize do
 
     class NLP_EN_Expression_Agent____
 

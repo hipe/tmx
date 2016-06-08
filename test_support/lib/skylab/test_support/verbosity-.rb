@@ -189,7 +189,7 @@ module Skylab::TestSupport
       self.class.members
     end
 
-    Callback_::Session::Ivars_with_Procs_as_Methods.call self, :@aref, :[]
+    Common_::Session::Ivars_with_Procs_as_Methods.call self, :@aref, :[]
 
     def make_snitch io, *expression_agent  # #storypoint-195
       self.class.get_snitch_class.new self, io, *expression_agent
@@ -242,7 +242,7 @@ module Skylab::TestSupport
       self.class.members
     end
 
-    Callback_::Session::Ivars_with_Procs_as_Methods.call self,
+    Common_::Session::Ivars_with_Procs_as_Methods.call self,
       :write, :puts, :say, :is, :@puts, :<<, :event, :y
         # (reminder: ":@foo, :bar" means "use proc in @foo for method 'bar')
   end

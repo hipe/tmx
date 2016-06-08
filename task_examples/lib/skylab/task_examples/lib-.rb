@@ -14,7 +14,7 @@ module Skylab::TaskExamples
 
     Methodize = -> sym do
       self._HELLO
-      Callback_::Name::Methodize[ sym ]
+      Common_::Name::Methodize[ sym ]
     end
 
     Task = sidesys[ :Task ]

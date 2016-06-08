@@ -86,7 +86,7 @@ module Skylab::Brazen
       class Mutable_Nonterminal_Queue
 
         def initialize
-          @box = Callback_::Box.new
+          @box = Common_::Box.new
           h = nil
           @box.instance_exec do
             h = @h

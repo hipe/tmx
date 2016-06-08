@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
   module Sssn___  # :+#throwaway-module for constants set in tests below
 
     # <-
 
-  TS_.describe "[ca] session - ivars with procs as methods" do
+  TS_.describe "[co] session - ivars with procs as methods" do
 
     it "enhance a class via enabling ivars to hold procs that act as methods" do
 

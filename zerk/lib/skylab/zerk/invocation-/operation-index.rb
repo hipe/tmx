@@ -47,7 +47,7 @@ module Skylab::Zerk
 
       def __partition_as_recurse
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         _ = @formal_operation.to_defined_formal_parameter_stream.map_by do |par|
           bx.add par.name_symbol, par
@@ -93,7 +93,7 @@ module Skylab::Zerk
       end
 
       def to_PVS_parameter_stream_
-        Callback_::Stream.via_nonsparse_array @_bespoke_parameters
+        Common_::Stream.via_nonsparse_array @_bespoke_parameters
       end
 
       def fetcher_proc_for_reception_set_symbol_via_name_symbol_

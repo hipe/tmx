@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
   Digraph = ::Module.new  # READ [#019] #storypoint-1
 

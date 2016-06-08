@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
   module Scn__  # read [#ba-022] the scanners narrative
 

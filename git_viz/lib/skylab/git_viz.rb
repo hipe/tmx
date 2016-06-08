@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::GitViz
 
@@ -13,11 +13,11 @@ module Skylab::GitViz
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
 
@@ -47,12 +47,12 @@ module Skylab::GitViz
 
   class << self
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
     end
   end  # >>
@@ -76,7 +76,6 @@ module Skylab::GitViz
   end
 
   ACHIEVED_ = true
-  Callback_Tree_ = Callback_::Tree
   CONTINUE_ = nil
   DASH_ = '-'.freeze
   DOT_ = '.'.freeze
@@ -85,11 +84,11 @@ module Skylab::GitViz
   EMPTY_S_ = ''.freeze
   FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   Home_ = self
-  Name_ = Callback_::Name
+  Name_ = Common_::Name
   NEWLINE_ = "\n"
   NIL_ = nil
   MONADIC_EMPTINESS_ = -> _ {}
-  Scn_ = Callback_::Scn
+  Scn_ = Common_::Scn
   SPACE_ = ' '.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze

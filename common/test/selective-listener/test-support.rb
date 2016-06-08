@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport::Selective_Listener
 
-  ::Skylab::Callback::TestSupport[ TS__ = self ]
+  ::Skylab::Common::TestSupport[ TS__ = self ]
 
   include Constants
 

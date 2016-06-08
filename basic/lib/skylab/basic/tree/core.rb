@@ -31,7 +31,7 @@ module Skylab::Basic
       def via sym, x, * x_a, & x_p
 
         p_x = Tree_::Input_Adapters__.const_get(
-          Callback_::Name.via_variegated_symbol( sym ).as_const, false )
+          Common_::Name.via_variegated_symbol( sym ).as_const, false )
 
         if x_a.length.nonzero? || block_given?
           x_a.push :upstream_x, x
@@ -189,7 +189,7 @@ module Skylab::Basic
 
   class Pooled_Leaf__
 
-    Callback_::Memoization::Pool[ self ].
+    Common_::Memoization::Pool[ self ].
       instances_can_only_be_accessed_through_instance_sessions
 
     def init_from_pool x
@@ -251,9 +251,9 @@ module Skylab::Basic
 
       def to_child_stream
         if has_children
-          Callback_::Stream.via_nonsparse_array @children
+          Common_::Stream.via_nonsparse_array @children
         else
-          Callback_::Stream.the_empty_stream
+          Common_::Stream.the_empty_stream
         end
       end
     end

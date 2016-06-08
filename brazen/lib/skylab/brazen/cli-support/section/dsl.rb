@@ -23,7 +23,7 @@ module Skylab::Brazen
 
       def receive x_a
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
 
         if @_has_open_section
 
@@ -104,7 +104,7 @@ module Skylab::Brazen
         end
 
         def name_symbol=
-          @_name = Callback_::Name.via_variegated_symbol @_st.gets_one ; nil
+          @_name = Common_::Name.via_variegated_symbol @_st.gets_one ; nil
         end
 
         # --
@@ -113,7 +113,7 @@ module Skylab::Brazen
 
           expag = @_invex.expression_agent
           invex = @_invex
-          item_st = Callback_::Stream.via_nonsparse_array @_items
+          item_st = Common_::Stream.via_nonsparse_array @_items
           num_lines = @_num_lines
           op = invex.option_parser
           section_name_function = remove_instance_variable :@_name

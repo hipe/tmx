@@ -128,7 +128,7 @@ module Skylab::Basic
 
           pair_a = [] ; surface_h = {}
 
-          formal_box = Callback_::Box.new
+          formal_box = Common_::Box.new
           marg = Margin_Engine__.new
           st = __to_pair_stream
 
@@ -193,7 +193,7 @@ module Skylab::Basic
             end
           end
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -245,7 +245,7 @@ module Skylab::Basic
 
         def to_pair_stream
           a = @a
-          Callback_::Stream.via_times a.length do | d |
+          Common_::Stream.via_times a.length do | d |
             a.fetch d
           end
         end
@@ -274,7 +274,7 @@ module Skylab::Basic
         end
       end
 
-      Margin_Engine__ = Callback_::Session::Ivars_with_Procs_as_Methods.new :give, :take do
+      Margin_Engine__ = Common_::Session::Ivars_with_Procs_as_Methods.new :give, :take do
 
         # read #about-margins
 

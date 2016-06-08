@@ -27,7 +27,7 @@ module Skylab::Brazen
 
           _s_a = ss_mod.name.split CONST_SEP_
 
-          _stream_2 = Callback_::Stream.via_nonsparse_array( ::Dir[ glob ] ) do | path |
+          _stream_2 = Common_::Stream.via_nonsparse_array( ::Dir[ glob ] ) do | path |
 
             Executable_as_Unbound___.new( path[ range ], path, _s_a )
           end
@@ -45,7 +45,7 @@ module Skylab::Brazen
         def initialize slug, path, const_ppfx
 
           @__const_pfx = const_ppfx
-          @name_function = Callback_::Name.via_slug slug
+          @name_function = Common_::Name.via_slug slug
           @__path = path
         end
 
@@ -111,7 +111,7 @@ module Skylab::Brazen
 
         def bound_call_under fr, & oes_p  # [tmx]
 
-          Callback_::Bound_Call.by do
+          Common_::Bound_Call.by do
 
             # when it comes time to invoke the executable, it must follow a
             # few rules in order to be exposed by this [br]-integrated

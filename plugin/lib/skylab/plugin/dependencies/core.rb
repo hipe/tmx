@@ -34,7 +34,7 @@ module Skylab::Plugin
       # [#.D] we have to make a deep copy manually:
 
       bx1 = @_sub_bx
-      bx2 = Callback_::Box.new
+      bx2 = Common_::Box.new
       bx2.a_.replace bx1.a_
 
       h_ = bx2.h_
@@ -106,7 +106,7 @@ module Skylab::Plugin
 
     def emits= i_a
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       i_a.each do | sym |
         bx.add sym, []
       end
@@ -116,7 +116,7 @@ module Skylab::Plugin
 
     def roles= i_a
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       i_a.each do | sym |
         bx.add sym, nil
       end

@@ -51,7 +51,7 @@ module Skylab::CodeMetrics
 
         @on_event_selectively.call :info, :enoent do
 
-          Callback_::Event.wrap.exception.with(
+          Common_::Event.wrap.exception.with(
             :exception, e,
             :path_hack,
             :terminal_channel_i, :enoent )
@@ -104,7 +104,7 @@ module Skylab::CodeMetrics
           if '[]' == a.last
             a.clear  # EGADS!
           end
-          Callback_::Known_Known[ a ]
+          Common_::Known_Known[ a ]
         end,
 
         :default, [ '.*' ],

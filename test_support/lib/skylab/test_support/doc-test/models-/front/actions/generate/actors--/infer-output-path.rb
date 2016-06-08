@@ -6,7 +6,7 @@ module Skylab::TestSupport
 
       class Actions::Generate
 
-        class Actors__::Infer_output_path < Callback_::Actor::Monadic
+        class Actors__::Infer_output_path < Common_::Actor::Monadic
 
           def initialize input_path, & oes_p
             @input_path = input_path

@@ -9,8 +9,8 @@ module Skylab::Cull
     class Actions::List < Action_
 
       def produce_result
-        Callback_::Stream.via_nonsparse_array Aggregator_::Items__.constants do | const_i |
-          Callback_::Name.via_const_symbol const_i
+        Common_::Stream.via_nonsparse_array Aggregator_::Items__.constants do | const_i |
+          Common_::Name.via_const_symbol const_i
         end
       end
     end

@@ -256,7 +256,7 @@ module Skylab::Basic
       end
     end
 
-    Require_components_models___ = Callback_.memoize do
+    Require_components_models___ = Common_.memoize do
 
       module Component_Models
 
@@ -270,7 +270,7 @@ module Skylab::Basic
 
             if nb_t_rx =~ x
 
-              Callback_::Known_Known[ arg_st.gets_one.to_sym ]
+              Common_::Known_Known[ arg_st.gets_one.to_sym ]
 
             else
 

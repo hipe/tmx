@@ -118,7 +118,7 @@ module Skylab::TestSupport
       end
 
       def to_test_path_stream
-        Callback_::Stream.via_nonsparse_array @test_path_a
+        Common_::Stream.via_nonsparse_array @test_path_a
       end
 
       def replace_test_path_s_a path_s_a
@@ -134,7 +134,7 @@ module Skylab::TestSupport
 
       def find_contiguous_range_of_paths argv
 
-        scn = Callback_::Scn.try_convert argv
+        scn = Common_::Scn.try_convert argv
 
         begin
           tok = scn.gets

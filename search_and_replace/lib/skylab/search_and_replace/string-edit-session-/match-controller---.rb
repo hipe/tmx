@@ -73,7 +73,7 @@ module Skylab::SearchAndReplace
 
         def engage_replacement_via_string s
           @replacement_is_engaged = true  # ok if redundant
-          @_replacement = Callback_::Known_Known[ s ]
+          @_replacement = Common_::Known_Known[ s ]
           NIL_
         end
 

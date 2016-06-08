@@ -152,7 +152,7 @@ module Skylab::Human
 
         def to_stream_of_pronouns
 
-          Callback_::Stream.via_nonsparse_array( @_ph_a ).expand_by do | ph |
+          Common_::Stream.via_nonsparse_array( @_ph_a ).expand_by do | ph |
             ph.to_stream_of_pronouns
           end
         end

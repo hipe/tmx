@@ -17,7 +17,7 @@ module Skylab::Git::TestSupport
         end
       end ).call
 
-      define_method :stashiz_path_, ( Callback_.memoize do
+      define_method :stashiz_path_, ( Common_.memoize do
 
         ::File.join Fixture_trees_[], 'stashiz'
       end )

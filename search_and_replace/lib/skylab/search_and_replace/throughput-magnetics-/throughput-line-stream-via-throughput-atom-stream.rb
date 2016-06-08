@@ -14,7 +14,7 @@ module Skylab::SearchAndReplace
 
       @_state = :___gets
 
-      Callback_.stream do  # #[#032]
+      Common_.stream do  # #[#032]
         send @_state
       end
     end
@@ -162,7 +162,7 @@ module Skylab::SearchAndReplace
 
       def to_unstyled_bytes_string_  # #testpoint
         Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
-          Callback_::Stream.via_nonsparse_array @a ).execute
+          Common_::Stream.via_nonsparse_array @a ).execute
       end
 
       def has_start_of_match d

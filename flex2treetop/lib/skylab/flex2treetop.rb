@@ -6,11 +6,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     y << "attempts to convert a FLEX grammar into a treetop grammar"
   end
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   stowaway :CLI do
     CLI = ::Class.new Brazen_::CLI
@@ -50,12 +50,12 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       Action__
     end
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
       Brazen_::Kernel.new Home_
     end )
 
     def lib_
-      @lib ||= Callback_.produce_library_shell_via_library_and_app_modules Lib_, self
+      @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
 
     def sidesys_path_
@@ -148,7 +148,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
         test = Test_.new nil
 
-        Callback_::Stream.via_nonsparse_array path_a do | path_ |
+        Common_::Stream.via_nonsparse_array path_a do | path_ |
 
           test.new path_
         end
@@ -406,7 +406,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       require 'pp' ; ::PP
     end
 
-    Stdlib_tmpdir = Callback_.memoize do
+    Stdlib_tmpdir = Common_.memoize do
       require 'tmpdir'
       ::Dir
     end
@@ -440,7 +440,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   Deferred_actor__ = -> p do  # why deferred? [#.B]
 
-    cls_p = Callback_::Memoize[ & p ]
+    cls_p = Common_::Memoize[ & p ]
 
     -> * x_a, & oes_p do
 
@@ -1232,7 +1232,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
     end
   end
 
-  Common_node___ = Callback_.memoize do
+  Common_node___ = Common_.memoize do
 
     # all of the below "public"-looking constants must be
     # visible to the grammar when it loads
@@ -1607,7 +1607,7 @@ Translate___ = Deferred_actor__[ -> do class Translate____
 
   Sessions__ = ::Module.new
 
-  Sessions__::Treetop_builder = Callback_.memoize do
+  Sessions__::Treetop_builder = Common_.memoize do
 
   class Treetop_Builder____ < LIB_.treetop::Compiler::RubyBuilder
 

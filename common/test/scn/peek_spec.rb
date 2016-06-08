@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Callback::TestSupport::Scn
+module Skylab::Common::TestSupport::Scn
 
-  describe "[ca] Scn__::Peek__" do
+  describe "[co] Scn__::Peek__" do
 
     it "like this" do
       _scn = Basic_::List.line_stream %i( a b )

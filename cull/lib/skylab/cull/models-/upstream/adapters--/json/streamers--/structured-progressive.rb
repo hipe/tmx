@@ -17,7 +17,7 @@ module Skylab::Cull
 
         def execute
 
-          o = Callback_::Stream
+          o = Common_::Stream
           o.new(
             o::Resource_Releaser.new do
               @fh.close

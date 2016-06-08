@@ -88,7 +88,7 @@ module Skylab::Zerk
 
     def invoke argv  # *always* result in an exitstatus
 
-      @_arg_st = Callback_::Polymorphic_Stream.via_array argv
+      @_arg_st = Common_::Polymorphic_Stream.via_array argv
 
       bc = ___bound_call
       if bc
@@ -345,7 +345,7 @@ module Skylab::Zerk
     end
 
     def store_floaty_value_of_bespoke__ qkn  # o.s
-      _ = ( @__bespoke_values_box ||= Callback_::Box.new )  # :"floaty structure"
+      _ = ( @__bespoke_values_box ||= Common_::Box.new )  # :"floaty structure"
       _.add qkn.name_symbol, qkn
       NIL_
     end
@@ -361,7 +361,7 @@ module Skylab::Zerk
     # in shoutcase (:#here):
 
     def _ARGS_AS_STREAM
-      @_arg_st ||= Callback_::Polymorphic_Stream.via_array( remove_instance_variable :@_argv )
+      @_arg_st ||= Common_::Polymorphic_Stream.via_array( remove_instance_variable :@_argv )
     end
 
     def _ARGS_AS_ARGV

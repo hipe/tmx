@@ -39,7 +39,7 @@ module Skylab::TestSupport
 
       def _build_box path_head
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         ::Dir.glob( "#{ path_head }/*" ).each do | path |
 

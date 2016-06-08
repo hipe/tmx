@@ -1,18 +1,18 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Plugin
 
   class << self
 
     def lib_
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -30,7 +30,7 @@ module Skylab::Plugin
     end
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   Autoloader_[ Bundle = ::Module.new ]
 

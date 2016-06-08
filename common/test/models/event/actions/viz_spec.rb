@@ -1,8 +1,8 @@
 require_relative '../../../test-support'
 
-module Skylab::Callback::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ca] [..] viz" do
+  describe "[co] [..] viz" do
 
     extend TS_
     TS_::Expect_Event[ self ]
@@ -22,7 +22,7 @@ module Skylab::Callback::TestSupport
       io.string.should eql <<-HERE.unindent
         digraph {
           node [shape="Mrecord"]
-          label="event stream graph for ::Skylab::Callback::TestSupport::Fixtures::WhoHah"
+          label="event stream graph for ::Skylab::Common::TestSupport::Fixtures::WhoHah"
           hacking -> business
           hacking -> pleasure
         }

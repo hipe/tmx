@@ -15,7 +15,7 @@ module Skylab::Basic
       end
 
       def process_iambic_fully x_a
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
         while st.unparsed_exists
           ivar = :"@#{ st.current_token }"
           if instance_variable_defined? ivar
@@ -34,7 +34,7 @@ module Skylab::Basic
         if a.length.zero?
           @node
         else
-          @_slug_stream = Callback_::Polymorphic_Stream.via_array a
+          @_slug_stream = Common_::Polymorphic_Stream.via_array a
           __main_loop_because_nonempty_slug_stream
         end
       end

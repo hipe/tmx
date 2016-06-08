@@ -4,7 +4,7 @@ module Skylab::System
 
       # <-
 
-    class Build_path_stream___ < Callback_::Actor::Monadic
+    class Build_path_stream___ < Common_::Actor::Monadic
 
       def initialize x, & p
         @args = x
@@ -43,7 +43,7 @@ module Skylab::System
           p[]
         end
 
-        o = Callback_::Stream
+        o = Common_::Stream
         o.new(
           o::Resource_Releaser.new do
             if thread && thread.alive?
@@ -60,7 +60,7 @@ module Skylab::System
 
         @on_event_selectively.call :error, :find_error do
 
-          Callback_::Event.inline_not_OK_with :find_error, :message, error_s
+          Common_::Event.inline_not_OK_with :find_error, :message, error_s
         end
         nil
       end

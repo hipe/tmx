@@ -4,7 +4,7 @@ module Skylab::Snag
 
     Actors_ = ::Module.new
 
-    class Actors_::Normalize_stem < Callback_::Actor::Monadic  # 1x <
+    class Actors_::Normalize_stem < Common_::Actor::Monadic  # 1x <
 
       def initialize x, & p
         @on_event_selectively = p
@@ -33,7 +33,7 @@ module Skylab::Snag
             if _rest
               _when_invalid
             else
-              Callback_::Known_Known[ @symbol.get_stem_string.intern ]
+              Common_::Known_Known[ @symbol.get_stem_string.intern ]
             end
           else
             _when_invalid
@@ -51,7 +51,7 @@ module Skylab::Snag
 
       def __build_invalid_event
 
-        Callback_::Event.inline_not_OK_with :invalid_tag_stem,
+        Common_::Event.inline_not_OK_with :invalid_tag_stem,
 
             :tag_s, @as_string do | y, o |
 

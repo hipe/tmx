@@ -39,7 +39,7 @@ module Skylab::TestSupport
         end
 
         def to_line_stream
-          Callback_::Stream.via_nonsparse_array @a
+          Common_::Stream.via_nonsparse_array @a
         end
       end
     end

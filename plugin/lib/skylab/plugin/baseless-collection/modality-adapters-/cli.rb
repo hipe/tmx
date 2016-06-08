@@ -81,7 +81,7 @@ module Skylab::Plugin
       end
 
       def plugin_symbol
-        @___plugin_symbol ||= Callback_::Name::Conversion_Functions::Methodize[ @_const ]
+        @___plugin_symbol ||= Common_::Name::Conversion_Functions::Methodize[ @_const ]
       end
 
       def dependency_

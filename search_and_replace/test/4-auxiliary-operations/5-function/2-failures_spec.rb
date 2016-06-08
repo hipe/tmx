@@ -38,7 +38,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def expression_agent_for_expect_event
-        Callback_::Event.codifying_expression_agent_instance
+        Common_::Event.codifying_expression_agent_instance
       end
     end
 

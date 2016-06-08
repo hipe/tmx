@@ -46,7 +46,7 @@ module Skylab::System
 
         fh = ::File.open path, ::File::RDONLY
 
-        _st = Callback_.stream do
+        _st = Common_.stream do
 
           line = fh.gets
           if line

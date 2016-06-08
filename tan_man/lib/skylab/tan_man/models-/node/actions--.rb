@@ -68,7 +68,7 @@ module Skylab::TanMan
 
         # :+#actionless-collection-controller-experiment
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
         bx.add :dot_file, dc
 
         precondition_for_self :_no_action_,
@@ -140,7 +140,7 @@ module Skylab::TanMan
 
         elsif oes_p
           oes_p.call :info, :component_not_found do
-            Callback_::Event.inline_neutral_with :component_not_found,
+            Common_::Event.inline_neutral_with :component_not_found,
               :entity_name_string, node_identifier.entity_name_string
           end
         end
@@ -247,7 +247,7 @@ module Skylab::TanMan
 
     def __init_via_node_stmt_and_immutable_preconditions node_stmt, precon_bx
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       bx.add :name, node_stmt.label
 
       @preconditions = precon_bx

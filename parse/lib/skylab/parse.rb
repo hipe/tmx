@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Parse  # see [#001]
 
@@ -12,14 +12,14 @@ module Skylab::Parse  # see [#001]
 
       def function sym
         Home_::Functions_.const_get(
-          Callback_::Name.via_variegated_symbol( sym ).as_const,
+          Common_::Name.via_variegated_symbol( sym ).as_const,
           false )
       end
 
       alias_method :function, :function
 
       def function_via_definition_array x_a
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
         function( st.gets_one ).new_via_polymorphic_stream st
       end
 
@@ -32,7 +32,7 @@ module Skylab::Parse  # see [#001]
       end
 
       def lib_
-        @lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+        @lib ||= Common_.produce_library_shell_via_library_and_app_modules(
           Lib___, self )
       end
 
@@ -45,8 +45,8 @@ module Skylab::Parse  # see [#001]
       end
     end  # >>
 
-    Callback_ = ::Skylab::Callback
-    Autoloader_ = Callback_::Autoloader
+    Common_ = ::Skylab::Common
+    Autoloader_ = Common_::Autoloader
 
     module Fields__
 
@@ -98,7 +98,7 @@ module Skylab::Parse  # see [#001]
       Stdlib_set = Autoloader_.build_require_stdlib_proc[ :Set ]
     end
 
-    Autoloader_[ self, Callback_::Without_extension[ __FILE__ ] ]
+    Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
     CLI = nil  # for host
     EMPTY_A_ = [].freeze

@@ -32,7 +32,7 @@ module Skylab::Human
       end
 
       def _ps x
-        Callback_::Polymorphic_Stream.via_array x
+        Common_::Polymorphic_Stream.via_array x
       end
 
       def __expression_session_via_sexp_stream st
@@ -61,7 +61,7 @@ module Skylab::Human
 
       def interpret_component st, asc
         _sx = st.gets_one
-        st_ = Callback_::Polymorphic_Stream.via_array _sx
+        st_ = Common_::Polymorphic_Stream.via_array _sx
         _cls = Here_._lookup_class st_
         _cls.interpret_component_with_own_stream_ st_, asc
       end
@@ -170,7 +170,7 @@ module Skylab::Human
         # --
 
         def express_into_under y, _expag
-          st = Callback_::Polymorphic_Stream.via_array @_s_a
+          st = Common_::Polymorphic_Stream.via_array @_s_a
           y << st.gets_one
           until st.no_unparsed_exists
             y << SPACE_

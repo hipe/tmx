@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Models__::Report
 
-      class Actors__::To_stream < Callback_::Actor::Dyadic
+      class Actors__::To_stream < Common_::Actor::Dyadic
 
         # narrative in [#006]:#note-007
 
@@ -24,7 +24,7 @@ module Skylab::Cull
 
         def normal
 
-          rfstream = Callback_::Polymorphic_Stream.via_array @call_a.reverse
+          rfstream = Common_::Polymorphic_Stream.via_array @call_a.reverse
           jogs = []
 
           begin
@@ -106,7 +106,7 @@ module Skylab::Cull
           when  0
             func = mapishes.first
             if :mutator == func.category_symbol
-              Callback_.stream do
+              Common_.stream do
                 ent = estream.gets
                 if ent
                   func[ ent, & @on_event_selectively ]
@@ -114,7 +114,7 @@ module Skylab::Cull
                 ent
               end
             else
-              Callback_.stream do
+              Common_.stream do
                 ent = estream.gets
                 if ent
                   ent = func[ ent, & @on_event_selectively ]
@@ -123,7 +123,7 @@ module Skylab::Cull
               end
             end
           when -1
-            Callback_.stream do
+            Common_.stream do
               ent = estream.gets
               if ent
                 mapishes.each do | func_ |

@@ -118,7 +118,7 @@ module Skylab::TestSupport
         @branch_dist_i_a = dist_i_a ; @branch_a = branch_a
       end
 
-      Distill__ = Callback_.distill
+      Distill__ = Common_.distill
 
       def matches_against dist_i_a, node_a
         against_i = @against_i

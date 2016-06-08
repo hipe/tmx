@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System
 
         o.event_name_symbol = :association_not_available
 
-        o.property_name = Callback_::Name.via_human 'association'
+        o.property_name = Common_::Name.via_human 'association'
 
         a = ss[ 1..-1 ].map do |fr|
           fr.name.as_slug

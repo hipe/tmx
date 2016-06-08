@@ -1,9 +1,9 @@
 
 self._REDO  # we need all test (support)
 
-require 'skylab/callback'
+require 'skylab/common'
 
-inf = Skylab::Callback::Sessions::Gemspec_Inference.new
+inf = Skylab::Common::Sessions::Gemspec_Inference.new
 
 inf.gemspec_path = __FILE__
 
@@ -31,7 +31,7 @@ Gem::Specification.new do | s |
 
   s.version = inf.version_via_VERSION_file
 
-  s.add_runtime_dependency 'skylab-callback', [ '0.0.0.ca.pre.bleeding' ]
+  s.add_runtime_dependency 'skylab-common', [ '0.0.0.co.pre.bleeding' ]
 
   # s.add_development_dependency ..
 

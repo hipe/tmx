@@ -31,11 +31,11 @@ this formal attribute system merely associates symbol names with ivar
 names in a direct way, while also maintaining knowledge of the order of
 the formal symbols to support various means of invoking the actor.
 
-we *think* that [ca] "actor" (now [#016]) originated as a simplified take
+we *think* that [co] "actor" (now [#016]) originated as a simplified take
 on the complete [br] entity system; one that was intented to serve only
 for the scope of "actors" as described in that document. (later, we
 simplified this even further by breaking out the  "monadic" and "dyadic"
-forms of these (now in [ca]) for even *less* API than this.)
+forms of these (now in [co]) for even *less* API than this.)
 
 feature summary:
   • does *not* have dedicated class for formal attributes

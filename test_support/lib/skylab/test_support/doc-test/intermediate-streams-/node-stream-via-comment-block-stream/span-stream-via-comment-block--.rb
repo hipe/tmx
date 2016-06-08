@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     class Intermediate_Streams_::
         Node_stream_via_comment_block_stream::Span_stream_via_comment_block__ <
-            Callback_::Actor::Monadic
+            Common_::Actor::Monadic
 
       def initialize cb
 
@@ -19,7 +19,7 @@ module Skylab::TestSupport
       end
 
       def execute
-        Callback_.stream( & method( :produce_node ) )
+        Common_.stream( & method( :produce_node ) )
       end
 
       def produce_node

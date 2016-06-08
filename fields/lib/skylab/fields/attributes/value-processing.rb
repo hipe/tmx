@@ -4,7 +4,7 @@ module Skylab::Fields
 
     class Value_Processing
 
-      # sadly, the two main other implementations of this (in [ca] and [br])
+      # sadly, the two main other implementations of this (in [co] and [br])
       # were not flexible enough to accomodate this kind of thing ..
 
       # this accommodates neither soft event handling nor "value collection
@@ -17,7 +17,7 @@ module Skylab::Fields
       )
 
       def iambic= x_a
-        @upstream = Callback_::Polymorphic_Stream.via_array x_a
+        @upstream = Common_::Polymorphic_Stream.via_array x_a
         x_a
       end
 
@@ -85,9 +85,9 @@ module Skylab::Fields
         end
 
         if had
-          Callback_::Known_Known[ x ]
+          Common_::Known_Known[ x ]
         else
-          Callback_::KNOWN_UNKNOWN
+          Common_::KNOWN_UNKNOWN
         end
       end
 

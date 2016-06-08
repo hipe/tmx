@@ -6,7 +6,7 @@ module Skylab::TestSupport
 
     class << self
 
-      define_method :krnl, ( Callback_.memoize do
+      define_method :krnl, ( Common_.memoize do
         Home_.lib_.brazen::Kernel.new Home_
       end )
     end  # >>

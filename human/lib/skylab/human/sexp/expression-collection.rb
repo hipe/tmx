@@ -31,14 +31,14 @@ module Skylab::Human
           st = et.to_stream
           cache = []
 
-          Callback_.stream do  # hand-written map-reduce for clarity
+          Common_.stream do  # hand-written map-reduce for clarity
 
             begin
               en = st.gets
 
               if ! en  # once we reach the end, don't repeat this work.
                 @_streamer = -> do
-                  Callback_::Stream.via_nonsparse_array cache
+                  Common_::Stream.via_nonsparse_array cache
                 end
                 break
               end

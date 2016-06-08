@@ -77,7 +77,7 @@ class Kernel  # [#015]
       @module.name_function
 
     else
-      nf = Callback_::Name.via_module @module
+      nf = Common_::Name.via_module @module
       @_name_function = nf
       nf
     end.as_human
@@ -112,7 +112,7 @@ class Kernel  # [#015]
 
   def silo_via_normal_identifier const_a
 
-    _silos.via_normal_stream Callback_::Polymorphic_Stream.via_array const_a
+    _silos.via_normal_stream Common_::Polymorphic_Stream.via_array const_a
   end
 
   def silo_via_normal_stream st

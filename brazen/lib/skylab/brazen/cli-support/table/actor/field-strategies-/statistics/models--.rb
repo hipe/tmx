@@ -47,7 +47,7 @@ module Skylab::Brazen
         def initialize seer, type_taxo
 
           @_top_seer = seer
-          @_type_counts = Callback_::Box.new
+          @_type_counts = Common_::Box.new
           @numeric_max = 0
           @_type_taxo = type_taxo
         end
@@ -80,7 +80,7 @@ module Skylab::Brazen
         end
       end
 
-      Type_taxonomy___ = Callback_.memoize do
+      Type_taxonomy___ = Common_.memoize do
         Type_Taxonomy___.new self
       end
 
@@ -392,7 +392,7 @@ module Skylab::Brazen
 
         def _see_as sym, x
 
-          @_children ||= Callback_::Box.new
+          @_children ||= Common_::Box.new
 
           _child = @_children.touch sym do
             __build_child_seer sym
@@ -421,7 +421,7 @@ module Skylab::Brazen
               @_terminal_name_symbols = nil
             else
 
-              sym = Callback_::Name.via_module( self ).as_variegated_symbol
+              sym = Common_::Name.via_module( self ).as_variegated_symbol
 
               sym_a = superclass.all_terminal_name_symbols
               if sym_a
@@ -449,7 +449,7 @@ module Skylab::Brazen
 
         def [] sym
           @_name_cache.fetch sym do
-            _const = Callback_::Name.via_variegated_symbol( sym ).as_const
+            _const = Common_::Name.via_variegated_symbol( sym ).as_const
             @_name_cache[ sym ] = @_mod.const_get _const, false
           end
         end

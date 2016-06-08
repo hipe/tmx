@@ -4,7 +4,7 @@ module Skylab::Basic
 
     Events_ = ::Module.new
 
-    Events_::No_Available_State_Transition = Callback_::Event.prototype_with(
+    Events_::No_Available_State_Transition = Common_::Event.prototype_with(
 
       :no_available_state_transition,
       :x, nil,

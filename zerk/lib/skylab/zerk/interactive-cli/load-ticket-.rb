@@ -232,7 +232,7 @@ module Skylab::Zerk
             x = kn.value_x
           end
 
-          _qkn = Callback_::Qualified_Knownness[ ( ! x ), @association ]
+          _qkn = Common_::Qualified_Knownness[ ( ! x ), @association ]
 
           rw.write_value _qkn
 

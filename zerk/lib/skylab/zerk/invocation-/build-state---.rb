@@ -88,7 +88,7 @@ module Skylab::Zerk
           Require_fields_lib_[]
           if Field_::Takes_many_arguments[ @_asc ]
             if kn.value_x.length.zero?
-              kn = Callback_::KNOWN_UNKNOWN
+              kn = Common_::KNOWN_UNKNOWN
             end
           end
         end
@@ -140,7 +140,7 @@ module Skylab::Zerk
           ___knownness_via_bound_call
         else
           _ = @_procure_bound_call.release_reasoning_
-          Callback_::Known_Unknown.via_reasoning _
+          Common_::Known_Unknown.via_reasoning _
         end
       end
 
@@ -171,7 +171,7 @@ module Skylab::Zerk
 
         # (maybe this succeeded, maybe it failed. for now we are indifferent?)
 
-        Callback_::Known_Known[ _business_result_x ]
+        Common_::Known_Known[ _business_result_x ]
       end
 
       def __knownness_via_non_customized_operation_dependency
@@ -185,7 +185,7 @@ module Skylab::Zerk
             self._WEEE  # maybe emit the events back into the bc block # #todo
           end
 
-          Callback_::Known_Known[ ok_x ]
+          Common_::Known_Known[ ok_x ]
         else
 
           _ = @_procure_bound_call.release_reasoning_
@@ -193,7 +193,7 @@ module Skylab::Zerk
           # (when the above fails, design something. hopefully all failure
           #  of dependee operations will have client-provided emission.)
 
-          Callback_::Known_Unknown.via_reasoning _
+          Common_::Known_Unknown.via_reasoning _
         end
       end
 

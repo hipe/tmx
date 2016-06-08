@@ -2,7 +2,7 @@ module Skylab::System
 
   module IO
 
-    Line_Scanner__ = Callback_::Session::Ivars_with_Procs_as_Methods.new(
+    Line_Scanner__ = Common_::Session::Ivars_with_Procs_as_Methods.new(
       :count, :gets, :lineno )
 
     class Line_Scanner__  # read [#164]

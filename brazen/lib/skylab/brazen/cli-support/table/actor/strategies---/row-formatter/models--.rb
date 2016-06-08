@@ -158,7 +158,7 @@ module Skylab::Brazen
         end
 
         def add_component sym, x
-          @_component_box ||= Callback_::Box.new
+          @_component_box ||= Common_::Box.new
           @_component_box.add sym, x
           NIL_
         end

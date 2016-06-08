@@ -124,7 +124,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         _expect P_Reuse_One
       end
 
-      P_reuse_source__ = Callback_.memoize do
+      P_reuse_source__ = Common_.memoize do
 
         class P_Reuse_Source
 

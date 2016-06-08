@@ -104,7 +104,7 @@ module Skylab::MyTerm::TestSupport
       def matches? sta
 
         @_state = sta
-        @_st = Callback_::Polymorphic_Stream.via_array remove_instance_variable :@x_a
+        @_st = Common_::Polymorphic_Stream.via_array remove_instance_variable :@x_a
 
         begin
           send @_st.gets_one

@@ -78,7 +78,7 @@ module Skylab::Fields
 
     # ==
 
-    class Determine_any_subject_string < Callback_::Actor::Monadic
+    class Determine_any_subject_string < Common_::Actor::Monadic
 
       # ..
 
@@ -112,7 +112,7 @@ module Skylab::Fields
 
       def __subject_X_when_selection_stack_of_length_greater_than_one ss
 
-        st = Callback_::Stream.via_times ss.length
+        st = Common_::Stream.via_times ss.length
 
         o = Home_.lib_.basic::Yielder::Mapper.joiner "", SPACE_
         y = o.y

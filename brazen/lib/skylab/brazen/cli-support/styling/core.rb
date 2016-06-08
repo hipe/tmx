@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Styling  # :[#092].
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
 
       define_singleton_method :o do | k, p |
         bx.add k, p
@@ -167,7 +167,7 @@ module Skylab::Brazen
 
       # ~ implementation
 
-      bx = Callback_::Box.new
+      bx = Common_::Box.new
       bx.add :strong, 1
       bx.add :reverse, 7
       a = bx.a_ ; h = bx.h_

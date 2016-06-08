@@ -14,7 +14,7 @@ module Skylab::Basic
             alias_method :new, :__orig_new
           end
 
-          const_set BX__, Callback_::Box.new
+          const_set BX__, Common_::Box.new
 
           _edit_via_symbols sym_a
 

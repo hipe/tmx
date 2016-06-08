@@ -22,7 +22,7 @@ module Skylab::System::TestSupport
 
     it "not exist (path arg passed, name is used)" do
 
-      _pa = Callback_::Qualified_Knownness.via_value_and_symbol(
+      _pa = Common_::Qualified_Knownness.via_value_and_symbol(
         _not_here, :wazoozie )
 
       @result = subject_.with(

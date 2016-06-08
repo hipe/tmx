@@ -10,7 +10,7 @@ module Skylab::Zerk
 
     # -- setup
 
-    o.qualified_knownness = Callback_::Qualified_Knownness.
+    o.qualified_knownness = Common_::Qualified_Knownness.
       via_value_and_symbol( s, :argument )  # ..
         # against this string
 

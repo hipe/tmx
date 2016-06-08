@@ -164,7 +164,7 @@ module Skylab::Basic
           x
         end
 
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -176,16 +176,16 @@ module Skylab::Basic
     end
 
     Build_each_pairable_via_even_iambic__ = -> a do
-      Callback_::Scanner.build_each_pairable_via_pair_stream_by do
+      Common_::Scanner.build_each_pairable_via_pair_stream_by do
         Build_pair_stream_via_even_iambic__[ a ]
       end
     end
 
     Build_pair_stream_via_even_iambic__ = -> a do
 
-      Callback_::Stream.via_times( a.length / 2 ).map_by do | d |
+      Common_::Stream.via_times( a.length / 2 ).map_by do | d |
         d <<= 1
-        Callback_::Pair.via_value_and_name(
+        Common_::Pair.via_value_and_name(
           a.fetch( d + 1 ),
           a.fetch( d ),
         )

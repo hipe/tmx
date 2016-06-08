@@ -111,7 +111,7 @@ module Skylab::Fields::TestSupport
       end
 
       def the_empty_polymorphic_stream_
-        Callback_::Polymorphic_Stream.the_empty_polymorphic_stream
+        Common_::Polymorphic_Stream.the_empty_polymorphic_stream
       end
 
       def polymorphic_stream_via_ * x_a
@@ -119,7 +119,7 @@ module Skylab::Fields::TestSupport
       end
 
       def polymorphic_stream_via_iambic_ x_a
-        Callback_::Polymorphic_Stream.via_array x_a
+        Common_::Polymorphic_Stream.via_array x_a
       end
 
       Subject_proc_ = -> do

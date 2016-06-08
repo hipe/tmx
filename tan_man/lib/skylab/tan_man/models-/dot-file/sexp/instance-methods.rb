@@ -36,7 +36,7 @@ module Skylab::TanMan
 
     def self.const_defined? const_x, look_up=true
       super or begin
-        entry_tree.normpath_from_distilled Callback_.distill[ const_x ]
+        entry_tree.normpath_from_distilled Common_.distill[ const_x ]
       end
     end
 

@@ -1,4 +1,4 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::SearchAndReplace
 
@@ -7,14 +7,14 @@ module Skylab::SearchAndReplace
   class << self
 
     def lib_
-      @___lib ||= Callback_.
+      @___lib ||= Common_.
         produce_library_shell_via_library_and_app_modules Lib_, self
     end
   end  # >>
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
-  Lazy_ = Callback_::Lazy
+  Lazy_ = Common_::Lazy
 
   rx = /(?:\r?\n|\r)\z/
   Mutate_by_my_chomp_ = -> mutable_s do
@@ -112,13 +112,13 @@ module Skylab::SearchAndReplace
           x = st.gets_one
           if x
             if x.respond_to? :casefold?
-              Callback_::Known_Known[ x ]
+              Common_::Known_Known[ x ]
             else
               ___interpret_ruby_regexp x, & pp
             end
           else
             # setting it to false-ish has been requested explicitly
-            Callback_::Known_Known[ x ]
+            Common_::Known_Known[ x ]
           end
         end
       end
@@ -152,7 +152,7 @@ module Skylab::SearchAndReplace
       rx = _lib.marshal_load s, & _oes_p
 
       if rx
-        Callback_::Known_Known[ rx ]
+        Common_::Known_Known[ rx ]
       else
         rx
       end
@@ -166,7 +166,7 @@ module Skylab::SearchAndReplace
         if st.unparsed_exists
           x = st.gets_one
           if x
-            Callback_::Known_Known[ x ]
+            Common_::Known_Known[ x ]
           end
         end
       end
@@ -184,7 +184,7 @@ module Skylab::SearchAndReplace
       -> st do
         x = st.gets_one
         if x
-          Callback_::Known_Known[ x ]
+          Common_::Known_Known[ x ]
         end
       end
     end
@@ -201,7 +201,7 @@ module Skylab::SearchAndReplace
       -> st do
         x = st.gets_one
         if x
-          Callback_::Known_Known[ x ]
+          Common_::Known_Known[ x ]
         end
       end
     end
@@ -329,7 +329,7 @@ module Skylab::SearchAndReplace
     Zerk_ = Home_.lib_.zerk ; nil
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -369,7 +369,7 @@ module Skylab::SearchAndReplace
 
   Autoloader_[ Throughput_Magnetics_ = ::Module.new ]
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   EMPTY_A_ = []

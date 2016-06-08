@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
   module Lib_  # :+[#ss-001]
 

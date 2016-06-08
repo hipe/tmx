@@ -1,8 +1,8 @@
 require_relative '../test-support'
 
-module Skylab::Callback::TestSupport::Bundles
+module Skylab::Common::TestSupport::Bundles
 
-  ::Skylab::Callback::TestSupport[ TS__ = self ]
+  ::Skylab::Common::TestSupport[ TS__ = self ]
 
   include Constants
 

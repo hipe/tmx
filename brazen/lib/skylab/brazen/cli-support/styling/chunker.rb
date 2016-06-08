@@ -11,13 +11,13 @@ module Skylab::Brazen
           def via_sexp sexp
 
             st = Implementor___.new sexp
-            Callback_.stream do
+            Common_.stream do
               st._gets
             end
           end
         end  # >>
 
-        Implementor___ = Callback_::Session::Ivars_with_Procs_as_Methods.new :_gets
+        Implementor___ = Common_::Session::Ivars_with_Procs_as_Methods.new :_gets
 
         # <- 2
 
@@ -60,7 +60,7 @@ module Skylab::Brazen
         state = :initial
         hot = true
 
-        st = Callback_::Polymorphic_Stream.via_array sexp
+        st = Common_::Polymorphic_Stream.via_array sexp
 
         building = nil
 

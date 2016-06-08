@@ -59,7 +59,7 @@ module Skylab::Brazen
 
     def __event_dispatcher
 
-      _ = Callback_::Event.produce_handle_event_selectively_through_methods
+      _ = Common_::Event.produce_handle_event_selectively_through_methods
       _.bookends self, :init
     end
 

@@ -34,7 +34,7 @@ In theory the core lifecycle of one such nub should consist of:
   where each element is one of the 5 classes above.
 
   2. call `match` on the nub object, passing that an array of actual
-  Callback event-looking objects. It will result in trueish or falseish,
+  Common event-looking objects. It will result in trueish or falseish,
   based on whether the expected did or did not match the actual,
   respectively. (Note the two arrays, expected vs. actual, are *not*
   parallel in any way. It is just coincidence that they are both

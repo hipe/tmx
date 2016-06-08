@@ -1,4 +1,4 @@
-module Skylab::Callback
+module Skylab::Common
 
   class CLI < Home_.lib_.brazen::CLI  # see [#018]
 

@@ -11,7 +11,7 @@ module Skylab::Parse
         end
       end  # >>
 
-      Extra_Input___ = Callback_::Event.prototype_with :extra_input,
+      Extra_Input___ = Common_::Event.prototype_with :extra_input,
           :x, nil,
           :error_category, :argument_error do | y, o |
 
@@ -38,7 +38,7 @@ module Skylab::Parse
 
           st.advance_one
 
-          _st = Callback_::Polymorphic_Stream.via_array a
+          _st = Common_::Polymorphic_Stream.via_array a
 
           _process_functions_via_polymorphic_stream _st
         else
@@ -86,7 +86,7 @@ module Skylab::Parse
 
       def __produce_parse_function_stream_via_polymorphic_stream st
 
-        Callback_.stream do
+        Common_.stream do
           if st.unparsed_exists
             sym = st.gets_one
             if :end_functions == sym
@@ -145,14 +145,14 @@ module Skylab::Parse
           end
 
           o.set_reflective_function_stream(
-            Callback_::Stream.via_nonsparse_array @function_a )
+            Common_::Stream.via_nonsparse_array @function_a )
 
           o.set_downstream y
         end
       end
 
       def to_reflective_function_stream_  # for above
-        Callback_::Stream.via_nonsparse_array @function_a
+        Common_::Stream.via_nonsparse_array @function_a
       end
 
       def to_parse_array_fully_proc

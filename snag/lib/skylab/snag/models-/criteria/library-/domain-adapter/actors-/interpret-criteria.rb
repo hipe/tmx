@@ -222,7 +222,7 @@ module Skylab::Snag
 
           def _parse_one_predicate_tail
 
-            _f_st = Callback_::Stream.via_nonsparse_array @assoc_ada_a
+            _f_st = Common_::Stream.via_nonsparse_array @assoc_ada_a
 
             winner = Parse_highest_scoring_candidate_.call(
                 @in_st,
@@ -268,7 +268,7 @@ module Skylab::Snag
 
             @pred_tail_trees = nil
 
-            @tree_of_predicates = Callback_::Pair.via_value_and_name(
+            @tree_of_predicates = Common_::Pair.via_value_and_name(
               _top_x,
               @model_reflection.identifier )
 

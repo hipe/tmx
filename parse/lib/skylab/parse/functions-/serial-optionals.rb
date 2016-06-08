@@ -95,11 +95,11 @@ module Skylab::Parse
           # args are matchers (constituency of the grammar). if unparsed
           # exists raise argument error. otherwise result is output tuple.
 
-          arg_st = Callback_::Polymorphic_Stream.via_array a
+          arg_st = Common_::Polymorphic_Stream.via_array a
           input_array = arg_st.gets_one
 
           new_with(
-            :function_objects_array, Callback_.stream do
+            :function_objects_array, Common_.stream do
               if arg_st.unparsed_exists
                 Functions_::Simple_Matcher.new_via_proc arg_st.gets_one
               end

@@ -81,7 +81,7 @@ module Skylab::BeautySalon::TestSupport
   # ~ bundles
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -100,8 +100,8 @@ module Skylab::BeautySalon::TestSupport
 
   # ~
   Home_ = ::Skylab::BeautySalon
-  Callback_ = ::Skylab::Callback
-  Autoloader_ = Callback_::Autoloader
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
 
   DELIMITER_ = Home_::NEWLINE_
   EMPTY_S_ = Home_::EMPTY_S_

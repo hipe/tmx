@@ -1,13 +1,13 @@
-module Skylab::Callback
+module Skylab::Common
 
   Models_ = ::Module.new
 
   Models_::Ping = -> pxy do
 
     pxy.on_event_selectively.call :info, :expression, :ping do | y |
-      y << "hello from callback."
+      y << "hello from common."
     end
-    :hello_from_callback
+    :hello_from_common
   end
 
   module Models_::Event

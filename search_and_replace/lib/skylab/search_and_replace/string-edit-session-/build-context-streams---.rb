@@ -82,7 +82,7 @@ module Skylab::SearchAndReplace
         redo
       end while nil
 
-      @_during_stream = Callback_::Stream.via_nonsparse_array a
+      @_during_stream = Common_::Stream.via_nonsparse_array a
       NIL_
     end
 
@@ -111,7 +111,7 @@ module Skylab::SearchAndReplace
         end while nil
       end
 
-      @_after_stream = Callback_::Stream.via_nonsparse_array a
+      @_after_stream = Common_::Stream.via_nonsparse_array a
 
       NIL_
     end
@@ -123,7 +123,7 @@ module Skylab::SearchAndReplace
       target_d = @num_lines_before
 
       if target_d.zero?
-        st = Callback_::Stream.the_empty_stream
+        st = Common_::Stream.the_empty_stream
       else
 
         st = Home_::String_Edit_Session_::Build_Before_Context_Stream___.new(

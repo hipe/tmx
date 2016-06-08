@@ -16,8 +16,8 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
   _1 = 'digit-1' ; _2 = 'digit-2'
 
   subsystem = -> sym do
-    require 'skylab/callback'
-    ::Skylab::Callback::Autoloader.require_sidesystem sym
+    require 'skylab/common'
+    ::Skylab::Common::Autoloader.require_sidesystem sym
   end
 
   require 'optparse'

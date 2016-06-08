@@ -31,7 +31,7 @@ module Skylab::CodeMetrics
 
           scn.string = string
 
-          Callback_.stream do
+          Common_.stream do
 
             if ! scn.eos?
 
@@ -80,7 +80,7 @@ module Skylab::CodeMetrics
 
         pieces = [ '\b(?:' ]
 
-        st = Callback_::Stream.via_nonsparse_array @pattern_strings do | s |
+        st = Common_::Stream.via_nonsparse_array @pattern_strings do | s |
           ::Regexp.escape s  # ..
         end
 

@@ -79,7 +79,7 @@ module Skylab::SearchAndReplace::TestSupport
         a = []
         a.push ::File.join( @_path, @_file_A )
         a.push path_of_file_B
-        _st = Callback_::Stream.via_nonsparse_array a
+        _st = Common_::Stream.via_nonsparse_array a
 
         guy = TestSupport_::Quickie::Plugins::Wip_It.allocate
         guy.instance_variable_set :@y, _y

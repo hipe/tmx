@@ -196,7 +196,7 @@ module Skylab::Fields
 
         @_.current_attribute.reader_by_ do
           -> do
-            Callback_::Known_Known[ argument_stream.gets_one ]
+            Common_::Known_Known[ argument_stream.gets_one ]
           end
         end
       end

@@ -1,8 +1,8 @@
-require 'skylab/callback'
+require 'skylab/common'
 
 module Skylab::Treemap
 
-  Callback_ = ::Skylab::Callback
+  Common_ = ::Skylab::Common
 
   class << self
 
@@ -10,21 +10,21 @@ module Skylab::Treemap
       y << "solid but impcomplete experiment with test coverage visualization"
     end
 
-    define_method :application_kernel_, ( Callback_.memoize do
+    define_method :application_kernel_, ( Common_.memoize do
 
       Home_.lib_.brazen::Kernel.new Home_
     end )
 
     def lib_
 
-      @___lib ||= Callback_.produce_library_shell_via_library_and_app_modules(
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib_, self )
     end
   end  # >>
 
   module Model_
 
-    define_singleton_method :common_action_class, ( Callback_.memoize do
+    define_singleton_method :common_action_class, ( Common_.memoize do
 
       class Common_Action_Class___ < Home_.lib_.brazen::Action
 
@@ -35,7 +35,7 @@ module Skylab::Treemap
     end )
   end
 
-  Autoloader_ = Callback_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   module Lib_
 
@@ -53,7 +53,7 @@ module Skylab::Treemap
 
   end
 
-  Autoloader_[ self, Callback_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   Autoloader_[ Input_Adapters_ = ::Module.new ]

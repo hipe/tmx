@@ -153,7 +153,7 @@ file here) will produce interesting information from the below table.
 
 this:
 
-    ./bin/tmx-cull survey reduce $PWD/lib/skylab/callback/doc/issues/60
+    ./bin/tmx-cull survey reduce $PWD/lib/skylab/common/doc/issues/60
 
 will show you only the list of unique features. we have written the
 table in line with our goal: we include those features that exist in the

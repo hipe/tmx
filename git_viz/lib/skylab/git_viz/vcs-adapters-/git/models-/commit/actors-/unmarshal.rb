@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Actors_::Unmarshal < Callback_::Actor::Dyadic
+      class Actors_::Unmarshal < Common_::Actor::Dyadic
 
         # broad algorithm narrated in [#012], storypoints in [#009]
 

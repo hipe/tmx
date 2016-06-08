@@ -234,7 +234,7 @@ module Skylab::System
 
         st = Here_::Input_Adapters_.const_get( sym ).tree_stream_from_lines( x )
 
-        Callback_.stream do
+        Common_.stream do
 
           tree = st.gets
           tree and begin

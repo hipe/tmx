@@ -63,7 +63,7 @@ module Skylab::Git
           end
         end
 
-        st = Callback_.stream do
+        st = Common_.stream do
           p[]
         end
 

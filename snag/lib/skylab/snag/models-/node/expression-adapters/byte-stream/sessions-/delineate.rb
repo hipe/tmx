@@ -69,7 +69,7 @@ module Skylab::Snag
 
         def __express_any_business_rows
 
-          st = Callback_::Stream.via_range @r do | d |
+          st = Common_::Stream.via_range @r do | d |
             @row_a.fetch d
           end
 

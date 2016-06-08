@@ -27,8 +27,8 @@ module Skylab::GitViz
 
         def __init_firsts_and_lasts
 
-          firsts = Callback_::Box.new
-          lasts = Callback_::Box.new
+          firsts = Common_::Box.new
+          lasts = Common_::Box.new
 
           @bundle.trails.each do | tr |
 
@@ -136,7 +136,7 @@ module Skylab::GitViz
           # must count backwards from N-1 to assign each new column index.
 
           column_index = @bundle.ci_box.length  # subtract one before you use it
-          order_box = Callback_::Box.new
+          order_box = Common_::Box.new
           pool = ::Hash[ @bundle.ci_box.a_.map { | sha_s | [ sha_s, true ] } ]
 
           # because of the way the vendor command works, the first (oldest)

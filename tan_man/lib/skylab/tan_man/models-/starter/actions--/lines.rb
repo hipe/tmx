@@ -44,7 +44,7 @@ module Skylab::TanMan
 
       class Session
 
-        Callback_::Event.selective_builder_sender_receiver self
+        Common_::Event.selective_builder_sender_receiver self
 
         def initialize k, oes_p
           @qualified_knownness_box = nil
@@ -99,7 +99,7 @@ module Skylab::TanMan
 
         def bld_using_default_event strtr, d
 
-          Callback_::Event.inline_neutral_with(
+          Common_::Event.inline_neutral_with(
 
             :using_default,
             :name_s, strtr.natural_key_string,
@@ -154,7 +154,7 @@ module Skylab::TanMan
 
         def via_enoent_bld_event
 
-          Callback_::Event.wrap.exception.with(
+          Common_::Event.wrap.exception.with(
             :path_hack,
             :terminal_channel_i, :resource_not_found,
             :exception, @enoent )
@@ -168,7 +168,7 @@ module Skylab::TanMan
 
           def fetch sym
 
-            "{{ #{ Callback_::Name.via_variegated_symbol( sym ).
+            "{{ #{ Common_::Name.via_variegated_symbol( sym ).
               as_lowercase_with_underscores_symbol.id2name.upcase } }}"
 
           end

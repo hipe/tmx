@@ -17,7 +17,7 @@ module Skylab::TMX
 
       @_lt = load_ticket
       @mod = @_lt.require_sidesystem_module
-      @_nf = Callback_::Name.via_module @mod
+      @_nf = Common_::Name.via_module @mod
     end
 
     # ~ dependency inference
@@ -69,7 +69,7 @@ module Skylab::TMX
 
       fh = ::File.open _lib_path, ::File::RDONLY
 
-      _line_st = Callback_.stream do
+      _line_st = Common_.stream do
         fh.gets
       end
 

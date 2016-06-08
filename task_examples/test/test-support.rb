@@ -134,7 +134,7 @@ module Skylab::TaskExamples::TestSupport
   # ~ these
 
   Expect_Event = -> tcc do
-    Callback_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Event[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do
@@ -189,7 +189,7 @@ module Skylab::TaskExamples::TestSupport
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
-  Callback_ = Home_::Callback_
+  Common_ = Home_::Common_
   DOT_BYTE_ = '.'.getbyte 0
   EMPTY_A_ = []
   EMPTY_H_ = {}.freeze

@@ -392,7 +392,7 @@ module Skylab::TestSupport
             nil
           end
         end
-        Callback_.stream do
+        Common_.stream do
           p[]
         end
       end
@@ -472,7 +472,7 @@ module Skylab::TestSupport
 
       def stdout_stderr_against_emission em
 
-        _st = Callback_::Stream.via_item( em ).flush_to_polymorphic_stream
+        _st = Common_::Stream.via_item( em ).flush_to_polymorphic_stream
         self.stream_for_expect_stdout_stderr = _st
         NIL_
       end
@@ -481,7 +481,7 @@ module Skylab::TestSupport
 
         # the subject of your tests will be this array of emissions.
 
-        _st = Callback_::Polymorphic_Stream.via_array em_a
+        _st = Common_::Polymorphic_Stream.via_array em_a
         self.stream_for_expect_stdout_stderr = _st
         NIL_
       end
@@ -501,7 +501,7 @@ module Skylab::TestSupport
       end
 
       def _bake_sout_serr
-        @__sout_serr_actual_stream__ = Callback_::Polymorphic_Stream.via_array(
+        @__sout_serr_actual_stream__ = Common_::Polymorphic_Stream.via_array(
           flush_baked_emission_array )
 
         true
@@ -518,7 +518,7 @@ module Skylab::TestSupport
 
     Frozen_State___ = ::Struct.new :exitstatus, :lines
 
-    Callback_ = ::Skylab::Callback
+    Common_ = ::Skylab::Common
 
     SIMPLE_STYLE_RX__ = Home_.lib_.brazen::CLI_Support::Styling::SIMPLE_STYLE_RX
 
@@ -531,7 +531,7 @@ module Skylab::TestSupport
         end
 
         def via_args x_a, & x_p
-          new Callback_::Polymorphic_Stream.via_array( x_a ), & x_p
+          new Common_::Polymorphic_Stream.via_array( x_a ), & x_p
         end
 
         private :new
@@ -715,7 +715,7 @@ module Skylab::TestSupport
 
         _add_failure_by do
 
-          _nf = Callback_::Name.via_variegated_symbol thing_sym
+          _nf = Common_::Name.via_variegated_symbol thing_sym
 
           "expected #{ _nf.as_human } #{ expected_x.inspect }, #{
             }had #{ actual_x.inspect }"
@@ -744,7 +744,7 @@ module Skylab::TestSupport
 
       def initialize a
         @_a = a
-        @_st = Callback_::Stream.via_nonsparse_array a
+        @_st = Common_::Stream.via_nonsparse_array a
       end
 
       def expect_chunk num_x=nil, stream_symbol

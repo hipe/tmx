@@ -42,7 +42,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
         o = build_root_ACS
 
-        _io = Callback_::Stream.via_nonsparse_array ['{}']
+        _io = Common_::Stream.via_nonsparse_array ['{}']
 
         _x = unmarshal_from_JSON o, _io
 

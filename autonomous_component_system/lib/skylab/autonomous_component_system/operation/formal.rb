@@ -31,7 +31,7 @@ module Skylab::Autonomous_Component_System
                 if ! ss.last  # kind of nasty [#030]: it is convenient for
                   # fuzzy lookup to be told what the actual name (symbol)
                   # is that was resolved, otherwise `sym` is inaccessible.
-                  ss[ -1 ] = Callback_::Name.via_variegated_symbol sym
+                  ss[ -1 ] = Common_::Name.via_variegated_symbol sym
                 end
 
                 _fo = new.___init_via m, ss
@@ -54,7 +54,7 @@ module Skylab::Autonomous_Component_System
 
         x = _ACS.send @_method_name do | * x_a |
 
-          st = Callback_::Polymorphic_Stream.via_array x_a
+          st = Common_::Polymorphic_Stream.via_array x_a
           begin
             send :"__accept__#{ st.gets_one }__meta_component", st
             st.no_unparsed_exists and break
@@ -107,7 +107,7 @@ module Skylab::Autonomous_Component_System
       end
 
       def _writable_param_box
-        @box ||= Callback_::Box.new
+        @box ||= Common_::Box.new
       end
 
       def __accept__end__meta_component _
@@ -197,7 +197,7 @@ module Skylab::Autonomous_Component_System
 
         # (case in point is [#ze-028]<->[#032] - this is requested 3 times for one invocation?)
 
-        Callback_::Stream.via_nonsparse_array _DFP_a
+        Common_::Stream.via_nonsparse_array _DFP_a
       end
 
       def __has_defined_formal_parameters

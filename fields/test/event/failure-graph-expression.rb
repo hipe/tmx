@@ -9,7 +9,7 @@ module Skylab::Fields::TestSupport
     # -- setup
 
     def name_ sym
-      Callback_::Name.via_variegated_symbol sym
+      Common_::Name.via_variegated_symbol sym
     end
 
     def begin_stub_ sym
@@ -62,7 +62,7 @@ module Skylab::Fields::TestSupport
     class Branch_Stub
 
       def initialize sym
-        @_nf = Callback_::Name.via_variegated_symbol( sym )
+        @_nf = Common_::Name.via_variegated_symbol( sym )
         @_reasons = nil
       end
 

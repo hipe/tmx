@@ -220,8 +220,8 @@ module Skylab::Brazen
 
           def __accept_for_random_access x, prp, _sym
 
-            _bx = ( @_random_access_box ||= Callback_::Box.new )
-            _qkn = Callback_::Qualified_Knownness.via_value_and_association( x, prp )
+            _bx = ( @_random_access_box ||= Common_::Box.new )
+            _qkn = Common_::Qualified_Knownness.via_value_and_association( x, prp )
             _bx.add prp.name_symbol, _qkn ; nil
           end
 
@@ -281,7 +281,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Callback_::Polymorphic_Stream  # assumes via array!
+          class Crazy_Scanner__ < Common_::Polymorphic_Stream  # assumes via array!
             attr_writer :d, :x_a_length
             attr_reader :d
           end

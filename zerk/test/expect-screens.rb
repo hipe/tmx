@@ -156,7 +156,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def _expscr_last_screen_stream_lines_stream
-        Callback_::Stream.via_nonsparse_array _expscr_last_screen_stream_lines 
+        Common_::Stream.via_nonsparse_array _expscr_last_screen_stream_lines 
       end
 
       def _expscr_last_screen_stream_lines
@@ -379,7 +379,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def _to_stream_line_stream & p
-        Callback_::Stream.via_nonsparse_array( @_stream_lines, & p )
+        Common_::Stream.via_nonsparse_array( @_stream_lines, & p )
       end
 
       def first_line_content
@@ -592,7 +592,7 @@ module Skylab::Zerk::TestSupport
 
       def initialize serr_line_string
 
-        bx = Callback_::Box.new
+        bx = Common_::Box.new
 
         rx = EGADS_RX___ ; sp = BUTTON_SEPARATOR_RX___
         pos = 0
@@ -766,7 +766,7 @@ module Skylab::Zerk::TestSupport
 
         io = Fake_Readable_IO___.new
 
-        st = Callback_::Polymorphic_Stream.via_array x_a
+        st = Common_::Polymorphic_Stream.via_array x_a
 
         lineify = -> s do
 
@@ -917,12 +917,12 @@ module Skylab::Zerk::TestSupport
         if remove_instance_variable( :@_did_get_to_end )
 
           _x = remove_instance_variable :@_end_result
-          end_result_wv = Callback_::Known_Known[ _x ]
+          end_result_wv = Common_::Known_Known[ _x ]
 
         else
 
           @_screens.last._close_screen
-          end_result_wv = Callback_::KNOWN_UNKNOWN
+          end_result_wv = Common_::KNOWN_UNKNOWN
           els = remove_instance_variable :@_event_loop_state
         end
 

@@ -101,7 +101,7 @@ module Skylab::MyTerm
 
         if kn
           @background_font.accept_path__ kn
-          Callback_::Known_Known[ :_was_written_ ]  # ick/meh
+          Common_::Known_Known[ :_was_written_ ]  # ick/meh
         else
           kn
         end

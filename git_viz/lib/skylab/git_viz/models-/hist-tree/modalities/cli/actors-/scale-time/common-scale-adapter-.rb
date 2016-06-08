@@ -62,7 +62,7 @@ module Skylab::GitViz
             @column_B_rows.each_with_index do | row_o, row_d |
               row_o or next
 
-              bucket_box = Callback_::Box.new
+              bucket_box = Common_::Box.new
 
               row_o.to_a.each do | filechange |
                 filechange or next

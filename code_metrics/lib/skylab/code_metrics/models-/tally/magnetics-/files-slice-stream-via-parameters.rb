@@ -75,7 +75,7 @@ module Skylab::CodeMetrics
           end
         end
 
-        Callback_::Stream.new w do
+        Common_::Stream.new w do
           chunk[]
         end
       end
@@ -146,7 +146,7 @@ module Skylab::CodeMetrics
           @_command.push OPEN_PAREN___
         end
 
-        st = Callback_::Stream.via_nonsparse_array a
+        st = Common_::Stream.via_nonsparse_array a
 
         _x = st.gets
 

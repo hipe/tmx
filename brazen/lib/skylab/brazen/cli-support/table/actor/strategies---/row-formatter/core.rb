@@ -265,7 +265,7 @@ module Skylab::Brazen
           __calculation_pass_two mutable
         end
 
-        _do_rendering_passes Callback_::Polymorphic_Stream.via_array mutable
+        _do_rendering_passes Common_::Polymorphic_Stream.via_array mutable
       end
 
       def __calculation_pass_one mutable
@@ -479,7 +479,7 @@ module Skylab::Brazen
         h = ( @_col_bx ||= {} )
 
         _bx = h.fetch d do
-          h[ d ] = Callback_::Box.new
+          h[ d ] = Common_::Box.new
         end
 
         _bx.add sym, x

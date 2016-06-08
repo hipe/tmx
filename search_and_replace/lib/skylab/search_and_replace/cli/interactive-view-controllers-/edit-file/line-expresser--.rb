@@ -24,7 +24,7 @@ module Skylab::SearchAndReplace
             tl = st.gets
             tl or break
             @_this_line_string = ""
-            @_atom_stream = Callback_::Stream.via_nonsparse_array tl.a
+            @_atom_stream = Common_::Stream.via_nonsparse_array tl.a
             @_done_with_line = false
             begin
               _ = @_atom_stream.gets

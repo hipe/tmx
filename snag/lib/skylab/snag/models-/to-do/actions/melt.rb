@@ -230,7 +230,7 @@ module Skylab::Snag
             end
           end
 
-          Callback_.stream do
+          Common_.stream do
             p[]
           end
         end
@@ -286,7 +286,7 @@ module Skylab::Snag
         end
       end
 
-      Summary___ = Callback_::Event.prototype_with(
+      Summary___ = Common_::Event.prototype_with(
         :summary,
         :was_dry, false,
         :number_of_files_seen_here, nil,
