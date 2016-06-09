@@ -71,7 +71,7 @@ class Skylab::Task
 
       def execute
         ok = __resolve_means_stream_via_path
-        ok &&= __resolve_graph_via_means_stream
+        ok && __init_graph_via_means_stream
         ok && __dotfile_graph_via_graph
       end
 
@@ -79,13 +79,20 @@ class Skylab::Task
         Magnetics_::DotfileGraph_via_Graph.new( @_graph, & @_oes_p ).execute
       end
 
-      def __resolve_graph_via_means_stream
-        @_graph = :_ohai_
+      def __init_graph_via_means_stream
+        _ = remove_instance_variable :@_means_stream
+        @_graph = Magnetics_::Graph_via_MeansStream[ _ ]
         ACHIEVED_
       end
 
       def __resolve_means_stream_via_path
-        ACHIEVED_
+
+        st = Magnetics_::MeansStream_via_Path.new( @path, @filesystem, & @_oes_p ).execute
+        if st
+          @_means_stream = st ; ACHIEVED_
+        else
+          st
+        end
       end
     end
 
@@ -98,13 +105,27 @@ class Skylab::Task
     # --
 
     module Magnetics_
+
+      Graph_via_MeansStream = -> st do
+        g = Models_::Graph.begin
+        begin
+          me = st.gets
+          me or break
+          g.add_means me.slugs_B, slug_A
+          redo
+        end while nil
+        g.finish
+      end
+
       Autoloader_[ self ]
     end
 
     module Models_
+
+      Means = ::Struct.new :slugs_B, :slug_A
+
       Autoloader_[ self ]
     end
-
 
     Here_ = self
   end
