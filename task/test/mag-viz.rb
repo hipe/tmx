@@ -14,5 +14,13 @@ module Skylab::Task::TestSupport
         Home_::MagneticsViz::CLI
       end
     end
+
+    def self.[] tcc
+      tcc.include self
+    end
+
+    def subject_module_
+      Home_::MagneticsViz
+    end
   end
 end

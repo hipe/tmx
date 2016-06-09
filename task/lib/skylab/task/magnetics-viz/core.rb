@@ -101,6 +101,11 @@ class Skylab::Task
       Autoloader_[ self ]
     end
 
+    module Models_
+      Autoloader_[ self ]
+    end
+
+
     Here_ = self
   end
 end
