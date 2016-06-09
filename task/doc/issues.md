@@ -10,7 +10,9 @@
 
 [#006]       where's that one thing (in situ)
 
-[#005]       "the dream of magnetics"
+[#005] #wish #high-value
+             "the dream of magnetics" is pathfinding in directed graph
+             A) we've done it somewhere in the universe before
              [magnetics viz]  (in branch at writing) (has subscribers)
 
 [#004]       [eventpoint]

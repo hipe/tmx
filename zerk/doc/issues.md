@@ -5,11 +5,13 @@
 [#043] #wish do something with the `default` for atomic components in
              niCLI. (needs design.) has subscribers.
 
-[#042] #wish iCLI some idiom for clearing an atomic component
+[#042] #wish #high-value
+             iCLI some idiom for clearing an atomic component
              (like entering a blank string). perhaps a `clearable`
              meta-component.
 
-[#041]       defaulting across the bundled modalities ..
+[#041] #wish #high-value
+             defaulting across the bundled modalities ..
 
 [#040] #open unify expression agent-ry between niCLI and iCLI
              #after #milestone-9 AND
@@ -57,7 +59,8 @@
 [#022]       #track what was lost when we stopped doing summary info (here)
              ( #was: duplicate of [#021] )
 
-[#021]       availability for iCLI will be added after #milestone-9 -
+[#021] #open #high-value
+             availability for iCLI will be added after #milestone-9 -
              this was/is an "essential-seeming" usability mechanic of iCLI
              but it is fact non-essential. it pains us to postpone it b.c it
              was one of the main catalysts of the milestone "era" but alas

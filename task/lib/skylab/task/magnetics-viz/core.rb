@@ -36,7 +36,17 @@ class Skylab::Task
     class Root_Autonomous_Component_System_
 
       def initialize client
+        @open = false
         @__filesystem_proc = client.method :filesystem
+      end
+
+      def __open__component_association
+
+        yield :description, -> y do
+          y << "(experimental) write the dotfile to a tmpfile and open it now."
+        end
+
+        yield :flag
       end
 
       def __magnetics_visualize__component_operation
@@ -47,6 +57,7 @@ class Skylab::Task
 
         -> path, & oes_p do
           o = Visualize_Magnetics___.new( & oes_p )
+          o.do_open = @open
           o.path = path
           o.filesystem = @__filesystem_proc.call
           o.execute
@@ -61,10 +72,12 @@ class Skylab::Task
       # (keep heavy lifting out of here. this is for synthesizing etc.)
 
       def initialize & oes_p
+        @do_open = false
         @_oes_p = oes_p
       end
 
       attr_writer(
+        :do_open,
         :filesystem,
         :path,
       )
@@ -72,7 +85,16 @@ class Skylab::Task
       def execute
         ok = __resolve_means_stream_via_path
         ok && __init_graph_via_means_stream
-        ok && __dotfile_graph_via_graph
+        ok && __open_or_dotfile_graph_via_graph
+      end
+
+      def __open_or_dotfile_graph_via_graph
+        dg = __dotfile_graph_via_graph
+        if @do_open && dg
+          Magnetics_::Open_via_DotfileGraph.new( dg, ::File ).execute
+        else
+          dg
+        end
       end
 
       def __dotfile_graph_via_graph

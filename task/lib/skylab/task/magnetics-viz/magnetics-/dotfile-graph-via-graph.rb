@@ -15,12 +15,11 @@ class Skylab::Task
         self  # for now
       end
 
-      def express_into_under y, expag
-        dup.__etc y, expag
+      def express_into_under y, _expag
+        dup.__etc y
       end
 
-      def __etc y, exp
-        @expression_agent = exp
+      def __etc y
         @y = y
         y << "digraph g {\n"
         __express_associations
