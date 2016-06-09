@@ -96,7 +96,7 @@ module Skylab::Zerk
         @__did_emit_error = false
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
         if @__did_emit_error
-          exitstatus_for_ :_component_rejected_request_  # observe [#026]
+          exitstatus_for_ :component_rejected_request  # observe [#026]
         else
           Here_::Express_Result___[ x, self ]  # see
           @_exitstatus
@@ -429,17 +429,23 @@ module Skylab::Zerk
         # (nothing more to add. everything went from options into the tree.)
       end
 
-      _fo = @_fo_frame.formal_operation_
+      whenner = nil
+      erroresque = -> i_a, & ev_p do  # 1x
+        whenner ||= Here_::When_::Unavailable[ self ]
+        whenner.on_unavailable__ i_a, & ev_p
+        UNRELIABLE_
+      end
 
       call_oes_p = -> * i_a, & ev_p do
-        :error == i_a.first and self._RECONSIDER_readme
-          # maybe use whenner insted of @__did_emit_error and the rest
         handle_ACS_emission_ i_a, & ev_p
+        UNRELIABLE_
       end
 
       _pp = -> _ do
         call_oes_p
       end
+
+      _fo = @_fo_frame.formal_operation_
 
       o = Home_::Invocation_::Procure_bound_call.begin_ _pvs, _fo, & _pp
 
@@ -449,12 +455,8 @@ module Skylab::Zerk
       end
       o.operation_index = _
 
-      whenner = nil
-
       o.on_unavailable_ = -> * i_a, & ev_p do
-
-        whenner ||= Here_::When_::Unavailable[ self ]
-        whenner.on_unavailable__ i_a, & ev_p
+        erroresque[ i_a, & ev_p ]
       end
 
       bc = o.execute

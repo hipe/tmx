@@ -133,8 +133,13 @@ class Skylab::Task
 
         def to_association_stream
 
-          Common_::Stream.via_nonsparse_array( @requisite_slugs ).map_by do |s|
-            Raw_Association___.new @waypoint_slug, s
+          a = @requisite_slugs
+          if a
+            Common_::Stream.via_nonsparse_array( a ).map_by do |s|
+              Raw_Association___.new @waypoint_slug, s
+            end
+          else
+            Common_::Stream.the_empty_stream
           end
         end
 

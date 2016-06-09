@@ -111,7 +111,7 @@ class Skylab::Task
         begin
           me = st.gets
           me or break
-          g.add_means me.slugs_B, slug_A
+          g.add_means me.slugs_B, me.slug_A
           redo
         end while nil
         g.finish

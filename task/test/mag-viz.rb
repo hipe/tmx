@@ -5,6 +5,7 @@ module Skylab::Task::TestSupport
     module CLI
 
       def self.[] tcc
+        Mag_Viz[ tcc ]
         Require_zerk_[]
         Zerk_.test_support::Non_Interactive_CLI[ tcc ]
         tcc.include self

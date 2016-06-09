@@ -21,9 +21,32 @@ class Skylab::Task
 
       def __etc y, exp
         @expression_agent = exp
-        @yielder = y
+        @y = y
         y << "digraph g {\n"
+        __express_associations
+        y << "\n"
+        __express_nodes
         y << "}\n"
+      end
+
+      def __express_associations
+        st = to_association_stream
+        begin
+          o = st.gets
+          o or break
+          @y << "  #{ o.from_identifier_string } -> #{ o.to_identifier_string }\n"
+          redo
+        end while nil
+      end
+
+      def __express_nodes
+        st = to_node_stream
+        begin
+          o = st.gets
+          o or break
+          @y << "  #{ o.identifier_string } [label=\"#{ o.label }\"]\n"
+          redo
+        end while nil
       end
 
       def to_association_stream
@@ -72,9 +95,12 @@ class Skylab::Task
             if first[ s ]
               a.push Node__.new( s, nr[ s ] )
             end
-            me.requisite_slugs.each do |s_|
-              first[ s_ ] or next
-              a.push Node__.new( s_, nr[ s_ ] )
+            s_a = me.requisite_slugs
+            if s_a
+              s_a.each do |s_|
+                first[ s_ ] or next
+                a.push Node__.new( s_, nr[ s_ ] )
+              end
             end
           else
             # of each means group (i.e waypoint), you want:
@@ -165,12 +191,19 @@ class Skylab::Task
           @_gen_h.fetch slug do
             s = slug.gsub BLACK_RX___, EMPTY_S_
             s.gsub! DASH_, UNDERSCORE_
+
+            if IS_KEYWORD___[ s ]
+              s.concat "_not_keyword"
+            end
+
             @_gen_h[ slug ] = s
             s
           end
         end
 
         alias_method :[], :general_identifier_string_via_slug
+
+        IS_KEYWORD___ = { "digraph" => true }  # ..
 
         BLACK_RX___ = /[^-a-z]+/
         DASH_ = '-'

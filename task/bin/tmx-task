@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/task'
+
+cli = Skylab::Task::MagneticsViz::CLI.new(
+  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+)
+cli.filesystem = ::Dir
+_ = cli.invoke ARGV
+
+$stderr.puts "(exitstatus: #{ _.inspect })"
