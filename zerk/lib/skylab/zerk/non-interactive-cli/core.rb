@@ -37,6 +37,7 @@ module Skylab::Zerk
     attr_writer(
       :compound_custom_sections,
       :compound_usage_strings,
+      :filesystem,  # compare to `filesystem_conduit`
       :invite,
       :location_module,
       :operation_usage_string,
@@ -681,6 +682,7 @@ module Skylab::Zerk
     attr_reader(
       :compound_custom_sections,
       :compound_usage_strings,
+      :filesystem,
       :location_module,
       :operation_usage_string,
       :sout,

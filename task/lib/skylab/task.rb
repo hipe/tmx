@@ -312,6 +312,8 @@ class Skylab::Task
     String_IO = -> do
       require 'stringio' ; ::StringIO
     end
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   module Models_

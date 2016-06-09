@@ -128,6 +128,12 @@ module Skylab::Task::TestSupport
   # --
 
   Home_ = ::Skylab::Task
+  Lazy_ = Home_::Lazy_
+
+  Require_zerk_ = Lazy_.call do
+    Zerk_ = Home_.lib_.zerk ; nil
+  end
+
   Autoloader__ = Home_::Autoloader_
 
   module TestLib_
