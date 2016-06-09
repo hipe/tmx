@@ -22,15 +22,13 @@ class Skylab::Task
 
       def add_means slug_Bs, slug_A
 
-        me = Means___.new slug_Bs, slug_A
-
-        @_waypoints_box_controller.if_has_name( me.waypoint_slug,
+        @_waypoints_box_controller.if_has_name( slug_A,
 
           -> wp do
-            wp.add_means me
+            wp.add_means Means__.new( wp.length, slug_Bs, slug_A )
           end,
           -> bx, k do
-            bx.add k, Waypoint___.new( bx.length, me )
+            bx.add k, Waypoint___.new( Means__.new( 0, slug_Bs, slug_A ) )
           end,
         )
         NIL_
@@ -53,9 +51,8 @@ class Skylab::Task
 
       class Waypoint___
 
-        def initialize d, first_means
+        def initialize first_means
           @_meanss = [ first_means ]
-          @waypoint_identifier_integer = d
         end
 
         # --
@@ -78,7 +75,7 @@ class Skylab::Task
             me.to_association_stream.map_by do |asc|
 
               Qualified_Association___.new(
-                asc.requisite_slug, self, asc.waypoint_slug )
+                asc.requisite_slug, asc.waypoint_slug, me )
             end
           end
         end
@@ -87,26 +84,49 @@ class Skylab::Task
           Common_::Stream.via_nonsparse_array @_meanss
         end
 
-        def only_means
+        def _
           @_meanss.fetch 0
         end
+        alias_method :only_means, :_
+        alias_method :first_means, :_
+        remove_method :_
 
         def has_only_one_means
           1 == @_d_kn.value_x
         end
 
+        def length
+          @_meanss.length
+        end
+
+        def meanss
+          @_meanss
+        end
+      end
+
+      class Qualified_Association___
+
+        def initialize s, s_, o
+          @requisite_slug = s
+          @waypoint_slug = s_
+          @_means = o
+        end
+
+        def means_identifier_integer
+          @_means.means_identifier_integer
+        end
+
         attr_reader(
-          :waypoint_identifier_integer,
+          :requisite_slug,
+          :waypoint_slug,
         )
       end
 
-      Qualified_Association___ = ::Struct.new(
-        :requisite_slug, :waypoint, :waypoint_slug )
+      class Means__
 
-      class Means___
+        def initialize d, slug_Bs, slug_A
 
-        def initialize slug_Bs, slug_A
-
+          @means_identifier_integer = d
           @requisite_slugs = slug_Bs
           @waypoint_slug = slug_A
         end
@@ -119,6 +139,7 @@ class Skylab::Task
         end
 
         attr_reader(
+          :means_identifier_integer,
           :requisite_slugs,
           :waypoint_slug,
         )

@@ -28,18 +28,23 @@ class Skylab::Task
 
       def to_association_stream
 
+        nr = @_name_registry
+
         @graph.to_waypoint_stream.expand_by do |wp|
 
           st = wp.to_association_stream.map_by do |asc|
-
-            Association___.new asc, @_name_registry
+            Association__.__normal_via asc, wp, nr
           end
 
           if wp.has_only_one_means
             st
           else
-            ::Kernel._B
-            a = _.to_a
+            a = []
+            wp.meanss.each do |me|
+              a.push Association__.waypointy_via__( me, wp, nr )
+            end
+            x = nil
+            a.push x while x = st.gets
             Common_::Stream.via_nonsparse_array a
           end
         end
@@ -72,7 +77,25 @@ class Skylab::Task
               a.push Node__.new( s_, nr[ s_ ] )
             end
           else
-            ::Kernel._B
+            # of each means group (i.e waypoint), you want:
+            #   • a node for the abstract waypoint IFF not done yet
+            #   • certainly a node for each means "head"
+            #   • a node for each means requisite IFF not done yet
+
+            s = wp.first_means.waypoint_slug
+            if first[ s ]
+              a.push Node__.new( s, nr[ s ] )
+            end
+            wp.meanss.each do |me_|
+              a.push Node__.new(
+                "(#{ me_.means_identifier_integer.to_s })",
+                nr._specific_IS_via( me_ ),
+              )
+              me_.requisite_slugs.each do |s_|
+                first[ s_ ] or next
+                a.push Node__.new( s_, nr[ s_ ] )
+              end
+            end
           end
 
           Common_::Stream.via_nonsparse_array a
@@ -81,17 +104,41 @@ class Skylab::Task
 
       Node__ = ::Struct.new :label, :identifier_string
 
-      class Association___
+      class Association__
 
-        def initialize asc, nr
+        class << self
 
-          if asc.waypoint.has_only_one_means
-            @from_identifier_string = nr.general_identifier_string_via_slug asc.waypoint_slug
-          else
-            ::Kernel._B
+          def __normal_via asc, wp, nr
+            new.__init_normal asc, wp, nr
           end
 
-          @to_identifier_string = nr.general_identifier_string_via_slug asc.requisite_slug
+          def waypointy_via__ me, wp, nr
+            new.__init_waypointy me, wp, nr
+          end
+
+          private :new
+        end  # >>
+
+        def __init_waypointy me, wp, nr
+
+          @from_identifier_string = nr[ me.waypoint_slug ]
+
+          @to_identifier_string = nr._specific_IS_via me
+
+          self
+        end
+
+        def __init_normal asc, wp, nr
+
+          if wp.has_only_one_means
+            @from_identifier_string = nr[ asc.waypoint_slug ]
+          else
+            @from_identifier_string = nr._specific_IS_via asc
+          end
+
+          @to_identifier_string = nr[ asc.requisite_slug ]
+
+          self
         end
 
         attr_reader(
@@ -104,6 +151,13 @@ class Skylab::Task
 
         def initialize
           @_gen_h = {}
+        end
+
+        def _specific_IS_via me
+
+          _s = general_identifier_string_via_slug me.waypoint_slug
+
+          "#{ _s }_#{ me.means_identifier_integer }"
         end
 
         def general_identifier_string_via_slug slug
