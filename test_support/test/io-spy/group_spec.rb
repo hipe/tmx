@@ -1,18 +1,12 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::IO_Spy::Group
-
-  ::Skylab::TestSupport::TestSupport::IO_Spy[ self ]
-
-  include Constants
-
-  extend Home_::Quickie
+module Skylab::TestSupport::TestSupport
 
   describe "[ts] IO spy group" do
 
     it "aggregates emissions from multiple streams onto the same ordered queue" do
 
-      g = Subject_[].new
+      g = _subject_module.new
       red = g.for :red
       blue = g.for :blue
       red.puts "r1"
@@ -20,9 +14,11 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Group
       red.write "r2\nnever see"
       g.lines.length.should eql(4)
       g.lines.map( & :stream_symbol ).should eql( [ :red, :blue, :blue, :red ] )
-      g.lines.map(&:string).join( EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
+      g.lines.map(&:string).join( Home_::EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
     end
 
-    Subject_ = -> { Home_::IO.spy.group }
+    def _subject_module
+      Home_::IO.spy.group
+    end
   end
 end

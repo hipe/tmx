@@ -2,6 +2,13 @@ require 'skylab/test_support'
 
 module Skylab::TestSupport::TestSupport
 
+  class << self
+
+    def transitional_ tcc
+      tcc.include InstanceMethods
+    end
+  end  # >>
+
   Home_ = ::Skylab::TestSupport
 
   Home_::Regret[ Top_TS_ = self, ::File.dirname( __FILE__ ) ]
@@ -50,6 +57,8 @@ module Skylab::TestSupport::TestSupport
     Home_ = Home_
     Top_TS_ = Top_TS_
   end
+
+  TS_ = self
 end
 
 # :+tombstone: 'mock_FS' as bundle

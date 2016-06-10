@@ -19,7 +19,7 @@ module Skylab::System
         # we jump through these nasty hoops because we don't want to
         # contribute to the equally nasty problem of polluting (or dictating
         # the use of) namespaces - let the user decide which namespaces to
-        # use (if any), we just want the "leaf" we are loooking for, and
+        # use (if any), we just want the "leaf" we are looking for, and
         # don't know where to look.
 
         # yes there are other ways to "solve" this "problem", but none of

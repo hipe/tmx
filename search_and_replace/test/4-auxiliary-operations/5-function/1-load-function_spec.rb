@@ -39,7 +39,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def __subject * x_a, & x_p
-        Home_::Lib_::System[].filesystem.hack_guess_module_tree( * x_a, & x_p )
+        Home_.lib_.system.filesystem.hack_guess_module_tree( * x_a, & x_p )
       end
 
   end

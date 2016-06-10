@@ -8,7 +8,7 @@ module Skylab::SearchAndReplace
 
     def lib_
       @___lib ||= Common_.
-        produce_library_shell_via_library_and_app_modules Lib_, self
+        produce_library_shell_via_library_and_app_modules Lib___, self
     end
   end  # >>
 
@@ -314,7 +314,7 @@ module Skylab::SearchAndReplace
   end
 
   Require_ACS_ = Lazy_.call do
-    ACS_ = Lib_::ACS[] ; nil
+    ACS_ = Home_.lib_.ACS ; nil
   end
 
   Attributes_actor_ = -> cls, * a do
@@ -331,7 +331,7 @@ module Skylab::SearchAndReplace
 
   Autoloader_ = Common_::Autoloader
 
-  module Lib_
+  module Lib___
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 

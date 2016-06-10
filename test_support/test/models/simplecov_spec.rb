@@ -1,10 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::Models
+module Skylab::TestSupport::TestSupport
 
   describe "[ts] models - simplecov" do
-
-    extend TS__
 
     it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process", wip: true do  # #old-wip:2015-10
 

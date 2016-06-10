@@ -116,9 +116,12 @@ class Skylab::Task
                 "(#{ me_.means_identifier_integer.to_s })",
                 nr._specific_IS_via( me_ ),
               )
-              me_.requisite_slugs.each do |s_|
-                first[ s_ ] or next
-                a.push Node__.new( s_, nr[ s_ ] )
+              s_a = me_.requisite_slugs
+              if s_a
+                s_a.each do |s_|
+                  first[ s_ ] or next
+                  a.push Node__.new( s_, nr[ s_ ] )
+                end
               end
             end
           end

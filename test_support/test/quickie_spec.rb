@@ -1,26 +1,16 @@
 require_relative 'test-support'
 
-module Skylab::TestSupport::TestSupport::Quickie
+module Skylab::TestSupport::TestSupport
 
-  Home_ = ::Skylab::TestSupport
-  Home_::TestSupport[ Quickie_TestSupport = self ]
-  Quickie = Home_::Quickie
-  LIB_ = Home_.lib_
+  # the bootstrapping problem here is obvious. Gödel would have
+  # something to say about this..
 
-  extend Quickie  # NOTE the *second* this gives you any grief,
-  # just use rspec! Gödel would have something to say about this..
-  # How we'll do it is try to build up to each more complex thing..
-  #
-  # (oh, actually, fuck we can't use rspec..)
-
-  Emission = ::Struct.new :type, :txt, :count
-
-  # OMG ick - remember how we are (necessarily) avoiding trampling on
-  # RSpec's `should`? well in the below tests we want to (where
-  # appropriate) *always* use our own `should` and not ::Rspec's,
-  # because that is what we are testing!  (er, this is relevant b.c
-  # sometimes we might use rspec to run the below tests, and in those
-  # cases Quickie avoids hacking the Kernel)
+  # ordinarily, if r.s has been loaded by the time the subject loads,
+  # it in effect disables itself. however in the below tests we want
+  # always to be testing against our own `should` method and not that
+  # of r.s. to this end we instead make this method called `shld` and
+  # that is what we test against. in this manner you can use r.s to
+  # run these tests (or the subject if the subject isn't broken.)
 
   ::Kernel.module_exec do
     def shld predicate
@@ -30,47 +20,56 @@ module Skylab::TestSupport::TestSupport::Quickie
 
   describe "[ts] quickie" do
 
+    TS_.transitional_ self
+
     last_id = 0
 
     let :context do
-      ctx = Quickie_TestSupport.const_set "CTX_#{ last_id += 1 }",
-        ( ::Class.new Quickie::Context__ )
-      desc_a = [ "desc xyzizzy #{ last_id }" ]
-      Quickie::Init_context__[ ctx, desc_a, nil, -> { } ]
+
+      o = _subject_module
+
+      ctx = ::Class.new o::Context__
+
+      TS_.const_set "X_Q_CTX_#{ last_id += 1 }", ctx
+
+      _desc_a = [ "desc xyzizzy #{ last_id }" ]
+
+      o::Init_context__[ ctx, _desc_a, nil, Home_::EMPTY_P_ ]
+
       ctx.new runtime
     end
+
+    _Emission = ::Struct.new :type, :txt, :count
+
+    X_Q_Emission = _Emission
 
     let :runtime do
 
       _pass = -> & msg do
-        add_output Emission.new( :pass, msg[] )
+        add_output _Emission.new( :pass, msg[] )
       end
 
       _fail = -> failed_eg_count, & msg do
-        add_output Emission.new( :fail, msg[], failed_eg_count )
+        add_output _Emission.new( :fail, msg[], failed_eg_count )
       end
 
       _pend = -> do
-        add_output Emission.new :pend
+        add_output _Emission.new :pend
       end
 
-      Quickie::Runtime__.new _pass, _fail, _pend
+      _subject_module::Runtime__.new _pass, _fail, _pend
     end
 
     def add_output e
+
       if do_debug
-        LIB_.stderr.puts "GOT OUTPUT: #{ e.inspect }"
+        debug_IO.puts "GOT OUTPUT: #{ e.inspect }"
       end
+
       ( @output ||= [ ] ) << e
     end
 
     attr_reader :output
-
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
 
     context "predicates, in context" do
 
@@ -195,6 +194,10 @@ module Skylab::TestSupport::TestSupport::Quickie
           end
         end.call
       end
+    end
+
+    def _subject_module
+      Home_::Quickie
     end
   end
 end

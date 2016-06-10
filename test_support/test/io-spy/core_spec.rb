@@ -1,21 +1,15 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::IO_Spy::Core
-
-  ::Skylab::TestSupport::TestSupport::IO_Spy[ self ]
-
-  include Constants
-
-  extend Home_::Quickie
+module Skylab::TestSupport::TestSupport
 
   describe "[ts] IO spy" do
 
     it "loads" do
-      Subject_[]
+      _subject_module
     end
 
     it "builds, spies on some writes" do
-      io = Subject_[].new
+      io = _subject_module.new
       io.puts 'foo'
       io.write 'bar'
       io.puts ' baz'
@@ -26,7 +20,7 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
 
       string_IO = Home_::Library_::StringIO.new
       d = -1
-      io = Subject_[].new :do_debug_proc, -> { ( ( d += 1 ) % 2 ).zero? },
+      io = _subject_module.new :do_debug_proc, -> { ( ( d += 1 ) % 2 ).zero? },
         :debug_IO, string_IO,
         :debug_prefix, '•',
         :puts_map_proc, -> s do
@@ -37,10 +31,10 @@ module Skylab::TestSupport::TestSupport::IO_Spy::Core
       io.puts "two"
       io.puts "three"
       string_IO.string.should eql "•_one_\n•_three_\n"
-
     end
 
-    Subject_ = -> { Home_::IO.spy }
-
+    def _subject_module
+      Home_::IO.spy
+    end
   end
 end

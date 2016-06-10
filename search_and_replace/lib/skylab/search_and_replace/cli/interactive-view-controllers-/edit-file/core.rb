@@ -42,10 +42,10 @@ module Skylab::SearchAndReplace
 
       def __all_remaining  # assume has next file
 
-        self._COVER_ME_might_be_OK
+        self._COVER_ME_this_worked_at_writing
 
         o = Home_::Magnetics_::All_Remaining_via_Parameters.new( & @UI_event_handler )
-        o.expression_agent = @__expression_agent
+        o.expression_agent = @_expression_agent
         o.file_UOW = @_file_UOW
         o.gets_one_next_file = -> do
           _move_to_next_file
