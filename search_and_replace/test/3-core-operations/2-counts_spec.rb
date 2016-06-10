@@ -27,17 +27,25 @@ module Skylab::SearchAndReplace::TestSupport
         h = { 'one' => 0, 'three' => 1 }
         other = h.length - 1
         rx = /\A[a-z]+(?=-)/
-        a.sort_by! do | sct |
-          _md = rx.match basename_ sct.path
-          d = h[ _md[ 0 ] ]
-          if d
-            d
-          else
-            other += 1
-          end
+
+        indexes = []
+        scores = []
+        a.each_with_index do |sct, idx|
+          md = rx.match basename_ sct.path
+          md or next
+          indexes.push idx
+          scores[ idx ] = h[ md[ 0 ] ] || ( other += 1 )
         end
 
-        state.to_state_with_customized_result a
+        indexes.sort_by! do |idx|
+          scores.fetch idx
+        end
+
+        _a_ = indexes.map do |idx|
+          a.fetch idx
+        end
+
+        state.to_state_with_customized_result _a_
       end
 
       def root_ACS_state_via result, acs

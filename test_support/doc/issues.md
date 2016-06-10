@@ -4,17 +4,25 @@
 
 [#047] #open subscribers to quickie ever supporting a negate operator
              ("should not")
-[#046] #open when doc-test rewrite, see subscribers
+
+[#046] #hole ( #moved-to: [#dt-xxx] )
+
 [#045]       permute (as a doctest action)
 [#044]       lexical scope vs inheritence (as it pertains to us)..
-[#043] #open modernize doc-test templates
+
+[#043] #hole ( #moved-to: [#dt-xxx] )
+
 [#042]       "dangerous memoize" (was "nasty OCD memoize") caveat ..
 [#041]       static file server ..
              (#was: sidesystem class now in [tmx] & [sli])
 [#040]       is find nearest TS file broken?
-[#039]       #parent-node: [#030] #tracking a `Subject_` parameter function
+
+[#039] #hole ( #moved-to: [#dt-xxx] )
+
 [#038]       expect line
-[#037]       #tracking tag warnings wishlist (#parent-node: [#014])
+
+[#037] #hole ( #moved-to: [#dt-XXX] )
+
 [#036] #ongoing   indentation in quickie
 
 [#035]       #track `def test_support` (for `\.test_support`) occurrences,
@@ -24,7 +32,8 @@
              is called, ruby will load the file redundantly which under
              some autoloaderifications will bork apparently flickeresquely
 
-[#034] #open #parent-node: [015] "re-architect.."
+[#034] #hole ( #moved-to: [#dt-XXX] )
+
 [#033]       #historical #done fix test globbing .. [#xx-009]
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
 [#032] #open the "counts" report is not covered, verbose mode is borked
@@ -35,16 +44,22 @@
 
 [#031] #open sunset io spy `qualified_knownness` for io spy group, re-purpose former to house mocks
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
-[#030] #open #parent-node:[#015] the doc-test recursive spec needs mock fs
+
+[#030] #hole ( #moved-to: [#dt-xxx] )
+
 [#029]       #track the 'expect' omnibus and narrative ..
 [#028]   #watching what do we have to do to get our custom predicates to
              work in both
              ( #was: "possible" #moved-to: [#ta-004]  ("eventpoint"))
              ( #was: #done borked quickie architecture near constants )k
-[#027]       #parent-node: [#015] peek hack explained .. (was templo)
-[#026]       #parent-node: [#015] the view-controller narrative ..
-[#025]       #parent-node: [#015] output adapters.
-[#024]       #doc-node the graded verbosity narrative ..
+
+[#027] #hole ( #moved-to: [#dt-XXX] )
+[#026] #hole ( #moved-to: [#dt-XXX] )
+[#025] #hole ( #moved-to: [#dt-XXX] )
+
+[#024] #hole "verbosity" module REMOVED because ancient
+             ( #was: #doc-node the graded verbosity narrative .. )
+
 [#023]       #doc-node #parent-node: [#020] "the IO spy"
 [#022]       #parent-node:[#021] "when to extlib and not to extlib.."
 [#021]       #doc-node the core node narrative ..
@@ -53,15 +68,18 @@
 [#018]       #quickie #in-situ
 [#017]       #doc-node #regret narrative
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
-[#015] #open this tracks the rewrite (nodes waiting on it)
-             #doc-node the doc-test narrative ..
-[#014]       #parent-node: [#015] how nodes are generated ..
+
+[#015] #hole (#moved-to: [#dt-001])
+[#014] #hole (#moved-to: [#dt-XXX])
+
 [#013] #hole ( #was: #historical #done #inquiry-point choke point etc )
                (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
-[#012]       #doc-point #in-situ (the particular importance of result values)
+
+[#012] #hole (#moved-to: [xx])
              ( #was: [#xx-006] )
              ( #was: #done #parent-node: [#015] setup vs example? )
+
 [#011]       #track fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #track "dark hack" this one weird old trick makes ..
 [#009]       #subscription - will Quickie ever short-circuit (throw

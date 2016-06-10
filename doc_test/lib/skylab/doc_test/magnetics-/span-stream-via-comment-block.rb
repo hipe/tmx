@@ -1,11 +1,7 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    class Intermediate_Streams_::
-        Node_stream_via_comment_block_stream::Span_stream_via_comment_block__ <
-            Common_::Actor::Monadic
-
+  class Magnetics_::SpanStream_via_CommentBlock < Common_::Actor::Monadic
+    # -
       def initialize cb
 
         @comment_block = cb
@@ -206,6 +202,6 @@ module Skylab::TestSupport
           :code_span
         end
       end
-    end
+    # -
   end
 end

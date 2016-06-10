@@ -1,8 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
   module DocTest
 
-    class Idioms_::Filesystem
+    class Models_::Filesystem
 
       # this is totally frontier and primordial: experimentally an "idioms"
       # is associated with the action instance and wraps common interactions
@@ -18,7 +18,7 @@ module Skylab::TestSupport
         @oes_p = oes_p
 
         @test_support_file_p = -> do
-          a = Home_::Init.test_support_filenames
+          a = Home_.lib_.test_support::Init.test_support_filenames
           x = a.fetch( a.length - 1 << 2 )
           @test_support_file_p = -> { x }
           x

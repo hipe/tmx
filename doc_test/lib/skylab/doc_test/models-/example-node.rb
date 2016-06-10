@@ -1,11 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    module Intermediate_Streams_
-
-      class Models_::Example_Node
-
+  class Models_::Example_Node
+    # -
+      # -
         class << self
           alias_method :build, :new
         end
@@ -83,7 +80,7 @@ module Skylab::TestSupport
             Models_::Predicate_Expressions.expression_via_matchdata md
           end
         end
-      end
-    end
+       # -
+     # -
   end
 end

@@ -2,16 +2,16 @@ require_relative '../test-support'
 
 module Skylab::TestSupport::TestSupport
 
-  describe "[ts] models - simplecov" do
+  describe "[ts] operations - simplecov" do
 
     it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process", wip: true do  # #old-wip:2015-10
 
       self._HEY_this_is_WIPPED_until_simplecov_is_back
 
-      _exe = ::File.join Top_TS_.my_bin_path, 'tmx-test-support'
+      _exe = ::File.join Home_.my_bin_path, 'tmx-test-support'
 
       _exe_ = ::File.join(
-        Top_TS_.my_test_path, 'fixture-executables/for-simplecov.rb' )
+        Home_.my_test_path, 'fixture-executables/for-simplecov.rb' )
 
       sys = Home_.lib_.system
 

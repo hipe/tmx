@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  module DocTest
+  module API
 
     module Models_::Front
 

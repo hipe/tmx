@@ -1,20 +1,20 @@
 require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - output adapters - quickie ( & OA's in general )" do
+  describe "[dt] output adapters - quickie (and o.a's in general)" do
 
-    extend TS_
-    use :expect_event
-    use :expect_line
+    TS_[ self ]
+    # use :expect_event
+    # use :expect_line
 
     it "loads" do
-      subject
+      _subject
     end
 
     context "business module names that are { three|two|one } parts long" do
 
-      it "three-part business path OK - note the top const is not there" do
+      it "three-part business path OK - note the top const is not there", wip: true do
 
         _against "Foo::Bar::Baz",
           "So, your example:\n",
@@ -32,7 +32,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         em.category.should eql [ :success, :wrote ]
       end
 
-      it "two-part business path OK - intentional redundancy with \"sigil\"" do
+      it "two-part business path OK - intentional redundancy with \"sigil\"", wip: true do
 
         _against 'WizzieWazzie::Moo_Moo',
           "THEN IT totally rocks:\n",
@@ -46,7 +46,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       end
 
-      it "one-part business path not OK - emits event talking about no" do
+      it "one-part business path not OK - emits event talking about no", wip: true do
 
         _against 'Wazoozle',
           "it's fun:\n",
@@ -61,11 +61,11 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       def _against business_module_name, desc_line, code_line_a
 
-        _oa = subject.output_adapter false, & _handle_event_selectively  # is known dry
+        _oa = _subject.output_adapter false, & _handle_event_selectively  # is known dry
 
         _mns = mock_node_stream desc_line, code_line_a
 
-        down_IO = Home_::Library_::StringIO.new
+        down_IO = TS_.testlib_.string_IO.new
 
         @result = _oa.against :business_module_name, business_module_name,
           :node_upstream, _mns,
@@ -82,15 +82,13 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       def mock_node_stream desc_line, code_line_a
 
-        _text_span = Omni_Mock_.new [ desc_line ]
+        _text_span = _Omni_Mock_.new [ desc_line ]
 
         _lines = Common_::Stream.via_nonsparse_array code_line_a
 
-        _matchdata = DocTest_::
-          Intermediate_Streams_::Models_::Example_Node::Matchdata.new(
-            nil, _lines )
+        _matchdata = Home_::Models_::Example_Node::Matchdata.new nil, _lines
 
-        _x = Subject_[]::Intermediate_Streams_::Models_::Example_Node.new(
+        _x = models_module_::Example_Node.new(
           _text_span, _matchdata )
 
         Common_::Stream.via_item _x
@@ -99,15 +97,15 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     context "INTEGRATION" do
 
-      it "omg." do
+      it "omg.", wip: true do
 
-        _input_path = DocTest_.dir_pathname.join(
+        _input_path = Home_.dir_pathname.join(
           Common_::Autoloader.default_core_file ).to_path
 
         _output_path = TS_.dir_pathname.join(
           'integration/final/top_spec.rb' ).to_path
 
-        @result = DocTest_::API.call(
+        @result = Home_::API.call(
           :generate,
           :upstream_path, _input_path,
           :output_path, _output_path,
@@ -127,8 +125,8 @@ module Skylab::TestSupport::TestSupport::DocTest
       event_log.handle_event_selectively
     end
 
-    def subject
-      Subject_[]::Output_Adapters_::Quickie
+    def _subject
+      output_adapters_module_::Quickie
     end
   end
 end

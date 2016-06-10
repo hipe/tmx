@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::Fields::TestSupport  # #[#ts-046] (used to be generated)
+module Skylab::Fields::TestSupport  # #[#dt-012] (used to be generated)
 
   describe "[fi] attributes - struct" do
 

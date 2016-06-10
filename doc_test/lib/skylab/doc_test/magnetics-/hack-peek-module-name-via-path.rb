@@ -1,16 +1,12 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    class Actors_::Infer_business_module_name_loadlessly  # introduction at [#027]
-
+  class Magnetics_::Hack_Peek_Module_Name_via_Path  # introduction at [#006]
+    # -
       Attributes_actor_.call( self,
         line_upstream: nil,
         path: nil,
         property: nil,
       )
-
-      include Lazy_Selective_Event_Methods_
 
       class << self
 
@@ -38,39 +34,46 @@ module Skylab::TestSupport
       end
 
       def execute
+        ok = __resolve_tree
+        ok && __init_against_symbol
+        ok && __init_leaf_list
+        ok && __via_leaves
+      end
+
+      def __resolve_tree
 
         _fs = Home_.lib_.system.filesystem
 
-        @tree = _fs.hack_guess_module_tree(
+        tr = _fs.hack_guess_module_tree(
           :path, @path,
           :line_upstream, @line_upstream,
           & @on_event_selectively
         )
 
-        @tree and via_tree
+        if tr
+          @tree = tr ; ACHIEVED_
+        else
+          tr
+        end
       end
 
-      def via_tree
-        init_against_symbol
-        init_leaf_list
-        via_leaves
-      end
+      def __init_against_symbol
 
-      def init_against_symbol
         _path = if COREFILE_TAIL__ == @path[ RANGE__ ]
           ::File.dirname @path
         else
           ::Pathname.new( @path ).sub_ext( EMPTY_S_ ).to_path
         end
-        @against_i = Distill__[ ::File.basename _path ]
-        nil
+
+        @_against_symbol = Distill__[ ::File.basename _path ]
+        NIL_
       end
 
       COREFILE_TAIL__ = "/#{ Autoloader_.default_core_file }"
 
       RANGE__ = - COREFILE_TAIL__.length .. -1
 
-      def init_leaf_list
+      def __init_leaf_list
 
         dist_i_a = [] ; leaf_a = []
 
@@ -82,10 +85,10 @@ module Skylab::TestSupport
         end
 
         @leaf_dist_i_a = dist_i_a ; @leaf_a = leaf_a
-        nil
+        NIL_
       end
 
-      def via_leaves
+      def __via_leaves
         d_a = matches_against @leaf_dist_i_a, @leaf_a
         case 1 <=> d_a.length
         when  0 ; when_money @leaf_a.fetch d_a.first
@@ -121,7 +124,7 @@ module Skylab::TestSupport
       Distill__ = Common_.distill
 
       def matches_against dist_i_a, node_a
-        against_i = @against_i
+        against_i = @_against_symbol
         d_a = []
         seen_h = {}
         dist_i_a.each_with_index do | distilled_i, idx |
@@ -143,14 +146,21 @@ module Skylab::TestSupport
       end
 
       def bld_ambiguous_event node_a
+
         i_a = node_a.map do |node|
           node.value_x.last
         end
-        build_not_OK_event_with :ambiguous,
-            :i_a, i_a, :path, @path do |y, o|
+
+        _event.build_not_OK_with(
+          :ambiguous,
+          :i_a, i_a,
+          :path, @path,
+        ) do |y, o|
+
           _s_a = o.i_a.map do |x|
             code x
           end
+
           y << "cannot resolve ambiguity: #{ and_ _s_a } #{
             }are all defined in #{ pth o.path }"
         end
@@ -172,11 +182,13 @@ module Skylab::TestSupport
           branch.value_x.last
         end
 
-        build_not_OK_event_with :not_found,
-            :distilled, @against_i,
-            :leaf_i_a, _leaf_i_a,
-            :branch_i_a, _branch_i_a,
-            :path, @path do |y, o|
+        _event.build_not_OK_with(
+          :not_found,
+          :distilled, @_against_symbol,
+          :leaf_i_a, _leaf_i_a,
+          :branch_i_a, _branch_i_a,
+          :path, @path,
+        ) do |y, o|
 
           _l_s_a = o.leaf_i_a.map do |x|
             code x
@@ -209,6 +221,10 @@ module Skylab::TestSupport
 
         i_a * CONST_SEP_
       end
-    end
+
+      def _event
+        @___EC ||= Event_Controller_.new( @on_event_selectively )
+      end
+    # -
   end
 end

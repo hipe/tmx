@@ -1,18 +1,18 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] DocTest" do
+  describe "[dt] CLI - self supporting intro" do
 
     context "will appear as the description string of your context or example." do
 
       before :all do
-        THIS_FILE_ = Home_::Expect_Line::File_Shell[ __FILE__ ]
+        THIS_FILE_ = TestSupport_::Expect_Line::File_Shell[ __FILE__ ]
 
         # this comment gets included in the output because it is indented
         # with four or more spaces and is part of a code span that goes out.
       end
-      it "this line here is the description for the following example" do
+      it "this line here is the description for the following example", wip: true do
         o = THIS_FILE_
 
         o.contains( "they will not#{' '}appear" ).should eql false
@@ -23,7 +23,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         o.contains( "this line#{' '}here is the desc" ).should eql true
       end
-      it "we now strip trailing colons from these description lines" do
+      it "we now strip trailing colons from these description lines", wip: true do
         THIS_FILE_.contains( 'from these description lines"' ).should eql true
       end
     end

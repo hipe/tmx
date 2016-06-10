@@ -1,23 +1,23 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest::Models::Front::Actions::Generate
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] DocTest::Models_::Front::Actions::Generate" do
+  describe "[dt] API - synchronize further" do
 
     context "the `API` module is application programmer's interface to the API" do
 
       before :all do
-        API = Home_::DocTest::API
+        self._NO ; API = Home_::API
       end
-      it "the minimal action that we can send to our API is the `ping` action" do
+      it "the minimal action that we can send to our API is the `ping` action", wip: true do
         API.call( :ping ).should eql :_hello_from_doc_test_
       end
-      it "from these comments you are reading" do
-        here = DocTest_::Models_::Front::Actions::Generate.
+      it "from these comments you are reading", wip: true do
+        here = Home_::Models_::Front::Actions::Generate.
           dir_pathname.join( 'core.rb' ).to_path
 
         output_pn = ::Pathname.new Top_TS_.test_path_(
-          'doc-test/models-front-actions/generate/integration/core_spec.rb' )
+          'doc-test/models/generate/integration/core_spec.rb' )
 
         stat = output_pn.stat
         size1 = stat.size

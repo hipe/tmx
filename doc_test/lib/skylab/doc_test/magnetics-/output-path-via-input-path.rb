@@ -1,4 +1,5 @@
-module Skylab::TestSupport
+self._K
+module Skylab::DocTest
 
   module DocTest
 
@@ -6,7 +7,7 @@ module Skylab::TestSupport
 
       class Actions::Generate
 
-        class Actors__::Infer_output_path < Common_::Actor::Monadic
+        class Actors__::OutputPath_via_InputPath < Common_::Actor::Monadic  # 1x
 
           def initialize input_path, & oes_p
             @input_path = input_path
@@ -91,7 +92,11 @@ module Skylab::TestSupport
             ext  = pn.extname
             stem = pn.sub_ext( EMPTY_S_ ).to_path
             Mutate_string_by_removing_trailing_dashes_[ stem ]
-            "#{ stem }#{ Home_::Init.test_file_basename_suffix_stem }#{ ext }"
+          end
+
+          Mutate_string_by_removing_trailing_dashes_ = -> s do
+            s.gsub! Common_::Name::TRAILING_DASHES_RX, EMPTY_S_  # ick/meh
+            NIL_
           end
         end
       end

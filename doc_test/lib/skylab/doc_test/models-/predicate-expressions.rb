@@ -1,11 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    module Intermediate_Streams_
-
-      module Models_::Predicate_Expressions
-
+  module Models_::Predicate_Expressions
+    # -
+      # -
         class << self
 
           def match line
@@ -60,7 +57,7 @@ module Skylab::TestSupport
             :proto_predicate
           end
         end
-      end
-    end
+      # -
+    # -
   end
 end

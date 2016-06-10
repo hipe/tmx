@@ -1,11 +1,7 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    class Output_Adapters_::Quickie < DocTest_::Output_Adapter_
-
-      include Lazy_Selective_Event_Methods_
-
+  class OutputAdapters_::Quickie < Home_::OutputAdapter_
+    # -
       Attributes_actor_.call( self,
         arbitrary_proc_array: :custom_interpreter_method,
         business_module_name: nil,
@@ -290,14 +286,16 @@ module Skylab::TestSupport
       end
 
       def when_short_business_module_name s
-        maybe_send_event :error, :shallow_business_module_name do
+
+        _event.maybe_send :error, :shallow_business_module_name do
           bld_shallow_business_module_name s
         end
+
         UNABLE_
       end
 
       def bld_shallow_business_module_name s
-        build_not_OK_event_with :shallow_business_module_name,
+        _event.build_not_OK_with :shallow_business_module_name,
             :module_name, s,
             :min_parts, @num_subsystem_parts do |y, o|
           y << "business module name is too shallow. we need at least #{
@@ -399,7 +397,8 @@ module Skylab::TestSupport
         x || DEFAULT_TEST_SUPPORT_RELPATH__
       end
 
-      DEFAULT_TEST_SUPPORT_RELPATH__ = Home_::Init.test_support_filestem
+      DEFAULT_TEST_SUPPORT_RELPATH__ =
+        Home_.lib_.test_support::Init.test_support_filestem
 
       def _any_result_for_write_to_line_downstream_whole_string whole_string
 
@@ -541,6 +540,6 @@ module Skylab::TestSupport
       end
 
       Self_ = self
-    end
+    # -
   end
 end

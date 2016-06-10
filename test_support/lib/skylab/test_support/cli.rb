@@ -1,10 +1,8 @@
 module Skylab::TestSupport
-
-  module DocTest
-
+  # -
     # this new guy, it's gotta be light and generated
 
-    class CLI < Brazen_::CLI
+  class CLI < Home_.lib_.brazen::CLI
 
       # ~ universal action adapter customization
 
@@ -208,6 +206,6 @@ module Skylab::TestSupport
           nil
         end
       end
-    end
+    # -
   end
 end

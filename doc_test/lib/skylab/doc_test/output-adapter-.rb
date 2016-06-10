@@ -1,10 +1,6 @@
-module Skylab::TestSupport
-
-  module DocTest
-
-    class Output_Adapter_  # :[#025]. (storypoints in [#014] for now)
-
-      include Lazy_Selective_Event_Methods_
+module Skylab::DocTest
+  # -
+    class OutputAdapter_  # :[#004]. (storypoints in [#003] for now)
 
       class << self
 
@@ -19,9 +15,11 @@ module Skylab::TestSupport
         def templates_pathname
           dir_pathname.join 'templates-'
         end
-      end
+      end  # >>
 
       def initialize
+
+        @_Fields = Home_.lib_.fields
         @on_shared_resources_created = nil
         @shared_resources = nil
       end
@@ -55,15 +53,13 @@ module Skylab::TestSupport
         _kp and execute
       end
 
-      Fields___ = Home_.lib_.fields
-
       def receive_stream_and_pfunc_prop st, prp
 
         pfunc = Autoloader_.const_reduce(
           [ prp.name.as_const ],
           self.class::Parameter_Functions_ )
 
-        if Fields___::Takes_argument[ prp ]
+        if @_Fields::Takes_argument[ prp ]
           _x = st.gets_one
           pfunc.call self, _x, @o, & @on_event_selectively
         else
@@ -78,8 +74,8 @@ module Skylab::TestSupport
       end
 
       def when_no_nodes
-        maybe_send_event :error, :no_nodes_in_upstream do
-          build_not_OK_event_with :no_nodes_in_upstream
+        _event.maybe_send :error, :no_nodes_in_upstream do
+          _event.build_not_OK_with :no_nodes_in_upstream
         end
       end
 
@@ -101,7 +97,7 @@ module Skylab::TestSupport
 
       def init_view_controller
         @view_controller = View_Controller_.view_controller(
-          @shared_resources, & handle_event_selectively )
+          @shared_resources, & _event.handle_selectively )
         nil
       end
 
@@ -117,7 +113,7 @@ module Skylab::TestSupport
         @view_controller.view_controller_for_node_symbol i
       end
 
-      class View_Controller_  # see [#026]
+      class View_Controller_  # see [#005]
 
         class << self
 
@@ -160,7 +156,7 @@ module Skylab::TestSupport
 
         def template_idioms
           @shared_resources.cached :template_idioms do
-            DocTest_::Idioms_::Template.new(
+            Home_::Models_::Template.new(
               @shared_resources.fetch( :template_dir_pathname ),
               @shared_resources,
               & @on_event_selectively )
@@ -237,6 +233,6 @@ module Skylab::TestSupport
   end
 
     end
-  end
+  # -
 end
 # +:#posterity: multiple early versions of stream via array, param lib

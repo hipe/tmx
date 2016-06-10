@@ -1,14 +1,15 @@
 require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - [ actions ] - recursive " do
+  describe "[dt] API - recurse intro" do
 
-    extend TS_
-    use :expect_event
+    TS_[ self ]
+    use :API
+    # use :expect_event
     # use :stubbed_FS
 
-    it "path is required" do
+    it "path is required", wip: true do
 
       _rx = /\Amissing required attribute 'path'\z/
 
@@ -20,7 +21,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       e.message.should match _rx
     end
 
-    it "enum works #frontier" do
+    it "enum works #frontier", wip: true do
 
       call_API :recursive, :path, 'not-there', :sub_action, :no_wai
 
@@ -32,7 +33,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
     it "'list' only those files relevant to the path. emits no events, result is stream", wip: true do  # #old-wip:2015-04
 
-      call_API :recursive, :sub_action, :list, :path, Subject_[].dir_pathname.to_path
+      call_API :recursive, :sub_action, :list, :path, sidesystem_dir_path_
 
       expect_no_events
 
@@ -45,7 +46,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       two.path.should match %r(/generate/core\.rb\z)
     end
 
-    it "'preview' adds a conditional property requirement" do
+    it "'preview' adds a conditional property requirement", wip: true do
 
       call_API :recursive, :sub_action, :preview, :path, 'x'
 
@@ -63,7 +64,7 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       call_API :recursive, :sub_action, :preview, :path,
 
-        Subject_[].dir_pathname.to_path,
+        sidesystem_dir_path_,
 
         :downstream, downstream
 
@@ -101,7 +102,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     def validate_content_of_the_generated_file_of_interest io
       string_IO = io[ :buffer ]
       string_IO.rewind
-      string_IO.gets.should eql "require_relative '../../test-support'\n"
+      string_IO.gets.should eql "require_relative '../test-support'\n"
     end
   end
 end

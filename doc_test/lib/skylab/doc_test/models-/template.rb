@@ -1,8 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
   module DocTest
 
-    class Idioms_::Template
+    class Models_::Template
 
       # see sibling filesystem idiom for desc
 

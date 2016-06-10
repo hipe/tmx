@@ -1,34 +1,18 @@
-require_relative '../test-support'
+module Skylab::DocTest::TestSupport
 
-module Skylab::TestSupport::TestSupport::DocTest
+  module Files
 
-  Top_TS_ = ::Skylab::TestSupport::TestSupport
+    def self.[] tcc
+      tcc.extend Module_Methods___
+      tcc.include Instance_Methods___
+    end
 
-  Top_TS_[ TS_ = self ]
+    # -
 
-  include Constants
-
-  extend Home_::Quickie
-
-  module ModuleMethods
-
-    define_method :use, -> do
-
-      cache_h = {}
-
-      -> sym do
-
-        ( cache_h.fetch sym do
-          _const = Common_::Name.via_variegated_symbol( sym ).as_const
-          x = Bundles___.const_get _const, false
-          cache_h[ sym ] = x
-          x
-        end )[ self ]
-      end
-    end.call
+  module Module_Methods___
 
     def with_big_file_path & p
-      define_method :big_file_path, & p
+      define_method :big_file_path_, & p
     end
 
     def with_magic_line _RX
@@ -38,13 +22,55 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
   end
 
-  module InstanceMethods
+  module Instance_Methods___
+
+    # -- setup
+
+    def with_file fake_file_name_symbol
+
+      _sct = fake_file_structure_for_path big_file_path_
+
+      _p = _sct.fake_files_demarcated_by_regex( magic_line_regexp )
+
+      _fake_file = _p[ fake_file_name_symbol ]
+
+      @cb_stream = cb_stream_via_fake_file _fake_file
+
+      NIL_
+    end
+
+    # ~ produce paths
+
+    h = {
+      file_that_does_not_exist: :__noent_path,
+      the_how_nodes_are_generated_document: :__this_one_path,  # 1x
+      the_readme_document: :__readme_path,  # 2x
+    }
+
+    define_method :special_file_path_ do |sym|
+      send h.fetch sym
+    end
+
+    def __noent_path
+      TS_.noent_path_
+    end
+
+    def __readme_path
+      ::File.join sidesystem_dir_path_, 'README.md'
+    end
+
+    def __this_one_path
+      ::File.join sidesystem_dir_path_, 'doc/issues', THIS_ONE_FILENAME__
+    end
+
+    # ~
 
     def build_IO_spy_downstream_for_doctest
 
-      Home_::IO.spy :do_debug_proc, -> do
-        do_debug
-      end, :debug_IO, debug_IO, :puts_map_proc, -> s do
+      _do_debug = method :do_debug
+
+      _puts_map_proc = -> s do
+
         s_ = s.chomp
 
         if s_.length < s.length
@@ -54,15 +80,17 @@ module Skylab::TestSupport::TestSupport::DocTest
         end
         # :+#guillemets
       end
-    end
 
-    def a_path_for_a_file_that_does_not_exist
-
-      Top_TS_.noent_path_
+      TestSupport_::IO.spy(
+        :do_debug_proc, _do_debug,
+        :debug_IO, debug_IO,
+        :puts_map_proc, _puts_map_proc,
+      )
     end
 
     def with_comment_block_in_ad_hoc_fake_file symbol
-      _fake_file = fake_file_structure_for_path( big_file_path ).
+
+      _fake_file = fake_file_structure_for_path( big_file_path_ ).
         ad_hoc_fake_file( symbol )
 
       cb_stream = cb_stream_via_fake_file _fake_file
@@ -73,16 +101,25 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def cb_stream_via_fake_file fake_file
-      Subject_[].
-        comment_block_stream_via_line_stream_using_single_line_comment_hack(
-          fake_file.fake_open )
+
+      _fh = fake_file.fake_open
+      magnetics_module_::CommentBlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _fh ]
     end
 
-    def fake_file_structure_for_path path
-      CACHE___.fetch path do
-        CACHE___[ path ] = Build_fake_file_structure_for_path[ path ]
+    cache = {}
+    define_method :fake_file_structure_for_path do | path |
+      cache.fetch path do
+        x = Build_fake_file_structure_for_path___[ path ]
+        cache[ path ] = x
+        x
       end
     end
+
+    def _Omni_Mock_
+      Omni_Mock___
+    end
+
+    # --
 
     def expect_comment_block_with_number_of_lines exp_d
       cb = @cb_stream.gets
@@ -109,7 +146,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       rx = /\A[[:space:]]*/
       -> do
         ln = next_interesting_line
-        ln and ln.gsub( rx, Home_::EMPTY_S_ )
+        ln and ln.gsub( rx, EMPTY_S_ )
       end
     end.call
 
@@ -133,22 +170,31 @@ module Skylab::TestSupport::TestSupport::DocTest
     end.call
 
     def subject_API
-      Subject_[]::API
+      Home_::API
     end
   end
 
-  Build_fake_file_structure_for_path = -> do
+  # --
 
-    rx = /\A\d+/
+  README_FILENAME__ = 'README.md'
+  THIS_ONE_FILENAME__ = '003-how-nodes-are-generated.md'
 
-    -> path do
-      const_get( :"Build_#{ rx.match( ::File.basename path )[ 0 ] }" )[ path ]
-    end
-  end.call
+  # --
+
+  class_via_path = {}
+  Build_fake_file_structure_for_path___ = -> path do
+
+    _cls = class_via_path.fetch ::File.basename path
+    _cls[ path ]
+  end
+
+  Register__ = -> cls, path do
+    class_via_path[ path ] = cls ; nil
+  end
 
   Build_fake_file_structure__ = ::Class.new
 
-  class Build_015 < Build_fake_file_structure__
+  class Build_fake_files_in_README_file____ < Build_fake_file_structure__
 
     def work
       read_fake_file :file_one
@@ -166,19 +212,23 @@ module Skylab::TestSupport::TestSupport::DocTest
       @stay_rx = /\A[[:space:]]+#/
       @ad_hoc_code_blocks ||= {}
       @ad_hoc_code_blocks[ :ad_hoc_one ] =
-        build_fake_file_from_line_and_every_line_while_stay_rx
+        _build_fake_file_from_line_and_every_line_while_stay_rx
       nil
     end
+
+    Register__[ self, README_FILENAME__ ]
   end
 
-  class Build_014 < Build_fake_file_structure__
+  class Build_fake_files_in_this_one_file____ < Build_fake_file_structure__
 
     def work
-      read_case_pair
-      read_case_pair
-      read_case_pair
-      nil
+      _read_case_pair
+      _read_case_pair
+      _read_case_pair
+      NIL_
     end
+
+    Register__[ self, THIS_ONE_FILENAME__ ]
   end
 
   class Build_fake_file_structure__
@@ -200,8 +250,8 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def build
-      fh = ::File.open @path, 'r'  # READ_MODE_
-      @expect_line_scanner = Home_::Expect_Line::Scanner.via_line_stream fh
+      fh = ::File.open @path, ::File::RDONLY
+      @expect_line_scanner = TestSupport_::Expect_Line::Scanner.via_line_stream fh
       work
       fh.close
       flush
@@ -217,32 +267,41 @@ module Skylab::TestSupport::TestSupport::DocTest
         @fake_files_hash_via_regex_h[ @rx ] = {}
       end
 
-      _h[ name_symbol ] = build_fake_file_from_line_and_every_line_while_stay_rx
+      _h[ name_symbol ] = _build_fake_file_from_line_and_every_line_while_stay_rx
 
       nil
     end
 
-    def read_case_pair
+    def _read_case_pair
+
       md = advance_to_next_rx CASE_INPUT_HEADER_RX__
-      example_name = md[ 1 ]
-      skip_blank_lines
-      ff = build_fake_file_from_line_and_every_line_while_stay_rx
 
-      md = advance_to_rx CASE_OUTPUT_HEADER_RX__
+      _example_name = md[ 1 ]
 
-      predicate_category = md[ 1 ]
       skip_blank_lines
-      ff_ = build_fake_file_from_line_and_every_line_while_stay_rx(
-        /\A[[:space:]]+[^[:space:]]/ )
+
+      _ff = _build_fake_file_from_line_and_every_line_while_stay_rx
+
+      _md = advance_to_rx CASE_OUTPUT_HEADER_RX__
+
+      _predicate_category = _md[ 1 ]
+
+      skip_blank_lines
+
+      _ff_ = _build_fake_file_from_line_and_every_line_while_stay_rx SPACEY_RX___
+
+      kase = TS_::Case.new _example_name, _ff, _predicate_category, _ff_
 
       @case_h ||= {}
-      kase = TS_::Case_.new( example_name, ff, predicate_category, ff_ )
       @case_h[ kase.case_name_symbol ] = kase
     end
 
     CASE_INPUT_HEADER_RX__ = /\Ahere is (.+\bexample\b.*):$/i
+
     CASE_OUTPUT_HEADER_RX__ =
       /\A(?:so,? )?the above input generates(?: the(?: following)?)?(?: ([^\n:]+))?:?$/i
+
+    SPACEY_RX___ = /\A[[:space:]]+[^[:space:]]/
 
     def advance_to_next_rx rx=@rx
       @expect_line_scanner.advance_to_next_rx rx
@@ -256,7 +315,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       @expect_line_scanner.skip_blank_lines
     end
 
-    def build_fake_file_from_line_and_every_line_while_stay_rx rx = @stay_rx
+    def _build_fake_file_from_line_and_every_line_while_stay_rx rx = @stay_rx
       @expect_line_scanner.build_fake_file_from_line_and_every_line_while_rx rx
     end
 
@@ -287,56 +346,13 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
   end
 
-  class Omni_Mock_  # (used in 1 test)
+  class Omni_Mock___  # 1x
     def initialize x
       @x = x
     end
     attr_reader :x
     alias_method :a, :x
   end
-
-  Fixture_file_ = -> do
-
-    p = -> filename do
-
-      dirname = TS_.dir_pathname.join( 'fixture-files' ).to_path
-
-      p = -> filename_ do
-        ::File.join dirname, filename_
-      end
-
-      p[ filename ]
-    end
-
-    -> filename do
-      p[ filename ]
-    end
-  end.call
-
-  module Bundles___
-
-    Expect_Event = -> tcc do
-      Home_::Common_.test_support::Expect_Event[ tcc ]
-    end
-
-    Expect_Line = -> tcc do
-      Home_::Expect_line[ tcc ]
-    end
-
-    Memoizer_Methods = -> tcc do
-
-      Home_::Memoization_and_subject_sharing[ tcc ]
-    end
+# -
   end
-
-  Subject_ = -> do
-    Home_::DocTest
-  end
-
-  Home_ = Home_
-
-  CACHE___ = {}
-  Common_ = Home_::Common_
-  DocTest_ = Home_::DocTest
-
 end

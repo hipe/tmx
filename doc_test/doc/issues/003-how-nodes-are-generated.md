@@ -1,7 +1,7 @@
-# how nodes are generated :[#014]  (formerly "the specer narrative :[#025])
+# how nodes are generated :[#003]  (formerly "the specer narrative :[#004])
 
 
-(reminder to self: this document continues the narrative started in [#015])
+(reminder to self: this document continues the narrative started in [#001])
 
 
 ## introduction
@@ -189,7 +189,7 @@ here is an example of the `let` hack:
     #
     #     oh_hey = ha hooie
     #
-    # jimmy jam used to be in janet jackson's band
+    # "peanut" "danced" in that taylor swift video
     #
     #     1  # => 1
 

@@ -4,31 +4,11 @@ module Skylab::TestSupport::TestSupport
 
   class << self
 
-    def transitional_ tcc
+    def [] tcc
+
+      tcc.send :define_singleton_method, :use, Use_method___
       tcc.include InstanceMethods
     end
-  end  # >>
-
-  Home_ = ::Skylab::TestSupport
-
-  Home_::Regret[ Top_TS_ = self, ::File.dirname( __FILE__ ) ]
-
-  extend Home_::Quickie
-
-  module InstanceMethods
-
-    attr_reader :do_debug
-
-    def debug!
-      @do_debug = true
-    end
-
-    def debug_IO
-      @debug_IO ||= Home_.lib_.stderr
-    end
-  end
-
-  class << self
 
     def doc_path_ s
       @___doc_path ||= ::File.join( _sidesys_path, 'doc' )
@@ -48,17 +28,59 @@ module Skylab::TestSupport::TestSupport
       @___sidesys_path ||= ::File.expand_path(
         '../../..', Home_.dir_pathname.to_path )
     end
+
+    cache = {}
+    define_method :lib_ do |sym|
+      cache.fetch sym do
+        x = Home_.fancy_lookup sym, TS_
+        cache[ sym ] = x
+        x
+      end
+    end
   end  # >>
 
-  module Constants
-    EMPTY_A_ = Home_::EMPTY_A_
-    EMPTY_S_ = Home_::EMPTY_S_
-    LIB_  = Home_.lib_
-    Home_ = Home_
-    Top_TS_ = Top_TS_
+  Home_ = ::Skylab::TestSupport
+  extend Home_::Quickie
+
+  # -
+    Use_method___ = -> sym do
+      TS_.lib_( sym )[ self ]
+    end
+  # -
+
+  module InstanceMethods
+
+    attr_reader :do_debug
+
+    def debug!
+      @do_debug = true
+    end
+
+    def debug_IO
+      @debug_IO ||= Home_.lib_.stderr
+    end
+
+    # --
+
+    def fixture_file__ filename
+      ::File.join Home_::Fixtures.files_path, filename
+    end
   end
 
-  TS_ = self
-end
+  # --
 
+  Expect_Event = -> tcc do
+    Common_.test_support::Expect_Event[ tcc ]
+  end
+
+  Memoizer_Methods = -> tcc do
+    Home_::Memoization_and_subject_sharing[ tcc ]
+  end
+
+  # --
+
+  Common_ = Home_::Common_
+  TS_ = self
+
+end
 # :+tombstone: 'mock_FS' as bundle

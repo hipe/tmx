@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby -w
 
-require 'skylab/test_support'
+self._NOT_YET_not_until_016  # #while-open [#016] not a gem yet
+require 'skylab/doc_test'
 
 Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
-  Skylab::TestSupport::DocTest::CLI.new( i, o, e, pn_s_a ).invoke argv
+  Skylab::DocTest::CLI.new( i, o, e, pn_s_a ).invoke argv
 end
 
 if __FILE__ == $PROGRAM_NAME

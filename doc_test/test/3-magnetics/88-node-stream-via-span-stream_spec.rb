@@ -1,20 +1,20 @@
 require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - intermediate streams - NS via SS" do
+  describe "[dt] magnetics - NS via SS" do
 
-    extend TS_
-
-    include TS_::Case_::Test_Context_Instance_Methods
+    TS_[ self ]
+    use :files
+    include TS_.lib_( :case )::Test_Context_Instance_Methods
 
     with_big_file_path do
 
-      Top_TS_.doc_path_ 'issues/014-how-nodes-are-generated.md'
+      special_file_path_ :the_how_nodes_are_generated_document
     end
 
     it "loads" do
-      subject
+      _subject
     end
 
     it "a minimal example of generating an example" do
@@ -29,9 +29,8 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_case :an_example_of_the_let_hack
     end
 
-    def subject
-      Subject_[]::Intermediate_Streams_::
-        Node_stream_via_comment_block_stream::Node_stream_via_span_stream__
+    def _subject
+      magnetics_module_::NodeStream_via_SpanStream
     end
   end
 end

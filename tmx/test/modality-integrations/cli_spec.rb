@@ -70,7 +70,7 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    it "quickie" do
+    it "quickie", wip: true do
 
       invoke 'test-support', 'quickie', '-ping'
 
@@ -97,7 +97,7 @@ module Skylab::TMX::TestSupport
       @exitstatus.should eql :hello_from_sub_tree
     end
 
-    it "test support" do
+    it "test support", wip: true do
       _against 'test-support', _ARG
       _expect_common
     end

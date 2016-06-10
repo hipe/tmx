@@ -1,11 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    module Intermediate_Streams_
-
-      class Models_::Let_Assignment
-
+  class Models_::Let_Assignment
+    # -
+      # -
         class << self
 
           def match line
@@ -43,7 +40,7 @@ module Skylab::TestSupport
         def node_symbol
           :let_assignment
         end
-      end
-    end
+      # -
+    # -
   end
 end

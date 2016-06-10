@@ -11,7 +11,7 @@ module Skylab::Basic
     # length of the `actuals` whose each value is a symbol from `symbols`
     # that classifies the value in actuals, for example:
     #
-    #     #open [#ts-046] this is a perfect use-case for d.t
+    #     #open [#dt-012] this is a perfect use-case for d.t
     #     ..when this happens consider going back to [#gv-026] and folding
     #     this back in.
 

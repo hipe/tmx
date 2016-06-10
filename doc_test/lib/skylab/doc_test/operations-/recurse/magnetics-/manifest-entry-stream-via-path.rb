@@ -1,4 +1,5 @@
-module Skylab::TestSupport
+self._K
+module Skylab::DocTest
 
   module DocTest
 

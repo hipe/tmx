@@ -144,7 +144,6 @@ module Skylab::TestSupport  # :[#021].
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
-  CONST_SEP_ = '::'.freeze
   DASH_ = '-'.freeze
   DOT_DOT_ = '..'.freeze
   EMPTY_A_ = [].freeze

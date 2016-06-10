@@ -1,13 +1,10 @@
-module Skylab::TestSupport
-
-  module TestSupport::DocTest
-
-    class Case_
-
-      module Test_Context_Instance_Methods
+module Skylab::DocTest::TestSupport
+  class Case
+    # -
+      module Test_Context_Instance_Methods  # part of public API too
 
         def expect_case name_i
-          @kase = fake_file_structure_for_path( big_file_path ).case name_i
+          @kase = fake_file_structure_for_path( big_file_path_ ).case name_i
           @node_upstream = via_case_build_node_stream
           _expect_tree = @kase.predicate_tree
           run_case_expectations_of_tree_children _expect_tree
@@ -17,9 +14,9 @@ module Skylab::TestSupport
           cb_stream = cb_stream_via_fake_file @kase.example_ff
           cb = cb_stream.gets
           cb_stream.gets and fail
-          o = Subject_[]::Intermediate_Streams_::Node_stream_via_comment_block_stream
-          _ss = o::Span_stream_via_comment_block__[ cb ]
-          o::Node_stream_via_span_stream__[ _ss ]
+          o = magnetics_module_
+          _ss = o::SpanStream_via_CommentBlock[ cb ]
+          o::NodeStream_via_SpanStream[ _ss ]
         end
 
         def run_case_expectations_of_tree_children tree
@@ -328,6 +325,9 @@ module Skylab::TestSupport
           end
         end
       end
-    end
+
+      # <-
+
+    ACHIEVED_ = true
   end
 end

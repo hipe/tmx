@@ -1,11 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    module Intermediate_Streams_
-
-      class Models_::Before_Node
-
+  class Models_::Before_Node
+    # -
+      # -
         class << self
 
           alias_method :build, :new
@@ -41,7 +38,7 @@ module Skylab::TestSupport
         def to_line_stream
           Common_::Stream.via_nonsparse_array @a
         end
-      end
-    end
+      # -
+    # -
   end
 end

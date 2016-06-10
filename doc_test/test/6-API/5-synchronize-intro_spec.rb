@@ -1,41 +1,46 @@
 require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - [ actions ] - generate" do
+  describe "[dt] API - synchronize intro" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
-    use :expect_event
-    use :expect_line
+    use :API
+    # use :expect_event
+    # use :expect_line
 
-    it "for the output adapter indicate no name" do
+    it "for the output adapter indicate no name", wip: true do
+      debug!
       call_API_with :output_adapter, nil
       expect_not_OK_event :wrong_const_name
       expect_failed
     end
 
-    it "for the output adapter indicate a strange name" do
+    it "for the output adapter indicate a strange name", wip: true do
+      debug!
       call_API_with :output_adapter, :wazoozle
       expect_not_OK_event :uninitialized_constant
       expect_failed
     end
 
-    it "no line downstream" do
+    it "no line downstream", wip: true do
+      debug!
       call_API_with :output_adapter, :quickie
       expect_not_OK_event :no_downstream
       expect_failed
     end
 
-    it "no line upstream" do
+    it "no line upstream", wip: true do
+      debug!
       call_API_with :output_adapter, :quickie, :line_downstream, :_HI_
       expect_not_OK_event :no_upstream
       expect_failed
     end
 
-    it "noent" do
+    it "noent", wip: true do
       @down_IO = :_HI_
-      call_API_against_path a_path_for_a_file_that_does_not_exist
+      call_API_against_path special_file_path_ :file_that_does_not_exist
       expect_not_OK_event :stat_error
       expect_failed
     end
@@ -47,7 +52,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       shared_subject :_state do
 
         _path = ::File.join(
-          DocTest_.dir_pathname.to_path,
+          Home_.dir_pathname.to_path,
           Common_::Autoloader.default_core_file )
 
         call_API_against_path _path
@@ -64,7 +69,7 @@ module Skylab::TestSupport::TestSupport::DocTest
         )
       end
 
-      it "neutral event talkin bout current output path (none)" do
+      it "neutral event talkin bout current output path (none)", wip: true do
 
         @event_log = Common_::Stream.via_nonsparse_array _state.emission_array
 
@@ -75,18 +80,18 @@ module Skylab::TestSupport::TestSupport::DocTest
         expect_no_more_events
       end
 
-      it "result is an emission talking about wrote - knows if dry" do
+      it "result is an emission talking about wrote - knows if dry", wip: true do
 
         _state.result.category.should eql [ :success, :wrote ]
         _wrote.is_known_to_be_dry and fail
       end
 
-      it "wrote has line count" do
+      it "wrote has line count", wip: true do
 
         ( 20 .. 40 ).should be_include _wrote.line_count
       end
 
-      it "knows if dry run" do
+      it "knows if dry run", wip: true do
 
         ( 900 .. 1100 ).should be_include _wrote.bytes
       end
@@ -95,13 +100,13 @@ module Skylab::TestSupport::TestSupport::DocTest
         _state.result.emission_value_proc.call
       end
 
-      it "content looks OK" do
+      it "content looks OK", wip: true do
 
         @output_s = _state.output_string
 
         advance_to_module_line
 
-        line.should eql "module Skylab::TestSupport::TestSupport::DocTest\n"
+        line.should eql "module Skylab::DocTest::TestSupport::DocTest\n"
 
         @interesting_line_rx = /\A      (?!end\b)[^ ]/
 
@@ -111,7 +116,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       end
     end
 
-    it "`force` argument works" do
+    it "`force` argument works", wip: true do
 
       call_API :generate,
         :output_path, _common_real_life_output_path,
@@ -126,7 +131,7 @@ module Skylab::TestSupport::TestSupport::DocTest
       expect_failed
     end
 
-    it "PRE-FINAL INTEGRATION HACK TEST (dry run)" do
+    it "PRE-FINAL INTEGRATION HACK TEST (dry run)", wip: true do
 
       em = subject_API.call(
         :generate,
@@ -146,7 +151,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def common_upstream_path
-      DocTest_.dir_pathname.join( 'models-/front/actions/generate/core.rb' ).to_path
+      Home_.dir_pathname.join( 'models-/front/actions/generate/core.rb' ).to_path
     end
 
     def _common_real_life_output_path
@@ -161,7 +166,7 @@ module Skylab::TestSupport::TestSupport::DocTest
     end
 
     def call_API_against_path x
-      @down_IO ||= Home_::Library_::StringIO.new
+      @down_IO ||= TS_.testlib_.string_IO.new
       x_a = [
         :generate,
         :output_adapter, :quickie,

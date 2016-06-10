@@ -1,12 +1,13 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest::CLI
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test integration: CLI generate" do
+  describe "[dt] CLI - synchronize intro" do
 
-    extend TS_
+    TS_[ self ]
+    use :CLI
 
-    it "0.0) no args" do
+    it "0.0) no args", wip: true do
       invoke 'genera'
       on_stream :errput
       expect "couldn't generate test document because no line upstream"
@@ -14,7 +15,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       expect_failed
     end
 
-    it "1.4) help" do
+    it "1.4) help", wip: true do
       invoke 'gen', '-h'
       on_stream :errput
       expect :styled, %r(\Ausage: ts-dt generate \[)i
@@ -26,14 +27,14 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       @exitstatus.should be_zero
     end
 
-    it "1.1) no ent" do
-      invoke 'generate', a_path_for_a_file_that_does_not_exist
+    it "1.1) no ent", wip: true do
+      invoke 'generate', special_file_path_( :file_that_does_not_exist )
       on_stream :errput
       expect %r(\Acouldn't generate .+ because no such file or direc.+noent\.f)i
       @exitstatus.should equal_generic_error
     end
 
-    it "1.3) money" do
+    it "1.3) money", wip: true do
 
       td = Home_.lib_.system.filesystem.tmpdir.new_with(
         :be_verbose, do_debug,

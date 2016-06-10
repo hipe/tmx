@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport
 
   describe "[ts] quickie" do
 
-    TS_.transitional_ self
+    TS_[ self ]
 
     last_id = 0
 

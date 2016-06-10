@@ -1,4 +1,4 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
   module DocTest
 
@@ -9,21 +9,16 @@ module Skylab::TestSupport
       end
     end
 
-    module Models_::Front
+    module Models_
+      Autoloader_[ self, :boxxy ]  # detect constants thru filesystem
+    end
 
-      module Actions
-
-        Autoloader_[ self, :boxxy ]
-
-      end
-
-      class Actions::Ping < Action_
-
-        edit_entity_class :promote_action
+    class Models_::Ping < Action_
+      # ->
 
         def produce_result
 
-          maybe_send_event :payload, :ping do
+          _event.maybe_send :payload, :ping do
 
             build_OK_event_with :ping do |y, o|
               y << "ping #{ highlight '!' }"
@@ -32,7 +27,7 @@ module Skylab::TestSupport
 
           :_hello_from_doc_test_
         end
-      end
+      # -
     end
   end
 end

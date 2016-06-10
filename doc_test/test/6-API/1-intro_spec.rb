@@ -1,27 +1,23 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - models - front - actions" do
+  describe "[dt] API - intro" do
 
-    extend TS_
-    use :expect_event
+    TS_[ self ]
+    # use :expect_event
 
-    it "no such action" do
+    it "no such action", wip: true do
       call_API
       expect_not_OK_event :no_such_action
       expect_failed
     end
 
-    it "ping" do
+    it "ping", wip: true do
       call_API :ping
       expect_OK_event :ping, 'ping (highlight "!")'
       @result.should eql :_hello_from_doc_test_
       expect_no_more_events
-    end
-
-    def subject_API
-      Subject_[]::API
     end
   end
 end

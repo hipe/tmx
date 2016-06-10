@@ -1,14 +1,15 @@
-module Skylab::TestSupport
+require 'skylab/common'
 
-  module DocTest  # see [#015]
-
+module Skylab::DocTest
+  # -
+    # see [#001] (the README) for an introduction.
     # synopsis:
     #
     # these first few lines of a text span, you can write whatever you want &
     # they will not appear in the generated spec file. the last line however,
     # will appear as the description string of your context or example.
     #
-    #     THIS_FILE_ = Home_::Expect_Line::File_Shell[ __FILE__ ]
+    #     THIS_FILE_ = self._NO::Expect_Line::File_Shell[ __FILE__ ]
     #
     #     # this comment gets included in the output because it is indented
     #     # with four or more spaces and is part of a code span that goes out.
@@ -17,6 +18,7 @@ module Skylab::TestSupport
     # now that we are back under four spaces in from our local margin, this
     # is again a text span. the previous code span is treated as a before
     # block because it has no magic "# =>" predicate sequence. it becomes a
+    # #todo: go this away (above)
     # before `all` block because it looks like it starts with a constant
     # assignment.
     #
@@ -37,51 +39,40 @@ module Skylab::TestSupport
     #
     #     THIS_FILE_.contains( 'from these description lines"' ) # => true
 
+    module CLI
+      # ..
+    end
+
     module API
 
       class << self
 
         def call * x_a, & oes_p
 
-          # don't ever write events to stdout / stderr by default.
+          # don't ever write events to stdout/stderr by default.
+          # see temporary tombstone A
 
-          if oes_p
-            x_a.push :on_event_selectively, oes_p
-          elsif x_a.length < 2 || :on_event_selectively != x_a[ -2 ]
-            x_a.push :on_event_selectively, -> i, *, & ev_p do
-              if :error == i
-                raise ev_p[].to_event.to_exception
-              end
-            end
-          end
-
-          bc = DocTest_.application_kernel_.bound_call_via_mutable_iambic x_a
-          bc and bc.receiver.send bc.method_name, * bc.args
-        end
-
-        def expression_agent_class
-          Brazen_::API.expression_agent_class
+          ::Kernel._K_ALSO_fix_indent_here
         end
       end  # >>
     end
+  # -
 
-    class << self
+  class << self
 
-      define_method :application_kernel_, ( Common_.memoize do
-        Brazen_::Kernel.new DocTest_
-      end )
-
-      def comment_block_stream_via_line_stream_using_single_line_comment_hack x
-        DocTest_::Input_Adapters__::
-          Comment_block_stream_via_line_stream_using_single_line_comment_hack[ x ]
-      end
-
-      def get_output_adapter_slug_array
-        self::Output_Adapters_.entry_tree.to_stream.map_by do | et |
+      def get_output_adapter_slug_array_
+        self::OutputAdapters_.entry_tree.to_stream.map_by do | et |
           et.name.as_slug
         end.to_a
       end
-    end  # >>
+
+    def lib_
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Lib___, self )
+    end
+  end  # >>
+
+  # -
 
     # ~ support for parsing
 
@@ -147,131 +138,7 @@ module Skylab::TestSupport
       end
     end
 
-    module Intermediate_Streams_
-
-      module Node_stream_via_comment_block_stream
-
-        class << self
-          def [] cb_stream
-            x = Self_::Span_stream_via_comment_block__[ cb_stream ]
-            x and Self_::Node_stream_via_span_stream__[ x ]
-          end
-        end
-
-        Self_ = self
-        Autoloader_[ self ]
-      end
-
-      module Models_
-        Autoloader_[ self ]
-      end
-
-      Autoloader_[ self ]
-    end
-
-    module Output_Adapters_
-      Autoloader_[ self ]
-    end
-
-    module Lazy_Selective_Event_Methods_
-
-    private
-
-      def build_not_OK_event_with * x_a, & msg_p
-        Common_::Event.
-          inline_not_OK_via_mutable_iambic_and_message_proc x_a, msg_p
-      end
-
-      def build_neutral_event_with * x_a, & msg_p
-        Common_::Event.
-          inline_neutral_via_mutable_iambic_and_message_proc x_a, msg_p
-      end
-
-      def maybe_send_event * i_a, & ev_p
-        @on_event_selectively[ * i_a, & ev_p ]
-      end
-
-      def handle_event_selectively
-        @on_event_selectively
-      end
-    end
-
-    class Parameter_Function_
-
-      class << self
-
-        def arity
-          instance_method( :initialize ).arity
-        end
-
-        def call gen, * a, & oes_p
-          new( gen, * a, & oes_p ).execute
-        end
-
-        attr_reader :description_proc
-
-      private
-
-        def description & p
-          @description_proc = p ; nil
-        end
-      end
-
-      def initialize gen, & oes_p
-        @generation = gen
-        @on_event_selectively = oes_p
-      end
-
-      def execute
-        _ok = normalize
-        _ok && flush
-      end
-
-    private
-
-      def build_unrecognized_param_arg ok_x_a
-
-        Home_.lib_.fields::Events::Extra.build(
-            [ @value_x ],
-            ok_x_a,
-            "parameter argument" )
-      end
-
-      def maybe_send_event * i_a, & oes_p
-        @on_event_selectively.call( * i_a, & oes_p )
-      end
-
-      Build_property_for_function = -> category, prop_cls, x, sym do  # #curry-friendly
-
-        argument_arity_symbol = case x.arity
-        when 1 ; :zero
-        when 2 ; :one
-        end
-
-        if argument_arity_symbol
-
-          if x.respond_to? :description_proc
-            desc_p = x.description_proc  # might be nil
-          end
-
-          prop_cls.new_by do
-
-            @name = Common_::Name.via_const_symbol sym
-            @argument_arity = argument_arity_symbol
-            @origin_category = category
-
-            if desc_p
-              accept_description_proc desc_p
-            end
-          end
-        end
-      end
-    end
-
-    Mutate_string_by_removing_trailing_dashes_ = -> s do
-      s.gsub! Common_::Name::TRAILING_DASHES_RX, EMPTY_S_  # ick/meh
-      nil
-    end
+    # --
 
     class Shared_Resources_
 
@@ -312,13 +179,73 @@ module Skylab::TestSupport
       end
     end
 
-    s = 'doc-test.manifest'.freeze
-    Manifest_filename_ = -> do
-      s
+  # -
+  # --
+
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+
+  # --
+
+  module Magnetics_
+
+    NodeStream_via_CommentBlock = -> cb do  # [#ta-005] done manually:
+
+      st = Magnetics_::SpanStream_via_CommentBlock[ cb ]
+      st and Magnetics_::NodeStream_via_SpanStream[ st ]
     end
 
-    Brazen_ = Home_.lib_.brazen
-    BLANK_RX_ = /\A[[:space:]]*\z/
-    DocTest_ = self
+    Autoloader_[ self ]
   end
+
+  # --
+
+  Attributes_actor_ = -> cls, * a do
+    Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
+  # --
+
+  module Lib___
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Basic = sidesys[ :Basic ]
+    Fields = sidesys[ :Fields ]
+
+    system_lib = nil
+
+    System = -> do
+      system_lib[].services
+    end
+
+    system_lib = sidesys[ :System ]
+
+    Test_support = sidesys[ :TestSupport ]
+  end
+
+  # --
+
+  module OutputAdapters_
+    Autoloader_[ self ]
+  end
+
+  module Models_
+    Autoloader_[ self ]
+  end
+
+  # -
+
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
+  ACHIEVED_ = true
+  BLANK_RX_ = /\A[[:space:]]*\z/
+  CONST_SEP_ = '::'.freeze
+  DocTest = :_fix_these_
+  EMPTY_P_ = -> { NOTHING_ }
+  EMPTY_S_ = ''
+  Home_ = self
+  NEWLINE_ = "\n"
+  NIL_ = nil
+  NOTHING_ = nil
 end
+# #temporary-tombstone:A: old [br] API call boilerplate

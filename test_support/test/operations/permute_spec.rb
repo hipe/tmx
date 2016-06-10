@@ -1,26 +1,59 @@
 require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::TestSupport::TestSupport
 
-  describe "[ts] doc-test - [ actions ] - permute" do
+  describe "[ts] operations - permute", wip: true do
 
-    extend TS_
+    TS_[ self ]
+    use :memoizer_methods
     use :expect_event
+    # use :doc_test
 
-    it "adds new test cases, skips existing, magnetic, maintains formatting" do
+    shared_subject :_shared_state do
+
+      X_O_Permute_Struct = ::Struct.new :out_string, :err_string, :result
+      o = X_O_Permute_Struct.new
 
       grp = __build_spy_group
       _st = __build_permutation_stream
 
       call_API :permute,
-        :test_file, Fixture_file_[ 'some_speg.rb' ],
+        :test_file, fixture_file__( 'some_speg.rb' ),
         :permutations, _st,
         :stdout, grp[ :o ],
         :stderr, grp[ :e ]
 
-      out_s, err_s = grp.flush_to_strings_for :o, :e
+      o.out_string, o.err_string = grp.flush_to_strings_for :o, :e
+      o.result = @result
+      o
+    end
 
-      out_s.should eql <<-HERE.unindent
+    it "results in a success value" do
+
+      _shared_state.result.should eql true
+    end
+
+    it "adds new test cases to the document" do
+
+      _rx = /\b(?<num_added>\d+) case\(s\) added\b/
+
+      _md = _shared_state.err_string.should match _rx
+
+      _md[ :num_added ].to_i.should eql 3
+    end
+
+    it "expresses that it skipped generating a test that existed already" do
+
+      _rx = /\b(?<num_skipped>\d+) already done\b/
+
+      _md = _shared_state.err_string.should match _rx
+
+      _md[ :num_skipped ].to_i.should eql 1
+    end
+
+    it "the output string is correct byte-per-byte" do
+
+      _exp = <<-HERE.unindent
         # etc 1
 
           it "zeep deep - foozazi" do
@@ -44,10 +77,6 @@ module Skylab::TestSupport::TestSupport::DocTest
 
         # etc 2
       HERE
-
-      err_s.should eql "(3 case(s) added, 1 already done)\n"
-
-      expect_succeeded
     end
 
     def __build_spy_group
@@ -75,5 +104,9 @@ module Skylab::TestSupport::TestSupport::DocTest
         Common_::Stream.via_nonsparse_array a
       end
     end.call
+
+    def subject_API
+      Home_::API
+    end
   end
 end

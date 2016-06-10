@@ -60,7 +60,7 @@ module Skylab::TestSupport
             redo
           end while nil
 
-          ACHIEVED_  # (was historically marked with what is now [#012])
+          ACHIEVED_  # (was historically marked with what is now [#dt-002])
         end
       end
 

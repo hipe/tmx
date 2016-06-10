@@ -1,9 +1,7 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    module Input_Adapters__::Comment_block_stream_via_line_stream_using_single_line_comment_hack
-
+  module Magnetics_::CommentBlockStream_via_LineStream_and_Single_Line_Comment_Hack
+    # -
       define_singleton_method :[] do |up|
 
         line = md = nil
@@ -11,13 +9,16 @@ module Skylab::TestSupport
 
         p = orig_p = -> do
 
-          while line = up.gets
+          begin
+            line = up.gets
+            line or break
             md = HACK_RX__.match line
             if md
               found = true
               break
             end
-          end
+            redo
+          end while nil
 
           if found
             p = when_found
@@ -51,7 +52,7 @@ module Skylab::TestSupport
             p = EMPTY_P_
           end
 
-          DocTest::Input_Adapter_::Comment_block_via_single_line_matchdata_array[ cb_a ]
+          Common_::Stream.via_nonsparse_array cb_a
         end
 
         Common_.stream do
@@ -60,6 +61,6 @@ module Skylab::TestSupport
       end
 
       HACK_RX__ = /\A([^#]*)#/
-    end
+    # -
   end
 end

@@ -1,10 +1,11 @@
-module Skylab::TestSupport
+self._K
+module Skylab::DocTest
 
   module DocTest
+    # ->
+      class Models_::Recursive < Action_
 
-    module Models_::Front
-
-      class Actions::Recursive < Action_
+        MANIFEST_FILENAME___ = 'doc-test.manifest'.freeze
 
         # ~ :+[#br-082] abstraction candidate - enum
 
@@ -25,7 +26,7 @@ module Skylab::TestSupport
 
         def ___ME_receive_bad_enum_value x, prp_name, x_a
 
-          maybe_send_event :error, :invalid_property_value do
+          _event.maybe_send :error, :invalid_property_value do
 
             Home_.lib_.fields::MetaAttributes::Enum::
               Build_extra_value_event[ x, enum_box.get_names, prp_name ]
@@ -48,7 +49,7 @@ module Skylab::TestSupport
             end,
 
             :description, -> y do
-              a = DocTest_.get_output_adapter_slug_array
+              a = Home_.get_output_adapter_slug_array_
               y << "available adapter#{ s a }: #{ a * ' | ' }"
             end,
             :default, :quickie,
@@ -96,7 +97,7 @@ module Skylab::TestSupport
 
           via_properties_init_ivars
 
-          @doc_test_files_file = Manifest_filename_[]
+          @doc_test_files_file = MANIFEST_FILENAME___
 
           pn = ::Pathname.new @path
           if pn.relative?
@@ -107,7 +108,7 @@ module Skylab::TestSupport
 
           if :preview == @sub_action && ! @downstream
 
-            maybe_send_event :error, :missing_required_properties do
+            _event.maybe_send :error, :missing_required_properties do
 
               _prp = self.class.properties.fetch :downstream
 
@@ -126,7 +127,7 @@ module Skylab::TestSupport
             @path,
             @doc_test_files_file,
             self.class.properties.fetch( :path ),
-            & handle_event_selectively ]
+            & _event.handle_selectively ]
 
           struct and begin
 
@@ -286,7 +287,7 @@ module Skylab::TestSupport
 
             @top_path,
 
-            & handle_event_selectively )
+            & _event.handle_selectively )
 
           Common_.stream do
             begin
@@ -304,6 +305,6 @@ module Skylab::TestSupport
 
         SLASH_BYTE_ = '/'.getbyte 0
       end
-    end
+    # -
   end
 end

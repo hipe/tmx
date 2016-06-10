@@ -1,19 +1,18 @@
 require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - actors - infer business module name loadlessly" do
+  describe "[dt] magnetics - hack peek [..]" do
 
-    extend TS_
-    use :expect_event
+    TS_[ self ]
 
     it "when matching leaf nodes not found, search branch nodes" do
 
-      _Basic = Home_.lib_.basic
+      _Basic = TS_.testlib_.basic
 
       _path = ::File.join _Basic.dir_pathname.to_path, 'method.rb'
 
-      subject( _path ).should eql "Skylab::Basic::Method"
+      _subject( _path ) == "Skylab::Basic::Method" or fail
     end
 
     it "detect const assignment also #experimental" do
@@ -31,17 +30,20 @@ module Skylab::TestSupport::TestSupport::DocTest
 
       _line_ups = Home_.lib_.basic::String.line_stream _whole_string
 
-      _name = subject(
+      _name = _subject(
         :path, '/var/xkcd/skorlorb/morta-horl/porse/voa-ordered-set--.rb',
-        :line_upstream, _line_ups, & event_log.handle_event_selectively )
+        :line_upstream, _line_ups,
+        & method( :___expect_no_event ) )
 
-      _name.should eql "Skorlab::MortaHorl::Porse::Voa_ordered_set__"
-
+      _name == "Skorlab::MortaHorl::Porse::Voa_ordered_set__" or fail
     end
 
-    def subject * a, & p
-      Subject_[]::Actors_::Infer_business_module_name_loadlessly[ * a, & p ]
+    def ___expect_no_event * i_a
+      fail "not expected: #{ i_a.inspect }"
     end
 
+    def _subject * a, & p
+      magnetics_module_::Hack_Peek_Module_Name_via_Path[ * a, & p ]
+    end
   end
 end

@@ -5,7 +5,7 @@ module Skylab::TestSupport
     expose_executables_with_prefix 'tmx-test-support-'
 
     def back_kernel
-      Home_::API.krnl
+      Home_::API.kernel__
     end
 
     def lookup_sidesystem_module

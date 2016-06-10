@@ -100,7 +100,7 @@ instead, they both depend on this abstraction.
     |                 |                |
 
 
-TODO: use `permute` to generate all this etc. waiting for [#ts-015]
+TODO: use `permute` to generate all this etc. waiting for [#dt-012])
 
 
 [1] there is perhaps an esoteric distinction to be made between

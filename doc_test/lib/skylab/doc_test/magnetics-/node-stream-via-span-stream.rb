@@ -1,11 +1,7 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    class Intermediate_Streams_::
-        Node_stream_via_comment_block_stream::Node_stream_via_span_stream__ <
-            Common_::Actor::Monadic
-
+  class Magnetics_::NodeStream_via_SpanStream < Common_::Actor::Monadic
+    # -
      def initialize x
        @span_stream = x
      end
@@ -82,11 +78,13 @@ module Skylab::TestSupport
       end
 
       def when_bare_example_code_span_via_matchdata example_md
+
         @do_stay = false
-        @result = Intermediate_Streams_::Models_::Example_Node.build(
-          @text_span, example_md )
+
+        @result = Models_::Example_Node.build @text_span, example_md
+
         @state = @state_machine.fetch :expect_bare_example_text_span
-        nil
+        NIL_
       end
 
       def when_contextualized_example_text_span
@@ -120,8 +118,8 @@ module Skylab::TestSupport
 
         if example_md
           @eg_a ||= []
-          @eg_a.push Intermediate_Streams_::Models_::Example_Node.build(
-            @text_span, example_md )
+          _en = Models_::Example_Node.build @text_span, example_md
+          @eg_a.push _en
         end
 
         nil
@@ -134,9 +132,9 @@ module Skylab::TestSupport
           @anc_nodes = nil
           a.concat @eg_a
           @eg_a = nil
-          Intermediate_Streams_::Models_::Context.build @first_text_span, a
+          Models_::Context.build @first_text_span, a
         else
-          # :+#[#037] warnings wishlist
+          # #[#009] warnings wishlist
           nil
         end
       end
@@ -176,7 +174,7 @@ module Skylab::TestSupport
 
             @topmost_content_line = @line
 
-            md = Intermediate_Streams_::Models_::Predicate_Expressions.match @line
+            md = Models_::Predicate_Expressions.match @line
             if md
               predicate_was_found = true
               break
@@ -193,7 +191,7 @@ module Skylab::TestSupport
         end
 
         def matchdata_when_predicate_found md
-          Intermediate_Streams_::Models_::Example_Node::Matchdata.new md, @scn, @span
+          Models_::Example_Node::Matchdata.new md, @scn, @span
         end
 
         def matchdata_when_predicate_not_found
@@ -245,7 +243,7 @@ module Skylab::TestSupport
               next
             end
 
-            md = Intermediate_Streams_::Models_::Let_Assignment.match @line
+            md = Models_::Let_Assignment.match @line
 
             if md
               @let_line_md_a ||= []
@@ -280,13 +278,13 @@ module Skylab::TestSupport
 
             _before_lines = @span.a[ 0, @num_non_let_lines ]
 
-            a.push Intermediate_Streams_::Models_::Before_Node.build(
+            a.push Models_::Before_Node.build(
               @topmost_content_line, _before_lines )
           end
 
           if @let_line_md_a
             @let_line_md_a.each do |md|
-              let = Intermediate_Streams_::Models_::Let_Assignment.build md
+              let = Models_::Let_Assignment.build md
               let and a.push let
             end
           end
@@ -294,6 +292,6 @@ module Skylab::TestSupport
           a
         end
       end
-    end
+    # -
   end
 end

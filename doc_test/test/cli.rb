@@ -1,26 +1,20 @@
-require_relative '../../test-support'
+module Skylab::DocTest::TestSupport
 
-module Skylab::TestSupport::TestSupport::DocTest::CLI
+  module CLI
 
-  Parent_ = ::Skylab::TestSupport::TestSupport::DocTest
+    def self.[] tcc
+      tcc.include self
+    end
 
-  Parent_[ TS_ = self ]
+    # -
 
-  include Constants
-
-  extend Home_::Quickie
-
-  Home_ = Home_
-
-  module InstanceMethods
-
-    include Home_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-
-    define_method :expect, instance_method( :expect )  # because rspec
+    # define_method :expect, instance_method( :expect )  # because rspec
 
     def invoke * s_a
 
-      g = Home_::IO.spy.group.new
+      self._NO_use_zerk  # no it's becky
+
+      g = TestSupport_::IO.spy.group.new
       g.debug_IO = debug_IO
       g.do_debug_proc = -> do
         do_debug
@@ -31,7 +25,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
 
       _invocation = _CLI_module.new( nil,
         * g.values_at( :output, :errput ),
-        [ FAKE_PROGNAME_ ] )
+        [ FAKE_PROGNAME___ ] )
 
       @exitstatus = _invocation.invoke s_a
 
@@ -39,12 +33,12 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       nil
     end
 
-    def _CLI_module
-      Subject_[]::CLI
+    def _CLI_module  # library scope
+      Home_::CLI
     end
 
     def the_main_real_file_doctestable_file_path
-      Home_::DocTest.dir_pathname.join( 'core.rb' ).to_path
+      ::File.join sidesystem_dir_path_, Autoloader_.default_core_file
     end
 
     def expect_failed
@@ -57,20 +51,20 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     end
 
     def count_occurrences_of_newlines_in_string string
-      count_occurrences_in_string_of_string string, Home_::NEWLINE_
+      count_occurrences_in_string_of_string string, NEWLINE_
     end
 
     def count_occurrences_in_string_of_string haystack_s, needle_s
       Home_.lib_.basic::String.
         count_occurrences_in_string_of_string haystack_s, needle_s
     end
+
+    # ==
+
+    FAKE_PROGNAME___ = 'ts-dt'
+
+    Generic_error__ = Common_::Lazy.call do
+      TestLib_.lib_.brazen::API.exit_statii.fetch :generic_error
+    end
   end
-
-  FAKE_PROGNAME_ = 'ts-dt'
-
-  Generic_error__ = Home_::Common_.memoize do
-    Home_.lib_.brazen::API.exit_statii.fetch :generic_error
-  end
-
-  Subject_ = Parent_::Subject_
 end

@@ -9,9 +9,9 @@ if __FILE__ == $PROGRAM_NAME
 
   module Skylab
     module TestSupport
-      Models_ = ::Module.new
       Home_ = self
       module API
+        Models_ = ::Module.new
         Brazen_ = ::Object.new
         def Brazen_::Model
           o = ::Object.new
@@ -38,7 +38,7 @@ module Skylab::TestSupport
     # for typical coverage measurement of a test or test suite. for such
     # standard use, please see the simplecov gem's README.md
 
-    class Home_::Models_::Simplecov
+    class Models_::Simplecov
 
       Actions = ::Module.new
 

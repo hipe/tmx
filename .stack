@@ -1,3 +1,4 @@
 the big question - slicer
-divorce [dt] from [ts]
-some developmental strategy for [dt]
+factor out dir_pathname (!)
+recursive
+design & implement the new synchronizing model (reversing!)

@@ -1,13 +1,14 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest::Input
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test - input adapters" do
+  describe "[dt] magnetics - CBS via LS and SLCH" do
 
-    extend TS_
+    TS_[ self ]
+    use :files
 
     with_big_file_path do
-      Top_TS_.doc_path_ 'issues/015-the-doc-test-narrative.md'
+      special_file_path_ :the_readme_document
     end
 
     with_magic_line %r(\A[ ]{4,}this is some code$)

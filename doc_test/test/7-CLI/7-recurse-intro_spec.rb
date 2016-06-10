@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::TestSupport::TestSupport::DocTest::CLI
+module Skylab::DocTest::TestSupport
 
-  describe "[ts] doc-test integration: CLI recursive" do
+  describe "[dt] CLI - recursive intro" do
 
-    extend TS_
+    TS_[ self ]
+    use :CLI
 
     # three laws compliant.
 
@@ -12,7 +13,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
       _CLI_module
     end
 
-    it "pings" do
+    it "pings", wip: true do
       invoke 'ping'
       on_stream :output
       expect :styled, 'ping !'
@@ -84,7 +85,7 @@ module Skylab::TestSupport::TestSupport::DocTest::CLI
     end
 
     def common_path
-      Subject_[].dir_pathname.to_path
+      Home_.dir_pathname.to_path
     end
   end
 end

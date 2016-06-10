@@ -1,4 +1,4 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
   module DocTest
 

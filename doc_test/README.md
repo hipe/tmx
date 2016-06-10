@@ -1,4 +1,4 @@
-# the doc-test narrative :[#015]
+# tmx doc-test
 
 
 ## introduction
@@ -10,7 +10,9 @@ the interest of coming up with ideas in a vacuum and then comparing
 notes later when some point of "done-ness" is reached with this project.
 
 currently "doc-test" must be classified as a "hack" because of the way
-it parses comments: it does not do so in a langauge-aware way (yet).
+it parses files: it does so with hand-written parsers that are hacks at
+best (for the time being, until we figure out what is up with
+`ruby2ruby` this many years later).
 
 
 
@@ -41,6 +43,14 @@ tests, that if nothing else enhance the process of writing a little
 comment in your code with a little usage example, by ensuring you that
 the code actually works as is documented.
 
+
+
+
+## revisiting the algorithm
+
+(this is for the rewrite..)
+
+parse the input file with "shadow parse".
 
 
 
@@ -120,7 +130,7 @@ but comment blocks are only the beginning..
 
 
 
-### intrdcution to the structural paraphernalia of test frameworks
+### introduction to the structural paraphernalia of test frameworks
 
 this is the structure of a generated test document in the default target
 test framework in the eyes of doc-test:
@@ -155,7 +165,7 @@ doc-test was designed from the beginning to accomodate different
 output adapters to output test code for different test frameworks.
 however currently we effectively hard-code doc-test to output test code
 targeting only one framework, because we have only ever needed one
-output adatper to date.
+output adaptper to date.
 
 (technically this output supports at least two test frameworks, because
 the "quickie" test framework that often use has a specification that is a
@@ -168,6 +178,9 @@ different output adapters.
 
 
 #### outputted paraphernalia for the default test framework
+
+(EDIT: this will probably change, now that we found "better"
+alternatives to before blocks.)
 
 for one doc-test compatible input file doc-test will output the contents
 of one complete spec file consisting of exactly one "describe block".
@@ -377,7 +390,7 @@ this example synthesizes every point from above:
     # the above blank lines are discarded because we are in a text span
     #    this line is three (not four) spaces deeper so it is text
     #       same here, still text because it's 3 deeper (not 4)
-    #           but as soon as we are 4 lines deeper, this is "code."
+    #           but as soon as we are 4 spaces deeper, this is "code."
     #                         code can go arbitrarily deeply: local margin
     #                         from the last text line holds throughout
     #
@@ -424,7 +437,7 @@ needing to be a valid input stream.
 ## notes on issues
 
 
-### :[#034] rearchitect ..
+### :[#XX-034] rearchitect ..
 
 the way we have implemented "parameter functions" is "good" in its
 isomorpic nature but problematic in its broader context. no single one

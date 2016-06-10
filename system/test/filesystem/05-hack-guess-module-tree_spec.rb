@@ -51,7 +51,7 @@ module Skylab::System::TestSupport
       count.should eql 5
     end
 
-    # (currently this gets more coverage in [#ts-015] doc-test)
+    # (currently this gets more coverage in [dt])
 
     def __subject * x_a, & x_p
 

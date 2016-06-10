@@ -1,16 +1,13 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
-  module DocTest
-
-    module Intermediate_Streams_
-
-      module Models_::Description_String
-
+  module Models_::Description_String
+    # -
+      # -
         class << self
 
           def [] str
 
-            # lifted directly from [#014]
+            # lifted directly from [#003]
 
             s = str.dup
             s.sub! TRAILING_RX__, EMPTY_S_
@@ -27,7 +24,7 @@ module Skylab::TestSupport
           TRAILING_RX__ = /[:,]?\r?\n?\z/
 
         end
-      end
-    end
+      # -
+    # -
   end
 end

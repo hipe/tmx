@@ -1,10 +1,8 @@
-module Skylab::TestSupport
+module Skylab::DocTest
 
   module DocTest
-
-    module Models_::Front
-
-      class Actions::Generate < Action_  # storypoints are in [#015]
+    # ->
+      class Models_::Generate < Action_  # storypoints are in [#001]
 
     # our handle on the whole doc-test API is the API module itself,
     # which you can call `call` on.
@@ -15,7 +13,7 @@ module Skylab::TestSupport
     #
     # So, the `API` module is application programmer's interface to the API:
     #
-    #     API = Home_::DocTest::API
+    #     API = self._NO Lib_::DocTest::API
     #
     #
     # the minimal action that we can send to our API is the `ping` action:
@@ -41,7 +39,7 @@ module Skylab::TestSupport
     # from these comments you are reading:
     #
     #
-    #     here = DocTest_::Models_::Front::Actions::Generate.
+    #     here = Home_::Models_::Front::Actions::Generate.
     #       dir_pathname.join( 'core.rb' ).to_path
     #
     #     output_pn = ::Pathname.new Top_TS_.test_path_(
@@ -78,8 +76,7 @@ module Skylab::TestSupport
 
         edit_entity_class do
 
-          o :promote_action,
-
+          o(
             :inflect,
               :verb, 'generate',
               :noun, 'test document',
@@ -95,7 +92,8 @@ module Skylab::TestSupport
             :meta_property, :origin_category,
 
 
-            :polymorphic_writer_method_name_suffix, :"="
+            :polymorphic_writer_method_name_suffix, :"=",
+          )
 
           # NOTE those properties that want to trigger side-effects are
           # written by hand below, and for readability they write their
@@ -156,7 +154,7 @@ module Skylab::TestSupport
 
           o :description, -> y do
 
-            a = DocTest_.get_output_adapter_slug_array
+            a = Home_.get_output_adapter_slug_array_
 
             a.map!( & method( :highlight ) )
 
@@ -274,6 +272,8 @@ module Skylab::TestSupport
 
         def execute  # no, this wasn't already implemented by the f.w!
 
+          self._K
+
           @argument_box ||= Common_::Box.the_empty_box # ick/meh
           bc = via_arguments_produce_bound_call  # will call normalize
           bc and begin
@@ -351,8 +351,7 @@ module Skylab::TestSupport
             [ prp.name.as_const ],
             Parameter_Functions_ )
 
-
-          oes_p = handle_event_selectively
+          oes_p = _event.handle_selectively
 
           if Field_::Takes_argument[ prp ]
 
@@ -447,6 +446,8 @@ module Skylab::TestSupport
 
         def produce_result
 
+          self._K
+
           # order is somewhat arbitrary: what is covered is to resolve
           # the output adapter first. normalization may hinge on a valid
           # upstream.
@@ -484,7 +485,7 @@ module Skylab::TestSupport
 
           mod = Autoloader_.const_reduce(
             [ @output_adapter ],  # nil ok
-            DocTest_::Output_Adapters_,
+            Home_::Output_Adapters_,
             & @on_event_selectively )
 
           if mod
@@ -498,7 +499,7 @@ module Skylab::TestSupport
         def via_output_adapter_module_resolve_output_adapter
           @output_adapter_o = @output_adapter_module.output_adapter(
             @dry_run,
-            & handle_event_selectively )
+            & _event.handle_selectively )
           @__formal_properties__ = nil  # above may add some
           ACHIEVED_
         end
@@ -512,7 +513,7 @@ module Skylab::TestSupport
           else
 
             @on_event_selectively.call :error, :no_downstream do
-              build_not_OK_event_with :no_downstream  # #could-go
+              _event.build_not_OK_with :no_downstream  # #could-go
             end
 
             UNABLE_
@@ -530,7 +531,7 @@ module Skylab::TestSupport
             :path, @output_path,
             :is_dry_run, @dry_run,
             :force_arg, _force_arg,
-            & handle_event_selectively )
+            & _event.handle_selectively )
 
           if kn
             io = kn.value_x
@@ -560,7 +561,7 @@ module Skylab::TestSupport
 
           @on_event_selectively.call :error, :no_upstream do
 
-            build_not_OK_event_with :no_line_upstream  # #could-go
+            _event.build_not_OK_with :no_line_upstream  # #could-go
           end
 
           UNABLE_
@@ -587,25 +588,31 @@ module Skylab::TestSupport
         end
 
         def rslv_comment_block_stream_via_line_stream
-          @comment_block_stream = DocTest_.
+          @comment_block_stream = Home_.
             comment_block_stream_via_line_stream_using_single_line_comment_hack(
               @line_upstream )
           @comment_block_stream ? ACHIEVED_ : UNABLE_
         end
 
         def rslv_node_upstream_via_comment_block_stream
-          @node_upstream = @comment_block_stream.expand_by do | comment_block |
-            DocTest_::Intermediate_Streams_::Node_stream_via_comment_block_stream[ comment_block ]
+
+          st = @comment_block_stream.expand_by do | cb |
+            Home_::Magnetics_::NodeStream_via_CommentBlock[ cb ]
           end
-          @node_upstream ? ACHIEVED_ : UNABLE_
+
+          if st
+            @node_upstream = st ; ACHIEVED_
+          else
+            st
+          end
         end
 
         # ~ normalize
 
         def __normalize
-          @business_module_name ||= DocTest_::Actors_::
-            Infer_business_module_name_loadlessly.call(
-               @upstream_path, & handle_event_selectively )
+
+          @business_module_name ||= ___build_business_name
+
           if @business_module_name
             if @_arbitrary_proc_a
               when_arbitrary_procs
@@ -617,6 +624,13 @@ module Skylab::TestSupport
             @result = @business_module_name
             UNABLE_
           end
+        end
+
+        def ___build_business_name
+
+          _ = Home_::Magnetics_::Hack_Peek_Module_Name_via_Path.call(
+            @upstream_path, & _event.handle_selectively )
+          _
         end
 
         def when_arbitrary_procs
@@ -633,7 +647,7 @@ module Skylab::TestSupport
         # ~~ filesys idioms
 
         def filesys_idioms
-          @FS_idioms ||= DocTest_::Idioms_::Filesystem.new
+          @FS_idioms ||= Home_::Models_::Filesystem.new
         end
 
         # ~~ output adapter
@@ -649,8 +663,8 @@ module Skylab::TestSupport
 
           if @output_path.nil? && @upstream_path
 
-            x = Self_::Actors__::Infer_output_path[
-              @upstream_path, handle_event_selectively ]
+            x = Home_::Magnetics::OutputPath_via_InputPath[
+              @upstream_path, _event.handle_selectively ]
 
             if x
               @output_path = x
@@ -692,7 +706,7 @@ module Skylab::TestSupport
 
         def ___emit_current_output_path
 
-          maybe_send_event :info, :current_output_path do
+          _event.maybe_send :info, :current_output_path do
 
             Common_::Event.inline_neutral_with(
               :current_output_path,
@@ -715,6 +729,6 @@ module Skylab::TestSupport
         Self_ = self
         TEMPORARY_ = false  # until a perfect work
       end
-    end
+    # -
   end
 end
