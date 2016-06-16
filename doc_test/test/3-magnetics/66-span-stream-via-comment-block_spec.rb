@@ -34,8 +34,8 @@ module Skylab::DocTest::TestSupport
 
       o = DT_IS_SS_via_CB_Struct.new
 
-      with_comment_block_in_ad_hoc_fake_file :ad_hoc_one
-      st = _subject[ @comment_block ]
+      _cb = comment_block_via_ad_hoc_fake_file_symbol__ :ad_hoc_one
+      st = _subject[ _cb ]
 
       o.first = st.gets
       o.second = st.gets

@@ -132,6 +132,8 @@ but comment blocks are only the beginning..
 
 ### introduction to the structural paraphernalia of test frameworks
 
+(EDIT: most of this section will probably change.. #todo)
+
 this is the structure of a generated test document in the default target
 test framework in the eyes of doc-test:
 

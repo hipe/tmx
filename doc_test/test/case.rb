@@ -11,11 +11,11 @@ module Skylab::DocTest::TestSupport
         end
 
         def via_case_build_node_stream
-          cb_stream = cb_stream_via_fake_file @kase.example_ff
-          cb = cb_stream.gets
-          cb_stream.gets and fail
+
+          _bs = block_stream_via_line_stream_ @kase.example_ff.fake_open
+          _cb = maybe_some_code_then_exactly_one_comment_block_via_block_stream__ _bs
           o = magnetics_module_
-          _ss = o::SpanStream_via_CommentBlock[ cb ]
+          _ss = o::SpanStream_via_CommentBlock[ _cb ]
           o::NodeStream_via_SpanStream[ _ss ]
         end
 

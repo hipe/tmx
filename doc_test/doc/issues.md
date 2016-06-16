@@ -1,3 +1,5 @@
+[#017]       essential operation pseudocode omnistory..
+
 [#016] #open when it becomes gem (do this)
 
 [#015] #former-stub infer leading and trailing hand-written content

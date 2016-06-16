@@ -26,17 +26,70 @@ module Skylab::DocTest::TestSupport
 
     # -- setup
 
-    def with_file fake_file_name_symbol
+    def comment_block_via_ad_hoc_fake_file_symbol__ symbol
+      _line_st = __line_stream_via_ad_hoc_fake_file_symbol symbol
+      _block_st = block_stream_via_line_stream_ _line_st
+      exactly_one_comment_block_via_block_stream_ _block_st
+    end
 
-      _sct = fake_file_structure_for_path big_file_path_
+    def maybe_some_code_then_exactly_one_comment_block_via_block_stream__ st
 
-      _p = _sct.fake_files_demarcated_by_regex( magic_line_regexp )
+      o = st.gets
+      if :static == o.category_symbol  # at least one item is assumed
+        o = st.gets
+      end
+      o_ = st.gets
+      if o_
+        :static == o_.category_symbol or fail
+      end
+      _this_etc o, st
+    end
 
-      _fake_file = _p[ fake_file_name_symbol ]
+    def exactly_one_comment_block_via_block_stream_ block_st
+      o = block_st.gets
+      o or fail _say_expected_comment_block
+      _this_etc o, block_st
+    end
 
-      @cb_stream = cb_stream_via_fake_file _fake_file
+    def _this_etc o, block_st
+      _expect_is_comment o
+      o_ = block_st.gets
+      o_ and fail __say_expected_no_additional_block( o_ )
+      o
+    end
 
+    def _expect_is_comment o
+      :comment == o.category_symbol or fail __say_expected_comment_block_had( o )
+    end
+
+    def __say_expected_no_additional_block o
+      "expected no additional block, had '#{ o.category_symbol }'"
+    end
+
+    def block_stream_via_line_stream_ line_st
+      magnetics_module_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ line_st ]
+    end
+
+    def with_file sym
+
+      _st = line_stream_via_fake_file_symbol sym
+      @_block_stream = block_stream_via_line_stream_ _st
       NIL_
+    end
+
+    def __line_stream_via_ad_hoc_fake_file_symbol sym
+
+      _ffs = fake_file_structure_for_path big_file_path_
+      _ff = _ffs.ad_hoc_fake_file sym
+      _ff.fake_open
+    end
+
+    def line_stream_via_fake_file_symbol sym
+
+      _ffs = fake_file_structure_for_path big_file_path_
+      _ffh = _ffs.fake_files_demarcated_by_regex magic_line_regexp
+      _ff = _ffh.fetch sym
+      _ff.fake_open
     end
 
     # ~ produce paths
@@ -88,24 +141,6 @@ module Skylab::DocTest::TestSupport
       )
     end
 
-    def with_comment_block_in_ad_hoc_fake_file symbol
-
-      _fake_file = fake_file_structure_for_path( big_file_path_ ).
-        ad_hoc_fake_file( symbol )
-
-      cb_stream = cb_stream_via_fake_file _fake_file
-      @comment_block = cb_stream.gets
-      x = cb_stream.gets
-      x and fail "should only have one comment block: #{ x }"
-      nil
-    end
-
-    def cb_stream_via_fake_file fake_file
-
-      _fh = fake_file.fake_open
-      magnetics_module_::CommentBlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _fh ]
-    end
-
     cache = {}
     define_method :fake_file_structure_for_path do | path |
       cache.fetch path do
@@ -122,24 +157,48 @@ module Skylab::DocTest::TestSupport
     # --
 
     def expect_comment_block_with_number_of_lines exp_d
-      cb = @cb_stream.gets
-      if cb
-        d = 0
-        d += 1 while cb.gets
-        if exp_d != d
-          d.should eql exp_d
-          fail
-        end
-      else
-        fail "expected comment block, had none."
-      end ; nil
+      _etc :comment, exp_d
     end
 
-    def expect_no_more_comment_blocks
-      cb = @cb_stream.gets
-      if cb
-        fail "expected no more comment blocks, had one."
+    def expect_static_block_with_number_of_lines exp_d
+      _etc :static, exp_d
+    end
+
+    def _etc sym, exp_d
+      o = @_block_stream.gets
+      if o
+        if sym == o.category_symbol
+          if exp_d != o.number_of_lines___
+            fail __say_N_for_M( o.number_of_lines___, exp_d, sym )
+          end
+        else
+          o.category_symbol.should eql sym
+        end
+      else
+        fail _say_expected_comment_block
       end
+    end
+
+    def __say_N_for_M n, m, sym
+      "had #{ n }, needed #{ m } #{ sym } lines"
+    end
+
+    def __say_expected_comment_block_had o
+      "expected comment block had '#{ o.category_symbol }' block"
+    end
+
+    def _say_expected_comment_block
+      "expected comment block, had no block"
+    end
+
+    def expect_no_more_blocks
+
+      o = @_block_stream.gets
+      o and fail __say_this_fail o
+    end
+
+    def __say_this_fail o
+      "expected no more comment blocks, had #{ o.category_symbol } block."
     end
 
     define_method :next_interesting_line_dedented, -> do
@@ -202,7 +261,7 @@ module Skylab::DocTest::TestSupport
       read_fake_file :file_three
       read_fake_file :file_four
       read_ad_hoc_code_block_one
-      nil
+      NIL_
     end
 
     def read_ad_hoc_code_block_one
@@ -213,7 +272,7 @@ module Skylab::DocTest::TestSupport
       @ad_hoc_code_blocks ||= {}
       @ad_hoc_code_blocks[ :ad_hoc_one ] =
         _build_fake_file_from_line_and_every_line_while_stay_rx
-      nil
+      NIL_
     end
 
     Register__[ self, README_FILENAME__ ]

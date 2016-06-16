@@ -182,33 +182,94 @@ yay!
 
 
 
-## the 5-phase action implementation sequence :[#.G]
+## the 5-phase (five-phase) action implementation sequence :[#.G]
 
-(this is better documented in commit messages currently..)
+consider the premise that the value of any application lies in the value
+of its "essential operation" (or operations). the extent to which this
+assertion is true (or perhaps even based on false premises), this would
+be an interesting discussion in itself but sadly that it out of our scope
+here.
 
-this is our favorite means of implementing a [br]-style model action for
-any action that is at all non-trivial.
+so we'll just accept it as axiomatic for now that it is important that
+we get our "essential operations" "right", in terms of both design and
+implementation.
 
-1. produce and write out the planned algorithm for the action's
-   implementation in pseudocode (in a commited document). it is OK if
-   this changes somewhat throughout the development, but typically a
-   detailed enough pseudocode document will be protected from too much
-   such violence.
+it is equally important, then, that we have a dialog with these
+"emergent practices" to guide us towards a development path for
+designing and delivering these operations.
 
-2. decide how the pseudocode will be partitioned into roles and
-   behaviors for actors, models and sessions.
+reference this technique in your commit messages as you use it, and
+include the string "5-phase" (without the quotes) somewhere in the message.
 
-3. one by one (at least one commit for each), implement each of the
-   above. hopefully order won't be too important because hopefully there
-   will be no dependency arcs.
+1. pseudocode - in a dedicated document (ideally at least one document
+   per essential operation), conceive and write out the planned algorithm
+   for the action's implementation in some kind of pseudocode.
 
-4. synthesize the model action from these components.
+   it's OK if the algorithm changes somewhat throughout the development,
+   but in our experience the best protection from dramatic code changes
+   late in the game is that we design and produce a sufficiently detailed,
+   well thought out, and complete pseudocode story.
 
-5. do any integration with the action to the rest of the system and/or
-   other modalities.
+   we find that the process of writing the document itself tends to
+   reveal edge cases or even suggest design changes back to the author,
+   which is why we imagine it as a dialog rather than just a one way
+   process of design.
 
-steps 3, 4 and 5 MUST have their own tests driving the development,
-ideally in a three laws compliant way.
+2. decomposition and compartmentalization - using the pseudocode story,
+   put some thought into what would make good boundaries for various
+   performers. consider what their constituency should be, what role
+   each of these constituents play, and how they will interact with
+   each other in terms of their interfaces to drive the pseudocode
+   story along from start to finish.
+
+   for each performer make initial best-guesses at what patterns you
+   will employ to implement it; i.e will it be an actor (like a pure
+   function), a session (a bit like a controller), or maybe a model
+   (pure data, maybe with "fat model" pattern as a proxy to other
+   performers).
+
+   these decisions can change, but the important part at this phase
+   is to make some decisions about these before we begin to write code.
+
+
+3. implement the constituents one-by-one.
+   one by one for each of the above performers, we will:
+
+     • "bottom-line" what its interface, behavior and pattern will be.
+
+     • create at least one test file dedicated only to this performer.
+
+     • create at least commit dedicated only to this performer.
+
+   ideally in a "three-laws" manner, treat the performer as a black box
+   while producing tests that demonstrate completeness.
+
+   ideally the order in which we roll out the various performers won't
+   matter when there are no dependency arcs between the performers.
+   (for example if they all take primitives or easily mockable objects
+   as their parameters.)
+
+   but if for example one performer (imagine a session or actor) needs
+   instances of one or more other performers, make a decision about
+   whether it is best to mock or use real objects, and if the latter,
+   let the dependency graph be your guide as to the order.
+
+
+4. operation synthesis - in a dedicated commit (or commits) write test
+   code (typically as API call ("functional") tests) that demonstrates
+   completeness; and implement the operation. assembling the operation
+   itself in such a manner is typically almost trivial, being that the
+   performers do all of the heavy lifting, and that logic is already
+   done and covered at this point.
+
+
+5. modality integration - as approrpriate for your application,
+   integrate this operation with the the modality or modalities that
+   expose it; by covering it.
+
+
+to restate, steps 3, 4 and 5 MUST have their own tests driving the
+development, ideally in a three laws compliant way.
 
 
 

@@ -4,7 +4,7 @@ module Skylab::DocTest
     # -
       def initialize cb
 
-        @comment_block = cb
+        @_line_matchdata_stream = cb.to_line_matchdata_stream__
 
         @current_flush_method_name = @next_flush_method_name = nil
         @state = STATE_MACHINE__.fetch :beginning_state
@@ -24,7 +24,7 @@ module Skylab::DocTest
           @do_stay = true
 
           begin
-            md = @comment_block.gets
+            md = @_line_matchdata_stream.gets
             if ! md
               @is_reading = false
               break
