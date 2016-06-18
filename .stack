@@ -8,3 +8,5 @@ iteration -3 - achieve a lossless reverse synchronizable document (a parse tree 
 iteration -4 - design & implement *basic* forwards translation (just "it" assertions)
 iteration -5 - at a layer on top of this, make it document-based, confirming that they are lossless
 iteration -6 - rewrite the existing magnetics so that they "seem" like they are lossless
+reconception of (etc) as "runs"
+revised implementation and coverage of "blocks"

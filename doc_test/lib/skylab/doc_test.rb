@@ -56,7 +56,6 @@ module Skylab::DocTest
         end
       end  # >>
     end
-  # -
 
   class << self
 
@@ -71,74 +70,6 @@ module Skylab::DocTest
         Lib___, self )
     end
   end  # >>
-
-  # -
-
-    # ~ support for parsing
-
-    class State_Machine_  # ( mentors :+[#ba-044] )
-
-      def initialize & p
-        @h = {}
-        sess = Edit_Session__.new method :receive_state_
-        sess.instance_exec( & p )
-      end
-
-      class Edit_Session__
-
-        def initialize p
-          @p = p
-        end
-
-        def o symbol, h
-          @p[ State_.new h, symbol ]
-          nil
-        end
-      end
-
-      def receive_state_ state
-        @h[ state.symbol ] = state
-        nil
-      end
-
-      def fetch symbol
-        @h.fetch symbol
-      end
-    end
-
-    class State_
-
-      class << self
-        alias_method :[], :new
-      end
-
-      def initialize h, symbol=nil
-        @i_i_h = h
-        @symbol = symbol
-      end
-
-      attr_reader :symbol
-
-      def method_name_for_state state_symbol
-        @i_i_h.fetch state_symbol do
-          when_key_not_found state_symbol
-        end
-      end
-
-    private
-
-      def when_key_not_found x
-
-        if @symbol
-          _for_symbol = " for '#{ @symbol }'"
-        end
-
-        raise ::KeyError, "key not found#{ _for_symbol }: #{ x.inspect }"
-
-      end
-    end
-
-    # --
 
     class Shared_Resources_
 
@@ -179,7 +110,6 @@ module Skylab::DocTest
       end
     end
 
-  # -
   # --
 
   Common_ = ::Skylab::Common
