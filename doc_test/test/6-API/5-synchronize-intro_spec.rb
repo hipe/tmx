@@ -40,7 +40,7 @@ module Skylab::DocTest::TestSupport
 
     it "noent", wip: true do
       @down_IO = :_HI_
-      call_API_against_path special_file_path_ :file_that_does_not_exist
+      call_API_against_path noent_path_
       expect_not_OK_event :stat_error
       expect_failed
     end

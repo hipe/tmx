@@ -1,3 +1,13 @@
+[#022]       (this internal ELC thing)
+
+[#021]       what are runs ..
+
+[#020]       what are comment blocks ..
+
+[#019]       current limitations in parsing ..
+
+[#018]       unified language..
+
 [#017]       essential operation pseudocode omnistory..
 
 [#016] #open when it becomes gem (do this)

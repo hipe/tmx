@@ -174,7 +174,7 @@ module Skylab::DocTest
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self
-  NEWLINE_ = "\n"
+  NEWLINE_ = "\n".freeze  # because #spot-2
   NIL_ = nil
   NOTHING_ = nil
 end

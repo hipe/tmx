@@ -56,6 +56,17 @@ module Skylab::DocTest::TestSupport
       Home_::Magnetics_
     end
 
+    -> do
+      cache = {}
+      define_method :full_path_ do |tail_path|
+        cache.fetch tail_path do
+          x = ::File.join sidesystem_dir_path_, tail_path
+          cache[ tail_path ] = x
+          x
+        end
+      end
+    end.call
+
     ssdp = nil
     define_method :sidesystem_dir_path_ do
       ssdp ||= ::File.expand_path( '../../..', Home_.dir_pathname.to_path )

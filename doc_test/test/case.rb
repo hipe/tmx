@@ -4,7 +4,7 @@ module Skylab::DocTest::TestSupport
       module Test_Context_Instance_Methods  # part of public API too
 
         def expect_case name_i
-          @kase = fake_file_structure_for_path( big_file_path_ ).case name_i
+          @kase = fake_file_structure_for_path( _TODO_real_file_path_ ).case name_i
           @node_upstream = via_case_build_node_stream
           _expect_tree = @kase.predicate_tree
           run_case_expectations_of_tree_children _expect_tree
