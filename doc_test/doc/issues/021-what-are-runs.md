@@ -57,10 +57,10 @@ of the above line. (indent is defined more formally soon below.)
 
 conversely, when you're in a code run the transition back to a
 discussion run is signalled (only) when the indent level goes back to
-what it was last was at the last discussion run (or less). (#cover-me)
+what it was last was at the last discussion run (or less). (#coverpoint-5)
 
 as with discussion runs, in a code run any blank line encountered will be
-rolled into that code run. (#cover-me)
+rolled into that code run. (#coverpoint-6)
 
 one small but essential missing piece is this: for each comment block,
 the parsing always categorizes the first "contented" line of that comment
@@ -70,7 +70,7 @@ nothing.
 
 (what we mean by "contented" and what happens when all N lines of a code
 block have no content, that is an edge case that is the subject of tests
-only and we won't give it further discussion here. (#cover-me))
+only and we won't give it further discussion here. (#coverpoint-9))
 
 with this algorithmic step of always starting things off with a
 discussion run, the trade-off is that there is no way to express a comment

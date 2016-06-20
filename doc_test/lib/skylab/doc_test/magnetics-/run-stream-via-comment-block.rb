@@ -23,19 +23,26 @@ module Skylab::DocTest
       @_pound_end_charpos = md.offset( 0 ).last  # will be same for each line
       _measure md
 
+      # (note there is some logical redundancy below because we're still not
+      #  sure whether we will ever want to know the indent level when we
+      #  create the discussion run.)
+
       # consume leading blanks
       blanks = nil
-      @_line_is_blank and self._COVER_THIS
       while @_line_is_blank
         ( blanks ||= [] ).push _release_blank_line
         _step
         @_reached_end_of_input && break
       end
 
-      if @_reached_end_of_input
+      if @_reached_end_of_input  # edge case - all lines blank (#coverpoint-9)
 
-        self._COVER_ME_read_this_all_lines_were_blank_do_something_with_state
-        # this is an edge case - all lines were blank..
+        _init_empty_discussion_run
+        blanks.each do |o|
+          @_discussion_run.accept_line o
+        end
+        @_state = :_nothing
+        _release_discussion_run
       else
         # assume is not blank. we have the first line with content in
         # the comment block. per
@@ -51,8 +58,7 @@ module Skylab::DocTest
       end
     end
 
-    def __finish_and_release_non_first_discussion_run
-
+    def _finish_and_release_non_first_discussion_run
       _init_empty_discussion_run
       _finish_and_release_discussion_run
     end
@@ -62,10 +68,16 @@ module Skylab::DocTest
       @_discussion_run = Models_::Discussion::Run.new_empty__ ; nil
     end
 
-    def _finish_and_release_discussion_run
+    def _finish_and_release_discussion_run  # mentor (template, even) to #here
+
+      # assume you have a current line that is a discussion line..
 
       @_discussion_run.accept_line _release_discussion_line
+
+      # while there are more lines and the line is a discussion line, same.
+
       begin
+
         _step
 
         if @_reached_end_of_input
@@ -78,48 +90,43 @@ module Skylab::DocTest
           redo
         end
 
-        this_indent_level = @_content_range.begin
+        @_this_indent_level = @_content_range.begin
 
-        indent_delta = this_indent_level - @_INDENT_LEVEL
-        case 0 <=> indent_delta
+        @_indent_delta = @_this_indent_level - @_INDENT_LEVEL
 
-        when NO_CHANGE_IN_INDENT__
+        d = 0 <=> @_indent_delta
 
-          @_discussion_run.accept_line _release_discussion_line
-          redo
+        if NO_CHANGE_IN_INDENT__ != d
 
-        when INDENT_HAS_INCREASED__
+          if INDENT_HAS_INCREASED__ == d
 
-          if INDENT_THRESHOLD__ <= indent_delta
-            @_state = :_finish_and_release_code_run
-            break
+            if INDENT_THRESHOLD__ <= @_indent_delta
+              @_state = :_finish_and_release_code_run
+              break
+            end
+            # (when indentation increased but not by enough to reach
+            #  threshold, push indent level inwards #coverpoint-2)
+          else
+            INDENT_HAS_DECREASED__ == d || ::Kernel._SANITY  # #coverpoint-4
           end
-
-          # when indentation increased but not by enough to reach threshold,
-          # this pushes the indent level inwards (#coverpoint-2).
-
-          @_INDENT_LEVEL = this_indent_level
-          @_discussion_run.accept_line _release_discussion_line
-          redo
-
-        when INDENT_HAS_DECREASED__
-
-          ::Kernel._WHEN_indentation_has_decreased_then_um_ETC
-        else
-
-          ::Kernel._WONT_COVER
+          _accept_new_indent_level
         end
 
-        ::Kernel._WONT_COVER
+        @_discussion_run.accept_line _release_discussion_line
+        redo
       end while nil
 
+      _clear_these
+      _release_discussion_run
+    end
+
+    def _release_discussion_run
       remove_instance_variable( :@_discussion_run ).finish__
     end
 
-    def _finish_and_release_code_run
+    def _finish_and_release_code_run  # very close mentee of #here
 
       # assume you have a current line that is a code line..
-      _remove_these_ivars
 
       cr = Models_::Code::Run.begin_via_offsets__( * _release_code_line_vals )
 
@@ -131,50 +138,49 @@ module Skylab::DocTest
 
         if @_reached_end_of_input
           @_state = :_nothing
-          cr = cr.finish
           break
         end
 
-        if @_line_is_blank
-          ::Kernel._K_probably_fine_RIDE_THIS
+        if @_line_is_blank  # #coverpoint-6
           cr.accept_line _release_blank_line
           redo
         end
 
-        # EXPERIMENTALLY we are using the same template as the other mode:
+        @_this_indent_level = @_content_range.begin
 
-        indent_delta = @_content_range.begin - @_INDENT_LEVEL
-        case 0 <=> indent_delta
+        @_indent_delta = @_this_indent_level - @_INDENT_LEVEL
 
-        when NO_CHANGE_IN_INDENT__
+        d = 0 <=> @_indent_delta
 
-          ::Kernel._K_MODE_CHANGE
+        if NO_CHANGE_IN_INDENT__ != d
 
-        when INDENT_HAS_INCREASED__
+          if INDENT_HAS_INCREASED__ == d
 
-          if INDENT_THRESHOLD__ <= indent_delta
-            ::Kernel._K_STILL_CODE
-            break
+            if INDENT_THRESHOLD__ <= @_indent_delta  # #coverpoint-5
+              cr.accept_line _release_code_line
+              redo
+            end
+          else
+            INDENT_HAS_DECREASED__ == d || ::Kernel._SANITY
           end
-
-          @_state = :__finish_and_release_non_first_discussion_run
-          break
-
-        when INDENT_HAS_DECREASED__
-
-          ::Kernel._K
-        else
-
-          ::Kernel._WONT_COVER
+          _accept_new_indent_level
         end
 
-        ::Kernel._WONT_COVER
-
-        # assume nonblank line. how does indent compare?
-
+        @_state = :_finish_and_release_non_first_discussion_run
+        break
       end while nil
 
-      cr
+      _clear_these
+      cr.finish
+    end
+
+    def _accept_new_indent_level
+      @_INDENT_LEVEL = @_this_indent_level
+    end
+
+    def _clear_these
+      @_indent_delta = nil ; remove_instance_variable :@_indent_delta
+      @_this_indent_level = nil ; remove_instance_variable :@_this_indent_level
     end
 
     INDENT_THRESHOLD__ = 4
@@ -182,7 +188,12 @@ module Skylab::DocTest
     INDENT_HAS_INCREASED__ = -1
     NO_CHANGE_IN_INDENT__ = 0
 
+    def _release_code_line
+      Models_::Code::Line.via_offsets_( * _release_code_line_vals )
+    end
+
     def _release_code_line_vals
+      _remove_these_ivars
       [
         remove_instance_variable( :@_margin_range ),
         remove_instance_variable( :@_content_range ),

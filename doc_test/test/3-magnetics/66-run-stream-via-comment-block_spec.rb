@@ -7,6 +7,7 @@ module Skylab::DocTest::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :embedded_line_collections
+    use :runs
 
     # (possibly like its sibling, this one stays tightly to this file:)
 
@@ -91,11 +92,11 @@ module Skylab::DocTest::TestSupport
       end
 
       it "(disc run)" do
-        _at_index_expect_cat_sym_and_num_lines 0, :discussion, 3
+        at_index_expect_cat_sym_and_num_lines_ 0, :discussion, 3
       end
 
       it "(code run)" do
-        _at_index_expect_cat_sym_and_num_lines 1, :code, 1
+        at_index_expect_cat_sym_and_num_lines_ 1, :code, 1
       end
     end
 
@@ -112,44 +113,13 @@ module Skylab::DocTest::TestSupport
       end
 
       it "(disc / code / disc)" do
-        _at_index_expect_cat_sym_and_num_lines 0, :discussion, 1
-        _at_index_expect_cat_sym_and_num_lines 1, :code, 1
-        _at_index_expect_cat_sym_and_num_lines 2, :discussion, 1
+        at_index_expect_cat_sym_and_num_lines_ 0, :discussion, 1
+        at_index_expect_cat_sym_and_num_lines_ 1, :code, 1
+        at_index_expect_cat_sym_and_num_lines_ 2, :discussion, 1
       end
     end
 
-    def _at_index_expect_cat_sym_and_num_lines d, sym, d_
-
-      run = _a.fetch( d )
-      run.category_symbol___ == sym or fail
-      run.number_of_lines___ == d_ or fail
-    end
-
-    def _for rx
-
-      _cb = __exactly_one_comment_block_for rx
-      _st = magnetics_module_::RunStream_via_CommentBlock[ _cb ]
-      _st.to_a
-    end
-
-    def __exactly_one_comment_block_for rx
-
-      cb = nil
-      _line_st = _ELC_line_stream_after rx
-      st = magnetics_module_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
-
-      begin
-        blk = st.gets
-        blk or break
-        sym = blk.category_symbol
-        :static == sym && redo
-        :comment == sym || ::Kernel._EEK
-        cb and ::Kernel._EEK
-        cb = blk
-        redo
-      end while nil
-      cb || ::Kernel._EEK
-    end
+    alias_method :_for, :run_array_via_regex_
   end
 end
 # history: this is a rename-and-cleanup of another test file numbered "66"
