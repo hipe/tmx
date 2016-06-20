@@ -29,7 +29,7 @@ module Skylab::DocTest::TestSupport
 
         it "has discussion run, is 3 lines long (#coverpoint-1)" do
           run = _run
-          run.category_symbol___ == :discussion or fail
+          run.category_symbol == :discussion or fail
           run.number_of_lines___ == 3 or fail
         end
 
@@ -53,7 +53,7 @@ module Skylab::DocTest::TestSupport
 
         it "has code run, is 1 line long" do
           run = _run
-          run.category_symbol___ == :code or fail
+          run.category_symbol == :code or fail
           run.number_of_lines___ == 1 or fail
         end
 
@@ -69,7 +69,7 @@ module Skylab::DocTest::TestSupport
 
       def _assemble_string
         _run.to_line_object_stream___.reduce_into_by "" do |s, o|
-          s << o.string___
+          s << o.string
         end
       end
 

@@ -39,7 +39,13 @@ module Skylab::DocTest
       freeze
     end
 
-    def to_line_matchdata_stream__
+    def to_line_stream_  # might be #testpoint-only..
+      to_line_matchdata_stream__.map_by do |md|
+        md.string
+      end
+    end
+
+    def to_line_matchdata_stream__  # and here
       Common_::Stream.via_nonsparse_array @_matchdatas
     end
 

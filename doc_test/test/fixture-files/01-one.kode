@@ -1,0 +1,18 @@
+module Foo
+
+  # this is a comment block with no example code
+  # this is the end of this block
+
+  # this is a comment block with code that has no magic copula string
+  #     1 == 1
+
+  # this comment block *does* have the magic copula string
+  # this selfsame line will serve as the description line of the example:
+  #
+  #     code before
+  #     1 == 1  # => true
+  #     code after
+  #
+  # that was a thing.
+
+end

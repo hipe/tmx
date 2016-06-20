@@ -52,6 +52,10 @@ module Skylab::DocTest::TestSupport
       Home_::OutputAdapters_
     end
 
+    def models_module_
+      Home_::Models_
+    end
+
     def magnetics_module_
       Home_::Magnetics_
     end

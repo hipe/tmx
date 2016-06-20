@@ -199,12 +199,19 @@ module Skylab::TestSupport
     Expect_same_string = -> actual_s, expected_s, context do
 
       lib = Home_.lib_.basic::String
-      exp_st = lib.line_stream expected_s
-      act_st = lib.line_stream actual_s
+
+      Streams_have_same_content.call(
+        lib.line_stream( actual_s ),
+        lib.line_stream( expected_s ),
+        context,
+      )
+    end
+
+    Streams_have_same_content = -> actual_st, expected_st, context do
 
       begin
-        act_s = act_st.gets
-        exp_s = exp_st.gets
+        act_s = actual_st.gets
+        exp_s = expected_st.gets
         if act_s
           if exp_s
             if exp_s == act_s

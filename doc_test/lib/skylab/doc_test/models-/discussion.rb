@@ -21,7 +21,13 @@ module Skylab::DocTest
         @_a.freeze ; self   # or not..
       end
 
-      def to_line_object_stream___  # #testpoint-only
+      def to_line_stream_  # might be #testpoint-only..
+        to_line_object_stream___.map_by do |o|
+          o.string
+        end
+      end
+
+      def to_line_object_stream___  # here too, #testpoint-only
         Common_::Stream.via_nonsparse_array @_a
       end
 
@@ -29,7 +35,7 @@ module Skylab::DocTest
         @_a.length
       end
 
-      def category_symbol___  # #testpoint-only
+      def category_symbol
         :discussion
       end
     end
@@ -45,12 +51,12 @@ module Skylab::DocTest
         @_margin_range = r
         @_content_range = r_
         @_LTS_range = r3
-        @_string = s
+        @string = s
       end
 
-      def string___  # #testpoint-only
-        @_string
-      end
+      attr_reader(
+        :string,
+      )
     end
   end
 end

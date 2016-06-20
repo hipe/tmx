@@ -11,7 +11,7 @@ module Skylab::DocTest::TestSupport
       def at_index_expect_cat_sym_and_num_lines_ d, sym, d_
 
         run = _a.fetch d
-        run.category_symbol___ == sym or fail
+        run.category_symbol == sym or fail
         run.number_of_lines___ == d_ or fail
       end
 

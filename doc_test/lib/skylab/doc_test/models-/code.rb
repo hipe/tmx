@@ -39,7 +39,13 @@ module Skylab::DocTest
         self
       end
 
-      def to_line_object_stream___  # #testpoint-only
+      def to_line_stream_  # might be #testpoint-only
+        to_line_object_stream___.map_by do |o|
+          o.string
+        end
+      end
+
+      def to_line_object_stream___  # here too. #testpoint-only
         Common_::Stream.via_nonsparse_array @_a
       end
 
@@ -47,7 +53,11 @@ module Skylab::DocTest
         @_a.length
       end
 
-      def category_symbol___  # #testpoint-only
+      attr_reader(
+        :has_magic_copula,
+      )
+
+      def category_symbol
         :code
       end
     end
@@ -75,17 +85,14 @@ module Skylab::DocTest
         @_margin_range = margin_r
         @_content_range = content_r
         @_LTS_range = lts_r
-        @_string = s
+        @string = s
       end
 
       COPULA_MD___ = /[ \t]*#[ \t]=>[ \t]/
 
-      def string___  # #testpoint-only
-        @_string
-      end
-
       attr_reader(
         :has_magic_copula,
+        :string,
       )
 
       def is_blank_line

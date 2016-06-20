@@ -275,12 +275,12 @@ module Skylab::DocTest
 
         @_LTS_range = _LTS_r
         @_margin_range = margin_r
-        @_string = s
+        @string = s
       end
 
-      def string___  # #testpoint-only
-        @_string
-      end
+      attr_reader(
+        :string,
+      )
 
       def is_blank_line  # #todo
         true

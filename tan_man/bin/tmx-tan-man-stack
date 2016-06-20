@@ -118,7 +118,7 @@ class Skylab::Stack
       if x
         if true == x
           0
-        elsif x.respond_to?( :gets )
+        elsif x.respond_to? :gets
           while line = x.gets
             @stderr.puts line
           end
@@ -241,7 +241,7 @@ class Skylab::Stack
     def __list__component_operation
 
       -> do
-        st = ___to_item_line_stream
+        st = _to_item_line_stream
         if st
           d = 0
           Stream__.new do
@@ -251,16 +251,39 @@ class Skylab::Stack
             end
           end
         else
-          @_oes_p.call :info, :expression, :stack_empty do | y |
-            y << "(stack empty.)"
-          end
-          Stream__.new do
-          end
+          _when_stack_empty
         end
       end
     end
 
-    def ___to_item_line_stream
+    def __top__component_operation
+
+      -> do
+        st = _to_item_line_stream
+        if st
+          line = st.gets  # the whole file was read. we don't have to close it.
+          p = -> do
+            p = -> { nil }  # EMPTY_P_, NOTHING_
+            line
+          end
+          Stream__.new do
+            p[]
+          end
+        else
+          _when_stack_empty
+        end
+      end
+    end
+
+    def _when_stack_empty
+      @_oes_p.call :info, :expression, :stack_empty do |y|
+        y << "(stack empty.)"
+      end
+      Stream__.new do
+      end
+    end
+
+    def _to_item_line_stream
       io = _readable_IO
       if io
         stack = []
