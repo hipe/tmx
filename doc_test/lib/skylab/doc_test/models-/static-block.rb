@@ -25,10 +25,6 @@ module Skylab::DocTest
       self  # we don't freeze because of #spot-N
     end
 
-    def number_of_lines___  # #testpoint only
-      @lines.length
-    end
-
     def category_symbol
       :static
     end

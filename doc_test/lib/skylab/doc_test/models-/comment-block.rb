@@ -43,10 +43,6 @@ module Skylab::DocTest
       Common_::Stream.via_nonsparse_array @_matchdatas
     end
 
-    def number_of_lines___  # #testpoint only
-      @_matchdatas.length
-    end
-
     def category_symbol
       :comment
     end
