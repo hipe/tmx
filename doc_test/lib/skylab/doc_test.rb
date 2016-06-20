@@ -71,45 +71,6 @@ module Skylab::DocTest
     end
   end  # >>
 
-    class Shared_Resources_
-
-      def initialize
-        @h = {}
-      end
-
-      def fetch * i_a, & p
-        touch_tail_hash( i_a ).fetch( i_a.last, & p )
-      end
-
-      def cached * i_a, & build_p
-        h = touch_tail_hash i_a
-        h.fetch i_a.last do
-          h[ i_a.last ] = build_p[]
-        end
-      end
-
-      def cache * i_a, x
-        touch_tail_hash( i_a )[ i_a.last ] = x
-        nil
-      end
-
-      def touch_head_hash i
-        @h.fetch i do
-          @h[ i ] = {}
-        end
-      end
-
-    private
-
-      def touch_tail_hash i_a
-        i_a[ 0 .. -2 ].reduce @h do | m, i |
-          m.fetch i do
-            m[ i ] = {}
-          end
-        end
-      end
-    end
-
   # --
 
   Common_ = ::Skylab::Common

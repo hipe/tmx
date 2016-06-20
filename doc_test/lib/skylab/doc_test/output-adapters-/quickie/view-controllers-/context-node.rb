@@ -1,3 +1,5 @@
+::Kernel._REWRITE_OR_SUNSET  # #todo
+
 module Skylab::DocTest
 
   module DocTest
