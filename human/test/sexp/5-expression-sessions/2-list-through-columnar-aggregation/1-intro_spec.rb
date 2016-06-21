@@ -74,9 +74,9 @@ module Skylab::Human::TestSupport
       end
 
       it "counts will be remembered even when values are not contiguous" do
-        push :X, :Y
-        push :P, :Q
-        push :X, :Z
+        push_symbols :X, :Y
+        push_symbols :P, :Q
+        push_symbols :X, :Z
         expect_line "X likes Y"
         expect_line "P likes Q"
         expect_line "X also likes Z"
@@ -116,9 +116,9 @@ module Skylab::Human::TestSupport
       end
 
       it "three times" do
-        push :A, :B
-        push :A, :B
-        push :A, :B
+        push_symbols :A, :B
+        push_symbols :A, :B
+        push_symbols :A, :B
         expect_line 'AB'
         expect_line 'AB again'
         expect_line 'AB again'
@@ -126,10 +126,10 @@ module Skylab::Human::TestSupport
       end
 
       it "strange things in between" do
-        push :A, :B
-        push :G, :Q
-        push :A, :B
-        push :G, :Q
+        push_symbols :A, :B
+        push_symbols :G, :Q
+        push_symbols :A, :B
+        push_symbols :G, :Q
         expect_line 'AB'
         expect_line 'GQ'
         expect_line 'AB again'
@@ -185,25 +185,25 @@ module Skylab::Human::TestSupport
       end
 
       it "three frames" do
-        push :A, ' wahoo'
-        push :B, ' wahoo'
-        push :C, ' wahoo'
+        push_mixed :A, ' wahoo'
+        push_mixed :B, ' wahoo'
+        push_mixed :C, ' wahoo'
         expect_line "A and B and C wahoo"
         expect_no_more_lines
       end
 
       it "three frames third dissimilar" do
-        push :A, 1
-        push :B, 1
-        push :C, 2
+        push_mixed :A, 1
+        push_mixed :B, 1
+        push_mixed :C, 2
         expect_line 'A and B1'
         expect_line 'C2'
         expect_no_more_lines
       end
 
       it "when the non-repeating field does not have an aggregator" do
-        push :A, 1
-        push :A, 2
+        push_mixed :A, 1
+        push_mixed :A, 2
         expect_line 'A1'
         expect_line 'A2'
         expect_no_more_lines

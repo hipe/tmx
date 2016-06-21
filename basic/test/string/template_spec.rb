@@ -44,25 +44,25 @@ module Skylab::Basic::TestSupport
         "foo {{ bar_baz }} biff {{bongo}}"
       end
 
-      it '`to_formal_variable_stream`' do
+      it '`to_parameter_occurrence_stream`' do
 
         subject.new_with( :string, template_string ).
-          to_formal_variable_stream.map_by( & :name_symbol ).to_a.should eql(
+          to_parameter_occurrence_stream.map_by( & :name_symbol ).to_a.should eql(
             [ :bar_baz, :bongo ] )
       end
 
       it "with `formal_paramters`, offset data, surface representation too" do
 
         o = subject.new_with :string, template_string
-        a = o.to_formal_variable_stream.to_a
+        a = o.to_parameter_occurrence_stream.to_a
 
         a.length.should eql 2
 
-        a.first.surface_s.should eql '{{ bar_baz }}'
+        a.first.surface_string.should eql '{{ bar_baz }}'
         a.first.name_symbol.should eql :bar_baz
         a.first.offset.should eql 4
 
-        a.last.surface_s.should eql '{{bongo}}'
+        a.last.surface_string.should eql '{{bongo}}'
         a.last.name_symbol.should eql :bongo
         a.last.offset.should eql 23
       end

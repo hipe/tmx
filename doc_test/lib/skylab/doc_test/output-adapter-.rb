@@ -2,7 +2,34 @@ module Skylab::DocTest
 
   module OutputAdapter_  # :[#004].
 
-    # (will rewrite)
+    # ==
+
+    class Paraphernalia_Loader
+
+      def initialize mod
+        @module = mod
+      end
+
+      def paraphernalia_class_for sym
+        Autoloader_.const_reduce [ sym ], @module
+      end
+    end
+
+    class Template_Loader
+
+      def initialize path
+        @dir_path = path
+      end
+
+      def build_template_via_file_path file_path
+
+        _full_path = ::File.expand_path file_path, @dir_path
+
+        Models_::Template.via_full_path _full_path
+      end
+    end
+
+    # ==
 
     # (when view controller, was [#005])
 

@@ -12,40 +12,39 @@ module Skylab::DocTest
       def initialize m_r, c_r, lts_r, s
 
         @_a = []
-
-        @_see = -> li do
-
-          if ! li.is_blank_line
-            # (hi.)
-            if li.has_magic_copula
-              @has_magic_copula = true
-              @_see = MONADIC_EMPTINESS_ ; nil
-            end
-          end
-        end
-
-        accept_line Line.via_offsets_( m_r, c_r, lts_r, s )
+        @_content_begin = c_r.begin
+        accept_line_via_offsets m_r, c_r, lts_r, s
       end
 
-      def accept_line li
+      def accept_line_via_offsets m_r, c_r, l_r, s
 
-        @_see[ li ]
+        # whatever the first code line was, that sets the cutoff margin
+        # to be used for all code lines. so disregard what the common
+        # regex says is the beginning offset for content.
+
+        li = Line___.__via_offsets m_r, ( @_content_begin ... c_r.end ), l_r, s
+        if li.has_magic_copula
+          @has_magic_copula = true
+        end
+        accept_line_object li
+      end
+
+      def accept_line_object li
         @_a.push li ; nil
       end
 
       def finish
-        remove_instance_variable :@_see
         @_a.freeze  # or not..
         self
       end
 
       def to_line_stream_  # might be #testpoint-only
-        to_line_object_stream___.map_by do |o|
+        to_line_object_stream.map_by do |o|
           o.string
         end
       end
 
-      def to_line_object_stream___  # here too. #testpoint-only
+      def to_line_object_stream
         Common_::Stream.via_nonsparse_array @_a
       end
 
@@ -55,6 +54,7 @@ module Skylab::DocTest
 
       attr_reader(
         :has_magic_copula,
+        :MARGIN_POSITION___,
       )
 
       def category_symbol
@@ -62,10 +62,10 @@ module Skylab::DocTest
       end
     end
 
-    class Line
+    class Line___
 
       class << self
-        alias_method :via_offsets_, :new
+        alias_method :__via_offsets, :new
         undef_method :new
       end  # >>
 
@@ -73,24 +73,42 @@ module Skylab::DocTest
 
         # not blank so the content string has something
 
-        md = COPULA_MD___.match s, content_r.begin
+        md = COPULA_RX___.match s, content_r.begin
 
         if md
           @has_magic_copula = true
-          @_COPULA_RANGE = md.offset 0
+          @copula_range = ::Range.new( * md.offset(0), true )
         else
           @has_magic_copula = false
         end
 
         @_margin_range = margin_r
         @_content_range = content_r
-        @_LTS_range = lts_r
+        @LTS_range = lts_r
         @string = s
       end
 
-      COPULA_MD___ = /[ \t]*#[ \t]=>[ \t]/
+      COPULA_RX___ = /[ \t]*#[ \t]=>[ \t]/
+
+      def to_common_paraphernalia_given choices  # assume has magic copula
+        Models_::CopulaAssertion.via_code_line__ self, choices
+      end
+
+      def get_content_line
+        @string[ get_content_line_range ]
+      end
+
+      def get_content_line_range
+        content_begin ... @LTS_range.end
+      end
+
+      def content_begin
+        @_content_range.begin
+      end
 
       attr_reader(
+        :copula_range,
+        :LTS_range,
         :has_magic_copula,
         :string,
       )

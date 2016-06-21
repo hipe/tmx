@@ -119,8 +119,8 @@ module Skylab::Basic
 
         o = Home_::String.template.new_with(
           :string, s,
-          :surface_pair_mapper, -> pair do
-            s = pair.unparsed_surface_content_s
+          :couplet_mapper, -> pair do
+            s = pair.unparsed_surface_content_string
             if s and s.include? IF_S___
               __receive_surface_var_with_conditional pair
             end
@@ -129,7 +129,7 @@ module Skylab::Basic
 
         @template_o = o
 
-        bx = o.to_formal_variable_stream.
+        bx = o.to_parameter_occurrence_stream.
           flush_to_box_keyed_to_method :name_symbol
 
         @tmpl_var_bx = o.formal_variable_box
@@ -143,10 +143,10 @@ module Skylab::Basic
 
       def __receive_surface_var_with_conditional var
 
-        md = IF_RX__.match var.unparsed_surface_content_s
+        md = IF_RX__.match var.unparsed_surface_content_string
         exp_s, cond_s = md.captures
 
-        var.unparsed_surface_content_s = nil
+        var.unparsed_surface_content_string = nil
         exp_s.strip!
         cond_s.strip!
         var.name_symbol = exp_s.intern

@@ -54,10 +54,13 @@ module Skylab::Human
       end
 
       def via_template_parse_remainder_of_polymorphic_stream st
+
         bx = Common_::Box.new
-        @nucleus.template.to_formal_variable_stream.each do | param |
-          bx.add param.name_symbol, Behaviors___.new( param )
+
+        @nucleus.template.to_parameter_occurrence_stream.each do |occu|
+          bx.add occu.name_symbol, Behaviors___.new( occu )
         end
+
         @nucleus.field_box = bx
         @nucleus.name_i_a = bx.get_names.freeze
         via_template_variables_parse_remainder_of_polymorphic_stream st

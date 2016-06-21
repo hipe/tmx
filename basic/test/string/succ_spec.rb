@@ -34,7 +34,7 @@ module Skylab::Basic::TestSupport
       p[].should eql 'x4'
     end
 
-    it "`first_item_does_not_use_number`" do
+    it "`first_item_does_not_use_number`" do  # #spot-1
       p = subject :first_item_does_not_use_number,
         :template, 'x{{ ID }}'
       p[].should eql 'x'

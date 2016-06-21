@@ -167,7 +167,7 @@ module Skylab::DocTest::TestSupport
           begin  # skip these leading blank lines
             line = st.gets
             line or break
-            if BLANK_RX__ =~ line
+            if BLANK_RX_ =~ line
               redo
             end
           end while nil
@@ -203,7 +203,7 @@ module Skylab::DocTest::TestSupport
           begin
             line or break  # NOTE the file can end here
 
-            if BLANK_RX__ =~ line
+            if BLANK_RX_ =~ line
               md = INDENTED_RX__.match line
               if md
                 indent_level_ = current_indent_level[]
@@ -243,7 +243,7 @@ module Skylab::DocTest::TestSupport
             break  # current line is nil or the next ordinary line
           end while nil
 
-          while BLANK_RX__ =~ cache.last
+          while BLANK_RX_ =~ cache.last
             cache.pop
           end
 
@@ -277,7 +277,7 @@ module Skylab::DocTest::TestSupport
         "no ELC matching /#{ rx.source }/ across #{ @_cache.length } ELC's"
       end
 
-      BLANK_RX__ = /\A[[:space:]]+\z/
+      BLANK_RX_ = Home_::BLANK_RX_
       COLON_RX___ = /:$/
       INDENTED_RX__ = /\A[\t ]+(?=[^[:space:]])/
     end

@@ -46,7 +46,13 @@ module Skylab::DocTest::TestSupport
       TestSupport_.debug_IO
     end
 
-    # --
+    # -- support for making assertions
+
+    def line_stream_via_string_ whole_string
+      Home_.lib_.basic::String.line_stream whole_string
+    end
+
+    # -- support for setting up
 
     def output_adapters_module_
       Home_::OutputAdapters_

@@ -68,7 +68,7 @@ module Skylab::DocTest::TestSupport
       end
 
       def _assemble_string
-        _run.to_line_object_stream___.reduce_into_by "" do |s, o|
+        _run.to_line_object_stream.reduce_into_by "" do |s, o|
           s << o.string
         end
       end

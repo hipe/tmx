@@ -32,11 +32,7 @@ module Skylab::Basic
       def initialize
 
         @is_not_parsed = true
-        @surface_pair_mapper = nil
-      end
-
-      def members
-        [ :call, :to_formal_variable_stream ]
+        @couplet_mapper = nil
       end
 
     private
@@ -53,41 +49,45 @@ module Skylab::Basic
         KEEP_PARSING_
       end
 
-      def surface_pair_mapper=
-        @surface_pair_mapper = gets_one_polymorphic_value
+      def couplet_mapper=
+        @couplet_mapper = gets_one_polymorphic_value
         KEEP_PARSING_
       end
 
     public
 
       def call actuals
-        __render_into_against( [], actuals ) * EMPTY_S_
+        express_into_against "", actuals
       end
 
-      def __render_into_against y, actuals
+      def express_into_against y, actuals
 
-        st = _parse_tree.to_pair_stream
+        st = _parse_tree.__parse_tree_to_couplet_stream
 
         begin
 
-          pair = st.gets
-          pair or break
+          couplet = st.gets
+          couplet or break
 
-          s = pair.plain_s
+          s = couplet._static_string
           if s
             y << s
           end
 
-          k = pair.name_symbol
+          k = couplet.name_symbol
           if k
+
             had = true
             x = actuals.fetch k do
               had = false
             end
+
             if had
-              y << x
+              if x  # #spot-1
+                y << x
+              end
             else
-              y << pair.surface_s
+              y << couplet.parameter_occurrence_surface_string
             end
           end
 
@@ -98,21 +98,21 @@ module Skylab::Basic
       end
 
       def first_margin_for sym
-        _parse_tree.fo_bx.fetch( sym ).margin_s
+        _parse_tree._occurrence_box.fetch( sym ).margin_string
       end
 
       def formal_variable_box
-        _parse_tree.fo_bx
+        _parse_tree._occurrence_box
       end
 
-      def to_formal_variable_stream
-        _parse_tree.fo_bx.to_value_stream
+      def to_parameter_occurrence_stream
+        _parse_tree._occurrence_box.to_value_stream
       end
 
       def _parse_tree
         if @is_not_parsed
           @is_not_parsed = false
-          @parse_tree = Parse___.new( @buid, @surface_pair_mapper ).parse
+          @parse_tree = Parse___.new( @buid, @couplet_mapper ).parse
         end
         @parse_tree
       end
@@ -121,30 +121,30 @@ module Skylab::Basic
 
         def initialize buid, fvm
           @buid = buid
-          @surface_pair_mapper = fvm
+          @couplet_mapper = fvm
         end
 
         def parse
 
-          pair_a = [] ; surface_h = {}
+          item_a = [] ; surface_h = {}
 
           formal_box = Common_::Box.new
           marg = Margin_Engine__.new
-          st = __to_pair_stream
+          st = ___parse_to_couplet_stream
 
           begin
-            pair = st.gets
-            pair or break
+            o = st.gets
+            o or break
 
-            if @surface_pair_mapper
-              pair = @surface_pair_mapper[ pair ]
+            if @couplet_mapper
+              o = @couplet_mapper[ o ]
             end
 
-            pair.resolve_any_name_symbol_
+            o.__init_any_name_symbol
 
-            sym = pair.name_symbol
+            sym = o.name_symbol
             if ! sym
-              pair_a.push pair
+              item_a.push o
               redo
             end
 
@@ -153,43 +153,49 @@ module Skylab::Basic
               subsequent_sighting = false
               surface_h[ sym ] = []
             end
-            _a.push pair_a.length
+            _a.push item_a.length
 
-            pair_a.push pair
+            item_a.push o
 
             if subsequent_sighting
               redo
             end
 
-            marg.take pair.plain_s
+            marg.take o._static_string
 
-            fo = Formal___.new( marg.give,  # margin
-              ( @scn.pos - pair.surface_s.length ),  # offset
-              pair )
+            _offset = @__volatile_string_scanner.pos -
+              o.parameter_occurrence_surface_string.length
 
-            formal_box.add fo.name_symbol, fo
+            occu = Parameter_Occurrence___.new(
+              marg.give,
+              _offset,
+              o,
+            )
+
+            formal_box.add occu.name_symbol, occu
 
             redo
           end while nil
 
-          Parse_Tree___.new( formal_box, pair_a, surface_h )
+          Parse_Tree___.new( formal_box, item_a, surface_h )
         end
 
-        def __to_pair_stream
+        def ___parse_to_couplet_stream
 
           var_rx = VAR_RX__
 
           plain_rx = /(?: (?! #{ var_rx.source } ) . )+/mx
 
           scn = Home_.lib_.string_scanner @buid.whole_string
-          @scn = scn
+          @__volatile_string_scanner = scn
 
           p = -> do
             if scn.eos?
               p = EMPTY_P_
-              nil
+              remove_instance_variable :@__volatile_string_scanner
+              NOTHING_
             else
-              Pair___.new scn.scan( plain_rx ), scn.scan( var_rx )
+              Static_then_Parameter_Strings___.new scn.scan( plain_rx ), scn.scan( var_rx )
             end
           end
 
@@ -199,31 +205,41 @@ module Skylab::Basic
         end
       end
 
-      class Pair___
+      class Static_then_Parameter_Strings___  # a.k.a "couplet"
+
+        # we parse tempate bytes by turning them into a stream of
+        # "couplets" where each couplet is one static string and one
+        # parameter surface string
 
         def initialize plain_s, surface_s
-          @plain_s = plain_s
-          @surface_s = surface_s
-          @unparsed_surface_content_s = if surface_s
+
+          @_static_string = plain_s
+          @parameter_occurrence_surface_string = surface_s
+          @unparsed_surface_content_string = if surface_s
             VAR_RX__.match( surface_s )[ 1 ]
           end
         end
 
-        def members
-          [ :name_symbol, :plain_s, :surface_s, :unparsed_surface_content_s ]
-        end
+        attr_writer(
+          :name_symbol,
+          :unparsed_surface_content_string,
+        )
 
-        attr_reader :plain_s, :surface_s
-        attr_accessor :name_symbol, :unparsed_surface_content_s
-
-        def resolve_any_name_symbol_
-          s = @unparsed_surface_content_s
+        def __init_any_name_symbol
+          s = @unparsed_surface_content_string
           if s
             sym = Name_symbol_via_surface_string__[ s ]
             @name_symbol = sym
           end
           nil
         end
+
+        attr_reader(
+          :name_symbol,
+          :_static_string,
+          :parameter_occurrence_surface_string,
+          :unparsed_surface_content_string,
+        )
       end
 
       VAR_RX__ = Home_::String.mustache_regexp
@@ -233,45 +249,38 @@ module Skylab::Basic
       end
 
       class Parse_Tree___
-        def initialize formal_bx, pair_a, surface_h
-          @fo_bx = formal_bx
-          @a = pair_a
-          @h = surface_h
-        end
-        def members
-          [ :a, :fo_box, :h ]
-        end
-        attr_reader :a, :fo_bx, :h
 
-        def to_pair_stream
-          a = @a
-          Common_::Stream.via_times a.length do | d |
-            a.fetch d
-          end
+        def initialize occu_bx, coup_a, surface_h
+
+          @_couplets = coup_a
+          @_hash = surface_h
+          @_occurrence_box = occu_bx
         end
+
+        def __parse_tree_to_couplet_stream
+          Common_::Stream.via_nonsparse_array @_couplets
+        end
+
+        attr_reader(
+          :_occurrence_box,
+        )
       end
 
-      class Formal___
+      class Parameter_Occurrence___
 
-        def initialize s, d, x
-          @margin_s = s
+        def initialize s, d, o
+          @margin_string = s
+          @name_symbol = o.name_symbol
           @offset = d
-          @pair = x
+          @surface_string = o.parameter_occurrence_surface_string
         end
 
-        def members
-          [ :margin_s, :name_symbol, :offset, :surface_s ]
-        end
-
-        attr_reader :margin_s, :offset
-
-        def name_symbol
-          @pair.name_symbol
-        end
-
-        def surface_s
-          @pair.surface_s
-        end
+        attr_reader(
+          :margin_string,
+          :name_symbol,
+          :surface_string,
+          :offset,
+        )
       end
 
       Margin_Engine__ = Common_::Session::Ivars_with_Procs_as_Methods.new :give, :take do

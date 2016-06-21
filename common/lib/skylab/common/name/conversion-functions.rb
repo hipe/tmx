@@ -62,19 +62,24 @@ module Skylab::Common
       end
     end.call
 
-    Methodize = -> do
+    Methodize = -> s do
+      Snake_case_string_via_human[ s ].intern
+    end
+
+    Snake_case_string_via_human = -> do
 
       black_rx = /[^a-z0-9]+/i
+      leading_or_trailing_separators_rx = /\A_+|_+\z/
       part_rx = /(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/
 
       -> s do
-
         s_ = s.to_s.gsub part_rx do
           "#{ UNDERSCORE_ }#{ $1 || $2 }"
         end
         s_.gsub! black_rx, UNDERSCORE_
+        s_.gsub! leading_or_trailing_separators_rx, EMPTY_S_
         s_.downcase!
-        s_.intern
+        s_
       end
     end.call
 

@@ -1,0 +1,3 @@
+def {{ test_case_method_name }}
+  {{ example_body }}
+end

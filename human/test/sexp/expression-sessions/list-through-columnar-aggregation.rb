@@ -12,11 +12,27 @@ module Skylab::Human::TestSupport
       Home_::Sexp.expression_session_via_sexp sx
     end
 
+    def push_mixed * x_a
+      _push x_a, To_s___
+    end
+
+    To_s___ = :to_s.to_proc
+
+    def push_symbols * sym_a
+      _push sym_a, Id2name___
+    end
+
+    Id2name___ = :id2name.to_proc
+
     def push * s_a
+      _push s_a, Home_::IDENTITY_
+    end
+
+    def _push in_x_a, p
       i_a = subject.field_i_a
       x_a = []
-      s_a.each_with_index do |s, d|
-        x_a.push i_a.fetch( d ), s
+      in_x_a.each_with_index do |x, d|
+        x_a.push i_a.fetch( d ), p[ x ]
       end
       push_input_frame_iambic x_a ; nil
     end

@@ -13,7 +13,11 @@ module Skylab::DocTest
         @_a = []
       end
 
-      def accept_line o
+      def accept_line_via_offsets m_r, c_r, l_r, s
+        accept_line_object Line___.___via_offsets( m_r, c_r, l_r, s ) ; nil
+      end
+
+      def accept_line_object o
         @_a.push o ; nil
       end
 
@@ -21,13 +25,27 @@ module Skylab::DocTest
         @_a.freeze ; self   # or not..
       end
 
+      def any_last_nonblank_line_object__
+
+        a = @_a
+        st = Common_::Stream.via_range( a.length - 1 .. 0 ).map_by do |d|
+          a.fetch d
+        end
+        begin
+          lo = st.gets
+          lo || break
+          lo.is_blank_line ? redo : break
+        end while nil
+        lo
+      end
+
       def to_line_stream_  # might be #testpoint-only..
-        to_line_object_stream___.map_by do |o|
+        to_line_object_stream.map_by do |o|
           o.string
         end
       end
 
-      def to_line_object_stream___  # here too, #testpoint-only
+      def to_line_object_stream
         Common_::Stream.via_nonsparse_array @_a
       end
 
@@ -40,10 +58,10 @@ module Skylab::DocTest
       end
     end
 
-    class Line
+    class Line___
 
       class << self
-        alias_method :via_offsets__, :new
+        alias_method :___via_offsets, :new
         undef_method :new
       end  # >>
 
@@ -54,9 +72,17 @@ module Skylab::DocTest
         @string = s
       end
 
+      def get_content_string
+        @string[ @_content_range ]
+      end
+
       attr_reader(
         :string,
       )
+
+      def is_blank_line
+        false
+      end
     end
   end
 end

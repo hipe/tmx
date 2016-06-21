@@ -1,3 +1,9 @@
+[#026]       particular paraphernalia model ..
+
+[#025]       common paraphernalia model..
+
+[#024]       (coming soon..)
+
 [#023]       run edge cases ..
 
 [#022]       (this internal ELC thing)

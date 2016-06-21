@@ -32,7 +32,8 @@
 
 [#049]       #doc-node the scn narrative ..
 
-[#048] #hole ( #was parent node. #moved-to: [#hu-054] )
+[#048] #open #minor is this a bug that this doesn't work? (name func. at [dt])
+             ( #was parent node. #moved-to: [#hu-054] )
 
 [#047]       #strain the family-strain of facilities that are basically
              `Enumerator#join`. ( #was: eventing .. #moved-to: [#hu-053] )

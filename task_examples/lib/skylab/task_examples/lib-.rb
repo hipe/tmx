@@ -12,11 +12,6 @@ module Skylab::TaskExamples
       System_lib___[].services.environment.any_home_directory_pathname
     end
 
-    Methodize = -> sym do
-      self._HELLO
-      Common_::Name::Methodize[ sym ]
-    end
-
     Task = sidesys[ :Task ]
 
     System = -> do

@@ -39,7 +39,7 @@ module Skylab::DocTest
 
         _init_empty_discussion_run
         blanks.each do |o|
-          @_discussion_run.accept_line o
+          @_discussion_run.accept_line_object o
         end
         @_state = :_nothing
         _release_discussion_run
@@ -51,7 +51,7 @@ module Skylab::DocTest
         _init_empty_discussion_run
         if blanks
           blanks.each do |o|
-            @_discussion_run.accept_line o
+            @_discussion_run.accept_line_object o
           end
         end
         _finish_and_release_discussion_run
@@ -72,7 +72,7 @@ module Skylab::DocTest
 
       # assume you have a current line that is a discussion line..
 
-      @_discussion_run.accept_line _release_discussion_line
+      @_discussion_run.accept_line_via_offsets( * _release_discussion_line_args )
 
       # while there are more lines and the line is a discussion line, same.
 
@@ -86,7 +86,7 @@ module Skylab::DocTest
         end
 
         if @_line_is_blank  # #coverpoint-1
-          @_discussion_run.accept_line _release_blank_line
+          @_discussion_run.accept_line_object _release_blank_line
           redo
         end
 
@@ -112,7 +112,7 @@ module Skylab::DocTest
           _accept_new_indent_level
         end
 
-        @_discussion_run.accept_line _release_discussion_line
+        @_discussion_run.accept_line_via_offsets( * _release_discussion_line_args )
         redo
       end while nil
 
@@ -128,7 +128,7 @@ module Skylab::DocTest
 
       # assume you have a current line that is a code line..
 
-      cr = Models_::Code::Run.begin_via_offsets__( * _release_code_line_vals )
+      cr = Models_::Code::Run.begin_via_offsets__( * _release_code_line_args )
 
       # while there are more lines and the line is a code line, keep going
 
@@ -142,7 +142,7 @@ module Skylab::DocTest
         end
 
         if @_line_is_blank  # #coverpoint-6
-          cr.accept_line _release_blank_line
+          cr.accept_line_object _release_blank_line
           redo
         end
 
@@ -157,7 +157,7 @@ module Skylab::DocTest
           if INDENT_HAS_INCREASED__ == d
 
             if INDENT_THRESHOLD__ <= @_indent_delta  # #coverpoint-5
-              cr.accept_line _release_code_line
+              cr.accept_line_via_offsets( * _release_code_line_args )
               redo
             end
           else
@@ -188,11 +188,7 @@ module Skylab::DocTest
     INDENT_HAS_INCREASED__ = -1
     NO_CHANGE_IN_INDENT__ = 0
 
-    def _release_code_line
-      Models_::Code::Line.via_offsets_( * _release_code_line_vals )
-    end
-
-    def _release_code_line_vals
+    def _release_code_line_args
       _remove_these_ivars
       [
         remove_instance_variable( :@_margin_range ),
@@ -202,14 +198,14 @@ module Skylab::DocTest
       ]
     end
 
-    def _release_discussion_line
+    def _release_discussion_line_args
       _remove_these_ivars
-      Models_::Discussion::Line.via_offsets__(
+      [
         remove_instance_variable( :@_margin_range ),
         remove_instance_variable( :@_content_range ),
         remove_instance_variable( :@_LTS_range ),
         remove_instance_variable( :@_string ),
-      )
+      ]
     end
 
     def _release_blank_line
@@ -282,7 +278,7 @@ module Skylab::DocTest
         :string,
       )
 
-      def is_blank_line  # #todo
+      def is_blank_line
         true
       end
     end
