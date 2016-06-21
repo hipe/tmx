@@ -2,7 +2,7 @@
 
 [#025]       common paraphernalia model..
 
-[#024]       (coming soon..)
+[#024]       node-theory ..
 
 [#023]       run edge cases ..
 

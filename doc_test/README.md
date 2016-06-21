@@ -12,7 +12,31 @@ variously kicking ourselves and lauding ourselves as appropriate)).
 
 ### synopsis
 
-(EDIT)
+if your "asset document" contains something like this:
+
+    # this singleton method
+    # makes a string from two strings:
+    #
+    #     MyLib.join( 'foo', 'bar' )  # => "foo AND bar"
+
+    (your code here)
+
+    # it can produce an array from such a string:
+    #
+    #     MyLib.split( 'foo AND bar' )  # => %w( foo bar )
+
+    (more code here, etc)
+
+the subject sidesystem can produce something like this:
+
+    it "makes a string from two strings" do
+      MyLib.join( 'foo', 'bar' ).should eql "foo AND bar"
+    end
+
+    it "can produce an array from such a string" do
+      MyLib.split( 'foo AND bar' ).should eql %w( foo bar )
+    end
+
 
 see more in the "overview" section below.
 
@@ -23,7 +47,7 @@ see more in the "overview" section below.
 because both a) this is largely a proof-of-concept and b) to do this
 "right" is outside our current scope of interest for this platform,
 this entire project is at its essence a hack: we "parse" code files and
-test files in this project, but we do not do so the "right" way, so edge
+test files in this project, but we do *not* do so the "right" way, so edge
 cases will certainly exist where the subject sidesystem will fail.
 (this is discussed further in [#019] current limitations in parsing.)
 
@@ -55,7 +79,7 @@ want (to the extent that that is possible), it may be useful to
 understand how it parses asset documents and turns them into test
 documents.
 
-at the coarsest level, the subject sidsystem parses the input (which it
+at the coarsest level, the subject sidesystem parses the input (which it
 sees as a line stream, but which is usually a file (an "asset document"))
 into "blocks": comment blocks and static blocks. see [#020] "what are
 comment blocks?" for more on this particular part of it.
@@ -65,4 +89,27 @@ by first breaking the comment block into "runs" of associated lines.
 there are "discussion runs" and "code runs". the former is freeform
 natural language, and the latter is example code that can (sometimes) be
 turned into tests. for more about this, see [#021] "what are runs?".
+
+these "runs" (that is, discussion runs in tandem with code runs) can
+then be turned into "items" like examples (or experimentally shared
+setup methods) which ultimately can contribute to producing test code.
+for detail on the logic behind this, see [#024] "what are items?".
+
+but we leverage the most power from the subject sidesystem by pointing
+it at existing test files, which we call "synchronization"..
+
+
+
+
+## experimental cool new feature 1: synchronization
+
+(EDIT)
+
+
+
+
+## experimental cool new feature 2: reverse synchronization
+
+(EDIT)
+
 _

@@ -2,11 +2,17 @@
 
 ## content (rougly in development order)
 
-  • block: the topost meta-kind of structure under document.
+  • block: the topmost meta-kind of structure under document.
     kind is `static` or `comment`.
 
   • run: a `comment` block can be broken down into ths "sub-blocks":
     a "discussion run" or a "code run".
+
+  • item: for "forwards" output (normal use), an item is an artifact
+    of tests. kind is `example` or ([#024]). code runs (bolstered
+    by discussion runs) make items.
+
+  • node: an experimenal branch-like grouping of items. see [#024].
 
   • "common paraphernalia models" (see paraphernalia). "common"
     paraphernalia is paraphernalia likely to be found in most test suite

@@ -28,10 +28,9 @@ module Skylab::DocTest::TestSupport
 
       it "as-is, whole document is lossless" do
 
-        TestSupport_::Expect_Line::Streams_have_same_content.call(
+        expect_actual_line_stream_has_same_content_as_expected_(
           _document.to_line_stream___,
           line_stream_via_fixture_file_symbol_( :one ),
-          self,
         )
       end
     end

@@ -60,7 +60,10 @@ module Skylab::DocTest::TestSupport
     #     is ever read more than once. as a precaution, the ELC lines
     #     will be frozen (so they cannot for example be chomped).
     #
-    #   • ISSUE: at present, the opened file will never close..
+    #   • ISSUE: at present, the opened file will never close by itself.
+    #     the workaround for this is that the client can call a method to
+    #     close the file when she knows she is done with it (typically
+    #     when the last ELC that appears in the file has been read).
 
     module ModuleMethods___
 
@@ -80,12 +83,7 @@ module Skylab::DocTest::TestSupport
 
       def _ELC_line_stream_after rx
 
-        Common_::Stream.via_nonsparse_array __ELC_lines_after rx
-      end
-
-      def __ELC_lines_after rx
-
-        _ELC_file.line_array_via_regex rx
+        _ELC_file.line_stream_via_regex rx
       end
 
       def _ELC_close_if_necessary
@@ -93,12 +91,12 @@ module Skylab::DocTest::TestSupport
       end
 
       def _ELC_file
-        ___ELC_file_via_path _ELC_path_for_in_file
+        _ELC_file_via_path _ELC_path_for_in_file
       end
 
       -> do
         cache = {}
-        define_method :___ELC_file_via_path do |path|
+        define_method :_ELC_file_via_path do |path|
           cache.fetch path do
             x = File___.new ::File.open( path, ::File::RDONLY )
             cache[ path ] = x
@@ -120,7 +118,7 @@ module Skylab::DocTest::TestSupport
         @_hot = true
       end
 
-      def line_array_via_regex rx
+      def line_stream_via_regex rx
 
         if @_hot
           col = __lookup rx
@@ -130,7 +128,7 @@ module Skylab::DocTest::TestSupport
           col = __seek_in_cache rx
         end
 
-        col.lines
+        Common_::Stream.via_nonsparse_array col.lines
       end
 
       def close_if_necessary

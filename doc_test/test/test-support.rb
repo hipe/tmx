@@ -48,11 +48,27 @@ module Skylab::DocTest::TestSupport
 
     # -- support for making assertions
 
+    def expect_actual_line_stream_has_same_content_as_expected_ a_st, e_st
+      TestSupport_::Expect_Line::Streams_have_same_content[ a_st, e_st, self ]
+    end
+
     def line_stream_via_string_ whole_string
       Home_.lib_.basic::String.line_stream whole_string
     end
 
     # -- support for setting up
+
+    -> do
+      yes = true ; x = nil
+      define_method :real_default_choices_ do
+        if yes
+          yes = false
+          x = Home_::OutputAdapters_::Quickie.begin_choices
+          x.init_default_choices
+        end
+        x
+      end
+    end.call
 
     def output_adapters_module_
       Home_::OutputAdapters_

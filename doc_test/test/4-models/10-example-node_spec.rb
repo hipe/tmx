@@ -27,7 +27,7 @@ module Skylab::DocTest::TestSupport
         _build_subject_instance_via_these_runs_and_choices(
           _same_discussion_run,
           _same_code_run,
-          __real_choices,
+          real_default_choices_,
         )
       end
 
@@ -78,20 +78,13 @@ module Skylab::DocTest::TestSupport
       def __widget_choices
         TS_::FixtureOutputAdapters::Widget.choices_instance___
       end
-
-      def __real_choices
-        o = Home_::OutputAdapters_::Quickie.begin_choices
-        o.init_default_choices
-        o
-      end
     end
 
     def _expect_big_string subject_instance, big_exp_s
 
-      TestSupport_::Expect_Line::Streams_have_same_content.call(
+      expect_actual_line_stream_has_same_content_as_expected_(
         subject_instance.to_line_stream,
         line_stream_via_string_( big_exp_s ),
-        self,
       )
     end
 
@@ -112,3 +105,4 @@ module Skylab::DocTest::TestSupport
     end
   end
 end
+# this test file is #file-1 (a fallback point)
