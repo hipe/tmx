@@ -35,7 +35,7 @@ module Skylab::DocTest::TestSupport
         _widget_subject_instance or fail
       end
 
-      it "builds (real)", wip: true do
+      it "builds (real)" do
         _real_subject_instance or fail
       end
 
@@ -49,7 +49,7 @@ module Skylab::DocTest::TestSupport
         HERE
       end
 
-      it "wahoootey (real)", wip: true do
+      it "wahoootey (real)" do
 
         _expect_big_string _real_subject_instance, <<-HERE.unindent
           it "smooth mamma jamma" do
@@ -75,12 +75,14 @@ module Skylab::DocTest::TestSupport
         HERE
       end
 
-      def __widget_choices  # not memoized
+      def __widget_choices
         TS_::FixtureOutputAdapters::Widget.choices_instance___
       end
 
-      def __real_choices  # not memoized
-        ::Kernel._K
+      def __real_choices
+        o = Home_::OutputAdapters_::Quickie.begin_choices
+        o.init_default_choices
+        o
       end
     end
 

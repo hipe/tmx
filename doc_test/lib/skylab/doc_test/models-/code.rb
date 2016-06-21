@@ -94,6 +94,10 @@ module Skylab::DocTest
         Models_::CopulaAssertion.via_code_line__ self, choices
       end
 
+      def to_line_stream
+        Common_::Stream.via_item get_content_line
+      end
+
       def get_content_line
         @string[ get_content_line_range ]
       end

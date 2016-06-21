@@ -14,9 +14,16 @@ module Skylab::DocTest
       @code_line = code_line
     end
 
+    def to_line_stream
+      _to_particular_paraphernalia.to_line_stream
+    end
+
     def to_line
-      _pp = @_choices.particular_paraphernalia_for self
-      _pp.to_line
+      _to_particular_paraphernalia.to_line
+    end
+
+    def _to_particular_paraphernalia
+      @_choices.particular_paraphernalia_for self
     end
 
     def to_three_pieces

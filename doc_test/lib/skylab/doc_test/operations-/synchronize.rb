@@ -485,7 +485,7 @@ module Skylab::DocTest
 
           mod = Autoloader_.const_reduce(
             [ @output_adapter ],  # nil ok
-            Home_::Output_Adapters_,
+            Home_::OutputAdapters_,
             & @on_event_selectively )
 
           if mod

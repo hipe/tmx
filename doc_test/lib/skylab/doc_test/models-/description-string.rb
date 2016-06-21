@@ -54,6 +54,11 @@ module Skylab::DocTest
 
     ITS_RX___ = /\Ait's /i
 
+    def escape_as_platform_string!
+
+      @_mutable_string = @_mutable_string.inspect ; nil  # EEK
+    end
+
     def convert_to_snake_case!
 
       # it is perhaps a bug that this doesn't work (#open [#co-048])?
