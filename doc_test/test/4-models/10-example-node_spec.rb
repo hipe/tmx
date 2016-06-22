@@ -89,7 +89,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def _build_subject_instance_via_these_runs_and_choices d_r, c_r, cx
-      _subject_module.via_runs_and_choices__ d_r, c_r, cx
+      _subject_module.via_runs_and_choices_ d_r, c_r, cx
     end
 
     def _disucssion_run_via_big_string s

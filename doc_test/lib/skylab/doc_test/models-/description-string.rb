@@ -19,8 +19,15 @@ module Skylab::DocTest
     end
 
     def use_last_nonblank_line!
+      _use_any_such_line :any_last_nonblank_line_object__
+    end
 
-      lo = remove_instance_variable( :@_description_run ).any_last_nonblank_line_object__
+    def use_first_nonblank_line!
+      _use_any_such_line :any_first_nonblank_line_object__
+    end
+
+    def _use_any_such_line m
+      lo = remove_instance_variable( :@_description_run ).send m
       if lo
         @_mutable_string = lo.get_content_string
         @found = true

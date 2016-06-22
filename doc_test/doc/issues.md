@@ -26,10 +26,11 @@
 
 [#013] #former-stub use whatever subject was there when you got there
 
-[#012] #open when doc-test rewrite, see subscribers (2x)
+[#012] #open when rewrite, see subscribers (2x)
              ( #was: [#ts-046] )
 
-[#011] #open modernize doc-test templates
+[#011]       this wild 'case' thing (furloughed but pretty great)
+             ( #was: modernize templates )
              ( #was: [#ts-043] )
 
 [#010]       #parent-node: [#007] #tracking a `Subject_` parameter function
@@ -41,7 +42,7 @@
 [#008] #open #parent-node: [#001] "re-architect.."
              ( #was: [#ts-034] )
 
-[#007] #open #parent-node:[#001] the doc-test recursive spec needs mock fs
+[#007] #open #old the recursive spec needs mock fs (?)
              ( #was: [#ts-030] )
 
 
@@ -67,5 +68,5 @@
 ## FIX ABOVE
 
 [#001] #open this tracks the rewrite (nodes waiting on it)
-             #doc-node the doc-test narrative ..
+             also, the README
              (was: [#ts-015]

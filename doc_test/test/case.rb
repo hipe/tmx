@@ -1,5 +1,13 @@
+self._REVIEW  # #todo
+
 module Skylab::DocTest::TestSupport
   class Case
+
+    # note from the future about this past: we plowed over this before
+    # we took the time to appreciate it (but we may as well have because
+    # if we want to rescussitate this the DSL will need to change a bit.)
+    # rather than expain this it's best to look at the tombstone here: [#011].
+
     # -
       module Test_Context_Instance_Methods  # part of public API too
 

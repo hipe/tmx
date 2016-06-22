@@ -22,7 +22,10 @@ module Skylab::DocTest
       end
 
       def ___assemble_line
-        "#{ @_actual_code_string }.should eql #{ @_expected_code_string }#{ @_LTS }"
+
+        _act_s = @_common.add_parens_if_maybe_necessary @_actual_code_string
+
+        "#{ _act_s }.should eql #{ @_expected_code_string }#{ @_LTS }"
       end
 
       def _EG_FUN

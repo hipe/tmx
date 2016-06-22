@@ -27,7 +27,7 @@ appropriate for that solution (to the extent that etc).
   • the subject class *SHOULD* have ad-hoc custom constructor methods,
     tailored to the particular shape of its input data.
 
-  • the subject class *CAN* take a "choices" object in its constrution.
+  • the subject class *OFTEN* takes a "choices" object in its constrution.
 
   • the subject *WILL TYPICALLY* provide a collection of "services"
     (methods) for an implementing "particular paraphernalia" to draw

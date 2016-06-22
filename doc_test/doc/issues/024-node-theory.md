@@ -1,5 +1,12 @@
 # node thoery :[#025]
 
+## this document..
+
+..is detail towards the more general subject introduced in [#003].
+
+
+
+
 ## objective
 
 the big open question of whether and how we support/produce
@@ -33,12 +40,13 @@ and code runs (for they should be cleanly alternating, and per
 
 there are code runs that look like examples (because they have one
 or more lines that look like tests because of the magic copula),
-and then there are those that don't. let the former be 'E' and the
-latter be 'O'.
+and then there are those that don't. let the former be 'E' (for
+"example") and let the others be 'O' (for "other").
 
 given all code runs that exist in toto for a given single comment block,
-we will define categories that will encompass comprehensively (by
-pattern) the sequence formed by the E's and O's of these code runs:
+we here define a comprehensive set of categories that encompasses (by
+pattern) all possible sequences formed by the E's and O's of these code
+runs:
 
   • although every comment block has at least one line, not
     all comment blocks have code runs. in such cases this
@@ -56,6 +64,10 @@ pattern) the sequence formed by the E's and O's of these code runs:
     because of this big assuption (C), then this will be expressed
     as a context node, which each constituent item (O or E) in the
     order it was received. (#coverpoint2-3)
+
+    (:axiom-1 is the assertion that above described conditions are
+    necessary preconditions for a context node, and may be assumed
+    under any such paraphernalia object.)
 
   • otherwise (and it is the case that every code run is an E
     (and ergo none are of category O)) (we'll call this one "EE"):

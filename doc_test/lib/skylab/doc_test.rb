@@ -79,13 +79,6 @@ module Skylab::DocTest
   # --
 
   module Magnetics_
-
-    NodeStream_via_CommentBlock = -> cb do  # [#ta-005] done manually:
-
-      st = Magnetics_::SpanStream_via_CommentBlock[ cb ]
-      st and Magnetics_::NodeStream_via_SpanStream[ st ]
-    end
-
     Autoloader_[ self ]
   end
 
@@ -131,7 +124,7 @@ module Skylab::DocTest
   ACHIEVED_ = true
   BLANK_RX_ = /\A[[:space:]]*\z/
   CONST_SEP_ = '::'.freeze
-  DocTest = :_fix_these_
+  DocTest = :_fix_these_  # #todo
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self

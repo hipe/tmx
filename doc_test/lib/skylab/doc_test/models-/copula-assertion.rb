@@ -44,6 +44,26 @@ module Skylab::DocTest
       [ s[ _r1_begin ... _r1_end ], s[ _r2_begin ... _r2_end ], s[ l_r ] ]
     end
 
+    def add_parens_if_maybe_necessary actual_code_s
+
+      # experimentally, try these translation rules:
+      #
+      #   • don't wrap the whole thing in parens if it
+      #     starts or ends with parens. (we might broaden this.)
+      #
+      #   • otherwise, do add parens if it has any spaces in it EEK
+
+      # eek - eek.
+
+      if PROBABLY_OK___ =~ actual_code_s
+        actual_code_s
+      else
+        "( #{ actual_code_s } )"
+      end
+    end
+
+    PROBABLY_OK___ = / \A \( | \) \z | \A[^[:space:]]+\z /x
+
     attr_reader(
       :code_line,
     )

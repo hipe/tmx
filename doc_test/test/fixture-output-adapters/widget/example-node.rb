@@ -12,7 +12,7 @@ module Skylab::DocTest
       # (and templates!) etc, we just cram a lot of the work into this file
       # under the justification that this is a good sized SLOC.
 
-      TEMPLATE_FILE__ = 'eg.templa'
+      TEMPLATE_FILE___ = 'eg.templa'
 
       def initialize para, cx
         @_choices = cx
@@ -62,7 +62,7 @@ module Skylab::DocTest
 
       def __assemble_template_and_etc
 
-        t = @_choices.load_template_for TEMPLATE_FILE__
+        t = @_choices.load_template_for TEMPLATE_FILE___
 
         t.set_simple_template_variable(
           remove_instance_variable( :@_test_case_method_name ),

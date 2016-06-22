@@ -12,33 +12,39 @@ variously kicking ourselves and lauding ourselves as appropriate)).
 
 ### synopsis
 
-if your "asset document" contains something like this:
+if your "asset document" (code file) contains a snippet like this:
 
-    # this singleton method
-    # makes a string from two strings:
+    this is some code
+
+    # we have redefined what it means to add (don't actually do this).
+    # adding two positive integers produces their sum plus one:
     #
-    #     MyLib.join( 'foo', 'bar' )  # => "foo AND bar"
+    #     1 + 2  # => 4
 
-    (your code here)
 
-    # it can produce an array from such a string:
-    #
-    #     MyLib.split( 'foo AND bar' )  # => %w( foo bar )
+the subject sidesystem produces this:
 
-    (more code here, etc)
-
-the subject sidesystem can produce something like this:
-
-    it "makes a string from two strings" do
-      MyLib.join( 'foo', 'bar' ).should eql "foo AND bar"
-    end
-
-    it "can produce an array from such a string" do
-      MyLib.split( 'foo AND bar' ).should eql %w( foo bar )
+    it "adding two positive integers produces their sum plus one" do
+      ( 1 + 2 ).should eql 4
     end
 
 
-see more in the "overview" section below.
+for more complete working examples, see (EDIT).
+
+for an introduction to the nitty gritty details about how this works and
+how it can be used, see below near "towards a deeper understanding of the
+translation syntax".
+
+
+
+### brief feature overview
+
+  • different test-suite solutions can be targeted individually
+    through its adapter architecture.
+
+  • uses a *really* simple mustache-like form of template
+
+  • (NEW) "forwards" and "reverse" "synchronization"! (see far below).
 
 
 
@@ -67,33 +73,64 @@ of characteristics (depending of course on whom you ask):
     high-level overview of key features.
 
 (but note that as we write this we are in the middle of a rewrite that
-is meant to make these two worlds coalesce somewhat..)
+is meant to make these two worlds coalesce somewhat #open [#001]..)
+
+
+
+### approach
+
+sensible defaults, zero config. ("the target document is the config.")
 
 
 
 
-## a deeper understanding of the "syntax"
+## towards a deeper understanding of the translation "syntax"
 
 to understand how to get the subject sidesystem to do exactly what you
 want (to the extent that that is possible), it may be useful to
-understand how it parses asset documents and turns them into test
-documents.
+understand the general pipeline described here for translating asset
+documents into test documents.
 
-at the coarsest level, the subject sidesystem parses the input (which it
-sees as a line stream, but which is usually a file (an "asset document"))
-into "blocks": comment blocks and static blocks. see [#020] "what are
-comment blocks?" for more on this particular part of it.
+### a document is broken into blocks
 
-then, we try to parse every comment block into test-related expressions
-by first breaking the comment block into "runs" of associated lines.
-there are "discussion runs" and "code runs". the former is freeform
-natural language, and the latter is example code that can (sometimes) be
-turned into tests. for more about this, see [#021] "what are runs?".
+at the coarsest level, the input (which is internally modeled as a line
+stream, but imagine it is is a file (i.e an "asset document")), this
+input line stream is broken into "blocks". each block is either a
+"comment block" or a "static block".
 
-these "runs" (that is, discussion runs in tandem with code runs) can
-then be turned into "items" like examples (or experimentally shared
-setup methods) which ultimately can contribute to producing test code.
-for detail on the logic behind this, see [#024] "what are items?".
+static blocks typically contain your real code and are ignored, but
+comment blocks are scanned for certain patterns. see [#020]
+"what are comment blocks?" for more on this early stage of the pipeline.
+
+### blocks are broken into runs
+
+then we break each comment block down further into groupings of
+associated lines we call "runs". each run is either a "discussion run"
+or a "code run." typically you explain something in more or less natural
+language in a "discussion run", and a "code run" has example code
+demonstrating the thing you just explained.
+
+the boundary between discussion run and code run is detected by
+matching a pattern of change in indent. this pattern is generally
+intuitive and easy to read and write and more or less follows the rule
+of thumb that increase indent by four (4) spaces will transition you
+from discussion run to code run; and then if you decrease the indent
+back to your old margin, you'll go back to a discussion run.
+
+(despite how simple this may sound, the inner-workings are a bit
+involved being that they rely on detecting what the "baseline" margin is
+as well as detecting when this changes, apart from detecting when the
+current margin has exceeded this threshold. all of this fun is the
+subject of [#021] "what are runs?".)
+
+### runs make items and other nodes
+
+finally, a pairing of dicsucssion run followed by code run can be
+translated into what we call an "item" of test paraphernalia like
+a test example (or maybe even a shared setup method (experimentally)).
+these paraphernalia are what do the actual producing of lines of test
+code. this (and more) is expounded upon beginning at [#003] how nodes
+are generated.
 
 but we leverage the most power from the subject sidesystem by pointing
 it at existing test files, which we call "synchronization"..

@@ -50,8 +50,7 @@ module Skylab::DocTest
         end
 
         if @_seen_other
-          ::Kernel._COVER_ME_coverpoint2_3  # #coverpoint2-3
-          x = self.__assemble_whole_node_because_OE
+          x = __assemble_whole_node_because_OE
         else
           __transition_to_flat_state
           x = send @_state
@@ -59,6 +58,15 @@ module Skylab::DocTest
         break
       end while nil
       x
+    end
+
+    def __assemble_whole_node_because_OE  # #coverpoint2-3
+
+      Models_::Context.via_valid_pair_array_and_choices__(
+
+        remove_instance_variable( :@_pairs ),
+        @choices,
+      )
     end
 
     def __transition_to_flat_state
@@ -79,13 +87,13 @@ module Skylab::DocTest
     def ___gets_from_cache_flatly
 
       pair = @_cache_stream.gets
-      if pair
+      if pair  # like #spot-4
 
         code_run = pair.value_x
         _discu_run = pair.name_x
         code_run.has_magic_copula or ::Kernel._SANITY  # because then not flat
 
-        Models_::ExampleNode.via_runs_and_choices__( _discu_run, code_run, @choices )
+        Models_::ExampleNode.via_runs_and_choices_ _discu_run, code_run, @choices
 
       else
         remove_instance_variable :@_cache_stream

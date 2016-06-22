@@ -274,9 +274,21 @@ module Skylab::DocTest
         @string = s
       end
 
+      def to_line_stream
+        Common_::Stream.via_item get_content_line
+      end
+
+      def get_content_line  # a bit of a misnomer, be careful
+        @string[ @_margin_range.end ... @_LTS_range.end ]
+      end
+
       attr_reader(
         :string,
       )
+
+      def has_magic_copula
+        false
+      end
 
       def is_blank_line
         true

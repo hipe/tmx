@@ -7,7 +7,7 @@ module Skylab::DocTest
 
     class << self
 
-      alias_method :via_runs_and_choices__, :new
+      alias_method :via_runs_and_choices_, :new
       undef_method :new
     end  # >>
 
@@ -18,7 +18,11 @@ module Skylab::DocTest
     end
 
     def to_line_stream
-      @_choices.particular_paraphernalia_for( self ).to_line_stream
+      to_particular_paraphernalia.to_line_stream
+    end
+
+    def to_particular_paraphernalia
+      @_choices.particular_paraphernalia_for self
     end
 
     def begin_description_string_session
@@ -33,6 +37,9 @@ module Skylab::DocTest
       :example_node
     end
 
+    def is_assertive  # (is same as "is example")
+      true
+    end
   end
 end
 # #tombstone (possibly temporary) - used Description_String

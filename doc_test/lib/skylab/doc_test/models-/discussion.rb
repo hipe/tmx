@@ -28,9 +28,18 @@ module Skylab::DocTest
       def any_last_nonblank_line_object__
 
         a = @_a
-        st = Common_::Stream.via_range( a.length - 1 .. 0 ).map_by do |d|
+        _st = Common_::Stream.via_range( a.length - 1 .. 0 ).map_by do |d|
           a.fetch d
         end
+        _any_first_nonblank_line_object_in _st
+      end
+
+      def any_first_nonblank_line_object__
+
+        _any_first_nonblank_line_object_in Common_::Stream.via_nonsparse_array @_a
+      end
+
+      def _any_first_nonblank_line_object_in st
         begin
           lo = st.gets
           lo || break

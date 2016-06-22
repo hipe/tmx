@@ -23,7 +23,7 @@ module Skylab::DocTest::TestSupport
 
       fi = _ELC_file_via_path full_path_ 'README.md'
 
-      _ls = fi.line_stream_via_regex %r(\bcontains something like this\z)
+      _ls = fi.line_stream_via_regex %r(\bcontains a snippet like this\z)
 
       o = magnetics_module_
 
@@ -31,10 +31,14 @@ module Skylab::DocTest::TestSupport
 
       _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, real_default_choices_ ]
 
+      exp_st = fi.line_stream_via_regex %r(\bproduces this\z)
+      fi.close_if_necessary
+
       expect_actual_line_stream_has_same_content_as_expected_(
         o::LineStream_via_NodeStream[ _ns ],
-        fi.line_stream_via_regex( %r(\bcan produce something like this\z) ),
+        exp_st,
       )
     end
   end
 end
+# this test file is #file-2

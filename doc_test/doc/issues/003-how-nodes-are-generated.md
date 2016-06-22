@@ -1,204 +1,173 @@
-# how nodes are generated :[#003]  (formerly "the specer narrative :[#004])
+# how nodes are generated :[#003]
 
+## how paraphernalia fits into the pipeline
 
-(reminder to self: this document continues the narrative started in [#001])
-
-
-## introduction
-
-
-in order to produce test code from comments, doc-test models the
-relevant parts of your content in intermediate representations of
-unit-test-like paraphernalia that are intended (on paper at least) to be
-independent of specific testing libraries. these "nodes" then get fed to
-an output adapter which renders them as the final output file.
-
-these "nodes" represent the various testing paraphernalia like contexts,
-before blocks, and examples. these nodes are generated from streams of
-spans. spans are either of the `text_span` or `code_span` classification.
-
-these parsing rules (and corollaries) apply to this end:
-
-• multiple contiguous text spans have no meaning to us and as such only
-  the last one is ever regarded (where text spans are used; if this is
-  even possible given upstream parsing logic).
-
-• a code span without an immediately preceding text span has no meaning
-  to us and as such will be ignored.
-
-• a trailing text span in the comment block has no meaning to us and
-  will effectively be ignored. (but use these anyway whenever they
-  bolster your coment).
-
-what the above amounts to is that what we are typically looking for is
-the pairing of one text span followed by one code span. this is the kind
-of thing that makes up several kinds of node.
+to the end of producing test code from comments, the subject sidesystem
+models the relevant content of the "asset code" (seen only as a line
+stream) in intermediate representations of common test-suite
+"paraphernalia" that are intended (on paper at least) to be agnostic
+of particular test-suite libraries. (this "common paraphernalia"
+is pseudo-spec'ed at [#025].)
 
 
 
+### the two-dimensional breadth of paraphernalia
 
-## how examples are built
+these objects of paraphernalia represent the various phenomena found in
+testing code like "examples" (or "cases" (but don't say "tests")),
+assertions (or "predicates" (but again don't say "tests")), contexts
+or similar, shared setup ("before blocks", "let" expressions), teardown
+routines, and all the other stuff of test suites (much of which we
+haven't considered or don't yet know about).
 
-for a code span to be considered an example, for now it has to have the
-magic "# =>" sequence somewhere in it.
+the listing above is just a limited sampling, but its variety is
+testament to not only the breadth of such phenomena in general, but also
+the breadth of regional variants of the phenomena across different
+test-suite solutions.
 
-here is a minimal example of generating an example:
+(it bears mentioning that some of these variants of phenomena are
+endemic not just to particular test-suite solutions but to the culture
+more generally, being as they are pieces in the the subjective and
+ever-moving landscape of evolving best practices and emerging new
+patterns, etc.)
 
-    this is some code
+fortunately the scope of our job is not to express every phenomena for
+every test suite solution, but rather to choose sane "isomorphic"
+behavior when deciding how to express a given phenomenon for a given
+solution. the "expression pipeline" is designed to this end: it is made
+to accomodate this breadth along both these axes; that is, it
+has accomodations for a variety of phenomena across a variety of
+test-suite solutions.
 
-    # the hello symbol equals the hello symbol:
+what we were calling "phenomena" above we call "common paraphernalia" in
+the pipeline (i.e code). each such object of common paraphernalia gets
+translated into an object of paraphernalia particular to the target
+test-suite, and it is these final objects that produce the lines of
+output.
+
+
+    +-------+    +--------+    +------+    +------+    +-------+    +-----+
+    | lines | => | blocks | => | runs | => | gen. | => | parti.| => |lines|
+    +-------+    +--------+    +------+    +------+    +-------+    +-----+
+                                                     ^
+                                                     |
+                                                    here
+
+the "here" indicates where the adapter architecture comes into play so
+that output is tailored to the particular target test-suite soultion
+(and possibly so that it takes into account other "choices" that would
+effect output (but we want to avoid these)).
+
+
+
+
+## just examples
+
+(the README demonstrated a basic translation. (EDIT))
+
+
+
+
+## experimenting with shared setup and depth
+
+code runs that don't have an assertion somewhere in them are called
+"unassertive code blocks". [#024] "node theory" expounds on the patterns
+that can emerge from these; but the short of it is something like this:
+
+unassertive code blocks aren't useful on their own (according to us),
+but we exploit them to produce something that is useful: "shared setup".
+(as this is all just one grand experiment at the moment, the particular
+paraphernalia of "shared setup" that we have chosen is what we call a
+`shared_subject`, which if you're not familiar is something like a `let`
+expression but crucially different in one way: assume it's for immutable
+data only.)
+
+the broader point here is that this is an experimental higher-level
+structure (or compound "node") that can emerge from exploiting higher-level
+patterns in the comment block:
+
+    some code
+
+    # with a foobric like this:
     #
-    #     :hello  # => :hello
-
-
-the above input has one comment block which has (what parses to) two text
-lines and one code line, i.e a text span and a code span.
-so, the above input generates the following structure:
-
-    + example node with description "the hello symbol equals the hello symbol"
-
-the output adapter is expected to render such a structure accordingly.
-other, more interesting examples will be provided below.
-
-
-
-
-## how description strings are produced
-
-in doc-test's conception of them, each of describe blocks, context
-blocks, and test cases have exactly one description string. conversely
-if a description string cannot be resolved from the input for the
-particular element of test paraphernalia it is "trying" to make, then
-that particular element is incomplete and cannot be outputted.
-
-these are the paraphernalia structures that have description strings:
-
-  • the describe block
-  • the context block
-  • the test case
-
-the describe block's description by default will be generated (somehow) by
-the input file path, possibly.
-
-for context blocks and tests, these are the rules for how description
-strings are produced: the lastmost text line before the firstmost code
-line will be used as the input description line.
-
-for contexts (that by definition have before blocks and/or `let` terms),
-the text line used is the lastmost text line before the firstmost code
-line that became part of the before block and/or `let` term.
-
-for test cases, the text line used is the lastmost text line before the
-firstmost code line that went into the test block.
-
-as a corollary of the above, any trailing text lines in a comment block
-are effectively ignored (but they are nonetheless encouraged to exist
-when they make the inline documentation stronger).
-
-
-### transformations on description strings
-
-once an input text line is resolved by the above rules, it furthermore
-undergoes the following translations:
-
-  • any trailing line delimiter sequence is removed
-
-  • any trailing ":" or "," is removed
-
-  • any leading { "so" | "then" } [","] " " is removed
-
-  • any leading "it " is removed
-
-  • any leading "it's " is transformed to "is "
-
-the above are cumulative, so for e.g "so it " becomes "".
-
-the reasons behind the ":" is this: because it is so often used in our
-documentation right before a code example, it becomes redundant and
-noisy always to include it in the output.
-
-the reason behind the "it "-related rules is because it reads better in
-spec-like output not to repeat the "it" term in the description string
-given that for test examples the word `it` *is* the method name (but note
-we may move this logic and logig like it up and out to the output adapter).
-
-the reason behind the "so " rule is because "so" is often used as a
-connecting word to a text line (inteded for description) that comes
-after a series of one or more text lines not intended for description.
-this makes such lines read better in both of their two modalities (code
-file and spec file).
-
-
-
-
-## how "before" blocks (and supporting ancillary nodes) are built
-
-this approaches or perhaps surpasses the limit of decency of what
-should be attempted with something like doc-test. all features are
-experimental.
-
-if the first "code-block" in a comment block does *not* have a
-"magic predicate sequence", and there is at least one other subsequent
-test block in this comment block, this code block will be output as a
-"before-block".
-
-but it gets worse:
-
-if the first content character(s) of the code block is [A-Z] or "class "
-or "module " it will produce a `before :all` block, otherwise it will
-produce a `before :each` block.
-
-
-here is an example of a minimal before block:
-
-    this is some code
-
-    # subclassing Foo is really fun:
+    #     foo = BilboBaggins.new
     #
-    #     class Bar < Foo
-    #     end
+    # you can do this:
     #
-    # then, build your Foo subclass instance like normal:
+    #     foo.has_ring  # => true
     #
-    #     foo = Bar.new
-    #     foo.wiz  # => "waz"
-
-
-the above input generates the following structure:
-
-    + a context node with:
-      + a before all block
-      + an example node with the description "build your Foo subclass instance like normal"
-
-
-
-### the `let` hack
-
-any trailing content lines of your before block that look something
-like `/\A[a-z_]+ = /` will be converted to `let` expressions.
-
-here is an example of the `let` hack:
-
-    this is some code
-
-    # wizzie wazzie
+    # or you can do this:
     #
-    #     some thing that happens before each
-    #
-    #     oh_hai = My_Thing.new
-    #
-    #     oh_hey = ha hooie
-    #
-    # "peanut" "danced" in that taylor swift video
-    #
-    #     1  # => 1
+    #     foo.wear_cloak  # => :invisible
 
-the above input generates the following structure:
+note how the above has one comment block with three different runs in
+it. remarkably (and EXPERIMENTALLY) the above makes this:
 
-    + a context node with:
-      + a before each block
-      + a let expression
-      + a let expression
-      + an example node
+    context "with a foobric like this" do
 
-that's all!
+      shared_subject :foo do
+        BilboBaggins.new
+      end
+
+      it "you can do this" do
+        foo.has_ring.should eql true
+      end
+
+      it "or you can do this" do
+        foo.wear_cloak.should eql :invisible
+      end
+    end
+
+(the above is #coverpoint2-3.)
+
+here's some edges while we're here.
+
+
+
+### edge case: no assertions
+
+this has no assertive code runs, only unassertive ones:
+
+    # jimmy
+    #     1 + 1
+    # jammy
+    #     2 + 2
+
+the above does not translate to any paraphernalia.
+(the above is #coverpoin2-2.)
+
+
+
+### edge case: assertions only
+
+if you have a single comment block with several code runs,
+each of which has an assertion:
+
+    # jimmy
+    #     1 + 1  # => 3
+    # jammy
+    #     2 + 2  # => 5
+
+you'll get:
+
+    it "jimmy" do
+      ( 1 + 1 ).should eql 3
+    end
+
+    it "jammy" do
+      ( 2 + 2 ).should eql 5
+    end
+
+(the above is #coverpoint2-4.)
+
+
+
+
+
+
+
+
+## (document meta)
+
+• #tombstone: examples of description string transformation, other theory.
+• #tombstone: [#011] the 'case' DSL examples (assert structure shape), excellent but furloughed

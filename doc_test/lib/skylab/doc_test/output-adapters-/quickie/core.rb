@@ -25,9 +25,15 @@ module Skylab::DocTest
 
       def particular_paraphernalia_for para
 
-        _cls = __paraphernalia_loader.paraphernalia_class_for(
-          para.paraphernalia_category_symbol )
+        particular_paraphernalia_of_for(
+          para.paraphernalia_category_symbol,
+          para,
+        )
+      end
 
+      def particular_paraphernalia_of_for sym, para
+
+        _cls = __paraphernalia_loader.paraphernalia_class_for sym
         _cls.new para, self
       end
 

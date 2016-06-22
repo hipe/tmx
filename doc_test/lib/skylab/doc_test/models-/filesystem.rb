@@ -1,3 +1,5 @@
+self._MIGHT_SUNSET  # #todo
+
 module Skylab::DocTest
 
   module DocTest
