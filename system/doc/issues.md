@@ -1,3 +1,4 @@
+[#034]       [ hack guess module tree ]
 [#033] #open feature islands
 [#032]       alternative (simplified) implementations of [#027] stubbed FS
 [#031]       [ processes ]

@@ -272,6 +272,36 @@ to restate, steps 3, 4 and 5 MUST have their own tests driving the
 development, ideally in a three laws compliant way.
 
 
+### a variant: sneek preview then end-to-end (the "St. Louis Arch" technique)
+
+in some contexts (often those where you're not on an island) there is
+probably benefit in giving the client (who may be you) a sneak preview
+of a working inteface that can be interacted with long before the full
+stack is actually working.
+
+  • a feedback loop around the interface may help steer the evolution
+    of the design or even shift (please don't say "pivot") the shape
+    of the essential operation.
+
+  • to see something that "looks like" the target product earlier rather
+    than later may bring a peace of mind that has business value (i.e
+    more confidence from the client earlier).
+
+
+to get (5) somewhat working before (4) will require something like
+mocked data (perhaps even hard-coded) in the higher-level (interface-ish)
+code.
+
+after this effort (or in parallel with it) you will of course still need
+to do 1 thru 4 (probably still in that order), and then join-up the two
+ends by either adding or replacing tests that use more "real" data
+instead of the stubbed code somehow!
+
+we call this the "St. Louis Arch" technique in reference to the last
+phase in building the arch where they needed to link-up the two towers,
+which resembles this process.
+
+
 
 
 ## branch and divide :[#143]  :+[#.A-F]

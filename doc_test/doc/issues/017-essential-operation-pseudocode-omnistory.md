@@ -63,7 +63,7 @@ a magic we have only dreamed of: the reverse synchronization.
 
 
 
-### the particular innovation of this verison: don't, "generate", "synchronize"
+### the particular innovation of this verison: don't "generate", "synchronize"
 
 hypothetically we can get what we want if rather than generating
 documents in a one-way manner (from code document to test document), we
@@ -143,6 +143,10 @@ some characteristics of this set of rules are:
 
 
 ## reverse
+
+"reverse synchronization" is the idea that you might want to fix some
+code in your *generated* test code and then write that code *back* into
+the *asset* document. it's crazy.
 
 for the hypothetical reverse synchronization we would not simply
 mirror the above rules because for whatever reason, what we want

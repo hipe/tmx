@@ -131,5 +131,6 @@ module Skylab::DocTest
   NEWLINE_ = "\n".freeze  # because #spot-2
   NIL_ = nil
   NOTHING_ = nil
+  UNABLE_ = false
 end
 # #temporary-tombstone:A: old [br] API call boilerplate

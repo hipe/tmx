@@ -2,7 +2,10 @@ module Skylab::System
 
   module Filesystem
 
-    class Hack_guess_module_tree  # :[#107].
+    class Hack_guess_module_tree  # :[#034].
+
+      # (see also the experimental [#dt-027] which tries to generalize
+      #  this algorithm and make it lossless.)
 
       # ->
 
@@ -312,3 +315,9 @@ module Skylab::System
     end
   end
 end
+# #history: this has survived a long journey across many sidesystems
+#  as they were created and subsumed:
+#
+#     [ttt] Grammar::Reflection => [cm] Const_Pryer => [bs] => [br] => [sy]
+#
+#  (some steps may be missing.) this used to have the number [#107] somewhere.

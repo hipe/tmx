@@ -1,3 +1,5 @@
+[#027]       the test document ..
+
 [#026]       particular paraphernalia model ..
 
 [#025]       common paraphernalia model..
@@ -49,23 +51,20 @@
 [#006]       #parent-node: [#001] peek hack explained .. (was templo)
              ( #was: [#ts-027] )
 
-[#005]       #parent-node: [#001] the view-controller narrative ..
+[#005] #hole
+             ( #was: the view-controller narrative .. )
              ( #was: [#ts-026] )
 
 
 [#004]       #parent-node: [#001] output adapters.
              ( #was: [#ts-025] )
 
-# == DEMARKER
-
 [#003]       #parent-node: [#001] how nodes are generated ..
              ( #was: [#ts-014] )
 
-
-[#002]       #doc-point #in-situ (the particular importance of result values)
+[#002]       this is a hack because (etc EDIT)
+             ( #was: #doc-point #in-situ (the particular importance of result values) )
              ( #was: [#ts-012] )
-
-## FIX ABOVE
 
 [#001] #open this tracks the rewrite (nodes waiting on it)
              also, the README

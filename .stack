@@ -3,5 +3,9 @@ factor out dir_pathname (!)
 recursive
 design & implement the new synchronizing model (reversing!)
 iteration -1 - complete reverse synchronization
-iteration -2 - make forwards translation synchronizing - the algo described in [#doc]
+iteration -2 - make forwards translation synchronizing - the algo described in [#017]
 iteration -3 - achieve a lossless reverse synchronizable document (a parse tree of a test file)
+step -1: replace the body of an item node
+step -2: positional/relative access and random access
+step -3: parse real documents, be lossless
+step -4: ersatz parser
