@@ -30,9 +30,9 @@ module Skylab::DocTest
         @default_branch_end_matcher_builder = p ; nil
       end
 
-      def add_branch_line_matcher mr, & id_s_p
+      def add_branch_line_matcher mr, sym=:branch, & id_s_p
         @branch_nonterminals.push(
-          NonTerminal___.new( mr, @default_branch_end_matcher_builder, id_s_p )
+          NonTerminal___.new( mr, sym, @default_branch_end_matcher_builder, id_s_p )
         )
       end
 
@@ -43,12 +43,12 @@ module Skylab::DocTest
 
       # --
 
-      def parse_string s
-        parse_line_stream Home_.lib_.basic::String.line_stream s
+      def parse_string s, & x_p
+        parse_line_stream Home_.lib_.basic::String.line_stream( s ), & x_p
       end
 
-      def parse_line_stream st
-        Parse___.new( st, self ).execute
+      def parse_line_stream st, & x_p
+        Parse___.new( st, self, & x_p ).execute
       end
 
       attr_reader(
@@ -60,20 +60,23 @@ module Skylab::DocTest
 
       class Parse___
 
-        def initialize st, g
+        def initialize st, g, & oes_p
           @_branch_nonterminals = g.branch_nonterminals
           @_default_branch_end_matcher_builder = g.default_branch_end_matcher_builder
           @_line_stream = st
+          @__on_event_selectively = oes_p  # any
         end
 
         def execute
 
+          @_lineno = 0
           @_stack = [ RootFrame___.new ]
           @_state = :_process_line_from_root_context
 
           begin
             line = @_line_stream.gets
             line || break
+            @_lineno += 1
             @_line = line
             send @_state
             redo
@@ -82,7 +85,44 @@ module Skylab::DocTest
           if 1 == @_stack.length
             @_stack.first.close_branch_frame
           else
-            ::Kernel._COVER_ME
+            # (since you cannot pop from root #here, if the stack depth
+            # is not one then it's more than one.)
+            ___when_ending_line_not_found
+          end
+        end
+
+        def ___when_ending_line_not_found
+
+          node = @_stack.last
+          line_string = node.nodes.first.line_string
+          lineno = node.lineno
+          total_lines = @_lineno
+
+          ev = Common_::Event.inline_not_OK_with(
+            :parse_error,
+            :lineno, lineno,
+            :line, line_string,
+            :error_subcategory, :ending_line_not_found,
+            :exception_class_by, -> do
+              ParseError
+            end
+
+          ) do |y, o|
+
+            y << "hack failed: couldn't find end line for node opened on line #{ lineno }\n"
+            y << "  line #{ lineno }: #{ line_string.inspect }\n"
+            y << "  (#{ total_lines } lines in file.)\n"
+          end
+
+          oes_p = @__on_event_selectively
+
+          if oes_p
+            oes_p.call :error, :parse_error do
+              ev
+            end
+            UNABLE_
+          else
+            raise ev.to_exception
           end
         end
 
@@ -107,6 +147,7 @@ module Skylab::DocTest
           else
             _add_nonblank_line
           end
+          # (note you cannot pop from the root context (assumed by #here))
           NIL_
         end
 
@@ -139,6 +180,7 @@ module Skylab::DocTest
           frame = NonRootFrame___.new(
             remove_instance_variable( :@_matchdata ),
             remove_instance_variable( :@_branch_nonterminal ),
+            @_lineno,
           )
           @_stack.push frame
           _add_nonblank_line
@@ -189,8 +231,9 @@ module Skylab::DocTest
 
       class NonTerminal___
 
-        def initialize mr, end_matcher_builder, id_s_p
+        def initialize mr, sym, end_matcher_builder, id_s_p
           @begin_matcher = mr
+          @category_symbol = sym
           @_end_matcher_builder = end_matcher_builder
           @identifying_string_proc = id_s_p  # optional
         end
@@ -204,6 +247,7 @@ module Skylab::DocTest
         end
 
         attr_reader(
+          :category_symbol,
           :identifying_string_proc,
         )
       end
@@ -275,9 +319,11 @@ module Skylab::DocTest
 
       class NonRootFrame___ < AbstractFrame__
 
-        def initialize md, bnt
+        def initialize md, bnt, lineno_d
           @_branch_NT = bnt
+          @category_symbol = bnt.category_symbol
           @_end_line_matcher = bnt.__build_end_line_matcher md
+          @lineno = lineno_d
           @_matchdata = md  # just for id s
           super()
         end
@@ -308,13 +354,11 @@ module Skylab::DocTest
         end
 
         attr_reader(
+          :category_symbol,
+          :lineno,
           :next,
           :previous,
         )
-
-        def category_symbol
-          :branch
-        end
 
         def is_branch
           true
@@ -339,6 +383,8 @@ module Skylab::DocTest
           false
         end
       end
+
+      ParseError = ::Class.new ::RuntimeError
     end
   end
 end

@@ -6,55 +6,16 @@ module Skylab::DocTest::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :ersatz_parser
 
     it "loads" do
-      _subject_module
+      ersatz_lib_module_
     end
 
     context '(context)' do
 
-      shared_subject :_subject_parser do
-
-        o = _subject_module.begin
-
-        # --
-
-        cache = {}  # don't make a new regex for every time a branch is pushed
-
-        o.default_branch_end_line_matcher_by do |md|
-          cache.fetch md[ :margin ] do |s|
-            x = /\A#{ ::Regexp.escape md[ :margin ] }end\b/
-            cache[ s ] = x
-            x
-          end
-        end
-
-        # --
-
-        rx = /\A
-          [ \t]+ (?:
-            ' (?<single_quoted_bytes> (?: [^\\'] | \\. )* ) ' |
-            " (?<double_quoted_bytes> (?: [^\\"] | \\. )* ) "
-          )
-        /x
-
-        o.add_branch_line_matcher(
-          %r(\A(?<margin>[\t ]*)begin\b)
-
-        ) do |md|
-          # (separate the easy problem of above from the harder problem here)
-
-          md_ = rx.match md.post_match
-          s = md_[ :single_quoted_bytes ] || md_[ :double_quoted_bytes ]
-          # (we aren't gonna bother unescaping for now..)
-          s
-        end
-
-        o.finish
-      end
-
       it "builds" do
-        _subject_parser
+        grammar_one_parser_
       end
 
       context "(input 1)" do
@@ -73,7 +34,7 @@ module Skylab::DocTest::TestSupport
 
           HERE
 
-          _subject_parser.parse_string _input_string
+          grammar_one_parser_.parse_string _input_string
         end
 
         it "parses" do
@@ -115,7 +76,7 @@ module Skylab::DocTest::TestSupport
             end
           HERE
 
-          _subject_parser.parse_string _input_string
+          grammar_one_parser_.parse_string _input_string
         end
 
         it "parses" do
@@ -189,10 +150,5 @@ module Skylab::DocTest::TestSupport
       end
       a
     end
-
-    def _subject_module
-      Home_::Models_::Document::ErsatzParser
-    end
-
   end
 end
