@@ -52,5 +52,39 @@ module Skylab::DocTest::TestSupport
         Home_::Models_::Document::ErsatzParser
       end
     # -
+
+    # ==
+
+    recurse = nil
+    Show_structure_into = -> y, nodes do
+      recurse[ 0, nodes, y ]
+    end
+
+    cache = {
+      0 => ""  # BASE CASE
+    }
+    indent = "  "
+
+    margin_for = -> depth do
+      cache.fetch depth do
+        x = "#{ margin_for[ depth - 1 ] }#{ indent }"
+        cache[ depth ] = x
+        x
+      end
+    end
+
+    recurse = -> depth, nodes, y do
+      deeper = nil
+      nodes.each do |node|
+        if node.is_branch
+          deeper ||= depth + 1
+          y << "#{ margin_for[ depth ] }#{ node.category_symbol }\n"
+          recurse[ deeper, node.nodes, y ]
+        end
+      end
+      y
+    end
+
+    # ==
   end
 end

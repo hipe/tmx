@@ -1,0 +1,206 @@
+#!/usr/bin/env ruby -w
+
+pn = -> do
+  ::File.basename $PROGRAM_NAME
+end
+
+exit = -> do
+  ::Kernel.exit 5
+end
+
+argv = ::ARGV
+serr = $stderr
+sout = $stdout
+
+usage = -> do
+  serr.puts "usage: #{ pn[] } [-batch [ [-skip N [-skip N [..]] | -from N ] <file>"
+  serr.puts "       #{ pn[] } -help"
+end
+
+invite_exit = -> s=nil do
+  if s
+    serr.puts s
+  end
+  serr.puts "use -h for help."
+  exit[]
+end
+
+empty = -> do
+  argv.length.zero?
+end
+
+if empty[]
+  invite_exit[ "missing argument: <file>" ]
+end
+
+empty_a = [].freeze
+
+shift = -> do
+  x = argv.fetch 0
+  argv[ 0, 1 ] = empty_a
+  x
+end
+
+arg = shift[]
+if '-h' == arg
+  usage[]
+
+  y = ::Enumerator::Yielder.new do |s|
+    serr.puts s
+  end
+  nl = nil
+
+  y << nl
+  y << "purpose: to find files that don't parse in our 500+ list of test files"
+  y << nl
+
+  y << "switches:"
+  y << "  -h        help (this screen)"
+  y << nl
+  y << "  -batch    <file> is a list of test filenames"
+  y << "                   (without this it is a test file)"
+  y << nl
+  y << "  -skip N   (the first file is 0) under batch mode, skip this file"
+  y << nl
+  y << "  -from N   only start processing from the file at this line number"
+
+  exit[]
+end
+
+d_rx = nil
+
+build_digit_parser_for = -> sw_s do
+
+  d_rx ||= /\A\d+\z/
+
+  -> arg_ do
+    md = d_rx.match arg_
+    if md
+      md[0].to_i
+    else
+      serr.puts "for #{ sw_s } expected a digit, had #{ arg_.inspect }"
+      invite_exit[]
+    end
+  end
+end
+
+expect_more_after = -> sw_s do
+
+  if empty[]
+    invite_exit[ "expected more arguments after #{ sw_s } expression" ]
+  end
+end
+
+if '-batch' == arg
+
+  if argv.length.zero?
+    invite_exit[ "expecting <file>" ]
+  end
+
+  is_batch_mode = true
+
+  arg = shift[]
+
+  from_switch = '-from'
+  skip_switch = '-skip'
+
+  if skip_switch == arg
+    skip_h = {}
+
+    p = build_digit_parser_for[ skip_switch ]
+    begin
+
+      skip_h[ p[ shift[] ] ] = true
+
+      expect_more_after[ skip_switch ]
+
+      arg = shift[]
+    end while skip_switch == arg
+
+  elsif from_switch == arg
+    from_d = build_digit_parser_for[ from_switch ][ shift[] ]
+    expect_more_after[ from_switch ]
+    arg = shift[]
+  end
+end
+
+if '-' == arg[ 0 ]
+  invite_exit[ "unrecognized option in this context: #{ arg.inspect }" ]
+end
+
+if ! empty[]
+  invite_exit[ "unexpected argument: #{ argv.first.inspect }" ]
+end
+
+path_arg = arg  # LOOK
+
+# --
+
+open = -> path do
+  ::File.open path, ::File::RDONLY
+end
+
+do_path = -> path do
+
+  _st = open[ path ]
+
+  require_relative '../../lib/skylab/doc_test'  # or [#016]
+
+  _HOME = ::Skylab::DocTest
+
+  _omg = _HOME::OutputAdapters_::Quickie::Models::TestDocument.parse_line_stream _st
+
+  _HOME.test_support_::Ersatz_Parser::Show_structure_into[ sout, _omg.nodes ]
+end
+
+do_batch_mode = -> do
+
+  lineno = 0
+  line = nil
+
+  do_skip = if skip_h
+    -> do
+      skip_h[ lineno ]
+    end
+  else
+    -> do
+      false
+    end
+  end
+
+  st = open[ path_arg ]
+
+  if from_d
+    line_offset = from_d - 1
+    line_offset.times do
+      st.gets || fail
+    end
+    lineno = line_offset
+  end
+
+  begin
+    line = st.gets
+    line or break
+    lineno += 1
+    line.chomp!
+
+    if do_skip[]
+      serr.puts ">> (skipping: #{ line })"
+      redo
+    end
+
+    serr.puts "\n>> doing path (lineno: #{lineno}) #{ line }"
+    do_path[ line ]
+    redo
+  end while nil
+  serr.puts "done."
+end
+
+if is_batch_mode
+  do_batch_mode[]
+
+else
+  do_path[ path_arg ]
+end
+
+::Kernel.exit 0

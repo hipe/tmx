@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby -w
+
+# here is what we did to A) get a "sample" of *all* known spec files in
+# our universe and then B) find the largest few ones, to the end of
+# trying [#027] against them. these are "optimistic notes" in that we
+# have put them here but don't know if we will bother turning this into
+# an actual script.
+
+# find .. -type f -name '*_spec.rb' > BIG_LIST
+# cat BIG_LIST | while read line ; do  wc -l "$line" ; done > BIGGER_LIST
+# cat BIGGER_LIST | sort -nr > biggest_list
+
+puts "read the comments in this file."

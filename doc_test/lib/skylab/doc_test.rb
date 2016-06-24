@@ -65,6 +65,13 @@ module Skylab::DocTest
         end.to_a
       end
 
+    def test_support_  # #[#ts-035]
+      if ! Home_.const_defined? :TestSupport, false
+        require_relative '../../test/test-support'
+      end
+      Home_::TestSupport
+    end
+
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         Lib___, self )

@@ -308,13 +308,31 @@ module Skylab::DocTest
           @nodes.push Line__.new s, :nonblank_line ; nil
         end
 
+        def to_node_stream
+          Common_::Stream.via_nonsparse_array @nodes
+        end
+
         attr_reader(
           :nodes,
         )
       end
 
       class RootFrame___  < AbstractFrame__
-        # #todo (hi.)
+
+        def write_lines_into y  # #testpoint-only (for now)
+          st = to_line_stream
+          begin
+            line = st.gets
+            line or break
+            y << line
+            redo
+          end while nil
+          y
+        end
+
+        def to_line_stream
+          Here_::LineStream_via_Node___[ self ]
+        end
       end
 
       class NonRootFrame___ < AbstractFrame__
@@ -384,6 +402,7 @@ module Skylab::DocTest
         end
       end
 
+      Here_ = self
       ParseError = ::Class.new ::RuntimeError
     end
   end
