@@ -14,14 +14,14 @@ module Skylab::DocTest
 
         def execute
 
-          st = @root_node.to_node_stream
+          st = @root_node.to_constituent_node_stream
           stack = [ st ]
 
           p = -> do
             o = st.gets
             if o
               if o.is_branch
-                st = o.to_node_stream
+                st = o.to_constituent_node_stream
                 stack.push st
                 p[]
               else

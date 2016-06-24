@@ -6,6 +6,7 @@ module Skylab::DocTest::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :output_adapters_quickie
 
     context '(context)' do
 
@@ -14,7 +15,7 @@ module Skylab::DocTest::TestSupport
       end
 
       it "the document parser loads (which is the same as builds)" do
-        _subject_parser_instance || fail
+        output_adapter_test_document_parser_ || fail
       end
 
       it "the document parser can parse THIS SELFSAME FILE" do
@@ -30,7 +31,7 @@ module Skylab::DocTest::TestSupport
               module\n
               [ ][ ]describe\n
               [ ][ ][ ][ ]context\n
-          (?: [ ][ ][ ][ ][ ][ ]it\n  ){3,}
+          (?: [ ][ ][ ][ ][ ][ ]example_node\n  ){3,}
         /x
 
         _rx =~ _act || fail
@@ -51,7 +52,7 @@ module Skylab::DocTest::TestSupport
 
       shared_subject :_omg_parse_tree_of_this_selfsame_file do
         fh = _open_file_two_times
-        x = _subject_parser_instance.parse_line_stream fh
+        x = output_adapter_test_document_parser_.parse_line_stream fh
         fh.close
         x
       end
@@ -59,14 +60,6 @@ module Skylab::DocTest::TestSupport
       def _open_file_two_times
         ::File.open __FILE__
       end
-    end
-
-    def _subject_parser_instance
-      output_adapter_module_::Models::TestDocument::PARSER
-    end
-
-    def output_adapter_module_
-      output_adapters_module_::Quickie
     end
   end
 end

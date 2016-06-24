@@ -308,7 +308,34 @@ module Skylab::DocTest
           @nodes.push Line__.new s, :nonblank_line ; nil
         end
 
-        def to_node_stream
+        # --
+
+        def first_example_node_with_identifying_string s
+
+          to_example_node_stream.flush_until_detect do |eg|
+
+            s == eg.identifying_string
+          end
+        end
+
+        def first_example_node
+
+          to_example_node_stream.gets
+        end
+
+        def to_example_node_stream
+
+          __to_branch_stream_recursive.reduce_by do |branch|
+
+            :example_node == branch.category_symbol
+          end
+        end
+
+        def __to_branch_stream_recursive
+          Here_::BranchStream_via_Node___[ self ]
+        end
+
+        def to_constituent_node_stream
           Common_::Stream.via_nonsparse_array @nodes
         end
 

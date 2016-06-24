@@ -31,7 +31,7 @@ this builds on [#017] our "essential operation" [about syncing] pseudocode.
 
     • positional & relative access to nodes
       • be able to get the first node from the document
-        (probably we need to model document nodes like [etc] and [etc])
+        (probably we need to model document nodes like module and `describe`)
 
     • random acccess to nodes
       • be able to retrieve a context node by name
