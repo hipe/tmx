@@ -18,24 +18,24 @@ this builds on [#017] our "essential operation" [about syncing] pseudocode.
 
 ## requirements (overview)
 
-  • (step -N: ersatz parser)
+  ✓ (step -N: ersatz parser)
 
-  • requirement -4: (step -N)
+  ✓ requirement -4: (step -N)
 
-    • (anti-requirement): we will allow ourselves to fail with some
+ 	  ✓ (anti-requirement): we will allow ourselves to fail with some
       documents while [#002] this is a hack.
 
-    • "lossless" - needs to be able to output every byte that went into it.
+    ✓ "lossless" - needs to be able to output every byte that went into it.
 
   • requirement -3: (step -N)
 
     • positional & relative access to nodes
-      • be able to get the first node from the document
+      ✓  be able to get the first node from the document
         (probably we need to model document nodes like module and `describe`)
 
     • random acccess to nodes
       • be able to retrieve a context node by name
-      • be able to retrieve an example node by name
+      ✓ be able to retrieve an example node by name
 
     • start to think about how to access unassertive nodes..
 
@@ -43,8 +43,8 @@ this builds on [#017] our "essential operation" [about syncing] pseudocode.
 
   • requirement -1: (mutability 2/2): item body lines that can be replaced
 
-    • after having retrieved an item node, be able to replace all of
-      its body lines with new lines. (step -1)
+    ✓ after having retrieved an item node, be able to replace all of
+      its body lines with new lines. (step -N)
 
 
 

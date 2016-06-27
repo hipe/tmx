@@ -25,7 +25,7 @@ module Skylab::DocTest
       self  # we don't freeze because of #spot-N
     end
 
-    def to_line_stream_  # might be #testpoint-only..
+    def to_line_stream  # might be #testpoint-only..
       Common_::Stream.via_nonsparse_array @lines
     end
 

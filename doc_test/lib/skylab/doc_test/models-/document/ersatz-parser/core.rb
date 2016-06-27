@@ -261,6 +261,8 @@ module Skylab::DocTest
           @nodes = []
         end
 
+        # -- initialization-time mutators
+
         def __add_completed_branch_frame fr
           o = fr.close_branch_frame
           ( @_branch_stack ||= [] ).push @nodes.length
@@ -297,18 +299,32 @@ module Skylab::DocTest
         end
 
         def add_blank_line s
-          @nodes.push Line__.new s, :blank_line ; nil
+          @nodes.push Line_.new s, :blank_line ; nil
         end
 
         def add_ending_line s
-          @nodes.push Line__.new s, :ending_line ; nil
+          @nodes.push Line_.new s, :ending_line ; nil
         end
 
         def add_nonblank_line s
-          @nodes.push Line__.new s, :nonblank_line ; nil
+          @nodes.push Line_.new s, :nonblank_line ; nil
         end
 
-        # --
+        # -- work-time mutators
+
+        def replace_constituent_lines line_st
+
+          a = Here_::NewNodes_via_LineStream_and_OriginalNodes[ line_st, @nodes ]
+          3 <= a.length || ::Kernel._SANITY
+          @nodes = a
+          NIL_
+        end
+
+        # -- readers
+
+        def to_line_stream
+          Here_::LineStream_via_Node___[ self ]
+        end
 
         def first_example_node_with_identifying_string s
 
@@ -355,10 +371,6 @@ module Skylab::DocTest
             redo
           end while nil
           y
-        end
-
-        def to_line_stream
-          Here_::LineStream_via_Node___[ self ]
         end
       end
 
@@ -412,11 +424,15 @@ module Skylab::DocTest
 
       # ==
 
-      class Line__
+      class Line_
 
         def initialize s, sym
           @category_symbol = sym
           @line_string = s
+        end
+
+        def is_blank_line
+          BLANK_RX_ =~ @line_string
         end
 
         attr_reader(

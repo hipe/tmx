@@ -38,7 +38,38 @@ module Skylab::DocTest
         self
       end
 
-      def to_line_stream_  # might be #testpoint-only
+      def to_content_line_stream_given choices
+        st = to_line_object_stream
+        p = nil
+        main_p = -> do
+          o = st.gets
+          if o
+            if o.has_magic_copula
+              st = o.to_common_paraphernalia_given( choices ).to_line_stream
+              p = -> do
+                line = st.gets
+                if line
+                  line
+                else
+                  p = main_p
+                  p[]
+                end
+              end
+              p[]
+            else
+              o.get_content_line
+            end
+          else
+            p = EMPTY_P_ ; NOTHING_
+          end
+        end
+        p = main_p
+        Common_.stream do
+          p[]
+        end
+      end
+
+      def to_line_stream  # might be #testpoint-only
         to_line_object_stream.map_by do |o|
           o.string
         end

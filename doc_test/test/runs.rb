@@ -40,17 +40,17 @@ module Skylab::DocTest::TestSupport
         end while nil
         cb || ::Kernel._EEK
       end
+
+      def disucssion_run_via_big_string_ s
+        Functions__.__discussion_run s
+      end
+
+      def code_run_via_big_string_ s
+        Functions__.__code_run s
+      end
     # -
 
     # ==
-
-    Code_run_via_big_string = -> big_s do
-      Functions__.__code_run big_s
-    end
-
-    Discussion_run_via_big_string = -> big_s do
-      Functions__.__discussion_run big_s
-    end
 
     module Functions__ ; class << self
 
@@ -62,10 +62,11 @@ module Skylab::DocTest::TestSupport
         st = line_stream_via_string_ big_s
 
         dr = Home_::Models_::Discussion::Run.new_empty__
+        p = _etc dr
 
         s = st.gets
         begin
-          dr.accept_line_via_offsets( * __disc_etc( s ), s )
+          p[ s ]
           s = st.gets
         end while s
 
@@ -77,31 +78,33 @@ module Skylab::DocTest::TestSupport
         st = line_stream_via_string_ big_s
 
         s = st.gets
-        cr = Home_::Models_::Code::Run.begin_via_offsets__( * _code_etc( s ), s )
+        cr = Home_::Models_::Code::Run.begin_via_offsets__( * _code_tuple_via_string( s ), s )
+        p = _etc cr
+
         while s = st.gets
-          cr.accept_line_via_offsets( * _code_etc( s ), s )
+          p[ s ]
         end
 
         cr
       end
 
-      def __disc_etc line
-
-        m_r, c_r, l_r = _three line
-        if c_r.size.zero?
-          ::Kernel._ETC
-        else
-          [ m_r, c_r, l_r ]
-        end
+      def _code_tuple_via_string line
+        a = _three line
+        a.fetch( 1 ).size.zero? and ::Kernel._SANITY
+        a
       end
 
-      def _code_etc line
-
-        m_r, c_r, l_r = _three line
-        if c_r.size.zero?
-          ::Kernel._ETC
-        else
-          [ m_r, c_r, l_r ]
+      def _etc run
+        -> line do
+          m_r, c_r, l_r = _three line
+          if c_r.size.zero?
+            _bl = Home_::Magnetics_::RunStream_via_CommentBlock::
+              Blank_Line___.via_offsets__ m_r, l_r, line
+            run.accept_line_object _bl
+          else
+            run.accept_line_via_offsets( m_r, c_r, l_r, line )
+          end
+          NIL_
         end
       end
 

@@ -263,7 +263,7 @@ module Skylab::DocTest
     class Blank_Line___
 
       class << self
-        alias_method :via_offsets__, :new
+        alias_method :via_offsets__, :new  # #testpoint
         undef_method :new
       end  # >>
 

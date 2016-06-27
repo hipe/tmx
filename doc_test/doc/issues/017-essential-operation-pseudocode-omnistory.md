@@ -119,11 +119,13 @@ we can arrive at the above by these rules:
   • if it does not exist and it is the first item
     in the source, prepend it to the destination document.
     ((A) demonstrates this.)
+    #TRICKY
 
   • otherwise (and it does not exist and is not first),
     place it immediately after the node that is above it
     in the source (in the destination).
     ((C) demonstrates this.)
+    #TRICKY
 
   • nodes that (by name) exist in the destination that
     do not exist in the source will remain in the destination.

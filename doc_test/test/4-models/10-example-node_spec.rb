@@ -6,6 +6,7 @@ module Skylab::DocTest::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :runs
 
     context "(context)" do
 
@@ -61,7 +62,7 @@ module Skylab::DocTest::TestSupport
 
       shared_subject :_same_discussion_run do
 
-        _disucssion_run_via_big_string <<-HERE.unindent
+        disucssion_run_via_big_string_ <<-HERE.unindent
           # matchu pitchu no see
           # it smooth mamma jamma:
         HERE
@@ -69,7 +70,7 @@ module Skylab::DocTest::TestSupport
 
       shared_subject :_same_code_run do
 
-        _code_run_via_big_string <<-HERE.unindent
+        code_run_via_big_string_ <<-HERE.unindent
           #     code line w/o ting ting
           #     some( thing )  # => :thang
         HERE
@@ -90,14 +91,6 @@ module Skylab::DocTest::TestSupport
 
     def _build_subject_instance_via_these_runs_and_choices d_r, c_r, cx
       _subject_module.via_runs_and_choices_ d_r, c_r, cx
-    end
-
-    def _disucssion_run_via_big_string s
-      TS_::Runs::Discussion_run_via_big_string[ s ]
-    end
-
-    def _code_run_via_big_string s
-      TS_::Runs::Code_run_via_big_string[ s ]
     end
 
     def _subject_module

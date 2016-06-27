@@ -48,7 +48,7 @@ module Skylab::DocTest
         lo
       end
 
-      def to_line_stream_  # might be #testpoint-only..
+      def to_line_stream  # might be #testpoint-only..
         to_line_object_stream.map_by do |o|
           o.string
         end
