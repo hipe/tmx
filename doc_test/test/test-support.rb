@@ -100,10 +100,26 @@ module Skylab::DocTest::TestSupport
 
   # -
 
+  Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
+
   # --
 
-  module API
+  module My_API
+
     def self.[] tcc
+      Beep__[][ tcc ]
+      tcc.include self
+    end
+
+    Beep__ = Lazy_.call do
+      Home_.lib_.zerk.test_support.lib :API
+    end
+
+    def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
+
+      @root_ACS = Home_::Root_Autonomous_Component_System_.new
+      @result = Home_::Call_ACS_[ x_a, @root_ACS, & pp ]
     end
   end
 
@@ -123,7 +139,6 @@ module Skylab::DocTest::TestSupport
 
   # --
 
-  Common_ = ::Skylab::Common
   Autoloader__ = Common_::Autoloader
 
   # --
@@ -142,7 +157,6 @@ module Skylab::DocTest::TestSupport
   Home_ = ::Skylab::DocTest
 
   EMPTY_S_ = Home_::EMPTY_S_
-  Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   TS_ = self

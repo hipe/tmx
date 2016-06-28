@@ -5,19 +5,46 @@ module Skylab::DocTest::TestSupport
   describe "[dt] API - intro" do
 
     TS_[ self ]
-    # use :expect_event
+    use :my_API
 
-    it "no such action", wip: true do
-      call_API
-      expect_not_OK_event :no_such_action
-      expect_failed
+    context '(ping)' do
+
+      call_by do
+        call :ping
+      end
+
+      it 'works' do
+        root_ACS_result == :_hello_from_doc_test_ || fail
+      end
+
+      it "emits" do
+        _be_this = be_emission_ending_with :expression, :ping do |y|
+          y == [ "ping ** ! **" ] || fail
+        end
+        only_emission.should _be_this
+      end
     end
 
-    it "ping", wip: true do
-      call_API :ping
-      expect_OK_event :ping, 'ping (highlight "!")'
-      @result.should eql :_hello_from_doc_test_
-      expect_no_more_events
+    context '(strange)' do
+
+      call_by do
+        call :strange
+      end
+
+      it 'fails' do
+        fails
+      end
+
+      it "emits" do
+
+        _be_this = be_emission_ending_with :no_such_association do |ev|
+
+          _ = black_and_white ev
+          _.include? "no such association 'strange'" or fail
+        end
+
+        only_emission.should _be_this
+      end
     end
   end
 end

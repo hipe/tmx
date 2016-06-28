@@ -39,23 +39,45 @@ module Skylab::DocTest
     #
     #     THIS_FILE_.contains( 'from these description lines"' ) # => true
 
-    module CLI
-      # ..
-    end
+  # ==
 
-    module API
+  module CLI
 
-      class << self
+  end
 
-        def call * x_a, & oes_p
+  module API
 
-          # don't ever write events to stdout/stderr by default.
-          # see temporary tombstone A
+  end
 
-          ::Kernel._K_ALSO_fix_indent_here
+  Call_ACS_ = -> x_a, acs, & pp do
+
+    Require_zerk_[]
+    Zerk_::API.call x_a, acs, & pp
+  end
+
+  class Root_Autonomous_Component_System_
+
+    def __ping__component_operation
+
+      -> & oes_p do
+
+        oes_p.call :payload, :expression, :ping do |y|
+          y << "ping #{ highlight '!' }"
         end
-      end  # >>
+
+        :_hello_from_doc_test_
+      end
     end
+  end
+
+  Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
+
+  Require_zerk_ = Lazy_.call do
+    Zerk_ = Home_.lib_.zerk
+  end
+
+  # ==
 
   class << self
 
@@ -80,10 +102,7 @@ module Skylab::DocTest
 
   # --
 
-  Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
-
-  # --
 
   module Magnetics_
     Autoloader_[ self ]
@@ -113,6 +132,7 @@ module Skylab::DocTest
     system_lib = sidesys[ :System ]
 
     Test_support = sidesys[ :TestSupport ]
+    Zerk = sidesys[ :Zerk ]
   end
 
   # --
@@ -124,8 +144,6 @@ module Skylab::DocTest
   module Models_
     Autoloader_[ self ]
   end
-
-  # -
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   ACHIEVED_ = true
@@ -140,4 +158,5 @@ module Skylab::DocTest
   NOTHING_ = nil
   UNABLE_ = false
 end
+# #tombstone: dedicated API file
 # #temporary-tombstone:A: old [br] API call boilerplate

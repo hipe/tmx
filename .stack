@@ -1,6 +1,8 @@
 the big question - slicer
 factor out dir_pathname (!)
-recursive
-design & implement the new synchronizing model (reversing!)
-iteration -1 - complete reverse synchronization
-iteration -2 - make forwards translation synchronizing - the algo described in [#017]
+reverse synchronization (or postpone)
+recursive for CLI
+recursive for API
+recursive magnetics
+CLI integration for single
+API integration for single

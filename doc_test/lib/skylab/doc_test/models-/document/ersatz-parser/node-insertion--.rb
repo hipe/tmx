@@ -251,7 +251,7 @@ module Skylab::DocTest
 
         # ==
 
-        Blank_line_ = Common_::Lazy.call do
+        Blank_line_ = Lazy_.call do
           Line_.new NEWLINE_, :blank_line
         end
       end

@@ -6,7 +6,7 @@ module Skylab::DocTest::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :API
+    use :my_API
     # use :expect_event
     # use :expect_line
 

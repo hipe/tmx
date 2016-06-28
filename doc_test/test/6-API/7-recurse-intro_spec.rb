@@ -5,7 +5,7 @@ module Skylab::DocTest::TestSupport
   describe "[dt] API - recurse intro" do
 
     TS_[ self ]
-    use :API
+    use :my_API
     # use :expect_event
     # use :stubbed_FS
 
