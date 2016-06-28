@@ -256,6 +256,16 @@ module Skylab::DocTest
 
       class BranchNode__
 
+        # -- mutators
+
+        def begin_insert_into_empty_branch_session
+          Here_::NodeInsertion__::Empty[ @nodes ]
+        end
+
+        def replace__ a  # freezes
+          @nodes = a.frozen? ? a : a.dup.freeze ; nil
+        end
+
         # -- readers
 
         def to_line_stream
@@ -277,17 +287,25 @@ module Skylab::DocTest
 
         def to_qualified_example_node_stream
 
-          o = Here_::BranchStream_via_Node___.begin_for__ self
+          o = _begin_branch_stream_session
 
           o.branch_stream.map_reduce_by do |branch|
 
             if :example_node == branch.category_symbol
-              Qualified_Frame___[ branch, o.current_parent_branch__ ]
+              Qualified_Example___[ branch, o.current_parent_branch__ ]
             end
           end
         end
 
-        Qualified_Frame___ = ::Struct.new :example_node, :parent_branch
+        Qualified_Example___ = ::Struct.new :example_node, :parent_branch
+
+        def to_branch_stream
+          _begin_branch_stream_session.branch_stream
+        end
+
+        def _begin_branch_stream_session
+          Here_::BranchStream_via_Node___.begin_for__ self
+        end
 
         def to_constituent_node_stream
           Common_::Stream.via_nonsparse_array @nodes
@@ -372,6 +390,10 @@ module Skylab::DocTest
         end
 
         # -- work-time mutators
+
+        def begin_insert_into_empty_document_given choices
+          choices.begin_insert_into_empty_document self
+        end
 
         def prepend_example eg
           @nodes = Here_::NodeInsertion__::Prepend[ eg, @nodes ]

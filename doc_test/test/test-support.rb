@@ -142,6 +142,7 @@ module Skylab::DocTest::TestSupport
   Home_ = ::Skylab::DocTest
 
   EMPTY_S_ = Home_::EMPTY_S_
+  Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   TS_ = self

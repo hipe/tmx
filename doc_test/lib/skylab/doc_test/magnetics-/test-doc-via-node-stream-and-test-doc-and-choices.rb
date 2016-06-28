@@ -15,6 +15,59 @@ module Skylab::DocTest
     # for the referenced (test) document to be a structured document and
     # not stream, that's what we do there.)
 
+    # ==
+
+    class Session
+
+      class << self
+        alias_method :begin, :new
+        undef_method :new
+      end  # >>
+
+      attr_writer(
+        :asset_line_stream,
+        :choices,
+        :original_test_line_stream,
+      )
+
+      def finish
+        self
+      end
+
+      def to_string
+        to_test_document.to_line_stream.reduce_into_by "" do |m, s|
+          m << s
+        end
+      end
+
+      def to_test_document
+
+        in_st = remove_instance_variable :@asset_line_stream
+        orig_st = remove_instance_variable :@original_test_line_stream
+
+        # -- run through the magnetics & related (near [#ta-005])
+
+        o = Magnetics_
+        _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ in_st ]
+        node_st = o::NodeStream_via_BlockStream_and_Choices[ _bs, @choices ]
+
+        test_doc = @choices.test_document_parser.parse_line_stream orig_st
+        orig_st.respond_to? :close and orig_st.close
+
+        # --
+
+        o = Here_.begin
+        o.choices = @choices
+        o.node_stream = node_st
+        o.test_document = test_doc
+        doc = o.finish
+        in_st.respond_to? :close and in_st.close
+        doc
+      end
+    end
+
+    # ==
+
     class << self
       alias_method :begin, :new
       undef_method :new
@@ -92,11 +145,23 @@ module Skylab::DocTest
     end
 
     def __prepend_this_node_to_the_beginning_of_the_document
+
       if @_box.length.zero?
-        self.__TODO_place_this_node_in_an_empty_document  # #todo
+        __insert_this_node_into_an_emptyesque_document
       else
         __prepend_this_node_before_the_first_node_in_the_document
       end
+      NIL_
+    end
+
+    def __insert_this_node_into_an_emptyesque_document
+
+      eg = remove_instance_variable :@_this_example
+      o = @test_document.begin_insert_into_empty_document_given @choices
+      o.example_node = eg
+      o = o.finish
+      @_last_inserted_example = eg
+      @_last_receiving_branch = o.last_receiving_branch
       NIL_
     end
 
@@ -109,7 +174,6 @@ module Skylab::DocTest
       @_last_inserted_example = eg
       @_last_receiving_branch = branch
       branch.prepend_example eg
-
       NIL_
     end
 
@@ -119,7 +183,6 @@ module Skylab::DocTest
       after_this = remove_instance_variable :@_last_inserted_example
       @_last_inserted_example = eg
       @_last_receiving_branch.insert_example_after after_this, eg
-
       NIL_
     end
 
@@ -147,5 +210,7 @@ module Skylab::DocTest
       @_box = bx
       NIL_
     end
+
+    Here_ = self
   end
 end

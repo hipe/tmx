@@ -6,8 +6,6 @@ module Skylab::DocTest::TestSupport
       tcc.include self
     end
 
-    Lazy_ = Common_::Lazy  # ..
-
     # -
 
       def line_stream_via_fixture_file_symbol_ sym

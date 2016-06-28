@@ -23,6 +23,18 @@ module Skylab::DocTest
         NIL_
       end
 
+      # --
+
+      def begin_insert_into_empty_document doc
+        Here_::Models::TestDocument::Insert_into_Empty_Document.new doc, self
+      end
+
+      def test_document_parser
+        Here_::Models::TestDocument::PARSER
+      end
+
+      # --
+
       def particular_paraphernalia_for para
 
         particular_paraphernalia_of_for(

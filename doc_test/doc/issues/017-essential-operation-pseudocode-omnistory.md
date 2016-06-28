@@ -149,6 +149,14 @@ some characteristics of this set of rules are:
      with duplicate content under different names.
 
 
+
+### edges
+
+  • reference document is partly or more empty #coverpoint3-5
+
+
+
+
 ## reverse
 
 "reverse synchronization" is the idea that you might want to fix some

@@ -6,6 +6,14 @@ module Skylab::DocTest
 
       module NodeInsertion__
 
+        Empty = -> nodes do
+
+          idx = Index__.new nodes
+          idx.work
+
+          Motifs__.new idx, nodes
+        end
+
         Prepend = -> eg, nodes do
 
           idx = Index__.new nodes
@@ -46,6 +54,7 @@ module Skylab::DocTest
 
           def initialize idx, nodes
             @index = idx
+            @reference_index = nil
             @original_nodes = nodes
             @result_nodes = []
           end
@@ -64,9 +73,24 @@ module Skylab::DocTest
             end
           end
 
+          def write_opening_node_and_any_blank_lines
+
+            st = Common_::Polymorphic_Stream.via_array @original_nodes
+            @result_nodes.push st.gets_one
+            begin
+              st.no_unparsed_exists && break
+              o = st.current_token
+              :blank_line == o.category_symbol || break
+              @result_nodes.push o
+              st.advance_one
+              redo
+            end while nil
+            @reference_index = st.current_index
+          end
+
           def write_new_example_node eg
 
-            margin = @original_nodes.fetch( @index.reference_index ).nodes.first.get_margin  # ..
+            margin = ___get_reference_margin
             nodes = []
 
             st = eg.to_line_stream
@@ -89,6 +113,16 @@ module Skylab::DocTest
             NIL_
           end
 
+          def ___get_reference_margin
+
+            d = @index.reference_index
+            if d
+              @original_nodes.fetch( d ).nodes.first.get_margin
+            else
+              "#{ @original_nodes.fetch( 0 ).get_margin }  "  # manual #indent #ick
+            end
+          end
+
           def nodes_exist_after_the_reference_example
             @index.reference_index < @original_nodes.length - 1
           end
@@ -100,18 +134,35 @@ module Skylab::DocTest
           end
 
           def write_from_the_reference_example_to_end
-            ( @index.reference_index ... @original_nodes.length ).each do |d|
+            _eek = @reference_index || @index.reference_index
+            ( _eek ... @original_nodes.length ).each do |d|
               @result_nodes.push @original_nodes.fetch d
             end
+          end
+
+          def write_blank_line_if_necessary
+            last = @result_nodes.last
+            if ! last || :blank_line != last.category_symbol
+              @result_nodes.push Blank_line_[]
+            end
+            NIL_
           end
 
           def write_separating_blank_line_run
             @result_nodes.concat @index.separating_blank_lines_array
           end
 
+          attr_writer(
+            :reference_margin,
+          )
+
           def finish
-            remove_instance_variable :@result_nodes
+            remove_instance_variable( :@result_nodes ).freeze
           end
+
+          attr_reader(
+            :index,
+          )
         end
 
         class Index__
@@ -199,6 +250,10 @@ module Skylab::DocTest
         end
 
         # ==
+
+        Blank_line_ = Common_::Lazy.call do
+          Line_.new NEWLINE_, :blank_line
+        end
       end
     end
   end

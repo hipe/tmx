@@ -95,86 +95,28 @@ module Skylab::DocTest::TestSupport
         end\n
       \z)mx.match _big_s
 
-      blank_lines = %r(\n+)
-      describe_rx = /^ +it "([^"]+)"/
-      nonblank_lines = %r((?:[ ]+[^ ].+\n)+)
-
-      bx = Common_::Box.new
-      scn = ::StringScanner.new _md[ :tons_o_stuff ]
-
-      s = scn.scan nonblank_lines
-      s or fail  # comments. toss it out
-      d = scn.skip blank_lines
-      d.zero? && fail
-
-      index = -1
-      begin
-
-        s = scn.scan nonblank_lines
-        md = describe_rx.match s
-
-        d = scn.skip blank_lines
-
-        index += 1
-        key = md[ 1 ]
-
-        if d
-          o = X_Ting___.new( key, index, d, s )
-          bx.add o.description_string, o
-          redo
-        end
-        o = X_Ting___.new( key, index, 0, s )
-        bx.add o.description_string, o
-        scn.eos? or Home_._SANITY
-        break
-      end while nil
-
-      bx
+      o = begin_simple_chunker_for_ _md[ :tons_o_stuff ]
+      o.skip_a_postseparated_chunk  # comments
+      o.to_box
     end
-
-    X_Ting___ = ::Struct.new :description_string, :index, :num_trailing_lines, :full_string
 
     shared_subject :_big_string do
 
-      # -- setup variables for magnetics
+      o = begin_forwards_synchronization_session_for_tests_
 
-      cx = real_default_choices_
+      o.choices = real_default_choices_
 
       path = fixture_tree_pather 'tree-01'
 
-      in_fh = ::File.open path[ 'asset.fake.rb' ]
+      o.asset_path = path[ 'asset.fake.rb' ]
 
-      orig_fh = ::File.open path[ 'original.test.fake.rb' ]
+      o.original_test_path = path[ 'original.test.fake.rb' ]
 
-      # -- run through the magnetics & related (near [#ta-005])
-
-      o = magnetics_module_
-
-      _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ in_fh ]
-
-      node_st = o::NodeStream_via_BlockStream_and_Choices[ _bs, cx ]
-
-      test_doc = output_adapter_test_document_parser_.parse_line_stream orig_fh
-      orig_fh.close
-
-      # --
-
-      o = _subject_magnetic.begin
-      o.choices = cx
-      o.node_stream = node_st
-      o.test_document = test_doc
-      doc = o.finish
-      in_fh.close
-
-      # --
-
-      doc.to_line_stream.reduce_into_by "" do |m, s|
-        m << s
-      end
+      o.to_string
     end
 
     def _subject_magnetic
-      magnetics_module_::TestDoc_via_NodeStream_and_TestDoc_and_Choices
+      forwards_synchronization_magnetic_module_
     end
   end
 end
