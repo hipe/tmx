@@ -254,7 +254,69 @@ module Skylab::DocTest
 
       # ==
 
-      class AbstractFrame__
+      class BranchNode__
+
+        # -- readers
+
+        def to_line_stream
+          Here_::LineStream_via_Node___[ self ]
+        end
+
+        def first_qualified_example_node_with_identifying_string s
+
+          to_qualified_example_node_stream.flush_until_detect do |qeg|
+
+            s == qeg.example_node.identifying_string
+          end
+        end
+
+        def first_example_node  # #testpoint-only
+
+          to_qualified_example_node_stream.gets.example_node
+        end
+
+        def to_qualified_example_node_stream
+
+          o = Here_::BranchStream_via_Node___.begin_for__ self
+
+          o.branch_stream.map_reduce_by do |branch|
+
+            if :example_node == branch.category_symbol
+              Qualified_Frame___[ branch, o.current_parent_branch__ ]
+            end
+          end
+        end
+
+        Qualified_Frame___ = ::Struct.new :example_node, :parent_branch
+
+        def to_constituent_node_stream
+          Common_::Stream.via_nonsparse_array @nodes
+        end
+
+        attr_reader(
+          :category_symbol,
+          :nodes,
+        )
+
+        def is_branch
+          true
+        end
+      end
+
+      class FreeformBranchFrame_ < BranchNode__
+
+        def initialize sym, eg, nodes
+          @category_symbol = sym
+          @identifying_string = eg.identifying_string
+          @nodes = nodes
+        end
+
+        attr_reader(
+          :identifying_string,
+        )
+      end
+
+      class BranchNode_from_Document__ < BranchNode__
 
         def initialize
           @_branch_stack = nil
@@ -272,8 +334,7 @@ module Skylab::DocTest
         def close_branch_frame
 
           # whenever a branch node receives its "close" expression
-          # it knows it's not getting any more children. at this time
-          # we tell each child who its previous and next is.
+          # it knows it's not getting any more children.
 
           stack = remove_instance_variable :@_branch_stack
           if stack
@@ -282,11 +343,11 @@ module Skylab::DocTest
             end
             right = st.gets
             middle = st.gets  # might be nil
-            right.receive_previous_and_next middle, NOTHING_
+            # right.receive_previous_and_next middle, NOTHING_
             if middle
               begin
                 left = st.gets  # might be nil
-                middle.receive_previous_and_next left, right
+                # middle.receive_previous_and_next left, right
                 left || break
                 right = middle
                 middle = left
@@ -312,55 +373,43 @@ module Skylab::DocTest
 
         # -- work-time mutators
 
-        def replace_constituent_lines line_st
-
-          a = Here_::NewNodes_via_LineStream_and_OriginalNodes[ line_st, @nodes ]
-          3 <= a.length || ::Kernel._SANITY
-          @nodes = a
+        def prepend_example eg
+          @nodes = Here_::NodeInsertion__::Prepend[ eg, @nodes ]
           NIL_
         end
 
-        # -- readers
-
-        def to_line_stream
-          Here_::LineStream_via_Node___[ self ]
+        def insert_example_after after_this_eg, eg
+          @nodes = Here_::NodeInsertion__::After[ after_this_eg, eg, @nodes ]
+          NIL_
         end
 
-        def first_example_node_with_identifying_string s
+        def replace_lines line_st
 
-          to_example_node_stream.flush_until_detect do |eg|
-
-            s == eg.identifying_string
-          end
+          o = Here_::NewNodes_via_LineStream_and_OriginalNodes.begin
+          o.line_stream = line_st
+          o.original_nodes = @nodes
+          o.do_replace_constituent_lines = false
+          _etc o
         end
 
-        def first_example_node
+        def replace_constituent_lines line_st
 
-          to_example_node_stream.gets
+          o = Here_::NewNodes_via_LineStream_and_OriginalNodes.begin
+          o.line_stream = line_st
+          o.original_nodes = @nodes
+          o.do_replace_constituent_lines = true
+          _etc o
         end
 
-        def to_example_node_stream
-
-          __to_branch_stream_recursive.reduce_by do |branch|
-
-            :example_node == branch.category_symbol
-          end
+        def _etc o
+          a = o.finish
+          3 <= a.length || ::Home_._SANITY
+          @nodes = a
+          NIL_
         end
-
-        def __to_branch_stream_recursive
-          Here_::BranchStream_via_Node___[ self ]
-        end
-
-        def to_constituent_node_stream
-          Common_::Stream.via_nonsparse_array @nodes
-        end
-
-        attr_reader(
-          :nodes,
-        )
       end
 
-      class RootFrame___  < AbstractFrame__
+      class RootFrame___  < BranchNode_from_Document__
 
         def write_lines_into y  # #testpoint-only (for now)
           st = to_line_stream
@@ -374,7 +423,7 @@ module Skylab::DocTest
         end
       end
 
-      class NonRootFrame___ < AbstractFrame__
+      class NonRootFrame___ < BranchNode_from_Document__
 
         def initialize md, bnt, lineno_d
           @_branch_NT = bnt
@@ -394,12 +443,6 @@ module Skylab::DocTest
           super()
         end
 
-        def receive_previous_and_next prev, nxt
-          @next = nxt
-          @previous = prev
-          self  # not frozen because only because identifying string is lazy
-        end
-
         def identifying_string  # assume a proc exists to determine any it
           @_id_s_kn ||= __build_identifying_string_knownness
           @_id_s_kn.value_x
@@ -411,15 +454,8 @@ module Skylab::DocTest
         end
 
         attr_reader(
-          :category_symbol,
           :lineno,
-          :next,
-          :previous,
         )
-
-        def is_branch
-          true
-        end
       end
 
       # ==
@@ -430,6 +466,12 @@ module Skylab::DocTest
           @category_symbol = sym
           @line_string = s
         end
+
+        def get_margin
+          MARGIN_RX___.match( @line_string )[ 0 ]
+        end
+
+        MARGIN_RX___ = /\A[\t ]*/
 
         def is_blank_line
           BLANK_RX_ =~ @line_string
@@ -450,3 +492,4 @@ module Skylab::DocTest
     end
   end
 end
+# #tombstone: previous and next

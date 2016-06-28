@@ -33,12 +33,12 @@ module Skylab::DocTest::TestSupport
           blk or break
           sym = blk.category_symbol
           :static == sym && redo
-          :comment == sym || ::Kernel._EEK
-          cb and ::Kernel._EEK
+          :comment == sym || ::Home_._EEK
+          cb and ::Home_._EEK
           cb = blk
           redo
         end while nil
-        cb || ::Kernel._EEK
+        cb || ::Home_._EEK
       end
 
       def disucssion_run_via_big_string_ s
@@ -90,7 +90,7 @@ module Skylab::DocTest::TestSupport
 
       def _code_tuple_via_string line
         a = _three line
-        a.fetch( 1 ).size.zero? and ::Kernel._SANITY
+        a.fetch( 1 ).size.zero? and ::Home_._SANITY
         a
       end
 

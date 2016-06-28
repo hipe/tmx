@@ -9,11 +9,18 @@ module Skylab::DocTest
       def initialize para, cx
         @_common = para
         @_choices = cx
+
+        # kind of janky - at construction time we go ahead and try to
+        # resolve the two derivatives of description, but we could just as
+        # soon resolve it lazily.
+
+        @_description_bytes_OK = __resolve_description_bytes
       end
 
       def to_line_stream
-        ok = __resolve_body_line_stream
-        ok &&= __resolve_description_bytes
+
+        ok = @_description_bytes_OK
+        ok &&= __resolve_body_line_stream
         ok && __assemble_template_and_etc
       end
 
@@ -96,6 +103,10 @@ module Skylab::DocTest
         ACHIEVED_
       end
 
+      def identifying_string
+        @_description_bytes_OK && @_identifying_string
+      end
+
       def __resolve_description_bytes  # (based off model)
 
         o = @_common.begin_description_string_session
@@ -107,6 +118,10 @@ module Skylab::DocTest
           # o.remove_any_leading_so_and_or_then!  when nec
           o.remove_any_leading_it!
           # o.uncontract_any_leading_its!  when nec
+
+          @_identifying_string = o.get_current_string
+            # (take a snapshot of the string as it stands now before the next line)
+
           o.escape_as_platform_string!
         end
 

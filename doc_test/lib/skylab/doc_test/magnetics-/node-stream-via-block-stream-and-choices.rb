@@ -91,7 +91,7 @@ module Skylab::DocTest
 
         code_run = pair.value_x
         _discu_run = pair.name_x
-        code_run.has_magic_copula or ::Kernel._SANITY  # because then not flat
+        code_run.has_magic_copula or Home_._SANITY  # because then not flat
 
         Models_::ExampleNode.via_runs_and_choices_ _discu_run, code_run, @choices
 
@@ -110,13 +110,13 @@ module Skylab::DocTest
       run = st.gets
       begin
 
-        :discussion == run.category_symbol or ::Kernel._SANITY
+        :discussion == run.category_symbol or Home_._SANITY
 
         run_ = st.gets
         if ! run_
           break
         end
-        :code == run_.category_symbol or ::Kernel._SANITY
+        :code == run_.category_symbol or Home_._SANITY
 
         if run_.has_magic_copula
           seen_example = true

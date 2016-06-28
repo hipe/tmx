@@ -107,7 +107,7 @@ module Skylab::DocTest
             # (when indentation increased but not by enough to reach
             #  threshold, push indent level inwards #coverpoint-2)
           else
-            INDENT_HAS_DECREASED__ == d || ::Kernel._SANITY  # #coverpoint-4
+            INDENT_HAS_DECREASED__ == d || Home_._SANITY  # #coverpoint-4
           end
           _accept_new_indent_level
         end
@@ -161,7 +161,7 @@ module Skylab::DocTest
               redo
             end
           else
-            INDENT_HAS_DECREASED__ == d || ::Kernel._SANITY
+            INDENT_HAS_DECREASED__ == d || Home_._SANITY
           end
           _accept_new_indent_level
         end

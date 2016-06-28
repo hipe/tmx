@@ -4,46 +4,83 @@ module Skylab::DocTest
 
     class ErsatzParser
 
-      class BranchStream_via_Node___ < Common_::Actor::Monadic
+      class BranchStream_via_Node___
 
-        # maybe only while we wait for things to settle
+        # the name, function and interface of this is in flux while things settle
+
+        class << self
+
+          def begin_for__ root_node
+            new( root_node ).__init
+          end
+
+          private :new
+        end  # >>
 
         def initialize root_node
           @root_node = root_node
         end
 
-        def execute
+        def __init
 
-          st = @root_node.to_constituent_node_stream
-          stack = [ st ]
+          fr = Frame__.new @root_node
+          @_stack = [ fr ]
+          st = fr.constituent_node_stream
 
           p = -> do
             begin
               o = st.gets
               if o
                 if o.is_branch
-                  st = o.to_constituent_node_stream
-                  stack.push st
+                  fr = Frame__.new o
+                  st = fr.constituent_node_stream
+                  @_stack.push fr
                   break
                 end
                 redo
               end
-              if 1 == stack.length
+              if 1 == @_stack.length
                 p = nil
                 break
               end
-              stack.pop
-              st = stack.fetch( -1 )
+              @_stack.pop
+              st = @_stack.fetch( -1 ).constituent_node_stream
               redo
             end while nil
             o
           end
 
-          Common_.stream do
+          @branch_stream = Common_.stream do
             p[]
           end
+
+          self
+        end
+
+        def current_parent_branch__
+          @_stack.fetch( -2 ).branch
+        end
+
+        attr_reader(
+          :branch_stream,
+        )
+
+        # ==
+
+        class Frame__
+
+          def initialize branch
+            @branch = branch
+            @constituent_node_stream = branch.to_constituent_node_stream
+          end
+
+          attr_reader(
+            :branch,
+            :constituent_node_stream,
+          )
         end
       end
     end
   end
 end
+# #pending-rename: probably

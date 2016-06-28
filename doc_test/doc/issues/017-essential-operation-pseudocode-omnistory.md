@@ -73,6 +73,8 @@ document.
   => something about the iso one way and the other way
 
 
+
+
 ## requirements
 
 in this rewrite what we are imagining is:
@@ -87,7 +89,8 @@ in this rewrite what we are imagining is:
 
 
 
-## stab
+
+## stab at :the-forwards-synchronization-algorithm
 
 for a sense of how forwards synchronization is supposed to work,
 start with this example:
@@ -115,21 +118,23 @@ we can arrive at the above by these rules:
     overwrite the content of that node what that of the
     source. (we won't bother checking if the content is
     the same, probably.) ((B) demonstrates this.)
+    (#coverpoint3-2)
 
   • if it does not exist and it is the first item
     in the source, prepend it to the destination document.
     ((A) demonstrates this.)
-    #TRICKY
+    (#coverpoint3-1)
 
   • otherwise (and it does not exist and is not first),
     place it immediately after the node that is above it
     in the source (in the destination).
     ((C) demonstrates this.)
-    #TRICKY
+    (#coverpoint3-3)
 
   • nodes that (by name) exist in the destination that
     do not exist in the source will remain in the destination.
     ((D) and (E) demonstrate this.)
+    (#coverpoint3-4)
 
 some characteristics of this set of rules are:
 

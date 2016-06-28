@@ -100,29 +100,6 @@ module Skylab::DocTest::TestSupport
           ]
         end
 
-        it "as linked list it looks right" do
-
-          as_array = _the_parse.nodes
-
-          3 == as_array.length or fail  # sanity before we continue.
-          # (only because there are no item lines at the root level)
-
-          _A, _B, _C = as_array
-          _A_oid, _B_oid, _C_oid = as_array.map( & :object_id )
-
-          # [ _ A b ] [ a B c ] [ b C _ ]
-          #   1   2     3   4     5   6
-
-          _A.previous && fail  # 1
-          _A.next.object_id == _B_oid || fail  # 2
-
-          _B.previous.object_id == _A_oid || fail  # 3
-          _B.next.object_id == _C_oid || fail  # 4
-
-          _C.previous.object_id == _B_oid || fail  # 5
-          _C.next && fail  # 6
-        end
-
         it "identifying strings!", f: true do
 
           _hey = _the_parse.nodes.map( & :identifying_string )
@@ -152,3 +129,4 @@ module Skylab::DocTest::TestSupport
     end
   end
 end
+# #tombstone: used to have linked list

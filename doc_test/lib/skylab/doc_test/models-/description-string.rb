@@ -81,6 +81,10 @@ module Skylab::DocTest
       BLANK_RX_ =~ @_mutable_string
     end
 
+    def get_current_string
+      @_mutable_string.dup
+    end
+
     def finish
       remove_instance_variable :@_mutable_string
     end

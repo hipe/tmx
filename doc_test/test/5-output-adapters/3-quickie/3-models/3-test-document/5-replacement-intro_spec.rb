@@ -57,16 +57,16 @@ module Skylab::DocTest::TestSupport
 
         # get the existing example:
 
-        eg = __example_via_regex %r(\breplace my lines\b), __doc
+        qeg = __qualified_example_via_regex %r(\breplace my lines\b), __doc
 
-        _replace_example_constituent_lines_with_this eg, <<-HERE
+        _replace_example_constituent_lines_with_this qeg, <<-HERE
           #     some code la la
           #     fo.wobble bar  # => :baz
           #
         HERE
         # the final "blank" line above is intentional (won't be used)
 
-        eg
+        qeg.example_node
       end
     end
 
@@ -81,9 +81,9 @@ module Skylab::DocTest::TestSupport
       _st = line_stream_via_string_ _s
       doc = output_adapter_test_document_parser_.parse_line_stream _st
 
-      eg = doc.first_example_node_with_identifying_string 'zizzo'
+      qeg = doc.first_qualified_example_node_with_identifying_string 'zizzo'
 
-      _replace_example_constituent_lines_with_this eg, <<-HERE
+      _replace_example_constituent_lines_with_this qeg, <<-HERE
         #     hi  # => :hey
         #
         #
@@ -101,28 +101,29 @@ module Skylab::DocTest::TestSupport
 
       _exp_st = line_stream_via_string_ _exp
 
-      _act_st = eg.to_line_stream
+      _act_st = qeg.example_node.to_line_stream
 
       expect_actual_line_stream_has_same_content_as_expected_ _act_st, _exp_st
     end
 
-    def __example_via_regex rx, doc
+    def __qualified_example_via_regex rx, doc
 
-      eg = doc.to_example_node_stream.flush_until_detect do |eg_|
-        eg_.identifying_string =~ rx
+      eg = doc.to_qualified_example_node_stream.flush_until_detect do |o|
+        o.example_node.identifying_string =~ rx
       end
       eg or fail
       eg
     end
 
-    def _replace_example_constituent_lines_with_this eg, big_s
+    def _replace_example_constituent_lines_with_this qeg, big_s
 
       _cr = code_run_via_big_string_ big_s
 
       _cx = real_default_choices_
 
-      eg.replace_constituent_lines _cr.to_content_line_stream_given _cx
-      eg
+      qeg.example_node.replace_constituent_lines _cr.to_content_line_stream_given _cx
+
+      NIL_
     end
 
     shared_subject :__doc do

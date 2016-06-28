@@ -24,20 +24,21 @@ module Skylab::DocTest::TestSupport
 
         _s = "can you access this second test by name?"
 
-        hi = _doc.first_example_node_with_identifying_string _s
-
-        hi || fail
-
-        hi.nodes.fetch( -2 ).line_string.include?( "OUCH_MY_BRAIN" ) || fail
+        qeg = _doc.first_qualified_example_node_with_identifying_string _s
+        qeg || fail
+        _eg = qeg.example_node
+        _eg.nodes.fetch( -2 ).line_string.include?( "OUCH_MY_BRAIN" ) || fail
       end
 
       it "can you access \"this\" third test? (it has quotes)" do
 
         _s = 'can you access "this" third test? (it has quotes)'
 
-        _hi = _doc.first_example_node_with_identifying_string _s
+        _qeg = _doc.first_qualified_example_node_with_identifying_string _s
 
-        _hi.nodes.fetch( -2 ).line_string.include?( 'HECK_YEAH' ) || fail
+        _eg = _qeg.example_node
+
+        _eg.nodes.fetch( -2 ).line_string.include?( 'HECK_YEAH' ) || fail
       end
     end
 
@@ -46,11 +47,14 @@ module Skylab::DocTest::TestSupport
       it "what about over here, can you get to this one in another context?" do
 
         s = "what about over here"
-        _hi = _doc.to_example_node_stream.flush_until_detect do |eg|
-          eg.identifying_string.include? s
+
+        _qeg = _doc.to_qualified_example_node_stream.flush_until_detect do |o|
+          o.example_node.identifying_string.include? s
         end
 
-        _hi.nodes.fetch( -2 ).line_string.include?( 'NICE_WORK' ) || fail
+        _eg = _qeg.example_node
+
+        _eg.nodes.fetch( -2 ).line_string.include?( 'NICE_WORK' ) || fail
       end
     end
 

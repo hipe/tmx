@@ -6,7 +6,10 @@ module Skylab::DocTest::TestSupport
       tcc.include self
     end
 
+    Lazy_ = Common_::Lazy  # ..
+
     # -
+
       def line_stream_via_fixture_file_symbol_ sym
         _path = path_via_fixture_file_symbol_ sym
         ::File.open _path, ::File::RDONLY
@@ -16,18 +19,27 @@ module Skylab::DocTest::TestSupport
         ___fixture_file_path_cache.fetch sym
       end
 
-      yes = true ; x = nil
-      define_method :___fixture_file_path_cache do
-        if yes
-          yes = false
-          x = PathCache___.new(
-            ::File.join( TS_.dir_pathname.to_path, 'fixture-files' ),
-            ::File,
-            ::Dir,
-          )
+      define_method :___fixture_file_path_cache, ( Lazy_.call do
+        PathCache___.new(
+          ::File.join( TS_.dir_pathname.to_path, 'fixture-files' ),
+          ::File,
+          ::Dir,
+        )
+      end )
+
+      def fixture_tree_pather file
+
+        dirname = ::File.expand_path file, ___fixture_tree_path
+
+        -> path do
+          ::File.expand_path path, dirname
         end
-        x
       end
+
+      define_method :___fixture_tree_path, ( Lazy_.call do
+        ::File.join TS_.dir_pathname.to_path, 'fixture-trees'
+      end )
+
     # -
 
     class PathCache___

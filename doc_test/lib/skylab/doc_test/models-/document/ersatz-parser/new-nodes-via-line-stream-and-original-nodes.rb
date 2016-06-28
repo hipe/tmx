@@ -4,7 +4,7 @@ module Skylab::DocTest
 
     class ErsatzParser
 
-      class NewNodes_via_LineStream_and_OriginalNodes < Common_::Actor::Dyadic
+      class NewNodes_via_LineStream_and_OriginalNodes
 
         # following the general design tenet of [#017] (but in a manner that
         # is experimental) we prefer to use "any" "formatting" in the test
@@ -28,13 +28,20 @@ module Skylab::DocTest
         # any leading and/or trailing blank lines in the asset document!
         # wait, no it won't. because the syntax doesn't pick up such spacing..)
 
-        def initialize st, a
-          @line_stream = st
-          @original_nodes = a
-          __init
-        end
+        class << self
+          alias_method :begin, :new
+          undef_method :new
+        end  # >>
 
-        def execute
+        attr_writer(
+          :do_replace_constituent_lines,
+          :line_stream,
+          :original_nodes,
+        )
+
+        def finish
+
+          __init
 
           __from_the_back_pop_off_those_nodes_that_you_intend_to_reuse
 
@@ -57,14 +64,21 @@ module Skylab::DocTest
           a.push beginline_node
           yes = remove_instance_variable :@_use_blankruns_of_original
           if yes
-            a.concat remove_instance_variable :@_head_blank_run
+            a_ = remove_instance_variable :@_head_blank_run
+            if a_
+              a.concat a_
+            end
           end
 
           st = remove_instance_variable :@line_stream
           s = st.gets
 
-          _margin = MARGIN_RX___.match( beginline_node.line_string )[ 0 ]
-          margin_ = "  #{ _margin }"  # hardcoded #indent ick/meh
+          _margin = beginline_node.get_margin
+          if @do_replace_constituent_lines
+            margin_ = "  #{ _margin }"  # hardcoded #indent ick/meh
+          else
+            margin_ = _margin
+          end
 
           begin
             _li = if BLANK_RX_ =~ s
@@ -77,13 +91,14 @@ module Skylab::DocTest
           end while s
 
           if yes
-            a.concat remove_instance_variable :@_tail_blank_run
+            a_ = remove_instance_variable :@_tail_blank_run
+            if a_
+              a.concat a_
+            end
           end
           a.push remove_instance_variable :@_endline_node
           a
         end
-
-        MARGIN_RX___ = /\A[\t ]*/
 
         def __there_is_any_nonblank_content_in_the_original_example
           @_has_current_forward_node || @_has_current_reverse_node
@@ -101,6 +116,11 @@ module Skylab::DocTest
           @_use_blankruns_of_original = true
 
           st = remove_instance_variable :@line_stream
+
+          unless @do_replace_constituent_lines
+            st.gets  # disregard the opener
+          end
+
           s = st.gets
           begin
             if BLANK_RX_ =~ s
@@ -114,6 +134,10 @@ module Skylab::DocTest
             a.push s
             s = st.gets
           end while s
+
+          unless @do_replace_constituent_lines
+            a.pop  # disregard the closer
+          end
 
           while BLANK_RX_ =~ a.last
             a.pop
