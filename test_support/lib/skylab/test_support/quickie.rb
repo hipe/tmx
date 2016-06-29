@@ -456,15 +456,20 @@ module Skylab::TestSupport
 
       def __parse_opts argv
 
-        op = __build_option_parser
-        begin
-          op.parse! argv
-        rescue Home_::Library_::OptionParser::ParseError => e
+        Rewrite_digit_switches___[ argv ]
+
+        if argv.length.nonzero?
+          _op = __build_option_parser
+          begin
+            _op.parse! argv
+          rescue Home_::Library_::OptionParser::ParseError => e
+          end
         end
+
         if e
           @_info_yielder << e.message
           _invite
-          NIL_
+          UNABLE_
         else
           @_tag_filter_p and fail ___say_this
           __init_tag_filter_proc
@@ -475,6 +480,30 @@ module Skylab::TestSupport
       def ___say_this
         "sanity - optparse and tag filter are mutex"
       end
+
+      Rewrite_digit_switches___ = -> do
+
+        # an experimental semi-hack: "expand" head-anchored digit-looking
+        # switches to become [etc]. anchored to head so we don't parse an
+        # argument for another option (unlike [#br-074]). the platform o.p
+        # is not sympathetic to causes like this at all.
+
+        rx = /\A-(?<lineno>\d+)\z/
+        -> argv do
+          md = rx.match argv.first  # nil item IFF empty ary
+          if md
+            argv_ = []
+            begin
+              argv.shift
+              argv_.push '--line', md[ :lineno ]
+              md = rx.match argv.first  # nil item IFF empty ary
+              md ? redo : break
+            end while nil
+            argv_.concat argv
+            argv.replace argv_ ; nil
+          end
+        end
+      end.call
 
       def __init_tag_filter_proc
 
