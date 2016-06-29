@@ -108,6 +108,11 @@ module Skylab::Zerk::TestSupport
         _zerk_expect_API_call :init_result_and_root_ACS_for_zerk_expect_API, x_a
       end
 
+      def call_via_iambic x_a
+
+        _zerk_expect_API_call :init_result_and_root_ACS_for_zerk_expect_API, x_a
+      end
+
       def _zerk_expect_API_call m, x_a
 
         _pp = __some_handler_builder_for_zerk_expect_API

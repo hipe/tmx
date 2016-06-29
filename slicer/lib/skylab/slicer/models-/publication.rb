@@ -8,7 +8,7 @@ module Skylab::Slicer
 
       @is_promoted = true
 
-      edit_entity_class :desc, -> y do
+      @instance_description_proc = -> y do
         y << '(no where close to integrated)'
       end
 

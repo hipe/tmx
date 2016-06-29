@@ -40,9 +40,10 @@ module Skylab::DocTest::TestSupport
           end
         HERE
 
-        _e = line_stream_via_string_ _expect
-        _a = Common_::Stream.via_nonsparse_array _many_lines
-        expect_actual_line_stream_has_same_content_as_expected_ _a, _e
+        expect_actual_line_stream_has_same_content_as_expected_(
+          Common_::Stream.via_nonsparse_array( _many_lines ),
+          line_stream_via_string_( _expect ),
+        )
       end
 
       shared_subject :_index do

@@ -25,6 +25,10 @@ module Skylab::DocTest
 
       # --
 
+      def some_original_test_line_stream
+        ViewControllers_::Starter.new( self ).some_original_test_line_stream__
+      end
+
       def begin_insert_into_empty_document doc
         Here_::Models::TestDocument::Insert_into_Empty_Document.new doc, self
       end

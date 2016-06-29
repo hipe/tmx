@@ -25,32 +25,11 @@ module Skylab::DocTest
         md[ :const ]
       end
 
-      # -- (will move)
-
-      double_quoted_unescaper_rx = / \\ (?<special_char> . ) /x
-
-      dquote = '"'
-
-      single_quoted_unescaper_rx = /\\[\\']/
+      # --
 
       identifying_string_via_quoted_string = -> md do
-
-        s = md[ :single_quoted_bytes ]
-        if s
-          s.gsub single_quoted_unescaper_rx do
-            ::Kernel._K
-          end
-        else
-          md[ :double_quoted_bytes ].gsub double_quoted_unescaper_rx do
-            _c = $~[ :special_char ]
-            if _c == dquote
-              _c
-            else
-              self._COVER_ME_readme  # the only reason you should be using
-              # escapes in your string is to get the quote char in it..
-            end
-          end
-        end
+        # (hi.)
+        Home_::Models_::String.unescape_quoted_string_literal_matchdata md
       end
 
       # --
@@ -59,12 +38,7 @@ module Skylab::DocTest
 
       const_part = "(?<const>(?:::)?#{ part }(?:::#{ part })*)\\b"
 
-      quoted_string_part = %q<
-        (?:
-          " (?<double_quoted_bytes> (?: [^\\\\"] | \\\\. )* ) " |
-          ' (?<single_quoted_bytes> (?: [^\\\\'] | \\\\. )* ) ' |
-        )
-      >
+      quoted_string_part = Models_::String.quoted_string_regex_part
 
       # --
 

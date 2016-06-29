@@ -144,7 +144,7 @@ do_path = -> path do
 
   _st = open[ path ]
 
-  require_relative '../../lib/skylab/doc_test'  # or [#016]
+  require 'skylab/doc_test'
 
   _HOME = ::Skylab::DocTest
 

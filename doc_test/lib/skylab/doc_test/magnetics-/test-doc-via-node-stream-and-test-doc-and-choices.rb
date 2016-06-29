@@ -6,6 +6,8 @@ module Skylab::DocTest
 
     # NOTE - at present this mutates the original document! this can be
     # changed if needed; it will require a deep dupe implementation.
+    # (this is to say, it mutates the document object in memory - it does
+    # *not* write anything to the filesystem.)
 
     # note - we take as argument a node stream and not an asset document
     # by the design consideration that we want to preserve streamed-ness

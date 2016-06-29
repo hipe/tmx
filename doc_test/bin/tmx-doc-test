@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-self._NOT_YET_not_until_016  # #while-open [#016] not a gem yet
+self._NEEDS_COVERAGE
 require 'skylab/doc_test'
 
 Skylab::Doc_test = -> i, o, e, pn_s_a, argv do

@@ -1,4 +1,4 @@
-require_relative '../lib/skylab/doc_test'  # #while-open [#016]
+require 'skylab/doc_test'
 require 'skylab/test_support'
 
 module Skylab::DocTest::TestSupport
@@ -48,8 +48,19 @@ module Skylab::DocTest::TestSupport
 
     # -- support for making assertions
 
+    def expect_actual_big_string_has_same_content_as_expected_ a_s, e_s
+      expect_actual_line_stream_has_same_content_as_expected_(
+        line_stream_via_string_( a_s ),
+        line_stream_via_string_( e_s ),
+      )
+    end
+
     def expect_actual_line_stream_has_same_content_as_expected_ a_st, e_st
       TestSupport_::Expect_Line::Streams_have_same_content[ a_st, e_st, self ]
+    end
+
+    def begin_expect_line_scanner_for_line_stream_ st
+      TestSupport_::Expect_Line::Scanner.via_stream st
     end
 
     def line_stream_via_string_ whole_string
@@ -95,33 +106,18 @@ module Skylab::DocTest::TestSupport
 
     ssdp = nil
     define_method :sidesystem_dir_path_ do
-      ssdp ||= ::File.expand_path( '../../..', Home_.dir_pathname.to_path )
+      ssdp ||= ::File.expand_path( '../../..', home_dir_path_ )
+    end
+
+    hdp = nil
+    define_method :home_dir_path_ do
+      hdp ||= Home_.dir_pathname.to_path
     end
 
   # -
 
   Common_ = ::Skylab::Common
   Lazy_ = Common_::Lazy
-
-  # --
-
-  module My_API
-
-    def self.[] tcc
-      Beep__[][ tcc ]
-      tcc.include self
-    end
-
-    Beep__ = Lazy_.call do
-      Home_.lib_.zerk.test_support.lib :API
-    end
-
-    def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
-
-      @root_ACS = Home_::Root_Autonomous_Component_System_.new
-      @result = Home_::Call_ACS_[ x_a, @root_ACS, & pp ]
-    end
-  end
 
   # --
 
@@ -139,23 +135,24 @@ module Skylab::DocTest::TestSupport
 
   # --
 
-  Autoloader__ = Common_::Autoloader
+  Autoloader_ = Common_::Autoloader
 
   # --
 
   module TestLib___
 
-    sidesys = Autoloader__.build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
   end
 
   # --
 
-  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   Home_ = ::Skylab::DocTest
 
+  DocTest = Home_  # only for generated tests, find it via (?!<::)DocTest\b
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil

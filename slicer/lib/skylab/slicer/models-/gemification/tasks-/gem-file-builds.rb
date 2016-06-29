@@ -8,10 +8,11 @@ module Skylab::Slicer
 
       def execute
 
-        name = @name
+        name = @Gemspec_File.name
 
         @_oes_p_.call :info, :expression do | y |
           y << "(\"#{ name.as_const }\" not yet implemented as task..)"
+          y << "(also, make sure you are running this from right inside the sidesystem)"
         end
 
         ACHIEVED_

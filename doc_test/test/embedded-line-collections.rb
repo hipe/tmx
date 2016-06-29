@@ -128,7 +128,11 @@ module Skylab::DocTest::TestSupport
           col = __seek_in_cache rx
         end
 
-        Common_::Stream.via_nonsparse_array col.lines
+        if col
+          Common_::Stream.via_nonsparse_array col.lines
+        else
+          raise __say_not_found rx
+        end
       end
 
       def close_if_necessary
@@ -146,31 +150,52 @@ module Skylab::DocTest::TestSupport
         end
       end
 
-      def __lookup rx
+      def __lookup rx  # #todo: so much eyeblood
 
-        line = remove_instance_variable :@_line
-        st = @line_stream
+        gets = nil ; line = nil ; stay = nil
 
+        done = -> do
+          gets = nil ; stay = false ; @_hot = nil ; NIL_
+        end
+
+        gets = -> do
+          line = remove_instance_variable :@_line
+          stay = true
+          if line
+            real_stream = @line_stream
+            gets = -> do
+              line = real_stream.gets
+              if ! line
+                done[]
+              end
+              line
+            end ; nil
+          else
+            done[] ; nil
+          end
+        end
+
+        gets[]
         begin
-          line or break
+          stay || break
 
           md = COLON_RX___.match line
           if ! md
-            line = st.gets
+            gets[]
             redo
           end
 
           identifying_s = md.pre_match  # not always used
 
           begin  # skip these leading blank lines
-            line = st.gets
-            line or break
+            gets[]
+            stay || break  # from #here
             if BLANK_RX_ =~ line
               redo
             end
           end while nil
 
-          line or break
+          stay || break  # to #here
 
           md = INDENTED_RX__.match line
           if ! md
@@ -196,10 +221,10 @@ module Skylab::DocTest::TestSupport
           end.call
 
           accept_curent_line[]
-          line = st.gets
+          gets[]
 
           begin
-            line or break  # NOTE the file can end here
+            stay || break
 
             if BLANK_RX_ =~ line
               md = INDENTED_RX__.match line
@@ -215,7 +240,7 @@ module Skylab::DocTest::TestSupport
               else
                 cache.push line.freeze  # sure why not
               end
-              line = st.gets
+              gets[]
               redo
             end
 
@@ -234,7 +259,7 @@ module Skylab::DocTest::TestSupport
 
             if _this_line_is_in
               accept_curent_line[]
-              line = st.gets
+              gets[]
               redo
             end
 
@@ -256,22 +281,13 @@ module Skylab::DocTest::TestSupport
             break
           end
           col = nil
-
-          if line
-            redo
-          end
-
-          break
+          redo
         end while nil
 
-        if col
-          col
-        else
-          raise ___say_not_found rx
-        end
+        col  # nil for a valid thing IFF was halfway thru reading
       end
 
-      def ___say_not_found rx
+      def __say_not_found rx
         "no ELC matching /#{ rx.source }/ across #{ @_cache.length } ELC's"
       end
 

@@ -13,7 +13,7 @@ module Skylab::DocTest::TestSupport
       full_path_ 'doc/issues/023-run-edge-cases.md'
     end
 
-    context "(#coverpoint-4)" do
+    context "(#coverpoint1-4)" do
 
       shared_subject :_a do
         _for %r(\bindent can decrease in a discussion like so\z)
@@ -29,7 +29,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(#coverpoint-5)" do
+    context "(#coverpoint1-5)" do
 
       shared_subject :_a do
         _for %r(\btransition back to discussion\z)
@@ -46,7 +46,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(#coverpoint-6)" do
+    context "(#coverpoint1-6)" do
 
       shared_subject :_a do
         _for %r(\bblank lines in a code run get added to that code run\z)
@@ -62,7 +62,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(#coverpoint-7)" do
+    context "(#coverpoint1-7)" do
 
       shared_subject :_a do
         _for %r(\btransition back to discussion while reducing margin\z)
@@ -79,7 +79,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(#coverpoint-8)" do
+    context "(#coverpoint1-8)" do
 
       shared_subject :_a do
         _for %r(\bwhatever this is\z)
@@ -96,7 +96,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(#coverpoint-9)" do
+    context "(#coverpoint1-9)" do
 
       shared_subject :_a do
         x = _for %r(\bwhen all comment lines are blank\z)

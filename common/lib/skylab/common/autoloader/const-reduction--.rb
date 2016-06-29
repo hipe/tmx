@@ -348,6 +348,7 @@ module Skylab::Common
           KEEP_PARSING_
         else
           _express_this_error :__build_wrong_const_name_event, :wrong_const_name
+          UNABLE_
         end
       end
 
@@ -374,11 +375,12 @@ module Skylab::Common
           when -1
             @_user_result_for_error = p[ send( build_event_m ) ]
           when 1
-            @_user_result_for_error = p.call :error, second_channel_sym do
+            p.call :error, second_channel_sym do
               send build_event_m
             end
+            @_user_result_for_error = UNABLE_
           end
-          UNABLE_
+          NIL_
         else
           raise send( build_event_m ).to_exception
         end

@@ -1,56 +1,53 @@
 require 'skylab/common'
 
 module Skylab::DocTest
-  # -
-    # see [#001] (the README) for an introduction.
-    # synopsis:
-    #
-    # these first few lines of a text span, you can write whatever you want &
-    # they will not appear in the generated spec file. the last line however,
-    # will appear as the description string of your context or example.
-    #
-    #     THIS_FILE_ = self._NO::Expect_Line::File_Shell[ __FILE__ ]
-    #
-    #     # this comment gets included in the output because it is indented
-    #     # with four or more spaces and is part of a code span that goes out.
-    #
-    #
-    # now that we are back under four spaces in from our local margin, this
-    # is again a text span. the previous code span is treated as a before
-    # block because it has no magic "# =>" predicate sequence. it becomes a
-    # #todo: go this away (above)
-    # before `all` block because it looks like it starts with a constant
-    # assignment.
-    #
-    # this line here is the description for the following example
-    #
-    #     o = THIS_FILE_
-    #
-    #     o.contains( "they will not#{' '}appear" ) # => false
-    #
-    #     o.contains( "will appear#{' '}as the description" )  # => true
-    #
-    #     o.contains( "this comment#{' '}gets included" )  # => true
-    #
-    #     o.contains( "this line#{' '}here is the desc" )  # => true
-    #
-    #
-    # we now strip trailing colons from these description lines:
-    #
-    #     THIS_FILE_.contains( 'from these description lines"' ) # => true
 
-  # ==
+  # (the README [#001] acts as the "top" of the documentation graph too.)
 
   module CLI
 
   end
 
-  module API
+  # here is the minimal interesting example for calling the API:
+  #
+  #     _path = "#{ DocTest.dir_pathname.to_path }.rb"
+  #
+  #     st = DocTest::API.call(
+  #       :synchronize,
+  #       :asset_line_stream, open( _path ),
+  #       :output_adapter, :quickie,
+  #     )
+  #
+  #     st.gets  # => "require_relative .."
+  #     st.gets  # blank line..
+  #     # ..
 
+  module API
+    class << self
+      def call * x_a, & x_p
+        Call_ACS_[ x_a, Root_Autonomous_Component_System_.new, & x_p ]
+      end
+    end  # >>
+  end
+
+  default_handler = -> * i_a, & ev_p do  # #[#co-045]
+    if :error == i_a.first
+      if :expression == i_a[1]
+        raise ev_p[ "" ]  # eew
+      else
+        _ = ev_p[]
+        _ev = _.to_exception
+        raise _ev
+      end
+    end
+  end
+
+  default_handler_builder = -> _root_ACS do
+    default_handler
   end
 
   Call_ACS_ = -> x_a, acs, & pp do
-
+    pp ||= default_handler_builder
     Require_zerk_[]
     Zerk_::API.call x_a, acs, & pp
   end
@@ -67,6 +64,10 @@ module Skylab::DocTest
 
         :_hello_from_doc_test_
       end
+    end
+
+    def __synchronize__component_operation
+      Home_::Operations_::Synchronize
     end
   end
 
@@ -158,5 +159,6 @@ module Skylab::DocTest
   NOTHING_ = nil
   UNABLE_ = false
 end
+# #tombstone: old self-test doc body copy
 # #tombstone: dedicated API file
 # #temporary-tombstone:A: old [br] API call boilerplate

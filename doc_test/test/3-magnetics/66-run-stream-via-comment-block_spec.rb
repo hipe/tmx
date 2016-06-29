@@ -27,7 +27,7 @@ module Skylab::DocTest::TestSupport
 
       context "(discussion run)" do
 
-        it "has discussion run, is 3 lines long (#coverpoint-1)" do
+        it "has discussion run, is 3 lines long (#coverpoint1-1)" do
           run = _run
           run.category_symbol == :discussion or fail
           run.number_of_lines___ == 3 or fail
@@ -81,7 +81,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(this second example) (#coverpoint-2)" do
+    context "(this second example) (#coverpoint1-2)" do
 
       shared_subject :_a do
         _for %r(\bas it does in this example\b)
@@ -100,7 +100,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    context "(this final example) (#coverpoint-3)" do
+    context "(this final example) (#coverpoint1-3)" do
 
       shared_subject :_a do
         x = _for %r(\bas in this example\b)

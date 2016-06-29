@@ -26,23 +26,14 @@ module Skylab::DocTest::TestSupport
 
         # --
 
-        rx = /\A
-          [ \t]+ (?:
-            ' (?<single_quoted_bytes> (?: [^\\'] | \\. )* ) ' |
-            " (?<double_quoted_bytes> (?: [^\\"] | \\. )* ) "
-          )
-        /x
-
         o.add_branch_line_matcher(
           %r(\A(?<margin>[\t ]*)begin\b)
 
         ) do |md|
           # (separate the easy problem of above from the harder problem here)
 
-          md_ = rx.match md.post_match
-          s = md_[ :single_quoted_bytes ] || md_[ :double_quoted_bytes ]
-          # (we aren't gonna bother unescaping for now..)
-          s
+          Home_::Models_::String.unescape_quoted_literal_anchored_at_head(
+            md.post_match )
         end
 
         o.finish

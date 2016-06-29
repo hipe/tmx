@@ -291,6 +291,22 @@ module Skylab::TestSupport
         count
       end
 
+      def buffer_until_line stop_here
+
+        buffer = ""
+        s = @line
+        begin
+          if stop_here == s
+            break
+          end
+          buffer << s
+          s = next_line
+          s or fail _say_never_found stop_here.inspect
+          redo
+        end while nil
+        buffer
+      end
+
       def advance_N_lines d
         line = nil
         d.times do
@@ -367,16 +383,43 @@ module Skylab::TestSupport
         NIL_
       end
 
+      def blank_line_then rx
+
+        _ok = exactly_one_blank_line
+
+        _ok && expect_that_line_matches( rx )
+      end
+
+      def exactly_one_blank_line
+
+        d = skip_blank_lines
+        if 1 == d
+          ACHIEVED_  # not sure
+        else
+          fail ___say_not_one( d, "blank line" )
+        end
+      end
+
+      def ___say_not_one d, s
+
+        "needed one #{ s }, had #{ d } (#{ at_where 'near ' })"
+      end
+
       def expect_blank_line
 
         @line = @up.gets
-        BLANK_RX___ =~ @line or fail "not blank: #{ @line.inspect }"
+        BLANK_RX___ =~ @line or fail ___say_current_line_not_blank
         NIL_
+      end
+
+      def __say_current_line_not_blank
+        "not blank: #{ @line.inspect }"
       end
 
       def skip_blank_lines
 
-        advance_past_lines_that_match BLANK_RX___
+        @line = @up.gets
+        _count_from_advance_to_not_rx BLANK_RX___
       end
 
       BLANK_RX___ = /\A[[:space:]]*\z/
@@ -423,13 +466,68 @@ module Skylab::TestSupport
       def advance_to_rx rx
 
         begin
-          @line or fail "never found before end of file: #{ rx.inspect }"
+          @line or fail _say_never_found rx
           md = rx.match @line
           md and break
           @line = @up.gets
           redo
         end while nil
         md
+      end
+
+      def _say_never_found desc_s
+        "never found before end of file: #{ desc_s }"
+      end
+
+      def expect_that_next_line_matches rx
+        @line = @up.gets
+        expect_that_line_matches rx
+      end
+
+      def expect_that_line_matches rx
+
+        if rx.respond_to? :ascii_only?
+          if rx == @line
+            ACHIEVED_
+          else
+            fail _say_current_line_does_not_match rx
+          end
+        elsif rx =~ @line
+          ACHIEVED_
+        else
+          fail _say_current_line_does_not_match rx
+        end
+      end
+
+      def _say_current_line_does_not_match rx
+
+        _ = if rx.respond_to? :ascii_only?
+          rx.inspect
+        else
+          "/#{ rx.source }/"
+        end
+        "did not match #{ _ }#{ at_where }"
+      end
+
+      def advance_until_line_that_equals s
+
+        count = 0
+        begin
+          @line = @up.gets
+          if ! @line
+            fail ___say_never_found_line s
+          end
+          count += 1
+          if s == @line
+            break
+          end
+          redo
+        end while nil
+        count
+      end
+
+      def ___say_never_found_line s
+        "never found line before end of stream - #{ s.inspect }"
       end
 
       # ~ finish
@@ -460,7 +558,20 @@ module Skylab::TestSupport
       def expect_no_more_lines
         @line = @up.gets
         if @line
-          fail "expected no more lines, had #{ @line.inspect }"
+          fail "expected no more lines#{ at_where ', had ' }"
+        end
+      end
+
+      def at_where s=" - "
+
+        line = @line
+        if line
+          "#{ s }#{ line.inspect }"
+        else
+          if /\A[ ,]/ =~ s
+            _space = SPACE_
+          end
+          "#{ _space }at end of file"
         end
       end
 

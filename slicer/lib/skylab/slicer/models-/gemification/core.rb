@@ -13,7 +13,7 @@ module Skylab::Slicer
       end
 
       edit_entity_class(
-        :property, :dry_run,
+        :flag, :property, :dry_run,
         :required, :property, :sidesystem_path,
       )
 

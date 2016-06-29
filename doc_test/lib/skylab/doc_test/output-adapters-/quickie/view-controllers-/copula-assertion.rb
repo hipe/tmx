@@ -12,23 +12,58 @@ module Skylab::DocTest
 
         @_actual_code_string, @_expected_code_string, @_LTS = @_common.to_three_pieces
 
-        @_md = SHOULD_RAISE_ERROR_MAGIC_PATTERN_RX__.match @_expected_code_string
+        yes = nil
+        yes ||= __looks_like_should_match_string_head
+        yes ||= __looks_like_should_raise
+        yes || __looks_like_should_equal
 
-        if @_md
-          self._FUN
-        else
-          Common_::Stream.via_item ___assemble_line
+        send @_stream_via_looks_like_this
+      end
+
+      # #todo - break the above into a mini plugin pattern: put them all in
+      #         and array of platform modules and etc
+
+      def __looks_like_should_raise
+        __looks_like :__stream_for_should_raise, SHOULD_RAISE_ERROR_MAGIC_PATTERN_RX__
+      end
+
+      def __looks_like_should_match_string_head
+
+        lib = Models_::String
+        md = lib.match_quoted_string_literal @_expected_code_string
+        if md
+          s = lib.unescape_quoted_string_literal_matchdata md
+          md_ = SIMPLY_THIS__.match s
+          if md_
+            @__string_head_matchdata = md_
+            @_stream_via_looks_like_this = :__stream_for_string_head
+            ACHIEVED_
+          end
         end
       end
 
-      def ___assemble_line
-
-        _act_s = @_common.add_parens_if_maybe_necessary @_actual_code_string
-
-        "#{ _act_s }.should eql #{ @_expected_code_string }#{ @_LTS }"
+      def __looks_like_should_equal
+        @_stream_via_looks_like_this = :__stream_for_should_equal
+        NIL_
       end
 
-      def _EG_FUN
+      def __looks_like m, rx
+
+        md = rx.match @_expected_code_string
+        if md
+          @_stream_via_looks_like_this = m
+          @_md = md
+          ACHIEVED_
+        else
+          UNABLE_
+        end
+      end
+
+      # --
+
+      def __stream_for_should_raise
+
+        Home_._ENJOY_this_rewrite
 
         const, fullmsg, msgfrag = @_md.captures
 
@@ -48,6 +83,32 @@ module Skylab::DocTest
         y << "  #{ @_actual_code_string }"
         y << "end.should raise_error( #{ const }, _rx )"
 
+        Common_::Stream.via_nonsparse_array y
+      end
+
+      def __stream_for_string_head
+
+        _source = ::Regexp.escape @__string_head_matchdata[ :head ]
+
+        _bytes = "%r(\\A#{ _source })"  # yeah?
+
+        _line = "#{ _actual }.should match #{ _bytes }#{ @_LTS }"
+
+        Common_::Stream.via_item _line
+      end
+
+      def __stream_for_should_equal
+
+        _ = "#{ _actual }.should eql #{ @_expected_code_string }#{ @_LTS }"
+
+        Common_::Stream.via_item _
+      end
+
+      def _actual
+        @_common.add_parens_if_maybe_necessary @_actual_code_string
+      end
+
+      def _stream_via_array s_a
         Common_::Stream.via_nonsparse_array s_a
       end
 
@@ -65,6 +126,8 @@ module Skylab::DocTest
           (?: (?<msgfrag> .* [^. ] ) [ ]* \.{2,} )
         ) \z
       /x
+
+      SIMPLY_THIS__ = /\A(?<head>.+)\.\.\z/
     end
   end
 end

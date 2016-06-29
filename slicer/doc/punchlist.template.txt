@@ -10,6 +10,7 @@ tmx                 q [ ]
 
 tan_man             q [ ]
 search_and_replace  q [ ]
+doc_test            q [ ]
 myterm              q [ ]
 snag                q [ ]
 git_viz             q [ ]

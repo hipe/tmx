@@ -84,8 +84,6 @@ module Skylab::DocTest::TestSupport
 
     end
 
-    def common_path
-      Home_.dir_pathname.to_path
-    end
+    alias_method :common_path, :home_dir_path_
   end
 end
