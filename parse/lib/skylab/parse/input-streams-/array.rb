@@ -21,6 +21,10 @@ module Skylab::Parse
         x
       end
 
+      def _IS_ON_FINAL_TOKEN
+        @x_a_length == @d + 1
+      end
+
       def no_unparsed_exists
         @x_a_length == @d
       end

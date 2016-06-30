@@ -114,11 +114,23 @@ module Skylab::Parse
           end while nil
 
           # now that we have finished classifying each member of the pool
-          # for this token. even if you have exact matches, if you have
-          # partial matches you have to keep looking
+          # for this token; even if you have exact matches, if you have
+          # partial matches you have to keep looking (unless..)
 
           if exact_match_a
-            if partial_match_a
+
+            # typically you need to pursue partial matches even when you have
+            # exact matches. the only time this is not the case is when you
+            # have reached (or more correctly are about to reach) the end
+            # of the input. in such cases you *must* go with the exact match,
+            # and disregard the partial matches, otherwise (for e.g) in the
+            # case of 'magnetics' vs. 'magnetics-viz', the former is unreachable.
+
+            _pursue_partial_matches = if partial_match_a
+              ! @_in_st._IS_ON_FINAL_TOKEN
+            end
+
+            if _pursue_partial_matches
               @_last_exact_matches = exact_match_a
               @_last_exact_match_index = @_in_st.current_index
             else

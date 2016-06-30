@@ -313,7 +313,22 @@ class Skylab::Task
       require 'stringio' ; ::StringIO
     end
 
+    String_scanner = -> do
+      require 'strscan' ; ::StringScanner
+    end
+
     Zerk = sidesys[ :Zerk ]
+  end
+
+  module Magnetics
+    module Magnetics_
+      Autoloader_[ self ]
+    end
+    module Models_
+      Autoloader_[ self ]
+    end
+    Autoloader_[ self ]
+    Here_ = self
   end
 
   module Models_
@@ -325,6 +340,7 @@ class Skylab::Task
   ACHIEVED_ = true
   CLI = nil  # for host
   EMPTY_A_ = [].freeze
+  EMPTY_S_ = ''.freeze
   Home_ = self
   NIL_ = nil
   NOTHING_ = nil

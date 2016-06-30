@@ -152,6 +152,7 @@ module Skylab::Task::TestSupport
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
   Common_ = Home_::Common_
+  EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
   NOTHING_ = nil
   TS_ = self
