@@ -67,6 +67,3 @@ be trivial on the theory and results presented here.)
     third, fourth, fifth: 500, 700, 900
 
     oh.
-
-or
-    10, 30, 50, 70, 90

@@ -75,6 +75,7 @@ class Skylab::Task
       }
 
       def __transition_from_BT20_to_IT20
+        _begin_term
         _move_to_state :IT20
       end
 
@@ -83,6 +84,7 @@ class Skylab::Task
       end
 
       def __transition_from_IT20_to_BT40
+        @__slot_term_symbol = _finish_term
         _move_to_state :BT40
       end
 
@@ -95,7 +97,7 @@ class Skylab::Task
       end
 
       def __transition_from_IT20_to_finish20
-        :_fake_finish_for_20_  # unassociated node
+        Here_::Models_::Unassociated_ItemTicket.new _finish_term
       end
 
       # -- area 40
@@ -110,6 +112,7 @@ class Skylab::Task
       }
 
       def __transition_from_BT40_to_IT40
+        _begin_term
         _move_to_state :IT40
       end
 
@@ -118,7 +121,11 @@ class Skylab::Task
       end
 
       def __transition_from_IT40_to_finish40
-        :_fake_finish_for_40_  # "manner" magnetic
+
+        Here_::Models_::Manner_ItemTicket.new(
+          _finish_term,
+          remove_instance_variable( :@__slot_term_symbol ),
+        )
       end
 
       # -- area 60
@@ -174,14 +181,24 @@ class Skylab::Task
       end
 
       def __transition_from_IT80_to_finish80
-        :_fake_finish_for_80_  # "function" magnetic
+        Here_::Models_::Function_ItemTicket.STUB
       end
 
       # -- area N
 
       # --
 
+      def _begin_term
+        @_term_in_progress = remove_instance_variable :@_word ; nil  # WILL MUTATE TOKEN (for now (ick))
+      end
+
       def _add_word_to_term
+        @_term_in_progress << UNDERSCORE_
+        @_term_in_progress << ( remove_instance_variable :@_word )
+      end
+
+      def _finish_term
+        remove_instance_variable( :@_term_in_progress ).intern
       end
 
       def _move_to_state sym

@@ -16,6 +16,14 @@ module Skylab::Task::TestSupport
       it "parses" do
         item_parse_tree || fail
       end
+
+      it "'unassociated' is the category symbol" do
+        _category_symbol == :unassociated || fail
+      end
+
+      it "knows its own name ('term_symbol') (and that's it)" do
+        _term_symbol == :foo_bar || fail
+      end
     end
 
     context "simple 'as'" do
@@ -26,6 +34,16 @@ module Skylab::Task::TestSupport
 
       it "parses" do
         item_parse_tree || fail
+      end
+
+      it "its category symbol is.." do
+        _category_symbol == :manner || fail
+      end
+
+      it "it knows the 'slot' and 'particular' names" do
+        o = item_parse_tree
+        o.slot_term_symbol == :fliff || fail
+        o.manner_term_symbol == :blam || fail
       end
     end
 
@@ -110,5 +128,14 @@ module Skylab::Task::TestSupport
         item_parse_tree || fail
       end
     end
+
+    def _category_symbol
+      item_parse_tree.category_symbol
+    end
+
+    def _term_symbol
+      item_parse_tree.term_symbol
+    end
+
   end
 end

@@ -350,6 +350,7 @@ class Skylab::Task
   NIL_ = nil
   NOTHING_ = nil
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 end
 # #tombstone: we no longer subclass rake task
 # #tombstone: (temporary) Home_.lib_.fields::Attribute::DSL[ self ]

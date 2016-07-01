@@ -31,7 +31,7 @@ module Skylab::Task::TestSupport
         end
 
         def input_word_array s_a
-          @_ITvTS_input_token_stream = Simple_Token_Stream___.new s_a ; nil
+          @_ITvTS_input_token_stream = Simple_Token_Stream_.new s_a ; nil
         end
 
         def input_word_drama * s_a
@@ -240,27 +240,6 @@ module Skylab::Task::TestSupport
         attr_reader(
           :ok,
         )
-      end
-
-      # ==
-
-      class Simple_Token_Stream___
-
-        def initialize a
-          @_a = a
-          @_d = -1
-          @_last = a.length - 1
-        end
-
-        def gets
-          if @_last != @_d
-            @_a.fetch( @_d += 1 )
-          end
-        end
-
-        def ok
-          true
-        end
       end
 
       # ==

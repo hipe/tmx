@@ -210,7 +210,6 @@ class Skylab::Task
         BLACK_RX___ = /[^-a-z]+/
         DASH_ = '-'
         EMPTY_P_ = -> { NOTHING_ }
-        UNDERSCORE_ = '_'
       end
     end
   end

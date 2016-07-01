@@ -9,4 +9,3 @@ CLI integration for single
 integration: solve a contrived problem with both
 find a path: don't cycle, find shortest path, whine when not found
 represent functions
-represent manners and let them write an API onto your interface class
