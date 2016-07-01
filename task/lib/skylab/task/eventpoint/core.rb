@@ -532,7 +532,6 @@ class Skylab::Task
       end
 
       Here_ = self
-      NEWLINE_ = "\n"
       SPACE_ = ' '
     end
   # -

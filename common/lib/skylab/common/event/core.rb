@@ -481,10 +481,6 @@ module Skylab::Common
           Inferred_Message.to_proc
         end
 
-        def make_event_prototype_with * deflist, & p
-          Event_.prototype.via_deflist_and_message_proc deflist, p
-        end
-
         def event_class
           Event_
         end

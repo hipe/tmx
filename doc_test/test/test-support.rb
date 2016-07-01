@@ -97,7 +97,7 @@ module Skylab::DocTest::TestSupport
       cache = {}
       define_method :full_path_ do |tail_path|
         cache.fetch tail_path do
-          x = ::File.join sidesystem_dir_path_, tail_path
+          x = ::File.join sidesystem_path_, tail_path
           cache[ tail_path ] = x
           x
         end
@@ -105,7 +105,7 @@ module Skylab::DocTest::TestSupport
     end.call
 
     ssdp = nil
-    define_method :sidesystem_dir_path_ do
+    define_method :sidesystem_path_ do
       ssdp ||= ::File.expand_path( '../../..', home_dir_path_ )
     end
 

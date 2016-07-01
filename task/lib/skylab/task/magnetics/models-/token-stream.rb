@@ -76,9 +76,13 @@ class Skylab::Task
 
           @_scn = ::StringScanner.new big_string
           @_m = :__first
-          Common_.stream do
-            send @_m
-          end
+          @ok = true
+
+          self  # eek
+        end
+
+        def gets
+          send @_m
         end
 
         def __first
@@ -203,6 +207,7 @@ class Skylab::Task
         def _expecting & exp_desc_p
 
           remove_instance_variable :@_m
+          @ok = UNABLE_
 
           express_into_under = -> y, _expag=nil do
 
@@ -236,9 +241,14 @@ class Skylab::Task
             raise express_into_under[ "" ]
           end
         end
+
+        attr_reader(
+          :ok,
+        )
       end
 
       PEEK_LENGTH__ = 10
+
     end
   end
 end

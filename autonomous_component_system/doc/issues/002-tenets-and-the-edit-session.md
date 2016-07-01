@@ -553,7 +553,7 @@ will report that it succeeded*. this is in contrast to (D) next.
 
 if a `not` symbol occurs immediately after the `if` symbol, it has
 semi-special significance: this `not` is something like a reserved
-word - you cannot have the symoblic name for your test be `not`, but
+word - you cannot have the symbolic name for your test be `not`, but
 any other name is allowed.
 
 currently the `not` keyword does not simply negate the result of

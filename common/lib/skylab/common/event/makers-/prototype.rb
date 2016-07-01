@@ -106,9 +106,9 @@ module Skylab::Common
             end
           end )
 
-          if cls.respond_to? :prop_bx  # modify a dup of an existing prop box
+          if cls.respond_to? :properties  # modify a dup of an existing prop box
 
-            _BOX_ = cls.prop_bx.dup
+            _BOX_ = cls.properties.dup
 
             for_property = -> k, v do
 
@@ -144,7 +144,7 @@ module Skylab::Common
           _BOX_.freeze
 
           cls.class_exec do
-            define_singleton_method :prop_bx do _BOX_ end
+            define_singleton_method :properties do _BOX_ end  # [ta]
             define_method :formal_properties do _BOX_ end
           end
 
@@ -368,7 +368,7 @@ module Skylab::Common
         private
           def bld_ivar_bx
             bx = Home_::Box.new
-            prop_bx.each_pair do |i, prop|
+            properties.each_pair do |i, prop|
               bx.add i, prop.name_as_ivar
             end
             bx.freeze

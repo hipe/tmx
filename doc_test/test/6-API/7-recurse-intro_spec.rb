@@ -33,7 +33,7 @@ module Skylab::DocTest::TestSupport
 
     it "'list' only those files relevant to the path. emits no events, result is stream", wip: true do  # #old-wip:2015-04
 
-      call_API :recursive, :sub_action, :list, :path, sidesystem_dir_path_
+      call_API :recursive, :sub_action, :list, :path, sidesystem_path_
 
       expect_no_events
 
@@ -64,7 +64,7 @@ module Skylab::DocTest::TestSupport
 
       call_API :recursive, :sub_action, :preview, :path,
 
-        sidesystem_dir_path_,
+        sidesystem_path_,
 
         :downstream, downstream
 

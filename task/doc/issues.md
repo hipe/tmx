@@ -1,3 +1,5 @@
+[#012]       unified langauge for magnetics implementation
+
 [#011]       magnetics item syntax..
 
 [#010] #open `./task/bin/tmx-task mag ./search_and_replace/lib/skylab/search_and_replace/magnetics-`

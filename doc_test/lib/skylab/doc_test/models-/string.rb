@@ -20,7 +20,7 @@ module Skylab::DocTest
       end
 
       def quoted_string_regex_part
-        QUOTED_STRING_REGEX_PART___
+        QUOTED_STRING_REGEX_PART__
       end
     end  # >>
 
@@ -29,69 +29,21 @@ module Skylab::DocTest
       Unescape_matchdata__[ SOFT_MATCH_RX___.match(s) ]
     end
 
-    Unescaping_Schema__ = ::Struct.new :rx, :escape_map_by
+    # (#coverpoint4-3 moved to [ba]!)
 
-    dquote = '"'
-    squote = "'"
-    bslash = '\\'
+    qsll = Home_.lib_.basic::String.quoted_string_literal_library
 
-    DOUBLE_UNESCAPING_SCHEMA___ = Unescaping_Schema__.new(
-      / \\ (?<special_char> . ) /x,
-      Lazy_.call do
-        {
-          dquote => dquote,
-          bslash => bslash,
-        }
-      end
-    )
+    Unescape_matchdata__ = qsll::Unescape_matchdata
 
-    SINGLE_UNESCAPING_SCHEMA___ = Unescaping_Schema__.new(
-      / \\ (?<special_char> . ) /x,  # tighten this
-      Lazy_.call do
-        {
-          squote => squote,
-          bslash => bslash,
-        }
-      end
-    )
+    quoted_string_part = qsll::QUOTED_STRING_REGEX_PART
 
-    Unescape_matchdata__ = -> md do
-
-      s = md[ :double_quoted_bytes ]
-      if s
-        schema = DOUBLE_UNESCAPING_SCHEMA___
-      else
-        s = md[ :single_quoted_bytes ]
-        schema = SINGLE_UNESCAPING_SCHEMA___
-      end
-
-      s.gsub schema.rx do
-
-        # (once you get inside here, it means that yes the string
-        #  probably had ostensible escape sequences in it.)
-
-        _char = $~[ :special_char ]  # a string one character in length
-        _map = schema.escape_map_by[]
-        _map.fetch _char
-      end
-    end
-
-    # --
-
-    quoted_string_part = %q<
-      (?:
-        " (?<double_quoted_bytes> (?: [^\\\\"] | \\\\. )* ) " |
-        ' (?<single_quoted_bytes> (?: [^\\\\'] | \\\\. )* ) ' |
-      )
-    >
-
-    # (#coverpoint4-3: we need those four (or three :/) backslashes.)
-
-    QUOTED_STRING_REGEX_PART___ = quoted_string_part
+    QUOTED_STRING_REGEX_PART__ = quoted_string_part
 
     SOFT_MATCH_RX___ = /\A[ \t]#{ quoted_string_part }/x
 
     EXACT_MATCH_RX___ = /\A#{ quoted_string_part }\z/x
+
   end
 end
+# #pending-rename: probably etc because of [ta] needing this
 # #history: broke out of output adapters quickie test document parser

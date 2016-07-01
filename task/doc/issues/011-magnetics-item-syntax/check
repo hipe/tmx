@@ -1,0 +1,471 @@
+#!/usr/bin/env ruby -w
+
+require 'skylab/task'
+
+class Skylab::Task
+
+  class Check___
+
+    def initialize i, o, e, pn_s_a
+      @sout = o ; @serr = e ; @program_name_string_array_ = pn_s_a
+    end
+
+    def execute
+      __init
+      __compare_graphs
+    end
+
+    def __compare_graphs
+
+      _asset_index = Asset_Index___.new( @asset_module, self ).execute
+
+      _st = AssocStream_via_Dotfile___.new( open( @dot_path ), self ).execute
+
+      _asset_index.check_against_association_stream _st
+    end
+
+    def __init
+      @asset_module = Home_::Magnetics::Magnetics_::ItemTicket_via_TokenStream
+      @dot_path = ::File.join Home_.sidesystem_path_, 'doc/issues/011-magnetics-item-syntax/figure-1-syntax.dot'
+      NIL_
+    end
+
+    attr_reader(
+      :serr,
+      :sout,
+    )
+
+    # ==
+
+    class Asset_Index___
+
+      # two broad phases of life: the first is that it just verifies the
+      # asset file within itself making sure that there is no left or
+      # right difference between the FSA structure and the methods defined
+      # all within the file.
+
+      # the second phase is where we are fed associations one at a time
+      # from the graph viz dotfile and we are supposed to do the same
+      # set operation with our FSA structure against the associations
+      # expressed there.
+
+      def initialize cls, client
+        @class = cls
+        @serr = client.serr
+        @sout = client.sout
+      end
+
+      def execute
+        __init
+        __index_FSA
+        __check_for_methods_missing_and_extra
+        self
+      end
+
+      # --
+
+      def check_against_association_stream st
+
+        # for each association that is in the dotfile, see (somehow) if it
+        # is in the FSA (in terms of its `from` and `to`).
+        #
+        # as a bonus, determine the token category from the label of the
+        # asssociation and verify that this, too, is correct in the FSA
+        # structure in the asset file.
+
+        my_pool = __build_mutable_FSA_for_associations_check
+        missing = __diminish_my_pool_against_associations my_pool, st
+        extra = __determine_extra_via_my_remaining_pool my_pool
+
+        if missing
+          _error_section missing do |y|
+            y << "missing - the following is/are in the design document but not the asset file:"
+          end
+        end
+
+        if extra
+          _error_section extra do |y|
+            y << "extra - the following are in the FSA of the asset file but not in the design document"
+          end
+        end
+
+        if @ok
+          SUCCESS_EXITSTATUS_
+        else
+          GENERIC_ERROR_EXITSTATUS_
+        end
+      end
+
+      def __determine_extra_via_my_remaining_pool my_pool
+
+        extra = nil
+        my_pool.each do |from, tok_cat_sym_via_to_sym|
+          tok_cat_sym_via_to_sym.each do |to, tok_cat_sym|
+            ( extra ||= [] ).push Extra___.new( from, to, tok_cat_sym )
+          end
+        end
+        extra
+      end
+
+      class Extra___
+
+        def initialize f, t, i
+          @from = f
+          @to = t
+          @tok_cat_sym = i
+        end
+
+        def to_line_string
+
+          # SUPER hacky - assume that when speaking of the asset file,
+          # things are generally uppercase whereas they are lowercase
+          # in the design document..
+
+          fr = @from.to_s.upcase
+          to = @to.to_s
+          unless FINISH_RX__ =~ to
+            to.upcase!
+          end
+
+          "#{ fr } transitioning to #{ to } (by way of '#{ @tok_cat_sym }')"
+        end
+      end
+
+      def __diminish_my_pool_against_associations my_pool, st
+
+        missing = nil
+
+        begin
+          asc = st.gets
+          asc || break
+
+          of_from = my_pool[ asc.from ]
+          if ! of_from
+            ( missing ||= [] ).push MissingAssoc__.new( :from, asc )
+            redo
+          end
+
+          tuple = of_from.delete asc.to
+          if ! tuple
+            ( missing ||= [] ).push MissingAssoc__.new( :to, asc )
+            redo
+          end
+
+          tok_cat_sym = tuple  # for now
+
+          if tok_cat_sym != asc.token_category_symbol
+            ( missing ||= [] ).push MissingAssoc__.new( :token_category_symbol, asc, tok_cat_sym )
+            redo
+          end
+
+          if of_from.length.zero?
+            my_pool.delete asc.from
+          end
+
+          redo
+        end while nil
+
+        missing
+      end
+
+      class MissingAssoc__
+
+        def initialize field_sym, asc, wrong_val=nil
+          @association = asc
+          @field_symbol = field_sym
+          @wrong_value = wrong_val
+        end
+
+        def to_line_string
+
+          asc = @association
+
+          y = "missing #{ asc.from }->#{ asc.to } (by '#{ asc.token_category_symbol }')"
+
+          x = @wrong_value
+          if x
+            _the_right = " the right"
+            _had = " (had '#{ x }')"
+          end
+
+          y << " - didn't have#{ _the_right } '#{ @field_symbol }' component#{ _had }"
+        end
+
+        attr_reader(
+          :association,
+          :field_symbol,
+          :wrong_value,
+        )
+      end
+
+      # --
+
+      def __build_mutable_FSA_for_associations_check
+
+        # the FSA as it appears in the asset file is a 2-deep hash of the
+        # structure:
+        #
+        #     hash[ from_symbol ][ token_category_symbol ] => method_name
+        #
+        # this structure is ordered so it works for parsing, but it does
+        # not work well for the kind of validation we are doing here.
+        # what we are doing here amounts to looking up each assocation and
+        # checking a property of it.
+
+        # as we go along each association in the design document (dot file)
+        # and check if it is here in the asset document (with the right
+        # "instigator" to boot), it would be prefereable to have a form
+        # something like:
+        #
+        #     hash[ from_symbol ][ to_symbol ] => token_category_symbol
+        #
+        # also, this large structure we take pains to build won't be going
+        # to "waste" - we need a mutable structure that we can delete from
+        # as we do our "diminishing pool" strategy to see what's missing
+        # based on what's left over in the pool at the end.
+        #
+        # (what's more, we honor (and expect) the different sides to use
+        # diffing casing conventions, but internally we make everything
+        # lowercase for the sake of comparison.)
+
+        my_pool = {}
+
+        im_h = @_implied_method_box.h_  # generated from real FSA so is coherent
+
+        @_REAL_FSA.each_pair do |from_symbol, m_via_token_cat_sym|
+
+          tok_cat_sym_via_to_sym = {}
+          my_pool[ from_symbol.downcase ] = tok_cat_sym_via_to_sym
+
+          m_via_token_cat_sym.each_pair do |token_cat_sym, m|
+
+            _implied_method = im_h.fetch m
+
+            tok_cat_sym_via_to_sym[ _implied_method.to ] = token_cat_sym
+          end
+        end
+
+        my_pool
+      end
+
+      # --
+
+      def __init
+        @_did_output_section = false
+        @ok = true
+        @_rx = %r(\A_+transition_from_(?<from>[^_]+)_to_(?<to>[^_]+)\z)
+      end
+
+      def __check_for_methods_missing_and_extra
+
+        missing = @_implied_method_box.h_.dup
+        extra = nil
+        rx = @_rx
+        @class.instance_methods( false ).each do |m|
+          md = rx.match m
+          md or next
+          _had = missing.delete m
+          if ! _had
+            ( extra ||= [] ).push m
+          end
+        end
+
+        if extra
+          _error_section extra do |y|
+            y << "extra (intrinsically) - #{ extra.length } method(s) defined but not in asset file FSA structure:"
+          end
+        end
+
+        d = missing.length
+        if d.nonzero?
+          _error_section missing.keys do |y|
+            y << "missing (intrinsically) - asset file FSA structure has #{ d } method(s) not yet defined by the parser class:"
+          end
+        end
+
+        NIL_
+      end
+
+      def __index_FSA
+
+        bx = Common_::Box.new
+        rx = @_rx
+        @_REAL_FSA = @class.const_get :FSA__
+        @_REAL_FSA.each_pair do |from_node_sym, to_node_h|
+
+          to_node_h.each_pair do |trans_type_sym, m|
+
+            md = rx.match m
+            md or fail ___say_make_this_match m
+
+            o = ImpliedMethod___.new( md[ :from ].intern, md[ :to ].intern, m )
+            # ..
+            bx.add o.method, o
+          end
+        end
+        @_implied_method_box = bx
+        NIL_
+      end
+
+      def ___say_make_this_match m
+        "`#{ m }` must match /#{ @_rx.source }/"
+      end
+
+      def _error_section o_a, & msg_p
+
+        @ok = false
+
+        y = ::Enumerator::Yielder.new( & @sout.method( :puts ) )
+
+        p = if o_a.first.respond_to? :to_line_string
+          :to_line_string.to_proc
+        else
+          IDENTITY_
+        end
+
+        if @_did_output_section
+          y << NEWLINE_
+        else
+          @_did_output_section = true
+        end
+
+        msg_p[ y ]
+        o_a.each do |o|
+          y << "  • #{ p[ o ] }"
+        end
+        NIL_
+      end
+    end
+
+    # ==
+
+    class ImpliedMethod___
+
+      def initialize from, to, method
+        @FROM = from
+        @TO = to
+        @from = from.downcase.intern
+        @to = to.downcase.intern
+        @method = method
+      end
+
+      attr_reader(
+        :FROM,
+        :from,
+        :method,
+        :TO,
+        :to,
+      )
+    end
+
+    # ==
+
+    class AssocStream_via_Dotfile___
+
+      def initialize st, client
+        @serr = client.serr
+        @sout = client.sout
+        @line_stream = st
+      end
+
+      def execute
+
+        st = remove_instance_variable :@line_stream
+
+        arrow = /->/
+        label_and_equals = /\[[ \t]*label[ \t]*=[ \t]*/
+        name = /[a-zA-Z_][a-zA-Z_0-9]*/
+        whitespace = /[ \t]*/
+
+        scn = Home_.lib_.string_scanner.new EMPTY_S_
+        @_scn = scn  # for failures
+
+        vendor_lib = Home_.lib_.string.quoted_literal_string_library
+
+        Common_.stream do
+          begin
+            line = st.gets
+            line || break
+
+            NEWLINE_ == line && redo  # "optimization"
+
+            scn.string = line
+            scn.skip whitespace
+
+            from = scn.scan name
+            from || redo
+            scn.skip whitespace
+
+            _d = scn.skip arrow
+            _d || redo  # once we've matched the arrow we're not messing aroudn ..
+            scn.skip whitespace
+
+            to = scn.scan name
+            to or fail _say_expected :name
+            scn.skip whitespace
+
+            d = scn.skip label_and_equals
+
+            # nasty - the only transition that doesn't need a label is the end transition
+            if d
+              label = vendor_lib.unescape_quoted_literal_at_scanner_head scn
+              label or fail _say_expected :label_quoted_string_literal
+            else
+              if FINISH_RX__ =~ to
+                label = END_S___
+              else
+                fail _say_expected :label_quoted_string_literal
+              end
+            end
+
+            x = DotfileAssociation___.new from, to, label
+            break
+          end while nil
+          x
+        end
+      end
+
+      END_S___ = 'end'.freeze
+
+      def _say_expected sym
+        "expected `#{ sym }` in #{ @_scn.string.inspect }"
+      end
+    end
+
+    # ==
+
+    class DotfileAssociation___
+
+      def initialize from_s, to_s, label_s
+
+        # (the ..)
+
+        md = QUOTED_RX___.match label_s
+        if md
+          label_s = md[ :inside ]
+        end
+
+        @from = from_s.intern
+        @to = to_s.intern
+        @token_category_symbol = label_s.intern
+      end
+
+      QUOTED_RX___ = /\A"(?<inside>.+)"\z/
+
+      attr_reader(
+        :from,
+        :to,
+        :token_category_symbol,
+      )
+    end
+
+    # ==
+
+    FINISH_RX__ = /\Afinish(?![a-z])/
+    GENERIC_ERROR_EXITSTATUS_ = 5
+    IDENTITY_ = -> x { x }
+    SUCCESS_EXITSTATUS_ = 0
+  end
+end
+
+exit Skylab::Task::Check___.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute

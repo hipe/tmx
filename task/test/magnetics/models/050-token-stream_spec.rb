@@ -113,11 +113,13 @@ module Skylab::Task::TestSupport
 
     def _expect input_string, * expected_output_tokens
 
-      _st = _tokenizer.token_stream_via_string input_string
+      st = _tokenizer.token_stream_via_string input_string
 
-      _a = _st.to_a
+      # (this used to be a [co] stream now it's custom. below is `.to_a`)
+      a = [] ; x = nil
+      a.push x while x = st.gets
 
-      _a == expected_output_tokens || fail
+      a == expected_output_tokens || fail
     end
 
     def _subject_module

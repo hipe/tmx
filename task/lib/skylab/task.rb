@@ -14,6 +14,10 @@ class Skylab::Task
     def lib_
       @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
+
+    def sidesystem_path_
+      @___sidesys_path ||= ::File.expand_path( '../../..', __FILE__ )
+    end
   end  # >>
 
   # this file is meant to contain all of the code necessary to load the
@@ -342,6 +346,7 @@ class Skylab::Task
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
   Home_ = self
+  NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil
   UNABLE_ = false

@@ -1,0 +1,71 @@
+digraph g {
+
+  /* NOTE when you make changes here, run the sibling "check" script" ! */
+
+  label="\nfigure 1. the syntax for a magnetics item"
+
+  node [shape=circle]
+
+  /* 20 */
+
+  bt20 [label="before\nterm (20)"]
+
+  bt20->it20 [label="other"]
+
+  it20 [label="in\nterm (20)"]
+
+  it20->it20 [label="other"]
+
+  it20->finish20
+
+  finish20 [label="finish\n(unassociated)" shape=rect]
+
+  it20->bt40 [label="\"as\""]
+
+  bt40 [label="before\nterm (40)"]
+
+  bt40->it40 [label="other"]
+
+  it40 [label="in\nterm (40)"]
+
+  it40->it40 [label="other"]
+
+  it40->finish40
+
+  finish40 [label="finish\n(manner)" shape=rect]
+
+  /* 60 */
+
+  it20->bt60 [label="\"and\""]
+
+  bt60 [label="before\n term(60)"]
+
+  bt60->it60 [label="other"]
+
+  it60 [label="in\nterm (60)"]
+
+  it60->it60 [label="other"]
+
+  it60->bt60 [label="\"and\""]
+
+  it60->bt80 [label="\"via\""]
+
+  /* 80 */
+
+  it20->bt80 [label="\"via\""]
+
+  bt80 [label="before\nterm (80)"]
+
+  bt80->it80 [label="other"]
+
+  it80 [label="in\nterm (80)"]
+
+  it80->finish80
+
+  finish80 [label="finish\n(function)" shape=rect]
+
+  it80->bt80 [label="\"and\""]
+
+  it80->it80 [label="other"]
+
+}

@@ -38,7 +38,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def the_main_real_file_doctestable_file_path
-      ::File.join sidesystem_dir_path_, Autoloader_.default_core_file
+      ::File.join sidesystem_path_, Autoloader_.default_core_file
     end
 
     def expect_failed

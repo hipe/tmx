@@ -101,6 +101,10 @@ module Skylab::Basic
         end
       end
 
+      def quoted_string_literal_library
+        Quoted_string_literal_library___[]
+      end
+
       def a_reasonably_short_length_for_a_string
         A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
       end
@@ -345,8 +349,103 @@ module Skylab::Basic
       end
     end
 
+    Quoted_string_literal_library___ = Lazy_.call do
+
+      module QUOTED_LITERAL_STRING_LIBRARY____
+
+        _this = -> scn do
+
+          md = SCANNER_MATCH_RX___.match scn.string, scn.pos
+          if md
+            scn.pos = md.offset( 0 ).last
+            Unescape_matchdata[ md ]
+          end
+        end
+
+        say_etc = nil
+        Unescape_matchdata = -> md do
+
+          s = md[ :double_quoted_bytes ]
+          if s
+            schema = DOUBLE_UNESCAPING_SCHEMA___
+          else
+            s = md[ :single_quoted_bytes ]
+            schema = SINGLE_UNESCAPING_SCHEMA___
+          end
+
+          s.gsub schema.rx do
+
+            # (once you get inside here, it means that yes the string
+            #  probably had ostensible escape sequences in it.)
+
+            char = $~[ :special_char ]  # a string one character in length
+            map = schema.escape_map
+            had = true
+            x = map.fetch char do
+              had = false
+            end
+            if had
+              x
+            else
+              raise say_etc[ char, map ]
+            end
+          end
+        end
+
+        say_etc = -> char, map do
+
+          _s_a = map.keys.map do |s|
+            s.inspect
+          end
+
+          "unsupported escape sequence for #{ char.inspect }. #{
+            }have (#{ _s_a * ', ' })"
+        end
+
+        Unescaping_Schema__ = ::Struct.new :rx, :escape_map
+
+        bslash = '\\'
+        dquote = '"'
+        squote = "'"
+
+        DOUBLE_UNESCAPING_SCHEMA___ = Unescaping_Schema__.new(
+          / \\ (?<special_char> . ) /x,
+          {
+            dquote => dquote,
+            bslash => bslash,
+          }
+        )
+
+        SINGLE_UNESCAPING_SCHEMA___ = Unescaping_Schema__.new(
+          / \\ (?<special_char> . ) /x,  # should probably tighten this
+          {
+            squote => squote,
+            bslash => bslash,
+          }
+        )
+
+        # --
+
+        quoted_string_part = %q<
+          (?:
+            " (?<double_quoted_bytes> (?: [^\\\\"] | \\\\. )* ) " |
+            ' (?<single_quoted_bytes> (?: [^\\\\'] | \\\\. )* ) '
+          )
+        >
+        # #coverpoint4-3 (in [dt]!): we need those four (or three :/) backslashes.)
+
+        QUOTED_STRING_REGEX_PART = quoted_string_part
+        SCANNER_MATCH_RX___ = /\G#{ quoted_string_part }/x
+
+        define_singleton_method :unescape_quoted_literal_at_scanner_head, _this
+
+        self
+      end
+    end
+
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
     String_ = self
   end
 end
+# #history: quoted string literal library moved here from [dt] models/string

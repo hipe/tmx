@@ -2014,7 +2014,7 @@ module Skylab::Common
         require_via_const = -> const_i do
 
           _compliant_slug = Name.via_const_symbol( const_i ).
-            as_lowercase_with_underscores_symbol
+            as_lowercase_with_underscores_string
 
           require "skylab/#{ _compliant_slug }"
         end

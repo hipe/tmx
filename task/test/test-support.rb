@@ -27,8 +27,8 @@ module Skylab::Task::TestSupport
 
   extend TestSupport_::Quickie
 
-    Use_method___ = -> sym do
-      TS_.lib_( sym )[ self ]
+    Use_method___ = -> sym, * x_a do
+      TS_.lib_( sym )[ self, * x_a ]
     end
 
   module Instance_Methods___
@@ -134,11 +134,11 @@ module Skylab::Task::TestSupport
     Zerk_ = Home_.lib_.zerk ; nil
   end
 
-  Autoloader__ = Home_::Autoloader_
+  Autoloader_ = Home_::Autoloader_
 
   module TestLib_
 
-    sidesys = Autoloader__.build_require_sidesystem_proc
+    sidesys = Autoloader_.build_require_sidesystem_proc
 
     system_lib = nil
 
@@ -149,7 +149,7 @@ module Skylab::Task::TestSupport
     system_lib = sidesys[ :System ]
   end
 
-  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   Common_ = Home_::Common_
   EMPTY_S_ = Home_::EMPTY_S_
