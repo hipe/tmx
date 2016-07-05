@@ -140,7 +140,7 @@ A) there is the simple dynamic where each surface piece
    "impossible" to predict without looking at each piece for
    a given target width; and:
 
-B) there the dynamic where at each line break we don't use
+B) there is the dynamic where at each line break we don't use
    (but rather lose) the space surface pieces (always
    separators) if it's not the breakable zero-width location
    after a hyphen.

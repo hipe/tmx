@@ -16,14 +16,18 @@ module Skylab::Task::TestSupport
         Mock_Manner_Class__.new sym
       end
 
-      def item_ticket_collection_via_ item_resolver, * s_s_a
-        _tss = ___token_stream_stream_via s_s_a
-        col = magnetics_module_::ItemTicketCollection_via_TokenStreamStream[ _tss ]
-        col.item_resolver = item_resolver
+      def item_ticket_collection_via_ ir, * s_s_a
+        _tss = token_stream_stream_via_ s_s_a
+        item_ticket_collection_via_item_resolver_and_token_stream_stream_ ir, _tss
+      end
+
+      def item_ticket_collection_via_item_resolver_and_token_stream_stream_ ir, tss
+        col = magnetics_module_::ItemTicketCollection_via_TokenStreamStream[ tss ]
+        col.item_resolver = ir
         col
       end
 
-      def ___token_stream_stream_via s_s_a
+      def token_stream_stream_via_ s_s_a
         Common_::Stream.via_nonsparse_array s_s_a do |s_a|
           Simple_Token_Stream_.new s_a
         end

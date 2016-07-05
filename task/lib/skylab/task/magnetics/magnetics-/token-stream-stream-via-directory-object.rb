@@ -1,6 +1,8 @@
+self._NOT_yet_refactored
+
 class Skylab::Task
 
-  module MagneticsViz
+  module Magnetics
 
     class Magnetics_::MeansStream_via_Path
 

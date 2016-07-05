@@ -380,7 +380,7 @@ class Skylab::Task
         scn = Home_.lib_.string_scanner.new EMPTY_S_
         @_scn = scn  # for failures
 
-        vendor_lib = Home_.lib_.string.quoted_literal_string_library
+        vendor_lib = Home_.lib_.basic::String.quoted_string_literal_library
 
         Common_.stream do
           begin
@@ -463,7 +463,6 @@ class Skylab::Task
 
     FINISH_RX__ = /\Afinish(?![a-z])/
     GENERIC_ERROR_EXITSTATUS_ = 5
-    IDENTITY_ = -> x { x }
     SUCCESS_EXITSTATUS_ = 0
   end
 end

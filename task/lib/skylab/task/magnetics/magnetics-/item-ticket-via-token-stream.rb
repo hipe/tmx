@@ -89,10 +89,13 @@ class Skylab::Task
       end
 
       def __transition_from_IT20_to_BT60
+        @_function_product_term_list = [ _finish_term ]
         _move_to_state :BT60
       end
 
       def __transition_from_IT20_to_BT80
+        @_function_product_term_list = [ _finish_term ]
+        @_function_precondition_term_list = []
         _move_to_state :BT80
       end
 
@@ -124,7 +127,7 @@ class Skylab::Task
 
         Here_::Models_::Manner_ItemTicket.new(
           _finish_term,
-          remove_instance_variable( :@__slot_term_symbol ),
+          @__slot_term_symbol,
         )
       end
 
@@ -141,6 +144,7 @@ class Skylab::Task
       }
 
       def __transition_from_BT60_to_IT60
+        _begin_term
         _move_to_state :IT60
       end
 
@@ -149,10 +153,13 @@ class Skylab::Task
       end
 
       def __transition_from_IT60_to_BT60
+        @_function_product_term_list.push _finish_term
         _move_to_state :BT60
       end
 
       def __transition_from_IT60_to_BT80
+        @_function_product_term_list.push _finish_term
+        @_function_precondition_term_list = []
         _move_to_state :BT80
       end
 
@@ -169,6 +176,7 @@ class Skylab::Task
       }
 
       def __transition_from_BT80_to_IT80
+        _begin_term
         _move_to_state :IT80
       end
 
@@ -177,11 +185,18 @@ class Skylab::Task
       end
 
       def __transition_from_IT80_to_BT80
+        @_function_precondition_term_list.push _finish_term
         _move_to_state :BT80
       end
 
       def __transition_from_IT80_to_finish80
-        Here_::Models_::Function_ItemTicket.STUB
+
+        @_function_precondition_term_list.push _finish_term
+
+        Here_::Models_::Function_ItemTicket.via_prerequisites_and_products__(
+          @_function_precondition_term_list,
+          @_function_product_term_list,
+        )
       end
 
       # -- area N

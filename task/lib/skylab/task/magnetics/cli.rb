@@ -1,6 +1,8 @@
+self._NOT_yet_refactored
+
 class Skylab::Task
 
-  module MagneticsViz
+  module Magnetics
 
     module CLI
 
@@ -98,6 +100,7 @@ class Skylab::Task
       end
 
       def __dotfile_graph_via_graph
+        self._REDO
         Magnetics_::DotfileGraph_via_Graph.new( @_graph, & @_oes_p ).execute
       end
 
@@ -125,22 +128,6 @@ class Skylab::Task
     end
 
     # --
-
-    module Magnetics_
-
-      Graph_via_MeansStream = -> st do
-        g = Models_::Graph.begin
-        begin
-          me = st.gets
-          me or break
-          g.add_means me.slugs_B, me.slug_A
-          redo
-        end while nil
-        g.finish
-      end
-
-      Autoloader_[ self ]
-    end
 
     module Models_
 

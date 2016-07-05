@@ -2,10 +2,10 @@ require_relative '../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] magnetics-viz - CLI integration" do
+  describe "[ta] magnetics - CLI", wip: true do
 
     TS_[ self ]
-    use :mag_viz_CLI  # [ze] non_interactive_CLI
+    use :magnetics_CLI
 
     context "schlum schlum" do
 

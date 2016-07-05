@@ -14,6 +14,10 @@ module Skylab::Basic
         width: nil,
       )
 
+      attr_writer(  # experimentally we bring a session-like interface in for some..
+        :aspect_ratio,
+      )
+
       def initialize
 
         @aspect_ratio = nil

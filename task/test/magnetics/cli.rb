@@ -1,31 +1,24 @@
 module Skylab::Task::TestSupport
 
-  module Mag_Viz
+  module Magnetics::CLI
 
-    module CLI
-
-      def self.[] tcc
-        Mag_Viz[ tcc ]
-        Require_zerk_[]
-        Zerk_.test_support::Non_Interactive_CLI[ tcc ]
-        tcc.include self
-      end
-
-      def subject_CLI
-        Home_::MagneticsViz::CLI
+    def self.[] tcc
+      tcc.send :define_singleton_method, :given do |*|
       end
     end
 
-    def self.[] tcc
+    def _WAS
+      Require_zerk_[]
+      Zerk_.test_support::Non_Interactive_CLI[ tcc ]
       tcc.include self
+    end
+
+    def subject_CLI
+      Home_::Magnetics::CLI
     end
 
     def begin_mock_FS_
       Mock_FS___.new
-    end
-
-    def subject_module_
-      Home_::MagneticsViz
     end
 
     # ==

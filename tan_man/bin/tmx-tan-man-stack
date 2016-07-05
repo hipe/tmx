@@ -258,20 +258,46 @@ class Skylab::Stack
 
     def __top__component_operation
 
-      -> do
-        st = _to_item_line_stream
-        if st
-          line = st.gets  # the whole file was read. we don't have to close it.
-          p = -> do
-            p = -> { nil }  # EMPTY_P_, NOTHING_
-            line
-          end
-          Stream__.new do
-            p[]
+      -> num=nil do
+
+        if num
+          md = /\A[0-9]+\z/.match num
+          if md
+            d = num.to_i
+          else
+            @_oes_p.call :error, :message, :invalid_input do |y|
+              y << "must be a positive integer - #{ num.inspect }"
+            end
           end
         else
-          _when_stack_empty
+          d = 1
         end
+
+        if d
+          __go_top d
+        else
+          UNABLE_
+        end
+      end
+    end
+
+    def __go_top d
+
+      # (we have read the whole file already, there is no need to close it.)
+
+      st = _to_item_line_stream
+      if st
+        Stream__.new do
+          if d.nonzero?
+            line = st.gets
+            if line
+              d -= 1
+              line
+            end
+          end
+        end
+      else
+        _when_stack_empty
       end
     end
 

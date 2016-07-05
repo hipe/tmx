@@ -532,7 +532,6 @@ class Skylab::Task
       end
 
       Here_ = self
-      SPACE_ = ' '
     end
   # -
 end

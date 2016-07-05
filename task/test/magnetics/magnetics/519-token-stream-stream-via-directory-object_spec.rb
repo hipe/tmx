@@ -2,11 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] magnetics-viz - magnetics - m s v p" do
+  describe "[ta] magnetics - magnetics - token stream stream via directory object", wip: true do
 
     TS_[ self ]
     use :memoizer_methods
-    use :mag_viz
 
     it "parses on \"via\"" do
       o = _fetch 0

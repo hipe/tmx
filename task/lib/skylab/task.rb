@@ -346,9 +346,11 @@ class Skylab::Task
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
   Home_ = self
+  IDENTITY_ = -> x { x }
   NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil
+  SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'
 end

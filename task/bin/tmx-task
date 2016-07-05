@@ -2,7 +2,7 @@
 
 require 'skylab/task'
 
-cli = Skylab::Task::MagneticsViz::CLI.new(
+cli = Skylab::Task::Magnetics::CLI.new(
   $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 )
 cli.filesystem = ::Dir

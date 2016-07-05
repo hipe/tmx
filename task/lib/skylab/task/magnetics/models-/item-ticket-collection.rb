@@ -10,7 +10,7 @@ class Skylab::Task
       end  # >>
 
       def initialize
-        @manner_box = nil
+        NOTHING_  # every ivar is instantiated lazily
       end
 
       attr_writer(
@@ -44,7 +44,12 @@ class Skylab::Task
       end
 
       def __accept_function fu
-        $stderr.puts "(collection is ignoring functions for now)"
+        ( @__function_items ||= [] ).push fu
+        NIL_
+      end
+
+      def __accept_unassociated ma
+        @UNASSOCIATEDS_WERE_ADDED_BUT_IGNORED = true
         NIL_
       end
 
@@ -53,7 +58,7 @@ class Skylab::Task
         self
       end
 
-      # -- manners
+      # -- use manners
 
       def write_manner_methods_onto cls
         Here_::Magnetics_::EnhancedClass_via_Class_and_ItemTicketCollection[ cls, self ]
@@ -61,6 +66,12 @@ class Skylab::Task
 
       def manner_slot_setter_class_cache___
         @___mssc_cache ||= {}
+      end
+
+      # -- use functions
+
+      def to_function_item_ticket_stream__
+        Common_::Stream.via_nonsparse_array @__function_items
       end
 
       # -- support
