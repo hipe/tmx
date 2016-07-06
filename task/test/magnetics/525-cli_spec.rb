@@ -2,56 +2,141 @@ require_relative '../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] magnetics - CLI", wip: true do
+  describe "[ta] magnetics - CLI" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :magnetics_CLI
 
-    context "schlum schlum" do
+    _OPERATION = 'magnetics-viz'
+
+    context "ping-like" do
 
       given do
-        argv 'magnetics-vis', 'shlum-shlum'
+        argv _OPERATION, '-x'
+      end
+
+      it "invalid option" do
+        _be_this = be_line "invalid option: -x"
+        first_line.should _be_this
+      end
+
+      it "invite" do
+        _be_this = be_line :styled, /\Asee 'xyzi magnetics-viz -h' for more about options\z/
+        last_line.should _be_this
+      end
+    end
+
+    context "(verify content)" do
+
+      given do
+        argv _OPERATION, 'shlum-shlum'
       end
 
       it "the output looks like a digraph (outer lines)" do
+
         a = niCLI_state.lines
         a.first.string == "digraph g {\n" or fail
         a.last.string == "}\n" or fail
       end
 
-      it "waypoint assoc" do
-        _at( 1 ) == "  hover_craft -> hover_craft_0\n" or fail
+      it "main thing points to the 'one of these' node" do
+
+        _reflection.A_points_to_this_ONE_OF_THESE_node :hover_craft, 1 or fail
       end
 
-      it "means component assoc" do
-        _at( 3 ) == "  hover_craft_0 -> amazon\n"
+      it "the 'one of these' nodes points to thse two" do
+
+        o = _reflection
+        o.this_ONE_OF_THESE_node_points_to_this_ALL_OF_THESE_node 1, 1
+        o.this_ONE_OF_THESE_node_points_to_B 1, :amazon
       end
 
-      it "blank line" do
-        _at( 6 ) == "\n" or fail
+      it "the 'all of these' node poins to these two" do
+
+        o = _reflection
+        o.this_ALL_OF_THESE_node_points_to_B 1, :cunning
+        o.this_ALL_OF_THESE_node_points_to_B 1, :ingenuity
       end
 
-      it "waypoint head label" do
-        _at( 7 ) == "  hover_craft [label=\"hover-craft\"]\n"
+      it "label for these two is normal" do
+        o = _reflection
+        o.label_for( :amazon ) == "amazon" || fail
+        o.label_for( :ingenuity ) == "ingenuity" || fail
       end
 
-      it "means head label" do
-        _at( 8 ) == "  hover_craft_0 [label=\"(0)\"]\n"
+      it "label for 'one of these' is parenthesized" do
+        _label_for_one_of_these.should _have_parenthesis
       end
 
-      def _at d
-        niCLI_state.lines.fetch( d ).string
+      it "label for 'all of these' is parenthesized" do
+        _label_for_all_of_these.should _have_parenthesis
+      end
+
+      def _have_parenthesis
+        match %r(\A\(.+\)\z)
+      end
+
+      it "label for 'one of these' does not wordwrap" do
+        _label_for_one_of_these.include? 'one of these' or fail
+      end
+
+      it "label for 'all of these' does not wordwrap" do
+        _label_for_all_of_these.include? 'all of these' or fail
+      end
+
+      shared_subject :_label_for_one_of_these do
+        _reflection.label_for_ONE_OF_THESE_node 1
+      end
+
+      shared_subject :_label_for_all_of_these do
+        _reflection.label_for_ALL_OF_THESE_node 1
+      end
+
+      it "label for \"hover craft\" word wraps" do
+        _ = _reflection.label_for :hover_craft
+        _ == 'hover\ncraft' || fail
+      end
+
+      shared_subject :_reflection do
+
+        _st = Common_::Stream.via_nonsparse_array niCLI_state.lines, & :string
+
+        TS_::Magnetics::Dotfile_Graph::Reflection.via_line_stream _st
       end
 
       def for_expect_stdout_stderr_prepare_invocation invo
 
-        fs = begin_mock_FS_
-        fs.add_thing 'shlum-shlum' do
-          %w( . ..
-            hover-craft-via-amazon.rx
-            hover-craft-via-cunning-and-ingenuity.rx )
+        _ = _this_mock_dir_class
+        invo.filesystem = _
+        NIL_
+      end
+
+      shared_subject :_this_mock_dir_class do
+
+        make_mock_directory_class_ :X_MAG_MOCK_DIR_CLASS_1, %w(
+          .
+          ..
+          hover-craft-via-amazon.rb
+          hover-craft-via-cunning-and-ingenuity.rb
+        ).freeze
+      end
+
+      def make_mock_directory_class_ const, s_a
+
+        o = ::Module.new
+
+        TS_.const_set const, o
+
+        _dir = TS_::Magnetics::MockDirectory.via_all_entries_array s_a
+
+        h = {}
+        h[ 'shlum-shlum' ] = _dir
+
+        o.send :define_singleton_method, :new do |s|
+          h.fetch s
         end
-        invo.filesystem = fs.finish
+        o
       end
     end
   end

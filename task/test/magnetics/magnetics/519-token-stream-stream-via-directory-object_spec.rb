@@ -58,7 +58,7 @@ module Skylab::Task::TestSupport
 
       _DASH = '-'
 
-      _dir = TS_::Magnetics::MockDirectory.via_all_entries_array__ a
+      _dir = TS_::Magnetics::MockDirectory.via_all_entries_array a
 
       tss = magnetics_module_::TokenStreamStream_via_DirectoryObject[ _dir ]
 

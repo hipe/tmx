@@ -28,6 +28,9 @@ module Skylab::Task::TestSupport
     #
     # however, do NOT be afraid to scrap this whole "test" for something
     # more content-oriented if ever that seems prudent.
+    #
+    # (and note that at writing we are parsing the whole dotfile anyway,
+    # an act which itself does some tacit assertion.)
 
     context '(big coverer)' do
 
@@ -48,7 +51,7 @@ module Skylab::Task::TestSupport
         _dfg_reflection || fail
       end
 
-      it "EEK every byte" do
+      it "EEK every byte (see comments here)" do
 
         _actual_s = _dfg_reflection.ONE_BIG_STRING
 
@@ -57,29 +60,29 @@ module Skylab::Task::TestSupport
             unique_product -> one_of_one [label="comes from"]
             other_unique_product -> one_of_two [label="depends on"]
             other_unique_product -> two_of_two [label="depends on"]
-            third_unique_product -> f2 [label="comes from"]
-            other_guy -> f2 [label="comes from"]
-            common_product -> oot1
-            oot1 -> one_of_one
-            oot1 -> aot1
-            aot1 -> one_of_two
-            aot1 -> two_of_two
-            other_common_product -> oot2
-            oot2 -> one_of_one
-            oot2 -> f6
-            thing -> oot3
-            oot3 -> one_of_one
-            oot3 -> f6
-            oot1 [label="(one of these)"]
-            oot2 [label="(one of these)"]
-            oot3 [label="(one of these)"]
-            aot1 [label="(all of these)"]
-            f2 -> one_of_two
-            f2 -> two_of_two
-            f6 -> one_of_two
-            f6 -> two_of_two
-            f2 [label="(all of these)"]
-            f6 [label="(all of these)"]
+            third_unique_product -> _f2 [label="comes from"]
+            other_guy -> _f2 [label="comes from"]
+            common_product -> _oot1
+            _oot1 -> one_of_one
+            _oot1 -> _aot1
+            _aot1 -> one_of_two
+            _aot1 -> two_of_two
+            other_common_product -> _oot2
+            _oot2 -> one_of_one
+            _oot2 -> _f6
+            thing -> _oot3
+            _oot3 -> one_of_one
+            _oot3 -> _f6
+            _oot1 [label="(one of these)"]
+            _oot2 [label="(one of these)"]
+            _oot3 [label="(one of these)"]
+            _aot1 [label="(all of these)"]
+            _f2 -> one_of_two
+            _f2 -> two_of_two
+            _f6 -> one_of_two
+            _f6 -> two_of_two
+            _f2 [label="(all of these)"]
+            _f6 [label="(all of these)"]
             one_of_one [label="one of\\none"]
             unique_product [label="unique\\nproduct"]
             other_unique_product [label="other unique\\nproduct"]

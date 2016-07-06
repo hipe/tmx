@@ -1,5 +1,3 @@
-self._NOT_yet_refactored
-
 class Skylab::Task
 
   module Magnetics
@@ -35,11 +33,12 @@ class Skylab::Task
       end  # >>
     end
 
-    class Root_Autonomous_Component_System_
+    class Root_Autonomous_Component_System_  # #stowaway
 
       def initialize client
         @open = false
         @__filesystem_proc = client.method :filesystem
+        # NOTE directory class expected for now of above (then #here)
       end
 
       def __open__component_association
@@ -51,7 +50,7 @@ class Skylab::Task
         yield :flag
       end
 
-      def __magnetics_visualize__component_operation
+      def __magnetics_viz__component_operation
 
         yield :description, -> y do
           y << "outputs a dotfile rendering the \"magnetics\" directory"
@@ -61,7 +60,7 @@ class Skylab::Task
           o = Visualize_Magnetics___.new( & oes_p )
           o.do_open = @open
           o.path = path
-          o.filesystem = @__filesystem_proc.call
+          o.directory_class = @__filesystem_proc.call  # #here
           o.execute
         end
       end
@@ -80,43 +79,27 @@ class Skylab::Task
 
       attr_writer(
         :do_open,
-        :filesystem,
+        :directory_class,
         :path,
       )
 
       def execute
-        ok = __resolve_means_stream_via_path
-        ok && __init_graph_via_means_stream
-        ok && __open_or_dotfile_graph_via_graph
-      end
 
-      def __open_or_dotfile_graph_via_graph
-        dg = __dotfile_graph_via_graph
-        if @do_open && dg
+        o = Here_::Magnetics_
+        _path = remove_instance_variable :@path
+        _dir = remove_instance_variable( :@directory_class ).new _path
+        _tss = o::TokenStreamStream_via_DirectoryObject[ _dir ]
+        _col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
+        _fi = o::FunctionIndex_via_ItemTicketCollection[ _col ]
+        line_stream = o::DotfileGraph_via_FunctionIndex[ _fi ]
+
+        # (ya #[#005])
+
+        if @do_open
+          ::Kernel._A
           Magnetics_::Open_via_DotfileGraph.new( dg, ::File ).execute
         else
-          dg
-        end
-      end
-
-      def __dotfile_graph_via_graph
-        self._REDO
-        Magnetics_::DotfileGraph_via_Graph.new( @_graph, & @_oes_p ).execute
-      end
-
-      def __init_graph_via_means_stream
-        _ = remove_instance_variable :@_means_stream
-        @_graph = Magnetics_::Graph_via_MeansStream[ _ ]
-        ACHIEVED_
-      end
-
-      def __resolve_means_stream_via_path
-
-        st = Magnetics_::MeansStream_via_Path.new( @path, @filesystem, & @_oes_p ).execute
-        if st
-          @_means_stream = st ; ACHIEVED_
-        else
-          st
+          line_stream
         end
       end
     end
@@ -126,16 +109,5 @@ class Skylab::Task
     Require_zerk_ = Lazy_.call do
       Zerk_ = Home_.lib_.zerk ; nil
     end
-
-    # --
-
-    module Models_
-
-      Means = ::Struct.new :slugs_B, :slug_A
-
-      Autoloader_[ self ]
-    end
-
-    Here_ = self
   end
 end

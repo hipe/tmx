@@ -91,7 +91,7 @@ module Skylab::Task::TestSupport
     class MockDirectory
 
       class << self
-        alias_method :via_all_entries_array__, :new
+        alias_method :via_all_entries_array, :new
         undef_method :new
       end  # >>
 

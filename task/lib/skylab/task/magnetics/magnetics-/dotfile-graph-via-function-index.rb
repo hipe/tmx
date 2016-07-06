@@ -69,7 +69,7 @@ class Skylab::Task
 
         @_m = :_express_remainder_of_function_stream
 
-        @_OoT = "oot#{ d }"
+        @_OoT = "#{ OOT__ }#{ d }"
 
         _ref = _touch_forward_reference_to_term sym
         _render_arc _ref, @_OoT
@@ -140,7 +140,7 @@ class Skylab::Task
         _bx = ( @_function_forward_references ||= Common_::Box.new )
 
         _o = _bx.touch fit.function_offset do
-          Common_::Pair.via_value_and_name fit, "f#{ fit.function_offset }"
+          Common_::Pair.via_value_and_name fit, "#{ FUN___ }#{ fit.function_offset }"
         end
 
         _o.name_x
@@ -194,7 +194,7 @@ class Skylab::Task
       def __render_next_one_of_these
         d = @_next_num[]
         if d
-          "  oot#{ d } [label=\"(one of these)\"]\n"
+          "  #{ OOT__ }#{ d } [label=\"(one of these)\"]\n"
         else
           @_m = :_render_any_numbered_function_referents
           send @_m
@@ -204,7 +204,7 @@ class Skylab::Task
       def __render_next_all_of_these
         d = @_next_num[]
         if d
-          "  aot#{ d } [label=\"(all of these)\"]\n"  # #here
+          "  #{ AOT__ }#{ d } [label=\"(all of these)\"]\n"  # #here
         else
           @_m = :_render_any_non_numbered_function_referents
           send @_m
@@ -267,12 +267,16 @@ class Skylab::Task
         @_after_all_of_these = m
         d = ( @_AoT_counter ||= 0 ) + 1
         @_AoT_counter = d
-        @_AoT = "aot#{ d }"
+        @_AoT = "#{ AOT__ }#{ d }"
 
         @_precon_st = fit.to_precondition_term_symbol_stream_
         @_m = :_all_of_these_main
         _render_arc @_OoT, @_AoT
       end
+
+      AOT__  = '_aot'
+      FUN___ = '_f'
+      OOT__  = '_oot'
 
       def _all_of_these_main
         sym = @_precon_st.gets
