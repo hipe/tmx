@@ -13,86 +13,87 @@ class Skylab::Task
         undef_method :new
       end  # >>
 
+      def add_head_anchored_skip_regex rx
+        ( @head_anchored_skip_regexes ||= [] ).push rx ; nil
+      end
+
       attr_writer(
         :end_token,
+        :end_expression_is_required,
         :word_regex,
         :separator_regex,
       )
 
       def initialize
         @end_token = nil
+        @end_expression_is_required = true  # if present
+        @head_anchored_skip_regexes = nil
       end
 
       def finish
 
-        @_stream_prototype = Stream_Builder___.__prototype_for(
-          remove_instance_variable( :@word_regex ),
-          remove_instance_variable( :@end_token ),
-          remove_instance_variable( :@separator_regex ),
-        )
+        if @end_token
+          @_end_rx = /#{ ::Regexp.escape @end_token }/
+          @_uses_end_expression = true
+        else
+          @_uses_end_expression = false
+        end
 
         freeze
       end
 
-      def token_stream_via_string big_string, & oes_p
-        @_stream_prototype.__build_stream_for big_string, & oes_p
-      end
-
-      # ==
-
       Home_.lib_.string_scanner
 
-      class Stream_Builder___
+      def token_stream_via_string big_string, & oes_p
+        dup.__become_stream_for big_string, & oes_p  # #[#sl-023] dup-and-mutate
+      end
 
-        class << self
-
-          def __prototype_for w_rx, e_tok, s_rx
-            new( w_rx, e_tok, s_rx ).freeze
-          end
-          private :new
-        end  # >>
-
-        def initialize w_rx, e_tok, s_rx
-
-          if e_tok
-            @_end_rx = /#{ ::Regexp.escape e_tok }/
-            @end_token = e_tok
-            @_uses_end_expression = true
-          else
-            @_uses_end_expression = false
-          end
-
-          @word_regex = w_rx
-          @separator_regex = s_rx
-        end
-
-        def __build_stream_for big_string, & oes_p
-          dup.__become_stream_for big_string, & oes_p  # #[#sl-023] dup-and-mutate
-        end
+      # == (was)
 
         def __become_stream_for big_string, & oes_p
 
           @on_event_selectively = oes_p
 
           @_scn = ::StringScanner.new big_string
-          @_m = :__first
           @ok = true
 
-          self  # eek
+          once = false
+          begin
+            s = @_scn.scan @word_regex
+            if s
+              @__first_token = s
+              @_m = :__first_token
+              x = self
+              break
+            end
+            once && break
+            once = true
+
+            if @head_anchored_skip_regexes
+              found = @head_anchored_skip_regexes.index do |rx|
+                @_scn.skip rx
+              end
+            end
+            found && break
+            x = __when_expecting_separator_or_end
+            break
+          end while nil
+          x
+        end
+
+        def __first_token
+          @_m = :__subsequent
+          remove_instance_variable :@__first_token
+        end
+
+        def to_a  # #testing-only
+          a = [] ; x = nil
+          a.push x while x = gets
+          a
         end
 
         def gets
           send @_m
-        end
-
-        def __first
-          s = @_scn.scan @word_regex
-          if s
-            @_m = :__subsequent
-            s
-          else
-            __when_expecting_word_or_end
-          end
         end
 
         def __subsequent
@@ -138,24 +139,38 @@ class Skylab::Task
 
         def _parse_end  # set @_succeed (and if not succeeded set @_emitted)
 
-          if @_uses_end_expression
+          if @_scn.eos?
+
+            # if you've reached the end of the input then whether or not you
+            # have succeeded is dependent upon whether or not you require an
+            # end expression.
+
+            if @_uses_end_expression && @end_expression_is_required
+              _expected_end_expression
+            else
+              @_succeeded = true
+            end
+          elsif @_uses_end_expression
+
+            # if you haven't reached the end of the input and you use an
+            # end expression, then (whether or not it's required) the end
+            # expression is what is required of the input head here.
+
             if @_scn.skip @_end_rx
               if @_scn.eos?
                 @_succeeded = true
               else
-                __expected_end_expression
-                @_succeeded = false
-                @_emitted = true
+                _expected_end_of_input
               end
             else
-              @_succeeded = false
-              @_emitted = false
+              _expected_end_expression
             end
-          elsif @_scn.eos?
-            @_succeeded = true
           else
-            @_succeeded = false
-            @_emitted = false
+
+            # if you haven't reached the end of the input and you don't
+            # use an end expression, then (since you expect the end):
+
+            _expected_end_of_input
           end
           NIL_
         end
@@ -180,7 +195,13 @@ class Skylab::Task
           end
         end
 
-        def __expected_end_expression  # assume not at end
+        def _expected_end_of_input
+          _expecting do
+            _end_desc
+          end
+        end
+
+        def _expected_end_expression  # assume not at end
           _expecting do
             _end_desc
           end
@@ -205,6 +226,9 @@ class Skylab::Task
         # --
 
         def _expecting & exp_desc_p
+
+          @_emitted = true
+          @_succeeded = false
 
           remove_instance_variable :@_m
           @ok = UNABLE_
@@ -245,7 +269,8 @@ class Skylab::Task
         attr_reader(
           :ok,
         )
-      end
+
+      # == (was)
 
       PEEK_LENGTH__ = 10
 

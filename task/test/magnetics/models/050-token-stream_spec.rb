@@ -47,29 +47,29 @@ module Skylab::Task::TestSupport
       end
     end
 
+    _COMMON_MESSAGE = 'expecting end expression (".ext") at ".exd"'
+
     context "expect certain endcaps" do
 
-      it "normative" do
+      it "normative input" do
 
         _expect 'foo-bar.ext', 'foo', 'bar'
       end
 
-      it "one" do
+      it "only one word" do
 
         _expect 'fo.ext', 'fo'
       end
 
       it "weird extension" do
 
-        _expect_error 'foo.exd', _COMMON_ERROR,
-          'expecting separator (/-/) or end expression (".ext") at ".exd"'
+        _expect_error 'foo.exd', _COMMON_ERROR, _COMMON_MESSAGE
       end
 
       it "no extension" do
 
         _expect_error 'foo', _COMMON_ERROR,
-          /\Aexpecting separator [^ ]+ or end expression [^ ]+#{
-           } at end of input\z/
+          /\Aexpecting end expression [^ ]+ at end of input\z/
       end
 
       shared_subject :_tokenizer do
@@ -81,6 +81,46 @@ module Skylab::Task::TestSupport
         o.finish
       end
     end
+
+    context "same but endcaps optional" do
+
+      it "normative input (same)" do
+
+        _expect 'foo-bar.ext', 'foo', 'bar'
+      end
+
+      it "only one word (same)" do
+
+        _expect 'fo.ext', 'fo'
+      end
+
+      it "weird extension (same)" do
+
+        _expect_error 'foo.exd', _COMMON_ERROR, _COMMON_MESSAGE
+      end
+
+      it "no extension - in contrast to the other, here it is ok" do
+
+        _expect 'foo', 'foo'
+      end
+
+      it "no extension (two words) - ok" do
+
+        _expect 'foo-bar', 'foo', 'bar'
+      end
+
+      shared_subject :_tokenizer do
+
+        o = _subject_module.begin
+        o.separator_regex = /-/
+        o.word_regex = /[a-z]+/
+        o.end_token = '.ext'
+        o.end_expression_is_required = false
+        o.finish
+      end
+    end
+
+
 
     def _expect_error input_string, error_category_sym, message_rx=nil
 
@@ -113,13 +153,11 @@ module Skylab::Task::TestSupport
 
     def _expect input_string, * expected_output_tokens
 
-      st = _tokenizer.token_stream_via_string input_string
+      _st = _tokenizer.token_stream_via_string input_string
 
-      # (this used to be a [co] stream now it's custom. below is `.to_a`)
-      a = [] ; x = nil
-      a.push x while x = st.gets
+      _a = _st.to_a
 
-      a == expected_output_tokens || fail
+      _a == expected_output_tokens || fail
     end
 
     def _subject_module

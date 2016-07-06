@@ -88,6 +88,25 @@ module Skylab::Task::TestSupport
 
     # ==
 
+    class MockDirectory
+
+      class << self
+        alias_method :via_all_entries_array__, :new
+        undef_method :new
+      end  # >>
+
+      def initialize a
+        @entries = a.frozen? ? a : a.dup.freeze
+      end
+
+      attr_reader(
+        :entries,
+      )
+    end
+
+    # ==
+
     Here_ = self
   end
 end
+# #history: assimilated & reconceived (now) mock directory from elsewhere

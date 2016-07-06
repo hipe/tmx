@@ -12,6 +12,3 @@ find a path: don't cycle, find shortest path, whine when not found (700-ish)
 -------
 ASSIMILATE MAGNETICS VIZ
 CLI (testfile) (525)
-for integration: token stream stream via directory object (testfile) (519)
-dotfile graph via function index (mocked only) (testfile) (513)
-function index (NO testfile) - needs (same) via collection (506)

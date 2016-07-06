@@ -18,30 +18,7 @@ module Skylab::Task::TestSupport
     end
 
     def begin_mock_FS_
-      Mock_FS___.new
-    end
-
-    # ==
-
-    class Mock_FS___
-
-      def initialize
-        @_h = {}
-      end
-
-      def add_thing xx, & p
-        @_h[ xx ] = p
-      end
-
-      def finish
-        self
-      end
-
-      # --
-
-      def entries path
-        @_h.fetch( path ).call
-      end
+      self._MOVED_see_history_entry  # (see historical item)
     end
   end
 end
