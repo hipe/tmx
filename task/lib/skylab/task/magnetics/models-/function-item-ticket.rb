@@ -10,7 +10,7 @@ class Skylab::Task
       end  # >>
 
       def initialize pre, pro
-        @precondition_term_symbols = pre
+        @prerequisite_term_symbols = pre
         @product_term_symbols = pro
       end
 
@@ -19,20 +19,46 @@ class Skylab::Task
       end
 
       def is_monadic
-        1 == @precondition_term_symbols.length
+        1 == @prerequisite_term_symbols.length
       end
 
       def has_one_product
         1 == @product_term_symbols.length
       end
 
-      def to_precondition_term_symbol_stream_
-        Common_::Stream.via_nonsparse_array @precondition_term_symbols
+      def to_prerequisite_term_symbol_stream_
+        Common_::Stream.via_nonsparse_array @prerequisite_term_symbols
+      end
+
+      def const
+        @___const ||= ___build_const
+      end
+
+      p = Here_.upcase_const_string_via_snake_case_symbol_
+
+      and_ = '_and_'
+      via = '_via_'
+
+      andify = -> buff, sym_a do
+        buff << p[ sym_a.fetch( 0 ) ]
+        d = 0
+        last = sym_a.length - 1
+        while d < last
+          buff << and_ << p[ sym_a.fetch( d += 1 ) ]
+        end
+      end
+
+      define_method :___build_const do
+        buffer = ""
+        andify[ buffer, @product_term_symbols ]
+        buffer << via
+        andify[ buffer, @prerequisite_term_symbols ]
+        buffer.intern
       end
 
       attr_reader(
         :function_offset,
-        :precondition_term_symbols,
+        :prerequisite_term_symbols,
         :product_term_symbols,
       )
 

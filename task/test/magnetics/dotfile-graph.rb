@@ -13,7 +13,7 @@ module Skylab::Task::TestSupport
         _tss = token_stream_stream_via_ s_s_a
         _itc = item_ticket_collection_via_item_resolver_and_token_stream_stream_ nil, _tss
         o = magnetics_module_
-        _fi = o::FunctionIndex_via_ItemTicketCollection[ _itc ]
+        _fi = _itc.function_index_
         _dfg = o::DotfileGraph_via_FunctionIndex[ _fi ]
         Reflection.via_line_stream _dfg
       end

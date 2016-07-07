@@ -2,120 +2,49 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Express_Trilean___
+    class Magnetics_::Surface_Parts_via_Three_Parts_Of_Speech_and_Trilean
 
-      GIVEN__ = [
-        :trilean,
-        :verb_lemma,
-        :verb_subject,
-      ]
+      class << self
 
-      MAKE__ = [
-        :initial_phrase_conjunction,
-        :inflected_verb,
-      ]
-
-      def initialize kns
-        @knowns_ = kns
-      end
-
-      def classically_but
-        o = Classically__[].dup
-        @knowns_.when_ GIVEN__, MAKE__, & o.to_proc
-        o
-      end
-
-      def classically
-        @knowns_.when_ GIVEN__, MAKE__, & Classically__[].to_proc
-        NIL_
-      end
-
-      Classically__ = Lazy_.call do
-        o = Classifier___.new
-        o.on_failed = Classically_Failed___
-        o.on_neutralled = Classically_Neutraled___
-        o.on_succeeded = Classically_Succeeded___
-        o
-      end
-
-      class Classifier___
-
-        attr_writer(
-          :on_failed,
-          :on_neutralled,
-          :on_succeeded,
-        )
-
-        def initialize_copy _
-          @___to_proc = nil
+        def via_magnetic_parameter_store ps
+          new.__init_via_parameter_store( ps ).execute
         end
 
-        def to_proc
-          @___to_proc ||= method :_via
-        end
+        private :new
+      end  # >>
 
-        def _via kns
-          x = kns.trilean.value_x
-          if x
-            @on_succeeded[ kns ]
-          elsif x.nil?
-            @on_neutralled[ kns ]
-          else
-            @on_failed[ kns ]
-          end
-        end
+      def __init_via_parameter_store ps
+
+        @trilean = ps.trilean
+        @three_parts_of_speech = ps.three_parts_of_speech
+        self
       end
 
-      _FAILED = nil
-
-      Classically_Failed___ = -> kns do
-
-        vl = kns.verb_lemma.value_x
-        _ = if vl
-          "failed to #{ vl }"
+      def execute
+        x = @trilean
+        send ( if x
+          :__when_successful
+        elsif x.nil?
+          :__when_neutral
         else
-          _FAILED ||= "failed".freeze
-        end
-
-        kns.initial_phrase_conjunction = NONE_
-        kns.inflected_verb = _
-        NIL_
+          :__when_failed
+        end )
       end
 
-      Classically_Neutraled___ = -> kns do
-
-        vl = kns.verb_lemma.value_x
-
-        _ing = if vl
-          Home_::NLP::EN::POS.progressive_verb vl
-        else
-          'processing request'
-        end
-
-        _ = kns.verb_subject.value_x
-        _inflected_verb = if _
-          "was #{ _ing }"
-        else
-          _ing
-        end
-
-        kns.initial_phrase_conjunction = 'while'
-        kns.inflected_verb = _inflected_verb
-        NIL_
+      def __when_failed
+        _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Failed_Classically
       end
 
-      Classically_Succeeded___ = -> kns do
+      def __when_neutral
+        _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Neutral_Classically
+      end
 
-        vl = kns.verb_lemma.value_x
-        _ = if vl
-          Home_::NLP::EN::POS.preterite_verb vl
-        else
-          'succeeded'
-        end
+      def __when_successful
+        _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Successful_Classically
+      end
 
-        kns.initial_phrase_conjunction = NONE_
-        kns.inflected_verb = _
-        NIL_
+      def _go const
+        Magnetics_.const_get( const, false )[ @three_parts_of_speech ]
       end
     end
   end

@@ -69,10 +69,8 @@ class Skylab::Task
         end
 
         def __set_manner ma
-          _ivar = ma.ivar
           _class = @collection.__item_via_item_ticket ma
-          _ma = _class.magnetic_manner_for @client, @collection
-          @client.instance_variable_set _ivar, _ma
+          @client.receive_magnetic_manner _class, ma, @collection
           NIL_
         end
       end

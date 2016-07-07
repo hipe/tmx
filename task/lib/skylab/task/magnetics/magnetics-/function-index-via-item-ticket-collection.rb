@@ -47,7 +47,7 @@ class Skylab::Task
       def __finish
         @_functions.freeze
         @_function_indexes_via_product.freeze
-        freeze
+        self  # not freezing self because #here
       end
 
       # --
@@ -61,6 +61,25 @@ class Skylab::Task
         @_function_indexes_via_product_h.fetch( sym ).map do |d|
           a.fetch d
         end
+      end
+
+      def proc_for_read_function_item_ticket_via_const__
+        h = ( @___foffset_via_const ||= ___index_consts )  # #here
+        a = @_functions
+        -> const do
+          a.fetch h.fetch const
+        end
+      end
+
+      def ___index_consts
+        h = {}
+        a = @_functions
+        d = a.length
+        while d.nonzero?
+          d -= 1
+          h[ a.fetch( d ).const ] = d
+        end
+        h
       end
     end
   end

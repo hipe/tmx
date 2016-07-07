@@ -42,7 +42,21 @@ module Skylab::Task::TestSupport
       _col = _collection
 
       cls = ::Class.new
+
       sandbox::MyClass1 = cls
+
+      cls.class_exec do
+
+        def receive_magnetic_manner cls, ma, col
+
+          _ma = cls.magnetic_manner_for self, col
+
+          _ivar = ma.ivar
+
+          instance_variable_set ma.ivar, _ma
+          NIL_
+        end
+      end
 
       _col.write_manner_methods_onto cls
     end

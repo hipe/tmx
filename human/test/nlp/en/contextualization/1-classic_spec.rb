@@ -135,7 +135,11 @@ module Skylab::Human::TestSupport
 
     dangerous_memoize :_beginning_prototype do
 
-      o = subject_class_.new
+      o = subject_class_.begin
+
+      o.express_trilean.classically
+
+      o.express_selection_stack.classically
 
       o.to_say_selection_stack_item = -> s do
 
@@ -145,8 +149,6 @@ module Skylab::Human::TestSupport
         s  # might be nil for those root "frames" that we make be nil
       end
 
-      o.express_selection_stack.classically
-      o.express_trilean.classically
       o
     end
   end

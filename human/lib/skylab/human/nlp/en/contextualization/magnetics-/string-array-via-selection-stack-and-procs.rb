@@ -2,146 +2,84 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Transition_ < Common_::Actor::Monadic
+    class Magnetics_::String_Array_via_Selection_Stack_and_Procs
 
-      def initialize kns
-        @knowns_ = kns
+      class << self
+
+        alias_method :begin, :new
+        undef_method :new
+      end  # >>
+
+      def initialize
+        @say_first_by = nil
+        @say_nonfirst_last_by = nil
       end
 
-      def say_subject_association_
-        _p = @knowns_.to_say_subject_association
-        _p ||= Express_subject_association___
-        say_subject_association_by_( & _p )
-      end
+      attr_writer(
+        :expression_agent,
+        :say_first_by,
+        :say_other_by,  # required
+        :say_nonfirst_last_by,
+        :selection_stack,
+      )
 
-      Express_subject_association___ = -> asc do
-        nm asc.name
-      end
+      def execute
 
-      def say_subject_association_by_ & p
-        @knowns_.expression_agent.calculate @knowns_.subject_association, & p
-      end
+        a = []
+        e = @expression_agent || Non_expressive_expresion_agent_instance___[]
 
-      # --
+        st = __build_selection_stack_value_scanner
 
-      def selection_stack_as_moniker_array__
-
-        o = begin_selection_stack_sayer_
-
-        _p = @knowns_.to_say_selection_stack_item
-        _p ||= Express_selection_stack_item___
-        o.say_other_by = _p
-
-        o.build_array
-      end
-
-      Express_selection_stack_item___ = -> x do
-        nf = x.name  # :[#048]. allows root to have a name
-        if nf
-          nm nf
-        end
-      end
-
-      def begin_selection_stack_sayer_
-        Selection_Stack_Sayer___.new self, @knowns_
-      end
-
-      def __selection_stack_as_knkn_stream
-
-        # to be safe, we'll allow nils to be in the s.s. so:
-
-        item_a = __selection_stack_as_array
-
-        Common_::Stream.via_times item_a.length do |d|
-
-          Common_::Known_Known[ item_a.fetch d ]
-        end
-      end
-
-      def __selection_stack_as_array
-
-        ss = @knowns_.selection_stack
-        ss_a = ::Array.try_convert ss
-        if ss_a
-          ss_a
-        else
-          ss.to_array  # assuming [#ba-002]#LL
-        end
-      end
-
-      # --
-
-      def derive_trilean_from_channel_if_necessary_
-        if ! @knowns_.trilean
-          send DERIVE_TRILEAN___.fetch @knowns_.channel.fetch 0
-        end
-        NIL_
-      end
-
-      DERIVE_TRILEAN___ = {
-        info: :__set_trilean_when_info,
-        error: :___set_trilean_when_error,
-      }
-
-      def ___set_trilean_when_error
-        @knowns_.trilean = false ; nil
-      end
-
-      def __set_trilean_when_info
-        @knowns_.trilean = nil ; nil
-      end
-
-      # --
-
-      class Selection_Stack_Sayer___
-
-        def initialize trns, kns
-
-          @knowns_ = kns
-          @_transition = trns
-
-          @say_first_by = nil
-          @say_nonfirst_last_by = nil
+        first = -> do
+          _x = st.gets_one
+          a.push e.calculate _x, & ( @say_first_by || @say_other_by )
         end
 
-        attr_writer(
-          :say_first_by,
-          :say_other_by,  # required
-          :say_nonfirst_last_by,
-        )
+        x = nil
 
-        def build_array
+        nonlast = -> do
+          a.push e.calculate x, & @say_other_by
+        end
 
-          a = []
+        nonfirst_last = -> do
+          _p = @say_nonfirst_last_by || @say_other_by
+          a.push e.calculate x, & _p
+        end
 
-          e = @knowns_.expression_agent || Not_expresion_agent_[]
-
-          st = @_transition.__selection_stack_as_knkn_stream
-          kn = st.gets
-          if kn
-
-            a.push e.calculate kn.value_x, & ( @say_first_by || @say_other_by )
-
-            kn = st.gets
-            if kn
-              begin
-                nxt = st.gets
-                if nxt
-                  a.push e.calculate kn.value_x, & @say_other_by
-                  kn = nxt
-                  redo
-                end
-                _p = @say_nonfirst_last_by || @say_other_by
-                a.push e.calculate kn.value_x, & _p
-                break
-              end while nil
-            end
+        if st.unparsed_exists
+          first[]
+          if st.unparsed_exists
+            begin
+              x = st.gets_one
+              st.no_unparsed_exists && break
+              nonlast[]
+              redo
+            end while nil
+            nonfirst_last[]
           end
-          a
         end
+
+        a
       end
 
-      Not_expresion_agent_ = Lazy_.call do
+      def __build_selection_stack_value_scanner
+
+        # first of all, the ss might be a linked list (move this whenever)
+
+        ss = @selection_stack
+        ss_a = ::Array.try_convert ss
+        if ! ss_a
+          ss_a = ss.to_array  # assume [#ba-002]#LL
+        end
+
+        # secondly, the selection stack can be sparse so stream over it this way:
+
+        Common_::Polymorphic_Stream.via_array ss_a
+      end
+
+      # ==
+
+      Non_expressive_expresion_agent_instance___ = Lazy_.call do
 
         # if the client didn't pass an expression agent, the case may be
         # that of callbacks A) she expects that they are *not* called in
@@ -158,6 +96,9 @@ module Skylab::Human
           self
         end.new
       end
+
+      # ==
     end
   end
 end
+# #history: was "transition"

@@ -10,11 +10,7 @@ class Skylab::Task
         @slot_term_symbol = slot_sym
       end
 
-      rx = /(?<=^|_)[a-z]/
-
-      p = -> sym do
-        sym.id2name.gsub rx, & :upcase
-      end
+      p = Here_.upcase_const_string_via_snake_case_symbol_
 
       define_method :const do
         @___const ||= :"#{ p[ @slot_term_symbol ] }_as_#{ p[ @manner_term_symbol ] }"

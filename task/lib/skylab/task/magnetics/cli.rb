@@ -90,7 +90,7 @@ class Skylab::Task
         _dir = remove_instance_variable( :@directory_class ).new _path
         _tss = o::TokenStreamStream_via_DirectoryObject[ _dir ]
         _col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
-        _fi = o::FunctionIndex_via_ItemTicketCollection[ _col ]
+        _fi = _col.function_index_
         line_stream = o::DotfileGraph_via_FunctionIndex[ _fi ]
 
         # (ya #[#005])

@@ -73,6 +73,22 @@ class Skylab::Task
         Common_::Stream.via_nonsparse_array @__function_items
       end
 
+      def proc_for_read_function_item_ticket_via_const
+
+        function_index_.proc_for_read_function_item_ticket_via_const__
+      end
+
+      def proc_for_read_function_item_via_function_item_ticket
+
+        -> fit do
+          @item_resolver[ fit ]  # (hi.)
+        end
+      end
+
+      def function_index_
+        @___fi ||= Here_::Magnetics_::FunctionIndex_via_ItemTicketCollection[ self ]
+      end
+
       # -- support
 
       def __item_via_item_ticket it

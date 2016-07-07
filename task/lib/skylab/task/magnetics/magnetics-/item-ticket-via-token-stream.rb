@@ -95,7 +95,7 @@ class Skylab::Task
 
       def __transition_from_IT20_to_BT80
         @_function_product_term_list = [ _finish_term ]
-        @_function_precondition_term_list = []
+        @_function_prerequisite_term_list = []
         _move_to_state :BT80
       end
 
@@ -159,7 +159,7 @@ class Skylab::Task
 
       def __transition_from_IT60_to_BT80
         @_function_product_term_list.push _finish_term
-        @_function_precondition_term_list = []
+        @_function_prerequisite_term_list = []
         _move_to_state :BT80
       end
 
@@ -185,16 +185,16 @@ class Skylab::Task
       end
 
       def __transition_from_IT80_to_BT80
-        @_function_precondition_term_list.push _finish_term
+        @_function_prerequisite_term_list.push _finish_term
         _move_to_state :BT80
       end
 
       def __transition_from_IT80_to_finish80
 
-        @_function_precondition_term_list.push _finish_term
+        @_function_prerequisite_term_list.push _finish_term
 
         Here_::Models_::Function_ItemTicket.via_prerequisites_and_products__(
-          @_function_precondition_term_list,
+          @_function_prerequisite_term_list,
           @_function_product_term_list,
         )
       end

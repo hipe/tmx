@@ -325,12 +325,46 @@ class Skylab::Task
   end
 
   module Magnetics
+
+    class << self
+
+      def collection_via_directory_object_and_module dir_o, mod
+
+        o = Magnetics_  # #[#005]
+
+        _tss = o::TokenStreamStream_via_DirectoryObject[ dir_o ]
+
+        col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
+
+        col.item_resolver = -> ticket do
+          mod.const_get ticket.const, false  # NOTE  just the const's value here
+        end
+
+        col
+      end
+
+      p = -> do
+
+        rx = /(?<=^|_)[a-z]/
+
+        -> sym do
+          sym.id2name.gsub rx, & :upcase
+        end
+      end
+
+      define_method :upcase_const_string_via_snake_case_symbol_ do
+        @___ ||= p[]
+      end
+    end  # >>
+
     module Magnetics_
       Autoloader_[ self ]
     end
+
     module Models_
       Autoloader_[ self ]
     end
+
     Autoloader_[ self ]
     Here_ = self
   end

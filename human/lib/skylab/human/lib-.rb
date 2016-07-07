@@ -26,5 +26,7 @@ module Skylab::Human
       require 'strscan'
       ::StringScanner.new s
     end
+
+    Task = sidesys[ :Task ]
   end
 end

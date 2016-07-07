@@ -2,6 +2,90 @@ module Skylab::Human
 
   class NLP::EN::Contextualization  # IS (see) :[#043].
 
+    class << self
+      alias_method :begin, :new
+      undef_method :new
+    end  # >>
+
+    def initialize & p
+      @_function_symbol_stack = nil
+      @_rw = nil
+      Do_big_index_and_enhance_once___[]
+      NIL_
+    end
+
+    def dup
+
+      fsc = @_function_symbol_stack
+      if fsc && ! fsc.frozen?
+        fsc.freeze
+      end
+
+      rw = @_rw
+      if rw && ! rw.frozen?
+        rw.freeze
+      end
+
+      super
+    end
+
+    def receive_magnetic_manner cls, manner, collection
+      cls.modify_contextualization_client_ self, manner, collection
+      NIL_
+    end
+
+    # -- mini-API for the above callback
+
+    def begin_customization_ col
+      @_collection = col
+      @_function_symbol_stack = []
+      @_rw = {}
+      NIL_
+    end
+
+    def push_function_ sym
+      @_function_symbol_stack.push sym ; nil
+    end
+
+    # -- experimental "var" API (first part)
+
+    advanced_attr_accessor = -> * sym_a do  # this is explained #here below
+
+      sym_a.each do |sym|
+
+        define_method "#{ sym }=" do |x|
+          write_magnetic_value x, sym
+          x
+        end
+
+        define_method sym do
+          read_magnetic_value sym
+        end
+      end
+    end
+
+    advanced_attr_accessor[
+      :expression_agent,
+      :selection_stack,
+      :to_say_selection_stack_item,
+      :three_parts_of_speech,
+      :trilean,
+    ]
+
+    # -- experimental hard-coded output inteface
+
+    def build_string
+
+      a = @_function_symbol_stack.dup
+      a.unshift :String_via_Surface_Parts
+
+      o = __begin_solution
+      o.function_symbol_stack = a
+      o.execute
+    end
+
+    if false
+
     def initialize & p
       @_solver = nil
 
@@ -47,8 +131,6 @@ module Skylab::Human
       initial_phrase_conjunction: :nilable,
       inflected_verb: :nilable,
       line_downstream: nil,
-      selection_stack: nil,
-      trilean: :nilable,
       verb_lemma: :nilable,
       verb_subject: :nilable,
       verb_object: :nilable,
@@ -56,36 +138,13 @@ module Skylab::Human
 
     attr_accessor(  # the below are plain old options, not used as nodes
       :emission_downhandler,
-      :expression_agent,
       :event,
       :event_proc,
       :line_stream,
       :line_yielder,
       :subject_association,
-      :to_say_selection_stack_item,
       :to_say_subject_association,
     )
-
-    ivar = ::Hash.new { |h,k| h[k] = :"@#{ k }" }
-
-    NODES__.each_pair do |k, i|
-
-      attr_reader k  # [#]"B" explains how this can be a knkn or a value
-
-      if :nilable == i
-        # then because nil is a valid value, this.
-        _p = -> x do
-          instance_variable_set ivar[ k ], Common_::Known_Known[ x ]
-          x
-        end
-      else
-        _p = -> x do
-          instance_variable_set ivar[ k ], x
-        end
-      end
-
-      define_method "#{ k }=", & _p
-    end
 
     # -- different forms of expression
 
@@ -165,24 +224,6 @@ module Skylab::Human
       y
     end
 
-    def build_string
-
-      as = Home_::Phrase_Assembly.begin_phrase_builder
-      so = bound_solver_
-
-      _ic = so.solve_for_ :initial_phrase_conjunction
-      _vs = so.solve_for_ :verb_subject
-      _iv = so.solve_for_ :inflected_verb
-      _vo = so.solve_for_ :verb_object
-
-      as.add_any_string _ic.value_x
-      as.add_any_string _vs.value_x
-      as.add_any_string _iv.value_x
-      as.add_any_string _vo.value_x
-
-      as.string_via_finish
-    end
-
     def bound_solver_
       @_bound_solver ||= @_solver.bound_to_knowns__ self
     end
@@ -222,8 +263,105 @@ module Skylab::Human
 
     NL_RX___ = /(?<!\n)\z/  # ..
 
+    end
+
+    def __begin_solution
+
+      o = Here_::Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
+      o.parameters = self
+      o.collection = @_collection
+      o
+    end
+
+    # -- experimental "var" API (second part)
+
+    # (so that a contextualization *prototype* can be made without needing
+    #  to load all involved assets (but only the manners and this file),
+    #  we hard-code all possible writable business values here..) :#here
+
+    def can_read sym
+      _o = @_rw[ sym ]
+      if ! _o
+        @_rw[ sym ] = Var__.new sym, false
+      end
+    end
+
+    def must_read sym
+      o = @_rw[ sym ]
+      if ! o || ! o.is_required
+        @_rw[ sym ] = Var__.new sym, true
+      end
+    end
+
+    class Var__
+
+      def initialize sym, b
+        @is_required = b
+        @ivar = :"@#{ sym }"
+      end
+
+      attr_reader(
+        :is_required,
+        :ivar,
+      )
+    end
+
+    def write_magnetic_value x, sym
+      _var = @_rw.fetch sym
+      instance_variable_set _var.ivar, Common_::Known_Known[ x ]
+      NIL_
+    end
+
+    def read_magnetic_value sym
+
+      var = @_rw.fetch sym
+      ivar = var.ivar
+
+      if var.is_required or instance_variable_defined? ivar
+        instance_variable_get( ivar ).value_x
+      end
+    end
+
+    # ==
+
+    module Magnetics_
+      Autoloader_[ self ]
+    end
+
+    module Models_
+
+      Surface_Parts = ::Struct.new(
+        :initial_phrase_conjunction,
+        :inflected_verb,
+        :verb_object,  # carried-over
+        :verb_subject,  # carried-over
+      ) do
+        class << self
+          def begin_via_parts_of_speech pos
+            new nil, nil, pos.verb_object, pos.verb_subject
+          end
+          private :new
+        end  # >>
+      end
+    end
+
+    # ==
+
+    Do_big_index_and_enhance_once___ = Lazy_.call do
+
+      _dir = ::Dir.new Magnetics_.dir_pathname.to_path
+
+      _col = Home_.lib_.task::Magnetics.
+        collection_via_directory_object_and_module _dir, Magnetics_
+
+      _col.write_manner_methods_onto Here_
+
+      NIL_
+    end
+
+    # ==
+
     Here_ = self
-    NOTHING_ = nil
     UNRELIABLE_ = :_UNRELIABLE_from_hu_c15n_
   end
 end

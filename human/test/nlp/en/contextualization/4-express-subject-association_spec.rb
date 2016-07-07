@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - express subject association" do
+  describe "[hu] NLP - EN - contextualization - express subject association", wip: true do
 
     TS_Joist_[ self ]
     use :memoizer_methods

@@ -80,7 +80,7 @@ class Skylab::Task
         fit = @_fit_st.gets
         if fit
           if fit.is_monadic  # then #cp1-4
-            _sym = fit.precondition_term_symbols.first
+            _sym = fit.prerequisite_term_symbols.first
             _ref = _touch_forward_reference_to_term _sym
             _render_arc @_OoT, _ref
           elsif fit.has_one_product  # #cp1-5
@@ -98,7 +98,7 @@ class Skylab::Task
 
       def __express_comes_from fit, sym  # #cp1-1
 
-        _rhs = fit.precondition_term_symbols.first
+        _rhs = fit.prerequisite_term_symbols.first
         _rhs_ref = _touch_forward_reference_to_term _rhs
         _lhs_ref = _touch_forward_reference_to_term sym
         _render_arc "comes from", _lhs_ref, _rhs_ref
@@ -114,7 +114,7 @@ class Skylab::Task
       def __express_as_a_classic_dependency_graph_of_one_to_many fit, sym  # #cp1-2
 
         @_sym_ref = _touch_forward_reference_to_term sym
-        @_st = fit.to_precondition_term_symbol_stream_
+        @_st = fit.to_prerequisite_term_symbol_stream_
         @_m = :__express_one_arc_of_classic_dependency
         send @_m
       end
@@ -266,7 +266,7 @@ class Skylab::Task
         @_after_all_of_these = m
         @_AoT = pair.name_x
 
-        @_precon_st = pair.value_x.to_precondition_term_symbol_stream_
+        @_precon_st = pair.value_x.to_prerequisite_term_symbol_stream_
         @_m = :_all_of_these_main
         send @_m
       end
@@ -278,7 +278,7 @@ class Skylab::Task
         @_AoT_counter = d
         @_AoT = "#{ AOT__ }#{ d }"
 
-        @_precon_st = fit.to_precondition_term_symbol_stream_
+        @_precon_st = fit.to_prerequisite_term_symbol_stream_
         @_m = :_all_of_these_main
         _render_arc @_OoT, @_AoT
       end
