@@ -11,18 +11,17 @@ module Skylab::Human
       class << self
 
         def via_magnetic_parameter_store ps
-          new.__init_via_parameter_store( ps ).execute
+          new( ps ).execute
         end
 
         private :new
       end  # >>
 
-      def __init_via_parameter_store ps
+      def initialize ps
 
         @expression_agent = ps.expression_agent
         @selection_stack = ps.selection_stack
         @to_say_selection_stack_item = ps.to_say_selection_stack_item
-        self
       end
 
       def execute

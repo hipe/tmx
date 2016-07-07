@@ -49,32 +49,81 @@ module Skylab::Human
 
     # -- experimental "var" API (first part)
 
-    advanced_attr_accessor = -> * sym_a do  # this is explained #here below
+    Magnetic_routing_attr_accessor_ = -> cls, * sym_a do
 
-      sym_a.each do |sym|
+      # simply routes the reading and writing thru these methods:
+      #
+      #     write_magnetic_value
+      #     read_magnetic_value
 
-        define_method "#{ sym }=" do |x|
-          write_magnetic_value x, sym
-          x
+      cls.class_exec do
+
+        sym_a.each do |sym|
+
+          define_method "#{ sym }=" do |x|
+            write_magnetic_value x, sym
+            x
+          end
+
+          define_method sym do
+            read_magnetic_value sym
+          end
         end
 
-        define_method sym do
-          read_magnetic_value sym
-        end
+        NIL_
       end
     end
 
-    advanced_attr_accessor[
+    Magnetic_routing_attr_accessor_.call( self,
       :expression_agent,
       :selection_stack,
       :to_say_selection_stack_item,
       :three_parts_of_speech,
       :trilean,
-    ]
+    )
+
+    # --- (for now these that are set internally with code are kept simple)
+
+    attr_reader(
+      :channel,
+      :emission_proc,
+    )
 
     # -- experimental hard-coded output inteface
 
-    def build_string
+    def given_emission i_a, & ev_p  # assume self is ad-hoc mutable
+
+      @_rw && Home_._COVER_ME
+      @_rw = {}
+      must_read :expression_agent
+      must_read :trilean
+      @channel = i_a
+      @emission_proc = ev_p
+      NIL_
+    end
+
+    def express_into_under line_yielder, expag  # assume self is ad-hoc mutable
+      self.expression_agent = expag
+      _express_into line_yielder
+    end
+
+    def express_into y  # assume self is ad-hoc mutable
+      self._COVER_ME
+      _express_into y
+    end
+
+    def _express_into line_yielder
+
+      o = Here_::Magnetics_::Expression_via_Emission.begin
+      o.channel = @channel
+      o.collection = COLLECTION__  # (not @_collection for now (but would be same))
+      o.expression_agent = self.expression_agent
+      o.emission_proc = @emission_proc
+      o.line_yielder = line_yielder
+      o.execute
+    end
+
+    def build_string  # might just be a #feature-island
 
       a = @_function_symbol_stack.dup
       a.unshift :String_via_Surface_Parts
@@ -127,7 +176,7 @@ module Skylab::Human
     NODES__ = {
       channel: nil,
       emission_handler: nil,  # endpoint
-      expression_proc: nil,  # subset of `event_proc`
+      emission_proc: nil,
       initial_phrase_conjunction: :nilable,
       inflected_verb: :nilable,
       line_downstream: nil,
@@ -139,9 +188,8 @@ module Skylab::Human
     attr_accessor(  # the below are plain old options, not used as nodes
       :emission_downhandler,
       :event,
-      :event_proc,
+      :emission_proc,
       :line_stream,
-      :line_yielder,
       :subject_association,
       :to_say_subject_association,
     )
@@ -184,44 +232,8 @@ module Skylab::Human
       _oes_p
     end
 
-    def express_emission i_a, & ev_p
-
-      if @_solver
-        self._COVER_ME
-      end
-      _will_express_emission
-      @channel = i_a
-      @event_proc = ev_p
-      express_into @line_yielder
-      UNRELIABLE_
-    end
-
     def _will_express_emission
-      Here_::Express_Emission___[ self ] ; nil
-    end
-
-    def __emit_expression i_a, & ev_p
-
-      @channel = i_a
-      @expression_proc = ev_p
-      me = self
-      @emission_handler.call( * i_a ) do |y|
-        me.express_into y
-      end
-      UNRELIABLE_
-    end
-
-    def express_into y  # mutates c15n for now
-
-      _so = bound_solver_
-      st = _so.solve_for_ :line_downstream
-      begin
-        s = st.gets
-        s or break
-        y << s
-        redo
-      end while nil
-      y
+      Here_::Express_Emission___[ self ] ; nil  # (changed to Expression_via_Emission)
     end
 
     def bound_solver_
@@ -236,33 +248,6 @@ module Skylab::Human
       @_solver.add_entry__ when_x, can_produce_x, & by_p
       NIL_
     end
-
-    class Newline_Adder_
-
-      def initialize
-
-        @y = ::Enumerator::Yielder.new do |s|
-          @_a.push Plus_newline_if_necessary_[ s ]
-        end
-        @_a = []
-      end
-
-      attr_reader :y
-
-      def to_line_stream
-        Common_::Stream.via_nonsparse_array @_a
-      end
-    end
-
-    Plus_newline_if_necessary_ = -> s do
-      if NL_RX___ =~ s
-        s = "#{ s }#{ NEWLINE_ }"
-      end
-      s
-    end
-
-    NL_RX___ = /(?<!\n)\z/  # ..
-
     end
 
     def __begin_solution
@@ -282,18 +267,18 @@ module Skylab::Human
     def can_read sym
       _o = @_rw[ sym ]
       if ! _o
-        @_rw[ sym ] = Var__.new sym, false
+        @_rw[ sym ] = Magnetic_Parameter_.new sym, false
       end
     end
 
     def must_read sym
       o = @_rw[ sym ]
       if ! o || ! o.is_required
-        @_rw[ sym ] = Var__.new sym, true
+        @_rw[ sym ] = Magnetic_Parameter_.new sym, true
       end
     end
 
-    class Var__
+    class Magnetic_Parameter_
 
       def initialize sym, b
         @is_required = b
@@ -345,16 +330,27 @@ module Skylab::Human
       end
     end
 
+    nl_rx = /(?<!\n)\z/  # ..
+    Plus_newline_if_necessary_ = -> s do
+      if nl_rx =~ s
+        "#{ s }#{ NEWLINE_ }"
+      else
+        s
+      end
+    end
+
     # ==
 
     Do_big_index_and_enhance_once___ = Lazy_.call do
 
       _dir = ::Dir.new Magnetics_.dir_pathname.to_path
 
-      _col = Home_.lib_.task::Magnetics.
+      col = Home_.lib_.task::Magnetics.
         collection_via_directory_object_and_module _dir, Magnetics_
 
-      _col.write_manner_methods_onto Here_
+      col.write_manner_methods_onto Here_
+
+      COLLECTION__ = col
 
       NIL_
     end

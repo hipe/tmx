@@ -10,6 +10,11 @@ module Skylab::Human
 
         # see other (even simpler) similar facilities, tracked with #[#ca-047])
 
+        class << self
+          alias_method :begin, :new
+          undef_method :new
+        end  # >>
+
         attr_writer(
           :on_first,
           :on_subsequent,

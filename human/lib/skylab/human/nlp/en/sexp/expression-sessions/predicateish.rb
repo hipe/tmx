@@ -285,8 +285,7 @@ module Skylab::Human
             o
           end
 
-          _ = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple
-          stmr = _.new
+          stmr = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple.begin
 
           stmr.on_first = -> verb_phrase do
             make_statement[ verb_phrase ]  # (hi.)

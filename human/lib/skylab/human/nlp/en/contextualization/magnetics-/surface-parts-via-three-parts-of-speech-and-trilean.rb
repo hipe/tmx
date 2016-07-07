@@ -7,17 +7,16 @@ module Skylab::Human
       class << self
 
         def via_magnetic_parameter_store ps
-          new.__init_via_parameter_store( ps ).execute
+          new( ps ).execute
         end
 
         private :new
       end  # >>
 
-      def __init_via_parameter_store ps
+      def initialize ps
 
         @trilean = ps.trilean
         @three_parts_of_speech = ps.three_parts_of_speech
-        self
       end
 
       def execute

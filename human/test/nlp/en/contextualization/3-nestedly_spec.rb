@@ -14,7 +14,7 @@ module Skylab::Human::TestSupport
 
       o.expression_agent = common_expag_
 
-      o.expression_proc = -> y do
+      o.emission_proc = -> y do
         y << "must be #{ highlight 'dootily' } hah"
         y << "yup"
       end

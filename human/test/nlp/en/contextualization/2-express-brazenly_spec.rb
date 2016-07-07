@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - express brazenly", wip: true do
+  describe "[hu] NLP - EN - contextualization - express brazenly" do
 
     TS_Joist_[ self ]
     use :memoizer_methods
@@ -109,12 +109,10 @@ module Skylab::Human::TestSupport
 
     def _lines_via_emission * i_a, & ev_p
 
-      o = subject_class_.new
-      a = []
-      o.expression_agent = common_expag_
-      o.line_yielder = a
-      o.express_emission i_a, & ev_p
-      a
+      o = subject_class_.begin
+      o.given_emission i_a, & ev_p
+      _expag = common_expag_
+      o.express_into_under [], _expag
     end
   end
 end

@@ -11,6 +11,11 @@ module Skylab::Human
         undef_method :new
       end  # >>
 
+      def function_symbol_path= x
+        @_invo_stream = :__function_invocation_stream_via_function_symbol_path
+        @function_symbol_path = x
+      end
+
       def function_symbol_stack= x
         @_invo_stream = :__function_invocation_stream_via_function_symbol_stack
         @function_symbol_stack = x
@@ -18,7 +23,6 @@ module Skylab::Human
 
       attr_writer(
         :parameters,
-        :function_path,
         :collection,
       )
 
@@ -71,18 +75,37 @@ module Skylab::Human
 
       def __function_invocation_stream_via_function_symbol_stack
 
-        sym_a = @function_symbol_stack
+        _invo_stream :__path_order_symbol_stream_via_symbol_stack
+      end
+
+      def __function_invocation_stream_via_function_symbol_path
+
+        _invo_stream :__path_order_symbol_stream_via_symbol_path
+      end
+
+      def _invo_stream m
+
         p = @collection.proc_for_read_function_item_ticket_via_const
         p_ = @collection.proc_for_read_function_item_via_function_item_ticket
 
-        Common_::Stream.via_range( sym_a.length - 1 .. 0 ) do |d|
-
-          _sym = sym_a.fetch d
-
-          it = p[ _sym ]
-
+        send( m ).map_by do |sym|
+          it = p[ sym ]
           Function_Invocation___.new p_[ it ], it
         end
+      end
+
+      def __path_order_symbol_stream_via_symbol_stack & p
+
+        sym_a = @function_symbol_stack
+
+        Common_::Stream.via_range( sym_a.length - 1 .. 0 ) do |d|
+
+          sym_a.fetch d
+        end
+      end
+
+      def __path_order_symbol_stream_via_symbol_path
+        Common_::Stream.via_nonsparse_array @function_symbol_path
       end
 
       # ==

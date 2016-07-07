@@ -2,23 +2,33 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class As_While_ < Here_::First_Line_Contextualization_
+    class Magnetics_::Line_Parts_via_Line_and_Event_and_Trilean_that_is_Positive
 
       # (see client comments about the scope of this)
 
-      def when_emission_
-        NOTHING_
+      class << self
+        def via_magnetic_parameter_store ps
+          new( ps ).execute
+        end
+        private :new
+      end  # >>
+
+      def initialize ps
+        @_ = ps
+        @event = ps.event
       end
 
-      def when_event_
-        if @event_.respond_to? :inflected_noun
+      def execute
+
+        if @event.respond_to? :inflected_noun
           ___ham
-        end
+        end  # otherwise nothing
+        NIL_
       end
 
       def ___ham
 
-        ev = @event_
+        ev = @event
 
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.progressive
@@ -26,7 +36,7 @@ module Skylab::Human
         as = Home_::Phrase_Assembly.begin_phrase_builder
         as.add_lazy_space
 
-        one = looks_like_one_word_
+        one = @_.content_string_looks_like_one_word_
 
         if one or n_s.include? SPACE_
 
@@ -42,18 +52,16 @@ module Skylab::Human
 
         gerund_phrase = as.string_via_finish
 
+        eek_mutable = @_.content_
+
         if one
-          @content_.concat gerund_phrase
+          eek_mutable.concat gerund_phrase
         else
-          @content_[ 0, 0 ] = "while#{ gerund_phrase }, "
+          eek_mutable[ 0, 0 ] = "while#{ gerund_phrase }, "
         end
 
         NIL_
       end
-
-      attr_reader(
-        :content_, :prefix_,
-      )
     end
   end
 end

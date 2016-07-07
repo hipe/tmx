@@ -179,7 +179,7 @@ module Skylab::Basic
       Autoloader_[ self ]
     end
 
-    class N_Lines
+    class N_Lines  # :[#030].
 
       class << self
         alias_method :session, :new

@@ -2,146 +2,115 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    # NOTE - this file is for now the dumping ground for several small
-    # "magnetic"-type actors, all of which are currently private to the file
-    # but stowaway here rather that being placed inside the file's node, so
-    # if/when we need to promote their visibilty it is trivial.
+    class Magnetics_::Expression_via_Emission
 
-    class Express_Emission___
+      # (mostly to help migrate to here whatever [br] used to do)
 
       class << self
-
-        def [] kns
-
-          kns.when_ :channel, :line_downstream do |kns_|
-
-            # this is a big jump. break this down into shorter steps if
-            # clients wants to be able to step in at some intermediate point.
-            # on the other hand, the subject is potentially customizable
-            # so etc..
-
-            new( kns_ ).execute
-          end
-        end
-
-        private :new
+        alias_method :begin, :new
+        undef_method :new
       end  # >>
 
-      def initialize kns
-        @knowns_ = kns
+      def initialize
+        @etc1 = nil
+        @etc2 = nil
       end
 
-      attr_accessor(
-        :line_downstream_via_line_stream,
-        :line_stream_via_channel,
+      # -- the argument parameters:
+
+      attr_writer(
+        :collection,
+        :line_yielder,
+      )
+
+      attr_accessor(  # (as above but also read by sub-clients)
+        :channel,
+        :emission_proc,
+        :expression_agent,
       )
 
       def execute
 
-        _ = self.line_stream_via_channel || Here_::Line_Stream_via_Channel___
-        _[ @knowns_ ]
+        path = []
+        path.push __etc1
+        path.push __etc2
 
-        _ = self.line_downstream_via_line_stream
-        _ ||= Here_::Line_Downstream_via_Line_Stream___
-        _[ @knowns_ ]
+        o = Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
+        o.function_symbol_path = path
+        o.collection = @collection
+        o.parameters = self  # so we don't pollute the top parameter namespace
+        st = o.execute
 
-        NIL_
-      end
-    end
-
-    Line_Downstream_via_Line_Stream___ = -> kns do
-
-      _ = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple
-
-      str = _.new
-
-      str.on_first = -> s do
-        o = Here_::First_Line_Contextualization_[ kns ]
-        o.line = s
-        o.build_line
+        y = @line_yielder
+        begin
+          s = st.gets
+          s || break
+          y << s
+          redo
+        end while nil
+        y
       end
 
-      str.on_subsequent = IDENTITY_
-
-      _st = str.to_stream_around kns.line_stream
-
-      kns.line_downstream = _st
-
-      NIL_
-    end
-
-    Line_Stream_via_Channel___  = -> kns do  # #stowaway
-
-      # (this is near a solution for #[#ca-046] emission handling pattern)
-
-      # side-effect is to resolve a trilean (shh)
-
-      if ! kns.event_proc
-        self._COVER_ME_emission_does_not_comply_to_this_modality
-      end
-
-      if :expression == kns.channel[ 1 ]  # #[#br-023]. [sli] has 1-item channels
-
-        Line_Stream_via_Expression___[ kns ]
-      else
-        Line_Stream_via_Event___[ kns ]
-      end
-    end
-
-    class Line_Stream_via_Expression___ < Here_::Transition_  # #stowaway
-
-      # assume event proc. side-effect is to resolve a trilean (shh)
-
-      def execute
-        ___determine_line_stream
-        derive_trilean_from_channel_if_necessary_
-        NIL_
-      end
-
-      def ___determine_line_stream
-        kns = @knowns_
-        nla = Newline_Adder_.new
-        kns.expression_agent.calculate nla.y, & kns.event_proc
-        kns.line_stream = nla.to_line_stream
-        NIL_
-      end
-    end
-
-    class Line_Stream_via_Event___ < Here_::Transition_ # #stowaway
-
-      # assume event proc. side-effect is to resolve a trilean and .. (shh)
-
-      def execute
-
-        # just like `to_stream_of_lines_rendered_under` but we add NL
-        ___determine_line_stream
-        __determine_trilean
-        NIL_
-      end
-
-      def ___determine_line_stream
-
-        kns = @knowns_
-        @_ev = kns.event_proc.call
-        kns.event = @_ev
-        nla = Newline_Adder_.new
-
-        ev = @_ev.to_event
-        kns.expression_agent.calculate nla.y, ev, & ev.message_proc
-        kns.line_stream = nla.to_line_stream
-        NIL_
-      end
-
-      def __determine_trilean
-
-        ev = @_ev.to_event
-
-        if ev.has_member :ok
-          tri = ev.ok
+      def __etc1
+        _x = @etc1
+        if _x
+          Home_._COVER_ME
+        else
+          :Line_Stream_via_Expression_Proc_and_Channel
         end
+      end
 
-        @knowns_.trilean = tri
-        NIL_
+      def __etc2
+        _x = @etc2
+        if _x
+          Home_._COVER_ME
+        else
+          :Contextualized_Line_Stream_via_Line_Stream_and_Emission
+        end
+      end
+
+      # -- ours only (still for clients) (the bulk of this would move)
+
+      Magnetic_required_attr_accessor_ = -> cls, * sym_a do
+
+        cls.class_exec do
+
+          sym_a.each do |sym|
+
+            define_method "#{ sym }=" do |x|
+              write_magnetic_value x, sym
+            end
+
+            define_method sym do
+              read_magnetic_value sym
+            end
+
+            param=nil
+
+            define_method :"__#{ sym }__mag_param" do
+              param ||= Magnetic_Parameter_.new( sym, true )
+            end
+          end
+          NIL_
+        end
+      end
+
+      Magnetic_required_attr_accessor_.call( self,
+        :event,
+        :line_stream,
+        :trilean,
+      )
+
+      def magnetic_value_is_known sym
+        instance_variable_defined? send( :"__#{ sym }__mag_param" ).ivar
+      end
+
+      def write_magnetic_value x, sym
+        instance_variable_set send( :"__#{ sym }__mag_param" ).ivar, Common_::Known_Known[ x ]
+      end
+
+      def read_magnetic_value sym
+        instance_variable_get( send( :"__#{ sym }__mag_param" ).ivar ).value_x
       end
     end
   end

@@ -2,23 +2,31 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class As_Negative___ < Here_::First_Line_Contextualization_
+    class Magnetics_::Line_Parts_via_Line_and_Event_and_Trilean_that_is_Negative
 
       # (see client comments about the scope of this)
 
-      def when_emission_
-        NOTHING_
+      class << self
+        def via_magnetic_parameter_store ps
+          new( ps ).execute
+        end
+        private :new
+      end  # >>
+
+      def initialize ps
+        @_ = ps
+        @event = ps.event
       end
 
-      def when_event_  # ..
+      def execute
 
-        vl = @event_.verb_lexeme
+        vl = @event.verb_lexeme
         if vl
           v_s = vl.lemma_string
         end
 
-        if @event_.respond_to? :noun_lexeme
-          nl = @event_.noun_lexeme
+        if @event.respond_to? :noun_lexeme
+          nl = @event.noun_lexeme
           if nl
             n_s = nl.lemma_string
           end
@@ -33,7 +41,7 @@ module Skylab::Human
           as.add_string "because"
           as.add_lazy_space
 
-          @prefix_ = as.string_via_finish
+          @_.prefix_ = as.string_via_finish
         end
 
         NIL_
