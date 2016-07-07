@@ -54,7 +54,6 @@ class Skylab::Task
       end
 
       def finish
-        $stderr.puts "(doing nothing to finish collection for now)"
         self
       end
 

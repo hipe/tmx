@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../test-support'
+
+module Skylab::Task::TestSupport
+
+  class ThisTestScript___
+
+    def initialize
+
+      o = Core___.new
+
+      require 'open3'
+
+      o.system = ::Open3
+
+      @_core = o
+    end
+
+    def __list_dirs__component_operation
+
+      @_core.method :list_dirs
+    end
+
+    class Core___
+
+      def list_dirs path
+        @system.popen3( 'find', path, '-type', 'd', '-name', '*magnetics-' ).fetch 1
+      end
+
+      attr_writer(
+        :system,
+      )
+    end
+  end
+
+  Require_zerk_[]
+
+  exit Zerk_::NonInteractiveCLI[ ::ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ThisTestScript___ ]
+end

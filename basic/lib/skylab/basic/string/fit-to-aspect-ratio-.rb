@@ -506,8 +506,7 @@ module Skylab::Basic
 
             # 1 means I win because my orphanless score (0-1) is higher
 
-          @ratio_vector = @me.abs_ratio_delta <=>
-            @other.abs_ratio_delta
+          @ratio_vector = @me.abs_ratio_delta <=> @other.abs_ratio_delta
 
             # -1 means I win here because I'm closer to target ratio
 
@@ -554,6 +553,7 @@ module Skylab::Basic
               @i_win = true
             else
               # sh .. let notices trigger. this might be "impossible"
+              # (UPDATE: has been encountered when multiple adjacent spaces)
             end
           end
         end

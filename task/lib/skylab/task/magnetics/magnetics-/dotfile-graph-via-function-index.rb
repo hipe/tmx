@@ -71,8 +71,8 @@ class Skylab::Task
 
         @_OoT = "#{ OOT__ }#{ d }"
 
-        _ref = _touch_forward_reference_to_term sym
-        _render_arc _ref, @_OoT
+        _sym = _touch_forward_reference_to_term sym
+        _render_arc _sym, @_OoT
       end
 
       def _express_remainder_of_function_stream
@@ -148,10 +148,19 @@ class Skylab::Task
 
       def _touch_forward_reference_to_term sym
 
-        @_term_forward_references.touch sym do true end
-
-        sym
+        @_term_forward_references.touch sym do
+          if IS_KEYWORD___[ sym ]
+            :"_not_keyword__#{ sym }__"
+          else
+            sym
+          end
+        end  # result is symbol to use internally
       end
+
+      IS_KEYWORD___ = {
+        digraph: true,
+        # ..
+      }
 
       # --
 
@@ -297,27 +306,31 @@ class Skylab::Task
         # were used and the values were only ever `true`.)
 
         _bx = remove_instance_variable :@_term_forward_references
-        @_term_referent_stream = _bx.to_name_stream
+        @__term_referent_pair_stream = _bx.to_pair_stream
         @_m = :__render_next_term_referent
         send @_m
       end
 
       def __render_next_term_referent
 
-        sym = @_term_referent_stream.gets
-        if sym
+        pair = @__term_referent_pair_stream.gets
+        if pair
 
           # first, make it look like a normal, word-wrappable string
 
-          s = sym.id2name
+          _label_sym = pair.name_x
+          _internal_ref_sym = pair.value_x
+
+          s = _label_sym.id2name
           s.gsub! UNDERSCORE_, SPACE_
 
           # then, actually wrap it
 
           _s_ = @_make_label[ s ]
 
-          _render_node _s_, sym
+          _render_node _s_, _internal_ref_sym
         else
+          remove_instance_variable :@__term_referent_pair_stream
           @_m = :__finish
           send @_m
         end

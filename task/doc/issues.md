@@ -2,7 +2,8 @@
 
 [#011]       magnetics item syntax..
 
-[#010] #open `./task/bin/tmx-task mag ./search_and_replace/lib/skylab/search_and_replace/magnetics-`
+[#010] #hole
+             ( #was: `./task/bin/tmx-task mag ./search_and_replace/lib/skylab/search_and_replace/magnetics-` )
              (why are we getting that empty node and label)
 
 [#009]       this needs comparative analysis (has subscribers)

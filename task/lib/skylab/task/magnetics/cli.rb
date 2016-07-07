@@ -96,11 +96,34 @@ class Skylab::Task
         # (ya #[#005])
 
         if @do_open
-          ::Kernel._A
-          Magnetics_::Open_via_DotfileGraph.new( dg, ::File ).execute
+          @filesystem = ::File  # ..
+          __oh_boy line_stream
         else
           line_stream
         end
+      end
+
+      def __oh_boy line_stream
+
+        fh = @filesystem.open 'tmp.dot', ::File::CREAT | ::File::WRONLY
+        fh.truncate 0
+
+        begin
+          line = line_stream.gets
+          line || break
+          fh << line
+          redo
+        end while nil
+
+        fh.close
+
+        path = fh.path
+        @_oes_p.call :info, :expression, :attempting_to_open do |y|
+          y << "(attempting to open #{ pth path })"
+        end
+
+        ::Kernel.exec 'open', path
+        Home_._NEVER_SEE
       end
     end
 
@@ -111,3 +134,4 @@ class Skylab::Task
     end
   end
 end
+# #history: subsumed the "open" magnetic

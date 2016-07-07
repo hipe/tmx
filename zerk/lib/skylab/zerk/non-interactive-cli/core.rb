@@ -19,6 +19,23 @@ module Skylab::Zerk
 
     class << self
 
+      def call argv, sin, sout, serr, pn_s_a, root_ACS_class  # (ultra shorthand)
+
+        cli = Here_.begin
+
+        cli.root_ACS = -> do
+          root_ACS_class.new
+        end
+
+        cli.universal_CLI_resources sin, sout, serr, pn_s_a
+
+        _fake_class = cli.finish
+
+        _fake_class.invoke argv
+      end
+
+      alias_method :[], :call
+
       def begin
         new.init_as_prototype_
       end
