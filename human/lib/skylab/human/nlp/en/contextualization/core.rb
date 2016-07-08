@@ -43,6 +43,13 @@ module Skylab::Human
       NIL_
     end
 
+    def push_inline_function_ a, a_, f
+      ifu = nil
+      @_function_symbol_stack.push -> do
+        ifu ||= Here_::Models_::InlineFunction.new a, a_, f  # #here-2
+      end
+    end
+
     def push_function_ sym
       @_function_symbol_stack.push sym ; nil
     end
@@ -75,6 +82,7 @@ module Skylab::Human
     end
 
     Magnetic_routing_attr_accessor_.call( self,
+      :contextualized_line_stream,
       :expression_agent,
       :selection_stack,
       :to_say_selection_stack_item,
@@ -82,11 +90,18 @@ module Skylab::Human
       :trilean,
     )
 
-    # --- (for now these that are set internally with code are kept simple)
+    # -- (for now for some of these that are internal or never put into
+    #     a prototype, we'll just keep them simple)
 
     attr_reader(
       :channel,
+      :line_yielder,
+    )
+
+    attr_accessor(
       :emission_proc,
+      :subject_association,
+      :to_say_subject_association,
     )
 
     # -- experimental hard-coded output inteface
@@ -108,18 +123,27 @@ module Skylab::Human
     end
 
     def express_into y  # assume self is ad-hoc mutable
-      self._COVER_ME
-      _express_into y
+      _express_into y  # (hi.)
     end
 
-    def _express_into line_yielder
+    def _express_into line_yielder  # assume is ad-hoc mutable
+
+      @line_yielder = line_yielder
+      if @_function_symbol_stack
+        __express_via_function_stack
+      else
+        __express_brazenly
+      end
+    end
+
+    def __express_brazenly
 
       o = Here_::Magnetics_::Expression_via_Emission.begin
       o.channel = @channel
       o.collection = COLLECTION__  # (not @_collection for now (but would be same))
       o.expression_agent = self.expression_agent
       o.emission_proc = @emission_proc
-      o.line_yielder = line_yielder
+      o.line_yielder = @line_yielder
       o.execute
     end
 
@@ -128,8 +152,21 @@ module Skylab::Human
       a = @_function_symbol_stack.dup
       a.unshift :String_via_Surface_Parts
 
-      o = __begin_solution
+      o = _begin_solution
       o.function_symbol_stack = a
+      o.execute
+    end
+
+    def __express_via_function_stack
+
+      o = _begin_solution
+      o.function_symbol_stack = @_function_symbol_stack
+
+      # -- (close to [#ta-005], experimental)
+
+      o.mutate_if_necessary_to_land_on :expression
+
+      # --
       o.execute
     end
 
@@ -174,12 +211,9 @@ module Skylab::Human
     end
 
     NODES__ = {
-      channel: nil,
       emission_handler: nil,  # endpoint
-      emission_proc: nil,
       initial_phrase_conjunction: :nilable,
       inflected_verb: :nilable,
-      line_downstream: nil,
       verb_lemma: :nilable,
       verb_subject: :nilable,
       verb_object: :nilable,
@@ -187,11 +221,6 @@ module Skylab::Human
 
     attr_accessor(  # the below are plain old options, not used as nodes
       :emission_downhandler,
-      :event,
-      :emission_proc,
-      :line_stream,
-      :subject_association,
-      :to_say_subject_association,
     )
 
     # -- different forms of expression
@@ -250,7 +279,7 @@ module Skylab::Human
     end
     end
 
-    def __begin_solution
+    def _begin_solution
 
       o = Here_::Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
       o.parameters = self
@@ -327,6 +356,21 @@ module Skylab::Human
           end
           private :new
         end  # >>
+      end
+
+      class InlineFunction  # 1x #here-2
+
+        def initialize produce_sym_a, prerequisite_sym_a, func_x
+          @function = func_x
+          @prerequisite_term_symbols = prerequisite_sym_a
+          @product_term_symbols = produce_sym_a
+        end
+
+        attr_reader(
+          :function,
+          :prerequisite_term_symbols,
+          :product_term_symbols,
+        )
       end
     end
 

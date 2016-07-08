@@ -13,7 +13,7 @@ module Skylab::Human
 
       def initialize ps
 
-        @__parameter_store = ps
+        @_parameter_store = ps
         @line_stream = ps.line_stream
         self
       end
@@ -25,8 +25,12 @@ module Skylab::Human
         stmr.on_first = -> s do
 
           o = Magnetics_::Contextualized_Line_via_Line_and_Emission.begin
+
+          ps = @_parameter_store
           o.line = s
-          o.parameter_store = @__parameter_store
+          o.trilean = ps.trilean
+          o.event = ps.event
+          o.parameter_store = ps
           o.execute
         end
 

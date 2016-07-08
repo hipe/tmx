@@ -12,61 +12,35 @@ module Skylab::Human
       end  # >>
 
       def initialize
-        @etc1 = nil
-        @etc2 = nil
       end
 
       # -- the argument parameters:
 
       attr_writer(
         :collection,
-        :line_yielder,
       )
 
       attr_accessor(  # (as above but also read by sub-clients)
         :channel,
         :emission_proc,
         :expression_agent,
+        :line_yielder,
       )
 
       def execute
 
         path = []
-        path.push __etc1
-        path.push __etc2
+
+        path.push :Line_Stream_via_Expression_Proc_and_Channel
+        path.push :Contextualized_Line_Stream_via_Line_Stream_and_Emission
+        path.push :Expression_via_Contextualized_Line_Stream
 
         o = Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
         o.function_symbol_path = path
         o.collection = @collection
         o.parameters = self  # so we don't pollute the top parameter namespace
-        st = o.execute
 
-        y = @line_yielder
-        begin
-          s = st.gets
-          s || break
-          y << s
-          redo
-        end while nil
-        y
-      end
-
-      def __etc1
-        _x = @etc1
-        if _x
-          Home_._COVER_ME
-        else
-          :Line_Stream_via_Expression_Proc_and_Channel
-        end
-      end
-
-      def __etc2
-        _x = @etc2
-        if _x
-          Home_._COVER_ME
-        else
-          :Contextualized_Line_Stream_via_Line_Stream_and_Emission
-        end
+        o.execute
       end
 
       # -- ours only (still for clients) (the bulk of this would move)
@@ -96,6 +70,7 @@ module Skylab::Human
       end
 
       Magnetic_required_attr_accessor_.call( self,
+        :contextualized_line_stream,
         :event,
         :line_stream,
         :trilean,

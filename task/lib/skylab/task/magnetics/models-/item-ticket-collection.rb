@@ -73,6 +73,15 @@ class Skylab::Task
         Common_::Stream.via_nonsparse_array @__function_items
       end
 
+      def const_for_A_atom_via_B_atom sym_A, sym_B
+        Here_::Models_::Function_ItemTicket::Const[ [sym_A], [sym_B] ]
+      end
+
+      def read_function_item_ticket_via_const const
+
+        function_index_.read_function_item_ticket_via_const__ const
+      end
+
       def proc_for_read_function_item_ticket_via_const
 
         function_index_.proc_for_read_function_item_ticket_via_const__

@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - nestedly", wip: true do
+  describe "[hu] NLP - EN - contextualization - nestedly" do
 
     TS_Joist_[ self ]
     use :memoizer_methods
@@ -10,9 +10,13 @@ module Skylab::Human::TestSupport
 
     it "(look like sole in-situ use case)" do  # :[#043]"C"
 
-      o = Home_::NLP::EN::Contextualization.new
+      o = subject_class_.begin
 
-      o.expression_agent = common_expag_
+      o.express_selection_stack.nestedly
+
+      _expag = common_expag_
+
+      o.expression_agent = _expag
 
       o.emission_proc = -> y do
         y << "must be #{ highlight 'dootily' } hah"
@@ -31,30 +35,11 @@ module Skylab::Human::TestSupport
 
       o.subject_association = :moe
 
-      o.express_selection_stack.nestedly
-
       _a = o.express_into []
 
       _a.should eql(
        [ "'moe' must be ** dootily ** hah in 'eenie' in 'meenie' in 'miney'\n",
          "yup\n" ] )
-    end
-
-    it "(stowaway) when pipeline can't be built" do
-
-      o = subject_class_.new do | * x_a, & ev_p |
-        ev_p[ :_xx_ ]
-      end
-
-      o.express_selection_stack.classically
-      o.express_trilean.classically
-
-      begin
-        o.to_emission_handler
-      rescue ::KeyError => e
-      end
-
-      e.message.should match %r(\Afrom the starting state 'emission_handler)
     end
   end
 end

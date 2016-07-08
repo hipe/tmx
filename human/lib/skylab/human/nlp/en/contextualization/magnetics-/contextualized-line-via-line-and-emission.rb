@@ -17,11 +17,13 @@ module Skylab::Human
         @to_pre_articulate_ = nil
       end
 
+      attr_writer(
+        :event,
+        :trilean,
+      )
+
       def parameter_store= ps
         @_ = ps
-        @event = ps.event
-        @trilean = ps.trilean  # be sure this gets it
-        ps
       end
 
       attr_writer(
@@ -91,7 +93,7 @@ module Skylab::Human
       def __specific_mutations
         p = @to_pre_articulate_
         if p
-          p[]
+          p[ self ]
         else
           f = remove_instance_variable :@_function
           if f
@@ -123,6 +125,10 @@ module Skylab::Human
 
       attr_reader(
         :event,
+      )
+
+      attr_writer(
+        :to_pre_articulate_,
       )
 
       # --

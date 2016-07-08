@@ -1,101 +1,76 @@
-self._REVISIT
-
 module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Express_Selection_Stack___
+    class Magnetics_::Contextualized_Line_Stream_via_Expression_Proc_and_Subject_Association  # ..
 
-      def initialize kns
-        @knowns_ = kns
-      end
+      # (.. and selection stack)
 
-      def nestedly
+      class << self
 
-        @knowns_.when_(
-          [  # when i get:
-            :expression_proc,
-          ],
-          [  # i make:
-            :line_downstream,
-          ],
-        ) do |kns|
-          Nestedly___.new( kns ).__solve_line_downstream
+        def via_magnetic_parameter_store ps
+          new( ps ).execute
         end
-        NIL_
-      end
 
-      def classically
-
-        @knowns_.when_(
-          [  # when i get:
-            :selection_stack,
-          ],
-          [  # i make:
-            :verb_lemma,
-            :verb_subject,
-            :verb_object,
-          ],
-        ) do |kns|
-          Classically___[ kns ]
-        end
-        NIL_
-      end
-
-      class Nestedly___ < Here_::Transition_
+        private :new
+      end  # >>
 
         # #history: the algorithm assimilated from [ac]'s last c15n
 
-        class << self
-          public :new
-        end  # >>
+      def initialize ps
+        @emission_proc = ps.emission_proc
+        @expression_agent = ps.expression_agent
+        @selection_stack = ps.selection_stack
+        @to_say_selection_stack_item = ps.to_say_selection_stack_item
+        @_ps = ps
+      end
 
-        # assume selection_stack and serveral others..
+      def execute
 
-        def __solve_line_downstream
-
-          kns = @knowns_
-          nla = Newline_Adder_.new
-          kns.expression_agent.calculate nla.y, & kns.expression_proc
-
-          _ = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple
-          o = _.new
-
-          o.on_first = method :___map_first_line
-
-          o.on_subsequent = IDENTITY_
-
-          kns.line_downstream = o.to_stream_around nla.to_line_stream
-
-          NIL_
+        lines = []
+        _y = ::Enumerator::Yielder.new do |s|
+          lines << Plus_newline_if_necessary_[ s ]
         end
 
-        def ___map_first_line line  # #cp
+        @expression_agent.calculate _y, & @emission_proc
 
-          lc = Here_::First_Line_Contextualization_.new_ @knowns_
-          lc.line = line
-          lc.on_pre_articulation_ = method :___pre_articulate
-          @_line_c15n = lc
-          lc.build_line
-        end
+        o = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple.begin
 
-        def ___pre_articulate
+        o.on_first = method :___map_first_line
 
-          lc = @_line_c15n
+        o.on_subsequent = IDENTITY_
 
-          o = Here_::Magnetics_::String_Array_via_Selection_Stack_and_Procs.begin
-          _p ||= Express_selection_stack_item___
-          o.say_other_by = _p
+        o.to_stream_around Common_::Stream.via_nonsparse_array lines
+      end
 
-          _ = Home_.lib_.basic::String
+      def ___map_first_line line  # #cp
 
-          s = say_subject_association_
+        o = Magnetics_::Contextualized_Line_via_Line_and_Emission.begin
+        o.parameter_store = self
+        o.event = NOTHING_
+        o.line = line
+        o.to_pre_articulate_ = method :___pre_articulate
+        o.execute
+      end
+
+      def ___pre_articulate lc
+
+        o = Here_::Magnetics_::String_Array_via_Selection_Stack_and_Procs.begin
+
+        o.expression_agent = @expression_agent
+        o.selection_stack = @selection_stack
+
+        _p = @to_say_selection_stack_item
+        _p ||= Express_selection_stack_item___
+        o.say_other_by = _p
+
+        s = Magnetics_::String_via_Subject_Association.via_magnetic_parameter_store @_ps
 
           if s
             lc.prefix_ = "#{ s } "
           end
 
-          s_a = o.build_array
+        s_a = o.execute
 
           # `s_a` => [ .. "in sub-thing", "in root thing" ]
 
@@ -104,12 +79,13 @@ module Skylab::Human
           end
 
           NIL_
-        end
       end
 
       Express_selection_stack_item___ = -> xx do
         self._K
       end
+
+      This_ = self
     end
   end
 end

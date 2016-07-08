@@ -76,7 +76,7 @@ module Skylab::Human
             ev = ev_p[]
 
             kns.channel = i_a
-            kns.expression_proc = -> y_ do
+            kns.emission_proc = -> y_ do
               ev.express_into_under y_, self
             end
             me._express_into y
@@ -90,7 +90,7 @@ module Skylab::Human
 
           kns.emission_downhandler.call( * i_a ) do |y|
             kns.channel = i_a
-            kns.expression_proc = ev_p
+            kns.emission_proc = ev_p
             me._express_into y
           end
 
@@ -107,24 +107,29 @@ module Skylab::Human
 
           ma.downstream_yielder = y
 
-          @knowns_.expression_agent.calculate ma.y, & @knowns_.expression_proc
+          @knowns_.expression_agent.calculate ma.y, & @knowns_.emission_proc
 
           y
         end
 
         def ___map_first_line line  # #cp
 
-          lc = Here_::First_Line_Contextualization_.new_ @knowns_
-          lc.line = line
-          lc.on_pre_articulation_ = method :___pre_articulate
-          @_line_c15n = lc
-          lc.build_line
+          o = Magnetics_::Contextualized_Line_via_Line_and_Emission.begin
+          o.line = line
+          o.parameter_store = @knowns_
+          o.to_pre_articulate_ = method :___pre_articulate
+          @_line_c15n = o
+          o.execute
         end
 
         def ___pre_articulate
 
           kns = @knowns_
-          derive_trilean_from_channel_if_necessary_
+
+          if ! kn.magnetic_value_is_known :trilean
+            Magnetics_::Trilean_via_Channel.into_via_magnetic_parameter_store kns
+          end
+
           Here_::Express_Selection_Stack___::Classically___[ kns ]
           so = @knowns_.bound_solver_
 
@@ -134,7 +139,7 @@ module Skylab::Human
           vs = kns.verb_subject.value_x
           iv = so.solve_for_( :inflected_verb ).value_x
           vo = kns.verb_object.value_x
-          so = say_subject_association_
+          so = Models_::String_via_Subject_Association[ xx ]
 
           # ==
 

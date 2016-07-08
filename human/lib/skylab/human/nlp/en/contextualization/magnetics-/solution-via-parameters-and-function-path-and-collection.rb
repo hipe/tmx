@@ -12,12 +12,14 @@ module Skylab::Human
       end  # >>
 
       def function_symbol_path= x
-        @_invo_stream = :__function_invocation_stream_via_function_symbol_path
+        @_forward_m = :__forward_stream_via_path
+        @_reverse_m = :__reverse_stream_via_path
         @function_symbol_path = x
       end
 
       def function_symbol_stack= x
-        @_invo_stream = :__function_invocation_stream_via_function_symbol_stack
+        @_forward_m = :__forward_stream_via_stack
+        @_reverse_m = :__reverse_stream_via_stack
         @function_symbol_stack = x
       end
 
@@ -28,9 +30,11 @@ module Skylab::Human
 
       def execute
 
+        @_did ||= _prepare
+
         ps = @parameters  # ("parameter store")
 
-        st = send @_invo_stream
+        st = send @_forward_m
         inv = st.gets
 
         begin
@@ -73,44 +77,121 @@ module Skylab::Human
         x
       end
 
-      def __function_invocation_stream_via_function_symbol_stack
+      def mutate_if_necessary_to_land_on sym  # very near [#ta-005]
 
-        _invo_stream :__path_order_symbol_stream_via_symbol_stack
+        @_did ||= _prepare
+
+        a = ( @_mutable_stack_array ||= __flush_to_mutable_stack )
+
+        sym_a = a.first.item_ticket.product_term_symbols
+
+        if ! sym_a.include? sym
+
+          _const = @collection.const_for_A_atom_via_B_atom sym, sym_a.first
+
+          _fit = @collection.read_function_item_ticket_via_const _const
+
+          _f = @_read_function_via_FIT[ _fit ]
+
+          _node = Function_Invocation__.new _f, _fit
+
+          a[ 0, 0 ] = [ _node ]
+
+        end
+        NIL_
       end
 
-      def __function_invocation_stream_via_function_symbol_path
-
-        _invo_stream :__path_order_symbol_stream_via_symbol_path
+      def _prepare
+        @_read_FIT_via_const = @collection.proc_for_read_function_item_ticket_via_const
+        @_read_function_via_FIT = @collection.proc_for_read_function_item_via_function_item_ticket
+        ACHIEVED_
       end
 
-      def _invo_stream m
+      def __flush_to_mutable_stack
 
-        p = @collection.proc_for_read_function_item_ticket_via_const
-        p_ = @collection.proc_for_read_function_item_via_function_item_ticket
+        remove_instance_variable :@_forward_m
 
-        send( m ).map_by do |sym|
-          it = p[ sym ]
-          Function_Invocation___.new p_[ it ], it
+        _stack_as_st = send remove_instance_variable :@_reverse_m
+
+        mutable_array = _stack_as_st.to_a
+
+        @function_symbol_path = nil
+        @function_symbol_stack = nil
+        remove_instance_variable :@function_symbol_stack
+        remove_instance_variable :@function_symbol_path
+
+        @_forward_m = :__forward_stream_via_mutable_stack_array
+        @_reverse_m = :__reverse_stream_via_mutable_stack_array
+
+        mutable_array
+      end
+
+      def __forward_stream_via_mutable_stack_array
+        a = @_mutable_stack_array
+        Common_::Stream.via_range( a.length - 1 .. 0 ) do |d|
+          a.fetch d
         end
       end
 
-      def __path_order_symbol_stream_via_symbol_stack & p
+      def __reverse_stream_via_mutable_stack_array
+        Common_::Stream.via_nonsparse_array @_mutable_stack_array
+      end
 
-        sym_a = @function_symbol_stack
+      def __forward_stream_via_path
 
-        Common_::Stream.via_range( sym_a.length - 1 .. 0 ) do |d|
+        _forward_of :@function_symbol_path
+      end
 
+      def __reverse_stream_via_path
+
+        _reverse_of :@function_symbol_path
+      end
+
+      def __forward_stream_via_stack
+
+        _reverse_of :@function_symbol_stack
+      end
+
+      def __reverse_stream_via_stack
+
+        _forward_of :@function_symbol_stack
+      end
+
+      def _forward_of ivar
+
+        _go Common_::Stream.via_nonsparse_array instance_variable_get ivar
+      end
+
+      def _reverse_of ivar
+
+        sym_a = instance_variable_get ivar
+        _st = Common_::Stream.via_range( sym_a.length - 1 .. 0 ) do |d|
           sym_a.fetch d
         end
+        _go _st
       end
 
-      def __path_order_symbol_stream_via_symbol_path
-        Common_::Stream.via_nonsparse_array @function_symbol_path
+      def _go sym_st
+
+        p = @_read_FIT_via_const
+        p_ = @_read_function_via_FIT
+
+        sym_st.map_by do |sym|
+
+          if sym.respond_to? :call
+
+            custom = sym[]
+            Function_Invocation__.new custom.function, custom
+          else
+            it = p[ sym ]
+            Function_Invocation__.new p_[ it ], it
+          end
+        end
       end
 
       # ==
 
-      class Function_Invocation___
+      class Function_Invocation__
 
         def initialize x, it
           @function = x

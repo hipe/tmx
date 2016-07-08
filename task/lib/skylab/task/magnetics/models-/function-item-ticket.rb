@@ -31,7 +31,7 @@ class Skylab::Task
       end
 
       def const
-        @___const ||= ___build_const
+        @___const ||= Const[ @product_term_symbols, @prerequisite_term_symbols ]
       end
 
       p = Here_.upcase_const_string_via_snake_case_symbol_
@@ -48,11 +48,11 @@ class Skylab::Task
         end
       end
 
-      define_method :___build_const do
+      Const = -> product_term_symbols, prerequisite_term_symbols do
         buffer = ""
-        andify[ buffer, @product_term_symbols ]
+        andify[ buffer, product_term_symbols ]
         buffer << via
-        andify[ buffer, @prerequisite_term_symbols ]
+        andify[ buffer, prerequisite_term_symbols ]
         buffer.intern
       end
 
