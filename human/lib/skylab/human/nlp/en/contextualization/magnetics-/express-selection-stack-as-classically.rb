@@ -9,13 +9,17 @@ module Skylab::Human
 
       class << self
 
-        def modify_contextualization_client_ client, _manner, _collection
+        def modify_contextualization_client_ o, _manner, collection  # o = "c15n"
 
-          client.push_function_ :Three_Parts_Of_Speech_via_Selection_Stack
+          if o.state_crutch_
+            o.begin_customization_ collection
+          end
 
-          client.can_read :expression_agent
-          client.must_read :selection_stack
-          client.must_read :three_parts_of_speech
+          o.push_function_ :Three_Parts_Of_Speech_via_Selection_Stack
+
+          o.can_read :expression_agent
+          o.must_read :selection_stack
+          o.must_read :three_parts_of_speech
 
           NIL_
         end

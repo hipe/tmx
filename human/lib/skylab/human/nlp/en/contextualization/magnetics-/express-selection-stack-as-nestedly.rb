@@ -6,7 +6,7 @@ module Skylab::Human
 
       class << self
 
-        def modify_contextualization_client_ o, _manner, collection
+        def modify_contextualization_client_ o, _manner, collection  # o = c15n
 
           o.begin_customization_ collection
 

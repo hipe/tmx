@@ -45,11 +45,8 @@ module Skylab::Human
           if fun.respond_to? :via_magnetic_parameter_store
             x = fun.via_magnetic_parameter_store ps
           else
-            a = []
-            inv.item_ticket.prerequisite_term_symbols.each do |sym|
-              a.push ps.read_magnetic_value sym
-            end
-            x = fun.call( * a )
+            _a = __build_arguments_for_function inv, ps
+            x = fun.call( * _a )
           end
 
           # see if there's a next function
@@ -66,15 +63,24 @@ module Skylab::Human
             ps.write_magnetic_value x, sym_a.first
 
           else
-            Home_._COVER_ME
+            self._COVER_ME
             sym_a.each_with_index do |sym, d|
               ps.write_magnetic_value x.fetch( d ), sym
             end
           end
+
           inv = inv_
           redo
         end while nil
         x
+      end
+
+      def __build_arguments_for_function inv, ps
+        a = []
+        inv.item_ticket.prerequisite_term_symbols.each do |sym|
+          a.push ps.read_magnetic_value sym
+        end
+        a
       end
 
       def mutate_if_necessary_to_land_on sym  # very near [#ta-005]
@@ -87,7 +93,9 @@ module Skylab::Human
 
         if ! sym_a.include? sym
 
-          _const = @collection.const_for_A_atom_via_B_atom sym, sym_a.first
+          via_sym = sym_a.first
+
+          _const = @collection.const_for_A_atom_via_B_atom sym, via_sym
 
           _fit = @collection.read_function_item_ticket_via_const _const
 
@@ -95,9 +103,9 @@ module Skylab::Human
 
           _node = Function_Invocation__.new _f, _fit
 
-          a[ 0, 0 ] = [ _node ]
-
+          a.unshift _node
         end
+
         NIL_
       end
 

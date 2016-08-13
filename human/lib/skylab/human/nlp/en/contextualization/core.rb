@@ -1,15 +1,20 @@
 module Skylab::Human
 
-  class NLP::EN::Contextualization  # IS (see) :[#043].
+  class NLP::EN::Contextualization  # [#043]
 
     class << self
       alias_method :begin, :new
       undef_method :new
     end  # >>
 
-    def initialize & p
+    def initialize
+
+      block_given? && ::Kernel._WHERE
+
+      @state_crutch_ = true  # will change this (somehow)
       @_function_symbol_stack = nil
       @_rw = nil
+
       Do_big_index_and_enhance_once___[]
       NIL_
     end
@@ -30,18 +35,23 @@ module Skylab::Human
     end
 
     def receive_magnetic_manner cls, manner, collection
+
       cls.modify_contextualization_client_ self, manner, collection
-      NIL_
     end
 
     # -- mini-API for the above callback
 
     def begin_customization_ col
+      remove_instance_variable :@state_crutch_
       @_collection = col
       @_function_symbol_stack = []
       @_rw = {}
       NIL_
     end
+
+    attr_reader(
+      :state_crutch_,
+    )
 
     def push_inline_function_ a, a_, f
       ifu = nil
@@ -51,6 +61,7 @@ module Skylab::Human
     end
 
     def push_function_ sym
+      sym == @_function_symbol_stack.last && self._WHERE  # #todo
       @_function_symbol_stack.push sym ; nil
     end
 
@@ -82,9 +93,11 @@ module Skylab::Human
     end
 
     Magnetic_routing_attr_accessor_.call( self,
+      :channel,
       :contextualized_line_stream,
       :expression_agent,
       :selection_stack,
+      :surface_parts,
       :to_say_selection_stack_item,
       :three_parts_of_speech,
       :trilean,
@@ -94,17 +107,18 @@ module Skylab::Human
     #     a prototype, we'll just keep them simple)
 
     attr_reader(
-      :channel,
       :line_yielder,
     )
 
     attr_accessor(
+      :downstream_selective_listener_proc,
       :emission_proc,
+      :on_failed_proc,
       :subject_association,
       :to_say_subject_association,
     )
 
-    # -- experimental hard-coded output inteface
+    # -- hard-coded output (targets) inteface dreams of [#ta-005]
 
     def given_emission i_a, & ev_p  # assume self is ad-hoc mutable
 
@@ -130,7 +144,7 @@ module Skylab::Human
 
       @line_yielder = line_yielder
       if @_function_symbol_stack
-        __express_via_function_stack
+        _express_via_function_stack
       else
         __express_brazenly
       end
@@ -140,11 +154,35 @@ module Skylab::Human
 
       o = Here_::Magnetics_::Expression_via_Emission.begin
       o.channel = @channel
-      o.collection = COLLECTION__  # (not @_collection for now (but would be same))
+      o.collection = COLLECTION_  # (not @_collection for now (but would be same))
       o.expression_agent = self.expression_agent
       o.emission_proc = @emission_proc
       o.line_yielder = @line_yielder
       o.execute
+    end
+
+    def emission_handler_via_emission_handler & downstream_oes_p
+
+      # (method name is referenced in the document.)
+
+      me = self
+
+      -> * i_a, & ev_p do
+
+        inst = me.dup
+
+        inst.channel = i_a
+
+        inst.emission_proc = ev_p
+
+        inst.downstream_selective_listener_proc = downstream_oes_p
+
+        o = inst._begin_solution_using_function_symbol_stack
+
+        o.mutate_if_necessary_to_land_on :expression
+
+        o.execute
+      end
     end
 
     def build_string  # might just be a #feature-island
@@ -157,19 +195,14 @@ module Skylab::Human
       o.execute
     end
 
-    def __express_via_function_stack
+    def _express_via_function_stack
 
-      o = _begin_solution
-      o.function_symbol_stack = @_function_symbol_stack
-
-      # -- (close to [#ta-005], experimental)
-
+      o = _begin_solution_using_function_symbol_stack
       o.mutate_if_necessary_to_land_on :expression
-
-      # --
       o.execute
     end
 
+#==BEGIN
     if false
 
     def initialize & p
@@ -211,8 +244,6 @@ module Skylab::Human
     end
 
     NODES__ = {
-      emission_handler: nil,  # endpoint
-      initial_phrase_conjunction: :nilable,
       inflected_verb: :nilable,
       verb_lemma: :nilable,
       verb_subject: :nilable,
@@ -254,19 +285,8 @@ module Skylab::Human
       cls.new s
     end
 
-    def to_emission_handler  # as referenced in [#043]
-
-      _so = bound_solver_
-      _oes_p = _so.solve_for_ :emission_handler
-      _oes_p
-    end
-
     def _will_express_emission
       Here_::Express_Emission___[ self ] ; nil  # (changed to Expression_via_Emission)
-    end
-
-    def bound_solver_
-      @_bound_solver ||= @_solver.bound_to_knowns__ self
     end
 
     # -- for sub-clients
@@ -277,6 +297,14 @@ module Skylab::Human
       @_solver.add_entry__ when_x, can_produce_x, & by_p
       NIL_
     end
+    end
+#==END
+
+    def _begin_solution_using_function_symbol_stack
+
+      o = _begin_solution
+      o.function_symbol_stack = @_function_symbol_stack
+      o
     end
 
     def _begin_solution
@@ -326,6 +354,11 @@ module Skylab::Human
       NIL_
     end
 
+    def read_magnetic_value_with_certainty sym
+
+      instance_variable_get( @_rw.fetch( sym ).ivar ).value_x
+    end
+
     def read_magnetic_value sym
 
       var = @_rw.fetch sym
@@ -345,14 +378,19 @@ module Skylab::Human
     module Models_
 
       Surface_Parts = ::Struct.new(
-        :initial_phrase_conjunction,
         :inflected_verb,
+        :prefixed_cojoinder,
+        :suffixed_cojoinder,
         :verb_object,  # carried-over
         :verb_subject,  # carried-over
       ) do
+
         class << self
           def begin_via_parts_of_speech pos
-            new nil, nil, pos.verb_object, pos.verb_subject
+            o = new
+            o.verb_object = pos.verb_object
+            o.verb_subject = pos.verb_subject
+            o
           end
           private :new
         end  # >>
@@ -374,9 +412,9 @@ module Skylab::Human
       end
     end
 
-    nl_rx = /(?<!\n)\z/  # ..
+    needs_nl_rx = /(?<!\n)\z/  # ..
     Plus_newline_if_necessary_ = -> s do
-      if nl_rx =~ s
+      if needs_nl_rx =~ s
         "#{ s }#{ NEWLINE_ }"
       else
         s
@@ -394,7 +432,7 @@ module Skylab::Human
 
       col.write_manner_methods_onto Here_
 
-      COLLECTION__ = col
+      COLLECTION_ = col
 
       NIL_
     end

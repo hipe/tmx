@@ -13,9 +13,9 @@ module Skylab::Human
         private :new
       end  # >>
 
-      def initialize ps
-        @_ = ps
-        @event = ps.event
+      def initialize line_contextualization
+        @_ = line_contextualization
+        @event = line_contextualization.event
       end
 
       def execute
@@ -41,7 +41,10 @@ module Skylab::Human
           as.add_string "because"
           as.add_lazy_space
 
-          @_.prefix_ = as.string_via_finish
+          _ = as.string_via_finish
+          @_.mutate_line_parts_by do |mlp|
+            mlp.prefix = _
+          end
         end
 
         NIL_

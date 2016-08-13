@@ -52,12 +52,15 @@ module Skylab::Human
 
         gerund_phrase = as.string_via_finish
 
-        eek_mutable = @_.content_
+        @_.mutate_line_parts_by do |mlp|
 
-        if one
-          eek_mutable.concat gerund_phrase
-        else
-          eek_mutable[ 0, 0 ] = "while#{ gerund_phrase }, "
+          eek_mutable = mlp.content
+
+          if one
+            eek_mutable.concat gerund_phrase
+          else
+            eek_mutable[ 0, 0 ] = "while#{ gerund_phrase }, "
+          end
         end
 
         NIL_

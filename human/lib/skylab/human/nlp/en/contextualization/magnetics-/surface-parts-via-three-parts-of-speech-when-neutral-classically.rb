@@ -23,8 +23,9 @@ module Skylab::Human
         end
 
         o = Models_::Surface_Parts.begin_via_parts_of_speech three_POS
-        o.initial_phrase_conjunction = 'while'
+        o.prefixed_cojoinder = 'while'
         o.inflected_verb = _inflected_verb
+        o.suffixed_cojoinder = ','
         o
 
       # -

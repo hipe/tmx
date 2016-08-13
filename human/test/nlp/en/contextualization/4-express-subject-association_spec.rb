@@ -2,24 +2,29 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - express subject association", wip: true do
+  describe "[hu] NLP - EN - contextualization - express subject association" do
 
     TS_Joist_[ self ]
     use :memoizer_methods
     use :NLP_EN_contextualization
-    use :NLP_EN_contextualization_ham
+    use :NLP_EN_contextualization_DSL
 
     context "(the normalest example)" do
 
-      emit_by_ do |oes_p|
+      given do |oes_p|
 
-        selection_stack_as no_name_, assoc_( :item ), assoc_( :add )
+        selection_stack no_name_, assoc_( :item ), assoc_( :add )
 
-        subject_association_as assoc_( :left_shark )
+        subject_association assoc_ :left_shark
 
         oes_p.call :error, :expression do |y|
           y << "should have been at #{ highlight 'this' } superbowl"
           y << "sho nuff"
+        end
+
+        begin_by do |o|
+          _customize o
+          NIL
         end
       end
 
@@ -42,15 +47,19 @@ module Skylab::Human::TestSupport
 
     context "(parens, info, one level shallower)" do
 
-      emit_by_ do |oes_p|
+      given do |oes_p|
 
-        selection_stack_as no_name_, assoc_( :frob )
+        selection_stack no_name_, assoc_( :frob )
 
-        subject_association_as assoc_( :left_shark )
+        subject_association assoc_ :left_shark
 
         oes_p.call :info, :expression do |y|
-          y << "(was convered to #{ highlight 'this' })"
+          y << "(was converted to #{ highlight 'this' })"
           y << "yup"
+        end
+
+        begin_by do |o|
+          _customize o
         end
       end
 
@@ -60,22 +69,30 @@ module Skylab::Human::TestSupport
 
       it "for now, the `while` pattern is employed.." do
         first_line_.should match(
-          %r(\A\(while frobing, left shark was convered to \*\* this \*\*\)) )
+          %r(\A\(while frobing, left shark was converted to \*\* this \*\*\)) )
       end
     end
 
-    def ham_ad_hoc_customizations_ o
+    def _customize o
 
       # (the below is a sketch for how we might style it in [ze] niCLI..)
+      #
+      # (order matters while #open [#043] because it's building a magnetic
+      # function stack, so highest level (last to run) first)
 
-      o.express_subject_association.integratedly
+      _but = o.express_trilean.classically.but
 
-      o.express_trilean.classically_but.on_failed = -> kns do
+      _but.on_failed = -> sp, pos do  # surface parts
 
-        kns.initial_phrase_conjunction = nil
-        kns.inflected_verb = "couldn't #{ kns.verb_lemma.value_x }"
+        sp.prefixed_cojoinder = nil
+        sp.verb_subject = nil
+        sp.inflected_verb = "couldn't #{ pos.verb_lemma }"
+        sp.verb_object = pos.verb_object
+        sp.suffixed_cojoinder = "because"
         NIL_
       end
+
+      o.express_subject_association.integratedly
 
       same = -> asc do
         asc.name.as_human
@@ -88,6 +105,7 @@ module Skylab::Human::TestSupport
       end
 
       o.to_say_subject_association = same
+
       NIL_
     end
   end

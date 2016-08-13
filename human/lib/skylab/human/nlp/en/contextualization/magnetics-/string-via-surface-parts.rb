@@ -4,11 +4,9 @@ module Skylab::Human
 
     Magnetics_::String_via_Surface_Parts = -> o do
 
-      # -
-
         as = Home_::Phrase_Assembly.begin_phrase_builder
 
-        as.add_any_string o.initial_phrase_conjunction
+        as.add_any_string o.prefixed_cojoinder
 
         as.add_any_string o.verb_subject
 
@@ -16,9 +14,10 @@ module Skylab::Human
 
         as.add_any_string o.verb_object
 
+        as.add_any_string o.suffixed_cojoinder
+
         as.string_via_finish
 
-      # -
     end
   end
 end

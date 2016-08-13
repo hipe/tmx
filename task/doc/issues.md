@@ -19,6 +19,7 @@
              "the dream of magnetics" is pathfinding in directed graph
              A) we've done it somewhere in the universe before
              [magnetics viz]  (in branch at writing) (has subscribers)
+             [hu] is waiting for this at #open [#hu-043]
 
 [#004]       [eventpoint]
 [#003]       [new task]

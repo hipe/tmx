@@ -14,11 +14,11 @@ module Skylab::Human
 
         @expression_agent = ps.expression_agent
         @subject_association = ps.subject_association
-        @_etc_p = ps.to_say_subject_association
+        @to_say_subject_association = ps.to_say_subject_association
       end
 
       def execute
-        p = @_etc_p
+        p = @to_say_subject_association
         p ||= Express_subject_association___
 
         # (was 'say_subject_association_by_` #todo)

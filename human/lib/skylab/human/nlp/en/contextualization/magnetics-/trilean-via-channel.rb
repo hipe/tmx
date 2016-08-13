@@ -5,22 +5,20 @@ module Skylab::Human
     module Magnetics_::Trilean_via_Channel ; class << self
 
       def into_via_magnetic_parameter_store ps
-        send CHANNEL___.fetch( ps.channel.fetch( 0 ) ), ps
+
+        ps.trilean = call ps.channel
         NIL_
       end
 
-      CHANNEL___ = {
-        info: :__info,
-        error: :__error,
+      def call channel
+        VALUES___.fetch channel.fetch 0
+      end
+      alias_method :[], :call
+
+      VALUES___ = {
+        error: false,
+        info: nil,
       }
-
-      def __error ps
-        ps.trilean = false
-      end
-
-      def __info ps
-        ps.trilean = nil
-      end
     end ; end
   end
 end

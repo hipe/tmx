@@ -40,10 +40,14 @@ module Skylab::Human
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.preterite
 
-        @_.prefix_ = if n_s
+        _ = if n_s
           "#{ v_s } #{ n_s }: "
         else
           v_s
+        end
+
+        @_.mutate_line_parts_by do |mlp|
+          mlp.prefix = _
         end
 
         NIL_

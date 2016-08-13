@@ -71,7 +71,6 @@ class Skylab::Task
         def __set_manner ma
           _class = @collection.__item_via_item_ticket ma
           @client.receive_magnetic_manner _class, ma, @collection
-          NIL_
         end
       end
     end

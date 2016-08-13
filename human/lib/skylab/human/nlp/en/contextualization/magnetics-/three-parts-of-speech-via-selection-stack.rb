@@ -97,7 +97,7 @@ module Skylab::Human
 
         o.selection_stack = @selection_stack
 
-        o.say_other_by = @to_say_selection_stack_item || _Express_selection_stack_item
+        o.to_say_other = @to_say_selection_stack_item || _Express_selection_stack_item
 
         o.expression_agent = @expression_agent
 

@@ -110,19 +110,19 @@ module Skylab::Human::TestSupport
       end
 
       it '(2)' do
-        _against 'zerper', 'add', 'while zerper was adding'
+        _against 'zerper', 'add', 'while zerper was adding,'
       end
 
       it '(2_)' do
-        _against nil, 'add', 'while adding'
+        _against nil, 'add', 'while adding,'
       end
 
       it '(3)' do
-        _against 'zerper', 'foo', 'add', 'while zerper was adding foo'
+        _against 'zerper', 'foo', 'add', 'while zerper was adding foo,'
       end
 
       it '(3_)' do
-        _against nil, 'foo', 'add', 'while adding foo'
+        _against nil, 'foo', 'add', 'while adding foo,'
       end
     end
 
@@ -137,9 +137,9 @@ module Skylab::Human::TestSupport
 
       o = subject_class_.begin
 
-      o.express_trilean.classically
+      o.express_trilean.classically  # before below
 
-      o.express_selection_stack.classically
+      o.express_selection_stack.classically  # after above
 
       o.to_say_selection_stack_item = -> s do
 

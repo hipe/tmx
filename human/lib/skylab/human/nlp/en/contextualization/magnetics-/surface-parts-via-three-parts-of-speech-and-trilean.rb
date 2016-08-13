@@ -15,6 +15,7 @@ module Skylab::Human
 
       def initialize ps
 
+        @on_failed_proc = ps.on_failed_proc
         @trilean = ps.trilean
         @three_parts_of_speech = ps.three_parts_of_speech
       end
@@ -31,7 +32,15 @@ module Skylab::Human
       end
 
       def __when_failed
-        _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Failed_Classically
+
+        p = @on_failed_proc
+        if p
+          sp = Models_::Surface_Parts.begin_via_parts_of_speech @three_parts_of_speech
+          p[ sp, @three_parts_of_speech ]
+          sp
+        else
+          _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Failed_Classically
+        end
       end
 
       def __when_neutral

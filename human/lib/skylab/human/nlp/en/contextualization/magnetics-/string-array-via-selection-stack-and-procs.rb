@@ -11,16 +11,16 @@ module Skylab::Human
       end  # >>
 
       def initialize
-        @say_first_by = nil
-        @say_nonfirst_last_by = nil
+        @to_say_first = nil
+        @to_say_nonfirst_last = nil
       end
 
       attr_writer(
         :expression_agent,
-        :say_first_by,
-        :say_other_by,  # required
-        :say_nonfirst_last_by,
         :selection_stack,
+        :to_say_first,
+        :to_say_other,  # required
+        :to_say_nonfirst_last,
       )
 
       def execute
@@ -32,17 +32,17 @@ module Skylab::Human
 
         first = -> do
           _x = st.gets_one
-          a.push e.calculate _x, & ( @say_first_by || @say_other_by )
+          a.push e.calculate _x, & ( @to_say_first || @to_say_other )
         end
 
         x = nil
 
         nonlast = -> do
-          a.push e.calculate x, & @say_other_by
+          a.push e.calculate x, & @to_say_other
         end
 
         nonfirst_last = -> do
-          _p = @say_nonfirst_last_by || @say_other_by
+          _p = @to_say_nonfirst_last || @to_say_other
           a.push e.calculate x, & _p
         end
 

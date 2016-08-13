@@ -30,7 +30,6 @@ module Skylab::Human
           o.line = s
           o.trilean = ps.trilean
           o.event = ps.event
-          o.parameter_store = ps
           o.execute
         end
 

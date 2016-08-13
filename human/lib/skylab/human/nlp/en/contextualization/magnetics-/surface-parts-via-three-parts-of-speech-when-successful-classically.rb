@@ -15,7 +15,6 @@ module Skylab::Human
         end
 
         o = Models_::Surface_Parts.begin_via_parts_of_speech three_POS
-        o.initial_phrase_conjunction = NONE_
         o.inflected_verb = _
         o
 

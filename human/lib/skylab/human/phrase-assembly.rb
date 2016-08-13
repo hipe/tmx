@@ -80,8 +80,14 @@ module Skylab::Human
     end
 
     def add_string s
-      _add [ :wordish, s ]
+      if COMMON_PUNCTUATION___[ s.getbyte 0 ]
+        _add_common_punctuation s
+      else
+        _add [ :wordish, s ]
+      end
     end
+
+    COMMON_PUNCTUATION___ = ::Hash[ ',.?!'.each_byte.map { |d| [d, true] } ]
 
     def add_lazy_space
       _add Lazy_Space___[]
@@ -92,13 +98,16 @@ module Skylab::Human
     end
 
     def add_period
-      _add [ :trailing, '.' ]
+      _add_common_punctuation '.'
     end
 
     def add_newline
       _add [ :as_is, NEWLINE_ ]
     end
 
+    def _add_common_punctuation s
+      _add [ :trailing, s ]
+    end
     def _add trueish_x
       send @_add_m, trueish_x
     end

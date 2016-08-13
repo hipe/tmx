@@ -1,3 +1,5 @@
+self._NOT_YET_REINTEGRATED  # #todo this is #spot-4
+
 module Skylab::Human
 
   class NLP::EN::Contextualization
@@ -79,51 +81,9 @@ module Skylab::Human
           @_entry_via_destination = h ; @_entries = a
         end
 
-        def bound_to_knowns__ kns
-          Bound_Read_Only___.new kns, @_entry_via_destination, @_entries
-        end
-
         def is_writable_
           false
         end
-      end
-
-      class Bound_Read_Only___
-
-        def initialize o, h, a
-          @_entries = a
-          @_entry_via_destination = h
-          @knowns_ = o
-        end
-
-        def __explain stack
-          _prefix = if 1 == stack.length
-            "from the starting state "
-          else
-            "under (#{ stack[ 0..-2 ] * ', ' }) "
-          end
-          "#{ _prefix }'#{ stack.last }' was necessary but was not set"
-        end
-
-        def solve_for_ k
-
-          x = _read_knownness_for k
-          if x
-            x
-          else
-            Solve__.new( [k], {}, self ).execute
-          end
-        end
-
-        def _read_knownness_for k
-          @knowns_.send k
-        end
-
-        attr_reader(
-          :_entries,
-          :_entry_via_destination,
-          :knowns_,
-        )
       end
 
       class Solve__

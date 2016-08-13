@@ -14,6 +14,7 @@ module Skylab::Human
       end  # >>
 
       def initialize
+        @event = nil
         @to_pre_articulate_ = nil
       end
 
@@ -21,10 +22,6 @@ module Skylab::Human
         :event,
         :trilean,
       )
-
-      def parameter_store= ps
-        @_ = ps
-      end
 
       attr_writer(
         :line,
@@ -105,22 +102,9 @@ module Skylab::Human
 
       # -- ( mini-API for the above clients )
 
-      # [open]
-
-      def prefix_= x
-        @_parts.prefix = x
-      end
-
-      def content_  # assume client will MUTATE string!
-        @_parts.content
-      end
-
-      def suffix_= x
-        @_parts.suffix = x
-      end
-
-      def close_= x
-        @_parse.close = x
+      def mutate_line_parts_by  # yields "mutable line parts" ("mlp")
+        yield @_parts
+        NIL_
       end
 
       attr_reader(

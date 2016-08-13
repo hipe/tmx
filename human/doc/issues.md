@@ -33,7 +33,13 @@
 [#046]       phrase assembler
 [#045] #open (in [sa] reverse-lookup for pluralized words..)
 [#044]       design patterns of expression ..
-[#043]       contextualization !!! (was: "the API action inflection hack") ..
+
+[#043] #open during a transitional period, this is NASTY - the objective
+             of this phase is to get the various implementations using
+             magnetics (functions), but since there is not yet pathfinding
+             (#open [#ta-005]), we hack thru that part of it for now..
+             (and #spot-4 is an old waylaid thing related)
+
 [#042]       (segment on NPR - joel warner ; peter macgraw ; manatee)
 [#041]       track wishes for conjunction phrase support #universal
 [#040]       a note

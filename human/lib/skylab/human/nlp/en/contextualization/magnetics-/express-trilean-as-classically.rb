@@ -6,17 +6,34 @@ module Skylab::Human
 
       class << self
 
-        def modify_contextualization_client_ client, _manner, collection
+        def modify_contextualization_client_ o, _manner, collection  # o = "c15n"
 
-          client.begin_customization_ collection
+          if o.state_crutch_
+            o.begin_customization_ collection
+          end
 
-          client.push_function_ :Surface_Parts_via_Three_Parts_Of_Speech_and_Trilean
+          o.push_function_ :Surface_Parts_via_Three_Parts_Of_Speech_and_Trilean
 
-          client.must_read :surface_parts
-          client.can_read :to_say_selection_stack_item
-          client.must_read :trilean
+          o.must_read :surface_parts
+          o.can_read :to_say_selection_stack_item
+          o.must_read :trilean
 
-          NIL_
+          Butter___.new o
+        end
+      end  # >>
+
+      class Butter___
+
+        def initialize c
+          @client = c
+        end
+
+        def but
+          self
+        end
+
+        def on_failed= x
+          @client.on_failed_proc = x ; x
         end
       end
     end

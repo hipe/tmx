@@ -2,28 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Express_Subject_Association___
-
-      GIVEN___ = [
-       :subject_association,  # (and expag and ss)
-      ]
-
-      MAKE___ = [
-        :emission_handler,
-      ]
-
-      def initialize _
-        @knowns_ = _
-      end
-
-      def integratedly
-        @knowns_.when_ GIVEN___, MAKE___ do |kns|
-          Integratedly___[ kns ]
-        end
-        NIL_
-      end
-
-      class Integratedly___ < Here_::Transition_
+    class Magnetics_::Three_Parts_Of_Speech_via_Preterite_Emission
 
         # primarily, effect the assumption that the emission expression is a
         # a preterite string whose intended subject is the association.
@@ -35,17 +14,6 @@ module Skylab::Human
         # "classic" style of selection stack expression:
         #
         #     "can't frob because password cannot .."
-
-        def initialize_copy _
-          @knowns_ = @knowns_.dup
-        end
-
-        def execute
-          @knowns_.emission_handler = -> * i_a, & ev_p do
-            dup.___receive_emission i_a, & ev_p
-            UNRELIABLE_
-          end
-        end
 
         def ___receive_emission i_a, & ev_p
 
@@ -112,7 +80,7 @@ module Skylab::Human
           y
         end
 
-        def ___map_first_line line  # #cp
+        def ___map_first_line line
 
           o = Magnetics_::Contextualized_Line_via_Line_and_Emission.begin
           o.line = line
@@ -135,7 +103,7 @@ module Skylab::Human
 
           # the next 5: "while" "app" "was adding" "fizbuz" (comma), "password"
 
-          ipc = so.solve_for_( :initial_phrase_conjunction ).value_x
+          ipc = so.solve_for_( :prefixed_cojoinder ).value_x
           vs = kns.verb_subject.value_x
           iv = so.solve_for_( :inflected_verb ).value_x
           vo = kns.verb_object.value_x
@@ -165,20 +133,17 @@ module Skylab::Human
 
           _ = as.string_via_finish
 
-          # ==
+          @_line_c15n.mutate_line_parts_by do |mlp|
 
-          co = @_line_c15n
-          co.prefix_ = _
+            mlp.prefix = _
 
-          @_line_c15n.prefix_ = _
+            mlp.close = Plus_newline_if_necessary_[ mlp.close || EMPTY_S_ ]
+          end
 
           # (no suffix)
 
-          co.close_ = Plus_newline_if_necessary_[ co.close_ || EMPTY_S_ ]
-
           NIL_
         end
-      end
     end
   end
 end
