@@ -185,57 +185,58 @@ class Skylab::Stack
     end
 
     def ___do_pop io
-      # - -
-          line_before_that = nil
-          last_line = nil
-          last_bytes = 0
-          this_bytes = 0
-          begin
-            line = io.gets
-            line or break
-            line_before_that = last_line
-            last_line = line
-            last_bytes = this_bytes
-            this_bytes = last_bytes + line.length
-            redo
-          end while nil
 
-          express_popped = -> do
-            if last_line
-              last_line.chop!  # EEK
-              @_oes_p.call :info, :expression, :popping do | y |
-                y << "(popped: #{ last_line })"
-              end
-            end
-          end
+      bytesize_to_keep = 0 ; bytesize = 0 ; old_topmost_line = nil
 
-          if last_bytes.zero?
+      begin
+        line = io.gets
+        line || break
+        new_topmost_line = old_topmost_line
+        old_topmost_line = line
+        bytesize_to_keep = bytesize
+        bytesize += line.bytesize
+        redo
+      end while nil
 
-            @_oes_p.call :info, :expression, :removing_file do | y |
-              y << "(stack cleared. removing file.)"
-            end
+      express_popped = -> do
 
-            express_popped[]
+        # the line that was just popped is written as-is to stdout so that
+        # the user can redirect this output (easily) to for example a "DID"
+        # file for use in informing a near future commit message.
 
-            io.close
+        if old_topmost_line
+          @stdout.puts old_topmost_line
+        end
+      end
 
-            @_filesystem.unlink io.path
-            # (result should be 1 - the number of files removed)
+      if bytesize_to_keep.zero?
 
-            ACHIEVED_
-          else
+        express_popped[]
 
-            @_oes_p.call :info, :expression, :current_top do | y |
-              y << "top: #{ line_before_that }"
-            end
+        @_oes_p.call :info, :expression, :removing_file do | y |
+          y << "(stack cleared. removing file.)"
+        end
 
-            express_popped[]
+        io.close
 
-            io.truncate last_bytes
-            io.close
-            ACHIEVED_
-          end
-      # - -
+        @_filesystem.unlink io.path
+        # (result should be 1 - the number of files removed)
+
+        ACHIEVED_
+      else
+
+        express_popped[]
+
+        new_topmost_line.chomp!  # EEK/meh
+
+        @_oes_p.call :info, :expression, :current_top do | y |
+          y << "(new top: #{ new_topmost_line })"
+        end
+
+        io.truncate bytesize_to_keep
+        io.close
+        ACHIEVED_
+      end
     end
 
     def __list__component_operation

@@ -232,9 +232,9 @@ module Skylab::CodeMetrics
 
           tbl.expression_width = _lookup_expression_width
 
-          tbl.express_into_IO_data_tree out, totes
+          _y = tbl.express_into_IO_data_tree out, totes
 
-          NIL_  # important - don't result in the output context
+          _y && ACHIEVED_
         end
       end
 
