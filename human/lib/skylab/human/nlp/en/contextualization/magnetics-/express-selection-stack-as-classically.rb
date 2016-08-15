@@ -15,11 +15,11 @@ module Skylab::Human
             o.begin_customization_ collection
           end
 
-          o.push_function_ :Three_Parts_Of_Speech_via_Selection_Stack
+          o.push_function_ :Lemmas_via_Selection_Stack  # 1 of 2
 
           o.can_read :expression_agent
+          o.must_read :lemmas
           o.must_read :selection_stack
-          o.must_read :three_parts_of_speech
 
           NIL_
         end

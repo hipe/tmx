@@ -2,48 +2,51 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::String_Array_via_Selection_Stack_and_Procs
+    class Magnetics_::String_Array_via_Procs_and_Selection_Stack
 
       class << self
 
-        alias_method :begin, :new
-        undef_method :new
+        def via_magnetic_parameter_store ps
+          new( ps ).execute
+        end
+
+        alias_method :[], :via_magnetic_parameter_store
       end  # >>
 
-      def initialize
-        @to_say_first = nil
-        @to_say_nonfirst_last = nil
+      def initialize ps
+        @_ps = ps
       end
-
-      attr_writer(
-        :expression_agent,
-        :selection_stack,
-        :to_say_first,
-        :to_say_other,  # required
-        :to_say_nonfirst_last,
-      )
 
       def execute
 
         a = []
-        e = @expression_agent || Non_expressive_expresion_agent_instance___[]
+
+        ps = @_ps
+
+        ea = ps.expression_agent
+        ea ||= Non_expressive_expresion_agent_instance___[]
 
         st = __build_selection_stack_value_scanner
 
+        default_p = ps.to_say_selection_stack_item
+
+        _first_p = ps.to_say_first_selection_stack_item
+
         first = -> do
           _x = st.gets_one
-          a.push e.calculate _x, & ( @to_say_first || @to_say_other )
+          a.push ea.calculate _x, & ( _first_p || default_p )
         end
 
         x = nil
 
         nonlast = -> do
-          a.push e.calculate x, & @to_say_other
+          a.push ea.calculate x, & default_p
         end
 
+        _NFL_p = ps.to_say_nonfirst_last_selection_stack_item
+
         nonfirst_last = -> do
-          _p = @to_say_nonfirst_last || @to_say_other
-          a.push e.calculate x, & _p
+          a.push ea.calculate x, & ( _NFL_p || default_p )
         end
 
         if st.unparsed_exists
@@ -66,7 +69,7 @@ module Skylab::Human
 
         # first of all, the ss might be a linked list (move this whenever)
 
-        ss = @selection_stack
+        ss = @_ps.selection_stack
         ss_a = ::Array.try_convert ss
         if ! ss_a
           ss_a = ss.to_array  # assume [#ba-002]#LL

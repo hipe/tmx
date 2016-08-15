@@ -2,33 +2,19 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Line_Parts_via_Line_and_Event_and_Trilean_that_is_Positive
+    module Magnetics_::First_Line_Proc_via_Event_that_Is_Success ; class << self
 
-      # (see client comments about the scope of this)
+      def mutate_line_contextualization_ lc, ev
 
-      class << self
-        def via_magnetic_parameter_store ps
-          new( ps ).execute
-        end
-        private :new
-      end  # >>
-
-      def initialize ps
-        @_ = ps
-        @event = ps.event
-      end
-
-      def execute
-
-        if @event.respond_to? :inflected_noun
-          ___ham
+        if ev.respond_to? :inflected_noun
+          __work lc, ev
         end  # otherwise nothing
         NIL_
       end
 
-      def ___ham
+      alias_method :[], :mutate_line_contextualization_
 
-        ev = @event
+      def __work lc, ev
 
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.progressive
@@ -36,7 +22,7 @@ module Skylab::Human
         as = Home_::Phrase_Assembly.begin_phrase_builder
         as.add_lazy_space
 
-        one = @_.content_string_looks_like_one_word_
+        one = lc.content_string_looks_like_one_word_
 
         if one or n_s.include? SPACE_
 
@@ -50,11 +36,11 @@ module Skylab::Human
           as.add_string v_s
         end
 
-        gerund_phrase = as.string_via_finish
+        gerund_phrase = as.flush_to_string
 
-        @_.mutate_line_parts_by do |mlp|
+        lc.mutate_line_parts_by do |mlp|  # #spot-5
 
-          eek_mutable = mlp.content
+          eek_mutable = mlp.normalized_original_content_string
 
           if one
             eek_mutable.concat gerund_phrase
@@ -65,6 +51,6 @@ module Skylab::Human
 
         NIL_
       end
-    end
+    end ; end
   end
 end

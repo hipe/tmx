@@ -2,11 +2,9 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Three_Parts_Of_Speech_via_Selection_Stack  # and..
+    class Magnetics_::Lemmas_via_Selection_Stack  # referenced 2x
 
-      # (and a proc and expag)
-
-      # logically ancient, probably a #feature-island, also a frontier
+      # if wasn't for the second reference, would be a #feature-island
 
       class << self
 
@@ -18,10 +16,7 @@ module Skylab::Human
       end  # >>
 
       def initialize ps
-
-        @expression_agent = ps.expression_agent
-        @selection_stack = ps.selection_stack
-        @to_say_selection_stack_item = ps.to_say_selection_stack_item
+        @_ps = ps
       end
 
       def execute
@@ -33,7 +28,7 @@ module Skylab::Human
           @_slug_a = slug_a
         end
 
-        o = Three_Parts_Of_Speech___.new
+        o = Lemmas___.new
 
         _vs = __subject_noun_phrase
         o.verb_subject = _vs  # whether trueish or not, it is now known
@@ -93,20 +88,20 @@ module Skylab::Human
 
       define_method :__selection_stack_as_moniker_array do
 
-        o = Here_::Magnetics_::String_Array_via_Selection_Stack_and_Procs.begin
+        ps = @_ps
 
-        o.selection_stack = @selection_stack
+        if ! ps.to_say_selection_stack_item
+          ps.to_say_selection_stack_item = _Express_selection_stack_item
+        end
 
-        o.to_say_other = @to_say_selection_stack_item || _Express_selection_stack_item
+        _s_a = Magnetics_::String_Array_via_Procs_and_Selection_Stack[ ps ]
 
-        o.expression_agent = @expression_agent
-
-        o.execute
+        _s_a  # #todo
       end
 
       # ==
 
-      Three_Parts_Of_Speech___ = ::Struct.new(
+      Lemmas___ = ::Struct.new(
         :verb_subject,
         :verb_lemma,
         :verb_object,

@@ -30,7 +30,49 @@ module Skylab::Human::TestSupport
 
       # -
 
+      def testcase_family_4_customization_ o
+
+        # :#C15n-testcase-family-4 ([ze])
+
+        # (the below is a sketch for how we might style it in [ze] niCLI..)
+        #
+        # (order matters while #open [#043] because it's building a magnetic
+        # function stack, so highest level (last to run) first)
+
+        _but = o.express_trilean.classically.but
+
+        _but.on_failed = -> ip, lemz do  # surface parts
+
+          ip.prefixed_cojoinder = nil
+          ip.verb_subject = nil
+          ip.inflected_verb = "couldn't #{ lemz.verb_lemma }"
+          ip.verb_object = lemz.verb_object
+          ip.suffixed_cojoinder = "because"
+          NIL_
+        end
+
+        o.express_subject_association.integratedly
+
+        same = -> asc do
+          asc.name.as_human
+        end
+
+        o.to_say_selection_stack_item = -> asc do
+          if asc.name
+            same[ asc ]
+          end
+        end
+
+        o.to_say_subject_association = same
+
+        NIL_
+      end
+
       # -
+
+      def exception_class_
+        _DSL_shared_state.exception.class
+      end
 
       def channel_
         _DSL_shared_state.channel
@@ -44,15 +86,47 @@ module Skylab::Human::TestSupport
         _DSL_shared_state.second_line
       end
 
+      def event_
+        _DSL_shared_state.event
+      end
+
       def __build_DSL_state sets_p
 
         # -- read the values
 
         dsl = __build_DSL_values sets_p
 
-        co = subject_class_.begin
+        m = dsl.state_building_method
+        if m
+          send m, dsl
+        else
+          __build_conventional_state dsl
+        end
+      end
 
-        dsl.begin_by[ co ]
+      def __build_exception_state dsl
+
+        co = _subject_class_begin
+
+        ex = dsl.to_build_exception[ co, dsl ]
+
+        o = __DSL_Shared_State_for_Exception.new
+        o.exception = ex
+
+        _s_a = ex.message.split NEWLINE_
+
+        _s_a.each_with_index do |s, d|
+          o[ LINES__.fetch( d ) ] = s
+        end
+
+        o
+      end
+
+      def __build_conventional_state dsl
+
+        co = _subject_class_begin
+
+        dsl.to_begin[ co ]
 
         co.selection_stack = dsl.selection_stack
 
@@ -73,21 +147,41 @@ module Skylab::Human::TestSupport
         a = remove_instance_variable( :@event_log ).flush_to_array
         1 == a.length or fail
         em = a.first
+        is_event = false
         em.reify_by do |y_p|
-          expag.calculate [], & y_p
+          if y_p.arity.zero?
+            is_event = true
+            y_p[]
+          else
+            expag.calculate [], & y_p
+          end
         end
+        x = em.cached_event_value
 
         # -- write the state
 
         ss = __DSL_Shared_State.new
-        em.cached_event_value.each_with_index do |s, d|
-          ss[ LINES___.fetch( d ) ] = s
+        if is_event
+          s_a = []
+          x.express_into_under s_a, expag
+          ss.event = x
+        else
+          s_a = x ; x = nil
         end
+
+        s_a.each_with_index do |s, d|
+          ss[ LINES__.fetch( d ) ] = s
+        end
+
         ss.channel = em.channel_symbol_array
         ss.freeze
       end
 
-      LINES___ = [ :first_line, :second_line ]
+      LINES__ = [ :first_line, :second_line ]
+
+      def _subject_class_begin
+        subject_class_.begin
+      end
 
       def __build_DSL_values sets_p
 
@@ -111,28 +205,44 @@ module Skylab::Human::TestSupport
         @_DSL_setup_vals.subject_association = x
       end
 
-      def begin_by & p
-        @_DSL_setup_vals.begin_by = p
+      def exception_by & p
+        @_DSL_setup_vals.to_build_exception = p
+        @_DSL_setup_vals.state_building_method = :__build_exception_state ; nil
       end
 
-      define_method :__DSL_Shared_State, ( Lazy_.call do
+      def begin_by & p
+        @_DSL_setup_vals.to_begin = p
+      end
 
-        X_NEC_DSL_Shared_State = ::Struct.new(
-          :channel,
+      define_method :__DSL_Shared_State_for_Exception, ( Lazy_.call do
+
+        X_NEC_DSL_SharedState_for_Exception = ::Struct.new(
+          :exception,
           :first_line,
           :second_line,
         )
       end )
 
+      define_method :__DSL_Shared_State, ( Lazy_.call do
+
+        X_NEC_DSL_Shared_State = ::Struct.new(
+          :channel,
+          :event,
+          :first_line,
+          :second_line,
+        )
+      end )
 
       define_method :__DSL_Setup_Values, ( Lazy_.call do
 
         X_NEC_DSL_Setup_Values = ::Struct.new(
-          :begin_by,
           :channel,
           :emission_proc,
           :selection_stack,
+          :state_building_method,
           :subject_association,
+          :to_begin,
+          :to_build_exception,
         )
       end )
 

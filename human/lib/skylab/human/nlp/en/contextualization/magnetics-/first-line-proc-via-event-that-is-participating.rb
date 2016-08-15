@@ -2,42 +2,42 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Contextualized_Line_Stream_via_Line_Stream_and_Emission
+    module Magnetics_::First_Line_Proc_via_Event_that_Is_Participating ; class << self
 
-      class << self
-        def via_magnetic_parameter_store ps
-          new( ps ).execute
+      # go this away eventually ([#043]."B")
+
+      def via_magnetic_parameter_store ps
+
+        x = ps.trilean
+
+        if x
+          ev = ps.event
+          if ev.has_member :is_completion and ev.is_completion
+            _is_comp = true
+          end
+          if _is_comp
+            Magnetics_::First_Line_Proc_via_Event_that_Is_Completion
+          else
+            Magnetics_::First_Line_Proc_via_Event_that_Is_Success
+          end
+        elsif x.nil?
+          First_Line_Proc_via_Event_that_Is_Neutral___
+        else
+          Magnetics_::First_Line_Proc_via_Event_that_Is_Failure
         end
-        private :new
-      end  # >>
-
-      def initialize ps
-
-        @_parameter_store = ps
-        @line_stream = ps.line_stream
-        self
       end
 
-      def execute
+      alias_method :[], :via_magnetic_parameter_store
 
-        stmr = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple.begin
+      # ==
 
-        stmr.on_first = -> s do
+      module First_Line_Proc_via_Event_that_Is_Neutral___
 
-          o = Magnetics_::Contextualized_Line_via_Line_and_Emission.begin
-
-          ps = @_parameter_store
-          o.line = s
-          o.trilean = ps.trilean
-          o.event = ps.event
-          o.execute
+        def self.mutate_line_contextualization_ _, __
+          NOTHING_
         end
-
-        stmr.on_subsequent = IDENTITY_
-
-        stmr.to_stream_around @line_stream
       end
-    end
+    end ; end
   end
 end
 # #history: broke out of "expression via emission"

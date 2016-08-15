@@ -94,71 +94,82 @@ module Skylab::Human
 
     Magnetic_routing_attr_accessor_.call( self,
       :channel,
-      :contextualized_line_stream,
+      :event,
       :expression_agent,
+      :inflected_parts,
+      :lemmas,
+      :precontextualized_line_stream,
       :selection_stack,
-      :surface_parts,
-      :to_say_selection_stack_item,
-      :three_parts_of_speech,
       :trilean,
     )
 
-    # -- (for now for some of these that are internal or never put into
-    #     a prototype, we'll just keep them simple)
+    # -- (we want the above to be simplified into the below during #open [#043])
+    #
+
+    # - the below haven't been needed yet, they default to a default
+
+    def to_contextualize_first_line_with_selection_stack
+      NOTHING_  # same
+    end
+
+    def to_say_first_selection_stack_item
+      NOTHING_  # same
+    end
+
+    def to_say_nonfirst_last_selection_stack_item
+      NOTHING_  # same
+    end
 
     attr_reader(
       :line_yielder,
     )
 
     attr_accessor(
+      :contextualized_line_stream,
       :downstream_selective_listener_proc,
       :emission_proc,
       :on_failed_proc,
       :subject_association,
+      :to_say_selection_stack_item,
       :to_say_subject_association,
     )
 
     # -- hard-coded output (targets) inteface dreams of [#ta-005]
 
-    def given_emission i_a, & ev_p  # assume self is ad-hoc mutable
+    def given_emission sym_a, & ev_p  # assume self is ad-hoc mutable
 
-      @_rw && Home_._COVER_ME
-      @_rw = {}
-      must_read :expression_agent
-      must_read :trilean
-      @channel = i_a
+      begin_customization_ COLLECTION_
+
+      must_read :channel
+      self.channel = sym_a
+
       @emission_proc = ev_p
+
+      # (unforgiveable crutch:) expect user can set these
+      must_read :expression_agent
+      must_read :event
+      must_read :precontextualized_line_stream
+      must_read :selection_stack
+      must_read :trilean
+
       NIL_
     end
 
     def express_into_under line_yielder, expag  # assume self is ad-hoc mutable
       self.expression_agent = expag
-      _express_into line_yielder
+      express_into line_yielder
     end
 
-    def express_into y  # assume self is ad-hoc mutable
-      _express_into y  # (hi.)
-    end
-
-    def _express_into line_yielder  # assume is ad-hoc mutable
+    def express_into line_yielder  # assume is ad-hoc mutable
 
       @line_yielder = line_yielder
-      if @_function_symbol_stack
-        _express_via_function_stack
+
+      if @_function_symbol_stack.length.zero?
+
+        Magnetics_::Contextualized_Expression_via_Emission[ self ]
       else
-        __express_brazenly
+        _solve_for_contextualized_expression
       end
-    end
-
-    def __express_brazenly
-
-      o = Here_::Magnetics_::Expression_via_Emission.begin
-      o.channel = @channel
-      o.collection = COLLECTION_  # (not @_collection for now (but would be same))
-      o.expression_agent = self.expression_agent
-      o.emission_proc = @emission_proc
-      o.line_yielder = @line_yielder
-      o.execute
     end
 
     def emission_handler_via_emission_handler & downstream_oes_p
@@ -167,39 +178,18 @@ module Skylab::Human
 
       me = self
 
-      -> * i_a, & ev_p do
+      -> * sym_a, & ev_p do
 
         inst = me.dup
 
-        inst.channel = i_a
+        inst.channel = sym_a
 
         inst.emission_proc = ev_p
 
         inst.downstream_selective_listener_proc = downstream_oes_p
 
-        o = inst._begin_solution_using_function_symbol_stack
-
-        o.mutate_if_necessary_to_land_on :expression
-
-        o.execute
+        inst._solve_for_contextualized_expression
       end
-    end
-
-    def build_string  # might just be a #feature-island
-
-      a = @_function_symbol_stack.dup
-      a.unshift :String_via_Surface_Parts
-
-      o = _begin_solution
-      o.function_symbol_stack = a
-      o.execute
-    end
-
-    def _express_via_function_stack
-
-      o = _begin_solution_using_function_symbol_stack
-      o.mutate_if_necessary_to_land_on :expression
-      o.execute
     end
 
 #==BEGIN
@@ -253,14 +243,18 @@ module Skylab::Human
     attr_accessor(  # the below are plain old options, not used as nodes
       :emission_downhandler,
     )
+    end
+#==END
 
     # -- different forms of expression
 
-    def to_exception  # #covered-only-by:[my]. mutates receiver.
-
+    def to_exception  # look:
+      # assume e.g `given_emission` was called
+      # mutate receiver
+      # covered by #C15n-test-family-5
       # (looks like #[#ca-066] emission-to-exception pattern)
 
-      if :expression == @channel.fetch( 1 )
+      if :expression == self.channel.fetch( 1 )
         ___exception_via_expression
       else
         self._EASY_just_build_the_event_and_call_to_exception_on_it
@@ -269,15 +263,16 @@ module Skylab::Human
 
     def ___exception_via_expression
 
-      @expression_agent ||= Home_.lib_.brazen::API.expression_agent_instance
+      if ! _magnetic_value_is_known_ :expression_agent
+        self.expression_agent = Home_.lib_.brazen::API.expression_agent_instance
+      end
 
-      _will_express_emission
       s = express_into ""
       s.chop!  # weee
 
-      _3rd = @channel[ 2 ]
-      if _3rd
-        cls = Common_::Event::To_Exception::Class_via_symbol.call _3rd do
+      sym = self.channel[ 2 ]
+      cls = if sym
+        Common_::Event::To_Exception::Class_via_symbol.call sym do
           NOTHING_
         end
       end
@@ -285,6 +280,8 @@ module Skylab::Human
       cls.new s
     end
 
+#==BEGIN
+    if false
     def _will_express_emission
       Here_::Express_Emission___[ self ] ; nil  # (changed to Expression_via_Emission)
     end
@@ -300,19 +297,62 @@ module Skylab::Human
     end
 #==END
 
-    def _begin_solution_using_function_symbol_stack
+    def build_string  # might just be a #feature-island
+
+      # changes radically at [#043]
+
+      a = @_function_symbol_stack
+      o = _begin_solution
+      o.function_symbol_stack = a
+
+      _hi  = o.bottom_item_ticket_
+      _hi.product_term_symbols == [ :inflected_parts ] || fail
+      _ip = o.execute
+      _ip.to_string__
+    end
+
+    def _solve_for_contextualized_expression
+
+      # very much a crutch for #open [#043]
+
+      mutable_a = @_function_symbol_stack.dup
 
       o = _begin_solution
-      o.function_symbol_stack = @_function_symbol_stack
-      o
+
+      o.function_symbol_stack = mutable_a
+
+      _hi = o.bottom_item_ticket_
+
+      _hi.const == :Inflected_Parts_via_Lemmas_and_Trilean || fail
+
+      mutable_a.unshift :Contextualized_Expression_via_Emission
+
+      o.execute
+    end
+
+    def _solve_via_function_symbol_stack a
+
+      o = _begin_solution
+      o.function_symbol_stack = a
+      o.execute
     end
 
     def _begin_solution
 
-      o = Here_::Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
+      o = Here_::Magnetic_Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
       o.parameters = self
       o.collection = @_collection
       o
+    end
+
+    def emission_is_expression__
+
+      if _magnetic_value_is_known_ :channel
+        _yes = :expression == self.channel[1]  # #[#br-023]. [sli] has 1-item channels
+      else
+        _yes = true
+      end
+      _yes  # #todo
     end
 
     # -- experimental "var" API (second part)
@@ -369,32 +409,41 @@ module Skylab::Human
       end
     end
 
+    def _magnetic_value_is_known_ sym
+
+      var = @_rw[ sym ]
+      if var
+        instance_variable_defined? var.ivar
+      end
+    end
+
     # ==
 
     module Magnetics_
+
+      _Express_subject_association___ = -> asc do
+        nm asc.name
+      end
+
+      Subject_Association_String_via_Subject_Association_SMALL = -> ps do
+        sa = ps.subject_association
+        if sa
+          _p = ps.to_say_subject_association
+          _p ||= _Express_Subject_Association___
+          _ = ps.expression_agent.calculate ps.subject_association, & _p
+          _  # #todo
+        end
+      end
+
+      Autoloader_[ self ]
+    end
+
+    module Magnetic_Magnetics_
+
       Autoloader_[ self ]
     end
 
     module Models_
-
-      Surface_Parts = ::Struct.new(
-        :inflected_verb,
-        :prefixed_cojoinder,
-        :suffixed_cojoinder,
-        :verb_object,  # carried-over
-        :verb_subject,  # carried-over
-      ) do
-
-        class << self
-          def begin_via_parts_of_speech pos
-            o = new
-            o.verb_object = pos.verb_object
-            o.verb_subject = pos.verb_subject
-            o
-          end
-          private :new
-        end  # >>
-      end
 
       class InlineFunction  # 1x #here-2
 
@@ -410,6 +459,8 @@ module Skylab::Human
           :product_term_symbols,
         )
       end
+
+      Autoloader_[ self ]
     end
 
     needs_nl_rx = /(?<!\n)\z/  # ..

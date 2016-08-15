@@ -4,16 +4,15 @@ module Skylab::Human
 
     module Magnetics_::Trilean_via_Channel ; class << self
 
-      def into_via_magnetic_parameter_store ps
-
-        ps.trilean = call ps.channel
-        NIL_
+      def via_magnetic_parameter_store ps
+        __via_channel ps.channel
       end
 
-      def call channel
+      alias_method :[], :via_magnetic_parameter_store
+
+      def __via_channel channel
         VALUES___.fetch channel.fetch 0
       end
-      alias_method :[], :call
 
       VALUES___ = {
         error: false,

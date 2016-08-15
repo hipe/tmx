@@ -10,14 +10,10 @@ module Skylab::Human
 
           o.begin_customization_ collection
 
-          o.push_function_ :Contextualized_Line_Stream_via_Expression_Proc_and_Subject_Association
-
-          # o.push_inline_function_ [ :contextualized_line_stream ], [ :emission_proc ], This_ (was)
-
           o.must_read :contextualized_line_stream
           o.must_read :expression_agent
+          o.must_read :precontextualized_line_stream
           o.must_read :selection_stack
-          o.must_read :to_say_selection_stack_item
 
           NIL_
         end
@@ -25,4 +21,5 @@ module Skylab::Human
     end
   end
 end
+# #tombstone: removed hints
 # #history: this sort of thin "hinting" node is perhaps temporary

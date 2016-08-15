@@ -2,11 +2,11 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    Magnetics_::Surface_Parts_via_Three_Parts_Of_Speech_when_Neutral_Classically = -> three_POS do
+    Magnetics_::Inflected_Parts_via_Lemmas_and_Trilean_that_Is_Neutral = -> lemmas do
 
       # -
 
-        vl = three_POS.verb_lemma
+        vl = lemmas.verb_lemma
 
         _ing = if vl
           Home_::NLP::EN::POS.progressive_verb vl
@@ -14,7 +14,7 @@ module Skylab::Human
           'processing request'
         end
 
-        _ = three_POS.verb_subject
+        _ = lemmas.verb_subject
 
         _inflected_verb = if _
           "was #{ _ing }"
@@ -22,7 +22,7 @@ module Skylab::Human
           _ing
         end
 
-        o = Models_::Surface_Parts.begin_via_parts_of_speech three_POS
+        o = Models_::Inflected_Parts.begin_via_lemmas lemmas
         o.prefixed_cojoinder = 'while'
         o.inflected_verb = _inflected_verb
         o.suffixed_cojoinder = ','

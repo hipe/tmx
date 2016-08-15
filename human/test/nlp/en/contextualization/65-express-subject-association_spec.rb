@@ -4,6 +4,8 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP - EN - contextualization - express subject association" do
 
+    # (this would be #C15n-test-family-4)
+
     TS_Joist_[ self ]
     use :memoizer_methods
     use :NLP_EN_contextualization
@@ -23,7 +25,7 @@ module Skylab::Human::TestSupport
         end
 
         begin_by do |o|
-          _customize o
+          testcase_family_4_customization_ o
           NIL
         end
       end
@@ -59,7 +61,7 @@ module Skylab::Human::TestSupport
         end
 
         begin_by do |o|
-          _customize o
+          testcase_family_4_customization_ o
         end
       end
 
@@ -71,42 +73,6 @@ module Skylab::Human::TestSupport
         first_line_.should match(
           %r(\A\(while frobing, left shark was converted to \*\* this \*\*\)) )
       end
-    end
-
-    def _customize o
-
-      # (the below is a sketch for how we might style it in [ze] niCLI..)
-      #
-      # (order matters while #open [#043] because it's building a magnetic
-      # function stack, so highest level (last to run) first)
-
-      _but = o.express_trilean.classically.but
-
-      _but.on_failed = -> sp, pos do  # surface parts
-
-        sp.prefixed_cojoinder = nil
-        sp.verb_subject = nil
-        sp.inflected_verb = "couldn't #{ pos.verb_lemma }"
-        sp.verb_object = pos.verb_object
-        sp.suffixed_cojoinder = "because"
-        NIL_
-      end
-
-      o.express_subject_association.integratedly
-
-      same = -> asc do
-        asc.name.as_human
-      end
-
-      o.to_say_selection_stack_item = -> asc do
-        if asc.name
-          same[ asc ]
-        end
-      end
-
-      o.to_say_subject_association = same
-
-      NIL_
     end
   end
 end

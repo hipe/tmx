@@ -2,11 +2,11 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    Magnetics_::Surface_Parts_via_Three_Parts_Of_Speech_when_Successful_Classically = -> three_POS do
+    Magnetics_::Inflected_Parts_via_Lemmas_and_Trilean_that_Is_Success = -> lemmas do
 
       # -
 
-        vl = three_POS.verb_lemma
+        vl = lemmas.verb_lemma
 
         _ = if vl
           Home_::NLP::EN::POS.preterite_verb vl
@@ -14,7 +14,7 @@ module Skylab::Human
           'succeeded'
         end
 
-        o = Models_::Surface_Parts.begin_via_parts_of_speech three_POS
+        o = Models_::Inflected_Parts.begin_via_lemmas lemmas
         o.inflected_verb = _
         o
 

@@ -2,41 +2,26 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Line_Parts_via_Line_and_Event_that_is_Completion
+    module Magnetics_::First_Line_Proc_via_Event_that_Is_Completion ; class << self
 
-      class << self
-        def via_magnetic_parameter_store ps
-          new( ps ).execute
-        end
-        private :new
-      end  # >>
+      def mutate_line_contextualization_ lc, ev
 
-      def initialize client
+        if ev.respond_to? :inflected_noun
 
-        @_ = client
-        @event = client.event
-      end
+          if lc.content_string_looks_like_one_word_
 
-      def execute
+            if ev.verb_lexeme
 
-        if @event.respond_to? :inflected_noun
-
-          if @_.content_string_looks_like_one_word_
-
-            if @event.verb_lexeme
-
-              Magnetics_::Line_Parts_via_Line_and_Event_and_Trilean_that_is_Positive.via_magnetic_parameter_store @_
+              Magnetics_::First_Line_Proc_via_Event_that_Is_Success[ lc, ev ]
             end
           else
-            __do_thing_with_colon
+            __do_the_thing_with_the_colon lc, ev
           end
         end
-        NIL_
       end
 
-      def __do_thing_with_colon
+      def __do_the_thing_with_the_colon lc, ev
 
-        ev = @event
         n_s = ev.inflected_noun
         v_s = ev.verb_lexeme.preterite
 
@@ -46,12 +31,12 @@ module Skylab::Human
           v_s
         end
 
-        @_.mutate_line_parts_by do |mlp|
-          mlp.prefix = _
+        lc.mutate_line_parts_by do |mlp|  # #spot-5
+          mlp.prefixed_string = _
         end
 
         NIL_
       end
-    end
+    end ; end
   end
 end

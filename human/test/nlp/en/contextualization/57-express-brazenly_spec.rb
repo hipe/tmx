@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - express brazenly" do
+  describe "[hu] NLP - EN - contextualization - express brazenly" do  # :#c15n-test-family-2
 
     TS_Joist_[ self ]
     use :memoizer_methods
@@ -57,8 +57,8 @@ module Skylab::Human::TestSupport
       _a = _lines_via_emission :error, :wazzozie do
         Common_::Event.inline_not_OK_with(
           :wazoozicle,
-          :noun_lexeme, _Fake_lexeme[ 'fish' ],
-          :verb_lexeme, _Fake_lexeme[ 'eat' ],
+          :noun_lexeme, __fish_lexeme,
+          :verb_lexeme, __eat_lexeme,
         ) do | y, o |
           y << "rick snyder #{ highlight 'failed' }"
           y << 'too bad'
@@ -69,6 +69,28 @@ module Skylab::Human::TestSupport
         [ "couldn't eat fish because rick snyder ** failed **\n",
           "too bad\n",
         ] )
+    end
+
+    it "when event and neutral trilean, just pass message thru" do
+
+      a = _lines_via_emission :info, :kek do
+        Common_::Event.inline_neutral_with(
+          :zerf,
+        ) do |y, o|
+          y << "rick snyder #{ highlight 'failed' }"
+          y << 'too bad'
+        end
+      end
+
+      a == [ "rick snyder ** failed **\n", "too bad\n" ] or fail
+    end
+
+    dangerous_memoize :__eat_lexeme do
+     _Fake_lexeme[ 'eat' ]
+    end
+
+    dangerous_memoize :__fish_lexeme do
+      _Fake_lexeme[ 'fish' ]
     end
 
     it "../ event / completion / two words - " do

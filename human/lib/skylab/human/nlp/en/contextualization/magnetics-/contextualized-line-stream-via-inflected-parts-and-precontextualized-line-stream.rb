@@ -2,78 +2,37 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    # crutch. #todo
+    module Magnetics_::Contextualized_Line_Stream_via_Inflected_Parts_and_Precontextualized_Line_Stream ; class << self
 
-    class Magnetics_::Expression_via_Surface_Parts
+      def via_magnetic_parameter_store ps
 
-      class << self
+        # mlp.prefix[0, 0] = "#{ _s }#{ SPACE_ }"  # ..
 
-        def via_magnetic_parameter_store ps
-          new( ps ).execute
-        end
-        private :new
-      end  # >>
+        pa = ps.inflected_parts.to_phrase_assembly__
 
-      def initialize ps
+        _s = Magnetics_::Subject_Association_String_via_Subject_Association_SMALL[ ps ]
 
-        @channel = ps.channel
-        @downstream_selective_listener_proc = ps.downstream_selective_listener_proc
-        @emission_proc = ps.emission_proc
-        @expression_agent = ps.expression_agent
-        @subject_association = ps.subject_association
-        @surface_parts = ps.surface_parts
-        @to_say_subject_association = ps.to_say_subject_association
-      end
+        _p = -> lc do
 
-      def execute
+          lc.mutate_line_parts_by do |mlp|
 
-        if :expression == @channel[1] || fail
-          __when_expression
-        else
-          self._NOT_YET_WRITTEN
-        end
-      end
+            pa.add_any_string _s
 
-      def __when_expression
+            pa.add_space_if_necessary
 
-        st = __to_final_line_stream
+            _ = pa.flush_to_string
 
-        @downstream_selective_listener_proc.call( * @channel ) do |y|
-          while s = st.gets
-            y << s
+            mlp.prefixed_string = _
           end
-          y
+          NIL_
         end
+
+        Magnetics_::Contextualized_Line_Stream_via_First_Line_Proc_and_Precontextualized_Line_Stream[
+          _p, ps.precontextualized_line_stream ]
       end
 
-      def __to_final_line_stream
-
-        o = Magnetics_::
-          Contextualized_Line_Stream_via_Expression_Proc_and_Subject_Association.
-            begin_for self
-
-        o.emission_proc = @emission_proc
-        o.expression_agent = @expression_agent
-        o.to_contextualize_first_line_with_selection_stack =
-          method :__contextualize_first_line_with_selection_stack
-        o.execute
-      end
-
-      def __contextualize_first_line_with_selection_stack o
-
-        o.mutate_line_parts_by do |mlp|
-          _s = Magnetics_::String_via_Surface_Parts[ @surface_parts ]
-          mlp.prefix[0, 0] = "#{ _s }#{ SPACE_ }"  # ..
-        end
-        NIL_
-      end
-
-      attr_reader(
-        :expression_agent,
-        :subject_association,
-        :to_say_subject_association,
-      )
-    end
+      alias_method :[], :via_magnetic_parameter_store
+    end ; end
   end
 end
-# #history: born expecting to be crutch
+# #history: born

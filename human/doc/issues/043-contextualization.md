@@ -104,7 +104,5 @@ this facility is sensitive to:
 
 ### ( "A" and "B" (the old way of parameter representation) were sunsetted. )
 
-### ( "C" is in-situ )
-_
 
 # #tombstone this used to be the first document whose contents were gleaned from the [#bs-014] `deliterate` utility.

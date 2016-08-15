@@ -160,7 +160,7 @@ module Skylab::Human
 
         pb.add_newline  # #experimental
 
-        _ = pb.string_via_finish
+        _ = pb.flush_to_string
 
         y << _
       end

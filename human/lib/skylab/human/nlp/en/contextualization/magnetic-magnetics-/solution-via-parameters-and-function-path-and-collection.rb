@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection
+    class Magnetic_Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection
 
       # (experimental, born during re-arch. a lot like [#ba-047].)
 
@@ -11,32 +11,28 @@ module Skylab::Human
         undef_method :new
       end  # >>
 
-      def function_symbol_path= x
-        @_forward_m = :__forward_stream_via_path
-        @_reverse_m = :__reverse_stream_via_path
-        @function_symbol_path = x
-      end
-
-      def function_symbol_stack= x
-        @_forward_m = :__forward_stream_via_stack
-        @_reverse_m = :__reverse_stream_via_stack
-        @function_symbol_stack = x
+      def collection= col
+        @_read_FIT_via_const = col.proc_for_read_function_item_ticket_via_const
+        @_read_function_via_FIT = col.proc_for_read_function_item_via_function_item_ticket
+        @collection = col
       end
 
       attr_writer(
+        :function_symbol_stack,
         :parameters,
-        :collection,
       )
 
       def execute
 
-        @_did ||= _prepare
-
         ps = @parameters  # ("parameter store")
 
-        st = send @_forward_m
-        inv = st.gets
+        stack_sym_a = @function_symbol_stack
+        sym_st = Common_::Stream.via_range( stack_sym_a.length-1 .. 0 ) do |d|
+          stack_sym_a.fetch d
+        end
 
+        sym = sym_st.gets
+        inv = _invocation_via_symbol sym ; sym = nil
         begin
 
           # call the current function
@@ -51,8 +47,8 @@ module Skylab::Human
 
           # see if there's a next function
 
-          inv_ = st.gets
-          inv_ || break  # when none, result is 'x' (might be array eek)
+          sym = sym_st.gets
+          sym || break  # when none, result is 'x' (might be array eek)
 
           # when there's a next function, write the results
           # from that last function into the parameter store
@@ -64,12 +60,12 @@ module Skylab::Human
 
           else
             self._COVER_ME
-            sym_a.each_with_index do |sym, d|
-              ps.write_magnetic_value x.fetch( d ), sym
+            sym_a.each_with_index do |sym_, d|
+              ps.write_magnetic_value x.fetch( d ), sym_
             end
           end
 
-          inv = inv_
+          inv = _invocation_via_symbol sym ; sym = nil
           redo
         end while nil
         x
@@ -83,7 +79,7 @@ module Skylab::Human
         a
       end
 
-      def mutate_if_necessary_to_land_on sym  # very near [#ta-005]
+      def _USE_ME_mutate_if_necessary_to_land_on sym  # very near [#ta-005]
 
         @_did ||= _prepare
 
@@ -109,91 +105,18 @@ module Skylab::Human
         NIL_
       end
 
-      def _prepare
-        @_read_FIT_via_const = @collection.proc_for_read_function_item_ticket_via_const
-        @_read_function_via_FIT = @collection.proc_for_read_function_item_via_function_item_ticket
-        ACHIEVED_
+      def bottom_item_ticket_
+        @_read_FIT_via_const[ @function_symbol_stack.fetch( 0 ) ]
       end
 
-      def __flush_to_mutable_stack
+      def _invocation_via_symbol sym
 
-        remove_instance_variable :@_forward_m
-
-        _stack_as_st = send remove_instance_variable :@_reverse_m
-
-        mutable_array = _stack_as_st.to_a
-
-        @function_symbol_path = nil
-        @function_symbol_stack = nil
-        remove_instance_variable :@function_symbol_stack
-        remove_instance_variable :@function_symbol_path
-
-        @_forward_m = :__forward_stream_via_mutable_stack_array
-        @_reverse_m = :__reverse_stream_via_mutable_stack_array
-
-        mutable_array
-      end
-
-      def __forward_stream_via_mutable_stack_array
-        a = @_mutable_stack_array
-        Common_::Stream.via_range( a.length - 1 .. 0 ) do |d|
-          a.fetch d
-        end
-      end
-
-      def __reverse_stream_via_mutable_stack_array
-        Common_::Stream.via_nonsparse_array @_mutable_stack_array
-      end
-
-      def __forward_stream_via_path
-
-        _forward_of :@function_symbol_path
-      end
-
-      def __reverse_stream_via_path
-
-        _reverse_of :@function_symbol_path
-      end
-
-      def __forward_stream_via_stack
-
-        _reverse_of :@function_symbol_stack
-      end
-
-      def __reverse_stream_via_stack
-
-        _forward_of :@function_symbol_stack
-      end
-
-      def _forward_of ivar
-
-        _go Common_::Stream.via_nonsparse_array instance_variable_get ivar
-      end
-
-      def _reverse_of ivar
-
-        sym_a = instance_variable_get ivar
-        _st = Common_::Stream.via_range( sym_a.length - 1 .. 0 ) do |d|
-          sym_a.fetch d
-        end
-        _go _st
-      end
-
-      def _go sym_st
-
-        p = @_read_FIT_via_const
-        p_ = @_read_function_via_FIT
-
-        sym_st.map_by do |sym|
-
-          if sym.respond_to? :call
-
-            custom = sym[]
-            Function_Invocation__.new custom.function, custom
-          else
-            it = p[ sym ]
-            Function_Invocation__.new p_[ it ], it
-          end
+        if sym.respond_to? :call
+          custom = sym[]
+          Function_Invocation__.new custom.function, custom
+        else
+          it = @_read_FIT_via_const[ sym ]
+          Function_Invocation__.new @_read_function_via_FIT[ it ], it
         end
       end
 

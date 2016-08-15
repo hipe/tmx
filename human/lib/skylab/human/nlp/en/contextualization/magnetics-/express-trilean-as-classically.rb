@@ -12,10 +12,9 @@ module Skylab::Human
             o.begin_customization_ collection
           end
 
-          o.push_function_ :Surface_Parts_via_Three_Parts_Of_Speech_and_Trilean
+          o.push_function_ :Inflected_Parts_via_Lemmas_and_Trilean  # the only reference
 
-          o.must_read :surface_parts
-          o.can_read :to_say_selection_stack_item
+          o.must_read :inflected_parts
           o.must_read :trilean
 
           Butter___.new o

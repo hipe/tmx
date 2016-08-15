@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Surface_Parts_via_Three_Parts_Of_Speech_and_Trilean
+    class Magnetics_::Inflected_Parts_via_Lemmas_and_Trilean  # 1x
 
       class << self
 
@@ -14,14 +14,26 @@ module Skylab::Human
       end  # >>
 
       def initialize ps
-
-        @on_failed_proc = ps.on_failed_proc
-        @trilean = ps.trilean
-        @three_parts_of_speech = ps.three_parts_of_speech
+        @_ps = ps
       end
 
       def execute
-        x = @trilean
+
+        ps = @_ps
+
+        @_lemmas = ps.lemmas
+
+        if ! ps._magnetic_value_is_known_ :trilean
+          # (hi.) [#043]
+          if ps._magnetic_value_is_known_ :channel
+            ps.trilean = Magnetics_::Trilean_via_Channel[ ps ]
+          end
+        end
+
+        x = if ps._magnetic_value_is_known_ :trilean
+          ps.trilean
+        end
+
         send ( if x
           :__when_successful
         elsif x.nil?
@@ -33,26 +45,26 @@ module Skylab::Human
 
       def __when_failed
 
-        p = @on_failed_proc
+        p = @_ps.on_failed_proc
         if p
-          sp = Models_::Surface_Parts.begin_via_parts_of_speech @three_parts_of_speech
-          p[ sp, @three_parts_of_speech ]
-          sp
+          ip = Models_::Inflected_Parts.begin_via_lemmas @_lemmas
+          p[ ip, @_lemmas ]
+          ip
         else
-          _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Failed_Classically
+          _go :Inflected_Parts_via_Lemmas_and_Trilean_that_Is_Failure
         end
       end
 
       def __when_neutral
-        _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Neutral_Classically
+        _go :Inflected_Parts_via_Lemmas_and_Trilean_that_Is_Neutral
       end
 
       def __when_successful
-        _go :Surface_Parts_via_Three_Parts_Of_Speech_when_Successful_Classically
+        _go :Inflected_Parts_via_Lemmas_and_Trilean_that_Is_Success  # the only reference
       end
 
       def _go const
-        Magnetics_.const_get( const, false )[ @three_parts_of_speech ]
+        Magnetics_.const_get( const, false )[ @_lemmas ]
       end
     end
   end

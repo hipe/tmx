@@ -2,134 +2,117 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Contextualized_Line_via_Line_and_Emission
+    class Magnetics_::Line_Contextualization_via_Line  # referenced 1x
 
-      # this whole node is primarily to get [br] to transition off of doing
-      # its own c15n. when dust settles we may DRY it up with its siblings.
-      # (because for one thing, as it is it is not configurable.)
+      # a low level *MUST-VISIT* map to simply:
+      #
+      #   - temporarily remove and memo any parenthesis or similar and
+      #     related, like trailing newlines then
+      #
+      #   - normalize received string content so it is receptive to
+      #     contextualization (i.e make the first uppcase letter lowercase
+      #     if it looks OK to do) then
+      #
+      #   - yield to the contextualizing client (typically the client
+      #     adds something to the beginning and/or end of the string,
+      #     thru the "parts" structure) then
+      #
+      #   - re-apply those any opening and closing e.g parenthesis to
+      #     produce the final, contextualized *first* line.
+      #
+      # justification:
+      #
+      # any operation that we consider a "contexutalization" should want
+      # this above behavior. there is no imaginable such operation that
+      # would not want it. implement this behavior nowhere but here. hence
+      # all pipelines must go thru this node.
+      #
+      # originally moved here from whatever hard-coded c15n [br] did. the
+      # more interesting parts from there (the actual linguistic operations)
+      # have since been abstracted to neighbor nodes and might be sunsetted.
+      #
+      # during #open [#043] perhaps make it compliant to that rather than
+      # having this custom interface.
 
       class << self
-        alias_method :begin, :new
-        undef_method :new
+
+        def call line
+          new( line ).execute
+        end
+        alias_method :[], :call
+
+        private :new
       end  # >>
 
-      def initialize
-        @event = nil
-        @to_pre_articulate_ = nil
+      def initialize line
+        @line = line
       end
-
-      attr_writer(
-        :event,
-        :trilean,
-      )
-
-      attr_writer(
-        :line,
-      )
 
       def execute
-        @_function = if @event
-          __function_when_event
-        end
-        __assemble_the_line
-      end
-
-      def __function_when_event
-
-        ok = @trilean
-        if ok
-          ev = @event.to_event
-          ev = ev.to_event
-          if ev.has_member :is_completion and ev.is_completion
-            _is_comp = true
-          end
-          if _is_comp
-            Magnetics_::Line_Parts_via_Line_and_Event_that_is_Completion
-          else
-            Magnetics_::Line_Parts_via_Line_and_Event_and_Trilean_that_is_Positive
-          end
-        elsif ok.nil?
-          Do_Not_Contextualize_Line___
-        else
-          Magnetics_::Line_Parts_via_Line_and_Event_and_Trilean_that_is_Negative
-        end
-      end
-
-      def __assemble_the_line
-
-        @_parts = Parts___.new
 
         __unparenthesize_the_line
 
         __downcase_the_first_letter
 
-        __specific_mutations
-
-        remove_instance_variable( :@_parts ).values.join
-      end
-
-      Parts___ = ::Struct.new :open, :prefix, :content, :suffix, :close
-
-      def __unparenthesize_the_line
-
-        o = @_parts
-
-        _line = remove_instance_variable :@line
-
-        o.open, o.content, o.close =
-          Home_.lib_.basic::String.unparenthesize_message_string _line
-
-        NIL_
+        Line_Contextualization___.new remove_instance_variable :@_parts
       end
 
       def __downcase_the_first_letter
-        Mutate_by_downcasing_first___[ @_parts.content ]
+        Mutate_by_downcasing_first___[ @_parts.normalized_original_content_string ]
         NIL_
       end
 
-      def __specific_mutations
-        p = @to_pre_articulate_
-        if p
-          p[ self ]
-        else
-          f = remove_instance_variable :@_function
-          if f
-            f.via_magnetic_parameter_store self
-          end
+      def __unparenthesize_the_line
+
+        o = Mutable_Line_Parts___.new
+
+        _line = remove_instance_variable :@line
+
+        o.open_string,
+        o.normalized_original_content_string,
+        o.close_string =
+          Home_.lib_.basic::String.unparenthesize_message_string _line
+
+        @_parts = o
+
+        NIL_
+      end
+
+      # ==
+
+      class Line_Contextualization___
+
+        def initialize mlp
+          @_mutable_line_parts = mlp  # #spot-5
         end
-        NIL_
+
+        def content_string_looks_like_one_word_
+          LOOKS_LIKE_ONE_WORD_RX___ =~ @_mutable_line_parts.normalized_original_content_string
+        end
+
+        LOOKS_LIKE_ONE_WORD_RX___ = /\A[a-z]+$/
+
+        def mutate_line_parts_by
+          yield @_mutable_line_parts
+          NIL_
+        end
+
+        def to_string__
+          @_mutable_line_parts.values.join EMPTY_S_
+        end
       end
 
-      # -- ( mini-API for the above clients )
+      # ==
 
-      def mutate_line_parts_by  # yields "mutable line parts" ("mlp")
-        yield @_parts
-        NIL_
-      end
-
-      attr_reader(
-        :event,
+      Mutable_Line_Parts___ = ::Struct.new(  # :#spot-5
+        :open_string,
+        :prefixed_string,
+        :normalized_original_content_string,
+        :suffixed_string,
+        :close_string,
       )
 
-      attr_writer(
-        :to_pre_articulate_,
-      )
-
-      # --
-
-      module Do_Not_Contextualize_Line___
-        def self.via_magnetic_parameter_store _
-          Home_._COVER_ME_reimplement_me_easy
-        end
-      end
-
-      # --
-
-      def content_string_looks_like_one_word_
-        LOOKS_LIKE_ONE_WORD_RX___ =~ @_parts.content
-      end
-
-      LOOKS_LIKE_ONE_WORD_RX___ = /\A[a-z]+$/
+      # ==
 
       Mutate_by_downcasing_first___ = -> do
         rx = nil

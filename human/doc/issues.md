@@ -40,6 +40,8 @@
              (#open [#ta-005]), we hack thru that part of it for now..
              (and #spot-4 is an old waylaid thing related)
 
+             "B": take all verb_lemma etc out of all events
+
 [#042]       (segment on NPR - joel warner ; peter macgraw ; manatee)
 [#041]       track wishes for conjunction phrase support #universal
 [#040]       a note

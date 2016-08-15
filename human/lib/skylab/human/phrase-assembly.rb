@@ -89,8 +89,15 @@ module Skylab::Human
 
     COMMON_PUNCTUATION___ = ::Hash[ ',.?!'.each_byte.map { |d| [d, true] } ]
 
+    def add_space_if_necessary
+      x = @_tokens.last
+      if ! x || Lazy_Space__[] != x
+        add_lazy_space
+      end
+    end
+
     def add_lazy_space
-      _add Lazy_Space___[]
+      _add Lazy_Space__[]
     end
 
     def add_comma
@@ -108,6 +115,7 @@ module Skylab::Human
     def _add_common_punctuation s
       _add [ :trailing, s ]
     end
+
     def _add trueish_x
       send @_add_m, trueish_x
     end
@@ -130,7 +138,7 @@ module Skylab::Human
 
     # --
 
-    def string_via_finish
+    def flush_to_string
       express_into ""
     end
 
@@ -163,7 +171,7 @@ module Skylab::Human
       Common_::Polymorphic_Stream.via_array remove_instance_variable :@_tokens
     end
 
-    Lazy_Space___ = Lazy_.call do
+    Lazy_Space__ = Lazy_.call do
 
       # expressed as a space IFF it's the non-first token, otherwise adds
       # the empty string to the string. (this token may not work as expected
