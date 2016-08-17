@@ -139,7 +139,7 @@ module Skylab::Human
         def express_string_into_under y, expag  # :+#experimenal here
 
           _y_ = express_words_into_under [], expag
-          y << Home_::Phrase_Assembly::Sentence_string_head_via_words[ _y_ ]
+          y << Home_::PhraseAssembly::Sentence_string_head_via_words[ _y_ ]
         end
 
         def express_words_into_under y, expag

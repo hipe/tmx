@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - express brazenly" do  # :#c15n-test-family-2
+  describe "[hu] NLP - EN - contextualization - againt participating event" do  # :#c15n-test-family-2
 
     TS_Joist_[ self ]
     use :memoizer_methods
@@ -11,25 +11,25 @@ module Skylab::Human::TestSupport
     it "all inline / expression / negative - nothing" do
 
       _a = _lines_via_emission :error, :expression, :_no_see_2_ do |y|
-        y << "not in the #{ highlight 'mood' } for shenanigans"
+        y << "Not in the #{ highlight 'mood' } for shenanigans"
         y << "nope"
         y << "fire"
       end
 
       _a.should eql [
-        "not in the ** mood ** for shenanigans\n",
+        "Not in the ** mood ** for shenanigans\n",
         "nope\n", "fire\n" ]
     end
 
     it "all inline / expression / neutral - nothing" do
 
       _a = _lines_via_emission :info, :expression, :_no_see_ do |y|
-        y << "things look #{ highlight 'good' }"
+        y << "Things look #{ highlight 'good' }"
         y << "yep"
         y << "such good"
       end
 
-      _a.should eql [ "things look ** good **\n", "yep\n", "such good\n" ]
+      _a.should eql [ "Things look ** good **\n", "yep\n", "such good\n" ]
     end
 
     _Fake_lexeme = -> x do
@@ -95,7 +95,7 @@ module Skylab::Human::TestSupport
 
     it "../ event / completion / two words - " do
 
-      _a = _lines_via_emission :"_anything?_", :_no_see_ do
+      _a = _lines_via_emission :success, :_not_expression_ do
 
         Common_::Event.inline_OK_with(
           :wazoozicle,
@@ -113,7 +113,7 @@ module Skylab::Human::TestSupport
 
     it "../ event / completion - one word - " do
 
-      _a = _lines_via_emission :"_anything?_", :_no_see_ do
+      _a = _lines_via_emission :success, :_not_expression_ do
 
         Common_::Event.inline_OK_with(
           :wazoozicle,
@@ -121,12 +121,12 @@ module Skylab::Human::TestSupport
           :verb_lexeme, _Fake_lexeme[ 'eat' ],
           :is_completion, true
         ) do | y, o |
-          y << 'donezo'  # need 1 words here
+          y << '(donezo.)'  # need 1 words here
           y << 'wee'
         end
       end
 
-      _a.should eql [ "donezo eating fish\n", "wee\n" ]
+      _a.should eql [ "(donezo eating fish.)\n", "wee\n" ]
     end
 
     def _lines_via_emission * i_a, & ev_p

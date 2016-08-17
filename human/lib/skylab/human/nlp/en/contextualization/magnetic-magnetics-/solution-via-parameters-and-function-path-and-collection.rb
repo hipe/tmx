@@ -56,12 +56,12 @@ module Skylab::Human
           sym_a = inv.item_ticket.product_term_symbols
           if 1 == sym_a.length
 
-            ps.write_magnetic_value x, sym_a.first
+            ps._write_magnetic_value_ x, sym_a.first
 
           else
             self._COVER_ME
             sym_a.each_with_index do |sym_, d|
-              ps.write_magnetic_value x.fetch( d ), sym_
+              ps._write_magnetic_value_ x.fetch( d ), sym_
             end
           end
 
@@ -74,7 +74,7 @@ module Skylab::Human
       def __build_arguments_for_function inv, ps
         a = []
         inv.item_ticket.prerequisite_term_symbols.each do |sym|
-          a.push ps.read_magnetic_value sym
+          a.push ps._read_magnetic_value_ sym
         end
         a
       end

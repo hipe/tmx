@@ -1,6 +1,6 @@
 module Skylab::Human
 
-  class Phrase_Assembly  # :[#046] (1 mentor)
+  class PhraseAssembly  # :[#046] (1 mentor)
 
     # this is *the* suite of methods (implemented as a session) for building
     # a "phrase" (string) from a collection of "tokens" while managing the
@@ -49,6 +49,14 @@ module Skylab::Human
 
     class << self
 
+      def [] * s_a  # experimental high-level convenience stringifier
+        o = begin_phrase_builder
+        s_a.each do |s|
+          o.add_any_string s
+        end
+        o.flush_to_string
+      end
+
       def begin_phrase_builder
         new.__init_phrase_builder
       end
@@ -59,6 +67,7 @@ module Skylab::Human
     def __init_phrase_builder
 
       @_add_m = :__add_first_token
+      @_has_nonzero_tokens = false
       @_sexp_via_finish_m = :_sexp_via_finish_when_empty
       @_2nd_sexp_via_finish_m = :__sexp_via_finish_when_non_empty
       @previous_sexp = nil
@@ -79,6 +88,13 @@ module Skylab::Human
       NIL_
     end
 
+    def add_any_string_as_is s
+      if s
+        add_string_as_is s
+      end
+      NIL_
+    end
+
     def add_string s
       if COMMON_PUNCTUATION___[ s.getbyte 0 ]
         _add_common_punctuation s
@@ -90,8 +106,7 @@ module Skylab::Human
     COMMON_PUNCTUATION___ = ::Hash[ ',.?!'.each_byte.map { |d| [d, true] } ]
 
     def add_space_if_necessary
-      x = @_tokens.last
-      if ! x || Lazy_Space__[] != x
+      if @_has_nonzero_tokens && @_tokens.last != Lazy_Space__[]
         add_lazy_space
       end
     end
@@ -109,11 +124,15 @@ module Skylab::Human
     end
 
     def add_newline
-      _add [ :as_is, NEWLINE_ ]
+      add_string_as_is NEWLINE_
     end
 
     def _add_common_punctuation s
       _add [ :trailing, s ]
+    end
+
+    def add_string_as_is s
+      _add [ :as_is, s ]
     end
 
     def _add trueish_x
@@ -121,6 +140,7 @@ module Skylab::Human
     end
 
     def __add_first_token o
+      @_has_nonzero_tokens = true
       @_tokens = [ o ]
       @_add_m = :___add_subsequent_token
       @_sexp_via_finish_m = remove_instance_variable :@_2nd_sexp_via_finish_m
@@ -139,7 +159,9 @@ module Skylab::Human
     # --
 
     def flush_to_string
-      express_into ""
+      if @_has_nonzero_tokens
+        express_into ""
+      end
     end
 
     def express_into y

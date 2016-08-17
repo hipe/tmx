@@ -121,7 +121,7 @@ module Skylab::Human
       end
 
       def final_separator= x
-        self.final_separator_sexp = Home_::Phrase_Assembly::Guess_sexp_via_string[ x ]
+        self.final_separator_sexp = Home_::PhraseAssembly::Guess_sexp_via_string[ x ]
       end
 
       def final_separator_sexp= x
@@ -129,7 +129,7 @@ module Skylab::Human
       end
 
       def separator= x
-        self.separator_sexp = Home_::Phrase_Assembly::Guess_sexp_via_string[ x ]
+        self.separator_sexp = Home_::PhraseAssembly::Guess_sexp_via_string[ x ]
       end
 
       def separator_sexp= x
@@ -198,7 +198,7 @@ module Skylab::Human
 
       def flush_to_word_string_stream___
         _st = _assembly_sexp_stream_via_finish
-        Home_::Phrase_Assembly::Word_string_stream_via_sexp_stream[ _st ]
+        Home_::PhraseAssembly::Word_string_stream_via_sexp_stream[ _st ]
       end
 
       # --
@@ -222,7 +222,7 @@ module Skylab::Human
               final = st.gets_one
 
               begin_phrase_assembly = -> do
-                Home_::Phrase_Assembly.begin_phrase_builder
+                Home_::PhraseAssembly.begin_phrase_builder
               end
 
               final_p = -> do
@@ -462,7 +462,7 @@ module Skylab::Human
             if :the_empty_sexp == sx.first
               redo
             end
-            s = if Home_::Phrase_Assembly::Add_space_between[ prev, sx ]
+            s = if Home_::PhraseAssembly::Add_space_between[ prev, sx ]
               "#{ SPACE_ }#{ sx.fetch 1 }"
             else
               sx.fetch 1

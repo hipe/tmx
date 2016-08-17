@@ -2,38 +2,30 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::First_Line_Proc_via_Event_that_Is_Failure ; class << self
+    module Magnetics_::First_Line_Map_via_Evento_Trilean_Idiom::That_Is_Lemmatic_Failed_To_Frob ; class << self
 
-      def mutate_line_contextualization_ lc, ev
+      def via_magnetic_parameter_store ps
 
-        vl = ev.verb_lexeme
-        if vl
-          v_s = vl.lemma_string
-        end
-
-        if ev.respond_to? :noun_lexeme
-          nl = ev.noun_lexeme
-          if nl
-            n_s = nl.lemma_string
+        -> line do
+          if ps.lemmas
+            __map_line line, ps
+          else
+            self._COVER_ME
           end
         end
+      end
 
-        if v_s || n_s
+      alias_method :[], :via_magnetic_parameter_store
 
-          as = Home_::Phrase_Assembly.begin_phrase_builder
-          as.add_string "couldn't"
-          as.add_any_string v_s
-          as.add_any_string n_s
-          as.add_string "because"
-          as.add_lazy_space
+      def __map_line line, ps
 
-          _ = as.flush_to_string
-          lc.mutate_line_parts_by do |mlp|  # #spot-5
-            mlp.prefixed_string = _
-          end
+        Magnetics_::First_Line_Map_via_Lemmas_and_Lemmato_Trilean_Idiom::
+            Idiom_that_Is_Failed_To_Frob.
+        map_line line, ps do |lc|
+
+          lc.mutable_line_parts.prefixed_string << SPACE_ << BECAUSE_
+          NIL_
         end
-
-        NIL_
       end
     end ; end
   end

@@ -10,10 +10,12 @@ module Skylab::Human
 
           o.begin_customization_ collection
 
-          o.must_read :contextualized_line_stream
+          o.can_read :channel
           o.must_read :expression_agent
-          o.must_read :precontextualized_line_stream
-          o.must_read :selection_stack
+          o.can_read :lemmas
+          o.must_read :precontextualized_line_streamer
+          o.can_read :selection_stack
+          o.must_read :trilean
 
           NIL_
         end

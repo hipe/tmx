@@ -39,18 +39,7 @@ module Skylab::Human::TestSupport
         # (order matters while #open [#043] because it's building a magnetic
         # function stack, so highest level (last to run) first)
 
-        _but = o.express_trilean.classically.but
-
-        _but.on_failed = -> ip, lemz do  # surface parts
-
-          ip.prefixed_cojoinder = nil
-          ip.verb_subject = nil
-          ip.inflected_verb = "couldn't #{ lemz.verb_lemma }"
-          ip.verb_object = lemz.verb_object
-          ip.suffixed_cojoinder = "because"
-          NIL_
-        end
-
+        o.express_trilean.classically
         o.express_subject_association.integratedly
 
         same = -> asc do
@@ -267,3 +256,4 @@ module Skylab::Human::TestSupport
     end
   end
 end
+# #tombstone: butter

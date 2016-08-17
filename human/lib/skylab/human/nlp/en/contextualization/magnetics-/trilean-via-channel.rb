@@ -5,7 +5,14 @@ module Skylab::Human
     module Magnetics_::Trilean_via_Channel ; class << self
 
       def via_magnetic_parameter_store ps
-        __via_channel ps.channel
+
+        # (the client could have set the trilean explicitly, which overrides this)
+
+        if ps._magnetic_value_is_known_ :trilean
+          ps.trilean
+        else
+          __via_channel ps.channel
+        end
       end
 
       alias_method :[], :via_magnetic_parameter_store
@@ -17,6 +24,7 @@ module Skylab::Human
       VALUES___ = {
         error: false,
         info: nil,
+        success: true,  #c15n-testpoint-1
       }
     end ; end
   end

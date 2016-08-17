@@ -29,7 +29,7 @@ module Skylab::Human
     end  # >>
 
     def to_string_with_punctuation_hack_ s_a
-      Home_::Phrase_Assembly::Sentence_string_head_via_words[ s_a ]
+      Home_::PhraseAssembly::Sentence_string_head_via_words[ s_a ]
     end
       # -
     end

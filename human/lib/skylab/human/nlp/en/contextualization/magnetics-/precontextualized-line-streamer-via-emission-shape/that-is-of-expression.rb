@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::Precontextualized_Line_Stream_via_Emission_that_Is_Expression ; class << self
+    module Magnetics_::Precontextualized_Line_Streamer_via_Emission_Shape::That_Is_Of_Expression ; class << self
 
       def via_magnetic_parameter_store ps
 
@@ -15,15 +15,17 @@ module Skylab::Human
         # streaming but note this is a hidden implementation decision.
         # (this comment is referenced by sibling.)
 
-        a = []
+        lines = []
 
         _y = ::Enumerator::Yielder.new do |s|
-          a << Plus_newline_if_necessary_[ s ]
+          lines << Plus_newline_if_necessary_[ s ]
         end
 
         ps.expression_agent.calculate _y, & ps.emission_proc
 
-        Common_::Stream.via_nonsparse_array a
+        -> do
+          Common_::Stream.via_nonsparse_array lines
+        end
       end
 
       alias_method :[], :via_magnetic_parameter_store

@@ -2,26 +2,13 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::String_Array_via_Procs_and_Selection_Stack
-
-      class << self
-
-        def via_magnetic_parameter_store ps
-          new( ps ).execute
-        end
-
-        alias_method :[], :via_magnetic_parameter_store
-      end  # >>
-
-      def initialize ps
-        @_ps = ps
-      end
+    class Magnetics_::Normal_Selection_Stack_via_Selection_Stack < Magnet_
 
       def execute
 
         a = []
 
-        ps = @_ps
+        ps = @ps_
 
         ea = ps.expression_agent
         ea ||= Non_expressive_expresion_agent_instance___[]
@@ -29,6 +16,7 @@ module Skylab::Human
         st = __build_selection_stack_value_scanner
 
         default_p = ps.to_say_selection_stack_item
+        default_p ||= Express_selection_stack_item___
 
         _first_p = ps.to_say_first_selection_stack_item
 
@@ -69,7 +57,7 @@ module Skylab::Human
 
         # first of all, the ss might be a linked list (move this whenever)
 
-        ss = @_ps.selection_stack
+        ss = @ps_.selection_stack
         ss_a = ::Array.try_convert ss
         if ! ss_a
           ss_a = ss.to_array  # assume [#ba-002]#LL
@@ -78,6 +66,15 @@ module Skylab::Human
         # secondly, the selection stack can be sparse so stream over it this way:
 
         Common_::Polymorphic_Stream.via_array ss_a
+      end
+
+      # ==
+
+      Express_selection_stack_item___ = -> x do
+        nf = x.name  # :[#048]. allows root to have a name
+        if nf
+          nm nf
+        end
       end
 
       # ==

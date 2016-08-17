@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::Precontextualized_Line_Stream_via_Emission_that_Is_Event ; class << self
+    module Magnetics_::Precontextualized_Line_Streamer_via_Emission_Shape::That_Is_Of_Event ; class << self
 
       def via_magnetic_parameter_store ps
 
@@ -14,11 +14,13 @@ module Skylab::Human
           lines.push Plus_newline_if_necessary_[ s ]
         end
 
-        ev = ps.event
+        ev = ps.possibly_wrapped_event.to_event
 
         ps.expression_agent.calculate _y, ev, & ev.message_proc
 
-        Common_::Stream.via_nonsparse_array lines
+        -> do
+          Common_::Stream.via_nonsparse_array lines
+        end
       end
 
       alias_method :[], :via_magnetic_parameter_store

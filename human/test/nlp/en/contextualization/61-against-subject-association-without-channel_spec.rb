@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - nestedly" do
+  describe "[hu] NLP - EN - contextualization - against subject association without channel" do
 
     # :#C15n-test-family-3
 

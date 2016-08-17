@@ -16,7 +16,10 @@ module Skylab::Human
       @_rw = nil
 
       Do_big_index_and_enhance_once___[]
-      NIL_
+
+      # -- experimental
+
+      @_possibly_wrapped_event_value_is_known = false
     end
 
     def dup
@@ -53,38 +56,26 @@ module Skylab::Human
       :state_crutch_,
     )
 
-    def push_inline_function_ a, a_, f
-      ifu = nil
-      @_function_symbol_stack.push -> do
-        ifu ||= Here_::Models_::InlineFunction.new a, a_, f  # #here-2
-      end
-    end
-
-    def push_function_ sym
-      sym == @_function_symbol_stack.last && self._WHERE  # #todo
-      @_function_symbol_stack.push sym ; nil
-    end
-
     # -- experimental "var" API (first part)
 
     Magnetic_routing_attr_accessor_ = -> cls, * sym_a do
 
       # simply routes the reading and writing thru these methods:
       #
-      #     write_magnetic_value
-      #     read_magnetic_value
+      #     _write_magnetic_value_
+      #     _read_magnetic_value_
 
       cls.class_exec do
 
         sym_a.each do |sym|
 
           define_method "#{ sym }=" do |x|
-            write_magnetic_value x, sym
+            _write_magnetic_value_ x, sym
             x
           end
 
           define_method sym do
-            read_magnetic_value sym
+            _read_magnetic_value_ sym
           end
         end
 
@@ -94,17 +85,29 @@ module Skylab::Human
 
     Magnetic_routing_attr_accessor_.call( self,
       :channel,
-      :event,
       :expression_agent,
-      :inflected_parts,
       :lemmas,
-      :precontextualized_line_stream,
+      :precontextualized_line_streamer,
       :selection_stack,
       :trilean,
     )
 
     # -- (we want the above to be simplified into the below during #open [#043])
     #
+
+    def possibly_wrapped_event  # use with caution. experimental..
+
+      # because it's not interesting to put the event-touching into the
+      # graph, we just write a lazy reader here "by hand" but note there
+      # are at least two assumptions being made, the second one is that..
+
+      unless @_possibly_wrapped_event_value_is_known
+        @_possibly_wrapped_event_value_is_known = true
+        @possibly_wrapped_event = @emission_proc.call
+      end
+
+      @possibly_wrapped_event
+    end
 
     # - the below haven't been needed yet, they default to a default
 
@@ -125,11 +128,20 @@ module Skylab::Human
     )
 
     attr_accessor(
-      :contextualized_line_stream,
+      :contextualized_line_streamer,
       :downstream_selective_listener_proc,
       :emission_proc,
-      :on_failed_proc,
+      :emission_shape,
+      :event_shape,
+      :evento_trilean_idiom,
+      :first_line_map,
+      :idiom_for_failure,
+      :idiom_for_neutrality,
+      :idiom_for_success,
+      :lemmato_trilean_idiom,
+      :normal_selection_stack,
       :subject_association,
+      :trilean_idiom,
       :to_say_selection_stack_item,
       :to_say_subject_association,
     )
@@ -140,35 +152,39 @@ module Skylab::Human
 
       begin_customization_ COLLECTION_
 
-      must_read :channel
+      can_read :channel
       self.channel = sym_a
 
       @emission_proc = ev_p
 
       # (unforgiveable crutch:) expect user can set these
       must_read :expression_agent
-      must_read :event
-      must_read :precontextualized_line_stream
-      must_read :selection_stack
+      can_read :lemmas
+      must_read :precontextualized_line_streamer
+      can_read :selection_stack
       must_read :trilean
 
       NIL_
     end
 
-    def express_into_under line_yielder, expag  # assume self is ad-hoc mutable
-      self.expression_agent = expag
-      express_into line_yielder
-    end
+    def to_exception  # makes several assumptions:
+      # assume e.g `given_emission` was called
+      # covered by #C15n-test-family-5
+      # (looks like #[#ca-066] emission-to-exception pattern)
 
-    def express_into line_yielder  # assume is ad-hoc mutable
+      if ! _magnetic_value_is_known_ :expression_agent
+        self.expression_agent = Home_.lib_.brazen::API.expression_agent_instance
+      end
 
-      @line_yielder = line_yielder
+      if :expression == self.channel.fetch( 1 )
 
-      if @_function_symbol_stack.length.zero?
-
-        Magnetics_::Contextualized_Expression_via_Emission[ self ]
+        a = _solve_stack_for_contextualized_expression
+        a = a.dup
+        a[ 0 ] = :Exception_via_Contextualized_Line_Streamer_and_First_Line_Map
+        _wow = _execute_stack a
+        _wow  # #todo
       else
-        _solve_for_contextualized_expression
+        self._EASY_just_build_the_event_and_call_to_exception_on_it
       end
     end
 
@@ -188,8 +204,27 @@ module Skylab::Human
 
         inst.downstream_selective_listener_proc = downstream_oes_p
 
-        inst._solve_for_contextualized_expression
+        inst._common_express
       end
+    end
+
+    def build_string  # might just be a #feature-island
+
+      # changes radically at [#043]
+      @_function_symbol_stack.length.zero? || Home_._FIXME
+      _execute_stack Hardcoded_path_1_classic___[]
+    end
+
+    def express_into_under line_yielder, expag  # assume self is ad-hoc mutable
+      self.expression_agent = expag
+      express_into line_yielder
+    end
+
+    def express_into line_yielder  # assume is ad-hoc mutable
+
+      @line_yielder = line_yielder
+      @_function_symbol_stack.length.zero? || Home_._FIXME
+      _common_express
     end
 
 #==BEGIN
@@ -234,54 +269,18 @@ module Skylab::Human
     end
 
     NODES__ = {
-      inflected_verb: :nilable,
-      verb_lemma: :nilable,
-      verb_subject: :nilable,
-      verb_object: :nilable,
+      inflected_verb_string: :nilable,
+      verb_lemma_string: :nilable,
+      verb_subject_string: :nilable,
+      verb_object_string: :nilable,
     }
 
     attr_accessor(  # the below are plain old options, not used as nodes
       :emission_downhandler,
     )
-    end
-#==END
 
     # -- different forms of expression
 
-    def to_exception  # look:
-      # assume e.g `given_emission` was called
-      # mutate receiver
-      # covered by #C15n-test-family-5
-      # (looks like #[#ca-066] emission-to-exception pattern)
-
-      if :expression == self.channel.fetch( 1 )
-        ___exception_via_expression
-      else
-        self._EASY_just_build_the_event_and_call_to_exception_on_it
-      end
-    end
-
-    def ___exception_via_expression
-
-      if ! _magnetic_value_is_known_ :expression_agent
-        self.expression_agent = Home_.lib_.brazen::API.expression_agent_instance
-      end
-
-      s = express_into ""
-      s.chop!  # weee
-
-      sym = self.channel[ 2 ]
-      cls = if sym
-        Common_::Event::To_Exception::Class_via_symbol.call sym do
-          NOTHING_
-        end
-      end
-      cls ||= ::RuntimeError
-      cls.new s
-    end
-
-#==BEGIN
-    if false
     def _will_express_emission
       Here_::Express_Emission___[ self ] ; nil  # (changed to Expression_via_Emission)
     end
@@ -297,62 +296,99 @@ module Skylab::Human
     end
 #==END
 
-    def build_string  # might just be a #feature-island
-
-      # changes radically at [#043]
-
-      a = @_function_symbol_stack
-      o = _begin_solution
-      o.function_symbol_stack = a
-
-      _hi  = o.bottom_item_ticket_
-      _hi.product_term_symbols == [ :inflected_parts ] || fail
-      _ip = o.execute
-      _ip.to_string__
+    def _common_express
+      _a = _solve_stack_for_contextualized_expression
+      _execute_stack _a
     end
 
-    def _solve_for_contextualized_expression
+    def _solve_stack_for_contextualized_expression
 
-      # very much a crutch for #open [#043]
+      if channel
 
-      mutable_a = @_function_symbol_stack.dup
+        self.emission_shape = Magnetics_::Emission_Shape_via_Channel[ self ]
 
-      o = _begin_solution
+        if :Is_Of_Event == @emission_shape
+          Hardcoded_path_2_event___[]
+        elsif _magnetic_value_is_known_ :selection_stack
+          Hardcoded_path_4_predicative___[]
+        else
+          Hardcoded_path_5_passthru___[]
+        end
 
-      o.function_symbol_stack = mutable_a
+      elsif subject_association
 
-      _hi = o.bottom_item_ticket_
+        self.emission_shape = :Is_Of_Expression
+        Hardcoded_path_3_no_channel_just_SA___[]
 
-      _hi.const == :Inflected_Parts_via_Lemmas_and_Trilean || fail
-
-      mutable_a.unshift :Contextualized_Expression_via_Emission
-
-      o.execute
+      else
+        self._COVER_ME
+      end
     end
 
-    def _solve_via_function_symbol_stack a
-
-      o = _begin_solution
-      o.function_symbol_stack = a
-      o.execute
+    common_finish = Lazy_.call do
+      [
+        :Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape,
+        :Contextualized_Line_Streamer_via_First_Line_Map_and_Precontextualized_Line_Streamer,
+        :Precontextualized_Line_Streamer_via_Emission_Shape,
+      ]
     end
 
-    def _begin_solution
+    classic_start = Lazy_.call do
+      [
+        :First_Line_Map_via_Lemmas_and_Lemmato_Trilean_Idiom,
+        :Lemmato_Trilean_Idiom_via_Trilean,
+        :Lemmas_via_Normal_Selection_Stack,
+        :Normal_Selection_Stack_via_Selection_Stack,
+        :Trilean_via_Channel,
+      ]
+    end
+
+    Hardcoded_path_5_passthru___ = Lazy_.call do
+      [
+        :Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape,
+        :Contextualized_Line_Streamer_via_Passthru_and_Precontextualized_Line_Streamer,
+        :Precontextualized_Line_Streamer_via_Emission_Shape,
+      ].freeze
+    end
+
+    Hardcoded_path_4_predicative___ = Lazy_.call do
+      [
+        * common_finish[],
+        * classic_start[],
+      ].freeze
+    end
+
+    Hardcoded_path_3_no_channel_just_SA___ = Lazy_.call do
+      [
+        * common_finish[],
+        :First_Line_Map_via_Subject_Association,
+      ].freeze
+    end
+
+    Hardcoded_path_2_event___ = Lazy_.call do
+      [
+        * common_finish[],
+        :First_Line_Map_via_Evento_Trilean_Idiom,
+        :Evento_Trilean_Idiom_via_Event_and_Trilean,
+        :Trilean_via_Channel,
+      ].freeze
+    end
+
+    Hardcoded_path_1_classic___ = Lazy_.call do
+      [
+        :Message_That_Is_Single_String_via_First_Line_Map,
+        * classic_start[],
+      ].freeze
+    end
+
+    def _execute_stack sym_a
 
       o = Here_::Magnetic_Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
-      o.parameters = self
       o.collection = @_collection
-      o
-    end
-
-    def emission_is_expression__
-
-      if _magnetic_value_is_known_ :channel
-        _yes = :expression == self.channel[1]  # #[#br-023]. [sli] has 1-item channels
-      else
-        _yes = true
-      end
-      _yes  # #todo
+      o.function_symbol_stack = sym_a
+      o.parameters = self
+      _ = o.execute
+      _ # #todo
     end
 
     # -- experimental "var" API (second part)
@@ -388,50 +424,161 @@ module Skylab::Human
       )
     end
 
-    def write_magnetic_value x, sym
-      _var = @_rw.fetch sym
-      instance_variable_set _var.ivar, Common_::Known_Known[ x ]
+    def _write_magnetic_value_ x, sym
+      par = @_rw[ sym ]
+      if par
+        instance_variable_set par.ivar, Common_::Known_Known[ x ]
+      else
+        instance_variable_set :"@#{ sym }", x
+      end
       NIL_
     end
 
-    def read_magnetic_value_with_certainty sym
-
-      instance_variable_get( @_rw.fetch( sym ).ivar ).value_x
+    def _read_any_magnetic_value_ sym
+      par = @_rw[ sym ]
+      if par
+        ivar = par.ivar
+        if instance_variable_defined? ivar
+          instance_variable_get( ivar ).value_x
+        end
+      end
     end
 
-    def read_magnetic_value sym
+    def _read_magnetic_value_with_certainty_ sym
 
-      var = @_rw.fetch sym
-      ivar = var.ivar
+      par = @_rw[ sym ]
+      if par
+        instance_variable_get( par.ivar ).value_x
+      else
+        ivar = :"@#{ sym }"
+        if instance_variable_defined? ivar
+          instance_variable_get ivar
+        else
+          raise ::NameError.new ivar
+        end
+      end
+    end
 
-      if var.is_required or instance_variable_defined? ivar
+    def _read_magnetic_value_ sym
+
+      par = @_rw.fetch sym
+      ivar = par.ivar
+
+      if par.is_required or instance_variable_defined? ivar
         instance_variable_get( ivar ).value_x
+      end
+    end
+
+    def _magnetic_value_is_known_and_trueish_ sym
+      par = @_rw[ sym ]
+      if par
+        ivar = par.ivar
+        if instance_variable_defined? ivar
+          instance_variable_get( ivar ) ? true : false
+        end
       end
     end
 
     def _magnetic_value_is_known_ sym
 
-      var = @_rw[ sym ]
-      if var
-        instance_variable_defined? var.ivar
+      par = @_rw[ sym ]
+      if par
+        instance_variable_defined? par.ivar
       end
     end
 
     # ==
 
+    class Magnet_
+      # (we prefer our magnetic functions to be small, stateless and module-
+      #  based but when they are not, we use this base class to avoid boilerplate)
+      class << self
+        def via_magnetic_parameter_store ps
+          new( ps ).execute
+        end
+        alias_method :[], :via_magnetic_parameter_store
+        private :new
+      end  # >>
+
+      def initialize ps
+        @ps_ = ps
+      end
+    end
+
     module Magnetics_
 
-      _Express_subject_association___ = -> asc do
+      # :#vanguards-of-experiment: magnetic switch statement
+
+      module Contextualized_Line_Streamer_via_Passthru_and_Precontextualized_Line_Streamer ; class << self
+        def via_magnetic_parameter_store ps
+          ps.precontextualized_line_streamer
+        end
+      end ; end
+
+      module Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape
+        class << self
+          def via_magnetic_parameter_store ps
+            _sym = ps.emission_shape
+            _const = :"Shape_that_#{ _sym }"
+            const_get( _const, false )[ ps ]
+          end
+          alias_method :[], :via_magnetic_parameter_store
+        end  # >>
+        Autoloader_[ self ]
+      end
+
+      module First_Line_Map_via_Evento_Trilean_Idiom
+        class << self
+          def via_magnetic_parameter_store ps
+            _sym = ps.evento_trilean_idiom
+            _const = :"That_#{ _sym }"
+            const_get( _const, false )[ ps ]
+          end
+          alias_method :[], :via_magnetic_parameter_store
+        end  # >>
+        Autoloader_[ self ]
+      end
+
+      module First_Line_Map_via_Lemmas_and_Lemmato_Trilean_Idiom
+        class << self
+          def via_magnetic_parameter_store ps
+            _sym = ps.lemmato_trilean_idiom
+            _const = :"Idiom_that_#{ _sym }"
+            const_get( _const, false )[ ps ]
+          end
+          alias_method :[], :via_magnetic_parameter_store
+        end  # >>
+        Autoloader_[ self ]
+      end
+
+      Inflected_Parts_via_Lemmas_and_Idiom_that_Is_Add_Nothing = -> _lemz do
+        # to be more touchy we provide an empty instance rather than nothing
+        Models_::InflectedParts.the_empty_instance
+      end
+
+      module Precontextualized_Line_Streamer_via_Emission_Shape
+        class << self
+          def via_magnetic_parameter_store ps
+            _sym = ps.emission_shape
+            _const = :"That_#{ _sym }"
+            const_get( _const, false )[ ps ]
+          end
+          alias_method :[], :via_magnetic_parameter_store
+        end  # >>
+        Autoloader_[ self ]
+      end
+
+      express_subject_association = -> asc do
         nm asc.name
       end
 
-      Subject_Association_String_via_Subject_Association_SMALL = -> ps do
+      String_via_Subject_Association = -> ps do
+
         sa = ps.subject_association
         if sa
           _p = ps.to_say_subject_association
-          _p ||= _Express_Subject_Association___
-          _ = ps.expression_agent.calculate ps.subject_association, & _p
-          _  # #todo
+          _p ||= express_subject_association
+          ps.expression_agent.calculate sa, & _p
         end
       end
 
@@ -445,23 +592,10 @@ module Skylab::Human
 
     module Models_
 
-      class InlineFunction  # 1x #here-2
-
-        def initialize produce_sym_a, prerequisite_sym_a, func_x
-          @function = func_x
-          @prerequisite_term_symbols = prerequisite_sym_a
-          @product_term_symbols = produce_sym_a
-        end
-
-        attr_reader(
-          :function,
-          :prerequisite_term_symbols,
-          :product_term_symbols,
-        )
-      end
-
       Autoloader_[ self ]
     end
+
+    # ==
 
     needs_nl_rx = /(?<!\n)\z/  # ..
     Plus_newline_if_necessary_ = -> s do
@@ -481,6 +615,8 @@ module Skylab::Human
       col = Home_.lib_.task::Magnetics.
         collection_via_directory_object_and_module _dir, Magnetics_
 
+      col.add_constants_not_in_filesystem Magnetics_
+
       col.write_manner_methods_onto Here_
 
       COLLECTION_ = col
@@ -490,7 +626,9 @@ module Skylab::Human
 
     # ==
 
+    BECAUSE_ = 'because'   # (used too many times - maybe #todo)
     Here_ = self
     UNRELIABLE_ = :_UNRELIABLE_from_hu_c15n_
   end
 end
+# #tombstone: inline functions, "butter"

@@ -2,54 +2,77 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::First_Line_Proc_via_Event_that_Is_Success ; class << self
+    module Magnetics_::First_Line_Map_via_Evento_Trilean_Idiom::That_Is_Lexemic_While_Frobbing ; class << self
 
-      def mutate_line_contextualization_ lc, ev
-
-        if ev.respond_to? :inflected_noun
-          __work lc, ev
-        end  # otherwise nothing
-        NIL_
+      def via_magnetic_parameter_store ps
+        self._NEEDS_MINOR_REWRITE
       end
 
-      alias_method :[], :mutate_line_contextualization_
+      alias_method :[], :via_magnetic_parameter_store
 
-      def __work lc, ev
+      def __work lc, ps
 
-        n_s = ev.inflected_noun
-        v_s = ev.verb_lexeme.progressive
+        ev = ps.possibly_wrapped_event
 
-        as = Home_::Phrase_Assembly.begin_phrase_builder
-        as.add_lazy_space
+        _n_s = ev.inflected_noun
 
-        one = lc.content_string_looks_like_one_word_
+        _one = lc.content_string_looks_like_one_word_
 
-        if one or n_s.include? SPACE_
+        _pa = if _one or ( _n_s and _n_s.include? SPACE_ )
 
           # ! "while a workspace opening" [br]
-          as.add_string v_s
-          as.add_any_string n_s
+
+          map_line_by_of_idiom_that_is_frobbing_item lc, ps
+
         else
 
           # "while fish eating.." [hu]
-          as.add_any_string n_s
-          as.add_string v_s
+
+          __map_line_by_of_idiom_that_is_item_frobbing lc, ps
+        end
+      end
+
+      def map_line_by_of_idiom_that_is_frobbing_item lc, ps
+
+        _same lc, ps do |pa, verb, noun|
+          pa.add_string verb
+          pa.add_any_string noun
+        end
+      end
+
+      def __map_line_by_of_idiom_that_is_item_frobbing lc, ps
+
+        _same lc, ps do |pa, verb, noun|
+          pa.add_any_string noun
+          pa.add_string verb
+        end
+      end
+
+      def _same lc, ps
+
+        pa = Home_::PhraseAssembly.begin_phrase_builder
+        pa.add_lazy_space
+
+        lexz = ps.possibly_wrapped_event
+        _verb = lexz.verb_lexeme.progressive
+        _noun = lexz.inflected_noun
+
+        yield pa, _verb, _noun
+
+        gerund_phrase = pa.flush_to_string
+
+        _mlp = lc.mutable_line_parts
+
+        eek_mutable = _mlp.normalized_original_content_string
+
+        if lc.content_string_looks_like_one_word_
+
+          eek_mutable.concat gerund_phrase
+        else
+          eek_mutable[ 0, 0 ] = "while#{ gerund_phrase },"
         end
 
-        gerund_phrase = as.flush_to_string
-
-        lc.mutate_line_parts_by do |mlp|  # #spot-5
-
-          eek_mutable = mlp.normalized_original_content_string
-
-          if one
-            eek_mutable.concat gerund_phrase
-          else
-            eek_mutable[ 0, 0 ] = "while#{ gerund_phrase }, "
-          end
-        end
-
-        NIL_
+        lc.to_string
       end
     end ; end
   end

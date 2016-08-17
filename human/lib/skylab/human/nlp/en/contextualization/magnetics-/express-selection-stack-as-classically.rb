@@ -15,11 +15,9 @@ module Skylab::Human
             o.begin_customization_ collection
           end
 
-          o.push_function_ :Lemmas_via_Selection_Stack  # 1 of 2
-
           o.can_read :expression_agent
-          o.must_read :lemmas
-          o.must_read :selection_stack
+          o.can_read :lemmas
+          o.can_read :selection_stack
 
           NIL_
         end

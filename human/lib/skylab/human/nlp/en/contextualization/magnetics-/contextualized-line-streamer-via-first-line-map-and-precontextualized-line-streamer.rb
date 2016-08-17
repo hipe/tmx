@@ -2,34 +2,33 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::Contextualized_Line_Stream_via_First_Line_Proc_and_Precontextualized_Line_Stream ; class << self  # 2x
+    module Magnetics_::Contextualized_Line_Streamer_via_First_Line_Map_and_Precontextualized_Line_Streamer ; class << self  # 2x
 
-      def call p, st
+      def via_magnetic_parameter_store ps
+
+        _flm = ps.first_line_map
+        st_p = ps.precontextualized_line_streamer
 
         o = Home_::Sexp::Expression_Sessions::List_through_Eventing::Simple.begin
 
         o.on_first = -> line do
 
-          lc = Magnetics_::Line_Contextualization_via_Line[ line ]  # the only reference
+          _line_ = _flm[ line ]
 
-          _ = p[ lc ]
-          _ && Home_._SANITY  # this proc is not a mapper - (we flip-flopped on this) be sure you're using it right # #todo
+          _line_ || Home_._SANITY  # #todo
 
-          lc.to_string__
+          _line_
         end
 
         o.on_subsequent = IDENTITY_
 
-        _ = o.to_stream_around st
-
-        _  # #todo
-
+        -> do
+          _st = st_p.call
+          o.to_stream_around _st
+        end
       end
-      alias_method :[], :call
 
-      # ==
-
-      # ==
+      alias_method :[], :via_magnetic_parameter_store
     end ; end
   end
 end

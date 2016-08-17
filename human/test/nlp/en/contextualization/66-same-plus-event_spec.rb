@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - contextualization - same but with event" do
+  describe "[hu] NLP - EN - contextualization - same but plus event" do
 
     # (would also be #C15n-test-family-4)
 
@@ -40,19 +40,19 @@ module Skylab::Human::TestSupport
       end
 
       it "the re-emitted channel is the same" do
-        channel_ == [ :error, :extra_properties ] || fail
+        channel_.should eql [ :error, :extra_properties ] or fail
       end
 
       it "the last line is the same" do
-        second_line_ == "did you mean \"wezo\" or \"dezo\"?\n" || fail
+        second_line_.should eql "did you mean \"wezo\" or \"dezo\"?\n" or fail
       end
 
       it "you still get the (an) event emitted omg!!" do
-        event_.lemma == 'kershploink' || fail
+        event_.lemma.should eql 'kershploink' or fail
       end
 
-      it "but the first line has been (nonsensically) mutated omg!!" do
-        first_line_ == "couldn't add item because left shark unrecognized kershploink \"bezo\"\n" || fail
+      it "the first item has been contextualized (sensically by chance)" do
+        first_line_.should eql "left shark failed to add item because unrecognized kershploink \"bezo\"\n" or fail
       end
     end
   end

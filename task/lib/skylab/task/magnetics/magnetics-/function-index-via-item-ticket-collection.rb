@@ -64,18 +64,18 @@ class Skylab::Task
       end
 
       def read_function_item_ticket_via_const__ const
-        @_functions.fetch _const_h.fetch const
+        @_functions.fetch const_h_.fetch const
       end
 
       def proc_for_read_function_item_ticket_via_const__
-        h = _const_h
+        h = const_h_
         a = @_functions
         -> const do
           a.fetch h.fetch const
         end
       end
 
-      def _const_h
+      def const_h_
         ( @___foffset_via_const ||= ___index_consts )  # #here
       end
 

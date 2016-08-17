@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::Contextualized_Expression_via_Contextualized_Line_Stream ; class << self
+    module Magnetics_::Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape::Shape_that_Is_Of_Expression ; class << self
 
       def via_magnetic_parameter_store ps
 
@@ -31,7 +31,7 @@ module Skylab::Human
 
       def _flush_into y, ps
 
-        st = ps.contextualized_line_stream
+        st = ps.contextualized_line_streamer.call
 
         begin
           line = st.gets

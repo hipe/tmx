@@ -145,7 +145,7 @@ module Skylab::Human
 
       def _phrase_builder_common_beginning
 
-        pb = Home_::Phrase_Assembly.begin_phrase_builder
+        pb = Home_::PhraseAssembly.begin_phrase_builder
 
         phrase = @freeform_prefix
         if phrase

@@ -2,26 +2,13 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Magnetics_::Lemmas_via_Selection_Stack  # referenced 2x
+    class Magnetics_::Lemmas_via_Normal_Selection_Stack < Magnet_  # referenced 2x
 
       # if wasn't for the second reference, would be a #feature-island
 
-      class << self
-
-        def via_magnetic_parameter_store ps
-          new( ps ).execute
-        end
-
-        private :new
-      end  # >>
-
-      def initialize ps
-        @_ps = ps
-      end
-
       def execute
 
-        slug_a = __selection_stack_as_moniker_array
+        slug_a = @ps_.normal_selection_stack
 
         @_length = slug_a.length
         if @_length.nonzero?
@@ -30,19 +17,26 @@ module Skylab::Human
 
         o = Lemmas___.new
 
-        _vs = __subject_noun_phrase
-        o.verb_subject = _vs  # whether trueish or not, it is now known
+        o.verb_subject_string = __subject_string
+          # whether trueish or not, it is now known
 
-        _vl = __verb_lemma
-        o.verb_lemma = _vl  # ditto
+        o.verb_lemma_string = __verb_lemma_string  # ditto
 
-        _on = __object_noun_phrase
-        o.verb_object = _on  # ditto
+        o.verb_object_string = __object_string  # ditto
 
         o
       end
 
-      def __subject_noun_phrase
+      def __subject_string
+
+        if @ps_.subject_association  # experimental here
+          Magnetics_::String_via_Subject_Association[ @ps_ ]
+        else
+          __subject_string_classically
+        end
+      end
+
+      def __subject_string_classically
 
         if @_length.nonzero?
           s = @_slug_a.fetch 0
@@ -57,13 +51,13 @@ module Skylab::Human
         end
       end
 
-      def __verb_lemma
+      def __verb_lemma_string
         if 1 < @_length
           @_slug_a.fetch( -1 )
         end
       end
 
-      def __object_noun_phrase
+      def __object_string
         if 2 < @_length
           if _has_many_adjectives
             @_slug_a[ -2 ]
@@ -77,36 +71,13 @@ module Skylab::Human
         5 < @_length
       end
 
-      # --
-
-      _Express_selection_stack_item = -> x do
-        nf = x.name  # :[#048]. allows root to have a name
-        if nf
-          nm nf
-        end
-      end
-
-      define_method :__selection_stack_as_moniker_array do
-
-        ps = @_ps
-
-        if ! ps.to_say_selection_stack_item
-          ps.to_say_selection_stack_item = _Express_selection_stack_item
-        end
-
-        _s_a = Magnetics_::String_Array_via_Procs_and_Selection_Stack[ ps ]
-
-        _s_a  # #todo
-      end
-
       # ==
 
       Lemmas___ = ::Struct.new(
-        :verb_subject,
-        :verb_lemma,
-        :verb_object,
+        :verb_subject_string,
+        :verb_lemma_string,
+        :verb_object_string,
       )
-
     end
   end
 end

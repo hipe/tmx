@@ -2,47 +2,48 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    class Models_::Inflected_Parts
+    class Models_::InflectedParts
 
       class << self
-        def begin_via_lemmas lemz
-          new.__init_via_lemmas lemz
+        def the_empty_instance
+          @___ ||= self.begin.freeze
         end
-        private :new
+
+        alias_method :begin, :new
+        undef_method :new
       end  # >>
 
-      def __init_via_lemmas lemz
-        @inflected_verb = nil
+      def initialize
+        @inflected_verb_string = nil
         @prefixed_cojoinder = nil
-        @verb_object = lemz.verb_object
-        @verb_subject = lemz.verb_subject
         @suffixed_cojoinder = nil
-        self
+        @verb_object_string = nil
+        @verb_subject_string = nil
       end
 
       attr_accessor(
-        :inflected_verb,
+        :inflected_verb_string,
         :prefixed_cojoinder,
         :suffixed_cojoinder,
-        :verb_object,
-        :verb_subject,
+        :verb_object_string,
+        :verb_subject_string,
       )
 
-      def to_string__
-        to_phrase_assembly__.flush_to_string
+      def to_string
+        to_phrase_assembly_.flush_to_string
       end
 
-      def to_phrase_assembly__
+      def to_phrase_assembly_
 
-        as = Home_::Phrase_Assembly.begin_phrase_builder
+        as = Home_::PhraseAssembly.begin_phrase_builder
 
         as.add_any_string @prefixed_cojoinder
 
-        as.add_any_string @verb_subject
+        as.add_any_string @verb_subject_string
 
-        as.add_any_string @inflected_verb
+        as.add_any_string @inflected_verb_string
 
-        as.add_any_string @verb_object
+        as.add_any_string @verb_object_string
 
         as.add_any_string @suffixed_cojoinder
 

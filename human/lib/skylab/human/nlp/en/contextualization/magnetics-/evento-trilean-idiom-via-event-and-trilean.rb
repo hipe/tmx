@@ -2,42 +2,107 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::First_Line_Proc_via_Event_that_Is_Participating ; class << self
+    class Magnetics_::Evento_Trilean_Idiom_via_Event_and_Trilean < Magnet_
 
-      # go this away eventually ([#043]."B")
+      # the difference between "lexeme" and "lemma" (see any dictionary)
+      # is significant here. (cheat: lemma is a bit like "class" and
+      # lexeme "object" by massive stretch of analogy.) if we have a lexeme
+      # then we also have inflectional information about how it is to be
+      # expressed. however if we only have a lemma than we are free to
+      # determine appropriate inflection ourselves. (this is not a hard fast
+      # rule but a synopsis.)
+      #
+      # one main reason why event-related expression has so many dedicated
+      # nodes on the pipeline is because the only way to get lexemes into
+      # the session is through an event (a reliance on this arrangement is
+      # an architectural smell, sure) and lexemes require special handling
+      # because they are not just strings but mutable objects with their own
+      # API.
+      #
+      # separate from this lexemo-eventular handling, we also have a smatter
+      # of lemmato-eventular handling. at the moment you can acquire lemmas
+      # via a subject association and/or selection stack. (if you have
+      # neither lemma nor lexeme then you may think you have no need for
+      # contextualization, but maybe you're trying to make an exception
+      # from an event.) so, when events are also in this mix with *lemmas*
+      # (not lexemes) then there are endemic linquistic patterns there
+      # (namely, assuming that events express complete sentence-phrases so..)
 
-      def via_magnetic_parameter_store ps
+      def execute
 
-        x = ps.trilean
+        event_x = @ps_.possibly_wrapped_event
+        @trilean = @ps_._read_magnetic_value_with_certainty_ :trilean
 
-        if x
-          ev = ps.event
-          if ev.has_member :is_completion and ev.is_completion
-            _is_comp = true
-          end
-          if _is_comp
-            Magnetics_::First_Line_Proc_via_Event_that_Is_Completion
-          else
-            Magnetics_::First_Line_Proc_via_Event_that_Is_Success
-          end
-        elsif x.nil?
-          First_Line_Proc_via_Event_that_Is_Neutral___
+        if event_x.respond_to? :inflected_verb
+          _receive_event event_x.to_event
+          @_event = event_x.to_event
+          self._FUN__when_wrapped
+
         else
-          Magnetics_::First_Line_Proc_via_Event_that_Is_Failure
+          _receive_event event_x
+
+          if event_x.has_member :verb_lexeme  # #todo - rename this to `verb_mutable_lexeme` WORLDWIDE
+            __when_lexemic
+          else
+            __when_other
+          end
         end
       end
 
-      alias_method :[], :via_magnetic_parameter_store
+      def _receive_event ev
+        @_event = ev
+        @_is_completion = ev.has_member( :is_completion ) && ev.is_completion
+        NIL_
+      end
 
-      # ==
+      def __when_lexemic
 
-      module First_Line_Proc_via_Event_that_Is_Neutral___
-
-        def self.mutate_line_contextualization_ _, __
-          NOTHING_
+        if @trilean
+          if @_is_completion
+            :Is_Lexemic_Frobbed_Colon
+          else
+            :Is_Lexemic_While_Frobbing
+          end
+        elsif @trilean.nil?
+          :Is_Lexemic_While_Frobbing
+        else
+          :Is_Lexemic_Couldnt_Frob_Because
         end
       end
-    end ; end
+
+      def __when_other
+
+        ps = @ps_
+        ss = ps.selection_stack
+        if ss
+          nss = Magnetics_::Normal_Selection_Stack_via_Selection_Stack[ ps ]
+          ps.normal_selection_stack = nss  # #open [#043]
+          lemz = Magnetics_::Lemmas_via_Normal_Selection_Stack[ ps ]
+          ps.lemmas = lemz  # #open [#043]
+        else
+          sa = ps.subject_association
+          if sa
+            lemz = Magnetics_::Lemmas_via_Subject_Association_XXX[ ps ]  # #todo
+            ps.lemmas = lemz
+          end
+        end
+
+        # note - we go "lemmatic" even when there are no lemmas, just to minify this
+        # (every "XXX" below is a #todo)
+
+        if @trilean
+          if @_is_completion
+            :Is_Lemmatic_Completion_XXX
+          else
+            :Is_Lemmatic_Neutral_XXX
+          end
+        elsif @trilean.nil?
+          :Is_Lemmatic_Neutral
+        else
+          :Is_Lemmatic_Failed_To_Frob
+        end
+      end
+    end
   end
 end
 # #history: broke out of "expression via emission"

@@ -10,12 +10,32 @@ class Skylab::Task
       end  # >>
 
       def initialize
-        NOTHING_  # every ivar is instantiated lazily
+        @_function_items = []
       end
 
       attr_writer(
         :item_resolver,
       )
+
+      def add_constants_not_in_filesystem mod
+
+        h = {}
+        @_function_items.each do |fi|
+          h[ fi.const ] = true
+        end
+        @manner_box.each_value do |bx|
+          bx.each_value do |mit|
+            h[ mit.const ] = true
+          end
+        end
+        mod.constants.each do |sym|
+          h[ sym ] && next
+          _ts = Here_::Magnetics_::TokenStream_via_Const[ sym ]
+          _it = Magnetics_::ItemTicket_via_TokenStream[ _ts ]
+          accept_item_ticket _it
+        end
+        NIL_
+      end
 
       def accept_item_ticket it
         send ACCEPT___.fetch( it.category_symbol ), it
@@ -44,7 +64,7 @@ class Skylab::Task
       end
 
       def __accept_function fu
-        ( @__function_items ||= [] ).push fu
+        @_function_items.push fu
         NIL_
       end
 
@@ -70,7 +90,7 @@ class Skylab::Task
       # -- use functions
 
       def to_function_item_ticket_stream__
-        Common_::Stream.via_nonsparse_array @__function_items
+        Common_::Stream.via_nonsparse_array @_function_items
       end
 
       def const_for_A_atom_via_B_atom sym_A, sym_B
