@@ -4,59 +4,59 @@
 
 # -- synthesize everything
 
-tmx                 q [ ]
+tmx                         :
 
 # -- actually useful
 
-tan_man             q [ ]
-search_and_replace  q [ ]
-doc_test            q [ ]
-myterm              q [ ]
-snag                q [ ]
-git_viz             q [ ]
+tan_man                     :
+search_and_replace          :
+doc_test                    :
+myterm                      :
+snag                        :
+git_viz                     :
 
 # -- bigger
 
-cull                q [ ]
-code_metrics        q [ ]
+cull                        :
+code_metrics                :
 
 # -- these
 
-task_examples       q [ ]
-task                q [ ]
+task_examples               :
+task                        :
 
 # -- legacy utils & coverers
 
-css_convert         q [ ]
-bnf2treetop         q [ ]
-flex2treetop        q [ ]
-yacc2treetop        q [ ]
+css_convert                 :
+bnf2treetop                 :
+flex2treetop                :
+yacc2treetop                :
 
-beauty_salon        q [ ]
+beauty_salon                :
 
 # -- toy (legacy & modern, alpha)
 
-treemap             q [ ]
-permute             q [ ]
-slicer              q [ ]
+treemap                     :
+permute                     :
+slicer                      :
 
 # == libs
 
 # -- ad-hoc libs
 
-git                 q [ ]
+git                         :
 
 # -- more general libs
 
-test_support        q [ ]
-sub_tree            q [ ]
-system              q [ ]
-zerk                q [ ]
-human               q [ ]
-brazen              q [ ]
-autonomous_component_system q [ ]
-parse               q [ ]
-plugin              q [ ]
-basic               q [ ]
-fields              q [ ]
-common              q [ ]
+test_support                :
+sub_tree                    :
+system                      :
+zerk                        :
+human                       :
+brazen                      :
+autonomous_component_system :
+parse                       :
+plugin                      :
+basic                       :
+fields                      :
+common                      :
