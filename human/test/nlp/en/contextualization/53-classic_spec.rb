@@ -139,10 +139,6 @@ module Skylab::Human::TestSupport
 
       o = subject_class_.begin
 
-      o.express_trilean.classically  # before below
-
-      o.express_selection_stack.classically  # after above
-
       o.to_say_selection_stack_item = -> s do
 
         # (in this file we represent the selection stack items as strings

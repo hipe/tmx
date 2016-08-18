@@ -11,6 +11,7 @@ class Skylab::Task
 
       def initialize
         @_function_items = []
+        @manner_box = nil
       end
 
       attr_writer(
@@ -23,9 +24,12 @@ class Skylab::Task
         @_function_items.each do |fi|
           h[ fi.const ] = true
         end
-        @manner_box.each_value do |bx|
-          bx.each_value do |mit|
-            h[ mit.const ] = true
+        bx = @manner_box
+        if bx
+          bx.each_value do |bx_|
+            bx_.each_value do |mit|
+              h[ mit.const ] = true
+            end
           end
         end
         mod.constants.each do |sym|

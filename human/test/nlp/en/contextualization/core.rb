@@ -19,10 +19,10 @@ module Skylab::Human::TestSupport
         Emit_by___ = -> & p do
 
           yes = true ; x = nil
-          define_method :_DSL_shared_state do
+          define_method :_emission_result_state do
             if yes
               yes = false
-              x = __build_DSL_state p
+              x = __build_emission_result_state p
             end
             x
           end
@@ -35,12 +35,6 @@ module Skylab::Human::TestSupport
         # :#C15n-testcase-family-4 ([ze])
 
         # (the below is a sketch for how we might style it in [ze] niCLI..)
-        #
-        # (order matters while #open [#043] because it's building a magnetic
-        # function stack, so highest level (last to run) first)
-
-        o.express_trilean.classically
-        o.express_subject_association.integratedly
 
         same = -> asc do
           asc.name.as_human
@@ -60,46 +54,46 @@ module Skylab::Human::TestSupport
       # -
 
       def exception_class_
-        _DSL_shared_state.exception.class
+        _emission_result_state.exception.class
       end
 
       def channel_
-        _DSL_shared_state.channel
+        _emission_result_state.channel
       end
 
       def first_line_
-        _DSL_shared_state.first_line
+        _emission_result_state.first_line
       end
 
       def second_line_
-        _DSL_shared_state.second_line
+        _emission_result_state.second_line
       end
 
       def event_
-        _DSL_shared_state.event
+        _emission_result_state.event
       end
 
-      def __build_DSL_state sets_p
+      def __build_emission_result_state sets_p
 
         # -- read the values
 
-        dsl = __build_DSL_values sets_p
+        dsl = __build_DSL_mutable_argument_store sets_p
 
         m = dsl.state_building_method
         if m
           send m, dsl
         else
-          __build_conventional_state dsl
+          __build_conventional_result_state dsl
         end
       end
 
-      def __build_exception_state dsl
+      def __build_exception_result_state dsl
 
         co = _subject_class_begin
 
         ex = dsl.to_build_exception[ co, dsl ]
 
-        o = __DSL_Shared_State_for_Exception.new
+        o = __Result_State_for_Exception.new
         o.exception = ex
 
         _s_a = ex.message.split NEWLINE_
@@ -111,19 +105,11 @@ module Skylab::Human::TestSupport
         o
       end
 
-      def __build_conventional_state dsl
+      def __build_conventional_result_state dsl
 
-        co = _subject_class_begin
+        co = _common_c15n_beginning dsl
 
-        dsl.to_begin[ co ]
-
-        co.selection_stack = dsl.selection_stack
-
-        co.subject_association = dsl.subject_association
-
-        expag = common_expag_
-
-        co.expression_agent = expag
+        expag = co.expression_agent  # eek/meh (get it back from ourself)
 
         # -- run the thing
 
@@ -149,7 +135,7 @@ module Skylab::Human::TestSupport
 
         # -- write the state
 
-        ss = __DSL_Shared_State.new
+        ss = __Result_State_for_Deep_Emission.new
         if is_event
           s_a = []
           x.express_into_under s_a, expag
@@ -157,22 +143,58 @@ module Skylab::Human::TestSupport
         else
           s_a = x ; x = nil
         end
-
-        s_a.each_with_index do |s, d|
-          ss[ LINES__.fetch( d ) ] = s
-        end
-
+        _write_two_lines ss, s_a
         ss.channel = em.channel_symbol_array
         ss.freeze
       end
 
+      def __build_lines_only_result_state dsl
+
+        co = _common_c15n_beginning dsl
+
+        _s_a = co.express_into []
+
+        ss = __Result_State_for_Lines_Only.new
+        _write_two_lines ss, _s_a
+        ss.freeze
+      end
+
+      def _write_two_lines ss, s_a
+
+        s_a.each_with_index do |s, d|
+          ss[ LINES__.fetch( d ) ] = s
+        end
+      end
+
       LINES__ = [ :first_line, :second_line ]
+
+      def _common_c15n_beginning dsl
+
+        co = _subject_class_begin
+
+        dsl.to_begin[ co ]
+
+        x = dsl.selection_stack
+        if x
+          co.selection_stack = x
+        end
+
+        x = dsl.subject_association
+        if x
+          co.subject_association = x
+        end
+
+        _expag = common_expag_
+
+        co.expression_agent = _expag
+        co
+      end
 
       def _subject_class_begin
         subject_class_.begin
       end
 
-      def __build_DSL_values sets_p
+      def __build_DSL_mutable_argument_store sets_p
 
         @_DSL_setup_vals = __DSL_Setup_Values.new
 
@@ -196,14 +218,18 @@ module Skylab::Human::TestSupport
 
       def exception_by & p
         @_DSL_setup_vals.to_build_exception = p
-        @_DSL_setup_vals.state_building_method = :__build_exception_state ; nil
+        @_DSL_setup_vals.state_building_method = :__build_exception_result_state ; nil
+      end
+
+      def lines_only
+        @_DSL_setup_vals.state_building_method = :__build_lines_only_result_state ; nil
       end
 
       def begin_by & p
         @_DSL_setup_vals.to_begin = p
       end
 
-      define_method :__DSL_Shared_State_for_Exception, ( Lazy_.call do
+      define_method :__Result_State_for_Exception, ( Lazy_.call do
 
         X_NEC_DSL_SharedState_for_Exception = ::Struct.new(
           :exception,
@@ -212,11 +238,19 @@ module Skylab::Human::TestSupport
         )
       end )
 
-      define_method :__DSL_Shared_State, ( Lazy_.call do
+      define_method :__Result_State_for_Deep_Emission, ( Lazy_.call do
 
-        X_NEC_DSL_Shared_State = ::Struct.new(
+        X_NEC_Result_State = ::Struct.new(
           :channel,
           :event,
+          :first_line,
+          :second_line,
+        )
+      end )
+
+      define_method :__Result_State_for_Lines_Only, ( Lazy_.call do
+
+        X_NEC_Result_State = ::Struct.new(
           :first_line,
           :second_line,
         )

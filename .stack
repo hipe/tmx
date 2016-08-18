@@ -8,10 +8,6 @@ recursive magnetics
 CLI integration for single
 -------
 integration: solve a contrived problem with both (900-ish)
+review #todo's ↕
 find a path: don't cycle, find shortest path, whine when not found (700-ish)
 use proper pathfinding
-maybe hinting away
-simplify away the formal parameters - ..
-maybe get @_collection out as an ivar (make it a method) (or not)
-make older tests like newer tests ↕
-get rid of unused code at top of c15n (corefile) and review #todo's ↕

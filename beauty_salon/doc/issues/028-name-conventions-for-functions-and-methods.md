@@ -36,7 +36,7 @@ more detail as referenced.
 
     this_method_has_a__generated_portion__  # see #A
 
-    _a_method_like_this_  # ..is for when the other is a business namespace
+    _a_method_like_this_  # ..is for when the other is a business namespace  # #tier-0.5
 
 
 
@@ -79,6 +79,14 @@ whole paragraph may change.
 
 (EDIT: the above should have an example if we stick with it.)
 
+
+
+### :#tier-0.5: stay out of the way scope
+
+methods `_named_like_this_` are part of some public API (like above) but
+they stay out of the way of the "normal" method names which might need
+to be wide open for business. this is perhaps a smell, which is why we
+don't fully explain what we mean by all of this.
 
 
 

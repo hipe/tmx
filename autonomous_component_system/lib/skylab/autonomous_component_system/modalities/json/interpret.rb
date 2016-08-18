@@ -386,8 +386,6 @@ module Skylab::Autonomous_Component_System
 
           o = Home_.lib_.human::NLP::EN::Contextualization.begin
 
-          o.express_selection_stack.nestedly
-
           o.expression_agent = expag
           o.emission_proc = y_p
 

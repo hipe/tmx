@@ -400,9 +400,6 @@ module Skylab::Zerk
 
       o = Home_.lib_.human::NLP::EN::Contextualization.begin
 
-      o.express_trilean.classically
-      o.express_subject_association.integratedly
-
       o.expression_agent = expression_agent
       o.selection_stack = @_fo_frame.formal_operation_.selection_stack
       o.subject_association = assoc

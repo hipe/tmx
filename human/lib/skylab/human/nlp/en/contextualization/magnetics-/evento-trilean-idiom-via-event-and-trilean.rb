@@ -55,7 +55,7 @@ module Skylab::Human
 
         # for now, we've got to always *overwrite* whatever trilean we got
         # from the channel (OR USER) with whatever is in the event (or change
-        # the pipeline..) legacy apps expect the event and not channe to be
+        # the pipeline..) legacy apps expect the event and not channel to be
         # the determiner here. ([br] falls apart without this.) :#c15n-spot-2
 
         x = ev.ok
