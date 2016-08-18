@@ -396,22 +396,16 @@ module Skylab::Zerk
 
       # (we like to hope that this is called IFF the component is sure
       # it's going to emit something.)
+      # (is of #C15n-testcase-family-4 in [hu])
 
-      o = Home_.lib_.human::NLP::EN::Contextualization.new( & @_oes_p )
+      o = Home_.lib_.human::NLP::EN::Contextualization.begin
+
+      o.express_trilean.classically
+      o.express_subject_association.integratedly
 
       o.expression_agent = expression_agent
       o.selection_stack = @_fo_frame.formal_operation_.selection_stack
       o.subject_association = assoc
-      o.express_subject_association.integratedly
-
-      tr = o.express_trilean.classically_but
-
-      tr.on_failed = -> kns do  # (not "failed to.." but:)
-        kns.initial_phrase_conjunction = nil
-        kns.inflected_verb = "couldn't #{ kns.verb_lemma.value_x }" ; nil
-      end
-
-      # tr.on_neutralled = .. # (try to take away "while" etc one day)
 
       same = -> asc do
         asc.name.as_human
@@ -425,7 +419,7 @@ module Skylab::Zerk
 
       o.to_say_subject_association = same
 
-      o.to_emission_handler
+      o.emission_handler_via_emission_handler( & @_oes_p )
     end
 
     def _parsed_OK

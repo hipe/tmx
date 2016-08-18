@@ -55,7 +55,7 @@ module Skylab::GitViz::TestSupport
 
       invoke 'hi', '--', '-1', 'x'
 
-      expect :styled, '<width> must be greater than or equal to 1, had -1'
+      expect :styled, 'failed because <width> must be greater than or equal to 1, had -1'
       expect_result_for_failure
     end
 

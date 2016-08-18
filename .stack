@@ -15,5 +15,3 @@ simplify away the formal parameters - ..
 maybe get @_collection out as an ivar (make it a method) (or not)
 make older tests like newer tests ↕
 get rid of unused code at top of c15n (corefile) and review #todo's ↕
-"full" coverage ↕
-globally green ↕

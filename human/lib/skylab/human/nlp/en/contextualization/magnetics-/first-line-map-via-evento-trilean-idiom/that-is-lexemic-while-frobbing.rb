@@ -5,12 +5,16 @@ module Skylab::Human
     module Magnetics_::First_Line_Map_via_Evento_Trilean_Idiom::That_Is_Lexemic_While_Frobbing ; class << self
 
       def via_magnetic_parameter_store ps
-        self._NEEDS_MINOR_REWRITE
+
+        -> line do
+          _lc = Magnetics_::Line_Contextualization_via_Line[ line ]
+          __map_line _lc, ps
+        end
       end
 
       alias_method :[], :via_magnetic_parameter_store
 
-      def __work lc, ps
+      def __map_line lc, ps
 
         ev = ps.possibly_wrapped_event
 
@@ -26,9 +30,10 @@ module Skylab::Human
 
         else
 
-          # "while fish eating.." [hu]
+          # (WAS: "while fish eating.." [hu])
 
-          __map_line_by_of_idiom_that_is_item_frobbing lc, ps
+          map_line_by_of_idiom_that_is_frobbing_item lc, ps
+          # __NOT_USED_but_keep_around__map_line_by_of_idiom_that_is_item_frobbing lc, ps
         end
       end
 
@@ -40,7 +45,7 @@ module Skylab::Human
         end
       end
 
-      def __map_line_by_of_idiom_that_is_item_frobbing lc, ps
+      def __NOT_USED_but_keep_around__map_line_by_of_idiom_that_is_item_frobbing lc, ps
 
         _same lc, ps do |pa, verb, noun|
           pa.add_any_string noun
@@ -69,7 +74,7 @@ module Skylab::Human
 
           eek_mutable.concat gerund_phrase
         else
-          eek_mutable[ 0, 0 ] = "while#{ gerund_phrase },"
+          eek_mutable[ 0, 0 ] = "while#{ gerund_phrase }, "
         end
 
         lc.to_string

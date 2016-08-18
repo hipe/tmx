@@ -112,6 +112,8 @@ module Skylab::Git
           y << "attempts to put the files back if there are no collisions."
         end,
 
+        :inflect, :noun, :lemma_string,  # say "couldn't pop stow", not "couldn't pop a stow"
+
         :required, :property, :filesystem,
         :required, :property, :system_conduit,
         :required, :property, :stows_path,

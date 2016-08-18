@@ -51,7 +51,7 @@ module Skylab::MyTerm::TestSupport
 
       it 'whines EEW' do  # #wish [#016] maybe after #milestone-9
 
-        _ = "imagemagick couldn't OSA script because bg font unrecognized font path \"not-a-font\""
+        _ = "bg font failed to OSA script because unrecognized font path \"not-a-font\""
         expect :third_from_last_line, _
       end
 

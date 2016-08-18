@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] mode-integrations - CLI" do
+  describe "[gi] mode-integrations - CLI (core)" do
 
     extend TS_
     use :modality_integrations_CLI_support
@@ -30,7 +30,7 @@ module Skylab::Git::TestSupport
     it "ping error channel (expect STDERR)" do
 
       invoke 'ping', '--channel', 'ero', 'wrong'
-      expect :e, '(pretending this was wrong: "wrong")'
+      expect :e, '(failed because pretending this was wrong: "wrong")'
       expect_specific_invite_line_to :ping
       expect_failed
     end

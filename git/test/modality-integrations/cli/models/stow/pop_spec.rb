@@ -34,7 +34,7 @@ module Skylab::Git::TestSupport
         invoke 'stow', 'pop', 'no-see-stow'
       end
 
-      expect :e, /\A"\.git" not found in \. or \d+ dirs up\z/
+      expect :e, /\Afailed because "\.git" not found in \. or \d+ dirs up\z/
 
       _expect_common_invite_line
       expect_no_more_lines

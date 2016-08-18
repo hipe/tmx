@@ -2,7 +2,7 @@ module Skylab::Common
 
   class Event
     # -
-      class Via_signature  # #covered-only-by:[bs]
+      class Via_signature  # :[#051]. #covered-only-by:[bs],[gi]
 
         class << self
           def begin_via_arglist__ a

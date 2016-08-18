@@ -19,7 +19,6 @@ module Skylab::Human
           o.can_read :lemmas
           o.must_read :precontextualized_line_streamer
           o.can_read :selection_stack
-          o.must_read :string
           o.must_read :trilean
 
           NIL_

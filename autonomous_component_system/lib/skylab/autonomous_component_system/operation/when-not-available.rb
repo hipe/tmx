@@ -21,12 +21,15 @@ module Skylab::Autonomous_Component_System
           end
         else
           if x
-            # #covered-only-by:[my]
+
+            # #C15n-test-family-5 in [hu]
+
             ( * sym_a, ev_p ) = x
-            o = Home_.lib_.human::NLP::EN::Contextualization.new
-            o.channel = sym_a
-            o.event_proc = ev_p
+
+            o = Home_.lib_.human::NLP::EN::Contextualization.begin
+            o.given_emission sym_a, & ev_p
             _ev = o.to_exception
+
           else
             _ev = Build_event[ fo ].to_exception
           end

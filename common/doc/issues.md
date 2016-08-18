@@ -26,7 +26,8 @@
 [#053] #open require sidesystem when sidesystem has dashed doesnt work
 [#052]       #doc-node: the internal lib node nrrative (was: [#ss-001]) ..
 
-[#051] #hole ( #was: margination. probably sunsetted.)
+[#051]       [wrapped events]
+             ( #was: margination. probably sunsetted.)
 
 [#050] #hole ( #was: aggregation .. moved to: [#hu-055] )
 

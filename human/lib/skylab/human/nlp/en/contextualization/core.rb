@@ -103,9 +103,12 @@ module Skylab::Human
 
       unless @_possibly_wrapped_event_value_is_known
         @_possibly_wrapped_event_value_is_known = true
-        @possibly_wrapped_event = @emission_proc.call
+        if :Is_Of_Event == @emission_shape
+          @possibly_wrapped_event = @emission_proc.call
+        else
+          @possibly_wrapped_event = NOTHING_
+        end
       end
-
       @possibly_wrapped_event
     end
 
@@ -348,6 +351,7 @@ module Skylab::Human
         :Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape,
         :Contextualized_Line_Streamer_via_Passthru_and_Precontextualized_Line_Streamer,
         :Precontextualized_Line_Streamer_via_Emission_Shape,
+        :Trilean_via_Channel,  # only b.c clients might ask
       ].freeze
     end
 
@@ -593,6 +597,12 @@ module Skylab::Human
     module Models_
 
       Autoloader_[ self ]
+    end
+
+    # ==
+
+    Const_via_idiom_ = -> sym do
+      :"Is_#{ sym }"
     end
 
     # ==

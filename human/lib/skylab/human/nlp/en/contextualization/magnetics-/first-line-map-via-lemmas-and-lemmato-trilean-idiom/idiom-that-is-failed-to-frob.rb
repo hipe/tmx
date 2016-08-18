@@ -15,10 +15,13 @@ module Skylab::Human
         lc = Magnetics_::Line_Contextualization_via_Line[ line ]
         lemz = ps.lemmas
 
-        _vss = lemz.verb_subject_string
+        if lemz
+          vl = lemz.verb_lemma_string
+          vs = lemz.verb_subject_string
+          vo = lemz.verb_object_string
+        end
 
         _ivs = lc.string_via_phrase_assembly do |pa|
-          vl = lemz.verb_lemma_string
           if vl
             pa.add_string "failed to #{ vl }"
           else
@@ -27,9 +30,9 @@ module Skylab::Human
         end
 
         lc.define_prefixed_string_via_inflected_parts do |ip|
-          ip.verb_subject_string = _vss
+          ip.verb_subject_string = vs
           ip.inflected_verb_string = _ivs
-          ip.verb_object_string = lemz.verb_object_string
+          ip.verb_object_string = vo
         end
 
         yield lc if block_given?

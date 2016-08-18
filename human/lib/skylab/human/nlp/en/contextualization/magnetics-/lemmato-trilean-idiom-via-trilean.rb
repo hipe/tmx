@@ -19,7 +19,7 @@ module Skylab::Human
       def __when_failed ps
         sym = ps.idiom_for_failure
         if sym
-          sym
+          Const_via_idiom_[ sym ]
         elsif ps.subject_association
           :Is_Predicate_Mode_Couldnt_Frob_Because
         else
@@ -30,7 +30,7 @@ module Skylab::Human
       def __when_neutral ps
         sym = ps.idiom_for_neutrality
         if sym
-          sym
+          Const_via_idiom_[ sym ]
         elsif ps.subject_association
           :Is_Predicate_Mode_While_Frobbing
         else
@@ -41,7 +41,7 @@ module Skylab::Human
       def __when_successful ps
         sym = ps.idiom_for_success
         if sym
-          sym
+          Const_via_idiom_[ sym ]
         elsif ps.subject_association
           :Is_Predicate_Mode_Frobbed
         else

@@ -36,7 +36,7 @@ module Skylab::Permute::TestSupport
         %w( generate --county=washtenaw --coint=pariah -c fooz ) )
 
       expect(
-        'ambiguous category letter "c" - did you mean "county" or "coint"?',
+        'failed because ambiguous category letter "c" - did you mean "county" or "coint"?',
       )
 
       expect_specifically_invited_to :generate

@@ -31,18 +31,16 @@ module Skylab::Human
       def execute
 
         event_x = @ps_.possibly_wrapped_event
-        @trilean = @ps_._read_magnetic_value_with_certainty_ :trilean
 
         if event_x.respond_to? :inflected_verb
           _receive_event event_x.to_event
-          @_event = event_x.to_event
-          self._FUN__when_wrapped
+          __when_wrapped
 
         else
           _receive_event event_x
 
           if event_x.has_member :verb_lexeme  # #todo - rename this to `verb_mutable_lexeme` WORLDWIDE
-            __when_lexemic
+            _when_lexemic
           else
             __when_other
           end
@@ -50,12 +48,29 @@ module Skylab::Human
       end
 
       def _receive_event ev
+
         @_event = ev
+
         @_is_completion = ev.has_member( :is_completion ) && ev.is_completion
+
+        # for now, we've got to always *overwrite* whatever trilean we got
+        # from the channel (OR USER) with whatever is in the event (or change
+        # the pipeline..) legacy apps expect the event and not channe to be
+        # the determiner here. ([br] falls apart without this.) :#c15n-spot-2
+
+        x = ev.ok
+        @ps_.trilean = x
+        @trilean = x
+
         NIL_
       end
 
-      def __when_lexemic
+      def __when_wrapped
+        # (hi.)
+        _when_lexemic
+      end
+
+      def _when_lexemic
 
         if @trilean
           if @_is_completion
@@ -64,7 +79,16 @@ module Skylab::Human
             :Is_Lexemic_While_Frobbing
           end
         elsif @trilean.nil?
-          :Is_Lexemic_While_Frobbing
+          if @_is_completion  # [br]
+            :Is_Lexemic_Frobbed_Colon
+          else
+            sym = @ps_.idiom_for_neutrality
+            if sym
+              Const_via_idiom_[ sym ]
+            else
+              :Is_Lexemic_While_Frobbing
+            end
+          end
         else
           :Is_Lexemic_Couldnt_Frob_Because
         end
@@ -97,7 +121,16 @@ module Skylab::Human
             :Is_Lemmatic_Neutral_XXX
           end
         elsif @trilean.nil?
-          :Is_Lemmatic_Neutral
+          if @_is_completion
+            :Is_Lemmatic_Completion_XXX
+          else
+            sym = @ps_.idiom_for_neutrality
+            if sym
+              Const_via_idiom_[ sym ]
+            else
+              :Is_Add_Nothing
+            end
+          end
         else
           :Is_Lemmatic_Failed_To_Frob
         end

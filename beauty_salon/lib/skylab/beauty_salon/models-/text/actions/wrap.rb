@@ -30,6 +30,8 @@ module Skylab::BeautySalon
           y << s while s = st.gets
         end,
 
+        :inflect, :noun, :lemma_string,  # say "couldn't wrap text", not "couldn't wrap a text"
+
         :required,
         :property, :output_bytestream,
 

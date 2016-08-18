@@ -10,7 +10,8 @@ module Skylab::Human
           if ps.lemmas
             __map_line line, ps
           else
-            self._COVER_ME
+            # (hi.) [gv] [pe]
+            __map_line line, ps
           end
         end
       end

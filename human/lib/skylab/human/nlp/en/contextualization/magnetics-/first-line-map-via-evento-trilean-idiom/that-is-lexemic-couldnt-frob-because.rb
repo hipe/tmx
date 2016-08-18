@@ -17,16 +17,20 @@ module Skylab::Human
 
         lc = Magnetics_::Line_Contextualization_via_Line[ line ]
 
-        ev = ps.possibly_wrapped_event  # not a wrapped event, a structured event
+        lexz = ps.possibly_wrapped_event  # might be wrapped, might be structured
 
-        vl = ev.verb_lexeme
+        vl = lexz.verb_lexeme
         if vl
           s = vl.lemma_string
           if s
             v_s = "couldn't #{ s }"
 
-            if ev.respond_to? :noun_lexeme
-              nl = ev.noun_lexeme
+            if lexz.respond_to? :inflected_noun
+              n_s = lexz.inflected_noun
+            end
+
+            if ! n_s and lexz.respond_to? :noun_lexeme
+              nl = lexz.noun_lexeme
               if nl
                 n_s = nl.lemma_string
               end
@@ -34,8 +38,8 @@ module Skylab::Human
           end
         end
 
-        # NOTE it's possible that both strings are still nil
-        # ev go thru the motions anyway to be touchy
+        # NOTE it's possible that both strings are still nil.
+        # we go thru the motions anyway to be touchy
 
         lc.define_prefixed_string_via_inflected_parts do |ip|
 

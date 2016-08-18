@@ -37,7 +37,7 @@ module Skylab::BeautySalon::TestSupport
 
       invoke 'deliterate', '1', '2', _path
 
-      expect :styled, :e, /\Ano such <file> - /
+      expect :styled, :e, /\Afailed because no such <file> - /
       expect_specifically_invited_to :deliterate
     end
 

@@ -1657,10 +1657,15 @@ module Skylab::Brazen
 
       def _emit_contextualizable_non_payload_emission i_a, & x_p
 
-        o = Home_.lib_.human::NLP::EN::Contextualization.new
-        o.expression_agent = expression_agent
-        o.line_yielder = _info_line_yielder
-        o.express_emission i_a, & x_p
+        o = Home_.lib_.human::NLP::EN::Contextualization.begin
+
+        o.given_emission i_a, & x_p
+
+        o.idiom_for_neutrality = :Add_Nothing
+
+        _expag = expression_agent
+        _y = _info_line_yielder
+        o.express_into_under _y, _expag
 
         __init_exitstatus_and_send_invite_via_c15n o
 
@@ -1709,14 +1714,14 @@ module Skylab::Brazen
 
       def __init_exitstatus_and_send_invite_via_c15n o
 
-        ev = o.event
-        x = o.trilean.value_x
-
-        if ev
+        wev = o.possibly_wrapped_event
+        x = o._read_magnetic_value_with_certainty_ :trilean  # because nil is meaningful
+        if wev
           if x.nil?
             maybe_use_exit_status SUCCESS_EXITSTATUS
           else
-            ___maybe_use_exit_status_via_OK_or_not_OK_event ev.to_event
+            ev = wev.to_event
+            ___maybe_use_exit_status_via_OK_or_not_OK_event ev
             if false == x
               send_invitation ev
             end

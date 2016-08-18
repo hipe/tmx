@@ -382,12 +382,14 @@ module Skylab::Autonomous_Component_System
 
         def __express_contextualized_expression y, asc, expag, & y_p
 
-          # (this block has a unit test counterpart at [#hu-043]"C")
+          # (this block has a unit test counterpart at [hu] #C15n-test-family-3
 
-          o = Home_.lib_.human::NLP::EN::Contextualization.new
+          o = Home_.lib_.human::NLP::EN::Contextualization.begin
+
+          o.express_selection_stack.nestedly
 
           o.expression_agent = expag
-          o.expression_proc = y_p
+          o.emission_proc = y_p
 
           o.to_say_subject_association = -> asc_ do
             code asc_.name.as_variegated_symbol
@@ -402,7 +404,6 @@ module Skylab::Autonomous_Component_System
 
           o.subject_association = asc
 
-          o.express_selection_stack.nestedly
 
           o.express_into y  # result is y
         end

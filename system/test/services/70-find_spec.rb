@@ -49,7 +49,7 @@ module Skylab::System::TestSupport
 
       _s_a = _np_like.express_words_into_under [], _expag
 
-      _s = Home_.lib_.human::Phrase_Assembly::Sentence_string_head_via_words[ _s_a ]
+      _s = Home_.lib_.human::PhraseAssembly::Sentence_string_head_via_words[ _s_a ]
 
       _s.should eql 'whose name matched "*.code" in «x» and «y»'
     end
