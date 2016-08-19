@@ -36,6 +36,14 @@ class Skylab::Stack
 
       else
 
+        # manually parse the case of a leading switch-like or argument-like
+        # integer N to be shorthand for "top N", i.e list the topmost N
+
+        md = /\A -?  (?<integer> \d+ ) \z/x.match argv.first
+        if md
+          argv = [ 'top', md[ :integer ], * argv[ 1 .. -1 ] ]
+        end
+
         sym = argv.first.intern
         if _can_execute_operation sym
           argv.shift
@@ -136,11 +144,11 @@ class Skylab::Stack
     end
 
     def _expag
-      @___expag ||= Expag___.new
+      @___expag ||= Expression_Agent___.new
     end
   end
 
-  class Expag___
+  class Expression_Agent___
 
     alias_method :calculate, :instance_exec
 
@@ -164,10 +172,10 @@ class Skylab::Stack
 
     def __push__component_operation
 
-      -> text do
+      -> * text do
         io = _read_writable_IO
         if io
-          io.puts text
+          io.puts text.join SPACE_
           io.close
           ACHIEVED_
         end
@@ -503,6 +511,7 @@ class Skylab::Stack
     end
 
     ACHIEVED_ = true
+    SPACE_ = ' '
     UNABLE_ = false
   end
 end
@@ -511,6 +520,10 @@ end
 
 _ = Skylab::Stack.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File )
 
-_x = _.invoke ::ARGV
+d = _.invoke ::ARGV
 
-$stderr.puts "(exitstatus: #{ _x })"
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit d
