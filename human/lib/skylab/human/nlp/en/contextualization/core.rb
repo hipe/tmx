@@ -87,7 +87,7 @@ module Skylab::Human
       :to_say_subject_association,
     )
 
-    # -- hard-coded output (targets) inteface dreams of [#ta-005]
+    # -- hard-coded output (targets) interface dreams of [#ta-005]
 
     def given_emission sym_a, & ev_p  # assume self is ad-hoc mutable
       @channel = sym_a
@@ -239,7 +239,7 @@ module Skylab::Human
 
     def _execute_stack sym_a
 
-      o = Here_::Magnetic_Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection.begin
+      o = Task_::Magnetics::Magnetics::Result_via_Collection_and_Function_Stack_and_Given_Parameters.begin
       o.collection = COLLECTION_
       o.function_symbol_stack = sym_a
       o.parameters = self
@@ -388,11 +388,6 @@ module Skylab::Human
       Autoloader_[ self ]
     end
 
-    module Magnetic_Magnetics_
-
-      Autoloader_[ self ]
-    end
-
     module Models_
 
       Autoloader_[ self ]
@@ -419,9 +414,11 @@ module Skylab::Human
 
     Do_big_index_and_enhance_once___ = Lazy_.call do
 
+      Task_ = Home_.lib_.task  # weee
+
       _dir = ::Dir.new Magnetics_.dir_pathname.to_path
 
-      col = Home_.lib_.task::Magnetics.
+      col = Task_::Magnetics.
         collection_via_directory_object_and_module _dir, Magnetics_
 
       col.add_constants_not_in_filesystem Magnetics_

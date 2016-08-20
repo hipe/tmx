@@ -4,6 +4,9 @@ module Skylab::Autonomous_Component_System
 
     class Normalization  # [#028] (and see open tag below)
 
+      # (we're calling this the fourth implementation of [#ta-005] pathfinding
+      # although that's a bit of a stretch.)
+
       class << self
         alias_method :begin, :new
         undef_method :new

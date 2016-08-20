@@ -1,3 +1,17 @@
+[#158]       rather than a single #bibliographic-referece, for now we
+             are using this node as a placeholder to be associated with
+             several references. we may at a later date resolve one, possibly
+             one that is not here.
+
+             - "known knowns [..]"
+               David C. Logan in The Journal of Experimental Botany
+               http://jxb.oxfordjournals.org/content/60/3/712.full
+
+             - the whole wikipedia page 'There_are_known_knows' includes
+               several items of interest, including a documentary by
+               acadamy award winning director Erol Morris, and this whole
+               "johari window" thing
+
 [#157]       #bibliographic-reference:
              _Patterns, Principles and Practices of Domain-Driven Design_,
              Scott Millet et guy, Wiley, 2015

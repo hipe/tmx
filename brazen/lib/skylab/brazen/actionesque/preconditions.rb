@@ -7,6 +7,8 @@ module Skylab::Brazen
       class Produce_Box
 
         # assume nonzero length precondition id's
+        # (we're
+        # calling this the second known implementation of [#ta-005] pathfinding.)
 
         def initialize id_a, bx, id, action, kernel, & oes_p
 

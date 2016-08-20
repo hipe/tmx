@@ -42,7 +42,7 @@ class Skylab::Task
       def _main
         sym = @_product_symbol_stream.gets
         if sym
-          fits_that_produce = @_function_index.get_functions_that_produce__ sym
+          fits_that_produce = @_function_index.get_functions_that_produce_ sym
           if 1 == fits_that_produce.length
             fit = fits_that_produce.fetch 0
             if fit.is_monadic

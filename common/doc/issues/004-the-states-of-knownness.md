@@ -31,6 +31,12 @@
 
 ## prerequisites and side-reading
 
+this whole thing gets its fundamental concepts and much of its
+nomenclature from donald rumsfeld (of all people)'s infamous blurb
+about the fact that there were no weapons of mass destruction found in
+iraq. [#sl-158] marks more broadly the realtionship of these terms to
+the outside world.
+
 this is perhaps one step after [#fi-038] the meta-meta-properties
 justification.
 

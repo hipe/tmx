@@ -56,10 +56,14 @@ class Skylab::Task
         @_function_indexes_via_product.to_name_stream
       end
 
-      def get_functions_that_produce__ sym
-        a = @_functions
-        @_function_indexes_via_product_h.fetch( sym ).map do |d|
-          a.fetch d
+      def get_functions_that_produce_ sym
+        d_a = @_function_indexes_via_product[ sym ]
+        if d_a
+          d_a.map do |d|
+            @_functions.fetch d
+          end
+        else
+          NOTHING_
         end
       end
 

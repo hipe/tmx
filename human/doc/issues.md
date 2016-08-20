@@ -38,7 +38,6 @@
              of this phase is to get the various implementations using
              magnetics (functions), but since there is not yet pathfinding
              (#open [#ta-005]), we hack thru that part of it for now..
-             (and #spot-4 is an old waylaid thing related)
 
              "B": take all verb_lemma etc out of all events
 

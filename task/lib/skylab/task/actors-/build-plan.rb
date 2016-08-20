@@ -2,6 +2,8 @@ class Skylab::Task
 
   class Actors_::Build_Plan
 
+    # we're calling this the third known implementation of [#005] pathfinding.
+
     # building a plan (in our linear, synchronous fashion such as things
     # are) involves arranging the nodes in a (sometimes partially
     # arbitrary) sequence such when we arrive at each node, it is

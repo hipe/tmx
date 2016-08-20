@@ -47,7 +47,7 @@ module Skylab::DocTest
         in_st = remove_instance_variable :@asset_line_stream
         orig_st = remove_instance_variable :@original_test_line_stream
 
-        # -- run through the magnetics & related (near [#ta-005])
+        # -- run through the magnetics & related (wants [#ta-005])
 
         o = Magnetics_
         _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ in_st ]

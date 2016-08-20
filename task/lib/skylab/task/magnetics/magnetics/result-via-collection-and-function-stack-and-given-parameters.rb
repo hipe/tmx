@@ -1,8 +1,8 @@
-module Skylab::Human
+class Skylab::Task
 
-  class NLP::EN::Contextualization
+  module Magnetics
 
-    class Magnetic_Magnetics_::Solution_via_Parameters_and_Function_Path_and_Collection
+    class Magnetics::Result_via_Collection_and_Function_Stack_and_Given_Parameters
 
       # (experimental, born during re-arch. a lot like [#ba-047].)
 

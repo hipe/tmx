@@ -9,5 +9,4 @@ CLI integration for single
 -------
 integration: solve a contrived problem with both (900-ish)
 review #todo's ↕
-find a path: don't cycle, find shortest path, whine when not found (700-ish)
 use proper pathfinding

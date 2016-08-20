@@ -4,6 +4,12 @@ module Skylab::Common
 
     class Stream::Actors_::Order
 
+      # (we're
+      # calling this the first known implementation of [#ta-005] pathfinding,
+      # although technically that's a misnomer: this does not work against
+      # general acyclic directed graphs but only (perhaps) trees, where every
+      # node is allowed to point to at most one "parent" that it must go after.)
+
       def self.[] upstream
         new( upstream ).execute
       end

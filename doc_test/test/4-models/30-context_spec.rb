@@ -69,7 +69,8 @@ module Skylab::DocTest::TestSupport
       o = magnetics_module_
       _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
       _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, real_default_choices_ ]
+      # (wants [#ta-005])
       _ns.to_a
-    end  # (we are covering code-runs like the above with [#ta-005] for now)
+    end
   end
 end

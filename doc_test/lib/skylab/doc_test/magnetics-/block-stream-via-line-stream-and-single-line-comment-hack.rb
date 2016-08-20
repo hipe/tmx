@@ -2,7 +2,7 @@ module Skylab::DocTest
 
   class Magnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack < Common_::Actor::Monadic
 
-    # (some of this is near [#ta-005]-ish magnetics composition.)
+    # (some of this is near [#ta-005]-ish magnetics composition (how?))
 
     def initialize line_stream
 

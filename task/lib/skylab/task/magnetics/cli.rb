@@ -93,7 +93,7 @@ class Skylab::Task
         _fi = _col.function_index_
         line_stream = o::DotfileGraph_via_FunctionIndex[ _fi ]
 
-        # (ya #[#005])
+        # (wants [#005])
 
         if @do_open
           @filesystem = ::File  # ..

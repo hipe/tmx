@@ -330,7 +330,7 @@ class Skylab::Task
 
       def collection_via_directory_object_and_module dir_o, mod
 
-        o = Magnetics_  # #[#005]
+        o = Magnetics_  # (wants [#005])
 
         _tss = o::TokenStreamStream_via_DirectoryObject[ dir_o ]
 
@@ -356,6 +356,10 @@ class Skylab::Task
         @___ ||= p[]
       end
     end  # >>
+
+    module Magnetics
+      Autoloader_[ self ]
+    end
 
     module Magnetics_
       Autoloader_[ self ]
