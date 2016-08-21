@@ -14,18 +14,32 @@ module Skylab::Task::TestSupport
         @given_sym_a = sym_a
       end
 
+      def given_array_ sym_a
+        @given_sym_a = sym_a
+      end
+
       def target_ sym
         @target_sym = sym
       end
+
+      def customize_by_ & p
+        @customize_by = p
+      end
+
+      attr_reader :customize_by
 
       # -- assertion
 
       def expect_stack_ * const_a
 
-        _a = _three_in_the_right_order
-        ok, const_a_ = subject_module_[ * _a ]
-
+        _o = _begin_session
+        ok, const_a_ = _o.execute
         ok || fail
+
+        if do_debug
+          debug_IO.puts const_a_.inspect
+        end
+
         last = const_a.length - 1
         last_ = const_a.length - 1
         d = -1
@@ -52,18 +66,28 @@ module Skylab::Task::TestSupport
 
       def expect_failure_structure__
 
-        o = subject_module_.begin_with( * _three_in_the_right_order )
-        o.do_trace = true
+        o = _begin_session do |o_|
+          o_.do_trace = true
+        end
         ok, x = o.execute
         ok && fail
         x
       end
 
-      def _three_in_the_right_order
+      def _begin_session
+
         _given_sym_a = remove_instance_variable :@given_sym_a
         _target_sym = remove_instance_variable :@target_sym
         _collection = collection_
-        [ _collection, _given_sym_a, _target_sym ]
+        o = subject_module_.begin_with _collection, _given_sym_a, _target_sym
+        if block_given?
+          yield o
+        end
+        p = customize_by
+        if p
+          p[ o ]
+        end
+        o
       end
 
       # -- support

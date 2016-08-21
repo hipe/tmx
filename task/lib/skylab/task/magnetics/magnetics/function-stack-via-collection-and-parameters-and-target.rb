@@ -57,6 +57,7 @@ class Skylab::Task
 
       def initialize
         @do_trace = nil
+        @preferred_waypoint_node = nil  # just a sketch for now
       end
 
       def _init target_sym, given_sym_a, collection  # NOTE in volatility order
@@ -69,6 +70,7 @@ class Skylab::Task
 
       attr_writer(
         :do_trace,
+        :preferred_waypoint_node,
       )
 
       def execute
@@ -93,7 +95,7 @@ class Skylab::Task
         # if there are no functions that produce the target node then it is a
         # "startpoint" node (see the document). that is, if we don't have it
         # then there is no way we can get it. ergo we now know that this node
-        # is unsolvavle.
+        # is unsolvable.
 
         # otherwise (and there *are* functions that produce this node), what
         # we do depends on whether there's one function or more than one
@@ -133,17 +135,17 @@ class Skylab::Task
         #
         # to jump ahead for a moment, imagine we have tried solving each of
         # these functions. if we tried all of them and solved none (that is,
-        # we determine that all of them are unsolvavle) then that's easy, we
+        # we determine that all of them are unsolvable) then that's easy, we
         # know that our target node is unsolvable and we're done.
         #
         # another easy case is that we solve only one function, this too is
         # easy - our solution should involve using that function.
         #
         # but the fun case is when we solve multiple functions. for now
-        # we're going to use a dirty heuristic but this will be the subject
-        # of further documentation and maybe API exposure..
+        # we default to a sometimes wacky heuristic but this will be the
+        # subject of API exposures as needed..
         #
-        # this dirty heuristic requires that we try to solve for each
+        # this wacky heuristic requires that we try to solve for each
         # function from a "blank slate" - that is, don't assume that you
         # already solved those nodes of the graph under the other functions
         # when you try to solve for this one. there is a cost to this in
@@ -170,7 +172,7 @@ class Skylab::Task
           if 1 == solution_stacks.length
             [ SOLVED__, solution_stacks.fetch(0) ]
           else
-            __hardcoded_tiebreak solution_stacks
+            __attempt_tiebreak solution_stacks
           end
         elsif do_trace
           [ UNSOLVABLE__, [ :no_functions_solved, failure_stacks ] ]  # covered only by [hu]
@@ -179,27 +181,58 @@ class Skylab::Task
         end
       end
 
-      def __hardcoded_tiebreak solution_stacks
+      def __attempt_tiebreak solution_stacks
+        sym = @preferred_waypoint_node
+        if sym
+          __attempt_tiebreak_via_preferred_waypoint_node sym, solution_stacks
+        else
+          _attempt_tiebreak_by_chosing_tallest_stack solution_stacks
+        end
+      end
 
-        # just to get through the day:
+      def __attempt_tiebreak_via_preferred_waypoint_node sym, solution_stacks
 
-        # this is not (necessarily) a good longterm solution to the problem
-        # but here is its rationale which is itself interesting, and built
-        # on top of a long series of assumptions:
+        # if we like this it may have to get a more articulated API..
+
+        d_a = nil
+        read = @function_index.proc_for_read_function_item_ticket_via_const_
+        solution_stacks.each_with_index do |stack, d|
+          stack.each do |function_sym|
+            if read[ function_sym ].prerequisite_term_symbols.include? sym
+              ( d_a ||= [] ).push d
+              next
+            end
+          end
+        end
+        if d_a
+          if 1 == d_a.length
+            [ SOLVED__, solution_stacks.fetch( d_a.fetch 0 ) ]
+          else
+            self._COVER_ME_tiebreak_the_shorter_stack_list
+          end
+        else
+          self._COVER_ME_fall_thru_to_ordinary_tie
+        end
+      end
+
+      def _attempt_tiebreak_by_chosing_tallest_stack solution_stacks
+
+        # when faced with multiple solution stacks, our wacky default
+        # behavior is to chose the longest stack (if there is one).
         #
-        # solution paths typically start at startpoints (i.e solution stacks
-        # typically have tops that touch startpoints). (the user can pass
-        # non-startpoint node values as givens, but we'll assume this is not
-        # typical.)
+        # here's the rationale behind this wacky default tiebreaking behavior:
         #
         # taller stacks typically traverse (solve) more nodes than shorter
         # stacks. typically this means that taller stacks tend to take more
         # of the given arguments into account than the shorter stacks.
         #
-        # typically, those paths that take into account more givens have
+        # typically, those stacks that take into account more givens have
         # behavior that is more custom-suited to those particular arguments.
         # so for these purposes, it is not shortest path we are after but the
         # longest. all of this may change.
+        #
+        # if the longest length of stack has multiple stacks that are this
+        # length, then there's nothing you can do, folks (for now).
 
         max = 0
         by_number_of_steps = ::Hash.new { |h, k| x = [] ; h[k] = x ; x }

@@ -108,7 +108,7 @@ class Skylab::Task
 
       def proc_for_read_function_item_ticket_via_const
 
-        function_index_.proc_for_read_function_item_ticket_via_const__
+        function_index_.proc_for_read_function_item_ticket_via_const_
       end
 
       def proc_for_read_function_item_via_function_item_ticket

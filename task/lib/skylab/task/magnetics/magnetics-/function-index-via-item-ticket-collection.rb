@@ -71,7 +71,7 @@ class Skylab::Task
         @_functions.fetch const_h_.fetch const
       end
 
-      def proc_for_read_function_item_ticket_via_const__
+      def proc_for_read_function_item_ticket_via_const_
         h = const_h_
         a = @_functions
         -> const do

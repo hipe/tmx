@@ -30,7 +30,7 @@ module Skylab::Human
       def __subject_string
 
         if @ps_.subject_association  # experimental here
-          Magnetics_::String_via_Subject_Association[ @ps_ ]
+          Magnetics_::Subject_Association_String_via_Subject_Association[ @ps_ ]
         else
           __subject_string_classically
         end

@@ -382,7 +382,7 @@ module Skylab::Human
         nm asc.name
       end
 
-      String_via_Subject_Association = -> ps do
+      Subject_Association_String_via_Subject_Association = -> ps do
 
         sa = ps.subject_association
         if sa

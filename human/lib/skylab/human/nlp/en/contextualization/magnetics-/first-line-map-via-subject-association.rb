@@ -47,7 +47,7 @@ module Skylab::Human
 
         ps = @ps_
 
-        final_s = Magnetics_::String_via_Subject_Association[ ps ]
+        final_s = Magnetics_::Subject_Association_String_via_Subject_Association[ ps ]
         # (no trailing space because #c15n-spot-1)
 
         @__express_subject_association = -> lc do
