@@ -3,6 +3,13 @@ module Skylab::Human
   class NLP::EN::Contextualization  # [#043]
 
     class << self
+
+      def collection
+        # (part of public API for visualization)
+        Do_big_index_and_enhance_once___[]
+        COLLECTION_
+      end
+
       alias_method :begin, :new
       undef_method :new
     end  # >>

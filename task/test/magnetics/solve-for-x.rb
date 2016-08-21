@@ -22,7 +22,9 @@ module Skylab::Task::TestSupport
 
       def expect_stack_ * const_a
 
-        ok, const_a_ = _pair
+        _a = _three_in_the_right_order
+        ok, const_a_ = subject_module_[ * _a ]
+
         ok || fail
         last = const_a.length - 1
         last_ = const_a.length - 1
@@ -48,17 +50,20 @@ module Skylab::Task::TestSupport
         NIL
       end
 
-      def expect_failure_structure__  # #todo
-        ok, x = _pair
+      def expect_failure_structure__
+
+        o = subject_module_.begin_with( * _three_in_the_right_order )
+        o.do_trace = true
+        ok, x = o.execute
         ok && fail
         x
       end
 
-      def _pair
+      def _three_in_the_right_order
         _given_sym_a = remove_instance_variable :@given_sym_a
         _target_sym = remove_instance_variable :@target_sym
         _collection = collection_
-        subject_module_.call _target_sym, _given_sym_a, _collection
+        [ _collection, _given_sym_a, _target_sym ]
       end
 
       # -- support

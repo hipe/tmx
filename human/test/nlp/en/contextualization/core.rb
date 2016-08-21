@@ -240,7 +240,7 @@ module Skylab::Human::TestSupport
 
       define_method :__Result_State_for_Deep_Emission, ( Lazy_.call do
 
-        X_NEC_Result_State = ::Struct.new(
+        X_NEC_Result_State_for_Deep_Emmission = ::Struct.new(
           :channel,
           :event,
           :first_line,
@@ -250,7 +250,7 @@ module Skylab::Human::TestSupport
 
       define_method :__Result_State_for_Lines_Only, ( Lazy_.call do
 
-        X_NEC_Result_State = ::Struct.new(
+        X_NEC_Result_State_for_Lines_Only = ::Struct.new(
           :first_line,
           :second_line,
         )

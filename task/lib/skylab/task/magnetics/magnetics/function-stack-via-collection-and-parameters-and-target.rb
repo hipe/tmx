@@ -42,20 +42,34 @@ class Skylab::Task
       # along the way to cull the tree. (see "contrived example" in the document.)
 
       class << self
-        def call target_sym, given_sym_a, collection
-          new( target_sym, given_sym_a, collection ).execute
+
+        def call collection, given_x, target_x
+          new._init( target_x, given_x, collection ).execute
         end
         alias_method :[], :call
+
+        def begin_with collection, given_x, target_x
+          new._init target_x, given_x, collection
+        end
+
         private :new
       end  # >>
 
-      def initialize target_sym, given_sym_a, collection
+      def initialize
+        @do_trace = nil
+      end
 
+      def _init target_sym, given_sym_a, collection  # NOTE in volatility order
         @function_index = collection.function_index_
         @knownnesses = ::Hash[ given_sym_a.map { |i| [i, KNOWN_TO_BE_SOLVED__ ] } ]
         @target_symbol = target_sym
         @visiting = {}
+        self
       end
+
+      attr_writer(
+        :do_trace,
+      )
 
       def execute
 
@@ -103,7 +117,11 @@ class Skylab::Task
           end
         else
           @knownnesses[ @target_symbol ] = KNOWN_TO_BE_UNSOLVABLE__
-          [ UNSOLVABLE__, [[ @target_symbol, :is_startpoint_but_is_not_a_given ]]]  # #here:result-tuple
+          if @do_trace
+            [ UNSOLVABLE__, [[ @target_symbol, :is_startpoint_but_is_not_a_given ]]]  # #here:result-tuple
+          else
+            UNSOLVABLE_RESULT_TUPLE__
+          end
         end
       end
 
@@ -134,6 +152,7 @@ class Skylab::Task
         #
         # there can only be one.
 
+        do_trace = @do_trace
         failure_stacks = nil  # #here:debugging-feature
         solution_stacks = nil
 
@@ -142,7 +161,7 @@ class Skylab::Task
           ok, x = _fork._solve_for_function_item_ticket fit
           if ok
             ( solution_stacks ||= [] ).push x
-          else
+          elsif do_trace
             ( failure_stacks ||= [] ).push x
           end
         end
@@ -153,8 +172,10 @@ class Skylab::Task
           else
             __hardcoded_tiebreak solution_stacks
           end
+        elsif do_trace
+          [ UNSOLVABLE__, [ :no_functions_solved, failure_stacks ] ]  # covered only by [hu]
         else
-          self.COVER_ME_fun_report_on_failure
+          UNSOLVABLE_RESULT_TUPLE__
         end
       end
 
@@ -213,6 +234,7 @@ class Skylab::Task
         # short-circuit to reduce search time (at cost of error message
         # detail.)
 
+        do_trace = @do_trace
         known_to_be_unsolvable = false
         metadata_about_unsolvability = nil
         pending_call_stacks = nil
@@ -242,8 +264,10 @@ class Skylab::Task
 
           if ! ok
             known_to_be_unsolvable = true
-            x.push [ @target_symbol, :via_function, fit.const, :has_argument_that_is_unsolvable, sym ]
-            metadata_about_unsolvability = x
+            if do_trace
+              x.push [ @target_symbol, :via_function, fit.const, :has_argument_that_is_unsolvable, sym ]
+              metadata_about_unsolvability = x
+            end
             break
           end
 
@@ -251,7 +275,11 @@ class Skylab::Task
         end
 
         if known_to_be_unsolvable
-          [ UNSOLVABLE__, metadata_about_unsolvability ]  # #here:result-tuple
+          if do_trace
+            [ UNSOLVABLE__, metadata_about_unsolvability ]  # #here:result-tuple
+          else
+            UNSOLVABLE_RESULT_TUPLE__
+          end
         else
           mutable_path_stack = [ fit.const ]
           if pending_call_stacks
@@ -301,10 +329,9 @@ class Skylab::Task
       def __build_a_fork
 
         # this produces a new object whose "notespace" is a DEEP DUP of
-        # the receiver's notespace. it's not cheap compare to etc.
+        # the receiver's notespace. it's not cheap compared to the other.
 
-        o = self.class.allocate
-        o.instance_variable_set :@function_index, @function_index
+        o = _begin_copy
         o.instance_variable_set :@knownnesses, @knownnesses.dup
         o.instance_variable_set :@target_symbol, @target_symbol
         o.instance_variable_set :@visiting, @visiting.dup
@@ -318,12 +345,18 @@ class Skylab::Task
         # the same notespace so that we don't repeat the same calculations
         # made for other, previous arguments. see #here:arbitrariness
 
-        o = self.class.allocate
-        o.instance_variable_set :@function_index, @function_index
+        o = _begin_copy
         o.instance_variable_set :@knownnesses, @knownnesses
         o.instance_variable_set :@target_symbol, sym
         o.instance_variable_set :@visiting, @visiting
         o._common
+      end
+
+      def _begin_copy
+        o = self.class.allocate
+        o.instance_variable_set :@do_trace, @do_trace
+        o.instance_variable_set :@function_index, @function_index
+        o
       end
 
       # ==
@@ -371,6 +404,7 @@ class Skylab::Task
 
       SOLVED__ = true
       UNSOLVABLE__ = false
+      UNSOLVABLE_RESULT_TUPLE__ = [ UNSOLVABLE__ ].freeze
     end
   end
 end

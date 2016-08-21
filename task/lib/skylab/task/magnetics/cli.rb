@@ -36,6 +36,7 @@ class Skylab::Task
     class Root_Autonomous_Component_System_  # #stowaway
 
       def initialize client
+        @extended = false
         @open = false
         @__filesystem_proc = client.method :filesystem
         # NOTE directory class expected for now of above (then #here)
@@ -45,6 +46,22 @@ class Skylab::Task
 
         yield :description, -> y do
           y << "(experimental) write the dotfile to a tmpfile and open it now."
+        end
+
+        yield :flag
+      end
+
+      def __extended__component_association
+
+        yield :description, -> y do
+          y << "interpret the path as `<require lib><const>.<method>`, e.g"
+          y << "  `skylab/human::Skylab::Human::NLP::EN::Contextualization.collection`"
+          y << "this option exists to accomodate collections that make runtime"
+          y << "mutations beyond just what can be isomorphed from the filesystem."
+          y << "the const must be fully qualified (start with `::`)."
+          y << "(at present) the method call cannot take any arguments."
+          y << "the lib will be required and then the method will be sent"
+          y << "to the object referenced by the const to resolve the collection."
         end
 
         yield :flag
@@ -60,6 +77,7 @@ class Skylab::Task
           o = Visualize_Magnetics___.new( & oes_p )
           o.do_open = @open
           o.path = path
+          o.path_is_a_call_spec = @extended
           o.directory_class = @__filesystem_proc.call  # #here
           o.execute
         end
@@ -81,19 +99,12 @@ class Skylab::Task
         :do_open,
         :directory_class,
         :path,
+        :path_is_a_call_spec,
       )
 
       def execute
 
-        o = Here_::Magnetics_
-        _path = remove_instance_variable :@path
-        _dir = remove_instance_variable( :@directory_class ).new _path
-        _tss = o::TokenStreamStream_via_DirectoryObject[ _dir ]
-        _col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
-        _fi = _col.function_index_
-        line_stream = o::DotfileGraph_via_FunctionIndex[ _fi ]
-
-        # (wants [#005])
+        line_stream = __line_stream
 
         if @do_open
           @filesystem = ::File  # ..
@@ -125,6 +136,84 @@ class Skylab::Task
         ::Kernel.exec 'open', path
         Home_._NEVER_SEE
       end
+
+      def __line_stream
+        if @path_is_a_call_spec
+          __line_stream_when_path_is_call_spec
+        else
+          __line_stream_when_path_is_directory
+        end
+      end
+
+      def __line_stream_when_path_is_call_spec
+
+        _spec_s = remove_instance_variable :@path
+        spec = Call_Spec___.__via_string _spec_s
+
+        require spec.require_lib
+
+        _broseph = spec.const_symbol_array.reduce ::Object do |m, x|
+          m.const_get x, false
+        end
+
+        _col = _broseph.send spec.method
+
+        _line_stream_via_collection _col
+      end
+
+      def __line_stream_when_path_is_directory
+        o = Here_::Magnetics_
+        _path = remove_instance_variable :@path
+        _dir = remove_instance_variable( :@directory_class ).new _path
+        _tss = o::TokenStreamStream_via_DirectoryObject[ _dir ]
+        _col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
+        # (wants [#005])
+        _line_stream_via_collection _col
+      end
+
+      def _line_stream_via_collection col
+        _fi = col.function_index_
+        Here_::Magnetics_::DotfileGraph_via_FunctionIndex[ _fi ]
+      end
+    end
+
+    # ==
+
+    class Call_Spec___
+
+      class << self
+
+        def __via_string s
+          # because we want to allow the path to be absolutely any
+          # nonzero-length string, we parse the spec from the end WEEE
+
+          scn = Home_.lib_.string_scanner.new s.reverse
+
+          method = scn.scan( %r([a-z0-9_]*)i ).reverse
+          scn.skip %r(\.) or fail
+          _const = scn.scan( %r((?:[a-zA-Z0-9_]*[A-Z]::)+) ).reverse
+          require_lib = scn.scan( %r(\A.+)m ).reverse
+          scn.eos? || fail
+          s_a = _const.split '::'
+          s_a.shift
+          _sym_a = s_a.map( & :intern )
+          new method.intern, _sym_a, require_lib
+        end
+
+        private :new
+      end  # >>
+
+      def initialize method, const_sym_a, require_lib
+        @const_symbol_array = const_sym_a
+        @method = method
+        @require_lib = require_lib
+      end
+
+      attr_reader(
+        :const_symbol_array,
+        :method,
+        :require_lib,
+      )
     end
 
     # --

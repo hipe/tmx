@@ -10,3 +10,5 @@ CLI integration for single
 integration: solve a contrived problem with both (900-ish)
 review #todo's ↕
 use proper pathfinding
+add that preference thing
+fix viz to take into account etc
