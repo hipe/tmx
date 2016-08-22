@@ -389,6 +389,7 @@ class Skylab::Task
         o = self.class.allocate
         o.instance_variable_set :@do_trace, @do_trace
         o.instance_variable_set :@function_index, @function_index
+        o.instance_variable_set :@preferred_waypoint_node, @preferred_waypoint_node
         o
       end
 

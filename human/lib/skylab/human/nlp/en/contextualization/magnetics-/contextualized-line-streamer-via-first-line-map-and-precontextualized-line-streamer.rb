@@ -13,11 +13,7 @@ module Skylab::Human
 
         o.on_first = -> line do
 
-          _line_ = _flm[ line ]
-
-          _line_ || Home_._SANITY  # #todo
-
-          _line_
+          _flm[ line ] || Home_._SANITY  # (no one should reduce the first line, right?)
         end
 
         o.on_subsequent = IDENTITY_

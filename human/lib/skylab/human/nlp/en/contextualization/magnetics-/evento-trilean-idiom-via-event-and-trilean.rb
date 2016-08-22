@@ -39,7 +39,7 @@ module Skylab::Human
         else
           _receive_event event_x
 
-          if event_x.has_member :verb_lexeme  # #todo - rename this to `verb_mutable_lexeme` WORLDWIDE
+          if event_x.has_member :verb_lexeme
             _when_lexemic
           else
             __when_other
@@ -106,13 +106,13 @@ module Skylab::Human
         else
           sa = ps.subject_association
           if sa
-            lemz = Magnetics_::Lemmas_via_Subject_Association_XXX[ ps ]  # #todo
+            lemz = Magnetics_::Lemmas_via_Subject_Association_XXX[ ps ]
             ps.lemmas = lemz
           end
         end
 
         # note - we go "lemmatic" even when there are no lemmas, just to minify this
-        # (every "XXX" below is a #todo)
+        # every XXX below and above is #open [#053]
 
         if @trilean
           if @_is_completion

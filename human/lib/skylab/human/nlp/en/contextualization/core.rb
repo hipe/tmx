@@ -6,8 +6,8 @@ module Skylab::Human
 
       def collection
         # (part of public API for visualization)
-        Do_big_index_and_enhance_once___[]
-        COLLECTION_
+        Init_collection_once__[]
+        COLLECTION__
       end
 
       alias_method :begin, :new
@@ -15,7 +15,7 @@ module Skylab::Human
     end  # >>
 
     def initialize
-      Do_big_index_and_enhance_once___[]
+      NOTHING_
     end
 
     def initialize_copy _
@@ -24,25 +24,9 @@ module Skylab::Human
 
     # -- parameter writer and reader definitions (from more to less complex)
 
-    # ~ because it's not interesting to put the event-touching into the graph
-    #   we just write a lazy reader here "by hand" but note the assumptions:
-
-    def possibly_wrapped_event
-      unless _magnetic_value_is_known_ :possibly_wrapped_event
-        if :Is_Of_Event == @emission_shape
-          @possibly_wrapped_event = @emission_proc.call
-        else
-          @possibly_wrapped_event = NOTHING_
-        end
-      end
-      @possibly_wrapped_event
-    end
-
-    # ~ a "trilean" is like a "boolean" but can be one of three meaningful
-    #   values: trueish, nil or false; usually interpreted to represent
-    #   success/ok, neutral and failure; respectively. we wrap it in
-    #   knownness to protect against reading when the value is unknown and
-    #   misinterpreting `nil`. see also #c15n-spot-2.
+    # ~ even though in a perfectly magnetic world it shouldn't be necessary,
+    #   we want to be sure that when we read `nil` from the below reader,
+    #   it's trilean `nil` and not the not-set `nil`. #c15n-spot-2 is nearby.
 
     def trilean= x
       @trilean = Common_::Known_Known[ x ] ; x
@@ -52,76 +36,125 @@ module Skylab::Human
       @trilean.value_x
     end
 
-    # - the below haven't been needed yet, they default to a default
+    # ~ functions are written assuming these terms are user-writable (and
+    #   when the below result in nil the function uses an appropriate default)
+    #   but since the overhaul we haven't needed as much customization..
+
+    def idiom_for_failure
+      NOTHING_
+    end
+
+    def idiom_for_success
+      NOTHING_
+    end
 
     def to_contextualize_first_line_with_selection_stack
-      NOTHING_  # same
+      NOTHING_
     end
 
     def to_say_first_selection_stack_item
-      NOTHING_  # same
+      NOTHING_
     end
 
     def to_say_nonfirst_last_selection_stack_item
-      NOTHING_  # same
+      NOTHING_
     end
 
-    attr_reader(
-      :line_yielder,
-    )
+    # ~ self-documenting city
 
-    attr_accessor(
+    # the ordinary startpoints:
+    WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_PIPELINE__ = [
       :channel,
-      :contextualized_line_streamer,
+      :selection_stack,
+      :subject_association,
+    ]
+
+    # not part of the pipeline, only for users to customize behavior:
+    WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_FUNCTIONS__ = [
       :downstream_selective_listener_proc,
-      :expression_agent,
       :emission_proc,
-      :emission_shape,
-      :event_shape,
+      :expression_agent,
+      :idiom_for_neutrality,  # [ba]
+      :to_say_selection_stack_item,
+      :to_say_subject_association,
+    ]
+
+    # the ordinary waypoints and endpoints of the pipeline:
+    RDWR_BY_PIPELINE_ONLY__ = [
+      :contextualized_line_streamer,
       :evento_trilean_idiom,
       :first_line_map,
-      :idiom_for_failure,
-      :idiom_for_neutrality,
-      :idiom_for_success,
       :lemmas,
       :lemmato_trilean_idiom,
       :normal_selection_stack,
       :precontextualized_line_streamer,
-      :selection_stack,
-      :subject_association,
       :trilean_idiom,
-      :to_say_selection_stack_item,
-      :to_say_subject_association,
+    ]
+
+    # nodes that are set here manually and read by the pipeline:
+    READ_ONLY_BY_PIPELINE_ONLY__ = [
+      :emission_shape,
+      :event,
+      :passthru,
+    ]
+
+    # set here manually and read by functions whew!
+    READ_ONLY_BY_FUNCTIONS_ONLY__ = [
+      :line_yielder,
+    ]
+
+    CAN_BE_DETECTED_AS_A_GIVEN___ = [
+      * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_PIPELINE__,
+      * READ_ONLY_BY_PIPELINE_ONLY__,
+
+      :trilean,  # write only by user and readable/writable by pipeline.
+      # has custom reader/writer so it must not be part of the below calls.
+    ]
+
+    attr_writer(
+      * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_PIPELINE__,
+      * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_FUNCTIONS__,
+      * RDWR_BY_PIPELINE_ONLY__,
     )
 
-    # -- hard-coded output (targets) interface dreams of [#ta-005]
+    attr_reader(
+      * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_PIPELINE__,
+      * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_FUNCTIONS__,
+      * RDWR_BY_PIPELINE_ONLY__,
+      * READ_ONLY_BY_PIPELINE_ONLY__,
+      * READ_ONLY_BY_FUNCTIONS_ONLY__,
+    )
 
-    def given_emission sym_a, & ev_p  # assume self is ad-hoc mutable
+    alias_method :possibly_wrapped_event, :event  # use the longer name in
+    # hand-written code. the shorter name is used in the pipeline network
+    # for ergonomics and name-change insulation but this may change. :#here-1
+
+    # -- hard-coded writer "macros"
+
+    def given_emission sym_a, & ev_p
       @channel = sym_a
       @emission_proc = ev_p
       NIL_
     end
 
-    def to_exception  # makes several assumptions:
-      # assume e.g `given_emission` was called
-      # covered by #C15n-test-family-5
-      # (looks like #[#ca-066] emission-to-exception pattern)
+    def to_exception  # assume e.g `given_emission` was called
+      # probably the last solution for #[#ca-066] emission-to-exception pattern
 
+      # (we would push this up higher but it hasn't been needed yet)
       if ! _magnetic_value_is_known_ :expression_agent
         @expression_agent = Home_.lib_.brazen::API.expression_agent_instance
       end
 
-      if :expression == @channel.fetch( 1 )
+      _init_emission_shape
 
-        a = _solve_stack_for_contextualized_expression
-        a = a.dup
-        a[ 0 ] = :Exception_via_Contextualized_Line_Streamer_and_First_Line_Map
-        _wow = _execute_stack a
-        _wow  # #todo
+      if :Is_Of_Expression == @emission_shape
+
+        _stack = _assisted_stack_when_emission_for :exception
+        _run_this _stack
       else
         self._EASY_just_build_the_event_and_call_to_exception_on_it
       end
-    end
+    end  # covered by #C15n-test-family-5
 
     def emission_handler_via_emission_handler & downstream_oes_p
 
@@ -130,22 +163,17 @@ module Skylab::Human
       me = self
 
       -> * sym_a, & ev_p do
-
         inst = me.dup
-
         inst.channel = sym_a
-
         inst.emission_proc = ev_p
-
         inst.downstream_selective_listener_proc = downstream_oes_p
-
         inst._common_express
       end
     end
 
     def build_string  # might just be a #feature-island
-      # changes radically at [#043]
-      _execute_stack Hardcoded_path_1_classic___[]
+      _stack = _stack_for :message_that_is_single_string
+      _run_this _stack
     end
 
     def express_into_under line_yielder, expag  # assume self is ad-hoc mutable
@@ -159,116 +187,141 @@ module Skylab::Human
     end
 
     def _common_express
-      _a = _solve_stack_for_contextualized_expression
-      _execute_stack _a
-    end
 
-    def _solve_stack_for_contextualized_expression
+      # what we do here that we [think we] can't do with pipelines is interesting
 
-      if _magnetic_value_is_known_ :channel
+      _stack = if _magnetic_value_is_known_ :channel
 
-        @emission_shape = Magnetics_::Emission_Shape_via_Channel[ self ]
+        _init_emission_shape
 
         if :Is_Of_Event == @emission_shape
-          Hardcoded_path_2_event___[]
-        elsif _magnetic_value_is_known_ :selection_stack
-          Hardcoded_path_4_predicative___[]
+          __hand_hacked_stack_for_event
         else
-          Hardcoded_path_5_passthru___[]
+          _assisted_stack_when_emission_for :contextualized_expression
         end
-
       elsif _magnetic_value_is_known_ :subject_association
 
         @emission_shape = :Is_Of_Expression
-        Hardcoded_path_3_no_channel_just_SA___[]
 
+        _stack_for :contextualized_expression
       else
         self._COVER_ME
       end
+
+      _run_this _stack
     end
 
-    common_finish = Lazy_.call do
-      [
-        :Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape,
-        :Contextualized_Line_Streamer_via_First_Line_Map_and_Precontextualized_Line_Streamer,
-        :Precontextualized_Line_Streamer_via_Emission_Shape,
-      ]
+    def _init_emission_shape
+      @emission_shape = Magnetics_::Emission_Shape_via_Channel[ self ]
     end
 
-    classic_start = Lazy_.call do
-      [
-        :First_Line_Map_via_Lemmas_and_Lemmato_Trilean_Idiom,
-        :Lemmato_Trilean_Idiom_via_Trilean,
-        :Lemmas_via_Normal_Selection_Stack,
-        :Normal_Selection_Stack_via_Selection_Stack,
-        :Trilean_via_Channel,
-      ]
+    def __hand_hacked_stack_for_event  # assume @emission_proc
+
+      @event = @emission_proc.call  # lhs ivar name is per #here-1
+      _stack_for :contextualized_expression do |o|
+        o.preferred_waypoint_node = :event
+      end
     end
 
-    Hardcoded_path_5_passthru___ = Lazy_.call do
-      [
-        :Contextualized_Expression_via_Contextualized_Line_Streamer_and_Emission_Shape,
-        :Contextualized_Line_Streamer_via_Passthru_and_Precontextualized_Line_Streamer,
-        :Precontextualized_Line_Streamer_via_Emission_Shape,
-        :Trilean_via_Channel,  # only b.c clients might ask
-      ].freeze
+    def _assisted_stack_when_emission_for target
+
+      if _magnetic_value_is_known_ :selection_stack
+
+        _stack_for :contextualized_expression
+      else
+        _assisted_stack_for_passthru target
+      end
     end
 
-    Hardcoded_path_4_predicative___ = Lazy_.call do
-      [
-        * common_finish[],
-        * classic_start[],
-      ].freeze
+    def _assisted_stack_for_passthru target
+      @passthru = true
+      _stack_for target do |o|
+        o.manual_adjustment_proc = Workaround_for_bug_hu_60___
+      end
     end
 
-    Hardcoded_path_3_no_channel_just_SA___ = Lazy_.call do
-      [
-        * common_finish[],
-        :First_Line_Map_via_Subject_Association,
-      ].freeze
+    def solve_for sym  # [br] (as covered by [gv])
+      if _magnetic_value_is_known_ sym
+        _read_magnetic_value_ sym
+      else
+        _stack = _stack_for sym
+        x = _run_this _stack  # because it was as the bottom of the stack:
+        _write_magnetic_value_ x, sym
+        x
+      end
     end
 
-    Hardcoded_path_2_event___ = Lazy_.call do
-      [
-        * common_finish[],
-        :First_Line_Map_via_Evento_Trilean_Idiom,
-        :Evento_Trilean_Idiom_via_Event_and_Trilean,
-        :Trilean_via_Channel,
-      ].freeze
+  -> do
+
+    # avoiding calculating the same stack for the same "ingredients" twice
+    # saves you palpable milliseconds (depending on the extent to which this
+    # happens.  #C15n-test-family-5 (a little) and #c15n-test-family-1 (a lot)
+
+    stack_cache = {}
+
+    define_method :_stack_for do |target_sym, &p|
+      query = Pipeline_Query___.new
+      query.given_symbol_array = __build_givens
+      query.target_symbol = target_sym
+      if p
+        p[ query ]
+      end
+      stack_cache.fetch query do
+        stack = __stack_via_query query
+        stack_cache[ query ] = stack
+        stack
+      end
+    end
+  end.call
+
+    def __stack_via_query query
+
+      Init_collection_once__[]
+
+      o = Task_::Magnetics::Magnetics::
+        Function_Stack_via_Collection_and_Parameters_and_Target.begin_with(
+          COLLECTION__,
+          query.given_symbol_array,
+          query.target_symbol,
+        )
+
+      o.preferred_waypoint_node = query.preferred_waypoint_node  # if any
+      o.do_trace = true
+      ok, stack = o.execute
+      if ok
+        stack
+      else
+        self._COVER_ME_stack_not_found
+      end
     end
 
-    Hardcoded_path_1_classic___ = Lazy_.call do
-      [
-        :Message_That_Is_Single_String_via_First_Line_Map,
-        * classic_start[],
-      ].freeze
+    def __build_givens
+      CAN_BE_DETECTED_AS_A_GIVEN___.reduce [] do |m, x|
+        if _magnetic_value_is_known_ x
+          m << x
+        end
+        m
+      end
     end
 
-    def _execute_stack sym_a
-
+    def _run_this stack
       o = Task_::Magnetics::Magnetics::Result_via_Collection_and_Function_Stack_and_Given_Parameters.begin
-      o.collection = COLLECTION_
-      o.function_symbol_stack = sym_a
+      o.collection = COLLECTION__
+      o.function_symbol_stack = stack
       o.parameters = self
-      _ = o.execute
-      _ # #todo
+      o.execute
     end
 
-    # -- experimental magnetic parameter reader/writer API (VERY experimental)
+    # -- an experimental implementation to frontier the experimental (sic)
+    #    API that will hold for a "parameter store" to be used when a
+    #    magnetic pipeline stack is executed. every method here MUST:
     #
-    # these exist so that magnetic pipeline pathfinding and solving concerns
-    # can inquire the [#co-004] knownness of, read and write particpating
-    # parameter values with an interface that is insulated from implementation
-    # details of the particular parameter store. it's VERY experimental and
-    # won't settle down until the whole magnetic implementation is out of [hu].
+    #      - use `_named_like_this_` to keep the namespace of ordinary-
+    #        looking names wide-open for business (see [#bs-028]:#tier-0.5)
     #
-    # every method in this section MUST:
-    #
-    #   - use `_named_like_this_` to keep the namespace of ordinary-looking
-    #     names wide-open for business (see [#bs-028]:#tier-0.5)
-    #
-    #   - match the regex /(\A|_)magnetic_value(\z|_)/
+    #      - match the regex /(\A|_)magnetic_value(\z|_)/
 
+  -> do
     ivars = ::Hash.new do |h, k|
       h[ k ] = :"@#{ k }"
     end
@@ -296,6 +349,7 @@ module Skylab::Human
     define_method :_magnetic_value_is_known_ do |sym|
       instance_variable_defined? ivars[ sym ]  # asssume this for now
     end
+  end.call
 
     # ==
 
@@ -396,9 +450,17 @@ module Skylab::Human
     end
 
     module Models_
-
       Autoloader_[ self ]
     end
+
+    # ==
+
+    Pipeline_Query___ = ::Struct.new(
+      :given_symbol_array,
+      :manual_adjustment_proc,
+      :preferred_waypoint_node,
+      :target_symbol,
+    )
 
     # ==
 
@@ -419,7 +481,7 @@ module Skylab::Human
 
     # ==
 
-    Do_big_index_and_enhance_once___ = Lazy_.call do
+    Init_collection_once__ = Lazy_.call do
 
       Task_ = Home_.lib_.task  # weee
 
@@ -430,14 +492,24 @@ module Skylab::Human
 
       col.add_constants_not_in_filesystem Magnetics_
 
-      COLLECTION_ = col
-
-      NIL_
+      COLLECTION__ = col ; nil
     end
 
     # ==
 
-    BECAUSE_ = 'because'   # (used too many times - maybe #todo)
+    Workaround_for_bug_hu_60___ = -> stack do
+      # the below is #open [#hu-060]
+      # caveat :#here-3: don't convert this to be an inline lambda because
+      # it will break the equivalency detection and caching will never hit
+      :Emission_Shape_via_Channel == stack[-1] || fail
+      :Emission_Shape_via_Channel == stack[-2] || fail
+      stack.pop
+      NIL
+    end
+
+    # ==
+
+    BECAUSE_ = 'because'  # (used multiple times :/ )
     Here_ = self
     UNRELIABLE_ = :_UNRELIABLE_from_hu_c15n_
   end

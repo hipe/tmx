@@ -1715,7 +1715,9 @@ module Skylab::Brazen
       def __init_exitstatus_and_send_invite_via_c15n o
 
         wev = o.possibly_wrapped_event
-        x = o._read_magnetic_value_with_certainty_ :trilean  # because nil is meaningful
+
+        x = o.solve_for :trilean
+
         if wev
           if x.nil?
             maybe_use_exit_status SUCCESS_EXITSTATUS

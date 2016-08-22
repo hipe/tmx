@@ -6,13 +6,10 @@ module Skylab::Human
 
       def via_magnetic_parameter_store ps
 
-        # (the client could have set the trilean explicitly, which overrides this)
-
         if ps._magnetic_value_is_known_ :trilean
-          ps.trilean
-        else
-          __via_channel ps.channel
+          self._FIXME  # this has changed now that we have pathfinding
         end
+        __via_channel ps.channel
       end
 
       alias_method :[], :via_magnetic_parameter_store

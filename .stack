@@ -6,7 +6,3 @@ recursive for CLI
 recursive for API
 recursive magnetics
 CLI integration for single
--------
-integration: solve a contrived problem with both (900-ish)
-review #todo's ↕
-use proper pathfinding

@@ -2,7 +2,7 @@ contextualized-expression-via-contextualized-line-streamer-and-emission-shape
 contextualized-line-streamer-via-first-line-map-and-precontextualized-line-streamer.rb
 emission-shape-via-channel.rb
 evento-trilean-idiom-via-event-and-trilean.rb
-exception-via-contextualized-line-streamer-and-first-line-map.rb
+exception-via-contextualized-line-streamer.rb
 first-line-map-via-evento-trilean-idiom
 first-line-map-via-lemmas-and-lemmato-trilean-idiom
 first-line-map-via-subject-association.rb

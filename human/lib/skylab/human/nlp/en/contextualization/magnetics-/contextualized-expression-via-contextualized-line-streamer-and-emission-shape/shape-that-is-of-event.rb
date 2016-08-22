@@ -22,12 +22,10 @@ module Skylab::Human
 
       def __build_and_emit_new_event
 
-        _ev = __build_new_event  # #todo - when not in development, change this to be lazy
-
-        _ignore = @__listen_proc.call( * @__channel ) do
+        _ev = __build_new_event
+        @__listen_proc.call( * @__channel ) do
           _ev
         end
-        # #todo
         UNRELIABLE_
       end
 

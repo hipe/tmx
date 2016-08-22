@@ -10,8 +10,7 @@ module Skylab::Human
 
       def via_magnetic_parameter_store ps
 
-        _ = ps.first_line_map[ NOTHING_ ]
-        _  # #todo
+        ps.first_line_map[ NOTHING_ ]
       end
 
       alias_method :[], :via_magnetic_parameter_store

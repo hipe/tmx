@@ -2,7 +2,7 @@ module Skylab::Human
 
   class NLP::EN::Contextualization
 
-    module Magnetics_::Exception_via_Contextualized_Line_Streamer_and_First_Line_Map ; class << self
+    module Magnetics_::Exception_via_Contextualized_Line_Streamer ; class << self
 
       def via_magnetic_parameter_store ps
 
