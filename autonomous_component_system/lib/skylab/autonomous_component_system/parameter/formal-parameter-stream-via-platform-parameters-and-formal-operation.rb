@@ -23,7 +23,7 @@ module Skylab::Autonomous_Component_System
           a.pop
         end
 
-        any_bx = fo.box
+        any_bx = fo.parameter_box
         use_bx = if any_bx
           any_bx
         else

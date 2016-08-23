@@ -82,9 +82,9 @@ module Skylab::Human
           if @_is_completion  # [br]
             :Is_Lexemic_Frobbed_Colon
           else
-            sym = @ps_.idiom_for_neutrality
-            if sym
-              Const_via_idiom_[ sym ]
+            x = @ps_.idiom_for_neutrality
+            if x
+              Const_via_idiom_[ x, @ps_ ]
             else
               :Is_Lexemic_While_Frobbing
             end
@@ -124,9 +124,9 @@ module Skylab::Human
           if @_is_completion
             :Is_Lemmatic_Completion_XXX
           else
-            sym = @ps_.idiom_for_neutrality
-            if sym
-              Const_via_idiom_[ sym ]
+            x = @ps_.idiom_for_neutrality
+            if x
+              Const_via_idiom_[ x, @ps_ ]
             else
               :Is_Add_Nothing
             end

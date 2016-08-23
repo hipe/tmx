@@ -3,12 +3,8 @@ module Skylab::DocTest::TestSupport
   module My_API
 
     def self.[] tcc
-      Beep__[][ tcc ]
+      Home_.lib_.zerk.test_support::API[ tcc ]
       tcc.include self
-    end
-
-    Beep__ = Lazy_.call do
-      Home_.lib_.zerk.test_support.lib :API
     end
 
     # -

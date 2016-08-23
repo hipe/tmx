@@ -15,10 +15,12 @@ module Skylab::DocTest::TestSupport
       end
     end
 
+    same = '01-one.kode'
+
     context "(document one)" do
 
       shared_subject :_document do
-        _ls = line_stream_via_fixture_file_symbol_ :one
+        _ls = line_stream_via_filename_ same
         _subject_module.via_line_stream___ _ls
       end
 
@@ -30,7 +32,7 @@ module Skylab::DocTest::TestSupport
 
         expect_actual_line_stream_has_same_content_as_expected_(
           _document.to_line_stream___,
-          line_stream_via_fixture_file_symbol_( :one ),
+          line_stream_via_filename_( same ),
         )
       end
     end

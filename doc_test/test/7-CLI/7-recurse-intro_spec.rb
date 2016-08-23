@@ -5,12 +5,12 @@ module Skylab::DocTest::TestSupport
   describe "[dt] CLI - recursive intro" do
 
     TS_[ self ]
-    use :CLI
+    use :my_non_interactive_CLI
 
     # three laws compliant.
 
     it "loads" do
-      _CLI_module
+      subject_CLI
     end
 
     it "pings", wip: true do

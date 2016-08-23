@@ -58,6 +58,7 @@ module Skylab::Zerk
       :invite,
       :location_module,
       :operation_usage_string,
+      :produce_reader_for_root_by,
       :system_conduit,
       :when_head_argument_looks_like_option,
     )
@@ -279,7 +280,7 @@ module Skylab::Zerk
 
     def ___parse_opts
 
-      @_operation_syntax.parse_opts__ _ARGS_AS_ARGV, self, & _parse_pp
+      @_operation_syntax.parse_options _ARGS_AS_ARGV, self, & _parse_pp
     end
 
     def when_via_option_parser_parse_error__ e  # t8
@@ -398,11 +399,17 @@ module Skylab::Zerk
       # it's going to emit something.)
       # (is of #C15n-testcase-family-4 in [hu])
 
+      build_common_emission_handler_where do |o|
+        o.selection_stack = @_fo_frame.formal_operation_.selection_stack
+        o.subject_association = assoc
+      end
+    end
+
+    def build_common_emission_handler_where
+
       o = Home_.lib_.human::NLP::EN::Contextualization.begin
 
       o.expression_agent = expression_agent
-      o.selection_stack = @_fo_frame.formal_operation_.selection_stack
-      o.subject_association = assoc
 
       same = -> asc do
         asc.name.as_human
@@ -415,6 +422,8 @@ module Skylab::Zerk
       end
 
       o.to_say_subject_association = same
+
+      yield o
 
       o.emission_handler_via_emission_handler( & @_oes_p )
     end
@@ -690,6 +699,7 @@ module Skylab::Zerk
     end
 
     attr_reader(
+      :produce_reader_for_root_by,
       :compound_custom_sections,
       :compound_usage_strings,
       :filesystem,

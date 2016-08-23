@@ -30,6 +30,7 @@ module Skylab::Autonomous_Component_System
     def initialize acs
 
       @ACS_ = acs
+      @BUILD_READ_FORMAL_OPERATION = nil
 
       cache = {}
       @_cached = -> k do
@@ -48,6 +49,10 @@ module Skylab::Autonomous_Component_System
     def clear_cache  # 1x [ze]
       @__clear_cache.call
     end
+
+    attr_writer(
+      :BUILD_READ_FORMAL_OPERATION,
+    )
 
     BUILD_CACHED_ITEM___ = {
       _detect_association_definition_: :__build_detect_etc,
@@ -109,7 +114,19 @@ module Skylab::Autonomous_Component_System
     end
 
     def __build_read_formal_operation
+
+      p = @BUILD_READ_FORMAL_OPERATION
+      if p
+        p[ self ]
+      else
+        build_read_formal_operation_normally
+      end
+    end
+
+    def build_read_formal_operation_normally
+
       m = CUSTOM_METHOD__.fetch :_read_formal_operation_
+
       if @ACS_.respond_to? m
         @ACS_.send m
       else
@@ -118,6 +135,10 @@ module Skylab::Autonomous_Component_System
     end
 
     # -
+
+    def to_non_operation_node_ticket_stream
+      to_non_operation_node_ticket_streamer.execute
+    end
 
     def to_non_operation_node_ticket_streamer
       o = to_node_ticket_streamer

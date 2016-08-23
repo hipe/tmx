@@ -28,40 +28,93 @@ module Skylab::Autonomous_Component_System
 
               -> ss do
 
-                if ! ss.last  # kind of nasty [#030]: it is convenient for
-                  # fuzzy lookup to be told what the actual name (symbol)
-                  # is that was resolved, otherwise `sym` is inaccessible.
-                  ss[ -1 ] = Common_::Name.via_variegated_symbol sym
-                end
-
-                _fo = new.___init_via m, ss
-                _fo.__evaluate_definition_and_finish
+                ss.last || Write_name__[ ss, sym ]
+                _fo = new.__init_via_method_and_selection_stack m, ss
+                _fo.__evaluate_definition_via_calling_method_and_finish
               end
             end
           end
         end
 
+        def via_by sym, ss, & p  # #experimental
+
+          ss.last || Write_name__[ ss, sym ]
+          _fo = new.__init_via_selection_stack_only ss
+          _fo.__evaluate_definition_via_other_money p
+        end
+
         private :new
       end  # >>
 
-      def ___init_via m, ss
-        @_method_name = m
+      Write_name__ = -> ss, sym do
+
+        # :[#030] a sort of nasty but "good enough" solution to this design
+        # problem: if for example the node was resolved fuzzily, we allow
+        # that the client push false-ish on to the top of the selection stack
+        # as a way of "requesting" that it be populated with an element
+        # reflecting the full name.
+
+        ss[ -1 ] = Common_::Name.via_variegated_symbol sym
+        NIL_
+      end
+
+      def initialize
+        @_saw_implementation = false
+      end
+
+      def __init_via_method_and_selection_stack m, ss
+        @__method_name = m
         @selection_stack = ss
         self
       end
 
-      def __evaluate_definition_and_finish
+      def __init_via_selection_stack_only ss
+        @selection_stack = ss ; self
+      end
 
-        x = _ACS.send @_method_name do | * x_a |
+      def __evaluate_definition_via_calling_method_and_finish
 
-          st = Common_::Polymorphic_Stream.via_array x_a
-          begin
-            send :"__accept__#{ st.gets_one }__meta_component", st
-            st.no_unparsed_exists and break
-            redo
-          end while nil
-          NIL_
+        _m = remove_instance_variable :@__method_name
+
+        _x = _ACS.send _m do |*x_a|
+          _accept_phrase x_a
         end
+
+        _maybe_implementation _x
+        self
+      end
+
+      def __evaluate_definition_via_other_money p
+
+        _y = ::Enumerator::Yielder.new do |*x_a|
+          _accept_phrase x_a
+        end
+
+        _x = p.call _y
+
+        _maybe_implementation _x
+        self
+      end
+
+      def _accept_phrase x_a
+
+        st = Common_::Polymorphic_Stream.via_array x_a
+        begin
+          x = send :"__accept__#{ st.gets_one }__meta_component", st
+          st.no_unparsed_exists ? break : redo
+        end while nil
+        x
+      end
+
+      def _maybe_implementation x
+
+        _did_see = remove_instance_variable :@_saw_implementation
+        unless _did_see
+          __init_normal_representation_normally x
+        end
+      end
+
+      def __init_normal_representation_normally x
 
         if x.respond_to? :call
           nr = Here_::NormalRepresentation_for_Proc___.new x, self
@@ -72,15 +125,11 @@ module Skylab::Autonomous_Component_System
         end
 
         @_normal_representation = nr
-        self
+        NIL_
       end
 
       def _ACS
         @selection_stack.fetch( -2 ).ACS
-      end
-
-      def ___accept_proc_as_implementation x
-        NIL_
       end
 
       # --
@@ -107,14 +156,26 @@ module Skylab::Autonomous_Component_System
       end
 
       def _writable_param_box
-        @box ||= Common_::Box.new
+        @parameter_box ||= Common_::Box.new
+      end
+
+      def __accept__via_ACS_by__meta_component st
+
+        @_saw_implementation = true
+
+        @_normal_representation =
+          Here_::NormalRepresentation_for_ACS___.new st.gets_one, self
+
+        st.assert_empty
+
+        NIL_
       end
 
       def __accept__end__meta_component _
         NOTHING_  # (this keyword exists only so we can have trailing commas)
       end
 
-      attr_reader :box
+      attr_reader :parameter_box
 
       # ~ for [ze]
 

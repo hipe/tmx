@@ -4,10 +4,6 @@ module Skylab::DocTest
 
   # (the README [#001] acts as the "top" of the documentation graph too.)
 
-  module CLI
-
-  end
-
   # here is the minimal interesting example for calling the API:
   #
   #     _path = "#{ DocTest.dir_pathname.to_path }.rb"
@@ -76,6 +72,8 @@ module Skylab::DocTest
 
   Require_zerk_ = Lazy_.call do
     Zerk_ = Home_.lib_.zerk
+    ACS_ = Home_.lib_.ACS
+    NIL_
   end
 
   # ==
@@ -121,6 +119,7 @@ module Skylab::DocTest
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
+    ACS = sidesys[ :Autonomous_Component_System ]
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
 
@@ -161,4 +160,3 @@ module Skylab::DocTest
 end
 # #tombstone: old self-test doc body copy
 # #tombstone: dedicated API file
-# #temporary-tombstone:A: old [br] API call boilerplate

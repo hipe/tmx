@@ -105,7 +105,7 @@ module Skylab::DocTest::TestSupport
 
       call_by do
 
-        _path = "#{ home_dir_path_ }#{ Autoloader_::EXTNAME_ }"
+        _path = home_asset_file_path_
 
         my_API_common_generate_(
           asset_line_stream: open( _path ),

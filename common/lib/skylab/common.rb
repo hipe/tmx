@@ -2424,7 +2424,7 @@ module Skylab::Common
       @_ivar ||= :"@#{ @value_x_ }"
     end
 
-    def as_parts  # special just for [br] silo reference symbols
+    def as_parts
       _stem_._stem_value_x_
     end
 

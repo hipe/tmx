@@ -15,7 +15,7 @@ module Skylab::Brazen
         end
 
         def render_as_argument_uninflected_for_arity prp  # 1x [ze], 1x here
-          _singleton._render_moniker_for_property prp
+          _singleton._render_argument_moniker_for_property prp
         end
 
         def _singleton
@@ -227,7 +227,7 @@ module Skylab::Brazen
 
       def ___render_as_argument prp
 
-        s = _render_moniker_for_property prp
+        s = _render_argument_moniker_for_property prp
 
         if Field_::Takes_many_arguments[ prp ]
           s = __render_moniker_as_glob s
@@ -239,7 +239,7 @@ module Skylab::Brazen
         s
       end
 
-      def _render_moniker_for_property prp
+      def _render_argument_moniker_for_property prp
 
         # (from here on down either don't mutate state or don't use singleton)
 

@@ -24,6 +24,7 @@ module Skylab::Zerk
         def initialize cli, acs
           @CLI = cli
           @next_frame_ = nil
+          @_reader_builder_for_this_frame = cli.produce_reader_for_root_by
           super acs
         end
 
@@ -70,6 +71,7 @@ module Skylab::Zerk
 
           @_association = qk.association
           @next_frame_ = former_top
+          @_reader_builder_for_this_frame = nil  # not yet available
           super qk.value_x
         end
 
@@ -368,10 +370,23 @@ module Skylab::Zerk
 
         alias_method :reader_writer_, :_reader  # track who needs it
 
-        did = false
+        yes = true
+        reader_builder = nil
+
         define_method :___build_reader do
-          did or did = true && Require_ACS_[]
-          ACS_::ReaderWriter.for_componentesque @ACS
+
+          if yes
+            yes = false
+            Require_ACS_[]
+            reader_builder = ACS_::ReaderWriter.method :for_componentesque
+          end
+
+          p = @_reader_builder_for_this_frame
+          if p
+            p[ @ACS, reader_builder ]
+          else
+            reader_builder[ @ACS ]
+          end
         end
 
         attr_reader(

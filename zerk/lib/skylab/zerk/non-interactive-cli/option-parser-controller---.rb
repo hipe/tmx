@@ -259,7 +259,7 @@ module Skylab::Zerk
           @_help_was_requested = true
           @_help_s = s
           # (hack - don't overwrite an already set response; e.g if a component
-          # rejected a request. the only wa this can work is if this is the only
+          # rejected a request. the only way this can work is if this is the only
           # place we do this, otherwise we have to go back to an if-else chain)
           NIL_
         end

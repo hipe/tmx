@@ -33,6 +33,9 @@ module Skylab::Human
           ip.verb_subject_string = vs
           ip.inflected_verb_string = _ivs
           ip.verb_object_string = vo
+          if line
+            ip.suffixed_cojoinder = BECAUSE_  # EEK [dt]
+          end
         end
 
         yield lc if block_given?

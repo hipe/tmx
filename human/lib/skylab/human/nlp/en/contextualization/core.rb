@@ -40,10 +40,6 @@ module Skylab::Human
     #   when the below result in nil the function uses an appropriate default)
     #   but since the overhaul we haven't needed as much customization..
 
-    def idiom_for_failure
-      NOTHING_
-    end
-
     def idiom_for_success
       NOTHING_
     end
@@ -74,6 +70,7 @@ module Skylab::Human
       :downstream_selective_listener_proc,
       :emission_proc,
       :expression_agent,
+      :idiom_for_failure,  # [dt]
       :idiom_for_neutrality,  # [ba]
       :to_say_selection_stack_item,
       :to_say_subject_association,
@@ -93,6 +90,7 @@ module Skylab::Human
 
     # nodes that are set here manually and read by the pipeline:
     READ_ONLY_BY_PIPELINE_ONLY__ = [
+      :custom_idiom_proc__,
       :emission_shape,
       :event,
       :passthru,
@@ -115,6 +113,7 @@ module Skylab::Human
       * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_PIPELINE__,
       * WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_FUNCTIONS__,
       * RDWR_BY_PIPELINE_ONLY__,
+      :custom_idiom_proc__,  # written by this lib but from the outside
     )
 
     attr_reader(
@@ -464,8 +463,14 @@ module Skylab::Human
 
     # ==
 
-    Const_via_idiom_ = -> sym do
-      :"Is_#{ sym }"
+    Const_via_idiom_ = -> x, ps do
+      # (experimental implementation)
+      if x.respond_to? :call
+        ps.custom_idiom_proc__ = x  # eek
+        :Is_Custom
+      else
+        :"Is_#{ x }"
+      end
     end
 
     # ==

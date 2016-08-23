@@ -17,9 +17,9 @@ module Skylab::Human
       alias_method :[], :via_magnetic_parameter_store
 
       def __when_failed ps
-        sym = ps.idiom_for_failure
-        if sym
-          Const_via_idiom_[ sym ]
+        x = ps.idiom_for_failure
+        if x
+          Const_via_idiom_[ x, ps ]
         elsif ps.subject_association
           :Is_Predicate_Mode_Couldnt_Frob_Because
         else
@@ -28,9 +28,9 @@ module Skylab::Human
       end
 
       def __when_neutral ps
-        sym = ps.idiom_for_neutrality
-        if sym
-          Const_via_idiom_[ sym ]
+        x = ps.idiom_for_neutrality
+        if x
+          Const_via_idiom_[ x, ps ]
         elsif ps.subject_association
           :Is_Predicate_Mode_While_Frobbing
         else
@@ -39,9 +39,9 @@ module Skylab::Human
       end
 
       def __when_successful ps
-        sym = ps.idiom_for_success
-        if sym
-          Const_via_idiom_[ sym ]
+        x = ps.idiom_for_success
+        if x
+          Const_via_idiom_[ x, ps ]
         elsif ps.subject_association
           :Is_Predicate_Mode_Frobbed
         else

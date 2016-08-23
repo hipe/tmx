@@ -21,12 +21,7 @@ module Skylab::Human
       def __map_line line, ps
 
         Magnetics_::First_Line_Map_via_Lemmas_and_Lemmato_Trilean_Idiom::
-            Idiom_that_Is_Failed_To_Frob.
-        map_line line, ps do |lc|
-
-          lc.mutable_line_parts.prefixed_string << SPACE_ << BECAUSE_
-          NIL_
-        end
+            Idiom_that_Is_Failed_To_Frob.map_line line, ps
       end
     end ; end
   end

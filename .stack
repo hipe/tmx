@@ -1,8 +1,7 @@
 the big question - slicer
 factor out dir_pathname (!)
-(fix [#ca-xx] => [#co-xx])
+(fix [#ca-xx] => [#co-xx], • in md's)
 reverse synchronization (or postpone)
 recursive for CLI
 recursive for API
 recursive magnetics
-CLI integration for single

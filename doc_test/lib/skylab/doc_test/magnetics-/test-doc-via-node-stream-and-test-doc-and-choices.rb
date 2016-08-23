@@ -11,7 +11,7 @@ module Skylab::DocTest
 
     # note - we take as argument a node stream and not an asset document
     # by the design consideration that we want to preserve streamed-ness
-    # where we can; and in this case case we can for the would-be input
+    # where we can; and in this case we can for the would-be input
     # document because the algorithm happens to process the upstream as
     # a stream and not document. (but note that because our algorithm wants
     # for the referenced (test) document to be a structured document and

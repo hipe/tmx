@@ -4,6 +4,8 @@ module Skylab::Zerk::TestSupport
 
     # just a hopefully semi-thin layer on top of "expect stdout stderr"
 
+    PUBLIC = true  # [dt]
+
     def self.[] tcc
       TS_::Expect_Stdout_Stderr[ tcc ]
       tcc.send :define_singleton_method, :given, Given___

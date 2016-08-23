@@ -64,65 +64,69 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Section__
+    class Section__  # #re-opens
 
       def to_option_index
 
         bx = Common_::Box.new
-        parse_line = Line_parser_for___[ bx ]
         st = to_line_stream
         st.gets  # skip header line
+        ol = nil  # implicitly enforces a syntax
         begin
           line = st.gets
-          line or break
-          parse_line[ line ]
+          line || break
+
+          if line.is_styled
+            was_styled = true
+            s = line._unstyled_string  # VIOLATION
+          else
+            was_styled = false
+            s = line.string
+          end
+
+          md = OPTION_LINE_RX__.match s
+
+          if md
+            ol = Option_Item___.new was_styled, * md.captures
+            s = ol.short
+            if s
+              bx.add s, ol
+            else
+              bx.add ol.long, ol
+            end
+            redo
+          end
+
+          if line.is_blank_line  # this might change
+            redo
+          end
+
+          ol.__add_additional_line line
           redo
         end while nil
         bx
       end
 
-      # --
-
-      Line_parser_for___ = -> bx do
-
-        rx = %r(\A
+      OPTION_LINE_RX__ = %r(\A
           [ ]{2,}
           (?: (?<short>-[a-z]),[ ] )?
           (?<long>--(?:(?![ ][ ]).)+)
           (?:[ ]{2,}(?<rest>[^ ].+))?
         \n\z)x
 
-        -> line do
-          if line.is_styled
-            was_styled = true
-            s = line._unstyled_string  # VIOLATION
-          else
-            s = line.string
-          end
-          md = rx.match s
-          if ! md
-            self._ROBUSTIFY_REXEP_maybe
-          end
-          ol = Option_Line___.new was_styled, * md.captures
-          s = ol.short
-          if s
-            bx.add s, ol
-          else
-            bx.add ol.long, ol
-          end
-          NIL_
-        end
-      end
+      # ==
 
-      # --
-
-      class Option_Line___
+      class Option_Item___
 
         def initialize b, s, s_, s__
           @desc = s__
           @long = s_
           @short = s
           @was_styled = b
+        end
+
+        def __add_additional_line line
+          ( @additional_lines ||= [] ).push line ; nil
         end
 
         def long_stem
@@ -132,6 +136,7 @@ module Skylab::Zerk::TestSupport
         RX___ = %r([a-z]+(?:-[a-z]+)*)
 
         attr_reader(
+          :additional_lines,
           :desc,
           :long,
           :short,
@@ -262,7 +267,7 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Section__
+    class Section__  # re-opened
 
       def initialize a
         @_a = a
@@ -813,6 +818,10 @@ module Skylab::Zerk::TestSupport
 
       Styling___ = Lazy_.call do
         Remote_CLI_lib_[]::Styling
+      end
+
+      def is_blank_line
+        NEWLINE_ == @_vendor_line.string
       end
 
       def string

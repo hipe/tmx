@@ -109,12 +109,32 @@ module Skylab::DocTest::TestSupport
       ssdp ||= ::File.expand_path( '../../..', home_dir_path_ )
     end
 
+    hafp = nil
+    define_method :home_asset_file_path_ do
+      hafp ||= "#{ home_dir_path_ }#{ Autoloader_::EXTNAME_ }"
+    end
+
     hdp = nil
     define_method :home_dir_path_ do
       hdp ||= Home_.dir_pathname.to_path
     end
 
   # -
+
+  module My_Non_Interactive_CLI
+
+    def self.[] tcc
+      Home_.lib_.zerk.test_support::Non_Interactive_CLI[ tcc ]
+      tcc.include self
+    end
+    # -
+      def subject_CLI
+        Home_::CLI
+      end
+    # -
+  end
+
+  # --
 
   Common_ = ::Skylab::Common
   Lazy_ = Common_::Lazy
@@ -152,9 +172,12 @@ module Skylab::DocTest::TestSupport
 
   Home_ = ::Skylab::DocTest
 
+  DASH_ = '-'
   DocTest = Home_  # only for generated tests, find it via (?!<::)DocTest\b
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   TS_ = self
+  UNDERSCORE_ = '_'
 end
+# #tombstone: pre-zerk CLI support lib

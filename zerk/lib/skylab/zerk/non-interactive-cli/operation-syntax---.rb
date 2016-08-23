@@ -29,7 +29,7 @@ module Skylab::Zerk
         @_OPC.the_option_parser__
       end
 
-      def parse_opts__ argv, client, & pp
+      def parse_options argv, client, & pp  # experimenal for [dt]
         @_init_OPC && _init_OPC
         @_OPC.parse__ argv, client, & pp
       end
