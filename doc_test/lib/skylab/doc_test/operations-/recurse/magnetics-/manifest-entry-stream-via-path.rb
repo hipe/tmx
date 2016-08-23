@@ -1,33 +1,6 @@
-self._K
 module Skylab::DocTest
 
-  module DocTest
-
-    module Models_::Front
-
-      class Actions::Recursive
-
-        class Actors__::Produce_manifest_entry_stream
-
-          Attributes_actor_.call( self,
-            :path,
-            :doc_test_files_file,
-            :path_prop,
-          )
-
-          def initialize
-            @filesystem = Home_.lib_.system.filesystem
-            super
-          end
-
-          def execute
-
-            ok = __resolve_manifest_path
-            ok &&= __via_manifest_path_resolve_open_file
-            ok && __build_result
-          end
-
-          def __resolve_manifest_path
+  self._K_will_rewrite
 
             start_path = if ::File.file? @path  # walks start from dirs always
               ::File.dirname @path
@@ -59,16 +32,6 @@ module Skylab::DocTest
 
             @open_file_IO && ACHIEVED_
           end
-
-          def __build_result
-
-            Result___.new @open_file_IO, @manifest_path, @surrounding_path
-          end
-
-          Result___ = ::Struct.new :open_file_IO, :manifest_path, :surrounding_path
-        end
-      end
-    end
-  end
 end
+# #tombstone: rewrite to simplify away manifest file syntax
 # :+#tombstone: back when the search was expressed by dir and file
