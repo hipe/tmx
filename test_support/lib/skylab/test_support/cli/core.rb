@@ -27,3 +27,4 @@ module Skylab::TestSupport
     end  # >>
   end
 end
+# #tombstone: 2 CLI-related near-toplevel files with long history
