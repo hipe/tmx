@@ -5,7 +5,7 @@ module Skylab::TestSupport
     class Magnetics_::CompoundTree_via_Classifications
 
       Attributes_actor_.call( self,
-        :cx, # classifications
+        :classifications,
         :path,
         :test_dir,
         :name_conventions,
@@ -13,11 +13,7 @@ module Skylab::TestSupport
       )
 
       def execute
-
-        @nc = @name_conventions ; @name_conventions = nil
-
-        extend EXTEND___.fetch( @cx.shape ).call
-
+        extend EXTEND___.fetch( @classifications.shape ).call
         execute
       end
 

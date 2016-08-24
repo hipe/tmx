@@ -31,16 +31,6 @@ module Skylab::SubTree
       _System_lib[].services
     end
 
-    _TS = sidesys[ :TestSupport ]
-
-    Test_file_suffix_a = -> do
-      [ _TS[].spec_rb ]
-    end
-
-    Test_dir_name_a = -> do
-      _TS[].constant :TEST_DIR_NAME_A
-    end
-
     INSTANCE = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )  # at the end
 

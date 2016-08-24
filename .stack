@@ -9,5 +9,3 @@ recursive magnetics
 re-house "file coverage" in [ts] not [st]
 freshen up [ts] CLI
 restore file coverage CLI
-restore file coverage API
-get file coverage magnets only working in new home

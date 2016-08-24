@@ -123,7 +123,7 @@ module Skylab::TestSupport
 
           path_s.split( ::File::SEPARATOR ).map do | s |
 
-            @nc.normal_string_for_test_dir_entry s
+            @name_conventions.normal_string_for_test_dir_entry s
           end
         end
 
@@ -167,8 +167,8 @@ module Skylab::TestSupport
           # normalized file (or directory) entr names per name conventions.
           # while so doing, memoize the input data into the output_node payloads.
 
-          dir_key = @nc.method dir_key
-          file_key = @nc.method file_key
+          dir_key = @name_conventions.method dir_key
+          file_key = @name_conventions.method file_key
 
           depth = 0
           output_node = Tree_lib_[].mutable_node.new
@@ -249,7 +249,7 @@ module Skylab::TestSupport
           m = :"normal_string_for_#{ left }_dir_entry"  # ick/meh
 
           _normal_path = @real_prune_path_a_for[ left ].map do | s |
-            @nc.send m, s
+            @name_conventions.send m, s
           end
 
           x = @prepared_trees[ right ].fetch_node _normal_path do end

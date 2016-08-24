@@ -1,6 +1,6 @@
 module Skylab::System
 
-  class Services___::Find  # see [#171].
+  class Services___::Find  # see [#016].
     # -
       # -
         # synopsis:
@@ -56,15 +56,6 @@ module Skylab::System
           @when_command = WHEN_COMMAND___
         end
 
-        def process_polymorphic_stream_passively st  # #[#fi-022]
-          super && normalize
-        end
-
-        def normalize
-          _decide_if_curry_and_resolve_command_args
-          KEEP_PARSING_
-        end
-
         WHEN_COMMAND___ = -> cmd do
           cmd.to_path_stream.to_a
         end
@@ -81,15 +72,15 @@ module Skylab::System
 
         def initialize_copy _otr_
 
-          # do not freeze here or make ivar dups here, this dup is for
-          # internal copies whose existing ivars are read-only but who
-          # must themselves reamain mutable, see #note-130
-
+          # (hi.) dups are created when a client wants to modify a prototype
+          # to create a new session, and also dups are created here for the
+          # dup-and-mutate pattern. as such we do not freeze the dup #note-130
         end
 
         def __init_new x_a, & oes_p
 
-          # for now this is hand-written to allow only the paths to change:
+          # when the client wants to dup-and-muate a session. for now this
+          # is written to allow only the argument paths to change (and etc):
 
           @unescaped_path_a = @unescaped_path_a.dup
 
@@ -99,22 +90,37 @@ module Skylab::System
 
           kp = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
           if kp
-            _decide_if_curry_and_resolve_command_args
-            freeze
+            frozen? || self._SANITY
+            self
           else
             kp
           end
         end
+
         protected :__init_new
 
-        def _decide_if_curry_and_resolve_command_args
+        def process_polymorphic_stream_passively st  # #[#fi-022]
+          super && normalize
+        end
+
+        def normalize  # assume..
+
+          # assume this instance (whether prototype or session) is "done"
+          # being mutated by arguments. whether or not we have zero argument
+          # paths is the sole determiner of whether this is to be considered
+          # a prototype or a session instance. life is easier/safer if we
+          # always freeze here and only ever freeze here.
+
           if @unescaped_path_a.length.zero?
             @is_curry = true
+            freeze
+            KEEP_PARSING_
           else
             @is_curry = false
-            __resolve_valid_command_args
+            kp = __resolve_valid_command_args
+            freeze
+            kp
           end
-          NIL_
         end
 
         def freeze
@@ -267,32 +273,32 @@ module Skylab::System
           end
         end
 
-        def express_into_under y, expag
+        def __resolve_valid_command_args  # amazing hax #note-130
+          otr = dup
+          otr.extend Command_Building_Methods__  # pattern #[#sl-003]
+          x = otr.__args_via_flush
+          if x
+            @args = x
+            if @on_event_selectively
+              @on_event_selectively.call :info, :event, :find_command_args do
+                express_under :Event
+              end
+            end
+            ACHIEVED_
+          else
+            x
+          end
+        end
 
+        def express_into_under y, expag
           express_under( expag ).express_into_under y, expag
         end
 
-        def __resolve_valid_command_args  # amazing hax #note-130
-
-          otr = dup
-          otr.extend Command_Building_Methods__  # pattern #[#sl-003]
-          @args = otr.__args_via_flush
-          if @args && @on_event_selectively
-            @on_event_selectively.call :info, :event, :find_command_args do
-
-              express_under :Event
-            end
-          end
-          NIL_
-        end
-
         def express_under modality_x
-
           __adapter_for( modality_x )[ self ]
         end
 
         def __adapter_for x
-
           Find_::Expression_Adapters.const_get x.intern, false
         end
 

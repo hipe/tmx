@@ -8,7 +8,8 @@ module Skylab::TestSupport
 
         def execute
           init
-          send :"__from__#{ @cx.testiness }__"
+          @_nc = remove_instance_variable :@name_conventions
+          send :"__from__#{ @classifications.testiness }__"
         end
 
         def __from__asset__
@@ -17,10 +18,10 @@ module Skylab::TestSupport
 
           a = []
           fn.to_dir_entry_stream.each do | entry |
-            a.push @nc.normal_string_for_asset_dir_entry entry
+            a.push @_nc.normal_string_for_asset_dir_entry entry
           end
 
-          compare = @nc.normal_string_for_asset_file_entry fn.file_entry
+          compare = @_nc.normal_string_for_asset_file_entry fn.file_entry
 
           test_dir = ::File.join @test_dir, * a
 
@@ -28,7 +29,7 @@ module Skylab::TestSupport
 
             # (#entry-model: string `ent` is an entry.)
 
-            if compare == @nc.normal_string_for_test_file_entry( ent )
+            if compare == @_nc.normal_string_for_test_file_entry( ent )
 
               _path = if a.length.zero?
                 ent.to_s
@@ -87,7 +88,7 @@ module Skylab::TestSupport
 
             :normal_string_for_dir_entry, -> entry do
 
-              @nc.normal_string_for_test_dir_entry entry
+              @_nc.normal_string_for_test_dir_entry entry
             end,
 
             :each_dir_entry, -> npl, entry do
@@ -97,7 +98,7 @@ module Skylab::TestSupport
 
             :normal_string_for_file_entry, -> entry do
 
-              @nc.normal_string_for_test_file_entry entry
+              @_nc.normal_string_for_test_file_entry entry
             end,
 
             :each_file_entry, -> npl, entry do
@@ -113,7 +114,7 @@ module Skylab::TestSupport
 
             :normal_string_for_dir_entry, -> entry do
 
-              @nc.normal_string_for_asset_dir_entry entry
+              @_nc.normal_string_for_asset_dir_entry entry
             end,
 
             :each_dir_entry, -> npl, entry do
@@ -123,7 +124,7 @@ module Skylab::TestSupport
 
             :normal_string_for_file_entry, -> entry do
 
-              @nc.normal_string_for_asset_file_entry entry
+              @_nc.normal_string_for_asset_file_entry entry
             end,
 
             :each_file_entry, -> npl, entry do
@@ -172,7 +173,7 @@ module Skylab::TestSupport
 
         def __via_test_filename_to_asset_path_stream
 
-          file_base = @nc.normal_string_for_test_file_entry @test_fn.file_entry
+          file_base = @_nc.normal_string_for_test_file_entry @test_fn.file_entry
 
           file_base or raise __say @test_fn.file_entry
 

@@ -362,6 +362,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @argument_arity = :zero ; nil
       end
 
+      def accept__glob__meta_component
+        @argument_arity = :one_or_more ; nil
+      end
+
       attr_reader(
         :argument_arity,
         :singplur_category,

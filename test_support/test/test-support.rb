@@ -93,9 +93,9 @@ module Skylab::TestSupport::TestSupport
 
   # --
 
-  Home_::Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
-
   Common_ = Home_::Common_
+  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
   Lazy_ = Common_::Lazy
   TS_ = self
 
