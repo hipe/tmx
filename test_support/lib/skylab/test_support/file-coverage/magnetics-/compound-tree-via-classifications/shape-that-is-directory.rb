@@ -1,10 +1,10 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  module FileCoverage
 
-    class Actors_::Build_compound_tree
+    class Magnetics_::CompoundTree_via_Classifications
 
-      module For_directory___
+      module Shape_that_Is_Directory
 
         def execute
 
@@ -23,12 +23,14 @@ module Skylab::SubTree
 
         def __resolve_the_big_tree
 
-          _st = Home_.lib_.system.find( :path, @business_hub_dir_,
-              :filename, "*#{ Autoloader_::EXTNAME }",  # here we :+[#008] assume all relevant files have one same extension
+          _st = Home_.lib_.system.find(
+            :path, @business_hub_dir_,
+              :filename, "*#{ Autoloader_::EXTNAME }",  # here we #[#013] assume all relevant files have one same extension
               :freeform_query_infix_words, TYPE_FILE___,
               :when_command, -> cmd do
                 cmd.to_path_stream
-              end )
+            end,
+          )
 
           r = @asset_local_range_
           _st = _st.map_by do | path |
@@ -36,7 +38,7 @@ module Skylab::SubTree
             path[ r ]
           end
 
-          @big_tree = Home_::lib_.tree.via :paths, _st
+          @big_tree = Tree_lib_[].via :paths, _st
           ACHIEVED_
         end
         TYPE_FILE___ = %w( -type file )
@@ -45,7 +47,7 @@ module Skylab::SubTree
 
           @test_dir_localized = @test_dir[ @asset_local_range_ ]
 
-          td_fn = File_Coverage_::Models_::Filename.new @test_dir_localized
+          td_fn = Here_::Models_::Filename.new @test_dir_localized
 
           _will_lose_child = @big_tree.fetch_node td_fn.to_dir_entry_stream.map( & :string )
 
@@ -90,7 +92,7 @@ module Skylab::SubTree
 
           else
 
-            # :+[#014] - test dir is *within* asset dir, hence the asymmetry
+            # test dir is *within* asset dir, hence the asymmetry
 
             _prune_this_big_tree sub_path, :asset, :test
           end
@@ -169,7 +171,7 @@ module Skylab::SubTree
           file_key = @nc.method file_key
 
           depth = 0
-          output_node = Home_.lib_.tree.mutable_node.new
+          output_node = Tree_lib_[].mutable_node.new
           parents = []
           st = tree.to_classified_stream
           tree_ = output_node
@@ -215,7 +217,7 @@ module Skylab::SubTree
 
 
             output_node = _my_parent.touch_node normal_s do
-              File_Coverage_::Models_::Node.new
+              Here_::Models_::Node.new
             end
 
             _method = if input_node.has_children

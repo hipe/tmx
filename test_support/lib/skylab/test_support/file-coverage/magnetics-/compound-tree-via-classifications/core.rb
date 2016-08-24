@@ -1,8 +1,8 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  module FileCoverage
 
-    class Actors_::Build_compound_tree
+    class Magnetics_::CompoundTree_via_Classifications
 
       Attributes_actor_.call( self,
         :cx, # classifications
@@ -16,14 +16,15 @@ module Skylab::SubTree
 
         @nc = @name_conventions ; @name_conventions = nil
 
-        extend ( if :file == @cx.shape
-          Build_compound_tree_::For_single_file___
-        else
-          Build_compound_tree_::For_directory___
-        end )
+        extend EXTEND___.fetch( @cx.shape ).call
 
         execute
       end
+
+      EXTEND___ = {
+        directory: -> { This__::Shape_that_Is_Directory },
+        file: -> { This__::Shape_that_Is_File },
+      }
 
       def init
 
@@ -40,7 +41,7 @@ module Skylab::SubTree
         path.length + 1 .. -1
       end
 
-      Build_compound_tree_ = self
+      This__ = self
     end
   end
 end

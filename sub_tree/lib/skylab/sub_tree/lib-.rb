@@ -41,10 +41,6 @@ module Skylab::SubTree
       _TS[].constant :TEST_DIR_NAME_A
     end
 
-    Tree = -> do
-      Basic[]::Tree
-    end
-
     INSTANCE = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )  # at the end
 

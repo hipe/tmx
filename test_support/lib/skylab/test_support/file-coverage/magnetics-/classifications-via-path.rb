@@ -1,8 +1,8 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  module FileCoverage
 
-    class Actors_::Classify_the_path < Common_::Actor::Dyadic
+    class Magnetics_::Classifications_via_Path < Common_::Actor::Dyadic
 
       def initialize td, path, & p
         @on_event_selectively = p
@@ -92,27 +92,42 @@ module Skylab::SubTree
       end
 
       def __flush
-
         Classifications___[ @testiness_symbol, @shape_symbol, @rootiness_symbol ]
       end
 
-      Classifications___ = ::Struct.new :testiness, :shape, :rootiness do
+      class Classifications___
+
+        class << self
+          alias_method :[], :new
+        end  # >>
+
+        def initialize te, sh, ro
+          @rootiness = ro
+          @shape = sh
+          @testiness = te
+        end
 
         def difference_against t_i, s_i, r_i
           d_x_a = nil
-          if testiness != t_i
-            ( d_x_a ||= [] ).push [ :testiness, testiness, t_i ]
+          if @testiness != t_i
+            ( d_x_a ||= [] ).push [ :testiness, @testiness, t_i ]
           end
-          if shape != s_i
-            ( d_x_a ||= [] ).push [ :shape, shape, s_i ]
+          if @shape != s_i
+            ( d_x_a ||= [] ).push [ :shape, @shape, s_i ]
           end
-          if rootiness != r_i
-            ( d_x_a ||= [] ).push [ :rootiness, rootiness, s_i ]
+          if @rootiness != r_i
+            ( d_x_a ||= [] ).push [ :rootiness, @rootiness, s_i ]
           end
           if d_x_a
             Difference___.new d_x_a
           end
         end
+
+        attr_reader(
+          :rootiness,
+          :shape,
+          :testiness,
+        )
       end
 
       class Difference___

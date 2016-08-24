@@ -1,12 +1,13 @@
 require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  describe "[st] models - file-coverage" do
+  describe "[ts] file-coverage - modalities - API", wip: true do
 
     TS_[ self ]
     use :expect_event
-    use :models_file_coverage, :expect_node_characteristics
+    use :file_coverage
+    use :file_coverage_expect_node_characteristics
 
     it "no path argument - exception" do
 
@@ -51,7 +52,7 @@ module Skylab::SubTree::TestSupport
     end
 
     def _one
-      fixture_tree_top_dir_for_ :one
+      fixture_tree :one
     end
 
     it "sub-tree under the test dir (counterparted)" do
@@ -83,7 +84,7 @@ module Skylab::SubTree::TestSupport
     # sub-tree within test dir (no counterpart) :+#skipped-because-boring
 
     def _three
-      fixture_tree_top_dir_for_ :three
+      fixture_tree :three
     end
 
     def _common_result_for_three
@@ -104,7 +105,7 @@ module Skylab::SubTree::TestSupport
 
       x_a.unshift :file_coverage
       call_API_via_iambic x_a
-      NIL_
+      NIL
     end
   end
 end

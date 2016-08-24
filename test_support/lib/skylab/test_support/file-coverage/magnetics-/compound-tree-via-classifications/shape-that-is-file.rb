@@ -1,10 +1,10 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  module FileCoverage
 
-    class Actors_::Build_compound_tree
+    class Magnetics_::CompoundTree_via_Classifications
 
-      module For_single_file___
+      module Shape_that_Is_File
 
         def execute
           init
@@ -24,9 +24,9 @@ module Skylab::SubTree
 
           test_dir = ::File.join @test_dir, * a
 
-          test_fn = @fs.entry_stream( test_dir ).flush_until_map_detect do | s |
+          test_fn = @fs.entry_stream( test_dir ).flush_until_map_detect do |ent|
 
-            ent = File_Coverage_::Models_::Entry[ s ]
+            # (#entry-model: string `ent` is an entry.)
 
             if compare == @nc.normal_string_for_test_file_entry( ent )
 
@@ -67,7 +67,7 @@ module Skylab::SubTree
 
         def _filename_via_path path
 
-          File_Coverage_::Models_::Filename.new path
+          Here_::Models_::Filename.new path
         end
 
         def init
@@ -76,7 +76,7 @@ module Skylab::SubTree
 
           @test_local_range = produce_local_range_ @test_dir
 
-          @tree = Home_.lib_.tree.mutable_node.new
+          @tree = Tree_lib_[].mutable_node.new
 
           NIL_
         end
@@ -149,7 +149,7 @@ module Skylab::SubTree
           fn.to_dir_entry_stream.each do | entry |
 
             tree_node = tree_node.touch_node dir_key[ entry ] do
-              File_Coverage_::Models_::Node.new
+              Here_::Models_::Node.new
             end
 
             o.each_dir_entry[ tree_node.node_payload, entry  ]
@@ -158,7 +158,7 @@ module Skylab::SubTree
           fe = fn.file_entry
 
           _leaf = tree_node.touch_node _file_key[ fe ] do
-            File_Coverage_::Models_::Node.new
+            Here_::Models_::Node.new
           end
 
           o.each_file_entry[ _leaf.node_payload, fe ]

@@ -1,26 +1,29 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  describe "[st] models - file-coverage - 01: find the test directory" do
+  describe "[ts] magnetics - test directory via path" do
 
     TS_[ self ]
     use :expect_event
-    use :models_file_coverage
+
+    it "loads" do
+      _subject_magnetic
+    end
 
     it "against an asset file when the root dir is not found" do
 
-      where do
+      given do
         the_asset_file
         max_num_dirs 0
       end
 
       expect_not_OK_event :resource_not_found do | ev |
         ev_ = ev.to_event
-        ev_.start_path.should eql the_asset_file_path
-        ev_.num_dirs_looked.should be_zero
-        ev_.file_pattern_x.should be_respond_to :each_with_index
-        ev_.ok.should eql false
+        ev_.start_path ==_the_asset_file_path || fail
+        ev_.num_dirs_looked.zero? || fail
+        ::Array.try_convert( ev_.file_pattern_x ) || fail
+        ev_.ok == false || fail
       end
 
       expect_failed
@@ -28,7 +31,7 @@ module Skylab::SubTree::TestSupport
 
     it "against a test file when the root dir is not found" do
 
-      where do
+      given do
         the_test_file
         max_num_dirs 0
       end
@@ -39,7 +42,7 @@ module Skylab::SubTree::TestSupport
 
     it "against an asset file when the root dir is found" do
 
-      where do
+      given do
         the_asset_file
         max_num_dirs 2
       end
@@ -49,7 +52,7 @@ module Skylab::SubTree::TestSupport
 
     it "against a test file when the root dir is found" do
 
-      where do
+      given do
         the_test_file
         max_num_dirs 2
       end
@@ -59,7 +62,7 @@ module Skylab::SubTree::TestSupport
 
     it "on the root dir itself - root is found" do
 
-      where do
+      given do
         path fixture_tree( :one )
         max_num_dirs 1
       end
@@ -69,7 +72,7 @@ module Skylab::SubTree::TestSupport
 
     it "on the test dir itself - root is found" do
 
-      where do
+      given do
         path "#{ fixture_tree :one }/test"
         max_num_dirs 1
       end
@@ -79,65 +82,65 @@ module Skylab::SubTree::TestSupport
 
     # ~ test setup & asset execution
 
-    def the_asset_file
-      path the_asset_file_path
+    def given
+
+      _oes_p = event_log.handle_event_selectively
+      o = _subject_magnetic.new( & _oes_p )
+
+      yield
+
+      d = remove_instance_variable :@__max_num_dirs
+      s = remove_instance_variable :@__path
+
+      o.instance_variable_set :@max_num_dirs_to_look, d
+      o.instance_variable_set :@start_path, s
+
+      @result = o.execute
+      NIL
     end
 
-    let :the_asset_file_path do
-      "#{ fixture_tree :one }/foo.rb"
+    def the_asset_file
+      path _the_asset_file_path
+    end
+
+    taf = nil
+    define_method :_the_asset_file_path do
+      taf ||= "#{ fixture_tree :one }/foo.rb"
     end
 
     def the_test_file
-      path the_test_file_path
+      path _the_test_file_path
     end
 
-    let :the_test_file_path do
-      "#{ fixture_tree :one }/test/foo_speg.rb"
-    end
-
-    check = -> unb do
-      check = nil
-      unb.is_branch and fail  # assert the firs ever [#br-013]:API.B
-    end
-
-    define_method :where do | & sess |
-
-      unb = Home_::API.application_kernel_.silo( :file_coverage ).unbound
-
-      check and check[ unb ]
-
-      bnd = unb.new kernel_stub_, & handle_event_selectively_
-
-      bnd.instance_variable_set :@nc, name_conventions_
-      bnd.instance_variable_set :@be_verbose, false
-      @__bound__ = bnd
-      sess[]
-      @result = bnd.__find_the_test_directory
-      NIL_
+    ttf = nil
+    define_method :_the_test_file_path do
+      ttf ||= "#{ _fixture_tree }/test/foo_speg.rb"
     end
 
     def path path
-      @__bound__.instance_variable_set :@path, path
-      NIL_
+      @__path = path ; nil
     end
 
     def max_num_dirs d
-      @__bound__.instance_variable_set :@max_num_dirs, d
-      NIL_
+      @__max_num_dirs = d ; nil
     end
 
     # ~ test assertion
 
-    fixed = nil
+    exp = nil
     define_method :expect_that_the_root_is_found do
 
-      fixed ||= _TEST
+      exp ||= ::File.join _fixture_tree, Home_::TEST_DIR_FILENAME_
+      @result == exp || fail
+    end
 
-      _s = @__bound__.instance_variable_get :@test_dir
+    ft = nil
+    define_method :_fixture_tree do
+      ft ||= fixture_tree :one
+    end
 
-      fixed == _s[ - fixed.length .. -1 ] or fail
-
-      expect_succeeded
+    def _subject_magnetic
+      Home_::Magnetics::TestDirectory_via_Path
     end
   end
 end

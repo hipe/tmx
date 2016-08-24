@@ -1,12 +1,14 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  describe "[st] models - file-coverage - 03: build compound tree - for directory" do
+  describe "[ts] file-coverage - magnetics - CTvC - shape that is directory" do
 
     TS_[ self ]
     use :expect_event
-    use :models_file_coverage, :build_compound_tree, :expect_node_characteristics
+    use :file_coverage
+    use :file_coverage_compound_tree
+    use :file_coverage_expect_node_characteristics
 
     it "minimal positive case" do
 
@@ -84,7 +86,7 @@ module Skylab::SubTree::TestSupport
     def _path s
 
       @node = _memoized_tree.fetch_node s
-      NIL_
+      NIL
     end
 
     define_method :_memoized_tree, -> do

@@ -1,32 +1,40 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  describe "[st] models - file-coverage - 02: classify the path" do
+  describe "[ts] file-coverage - magnetics - classifications via path" do
 
     TS_[ self ]
     use :expect_event
-    use :models_file_coverage
+    use :file_coverage
+
+    it "(the subsystem loads)" do  # stowed away here b.c this file is first
+      subsystem_
+    end
+
+    it "loads" do
+      _subject_magnetic
+    end
 
     it "path does not exist" do
 
-      where do
+      given do
         test_dir_is_test_dir_one
-        @path = "#{ fixture_tree :one }/i-dont-exist.file"
+        @path = fixture_tree :one, 'i-dont-exist.file'
       end
 
-      expect_not_OK_event :resource_not_found do | ev |
-
-        ::File.basename( ev.path ).should eql 'i-dont-exist.file'
+      expect_not_OK_event :resource_not_found do |ev|
+        ::File.basename( ev.path ) == 'i-dont-exist.file' || fail
       end
+
       expect_failed
     end
 
     it "path is a test file" do
 
-      where do
+      given do
         test_dir_is_test_dir_one
-        @path = "#{ fixture_tree :one }/test/foo_speg.rb"
+        @path = fixture_tree :one, 'test', 'foo_speg.rb'
       end
 
       expect :test, :file
@@ -34,9 +42,9 @@ module Skylab::SubTree::TestSupport
 
     it "path is an asset file" do
 
-      where do
+      given do
         test_dir_is_test_dir_one
-        @path = "#{ fixture_tree :one }/foo.rb"
+        @path = fixture_tree :one, 'foo.rb'
       end
 
       expect :asset, :file
@@ -44,9 +52,9 @@ module Skylab::SubTree::TestSupport
 
     it "path is a non-root test directory" do
 
-      where do
+      given do
         test_dir_is_test_dir_two
-        @path = "#{ fixture_tree :two }/test/dir-A"
+        @path = fixture_tree :two, 'test', 'dir-A'
       end
 
       expect :test, :directory, :non_root
@@ -54,9 +62,9 @@ module Skylab::SubTree::TestSupport
 
     it "path is a non-root asset directory" do
 
-      where do
+      given do
         test_dir_is_test_dir_two
-        @path = "#{ fixture_tree :two }/dir-A-"
+        @path = fixture_tree :two, 'dir-A-'
       end
 
       expect :asset, :directory, :non_root
@@ -64,9 +72,9 @@ module Skylab::SubTree::TestSupport
 
     it "path is the root test directory" do
 
-      where do
+      given do
         test_dir_is_test_dir_one
-        @path = "#{ fixture_tree :one }/test"
+        @path = fixture_tree :one, 'test'
       end
 
       expect :test, :directory, :root
@@ -74,7 +82,7 @@ module Skylab::SubTree::TestSupport
 
     it "path is the root asset directory" do
 
-      where do
+      given do
         test_dir_is_test_dir_one
         @path = fixture_tree :one
       end
@@ -82,34 +90,47 @@ module Skylab::SubTree::TestSupport
       expect :asset, :directory, :root
     end
 
-    def test_dir_is_test_dir_one
-      @test_dir = "#{ fixture_tree :one }/test"
-      nil
-    end
+    # --
 
-    def test_dir_is_test_dir_two
-      @test_dir = "#{ fixture_tree :two }/test"
-      nil
-    end
+    def given
 
-    def where
       yield
-      @result = subject_::Actors_::Classify_the_path[
-        @test_dir, @path, & handle_event_selectively_ ]
-      NIL_
+
+      _td = remove_instance_variable :@test_dir
+      _pa = remove_instance_variable :@path
+      _oes_p = event_log.handle_event_selectively
+
+      @result = _subject_magnetic[ _td, _pa, & _oes_p ]
+      NIL
+    end
+
+    td1 = nil
+    define_method :test_dir_is_test_dir_one do
+      td1 ||= _same :one
+      @test_dir = td1 ; nil
+    end
+
+    td2 = nil
+    define_method :test_dir_is_test_dir_two do
+      td2 ||= _same :two
+      @test_dir = td2 ; nil
+    end
+
+    def _same sym
+      fixture_tree sym, Home_::TEST_DIR_FILENAME_
     end
 
     def expect testiness_symbol, shape_symbol, rootiness_symbol=nil
 
       if @result
-
         x = @result.difference_against testiness_symbol, shape_symbol, rootiness_symbol
         x and fail x.description
         expect_no_events
       else
         fail "expected result, had none"
       end
-
     end
+
+    alias_method :_subject_magnetic, :classifications_via_path_magnetic_
   end
 end

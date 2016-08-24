@@ -1,85 +1,48 @@
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  module Models::File_Coverage
+  module File_Coverage
 
-    def self.[] tcc, * x_a
-
+    def self.[] tcc
       tcc.include self
-
-      x_a.each do | sym |
-        _const = Common_::Name.via_variegated_symbol( sym ).as_const
-        Here_.const_get( _const, false )[ tcc ]
-      end
-
-      NIL_
+      NIL
     end
+
+    # -
 
     -> do
-
-      _FIXTURE_TREE = 'fixture-trees'
-
-      path = -> do
-        cache = {}
-        -> sym do
-          cache.fetch sym do
-
-            x = ::File.join(
-              TS_.dir_pathname.to_path,
-              _FIXTURE_TREE,
-              sym.id2name,
-            ).freeze
-
-            cache[ sym ] = x
-            x
-          end
+      cache = {}
+      define_method :fixture_tree_test_dir_for_ do |sym|
+        cache.fetch sym do
+          x = fixture_tree sym, Home_::TEST_DIR_FILENAME_
+          cache[ sym ] = x
+          x
         end
-      end.call
-
-      _TEST = 'test'
-
-      define_method :fixture_tree_test_dir_for_ do | sym |
-        ::File.join path[ sym ], _TEST
       end
-
-      define_method :fixture_tree_top_dir_for_, path
-
     end.call
 
-    define_method :kernel_stub_, ( -> do
+    subsystem = nil
 
-      p = -> do
-        x = class Kernel_Stub
+    define_method :name_conventions_, ( Lazy_.call do
+      subsystem[]::Models_::NameConventions.new %w( *_speg.rb *_spek.rb )
+    end )
 
-          def reactive_tree_seed
-            self._ONLY_for_respond_to
-          end
-
-          self
-        end.new.freeze
-        p = -> { x }
-        x
-      end
-      -> do
-        p[]
-      end
-    end ).call
-
-    def name_conventions_
-      Name_conventions__[]
+    def classifications_via_path_magnetic_
+      subsystem_magnetics_module_::Classifications_via_Path
     end
 
-    def subject_
-      Subject__[]
+    def subsystem_magnetics_module_
+      subsystem_::Magnetics_
     end
 
-    _TEST = 'test'.freeze
-    define_method :_TEST do
-      _TEST
+    subsystem = -> do
+      Home_::FileCoverage
     end
 
-    # <-
+    define_method :subsystem_, subsystem
 
-  module Build_Compound_Tree
+    # ==
+
+  module Compound_Tree
 
     class << self
       def [] tcm
@@ -89,25 +52,31 @@ module Skylab::SubTree::TestSupport
 
     def against t_or_a, f_or_d, r_or_nr=nil, path
 
-      o = Subject__[]
+      _cx = classifications_via_path_magnetic_::Classifications___[ t_or_a, f_or_d, r_or_nr ]
+      _fs = __real_filesystem
+      _nc = name_conventions_
+      _oes_p = event_log.handle_event_selectively
 
-      _cx = o::Actors_::Classify_the_path::Classifications___.new(
-        t_or_a, f_or_d, r_or_nr )
-
-      @tree = o::Actors_::Build_compound_tree[
-        _cx, path,
+      @tree = compound_tree_via_classifications_magnetic_.call(
+        _cx,
+        path,
         test_dir_for_build_compound_tree,
-        Name_conventions__[],
-        ___real_filesystem, & handle_event_selectively_ ]
-
-      NIL_
+        _nc,
+        _fs,
+        & _oes_p
+      )
+      NIL
     end
 
     def test_dir_for_build_compound_tree
       @test_dir
     end
 
-    def ___real_filesystem
+    def compound_tree_via_classifications_magnetic_
+      subsystem_magnetics_module_::CompoundTree_via_Classifications
+    end
+
+    def __real_filesystem
       Home_.lib_.system.filesystem
     end
   end
@@ -171,18 +140,8 @@ module Skylab::SubTree::TestSupport
   end
 
   Expect_Stdin_Stdout = -> tcm do
-
-    tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+    tcm.include Home_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
     tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
-  end
-
-  Name_conventions__ = Common_.memoize do
-
-    Subject__[]::Models_::Name_Conventions.new %w( *_speg.rb *_spek.rb )
-  end
-
-  Subject__ = -> do
-    Home_::Models_::File_Coverage
   end
 
   # ->

@@ -1,11 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  describe "[st] models - file-coverage - modalities - CLI" do
+  describe "[ts] file-coverage - modalities - CLI", wip: true do
 
     TS_[ self ]
-    use :models_file_coverage, :expect_stdin_stdout
+    use :file_coverage
+    use :file_coverage_expect_stdin_stdout
 
     it "2.2 - help infixed - ambiguity!" do
 

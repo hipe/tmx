@@ -1,6 +1,6 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  module FileCoverage
 
     class Models_::Node
 

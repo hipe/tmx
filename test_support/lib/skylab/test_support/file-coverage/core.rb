@@ -1,6 +1,8 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage < API.action_class_  # :[#002].
+  module FileCoverage  # (one paragraph in [#012])
+    if false
+  class Models_::FileCoverage < API.action_class_
 
     # (at writing this is the only :+[#br-013]:API.B - action at top.)
 
@@ -73,9 +75,13 @@ module Skylab::SubTree
 
       def __find_the_test_directory  # assume @max_num_dirs and @path
 
-        @test_dir = File_Coverage_::Actors_::Find_the_test_directory.with(
+        self._HERE
+ 
+        # :filenames, FILENAMES___
+        # FILENAMES___ = Home_::Lib_::Test_dir_name_a[]
 
-          :filenames, FILENAMES___,
+        @test_dir = Here_::Actors_::Find_the_test_directory.with(
+
           :start_path, @path,
           :be_verbose, @be_verbose,
           :max_num_dirs_to_look, @max_num_dirs,
@@ -86,7 +92,7 @@ module Skylab::SubTree
 
       def __classify_the_path
 
-        cx = File_Coverage_::Actors_::Classify_the_path[
+        cx = Here_::Actors_::Classify_the_path[
           @test_dir, @path, & handle_event_selectively ]
 
         cx and begin
@@ -103,7 +109,7 @@ module Skylab::SubTree
           "*#{ s }"
         end
 
-        @name_conventions = File_Coverage_::Models_::Name_Conventions.
+        @name_conventions = Here_::Models_::NameConventions.
           new _pattern_s_a
 
         ACHIEVED_
@@ -113,7 +119,7 @@ module Skylab::SubTree
 
         _filesystem = Home_.lib_.system.filesystem
 
-        tree = File_Coverage_::Actors_::Build_compound_tree[
+        tree = Here_::Actors_::Build_compound_tree[
 
           @classifications,
           @path,
@@ -143,20 +149,30 @@ module Skylab::SubTree
 
       def express_into_under y, expag
 
-        File_Coverage_::Modalities::CLI::Agnostic_Text_Based_Expression.
+        Here_::Modalities::CLI::Agnostic_Text_Based_Expression.
           new( y, expag, @tree ).execute
       end
     end
+  end
 
-    Autoloader_[ Actors_ = ::Module.new ]
+    end  # if false
 
-    File_Coverage_ = self
+    module Magnetics_
+      Autoloader_[ self ]
+    end
 
-    FILENAMES___ = Home_::Lib_::Test_dir_name_a[]
+    module Models_
+      Autoloader_[ self ]
+    end
 
-    Autoloader_[ Models_ = ::Module.new ]
+    # --
 
-    Models_::Entry = IDENTITY_
+    Tree_lib_ = -> do
+      Home_.lib_.basic::Tree
+    end
 
+    # --
+
+    Here_ = self
   end
 end

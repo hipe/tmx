@@ -1,8 +1,8 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  Magnetics = ::Module.new
 
-    class Actors_::Find_the_test_directory
+    class Magnetics::TestDirectory_via_Path
 
       # our algorithm is particular enough that it can be served neither by
       # [hl]'s "walk" nor by `::File#glob` - neither of these has a built-in
@@ -20,11 +20,17 @@ module Skylab::SubTree
         :max_num_dirs_to_look,
       )
 
+      FILENAMES___ = [ TEST_DIR_FILENAME_ ]
+
       def initialize & p
+        @be_verbose = false
         @on_event_selectively = p
       end
 
       def execute
+
+        @filenames ||= FILENAMES___
+
         __init_find
 
         current_path = @start_path
@@ -129,5 +135,4 @@ module Skylab::SubTree
         end
       end
     end
-  end
 end

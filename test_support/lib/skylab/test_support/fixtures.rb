@@ -12,6 +12,10 @@ module Skylab::TestSupport
         ::File.join @files_path, __files_box.fetch( sym )
       end
 
+      def tree sym
+        ::File.join @trees_path, __trees_box.fetch( sym )
+      end
+
       attr_reader(
         :dirs_path,
         :files_path,
@@ -37,16 +41,20 @@ module Skylab::TestSupport
         bx
       end
 
+      def __trees_box
+        @___trees_box ||= _build_box @trees_path
+      end
+
       def _build_box path_head
 
         bx = Common_::Box.new
 
-        ::Dir.glob( "#{ path_head }/*" ).each do | path |
+        ::Dir.glob( "#{ path_head }/*" ).each do |path|
 
           bn = ::File.basename path
           ext = ::File.extname bn
-          _stem = bn[ 0 ... - ( ext.length ) ]
-
+          d = ext.length
+          _stem = d.zero? ? bn : bn[ 0 ... -d ]
           bx.add _stem.gsub( DASH_, UNDERSCORE_ ).intern, bn
         end
 
@@ -54,11 +62,11 @@ module Skylab::TestSupport
       end
     end  # >>
 
-    _dir_path = ::File.expand_path '../../..', Home_.dir_pathname.to_path
+    dir = ::File.expand_path '../../..', Home_.dir_pathname.to_path
 
-    @files_path = ::File.join( _dir_path, 'fixture-files' ).freeze
-
-    @dirs_path = ::File.join( _dir_path, 'fixture-directories' ).freeze
+    @dirs_path = ::File.join( dir, 'fixture-directories' ).freeze
+    @files_path = ::File.join( dir, 'fixture-files' ).freeze
+    @trees_path = ::File.join( dir, 'fixture-trees' ).freeze
 
   end
 end

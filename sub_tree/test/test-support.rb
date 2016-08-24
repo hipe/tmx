@@ -44,27 +44,9 @@ module Skylab::SubTree::TestSupport
       TestSupport_.debug_IO
     end
 
-    def handle_event_selectively_
-      event_log.handle_event_selectively
+    def fixture_tree sym
+      TestSupport_::Fixtures.tree sym
     end
-
-    _MID = 'fixture-trees'
-    define_method :fixture_tree, ( -> do
-      cache = {}
-      -> sym do
-        cache.fetch sym do
-
-          x = ::File.join(
-            TS_.dir_pathname.to_path,
-            _MID,
-            sym.id2name.gsub( UNDERSCORE_, DASH_ ),
-          ).freeze
-
-          cache[ sym ] = x
-          x
-        end
-      end
-    end ).call
 
     def subject_API
       Home_::API

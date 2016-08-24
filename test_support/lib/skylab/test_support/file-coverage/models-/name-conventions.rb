@@ -1,8 +1,8 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  module FileCoverage
 
-    class Models_::Name_Conventions
+    class Models_::NameConventions
 
       # a placeholder for the idea of it
 

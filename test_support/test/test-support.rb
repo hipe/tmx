@@ -65,6 +65,20 @@ module Skylab::TestSupport::TestSupport
     def fixture_file__ filename
       ::File.join Home_::Fixtures.files_path, filename
     end
+
+    ftcache = {}
+    define_method :fixture_tree do |sym, * s_a|
+      path = ftcache.fetch sym do
+        x = Home_::Fixtures.tree sym
+        ftcache[ sym ] = x
+        x
+      end
+      if s_a.length.zero?
+        path
+      else
+        ::File.join path, * s_a
+      end
+    end
   end
 
   # --
@@ -79,7 +93,10 @@ module Skylab::TestSupport::TestSupport
 
   # --
 
+  Home_::Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
   Common_ = Home_::Common_
+  Lazy_ = Common_::Lazy
   TS_ = self
 
 end

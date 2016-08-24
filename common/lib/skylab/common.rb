@@ -1433,7 +1433,10 @@ module Skylab::Common
         et = h[ dir ]
 
         if et
-          et_ = et.normpath_from_distilled Distill_[ entry ]
+          np = et.normpath_from_distilled Distill_[ entry ]
+          if np && np.has_directory
+            et_ = np
+          end
         end
 
         if et_

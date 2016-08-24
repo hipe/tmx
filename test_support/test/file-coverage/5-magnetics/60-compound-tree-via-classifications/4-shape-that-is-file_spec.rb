@@ -1,16 +1,21 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::SubTree::TestSupport
+module Skylab::TestSupport::TestSupport
 
-  describe "[st] models - file-coverage - 03: build compound tree - for single file" do
+  describe "[ts] file-coverage - magnetics - CTvC - shape that is file" do
 
     TS_[ self ]
     use :expect_event
-    use :models_file_coverage, :build_compound_tree
+    use :file_coverage
+    use :file_coverage_compound_tree
+
+    it "loads" do
+      compound_tree_via_classifications_magnetic_
+    end
 
     it "of single test with counterpart" do
 
-      against :test, :file, "#{ fixture_tree :two }/test/dir-A/foo-bar_spek.rb"
+      against :test, :file, fixture_tree( :two, *%w( test dir-A foo-bar_spek.rb ) )
 
       _common_result
     end
@@ -102,7 +107,6 @@ module Skylab::SubTree::TestSupport
     # complement test :+#skipped-because-boring
 
     def test_dir_for_build_compound_tree
-
       fixture_tree_test_dir_for_ :two
     end
   end

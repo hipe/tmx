@@ -27,8 +27,9 @@ module Skylab::System::TestSupport
         :filename, '&![]',
         :when_command, -> cmd_o do
           cmd_o
-        end ) do | i, *_, & ev_p |
-          if :info == i
+        end,
+      ) do |sym, *_, & ev_p|
+          if :info == sym
             ev = ev_p[]
           else
             raise ev.to_exception

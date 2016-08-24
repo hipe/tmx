@@ -72,11 +72,16 @@
 [#015] #hole (#moved-to: [#dt-001])
 [#014] #hole (#moved-to: [#dt-XXX])
 
-[#013] #hole ( #was: #historical #done #inquiry-point choke point etc )
+[#013]       the big assumptions, that should be data:
+               - all relevant files have one extension
+
+             #parent-node: [#012]
+             ( #was: #historical #done #inquiry-point choke point etc )
                (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
 
-[#012] #hole (#moved-to: [xx])
+[#012]       [ file coverage ]
+             (#moved-to: [xx])
              ( #was: [#xx-006] )
              ( #was: #done #parent-node: [#015] setup vs example? )
 

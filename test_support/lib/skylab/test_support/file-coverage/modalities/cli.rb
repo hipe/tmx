@@ -1,6 +1,6 @@
-module Skylab::SubTree
+module Skylab::TestSupport
 
-  class Models_::File_Coverage
+  class Models_::FileCoverage
 
     Modalities = ::Module.new
 
@@ -14,7 +14,7 @@ module Skylab::SubTree
 
       Actions = ::Module.new  # THE_EMPTY_MODULE_
 
-      class Actions::File_Coverage < Home_::CLI::Action_Adapter
+      class Actions::FileCoverage < Home_::CLI::Action_Adapter
 
         def init_properties  # #nascent-operation :+[#br-042]
 

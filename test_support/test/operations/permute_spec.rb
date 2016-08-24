@@ -90,7 +90,7 @@ module Skylab::TestSupport::TestSupport
 
     define_method :__build_permutation_stream, -> do
 
-      _Struct = ( Common_.memoize do
+      _Struct = ( Lazy_.call do
         ::Struct.new :A, :B
       end )
 
