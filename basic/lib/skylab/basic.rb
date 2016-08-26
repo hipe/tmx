@@ -148,6 +148,10 @@ module Skylab::Basic  # introduction at [#020]
     def description
       "« #{ @name.as_slug } »"  # :+#guillemets
     end
+
+    def parameter_arity
+      :too_basic_for_arity
+    end
   end
 
   Normalizers_instance__ = Common_.memoize do

@@ -1,36 +1,38 @@
 module Skylab::TestSupport
 
-  module FileCoverage  # (one paragraph in [#012])
+  module FileCoverage  # (one paragraph in [#012]. also desc at #here-2)
 
-    module API
+    # (see #spot-fc-CLI for comments about our CLI exposure)
 
-      class << self
+    module API ; class << self
 
-        def call * x_a, & oes_p
+      def call * x_a, & oes_p
 
-          Require_zerk_[]
+        Require_zerk_[]
 
-          Zerk_::API.call x_a, root_ACS_ do |_|
-            oes_p
-          end
+        Zerk_::API.call x_a, Here_.__root_ACS do |_|
+          oes_p
         end
+      end
+    end ; end  # >>
 
-        def root_ACS_
-          # for now we're daemonizing this just because we can. it makes
-          # little impact either way, but it's one less object per test to
-          # build. see #here for one gotcha we don't have to worry about.
-          @___daemon ||= __build_root_ACS
+    class << self
+
+      def __root_ACS
+        # for now we're daemonizing this just because we can. it makes
+        # little impact either way, but it's one less object per test to
+        # build. see #here for one gotcha we don't have to worry about.
+        @___daemon ||= __build_root_ACS
+      end
+
+      def __build_root_ACS
+        Root_Autonomous_Component_System.by_filesystem do
+          Home_.lib_.system.filesystem
         end
+      end
+    end  # >>
 
-        def __build_root_ACS
-          Root_Autonomous_Component_System__.by_filesystem do
-            Home_.lib_.system.filesystem
-          end
-        end
-      end  # >>
-    end
-
-    class Root_Autonomous_Component_System__
+    class Root_Autonomous_Component_System
 
       class << self
         def by_filesystem & p
@@ -43,7 +45,7 @@ module Skylab::TestSupport
         @_filesystem_p = filesystem_p
       end
 
-      def __file_coverage__component_operation
+      def __file_coverage__component_operation  # #public-API
 
         yield :parameter, :test_directory_filename, :optional
         yield :parameter, :test_file_suffix, :optional
@@ -62,15 +64,28 @@ module Skylab::TestSupport
 
     class File_Coverage_Operation___
 
+      def self.describe_into_under y, expag
+
+        y << "see crude unit test coverage with a left-right-middle filetree diff"
+        y << "  - test files with corresponding application files appear as green."
+        y << "  - application files with no corresponding test files appear as red."
+
+        # #todo -  ideally you would get the styling descriptions from the expag
+      end
+
       def initialize fs_p
         @test_directory_filename = nil
-        @test_file_suffix = nil
+        @test_file_suffixes = nil
         @_filesystem_p = fs_p
       end
 
       def __test_directory_filename__component_association
 
-        yield :glob
+        yield :description, -> y do
+
+          _ = ick Test_directory_filename__[]
+          y << "the name(s) used for test directories (default: #{ _ })"
+        end
 
         -> st do
           x = st.gets_one
@@ -79,22 +94,23 @@ module Skylab::TestSupport
         end
       end
 
+      def __test_file_suffixes__component_association
+        yield :is_plural_of, :test_file_suffix
+      end
+
       def __test_file_suffix__component_association
 
-        yield :glob
+        yield :is_singular_of, :test_file_suffixes
 
         yield :description, -> y do
 
-          _s = Test_file_suffix_array__[].map do |s|
-            ick s
-          end.join ', '
-
-          y << "the test file suffixes to use (default: #{ _s })"
+          _ = render_list_commonly_ Test_file_suffix_array__[]
+          y << "the test file suffixes to use (default: #{ _ })"
         end
 
         -> st do
           x = st.gets_one
-          ::Array.try_convert x or Zerk_._SANTIY
+          ::Array.try_convert( x ) && Home_._SANITY
           Common_::Known_Known[ x ]
         end
       end
@@ -105,13 +121,14 @@ module Skylab::TestSupport
           y << "the path to any file or folder in a project"
         end
 
-        -> st, & oes_p do
-
+        -> st, & pp do
           _x = st.gets_one
-          qkn = Common_::Qualified_Knownness.via_value_and_symbol _x, :path
-
-            Home_.lib_.basic::Pathname.normalization.new_with( :absolute ).
-              normalize_qualified_knownness( qkn, & oes_p )
+          _qkn = Common_::Qualified_Knownness.via_value_and_symbol _x, :path
+          _n11n = Home_.lib_.basic::Pathname.normalization.new_with :absolute
+          _n11n.normalize_qualified_knownness _qkn do |*i_a, &ev_p|
+            _oes_p = pp[ :_fc_hi_ ]
+            _oes_p[ * i_a, & ev_p ]
+          end
         end
       end
 
@@ -119,14 +136,13 @@ module Skylab::TestSupport
         FileCoverageExecution___.new(
           @path,
           @test_directory_filename,
-          @test_file_suffix,
+          @test_file_suffixes,
           @_filesystem_p,
           & oes_p ).execute
       end
     end
 
     class FileCoverageExecution___
-
       # reasons this exists as a separate object even though it's
       # structurally almost identical to its lone client:
       #
@@ -137,7 +153,7 @@ module Skylab::TestSupport
       #
       #    - let [ac] avoid unnecessarily indexing all these methods
 
-      def initialize pa, tdf_a, tfs_a, fs_p, & oes_p
+      def initialize pa, tdfn, tfs_a, fs_p, & oes_p
 
         @be_verbose = false  # may be an option one day. turning this on
         # will lead to a sub-node emitting every find command, for e.g
@@ -145,7 +161,7 @@ module Skylab::TestSupport
         @max_num_dirs = -1  # may be option one day
 
         @path = pa
-        @test_directory_filename_array = tdf_a || Test_dir_name_array__[]
+        @test_directory_filename = tdfn || Test_directory_filename__[]
         @test_file_suffix_array = tfs_a || Test_file_suffix_array__[]
 
         @_filesystem_p = fs_p
@@ -165,7 +181,7 @@ module Skylab::TestSupport
 
         _x = Home_::Magnetics::TestDirectory_via_Path.with(
           :start_path, @path,
-          :filenames, @test_directory_filename_array,
+          :filenames, [ @test_directory_filename ],
           :be_verbose, @be_verbose,
           :max_num_dirs_to_look, @max_num_dirs,
           & @_on_event_selectively )
@@ -183,8 +199,12 @@ module Skylab::TestSupport
 
       def __resolve_name_conventions
 
-        _pattern_s_a = @test_file_suffix_array.map do | s |
-          "*#{ s }"
+        _pattern_s_a = @test_file_suffix_array.map do |s|
+          if ASTERISK_BYTE__ == s.getbyte(0)
+            s
+          else
+            "#{ ASTERISK_ }#{ s }"
+          end
         end
 
         @name_conventions = Here_::Models_::NameConventions.new _pattern_s_a
@@ -258,8 +278,8 @@ module Skylab::TestSupport
     Common_ = Home_::Common_
     Lazy_ = Common_::Lazy
 
-    Test_dir_name_array__ = Lazy_.call do
-      [ TEST_DIR_FILENAME_ ].freeze
+    Test_directory_filename__ = -> do
+      TEST_DIR_FILENAME_
     end
 
     Test_file_suffix_array__ = Lazy_.call do
@@ -278,6 +298,8 @@ module Skylab::TestSupport
 
     # --
 
+    ASTERISK_ = '*'
+    ASTERISK_BYTE__ = ASTERISK_.getbyte 0
     Here_ = self
   end
 end

@@ -72,13 +72,9 @@ module Skylab::TestSupport
         end
 
         def init
-
           super
-
-          @test_local_range = produce_local_range_ @test_dir
-
+          @test_local_range = tailer_range_via_path_ @test_dir
           @tree = Tree_lib_[].mutable_node.new
-
           NIL_
         end
 
@@ -93,7 +89,7 @@ module Skylab::TestSupport
 
             :each_dir_entry, -> npl, entry do
 
-              npl.receive_test_dir_entry_string_ entry.to_s
+              npl.receive_test_dir_entry_string_ entry  # #entry-model
             end,
 
             :normal_string_for_file_entry, -> entry do
@@ -102,7 +98,7 @@ module Skylab::TestSupport
             end,
 
             :each_file_entry, -> npl, entry do
-              npl.receive_test_file_entry_string_ entry.to_s
+              npl.receive_test_file_entry_string_ entry  # #entry-model
             end
 
           NIL_
@@ -119,7 +115,7 @@ module Skylab::TestSupport
 
             :each_dir_entry, -> npl, entry do
 
-              npl.receive_asset_dir_entry_string_ entry.to_s
+              npl.receive_asset_dir_entry_string_ entry  # #entry-model
             end,
 
             :normal_string_for_file_entry, -> entry do
@@ -129,7 +125,7 @@ module Skylab::TestSupport
 
             :each_file_entry, -> npl, entry do
 
-              npl.receive_asset_file_entry_string_ entry.to_s
+              npl.receive_asset_file_entry_string_ entry  # #entry-model
             end
 
           NIL_
@@ -167,9 +163,12 @@ module Skylab::TestSupport
           NIL_
         end
 
-        Touch_Filename___ = ::Struct.new :each_dir_entry, :each_file_entry,
-
-          :normal_string_for_dir_entry, :normal_string_for_file_entry
+        Touch_Filename___ = ::Struct.new(
+          :each_dir_entry,
+          :each_file_entry,
+          :normal_string_for_dir_entry,
+          :normal_string_for_file_entry,
+        )
 
         def __via_test_filename_to_asset_path_stream
 
@@ -187,7 +186,7 @@ module Skylab::TestSupport
         end
 
         def __say entry
-          "does not look like test file - #{ entry.to_s.inspect }"
+          "does not look like test file - #{ entry.inspect }"  # #entry-model
         end
 
         def __via_test_filename_to_final_directory_stream
@@ -198,7 +197,7 @@ module Skylab::TestSupport
 
             st = st.expand_by do | full_path |
 
-              __to_N_tries_dir_stream( full_path, entry.to_s ).reduce_by do | full_path_ |
+              __to_N_tries_dir_stream( full_path, entry ).reduce_by do |full_path_|  # #entry-model
 
                 @fs.directory? full_path_
 
@@ -219,9 +218,11 @@ module Skylab::TestSupport
 
         def __to_N_tries_file_stream dir, entry_s
 
-          Common_::Stream.via_times ETC__.length do | d |
-
-            ::File.join dir, "#{ entry_s }#{ ETC__.fetch d }#{ Autoloader_::EXTNAME }"
+          @_nc.to_big_tree_filename_patterns__.expand_by do |ext|
+            Common_::Stream.via_times ETC__.length do |d|
+              _some_dashes = ETC__.fetch d
+              ::File.join dir, "#{ entry_s }#{ _some_dashes }#{ ext }"
+            end
           end
         end
 

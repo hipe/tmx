@@ -120,9 +120,9 @@ module Skylab::SubTree::TestSupport
 
       _exp = <<-HERE.unindent
         └── one
-            ├── foo.rb
+            ├── foo.kode
             └── test
-                └── foo_speg.rb
+                └── foo_speg.kode
       HERE
 
       _act.should eql _exp

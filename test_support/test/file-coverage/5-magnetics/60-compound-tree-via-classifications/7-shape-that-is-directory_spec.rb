@@ -35,39 +35,39 @@ module Skylab::TestSupport::TestSupport
       npl.has_assets.should eql true
       npl.has_tests.should eql true
 
-      npl.asset_file_entry_s_a.should eql %w( foo-bar--.rb )
-      npl.test_file_entry_s_a.should eql %w( foo-bar_spek.rb )
+      npl.asset_file_entry_s_a.should eql %w( foo-bar--.kode )
+      npl.test_file_entry_s_a.should eql %w( foo-bar_spek.kode )
 
     end
 
     it "level 0 test without asset is expressed" do
 
       _path 'twna'
-      _expect_test_without_asset 'twna_speg.rb'
+      _expect_test_without_asset 'twna_speg.kode'
     end
 
     it "level 0 asset without test is expressed" do
 
       _path 'awnt'
-      _expect_asset_without_test 'awnt---.rb'
+      _expect_asset_without_test 'awnt---.kode'
     end
 
     it "level 1 asset without test is expressed" do
 
       _path 'dir-with/awnt2'
-      _expect_asset_without_test 'awnt2.rb'
+      _expect_asset_without_test 'awnt2.kode'
     end
 
     it "level 1 test without asset is expressed (in a folder with normal tests)" do
 
       _path 'aa-bb/twna2'
-      _expect_test_without_asset 'twna2_speg.rb'
+      _expect_test_without_asset 'twna2_speg.kode'
     end
 
     it "level 1 test without asset is expressed (in its own folder)" do
 
       _path 'dir-with-2/twna3'
-      _expect_test_without_asset 'twna3_speg.rb'
+      _expect_test_without_asset 'twna3_speg.kode'
     end
 
     it "some file are ignored per the name conventions" do

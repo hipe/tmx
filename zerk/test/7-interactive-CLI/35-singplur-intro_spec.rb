@@ -4,7 +4,7 @@ module Skylab::Zerk::TestSupport
 
   describe "[ze] iCLI - singplur intro" do
 
-    # call this (mandatory) #masking if you like. in the entity-item view
+    # call this (mandatory) #mode-tweaking if you like. in the entity-item view
     # view it never makes sense to express the singluar counterpart of
     # a sing-plur pairing. always render the plural counterpart only.
     #

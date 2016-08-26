@@ -99,7 +99,7 @@ module Skylab::Autonomous_Component_System
             pair = st.gets
             pair || break
 
-            _asc = pair.name_x._real_association
+            _asc = pair.name_x._defined_association
 
             _st = Field_::Argument_stream_via_value[ pair.value_x ]  # MODALITY user value
 
@@ -166,8 +166,35 @@ module Skylab::Autonomous_Component_System
           else
             @_has = false
             @argument_arity = :one
-            @parameter_arity = :one  # .. (if we were truly autonomous we would recurse)
+
+            # this is all VERY experimental - generally (and unlike elsewhere)
+            # we want the default parameter arity to end up as "required".
+            # if you want to tamp this down you have to do it explicitly
+            # (for now in the higher-level definition space, not the lower)
+
+            sym = nt.association.singplur_category
+            @parameter_arity = if sym
+              # tricky - what we don't want is the plural counterpart of a
+              # singplur pair to be reported as required (to any client?)
+              THESE___.fetch sym
+            else
+              :one  # .. (if we were truly autonomous we would recurse)
+            end
           end
+        end
+
+        THESE___ = {
+          plural_of: :zero_or_one,
+          singular_of: :one,
+        }
+
+        def prepend_normalization_by & p
+          nt = @_node_ticket
+          _asc_ = nt.association.prepend_normalization__ p
+          _nt_ = nt.new_with_association__ _asc_
+          otr = dup
+          otr.instance_variable_set :@_node_ticket, _nt_
+          otr
         end
 
         def description_proc  # wild ride..
@@ -176,7 +203,7 @@ module Skylab::Autonomous_Component_System
             p = @_fopa.description_proc
           end
 
-          p_ = _real_association.description_proc
+          p_ = _defined_association.description_proc
 
           if p
             if p_
@@ -192,10 +219,6 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        def _real_association
-          @_node_ticket.association
-        end
-
         def argument_argument_moniker
           if @_has
             @_fopa.argument_argument_moniker
@@ -206,6 +229,19 @@ module Skylab::Autonomous_Component_System
           if @_has
             @_fopa.default_proc
           end
+        end
+
+        def is_probably_the_singularest
+          sym = _defined_association.singplur_category
+          if sym
+            :singular_of == sym
+          else
+            true
+          end
+        end
+
+        def _defined_association
+          @_node_ticket.association
         end
 
         attr_reader(

@@ -462,13 +462,21 @@ module Skylab::Fields
   class Argument_stream_via_value  # :[#019] (2x similar)
 
     class << self
-      alias_method :[], :new
+
+      def [] x
+        new Common_::Known_Known[ x ]
+      end
+
+      def via_known_known kn  # [ac]
+        new kn
+      end
+
       private :new
     end  # >>
 
-    def initialize x
+    def initialize kn
       @_done = false
-      @_kn = Common_::Known_Known[ x ]
+      @_kn = kn
     end
 
     def gets_one

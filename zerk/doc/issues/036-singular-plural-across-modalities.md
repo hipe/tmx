@@ -10,7 +10,7 @@ argument arity with a ceiling of more than one. BUT:
     because it clutters the generated UI. there should only appear
     to be (and actually be) one.
 
-    here we see a mandatory #masking: we omit entirely the plural
+    here we see a mandatory #mode-tweaking: we omit entirely the plural
     form. when the formal node is expressed in the option parser,
     it should work in the expected way, pushing to the same array
     with each invocation. when expressed in the arguments, well, etc.

@@ -128,42 +128,64 @@ module Skylab::Autonomous_Component_System
         @__reader = rdr
       end
 
+      def new_with_association__ asc
+        otr = dup
+        otr.instance_variable_set :@_asc_m, :__asc_via_ivar
+        otr.instance_variable_set :@___asc, asc
+        otr
+      end
+
       def new en
         dup.__init en
       end
 
-      def __init en
+      def __init entry
 
         # everything is memoized; lazily. i.e: load/build/request as little
         # as necessary (and perhaps less) to satisfy what is being requested
 
         reader = remove_instance_variable :@__reader
-        name_sym = en.name_symbol ; en = nil
+        name_sym = entry.name_symbol ; entry = nil
 
-        @_qk = -> do
-          _asc = @_asc[]
-          qk = reader.qualified_knownness_of_association _asc
-          @_qk = -> { qk }
-          qk
+        # --
+
+        @_qk_m = :__qk_via_proc
+        @__qk_proc = -> do
+          remove_instance_variable :@__qk_proc
+          _asc = send @_asc_m
+          @___qk = reader.qualified_knownness_of_association _asc
+          @_qk_m = :__qk_via_ivar
+          send @_qk_m
         end
 
-        @_asc = -> do
+        # ~
+
+        @_asc_m = :__asc_via_proc
+        @__asc_proc = ->  do
+
+          # whether or not we have produced a name by the below means,
+          # overwrite it with this ("more correct") name
+
+          remove_instance_variable :@__asc_proc
           asc = reader.read_association name_sym
-          # (whether or not we have produced a name by the below means,
-          # overwrite it with this ("more correct") name)
-          nf = asc.name
-          @_name = -> { nf }
-          @_asc = -> { asc }
-          asc
+          @___nf = asc.name
+          @_nf_m = :__name_via_ivar
+          @_asc_m = :__asc_via_ivar
+          @___asc = asc
+          send @_asc_m
         end
 
-        @_name = -> do
+        # ~
+
+        @_nf_m = :__name_via_proc
+        @__nf_proc = -> do
           # there is a potential gotcha here - if the compasc would customize
           # the name ([sg]) it won't be represented here unless the caller has
           # requested the compasc any time before this request of the name.
-          nf = Common_::Name.via_variegated_symbol name_sym
-          @_name = -> { nf }
-          nf
+
+          remove_instance_variable :@__nf_proc
+          @_nf_m = :__name_via_ivar
+          @___nf = Common_::Name.via_variegated_symbol name_sym
         end
 
         @name_symbol = name_sym
@@ -172,19 +194,37 @@ module Skylab::Autonomous_Component_System
       end
 
       def to_qualified_knownness
-        @_qk[]
+        send @_qk_m
+      end
+      def __qk_via_proc
+        @__qk_proc[]
+      end
+      def __qk_via_ivar
+        @___qk
       end
 
       def is_a_singular
-        :singular_of == @_asc[].singplur_category
+        :singular_of == send( @_asc_m ).singplur_category
       end
 
       def association
-        @_asc[]
+        send @_asc_m
+      end
+      def __asc_via_proc
+        @__asc_proc[]
+      end
+      def __asc_via_ivar
+        @___asc
       end
 
       def name
-        @_name[]
+        send @_nf_m
+      end
+      def __name_via_proc
+        @__nf_proc[]
+      end
+      def __name_via_ivar
+        @___nf
       end
 
       attr_reader(

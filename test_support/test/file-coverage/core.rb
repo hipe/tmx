@@ -23,7 +23,7 @@ module Skylab::TestSupport::TestSupport
     subsystem = nil
 
     define_method :name_conventions_, ( Lazy_.call do
-      subsystem[]::Models_::NameConventions.new %w( *_speg.rb *_spek.rb )
+      subsystem[]::Models_::NameConventions.new %w( *_speg.kode *_spek.kode )
     end )
 
     def classifications_via_path_magnetic_

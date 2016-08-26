@@ -1,3 +1,6 @@
+[#046]       :#mode-tweaking, :#mode-tweak (frontier is in-situ in [ts])
+             this is [ze]'s improvement on [#br-042]
+
 [#045]       track this interruption handler for iCLI
 
 [#044]       flag

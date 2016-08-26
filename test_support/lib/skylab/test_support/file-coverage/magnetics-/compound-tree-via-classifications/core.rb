@@ -12,6 +12,10 @@ module Skylab::TestSupport
         :fs,
       )
 
+      def initialize & p
+        @on_event_selectively_ = p
+      end
+
       def execute
         extend EXTEND___.fetch( @classifications.shape ).call
         execute
@@ -23,17 +27,13 @@ module Skylab::TestSupport
       }
 
       def init
-
         bhd = ::File.dirname @test_dir
-
-        @asset_local_range_ = produce_local_range_ bhd
-
+        @asset_local_range_ = tailer_range_via_path_ bhd
         @business_hub_dir_ = bhd
-
         NIL_
       end
 
-      def produce_local_range_ path
+      def tailer_range_via_path_ path
         path.length + 1 .. -1
       end
 

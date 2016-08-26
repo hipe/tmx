@@ -232,7 +232,7 @@ module Skylab::Basic
 
         def nope terminal_channel_symbol
 
-          @result = maybe_send_event :error, :invalid_property_value do
+          maybe_send_event :error, :invalid_property_value do
 
             build_argument_error_event_with_(
 
@@ -248,6 +248,8 @@ module Skylab::Basic
               y << "#{ par o.prop } #{ s_a * SPACE_ } - #{ ick o.path }"
             end
           end
+          # (result from above is unreliable)
+          @result = UNABLE_
           UNABLE_
         end
 

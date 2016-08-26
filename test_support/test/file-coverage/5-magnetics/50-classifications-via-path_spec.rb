@@ -34,7 +34,7 @@ module Skylab::TestSupport::TestSupport
 
       given do
         test_dir_is_test_dir_one
-        @path = fixture_tree :one, 'test', 'foo_speg.rb'
+        @path = fixture_tree :one, 'test', 'foo_speg.kode'
       end
 
       expect :test, :file
@@ -44,7 +44,7 @@ module Skylab::TestSupport::TestSupport
 
       given do
         test_dir_is_test_dir_one
-        @path = fixture_tree :one, 'foo.rb'
+        @path = fixture_tree :one, 'foo.kode'
       end
 
       expect :asset, :file

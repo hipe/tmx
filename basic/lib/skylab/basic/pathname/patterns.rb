@@ -5,11 +5,12 @@ module Skylab::Basic
     class Patterns
 
       class << self
-        def [] s_a
+        def call s_a
           new( s_a.map do | s |
             Pattern___.new s
           end )
         end
+        alias_method :[], :call
       end  # >>
 
       def initialize o_a

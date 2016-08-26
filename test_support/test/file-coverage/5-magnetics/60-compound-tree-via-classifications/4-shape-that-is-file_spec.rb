@@ -15,14 +15,14 @@ module Skylab::TestSupport::TestSupport
 
     it "of single test with counterpart" do
 
-      against :test, :file, fixture_tree( :two, *%w( test dir-A foo-bar_spek.rb ) )
+      against :test, :file, fixture_tree( :two, *%w( test dir-A foo-bar_spek.kode ) )
 
       _common_result
     end
 
     it "of single asset with counterpart" do
 
-      against :asset, :file, "#{ fixture_tree :two }/dir-A-/foo-bar--.rb"
+      against :asset, :file, "#{ fixture_tree :two }/dir-A-/foo-bar--.kode"
 
       _common_result
     end
@@ -33,8 +33,8 @@ module Skylab::TestSupport::TestSupport
       nd.children_count.should be_zero
 
       npl = nd.node_payload
-      npl.test_file_entry_s_a.should eql %w( foo-bar_spek.rb )
-      npl.asset_file_entry_s_a.should eql %w( foo-bar--.rb )
+      npl.test_file_entry_s_a.should eql %w( foo-bar_spek.kode )
+      npl.asset_file_entry_s_a.should eql %w( foo-bar--.kode )
 
     end
 
@@ -50,7 +50,7 @@ module Skylab::TestSupport::TestSupport
 
     it "of single test with no counterpart" do
 
-      against :test, :file, "#{ fixture_tree :two }/test/dir-A/wizzie_spek.rb"
+      against :test, :file, "#{ fixture_tree :two }/test/dir-A/wizzie_spek.kode"
 
       x = @tree.fetch_only_child
       npl = x.node_payload
@@ -61,7 +61,7 @@ module Skylab::TestSupport::TestSupport
       x.children_count.should be_zero
 
       npl = x.node_payload
-      npl.test_file_entry_s_a.should eql %w( wizzie_spek.rb )
+      npl.test_file_entry_s_a.should eql %w( wizzie_spek.kode )
 
       npl.asset_dir_entry_s_a.should be_nil
 
@@ -69,7 +69,7 @@ module Skylab::TestSupport::TestSupport
 
     it "of single asset with no counterpart" do
 
-      against :asset, :file, "#{ fixture_tree :two }/dir-A-/mizzie--.rb"
+      against :asset, :file, "#{ fixture_tree :two }/dir-A-/mizzie--.kode"
 
       x = @tree.fetch_only_child
       x.slug.should eql 'dir-A'
@@ -81,12 +81,12 @@ module Skylab::TestSupport::TestSupport
       x.children_count.should be_zero
       npl = x.node_payload
 
-      npl.asset_file_entry_s_a.should eql %w( mizzie--.rb )
+      npl.asset_file_entry_s_a.should eql %w( mizzie--.kode )
     end
 
     it "of single test file in test directory with no counterpart" do
 
-      against :test, :file, "#{ fixture_tree :two }/test/dir-T/hi_speg.rb"
+      against :test, :file, "#{ fixture_tree :two }/test/dir-T/hi_speg.kode"
 
       x = @tree.fetch_only_child
 
@@ -99,7 +99,7 @@ module Skylab::TestSupport::TestSupport
       npl = x.node_payload
       npl.has_tests.should eql true
       npl.has_assets.should be_nil
-      npl.test_file_entry_s_a.should eql %w( hi_speg.rb )
+      npl.test_file_entry_s_a.should eql %w( hi_speg.kode )
 
       x.children_count.should be_zero
     end

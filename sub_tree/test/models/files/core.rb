@@ -55,9 +55,9 @@ module Skylab::SubTree::TestSupport
     define_method :_PRETTY_ do
       pretty ||= <<-HERE.unindent
         one
-        ├── foo.rb
+        ├── foo.kode
         └── test
-            └── foo_spec.rb
+            └── foo_spec.kode
       HERE
     end
 

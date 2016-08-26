@@ -19,6 +19,18 @@ module Skylab::TestSupport::TestSupport
       e.message =~ %r(\bmissing required parameter 'path') || fail
     end
 
+    it "invalid path arg fails gracefully" do
+
+      _call_API :path, 'not-absolute-path'
+
+      expect_not_OK_event :invalid_property_value do |ev|
+        _hi = black_and_white( ev )
+        _hi == "'path' cannot be relative - \"not-absolut[..]\"" || fail
+      end
+
+      expect_failed
+    end
+
     it "easy boogie against the project tree" do
 
       _against_path fixture_tree :one
@@ -27,7 +39,7 @@ module Skylab::TestSupport::TestSupport
 
     it "easy boogie against the asset file" do
 
-      _against_path fixture_tree( :one, 'foo.rb' )
+      _against_path fixture_tree( :one, 'foo.kode' )
       _common_result_for_one
     end
 
@@ -37,8 +49,8 @@ module Skylab::TestSupport::TestSupport
       nd.slug == 'foo' || fail
       npl = nd.node_payload
 
-      npl.asset_file_entry_s_a == %w( foo.rb ) || fail
-      npl.test_file_entry_s_a == %w( foo_speg.rb ) || fail
+      npl.asset_file_entry_s_a == %w( foo.kode ) || fail
+      npl.test_file_entry_s_a == %w( foo_speg.kode ) || fail
     end
 
     it "do not boogie - noent" do
@@ -87,8 +99,8 @@ module Skylab::TestSupport::TestSupport
 
     tfs = nil
     define_method :_against_path do |path|
-      tfs ||= %w( _speg.rb )
-      _call_API :path, path, :test_file_suffix, tfs
+      tfs ||= %w( _speg.kode )
+      _call_API :path, path, :test_file_suffixes, tfs
     end
 
     def _call_API * x_a

@@ -24,9 +24,9 @@ module Skylab::SubTree::TestSupport
 
       scn = TestSupport_::Expect_Line::Scanner.via_string io.string
       scn.next_line.should eql ".\n"
-      scn.next_line.should match %r(\A├── foo.rb #{ _MTIME }$)
+      scn.next_line.should match %r(\A├── foo.kode #{ _MTIME }$)
       scn.next_line.should match %r(\A└── test$)
-      scn.next_line.should match %r(\A    └── foo_speg\.rb #{ _MTIME }$)
+      scn.next_line.should match %r(\A    └── foo_speg\.kode #{ _MTIME }$)
       scn.next_line.should be_nil
 
       expect_succeeded
@@ -49,10 +49,10 @@ module Skylab::SubTree::TestSupport
 
       io.string.should eql EMPTY_S_
 
-      st.gets.should eql ".                          \n"
-      st.gets.should eql "├── foo.rb           1 line\n"
-      st.gets.should eql "└── test                   \n"
-      st.gets.should eql "    └── foo_speg.rb  1 line\n"
+      st.gets.should eql ".                            \n"
+      st.gets.should eql "├── foo.kode           1 line\n"
+      st.gets.should eql "└── test                     \n"
+      st.gets.should eql "    └── foo_speg.kode  1 line\n"
       st.gets.should be_nil
     end
 
@@ -75,11 +75,11 @@ module Skylab::SubTree::TestSupport
 
       st.gets.should match %r(\A\.[ ]+\n\z)
 
-      st.gets.should match %r(\A├── foo\.rb[ ]+#{ _MTIME } 1 line[ ]*\n\z)
+      st.gets.should match %r(\A├── foo\.kode[ ]+#{ _MTIME } 1 line[ ]*\n\z)
 
       st.gets.should match %r(\A└── test[ ]+\n\z)
 
-      st.gets.should match %r(\A    └── foo_speg\.rb  #{ _MTIME } 1 line[ ]*\n\z)
+      st.gets.should match %r(\A    └── foo_speg\.kode  #{ _MTIME } 1 line[ ]*\n\z)
 
       st.gets.should be_nil
     end

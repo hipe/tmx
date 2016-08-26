@@ -105,7 +105,7 @@ module Skylab::TestSupport::TestSupport
 
     taf = nil
     define_method :_the_asset_file_path do
-      taf ||= "#{ fixture_tree :one }/foo.rb"
+      taf ||= "#{ fixture_tree :one }/foo.kode"
     end
 
     def the_test_file
@@ -114,7 +114,7 @@ module Skylab::TestSupport::TestSupport
 
     ttf = nil
     define_method :_the_test_file_path do
-      ttf ||= "#{ _fixture_tree }/test/foo_speg.rb"
+      ttf ||= "#{ _fixture_tree }/test/foo_speg.kode"
     end
 
     def path path
