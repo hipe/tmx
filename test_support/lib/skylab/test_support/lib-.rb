@@ -29,7 +29,7 @@ module Skylab::TestSupport
     end
   end
 
-  _instance = module Lib_
+  module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
@@ -62,10 +62,5 @@ module Skylab::TestSupport
     Task = sidesys[ :Task ]
     TMX = sidesys[ :TMX ]
     Zerk = sidesys[ :Zerk ]
-
-    Common_.produce_library_shell_via_library_and_app_modules(
-      self, Home_ )
   end
-
-  LIB_ = _instance
 end

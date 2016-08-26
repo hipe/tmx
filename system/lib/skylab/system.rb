@@ -83,6 +83,18 @@ module Skylab::System
         _common( :Patch ).call_via_arglist x_a, & x_p
       end
 
+      def path_looks_absolute path  # ..
+        FILE_SEPARATOR_BYTE_ == path.getbyte(0)
+      end
+
+      def path_looks_relative path  # ..
+        FILE_SEPARATOR_BYTE_ != path.getbyte(0)
+      end
+
+      def path_looks_like_directory path
+        FILE_SEPARATOR_BYTE_ == path.getbyte(-1)
+      end
+
       def popen3 * cmd_s_a, & please_not_this_way
         Home_.lib_.open3.popen3( * cmd_s_a, & please_not_this_way )
       end
@@ -130,7 +142,6 @@ module Skylab::System
     DOT_ = '.'
     DOT_DOT_ = '..'
     FILE_FTYPE = 'file'
-    FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
 
     Autoloader_[ self ]
   end
@@ -145,6 +156,14 @@ module Skylab::System
     Home_.lib_.fields::Attributes[ h ]
   end
 
+  Path_looks_absolute_ = -> path do
+    Home_.services.path_looks_absolute path
+  end
+
+  Path_looks_relative_ = -> path do
+    Home_.services.path_looks_relative path
+  end
+
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   Autoloader_[ Services___ = ::Module.new ]
@@ -153,6 +172,7 @@ module Skylab::System
   CLI = nil  # for host
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
+  FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   Home_ = self
   KEEP_PARSING_ = true
   NEWLINE_ = "\n"

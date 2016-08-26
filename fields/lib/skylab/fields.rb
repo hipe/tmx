@@ -572,7 +572,7 @@ module Skylab::Fields
     # arity). the normalizing agent must handle cases like lists and flags
     # itself..
 
-    ! includes_zero[ prp.parameter_arity ]
+    ! includes_zero.fetch prp.parameter_arity
   end
 
   # ~ argument arity derivations
@@ -592,7 +592,7 @@ module Skylab::Fields
     # an argument being optional is different than a parameter being optional.
     # avoid this nastiness if you have a choice! more at [#br]#self-wormhole-1
 
-    includes_zero[ prp.argument_arity ]
+    includes_zero.fetch prp.argument_arity
   end
 
   Takes_argument = -> prp do
@@ -602,6 +602,8 @@ module Skylab::Fields
   # ~ support
 
   includes_zero = {
+    one: false,
+    one_or_more: false,
     zero: true,
     zero_or_one: true,
     zero_or_more: true,

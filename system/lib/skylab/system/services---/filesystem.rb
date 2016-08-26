@@ -207,12 +207,7 @@ module Skylab::System
 
       # ~ etc :+#core-services
 
-      def path_is_absolute path
-
-        # (this is a placeholder for the idea)
-
-        FILE_SEPARATOR_BYTE == path.getbyte( 0 )
-      end
+      define_method :path_is_absolute, Path_looks_absolute_
 
     # - end core services
   end

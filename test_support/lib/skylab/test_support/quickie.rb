@@ -841,7 +841,7 @@ module Skylab::TestSupport
       end
 
       skip = -> do
-        # LIB_.stderr.puts "#{ indent[ d ] }(#{ eg.description } SKIPPED)"
+        # Home_.lib_.stderr.puts "#{ indent[ d ] }(#{ eg.description } SKIPPED)"
         eg = nil
       end
 

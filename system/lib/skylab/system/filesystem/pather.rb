@@ -69,7 +69,7 @@ module Skylab::System
 
       def call path  # assume nonzero length string
 
-        if FILE_SEPARATOR_BYTE == path.getbyte( 0 )
+        if Path_looks_absolute_[ path ]
 
           ar = Argument_Representation___.new path
 

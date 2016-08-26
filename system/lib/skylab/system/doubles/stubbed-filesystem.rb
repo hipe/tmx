@@ -178,7 +178,7 @@ module Skylab::System
 
       def initialize line  # #storypoint-90
 
-        is_dir = FILE_SEPARATOR_BYTE_ == line.getbyte( -1 )
+        is_dir = Home_.services.path_looks_like_directory line
 
         path_i_a = line.gsub( ABNORMAL_SEPARATOR_RX__, EMPTY_S_ ).
           split( ::File::SEPARATOR, -1 ).map( & :intern )
@@ -195,7 +195,6 @@ module Skylab::System
 
     ABNORMAL_SEPARATOR_RX__ = %r((?<=/)/+|/+\z)
     DOT_SYMBOL___ = :'.'
-    FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   end
 end
 # :+#tombstone: #storypoint-80

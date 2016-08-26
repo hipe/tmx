@@ -82,7 +82,7 @@ module Skylab::System
       private
 
         def __init_ivars
-          if FILE_SEPARATOR_BYTE != @start_path.getbyte( 0 )
+          if Path_looks_relative_[ @start_path ]
             @start_path = @filesystem.expand_path @start_path
           end
           nil

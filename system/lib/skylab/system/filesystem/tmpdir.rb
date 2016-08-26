@@ -453,9 +453,9 @@ module Skylab::System
         pn = touch_r local_path
 
         if pn
-          pn.open ::File::CREAT | ::File::TRUNC | ::File::WRONLY do | fh |
-            fh.write file_contents_s
-          end
+          fh = ::File.open pn.to_path, ::File::CREAT | ::File::TRUNC | ::File::WRONLY
+          fh.write file_contents_s
+          fh.close
         end
         pn
       end
@@ -468,14 +468,14 @@ module Skylab::System
 
           path_tail_s = path_tail_x.to_s
 
-          if FILE_SEPARATOR_BYTE == path_tail_s.getbyte( 0 )
+          if Path_looks_absolute_[ path_tail_s ]
 
             Raise__[ ::ArgumentError, __say_not_relative( path_tail_s ) ]
           end
 
           dest_path = join path_tail_s
 
-          if FILE_SEPARATOR_BYTE == dest_path.to_path.getbyte( -1 )
+          if Home_.services.path_looks_like_directory dest_path.to_path
 
             last_pathname = dest_dir = dest_path
             last_was_dir = true

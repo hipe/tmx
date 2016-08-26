@@ -72,7 +72,7 @@ module Skylab::TestSupport
           p[]
         end
 
-        Home_.lib_.brazen::CLI_Support::Table::Actor.call(
+        CLI_support_[]::Table::Actor.call(
 
           :field, 'subproduct',
           :field, 'num test files',

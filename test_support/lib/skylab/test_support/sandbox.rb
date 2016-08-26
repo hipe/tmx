@@ -16,8 +16,6 @@ module Skylab::TestSupport
   # always by hand.
 
 
-  LIB_ = ::Skylab::TestSupport.lib_
-
   module Spawner
 
     #  top secret experiment
@@ -111,7 +109,7 @@ module Skylab::TestSupport
     end
   end
 
-  Shell_ = LIB_.plugin::Bundle::Enhance::Shell.new(
+  Shell_ = Home_.lib_.plugin::Bundle::Enhance::Shell.new(
     :kiss_with, :produce_subclasses_of,
   )
 

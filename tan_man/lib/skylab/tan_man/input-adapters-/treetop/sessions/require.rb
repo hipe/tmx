@@ -39,7 +39,7 @@ module Skylab::TanMan
 
         key = @add_treetop_grammar.last
 
-        if FILE_SEPARATOR_BYTE_ != key.getbyte( 0 )
+        if Path_looks_relative_[ key ]
           key = ::File.join @input_path_head_for_relative_paths, key
         end
 
@@ -246,8 +246,6 @@ module Skylab::TanMan
         LOADED__.add uow.input_path, cls
         cls
       end
-
-      FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
     end
   end
 end

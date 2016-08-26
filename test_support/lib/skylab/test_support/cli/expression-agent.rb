@@ -11,7 +11,7 @@ module Skylab::TestSupport
       # passed throughout the application and is the central conduit though
       # which all expression is received and then articulated.
 
-      LIB_.human::NLP::EN::Methods.call self, :private, [ :and_, :or_, :s ]
+      Home_.lib_.human::NLP::EN::Methods.call self, :private, [ :and_, :or_, :s ]
 
       def initialize action_reflection
         @up = action_reflection
@@ -24,7 +24,7 @@ module Skylab::TestSupport
       # ~
 
       def code x
-        Home_.lib_.brazen::CLI_Support::Styling.stylize x, :green
+        CLI_support_[]::Styling.stylize x, :green
       end
 
       def escape_path path_x
@@ -33,15 +33,15 @@ module Skylab::TestSupport
       end
 
       def highlight s # [br]
-        Home_.lib_.brazen::CLI_Support::Styling.stylize s, :green
+        CLI_support_[]::Styling.stylize s, :green
       end
 
       def hdr s  # [br]
-        Home_.lib_.brazen::CLI_Support::Styling.stylize s, :strong, :green
+        CLI_support_[]::Styling.stylize s, :strong, :green
       end
 
       def ick x
-        LIB_.basic::String.via_mixed x
+        Home_.lib_.basic::String.via_mixed x
       end
 
       def lbl x

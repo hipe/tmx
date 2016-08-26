@@ -37,6 +37,10 @@ module Skylab::TanMan
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  Path_looks_relative_ = -> path do
+    Home_.lib_.system.path_looks_relative path
+  end
+
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true

@@ -3,7 +3,7 @@
 ([#013] is an introduction to the ideas explored in-depth here.)
 
 we have run into the issue where old tests we made and stashed
-pre-mid-january use what we now call the "isolationist" model, and the
+pre-mid-january use what we now call the "isolationist" model, and then
 mid-january we semi-formalized what we now call the "socialist" model.
 here we define these two models, explore their differences, and finally
 define the specification of our API that can effect them in concert.

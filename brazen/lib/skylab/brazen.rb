@@ -143,13 +143,6 @@ module Skylab::Brazen
     kp
   end
 
-  Lazy_ = Common_::Lazy
-
-  Require_fields_lib_ = Lazy_.call do  # ..
-    Field_ = Home_.lib_.fields
-    NIL_
-  end
-
   Autoloader_ = Common_::Autoloader
 
   module Collection_Adapters
@@ -172,6 +165,10 @@ module Skylab::Brazen
     Autoloader_[ self ]
   end
 
+  # --
+
+  Lazy_ = Common_::Lazy
+
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
@@ -180,7 +177,14 @@ module Skylab::Brazen
     Home_.lib_.fields::Attributes[ h ]
   end
 
-  # (was N_Lines_)
+  Path_looks_absolute_ = -> path do
+    Home_.lib_.system.path_looks_absolute path
+  end
+
+  Require_fields_lib_ = Lazy_.call do  # ..
+    Field_ = Home_.lib_.fields
+    NIL_
+  end
 
   module Lib_
 
@@ -247,6 +251,10 @@ module Skylab::Brazen
     end
 
     Zerk = sidesys[ :Zerk ]  # for testing only
+  end
+
+  Path_looks_relative_ = -> path do
+    Home_.lib_.system.path_looks_absolute path
   end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]

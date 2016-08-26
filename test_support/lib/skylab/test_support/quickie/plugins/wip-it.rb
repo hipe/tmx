@@ -202,7 +202,7 @@ module Skylab::TestSupport
       end
 
       def _begin_handler_expresser
-        he = Home_.lib_.brazen::CLI_Support::Expression_Agent.instance.begin_handler_expresser
+        he = CLI_support_[]::Expression_Agent.instance.begin_handler_expresser
         he.downstream_yielder = @y
         he
       end

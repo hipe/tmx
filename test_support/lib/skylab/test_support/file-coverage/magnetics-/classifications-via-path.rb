@@ -13,7 +13,7 @@ module Skylab::TestSupport
       def execute
         ok = __resolve_stat
         ok &&= __via_stat_determine_shape
-        ok &&= __determine_testiness
+        ok && __init_testiness
         ok &&= __determine_rootiness
         ok && __flush
       end
@@ -53,29 +53,10 @@ module Skylab::TestSupport
         ACHIEVED_
       end
 
-      def __determine_testiness
-
-        # sure there are ways we can complicate this, but we'll wait on that
-
-        td = @test_dir
-
-        @testiness_symbol = if td.length == @path.length
-          if td == @path
-            :test
-          else
-            :asset
-          end
-        else
-          if ::File::SEPARATOR != td[ -1 ]
-            td = "#{ td }#{ ::File::SEPARATOR }"
-          end
-          if td == @path[ 0, td.length ]
-            :test
-          else
-            :asset
-          end
-        end
-        ACHIEVED_
+      def __init_testiness
+        _ = Home_.lib_.basic::Pathname::Path_matches_directory[ @path, @test_dir ]
+        @testiness_symbol = _ ? :test : :asset
+        NIL
       end
 
       def __determine_rootiness
@@ -138,6 +119,8 @@ module Skylab::TestSupport
           "difference: #{ @d_x_a.inspect }"
         end
       end
+
+      FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
     end
   end
 end

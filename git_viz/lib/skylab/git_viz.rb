@@ -62,7 +62,7 @@ module Skylab::GitViz
 
     d = short.length
     short == long[ 0, d ] or raise ::ArgumentError
-    FILE_SEPARATOR_BYTE_ == long.getbyte( d ) or raise ::ArgumentError
+    Path_looks_absolute_[ long ] or raise ::ArgumentError
 
     if short.length + 1 == d
       NIL_  # long path was just short path with trailing slash
@@ -75,6 +75,10 @@ module Skylab::GitViz
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  Path_looks_absolute_ = -> path do
+    Home_.lib_.system.path_looks_absolute path
+  end
+
   ACHIEVED_ = true
   CONTINUE_ = nil
   DASH_ = '-'.freeze
@@ -82,7 +86,6 @@ module Skylab::GitViz
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
-  FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   Home_ = self
   Name_ = Common_::Name
   NEWLINE_ = "\n"
@@ -92,7 +95,6 @@ module Skylab::GitViz
   SPACE_ = ' '.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
 end
 
 # :#tombstone: [#005]:#this-node-looks-funny-because-it-is-multi-domain

@@ -10,7 +10,7 @@ module Skylab::Basic
         end
       end
 
-      def expand_real_parts_by_relative_parts real_parts, rel_parts, sep=FILE_SEP_, & oes_p
+      def expand_real_parts_by_relative_parts real_parts, rel_parts, sep=File::SEPARATOR, & oes_p
 
         a = real_parts.dup
         ok = true
@@ -125,10 +125,33 @@ module Skylab::Basic
       end
     end
 
+    # ==
+
+    Path_matches_directory = -> path, dir do  # assume..
+ 
+      # assume both paths are "fully normal", i.e they are absolute and they
+      # do not end in a file separator. `path` "matches" `dir` IFF` `path`
+      # points to a node that is inside `dir` or both point to the same node
+      # (i.e are the same path).
+
+      case dir.length <=> path.length
+
+      when -1  # path is longer
+        d = dir.length
+        dir == path[ 0, d ] && FILE_SEPARATOR_BYTE_ == path.getbyte(d)
+
+      when 0  # dir and path are same length
+        dir == path
+
+      when 1  # path is shorter
+        false
+      end
+    end
+
+    # ==
+
     DOT_DOT_ = '..'
-
-    FILE_SEP_ = ::File::SEPARATOR
-
+    FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
     Pathname_ = self
   end
 end

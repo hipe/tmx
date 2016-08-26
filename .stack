@@ -9,3 +9,7 @@ recursive magnetics
 re-house "file coverage" in [ts] not [st]
 freshen up [ts] CLI
 restore file coverage CLI
+CLI tests pass
+CLI visual inspection works (use realistic use cases)
+new backend with bugfix/new feature
+universal small cleanup

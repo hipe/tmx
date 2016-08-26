@@ -5,7 +5,7 @@ module Skylab
     module Init  # this node may be loaded before even the core file for
       # this subsystem is loaded so that these constants can be used to
       # generate test coverage, where that coverage may even be for
-      # arbitrary nodes in this subystem (other than this one). so don't
+      # arbitrary nodes in this subsystem (other than this one). so don't
       # pull in any other files from this one, and don't expect to have
       # any accesss to any subsystem facilities here.
 

@@ -50,7 +50,9 @@ Skylab::TestSupport_quickie = program
 
 if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
 
-  exit( program.call( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ) do | dae |
+  _d = program.call( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ) do | dae |
     dae.listen
-  end )
+  end
+
+  exit _d
 end

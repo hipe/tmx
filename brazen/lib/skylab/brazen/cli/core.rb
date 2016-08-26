@@ -1150,8 +1150,7 @@ module Skylab::Brazen
         if qkn.is_known_known
           path = qkn.value_x
           if path
-            if FILE_SEPARATOR_BYTE != path.getbyte( 0 )  # ick/meh
-
+            if Path_looks_relative_[ path ]
               _path_ = _filesystem.expand_path path, present_working_directory
               kn = Common_::Known_Known[ _path_ ]
             end
@@ -2167,7 +2166,6 @@ module Skylab::Brazen
 
     o = Home_::CLI_Support
 
-    FILE_SEPARATOR_BYTE = o::FILE_SEPARATOR_BYTE
     CLI_ = self
     DASH_BYTE_ = DASH_.getbyte 0
     GENERIC_ERROR_EXITSTATUS = o::GENERIC_ERROR_EXITSTATUS

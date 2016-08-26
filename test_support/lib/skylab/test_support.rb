@@ -43,7 +43,8 @@ module Skylab::TestSupport  # :[#021].
     end.call
 
     def lib_
-      @___lib ||= Home_::LIB_
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Home_::Lib_, Home_ )
     end
 
     def spec_rb
@@ -133,6 +134,18 @@ module Skylab::TestSupport  # :[#021].
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
+  CLI_support_ = -> do
+    Home_.lib_.brazen::CLI_Support
+  end
+
+  Path_looks_absolute_ = -> path do
+    Home_.lib_.system.path_looks_absolute path
+  end
+
+  Path_looks_relative_ = -> path do
+    Home_.lib_.system.path_looks_relative path
   end
 
   # --

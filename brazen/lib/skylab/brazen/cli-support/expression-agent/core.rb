@@ -126,7 +126,7 @@ module Skylab::Brazen
           s = s.to_path
         end
 
-        if FILE_SEPARATOR_BYTE == s.getbyte( 0 )
+        if Path_looks_absolute_[ s ]
 
           @___pather ||= Home_.lib_.system.new_pather
           @___pather.call s

@@ -184,7 +184,6 @@ module Skylab::Brazen
     end
 
     Actions = nil  # [#062]
-    FILE_SEPARATOR_BYTE = ::File::SEPARATOR.getbyte 0
     GENERIC_ERROR_EXITSTATUS = 5
     Here_ = self
     MAX_DESC_LINES = 2

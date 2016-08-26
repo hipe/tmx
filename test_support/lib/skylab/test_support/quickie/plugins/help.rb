@@ -56,7 +56,7 @@ module Skylab::TestSupport
           Multiline_column_B__[ row_a, da.syntax_moniker, da.some_desc_a ]
         end
 
-        Home_.lib_.brazen::CLI_Support::Table::Actor.call(
+        CLI_support_[]::Table::Actor.call(
           :field,
           :field, :left,
           :header, :none,
