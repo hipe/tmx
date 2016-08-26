@@ -2,70 +2,61 @@ module Skylab::TestSupport
 
   module API
 
-    class << self
+    # this node in its current form is something of an oddity: there is no
+    # traditional (or any) API client exposed here (only for lack of interest
+    # on our part). instead it only has a stowaway: the root autonomous
+    # component system for [ts].
+    #
+    # this oddness stems from the the fact that [ts] itself is not an
+    # application per se. if we reach a deeper understanding of [ts]'s
+    # objective and scope as it pertains to interfaces, we might reconceive
+    # what at first seemed odd as new patterns and norms.
+    #
+    # it is not the case that [ts] *is* an application. rather it happens to
+    # house one or possibliy more utilities for which interfaces can be
+    # arrived at. (we can omit from this discussion the test-runner clients
+    # which have their own, isolated client implementations *and* interfaces
+    # (as they should); but it is also the case that [ts] does not derive
+    # its identity from these (all important) clients.)
+    #
+    # in service of these utilities, [ts] acts purely as a dumb (or close
+    # enough to dumb) branch node that exposes these utilities.
+    #
+    # on the converse side of this, utilities need not concern themselves
+    # with full-blown modality exposures. intead they can defer that work
+    # to us simply by exposing a root ACS of their own.
+    #
+    # :#spot-ts-CLI (such as it is.)
 
-      def call * x_a, & oes_p
+    class Root_Autonomous_Component_System
 
-        # don't ever write events to stdout / stderr by default.
-
-        if oes_p
-          x_a.push :on_event_selectively, oes_p
-        elsif x_a.length < 2 || :on_event_selectively != x_a[ -2 ]
-          x_a.push :on_event_selectively, -> i, *, & ev_p do
-            if :error == i
-              raise ev_p[].to_event.to_exception
-            end
-          end
-        end
-
-        bc = application_kernel_.bound_call_via_mutable_iambic x_a
-        bc and bc.receiver.send bc.method_name, * bc.args
+      def initialize fs_p
+        @_filesystem_proc = fs_p
       end
 
-      def application_kernel_
-        Home_.lib_.brazen::Kernel.new API
+      def __ping__component_operation
+        yield :description, -> y do
+          y << 'pingzorzzs'
+        end
+        Ping___
       end
 
-      def expression_agent_class
-        Home_.lib_.brazen::API.expression_agent_class
+      def __file_coverage__component_operation( & yielder )
+
+        @___fc_ACS ||= Home_::FileCoverage::Root_Autonomous_Component_System.
+          by_filesystem( & @_filesystem_proc )
+
+        @___fc_ACS.__file_coverage__component_operation( & yielder )
       end
-
-      yes = true ; x = nil
-      define_method :kernel__ do
-        if yes
-          yes = false
-          x = Brazen_::Kernel.new API
-        end
-        x
-      end
-    end  # >>
-
-    module Models_
-
-      Ping = -> * rest, mock_bound_action, & oes_p do
-
-        if 1 == rest.length && rest.first.nil?
-          rest.clear  # meh
-        end
-
-        kr = mock_bound_action.kernel
-
-        _x = if rest.length.nonzero?
-          ": #{ rest.inspect }"
-        else
-          '.'
-        end
-
-        oes_p.call :info, :expression, :ping do | y |
-          y << "hello from #{ kr.app_name }#{ _x }\n"
-        end
-
-        :hello_from_test_support
-      end
-
-      Autoloader_[ self, :boxxy ]
     end
 
-    Brazen_ = Home_.lib_.brazen
+    Ping___ = -> & oes_p do
+      oes_p.call :info, :expression, :ping do |y|
+        y << "pong from #{ highlight '[ts]' }!"
+      end
+      NOTHING_
+    end
+
+    NOTHING_ = nil
   end
 end

@@ -45,15 +45,11 @@ module Skylab::TestSupport
         ).freeze
       end
 
-      def release_lines_for_expect_stdout_stderr
-        _expect_sout_serr_release_lines_same
-      end
-
       def flush_baked_emission_array  # :+#hook-near #universal
-        _expect_sout_serr_release_lines_same
+        release_lines_for_expect_stdout_stderr
       end
 
-      def _expect_sout_serr_release_lines_same
+      def release_lines_for_expect_stdout_stderr
         _ = remove_instance_variable :@IO_spy_group_for_expect_stdout_stderr
         _.release_lines
       end
@@ -107,39 +103,15 @@ module Skylab::TestSupport
 
       def init_invocation_for_expect_stdout_stderr
 
-        g = Home_::IO.spy.group.new
-
-        g.do_debug_proc = -> do
-          do_debug  # :+#hook-out
-        end
-
-        g.debug_IO = debug_IO  # :+#hook-out
-
-        io = stdin_for_expect_stdout_stderr
-        if io
-          g.add_stream :i, io
-        else
-          g.add_stream :i, :__instream_not_used_yet__
-        end
-
-        g.add_stream :o
-
-        io = stderr_for_expect_stdout_stderr
-        if io
-          g.add_stream :e, io
-        else
-          g.add_stream :e
-        end
-
+        g = __build_IO_spy_group_for_expect_stdout_stderr
         @IO_spy_group_for_expect_stdout_stderr = g
 
         _s_a = invocation_strings_for_expect_stdout_stderr  # #hook-out:1
 
-        invo = subject_CLI.new(  # :+#hook-out
-          * g.values_at( :i, :o, :e ),
-          _s_a,
-          * self.CLI_options_for_expect_stdout_stderr,
-        )
+        _x = self.CLI_options_for_expect_stdout_stderr
+
+        invo = build_invocation_for_expect_stdout_stderr(
+          * g.values_at( :i, :o, :e ), _s_a, * _x )
 
         if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
           @for_expect_stdout_stderr_prepare_invocation[ invo ]
@@ -149,7 +121,35 @@ module Skylab::TestSupport
 
         @invocation = invo
 
-        NIL_
+        NIL
+      end
+
+      def build_invocation_for_expect_stdout_stderr sin, sout, serr, pn_s_a, * xtra
+
+        subject_CLI.new( sin, sout, serr, pn_s_a, * xtra )  # #hook-out
+      end
+
+      def __build_IO_spy_group_for_expect_stdout_stderr
+
+        g = Home_::IO.spy.group.new
+
+        g.do_debug_proc = -> do
+          do_debug  # :+#hook-out
+        end
+
+        g.debug_IO = debug_IO  # :+#hook-out
+
+        g.add_stream :i, ( stdin_for_expect_stdout_stderr || :__instream_not_used_yet__ )
+
+        g.add_stream :o
+
+        io = stderr_for_expect_stdout_stderr
+        if io
+          g.add_stream :e, io
+        else
+          g.add_stream :e
+        end
+        g
       end
 
       attr_accessor :IO_spy_group_for_expect_stdout_stderr, :invocation  # for hax

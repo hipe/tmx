@@ -2,7 +2,17 @@
 
 require 'skylab/test_support'
 
-_x = Skylab::TestSupport::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+_cli = Skylab::TestSupport::CLI.new $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] do |o|
 
-$stderr.puts "(exitstatus: #{ _x })"  # covered.
+  o.filesystem_by do
+    Skylab::TestSupport.lib_.system.filesystem
+  end
+end
+
+d = _cli.invoke ARGV
+
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit d

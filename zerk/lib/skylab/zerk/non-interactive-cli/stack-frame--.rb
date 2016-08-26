@@ -56,6 +56,10 @@ module Skylab::Zerk
           NOTHING_
         end
 
+        def root_frame
+          self
+        end
+
         def is_root
           true
         end
@@ -109,11 +113,38 @@ module Skylab::Zerk
 
         include NonRoot_Methods__
 
-        def initialize former_top, fo
+        def initialize former_top, fo, map_x
 
           @formal_operation_ = fo
           @next_frame_ = former_top
           @_sns = nil
+
+          if map_x
+            __process_map map_x
+          else
+            @_to_defined_formal_parameter_stream = :_to_defined_formal_parameter_stream_normally
+          end
+        end
+
+        def __process_map map_proc
+
+          map_x = map_proc.call
+
+          st = _to_defined_formal_parameter_stream_normally
+          a = []
+          begin
+            par = st.gets
+            par || break
+            map_proc_ = map_x[ par.name_symbol ]
+            if map_proc_
+              par = map_proc_[ par, self ]
+            end
+            a.push par
+            redo
+          end while nil
+
+          @__cached_parameters = a
+          @_to_defined_formal_parameter_stream = :__same_via_cached_parameters
         end
 
         def operation_syntax_
@@ -125,7 +156,18 @@ module Skylab::Zerk
         end
 
         def to_defined_formal_parameter_stream__
+          send @_to_defined_formal_parameter_stream
+        end
+
+        def _to_defined_formal_parameter_stream_normally
+
+          # when there's singplur counterparts, don't represent both of them..
+
           @formal_operation_.to_defined_formal_parameter_stream
+        end
+
+        def __same_via_cached_parameters
+          Common_::Stream.via_nonsparse_array @__cached_parameters
         end
 
         def has_stated_parameters__
@@ -168,6 +210,10 @@ module Skylab::Zerk
 
         def subprogram_name_slug
           name.as_slug
+        end
+
+        def root_frame
+          @next_frame_.root_frame
         end
       end
 
@@ -225,7 +271,7 @@ module Skylab::Zerk
         def lookup_and_attach_frame__ token, set_sym, & oes_p
           fn = Lookup__.new( token, set_sym, self, & oes_p ).execute
           if fn
-            send ATTACH_FOR___.fetch( fn.formal_node_category ), fn
+            send ATTACH_FOR___.fetch( fn.formal_node_category ), fn, NOTHING_
           else
             fn
           end
@@ -240,7 +286,7 @@ module Skylab::Zerk
           formal_operation: :attach_operation_frame_via_formal_operation_,
         }
 
-        def __attach_frame_via_association asc
+        def __attach_frame_via_association asc, _
           _m = ATTACH_ASC_FOR___.fetch asc.model_classifications.category_symbol
           send _m, asc
         end
@@ -249,8 +295,8 @@ module Skylab::Zerk
           compound: :attach_compound_frame_via_association_,
         }
 
-        def attach_operation_frame_via_formal_operation_ fo
-          Operation___.new self, fo
+        def attach_operation_frame_via_formal_operation_ fo, map_x
+          Operation___.new self, fo, map_x
         end
 
         def attach_compound_frame_via_association_ asc

@@ -2,66 +2,91 @@ module Skylab::TestSupport
 
   module CLI
 
-    class Expression_Agent
-
-      # a reconception of the pen. imagine accessibility and text to speech.
-      # we have hopes for this to flourish upwards and outwards.
-      # think of it as a proxy for that subset of your modality client that
-      # does rendering. you then pass that proxy to the snitch, which is
-      # passed throughout the application and is the central conduit though
-      # which all expression is received and then articulated.
-
-      Home_.lib_.human::NLP::EN::Methods.call self, :private, [ :and_, :or_, :s ]
-
-      def initialize action_reflection
-        @up = action_reflection
-      end
-
-      # ~ hook-outs for [br]
+    module ExpressionAgent ; class << self  # see [#br-093]
 
       alias_method :calculate, :instance_exec
 
       # ~
 
-      def code x
-        CLI_support_[]::Styling.stylize x, :green
+      lib = Home_.lib_
+
+      stylify = -> i_a, s do
+        stylify = CLI_support_[]::Styling::Stylify
+        stylify[ i_a, s ]
       end
 
-      def escape_path path_x
-        ( @___pather ||= Home_.lib_.system.new_pather )
-        @___pather.call path_x
+      as = -> * i_a do
+        -> s do
+          stylify[ i_a, s ]
+        end
       end
 
-      def highlight s # [br]
-        CLI_support_[]::Styling.stylize s, :green
+      # -- experimental utility-specific customization
+
+      def file_coverage_glyphset_identifier__
+        :wide  # narrow | wide
       end
 
-      def hdr s  # [br]
-        CLI_support_[]::Styling.stylize s, :strong, :green
+      # -- ..
+
+      def begin_handler_expresser
+        CLI_support_[]::Expression_Agent::Handler_Expresser.new self
       end
 
-      def ick x
-        Home_.lib_.basic::String.via_mixed x
+      # -- reduce other structures to strings (& related)
+
+      def render_list_commonly_ s_a
+        s_a.map( & method( :ick ) ).join ', '
+      end
+
+      lib.human::NLP::EN::Methods.call self, :private,
+        [ :and_, :or_, :plural_noun, :s ]
+
+      # -- ways to style strings
+
+      define_method :code, as[ :green ]
+
+      pather = nil
+      define_method :escape_path do |x|
+        pather ||= lib.system.new_pather
+        pather[ x ]
+      end
+
+      define_method :highlight, as[ :green ]  # [br]
+
+      define_method :hdr, as[ :strong, :green ]  # [br]
+
+      ick = -> x do
+        o = lib.basic::String.via_mixed.dup
+        o.max_width = 60
+        ick = o.to_proc
+        ick[ x ]
+      end
+
+      define_method :ick do |x|
+        ick[ x ]
       end
 
       def lbl x
         x
       end
 
-      def par prp
-        send @up.expression_strategy_for_property( prp ), prp
+      def nm name
+        "'#{ name.as_slug }'"
       end
 
-      # ~ (from above)
-
-      def render_property_as__argument__ prp
-        "<#{ prp.name.as_slug }>"
+      def par par
+        "«#{ par.name.as_slug }»"
       end
 
-      # ~
-      def val x
-        @client.hi x
+      define_method :stylify_ do |i_a, s|
+        stylify[ i_a, s ]
       end
-    end
+
+      def instance__
+        self
+      end
+    end ; end
   end
 end
+# #tombstone: text-to-speech blurb near expags

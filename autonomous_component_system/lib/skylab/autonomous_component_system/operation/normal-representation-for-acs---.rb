@@ -21,7 +21,10 @@ module Skylab::Autonomous_Component_System
         if ! p
           @_did || _do
           if @_ACS.class.respond_to? :describe_into_under  # eew
-            ::Kernel._K
+            cls = @_ACS.class
+            p = -> y do
+              cls.describe_into_under y, self
+            end
           end
         end
         p

@@ -24,7 +24,7 @@ module Skylab::Zerk
       @filesystem_conduit_known_known = Common_::Known_Known[ x ] ; nil
     end
 
-    def root_ACS= p
+    def root_ACS_by & p
       @_root_ACS_proc = p
     end
 

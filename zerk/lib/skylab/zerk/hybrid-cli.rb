@@ -28,7 +28,7 @@ module Skylab::Zerk
 
       _ACS = self.top_frame.ACS  # use own public API
 
-      ic.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
+      ic.root_ACS_by do  # #cold-model
         _ACS
       end
 

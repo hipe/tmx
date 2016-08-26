@@ -54,12 +54,14 @@ module Skylab::Zerk::TestSupport
 
         cli = Home_::Interactive_CLI.begin
 
-        cli.root_ACS = method :build_root_ACS_for_expect_screens
+        cli.root_ACS_by do  # ignore oes_p
+          build_root_ACS_for_expect_screens
+        end
 
         cli.to_classesque
       end
 
-      def build_root_ACS_for_expect_screens  # ignore oes_p
+      def build_root_ACS_for_expect_screens
 
         _ = subject_root_ACS_class
         _.new_cold_root_ACS_for_iCLI_test  # #cold-model

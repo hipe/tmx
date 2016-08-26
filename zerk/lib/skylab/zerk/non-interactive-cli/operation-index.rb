@@ -84,15 +84,18 @@ module Skylab::Zerk
 
         @_my_set_symbol_via_name_symbol[ @_k ] = :_bespoke_
 
-        if Field_::Is_required[ @_parameter ]
+        if @_parameter.is_probably_the_singularest
 
-          if Field_::Can_be_more_than_one[ @_parameter.argument_arity ]
-            self._K
+          if Field_::Is_required[ @_parameter ]
+
+            if Field_::Can_be_more_than_one[ @_parameter.argument_arity ]
+              self._K
+            else
+              ( @_arguments ||= [] ).push @_parameter
+            end
           else
-            ( @_arguments ||= [] ).push @_parameter
+            ( @_bespokes_to_add_to_op ||= [] ).push @_parameter
           end
-        else
-          ( @_bespokes_to_add_to_op ||= [] ).push @_parameter
         end
         NIL_
       end

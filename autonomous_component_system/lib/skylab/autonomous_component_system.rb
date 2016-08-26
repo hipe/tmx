@@ -211,6 +211,22 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         @_name_mutation = nil
       end
 
+      def prepend_normalization__ p  # #experimental
+        model_classifications.looks_primitivesque || self._NO
+        otr = dup
+        _downstream = @component_model
+        otr.instance_variable_set :@component_model, -> st, & pp do
+          kn = p[ st, & pp ]
+          if kn
+            _st = Field_::Argument_stream_via_value.via_known_known kn
+            _downstream[ _st, & pp ]
+          else
+            kn
+          end
+        end
+        otr
+      end
+
       def _finish_via cm, sym
 
         nf = Common_::Name.via_variegated_symbol sym

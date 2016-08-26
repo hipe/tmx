@@ -12,7 +12,7 @@ class Skylab::Task
 
           cli = Zerk_::HybridCLI.begin
 
-          cli.root_ACS = -> do
+          cli.root_ACS_by do
             Root_Autonomous_Component_System_.new cli
           end
 

@@ -153,6 +153,10 @@ module Skylab::Brazen
         @_action_reflection.environment_variable_name_string_via_property_ prp
       end
 
+      def render_propperty_without_styling prp
+        prp.name.as_slug
+      end
+
       def s * x_a
         _NLP_agent.s( * x_a )
       end

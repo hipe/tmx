@@ -24,7 +24,7 @@ module Skylab::SearchAndReplace
 
       cli = Zerk_::HybridCLI.begin
 
-      cli.root_ACS = -> & _ignore_oes_p do  # #cold-model
+      cli.root_ACS_by do  # #cold-model
         acs = Root_Autonomous_Component_System_.new
         acs._init_with_defaults
         acs

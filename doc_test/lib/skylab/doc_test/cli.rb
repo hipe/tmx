@@ -26,7 +26,7 @@ module Skylab::DocTest
 
         o.universal_CLI_resources sin, sout, serr, pn_s_a
 
-        o.filesystem = ::File
+        o.filesystem_by { ::File }
 
         o.produce_reader_for_root_by = -> acs, produce_reader_for do
 
@@ -213,7 +213,7 @@ module Skylab::DocTest
 
       o = Zerk_::NonInteractiveCLI.begin
 
-      o.root_ACS = -> do
+      o.root_ACS_by do
         Root_Autonomous_Component_System_.new
       end
 

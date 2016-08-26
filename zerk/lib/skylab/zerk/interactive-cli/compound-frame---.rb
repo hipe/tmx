@@ -87,7 +87,7 @@ module Skylab::Zerk
         _cust_x = h[ nt.name_symbol ]
 
         lt = Here_::Load_Ticket_[ _cust_x, nt, self ]
-        lt or redo  # #masking
+        lt or redo  # #mode-tweaking
 
         butz.add lt
         load_tickets.push lt

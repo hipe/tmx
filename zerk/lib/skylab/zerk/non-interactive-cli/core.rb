@@ -23,7 +23,7 @@ module Skylab::Zerk
 
         cli = Here_.begin
 
-        cli.root_ACS = -> do
+        cli.root_ACS_by do
           root_ACS_class.new
         end
 
@@ -47,25 +47,35 @@ module Skylab::Zerk
 
     def init_as_prototype_
       @invite = nil
+      @node_map = nil
       @when_head_argument_looks_like_option = nil
       self
+    end
+
+    def expression_agent= x
+      @__expag = x
+    end
+
+    def root_ACS_by & p
+      @root_ACS_proc = p
+    end
+
+    def filesystem_by & p  # perhaps identical to `filesystem_conduit`. courtesy only
+      @filesystem_proc = p
     end
 
     attr_writer(
       :compound_custom_sections,
       :compound_usage_strings,
-      :filesystem,  # compare to `filesystem_conduit`
       :invite,
       :location_module,
+      :node_map,
       :operation_usage_string,
       :produce_reader_for_root_by,
+      :root_ACS_proc,
       :system_conduit,
       :when_head_argument_looks_like_option,
     )
-
-    def root_ACS= p
-      @_root_ACS_proc = p
-    end
 
     def to_classesque  # tracking #[#011]
       Home_::CLI_::Prototype_as_Classesque.new self
@@ -92,7 +102,7 @@ module Skylab::Zerk
 
       @_oes_p = method :on_ACS_emission_  # (only do this in 1 place)
 
-      _p = remove_instance_variable :@_root_ACS_proc
+      _p = remove_instance_variable :@root_ACS_proc
 
       _acs = _p.call  # #cold-model
 
@@ -250,7 +260,13 @@ module Skylab::Zerk
 
     def __parse_found_operation fo
 
-      fo_frame = @_top.attach_operation_frame_via_formal_operation_ fo
+      p = @node_map  # #experimental - will probably move
+      if p
+        @node_map = nil
+        map_x = p[ fo.name_symbol ]
+      end
+
+      fo_frame = @_top.attach_operation_frame_via_formal_operation_ fo, map_x
 
       @_fo_frame = fo_frame  # redundant ivar w/ below for sanity
       @_operation_syntax = fo_frame.operation_syntax_
@@ -447,13 +463,21 @@ module Skylab::Zerk
       end
 
       whenner = nil
-      erroresque = -> i_a, & ev_p do  # 1x
+
+      touch_whenner = -> do
         whenner ||= Here_::When_::Unavailable[ self ]
+      end
+
+      erroresque = -> i_a, & ev_p do  # 1x
+        touch_whenner[]
         whenner.on_unavailable__ i_a, & ev_p
         UNRELIABLE_
       end
 
       call_oes_p = -> * i_a, & ev_p do
+        if :error == i_a.first
+          touch_whenner[]
+        end
         handle_ACS_emission_ i_a, & ev_p
         UNRELIABLE_
       end
@@ -582,7 +606,10 @@ module Skylab::Zerk
       :express_stack_invite_
 
     def expression_strategy_for_property prp  # for expag
-      if Home_.lib_.fields::Is_required[ prp ]
+
+      if :too_basic_for_arity == prp.parameter_arity
+        :render_propperty_without_styling
+      elsif Home_.lib_.fields::Is_required[ prp ]
         :render_property_as_argument
       else
         self._K
@@ -684,7 +711,7 @@ module Skylab::Zerk
     end
 
     def expression_agent
-      @___expag ||= Remote_CLI_lib_[]::Expression_Agent.new self
+      @__expag ||= Remote_CLI_lib_[]::Expression_Agent.new self
     end
 
     def line_yielder
@@ -698,11 +725,17 @@ module Skylab::Zerk
       end
     end
 
+    # --
+
+    def filesystem  # courtesy only
+      @filesystem_proc.call
+    end
+
     attr_reader(
       :produce_reader_for_root_by,
       :compound_custom_sections,
       :compound_usage_strings,
-      :filesystem,
+      :filesystem_proc,  # courtesy only
       :location_module,
       :operation_usage_string,
       :sout,

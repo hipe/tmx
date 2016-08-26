@@ -236,8 +236,7 @@ module Skylab::Zerk::TestSupport
 
         _class = subject_root_ACS_class
 
-        cli.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
-
+        cli.root_ACS_by do  # #cold-model
           _class.new_cold_root_ACS_for_niCLI_test
         end
 

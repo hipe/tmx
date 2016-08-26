@@ -149,6 +149,10 @@ module Skylab::Autonomous_Component_System
         :argument_arity,
       )
 
+      def is_probably_the_singularest  # ..
+        true
+      end
+
       Here_ = self
     end
   # -

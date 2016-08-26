@@ -13,7 +13,7 @@ module Skylab::Zerk::TestSupport
       shared_subject :subject_CLI do
 
         cli = Home_::NonInteractiveCLI.begin
-        cli.root_ACS = -> & _ignore_top_oes_p do  # #cold-model
+        cli.root_ACS_by do  # #cold-model
           NIL_
         end
         cli.to_classesque

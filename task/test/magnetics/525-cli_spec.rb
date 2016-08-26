@@ -107,8 +107,8 @@ module Skylab::Task::TestSupport
 
       def for_expect_stdout_stderr_prepare_invocation invo
 
-        _ = _this_mock_dir_class
-        invo.filesystem = _
+        dir = _this_mock_dir_class
+        invo.filesystem_by { dir }
         NIL_
       end
 
