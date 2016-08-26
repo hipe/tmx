@@ -20,10 +20,9 @@ module Skylab::TestSupport
 
         def __resolve_the_big_tree
 
-          # find every file with the extension of interest (maybe one day
-          # patterns of interest) under the business hub dir (as a stream of
-          # paths) and make a tree out of it. the root node of the tree will
-          # correspond to the business hub dir, not the root of the filesystem.
+          # the "big tree" is derived from the paths of the files. what files?
+          # the files from the "business hub dir" ("BHD") that match the "big
+          # tree filename patterns". what patterns? see [#013]:#note-1.
 
           _big_tree_filename_patterns = @name_conventions.big_tree_filename_patterns__
 
@@ -92,20 +91,75 @@ module Skylab::TestSupport
 
         def __init_pre_pruned_trees_by_maybe_pruning_the_long_stem
 
-          # if the argument path was not the "business hub" or its adjacent
-          # test directory, then "scrunch" the lead-up slugs into a label..
+          # the BHD is simply the directory surrounding the test directory.
+          # if the argument path *is* either (doesn't matter which) of these,
+          #   if the BHD looks like a gem, do special handling there
+          #   otherwise life is easy: no pruning to do.
+          # otherwise (and the argument path was not touching the BHD, i.e
+          # it did not point to the "root" of the "project"), then what we
+          # do is not well-documentd, but meant to show only the node (pair)
+          # of interest.
 
           if @business_hub_dir_ == @path || @test_dir == @path
 
             remove_instance_variable :@_test_dir_localized
-            @_pre_pruned = remove_instance_variable :@_full
-            @_prune_the_other_tree_in_this_order = nil
-            NIL
+
+            if @_full.asset.has_name LIB__
+              __init_pre_pruned_trees_when_gem
+            else
+              @_pre_pruned = remove_instance_variable :@_full
+              @_prune_the_other_tree_in_this_order = nil
+            end
           else
             __init_pre_pruned_trees_by_pruning_the_long_stem
-            NIL
           end
+          NIL
         end
+
+        def __init_pre_pruned_trees_when_gem
+
+          # assume argument path indicates the BHD and it "looks like" a gem.
+          # we've got to consume the un-interesting "stalk" part of the tree
+          # (of arbitrary length) til we get to the point of interest. raunchy!
+
+          o = @_full.asset.h_.fetch LIB__
+
+          begin
+            if 1 == o.length
+              o = o.h_.fetch o.a_.fetch 0
+              redo
+            end
+            2 == o.length || self._COVER_ME_not_look_like_gem
+            break
+          end while nil
+
+          two_filenames = o.a_
+
+          # one should have the extension and the other not.
+
+          s_a = @name_conventions.big_tree_filename_extensions
+          1 == s_a.length || self._MEH
+          ext = s_a.fetch 0
+
+          r = - ext.length .. -1
+          d = two_filenames.index do |s|
+            ext == s[ r ]
+          end
+          d || self._COVER_ME_file_with_extension_not_found
+
+          w_extension = two_filenames.fetch d
+          wo_extension = two_filenames.fetch( d.zero? ? 1 : 0 )
+
+          _yes = wo_extension == w_extension[ 0, wo_extension.length ]
+          _yes || self._COVER_ME_the_one_did_not_look_like_the_other
+
+          @_full.asset = o.h_.fetch wo_extension
+          @_pre_pruned = remove_instance_variable :@_full
+          @_prune_the_other_tree_in_this_order = nil
+          NIL
+        end
+
+        LIB__ = 'lib'
 
         def __init_pre_pruned_trees_by_pruning_the_long_stem  # assume path is not test dir
 

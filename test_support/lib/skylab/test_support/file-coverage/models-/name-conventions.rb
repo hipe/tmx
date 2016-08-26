@@ -33,7 +33,7 @@ module Skylab::TestSupport
           end
         end
 
-        @_big_tree_filename_extensions = if a.length.nonzero?
+        @big_tree_filename_extensions = if a.length.nonzero?
           a.freeze
         end
         NIL
@@ -116,7 +116,7 @@ module Skylab::TestSupport
       end
 
       def ___build_etc
-        s_a = @_big_tree_filename_extensions
+        s_a = @big_tree_filename_extensions
         if s_a
           x = s_a.map { |s| "#{ ASTERISK_ }#{ s }" }
         end
@@ -124,11 +124,15 @@ module Skylab::TestSupport
       end
 
       def to_big_tree_filename_patterns__
-        s_a = @_big_tree_filename_extensions
+        s_a = @big_tree_filename_extensions
         if s_a
           Common_::Stream.via_nonsparse_array s_a
         end
       end
+
+      attr_reader(
+        :big_tree_filename_extensions,
+      )
     end
   end
 end

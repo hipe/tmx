@@ -97,6 +97,18 @@ module Skylab::TestSupport::TestSupport
       expect_assets_and_tests_ x[ 'from-another' ]
     end
 
+    it "fix for gem-likes" do
+
+      _path = fixture_tree :'4_gem_like'
+      _against_path _path
+
+      expect_no_events
+
+      pl = @result.tree['wan-noodle']['zeepie'].node_payload
+      pl.asset_file_entry_s_a == %w( zeepie--.kode ) || fail
+      pl.test_file_entry_s_a == %w( 1-zeepie_speg.kode ) || fail
+    end
+
     tfs = nil
     define_method :_against_path do |path|
       tfs ||= %w( _speg.kode )
