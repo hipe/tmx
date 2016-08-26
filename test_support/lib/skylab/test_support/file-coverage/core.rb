@@ -266,10 +266,17 @@ module Skylab::TestSupport
     # --
 
     module Magnetics_
+
+      module TwoTrees_via_BigTreePattern
+        Autoloader_[ self ]
+      end
       Autoloader_[ self ]
     end
 
     module Models_
+
+      Trees = ::Struct.new :asset, :test
+
       Autoloader_[ self ]
     end
 
@@ -300,6 +307,7 @@ module Skylab::TestSupport
 
     ASTERISK_ = '*'
     ASTERISK_BYTE__ = ASTERISK_.getbyte 0
+    LIB_ENTRY_ = 'lib'
     Here_ = self
   end
 end

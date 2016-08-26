@@ -82,7 +82,7 @@ module Skylab::TestSupport
 
           _test_node = _will_lose_child.remove filename.file_entry  # #entry-model
 
-          t = Trees__.new
+          t = Models_::Trees.new
           t.asset = big_tree
           t.test = _test_node
           @_full = t
@@ -100,107 +100,28 @@ module Skylab::TestSupport
           # do is not well-documentd, but meant to show only the node (pair)
           # of interest.
 
+          full = remove_instance_variable :@_full
+          tdl = remove_instance_variable :@_test_dir_localized
+
           if @business_hub_dir_ == @path || @test_dir == @path
 
-            remove_instance_variable :@_test_dir_localized
+            @_prune_the_other_tree_in_this_order = nil
 
-            if @_full.asset.has_name LIB__
-              __init_pre_pruned_trees_when_gem
+            @_pre_pruned = if full.asset.has_name LIB_ENTRY_
+
+              Magnetics_::TwoTrees_via_BigTreePattern::Gem[ full, @name_conventions ]
             else
-              @_pre_pruned = remove_instance_variable :@_full
-              @_prune_the_other_tree_in_this_order = nil
+              full
             end
           else
-            __init_pre_pruned_trees_by_pruning_the_long_stem
+
+            o = Magnetics_::TwoTrees_via_BigTreePattern::SubPath.call(
+              @path[ @asset_local_range_ ], tdl, full )
+
+            @_pre_pruned = o.pre_pruned
+            @_prune_the_other_tree_in_this_order = o.order
+            @_real_prune_path_array_for = o.paths
           end
-          NIL
-        end
-
-        def __init_pre_pruned_trees_when_gem
-
-          # assume argument path indicates the BHD and it "looks like" a gem.
-          # we've got to consume the un-interesting "stalk" part of the tree
-          # (of arbitrary length) til we get to the point of interest. raunchy!
-
-          o = @_full.asset.h_.fetch LIB__
-
-          begin
-            if 1 == o.length
-              o = o.h_.fetch o.a_.fetch 0
-              redo
-            end
-            2 == o.length || self._COVER_ME_not_look_like_gem
-            break
-          end while nil
-
-          two_filenames = o.a_
-
-          # one should have the extension and the other not.
-
-          s_a = @name_conventions.big_tree_filename_extensions
-          1 == s_a.length || self._MEH
-          ext = s_a.fetch 0
-
-          r = - ext.length .. -1
-          d = two_filenames.index do |s|
-            ext == s[ r ]
-          end
-          d || self._COVER_ME_file_with_extension_not_found
-
-          w_extension = two_filenames.fetch d
-          wo_extension = two_filenames.fetch( d.zero? ? 1 : 0 )
-
-          _yes = wo_extension == w_extension[ 0, wo_extension.length ]
-          _yes || self._COVER_ME_the_one_did_not_look_like_the_other
-
-          @_full.asset = o.h_.fetch wo_extension
-          @_pre_pruned = remove_instance_variable :@_full
-          @_prune_the_other_tree_in_this_order = nil
-          NIL
-        end
-
-        LIB__ = 'lib'
-
-        def __init_pre_pruned_trees_by_pruning_the_long_stem  # assume path is not test dir
-
-          _tdl = remove_instance_variable :@_test_dir_localized
-          sub_path = @path[ @asset_local_range_ ]
-          test_head = "#{ _tdl }#{ ::File::SEPARATOR }"
-
-          if test_head == sub_path[ 0, test_head.length ]
-
-            _path = sub_path[ test_head.length .. -1 ]
-
-            _init_pre_pruned_tree_by_doing_it_this_way _path, :test, :asset
-
-          else
-
-            # test dir is *within* asset dir, hence the asymmetry
-
-            _init_pre_pruned_tree_by_doing_it_this_way sub_path, :asset, :test
-          end
-          NIL
-        end
-
-        def _init_pre_pruned_tree_by_doing_it_this_way real_path, left, right
-
-          paths = Trees__.new
-          pre_pruned = Trees__.new
-
-          path_a = real_path.split ::File::SEPARATOR
-          full = remove_instance_variable :@_full
-
-          _full_left = full[ left ].fetch_node path_a do end
-          _full_right = full[ right ]
-
-          pre_pruned[ left ] = _full_left
-          pre_pruned[ right ] = _full_right
-
-          paths[ left ] = path_a
-
-          @_pre_pruned = pre_pruned
-          @_prune_the_other_tree_in_this_order = [ left, right ]
-          @_real_prune_path_array_for = paths
           NIL
         end
 
@@ -215,13 +136,11 @@ module Skylab::TestSupport
             :receive_asset_dir_entry_string_,
             :receive_asset_file_entry_string_
 
-          trees = Trees__.new
+          trees = Models_::Trees.new
           trees.asset = _tr_
           @_normal_keyed = trees
           NIL
         end
-
-        Trees__ = ::Struct.new :asset, :test
 
         def __init_normal_keyed_test_tree_pre_pruned_test_tree
 
