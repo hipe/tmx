@@ -2,9 +2,7 @@ module Skylab::TestSupport
 
   module FileCoverage
 
-    Modalities = ::Module.new
-
-    module Modalities::CLI
+    module CLI
 
       # #spot-ts-CLI explains why there is no full CLI exposure here.
       # :#spot-fc-CLI (sorry).

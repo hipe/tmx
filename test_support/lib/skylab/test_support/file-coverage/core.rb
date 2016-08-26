@@ -254,7 +254,7 @@ module Skylab::TestSupport
 
       def express_into_under y, expag
         # ..
-        Here_::Modalities::CLI::Agnostic_Text_Based_Expression.
+        Here_::CLI::Agnostic_Text_Based_Expression.
           new( y, expag, @tree ).execute
       end
 

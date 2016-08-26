@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby -w
 
+# (see also spots marked [#002]. at writing all coverage is borked.)
+
+$stderr.puts "no way."
+exit 7
+
 if __FILE__ == $PROGRAM_NAME
 
   # for fun and regressability we allow this to be run as a standalone script

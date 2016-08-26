@@ -14,7 +14,7 @@ module Skylab::TestSupport
 
         cli.node_map = {
           file_coverage: -> do
-            Home_::FileCoverage::Modalities::CLI::NODE_MAP
+            Home_::FileCoverage::CLI::NODE_MAP
           end,
         }
 
