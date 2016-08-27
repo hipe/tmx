@@ -2,54 +2,64 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport
 
-  describe "[ts] operations - permute", wip: true do
+  describe "[ts] permute" do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :expect_event
-    # use :doc_test
+    Zerk_test_support_[]::API[ self ]
 
-    shared_subject :_shared_state do
+    context "ping" do
 
-      X_O_Permute_Struct = ::Struct.new :out_string, :err_string, :result
-      o = X_O_Permute_Struct.new
+      call_by do
+        call :ping  # (result is state)
+      end
 
-      grp = __build_spy_group
-      _st = __build_permutation_stream
+      it "works" do
 
-      call_API :permute,
-        :test_file, fixture_file__( 'some_speg.rb' ),
-        :permutations, _st,
-        :stdout, grp[ :o ],
-        :stderr, grp[ :e ]
+        _be_this = be_emission :info, :expression, :ping do |y|
+          y == ['ping from permute.'] || fail
+        end
 
-      o.out_string, o.err_string = grp.flush_to_strings_for :o, :e
-      o.result = @result
-      o
+        first_emission.should _be_this
+      end
     end
 
-    it "results in a success value" do
+    context "money" do
 
-      _shared_state.result.should eql true
-    end
+      call_by do
+        _path = fixture_file__ 'some_speg.kode'
+        _st = __build_permutation_stream
+        _ = call(
+          :permute,
+          :test_file, _path,
+          :permutations, _st,
+        )
+        _
+      end
 
     it "adds new test cases to the document" do
 
       _rx = /\b(?<num_added>\d+) case\(s\) added\b/
 
-      _md = _shared_state.err_string.should match _rx
-
-      _md[ :num_added ].to_i.should eql 3
-    end
+        _md = _rx.match _the_line
+        _md[ :num_added ].to_i.should eql 3
+      end
 
     it "expresses that it skipped generating a test that existed already" do
 
       _rx = /\b(?<num_skipped>\d+) already done\b/
 
-      _md = _shared_state.err_string.should match _rx
+        _md = _rx.match _the_line
+        _md[ :num_skipped ].to_i == 1 || fail
+      end
 
-      _md[ :num_skipped ].to_i.should eql 1
-    end
+      shared_subject :_the_line do
+
+        lines = nil
+        first_emission.should( be_emission( :info, :expression, :summary ) do |y|
+          lines = y
+        end )
+        lines.fetch 0
+      end
 
     it "the output string is correct byte-per-byte" do
 
@@ -77,16 +87,13 @@ module Skylab::TestSupport::TestSupport
 
         # etc 2
       HERE
-    end
 
-    def __build_spy_group
-      grp = Home_::IO.spy.group.new
-      grp.debug_IO = debug_IO
-      grp.do_debug_proc = -> { do_debug }
-      grp.add_stream :o
-      grp.add_stream :e
-      grp
-    end
+        lib = Home_::Expect_Line
+        _actual_st = root_ACS_state.result
+        _exp_st = Home_.lib_.basic::String.line_stream _exp
+
+        lib::Streams_have_same_content[ _actual_st, _exp_st, self ]
+      end
 
     define_method :__build_permutation_stream, -> do
 
@@ -105,8 +112,9 @@ module Skylab::TestSupport::TestSupport
       end
     end.call
 
-    def subject_API
-      Home_::API
+      end
+    def build_root_ACS
+      Home_::Permute::Root_Autonomous_Component_System_.instance_
     end
   end
 end

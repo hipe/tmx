@@ -1,35 +1,92 @@
 module Skylab::TestSupport
 
-  module API
+  module Permute  # :[#045].
 
-    module Models_::Front
+    class Root_Autonomous_Component_System_
 
-      class Actions::Permute < Action_  # :[#045].
+      class << self
+        def instance_
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
 
-        edit_entity_class(
+      def initialize
+        @_filesystem_proc = -> do
 
-          :promote_action,
+        end
+      end
 
-          :branch_description, -> y do
-            y << "magnets HACK"
-          end,
+      def __ping__component_operation
 
+        -> &oes_p do
+
+          oes_p.call :info, :expression, :ping do |y|
+            y << "ping from permute."
+          end
+          NOTHING_
+        end
+      end
+
+      def __permute__component_operation
+
+        yield :via_ACS_by, -> do
+          Permute_Operation___.new @_filesystem_proc
+        end
+      end
+    end
+
+    class Permute_Operation___  # :[#045].
+
+      def initialize fs_p
+        @_filesystem_proc = fs_p
+      end
+
+      def self.describe_into_under y, expag
+        y << "(EDIT permute description)"
+      end
+
+      if false
+        hi(
           :inflect,
             :verb, 'permute',
             :noun, 'test document',
             :verb_as_noun, 'permutation',
-
-          :required, :property, :permutations,
-
-          :required, :property, :stdout,
-          :required, :property, :stderr,
-
-          :required, :property, :test_file
         )
+      end
 
-        def produce_result
+      def __permutations__component_association
+        -> st do
+          Common_::Known_Known[ st.gets_one ]
+        end
+      end
 
-          ok = __resolve_upstream_IO
+      def __test_file__component_association
+
+        -> st, & pp do
+
+          _x = st.gets_one
+          _kn = Common_::Qualified_Knownness.via_value_and_symbol _x, :test_file
+          _oes_p = pp[ nil ]
+
+          Home_.lib_.system.filesystem( :Upstream_IO ).with(
+            :qualified_knownness_of_path, _kn,
+            & _oes_p )
+        end
+      end
+
+      def execute & oes_p
+        @_on_event_selectively = oes_p
+        extend Permutations_Implementation___
+        execute
+      end
+    end
+    # -
+      module Permutations_Implementation___
+
+        def execute
+          @_down = Puts_Proxy___.new
+          ok = true
           ok &&= __index_existing_lines
           ok &&= __rewind_and_ouput_beginning_while_looking_for_mentor
           ok &&= __via_mentor_advance_to_end_of_this_test
@@ -37,38 +94,18 @@ module Skylab::TestSupport
           ok && __output_the_rest_and_finish
         end
 
-        def __resolve_upstream_IO
-
-          kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
-            :qualified_knownness_of_path, knownness( :test_file ),
-            & handle_event_selectively )
-
-          if kn
-
-            h = @argument_box.h_
-
-            @_down = h.fetch :stdout
-            @_thru = h.fetch :stderr
-            @_up = kn.value_x
-
-            ACHIEVED_
-          else
-            kn
-          end
-        end
-
         def __index_existing_lines
 
           # before we write anything, we have to know
           # what cases are already there
 
-          up = @_up
+          up = @test_file
 
           st = Common_.stream do
             up.gets
           end.map_reduce_by do | line |
 
-            Line_Matchdata__.any_via_line line
+            Models_::Line_Matchdata.any_via_line line
           end
 
           seen_h = {}
@@ -96,12 +133,12 @@ module Skylab::TestSupport
 
         def __rewind_and_ouput_beginning_while_looking_for_mentor
 
-          @_up.rewind
+          @test_file.rewind
           begin
-            line = @_up.gets
+            line = @test_file.gets
             line or break
             @_down.puts line
-            match = Line_Matchdata__.any_via_line line
+            match = Models_::Line_Matchdata.any_via_line line
             if match
               break
             end
@@ -121,7 +158,7 @@ module Skylab::TestSupport
           rx = /\A#{ ::Regexp.escape @_mentor.margin }end$/
 
           begin
-            line = @_up.gets
+            line = @test_file.gets
             line or break
             @_down.puts line
             if rx =~ line
@@ -141,7 +178,7 @@ module Skylab::TestSupport
 
           sep = ', '
 
-          case_string_st = @argument_box.fetch( :permutations ).map_by do | perm |
+          case_string_st = @permutations.map_by do | perm |
 
             perm.values.join sep
           end
@@ -190,7 +227,7 @@ module Skylab::TestSupport
         def __output_the_rest_and_finish
 
           begin
-            line = @_up.gets
+            line = @test_file.gets
             line or break
             @_down.puts line
             redo
@@ -201,13 +238,37 @@ module Skylab::TestSupport
           if d.nonzero?
             _extra = ", #{ d } already done"
           end
-          @_thru.puts "(#{ o.number_added } case(s) added#{ _extra })"
-          ACHIEVED_
+
+          @_on_event_selectively.call :info, :expression, :summary do |y|
+            y << "(#{ o.number_added } case(s) added#{ _extra })"
+          end
+
+          _lines = remove_instance_variable( :@_down )._a
+          Common_::Stream.via_nonsparse_array _lines
         end
 
         Counts___ = ::Struct.new :number_added, :number_already_done
 
-        class Line_Matchdata__
+        Models_ = ::Module.new
+
+        class Puts_Proxy___  # surpsingly we didn't see another like this
+          def initialize 
+            @_a = []
+          end
+          def puts line
+            if LOOKS_LIKE_LINE_RX___ !~ line
+              line = "#{ line }#{ NEWLINE_ }"
+            end
+            @_a.push line ; nil
+          end
+          attr_reader(
+            :_a,
+          )
+        end
+
+        LOOKS_LIKE_LINE_RX___ = /[\n\r]\z/
+
+        class Models_::Line_Matchdata
 
           class << self
             def any_via_line line
@@ -247,8 +308,8 @@ module Skylab::TestSupport
         # CASE_RX__ = /.*(?= - (?:(?! - ).)+\z)/  # match longest  ("foo - bar")
 
         CASE_RX__ = /(?:(?! - ).)+(?= - .+\z)/  # match shortest ("foo")
-
       end
-    end
+    # -
   end
 end
+# #tombstone: pre-zerk

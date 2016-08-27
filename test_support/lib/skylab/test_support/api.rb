@@ -56,7 +56,5 @@ module Skylab::TestSupport
       end
       NOTHING_
     end
-
-    NOTHING_ = nil
   end
 end

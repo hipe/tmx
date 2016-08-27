@@ -169,6 +169,7 @@ module Skylab::TestSupport  # :[#021].
   stowaway :Library_, 'lib-'
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n".freeze
+  NOTHING_ = nil
   NIL_ = nil
   SPACE_ = ' '.freeze
   TEST_DIR_FILENAME_ = 'test'.freeze

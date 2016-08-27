@@ -93,6 +93,12 @@ module Skylab::TestSupport::TestSupport
 
   # --
 
+  Zerk_test_support_ = -> do
+    Home_.lib_.zerk.test_support
+  end
+
+  # --
+
   Common_ = Home_::Common_
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
