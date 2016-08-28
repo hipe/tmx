@@ -35,12 +35,6 @@ module Skylab::TestSupport
         CLI::Visual_Client___
       end
     end  # >>
-
-    Lazy_ = Common_::Lazy
-
-    Require_zerk_ = Lazy_.call do
-      Zerk_ = Home_.lib_.zerk ; nil
-    end
   end
 end
 # #tombstone: 2 CLI-related near-toplevel files with long history

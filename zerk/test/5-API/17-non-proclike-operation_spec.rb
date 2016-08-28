@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - non-proclike operation" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     it "missing required args - raises arg. error (cp)" do
 

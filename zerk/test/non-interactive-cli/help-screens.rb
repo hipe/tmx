@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
     # [#br-045] / #[#br-106] blind rewrite!
 
     def self.[] tcc
-      Memoizer_Methods[ tcc ]
+      Use_::Memoizer_methods[ tcc ]
       Non_Interactive_CLI[ tcc ]
       tcc.send :define_singleton_method, :given_screen, Given_screen___
       tcc.include Instance_Methods__

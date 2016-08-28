@@ -295,10 +295,6 @@ module Skylab::TestSupport
 
     # --
 
-    Require_zerk_ = Lazy_.call do
-      Zerk_ = Home_.lib_.zerk ; nil
-    end
-
     Tree_lib_ = -> do
       Home_.lib_.basic::Tree
     end

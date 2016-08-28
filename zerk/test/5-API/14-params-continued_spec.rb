@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - params continued" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "call a thing with one required arg (invalid)" do
 

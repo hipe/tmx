@@ -111,10 +111,10 @@ module Skylab::TestSupport::TestSupport
         Common_::Stream.via_nonsparse_array a
       end
     end.call
+    end
 
-      end
-    def build_root_ACS
-      Home_::Permute::Root_Autonomous_Component_System_.instance_
+    def subject_API
+      Home_::Permute::API
     end
   end
 end

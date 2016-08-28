@@ -149,8 +149,14 @@ module Skylab::Autonomous_Component_System
         :argument_arity,
       )
 
-      def is_probably_the_singularest  # ..
+      # -- see #note-1 and #note-2 in [#026]
+
+      def is_singular_counterpart_or_not_in_singplur_grouping
         true
+      end
+
+      def is_singular_counterpart_of_singplur_grouping
+        false
       end
 
       Here_ = self

@@ -46,15 +46,7 @@
 
              coincidentally, [#ze-027] is related.
 
-
-[#026]       for now, if an association is `is_singular_of` another
-             association, *by the storage implementation* (ivars)
-             the singular form of actual value is stored in the storage
-             location of the plural variant, after this singular value
-             is "upgraded" to being one-length array. :A
-
-             B) #API-point: all `is_plural_of` are automatically given
-                an argument arity of `one_or_more`.
+[#026]       `singplur`, `is_singular_of`, `is_plural_of`, argument arity..
 
 [#025]       #after: [#010]
 

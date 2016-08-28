@@ -7,7 +7,7 @@ module Skylab::Zerk::TestSupport
     PUBLIC = true  # [dt]
 
     def self.[] tcc
-      TS_::Expect_Stdout_Stderr[ tcc ]
+      Use_::Expect_stdout_stderr[ tcc ]
       tcc.send :define_singleton_method, :given, Given___
       tcc.include self
     end

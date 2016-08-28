@@ -61,12 +61,11 @@ module Skylab::Common::TestSupport
           call_API_via_iambic x_a, & x_p
         end
 
-        def call_API_via_iambic x_a, & x_p
+        def call_API_via_iambic x_a, & oes_p
           if ! block_given?
-            _oes_p = event_log.handle_event_selectively
-            x_a.push :on_event_selectively, _oes_p
+            oes_p = event_log.handle_event_selectively
           end
-          @result = subject_API.call( * x_a, & x_p )
+          @result = subject_API.call( * x_a, & oes_p )
           NIL_
         end
 
@@ -127,6 +126,37 @@ module Skylab::Common::TestSupport
           # (kept for continuity with a possible future)
         end
 
+        # ~ emission..
+
+        def expect_emission * sym_a, & exp_y_p
+
+          # (written to accomodate the "expression" shape of event)
+
+          _next_actual_expev_emission do |em|
+
+            if em.channel_symbol_array != sym_a
+              sym_a.should eql em.channel_symbol_array
+              return
+            end
+
+            if Looks_like_expression__[ sym_a ]
+
+              em.reify_by do |act_y_p|
+                _expag = _expev_upper_level_expression_agent
+                _expag.calculate [], & act_y_p
+              end
+
+              if block_given?
+                _actual_lines = em.cached_event_value
+                exp_y_p[ _actual_lines ]
+              end
+            else
+              Expect_Event.__DESIGN_ME
+            end
+            NIL
+          end
+        end
+
         # ~ expectations along the different qualities of events
 
         def black_and_white ev
@@ -134,7 +164,7 @@ module Skylab::Common::TestSupport
         end
 
         def black_and_white_lines ev
-          _expag = __expev_upper_level_expression_agent
+          _expag = _expev_upper_level_expression_agent
           ev.express_into_under [], _expag
         end
 
@@ -450,7 +480,7 @@ module Skylab::Common::TestSupport
 
       lazy = Common_::Lazy
 
-      define_method :__expev_upper_level_expression_agent, -> do
+      define_method :_expev_upper_level_expression_agent, -> do
 
         m = :black_and_white_expression_agent_for_expect_event
 

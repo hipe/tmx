@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - operation intro" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "only write an item - result is the qk (REDUNDANT w/ prev file)" do
 

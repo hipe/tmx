@@ -35,22 +35,21 @@ module Skylab::Autonomous_Component_System::TestSupport
         @result, @emission_array, @root = a
       end
 
-      attr_reader( :result, :emission_array, :root )
-
       def to_state_with_customized_result x
         State_with_Customized_Result___[ x, @emission_array, @root ]
       end
+
+      attr_reader(
+        :result,
+        :emission_array,
+        :root,
+      )
     end
 
     State_with_Customized_Result___ = ::Struct.new(
-      :__customized_result, :emission_array, :root )
-
-    def build_root_ACS  # *is* `build_cold_root_ACS`
-
-      # NOTE - define your own version of this if you're using
-      # it to test production root ACS nodes
-
-      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
-    end
+      :__customized_result,
+      :emission_array,
+      :root,
+    )
   end
 end

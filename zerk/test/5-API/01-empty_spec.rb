@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] 0 - the empty ACS" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     it "builds" do
       build_root_ACS

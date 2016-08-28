@@ -109,12 +109,9 @@ module Skylab::MyTerm::TestSupport
       tcc.include self
     end
 
-    def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp  # #spot-2
-
+    def zerk_API_call oes_p, x_a  # #spot-2
       @root_ACS = build_root_ACS_for_testing_
-      @result = Home_::Call_[ x_a, @root_ACS, & pp ]
-
-      NIL_
+      Home_::Call_.call( x_a, @root_ACS ) { |_| oes_p }
     end
   end
 

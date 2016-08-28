@@ -5,7 +5,7 @@ module Skylab::Permute::TestSupport
   describe "[pe] non-interactive CLI", wip: true do
 
     extend TS_
-    use :expect_CLI
+    # use :expect_CLI
 
     # INVITE_RX = /try.+permoot.+for help/
     it '0     no args - says expecting / usage / invite' do

@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - dep graph intro" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "(exposition) try to get a card without money" do
 

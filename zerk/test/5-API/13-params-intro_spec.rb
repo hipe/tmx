@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - params intro (DOESN'T EVEN GET TO PARAMS)" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     it "shoe model loads" do
       subject_root_ACS_class.hello.should eql :_omg_shoes_

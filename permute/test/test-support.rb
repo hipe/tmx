@@ -32,7 +32,7 @@ module Skylab::Permute::TestSupport
     end
 
     def subject_API
-      Home_.application_kernel_
+      Home_::API
     end
   end
 
@@ -66,10 +66,11 @@ module Skylab::Permute::TestSupport
     Common_.test_support::Expect_Event[ tcm ]
   end
 
+  Home_ = ::Skylab::Permute
+
   EMPTY_S_ = ''
   NIL_ = nil
-  Home_ = ::Skylab::Permute
   Common_ = Home_::Common_
+  Zerk_lib_ = Home_::Zerk_lib_
 end
-
 # :+#tombstone: was [#ts-010] dark hack "one weird old tr.."

@@ -111,6 +111,12 @@ module Skylab::Autonomous_Component_System::TestSupport
     def codifying_expag_
       Common_::Event.codifying_expression_agent_instance
     end
+
+    # --
+
+    def build_root_ACS  # build cold root
+      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
+    end
   end
 
   Common_ = ::Skylab::Common

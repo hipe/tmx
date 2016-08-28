@@ -17,7 +17,7 @@ module Skylab::Zerk::TestSupport
     # test and so it is now subject to re-appropriation as may be desired.
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "several component association with proc-like models.." do
 

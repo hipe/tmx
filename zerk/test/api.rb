@@ -8,8 +8,8 @@ module Skylab::Zerk::TestSupport
 
     def self.[] tcc
 
-      Memoizer_Methods[ tcc ]
-      Expect_Event[ tcc ]
+      Use_::Memoizer_methods[ tcc ]
+      Use_::Expect_event[ tcc ]
       ACS_.test_support::Expect_Root_ACS[ tcc ]
 
       tcc.send :define_singleton_method, :call_by, Call_by_method___
@@ -29,6 +29,13 @@ module Skylab::Zerk::TestSupport
 
       def fails
         root_ACS_result.should eql Home_::UNABLE_
+      end
+
+      def expect_trueish_result
+        x = root_ACS_result
+        if ! x
+          fail "expected trueish result, had #{ x.inspect }"
+        end
       end
 
       def message_  # must be used in conjuction with #here
@@ -103,49 +110,33 @@ module Skylab::Zerk::TestSupport
         e
       end
 
-      def call * x_a
+      def call * x_a  # result is state
 
-        _zerk_expect_API_call :init_result_and_root_ACS_for_zerk_expect_API, x_a
+        call_via_iambic x_a
       end
 
-      def call_via_iambic x_a
+      def call_via_iambic x_a  # result is state
 
-        _zerk_expect_API_call :init_result_and_root_ACS_for_zerk_expect_API, x_a
-      end
+        el = event_log
 
-      def _zerk_expect_API_call m, x_a
+        _use_oes_p = if el
+          el.handle_event_selectively
+        else
+          Expect_no_events_because_event_log_was_falseish___
+        end
 
-        _pp = __some_handler_builder_for_zerk_expect_API
-
-        send m, x_a, & _pp
-
-        _x = remove_instance_variable :@result
+        result = zerk_API_call _use_oes_p, x_a
 
         if instance_variable_defined? :@root_ACS
           _o = remove_instance_variable :@root_ACS
         end
 
-        root_ACS_state_via _x, _o
+        root_ACS_state_via result, _o
       end
 
-      def __some_handler_builder_for_zerk_expect_API  # publicize whenever
+      def zerk_API_call oes_p, x_a  # result is result
 
-        el = event_log
-        if el
-          use_oes_p = el.handle_event_selectively
-          -> _ do
-            use_oes_p
-          end
-        else
-          No_events_because_etc_pp_
-        end
-      end
-
-      def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
-
-        @root_ACS ||= build_root_ACS  # build COLD root ACS
-        @result = Home_::API.call x_a, @root_ACS, & pp
-        NIL_
+        subject_API.call( * x_a, & oes_p )
       end
 
       # -- hook-outs/ins
@@ -160,14 +151,8 @@ module Skylab::Zerk::TestSupport
 
     # -
 
-    say_etc = nil
-
-    No_events_because_etc_pp_ = -> _ do  # cp from [ac]
-      fail say_etc[]
-    end
-
-    say_etc = -> do
-      "no events were expected because `event_log` was false-ish"
+    Expect_no_events_because_event_log_was_falseish___ = -> * x_a, & _ev_p do
+      fail "no events were expected because `event_log` was false-ish (had: #{ x_a.inpsect })"
     end
   end
 end

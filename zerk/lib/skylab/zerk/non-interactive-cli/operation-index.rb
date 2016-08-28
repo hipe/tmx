@@ -84,7 +84,7 @@ module Skylab::Zerk
 
         @_my_set_symbol_via_name_symbol[ @_k ] = :_bespoke_
 
-        if @_parameter.is_probably_the_singularest
+        if @_parameter.is_singular_counterpart_or_not_in_singplur_grouping
 
           if Field_::Is_required[ @_parameter ]
 

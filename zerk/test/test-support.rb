@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def _libs
-      @___libs ||= TestSupport_::Library.new TS_
+      @___libs ||= TestSupport_::Library.new Use_, TS_
     end
   end  # >>
 
@@ -47,6 +47,12 @@ module Skylab::Zerk::TestSupport
 
     def debug_IO
       TestSupport_.debug_IO
+    end
+
+    # --
+
+    def build_root_ACS  # cp from [ac]
+      subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
     end
   # -
 
@@ -103,22 +109,40 @@ module Skylab::Zerk::TestSupport
 
   # -- test lib nodes
 
-  Expect_Event = -> tcc do
-    Common_.test_support::Expect_Event[ tcc ]
+  module Use_
+
+    module My_API
+
+      def self.[] tcc
+        TS_::API[ tcc ]
+        tcc.include self
+      end
+
+      def zerk_API_call oes_p, x_a
+        @root_ACS ||= subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
+        Home_::API.call( x_a, @root_ACS ) { |_| oes_p }
+      end
+    end
+
+    Expect_event = -> tcc do
+      Common_.test_support::Expect_Event[ tcc ]
+    end
+
+    Expect_stdout_stderr = -> tcc do
+      tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
+    end
+
+    Memoizer_methods = -> tcc do
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    end
   end
 
-  Expect_Stdout_Stderr = -> tcc do
-    tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-  end
+  # --
 
   Future_expect_nothing_ = Lazy_.call do
     -> * i_a do
       fail "unexpected: #{ i_a.inspect }"
     end
-  end
-
-  Memoizer_Methods = -> tcc do
-    TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
   # --

@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - depth intro" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "call top node with something strange:" do
 

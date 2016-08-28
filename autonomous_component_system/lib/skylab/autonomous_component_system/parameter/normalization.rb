@@ -86,6 +86,11 @@ module Skylab::Autonomous_Component_System
           f = fo_st.gets
           f or break
 
+          if f.is_singular_counterpart_of_singplur_grouping
+            # currently we never use the singular side for storage.
+            redo
+          end
+
           evl = rdr_p[ f ]  # honor the above mentioned API point.
           if evl.is_effectively_known
             redo

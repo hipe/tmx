@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - flag" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "dry run is off is off - not special" do
 

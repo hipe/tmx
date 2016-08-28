@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - operation dependency customization" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "(essentials)" do
 

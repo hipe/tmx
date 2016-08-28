@@ -8,11 +8,9 @@ module Skylab::DocTest::TestSupport
     end
 
     # -
-
-      def init_result_and_root_ACS_for_zerk_expect_API x_a, & pp
-
+      def zerk_API_call oes_p, x_a
         @root_ACS = Home_::Root_Autonomous_Component_System_.new
-        @result = Home_::Call_ACS_[ x_a, @root_ACS, & pp ]
+        Home_::Call_ACS_.call( x_a, @root_ACS ) { |_| oes_p }
       end
 
       def my_API_common_generate_ h  # mutates h

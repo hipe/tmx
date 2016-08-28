@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] API - pop intro" do
 
     TS_[ self ]
-    use :API
+    use :my_API
 
     context "sic" do
 

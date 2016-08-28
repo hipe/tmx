@@ -2,10 +2,19 @@ module Skylab::TestSupport
 
   module Permute  # :[#045].
 
-    class Root_Autonomous_Component_System_
+    module API ; class << self
+
+      def call * x_a, & oes_p
+        Require_zerk_[]
+        _acs = Root_Autonomous_Component_System___.__instance
+        Zerk_::API.call( x_a, _acs ) { |_| oes_p }
+      end
+    end ; end
+
+    class Root_Autonomous_Component_System___
 
       class << self
-        def instance_
+        def __instance
           @___instance ||= new
         end
         private :new

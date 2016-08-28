@@ -132,6 +132,10 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
+  Common_ = ::Skylab::Common
+
+  Lazy_ = Common_::Lazy
+
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
@@ -148,9 +152,11 @@ module Skylab::TestSupport  # :[#021].
     Home_.lib_.system.path_looks_relative path
   end
 
-  # --
+  Require_zerk_ = Lazy_.call do
+    Zerk_ = Home_.lib_.zerk ; nil
+  end
 
-  Common_ = ::Skylab::Common
+  # --
 
   Autoloader_ = Common_::Autoloader
 

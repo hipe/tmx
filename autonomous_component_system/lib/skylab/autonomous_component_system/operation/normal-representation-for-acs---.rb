@@ -234,7 +234,20 @@ module Skylab::Autonomous_Component_System
           end
         end
 
-        def is_probably_the_singularest
+        # --
+
+        # see #note-1 and #note-2 in [#026]
+
+        def is_singular_counterpart_of_singplur_grouping
+          sym = _defined_association.singplur_category
+          if sym
+            :singular_of == sym
+          else
+            false
+          end
+        end
+
+        def is_singular_counterpart_or_not_in_singplur_grouping
           sym = _defined_association.singplur_category
           if sym
             :singular_of == sym
