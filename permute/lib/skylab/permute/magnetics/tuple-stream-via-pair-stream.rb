@@ -1,106 +1,107 @@
 module Skylab::Permute
 
-  Models_ = ::Module.new
+  Magnetics = ::Module.new
 
-  module Models_::Permutation
+  module Magnetics::TupleStream_via_PairStream ; class << self
 
-    Actions = ::Module.new
+    # this is the core function behind our core operation.
+    # recursively it makes streams out of the categories and their values.
+    # whenever it is on the non-last category ("column", if you like), it
+    # expands the current stream
 
-    same = Home_.lib_.brazen::Action
+    def call pair_st
 
-    class Actions::Ping < same
+      bx = __box_via_pair_stream pair_st
 
-      @is_promoted = true
-
-      def produce_result
-
-        maybe_send_event :info, :expression, :ping do | y |
-
-          y << "hello from #{ app_name }."
-        end
-
-        :hello_from_permute
+      if bx.length.zero?
+        Common_::Stream.the_empty_stream
+      else
+        __via_nonempty_box bx
       end
     end
 
-    class Actions::Generate < same
+    def __via_nonempty_box bx
 
-      @is_promoted = true
+      categories = bx.to_pair_stream.to_a ; bx = nil
 
-      Home_.lib_.brazen::Modelesque.entity self
+      struct_class = __struct_class_via_categories categories
 
-      edit_entity_class(
+      categories_length = categories.length
 
-        :branch_description, -> y do
-          y << "minimal permutations generator."
-        end,
+      last = categories_length - 1
 
-        :argument_arity, :custom,
-        :required,
-        :property, :pair )
+      recurse = -> st, d do
 
-      def pair=   # must be public here, distinct from actor
-
-        name_x = gets_one_polymorphic_value
-
-        _pair = Common_::Pair.via_value_and_name(
-          gets_one_polymorphic_value,
-          name_x )
-
-        @argument_box.touch_array_and_push :pair, _pair
-
-        KEEP_PARSING_
-      end
-
-      def produce_result
-
-        cat_box = Common_::Box.new
-
-        @argument_box.fetch( :pair ).each do | pair |
-
-          cat_box.touch pair.name_x do
-            Common_::Pair.via_value_and_name [], pair.name_x
-          end.value_x.push pair.value_x
-        end
-
-        @_cat_box = cat_box
-        @_num_cats = cat_box.length
-
-        _a = @_cat_box.a_.map do | x |
-          x.to_s.gsub( DASH_, UNDERSCORE_ ).intern
-        end
-
-        @_row_struct = ::Struct.new( * _a )
-
-        __build_stream
-      end
-
-      def __build_stream
-
-        cat_a = @_cat_box.enum_for( :each_value ).to_a
-
-        _number_of_permutations = cat_a.map do | pr |
-          pr.value_x.length
-        end.reduce( & :* )
-
-        Common_::Stream.via_times _number_of_permutations do | d |
-
-          x = @_row_struct.new
-          @_num_cats.times do | col_d |
-
-            cat = cat_a.fetch col_d
-
-            prev_d = d
-            len = cat.value_x.length
-            d /= len
-
-            x[ col_d ] = cat.value_x.fetch( prev_d % len )
+        st_ = st.expand_by do |sct|
+          x_a = categories.fetch( d ).value_x  # as #here
+          Common_::Stream.via_times x_a.length do |d_|
+            o = sct.dup
+            o[ d ] = x_a.fetch d_
+            o
           end
-          x
+        end
+
+        if last == d
+          st_
+        else
+          recurse[ st_, d + 1 ]
         end
       end
 
-      DASH_ = '-'
+      x_a = categories.fetch( 0 ).value_x  # as #here
+      st = Common_::Stream.via_times x_a.length do |d|
+        struct_class.new x_a.fetch d
+      end
+      if last.zero?
+        st
+      else
+        recurse[ st, 1 ]
+      end
     end
-  end
+
+    alias_method :[], :call
+
+    # --
+
+    def __struct_class_via_categories cat_a
+
+      sym_a = cat_a.map( & :name_x )
+
+      const = GENERATED_STRUCT_CONSTS__.fetch sym_a do
+
+        _d = GENERATED_STRUCT_CONSTS__.length + 1
+        const_ = :"G#{ _d }"
+        GeneratedStructs__.const_set const_, ::Struct.new( * sym_a )
+        GENERATED_STRUCT_CONSTS__[ sym_a ] = const_
+        const_
+      end
+
+      GeneratedStructs__.const_get const, false
+    end
+  end  # >>
+
+    # (define these consts in the module, not its singleton class)
+
+    GeneratedStructs__ = ::Module.new
+
+    GENERATED_STRUCT_CONSTS__ = {}
+
+  class << self
+
+    # --
+
+    def __box_via_pair_stream pair_st
+
+      bx = Common_::Box.new
+      begin
+        pair = pair_st.gets
+        pair || break
+        x, k = pair
+        bx.touch_array_and_push k, x
+        redo
+      end while nil
+      bx
+    end
+  end ; end
 end
+# #tombstone: nima algorithm

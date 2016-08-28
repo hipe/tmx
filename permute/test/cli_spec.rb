@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Permute::TestSupport
 
-  describe "[pe] CLI" do
+  describe "[pe] non-interactive CLI", wip: true do
 
     extend TS_
     use :expect_CLI

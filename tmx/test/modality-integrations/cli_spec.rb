@@ -65,7 +65,7 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    it "permute" do
+    it "permute", wip: true do
       _against 'permute', _ARG
       _expect_common
     end

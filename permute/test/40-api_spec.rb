@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Permute::TestSupport
 
-  describe "[pe] models" do
+  describe "[pe] models", wip: true do
 
     extend TS_
     use :expect_event
