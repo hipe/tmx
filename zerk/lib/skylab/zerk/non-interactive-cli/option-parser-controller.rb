@@ -2,51 +2,83 @@ module Skylab::Zerk
 
   class NonInteractiveCLI
 
-    class Option_Parser_Controller  # see [#015]
+    class OptionParserController  # see [#015]
 
       # implement exactly the :#"algorithm".
       #
 
-      def initialize oi
+      def initialize custom_op_p, oi
 
         @_operation_index = oi
-        __assemble_op
+        @_stdlib_op_lib = Home_.lib_.stdlib_option_parser  # see #note-1
+
+        if custom_op_p
+          @_op = custom_op_p[ oi.stack_frame_ ]
+        else
+          @_op = Build___.new( @_operation_index, @_stdlib_op_lib ).execute
+        end
       end
 
       def parse__ argv, client, & pp
-        Parse___.new( argv, @_op, @_operation_index, client, & pp ).execute
+        Parse___.new( argv, @_op, @_operation_index, client, @_stdlib_op_lib, & pp ).execute
       end
 
       def the_option_parser__  # just for help
         @_op
       end
 
-      def __assemble_op
+      class Build___
 
-        __begin_option_parser
-
-        shorts = ::Hash.new do |h, k|
-          h[ k ] = false ; true
-        end
-        shorts[ 'h' ] = false  # never use this one
-        @__shorts = shorts
-
-        oi = @_operation_index
-
-        a = oi.__release_bespokes_to_add_to_op
-        bx = oi.release_primitivesque_appropriation_op_box__
-
-        if bx && bx.length.zero?
-          bx = nil  # could have been emptied at #spot-3 :#here-1
+        def initialize oi, stdl
+          @_operation_index = oi
+          @_stdlib_op_lib = stdl
         end
 
-        if a || bx
-          ___populate_option_parser_with_something a, bx
-        end
-        NIL_
-      end
+        def execute
 
-      def ___populate_option_parser_with_something a, bx  # assume one or both
+          @_op = @_stdlib_op_lib.new
+
+          __commmon_init
+
+          oi = @_operation_index
+
+          a = oi.__release_bespokes_to_add_to_op
+
+          bx = oi.release_primitivesque_appropriation_op_box__
+
+          if a || ( bx && bx.length.nonzero? )
+
+            # box could have been emptied at #spot-3 :#here-1
+
+            __work a, bx
+          end
+
+          @_op
+        end
+
+        def __commmon_init
+
+          # init shorts
+
+          shorts = ::Hash.new do |h, k|
+            h[ k ] = false ; true
+          end
+          shorts[ H__ ] = false  # never use this one
+          @__shorts = shorts
+
+          # add help option
+
+          @_op.on SHORT_HELP_OPTION, '--help[=named-argument]' do |s|
+            SpecialDirective.new s, :help
+          end
+          NIL
+        end
+
+        H__ = 'h'
+
+      #== BEGIN old "build"
+
+      def __work a, bx  # assume one or both
 
         @_expag = @_operation_index.root_frame__.CLI.expression_agent  # :#spot-1
         @_scope_index = @_operation_index.scope_index_
@@ -109,7 +141,7 @@ module Skylab::Zerk
         end
 
         @_op.on( * short, _long, * _s_a ) do |s|
-          Primitivesque_Invocation___.new s, asc
+          Assignment.new s, asc  # was Primitivesque_Invocation___
         end
         NIL_
       end
@@ -131,7 +163,7 @@ module Skylab::Zerk
         end
 
         @_op.on( * short, _long, * _s_a ) do |s|
-          Bespoke_Invocation___.new s, par
+          Assignment.new s, par
         end
         NIL_
       end
@@ -158,28 +190,20 @@ module Skylab::Zerk
       end
 
       # == END
-
-      def __begin_option_parser
-
-        op = Home_.lib_.stdlib_option_parser.new
-
-        op.on SHORT_HELP_OPTION, '--help[=named-argument]' do |s|
-          Special_Invocation___.new s, :__receive_help
-        end
-
-        @_op = op ; nil
+      #== END
       end
 
       # ==
 
       class Parse___
 
-        def initialize argv, op, oi, client, & pp
+        def initialize argv, op, oi, client, op_lib, & pp
           @_argv = argv
           @client = client
           @__oes_pp = pp
           @__oi = oi
           @__op = op
+          @__op_lib = op_lib
         end
 
         def execute
@@ -196,7 +220,7 @@ module Skylab::Zerk
           # (here we in effect choose for the client the priority of these:)
 
           if @_had_parse_error
-            @client.when_via_option_parser_parse_error__ @__parse_error
+            @client.when_via_option_parser_parse_error__ @_parse_error
 
           elsif @_component_rejected_request
             @client.when_via_option_parser_component_rejected_request__
@@ -216,6 +240,8 @@ module Skylab::Zerk
 
         def ___parse
 
+          # [#015] :#public-API:Point-1: the `parse_in_order` signature below
+
           # because it's of an arguably better design (separating formal
           # structure from invocation-time event handling), we circumvent
           # stdlib o.p's published interface and use its private method,
@@ -224,7 +250,8 @@ module Skylab::Zerk
           _setter = -> _normal_slug, invo do
 
             if invo.is_special
-              send invo.method_name, invo.argument_string
+              _m = AVALABLE_SPECIAL_DIRECTIVES___.fetch invo.__method_name
+              send _m, * invo.__argument_array
             else
               ___receive invo._to_qkn
             end
@@ -235,11 +262,28 @@ module Skylab::Zerk
               @_had_non_opts = true
               ( @__non_opts ||= [] ).push non_opt ; nil
             end
-          rescue ::OptionParser::ParseError => e
+          rescue @__op_lib::ParseError => e
             @_had_parse_error = true
-            @__parse_error = e
+            @_parse_error = e
           end
           NIL_
+        end
+
+        AVALABLE_SPECIAL_DIRECTIVES___ = {
+          help: :__receive_help,
+          parse_error: :_receive_mixed_parse_error,
+          parse_error_event: :_receive_mixed_parse_error,
+          parse_error_expression: :_receive_mixed_parse_error,
+        }
+
+        def _receive_mixed_parse_error x
+          @_had_parse_error = true
+          @_parse_error = x ; nil
+        end
+
+        def __receive_help s
+          @_help_was_requested = true
+          @_help_s = s ; nil
         end
 
         def ___receive qk  # (thoughts on availability.. #"c4")
@@ -253,30 +297,20 @@ module Skylab::Zerk
           end
           NIL_
         end
-
-        def __receive_help s
-
-          @_help_was_requested = true
-          @_help_s = s
-          # (hack - don't overwrite an already set response; e.g if a component
-          # rejected a request. the only way this can work is if this is the only
-          # place we do this, otherwise we have to go back to an if-else chain)
-          NIL_
-        end
       end
 
       # ==
 
-      class Special_Invocation___
+      class SpecialDirective
 
-        def initialize s, sym
-          @argument_string = s
-          @method_name = sym
+        def initialize *args, sym
+          @__argument_array = args
+          @__method_name = sym
         end
 
         attr_reader(
-          :argument_string,
-          :method_name,
+          :__argument_array,
+          :__method_name,
         )
 
         def is_special
@@ -286,31 +320,15 @@ module Skylab::Zerk
 
       # ==
 
-      class Bespoke_Invocation___
+      class Assignment
 
-        def initialize any_value_s, par
-          @any_value_s = any_value_s
-          @parameter = par
+        def initialize any_value_s, form
+          @__any_value_string = any_value_s
+          @__association_or_parameter = form
         end
 
         def _to_qkn
-          Common_::Qualified_Knownness[ @any_value_s, @parameter ]
-        end
-
-        def is_special
-          false
-        end
-      end
-
-      class Primitivesque_Invocation___
-
-        def initialize any_value_s, asc
-          @any_value_s = any_value_s
-          @association = asc
-        end
-
-        def _to_qkn
-          Common_::Qualified_Knownness[ @any_value_s, @association ]
+          Common_::Qualified_Knownness[ @__any_value_string, @__association_or_parameter ]
         end
 
         def is_special

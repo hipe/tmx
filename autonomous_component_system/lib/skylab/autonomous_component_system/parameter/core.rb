@@ -28,23 +28,25 @@ module Skylab::Autonomous_Component_System
       end  # >>
 
       def initialize & p
-        @argument_arity = :one
+        @argument_arity = :one  # "most" are this
+        @parameter_arity = :one  # "most" are this
         instance_exec( & p )
       end
 
-      # --
+      # -- dup-and-mutate
 
-      def dup_by & p
+      def dup_by
         o = dup
-        o.instance_exec( & p )
+        yield o
         o
       end
 
       private :dup
 
-      def name= x
-        @name = x
-      end
+      attr_writer(
+        :argument_arity,
+        :name,
+      )
 
       # --
 
@@ -151,12 +153,8 @@ module Skylab::Autonomous_Component_System
 
       # -- see #note-1 and #note-2 in [#026]
 
-      def is_singular_counterpart_or_not_in_singplur_grouping
-        true
-      end
-
-      def is_singular_counterpart_of_singplur_grouping
-        false
+      def singplur_category_of_association
+        NOTHING_
       end
 
       Here_ = self

@@ -191,8 +191,8 @@ module Skylab::Fields
         NOTHING_
       end
 
-      def is_singular_counterpart_of_singplur_grouping  # [ac] n11n compat
-        false
+      def singplur_category_of_association  # [ac] n11n compat
+        NOTHING_
       end
 
       Read___ = -> do

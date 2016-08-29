@@ -4,7 +4,7 @@ module Skylab::Permute
 
   module API ; class << self
     def call * x_a, & oes_p
-      Zerk_lib_[]::API.call x_a, AutonomousComponentSystem___.__instance do oes_p end
+      Zerk_lib_[]::API.call x_a, AutonomousComponentSystem_.instance_ do oes_p end
     end
   end ; end
 
@@ -20,10 +20,10 @@ module Skylab::Permute
     end
   end  # >>
 
-  class AutonomousComponentSystem___
+  class AutonomousComponentSystem_
 
     class << self
-      def __instance
+      def instance_
         @___instance ||= new
       end
       private :new
@@ -53,6 +53,15 @@ module Skylab::Permute
 
   class Generate_Operation___
 
+    class << self
+      def describe_into_under y, expag
+        y << "given a collection of \"categories\" where each category is"
+        y << "one name and one or more values, produce a \"stream of tuples\""
+        y << "(rows of data) representing all the possible permutations"
+        y << "combining one value from every category."
+      end
+    end  # >>
+
     def __value_name_pairs__component_association
 
       yield :is_plural_of, :value_name_pair
@@ -62,19 +71,21 @@ module Skylab::Permute
 
       yield :is_singular_of, :value_name_pairs
 
+      yield :description, -> y do
+        y << "never see this (because custom) yadda yadda"
+      end
+
       -> st do
-        Common_::Known_Known[ st.gets_one ]
+        x = st.gets_one
+        Common_::Known_Known[ x ]
       end
     end
 
     def execute  # cannot fail
 
-      x = remove_instance_variable :@value_name_pairs
-      _st = if x.respond_to? :gets  # not even covered
-        x  # not even covered
-      else
-        Common_::Stream.via_nonsparse_array x
-      end
+      _x = remove_instance_variable :@value_name_pairs
+
+      _st = Common_::Stream.via_nonsparse_array _x
 
       Home_::Magnetics::TupleStream_via_ValueNameStream[ _st ]
     end

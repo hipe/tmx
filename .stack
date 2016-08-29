@@ -1,10 +1,11 @@
 the big question - slicer
 factor out dir_pathname (!)
-(fix [#ca-xx] => [#co-xx], • in md's)
+insane experment with [sa] - convert every `should eql` to etc and see diff
+no more regret
+(fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`)
 reverse synchronization (or postpone)
 recursive for CLI
 recursive for API
 recursive magnetics
 --
 [ts] permute full stack
-[pe] full stack

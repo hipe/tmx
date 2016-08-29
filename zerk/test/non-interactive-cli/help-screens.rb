@@ -270,7 +270,7 @@ module Skylab::Zerk::TestSupport
     class Section__  # re-opened
 
       def initialize a
-        @_a = a
+        @raw_lines = a
       end
 
       def items
@@ -279,8 +279,8 @@ module Skylab::Zerk::TestSupport
 
       def __recurse
 
-        _st = Common_::Stream.via_range( 1 ... @_a.length ) do |d|
-          @_a.fetch d
+        _st = Common_::Stream.via_range( 1 ... @raw_lines.length ) do |d|
+          @raw_lines.fetch d
         end
 
         Coarse_pass_recurse___[ _st ]
@@ -349,12 +349,12 @@ module Skylab::Zerk::TestSupport
         cache_a = ( @_line_cache ||= [] )
 
         cache = -> d do
-          x = Line___.new @_a.fetch d
+          x = Line___.new @raw_lines.fetch d
           cache_a[ d ] = x
           x
         end
 
-        Common_::Stream.via_times @_a.length do |d|
+        Common_::Stream.via_times @raw_lines.length do |d|
           cache_a[ d ] || cache[ d ]
         end
       end
@@ -362,16 +362,20 @@ module Skylab::Zerk::TestSupport
       # --
 
       def first_string
-        @_a.fetch( 0 ).string
+        @raw_lines.fetch( 0 ).string
       end
 
       def raw_line d
-        @_a.fetch d
+        @raw_lines.fetch d
       end
 
       def line_count
-        @_a.length
+        @raw_lines.length
       end
+
+      attr_reader(
+        :raw_lines,
+      )
     end
 
     # ==

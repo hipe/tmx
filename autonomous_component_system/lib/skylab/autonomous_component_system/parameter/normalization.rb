@@ -86,7 +86,8 @@ module Skylab::Autonomous_Component_System
           f = fo_st.gets
           f or break
 
-          if f.is_singular_counterpart_of_singplur_grouping
+          sym = f.singplur_category_of_association
+          if sym && :singular_of == sym
             # currently we never use the singular side for storage.
             redo
           end

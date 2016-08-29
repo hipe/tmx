@@ -123,7 +123,7 @@ operation-dependencies.
             add it to the arguments array
           (note :B)
         (note :C)
-      otherwise (and it's bespoke)
+      otherwise (and it's bespoke) (then generally, but see figure 1.)
         if it's required
           add it to the arguments array
         otherwise
@@ -239,3 +239,29 @@ be used, emitting a parse error if it is breached.
 _
 
 # (there is a #photo of the whiteboard version of the algorithm)
+
+
+
+
+## :#note-1
+
+for typical use cases we load the stdlib option parser library (`optparse`
+and `::OptionParser`) and we use this module 2x: once to build the o.p and
+once to catch parse error exceptions that are thrown from it. (we don't love
+the use of exceptions as part of the "normal flow" (of handling strange
+option flags; to us that's normal), but that's the way the library was
+designed and we've got to follow it to be idiomatic within the platform.)
+
+if the client provides a custom option parser (however that happens), then
+for now we *still* load the stdlib o.p lib for these reasons:
+
+  - maybe the client's custom o.p implementation will still draw on the
+    stdlib o.p to ask it (for example) how wide to make margins etc in help
+    screens (so loading the library is not wasted in these cases).
+
+  - our code's (sadly necessary) exception-handling spot is pseudo-hard-coded
+    assuming that stdlib o.p exceptions are being thrown, because it is
+    usually they who are.
+
+in order to localize all these assumptions, we use the subject ivar instead
+of a plain old constant reference to the stdlib o.p module.

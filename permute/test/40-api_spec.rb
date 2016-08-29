@@ -4,7 +4,7 @@ module Skylab::Permute::TestSupport
 
   describe "[pe] API" do
 
-    extend TS_
+    TS_[ self ]
 
     Zerk_test_support_[]::API[ self ]
 

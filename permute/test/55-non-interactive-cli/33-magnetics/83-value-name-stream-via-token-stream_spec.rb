@@ -4,7 +4,7 @@ module Skylab::Permute::TestSupport
 
   describe "[pe] non-interactive CLI - magnetics - [magnet #3]" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event
 
@@ -42,7 +42,7 @@ module Skylab::Permute::TestSupport
 
       it "for now, strings everywhere" do
         _ = _this.result
-        _ == [['fg', 'abcde'], ['hi', 'abcde'], ['p', 'jklm']] || fail
+        _ == [['fg', :abcde], ['hi', :abcde], ['p', :jklm]] || fail
       end
     end
 

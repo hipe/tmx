@@ -2,12 +2,21 @@ module Skylab::Autonomous_Component_System
 
   class Singularize___
 
+    # if your [ac] model has a plural assocation (i.e an "argument arity"
+    # that is possibly more than one), then under [ac] (at writing) it is
+    # because that association is actually defined as two associations in
+    # what is described as a `singplur` pair (explained in [#029]).
+    #
+    # part of this arrangement is that if an an argument request specifies
+    # multiple values for this plural field, then each of those values will
+    # be normalized in the expected way "for free" without the model
+    # author having to really think about it. here is where we implement that.
+
     class << self
-      def _call * a
+      def call * a
         new( * a ).execute
       end
-      alias_method :[], :_call
-      alias_method :call, :_call
+      alias_method :[], :call
     end  # >>
 
     def initialize sing_ca, plur_sym, plur_ca, acs
@@ -34,12 +43,24 @@ module Skylab::Autonomous_Component_System
 
     def ___build_value arg_st, & x_p
 
-      _x = arg_st.gets_one
-      a = ::Array.try_convert _x
-      if a
+      x = arg_st.gets_one
+      if ::Array.try_convert x
+        p = __normstream_for_array x
+
+      elsif x.respond_to? :gets
+        p = __normstream_for_nonsparse_stream x
+
+      else
+        self._COVER_ME_not_array_or_stream
+      end
+      __money x_p, p
+    end
+
+    def __money x_p, normstream_p
+
         ok_value_a = []
         ok = true
-        a.each_with_index do | x, d |
+        normstream_p.call do |x, d|
 
           _st = Home_.lib_.fields::Argument_stream_via_value[ x ]
 
@@ -56,14 +77,33 @@ module Skylab::Autonomous_Component_System
             break
           end
         end
+
         if ok
           Common_::Known_Known[ ok_value_a ]
         else
           # assume the callback was called
           ok
         end
-      else
-        self._COVER_ME_not_array
+    end
+
+    def __normstream_for_nonsparse_stream st
+      self._WORKED_ONCE_but_needs_coverage_again  # #todo
+      -> & y do
+        d = -1
+        begin
+          x = st.gets
+          x || break
+          y[ x, ( d+=1 ) ]
+          redo
+        end while nil
+        NIL
+      end
+    end
+
+    def __normstream_for_array a
+      -> & y do
+        a.each_with_index( & y )
+        NIL
       end
     end
   end

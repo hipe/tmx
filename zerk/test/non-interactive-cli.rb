@@ -64,7 +64,7 @@ module Skylab::Zerk::TestSupport
           "expecting <compound-or-operation>: { #{ _s_a_.join ' | ' } }"
       end
 
-      def be_expecting_line_unadorned__
+      def be_line_about_expecting_compound_or_operation
         be_line :styled, :e, 'expecting <compound-or-operation>'
       end
 
@@ -204,6 +204,10 @@ module Skylab::Zerk::TestSupport
       end
 
       def argv * argv  # see DSL tombstone
+        argv_array argv
+      end
+
+      def argv_array argv
 
         using_expect_stdout_stderr_invoke_via_argv argv
 

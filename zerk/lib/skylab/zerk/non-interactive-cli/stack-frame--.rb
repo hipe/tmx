@@ -21,11 +21,11 @@ module Skylab::Zerk
 
       class Root < CompoundFrame__
 
-        def initialize cli, acs
+        def initialize node_map, cli, acs
           @CLI = cli
           @next_frame_ = nil
           @_reader_builder_for_this_frame = cli.produce_reader_for_root_by
-          super acs
+          super acs, node_map
         end
 
         def description_proc_
@@ -71,12 +71,12 @@ module Skylab::Zerk
 
         include NonRoot_Methods__
 
-        def initialize former_top, qk
+        def initialize former_top, qk, node_map
 
           @_association = qk.association
           @next_frame_ = former_top
           @_reader_builder_for_this_frame = nil  # not yet available
-          super qk.value_x
+          super qk.value_x, node_map
         end
 
         def description_proc_
@@ -117,38 +117,66 @@ module Skylab::Zerk
 
           @formal_operation_ = fo
           @next_frame_ = former_top
+          @_custom_op_proc = nil
+          @_to_defined_formal_parameter_stream = :_to_defined_formal_parameter_stream_normally
           @_sns = nil
 
           if map_x
             __process_map map_x
-          else
-            @_to_defined_formal_parameter_stream = :_to_defined_formal_parameter_stream_normally
           end
         end
 
+        # -- exactly "node maps" (#mode-tweaking) in [#003]
+
         def __process_map map_proc
+          oc = OperationCustomization___.new self
+          if map_proc.arity.zero?
+            _node_map = map_proc.call
+            oc.map_these_formal_parameters _node_map
+          else
+            map_proc[ oc ]
+          end
+          NIL
+        end
 
-          map_x = map_proc.call
+        # ~ facilities for processing the above
 
-          st = _to_defined_formal_parameter_stream_normally
-          a = []
-          begin
-            par = st.gets
-            par || break
-            map_proc_ = map_x[ par.name_symbol ]
-            if map_proc_
-              par = map_proc_[ par, self ]
-            end
-            a.push par
-            redo
-          end while nil
+        def __operation_customization_says_use_this_op_proc p
+          @has_custom_option_parser__ = true
+          @_custom_op_proc = p ; nil
+        end
 
-          @__cached_parameters = a
-          @_to_defined_formal_parameter_stream = :__same_via_cached_parameters
+        def __operation_customization_says_parameters_being_mutable_box
+
+          @___did ||= __convert_parameters_to_mutable_box
+          @_mutable_FP_box
+        end
+
+        def __convert_parameters_to_mutable_box
+
+          _st = _to_defined_formal_parameter_stream_normally
+          @_mutable_FP_box = _st.flush_to_box_keyed_to_method :name_symbol
+          @_to_defined_formal_parameter_stream =
+            :__to_defined_formal_parameter_stream_when_mutable_box
+          ACHIEVED_
+        end
+
+        def __to_defined_formal_parameter_stream_when_mutable_box
+          @_mutable_FP_box.to_value_stream
+        end
+
+        attr_reader(
+          :has_custom_option_parser__,
+        )
+
+        # --
+
+        def remove_positional_argument sym  # [pe]
+          operation_syntax_.remove_positional_argument__ sym
         end
 
         def operation_syntax_
-          @___os ||= Here_::Operation_Syntax___.new self
+          @___os ||= Here_::Operation_Syntax___.new( @_custom_op_proc,  self )
         end
 
         def syntax__  # assert-esque is already determined
@@ -159,6 +187,10 @@ module Skylab::Zerk
           send @_to_defined_formal_parameter_stream
         end
 
+        def formal_parameter sym
+          @formal_operation_.formal_parameter sym
+        end
+
         def _to_defined_formal_parameter_stream_normally
 
           # when there's singplur counterparts, don't represent both of them..
@@ -166,8 +198,8 @@ module Skylab::Zerk
           @formal_operation_.to_defined_formal_parameter_stream
         end
 
-        def __same_via_cached_parameters
-          Common_::Stream.via_nonsparse_array @__cached_parameters
+        def __to_defined_formal_parameter_stream_customly
+          Common_::Stream.via_nonsparse_array @_custom_parameters
         end
 
         def has_stated_parameters__
@@ -221,9 +253,10 @@ module Skylab::Zerk
 
       class CompoundFrame__
 
-        def initialize acs
+        def initialize acs, node_map
           @ACS = acs
           @_did_big_index = false
+          @_node_map = node_map
           @_sns = nil
         end
 
@@ -271,14 +304,10 @@ module Skylab::Zerk
         def lookup_and_attach_frame__ token, set_sym, & oes_p
           fn = Lookup__.new( token, set_sym, self, & oes_p ).execute
           if fn
-            send ATTACH_FOR___.fetch( fn.formal_node_category ), fn, NOTHING_
+            send ATTACH_FOR___.fetch( fn.formal_node_category ), fn
           else
             fn
           end
-        end
-
-        def lookup_formal_node__ token, set_sym, & oes_p
-          Lookup__.new( token, set_sym, self, & oes_p ).execute
         end
 
         ATTACH_FOR___ = {
@@ -286,7 +315,11 @@ module Skylab::Zerk
           formal_operation: :attach_operation_frame_via_formal_operation_,
         }
 
-        def __attach_frame_via_association asc, _
+        def lookup_formal_node__ token, set_sym, & oes_p
+          Lookup__.new( token, set_sym, self, & oes_p ).execute
+        end
+
+        def __attach_frame_via_association asc
           _m = ATTACH_ASC_FOR___.fetch asc.model_classifications.category_symbol
           send _m, asc
         end
@@ -295,13 +328,28 @@ module Skylab::Zerk
           compound: :attach_compound_frame_via_association_,
         }
 
-        def attach_operation_frame_via_formal_operation_ fo, map_x
-          Operation___.new self, fo, map_x
+        def attach_operation_frame_via_formal_operation_ fo
+
+          # will move
+          p = @_node_map
+          if p
+            _node_map = p[ fo.name_symbol ]
+          end
+
+          Operation___.new self, fo, _node_map
         end
 
         def attach_compound_frame_via_association_ asc
+
           _qk = qualified_knownness_of_touched_via_association_ asc
-          NonRootCompound___.new self, _qk
+
+          p = @_node_map
+          if p
+            self._COVER_ME_never_carried_a_node_map_deeper_than_one_level
+            _node_map = p[ asc.name_symbol ]
+          end
+
+          NonRootCompound___.new self, _qk, _node_map
         end
 
         def qualified_knownness_of_touched_via_association_ asc
@@ -682,6 +730,58 @@ module Skylab::Zerk
           else
             fo_p
           end
+        end
+      end
+
+      # ==
+
+      class OperationCustomization___  # #stowaway
+
+        def initialize fr
+          @_frame = fr
+        end
+
+        def custom_option_parser_by & p
+          @_frame.__operation_customization_says_use_this_op_proc p ; nil
+        end
+
+        def map_these_formal_parameters read
+
+          # (currently #public-API but only called from here for now.)
+
+          # `read` is a reader: must respond to `[]`, typically hash or proc.
+          #
+          # for each existing formal parameter, the reader is passed its name
+          # symbol. what happens next will amaze you. with the result:
+          #
+          #   - if the result is `false`, this means remove the parameter
+          #     (not yet implemented, just the idea. should be easy.)
+          #
+          #   - if the result is `nil`, do nothing (the parameter remains as-is)
+          #
+          #   - otherwise (and the result is true) yadda
+
+          bx = @_frame.__operation_customization_says_parameters_being_mutable_box
+
+          remove_these = nil
+
+          bx.each_name do |k|
+            x = read[ k ]
+            x.nil? && next
+            if x
+              _par_ = x[ bx[ k ], @_frame ]
+              _par_ || self._COVER_ME_this_is_not_the_way_to_remove_parameters  # #todo
+              bx.replace k, _par_
+            else
+              ( remove_these ||= [] ).push k
+            end
+          end
+
+          if remove_these
+            # note we MUST do this after NOT DURING traversal of the box!
+            self._FUN_AND_EASY_all_you_need_to_do_is_cover_it_and_box_remove
+          end
+          NIL
         end
       end
 

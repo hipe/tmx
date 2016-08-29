@@ -65,9 +65,10 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    it "permute", wip: true do
+    it "permute" do
       _against 'permute', _ARG
-      _expect_common
+      _expect_common_start
+      @exitstatus.zero? || fail
     end
 
     it "quickie", wip: true do
@@ -134,7 +135,6 @@ module Skylab::TMX::TestSupport
       NIL_
     end
 
-    _DASH = '-'
     _SPACE = ' '
     _UNDERSCORE = '_'
 
@@ -154,7 +154,7 @@ module Skylab::TMX::TestSupport
     define_method :_expect_common_start do
 
       @_slug ||= @_argv.fetch( -2 )
-      @_s_a = @_slug.split _DASH
+      @_s_a = @_slug.split Home_::DASH_
 
       expect :e, "hello from #{ @_s_a.join _SPACE }."
 

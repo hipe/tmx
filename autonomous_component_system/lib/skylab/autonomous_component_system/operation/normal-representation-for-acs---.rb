@@ -200,6 +200,21 @@ module Skylab::Autonomous_Component_System
           otr
         end
 
+        # --
+
+        def dup_by  # [ze]
+          otr = dup
+          yield otr
+          otr
+        end
+
+        attr_writer(  # only for above
+          :argument_arity,
+          :parameter_arity,
+        )
+
+        # --
+
         def description_proc  # wild ride..
 
           if @_has
@@ -238,22 +253,8 @@ module Skylab::Autonomous_Component_System
 
         # see #note-1 and #note-2 in [#026]
 
-        def is_singular_counterpart_of_singplur_grouping
-          sym = _defined_association.singplur_category
-          if sym
-            :singular_of == sym
-          else
-            false
-          end
-        end
-
-        def is_singular_counterpart_or_not_in_singplur_grouping
-          sym = _defined_association.singplur_category
-          if sym
-            :singular_of == sym
-          else
-            true
-          end
+        def singplur_category_of_association
+          _defined_association.singplur_category
         end
 
         def _defined_association

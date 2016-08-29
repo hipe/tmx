@@ -106,7 +106,9 @@ module Skylab::Zerk
 
       _acs = _p.call  # #cold-model
 
-      @_top = Here_::Stack_Frame__::Root.new self, _acs
+      _node_map = remove_instance_variable :@node_map
+
+      @_top = Here_::Stack_Frame__::Root.new _node_map, self, _acs
 
       self
     end
@@ -260,13 +262,7 @@ module Skylab::Zerk
 
     def __parse_found_operation fo
 
-      p = @node_map  # #experimental - will probably move
-      if p
-        @node_map = nil
-        map_x = p[ fo.name_symbol ]
-      end
-
-      fo_frame = @_top.attach_operation_frame_via_formal_operation_ fo, map_x
+      fo_frame = @_top.attach_operation_frame_via_formal_operation_ fo
 
       @_fo_frame = fo_frame  # redundant ivar w/ below for sanity
       @_operation_syntax = fo_frame.operation_syntax_
@@ -288,7 +284,11 @@ module Skylab::Zerk
       # if the argument stream is empty, avoid the heavy lift of building o.p
 
       if @_arg_st.no_unparsed_exists  # then is empty
-        KEEP_PARSING_
+        if @_fo_frame.has_custom_option_parser__  # EXPERIMENTAL (for [pe])
+          ___parse_opts
+        else
+          KEEP_PARSING_
+        end
       else
         ___parse_opts
       end
@@ -299,8 +299,21 @@ module Skylab::Zerk
       @_operation_syntax.parse_options _ARGS_AS_ARGV, self, & _parse_pp
     end
 
-    def when_via_option_parser_parse_error__ e  # t8
-      _done_because e.message, :option
+    def when_via_option_parser_parse_error__ x  # t8
+
+      # ([pe] is frontiering custom option parsers with myriad ways to fail)
+
+      if x.respond_to? :message  # exception
+        _done_because x.message, :option
+
+      elsif x.respond_to? :to_event  # event
+        x.express_into_under line_yielder, expression_agent
+        _done_because :option
+
+      else  # assume expression
+        expression_agent.calculate line_yielder, & x
+        _done_because :option
+      end
     end
 
     def when_via_option_parser_component_rejected_request__
@@ -738,6 +751,7 @@ module Skylab::Zerk
       :filesystem_proc,  # courtesy only
       :location_module,
       :operation_usage_string,
+      :serr,  # [ts]
       :sout,
       :system_conduit,
     )

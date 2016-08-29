@@ -30,7 +30,7 @@ module Skylab::Zerk::TestSupport
         end
 
         it "expecting" do
-          first_line.should be_expecting_line_unadorned__
+          first_line.should be_line_about_expecting_compound_or_operation
         end
 
         it "usage" do

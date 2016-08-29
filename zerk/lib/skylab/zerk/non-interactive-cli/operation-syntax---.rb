@@ -16,8 +16,9 @@ module Skylab::Zerk
 
       # #during #milestone-9 all these sanity checks..
 
-      def initialize fo_frame
+      def initialize etc_p, fo_frame
 
+        @__custom_OP_proc = etc_p
         @_determine_APC = true  # not all syntaxes will have these
         @_fo_frame = fo_frame
         @_init_OI = true
@@ -37,11 +38,29 @@ module Skylab::Zerk
       def _init_OPC
         @_init_OPC = false
         @_init_OI && _init_OI
-        @_OPC = Here_::Option_Parser_Controller.new @_operation_index
+        _p = remove_instance_variable :@__custom_OP_proc
+        @_OPC = Here_::OptionParserController.new _p, @_operation_index
         NIL_
       end
 
       # --
+
+      def remove_positional_argument__ sym
+
+        @_determine_APC && _determine_APC
+        a = @_APC.attributes_array__
+        d = a.index do |par|
+          par.name_symbol == sym
+        end
+        x = a.fetch d
+        a[ d, 1 ] = EMPTY_A_
+        if a.length.zero?
+          @_has_APC = false
+          remove_instance_variable :@_APC
+          # eek! but it's what we want
+        end
+        x
+      end
 
       def any_argument_attributes_array__  # only for help (the usage line)
 

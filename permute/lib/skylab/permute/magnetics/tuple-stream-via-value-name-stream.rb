@@ -20,6 +20,8 @@ module Skylab::Permute
       end
     end
 
+    alias_method :[], :call
+
     def __via_nonempty_box bx
 
       categories = bx.to_pair_stream.to_a ; bx = nil
@@ -58,8 +60,6 @@ module Skylab::Permute
         recurse[ st, 1 ]
       end
     end
-
-    alias_method :[], :call
 
     # --
 

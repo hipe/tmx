@@ -59,7 +59,11 @@ module Skylab::Zerk
         x = st.gets
         if x
           @x = x
-          _determine_strategy
+          if x.respond_to? :members
+            st = __special_thing_for_stream_of_structs st
+          else
+            _determine_strategy
+          end
           begin
             _act
             @x = st.gets
@@ -70,6 +74,22 @@ module Skylab::Zerk
           self._COVER_ME_empty_list
         end
         NIL_
+      end
+
+      def __special_thing_for_stream_of_structs st  # result in stream
+
+        @shape = :stringish
+        o = Here_::TuplePager.begin
+        o.first_tuple = @x
+        o.tuple_stream = st
+
+        # you could style it but meh for now
+        o.page_size = 14  # low for now to catch issues
+        # (about halfway down my screen when it's zoomed in.)
+
+        st = o.execute
+        @x = st.gets  # eek
+        st
       end
 
       def _determine_strategy

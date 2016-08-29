@@ -2,7 +2,12 @@
 
 require 'skylab/permute'
 
-_x = Skylab::Permute::CLI.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+_cli = Skylab::Permute::CLI.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ] )
 
-$stderr.puts "(exitstatus: #{ _x })"
+d = _cli.invoke ARGV
+
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit d

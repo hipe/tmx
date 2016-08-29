@@ -4,7 +4,7 @@ module Skylab::Permute::TestSupport
 
   describe "[pe] non-interactive CLI - magnetics - [magnet #2]" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event
 

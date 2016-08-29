@@ -97,9 +97,11 @@ module Skylab::Permute
 
         a = []
         @_bx.each_value do |cat|
-          name_s = cat.name_string
+
+          name_sym = cat.name_string.intern  # to produce a struct, need symbols
+
           cat.string_array.each do |val_s|
-            a.push [ val_s, name_s ]
+            a.push [ val_s, name_sym ]
           end
         end
         a

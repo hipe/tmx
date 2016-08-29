@@ -106,7 +106,7 @@ we'll make some suggestions here):
 
     but this is an interface design decision that is not up to [ac].
 
-    (nontheless, to support this we have a special method at :#note-2)
+    (:#Note-2)
 
   - as for iCLI and GUI's in general
 

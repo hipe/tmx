@@ -3,23 +3,27 @@ require 'skylab/test_support'
 
 module Skylab::Permute::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
-
-    def use sym
+  # -
+    Use_method___ = -> sym do
       s = sym.id2name
       s[ 0 ] = s[ 0 ].upcase
       Use__.const_get( s, false )[ self ]
-      NIL_
+      NIL
     end
-  end
+  # -
 
-  module InstanceMethods
+  module InstanceMethods___
 
     attr_reader :do_debug
 
@@ -99,7 +103,10 @@ module Skylab::Permute::TestSupport
 
   # --
 
+  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+
   EMPTY_S_ = ''
   NIL_ = nil
+  TS_ = self
 end
 # :+#tombstone: was [#ts-010] dark hack "one weird old tr.."

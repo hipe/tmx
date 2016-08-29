@@ -187,6 +187,10 @@ module Skylab::Autonomous_Component_System
         @_normal_representation.begin_parameter_store_( & call_handler )
       end
 
+      def formal_parameter sym  # [pe]
+        @_normal_representation.__formal_parameter sym
+      end
+
       def has_defined_formal_parameters
         @_normal_representation.__has_defined_formal_parameters
       end
@@ -252,6 +256,14 @@ module Skylab::Autonomous_Component_System
       def begin_preparation_ & call_handler
 
         self.class::Preparation.new self, @formal_.selection_stack, & call_handler
+      end
+
+      def __formal_parameter sym
+        a = _DFP_a
+        d = a.index do |par|
+          sym == par.name_symbol
+        end
+        a.fetch d
       end
 
       def to_defined_formal_parameter_stream_cached_

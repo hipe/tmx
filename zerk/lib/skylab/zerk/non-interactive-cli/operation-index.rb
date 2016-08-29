@@ -28,7 +28,7 @@ module Skylab::Zerk
 
         Require_fields_lib_[]
 
-        @__fo_frame = fo_frame
+        @stack_frame_ = fo_frame
         @_si = Here_::Scope_Index.new fo_frame
         @_primitivesque_appropriation_op_box = @_si.release_POOB__
         ___index_stateds
@@ -50,7 +50,7 @@ module Skylab::Zerk
         @_scope_node_ticket = nil
 
         h = @_si.hash_for_scope_node_identifier_via_name_symbol__
-        st = @__fo_frame.to_defined_formal_parameter_stream__
+        st = @stack_frame_.to_defined_formal_parameter_stream__
 
         begin
           @_parameter = st.gets
@@ -80,29 +80,60 @@ module Skylab::Zerk
         NIL_
       end
 
+      # -- is exactly [#015] figure 1. flowchart for expression of para..
+
       def __when_bespoke
 
         @_my_set_symbol_via_name_symbol[ @_k ] = :_bespoke_
 
-        if @_parameter.is_singular_counterpart_or_not_in_singplur_grouping
-
-          if Field_::Is_required[ @_parameter ]
-
-            if Field_::Can_be_more_than_one[ @_parameter.argument_arity ]
-              self._K
-            else
-              ( @_arguments ||= [] ).push @_parameter
-            end
-          else
-            ( @_bespokes_to_add_to_op ||= [] ).push @_parameter
+        sym = @_parameter.singplur_category_of_association
+        if sym
+          if :singular_of == sym
+            __when_the_singular_bespoke
           end
+        else
+          __when_nonsingplur_bespoke
         end
-        NIL_
+        NIL
+      end
+
+      def __when_the_singular_bespoke
+
+        if Field_::Is_required[ @_parameter ]
+          if @_did_one_glob
+            # (it would be nice if help screen screen explained the
+            # requiredness and the plurality of this parameter)
+            _add_this_bespoke_to_the_op
+          else
+            _occupy_the_glob_slot
+          end
+        else
+          # (it would be nice if help screen explained the plurality of this)
+          _add_this_bespoke_to_the_op
+        end
+        NIL
+      end
+
+      def __when_nonsingplur_bespoke
+
+        if Field_::Is_required[ @_parameter ]
+          Field_::Can_be_more_than_one[ @_parameter.argument_arity ] && self._SANITY_see_flowchart  # #todo
+          ( @_arguments ||= [] ).push @_parameter
+        else
+          _add_this_bespoke_to_the_op
+        end
+        NIL
+      end
+
+      def _add_this_bespoke_to_the_op
+        ( @_bespokes_to_add_to_op ||= [] ).push @_parameter ; nil
       end
 
       def __release_bespokes_to_add_to_op
         remove_instance_variable :@_bespokes_to_add_to_op
       end
+
+      # --
 
       def __when_appropriation
 
@@ -171,16 +202,22 @@ module Skylab::Zerk
         nil => :__maybe_reindex_appropriated_as_argument,
       }
 
+      def __maybe_reindex_appropriated_as_argument
+
+        @_primitivesque_appropriation_op_box.remove @_k  # :#spot-3
+        _reindex_appropriated_as_argument
+      end
+
       def __maybe_reindex_plurof_as_argument
 
         if @_did_one_glob
           self._K
         else
-          ___do_reindex_plurof_as_argument
+          _occupy_the_glob_slot
         end
       end
 
-      def ___do_reindex_plurof_as_argument
+      def _occupy_the_glob_slot
 
         # express a singplur pair as a "glob"-type trailing formal argument.
         # use variously the singular AND plural surface form based on what
@@ -193,42 +230,50 @@ module Skylab::Zerk
         #     use the plural (`paths`)
         #
         #   • when writing to an ivar use the plural `@paths`
+        #
+        # (the above is now explained in further depth in [#ac-026])
 
         @_did_one_glob = true
 
-        asc = @_asc
+        if @_scope_node_identifier  # then appropriated
+          __occupy_the_glob_slot_when_appropriated
+        else
+          __occupy_the_glob_slot_when_bespoke
+        end
+        NIL
+      end
 
+      def __occupy_the_glob_slot_when_appropriated
+
+        asc = @_asc
         plur_sym = asc.name_symbol
         sing_sym = asc.singplur_referent_symbol
+        asc = nil
 
         _d = @_si.scope_node_identifier_via_node_name_symbol__ sing_sym
         mixed_name = @_si.scope_node_( _d ).name
 
-        @_parameter = @_parameter.dup_by do
+        @_parameter = @_parameter.dup_by do |o|
 
-          plur_sym == @name_symbol or self._SANITY
+          plur_sym == o.name_symbol or self._SANITY  # #todo
 
-          self.name = mixed_name
+          o.name = mixed_name
 
-          if :one == @argument_arity
-            @argument_arity = :one_or_more
+          sym = o.argument_arity
+
+          if :one == sym
+            o.argument_arity = :one_or_more
           else
-            :zero_or_more == @argument_arity or self._COVER_ME
+            :zero_or_more == sym || self._COVER_ME  # #todo
           end
         end
 
         @_primitivesque_appropriation_op_box.remove sing_sym
 
-        _reindex_as_argument
+        _reindex_appropriated_as_argument
       end
 
-      def __maybe_reindex_appropriated_as_argument
-
-        @_primitivesque_appropriation_op_box.remove @_k  # :#spot-3
-        _reindex_as_argument
-      end
-
-      def _reindex_as_argument
+      def _reindex_appropriated_as_argument
 
         _d = ( @_arguments ||= [] ).length
 
@@ -236,6 +281,22 @@ module Skylab::Zerk
           @_scope_node_identifier
 
         @_arguments.push @_parameter ; nil
+      end
+
+      def __occupy_the_glob_slot_when_bespoke
+
+        # a bespoke that is taking the glob spot must be the singular of
+        # a singplur pair. for aesthetics we want the singular moniker to
+        # appear (`<file> [<file> [..]]` not `<files> [<files> [..]]`).
+        # also, per [#ac-026] the singular has most of the definition in it
+        # (i.e description) so that's the one we want. but to get it to show
+        # the ellipsis:
+
+        @_parameter = @_parameter.dup_by do |o|
+          o.argument_arity = :one_or_more
+        end
+        ( @_arguments ||= [] ).push @_parameter
+        NIL
       end
 
       # -- readers
@@ -326,6 +387,7 @@ module Skylab::Zerk
 
       attr_reader(
         :node_ticket_index_via_argument_index__,
+        :stack_frame_,
       )
 
       # ==
@@ -374,6 +436,8 @@ module Skylab::Zerk
           @_si
         end
       end
+
+      # ==
     end
   end
 end

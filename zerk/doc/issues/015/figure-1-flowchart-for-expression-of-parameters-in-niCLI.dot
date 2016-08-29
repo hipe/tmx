@@ -1,0 +1,80 @@
+digraph g {
+
+label = "
+document 15 figure 1. flowchart for the expression of parameters in niCLI -
+the decision tree for what parameters become arguments is intricate because
+there are constraints on positional arguments as well as the constraints
+expressed by the component definitions (near the \"glob slot\")."
+
+state_start [shape=rectangle label="start"]
+
+state_start->q0_1
+
+q0_1 [shape=diamond label="singplur?"]
+q0_1->q1_2 [label="yes"]
+q0_1->q2_1 [label="no"]
+
+
+
+
+/* cluster 1 - yes singplur */
+
+q1_2 [shape=diamond label="which\none?"]
+
+q1_2->q1_3 [label="singular"]
+q1_2->state1_4 [label="plural"]
+
+state1_4 [shape=rectangle label="ignored\n(sort of)"]
+
+q1_3 [shape=diamond label="required?"]
+
+q1_3->comment1_1 [shape=diamond label="no"]
+q1_3->q1_4 [shape=diamond label="yes"]
+
+comment1_1 [shape=rectangle label="(it would be nice if the
+help screen expained the
+plurality of this option)"]
+
+comment1_1->state3_1
+
+q1_4 [shape=diamond label="is the\nglob spot\nopen?"]
+q1_4->comment1_2 [shape=diamond label="no"]
+q1_4->state1_5 [shape=diamond label="yes"]
+
+state1_5 [shape=rectangle style=filled fillcolor=grey label="it becomes
+THE (positional)
+glob argument"]
+
+comment1_2 [shape=rectangle label="(it would be nice if the
+help screen expained the
+required-ness of this \"option\")"]
+
+comment1_2->comment1_1
+
+
+
+
+/* cluster 2 - not singplur */
+
+q2_1 [shape=diamond label="required?"]
+
+q2_1->state3_1 [label="no"]
+q2_1->q2_2 [label="yes"]
+
+q2_2 [shape=diamond label="can\nbe more\nthan\none?"]
+
+q2_2->state2_1 [label="yes"]
+state2_1 [shape=rectangle label="ERROR - why didn't this\nget caught by `singplur`?"]
+
+q2_2->state3_2 [label="no"]
+
+
+
+
+/* cluster 3 - common */
+
+state3_1 [shape=rectangle style=filled fillcolor=grey label="option"]
+
+state3_2 [shape=rectangle style=filled fillcolor=grey label="(positional) non-\nglob argument"]
+
+}
