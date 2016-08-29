@@ -2,7 +2,7 @@ module Skylab::Permute
 
   Magnetics = ::Module.new
 
-  module Magnetics::TupleStream_via_PairStream ; class << self
+  module Magnetics::TupleStream_via_ValueNameStream ; class << self
 
     # this is the core function behind our core operation.
     # recursively it makes streams out of the categories and their values.

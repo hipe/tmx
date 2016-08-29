@@ -59,6 +59,10 @@ module Skylab::TaskExamples::TestSupport
       _x = state_.result
       false == _x or fail
     end
+
+    def state_for_expect_event
+      state_
+    end
   end
 
   State___ = ::Struct.new :result, :emission_array, :task

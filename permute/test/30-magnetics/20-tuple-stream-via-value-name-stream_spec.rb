@@ -69,7 +69,7 @@ module Skylab::Permute::TestSupport
 
       _st = Common_::Stream.via_nonsparse_array pairs
 
-      _st_ = Home_::Magnetics::TupleStream_via_PairStream[ _st ]
+      _st_ = Home_::Magnetics::TupleStream_via_ValueNameStream[ _st ]
 
       _st_.map_by do |sct|
         sct.values

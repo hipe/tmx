@@ -23,7 +23,7 @@ module Skylab::Basic
 
         def __state__component_association
           yield :can, :add
-          State_
+          Here_
         end
 
         def __add__component qk, & _x_p
@@ -36,19 +36,31 @@ module Skylab::Basic
           end
         end
 
-        def build_state_machine
+        def flush_to_state_machine
+          bx = remove_instance_variable :@_bx
+          bx.freeze
+          Here_::Machine.new bx
+        end
 
-          bx = @_bx
-          @_bx = nil
-          Machine___.new bx.freeze
+        def flush_to_grammar
+          bx = remove_instance_variable :@_bx
+          bx.freeze
+          Grammar___.new bx
         end
       end
-
-      Machine___ = self
     end
 
-    State_ = self
-    class State_
+    class Grammar___
+      def initialize bx
+        @_bx = bx
+      end
+      def build_state_machine
+        Here_::Machine.new @_bx
+      end
+    end
+
+    Here_ = self
+    class Here_
 
       class << self
         def [] st
@@ -451,7 +463,7 @@ module Skylab::Basic
           had_more = false
         end
 
-        State_::Events_::No_Available_State_Transition.new_with(
+        Here_::Events_::No_Available_State_Transition.new_with(
           :x, x,
           :had_more, had_more,
           :possible_state_array, sta_a,

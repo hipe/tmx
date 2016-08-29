@@ -1,5 +1,7 @@
 module Skylab::Permute
 
+  module CLI
+  if false
   class CLI < Home_.lib_.brazen::CLI
 
     Actions = ::Module.new
@@ -89,5 +91,7 @@ module Skylab::Permute
     Autoloader_[ Actors_ = ::Module.new ]
     EMPTY_A_ = [].freeze
     Autoloader_[ Sessions_ = ::Module.new ]
+  end
+  end
   end
 end

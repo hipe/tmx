@@ -79,6 +79,10 @@ module Skylab::Fields::TestSupport
     def common_expression_agent_
       Home_.lib_.brazen::API.expression_agent_instance
     end
+
+    def state_for_expect_event
+      state_
+    end
   end
 
   Build_next_integer_generator_starting_after = -> d do

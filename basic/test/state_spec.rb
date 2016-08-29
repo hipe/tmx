@@ -92,7 +92,7 @@ module Skylab::Basic::TestSupport
           NIL_  # you must declare that you have no next state
         end
 
-      _SM = o.build_state_machine
+      _SM = o.flush_to_state_machine
 
     end
 

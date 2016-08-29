@@ -1,8 +1,8 @@
 module Skylab::Permute
 
-  class CLI
+  module CLI
 
-    Actors_::Build_state_machine = -> do
+    Magnetics_::Tokenizer = Lazy_.call do
 
       _LONG_RX___ = /\A
         --
@@ -84,7 +84,7 @@ module Skylab::Permute
           NIL_  # you must declare that you have no next state
         end
 
-      o.build_state_machine
+      o.flush_to_grammar
     end
   end
 end

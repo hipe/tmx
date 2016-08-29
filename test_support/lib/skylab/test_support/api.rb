@@ -44,7 +44,7 @@ module Skylab::TestSupport
       def __file_coverage__component_operation( & yielder )
 
         @___fc_ACS ||= Home_::FileCoverage::Root_Autonomous_Component_System.
-          by_filesystem( & @_filesystem_proc )
+          via_filesystem_by( & @_filesystem_proc )
 
         @___fc_ACS.__file_coverage__component_operation( & yielder )
       end

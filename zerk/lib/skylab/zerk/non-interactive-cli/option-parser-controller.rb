@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class NonInteractiveCLI
 
-    class Option_Parser_Controller___  # see [#015]
+    class Option_Parser_Controller  # see [#015]
 
       # implement exactly the :#"algorithm".
       #

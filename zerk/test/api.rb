@@ -141,7 +141,7 @@ module Skylab::Zerk::TestSupport
 
       # -- hook-outs/ins
 
-      def state_  # for expect event
+      def state_for_expect_event
         root_ACS_state
       end
 

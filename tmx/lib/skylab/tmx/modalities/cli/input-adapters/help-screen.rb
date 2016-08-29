@@ -240,7 +240,7 @@ module Skylab::TMX
         end,
       )
 
-      o.build_state_machine
+      o.flush_to_state_machine
     end
 
     def lines_by & receive_proxy

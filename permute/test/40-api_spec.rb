@@ -6,7 +6,7 @@ module Skylab::Permute::TestSupport
 
     extend TS_
 
-    Zerk_lib_[].test_support::API[ self ]
+    Zerk_test_support_[]::API[ self ]
 
     it "ping (as one inline test)" do
 

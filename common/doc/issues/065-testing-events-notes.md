@@ -110,4 +110,33 @@ look for ways to integrate it with 'expect-event'. as it is, it is
 so minimal that we have left it separate. but since its inception
 we have overhauled "expect event" so it is now fresher than this.
 (and there is certainly conceptual redundancy between the two.)
-_
+
+
+
+
+## :#note-4 - about the newschool reification of expression emissions
+
+the earliest incarnation of this library had a bias towards events
+over emissions. as such the old way was that when an emission was
+encountered, it was "upgraded" to look like an event for the
+purposes of testing. for better or worse, we're preserving that
+behavior for back-compatibility for now.
+
+the "new way" is that emissions are simply flushed into lines
+use some expression agent, and it is those lines (not a pseudo-
+event) that get passed to our little assertion block.
+
+this way feels more ergonomic to write tests for, but keep in mind
+these tradeoffs: 1) reifying the emission in this way means that
+other tests that test over the emission cannot reify it another way.
+(in practice this is never a problem - emissions are really just lines
+waiting to be rendered, so when you test them you are usually just
+testing over the produced lines and nothing else; even if testing occurs
+on one emission across different tests.)
+
+relatedly, the particular expression agent used here will leave its mark
+on the baked-in lines. 2) your test code will now have the added
+fragility of assuming this shape for this event. also probably not that
+big a deal in practice, when we consider how frequently it is that we
+convert an emission from one shape to another (rarely) times how many
+tests per emission we usually have (few).

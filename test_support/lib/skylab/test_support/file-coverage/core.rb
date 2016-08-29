@@ -26,7 +26,7 @@ module Skylab::TestSupport
       end
 
       def __build_root_ACS
-        Root_Autonomous_Component_System.by_filesystem do
+        Root_Autonomous_Component_System.via_filesystem_by do
           Home_.lib_.system.filesystem
         end
       end
@@ -35,7 +35,7 @@ module Skylab::TestSupport
     class Root_Autonomous_Component_System
 
       class << self
-        def by_filesystem & p
+        def via_filesystem_by & p
           new p
         end
         private :new

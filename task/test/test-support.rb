@@ -107,6 +107,10 @@ module Skylab::Task::TestSupport
     def exception_message_
       state_.message
     end
+
+    def state_for_expect_event
+      state_
+    end
   end
 
   # -- these

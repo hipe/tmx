@@ -131,29 +131,35 @@ module Skylab::Common::TestSupport
         def expect_emission * sym_a, & exp_y_p
 
           # (written to accomodate the "expression" shape of event)
+          # (experimentally now a hybrid of oldschool/newschool
+
+          if instance_variable_defined? :@event_log
+            __expect_emission_oldschool exp_y_p, sym_a
+          else
+            _em = only_emission
+            _do_expect_emission _em, exp_y_p, sym_a
+          end
+        end
+
+        def __expect_emission_oldschool exp_y_p, sym_a
 
           _next_actual_expev_emission do |em|
 
-            if em.channel_symbol_array != sym_a
-              sym_a.should eql em.channel_symbol_array
-              return
-            end
+            _do_expect_emission em, exp_y_p, sym_a
+          end
+        end
 
-            if Looks_like_expression__[ sym_a ]
+        def _do_expect_emission em, p, sym_a
 
-              em.reify_by do |act_y_p|
-                _expag = _expev_upper_level_expression_agent
-                _expag.calculate [], & act_y_p
+          if em.channel_symbol_array == sym_a
+            if p
+              if em._needs_reification
+                __reify_emission_the_new_way em
               end
-
-              if block_given?
-                _actual_lines = em.cached_event_value
-                exp_y_p[ _actual_lines ]
-              end
-            else
-              Expect_Event.__DESIGN_ME
+              p[ em.cached_event_value ]
             end
-            NIL
+          else
+            em.channel_symbol_array.should eql sym_a
           end
         end
 
@@ -233,10 +239,8 @@ module Skylab::Common::TestSupport
       def flush_event_log_and_result_to_state x
 
         _a = remove_instance_variable( :@event_log ).flush_to_array
-        Common_State___.new x, _a
+        State.new x, _a
       end
-
-      Common_State___ = ::Struct.new :result, :emission_array
 
       # -- log-based event testing
 
@@ -322,7 +326,6 @@ module Skylab::Common::TestSupport
       end
 
       def _gets_expev_emission  # a compound assumption.. (#note-B)
-
         @event_log.gets
       end
 
@@ -390,8 +393,21 @@ module Skylab::Common::TestSupport
 
       # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
+      def fails
+        _state = state_for_expect_event
+        _state.result == false || fail( "did not fail" )
+      end
+
+      def result_is_nothing
+        state = state_for_expect_event
+        state.result.nil? || fail( "needed nil had #{ String_via_mixed__[ state.result ] }" )
+      end
+
       def expect_no_emissions
-        emission_count.should be_zero
+        a = emission_array
+        if a
+          a.length.zero? || fail
+        end
       end
 
       def emission_count
@@ -422,7 +438,7 @@ module Skylab::Common::TestSupport
       end
 
       def emission_array
-        state_.emission_array
+        state_for_expect_event.emission_array
       end
 
       def be_emission_beginning_with * x_a, & x_p
@@ -474,6 +490,20 @@ module Skylab::Common::TestSupport
 
       # -- internal support
 
+      def __reify_emission_the_new_way em  # assume emission is not reified.
+
+        # there is a weirdly long discussion of this in the doc at #note-4.
+
+        if Looks_like_expression__[ em.channel_symbol_array ]
+          em.reify_by do |act_y_p|
+            _expag = _expev_upper_level_expression_agent
+            _expag.calculate [], & act_y_p
+          end
+        else
+          em._reify_when_event
+        end
+      end
+
       def __expev_expag_for_reification
         _expev_lower_level_expression_agent
       end
@@ -518,7 +548,7 @@ module Skylab::Common::TestSupport
       end )
     end
 
-    # -
+    # ==
 
     class Emission_Matcher___
 
@@ -643,12 +673,10 @@ module Skylab::Common::TestSupport
 
       def ___say_detailed_explanation_about_channel_mismatch bad_d, act, exp
 
-        ba = Basic_
+        _ord = Basic_::Number::EN.num2ord bad_d + 1
 
-        _ord = ba::Number::EN.num2ord bad_d + 1
-
-        _had_x = ba::String.via_mixed act[ bad_d ]  # any
-        _need_x = ba::String.via_mixed exp[ bad_d ]  # any
+        _had_x = String_via_mixed__[ act[ bad_d ] ]  # any
+        _need_x = String_via_mixed__[ exp[ bad_d ] ]  # any
 
         _had = act.inspect
 
@@ -781,6 +809,8 @@ module Skylab::Common::TestSupport
       end
     end
 
+    # ==
+
     class Expectation__
 
       def initialize & def_p
@@ -860,6 +890,8 @@ module Skylab::Common::TestSupport
         :alternate_user_proc,
       )
     end
+
+    # ==
 
     class Event_Log  # [ta]
 
@@ -1075,6 +1107,8 @@ module Skylab::Common::TestSupport
       end
     end
 
+    # ==
+
     class Emission___  # :[#045]. (has mentees)
 
       def initialize event_proc, channel_symbol_array
@@ -1086,39 +1120,47 @@ module Skylab::Common::TestSupport
 
       def cached_event_value
         if @_needs_reification
-          ___reify
+          __reify
           @_needs_reification = false
         end
         @_x
       end
 
       def reify_by & do_this
-
         _p = remove_instance_variable :@_x_p
-
         @_needs_reification = false
-
         @_x = do_this[ _p ]
-
         NIL_
       end
 
-      def ___reify
+      def __reify
 
-        p = remove_instance_variable :@_x_p
-
-        @_x = if Looks_like_expression__[ @channel_symbol_array ]
-          Expression_as_Event___.new( p, @channel_symbol_array.last )
+        if Looks_like_expression__[ @channel_symbol_array ]
+          _p = remove_instance_variable :@_x_p
+          @_x = Expression_as_Event___.new _p, @channel_symbol_array.last
         else
-          p[]
+          __do_reify_when_event
         end
-        NIL_
+        NIL
+      end
+
+      def _reify_when_event
+        __do_reify_when_event
+        @_needs_reification = false
+      end
+
+      def __do_reify_when_event
+        @_x = remove_instance_variable( :@_x_p ).call
+        NIL
       end
 
       attr_reader(
         :channel_symbol_array,
+        :_needs_reification,
       )
     end
+
+    # ==
 
     class Expression_as_Event___
 
@@ -1154,11 +1196,17 @@ module Skylab::Common::TestSupport
     end
 
     Say_not_trilean__ = -> act_x do
-      Home_.lib_.basic::String.via_mixed act_x
+      String_via_mixed__[ act_x ]
     end
 
     Say_trilean__ = -> x do
       Trilean_string_via_value___[].fetch x
+    end
+
+    State = ::Struct.new :result, :emission_array
+
+    String_via_mixed__ = -> x do
+      Home_.lib_.basic::String.via_mixed x
     end
 
     Trilean_string_via_value___ = Common_::Lazy.call do

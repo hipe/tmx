@@ -37,7 +37,7 @@ module Skylab::Zerk
       def _init_OPC
         @_init_OPC = false
         @_init_OI && _init_OI
-        @_OPC = Here_::Option_Parser_Controller___.new @_operation_index
+        @_OPC = Here_::Option_Parser_Controller.new @_operation_index
         NIL_
       end
 

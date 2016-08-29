@@ -72,7 +72,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       [ "{}\n" ]
     end
 
-    def state_  # nasty: for expect_event & expect_root_ACS when together
+    def state_for_expect_event
       root_ACS_state
     end
 

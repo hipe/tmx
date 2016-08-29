@@ -76,7 +76,7 @@ module Skylab::Permute
         Common_::Stream.via_nonsparse_array x
       end
 
-      Home_::Magnetics::TupleStream_via_PairStream[ _st ]
+      Home_::Magnetics::TupleStream_via_ValueNameStream[ _st ]
     end
   end
 
@@ -97,12 +97,14 @@ module Skylab::Permute
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]  # Collection.fuzzy etc
     Zerk = sidesys[ :Zerk ]
   end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
+  EMPTY_A_ = []
   KEEP_PARSING_ = true
   NIL_ = nil
   NOTHING_ = nil
