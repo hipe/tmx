@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     class Express_Mixed
 
-      class Build_listing_expresser___ < Common_::Actor::Dyadic
+      class Build_listing_expresser___ < Common_::Actor::Dyadic  # :[#064].
 
         def initialize x, y
           @expag = x

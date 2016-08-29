@@ -4,7 +4,9 @@
 ## about this document & the many tables
 
 we almost called this "the omni table narrative", but didn't because our
-longerm goal is to unify all table implementions:
+longerm goal is (or isn't) to unify all table implementions:
+
+    [#ze-047]  2016-08-28  "tuple pager" for long streams of data
 
     [#.D]  2013-03-13  ad-hoc for application. rewritten once.
 

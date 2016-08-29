@@ -100,7 +100,8 @@
 [#065]       track stubbing hacks in the universe (for reactive model trees)
              ( #was: #track procs are always not-promoted )
              ( #was: #done implement unmarshaling for strings with newlines (git-config) )
-[#064] #hole ( #was: either rename `desc` to `entity_description` or make
+[#064]       [ listing expresser ]
+             ( #was: either rename `desc` to `entity_description` or make
              the syntax smarter without bloating it. )
              ( #was: #done marshal issue near regexps with escape-looking sequences )
 [#063]       [ isomorphicisms and emergent interfaces ]

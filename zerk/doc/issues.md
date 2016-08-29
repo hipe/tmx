@@ -1,3 +1,5 @@
+[#047]       [ tuple pager ]
+
 [#046]       :#mode-tweaking, :#mode-tweak (frontier is in-situ in [ts])
              this is [ze]'s improvement on [#br-042]
 
