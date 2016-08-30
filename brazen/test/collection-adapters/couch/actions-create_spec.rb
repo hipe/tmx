@@ -42,9 +42,11 @@ module Skylab::Brazen::TestSupport
 
     it "with an empty directory workspace path" do
 
-      call_API :collection, :couch, :create, :name, 'zeep',
+      call_API(
+        :collection, :couch, :create, :name, 'zeep',
         :workspace_path,
-        TestSupport_::Fixtures.dir( :empty_esque_directory )
+        TestSupport_::Fixtures.directory( :empty_esque_directory ),
+      )
 
       _em = expect_not_OK_event :resource_not_found
 

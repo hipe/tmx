@@ -68,7 +68,9 @@
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
 
 [#015] #hole (#moved-to: [#dt-001])
-[#014] #hole (#moved-to: [#dt-XXX])
+
+[#014]       file-coverage [ big tree ]
+             ( #was: #moved-to: [#dt-XXX])
 
 [#013]       file coverage implementation notes ..
              ( #was: #historical #done #inquiry-point choke point etc )

@@ -51,7 +51,7 @@
 [#006]       #parent-node: [#001] peek hack explained .. (was templo)
              ( #was: [#ts-027] )
 
-[#005] #hole
+[#005]       the recursive money ..
              ( #was: the view-controller narrative .. )
              ( #was: [#ts-026] )
 

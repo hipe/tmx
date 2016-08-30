@@ -46,7 +46,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       call_by do
 
-        _dir = TestSupport_::Fixtures.dir :empty_esque_directory
+        _dir = TestSupport_::Fixtures.directory :empty_esque_directory
         _call_with_directory _dir
       end
 

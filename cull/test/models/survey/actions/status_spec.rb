@@ -20,7 +20,7 @@ module Skylab::Cull::TestSupport
     end
 
     it "with a path that is a directory but workspace not found" do
-      against TestSupport_::Fixtures.dir( :empty_esque_directory )
+      against TestSupport_::Fixtures.directory :empty_esque_directory
       expect_not_OK_event :resource_not_found
       expect_failed
     end

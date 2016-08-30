@@ -27,7 +27,7 @@ module Skylab::Git::TestSupport
       end
 
       def empty_dir_
-        TestSupport_::Fixtures.dir( :empty_esque_directory )
+        TestSupport_::Fixtures.directory :empty_esque_directory
       end
 
       def mock_system_conduit_where_ chdir, cmd, & three_p

@@ -20,8 +20,8 @@ module Skylab::DocTest
 
   module API
     class << self
-      def call * x_a, & x_p
-        Call_ACS_[ x_a, Root_Autonomous_Component_System_.new, & x_p ]
+      def call * x_a, & oes_p
+        Call_ACS_.call( x_a, Root_Autonomous_Component_System_.instance_ ) {|_| oes_p }
       end
     end  # >>
   end
@@ -50,20 +50,43 @@ module Skylab::DocTest
 
   class Root_Autonomous_Component_System_
 
+    class << self
+
+      def instance_
+        @__instance ||= new
+      end
+
+      alias_method :new_instance__, :new  # while we're in denial
+
+      private :new
+    end  # >>
+
     def __ping__component_operation
+
+      yield :description, -> y { y << "just a simple ping." }
 
       -> & oes_p do
 
         oes_p.call :payload, :expression, :ping do |y|
-          y << "ping #{ highlight '!' }"
+          y << "pong from doc-test#{ highlight '!' }"
         end
 
-        :_hello_from_doc_test_
+        nil
       end
     end
 
     def __synchronize__component_operation
       Home_::Operations_::Synchronize
+    end
+
+    def __recurse__component_operation
+
+      yield :parameter, :list, :optional, :is_flag
+
+      yield :via_ACS_by, -> do
+        _fs = Home_.lib_.system.filesystem
+        Home_::Operations_::Recurse.new _fs
+      end
     end
   end
 
@@ -111,6 +134,10 @@ module Skylab::DocTest
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
+  end
+
+  Attributes_ = -> h do
+    Home_.lib_.fields::Attributes[ h ]
   end
 
   # --

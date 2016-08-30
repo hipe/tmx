@@ -8,39 +8,39 @@ module Skylab::DocTest::TestSupport
 
     # -
 
-      fixture_file_path = nil
-      fixture_tree_path = nil
+      def the_noent_directory_
+        TestSupport_::Fixtures.directory :not_here
+      end
 
       def line_stream_via_filename_ file
-        _path = path_via_filename_ file
-        ::File.open _path, ::File::RDONLY
+
+        ::File.open path_via_filename_( file ), ::File::RDONLY
       end
 
-      define_method :path_via_filename_ do |file|
+      def fixture_tree_pather path
 
-        ::File.join fixture_file_path[], file
-      end
+        dirname = ::File.expand_path path, _fixture_trees_directory
 
-      define_method :fixture_tree_pather do |file|
-
-        dirname = ::File.expand_path file, fixture_tree_path[]
-
-        -> path do
-          ::File.expand_path path, dirname
+        -> path_ do
+          ::File.expand_path path_, dirname
         end
+      end
+
+      def path_via_filename_ file
+        File.join _fixture_files_directory, file
       end
 
       common = Lazy_.call do
         TS_.dir_pathname.to_path
       end
 
-      fixture_tree_path = -> do
+      define_method :_fixture_trees_directory, ( Lazy_.call do
         ::File.join common[], 'fixture-trees'
-      end
+      end )
 
-      fixture_file_path = -> do
+      define_method :_fixture_files_directory, ( Lazy_.call do
         ::File.join common[], 'fixture-files'
-      end
+      end )
     # -
   end
 end

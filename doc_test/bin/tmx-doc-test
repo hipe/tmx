@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby -w
 
-self._NEEDS_COVERAGE
 require 'skylab/doc_test'
 
 Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
@@ -8,6 +7,9 @@ Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-
-  Skylab::Doc_test[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  d = Skylab::Doc_test[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  if d.nonzero?
+    $stderr.puts "(exitstatus: #{ d })"
+  end
+  exit d
 end

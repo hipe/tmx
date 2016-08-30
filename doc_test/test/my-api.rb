@@ -8,10 +8,6 @@ module Skylab::DocTest::TestSupport
     end
 
     # -
-      def zerk_API_call oes_p, x_a
-        @root_ACS = Home_::Root_Autonomous_Component_System_.new
-        Home_::Call_ACS_.call( x_a, @root_ACS ) { |_| oes_p }
-      end
 
       def my_API_common_generate_ h  # mutates h
 
@@ -59,6 +55,10 @@ module Skylab::DocTest::TestSupport
 
       def __say_not_an_example
         "not an example #{ @line_scanner.at_where 'near' }"
+      end
+
+      def subject_API
+        Home_::API
       end
     # -
   end

@@ -62,6 +62,10 @@ module Skylab::DocTest
 
         y.yield(
 
+          :description, -> y_ do
+            y_ << "create or update test file via asset file."
+          end,
+
           :parameter, :reverse, :is_flag,
 
           :parameter, :original_test_path, :optional,
@@ -214,7 +218,7 @@ module Skylab::DocTest
       o = Zerk_::NonInteractiveCLI.begin
 
       o.root_ACS_by do
-        Root_Autonomous_Component_System_.new
+        Root_Autonomous_Component_System_.new_instance__
       end
 
       # o.location_module = CLI

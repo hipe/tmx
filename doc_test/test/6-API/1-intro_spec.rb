@@ -13,13 +13,13 @@ module Skylab::DocTest::TestSupport
         call :ping
       end
 
-      it 'works' do
-        root_ACS_result == :_hello_from_doc_test_ || fail
+      it 'works (result is nil)' do
+        result_is_nothing
       end
 
       it "emits" do
         _be_this = be_emission_ending_with :expression, :ping do |y|
-          y == [ "ping ** ! **" ] || fail
+          y == [ "pong from doc-test** ! **" ] || fail
         end
         only_emission.should _be_this
       end

@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module FileCoverage
 
-    class Magnetics_::CompoundTree_via_Classifications
+    class Magnetics_::CompoundTree_via_Classifications  # :[#014].
 
       module Shape_that_Is_Directory
 

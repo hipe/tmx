@@ -163,7 +163,7 @@ module Skylab::SearchAndReplace::TestSupport
     # ~ setup
 
     def __dir_of_some_depth
-      TestSupport_::Fixtures.dir :some_depth
+      TestSupport_::Fixtures.directory :some_depth
     end
 
     # ~ assertion

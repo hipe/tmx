@@ -42,7 +42,7 @@ module Skylab::System::TestSupport
 
     it "wrong ftype" do
 
-      against_ TestSupport_::Fixtures.dir( :empty_esque_directory )
+      against_ TestSupport_::Fixtures.directory :empty_esque_directory
       expect_not_OK_event :wrong_ftype
       expect_failed
     end

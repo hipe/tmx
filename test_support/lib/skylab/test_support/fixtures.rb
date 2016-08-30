@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     class << self
 
-      def dir sym
+      def directory sym
         ::File.join @dirs_path, __dirs_box.fetch( sym )
       end
 

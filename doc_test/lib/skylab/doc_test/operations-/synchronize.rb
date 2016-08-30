@@ -1,12 +1,6 @@
 module Skylab::DocTest
 
-  module Operations_
-
-    Attributes_ = -> h do
-      Home_.lib_.fields::Attributes[ h ]
-    end
-
-    class Synchronize
+    class Operations_::Synchronize
 
       PARAMETERS = Attributes_.call(
         output_adapter: nil,
@@ -83,6 +77,5 @@ module Skylab::DocTest
           end
         end
     end
-  end
 end
 # #tombstone: lots of old code and compatible comment examples

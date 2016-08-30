@@ -176,7 +176,7 @@ module Skylab::TaskExamples::TestSupport
       end
 
       def the_empty_directory_
-        TestSupport_::Fixtures.dir :empty_esque_directory
+        TestSupport_::Fixtures.directory :empty_esque_directory
       end
 
       def real_filesystem_
