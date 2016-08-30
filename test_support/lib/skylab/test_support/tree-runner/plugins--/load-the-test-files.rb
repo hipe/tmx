@@ -48,7 +48,7 @@ module Skylab::TestSupport
             end
           else
             -> do
-              serr.write DOT___
+              serr.write DOT_
             end
           end
 
@@ -63,9 +63,6 @@ module Skylab::TestSupport
           ACHIEVED_  # (was historically marked with what is now [#dt-002])
         end
       end
-
-      DOT___ = '.'
-
     end
   end
 end

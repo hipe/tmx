@@ -164,6 +164,7 @@ module Skylab::TestSupport  # :[#021].
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze
+  DOT_ = '.'
   DOT_DOT_ = '..'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}

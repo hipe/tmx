@@ -29,8 +29,6 @@ module Skylab::TestSupport
         :directory_entry_string_array,
         :file_entry,
       )
-
-      DOT_ = '.'
     end
   end
 end

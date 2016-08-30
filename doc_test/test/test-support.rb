@@ -104,6 +104,11 @@ module Skylab::DocTest::TestSupport
       end
     end.call
 
+    mtd = nil
+    define_method :my_test_directory_ do
+      mtd ||= ::File.join sidesystem_path_, 'test'
+    end
+
     ssdp = nil
     define_method :sidesystem_path_ do
       ssdp ||= ::File.expand_path( '../../..', home_dir_path_ )

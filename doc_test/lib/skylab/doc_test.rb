@@ -126,6 +126,10 @@ module Skylab::DocTest
 
   Autoloader_ = Common_::Autoloader
 
+  module RecursionMagnetics_
+    Autoloader_[ self ]
+  end
+
   module Magnetics_
     Autoloader_[ self ]
   end
@@ -165,6 +169,10 @@ module Skylab::DocTest
   # --
 
   module OutputAdapters_
+    Autoloader_[ self ]
+  end
+
+  module RecursionModels_
     Autoloader_[ self ]
   end
 

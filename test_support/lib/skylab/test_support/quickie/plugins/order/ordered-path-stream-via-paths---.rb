@@ -44,11 +44,15 @@ module Skylab::TestSupport
           NIL_
         end
 
-        rx = /\A(?<digits>[0-9]+)?(?<rest>.*)\z/
+        rx = /\A
+          (?<major_integer> \d+ )
+          (?:  \. (?<sub_integers>  \d+ (?: \. \d+ )*  ) )?
+          (?<rest>.*)
+        \z/x
 
         Comparer_for___ = -> pair do
           md = rx.match pair.name_x
-          if md[ :digits ]
+          if md[ :major_integer ]
             Numbered_Comparer___.new md
           else
             Non_Numbered_Comparer___.new pair.name_x
@@ -58,20 +62,52 @@ module Skylab::TestSupport
         class Numbered_Comparer___
 
           def initialize md
-            @_d = md[ :digits ].to_i
-            # @_NOT_USED_s_for_compare = md[ :rest ]
+            d_a = [ md[ :major_integer ].to_i ]
+            s = md[ :sub_integers ]
+            if s
+              d_a.concat s.split( DOT_ ).map( & :to_i )
+            end
+            @_digits = d_a
+            @_digits_depth = d_a.length
           end
 
           def <=> otr
             if otr.has_digits
-              d = @_d <=> otr._d
-              if d.zero?
-                self._FAIL_comparison_undefined_for_same_numbers
-                # (easy enough to fix but the point is we don't want to)
-              end
-              d
+              __do_number_comparision otr
             else
               -1  # I always come before others without digits
+            end
+          end
+
+          def __do_number_comparision otr  # -1: you come first. 1: other does.
+
+            digits = otr._digits
+            digits_depth = otr._digits_depth
+
+            depth_cmp = @_digits_depth <=> digits_depth
+            _use_depth = case depth_cmp
+            when -1
+              @_digits_depth
+            else
+              digits_depth
+            end
+
+            cmp = 0
+            _use_depth.times do |d|
+              cmp_ = @_digits.fetch(d) <=> digits.fetch(d)
+              cmp_.zero? && next
+              cmp = cmp_
+              break
+            end
+
+            if cmp.zero?
+              if depth_cmp.zero?
+                self._FAIL_comparison_undefined_for_same_numbers
+              else
+                depth_cmp
+              end
+            else
+              cmp
             end
           end
 
@@ -79,8 +115,11 @@ module Skylab::TestSupport
             true
           end
 
-          attr_reader :_d
-          protected :_d
+        protected
+          attr_reader(
+            :_digits,
+            :_digits_depth,
+          )
         end
 
         class Non_Numbered_Comparer___
