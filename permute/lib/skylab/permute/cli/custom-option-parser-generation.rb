@@ -24,18 +24,30 @@ module Skylab::Permute
       # are not there.
 
       class << self
-
         alias_method :begin_for, :new
         undef_method :new
       end  # >>
 
       def initialize fr
-        @stack_frame = fr
+        @_mutable_prototype = CaseWorker___.new fr
+        @__mutate_didactic_syntax_parts_proc =  nil
+      end
+
+      def absorb_a_double_dash
+        @_mutable_prototype.__do_absorb_a_double_dash = true ; nil
+      end
+
+      def handle_value_name_stream_by & p
+        @_mutable_prototype.__handle_value_name_stream_proc = p ; nil
+      end
+
+      def mutate_didactic_syntax_parts_by & p
+        @__mutate_didactic_syntax_parts_proc = p ; nil
       end
 
       def finish
-        # we are doing both expression and interpretation on our own:
-        @stack_frame.remove_positional_argument :value_name_pair
+        @_prototype = remove_instance_variable( :@_mutable_prototype ).finish
+        freeze
         self
       end
 
@@ -51,7 +63,9 @@ module Skylab::Permute
 
         # #hook-out expecting [#ze-015] #public-API:Point-1
 
-        CaseWorker___.new( argv, @stack_frame, setter, nonopt ).execute
+        parse = @_prototype.__begin_parse
+        parse.__accept_these argv, setter, nonopt
+        parse.execute
         NIL
       end
 
@@ -62,7 +76,11 @@ module Skylab::Permute
           '--other-cat VAL',
           '[ -o V2 [ -o V3 [..]]]' ]
 
-        # (we used to expose mutation of the array here; see tombstone)
+        p = @__mutate_didactic_syntax_parts_proc
+        if p
+          p[ s_a ]
+        end
+
         s_a
       end
 
@@ -108,21 +126,50 @@ module Skylab::Permute
         #      of the `setter` proc being used to send simple structured
         #      messages.
 
-        def initialize a, fr, p, p_
-          @argv = a
-          @nonopt = p_
-          @setter = p
-          @stack_frame = fr
+        def initialize frame
+          @__do_absorb_a_double_dash = false
+          @__NOT_USED_stack_frame = frame
+        end
+
+        attr_writer(
+          :__do_absorb_a_double_dash,
+          :__handle_value_name_stream_proc,
+        )
+
+        def finish
+          @lib = Zerk_lib_[]::NonInteractiveCLI::OptionParserController
+          freeze
+        end
+
+        def __begin_parse
+          dup
+        end
+
+        def __accept_these argv, setter, nonopt
+          @_argv = argv
+          @__nonopt = nonopt
+          @setter = setter ; nil
         end
 
         def execute  # side-effects only
 
-          @_lib = Zerk_lib_[]::NonInteractiveCLI::OptionParserController
           @_oes_p = method :___handle_anything
 
           ok = __resolve_token_stream_via_ARGV_and_tokenizer
           ok &&= __resolve_value_name_stream_via_token_stream
+          ok && __maybe_absorb_a_double_dash
           ok && __send_value_name_stream
+          NIL
+        end
+
+        def __maybe_absorb_a_double_dash
+
+          if @__do_absorb_a_double_dash && @_argv.length.nonzero?
+            # (hi.)
+            if '--' == @_argv.first
+              @_argv.shift
+            end
+          end
           NIL
         end
 
@@ -134,11 +181,20 @@ module Skylab::Permute
           # this structured data, it works out remarkably.)
 
           _vns = remove_instance_variable :@__value_name_stream
-          _par = @stack_frame.formal_parameter :value_name_pairs
-          _ast = @_lib::Assignment.new _vns, _par
-          @setter[ NOTHING_, _ast ]
+          _p = remove_instance_variable :@__handle_value_name_stream_proc
+          _p[ _vns, self ]
           NIL
         end
+
+        # -- for above
+
+        attr_reader(
+          :lib,
+          # :nonopt, maybe one day
+          :setter,
+        )
+
+        # --
 
         def __resolve_value_name_stream_via_token_stream
 
@@ -149,8 +205,7 @@ module Skylab::Permute
 
         def __resolve_token_stream_via_ARGV_and_tokenizer
 
-          _argv = remove_instance_variable :@argv
-          _ts = Here_::Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer[ _argv, & @_oes_p ]
+          _ts = Here_::Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer[ @_argv, & @_oes_p ]
           _if _ts, :@__token_stream
         end
 
@@ -213,7 +268,7 @@ module Skylab::Permute
         end
 
         def _send * a, m
-          _si = @_lib::SpecialDirective.new( * a, m )
+          _si = @lib::SpecialDirective.new( * a, m )
           @setter[ NOTHING_, _si ]
           NIL
         end
@@ -229,4 +284,3 @@ module Skylab::Permute
     end
   end
 end
-# #tombstone: `mutate_syntax_string_parts`

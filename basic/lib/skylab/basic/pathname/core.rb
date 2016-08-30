@@ -128,7 +128,7 @@ module Skylab::Basic
     # ==
 
     Path_matches_directory = -> path, dir do  # assume..
- 
+
       # assume both paths are "fully normal", i.e they are absolute and they
       # do not end in a file separator. `path` "matches" `dir` IFF` `path`
       # points to a node that is inside `dir` or both point to the same node

@@ -63,6 +63,8 @@ module Skylab::TestSupport::TestSupport
 
     it "the output string is correct byte-per-byte" do
 
+      same = "::Kernel._WRITE_ME"
+
       _exp = <<-HERE.unindent
         # etc 1
 
@@ -71,15 +73,15 @@ module Skylab::TestSupport::TestSupport
           end
 
           it "two, three" do
-            self._COVER_ME
+            #{ same }
           end
 
           it "one, four" do
-            self._COVER_ME
+            #{ same }
           end
 
           it "two, four" do
-            self._COVER_ME
+            #{ same }
           end
 
             it "one, three - already done (and deeper indent)" do

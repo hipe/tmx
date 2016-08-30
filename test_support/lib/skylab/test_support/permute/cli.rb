@@ -1,129 +1,73 @@
 module Skylab::TestSupport
 
-  module API
+  module Permute
 
-    module Models_::Front
+    module CLI
 
-      Modalities = ::Module.new
+      Node_mappings_for_permute_operation = -> o do
 
-      module Modalities::CLI
+        # ~ confirm the constituency of the formal parameters -
+        #   make sure it's an identical set for touchiness.
+        #   if you turn any of the below to `false`, the parameter is reomved
 
-        Actions = ::Module.new
+        h = {
+          permutations: nil,
+          test_file: nil,
+        }
 
-        class Actions::Permute < DocTest_::CLI::Action_Adapter
-
-          MUTATE_THESE_PROPERTIES = [ :permutations, :stdout, :stderr ]
-
-          def mutate__permutations__properties
-
-            mutable_front_properties.remove :permutations
-          end
-
-          def mutate__stdout__properties
-
-            mutable_front_properties.remove :stdout
-          end
-
-          def mutate__stderr__properties
-
-            mutable_front_properties.remove :stderr
-          end
-
-          def begin_option_parser
-
-            @_lib = Home_.lib_.permute
-
-            o = @_lib::CLI::Sessions_::Custom_Option_Parser.new( & __me )
-
-            o.mutate_syntax_string_parts = -> s_a do
-              s_a.concat help_renderer.any_argument_glyphs
-            end
-
-            o
-          end
-
-          def __me
-
-            -> * i_a, & ev_p do
-
-              i_a_ = i_a.dup
-              if :directive == i_a.first
-                i_a_.reverse!
-              else
-                i_a_.unshift i_a_.pop
-              end
-
-              send :"__receive__#{ i_a_ * UNDERSCORE_ }__", ev_p[]
-            end
-          end
-
-          def __receive__help_directive__ st
-
-            st.advance_one
-            @op.help_pair.last.call nil
-            NIL_
-          end
-
-          def __receive__no_arguments_case__ _
-            UNABLE_
-          end
-
-          def __receive__no_available_state_transition_error_case__ ev
-
-            _ev_ = ev.new_with :error_category, :optionparser_parseerror
-
-            _ex_ = _ev_.to_exception
-
-            raise _ex_  # sadly, it is "best" to follow unpleasant stdlib o.p API
-          end
-
-          def __receive__parsed_nodes_payload_array__ a
-
-            @_a = a
-            NIL_
-          end
-
-          def prepare_backstream_call x_a
-
-            if @_a
-
-              y = []
-
-              ok = @_lib::CLI::Actors_::Convert_parse_tree_into_iambic_arguments[
-                y, @_a, & handle_event_selectively ]
-
-              if ok
-                @_a = nil
-                __the_rest x_a, y
-              else
-                ok
-              end
-            else
-              @_a
-            end
-          end
-
-          def __the_rest x_a, y
-
-            y.unshift :generate
-
-            _kr = @_lib.application_kernel_
-
-            bc = _kr.bound_call_via_mutable_iambic y, & handle_event_selectively
-
-            st = bc.receiver.send bc.method_name, * bc.args
-
-            if st
-              o = resources
-              x_a.push :stdout, o.sout
-              x_a.push :stderr, o.serr
-              x_a.push :permutations, st
-              ACHIEVED_
-            else
-              st
-            end
-          end
+        o.map_these_formal_parameters -> k do
+          h.fetch k
         end
+
+        # ~
+
+        o.custom_option_parser_by do |fr|
+          Build_custom_option_parser___[ fr ]
+        end
+
+        NIL
+      end
+
+      Build_custom_option_parser___ = -> fr do
+
+        Require_permute_[]
+
+        copg = Permute_::CLI::CustomOptionParserGeneration.begin_for fr
+
+        fr.remove_positional_argument :permutations
+
+        copg.mutate_didactic_syntax_parts_by do |args|
+          args.push '--'
+        end
+
+        copg.absorb_a_double_dash
+
+        copg.handle_value_name_stream_by do |vns, rsx|
+
+          # [pe]'s custom o.p is for delivering a stream of normal pairs to
+          # its core function (called from its backend) to create the stream
+          # of tuples. our o.p, on the other hand, must go that further step
+          # and ge to the stream of tuples here.
+
+          if ::Array.try_convert vns  # see similar in [pe]
+            vns = Common_::Stream.via_nonsparse_array vns
+          end
+
+          _ts  = Permute_::Magnetics::TupleStream_via_ValueNameStream[ vns ]
+
+          _par = fr.formal_parameter :permutations
+
+          _ast = rsx.lib::Assignment.new _ts, _par
+
+          rsx.setter[ NOTHING_, _ast ]
+          NIL
+        end
+
+        copg.finish
+      end
+
+      Require_permute_ = Lazy_.call do
+        Permute_ = Home_.lib_.permute ; nil
       end
     end
   end

@@ -156,7 +156,8 @@ module Skylab::System
         else
           maybe_send_event :error, :stat_error do
             wrap_exception_ @exception_
-          end  # result.
+          end
+          UNABLE_  # result of above is unreliable
         end
       end
 
@@ -173,6 +174,7 @@ module Skylab::System
           maybe_send_event :error, :wrong_ftype do
             build_wrong_ftype_event_ path_, @stat_, FILE_FTYPE
           end
+          UNABLE_  # result of above is unreliable
         end
       end
 

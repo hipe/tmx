@@ -16,6 +16,9 @@ module Skylab::TestSupport
           file_coverage: -> do
             Home_::FileCoverage::CLI::NODE_MAP
           end,
+          permute: -> o do
+            Home_::Permute::CLI::Node_mappings_for_permute_operation[ o ]
+          end,
         }
 
         cli.expression_agent = CLI::Expression_Agent.instance__

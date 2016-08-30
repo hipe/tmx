@@ -41,7 +41,15 @@ module Skylab::TestSupport
         Ping___
       end
 
-      def __file_coverage__component_operation( & yielder )
+      def __permute__component_operation & yielder
+
+        @___pe_ACS ||= Home_::Permute::Root_Autonomous_Component_System.
+          via_filesystem_by( & @_filesystem_proc )
+
+        @___pe_ACS.__permute__component_operation( & yielder )
+      end
+
+      def __file_coverage__component_operation & yielder
 
         @___fc_ACS ||= Home_::FileCoverage::Root_Autonomous_Component_System.
           via_filesystem_by( & @_filesystem_proc )

@@ -33,6 +33,16 @@ module Skylab::TestSupport
         CLI_support_[]::Expression_Agent::Handler_Expresser.new self
       end
 
+      # --
+
+      def pth path
+        if Home_.lib_.system.path_looks_absolute path
+          "(( [ts] xyzzy1 #{ path } ))"
+        else
+          path
+        end
+      end
+
       # -- reduce other structures to strings (& related)
 
       def render_list_commonly_ s_a

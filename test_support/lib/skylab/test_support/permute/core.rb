@@ -6,24 +6,28 @@ module Skylab::TestSupport
 
       def call * x_a, & oes_p
         Require_zerk_[]
-        _acs = Root_Autonomous_Component_System___.__instance
+        _acs = Root_Autonomous_Component_System.__instance
         Zerk_::API.call( x_a, _acs ) { |_| oes_p }
       end
     end ; end
 
-    class Root_Autonomous_Component_System___
+    class Root_Autonomous_Component_System  # (accessed by our host, [ts])
 
       class << self
+
         def __instance
-          @___instance ||= new
+          @___instance ||= via_filesystem_by { Home_.lib_.system.filesystem }
         end
+
+        def via_filesystem_by & fs_p
+          new fs_p
+        end
+
         private :new
       end  # >>
 
-      def initialize
-        @_filesystem_proc = -> do
-
-        end
+      def initialize fs_p
+        @_filesystem_proc = fs_p
       end
 
       def __ping__component_operation
@@ -52,7 +56,7 @@ module Skylab::TestSupport
       end
 
       def self.describe_into_under y, expag
-        y << "(EDIT permute description)"
+        y << "generate stub tests given a collection of categories"
       end
 
       if false
@@ -72,13 +76,18 @@ module Skylab::TestSupport
 
       def __test_file__component_association
 
+        yield :description, -> y do
+          y << "(the test file yadda)"
+        end
+
         -> st, & pp do
 
           _x = st.gets_one
           _kn = Common_::Qualified_Knownness.via_value_and_symbol _x, :test_file
           _oes_p = pp[ nil ]
 
-          Home_.lib_.system.filesystem( :Upstream_IO ).with(
+          _fs = @_filesystem_proc.call
+          _fs.normalization( :Upstream_IO ).with(
             :qualified_knownness_of_path, _kn,
             & _oes_p )
         end
@@ -187,9 +196,9 @@ module Skylab::TestSupport
 
           sep = ', '
 
-          case_string_st = @permutations.map_by do | perm |
+          case_string_st = @permutations.map_by do |tuple|
 
-            perm.values.join sep
+            tuple.values.join sep
           end
 
           counts = Counts___.new 0, 0
@@ -227,7 +236,7 @@ module Skylab::TestSupport
           -> case_s do
 
             down.puts "#{ margin }it \"#{ case_s }\" do"
-            down.puts "#{ margin }  self._COVER_ME"
+            down.puts "#{ margin }  ::Kernel._WRITE_ME"
             down.puts "#{ margin }end"
             NIL_
           end
