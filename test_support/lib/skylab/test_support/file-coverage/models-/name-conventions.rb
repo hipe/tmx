@@ -103,7 +103,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      NUMBER_PREFIX_RX__ = /\A\d+-/
+      NUMBER_PREFIX_RX__ = /\A\d+(?:\.\d+)*-/
 
       def _mutate_by_removing_trailing_dashes s
 

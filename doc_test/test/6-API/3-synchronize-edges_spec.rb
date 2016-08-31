@@ -66,9 +66,9 @@ module Skylab::DocTest::TestSupport
 
         path = fixture_tree_pather 'tree-02-little-formatting'
 
-        o.asset_path = path[ 'asset.whootily.rb' ]
+        o.asset_path = path[ 'asset.whootily.kode' ]
 
-        o.original_test_path = path[ 'original.test.whootily.rb' ]
+        o.original_test_path = path[ 'original.test.whootily.kode' ]
 
         o.to_line_stream.to_a
       end

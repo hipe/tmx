@@ -108,9 +108,9 @@ module Skylab::DocTest::TestSupport
 
       path = fixture_tree_pather 'tree-01'
 
-      o.asset_path = path[ 'asset.fake.rb' ]
+      o.asset_path = path[ 'asset.kode' ]
 
-      o.original_test_path = path[ 'original.test.fake.rb' ]
+      o.original_test_path = path[ 'original.test.kode' ]
 
       o.to_string
     end

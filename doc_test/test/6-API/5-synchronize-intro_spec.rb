@@ -38,7 +38,7 @@ module Skylab::DocTest::TestSupport
 
       call_by do
 
-        _asset_path = fixture_tree_pather( 'tree-02-little-formatting' )[ 'asset.whootily.rb' ]
+        _asset_path = fixture_tree_pather( 'tree-02-little-formatting' )[ 'asset.whootily.kode' ]
 
         my_API_common_generate_(
           asset_line_stream: open( _asset_path ),
