@@ -154,6 +154,14 @@ module Skylab::DocTest
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
 
+    _Strscn = Lazy_.call do
+      require 'strscan' ; ::StringScanner
+    end
+
+    String_scanner = -> s do
+      _Strscn[].new s
+    end
+
     system_lib = nil
 
     System = -> do

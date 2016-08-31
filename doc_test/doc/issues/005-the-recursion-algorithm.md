@@ -174,16 +174,25 @@ this sub-algorithm:
   - if that path "starts with" (in the way that we mean) `lib`, then
     OK, otherwise we don't know what to do and we are done.
 
-  - now, because we aren't going to assume the existence of any test
-    files yet, we've got to find the "counterpart directory" this way:
-    keep stepping down from the current directory into the only child
-    directory (filesystem hits) while there is only one child entry.
-    when there is not a child entry, check the assumption that there
-    is a directory `foo-bizzle` and a corresponding entrypoint file
-    `foo-bizzle.rb` right next to it. if there is not then we don't know
-    what to do and we are done. if there is then the `foo-bizzle`
-    directory is our counterpart directory and we are done.
+  - find the "counterpart directory" this way:
+    from the current directory (`lib` to start), get a listing of its
+    entries (i.e do a directory listing). (we use `glob` instead of
+    `Dir#entries` partly so we don't have to much with '.' and '..').
+    (each of these is of course a separate filesystem hit.)
 
+      - if there are zero entries then we don't know what to do
+        and we are done.
+
+      - if there is one entry, (see "when there is one entry" in code)
+
+      - otherwise (and there are multiple entries), result is in the
+        next bullet:
+
+    we check the assumption that there is a directory `foo_bizzle` and a
+    corresponding entrypoint file `foo_bizzle.rb` right next to it. if
+    there is not then we don't know what to do and we are done. if there
+    is then the `foo_bizzle` directory is our counterpart directory and we
+    have found our target instance.
 
 
 

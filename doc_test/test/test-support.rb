@@ -104,8 +104,24 @@ module Skylab::DocTest::TestSupport
       end
     end.call
 
+    rpmd = nil
+    define_method :my_real_magnetics_dir_ do
+      # this is one that depends on the real filesystem
+      rpmd ||= ::File.join my_real_counterpart_dir_, 'magnetics-'
+    end
+
+    rcd = nil
+    define_method :my_real_counterpart_dir_ do
+      rcd ||= ::File.join sidesystem_path_, 'lib', 'skylab', 'doc_test'
+    end
+
+    tp12 = nil
+    define_method :imaginary_path_one_two__ do
+      tp12 ||= ::File.join sidesystem_path_, 'one', 'two'
+    end
+
     mtd = nil
-    define_method :my_test_directory_ do
+    define_method :my_real_test_directory_ do
       mtd ||= ::File.join sidesystem_path_, 'test'
     end
 

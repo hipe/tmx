@@ -2,6 +2,8 @@ module Skylab::DocTest
 
   class RecursionMagnetics_::TestDirectory_via_ArgumentPath
 
+    # exactly [#005]
+
     class << self
 
       def call path

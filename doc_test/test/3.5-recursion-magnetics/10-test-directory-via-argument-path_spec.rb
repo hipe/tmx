@@ -12,12 +12,12 @@ module Skylab::DocTest::TestSupport
 
     it "finds it exactly one level under" do
       _against sidesystem_path_
-      _expect my_test_directory_
+      _expect my_real_test_directory_
     end
 
     it "finds it upwards from a path" do
-      _against "#{ sidesystem_path_ }/one/two"
-      _expect my_test_directory_
+      _against imaginary_path_one_two__
+      _expect my_real_test_directory_
     end
 
     def _against path
