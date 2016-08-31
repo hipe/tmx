@@ -1,3 +1,7 @@
+[#029]       notes about our tests..
+
+[#028]       [ the counterpart test index ]
+
 [#027]       the test document ..
 
 [#026]       particular paraphernalia model ..

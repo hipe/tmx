@@ -11,12 +11,12 @@ module Skylab::DocTest::TestSupport
     end
 
     it "given one business dir down below, finds counterpart dir" do
-      _against my_real_magnetics_dir_, my_real_test_directory_
+      _against my_real_magnetics_directory_, my_real_test_directory_
       _expect_same
     end
 
     it "given counterpart dir itself, same" do
-      _against my_real_counterpart_dir_, my_real_test_directory_
+      _against my_real_counterpart_directory_, my_real_test_directory_
       _expect_same
     end
 
@@ -35,7 +35,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def _expect_same
-      __expect my_real_counterpart_dir_
+      __expect my_real_counterpart_directory_
     end
 
     def __expect path

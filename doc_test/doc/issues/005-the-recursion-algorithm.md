@@ -23,7 +23,8 @@ is outside of this scope.
 ## assumptions
 
   - we are going to assume that the test files (if any, for this
-    request) all live in a single test directory.
+    request) all live in a single test directory (but they can be
+    in a deep tree under this node).
 
   - we are going to assume that the test file tree has a structure that
     mirrors the asset file tree (to the extent that we will describe below).

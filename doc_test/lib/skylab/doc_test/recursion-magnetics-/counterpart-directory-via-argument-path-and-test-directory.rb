@@ -12,7 +12,7 @@ module Skylab::DocTest
     def execute
 
       @filesystem_directories ||= ::Dir
-      @name_conventions ||= RecursionModels_::NameConventions.instance__
+      @name_conventions ||= RecursionModels_::NameConventions.instance_
 
       ok = __check_the_lib_assumption
       ok &&= __step_downward_until_something_other_than_exactly_one_directory
@@ -135,24 +135,22 @@ module Skylab::DocTest
       if len == @argument_path.length
         __check_the_lib_assumption_when_shorter_arg_path proj_dir
       else
-        scn = Home_.lib_.string_scanner @argument_path
-        scn.pos = len
-        __check_the_lib_assumption_when_longer_arg_path scn, proj_dir
+        __check_the_lib_assumption_when_longer_arg_path len, proj_dir
       end
     end
 
-    def __check_the_lib_assumption_when_longer_arg_path scn, proj_dir
+    def __check_the_lib_assumption_when_longer_arg_path len, proj_dir
 
       # if the argument path is within the project dir, we can avoid an
       # extra filesystem hit by confirming the lib dir using the argument
       # path alone.
 
-      same = ::Regexp.escape ::File::SEPARATOR 
-      sep_rx = /#{ same }/
-      entry_rx = /[^#{ same }]+/
+      scn = RecursionModels_::EntryScanner.via_path_ @argument_path
+      scn.pos = len
+      scn.expect_one_separator__
 
-      scn.skip(sep_rx) || self._SANITY
-      lib = scn.scan entry_rx
+      lib = scn.scan_entry
+
       if LIB__ == lib
         @_lib_directory = ::File.join proj_dir, lib
         ACHIEVED_
@@ -162,7 +160,7 @@ module Skylab::DocTest
     end
 
     def __check_the_lib_assumption_when_shorter_arg_path proj_dir
-      
+
       # .. but if the argument path is not within the project dir (we *think*
       # this is only possible in one case), then we have one more filesytem
       # hit to do

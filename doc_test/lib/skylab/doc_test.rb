@@ -90,6 +90,8 @@ module Skylab::DocTest
     end
   end
 
+  # ==
+
   Common_ = ::Skylab::Common
   Lazy_ = Common_::Lazy
 

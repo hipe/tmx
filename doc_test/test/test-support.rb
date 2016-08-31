@@ -93,6 +93,24 @@ module Skylab::DocTest::TestSupport
       Home_::Magnetics_
     end
 
+    def normalize_real_test_file_path_ path
+      # this craziness is explained in [#029] #note-1
+      _omg = path.reverse
+      scn = Home_::RecursionModels_::EntryScanner.via_path_ _omg
+      egads = []
+      test_backwards = 'tset'  # "test"
+      begin
+        entry = scn.scan_entry
+        entry || Home_._SANITY
+        if test_backwards == entry
+          break
+        end
+        egads.push entry.reverse
+        redo
+      end while above
+      ::File.join my_real_test_directory_, * egads.reverse
+    end
+
     -> do
       cache = {}
       define_method :full_path_ do |tail_path|
@@ -105,13 +123,13 @@ module Skylab::DocTest::TestSupport
     end.call
 
     rpmd = nil
-    define_method :my_real_magnetics_dir_ do
+    define_method :my_real_magnetics_directory_ do
       # this is one that depends on the real filesystem
-      rpmd ||= ::File.join my_real_counterpart_dir_, 'magnetics-'
+      rpmd ||= ::File.join my_real_counterpart_directory_, 'magnetics-'
     end
 
     rcd = nil
-    define_method :my_real_counterpart_dir_ do
+    define_method :my_real_counterpart_directory_ do
       rcd ||= ::File.join sidesystem_path_, 'lib', 'skylab', 'doc_test'
     end
 
@@ -140,6 +158,15 @@ module Skylab::DocTest::TestSupport
       hdp ||= Home_.dir_pathname.to_path
     end
 
+    ted = nil
+    define_method :the_empty_directory_ do
+      ted ||= TestSupport_::Fixtures.directory :empty_esque_directory
+    end
+
+    tnd = nil
+    define_method :the_noent_directory_ do
+      tnd ||= TestSupport_::Fixtures.directory :not_here
+    end
   # -
 
   module My_Non_Interactive_CLI
@@ -159,6 +186,14 @@ module Skylab::DocTest::TestSupport
 
   Common_ = ::Skylab::Common
   Lazy_ = Common_::Lazy
+
+  # --
+
+  Safe_localize_ = -> longer, shorter do
+    len = shorter.length
+    longer[ 0, len ] == shorter || self._SANITY
+    longer[ len .. -1 ]
+  end
 
   # --
 

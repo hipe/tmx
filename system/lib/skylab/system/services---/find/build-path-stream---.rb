@@ -60,7 +60,17 @@ module Skylab::System
 
         @on_event_selectively.call :error, :find_error do
 
-          Common_::Event.inline_not_OK_with :find_error, :message, error_s
+          Common_::Event.inline_not_OK_with :find_error, :message, error_s do |y, o|
+
+            # see tombstone - we used to let the default inline event
+            # expression happen, but it was truncating the long strings from
+            # `find`, strings which have useful content in them talking bout
+            # noent paths. also, that behavior would contextualize this with
+            # "find error: " but that is mostly redundant with what `find`
+            # itself emits.
+
+            y << o.message
+          end
         end
         nil
       end
@@ -69,3 +79,4 @@ module Skylab::System
     end
   # -
 end
+# #tombstone: we used to let the defalt inline event expression happen

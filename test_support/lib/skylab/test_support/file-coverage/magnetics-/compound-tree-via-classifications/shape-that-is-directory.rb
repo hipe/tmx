@@ -4,6 +4,8 @@ module Skylab::TestSupport
 
     class Magnetics_::CompoundTree_via_Classifications  # :[#014].
 
+      # (if you're trying to refactor, there is newer similar guy at [#dt-028])
+
       module Shape_that_Is_Directory
 
         def execute

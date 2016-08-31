@@ -19,7 +19,7 @@ module Skylab::DocTest
 
     def execute
       @filesystem ||= ::File
-      @name_conventions ||= RecursionModels_::NameConventions.instance__
+      @name_conventions ||= RecursionModels_::NameConventions.instance_
       @_entry = @name_conventions.test_directory_entry_name
 
       base = @argument_path

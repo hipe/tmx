@@ -395,7 +395,11 @@ module Skylab::Common::TestSupport
 
       def fails
         _state = state_for_expect_event
-        _state.result == false || fail( "did not fail" )
+        expect_failure_value _state.result
+      end
+
+      def expect_failure_value x
+        x == false || fail( "did not fail - expected false, had #{ String_via_mixed__[ x ] }" )
       end
 
       def result_is_nothing
