@@ -1,1 +1,3 @@
-# empty.
+# lines can always be added to this file but not removed (without checking
+# the subsystems that say hello on the lines they use.
+# for [dt]:  # =>

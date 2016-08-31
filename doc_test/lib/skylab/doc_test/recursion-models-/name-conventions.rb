@@ -14,6 +14,8 @@ module Skylab::DocTest
 
     def __init_with_defaults
 
+      @asset_filename_pattern__ = '*.kode'  # .. do NOT commit!
+
       @__stemify_asset_directory_entry = :__stemify_asset_directory_entry_normally
       @__stemify_asset_file_entry = :__stemify_asset_file_entry_normally
 
@@ -73,6 +75,7 @@ module Skylab::DocTest
     end
 
     attr_reader(
+      :asset_filename_pattern__,
       :test_directory_entry_name,
       :test_filename_patterns__,
     )

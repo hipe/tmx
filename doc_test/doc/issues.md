@@ -33,22 +33,26 @@
 [#013] #former-stub use whatever subject was there when you got there
 
 [#012] #open when rewrite, see subscribers (2x)
+             internally, this also refers to the new synchronization feature
              ( #was: [#ts-046] )
 
 [#011]       this wild 'case' thing (furloughed but pretty great)
              ( #was: modernize templates )
              ( #was: [#ts-043] )
 
-[#010]       #parent-node: [#007] #tracking a `Subject_` parameter function
+[#010] #hole
+             ( #was: #parent-node: [#007] #tracking a `Subject_` parameter function )
              ( #was: [#ts-039] )
 
 [#009]       #tracking tag warnings wishlist (#parent-node: [#003])
              ( #was: [#ts-037] )
 
-[#008] #open #parent-node: [#001] "re-architect.."
+[#008] #hole
+             ( #was: #parent-node: [#001] "re-architect.." )
              ( #was: [#ts-034] )
 
-[#007] #open #old the recursive spec needs mock fs (?)
+[#007] #open rename spec files that use real-looking asset file names
+             ( #wontfix - too much work to be worth it. using filesystem is OK)
              ( #was: [#ts-030] )
 
 
@@ -70,6 +74,5 @@
              ( #was: #doc-point #in-situ (the particular importance of result values) )
              ( #was: [#ts-012] )
 
-[#001] #open this tracks the rewrite (nodes waiting on it)
-             also, the README
+[#001]       [ the README ]
              (was: [#ts-015]

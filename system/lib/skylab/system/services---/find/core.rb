@@ -38,6 +38,10 @@ module Skylab::System
           end
         end
 
+      def statuser_by & oes_p
+        Statuser__.new oes_p
+      end
+
         private :new
       end  # >>
 
@@ -402,6 +406,46 @@ module Skylab::System
         Find_ = self
       # -
     # -
+
+    # ==
+
+    class Statuser__  # (this is in need of a better name. it's "satus"-"er",
+      # (*not* "stat user") as in, "a thing that produces statuses.")
+
+      # because the find command is immutable (stateless) and the stream is
+      # just a stream, then the onus moves to the client to jump through
+      # the hoops of eventing to determine whether the command emitted any
+      # errors (otherwise it is impossible to know if (for example) receiving
+      # nothing from the first `gets` mean the empty stream or a failure.)
+      #
+      # this is an experimental salve for that, but not perfect because the
+      # client still has to know a lot to use this.
+
+      def initialize oes_p
+
+        did = -> do
+          @ok = false
+        end
+
+        @to_proc = -> * i_a, & x_p do
+          if :error == i_a.fetch(0)
+            did[]
+          end
+          if oes_p
+            oes_p[ * i_a, & x_p ]
+          end
+          :_sy_unreliable_
+        end
+
+        @ok = true  # it *must* be innocent til proven guilty
+      end
+
+      attr_reader(
+        :ok,  # we would say "is" or "was" but that is misleading
+        :to_proc,
+      )
+    end
+    # ==
   end
 end
 # :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern

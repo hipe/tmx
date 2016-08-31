@@ -28,7 +28,7 @@ module Skylab::DocTest
 
       st = remove_instance_variable :@__path_stream
       path = st.gets
-      if @_find_command_was_OK
+      if @_find.ok
         __build_index_via path, st
       else
         path
@@ -120,30 +120,21 @@ module Skylab::DocTest
       # find all paths in the test directory that look like test files.
       # it's OK if none are found (however the directory must exist).
 
-      oes_p = @_on_event_selectively
-      _peek = -> * i_a, & ev_p do
-        if :error == i_a.fetch(0)
-          @_find_command_was_OK = false
-        end
-        if oes_p
-          oes_p[ * i_a, & ev_p ]
-        end
-      end
-
       _patterns = @name_conventions.test_filename_patterns__
+
+      @_find = @the_find_service.statuser_by( & @_on_event_selectively )
 
       _command = @the_find_service.new_with(
         :path, @test_directory,
         :filenames, _patterns,
         :freeform_query_infix_words, TYPE_FILE___,
         :when_command, IDENTITY_,
-        & _peek
+        & @_find
       )
 
       _st = _command.to_path_stream
       _st || self._SANITY  # even when noent
       @__path_stream = _st
-      @_find_command_was_OK = true
       NIL
     end
 
@@ -192,7 +183,6 @@ module Skylab::DocTest
 
     # ==
 
-    IDENTITY_ = -> x { x }
     TYPE_FILE___ = %w( -type f )
   end
 end

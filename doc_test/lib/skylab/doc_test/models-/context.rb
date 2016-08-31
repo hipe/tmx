@@ -3,7 +3,7 @@ module Skylab::DocTest
   class Models_::Context  # #[#025] common paraphernalia
 
     # this rewritten handling of context is experimental. it cannot be
-    # considered to have "gelled" until [#001] synchronizing is in.
+    # considered to have "gelled" until [#012] synchronizing is in.
 
     class << self
 

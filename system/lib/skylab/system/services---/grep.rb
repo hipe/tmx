@@ -15,9 +15,13 @@ module Skylab::System
       class << self
 
         def for_mutable_args_ x_a, & oes_p
-          o = new( & oes_p )
-          o.__init_via_iambic x_a
-          o.execute
+          if x_a.length.nonzero? || block_given?
+            o = new( & oes_p )
+            o.__init_via_iambic x_a
+            o.execute
+          else
+            self
+          end
         end
 
         private :new
@@ -41,6 +45,7 @@ module Skylab::System
         _ok = ___resolve_regexp
         _ok && freeze
       end
+      alias_method :finish, :execute  # #todo
 
       def ___resolve_regexp
 
