@@ -47,7 +47,7 @@ module Skylab::DocTest::TestSupport
 
     o :name_conventions_ do
       o = Home_::RecursionModels_::NameConventions.begin
-      o.asset_filename_pattern = '*.kode'
+      o.asset_extname = '.kode'
       o.finish
     end
   end

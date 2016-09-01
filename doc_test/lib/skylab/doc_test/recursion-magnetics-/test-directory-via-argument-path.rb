@@ -7,6 +7,11 @@ module Skylab::DocTest
     # non-declared parameters: filesystem, name_conventions
     # of filesystem calls only `exist?`
 
+    # (look like a participating file, only to be a UoW for a test..)
+    #
+    #     Home_::RecursionMagnetics_::TestDirectory_via_ArgumentPath[ '/foo/bar/baz' ]  # => "/foo/test"
+    #
+
     class << self
 
       def of rsx

@@ -30,13 +30,11 @@ module Skylab::DocTest
       @counterpart_directory = cd
       @name_conventions = nc
       @test_directory = td
+      @the_find_service = Home_.lib_.system.find  # module
       @_on_event_selectively = oes_p  # not guaranteed
     end
 
     def execute
-
-      @the_find_service = Home_.lib_.system.find  # module
-
       __init_path_stream
       __build_index_via_path_stream
     end

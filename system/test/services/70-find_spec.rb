@@ -8,14 +8,15 @@ module Skylab::System::TestSupport
 
     it "minimal working example - find one file" do
 
-      args = _parent_subject.find :path, TS_.dir_pathname.to_path,
+      _args = _parent_subject.find :path, TS_.dir_pathname.to_path,
         :filename, 'find_spec.*',
         :when_command, -> command do
           command.args
         end
 
-      [ * args[ 0, 2 ], 'XX', * args[ 3..-1 ] ].should eql(
-        %w'find -f XX -- ( -name find_spec.* )' )
+      act = _args.dup
+      act[ 3 ] = 'XX'
+      act == %w'find -H -f XX -- ( -name find_spec.* )' || fail
     end
 
     it "emits an informational event upon request" do

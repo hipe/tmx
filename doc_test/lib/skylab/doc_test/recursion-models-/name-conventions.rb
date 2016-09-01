@@ -26,11 +26,16 @@ module Skylab::DocTest
     end
 
     attr_writer(
-      :asset_filename_pattern,
+      :asset_extname,
     )
 
     def finish
-      @asset_filename_pattern ||= '*.rb'
+      @asset_filename_pattern__ ||= begin
+        s = @asset_extname
+        if s
+          "*#{ s }"
+        end
+      end
       freeze
     end
 
@@ -82,7 +87,8 @@ module Skylab::DocTest
     end
 
     attr_reader(
-      :asset_filename_pattern,
+      :asset_extname,
+      :asset_filename_pattern__,
       :test_directory_entry_name,
       :test_filename_patterns__,
     )

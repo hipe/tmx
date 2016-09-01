@@ -325,6 +325,8 @@ module Skylab::System
 
             @y = [ FIND__ ]
 
+            @y.push FOLLOW_ARGUMENT_SYMLINKS___
+
             __add_paths
 
             @y.push DOUBLE_DASH___
@@ -352,6 +354,9 @@ module Skylab::System
 
           DOUBLE_DASH___ = '--'.freeze
           FIND__ = 'find'.freeze
+          FOLLOW_ARGUMENT_SYMLINKS___ = '-H'.freeze  # it's kind of gross
+            # to hardcode this but it's what we need in one place [dt]
+            # and probably what we want always. if not, can be optionized
 
           def __add_paths
 

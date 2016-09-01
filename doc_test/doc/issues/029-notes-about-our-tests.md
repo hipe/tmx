@@ -39,3 +39,19 @@ try to write a scanner that scans from the reverse but A) we don't
 and B) internally we use ::StringScanner which doesn't do this
 either, and while scanning for ::File::SEPARATOR from the end of the
 string is trivial enough, like we said we don't care :P
+
+
+
+
+
+## :#note-2
+
+the "resolve test directory" magnet given a search for "X" under
+"/a/b" will check for "/a/b/X", "/a/X" and "/X" *regardless* of
+whether "/a/b" and "/a" exist. we *cannot* sanely cover the above
+for the myriad noent cases without mocking the filesystem, something
+that for now we abstain from in the interest of simplicity.
+
+but we can at least cover one of noent cases if we add this check
+here. whether this check should be moved to the magnet is an open
+question.

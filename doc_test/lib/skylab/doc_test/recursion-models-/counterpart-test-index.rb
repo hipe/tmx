@@ -17,13 +17,8 @@ module Skylab::DocTest
 
     def finish__
 
-      cd = remove_instance_variable :@__counterpart_directory
-      len = cd.length
-      @_localize_r = len .. -1
-      @_sanity_r = 0 ... len
-      @_sanity_s = cd
-
       @_lookup_prototype = Lookup___.new(
+        remove_instance_variable( :@__counterpart_directory ),
         remove_instance_variable( :@__trees ),
         remove_instance_variable( :@__paths ),
         remove_instance_variable( :@__test_directory ),
@@ -33,17 +28,16 @@ module Skylab::DocTest
     end
 
     def details_via_asset_path path
-      _check = path[ @_sanity_r ]
-      @_sanity_s == _check || self._SANITY
-      _local_path = path[ @_localize_r ]
-      @_lookup_prototype.__details_via_local_asset_path _local_path
+      @_lookup_prototype.__details_via_asset_path path
     end
 
     # ==
 
     class Lookup___
 
-      def initialize tr, pa, td, nc
+      def initialize cd, tr, pa, td, nc
+
+        __init_crazy_regex cd
         @name_conventions = nc
         @_paths = p
         @_trees = tr
@@ -51,25 +45,78 @@ module Skylab::DocTest
         freeze
       end
 
-      def __details_via_local_asset_path local_path
+      def __init_crazy_regex cd
+        # parsing the asset paths would be simple were it not for one
+        # edge case we want to support..
+
+        dn = ::File.dirname cd
+        bn = ::File.basename cd
+        esc = ::Regexp.method :escape
+        sep = esc[ ::File::SEPARATOR ]
+
+        # all asset paths must be under the *parent* directory of the
+        # "counterpart directory" (undefined if not). BUT we are making
+        # an allowance of one special file that can exist outside of it
+        # for now (and this all may broaden or tighten later..)
+
+        @_rx = /\A
+          #{ esc[ dn ] } #{ sep }  # all asset paths must be in this
+          (?:                      # directory, and then EITHER:
+
+           #{ esc[ bn ] } #{ sep } (?<typical_path> .+ )
+           |
+           (?<atypical_path> .* )  # anything else (for now)
+          )
+        \z/x
+
+        @__counterpart_directory_basename = bn
+      end
+
+      def __details_via_asset_path asset_path
         otr = dup
-        otr.local_path = local_path
+        otr.asset_path = asset_path
         otr.execute
       end
 
     protected
 
       attr_writer(
-        :local_path,
+        :asset_path,
       )
 
       def execute
+        md = @_rx.match @asset_path
+        # ..
+        s = md[ :typical_path ]
+        if s
+          _for_localized_asset_path s
+        else
+          __when_atypical_path md[ :atypical_path ]
+        end
+      end
+
+      def __when_atypical_path s
+
+        # the operation is based around straightforward isomorphisms between
+        # asset and test files. here we deal with those parts that are not
+        # straightforward.
+
+        exp = "#{ @__counterpart_directory_basename }#{ @name_conventions.asset_extname }"
+        if exp == s
+          _pretend = "core#{ @name_conventions.asset_extname }"
+          _for_localized_asset_path _pretend
+        else
+          self._COVER_ME_not_corefile
+        end
+      end
+
+      def _for_localized_asset_path local_path
 
         is_real = true ; these = []
 
         tip = @_trees
 
-        scn  = RecursionModels_::EntryScanner.via_path_ @local_path
+        scn  = RecursionModels_::EntryScanner.via_path_ local_path
         entry = scn.scan_entry
         entry_ = scn.scan_entry
         begin

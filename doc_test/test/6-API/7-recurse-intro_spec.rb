@@ -5,104 +5,96 @@ module Skylab::DocTest::TestSupport
   describe "[dt] API - recurse intro" do
 
     TS_[ self ]
+    use :fixture_files
     use :my_API
-    # use :expect_event
-    # use :stubbed_FS
 
-    it "path is required", wip: true do
-
-      _rx = /\Amissing required attribute 'path'\z/
-
+    it "`path` is a required parameter" do
       begin
-        call_API :recursive
+        call_API :recurse
       rescue ::ArgumentError => e
       end
-
-      e.message.should match _rx
+      e.message.include? "'recurse' is missing required parameter 'path'" or fail
     end
 
-    it "enum works #frontier", wip: true do
+    context "against noent dir" do
 
-      call_API :recursive, :path, 'not-there', :sub_action, :no_wai
+      call_by do
 
-      expect_not_OK_event :invalid_attribute_value,
-        "invalid sub action (ick :no_wai), expecting { list | preview }"
+        _dir = the_noent_directory_
 
-      expect_failed
+        call(
+          :recurse,
+          :path, _dir,
+        )
+      end
+
+      it "fails" do
+        fails
+      end
+
+      it "emits" do
+        expect_emission :error, :stat_error do |ev|
+          _msg = black_and_white ev
+          _msg.include? "No such file or directory -" or fail
+        end
+      end
     end
 
-    it "'list' only those files relevant to the path. emits no events, result is stream", wip: true do  # #old-wip:2015-04
+    context "whoopie list (test against self eek)" do
 
-      call_API :recursive, :sub_action, :list, :path, sidesystem_path_
+      call_by do
 
-      expect_no_events
+        _dir = sidesystem_path_
 
-      st = @result
-      one = st.gets
-      two = st.gets
-      st.gets.should be_nil
+        call(
+          :recurse,
+          :path, _dir,
+          :list, true,
+        )
+      end
 
-      one.path.should match %r(/doc-test/core\.rb\z)
-      two.path.should match %r(/generate/core\.rb\z)
+      it "appears to succeed" do
+        expect_trueish_result
+      end
+
+      it "no unexpected emissions" do
+        expect_no_emissions
+      end
+
+      context "result.." do
+
+        shared_subject :_array do
+
+          a = root_ACS_result.to_a
+
+          a.sort_by! do |uow|
+            uow.asset_path.length
+          end
+          a
+        end
+
+        it "uow for probably shallower asset, test file DOES exit; is last thing" do
+
+          uow = _array.fetch 0
+          uow.asset_path || fail
+          uow.test_path || fail
+          uow.test_path_is_real && fail
+        end
+
+        it "uow for probably deeper asset, test file does NOT exist" do
+
+          a = _array
+          a.fetch(1).test_path_is_real || fail
+          a.length == 2 || fail
+        end
+      end
     end
 
-    it "'preview' adds a conditional property requirement", wip: true do
-
-      call_API :recursive, :sub_action, :preview, :path, 'x'
-
-      _em = expect_not_OK_event :missing_required_properties
-
-      black_and_white( _em.cached_event_value ).should eql(
-        "missing required attribute 'downstream'\n" )
-
-      expect_failed
-    end
-
-    it "'preview' results in a stream of \"generation\"s", wip: true do  # #old-whip:2015-04
-
-      downstream = build_IO_spy_downstream_for_doctest
-
-      call_API :recursive, :sub_action, :preview, :path,
-
-        sidesystem_path_,
-
-        :downstream, downstream
-
-      gen_stream = @result
-
-
-      _gen = gen_stream.gets
-
-      x = _gen.execute
-
-      x.should eql nil
-
-      ev = expect_neutral_event :current_output_path
-
-      ev.to_event.path.should match %r( integration/final/top_spec\.rb \z)x
-
-      ev = expect_neutral_event :wrote
-
-      expect_no_more_events
-
-      ( 28 .. 33 ).should be_include ev.to_event.line_count
-
-      gen_ = gen_stream.gets
-
-      gen_.output_path.should match %r( integration/core_spec\.rb \z)x
-
-      x = gen_stream.gets
-
-      x.should be_nil
-
-      validate_content_of_the_generated_file_of_interest downstream
-
-    end
-
-    def validate_content_of_the_generated_file_of_interest io
-      string_IO = io[ :buffer ]
-      string_IO.rewind
-      string_IO.gets.should eql "require_relative '../test-support'\n"
+    h = { find_command_args: true }
+    define_method :ignore_for_expect_event do
+      h
     end
   end
 end
+# #tombstone: tests removed in this commit will have DNA brought back in a future commit.
+# #tombstone: tested old enum meta-field

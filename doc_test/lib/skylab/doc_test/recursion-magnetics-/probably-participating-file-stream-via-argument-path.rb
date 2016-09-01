@@ -55,7 +55,7 @@ module Skylab::DocTest
 
       asset_path_st = remove_instance_variable :@_find_stream
 
-      _CHUNK_SIZE = 2
+      _CHUNK_SIZE = 30  # see #note-1 in doc if you dare
       next_chunk = -> do
         path = asset_path_st.gets
         if path
@@ -138,7 +138,7 @@ module Skylab::DocTest
     #    so in theory any string should be OK and not break the syntax.
 
     def __resolve_valid_filenames
-      s = @name_conventions.asset_filename_pattern
+      s = @name_conventions.asset_filename_pattern__
       if s && s.length.nonzero?
         @__valid_filenames = [ s ]
         ACHIEVED_

@@ -46,7 +46,7 @@ module Skylab::Snag::TestSupport
 
       invoke( * _action, '--show-command', '-p', 'zipperly', _some_todos )
 
-      expect :o, /\Agenerated `find` command: "find -f\b/
+      expect :o, /\Agenerated `find` command: "find -[a-zA-Z]\b/
       expect_result_for_success
     end
 

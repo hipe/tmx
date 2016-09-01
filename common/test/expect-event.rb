@@ -25,7 +25,7 @@ module Skylab::Common::TestSupport
       end
     end  # >>
 
-    IGNORE_METHOD__ = :_hash_of_terminal_channels_for_expev_to_ignore
+    IGNORE_METHOD__ = :ignore_for_expect_event
 
     OPTS___ = {
 

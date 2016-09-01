@@ -232,7 +232,7 @@ entries in it - the "entry" will correspond exactly to a filesystem
 entry (file or directory). for now, we'll call this the "test index"
 but it could just as soon be an asset index (for reverse
 synchronization!). anyway, **each node has one "normal index" (symbol)**
-that it exists under in its parent. 
+that it exists under in its parent.
 
 (we could do this a different way, where we put the "edge of the
 world"-shortened paths into a tree as-is, without keyifiing their names
@@ -296,3 +296,110 @@ because the units of work should be desiged to resemble the arguments
 that the core operation (function) takes.
 
 WHEW!
+
+
+
+
+## `find` and `grep` - why (and at what cost)?
+
+the general implementation plan here is that we acquire a list of files
+from `find` and then pass them to `grep` to reduce this list of files
+to be only those files that *look like* they are "participating".
+
+we say "look like" because at this stage in the pipeline we are only
+making a guess based on file content - we can't be sure that the file
+is "participating" unless we use a tall stack of ruby to parse it.
+
+if `grep` is available on the system and we talk that particalar
+installation of grep correctly, we can use it to pare down the files
+that we look at for consideration as being "participating" files.
+this requires a much smaller swath of code and is a more reasonable use
+of system resources at this stage, rather than opening every single asset
+file under the argument path and trying to parse it with a bunch of
+ruby. (typically tens, hundreds or thousands of files; and only a small
+percentage that are particating; but these numbers are of course fully
+dependent on use-case.)
+
+(what do to when `grep` is not available or compatible on the particular
+system is a real issue, but it's a bridge we haven't yet crossed because
+we find the problem uninteresting. we can regress to the ineffcient
+way as necessary in the future.)
+
+(what to do about `find` not being available or incompatible is a somewhat
+more challenging problem. basically we should just consider compatible
+forms of these two as being requirements..)
+
+one cost to using grep in this manner is this: when we simply search for
+any first occurrence of the magic byte sequence in each asset file, this
+can certainly produce false positives because *any* asset file that contains
+the magic byte sequence will look like a match. we can't be sure that a
+given asset file is actually "participating" unless we parse it with the
+tall stack of ruby. however since in practice the accuracy rate of this
+guess is probably something like 98% or more, it's a purchase we're happy
+to make.
+
+but a corollary of this cost is that our "units of work" (or maybe just
+our "probably participating files", depending on how we implement the
+"UoW" streamer) might contain these false positives. consumers of such
+streams must be aware of this, and hop over these cases as appropriate
+so we can take advantage of this happy purchase.
+
+
+
+
+## `find` and `grep` - why chunking?
+
+in short, its because of input buffer limits in shells (or the system
+or whatever). we are walking along a spectrum:
+
+in one extreme we open up a new process for running the grep command
+on *every* asset file produced by `find`, which throws out the window
+all efficiency gains of using these two entirely.
+
+on the other end of the spectrum, we cram all hundreds and hundreds
+(or whatever) of files as resulted by `find` into the `grep` command.
+*this* approach will fail at some limit, which is A) system dependant
+and B) certainly reachable: it's not unreasonable to expect us to point
+a recursive listing operation on a tree with thousands of asset files.
+if each path to these files one hundred-ish bytes, then the string-form
+of our super-long `grep` command is in the ballbark of 100 kilobytes.
+
+the point is that expecting to hit all the files resulted by `find` with
+one `grep` command is not a scalable assumption. as such we "chunk"
+this pipeline by breaking the `find` stream of paths into chunks of
+paths each of which we pass into grep in its own process.
+
+A) although we accomplish this only crudely with a hard-coded limit
+(see #note-1 below), the general idea is there, and a scale-path is
+availble to perhaps make smart-chunking that perhaps calculates a
+real byte-length for the grep command as it is being built; but yeah, eew.
+
+B) more interestingly, chunking opens the door to an architecture that
+would solve this problem with concurrency. we won't explore that idea
+further here, other than to just say "go routines".
+
+
+### :#note-1
+
+currently the ultra-crude way we do "chunking" is to use a hard-coded
+chunk size. (although we say this is crude, for realistic use-cases it's
+likely to never hit the system command input buffer size limit and
+to probably yield a reasonably small number of chunks for typical usage.)
+
+the way we arrived at this particular number was to say "how many asset
+files are there in the subject sidesystem (at writing)?"
+
+    find . -name test -prune -o -name '*.rb' -print | wc -l  # => 51
+
+and then add 15% to it (to allow a little room to grow):
+
+    51 * ( 1.15 )  # => 58.65
+
+and then divide by two (and round up):
+
+    ( 58.65 / 2 ).ceil  # => 30
+
+the idea here is that when we run the subject operation against the selfsame
+sidesystem, we are likely to chunk exactly once. this is what we want,
+so that we exercise the chunking code (real-use coverage?), but so that
+we do not chunk so many times that performance is choppy. whew!

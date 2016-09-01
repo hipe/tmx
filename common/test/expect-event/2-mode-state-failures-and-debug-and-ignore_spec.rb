@@ -53,7 +53,7 @@ module Skylab::Common::TestSupport
         _this_same_ignoration_test
       end
 
-      attr_reader :_hash_of_terminal_channels_for_expev_to_ignore  # 1 of 2
+      attr_reader :ignore_for_expect_event  # 1 of 2
     end
 
     context "when `do_debug` is on" do
@@ -115,7 +115,7 @@ module Skylab::Common::TestSupport
           io.gets and fail
         end
 
-        attr_reader :_hash_of_terminal_channels_for_expev_to_ignore  # 2 of 2
+        attr_reader :ignore_for_expect_event  # 2 of 2
       end
     end
 
@@ -123,7 +123,7 @@ module Skylab::Common::TestSupport
 
     define_method :_this_same_ignoration_test do
 
-      @_hash_of_terminal_channels_for_expev_to_ignore = _IGNORE_ZIZZO
+      @ignore_for_expect_event = _IGNORE_ZIZZO
 
       send_potential_event_ :zizzo do
         self._NEVER

@@ -52,7 +52,7 @@ module Skylab::TestSupport
 
         Comparer_for___ = -> pair do
           md = rx.match pair.name_x
-          if md[ :major_integer ]
+          if md
             Numbered_Comparer___.new md
           else
             Non_Numbered_Comparer___.new pair.name_x
