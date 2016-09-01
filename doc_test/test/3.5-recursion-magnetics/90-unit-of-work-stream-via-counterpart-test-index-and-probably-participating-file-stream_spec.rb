@@ -14,7 +14,7 @@ module Skylab::DocTest::TestSupport
     context "runny money" do
 
       shared_subject :_units do
-        _st = _subject_mag[ __build_stub_index, __build_stub_stream ]
+        _st = __against __build_stub_index, __build_stub_stream
         _st.to_a
       end
 
@@ -89,6 +89,10 @@ module Skylab::DocTest::TestSupport
       ) do
         # ..
       end
+    end
+
+    def __against cti, ppfs
+      _subject_mag[ cti, ppfs ]
     end
 
     def _subject_mag

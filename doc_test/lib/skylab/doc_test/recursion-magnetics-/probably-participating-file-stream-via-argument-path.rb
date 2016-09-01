@@ -7,32 +7,31 @@ module Skylab::DocTest
     #     find /the/argument/path -name test -prune -o -name '*.kode' -print
     #
 
+    # non-declared parameters: name_conventions
+    # currently hard-coded: the_find_service
+
     class << self
-      alias_method :begin_via, :new
-      undef_method :new
+
+      def of rsx
+        call rsx.argument_path, rsx.name_conventions, & rsx.listener_
+      end
+
+      def call *a, &p
+        new( *a, &p ).execute
+      end
+
+      alias_method :[], :call
+      private :new
     end  # >>
 
-    def initialize ap, & p
+    def initialize ap, nc, & p
       @argument_path = ap
-      @on_event_selectively = p
-    end
-
-    attr_writer(
-      :name_conventions,
-    )
-
-    def finish
-      @name_conventions ||= RecursionModels_::NameConventions.instance_
-      @the_find_service ||= Home_.lib_.system.find  # module
-      @__execute_method = :__main
-      self
+      @name_conventions = nc
+      @_on_event_selectively = p
+      @the_find_service = Home_.lib_.system.find  # module
     end
 
     def execute
-      send @__execute_method  # so we are sure `finish` was called
-    end
-
-    def __main
       ok = true
       ok &&= __resolve_valid_infix_thing
       ok &&= __resolve_valid_filenames
@@ -51,7 +50,7 @@ module Skylab::DocTest
       proto = @the_grep_service.new_with(
         :grep_extended_regexp_string, '[^[:space:]][ ]+# =>',
         :freeform_options, %w( --files-with-matches ),
-        & @on_event_selectively
+        & @_on_event_selectively
       ).finish
 
       asset_path_st = remove_instance_variable :@_find_stream
@@ -117,7 +116,7 @@ module Skylab::DocTest
 
     def __init_find_things
 
-      find = @the_find_service.statuser_by( & @on_event_selectively )
+      find = @the_find_service.statuser_by( & @_on_event_selectively )
 
       _command = @the_find_service.new_with(
         :path, @argument_path,

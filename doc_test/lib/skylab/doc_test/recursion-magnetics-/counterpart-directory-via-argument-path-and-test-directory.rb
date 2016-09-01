@@ -4,15 +4,32 @@ module Skylab::DocTest
 
     # exactly [#005]
 
-    def initialize pa, pa_
-      @argument_path = pa
-      @test_directory = pa_
+    # non-declared parameters: name_conventions
+    # currently hard-coded: filesystem_directories
+
+    class << self
+
+      def of rsx
+        call rsx.argument_path, rsx.test_directory, rsx.name_conventions
+      end
+
+      def call *a
+        new( *a ).execute
+      end
+
+      alias_method :[], :call
+      private :new
+    end  # >>
+
+    def initialize ap, td, nc
+      @argument_path = ap
+      @name_conventions = nc
+      @test_directory = td
     end
 
     def execute
 
-      @filesystem_directories ||= ::Dir
-      @name_conventions ||= RecursionModels_::NameConventions.instance_
+      @filesystem_directories = ::Dir
 
       ok = __check_the_lib_assumption
       ok &&= __step_downward_until_something_other_than_exactly_one_directory

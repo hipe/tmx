@@ -29,7 +29,7 @@ module Skylab::DocTest::TestSupport
       shared_subject :_index do
 
         _test_dir = the_empty_directory_
-        _subject_mag[ _test_dir, '/watanabi/fatanabi' ]
+        _against _test_dir, '/watanabi/fatanabi'
       end
 
       it "builds" do
@@ -62,7 +62,7 @@ module Skylab::DocTest::TestSupport
 
         _test_dir = my_real_test_directory_
         _counterpart_dir = my_real_counterpart_directory_
-        _subject_mag[ _test_dir, _counterpart_dir ]
+        _against _test_dir, _counterpart_dir
       end
 
       it "builds" do
@@ -117,10 +117,14 @@ module Skylab::DocTest::TestSupport
 
       el.set_hash_of_terminal_channels_to_ignore( find_command_args: true )
 
-      _result = _subject_mag[ test_dir, :_nver_, & _oes_p ]
+      _result = _subject_mag[ test_dir, :_nvr_, name_conventions_, & _oes_p ]
 
       expect_failure_value _result
       NIL
+    end
+
+    def _against td, cd  # assume no error ergo no emissions ergo no listener
+      _subject_mag[ td, cd, name_conventions_ ]
     end
 
     def _subject_mag

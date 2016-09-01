@@ -13,11 +13,9 @@ module Skylab::DocTest::TestSupport
 
     it "runny money" do
 
-      _omg = TestSupport_::Fixtures.tree :three
+      _dir = TestSupport_::Fixtures.tree :three
 
-      o = _subject_mag.begin_via _omg
-      o.name_conventions =  name_conventions_used_in_testing__
-      _st = o.finish.execute
+      _st = __against _dir
 
       a = []
       a.push _st.gets
@@ -34,6 +32,10 @@ module Skylab::DocTest::TestSupport
 
       a[0] || fail
       a[1] || fail
+    end
+
+    def __against ap
+      _subject_mag[ ap, name_conventions_ ]
     end
 
     def _subject_mag

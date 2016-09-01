@@ -45,7 +45,7 @@ module Skylab::DocTest::TestSupport
       ::File.join my_real_test_directory_, * egads.reverse
     end
 
-    o :name_conventions_used_in_testing__ do
+    o :name_conventions_ do
       o = Home_::RecursionModels_::NameConventions.begin
       o.asset_filename_pattern = '*.kode'
       o.finish

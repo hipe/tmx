@@ -4,22 +4,29 @@ module Skylab::DocTest
 
     # exactly [#005]
 
+    # non-declared parameters: filesystem, name_conventions
+    # of filesystem calls only `exist?`
+
     class << self
 
-      def call path
-        new( path ).execute
+      def of rsx
+        call rsx.argument_path, rsx.name_conventions, rsx.filesystem
       end
+
+      def call *a
+        new( *a ).execute
+      end
+
       alias_method :[], :call
-      private :new
     end  # >>
 
-    def initialize path
-      @argument_path = path
+    def initialize ap, nc, fs
+      @argument_path = ap
+      @filesystem = fs
+      @name_conventions = nc
     end
 
     def execute
-      @filesystem ||= ::File
-      @name_conventions ||= RecursionModels_::NameConventions.instance_
       @_entry = @name_conventions.test_directory_entry_name
 
       base = @argument_path

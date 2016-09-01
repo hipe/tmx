@@ -5,11 +5,6 @@ module Skylab::DocTest
     # (this is a repurposing (and possible improvement upon) a same-named node in [ts])
 
     class << self
-
-      def instance_
-        @___instance ||= self.begin.finish
-      end
-
       alias_method :begin, :new
       undef_method :new
     end  # >>

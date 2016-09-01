@@ -7,26 +7,27 @@ module Skylab::DocTest
       undef_method :new
     end  # >>
 
-    def initialize tr, pa, cd, td
+    def initialize tr, pa, cd, td, nc
       @__counterpart_directory = cd
+      @__name_conventions = nc
       @__paths = pa
       @__test_directory = td
       @__trees = tr
     end
 
     def finish__
+
       cd = remove_instance_variable :@__counterpart_directory
       len = cd.length
       @_localize_r = len .. -1
       @_sanity_r = 0 ... len
       @_sanity_s = cd
-      @name_conventions ||= RecursionModels_::NameConventions.instance_
 
       @_lookup_prototype = Lookup___.new(
         remove_instance_variable( :@__trees ),
         remove_instance_variable( :@__paths ),
         remove_instance_variable( :@__test_directory ),
-        @name_conventions,
+        remove_instance_variable( :@__name_conventions ),
       )
       self
     end

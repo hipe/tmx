@@ -4,16 +4,38 @@ module Skylab::DocTest
 
     # exactly [#005]
 
-    def initialize td, cd, & oes_p
+    # non-declared parameters: name_conventions
+    # currently hard-coded: the_find_service
+
+    class << self
+
+      def of rsx
+        call(
+          rsx.test_directory,
+          rsx.counterpart_directory,
+          rsx.name_conventions,
+          & rsx.listener_
+        )
+      end
+
+      def call *a, &p
+        new( *a, &p ).execute
+      end
+
+      alias_method :[], :call
+      private :new
+    end  # >>
+
+    def initialize td, cd, nc, & oes_p
       @counterpart_directory = cd
+      @name_conventions = nc
       @test_directory = td
       @_on_event_selectively = oes_p  # not guaranteed
     end
 
     def execute
 
-      @name_conventions ||= RecursionModels_::NameConventions.instance_
-      @the_find_service ||= Home_.lib_.system.find  # module
+      @the_find_service = Home_.lib_.system.find  # module
 
       __init_path_stream
       __build_index_via_path_stream
@@ -58,6 +80,7 @@ module Skylab::DocTest
         remove_instance_variable( :@_paths ),
         @counterpart_directory,
         @test_directory,
+        @name_conventions,
       ).finish__
     end
 

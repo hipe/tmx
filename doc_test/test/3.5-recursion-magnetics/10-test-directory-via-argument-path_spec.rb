@@ -22,7 +22,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def _against path
-      @_result = _subject_mag[ path ]
+      @_result = _subject_mag[ path, name_conventions_, ::File ]
     end
 
     def _expect path
