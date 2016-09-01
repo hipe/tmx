@@ -5,6 +5,7 @@ module Skylab::DocTest::TestSupport
   describe "[dt] recursion mags - counterpart directory via [..]" do
 
     TS_[ self ]
+    use :recursion_magnetics
 
     it "loads" do
       _subject_mag

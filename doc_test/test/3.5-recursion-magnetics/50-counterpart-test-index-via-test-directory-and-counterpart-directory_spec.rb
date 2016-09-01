@@ -7,6 +7,7 @@ module Skylab::DocTest::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :expect_event
+    use :recursion_magnetics
 
     it "loads" do
       _subject_mag
@@ -83,7 +84,7 @@ module Skylab::DocTest::TestSupport
         it "against all odds the correct path is found" do
 
           _act = _details.to_path
-          _exp = normalize_real_test_file_path_ __FILE__  # have a look
+          _exp = normalize_real_test_file_path__ __FILE__  # have a look
           _act == _exp || fail
         end
       end

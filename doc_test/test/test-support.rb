@@ -93,24 +93,6 @@ module Skylab::DocTest::TestSupport
       Home_::Magnetics_
     end
 
-    def normalize_real_test_file_path_ path
-      # this craziness is explained in [#029] #note-1
-      _omg = path.reverse
-      scn = Home_::RecursionModels_::EntryScanner.via_path_ _omg
-      egads = []
-      test_backwards = 'tset'  # "test"
-      begin
-        entry = scn.scan_entry
-        entry || Home_._SANITY
-        if test_backwards == entry
-          break
-        end
-        egads.push entry.reverse
-        redo
-      end while above
-      ::File.join my_real_test_directory_, * egads.reverse
-    end
-
     -> do
       cache = {}
       define_method :full_path_ do |tail_path|
@@ -122,35 +104,14 @@ module Skylab::DocTest::TestSupport
       end
     end.call
 
-    rpmd = nil
-    define_method :my_real_magnetics_directory_ do
-      # this is one that depends on the real filesystem
-      rpmd ||= ::File.join my_real_counterpart_directory_, 'magnetics-'
-    end
-
-    rcd = nil
-    define_method :my_real_counterpart_directory_ do
-      rcd ||= ::File.join sidesystem_path_, 'lib', 'skylab', 'doc_test'
-    end
-
-    tp12 = nil
-    define_method :imaginary_path_one_two__ do
-      tp12 ||= ::File.join sidesystem_path_, 'one', 'two'
-    end
-
-    mtd = nil
-    define_method :my_real_test_directory_ do
-      mtd ||= ::File.join sidesystem_path_, 'test'
+    hafp = nil
+    define_method :home_asset_file_path_ do
+      hafp ||= "#{ home_dir_path_ }#{ Autoloader_::EXTNAME_ }"
     end
 
     ssdp = nil
     define_method :sidesystem_path_ do
       ssdp ||= ::File.expand_path( '../../..', home_dir_path_ )
-    end
-
-    hafp = nil
-    define_method :home_asset_file_path_ do
-      hafp ||= "#{ home_dir_path_ }#{ Autoloader_::EXTNAME_ }"
     end
 
     hdp = nil

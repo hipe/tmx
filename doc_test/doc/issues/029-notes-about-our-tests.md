@@ -19,7 +19,7 @@ magic.
 
 but that test file always loads the core test support file, and that
 file always loads the gem. once we load that gem, the files that are
-loaded from the resource in that gem will be "behind" the gem
+loaded from the resources in that gem will be "behind" the gem
 boundary. this means that when they use the `__FILE__` reader they
 will resolve a path that is under the symlink, not the "real"
 directory.
@@ -30,3 +30,12 @@ that A) we assume is guarateed to be found and B) won't have a
 name-change based on what we described in the above. that directory
 is `test`. by this means we convert the real filesystem path to the
 corresponding path that is under the symlink directory.
+
+the silliness with reversing the string at the beginning and again
+at the end is only because our "path entry scanner" is written to
+work in the manner most string scanners work: from the beginning of
+the string to the end. if we cared about the cost of this we could
+try to write a scanner that scans from the reverse but A) we don't
+and B) internally we use ::StringScanner which doesn't do this
+either, and while scanning for ::File::SEPARATOR from the end of the
+string is trivial enough, like we said we don't care :P

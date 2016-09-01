@@ -8,26 +8,17 @@ module Skylab::DocTest
     #
 
     class << self
-
-      def call s, & p
-        o = self.begin
-        o.argument_path = s
-        o.on_event_selectively = p
-        o.finish.execute
-      end
-      alias_method :[], :call
-
-      alias_method :begin, :new
+      alias_method :begin_via, :new
       undef_method :new
     end  # >>
 
-    def initialize
-      @on_event_selectively = nil
+    def initialize ap, & p
+      @argument_path = ap
+      @on_event_selectively = p
     end
 
     attr_writer(
-      :argument_path,
-      :on_event_selectively,
+      :name_conventions,
     )
 
     def finish
@@ -148,7 +139,7 @@ module Skylab::DocTest
     #    so in theory any string should be OK and not break the syntax.
 
     def __resolve_valid_filenames
-      s = @name_conventions.asset_filename_pattern__
+      s = @name_conventions.asset_filename_pattern
       if s && s.length.nonzero?
         @__valid_filenames = [ s ]
         ACHIEVED_

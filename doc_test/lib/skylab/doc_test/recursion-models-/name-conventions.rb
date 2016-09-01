@@ -2,29 +2,41 @@ module Skylab::DocTest
 
   class RecursionModels_::NameConventions
 
+    # (this is a repurposing (and possible improvement upon) a same-named node in [ts])
+
     class << self
 
       def instance_
-        @___ ||= new.__init_with_defaults.freeze
+        @___instance ||= self.begin.finish
       end
+
+      alias_method :begin, :new
+      undef_method :new
     end  # >>
 
     def initialize
-    end
 
-    def __init_with_defaults
+      # (when the thing hasn't exposed a setter yet, just put it here)
 
-      @asset_filename_pattern__ = '*.kode'  # .. do NOT commit!
+      @test_directory_entry_name = 'test'
+      @test_filename_patterns__ = %w( *_spec.rb )
+
+      # ~
 
       @__stemify_asset_directory_entry = :__stemify_asset_directory_entry_normally
       @__stemify_asset_file_entry = :__stemify_asset_file_entry_normally
 
       @__stemify_test_directory_entry = :__stemify_test_directory_entry_normally
       @__stemify_test_file_entry = :__stemify_test_file_entry_normally
+    end
 
-      @test_directory_entry_name = 'test'
-      @test_filename_patterns__ = %w( *_spec.rb )
-      self
+    attr_writer(
+      :asset_filename_pattern,
+    )
+
+    def finish
+      @asset_filename_pattern ||= '*.rb'
+      freeze
     end
 
     def test_directory_entry_for_stem stem
@@ -75,7 +87,7 @@ module Skylab::DocTest
     end
 
     attr_reader(
-      :asset_filename_pattern__,
+      :asset_filename_pattern,
       :test_directory_entry_name,
       :test_filename_patterns__,
     )

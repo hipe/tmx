@@ -5,6 +5,7 @@ module Skylab::DocTest::TestSupport
   describe "[dt] recursion mags - probably [..]" do
 
     TS_[ self ]
+    use :recursion_magnetics
 
     it "loads" do
       _subject_mag
@@ -14,7 +15,9 @@ module Skylab::DocTest::TestSupport
 
       _omg = TestSupport_::Fixtures.tree :three
 
-      _st = _subject_mag[ _omg ]
+      o = _subject_mag.begin_via _omg
+      o.name_conventions =  name_conventions_used_in_testing__
+      _st = o.finish.execute
 
       a = []
       a.push _st.gets
