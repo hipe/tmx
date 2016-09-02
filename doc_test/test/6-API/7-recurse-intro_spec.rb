@@ -10,7 +10,7 @@ module Skylab::DocTest::TestSupport
 
     it "`path` is a required parameter" do
       begin
-        call_API :recurse
+        call_API :recurse, :filesystem, :_not_an_FS_
       rescue ::ArgumentError => e
       end
       e.message.include? "'recurse' is missing required parameter 'path'" or fail
@@ -25,6 +25,7 @@ module Skylab::DocTest::TestSupport
         call(
           :recurse,
           :path, _dir,
+          :filesystem, the_real_filesystem_,
         )
       end
 
@@ -50,6 +51,7 @@ module Skylab::DocTest::TestSupport
           :recurse,
           :path, _dir,
           :list, true,
+          :filesystem, the_real_filesystem_,
         )
       end
 

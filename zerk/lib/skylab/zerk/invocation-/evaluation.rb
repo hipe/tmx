@@ -6,7 +6,7 @@ module Skylab::Zerk
 
       class << self
 
-        def proc_for_ pbc, oi
+        def proc_for_ pbc, oi  # procure bound call, operation index
 
           fetch_set = oi.fetcher_proc_for_reception_set_symbol_via_name_symbol_
 
@@ -23,6 +23,10 @@ module Skylab::Zerk
 
             _operation_dependency_: -> par do
               new( par, pbc, oi ).execute  # (hi.)
+            end,
+
+            _provisioned_: -> par do
+              pbc.evaluate_provisioned_parameter__ par
             end,
           }
 

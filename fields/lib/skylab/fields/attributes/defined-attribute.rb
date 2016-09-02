@@ -195,6 +195,10 @@ module Skylab::Fields
         NOTHING_
       end
 
+      def is_provisioned  # a [ze] thing, near defaulting
+        false
+      end
+
       Read___ = -> do
         argument_stream.gets_one
       end

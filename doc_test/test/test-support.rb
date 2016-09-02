@@ -128,6 +128,10 @@ module Skylab::DocTest::TestSupport
     define_method :the_noent_directory_ do
       tnd ||= TestSupport_::Fixtures.directory :not_here
     end
+
+    def the_real_filesystem_
+      Home_.lib_.system.filesystem
+    end
   # -
 
   module My_Non_Interactive_CLI

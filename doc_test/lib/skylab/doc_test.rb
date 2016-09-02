@@ -84,8 +84,7 @@ module Skylab::DocTest
       yield :parameter, :list, :optional, :is_flag
 
       yield :via_ACS_by, -> do
-        _fs = Home_.lib_.system.filesystem
-        Home_::Operations_::Recurse.new _fs
+        Home_::Operations_::Recurse.new
       end
     end
   end

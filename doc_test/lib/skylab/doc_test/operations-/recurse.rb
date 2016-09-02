@@ -10,8 +10,7 @@ module Skylab::DocTest
       end
     end
 
-    def initialize fs
-      @filesystem = fs
+    def initialize
       @list = nil
     end
 
@@ -38,6 +37,13 @@ module Skylab::DocTest
       end
     end
 
+    def __filesystem__component_association
+
+      -> st do
+        Common_::Known_Known[ st.gets_one ]
+      end
+    end
+
     def execute & oes_p
       @_on_event_selectively = oes_p
       extend ImplementationAssistance___
@@ -48,8 +54,7 @@ module Skylab::DocTest
 
       def execute
         __prepare
-        _ok = __resolve_unit_of_work_stream
-        _ok && __via_unit_of_work_stream
+        __unit_of_work_stream
       end
 
       def __prepare
@@ -58,17 +63,9 @@ module Skylab::DocTest
         NIL
       end
 
-      def __via_unit_of_work_stream
-        if @list
-          remove_instance_variable :@_unit_of_work_stream
-        else
-          ::Kernel._K
-        end
-      end
-
       # -- automatable
 
-      def __resolve_unit_of_work_stream
+      def __unit_of_work_stream
 
         # if you're thinking that a lot of this looks like boilerplate
         # that could be generated, you're right - [#ta-005]
@@ -80,7 +77,7 @@ module Skylab::DocTest
         ok &&= __resolve_counterpart_index
         ok &&= __resolve_probably_participating_file_stream
         ok &&= __resolve_unit_of_work_stream_
-        ok
+        ok && remove_instance_variable( :@unit_of_work_stream )
       end
 
       def __check_that_path_exists  # because #note-2 in [#029]
@@ -121,7 +118,7 @@ module Skylab::DocTest
       def __resolve_unit_of_work_stream_
 
         _ = @_lib::UnitOfWorkStream_via_CounterpartTestIndex_and_ProbablyParticipatingFileStream.of self
-        _if _, :@_unit_of_work_stream
+        _if _, :@unit_of_work_stream
       end
 
       # -- destructive readers (we assert read only once, just because)
@@ -154,6 +151,7 @@ module Skylab::DocTest
 
       attr_reader(
         :filesystem,
+        :list,  # do list
         :name_conventions,
         :test_directory,
       )

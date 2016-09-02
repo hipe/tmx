@@ -9,15 +9,36 @@ module Skylab::DocTest
       )
       attr_writer( * PARAMETERS.symbols )
 
+      class << self
+        def prototype_for_recurse__ p, output_adapter_sym
+          new( & p ).__finish_prototype_for_recurse output_adapter_sym
+        end
+      end  # >>
+
       def initialize & p
         @on_event_selectively = p
         @original_test_line_stream = nil
       end
 
-      def execute
+      def __finish_prototype_for_recurse sym
+        self.output_adapter = sym
+        _ok = _prepare_common
+        _ok && freeze
+      end
 
+      def execute
+        ok = _prepare_common
+        ok &&= to_line_stream
+      end
+
+      def _prepare_common
         ok = __resolve_output_adapter_module
         ok && __init_choices
+        ok
+      end
+
+      def to_line_stream
+        ok = true
         ok && __init_original_line_stream_if_necessary
         ok && __synthesize_result_line_stream
       end

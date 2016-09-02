@@ -20,3 +20,23 @@ exists in) CLI.
 
 the way you express a customization to an interface element is through
 a "node map". (EDIT)
+
+
+
+
+
+
+# disjoint notes
+
+## #note-1
+
+this took quite a long time to untangle, and it is still quite tangled.
+this is terrible and needs a rewrite it's so confusing #todo:
+
+we don't have to transfer all the stated values, only the
+bespokes, because #spot-4 does the appropriated values.
+
+and now we have to pass thru the provisioned guys too,
+but with no value so etc..
+
+look at how we hack two parallel streams or whatever that is

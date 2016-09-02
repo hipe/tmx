@@ -209,6 +209,11 @@ module Skylab::Zerk
         @real_store_.evaluation_of par
       end
 
+      def evaluate_provisioned_parameter__ par
+        # (for now is same as bespokes but only because of #spot-6)
+        @real_store_.evaluation_of par
+      end
+
       def internal_store_substrate
         @real_store_.internal_store_substrate
       end

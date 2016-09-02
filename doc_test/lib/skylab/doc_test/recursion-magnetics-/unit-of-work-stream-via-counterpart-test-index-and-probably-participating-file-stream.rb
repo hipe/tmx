@@ -4,28 +4,44 @@ module Skylab::DocTest
 
     # exactly [#005]
 
-    # non-declared parameters: none
+    # non-declared parameters: list (the flag), filesystem
 
     class << self
 
       def of rsx
-        call rsx.counterpart_test_index, rsx.probably_participating_file_stream
+        call(
+          rsx.counterpart_test_index,
+          rsx.probably_participating_file_stream,
+          rsx.list,
+          rsx.filesystem,
+          & rsx.listener_
+        )
       end
 
-      def call *a
-        new( *a ).execute
+      def call *a, &p
+        new( *a, &p ).execute
       end
 
       alias_method :[], :call
       private :new
     end  # >>
 
-    def initialize cti, ppfs
+    def initialize cti, ppfs, do_list, fs, &p
+
       @counterpart_test_index = cti
+      @do_list = do_list
+      @filesystem = fs
       @probably_participating_file_stream = ppfs
+      @_on_event_selectively = p
     end
 
     def execute
+
+      proto = RecursionModels_::UnitOfWork.prototype(
+        @do_list,
+        @filesystem,
+        & @_on_event_selectively
+      )
 
       cti = @counterpart_test_index
 
@@ -33,7 +49,7 @@ module Skylab::DocTest
 
         _details = cti.details_via_asset_path path
 
-        RecursionModels_::UnitOfWork.new _details, path
+        proto.new _details, path
       end
     end
   end

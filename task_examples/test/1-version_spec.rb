@@ -28,7 +28,7 @@ module Skylab::TaskExamples::TestSupport
       shared_subject :state_ do
 
         _str = "abc1.2.3def4.5"
-        el = Common_.test_support::Expect_Event::Event_Log.new
+        el = Common_.test_support::Expect_Event::EventLog.new
         _ = el.handle_event_selectively
         _x = _subject.parse _str, & _
         _a = el.flush_to_array

@@ -4,7 +4,7 @@ module Skylab::Common
 
     class Interpreter
 
-      define_singleton_method :common, ( Lazy.call do
+      define_singleton_method :common, ( Lazy_.call do
 
         class Common_Emission_Interpreter____ < self
 

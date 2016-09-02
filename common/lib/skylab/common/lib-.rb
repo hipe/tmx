@@ -16,7 +16,7 @@ module Skylab::Common
       ::OptionParser
     end
 
-    strange = Lazy.call do
+    strange = Lazy_.call do
 
       _LENGTH_OF_A_LONG_LINE = 120
       o = Basic[]::String.via_mixed.dup
@@ -28,12 +28,12 @@ module Skylab::Common
       strange[][ x ]
     end
 
-    String_IO = Lazy.call do
+    String_IO = Lazy_.call do
       require 'stringio'
       ::StringIO
     end
 
-    StringScanner = Lazy.call do
+    StringScanner = Lazy_.call do
       require 'strscan'
       ::StringScanner
     end

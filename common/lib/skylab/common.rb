@@ -2564,6 +2564,7 @@ module Skylab::Common
       x
     end
   end
+  Lazy_ = Lazy  # for use by this sidesystem
 
   Memoize = -> & p do
     p_ = -> do

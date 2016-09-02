@@ -231,6 +231,7 @@ module Skylab::Common::TestSupport
     # --
 
     Common_ = Home_  # b.c we keep forgetting ..
+    Lazy_ = Home_::Lazy_
 
     module Test_Context_Instance_Methods
 
@@ -250,11 +251,7 @@ module Skylab::Common::TestSupport
 
       def build_event_log
 
-        log = Event_Log.new
-
-        if do_debug
-          log.set_auxiliary_listener_by( & __build_expev_debug_auxil_proc )
-        end
+        log = EventLog.for self
 
         h = send IGNORE_METHOD__
         if h
@@ -267,14 +264,15 @@ module Skylab::Common::TestSupport
       define_method IGNORE_METHOD__ do
         NIL_
       end
+    end  # will reopen
 
-      def __build_expev_debug_auxil_proc
+      Debugging_listener_for___ = -> tc do
 
         # eek - this is a tradeoff. when an API call is resulting in the
         # "wrong" event, this level of detail can be helpful but at the
         # cost of a large library footprint .. see tombstone
 
-        io = debug_IO
+        io = tc.debug_IO
 
         br = Home_.lib_.brazen
         _expag = br::API.expression_agent_instance
@@ -287,6 +285,8 @@ module Skylab::Common::TestSupport
           o.handle i_a, & ev_p
         end
       end
+
+    module Test_Context_Instance_Methods  # re-opened
 
       # -- newschool support for the oldschool ways
 
@@ -499,10 +499,7 @@ module Skylab::Common::TestSupport
         # there is a weirdly long discussion of this in the doc at #note-4.
 
         if Looks_like_expression__[ em.channel_symbol_array ]
-          em.reify_by do |act_y_p|
-            _expag = _expev_upper_level_expression_agent
-            _expag.calculate [], & act_y_p
-          end
+          em._reify_when_expression_under _expev_upper_level_expression_agent
         else
           em._reify_when_event
         end
@@ -512,8 +509,6 @@ module Skylab::Common::TestSupport
         _expev_lower_level_expression_agent
       end
 
-      lazy = Common_::Lazy
-
       define_method :_expev_upper_level_expression_agent, -> do
 
         m = :black_and_white_expression_agent_for_expect_event
@@ -522,17 +517,14 @@ module Skylab::Common::TestSupport
           if respond_to? m
             send m
           else
-            default_black_and_white_expression_agent_for_expect_event
+            black_and_white_expression_agent_for_expect_event_normally
           end
         end
       end.call
 
-      define_method(
-        :default_black_and_white_expression_agent_for_expect_event,
-        ( lazy.call do
-          Home_.lib_.brazen::API.expression_agent_instance
-        end ),
-      )
+      def black_and_white_expression_agent_for_expect_event_normally
+        Black_and_white_expression_agent__[]
+      end
 
       define_method :_expev_lower_level_expression_agent, -> do
 
@@ -542,14 +534,14 @@ module Skylab::Common::TestSupport
           if respond_to? m
             send m
           else
-            default_expression_agent_for_expect_event
+            expression_agent_for_expect_event_normally
           end
         end
       end.call
 
-      define_method :default_expression_agent_for_expect_event, ( lazy.call do
-        Home_::Event.codifying_expression_agent_instance
-      end )
+      def expression_agent_for_expect_event_normally
+        Codifying_expresion_agent__[]
+      end
     end
 
     # ==
@@ -670,7 +662,7 @@ module Skylab::Common::TestSupport
         NIL_
       end
 
-      Require_basic__ = Common_::Lazy.call do
+      Require_basic__ = Lazy_.call do
         Basic_ = Home_.lib_.basic
         NIL_
       end
@@ -897,7 +889,7 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    class Event_Log  # [ta]
+    class EventLog  # [ta]
 
       # at present this wraps multiple concerns and implements them with
       # function soup.
@@ -910,6 +902,17 @@ module Skylab::Common::TestSupport
       #
       # so its implementation **and interface** is an experiment vulnerable
       # to (yet more) change..
+
+      class << self
+
+        def for test_context
+          log = new
+          if test_context.do_debug
+            log.set_auxiliary_listener_by( & Debugging_listener_for___[ test_context ] )
+          end
+          log
+        end
+      end  # >>
 
       def initialize
 
@@ -1122,12 +1125,64 @@ module Skylab::Common::TestSupport
         @_x_p = event_proc
       end
 
+      # -- IFF you know the emission is an expression
+
+      def expression_line_in_black_and_white
+        _be_careful :__black_and_white_line
+      end
+
+      def expression_line_codified
+        _be_careful :__codified_line
+      end
+
+      def _be_careful sym
+
+        if @_needs_reification
+
+          reify_by do |y_p|
+            __build_crazy_structure y_p
+          end
+        end
+
+        @_x.fetch( sym ).call
+      end
+
+      def __build_crazy_structure y_p
+
+        line_under = -> expag do
+          expag.calculate "", & y_p
+        end
+
+        black_and_white_line = Lazy_.call do
+          line_under[ Black_and_white_expression_agent__[] ]
+        end
+
+        codified_line = Lazy_.call do
+          line_under[ Codifying_expresion_agent__[] ]
+        end
+
+        {
+          __black_and_white_line: -> { black_and_white_line[] },
+          __codified_line: -> { codified_line[] },
+        }
+      end
+
+      # --
+
       def cached_event_value
         if @_needs_reification
           __reify
           @_needs_reification = false
         end
         @_x
+      end
+
+      def _reify_when_expression_under expag
+
+        reify_by do |act_y_p|
+          expag.calculate [], & act_y_p
+        end
+        NIL
       end
 
       def reify_by & do_this
@@ -1190,6 +1245,18 @@ module Skylab::Common::TestSupport
       end
     end
 
+    # ==
+
+    Black_and_white_expression_agent__ = Lazy_.call do
+      Home_.lib_.brazen::API.expression_agent_instance
+    end
+
+    Codifying_expresion_agent__ = Lazy_.call do
+      Home_::Event.codifying_expression_agent_instance
+    end
+
+    # ==
+
     Looks_like_expression__ = -> sym_a do  # #[#br-023]
       :expression == sym_a[ 1 ]
     end
@@ -1213,7 +1280,7 @@ module Skylab::Common::TestSupport
       Home_.lib_.basic::String.via_mixed x
     end
 
-    Trilean_string_via_value___ = Common_::Lazy.call do
+    Trilean_string_via_value___ = Lazy_.call do
       {
         nil => "neutral",
         false => "negative",

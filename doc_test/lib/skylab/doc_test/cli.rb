@@ -223,13 +223,15 @@ module Skylab::DocTest
       # the normalization to it to expand relative pathnames. (the backend
       # is not allowed to do this.)
 
-      the_node_map_for_the_recurse_operation = {
-        path: Customize_the_path_parameter___,
-      }
-
       o.node_map = {
-        recurse: -> do
-          the_node_map_for_the_recurse_operation
+
+        recurse: -> oc do  # operation customization
+
+          oc.map :path, & Customize_the_path_parameter___
+
+          oc.for :filesystem do |par, cli_frame|
+            cli_frame.root_frame.CLI.filesystem
+          end
         end
       }
 

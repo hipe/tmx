@@ -84,7 +84,16 @@ module Skylab::Zerk
 
       def __when_bespoke
 
-        @_my_set_symbol_via_name_symbol[ @_k ] = :_bespoke_
+        if @_parameter.is_provisioned
+          @_my_set_symbol_via_name_symbol[ @_k ] = :_provisioned_
+        else
+          @_my_set_symbol_via_name_symbol[ @_k ] = :_bespoke_
+          __express_bespoke_in_interface
+        end
+        NIL
+      end
+
+      def __express_bespoke_in_interface
 
         sym = @_parameter.singplur_category_of_association
         if sym
@@ -136,6 +145,10 @@ module Skylab::Zerk
       # --
 
       def __when_appropriation
+
+        if @_parameter.is_provisioned
+          self._ENJOY
+        end
 
         @_scope_node_ticket = @_si.scope_node_ @_scope_node_identifier
 
@@ -372,10 +385,11 @@ module Skylab::Zerk
         # tells #spot-4 when we need to write *from* ACS tree *to* param store)
 
         _ = @_my_set_symbol_via_name_symbol.fetch k  # until not..
-        OVERKILL_SANITY_CHECK___.fetch _
+        TREAT_AS_APPROPRIATED___.fetch _
       end
 
-      OVERKILL_SANITY_CHECK___ = {
+      TREAT_AS_APPROPRIATED___ = {
+        _provisioned_: false,
         _appropriated_: true,
         _bespoke_: false,
         _operation_dependency_: true,

@@ -175,33 +175,54 @@ module Skylab::Zerk
           false  # eek not sure
         end
 
-        def to_controller_against head_parsable_formal_bx
+        def to_controller_against head_parsable_formal_bx  # per [#028]:#"Head parse"
 
-          # NASTY - in lockstep, present each assignment that's in the value
-          # box as if it's being parsed off an argument stream or similar :(
+          # the ways in which this is terrible are elucidated at [#003] #note-1
 
-          ( @_value_box.a_ - head_parsable_formal_bx.a_ ).length.zero? or self._SANITY
+          _EEK_KN = nil
 
-          # the above is #todo a sanity check but it is to emphasize that:
-          # we don't have to transfer all the stated values, only the
-          # bespokes, because #spot-4 does the appropriated values.
+          fo_st = head_parsable_formal_bx.to_value_stream
 
-          qkn_st = @_value_box.to_value_stream
-          cur = nil
+          _formal_parameter_stream = Common_.stream do
+            begin
 
-          _par_st = Common_.stream do
-            cur = qkn_st.gets
-            if cur
-              cur.association
-            end
+              fo = fo_st.gets
+              fo || break
+
+              qk = @_value_box[ fo.name_symbol ]
+              if qk
+                asc = qk.association
+                _EEK_KN = qk
+                break
+              end
+
+              if ! fo.is_provisioned
+                redo
+              end
+
+              # provisioning happens at the modality level. so we have to do
+              # it now because the default proc won't be there on the back..
+              # this is :#spot-6.
+
+              asc = fo
+              _anything = fo.default_proc.call
+              _EEK_KN = Common_::Known_Known[ _anything ]
+              break
+
+            end while above
+            asc
           end
 
-          _x_st = Gets_one_proxy___.new do
-            cur.value_x
+          _parameter_value_stream = Gets_one_proxy___.new do
+            _EEK_KN.value_x
           end
 
-          PVS_via_Box_Controller___[ _par_st, _x_st ]
+          PVS_via_Box_Controller___[ _formal_parameter_stream, _parameter_value_stream ]
         end
+      end
+
+      Known_nothing___ = Lazy_.call do
+        Common_::Known_Known[ NOTHING_ ]
       end
 
       # ==

@@ -7,6 +7,7 @@ module Skylab::Autonomous_Component_System
       def initialize obj_p, fo
 
         @_ACS_proc = obj_p
+        @_has_own_default_proc = false
         @_did = false
         @formal_ = fo
       end
@@ -157,6 +158,7 @@ module Skylab::Autonomous_Component_System
 
         def initialize fopa, nt
           :association == nt.node_ticket_category || Home_._EEK
+          @_has_own_default_proc = false
           @_node_ticket = nt
           @name = nt.name
           @name_symbol = nt.name_symbol
@@ -243,8 +245,19 @@ module Skylab::Autonomous_Component_System
           end
         end
 
+        def be_provisioned__
+          @is_provisioned = true ; nil
+        end
+
+        def default_proc= p
+          @_has_own_default_proc = true
+          @__default_proc = p
+        end
+
         def default_proc
-          if @_has
+          if @_has_own_default_proc
+            @__default_proc
+          elsif @_has
             @_fopa.default_proc
           end
         end
@@ -263,6 +276,7 @@ module Skylab::Autonomous_Component_System
 
         attr_reader(
           :argument_arity,
+          :is_provisioned,
           :name,
           :name_symbol,
           :parameter_arity,

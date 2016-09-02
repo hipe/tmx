@@ -157,6 +157,10 @@ module Skylab::Autonomous_Component_System
         NOTHING_
       end
 
+      def is_provisioned  # currently a [ze] thing
+        false
+      end
+
       Here_ = self
     end
   # -

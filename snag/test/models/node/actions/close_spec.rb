@@ -34,7 +34,7 @@ module Skylab::Snag::TestSupport
     end
 
     def expression_agent_for_expect_event
-      default_black_and_white_expression_agent_for_expect_event
+      black_and_white_expression_agent_for_expect_event_normally
     end
 
     it "closing one that has no taggings at all - works, reindents" do

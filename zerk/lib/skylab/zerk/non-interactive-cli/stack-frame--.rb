@@ -129,7 +129,7 @@ module Skylab::Zerk
         # -- exactly "node maps" (#mode-tweaking) in [#003]
 
         def __process_map map_proc
-          oc = OperationCustomization___.new self
+          oc = Here_::OperationCustomization___.new self
           if map_proc.arity.zero?
             _node_map = map_proc.call
             oc.map_these_formal_parameters _node_map
@@ -141,13 +141,12 @@ module Skylab::Zerk
 
         # ~ facilities for processing the above
 
-        def __operation_customization_says_use_this_op_proc p
+        def operation_customization_says_use_this_op_proc__ p
           @has_custom_option_parser__ = true
           @_custom_op_proc = p ; nil
         end
 
-        def __operation_customization_says_parameters_being_mutable_box
-
+        def operation_customization_says_parameters_being_mutable_box_
           @___did ||= __convert_parameters_to_mutable_box
           @_mutable_FP_box
         end
@@ -732,59 +731,6 @@ module Skylab::Zerk
           end
         end
       end
-
-      # ==
-
-      class OperationCustomization___  # #stowaway
-
-        def initialize fr
-          @_frame = fr
-        end
-
-        def custom_option_parser_by & p
-          @_frame.__operation_customization_says_use_this_op_proc p ; nil
-        end
-
-        def map_these_formal_parameters read
-
-          # (currently #public-API but only called from here for now.)
-
-          # `read` is a reader: must respond to `[]`, typically hash or proc.
-          #
-          # for each existing formal parameter, the reader is passed its name
-          # symbol. what happens next will amaze you. with the result:
-          #
-          #   - if the result is `false`, this means remove the parameter
-          #     (not yet implemented, just the idea. should be easy.)
-          #
-          #   - if the result is `nil`, do nothing (the parameter remains as-is)
-          #
-          #   - otherwise (and the result is true) yadda
-
-          bx = @_frame.__operation_customization_says_parameters_being_mutable_box
-
-          remove_these = nil
-
-          bx.each_name do |k|
-            x = read[ k ]
-            x.nil? && next
-            if x
-              _par_ = x[ bx[ k ], @_frame ]
-              _par_ || self._COVER_ME_this_is_not_the_way_to_remove_parameters  # #todo
-              bx.replace k, _par_
-            else
-              ( remove_these ||= [] ).push k
-            end
-          end
-
-          if remove_these
-            # note we MUST do this after NOT DURING traversal of the box!
-            self._FUN_AND_EASY_all_you_need_to_do_is_cover_it_and_box_remove
-          end
-          NIL
-        end
-      end
-
       # ==
     end
   end
