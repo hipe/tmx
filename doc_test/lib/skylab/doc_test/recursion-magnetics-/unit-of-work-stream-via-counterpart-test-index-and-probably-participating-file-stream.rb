@@ -33,30 +33,8 @@ module Skylab::DocTest
 
         _details = cti.details_via_asset_path path
 
-        UnitOfWork___.new _details, path
+        RecursionModels_::UnitOfWork.new _details, path
       end
-    end
-
-    # ==
-
-    class UnitOfWork___
-
-      def initialize details, path
-        @asset_path = path
-        @_details = details
-      end
-
-      def test_path_is_real
-        @_details.is_real
-      end
-
-      def test_path
-        @_details.to_path
-      end
-
-      attr_reader(
-        :asset_path,
-      )
     end
   end
 end

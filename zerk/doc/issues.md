@@ -1,3 +1,5 @@
+[#048]       common relative-to-absolute filesystem path normalization
+
 [#047]       [ tuple pager ]
 
 [#046]       :#mode-tweaking, :#mode-tweak (frontier is in-situ in [ts])

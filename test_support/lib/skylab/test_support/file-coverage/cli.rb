@@ -32,6 +32,7 @@ module Skylab::TestSupport
             Common_::Known_Known[ path ]
           end
         end
+        # (we do the above often enough that it is now tracked by #[#ze-048])
       }
 
       # ==

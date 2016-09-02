@@ -127,6 +127,26 @@ module Skylab::Basic
 
     # ==
 
+    Localizer = -> root, & else_p do
+
+      # somewhat like `::Pathname#relative_path_from` with an assertion
+
+      expect_head = "#{ root }#{ ::File::SEPARATOR }"
+      len = expect_head.length
+      first_half_range = 0 ... len
+      second_half_range = len .. -1
+
+      -> path do
+        if len < path.length && expect_head == path[ first_half_range ]
+          path[ second_half_range ]
+        else
+          else_p[]  # not covered, just brushed under the rug
+        end
+      end
+    end
+
+    # ==
+
     Path_matches_directory = -> path, dir do  # assume..
 
       # assume both paths are "fully normal", i.e they are absolute and they

@@ -125,9 +125,12 @@ module Skylab::System
 
       # ~ "etc" core services per mentor
 
-      def path_is_absolute path
-        # let the real filesystem decide
-        Home_.services.filesystem.path_is_absolute path
+      def path_looks_absolute path
+        Home_.services.filesystem.path_looks_absolute path
+      end
+
+      def path_looks_relative path
+        Home_.services.filesystem.path_looks_relative path
       end
 
       # ~ internal support

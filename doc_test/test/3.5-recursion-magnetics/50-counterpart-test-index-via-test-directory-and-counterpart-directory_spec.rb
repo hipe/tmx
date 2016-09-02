@@ -51,7 +51,7 @@ module Skylab::DocTest::TestSupport
         it "comes up with a path that is not real" do
           _abs = _details.to_path
           _act = Safe_localize_[ _abs, the_empty_directory_ ]
-          _act == "/woobie-foobie/noobie-choobie_spec.rb" || fail  # #path
+          _act == "woobie-foobie/noobie-choobie_spec.rb" || fail  # #path
         end
       end
     end
@@ -104,7 +104,7 @@ module Skylab::DocTest::TestSupport
         it "uses the real directory" do
           _abs = _details.to_path
           _act = Safe_localize_[ _abs, my_real_test_directory_ ]
-          _act == "/3-magnetics/jimbie-joobie_spec.rb" || fail
+          _act == "3-magnetics/jimbie-joobie_spec.rb" || fail
         end
       end
     end

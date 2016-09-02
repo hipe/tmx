@@ -6,6 +6,7 @@ module Skylab::DocTest
       expag.calculate do
         y << "#{ code 'sync' } for an entire directory (EXPERIMENTAL)."
         y << "(currently overloaded with sane defaults, configurable later.)"
+        y << "(it is not supposed to overwrite unversioned content ever.)"
       end
     end
 
@@ -29,8 +30,11 @@ module Skylab::DocTest
         y << "the directory or file yadda (EDIT)"
       end
 
-      -> st do
-        Common_::Known_Known[ st.gets_one ]
+      -> st, & pp do
+
+        _n18n = Path_must_be_absolute___[]
+
+        _n18n.normalize_value st.gets_one, & pp[ nil ]
       end
     end
 
@@ -163,6 +167,17 @@ module Skylab::DocTest
           x
         end
       end
+    end
+
+    # ==
+
+    Path_must_be_absolute___ = Lazy_.call do
+
+      Home_.lib_.basic::Pathname.normalization.new_with(
+        :absolute,
+        :downward_only,
+        :no_single_dots,
+      )
     end
 
     # ==

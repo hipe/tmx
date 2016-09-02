@@ -122,6 +122,14 @@ module Skylab::Zerk::TestSupport
       # convert them this early because we often have to de-style them
       # and that is part of the assertion, not done here.
 
+      def to_output_line_stream
+        Common_::Stream.via_nonsparse_array( niCLI_state.lines ).map_reduce_by do |li|
+          if :o == li.stream_symbol
+            li.string
+          end
+        end
+      end
+
       def only_line
         a = _niCLI_state_lines
         1 == a.length or fail

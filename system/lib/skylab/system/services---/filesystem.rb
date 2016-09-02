@@ -207,7 +207,9 @@ module Skylab::System
 
       # ~ etc :+#core-services
 
-      define_method :path_is_absolute, Path_looks_absolute_
+      define_method :path_looks_absolute, Path_looks_absolute_
+
+      define_method :path_looks_relative, Path_looks_relative_
 
     # - end core services
   end

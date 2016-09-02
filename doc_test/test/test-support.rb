@@ -151,9 +151,7 @@ module Skylab::DocTest::TestSupport
   # --
 
   Safe_localize_ = -> longer, shorter do
-    len = shorter.length
-    longer[ 0, len ] == shorter || self._SANITY
-    longer[ len .. -1 ]
+    Home_.lib_.basic::Pathname::Localizer[ shorter ][ longer ]
   end
 
   # --

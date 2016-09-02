@@ -26,7 +26,9 @@ module Skylab::DocTest
 
         o.universal_CLI_resources sin, sout, serr, pn_s_a
 
-        o.filesystem_by { ::File }
+        o.filesystem_by do
+          Home_.lib_.system.filesystem
+        end
 
         o.produce_reader_for_root_by = -> acs, produce_reader_for do
 
@@ -217,6 +219,20 @@ module Skylab::DocTest
 
       o = Zerk_::NonInteractiveCLI.begin
 
+      # map our `path` parameter to become a new parameter that prepends
+      # the normalization to it to expand relative pathnames. (the backend
+      # is not allowed to do this.)
+
+      the_node_map_for_the_recurse_operation = {
+        path: Customize_the_path_parameter___,
+      }
+
+      o.node_map = {
+        recurse: -> do
+          the_node_map_for_the_recurse_operation
+        end
+      }
+
       o.root_ACS_by do
         Root_Autonomous_Component_System_.new_instance__
       end
@@ -225,6 +241,23 @@ module Skylab::DocTest
 
       o
     end
+
+    Customize_the_path_parameter___ = -> par, cli_frame do
+
+      par.prepend_normalization_by do |st, & pp|
+
+        path = st.gets_one
+        fs = cli_frame.root_frame.CLI.filesystem
+
+        if fs.path_looks_relative path
+          path = fs.expand_path path
+        end
+
+        Common_::Known_Known[ path ]
+      end
+      # (the above is #[#ze-048] a common n11n that might get abstracted
+    end
+
   end
 end
 # #history: born anew

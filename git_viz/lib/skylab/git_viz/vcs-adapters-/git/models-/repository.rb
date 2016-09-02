@@ -84,7 +84,7 @@ module Skylab::GitViz
 
         def execute
 
-          if @fs.path_is_absolute @path
+          if @fs.path_looks_absolute @path
 
             _is_file = @fs.file? @path
 
