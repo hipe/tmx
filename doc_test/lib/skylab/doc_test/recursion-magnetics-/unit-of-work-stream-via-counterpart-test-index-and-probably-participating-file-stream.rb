@@ -13,6 +13,7 @@ module Skylab::DocTest
           rsx.counterpart_test_index,
           rsx.probably_participating_file_stream,
           rsx.list,
+          rsx.VCS_reader,
           rsx.filesystem,
           & rsx.listener_
         )
@@ -26,12 +27,13 @@ module Skylab::DocTest
       private :new
     end  # >>
 
-    def initialize cti, ppfs, do_list, fs, &p
+    def initialize cti, ppfs, do_list, vcs_rdr, fs, &p
 
       @counterpart_test_index = cti
       @do_list = do_list
       @filesystem = fs
       @probably_participating_file_stream = ppfs
+      @VCS_reader = vcs_rdr
       @_on_event_selectively = p
     end
 
@@ -39,6 +41,7 @@ module Skylab::DocTest
 
       proto = RecursionModels_::UnitOfWork.prototype(
         @do_list,
+        @VCS_reader,
         @filesystem,
         & @_on_event_selectively
       )

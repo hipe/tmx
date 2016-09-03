@@ -156,6 +156,10 @@ module Skylab::DocTest
         :test_directory,
       )
 
+      def VCS_reader
+        :_not_needed_yet_
+      end
+
       # --
 
       def _if x, ivar

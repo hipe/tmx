@@ -7,11 +7,11 @@ module Skylab::DocTest
       undef_method :new
     end  # >>
 
-    def initialize do_list, fs, &p
+    def initialize do_list, vcs_rdr, fs, &p
       if do_list
         @_express = :__express_when_listing
       else
-        __init_prototype_for_execution p, fs
+        __init_prototype_for_execution p, vcs_rdr, fs
       end
       freeze
     end
@@ -52,7 +52,9 @@ module Skylab::DocTest
 
     # --
 
-    def __init_prototype_for_execution p, fs
+    def __init_prototype_for_execution p, vcs_rdr, fs
+
+      @counts = Counts___.new 0, 0, 0, 0  # strange to put this in the prototype..
 
       @_express = :__express_when_executing
 
@@ -61,19 +63,24 @@ module Skylab::DocTest
       @__the_synchronize_operation_prototype =
         Home_::Operations_::Synchronize.prototype_for_recurse__ p, :quickie  # #todo
 
+      @__VCS_reader = vcs_rdr
+
       @_on_event_selectively = p
       NIL
     end
 
+    Counts___ = ::Struct.new :created, :lines, :skipped, :updated
+
     def __express_when_executing y, _expag
 
       @_test_file_probably_existed = test_path_is_real
+
       @_test_path = test_path
 
       st = __output_test_file_line_stream
 
       if @_test_file_probably_existed
-        self._UH_OH
+        __update_existing_test_file st
       else
         __create_new_test_file st
       end
@@ -81,18 +88,60 @@ module Skylab::DocTest
       y  # only because of silly compatibility with "express result" near [#ze-025]
     end
 
+    def __update_existing_test_file st
+
+      path = @_test_path
+      o = @__VCS_reader.status_via_path path
+      if o.is_versioned
+        if o.has_unversioned_changes
+          ok = false
+          reason_s = "has changes"
+        else
+          ok = true
+        end
+      else
+        ok = false
+        reason_s = "is not versioned"
+      end
+
+      if ok
+        __DO_CLOBBER_EXISTING_TEST_FILE__ st
+      else
+        @_on_event_selectively.call :info, :expression, :file_write_summary, :skipped do |y|
+          y << "skipping because #{ reason_s }: #{ pth path }"
+        end
+        @counts.skipped += 1
+      end
+      NIL
+    end
+
+    def __DO_CLOBBER_EXISTING_TEST_FILE__ st  # be careful - no tmpfiles, no undo
+
+      path = @_test_path
+      fh = @_filesystem.open path, ::File::TRUNC | ::File::WRONLY
+      lines, bytes = _write fh, st
+      fh.close
+
+      @_on_event_selectively.call :info, :expression, :file_write_summary, :updated do |y|
+        y << "updated #{ pth path } (#{ lines } lines, #{ bytes } bytes)"
+      end
+      @counts.lines += lines
+      @counts.updated += 1
+      NIL
+    end
+
     def __create_new_test_file st
 
       path = @_test_path
       fh = @_filesystem.open path, ::File::CREAT | ::File::EXCL | ::File::WRONLY
-      # #flock #todo
       lines, bytes = _write fh, st
       fh.close
 
       @_on_event_selectively.call :info, :expression, :file_write_summary, :created do |y|
         y << "created #{ pth path } (#{ lines } lines, #{ bytes } bytes)"
       end
-
+      @counts.lines += lines
+      @counts.created += 1
       NIL
     end
 
@@ -135,6 +184,7 @@ module Skylab::DocTest
     end
 
     attr_reader(
+      :counts,
       :asset_path,
     )
   end

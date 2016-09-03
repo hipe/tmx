@@ -47,6 +47,10 @@ module Skylab::DocTest
 
         # -- init receiving branch
 
+        def __when_document
+          _init_recv_branch :@document
+        end
+
         def _when_module
           self._TODO_touch_describe
           _when_describe
@@ -80,6 +84,7 @@ module Skylab::DocTest
           st = @document.to_branch_stream
           a = BOX__.a_
           h = BOX__.h_
+          @_init_receiving_branch = :__when_document
           begin
             @_branch = st.gets
             @_branch || break
