@@ -1,0 +1,18 @@
+some test code 1
+
+# this file will be read and the backend will produce merged content,
+# but because we stub this to look like it is not versioned at all,
+# it won't be overwritten.
+
+module MyFakeTest
+
+  decribe "wazoo" do
+
+    it "hi xyzzytftt3glzdk" do
+      1.should eql 2
+    end
+    it "x." do
+      stay.here
+    end
+  end
+end

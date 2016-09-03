@@ -7,7 +7,7 @@ module Skylab::Common
     class << self
 
       def the_empty_stream
-        @tes ||= new do NIL_ end
+        @___the_empty_stream ||= new do NIL end  # NOTHING_
       end
 
       def mutable_with_random_access

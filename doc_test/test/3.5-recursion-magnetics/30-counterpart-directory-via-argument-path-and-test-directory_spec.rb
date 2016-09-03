@@ -32,7 +32,10 @@ module Skylab::DocTest::TestSupport
     end
 
     def _against arg_path, test_dir
-      @_result = _subject_mag[ arg_path, test_dir, selfsame_name_conventions_ ]
+
+      _nc = selfsame_name_conventions_
+      _fs = the_real_filesystem_
+      @_result = _subject_mag[ arg_path, test_dir, _nc, _fs ]
     end
 
     def _expect_same

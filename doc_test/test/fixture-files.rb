@@ -26,8 +26,12 @@ module Skylab::DocTest::TestSupport
         end
       end
 
+      def tree_path_via_dir_ dir
+        ::File.join _fixture_trees_directory, dir
+      end
+
       def path_via_filename_ file
-        File.join _fixture_files_directory, file
+        ::File.join _fixture_files_directory, file
       end
 
       common = Lazy_.call do

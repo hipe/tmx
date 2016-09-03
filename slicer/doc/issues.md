@@ -1,3 +1,5 @@
+[#159]       martin fowler's oft-referenced "mocks aren't stubs" blog entry
+
 [#158]       rather than a single #bibliographic-referece, for now we
              are using this node as a placeholder to be associated with
              several references. we may at a later date resolve one, possibly

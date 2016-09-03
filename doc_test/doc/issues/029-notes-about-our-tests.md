@@ -1,5 +1,30 @@
 # notes about our tests :[#029]
 
+## :#note-4
+
+to fit with the API for a generated [ze] client to "express" these,
+we use [#ze-025] whose semantics (`express_into_under yielder, expag`)
+might seem weird because
+
+  A) the emissions we do make go up through the modality client via
+     its listener; we do not write directly to the output yielder
+     here and
+
+  B) the main "expression" we do is really into the filesystem at
+     this point.
+
+so we hide that weirdness here because there is a chance that that
+remote API point may evolve to fit scenarios like this; however at
+writing we think that the remote #hook-in method API is a good,
+one-size-fits most solution.
+
+as for the suject (test support method), there's no good single
+support library to put this in - we want it in both magnetic tests
+and API/functional tests.
+
+
+
+
 ## :#note-1
 
 during development of a gem we often swap-out the gem in the gems
@@ -69,3 +94,53 @@ event log - what we'll do is: when *ANY ONE* of these units of work's
 emissions are requested, *ONLY ONCE* per unit of work will we use this
 tailor made "shave" (basically pop) method of the event log to
 *REMOVE* those emissions and memoize them into the associated tuple.
+
+
+
+
+## :#note-5
+
+these tests use a mocked system but a real filesystem, an arrangement
+that has particular justification and particular consequences. first,
+the justification:
+
+  - mocking a filesystem (tree) feels cludgy when the real filesystem
+    is so much better at being a filesystem (tree), in terms of
+    ergonomics and transparency - using a real-filesystem (tree) as a
+    test fixture requires zero prerequisite API knowledge.
+
+  - similarly but conversely, using the real system feels too cludgy
+    when our only interaction with git is a few `git status` commands:
+
+      - "shipping" with a fixture "project" is not really feasible
+
+      - touching/producing such a project on-the-fly seems like overkill
+
+      - using the selfsame project is nasty:
+        - we should not assume that the installation against which the
+          tests are being run is a git checkout
+        - some tests need to modify the files under version control.
+          doing this against "selfsame" files seems really wrong.
+
+when using the real filesystem and executing a test case that under normal
+execution is expected to modify those files, we have at least two choices:
+
+  1) have a "fixture tree" representing a filesystem tree with structure
+     and content that reflects a particular starting state for a one or
+     more tests; copy this whole structure recursively to a mutable,
+     temporary location; execute the operation against this temporary tree;
+     make assertions against this temporary tree; then (during test cleanup)
+     remove the whole tree ("recursively").
+
+  2) rather than copying the whole tree recursively, allow the test to
+     modify the *original* (and only) copy of the fixture tree (yes the
+     one that is part of the distribution, i.e in version control) and then
+     after the operation under test has been executed and the assertions
+     have been asserted, carefully restore this tree to its original state
+     (byte for byte).
+
+the (2) way is kind of crazy, but has the advantages that for simple
+scenarios it requires less code and executes faster. however care must be
+taken when developing this way that you are always able to restore the
+tree to its pristine state when an unexpected fatal error occurs before
+the test can restore it.

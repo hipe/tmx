@@ -112,17 +112,30 @@ module Skylab::Git
 
       # --
 
+      def status_via_path path, & oes_p  # experimental newer inerface for [dt]
+
+        chk = _begin_check oes_p, path
+        chk.extend StructureBased__
+        chk.execute
+      end
+
       def check path, & oes_p
 
-        _oes_p = oes_p || @_oes_p  # nil OK
+        chk = _begin_check oes_p, path
+        chk.extend EmissionBased___
+        chk.execute
+      end
 
-        Check___.new( path, @system_conduit, & _oes_p ).execute
+      def _begin_check oes_p, path
+
+        _oes_p = oes_p || @_oes_p  # nil OK
+        Check__.new path, @system_conduit, & _oes_p
       end
     end
 
     # ==
 
-    class Check___
+    class Check__
 
       # what this does is run a "git status" (with particular options)
       # against one file and derives meaning from the *one* line of output
@@ -150,13 +163,16 @@ module Skylab::Git
 
         s = @_serr.gets
         if s
-          __when_errput s
+          when_errput_ s
         else
           __when_probably_output
         end
       end
+    end  # re-opens
 
-      def __when_errput s
+    module EmissionBased___
+
+      def when_errput_ s
 
         # expect unversioned outside of directory
 
@@ -174,8 +190,19 @@ module Skylab::Git
             y << "#{ s } - #{ pth path }"
           end
         end
+
         UNABLE_
       end
+    end  # re-opens
+
+    module StructureBased__
+
+      def when_errput_ _s
+        Not_versioned__[]  # meh
+      end
+    end
+
+    class Check__  # #re-open
 
       def __when_probably_output
 
@@ -186,9 +213,9 @@ module Skylab::Git
 
         if s
           __parse_the_one_line_of_output s
-          send :"__when__#{ @_index_symbol }__and__#{ @_worktree_symbol }"
+          send :"when__#{ @index_symbol }__and__#{ @worktree_symbol }"
         else
-          ACHIEVED_
+          when_no_status_line_
         end
       end
 
@@ -199,8 +226,8 @@ module Skylab::Git
         s.chomp!
         md = RX___.match s
 
-        @_index_symbol = ADJ__.fetch md[ :X ]
-        @_worktree_symbol = ADJ__.fetch md[ :Y ]
+        @index_symbol = ADJ__.fetch md[ :X ]
+        @worktree_symbol = ADJ__.fetch md[ :Y ]
         @_the_rest = md[ :rest ]
         NIL_
       end
@@ -227,11 +254,11 @@ module Skylab::Git
 
       # (line 3 is covered by lines 7, 8 & 9)
 
-      def __when__deleted__and__unmodified  # line 4
+      def when__deleted__and__unmodified  # line 4
         _deleted_from_index
       end
 
-      def __when__deleted__and__modified
+      def when__deleted__and__modified
         _deleted_from_index
       end
 
@@ -239,124 +266,184 @@ module Skylab::Git
 
       # (line 6 is covered by line 7, 8 & 9)
 
-      def __when__modified__and__unmodified  # line 7
+      def when__modified__and__unmodified  # line 7
         _index_and_work_tree_match
       end
 
-      def __when__added__and__unmodified
+      def when__added__and__unmodified
         _index_and_work_tree_match
       end
 
-      def __when__renamed__and__unmodified
+      def when__renamed__and__unmodified
         _index_and_work_tree_match
       end
 
-      def __when__copied__and__unmodified
+      def when__copied__and__unmodified
         _index_and_work_tree_match
       end
 
-      def __when__unmodified__and__modified  # line 8
+      def when__unmodified__and__modified  # line 8
         _work_tree_changed_since_index
       end
 
-      def __when__modified__and__modified
+      def when__modified__and__modified
         _work_tree_changed_since_index
       end
 
-      def __when__added__and__modified
+      def when__added__and__modified
         _work_tree_changed_since_index
       end
 
-      def __when__renamed__and__modified
+      def when__renamed__and__modified
         _work_tree_changed_since_index
       end
 
-      def __when__copied__and__modified
+      def when__copied__and__modified
         _work_tree_changed_since_index
       end
 
-      def __when__unmodified__and__deleted  # line 9
+      def when__unmodified__and__deleted  # line 9
         _deleted_in_work_tree
       end
 
-      def __when__modified__and__deleted
+      def when__modified__and__deleted
         _deleted_in_work_tree
       end
 
-      def __when__added__and__deleted
+      def when__added__and__deleted
         _deleted_in_work_tree
       end
 
-      def __when__renamed__and__deleted
+      def when__renamed__and__deleted
         _deleted_in_work_tree
       end
 
-      def __when__copied__and__deleted
+      def when__copied__and__deleted
         _deleted_in_work_tree
       end
 
       # ~
 
       def _deleted_from_index
-        _meaning 'deleted from index'
+        when_asymmetric_idiom_ :deleted_from_index
       end
 
       def _index_and_work_tree_match
-        _meaning 'index and work tree match'
+        when_asymmetric_idiom_ :index_and_work_tree_match
       end
 
       def _work_tree_changed_since_index
-        _meaning 'file changed since index'
+        when_asymmetric_idiom_ :file_changed_since_index
       end
 
       def _deleted_in_work_tree
-        _meaning 'deleted in work tree'
+        when_asymmetric_idiom_ :deleted_in_work_tree
       end
 
       # --- (that second of three sections)
 
-      def __when__deleted__and__deleted
-        _unmerged 'both deleted'
+      def when__deleted__and__deleted
+        _unmerged :both_deleted
       end
 
-      def __when__added__and__updated
-        _unmerged 'added by us'
+      def when__added__and__updated
+        _unmerged :added_by_us
       end
 
-      def __when__updated__and__deleted
-        _unmerged 'deleted by them'
+      def when__updated__and__deleted
+        _unmerged :deleted_by_them
       end
 
-      def __when__updated__and__added
-        _unmerged 'added by them'
+      def when__updated__and__added
+        _unmerged :added_by_them
       end
 
-      def __when__deleted__and__updated
-        _unmerged 'deleted by us'
+      def when__deleted__and__updated
+        _unmerged :deleted_by_us
       end
 
-      def __when__added__and__added
-        _unmerged 'both added'
+      def when__added__and__added
+        _unmerged :both_added
       end
 
-      def __when__updated__and__updated
-        _unmerged 'both modified'
+      def when__updated__and__updated
+        _unmerged :both_modified
+      end
+
+      def _unmerged s  # not covered but meh
+        when_asymmetric_idiom_ :unmerged
       end
 
       # --- (that third of three sections)
 
-      def __when__untracked__and__untracked
-        _singular_reason 'file is not under version control'
+      def when__untracked__and__untracked
+        when_symmetric_idiom_ :file_is_not_under_version_control
       end
 
-      def __when__ignored__and__ignored
-        _singular_reason 'ignored'
+      def when__ignored__and__ignored
+        when_symmetric_idiom_ :ignored
+      end
+    end  # re-opens
+
+    module StructureBased__  # #re-open
+
+      def when_symmetric_idiom_ _
+        Unversioned_changes__[]
       end
 
-      # --
+      def when_asymmetric_idiom_ _
+        Unversioned_changes__[]
+      end
 
-      def _singular_reason s
+      def when_no_status_line_
+        No_unversioned_changes___[]
+      end
+    end
+
+    Lazy_ = Common_::Lazy
+
+    Not_versioned__ = Lazy_.call do
+      class NotVersioned____
+        def is_versioned
+          false
+        end
+        new
+      end
+    end
+
+    Unversioned_changes__ = Lazy_.call do
+      class UnversionedChanges____
+        def is_versioned
+          true
+        end
+        def has_unversioned_changes
+          true
+        end
+        new
+      end
+    end
+
+    No_unversioned_changes___ = Lazy_.call do
+      class NoUnversionedChanges____
+        def is_versioned
+          true
+        end
+        def has_unversioned_changes
+          false
+        end
+        new
+      end
+    end
+
+    module EmissionBased___  # #re-open
+
+      def when_no_status_line_
+        ACHIEVED_
+      end
+
+      def when_symmetric_idiom_ sym
         if @_oes_p
+          s = message_via_symbol sym
           path = @path
           s.chomp!
           @_oes_p.call :error, :expression do |y|
@@ -366,16 +453,12 @@ module Skylab::Git
         UNABLE_
       end
 
-      def _unmerged s  # not covered but meh
-        _meaning 'unmerged'
-      end
-
-      def _meaning s
+      def when_asymmetric_idiom_ sym
 
         if @_oes_p
-
-          _ = Adjective__[ @_index_symbol ]
-          __ = Adjective__[ @_worktree_symbol ]
+          s = message_via_symbol sym
+          _ = Adjective__[ @index_symbol ]
+          __ = Adjective__[ @worktree_symbol ]
 
           path = @path
 
@@ -390,8 +473,15 @@ module Skylab::Git
       Adjective__ = -> sym do
         sym.id2name.gsub UNDERSCORE_, SPACE_
       end
+    end
 
-      # --
+    # ==
+
+    class Check__  # re-open
+
+      def message_via_symbol s
+        s.id2name.gsub UNDERSCORE_, SPACE_
+      end
 
       def __send_and_receive_status
 

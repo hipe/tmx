@@ -4,10 +4,11 @@ module Skylab::System
 
       # <-
 
-    class Build_path_stream___ < Common_::Actor::Monadic
+    class Build_path_stream___ < Common_::Actor::Dyadic
 
-      def initialize x, & p
+      def initialize x, sc, & p
         @args = x
+        @system_conduit = sc
         @on_event_selectively = p
       end
 
@@ -21,7 +22,7 @@ module Skylab::System
 
         p = -> do
 
-          _, o, e, thread = Home_.lib_.open3.popen3( * @args )
+          _, o, e, thread = @system_conduit.popen3( * @args )
 
           p = -> do
             s = o.gets

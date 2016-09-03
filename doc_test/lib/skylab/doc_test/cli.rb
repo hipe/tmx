@@ -24,11 +24,9 @@ module Skylab::DocTest
 
         o = My_noninteractive_CLI_prototype___[].dup
 
-        o.universal_CLI_resources sin, sout, serr, pn_s_a
+        yield o
 
-        o.filesystem_by do
-          Home_.lib_.system.filesystem
-        end
+        o.universal_CLI_resources sin, sout, serr, pn_s_a
 
         o.produce_reader_for_root_by = -> acs, produce_reader_for do
 
@@ -97,8 +95,9 @@ module Skylab::DocTest
 
         cli = root_frame.CLI
 
-        @_filesystem = cli.filesystem
+        @__filesystem_proc = cli.filesystem_proc
         @_root_ACS = root_frame.ACS
+        @__system_conduit_proc = cli.system_conduit_proc
 
         #== EXPERIMENT
 
@@ -171,7 +170,7 @@ module Skylab::DocTest
 
       def __resolve_upstream_line_stream
 
-        _FS = @_filesystem
+        _FS = remove_instance_variable( :@__filesystem_proc ).call
         path = @original_test_path
 
         begin
@@ -231,6 +230,10 @@ module Skylab::DocTest
 
           oc.for :filesystem do |par, cli_frame|
             cli_frame.root_frame.CLI.filesystem
+          end
+
+          oc.for :system_conduit do |par, cli_frame|
+            cli_frame.root_frame.CLI.system_conduit
           end
         end
       }

@@ -1,0 +1,4 @@
+some test code 2
+
+# this file is read but because we pretend we have unversioned changes
+# it is not overwritten.

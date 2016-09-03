@@ -39,7 +39,19 @@ module Skylab::DocTest
       end
     end
 
+    def __asset_extname__component_association
+      Any_value__
+    end
+
+    def __test_filename_pattern__component_association
+      Any_value__
+    end
+
     def __filesystem__component_association
+      Any_value__
+    end
+
+    def __system_conduit__component_association
       Any_value__
     end
 
@@ -69,13 +81,11 @@ module Skylab::DocTest
         end
 
         if @asset_extname
-          self._NOT_YET_COVERED_might_be_OK
           dup[].asset_extname = @asset_extname
         end
 
         if @test_filename_pattern
-          self._NOT_YET_COVERED_might_be_OK
-          dup[].test_filename_pattern = @test_filename_pattern
+          dup[].test_filename_patterns = [ @test_filename_pattern ]
         end
 
         if otr
@@ -186,11 +196,19 @@ module Skylab::DocTest
         :filesystem,
         :list,  # do list
         :name_conventions,
+        :system_conduit,
         :test_directory,
       )
 
       def VCS_reader
-        :_not_needed_yet_
+        @___VCS_reader ||= __build_VCS_reader
+      end
+
+      def __build_VCS_reader
+        _cls = Home_.lib_.git::Check::Session
+        sess = _cls.begin
+        sess.system_conduit = @system_conduit
+        sess.finish
       end
 
       # --

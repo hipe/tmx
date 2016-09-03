@@ -10,6 +10,7 @@ module Skylab::System
         path: [ :singular_of, :paths, :optional, ],
         paths: :optional,
         ruby_regexp: :optional,
+        system_conduit: :optional,
       )
 
       class << self
@@ -28,14 +29,12 @@ module Skylab::System
       end  # >>
 
       def initialize & p
-
-        @system_conduit = Home_.lib_.open3  # etc
-
         @_any_oes_p = p
       end
 
       def __init_via_iambic x_a
         PARAMS___.init self, x_a
+        @system_conduit ||= Home_.lib_.open3
         NIL_
       end
 

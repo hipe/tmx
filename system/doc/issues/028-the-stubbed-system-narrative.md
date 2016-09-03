@@ -41,6 +41,8 @@ stubbed system.
   5) "snippet" based, which stores its "snapshots" in files but uses
      a platform format rather than OGDL..
 
+  6) a custom jobber at [#035], which of course should etc etc.
+
 
 
 

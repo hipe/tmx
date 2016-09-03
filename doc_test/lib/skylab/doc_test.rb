@@ -83,6 +83,12 @@ module Skylab::DocTest
 
       yield :parameter, :list, :optional, :is_flag
 
+      yield :parameter, :asset_extname, :optional,
+
+            :parameter, :test_filename_pattern, :optional
+
+      # #open [#ze-049] for now the above must be here and not there.
+
       yield :via_ACS_by, -> do
         Home_::Operations_::Recurse.new
       end
@@ -155,6 +161,8 @@ module Skylab::DocTest
     Basic = sidesys[ :Basic ]
     Fields = sidesys[ :Fields ]
 
+    Git = sidesys[ :Git ]
+
     _Strscn = Lazy_.call do
       require 'strscan' ; ::StringScanner
     end
@@ -163,13 +171,11 @@ module Skylab::DocTest
       _Strscn[].new s
     end
 
-    system_lib = nil
-
     System = -> do
-      system_lib[].services
+      System_lib[].services
     end
 
-    system_lib = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
 
     Test_support = sidesys[ :TestSupport ]
     Zerk = sidesys[ :Zerk ]

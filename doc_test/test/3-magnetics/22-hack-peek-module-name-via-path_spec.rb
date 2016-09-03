@@ -43,6 +43,10 @@ module Skylab::DocTest::TestSupport
     end
 
     def _subject * a, & p
+      if 1 == a.length
+        a.unshift :path  # duplicate its syntax sugar :/
+      end
+      a.push :filesystem, ::File  # always use the real filesystem
       magnetics_module_::Hack_Peek_Module_Name_via_Path[ * a, & p ]
     end
   end

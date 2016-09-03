@@ -272,8 +272,12 @@ module Skylab::System
         end
 
         def to_path_stream
+          path_stream_via Home_.lib_.open3
+        end
+
+        def path_stream_via system_conduit
           @args and begin
-            Find_::Build_path_stream___[ @args, & @on_event_selectively ]
+            Find_::Build_path_stream___[ @args, system_conduit, & @on_event_selectively ]
           end
         end
 

@@ -64,6 +64,10 @@ module Skylab::Zerk
       @filesystem_proc = p
     end
 
+    def system_conduit_by & p
+      @system_conduit_proc = p
+    end
+
     attr_writer(
       :compound_custom_sections,
       :compound_usage_strings,
@@ -73,7 +77,7 @@ module Skylab::Zerk
       :operation_usage_string,
       :produce_reader_for_root_by,
       :root_ACS_proc,
-      :system_conduit,
+      :system_conduit_proc,
       :when_head_argument_looks_like_option,
     )
 
@@ -744,6 +748,13 @@ module Skylab::Zerk
       @filesystem_proc.call
     end
 
+    def system_conduit  # courtesy only
+      p = system_conduit_proc
+      if p
+        p[]
+      end
+    end
+
     attr_reader(
       :produce_reader_for_root_by,
       :compound_custom_sections,
@@ -753,7 +764,7 @@ module Skylab::Zerk
       :operation_usage_string,
       :serr,  # [ts]
       :sout,
-      :system_conduit,
+      :system_conduit_proc,  # courtesy only
     )
 
     # -- exit statii

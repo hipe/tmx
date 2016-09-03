@@ -33,6 +33,8 @@ module Skylab::DocTest
 
       def find_testsupport_file_upwards dirname, * rest, & oes_p
 
+        self._MARK  # #todo
+
         path = Home_.lib_.system.filesystem.walk(
           :start_path, dirname,
           :filename, test_support_file,

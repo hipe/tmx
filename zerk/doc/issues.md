@@ -1,3 +1,6 @@
+[#049] #open it would nice if ACS-as-operation could express the parameter
+             arity of their components somehow
+
 [#048]       common relative-to-absolute filesystem path normalization
 
 [#047]       [ tuple pager ]

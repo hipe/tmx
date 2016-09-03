@@ -1,0 +1,3 @@
+# this file will be read (by grep).
+# this exists to remind us that files need to contain
+# the magic sequence in order to give rise to units of work.

@@ -100,7 +100,7 @@ module Skylab::DocTest::TestSupport
           ]
         end
 
-        it "identifying strings!", f: true do
+        it "identifying strings!" do
 
           _hey = _the_parse.nodes.map( & :identifying_string )
           _hey == %w( johnny jammer jizniffer ) or fail

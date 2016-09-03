@@ -13,7 +13,12 @@ module Skylab::DocTest
     class << self
 
       def of rsx
-        call rsx.argument_path, rsx.name_conventions, & rsx.listener_
+        call(
+          rsx.argument_path,
+          rsx.name_conventions,
+          rsx.system_conduit,
+          & rsx.listener_
+        )
       end
 
       def call *a, &p
@@ -24,10 +29,11 @@ module Skylab::DocTest
       private :new
     end  # >>
 
-    def initialize ap, nc, & p
+    def initialize ap, nc, sc, & p
       @argument_path = ap
       @name_conventions = nc
       @_on_event_selectively = p
+      @system_conduit = sc
       @the_find_service = Home_.lib_.system.find  # module
     end
 
@@ -50,6 +56,7 @@ module Skylab::DocTest
       proto = @the_grep_service.new_with(
         :grep_extended_regexp_string, '[^[:space:]][ ]+# =>',
         :freeform_options, %w( --files-with-matches ),
+        :system_conduit, @system_conduit,
         & @_on_event_selectively
       ).finish
 
@@ -127,7 +134,7 @@ module Skylab::DocTest
         & find
       )
 
-      _st = _command.to_path_stream
+      _st = _command.path_stream_via @system_conduit
       _st || self._SANITY  # even when noent
       @_find_status = find
       @_find_stream = _st

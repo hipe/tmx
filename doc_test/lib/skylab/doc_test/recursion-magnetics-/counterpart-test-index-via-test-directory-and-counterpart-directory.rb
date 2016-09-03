@@ -14,6 +14,7 @@ module Skylab::DocTest
           rsx.test_directory,
           rsx.counterpart_directory,
           rsx.name_conventions,
+          rsx.system_conduit,
           & rsx.listener_
         )
       end
@@ -26,9 +27,10 @@ module Skylab::DocTest
       private :new
     end  # >>
 
-    def initialize td, cd, nc, & oes_p
+    def initialize td, cd, nc, sc, & oes_p
       @counterpart_directory = cd
       @name_conventions = nc
+      @system_conduit = sc
       @test_directory = td
       @the_find_service = Home_.lib_.system.find  # module
       @_on_event_selectively = oes_p  # not guaranteed
@@ -150,7 +152,7 @@ module Skylab::DocTest
         & @_find
       )
 
-      _st = _command.to_path_stream
+      _st = _command.path_stream_via @system_conduit
       _st || self._SANITY  # even when noent
       @__path_stream = _st
       NIL

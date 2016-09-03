@@ -124,14 +124,18 @@ module Skylab::DocTest::TestSupport
 
       _oes_p = el.handle_event_selectively
 
-      _result = _subject_mag[ test_dir, :_nvr_, _name_conventions, & _oes_p ]
+      _result = _subject_mag[ test_dir, :_nvr_, _name_conventions, _sc, & _oes_p ]
 
       expect_failure_value _result
       NIL
     end
 
     def _against td, cd  # assume no error ergo no emissions ergo no listener
-      _subject_mag[ td, cd, _name_conventions ]
+      _subject_mag[ td, cd, _name_conventions, _sc ]
+    end
+
+    def _sc
+      the_real_system_
     end
 
     alias_method :_name_conventions, :tite_fake_name_conventions_

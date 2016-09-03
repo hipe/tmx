@@ -25,6 +25,8 @@ module Skylab::DocTest
 
             fs = Home_.lib_.system.filesystem
 
+            self._MARK  # #todo
+
             surrounding_path = fs.walk(
               :start_path, ::File.dirname( @input_path ),
               :filename, TEST_DIR_FILENAME_,

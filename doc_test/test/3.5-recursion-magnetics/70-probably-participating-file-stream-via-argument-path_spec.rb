@@ -35,7 +35,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def __against ap
-      _subject_mag[ ap, longer_fake_name_conventions__ ]
+      _subject_mag[ ap, longer_fake_name_conventions__, the_real_system_ ]
     end
 
     def _subject_mag

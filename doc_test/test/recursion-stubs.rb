@@ -92,7 +92,7 @@ module Skylab::DocTest::TestSupport
         need = '/stub/assetz/'
         r = 0 ... need.length
 
-        fs._read_only_filesystem.__to_path_stream.reduce_by do |path|
+        fs._read_only_filesystem.to_path_stream.reduce_by do |path|
           need == path[ r ]
         end
       end
@@ -112,8 +112,7 @@ module Skylab::DocTest::TestSupport
 
             d = event_log.current_emission_count
 
-            _hi = uow.express_into_under :_not_used, :_expag_not_used
-            _hi == :_not_used || fail
+            execute_unit_of_work_ uow
 
             d_ = event_log.current_emission_count
 
@@ -242,11 +241,11 @@ module Skylab::DocTest::TestSupport
 
     This_one_read_only_filesystem = Lazy_.call do
 
-      fs = StubbedFilesystem___.new
+      fs = ReadOnlyFilesystem.new
 
       # ~ "file 21"
 
-      fs._add_file '/stub/assetz/file-21-participating-create.kerd' do
+      fs.add_file '/stub/assetz/file-21-participating-create.kerd' do
 
         <<-HERE.unindent
           some code
@@ -263,7 +262,7 @@ module Skylab::DocTest::TestSupport
 
       # ~ "file 22"
 
-      fs._add_file '/stub/assetz/file-22-participating-but-changes.kerd' do
+      fs.add_file '/stub/assetz/file-22-participating-but-changes.kerd' do
 
         <<-HERE.unindent
           # xx:
@@ -271,7 +270,7 @@ module Skylab::DocTest::TestSupport
         HERE
       end
 
-      fs._add_file '/stub/testz/file-22-participating-but-changes_speg.kerd' do
+      fs.add_file '/stub/testz/file-22-participating-but-changes_speg.kerd' do
 
         <<-HERE.unindent
           this old test content might not be versioned..
@@ -280,7 +279,7 @@ module Skylab::DocTest::TestSupport
 
       # ~ "file 23"
 
-      fs._add_file '/stub/assetz/file-23-participating-clobberin-time.kerd' do
+      fs.add_file '/stub/assetz/file-23-participating-clobberin-time.kerd' do
 
         <<-HERE.unindent
           # xx:
@@ -288,7 +287,7 @@ module Skylab::DocTest::TestSupport
         HERE
       end
 
-      fs._add_file '/stub/testz/file-23-participating-clobberin-time_speg.kerd' do
+      fs.add_file '/stub/testz/file-23-participating-clobberin-time_speg.kerd' do
 
         <<-HERE.unindent
           this old test content *is* versioned
@@ -307,8 +306,21 @@ module Skylab::DocTest::TestSupport
         @_read_only_filesystem = ro
       end
 
+      def touch_excl path
+        did = nil
+        @_files_written.fetch path do
+          did = true
+          @_files_written[ path ] = EMPTY_S_
+        end
+        did || fail
+      end
+
       def open path, mode
         dup.extend( OpenSupport___ ).__execute_against path, mode
+      end
+
+      def normalization const
+        The_real_filesystem_[].normalization const
       end
 
       attr_reader(
@@ -435,14 +447,14 @@ module Skylab::DocTest::TestSupport
 
     # ==
 
-    class StubbedFilesystem___
+    class ReadOnlyFilesystem
 
       def initialize
         @_a = []
         @_h = {}
       end
 
-      def _add_file path, & y_p
+      def add_file path, & y_p
         @_a.push path
         @_h[ path ] = y_p ; nil
       end
@@ -455,11 +467,7 @@ module Skylab::DocTest::TestSupport
         _st
       end
 
-      def __has path
-        @_h.key? path
-      end
-
-      def __to_path_stream
+      def to_path_stream
         Common_::Stream.via_nonsparse_array @_a
       end
     end

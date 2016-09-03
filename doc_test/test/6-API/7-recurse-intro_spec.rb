@@ -7,11 +7,16 @@ module Skylab::DocTest::TestSupport
     TS_[ self ]
     use :fixture_files
     use :my_API
+    use :mock_systems
 
     it "`path` is a required parameter" do
 
       begin
-        call_API :recurse, :filesystem, :_not_an_FS_
+        call_API(
+          :recurse,
+          :filesystem, :_trueish_for_FS_,
+          :system_conduit, :_trueish_for_system_,
+        )
       rescue ::Skylab::Autonomous_Component_System::MissingRequiredParameters => e
       end
 
@@ -28,6 +33,7 @@ module Skylab::DocTest::TestSupport
           :recurse,
           :path, _dir,
           :filesystem, the_real_filesystem_,
+          :system_conduit, :_trueish_for_system_,
         )
       end
 
@@ -54,6 +60,7 @@ module Skylab::DocTest::TestSupport
           :path, _dir,
           :list, true,
           :filesystem, the_real_filesystem_,
+          :system_conduit, the_real_system_,
         )
       end
 
@@ -94,11 +101,180 @@ module Skylab::DocTest::TestSupport
       end
     end
 
+    context "system stubbed, filesystem LIVE" do
+
+      call_by do
+
+        _fs = the_real_filesystem_
+        @_path = tree_path_via_dir_ 'tree-03-gemish'
+        _sc = mock_system_for_tree_03_gemish__
+
+        call(
+          :recurse,
+          :asset_extname, '.ko',
+          :test_filename_pattern, '*_speg.ko',
+          :path, @_path,
+          :filesystem, _fs,
+          :system_conduit, _sc,
+        ) # calls method #here
+      end
+
+      it "first - test file exists and is not versioned at all - skip" do
+
+        _execute :first_UoW
+
+        expect_emission :info, :expression, :file_write_summary, :skipped
+
+        expect_no_emissions
+      end
+
+      it "second - test file exists and has unversioend changes - skip" do
+
+        _execute :second_UoW
+
+        expect_emission :info, :expression, :file_write_summary, :skipped
+
+        expect_no_emissions
+      end
+
+      # tests that have portions of their names in all caps [#029] #note-5
+
+      it "third - test file does not exist at all - CREATE.." do
+
+        # (pre-assert, execute, cleanup, post-assert)
+
+        path = ::File.join root_ACS_state.gemish, 'test', 'berdersic-flersic_speg.ko'
+        ::File.exist? path and fail
+
+        _execute :third_UoW
+
+        stat = ::File.stat path
+        ::File.unlink path  # manual-cleanup - do before assertions
+
+        stat.size.zero? && fail   # we assert content elsewhere
+        expect_emission :info, :expression, :file_write_summary, :created
+        expect_no_emissions
+      end
+
+      context "fourth - test file exists but has no unversioned changes - UPDATE.." do
+
+        shared_subject :_state do
+
+          # (memo for pre-assert, execute, cleanup, memo for post-assert)
+
+          o = X_ari_Struct2.new
+
+          path = ::File.join root_ACS_state.gemish, 'test', 'cerebus-rex_speg.ko'
+          o.content_before = ::File.read path
+
+          _execute :fourth_UoW
+
+          o.content_after = ::File.read path
+          ::File.write path, o.content_before  # #manual-cleanup
+
+          o.emission_stream = remove_instance_variable :@event_log
+          o
+        end
+
+        it "emits as expected" do
+
+          @event_log = _state.emission_stream
+
+          expect_emission :info, :expression, :file_write_summary, :updated
+          expect_no_emissions
+        end
+
+        it "content looks good" do
+
+          exp = <<-HERE.unindent
+            some test code 4
+
+            # for this file we fake it to look like it has NO unversioned content
+            # so it *will* get overwritten. every byte of this file is covered.
+          HERE
+
+          o = _state
+          o.content_before == exp || fail  # sanity
+
+          rx = /(?<=\n)/  # amazing that /$/ doesn't work
+          s_a = exp.split rx
+
+          s_a[ 2, 0 ] = [
+            "  it \"xyzzytftt3glzdcr\" do\n",
+            "    1.should eql 5\n",
+            "  end\n",
+          ]
+          exp = s_a.join
+
+          o.content_after == exp || fail
+        end
+
+        X_ari_Struct2 = ::Struct.new :content_before, :content_after, :emission_stream
+      end
+
+      def expect_no_emissions  # (local "correction")
+        @event_log.gets && fail
+      end
+
+      def root_ACS_state_via st, _  # called by #here
+
+        _eek_a = remove_instance_variable( :@event_log ).release_to_mutable_array  # EXPERIMENT  # #todo
+
+        first = st.gets
+        first || fail
+
+        second = st.gets
+        second || fail
+
+        third = st.gets
+        third || fail
+
+        fourth = st.gets
+        fourth || fail
+
+        fifth = st.gets
+        fifth && fail
+
+        # although options exist for `find` to control the ordering of the
+        # results, we'd rather avoid them for now and just do it here instead:
+
+        desired_order = %w(
+          zerby-derby.ko
+          acerbic--.ko
+          berdersic-flersic-.ko
+          cerebus-rex.ko
+          gonzo-journalism.ko
+        )
+
+        uows = [ first, second, third, fourth ]
+
+        uows.sort_by! do |uow|
+          desired_order.index ::File.basename uow.asset_path or fail
+        end
+
+        X_ari_Struct.new( * uows, _eek_a, remove_instance_variable( :@_path ) )
+      end
+
+      X_ari_Struct = ::Struct.new(
+        :first_UoW, :second_UoW, :third_UoW, :fourth_UoW, :eek, :gemish )
+
+      def _execute member_sym
+
+        state = root_ACS_state
+        em_a = state.eek
+        d = em_a.length
+        execute_unit_of_work_ state[ member_sym ]
+        r = d .. -1
+        @event_log = Common_::Stream.via_nonsparse_array em_a[ r ]
+        em_a[ r ] = EMPTY_A_
+        NIL
+      end
+    end
+
     h = { find_command_args: true }
     define_method :ignore_for_expect_event do
       h
     end
   end
 end
-# #tombstone: tests removed in this commit will have DNA brought back in a future commit.
 # #tombstone: tested old enum meta-field

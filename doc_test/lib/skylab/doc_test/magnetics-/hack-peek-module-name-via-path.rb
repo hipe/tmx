@@ -3,6 +3,7 @@ module Skylab::DocTest
   class Magnetics_::Hack_Peek_Module_Name_via_Path  # introduction at [#006]
     # -
       Attributes_actor_.call( self,
+        filesystem: nil,
         line_upstream: nil,
         path: nil,
         property: nil,
@@ -27,7 +28,6 @@ module Skylab::DocTest
         @line_upstream = nil
         @on_event_selectively = nil
         @path = nil
-
         if oes_p
           @on_event_selectively = oes_p
         end
@@ -45,6 +45,7 @@ module Skylab::DocTest
         _fs = Home_.lib_.system.filesystem
 
         tr = _fs.hack_guess_module_tree(
+          :filesystem, @filesystem,
           :path, @path,
           :line_upstream, @line_upstream,
           & @on_event_selectively

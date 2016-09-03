@@ -917,7 +917,7 @@ module Skylab::Common::TestSupport
       end
 
       def __first_gets_call
-        _em_a = _release_to_mutable_array
+        _em_a = release_to_mutable_array
         @__stream = Common_::Stream.via_nonsparse_array _em_a
         @_gets = :__subsequent_gets_call
         _close
@@ -941,18 +941,18 @@ module Skylab::Common::TestSupport
       end
 
       def __close_as_scanner
-        em_a = _release_to_mutable_array
+        em_a = release_to_mutable_array
         _close
         Common_::Polymorphic_Stream.via_array em_a
       end
 
       def __close_as_array
-        em_a = _release_to_mutable_array
+        em_a = release_to_mutable_array
         _close
         em_a.freeze
       end
 
-      def _release_to_mutable_array
+      def release_to_mutable_array  # [dt]
 
         if :option_time == @_state  # #note-6 - kept simple for now..
           _transition_to_record_time

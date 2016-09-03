@@ -5,12 +5,16 @@ module Skylab::DocTest
     # exactly [#005]
 
     # non-declared parameters: name_conventions
-    # currently hard-coded: filesystem_directories
 
     class << self
 
       def of rsx
-        call rsx.argument_path, rsx.test_directory, rsx.name_conventions
+        call(
+          rsx.argument_path,
+          rsx.test_directory,
+          rsx.name_conventions,
+          rsx.filesystem,
+        )
       end
 
       def call *a
@@ -21,16 +25,14 @@ module Skylab::DocTest
       private :new
     end  # >>
 
-    def initialize ap, td, nc
+    def initialize ap, td, nc, fs
       @argument_path = ap
+      @filesystem = fs
       @name_conventions = nc
       @test_directory = td
     end
 
     def execute
-
-      @filesystem_directories = ::Dir
-
       ok = __check_the_lib_assumption
       ok &&= __step_downward_until_something_other_than_exactly_one_directory
       ok && __via_paths_from_glob
@@ -114,7 +116,7 @@ module Skylab::DocTest
 
       begin
         _glob = ::File.join dir, GLOB___
-        paths = @filesystem_directories[ _glob ]
+        paths = @filesystem.glob _glob
         cmp = 1 <=> paths.length
 
         if 1 == cmp  # when there are no entries:
@@ -183,7 +185,7 @@ module Skylab::DocTest
       # hit to do
 
       dir = ::File.join proj_dir, LIB__
-      if @filesystem_directories.exist? dir
+      if @filesystem.directory? dir
         @_lib_directory = dir
         ACHIEVED_
       else

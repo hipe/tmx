@@ -7,6 +7,7 @@ module Skylab::DocTest::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :my_non_interactive_CLI
+    use :mock_systems
 
     _OP = 'recur'
 
@@ -43,6 +44,12 @@ module Skylab::DocTest::TestSupport
         digislug = '\d+(?:\.\d+)*(?:-[a-z]+)+'
         test_path =~ %r(\Atest(?:/#{ digislug })+/#{ digislug }_spec\.rb\z) || fail
       end
+
+      def this_system_conduit_
+        mock_system_that_is_passthru_of_filesystem_related_only__
+      end
+
+      alias_method :this_filesystem_, :the_real_filesystem_
     end
 
     _preview_done_rx = %r(\A\(preview for one file done \(\d+ lines)

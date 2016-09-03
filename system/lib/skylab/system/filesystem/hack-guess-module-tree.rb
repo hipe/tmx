@@ -51,6 +51,7 @@ module Skylab::System
         end  # >>
 
         Attributes_actor_.call( self,
+          filesystem: nil,
           line_upstream: :custom_interpreter_method,
           path: :custom_interpreter_method,
         )
@@ -95,6 +96,7 @@ module Skylab::System
         # ~ normalize
 
         def normalize
+          @filesystem ||= ::File
           send @resolve_line_upstream_method_name
         end
 
@@ -105,8 +107,11 @@ module Skylab::System
         end
 
         def via_path_resolve_line_upstream
-          @line_upstream = ::File.open @path, ::File::RDONLY
-          @line_upstream ? ACHIEVED_ : UNABLE_
+
+          io = @filesystem.open @path, ::File::RDONLY
+          io || Home_._SANITY
+          @line_upstream = io
+          ACHIEVED_
         end
 
         # ~ work

@@ -118,6 +118,8 @@ module Skylab::DocTest::TestSupport
       dangerous_memoize :_md do
         /\A(?<head>.*)no such file or directory @ rb_sysopen - (?<path>.+)$/.match first_line.string
       end
+
+      alias_method :this_filesystem_, :the_real_filesystem_
     end
 
     _END_LINE = "end\n"
@@ -147,6 +149,8 @@ module Skylab::DocTest::TestSupport
       dangerous_memoize :_lines do
         niCLI_state.lines
       end
+
+      alias_method :this_filesystem_, :the_real_filesystem_
     end
 
     context "output the lines from an asset file and an original test file" do
@@ -208,6 +212,8 @@ module Skylab::DocTest::TestSupport
       def _lines
         niCLI_state.lines
       end
+
+      alias_method :this_filesystem_, :the_real_filesystem_
     end
 
     def __original_test_file

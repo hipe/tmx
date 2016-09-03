@@ -48,6 +48,12 @@ module Skylab::DocTest::TestSupport
 
     # -- support for making assertions
 
+    def execute_unit_of_work_ uow  # explained in [#029] #note-4
+      _hi = uow.express_into_under :___yielder_not_used, :____expag_not_used
+      _hi == :___yielder_not_used || fail
+      NIL
+    end
+
     def expect_actual_big_string_has_same_content_as_expected_ a_s, e_s
       expect_actual_line_stream_has_same_content_as_expected_(
         line_stream_via_string_( a_s ),
@@ -130,7 +136,11 @@ module Skylab::DocTest::TestSupport
     end
 
     def the_real_filesystem_
-      Home_.lib_.system.filesystem
+      The_real_filesystem_[]
+    end
+
+    def the_real_system_
+      The_real_system__[]
     end
   # -
 
@@ -141,8 +151,19 @@ module Skylab::DocTest::TestSupport
       tcc.include self
     end
     # -
-      def subject_CLI
-        Home_::CLI
+
+      def build_invocation_for_expect_stdout_stderr sin, sout, serr, pn_s_a, * xtra
+
+        Home_::CLI.new sin, sout, serr, pn_s_a do |cli|
+
+          cli.filesystem_by do
+            this_filesystem_
+          end
+
+          cli.system_conduit_by do
+            this_system_conduit_
+          end
+        end
       end
     # -
   end
@@ -156,6 +177,14 @@ module Skylab::DocTest::TestSupport
 
   Safe_localize_ = -> longer, shorter do
     Home_.lib_.basic::Pathname::Localizer[ shorter ][ longer ]
+  end
+
+  The_real_filesystem_ = Lazy_.call do
+    Home_.lib_.system.filesystem
+  end
+
+  The_real_system__ = Lazy_.call do
+    Home_.lib_.system_lib.lib_.open3  # #violation
   end
 
   # --
@@ -192,6 +221,7 @@ module Skylab::DocTest::TestSupport
   Home_ = ::Skylab::DocTest
 
   DASH_ = '-'
+  EMPTY_A_ = []
   DocTest = Home_  # only for generated tests, find it via (?!<::)DocTest\b
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
