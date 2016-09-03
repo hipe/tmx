@@ -55,3 +55,17 @@ that for now we abstain from in the interest of simplicity.
 but we can at least cover one of noent cases if we add this check
 here. whether this check should be moved to the magnet is an open
 question.
+
+
+
+
+
+## :#note-3
+
+kinda fun but kinda scary - accepting that our units of work might
+be expressed in any arbitrary order separate form the order in which
+the stream produced them, but yet *ALL THE WHILE* writing to *THE SAME*
+event log - what we'll do is: when *ANY ONE* of these units of work's
+emissions are requested, *ONLY ONCE* per unit of work will we use this
+tailor made "shave" (basically pop) method of the event log to
+*REMOVE* those emissions and memoize them into the associated tuple.

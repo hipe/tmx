@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Expect_Event  # :[#065].
+  module Expect_Event  # some notes in [#065]
 
     # per name conventions, all method *and ivar* names with neither leading
     # nor trailing underscores are part of the [sub-]subject's public API.
@@ -889,126 +889,207 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    class EventLog  # [ta]
-
-      # at present this wraps multiple concerns and implements them with
-      # function soup.
-      #
-      #   advantage: it serves as a front for this whole API, allowing the
-      #     client (the test context) to clutter its ivar namespace with
-      #     only this one name (and its concept-space with only this object.)
-      #
-      #   disadvantage: it violates the Single Responsibility Principle.
-      #
-      # so its implementation **and interface** is an experiment vulnerable
-      # to (yet more) change..
+    class EventLog  # exactly #note-5 (see).
 
       class << self
 
         def for test_context
-          log = new
+          el = new
           if test_context.do_debug
-            log.set_auxiliary_listener_by( & Debugging_listener_for___[ test_context ] )
+            el.set_auxiliary_listener_by( & Debugging_listener_for___[ test_context ] )
           end
-          log
+          el
         end
       end  # >>
 
       def initialize
+        @_options = nil
+        @_option_time_write = :__first_option_time_write
+        @_record_time_read = :__first_record_time_read
+        @_read_time_read = :__first_read_time_read
+        @_state = :option_time
+      end
 
-        # -- set options
+      # -- read-time
 
-        opts = nil
-        @_receive_option = -> sym, x do
-          opts ||= Options___.new
-          opts[ sym ] = x ; nil
+      def gets
+        send( @_gets ||= :__first_gets_call )
+      end
+
+      def __first_gets_call
+        _em_a = _release_to_mutable_array
+        @__stream = Common_::Stream.via_nonsparse_array _em_a
+        @_gets = :__subsequent_gets_call
+        _close
+        send @_gets
+      end
+
+      def __subsequent_gets_call
+        @__stream.gets
+      end
+
+      def flush_to_scanner
+        send @_read_time_read, :__close_as_scanner
+      end
+
+      def flush_to_array
+        send @_read_time_read, :__close_as_array
+      end
+
+      def __first_read_time_read m
+        send m
+      end
+
+      def __close_as_scanner
+        em_a = _release_to_mutable_array
+        _close
+        Common_::Polymorphic_Stream.via_array em_a
+      end
+
+      def __close_as_array
+        em_a = _release_to_mutable_array
+        _close
+        em_a.freeze
+      end
+
+      def _release_to_mutable_array
+
+        if :option_time == @_state  # #note-6 - kept simple for now..
+          _transition_to_record_time
         end
 
-        # -- log emissions
+        remove_instance_variable( :@_record_time ).mutable_array
+      end
+
+      def _close
+        @_record_time_read = :_method_no_longer_available
+        @_read_time_read = :_method_no_longer_available
+        @_state = :closed
+        freeze
+      end
+
+      # -- record-time
+
+      def handle_event_selectively
+        send @_record_time_read, :listener
+      end
+
+      def shave num  # hacky fun - pop off the last N items with assertion
+
+        em_a = send @_record_time_read, :mutable_array
+        em_a.length < num && fail
+        r = -num .. -1
+        em_a_ = em_a[ r ]
+        em_a[ r ] = EMPTY_A_
+        em_a_
+      end
+
+      def current_emission_count
+        send( @_record_time_read, :mutable_array ).length
+      end
+
+      def __first_record_time_read k
+        _transition_to_record_time
+        send @_record_time_read, k
+      end
+
+      def _transition_to_record_time
 
         a = []
 
-        close_options = -> do  # idempotent
-          @_receive_option = nil
-        end
+        handler = Handler_via_options___[ a, remove_instance_variable( :@_options ) ]
 
-        receive_emission = -> symbol_array, & event_proc do
+        @_record_time = RecordTime___.new(
+          -> * i_a, & ev_p do
+            handler[ i_a, & ev_p ]
+          end,
+          a,
+        )
 
-          close_options[]
-
-          record = __proc_for_record a
-
-          receive_emission = if opts
-            __proc_when_options opts, record
-          else
-            record
-          end
-
-          receive_emission[ symbol_array, & event_proc ]
-        end
-
-        @handle_event_selectively = -> * i_a, & ev_p do
-          receive_emission[ i_a, & ev_p ]
-          UNRELIABLE_
-        end
-
-        # -- read emissions
-
-        close_options_and_readers = -> do
-
-          close_options[]
-          receive_emission = nil
-
-          @_flush_to_scanner = nil
-          @_flush_to_array = nil
-          @_gets_x = nil
-        end
-
-        @_flush_to_scanner = -> do
-          close_options_and_readers[]
-          Common_::Polymorphic_Stream.via_array a
-        end
-
-        @_flush_to_array = -> do
-          close_options_and_readers[]
-          a.freeze
-        end
-
-        @_gets_x = -> do
-
-          # this ivar could be made to be immutable **but it is NOT currently**
-
-          close_options_and_readers[]
-          @_gets_x = Common_::Stream.via_nonsparse_array a
-          @_gets_x.call
-        end
+        @_option_time_write = :_method_no_longer_available
+        @_record_time_read = :__subsequent_record_time_read
+        @_state = :record_time
       end
 
-      # -- set options (counterpart)
+      def __subsequent_record_time_read k
+        @_record_time[ k ]
+      end
+
+      # -- configure-time
 
       def set_auxiliary_listener_by & aux_chan_p
-        @_receive_option[ :aux_listener, aux_chan_p ]
-        NIL_
+        send @_option_time_write, :aux_handler, aux_chan_p
+        NIL
       end
 
       def set_hash_of_terminal_channels_to_ignore h
-        @_receive_option[ :ignore_term_chan_hash, h ]
-        NIL_
+        send @_option_time_write, :ignore_term_chan_hash, h
+        NIL
       end
 
-      # -- log emissions (counterpart)
+      def __first_option_time_write k, x
+        @_options = Options___.new
+        @_option_time_write = :__subsequent_option_time_write
+        send @_option_time_write, k, x
+        NIL
+      end
 
-      attr_reader(
-        :handle_event_selectively,
-      )
+      def __subsequent_option_time_write k, x
+        @_options[ k ] = x ; nil
+      end
 
-      def __proc_when_options opts, record
+      # -- support
 
-        aux_chan_p = opts.aux_listener
+      def _method_no_longer_available( * )
+
+        loc, loc_ = caller_locations 1, 2
+        _path = ::File.basename loc_.path
+
+        raise MethodNotAvailableFromCurrentState,
+          "method `#{ loc.base_label }` is no longer available because #{
+            }event log has moved to '#{ @_state }' state (called from #{
+              }#{ _path }:#{ loc_.lineno }))"
+      end
+    end
+
+    MethodNotAvailableFromCurrentState = ::Class.new ::RuntimeError
+
+    # ==
+
+    Options___ = ::Struct.new :aux_handler, :ignore_term_chan_hash
+
+    RecordTime___ = ::Struct.new(
+      :listener,
+      :mutable_array,
+    )
+
+    # ==
+
+    module Handler_via_options___ ; class << self
+
+      # see #note-7 "listener vs. handler"
+      #
+      # most of subject is concerned with the case of when debugging is
+      # on and certain channels are being ignored: for each emission that
+      # occurs on an ignored channel we still express some information to
+      # the debugging handler (although the emission is not recorded nor the
+      # emission payload proc memoized).
+
+      def [] em_a, opts
+        if opts
+          __handler_when_opts em_a, opts
+        else
+          _handler_that_records em_a
+        end
+      end
+
+      def __handler_when_opts em_a, opts
+
+        aux_chan_p = opts.aux_handler
         ignore_h = opts.ignore_term_chan_hash
 
         if aux_chan_p
-          mux_p = __proc_for_mux aux_chan_p, record
+          mux_p = __handler_when_mux aux_chan_p, _handler_that_records( em_a )
         end
 
         if ignore_h
@@ -1017,22 +1098,20 @@ module Skylab::Common::TestSupport
             when_ignored = ___proc_for_when_ignored_under_mux aux_chan_p
             when_not_ignored = mux_p
           else
-            when_not_ignored = record
+            when_not_ignored = _handler_that_records em_a
           end
 
-          __if_ignore ignore_h, when_ignored, when_not_ignored
+          __handler_when_ignore ignore_h, when_ignored, when_not_ignored
         else
 
           mux_p
         end
       end
 
-      Options___ = ::Struct.new :aux_listener, :ignore_term_chan_hash
-
       def ___proc_for_when_ignored_under_mux aux_chan_p
 
         # ignoring means ignoring BUT if debugging is on then we ignore the
-        # content but not thechanne
+        # content but not the channel
 
         -> sym_a, & ev_p do
 
@@ -1044,7 +1123,7 @@ module Skylab::Common::TestSupport
         end
       end
 
-      def __if_ignore ignore_h, when_ignore_p, when_not_ignore_p
+      def __handler_when_ignore ignore_h, when_ignore_p, when_not_ignore_p
 
         ignore = -> sym_a do
           ignore_h[ sym_a.last ]
@@ -1075,11 +1154,11 @@ module Skylab::Common::TestSupport
         end
       end
 
-      def __proc_for_mux aux_chan_p, record
+      def __handler_when_mux aux_chan_p, record
 
         -> sym_a, & p do
 
-          _unreliable = record[ sym_a, & p ]
+          record[ sym_a, & p ]
 
           # DOUBLE-BUILDING
 
@@ -1089,7 +1168,7 @@ module Skylab::Common::TestSupport
         end
       end
 
-      def __proc_for_record em_a
+      def _handler_that_records em_a
 
         -> sym_a, & ev_p do
 
@@ -1098,21 +1177,7 @@ module Skylab::Common::TestSupport
           UNRELIABLE_
         end
       end
-
-      # -- read emissions (counterpart)
-
-      def flush_to_scanner
-        @_flush_to_scanner[]
-      end
-
-      def flush_to_array
-        @_flush_to_array[]
-      end
-
-      def gets
-        @_gets_x.call
-      end
-    end
+    end ; end
 
     # ==
 
@@ -1291,4 +1356,5 @@ module Skylab::Common::TestSupport
     UNRELIABLE_ = false
   end
 end
+# #tombstone - event log was function soup
 # #tombstone - simple debugging output

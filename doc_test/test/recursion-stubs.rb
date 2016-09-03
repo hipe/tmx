@@ -4,10 +4,117 @@ module Skylab::DocTest::TestSupport
 
     class << self
       def [] tcc
-        # (orthogonal access - constants only..)
-        Home_::NOTHING_
+        tcc.send(
+          :define_singleton_method,
+          :given_unit_of_work_stream_for_filesystem__,
+          Given_etc___,
+        )
+        tcc.include InstanceMethods___ ; nil
       end
     end  # >>
+
+    # -
+
+      Given_etc___ = -> & fs_p do
+
+        yes = true ; x = nil
+
+        define_method :_the_unit_of_work_tuples do
+          if yes
+            yes = false
+            x = self.__build_unit_of_work_tuples_given fs_p
+          end
+          x
+        end
+      end
+    # -
+
+    module InstanceMethods___
+
+      def find_line_with_ needle, path
+
+        _fs = _the_unit_of_work_tuple.the_filesystem_post_execution[]
+
+        io = _fs.open path, ::File::RDONLY
+
+        begin
+          line = io.gets
+          line.include? needle and break
+          redo
+        end while above
+        io.close
+        line
+      end
+
+      def the_emission_
+        em_a = the_emissions_
+        1 == em_a.length || fail
+        em_a.fetch 0
+      end
+
+      def the_emissions_
+        _the_unit_of_work_tuple.the_lazily_evaluated_emissions[]
+      end
+
+      def _the_unit_of_work_tuple
+        _the_unit_of_work_tuples.fetch the_unit_of_work_index_
+      end
+
+      def __build_unit_of_work_tuples_given fs_p
+
+        fs = fs_p[]
+
+        _asset_st = fs._read_only_filesystem_._to_path_stream_
+
+        event_log = Common_.test_support::Expect_Event::EventLog.for self
+
+        _oes_p = event_log.handle_event_selectively
+
+        _DO_NOT_LIST = false
+
+        _mock_index = _new_stub_index
+
+        st = against_ _mock_index, _asset_st, _DO_NOT_LIST, fs,  & _oes_p
+
+        # -- unwound:
+
+        st.map_by do |uow|
+
+          tuple = UnitOfWorkTuple___.new
+
+          tuple.the_filesystem_post_execution = -> do
+            tuple.the_lazily_evaluated_emissions[]
+            fs
+          end
+
+          tuple.the_lazily_evaluated_emissions = Lazy_.call do  # eek [#029] #note-3
+
+            d = event_log.current_emission_count
+
+            _hi = uow.express_into_under :_not_used, :_expag_not_used
+            _hi == :_not_used || fail
+
+            d_ = event_log.current_emission_count
+
+            num = d_ - d
+            num.zero? && fail
+
+            event_log.shave num
+          end
+
+          tuple
+        end.to_a
+      end
+    end
+
+    # ==
+
+    UnitOfWorkTuple___ = ::Struct.new(
+      :the_filesystem_post_execution,
+      :the_lazily_evaluated_emissions,
+    )
+
+    # ==
 
     class StubIndex
 

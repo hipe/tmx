@@ -113,9 +113,9 @@ module Skylab::DocTest::TestSupport
 
       el = event_log
 
-      _oes_p = el.handle_event_selectively
-
       el.set_hash_of_terminal_channels_to_ignore( find_command_args: true )
+
+      _oes_p = el.handle_event_selectively
 
       _result = _subject_mag[ test_dir, :_nvr_, name_conventions_, & _oes_p ]
 

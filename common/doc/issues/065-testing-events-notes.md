@@ -2,6 +2,70 @@
 
 
 
+## local idioms: "handler" vs "listener" :#note-7
+
+reminder: as local idioms, "listener" and "handler" are almost the
+same: both receive a list of symbols (the "channel"), and both
+typically use the block parameter which is a means to produce or
+effect the emission payload or side-effect (e.g event or expression
+as appropriate for the emission).
+
+the difference here is that a "handler" *must* accept one positional
+parameter which will be the "channel" in the form of an array of
+symbols; whereas the "listener" receives this same channel but spread
+across all its positional arguments (so typically a listern has a
+single "glob" parameter).
+
+we prefer using handlers internally because of the memory savings that
+is realized by using the same channel; but we prefer the "listener"
+form when it is actually being used to receive an emission that is
+written as code inline in some business space (because of readability
+and ergonomics).
+
+
+
+
+## :#note-5
+
+as well as being the underlying workhorse behind most of this library,
+the subject is also available to clients to be used as a standalone
+testing insturment in its own right.
+
+the subject is for recording the emissions that occur during
+(typically) the operation under test, and then subsequenty exposing
+those emissions for reading in a variety of ways. essentially it's
+just a selective emission listener (proc) bundled alongside a queue
+(array) that gets written to with an emission structure derived from
+each emission sent to that listener; but to in order to assert sane
+usage and sensible test design, the user may want to know about its
+underlying state-based mechanic:
+
+the event log is always in exactly one of these states (i.e modes):
+
+    option-time  ->  record-time  ->  read-time  ->  closed
+
+it starts in the state on the left and at any point it can transition
+(internally) to each next state through the transitions proscribed by
+the arrows; i.e once it has left a state it cannot go back.
+
+every exposed method is associated with exactly one of these states.
+when any such method is called, if the current state is not the
+requisite state but is "accessible", the state will be transitioned
+forwards as necessary. trying to call a method that is associated
+with a previous state is guaranteed to fail loudly.
+
+this used to be function soup (see tombstone).
+
+
+
+### :#note-6
+
+we could do the thing with a hash that associates states with
+offsets and and array of transition methods, and call each
+necessary method but that's just barely overkill yet..
+
+
+
 
 ## a hierarchy of checks  :note-A
 

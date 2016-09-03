@@ -14,7 +14,7 @@ module Skylab::Common::TestSupport
         :_no_see_
       end
 
-      _expect_same_failure_by do
+      _expect_state_faulure :record_time do
         @event_log.set_hash_of_terminal_channels_to_ignore Home_::EMPTY_H_
       end
     end
@@ -29,21 +29,21 @@ module Skylab::Common::TestSupport
 
       :hi == _em.channel_symbol_array.fetch( 0 ) or fail
 
-      _expect_same_failure_by do
+      _expect_state_faulure :closed do
         send_potential_event_ :hi do
           :_no_see_
         end
       end
     end
 
-    def _expect_same_failure_by
+    def _expect_state_faulure sym
 
       begin
         yield
-      rescue ::NoMethodError => e
+      rescue TS_::Expect_Event::MethodNotAvailableFromCurrentState => e
       end
 
-      e.message.should eql "undefined method `[]' for nil:NilClass"
+      e.message.include? "has moved to '#{ sym }' state" or fail
     end
 
     context "the ignore option" do
