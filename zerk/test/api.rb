@@ -94,9 +94,10 @@ module Skylab::Zerk::TestSupport
       # -- effecting the state
 
       def rescue_argument_error & p  # is :#here
+
         begin
           instance_exec( & p )
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::MissingRequiredParameters => e
         end
 
         if do_debug

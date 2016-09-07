@@ -15,6 +15,7 @@ module Skylab::Fields
       :reasons, nil,  # #"c1"
       :selection_stack, nil,
       :lemma, DEFAULT_PROPERTY_LEMMA_,
+      :exception_class_by, -> { Home_::MissingRequiredAttributes },  # ..
       :error_category, :argument_error,
       :ok, false,
 

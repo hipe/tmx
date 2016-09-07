@@ -631,6 +631,10 @@ module Skylab::Fields
 
   # --
 
+  MissingRequiredAttributes = ::Class.new ::ArgumentError
+
+  # --
+
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc

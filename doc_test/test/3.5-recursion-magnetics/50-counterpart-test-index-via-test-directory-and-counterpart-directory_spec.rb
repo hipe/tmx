@@ -39,7 +39,7 @@ module Skylab::DocTest::TestSupport
       context "zoopie" do
 
         shared_subject :_details do
-          _asset_path = '/watanabi/fatanabi/woobie-foobie-/noobie-choobie--.rb'
+          _asset_path = '/watanabi/fatanabi/woobie-foobie-/noobie-choobie--.ko'
           _ind = _index
           _ind.details_via_asset_path _asset_path
         end
@@ -51,9 +51,11 @@ module Skylab::DocTest::TestSupport
         it "comes up with a path that is not real" do
           _abs = _details.to_path
           _act = Safe_localize_[ _abs, the_empty_directory_ ]
-          _act == "woobie-foobie/noobie-choobie_spec.rb" || fail  # #path
+          _act == "woobie-foobie/noobie-choobie_speg.ko" || fail  # #path
         end
       end
+
+      alias_method :_name_conventions, :tite_fake_name_conventions_
     end
 
     context "moneytackulous" do
@@ -92,7 +94,10 @@ module Skylab::DocTest::TestSupport
       context "when there IS a corresponding test dir, but no file" do
 
         shared_subject :_details do
-          _asset_path = "#{ my_real_magnetics_directory_ }/jimbie-joobie--.rb"  # #path
+
+          _asset_path = "#{ my_real_magnetics_directory_ }/jimbie-joobie--.rb"
+            # use a real-looking extension here because etc.; #path
+
           _ind = _index
           _ind.details_via_asset_path _asset_path
         end
@@ -107,6 +112,8 @@ module Skylab::DocTest::TestSupport
           _act == "3-magnetics/jimbie-joobie_spec.rb" || fail
         end
       end
+
+      alias_method :_name_conventions, :selfsame_name_conventions_
     end
 
     def _against_expecting_error test_dir
@@ -117,15 +124,17 @@ module Skylab::DocTest::TestSupport
 
       _oes_p = el.handle_event_selectively
 
-      _result = _subject_mag[ test_dir, :_nvr_, name_conventions_, & _oes_p ]
+      _result = _subject_mag[ test_dir, :_nvr_, _name_conventions, & _oes_p ]
 
       expect_failure_value _result
       NIL
     end
 
     def _against td, cd  # assume no error ergo no emissions ergo no listener
-      _subject_mag[ td, cd, name_conventions_ ]
+      _subject_mag[ td, cd, _name_conventions ]
     end
+
+    alias_method :_name_conventions, :tite_fake_name_conventions_
 
     def _subject_mag
       Home_::RecursionMagnetics_::CounterpartTestIndex_via_TestDirectory_and_CounterpartDirectory

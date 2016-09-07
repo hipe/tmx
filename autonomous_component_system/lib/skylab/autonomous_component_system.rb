@@ -579,6 +579,9 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
       Autoloader_[ self ]
     end
 
+    MissingRequiredParameters = ::Class.new ::ArgumentError
+    NotAvailable = ::Class.new ::ArgumentError
+
     Lazy_ = Common_::Lazy
 
     Require_fields_lib_ = Lazy_.call do

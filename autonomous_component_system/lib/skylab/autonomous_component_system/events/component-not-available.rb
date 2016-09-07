@@ -40,6 +40,8 @@ module Skylab::Autonomous_Component_System
 
         o.valid_collection = nil
 
+        o.exception_class_by = -> { Home_::NotAvailable }
+
         o.execute
       end
     # -

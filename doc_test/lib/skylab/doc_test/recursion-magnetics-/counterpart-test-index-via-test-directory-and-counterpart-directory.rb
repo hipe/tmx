@@ -57,10 +57,7 @@ module Skylab::DocTest
 
     def __build_index_via path, st  # if path is false-ish, stream is empty
 
-      @_localize_r = @test_directory.length .. -1
-        # we will localize each path that we get back from the find
-        # command. be carefule: result paths will lead with '/'
-
+      @_localize = Home_.lib_.basic::Pathname::Localizer[ @test_directory ]
       @_paths = []
       @_tree = {}
 
@@ -71,15 +68,15 @@ module Skylab::DocTest
         redo
       end while above
 
-      remove_instance_variable :@_localize_r
+      remove_instance_variable :@_localize
 
-      Home_::RecursionModels_::CounterpartTestIndex.begin_via__(
+      Home_::RecursionModels_::CounterpartTestIndex.via__(
         remove_instance_variable( :@_tree ),
         remove_instance_variable( :@_paths ),
         @counterpart_directory,
         @test_directory,
         @name_conventions,
-      ).finish__
+      )
     end
 
     def __process_test_path path
@@ -100,7 +97,7 @@ module Skylab::DocTest
 
       tip = @_tree
 
-      scn = RecursionModels_::EntryScanner.via_path_ path[ @_localize_r ]
+      scn = RecursionModels_::EntryScanner.via_path_ @_localize[ path ]
       entry = scn.scan_entry
       entry_ = scn.scan_entry
       begin
@@ -141,7 +138,7 @@ module Skylab::DocTest
       # find all paths in the test directory that look like test files.
       # it's OK if none are found (however the directory must exist).
 
-      _patterns = @name_conventions.test_filename_patterns__
+      _patterns = @name_conventions.test_filename_patterns
 
       @_find = @the_find_service.statuser_by( & @_on_event_selectively )
 

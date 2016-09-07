@@ -13,7 +13,7 @@ module Skylab::Zerk::TestSupport
 
       begin
         call :zoof  # #test-03
-      rescue ::ArgumentError => e
+      rescue Home_::ACS_::MissingRequiredParameters => e
       end
 
       e.message.should eql _s

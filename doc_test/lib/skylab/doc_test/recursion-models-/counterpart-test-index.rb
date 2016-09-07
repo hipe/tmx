@@ -3,28 +3,12 @@ module Skylab::DocTest
   class RecursionModels_::CounterpartTestIndex
 
     class << self
-      alias_method :begin_via__, :new
+      alias_method :via__, :new
       undef_method :new
     end  # >>
 
     def initialize tr, pa, cd, td, nc
-      @__counterpart_directory = cd
-      @__name_conventions = nc
-      @__paths = pa
-      @__test_directory = td
-      @__trees = tr
-    end
-
-    def finish__
-
-      @_lookup_prototype = Lookup___.new(
-        remove_instance_variable( :@__counterpart_directory ),
-        remove_instance_variable( :@__trees ),
-        remove_instance_variable( :@__paths ),
-        remove_instance_variable( :@__test_directory ),
-        remove_instance_variable( :@__name_conventions ),
-      )
-      self
+      @_lookup_prototype = Lookup___.new cd, tr, pa, td, nc
     end
 
     def details_via_asset_path path

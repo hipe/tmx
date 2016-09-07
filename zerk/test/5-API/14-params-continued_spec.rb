@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
       shared_subject :_msg do
         begin
           call :shoe, :globbie_complex, :is_dry, true, :file, EMPTY_A_
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::MissingRequiredParameters => e
         end
         e.message
       end

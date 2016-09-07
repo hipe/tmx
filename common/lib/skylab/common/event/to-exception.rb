@@ -30,10 +30,13 @@ module Skylab::Common
 
         def __init_exception_class
 
-          if @event.has_member :exception_class_by  # #not-covered (may be covered by [dt])
+          if @event.has_member :exception_class_by  # #covered-only-by:[dt]
+            p = @event.exception_class_by
+          end
 
+          if p
             @_error_category = nil
-            @_exception_class = @event.exception_class_by.call
+            @_exception_class = p[]
 
           elsif @event.has_member :error_category
 

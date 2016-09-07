@@ -43,7 +43,7 @@ module Skylab::Zerk::TestSupport
 
         begin
           call :upper_color  # #test-07+avail
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::NotAvailable => e
         end
         e
       end
@@ -66,7 +66,7 @@ module Skylab::Zerk::TestSupport
 
         begin
           call :upper_color, :red  # #test-11+avail
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::NotAvailable => e
         end
         e
       end

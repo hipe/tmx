@@ -11,7 +11,9 @@ module Skylab::DocTest
     end
 
     def initialize
+      @asset_extname = nil
       @list = nil
+      @test_filename_pattern = nil
     end
 
     def __list__component_association
@@ -38,10 +40,7 @@ module Skylab::DocTest
     end
 
     def __filesystem__component_association
-
-      -> st do
-        Common_::Known_Known[ st.gets_one ]
-      end
+      Any_value__
     end
 
     def execute & oes_p
@@ -58,9 +57,43 @@ module Skylab::DocTest
       end
 
       def __prepare
+
         @_lib = Home_::RecursionMagnetics_
-        @name_conventions = Hardcoded_name_conventions_for_now___[]
+
+        nc = Home_::RecursionModels_::NameConventions.default_instance__
+
+        otr = nil
+        dup = Lazy_.call do
+          otr = nc.dup
+          otr
+        end
+
+        if @asset_extname
+          self._NOT_YET_COVERED_might_be_OK
+          dup[].asset_extname = @asset_extname
+        end
+
+        if @test_filename_pattern
+          self._NOT_YET_COVERED_might_be_OK
+          dup[].test_filename_pattern = @test_filename_pattern
+        end
+
+        if otr
+          nc = otr.finish
+        end
+
+        @name_conventions = nc
         NIL
+      end
+
+      def __build_name_conventions_to_order
+        nc = Home_::RecursionModels_::NameConventions.begin
+        nc.asset_extname = @asset_extname  # nil ok
+        s = @test_filename_pattern
+        if s
+          nc.test_filename_patterns = [ s ]  # because etc
+        end
+        nc.finish
       end
 
       # -- automatable
@@ -184,10 +217,8 @@ module Skylab::DocTest
 
     # ==
 
-    Hardcoded_name_conventions_for_now___ = Lazy_.call do
-      o = Home_::RecursionModels_::NameConventions.begin
-      o.asset_extname = Autoloader_::EXTNAME
-      o.finish
+    Any_value__ = -> st do
+      Common_::Known_Known[ st.gets_one ]
     end
   end
 end

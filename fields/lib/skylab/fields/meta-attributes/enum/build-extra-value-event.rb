@@ -23,6 +23,7 @@ module Skylab::Fields
       def initialize
         @adjective = INVALID___
         @event_name_symbol = :invalid_property_value
+        @exception_class_by = nil
         @predicate_string = nil
         @valid_value_mapper_from = nil
       end
@@ -36,6 +37,7 @@ module Skylab::Fields
         :predicate_string,
         :property_name,
         :event_name_symbol,
+        :exception_class_by,
         :valid_value_mapper_from,
       )
 
@@ -49,6 +51,7 @@ module Skylab::Fields
           :enum_value_polymorphic_streamable, @valid_collection,
           :valid_value_mapper_from, @valid_value_mapper_from,
           :adjective, @adjective,
+          :exception_class_by, @exception_class_by,
         )
         _
       end

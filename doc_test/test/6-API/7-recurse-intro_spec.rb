@@ -9,10 +9,12 @@ module Skylab::DocTest::TestSupport
     use :my_API
 
     it "`path` is a required parameter" do
+
       begin
         call_API :recurse, :filesystem, :_not_an_FS_
-      rescue ::ArgumentError => e
+      rescue ::Skylab::Autonomous_Component_System::MissingRequiredParameters => e
       end
+
       e.message.include? "'recurse' is missing required parameter 'path'" or fail
     end
 

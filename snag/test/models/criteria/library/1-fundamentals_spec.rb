@@ -15,8 +15,9 @@ module Skylab::Snag::TestSupport
 
       begin
         subject_module_::Association_Adapter.new_with
-      rescue ::ArgumentError => e
+      rescue ::Skylab::Fields::MissingRequiredAttributes => e
       end
+
       e.message.should match %r(\Amissing required (?:property|attribute) 'verb-lemma-and-phrase-head-s-a')
     end
 

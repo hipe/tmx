@@ -13,7 +13,7 @@ module Skylab::Zerk::TestSupport
 
         begin
           call :flickerer  # #test-05+avail
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::NotAvailable => e
         end
 
         e
@@ -37,9 +37,8 @@ module Skylab::Zerk::TestSupport
 
         begin
           call :left_number, '-2', :add  # #test-03
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::MissingRequiredParameters => e
         end
-
         e
       end
 

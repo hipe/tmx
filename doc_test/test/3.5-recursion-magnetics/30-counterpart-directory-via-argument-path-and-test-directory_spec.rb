@@ -32,7 +32,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def _against arg_path, test_dir
-      @_result = _subject_mag[ arg_path, test_dir, name_conventions_ ]
+      @_result = _subject_mag[ arg_path, test_dir, selfsame_name_conventions_ ]
     end
 
     def _expect_same

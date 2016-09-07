@@ -75,7 +75,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       begin
         shoe.edit :set_color_of_upper, :alpha, :no_alpha, :blink, :yes_blink
-      rescue ::ArgumentError => e
+      rescue Home_::MissingRequiredParameters => e
       end
 
       e.message.should _be_this_msg

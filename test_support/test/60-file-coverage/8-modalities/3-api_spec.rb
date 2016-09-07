@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport
 
       begin
         _call_API
-      rescue ::ArgumentError => e
+      rescue ::Skylab::Autonomous_Component_System::MissingRequiredParameters => e
       end
 
       e.message =~ %r(\bmissing required parameter 'path') || fail

@@ -10,6 +10,7 @@ module Skylab::Fields
       :enum_value_polymorphic_streamable, nil,
       :valid_value_mapper_from, nil,
       :adjective, nil,
+      :exception_class_by, nil,
       :error_category, :argument_error,
       :ok, false,
     ) do |y, o|

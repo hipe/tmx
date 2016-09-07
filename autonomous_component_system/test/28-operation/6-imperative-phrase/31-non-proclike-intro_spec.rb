@@ -15,7 +15,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       begin
         call_ :zoof
-      rescue ::ArgumentError => e
+      rescue Home_::MissingRequiredParameters => e
       end
 
       e.message.should eql _s

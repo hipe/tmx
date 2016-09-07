@@ -18,6 +18,8 @@ assumptions out of the subject code. whether this comes from for example
 configuration files or environment variables or user interface elements
 is outside of this scope.
 
+(this "name conventions" participant is discussed further at #note-N below.)
+
 
 
 ## assumptions
@@ -28,6 +30,48 @@ is outside of this scope.
 
   - we are going to assume that the test file tree has a structure that
     mirrors the asset file tree (to the extent that we will describe below).
+
+
+
+
+## participants in the pipeline
+
+### name conventions :#note-2
+
+this is a repurposing of a same-named node in [ts]. it has diverged
+from there (outside and in) so much that probably they are permananty
+separate now (but maybe the subject could fold back into there one day).
+
+the subject's purpose is to encapsulate those functions and elements
+that relate to "filename patterns" and "stemming" in the following chain
+of steps:
+
+earlier in the pipeline, what we're calling "filename patterns" (e.g
+`*_test.rb`) are given as arguments to dedicated subsystems that use
+`find` and `grep` to find test and asset files variously.
+
+then later in the pipeline, we (probably) re-represent one of these
+lists as a tree (the "against" list), and with the other list (the
+"given" list), for each path in that list we look for a corresponding
+"counterpart" file in the "against" list using a techinque called
+"stemming": we derive (and cache as appropriate) a "stem" string for
+every element of every path being searched for or searched against.
+the "stem" is the path element stripped of name-conventional decorating
+so that only its semantic core remains; for example the asset directory
+"foo-bizzle-", the asset file "foo-bizzle--.rb" and the test file
+`08-foo-bizzle_test.rb` all have the same stem, "foo-bizzle".
+
+how path elements are "stemmed" depends on what kind of element they
+are across directory/file and asset/test (so there's four permutations
+there). we distinguish these classifications in part because a
+"morpheme" that might be part of a name convention for a path element
+in one sub-tree (for example `_test` in a test file) might be a
+legitimate part of the element's name in another (a file that houses
+a node whose name is, say, `SystemCompatibilityTest`, i.e is not a
+test file but an asset file).
+
+some of this is configurble and some is hard-coded. we can expose
+more API to convert the other to the one as needed.
 
 
 

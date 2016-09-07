@@ -45,10 +45,26 @@ module Skylab::DocTest::TestSupport
       ::File.join my_real_test_directory_, * egads.reverse
     end
 
-    o :name_conventions_ do
-      o = Home_::RecursionModels_::NameConventions.begin
-      o.asset_extname = '.kode'
+    def selfsame_name_conventions_
+      _name_conventions_node.default_instance__
+    end
+
+    o :tite_fake_name_conventions_ do
+      o = _name_conventions_node.default_instance__.dup
+      o.asset_extname = '.ko'
+      o.test_filename_patterns = [ '*_speg.ko' ]
       o.finish
+    end
+
+    o :longer_fake_name_conventions__ do
+      o = _name_conventions_node.default_instance__.dup
+      o.asset_extname = '.kode'
+      o.test_filename_patterns = [ '*_speg.kode' ]
+      o.finish
+    end
+
+    def _name_conventions_node
+      Home_::RecursionModels_::NameConventions
     end
   end
 end

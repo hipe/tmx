@@ -156,6 +156,7 @@ module Skylab::Autonomous_Component_System
           :reasons, miss_a,
           :selection_stack, @selection_stack,
           :lemma, :parameter,
+          :exception_class_by, -> { Home_::MissingRequiredParameters },
         )
 
         oes_p = @on_missing_required
