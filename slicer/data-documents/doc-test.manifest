@@ -16,11 +16,8 @@ lib/skylab/common/scn--/peek--.rb  #chomp-module
 lib/skylab/common/scn--/core.rb  #chomp-module
 
 
-lib/skylab/face/cli/lipstick.rb  #setup-for-regret
 lib/skylab/face/cli/table.rb  #branch-down-to-core
 lib/skylab/face/cli/tableize--.rb  #chomp-module
-lib/skylab/face/plugin/host/metaservices-/chain-.rb  #setup-for-regret
-lib/skylab/face/plugin/host/proxy.rb  #setup-for-regret
 
 
 lib/skylab/headless/cli/option--/core.rb
@@ -30,9 +27,7 @@ lib/skylab/headless/cli/option--/core.rb
 lib/skylab/information-tactics/levenshtein.rb  #chomp-module
 
 
-lib/skylab/meta-hell/basic-fields.rb  #branch-down-to-core
 lib/skylab/meta-hell/dsl-dsl/core.rb
-lib/skylab/meta-hell/fields/from.rb
 lib/skylab/meta-hell/lib--.rb  #branch-down-to-core
 
 
