@@ -400,8 +400,6 @@ module Skylab::Git
       end
     end
 
-    Lazy_ = Common_::Lazy
-
     Not_versioned__ = Lazy_.call do
       class NotVersioned____
         def is_versioned

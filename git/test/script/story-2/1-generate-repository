@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+tgt='fazoozle'
+
+if [[ -e "$tgt" ]] ; then
+
+  echo "must not exist: $tgt"
+  exit 5
+
+fi
+
+mkdir "$tgt"
+
+cd "$tgt"
+
+git init .
+
+echo "lineA1
+lineA2
+lineA3" > fileA-1
+
+echo "lineB1
+lineB2
+lineB3" > fileB-1
+
+git add fileA-1 fileB-1
+
+git ci -m '(first commit)'
+
+git mv fileA-1 fileA-2
+
+echo "lineB1
+lineB2-2
+lineB3" > fileB-1
+
+git add -u
+
+git ci -m '(second commit)'
+
+git mv fileA-2 fileA-3
+
+git ci -m '(third commit)'
+
+echo "lineA1
+lineA2-2
+lineA3" > fileA-3
+
+git mv fileA-3 fileA-4
+
+git add -u
+
+git ci -m '(fourth commit)'
+
+echo "generated git repostory in \"$tgt\"."

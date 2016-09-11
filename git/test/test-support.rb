@@ -130,5 +130,6 @@ module Skylab::Git::TestSupport
   Home_ = ::Skylab::Git
   NEWLINE_ = "\n"
   NIL_ = nil
+  NOTHING_ = nil
   UNDERSCORE_ = '_'
 end

@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - reverse scanner" do
+  describe "[ba] string - small procs - reverse scanner" do
 
     extend TS_
     use :string

@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - `unparenthesize` (& core) " do
+  describe "[ba] string - small time actors - `unparenthesize` (& core) " do
 
     extend TS_
     use :string

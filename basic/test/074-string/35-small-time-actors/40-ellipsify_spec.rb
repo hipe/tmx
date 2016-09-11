@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - math ellipsify" do
+  describe "[ba] string - small time actors - math ellipsify" do
 
     extend TS_
     use :string

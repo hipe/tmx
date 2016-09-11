@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  module String
+  module String  # notes in [#029]
 
     class << self
 
@@ -75,22 +75,25 @@ module Skylab::Basic
       end
       MUSTACHE_RX__ = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
 
-      define_method :mutate_by_unindenting, -> do
+      define_method :mutate_by_unindenting, -> do  # see #note-01
 
-        # use the leading whitespace in the first line as the
-        # amount by which to "deindent" the whole string
+        say = nil ; rx = nil
+        p = -> s do
 
-        rx = nil
-        -> s do
+          rx ||= /^(?<leading_whitespace>[ \t]+)(?=[^[:space:]])/
+          md = rx.match s
+          md or fail say[s]
 
-          rx ||= /\A[ \t]+/
-
-          _rx = /^#{ ::Regexp.escape rx.match( s )[ 0 ] }/
+          _rx = /^#{ ::Regexp.escape md[ :leading_whitespace ] }/
 
           s.gsub! _rx, EMPTY_S_
 
           NIL_  # don't result a mutant
         end
+        say = -> _s do
+          "found no line that had both nonzero-width leading whitespace and content"
+        end
+        p
       end.call
 
       def paragraph_string_via_message_lines * a

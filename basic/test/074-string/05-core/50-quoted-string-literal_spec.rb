@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - quoted string literals" do
+  describe "[ba] string - core - quoted string literals" do
 
     it "loads" do
       _subject_library

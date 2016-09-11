@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] list scanner for string" do
+  describe "[ba] string - line scanner" do
 
     extend TS_
     use :string

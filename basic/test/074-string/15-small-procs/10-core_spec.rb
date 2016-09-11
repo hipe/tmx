@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - small procs" do
+  describe "[ba] string - small procs - core" do
 
     context "(paragraph string via message lines)" do
 

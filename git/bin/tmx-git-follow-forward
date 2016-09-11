@@ -1,9 +1,19 @@
 #!/usr/bin/env ruby -w
 
-class Skylab_Git_follow_forward_one_off
+class Skylab_Git__follow_forward__one_off
 
-    def initialize *a
-      @sin, @sout, @serr, @program_name_string_array = a
+    def initialize sin, sout, serr, pn_s_a
+      @program_name_string_array = pn_s_a
+      @serr = serr
+      @sin = sin
+      @sout = sout
+      @system_proc = nil
+      block_given? and yield self
+      @system_proc ||= -> { require 'open3' ; ::Open3 }
+    end
+
+    def system_by & p
+      @system_proc = p ; nil
     end
 
     def invoke a
@@ -79,77 +89,164 @@ class Skylab_Git_follow_forward_one_off
     # --
 
     def __execute
+      __prepare
+      _ok = __normalize_path
+      _ok && __work
+      @_exitstatus
+    end
 
-      require 'open3'
-      @system = ::Open3
-
+    def __prepare
+      @command_prototype = COMMAND_PROTOTYPE__
       @_current_path = @path
       @_exitstatus = SUCCESS_EXITSTATUS__
+      @_lib = begin ; require 'skylab/git' ; ::Skylab::Git end
+      @listener = __build_selective_listener
+      @_magnetics = @_lib::Magnetics
+      @system = remove_instance_variable( :@system_proc ).call
+    end
 
+    def __normalize_path
+      if '/.'.include? @path[ 0 ]
+        @serr.puts "path must be relative and from root of repository"
+        @_exitstatus = _invite
+        UNABLE_
+      else
+        ACHIEVED_
+      end
+    end
+
+    # assume the argument path does not currently exist in the tree but did.
+    # this process: find the last commit to have touched the current path
+    # (so since the path is not a current path, it would have to be either
+    # a move *from* path X *to* the current path, or a delete). if delete,
+    # we now know what happend to the path and we are done. otherwise, repeat
+    # this process with current path as path X.
+    #
+    # ideally the result is a series of either:
+    #   - zero or more renames and one delete -OR-
+    #   - one or more renames
+    #
+    # if you have the case where different "files" (in terms of their
+    # content-identity) travelled through the same path at different points
+    # in time, only the file that was most recently at that path is reachable.
+    # maybe this could infinite loop in some such scenarios..
+
+    def __work
+
+      last_seen_sha = nil
       begin
+
         ci = __last_commit
         ci || break
+        if last_seen_sha == ci.sha_string
+          # the the last commit to touch the file in its new path is the
+          # rename commit that moved it there, which we already did so
+          break
+        end
+        last_seen_sha = ci.sha_string
+
         o = __parse_show_screen_for ci.sha_string
+
         if o.is_rename
-          path = o.renamed_to
+
+          path = o.to_path
           @sout.puts "#{ Commit_like_this__[ ci ] } renamed to #{ path }"
           @_current_path = path
           redo
         end
+
         if o.is_delete
           @sout.puts "#{ Commit_like_this__[ ci ] } deleted."
         else
-          o.is_present || self._SANITY
+          o.is_change || self._OH
         end
+
         break
       end while above
-
-      @_exitstatus
+      NIL
     end
 
     # -- commands
 
     def __parse_show_screen_for sha
-      _cmd = _command SHOW_CMD___, sha
-      _process = _system _cmd
-      Parse_a_show_screen_to_detect_etc___[ _process, @_current_path ]
-    end
 
-    SHOW_CMD___ = %w( show -M --format=%D )
+      current_path = @_current_path
+
+      st = @_magnetics::FileOperationStream_via_PatchProcess.via_sha(
+        sha, @command_prototype, @system, & @listener )
+
+      file_operation = nil
+      winning_operation = nil
+
+      did_find = -> do
+        winning_operation = file_operation
+        did_find = -> do
+          self._WAHOO
+        end
+      end
+
+      begin
+
+        file_operation = st.gets
+        file_operation || break
+        if current_path == file_operation.path
+          did_find[]
+        end
+
+        redo
+      end while nil
+
+      winning_operation || self._SANITY
+    end
 
     def __last_commit
-      cmd = _command LOG_CMD___, @_current_path
-      line = __maybe_one_line cmd
-      if line
-        Commit___.new( * line.split( SPACE_ ) )
-      else
-        @serr.puts "can't find commit: expected one, had no lines from ~ #{ cmd * SPACE_ }"
-        @_exitstatus = _invite
-        line
-      end
+      @_magnetics::Commit_via_Path.call(
+        @_current_path, @command_prototype, @system, & @listener )
     end
-
-    LOG_CMD___ = [ 'log', '--follow', '--format=%H %ai', '-1', '--' ].freeze
 
     # -- command support
 
-    def _command mid_a, * rest
-      a = [ CMD__ ]
-      a.concat mid_a
-      a.concat rest
-      if @do_debug
-        @serr.puts ">>>> ~ #{ a * SPACE_ }"
+    def __build_selective_listener
+      these = {
+        command: :__maybe_emit_command,
+        expression: :__express_expression,
+      }
+      -> * i_a, & ev_p do
+        _m = these.fetch i_a.fetch 1
+        send _m, ev_p, i_a
       end
-      a
     end
 
-    def __maybe_one_line argv
-      Maybe_one_line___.new( _system( argv ), @serr ).execute
+    def __maybe_emit_command x_p, _
+      if @do_debug
+        @serr.puts ">>>> ~ #{ x_p[].join SPACE_ }"
+      end
+      NIL
     end
 
-    def _system argv
-      _, sout, serr, wait = @system.popen3( * argv )
-      ProcessConnection___.new nil, sout, serr, wait
+    def __express_expression y_p, i_a
+      NOTHING_.instance_exec _info_yielder, & y_p
+      m = EXPRESSION_MOODS___.fetch i_a.fetch 0
+      if m
+        send m
+      end
+      NIL
+    end
+
+    NOTHING_ = nil
+    EXPRESSION_MOODS___ = {
+      error: :__when_expressed_error,
+      info: NOTHING_,
+    }
+
+    def __when_expressed_error
+      @_exitstatus = __invite_passively
+      NIL
+    end
+
+    def __invite_passively
+      @serr.puts "'#{ _program_name } -h' may have more information."
+      GENERIC_ERROR_EXITSTATUS__
     end
 
     def _invite
@@ -157,312 +254,8 @@ class Skylab_Git_follow_forward_one_off
       GENERIC_ERROR_EXITSTATUS__
     end
 
-    # ==
-
-    class Parse_a_show_screen_to_detect_etc___
-
-      class << self
-        def [] back, path
-          new( back, path ).execute
-        end
-      end
-
-      def initialize process, path
-        @path = path
-        @pserr = process.stderr
-        @stream = process.stdout
-        @wait = process.wait
-      end
-
-      def execute
-        @_found = false
-        @_reached_end = false
-        _consume_blank_line
-        _consume_blank_line
-        _consume_line
-        _assume_current_line_is_diff_line
-        _consume_operation_line
-        begin
-          @_reached_end && break
-          case @_operation
-          when :change
-            __consume_index_section
-            redo
-          when :rename
-            __consume_rename_section
-            # @_found && break  # keep going so we exercise our parsing
-            redo
-          when :delete
-            __consume_delete_section
-            # @_found && break  # keep going so we exercise our parsing
-            redo
-          when :create
-            __consume_create_section
-            redo
-          else
-            never
-          end
-        end while above
-
-        if @_found
-          @_reached_end || self._SANITY
-          __finish_process
-          case @_found_operation
-          when :rename
-            Rename___.new @_found_after
-          when :delete
-            Delete___[]
-          else
-            never
-          end
-        else
-          @_reached_end || self._SANITY
-          Present___[]
-        end
-      end
-
-      def __finish_process
-        d = @wait.value.exitstatus
-        d.zero? || self._SANITY
-        s = @pserr.gets
-        s && self._HMM
-        NIL
-      end
-
-      def __consume_index_section  # assume current line is index line
-        _consume_raw_line
-        begin
-          __classify_current_line_which_might_be_chunk_line
-          if @_line_looks_like_a_chunk_line
-            _consume_any_line
-            @_reached_end && break
-            redo
-          end
-          _assume_current_line_is_diff_line
-          _consume_operation_line
-          break
-        end while above
-        NIL
-      end
-
-      def __consume_rename_section
-
-        __consume_rename_from_line
-        __consume_rename_to_line
-
-        if @_before == @path
-          @_found && self._SANITY_did_the_file_duplicate_into_two_or_more?
-          @_found = true
-          @_found_operation = :rename
-          @_found_after = @_after
-        end
-
-        _consume_any_line
-        unless @_reached_end
-          __assume_current_line_is_diff_line_or_index_line
-          unless @_line_is_index_line
-            _consume_operation_line
-          end
-        end
-        NIL
-      end
-
-      def __consume_delete_section
-
-        _consume INDEX_RX__
-        path = _consume( MINUS_MINUS_MINUS_RX___ )[ :path ]
-        _consume PLUS_PLUS_PLUS_DEV_NULL_RX___
-        _consume CHUNK_RX__
-        _consume_line
-        begin
-          __classify_current_line_which_might_be_chunk_line
-          if @_line_looks_like_a_chunk_line
-            _consume_any_line
-            @_reached_end && break
-            redo
-          end
-          break
-        end while above
-
-        if path == @path
-          @_found && self._SANITY
-          @_found = true
-          @_found_operation = :delete
-          @_found_after = nil
-          remove_instance_variable :@_found_after
-        end
-
-        if ! @_reached_end
-          _consume_operation_line
-        end
-        NIL
-      end
-
-      def __consume_create_section
-
-        _consume INDEX_RX__
-        _consume MINUS_MINUS_MINUS_DEV_NULL_RX___
-        _consume PLUS_PLUS_PLUS_RX___
-        _consume CHUNK_RX__
-        _consume_line
-        begin
-          __classify_current_line_which_might_be_chunk_line
-          if @_line_looks_like_a_chunk_line
-            _consume_any_line
-            @_reached_end && break
-            redo
-          end
-          break
-        end while above
-
-        if ! @_reached_end
-          _consume_operation_line
-        end
-        NIL
-      end
-
-      INDEX_RX__ = /\Aindex /
-
-      MINUS_MINUS_MINUS_DEV_NULL_RX___ = %r(\A--- /dev/null\z)
-      PLUS_PLUS_PLUS_DEV_NULL_RX___ = %r(\A\+\+\+ /dev/null\z)
-
-      MINUS_MINUS_MINUS_RX___ = %r(\A--- a/(?<path>.+)\z)
-      PLUS_PLUS_PLUS_RX___ = %r(\A\+\+\+ b/(?<path>.+)\z)
-
-      CHUNK_RX__ = %r(\A@@ )
-
-      # --
-
-      def _consume_operation_line
-        _consume_line
-        md = _assume_match_regex OPERATIONS_RX___
-        @_operation = if md[ :index ]
-          :change
-        elsif md[ :similarity_index ]
-          :rename
-        elsif md[ :deleted ]
-          :delete
-        else
-          :create
-        end
-        NIL
-      end
-
-      OPERATIONS_RX___ = /\A
-        (?:
-          (?<index>index)
-          |
-          (?<similarity_index>similarity[ ]index)
-          |
-          (?<deleted>deleted)
-          |
-          (?<new_file>new[ ]file)
-        )\b
-      /x
-
-      def __assume_current_line_is_diff_line_or_index_line
-        md = _assume_match_regex THESE_TWO_RX___
-        if md[ :diff ]
-          @_line_is_index_line = false
-          _assume_current_line_is_diff_line
-        else
-          @_line_is_index_line = true
-        end
-      end
-
-      THESE_TWO_RX___ = /\A(?:(?<diff>diff)|(?<index>index)) /
-
-      def _assume_current_line_is_diff_line
-        md = _assume_match_regex DIFF_LINE_RX___
-        @_before = md[ :before ] ; @_after = md[ :after ] ; nil
-      end
-
-      DIFF_LINE_RX___ = %r(\A
-        diff[ ]--git[ ]a/(?<before>[^ ]+)[ ]b/(?<after>[^ ]+)
-      \z)x
-
-      def __classify_current_line_which_might_be_chunk_line
-        _md = _assume_match_regex THING_RX___
-        if _md[ :chunk_line ]
-          @_line_looks_like_a_chunk_line = true
-        else
-          @_line_looks_like_a_chunk_line = false
-          @_line.chomp!
-        end
-        NIL
-      end
-
-      THING_RX___ = /\A
-        (?:
-          (?<chunk_line>[-+@ ])
-          |
-          (?<other>[a-z])  # ballsy
-        )
-      /x
-
-      def __consume_rename_from_line
-        _consume_line
-        @_from = _assume_match_regex( FROM_RX___ )[ :from ]
-        NIL
-      end
-
-      FROM_RX___ = /\Arename from (?<from>.+)\z/
-
-      def __consume_rename_to_line
-        _consume_line
-        @_to = _assume_match_regex( TO_RX___ )[ :to ]
-        NIL
-      end
-
-      TO_RX___ = /\Arename to (?<to>.+)\z/
-
-      # --
-
-      def _consume_blank_line
-        _consume_line
-        __assume_line_is_blank
-      end
-
-      def __assume_line_is_blank
-        @_line.length.zero? || self._ASSUMPTION_FAILED
-        NIL
-      end
-
-      def _consume rx
-        _consume_line
-        _assume_match_regex rx
-      end
-
-      def _assume_match_regex rx
-        md = rx.match @_line
-        md || self._REGEX_ASSUMPTION_FAILURE
-        md
-      end
-
-      def _consume_line
-        _consume_raw_line
-        @_line.chomp! ; nil
-      end
-
-      def _consume_raw_line
-        s = @stream.gets
-        s || fail
-        @_line = s ; nil
-      end
-
-      def _consume_any_line
-        s = @stream.gets
-        if s
-          s.chomp!
-          @_line = s
-        else
-          @_reached_end = true
-          remove_instance_variable :@_line
-        end
-        NIL
-      end
-
-      SIM_RX___ = /\Asimilarity index\b/
+    def _info_yielder
+      @___info_yielder ||= ::Enumerator::Yielder.new( & @serr.method( :puts ) )
     end
 
     # ==
@@ -477,158 +270,18 @@ class Skylab_Git_follow_forward_one_off
 
     # ==
 
-    class Commit___
-      def initialize sha, date, time, zone
-        @date_string = date
-        @sha_string = sha
-        @time_string = time
-        @zone_string = zone
-      end
-      attr_reader(
-        :date_string,
-        :sha_string,
-        :time_string,
-        :zone_string,
-      )
-    end
-
-    class Rename___
-      def initialize path
-        @renamed_to = path
-      end
-      attr_reader(
-        :renamed_to,
-      )
-      def is_rename
-        true
-      end
-    end
-
-    Lazy_ = -> & p do
-      yes = true ; x = nil
-      -> do
-        if yes
-          yes = false
-          x = p[]
-        end
-        x
-      end
-    end
-
-    Delete___ = Lazy_.call do
-      class Delete____
-        def is_delete
-          true
-        end
-        def is_rename
-          false
-        end
-        new
-      end
-    end
-
-    Present___ = Lazy_.call do
-      class Present____
-        def is_delete
-          false
-        end
-        def is_present
-          true
-        end
-        def is_rename
-          false
-        end
-        new
-      end
-    end
-
-    # ==
-
-    class Maybe_one_line___
-
-      def initialize sc, serr
-        @stderr = serr
-        _, @sout, @serr, @wait = sc.to_a
-      end
-
-      def execute
-        @_line = @sout.gets
-        if @_line
-          __when_one_line
-        else
-          __when_no_lines
-        end
-      end
-
-      def __when_no_lines
-        @_err = @serr.gets
-        if @_err
-          _when_err_lines
-        else
-          __when_no_err_lines
-        end
-      end
-
-      def __when_one_line
-        line_ = @sout.gets
-        if line_
-          self._WHEN_more_than_one_line
-        else
-          @_err = @serr.gets
-          if @_err
-            _when_err_lines  # or not
-          else
-            d = _wait_exitstatus
-            if d.zero?
-              @_line
-            else
-              _express_exitstatus d
-              UNABLE_
-            end
-          end
-        end
-      end
-
-      def _when_err_lines
-        line = remove_instance_variable :@_err
-        begin
-          line_ = @_serr.gets
-          line_ || break
-          @stderr.puts line
-          line = line_
-          redo
-        end while above
-        _d = _wait_exitstatus
-        @stderr.puts "#{ line } (exitstatus: #{ _d })"
-        @_line  # the original false or nil
-      end
-
-      def __when_no_err_lines
-        _d = _wait_exitstatus
-        _express_exitstatus _d
-        @_line
-      end
-
-      def _express_exitstatus d
-        @stderr.puts "(exitstatus from system call: #{ d })"
-      end
-
-      def _wait_exitstatus
-        @wait.value.exitstatus
-      end
-    end
-
-    ProcessConnection___ = ::Struct.new :_, :stdout, :stderr, :wait
-
-    # ==
-
-    CMD__ = 'git'
+    ACHIEVED_ = true
+    COMMAND_PROTOTYPE__ = %w( git ).freeze
     GENERIC_ERROR_EXITSTATUS__ = 5
     SPACE_ = ' '
     SUCCESS_EXITSTATUS__ = 0
     UNABLE_ = false
 end
 
-exit Skylab_Git_follow_forward_one_off.new(
-  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
-).invoke ::ARGV
+if __FILE__ == $PROGRAM_NAME
+
+  exit Skylab_Git__follow_forward__one_off.new(
+    $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ).invoke ::ARGV
+
+end

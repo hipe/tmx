@@ -63,6 +63,27 @@ module Skylab::Git
     end
   end  # >>
 
+  module Magnetics
+    Autoloader_[ self ]
+  end
+
+  module Models
+    Autoloader_[ self ]
+  end
+
+  module Models_
+    Autoloader_[ self, :boxxy ]
+  end
+
+  Process_ = ::Struct.new :in, :out, :err, :wait, :command
+
+  module ProcLike_
+    def call * a, & p
+      new( * a, & p ).execute
+    end
+    alias_method :[], :call
+  end
+
   ACHIEVED_ = true
   DASH_ = '-'.freeze
   DOT_ = '.'
@@ -70,11 +91,10 @@ module Skylab::Git
   EMPTY_P_ = -> { NIL_ }
   GIT_EXE_ = 'git'
   KEEP_PARSING_ = true
-  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
-  Autoloader_[ Models = ::Module.new ]
+  Lazy_ = Common_::Lazy
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
 end

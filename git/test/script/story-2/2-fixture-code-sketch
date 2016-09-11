@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../../test-support'
+
+module Skylab::Git::TestSupport
+
+  # - would be class
+    # - would be def
+      # - code level
+
+      # run the application against the command while "recording" the
+      # interaction with the system (outputting suggestive fixture code)
+
+      _COMMAND = %w( fileA-2 )
+
+      _CLI = TS_::One_Off_As_Operation::Require[ 'tmx-git-follow-forward' ]
+
+      require 'fileutils'
+      ::FileUtils.cd 'fazoozle'  # from step one (sibling file)
+
+      _Recording = Home_.lib_.system_lib::Doubles::Stubbed_System::Recording
+
+      _real_system = begin ; require 'open3' ; ::Open3 end
+
+      recording = _Recording.via $stdout, _real_system do |rec|
+
+        rec.wrap_in_module(
+          'Skylab::Git::TestSupport',
+          'Fixture_Modules::Mock_Processes_01',
+        )
+
+        rec.holler_back ::File.dirname __FILE__
+      end
+
+      _cli = _CLI.new nil, $stderr, $stderr, %w([gizzi2]) do |cli_|
+        cli_.system_by do
+          recording
+        end
+      end
+
+      d = _cli.invoke _COMMAND
+
+      recording.receive_done
+
+      if d.nonzero?
+        $stderr.puts "(exitstatus: #{ d })"
+      end
+
+      # - code level
+    # - would be def
+  # - would be class
+end
