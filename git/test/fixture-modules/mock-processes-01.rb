@@ -21,13 +21,13 @@ module Skylab::Git::TestSupport
       o.on ["git", "log", "--follow", "--format=%H %ai", "-1", "--", "fileA-2"] do
 
         _out = <<-HERE.unindent
-          fake-sha-1 2016-09-11 03:19:40 -0400
+          1-fake-sha 2016-09-11 03:19:40 -0400
         HERE
 
         [ 0, _out ]
       end
 
-      o.on ["git", "show", "-M", "--format=%D", "fake-sha-1"] do
+      o.on ["git", "show", "-M", "--format=%D", "1-fake-sha"] do
 
         _out = <<-HERE.unindent
 
@@ -44,13 +44,13 @@ module Skylab::Git::TestSupport
       o.on ["git", "log", "--follow", "--format=%H %ai", "-1", "--", "fileA-3"] do
 
         _out = <<-HERE.unindent
-          fake-sha-2 2016-09-11 03:19:40 -0400
+          2-fake-sha 2016-09-11 03:19:40 -0400
         HERE
 
         [ 0, _out ]
       end
 
-      o.on ["git", "show", "-M", "--format=%D", "fake-sha-2"] do
+      o.on ["git", "show", "-M", "--format=%D", "2-fake-sha"] do
 
         _out = <<-HERE.unindent
           HEAD, master
@@ -75,7 +75,7 @@ module Skylab::Git::TestSupport
       o.on ["git", "log", "--follow", "--format=%H %ai", "-1", "--", "fileA-4"] do
 
         _out = <<-HERE.unindent
-          fake-sha-2 2016-09-11 03:19:40 -0400
+          2-fake-sha 2016-09-11 03:19:40 -0400
         HERE
 
         [ 0, _out ]

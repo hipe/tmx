@@ -2,7 +2,7 @@ module Skylab::System
 
   module Doubles::Stubbed_System
 
-    class Readable_Writable_Based_
+    class Readable_Writable_Based_  # :[#038].
 
       def initialize path
 

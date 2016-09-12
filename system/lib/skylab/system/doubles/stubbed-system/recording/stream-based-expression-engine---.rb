@@ -29,7 +29,6 @@ module Skylab::System
       def _receive_popen3 argv
 
         @rendering.express_blank_line
-        @rendering.indented_puts "o.on #{ argv.inspect } do"
 
         sin, out, err, wait = @real_system.popen3( * argv )
 
@@ -37,7 +36,7 @@ module Skylab::System
       end
 
       def receive_done_
-        @rendering.receive_done__
+        @rendering.receive_done
         NIL
       end
 
@@ -52,6 +51,8 @@ module Skylab::System
           @psout = psout
           @rendering = rendering
           @wait = wait
+
+          rendering.express_process_opening argv  # ick/meh
 
           @_receive_exitstatus = :__CANNOT_receive_exitstatus_because_waiting_for_both_streams_to_close
           @_receive_serr = :__receive_first_which_is_serr

@@ -85,6 +85,34 @@ module Skylab::Git::TestSupport
         end
       end
 
+      def build_screen_index__
+        TS_::CommonTabularScreenIndex.new lines
+      end
+
+      def expect_part_ part
+        x = _ooao_part_stream.gets
+        if part != x
+          x.should eql part
+        end
+      end
+
+      def expect_no_more_output_lines_
+        x = _ooao_part_stream.gets
+        if x
+          fail "unexpected extra output line (with: #{ x.inspect })"
+        end
+      end
+
+      def _ooao_part_stream
+        @___ooao_part_stream ||= __ooao_build_part_stream
+      end
+
+      def __ooao_build_part_stream
+        Common_::Stream.via_nonsparse_array lines do |line|
+          FOURTH_CEL_RX___.match( line.string )[ :cel ]
+        end
+      end
+
       def lines
         ooao_state_.lines
       end
@@ -128,6 +156,7 @@ module Skylab::Git::TestSupport
 
     # ==
 
+    FOURTH_CEL_RX___ = /(?:\A(?:[^ ]+)(?:[ ][^ ]+){2}[ ])(?<cel>.+)/
     PN_S_A___ = %w( gizzy )
   end
 end

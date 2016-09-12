@@ -29,7 +29,7 @@ fragments that approximate the code for a startingpoint of a fixture file.
 
 
 
-## the primary implementation mechanic/assumption
+## the stream-based expression engine
 
 we can implement this relatively easily as a direct, line-by-line
 passthru mapping of the througput from real system to real client
@@ -42,10 +42,25 @@ are not met.
 
 
 
-## wishes/issues
+## the cache-based expression engine
 
-  - most commands in our practice seem to write to stdout but not stderr
-    at all so it would be nice to elimiate the noise of unnecessary
-    `serr = NOTHING_`
+for more complex, concurrent system interactions, the above strategy
+can fall over. when multiple processes will be open and read from
+concurrently (or just in a staggered, overlapping manner) we cannot
+use the simple algorithm of a line-for-line outputting to a fixture
+file of what is read from the system process. instead we (here) store
+all such lines in memory until the recorder receives notification that
+we are done with all system interactions. only then does it flush the
+rendering of the fixture code.
 
-  - maybe make the baseline margin an option
+this will store *all* of the lines read from the system *in memory*
+to work. if this won't scale to the (weirdly large) system interaction
+you are recording, look at our older cousin recorders, like:
+
+  - look at [#037] the snippet-based recorder.
+
+  - look at [#038] the legacy recorder that uses OGDL.
+
+if any of the above see any future utility, they should probably be
+refactored to become an "expression engine" for our new recording
+architecture.

@@ -107,11 +107,16 @@ module Skylab::System
         NIL
       end
 
+      def express_process_opening argv
+        indented_puts "o.on #{ argv.inspect } do"
+        NIL
+      end
+
       def new_process_rendering
         Here_::ProcessRendering___.new self
       end
 
-      def receive_done__
+      def receive_done
         express_blank_line
         indented_puts "o.finish"
         while @_mutable_current_margin.length.nonzero?

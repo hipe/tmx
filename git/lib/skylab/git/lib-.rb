@@ -47,5 +47,7 @@ module Skylab::Git
     end
 
     System_lib = sidesys[ :System ]
+
+    Time = Lazy_.call { require 'time' ; ::Time }  # for tests only
   end
 end

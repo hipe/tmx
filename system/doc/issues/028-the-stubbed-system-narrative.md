@@ -31,15 +31,16 @@ stubbed system.
 
   2) "readable-writable". ironically or not, a simplificaton of the
      above but is now seen as too complicated and might deprecate too.
+     [#038]
 
   3) "inline static" based, which is so short and simple you can almost
-     understand its inteface by reading its code.
+     understand its interface by reading its code.
 
   4) "inline pool" based, which is like above but diminishes and has
      function-based resolution.
 
   5) "snippet" based, which stores its "snapshots" in files but uses
-     a platform format rather than OGDL..
+     a platform format rather than OGDL. [#037]
 
   6) a custom jobber at [#035], which of course should etc etc.
 

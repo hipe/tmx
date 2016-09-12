@@ -2,7 +2,7 @@ module Skylab::System
 
   module Doubles::Stubbed_System
 
-    class Snippet_Based
+    class Snippet_Based  # :[#037].
 
       class << self
 

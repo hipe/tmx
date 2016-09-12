@@ -9,14 +9,23 @@ module Skylab::System
         @_ = rendering
       end
 
+      def express_all_nonzero_lines lines, stem
+        _do_express_first_line stem, lines.fetch( 0 )
+        ( 1 ... lines.length ).each do |d|
+          express_line lines.fetch d
+        end
+        receive_an_end_of_lines
+        NIL
+      end
+
       def express_any_first_line stem, line
         if line
-          __do_express_first_line stem, line
+          _do_express_first_line stem, line
         end
         NIL
       end
 
-      def __do_express_first_line stem, line
+      def _do_express_first_line stem, line
         @_.express_blank_line
         @_did_out_did_err[ stem ] = true
         @_.indented_puts "  _#{ stem } = <<-HERE.unindent"

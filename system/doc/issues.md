@@ -1,3 +1,5 @@
+[#038]       [ the "readable writable" legacy system recorder ]
+[#037]       [ the snippet based legacy system recorder ]
 [#036]       the new recording proxy
 [#035]       a sixth system double
 [#034]       [ hack guess module tree ]

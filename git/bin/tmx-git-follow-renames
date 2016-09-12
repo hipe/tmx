@@ -1,0 +1,318 @@
+#!/usr/bin/env ruby -w
+
+class Skylab_Git__follow_renames__one_off
+
+    def initialize _sin, sout, serr, pn_s_a
+      block_given? and yield self
+      @system_proc ||= -> { require 'open3' ; ::Open3 }
+      @sout = sout
+      @serr = serr
+      @program_name_string_array = pn_s_a
+    end
+
+    def system_by & p
+      @system_proc = p ; nil
+    end
+
+    def invoke a
+
+      len = a.length
+      if len.nonzero?
+        v = '-v'
+        if v == a.first
+          a.shift
+          do_debug = true
+        elsif 1 < len && v == a.last
+          a.pop
+          do_debug = true
+        end
+        if do_debug
+          len = len - 1
+        end
+      end
+
+      if len.zero?
+        @serr.puts "expecting #{ _main_argument }"
+        _usage_and_invite
+      else
+        rx = /\A--?h(?:e(?:l(?:p)?)?)?\z/
+        if rx =~ a[0] || 1 < len && rx =~ a.last
+          _help
+        elsif 1 == len
+          @do_debug = do_debug
+          @path = a.fetch 0
+          __execute
+        else
+          @serr.puts "unexpected argument: #{ a[1].inspect }"
+          _usage_and_invite
+        end
+      end
+    end
+
+    def _usage_and_invite
+      _usage
+      _invite
+    end
+
+    def _help
+      _usage
+      @serr.puts #zero      teens     twenties  thrities forties   fifties   sixities  seventies 0
+      @serr.puts "description: like `git log --follow -M` but reduces the output to show only"
+      @serr.puts "             those commits where the file was renamed.."
+      @serr.puts
+      @serr.puts "argument:"
+      @serr.puts "  <path>     a path to an extant, versioned file"
+      @serr.puts
+      @serr.puts "option:"
+      @serr.puts "  -v         (verbose) some debugging info is written to stderr."
+
+      SUCCESS_EXITSTATUS__
+    end
+
+    def _usage
+      @serr.puts "usage: #{ _program_name } [-v] #{ _main_argument }"
+    end
+
+    def _main_argument
+      '<path>'
+    end
+
+    # --
+
+    def __execute
+      __prepare
+      _ok = __normalize
+      _ok && __work
+      @_exitstatus
+    end
+
+    def __prepare
+      @command_prototype = COMMAND_HEAD__
+      @_exitstatus = SUCCESS_EXITSTATUS__
+      @_lib = begin ; require 'skylab/git' ; ::Skylab::Git end
+      @_magnetics = @_lib::Magnetics
+      @listener = __build_selective_listener
+      @system = remove_instance_variable( :@system_proc ).call
+      NIL
+    end
+
+    def __normalize
+      if './'.include? @path[0]
+        @serr.puts "the path provided must look like a normal repository path"
+        @serr.puts "(we are lazy). must be relative and use no dots (had: #{ @path.inspect })"
+        @_exitstatus = _invite
+        UNABLE_
+      else
+        ACHIEVED_
+      end
+    end
+
+    # do the normal "git log --follow" but reduce this stream of commits
+    # down to only those commits where etc..
+
+    def __work
+
+      # (a hand-written map-expand and then map-reduce..)
+
+      ci_st = @_magnetics::CommitStream_via_Path.for self
+
+      @_current_path = @path
+      @_next_current_path = @_current_path
+
+      begin
+        ci = ci_st.gets
+        ci || break
+        @_commit = ci
+        @_found_rename_in_this_commit = false  # sanity
+
+        st = __file_operation_stream_via_sha ci.sha_string
+        begin
+          # (for now, all of them to excercize the parsing)
+          fo = st.gets
+          fo || break
+          m = ON_FILE_OPERATION___.fetch fo.category_symbol
+          m || redo
+          send m, fo
+          redo
+        end while above
+
+        @_current_path = @_next_current_path
+
+        redo
+      end while above
+
+      NIL
+    end
+
+    NOTHING_ = nil
+    ON_FILE_OPERATION___ = {
+      change: :__on_change,
+      create: :__on_create,
+      delete: :__on_delete,
+      rename: :__on_rename,
+    }
+
+    def __on_rename fo
+      if @_current_path == fo.to_path
+        @_found_rename_in_this_commit && self._SANITY
+        @_found_rename_in_this_commit = true
+        @_next_current_path = fo.from_path
+        __express_rename fo, @_commit
+      end
+    end
+
+    def __on_change fo
+      # maybe one day for medium verbosity ..
+      # if @_current_path == fo.path
+        # @serr.puts fo.to_summary
+      # end
+      NIL
+    end
+
+    def __on_create fo
+      if @_current_path == fo.path
+        __express_create fo, @_commit
+      end
+      NIL
+    end
+
+    def __on_delete fo
+      if @_current_path == fo.path
+        __express_delete fo, @_commit
+      end
+      NIL
+    end
+
+    def __express_create fo, ci
+      _express_file_operation " create      #{ fo.path }", ci
+    end
+
+    def __express_rename fo, ci
+      _express_file_operation " rename from #{ fo.from_path }", ci
+    end
+
+    def __express_delete fo, ci
+      _express_file_operation " delete      #{ fo.path }", ci
+    end
+
+    def _express_file_operation s, ci
+      buffer = Commit_like_this__[ ci ]
+      buffer << s
+      @sout.puts buffer
+      NIL
+    end
+
+    def __file_operation_stream_via_sha sha
+      @_magnetics::FileOperationStream_via_PatchProcess.via_sha(
+        sha, @command_prototype, @system, & @listener )
+    end
+
+    # --
+
+    def __build_selective_listener
+      these = {
+        command: :__maybe_express_command,
+        nonzero_exitstatus: :__receive_nonzero_exitstatus,
+        expression: :__express_expression,
+      }
+      -> * i_a, & ev_p do
+        _m = these.fetch i_a.fetch 1
+        send _m, ev_p, i_a
+      end
+    end
+
+    def __maybe_express_command x_p, i_a
+      if @do_debug
+        _cmd = x_p.call
+        @serr.puts ">>>> ~ #{ _cmd.join SPACE_ }"
+      end
+      NIL
+    end
+
+    def __express_expression x_p, i_a
+      _expression_agent.calculate _info_yielder, & x_p
+      m = EXPRESSION_MOOD___.fetch i_a.fetch 0
+      if m
+        send m
+      end
+      NIL
+    end
+
+    EXPRESSION_MOOD___ = {
+      info: NOTHING_,
+      error: :__after_error_expression,
+    }
+
+    def __after_error_expression
+      @_exitstatus = GENERIC_ERROR_EXITSTATUS__
+      _invite
+      NIL
+    end
+
+    def __receive_nonzero_exitstatus d_p, i_a
+      @_exitstatus = d_p[]
+      NIL
+    end
+
+    def _expression_agent
+      ExpressionAgent___.instance
+    end
+
+    def _invite
+      @serr.puts "see '#{ _program_name } -h'"
+      GENERIC_ERROR_EXITSTATUS__
+    end
+
+    def _info_yielder
+      @___info_yielder ||= ::Enumerator::Yielder.new { |s| @serr.puts s }
+    end
+
+    def _program_name
+      ::File.basename @program_name_string_array.fetch(-1)
+    end
+
+    attr_reader(
+      :path,
+      :command_prototype,
+      :system,
+      :listener,
+    )
+
+    # ==
+
+    Commit_like_this__ = -> ci do
+      "#{ Short__[ ci.sha_string ] } #{ ci.date_string } #{ ci.time_string } #{ ci.zone_string }"
+    end
+
+    Short__ = -> sha do
+      sha[ 0, 7 ]
+    end
+
+    # ==
+
+    class ExpressionAgent___
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
+      alias_method :calculate, :instance_exec
+    end
+
+    # ==
+
+    ACHIEVED_ = true
+    COMMAND_HEAD__ = %w( git ).freeze
+    GENERIC_ERROR_EXITSTATUS__ = 5
+    SPACE_ = ' '
+    SUCCESS_EXITSTATUS__ = 0
+    UNABLE_ = false
+end
+
+if __FILE__ == $PROGRAM_NAME
+  exit Skylab_Git__follow_renames__one_off.new(
+    $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ).invoke ::ARGV
+end
