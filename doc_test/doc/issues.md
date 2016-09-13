@@ -49,7 +49,7 @@
 [#009]       #tracking tag warnings wishlist (#parent-node: [#003])
              ( #was: [#ts-037] )
 
-[#008] #hole
+[#008]       #[#bs-026] #tombstone a method case study (maybe get rid of it)
              ( #was: #parent-node: [#001] "re-architect.." )
              ( #was: [#ts-034] )
 

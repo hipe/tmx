@@ -229,4 +229,5 @@ module Skylab::DocTest::TestSupport
   TS_ = self
   UNDERSCORE_ = '_'
 end
+# #tombstone: "case" testing DSL
 # #tombstone: pre-zerk CLI support lib
