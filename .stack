@@ -8,12 +8,41 @@ recursive for CLI
 eliminate old doctest manifest file b.c all is new
 every old [dt] test that requires shared setup
 every old [dt] test that is easy (use and modify CLI for this as needed)
-map/reduce/expand every old doc-test manifest time into an item in THIS stack
-re-classify and line-up the more difficult ones
-./basic/lib/skylab/basic/proxy/inline.rb  "good first candidate for shared subject"
+
+maybe refactor these when done - have one or more smells/deeper issues -
+./basic/lib/skylab/basic/pathname/union.rb  "hard to decide what kind of sharing"
+./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row"
+./basic/lib/skylab/basic/rotating-buffer.rb  "too many tests in a row"
+
+the easiest -
+./task/lib/skylab/task/eventpoint/expression-.rb  "annoying"
 ./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up"
 ./basic/lib/skylab/basic/hash/as-ordered.rb  "clunky for one test but hard to break up"
+./brazen/lib/skylab/brazen/cli-support/table/core.rb  "three tests"
 ./human/lib/skylab/human/levenshtein.rb  "good first one"
 ./basic/lib/skylab/basic/list/core.rb  "good first one"
 ./common/lib/skylab/common/scn--/core.rb   "could stand to be broken up but meh"
 ./common/lib/skylab/common/scn--/peek--.rb  "even simpler first one"
+
+shared subject (:#caass: const assignment as shared setup) -
+./basic/lib/skylab/basic/function/core.rb  "ideal shared subject"
+./basic/lib/skylab/basic/proxy/inline.rb  "good first candidate for shared subject"
+./parse/lib/skylab/parse/functions-/alternation.rb "type #caass"
+./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"
+./parse/lib/skylab/parse/functions-/simple-pool.rb  "type #caass"
+./parse/lib/skylab/parse/functions-/spending-pool.rb  "type #caass"
+./fields/lib/skylab/fields/attributes/struct.rb  "type #caass"
+./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"
+./fields/lib/skylab/fields/attributes/stack/common-frame.rb  "module *in* shared subject.."
+
+module as subject -
+./basic/lib/skylab/basic/hash/core.rb  (2 tests)
+./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)
+./basic/lib/skylab/basic/proxy/makers/functional/core.rb  (1 setup, 2 tests)
+./parse/lib/skylab/parse/dsl-dsl/core.rb (1 setup, 3 tests)
+./common/lib/skylab/common/memoization.rb  "module as subject, raises exceptions"
+./common/lib/skylab/common/session.rb  (4 setups, 6 tests, raises exceptions)
+./system/lib/skylab/system/filesystem/cache.rb   "module in setup, module IN test.."
+
+challenge mode -
+./basic/lib/skylab/basic/module/accessors.rb  "you solve this you solve a lot"

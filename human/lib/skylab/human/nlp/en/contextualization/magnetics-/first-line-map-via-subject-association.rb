@@ -80,7 +80,7 @@ module Skylab::Human
         end
 
         s_a = Magnetics_::Normal_Selection_Stack_via_Selection_Stack[ @ps_ ]
-          # => [ .. "in sub-thing", "in root thing" ]
+          # [ .. "in sub-thing", "in root thing" ]
 
         _ = if s_a.length.nonzero?
           s_a.join SPACE_  # (no leading space because #c15n-spot-1)
