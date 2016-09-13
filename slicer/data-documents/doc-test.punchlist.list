@@ -1,33 +1,33 @@
 ./basic/lib/skylab/basic/function/core.rb  "todo"
-./basic/lib/skylab/basic/hash/as-ordered.rb  "good"  was: lib/skylab/basic/hash/order-proxy.rb
-./basic/lib/skylab/basic/hash/core.rb  "mild challenge"  was: lib/skylab/basic/hash/core.rb
-./basic/lib/skylab/basic/list/core.rb  "good"  was: lib/skylab/basic/list/core.rb
+./basic/lib/skylab/basic/hash/as-ordered.rb  "good"
+./basic/lib/skylab/basic/hash/core.rb  "mild challenge"
+./basic/lib/skylab/basic/list/core.rb  "good"
 ./basic/lib/skylab/basic/method.rb  "mildly annoying"
-./basic/lib/skylab/basic/module/accessors.rb  "annoying"  was: lib/skylab/meta-hell/module/accessors.rb
-./basic/lib/skylab/basic/pathname/union.rb  "good challenge"  lib/skylab/basic/pathname/union.rb
-./basic/lib/skylab/basic/proxy/inline.rb  "good" was: lib/skylab/common/proxy/inline--.rb
-./basic/lib/skylab/basic/proxy/makers/functional/core.rb  "perfect challenge" lib/skylab/common/proxy/functional--.rb
-./basic/lib/skylab/basic/rotating-buffer.rb  "good challenge" lib/skylab/basic/rotating-buffer.rb
-./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "good"  was: lib/skylab/headless/cli/option--/core.rb
-./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "complicated"  SEE GROUP X: lib/skylab/face/cli/table.rb
-./brazen/lib/skylab/brazen/cli-support/table/core.rb  SEE GROUP X: lib/skylab/face/cli/tableize--.rb
+./basic/lib/skylab/basic/module/accessors.rb  "annoying"
+./basic/lib/skylab/basic/pathname/union.rb  "good challenge"
+./basic/lib/skylab/basic/proxy/inline.rb  "good"
+./basic/lib/skylab/basic/proxy/makers/functional/core.rb  "perfect challenge"
+./basic/lib/skylab/basic/rotating-buffer.rb  "good challenge"
+./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "good"
+./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "complicated"  was: lib/skylab/face/cli/table.rb
+./brazen/lib/skylab/brazen/cli-support/table/core.rb  was: lib/skylab/face/cli/tableize--.rb
 ./common/lib/skylab/common/memoization.rb  "todo"
-./common/lib/skylab/common/scn--/core.rb  "good"  was: lib/skylab/common/scn--/core.rb
-./common/lib/skylab/common/scn--/peek--.rb "good"  was: lib/skylab/common/scn--/peek--.rb
-./common/lib/skylab/common/session.rb  "medium"  was: lib/skylab/meta-hell/ivars-with-procs-as-methods.rb
-./doc_test/lib/skylab/doc_test/recursion-magnetics-/probably-participating-file-stream-via-argument-path.rb  "todo"
+./common/lib/skylab/common/scn--/core.rb  "good"
+./common/lib/skylab/common/scn--/peek--.rb "good"
+./common/lib/skylab/common/session.rb  "medium"
+./doc_test/lib/skylab/doc_test/recursion-magnetics-/probably-participating-file-stream-via-argument-path.rb  "false match" (see - it's the main thing)
 ./doc_test/lib/skylab/doc_test/recursion-magnetics-/test-directory-via-argument-path.rb  "skip"
 ./doc_test/lib/skylab/doc_test.rb  "skip"
-./doc_test/test/recursion-stubs.rb "todo"
-./fields/lib/skylab/fields/attributes/stack/common-frame.rb  "complicated"  was: lib/skylab/brazen/entity/properties-stack--/common-frame--.rb
-./fields/lib/skylab/fields/attributes/struct.rb "complicated" was: lib/skylab/basic/struct.rb
-./human/lib/skylab/human/levenshtein.rb  "good"  was: lib/skylab/information-tactics/levenshtein.rb
+./doc_test/test/recursion-stubs.rb "false match" (see - it's a test that makes the thing)
+./fields/lib/skylab/fields/attributes/stack/common-frame.rb  "complicated"
+./fields/lib/skylab/fields/attributes/struct.rb "complicated"
+./human/lib/skylab/human/levenshtein.rb  "good"
 ./human/lib/skylab/human/nlp/en/contextualization/magnetics-/first-line-map-via-subject-association.rb
-./parse/lib/skylab/parse/dsl-dsl/core.rb  "complicated"  was: lib/skylab/meta-hell/dsl-dsl/core.rb
-./parse/lib/skylab/parse/functions-/alternation.rb  "complicated"  was: lib/skylab/meta-hell/parse/functions-/alternation.rb
-./parse/lib/skylab/parse/functions-/serial-optionals.rb  "complicated"  was: lib/skylab/meta-hell/parse/functions-/serial-optionals.r
-./parse/lib/skylab/parse/functions-/simple-pool.rb  "complicated"  was: lib/skylab/meta-hell/parse/functions-/simple-pool.rb
-./parse/lib/skylab/parse/functions-/spending-pool.rb  "complicated"  was: lib/skylab/meta-hell/parse/functions-/spending-pool.rb
-./system/lib/skylab/system/filesystem/cache.rb  "complicated"  lib/skylab/headless/system--/services--/filesystem/cache--.rb
-./task/lib/skylab/task/eventpoint/expression-.rb  "annoying"  was: lib/skylab/test-support/quickie/possible-/articulator-.rb
+./parse/lib/skylab/parse/dsl-dsl/core.rb  "complicated"
+./parse/lib/skylab/parse/functions-/alternation.rb  "complicated"
+./parse/lib/skylab/parse/functions-/serial-optionals.rb  "complicated"
+./parse/lib/skylab/parse/functions-/simple-pool.rb  "complicated"
+./parse/lib/skylab/parse/functions-/spending-pool.rb  "complicated"
+./system/lib/skylab/system/filesystem/cache.rb  "complicated"
+./task/lib/skylab/task/eventpoint/expression-.rb  "annoying"
 ./test_support/lib/skylab/test_support/sandbox.rb  "todo"
