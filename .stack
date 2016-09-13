@@ -9,3 +9,11 @@ eliminate old doctest manifest file b.c all is new
 every old [dt] test that requires shared setup
 every old [dt] test that is easy (use and modify CLI for this as needed)
 map/reduce/expand every old doc-test manifest time into an item in THIS stack
+re-classify and line-up the more difficult ones
+./basic/lib/skylab/basic/proxy/inline.rb  "good first candidate for shared subject"
+./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up"
+./basic/lib/skylab/basic/hash/as-ordered.rb  "clunky for one test but hard to break up"
+./human/lib/skylab/human/levenshtein.rb  "good first one"
+./basic/lib/skylab/basic/list/core.rb  "good first one"
+./common/lib/skylab/common/scn--/core.rb   "could stand to be broken up but meh"
+./common/lib/skylab/common/scn--/peek--.rb  "even simpler first one"
