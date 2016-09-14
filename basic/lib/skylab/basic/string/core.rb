@@ -71,9 +71,10 @@ module Skylab::Basic
       end
 
       def mustache_regexp
-        MUSTACHE_RX__
+        MUSTACHE_RX___
       end
-      MUSTACHE_RX__ = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
+
+      MUSTACHE_RX___ = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
 
       define_method :mutate_by_unindenting, -> do  # see #note-01
 
@@ -113,9 +114,8 @@ module Skylab::Basic
       end
 
       def regex_for_line_scanning
-        LINE_RX__
+        LINE_RX_
       end
-      LINE_RX__  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
 
       def reverse_scanner string, d
         String_::Small_Procs__::Build_reverse_scanner[ string, d ]
@@ -448,6 +448,7 @@ module Skylab::Basic
 
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
+    LINE_RX_  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
     String_ = self
   end
 end

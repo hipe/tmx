@@ -265,7 +265,7 @@ module Skylab::DocTest::TestSupport
         d = em_a.length
         execute_unit_of_work_ state[ member_sym ]
         r = d .. -1
-        @event_log = Common_::Stream.via_nonsparse_array em_a[ r ]
+        @event_log = Stream_[ em_a[ r ] ]
         em_a[ r ] = EMPTY_A_
         NIL
       end

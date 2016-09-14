@@ -10,32 +10,27 @@ module Skylab::DocTest
       TEMPLATE_FILE___ = '_ctx.tmpl'
 
       def initialize para, cx
-        @_common = para
         @_choices = cx
+        @_common = para
       end
+
+      #   - our own line stream will be the output of our template,
+      #     which will magically take care of indenting our body.
+      #
+      #   - we have child "item" nodes: necessarily at least two, one
+      #     example node and one unassertive code node per [#025]:axiom-1
+      #
+      #   - our body should be the line stream from our item nodes,
+      #     using "line stream via node stream" (covered by #file-2).
+      #
+      #   - it's not a straightforward map-expand because of a few things:
+      #
+      #     - we need to figure out what our description line is from a child
+      #     - (below)
 
       def to_line_stream
 
-        # so a few things:
-        #
-        #   • our own line stream will be the output of our template,
-        #     which will hopefully magically take care of indenting
-        #     our body.
-        #
-        #   • we have a bunch of child "item" nodes: necessarily at least
-        #     two, one example node and one unassertive code node per
-        #     [#025]:axiom-1.
-        #
-        #   • our body should be the line stream from our item nodes,
-        #     using "line stream via node stream" (covered by #file-2).
-        #
-        # some more detail:
-        #
-        #   • we need to figure out what our description line is.
-        #
-        #   • see next method
-
-        ___index
+        __index
 
         _p_a = remove_instance_variable :@_particular_array
         _n_st = Common_::Stream.via_nonsparse_array _p_a
@@ -53,8 +48,6 @@ module Skylab::DocTest
 
         t.flush_to_line_stream
       end
-
-      def ___index
 
         # here is at least one reason why we must peek the stream, and some
         # other reasons why we may want to:
@@ -90,55 +83,162 @@ module Skylab::DocTest
         #   in that order. but we make the implementation more lenient than
         #   that just so we don't have to raise syntax errors/warnings.
         #   (note we haven't had to model any yet.)
+        #   (EDIT this is changing..)
         #
         # • BUT it may be that unassertive code blocks that don't match one
         #   or another hacky pattern are simply skipped over. yes, this for
         #   now..
 
+      def __index
+
         @_particular_array = []
 
         st = @_common.to_common_paraphernalia_stream
 
-        @_see_unassertive = method :___see_first_unassertive
+        @_on_assertive = :__on_assertive_normally
+        @_on_unassertive = :__on_first_unassertive
 
         begin
           common = st.gets
           common || break
           if common.is_assertive
-            _accept common.to_particular_paraphernalia
-            redo
+            send @_on_assertive, common
+          else
+            send @_on_unassertive, common
           end
-          @_see_unassertive[ common ]
           redo
         end while nil
 
-        remove_instance_variable :@_see_unassertive
-        NIL_
+        remove_instance_variable :@_on_unassertive
+        NIL
       end
 
-      def ___see_first_unassertive unassa
+      def __on_first_unassertive unasser
 
-        o = unassa.begin_description_string_session
+        __init_description_bytes unasser
+        @_on_unassertive = :__on_every_unassertive
+        @_has_visible_setups = false
+        send @_on_unassertive, unasser
+        NIL
+      end
+
+      def __init_description_bytes unasser
+
+        o = unasser.begin_description_string_session
         o.use_first_nonblank_line!
         o.remove_any_trailing_colons_or_commas!
         @__description_bytes = o.finish.inspect  # hm..
-
-        @_see_unassertive = method :___see_subsequent_unassertive
-        @_see_unassertive[ unassa ]
-        NIL_
+        NIL
       end
 
-      def ___see_subsequent_unassertive unassa
+      def __on_every_unassertive unasser
 
-        if unassa.has_what_looks_like_a_variable_assignment
-          _accept unassa.to_particular_paraphernalia_of :shared_subject
+        c_a = unasser.starts_with_what_looks_like_a_constant_assignment
+
+        v_a = unasser.has_what_looks_like_a_variable_assignment
+
+        if c_a
+          if v_a
+            self._WEE_enjoy_when_you_have_both
+          else
+            __on_const_definition unasser
+          end
+        elsif v_a
+          __on_shared_subject unasser
         else
-          self._SHOULD_WARN
+          self._SHOULD_FAIL_see_me  # let's say that an unassertive block
+          # must employ features, so its means of expression is clear.
         end
+        NIL
+      end
+
+      def __on_const_definition unasser
+
+        o = unasser.to_particular_paraphernalia_of :const_definition
+        if ! @_has_visible_setups
+          @_has_visible_setups = true
+          @_on_assertive = :__on_assertive_mapped_through_visible_setups
+          @_mutable_visible_setups = MutableVisibleSetups___.new
+        end
+        @_readable_visible_setups = nil
+        @_mutable_visible_setups.push_etc o
+        _accept o
+        NIL
+      end
+
+      def __on_shared_subject unasser
+        _ = unasser.to_particular_paraphernalia_of :shared_subject
+        _accept _
+        NIL
+      end
+
+      def __on_assertive_mapped_through_visible_setups common
+        @_readable_visible_setups ||= @_mutable_visible_setups.to_readable
+        _ = common.to_particular_paraphernalia_under @_readable_visible_setups
+        _accept _
+        NIL
+      end
+
+      def __on_assertive_normally common
+        _ = common.to_particular_paraphernalia
+        _accept _
+        NIL
       end
 
       def _accept common
         @_particular_array.push common ; nil
+      end
+
+      # === [#010]:B
+
+      # ==
+
+      class MutableVisibleSetups___
+
+        def initialize
+          @_visible_particulars = []
+          @_cached_dootilies = []
+        end
+
+        def push_etc o
+          @_visible_particulars.push o ; nil
+        end
+
+        def to_readable
+
+          # the subject is a recording structure. rather than being "finished"
+          # at any discrete point, we allow a "readable" (frozen) form of it
+          # to spawn off at any point..
+
+          cooked = @_cached_dootilies
+          raw = @_visible_particulars
+          if cooked.length == raw.length
+            @__last_readable
+          else
+            ( cooked.length ... raw.length ).each do |d|
+              cooked[ d ] = raw.fetch(d).to_mapper__
+            end
+            x = ReadableVisibleSetups__.new cooked.dup.freeze  # think
+            @__last_readable = x
+            x
+          end
+        end
+      end
+
+      # ==
+
+      class ReadableVisibleSetups__
+
+        def initialize a
+          if 1 != a.length
+            self._ANNOYING_multiple_visible_shared_setups
+          end
+          @__p = a.fetch 0
+        end
+
+        def map_body_line_stream__ st
+          @__p[ st ]
+        end
       end
     end
   end

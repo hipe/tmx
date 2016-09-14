@@ -121,6 +121,33 @@ module Skylab::DocTest
 
       COPULA_RX___ = /[ \t]*#[ \t]=>[ \t]/
 
+      # --
+
+      def dup_by
+        otr = dup
+        otr.extend Writable_when_duped___
+        yield otr
+        otr
+      end
+
+      module Writable_when_duped___
+
+        def string= str
+          # because the subject is heavily indexed already, this would be
+          # a bit of PITA do correctly. instead, we say this won't Just
+          # Work for all strings..
+          delta = str.length - @string.length
+          if delta.nonzero?
+            p = Range_mapper___[ delta ]
+            @_content_range = p[ @_content_range ]
+            @LTS_range = p[ @LTS_range ]
+          end
+          @string = str
+        end
+      end
+
+      # --
+
       def to_common_paraphernalia_given choices  # assume has magic copula
         Models_::CopulaAssertion.via_code_line__ self, choices
       end
@@ -150,6 +177,14 @@ module Skylab::DocTest
 
       def is_blank_line
         false
+      end
+    end
+
+    # ==
+
+    Range_mapper___ = -> delta do
+      -> r do
+        ::Range.new r.begin, r.end + delta, r.exclude_end?
       end
     end
 

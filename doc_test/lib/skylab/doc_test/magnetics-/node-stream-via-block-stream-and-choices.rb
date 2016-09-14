@@ -1,12 +1,15 @@
 module Skylab::DocTest
 
-  class Magnetics_::NodeStream_via_BlockStream_and_Choices < Common_::Actor::Dyadic
+  class Magnetics_::NodeStream_via_BlockStream_and_Choices
 
     # see [#024] node theory
 
-    def initialize bs, cx
+    extend Common_::Actor::ProcLike
+
+    def initialize bs, tfcp, cx
       @block_stream = bs
       @choices = cx
+      @__test_file_context_proc = tfcp
     end
 
     def execute
@@ -65,6 +68,7 @@ module Skylab::DocTest
       Models_::Context.via_valid_pair_array_and_choices__(
 
         remove_instance_variable( :@_pairs ),
+        @__test_file_context_proc,
         @choices,
       )
     end
@@ -89,8 +93,8 @@ module Skylab::DocTest
       pair = @_cache_stream.gets
       if pair  # like #spot-4
 
-        code_run = pair.value_x
-        _discu_run = pair.name_x
+        code_run = pair.code_run
+        _discu_run = pair.discussion_run
         code_run.has_magic_copula or Home_._SANITY  # because then not flat
 
         Models_::ExampleNode.via_runs_and_choices_ _discu_run, code_run, @choices
@@ -123,7 +127,7 @@ module Skylab::DocTest
         else
           seen_other = true
         end
-        ( pairs ||= [] ).push Common_::Pair.via_value_and_name( run_, run )
+        ( pairs ||= [] ).push DiscussionRunAndCodeRun___[ run, run_ ]
 
         run = st.gets
       end while run
@@ -149,5 +153,9 @@ module Skylab::DocTest
       end
       NIL_
     end
+
+    # ==
+
+    DiscussionRunAndCodeRun___ = ::Struct.new :discussion_run, :code_run
   end
 end

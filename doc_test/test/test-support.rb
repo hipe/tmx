@@ -179,6 +179,10 @@ module Skylab::DocTest::TestSupport
     Home_.lib_.basic::Pathname::Localizer[ shorter ][ longer ]
   end
 
+  Stream_ = -> a do
+    Common_::Stream.via_nonsparse_array a
+  end
+
   The_real_filesystem_ = Lazy_.call do
     Home_.lib_.system.filesystem
   end

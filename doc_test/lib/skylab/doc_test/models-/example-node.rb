@@ -21,6 +21,10 @@ module Skylab::DocTest
       to_particular_paraphernalia.to_line_stream
     end
 
+    def to_particular_paraphernalia_under x
+      @_choices.particular_paraphernalia_for_under self, x
+    end
+
     def to_particular_paraphernalia
       @_choices.particular_paraphernalia_for self
     end

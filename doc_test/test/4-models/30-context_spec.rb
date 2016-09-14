@@ -7,7 +7,6 @@ module Skylab::DocTest::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :embedded_line_collections
-    # use :case
 
     in_file do
       full_path_ 'doc/issues/003-how-nodes-are-generated.md'
@@ -51,8 +50,7 @@ module Skylab::DocTest::TestSupport
 
       it "(every byte)" do
 
-        _a_st = magnetics_module_::LineStream_via_NodeStream[
-          Common_::Stream.via_nonsparse_array( _a ) ]
+        _a_st = magnetics_module_::LineStream_via_NodeStream[ Stream_[ _a ] ]
 
         _e_st = _ELC_line_stream_after %r(\byou'll get\z)
         _ELC_close_if_necessary
@@ -64,13 +62,7 @@ module Skylab::DocTest::TestSupport
     # not yet covered: #coverpoint2-1: a comment block with no code run
 
     def _for rx
-
-      _line_st = _ELC_line_stream_after rx
-      o = magnetics_module_
-      _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
-      _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, real_default_choices_ ]
-      # (wants [#ta-005])
-      _ns.to_a
+      first_node_stream_corresponding_to_regex_( rx ).to_a.freeze
     end
   end
 end

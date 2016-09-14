@@ -135,7 +135,7 @@ module Skylab::DocTest
 
         @_line_object_stream = @_common.to_code_run_line_object_stream
 
-        _val_a = @_common.last_line_index___.variable_assignment_lines
+        _val_a = @_common.variable_assignment_lines
         @_VAL = _val_a.fetch( -1 )  # we just disregard the non-last ones.
       end
     end

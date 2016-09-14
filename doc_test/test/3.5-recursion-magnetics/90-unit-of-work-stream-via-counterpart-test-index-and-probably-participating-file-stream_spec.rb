@@ -56,7 +56,7 @@ module Skylab::DocTest::TestSupport
 
       def __the_asset_stream
         _a = %w( /stub/asset/file-one.zink /stub-asset/file/two.zonk )
-        Common_::Stream.via_nonsparse_array _a
+        Stream_[ _a ]
       end
 
       shared_subject :the_stub_index_ do

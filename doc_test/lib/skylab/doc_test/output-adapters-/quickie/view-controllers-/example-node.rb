@@ -6,7 +6,15 @@ module Skylab::DocTest
 
       TEMPLATE_FILE___ = '_eg-simple.tmpl'
 
-      def initialize para, cx
+      def initialize para, cx, visible_shared=nil
+
+        if visible_shared
+          @_has_visible_shared_items = true
+          @_visible_shared_items = visible_shared
+        else
+          @_has_visible_shared_items = false
+        end
+
         @_common = para
         @_choices = cx
 
@@ -20,11 +28,21 @@ module Skylab::DocTest
       def to_line_stream
 
         ok = @_description_bytes_OK
-        ok &&= __resolve_body_line_stream
+        ok && __init_body_line_stream
         ok && __assemble_template_and_etc
       end
 
-      def __resolve_body_line_stream  # (based off model)
+      def __init_body_line_stream
+
+        st = __body_line_stream_normally
+        if @_has_visible_shared_items
+          st = @_visible_shared_items.map_body_line_stream__ st
+        end
+        @__body_line_stream = st
+        NIL
+      end
+
+      def __body_line_stream_normally  # (based off model)
 
         # (this became the worst thing ever when we tried to add stripping
         # trailing blank lines to it. before it was pretty straightforward.
@@ -96,12 +114,10 @@ module Skylab::DocTest
         end
         p = main_p
 
-        @_body_line_stream = Common_.stream do
+        Common_.stream do
           p[]
         end
-        ACHIEVED_
       end
-
       def identifying_string
         @_description_bytes_OK && @_identifying_string
       end
@@ -127,7 +143,7 @@ module Skylab::DocTest
         if ! o.found || o.is_blank
           UNABLE_
         else
-          @_description_bytes = o.finish
+          @__description_bytes = o.finish
           ACHIEVED_
         end
       end
@@ -137,12 +153,12 @@ module Skylab::DocTest
         t = @_choices.load_template_for TEMPLATE_FILE___
 
         t.set_simple_template_variable(
-          remove_instance_variable( :@_description_bytes ),
+          remove_instance_variable( :@__description_bytes ),
           :description_bytes,
         )
 
         t.set_multiline_template_variable(
-          remove_instance_variable( :@_body_line_stream ),
+          remove_instance_variable( :@__body_line_stream ),
           :example_body,
         )
 

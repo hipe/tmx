@@ -360,7 +360,7 @@ it is perhaps a misunderstanding of the convention, but we base these
 semantics off of something we read in the [#sl-142] hilleglas book: "In the common
 idioms of Objective-C, a method prefixed with `get` takes an address
 where data can be copied. [..]" [3][3]  We take a very liberal
-interpretatin of this convention to make it one of ours: whereas in the
+interpretation of this convention to make it one of ours: whereas in the
 Obj-C case the `get_` method presumably allocates memory to carry out
 the said copying, we use the `get_` prefix to apply more broadly to all
 of those methods that allocate memory towards their result

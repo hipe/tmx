@@ -16,9 +16,9 @@ might seem weird because
 so we hide that weirdness here because there is a chance that that
 remote API point may evolve to fit scenarios like this; however at
 writing we think that the remote #hook-in method API is a good,
-one-size-fits most solution.
+one-size-fits-most solution.
 
-as for the suject (test support method), there's no good single
+as for the subject (test support method), there's no good single
 support library to put this in - we want it in both magnetic tests
 and API/functional tests.
 

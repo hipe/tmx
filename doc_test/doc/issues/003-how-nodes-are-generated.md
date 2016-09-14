@@ -160,9 +160,8 @@ you'll get:
 
 (the above is #coverpoint2-4.)
 
-
-
-
+see the above referenced [#024] and then [#010] after it to learn
+about patterns of shared setup that can be recognized and expressed.
 
 
 

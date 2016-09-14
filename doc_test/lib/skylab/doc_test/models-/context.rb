@@ -11,9 +11,10 @@ module Skylab::DocTest
       undef_method :new
     end  # >>
 
-    def initialize pair_a, cx
+    def initialize pair_a, tfcp, cx
       @_choices = cx
       @_pairs = pair_a
+      @__test_file_context_proc = tfcp
     end
 
     def to_line_stream
@@ -24,13 +25,14 @@ module Skylab::DocTest
 
       Common_::Stream.via_nonsparse_array( @_pairs ).map_by do |pair|  # like #spot-4
 
-        code_run = pair.value_x
-        discu_run = pair.name_x
+        code_run = pair.code_run
+        discu_run = pair.discussion_run
 
         if code_run.has_magic_copula
           Models_::ExampleNode.via_runs_and_choices_ discu_run, code_run, @_choices
         else
-          Models_::UnassertiveCodeNode.via_runs_and_choices_ discu_run, code_run, @_choices
+          Models_::UnassertiveCodeNode.via_runs_and_choices_(
+            discu_run, code_run, @__test_file_context_proc, @_choices )
         end
       end
     end

@@ -39,30 +39,31 @@ module Skylab::DocTest
 
       # --
 
-      def particular_paraphernalia_for para
-
-        particular_paraphernalia_of_for(
-          para.paraphernalia_category_symbol,
-          para,
-        )
+      def particular_paraphernalia_for_under para, x
+        _sym = para.paraphernalia_category_symbol
+        _cls = _paraphernalia_class_for _sym
+        _cls.new para, self, x
       end
 
-      def particular_paraphernalia_of_for sym, para
-
-        _cls = __paraphernalia_loader.paraphernalia_class_for sym
+      def particular_paraphernalia_for para
+        _sym = para.paraphernalia_category_symbol
+        _cls = _paraphernalia_class_for _sym
         _cls.new para, self
       end
 
-      def load_template_for file
-        __template_loader.build_template_via_file_path file
+      def particular_paraphernalia_of_for sym, para
+        _cls = _paraphernalia_class_for sym
+        _cls.new para, self
       end
 
-      def __paraphernalia_loader
+      def _paraphernalia_class_for sym
         @___PL ||= Home_::OutputAdapter_::Paraphernalia_Loader.new ViewControllers_
+        @___PL.paraphernalia_class_for sym
       end
 
-      def __template_loader
+      def load_template_for file
         @___TL ||= Home_::OutputAdapter_::Template_Loader.new Template_dir___[]
+        @___TL.build_template_via_file_path file
       end
     end
 

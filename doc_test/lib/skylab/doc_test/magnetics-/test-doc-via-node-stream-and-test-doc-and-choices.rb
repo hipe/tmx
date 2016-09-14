@@ -30,6 +30,7 @@ module Skylab::DocTest
         :asset_line_stream,
         :choices,
         :original_test_line_stream,
+        :test_file_context_proc,
       )
 
       def finish
@@ -46,12 +47,13 @@ module Skylab::DocTest
 
         in_st = remove_instance_variable :@asset_line_stream
         orig_st = remove_instance_variable :@original_test_line_stream
+        tfcp = remove_instance_variable :@test_file_context_proc
 
         # -- run through the magnetics & related (wants [#ta-005])
 
         o = Magnetics_
         _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ in_st ]
-        node_st = o::NodeStream_via_BlockStream_and_Choices[ _bs, @choices ]
+        node_st = o::NodeStream_via_BlockStream_and_Choices[ _bs, tfcp, @choices ]
 
         test_doc = @choices.test_document_parser.parse_line_stream orig_st
         orig_st.respond_to? :close and orig_st.close

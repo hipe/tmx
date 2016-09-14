@@ -18,7 +18,7 @@ assumptions out of the subject code. whether this comes from for example
 configuration files or environment variables or user interface elements
 is outside of this scope.
 
-(this "name conventions" participant is discussed further at #note-N below.)
+(this "name conventions" participant is discussed further at #note-2 below.)
 
 
 

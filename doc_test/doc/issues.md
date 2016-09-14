@@ -42,7 +42,7 @@
              ( #was: modernize templates )
              ( #was: [#ts-043] )
 
-[#010] #hole
+[#010]       other magic: shared setup patterns
              ( #was: #parent-node: [#007] #tracking a `Subject_` parameter function )
              ( #was: [#ts-039] )
 

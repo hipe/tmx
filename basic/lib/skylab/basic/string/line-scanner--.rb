@@ -38,31 +38,98 @@ module Skylab::Basic
 
         def via_arglist a
 
-          upstream = Implementation___.new( * a )
+          upstream = if 1 == a.length
+            TerminatorSemantics___.new a.fetch 0
+          else
+            SeparatorSemantics___.new( * a )
+          end
 
           new upstream do
-            upstream.__gets
+            upstream.gets_
           end
         end
       end  # >>
 
-      def members
-        [ :gets, :lineno ]
-      end
-
       def lineno
-        @upstream.__lineno
+        @upstream.lineno_
       end
 
       def rewind
-        @upstream.__rewind
+        @upstream.rewind_
       end
 
       def close
-        NIL_  # this is stateless unlike a real resource handle
+        # (this is stateless unlike a resource handle, but for sanity:)
+        remove_instance_variable :@upstream ; nil
       end
 
-      class Implementation___
+      class SeparatorSemantics___
+
+        def initialize s, rx
+
+          if rx.respond_to? :ascii_only?
+            rx = ::Regexp.new rx
+          end
+
+          @_not_separator_rx = ::Regexp.new(
+            "(?:(?!#{ rx.source }).)+",
+            rx.options,  # if this one uses 'x', use 'x' ..
+          )
+
+          @_scn = Home_.lib_.string_scanner s
+          @_separator_rx = rx
+          @_gets = :_first_gets
+        end
+
+        def gets_
+          send @_gets
+        end
+
+        def _first_gets
+          s = @_scn.scan @_not_separator_rx
+          if s
+            @_gets = @_scn.eos? ? :_done : :__subsequent_gets
+            s
+          elsif @_scn.eos?
+            @_gets = :_done
+            NOTHING_
+          else
+            @_scn.check( @_separator_rx ) || self._REGEX_SANITY
+            self._WE_NEED_OPTIONS_for_absoulte_path_looking_strings
+          end
+        end
+
+        def __subsequent_gets  # assume not eos
+          @_scn.skip @_separator_rx or self._REGEX_SANITY
+          if @_scn.eos?
+            self._WE_NEED_OPTIONS_for_dir_looking_strings
+          else
+            s = @_scn.scan @_not_separator_rx
+            s || self._REGEX_SANITY
+            if @_scn.eos?
+              @_gets = :_done
+            end
+            s
+          end
+        end
+
+        def _done
+          NOTHING_
+        end
+
+        def rewind_
+          @_gets = :_first_gets
+          @_item_number = 0
+          @_scn.pos = 0
+          0
+        end
+
+        def lineno_
+          @_item_number
+        end
+      end
+
+      class TerminatorSemantics___
 
         # to be in the stream inheirance hierarchy we must contain all of our
         # state in one object that can be passed around to derivative streams
@@ -78,7 +145,7 @@ module Skylab::Basic
           scn = Home_.lib_.string_scanner s
 
           @_gets = -> do
-            s = scn.scan LINE_RX___
+            s = scn.scan LINE_RX_
             if s
               lineno += 1
             end
@@ -92,17 +159,15 @@ module Skylab::Basic
           end
         end
 
-        LINE_RX___ = String.regex_for_line_scanning
-
-        def __gets
+        def gets_
           @_gets[]
         end
 
-        def __lineno
+        def lineno_
           @_lineno[]
         end
 
-        def __rewind
+        def rewind_
           @_rewind[]
         end
       end

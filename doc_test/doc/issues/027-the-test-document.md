@@ -39,9 +39,9 @@ this builds on [#017] our "essential operation" [about syncing] pseudocode.
 
     • start to think about how to access unassertive nodes..
 
-  • requirement -2: (mutability 1/2): nodes can be added (..)
+  ✓ requirement -2: (mutability 1/2): nodes can be added (..)
 
-  • requirement -1: (mutability 2/2): item body lines that can be replaced
+  ✓ requirement -1: (mutability 2/2): item body lines that can be replaced
 
     ✓ after having retrieved an item node, be able to replace all of
       its body lines with new lines. (step -N)

@@ -29,7 +29,7 @@ module Skylab::DocTest::TestSupport
 
       _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _ls ]
 
-      _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, real_default_choices_ ]
+      _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, :_no_tfc_2_, real_default_choices_ ]
 
       exp_st = fi.line_stream_via_regex %r(\bproduces this\z)
       fi.close_if_necessary

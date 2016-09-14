@@ -48,6 +48,13 @@ module Skylab::Common
 
   module Actor  # see [#fi-016] the actor narrative
 
+    module ProcLike
+      def call * a, & p
+        new( * a, & p ).execute
+      end
+      alias_method :[], :call
+    end
+
     class Dyadic
       class << self
         def _call x, y, & p

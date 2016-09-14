@@ -47,6 +47,7 @@ module Skylab::DocTest::TestSupport
     #
     #   • always you access a collection of "embedded lines" by using
     #     a regex for matching the last line before the embedded lines.
+    #     (we don't call this a "key line" or "key string" for this reason:)
     #
     #   • the regex does not act as a "key". you can use any regex that
     #     matches one such line and your result will be the first embedded
@@ -80,6 +81,44 @@ module Skylab::DocTest::TestSupport
     end
 
     module InstanceMethods___
+
+      # -- the methods in this section bleed into business specifics in an
+      #    otherwise "pure" library - move them out if we abstract the lib
+
+      def first_fake_file_node_stream_corresponding_to_regex_ rx
+
+        line_st = _ELC_line_stream_after rx
+
+        _line = line_st.gets
+        md = PRETEND_THIS_IS_FILE_RX___[].match _line
+        if ! md
+          fail TS_._REGEX_SANITY
+        end
+        tfc = StubTestFileContext___.new md[ :pretend_path ]
+
+        _node_stream_via line_st, -> { tfc }
+      end
+
+      PRETEND_THIS_IS_FILE_RX___ = Lazy_.call do
+        /\A# \(pretend this is(?: in)?(?: file)? "(?<pretend_path>[^"]+)"/
+      end
+
+      def first_node_stream_corresponding_to_regex_ rx
+
+        _line_st = _ELC_line_stream_after rx
+        _node_stream_via _line_st, :_no_tfc_1_
+      end
+
+      def _node_stream_via _line_st, tfcp  # test file context proc
+
+        o = magnetics_module_
+        _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
+        _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, tfcp, real_default_choices_ ]
+        # (wants [#ta-005])
+        _ns
+      end
+
+      # --
 
       def _ELC_line_stream_after rx
 
@@ -294,6 +333,48 @@ module Skylab::DocTest::TestSupport
       BLANK_RX_ = Home_::BLANK_RX_
       COLON_RX___ = /:$/
       INDENTED_RX__ = /\A[\t ]+(?=[^[:space:]])/
+    end
+
+    # ==
+
+    class StubTestFileContext___
+
+      # experiment - made just for tests, to refine our (as yet unintegrated)
+      # API on the "recurse" side to work with this - take a path like:
+      #
+      #   "test/1-abc-def/ghi-jkl_speg.kode"
+      #
+      # and produce a stem like this:
+      #
+      #   "ad_gj"
+      #
+      # which is the first "letter" of every "word" where etc (three things)
+
+      def initialize local_path
+
+        _String = Home_.lib_.basic::String
+
+        st = _String.line_stream local_path, ::File::SEPARATOR
+
+        _test = st.gets
+        'test' == _test || fail
+
+        crazy_rx = /\A(\d+-)?(?<stem>[^_]+)/
+
+        _ = st.join_into_with_using_by "", UNDERSCORE_, :concat do |entry|
+
+          _stem = crazy_rx.match( entry )[ :stem ]
+          _initials = _stem.split( DASH_ ).reduce "" do |m, s|
+            m.concat s[0]
+          end
+        end
+
+        @short_hopefully_unique_stem__ = _
+      end
+
+      attr_reader(
+        :short_hopefully_unique_stem__,
+      )
     end
 
     # ==

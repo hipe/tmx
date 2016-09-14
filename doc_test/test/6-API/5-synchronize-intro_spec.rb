@@ -94,7 +94,7 @@ module Skylab::DocTest::TestSupport
     #   2) in another, dedicated example here, we make sure that the example
     #      written here passes. (er, we just run that example.)
     #
-    # in this way we esure (more-or-less) that what the embedded test
+    # in this way we ensure (more-or-less) that what the embedded test
     # expresses is valid, but in a manner that is much easier to maintain
     # than the old way.
 

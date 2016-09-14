@@ -41,7 +41,7 @@ module Skylab::DocTest::TestSupport
         HERE
 
         expect_actual_line_stream_has_same_content_as_expected_(
-          Common_::Stream.via_nonsparse_array( _many_lines ),
+          Stream_[ _many_lines ],
           line_stream_via_string_( _expect ),
         )
       end

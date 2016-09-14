@@ -77,12 +77,7 @@ module Skylab::Git
 
   Process_ = ::Struct.new :in, :out, :err, :wait, :command
 
-  module ProcLike_
-    def call * a, & p
-      new( * a, & p ).execute
-    end
-    alias_method :[], :call
-  end
+  ProcLike_ = Common_::Actor::ProcLike
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze

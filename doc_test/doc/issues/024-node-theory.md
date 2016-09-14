@@ -19,9 +19,12 @@ to decide how useful it is to support..
 
 ## scope
 
+(there are specifics in [#010] that answer open questions here EDIT)
+
 we are irresolute about which course of action to pursue
 for those code runs that do not look like examples (A). we could
 B) ignore them or C) assume they are shared setup of some kind.
+(EDIT: we are going with (C).)
 
 the rest of the discussion here is predicated on the assumption that
 (C) we are not ignoring them and that they are some kind of shared
@@ -79,3 +82,5 @@ make such cases exist in a context node if desired).
 again we shouldn't get too carried away until universal re-integration
 happens and we can revisit real-world use bolstered by synchronization,
 which could end up revealing all this to be a fabricated problem.
+
+[#010] delves deeper into magical patterns of shared setup.

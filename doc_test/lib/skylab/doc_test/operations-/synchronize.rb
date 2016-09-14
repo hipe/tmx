@@ -50,6 +50,7 @@ module Skylab::DocTest
         o.asset_line_stream = @asset_line_stream
         o.choices = @_choices
         o.original_test_line_stream = @original_test_line_stream
+        o.test_file_context_proc = :_no_tfc_3_
 
         _document = o.to_test_document
         _document.to_line_stream
