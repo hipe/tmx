@@ -11,7 +11,11 @@ module Skylab::DocTest
 
       def initialize para, cx
         @_choices = cx
-        @_common = para
+        __index para
+      end
+
+      def identifying_string
+        @__description_string  # 5x
       end
 
       #   - our own line stream will be the output of our template,
@@ -30,12 +34,9 @@ module Skylab::DocTest
 
       def to_line_stream
 
-        __index
-
         _p_a = remove_instance_variable :@_particular_array
         _n_st = Common_::Stream.via_nonsparse_array _p_a
         _body_line_st = Magnetics_::LineStream_via_NodeStream[ _n_st ]
-
         _d_s = remove_instance_variable :@__description_bytes
 
         # --
@@ -89,11 +90,11 @@ module Skylab::DocTest
         #   or another hacky pattern are simply skipped over. yes, this for
         #   now..
 
-      def __index
+      def __index common
 
         @_particular_array = []
 
-        st = @_common.to_common_paraphernalia_stream
+        st = common.to_common_paraphernalia_stream
 
         @_on_assertive = :__on_assertive_normally
         @_on_unassertive = :__on_first_unassertive
@@ -127,7 +128,9 @@ module Skylab::DocTest
         o = unasser.begin_description_string_session
         o.use_first_nonblank_line!
         o.remove_any_trailing_colons_or_commas!
-        @__description_bytes = o.finish.inspect  # hm..
+        s = o.finish
+        @__description_string = s
+        @__description_bytes = s.inspect  # hm..
         NIL
       end
 

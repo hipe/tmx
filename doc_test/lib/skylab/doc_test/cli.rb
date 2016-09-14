@@ -151,21 +151,27 @@ module Skylab::DocTest
 
       def __result_via_upstream_line_stream
 
-        _asset_line_stream = remove_instance_variable :@__asset_line_stream
-        original_test_line_stream = remove_instance_variable :@__original_test_line_stream
-
         op = Home_::Operations_::Synchronize.new( & @_oes_p )
-        op.asset_line_stream = _asset_line_stream
-        op.original_test_line_stream = original_test_line_stream
+
+        op.asset_line_stream =
+          remove_instance_variable :@__asset_line_stream
+
+        op.original_test_line_stream =
+          remove_instance_variable :@__original_test_line_stream
+
+        op.original_test_path =
+          remove_instance_variable :@original_test_path
+
         op.output_adapter = :quickie
 
-        _x = op.execute
-        if _x.respond_to? :gets
-          $stderr.puts "(looks ok in CLI client)"
+        x = op.execute
+        if x.respond_to? :gets
+          $stderr.puts "(looks ok in CLI client)"  # #todo
         else
-          $stderr.puts "(something funny in CLI client)"
+          $stderr.puts "(something funny in CLI client)"  # #todo
+          x = NIL  # CLI should output nothing, not "no"
         end
-        _x
+        x
       end
 
       def __resolve_upstream_line_stream
@@ -189,7 +195,6 @@ module Skylab::DocTest
           UNABLE_
         else
           remove_instance_variable :@asset_path
-          remove_instance_variable :@original_test_path
           @__asset_line_stream = asset_line_stream
           @__original_test_line_stream = original_test_line_stream
           ACHIEVED_

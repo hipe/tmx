@@ -1,3 +1,8 @@
+[#032] #minor when we had this item in the template, it got push to
+             the end and didn't stay at the top of the node (in situ)
+
+[#031] #open when a test directory is the argument path, should work?
+
 [#030]       mock system ..
 
 [#029]       notes about our tests..
@@ -53,7 +58,8 @@
              ( #was: #parent-node: [#001] "re-architect.." )
              ( #was: [#ts-034] )
 
-[#007] #open rename spec files that use real-looking asset file names
+[#007] #open in CLI, a verbose option
+             ( #was: rename spec files that use real-looking asset file names )
              ( #wontfix - too much work to be worth it. using filesystem is OK)
              ( #was: [#ts-030] )
 

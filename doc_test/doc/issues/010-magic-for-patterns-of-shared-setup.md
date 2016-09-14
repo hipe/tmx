@@ -85,3 +85,7 @@ the former are covered by our older sibling document, and the latter work
 like this:
 
 EDIT (see this commit message for notes)
+
+
+
+## the actual thing we used to do (and still do) "by hand" (:C)

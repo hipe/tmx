@@ -149,7 +149,11 @@ module Skylab::DocTest
           end
 
           def write_separating_blank_line_run
-            @result_nodes.concat @index.separating_blank_lines_array
+            a = @index.separating_blank_lines_array
+            if a
+              @result_nodes.concat a
+            end
+            NIL
           end
 
           attr_writer(
@@ -172,6 +176,7 @@ module Skylab::DocTest
 
             @_stop = false
             @_on_blank_line = :_ignore
+            @_on_module = :_ignore
             @_on_nonblank_line = :_ignore
           end
 
@@ -240,6 +245,7 @@ module Skylab::DocTest
           IVARS___ = {
             blank_line: :@_on_blank_line,
             example_node: :@_on_example_node,
+            module: :@_on_module,
             nonblank_line: :@_on_nonblank_line,
           }
 

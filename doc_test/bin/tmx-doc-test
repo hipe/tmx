@@ -7,13 +7,11 @@ Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
   _cli = Skylab::DocTest::CLI.new i, o, e, pn_s_a do |cli_|
 
     cli_.filesystem_by do
-      self._COVER_ME_probably_works
-      Home_.lib_.system.filesystem
+      Skylab::DocTest.lib_.system.filesystem
     end
 
     cli_.system_conduit_by do
-      self._COVER_ME_probably_works
-      Home_.lib_.system
+      Skylab::DocTest.lib_.system
     end
   end
 

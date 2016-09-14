@@ -122,6 +122,10 @@ module Skylab::System
         Home_.test_support
       end
 
+      def nil?  # [dt] CLI client
+        false
+      end
+
       self
     end.new
   end

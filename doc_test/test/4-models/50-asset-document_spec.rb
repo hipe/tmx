@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::DocTest::TestSupport
 
-  describe "models - asset document" do
+  describe "[dt] models - asset document" do
 
     TS_[ self ]
     use :memoizer_methods

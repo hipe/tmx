@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Line_Scanner__ < Common_::Stream.stream_class  # :[#024]
+    class Line_Scanner__ < Common_::Stream  # :[#024]
 
       # represent a string as a stream of "lines", each produced successively
       # through the universal minimal stream interface of a method named
@@ -37,15 +37,13 @@ module Skylab::Basic
         end
 
         def via_arglist a
-
-          upstream = if 1 == a.length
-            TerminatorSemantics___.new a.fetch 0
+          if 1 == a.length
+            upstream = TerminatorSemantics___.new a.fetch 0
+            new upstream do
+              upstream.gets_
+            end
           else
-            SeparatorSemantics___.new( * a )
-          end
-
-          new upstream do
-            upstream.gets_
+            SeparatorSemanticsScanner___.new( * a )
           end
         end
       end  # >>
@@ -63,7 +61,7 @@ module Skylab::Basic
         remove_instance_variable :@upstream ; nil
       end
 
-      class SeparatorSemantics___
+      class SeparatorSemanticsScanner___
 
         def initialize s, rx
 
@@ -79,11 +77,46 @@ module Skylab::Basic
           @_scn = Home_.lib_.string_scanner s
           @_separator_rx = rx
           @_gets = :_first_gets
+
+          s = send @_gets
+          if s
+            @_kn_kn = Writable_Known_Known___[ s ]
+            @unparsed_exists = true
+          end
         end
 
-        def gets_
-          send @_gets
+        def to_stream
+          Common_.stream do
+            if @unparsed_exists
+              gets_one
+            end
+          end
         end
+
+        def gets_one
+          x = current_token
+          advance_one
+          x
+        end
+
+        def advance_one
+          s = send @_gets
+          if s
+            @_kn_kn.value_x = s
+          else
+            remove_instance_variable :@_kn_kn
+            @unparsed_exists = false
+          end
+          NIL
+        end
+
+        def current_token
+          @_kn_kn.value_x
+        end
+
+        attr_reader(
+          :unparsed_exists
+        )
 
         def _first_gets
           s = @_scn.scan @_not_separator_rx
@@ -116,18 +149,9 @@ module Skylab::Basic
         def _done
           NOTHING_
         end
-
-        def rewind_
-          @_gets = :_first_gets
-          @_item_number = 0
-          @_scn.pos = 0
-          0
-        end
-
-        def lineno_
-          @_item_number
-        end
       end
+
+      # ==
 
       class TerminatorSemantics___
 
@@ -172,6 +196,8 @@ module Skylab::Basic
         end
       end
 
+      # ==
+
       Reverse__ = -> mutable_string do  # see #the-reverse-scanner
         is_first = true
         ::Enumerator::Yielder.new do |line|
@@ -183,6 +209,12 @@ module Skylab::Basic
           end ; nil
         end
       end
+
+      # ==
+
+      Writable_Known_Known___ = ::Struct.new :value_x
+
+      # ==
     end
   end
 end

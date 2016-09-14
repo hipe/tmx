@@ -224,14 +224,12 @@ module Skylab::DocTest::TestSupport
 
   Home_ = ::Skylab::DocTest
 
-  DASH_ = '-'
   EMPTY_A_ = []
   DocTest = Home_  # only for generated tests, find it via (?!<::)DocTest\b
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   TS_ = self
-  UNDERSCORE_ = '_'
 end
 # #tombstone: "case" testing DSL
 # #tombstone: pre-zerk CLI support lib

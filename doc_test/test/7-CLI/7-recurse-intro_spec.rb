@@ -38,7 +38,7 @@ module Skylab::DocTest::TestSupport
         c_or_d, test_path, asset_path = _sorted_tuples.fetch 1
         c_or_d == :update || fail
 
-        asset_path.include? '/recursion-magnetics-/' or fail
+        asset_path.include? '/test-file-context.' or fail
 
         # be jerks
         digislug = '\d+(?:\.\d+)*(?:-[a-z]+)+'

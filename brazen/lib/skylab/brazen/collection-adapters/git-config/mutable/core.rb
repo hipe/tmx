@@ -246,7 +246,7 @@ module Skylab::Brazen
         end
 
         def _to_node_stream_via_symbol sym
-          _to_node_streamish Common_::Stream.stream_class, sym
+          _to_node_streamish Common_::Stream, sym
 
         end
 

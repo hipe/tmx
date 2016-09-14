@@ -96,7 +96,7 @@ module Skylab::DocTest::TestSupport
 
           a = _array
           a.fetch(1).test_path_is_real || fail
-          a.length == 2 || fail
+          a.length == 3 || fail
         end
       end
     end

@@ -5,7 +5,8 @@ module Skylab::DocTest
       PARAMETERS = Attributes_.call(
         output_adapter: nil,
         asset_line_stream: nil,
-        original_test_line_stream: :optional,
+        original_test_path: :optional,  # used only for [#010]:C
+        original_test_line_stream: :optional,  # separate concern from above
       )
       attr_writer( * PARAMETERS.symbols )
 
@@ -18,6 +19,7 @@ module Skylab::DocTest
       def initialize & p
         @on_event_selectively = p
         @original_test_line_stream = nil
+        @original_test_path = nil
       end
 
       def __finish_prototype_for_recurse sym
@@ -50,10 +52,23 @@ module Skylab::DocTest
         o.asset_line_stream = @asset_line_stream
         o.choices = @_choices
         o.original_test_line_stream = @original_test_line_stream
-        o.test_file_context_proc = :_no_tfc_3_
+
+        o.test_file_context_proc = -> do
+          @___TFC ||= __some_test_file_context
+        end
 
         _document = o.to_test_document
         _document.to_line_stream
+      end
+
+      def __some_test_file_context
+
+        otp = @original_test_path
+        if otp
+          Home_::Models_::TestFileContext.via_path otp
+        else
+          Home_::Models_::TestFileContext.default_instance__
+        end
       end
 
       def __init_original_line_stream_if_necessary

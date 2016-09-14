@@ -64,9 +64,9 @@ module Skylab::DocTest::TestSupport
 
         o.blank_line_then %r(\Amodule YourModuleHere\b)
 
-        o.blank_line_then %r(\A  TS_\[ self \])
-
         o.blank_line_then %r(\A  describe "[^"]+" do\n\z)
+
+        # o.blank_line_then %r(\A  TS_\[ self \])  # you would want it wouldn't you #open [#032]
 
         _info = scan_all_examples_ o
 

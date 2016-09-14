@@ -18,10 +18,6 @@ module Skylab::Common
         Stream_::Actors_::Order[ st ]
       end
 
-      def stream_class
-        self
-      end
-
       def via_item x, & p
         p_ = -> do
           p_ = EMPTY_P_

@@ -32,3 +32,13 @@ appropriate for that solution (to the extent that etc).
   • the subject *WILL TYPICALLY* provide a collection of "services"
     (methods) for an implementing "particular paraphernalia" to draw
     on in its implementation.
+
+
+## notes
+
+### :#note-1
+
+we are hacking the parse of the assignment operator because to do it
+correctly with regex is difficult..
+
+

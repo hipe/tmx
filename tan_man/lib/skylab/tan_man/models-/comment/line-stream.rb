@@ -122,7 +122,7 @@ module Skylab::TanMan
         BLANK_LINES_RX__ = /([ \t]*\r?\n)+/
       end
 
-      class Stream__ < Common_::Stream.stream_class
+      class Stream__ < Common_::Stream
 
         def initialize scn=nil, & p
           @last_start_position = @last_end_position = nil

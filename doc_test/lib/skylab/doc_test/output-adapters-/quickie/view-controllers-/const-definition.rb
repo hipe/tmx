@@ -54,8 +54,8 @@ module Skylab::DocTest
       end
 
       def __init_localizing_prefix
-        _ = @_test_file_context.short_hopefully_unique_stem__
-        @_localizing_prefix = "X_#{ _ }_"
+        _ = @_test_file_context.short_hopefully_unique_stem
+        @_localizing_prefix = "X_#{ _ }_"  # is [#010]:C
         NIL
       end
 

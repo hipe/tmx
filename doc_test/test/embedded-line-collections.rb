@@ -94,7 +94,7 @@ module Skylab::DocTest::TestSupport
         if ! md
           fail TS_._REGEX_SANITY
         end
-        tfc = StubTestFileContext___.new md[ :pretend_path ]
+        tfc = Home_::Models_::TestFileContext.via_path md[ :pretend_path ]
 
         _node_stream_via line_st, -> { tfc }
       end
@@ -333,48 +333,6 @@ module Skylab::DocTest::TestSupport
       BLANK_RX_ = Home_::BLANK_RX_
       COLON_RX___ = /:$/
       INDENTED_RX__ = /\A[\t ]+(?=[^[:space:]])/
-    end
-
-    # ==
-
-    class StubTestFileContext___
-
-      # experiment - made just for tests, to refine our (as yet unintegrated)
-      # API on the "recurse" side to work with this - take a path like:
-      #
-      #   "test/1-abc-def/ghi-jkl_speg.kode"
-      #
-      # and produce a stem like this:
-      #
-      #   "ad_gj"
-      #
-      # which is the first "letter" of every "word" where etc (three things)
-
-      def initialize local_path
-
-        _String = Home_.lib_.basic::String
-
-        st = _String.line_stream local_path, ::File::SEPARATOR
-
-        _test = st.gets
-        'test' == _test || fail
-
-        crazy_rx = /\A(\d+-)?(?<stem>[^_]+)/
-
-        _ = st.join_into_with_using_by "", UNDERSCORE_, :concat do |entry|
-
-          _stem = crazy_rx.match( entry )[ :stem ]
-          _initials = _stem.split( DASH_ ).reduce "" do |m, s|
-            m.concat s[0]
-          end
-        end
-
-        @short_hopefully_unique_stem__ = _
-      end
-
-      attr_reader(
-        :short_hopefully_unique_stem__,
-      )
     end
 
     # ==

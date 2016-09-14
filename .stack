@@ -46,3 +46,5 @@ module as subject -
 
 challenge mode -
 ./basic/lib/skylab/basic/module/accessors.rb  "you solve this you solve a lot"
+maybe add single lines of whitepace afte test and see if it takes in syncing
+this synchronizing bug with nodes - no problem!

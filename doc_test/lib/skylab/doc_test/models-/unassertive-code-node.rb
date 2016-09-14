@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class Models_::UnassertiveCodeNode # #[#025]
+  class Models_::UnassertiveCodeNode  # notes in #[#025]
 
     class << self
 
@@ -153,15 +153,16 @@ module Skylab::DocTest
         (?:
           (?: module | class ) [ ] (?<const> #{ const_rxs } )
         |
-          (?<const> #{ const_rxs } )[ \t]*=\b
+          (?<const> #{ const_rxs } )[ \t]*=[^=>]
         )
       /x
+      # #note-1
 
       def __line_looks_like_assignment_line
         _match ASSIGNMENT_RX___
       end
 
-      ASSIGNMENT_RX___ = /\G(?<lvar>[_a-z][_a-zA-Z0-9]*)[ \t]*=[\t ]*/
+      ASSIGNMENT_RX___ = /\G(?<lvar>[_a-z][_a-zA-Z0-9]*)[ \t]*=[^=>]/ # #note-1
 
       def _match rx
         @_matchdata = rx.match @_line.string, @_line.content_begin
