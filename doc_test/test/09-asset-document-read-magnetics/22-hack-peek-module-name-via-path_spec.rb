@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::DocTest::TestSupport
 
-  describe "[dt] magnetics - hack peek [..]" do
+  describe "[dt] [..] hack peek module name via path" do
 
     TS_[ self ]
 
@@ -47,7 +47,8 @@ module Skylab::DocTest::TestSupport
         a.unshift :path  # duplicate its syntax sugar :/
       end
       a.push :filesystem, ::File  # always use the real filesystem
-      magnetics_module_::Hack_Peek_Module_Name_via_Path[ * a, & p ]
+      Home_::AssetDocumentReadMagnetics_::Hack_Peek_Module_Name_via_Path[ * a, & p ]
+
     end
   end
 end

@@ -1,12 +1,8 @@
 module Skylab::DocTest
 
-  module Models_::Document
+  module TestDocumentMutationMagnetics_::Insertion_via_NewNodes
 
-    class ErsatzParser
-
-      module NodeInsertion__
-
-        Empty = -> nodes do
+        Begin_insert_into_empty = -> nodes do
 
           idx = Index__.new nodes
           idx.work
@@ -28,7 +24,7 @@ module Skylab::DocTest
           o.finish
         end
 
-        After = -> after_this_eg, eg, nodes do
+        Insert_after = -> after_this_eg, eg, nodes do
 
           idx = Index__.new nodes
           idx.__will_search_for_this after_this_eg
@@ -108,7 +104,7 @@ module Skylab::DocTest
               redo
             end while nil
 
-            @result_nodes.push FreeformBranchFrame_.new( :example_node, eg, nodes )
+            @result_nodes.push ErsatzParser::FreeformBranchFrame.new :example_node, eg, nodes
 
             NIL_
           end
@@ -260,7 +256,9 @@ module Skylab::DocTest
         Blank_line_ = Lazy_.call do
           Line_.new NEWLINE_, :blank_line
         end
-      end
-    end
+
+        Line_ = ErsatzParser::Line
+
+
   end
 end

@@ -18,7 +18,7 @@ module Skylab::DocTest::TestSupport
       def run_array_via_regex_ rx
 
         _cb = __RUNS_exactly_one_comment_block_for rx
-        _st = magnetics_module_::RunStream_via_CommentBlock[ _cb ]
+        _st = Home_::AssetDocumentReadMagnetics_::RunStream_via_CommentBlock[ _cb ]
         _st.to_a
       end
 
@@ -26,7 +26,7 @@ module Skylab::DocTest::TestSupport
 
         cb = nil
         _line_st = _ELC_line_stream_after rx
-        st = magnetics_module_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
+        st = Home_::AssetDocumentReadMagnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
 
         begin
           blk = st.gets
@@ -98,7 +98,7 @@ module Skylab::DocTest::TestSupport
         -> line do
           m_r, c_r, l_r = _three line
           if c_r.size.zero?
-            _bl = Home_::Magnetics_::RunStream_via_CommentBlock::
+            _bl = Home_::AssetDocumentReadMagnetics_::RunStream_via_CommentBlock::
               Blank_Line___.via_offsets__ m_r, l_r, line
             run.accept_line_object _bl
           else
@@ -114,9 +114,9 @@ module Skylab::DocTest::TestSupport
 
       def _three line  # EEK
 
-        md = Home_::Magnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack::HACK_RX__.match line
+        md = Home_::AssetDocumentReadMagnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack::HACK_RX__.match line
 
-        lib = Home_::Magnetics_::RunStream_via_CommentBlock
+        lib = Home_::AssetDocumentReadMagnetics_::RunStream_via_CommentBlock
         md_ = lib::RX___.match line, md.offset( 0 ).last
 
         ( 1 .. 3 ).map do |d|

@@ -50,7 +50,7 @@ module Skylab::DocTest::TestSupport
 
       it "(every byte)" do
 
-        _a_st = magnetics_module_::LineStream_via_NodeStream[ Stream_[ _a ] ]
+        _a_st = Home_::AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ Stream_[ _a ] ]
 
         _e_st = _ELC_line_stream_after %r(\byou'll get\z)
         _ELC_close_if_necessary

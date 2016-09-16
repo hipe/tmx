@@ -20,7 +20,7 @@ module Skylab::DocTest
 
     def __init_via_line_stream line_st
 
-      block_st = Magnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ line_st ]
+      block_st = AssetDocumentReadMagnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ line_st ]
       begin
         block = block_st.gets
         block or break
@@ -62,7 +62,7 @@ module Skylab::DocTest
       a = []
       indexes_of_runs_with_magic = nil
 
-      st = Magnetics_::RunStream_via_CommentBlock[ cb ]
+      st = AssetDocumentReadMagnetics_::RunStream_via_CommentBlock[ cb ]
 
       begin
         run = st.gets

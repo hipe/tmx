@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class Magnetics_::Hack_Peek_Module_Name_via_Path  # introduction at [#006]
+  class AssetDocumentReadMagnetics_::Hack_Peek_Module_Name_via_Path  # introduction at [#006]
     # -
       Attributes_actor_.call( self,
         filesystem: nil,

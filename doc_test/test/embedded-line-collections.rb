@@ -111,7 +111,7 @@ module Skylab::DocTest::TestSupport
 
       def _node_stream_via _line_st, tfcp  # test file context proc
 
-        o = magnetics_module_
+        o = Home_::AssetDocumentReadMagnetics_
         _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_st ]
         _ns = o::NodeStream_via_BlockStream_and_Choices[ _bs, tfcp, real_default_choices_ ]
         # (wants [#ta-005])

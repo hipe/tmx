@@ -12,7 +12,7 @@ module Skylab::DocTest::TestSupport
     end
 
     it "given one business dir down below, finds counterpart dir" do
-      _against my_real_magnetics_directory_, my_real_test_directory_
+      _against some_real_magnetics_directory_, my_real_test_directory_
       _expect_same
     end
 

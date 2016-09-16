@@ -40,7 +40,7 @@ module Skylab::DocTest::TestSupport
       end
 
       def ersatz_lib_module_
-        Home_::Models_::Document::ErsatzParser
+        Home_::ErsatzParser
       end
     # -
 

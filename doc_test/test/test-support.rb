@@ -95,10 +95,6 @@ module Skylab::DocTest::TestSupport
       Home_::Models_
     end
 
-    def magnetics_module_
-      Home_::Magnetics_
-    end
-
     -> do
       cache = {}
       define_method :full_path_ do |tail_path|

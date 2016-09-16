@@ -47,7 +47,7 @@ module Skylab::DocTest
 
       def __synthesize_result_line_stream
 
-        o = Magnetics_::TestDoc_via_NodeStream_and_TestDoc_and_Choices::Session.begin
+        o = Home_::TestDocumentMutationMagnetics_::Plan_via_AssetNodes_and_TestDocumentIndex::Session.begin
 
         o.asset_line_stream = @asset_line_stream
         o.choices = @_choices

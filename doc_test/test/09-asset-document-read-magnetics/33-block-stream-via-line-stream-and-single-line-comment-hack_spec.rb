@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::DocTest::TestSupport
 
-  describe "[dt] magnetics - BS via LS and SLCH" do
+  describe "[dt] [..] block stream via line stream and single line commen hack" do
 
     TS_[ self ]
     use :embedded_line_collections
@@ -54,7 +54,7 @@ module Skylab::DocTest::TestSupport
 
     def _for rx
       _line_stream = _ELC_line_stream_after rx
-      @_stream = magnetics_module_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_stream ]
+      @_stream = Home_::AssetDocumentReadMagnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _line_stream ]
       NIL_
     end
 

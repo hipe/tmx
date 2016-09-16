@@ -1,10 +1,6 @@
 module Skylab::DocTest
 
-  module Models_::Document
-
-    class ErsatzParser
-
-      class LineStream_via_Node___ < Common_::Actor::Monadic
+  class TestDocumentReadMagnetics_::LineStream_via_BranchNode < Common_::Actor::Monadic
 
         # (as we've done many times before)
 
@@ -41,7 +37,5 @@ module Skylab::DocTest
             p[]
           end
         end
-      end
-    end
   end
 end

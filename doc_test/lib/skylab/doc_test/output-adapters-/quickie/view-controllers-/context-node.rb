@@ -36,7 +36,7 @@ module Skylab::DocTest
 
         _p_a = remove_instance_variable :@_particular_array
         _n_st = Common_::Stream.via_nonsparse_array _p_a
-        _body_line_st = Magnetics_::LineStream_via_NodeStream[ _n_st ]
+        _body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ _n_st ]
         _d_s = remove_instance_variable :@__description_bytes
 
         # --

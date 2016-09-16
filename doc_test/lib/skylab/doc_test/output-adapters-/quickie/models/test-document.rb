@@ -4,7 +4,15 @@ module Skylab::DocTest
 
     class Models::TestDocument
 
-      o = Home_::Models_::Document::ErsatzParser.begin
+      class << self
+
+        def via_line_stream st  # #testpoint-only
+
+          PARSER.parse_line_stream st
+        end
+      end  # >>
+
+      o = Home_::ErsatzParser.begin
 
       # given a line that opens a branch node, here is how
       # we match the line with the `end` keyword on it

@@ -67,7 +67,7 @@ module Skylab::DocTest::TestSupport
 
       def _build_session
 
-        o = Home_::Magnetics_::TestDoc_via_NodeStream_and_TestDoc_and_Choices::Session.begin
+        o = Home_::TestDocumentMutationMagnetics_::Plan_via_AssetNodes_and_TestDocumentIndex::Session.begin
         o.asset_line_stream = ::File.open @asset_path
         o.choices = @choices
         o.original_test_line_stream = ::File.open @original_test_path

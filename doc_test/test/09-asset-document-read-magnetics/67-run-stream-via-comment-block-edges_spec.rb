@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::DocTest::TestSupport
 
-  describe "[dt] magnetics - run stream via comment block (edges)" do
+  describe "[dt] [..] run stream via comment block (edges)" do
 
     TS_[ self ]
     use :memoizer_methods

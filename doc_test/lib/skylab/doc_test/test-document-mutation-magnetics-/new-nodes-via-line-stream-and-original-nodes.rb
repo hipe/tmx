@@ -1,10 +1,6 @@
 module Skylab::DocTest
 
-  module Models_::Document
-
-    class ErsatzParser
-
-      class NewNodes_via_LineStream_and_OriginalNodes
+  class TestDocumentMutationMagnetics_::NewNodes_via_LineStream_and_OriginalNodes
 
         # following the general design tenet of [#017] (but in a manner that
         # is experimental) we prefer to use "any" "formatting" in the test
@@ -82,9 +78,9 @@ module Skylab::DocTest
 
           begin
             _li = if BLANK_RX_ =~ s
-              Line_.new s, :blank_line
+              ErsatzParser::Line.new s, :blank_line
             else
-              Line_.new "#{ margin_ }#{ s }", :nonblank_line
+              ErsatzParser::Line.new "#{ margin_ }#{ s }", :nonblank_line
             end
             a.push _li
             s = st.gets
@@ -229,7 +225,5 @@ module Skylab::DocTest
             end
           end
         end
-      end
-    end
   end
 end

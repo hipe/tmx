@@ -95,19 +95,6 @@ module Skylab::DocTest
     end
   end
 
-  # ==
-
-  Common_ = ::Skylab::Common
-  Lazy_ = Common_::Lazy
-
-  Require_zerk_ = Lazy_.call do
-    Zerk_ = Home_.lib_.zerk
-    ACS_ = Home_.lib_.ACS
-    NIL_
-  end
-
-  # ==
-
   class << self
 
       def get_output_adapter_slug_array_
@@ -131,17 +118,26 @@ module Skylab::DocTest
 
   # --
 
+  Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
 
-  module RecursionMagnetics_
-    Autoloader_[ self ]
+  # -- branch modules (alpha)
+
+  o = -> const do
+    Autoloader_[ const_set const, ::Module.new ]
   end
 
-  module Magnetics_
-    Autoloader_[ self ]
-  end
+  o[ :AssetDocumentReadMagnetics_ ]
+  o[ :Models_ ]
+  o[ :Operations_ ]
+  o[ :OutputAdapters_ ]
+  o[ :RecursionMagnetics_ ]
+  o[ :RecursionModels_ ]
+  o[ :TestDocumentMutationMagnetics_ ]
+  o[ :TestDocumentReadMagnetics_ ]
 
-  # --
+  # -- functions
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
@@ -149,6 +145,12 @@ module Skylab::DocTest
 
   Attributes_ = -> h do
     Home_.lib_.fields::Attributes[ h ]
+  end
+
+  Require_zerk_ = Lazy_.call do
+    Zerk_ = Home_.lib_.zerk
+    ACS_ = Home_.lib_.ACS
+    NIL_
   end
 
   # --
@@ -182,18 +184,6 @@ module Skylab::DocTest
   end
 
   # --
-
-  module OutputAdapters_
-    Autoloader_[ self ]
-  end
-
-  module RecursionModels_
-    Autoloader_[ self ]
-  end
-
-  module Models_
-    Autoloader_[ self ]
-  end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   ACHIEVED_ = true

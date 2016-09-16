@@ -30,7 +30,7 @@ module Skylab::DocTest
       end
 
       def begin_insert_into_empty_document doc
-        Here_::Models::TestDocument::Insert_into_Empty_Document.new doc, self
+        Here_::DocumentWriteMagnetics_::Insert_into_Empty_Document.new doc, self
       end
 
       def test_document_parser

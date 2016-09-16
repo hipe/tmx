@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class Magnetics_::TestDoc_via_NodeStream_and_TestDoc_and_Choices
+  class TestDocumentMutationMagnetics_::Plan_via_AssetNodes_and_TestDocumentIndex  # 1x
 
     # exactly [#017]:the-forwards-synchronization-algorithm
 
@@ -51,7 +51,7 @@ module Skylab::DocTest
 
         # -- run through the magnetics & related (wants [#ta-005])
 
-        o = Magnetics_
+        o = AssetDocumentReadMagnetics_
         _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ in_st ]
         node_st = o::NodeStream_via_BlockStream_and_Choices[ _bs, tfcp, @choices ]
 

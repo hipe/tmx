@@ -1,10 +1,6 @@
 module Skylab::DocTest
 
-  module Models_::Document
-
-    class ErsatzParser
-
-      class BranchStream_via_Node___
+  class TestDocumentReadMagnetics_::BranchStream_via_BranchNode
 
         # the name, function and interface of this is in flux while things settle
 
@@ -79,8 +75,5 @@ module Skylab::DocTest
             :constituent_node_stream,
           )
         end
-      end
-    end
   end
 end
-# #pending-rename: probably

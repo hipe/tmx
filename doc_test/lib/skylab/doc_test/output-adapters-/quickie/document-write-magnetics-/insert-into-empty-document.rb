@@ -2,9 +2,7 @@ module Skylab::DocTest
 
   module OutputAdapters_::Quickie
 
-    class Models::TestDocument
-
-      class Insert_into_Empty_Document
+    class DocumentWriteMagnetics_::Insert_into_Empty_Document
 
         def initialize doc, cx
           @choices = cx
@@ -122,7 +120,6 @@ module Skylab::DocTest
         def __note_context
           @_context = @_branch
         end
-      end
     end
   end
 end

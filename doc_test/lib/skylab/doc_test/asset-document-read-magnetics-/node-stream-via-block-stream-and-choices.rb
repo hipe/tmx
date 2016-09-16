@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class Magnetics_::NodeStream_via_BlockStream_and_Choices
+  class AssetDocumentReadMagnetics_::NodeStream_via_BlockStream_and_Choices
 
     # see [#024] node theory
 
@@ -108,7 +108,7 @@ module Skylab::DocTest
 
     def __thoroughly_index_comment_block cb
 
-      st = Magnetics_::RunStream_via_CommentBlock[ cb ]
+      st = AssetDocumentReadMagnetics_::RunStream_via_CommentBlock[ cb ]
       pairs = nil
 
       run = st.gets

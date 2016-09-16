@@ -95,7 +95,7 @@ module Skylab::DocTest::TestSupport
 
         shared_subject :_details do
 
-          _asset_path = "#{ my_real_magnetics_directory_ }/jimbie-joobie--.rb"
+          _asset_path = "#{ some_real_magnetics_directory_ }/jimbie-joobie--.rb"
             # use a real-looking extension here because etc.; #path
 
           _ind = _index
@@ -109,7 +109,7 @@ module Skylab::DocTest::TestSupport
         it "uses the real directory" do
           _abs = _details.to_path
           _act = Safe_localize_[ _abs, my_real_test_directory_ ]
-          _act == "3-magnetics/jimbie-joobie_spec.rb" || fail
+          _act == "47-recursion-magnetics/jimbie-joobie_spec.rb" || fail
         end
       end
 

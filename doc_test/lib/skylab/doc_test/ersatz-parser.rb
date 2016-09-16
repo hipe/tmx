@@ -1,8 +1,6 @@
 module Skylab::DocTest
 
-  module Models_::Document
-
-    class ErsatzParser
+  class ErsatzParser
 
       # (try to generalize the dark hack of [#sy-034].)
       #
@@ -259,7 +257,7 @@ module Skylab::DocTest
         # -- mutators
 
         def begin_insert_into_empty_branch_session
-          Here_::NodeInsertion__::Empty[ @nodes ]
+          Home_::TestDocumentMutationMagnetics_::Insertion_via_NewNodes::Begin_insert_into_empty[ @nodes ]
         end
 
         def replace__ a  # freezes
@@ -269,7 +267,7 @@ module Skylab::DocTest
         # -- readers
 
         def to_line_stream
-          Here_::LineStream_via_Node___[ self ]
+          Home_::TestDocumentReadMagnetics_::LineStream_via_BranchNode[ self ]
         end
 
         def first_qualified_example_node_with_identifying_string s
@@ -304,7 +302,7 @@ module Skylab::DocTest
         end
 
         def _begin_branch_stream_session
-          Here_::BranchStream_via_Node___.begin_for__ self
+          Home_::TestDocumentReadMagnetics_::BranchStream_via_BranchNode.begin_for__ self
         end
 
         def to_constituent_node_stream
@@ -321,7 +319,7 @@ module Skylab::DocTest
         end
       end
 
-      class FreeformBranchFrame_ < BranchNode__
+      class FreeformBranchFrame < BranchNode__  # 1x
 
         def initialize sym, eg, nodes
           @category_symbol = sym
@@ -396,18 +394,18 @@ module Skylab::DocTest
         end
 
         def prepend_example eg
-          @nodes = Here_::NodeInsertion__::Prepend[ eg, @nodes ]
+          @nodes = Home_::TestDocumentMutationMagnetics_::Insertion_via_NewNodes::Prepend[ eg, @nodes ]
           NIL_
         end
 
         def insert_example_after after_this_eg, eg
-          @nodes = Here_::NodeInsertion__::After[ after_this_eg, eg, @nodes ]
+          @nodes = Home_::TestDocumentMutationMagnetics_::Insertion_via_NewNodes::Insert_after[ after_this_eg, eg, @nodes ]
           NIL_
         end
 
         def replace_lines line_st
 
-          o = Here_::NewNodes_via_LineStream_and_OriginalNodes.begin
+          o = Home_::TestDocumentMutationMagnetics_::NewNodes_via_LineStream_and_OriginalNodes.begin
           o.line_stream = line_st
           o.original_nodes = @nodes
           o.do_replace_constituent_lines = false
@@ -416,7 +414,7 @@ module Skylab::DocTest
 
         def replace_constituent_lines line_st
 
-          o = Here_::NewNodes_via_LineStream_and_OriginalNodes.begin
+          o = Home_::TestDocumentMutationMagnetics_::NewNodes_via_LineStream_and_OriginalNodes.begin
           o.line_stream = line_st
           o.original_nodes = @nodes
           o.do_replace_constituent_lines = true
@@ -482,7 +480,7 @@ module Skylab::DocTest
 
       # ==
 
-      class Line_
+      class Line
 
         def initialize s, sym
           @category_symbol = sym
@@ -510,8 +508,8 @@ module Skylab::DocTest
       end
 
       Here_ = self
+      Line_ = Line
       ParseError = ::Class.new ::RuntimeError
-    end
   end
 end
 # #tombstone: previous and next

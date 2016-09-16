@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::DocTest::TestSupport
 
-  describe "[dt] magnetics - node stream via block stream" do
+  describe "[dt] [..] node stream via block stream and choices" do
 
     # NOTE
     #   • if any of these fail, try falling back to the test file #file-1.
@@ -25,7 +25,7 @@ module Skylab::DocTest::TestSupport
 
       _ls = fi.line_stream_via_regex %r(\bcontains a snippet like this\z)
 
-      o = magnetics_module_
+      o = Home_::AssetDocumentReadMagnetics_
 
       _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _ls ]
 

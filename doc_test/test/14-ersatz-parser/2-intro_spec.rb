@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::DocTest::TestSupport
 
-  describe "[dt] models - document - ersatz parser" do
+  describe "[dt] ersatz parser - intro" do
 
     TS_[ self ]
     use :memoizer_methods

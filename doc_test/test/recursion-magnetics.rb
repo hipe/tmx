@@ -10,9 +10,9 @@ module Skylab::DocTest::TestSupport
       define_method :o, TestSupport_::DANGEROUS_MEMOIZE
     end  # >>
 
-    o :my_real_magnetics_directory_ do
+    o :some_real_magnetics_directory_ do
       # this is one that depends on the real filesystem
-      ::File.join my_real_counterpart_directory_, 'magnetics-'
+      ::File.join my_real_counterpart_directory_, 'recursion-magnetics-'
     end
 
     o :my_real_test_directory_ do
