@@ -1,5 +1,13 @@
 # essential operation pseudocode omnistory :[#017]
 
+## synopsis
+
+the actual algorithm is now in [#035]. this has become more history and
+context.
+
+
+
+
 ## objective & scope
 
 something we never did but should have done was this, the first step
@@ -44,7 +52,28 @@ these are the [parameter] functions that we are eliminating:
 every single one of these existed to tell the code generator to do
 something differently than would have been done otherwise. and without
 exception, every single one of them (as behavior) is obviated by the
-particular innovation of this version.
+particular innovation of this version (tentatively). as a sneak peek
+of how they are being eliminated (but it won't fully make sense here):
+
+  - branch down to core  - in "recurse", it should be that the software
+      will pick the right file. in "synchronize", it writes to stdout.
+
+  - chomp module - with synchornizing instead of generating this is N/A (A),
+      and (B) the convention of how we structure now produces files that
+      are more structurally consistent with each other (i.e now as opposed
+      to then, each test file is generally run from within the same module,
+      one such module per sidesystem, not one such module per test directory).
+
+  - eponymous const - no more need to derive these for the same reason as above.
+
+  - look for t.s - obviated by synchronization over generation.
+
+  - output filename - obviated for same reason as "branch down to core"
+
+  - setup for regret  - obviated by synchronization
+
+  - subject proc  - obviated by synchronization
+
 
 
 
@@ -79,74 +108,44 @@ document.
 
 in this rewrite what we are imagining is:
 
-  • less stream-oriented, more document oriented (see-1).
+  - less stream-oriented, more document oriented
 
-  • representation for two kinds of documents (asset and test).
+  - representation for two kinds of documents (asset and test).
 
-  • the representation has two features. one is that it is lossless.
+  - the representation has two features. one is that it is lossless.
 
-  • the other feature is that it is editable (in a particular way).
-
-
+  - the other feature is that it is editable (in a particular way).
 
 
-## stab at :the-forwards-synchronization-algorithm
 
-for a sense of how forwards synchronization is supposed to work,
-start with this example:
 
-    asset file              test file before
+## our approach to developing the #forwards-synchronization-algorithm
 
-          A                      D
-          B                      B
-          C                      E
+the full forwards synchronization algorithm is made up of pieces that we
+created/discovered iteratively, as we tried to apply our theory to our
+practice piece by piece.
 
-                             test file after
+here we will introduce each of these pieces one by one, and with each
+piece (which we my consider a "sub-algorithm") we first explore it in
+depth, demonstrating how it is useful to use; and then (where releveant)
+we will explore the shortcomings where our conceptual model doesn't quite
+fit every detail of our actual model.
 
-                                 A (added)
-                                 D (uninvolved)
-                                 B (modified)
-                                 C (added)
-                                 E (uninvolved)
+then in a subsequent section we will introduce a refinement (actually new
+sub-algorithm) and repeat the above steps for that, and so on until our
+conceptual model produces behavior that adequately satisfies our design
+factors.
 
-we can arrive at the above by these rules:
+finally, we synthesize the sub algorithms into our final algorithm.
 
-  • every single node from the source will
-    be written as-is into the destination.
+as it stands, each of these pieces and then the final synthesis all have
+their own dedicated documents. the pieces are:
 
-  • if the source exists in the destination (by name),
-    overwrite the content of that node what that of the
-    source. (we won't bother checking if the content is
-    the same, probably.) ((B) demonstrates this.)
-    (#coverpoint3-2)
+  1. the fine and dandy sub-algorithm [#033]
+  2. the tree-pruning sub-algorithm [#034]
+  3. [ maybe something about special anonymous nodes and shared setup nodes ]
 
-  • if it does not exist and it is the first item
-    in the source, prepend it to the destination document.
-    ((A) demonstrates this.)
-    (#coverpoint3-1)
-
-  • otherwise (and it does not exist and is not first),
-    place it immediately after the node that is above it
-    in the source (in the destination).
-    ((C) demonstrates this.)
-    (#coverpoint3-3)
-
-  • nodes that (by name) exist in the destination that
-    do not exist in the source will remain in the destination.
-    ((D) and (E) demonstrate this.)
-    (#coverpoint3-4)
-
-some characteristics of this set of rules are:
-
-   • the only way that forwards synchronization takes away
-     information is when a (B) case overwrites what is in
-     the destination. otherwise information is only ever added
-     to the destination.
-
-   • whenever you change the "name" (actually description)
-     in either the source or destination, the connection between
-     these two nodes is broken and when you sync you may end up
-     with duplicate content under different names.
+we synthesize all of them here: [#035]
 
 
 

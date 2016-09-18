@@ -1,3 +1,11 @@
+[#036]       [reserved for now, in-situ]
+
+[#035]       synthesis ..
+
+[#034]       [ this other sub-algorithm ] ..
+
+[#033]       the fine and dancy sub-alogrithm ..
+
 [#032] #minor when we had this item in the template, it got push to
              the end and didn't stay at the top of the node (in situ)
 

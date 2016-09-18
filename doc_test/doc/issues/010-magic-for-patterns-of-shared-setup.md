@@ -85,6 +85,7 @@ the former are covered by our older sibling document, and the latter work
 like this:
 
 EDIT (see this commit message for notes)
+(the above is probably commit 23/R)
 
 
 
