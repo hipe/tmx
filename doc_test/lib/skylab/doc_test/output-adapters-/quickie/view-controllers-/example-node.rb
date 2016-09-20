@@ -118,6 +118,7 @@ module Skylab::DocTest
           p[]
         end
       end
+
       def identifying_string
         @_description_bytes_OK && @_identifying_string
       end
@@ -163,6 +164,10 @@ module Skylab::DocTest
         )
 
         t.flush_to_line_stream
+      end
+
+      def paraphernalia_category_symbol
+        :example_node
       end
     end
   end

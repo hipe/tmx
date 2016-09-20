@@ -2,6 +2,8 @@ module Skylab::DocTest
 
   module TestDocumentMutationMagnetics_::Insertion_via_NewNodes
 
+    # (ALL of this is in service of the "ersatz parser" mutator methods only.)
+
         Begin_insert_into_empty = -> nodes do
 
           idx = Index__.new nodes
@@ -10,7 +12,7 @@ module Skylab::DocTest
           Motifs__.new idx, nodes
         end
 
-        Prepend = -> eg, nodes do
+        Prepend_before_some_existing = -> eg, nodes do
 
           idx = Index__.new nodes
           idx.__record_between_first_and_second_example

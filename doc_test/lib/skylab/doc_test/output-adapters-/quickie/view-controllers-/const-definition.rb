@@ -93,6 +93,10 @@ module Skylab::DocTest
         end
         NIL
       end
+
+      def paraphernalia_category_symbol
+        :const_definition_shared_setup
+      end
     end
   end
 end

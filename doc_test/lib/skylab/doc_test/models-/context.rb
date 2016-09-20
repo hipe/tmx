@@ -42,7 +42,7 @@ module Skylab::DocTest
     end
 
     def paraphernalia_category_symbol
-      :context_node  # eew/meh
+      :context_node  # we're using the solution-specific name as the general name
     end
   end
 end

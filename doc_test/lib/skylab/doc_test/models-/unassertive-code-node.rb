@@ -20,6 +20,26 @@ module Skylab::DocTest
       @_choices.particular_paraphernalia_for( self ).to_line_stream
     end
 
+    def paraphernalia_category_symbol
+      @__paraphernalia_category_symbol ||= __calculate_type_symbol
+    end
+
+    def __calculate_type_symbol
+      @_do_index_features && _index_features
+      if @starts_with_what_looks_like_a_constant_assignment
+        if @has_what_looks_like_a_variable_assignment
+          self._CONFUSED_ABOUT_WHAT_TYPE_OF_SHARED_SETUP_THIS_IS
+        else
+          :const_definition_shared_setup
+        end
+      elsif @has_what_looks_like_a_variable_assignment
+        :shared_subject_shared_setup
+      else
+        self._WHAT_DO_WE_DO_WITH_CODE_RUNS_WITH_NO_MAGIC
+      end
+      # this is simlar to #spot-5 - we might abstract
+    end
+
     def starts_with_what_looks_like_a_constant_assignment
       @_do_index_features && _index_features
       @starts_with_what_looks_like_a_constant_assignment
@@ -61,11 +81,11 @@ module Skylab::DocTest
     end
 
     def _feature_index
-      @___feature_index ||=  UnassertiveIndex___.new @_code_run
+      @_feature_index ||= UnassertiveIndex___.new @_code_run
     end
 
     def feature_index__  # as an assertion
-      @___feature_index
+      @_feature_index
     end
 
     attr_reader(

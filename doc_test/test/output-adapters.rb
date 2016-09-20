@@ -5,7 +5,6 @@ module Skylab::DocTest::TestSupport
     module Quickie
 
       def self.[] tcc
-        tcc.include Here_
         tcc.include self
       end
 
@@ -23,6 +22,14 @@ module Skylab::DocTest::TestSupport
           Simple_chunker__[].for big_s
         end
 
+        def begin_forwards_synchronization_session_for_tests_
+          this_magnetic_just_for_tests_.new
+        end
+
+        def this_magnetic_just_for_tests_
+          ForwardsSyncSession___
+        end
+
       # -
 
       # ==
@@ -35,21 +42,9 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    # -
-
-      def begin_forwards_synchronization_session_for_tests_
-        forwards_synchronization_magnetic_module_
-      end
-
-      def forwards_synchronization_magnetic_module_
-        ForwardsSyncSession___.new
-      end
-
-    # -
-
     # ==
 
-    class ForwardsSyncSession___
+    class ForwardsSyncSession___  # why this exists: [#029] #note-6
 
       attr_writer(
         :asset_path,
@@ -57,22 +52,22 @@ module Skylab::DocTest::TestSupport
         :original_test_path,
       )
 
-      def to_string
-        _build_session.to_string
+      def to_string__
+        to_line_stream.reduce_into_by "" do |m, s|
+          m << s
+        end
       end
 
       def to_line_stream
-        _build_session.to_test_document.to_line_stream
+        o = self.class.operation_.new
+        o.asset_line_stream = ::File.open @asset_path
+        o.instance_variable_set :@choices, @choices
+        o.original_test_line_stream = ::File.open @original_test_path
+        o.to_line_stream
       end
 
-      def _build_session
-
-        o = Home_::TestDocumentMutationMagnetics_::Plan_via_AssetNodes_and_TestDocumentIndex::Session.begin
-        o.asset_line_stream = ::File.open @asset_path
-        o.choices = @choices
-        o.original_test_line_stream = ::File.open @original_test_path
-        o.test_file_context_proc = -> { :_no_tfc_4_ }
-        o.finish
+      def self.operation_
+        Home_::Operations_::Synchronize
       end
     end
 

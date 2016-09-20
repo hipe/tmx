@@ -15,7 +15,7 @@ module Skylab::DocTest
       end
 
       def identifying_string
-        @__description_string  # 5x
+        @identifying_string  # 5x
       end
 
       #   - our own line stream will be the output of our template,
@@ -34,8 +34,7 @@ module Skylab::DocTest
 
       def to_line_stream
 
-        _p_a = remove_instance_variable :@_particular_array
-        _n_st = Common_::Stream.via_nonsparse_array _p_a
+        _n_st = to_particular_paraphernalia_stream
         _body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ _n_st ]
         _d_s = remove_instance_variable :@__description_bytes
 
@@ -48,6 +47,10 @@ module Skylab::DocTest
         t.set_multiline_template_variable _body_line_st, :context_body
 
         t.flush_to_line_stream
+      end
+
+      def to_particular_paraphernalia_stream
+        Common_::Stream.via_nonsparse_array @_particular_array
       end
 
         # here is at least one reason why we must peek the stream, and some
@@ -129,7 +132,7 @@ module Skylab::DocTest
         o.use_first_nonblank_line!
         o.remove_any_trailing_colons_or_commas!
         s = o.finish
-        @__description_string = s
+        @identifying_string = s
         @__description_bytes = s.inspect  # hm..
         NIL
       end
@@ -152,6 +155,8 @@ module Skylab::DocTest
           self._SHOULD_FAIL_see_me  # let's say that an unassertive block
           # must employ features, so its means of expression is clear.
         end
+
+        # (we're calling this :#spot-5 - similiar elsewhere, might abstract)
         NIL
       end
 
@@ -190,6 +195,10 @@ module Skylab::DocTest
 
       def _accept common
         @_particular_array.push common ; nil
+      end
+
+      def paraphernalia_category_symbol
+        :context_node
       end
 
       # === [#010]:B

@@ -69,7 +69,10 @@ module Skylab::DocTest
           end
           @current_line = x
         else
-          remove_instance_variable :@line_stream
+          io = remove_instance_variable :@line_stream
+          if io.respond_to? :close
+            io.close
+          end
           @has_current_line = false
           @current_line_has_comment = false
           @current_line = nil

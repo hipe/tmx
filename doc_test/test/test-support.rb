@@ -220,7 +220,7 @@ module Skylab::DocTest::TestSupport
 
   Home_ = ::Skylab::DocTest
 
-  EMPTY_A_ = []
+  EMPTY_A_ = Home_::EMPTY_A_
   DocTest = Home_  # only for generated tests, find it via (?!<::)DocTest\b
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_

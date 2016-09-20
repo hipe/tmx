@@ -18,7 +18,7 @@ module Skylab::DocTest
           __index_every_branch_node_finding_the_last_deepest_one
           send @_init_receiving_branch
           __into_receiving_branch_insert
-          self
+          NIL # might change
         end
 
         def __into_receiving_branch_insert

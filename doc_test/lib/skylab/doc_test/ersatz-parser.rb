@@ -305,8 +305,22 @@ module Skylab::DocTest
           Home_::TestDocumentReadMagnetics_::BranchStream_via_BranchNode.begin_for__ self
         end
 
-        def to_constituent_node_stream
+        def first_via_category_symbol sym
+          st = to_immediate_child_node_stream
+          begin
+            no = st.gets
+            no || break
+            sym == no.category_symbol ? break : redo
+          end while above
+          no
+        end
+
+        def to_immediate_child_node_stream
           Common_::Stream.via_nonsparse_array @nodes
+        end
+
+        def to_immediate_child_scanner
+          Common_::Polymorphic_Stream.via_array @nodes
         end
 
         attr_reader(
@@ -393,12 +407,12 @@ module Skylab::DocTest
           choices.begin_insert_into_empty_document self
         end
 
-        def prepend_example eg
-          @nodes = Home_::TestDocumentMutationMagnetics_::Insertion_via_NewNodes::Prepend[ eg, @nodes ]
+        def prepend_example_before_some_existing_examples__ eg
+          @nodes = Home_::TestDocumentMutationMagnetics_::Insertion_via_NewNodes::Prepend_before_some_existing[ eg, @nodes ]
           NIL_
         end
 
-        def insert_example_after after_this_eg, eg
+        def insert_example_after__ after_this_eg, eg
           @nodes = Home_::TestDocumentMutationMagnetics_::Insertion_via_NewNodes::Insert_after[ after_this_eg, eg, @nodes ]
           NIL_
         end

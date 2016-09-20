@@ -144,3 +144,25 @@ scenarios it requires less code and executes faster. however care must be
 taken when developing this way that you are always able to restore the
 tree to its pristine state when an unexpected fatal error occurs before
 the test can restore it.
+
+
+
+
+## :#note-6
+
+we get a few things from this:
+
+  1. it used to be that this session called back to a magnetic. then
+     things changed and now it calls back to an operation. with this
+     wrapper as a layer of insulation, the tests don't need to know
+     the difference.
+
+  1. the subject API is a session interface where we can build up
+     our request progressively with simple `attr_writers`'s which
+     gives us a degree of flexibility and readability well-suited
+     to tests. although at writing it appears we could probably also
+     build our operation "request" in this manner, the subject
+     insulates us from having to make that assumption.
+
+  1. we are insulated from the details of particular shape changes
+     for the parameters that the operation's production API exposes.

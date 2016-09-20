@@ -9,19 +9,10 @@ module Skylab::DocTest::TestSupport
     use :fixture_files
     use :output_adapters_quickie
 
-    # about its placement: this test file exists squarely to test
-    # [#017]:#the-forwards-synchronization-algorithm, which is implemented
-    # as a magnetic. test files that test these topmost-level magnetics
-    # typically go in the magnetics test node, but this file is instead
-    # here because it integrates (and relies upon) so many other components
-    # (magnetic and non-magnetic alike). as such, it is both more clear from
-    # a conceptual standpoint and more valuable from a regression standpoint
-    # to place the file here. (also an imaginary "operations" node overlaps
-    # with the "API" node of tests.
-    # (assumes [#ts-001].C test numbering conventions.)
+    # (erased big comment TODO)
 
     it "loads" do
-      _subject_magnetic
+      this_magnetic_just_for_tests_.operation_
     end
 
     it "an output document (lines) is generated" do
@@ -112,11 +103,7 @@ module Skylab::DocTest::TestSupport
 
       o.original_test_path = path[ 'original.test.kode' ]
 
-      o.to_string
-    end
-
-    def _subject_magnetic
-      forwards_synchronization_magnetic_module_
+      o.to_string__
     end
   end
 end

@@ -33,8 +33,6 @@ module Skylab::DocTest
         md[ :const ]
       end
 
-      # --
-
       identifying_string_via_quoted_string = -> md do
         # (hi.)
         Home_::Models_::String.unescape_quoted_string_literal_matchdata md
@@ -73,6 +71,39 @@ module Skylab::DocTest
         :context,
         & identifying_string_via_quoted_string
       )
+
+      o.add_branch_line_matcher(
+        %r(\A
+          (?<margin>[\t ]*)
+            before (?:
+              \( [\t ]* :(?<a_or_e>[a-zA-Z_]+) [ \t]* \) [ \t]*
+            |
+                 [\t ]* :(?<a_or_e>[a-zA-Z_]+)[ \t]+
+            |
+                 [\t ]+
+            )
+            do\b
+        )x,
+        :before,
+      ) do |md|
+        md[ :a_or_e ]
+      end
+
+      same = '[a-zA-Z_][a-z_A-Z0-9]*'
+      o.add_branch_line_matcher(
+        %r(\A
+          (?<margin>[\t ]*)
+            shared_subject(?:
+              \( [\t ]* :(?<var_name>#{ same }) [ \t]* \) [ \t]*
+            |
+                 [\t ]* :(?<var_name>#{ same })[ \t]+
+            )
+            do\b
+        )x,
+        :shared_subject,
+      ) do |md|
+        md[ :var_name ]
+      end
 
       PARSER = o.finish
     end

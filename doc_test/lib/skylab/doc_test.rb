@@ -190,6 +190,7 @@ module Skylab::DocTest
   BLANK_RX_ = /\A[[:space:]]*\z/
   CONST_SEP_ = '::'.freeze
   DocTest = :_fix_these_  # #todo
+  EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self

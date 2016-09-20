@@ -21,7 +21,7 @@ module Skylab::DocTest
 
           fr = Frame__.new @root_node
           @_stack = [ fr ]
-          st = fr.constituent_node_stream
+          st = fr.immediate_child_node_stream
 
           p = -> do
             begin
@@ -29,7 +29,7 @@ module Skylab::DocTest
               if o
                 if o.is_branch
                   fr = Frame__.new o
-                  st = fr.constituent_node_stream
+                  st = fr.immediate_child_node_stream
                   @_stack.push fr
                   break
                 end
@@ -40,7 +40,7 @@ module Skylab::DocTest
                 break
               end
               @_stack.pop
-              st = @_stack.fetch( -1 ).constituent_node_stream
+              st = @_stack.fetch( -1 ).immediate_child_node_stream
               redo
             end while nil
             o
@@ -67,12 +67,12 @@ module Skylab::DocTest
 
           def initialize branch
             @branch = branch
-            @constituent_node_stream = branch.to_constituent_node_stream
+            @immediate_child_node_stream = branch.to_immediate_child_node_stream
           end
 
           attr_reader(
             :branch,
-            :constituent_node_stream,
+            :immediate_child_node_stream,
           )
         end
   end

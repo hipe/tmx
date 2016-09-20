@@ -185,3 +185,42 @@ whew! so these three structures combined together we can call the
 "document synchronization plan".
 
   - apply both the tree and the queue to the destination document somehow.
+
+
+
+
+## :"code nodes"
+
+formulate a plan that when finished consists of these three components:
+
+  - "clobber queue" - example nodes to overwrite
+
+  - "dandy queue" - context nodes that exist on the right (by name)
+    composed of one or more nodes that don't yet exist on the right
+
+  - "creation tree" - context nodes and example nodes that do not
+    exist on the right.
+
+because our algorithm needs the identifying strings (context nodes,
+example nodes) to decide between a create and an update, and because
+only the particulars and not the abstracts know their identifying
+strings, and because those example nodes that are sibling to shared
+constant assignments must be constructed with special processing that
+is sensitive to which const assigments are sibling to and physically
+above them; we collapse the child nodes of context nodes into a stream
+of particulars almost immediately.
+
+there are some constraints that we can exploit on the "left" side that
+are not in place on the "right" side:
+
+  - in real life we can write `before :all` blocks immediately under
+    the `describe` block; however, through synchronization such
+    paraphernalia is only ever expressed as being under a context
+    (just because that's the way the syntax is).
+
+  - when (ersatz) parsing a test document, we have to anticipate that
+    there is an arbitrarily deep recursion of context nodes inside
+    context nodes. however, on the "left side" the maximum depth that
+    occurs is fixed: we cannot express contexts inside contexts in our
+    asset documents. however however, we may pretend we don't know
+    this for algorithmic simplicity.

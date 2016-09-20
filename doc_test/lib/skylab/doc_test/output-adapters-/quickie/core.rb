@@ -25,6 +25,35 @@ module Skylab::DocTest
 
       # --
 
+      def best_root_contextesque_node_for_test_document__ ersatz_test_document
+
+        # new in this commit (#here) we want the choices to decide what is
+        # the appropriate document branch node to use as the root-level
+        # branch node for the purpose of all document edits (near [#035]).
+        # at present it's a rough sketch, not smart enough to work for all
+        # test documents, just most of ours (probably).
+
+        # if you can find `[ module [ module [..]]] describe`, use that.
+        # otherwise use the root document
+
+        branch = ersatz_test_document
+        begin
+          branch_ = branch.first_via_category_symbol :module
+          if branch_
+            branch = branch_
+            redo
+          end
+          break
+        end while above
+
+        desc = branch.first_via_category_symbol :describe
+        if desc
+          desc
+        else
+          ersatz_test_document
+        end
+      end
+
       def some_original_test_line_stream
         ViewControllers_::Starter.new( self ).some_original_test_line_stream__
       end
@@ -80,3 +109,4 @@ module Skylab::DocTest
     Here_ = self
   end
 end
+# #history - #here

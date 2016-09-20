@@ -6,7 +6,7 @@ some test code 1
 
 module MyFakeTest
 
-  decribe "wazoo" do
+  describe "wazoo" do
 
     it "hi xyzzytftt3glzdk" do
       1.should eql 2

@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-    class Operations_::Synchronize
+  class Operations_::Synchronize
 
       PARAMETERS = Attributes_.call(
         output_adapter: nil,
@@ -16,11 +16,11 @@ module Skylab::DocTest
         end
       end  # >>
 
-      def initialize & p
-        @on_event_selectively = p
+    def initialize & p
+      @listener = p
         @original_test_line_stream = nil
         @original_test_path = nil
-      end
+    end
 
       def __finish_prototype_for_recurse sym
         self.output_adapter = sym
@@ -33,33 +33,53 @@ module Skylab::DocTest
         ok &&= to_line_stream
       end
 
-      def _prepare_common
-        ok = __resolve_output_adapter_module
-        ok && __init_choices
-        ok
-      end
+    def _prepare_common
+      ok = _ok :@_output_adapter_module, __output_adapter_module
+      ok && __init_choices_via_output_adapter_module
+      ok
+    end
 
-      def to_line_stream
-        ok = true
-        ok && __init_original_line_stream_if_necessary
-        ok && __synthesize_result_line_stream
-      end
+    def to_line_stream
+      __init_original_line_stream_if_necessary
+      # exactly [#035]
+      ok = true
+      ok &&= __resolve_test_document_via_original_test_line_stream
+      ok &&= __resolve_test_document_index_via_test_document
+      ok &&= __resolve_asset_nodes_via_asset_line_stream
+      ok &&= __resolve_plan_via_asset_nodes_and_test_document_index
+      ok &&= __resolve_modified_test_document_via_plan_and_test_document_index
+      ok && @__modified_test_document.to_line_stream
+    end
 
-      def __synthesize_result_line_stream
+    def __resolve_modified_test_document_via_plan_and_test_document_index
+      _plan = remove_instance_variable :@__plan
+      _tdi = remove_instance_variable :@test_document_index
+      _ = TestDocumentMutationMagnetics_::
+          TestDocument_via_Plan_and_TestDocumentIndex.new(
+        _plan, _tdi, @choices, & @listener ).execute
+      _ok :@__modified_test_document, _
+    end
 
-        o = Home_::TestDocumentMutationMagnetics_::Plan_via_AssetNodes_and_TestDocumentIndex::Session.begin
+    def __resolve_plan_via_asset_nodes_and_test_document_index
+      _st = remove_instance_variable :@__asset_nodes
+      _ = TestDocumentMutationMagnetics_::
+          Plan_via_AssetNodes_and_TestDocumentIndex.new(
+        _st, @test_document_index, & @listener ).execute
+      _ok :@__plan, _
+    end
 
-        o.asset_line_stream = @asset_line_stream
-        o.choices = @_choices
-        o.original_test_line_stream = @original_test_line_stream
+    def __resolve_asset_nodes_via_asset_line_stream
+      _tfcp = method :__test_file_context
+      _ = remove_instance_variable :@asset_line_stream
+      o = AssetDocumentReadMagnetics_  # (near [#ta-005])
+      _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _ ]
+      _ = o::NodeStream_via_BlockStream_and_Choices[ _bs, _tfcp, @choices ]
+      _ok :@__asset_nodes, _
+    end
 
-        o.test_file_context_proc = -> do
-          @___TFC ||= __some_test_file_context
-        end
-
-        _document = o.to_test_document
-        _document.to_line_stream
-      end
+    def __test_file_context
+      @__TFC ||= __some_test_file_context
+    end
 
       def __some_test_file_context
 
@@ -71,23 +91,45 @@ module Skylab::DocTest
         end
       end
 
-      def __init_original_line_stream_if_necessary
+    def __resolve_test_document_index_via_test_document
 
-        if ! @original_test_line_stream
-          @original_test_line_stream = @_choices.some_original_test_line_stream
-        end
-        NIL_
+      _test_doc = remove_instance_variable :@__test_document
+      _ = TestDocumentReadMagnetics_::
+          TestDocumentIndex_via_Choices_and_TestDocument.
+        new( _test_doc, @choices, & @listener ).execute
+      _ok :@test_document_index, _
+    end
+
+    def __resolve_test_document_via_original_test_line_stream
+
+      io = remove_instance_variable :@original_test_line_stream
+
+      test_doc = @choices.test_document_parser.parse_line_stream io
+
+      if io.respond_to? :close
+        io.close
       end
 
-      def __init_choices
+      _ok :@__test_document, test_doc  # probably always fine
+    end
+
+    def __init_original_line_stream_if_necessary
+
+      if ! @original_test_line_stream
+        @original_test_line_stream = @choices.some_original_test_line_stream
+      end
+      NIL
+    end
+
+    def __init_choices_via_output_adapter_module
 
         _OAM = remove_instance_variable :@_output_adapter_module
         cx = _OAM.begin_choices
         cx.init_default_choices
         # (etc something or other would go here)
-        @_choices = cx
-        NIL_
-      end
+      @choices = cx
+      NIL
+    end
 
       _hi = -> y do
 
@@ -99,20 +141,20 @@ module Skylab::DocTest
             y << "conjunction with help, more options may appear."
       end
 
-        def __resolve_output_adapter_module
-
-          mod = Autoloader_.const_reduce(
+    def __output_adapter_module
+      Autoloader_.const_reduce(
             [ @output_adapter ],  # nil ok
             Home_::OutputAdapters_,
-            & @on_event_selectively )
-
-          if mod
-            @_output_adapter_module = mod
-            ACHIEVED_
-          else
-            mod
-          end
-        end
+      & @listener )
     end
+
+    def _ok ivar, x
+      if x
+        instance_variable_set ivar, x ; ACHIEVED_
+      else
+        x
+      end
+    end
+  end
 end
 # #tombstone: lots of old code and compatible comment examples
