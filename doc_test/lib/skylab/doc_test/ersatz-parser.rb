@@ -130,7 +130,7 @@ module Skylab::DocTest
         # it opens a "branch" node. we pop when a line looks like it closes
         # that branch node (according to the branch node).
         #
-        #   • the logic is slighly different when in the root context
+        #   • the logic is slightly different when in the root context
         #     because we aren't scanning for an end token.
         #
         #   • the blank line check is an "optimization" - we assume that
@@ -278,7 +278,7 @@ module Skylab::DocTest
           end
         end
 
-        def first_example_node  # #testpoint-only
+        def first_example_node  # #testpoint-only, #todo too high here
 
           to_qualified_example_node_stream.gets.example_node
         end
@@ -305,14 +305,58 @@ module Skylab::DocTest
           Home_::TestDocumentReadMagnetics_::BranchStream_via_BranchNode.begin_for__ self
         end
 
+        def only_one * sym_a, & l
+          x = self
+          sym_a.length.times do |d|
+            x = x.__only_one_via_category_symbol sym_a.fetch d do |*i_a, &ev_p|
+              __maybe_contextualize_error d, sym_a, ev_p, i_a, l
+            end
+          end
+          x
+        end
+
+        def __maybe_contextualize_error d, sym_a, ev_p, i_a, l
+          l ||= -> *, & ev_p_ do
+            raise ev_p_[].to_exception
+          end
+          if d.zero?
+            l[ * i_a, & ev_p ]
+          else
+            l.call( * i_a ) do
+              _orig_em = ev_p[]
+              _e = _orig_em.to_exception
+              _e_ = _e.with_path sym_a[0..d]
+              _e_.to_wrapped_exception
+            end
+          end
+        end
+
+        def __only_one_via_category_symbol sym, & l
+
+          a = __all_via_category_symbol sym
+          if 1 == a.length
+            a.fetch 0
+          else
+            l.call :error, :exception, :failed_assumption do
+              _e = FailedAssumption.new [sym], "expected 1 had #{ a.length } node(s)"
+              _e.to_wrapped_exception
+            end
+            UNABLE_
+          end
+        end
+
         def first_via_category_symbol sym
-          st = to_immediate_child_node_stream
-          begin
-            no = st.gets
-            no || break
-            sym == no.category_symbol ? break : redo
-          end while above
-          no
+          _to_stream_of( sym ).gets
+        end
+
+        def __all_via_category_symbol sym
+          _to_stream_of( sym ).to_a
+        end
+
+        def _to_stream_of sym
+          to_immediate_child_node_stream.reduce_by do |no|
+            sym == no.category_symbol
+          end
         end
 
         def to_immediate_child_node_stream
@@ -520,6 +564,34 @@ module Skylab::DocTest
           false
         end
       end
+
+      # ==
+
+      class FailedAssumption < ::RuntimeError
+
+        def initialize sym_a, msg
+          @symbol_array = sym_a
+          @_message_stem = msg
+          super "#{ msg } for #{ sym_a.inspect }"
+        end
+
+        def with_path sym_a
+          self.class.new sym_a, @_message_stem
+        end
+
+        def to_wrapped_exception
+          WrappedException___.new self
+        end
+
+        attr_reader(
+          :symbol_array,
+        )
+      end
+
+      WrappedException___ = ::Struct.new :to_exception
+        # (future-proof ourselves the possibility of emitting events)
+
+      # ==
 
       Here_ = self
       Line_ = Line

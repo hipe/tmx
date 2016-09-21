@@ -38,7 +38,7 @@ module Skylab::DocTest
         abstract.to_particular_paraphernalia
       end
 
-      _ = Recurse__.into_for _st, self
+      _ = Recurse__.into_with_for _st, @test_document_index.branch_index, self
       _ok :@__plan_array, _
     end
 
@@ -82,12 +82,13 @@ module Skylab::DocTest
       # arguments. IFF soft fatal error, result will instead be false-ish.
 
       class << self
-        def into_for particular_stream, args
+        def into_with_for particular_stream, bi, args
           new(
             args.clobber_queue,
             args.dandy_queue,
             particular_stream,
             args.has_some_context_or_examples_boolean_reference,
+            bi,
             args.test_document_index,
             & args.listener
           ).execute
@@ -95,7 +96,8 @@ module Skylab::DocTest
         private :new
       end  # >>
 
-      def initialize cq, dq, ps, br, tdi, & l
+      def initialize cq, dq, ps, br, bi, tdi, & l
+        @branch_index = bi
         @clobber_queue = cq
         @dandy_queue = dq
         @has_some_context_or_examples_boolean_reference = br
@@ -178,7 +180,7 @@ module Skylab::DocTest
           eni = @test_document_index.lookup_via_identifying_string k
           if eni  # existing node index
             _left_is_branch = IS_BRANCH___.fetch no.paraphernalia_category_symbol
-            if eni.is_branch == _left_is_branch
+            if eni.is_of_branch == _left_is_branch
               [ ACHIEVED_, eni ]
             else
               self._COVER_ME_node_changed_shape_fun
@@ -202,12 +204,10 @@ module Skylab::DocTest
         # recurse. if empty, disregard. otherwise, add to the dandy tree.
         # remember that there are also side effects - the two queues
 
-        creation_branch = _recurse no
+        creation_branch = __recurse2 no, eni
         if creation_branch
           if creation_branch.length.nonzero?
-            self._xx
-            _bp = BranchPlan___.new creation_branch, eni
-            ( @_creation_branch ||= [] ).push _bp
+            _add  BranchPlan___.new( creation_branch, eni )
           end
           ACHIEVED_
         else
@@ -246,17 +246,17 @@ module Skylab::DocTest
         end
 
         @_previous_item_plan = plan
-        ( @_creation_branch ||= [] ).push plan
+        _add plan
         ACHIEVED_
       end
 
-      def _recurse no
+      def __recurse2 no, branch_index
 
         # a context node *is* a branch node (the only kind we recognize here)
 
         _parti_st = no.to_particular_paraphernalia_stream
 
-        self.class.into_for _parti_st, self
+        self.class.into_with_for _parti_st, branch_index, self
       end
 
       def __process_const_definition_shared_setup no
@@ -270,10 +270,26 @@ module Skylab::DocTest
 
       def __do_process_const_definition_shared_setup no
 
-        plan = TouchConstDefinition___.new no, @_previous_item_plan
-        plan = @_previous_item_plan
-        ( @_creation_branch || [] ).push plan
+        # this algorithm is composed (perhaps solely) of conceptual elements
+        # found elsewhere, but in a composition that is unique to this case:
+        # because at any branch node there can only be one (for now),
+        # *at this branch node* if there's *any* existing one, replace it.
+        # otherwise we'll place it after any most recently noted node, or
+        # otherwise prepend.
+        # (also, this must be moved to the choices)
+
+        plan = if @branch_index.has_before_all
+          ReplaceConstDefinition___.new no, @branch_index.before_all_block
+        else
+          InsertConstDefinitionAfterNode__.new no, @_previous_item_plan
+        end
+        @_previous_item_plan = plan
+        _add plan
         ACHIEVED_
+      end
+
+      def _add plan
+        ( @_creation_branch ||= [] ).push plan ; nil
       end
 
       attr_reader(
@@ -301,15 +317,29 @@ module Skylab::DocTest
     class BranchPlan___
 
       def initialize a, eni
-        self._NEEDS_MORE_probably
-        @_a = a
-        @_existing_node_index = eni
+        @existing_node_index = eni
+        @plan_array = a
+      end
+
+      attr_reader(
+        :existing_node_index,
+        :plan_array,
+      )
+
+      def plan_type
+        :branch
       end
     end
 
-    TouchConstDefinition___ = ::Struct.new :new_node, :previous_item_plan do
+    ReplaceConstDefinition___ = ::Struct.new :new_node, :existing_node do
       def plan_type
-        :touch_const_definition
+        :replace_const_definition
+      end
+    end
+
+    InsertConstDefinitionAfterNode__ = ::Struct.new :new_node, :previous_item_plan do
+      def plan_type
+        :insert_const_definition_after_node
       end
     end
 

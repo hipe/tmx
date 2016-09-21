@@ -86,7 +86,10 @@ module Skylab::DocTest
       end
 
       def __finish
-        BranchIndex___.new @_seen_a_before_all_block, @_node_indexes_of_interest
+        if @_seen_a_before_all_block
+          _bab = @__before_all_block
+        end
+        BranchIndex___.new _bab, @_node_indexes_of_interest, @_branch_docnode
       end
 
       def __index
@@ -130,6 +133,7 @@ module Skylab::DocTest
           self._COVER_ME_fail_softly
         else
           @_seen_a_before_all_block = true
+          @__before_all_block = no
           @_node_indexes_of_interest.push :_placeholder_for_before_all
           ACHIEVED_
         end
@@ -137,19 +141,36 @@ module Skylab::DocTest
 
       def __index_a_context_node no
 
-        _ni = Existing_context_node_index___[].dup_by do |o|
+        # we exploit the universal name index for two (perhaps somewhat at
+        # odds) purposes: 1) when the indexing is all done, we use it to
+        # reference nodes of interest by name. 2) *during* the indexing, we
+        # want to use it to detect name collisions.
+        #
+        # when we are recursing into a branch node, we want to be able to
+        # detect name collisions even against the name of any branch we are
+        # inside. but the branch index isn't complete until we return from
+        # the recurse. so we use a placeholder :/
+
+        tmp = TemporaryBranchNodeIndex___.new do |o|
           o.existing_child_document_node = no
-          o.existing_parent_document_node = @_branch_docnode
         end
 
-        ok = _add_to_universal_name_index _ni
-        ok &&= _recurse no
+        ok = _add_to_universal_name_index tmp
+        if ok
+          bi = self.class.into_for no, self  # recurse
+          if bi
+            @_node_indexes_of_interest.push bi
+            @_universal_name_box.replace tmp.identifying_string, bi
+          else
+            ok = bi
+          end
+        end
         ok
       end
 
       def __index_an_example_node no
 
-        _ni = Existing_example_node_index__[].dup_by do |o|
+        _ni = ExistingExampleNodeIndex___.new do |o|
           o.existing_child_document_node = no
           o.existing_parent_document_node = @_branch_docnode
         end
@@ -174,17 +195,6 @@ module Skylab::DocTest
         ACHIEVED_  # reserved for if we ever soft-fail on name collisions
       end
 
-      def _recurse no
-
-        bi = self.class.into_for no, self
-        if bi
-          @_node_indexes_of_interest.push bi
-          ACHIEVED_
-        else
-          bi
-        end
-      end
-
       attr_reader(
         :listener,
         :_universal_name_box,
@@ -195,42 +205,34 @@ module Skylab::DocTest
 
     class BranchIndex___
 
-      def initialize _1, _2
-        @has_before_all = _1
-        @node_indexes_of_interest = _2
+      def initialize bab, nioi, dn
+        if bab
+          @has_before_all = true
+          @before_all_block = bab
+        end
+        @existing_document_node = dn
+        @node_indexes_of_interest = nioi
       end
 
       attr_reader(
+        :existing_document_node,
+        :before_all_block,
         :has_before_all,
         :node_indexes_of_interest,
       )
+
+      def is_of_branch
+        true
+      end
     end
 
     # ==
 
-    Existing_context_node_index___ = Lazy_.call do
-      ExistingNodeIndex__.instance.dup_by do |o|
-        o.is_branch = true
-      end
-    end
-
-    Existing_example_node_index__ = Lazy_.call do
-      ExistingNodeIndex__.instance.dup_by do |o|
-        o.is_branch = false
-      end
-    end
-
     class ExistingNodeIndex__
 
-      class << self
-        attr_reader :instance
-        private :new
-      end  # >>
-
-      def dup_by
-        o = dup
-        yield o
-        o.freeze
+      def initialize
+        yield self
+        freeze
       end
 
       def identifying_string
@@ -240,10 +242,19 @@ module Skylab::DocTest
       attr_accessor(
         :existing_child_document_node,
         :existing_parent_document_node,
-        :is_branch,
       )
+    end
 
-      @instance = new.freeze
+    class ExistingExampleNodeIndex___ < ExistingNodeIndex__
+      def is_of_branch
+        false
+      end
+    end
+
+    class TemporaryBranchNodeIndex___ < ExistingNodeIndex__
+      def is_of_branch
+        true
+      end
     end
   end
 end

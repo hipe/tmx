@@ -57,24 +57,40 @@ module Skylab::DocTest
 
     class Recurse__
 
-      def initialize dest, src, cx
+      def initialize dest, plan_a, cx
         @choices = cx
         @destination_branch = dest  # ersatz document branch node
-        @source_branch_array = src  # array of mixed nodes
+        @plan_array = plan_a
       end
 
       def execute
-        @source_branch_array.each do |node_plan|
+        @plan_array.each do |node_plan|
           send PLAN_TYPE___.fetch( node_plan.plan_type ), node_plan
         end
         NIL
       end
 
       PLAN_TYPE___ = {
+        branch: :__wahoo_branch,
         insert_example_after_node: :__insert_example_after_node,
         place_example_in_effectively_empty_document:
           :__place_example_in_effectively_empty_document,
+        replace_const_definition: :__replace_const_definition,
       }
+
+      def __wahoo_branch bp  # branch plan
+        Recurse__.new(
+          bp.existing_node_index.existing_document_node,
+          bp.plan_array,
+          @choices,
+        ).execute
+        NIL
+      end
+
+      def __replace_const_definition np  # node plan
+        np.existing_node.replace_lines np.new_node.to_line_stream
+        NIL
+      end
 
       def __place_example_in_effectively_empty_document node_plan
         o = @destination_branch.begin_insert_into_empty_document_given @choices
