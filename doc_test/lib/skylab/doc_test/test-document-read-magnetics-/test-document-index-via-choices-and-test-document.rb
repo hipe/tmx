@@ -45,7 +45,7 @@ module Skylab::DocTest
 
       def initialize unb, bi, rcn, td
         @branch_index = bi
-        @root_context_node = rcn
+        @existing_document_node = rcn
         @test_document = td
         @__universal_name_box = unb
       end
@@ -56,7 +56,7 @@ module Skylab::DocTest
 
       attr_reader(
         :branch_index,
-        :root_context_node,
+        :existing_document_node,
         :test_document,
       )
     end

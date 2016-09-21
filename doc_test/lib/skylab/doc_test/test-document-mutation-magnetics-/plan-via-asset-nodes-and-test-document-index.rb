@@ -18,11 +18,6 @@ module Skylab::DocTest
     end
 
     def __prepare
-      br = BooleanReference___.new
-      if @test_document_index.branch_index.node_indexes_of_interest.length.nonzero?
-        br.become_true
-      end
-      @has_some_context_or_examples_boolean_reference = br
       @clobber_queue = []
       @dandy_queue = []
       NIL
@@ -67,7 +62,6 @@ module Skylab::DocTest
     attr_reader(
       :clobber_queue,
       :dandy_queue,
-      :has_some_context_or_examples_boolean_reference,
       :listener,
       :test_document_index,
     )
@@ -77,7 +71,7 @@ module Skylab::DocTest
     class Recurse__
 
       # because it's algorithmically convenient, result is a possibly zero-
-      # length array representing the creation tree, whereas the other two
+      # length array representing the creation branch, whereas the other two
       # target structures (queues) are written to via mutate-in-place
       # arguments. IFF soft fatal error, result will instead be false-ish.
 
@@ -87,7 +81,6 @@ module Skylab::DocTest
             args.clobber_queue,
             args.dandy_queue,
             particular_stream,
-            args.has_some_context_or_examples_boolean_reference,
             bi,
             args.test_document_index,
             & args.listener
@@ -96,11 +89,15 @@ module Skylab::DocTest
         private :new
       end  # >>
 
-      def initialize cq, dq, ps, br, bi, tdi, & l
+      def initialize cq, dq, ps, bi, tdi, & l
+
+        @_has_some_content_of_interest = if bi
+          bi.node_indexes_of_interest.length.nonzero?
+        end
+
         @branch_index = bi
         @clobber_queue = cq
         @dandy_queue = dq
-        @has_some_context_or_examples_boolean_reference = br
         @listener = l
         @__particular_stream = ps
         @test_document_index = tdi
@@ -110,7 +107,7 @@ module Skylab::DocTest
 
         @_creation_branch = nil  # array
         @_did_see_const_definition = false
-        @_previous_item_plan = nil
+        @_previous_plan = nil
 
         ok = ACHIEVED_
         st = remove_instance_variable :@__particular_stream
@@ -118,8 +115,7 @@ module Skylab::DocTest
           no = st.gets
           no || break
           ok = send SHAPE___.fetch( no.paraphernalia_category_symbol ), no
-          ok || break
-          redo
+          ok ? redo : break
         end while above
         ok && __release_branch_result
       end
@@ -201,13 +197,15 @@ module Skylab::DocTest
 
       def __when_context_node_already_exists eni, no
 
-        # recurse. if empty, disregard. otherwise, add to the dandy tree.
+        # recurse. if empty, disregard. otherwise, add to the dandy queue.
         # remember that there are also side effects - the two queues
 
-        creation_branch = __recurse2 no, eni
+        creation_branch = _recurse2 no, eni
         if creation_branch
           if creation_branch.length.nonzero?
-            _add  BranchPlan___.new( creation_branch, eni )
+            plan = Plan__::Merge_context[ eni, creation_branch ]
+            @_previous_plan = plan
+            __add_to_dandy_queue plan
           end
           ACHIEVED_
         else
@@ -217,40 +215,57 @@ module Skylab::DocTest
 
       def __when_context_node_doesnt_already_exist no
 
-        ::Kernel._K_readme_fun_plainish_and_simplesque
-        # recurse. if empty, disregard. otherwise, add to creation tree.
-        ACHIEVED_
+        # recurse. if empty, disregard. otherwise, add to creation branch.
+
+        creation_branch = _recurse2 no
+        if creation_branch
+          if creation_branch.length.nonzero?
+            if @_has_some_content_of_interest
+              plan = Plan__::Insert_context[ no, creation_branch, @_previous_plan ]
+            else
+              plan = Plan__::Insert_context[ no, creation_branch, @_previous_plan ]
+              plan.become_first_content
+              @_has_some_content_of_interest = true
+            end
+            @_previous_plan = plan
+            _add_to_creation_branch plan
+          end
+          ACHIEVED_
+        else
+          creation_branch  # assume soft fatal
+        end
       end
 
       def __when_example_node_already_exists eni, no  # #coverpoint3-2
 
         # simply add to clobber queue. it's the only answer and the only way
 
-        plan = ReplaceExample___.new no, eni, @_previous_item_plan
-        @_previous_item_plan = plan
-        @clobber_queue.push plan
+        plan = Plan__::Replace_example[ no, eni, @_previous_plan ]
+        @_previous_plan = plan
+        __add_to_clobber_queue plan
         ACHIEVED_
       end
 
       def __when_example_node_doesnt_already_exist no
 
-        plan = if @has_some_context_or_examples_boolean_reference.value
+        if @_has_some_content_of_interest
 
           # #coverpoint3-1 - prepend this node before the first node in the doc
           # #coverpoint3-3 - place this node immediately after last inserted node
 
-          InsertExampleAfterNode___.new no, @_previous_item_plan
+          plan = Plan__::Insert_example[ no, @_previous_plan ]
         else
-          @has_some_context_or_examples_boolean_reference.become_true
-          PlaceExampleInEffectivelyEmptyDocument___.new no
+          @_has_some_content_of_interest = true
+          plan = Plan__::Insert_example[ no, @_previous_plan ]
+          plan.become_first_content
         end
 
-        @_previous_item_plan = plan
-        _add plan
+        @_previous_plan = plan
+        _add_to_creation_branch plan
         ACHIEVED_
       end
 
-      def __recurse2 no, branch_index
+      def _recurse2 no, branch_index=nil
 
         # a context node *is* a branch node (the only kind we recognize here)
 
@@ -278,24 +293,39 @@ module Skylab::DocTest
         # otherwise prepend.
         # (also, this must be moved to the choices)
 
-        plan = if @branch_index.has_before_all
-          ReplaceConstDefinition___.new no, @branch_index.before_all_block
+        bi = @branch_index
+        if bi
+          if bi.has_before_all
+            _do_replace = true
+          end
+        end  # (if no branch index then no branch ergo all items will be "create")
+
+        plan = if _do_replace
+          Plan__::Replace_const_def[ no, @branch_index.before_all_block ]
         else
-          InsertConstDefinitionAfterNode__.new no, @_previous_item_plan
+          Plan__::Insert_const_def[ no, @_previous_plan ]
         end
-        @_previous_item_plan = plan
-        _add plan
+
+        @_previous_plan = plan
+        _add_to_creation_branch plan
         ACHIEVED_
       end
 
-      def _add plan
+      def _add_to_creation_branch plan
         ( @_creation_branch ||= [] ).push plan ; nil
+      end
+
+      def __add_to_dandy_queue plan
+        @dandy_queue.push plan ; nil
+      end
+
+      def __add_to_clobber_queue plan
+        @clobber_queue.push plan ; nil
       end
 
       attr_reader(
         :clobber_queue,
         :dandy_queue,
-        :has_some_context_or_examples_boolean_reference,
         :listener,
         :node_stream,
         :test_document_index,
@@ -314,64 +344,88 @@ module Skylab::DocTest
 
     Plan___ = ::Struct.new :clobber_queue, :creation_tree, :dandy_queue
 
-    class BranchPlan___
+    module Plan__
 
-      def initialize a, eni
-        @existing_node_index = eni
-        @plan_array = a
+      Merge_context = -> eni, a do
+        o = NodePlan__.new
+        o.existing_node_index = eni
+        o.plan_array = a
+        o.node_shape = :context
+        o.plan_verb = :merge
+        o.finish
+      end
+
+      Insert_context = -> cn, a, pp do
+        o = NodePlan__.new
+        o.context_node = cn
+        o.plan_array = a
+        o.previous_plan = pp
+        o.node_shape = :context
+        o.plan_verb = :insert
+        o.finish
+      end
+
+      Replace_const_def = -> nn, en do
+        o = NodePlan__.new
+        o.existing_node = en
+        o.new_node = nn
+        o.node_shape = :const_definition
+        o.plan_verb = :replace
+        o.finish
+      end
+
+      Insert_const_def = -> nn, pp do
+        o = NodePlan__.new
+        o.previous_plan = pp
+        o.new_node = nn
+        o.node_shape = :const_definition
+        o.plan_verb = :insert
+        o.finish
+      end
+
+      Replace_example = -> nn, eni, pp do
+        o = NodePlan__.new
+        o.existing_node_index = eni
+        o.new_node = nn
+        o.previous_plan = pp
+        o.node_shape = :example
+        o.plan_verb = :replace
+        o.finish
+      end
+
+      Insert_example = -> nn, pp do
+        o = NodePlan__.new
+        o.new_node = nn
+        o.previous_plan = pp
+        o.node_shape = :example
+        o.plan_verb = :insert
+        o.finish
+      end
+    end
+
+    class NodePlan__
+
+      def finish
+        self
+      end
+
+      def become_first_content
+        @is_first_content = true
       end
 
       attr_reader(
-        :existing_node_index,
-        :plan_array,
+        :is_first_content,
       )
 
-      def plan_type
-        :branch
-      end
-    end
-
-    ReplaceConstDefinition___ = ::Struct.new :new_node, :existing_node do
-      def plan_type
-        :replace_const_definition
-      end
-    end
-
-    InsertConstDefinitionAfterNode__ = ::Struct.new :new_node, :previous_item_plan do
-      def plan_type
-        :insert_const_definition_after_node
-      end
-    end
-
-    ReplaceExample___ = ::Struct.new :new_node, :existing_node_index, :previous_item_plan do
-      def plan_type
-        :replace_example
-      end
-    end
-
-    InsertExampleAfterNode___ = ::Struct.new :new_node, :previous_item_plan do
-      def plan_type
-        :insert_example_after_node
-      end
-    end
-
-    PlaceExampleInEffectivelyEmptyDocument___ = ::Struct.new :new_node do
-      def plan_type
-        :place_example_in_effectively_empty_document
-      end
-    end
-
-    # ==
-
-    class BooleanReference___
-      def initialize
-        @value = false
-      end
-      def become_true
-        @value = true ; nil
-      end
-      attr_reader(
-        :value,
+      attr_accessor(
+        :context_node,
+        :existing_node,
+        :existing_node_index,
+        :new_node,
+        :node_shape,
+        :plan_array,
+        :plan_verb,
+        :previous_plan,
       )
     end
   end

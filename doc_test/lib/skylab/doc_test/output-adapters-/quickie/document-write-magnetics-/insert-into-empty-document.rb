@@ -10,7 +10,7 @@ module Skylab::DocTest
         end
 
         attr_writer(
-          :example_node,
+          :node_of_interest,
         )
 
         def finish
@@ -29,9 +29,9 @@ module Skylab::DocTest
 
           o.write_blank_line_if_necessary
 
-          o.write_new_example_node @example_node
+          o.write_new_node_of_interest @node_of_interest
 
-          o.write_from_the_reference_example_to_end  # closing line
+          o.write_from_the_reference_node_to_end  # closing line
 
           _nodes = o.finish
 

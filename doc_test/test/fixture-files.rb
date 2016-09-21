@@ -8,6 +8,10 @@ module Skylab::DocTest::TestSupport
 
     # -
 
+      def test_document_via_line_stream_ st  # (imperfect fit here, might move)
+        Home_::OutputAdapters_::Quickie::Models::TestDocument.via_line_stream st
+      end
+
       def the_noent_directory_
         TestSupport_::Fixtures.directory :not_here
       end

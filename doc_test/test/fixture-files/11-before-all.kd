@@ -1,0 +1,38 @@
+module Skorlorb::Berserk
+
+  module Merdule::Accerssers
+
+    # jumanji blumanji
+
+    # p2 line 1
+    # p2 line 2
+    # p2 line 3
+    #
+    # p3 only line (no see):
+    #
+    #     module MyApp
+    #       class MyClient
+    #
+    #       end
+    #     end
+    #
+    # no see
+    #
+    # shoopilie doopile:
+    #
+    #     module MyApp
+    #       def MyClient.xx
+    #         :yy
+    #       end
+    #     end
+    #
+    #     cli = MyApp::MyClient.new
+    #     cli.xx  # => :yy
+    #
+    #
+    # something about the above.
+
+    some code
+
+  end
+end

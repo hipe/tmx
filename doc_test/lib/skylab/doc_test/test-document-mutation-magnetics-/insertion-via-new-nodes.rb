@@ -4,51 +4,66 @@ module Skylab::DocTest
 
     # (ALL of this is in service of the "ersatz parser" mutator methods only.)
 
-        Begin_insert_into_empty = -> nodes do
+    # these are attempts at making higher-level "edit macros" that
+    # try to infer formatting to use (mainly insertion of blank lines)
+    # agnostic of the particular solution.
 
-          idx = Index__.new nodes
-          idx.work
+    Prepend_before_some_existing = -> no, nodes do
 
-          Motifs__.new idx, nodes
-        end
+      _idx = Index__.of nodes do |o|
+        o.__record_between_first_and_second_example
+      end
 
-        Prepend_before_some_existing = -> eg, nodes do
+      o = Rewrite__.new _idx, nodes
+      o.write_nodes_before_the_reference_node
+      o.write_new_node_of_interest no
+      o.write_separating_blank_line_run
+      o.write_from_the_reference_node_to_end
+      o.finish
+    end
 
-          idx = Index__.new nodes
-          idx.__record_between_first_and_second_example
-          idx.work
+    Insert_after = -> after_this_eg, no, nodes do
 
-          o = Motifs__.new idx, nodes
-          o.write_nodes_before_the_reference_example
-          o.write_new_example_node eg
-          o.write_separating_blank_line_run
-          o.write_from_the_reference_example_to_end
-          o.finish
-        end
+      _idx = Index__.of nodes do |o|
+        o.__will_search_for_this after_this_eg
+      end
 
-        Insert_after = -> after_this_eg, eg, nodes do
+      o = Rewrite__.new _idx, nodes
+      o.write_nodes_through_the_reference_node
+      o.write_separating_blank_line_run
+      o.write_new_node_of_interest no
 
-          idx = Index__.new nodes
-          idx.__will_search_for_this after_this_eg
-          idx.work
-
-          o = Motifs__.new idx, nodes
-          o.write_nodes_through_the_reference_example
-          o.write_separating_blank_line_run
-          o.write_new_example_node eg
-
-          if o.nodes_exist_after_the_reference_example
+      if o.nodes_exist_after_the_reference_node
 
             # assume there was already some separating blank lines ahead
             # of this remaining content; so we don't write our own.
 
-            o.write_nodes_after_the_reference_example_to_the_end
-          end
+        o.write_nodes_after_the_reference_node_to_the_end
+      end
 
-          o.finish
-        end
+      o.finish
+    end
 
-        class Motifs__
+    Hack_insert_first_content = -> no, nodes do
+
+      _idx = Index__.of nodes do |o|
+        o.__set_reference_node_to_be_the_penultimate_node
+      end
+
+      o = Rewrite__.new _idx, nodes
+      o.write_nodes_through_the_reference_node
+      o.write_blank_line_if_necessary
+      o.write_new_node_of_interest no
+      o.write_nodes_after_the_reference_node_to_the_end
+      o.finish
+    end
+
+    Begin_insert_into_empty = -> nodes do
+      _idx = Index__.of nodes
+      Rewrite__.new _idx, nodes
+    end
+
+    class Rewrite__
 
           def initialize idx, nodes
             @index = idx
@@ -57,19 +72,25 @@ module Skylab::DocTest
             @result_nodes = []
           end
 
-          def write_nodes_through_the_reference_example
-
+      def write_nodes_through_the_reference_node
             ( @index.reference_index + 1 ).times do |d|
               @result_nodes.push @original_nodes.fetch d
             end
-          end
+      end
 
-          def write_nodes_before_the_reference_example
-
+      def write_nodes_before_the_reference_node
             @index.reference_index.times do |d|
               @result_nodes.push @original_nodes.fetch d
             end
-          end
+      end
+
+      def write_from_beginning_through_penultimate
+        @reference_index = @original_nodes.length - 1
+        @reference_index.times do |d|
+          @result_nodes.push @original_nodes.fetch d
+        end
+        NIL
+      end
 
           def write_opening_node_and_any_blank_lines
 
@@ -86,12 +107,22 @@ module Skylab::DocTest
             @reference_index = st.current_index
           end
 
-          def write_new_example_node eg
+      def write_new_node_of_interest no
+
+        _st = no.to_line_stream
+
+        __write_node_of_interest(
+          no.paraphernalia_category_symbol,
+          no.identifying_string,
+          _st,
+        )
+        NIL
+      end
+
+      def __write_node_of_interest sym, is, st  # is=identifying string; st=line stream
 
             margin = ___get_reference_margin
             nodes = []
-
-            st = eg.to_line_stream
 
             nodes.push Line_.new( "#{ margin }#{ st.gets }", :nonblank_line )  # or..
             begin
@@ -106,10 +137,10 @@ module Skylab::DocTest
               redo
             end while nil
 
-            @result_nodes.push ErsatzParser::FreeformBranchFrame.new :example_node, eg, nodes
+        @result_nodes.push ErsatzParser::FreeformBranchFrame.new sym, is, nodes
 
-            NIL_
-          end
+        NIL
+      end
 
           def ___get_reference_margin
 
@@ -121,22 +152,23 @@ module Skylab::DocTest
             end
           end
 
-          def nodes_exist_after_the_reference_example
+      def nodes_exist_after_the_reference_node
             @index.reference_index < @original_nodes.length - 1
-          end
+      end
 
-          def write_nodes_after_the_reference_example_to_the_end
+      def write_nodes_after_the_reference_node_to_the_end
             ( @index.reference_index + 1 ... @original_nodes.length ).each do |d|
               @result_nodes.push @original_nodes.fetch d
             end
-          end
+      end
 
-          def write_from_the_reference_example_to_end
+      def write_from_the_reference_node_to_end
             _eek = @reference_index || @index.reference_index
             ( _eek ... @original_nodes.length ).each do |d|
               @result_nodes.push @original_nodes.fetch d
             end
-          end
+        NIL
+      end
 
           def write_blank_line_if_necessary
             last = @result_nodes.last
@@ -165,9 +197,30 @@ module Skylab::DocTest
           attr_reader(
             :index,
           )
-        end
+    end
 
-        class Index__
+    class Index__
+
+      class << self
+        def of nodes
+          o = BuildIndex___.new nodes
+          yield o if block_given?
+          o.execute
+        end
+      end  # >>
+
+      def initialize _, __
+        @reference_index = _
+        @separating_blank_lines_array = __
+      end
+
+      attr_reader(
+        :reference_index,
+        :separating_blank_lines_array,
+      )
+    end
+
+    class BuildIndex___
 
           def initialize nodes
             @nodes = nodes
@@ -177,6 +230,14 @@ module Skylab::DocTest
             @_on_module = :_ignore
             @_on_nonblank_line = :_ignore
           end
+
+      def __set_reference_node_to_be_the_penultimate_node
+        len = @nodes.length
+        1 < len || fail
+        @reference_index = len - 2
+        @_stop = true
+        NIL
+      end
 
           def __record_between_first_and_second_example
             @_on_example_node = :__on_first_example_etc
@@ -202,16 +263,22 @@ module Skylab::DocTest
 
           # --
 
-          def work
+      def execute
+        @reference_index = nil ; @separating_blank_lines_array = nil
+        __do_index
+        Index__.new @reference_index, @separating_blank_lines_array
+      end
 
-            ( 1 ... @nodes.length-1 ).each do |d|
-              @_current_node_index = d
-              @_current_node = @nodes.fetch d
-              send instance_variable_get IVARS___.fetch @_current_node.category_symbol
-              @_stop && break
-            end
-            NIL_
-          end
+      def __do_index
+
+        ( 1 ... @nodes.length-1 ).each do |d|
+          @_stop && break
+          @_current_node_index = d
+          @_current_node = @nodes.fetch d
+          send instance_variable_get IVARS___.fetch @_current_node.category_symbol
+        end
+        NIL
+      end
 
           def _record_this_blank_line
             @_blank_lines_array.push remove_instance_variable :@_current_node
@@ -246,12 +313,7 @@ module Skylab::DocTest
             module: :@_on_module,
             nonblank_line: :@_on_nonblank_line,
           }
-
-          attr_reader(
-            :reference_index,
-            :separating_blank_lines_array,
-          )
-        end
+    end
 
         # ==
 
@@ -260,7 +322,5 @@ module Skylab::DocTest
         end
 
         Line_ = ErsatzParser::Line
-
-
   end
 end

@@ -11,7 +11,18 @@ module Skylab::DocTest
 
       def initialize para, cx
         @_choices = cx
-        __index para
+        _ = para.to_common_paraphernalia_stream
+        __init_via_common_paraphernalia_stream _
+      end
+
+      def dup_by
+        otr = dup
+        yield otr
+        otr
+      end
+
+      def particular_array= x
+        @_particular_array = x
       end
 
       def identifying_string
@@ -34,17 +45,19 @@ module Skylab::DocTest
 
       def to_line_stream
 
-        _n_st = to_particular_paraphernalia_stream
-        _body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ _n_st ]
-        _d_s = remove_instance_variable :@__description_bytes
+        n_st = to_particular_paraphernalia_stream
+
+        # --
+
+        body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ n_st ]
 
         # --
 
         t = @_choices.load_template_for TEMPLATE_FILE___
 
-        t.set_simple_template_variable _d_s, :description_bytes
+        t.set_simple_template_variable @__description_bytes, :description_bytes
 
-        t.set_multiline_template_variable _body_line_st, :context_body
+        t.set_multiline_template_variable body_line_st, :context_body
 
         t.flush_to_line_stream
       end
@@ -93,11 +106,9 @@ module Skylab::DocTest
         #   or another hacky pattern are simply skipped over. yes, this for
         #   now..
 
-      def __index common
+      def __init_via_common_paraphernalia_stream st
 
         @_particular_array = []
-
-        st = common.to_common_paraphernalia_stream
 
         @_on_assertive = :__on_assertive_normally
         @_on_unassertive = :__on_first_unassertive
@@ -113,7 +124,14 @@ module Skylab::DocTest
           redo
         end while nil
 
+        @_has_visible_setups = nil
+        @_mutable_visible_setups = nil
+        @_readable_visible_setups = nil
+        remove_instance_variable :@_has_visible_setups
+        remove_instance_variable :@_mutable_visible_setups
+        remove_instance_variable :@_on_assertive
         remove_instance_variable :@_on_unassertive
+        remove_instance_variable :@_readable_visible_setups
         NIL
       end
 
