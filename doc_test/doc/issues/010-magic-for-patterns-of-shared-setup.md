@@ -1,6 +1,6 @@
 # [title per filename] :[#010]
 
-this behavior phenomenon predates this attempt to desribe it by years..
+this behavior phenomenon predates this attempt to describe it by years..
 
 we almost tried to work "anti-patterns" into the name.
 

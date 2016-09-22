@@ -63,8 +63,6 @@ module Skylab::DocTest
 
       def __stream_for_should_raise
 
-        Home_._ENJOY_this_rewrite
-
         const, fullmsg, msgfrag = @_md.captures
 
         _rx = if fullmsg
@@ -79,11 +77,15 @@ module Skylab::DocTest
         end
 
         y << "_rx = ::Regexp.new #{ _rx }"
-        y << "-> do"
+        s_a.push @_LTS
+        y << "begin"
         y << "  #{ @_actual_code_string }"
-        y << "end.should raise_error( #{ const }, _rx )"
+        y << "rescue #{ const } => e"
+        y << "end"
+        s_a.push @_LTS
+        y << "e.message.should match _rx"
 
-        Common_::Stream.via_nonsparse_array y
+        Common_::Stream.via_nonsparse_array s_a
       end
 
       def __stream_for_string_head
