@@ -182,6 +182,13 @@ module Skylab::System
         end
       end
 
+      def prepare_if_not_exist
+        if ! exist?
+          prepare_when_not_exist
+        end
+        NIL
+      end
+
       def prepare_when_not_exist  # :+#public-API
 
         if __sanity_check_self_for_mkdir

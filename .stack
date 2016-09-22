@@ -42,4 +42,3 @@ module as subject -
 ./parse/lib/skylab/parse/dsl-dsl/core.rb (1 setup, 3 tests)
 ./common/lib/skylab/common/memoization.rb  "module as subject, raises exceptions"
 ./common/lib/skylab/common/session.rb  (4 setups, 6 tests, raises exceptions)
-./system/lib/skylab/system/filesystem/cache.rb   "module in setup, module IN test.."

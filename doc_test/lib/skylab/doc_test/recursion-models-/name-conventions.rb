@@ -159,7 +159,7 @@ module Skylab::DocTest
           rxs.concat lead_rxs
         end
 
-        rxs.concat '(?<stem>[a-z]+(?:-[a-z]+)*)'
+        rxs.concat '(?<stem>[a-z]+(?:-[a-z]+)*(?:-[0-9])?)'
 
         if trail_rxs
           rxs.concat trail_rxs

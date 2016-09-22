@@ -161,14 +161,16 @@ module Skylab::DocTest
 
       _asset_line_st = @_filesystem.open asset_path, ::File::RDONLY
 
-      _any_test_line_st = if @_test_file_probably_existed
+      if @_test_file_probably_existed
 
-        @_filesystem.open @_test_path, ::File::RDONLY
+        test_line_st = @_filesystem.open @_test_path, ::File::RDONLY
+        localized_test_path = @_details.localize_test_path @_test_path
       end
 
       o = @__the_synchronize_operation_prototype.dup
       o.asset_line_stream = _asset_line_st
-      o.original_test_line_stream = _any_test_line_st
+      o.original_test_line_stream =  test_line_st
+      o.original_test_path = localized_test_path
       _ = o.to_line_stream
       _  # #todo
     end

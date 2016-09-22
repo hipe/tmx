@@ -177,6 +177,14 @@ module Skylab::DocTest
           ::File.join @test_directory, * _s_a
         end
 
+        def localize_test_path path
+          ( @___p ||= ___etc ).call path
+        end
+
+        def ___etc
+          Home_.lib_.basic::Pathname::Localizer[ ::File.dirname( @test_directory ) ]
+        end
+
         attr_reader(
           :is_real,
           :qualified_entries,

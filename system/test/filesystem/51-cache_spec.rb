@@ -2,164 +2,180 @@ require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  module Svcs_FS_Cche___  # (modules are added to here during tests)
+  Tmpdir_controller_[].prepare_if_not_exist  # tests assume this, cleanup if not
+  # Tmpdir_controller_[].UNLINK_FILES_RECURSIVELY_  # (undoes above, see what breaks), :#here
 
-    subject_front = -> do
-      Home_.services.filesystem.cache
-    end
-
-    Subject__ = -> *a do
-
-      if a.length.zero?
-        subject_front[]
-      else
-        _p = subject_front[].cache_path_proc_via_module( * a )
-        a.first.define_singleton_method :cache_path, _p
-        nil
-      end
-    end
-
-    TMPDIR_PATH__ = ::Pathname.new ::File.join( TS_.tmpdir_path_, 'woo-wee' )
-
-    # <-
-
-  TS_.describe "[sy] - services - filesystem - bridges - cache (manual)" do
+  describe "[sy] - services - filesystem - bridges - cache (manual)" do
 
     TS_[ self ]
 
     it "loads" do
-      Subject__[]
+      _subject_module
     end
 
     it "won't apply to a toplevel module #scary-test" do
+
       _rx = %r(\bcan't operate on toplevel module - #{ ::Skylab.name }\b)
-      -> do
-        Subject__[ ::Skylab ]
-      end.should raise_error ::ArgumentError, _rx
+
+      begin
+        _subject_module[ ::Skylab ]
+      rescue _subject_module::RuntimeError => e
+      end
+
+      e.message =~ _rx || fail
     end
 
-    context "will apply to any non-top level module #fragile-test" do
+    context "will apply to any non-top level module" do
 
       before :all do
 
-        module Wiz_Waz
-          Subject__[ self ]
+        module X_f_c_Foo10
+          Home_::Filesystem::Cache[ self ]
         end
       end
 
       it "the module now responds to `cache_path`" do
-        Wiz_Waz.should be_respond_to :cache_path
+        X_f_c_Foo10.should be_respond_to :cache_path
       end
 
-      it "but if you try to access this pn, it fails bc no parent complies" do
+      it "but if you try to access this pn, it fails bc no parent complies #fragile-test" do
+
+        # (this breaks if TS_ responds to the API method.)
+
         _rx = %r(\Anone of the \d+ parent module\(s\) responded to `cac)
-        -> do
-          Wiz_Waz.cache_path
-        end.should raise_error _rx
-      end
-    end
 
-    context "filenames can't look weird" do
-
-      before :all do
-        module Wiff_Waff
-          def self.cache_path
-            TMPDIR_PATH__
-          end
-
-          module Weezy_Deezy
-            Subject__[ self, :abbrev, "zoipey/../doipey" ]
-          end
+        begin
+          X_f_c_Foo10.cache_path
+        rescue _subject_module::RuntimeError => e
         end
-      end
 
-      it "raises" do
-        tmpdir_pn.prepare
-        _rx = %r(\Afilename contains invalid characters - ['"]zoipey)
-        -> do
-          Wiff_Waff::Weezy_Deezy.cache_path
-        end.should raise_error ::ArgumentError, _rx
+        e.message =~ _rx || fail
       end
     end
 
-    context "but then get busy when everything is right" do
+    context "`cache_path_proc_via_module` -" do
 
       before :all do
-        module Woo_Wee
+
+        module X_f_c_Foo
+
           def self.cache_path
-            TMPDIR_PATH__
+            Tmpdir_[]
           end
 
           module BarBaz
-            Subject__[ self ]
+            _p = Home_.services.filesystem.cache.cache_path_proc_via_module self
+            define_singleton_method :cache_path, _p
           end
         end
       end
 
       it "if parent directory not exist - raises #fragile: before next test" do
-        pn = tmpdir_pn
-        if pn.exist?
-          pn.UNLINK_FILES_RECURSIVELY_
+
+        tmp = Tmpdir_controller_[]
+        if tmp.exist?
+          tmp.UNLINK_FILES_RECURSIVELY_
         end
-        _rx = %r(No such file or directory .+/woo-wee\z)
-        -> do
-          Woo_Wee::BarBaz.cache_path
-        end.should raise_error ::Errno::ENOENT, _rx
+
+        _rx = %r(No such file or directory )
+
+        begin
+          X_f_c_Foo20::BarBaz.cache_path
+        rescue ::Errno::ENOENT => e
+        ensure
+          tmp.prepare
+        end
+
+        e.message =~ _rx || fail
       end
 
-      it "if parent directory exists, ok have at it #after-above" do
-        pn = tmpdir_pn
-        pn.prepare
+      it "the nested client module builds its `cache_path` isomoprhically" do
 
-        _path = Woo_Wee::BarBaz.cache_path
-        _path.should match %r(\[sy\]/woo-wee/bar-baz\z)
-
-        pn.should be_exist
+        X_f_c_Foo::BarBaz.cache_path.should eql ::File.join( Tmpdir_[], 'bar-baz' )
       end
     end
 
-    context "`abbrev` with good filename" do
+    context "(with `abbrev` filenames can't look weird)" do
 
       before :all do
-        module Hiff_Heff
+
+        module X_f_c_Foo30
+
           def self.cache_path
-            TMPDIR_PATH__
+            Tmpdir_[]
           end
 
-          module Wip_Nizzle
-            Subject__[ self, :abbrev, 'zee_dee-doo-789' ]
+          module Weezy_Deezy
+            Home_::Filesystem::Cache[ self, :abbrev, "zoipey/../doipey" ]
           end
         end
       end
 
-      it "ok" do
+      it "raises lazily" do
 
-        tmpdir_pn.prepare
+        _rx = %r(\Afilename contains invalid characters - ['"]zoipey)
 
-        path = Hiff_Heff::Wip_Nizzle.cache_path
-        path.match( %r([^/]{4}/[^/]+/[^/]+\z) )[ 0 ].
-          should eql "[sy]/woo-wee/zee_dee-doo-789"
+        begin
+          X_f_c_Foo30::Weezy_Deezy.cache_path
+        rescue _subject_module::RuntimeError => e
+        end
 
-        ::File.exist?( path ).should eql true
+        e.message =~ _rx || fail
       end
     end
 
-    def tmpdir_pathname_path
-      TMPDIR_PATH__.to_path
+    it "if you want a filename other than what is inferred, use `abbrev`" do
+
+      module Foo2
+        def self.cache_path
+          Tmpdir_[]
+        end
+        Bar = ::Module.new
+      end
+
+      _p = Home_.services.filesystem.cache.cache_path_proc_via_module(
+        Foo2::Bar,
+        :abbrev, 'some-other-filename',
+      )
+
+      _p[].should eql ::File.join( Tmpdir_[], 'some-other-filename' )
     end
 
-    def tmpdir_pn
-      @tmpdir_pn ||= bld_tmpdir_pn
+    context "- hopping modules" do
+
+      before :all do
+
+        module X_f_c_Foo3
+
+          def self.cache_path
+            Tmpdir_[]
+          end
+
+          module Bar
+            module Baz
+              _p = Home_.services.filesystem.cache.cache_path_proc_via_module self
+              define_singleton_method :cache_path, _p
+            end
+          end
+        end
+      end
+
+      it "the (locally) topmost module knows its associated path" do
+        X_f_c_Foo3.cache_path.should eql Tmpdir_[]
+      end
+
+      it "but this intermediate module has no associated path" do
+        X_f_c_Foo3::Bar.respond_to?( :cache_path ).should eql false
+      end
+
+      it "but yet this here, innermost module SKIPS OVER the intermediate step" do
+
+        X_f_c_Foo3::Bar::Baz.cache_path.should eql ::File.join( Tmpdir_[], 'baz' )
+      end
     end
 
-    def bld_tmpdir_pn
-      services_.filesystem.tmpdir(
-        :path, tmpdir_pathname_path,
-        :be_verbose, do_debug,
-        :debug_IO, debug_IO,
-        :max_mkdirs, 6 )  # make the `hl` dir if necessary
+    def _subject_module
+      Home_::Filesystem::Cache
     end
-  end
-# ->
   end
 end

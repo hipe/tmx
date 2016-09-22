@@ -203,7 +203,11 @@ module Skylab::DocTest::TestSupport
     LookupResult___ = ::Struct.new(
       :is_real,
       :to_path,
-    )
+    ) do
+      def localize_test_path x
+        x
+      end
+    end
 
     # ==== Section 3. mock VCS reader controller
 

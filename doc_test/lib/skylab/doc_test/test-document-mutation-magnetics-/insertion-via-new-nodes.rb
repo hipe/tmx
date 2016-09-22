@@ -226,6 +226,7 @@ module Skylab::DocTest
         @nodes = nodes
 
         @_stop = false
+        @_on_before = :_ignore
         @_on_blank_line = :_ignore
         @_on_context = :_ignore
         @_on_module = :_ignore
@@ -313,6 +314,7 @@ module Skylab::DocTest
           end
 
       IVARS___ = {
+        before: :@_on_before,
         blank_line: :@_on_blank_line,
         context_node: :@_on_context,
         example_node: :@_on_example,

@@ -61,7 +61,7 @@ module Skylab::System::TestSupport
       TestSupport_.debug_IO
     end
 
-    define_method :memoized_tmpdir_, ( -> do
+    define_method :memoized_tmpdir_, ( -> do  # (see also #here)
       o = nil
       -> do
         if o
@@ -108,11 +108,31 @@ module Skylab::System::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  # --
+  # -- functions
 
   Home_ = ::Skylab::System
-
   Common_ = Home_::Common_
+  Lazy_ = Common_::Lazy
+
+  Tmpdir_ = Lazy_.call do
+    Tmpdir_controller_[].path
+  end
+
+  Tmpdir_controller_ = Lazy_.call do
+
+    # (use memoized_tmpdir_ if you can, this if you can't (#here))
+
+    svcs = Home_.services
+    _tmpdir = svcs.defaults.dev_tmpdir_path
+    _path = ::File.join _tmpdir, 'sy-xyzizzy-g'
+
+    svcs.filesystem.tmpdir(
+      :path, _path,
+      :max_mkdirs, 2,  # one universe wide, one for the sidesystem
+    )
+  end
+
+  # --
 
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 

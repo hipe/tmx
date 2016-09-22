@@ -26,31 +26,31 @@ module Skylab::System
     # then a nested module can use the topic:
     #
     #     module Foo
-    #       def self.cache_path
-    #         @path
-    #       end
-    #       @path = '/var/xkcd/foo'
-    #     end
     #
-    #     module Foo::BarBaz
-    #       define_singleton_method :cache_path, &
-    #         Subject_[].cache_path_proc_via_module( self )
+    #       def self.cache_path
+    #         Tmpdir_[]
+    #       end
+    #
+    #       module BarBaz
+    #         _p = Home_.services.filesystem.cache.cache_path_proc_via_module self
+    #         define_singleton_method :cache_path, _p
+    #       end
     #     end
     #
     # the nested client module builds its `cache_path` isomoprhically:
     #
-    #     Foo::BarBaz.cache_path  # => "/var/xkcd/foo/bar-baz"
+    #     Foo::BarBaz.cache_path  # => ::File.join( Tmpdir_[], 'bar-baz' )
     #
-    #     # which exists and has the same permissions as the parent diretory.
+    # (the above directory also has the same permissons as the parent directory)
     #
     # Some gotchas so far:
     #
-    #   + the directory is created (if necessary) *lazily* the first time
+    #   - the directory is created (if necessary) *lazily* the first time
     #     `cache_path` is called for that module, hence do not expect
     #     the directory to exist if you never called `cache_path` for
     #     that module.
     #
-    #   + the fact that it is memoized means that this check for the
+    #   - the fact that it is memoized means that this check for the
     #     directory's existence will only happen exactly once during the
     #     runtime hence if you or something else removes the directory or
     #     changes its permissions during runtime, you are on your own to
@@ -58,49 +58,79 @@ module Skylab::System
 
     # Some features / behavior details:
     #
-    #   + the filename ("foo-bar" in the above example) is of course inferred
-    #     from the const name ("FooBar" in the example above.
-    #     for a different filename you can use the `abbrev` iambic option:
+    #   - the `abbrev` option
+    #     the filename ("foo-bar" in the above example) is of course inferred
+    #     from the const name ("Foo::BarBaz" in the example above).
+    #     if you want a filename other than what is inferred, use `abbrev`:
     #
-    #         p = Subject_[].cache_path_proc_via_module self,
-    #           :abbrev, 'some-other-filename'
+    #         module Foo2
+    #           def self.cache_path
+    #             Tmpdir_[]
+    #           end
+    #           Bar = ::Module.new
+    #         end
     #
-    #         p[]  # => "/var/xkcd/foo-some-other-filename"
+    #         _p = Home_.services.filesystem.cache.cache_path_proc_via_module(
+    #           Foo2::Bar,
+    #           :abbrev, 'some-other-filename',
+    #         )
     #
-    #   + when searching upwards for a parent module that responds to
+    #         _p[]  # => ::File.join( Tmpdir_[], 'some-other-filename' )
+    #
+    #   - hopping modules
+    #     when searching upwards for a parent module that responds to
     #     `cache_path`, the search will hop over intermediate modules
     #     that do not do so; so you can design your module graph to contain
     #     as many modules as you find taxonomically useful, and not be held
-    #     to making intermediate directories in your cache tree. so not all
-    #     modules need to have their own cache directories:
+    #     to making intermediate directories in your cache tree. so
+    #     not all intermediate modules need to have their own cache directories:
     #
-    #         module Foo_
-    #           define_singleton_method :cache_path, -> do
-    #             _PATH = ::File.join '/var/xkcd', 'my-app'
-    #             -> do
-    #               _PATH
-    #             end
-    #           end.call
+    #         module Foo3
+    #
+    #           def self.cache_path
+    #             Tmpdir_[]
+    #           end
     #
     #           module Bar
     #             module Baz
-    #               define_singleton_method :cache_path, &
-    #                 Subject_[].cache_path_proc_via_module( self )
+    #               _p = Home_.services.filesystem.cache.cache_path_proc_via_module self
+    #               define_singleton_method :cache_path, _p
     #             end
     #           end
     #         end
     #
-    #         Foo_.cache_path  # => "/var/xkcd/my-app"
-    #         Foo_::Bar.respond_to?( :cache_path )  # => false
-    #         Foo_::Bar::Baz.cache_path  # => "/var/xkcd/my-app/baz"
+    #     the (locally) topmost module knows its associated path:
+    #
+    #         Foo3.cache_path  # => Tmpdir_[]
+    #
+    #     but this intermediate module has no associated path:
+    #
+    #         Foo3::Bar.respond_to?( :cache_path )  # => false
+    #
+    #     but yet this here, innermost module SKIPS OVER the intermediate step:
+    #
+    #         Foo3::Bar::Baz.cache_path  # => ::File.join( Tmpdir_[], 'baz' )
     #
     # happy hacking!
+
+      class << self
+
+        def [] mod, * x_a
+          _p = Home_.services.filesystem.cache.cache_path_proc_via_module mod, * x_a
+          mod.define_singleton_method :cache_path, _p
+          NIL
+        end
+      end  # >>
 
       def initialize fs
         @_filesystem = fs
       end
 
       def cache_path_proc_via_module mod, * x_a
+        _cache_path_proc_via mod, x_a
+      end
+
+      def _cache_path_proc_via mod, x_a
 
         @_actor_curry ||= Actor___.curry_with(
           :filesystem, @_filesystem,
@@ -150,13 +180,19 @@ module Skylab::System
           end
 
           def when_too_few_name_parts
-            _ev = build_not_OK_event_with :toplevel_module,
-                :mod, @mod, :error_category, :argument_error do |y, o|
+
+            _ev = build_not_OK_event_with(
+              :toplevel_module,
+              :mod, @mod,
+              :exception_class_by, -> { RuntimeError },
+              :error_category, :argument_error
+
+            ) do |y, o|
 
               y << "this enhancement is for nested modules only (for now), #{
                } can't operate on toplevel module - #{ o.mod }"
-
             end
+
             finish_with_error_event _ev
           end
 
@@ -209,12 +245,19 @@ module Skylab::System
           end
 
           def when_parent_not_found
-            _ev = build_not_OK_event_with :parent_cache_path_proprietor_not_found,
-                :mod, @mod, :mod_a, @mod_a do |y, o|
+
+            _ev = build_not_OK_event_with(
+              :parent_cache_path_proprietor_not_found,
+              :mod, @mod,
+              :mod_a, @mod_a,
+              :exception_class_by, -> { RuntimeError },
+
+            ) do |y, o|
 
               y << "none of the #{ o.mod_a.length } parent module(s) #{
                 }responded to `cache_path` among #{ o.mod_a.last.name }"
             end
+
             finish_with_error_event _ev
           end
 
@@ -248,9 +291,14 @@ module Skylab::System
           end
 
           def when_bad_filename
+
             _ev = build_not_OK_event_with(
-              :filename_contains_invalid_characters, :filename, @filename,
-              :error_category, :argument_error )
+              :filename_contains_invalid_characters,
+              :filename, @filename,
+              :exception_class_by, -> { RuntimeError },
+              :error_category, :argument_error,
+            )
+
             finish_with_error_event _ev
           end
 
@@ -279,6 +327,11 @@ module Skylab::System
           FILENAME_RX__ = /\A[-_a-z0-9]+\z/i
         end
         # <-
+
+
+      # ==
+
+      RuntimeError = ::Class.new ::RuntimeError
     end
   end
 end
