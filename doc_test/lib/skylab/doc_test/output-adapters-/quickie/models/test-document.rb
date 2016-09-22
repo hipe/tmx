@@ -68,7 +68,7 @@ module Skylab::DocTest
 
       o.add_branch_line_matcher(
         %r(\A(?<margin>[\t ]*)context[ ]#{ quoted_string_part })x,
-        :context,
+        :context_node,
         & identifying_string_via_quoted_string
       )
 

@@ -376,6 +376,10 @@ module Skylab::DocTest
           :nodes,
         )
 
+        def is_blank_line
+          false  # (could be, actually, but that's on you)
+        end
+
         def is_branch
           true
         end

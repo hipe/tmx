@@ -11,7 +11,7 @@ module Skylab::DocTest
     Prepend_before_some_existing = -> no, nodes do
 
       _idx = Index__.of nodes do |o|
-        o.__record_between_first_and_second_example
+        o.__record_between_first_and_second_node_of_interest
       end
 
       o = Rewrite__.new _idx, nodes
@@ -22,10 +22,10 @@ module Skylab::DocTest
       o.finish
     end
 
-    Insert_after = -> after_this_eg, no, nodes do
+    Insert_after = -> after_this_noi, no, nodes do
 
       _idx = Index__.of nodes do |o|
-        o.__will_search_for_this after_this_eg
+        o.__will_search_for_this after_this_noi
       end
 
       o = Rewrite__.new _idx, nodes
@@ -222,14 +222,15 @@ module Skylab::DocTest
 
     class BuildIndex___
 
-          def initialize nodes
-            @nodes = nodes
+      def initialize nodes
+        @nodes = nodes
 
-            @_stop = false
-            @_on_blank_line = :_ignore
-            @_on_module = :_ignore
-            @_on_nonblank_line = :_ignore
-          end
+        @_stop = false
+        @_on_blank_line = :_ignore
+        @_on_context = :_ignore
+        @_on_module = :_ignore
+        @_on_nonblank_line = :_ignore
+      end
 
       def __set_reference_node_to_be_the_penultimate_node
         len = @nodes.length
@@ -239,27 +240,31 @@ module Skylab::DocTest
         NIL
       end
 
-          def __record_between_first_and_second_example
-            @_on_example_node = :__on_first_example_etc
-          end
+      def __record_between_first_and_second_node_of_interest
+        @_on_context = :_on_first_node_of_interest
+        @_on_example = :_on_first_node_of_interest
+      end
 
-          def __on_first_example_etc
+      def _on_first_node_of_interest
 
-            @reference_index = @_current_node_index
-            @_blank_lines_array = []
-            @_on_blank_line = :_record_this_blank_line
-            @_on_nonblank_line = :_stop_recording_blank_lines
-            @_on_example_node = :_stop_recording_blank_lines
-          end
+        @reference_index = @_current_node_index
+        @_blank_lines_array = []
+        @_on_blank_line = :_record_this_blank_line
+        @_on_nonblank_line = :_stop_recording_blank_lines
+        @_on_context = :_stop_recording_blank_lines
+        @_on_example = :_stop_recording_blank_lines
+      end
 
-          def __will_search_for_this after_this
+      def __will_search_for_this after_this
 
             @_blank_lines_array = []
             @_on_blank_line = :_record_this_blank_line
             @_on_nonblank_line = :__this_special_thing
             @_find_me = after_this.identifying_string
-            @_on_example_node = :__is_this_the_example_node
-          end
+
+        @_on_context = :_is_this_the_node_of_interest
+        @_on_example = :_is_this_the_node_of_interest
+      end
 
           # --
 
@@ -284,7 +289,7 @@ module Skylab::DocTest
             @_blank_lines_array.push remove_instance_variable :@_current_node
           end
 
-          def __is_this_the_example_node
+      def _is_this_the_node_of_interest
 
             if @_find_me == @_current_node.identifying_string
               @reference_index = @_current_node_index
@@ -292,7 +297,7 @@ module Skylab::DocTest
             else
               @_blank_lines_array.clear
             end
-          end
+      end
 
           def __this_special_thing
             @_blank_lines_array.clear
@@ -307,12 +312,13 @@ module Skylab::DocTest
             NOTHING_
           end
 
-          IVARS___ = {
-            blank_line: :@_on_blank_line,
-            example_node: :@_on_example_node,
-            module: :@_on_module,
-            nonblank_line: :@_on_nonblank_line,
-          }
+      IVARS___ = {
+        blank_line: :@_on_blank_line,
+        context_node: :@_on_context,
+        example_node: :@_on_example,
+        module: :@_on_module,
+        nonblank_line: :@_on_nonblank_line,
+      }
     end
 
         # ==

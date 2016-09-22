@@ -31,7 +31,7 @@ module Skylab::DocTest::TestSupport
 
         _doc = Home_::OutputAdapters_::Quickie::Models::TestDocument.via_line_stream _st
 
-        _ctxt = _doc.only_one :module, :describe, :context
+        _ctxt = _doc.only_one :module, :describe, :context_node
 
         a = _ctxt.nodes
 

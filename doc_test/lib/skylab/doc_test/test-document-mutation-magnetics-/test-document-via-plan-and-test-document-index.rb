@@ -156,7 +156,7 @@ module Skylab::DocTest
           pl.new_node
         end
 
-        plan.context_node.dup_by do |o|
+        plan.new_node.dup_by do |o|
           o.particular_array = _particular_array
         end
       end
@@ -165,7 +165,12 @@ module Skylab::DocTest
 
         pp = plan.previous_plan
         if pp
-          @destination_branch.insert_after__ pp.new_node, new_node
+
+          _ref_node = pp.new_node
+          _ref_node ||= pp.existing_node_index.existing_document_node
+          _ref_node || fail
+
+          @destination_branch.insert_after__ _ref_node, new_node
 
         elsif plan.is_first_content
 

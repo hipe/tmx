@@ -30,7 +30,7 @@ module Skylab::DocTest::TestSupport
         _rx = /\A
               module\n
               [ ][ ]describe\n
-              [ ][ ][ ][ ]context\n
+              [ ][ ][ ][ ]context_node\n
           (?: [ ][ ][ ][ ][ ][ ]example_node\n  ){3,}
         /x
 

@@ -112,7 +112,7 @@ module Skylab::DocTest
 
       INDEX_THIS___ = {
         before: :__maybe_index_a_before_node,
-        context: :__index_a_context_node,
+        context_node: :__index_a_context_node,
         ending_line: :__ending_line_is_noop,
         example_node: :__index_an_example_node,
         nonblank_line: :__probably_dont_index_a_nonblank_line,

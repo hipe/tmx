@@ -43,8 +43,3 @@ module as subject -
 ./common/lib/skylab/common/memoization.rb  "module as subject, raises exceptions"
 ./common/lib/skylab/common/session.rb  (4 setups, 6 tests, raises exceptions)
 ./system/lib/skylab/system/filesystem/cache.rb   "module in setup, module IN test.."
-
-challenge mode -
-./basic/lib/skylab/basic/module/accessors.rb  "you solve this you solve a lot"
-maybe add single lines of whitepace afte test and see if it takes in syncing
-this synchronizing bug with nodes - no problem!

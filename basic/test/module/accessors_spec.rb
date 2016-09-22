@@ -2,17 +2,13 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport
 
-  module Mdl_A___  # :+#throwaway-module for contants set during tests
+  describe "[ba] module accessors" do
 
-    # <-
-
-  TS_.describe "[ba] module accessors" do
-
-    context "imagine a module graph with the below five modules" do
+    context "a lightweight enhancer that for the module using it generates instance" do
 
       before :all do
 
-        module MyApp
+        module X_xkcd_MyApp
           module CLI
             class Client
             end
@@ -27,7 +23,7 @@ module Skylab::Basic::TestSupport
 
       it "from one instance you can reach a module in its class's graph" do
 
-        module MyApp
+        module X_xkcd_MyApp
           class CLI::Client
             Home_::Module::Accessors.enhance self do
               public_methods do
@@ -37,16 +33,16 @@ module Skylab::Basic::TestSupport
           end
         end
 
-        cli = MyApp::CLI::Client.new
-        cli.API_client_module.should eql MyApp::API::Client
+        cli = X_xkcd_MyApp::CLI::Client.new
+        cli.API_client_module.should eql X_xkcd_MyApp::API::Client
       end
     end
 
-    context "here's the autovivifying hack" do
+    context "There are also undocumented facilities for auto-vivifying the constants" do
 
       before :all do
 
-        class Foo
+        class X_xkcd_Foo
 
           Home_::Module::Accessors.enhance self do
 
@@ -71,14 +67,14 @@ module Skylab::Basic::TestSupport
 
       it "the first time the thing is accessed, the two procs are called" do
 
-        foo = Foo.new
+        foo = X_xkcd_Foo.new
         foo.touch
-        Foo::Ohai_.instance_variable_get( :@counter ).should eql 1
+        X_xkcd_Foo::Ohai_.instance_variable_get( :@counter ).should eql 1
       end
 
       it "if you create the thing before it is accessed, etc" do
 
-        class Bar < Foo
+        class Bar < X_xkcd_Foo
           module Ohai_
             @counter = 10
           end
@@ -95,7 +91,5 @@ module Skylab::Basic::TestSupport
         Bar::Ohai_.instance_variable_get( :@counter ).should eql 11
       end
     end
-  end
-# ->
   end
 end

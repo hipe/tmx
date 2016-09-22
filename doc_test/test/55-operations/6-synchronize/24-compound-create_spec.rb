@@ -26,7 +26,7 @@ module Skylab::DocTest::TestSupport
 
         _doc = test_document_via_line_stream_ _st
 
-        _ctxt = _doc.only_one :module, :describe, :context
+        _ctxt = _doc.only_one :module, :describe, :context_node
 
         a = _ctxt.nodes
 

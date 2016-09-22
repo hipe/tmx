@@ -357,7 +357,7 @@ module Skylab::DocTest
 
       Insert_context = -> cn, a, pp do
         o = NodePlan__.new
-        o.context_node = cn
+        o.new_node = cn
         o.plan_array = a
         o.previous_plan = pp
         o.node_shape = :context
@@ -418,7 +418,6 @@ module Skylab::DocTest
       )
 
       attr_accessor(
-        :context_node,
         :existing_node,
         :existing_node_index,
         :new_node,

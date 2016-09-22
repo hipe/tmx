@@ -174,7 +174,7 @@ module Skylab::DocTest
 
         @insert_at = insert_at
         @prototype_array = prototype.freeze
-        @stemmer_regex = ::Regexp.new rxs
+        @stemmer_regex = ::Regexp.new rxs, ::Regexp::IGNORECASE  # see #here
 
         NIL
       end
@@ -191,7 +191,7 @@ module Skylab::DocTest
           if ! md
             self._DID_NOT_MATCH_REGEX  # #todo
           end
-          md[ :stem ]
+          md[ :stem ].downcase  # :#here - uppercase OK in test not asset files
         end
       end
 
