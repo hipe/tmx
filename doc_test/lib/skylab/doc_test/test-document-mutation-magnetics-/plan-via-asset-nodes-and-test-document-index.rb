@@ -133,13 +133,24 @@ module Skylab::DocTest
         context_node: :__process_context_node,
         const_definition_shared_setup: :__process_const_definition_shared_setup,
         example_node: :__process_example_node,
-        shared_subject_shared_setup: :__PROCESS_SHARED_SUBJECT_SHARED_SETUP,
+        shared_subject_shared_setup: :__process_shared_subject_shared_setup,
       }
 
       # --
       # in the many of the guys below, we'll be taking memos to effect our
       # own branch-local version of (exactly) [#033] the fine and dandy algo
       # --
+
+      def __process_shared_subject_shared_setup no
+        if @branch_index
+          self._DO_ME
+        else
+          plan = Plan__::Insert_shared_subject[ no, @_previous_plan ]
+          @_previous_plan = plan
+          _add_to_creation_branch plan
+          ACHIEVED_
+        end
+      end
 
       def __process_context_node no
 
@@ -380,6 +391,15 @@ module Skylab::DocTest
         o.new_node = nn
         o.node_shape = :const_definition
         o.plan_verb = :insert
+        o.finish
+      end
+
+      Insert_shared_subject = -> no, pp do
+        o = NodePlan__.new
+        o.previous_plan = pp
+        o.new_node = no
+        o.node_shape = :shared_setup
+        o.plan_verb = :create
         o.finish
       end
 

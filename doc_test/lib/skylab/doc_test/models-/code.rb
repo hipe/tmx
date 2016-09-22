@@ -11,9 +11,15 @@ module Skylab::DocTest
 
       def initialize m_r, c_r, lts_r, s
 
-        @_a = []
+        @lines_ = []
         @_content_begin = c_r.begin
         accept_line_via_offsets m_r, c_r, lts_r, s
+      end
+
+      def dup_via_lines__ lines
+        otr = dup
+        otr.instance_variable_set :@lines_, lines
+        otr
       end
 
       def accept_line_via_offsets m_r, c_r, l_r, s
@@ -30,11 +36,11 @@ module Skylab::DocTest
       end
 
       def accept_line_object li
-        @_a.push li ; nil
+        @lines_.push li ; nil
       end
 
       def finish
-        @_a.freeze  # or not..
+        @lines_.freeze  # or not..
         self
       end
 
@@ -76,14 +82,15 @@ module Skylab::DocTest
       end
 
       def to_line_object_stream
-        Common_::Stream.via_nonsparse_array @_a
+        Common_::Stream.via_nonsparse_array @lines_
       end
 
       def number_of_lines___  # #testpoint-only
-        @_a.length
+        @lines_.length
       end
 
       attr_reader(
+        :lines_,
         :has_magic_copula,
         :MARGIN_POSITION___,
       )

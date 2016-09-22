@@ -10,18 +10,28 @@ module Skylab::DocTest
 
       TEMPLATE_FILE___ = '_shared-subject.tmpl'
 
-      def initialize o, cx
+      def initialize o, cx, visible_shared=nil
         @_common = o
         @_choices = cx
+        @_visible_shared = visible_shared
       end
 
       def to_line_stream
+        st = __to_line_stream_normally
+        vs = @_visible_shared
+        if vs
+          st = vs.map_body_line_stream st
+        end
+        st
+      end
+
+      def __to_line_stream_normally
 
         _s_a = __assemble_body_line_cache
 
         t = @_choices.load_template_for TEMPLATE_FILE___
 
-        t.set_simple_template_variable @_VAL.matchdata[ :lvar ], :lvar
+        t.set_simple_template_variable @_match.matchdata[ :lvar ], :lvar
 
         t.set_multiline_template_variable(
           Common_::Stream.via_nonsparse_array( _s_a ),
@@ -74,7 +84,7 @@ module Skylab::DocTest
           lo = @_line_object_stream.gets
         end while lo
 
-        _line "#{ @_VAL.matchdata[ :lvar ] }#{ __LTS }"  # EEK
+        _line "#{ @_match.matchdata[ :lvar ] }#{ __LTS }"  # EEK
       end
 
       def __finish_the_lines_when_the_assignment_line_is_the_last_line
@@ -86,7 +96,7 @@ module Skylab::DocTest
         remove_instance_variable :@_blank_line_objects
         # don't render any blank lines that trailed the whole block
 
-        _line @_VAL.matchdata.post_match
+        _line @_match.matchdata.post_match
       end
 
       def __render_the_zero_or_more_lines_that_come_before_the_assignment_line
@@ -94,7 +104,7 @@ module Skylab::DocTest
         # the zero or more lines that occur before the last assignment line,
         # pass those through as-is:
 
-        @_VAL.line_offset.times do
+        @_match.line_offset.times do
           _accept_line_object @_line_object_stream.gets
         end
 
@@ -136,7 +146,11 @@ module Skylab::DocTest
         @_line_object_stream = @_common.to_code_run_line_object_stream
 
         _val_a = @_common.variable_assignment_lines
-        @_VAL = _val_a.fetch( -1 )  # we just disregard the non-last ones.
+        @_match = _val_a.fetch( -1 )  # we just disregard the non-last ones.
+      end
+
+      def paraphernalia_category_symbol
+        :shared_subject_shared_setup
       end
     end
   end

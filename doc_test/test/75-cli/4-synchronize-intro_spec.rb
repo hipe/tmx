@@ -217,7 +217,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def __original_test_file
-      path_via_filename_  '51-some_speg.rb'
+      fixture_file_  '51-some_speg.rb'
     end
 
     def _same_file

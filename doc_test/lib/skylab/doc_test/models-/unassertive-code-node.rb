@@ -10,10 +10,20 @@ module Skylab::DocTest
 
     def initialize discussion_run, code_run, test_file_context_p, choices
       @_choices = choices
-      @_code_run = code_run
+      @code_run = code_run
       @_discussion_run = discussion_run
       @_do_index_features = true
       @test_file_context_proc__ = test_file_context_p
+    end
+
+    def code_run= x
+      @_do_index_features = true
+      @code_run = x
+    end
+
+    def variable_assignment_lines= x
+      @_do_index_features = true
+      @variable_assignment_lines = x
     end
 
     def to_line_stream
@@ -59,11 +69,15 @@ module Skylab::DocTest
     end
 
     def to_code_run_line_object_stream
-      @_code_run.to_line_object_stream
+      @code_run.to_line_object_stream
     end
 
     def to_particular_paraphernalia_of sym
       @_choices.particular_paraphernalia_of_for sym, self
+    end
+
+    def to_particular_paraphernalia_of_under sym, x
+      @_choices.particular_paraphernalia_of_for_under sym, self, x
     end
 
     def begin_description_string_session
@@ -76,12 +90,12 @@ module Skylab::DocTest
 
     def _index_features
       @_do_index_features = false
-      Index_features___.new( self, @_code_run ).execute
+      Index_features___.new( self, @code_run ).execute
       NIL
     end
 
     def _feature_index
-      @_feature_index ||= UnassertiveIndex___.new @_code_run
+      @_feature_index ||= UnassertiveIndex___.new @code_run
     end
 
     def feature_index__  # as an assertion
@@ -89,6 +103,7 @@ module Skylab::DocTest
     end
 
     attr_reader(
+      :code_run,
       :test_file_context_proc__
     )
 

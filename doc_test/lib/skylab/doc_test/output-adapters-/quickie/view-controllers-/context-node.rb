@@ -163,12 +163,12 @@ module Skylab::DocTest
 
         if c_a
           if v_a
-            self._WEE_enjoy_when_you_have_both
+            __holy_smokes_you_want_both unasser  # #coverpoint5-2
           else
-            __on_const_definition unasser
+            _on_const_definition unasser
           end
         elsif v_a
-          __on_shared_subject unasser
+          _on_shared_subject unasser
         else
           self._SHOULD_FAIL_see_me  # let's say that an unassertive block
           # must employ features, so its means of expression is clear.
@@ -178,7 +178,18 @@ module Skylab::DocTest
         NIL
       end
 
-      def __on_const_definition unasser
+      def __holy_smokes_you_want_both unasser
+
+        DocumentWriteMagnetics_::HybridSetup.by do |o|
+          o.choices = @_choices
+          o.on_const_definition = method :_on_const_definition
+          o.on_shared_subject = method :_on_shared_subject
+          o.unassertive_node = unasser
+        end
+        NIL
+      end
+
+      def _on_const_definition unasser
 
         o = unasser.to_particular_paraphernalia_of :const_definition
         if ! @_has_visible_setups
@@ -192,13 +203,21 @@ module Skylab::DocTest
         NIL
       end
 
-      def __on_shared_subject unasser
-        _ = unasser.to_particular_paraphernalia_of :shared_subject
-        _accept _
+      def _on_shared_subject unasser
+        if @_has_visible_setups
+          _interpolate unasser
+        else
+          _ = unasser.to_particular_paraphernalia_of :shared_subject
+          _accept _
+        end
         NIL
       end
 
       def __on_assertive_mapped_through_visible_setups common
+        _interpolate common
+      end
+
+      def _interpolate common
         @_readable_visible_setups ||= @_mutable_visible_setups.to_readable
         _ = common.to_particular_paraphernalia_under @_readable_visible_setups
         _accept _
@@ -266,7 +285,7 @@ module Skylab::DocTest
           @__p = a.fetch 0
         end
 
-        def map_body_line_stream__ st
+        def map_body_line_stream st
           @__p[ st ]
         end
       end

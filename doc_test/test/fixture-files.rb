@@ -18,7 +18,7 @@ module Skylab::DocTest::TestSupport
 
       def line_stream_via_filename_ file
 
-        ::File.open path_via_filename_( file ), ::File::RDONLY
+        ::File.open fixture_file_( file ), ::File::RDONLY
       end
 
       def fixture_tree_pather path
@@ -34,7 +34,7 @@ module Skylab::DocTest::TestSupport
         ::File.join _fixture_trees_directory, dir
       end
 
-      def path_via_filename_ file
+      def fixture_file_ file
         ::File.join _fixture_files_directory, file
       end
 

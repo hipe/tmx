@@ -12,7 +12,7 @@ module Skylab::DocTest::TestSupport
 
       call_by do
 
-        _asset = path_via_filename_ '11-before-all.kd'
+        _asset = fixture_file_ '11-before-all.kd'
         _asset_lines = ::File.open _asset
 
         my_API_common_generate_(
@@ -22,11 +22,7 @@ module Skylab::DocTest::TestSupport
 
       shared_subject :_custom_tuple do
 
-        _st = root_ACS_result
-
-        _doc = test_document_via_line_stream_ _st
-
-        _ctxt = _doc.only_one :module, :describe, :context_node
+        _ctxt = context_node_via_result_
 
         a = _ctxt.nodes
 

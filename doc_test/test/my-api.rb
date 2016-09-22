@@ -9,6 +9,30 @@ module Skylab::DocTest::TestSupport
 
     # -
 
+      def filter_endcaps_and_blank_lines_common_ a
+        last = a.length - 2
+        d = 1
+        a_ = []
+        begin
+          :blank_line == a.fetch( d ).category_symbol || fail
+          d += 1
+          a_.push a.fetch d
+          last == d && break
+          d += 1
+          redo
+        end while above
+        a_
+      end
+
+      def context_node_via_result_
+
+        _st = root_ACS_result
+
+        _doc = test_document_via_line_stream_ _st
+
+        _doc.only_one :module, :describe, :context_node
+      end
+
       def my_API_common_generate_ h  # mutates h
 
         if ! h.key? :output_adapter

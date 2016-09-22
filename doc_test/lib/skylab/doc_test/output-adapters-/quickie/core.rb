@@ -68,6 +68,11 @@ module Skylab::DocTest
 
       # --
 
+      def particular_paraphernalia_of_for_under sym, para, x
+        _cls = _paraphernalia_class_for sym
+        _cls.new para, self, x
+      end
+
       def particular_paraphernalia_for_under para, x
         _sym = para.paraphernalia_category_symbol
         _cls = _paraphernalia_class_for _sym
@@ -101,6 +106,10 @@ module Skylab::DocTest
     end
 
     # ==
+
+    module DocumentWriteMagnetics_
+      Autoloader_[ self ]
+    end
 
     module ViewControllers_
       Autoloader_[ self ]

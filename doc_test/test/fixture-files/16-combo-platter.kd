@@ -1,0 +1,25 @@
+module Skerlerb::Kermmon
+
+  Zesson = ::Module.new
+
+  module Zesson::Ervers_werth_Prercs_ers_Mertherds
+
+    # jumanji this dumanji
+    #
+    #     class Baz
+    #       attr_reader :hi, :yep
+    #     end
+    #
+    #     foo = Baz.new
+    #
+    # you can call this method:
+    #
+    #     foo.hi  # => nil
+    #
+    # and you can call this method:
+    #
+    #     otr = Baz.new
+    #     foo.yep  # => otr.yep
+
+  end
+end

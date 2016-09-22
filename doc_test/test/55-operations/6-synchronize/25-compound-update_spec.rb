@@ -15,7 +15,7 @@ module Skylab::DocTest::TestSupport
         _asset = ::File.join home_dir_path_, 'models-/test-file-context.rb'
         _asset_lines = ::File.open _asset
 
-        _test = path_via_filename_ '56-sync-against-this_speg.kd'
+        _test = fixture_file_ '56-sync-against-this_speg.kd'
         _test_lines = ::File.open _test
 
         my_API_common_generate_(
@@ -27,19 +27,12 @@ module Skylab::DocTest::TestSupport
 
       shared_subject :_custom_tuple do
 
-        _st = root_ACS_result
-
-        _doc = Home_::OutputAdapters_::Quickie::Models::TestDocument.via_line_stream _st
-
-        _ctxt = _doc.only_one :module, :describe, :context_node
+        _ctxt = context_node_via_result_
 
         a = _ctxt.nodes
-
-        :blank_line == a[1].category_symbol || fail
-        before = a[2]
-        :blank_line == a[3].category_symbol || fail
-        6 == a.length || fail
-        [ before, a[4] ]
+        a = filter_endcaps_and_blank_lines_common_ a
+        2 == a.length || fail
+        a
       end
 
       it "looks OK structurally" do

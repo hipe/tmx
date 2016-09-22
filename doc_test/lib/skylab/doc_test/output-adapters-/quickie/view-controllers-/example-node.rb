@@ -36,7 +36,7 @@ module Skylab::DocTest
 
         st = __body_line_stream_normally
         if @_has_visible_shared_items
-          st = @_visible_shared_items.map_body_line_stream__ st
+          st = @_visible_shared_items.map_body_line_stream st
         end
         @__body_line_stream = st
         NIL
