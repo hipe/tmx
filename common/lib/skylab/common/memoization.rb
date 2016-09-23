@@ -9,23 +9,40 @@ module Skylab::Common
     # avoid incurring the overhead of allocating and de-allocating lots of
     # objects that you expect to need for perhaps only a short time or
     # limited scope.
-    #
-    # example of enhancing a class by defining on it this method:
-    #
-    #     class Foo
-    #       Pool[ self ]
-    #         instances_can_only_be_accessed_through_instance_sessions
-    #     end
-    #
-    #     Foo.new  # => NoMethodError: private method `new' called for [..]
-    #
-    #     Foo.instance_session do |f|
-    #       # .. ( use f )
-    #     end
-    #
+
+    # here's an example of enhancing a class with the enhancer function:
     # This implementation requires that your class define a `clear_for_pool`
     # instance method that will be called to reset the object back to an
     # empty state after it is used in each `instance_session` block.
+    #
+    #     class Foo
+    #
+    #       Home_::Memoization::Pool[ self ].instances_can_only_be_accessed_through_instance_sessions
+    #
+    #       def initialize
+    #         @state = :money
+    #       end
+    #
+    #       def clear_for_pool
+    #         @state = :cleared
+    #       end
+    #
+    #       attr_reader :state
+    #     end
+    #
+    # with such a class, you can't create instances of it
+    #
+    #     Foo.new  # => NoMethodError: private method `new' called for..
+    #
+    # however you can access it during a session:
+    #
+    #     keep = nil
+    #     Foo.instance_session do |o|
+    #       o.state  # => :money
+    #       keep = o
+    #     end
+    #
+    #     keep.state  # => :cleared
     #
     # ( Be forewarned that flyweighting can cause hard to track down bugs
     # if used frivolously. You've got to make sure that `clear_for_pool`
@@ -33,6 +50,7 @@ module Skylab::Common
     # to something that doesn't know it's a flyweight, because it might
     # otherwise change state while they are holding on to it. )
     #
+    # (we break this last rule in the test to show that the callback is called.)
 
     class << self
 

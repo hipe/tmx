@@ -2,82 +2,60 @@ require_relative 'test-support'
 
 module Skylab::Common::TestSupport
 
-  module Mmztn___  # :+#throwaway-module for constants created during tests
-
-    # <-
-
-  TS_.describe "[co] memoization" do
+  describe "[co] memoization" do
 
     extend TS_
+    use :memoizer_methods
 
-    context "'s block form" do
+    context "here's an example of enhancing a class with the enhancer function" do
 
-      context "uses the same objects, kept in a pool, for each block" do
+      before :all do
 
-        before :all do
+        class X_m_Foo
 
-          class Wat
+          Home_::Memoization::Pool[ self ].instances_can_only_be_accessed_through_instance_sessions
 
-            Home_::Memoization::Pool[ self ].
-              instances_can_only_be_accessed_through_instance_sessions
-
-            count = 0
-            define_method :initialize do
-              @count = ( count += 1 )
-            end
-
-            @@clear_was_called_a = []
-
-            define_method :clear_for_pool do
-              @@clear_was_called_a << @count
-            end
-
-            define_singleton_method :cwc_a do
-              @@clear_was_called_a
-            end
-
-            attr_reader :count
+          def initialize
+            @state = :money
           end
+
+          def clear_for_pool
+            @state = :cleared
+          end
+
+          attr_reader :state
+        end
+      end
+
+      it "with such a class, you can't create instances of it" do
+
+        _rx = ::Regexp.new "\\Aprivate\\ method\\ `new'\\ called\\ for"
+
+        begin
+          X_m_Foo.new
+        rescue NoMethodError => e
         end
 
-        # we see that new objects are created as they are needed, and
-        # that the pool is used as a stack.
+        e.message.should match _rx
+      end
 
-        it "we see that the pool is used as a stack" do
+      it "however you can access it during a session" do
 
-          cls = Wat
-
-          cls.instance_session do |o|
-            o.count.should eql( 1 )
-          end
-
-          cls.instance_session do |o|
-            o.count.should eql( 1 )
-            cls.instance_session do |p|
-              p.count.should eql( 2 )
-            end
-          end
-
-          cls.instance_session do |o|
-            o.count.should eql( 1 )
-            cls.instance_session do |p|
-              p.count.should eql( 2 )
-              cls.instance_session do |q|
-                q.count.should eql( 3 )
-              end
-            end
-          end
-
-          cls.cwc_a.should eql( [ 1, 2, 1, 3, 2, 1 ] )
+        keep = nil
+        X_m_Foo.instance_session do |o|
+        (   o.state ).should eql :money
+          keep = o
         end
+
+        keep.state.should eql :cleared
       end
     end
 
-    context "'s lease-relase form" do
+    context "uses `lease` and `release` to yield the same objects from a pool" do
 
-      it "uses `lease` and `release` to yield the same objects from a pool" do
+      shared_subject :_custom_tuple do
 
-        class How
+        class X_c_m_Bar
 
           count = 0
 
@@ -88,42 +66,69 @@ module Skylab::Common::TestSupport
             o
           end
 
-          attr_accessor :message
-          attr_reader :pessage
-          attr_accessor :rando
-
           def initialize cnt
             @pessage = "which came after #{ cnt - 1 }"
           end
+
+          attr_writer(
+            :message,
+            :_object_identifier,
+          )
 
           def clear_for_pool
             # leave @pessage as-is
           end
 
           def say
-            "#{ message } #{ pessage }"
+            "#{ @message } #{ @pessage }"
           end
+
+          attr_reader(
+            :_object_identifier,
+          )
         end
 
-        cls = How
+        a = []
+        cls = X_c_m_Bar
 
-        o1 = cls.lease
-        o1.say.should eql( "i am the 1th nerk which came after 0" )
-        o1.rando = :first
+        o = cls.lease
+        a.push o.say
+        o._object_identifier = :first
 
-        o2 = cls.lease
-        o2.say.should eql( "i am the 2th nerk which came after 1" )
-        o2.rando = :second
+        o_ = cls.lease
+        a.push o_.say
+        o_._object_identifier = :second
 
-        cls.release o1  # does nothing but add it back to the pool!
-        o1.say.should eql( "i am the 1th nerk which came after 0" )
+        cls.release o  # does nothing but add it back to the pool!
+        a.push o.say
 
-        o3_1 = cls.lease
-        o3_1.say.should eql( "i am the 1th nerk which came after 0" )
-        o3_1.rando.should eql( :first )
+        o = cls.lease
+        a.push o.say
+        a.push o._object_identifier
+        a
+      end
+
+      same = "i am the 1th nerk which came after 0"
+
+      it "test 1" do
+        _at(0) == same || fail
+      end
+
+      it "test 2" do
+        _at(1) == "i am the 2th nerk which came after 1" || fail
+      end
+
+      it "test 3" do
+
+        a = _custom_tuple
+        a[2] == same || fail
+        a[3] == same || fail
+        a[4] == :first || fail
+      end
+
+      def _at d
+        _custom_tuple.fetch d
       end
     end
-  end
-# ->
   end
 end
