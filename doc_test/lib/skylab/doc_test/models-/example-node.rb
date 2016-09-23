@@ -1,9 +1,6 @@
 module Skylab::DocTest
 
-  class Models_::ExampleNode
-
-    # implement [#025] "common paraphernalia model"
-    # (three laws)
+  class Models_::ExampleNode  # #[#025]
 
     class << self
 

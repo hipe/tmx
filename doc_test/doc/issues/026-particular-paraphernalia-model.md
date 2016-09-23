@@ -15,9 +15,9 @@ item, but that would require a custom "choices" class that maps names..
 
 ## spec-ish
 
-it is up to the particular common paraphernalia (got that?) to decide ..
+it is up to the particular stem paraphernalia (got that?) to decide ..
 
 one day it would be nice to give "vertical reflection" so that the
-common paraphernalia asks the particular paraphernalia what is its
+stem paraphernalia asks the particular paraphernalia what is its
 expression shape (string, line, or lines) and then report that as *its*
 expression shape..

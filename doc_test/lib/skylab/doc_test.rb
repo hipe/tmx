@@ -122,6 +122,33 @@ module Skylab::DocTest
   Autoloader_ = Common_::Autoloader
   Lazy_ = Common_::Lazy
 
+  # --
+
+  module Paraphernalia_
+
+    # rather than the abstract or particular classes (and/or similar) to have
+    # to represent this meta-data, we conentrate all of it here for now ..
+
+    _IS_NODE_OF_INTEREST = {  # more or less as covered
+      context_node: true,
+      example_node: true,
+      const_definition_shared_setup: false,
+    }
+
+    Is_node_of_interest = -> parti do
+      _IS_NODE_OF_INTEREST.fetch parti.paraphernalia_category_symbol
+    end
+
+    _IS_BRANCH = {
+      context_node: true,
+      example_node: false,
+    }
+
+    Is_branch = -> parti do
+      _IS_BRANCH.fetch parti.paraphernalia_category_symbol
+    end
+  end
+
   # -- branch modules (alpha)
 
   o = -> const do
@@ -199,6 +226,7 @@ module Skylab::DocTest
   NIL_ = nil
   NOTHING_ = nil
   UNABLE_ = false
+  ZERO_LENGTH_LINE_RX_ = /\A$/
 end
 # #tombstone: old self-test doc body copy
 # #tombstone: dedicated API file

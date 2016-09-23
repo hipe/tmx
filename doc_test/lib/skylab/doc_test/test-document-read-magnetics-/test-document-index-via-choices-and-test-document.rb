@@ -119,7 +119,7 @@ module Skylab::DocTest
       }
 
       def __maybe_index_a_before_node no
-        if ALL___ == no.identifying_string
+        if ALL___ == no.mixed_identifying_key
           __index_before_all no
         else
           self._COVER_ME_before_each_do_nothing
@@ -160,7 +160,7 @@ module Skylab::DocTest
           bi = self.class.into_for no, self  # recurse
           if bi
             @_node_indexes_of_interest.push bi
-            @_universal_name_box.replace tmp.identifying_string, bi
+            @_universal_name_box.replace tmp.mixed_identifying_key, bi
           else
             ok = bi
           end
@@ -190,7 +190,7 @@ module Skylab::DocTest
 
       def _add_to_universal_name_index node_index
 
-        k = node_index.identifying_string
+        k = node_index.mixed_identifying_key
         @_universal_name_box.add k, node_index
         ACHIEVED_  # reserved for if we ever soft-fail on name collisions
       end
@@ -235,8 +235,14 @@ module Skylab::DocTest
         freeze
       end
 
-      def identifying_string
-        @existing_child_document_node.identifying_string
+      def dup_by  # (in its use case this fully overwrites, but meh)
+        o = dup
+        yield o
+        o.freeze
+      end
+
+      def mixed_identifying_key
+        @existing_child_document_node.mixed_identifying_key
       end
 
       attr_accessor(

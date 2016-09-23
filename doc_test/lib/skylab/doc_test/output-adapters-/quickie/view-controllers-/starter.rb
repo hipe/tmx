@@ -8,6 +8,11 @@ module Skylab::DocTest
 
       TEMPLATE_FILE___ = '_starter.tmpl'
 
+      class << self
+        alias_method :via_choices, :new
+        undef_method :new
+      end  # >>
+
       def initialize cx
         @_choices = cx
       end

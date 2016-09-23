@@ -5,13 +5,23 @@ module Skylab::DocTest
     class ViewControllers_::SharedSubject  # #[#026]
 
       # this one is a little different: near [#024] the subject instance
-      # is built off the common paraphernalia IFF it has a line or lines
+      # is built off the stem paraphernalia IFF it has a line or lines
       # that match a pattern..
 
       TEMPLATE_FILE___ = '_shared-subject.tmpl'
 
-      def initialize o, cx, visible_shared=nil
-        @_common = o
+      class << self
+
+        def via_two_ o, cx
+          via_three_ o, NOTHING_, cx
+        end
+
+        alias_method :via_three_, :new
+        undef_method :new
+      end  # >>
+
+      def initialize o, visible_shared, cx
+        @_stem = o
         @_choices = cx
         @_visible_shared = visible_shared
       end
@@ -143,9 +153,9 @@ module Skylab::DocTest
 
         @_body_line_cache = []  # this is the final line string cache
 
-        @_line_object_stream = @_common.to_code_run_line_object_stream
+        @_line_object_stream = @_stem.to_code_run_line_object_stream
 
-        _val_a = @_common.variable_assignment_lines
+        _val_a = @_stem.variable_assignment_lines
         @_match = _val_a.fetch( -1 )  # we just disregard the non-last ones.
       end
 

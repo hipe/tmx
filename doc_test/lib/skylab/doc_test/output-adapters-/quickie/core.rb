@@ -55,7 +55,7 @@ module Skylab::DocTest
       end
 
       def some_original_test_line_stream
-        ViewControllers_::Starter.new( self ).some_original_test_line_stream__
+        ViewControllers_::Starter.via_choices( self ).some_original_test_line_stream__
       end
 
       def begin_insert_into_empty_document doc
@@ -70,24 +70,24 @@ module Skylab::DocTest
 
       def particular_paraphernalia_of_for_under sym, para, x
         _cls = _paraphernalia_class_for sym
-        _cls.new para, self, x
+        _cls.via_three_ para, x, self
       end
 
       def particular_paraphernalia_for_under para, x
         _sym = para.paraphernalia_category_symbol
         _cls = _paraphernalia_class_for _sym
-        _cls.new para, self, x
+        _cls.via_three_ para, x, self
       end
 
       def particular_paraphernalia_for para
         _sym = para.paraphernalia_category_symbol
         _cls = _paraphernalia_class_for _sym
-        _cls.new para, self
+        _cls.via_two_ para, self
       end
 
       def particular_paraphernalia_of_for sym, para
         _cls = _paraphernalia_class_for sym
-        _cls.new para, self
+        _cls.via_two_ para, self
       end
 
       def _paraphernalia_class_for sym

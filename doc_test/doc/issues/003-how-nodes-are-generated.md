@@ -6,7 +6,7 @@ to the end of producing test code from comments, the subject sidesystem
 models the relevant content of the "asset code" (seen only as a line
 stream) in intermediate representations of common test-suite
 "paraphernalia" that are intended (on paper at least) to be agnostic
-of particular test-suite libraries. (this "common paraphernalia"
+of particular test-suite libraries. (this "stem paraphernalia"
 is pseudo-spec'ed at [#025].)
 
 
@@ -39,8 +39,8 @@ to accomodate this breadth along both these axes; that is, it
 has accomodations for a variety of phenomena across a variety of
 test-suite solutions.
 
-what we were calling "phenomena" above we call "common paraphernalia" in
-the pipeline (i.e code). each such object of common paraphernalia gets
+what we were calling "phenomena" above we call "stem paraphernalia" in
+the pipeline (i.e code). each such object of stem paraphernalia gets
 translated into an object of paraphernalia particular to the target
 test-suite, and it is these final objects that produce the lines of
 output.

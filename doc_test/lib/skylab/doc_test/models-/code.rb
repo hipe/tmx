@@ -51,7 +51,7 @@ module Skylab::DocTest
           o = st.gets
           if o
             if o.has_magic_copula
-              st = o.to_common_paraphernalia_given( choices ).to_line_stream
+              st = o.to_stem_paraphernalia_given( choices ).to_line_stream
               p = -> do
                 line = st.gets
                 if line
@@ -155,7 +155,7 @@ module Skylab::DocTest
 
       # --
 
-      def to_common_paraphernalia_given choices  # assume has magic copula
+      def to_stem_paraphernalia_given choices  # assume has magic copula
         Models_::CopulaAssertion.via_code_line__ self, choices
       end
 

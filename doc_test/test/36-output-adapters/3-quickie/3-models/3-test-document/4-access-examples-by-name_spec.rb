@@ -16,7 +16,7 @@ module Skylab::DocTest::TestSupport
 
         eg.nodes.fetch(2).line_string == "        eg = _doc.first_example_node  # WAHOOTEY\n" || fail
 
-        _ = eg.identifying_string
+        _ = eg.mixed_identifying_key
         _ == "i am the first test in this document. can you see me?" || fail
       end
 
@@ -49,7 +49,10 @@ module Skylab::DocTest::TestSupport
         s = "what about over here"
 
         _qeg = _doc.to_qualified_example_node_stream.flush_until_detect do |o|
-          o.example_node.identifying_string.include? s
+          x = o.example_node.mixed_identifying_key
+          if x.respond_to? :ascii_only?
+            x.include? s
+          end
         end
 
         _eg = _qeg.example_node

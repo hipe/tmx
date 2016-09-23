@@ -1,9 +1,6 @@
 module Skylab::DocTest
 
-  class Models_::Context  # #[#025] common paraphernalia
-
-    # this rewritten handling of context is experimental. it cannot be
-    # considered to have "gelled" until [#012] synchronizing is in.
+  class Models_::Context  # #[#025]
 
     class << self
 
@@ -25,7 +22,7 @@ module Skylab::DocTest
       @_choices.particular_paraphernalia_for self
     end
 
-    def to_common_paraphernalia_stream
+    def to_stem_paraphernalia_stream
 
       Common_::Stream.via_nonsparse_array( @_pairs ).map_by do |pair|  # like #spot-4
 

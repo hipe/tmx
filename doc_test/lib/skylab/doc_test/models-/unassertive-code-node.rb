@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class Models_::UnassertiveCodeNode  # notes in #[#025]
+  class Models_::UnassertiveCodeNode  # #[#025]
 
     class << self
 

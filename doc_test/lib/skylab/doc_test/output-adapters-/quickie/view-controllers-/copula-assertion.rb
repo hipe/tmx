@@ -4,13 +4,18 @@ module Skylab::DocTest
 
     class ViewControllers_::CopulaAssertion  # #[#026]
 
-      def initialize common_para, _choices
-        @_common = common_para
+      class << self
+        alias_method :via_two_, :new
+        undef_method :new
+      end  # >>
+
+      def initialize stem, _choices
+        @_stem = stem
       end
 
       def to_line_stream
 
-        @_actual_code_string, @_expected_code_string, @_LTS = @_common.to_three_pieces
+        @_actual_code_string, @_expected_code_string, @_LTS = @_stem.to_three_pieces
 
         yes = nil
         yes ||= __looks_like_should_match_string_head
@@ -107,7 +112,7 @@ module Skylab::DocTest
       end
 
       def _actual
-        @_common.add_parens_if_maybe_necessary @_actual_code_string
+        @_stem.add_parens_if_maybe_necessary @_actual_code_string
       end
 
       def _stream_via_array s_a

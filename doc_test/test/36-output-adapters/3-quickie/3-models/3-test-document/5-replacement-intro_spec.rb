@@ -109,7 +109,7 @@ module Skylab::DocTest::TestSupport
     def __qualified_example_via_regex rx, doc
 
       eg = doc.to_qualified_example_node_stream.flush_until_detect do |o|
-        o.example_node.identifying_string =~ rx
+        rx =~ o.example_node.mixed_identifying_key
       end
       eg or fail
       eg

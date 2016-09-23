@@ -53,7 +53,13 @@ module Skylab::DocTest
       o = Rewrite__.new _idx, nodes
       o.write_nodes_through_the_reference_node
       o.write_blank_line_if_necessary
-      o.write_new_node_of_interest no
+
+      if Paraphernalia_::Is_node_of_interest[ no ]
+        o.write_new_node_of_interest no
+      else
+        o.__create_and_push_freeform_branch_frame_for no
+      end
+
       o.write_nodes_after_the_reference_node_to_the_end
       o.finish
     end
@@ -121,36 +127,58 @@ module Skylab::DocTest
 
       def __write_node_of_interest sym, is, st  # is=identifying string; st=line stream
 
-            margin = ___get_reference_margin
-            nodes = []
+        bf = ErsatzParser::FreeformBranchFrame.via_four(
+          is, sym, st, __get_margin )
 
-            nodes.push Line_.new( "#{ margin }#{ st.gets }", :nonblank_line )  # or..
-            begin
-              line = st.gets
-              line or break
-              _o = if BLANK_RX_ =~ line
-                Line_.new line, :blank_line
-              else
-                Line_.new "#{ margin }#{ line }", :nonblank_line
-              end
-              nodes.push _o
-              redo
-            end while nil
-
-        @result_nodes.push ErsatzParser::FreeformBranchFrame.new sym, is, nodes
-
+        if bf
+          @result_nodes.push bf
+        end
         NIL
       end
 
-          def ___get_reference_margin
+      def __create_and_push_freeform_branch_frame_for no
 
-            d = @index.reference_index
-            if d
-              @original_nodes.fetch( d ).nodes.first.get_margin
-            else
-              "#{ @original_nodes.fetch( 0 ).get_margin }  "  # manual #indent #ick
-            end
+        _id_x = no.TOUCH_EXPERIMENTAL_UNIQUE_IDENTIFIER
+        _sym = no.paraphernalia_category_symbol
+        _st = no.to_line_stream
+
+        # --  # eek see #spot-6
+        d = @index.reference_index
+        d || fail
+        node = @original_nodes.fetch d
+        node.is_branch && fail
+        if BLANK_RX_ =~ node.line_string
+          margin = node.line_string
+          margin.chop!
+          @result_nodes.pop  # eek don't use the line meant to show indent
+        else
+          margin = node.get_margin
+        end
+        # --
+
+        bf = ErsatzParser::FreeformBranchFrame.via_four(
+          _id_x, _sym, _st, margin )
+
+        if bf
+          @result_nodes.push bf
+        end
+        NIL
+      end
+
+      def __get_margin
+
+        d = @index.reference_index
+        if d
+          node = @original_nodes.fetch d
+          if node.is_branch
+            node.nodes.first.get_margin
+          else
+            node.get_margin
           end
+        else
+              "#{ @original_nodes.fetch( 0 ).get_margin }  "  # manual #indent #ick
+        end
+      end
 
       def nodes_exist_after_the_reference_node
             @index.reference_index < @original_nodes.length - 1
@@ -231,6 +259,7 @@ module Skylab::DocTest
         @_on_context = :_ignore
         @_on_module = :_ignore
         @_on_nonblank_line = :_ignore
+        @reference_index = nil
       end
 
       def __set_reference_node_to_be_the_penultimate_node
@@ -258,19 +287,24 @@ module Skylab::DocTest
 
       def __will_search_for_this after_this
 
-            @_blank_lines_array = []
-            @_on_blank_line = :_record_this_blank_line
-            @_on_nonblank_line = :__this_special_thing
-            @_find_me = after_this.identifying_string
+        if Paraphernalia_::Is_node_of_interest[ after_this ]
+          @_find_me = after_this.identifying_string
+        else
+          @_find_me = after_this.EXPERIMENTAL_UNIQUE_IDENTIFIER
+        end
 
+        @_blank_lines_array = []
+        @_on_blank_line = :_record_this_blank_line
+        @_on_nonblank_line = :__this_special_thing
         @_on_context = :_is_this_the_node_of_interest
         @_on_example = :_is_this_the_node_of_interest
+        @_on_shared_setup = :_is_this_the_node_of_interest
       end
 
           # --
 
       def execute
-        @reference_index = nil ; @separating_blank_lines_array = nil
+        @separating_blank_lines_array = nil
         __do_index
         Index__.new @reference_index, @separating_blank_lines_array
       end
@@ -292,12 +326,13 @@ module Skylab::DocTest
 
       def _is_this_the_node_of_interest
 
-            if @_find_me == @_current_node.identifying_string
-              @reference_index = @_current_node_index
-              _stop_recording_blank_lines
-            else
-              @_blank_lines_array.clear
-            end
+        if @_find_me == @_current_node.mixed_identifying_key
+          @reference_index = @_current_node_index
+          _stop_recording_blank_lines
+        else
+          @_blank_lines_array.clear
+        end
+        NIL
       end
 
           def __this_special_thing
@@ -316,6 +351,7 @@ module Skylab::DocTest
       IVARS___ = {
         before: :@_on_before,
         blank_line: :@_on_blank_line,
+        const_definition_shared_setup: :@_on_shared_setup,
         context_node: :@_on_context,
         example_node: :@_on_example,
         module: :@_on_module,

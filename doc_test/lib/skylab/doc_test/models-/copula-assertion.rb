@@ -1,8 +1,6 @@
 module Skylab::DocTest
 
-  class Models_::CopulaAssertion
-
-    # implement [#025] "common paraphernalia model"
+  class Models_::CopulaAssertion  # #[#025]
 
     class << self
       alias_method :via_code_line__, :new

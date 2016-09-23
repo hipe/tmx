@@ -6,7 +6,17 @@ module Skylab::DocTest
 
       TEMPLATE_FILE___ = '_eg-simple.tmpl'
 
-      def initialize para, cx, visible_shared=nil
+      class << self
+
+        def via_two_ para, cx
+          via_three_ para, NOTHING_, cx
+        end
+
+        alias_method :via_three_, :new
+        undef_method :new
+      end  # >>
+
+      def initialize para, visible_shared, cx
 
         if visible_shared
           @_has_visible_shared_items = true
@@ -71,7 +81,7 @@ module Skylab::DocTest
           # magic copula to expand to take up more than one line, all the
           # while streaming.
 
-          st = lo.to_common_paraphernalia_given( @_choices ).to_line_stream
+          st = lo.to_stem_paraphernalia_given( @_choices ).to_line_stream
           lo = nil
           p = -> do
             s = st.gets
@@ -144,7 +154,7 @@ module Skylab::DocTest
         if ! o.found || o.is_blank
           UNABLE_
         else
-          @__description_bytes = o.finish
+          @description_bytes_ = o.finish
           ACHIEVED_
         end
       end
@@ -154,7 +164,7 @@ module Skylab::DocTest
         t = @_choices.load_template_for TEMPLATE_FILE___
 
         t.set_simple_template_variable(
-          remove_instance_variable( :@__description_bytes ),
+          remove_instance_variable( :@description_bytes_ ),
           :description_bytes,
         )
 

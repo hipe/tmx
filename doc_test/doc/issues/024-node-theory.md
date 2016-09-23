@@ -1,4 +1,4 @@
-# node thoery :[#025]
+# node thoery :[#024]
 
 ## this document..
 

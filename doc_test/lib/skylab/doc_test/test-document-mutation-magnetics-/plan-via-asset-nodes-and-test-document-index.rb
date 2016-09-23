@@ -91,11 +91,18 @@ module Skylab::DocTest
 
       def initialize cq, dq, ps, bi, tdi, & l
 
-        @_has_some_content_of_interest = if bi
-          bi.node_indexes_of_interest.length.nonzero?
+        if bi
+          if bi.is_of_branch
+            has_some = bi.node_indexes_of_interest.length.nonzero?
+            use_bi = bi
+          else
+            NOTHING_  # #coverpoint5-4
+          end
         end
 
-        @branch_index = bi
+        @_has_some_content_of_interest = has_some
+        @branch_index = use_bi
+
         @clobber_queue = cq
         @dandy_queue = dq
         @listener = l
@@ -186,11 +193,17 @@ module Skylab::DocTest
         if k
           eni = @test_document_index.lookup_via_identifying_string k
           if eni  # existing node index
-            _left_is_branch = IS_BRANCH___.fetch no.paraphernalia_category_symbol
-            if eni.is_of_branch == _left_is_branch
-              [ ACHIEVED_, eni ]
+            left_is_branch = Paraphernalia_::Is_branch[ no ]
+            if left_is_branch
+              if eni.is_of_branch
+                [ ACHIEVED_, eni ]  # branch => branch
+              else
+                [ ACHIEVED_, eni ]  # item => branch ("upgrade")
+              end
+            elsif eni.is_of_branch
+              __when_downgrade  # branch => item
             else
-              self._COVER_ME_node_changed_shape_fun
+              [ ACHIEVED_, eni ]  # item => item
             end
           else
             ACHIEVED_
@@ -201,10 +214,14 @@ module Skylab::DocTest
         end
       end
 
-      IS_BRANCH___ = {
-        context_node: true,
-        example_node: false,
-      }
+      def __when_downgrade
+         # when left is item and right is branch, it's a "DOWNGRADE" - can't
+         @listener.call :error, :expression, :will_not_downgrade do |y|
+          y << "won't downgrade from context to example - #{ k.inspect }"
+          y << "(information will be lost)"
+        end
+        UNABLE_
+      end
 
       def __when_context_node_already_exists eni, no
 
@@ -214,7 +231,7 @@ module Skylab::DocTest
         creation_branch = _recurse2 no, eni
         if creation_branch
           if creation_branch.length.nonzero?
-            plan = Plan__::Merge_context[ eni, creation_branch ]
+            plan = Plan__::Merge_context[ eni, creation_branch, no ]
             @_previous_plan = plan
             __add_to_dandy_queue plan
           end
@@ -311,10 +328,14 @@ module Skylab::DocTest
           end
         end  # (if no branch index then no branch ergo all items will be "create")
 
-        plan = if _do_replace
-          Plan__::Replace_const_def[ no, @branch_index.before_all_block ]
+        if _do_replace
+          plan = Plan__::Replace_const_def[ no, @branch_index.before_all_block ]
         else
-          Plan__::Insert_const_def[ no, @_previous_plan ]
+          plan = Plan__::Insert_const_def[ no, @_previous_plan ]
+          if ! @_has_some_content_of_interest
+            # @_has_some_content_of_interest = true  uh oh..
+            plan.become_first_content
+          end
         end
 
         @_previous_plan = plan
@@ -357,10 +378,11 @@ module Skylab::DocTest
 
     module Plan__
 
-      Merge_context = -> eni, a do
+      Merge_context = -> eni, a, no do
         o = NodePlan__.new
         o.existing_node_index = eni
         o.plan_array = a
+        o.new_node = no
         o.node_shape = :context
         o.plan_verb = :merge
         o.finish
@@ -424,6 +446,12 @@ module Skylab::DocTest
     end
 
     class NodePlan__
+
+      def dup_by
+        o = dup
+        yield o
+        o.freeze
+      end
 
       def finish
         self

@@ -32,21 +32,41 @@ module Skylab::DocTest
     def __transfer_the_dandy_queue
       dq = @dandy_queue
       if dq
+
         # exactly #note-1 - context nodes that exist on the right composed
         # of one or more nodes that don't yet exist on the right.
+
         dq.each do |plan|
+
           :context == plan.node_shape || self._SANITY
           :merge == plan.plan_verb || self._SANITY
-          # (because of its rigid, narrow structural profile we could
-          # streamline the execution of this but meh, why bother)
-          Recurse__.new(
-            plan.existing_node_index.existing_document_node,
-            plan.plan_array,
-            1,  # any nonzero eew
-            @choices,
-          ).execute
+
+          __recurse plan
         end
       end
+      NIL
+    end
+
+    def __recurse plan
+
+      # because of its rigid, narrow structural profile we could
+      # streamline the execution of this but meh, why bother
+
+      eni = plan.existing_node_index
+
+      if eni.is_of_branch
+        existing = eni.existing_document_node
+      else
+        # #coverpoint5-4 - upgrading an item node (experiment)
+        existing = plan.new_node.UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE plan
+      end
+
+      Recurse__.new(
+        existing,
+        plan.plan_array,
+        1,  # any nonzero eew
+        @choices,
+      ).execute
       NIL
     end
 
@@ -116,12 +136,17 @@ module Skylab::DocTest
       end
 
       CONST_DEF__ = {
-        insert: :__TODO_insert_const_def,
+        insert: :__insert_const_def,
         replace: :__replace_const_def,
       }
 
       def __replace_const_def plan
         plan.existing_node.replace_lines plan.new_node.to_line_stream
+        NIL
+      end
+
+      def __insert_const_def plan
+        _insert_this_content_somewhere plan.new_node, plan
         NIL
       end
 
@@ -166,11 +191,11 @@ module Skylab::DocTest
         pp = plan.previous_plan
         if pp
 
-          _ref_node = pp.new_node
-          _ref_node ||= pp.existing_node_index.existing_document_node
-          _ref_node || fail
+          ref_node = pp.new_node
+          ref_node ||= pp.existing_node_index.existing_document_node
+          ref_node || fail
 
-          @destination_branch.insert_after__ _ref_node, new_node
+          @destination_branch.insert_after__ ref_node, new_node
 
         elsif plan.is_first_content
 

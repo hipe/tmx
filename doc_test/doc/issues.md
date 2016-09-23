@@ -23,7 +23,7 @@
 
 [#026]       particular paraphernalia model ..
 
-[#025]       common paraphernalia model..
+[#025]       the stem paraphernalia model..
 
 [#024]       node-theory ..
 

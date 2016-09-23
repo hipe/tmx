@@ -89,7 +89,8 @@ module Skylab::DocTest
         end
 
         def to_particular_paraphernalia_under x
-          ViewControllers_::SharedSubject.new self, remove_instance_variable( :@_cx ), x
+          _choices = remove_instance_variable :@_cx
+          ViewControllers_::SharedSubject.via_three_ self, x, _choices
         end
 
         # -- all for the second proxy

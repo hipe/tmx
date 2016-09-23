@@ -29,42 +29,8 @@ module Skylab::DocTest
     def set_multiline_template_variable st, sym
 
       _para = @_reflection._lookup_parameter sym
-
-      margin_s = _para.margins.first  # or last or whatever..
-
-      # the only reason we're being OCD about the below is because
-      # we want the user (not us) to decide whether tabs are used
-
-      if BLANK_RX_ !~ margin_s
-        ::Kernel._DESIGN_ME_readme
-      end
-
-      # the first line does not get deepend (because in the template
-      # (presumably) that "line" spot is already marginated)
-
-      big_string = st.gets
-
-      # any remaining lines *do* get deepened:
-
-      st.reduce_into_by big_string do |m, line|
-
-        if BLANK_RX_ =~ line
-          # it is almost certainly the case that when there is a "blank"
-          # line in the source document, it should not get deepened.
-          # use the user's LTS
-          m << line
-        else
-          # since there is content in the line, do this shim sham
-          m << "#{ margin_s }#{ line }"
-        end
-      end
-
-      # finally, don't add any final LTS in addition to
-      # the one that is presumably in the template
-
-      big_string.chomp!
-
-      _write_setting big_string, sym
+      _big_s = Big_string_via_multiline_etc___[ st, _para ]
+      _write_setting _big_s, sym
     end
 
     def set_simple_template_variable s, sym
@@ -108,6 +74,53 @@ module Skylab::DocTest
       template_cache[ normal_path ] = x
       x
     end
+
+    # ==
+
+    module Big_string_via_multiline_etc___ ; class << self
+
+      def call st, para
+
+        x = st.gets
+        if x
+          __when_some x, st, para
+        else
+          EMPTY_S_
+        end
+      end
+      alias_method :[], :call
+
+      def __when_some buffer, st, para
+
+        margin_s = para.margins.first  # or last or whatever..
+
+        # we want the user (not us) to decide whether tabs are used
+
+        # the first line does not get deepend (because in the template
+        # (presumably) that "line" spot is already marginated)
+
+        # any remaining lines *do* get deepened:
+
+        st.reduce_into_by buffer do |m, line|
+
+          if ZERO_LENGTH_LINE_RX_ =~ line
+            # it is almost certainly the case that when there is a "blank"
+            # line in the source document, it should not get deepened.
+            # use the user's LTS
+            m << line
+          else
+            # since there is content in the line, do this shim sham
+            m << "#{ margin_s }#{ line }"
+          end
+        end
+
+        # finally, don't add any final LTS in addition to
+        # the one that is presumably in the template
+
+        buffer.chomp!
+        buffer
+      end
+    end ; end
 
     # ==
 

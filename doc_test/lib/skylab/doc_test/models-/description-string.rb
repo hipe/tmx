@@ -1,9 +1,7 @@
 module Skylab::DocTest
 
-  class Models_::DescriptionString
+  class Models_::DescriptionString  # near #[#025]
 
-    # a bit like a [#025] "common paraphernalia model"
-    #
     # but this is modeled as an ornate session in which
     # particular methods must be called in a particular order :/
 

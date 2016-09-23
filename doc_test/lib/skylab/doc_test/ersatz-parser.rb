@@ -256,8 +256,33 @@ module Skylab::DocTest
 
         # -- mutators
 
+        def mutate_by_replacing_child__ child_, child
+
+          a = @nodes
+          oid = child.object_id
+          _d = a.length.times.detect do |d_|
+            oid == a.fetch( d_ ).object_id
+          end
+
+          a_ = a.dup  # was frozen
+          a_[ _d ] = child_
+          a_.freeze
+          @nodes = a_
+          NIL
+        end
+
+        def insert_after__ after_this, no
+          @nodes = _insert::Insert_after[ after_this, no, @nodes ]
+          NIL_
+        end
+
         def begin_insert_into_empty_branch_session
-          _mags::Insertion_via_NewNodes::Begin_insert_into_empty[ @nodes ]
+          _insert::Begin_insert_into_empty[ @nodes ]
+        end
+
+        def hack_insert_first_content__ no
+          @nodes = _insert::Hack_insert_first_content[ no, @nodes ]
+          NIL
         end
 
         def replace__ a  # freezes
@@ -274,7 +299,7 @@ module Skylab::DocTest
 
           to_qualified_example_node_stream.flush_until_detect do |qeg|
 
-            s == qeg.example_node.identifying_string
+            s == qeg.example_node.mixed_identifying_key
           end
         end
 
@@ -367,6 +392,10 @@ module Skylab::DocTest
           Common_::Polymorphic_Stream.via_array @nodes
         end
 
+        def _insert
+          _mags::Insertion_via_NewNodes
+        end
+
         def _mags
           Home_::TestDocumentMutationMagnetics_
         end
@@ -385,16 +414,28 @@ module Skylab::DocTest
         end
       end
 
-      class FreeformBranchFrame < BranchNode__  # 1x
+      class FreeformBranchFrame < BranchNode__
 
-        def initialize sym, is, nodes
+        class << self
+
+          def via_four id_x, sym, st, margin
+            nodes = Line_nodes_via_line_stream_and_margin___[ st, margin ]
+            if nodes
+              new id_x, sym, nodes
+            end
+          end
+
+          private :new
+        end  # >>
+
+        def initialize k_x, sym, nodes
           @category_symbol = sym
-          @identifying_string = is
+          @mixed_identifying_key = k_x
           @nodes = nodes
         end
 
         attr_reader(
-          :identifying_string,
+          :mixed_identifying_key,
         )
       end
 
@@ -460,18 +501,8 @@ module Skylab::DocTest
         end
 
         def prepend_before_some_existing_content__ no
-          @nodes = _mags::Insertion_via_NewNodes::Prepend_before_some_existing[ no, @nodes ]
+          @nodes = _insert::Prepend_before_some_existing[ no, @nodes ]
           NIL_
-        end
-
-        def insert_after__ after_this, no
-          @nodes = _mags::Insertion_via_NewNodes::Insert_after[ after_this, no, @nodes ]
-          NIL_
-        end
-
-        def hack_insert_first_content__ no
-          @nodes = _mags::Hack_insert_first_content[ no, @nodes ]
-          NILn
         end
 
         def replace_lines line_st
@@ -517,11 +548,11 @@ module Skylab::DocTest
       class NonRootFrame___ < BranchNode_from_Document__
 
         def initialize md, bnt, lineno_d
-          @_branch_NT = bnt
           @category_symbol = bnt.category_symbol
           @_end_line_matcher = bnt.__build_end_line_matcher md
           @lineno = lineno_d
           @_matchdata = md  # just for id s
+          @__identifying_string_proc = bnt.identifying_string_proc
           super()
         end
 
@@ -534,19 +565,48 @@ module Skylab::DocTest
           super()
         end
 
-        def identifying_string  # assume a proc exists to determine any it
-          @_id_s_kn ||= __build_identifying_string_knownness
-          @_id_s_kn.value_x
+        def mixed_identifying_key
+          ( @___idkn ||= ___build_mixed_identifying_key_knownness ).value_x
         end
 
-        def __build_identifying_string_knownness
-          Common_::Known_Known[
-            @_branch_NT.identifying_string_proc[ @_matchdata ] ]
+        def ___build_mixed_identifying_key_knownness
+          # assume a proc exists to determine any it
+          _p = remove_instance_variable :@__identifying_string_proc
+          _x = _p[ @_matchdata ]
+          Common_::Known_Known[ _x ]
         end
 
         attr_reader(
           :lineno,
         )
+      end
+
+      # ==
+
+      line_nodes_via_line_stream = nil
+
+      Line_nodes_via_line_stream_and_margin___ = -> st, margin do
+        line_nodes_via_line_stream.call st do |line|
+          "#{ margin }#{ line }"
+        end
+      end
+
+      line_nodes_via_line_stream = -> st, & p do
+        line = st.gets
+        if line
+          nodes = []
+          begin
+            if ZERO_LENGTH_LINE_RX_ =~ line
+              sym = :blank_line
+            else
+              line = p[ line ]
+              sym = ( BLANK_RX_ =~ line ) ? :blank_line : :nonblank_line
+            end
+            nodes.push Line_.new line, sym
+            line = st.gets
+          end while line
+          nodes
+        end
       end
 
       # ==
@@ -559,10 +619,8 @@ module Skylab::DocTest
         end
 
         def get_margin
-          MARGIN_RX___.match( @line_string )[ 0 ]
+          ANY_MARGIN_RX___.match( @line_string )[ 0 ]
         end
-
-        MARGIN_RX___ = /\A[\t ]*/
 
         def is_blank_line
           BLANK_RX_ =~ @line_string
@@ -608,6 +666,10 @@ module Skylab::DocTest
 
       Here_ = self
       Line_ = Line
+
+    ANY_MARGIN_RX___ = /\A[\t ]*/
+    MARGIN_RX = /\A(?<nonzero_length_margin>[\t ]+)/
+
       ParseError = ::Class.new ::RuntimeError
   end
 end

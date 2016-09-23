@@ -30,7 +30,7 @@ module Skylab::DocTest
         _ = @_common.to_code_run_line_object_stream.map_by do |li|
 
           if li.has_magic_copula
-            li.to_common_paraphernalia_given( @_choices ).to_line
+            li.to_stem_paraphernalia_given( @_choices ).to_line
           else
             li.get_content_line
           end

@@ -102,7 +102,7 @@ module Skylab::DocTest::TestSupport
 
         it "identifying strings!" do
 
-          _hey = _the_parse.nodes.map( & :identifying_string )
+          _hey = _the_parse.nodes.map( & :mixed_identifying_key )
           _hey == %w( johnny jammer jizniffer ) or fail
         end
       end

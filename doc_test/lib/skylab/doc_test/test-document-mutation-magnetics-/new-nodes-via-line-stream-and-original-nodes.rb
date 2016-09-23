@@ -77,7 +77,7 @@ module Skylab::DocTest
           end
 
           begin
-            _li = if BLANK_RX_ =~ s
+            _li = if ZERO_LENGTH_LINE_RX_ =~ s
               ErsatzParser::Line.new s, :blank_line
             else
               ErsatzParser::Line.new "#{ margin_ }#{ s }", :nonblank_line

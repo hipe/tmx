@@ -6,13 +6,13 @@ module Skylab::DocTest
 
     class CopulaAssertion
 
-      def initialize common_para, _choices
-        @_common = common_para
+      def initialize stem, _choices
+        @_stem = stem
       end
 
       def to_line
 
-        actual_code_string, expected_code_string, lts = @_common.to_three_pieces
+        actual_code_string, expected_code_string, lts = @_stem.to_three_pieces
 
         "#{ actual_code_string }.must eql #{ expected_code_string }#{ lts }"
       end

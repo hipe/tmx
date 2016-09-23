@@ -9,10 +9,32 @@ module Skylab::DocTest
 
       TEMPLATE_FILE___ = '_ctx.tmpl'
 
-      def initialize para, cx
+      class << self
+
+        def via_two_ o, cx
+          new.__init_by_two o, cx
+        end
+
+        def empty_via__ desc, cx
+          new.__init_via_desc desc, cx
+        end
+
+        private :new
+      end  # >>
+
+      def __init_by_two gene, cx
         @_choices = cx
-        _ = para.to_common_paraphernalia_stream
-        __init_via_common_paraphernalia_stream _
+        _ = gene.to_stem_paraphernalia_stream
+        __init_via_stem_paraphernalia_stream _
+        self
+      end
+
+      def __init_via_desc desc, cx
+        @_choices = cx
+        @identifying_string = desc
+        @description_bytes_ = desc.inspect  # #meh
+        @_particular_array = EMPTY_A_
+        self
       end
 
       def dup_by
@@ -27,6 +49,10 @@ module Skylab::DocTest
 
       def identifying_string
         @identifying_string  # 5x
+      end
+
+      def UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE plan
+        DocumentWriteMagnetics_::Upgrade.new( plan, @_choices ).execute
       end
 
       #   - our own line stream will be the output of our template,
@@ -55,7 +81,7 @@ module Skylab::DocTest
 
         t = @_choices.load_template_for TEMPLATE_FILE___
 
-        t.set_simple_template_variable @__description_bytes, :description_bytes
+        t.set_simple_template_variable @description_bytes_, :description_bytes
 
         t.set_multiline_template_variable body_line_st, :context_body
 
@@ -106,7 +132,7 @@ module Skylab::DocTest
         #   or another hacky pattern are simply skipped over. yes, this for
         #   now..
 
-      def __init_via_common_paraphernalia_stream st
+      def __init_via_stem_paraphernalia_stream st
 
         @_particular_array = []
 
@@ -151,7 +177,7 @@ module Skylab::DocTest
         o.remove_any_trailing_colons_or_commas!
         s = o.finish
         @identifying_string = s
-        @__description_bytes = s.inspect  # hm..
+        @description_bytes_ = s.inspect  # hm..
         NIL
       end
 
