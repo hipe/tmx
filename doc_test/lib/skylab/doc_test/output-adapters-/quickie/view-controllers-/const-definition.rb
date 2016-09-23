@@ -100,7 +100,7 @@ module Skylab::DocTest
       end
 
       def TOUCH_EXPERIMENTAL_UNIQUE_IDENTIFIER
-        ( @___UID ||= Common_::Known_Known[ New_unique_identifier_[] ] ).value_x
+        ( @___UID ||= New_unique_identifier_knownness_for_[ :const_def ] ).value_x
       end
 
       def EXPERIMENTAL_UNIQUE_IDENTIFIER
@@ -110,20 +110,6 @@ module Skylab::DocTest
       def paraphernalia_category_symbol
         :const_definition_shared_setup
       end
-
-      # ==
-
-      New_unique_identifier_ = -> do  # ..
-        p = -> do
-          d = 0
-          p = -> do
-            d += 1
-            :"_unique_identifier__#{ d }__"
-          end
-          p[]
-        end
-        -> { p[] }
-      end.call
     end
   end
 end

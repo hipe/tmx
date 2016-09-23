@@ -4,18 +4,16 @@ module Skylab::Common
 
   module Session::Ivars_with_Procs_as_Methods
 
-
     # enhance a class via enabling ivars to hold procs that act as methods
     #
     #     class Foo
     #       def initialize
     #         @bar = -> { :baz }
     #       end
-    #       Subject_[ self, :bar ]
+    #       Home_::Session::Ivars_with_Procs_as_Methods[ self, :bar ]
     #     end
     #
     #     Foo.new.bar  # => :baz
-
 
     # you can indicate an ivar with a name other than the method name:
     #
@@ -23,37 +21,45 @@ module Skylab::Common
     #       def initialize
     #         @_secret = -> { :ting }
     #       end
-    #       Subject_[ self, :@_secret, :wahoo ]
+    #       Home_::Session::Ivars_with_Procs_as_Methods[ self, :@_secret, :wahoo ]
     #     end
     #
     #     Bar.new.wahoo  # => :ting
 
-
     # you can use the DSL to control visibility
     #
     #     class Baz
+    #
     #       def initialize
     #         @_go = -> { :thats_right }
     #         @_hi = -> x { "HI:#{ x }" }
     #       end
     #
-    #       Subject_[ self ].as_public_method :_hi
+    #       o = Home_::Session::Ivars_with_Procs_as_Methods
     #
-    #       Subject_[ self ].as_private_getter :@_go, :yep
+    #       o[ self ].as_public_method :_hi
     #
+    #       o[ self ].as_private_getter :@_go, :yep
     #     end
     #
     #     foo = Baz.new
     #
-    #     foo._hi( 'X' ) #=> "HI:X"
+    # calling this public method works:
+    #
+    #     foo._hi( 'X' ) # => "HI:X"
+    #
+    # calling this private method does not:
+    #
     #     foo.yep  # => NoMethodError: private method `yep' called for ..
+    #
+    # but privately you can still call it:
+    #
     #     foo.send( :yep )  # => :thats_right
     #
 
-
     # you can use the struct-like producer to create the class automatically
     #
-    #     Wahoo = Subject_[].new :fief do
+    #     Wahoo = Home_::Session::Ivars_with_Procs_as_Methods.new :fief do
     #       def initialize
     #         @fief = -> { :zap }
     #       end
@@ -62,7 +68,6 @@ module Skylab::Common
     #     Wahoo.new.fief  # => :zap
     #
     # enjoy!
-
 
     class << self
 

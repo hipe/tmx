@@ -81,15 +81,19 @@ module Skylab::DocTest
       @__TFC ||= __some_test_file_context
     end
 
-      def __some_test_file_context
+    def __some_test_file_context
 
-        otp = @original_test_path
-        if otp
-          Home_::Models_::TestFileContext.via_path otp
-        else
-          Home_::Models_::TestFileContext.default_instance__
+      path = @original_test_path
+      if path
+        if Home_.lib_.system.filesystem.path_looks_absolute path
+          path = path[ 1..-1 ]   # awful - see #spot-8
         end
+        Home_::Models_::TestFileContext.via_path_and_choices__(
+          path, @choices )
+      else
+        Home_::Models_::TestFileContext.default_instance__
       end
+    end
 
     def __resolve_test_document_index_via_test_document
 

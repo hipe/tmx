@@ -62,7 +62,7 @@ since nodes can never be removed, maybe we can index these. but what if
 we change our minds?
 
 we don't know what we're going to do about unassertive nodes (tho they
-*can* be indexed by lvar name, can't they?)
+*can* be indexed by lvalue name, can't they?)
 
 (#coverpoint3-3)
 

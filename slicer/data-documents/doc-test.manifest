@@ -1,2 +1,3 @@
 basic/lib/skylab/basic/module/accessors.rb
+common/lib/skylab/common/session.rb
 system/lib/skylab/system/filesystem/cache.rb

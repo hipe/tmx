@@ -116,6 +116,7 @@ module Skylab::DocTest
         ending_line: :__ending_line_is_noop,
         example_node: :__index_an_example_node,
         nonblank_line: :__probably_dont_index_a_nonblank_line,
+        shared_subject: :__index_a_shared_subject,
       }
 
       def __maybe_index_a_before_node no
@@ -134,7 +135,7 @@ module Skylab::DocTest
         else
           @_seen_a_before_all_block = true
           @__before_all_block = no
-          @_node_indexes_of_interest.push :_placeholder_for_before_all
+          @_node_indexes_of_interest.push Before_all_placeholder___[]
           ACHIEVED_
         end
       end
@@ -168,15 +169,21 @@ module Skylab::DocTest
         ok
       end
 
+      def __index_a_shared_subject no
+        @_node_indexes_of_interest.push SharedSubjectNodeIndex___.new(
+          no, @_branch_docnode )
+        ACHIEVED_
+      end
+
       def __index_an_example_node no
 
-        _ni = ExistingExampleNodeIndex___.new do |o|
+        ni = ExistingExampleNodeIndex___.new do |o|
           o.existing_child_document_node = no
           o.existing_parent_document_node = @_branch_docnode
         end
 
-        ok = _add_to_universal_name_index _ni
-        ok and @_node_indexes_of_interest.push :_yizzy_an_example_
+        ok = _add_to_universal_name_index ni
+        ok and @_node_indexes_of_interest.push ni
         ok
       end
 
@@ -205,30 +212,96 @@ module Skylab::DocTest
 
     class BranchIndex___
 
-      def initialize bab, nioi, dn
+      def initialize bab, cni, dn
         if bab
           @has_before_all = true
           @before_all_block = bab
         end
+        @child_node_indexes = cni
         @existing_document_node = dn
-        @node_indexes_of_interest = nioi
+      end
+
+      def to_stream_of sym
+        Common_::Stream.via_nonsparse_array( @child_node_indexes ).reduce_by do |o|
+          sym == o.category_symbol
+        end
       end
 
       attr_reader(
+        :child_node_indexes,
         :existing_document_node,
         :before_all_block,
         :has_before_all,
-        :node_indexes_of_interest,
       )
+
+      def is_of_branch
+        true
+      end
+
+      def category_symbol
+        :probably_context_or_describe
+      end
+    end
+
+    # ==
+
+    NodeOfInterestIndex__ = ::Class.new
+
+    Before_all_placeholder___ = Lazy_.call do
+      BeforeAllNodeIndex___.new :BEFORE_ALL_PLACEHOLDER
+    end
+
+    class BeforeAllNodeIndex___
+
+      def initialize x
+        @HI = x
+      end
+
+      attr_reader(
+        :HI,
+      )
+
+      def category_symbol
+        :before_all
+      end
+    end
+
+    class SharedSubjectNodeIndex___
+
+      def initialize no, pa
+        @existing_child_document_node = no
+        @existing_parent_document_node = pa
+      end
+
+      attr_reader(
+        :existing_child_document_node,
+        :existing_parent_document_node,
+      )
+
+      def category_symbol
+        :shared_subject
+      end
+    end
+
+    class ExistingExampleNodeIndex___ < NodeOfInterestIndex__
+
+      def category_symbol
+        :example_node
+      end
+
+      def is_of_branch
+        false
+      end
+    end
+
+    class TemporaryBranchNodeIndex___ < NodeOfInterestIndex__
 
       def is_of_branch
         true
       end
     end
 
-    # ==
-
-    class ExistingNodeIndex__
+    class NodeOfInterestIndex__
 
       def initialize
         yield self
@@ -249,18 +322,6 @@ module Skylab::DocTest
         :existing_child_document_node,
         :existing_parent_document_node,
       )
-    end
-
-    class ExistingExampleNodeIndex___ < ExistingNodeIndex__
-      def is_of_branch
-        false
-      end
-    end
-
-    class TemporaryBranchNodeIndex___ < ExistingNodeIndex__
-      def is_of_branch
-        true
-      end
     end
   end
 end

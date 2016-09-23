@@ -93,7 +93,7 @@ module Skylab::DocTest
 
         if bi
           if bi.is_of_branch
-            has_some = bi.node_indexes_of_interest.length.nonzero?
+            has_some = bi.child_node_indexes.length.nonzero?
             use_bi = bi
           else
             NOTHING_  # #coverpoint5-4
@@ -149,14 +149,38 @@ module Skylab::DocTest
       # --
 
       def __process_shared_subject_shared_setup no
+
         if @branch_index
-          self._DO_ME
+          __maybe_replace_shared_subject no
         else
-          plan = Plan__::Insert_shared_subject[ no, @_previous_plan ]
-          @_previous_plan = plan
-          _add_to_creation_branch plan
-          ACHIEVED_
+          _insert_this_shared_subject no
         end
+      end
+
+      def __maybe_replace_shared_subject ss
+
+        find_any_me = ss.lvalue_string
+
+        di = @branch_index.to_stream_of( :shared_subject ).flush_until_detect do |o|
+          find_any_me == o.existing_child_document_node.mixed_identifying_key
+        end
+
+        if di
+          plan = Plan__::Replace_shared_subject[ ss, di, @_previous_plan ]
+          @_previous_plan = plan
+          _add_to_clobber_queue plan
+          ACHIEVED_
+        else
+          ::Kernel._K
+          _insert_this_shared_subject ss
+        end
+      end
+
+      def _insert_this_shared_subject ss
+        plan = Plan__::Insert_shared_subject[ ss, @_previous_plan ]
+        @_previous_plan = plan
+        _add_to_creation_branch plan
+        ACHIEVED_
       end
 
       def __process_context_node no
@@ -214,7 +238,7 @@ module Skylab::DocTest
         end
       end
 
-      def __when_downgrade
+      def __when_downgrade  # #not-covered
          # when left is item and right is branch, it's a "DOWNGRADE" - can't
          @listener.call :error, :expression, :will_not_downgrade do |y|
           y << "won't downgrade from context to example - #{ k.inspect }"
@@ -270,7 +294,7 @@ module Skylab::DocTest
 
         plan = Plan__::Replace_example[ no, eni, @_previous_plan ]
         @_previous_plan = plan
-        __add_to_clobber_queue plan
+        _add_to_clobber_queue plan
         ACHIEVED_
       end
 
@@ -351,7 +375,7 @@ module Skylab::DocTest
         @dandy_queue.push plan ; nil
       end
 
-      def __add_to_clobber_queue plan
+      def _add_to_clobber_queue plan
         @clobber_queue.push plan ; nil
       end
 
@@ -394,7 +418,7 @@ module Skylab::DocTest
         o.plan_array = a
         o.previous_plan = pp
         o.node_shape = :context
-        o.plan_verb = :insert
+        o.plan_verb = :create
         o.finish
       end
 
@@ -412,7 +436,17 @@ module Skylab::DocTest
         o.previous_plan = pp
         o.new_node = nn
         o.node_shape = :const_definition
-        o.plan_verb = :insert
+        o.plan_verb = :create
+        o.finish
+      end
+
+      Replace_shared_subject = -> nn, eni, pp do
+        o = NodePlan__.new
+        o.existing_node_index = eni
+        o.new_node = nn
+        o.previous_plan = pp
+        o.node_shape = :shared_subject
+        o.plan_verb = :replace
         o.finish
       end
 
@@ -420,7 +454,7 @@ module Skylab::DocTest
         o = NodePlan__.new
         o.previous_plan = pp
         o.new_node = no
-        o.node_shape = :shared_setup
+        o.node_shape = :shared_subject
         o.plan_verb = :create
         o.finish
       end
@@ -440,7 +474,7 @@ module Skylab::DocTest
         o.new_node = nn
         o.previous_plan = pp
         o.node_shape = :example
-        o.plan_verb = :insert
+        o.plan_verb = :create
         o.finish
       end
     end

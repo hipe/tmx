@@ -99,7 +99,26 @@ module Skylab::DocTest
         @___TL ||= Home_::OutputAdapter_::Template_Loader.new Template_dir___[]
         @___TL.build_template_via_file_path file
       end
+
+      def test_directory_entry
+
+        # use "name conventions" to get this instead, if you've got it.
+        # this was exposed solely to support #spot-7.
+
+        DEFAULT_TEST_DIRECTORY_ENTRY_
+      end
     end
+
+    # ==
+
+    New_unique_identifier_knownness_for_ = -> do
+      d = 0
+      -> sym do
+        Common_::Known_Known[ :"_unique_identifier_for_#{ sym }_#{ d += 1 }_" ]
+      end
+    end.call
+
+    # ==
 
     Template_dir___ = Lazy_.call do
       ::File.join Here_.dir_pathname.to_path, 'templates-'

@@ -109,6 +109,7 @@ module Skylab::DocTest
         const_definition: :__write_const_definition,
         context: :__write_context,
         example: :__write_example,
+        shared_subject: :__write_shared_subject,
       }
 
       def __write_context plan
@@ -116,7 +117,7 @@ module Skylab::DocTest
       end
 
       CONTEXT___ = {
-        insert: :__insert_context,
+        create: :__insert_context,
         merge: :__merge_context,
       }
 
@@ -135,9 +136,18 @@ module Skylab::DocTest
         send CONST_DEF__.fetch( plan.plan_verb ), plan
       end
 
+      def __write_shared_subject plan
+        send SHARED_SUBJECT___.fetch( plan.plan_verb ), plan
+      end
+
       CONST_DEF__ = {
-        insert: :__insert_const_def,
+        create: :__insert_const_def,
         replace: :__replace_const_def,
+      }
+
+      SHARED_SUBJECT___ = {
+        create: :__insert_shared_subject,
+        replace: :__replace_shared_subject,
       }
 
       def __replace_const_def plan
@@ -145,7 +155,16 @@ module Skylab::DocTest
         NIL
       end
 
+      def __replace_shared_subject plan  # #not-covoered
+        ::Kernel._K
+      end
+
       def __insert_const_def plan
+        _insert_this_content_somewhere plan.new_node, plan
+        NIL
+      end
+
+      def __insert_shared_subject plan  # #not-covoered
         _insert_this_content_somewhere plan.new_node, plan
         NIL
       end
@@ -155,7 +174,7 @@ module Skylab::DocTest
       end
 
       EG___ = {
-        insert: :__insert_example,
+        create: :__insert_example,
         replace: :__TODO_replace_example,
       }
 

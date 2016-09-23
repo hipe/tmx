@@ -31,7 +31,7 @@ module Skylab::DocTest
       o = Rewrite__.new _idx, nodes
       o.write_nodes_through_the_reference_node
       o.write_separating_blank_line_run
-      o.write_new_node_of_interest no
+      o.write_new_node no
 
       if o.nodes_exist_after_the_reference_node
 
@@ -53,13 +53,7 @@ module Skylab::DocTest
       o = Rewrite__.new _idx, nodes
       o.write_nodes_through_the_reference_node
       o.write_blank_line_if_necessary
-
-      if Paraphernalia_::Is_node_of_interest[ no ]
-        o.write_new_node_of_interest no
-      else
-        o.__create_and_push_freeform_branch_frame_for no
-      end
-
+      o.write_new_node no
       o.write_nodes_after_the_reference_node_to_the_end
       o.finish
     end
@@ -113,6 +107,15 @@ module Skylab::DocTest
             @reference_index = st.current_index
           end
 
+      def write_new_node no
+
+        if Paraphernalia_::Is_node_of_interest[ no ]
+          write_new_node_of_interest no
+        else
+          __create_and_push_freeform_branch_frame_for no
+        end
+      end
+
       def write_new_node_of_interest no
 
         _st = no.to_line_stream
@@ -146,8 +149,9 @@ module Skylab::DocTest
         d = @index.reference_index
         d || fail
         node = @original_nodes.fetch d
-        node.is_branch && fail
-        if BLANK_RX_ =~ node.line_string
+        if node.is_branch
+          margin = node.nodes.first.get_margin
+        elsif BLANK_RX_ =~ node.line_string
           margin = node.line_string
           margin.chop!
           @result_nodes.pop  # eek don't use the line meant to show indent
@@ -356,6 +360,7 @@ module Skylab::DocTest
         example_node: :@_on_example,
         module: :@_on_module,
         nonblank_line: :@_on_nonblank_line,
+        shared_subject_shared_setup: :@_on_shared_setup,
       }
     end
 

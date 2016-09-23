@@ -21,6 +21,7 @@ module Skylab::DocTest
       end  # >>
 
       def initialize o, visible_shared, cx
+        @_do_index = true
         @_stem = o
         @_choices = cx
         @_visible_shared = visible_shared
@@ -41,7 +42,7 @@ module Skylab::DocTest
 
         t = @_choices.load_template_for TEMPLATE_FILE___
 
-        t.set_simple_template_variable @_match.matchdata[ :lvar ], :lvar
+        t.set_simple_template_variable @_match.matchdata[ :lvalue_string ], :lvalue
 
         t.set_multiline_template_variable(
           Common_::Stream.via_nonsparse_array( _s_a ),
@@ -54,10 +55,11 @@ module Skylab::DocTest
       def __assemble_body_line_cache
 
         # as a goofy experiment, what we render takes on one of two forms
-        # based on whether the final lvar assignment happens as the last
+        # based on whether the final lvalue assignment happens as the last
         # line of the code run..
 
-        __prepare
+        @_do_index && _index
+
         __render_the_zero_or_more_lines_that_come_before_the_assignment_line
 
         # is there a contented line or lines after the assignment line?
@@ -80,8 +82,8 @@ module Skylab::DocTest
 
         # when there are lines after the assignment line (visualize this)
         # pass everything through as is, but add a final line that is just
-        # the lvar of interest so that the object of interest is the result
-        # of the method call EEK!
+        # the lvalue of interest so that the object of interest is the result
+        # of the method call eek!
 
         a = remove_instance_variable :@_blank_line_objects
         if a
@@ -94,12 +96,12 @@ module Skylab::DocTest
           lo = @_line_object_stream.gets
         end while lo
 
-        _line "#{ @_match.matchdata[ :lvar ] }#{ __LTS }"  # EEK
+        _line "#{ self.lvalue_string }#{ __LTS }"  # EEK
       end
 
       def __finish_the_lines_when_the_assignment_line_is_the_last_line
 
-        # when the assignment line is the last line, get the lvar and
+        # when the assignment line is the last line, get the lvalue and
         # equals sign out of there. whatever remains will be the result
         # of the method call EEK!
 
@@ -149,14 +151,32 @@ module Skylab::DocTest
         @_assignment_line_object.string[ @_assignment_line_object.LTS_range ]
       end
 
-      def __prepare
+      def TOUCH_EXPERIMENTAL_UNIQUE_IDENTIFIER
+        ( @___UID ||= New_unique_identifier_knownness_for_[ :const_def ] ).value_x
+      end
+
+      def EXPERIMENTAL_UNIQUE_IDENTIFIER
+        @___UID.value_x
+      end
+
+      def lvalue_string
+        @_do_index && _index
+        @_match.matchdata[ :lvalue_string ]
+      end
+
+      def _index
+
+        @_index = false
 
         @_body_line_cache = []  # this is the final line string cache
 
         @_line_object_stream = @_stem.to_code_run_line_object_stream
 
         _val_a = @_stem.variable_assignment_lines
+
         @_match = _val_a.fetch( -1 )  # we just disregard the non-last ones.
+
+        NIL
       end
 
       def paraphernalia_category_symbol

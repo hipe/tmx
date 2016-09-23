@@ -41,4 +41,3 @@ module as subject -
 ./basic/lib/skylab/basic/proxy/makers/functional/core.rb  (1 setup, 2 tests)
 ./parse/lib/skylab/parse/dsl-dsl/core.rb (1 setup, 3 tests)
 ./common/lib/skylab/common/memoization.rb  "module as subject, raises exceptions"
-./common/lib/skylab/common/session.rb  (4 setups, 6 tests, raises exceptions)

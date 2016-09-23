@@ -21,6 +21,13 @@ module Skylab::DocTest
     # document reference (that is, both deriving a short, hopefully unique
     # stem from a path *and* "defined constant" as shared setup WHEW!)
 
+    # we want this to be able to work for simple, single-file use-cases
+    # without having to incur the heavy machinery of the recursive stack
+    # and the many hits to the filesystem it needs to orient itself.
+    # as such use a "simple" string calculation to localize the argument
+    # path: we look for the first occurrence of a given test directory
+    # entry name (for now). :#spot-7
+
     class << self
 
       def default_instance__
@@ -28,19 +35,22 @@ module Skylab::DocTest
       end
 
       def via_path local_path
+        _via local_path, DEFAULT_TEST_DIRECTORY_ENTRY_
+      end
+
+      def via_path_and_choices__ local_path, cx
+        _via local_path, cx.test_directory_entry
+      end
+
+      def _via local_path, test_dir_entry
 
         _String = Home_.lib_.basic::String
 
-        _scn = _String.line_stream local_path, ::File::SEPARATOR
-
-        via_entry_scanner _scn
-      end
-
-      def via_entry_scanner scn
+        scn = _String.line_stream local_path, ::File::SEPARATOR
 
         begin
           scn.unparsed_exists || break
-          if HARDCODED___ == scn.current_token
+          if test_dir_entry == scn.current_token
             scn.advance_one
             break
           end
@@ -68,7 +78,6 @@ module Skylab::DocTest
 
     # ==
 
-    HARDCODED___ = 'test'
     THING_DING_RX___ = /\A(\d+-)?(?<stem>[^_]+)/
 
     class ViaString__

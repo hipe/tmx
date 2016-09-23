@@ -196,12 +196,18 @@ module Skylab::DocTest
         elsif v_a
           _on_shared_subject unasser
         else
-          self._SHOULD_FAIL_see_me  # let's say that an unassertive block
-          # must employ features, so its means of expression is clear.
+          __when_neither unasser
         end
 
         # (we're calling this :#spot-5 - similiar elsewhere, might abstract)
         NIL
+      end
+
+      def __when_neither  unassa  # #not-covered
+
+        # a code block with no magic - it is ignored! (used to fail)
+
+        NOTHING_
       end
 
       def __holy_smokes_you_want_both unasser

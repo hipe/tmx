@@ -2,11 +2,10 @@ require_relative 'test-support'
 
 module Skylab::Common::TestSupport
 
-  module Sssn___  # :+#throwaway-module for constants set in tests below
+  describe "[co] session - ivars with procs as methods" do
 
-    # <-
-
-  TS_.describe "[co] session - ivars with procs as methods" do
+    extend TS_
+    use :memoizer_methods
 
     it "enhance a class via enabling ivars to hold procs that act as methods" do
 
@@ -14,7 +13,7 @@ module Skylab::Common::TestSupport
         def initialize
           @bar = -> { :baz }
         end
-        Subject_[ self, :bar ]
+        Home_::Session::Ivars_with_Procs_as_Methods[ self, :bar ]
       end
 
       Foo.new.bar.should eql :baz
@@ -26,39 +25,59 @@ module Skylab::Common::TestSupport
         def initialize
           @_secret = -> { :ting }
         end
-        Subject_[ self, :@_secret, :wahoo ]
+        Home_::Session::Ivars_with_Procs_as_Methods[ self, :@_secret, :wahoo ]
       end
 
       Bar.new.wahoo.should eql :ting
     end
 
-    it "you can use the DSL to control visibility" do
+    context "you can use the DSL to control visibility" do
 
-      class Baz
-        def initialize
-          @_go = -> { :thats_right }
-          @_hi = -> x { "HI:#{ x }" }
+      before :all do
+
+        class X_s_Baz
+
+          def initialize
+            @_go = -> { :thats_right }
+            @_hi = -> x { "HI:#{ x }" }
+          end
+
+          o = Home_::Session::Ivars_with_Procs_as_Methods
+
+          o[ self ].as_public_method :_hi
+
+          o[ self ].as_private_getter :@_go, :yep
         end
-
-        Subject_[ self ].as_public_method :_hi
-
-        Subject_[ self ].as_private_getter :@_go, :yep
-
       end
 
-      foo = Baz.new
+      shared_subject :foo do
+        X_s_Baz.new
+      end
 
-      foo._hi( 'X' ).should eql "HI:X"
-      _rx = ::Regexp.new( "\\Aprivate\\ method\\ `yep'\\ called\\ for" )
-      -> do
-        foo.yep
-      end.should raise_error( NoMethodError, _rx )
-      foo.send( :yep ).should eql :thats_right
+      it "calling this public method works" do
+        foo._hi( 'X' ).should eql "HI:X"
+      end
+
+      it "calling this private method does not" do
+
+        _rx = ::Regexp.new "\\Aprivate\\ method\\ `yep'\\ called\\ for"
+
+        begin
+          foo.yep
+        rescue NoMethodError => e
+        end
+
+        e.message.should match _rx
+      end
+
+      it "but privately you can still call it" do
+        foo.send( :yep ).should eql :thats_right
+      end
     end
 
     it "you can use the struct-like producer to create the class automatically" do
 
-      Wahoo = Subject_[].new :fief do
+      Wahoo = Home_::Session::Ivars_with_Procs_as_Methods.new :fief do
         def initialize
           @fief = -> { :zap }
         end
@@ -66,19 +85,5 @@ module Skylab::Common::TestSupport
 
       Wahoo.new.fief.should eql :zap
     end
-
-    Subject_ = -> do
-      p = -> a do
-        p = -> a_ do
-          Home_::Session::Ivars_with_Procs_as_Methods[ * a_ ]
-        end
-        p[ a ]
-      end
-      -> * a do
-        p[ a ]
-      end
-    end.call
-  end
-# ->
   end
 end

@@ -18,7 +18,7 @@ module Skylab::DocTest
     Here___ = self
 
     def initialize tfnpz, ae
-      @test_directory_entry_name = 'test'
+      @test_directory_entry_name = DEFAULT_TEST_DIRECTORY_ENTRY_
       self.asset_extname = ae
       self.test_filename_patterns = tfnpz
       finish

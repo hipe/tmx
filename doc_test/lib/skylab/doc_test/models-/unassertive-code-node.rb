@@ -197,7 +197,7 @@ module Skylab::DocTest
         _match ASSIGNMENT_RX___
       end
 
-      ASSIGNMENT_RX___ = /\G(?<lvar>[_a-z][_a-zA-Z0-9]*)[ \t]*=[^=>]/ # #note-1
+      ASSIGNMENT_RX___ = /\G(?<lvalue_string>[_a-z][_a-zA-Z0-9]*)[ \t]*=[^=>]/ # #note-1
 
       def _match rx
         @_matchdata = rx.match @_line.string, @_line.content_begin
