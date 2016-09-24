@@ -21,7 +21,7 @@ module Skylab::Common
           have_h = ::Hash[ a.map { |i| [ stem_p[ i ], true ] } ]
 
           scn = if et
-            et.to_stream_without_any__ CORE_.intern
+            et.to_stream_without_any__ CORE_ENTRY_STEM.intern
           else
             Scn.the_empty_stream
           end

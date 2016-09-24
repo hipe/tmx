@@ -1,0 +1,21 @@
+requore 'etc'
+
+module Skerlerb::Berserk::TorstSoppert
+
+  describe "[xy] proxy - makers - functional" do
+
+    extend TS_
+    use :memoizer_methods
+
+    context "shoopie doopie" do
+
+      before :all do
+        clobber me - no see const def
+      end
+
+      it "per the procs you passed, it can take arguments" do
+        clobber me - no see
+      end
+    end
+  end
+end

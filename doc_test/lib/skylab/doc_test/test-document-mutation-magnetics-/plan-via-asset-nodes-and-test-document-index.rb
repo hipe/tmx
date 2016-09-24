@@ -360,7 +360,6 @@ module Skylab::DocTest
           _add_to_clobber_queue plan
           ACHIEVED_
         else
-          ::Kernel._K
           _insert_this_shared_subject pc
         end
       end

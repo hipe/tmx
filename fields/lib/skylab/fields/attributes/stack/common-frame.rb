@@ -6,7 +6,7 @@ module Skylab::Fields
       # you can define [non-]memoized { proc | inline } methods
       #
       #     class Foo
-      #       Home_::Property::Stack.common_frame self,
+      #       Home_::Attributes::Stack.common_frame self,
       #         :proc, :foo, -> do
       #            d = 0
       #            -> { d += 1 }
@@ -102,7 +102,7 @@ module Skylab::Fields
           end
         end  # >>
 
-        self::Property = ::Class.new Legacy_::Property
+        Property = ::Class.new Legacy_::Property
 
         RP_METH___ = -> prp do
 
@@ -316,7 +316,7 @@ module Skylab::Fields
     # [ `required` ] `field`s -
     #
     #     class Bar
-    #       Home_:Property::Stack.common_frame self,
+    #       Home_::Attributes::Stack.common_frame self,
     #         :globbing, :processor, :initialize,
     #         :required, :readable, :field, :foo,
     #         :readable, :field, :bar

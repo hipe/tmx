@@ -1891,13 +1891,13 @@ module Skylab::Common
 
     class File_Entry_
       def is_corefile
-        CORE_ == @corename
+        CORE_ENTRY_STEM == @corename
         # CORE_FILE_ == @entry_s
       end
     end
 
-    CORE_ = 'core'.freeze
-    CORE_FILE_ = "#{ CORE_ }#{ EXTNAME_ }".freeze
+    CORE_ENTRY_STEM = 'core'.freeze
+    CORE_FILE_ = "#{ CORE_ENTRY_STEM }#{ EXTNAME_ }".freeze
 
     # ~ the const_reduce integration (see spec for tombstones)
 
@@ -1910,7 +1910,7 @@ module Skylab::Common
       def get_require_file_path
 
         if @h.key? CORE_FILE_
-          "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ }"
+          "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ENTRY_STEM }"
         else
           raise ::LoadError, __say_get_require_file_path
         end

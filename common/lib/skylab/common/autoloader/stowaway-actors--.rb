@@ -91,7 +91,7 @@ module Skylab::Common
         np = produce_prepared_np
         @load_file_path = real_dpn.to_path
         if @do_add_core_file
-          @load_file_path = "#{ @load_file_path }#{ PATH_SEP_ }#{ CORE_ }"
+          @load_file_path = "#{ @load_file_path }#{ PATH_SEP_ }#{ CORE_ENTRY_STEM }"
         end
         require @load_file_path
         :loaded == @mod_et.state_i or @mod_et.change_state_to :loaded

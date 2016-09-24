@@ -34,4 +34,3 @@ shared subject (:#caass: const assignment as shared setup) -
 ./parse/lib/skylab/parse/functions-/spending-pool.rb  "type #caass"
 ./fields/lib/skylab/fields/attributes/struct.rb  "type #caass"
 ./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"
-./fields/lib/skylab/fields/attributes/stack/common-frame.rb  "module *in* shared subject.."

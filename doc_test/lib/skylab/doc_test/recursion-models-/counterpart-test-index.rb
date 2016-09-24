@@ -140,8 +140,16 @@ module Skylab::DocTest
             if node.has_test_file
               these.push _real node.first_test_file_entry
             else
-              ::Kernel._K_should_be_easy_but_lets_find_it
-              is_real = false
+              # #todo - you're in sketch-town
+              node_ = node.hash.fetch Autoloader_::CORE_ENTRY_STEM  # ..
+              if node_.has_test_file
+                _dir = node.first_directory_entry
+                _test = node_.first_test_file_entry
+                these.push _real ::File.join( _dir, _test )
+              else
+                ::Kernel._K_should_be_easy_but_lets_find_it
+                is_real = false
+              end
             end
           else
             _entry = @name_conventions.test_file_entry_for_stem file_stem
