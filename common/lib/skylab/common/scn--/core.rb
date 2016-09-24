@@ -24,16 +24,16 @@ module Skylab::Common
       end
     end
 
-
     # basic list scanner aggregate
     # aggregates other scanners, makes them behave as one sequence of scanners
     #
-    #     self._TODO  # etc
-    #     lib = LIB_.basic::List
+    #     scn_via = Home_.lib_.basic::List.line_stream.method :new
+    #
     #     scn = Home_::Scn.aggregate(
-    #         lib.line_stream( [ :a, :b ] ),
-    #         lib.line_stream( [] ),
-    #         lib.line_stream( [ :c ] ) )
+    #       scn_via[ [ :a, :b ] ],
+    #       scn_via[ [] ],
+    #       scn_via[ [ :c ] ],
+    #     )
     #
     #     scn.count  # => 0
     #     scn.gets  # => :a

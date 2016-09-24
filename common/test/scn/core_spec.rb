@@ -2,16 +2,17 @@ require_relative 'test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] Scn__" do
+  describe "[co] scn (core)" do
 
     it "aggregates other scanners, makes them behave as one sequence of scanners" do
 
-      lib = LIB_.basic::List
+      scn_via = Home_.lib_.basic::List.line_stream.method :new
 
       scn = Home_::Scn.aggregate(
-        lib.line_stream( [ :a, :b ] ),
-        lib.line_stream( [] ),
-        lib.line_stream( [ :c ] ) )
+        scn_via[ [ :a, :b ] ],
+        scn_via[ [] ],
+        scn_via[ [ :c ] ],
+      )
 
       scn.count.should eql 0
       scn.gets.should eql :a

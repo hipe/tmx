@@ -6,6 +6,8 @@ basic/lib/skylab/basic/proxy/inline.rb
 basic/lib/skylab/basic/proxy/makers/functional/core.rb
 common/lib/skylab/common/memoization.rb
 common/lib/skylab/common/session.rb
+common/lib/skylab/common/scn--/core.rb
+common/lib/skylab/common/scn--/peek--.rb
 fields/lib/skylab/fields/attributes/stack/common-frame.rb
 fields/lib/skylab/fields/attributes/struct.rb
 parse/lib/skylab/parse/dsl-dsl/core.rb

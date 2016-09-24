@@ -27,5 +27,3 @@ the easiest -
 ./brazen/lib/skylab/brazen/cli-support/table/core.rb  "three tests"
 ./human/lib/skylab/human/levenshtein.rb  "good first one"
 ./basic/lib/skylab/basic/list/core.rb  "good first one"
-./common/lib/skylab/common/scn--/core.rb   "could stand to be broken up but meh"
-./common/lib/skylab/common/scn--/peek--.rb  "even simpler first one"

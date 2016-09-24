@@ -14,7 +14,6 @@ module Skylab::Common
       #     scn.gets  # => :b
       #     scn.peek  # => nil
 
-
       class << self
 
         def gets_under scn
