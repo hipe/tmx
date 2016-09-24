@@ -8,11 +8,14 @@ module Skylab::Basic::TestSupport::Hash
 
       h = { foo: 'bar', biff: 'baz' }
       h.default_proc = Subject_[].loquacious_default_proc.curry[ 'beefel' ]
+      _rx = ::Regexp.new "\\Ano\\ such\\ beefel\\ 'luhrmann'\\.\\ did\\ you\\ mean\\ 'foo'\\ or\\ 'biff'\\?\\z"
 
-      _rx = ::Regexp.new( "\\Ano\\ such\\ beefel\\ 'luhrmann'\\.\\ did\\ you\\ mean\\ 'foo'\\ or\\ 'biff'\\?\\z" )
-      -> do
+      begin
         h[ :luhrmann ]
-      end.should raise_error( KeyError, _rx )
+      rescue KeyError => e
+      end
+
+      e.message.should match _rx
     end
 
     it "`unpack_equal` flattens a hash's values into an array" do

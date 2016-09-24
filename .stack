@@ -13,6 +13,7 @@ maybe refactor these when done - have one or more smells/deeper issues -
 ./basic/lib/skylab/basic/pathname/union.rb  "hard to decide what kind of sharing"
 ./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row"
 ./basic/lib/skylab/basic/rotating-buffer.rb  "too many tests in a row"
+./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?
 
 the easiest -
 ./task/lib/skylab/task/eventpoint/expression-.rb  "annoying"
@@ -34,7 +35,3 @@ shared subject (:#caass: const assignment as shared setup) -
 ./fields/lib/skylab/fields/attributes/struct.rb  "type #caass"
 ./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"
 ./fields/lib/skylab/fields/attributes/stack/common-frame.rb  "module *in* shared subject.."
-
-module as subject -
-./basic/lib/skylab/basic/hash/core.rb  (2 tests)
-./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)

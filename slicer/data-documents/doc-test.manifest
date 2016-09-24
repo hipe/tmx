@@ -1,3 +1,4 @@
+basic/lib/skylab/basic/hash/core.rb
 basic/lib/skylab/basic/module/accessors.rb
 basic/lib/skylab/basic/proxy/makers/functional/core.rb
 common/lib/skylab/common/memoization.rb
