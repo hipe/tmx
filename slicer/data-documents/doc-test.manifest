@@ -16,3 +16,4 @@ parse/lib/skylab/parse/dsl-dsl/core.rb
 parse/lib/skylab/parse/functions-/simple-pool.rb
 parse/lib/skylab/parse/functions-/spending-pool.rb
 system/lib/skylab/system/filesystem/cache.rb
+task/lib/skylab/task/eventpoint/expression-.rb

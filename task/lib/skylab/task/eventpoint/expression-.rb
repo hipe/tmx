@@ -1,39 +1,64 @@
 class Skylab::Task
-  # ->
-    class Eventpoint
 
-      class Expression_
+  class Eventpoint
 
-        # this generates a simple articulator class.
-        #
-        #     _Wing_Wang_Predicate = Subject.
-        #       new( :wing, :wang, -> do
-        #         "wing is: #{ @wing }, wang: #{ @wang }"
-        #       end )
-        #
-        #     obj = _Wing_Wang_Predicate.new 'DING', 'DANG'
-        #
-        #     obj.wing  # => 'DING'
-        #
-        #     obj.wang  # => 'DANG'
-        #
-        #     obj.instance_exec( & obj.articulation_proc )  # => "wing is: DING, wang: DANG"
+    class Expression_
 
+      # this is a class that makes classes, similar to platform ::Struct.
+      # whereas we construct a ::Struct subclass by passing it a list of
+      # symbols (representing its members), here we pass it a list of members
+      # PLUS one additional argument representing the "expression proc".
+      #
+      # so build the class with N (one or more) symbols and one proc:
+      #
+      #     Wing_Wang_Predicate = _Subject.new :wing, :wang, -> do
+      #       "wing is: #{ @wing }, wang: #{ @wang }"
+      #     end
+      #
+      # then you can construct an instance of the expression in the same way
+      # that you would construt a struct instance, passing values for members:
+      #
+      #     expr = Wing_Wang_Predicate.new 'DING', 'DANG'
+      #
+      # if we want we can read those member values with readers:
+      #
+      #     expr.wing  # => 'DING'
+      #     expr.wang  # => 'DANG'
+      #
+      # the members are stored as ivars. hackishly, we can see this in
+      # action by evaluating our expression proc in the context of our
+      # expression object:
+      #
+      #     expr.instance_exec( & expr.articulation_proc )  # => "wing is: DING, wang: DANG"
+      #
 
-        # with `articulate_self` pass the same fields in as arguments
-        #
-        #     o = Subject.new( :a, :b, -> a, b { "#{ a } + #{ b }" } )
-        #     o[ "one", "two" ].articulate_self  # => "one + two"
+      # alternately you can define the proc to take arguments:
+      #
+      #     ArgTaker = _Subject.new :a, :b, -> a, b { "#{ a } + #{ b }" }
+      #
+      # when the expression proc has been defined in this manner,
+      # call `articulate_self` to produce an expression string:
+      #
+      #     _expr = ArgTaker[ "one", "two" ]  # same as `.new(..)`
+      #
+      #     _expr.articulate_self  # => "one + two"
 
-
-
-        # definine the articulator with ony one function:
-        #
-        #     o = Subject.new do |a, b|
-        #       "#{ a } + #{ b }"
-        #     end
-        #
-        #     o[ "one", "two" ].articulate_self  # => "one + two"
+      # even better, you can define the articulation class with only a
+      # proc (actually a block) and it will work as is (probably) expected:
+      #
+      #     EvenBetter = _Subject.new do |a, b|
+      #       "#{ a } + #{ b }"
+      #     end
+      #
+      # (as always) we can use `members` to see what the formal members
+      # are. (we have used platform proc reflection to get those names):
+      #
+      #     EvenBetter.members   # => [ :a, :b ]
+      #
+      # and we can express like the "arg taker" form above:
+      #
+      #     _expr = EvenBetter.new "one", "two"
+      #     _expr.articulate_self  # => "one + two"
 
         class << self
           alias_method :orig_new, :new
@@ -76,11 +101,16 @@ class Skylab::Task
         end
 
         class << self
+
           alias_method :[], :new
-        end
+
+          def members
+            self::MEMBER_A_
+          end
+        end  # >>
 
         def members
-          self.class::MEMBER_A_
+          self.class.members
         end
 
         def ivar_a
@@ -105,46 +135,82 @@ class Skylab::Task
           ivar_a.map( & method( :instance_variable_get ) )
         end
 
-      # other times you might do clever things with the rendering context
+    begin
+
+      # because the expression proc is expose as the ordinary proc that it
+      # is, you can evaluate it in any arbitrary context.
       #
-      #     _Error_Predicate = Subject.new(
-      #       :name, :val, -> o do
-      #         n, v = o.at :name, :val
+      # here we'll define an expression class and what we call an
+      # "expression agent":
+      #
+      #     module My
+      #
+      #       class ExpressionAgent
+      #         def em s
+      #           "__#{ s.upcase }__"
+      #         end
+      #       end
+      #
+      #       _Subject = Home_::Eventpoint::Expression_
+      #
+      #       ErrorPredicate = _Subject.new( :name, :value, -> me do
+      #         n, v = me.at :name, :value
       #         "#{ n } had a #{ em 'bad' } issue - #{ v }"
       #       end )
+      #     end
       #
-      #     err = _Error_Predicate.new 'I', 'burnout'
+      # now, when we evaluate the expression proc we'll do it in the context
+      # of this "expression agent" (which could be anything). in this way,
+      # you can define a formal set of "expression functions" and implement
+      # those functions in any arbitrary way in your expression agent,
+      # allowing for a bit of dependency injection:
       #
-      #     o = ::Object.new
-      #     def o.em s ; "__#{ s.upcase }__" end
+      #     expr = My::ErrorPredicate.new 'I', 'burnout'
       #
-      #     exp = "I had a __BAD__ issue - burnout"
-      #     ( o.instance_exec err, & err.articulation_proc )  # => exp
+      #     _expag = My::ExpressionAgent.new
+      #
+      #     _s = _expag.instance_exec expr, & expr.articulation_proc
+      #
+      #     _s  # => "I had a __BAD__ issue - burnout"
 
-
-      # write your proc signature however you like, e.g use `to_a`
+      # `to_a` is available..
       #
-      #     _Art = Subject.new :up, :down, -> up, down do
+      #     Pair = _Subject.new :up, :down, -> up, down do
       #       "#{ up } and #{ down }"
       #     end
       #
-      #     p = _Art.new( 'hi', 'lo' )
-      #     p.articulation_proc[ * p.to_a ]  # => 'hi and lo'
+      # ..if for example you wanted to mimic `articulate_self`:
+      #
+      #     expr = Pair.new 'hi', 'lo'
+      #     expr.articulation_proc[ * expr.to_a ]  # => 'hi and lo'
       #
 
-      # expression sessions have a stupid simple but powerful algorithm for inflection
+      # expression instances have a stupid simple but powerful algorithm
+      # for inflection.
       #
-      #     _NP = Subject[ :a, -> a { a * ' and ' } ]
-      #     _VP = Subject[ :tense, :a, -> t, a do
-      #       :present == t ? ( 1 == a.length ? 'has' : 'have' ) : 'had'
-      #     end ]
+      #     module These
       #
-      #     ( _NP[ [ 'jack' ] ] | _VP[ :present ] ).inflect  # => "jack has"
+      #       _Subject = Home_::Eventpoint::Expression_
       #
-      #     ( _NP[ %w(Jack Jill) ] | _VP[ :present ] ).inflect  # => "Jack and Jill have"
+      #       NP = _Subject.new :a, -> a { a * ' and ' }
       #
-      #     ( _NP[ %w( Jack ) ] | _VP[ :past ] ).inflect  # => "Jack had"
+      #       VP = _Subject.new :tense, :a, -> t, a do
+      #         :present == t ? ( 1 == a.length ? 'has' : 'have' ) : 'had'
+      #       end
+      #     end
+      #
+      # it's a bit obtuse (i don't understand it today) but it's almost magical:
+      #
+      #     o = These
+      #     vp = o::VP ; np = o::NP
+      #
+      #     ( np[ [ 'jack' ] ] | vp[ :present ] ).inflect  # => "jack has"
+      #
+      #     ( np[ %w(Jack Jill) ] | vp[ :present ] ).inflect  # => "Jack and Jill have"
+      #
+      #     ( np[ %w( Jack ) ] | vp[ :past ] ).inflect  # => "Jack had"
 
+    end
         def | art_x
           Inflection___.new self, art_x
         end
@@ -156,7 +222,6 @@ class Skylab::Task
         def []= member_i, x
           instance_variable_set ivar_h.fetch( member_i ), x
         end
-      end
 
       class Inflection___
 
@@ -205,5 +270,5 @@ class Skylab::Task
         end
       end
     end
-  # -
+  end
 end
