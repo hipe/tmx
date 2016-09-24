@@ -11,6 +11,7 @@ common/lib/skylab/common/scn--/core.rb
 common/lib/skylab/common/scn--/peek--.rb
 fields/lib/skylab/fields/attributes/stack/common-frame.rb
 fields/lib/skylab/fields/attributes/struct.rb
+human/lib/skylab/human/levenshtein.rb
 parse/lib/skylab/parse/dsl-dsl/core.rb
 parse/lib/skylab/parse/functions-/simple-pool.rb
 parse/lib/skylab/parse/functions-/spending-pool.rb

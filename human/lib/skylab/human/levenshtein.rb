@@ -2,14 +2,14 @@ module Skylab::Human
 
   # levenshtein distance is kind of amazing
   #
-  #     a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
+  #     _a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
   #
-  #     a_ = Home_::Levenshtein.with(
+  #     _a_ = Home_::Levenshtein.with(
   #       :item, :bernono,
-  #       :items, a,
+  #       :items, _a,
   #       :closest_N_items, 3 )
   #
-  #     a_  # => [ :onono, :ernana, :banana ]
+  #     _a_  # => [ :onono, :ernana, :banana ]
 
   class Levenshtein
 
