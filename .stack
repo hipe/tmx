@@ -39,4 +39,3 @@ module as subject -
 ./basic/lib/skylab/basic/hash/core.rb  (2 tests)
 ./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)
 ./basic/lib/skylab/basic/proxy/makers/functional/core.rb  (1 setup, 2 tests)
-./parse/lib/skylab/parse/dsl-dsl/core.rb (1 setup, 3 tests)

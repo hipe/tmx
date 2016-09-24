@@ -305,9 +305,11 @@ module Skylab::DocTest
         @_blank_lines_array = []
         @_on_blank_line = :_record_this_blank_line
         @_on_nonblank_line = :__this_special_thing
-        @_on_context = :_is_this_the_node_of_interest
-        @_on_example = :_is_this_the_node_of_interest
-        @_on_shared_setup = :_is_this_the_node_of_interest
+
+        @_on_before = :_is_it_me_youre_looking_for
+        @_on_context = :_is_it_me_youre_looking_for
+        @_on_example = :_is_it_me_youre_looking_for
+        @_on_shared_setup = :_is_it_me_youre_looking_for
       end
 
           # --
@@ -333,7 +335,7 @@ module Skylab::DocTest
             @_blank_lines_array.push remove_instance_variable :@_current_node
           end
 
-      def _is_this_the_node_of_interest
+      def _is_it_me_youre_looking_for
 
         _yes = @_this_node_is_a_match[ @_current_node ]
         if _yes

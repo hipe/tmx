@@ -119,18 +119,16 @@ module Skylab::DocTest
         shared_subject: :__index_a_shared_subject,
       }
 
-      def __maybe_index_a_before_node no
+      def __maybe_index_a_before_node no  # #todo this is too high here
 
         _hi = no.node_internal_identifying_symbol
-        if BEFORE_ALL___ == _hi
+        if BEFORE_ALL_ == _hi
           __index_before_all no
         else
           self._COVER_ME_before_each_do_nothing
           ACHIEVED_
         end
       end
-
-      BEFORE_ALL___ = :before_all
 
       def __index_before_all no
         if @_seen_a_before_all_block

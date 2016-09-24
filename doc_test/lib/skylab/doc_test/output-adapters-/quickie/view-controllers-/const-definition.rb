@@ -24,11 +24,19 @@ module Skylab::DocTest
         Branch_local_document_node_matcher___
       end
 
-      Branch_local_document_node_matcher___ = -> document_node do
+      Branch_local_document_node_matcher___ = -> docnode do
 
-        if :const_definition_shared_setup == document_node.category_symbol
-          # per [#038] we assume only one such node per branch
-          ACHIEVED_
+        sym = docnode.category_symbol
+
+        if :const_definition_shared_setup == sym
+
+          ACHIEVED_  # per [#038] we assume only one such node per branch
+
+        elsif :before == sym
+
+          _hi = docnode.node_internal_identifying_symbol
+
+          BEFORE_ALL_ == _hi  # same
         end
       end
 

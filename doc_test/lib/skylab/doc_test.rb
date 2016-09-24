@@ -215,6 +215,7 @@ module Skylab::DocTest
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   ACHIEVED_ = true
+  BEFORE_ALL_ = :before_all  # will move
   BLANK_RX_ = /\A[[:space:]]*\z/
   CONST_SEP_ = '::'.freeze
   DocTest = :_fix_these_  # #todo

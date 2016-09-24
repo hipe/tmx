@@ -24,34 +24,33 @@ module Skylab::Parse
   #
   # if you define an `atom` field called 'wiz':
   #
-  #     class Foo
-  #       Home_::DSL_DSL.enhance self do
-  #         atom :wiz                     # make an atomic (basic) field
-  #       end                             # called `wiz`
+  #     module Foo
+  #       class Base
   #
-  #       wiz :fiz                        # set a default here if you like
+  #         Home_::DSL_DSL.enhance self do
+  #           atom :wiz                     # make an atomic (basic) field
+  #         end                             # called `wiz`
+  #
+  #         wiz :fiz                        # set a default here if you like
+  #       end
+  #
+  #       class Bar < Base                  # subclass..
+  #         wiz :piz                        # then set the value of `wiz`
+  #       end
   #     end
-  #
-  #     class Bar < Foo                   # subclass..
-  #       wiz :piz                        # then set the value of `wiz`
-  #     end
-  #
   #
   # you can read this value on the pertinent classes with `wiz_value`:
   #
-  #     Bar.wiz_value  # => :piz
-  #
+  #     Foo::Bar.wiz_value  # => :piz
   #
   # these setter module methods are by default private:
   #
-  #     Bar.wiz :other  # => NoMethodError: private method `wiz' called..
-  #
+  #     Foo::Bar.wiz :other  # => NoMethodError: private method `wiz' called..
   #
   # because this DSL generates only readers and not writers for your instances,
   # you get a public instance getter of the same name (no `_value` suffix):
   #
-  #     Bar.new.wiz  # => :piz
-  #
+  #     Foo::Bar.new.wiz  # => :piz
   #
   # happy hacking!
 
@@ -118,23 +117,24 @@ module Skylab::Parse
 
     # a `block` field called 'zinger' gives you an eponymous proc writer:
     #
-    #     class Fob
-    #       Home_::DSL_DSL.enhance self do
-    #         block :zinger
+    #     module Fob
+    #       class Base
+    #         Home_::DSL_DSL.enhance self do
+    #           block :zinger
+    #         end
+    #       end
+    #
+    #       class Bar < Base
+    #         ohai = 0
+    #         zinger do
+    #           ohai += 1
+    #         end
     #       end
     #     end
-    #
-    #     class Bab < Fob
-    #       ohai = 0
-    #       zinger do
-    #         ohai += 1
-    #       end
-    #     end
-    #
     #
     # you must use `zinger.call` on the instance:
     #
-    #     bar = Bab.new
+    #     bar = Fob::Bar.new
     #     bar.zinger.call  # => 1
     #     bar.zinger.call  # => 2
     #
@@ -166,7 +166,6 @@ module Skylab::Parse
     #         atom_accessor :with_name
     #       end
     #     end
-    #
     #
     # in the instance you can write to the field in the same DSL-y way
     #
@@ -259,22 +258,23 @@ module Skylab::Parse
   # if you must, use a module and not a class to encapsulate reusability:
   #
   #     module Fod
-  #       Home_::DSL_DSL.enhance_module self do
-  #         atom :pik
+  #       module ExtensionModule
+  #         Home_::DSL_DSL.enhance_module self do
+  #           atom :pik
+  #         end
+  #       end
+  #
+  #       class Bar
+  #         extend ExtensionModule::ModuleMethods
+  #         include ExtensionModule::InstanceMethods
+  #         pik :nic
   #       end
   #     end
   #
-  #     class Badd
-  #       extend Fod::ModuleMethods
-  #       include Fod::InstanceMethods
-  #       pik :nic
-  #     end
-  #
-  #
   # then you can enhance a class with your module with the above two steps:
   #
-  #     Badd.pik_value # => :nic
-  #     Badd.new.pik # => :nic
+  #     Fod::Bar.pik_value  # => :nic
+  #     Fod::Bar.new.pik  # => :nic
 
     class << self
 

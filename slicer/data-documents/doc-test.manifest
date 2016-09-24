@@ -1,4 +1,5 @@
 basic/lib/skylab/basic/module/accessors.rb
 common/lib/skylab/common/memoization.rb
 common/lib/skylab/common/session.rb
+parse/lib/skylab/parse/dsl-dsl/core.rb
 system/lib/skylab/system/filesystem/cache.rb
