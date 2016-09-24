@@ -14,6 +14,7 @@ maybe refactor these when done - have one or more smells/deeper issues -
 ./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row"
 ./basic/lib/skylab/basic/rotating-buffer.rb  "too many tests in a row"
 ./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?
+./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"  NEEDS RENAME
 
 the easiest -
 ./task/lib/skylab/task/eventpoint/expression-.rb  "annoying"
@@ -32,5 +33,3 @@ shared subject (:#caass: const assignment as shared setup) -
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"
 ./parse/lib/skylab/parse/functions-/simple-pool.rb  "type #caass"
 ./parse/lib/skylab/parse/functions-/spending-pool.rb  "type #caass"
-./fields/lib/skylab/fields/attributes/struct.rb  "type #caass"
-./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"

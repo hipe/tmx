@@ -12,7 +12,7 @@ module Skylab::Fields
 
     # make a basic struct class with a list of member names (like ::Struct)
     #
-    #     Foo = Home_::Struct.new :nerp
+    #     Foo = Home_::Attributes.const_get( :Struct, false ).new :nerp
     #
     #
     # build an instance with `new`, by default the member is nil (like ::Struct)
