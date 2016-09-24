@@ -72,6 +72,11 @@ module Skylab::DocTest
       @code_run.to_line_object_stream
     end
 
+    def to_particular_paraphernalia_under x
+      # educated guess.. sort of hacked for #coverpoint5-5
+      @_choices.particular_paraphernalia_of_for_under :shared_subject, self, x
+    end
+
     def to_particular_paraphernalia_of sym
       @_choices.particular_paraphernalia_of_for sym, self
     end

@@ -148,41 +148,6 @@ module Skylab::DocTest
       # own branch-local version of (exactly) [#033] the fine and dandy algo
       # --
 
-      def __process_shared_subject_shared_setup no
-
-        if @branch_index
-          __maybe_replace_shared_subject no
-        else
-          _insert_this_shared_subject no
-        end
-      end
-
-      def __maybe_replace_shared_subject ss
-
-        find_any_me = ss.lvalue_string
-
-        di = @branch_index.to_stream_of( :shared_subject ).flush_until_detect do |o|
-          find_any_me == o.existing_child_document_node.mixed_identifying_key
-        end
-
-        if di
-          plan = Plan__::Replace_shared_subject[ ss, di, @_previous_plan ]
-          @_previous_plan = plan
-          _add_to_clobber_queue plan
-          ACHIEVED_
-        else
-          ::Kernel._K
-          _insert_this_shared_subject ss
-        end
-      end
-
-      def _insert_this_shared_subject ss
-        plan = Plan__::Insert_shared_subject[ ss, @_previous_plan ]
-        @_previous_plan = plan
-        _add_to_creation_branch plan
-        ACHIEVED_
-      end
-
       def __process_context_node no
 
         ok, eni = _check_for_any_existing no
@@ -326,6 +291,8 @@ module Skylab::DocTest
         self.class.into_with_for _parti_st, branch_index, self
       end
 
+      # ~
+
       def __process_const_definition_shared_setup no
         if @_did_see_const_definition
           self._COVER_ME_MULTIPLE_const_definitionS
@@ -366,6 +333,46 @@ module Skylab::DocTest
         _add_to_creation_branch plan
         ACHIEVED_
       end
+
+      # ~
+
+      def __process_shared_subject_shared_setup pc  # pc=particular compoent
+
+        if @branch_index
+          __maybe_replace_shared_subject pc
+        else
+          _insert_this_shared_subject pc
+        end
+      end
+
+      def __maybe_replace_shared_subject pc
+
+        match = pc.to_branch_local_document_node_matcher
+
+        di = @branch_index.to_stream_of( :shared_subject ).flush_until_detect do |di_|
+
+          match[ di_.existing_child_document_node ]
+        end
+
+        if di
+          plan = Plan__::Replace_shared_subject[ pc, di, @_previous_plan ]
+          @_previous_plan = plan
+          _add_to_clobber_queue plan
+          ACHIEVED_
+        else
+          ::Kernel._K
+          _insert_this_shared_subject pc
+        end
+      end
+
+      def _insert_this_shared_subject ss
+        plan = Plan__::Insert_shared_subject[ ss, @_previous_plan ]
+        @_previous_plan = plan
+        _add_to_creation_branch plan
+        ACHIEVED_
+      end
+
+      # --
 
       def _add_to_creation_branch plan
         ( @_creation_branch ||= [] ).push plan ; nil

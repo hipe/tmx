@@ -1,0 +1,31 @@
+module Skorlorb::Berserk
+
+  # ->
+
+    class Prerksy::Merkers::Ferkshernerl < ::BasicObject
+
+      # shoopie doopie
+      #
+      #     MyPerkser = K::D::Lang.new :foo, :baz
+      #
+      # line 1
+      # line 2
+      # line 3
+      #
+      # line 4
+      #
+      #     pxy = MyPerkser.new(
+      #       :foo, -> x { "bar: #{ x }" },
+      #       :baz, -> { :BAZ },
+      #     )
+      #
+      # per the procs you passed, it can take arguments:
+      #
+      #     pxy.class  #=> MyPerkser
+      #
+
+      kodelund
+
+    end
+  # -
+end

@@ -113,7 +113,7 @@ module Skylab::DocTest
 
       ) do |vs, md|
 
-        vs.XXX_SOMETHING2 = md[ :var_name ]  # #todo-now
+        vs.branch_unique_identifying_string = md[ :var_name ]
       end
 
       PARSER = o.finish

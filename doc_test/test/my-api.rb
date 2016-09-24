@@ -9,6 +9,15 @@ module Skylab::DocTest::TestSupport
 
     # -
 
+      THIS_METHOD___ = def _DEBUG_AND_EXIT
+        io = debug_IO
+        root_ACS_result.each do |line|
+          io.puts line
+        end
+        io.puts "(exiting because #{ THIS_METHOD___ } was called.)"
+        exit 0
+      end
+
       def filter_endcaps_and_blank_lines_common_ a
         last = a.length - 2
         d = 1

@@ -27,6 +27,16 @@ module Skylab::DocTest
         @_visible_shared = visible_shared
       end
 
+      def to_branch_local_document_node_matcher  # [#038] #note-1
+
+        lvalue_string = self.lvalue_string
+        -> dn do
+          if :shared_subject == dn.category_symbol
+            lvalue_string == dn.branch_unique_identifying_string
+          end
+        end
+      end
+
       def to_line_stream
         st = __to_line_stream_normally
         vs = @_visible_shared
@@ -42,7 +52,7 @@ module Skylab::DocTest
 
         t = @_choices.load_template_for TEMPLATE_FILE___
 
-        t.set_simple_template_variable @_match.matchdata[ :lvalue_string ], :lvalue
+        t.set_simple_template_variable @_lvalue_string, :lvalue
 
         t.set_multiline_template_variable(
           Common_::Stream.via_nonsparse_array( _s_a ),
@@ -153,7 +163,7 @@ module Skylab::DocTest
 
       def lvalue_string
         @_do_index && _index
-        @_match.matchdata[ :lvalue_string ]
+        @_lvalue_string
       end
 
       def _index
@@ -166,7 +176,13 @@ module Skylab::DocTest
 
         _val_a = @_stem.variable_assignment_lines
 
-        @_match = _val_a.fetch( -1 )  # we just disregard the non-last ones.
+        match = _val_a.fetch( -1 )  # we just disregard the non-last ones.
+
+        md = match.matchdata
+
+        @_match = match
+
+        @_lvalue_string = md[ :lvalue_string ].freeze
 
         NIL
       end

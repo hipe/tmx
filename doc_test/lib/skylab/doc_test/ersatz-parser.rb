@@ -576,6 +576,10 @@ module Skylab::DocTest
           _identifyings.document_unique_identifying_string_knownness.value_x
         end
 
+        def branch_unique_identifying_string
+          _identifyings.branch_unique_identifying_string_knownness.value_x
+        end
+
         def node_internal_identifying_symbol
           _identifyings.node_internal_identifying_symbol_knownness.value_x
         end
@@ -603,6 +607,8 @@ module Skylab::DocTest
 
         ik = IdentifyingsKnownnesses___.new
 
+        ik.branch_unique_identifying_string_knownness = Knownness___[ vs.branch_unique_identifying_string ]
+
         ik.document_unique_identifying_string_knownness = Knownness___[ vs.document_unique_identifying_string ]
 
         ik.node_internal_identifying_symbol_knownness = Knownness___[ vs.node_internal_identifying_symbol ]
@@ -611,11 +617,13 @@ module Skylab::DocTest
       end
 
       IdentifyingsKnownnesses___ = ::Struct.new(
+        :branch_unique_identifying_string_knownness,
         :document_unique_identifying_string_knownness,
         :node_internal_identifying_symbol_knownness,
       )
 
       IdentifyingsStore___ = ::Struct.new(
+        :branch_unique_identifying_string,
         :document_unique_identifying_string,
         :node_internal_identifying_symbol,
       )

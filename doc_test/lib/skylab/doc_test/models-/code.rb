@@ -126,7 +126,7 @@ module Skylab::DocTest
         @string = s
       end
 
-      COPULA_RX___ = /[ \t]*#[ \t]=>[ \t]/
+      COPULA_RX___ = /[ \t]*#[ \t]?=>[ \t]/
 
       # --
 
