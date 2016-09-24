@@ -6,23 +6,64 @@ module Skylab::Basic
       1 == d ? A_Buffer_Of_One__.new : new( d )
     end
 
-    # it's just like tivo:
+    # construct a rotating buffer with a positive integer indicating the
+    # size of the buffer (in terms of number of items). then use `<<`
+    # to load items on it progressively, whenever.
     #
-    #     rotbuf = Subject_[].new 4
+    #     rotbuf = Home_::Rotating_Buffer.new 4
     #     rotbuf << :a << :b << :c << :d << :e
-    #     rotbuf[ 2 ] # =>  :d
+    #
+    # we have a buffer 4 items "wide" with 5 items having been loaded into
+    # it. this means that the first of those five items is no longer
+    # stored. for any rotating buffer of size N, we can always imagine that
+    # there is an array holding the *last* N items that have been added to
+    # the buffer.
+    #
+    # you can use `[]` to randomly access the items of this imaginary array
+    # with most of the familiar idioms of platform arrays.
+    #
+    # you can send a positive integer thru `[]` to the the item that is
+    # at that offset in the imaginary array:
+    #
+    #     rotbuf[ 2 ]  # =>  :d
+    #
+    # (there are 4 items in the buffer, the last four are [ :b, :c, :d, :e ],
+    #  the item at offset 2 in that imaginary array is `:d`.)
+    #
+    # you can access items with reference to their offset from the *end* of
+    # the imaginary array:
+    #
     #     rotbuf[ -1 ] # =>  :e
     #     rotbuf[ -4 ] # =>  :b
+    #
+    # going off the "left end" of the imaginary array gets you:
+    #
     #     rotbuf[ -5 ] # =>  nil
+    #
+    # on that topic, going off the "right end" of the imaginary array:
+    #
+    #     rotbuf[ 4 ]  # => nil
+    #
+    # a range expressed as offset and size:
+    #
     #     rotbuf[ 0, 4 ] # =>  %i( b c d e )
+    #
+    # a range expressed as a range object referencing the end:
+    #
     #     rotbuf[ -2 .. -1 ] # =>  %i( d e )
+    #
+    # going off the left end with a range object gets you:
+    #
     #     rotbuf[ -10 .. -1 ] # =>  nil
+    #
+    # going off the right end with a range like this, however:
+    #
     #     rotbuf[ 2, 22 ] # =>  %i( d e )
 
     # if you haven't yet reached the size limit of your buffer,
     # accessing the last N items will work:
     #
-    #     rotbuf = Subject_[].new 5
+    #     rotbuf = Home_::Rotating_Buffer.new 5
     #     rotbuf << :a << :b << :c
     #     rotbuf[ -3 .. -1 ]  # => %i( a b c )
 
@@ -40,21 +81,18 @@ module Skylab::Basic
     attr_reader :virtual_buffer_length
 
     # you can use `to_a` on a rotating buffer
-    #
-    #     r = Subject_[].new 3
-    #
-    #
     # it works on not-yet-cycles buffers:
     #
+    #     r = Home_::Rotating_Buffer.new 3
     #     r << :a << :b
     #     r.to_a  # => %i( a b )
     #
     #
     # on a buffer that has cycled, it gives you the last N items:
     #
+    #     r = Home_::Rotating_Buffer.new 3
     #     r << :a << :b << :c << :d
     #     r.to_a  # => %i( b c d )
-    #
 
     def to_a
       if @virtual_buffer_length.zero?
