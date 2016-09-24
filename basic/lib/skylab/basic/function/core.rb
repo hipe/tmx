@@ -4,11 +4,7 @@ module Skylab::Basic
 
     # given a queue of functions and one seed value, produce one result
     #
-    #   self._REDO etc
-    #
-    #     FUNC = begin
-    #
-    #     _p_a = [
+    #     FUNC = Home_::Function.chain( [
     #       -> item do
     #         if 'cilantro' == item            # the true-ishness of the 1st
     #           [ false, 'i hate cilantro' ]   # element in the result tuple
@@ -23,14 +19,11 @@ module Skylab::Basic
     #         else
     #           [ item1, item2 ]
     #         end
-    #       end ]
+    #       end,
+    #     ] )
     #
     #
-    #       M_etaHell_.function_chain.curry[ _p_a ]
-    #     end
-    #
-    #
-    # this short circuits at te first branch, resulting in a value
+    # this short circuits at the first branch, resulting in a value
     #
     #     s = FUNC[ 'cilantro' ]
     #     s  # => 'i hate cilantro'
@@ -48,7 +41,7 @@ module Skylab::Basic
     #     s  # => 'nope i hate tomato'
     #
     #
-    # this followed all the way through to the end with a true-ish itme
+    # this follows all the way through to the end with a true-ish item
     #
     #     x = FUNC[ 'blue' ]
     #     x  # => [ 'blue', 'potato' ]

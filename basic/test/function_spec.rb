@@ -4,13 +4,11 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] function (chain)" do
 
-    context "given a queue of [..]" do
-
-      _FUNC = nil
+    context "given a queue of functions and one seed value, produce one result" do
 
       before :all do
 
-        _p_a = [
+        X_f_FUNC = Home_::Function.chain( [
           -> item do
             if 'cilantro' == item            # the true-ishness of the 1st
               [ false, 'i hate cilantro' ]   # element in the result tuple
@@ -25,32 +23,27 @@ module Skylab::Basic::TestSupport
             else
               [ item1, item2 ]
             end
-          end ]
-
-        _FUNC = Home_::Function.chain _p_a
+          end,
+        ] )
       end
 
-      it "this short circuits at [..[" do
-
-        s = _FUNC[ 'cilantro' ]
+      it "this short circuits at the first branch, resulting in a value" do
+        s = X_f_FUNC[ 'cilantro' ]
         s.should eql 'i hate cilantro'
       end
 
-      it "resulting in a [..]" do
-
-        s = _FUNC[ 'carrots' ]
+      it "resulting in a single true-ish item will result in that value" do
+        s = X_f_FUNC[ 'carrots' ]
         s.should eql "let's have carrots and potato"
       end
 
-      it "resulting in the tuple [..]" do
-
-        s = _FUNC[ 'red' ]
+      it "resulting in the tuple [ false, X ] gives you X" do
+        s = X_f_FUNC[ 'red' ]
         s.should eql 'nope i hate tomato'
       end
 
-      it "this followed all the way through to the end with a true-ish itme" do
-
-        x = _FUNC[ 'blue' ]
+      it "this follows all the way through to the end with a true-ish item" do
+        x = X_f_FUNC[ 'blue' ]
         x.should eql [ 'blue', 'potato' ]
       end
     end
