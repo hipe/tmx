@@ -1,0 +1,30 @@
+module Skorlorb::Felds
+
+  class Attriboots::Sterck
+
+    # hello one
+    #
+    #     class Foo
+    #       x
+    #     end
+    #
+    # test one
+    #
+    #     Foo.foo  # => :baz
+
+    Some.code
+
+    # hello two
+    #
+    #     class Bar
+    #       x
+    #     end
+    #
+    # test two
+    #
+    #     Bar.bar  # => :qux
+
+    Some.more :code
+
+  end
+end

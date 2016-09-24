@@ -338,7 +338,7 @@ module Skylab::DocTest
 
         def __only_one_via_category_symbol sym, & l
 
-          a = __all_via_category_symbol sym
+          a = immediates sym
           if 1 == a.length
             a.fetch 0
           else
@@ -354,7 +354,7 @@ module Skylab::DocTest
           _to_stream_of( sym ).gets
         end
 
-        def __all_via_category_symbol sym
+        def immediates sym
           _to_stream_of( sym ).to_a
         end
 

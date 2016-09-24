@@ -55,6 +55,20 @@ module Skylab::DocTest
         DocumentWriteMagnetics_::Upgrade.new( plan, @_choices ).execute
       end
 
+      def to_branch_local_document_node_matcher
+
+        mine = @identifying_string
+
+        -> dn do
+
+          if :context_node == dn.category_symbol
+
+            _theirs = dn.document_unique_identifying_string
+            mine == _theirs
+          end
+        end
+      end
+
       #   - our own line stream will be the output of our template,
       #     which will magically take care of indenting our body.
       #
