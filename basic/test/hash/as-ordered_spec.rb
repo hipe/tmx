@@ -1,18 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Hash::As_Ordered
-
-  ::Skylab::Basic::TestSupport::Hash[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Home_ = Home_
+module Skylab::Basic::TestSupport
 
   describe "[ba] hash - as ordered" do
 
-    it "acts like a hash, but it memoizes the order of `aset` keys" do
+    it "so it acts like a hash, but it memoizes the order of `aset` keys" do
+
       h = { }
       op = Home_::Hash::As_Ordered.new h
 

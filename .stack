@@ -9,10 +9,14 @@ eliminate old doctest manifest file b.c all is new
 every old [dt] test that requires shared setup
 every old [dt] test that is easy (use and modify CLI for this as needed)
 
+syncing issues-
+./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up" "also rename"
+
 maybe refactor these when done - have one or more smells/deeper issues -
 ./basic/lib/skylab/basic/pathname/union.rb  "hard to decide what kind of sharing"
 ./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row"
 ./basic/lib/skylab/basic/rotating-buffer.rb  "too many tests in a row"
+./task/lib/skylab/task/eventpoint/expression-.rb  "need breakup"
 ./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?
 ./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"  NEEDS RENAME
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"  NEEDS RENAME
@@ -20,9 +24,6 @@ maybe refactor these when done - have one or more smells/deeper issues -
 basic/lib/skylab/basic/function/core.rb needs rename ONLY
 
 the easiest -
-./task/lib/skylab/task/eventpoint/expression-.rb  "annoying"
-./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up"
-./basic/lib/skylab/basic/hash/as-ordered.rb  "clunky for one test but hard to break up"
 ./brazen/lib/skylab/brazen/cli-support/table/core.rb  "three tests"
 ./human/lib/skylab/human/levenshtein.rb  "good first one"
 ./basic/lib/skylab/basic/list/core.rb  "good first one"

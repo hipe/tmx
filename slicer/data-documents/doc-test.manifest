@@ -1,4 +1,5 @@
 basic/lib/skylab/basic/function/core.rb
+basic/lib/skylab/basic/hash/as-ordered.rb
 basic/lib/skylab/basic/hash/core.rb
 basic/lib/skylab/basic/module/accessors.rb
 basic/lib/skylab/basic/proxy/inline.rb

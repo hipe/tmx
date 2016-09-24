@@ -8,7 +8,7 @@ module Skylab::Basic
     # so it acts like a hash, but it memoizes the order of `aset` keys:
     #
     #     h = { }
-    #     op = Subject_[].new h
+    #     op = Home_::Hash::As_Ordered.new h
     #
     #     op[ :foo ] = :bar
     #     op[ :bing ] = :baz
