@@ -6,4 +6,5 @@ common/lib/skylab/common/session.rb
 fields/lib/skylab/fields/attributes/stack/common-frame.rb
 fields/lib/skylab/fields/attributes/struct.rb
 parse/lib/skylab/parse/dsl-dsl/core.rb
+parse/lib/skylab/parse/functions-/spending-pool.rb
 system/lib/skylab/system/filesystem/cache.rb

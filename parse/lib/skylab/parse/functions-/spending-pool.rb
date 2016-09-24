@@ -21,7 +21,7 @@ module Skylab::Parse
     #
     # with one such parser build from an empty set of parsers,
     #
-    #     None = Subject_[].new_with( :functions ).to_output_node_and_mutate_array_proc
+    #     None = Home_.function( :spending_pool ).new_with( :functions ).to_output_node_and_mutate_array_proc
     #
     #
     # a parser with no nodes in it will always report 'no parse' and 'spent':
@@ -36,11 +36,12 @@ module Skylab::Parse
 
     # with parser with one node that reports it always matches & always spends
     #
-    #     One = Subject_[].new_with(
+    #     One = Home_.function( :spending_pool ).new_with(
     #       :functions,
     #         :proc, -> in_st do
-    #           Parse_lib_[]::OutputNode.for nil
-    #         end ).to_output_node_and_mutate_array_proc
+    #           Home_::OutputNode.for nil
+    #         end,
+    #     ).to_output_node_and_mutate_array_proc
     #
     # is always the same output node:
     #
@@ -50,11 +51,12 @@ module Skylab::Parse
 
     # with a parser with one node that reports it never matches & always spends
     #
-    #     Spendless = Subject_[].new_with(
+    #     Spendless = Home_.function( :spending_pool ).new_with(
     #       :functions,
     #         :proc, -> in_st do
     #           nil
-    #         end ).to_output_node_and_mutate_array_proc
+    #         end,
+    #     ).to_output_node_and_mutate_array_proc
     #
     # it never parses:
     #
@@ -63,9 +65,11 @@ module Skylab::Parse
 
     # of 2 keywords, parse them at most once each. parse any and all digits:
     #
-    #     _NNI = Parse_lib_[]::Functions_::Non_Negative_Integer
+    #     Digits = begin
     #
-    #     Digits = Subject_[].new_with(
+    #       _NNI = Home_.function( :non_negative_integer )
+    #
+    #       Home_.function( :spending_pool ).new_with(
     #       :functions,
     #         :keyword, "foo",
     #         :keyword, "bar",
@@ -74,7 +78,9 @@ module Skylab::Parse
     #           if on
     #             on.new_with :function_is_not_spent
     #           end
-    #         end ).to_output_node_and_mutate_array_proc
+    #         end,
+    #       ).to_output_node_and_mutate_array_proc
+    #     end
     #
     #
     # does nothing with nothing:
