@@ -5,54 +5,68 @@ module Skylab::DocTest::TestSupport
   describe "[dt] API - synchronize - shared subject update" do
 
     TS_[ self ]
-    use :fixture_files
+    use :fixture_files_simple_triad_asset
     use :my_API
 
-    context '(context)' do
+    context 'shared subject update' do
 
       call_by do
-
-        _asset = fixture_file_ '12-shared-subject.kd'
-        _asset_lines = ::File.open _asset
-
-        _test = fixture_file_ '62-shared-subj-tezd.kd'  # #coverpoint5-5
-        _test_lines = ::File.open _test
-
-        my_API_common_generate_(
-          asset_line_stream: _asset_lines,
-          original_test_line_stream: _test_lines,
-        )
+        the_API_call_
       end
 
-      shared_subject :_custom_tuple do
+      shared_subject :the_custom_tuple_ do
+        build_the_custom_tuple_
+      end
 
-        _ctxt = context_node_via_result_
-
-        a = _ctxt.nodes
-        a = filter_endcaps_and_blank_lines_common_ a
-        3 == a.length || fail
-        a
+      def the_existing_test_file_path_
+        fixture_file_ '62-shared-subj-tezd.kd'  # #coverpoint5-5
       end
 
       it "looks OK structurally" do
-        _custom_tuple || fail
+        the_custom_tuple_ || fail
       end
 
       it "the before block got updated" do
-        a = _custom_tuple.first.nodes
-        a[1].line_string == "        X_xkcd_MyPerkser = K::D::Lang.new :foo, :baz\n" || fail
-        3 == a.length || fail
+        the_before_block_looks_OK_
       end
 
       it "the shared subject got updated" do
-        a = _custom_tuple[1].nodes
-        a[1].line_string == "        pxy = X_xkcd_MyPerkser.new(\n" || fail
+        the_shared_subject_looks_OK_
       end
 
       it "the example block got updated" do
-        a = _custom_tuple.last.nodes
-        a[1].line_string == "        pxy.class.should eql X_xkcd_MyPerkser\n" || fail
-        3 == a.length || fail
+        the_example_block_looks_OK_
+      end
+    end
+
+    context 'example insert' do
+
+      call_by do
+        the_API_call_
+      end
+
+      shared_subject :the_custom_tuple_ do
+        build_the_custom_tuple_
+      end
+
+      def the_existing_test_file_path_
+        fixture_file_ '63-insert-example-tezd.kd'
+      end
+
+      it "looks OK structurally" do
+        the_custom_tuple_ || fail
+      end
+
+      it "the before block got updated" do
+        the_before_block_looks_OK_
+      end
+
+      it "the shared subject got updated" do
+        the_shared_subject_looks_OK_
+      end
+
+      it "the example block got updated" do
+        the_example_block_looks_OK_
       end
     end
   end

@@ -138,9 +138,9 @@ module Skylab::DocTest
 
       SHAPE___ = {
         context_node: :__process_context_node,
-        const_definition_shared_setup: :__process_const_definition_shared_setup,
+        const_definition: :__process_const_definition,
         example_node: :__process_example_node,
-        shared_subject_shared_setup: :__process_shared_subject_shared_setup,
+        shared_subject: :__process_shared_subject,
       }
 
       # --
@@ -293,16 +293,16 @@ module Skylab::DocTest
 
       # ~
 
-      def __process_const_definition_shared_setup no
+      def __process_const_definition no
         if @_did_see_const_definition
           self._COVER_ME_MULTIPLE_const_definitionS
         else
           @_did_see_const_definition = true
-          __do_process_const_definition_shared_setup no
+          __do_process_const_definition no
         end
       end
 
-      def __do_process_const_definition_shared_setup no
+      def __do_process_const_definition no
 
         # this algorithm is composed (perhaps solely) of conceptual elements
         # found elsewhere, but in a composition that is unique to this case:
@@ -336,7 +336,7 @@ module Skylab::DocTest
 
       # ~
 
-      def __process_shared_subject_shared_setup pc  # pc=particular compoent
+      def __process_shared_subject pc  # pc=particular compoent
 
         if @branch_index
           __maybe_replace_shared_subject pc

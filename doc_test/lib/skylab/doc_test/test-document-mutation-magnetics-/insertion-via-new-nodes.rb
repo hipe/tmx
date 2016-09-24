@@ -363,12 +363,12 @@ module Skylab::DocTest
       IVARS___ = {
         before: :@_on_before,
         blank_line: :@_on_blank_line,
-        const_definition_shared_setup: :@_on_shared_setup,
+        const_definition: :@_on_shared_setup,
         context_node: :@_on_context,
         example_node: :@_on_example,
         module: :@_on_module,
         nonblank_line: :@_on_nonblank_line,
-        shared_subject_shared_setup: :@_on_shared_setup,
+        shared_subject: :@_on_shared_setup,
       }
     end
 

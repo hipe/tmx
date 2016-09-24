@@ -28,7 +28,7 @@ module Skylab::DocTest
 
         sym = docnode.category_symbol
 
-        if :const_definition_shared_setup == sym
+        if :const_definition == sym
 
           ACHIEVED_  # per [#038] we assume only one such node per branch
 
@@ -128,7 +128,7 @@ module Skylab::DocTest
       end
 
       def paraphernalia_category_symbol
-        :const_definition_shared_setup
+        :const_definition
       end
     end
   end

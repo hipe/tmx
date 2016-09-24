@@ -132,8 +132,8 @@ module Skylab::DocTest
     _IS_NODE_OF_INTEREST = {  # more or less as covered
       context_node: true,
       example_node: true,
-      const_definition_shared_setup: false,
-      shared_subject_shared_setup: false,
+      const_definition: false,
+      shared_subject: false,
     }
 
     Is_node_of_interest = -> parti do

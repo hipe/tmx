@@ -37,6 +37,13 @@ module Skylab::DocTest
         end
       end
 
+      def write_identifying_information_into vs
+
+        _ = lvalue_string
+        vs.branch_unique_identifying_string = lvalue_string
+        NIL
+      end
+
       def to_line_stream
         st = __to_line_stream_normally
         vs = @_visible_shared
@@ -188,7 +195,7 @@ module Skylab::DocTest
       end
 
       def paraphernalia_category_symbol
-        :shared_subject_shared_setup
+        :shared_subject
       end
     end
   end

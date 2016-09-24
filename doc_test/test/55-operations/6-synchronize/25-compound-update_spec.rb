@@ -13,14 +13,12 @@ module Skylab::DocTest::TestSupport
       call_by do
 
         _asset = ::File.join home_dir_path_, 'models-/test-file-context.rb'
-        _asset_lines = ::File.open _asset
 
         _test = fixture_file_ '56-sync-against-this_speg.kd'
-        _test_lines = ::File.open _test
 
         my_API_common_generate_(
-          asset_line_stream: _asset_lines,
-          original_test_line_stream: _test_lines,
+          asset_line_stream: ::File.open( _asset ),
+          original_test_line_stream: ::File.open( _test ),
           original_test_path: 'foobie/doobie/test/anthony-banthony/canthony-danthony_nosee.zz',
         )
       end

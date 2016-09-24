@@ -13,14 +13,12 @@ module Skylab::DocTest::TestSupport
       call_by do
 
         _asset = fixture_file_ '17-upgrade.kd'
-        _asset_lines = ::File.open _asset
 
         _test = fixture_file_ '51-some_speg.rb'
-        _test_lines = ::File.open _test
 
         my_API_common_generate_(
-          asset_line_stream: _asset_lines,
-          original_test_line_stream: _test_lines,
+          asset_line_stream: ::File.open( _asset ),
+          original_test_line_stream: ::File.open( _test ),
         )
       end
 

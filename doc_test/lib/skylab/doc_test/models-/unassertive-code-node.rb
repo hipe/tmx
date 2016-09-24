@@ -40,10 +40,10 @@ module Skylab::DocTest
         if @has_what_looks_like_a_variable_assignment
           self._CONFUSED_ABOUT_WHAT_TYPE_OF_SHARED_SETUP_THIS_IS
         else
-          :const_definition_shared_setup
+          :const_definition
         end
       elsif @has_what_looks_like_a_variable_assignment
-        :shared_subject_shared_setup
+        :shared_subject
       else
         self._WHAT_DO_WE_DO_WITH_CODE_RUNS_WITH_NO_MAGIC
       end

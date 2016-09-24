@@ -1,0 +1,21 @@
+requore 'etc'
+
+module Skerlerb::Berserk::TorstSoppert
+
+  describe "[xy] proxy - makers - functional" do
+
+    extend TS_
+    use :memoizer_methods
+
+    context "shoopie doopie" do
+
+      before :all do
+        clobber me - no see const def
+      end
+
+      shared_subject :pxy do
+        clobber me - no see shared subj
+      end
+    end
+  end
+end
