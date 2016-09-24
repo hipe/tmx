@@ -6,7 +6,7 @@ module Skylab::Basic
 
       # make a 'fuctional' proxy class with a list of member names:
       #
-      #     My_Proxy = Subject_[].functional :foo, :baz
+      #     MyProxy = Home_::Proxy::Makers::Functional.new :foo, :bar
       #
       # in contrast to `inline` which creates a proxy "inline" by mutating
       # a singleton class, this makes a (::BasicObject) subclass proxy class
@@ -14,11 +14,32 @@ module Skylab::Basic
       #
       # build a proxy instance by passing it procs to implement the fields:
       #
-      #     pxy = My_Proxy.new :foo, -> x { "bar: #{ x }" },
-      #       :baz, -> { :BAZ }
+      #     pxy = MyProxy.new(
+      #       :foo, -> x { "bar: #{ x }" },
+      #       :bar, -> { :BAZ },
+      #     )
       #
-      #     pxy.foo( :wee )  #=> "bar: wee"
-      #     pxy.baz  # => :BAZ
+      # per the procs you passed, it can take arguments:
+      #
+      #     pxy.foo( :wee )  # => "bar: wee"
+      #
+      # or not:
+      #
+      #     pxy.bar  # => :BAZ
+      #
+      #
+      # build another proxy instance, this time with a hash
+      #
+      #     pxy2 = MyProxy.new(
+      #       foo: -> { :A },
+      #       bar: -> s { "#{ s.upcase }A#{ s.upcase }" },
+      #     )
+      #
+      # note the signatures of the methods have changed
+      #
+      #     pxy2.foo  # => :A
+      #     pxy2.bar 'y'  # => "YAY"
+      #
 
       class << self
 

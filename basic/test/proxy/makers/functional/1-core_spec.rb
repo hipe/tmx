@@ -5,57 +5,72 @@ module Skylab::Basic::TestSupport
   describe "[ba] proxy - makers - functional" do
 
     extend TS_
+    use :memoizer_methods
 
-    context "one." do
+    context "make a 'fuctional' proxy class with a list of member names" do
 
-      it "makes" do
-        _class
+      before :all do
+        X_p_m_f_c_MyProxy = Home_::Proxy::Makers::Functional.new :foo, :bar
       end
 
-      it "build a proxy from proxy class with a hash" do
+      shared_subject :pxy do
 
-        pxy = _class.new foo: -> x { "#{ pee }-#{ x }-#{ dee }" },
-                           bar: -> { @dee_meyers }
-        @dee_meyers = 'who'
+        pxy = X_p_m_f_c_MyProxy.new(
+          :foo, -> x { "bar: #{ x }" },
+          :bar, -> { :BAZ },
+        )
 
-        pxy.foo( 'y' ).should eql 'wee-y-who'
-        pxy.bar.should eql 'who'
+        pxy
       end
 
-      it "build it from a literal iambic" do
-        pxy = _class.new :foo, -> { :A }, :bar, -> { @b }
-        @b = :B
-        pxy.foo.should eql :A
-        pxy.bar.should eql :B
+      it "per the procs you passed, it can take arguments" do
+        pxy.foo( :wee ).should eql "bar: wee"
       end
 
-      def pee
-        'wee'
+      it "or not" do
+        pxy.bar.should eql :BAZ
       end
 
-      def dee
-        @dee_meyers
+      shared_subject :pxy2 do
+
+        pxy2 = X_p_m_f_c_MyProxy.new(
+          foo: -> { :A },
+          bar: -> s { "#{ s.upcase }A#{ s.upcase }" },
+        )
+
+        pxy2
       end
 
-      dangerous_memoize_ :_class do
-        Pxy_Fnctnl_01_01 = _subject :foo, :bar
+      it "note the signatures of the methods have changed" do
+        pxy2.foo.should eql :A
+        ( pxy2.bar 'y' ).should eql "YAY"
       end
     end
 
-    context "two." do
+    context "(errors that can happen)" do
 
       it "raises key error on extra" do
+
         _rx = /\Akey not found: :murphy/
-        -> do
+
+        begin
           _class.new :murphy, :bed
-        end.should raise_error ::KeyError, _rx
+        rescue ::KeyError => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "raises argument error on missing" do
+
         _rx = /\Amissing required proxy function definition\(s\): \(derkie, tata\)\z/
-        -> do
+
+        begin
           _class.new zerpie: :herpie
-        end.should raise_error ::ArgumentError, _rx
+        rescue ::ArgumentError => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "you can add more stuff in an arbitrary definition block" do

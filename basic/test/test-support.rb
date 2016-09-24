@@ -102,6 +102,11 @@ module Skylab::Basic
       Home_::Common_.test_support::Future_Expect[ tcc ]
     end
 
+    Memoizer_Methods = -> tcc do
+
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    end
+
     String = -> tcc do  # :+#stowaway
       tcc.send :define_method, :subject_module_ do
         Home_::String
