@@ -4,6 +4,13 @@ module Skylab::Basic::TestSupport
   # -
     describe "[ba] list - lowest (etc)" do
 
+      it "that lets you `each_pair` over them" do
+
+        _ea = Home_::List.build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
+
+        ( ::Hash[ _ea.each_pair.to_a ] ).should eql ( { a: :b, c: :d } )
+      end
+
       it "none (left)" do
         _a = _against EMPTY_A_, %i( a )
         _a and fail

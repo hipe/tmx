@@ -4,6 +4,13 @@ module Skylab::Basic
 
     class << self
 
+      # given a flat list of name-value pairs, produce an enumerator
+      # that lets you `each_pair` over them:
+      #
+      #     _ea = Home_::List.build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
+      #
+      #     ::Hash[ _ea.each_pair.to_a ]  # => ( { a: :b, c: :d } )
+
       def build_each_pairable_via_even_iambic a
         Build_each_pairable_via_even_iambic__[ a ]
       end
@@ -192,11 +199,6 @@ module Skylab::Basic
       end
     end
 
-    # with `build_each_pairable_via_even_iambic` produce an object
-    # that responds to `each_pair` via a flat list of name-value pairs
-    #
-    #     ea = Home_::List.build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
-    #     ::Hash[ ea.each_pair.to_a ]  # => ( { a: :b, c: :d } )
 
     List_ = self
   end

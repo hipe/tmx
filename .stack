@@ -26,4 +26,3 @@ basic/lib/skylab/basic/function/core.rb needs rename ONLY
 the easiest -
 ./brazen/lib/skylab/brazen/cli-support/table/core.rb  "three tests"
 ./human/lib/skylab/human/levenshtein.rb  "good first one"
-./basic/lib/skylab/basic/list/core.rb  "good first one"
