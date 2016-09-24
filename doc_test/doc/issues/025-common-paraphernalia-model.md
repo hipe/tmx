@@ -1,4 +1,4 @@
-# the stem paraphernalia model :[#025]
+# a stem paraphernalia model :[#025]
 
 ## overview
 
@@ -6,7 +6,7 @@
 to build tests using a test suite solution. "stem paraphernalia" are
 generic reprentations of these in code meant to be test-suite-solution
 agnostic and hopefully apply to most test suite solutions generally.
-"stem paraphernalia" are critica part of the whole pipeline.
+"stem paraphernalia" are critica part of the whole [#039] pipeline.
 
 
 

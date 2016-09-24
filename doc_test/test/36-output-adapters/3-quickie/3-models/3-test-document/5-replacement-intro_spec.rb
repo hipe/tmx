@@ -8,6 +8,7 @@ module Skylab::DocTest::TestSupport
     use :memoizer_methods
     use :runs
     use :output_adapters_quickie
+    use :test_document_shorthand
 
     context '(context)' do
 
@@ -57,7 +58,7 @@ module Skylab::DocTest::TestSupport
 
         # get the existing example:
 
-        qeg = __qualified_example_via_regex %r(\breplace my lines\b), __doc
+        qeg = __qualified_example_via_regex %r(\breplace my lines\b)
 
         _replace_example_constituent_lines_with_this qeg, <<-HERE
           #     some code la la
@@ -81,7 +82,7 @@ module Skylab::DocTest::TestSupport
       _st = line_stream_via_string_ _s
       doc = output_adapter_test_document_parser_.parse_line_stream _st
 
-      qeg = doc.first_qualified_example_node_with_identifying_string 'zizzo'
+      qeg = first_qualified_example_node_with_identifying_string_in_of_ doc, 'zizzo'
 
       _replace_example_constituent_lines_with_this qeg, <<-HERE
         #     hi  # => :hey
@@ -106,10 +107,10 @@ module Skylab::DocTest::TestSupport
       expect_actual_line_stream_has_same_content_as_expected_ _act_st, _exp_st
     end
 
-    def __qualified_example_via_regex rx, doc
+    def __qualified_example_via_regex rx
 
-      eg = doc.to_qualified_example_node_stream.flush_until_detect do |o|
-        rx =~ o.example_node.mixed_identifying_key
+      eg = to_qualified_example_node_stream_.flush_until_detect do |o|
+        rx =~ o.example_node.document_unique_identifying_string
       end
       eg or fail
       eg
@@ -126,7 +127,7 @@ module Skylab::DocTest::TestSupport
       NIL_
     end
 
-    shared_subject :__doc do
+    shared_subject :test_document_ do
 
       fh = ::File.open __FILE__
       x = output_adapter_test_document_parser_.parse_line_stream fh

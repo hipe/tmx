@@ -2,12 +2,19 @@ module Skylab::DocTest
 
   class ErsatzParser
 
+    # called "ersatz" because it's a stand-in for a proper parser - it uses
+    # a hack to parse the test files and is not robust (although it perhaps
+    # has the same level of robustness as your average syntax highlighter
+    # in your editor, and it may suffice for our 95% of use cases). :[#002]
+
+    # (the parsing "algorithm" is explained #here2.)
+
+    # we try to stay away from business-specifics here, aiming instead for
+    # a parser that breaks files up into branch nodes and item nodes (where
+    # each item node correponds to a line of a file).
+
       # (try to generalize the dark hack of [#sy-034].)
-      #
-      # called "ersatz" because this is fundamentally a hack :[#002];
-      # that is, no matter how good a job we do here we will never be
-      # able to scale to all documents by parsing by-hand like this
-      # while tokenizing on lines, nor should we want to. this is just
+
       # a stand-in for the proof of concept of it all (the dream of [cm]).
 
       class << self
@@ -124,7 +131,7 @@ module Skylab::DocTest
           end
         end
 
-        # -- the central "algorithm"
+        # -- the central "algorithm" :#here2
         #
         # we tokenize on lines. we push when we see a line that looks like
         # it opens a "branch" node. we pop when a line looks like it closes
@@ -229,11 +236,11 @@ module Skylab::DocTest
 
       class NonTerminal___
 
-        def initialize mr, sym, end_matcher_builder, id_s_p
+        def initialize mr, sym, end_matcher_builder, ir
           @begin_matcher = mr
           @category_symbol = sym
           @_end_matcher_builder = end_matcher_builder
-          @identifying_string_proc = id_s_p  # optional
+          @identifyingser = ir  # optional
         end
 
         def __build_end_line_matcher md
@@ -246,7 +253,7 @@ module Skylab::DocTest
 
         attr_reader(
           :category_symbol,
-          :identifying_string_proc,
+          :identifyingser,
         )
       end
 
@@ -295,38 +302,11 @@ module Skylab::DocTest
           Home_::TestDocumentReadMagnetics_::LineStream_via_BranchNode[ self ]
         end
 
-        def first_qualified_example_node_with_identifying_string s
-
-          to_qualified_example_node_stream.flush_until_detect do |qeg|
-
-            s == qeg.example_node.mixed_identifying_key
-          end
-        end
-
-        def first_example_node  # #testpoint-only, #todo too high here
-
-          to_qualified_example_node_stream.gets.example_node
-        end
-
-        def to_qualified_example_node_stream
-
-          o = _begin_branch_stream_session
-
-          o.branch_stream.map_reduce_by do |branch|
-
-            if :example_node == branch.category_symbol
-              Qualified_Example___[ branch, o.current_parent_branch__ ]
-            end
-          end
-        end
-
-        Qualified_Example___ = ::Struct.new :example_node, :parent_branch
-
         def to_branch_stream
-          _begin_branch_stream_session.branch_stream
+          begin_branch_stream_session.branch_stream
         end
 
-        def _begin_branch_stream_session
+        def begin_branch_stream_session
           Home_::TestDocumentReadMagnetics_::BranchStream_via_BranchNode.begin_for__ self
         end
 
@@ -414,29 +394,30 @@ module Skylab::DocTest
         end
       end
 
+      IdentifyingsMethods__ = ::Module.new
+
       class FreeformBranchFrame < BranchNode__
+
+        include IdentifyingsMethods__
 
         class << self
 
-          def via_four id_x, sym, st, margin
+          def oh_my sym, st, margin, & xx_p
+
             nodes = Line_nodes_via_line_stream_and_margin___[ st, margin ]
             if nodes
-              new id_x, sym, nodes
+              new xx_p, sym, nodes
             end
           end
 
           private :new
         end  # >>
 
-        def initialize k_x, sym, nodes
+        def initialize xx_p, sym, nodes
+          @_identifyings_ = Identifying_knownnesses_via__[ xx_p ]
           @category_symbol = sym
-          @mixed_identifying_key = k_x
           @nodes = nodes
         end
-
-        attr_reader(
-          :mixed_identifying_key,
-        )
       end
 
       class BranchNode_from_Document__ < BranchNode__
@@ -511,7 +492,7 @@ module Skylab::DocTest
           o.line_stream = line_st
           o.original_nodes = @nodes
           o.do_replace_constituent_lines = false
-          _etc o
+          _finish_replace_lines o
         end
 
         def replace_constituent_lines line_st
@@ -520,10 +501,10 @@ module Skylab::DocTest
           o.line_stream = line_st
           o.original_nodes = @nodes
           o.do_replace_constituent_lines = true
-          _etc o
+          _finish_replace_lines o
         end
 
-        def _etc o
+        def _finish_replace_lines o
           a = o.finish
           3 <= a.length || ::Home_._SANITY
           @nodes = a
@@ -531,7 +512,7 @@ module Skylab::DocTest
         end
       end
 
-      class RootFrame___  < BranchNode_from_Document__
+      class RootFrame___ < BranchNode_from_Document__
 
         def write_lines_into y  # #testpoint-only (for now)
           st = to_line_stream
@@ -547,12 +528,14 @@ module Skylab::DocTest
 
       class NonRootFrame___ < BranchNode_from_Document__
 
-        def initialize md, bnt, lineno_d
+        include IdentifyingsMethods__
+
+        def initialize md, bnt, lineno_d  # bnt=branch nonterminal
           @category_symbol = bnt.category_symbol
           @_end_line_matcher = bnt.__build_end_line_matcher md
+          @__identifyingser = bnt.identifyingser
           @lineno = lineno_d
-          @_matchdata = md  # just for id s
-          @__identifying_string_proc = bnt.identifying_string_proc
+          @__matchdata = md
           super()
         end
 
@@ -565,20 +548,80 @@ module Skylab::DocTest
           super()
         end
 
-        def mixed_identifying_key
-          ( @___idkn ||= ___build_mixed_identifying_key_knownness ).value_x
-        end
+        def _flush_identifying_knownnesses_
 
-        def ___build_mixed_identifying_key_knownness
-          # assume a proc exists to determine any it
-          _p = remove_instance_variable :@__identifying_string_proc
-          _x = _p[ @_matchdata ]
-          Common_::Known_Known[ _x ]
+          @_identifyings_ = :_LOCKED_  # catch infinite recursion maybe
+            # (only necessary if we pass ourselves out here, which we don't)
+
+          _md = remove_instance_variable :@__matchdata
+          _ir = remove_instance_variable :@__identifyingser
+
+          Identifying_knownnesses_via__[ _ir, _md ]
         end
 
         attr_reader(
           :lineno,
         )
+      end
+
+      # ==
+
+      module IdentifyingsMethods__
+
+        def any_document_unique_identifying_string
+          _any_mixed_identifying :document_unique_identifying_string_knownness
+        end
+
+        def document_unique_identifying_string
+          _identifyings.document_unique_identifying_string_knownness.value_x
+        end
+
+        def node_internal_identifying_symbol
+          _identifyings.node_internal_identifying_symbol_knownness.value_x
+        end
+
+        def _identifyings
+          @_identifyings_ ||= _flush_identifying_knownnesses_
+        end
+
+        def _any_mixed_identifying m
+          kn = _identifyings[ m ]
+          if kn.is_known_known
+            kn.value_x
+          end
+        end
+      end
+
+      Identifying_knownnesses_via__ = -> * args do  # identifyinser, matchdata
+
+        identifyingser = args.fetch 0
+        vs = IdentifyingsStore___.new
+        args[ 0 ] = vs
+        args.push :_reserved_, :_etc_
+
+        identifyingser[ * args ]
+
+        ik = IdentifyingsKnownnesses___.new
+
+        ik.document_unique_identifying_string_knownness = Knownness___[ vs.document_unique_identifying_string ]
+
+        ik.node_internal_identifying_symbol_knownness = Knownness___[ vs.node_internal_identifying_symbol ]
+
+        ik
+      end
+
+      IdentifyingsKnownnesses___ = ::Struct.new(
+        :document_unique_identifying_string_knownness,
+        :node_internal_identifying_symbol_knownness,
+      )
+
+      IdentifyingsStore___ = ::Struct.new(
+        :document_unique_identifying_string,
+        :node_internal_identifying_symbol,
+      )
+
+      Knownness___ = -> x do
+        x ? Common_::Known_Known[ x ] : Common_::KNOWN_UNKNOWN
       end
 
       # ==

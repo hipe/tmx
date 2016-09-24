@@ -4,7 +4,7 @@ module Skylab::DocTest
 
     def self.describe_into_under y, expag
       expag.calculate do
-        y << "#{ code 'sync' } for an entire directory (EXPERIMENTAL)."
+        y << "#{ code 'sync' } for an entire directory #experimental."
         y << "(currently overloaded with sane defaults, configurable later.)"
         y << "(it is not supposed to overwrite unversioned content ever.)"
       end

@@ -22,13 +22,17 @@ module Skylab::DocTest
       o.finish
     end
 
-    Insert_after = -> after_this_noi, no, nodes do
+    Insert_after = -> after_this_node, no, doc_nodes do
 
-      _idx = Index__.of nodes do |o|
-        o.__will_search_for_this after_this_noi
+      idx = Index__.of doc_nodes do |o|
+        o.__will_search_for_this after_this_node
       end
 
-      o = Rewrite__.new _idx, nodes
+      if ! idx.reference_index
+        self._SANITY_referenced_node_not_found
+      end
+
+      o = Rewrite__.new idx, doc_nodes
       o.write_nodes_through_the_reference_node
       o.write_separating_blank_line_run
       o.write_new_node no
@@ -130,8 +134,12 @@ module Skylab::DocTest
 
       def __write_node_of_interest sym, is, st  # is=identifying string; st=line stream
 
-        bf = ErsatzParser::FreeformBranchFrame.via_four(
-          is, sym, st, __get_margin )
+        _margin = __get_margin
+
+        bf = ErsatzParser::FreeformBranchFrame.oh_my sym, st, _margin do |vs|
+          vs.document_unique_identifying_string = is
+          NIL
+        end
 
         if bf
           @result_nodes.push bf
@@ -141,10 +149,6 @@ module Skylab::DocTest
 
       def __create_and_push_freeform_branch_frame_for no
 
-        _id_x = no.TOUCH_EXPERIMENTAL_UNIQUE_IDENTIFIER
-        _sym = no.paraphernalia_category_symbol
-        _st = no.to_line_stream
-
         # --  # eek see #spot-6
         d = @index.reference_index
         d || fail
@@ -152,7 +156,7 @@ module Skylab::DocTest
         if node.is_branch
           margin = node.nodes.first.get_margin
         elsif BLANK_RX_ =~ node.line_string
-          margin = node.line_string
+          margin = node.line_string.dup
           margin.chop!
           @result_nodes.pop  # eek don't use the line meant to show indent
         else
@@ -160,8 +164,13 @@ module Skylab::DocTest
         end
         # --
 
-        bf = ErsatzParser::FreeformBranchFrame.via_four(
-          _id_x, _sym, _st, margin )
+        _sym = no.paraphernalia_category_symbol
+        _st = no.to_line_stream
+
+        bf = ErsatzParser::FreeformBranchFrame.oh_my _sym, _st, margin do |vs|
+
+          no.write_identifying_information_into vs
+        end
 
         if bf
           @result_nodes.push bf
@@ -291,11 +300,7 @@ module Skylab::DocTest
 
       def __will_search_for_this after_this
 
-        if Paraphernalia_::Is_node_of_interest[ after_this ]
-          @_find_me = after_this.identifying_string
-        else
-          @_find_me = after_this.EXPERIMENTAL_UNIQUE_IDENTIFIER
-        end
+        @_this_node_is_a_match = after_this.to_branch_local_document_node_matcher
 
         @_blank_lines_array = []
         @_on_blank_line = :_record_this_blank_line
@@ -330,7 +335,8 @@ module Skylab::DocTest
 
       def _is_this_the_node_of_interest
 
-        if @_find_me == @_current_node.mixed_identifying_key
+        _yes = @_this_node_is_a_match[ @_current_node ]
+        if _yes
           @reference_index = @_current_node_index
           _stop_recording_blank_lines
         else

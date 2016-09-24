@@ -32,4 +32,7 @@
   • "test" (as a paraphernalia component) is a term we would like to
     avoid. (explanation at [#025]).
 
+  - "identifyings": identifiers used to identify components in
+    particular contexts - see [#038]
+
   • "LTS" - this is a loanword from [sa] - "line termination sequence".

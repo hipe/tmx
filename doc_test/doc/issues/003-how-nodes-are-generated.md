@@ -101,7 +101,7 @@ patterns in the comment block:
     #     foo.wear_cloak  # => :invisible
 
 note how the above has one comment block with three different runs in
-it. remarkably (and EXPERIMENTALLY) the above makes this:
+it. remarkably (and #experimental'ly) the above makes this:
 
     context "with a foobric like this" do
 

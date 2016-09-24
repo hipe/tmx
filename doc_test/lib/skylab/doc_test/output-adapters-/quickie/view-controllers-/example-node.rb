@@ -35,6 +35,22 @@ module Skylab::DocTest
         @_description_bytes_OK = __resolve_description_bytes
       end
 
+      def to_branch_local_document_node_matcher
+
+        id_s = identifying_string
+
+        if id_s
+
+          -> doc_node do
+
+            id_s_ = doc_node.any_document_unique_identifying_string
+            if id_s_
+              id_s == id_s_  # (hi.)
+            end
+          end
+        end
+      end
+
       def to_line_stream
 
         ok = @_description_bytes_OK

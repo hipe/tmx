@@ -29,11 +29,15 @@ module Skylab::DocTest::TestSupport
         o.add_branch_line_matcher(
           %r(\A(?<margin>[\t ]*)begin\b)
 
-        ) do |md|
+        ) do |vs, md|
           # (separate the easy problem of above from the harder problem here)
 
-          Home_::Models_::String.unescape_quoted_literal_anchored_at_head(
+          _ = Home_::Models_::String.unescape_quoted_literal_anchored_at_head(
             md.post_match )
+
+          vs.document_unique_identifying_string = _
+
+          NIL
         end
 
         o.finish

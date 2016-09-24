@@ -107,4 +107,3 @@ module Skylab::DocTest::TestSupport
     end
   end
 end
-# #pending-rename: see big comment in this file.

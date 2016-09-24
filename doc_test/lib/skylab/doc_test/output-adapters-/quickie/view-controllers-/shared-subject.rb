@@ -151,14 +151,6 @@ module Skylab::DocTest
         @_assignment_line_object.string[ @_assignment_line_object.LTS_range ]
       end
 
-      def TOUCH_EXPERIMENTAL_UNIQUE_IDENTIFIER
-        ( @___UID ||= New_unique_identifier_knownness_for_[ :const_def ] ).value_x
-      end
-
-      def EXPERIMENTAL_UNIQUE_IDENTIFIER
-        @___UID.value_x
-      end
-
       def lvalue_string
         @_do_index && _index
         @_match.matchdata[ :lvalue_string ]
@@ -166,7 +158,7 @@ module Skylab::DocTest
 
       def _index
 
-        @_index = false
+        @_do_index = false
 
         @_body_line_cache = []  # this is the final line string cache
 

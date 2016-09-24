@@ -29,13 +29,15 @@ module Skylab::DocTest
 
       # --
 
-      identifying_string_via_const = -> md do
-        md[ :const ]
+      identifying_string_via_const = -> vs, md, * do
+
+        vs.XXX_SOMETHING1 = md[ :const ]  # #todo-now
       end
 
-      identifying_string_via_quoted_string = -> md do
-        # (hi.)
-        Home_::Models_::String.unescape_quoted_string_literal_matchdata md
+      identifying_string_via_quoted_string = -> vs, md, * do
+
+        vs.document_unique_identifying_string =
+          Home_::Models_::String.unescape_quoted_string_literal_matchdata md
       end
 
       # --
@@ -72,6 +74,12 @@ module Skylab::DocTest
         & identifying_string_via_quoted_string
       )
 
+      before_which = -> ss do
+        _h = { "all" => :before_all, "each" => :before_each }
+        before_which = _h.method :fetch
+        before_which[ ss ]
+      end
+
       o.add_branch_line_matcher(
         %r(\A
           (?<margin>[\t ]*)
@@ -85,8 +93,9 @@ module Skylab::DocTest
             do\b
         )x,
         :before,
-      ) do |md|
-        md[ :a_or_e ]
+
+      ) do |vs, md|
+        vs.node_internal_identifying_symbol = before_which[ md[ :a_or_e ] ]
       end
 
       same = '[a-zA-Z_][a-z_A-Z0-9]*'
@@ -101,8 +110,10 @@ module Skylab::DocTest
             do\b
         )x,
         :shared_subject,
-      ) do |md|
-        md[ :var_name ]
+
+      ) do |vs, md|
+
+        vs.XXX_SOMETHING2 = md[ :var_name ]  # #todo-now
       end
 
       PARSER = o.finish

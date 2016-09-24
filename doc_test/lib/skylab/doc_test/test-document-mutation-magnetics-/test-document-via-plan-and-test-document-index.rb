@@ -155,7 +155,7 @@ module Skylab::DocTest
         NIL
       end
 
-      def __replace_shared_subject plan  # #not-covoered
+      def __replace_shared_subject plan  # #not-covered
         ::Kernel._K
       end
 

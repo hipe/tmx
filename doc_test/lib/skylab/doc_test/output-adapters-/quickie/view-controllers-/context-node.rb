@@ -4,7 +4,7 @@ module Skylab::DocTest
 
     class ViewControllers_::ContextNode  # #[#026]
 
-      # this node is rife with comments, and all of it is EXPERIMENTAL
+      # this node is rife with comments, and all of it is #experimental
       # exactly as [#024] node theory.
 
       TEMPLATE_FILE___ = '_ctx.tmpl'

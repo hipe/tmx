@@ -111,15 +111,6 @@ module Skylab::DocTest
 
     # ==
 
-    New_unique_identifier_knownness_for_ = -> do
-      d = 0
-      -> sym do
-        Common_::Known_Known[ :"_unique_identifier_for_#{ sym }_#{ d += 1 }_" ]
-      end
-    end.call
-
-    # ==
-
     Template_dir___ = Lazy_.call do
       ::File.join Here_.dir_pathname.to_path, 'templates-'
     end

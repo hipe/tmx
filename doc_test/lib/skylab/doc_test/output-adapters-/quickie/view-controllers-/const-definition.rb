@@ -16,6 +16,26 @@ module Skylab::DocTest
         @_choices = cx
         @_common = o
         @_test_file_context = o.test_file_context_proc__.call
+
+        @__EXPERIMENT_sanity_mutex = nil
+      end
+
+      def to_branch_local_document_node_matcher
+        Branch_local_document_node_matcher___
+      end
+
+      Branch_local_document_node_matcher___ = -> document_node do
+
+        if :const_definition_shared_setup == document_node.category_symbol
+          # per [#038] we assume only one such node per branch
+          ACHIEVED_
+        end
+      end
+
+      def write_identifying_information_into vs
+
+        remove_instance_variable :@__EXPERIMENT_sanity_mutex  # only once, right?
+        NOTHING_  # hi.
       end
 
       def to_mapper__
@@ -97,14 +117,6 @@ module Skylab::DocTest
           o.get_content_line
         end
         NIL
-      end
-
-      def TOUCH_EXPERIMENTAL_UNIQUE_IDENTIFIER
-        ( @___UID ||= New_unique_identifier_knownness_for_[ :const_def ] ).value_x
-      end
-
-      def EXPERIMENTAL_UNIQUE_IDENTIFIER
-        @___UID.value_x
       end
 
       def paraphernalia_category_symbol

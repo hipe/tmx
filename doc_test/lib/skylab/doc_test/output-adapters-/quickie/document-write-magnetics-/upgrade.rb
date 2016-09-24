@@ -42,20 +42,18 @@ module Skylab::DocTest
 
       def __new_child_via child
 
-        id_x = child.mixed_identifying_key
+        id_s = child.document_unique_identifying_string
 
-        cn = Here_::ViewControllers_::ContextNode.empty_via__ id_x, @_choices
+        cn = Here_::ViewControllers_::ContextNode.empty_via__ id_s, @_choices
 
         _st = __map_lines cn
 
         _margin = child.nodes.first.get_margin
+        _sym = cn.paraphernalia_category_symbol
 
-        ErsatzParser::FreeformBranchFrame.via_four(
-          id_x,
-          cn.paraphernalia_category_symbol,
-          _st,
-          _margin,
-        )
+        ErsatzParser::FreeformBranchFrame.oh_my _sym, _st, _margin do |vs|
+          vs.document_unique_identifying_string = id_s
+        end
       end
 
       # for those templates that correspond to branch-nodes our custom is that:

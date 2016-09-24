@@ -7,16 +7,17 @@ module Skylab::DocTest::TestSupport
     TS_[ self ]
     use :memoizer_methods
     use :output_adapters_quickie
+    use :test_document_shorthand
 
     context '(context)' do
 
       it "i am the first test in this document. can you see me?" do
 
-        eg = _doc.first_example_node  # WAHOOTEY
+        eg = first_example_node_  # WAHOOTEY
 
-        eg.nodes.fetch(2).line_string == "        eg = _doc.first_example_node  # WAHOOTEY\n" || fail
+        eg.nodes.fetch(2).line_string == "        eg = first_example_node_  # WAHOOTEY\n" || fail
 
-        _ = eg.mixed_identifying_key
+        _ = eg.document_unique_identifying_string
         _ == "i am the first test in this document. can you see me?" || fail
       end
 
@@ -24,7 +25,7 @@ module Skylab::DocTest::TestSupport
 
         _s = "can you access this second test by name?"
 
-        qeg = _doc.first_qualified_example_node_with_identifying_string _s
+        qeg = first_qualified_example_node_with_identifying_string_ _s
         qeg || fail
         _eg = qeg.example_node
         _eg.nodes.fetch( -2 ).line_string.include?( "OUCH_MY_BRAIN" ) || fail
@@ -34,7 +35,7 @@ module Skylab::DocTest::TestSupport
 
         _s = 'can you access "this" third test? (it has quotes)'
 
-        _qeg = _doc.first_qualified_example_node_with_identifying_string _s
+        _qeg = first_qualified_example_node_with_identifying_string_ _s
 
         _eg = _qeg.example_node
 
@@ -48,8 +49,8 @@ module Skylab::DocTest::TestSupport
 
         s = "what about over here"
 
-        _qeg = _doc.to_qualified_example_node_stream.flush_until_detect do |o|
-          x = o.example_node.mixed_identifying_key
+        _qeg = to_qualified_example_node_stream_.flush_until_detect do |o|
+          x = o.example_node.document_unique_identifying_string
           if x.respond_to? :ascii_only?
             x.include? s
           end
@@ -61,7 +62,7 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    shared_subject :_doc do
+    shared_subject :test_document_ do
 
       fh = ::File.open __FILE__
       x = output_adapter_test_document_parser_.parse_line_stream fh
