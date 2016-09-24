@@ -31,4 +31,3 @@ shared subject (:#caass: const assignment as shared setup) -
 ./basic/lib/skylab/basic/proxy/inline.rb  "good first candidate for shared subject"
 ./parse/lib/skylab/parse/functions-/alternation.rb "type #caass"
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"
-./parse/lib/skylab/parse/functions-/simple-pool.rb  "type #caass"

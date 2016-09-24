@@ -30,15 +30,13 @@ module Skylab::Parse
     # constituents positionally.
     #
     # this function is :+#empty-stream-safe.
-    #
+
     # with an ordered set parser (built from a list of arbitrary procs)
     #
-    #     bill_rx = /bill/i
-    #
-    #     SP = Parse_lib_[]::Functions_::Simple_Pool.new_with(
+    #     SP = Home_.function( :simple_pool ).new_with(
     #       :functions,
     #         :trueish_mapper, -> in_st do
-    #           if bill_rx =~ in_st.current_token_object.value_x
+    #           if /bill/i =~ in_st.current_token_object.value_x
     #             in_st.gets_one.value_x
     #           end
     #         end,
@@ -47,7 +45,8 @@ module Skylab::Parse
     #             in_st.advance_one
     #             :hello
     #           end
-    #         end )
+    #         end,
+    #     )
     #
     #
     # result array is in order of "grammar", not of elements in argv:
