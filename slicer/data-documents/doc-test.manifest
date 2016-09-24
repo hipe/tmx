@@ -1,5 +1,6 @@
 basic/lib/skylab/basic/hash/core.rb
 basic/lib/skylab/basic/module/accessors.rb
+basic/lib/skylab/basic/proxy/inline.rb
 basic/lib/skylab/basic/proxy/makers/functional/core.rb
 common/lib/skylab/common/memoization.rb
 common/lib/skylab/common/session.rb

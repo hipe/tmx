@@ -6,6 +6,18 @@ module Skylab::Basic::TestSupport
 
     extend TS_
 
+    it "produce a proxy \"inline\" from a hash-like whose values are procs" do
+
+      pxy = Home_::Proxy::Inline.new(
+        :foo, -> x { "bar: #{ x }" },
+        :biz, -> { :baz },
+      )
+
+      pxy.foo( :wee ).should eql "bar: wee"
+
+      pxy.biz.should eql :baz
+    end
+
     it "2 equivalent ways to construct it" do
 
       p2 = _subject :bar, -> { :ba }

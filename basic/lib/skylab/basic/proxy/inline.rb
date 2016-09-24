@@ -6,11 +6,10 @@ module Skylab::Basic
 
       # produce a proxy "inline" from a hash-like whose values are procs:
       #
-      # self._REDO_DOCTEST
-      #
-      #     pxy = Subject_.call(
+      #     pxy = Home_::Proxy::Inline.new(
       #       :foo, -> x { "bar: #{ x }" },
-      #       :biz, -> { :baz } )
+      #       :biz, -> { :baz },
+      #     )
       #
       #     pxy.foo( :wee )  # => "bar: wee"
       #
