@@ -12,17 +12,15 @@ module Skylab::Brazen
 
     Express_table_minimally___ = -> y, opt_h, h_a do  # [#096.A]
 
-    # for expressing a simple table minimally:
-    #
-    #     self._TODO: reverse write
-    #
-    #     y = Home_::CLI_Support::Table.express_minimally_into [],
-    #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } )
-    #
-    #     y.shift   # => "|   Food  |   Drink |"
-    #     y.shift   # => "| donuts  |  coffee |"
-    #     y.length  # => 0
-    #
+      # for expressing a simple table minimally:
+      #
+      #     y = Home_::CLI_Support::Table.express_minimally_into( [],
+      #       [ food: "donuts", drink: "coffee" ],
+      #     )
+      #
+      #     y[ 0 ]  # => "|   Food  |   Drink |"
+      #     y[ 1 ]  # => "| donuts  |  coffee |"
+      #     y.length  # => 2
 
       opt_h = { show_header: true }.merge opt_h
 

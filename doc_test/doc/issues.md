@@ -1,3 +1,7 @@
+[#040] #open updating an item (example) with no body lines ends up wrapping
+             example inside example -
+             brazen/lib/skylab/brazen/cli-support/table/core.rb
+
 [#039]       the pipeline ..
 
 [#038]       identifyings ..
