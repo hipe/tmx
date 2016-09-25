@@ -12,12 +12,11 @@ module Skylab::Basic
         end
       end  # >>
 
-
   module Instance_Methods__
 
-    def normalize_against x
+    def normalize_against_ x
 
-      _cls = subject
+      _cls = subject_normalization_
 
       _oes_p = handle_event_selectively_
 
@@ -45,7 +44,7 @@ module Skylab::Basic
 
       expect_no_events
 
-      output_value_was_written
+      expect_output_value_was_written_
 
       qkn = @input_arg
       kn = @output_arg
@@ -66,18 +65,18 @@ module Skylab::Basic
      "expected (non-qualified) knownness had #{ kn.class }"
     end
 
-    def expect_nothing
+    def expect_nothing_
 
-      output_value_was_not_written
+      expect_output_value_was_not_written_
       expect_no_events
       @result_x.should be_nil
     end
 
-    def output_value_was_written
+    def expect_output_value_was_written_
       @output_value_was_written.should eql true
     end
 
-    def output_value_was_not_written
+    def expect_output_value_was_not_written_
       @output_value_was_written.should eql false
     end
   end

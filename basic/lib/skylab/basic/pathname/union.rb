@@ -2,7 +2,7 @@ module Skylab::Basic
 
   # you can build up the union progressively, one path at at time:
   #
-  #     u = Subject_[].new
+  #     u = Home_::Pathname::Union.new
   #     u.length  # => 0
   #     u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)
   #     u.length  # => 1
@@ -12,8 +12,7 @@ module Skylab::Basic
 
   # you can build a union from a list of paths
   #
-  #     u = Subject_[ '/foo/bar', '/foo', '/biff/baz' ]
-  #
+  #     u = Home_::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
   #
   # `normalize` eliminates logical redundancies in the union:
   #
@@ -21,7 +20,6 @@ module Skylab::Basic
   #     e = u.normalize
   #     e.message_proc[] # => 'eliminating redundant entry /foo/bar which is covered by /foo'
   #     u.length  # => 2
-  #
   #
   # `match` will result in the first path in the union that 'matches':
   #
@@ -176,6 +174,6 @@ module Skylab::Basic
   # for fun, `message_proc` may play with `aggregated articulation`
   # like so:
   #
-  #     u = Subject_[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
+  #     u = Home_::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
   #     u.normalize.message_proc[]  # => "eliminating redundant entries /a/b and /a/b/c which are covered by /a. eliminating redundant entries /foo/bar and /foo/baz/bing which are covered by /foo."
 end

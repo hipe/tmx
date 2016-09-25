@@ -190,7 +190,7 @@ module Skylab::DocTest
                 [ ACHIEVED_, eni ]  # item => branch ("upgrade")
               end
             elsif eni.is_of_branch
-              __when_downgrade  # branch => item
+              __when_downgrade k  # branch => item
             else
               [ ACHIEVED_, eni ]  # item => item
             end
@@ -203,7 +203,7 @@ module Skylab::DocTest
         end
       end
 
-      def __when_downgrade  # #not-covered
+      def __when_downgrade k  # #not-covered
          # when left is item and right is branch, it's a "DOWNGRADE" - can't
          @listener.call :error, :expression, :will_not_downgrade do |y|
           y << "won't downgrade from context to example - #{ k.inspect }"

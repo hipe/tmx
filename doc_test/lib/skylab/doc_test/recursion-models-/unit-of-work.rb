@@ -78,11 +78,14 @@ module Skylab::DocTest
       @_test_path = test_path
 
       st = __output_test_file_line_stream
-
-      if @_test_file_probably_existed
-        __update_existing_test_file st
+      if st
+        if @_test_file_probably_existed
+          __update_existing_test_file st
+        else
+          __create_new_test_file st
+        end
       else
-        __create_new_test_file st
+        # #todo - not covered - (corresponds to other not covered points)
       end
 
       y  # only because of silly compatibility with "express result" near [#ze-025]

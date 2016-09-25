@@ -3,6 +3,7 @@ basic/lib/skylab/basic/list/core.rb
 basic/lib/skylab/basic/hash/as-ordered.rb
 basic/lib/skylab/basic/hash/core.rb
 basic/lib/skylab/basic/module/accessors.rb
+basic/lib/skylab/basic/pathname/union.rb
 basic/lib/skylab/basic/proxy/inline.rb
 basic/lib/skylab/basic/proxy/makers/functional/core.rb
 basic/lib/skylab/basic/rotating-buffer.rb

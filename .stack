@@ -13,10 +13,9 @@ syncing issues-
 
 ./brazen/lib/skylab/brazen/cli-support/table/core.rb  "three tests" - "try syncing this"..
 ./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up" "also rename"
+./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row" "shared subject multiline"
 
 maybe refactor these when done - have one or more smells/deeper issues -
-./basic/lib/skylab/basic/pathname/union.rb  "hard to decide what kind of sharing"
-./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row"
 ./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?
 ./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"  NEEDS RENAME
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"  NEEDS RENAME
