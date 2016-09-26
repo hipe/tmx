@@ -365,7 +365,7 @@ module Skylab::DocTest
         end
 
         def to_immediate_child_node_stream
-          Common_::Stream.via_nonsparse_array @nodes
+          Stream_[ @nodes ]
         end
 
         def to_immediate_child_scanner

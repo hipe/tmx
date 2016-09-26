@@ -72,7 +72,7 @@ module Skylab::DocTest
 
         t = @_choices.load_template_for TEMPLATE_FILE___
 
-        _st = Common_::Stream.via_nonsparse_array @__localized_line_strings
+        _st = Stream_[ @__localized_line_strings ]
 
         t.set_multiline_template_variable _st, :modified_const_definition_lines
 

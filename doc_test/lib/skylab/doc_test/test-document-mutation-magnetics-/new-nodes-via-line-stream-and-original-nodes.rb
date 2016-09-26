@@ -139,7 +139,7 @@ module Skylab::DocTest
             a.pop
           end
 
-          @line_stream = Common_::Stream.via_nonsparse_array a
+          @line_stream = Stream_[ a ]
           _clear_scanners
         end
 

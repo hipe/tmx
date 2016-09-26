@@ -36,7 +36,7 @@ module Skylab::DocTest
 
       def any_first_nonblank_line_object__
 
-        _any_first_nonblank_line_object_in Common_::Stream.via_nonsparse_array @_a
+        _any_first_nonblank_line_object_in Stream_[ @_a ]
       end
 
       def _any_first_nonblank_line_object_in st
@@ -55,7 +55,7 @@ module Skylab::DocTest
       end
 
       def to_line_object_stream
-        Common_::Stream.via_nonsparse_array @_a
+        Stream_[ @_a ]
       end
 
       def number_of_lines___  # #testpoint-only

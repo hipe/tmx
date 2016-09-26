@@ -77,8 +77,7 @@ module Skylab::DocTest
 
       _cleanup_ivars
 
-      @_cache_stream = Common_::Stream.via_nonsparse_array(
-        remove_instance_variable :@_pairs )
+      @_cache_stream = Stream_[ remove_instance_variable :@_pairs ]
 
       @_state = :___gets_from_cache_flatly ; nil
     end

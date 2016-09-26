@@ -168,7 +168,7 @@ module Skylab::DocTest::TestSupport
         end
 
         if col
-          Common_::Stream.via_nonsparse_array col.lines
+          Stream_[ col.lines ]
         else
           raise __say_not_found rx
         end

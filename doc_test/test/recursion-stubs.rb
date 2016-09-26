@@ -472,7 +472,7 @@ module Skylab::DocTest::TestSupport
       end
 
       def to_path_stream
-        Common_::Stream.via_nonsparse_array @_a
+        Stream_[ @_a ]
       end
     end
   end

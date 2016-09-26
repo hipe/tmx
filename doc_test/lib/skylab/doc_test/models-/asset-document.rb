@@ -43,7 +43,7 @@ module Skylab::DocTest
     # -- reading
 
     def to_line_stream___  # #testpoint-only
-      Common_::Stream.via_nonsparse_array( @_blocks ).expand_by do |blk|
+      Stream_[ @_blocks ].expand_by do |blk|
         blk.to_line_stream
       end
     end
@@ -93,7 +93,7 @@ module Skylab::DocTest
       end
 
       def to_line_stream  # might be #testpoint-only..
-        Common_::Stream.via_nonsparse_array( @_runs ).expand_by do |run|
+        Stream_[ @_runs ].expand_by do |run|
           run.to_line_stream
         end
       end

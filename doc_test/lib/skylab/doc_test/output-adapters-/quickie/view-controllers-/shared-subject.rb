@@ -62,7 +62,7 @@ module Skylab::DocTest
         t.set_simple_template_variable @_lvalue_string, :lvalue
 
         t.set_multiline_template_variable(
-          Common_::Stream.via_nonsparse_array( _s_a ),
+          Stream_[ _s_a ],
           :code_block_body_lines,
         )
 

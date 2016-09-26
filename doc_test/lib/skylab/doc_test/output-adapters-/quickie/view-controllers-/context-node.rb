@@ -103,7 +103,7 @@ module Skylab::DocTest
       end
 
       def to_particular_paraphernalia_stream
-        Common_::Stream.via_nonsparse_array @_particular_array
+        Stream_[ @_particular_array ]
       end
 
         # here is at least one reason why we must peek the stream, and some

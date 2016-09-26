@@ -46,7 +46,7 @@ module Skylab::DocTest
     end
 
     def to_line_matchdata_stream__  # and here
-      Common_::Stream.via_nonsparse_array @_matchdatas
+      Stream_[ @_matchdatas ]
     end
 
     def category_symbol

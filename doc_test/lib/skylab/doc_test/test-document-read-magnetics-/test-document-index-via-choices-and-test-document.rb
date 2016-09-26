@@ -223,7 +223,7 @@ module Skylab::DocTest
       end
 
       def to_stream_of sym
-        Common_::Stream.via_nonsparse_array( @child_node_indexes ).reduce_by do |o|
+        Stream_[ @child_node_indexes ].reduce_by do |o|
           sym == o.category_symbol
         end
       end

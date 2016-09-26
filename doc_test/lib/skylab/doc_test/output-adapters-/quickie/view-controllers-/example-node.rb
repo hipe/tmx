@@ -81,7 +81,7 @@ module Skylab::DocTest
         cbl = nil ; lo = nil ; main_p = nil ; p = nil
 
         transition_to_cbl = -> do  # #coverpoint4-1
-          st = Common_::Stream.via_nonsparse_array cbl ; cbl = nil
+          st = Stream_[ cbl ] ; cbl = nil
           p = -> do
             lo_ = st.gets
             if lo_

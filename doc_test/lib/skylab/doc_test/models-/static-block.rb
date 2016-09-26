@@ -26,7 +26,7 @@ module Skylab::DocTest
     end
 
     def to_line_stream  # might be #testpoint-only..
-      Common_::Stream.via_nonsparse_array @lines
+      Stream_[ @lines ]
     end
 
     def category_symbol

@@ -24,7 +24,7 @@ module Skylab::DocTest
 
     def to_stem_paraphernalia_stream
 
-      Common_::Stream.via_nonsparse_array( @_pairs ).map_by do |pair|  # like #spot-4
+      Stream_[ @_pairs ].map_by do |pair|  # like #spot-4
 
         code_run = pair.code_run
         discu_run = pair.discussion_run

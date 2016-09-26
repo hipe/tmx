@@ -115,7 +115,7 @@ module Skylab::DocTest
 
         lines.push line while line = st.gets
 
-        Common_::Stream.via_nonsparse_array lines
+        Stream_[ lines ]
       end
     end
   end

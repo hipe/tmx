@@ -82,7 +82,7 @@ module Skylab::DocTest
       end
 
       def to_line_object_stream
-        Common_::Stream.via_nonsparse_array @lines_
+        Stream_[ @lines_ ]
       end
 
       def number_of_lines___  # #testpoint-only
