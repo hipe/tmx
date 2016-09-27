@@ -455,21 +455,16 @@ module Skylab::Brazen
         end
       end
 
-      # (the below moved here with the file but have become detached frm tests)
+  begin  # :/
 
     # it is a pesudo-proc ..
     #
-    #     Table = Face_::CLI::Table
+    #     Table = Home_::CLI_Support::Table::Actor
     #
     #
-    # call it with nothing and it renders nothing:
+    # call it with nothing ane it renders nothing:
     #
     #     Table[]  # => nil
-    #
-    #
-    # call it with one thing, must respond to each (in two dimensions)
-    #
-    #     Table[ :a ]  # => NoMethodError: "private method .."
     #
     #
     # that is, an array of atoms won't fly either
@@ -491,42 +486,54 @@ module Skylab::Brazen
     # and text cels aligned left with this
     # minimal normative example:
     #
-    #     act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
-    #     exp = <<-HERE.gsub %r<^ +>, ''
-    #       | Food   | Drink  |
-    #       | donuts | coffee |
+    #     _act = Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
+    #
+    #     _exp = <<-HERE.gsub %r<^ +>, EMPTY_S_
+    #        | Food   | Drink  |
+    #        | donuts | coffee |
     #     HERE
-    #     act  # => exp
+    #
+    #     _act  # => _exp
 
     # specify custom headers, separators, and output functions:
     #
     #     a = []
-    #     x = Face_::CLI::Table[ :field, 'Food', :field, 'Drink',
-    #       :left, '(', :sep, ',', :right, ')',
-    #       :read_rows_from, [[ 'nut', 'pomegranate' ]],
-    #       :write_lines_to, a ]
     #
-    #     x  # => nil
+    #     _x = Home_::CLI_Support::Table::Actor.call(
+    #
+    #       :field, 'Food', :field, 'Drink',
+    #
+    #       :left, '(', :sep, ',', :right, ')',
+    #
+    #       :read_rows_from, [[ 'nut', 'pomegranate' ]],
+    #
+    #       :write_lines_to, a,
+    #     )
+    #
+    #     _x.object_id  # => a.object_id
+    #
     #     ( a * 'X' )  # => "(Food,Drink      )X(nut ,pomegranate)"
 
     # add field modifiers between the `field` keyword and its label (left/right):
     #
-    #     str = Face_::CLI::Table[
+    #     _str = Home_::CLI_Support::Table::Actor.call(
     #       :field, :right, :label, "Subproduct",
     #       :field, :left, :label, "num test files",
-    #       :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
+    #       :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ],
+    #     )
     #
-    #     exp = <<-HERE.unindent
+    #     _exp = <<-HERE.unindent
     #       | Subproduct | num test files |
     #       |       face | 100            |
     #       |   headless | 99             |
     #     HERE
-    #     str # => exp
+    #
+    #     _str  # => _exp
 
     # but the real fun begins with currying
     # you can curry properties and behavior for table in one place ..
     #
-    #     P = Face_::CLI::Table.curry :left, '<', :sep, ',', :right, ">\n"
+    #     P = Home_::CLI_Support::Table::Actor.curry :left, '<', :sep, ',', :right, ">"
     #
     #
     # and then use it in another place:
@@ -539,12 +546,23 @@ module Skylab::Brazen
     #     P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ]  # => "<a;b>\n<c;d>\n"
     #
     #
-    #
     # you can even curry the curried "function", curry the data, and so on -
     #
-    #     q = P.curry( :read_rows_from, [ %w( a b ) ], :sep, 'X' )
-    #     q[ :sep, '_' ]  # => "<a_b>\n"
-    #     q[]  # => "<aXb>\n"
+    #     q = P.curry :sep, '_'
+    #
+    # call the curry with one dootiy-hah:
+    #
+    #     q.call(
+    #       :read_rows_from, [ %w'a b' ],
+    #     )  # => "<a_b>\n"
+    #
+    # call the curry with the other dootily-hah:
+    #
+    #     q.call(
+    #       :read_rows_from, [ %w'c d' ],
+    #       :left, 'HUZZAH ',
+    #     )  # => "HUZZAH c_d>\n"
+  end
 
     end
   end

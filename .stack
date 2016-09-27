@@ -13,7 +13,7 @@ after unification -
 
 ./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?
 
-syncing issues-
+synchronization issue - method is in too low a class in ersatz parser, cover and move up
 
 ./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up" "also rename"
 
@@ -23,6 +23,3 @@ multiline shared subject -
 ./basic/lib/skylab/basic/function/core.rb needs rename ONLY
 ./parse/lib/skylab/parse/functions-/alternation.rb "type #caass"  NEEDS RENAME
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"  NEEDS RENAME
-
-maybe refactor these when done - have one or more smells/deeper issues -
-./brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb  "type #caass, complicated as hell"  NEEDS RENAME

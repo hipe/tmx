@@ -1,33 +1,48 @@
-require_relative '../../../test-support'
+require_relative '../../../../../test-support'
 
 module Skylab::Brazen::TestSupport
 
   describe "[br] CLI support - table - actor" do
 
-    context "is a pesudo-proc .." do
+    TS_[ self ]
+    use :memoizer_methods
 
-      it "call it with nothing and it renders nothing" do
+    context "it is a pesudo-proc .." do
 
-        _subject_callable[].should be_nil
+      before :all do
+        X_cs_t_a_fs_s_m_Table = Home_::CLI_Support::Table::Actor
+      end
+
+      it "call it with nothing ane it renders nothing" do
+        X_cs_t_a_fs_s_m_Table[].should eql nil
+      end
+
+      it "that is, an array of atoms won't fly either" do
+        _rx = ::Regexp.new "\\Aundefined\\ method\\ `each_wi"
+
+        begin
+          X_cs_t_a_fs_s_m_Table[ [ :a, :b ] ]
+        rescue NoMethodError => e
+        end
+
+        e.message.should match _rx
       end
 
       it "here is the smallest table you can render, which is boring" do
-
-        _subject_callable[ [] ].should eql EMPTY_S_
+        ( X_cs_t_a_fs_s_m_Table[ [] ] ).should eql ''
       end
 
       it "default styling (\"| \", \" |\") is evident in this minimal non-empty table" do
-
-        _subject_callable[ [ [ 'a' ] ] ].should eql "| a |\n"
+        ( X_cs_t_a_fs_s_m_Table[ [ [ 'a' ] ] ] ).should eql "| a |\n"
       end
 
       it "minimal normative example" do
 
-        _act = _subject_callable[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
+        _act = X_cs_t_a_fs_s_m_Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
 
         _exp = <<-HERE.gsub %r<^ +>, EMPTY_S_
-          | Food   | Drink  |
-          | donuts | coffee |
+           | Food   | Drink  |
+           | donuts | coffee |
         HERE
 
         _act.should eql _exp
@@ -38,7 +53,7 @@ module Skylab::Brazen::TestSupport
 
       a = []
 
-      _x = _subject_callable.call(
+      _x = Home_::CLI_Support::Table::Actor.call(
 
         :field, 'Food', :field, 'Drink',
 
@@ -46,7 +61,7 @@ module Skylab::Brazen::TestSupport
 
         :read_rows_from, [[ 'nut', 'pomegranate' ]],
 
-        :write_lines_to, a
+        :write_lines_to, a,
       )
 
       _x.object_id.should eql a.object_id
@@ -56,10 +71,11 @@ module Skylab::Brazen::TestSupport
 
     it "add field modifiers between the `field` keyword and its label (left/right)" do
 
-      _str = _subject_callable[
+      _str = Home_::CLI_Support::Table::Actor.call(
         :field, :right, :label, "Subproduct",
         :field, :left, :label, "num test files",
-        :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ] ]
+        :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ],
+      )
 
       _exp = <<-HERE.unindent
         | Subproduct | num test files |
@@ -70,46 +86,36 @@ module Skylab::Brazen::TestSupport
       _str.should eql _exp
     end
 
-    _Subject_callable = -> do
-      Home_::CLI_Support::Table::Actor
-    end
-
-    context "you can curry properties and behavior for table in one place .." do
-
-      _P = nil
+    context "but the real fun begins with currying" do
 
       before :all do
-
-        _P = _Subject_callable[].curry :left, '<', :sep, ',', :right, ">"
+        X_cs_t_a_fs_s_m_P = Home_::CLI_Support::Table::Actor.curry :left, '<', :sep, ',', :right, ">"
       end
 
       it "and then use it in another place" do
-
-        _P[ [ %w(a b), %w(c d) ] ].should eql "<a,b>\n<c,d>\n"
+        ( X_cs_t_a_fs_s_m_P[ [ %w(a b), %w(c d) ] ] ).should eql "<a,b>\n<c,d>\n"
       end
 
       it "you can optionally modify the properties for your call" do
-
-        _P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ].should eql "<a;b>\n<c;d>\n"
+        ( X_cs_t_a_fs_s_m_P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ] ).should eql "<a;b>\n<c;d>\n"
       end
 
-      it "you can even curry the curried \"function\", curry the data, and so on -" do
+      shared_subject :q do
+        X_cs_t_a_fs_s_m_P.curry :sep, '_'
+      end
 
-        q = _P.curry :sep, '_'
+      it "call the curry with one dootiy-hah" do
+        q.call(
+          :read_rows_from, [ %w'a b' ],
+        ).should eql "<a_b>\n"
+      end
 
-        q[
-          :read_rows_from, [ %w( a b ) ],
-        ].should eql "<a_b>\n"
-
-        q[
+      it "call the curry with the other dootily-hah" do
+        q.call(
           :read_rows_from, [ %w'c d' ],
           :left, 'HUZZAH ',
-        ].should eql "HUZZAH c_d>\n"
+        ).should eql "HUZZAH c_d>\n"
       end
-    end
-
-    define_method :_subject_callable do
-      _Subject_callable[]
     end
   end
 end
