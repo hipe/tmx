@@ -58,8 +58,8 @@ module Skylab::DocTest
         ViewControllers_::Starter.via_choices( self ).some_original_test_line_stream__
       end
 
-      def begin_insert_into_empty_document doc
-        Here_::DocumentWriteMagnetics_::Insert_into_Empty_Document.new doc, self
+      def begin_insert_into_empty_document doc, & p
+        Here_::DocumentWriteMagnetics_::Insert_into_Empty_Document.new doc, self, & p
       end
 
       def test_document_parser

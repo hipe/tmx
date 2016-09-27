@@ -44,14 +44,14 @@ module Skylab::DocTest
         self
       end
 
-      def to_content_line_stream_given choices
+      def to_content_line_stream_given__ choices, & p  # TEST ONLY (?)
         st = to_line_object_stream
         p = nil
         main_p = -> do
           o = st.gets
           if o
             if o.has_magic_copula
-              st = o.to_stem_paraphernalia_given( choices ).to_line_stream
+              st = o.to_stem_paraphernalia_given( choices ).to_line_stream( & p )
               p = -> do
                 line = st.gets
                 if line

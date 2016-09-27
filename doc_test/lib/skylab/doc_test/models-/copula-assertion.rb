@@ -12,8 +12,8 @@ module Skylab::DocTest
       @code_line = code_line
     end
 
-    def to_line_stream
-      _to_particular_paraphernalia.to_line_stream
+    def to_line_stream & p
+      _to_particular_paraphernalia.to_line_stream( & p )
     end
 
     def to_line

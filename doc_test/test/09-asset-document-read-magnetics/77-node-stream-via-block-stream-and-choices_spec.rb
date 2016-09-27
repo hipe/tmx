@@ -35,7 +35,7 @@ module Skylab::DocTest::TestSupport
       fi.close_if_necessary
 
       expect_actual_line_stream_has_same_content_as_expected_(
-        o::LineStream_via_NodeStream[ _ns ],
+        o::LineStream_via_NodeStream[ _ns, & Expect_no_emission_ ],
         exp_st,
       )
     end

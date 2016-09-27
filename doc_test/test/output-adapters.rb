@@ -59,7 +59,7 @@ module Skylab::DocTest::TestSupport
       end
 
       def to_line_stream
-        o = self.class.operation_.new
+        o = self.class.operation_.new( & Expect_no_emission_ )
         o.asset_line_stream = ::File.open @asset_path
         o.instance_variable_set :@choices, @choices
         o.original_test_line_stream = ::File.open @original_test_path

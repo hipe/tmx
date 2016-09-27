@@ -51,8 +51,8 @@ module Skylab::DocTest
         @identifying_string  # 5x
       end
 
-      def UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE plan
-        DocumentWriteMagnetics_::Upgrade.new( plan, @_choices ).execute
+      def UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE plan, & p
+        DocumentWriteMagnetics_::Upgrade.new( plan, @_choices, & p ).execute
       end
 
       def to_branch_local_document_node_matcher
@@ -83,13 +83,13 @@ module Skylab::DocTest
       #     - we need to figure out what our description line is from a child
       #     - (below)
 
-      def to_line_stream
+      def to_line_stream & p
 
         n_st = to_particular_paraphernalia_stream
 
         # --
 
-        body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ n_st ]
+        body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ n_st, & p ]
 
         # --
 

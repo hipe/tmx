@@ -15,8 +15,8 @@ module Skylab::DocTest
         EXACT_MATCH_RX___.match s
       end
 
-      def unescape_quoted_string_literal_matchdata md
-        Unescape_matchdata__[ md ]
+      def unescape_quoted_string_literal_matchdata md, & p
+         Unescape_matchdata__[ md, & p ]
       end
 
       def quoted_string_regex_part

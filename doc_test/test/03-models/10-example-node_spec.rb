@@ -84,7 +84,7 @@ module Skylab::DocTest::TestSupport
     def _expect_big_string subject_instance, big_exp_s
 
       expect_actual_line_stream_has_same_content_as_expected_(
-        subject_instance.to_line_stream,
+        subject_instance.to_line_stream( & Expect_no_emission_ ),
         line_stream_via_string_( big_exp_s ),
       )
     end

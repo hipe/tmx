@@ -366,7 +366,7 @@ module Skylab::Basic
         end
 
         say_etc = nil
-        Unescape_matchdata = -> md do
+        Unescape_matchdata = -> md, & l do
 
           s = md[ :double_quoted_bytes ]
           if s
@@ -389,23 +389,32 @@ module Skylab::Basic
             end
             if had
               x
+            elsif l
+              l.call :error, :expression, :unsupported_escape_sequence do |y|
+                y << say_etc[ char, schema ]
+              end
+              UNABLE_
             else
-              raise say_etc[ char, map ]
+              raise say_etc[ char, schema ]
             end
           end
         end
 
-        say_etc = -> char, map do
+        say_etc = -> char, schema do  # #covered-by [dt]
 
-          _s_a = map.keys.map do |s|
+          _s_a = schema.escape_map.keys.map do |s|
             s.inspect
           end
 
-          "unsupported escape sequence for #{ char.inspect }. #{
-            }have (#{ _s_a * ', ' })"
+          _these = Common_::Oxford_and[ _s_a ]
+
+          "in a #{ schema.adjective }-quoted string, #{
+            }we don't know how to unescape #{ char.inspect } #{
+            }(this is only a hack). #{
+            }we only know how to unescape #{ _these }."
         end
 
-        Unescaping_Schema__ = ::Struct.new :rx, :escape_map
+        Unescaping_Schema__ = ::Struct.new :rx, :escape_map, :adjective
 
         bslash = '\\'
         dquote = '"'
@@ -414,9 +423,11 @@ module Skylab::Basic
         DOUBLE_UNESCAPING_SCHEMA___ = Unescaping_Schema__.new(
           / \\ (?<special_char> . ) /x,
           {
-            dquote => dquote,
             bslash => bslash,
-          }
+            dquote => dquote,
+            'n'    => NEWLINE_,
+          },
+          "double",
         )
 
         SINGLE_UNESCAPING_SCHEMA___ = Unescaping_Schema__.new(
@@ -424,7 +435,8 @@ module Skylab::Basic
           {
             squote => squote,
             bslash => bslash,
-          }
+          },
+          "single",
         )
 
         # --

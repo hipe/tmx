@@ -36,3 +36,6 @@
     particular contexts - see [#038]
 
   • "LTS" - this is a loanword from [sa] - "line termination sequence".
+
+  - "magic" - our general name for the patterns that [dt] recognizes
+    in input data that it can translate into output data.

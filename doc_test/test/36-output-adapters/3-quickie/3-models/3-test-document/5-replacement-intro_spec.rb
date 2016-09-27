@@ -122,7 +122,9 @@ module Skylab::DocTest::TestSupport
 
       _cx = real_default_choices_
 
-      qeg.example_node.replace_constituent_lines _cr.to_content_line_stream_given _cx
+      _xx = _cr.to_content_line_stream_given__( _cx, & Expect_no_emission_ )
+
+      qeg.example_node.replace_constituent_lines _xx
 
       NIL_
     end

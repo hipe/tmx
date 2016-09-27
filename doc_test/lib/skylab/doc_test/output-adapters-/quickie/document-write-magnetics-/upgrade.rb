@@ -19,8 +19,9 @@ module Skylab::DocTest
       #
       #   1. with these lines build a freeform branch document node.
 
-      def initialize plan, cx
+      def initialize plan, cx, & p
         @_choices = cx
+        @_listener = p
         @plan = plan
       end
 
@@ -99,7 +100,7 @@ module Skylab::DocTest
       def __map_lines node
 
         lines = []
-        st = node.to_line_stream
+        st = node.to_line_stream( & @_listener )
         begin
           line = st.gets
           line || break

@@ -171,6 +171,10 @@ module Skylab::DocTest::TestSupport
 
   # --
 
+  Expect_no_emission_ = -> * a do
+    fail "no: #{ a.inspect }"
+  end
+
   Safe_localize_ = -> longer, shorter do
     Home_.lib_.basic::Pathname::Localizer[ shorter ][ longer ]
   end
@@ -221,6 +225,7 @@ module Skylab::DocTest::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  Stream_ = Home_::Stream_
   TS_ = self
 end
 # #tombstone: "case" testing DSL

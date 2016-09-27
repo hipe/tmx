@@ -28,7 +28,8 @@ module Skylab::DocTest
     # maybe this won't be useful in synchronization but then again maybe it
     # will.
 
-    def initialize ns
+    def initialize ns, & p
+      @_listener = p
       @node_stream = ns
     end
 
@@ -85,7 +86,7 @@ module Skylab::DocTest
       begin
         node = @node_stream.gets
         node || break
-        st = node.to_line_stream
+        st = node.to_line_stream( & @_listener )
         st || redo
         line = st.gets
         line ? break : redo

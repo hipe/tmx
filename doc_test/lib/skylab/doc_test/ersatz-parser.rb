@@ -6,6 +6,7 @@ module Skylab::DocTest
     # a hack to parse the test files and is not robust (although it perhaps
     # has the same level of robustness as your average syntax highlighter
     # in your editor, and it may suffice for our 95% of use cases). :[#002]
+    # (this approach is given a more broad treatment obliquely in [#042].)
 
     # (the parsing "algorithm" is explained #here2.)
 
@@ -278,17 +279,17 @@ module Skylab::DocTest
           NIL
         end
 
-        def insert_after__ after_this, no
-          @nodes = _insert::Insert_after[ after_this, no, @nodes ]
+        def insert_after__ after_this, no, & p
+          @nodes = _insert::Insert_after[ after_this, no, @nodes, & p ]
           NIL_
         end
 
-        def begin_insert_into_empty_branch_session
-          _insert::Begin_insert_into_empty[ @nodes ]
+        def begin_insert_into_empty_branch_session & p
+          _insert::Begin_insert_into_empty[ @nodes, & p ]
         end
 
-        def hack_insert_first_content__ no
-          @nodes = _insert::Hack_insert_first_content[ no, @nodes ]
+        def hack_insert_first_content__ no, & p
+          @nodes = _insert::Hack_insert_first_content[ no, @nodes, & p ]
           NIL
         end
 
@@ -477,12 +478,12 @@ module Skylab::DocTest
 
         # -- work-time mutators
 
-        def begin_insert_into_empty_document choices
-          choices.begin_insert_into_empty_document self
+        def begin_insert_into_empty_document choices, & p
+          choices.begin_insert_into_empty_document self, & p
         end
 
-        def prepend_before_some_existing_content__ no
-          @nodes = _insert::Prepend_before_some_existing[ no, @nodes ]
+        def prepend_before_some_existing_content__ no, & p
+          @nodes = _insert::Prepend_before_some_existing[ no, @nodes, & p ]
           NIL_
         end
 

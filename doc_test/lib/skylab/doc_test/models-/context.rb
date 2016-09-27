@@ -14,8 +14,8 @@ module Skylab::DocTest
       @__test_file_context_proc = tfcp
     end
 
-    def to_line_stream
-      to_particular_paraphernalia.to_line_stream
+    def to_line_stream & p
+      to_particular_paraphernalia.to_line_stream( & p )
     end
 
     def to_particular_paraphernalia

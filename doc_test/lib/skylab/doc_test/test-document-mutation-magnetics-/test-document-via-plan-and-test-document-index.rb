@@ -9,7 +9,7 @@ module Skylab::DocTest
       @clobber_queue = plan.clobber_queue
       @creation_tree = plan.creation_tree
       @dandy_queue = plan.dandy_queue
-      @NOT_USED_listener = l
+      @_listener = l
       @plan = p
       @test_document_index = tdi
     end
@@ -24,7 +24,12 @@ module Skylab::DocTest
     def __transfer_the_creation_tree
       ct = @creation_tree
       if ct
-        Recurse__.new( @test_document_index.existing_document_node, ct, @choices ).execute
+        Recurse__.new(
+          @test_document_index.existing_document_node,
+          ct,
+          @choices,
+          & @_listener
+        ).execute
       end
       NIL
     end
@@ -58,7 +63,8 @@ module Skylab::DocTest
         existing = eni.existing_document_node
       else
         # #coverpoint5-4 - upgrading an item node (experiment)
-        existing = plan.new_node.UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE plan
+        existing = plan.new_node.UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE(
+          plan, & @_listener )
       end
 
       Recurse__.new(
@@ -66,6 +72,7 @@ module Skylab::DocTest
         plan.plan_array,
         1,  # any nonzero eew
         @choices,
+        & @_listener
       ).execute
       NIL
     end
@@ -82,7 +89,7 @@ module Skylab::DocTest
       new_node = plan.new_node
       existing_node_index = plan.existing_node_index
       # --
-      _st = new_node.to_line_stream
+      _st = new_node.to_line_stream( & @_listener )
       existing_node_index.existing_child_document_node.replace_lines _st
       NIL
     end
@@ -91,10 +98,11 @@ module Skylab::DocTest
 
     class Recurse__
 
-      def initialize dest, plan_a, depth=0, cx
+      def initialize dest, plan_a, depth=0, cx, & l
         @choices = cx
         @_depth = depth
         @destination_branch = dest  # ersatz document branch node
+        @_listener = l
         @plan_array = plan_a
       end
 
@@ -214,20 +222,20 @@ module Skylab::DocTest
           ref_node ||= pp.existing_node_index.existing_document_node
           ref_node || fail
 
-          @destination_branch.insert_after__ ref_node, new_node
+          @destination_branch.insert_after__ ref_node, new_node, & @_listener
 
         elsif plan.is_first_content
 
           if @_depth.zero?
-            o = @destination_branch.begin_insert_into_empty_document @choices
+            o = @destination_branch.begin_insert_into_empty_document @choices, & @_listener
             o.node_of_interest = new_node
             o.finish  # nil
           else
-            @destination_branch.hack_insert_first_content__ new_node
+            @destination_branch.hack_insert_first_content__ new_node, & @_listener
           end
 
         else
-          @destination_branch.prepend_before_some_existing_content__ new_node
+          @destination_branch.prepend_before_some_existing_content__ new_node, & @_listener
         end
         NIL
       end

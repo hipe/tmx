@@ -8,13 +8,13 @@ module Skylab::DocTest
     # try to infer formatting to use (mainly insertion of blank lines)
     # agnostic of the particular solution.
 
-    Prepend_before_some_existing = -> no, nodes do
+    Prepend_before_some_existing = -> no, nodes, & p do
 
       _idx = Index__.of nodes do |o|
         o.__record_between_first_and_second_node_of_interest
       end
 
-      o = Rewrite__.new _idx, nodes
+      o = Rewrite__.new _idx, nodes, & p
       o.write_nodes_before_the_reference_node
       o.write_new_node_of_interest no
       o.write_separating_blank_line_run
@@ -22,7 +22,7 @@ module Skylab::DocTest
       o.finish
     end
 
-    Insert_after = -> after_this_node, no, doc_nodes do
+    Insert_after = -> after_this_node, no, doc_nodes, & p do
 
       idx = Index__.of doc_nodes do |o|
         o.__will_search_for_this after_this_node
@@ -32,7 +32,7 @@ module Skylab::DocTest
         self._SANITY_referenced_node_not_found
       end
 
-      o = Rewrite__.new idx, doc_nodes
+      o = Rewrite__.new idx, doc_nodes, & p
       o.write_nodes_through_the_reference_node
       o.write_separating_blank_line_run
       o.write_new_node no
@@ -48,13 +48,13 @@ module Skylab::DocTest
       o.finish
     end
 
-    Hack_insert_first_content = -> no, nodes do
+    Hack_insert_first_content = -> no, nodes, & p do
 
       _idx = Index__.of nodes do |o|
         o.__set_reference_node_to_be_the_penultimate_node
       end
 
-      o = Rewrite__.new _idx, nodes
+      o = Rewrite__.new _idx, nodes, & p
       o.write_nodes_through_the_reference_node
       o.write_blank_line_if_necessary
       o.write_new_node no
@@ -62,19 +62,20 @@ module Skylab::DocTest
       o.finish
     end
 
-    Begin_insert_into_empty = -> nodes do
+    Begin_insert_into_empty = -> nodes, & p do
       _idx = Index__.of nodes
-      Rewrite__.new _idx, nodes
+      Rewrite__.new _idx, nodes, & p
     end
 
     class Rewrite__
 
-          def initialize idx, nodes
-            @index = idx
-            @reference_index = nil
-            @original_nodes = nodes
-            @result_nodes = []
-          end
+      def initialize idx, nodes, & p
+        @index = idx
+        @_listener = p
+        @original_nodes = nodes
+        @reference_index = nil
+        @result_nodes = []
+      end
 
       def write_nodes_through_the_reference_node
             ( @index.reference_index + 1 ).times do |d|
@@ -122,7 +123,7 @@ module Skylab::DocTest
 
       def write_new_node_of_interest no
 
-        _st = no.to_line_stream
+        _st = no.to_line_stream( & @_listener )
 
         __write_node_of_interest(
           no.paraphernalia_category_symbol,

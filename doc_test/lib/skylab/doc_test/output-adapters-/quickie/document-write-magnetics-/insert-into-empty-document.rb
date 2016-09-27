@@ -4,9 +4,10 @@ module Skylab::DocTest
 
     class DocumentWriteMagnetics_::Insert_into_Empty_Document
 
-        def initialize doc, cx
+        def initialize doc, cx, & p
           @choices = cx
           @document = doc
+          @_listener = p
         end
 
         attr_writer(
@@ -23,13 +24,13 @@ module Skylab::DocTest
 
         def __into_receiving_branch_insert
 
-          o = @_receiving_branch.begin_insert_into_empty_branch_session
+          o = @_receiving_branch.begin_insert_into_empty_branch_session( & @_listener )
 
           o.write_opening_node_and_any_blank_lines
 
           o.write_blank_line_if_necessary
 
-          o.write_new_node_of_interest @node_of_interest
+          o.write_new_node_of_interest @node_of_interest, & @_listener
 
           o.write_from_the_reference_node_to_end  # closing line
 

@@ -28,7 +28,7 @@ module Skylab::DocTest::TestSupport
 
       it "(every byte)" do
 
-        _a_st = _nodes.first.to_line_stream
+        _a_st = _nodes.first.to_line_stream( & Expect_no_emission_ )
 
         _e_st = _ELC_line_stream_after %r(\bthe above produces\z)
 

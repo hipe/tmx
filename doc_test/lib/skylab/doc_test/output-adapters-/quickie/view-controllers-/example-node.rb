@@ -27,19 +27,14 @@ module Skylab::DocTest
 
         @_common = para
         @_choices = cx
-
-        # kind of janky - at construction time we go ahead and try to
-        # resolve the two derivatives of description, but we could just as
-        # soon resolve it lazily.
-
-        @_description_bytes_OK = __resolve_description_bytes
+        __init_description_bytes
       end
 
       def to_branch_local_document_node_matcher
 
-        id_s = identifying_string
+        if @_has_description_bytes
 
-        if id_s
+          id_s = @_identifying_string
 
           -> doc_node do
 
@@ -51,9 +46,21 @@ module Skylab::DocTest
         end
       end
 
-      def to_line_stream
+      def to_line_stream & p
+        dup.extend( ToLineStream___ ).__init( p ).execute
+      end
 
-        ok = @_description_bytes_OK
+      # == ON
+
+      module ToLineStream___
+
+        def __init p
+          @_listener = p
+          self
+        end
+
+      def execute
+        ok = @_has_description_bytes
         ok && __init_body_line_stream
         ok && __assemble_template_and_etc
       end
@@ -97,7 +104,10 @@ module Skylab::DocTest
           # magic copula to expand to take up more than one line, all the
           # while streaming.
 
-          st = lo.to_stem_paraphernalia_given( @_choices ).to_line_stream
+            _assertion_stem = lo.to_stem_paraphernalia_given @_choices
+            st = _assertion_stem.to_line_stream( & @_listener )
+            # we assume the above never to fail per [#042] #note-2
+
           lo = nil
           p = -> do
             s = st.gets
@@ -144,12 +154,15 @@ module Skylab::DocTest
           p[]
         end
       end
-
-      def identifying_string
-        @_description_bytes_OK && @_identifying_string
       end
 
-      def __resolve_description_bytes  # (based off model)
+      # == OFF
+
+      def identifying_string
+        @_has_description_bytes && @_identifying_string
+      end
+
+      def __init_description_bytes
 
         o = @_common.begin_description_string_session
 
@@ -168,13 +181,17 @@ module Skylab::DocTest
         end
 
         if ! o.found || o.is_blank
-          UNABLE_
+          @_has_description_bytes = false
         else
+          @_has_description_bytes = true
           @description_bytes_ = o.finish
-          ACHIEVED_
         end
+        NIL
       end
 
+    # == ON (again)
+
+      module ToLineStream___
       def __assemble_template_and_etc  # (based off model)
 
         t = @_choices.load_template_for TEMPLATE_FILE___
@@ -191,6 +208,9 @@ module Skylab::DocTest
 
         t.flush_to_line_stream
       end
+      end
+
+    # == OFF (again)
 
       def paraphernalia_category_symbol
         :example_node

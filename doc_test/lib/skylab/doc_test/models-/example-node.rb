@@ -14,8 +14,8 @@ module Skylab::DocTest
       @_discussion_run = discussion_run
     end
 
-    def to_line_stream
-      to_particular_paraphernalia.to_line_stream
+    def to_line_stream & p
+      to_particular_paraphernalia.to_line_stream( & p )
     end
 
     def to_particular_paraphernalia_under x
