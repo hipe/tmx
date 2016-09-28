@@ -2,10 +2,11 @@
 
 [#042]       sub-magic and..
 
-[#041] #wish if not a dry-run (which, sure, just have that), then at
+[#041] #hole
+             (#was: if not a dry-run (which, sure, just have that), then at
              least the ability for the (CLI or deeper) "recurse" operation
              to show which (any) test file corresponds to an arbitrary
-             asset file.
+             asset file.)
 
 [#040] #open updating an item (example) with no body lines ends up wrapping
              example inside example -

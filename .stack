@@ -19,7 +19,10 @@ synchronization issue - method is in too low a class in ersatz parser, cover and
 
 multiline shared subject -
 
-./basic/lib/skylab/basic/method.rb  "module as subject, too many tests in a row" "shared subject multiline"
-./basic/lib/skylab/basic/function/core.rb needs rename ONLY
-./parse/lib/skylab/parse/functions-/alternation.rb "type #caass"  NEEDS RENAME
-./parse/lib/skylab/parse/functions-/serial-optionals.rb  "type #caass"  NEEDS RENAME
+./basic/lib/skylab/basic/method.rb  (constdef, assertion) (constdef, asst 2x, assertion 4x)
+
+./parse/lib/skylab/parse/functions-/serial-optionals.rb (break this up, the last context)
+
+./parse/lib/skylab/parse/functions-/alternation.rb ACCEPTANCE TEST CASE
+
+./basic/lib/skylab/basic/function/core.rb MODEL CASE (HERE FOR HISTORY, DONE IN THIS COMMIT)

@@ -4,11 +4,13 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] function (chain)" do
 
-    context "given a queue of functions and one seed value, produce one result" do
+    extend TS_
+    use :memoizer_methods
 
-      before :all do
+    context "compose a \"function chain\" with a list of functions" do
 
-        X_f_FUNC = Home_::Function.chain( [
+      shared_subject :func do
+        func = Home_::Function.chain( [
           -> item do
             if 'cilantro' == item            # the true-ishness of the 1st
               [ false, 'i hate cilantro' ]   # element in the result tuple
@@ -25,26 +27,24 @@ module Skylab::Basic::TestSupport
             end
           end,
         ] )
+
+        func
       end
 
-      it "this short circuits at the first branch, resulting in a value" do
-        s = X_f_FUNC[ 'cilantro' ]
-        s.should eql 'i hate cilantro'
+      it "result of the call is that second element of the tuple" do
+        ( func[ 'cilantro' ] ).should eql "i hate cilantro"
       end
 
-      it "resulting in a single true-ish item will result in that value" do
-        s = X_f_FUNC[ 'carrots' ]
-        s.should eql "let's have carrots and potato"
+      it "the chain call" do
+        ( func[ 'carrots' ] ).should eql "let's have carrots and potato"
       end
 
-      it "resulting in the tuple [ false, X ] gives you X" do
-        s = X_f_FUNC[ 'red' ]
-        s.should eql 'nope i hate tomato'
+      it "result (`X`) has been found" do
+        ( func[ 'red' ] ).should eql "nope i hate tomato"
       end
 
-      it "this follows all the way through to the end with a true-ish item" do
-        x = X_f_FUNC[ 'blue' ]
-        x.should eql [ 'blue', 'potato' ]
+      it "going. for now, the result is just the tuple as-is" do
+        ( func[ 'blue' ] ).should eql %w( blue potato )
       end
     end
   end

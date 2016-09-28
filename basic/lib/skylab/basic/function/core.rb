@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module Function
 
-    # given a queue of functions and one seed value, produce one result
+    # compose a "function chain" with a list of functions:
     #
-    #     FUNC = Home_::Function.chain( [
+    #     func = Home_::Function.chain( [
     #       -> item do
     #         if 'cilantro' == item            # the true-ishness of the 1st
     #           [ false, 'i hate cilantro' ]   # element in the result tuple
@@ -22,32 +22,42 @@ module Skylab::Basic
     #       end,
     #     ] )
     #
+    # normally each component function's result is treated as a "tuple"
+    # (array) where the first element of that tuple is treated as a boolean
+    # indicating whether or not to continue along on the chain of functions
+    # (true-ish means "yes" and false-ish means "no"), and any remaining
+    # elements in the tuple at offset 1 thru N-1 will either be used as
+    # arguments to pass to the next function, or the final result as
+    # appropriate.
     #
-    # this short circuits at the first branch, resulting in a value
+    # given the below argument, the *first* function results in a tuple whose
+    # first element is `false` (which means "don't keep going"); so the final
+    # result of the call is that second element of the tuple:
     #
-    #     s = FUNC[ 'cilantro' ]
-    #     s  # => 'i hate cilantro'
+    #     func[ 'cilantro' ]  # => "i hate cilantro"
     #
+    # otherwise, when (as with the argument in the next example) the first
+    # tuple element is trueh-ish, it means "keep going", and the elements at
+    # offsets 1 thru N-1 of that tuple are passed as arguments to the next
+    # function in the chain.
     #
-    # resulting in a single true-ish item will result in that value
+    # if the result of the component function does not look like a tuple
+    # (array), this value (whatever it is) is used as the final result of
+    # the chain call:
     #
-    #     s = FUNC[ 'carrots' ]
-    #     s  # => "let's have carrots and potato"
+    #     func[ 'carrots' ]  # => "let's have carrots and potato"
     #
+    # the above is shorthand for resulting in `[ false-ish, X ]` which
+    # (since its first element is falseish) is an indication that the final
+    # result (`X`) has been found:
     #
-    # resulting in the tuple [ false, X ] gives you X
+    #     func[ 'red' ]  # => "nope i hate tomato"
     #
-    #     s = FUNC[ 'red' ]
-    #     s  # => 'nope i hate tomato'
+    # if you are at the last function and you result in what looks like a
+    # tuple that expresses "keep going", there is no next function to keep
+    # going. for now, the result is just the tuple as-is:
     #
-    #
-    # this follows all the way through to the end with a true-ish item
-    #
-    #     x = FUNC[ 'blue' ]
-    #     x  # => [ 'blue', 'potato' ]
-    #
-    #
-    # Blue potato. everything should be perfectly clear now.
+    #     func[ 'blue' ]  # => %w( blue potato )
 
     class << self
 
