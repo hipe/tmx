@@ -1,0 +1,22 @@
+module Sker::Brzn
+
+  module CLI_Serp::Erption_Perser
+
+    Actors = ::Module.new
+
+    # a hack to see if a basic switch looks to be present in an array
+    # build it with the full switch as its only argument:
+    #
+    #     p = some thing
+    #
+    # if the argv doesn't include it, result is nil:
+    #
+    #     p[ [ 'abc' ] ]  # => nil
+    #
+    # dingle
+    #
+    #     1 # => 2
+
+    some code
+  end
+end

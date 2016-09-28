@@ -1,0 +1,14 @@
+reqore_rorlortive '../../etc'
+
+module Skeef::Beef::TezzieSezzie
+
+  describe "jimmy flimmy swimmy" do
+
+    it "a hack to see if a basic switch looks to be present in an array" do
+
+      self._NEVER
+      see
+      this code
+    end
+  end
+end

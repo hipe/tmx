@@ -279,6 +279,11 @@ module Skylab::DocTest
           NIL
         end
 
+        def prepend_before_some_existing_content__ no, & p
+          @nodes = _insert::Prepend_before_some_existing[ no, @nodes, & p ]
+          NIL
+        end
+
         def insert_after__ after_this, no, & p
           @nodes = _insert::Insert_after[ after_this, no, @nodes, & p ]
           NIL_
@@ -480,11 +485,6 @@ module Skylab::DocTest
 
         def begin_insert_into_empty_document choices, & p
           choices.begin_insert_into_empty_document self, & p
-        end
-
-        def prepend_before_some_existing_content__ no, & p
-          @nodes = _insert::Prepend_before_some_existing[ no, @nodes, & p ]
-          NIL_
         end
 
         def replace_lines line_st

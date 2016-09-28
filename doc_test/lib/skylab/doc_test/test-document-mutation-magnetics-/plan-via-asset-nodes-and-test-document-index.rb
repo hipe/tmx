@@ -105,7 +105,7 @@ module Skylab::DocTest
         @clobber_queue = cq
         @dandy_queue = dq
         @_did_see_const_definition = false
-        @_document_has_first_node_of_interest = has_some
+        @_document_has_first_content = has_some
         @listener = l
         @__particular_stream = ps
         @_previous_plan = nil
@@ -264,12 +264,7 @@ module Skylab::DocTest
 
       def _add_node_of_interest_to_creation_branch plan
 
-        if ! @_document_has_first_node_of_interest
-          @_document_has_first_node_of_interest = false
-          plan.become_first_content
-        end
-
-        @_previous_plan = plan
+        _positionalize_plan plan
         _add_to_creation_branch plan
       end
 
@@ -281,6 +276,15 @@ module Skylab::DocTest
 
         @_previous_plan = plan
         _add_to_clobber_queue plan
+      end
+
+      def _positionalize_plan plan
+        @_previous_plan = plan
+        if ! @_document_has_first_content
+          @_document_has_first_content = false
+          plan.become_first_content
+        end
+        NIL
       end
 
       def _recurse branch_index=nil
@@ -322,15 +326,12 @@ module Skylab::DocTest
 
         if _do_replace
           plan = Plan__::Replace_const_def[ no, @branch_index.before_all_block ]
+          @_previous_plan = plan
         else
           plan = Plan__::Insert_const_def[ no, @_previous_plan ]
-          if ! @_document_has_first_node_of_interest
-            # @_document_has_first_node_of_interest = true  uh oh..
-            plan.become_first_content
-          end
+          _positionalize_plan plan
         end
 
-        @_previous_plan = plan
         _add_to_creation_branch plan
       end
 
@@ -365,7 +366,7 @@ module Skylab::DocTest
 
       def _insert_this_shared_subject ss
         plan = Plan__::Insert_shared_subject[ ss, @_previous_plan ]
-        @_previous_plan = plan
+        _positionalize_plan plan
         _add_to_creation_branch plan
       end
 
