@@ -24,5 +24,3 @@ multiline shared subject -
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb (break this up, the last context)
 
 ./parse/lib/skylab/parse/functions-/alternation.rb ACCEPTANCE TEST CASE
-
-./basic/lib/skylab/basic/function/core.rb MODEL CASE (HERE FOR HISTORY, DONE IN THIS COMMIT)

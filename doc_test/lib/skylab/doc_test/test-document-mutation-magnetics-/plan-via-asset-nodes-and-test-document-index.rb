@@ -100,22 +100,19 @@ module Skylab::DocTest
           end
         end
 
-        @_has_some_content_of_interest = has_some
         @branch_index = use_bi
-
+        @_creation_branch = nil  # array
         @clobber_queue = cq
         @dandy_queue = dq
+        @_did_see_const_definition = false
+        @_document_has_first_node_of_interest = has_some
         @listener = l
         @__particular_stream = ps
+        @_previous_plan = nil
         @test_document_index = tdi
       end
 
       def execute
-
-        @_creation_branch = nil  # array
-        @_did_see_const_definition = false
-        @_previous_plan = nil
-
         ok = ACHIEVED_
         st = remove_instance_variable :@__particular_stream
         begin
@@ -137,9 +134,9 @@ module Skylab::DocTest
       end
 
       SHAPE___ = {
-        context_node: :__process_context_node,
+        context_node: :_process_node_of_interest,
         const_definition: :__process_const_definition,
-        example_node: :__process_example_node,
+        example_node: :_process_node_of_interest,
         shared_subject: :__process_shared_subject,
       }
 
@@ -148,63 +145,49 @@ module Skylab::DocTest
       # own branch-local version of (exactly) [#033] the fine and dandy algo
       # --
 
-      def __process_context_node no
+      def _process_node_of_interest no  # example node or context node
 
-        ok, eni = _check_for_any_existing no
-        if ok
-          if eni
-            __when_context_node_already_exists eni, no
-          else
-            __when_context_node_doesnt_already_exist no
-          end
+        @_node_of_interest = no
+
+        _ = TestDocumentMutationMagnetics_::
+            TransitionCharacterization_via_LeftNode_and_TestDocumentIndex.new(
+          no, @test_document_index )
+
+        c14n = _.execute
+        if c14n
+          @_characterization = c14n
+          send NODE_OF_INTEREST_VERB__.fetch c14n.verb_symbol
         else
-          ok
+          c14n  # false-ish
         end
       end
 
-      def __process_example_node no
+      NODE_OF_INTEREST_VERB__ = {
+        create: :__when_create_node_of_interest,
+        downgrade: :__when_downgrade,
+        same_shape: :__when_edit_existing_node_of_interest,
+        upgrade: :__when_upgrade,
+      }
 
-        ok, eni = _check_for_any_existing no
-        if ok
-          if eni
-            __when_example_node_already_exists eni, no
-          else
-            __when_example_node_doesnt_already_exist no
-          end
+      def __when_edit_existing_node_of_interest
+        if @_characterization.is_of_branch
+          __when_edit_existing_context
         else
-          ok
+          __when_replace_example
         end
       end
 
-      def _check_for_any_existing no
-
-        k = no.identifying_string
-        if k
-          eni = @test_document_index.lookup_via_identifying_string k
-          if eni  # existing node index
-            left_is_branch = Paraphernalia_::Is_branch[ no ]
-            if left_is_branch
-              if eni.is_of_branch
-                [ ACHIEVED_, eni ]  # branch => branch
-              else
-                [ ACHIEVED_, eni ]  # item => branch ("upgrade")
-              end
-            elsif eni.is_of_branch
-              __when_downgrade k  # branch => item
-            else
-              [ ACHIEVED_, eni ]  # item => item
-            end
-          else
-            ACHIEVED_
-          end
+      def __when_create_node_of_interest
+        if @_characterization.is_of_branch
+          __when_create_context_node
         else
-          self._COVER_ME__node_did_not_have_identifying_string_for_whatever_reason
-          k
+          __when_create_example_node
         end
       end
 
-      def __when_downgrade k  # #not-covered
+      def __when_downgrade  # #not-covered
          # when left is item and right is branch, it's a "DOWNGRADE" - can't
+         k = @_characterization.identifying_string
          @listener.call :error, :expression, :will_not_downgrade do |y|
           y << "won't downgrade from context to example - #{ k.inspect }"
           y << "(information will be lost)"
@@ -212,81 +195,99 @@ module Skylab::DocTest
         UNABLE_
       end
 
-      def __when_context_node_already_exists eni, no
+      def __when_upgrade
 
-        # recurse. if empty, disregard. otherwise, add to the dandy queue.
-        # remember that there are also side effects - the two queues
+        # recurse. if empty, disregard. otherwise, add to the CLOBBER queue.
 
-        creation_branch = _recurse2 no, eni
-        if creation_branch
-          if creation_branch.length.nonzero?
-            plan = Plan__::Merge_context[ eni, creation_branch, no ]
-            @_previous_plan = plan
-            __add_to_dandy_queue plan
-          end
-          ACHIEVED_
-        else
-          creation_branch  # assume soft fatal
+        _with_nonzero_length_creation_branch_from_recurse do |cb|
+
+          _eni = @_characterization.existing_node_index  # NOT used in the above
+
+          plan = Plan__::Upgrade[ _eni, cb, @_node_of_interest ]
+          @_previous_plan = plan
+          _add_to_clobber_queue plan
         end
       end
 
-      def __when_context_node_doesnt_already_exist no
+      def __when_edit_existing_context
+
+        # recurse. if empty, disregard. otherwise, add to the dandy queue.
+
+        eni = @_characterization.existing_node_index
+
+        _with_nonzero_length_creation_branch_from_recurse eni do |cb|
+
+          plan = Plan__::Merge_context[ eni, cb, @_node_of_interest ]
+          @_previous_plan = plan
+          __add_to_dandy_queue plan
+        end
+      end
+
+      def __when_create_context_node
 
         # recurse. if empty, disregard. otherwise, add to creation branch.
 
-        creation_branch = _recurse2 no
+        _with_nonzero_length_creation_branch_from_recurse do |cb|
+
+          _plan = Plan__::Insert_context[ @_node_of_interest, cb, @_previous_plan ]
+          @_previous_plan = _plan  # NOT SURE
+          _add_node_of_interest_to_creation_branch _plan
+        end
+      end
+
+      def _with_nonzero_length_creation_branch_from_recurse existing_node_index=nil
+
+        # an abstraction of the common pattern -
+        # fail on failure, ignore (but succeed) on no-op branches.
+
+        creation_branch = _recurse existing_node_index
         if creation_branch
-          if creation_branch.length.nonzero?
-            if @_has_some_content_of_interest
-              plan = Plan__::Insert_context[ no, creation_branch, @_previous_plan ]
-            else
-              plan = Plan__::Insert_context[ no, creation_branch, @_previous_plan ]
-              plan.become_first_content
-              @_has_some_content_of_interest = true
-            end
-            @_previous_plan = plan
-            _add_to_creation_branch plan
+          if creation_branch.length.zero?
+            ACHIEVED_
+          else
+            yield creation_branch
           end
-          ACHIEVED_
         else
           creation_branch  # assume soft fatal
         end
       end
 
-      def __when_example_node_already_exists eni, no  # #coverpoint3-2
+      def __when_create_example_node
 
-        # simply add to clobber queue. it's the only answer and the only way
+        # #coverpoint3-1 - prepend this node before the first node in the doc
+        # #coverpoint3-3 - place this node immediately after last inserted node
 
-        plan = Plan__::Replace_example[ no, eni, @_previous_plan ]
-        @_previous_plan = plan
-        _add_to_clobber_queue plan
-        ACHIEVED_
+        _plan = Plan__::Insert_example[ @_node_of_interest, @_previous_plan ]
+
+        _add_node_of_interest_to_creation_branch _plan
       end
 
-      def __when_example_node_doesnt_already_exist no
+      def _add_node_of_interest_to_creation_branch plan
 
-        if @_has_some_content_of_interest
-
-          # #coverpoint3-1 - prepend this node before the first node in the doc
-          # #coverpoint3-3 - place this node immediately after last inserted node
-
-          plan = Plan__::Insert_example[ no, @_previous_plan ]
-        else
-          @_has_some_content_of_interest = true
-          plan = Plan__::Insert_example[ no, @_previous_plan ]
+        if ! @_document_has_first_node_of_interest
+          @_document_has_first_node_of_interest = false
           plan.become_first_content
         end
 
         @_previous_plan = plan
         _add_to_creation_branch plan
-        ACHIEVED_
       end
 
-      def _recurse2 no, branch_index=nil
+      def __when_replace_example  # #coverpoint3-2
+        # simply add to clobber queue. it's the only answer and the only way
+
+        plan = Plan__::Replace_example.call(
+          @_node_of_interest, @_characterization.existing_node_index, @_previous_plan )
+
+        @_previous_plan = plan
+        _add_to_clobber_queue plan
+      end
+
+      def _recurse branch_index=nil
 
         # a context node *is* a branch node (the only kind we recognize here)
 
-        _parti_st = no.to_particular_paraphernalia_stream
+        _parti_st = @_node_of_interest.to_particular_paraphernalia_stream
 
         self.class.into_with_for _parti_st, branch_index, self
       end
@@ -323,15 +324,14 @@ module Skylab::DocTest
           plan = Plan__::Replace_const_def[ no, @branch_index.before_all_block ]
         else
           plan = Plan__::Insert_const_def[ no, @_previous_plan ]
-          if ! @_has_some_content_of_interest
-            # @_has_some_content_of_interest = true  uh oh..
+          if ! @_document_has_first_node_of_interest
+            # @_document_has_first_node_of_interest = true  uh oh..
             plan.become_first_content
           end
         end
 
         @_previous_plan = plan
         _add_to_creation_branch plan
-        ACHIEVED_
       end
 
       # ~
@@ -358,7 +358,6 @@ module Skylab::DocTest
           plan = Plan__::Replace_shared_subject[ pc, di, @_previous_plan ]
           @_previous_plan = plan
           _add_to_clobber_queue plan
-          ACHIEVED_
         else
           _insert_this_shared_subject pc
         end
@@ -368,21 +367,23 @@ module Skylab::DocTest
         plan = Plan__::Insert_shared_subject[ ss, @_previous_plan ]
         @_previous_plan = plan
         _add_to_creation_branch plan
-        ACHIEVED_
       end
 
       # --
 
       def _add_to_creation_branch plan
-        ( @_creation_branch ||= [] ).push plan ; nil
+        ( @_creation_branch ||= [] ).push plan
+        ACHIEVED_
       end
 
       def __add_to_dandy_queue plan
-        @dandy_queue.push plan ; nil
+        @dandy_queue.push plan
+        ACHIEVED_
       end
 
       def _add_to_clobber_queue plan
-        @clobber_queue.push plan ; nil
+        @clobber_queue.push plan
+        ACHIEVED_
       end
 
       attr_reader(
@@ -407,6 +408,15 @@ module Skylab::DocTest
     Plan___ = ::Struct.new :clobber_queue, :creation_tree, :dandy_queue
 
     module Plan__
+
+      Upgrade = -> eg_node_index, a, no do
+        o = NodePlan__.new
+        o.existing_node_index = eg_node_index
+        o.plan_array = a
+        o.new_node = no
+        o.plan_verb = :upgrade
+        o.finish
+      end
 
       Merge_context = -> eni, a, no do
         o = NodePlan__.new

@@ -24,12 +24,7 @@ module Skylab::DocTest
     def __transfer_the_creation_tree
       ct = @creation_tree
       if ct
-        Recurse__.new(
-          @test_document_index.existing_document_node,
-          ct,
-          @choices,
-          & @_listener
-        ).execute
+        _recurse ct, @test_document_index.existing_document_node, 0
       end
       NIL
     end
@@ -46,13 +41,13 @@ module Skylab::DocTest
           :context == plan.node_shape || self._SANITY
           :merge == plan.plan_verb || self._SANITY
 
-          __recurse plan
+          __merge_context plan
         end
       end
       NIL
     end
 
-    def __recurse plan
+    def __merge_context plan
 
       # because of its rigid, narrow structural profile we could
       # streamline the execution of this but meh, why bother
@@ -62,30 +57,57 @@ module Skylab::DocTest
       if eni.is_of_branch
         existing = eni.existing_document_node
       else
-        # #coverpoint5-4 - upgrading an item node (experiment)
-        existing = plan.new_node.UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE(
-          plan, & @_listener )
+        self._THIS_CHANGED  # #todo moved #here-2
       end
 
-      Recurse__.new(
-        existing,
-        plan.plan_array,
-        1,  # any nonzero eew
-        @choices,
-        & @_listener
-      ).execute
+      _recurse plan.plan_array, existing, 1
       NIL
     end
 
     def __transfer_the_clobber_queue
       cq = @clobber_queue
       if cq
-        cq.each( & method( :__transfer_example ) )
+        cq.each do |plan|
+          send CLOBBER___.fetch( plan.plan_verb ), plan
+        end
       end
       NIL
     end
 
-    def __transfer_example plan
+    CLOBBER___ = {
+      replace: :__clobber_replace,
+      upgrade: :__clobber_upgrade,
+    }
+
+    def __clobber_upgrade plan
+
+      # #coverpoint5-4 - upgrading an item node (experiment)
+
+      _existing = plan.new_node.UPGRADE_ITEM_NODE_TO_BE_EMPTY_BRANCH_NODE(
+        plan, & @_listener )
+
+      _recurse plan.plan_array, _existing, 1
+      NIL
+    end
+
+    def __clobber_replace plan
+      send CLOBBER_REPLACE___.fetch( plan.node_shape ), plan
+    end
+
+    CLOBBER_REPLACE___ = {
+      example: :__clobber_replace_example,
+      shared_subject: :__clobber_replace_sharedsubj,
+    }
+
+    def __clobber_replace_sharedsubj plan
+      _clobber_replace_item plan  # (hi.)
+    end
+
+    def __clobber_replace_example plan
+      _clobber_replace_item plan  # (hi.)
+    end
+
+    def _clobber_replace_item plan
       new_node = plan.new_node
       existing_node_index = plan.existing_node_index
       # --
@@ -94,11 +116,21 @@ module Skylab::DocTest
       NIL
     end
 
+    def _recurse plans, existing_document_node, depth_integer=0
+      Recurse___.new(
+        existing_document_node,
+        plans,
+        depth_integer,
+        @choices,
+        & @_listener
+      ).execute
+    end
+
     # ==
 
-    class Recurse__
+    class Recurse___
 
-      def initialize dest, plan_a, depth=0, cx, & l
+      def initialize dest, plan_a, depth, cx, & l
         @choices = cx
         @_depth = depth
         @destination_branch = dest  # ersatz document branch node
@@ -130,14 +162,7 @@ module Skylab::DocTest
       }
 
       def __merge_context plan
-        self._REVIEW_might_be_OK
-        Recurse__.new(
-          plan.existing_node_index.existing_document_node,
-          plan.plan_array,
-          @_depth + 1,
-          @choices,
-        ).execute
-        NIL
+        self._SEE  # #tombstone #here-1
       end
 
       def __write_const_definition plan
@@ -244,4 +269,5 @@ module Skylab::DocTest
     # ==
   end
 end
+# #tombstone #here-1
 # #history: born of pseudocode
