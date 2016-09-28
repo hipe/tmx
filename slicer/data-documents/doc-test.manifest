@@ -7,6 +7,7 @@ basic/lib/skylab/basic/pathname/union.rb
 basic/lib/skylab/basic/proxy/inline.rb
 basic/lib/skylab/basic/proxy/makers/functional/core.rb
 basic/lib/skylab/basic/rotating-buffer.rb
+brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb
 brazen/lib/skylab/brazen/cli-support/table/core.rb
 brazen/lib/skylab/brazen/cli-support/table/actor/field-strategies-/statistics/models--.rb
 common/lib/skylab/common/memoization.rb

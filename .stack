@@ -13,10 +13,6 @@ after unification -
 
 ./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?
 
-synchronization issue - method is in too low a class in ersatz parser, cover and move up
-
-./brazen/lib/skylab/brazen/cli-support/option-parser/actors.rb  "simple as is but should be broken up" "also rename"
-
 multiline shared subject -
 
 ./basic/lib/skylab/basic/method.rb  (constdef, assertion) (constdef, asst 2x, assertion 4x)

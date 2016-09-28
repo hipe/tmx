@@ -5,10 +5,20 @@ module Skylab::Brazen
     Actors = ::Module.new
 
     # a hack to see if a basic switch looks to be present in an array
+    # build it with the full switch as its only argument:
     #
     #     p = Home_::CLI_Support::Option_Parser::Actors::Build_basic_switch_proc[ '--foom' ]
+    #
+    # if the argv doesn't include it, result is nil:
+    #
     #     p[ [ 'abc' ] ]  # => nil
+    #
+    # if the argv includes a token that matches it partially, result is index:
+    #
     #     p[ [ 'abc', '--fo', 'def' ] ]  # => 1
+    #
+    # but it won't do this fuzzy matching in the other direction:
+    #
     #     p[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
 
     Actors::Build_basic_switch_proc = -> do
