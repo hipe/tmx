@@ -30,7 +30,7 @@ module Skylab::DocTest
 
           o.write_blank_line_if_necessary
 
-          o.write_new_node_of_interest @node_of_interest, & @_listener
+          o.write_new_node @node_of_interest, & @_listener
 
           o.write_from_the_reference_node_to_end  # closing line
 

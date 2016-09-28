@@ -63,8 +63,11 @@ module Skylab::Parse::TestSupport
   module Test_Support_Bundles___
 
     Expect_Event = -> tcm do
-
       Common_.test_support::Expect_Event[ tcm ]
+    end
+
+    Memoizer_Methods = -> tcc do
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end
   end
 

@@ -48,71 +48,73 @@ module Skylab::Parse
     end
     # <-
 
+begin  # :/
+
   # the output node reports the winning index. can be called inline.
   #
-  #     on = Subject_[].with(
+  #     on = Home_.function( :alternation ).with(
   #       :input_array, [ :b ],
   #       :functions,
   #         :trueish_single_value_mapper, -> x { :a == x and :A },
   #         :trueish_single_value_mapper, -> x { :b == x and :B } )
   #
+  # the output node has the winning value:
+  #
   #     on.value_x  # => :B
+  #
+  # the output node reports the index of the winning node:
+  #
   #     on.constituent_index  # => 1
   #
 
   # you can curry the parser separately
   #
-  #     P = Subject_[].new_with(
+  #     p = Home_.function( :alternation ).new_with(
   #       :functions,
   #         :trueish_single_value_mapper, -> x { :a == x and :A },
   #         :trueish_single_value_mapper, -> x { :b == x and :B } ).
   #     method( :output_node_via_single_token_value )
   #
-  #
   # and call it in another
   #
-  #     P[ :a ].value_x  # => :A
-  #
+  #     p[ :a ].value_x  # => :A
   #
   # and another:
   #
-  #     P[ :b ].value_x  # => :B
-  #     P[ :c ]  # => nil
+  #     p[ :b ].value_x  # => :B
+  #     p[ :c ]  # => nil
 
   # in the minimal case, the empty parser always results in nil
   #
-  #     g = Subject_[].new_with :functions
+  #     g = Home_.function( :alternation ).new_with :functions
   #     g.output_node_via_single_token_value( :bizzie )  # => nil
 
   # maintaining parse state (artibrary extra arguments)
   #
-  #     g = Subject_[].new_with(
+  #     g = Home_.function( :alternation ).new_with(
   #       :functions,
   #         :trueish_single_value_mapper, -> x { :one == x and :is_one },
   #         :trueish_single_value_mapper, -> x { :two == x and :is_two } )
-  #     P_ = -> * x_a do
+  #
+  #     p = -> * x_a do
   #       g.output_node_via_input_array_fully x_a
   #     end
   #
-  #
   # it parses none:
   #
-  #     P_[ :will, :not, :parse ]  # => nil
-  #
+  #     p[ :will, :not, :parse ]  # => nil
   #
   # it parses one:
   #
-  #     P_[ :one ].value_x  # => :is_one
-  #
+  #     p[ :one ].value_x  # => :is_one
   #
   # it parses two:
   #
-  #     P_[ :two ].constituent_index  # => 1
-  #
+  #     p[ :two ].constituent_index  # => 1
   #
   # but it won't parse two after one:
   #
-  #     P_[ :one, :two ]  # => nil
+  #     p[ :one, :two ]  # => nil
 
-
+end
 end

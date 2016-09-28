@@ -16,7 +16,7 @@ module Skylab::DocTest
 
       o = Rewrite__.new _idx, nodes, & p
       o.write_nodes_before_the_reference_node
-      o.write_new_node_of_interest no
+      o.write_new_node no
       o.write_separating_blank_line_run
       o.write_from_the_reference_node_to_end
       o.finish
@@ -115,13 +115,13 @@ module Skylab::DocTest
       def write_new_node no
 
         if Paraphernalia_::Is_node_of_interest[ no ]
-          write_new_node_of_interest no
+          __write_new_node_of_interest no
         else
           __create_and_push_freeform_branch_frame_for no
         end
       end
 
-      def write_new_node_of_interest no
+      def __write_new_node_of_interest no
 
         _st = no.to_line_stream( & @_listener )
 
