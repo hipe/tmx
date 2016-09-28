@@ -168,7 +168,7 @@ module Skylab::DocTest::TestSupport
               end
           HERE
 
-          _exp_st = Home_.lib_.basic::String.line_stream _exp_s
+          _exp_st = Line_stream_via_string_[ _exp_s ]
 
           TestSupport_::Expect_Line::Streams_have_same_content[ _act_st, _exp_st, self ]
         end

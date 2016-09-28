@@ -18,6 +18,49 @@ module Skylab::DocTest::TestSupport
         exit 0
       end
 
+      # --
+
+      def expect_unindented_at_ d, big_s
+
+        big_s.unindent
+
+        _expected_line_stream = Line_stream_via_string_[ big_s ]
+
+        _actual_doc_node = document_node_tuple_.fetch d
+
+        nodes = _actual_doc_node.nodes
+
+        _margin = nodes.fetch(0).get_margin
+
+        demarginator_rx = /\A#{ ::Regexp.escape _margin }/
+
+        _actual_st = Stream_[ nodes ].map_by do |node|
+
+          s = node.line_string
+          if Home_::ZERO_LENGTH_LINE_RX_ =~ s
+            s
+          else
+            demarginator_rx.match( s ).post_match
+          end
+        end
+
+        TestSupport_::Expect_Line::Streams_have_same_content.call(
+          _actual_st, _expected_line_stream, self )
+
+        NIL
+      end
+
+      # --
+
+      def n_significant_nodes_from_only_context_node_via_result_ d
+
+        _ctxt = only_context_node_via_result_
+        a = _ctxt.nodes
+        a = filter_endcaps_and_blank_lines_common_ a
+        d == a.length || fail
+        a
+      end
+
       def filter_endcaps_and_blank_lines_common_ a
         last = a.length - 2
         d = 1
@@ -33,13 +76,18 @@ module Skylab::DocTest::TestSupport
         a_
       end
 
-      def context_node_via_result_
+      def only_context_node_via_result_
+
+        only_describe_node_via_result_.only_one_via_category_symbol :context_node
+      end
+
+      def only_describe_node_via_result_
 
         _st = root_ACS_result
 
         _doc = test_document_via_line_stream_ _st
 
-        _doc.only_one :module, :describe, :context_node
+        _doc.only_one :module, :describe
       end
 
       def my_API_common_generate_ h  # mutates h

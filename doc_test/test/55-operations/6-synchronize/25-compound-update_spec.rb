@@ -24,13 +24,7 @@ module Skylab::DocTest::TestSupport
       end
 
       shared_subject :_custom_tuple do
-
-        _ctxt = context_node_via_result_
-
-        a = _ctxt.nodes
-        a = filter_endcaps_and_blank_lines_common_ a
-        2 == a.length || fail
-        a
+        n_significant_nodes_from_only_context_node_via_result_ 2
       end
 
       it "looks OK structurally" do

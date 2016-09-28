@@ -109,7 +109,7 @@ module Skylab::DocTest::TestSupport
       end
 
       def line_stream_via_string_ s  # again
-        Home_.lib_.basic::String.line_stream s
+        Line_stream_via_string_[ s ]
       end
 
       def _three line  # EEK

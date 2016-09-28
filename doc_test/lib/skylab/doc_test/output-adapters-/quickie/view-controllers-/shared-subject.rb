@@ -138,6 +138,7 @@ module Skylab::DocTest
         end
 
         @_assignment_line_object = @_line_object_stream.gets  # guaranteed to exist
+        NIL
       end
 
       def __cache_up_blank_lines

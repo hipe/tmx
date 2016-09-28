@@ -38,12 +38,16 @@ module Skylab::Basic
 
         def via_arglist a
           if 1 == a.length
-            upstream = TerminatorSemantics___.new a.fetch 0
-            new upstream do
-              upstream.gets_
-            end
+            via_big_string a.fetch 0
           else
             SeparatorSemanticsScanner___.new( * a )
+          end
+        end
+
+        def via_big_string big_s
+          upstream = TerminatorSemantics___.new big_s
+          new upstream do
+            upstream.gets_
           end
         end
       end  # >>

@@ -11,15 +11,21 @@ module Skylab::DocTest::TestSupport
     context "create (no existing test file)" do
 
       call_by do
-        the_API_call_
+
+        _asset = fixture_file_ '25-compound-compound.kd'  # #coverpoint5-6
+
+        my_API_common_generate_(
+          asset_line_stream: ::File.open( _asset ),
+        )
       end
 
-      shared_subject :_custom_tuple do
-        __build_custom_tuple_samely
-      end
+      shared_subject :document_node_tuple_ do
 
-      def the_existing_test_file_path_
-        NIL  # NOTHING_
+        a = only_describe_node_via_result_.immediates :context_node
+        2 == a.length || fail
+        a_ = []
+        a_ << ( filter_endcaps_and_blank_lines_common_ a[0].nodes )
+        a_ << ( filter_endcaps_and_blank_lines_common_ a[1].nodes )
       end
 
       it "const def 1" do
@@ -39,26 +45,59 @@ module Skylab::DocTest::TestSupport
       end
     end
 
-    def __build_custom_tuple_samely
+    context "multiline" do
 
-      _st = root_ACS_result
+      call_by do
 
-      _doc = test_document_via_line_stream_ _st
+        _asset = fixture_file_ '26-compound-edge.kd'
 
-      _desc = _doc.only_one :module, :describe
+        my_API_common_generate_(
+          asset_line_stream: ::File.open( _asset ),
+        )
+      end
 
-      a = _desc.immediates :context_node
+      shared_subject :document_node_tuple_ do
+        n_significant_nodes_from_only_context_node_via_result_ 3
+      end
 
-      2 == a.length || fail
-      ctx1, ctx2 = a
-      a = filter_endcaps_and_blank_lines_common_ ctx1.nodes
-      a_ = filter_endcaps_and_blank_lines_common_ ctx2.nodes
-      [ a, a_ ]
+      it "const definition" do
+
+        expect_unindented_at_ 0, <<-HERE
+          before :all do
+            class X_xkcd_Bar
+              xx
+            end
+          end
+        HERE
+      end
+
+      it "shared subject" do
+
+        expect_unindented_at_ 1, <<-HERE
+          shared_subject :p do
+            foo = X_xkcd_Bar.new
+
+            p = -> *a do
+              line 1/2
+              line 2/2
+            end
+
+            p
+          end
+        HERE
+      end
+
+      it "first test" do
+
+        expect_unindented_at_ 2, <<-HERE
+          it "description for the first test" do
+            ( p[ 1, 2, 3 ] ).should eql "no: 3 for 1..2"
+          end
+        HERE
+      end
     end
 
-    def the_asset_file_path_
-      fixture_file_ '25-compound-compound.kd'  # #coverpoint5-6
-    end
+    # -- custom assertions
 
     def _class s, nodes
       _exp = "        class #{ s }\n"
@@ -76,7 +115,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def _at d, d_
-      _ctx = _custom_tuple.fetch d
+      _ctx = document_node_tuple_.fetch d
       _ctx.fetch( d_ ).nodes
     end
   end

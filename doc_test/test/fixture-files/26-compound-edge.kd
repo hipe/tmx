@@ -1,0 +1,24 @@
+module Skerlerb::Berserk
+
+  module Merthod
+
+      # description for the only context
+      #
+      #     class Bar
+      #       xx
+      #     end
+      #
+      #     foo = Bar.new
+      #
+      #     p = -> *a do
+      #       line 1/2
+      #       line 2/2
+      #     end
+      #
+      # description for the first test:
+      #
+      #     p[ 1, 2, 3 ] # => "no: 3 for 1..2"
+
+      code B
+  end
+end

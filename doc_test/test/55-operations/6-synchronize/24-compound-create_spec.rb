@@ -21,7 +21,7 @@ module Skylab::DocTest::TestSupport
 
       shared_subject :_custom_tuple do
 
-        _ctxt = context_node_via_result_
+        _ctxt = only_context_node_via_result_
 
         a = _ctxt.nodes
 

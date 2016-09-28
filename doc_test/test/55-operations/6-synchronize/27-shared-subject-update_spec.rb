@@ -5,25 +5,27 @@ module Skylab::DocTest::TestSupport
   describe "[dt] API - synchronize - shared subject update" do
 
     TS_[ self ]
-    use :fixture_files_simple_triad_asset
+    use :fixture_files
     use :my_API
 
     context 'shared subject update' do
 
       call_by do
-        the_API_call_
+
+        _test = fixture_file_ '62-shared-subj-tezd.kd'  # #coverpoint5-5
+
+        my_API_common_generate_(
+          asset_line_stream: _same_asset_line_stream,
+          original_test_line_stream: ::File.open( _test ),
+        )
       end
 
-      shared_subject :the_custom_tuple_ do
-        build_the_custom_tuple_
-      end
-
-      def the_existing_test_file_path_
-        fixture_file_ '62-shared-subj-tezd.kd'  # #coverpoint5-5
+      shared_subject :_the_custom_tuple do
+        _build_the_same_custom_tuple
       end
 
       it "looks OK structurally" do
-        the_custom_tuple_ || fail
+        _the_custom_tuple || fail
       end
 
       it "the before block got updated" do
@@ -42,19 +44,21 @@ module Skylab::DocTest::TestSupport
     context 'shared subject create' do
 
       call_by do
-        the_API_call_
+
+        _test = fixture_file_ '64-shared-subj-create-tezd.kd'
+
+        my_API_common_generate_(
+          asset_line_stream: _same_asset_line_stream,
+          original_test_line_stream: ::File.open( _test ),
+        )
       end
 
-      shared_subject :the_custom_tuple_ do
-        build_the_custom_tuple_
-      end
-
-      def the_existing_test_file_path_
-        fixture_file_ '64-shared-subj-create-tezd.kd'
+      shared_subject :_the_custom_tuple do
+        _build_the_same_custom_tuple
       end
 
       it "looks OK structurally" do
-        the_custom_tuple_ || fail
+        _the_custom_tuple || fail
       end
 
       it "the before block got updated" do
@@ -73,19 +77,21 @@ module Skylab::DocTest::TestSupport
     context 'example insert' do
 
       call_by do
-        the_API_call_
+
+        _test = fixture_file_ '63-insert-example-tezd.kd'
+
+        my_API_common_generate_(
+          asset_line_stream: _same_asset_line_stream,
+          original_test_line_stream: ::File.open( _test ),
+        )
       end
 
-      shared_subject :the_custom_tuple_ do
-        build_the_custom_tuple_
-      end
-
-      def the_existing_test_file_path_
-        fixture_file_ '63-insert-example-tezd.kd'
+      shared_subject :_the_custom_tuple do
+        _build_the_same_custom_tuple
       end
 
       it "looks OK structurally" do
-        the_custom_tuple_ || fail
+        _the_custom_tuple || fail
       end
 
       it "the before block got updated" do
@@ -99,6 +105,31 @@ module Skylab::DocTest::TestSupport
       it "the example block got updated" do
         the_example_block_looks_OK_
       end
+    end
+
+    def _same_asset_line_stream
+      ::File.open fixture_file_ '12-shared-subject.kd'
+    end
+
+    def _build_the_same_custom_tuple
+      n_significant_nodes_from_only_context_node_via_result_ 3
+    end
+
+    def the_before_block_looks_OK_
+      a = _the_custom_tuple.first.nodes
+      a[1].line_string == "        X_xkcd_MyPerkser = K::D::Lang.new :foo, :baz\n" || fail
+      3 == a.length || fail
+    end
+
+    def the_shared_subject_looks_OK_
+      a = _the_custom_tuple[1].nodes
+      a[1].line_string == "        pxy = X_xkcd_MyPerkser.new(\n" || fail
+    end
+
+    def the_example_block_looks_OK_
+      a = _the_custom_tuple.last.nodes
+      a[1].line_string == "        pxy.class.should eql X_xkcd_MyPerkser\n" || fail
+      3 == a.length || fail
     end
   end
 end

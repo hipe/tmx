@@ -319,7 +319,7 @@ module Skylab::DocTest
         def only_one * sym_a, & l
           x = self
           sym_a.length.times do |d|
-            x = x.__only_one_via_category_symbol sym_a.fetch d do |*i_a, &ev_p|
+            x = x.only_one_via_category_symbol sym_a.fetch d do |*i_a, &ev_p|
               __maybe_contextualize_error d, sym_a, ev_p, i_a, l
             end
           end
@@ -342,7 +342,7 @@ module Skylab::DocTest
           end
         end
 
-        def __only_one_via_category_symbol sym, & l
+        def only_one_via_category_symbol sym, & l
 
           a = immediates sym
           if 1 == a.length

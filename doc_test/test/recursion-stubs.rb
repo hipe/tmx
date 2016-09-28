@@ -467,8 +467,7 @@ module Skylab::DocTest::TestSupport
         ::File::RDONLY == mode || fail
         _p = @_h.fetch path
         _big_string = _p[]
-        _st = Home_.lib_.basic::String.line_stream _big_string
-        _st
+        Line_stream_via_string_[ _big_string ]
       end
 
       def to_path_stream

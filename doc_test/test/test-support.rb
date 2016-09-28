@@ -70,7 +70,7 @@ module Skylab::DocTest::TestSupport
     end
 
     def line_stream_via_string_ whole_string
-      Home_.lib_.basic::String.line_stream whole_string
+      Line_stream_via_string_[ whole_string ]
     end
 
     # -- support for setting up
@@ -170,6 +170,16 @@ module Skylab::DocTest::TestSupport
   Lazy_ = Common_::Lazy
 
   # --
+
+  Line_stream_via_string_ = -> do
+    p = -> s do
+      p = Home_.lib_.basic::String.line_stream.method :via_big_string
+      p[ s ]
+    end
+    -> s do
+      p[ s ]
+    end
+  end.call
 
   Expect_no_emission_ = -> * a do
     fail "no: #{ a.inspect }"
