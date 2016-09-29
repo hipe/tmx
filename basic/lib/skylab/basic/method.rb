@@ -29,11 +29,15 @@ module Skylab::Basic
       #       end
       #     end
       #
-      #     foo = Foo.new
-      #     mc = Home_::Method.curry.new foo.method(:bar), [ 'yes', 'sir' ]
+      #     _foo = Foo.new
+      #
+      #     mc = Home_::Method.curry.new _foo.method( :bar ), [ 'yes', 'sir' ]
+      #
+      # it's really little more than a structure holding the constituent
+      # parts of a method call
+      #
       #     x = mc.receiver.send mc.method_name, * mc.arguments
       #     x  # => "ok:yessir"
-      #
 
       def initialize method, arg_a=EMPTY_A_
         @bound_method = method
@@ -71,9 +75,20 @@ module Skylab::Basic
       #       end
       #     end
       #
+      # too many arguments:
+      #
       #     p[ 1, 2, 3 ] # => "no: 3 for 1..2"
+      #
+      # the max number of allowed args:
+      #
       #     p[ 1, 2 ]  # => [ 1, 2 ]
+      #
+      # the min number of allowed args:
+      #
       #     p[ 1 ]  # => [ 1, nil ]
+      #
+      # not enough arguments:
+      #
       #     p[ ]  # => "no: 0 for 1..2"
 
       def validate_arity

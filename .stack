@@ -15,6 +15,4 @@ after unification -
 
 multiline shared subject -
 
-./basic/lib/skylab/basic/method.rb  (constdef, assertion) (constdef, asst 2x, assertion 4x)
-
 ./parse/lib/skylab/parse/functions-/serial-optionals.rb (break this up, the last context)
