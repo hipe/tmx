@@ -10,8 +10,6 @@ module Skylab::Basic::TestSupport::Hash
 
   Home_ = Home_
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
   Subject_ = -> do
     Home_::Hash
   end

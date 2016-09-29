@@ -4,11 +4,3 @@ insane experment with [sa] - convert every `should eql` to etc and see diff
 no more regret
 (fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`)
 look into better intergration of dev (click on stack frames)
-recursive for CLI
-eliminate old doctest manifest file b.c all is new
-every old [dt] test that requires shared setup
-every old [dt] test that is easy (use and modify CLI for this as needed)
-
-after unification -
-
-./test_support/lib/skylab/test_support/sandbox.rb  (1 setup, 1 test)  NO TEST - NO USAGE? ASSET ISLAND?

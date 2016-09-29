@@ -147,10 +147,6 @@ module Skylab::CodeMetrics::TestSupport
     ::File.join TS_.dir_pathname.to_path, 'fixture-trees/fixture-tree-two'
   end
 
-  module Sandbox_
-    TestSupport_::Sandbox.enhance( self ).kiss_with 'KLS_'
-  end
-
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   EMPTY_S_ = Home_::EMPTY_S_

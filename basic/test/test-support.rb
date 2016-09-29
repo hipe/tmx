@@ -8,8 +8,6 @@ module Skylab::Basic
 
     TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
 
-    TestSupport_::Sandbox::Host[ self ]
-
     extend TestSupport_::Quickie
 
     module ModuleMethods

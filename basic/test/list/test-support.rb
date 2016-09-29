@@ -8,8 +8,6 @@ module Skylab::Basic::TestSupport::List
 
   extend TestSupport_::Quickie
 
-  Sandboxer = TestSupport_::Sandbox::Spawner.new
-
   Subject_ = -> do
     Home_::List
   end
