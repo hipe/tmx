@@ -14,8 +14,11 @@ module Skylab::Slicer
 
       def produce_result
 
-        io = ::File.open(
-          ::Skylab.dir_pathname.join( '../../GREENLIST' ).to_path )
+        self._NOT_USED_probably
+
+        _path = ::File.expand_path '../../GREENLIST', ::Skylab.dir_path
+
+        io = ::File.open _path
 
         bx = Common_::Box.new
         rx = /[[:space:]]+/

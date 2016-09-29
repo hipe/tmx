@@ -41,7 +41,7 @@ module Skylab::Treemap::TestSupport
   Fixture_file_ = -> do
 
     p = -> path do
-      dirname = TS_.dir_pathname.join( 'fixture-files' ).to_path
+      dirname = ::File.join TS_.dir_path, 'fixture-files'
       p = -> path_ do
         ::File.join dirname, path_
       end

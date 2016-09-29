@@ -1,4 +1,5 @@
 the big question - slicer (G)->(B,D)
 insane experment with [sa] - convert every `should eql` to etc and see diff (C)
-fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`) (B)
+fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`, memoize vs lazy) (B)
 factor out dir_pathname (!) (D)
+relative_path_from

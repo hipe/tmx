@@ -42,13 +42,13 @@ module Skylab::Brazen::TestSupport
 
     it "gets back up with backslashes" do
 
-      _cfg_path = Home_::TestSupport::Fixtures.dir_pathname.join( '00-escape.cfg' ).to_path
+      _head = Home_::TestSupport::Fixtures.dir_path
+      _cfg_path = ::File.join _head, '00-escape.cfg'
 
       doc = subject.parse_path _cfg_path
       sect = doc.sections.first
       ast = sect.assignments.first
       ast.value_x.should eql '\\b'
-
     end
   end
 end

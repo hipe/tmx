@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport::Sexp
       TestSupport_::Let[ self ]
 
       let :fixtures_dir_pathname do
-        dir_pathname.join('../fixtures').to_s
+        ::File.expand_path '../fixtures', dir_path
       end
 
       let :grammars_module do
@@ -82,7 +82,7 @@ module Skylab::TanMan::TestSupport::Sexp
     TestSupport_::Let[ self ]
 
     let :anchor_dir_pathname do
-      self.class.grammars_module.dir_pathname.join stem_path
+      ::File.join self.class.grammars_module.dir_path, stem_path
     end
 
     num_rx = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/

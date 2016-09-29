@@ -209,15 +209,17 @@ module Skylab::TanMan::TestSupport
       granule_s = grammar_pathpart_
       mod = grammars_module_
       desired_module_const_i = bld_grammar_const granule_s
+
       if ! mod.const_defined? desired_module_const_i
-        _BASE_PN_ = mod.dir_pathname.join granule_s
-        load _BASE_PN_.join( CLIENT___ ).to_path
+        _BASE_PATH_ = ::File.join mod.dir_path, granule_s
+        load ::File.join( _BASE_PATH_, CLIENT___ )
         was_not_defined = true
       end
+
       @grammar_class = mod.const_get desired_module_const_i, false
       if was_not_defined
-        @grammar_class.define_singleton_method :dir_pathname do
-          _BASE_PN_
+        @grammar_class.define_singleton_method :dir_path do
+          _BASE_PATH_
         end
       end ; nil
     end
@@ -263,7 +265,13 @@ module Skylab::TanMan::TestSupport
 
         o.generated_grammar_dir_path existent_testing_GGD_path
 
-        o.grammar_path @grammar_class.dir_pathname.relative_path_from( TS_.dir_pathname ).join( ALWAYS_G1__ ).to_path
+        _reference_pn = ::Pathname.new TS_.dir_path
+        _here_pn = ::Pathname.new @grammar_class.dir_path
+        _relative_pn = _here_pn.relative_path_from _reference_pn
+
+        _finally = ::File.join _relative_pn.to_path, ALWAYS_G1__
+
+        o.grammar_path _finally
       end
 
       nil
@@ -409,9 +417,7 @@ module Skylab::TanMan::TestSupport
     module Graphs
       class << self
         def [] sym
-          dir_pathname.join(
-            "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.dot"
-          ).to_path
+          ::File.join dir_path, "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.dot"
         end
       end
       Autoloader_[ self ]

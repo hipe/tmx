@@ -138,8 +138,7 @@ module Skylab::CodeMetrics::TestSupport
   end
 
   Fixture_tree_directory_ = Common_.memoize do
-
-    TS_.dir_pathname.join( 'fixture-trees/fixture-tree-one' ).to_path
+    ::File.join TS_.dir_path, 'fixture-trees', 'fixture-tree-one'
   end
 
   Fixture_tree_two_ = Common_::Lazy.call do

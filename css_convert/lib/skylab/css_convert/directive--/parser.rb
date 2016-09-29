@@ -26,7 +26,7 @@ module Skylab::CSS_Convert
 
     def __produce_parser_class_via_generate_grammar_dir ggd
 
-      _relpath_root = Directive__::Parser.dir_pathname
+      _relpath_root = Directive__::Parser.dir_path
 
       o = start_treetop_require_
 

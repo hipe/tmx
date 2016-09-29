@@ -449,6 +449,10 @@ module Skylab::Snag
       end
     end
 
+    def expression_strategy_for_uncategorized_property prp
+      :render_property_as_unknown
+    end
+
     Brazen_ = Home_.lib_.brazen
   end
 end

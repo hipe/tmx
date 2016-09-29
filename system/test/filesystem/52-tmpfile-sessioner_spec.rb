@@ -65,7 +65,8 @@ module Skylab::System::TestSupport
       sess = _common_setup_two
       2 == sess.__resolve_directory.length or fail
 
-      _exe_path = Home_::TestSupport.dir_pathname.join( 'fixture-bin/omg' ).to_path
+      _exe_path = ::File.join Home_::TestSupport.dir_path, 'fixture-bin', 'omg'
+
       i, o, _e, t = Home_.lib_.open3.popen3 _exe_path
 
       _tmpdir_path = sess.instance_variable_get :@_tmpdir_path

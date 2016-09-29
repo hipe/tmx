@@ -6,9 +6,10 @@ module Skylab::Cull::TestSupport
 
       class << self
         def [] sym
-          dir_pathname.join( sym.id2name.gsub( UNDERSCORE_, DASH_ ) ).to_path
+          _tail = sym.id2name.gsub UNDERSCORE_, DASH_
+          ::File.join dir_path, _tail
         end
-      end
+      end  # >>
 
       Home_::Autoloader_[ self ]
 
@@ -48,9 +49,10 @@ module Skylab::Cull::TestSupport
 
       class << self
         def [] sym
-          dir_pathname.join( "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.patch" ).to_path
+          _tail = "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.patch"
+          ::File.join dir_path, _tail
         end
-      end
+      end  # >>
 
       Home_::Autoloader_[ self ]
 

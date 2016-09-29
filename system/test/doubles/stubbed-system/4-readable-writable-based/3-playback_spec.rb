@@ -40,8 +40,7 @@ module Skylab::System::TestSupport
     end
 
     memoize :_no_ent_path do
-
-      TS_.dir_pathname.join( 'no-ent' ).to_path
+      ::File.join TS_.dir_path, 'no-ent'
     end
 
     dangerous_memoize :_manifest_A do

@@ -72,13 +72,17 @@ end
     end
 
     def no_request_client_notify loc
+
       desc = if BLOCK_ == loc.label[ BLK_R_ ]
-        pth = loc.absolute_path
-        pth.sub! %r|\A#{ ::Regexp.escape ::Skylab.dir_pathname.to_s }/|, ''
-        " in block at #{ pth }:#{ loc.lineno }"
+
+        path = loc.absolute_path.dup
+        _reference_pn = ::Pathname.new ::Skylab.dir_path
+        path = ::Pathname.new( path ).relative_path_from( _reference_pn ).to_path
+        " in block at #{ path }:#{ loc.lineno }"
       else
         " of `#{ loc.base_label }`"
       end
+
       fail "#{ self.class } cannot delegate call#{ desc } #{
         }upwards to request client - request client is human (#{
         }do you need to implement it for that class)?"

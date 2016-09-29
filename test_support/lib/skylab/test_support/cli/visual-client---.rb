@@ -18,11 +18,8 @@ module Skylab::TestSupport
         @pth_mod = mod::TestSupport
         @viz_mod = mod::TestSupport_Visual
 
-        _path = ::File.expand_path '../../../test', mod.dir_path  # `sidesys_path_`
-        @the_dir_pathname_ = ::Pathname.new _path
+        @_dir_path = ::File.expand_path '../../../test', mod.dir_path  # `sidesys_path_`
       end
-
-      attr_reader :the_dir_pathname_
 
       def execute
         o = produce_executable_
@@ -33,6 +30,8 @@ module Skylab::TestSupport
         a.push $PROGRAM_NAME
         a
       end
+
+      attr_reader :_dir_path
     end
 
     class Client
@@ -102,8 +101,8 @@ module Skylab::TestSupport
         a
       end
 
-      def the_dir_pathname_
-        @viz_mod.dir_pathname.dirname
+      def _dir_path
+        @___dir_path ||= ::File.dirname @viz_mod.dir_path
       end
     end
 
@@ -117,9 +116,9 @@ module Skylab::TestSupport
         o.puts
         o.puts "facilities:"
 
-        _a = ::Dir[ the_dir_pathname_.join( '*/visual.rb' ).to_path ]
-        _a.each do | s |
-
+        _glob = ::File.join _dir_path, '*', 'visual.rb'
+        _entries = ::Dir[ _glob ]
+        _entries.each do |s|
           _ = ::File.basename ::File.dirname s
           o.puts "  #{ _ }"
         end
@@ -133,13 +132,13 @@ module Skylab::TestSupport
 
         sym = Common_::Name.via_slug( s ).as_const
 
-        pn = the_dir_pathname_.join "#{ s }/visual"
+        path = ::File.join _dir_path, s, 'visual'
 
-        require pn.to_path
+        require path
 
         cls = Autoloader_.const_reduce [ sym ], @viz_mod
 
-        Autoloader_[ cls, pn.to_path ]
+        Autoloader_[ cls, path ]
 
         o = cls.new @stdin, @stdout, @stderr, @argv
 

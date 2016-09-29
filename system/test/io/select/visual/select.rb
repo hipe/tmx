@@ -6,9 +6,9 @@ module Skylab::System::TestSupport
 
   stderr = ::Skylab::TestSupport.debug_IO
 
-  from_dir = TS_.dir_pathname.join( 'io/select/visual-' ).to_path
+  _from_dir = ::File.join TS_.dir_path, 'io', 'select', 'visual-'
 
-  Home_.lib_.file_utils.cd from_dir, verbose: true do
+  Home_.lib_.file_utils.cd _from_dir, verbose: true do
 
     select = Home_::IO.select.new
     select.timeout_seconds = 0.3

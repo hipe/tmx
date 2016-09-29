@@ -171,9 +171,9 @@ module Skylab::Snag
 
           o.directory_is_assumed_to_exist = false
 
-          o.directory_path = Home_.dir_pathname.join(
-            PERSISTED_CRITERIA_FILENAME___
-          ).to_path
+          _path = ::File.join Home_.dir_path, PERSISTED_CRITERIA_FILENAME___
+
+          o.directory_path = _path
 
           o.filename_pattern = /\A[a-z0-9]+(?:[-_][a-z0-9]+)*\z/i
 

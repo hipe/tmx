@@ -56,13 +56,16 @@ module Skylab::TestSupport
     end
 
     def get_command_name
-      @cn ||= begin
-        path = ::Pathname.new( @path_prefix_p.call ).
-          relative_path_from( ::Skylab.dir_pathname ).to_s
-        "#{ path } c/o #{ me }"
-      end
+      @___command_name ||= __build_command_name
     end
 
+    def __build_command_name
+      _here_path = @path_prefix_p.call
+      _here_pn = ::Pathame.new _here_pn
+      _reference_pn = ::Pathame.new ::Skylab.dir_path
+      _relative_pn = _here_pn.relative_path_from _reference_pn
+      "#{ _relative_pn.to_path } c/o #{ me }"
+    end
 
     def report
       if @sc_was_OK

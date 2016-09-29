@@ -105,13 +105,11 @@ module Skylab::TanMan
 
       def __to_name_of_module_that_has_hear_map_stream
 
-        Common_::Stream.via_nonsparse_array(
+        # just reading from the filesystem is easier and cheaper
 
-          ::Dir[ "#{ Models_.dir_pathname }/*/hear-map#{ Autoloader_::EXTNAME }" ]
-
-            # just reading from the filesystem is easier and cheaper
-
-        ) do | path |
+        _glob = ::File.join Models_.dir_path, '*', "hear-map#{ Autoloader_::EXTNAME }"
+        _entries = ::Dir[ _glob ]
+        Common_::Stream.via_nonsparse_array _entries do |path|
 
           Common_::Name.via_slug( ::File.basename ::File.dirname path )
         end

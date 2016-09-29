@@ -113,11 +113,10 @@ module Skylab::Snag::TestSupport
     end
 
     Path__ = Common_.memoize do
-
-      Home_.dir_pathname.join(
-        Home_::Models_::Criteria::PERSISTED_CRITERIA_FILENAME___
-      ).to_path
-
+      ::File.join(
+        Home_.dir_path,
+        Home_::Models_::Criteria::PERSISTED_CRITERIA_FILENAME___,
+      )
     end
   end
 end

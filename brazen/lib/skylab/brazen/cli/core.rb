@@ -1027,8 +1027,8 @@ module Skylab::Brazen
         NIL_
       end
 
-      def _expression_strategy_for_uncategorized_property prp
-        @parent._expression_strategy_for_uncategorized_property prp
+      def expression_strategy_for_uncategorized_property prp
+        @parent.expression_strategy_for_uncategorized_property prp
       end
 
       def _expression_agent_class
@@ -1764,7 +1764,7 @@ module Skylab::Brazen
         if sym
           expression_strategy_for_category sym
         else
-          _expression_strategy_for_uncategorized_property prp
+          expression_strategy_for_uncategorized_property prp
         end
       end
 

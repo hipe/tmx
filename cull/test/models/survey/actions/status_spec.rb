@@ -8,7 +8,7 @@ module Skylab::Cull::TestSupport
     use :expect_event
 
     it "with a noent path" do
-      against TS_.dir_pathname.join( 'no-ent' ).to_path
+      against ::File.join TS_.dir_path, 'no-ent'
       expect_not_OK_event_ :start_directory_does_not_exist
       expect_failed
     end

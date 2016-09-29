@@ -162,7 +162,9 @@ module Skylab::Snag::TestSupport
 
     p = -> tcm do
 
-      require TS_.dir_pathname.join( 'modality-integrations/expect-cli' ).to_path
+      _path = ::File.join TS_.dir_path, 'modality-integrations', 'expect-cli'
+
+      require _path
 
       p = TS_::Expect_CLI.new_with(
         :subject_CLI, -> { Home_::CLI },
@@ -227,7 +229,7 @@ module Skylab::Snag::TestSupport
     p = -> sym do
       h = {}
 
-      _path = TS_.dir_pathname.join( 'fixture-files' ).to_path
+      _path = ::File.join TS_.dir_path, 'fixture-files'
 
       rx = /[-\.]/
 
@@ -263,8 +265,7 @@ module Skylab::Snag::TestSupport
   Common_ = Home_::Common_
 
   Fixture_tree_dir___ = Common_.memoize do
-
-    TS_.dir_pathname.join( 'fixture-trees' ).to_path
+    ::File.join TS_.dir_path, 'fixture-trees'
   end
 
   My_Tmpdir_ = -> do

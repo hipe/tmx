@@ -238,7 +238,7 @@ module Skylab::Brazen
           compare_symbol[ prp_.name.as_variegated_symbol ]
         end
 
-        _sym = CATEGORIES.reduce nil do | _, category |
+        sym = CATEGORIES.reduce nil do | _, category |
           a = instance_variable_get category.ivar
           a or next
           x = a.detect( & compare )
@@ -246,11 +246,12 @@ module Skylab::Brazen
           break category.symbol
         end
 
-        if ! _sym
-          self._K
+        if sym
+          sym
+        else
+          # #not-covered
+          NOTHING_
         end
-
-        _sym
       end
 
       def for cat

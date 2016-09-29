@@ -96,9 +96,10 @@ module Skylab::Plugin
 
       def _build_soft_bundle_fetcher
 
-        @a = [ ] ; @h = { }
+        self._NOT_COVERD_might_still_work  # #cover-me or delete
 
-        dir_pathname.children( false ).each do |pn|
+        @a = [ ] ; @h = { }
+        ::Pathname.new( dir_patn ).children( false ).each do |pn|
           stem = pn.sub_ext( EMPTY_S_ ).to_s
           WHITE_STEM_RX__ =~ stem or next
           stem.gsub! DASH_, UNDERSCORE_

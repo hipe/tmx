@@ -6,11 +6,6 @@ module Skylab::TestSupport
 
     require 'skylab/test_support'
 
-    if ! self.respond_to? :dir_pathname
-      self._HELLO
-      Autoloader_[ self ]
-    end
-
     Autoloader_[ Plugins__, :boxxy ]
 
     # ~
