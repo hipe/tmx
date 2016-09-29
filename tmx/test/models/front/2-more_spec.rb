@@ -4,7 +4,7 @@ module Skylab::TMX::TestSupport
 
   describe "[tmx] models - front - 2" do
 
-    extend TS_
+    TS_[ self ]
     use :models_reactions
 
     context "with two nodes" do

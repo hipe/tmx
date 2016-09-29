@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 describe "[cssc] with 'just-a-comment.css'" do
 
-  extend ::Skylab::CSS_Convert::TestSupport
+  ::Skylab::CSS_Convert::TestSupport[ self ]
   use :expect_event
 
   it "should parse and unparse (PLACEHOLDER)" do

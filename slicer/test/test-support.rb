@@ -3,22 +3,26 @@ require 'skylab/test_support'
 
 module Skylab::Slicer::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
-
-    def use sym
+  # -
+    Use_method___ = -> sym do
       :expect_CLI == sym or fail
       Brazen_.test_support.lib( :CLI_support_expectations )[ self ]
       NIL_
     end
-  end
+  # -
 
-  module InstanceMethods
+  module InstanceMethods___
 
     attr_reader :do_debug
 
@@ -44,6 +48,9 @@ module Skylab::Slicer::TestSupport
 
   Home_ = ::Skylab::Slicer
 
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   Brazen_ = Home_::Brazen_
   NIL_ = nil
+  TS_ = self
 end

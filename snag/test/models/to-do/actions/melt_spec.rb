@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - to-do - actions - melt" do
 
-    extend TS_
+    TS_[ self ]
 
     use :expect_event, :ignore, :find_command_args
 

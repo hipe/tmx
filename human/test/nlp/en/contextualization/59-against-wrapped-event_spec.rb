@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP - EN - contextualization - againt wrapped event" do
 
-    TS_Joist_[ self ]
+    TS_[ self ]
     use :memoizer_methods
     use :NLP_EN_contextualization
 

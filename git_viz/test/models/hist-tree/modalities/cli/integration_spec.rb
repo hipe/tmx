@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - integration" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :VCS_adapters_git_support_bundle_support
     use :my_CLI_expectations  # order matters

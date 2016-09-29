@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - alternation" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "the output node reports the winning index. can be called inline." do

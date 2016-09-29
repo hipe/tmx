@@ -7,7 +7,7 @@ module Skylab::TMX::TestSupport
     # (somewhat at odds with other nearby test nodes,
     #  this is testing *our* tmx, and not *the* tmx)
 
-    extend TS_
+    TS_[ self ]
     use :modalities_CLI
 
     _ARG = 'ping'.freeze

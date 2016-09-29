@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] models - branches - re-number" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "\"to\" and \"from\" must be in the collection" do

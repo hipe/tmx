@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] checker" do
 
-    TS_transitional_[ self ]
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event
 

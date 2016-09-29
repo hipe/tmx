@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - tag - actions - create" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
     use :byte_up_and_downstreams
     use :node_support

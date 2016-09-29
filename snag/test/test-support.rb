@@ -3,13 +3,18 @@ require 'skylab/test_support'
 
 module Skylab::Snag::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  module ModuleMethods___
 
     def use sym, * x_a
 
@@ -38,7 +43,7 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true
@@ -311,12 +316,14 @@ module Skylab::Snag::TestSupport
     ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
   end
 
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   ACHIEVED_ = true
   EMPTY_P_ = Home_::EMPTY_P_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
   NEWLINE_ = "\n"
   SPACE_ = Home_::SPACE_
+  TS_ = self
   UNDERSCORE_ = Home_::UNDERSCORE_
-
 end

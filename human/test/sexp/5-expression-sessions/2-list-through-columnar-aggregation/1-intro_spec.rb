@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] sexp - expression sessions - list thru c.agg. - intro" do
 
-    TS_Joist_[ self ]
+    TS_[ self ]
     use :memoizer_methods
     use :sexp_expression_sessions_list_through_columnar_aggregation
 

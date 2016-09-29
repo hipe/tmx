@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - sequence" do
 
-    extend TS_
+    TS_[ self ]
 
     context "the empty sequence" do
 

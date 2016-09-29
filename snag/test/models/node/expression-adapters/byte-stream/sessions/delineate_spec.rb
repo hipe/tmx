@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - node [..] delineate" do
 
-    extend TS_
+    TS_[ self ]
     use :byte_up_and_downstreams
 
     context "delineation" do

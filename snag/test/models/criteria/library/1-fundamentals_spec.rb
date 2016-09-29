@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - criteria - library - funadmentals" do
 
-    extend TS_
+    TS_[ self ]
     use :criteria_library_support
 
     it "loads" do

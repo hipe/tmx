@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - bundle" do
 
-    extend TS_
+    TS_[ self ]
     use :VCS_adapters_git_support_bundle_support
 
     it "noent - soft error" do

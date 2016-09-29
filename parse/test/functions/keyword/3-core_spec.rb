@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - keyword" do
 
-    extend TS_
+    TS_[ self ]
 
     memoize_subject_parse_function_ do
 

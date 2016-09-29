@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - criteria - library - disambiguation" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
     use :criteria_library_support
 

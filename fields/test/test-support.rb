@@ -3,16 +3,14 @@ require 'skylab/test_support'
 
 module Skylab::Fields::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
-
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
   class << self
-
-    def [] tcc  # until etc
-      tcc.extend self
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
     end
   end  # >>
+
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
@@ -45,7 +43,7 @@ module Skylab::Fields::TestSupport
     TS_.require_( k )[ self ]
   end
 
-  module ModuleMethods
+  module ModuleMethods___
 
     define_method :use, Use_method__
 
@@ -60,7 +58,7 @@ module Skylab::Fields::TestSupport
     define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true
@@ -106,8 +104,11 @@ module Skylab::Fields::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   Lazy_ = Home_::Lazy_
   NIL_ = nil
+  TS_ = self
 end
 
 Skylab::TestSupport::Quickie.enable_kernel_describe  # for > 10 legacy files

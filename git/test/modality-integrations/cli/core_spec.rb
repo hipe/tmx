@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] mode-integrations - CLI (core)" do
 
-    extend TS_
+    TS_[ self ]
     use :modality_integrations_CLI_support
 
     it "CLI client loads" do  # can be moved up when appropriate

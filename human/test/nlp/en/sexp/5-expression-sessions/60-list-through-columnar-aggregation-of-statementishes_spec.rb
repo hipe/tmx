@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] [..] expression sessions - list through columnar aggregation of statementishes" do
 
-    extend TS_
+    TS_[ self ]
 
     it "(cute)" do
 

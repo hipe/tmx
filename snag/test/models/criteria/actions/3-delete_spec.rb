@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - criteria - delete - (NOT FULLY INTEGRATED)" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
     use :my_tmpdir_
 

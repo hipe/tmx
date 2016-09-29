@@ -3,20 +3,20 @@ require 'skylab/test_support'
 
 module Skylab::Human::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  TS_Joist_ = -> tcc do  # #until after [#sa-019]
-
-    tcc.send :define_singleton_method, :use, Use_method__
-    tcc.include InstanceMethods
-  end
-
+  # -
     Use_method__ = -> do
 
       cache_h = {}
@@ -31,8 +31,9 @@ module Skylab::Human::TestSupport
         NIL_
       end
     end.call
+  # -
 
-  module ModuleMethods
+  module ModuleMethods___
 
     define_method :use, Use_method__
 
@@ -41,7 +42,7 @@ module Skylab::Human::TestSupport
     end
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true
@@ -78,11 +79,14 @@ module Skylab::Human::TestSupport
 
   Home_ = ::Skylab::Human
 
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   Common_ = Home_::Common_
   EMPTY_A_ = [].freeze
   Lazy_ = Home_::Lazy_
   NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = Home_::NOTHING_
+  TS_ = self
   UNRELIABLE_ = :_unre_
 end

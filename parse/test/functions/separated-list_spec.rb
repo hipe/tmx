@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - separated list" do
 
-    extend TS_
+    TS_[ self ]
 
     same_item_proc = -> in_st do
       if in_st.unparsed_exists

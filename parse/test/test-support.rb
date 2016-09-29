@@ -3,13 +3,18 @@ require 'skylab/test_support'
 
 module Skylab::Parse::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  module ModuleMethods___
 
     def memoize_subject_parse_function_ & build_p
 
@@ -25,7 +30,7 @@ module Skylab::Parse::TestSupport
     end
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def against_ * s_a
       against_input_array s_a
@@ -73,11 +78,14 @@ module Skylab::Parse::TestSupport
 
   Home_ = ::Skylab::Parse
 
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   Autoloader_ = Home_::Autoloader_
   Common_ = Home_::Common_
   EMPTY_A_ = Home_::EMPTY_A_
   IDENTITY_ = -> x { x }
   NIL_ = nil
+  TS_ = self
   UNDERSCORE_ = '_'
 
   module Constants

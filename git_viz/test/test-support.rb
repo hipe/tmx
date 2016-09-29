@@ -5,6 +5,11 @@ module Skylab::GitViz::TestSupport
 
   class << self
 
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+
     def at_ sym
       CONSTANTS___.lookup sym
     end
@@ -17,13 +22,11 @@ module Skylab::GitViz::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  # -
+    Use_method___ = -> do
 
-    define_method :use, -> do
       h = {}
       -> sym do
         ( h.fetch sym do
@@ -32,9 +35,9 @@ module Skylab::GitViz::TestSupport
         end )[ self ]
       end
     end.call
-  end
+  # -
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true ; nil
@@ -229,5 +232,8 @@ module Skylab::GitViz::TestSupport
   end
 
   Home_ = ::Skylab::GitViz
+
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   NIL_ = nil
+  TS_ = self
 end

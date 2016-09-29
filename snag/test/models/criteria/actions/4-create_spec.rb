@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - criteria - create" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
     use :models_criteria_actions
 

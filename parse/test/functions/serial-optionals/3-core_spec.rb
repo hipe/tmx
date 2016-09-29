@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - serial optionals - core" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     it "there is a highlevel shorthand inline convenience macro" do

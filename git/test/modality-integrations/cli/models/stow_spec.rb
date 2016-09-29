@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] mode integrations - CLI - models - stow" do
 
-    extend TS_
+    TS_[ self ]
     use :modality_integrations_CLI_support
 
     it "list the known stows" do

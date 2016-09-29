@@ -5,7 +5,7 @@ module Skylab::Parse::TestSupport
   # <-
 describe "[pa] fuctions - serial optionals - foundation" do
 
-  extend TS_
+  TS_[ self ]
 
   context "my first nonterminal (integration)" do
 

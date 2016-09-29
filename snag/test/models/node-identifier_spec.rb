@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - node identifier" do
 
-    extend TS_
+    TS_[ self ]
 
     it "loads" do
       _subject

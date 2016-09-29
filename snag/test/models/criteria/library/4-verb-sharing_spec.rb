@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - criteria - library - verb sharing" do
 
-    extend TS_
+    TS_[ self ]
     use :criteria_library_support
 
     it "build" do

@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] models" do
 
-    extend TS_
+    TS_[ self ]
     use :reactive_model_support
 
     it "loads" do

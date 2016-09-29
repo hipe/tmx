@@ -4,7 +4,7 @@ module Skylab::TMX::TestSupport
 
   describe "[tmx] models - front" do
 
-    extend TS_
+    TS_[ self ]
     use :models_reactions
 
     # three laws all the way.

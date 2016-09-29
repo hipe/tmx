@@ -3,13 +3,18 @@ require 'skylab/test_support'
 
 module Skylab::TMX::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  module ModuleMethods___
 
     define_method :use, -> do
       cache = {}
@@ -36,7 +41,7 @@ module Skylab::TMX::TestSupport
     end
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     attr_reader :do_debug
 
@@ -51,5 +56,9 @@ module Skylab::TMX::TestSupport
 
   Common_ = ::Skylab::Common
   Home_ = ::Skylab::TMX
+
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   NIL_ = nil
+  TS_ = self
 end

@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] mode integrations - CLI - models - stow - pop" do
 
-    extend TS_
+    TS_[ self ]
     use :modality_integrations_CLI_support
 
     # expect ERR_I, /\A\(while listing stash.+no stashes found in /

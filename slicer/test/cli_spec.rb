@@ -4,7 +4,7 @@ module Skylab::Slicer::TestSupport
 
   describe "[sli] CLI cannon" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_CLI
 
     it "1.3" do

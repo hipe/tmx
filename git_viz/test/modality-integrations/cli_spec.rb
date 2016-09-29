@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] modality integrations - CLI" do
 
-    extend TS_
+    TS_[ self ]
     use :my_CLI_expectations
 
     define_method :expect, instance_method( :expect )  # because rspec

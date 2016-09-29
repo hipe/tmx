@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] models - stow - actions - status, show" do
 
-    extend TS_
+    TS_[ self ]
     use :models_stow_support
 
     it "status - dir not found" do

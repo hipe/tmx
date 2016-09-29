@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport
 
   describe "[bs] models - text (wrap)" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "number not number" do

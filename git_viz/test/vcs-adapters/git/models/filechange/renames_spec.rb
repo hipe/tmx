@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - filechange - renames" do
 
-    extend TS_
+    TS_[ self ]
     use :story_01
 
     it "simple change looks good" do

@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - tag - expads - b.s - structured" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_piece
     use :expect_event
 

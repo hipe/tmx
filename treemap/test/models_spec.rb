@@ -4,7 +4,7 @@ module Skylab::Treemap::TestSupport
 
   describe "[tr] models" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "ping OK" do

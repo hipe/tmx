@@ -3,21 +3,26 @@ require 'skylab/test_support'
 
 module Skylab::Treemap::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
+  # -
 
-    def use sym
+    Use_method___ = -> sym do
       :expect_event == sym or fail
       Home_::Common_.test_support::Expect_Event[ self ]
     end
-  end
+  # -
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true
@@ -56,4 +61,8 @@ module Skylab::Treemap::TestSupport
   end  # >>
 
   Home_ = ::Skylab::Treemap
+
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  TS_ = self
 end

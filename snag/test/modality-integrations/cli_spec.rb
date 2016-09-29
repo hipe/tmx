@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] CLI core" do
 
-    extend TS_
+    TS_[ self ]
 
     use :expect_my_CLI
     use :my_tmpdir_

@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - hashtag" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_piece
 
     context "parses" do

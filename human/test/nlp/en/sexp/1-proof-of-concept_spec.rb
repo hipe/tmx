@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP EN Sexp - proof of concept" do  # (:#spot-2)
 
-    extend TS_
+    TS_[ self ]
 
     it "node loads" do
       _lib_node

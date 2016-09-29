@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport
 
   describe "[bs] models - delit - modalities - CLI" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :modality_integrations_CLI_support
 

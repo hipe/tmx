@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP - EN - methods" do
 
-    extend TS_
+    TS_[ self ]
 
     it "an - matches a/an, case" do
 

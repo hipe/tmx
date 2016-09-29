@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport
 
   describe "[bs] mode-integrations - CLI" do
 
-    extend TS_
+    TS_[ self ]
     use :modality_integrations_CLI_support
 
     it "ping" do

@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] operations - follow forward" do
 
-    TS_transitional_[ self ]
+    TS_[ self ]
     use :memoizer_methods
     use :one_off_as_operation
 

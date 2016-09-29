@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - node collection [..] find reappropriablest node" do
 
-    extend TS_
+    TS_[ self ]
 
     it "if no nodes match the criteria, result is nil" do
 

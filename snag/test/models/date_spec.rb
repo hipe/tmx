@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - date" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     context 'Date' do

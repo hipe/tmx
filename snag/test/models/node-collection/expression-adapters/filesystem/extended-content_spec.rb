@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - node collection - expads - f.s - extended content" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     context "in a manifest with a corresponding directory" do

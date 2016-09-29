@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models - to-do - actions - to stream" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_my_CLI
 
     it "regular style - works, is hard to read and boring" do

@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport
 
   describe "[bs] models - deliterate (and ping)" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "ping" do

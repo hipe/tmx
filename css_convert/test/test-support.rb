@@ -3,21 +3,27 @@ require 'skylab/test_support'
 
 module Skylab::CSS_Convert::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
+
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  module ModuleMethods
+  # -
 
-    def use sym
-
+    Use_method___ = -> sym do
       USE___.fetch( sym ).call self
     end
-  end
+
+  # -
 
   USE___ = {
 
@@ -40,7 +46,7 @@ module Skylab::CSS_Convert::TestSupport
     end,
   }
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true
@@ -118,8 +124,10 @@ module Skylab::CSS_Convert::TestSupport
 
   Home_ = ::Skylab::CSS_Convert
 
-  FIXTURES_DIR___ = ::File.expand_path( '../fixtures', __FILE__ )
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  FIXTURES_DIR___ = ::File.expand_path( '../fixtures', __FILE__ )
   NIL_ = nil
+  TS_ = self
 
 end

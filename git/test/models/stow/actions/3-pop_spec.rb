@@ -4,7 +4,7 @@ module Skylab::Git::TestSupport
 
   describe "[gi] models - stow - actions - pop" do
 
-    extend TS_
+    TS_[ self ]
     use :models_stow_support
 
     context "(one)" do

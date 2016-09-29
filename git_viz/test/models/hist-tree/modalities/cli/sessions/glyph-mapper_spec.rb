@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - sessions - glyph mapper:[#026]" do
 
-    extend TS_
+    TS_[ self ]
     use :double_decker_memoize
 
     it "outside range (low end) is nil" do

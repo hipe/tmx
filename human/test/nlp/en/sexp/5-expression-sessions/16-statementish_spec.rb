@@ -6,7 +6,7 @@ module Skylab::Human::TestSupport
 
     # (OK to move some of these to future lower-level (lower-numbered) tests)
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "(context)" do

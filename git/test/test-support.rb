@@ -3,21 +3,22 @@ require 'skylab/test_support'
 
 module Skylab::Git::TestSupport
 
+  class << self
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
+
   Common_ = ::Skylab::Common
 
   TestSupport_ = ::Skylab::TestSupport
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
-
   extend TestSupport_::Quickie
 
-  TS_transitional_ = -> tcc do
-    tcc.send :define_singleton_method, :use, USE_METHOD__
-    tcc.include InstanceMethods
-  end
-
+  # -
     cache = {}
-    USE_METHOD__ = -> sym do
+    Use_method___ = -> sym do
 
       _test_support_lib = cache.fetch sym do
 
@@ -34,12 +35,9 @@ module Skylab::Git::TestSupport
 
       _test_support_lib[ self ]
     end
+  # -
 
-  module ModuleMethods
-    define_method :use, USE_METHOD__
-  end
-
-  module InstanceMethods
+  module InstanceMethods___
 
     # ~ test-time support
 
@@ -125,11 +123,17 @@ module Skylab::Git::TestSupport
     ::File.join TS_.dir_pathname.to_path, 'fixture-trees'
   end
 
+  # --
+
+  Home_ = ::Skylab::Git
+
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   DASH_ = '-'
   DOT_ = '.'
-  Home_ = ::Skylab::Git
   NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil
+  TS_ = self
   UNDERSCORE_ = '_'
 end

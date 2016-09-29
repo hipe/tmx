@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - item from matrix" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     define_singleton_method :memoize_ do | sym, & p |

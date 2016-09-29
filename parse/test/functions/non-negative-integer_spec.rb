@@ -4,7 +4,7 @@ module Skylab::Parse::TestSupport
 
   describe "[pa] functions - integer" do
 
-    extend TS_
+    TS_[ self ]
 
     it "non-integer - no" do
       _against( 'foo' ).should be_nil

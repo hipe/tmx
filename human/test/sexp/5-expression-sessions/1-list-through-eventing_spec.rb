@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] sexp - expression sessions - list thru eventing" do
 
-    TS_Joist_[ self ]
+    TS_[ self ]
     use :memoizer_methods
 
     context "can operate in \"scanner\" mode or \"buffering\" mode" do

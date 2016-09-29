@@ -4,7 +4,7 @@ module Skylab::TMX::TestSupport
 
   describe "[tmx] models - front - modalities - CLI" do
 
-    extend TS_
+    TS_[ self ]
 
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ self ]
     use :models_building

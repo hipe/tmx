@@ -4,7 +4,7 @@ module Skylab::BeautySalon::TestSupport
 
   describe "[bs] CLI wrap" do
 
-    extend TS_
+    TS_[ self ]
     use :modality_integrations_CLI_support
 
     it "help screen has some customizations (fragile..)" do

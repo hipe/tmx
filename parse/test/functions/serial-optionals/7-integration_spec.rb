@@ -8,7 +8,7 @@ module Skylab::Parse::TestSupport
 
   TS_.describe "[pa] parse functions - serial optionals - integrate w/ int & kw" do
 
-    extend TS_
+    TS_[ self ]
 
     before :all do
 

@@ -4,7 +4,7 @@ module Skylab::Treemap::TestSupport
 
   describe "[tr] output-adapters - group by sigil" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "OK (small representative sample)" do

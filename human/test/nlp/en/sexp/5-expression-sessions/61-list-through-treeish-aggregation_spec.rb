@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] [..] expression sessions - list through treeish aggregation" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "artificial case" do

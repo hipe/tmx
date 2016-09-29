@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - commit" do
 
-    extend TS_
+    TS_[ self ]
     use :VCS_adapters_git_support_commit_support
 
     it "try to build a commit from a noent commit - there is a custom error event" do

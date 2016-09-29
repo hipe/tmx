@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] [..] expression sessions - O&S intro" do
 
-    extend TS_
+    TS_[ self ]
     use :NLP_EN_sexp_magnetics
 
     if false  #  the mentor case, here for reference:

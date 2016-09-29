@@ -6,7 +6,7 @@ module Skylab::Yacc2Treetop::TestSupport
 
 describe "[y2] CLI integration" do
 
-  extend TS_
+  TS_[ self ]
 
   context "(reactive model)" do
 

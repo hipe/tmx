@@ -5,15 +5,20 @@ require 'skylab/test_support'
 
 module Skylab::Yacc2Treetop::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
   # TestSupport_::Quickie.enable_kernel_describe
 
-  module ModuleMethods
+  module ModuleMethods___
 
     o = {}
 
@@ -41,7 +46,7 @@ module Skylab::Yacc2Treetop::TestSupport
     end
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     INVITE_RX = /\Ayacc2treetop -h for help\z/
     USAGE_RX = /\Ausage: yacc2treetop .*<yaccfile>/
@@ -114,11 +119,17 @@ module Skylab::Yacc2Treetop::TestSupport
     end
   end
 
-  Common_ = ::Skylab::Common
   Home_ = ::Skylab::Yacc2Treetop
+
+  Common_ = ::Skylab::Common
+
+  Autoloader_ = Common_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   _TEST_DIR = ::File.join( Home_.sidesys_path_, TestSupport_::TEST_DIR_FILENAME_ )
 
   FIXTURES_PATH = ::File.join _TEST_DIR, 'fixtures'
 
+  TS_ = self
 end

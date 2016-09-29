@@ -6,7 +6,7 @@ module Skylab::Human::TestSupport
 
     # #c15n-test-family-1
 
-    TS_Joist_[ self ]
+    TS_[ self ]
     use :memoizer_methods
     use :NLP_EN_contextualization
 

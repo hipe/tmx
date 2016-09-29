@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP EN POS - noun" do
 
-    extend TS_
+    TS_[ self ]
 
     context "(jeefis)" do
 

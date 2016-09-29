@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - models - sparse matrix of content" do
 
-    extend TS_
+    TS_[ self ]
     use :VCS_adapters_git_support_bundle_support
 
     it "loads" do

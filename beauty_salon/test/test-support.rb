@@ -3,15 +3,19 @@ require 'skylab/test_support'
 
 module Skylab::BeautySalon::TestSupport
 
-  TestSupport_ = ::Skylab::TestSupport
+  class << self
+    def [] tcc
+      tcc.send :define_singleton_method, :use, Use_method___
+      tcc.include InstanceMethods___
+    end
+  end  # >>
 
-  TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+  TestSupport_ = ::Skylab::TestSupport
 
   extend TestSupport_::Quickie
 
-  module ModuleMethods
-
-    define_method :use, -> do
+  # -
+    Use_method___ = -> do
       h = {}
       -> sym do
         ( h.fetch sym do
@@ -21,9 +25,9 @@ module Skylab::BeautySalon::TestSupport
         end )[ self ]
       end
     end.call
-  end
+  # -
 
-  module InstanceMethods
+  module InstanceMethods___
 
     attr_reader :do_debug
 
@@ -99,13 +103,16 @@ module Skylab::BeautySalon::TestSupport
   end
 
   # ~
+
   Home_ = ::Skylab::BeautySalon
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   DELIMITER_ = Home_::NEWLINE_
   EMPTY_S_ = Home_::EMPTY_S_
   Autoloader_[ Models = ::Module.new ]  # some tests drill into this directly
   NIL_ = nil
-
+  TS_ = self
 end

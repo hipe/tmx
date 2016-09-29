@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] [..] expression sessions - O&S object count" do
 
-    extend TS_
+    TS_[ self ]
     use :NLP_EN_sexp_magnetics
 
     # [td] permute --x "more is expected" -x "(no expectation)"

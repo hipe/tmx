@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] VCS adapters - git - models - hist-tree - CLI - actors - scale time - scale adapters" do
 
-    extend TS_
+    TS_[ self ]
     use :models_support_mocks
     use :double_decker_memoize
 

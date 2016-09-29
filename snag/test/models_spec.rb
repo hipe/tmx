@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
   describe "[sg] models" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "loads" do

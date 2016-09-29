@@ -4,7 +4,7 @@ module Skylab::Human::TestSupport
 
   describe "[hu] NLP EN POS - pronoun" do
 
-    extend TS_
+    TS_[ self ]
 
     it "experimentally, entire np BECOMES pronoun by setting exponents" do
 

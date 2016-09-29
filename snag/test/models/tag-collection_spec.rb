@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     # currently there is no actual "tag collection" asset node
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
     use :byte_up_and_downstreams
 

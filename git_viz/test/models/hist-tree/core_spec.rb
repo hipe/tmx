@@ -4,7 +4,7 @@ module Skylab::GitViz::TestSupport
 
   describe "[gv] models - hist-tree" do
 
-    extend TS_
+    TS_[ self ]
     use :models_support_hist_tree_model_support
 
     it "absolute path no ent (mocked) - x" do
