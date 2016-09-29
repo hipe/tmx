@@ -9,7 +9,7 @@ module Skylab::Common::TestSupport
 
     it "with the ideal case - works" do
 
-      _path = Home_.dir_pathname.to_path
+      _path = Home_.dir_path
 
       call_API(
         :fire,

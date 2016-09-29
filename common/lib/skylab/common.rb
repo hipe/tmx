@@ -953,6 +953,10 @@ module Skylab::Common
 
     module Methods__
 
+      def dir_path
+        @____dir_path ||= dir_pathname.to_path
+      end
+
       def dir_pathname
 
         @___dpn_is_known_is_known ||= __resolve_dir_pathname

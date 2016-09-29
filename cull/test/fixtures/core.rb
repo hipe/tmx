@@ -20,7 +20,7 @@ module Skylab::Cull::TestSupport
 
         p = -> sym do
 
-          path = Files.dir_pathname.to_path
+          path = Files.dir_path
           path_a = ::Dir.glob( "#{ path }/*" )
           h = {}
           path_a.each do | path_ |

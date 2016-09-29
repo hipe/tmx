@@ -46,7 +46,7 @@ module Skylab::System::TestSupport
       p_p = -> do
         p_p = nil
 
-        head_s = _Here.dir_pathname.to_path
+        head_s = _Here.dir_path
 
         p = -> tail_s do
           ::File.join head_s, tail_s

@@ -21,7 +21,7 @@ module Skylab::Brazen
           ss_mod = lookup_sidesystem_module
 
           glob = ::File.expand_path "../../../bin/#{ s }*",
-            ss_mod.dir_pathname.to_path
+            ss_mod.dir_path
 
           range = glob.length - 1 .. -1
 

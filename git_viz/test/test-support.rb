@@ -226,7 +226,7 @@ module Skylab::GitViz::TestSupport
     define_method :GIT_FIXTURE_STORIES_ do
 
       ::File.join(
-        TS_.dir_pathname.to_path,
+        TS_.dir_path,
         'vcs-adapters/git/fixture-stories' )
     end
   end

@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
     end
 
     define_method :fixtures_path_, ( Common_.memoize do
-      _path = Models::Association.dir_pathname.to_path
+      _path = Models::Association.dir_path
       ::File.join _path, FIXTURES_ENTRY_
     end )
 

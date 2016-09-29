@@ -10,7 +10,7 @@ module Skylab::DocTest::TestSupport
 
       _Basic = TS_.testlib_.basic
 
-      _path = ::File.join _Basic.dir_pathname.to_path, 'method.rb'
+      _path = ::File.join _Basic.dir_path, 'method.rb'
 
       _subject( _path ) == "Skylab::Basic::Method" or fail
     end

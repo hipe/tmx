@@ -88,7 +88,7 @@ module Skylab::System::TestSupport
 
     memoize :_here_path do
 
-      ::File.join TS_.dir_pathname.to_path, 'services/71-grep_spec.rb'
+      ::File.join TS_.dir_path, 'services/71-grep_spec.rb'
     end
 
     def _parent_subject

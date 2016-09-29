@@ -62,7 +62,7 @@ module Skylab::TanMan
 
         # o.force_overwrite!  # re-writes generated parser files - use only when syntax changes
 
-        _path = Models_::DotFile.dir_pathname.to_path
+        _path = Models_::DotFile.dir_path
 
         o.input_path_head_for_relative_paths = _path
 

@@ -10,7 +10,7 @@ module Skylab::TaskExamples
     end
 
     def sidesystem_path
-      @___ss_path ||= ::File.expand_path( '../../..', Home_.dir_pathname.to_path )
+      @___ss_path ||= ::File.expand_path( '../../..', Home_.dir_path )
     end
   end  # >>
 

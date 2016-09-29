@@ -146,7 +146,7 @@ module Skylab::Git::TestSupport
     end
 
     Sidesystem_path__ = Lazy_.call do
-      ::File.expand_path '../../..', Home_.dir_pathname.to_path
+      ::File.expand_path '../../..', Home_.dir_path
     end
 
     # ==

@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport
 
         _tail = "sexp/prototype/grammars/#{ grammar_pathpart_ }/fixtures"
 
-        ::File.join TS_.dir_pathname.to_path, _tail
+        ::File.join TS_.dir_path, _tail
       end
 
       def grammars_module_

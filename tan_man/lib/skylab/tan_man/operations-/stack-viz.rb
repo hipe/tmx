@@ -122,8 +122,16 @@ module Skylab::TanMan
 
     def __init_graph_line_stream
 
-      _st = @streamer.call
-      _st = Home_::StackMagnetics_::ItemStream_via_LineStream[ _st, & @listener ]
+      st = @streamer.call
+      if st
+        __init_graph_line_stream_via_stream st
+      else
+        st
+      end
+    end
+
+    def __init_graph_line_stream_via_stream st
+      _st = Home_::StackMagnetics_::ItemStream_via_LineStream[ st, & @listener ]
       _gr = Home_::StackMagnetics_::Graph_via_ItemStream[ _st, & @listener ]
       _st = Home_::StackMagnetics_::LineStream_via_Graph[ _gr, & @listener ]
       _store :@__graph_line_stream, _st

@@ -85,7 +85,7 @@ module Skylab::Common::TestSupport
       it "inheritence - child of autoloady parent" do
 
         mod = fixture_directories_::Seven_Son::Child
-        mod.dir_pathname.to_path =~ %r(/seven-son/child) || fail
+        mod.dir_path =~ %r(/seven-son/child) || fail
         mod::Foo::YEP == :_yep_ || fail
       end
 

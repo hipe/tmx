@@ -4,8 +4,9 @@
 
 the skylab "common" ([co]) sidesystem evolved to become the home of
 the most essential & commonly used facilities in the skylab libraries.
-the fact that it is called "callback" is now largely historical - we are
-looking for a better name for it.
+
+(it used to be called "callback", and at writing traces of this name
+may remain in some places, namely the `[ca]` medallion..)
 
 examples of these most essential services are:
 

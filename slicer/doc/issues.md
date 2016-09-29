@@ -193,7 +193,10 @@
 [#009] 2011-09-09 @closed attribute definer is (re)born. derking around w/ dep.
 [#006] 2011-08-28 @closed aliases have namespaces too
 [#005] 2011-08-27 @closed death to old filemetrics
-[#004] 2011-08-24 @closed the birth of dependency graph, Open2 wrapper for face
+
+[#004] #open pry and cetera ..
+             ( #was: 2011-08-24 @closed the birth of dependency graph, Open2
+               wrapper for face )
 
 [#003]       spawned off of [#023], if you have a lower-level object
              (a "performer") that needs to read more than one or two

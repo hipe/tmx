@@ -61,7 +61,7 @@ module Skylab::CodeMetrics::TestSupport
 
       dangerous_memoize :the_asset_directory_for_this_project_ do
 
-        _the_asset_module_for_this_project.dir_pathname.to_path
+        _the_asset_module_for_this_project.dir_path
       end
 
       def magnetics_module_

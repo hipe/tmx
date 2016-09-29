@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport
 
     discover_client_class = -> do
 
-      _path = Models::Dot_File.dir_pathname.to_path
+      _path = Models::Dot_File.dir_path
 
       TS_::client_proximity_index_.nearest_such_class_to_path _path
     end

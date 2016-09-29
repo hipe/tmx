@@ -57,7 +57,7 @@ module Skylab::BeautySalon::TestSupport
     def __fixture_file s
 
       ::File.join(
-        TS_.dir_pathname.to_path,
+        TS_.dir_path,
         'models/deliterate/fixture-files',
         s )
     end

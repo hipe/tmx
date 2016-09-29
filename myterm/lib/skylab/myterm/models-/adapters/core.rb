@@ -86,7 +86,7 @@ module Skylab::MyTerm
 
         single_mod = Home_::Image_Output_Adapters_
 
-        _glob_path = "#{ single_mod.dir_pathname.to_path }/[a-z0-9]*"
+        _glob_path = "#{ single_mod.dir_path }/[a-z0-9]*"
 
         paths = _fs.glob _glob_path
 

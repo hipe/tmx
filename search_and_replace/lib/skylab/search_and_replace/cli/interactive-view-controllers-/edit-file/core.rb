@@ -42,7 +42,7 @@ module Skylab::SearchAndReplace
 
       def __all_remaining  # assume has next file
 
-        self._COVER_ME_this_worked_at_writing
+        # #cover-me
 
         o = Home_::Magnetics_::All_Remaining_via_Parameters.new( & @UI_event_handler )
         o.expression_agent = @_expression_agent

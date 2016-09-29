@@ -185,7 +185,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def dirs
-      ::Skylab::TanMan::TestSupport::Fixtures::Dirs.dir_pathname.to_path
+      ::Skylab::TanMan::TestSupport::Fixtures::Dirs.dir_path
     end
 
     def cfn

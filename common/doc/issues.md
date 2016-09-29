@@ -29,7 +29,8 @@
 [#051]       [wrapped events]
              ( #was: margination. probably sunsetted.)
 
-[#050] #hole ( #was: aggregation .. moved to: [#hu-055] )
+[#050] #open `dir_p{}athname` away
+             ( #was: aggregation .. moved to: [#hu-055] )
 
 [#049]       #doc-node the scn narrative ..
 

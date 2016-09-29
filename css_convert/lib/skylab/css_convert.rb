@@ -579,7 +579,7 @@ module Skylab::CSS_Convert
 
   ACHIEVED_ = true
   EARLY_FINISH_ = nil
-  FIXTURES_DIR__ = ::File.join Home_.dir_pathname.to_path, 'test/fixtures'
+  FIXTURES_DIR__ = ::File.join Home_.dir_path, 'test/fixtures'
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false

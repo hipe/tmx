@@ -9,7 +9,7 @@ module Skylab::SearchAndReplace::TestSupport
       end
 
       def _dir_path
-        @___ ||= dir_pathname.to_path
+        @___ ||= dir_path
       end
 
     end  # >>

@@ -11,7 +11,7 @@ module Skylab::SubTree::TestSupport
 
     define_method :fixture_file do | sym |
 
-      head ||= Here_.dir_pathname.to_path
+      head ||= Here_.dir_path
 
       _tail = "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.output"
 

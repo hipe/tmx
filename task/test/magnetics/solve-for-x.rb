@@ -93,7 +93,7 @@ module Skylab::Task::TestSupport
       # -- support
 
       def fixture_path_ entry
-        ::File.join TS_.dir_pathname.to_path, 'fixture-files', entry
+        ::File.join TS_.dir_path, 'fixture-files', entry
       end
 
       def collection_via_path_ path

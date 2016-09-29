@@ -35,7 +35,7 @@ module Skylab::DocTest
       end
 
       def __template_loader
-        @___TL ||= Home_::OutputAdapter_::Template_Loader.new Here_.dir_pathname.to_path
+        @___TL ||= Home_::OutputAdapter_::Template_Loader.new Here_.dir_path
       end
     end
 

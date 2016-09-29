@@ -24,7 +24,7 @@ module Skylab::GitViz::TestSupport
       end )
     end
 
-    STORY__ = ::File.join TS_.dir_pathname.to_path,
+    STORY__ = ::File.join TS_.dir_path,
       'vcs-adapters/git/fixture-stories/01-representative-renames'
   end
 end

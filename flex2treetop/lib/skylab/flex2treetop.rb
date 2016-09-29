@@ -60,7 +60,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
     def sidesys_path_
       @___sidesys_path ||=
-        ::File.expand_path( '../../..', dir_pathname.to_path )
+        ::File.expand_path( '../../..', dir_path )
     end
   end  # >>
 

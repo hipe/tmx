@@ -112,7 +112,7 @@ module Skylab::Git::TestSupport
   Lazy_ = Common_::Lazy
 
   Fixture_data_path_ = Lazy_.call do
-    ::File.join TS_.dir_pathname.to_path, 'fixture-data'
+    ::File.join TS_.dir_path, 'fixture-data'
   end
 
   Fixture_tree_ = -> sym do
@@ -120,7 +120,7 @@ module Skylab::Git::TestSupport
   end
 
   Fixture_trees_ = Lazy_.call do
-    ::File.join TS_.dir_pathname.to_path, 'fixture-trees'
+    ::File.join TS_.dir_path, 'fixture-trees'
   end
 
   # --

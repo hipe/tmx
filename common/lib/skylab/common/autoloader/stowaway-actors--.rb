@@ -224,7 +224,7 @@ module Skylab::Common
     private
 
       def init_ivars
-        @existant_a = @mod.dir_pathname.to_path.split PATH_SEP_
+        @existant_a = @mod.dir_path.split PATH_SEP_
         @imagined_a = @dpn.to_path.split PATH_SEP_
         @same_a = []
       end

@@ -6,7 +6,7 @@ module Skylab::DocTest
 
   # here is the minimal interesting example for calling the API:
   #
-  #     _path = "#{ DocTest.dir_pathname.to_path }.rb"
+  #     _path = "#{ DocTest.dir_path }.rb"
   #
   #     st = DocTest::API.call(
   #       :synchronize,

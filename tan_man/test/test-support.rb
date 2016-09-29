@@ -259,7 +259,7 @@ module Skylab::TanMan::TestSupport
 
       @parse = TS_::Parse.new _oes_p do | o |
 
-        o.root_for_relative_paths_for_load TS_.dir_pathname.to_path
+        o.root_for_relative_paths_for_load TS_.dir_path
 
         o.generated_grammar_dir_path existent_testing_GGD_path
 
@@ -328,7 +328,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def fixtures_path_
-      ::File.join @grammar_path.dir_pathname.to_path, FIXTURES_ENTRY_
+      ::File.join @grammar_path.dir_path, FIXTURES_ENTRY_
     end
 
     def produce_result_via_parse_method_i

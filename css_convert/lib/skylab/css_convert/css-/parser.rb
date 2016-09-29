@@ -44,7 +44,7 @@ module Skylab::CSS_Convert
 
     def produce_parser_class
 
-      @_indir = ::File.join Home_.dir_pathname.to_path, 'css-/parser'
+      @_indir = ::File.join Home_.dir_path, 'css-/parser'
 
       if ! ::File.directory? @out_dir_head
         ::Dir.mkdir @out_dir_head

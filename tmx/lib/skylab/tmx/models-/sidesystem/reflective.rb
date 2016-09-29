@@ -93,7 +93,7 @@ module Skylab::TMX
 
       # so this is hacky af - we need to read the file "by hand"
 
-      code_root = @mod.dir_pathname.to_path
+      code_root = @mod.dir_path
 
       try_deep = "#{ code_root }/lib-#{ Autoloader_::EXTNAME }"
 

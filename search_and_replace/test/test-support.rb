@@ -63,7 +63,7 @@ module Skylab::SearchAndReplace::TestSupport
 
     memoize :this_test_directory_ do
 
-      dir = ::File.join TS_.dir_pathname.to_path, '6-interactive-CLI'
+      dir = ::File.join TS_.dir_path, '6-interactive-CLI'
       ::File.directory? dir or fail
       dir
     end

@@ -107,7 +107,7 @@ module Skylab::System::TestSupport
     end
 
     define_method :_my_fixtures_dirname, ( Lazy_.call do
-      ::File.join TS_.dir_pathname.to_path, 'services/74-patch/fixtures'
+      ::File.join TS_.dir_path, 'services/74-patch/fixtures'
     end )
 
     # ~ execution

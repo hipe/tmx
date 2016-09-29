@@ -1205,7 +1205,7 @@ module Skylab::Git
 
     private
       def engage
-        require self.class.dir_pathname.to_path
+        require self.class.dir_path
         init
       end
       Autoloader_[ self ]

@@ -39,7 +39,7 @@ module Skylab::DocTest::TestSupport
       end
 
       common = Lazy_.call do
-        TS_.dir_pathname.to_path
+        TS_.dir_path
       end
 
       define_method :_fixture_trees_directory, ( Lazy_.call do

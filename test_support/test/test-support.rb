@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport
     end
 
     def noent_path_
-      @___noent_path ||= ::File.join( Home_.dir_pathname.to_path, 'noent.file' )
+      @___noent_path ||= ::File.join( Home_.dir_path, 'noent.file' )
     end
 
     def test_path_ s
@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport
 
     def _sidesys_path
       @___sidesys_path ||= ::File.expand_path(
-        '../../..', Home_.dir_pathname.to_path )
+        '../../..', Home_.dir_path )
     end
 
     cache = {}

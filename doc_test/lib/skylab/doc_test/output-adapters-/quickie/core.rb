@@ -112,7 +112,7 @@ module Skylab::DocTest
     # ==
 
     Template_dir___ = Lazy_.call do
-      ::File.join Here_.dir_pathname.to_path, 'templates-'
+      ::File.join Here_.dir_path, 'templates-'
     end
 
     # ==

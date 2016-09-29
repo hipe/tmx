@@ -74,7 +74,7 @@ module Skylab::DocTest::TestSupport
       context "when there IS a corresponding test, it finds it and says so" do
 
         shared_subject :_details do
-          _asset_path = "#{ _subject_mag.dir_pathname.to_path }#{ Autoloader_::EXTNAME }"
+          _asset_path = "#{ _subject_mag.dir_path }#{ Autoloader_::EXTNAME }"
           _ind = _index
           _ind.details_via_asset_path _asset_path
         end

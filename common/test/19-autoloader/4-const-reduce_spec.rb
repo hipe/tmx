@@ -156,7 +156,7 @@ module Skylab::Common::TestSupport
 
         mod.singleton_class.ancestors[ 1 ] == ::Module or fail  # eew
 
-        _ = mod.dir_pathname.to_path
+        _ = mod.dir_path
         _ =~ %r(fixture-tree/one-skorlab\z) || fail
       end
 
@@ -204,7 +204,7 @@ module Skylab::Common::TestSupport
       # do not autoload this node, because we want the creation of its
       # entry tree to be its own and not its parent's
 
-      _path = fixture_tree_.dir_pathname.to_path
+      _path = fixture_tree_.dir_path
 
       _load_me = ::File.join _path, 'for-skerlerb/core.rb'
 

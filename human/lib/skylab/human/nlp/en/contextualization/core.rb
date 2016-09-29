@@ -490,7 +490,7 @@ module Skylab::Human
 
       Task_ = Home_.lib_.task  # weee
 
-      _dir = ::Dir.new Magnetics_.dir_pathname.to_path
+      _dir = ::Dir.new Magnetics_.dir_path
 
       col = Task_::Magnetics.
         collection_via_directory_object_and_module _dir, Magnetics_

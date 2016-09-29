@@ -118,7 +118,7 @@ module Skylab::DocTest::TestSupport
 
     hdp = nil
     define_method :home_dir_path_ do
-      hdp ||= Home_.dir_pathname.to_path
+      hdp ||= Home_.dir_path
     end
 
     ted = nil

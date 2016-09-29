@@ -124,7 +124,7 @@ describe "[y2] CLI integration" do
     context 'giving it a nonexistant filename' do
 
       invoke_by do
-        ::File.join TestSupport_.dir_pathname.to_path, 'not-there.yacc'
+        ::File.join TestSupport_.dir_path, 'not-there.yacc'
       end
 
       it 'fails' do

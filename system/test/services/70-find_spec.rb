@@ -8,7 +8,7 @@ module Skylab::System::TestSupport
 
     it "minimal working example - find one file" do
 
-      _args = _parent_subject.find :path, TS_.dir_pathname.to_path,
+      _args = _parent_subject.find :path, TS_.dir_path,
         :filename, 'find_spec.*',
         :when_command, -> command do
           command.args

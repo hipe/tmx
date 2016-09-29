@@ -62,7 +62,7 @@ module Skylab::TestSupport
       end
     end  # >>
 
-    dir = ::File.expand_path '../../..', Home_.dir_pathname.to_path
+    dir = ::File.expand_path '../../..', Home_.dir_path
 
     @dirs_path = ::File.join( dir, 'fixture-directories' ).freeze
     @files_path = ::File.join( dir, 'fixture-files' ).freeze
