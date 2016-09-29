@@ -20,6 +20,7 @@ fields/lib/skylab/fields/attributes/struct.rb
 human/lib/skylab/human/levenshtein.rb
 parse/lib/skylab/parse/dsl-dsl/core.rb
 parse/lib/skylab/parse/functions-/alternation.rb
+parse/lib/skylab/parse/functions-/serial-optionals.rb
 parse/lib/skylab/parse/functions-/simple-pool.rb
 parse/lib/skylab/parse/functions-/spending-pool.rb
 system/lib/skylab/system/filesystem/cache.rb

@@ -2,30 +2,29 @@ require_relative '../../test-support'
 
 module Skylab::Parse::TestSupport
 
-  module Fz_SO_G___  # :+#throwaway-module for constants generated during tests
+  describe "[pa] functions - serial optionals - core" do
 
-    # <-
-
-  TS_.describe "[pa] functions - serial optionals" do
+    extend TS_
+    use :memoizer_methods
 
     it "there is a highlevel shorthand inline convenience macro" do
 
-      args = [ '30', 'other' ]
+      _argv = [ '30', 'brisbane' ]
 
-      age, sex, loc =  Home_.parse_serial_optionals args,
+      age, sex, loc =  Home_.parse_serial_optionals _argv,
         -> a { /\A\d+\z/ =~ a },
         -> s { /\A[mf]\z/i =~ s },
         -> l { /./ =~ l }
 
       age.should eql '30'
       sex.should eql nil
-      loc.should eql 'other'
+      loc.should eql 'brisbane'
     end
 
-    context "curried usage" do
+    context "currying can make your code more readable and may improve performance" do
 
-      before :all do
-        P = Home_.function( :serial_optionals ).new_with(
+      shared_subject :p do
+        p = Home_.function( :serial_optionals ).new_with(
           :matcher_functions,
             -> age do
               /\A\d+\z/ =~ age
@@ -36,67 +35,90 @@ module Skylab::Parse::TestSupport
             -> location do
               /\A[A-Z]/ =~ location   # must start with capital
             end ).to_parse_array_fully_proc
+
+        p
       end
 
       it "full normal case (works to match each of the three terms)." do
-        P[ [ '30', 'male', "Mom's basement" ] ].should eql [ '30', 'male', "Mom's basement" ]
+        ( p[ [ '30', 'male', "Mom's basement" ] ] ).should eql [ '30', 'male', "Mom's basement" ]
       end
 
       it "one valid input token will match any first matching formal symbol found" do
-        P[ [ '30' ] ].should eql [ '30', nil, nil ]
+        ( p[ [ '30' ] ] ).should eql [ '30', nil, nil ]
       end
 
       it "successful result is always array as long as number of formal symbols" do
-        P[ [ "Mom's basement" ] ].should eql [ nil, nil, "Mom's basement" ]
+        ( p[ [ "Mom's basement" ] ] ).should eql [ nil, nil, "Mom's basement" ]
       end
 
       it "ergo an earlier matching formal symbol will always win over a later one" do
-        P[ [ 'M' ] ].should eql [ nil, 'M', nil ]
+        ( p[ [ 'M' ] ] ).should eql [ nil, 'M', nil ]
       end
 
       it "because we have that 'fully' suffix, we raise argument errors" do
+
         argv = [ '30', 'm', "Mom's", "Mom's again" ]
-        -> do
-          P[ argv ]
-        end.should raise_error( ArgumentError,
-                     ::Regexp.new( "\\Aunrecognized\\ argument\\ \"Mom's" ) )
+        _rx = ::Regexp.new "\\Aunrecognized\\ argument\\ \"Mom's"
+
+        begin
+          p[ argv ]
+        rescue ArgumentError => e
+        end
+
+        e.message.should match _rx
       end
     end
 
-    it "you can provide arbitrary procs to implement your parse functions" do
-      feet_rx = /\A\d+\z/
-      inch_rx = /\A\d+(?:\.\d+)?\z/
+    context "you can provide arbitrary procs to implement your parse functions" do
 
-      p = subject_parse_module_.new_with(
-        :functions,
-        :proc, -> st do
-          if feet_rx =~ st.current_token_object.value_x
-            tok = st.current_token_object
-            st.advance_one
-            Home_::OutputNode.for tok.value_x.to_i
-          end
-        end,
-        :proc, -> st do
-          if inch_rx =~ st.current_token_object.value_x
-            tok = st.current_token_object
-            st.advance_one
-            Home_::OutputNode.for tok.value_x.to_f
-          end
-        end ).to_parse_array_fully_proc
+      shared_subject :p do
 
-      p[ [ "8"   ] ].should eql [ 8,  nil  ]
-      p[ [ "8.1" ] ].should eql [ nil, 8.1 ]
-      p[ [ "8", "9" ] ].should eql [ 8, 9.0 ]
-      -> do
-        p[ [ "8.1", "8.2" ] ]
-      end.should raise_error( ArgumentError,
-                   ::Regexp.new( "\\Aunrecognized\\ argument" ) )
+        feet_rx = /\A\d+\z/
+        inch_rx = /\A\d+(?:\.\d+)?\z/
+
+        p = Home_.function( :serial_optionals ).new_with(
+          :functions,
+          :proc, -> st do
+            if feet_rx =~ st.current_token_object.value_x
+              tok = st.current_token_object
+              st.advance_one
+              Home_::OutputNode.for tok.value_x.to_i
+            end
+          end,
+          :proc, -> st do
+            if inch_rx =~ st.current_token_object.value_x
+              tok = st.current_token_object
+              st.advance_one
+              Home_::OutputNode.for tok.value_x.to_f
+            end
+          end ).to_parse_array_fully_proc
+
+        p
+      end
+
+      it "if it's an integer, it matches the first pattern" do
+        ( p[ [ "8"   ] ] ).should eql [ 8,  nil  ]
+      end
+
+      it "but if it's a float, it matches the second pattern" do
+        ( p[ [ "8.1" ] ] ).should eql [ nil, 8.1 ]
+      end
+
+      it "still falls into the float \"slot\"" do
+        ( p[ [ "8", "9" ] ] ).should eql [ 8, 9.0 ]
+      end
+
+      it "but the converse is not true; i.e you can't have two floats" do
+
+        _rx = ::Regexp.new "\\Aunrecognized\\ argument"
+
+        begin
+          p[ [ "8.1", "8.2" ] ]
+        rescue ArgumentError => e
+        end
+
+        e.message.should match _rx
+      end
     end
-
-    def subject_parse_module_
-      Home_.function :serial_optionals
-    end
-  end
-  # <-
   end
 end

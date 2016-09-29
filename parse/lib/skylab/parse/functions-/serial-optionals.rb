@@ -1,9 +1,8 @@
 module Skylab::Parse
 
-  # ->
+  begin  # :/
 
     # see [#004]
-
     # a "serial optionals" parse function never fails. any input stream is
     # passed to the first constituent. if this parse succeeds, any remaining
     # input stream is passed to any next constituent and so on. if the current
@@ -29,17 +28,19 @@ module Skylab::Parse
     #
     # there is a highlevel shorthand inline convenience macro:
     #
-    #     args = [ '30', 'other' ]
-    #     age, sex, loc =  Parse_lib_[].parse_serial_optionals args,
+    #     _argv = [ '30', 'brisbane' ]
+    #
+    #     age, sex, loc =  Home_.parse_serial_optionals _argv,
     #       -> a { /\A\d+\z/ =~ a },
     #       -> s { /\A[mf]\z/i =~ s },
     #       -> l { /./ =~ l }
     #
     #     age  # => '30'
     #     sex  # => nil
-    #     loc  # => 'other'
+    #     loc  # => 'brisbane'
     #
-    # (see what happens when we limit ourselves to binary gender)
+    # because the second argument doesn't match our narrow pattern for sex,
+    # but it does match our leient pattern for location, it is parsed as that.
 
     # currying can make your code more readable and may improve performance:
     # with `curry_with` you can separate the step of creating the parseer
@@ -47,7 +48,7 @@ module Skylab::Parse
     #
     # curried usage:
     #
-    #     P = Subject_[].new_with(
+    #     p = Home_.function( :serial_optionals ).new_with(
     #       :matcher_functions,
     #         -> age do
     #           /\A\d+\z/ =~ age
@@ -59,31 +60,26 @@ module Skylab::Parse
     #           /\A[A-Z]/ =~ location   # must start with capital
     #         end ).to_parse_array_fully_proc
     #
-    #
     # full normal case (works to match each of the three terms).
     #
-    #     P[ [ '30', 'male', "Mom's basement" ] ]  # => [ '30', 'male', "Mom's basement" ]
-    #
+    #     p[ [ '30', 'male', "Mom's basement" ] ]  # => [ '30', 'male', "Mom's basement" ]
     #
     # one valid input token will match any first matching formal symbol found
     #
-    #     P[ [ '30' ] ]              # => [ '30', nil, nil ]
-    #
+    #     p[ [ '30' ] ]              # => [ '30', nil, nil ]
     #
     # successful result is always array as long as number of formal symbols
     #
-    #     P[ [ "Mom's basement" ] ]  # => [ nil, nil, "Mom's basement" ]
-    #
+    #     p[ [ "Mom's basement" ] ]  # => [ nil, nil, "Mom's basement" ]
     #
     # ergo an earlier matching formal symbol will always win over a later one
     #
-    #     P[ [ 'M' ] ]               # => [ nil, 'M', nil ]
-    #
+    #     p[ [ 'M' ] ]               # => [ nil, 'M', nil ]
     #
     # because we have that 'fully' suffix, we raise argument errors
     #
     #     argv = [ '30', 'm', "Mom's", "Mom's again" ]
-    #     P[ argv ]  # => ArgumentError: unrecognized argument 'Mom's..
+    #     p[ argv ]  # => ArgumentError: unrecognized argument "Mom's..
 
     class Functions_::Serial_Optionals < Home_::Function_::Currying
 
@@ -165,31 +161,43 @@ module Skylab::Parse
     #     feet_rx = /\A\d+\z/
     #     inch_rx = /\A\d+(?:\.\d+)?\z/
     #
-    #     p = Subject_[].new_with(
+    #     p = Home_.function( :serial_optionals ).new_with(
     #       :functions,
     #       :proc, -> st do
     #         if feet_rx =~ st.current_token_object.value_x
     #           tok = st.current_token_object
     #           st.advance_one
-    #           Parse_lib_[]::OutputNode.for tok.value_x.to_i
+    #           Home_::OutputNode.for tok.value_x.to_i
     #         end
     #       end,
     #       :proc, -> st do
     #         if inch_rx =~ st.current_token_object.value_x
     #           tok = st.current_token_object
     #           st.advance_one
-    #           Parse_lib_[]::OutputNode.for tok.value_x.to_f
+    #           Home_::OutputNode.for tok.value_x.to_f
     #         end
     #       end ).to_parse_array_fully_proc
     #
+    # if it's an integer, it matches the first pattern:
+    #
     #     p[ [ "8"   ] ]         # => [ 8,  nil  ]
+    #
+    # but if it's a float, it matches the second pattern:
+    #
     #     p[ [ "8.1" ] ]         # => [ nil, 8.1 ]
+    #
+    # because of positionality, even though the second term is an interger,
+    # it still falls into the float "slot":
+    #
     #     p[ [ "8", "9" ] ]      # => [ 8, 9.0 ]
+    #
+    # but the converse is not true; i.e you can't have two floats:
+    #
     #     p[ [ "8.1", "8.2" ] ]  # => ArgumentError: unrecognized argument ..
     #
     # NOTE however that when doing this you have to be more careful:
     # no longer is the simple true-ishness of your result used to determine
     # whether there was a match. instead, `nil?` is used.
 
-    # <-
+  end
 end

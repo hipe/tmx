@@ -1,9 +1,9 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Parse::TestSupport
 
   # <-
-describe "[pa] fuctions - serial optionals" do
+describe "[pa] fuctions - serial optionals - foundation" do
 
   extend TS_
 
