@@ -1,26 +1,18 @@
 require_relative 'test-support'
 
-module Skylab::Common::TestSupport::OD__
-
-  ::Skylab::Common::TestSupport[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Subject_ = -> { Home_::Ordered_Dictionary }
+module Skylab::Common::TestSupport
 
   describe "[co] ordered dictionary" do
 
     context "when you make a \"static\" listener class" do  # #needs-indent
 
       before :all do
-        Adapter_Listener_ = Subject_[].new :error, :info
+        X_od_Listener = Home_::Ordered_Dictionary.new :error, :info
       end
 
       it "normative" do
         e_a = [] ; i_a = []
-        listener = Adapter_Listener_.new -> x { e_a << x }, -> x { i_a << x }
+        listener = X_od_Listener.new -> x { e_a << x }, -> x { i_a << x }
         listener.receive_error_event :x
         listener.receive_info_event :y
         listener.receive_info_event :z
@@ -30,14 +22,14 @@ module Skylab::Common::TestSupport::OD__
 
       it "nil callbacks don't get called" do
         one_a = []
-        listener = Adapter_Listener_.new -> x { one_a << x }
+        listener = X_od_Listener.new -> x { one_a << x }
         listener.receive_error_event :a
         listener.receive_info_event :b
         one_a.should eql [ :a ]
       end
 
       it "you can reflect on the listeners themselves" do
-        listener = Adapter_Listener_.new :foo, :bar
+        listener = X_od_Listener.new :foo, :bar
         listener.error_p.should eql :foo
         listener.info_p.should eql :bar
       end
@@ -73,7 +65,7 @@ module Skylab::Common::TestSupport::OD__
         end
 
         def subject * x_a
-          @subject = Adapter_Listener_.call_via_iambic x_a
+          @subject = X_od_Listener.call_via_iambic x_a
         end
       end
     end
@@ -82,7 +74,7 @@ module Skylab::Common::TestSupport::OD__
 
       it "ok." do
         a = []
-        listener = Subject_[].inline :foo, -> x { a << x }, :bar, -> { a << :b }
+        listener = _subject_module.inline :foo, -> x { a << x }, :bar, -> { a << :b }
         listener.receive_foo_event :a
         listener.receive_bar_event
         listener.foo_p[ :c ]
@@ -119,7 +111,7 @@ module Skylab::Common::TestSupport::OD__
       end
 
       def inline * x_a
-        @against_listener = Subject_[].inline_via_iambic x_a
+        @against_listener = _subject_module.inline_via_iambic x_a
       end
 
       def with argument_listener
@@ -137,9 +129,14 @@ module Skylab::Common::TestSupport::OD__
       end
 
       before :all do
-        Static_Guy_With_Two = Subject_[].new :foo, :bar
-        Static_Guy_With_Three = Subject_[].new :bar, :baz, :boffo
+        cls = Home_::Ordered_Dictionary
+        Static_Guy_With_Two = cls.new :foo, :bar
+        Static_Guy_With_Three = cls.new :bar, :baz, :boffo
       end
+    end
+
+    def _subject_module
+      Home_::Ordered_Dictionary
     end
   end
 end

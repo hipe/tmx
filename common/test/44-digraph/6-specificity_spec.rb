@@ -1,17 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Digraph::Specificity
-
-  ::Skylab::Common::TestSupport::Digraph[ Specificity_TestSupport = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::Common::TestSupport
 
   describe "[co] digraph specificity" do
 
-    extend Specificity_TestSupport
-
+    TS_[ self ]
+    use :digraph
 
     # Given the below event stream graph relating the three streams of
     # [B]usiness, [P]leasure and [H]acking where (not shown) the arrows
@@ -26,7 +20,6 @@ module Skylab::Common::TestSupport::Digraph::Specificity
     # arrangements there are four of them, yeah?), and within each of
     # those listening arrangement we go through a variety of emitting
     # on streams (hopefully all significant permutations there).
-
 
     context "simple multi-inheritence triangle graph" do
 
@@ -77,7 +70,6 @@ module Skylab::Common::TestSupport::Digraph::Specificity
         a[ order.index( i ) ] = ( e.is_event if e )
       end
 
-
       context "1. listening to only the non-taxonomic stream - works" do
 
       #        B   P
@@ -85,7 +77,7 @@ module Skylab::Common::TestSupport::Digraph::Specificity
       #         [H]
 
         whence do |a|
-          z = Home_::TestSupport::Fixtures::ZigZag.new
+          z = Home_::TestSupport::FixtureFiles::ZigZag.new
           z.with_specificity do
             z.on_hacking do |e|
               touch[ a, :h, e ]
@@ -133,7 +125,7 @@ module Skylab::Common::TestSupport::Digraph::Specificity
       #          H
 
         whence do |a|
-          z = Home_::TestSupport::Fixtures::ZigZag.new
+          z = Home_::TestSupport::FixtureFiles::ZigZag.new
           z.with_specificity do
             z.on_pleasure do |e|
               touch[ a, :p, e ]
@@ -170,7 +162,7 @@ module Skylab::Common::TestSupport::Digraph::Specificity
       #         [H]
 
         whence do |a|
-          z = Home_::TestSupport::Fixtures::ZigZag.new
+          z = Home_::TestSupport::FixtureFiles::ZigZag.new
           z.with_specificity do
             z.on_hacking do |e|
               touch[ a, :h, e ]
@@ -220,7 +212,7 @@ module Skylab::Common::TestSupport::Digraph::Specificity
       #          H
 
         whence do |a|
-          z = Home_::TestSupport::Fixtures::ZigZag.new
+          z = Home_::TestSupport::FixtureFiles::ZigZag.new
           z.with_specificity do
             z.on_business do |e|
               touch[ a, :b, e ]

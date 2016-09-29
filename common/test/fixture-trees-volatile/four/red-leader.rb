@@ -1,2 +1,2 @@
-Skylab::Common::TestSupport::Autoloader::Boxxy::Fixtures::One::RedLeader =
+Skylab::Common::TestSupport::FixtureTreesVolatile::Four::RedLeader =
   ::Module.new

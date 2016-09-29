@@ -1,15 +1,15 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Bundles
+module Skylab::Common::TestSupport
 
   describe "[co] bundles - emit via simple IO manifold" do
 
-    extend TS__
+    TS_[ self ]
 
     context "minimal" do
 
       before :all do
-        class Foo_EVSIM
+        class X_b_etiss_Foo
           Home_[ self, :emit_to_IO_stream_string ]
           def initialize dbg_IO
             @fun_IO = TestSupport_::IO.spy(
@@ -39,17 +39,23 @@ module Skylab::Common::TestSupport::Bundles
       end
 
       it "when bad channel - X" do
-        -> do
+
+        _s = "no such stream 'fran'. did you mean 'fun'?"
+
+        begin
           foo.emt :fran, "doikey"
-        end.should raise_error ::KeyError,
-          "no such stream 'fran'. did you mean 'fun'?"
+        rescue ::KeyError => e
+        end
+
+        e.message == _s || fail
       end
 
       def foo
         @foo ||= build_foo
       end
+
       def build_foo
-        Foo_EVSIM.new any_relevant_debug_IO
+        X_b_etiss_Foo.new do_debug && debug_IO
       end
     end
   end

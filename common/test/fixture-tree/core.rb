@@ -1,3 +1,3 @@
-module Skylab::Common::TestSupport::Autoloader::Const_Reduce::Fixtures
-  Fixtures_ = self
+module Skylab::Common::TestSupport::FixtureTree
+  FixtureTree_ = self
 end

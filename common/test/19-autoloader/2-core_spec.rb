@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Autoloader
+module Skylab::Common::TestSupport
 
   describe "[co] autoloader core" do
 
@@ -8,101 +8,131 @@ module Skylab::Common::TestSupport::Autoloader
 
       it "1. the eponymous leaf file (with a correction)" do
         _x = TS_::Fixture
-        _x.should eql :_yes_
+        _x == :_yes_ || fail
         _x = TS_::Fixture
-        _x.should eql :_yes_
+        _x == :_yes_ || fail
       end
 
       it "1. random name - X" do
-        -> do
+
+        _rx = %r(\Auninitialized constant [A-Za-z:]+::Whatever #{
+          }and no directory\[file\] .+/whatever\[\.rb\]\z)
+
+        begin
           TS_::Whatever
-        end.should raise_error ::NameError, %r(\Auninit.+loader::Whatever #{
-          }and no directory\[file\] .+loader/whatever\[\.rb\]\z)
+        rescue _name_error => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "1. the eponymous leaf who fails to define - X" do
-        -> do
+
+        _rx = %r(\A.+::TestSupport::\( ~ foxture \) #{
+          }must be but does not appear to be defined in #{
+           }.+test/foxture\.rb\z)
+
+        begin
           TS_::Foxture
-        end.should raise_error ::NameError, %r(\A.+::Autoloader::#{
-          }\( ~ foxture \) must be but does not appear to be defined in #{
-           }.+autoloader/foxture\.rb\z)
+        rescue _name_error => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "3. (2 is pre-requisite on 3). the dir (but no core.#{}rb)" do
-        TS_::Fixtures.dir_pathname or fail
+        fixture_directories_.dir_pathname or fail
       end
 
       it "2. the dir with a core.#{}rb" do
-        TS_::Fixtures.class  # kick
-        TS_::Fixtures::Five::OHAI.should eql :_hey_
-        TS_::Fixtures::Five::OHAI.should eql :_hey_
-        TS_::Fixtures::Five.dir_pathname or fail
+        fixture_directories_::Five::OHAI.should eql :_hey_
+        fixture_directories_::Five::OHAI.should eql :_hey_
+        fixture_directories_::Five.dir_pathname or fail
       end
 
       it "2. the dir with a core.#{}rb that was loaded adjunctly" do
-        TS_::Const_Reduce::Fixtures.dir_pathname
+        TS_::FixtureTree.dir_pathname
       end
 
       it "2. WHATEVER" do
-        TS_::Fixtures::Thrtn_Herdless::Terxt
+        fixture_directories_::Thrtn_Herdless::Terxt
       end
 
       it "4. for a branch node, load any file (like even core.rb)" do
-        TS_::Fixtures::NINE::Peripheral.should eql :_nine_
+        fixture_directories_::NINE::Peripheral.should eql :_nine_
       end
 
       it "4. but when a directory has no valid leaf or branch" do
-        -> do
-          TS_::Fixtures::Ten
-        end.should raise_error ::NameError, %r(\Acannot determine correct #{
-          }casing and scheme for [:A-Za-z]+::Fixtures::\( ~ ten \) - #{
-           }directory is effectively empty: .+/fixtures/ten\z)
+
+        _rx = %r(\Acannot determine correct #{
+          }casing and scheme for [:A-Za-z]+::FixtureDirectories::\( ~ ten \) - #{
+           }directory is effectively empty: .+/fixture-directories/ten\z)
+
+        begin
+          fixture_directories_::Ten
+        rescue _name_error => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "autovivifying as we know it either does or doesn't happen still" do
-        _mod = TS_::Fixtures::SixBersic
-        _mod.name.should match %r(::Fixtures::Six_Bersic)
+
+        _mod = fixture_directories_::SixBersic
+        _mod.name =~ %r(::FixtureDirectories::Six_Bersic) || fail
       end
 
       it "inheritence - child of autoloady parent" do
-        _mod = TS_::Fixtures::Seven_Son::Child
-        _mod.dir_pathname.to_path.should match %r(/seven-son/child)
-        _mod::Foo::YEP.should eql :_yep_
+
+        mod = fixture_directories_::Seven_Son::Child
+        mod.dir_pathname.to_path =~ %r(/seven-son/child) || fail
+        mod::Foo::YEP == :_yep_ || fail
       end
 
       it "experimental trick with correction" do
-        _mod = TS_::Fixtures::Four
-        x = TS_::Fixtures::Four::Npl::Ne::Numbers
-        x.name.should eql "#{ TS_.name }#{
-          }::Fixtures::Four::NPL::NE::Numbers"
+
+        _mod = fixture_directories_::Four
+
+        x = fixture_directories_::Four::Npl::Ne::Numbers
+
+        x.name == "#{ TS_.name }::FixtureDirectories::Four::NPL::NE::Numbers" || fail
       end
 
       it "collateral - nodes loaded along the way still get enhanced" do
-        _mod_a = TS_::Fixtures::Eight_HERDLESS::CIL
+
+        _mod_a = fixture_directories_::Eight_HERDLESS::CIL
         _mod_b = _mod_a::Erkshern
         _x = _mod_b::Me
-        _x.should eql :_ok_you_
+        _x == :_ok_you_ || fail
       end
 
       it "a stowaway path that does not isomorph to a node is OK.." do
-        _Face = TS_::Fixtures::Elvn_Ferce
+        _Face = fixture_directories_::Elvn_Ferce
         _Face::TerstSerppert
       end
 
       it "..and make sure that such a node can set its own dirpn" do
-        _Face = TS_::Fixtures::Elvn_Ferce
+        _Face = fixture_directories_::Elvn_Ferce
         _TS = _Face::TerstSerppert
         _TS::CIL
       end
 
       it "entry trees get hackishly built" do
-        _TernMern = TS_::Fixtures::Frtrn_TM
+        _TernMern = fixture_directories_::Frtrn_TM
         _TernMern::Kernel_::YEP.should eql :yep
       end
 
       it "at the boundary of an integration with old :+[#027]" do
-        TS_::Fixtures::Twlv_DLI::Glient
+        fixture_directories_::Twlv_DLI::Glient
       end
+    end
+
+    def _name_error
+      Home_::Autoloader::NameError
+    end
+
+    def fixture_directories_
+      TS_::FixtureDirectories
     end
   end
 end

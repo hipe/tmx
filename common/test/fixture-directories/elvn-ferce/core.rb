@@ -1,5 +1,5 @@
 module Skylab::Common::TestSupport
-  module Autoloader::Fixtures::Elvn_Ferce
+  module FixtureDirectories::Elvn_Ferce
     Autoloader_[ self ]
 
     stowaway :TerstSerppert, 'terst/terst-serppert'

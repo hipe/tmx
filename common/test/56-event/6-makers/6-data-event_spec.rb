@@ -2,35 +2,41 @@ require_relative '../../test-support'
 
 module Skylab::Common::TestSupport
 
-  module Evnt_Clss_Fctrs_DtEvnt___  # :+#throwaway-module for below consts
+  describe "[co] event - makers - data event" do
 
-    # <-
-
-  TS_.describe "[co] event - makers - data event" do
+    TS_[ self ]
+    use :memoizer_methods
 
     subject = -> do
       Home_::Event.data_event_class_maker
     end
 
     before :all do
-      Some_Data_Event = subject[].new :countizzle, :objectizzle
+      X_e_m_DataEvent = subject[].new :countizzle, :objectizzle
     end
 
     it "loads (builds class)" do
     end
 
-    it "easy way to build an event class that has no message proc, is OK" do
-      ev = Some_Data_Event[ 43, :_hi_ ]
-      ev_ = Some_Data_Event[ 43, :_hi_ ]
-      ev.ok.should eql true
-      ev.countizzle.should eql 43
-      ev_.countizzle.should eql ev.countizzle
-      ev.objectizzle.should eql :_hi_
-      ( ev.object_id == ev_.object_id ).should eql false
-      ev.class.should eql ev_.class
-      ev.message_proc.should be_nil
+    context "easy way to build an event class that has no message proc, is OK" do
+
+      shared_subject :_obj do
+        X_e_m_DataEvent[ 43, :_hi_ ]
+      end
+
+      it "the custom properties are there" do
+        o = _obj
+        o.countizzle == 43 || fail
+        o.objectizzle == :_hi_ || fail
+      end
+
+      it "by default, is OK" do
+        _obj.ok || fail
+      end
+
+      it "no message proc" do
+        _obj.message_proc && fail
+      end
     end
-  end
-# ->
   end
 end

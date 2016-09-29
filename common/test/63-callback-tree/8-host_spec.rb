@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::CallbackTree
+module Skylab::Common::TestSupport
 
   describe "[co] callback tree - host " do
 
@@ -8,7 +8,7 @@ module Skylab::Common::TestSupport::CallbackTree
 
       before :all do
 
-        class Mazlo
+        class X_ct_hs_Mazlow
           Home_::CallbackTree::Host[ self ]
           spec = build_mutable_callback_tree_specification
           spec.default_pattern :listeners
@@ -30,16 +30,16 @@ module Skylab::Common::TestSupport::CallbackTree
       end
 
       it "creates the thing" do
-        Mazlo.should be_const_defined :Common_Tree__
+        X_ct_hs_Mazlow.should be_const_defined :Common_Tree__
       end
 
       it "builds the thing" do
-        maz = Mazlo.new
+        maz = X_ct_hs_Mazlow.new
         maz.should be_instance_variable_defined :@callbacks
       end
 
       it "can get busy" do
-        maz = Mazlo.new ; y = z = nil
+        maz = X_ct_hs_Mazlow.new ; y = z = nil
         maz.add_pow_listener -> x { y = x }
         maz.add_pow_listener -> x { z = x }
         r = maz.pow :hi

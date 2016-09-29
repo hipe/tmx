@@ -4,10 +4,9 @@ module Skylab::Common::TestSupport
 
   class << self
 
-    def etc_ tcc
-      tcc.extend ModuleMethods
-      tcc.include InstanceMethods
-      NIL_
+    def [] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
     end
 
     def call_digraph_listeners_spy *a
@@ -21,18 +20,16 @@ module Skylab::Common::TestSupport
   end  # >>
 
   Home_ = ::Skylab::Common
-    Autoloader_ = Home_::Autoloader
+
+  Autoloader_ = Home_::Autoloader
 
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
   extend TestSupport_::Quickie
 
   TS_ = self
-  TestSupport_::Regret[ self, ::File.dirname( __FILE__ ) ]
 
-  define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
-
-  module ModuleMethods
+  module ModuleMethods___
 
     define_method :use, -> do
 
@@ -50,7 +47,7 @@ module Skylab::Common::TestSupport
     end.call
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def debug!
       @do_debug = true ; nil
@@ -74,7 +71,19 @@ module Skylab::Common::TestSupport
     end
   end
 
-  # ~ singles
+  # --
+
+  module FixtureTreesVolatile
+    Autoloader_[ self ]
+  end
+
+  module FixtureFiles
+    Autoloader_[ self ]
+  end
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  # --
 
   ACHIEVED_ = Home_::ACHIEVED_
   EMPTY_A_ = Home_::EMPTY_A_
@@ -82,13 +91,4 @@ module Skylab::Common::TestSupport
   NEWLINE_ = "\n".freeze
   NIL_ = nil
   UNABLE_ = false
-
-  # ~ give these to the children
-
-  module Constants
-    Home_ = Home_
-    EMPTY_A_ = EMPTY_A_
-    KEEP_PARSING_ = KEEP_PARSING_
-    TestSupport_ = TestSupport_
-  end
 end

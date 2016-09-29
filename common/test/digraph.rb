@@ -1,17 +1,13 @@
-require_relative '../test-support'
+module Skylab::Common::TestSupport
 
-module Skylab::Common::TestSupport::Digraph
+  module Digraph
 
-  ::Skylab::Common::TestSupport[ Digraph_TestSupport = self ] # #regret
+    def self.[] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
 
-  include Constants
-
-  Home_ = Home_
-
-  extend TestSupport_::Quickie
-
-  module ModuleMethods
-    include Constants
+    module ModuleMethods___
     include Home_.lib_.basic::Class::Creator::ModuleMethods
 
     def inside &b                 # define the dsl-ish klass body to be somthing
@@ -23,7 +19,8 @@ module Skylab::Common::TestSupport::Digraph
       define_method name, & Home_.memoize( & func )
       nil
     end
-  end
+
+    end
 
   B_D_E___ = -> * a, i, esg do
     if a.length.zero?
@@ -59,9 +56,11 @@ module Skylab::Common::TestSupport::Digraph
     end.call
   end
 
-  module InstanceMethods
+  module InstanceMethods___
 
     include Home_.lib_.basic::Class::Creator::InstanceMethods
+
+    define_singleton_method :let, TestSupport_::Let::LET_METHOD
 
     let :meta_hell_anchor_module do ::Module.new end
 
@@ -69,7 +68,7 @@ module Skylab::Common::TestSupport::Digraph
 
     let :klass do                 # working in conjunction w/ `inside` below,
       blk = inside                # make a Common empowered class and nerk it
-      kls = Digraph_TestSupport.const_set :"KLS_#{ counter += 1 }", ::Class.new
+      kls = Here_.const_set :"KLS_#{ counter += 1 }", ::Class.new
       kls.class_exec do
         Home_[ self, :employ_DSL_for_digraph_emitter ]
         public :call_digraph_listeners  # [#002] public for testing
@@ -85,5 +84,8 @@ module Skylab::Common::TestSupport::Digraph
 
     def inside                    # the inside def dsl-ish part of a klass
     end
+  end
+
+    Here_ = self
   end
 end

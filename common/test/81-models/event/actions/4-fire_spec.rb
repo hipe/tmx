@@ -4,8 +4,8 @@ module Skylab::Common::TestSupport
 
   describe "[co] [..] fire" do
 
-    extend TS_
-    TS_::Expect_Event[ self ]
+    TS_[ self ]
+    use :expect_event
 
     it "with the ideal case - works" do
 
@@ -14,7 +14,7 @@ module Skylab::Common::TestSupport
       call_API(
         :fire,
         :file, _path,
-        :const, 'Skylab::Common::TestSupport::Fixtures::ZigZag',
+        :const, 'Skylab::Common::TestSupport::FixtureFiles::ZigZag',
         :channel, 'hacking'
       )
 

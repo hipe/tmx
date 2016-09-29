@@ -1,4 +1,4 @@
-module Skylab::Common::TestSupport::Autoloader::Fixtures
+module Skylab::Common::TestSupport::FixtureDirectories
 
   class Seven_Son::Child < Seven_Son::Parent
 

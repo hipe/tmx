@@ -2,6 +2,8 @@ module Skylab::Common::TestSupport
 
   module Expect_Event::Meta
 
+    # (NOTE can be found as `use :expect_event_meta`)
+
     # NOTE as part of its public API this node makes a future-compatible
     # promise never to override the failure methods of our test librarires.
     # (do that elsewhere when necessary).

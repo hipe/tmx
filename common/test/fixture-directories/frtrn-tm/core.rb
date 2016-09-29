@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Autoloader::Fixtures::Frtrn_TM
+  module FixtureDirectories::Frtrn_TM
 
     Autoloader_[ self ]
 

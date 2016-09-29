@@ -1,13 +1,13 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Autoloader
+module Skylab::Common::TestSupport
 
   describe "[co] autoloader const reduce is an improvement on boxxy" do
 
     context "in that from the ground up it does not assume a mutated module" do
 
       before :all do
-        module Foo1
+        module X_a_c_Foo1
           module Bar_Biff
             Baz = :some_x
           end
@@ -16,14 +16,14 @@ module Skylab::Common::TestSupport::Autoloader
 
       it "normative use-case" do
 
-        _ = _subject %i( bar_biff baz ), Foo1
+        _ = _subject %i( bar_biff baz ), X_a_c_Foo1
         _ == :some_x or fail
       end
 
       it "& it has an explicit form of syntax (tight form, remote ctx)" do
 
         _ = _subject(
-          :from_module, Foo1,
+          :from_module, X_a_c_Foo1,
           :const_path, %i( bar_biff baz ),
         )
         _ == :some_x or fail
@@ -32,11 +32,11 @@ module Skylab::Common::TestSupport::Autoloader
       it "& it is infinitely extensible (one day) (long form, local ctx)" do
 
         _rx = %r(\Aname_error: uninitialized constant #{
-          }[A-Za-z:]+::Foo1::Bar_Biff::\( ~ cowabungaa \) \(cowabungaa\))
+          }[A-Za-z:]+::X_a_c_Foo1::Bar_Biff::\( ~ cowabungaa \) \(cowabungaa\))
 
         _ = _subject(
 
-          :from_module, Foo1,
+          :from_module, X_a_c_Foo1,
           :const_path, %i( bar_biff cowabungaa bowzer ),
 
         ) do | name_error_event |
@@ -52,7 +52,7 @@ module Skylab::Common::TestSupport::Autoloader
       it "invalid const name when just normal style - name error X" do
 
         begin
-          _subject %i( 123fml ), Foo1
+          _subject %i( 123fml ), X_a_c_Foo1
         rescue ::NameError => e
         end
 
@@ -62,7 +62,7 @@ module Skylab::Common::TestSupport::Autoloader
       it "invalid const name and your else block takes one arg - o" do
 
         ev = nil
-        _ = _subject %(123fml), Foo1 do |ev_|
+        _ = _subject %(123fml), X_a_c_Foo1 do |ev_|
           ev = ev_ ; :hi
         end
 
@@ -78,7 +78,7 @@ module Skylab::Common::TestSupport::Autoloader
 
       it "invalid const name and your else block takes no args - X" do
 
-        _x = _subject %i( 123fml ), Foo1 do :x end
+        _x = _subject %i( 123fml ), X_a_c_Foo1 do :x end
 
         :x == _x or fail
       end
@@ -86,18 +86,18 @@ module Skylab::Common::TestSupport::Autoloader
       it "const not found and your else block takes one arg - o" do
 
         ev = nil
-        _ = _subject %i( bar_biff boon_doggle bizzle ), Foo1 do |ev_|
+        _ = _subject %i( bar_biff boon_doggle bizzle ), X_a_c_Foo1 do |ev_|
           ev = ev_ ; :hi
         end
 
         _ == :hi or fail
-        ev.mod == Foo1::Bar_Biff or fail
+        ev.mod == X_a_c_Foo1::Bar_Biff or fail
         ev.name == :boon_doggle or fail
       end
 
       it "const not found and your else block takes no args - o" do
 
-        _ = _subject %i(who_hah), Foo1 do :x end
+        _ = _subject %i(who_hah), X_a_c_Foo1 do :x end
         _ == :x or fail
       end
     end
@@ -105,7 +105,7 @@ module Skylab::Common::TestSupport::Autoloader
     context "currently it tries 2 name conventions" do
 
       before :all do
-        module Foo2
+        module X_a_c_Foo2
           module BarBiff
             NCSA_Spy = :some_y
           end
@@ -114,7 +114,7 @@ module Skylab::Common::TestSupport::Autoloader
 
       it "and you have no say in the matter" do
 
-        _ = _subject %i( bar_biff NCSA_spy ), Foo2
+        _ = _subject %i( bar_biff NCSA_spy ), X_a_c_Foo2
         _ == :some_y or fail
       end
     end
@@ -122,7 +122,7 @@ module Skylab::Common::TestSupport::Autoloader
     context "transitional hacks - result in name and value.." do
 
       before :all do
-        module Foo3
+        module X_a_c_Foo3
           NCSA_Spy = :x
           Autoloader_[ self ]
         end
@@ -133,7 +133,7 @@ module Skylab::Common::TestSupport::Autoloader
         pair = _subject(
 
           :const_path, %i( NCSASpy ),
-          :from_module, Foo3,
+          :from_module, X_a_c_Foo3,
           :result_in_name_and_value,
         )
 
@@ -147,44 +147,44 @@ module Skylab::Common::TestSupport::Autoloader
     context "with an (autolaoded) node that resolves its own dir_pathname" do
 
       it "make sure autoloading is not broken at this node" do
-        TS_::Const_Reduce::Fixtures.dir_pathname
+        fixture_tree_.dir_pathname
       end
 
       it "(loads, has dir_pathname, ancestor chain is not mutated)" do
 
-        mod = TS_::Const_Reduce::Fixtures::One_Skorlab
+        mod = fixture_tree_::One_Skorlab
 
         mod.singleton_class.ancestors[ 1 ] == ::Module or fail  # eew
 
         _ = mod.dir_pathname.to_path
-        _ =~ %r(fixtures/one-skorlab\z) or fail
+        _ =~ %r(fixture-tree/one-skorlab\z) || fail
       end
 
       it "with a node that is not itself designed to autoload" do
 
         pair = _subject(
           :result_in_name_and_value,
-          :from_module, TS_::Const_Reduce::Fixtures::One_Skorlab,
+          :from_module, fixture_tree_::One_Skorlab,
           :path_x, :Infermation_Terktix,
         )
 
         pair.name_x == :InfermationTerktix or fail
-        pair.value_x.name =~ %r(Fixtures::One_Skorlab::InfermationTerktix\z) or fail
+        pair.value_x.name =~ %r(FixtureTree::One_Skorlab::InfermationTerktix\z) or fail
       end
 
       it "the same as above but value only (name correction)" do
 
         _mod = _subject(
-          :from_module, TS_::Const_Reduce::Fixtures::Two_Skorlab,
+          :from_module, fixture_tree_::Two_Skorlab,
           :path_x, :Infermation_Terktix,
         )
 
-        _mod.name =~ %r(Fixtures::Two_Skorlab::InfermationTerktix\z) or fail
+        _mod.name =~ %r(FixtureTree::Two_Skorlab::InfermationTerktix\z) or fail
       end
 
       it "if you want name correction on a boxxy module, you need one option" do
 
-        _a = TS_::Const_Reduce::Fixtures
+        _a = fixture_tree_
 
         _b = _a::Tre_Skorlab  # #spot-2
 
@@ -204,13 +204,13 @@ module Skylab::Common::TestSupport::Autoloader
       # do not autoload this node, because we want the creation of its
       # entry tree to be its own and not its parent's
 
-      _path = TS_::Const_Reduce::Fixtures.dir_pathname.to_path
+      _path = fixture_tree_.dir_pathname.to_path
 
       _load_me = ::File.join _path, 'for-skerlerb/core.rb'
 
       load _load_me
 
-      _Skylab = TS_::Const_Reduce::Fixtures::For_Skerlerb
+      _Skylab = fixture_tree_::For_Skerlerb
 
       _hi = _subject %i( Infermershern ), _Skylab
 
@@ -223,6 +223,10 @@ module Skylab::Common::TestSupport::Autoloader
       # for the performer, but meh that's not the focus)
 
       Home_::Autoloader::Const_Reduction__.new( x_a, & x_p ).execute
+    end
+
+    def fixture_tree_
+      TS_::FixtureTree
     end
   end
 end

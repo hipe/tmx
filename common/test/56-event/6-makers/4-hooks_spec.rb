@@ -4,7 +4,8 @@ module Skylab::Common::TestSupport
 
   describe "[co] event - makers - hooks" do
 
-    extend TS_
+    TS_[ self ]
+    use :memoizer_methods
 
     it "loads" do
       _subject_module
@@ -40,10 +41,9 @@ module Skylab::Common::TestSupport
       _class.new
     end
 
-    dangerous_memoize_ :_class do
+    dangerous_memoize :_class do
 
-      TS_::E_M_Hooks_1 = _subject_module.new :win, :loss
-
+      X_e_m_Hooks = _subject_module.new :win, :loss
     end
 
     it "use optional block to add more"

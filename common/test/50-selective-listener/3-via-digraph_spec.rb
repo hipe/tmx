@@ -1,13 +1,14 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport
 
   describe "[co] selective listener - via digraph [emitter]" do
 
-    extend TS__
+    TS_[ self ]
+    use :selective_listener
 
     before :all do
-      class Digraph_FD
+      class X_sl_vd_Digraph
         def initialize a
           @a = a
         end
@@ -23,18 +24,23 @@ module Skylab::Common::TestSupport::Selective_Listener
     end
 
     it "must have same arity - (a deep bug lurks behind this) - X" do
-      -> do
+
+      _rx = /\bwrong number of arguments \(3 for 2\)/
+
+      begin
         listener.maybe_receive_event :one, :two, :_no_see_
-      end.should raise_error ::ArgumentError,
-        /\bwrong number of arguments \(3 for 2\)/
+      rescue ::ArgumentError => e
+      end
+
+      e.message =~ _rx || fail
     end
 
     def build_listener
-      Subject_[].via_digraph_emitter emitter
+      subject_module_.via_digraph_emitter emitter
     end
 
     def build_digraph_emitter
-      Digraph_FD.new( @a = [] )
+      X_sl_vd_Digraph.new( @a = [] )
     end
   end
 end

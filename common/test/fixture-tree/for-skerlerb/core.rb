@@ -1,12 +1,9 @@
-module Skylab::Common::TestSupport::Autoloader
+module Skylab::Common::TestSupport
 
-  module Const_Reduce
+  module FixtureTree::For_Skerlerb
 
-    module Fixtures::For_Skerlerb
-
-      dpn = TS_.dir_pathname.join 'const-reduce/fixtures/for-skerlerb'
+      dpn = TS_.dir_pathname.join 'fixture-tree/for-skerlerb'
       define_singleton_method :dir_pathname do dpn end
 
-    end
   end
 end

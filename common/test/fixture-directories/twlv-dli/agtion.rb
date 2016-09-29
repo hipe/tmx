@@ -1,4 +1,4 @@
-module Skylab::Common::TestSupport::Autoloader::Fixtures
+module Skylab::Common::TestSupport::FixtureDirectories
   module Twlv_DLI::Agtion
   end
 end

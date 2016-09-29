@@ -1,16 +1,17 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport
 
   describe "[co] selective listener - make via didactic matrix" do
 
-    extend TS__
+    TS_[ self ]
+    use :selective_listener
 
     before :all do
 
-      Mofo_CFDM = Subject_[].make_via_didactic_matrix [ :info, :error ], [ :string, :line ]
+      X_sl_mvm_Mofo = Home_::Selective_Listener.make_via_didactic_matrix [ :info, :error ], [ :string, :line ]
 
-      class Digraph_CFDM
+      class X_sl_mvm_Digraph
         def initialize a
           @a = a
         end
@@ -26,21 +27,26 @@ module Skylab::Common::TestSupport::Selective_Listener
     end
 
     -> do
+
       msg = "no such shape 'event'. did you mean 'string' or 'line'?"
 
       it "#{ msg } - X" do
-        -> do
+
+        begin
           listener.maybe_receive_event :info, :event, :hi
-        end.should raise_error ::KeyError, msg
+        rescue ::KeyError => e
+        end
+
+        e.message == msg || fail
       end
     end.call
 
     def build_digraph_emitter
-      Digraph_CFDM.new( @a = [] )
+      X_sl_mvm_Digraph.new( @a = [] )
     end
 
     def build_listener
-      Mofo_CFDM.new emitter
+      X_sl_mvm_Mofo.new emitter
     end
   end
 end

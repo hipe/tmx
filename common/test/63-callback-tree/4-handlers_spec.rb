@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::CallbackTree
+module Skylab::Common::TestSupport
 
   describe "[co] callback tree - handlers" do
 

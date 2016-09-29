@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Fixtures::WhoHah
+  module FixtureFiles::WhoHah
 
     Home_[ self, :employ_DSL_for_digraph_emitter ]
 

@@ -4,7 +4,7 @@ module Skylab::Common::TestSupport
 
   describe "[co] box - as" do
 
-    extend TS_
+    TS_[ self ]
     use :box_support
 
     context "retrieve" do

@@ -21,7 +21,7 @@ module Skylab::Common::TestSupport
     # as such; if the method has no leading underscores it's the one being
     # tested. otherwise it's a method assisting in the test. whew!
 
-    TS_.etc_ self
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event_meta
     use :expect_event

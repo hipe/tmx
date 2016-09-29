@@ -1,12 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Digraph
-
-  # Quickie.
+module Skylab::Common::TestSupport
 
   describe "[co] digraph" do
 
-    extend Digraph_TestSupport
+    TS_[ self ]
+    use :digraph
 
     # --*--
 

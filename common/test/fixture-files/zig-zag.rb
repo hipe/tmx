@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  class Fixtures::ZigZag
+  class FixtureFiles::ZigZag
 
     Home_[ self, :employ_DSL_for_digraph_emitter ]
 

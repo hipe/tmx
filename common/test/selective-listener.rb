@@ -1,16 +1,13 @@
-require_relative '../test-support'
+module Skylab::Common::TestSupport
 
-module Skylab::Common::TestSupport::Selective_Listener
+  module Selective_Listener
 
-  ::Skylab::Common::TestSupport[ TS__ = self ]
+    def self.[] tcc
+      tcc.include InstanceMethods___
+    end
 
-  include Constants
+    module InstanceMethods___
 
-  Home_ = Home_
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
     def client
       @client ||= build_client
     end
@@ -23,13 +20,10 @@ module Skylab::Common::TestSupport::Selective_Listener
     def subject
       @subject ||= build_subject
     end
-  end
 
-  Subject_ = -> * x_a do
-    if x_a.length.zero?
-      Home_::Selective_Listener
-    else
-      Home_::Selective_Listener[ * x_a ]
+      def subject_module_
+        Home_::Selective_Listener
+      end
     end
   end
 end

@@ -4,7 +4,7 @@ module Skylab::Common::TestSupport
 
   describe "[co] expect event - (2) mode state failure, debug, ignore" do
 
-    TS_.etc_ self
+    TS_[ self ]
     use :expect_event_meta
     use :expect_event
 

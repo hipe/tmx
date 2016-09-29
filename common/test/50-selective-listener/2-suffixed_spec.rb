@@ -1,13 +1,14 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport
 
   describe "[co] selective listener - suffixed" do
 
-    extend TS__
+    TS_[ self ]
+    use :selective_listener
 
     before :all do
-      class Client_SFFXD
+      class X_sl_s_Client
         def initialize a
           @a = a
         end
@@ -28,19 +29,24 @@ module Skylab::Common::TestSupport::Selective_Listener
     end
 
     it "when an unsupported channel name is emitted - X" do
-      -> do
+
+      _rx = /\bundefined method `montoya_from_agent'/
+
+      begin
         listener.maybe_receive_event :montoya, :_no_see_
-      end.should raise_error ::NoMethodError,
-        /\bundefined method `montoya_from_agent'/
+      rescue ::NoMethodError => e
+      end
+
+      e.message =~ _rx
     end
 
     def build_listener
-      Subject_[].suffixed client, :from_agent
+      subject_module_.suffixed client, :from_agent
     end
 
     def build_client
       @a = []
-      Client_SFFXD.new @a
+      X_sl_s_Client.new @a
     end
   end
 end

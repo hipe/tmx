@@ -1,6 +1,6 @@
-module Skylab::Common::TestSupport::Autoloader
+module Skylab::Common::TestSupport
 
-  module Const_Reduce::Fixtures::Tre_Skorlab
+  module FixtureTree::Tre_Skorlab
 
     Autoloader_[ self, :boxxy ]  # what is tested
   end

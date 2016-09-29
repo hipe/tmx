@@ -1061,7 +1061,7 @@ module Skylab::Common
           }#{ @mod.name }::#{ @name.as_const } #{
            }and no directory[file] #{
             }#{ @mod.dir_pathname }/#{ @name.as_slug }[#{ EXTNAME_ }]"
-        raise ::NameError, _say
+        raise NameError_, _say
       end
 
       def __result_when_not_loaded
@@ -1133,7 +1133,7 @@ module Skylab::Common
           if zero_p
             zero_p[]
           else
-            raise ::NameError, __say_zero( name, mod )
+            raise NameError_, __say_zero( name, mod )
           end
 
         when  0
@@ -1147,7 +1147,7 @@ module Skylab::Common
           if many_p
             many_p[ a ]
           else
-            raise ::NameError, __say_ambiguous( a, name, mod )
+            raise NameError_, __say_ambiguous( a, name, mod )
           end
         end
       end
@@ -1792,7 +1792,7 @@ module Skylab::Common
         until node.can_produce_load_file_path
           node_ = node.any_file_normpath
           node_ ||= node.any_dir_normpath
-          node_ or raise ::NameError, say_no_recurse( node )
+          node_ or raise NameError_, say_no_recurse( node )
           node = node_
           node.change_state_to :loading
           a << node
@@ -1931,6 +1931,8 @@ module Skylab::Common
     end
 
     Autoloader_ = self
+    NameError = ::Class.new ::NameError
+    NameError_ = NameError  # be more clear
   end
 
   Autoloader[ Actor ]
@@ -2141,7 +2143,7 @@ module Skylab::Common
           if VALID_CONST_RX_ =~ s
             Here_._via_normal_string_ s
           else
-            raise ::NameError, ___say_wrong_const_name( s )
+            raise Autoloader::NameError, ___say_wrong_const_name( s )
           end
         end
 

@@ -1,4 +1,4 @@
 
-Skylab::Common::TestSupport::Autoloader::
+Skylab::Common::TestSupport::
 
-  Fixtures::Six_Bersic::Merterx::Hersh = ::Class.new
+  FixtureDirectories::Six_Bersic::Merterx::Hersh = ::Class.new

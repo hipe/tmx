@@ -1,16 +1,17 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Selective_Listener
+module Skylab::Common::TestSupport
 
   describe "[co] selective listener - emission matrix" do
 
-    extend TS__
+    TS_[ self ]
+    use :selective_listener
 
     before :all do
 
-      class Goofis_EM
+      class X_sl_em_Goofis
 
-        Subject_.call self,
+        Home_::Selective_Listener.call self,
           :emission_matrix, [ :inf, :err ], [ :ln, :str ]
 
         def initialize listener
@@ -18,7 +19,7 @@ module Skylab::Common::TestSupport::Selective_Listener
         end
       end
 
-      class Listener_EM
+      class X_sl_em_Listener
         def initialize a
           @a = a ; nil
         end
@@ -40,11 +41,11 @@ module Skylab::Common::TestSupport::Selective_Listener
     end
 
     def build_listener
-      Listener_EM.new( @a = [] )
+      X_sl_em_Listener.new( @a = [] )
     end
 
     def build_subject
-      Goofis_EM.new listener
+      X_sl_em_Goofis.new listener
     end
   end
 end

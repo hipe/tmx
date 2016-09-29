@@ -1,8 +1,6 @@
-module Skylab::Common::TestSupport::Autoloader
+module Skylab::Common::TestSupport
 
-  module Const_Reduce
-
-    module Fixtures::For_Skerlerb
+    module FixtureTree::For_Skerlerb
 
       module Infermershern
 
@@ -10,5 +8,4 @@ module Skylab::Common::TestSupport::Autoloader
 
       end
     end
-  end
 end

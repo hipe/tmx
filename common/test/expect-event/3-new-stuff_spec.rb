@@ -4,7 +4,7 @@ module Skylab::Common::TestSupport
 
   describe "[co] expect event - (3) new stuff" do
 
-    TS_.etc_ self
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event_meta
     use :expect_event

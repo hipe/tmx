@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::CallbackTree
+module Skylab::Common::TestSupport
 
   describe "[co] callback tree - mutable shell" do
 
@@ -8,7 +8,7 @@ module Skylab::Common::TestSupport::CallbackTree
 
       before :all do
 
-        class Wap_Zazzle
+        class X_ct_ms_WapZazzle
           Home_::CallbackTree::Host[ self ]
           spec = build_mutable_callback_tree_specification
           spec.default_pattern :callback
@@ -20,7 +20,7 @@ module Skylab::Common::TestSupport::CallbackTree
       end
 
       it "build yielder for (and test new 'callback' pattern)" do
-        cb = Wap_Zazzle.new.callbacks
+        cb = X_ct_ms_WapZazzle.new.callbacks
         y = cb.build_yielder_for :waff ; z = nil
         cb.set_callback :waff, -> x { z = x }
         y << :neet
@@ -28,7 +28,7 @@ module Skylab::Common::TestSupport::CallbackTree
       end
 
       it "mutable shell builds" do
-        Wap_Zazzle.new.callbacks.build_mutable_shell
+        X_ct_ms_WapZazzle.new.callbacks.build_mutable_shell
       end
 
       it "mutable shell single arg proc form" do
@@ -44,7 +44,7 @@ module Skylab::Common::TestSupport::CallbackTree
       end
 
       def same
-        cb = Wap_Zazzle.new.callbacks
+        cb = X_ct_ms_WapZazzle.new.callbacks
         cond = cb.build_mutable_shell
         yield cond
         cb.call_callback :wiff, :merp

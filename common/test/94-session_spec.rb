@@ -4,31 +4,31 @@ module Skylab::Common::TestSupport
 
   describe "[co] session - ivars with procs as methods" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     it "enhance a class via enabling ivars to hold procs that act as methods" do
 
-      class Foo
+      class X_s_Foo
         def initialize
           @bar = -> { :baz }
         end
         Home_::Session::Ivars_with_Procs_as_Methods[ self, :bar ]
       end
 
-      Foo.new.bar.should eql :baz
+      X_s_Foo.new.bar.should eql :baz
     end
 
     it "you can indicate an ivar with a name other than the method name" do
 
-      class Bar
+      class X_s_Bar
         def initialize
           @_secret = -> { :ting }
         end
         Home_::Session::Ivars_with_Procs_as_Methods[ self, :@_secret, :wahoo ]
       end
 
-      Bar.new.wahoo.should eql :ting
+      X_s_Bar.new.wahoo.should eql :ting
     end
 
     context "you can use the DSL to control visibility" do
@@ -77,13 +77,13 @@ module Skylab::Common::TestSupport
 
     it "you can use the struct-like producer to create the class automatically" do
 
-      Wahoo = Home_::Session::Ivars_with_Procs_as_Methods.new :fief do
+      X_s_Wahoo = Home_::Session::Ivars_with_Procs_as_Methods.new :fief do
         def initialize
           @fief = -> { :zap }
         end
       end
 
-      Wahoo.new.fief.should eql :zap
+      X_s_Wahoo.new.fief.should eql :zap
     end
   end
 end

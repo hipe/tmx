@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::CallbackTree
+module Skylab::Common::TestSupport
 
   describe "[co] callback tree - listeners" do
 
@@ -15,16 +15,26 @@ module Skylab::Common::TestSupport::CallbackTree
       end
 
       it "try to add a listener for a nonexist channel" do
-        -> do
+
+        _rx = /\Athere is no 'no_existo' channel at the 'root' node/
+
+        begin
           callbacks.add_listener :no_existo, :_fake_p_
-        end.should raise_error ::KeyError,
-          /\Athere is no 'no_existo' channel at the 'root' node/
+        rescue ::KeyError => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "try to call a call that goes off the end" do
-        -> do
+
+        _rx = /\Aoff the end: 'feeple_deeple'/
+        begin
           callbacks.call_listeners :za_zang, :feeple_deeple do :xyzizzy end
-        end.should raise_error ::KeyError, /\Aoff the end: 'feeple_deeple'/
+        rescue ::KeyError => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       let :callbacks do
@@ -35,10 +45,15 @@ module Skylab::Common::TestSupport::CallbackTree
     context "a typical listeners tree" do
 
       it "calling an event outside of the tree is a no-no" do
-        -> do
+
+        _rx = /\Ano 'i_am' at this node\. the only known node is 'error'\z/
+
+        begin
           callbacks.call_listeners :i_am, :not_there do self._never_see_ end
-        end.should raise_error ::KeyError, /\Ano 'i_am' at this node\. #{
-          }the only known node is 'error'\z/
+        rescue ::KeyError => e
+        end
+
+        e.message =~ _rx || fail
       end
 
       it "no listeners: not only does no body hear it, but it doesn't fall" do

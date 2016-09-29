@@ -4,7 +4,8 @@ module Skylab::Common::TestSupport
 
   describe "[co] event - makers - structured expressive" do
 
-    extend TS_
+    TS_[ self ]
+    use :memoizer_methods
 
     it "loads" do
       _subject_module
@@ -27,10 +28,9 @@ module Skylab::Common::TestSupport
       o.to_a.should eql [ 'A', 'B',  nil ]
     end
 
-    dangerous_memoize_ :_structured_class do
+    shared_subject :_structured_class do
 
-      TS_::E_M_SE_01 = _subject_module.new :a, :b, :c
-
+      X_e_m_SE_01 = _subject_module.new :a, :b, :c
     end
 
     it "expressive guy makes" do
@@ -51,11 +51,11 @@ module Skylab::Common::TestSupport
       _y.should eql [ '"ONE", "TWO"' ]
     end
 
-    dangerous_memoize_ :_expressive_class do
+    shared_subject :_expressive_class do
 
       _mod = _subject_module
 
-      TS_::E_M_SE_02 = _mod.new do | one, two |
+      X_e_m_SE_02 = _mod.new do | one, two |
 
         "#{ code one }, #{ ick two }"
       end

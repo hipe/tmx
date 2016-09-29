@@ -1,4 +1,4 @@
-module Skylab::Common::TestSupport::Autoloader::Const_Reduce::Fixtures::
+module Skylab::Common::TestSupport::FixtureTree::
     One_Skorlab
   module InfermationTerktix
   end

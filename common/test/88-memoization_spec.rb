@@ -4,7 +4,7 @@ module Skylab::Common::TestSupport
 
   describe "[co] memoization" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "here's an example of enhancing a class with the enhancer function" do

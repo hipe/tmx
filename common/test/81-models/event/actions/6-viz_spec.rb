@@ -4,8 +4,8 @@ module Skylab::Common::TestSupport
 
   describe "[co] [..] viz" do
 
-    extend TS_
-    TS_::Expect_Event[ self ]
+    TS_[ self ]
+    use :expect_event
 
     it "with the ideal case - works" do
 
@@ -16,13 +16,13 @@ module Skylab::Common::TestSupport
         :viz,
         :stdout, io,
         :file, _path,
-        :const, "#{ TS_.name }::Fixtures::WhoHah",
+        :const, "#{ TS_.name }::FixtureFiles::WhoHah",
       )
 
       io.string.should eql <<-HERE.unindent
         digraph {
           node [shape="Mrecord"]
-          label="event stream graph for ::Skylab::Common::TestSupport::Fixtures::WhoHah"
+          label="event stream graph for ::Skylab::Common::TestSupport::FixtureFiles::WhoHah"
           hacking -> business
           hacking -> pleasure
         }

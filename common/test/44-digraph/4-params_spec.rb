@@ -1,10 +1,11 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Common::TestSupport::Digraph
+module Skylab::Common::TestSupport
 
   describe "[co] digraph params - when your handler takes" do
 
-    extend Digraph_TestSupport
+    TS_[ self ]
+    use :digraph
 
     klas = instance_method :klass
 

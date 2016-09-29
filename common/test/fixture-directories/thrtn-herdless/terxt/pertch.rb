@@ -1,4 +1,4 @@
-module Skylab::Common::TestSupport::Autoloader::Fixtures
+module Skylab::Common::TestSupport::FixtureDirectories
   module Thrtn_Herdless
     module Terxt::Pertch
 
