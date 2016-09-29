@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] string - word wrappers - calm" do
 
-    extend TS_
+    TS_[ self ]
     use :string
 
     it "loads" do

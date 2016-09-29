@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] Method" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "a method curry (like that other thing) binds arguments to a bound method call" do

@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] pathname union" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     it "you can build up the union progressively, one path at at time" do

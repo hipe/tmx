@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] pathname normalization" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event
     use :expect_normalization

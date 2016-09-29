@@ -1,14 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Digraph::Core
-
-  ::Skylab::Basic::TestSupport::Digraph[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  Common_ = Common_
+module Skylab::Basic::TestSupport
 
   describe "[ba] digraph" do
 

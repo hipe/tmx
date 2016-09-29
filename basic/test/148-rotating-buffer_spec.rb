@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] rotating buffer" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "construct a rotating buffer with a positive integer indicating the" do

@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] string - succ" do
 
-    extend TS_
+    TS_[ self ]
     use :string
 
     it "minimal" do

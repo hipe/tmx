@@ -1,6 +1,6 @@
 module Skylab::Basic::TestSupport
 
-  module Module::As::Unbound::Support
+  module Module::As_Unbound
 
     def self.[] tcc
       tcc.include self

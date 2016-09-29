@@ -4,8 +4,8 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] class - creator" do
 
-    extend TS_
-    use :class_creator_define_klass, Cls_Crtr_C___ = ::Module.new
+    TS_[ self ]
+    use :class_creator, Cls_Crtr_C___ = ::Module.new
 
     context "lets you define a minimal class with \"klass\" which" do
 

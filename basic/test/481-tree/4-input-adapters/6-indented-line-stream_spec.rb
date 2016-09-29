@@ -1,12 +1,12 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - via indented line stream" do
 
-    extend TS_
-
+    TS_[ self ]
     use :expect_event
+    use :tree
 
     it "none" do
       _against_lines nil
@@ -154,7 +154,7 @@ module Skylab::Basic::TestSupport::Tree_TS
 
       _oes_p = handle_event_selectively_
 
-      @tree = Subject_[].via(
+      @tree = subject_module_.via(
         :indented_line_stream, @lines,
         :build_using, handle_build,
         :glyph, '+ ',

@@ -1,4 +1,4 @@
-require_relative 'auto/test-support'
+require_relative '../sexp'
 
 module Skylab::Basic::TestSupport
 

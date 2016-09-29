@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] function (chain)" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "compose a \"function chain\" with a list of functions" do

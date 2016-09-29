@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] range normalization" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     it "outside left" do

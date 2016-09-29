@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] module creator" do
 
-    extend TS_
+    TS_[ self ]
     use :module_creator_define_klass, ( Mdl_Crtr_Cr__ = ::Module.new )
 
     context "defining a single module" do

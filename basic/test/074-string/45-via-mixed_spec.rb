@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] string - `via_mixed`" do
 
-    extend TS_
+    TS_[ self ]
     use :string
 
     it "a string 10 chars wide gets quoted and becomes 12 characters wide" do

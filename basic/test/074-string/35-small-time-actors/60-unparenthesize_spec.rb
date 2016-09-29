@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] string - small time actors - `unparenthesize` (& core) " do
 
-    extend TS_
+    TS_[ self ]
     use :string
 
     it "loads" do

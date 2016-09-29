@@ -1,10 +1,11 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - expad - text - classified stream from paths" do
 
-    extend TS_
+    TS_[ self ]
+    use :tree
 
     it "3 node triangle" do
 

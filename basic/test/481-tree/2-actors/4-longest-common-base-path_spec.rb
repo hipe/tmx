@@ -1,10 +1,11 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
-  # ->
+  describe "[ba] tree - actors - `longest_common_base_path`" do
 
-    describe "[ba] tree - actors - `longest_common_base_path`" do
+    TS_[ self ]
+    use :tree
 
       it "(does paths to tree and vice-versa)" do
 
@@ -15,14 +16,15 @@ module Skylab::Basic::TestSupport::Tree_TS
           'bb/cc/dd/ee'
         ].freeze
 
-        __paths_via_tree(
-          Subject_[].via :paths, _from_paths
-        ).should eql %w(
+        _tree = subject_module_.via :paths, _from_paths
+        _paths = __paths_via_tree _tree
+        _paths == %w(
           a
           bb/
           bb/cc/
           bb/cc/dd/
-          bb/cc/dd/ee )
+          bb/cc/dd/ee
+        ) || fail
       end
 
       it "when empty" do
@@ -80,16 +82,15 @@ module Skylab::Basic::TestSupport::Tree_TS
       end
 
       def expect s_a
-        Subject_[].via( :paths, @s_a ).
-          longest_common_base_path.should eql s_a
+
+        _ = subject_module_.via :paths, @s_a
+        _act = _.longest_common_base_path
+        _act == s_a || fail
       end
 
       def __paths_via_tree t
         t.to_stream_of( :paths ).to_a
       end
 
-    end
-
-    # <-
-
+  end
 end

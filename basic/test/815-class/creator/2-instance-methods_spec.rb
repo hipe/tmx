@@ -4,8 +4,8 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] class - creator - instance methods" do
 
-    extend TS_
-    use :class_creator_define_klass, Cls_Crtr_IM___ = ::Module.new
+    TS_[ self ]
+    use :class_creator, Cls_Crtr_IM___ = ::Module.new
 
     context "minimal" do
       snip

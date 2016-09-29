@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] proxy - inline" do
 
-    extend TS_
+    TS_[ self ]
 
     it "produce a proxy \"inline\" from a hash-like whose values are procs" do
 

@@ -1,8 +1,11 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - sessions - merge" do
+
+    TS_[ self ]
+    use :tree
 
     it "merge monadic trees - different" do
 
@@ -37,7 +40,7 @@ module Skylab::Basic::TestSupport::Tree_TS
     end
 
     def _tree_via_paths a
-      Subject_[].via :paths, a
+      subject_module_.via :paths, a
     end
 
     def _go

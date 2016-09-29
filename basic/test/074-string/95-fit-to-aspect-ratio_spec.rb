@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] string - fit to aspect ratio" do
 
-    extend TS_
+    TS_[ self ]
     use :string
 
     it "target aspect ratio of 2:3 against 4 pairs" do

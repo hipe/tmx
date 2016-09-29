@@ -1,6 +1,6 @@
 module Skylab::Basic::TestSupport
 
-  module Class::Creator::Define_Klass
+  module Class::Creator
 
     class << self
 

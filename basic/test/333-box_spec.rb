@@ -1,12 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::Box
-
-  ::Skylab::Basic::TestSupport[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::Basic::TestSupport
 
   describe "[ba] box" do
 

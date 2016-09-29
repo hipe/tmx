@@ -4,9 +4,9 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] module - as - unbound: integrate w/ CLI" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_CLI
-    use :module_as_unbound_support
+    use :module_as_unbound
 
     it "1.4 - help" do
 

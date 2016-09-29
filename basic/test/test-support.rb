@@ -4,13 +4,18 @@ module Skylab::Basic
 
   module TestSupport
 
-    TestSupport_ = Autoloader_.require_sidesystem :TestSupport
+    class << self
+      def [] tcc
+        tcc.extend ModuleMethods___
+        tcc.include InstanceMethods___
+      end
+    end  # >>
 
-    TestSupport_::Regret[ TS_ = self, ::File.dirname( __FILE__ ) ]
+    TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
     extend TestSupport_::Quickie
 
-    module ModuleMethods
+    module ModuleMethods___
 
       def use sym, * args
         Use_[ args, sym, self ]
@@ -48,7 +53,7 @@ module Skylab::Basic
       end
     end.call
 
-    module InstanceMethods
+    module InstanceMethods___
 
       def debug!
         @do_debug = true
@@ -112,10 +117,14 @@ module Skylab::Basic
     end
 
     Home_ = ::Skylab::Basic
+
+    Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
     Common_ = Home_::Common_
     EMPTY_A_ = Home_::EMPTY_A_
     EMPTY_S_ = Home_::EMPTY_S_
     NIL_ = nil
+    TS_ = self
 
     module Constants
       Home_ = Home_

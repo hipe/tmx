@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] string - small procs - reverse scanner" do
 
-    extend TS_
+    TS_[ self ]
     use :string
 
     it "abs 2" do

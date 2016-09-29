@@ -1,16 +1,10 @@
 require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Numeric
-
-  ::Skylab::Basic::TestSupport[ TS_ = self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::Basic::TestSupport
 
   describe "[ba] number normalization" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
     use :expect_event
     use :expect_normalization
@@ -22,7 +16,7 @@ module Skylab::Basic::TestSupport::Numeric
     context "the normalizer with no args" do
 
       shared_subject :subject_normalization_ do
-        X_t_n_With_Nothing = _subject_module.new_via_arglist Home_::EMPTY_A_
+        _subject_module.new_via_arglist Home_::EMPTY_A_
       end
 
       it "builds" do
@@ -56,7 +50,7 @@ module Skylab::Basic::TestSupport::Numeric
     context "the normalizer with a minimum" do
 
       shared_subject :subject_normalization_ do
-        X_t_n_Min = _subject_module.new_with :minimum, -3
+        _subject_module.new_with :minimum, -3
       end
 
       it "when input is below minimum (string)" do

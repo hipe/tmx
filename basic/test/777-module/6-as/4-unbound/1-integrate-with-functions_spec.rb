@@ -4,9 +4,9 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] module - as - unbound: kernel integration (assumed func)" do
 
-    extend TS_
+    TS_[ self ]
     use :future_expect
-    use :module_as_unbound_support
+    use :module_as_unbound
 
     context "kernel integration - setup 1" do
 

@@ -1,17 +1,15 @@
-require_relative '../test-support'
+module Skylab::Basic::TestSupport
 
-module Skylab::Basic::TestSupport::Tree_TS
+  module Tree
 
-  ::Skylab::Basic::TestSupport[ TS_ = self, :filename, 'tree' ]
+    def self.[] tcc
+      tcc.include InstanceMethods___
+    end  # >>
 
-  include Constants
-
-  extend TestSupport_::Quickie
-
-  module InstanceMethods
+    module InstanceMethods___
 
     def via_paths_ * x_a
-      Subject_[].via :paths, x_a
+      Home_::Tree.via :paths, x_a
     end
 
     define_method :deindent_, -> do
@@ -21,25 +19,12 @@ module Skylab::Basic::TestSupport::Tree_TS
         s
       end
     end.call
+
+      def subject_module_
+        Home_::Tree
+      end
+    end
   end
-
-  Subject_ = -> do
-    Home_::Tree
-  end
-
-  o = Home_
-
-  Common_ = o::Common_
-  EMPTY_A_ = o::EMPTY_A_
-  EMPTY_P_ = o::EMPTY_P_
-  EMPTY_S_ = o::EMPTY_S_
-  NIL_ = o::NIL_
-
-  module Constants
-    Subject_ = Subject_
-  end
-
-  Home_ = Home_
 end
 
 # #tombstone legacy artifacts of early early test setup

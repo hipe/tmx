@@ -1,13 +1,15 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - expad - paths" do
 
-    extend TS_
+    TS_[ self ]
+    use :tree
+
     it "x." do
 
-      tree = Subject_[].mutable_node.new
+      tree = subject_module_.mutable_node.new
       tree.touch_node 'one/two'
       tree.touch_node 'three/four/five'
       tree.touch_node 'one/six'

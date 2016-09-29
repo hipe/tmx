@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] proxy - makers - functional" do
 
-    extend TS_
+    TS_[ self ]
     use :memoizer_methods
 
     context "make a 'fuctional' proxy class with a list of member names" do

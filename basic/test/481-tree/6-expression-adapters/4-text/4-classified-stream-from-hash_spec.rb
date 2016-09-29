@@ -1,16 +1,17 @@
 # encoding: utf-8
 
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - expad - text = classified stream from hash" do
 
-    extend TS_
+    TS_[ self ]
+    use :tree
 
     it "renders a pretty tree" do
 
-      _node = Subject_[].via :hash,
+      _node = subject_module_.via :hash,
         { :name => "document",
           :children => [
             { :name => "head" },

@@ -1,10 +1,10 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Basic::TestSupport
 
   describe "[ba] queue [action queue] - args" do
 
-    extend TS_
+    TS_[ self ]
     use :queue
 
     memoize_ :subject_class_ do

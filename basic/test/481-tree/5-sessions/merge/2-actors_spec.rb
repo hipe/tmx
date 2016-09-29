@@ -1,8 +1,11 @@
-require_relative '../../test-support'
+require_relative '../../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - sessions - merge - actors" do
+
+    TS_[ self ]
+    use :tree
 
     it "loads" do
 
@@ -61,7 +64,7 @@ module Skylab::Basic::TestSupport::Tree_TS
     end
 
     def _subject
-      Subject_[]::Sessions_::Merge
+      subject_module_::Sessions_::Merge
     end
   end
 end

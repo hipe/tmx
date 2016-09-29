@@ -1,18 +1,15 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS::IA_PNP
-
-  ::Skylab::Basic::TestSupport::Tree_TS[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - input adapters - node identifiers" do
 
+    TS_[ self ]
+    use :tree
+
     it "works" do
 
-      hi = Subject_[].via :node_identifiers, [ path_node_one, path_node_two ]
+      hi = subject_module_.via :node_identifiers, [ path_node_one, path_node_two ]
       hi.children_count.should eql 2
       one, two = hi.to_child_stream.to_a
       one.slug.should eql "hi_there"

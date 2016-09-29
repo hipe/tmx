@@ -1,5 +1,7 @@
 require_relative '../../test-support'
 
+# NOTE - this has to be run under the recursive runner - you can't invoke it directly
+
 # the below tests are especially ugly because they themselves are testing
 # how this library affects modules, yet the whole purpose of this library
 # was to make things like testing modules prettier, hence as a quintessential
@@ -44,7 +46,7 @@ module Skylab::Basic::TestSupport
     TS_.describe "[ba] Module::Creator::ModuleMethods (*on* modules, #{
       }not classes" do
 
-      extend TS_
+      TS_[ self ]
 
       it "a klass can include modules that have graphs, and work" do
 
@@ -98,7 +100,7 @@ module Skylab::Basic::TestSupport
     TS_.describe "[ba] Module::Creator::ModuleMethods scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
-      extend TS_
+      TS_[ self ]
 
       before :all do
         Once__[]

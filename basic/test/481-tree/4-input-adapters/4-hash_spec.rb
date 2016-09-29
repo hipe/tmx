@@ -1,12 +1,15 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - input adapters - hash" do
 
+    TS_[ self ]
+    use :tree
+
     it 'works' do
 
-      tree = Subject_[].via :hash,
+      tree = subject_module_.via :hash,
 
         { name: 'foo',
           children: [

@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Hash
+module Skylab::Basic::TestSupport
 
   describe "[ba] hash - hotstrings" do
 
@@ -44,7 +44,7 @@ module Skylab::Basic::TestSupport::Hash
     end
 
     def subject a
-      Subject_[]::Hotstrings[ a ]
+      Home_::Hash::Hotstrings[ a ]
     end
   end
 end

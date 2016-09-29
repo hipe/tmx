@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] proxy - makers - functional - 3. nice" do
 
-    extend TS_
+    TS_[ self ]
 
     context "with a straight up-produced class" do
 

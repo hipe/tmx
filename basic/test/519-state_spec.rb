@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] state" do
 
-    extend TS_
+    TS_[ self ]
     use :expect_event
 
     _SM = nil

@@ -1,8 +1,11 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree - input adapters - hash" do
+
+    TS_[ self ]
+    use :tree
 
     it 'works' do
 
@@ -13,7 +16,7 @@ module Skylab::Basic::TestSupport::Tree_TS
         'bb/cc/dd/ee'
       ].freeze
 
-      node = Subject_[].via :paths, paths
+      node = subject_module_.via :paths, paths
 
       node.slug.should be_nil
 

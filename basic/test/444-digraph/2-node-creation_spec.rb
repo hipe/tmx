@@ -1,12 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Digraph::Holes__
-
-  ::Skylab::Basic::TestSupport::Digraph[ self ]
-
-  include Constants
-
-  extend TestSupport_::Quickie
+module Skylab::Basic::TestSupport
 
   describe "[ba] digraph node creation" do
 

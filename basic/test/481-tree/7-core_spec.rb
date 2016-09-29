@@ -1,20 +1,25 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::Tree_TS
+module Skylab::Basic::TestSupport
 
   describe "[ba] tree" do
 
+    TS_[ self ]
+    use :tree
+
     it "lazy via enumeresque" do
 
-      tree = Subject_[].lazy_via_enumeresque :local_data_1 do |y|
+      lib = subject_module_
+
+      tree = lib.lazy_via_enumeresque :local_data_1 do |y|
 
         y << :node_1
 
-        y << Subject_[].lazy_via_enumeresque do |yy|
+        y << lib.lazy_via_enumeresque do |yy|
 
           yy << :node_2_1
 
-          yy << ( Subject_[].lazy_via_enumeresque :local_data_3 do |yyy|
+          yy << ( lib.lazy_via_enumeresque :local_data_3 do |yyy|
             yyy << :node_3_1
             yyy << :node_3_2
           end )

@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Basic::TestSupport::List
+module Skylab::Basic::TestSupport
 
   describe "[ba] list scanner for array" do
 
@@ -43,7 +43,7 @@ module Skylab::Basic::TestSupport::List
     end
 
     def subject
-      Subject_[].line_stream
+      Home_::List.line_stream
     end
   end
 end

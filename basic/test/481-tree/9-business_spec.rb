@@ -4,9 +4,9 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] tree - business" do
 
-    extend TS_
+    TS_[ self ]
 
-    _Subject = -> do
+    subject = -> do
       Home_::Tree::Business
     end
 
@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport
 
       _with_class do
 
-        T_B_1 = _Subject[].new :foo
+        T_B_1 = subject[].new :foo
       end
 
       it "trying to pass too many args - arg error" do
@@ -39,7 +39,7 @@ module Skylab::Basic::TestSupport
 
       it "unlike struct, it can subclass" do
 
-        T_B_2 = ::Class.new( _Subject[].new( :foo, :bar ) )
+        T_B_2 = ::Class.new( subject[].new( :foo, :bar ) )
 
         T_B_3 = T_B_2.subclass :wing, :wang
 

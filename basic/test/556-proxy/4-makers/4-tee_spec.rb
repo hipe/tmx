@@ -4,7 +4,7 @@ module Skylab::Basic::TestSupport
 
   describe "[ba] proxy - makers - tee" do
 
-    extend TS_
+    TS_[ self ]
 
     context "let's construct a tee for the methods `push` and `shift`" do
 

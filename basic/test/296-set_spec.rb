@@ -1,14 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Basic::TestSupport::Set
-
-  ::Skylab::Basic::TestSupport[ self ]
-
-  include Constants
-
-  Home_ = Home_
-
-  extend TestSupport_::Quickie
+module Skylab::Basic::TestSupport
 
   describe '[ba] set normalization' do
 
@@ -19,11 +11,17 @@ module Skylab::Basic::TestSupport::Set
     context "define-time failures" do
 
       it "if you provide an array for 'with_members', must be frozen" do
-        -> do
-          class Wont_Work
+
+        _rx = /\bmust be frozen\b/
+
+        begin
+          class X_s_Wont_Work
             Home_::Set[ self, :with_members, %i( foo bar ) ]
           end
-        end.should raise_error( ::ArgumentError, %r{\bmust be frozen\b} )
+        rescue ::ArgumentError => e
+        end
+
+        e.message =~ _rx || fail
       end
     end
 
@@ -33,7 +31,7 @@ module Skylab::Basic::TestSupport::Set
 
     context "initialize_basic_set_with_hash" do
       before :all do
-        class Foo
+        class X_s_Foo
           Home_::Set[ self,
             :with_members, %i( foo bar ).freeze,
             :initialize_basic_set_with_hash ]
@@ -45,15 +43,27 @@ module Skylab::Basic::TestSupport::Set
       end
 
       it "undershoot" do
-        -> do
-          build_foo.initialize_basic_set_with_hash foo: true
-        end.should raise_error ::ArgumentError, _MISSING_REQUIRED_RX
+
+        foo = build_foo
+
+        begin
+          foo.initialize_basic_set_with_hash foo: true
+        rescue ::ArgumentError => e
+        end
+
+        e.message =~ _MISSING_REQUIRED_RX || fail
       end
 
       it "overshoot" do
-        -> do
-          build_foo.initialize_basic_set_with_hash foo: true, bar: true, baz: nil
-        end.should raise_error ::ArgumentError, _UNREC_PARAM_RX
+
+        foo = build_foo
+
+        begin
+          foo.initialize_basic_set_with_hash foo: true, bar: true, baz: nil
+        rescue ::ArgumentError => e
+        end
+
+        e.message =~ _UNREC_PARAM_RX || fail
       end
 
       it "money" do
@@ -64,13 +74,13 @@ module Skylab::Basic::TestSupport::Set
       end
 
       def build_foo
-        Foo.new
+        X_s_Foo.new
       end
     end
 
     context "initialize_basic_set_with_iambic" do
       before :all do
-        class Bar
+        class X_s_Bar
           members_i = %i( foo bar )
           Home_::Set[ self,
             :with_members, -> { members_i },
@@ -109,13 +119,13 @@ module Skylab::Basic::TestSupport::Set
       end
 
       def build_bar
-        Bar.new
+        X_s_Bar.new
       end
     end
 
     context "error_count - aware" do
       before :all do
-        class Error_Counting
+        class X_s_Error_Counting
           Home_::Set[ self, :with_members, %i( foo bar ).freeze,
                       :initialize_basic_set_with_iambic ]
           public :initialize_basic_set_with_iambic
@@ -145,13 +155,13 @@ module Skylab::Basic::TestSupport::Set
       end
 
       def build_error_counting
-        Error_Counting.new
+        X_s_Error_Counting.new
       end
     end
 
     context "customize event handling with 'basic_set_bork_event_listener_p'" do
       before :all do
-        class Borker
+        class X_s_Borker
           Home_::Set[ self, :with_members, %i( foo bar ).freeze,
                       :initialize_basic_set_with_iambic,
                       :basic_set_bork_event_listener_p, -> ev do
@@ -179,29 +189,29 @@ module Skylab::Basic::TestSupport::Set
       end
 
       def build_borker
-        Borker.new
+        X_s_Borker.new
       end
     end
 
     context "gotcha" do
 
       before :all do
-        class Gotcha_Base
+        class X_s_Gotcha_Base
           Home_::Set[ self, :with_members, -> do
             self.class::PURUMS
           end ]
         end
-        class Gotcha_Left < Gotcha_Base
+        class X_s_Gotcha_Left < X_s_Gotcha_Base
           PURUMS = %i( wing )
         end
-        class Gotcha_Rite < Gotcha_Base
+        class X_s_Gotcha_Rite < X_s_Gotcha_Base
           PURUMS = %i( ding )
         end
       end
 
       it "(if you are too clever with memoizing this bites you)" do
-        left = Gotcha_Left.new
-        rite = Gotcha_Rite.new
+        left = X_s_Gotcha_Left.new
+        rite = X_s_Gotcha_Rite.new
         left.basic_set_member_set.should eql [ :wing ].to_set
         rite.basic_set_member_set.should eql [ :ding ].to_set
       end
