@@ -57,7 +57,7 @@ module Skylab::System::TestSupport
 
       before :all do
 
-        module X_f_c_Foo
+        module X_f_c_Foo20
 
           def self.cache_path
             Tmpdir_[]
@@ -91,7 +91,7 @@ module Skylab::System::TestSupport
 
       it "the nested client module builds its `cache_path` isomoprhically" do
 
-        X_f_c_Foo::BarBaz.cache_path.should eql ::File.join( Tmpdir_[], 'bar-baz' )
+        X_f_c_Foo20::BarBaz.cache_path.should eql ::File.join( Tmpdir_[], 'bar-baz' )
       end
     end
 

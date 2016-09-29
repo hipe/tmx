@@ -45,7 +45,7 @@ module Skylab::MyTerm
           self._WORKS_or_worked_BUT_IS_NOT_COVERED
           load_path = @file[ 0 ... - Autoloader_::EXTNAME.length ]
         else
-          load_path = ::File.join @dir, Autoloader_::CORE_  # #violation
+          load_path = ::File.join @dir, Autoloader_::CORE_ENTRY_STEM
         end
 
         require load_path  # ..

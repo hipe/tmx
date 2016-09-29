@@ -2,18 +2,13 @@ require_relative '../../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_stack_common_frame
-  module Attributes::Stack::Common_Frame
-
-    TS_.describe "[br] property - stack - common frame - integrate with entity" do
-
-      Here_[ self ]
+  describe "[br] property - stack - common frame - integrate with entity" do
 
     before :all do
 
-      class X_IE_A
+      class X_a_s_cf_Inter_1
 
-        Subject_.call self,
+        Home_::Attributes::Stack::Common_Frame.call self,
           :globbing, :processor, :initialize,
           :readable, :field, :foo,
           :required, :readable, :field, :bar
@@ -33,25 +28,33 @@ module Skylab::Fields::TestSupport
     end
 
     it "property names look good" do
-      X_IE_A.properties.get_names.should eql [ :foo, :bar, :biz ]
+      _subject_class.properties.get_names.should eql [ :foo, :bar, :biz ]
     end
 
     it "required fields still bork" do
+
       _rx = /\Amissing required field - 'bar'/
-      -> do
-        X_IE_A.new
-      end.should raise_error ::ArgumentError, _rx
+
+      begin
+        _subject_class.new
+      rescue ::ArgumentError => e
+      end
+
+      e.message =~ _rx || fail
     end
 
     it "works with all" do
-      foo = X_IE_A.new :biz, :B, :foo, :F, :bar, :A
+      foo = _subject_class.new :biz, :B, :foo, :F, :bar, :A
       [ foo.foo, foo.bar, foo.biz_x ].should eql %i| F A B |
     end
 
     it "works with one" do
-      foo = X_IE_A.new :bar, :A
+      foo = _subject_class.new :bar, :A
       [ foo.foo, foo.bar, foo.biz_x ].should eql [ nil, :A, nil ]
     end
+
+    def _subject_class
+      X_a_s_cf_Inter_1
     end
   end
 end

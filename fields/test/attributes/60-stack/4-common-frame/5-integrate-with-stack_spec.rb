@@ -2,18 +2,13 @@ require_relative '../../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_stack_common_frame
-  module Attributes::Stack::Common_Frame
-
-    TS_.describe "[br] property - stack - common frame - integrate with pstack" do
-
-      Here_[ self ]
+  describe "[br] property - stack - common frame - integrate with pstack" do
 
     before :all do
 
-      class X_IAS_A
+      class X_a_s_cf_IntWithStack_1
 
-        Subject_.call self,
+        Home_::Attributes::Stack::CommonFrame.call self,
 
           :proc, :foo, -> do
             :Foo
@@ -45,7 +40,7 @@ module Skylab::Fields::TestSupport
     end
 
     it "ok" do
-      frame = X_IAS_A.new {}
+      frame = X_a_s_cf_IntWithStack_1.new {}
       stack = Home_::Attributes::Stack.new
       stack.push_frame frame
       stack.push_frame_with :foo, :FOO
@@ -55,7 +50,6 @@ module Skylab::Fields::TestSupport
 
       stack.property_value_via_symbol( :baz ).should eql 'baz.'
       stack.property_value_via_symbol( :boffo ).should eql "Foo: 1"
-    end
     end
   end
 end

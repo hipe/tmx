@@ -2,24 +2,19 @@ require_relative '../../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_stack_common_frame
-  module Attributes::Stack::Common_Frame
+  describe "[br] property - stack - common frame" do
 
-    TS_.describe "[br] property - stack - common frame" do
-
-      Here_[ self ]
-
-      it "loads." do
-        Subject_module_[]
-      end
+    it "loads." do
+      Home_::Attributes::Stack::Common_Frame
+    end
 
     it "whines on weirdness" do
 
       _rx = /\bunrecognized property 'weirdness'/
 
       begin
-        class X_Intro_A
-          Subject_[ self, :weirdness ]
+        class X_a_s_cf_Intro_A
+          Home_::Attributes::Stack::Common_Frame.call self, :weirdness
         end
       rescue ::ArgumentError => e
       end
@@ -31,11 +26,10 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_B
+        class X_a_s_cf_Intro_B
 
-          Subject_module_[].call( self,
-            :method, :foo_diddle,
-          )
+          Home_::Attributes::Stack::Common_Frame.call(
+            self, :method, :foo_diddle, )
 
           def foo_diddle
             ( @d ||= 0 )
@@ -50,7 +44,7 @@ module Skylab::Fields::TestSupport
 
       it "we have full reflection on these properties" do
 
-        prop = X_Intro_B.properties.fetch :foo_diddle
+        prop = X_a_s_cf_Intro_B.properties.fetch :foo_diddle
         prop.reader_classification.should eql :method
         prop.parameter_arity.should eql :zero_or_one
 
@@ -58,9 +52,8 @@ module Skylab::Fields::TestSupport
 
       it "and then with an object of this class, call the method by `property_value_via_symbol`" do
 
-        frame = X_Intro_B.new { }
+        frame = X_a_s_cf_Intro_B.new { }
         frame.property_value_via_symbol( :foo_diddle ).should eql "foo diddle: 1"
-
       end
     end
 
@@ -68,9 +61,9 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_C
+        class X_a_s_cf_Intro_C
 
-          Subject_.call self,
+          Home_::Attributes::Stack::Common_Frame.call self,
 
             :proc, :wiz_waz, -> do
               d = 0
@@ -85,7 +78,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "reads (fresh call each time), makes reader methods too", f:true do
-        entity = X_Intro_C.new { }
+        entity = X_a_s_cf_Intro_C.new { }
         entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 1"
         entity.property_value_via_symbol( :wiz_waz ).should eql "wiz waz: 2"
         entity.wiz_waz.should eql 'wiz waz: 3'
@@ -97,9 +90,9 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_D
+        class X_a_s_cf_Intro_D
 
-          Subject_.call self,
+          Home_::Attributes::Stack::Common_Frame.call self,
 
             :memoized, :proc, :wiz_wuz, -> do
               d = 0
@@ -115,7 +108,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "reaads (fresh call first time, subsequently memoized)" do
-        entity = X_Intro_D.new { }
+        entity = X_a_s_cf_Intro_D.new { }
         entity.property_value_via_symbol( :wiz_wuz ).should eql "wiz wuz: 1"
         entity.property_value_via_symbol( :wiz_wuz ).should eql "wiz wuz: 1"
       end
@@ -127,10 +120,10 @@ module Skylab::Fields::TestSupport
 
         _rx = /\Apre-existing methods cannot be memoized\b/
 
-        CF_Memoized_Method = ::Class.new
+        X_a_s_cf_xxx = ::Class.new
 
         begin
-          Subject_.call CF_Memoized_Method, :memoized, :method, :jib_jab
+          Home_::Attributes::Stack::Common_Frame.call X_a_s_cf_xxx, :memoized, :method, :jib_jab
         rescue ::ArgumentError => e
         end
 
@@ -142,9 +135,9 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_E
+        class X_a_s_cf_Intro_E
 
-          Subject_.call self,
+          Home_::Attributes::Stack::Common_Frame.call self,
 
             :inline_method, :dozer, -> do
               "zack #{ briff }"
@@ -160,7 +153,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "works (both ways)" do
-        ent = X_Intro_E.new { }
+        ent = X_a_s_cf_Intro_E.new { }
         ent.dozer.should eql 'zack braff'
         ent.property_value_via_symbol( :dozer ).should eql 'zack braff'
       end
@@ -170,11 +163,11 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_F
+        class X_a_s_cf_Intro_F
 
           d = 0
 
-          Subject_.call self,
+          Home_::Attributes::Stack::Common_Frame.call self,
             :memoized, :inline_method, :wowzaa, -> do
               "#{ fib_nibble  } #{ d += 1 }"
             end
@@ -190,7 +183,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "works (both ways)" do
-        ent = X_Intro_F.new { }
+        ent = X_a_s_cf_Intro_F.new { }
         ent.wowzaa.should eql "1 1"
         ent.wowzaa.should eql "1 1"
         ent.property_value_via_symbol( :wowzaa ).should eql "1 1"
@@ -202,9 +195,9 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_G
+        class X_a_s_cf_Intro_G
 
-          Subject_.call self, :readable, :field, :dingle_woofer,
+          Home_::Attributes::Stack::Common_Frame.call self, :readable, :field, :dingle_woofer,
 
             :globbing, :processor, :initialize
 
@@ -216,7 +209,7 @@ module Skylab::Fields::TestSupport
 
       it "constructs iambicly" do
 
-        entity = X_Intro_G.new :dingle_woofer, :toofer
+        entity = X_a_s_cf_Intro_G.new :dingle_woofer, :toofer
 
         x = entity.dingle_woofer
         x.should eql :toofer
@@ -231,9 +224,9 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_H
+        class X_a_s_cf_Intro_H
 
-          Subject_.call self,
+          Home_::Attributes::Stack::Common_Frame.call self,
             :readable, :field, :foo,
             :field, :bar,
             :globbing, :processor, :initialize,
@@ -246,7 +239,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "when provide all properties" do
-        entity = X_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
+        entity = X_a_s_cf_Intro_H.new :foo, :FO, :bar, :BR, :baz, :BZ
         entity.foo.should eql :FO
         entity.baz.should eql :BZ
         entity.property_value_via_symbol( :baz ).should eql :BZ
@@ -261,7 +254,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "when non-required fields missing" do
-        entity = X_Intro_H.new :baz, :hi
+        entity = X_a_s_cf_Intro_H.new :baz, :hi
         entity.baz.should eql :hi
         entity.foo.should be_nil
       end
@@ -271,7 +264,7 @@ module Skylab::Fields::TestSupport
         _rx = /\Amissing required field - 'baz'\z/
 
         begin
-          X_Intro_H.new
+          X_a_s_cf_Intro_H.new
         rescue ::ArgumentError => e
         end
 
@@ -283,16 +276,16 @@ module Skylab::Fields::TestSupport
 
       before :all do
 
-        class X_Intro_I
+        class X_a_s_cf_Intro_I
 
-          Subject_.call self,
+          Home_::Attributes::Stack::Common_Frame.call self,
             :required, :field, :foo,
             :globbing, :processor, :initialize
         end
       end
 
       it "when yes" do
-        x = X_Intro_I.new :foo, :F
+        x = X_a_s_cf_Intro_I.new :foo, :F
         x.instance_variable_get( :@foo ).should eql :F
       end
 
@@ -301,13 +294,12 @@ module Skylab::Fields::TestSupport
         _rx = /\Amissing required field - 'foo'\z/
 
         begin
-          X_Intro_I.new
+          X_a_s_cf_Intro_I.new
         rescue ::ArgumentError => e
         end
 
         e.message.should match _rx
       end
-    end
     end
   end
 end
