@@ -112,7 +112,7 @@ module Skylab::DocTest
 
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
-        Lib___, self )
+        Lib_, self )
     end
   end  # >>
 
@@ -187,7 +187,7 @@ module Skylab::DocTest
 
   # --
 
-  module Lib___
+  module Lib_  # # use this name per [sl] viz for now
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 

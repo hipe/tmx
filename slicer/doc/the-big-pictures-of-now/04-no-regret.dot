@@ -6,34 +6,37 @@ digraph g {
 
   clean_up_doctest -> re_house_xx
   re_house_xx [label="re-house\nquickie\nplugin lib" fillcolor="gray" style="filled"]
-  clean_up_doctest [label="clean up\ndoc-test" ]
+  clean_up_doctest [label="clean up\ndoc-test" style=filled fillcolor=grey ]
   clean_up_doctest -> re_house_yy
   re_house_yy [label="re-house\nquickie dependency-graph" style="filled"]
   clean_up_doctest->insane_CM_redux
-  insane_CM_redux [label="insane\ncode-molester\nredux"]
+  insane_CM_redux [label="insane\ncode-molester\nredux" style=filled fillcolor=grey]
 
   insane_CM_redux->mag
-  mag [label="magnetics" ]
+  mag [label="magnetics" style=filled fillcolor=grey]
+  viz_tool [style=filled fillcolor=grey]
   mag -> viz_tool
 
-  ACS_CLI [label="ACS CLI (\"zerk\nnon-interactive\")" style=filled fillcolor="#b5d5fb"]
+  ACS_CLI [label="ACS CLI (\"zerk\nnon-interactive\")" style=filled fillcolor=grey]
 
+  myterm [style=filled fillcolor=grey]
   myterm->ACS_CLI [label="MAYBE rewrite\nmyterm to use this"]
 
   viz_tool -> ACS_CLI
   ACS_CLI -> br_cleanup
   ACS_CLI -> acs
-  br_cleanup [style=filled fillcolor="grey"]
+  br_cleanup [style=filled fillcolor=grey]
 
+  no_regret [label="no\nregret" style=filled fillcolor=grey]
   no_regret -> sea
   no_regret -> clean_up_doctest
 
   dpn->no_regret
-  dpn [label="`dir_pathname` -> `dir_path`"]
-  sea [label="re-write search-replace\n"]
+  dpn [label="`dir_pathname` -> `dir_path`" style=filled fillcolor="#b5d5fb" ]
+  sea [label="re-write search-replace\n" style=filled fillcolor=grey]
   sea->ACS_CLI
   sea->zerk
-  zerk [label="zerk - full rewrite\nto use ACS"]
+  zerk [label="zerk - full rewrite\nto use ACS" style=filled fillcolor=grey]
   zerk->expect_event
   expect_event [label="rewrite\nexpect event" style=filled]
   expect_event -> tally
@@ -42,5 +45,4 @@ digraph g {
   rfm [label="rebrand file-metrics\nas code-metrics" style=filled]
   zerk->acs
   acs [label="ACS - that\none eventing\nre-arch branch" style=filled]
-  no_regret [label="no\nregret"]
 }

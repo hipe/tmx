@@ -19,8 +19,7 @@ module Skylab::TanMan
           o.item_symbol = sym
           o.item_label = item.item_label
           if item.is_first
-            o.add_attribute 'style', 'filled'
-            o.add_attribute 'color', 'grey'
+            o.is_first = true
           end
         end
 
@@ -69,16 +68,8 @@ module Skylab::TanMan
 
     class Item___
 
-      def initialize
-        @attribute_pairs = nil
-      end
-
-      def add_attribute s, s_
-        ( @attribute_pairs ||= [] ).push [ s, s_ ] ; nil
-      end
-
       attr_accessor(
-        :attribute_pairs,
+        :is_first,
         :item_label,
         :item_symbol,
       )

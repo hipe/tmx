@@ -552,8 +552,7 @@ module Skylab::Basic
             when   1
               @i_win = true
             else
-              # sh .. let notices trigger. this might be "impossible"
-              # (UPDATE: has been encountered when multiple adjacent spaces)
+              @i_win = nil  # when both are equal
             end
           end
         end

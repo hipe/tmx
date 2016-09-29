@@ -8,6 +8,7 @@ digraph {
   co [ label="Common" ]
   cc [ label="CSS_Convert" ]
   cu [ label="Cull" ]
+  dt [ label="DocTest" ]
   fi [ label="Fields" ]
   f2 [ label="Flex2Treetop" ]
   gi [ label="Git" ]
@@ -81,6 +82,13 @@ digraph {
   cu -> br
   cu -> fi
   cu -> sy
+  dt -> ac
+  dt -> ba
+  dt -> fi
+  dt -> gi
+  dt -> sy
+  dt -> ts
+  dt -> ze
   fi -> ba
   fi -> br
   fi -> hu
@@ -107,6 +115,7 @@ digraph {
   hu -> fi
   hu -> pa
   hu -> pl
+  hu -> ta
   my -> ac
   my -> ba
   my -> br
@@ -114,6 +123,7 @@ digraph {
   my -> ze
   pe -> ba
   pe -> br
+  pe -> ze
   pl -> ba
   pl -> br
   pl -> fi
@@ -140,7 +150,6 @@ digraph {
   st -> fi
   st -> hu
   st -> sy
-  st -> ts
   sy -> ac
   sy -> ba
   sy -> br
@@ -157,6 +166,7 @@ digraph {
   ta -> ba
   ta -> br
   ta -> fi
+  ta -> ze
   te -> ba
   te -> br
   te -> ta
@@ -172,6 +182,7 @@ digraph {
   ts -> sy
   ts -> ta
   ts -> tmx
+  ts -> ze
   tmx -> ba
   tmx -> br
   tmx -> sy

@@ -65,7 +65,12 @@ module Skylab::TanMan
         :input_words, s_a,
       )
 
-      a = item.attribute_pairs
+      a = nil
+      if item.is_first
+        ( a ||= [] ).push [ 'style', 'filled' ]
+        a.push ['fillcolor', '"#b5d5fb"']  # light blue
+      end
+
       if a
         _st = Common_::Stream.via_nonsparse_array( a ).map_by do |pair|
           ", #{ pair.first}=#{ pair.last }"  # meh
