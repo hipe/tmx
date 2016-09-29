@@ -64,7 +64,10 @@
 [#020]       #doc-node the IO spy composite types narrative ..
 [#019]       #node-point "tree walker" (became [#!gone:hl-176] then [#sy-018])
 [#018]       #quickie #in-situ
-[#017]       #doc-node #regret narrative
+
+[#017] #hole
+             ( #was: the regret narrative )
+
 [#016]       #parent-node:[#017] why we do not include parent anchor module..
 
 [#015]       #to-benchmark (in-situ in [dt])
