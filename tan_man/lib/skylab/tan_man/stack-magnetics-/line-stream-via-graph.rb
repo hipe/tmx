@@ -44,9 +44,19 @@ module Skylab::TanMan
       # ..
       escaped_item_label = s
 
+      a = item.attribute_pairs
+      if a
+        _st = Common_::Stream.via_nonsparse_array( a ).map_by do |pair|
+          ", #{ pair.first}=#{ pair.last }"  # meh
+        end
+        _ = _st.reduce_into_by "" do |m, s_|
+          m << s_
+        end
+      end
+
       # --
 
-      "  #{ item_sym } [label=\"#{ escaped_item_label }\"]#{ NEWLINE_ }"
+      "  #{ item_sym } [label=\"#{ escaped_item_label }\"#{ _ }]#{ NEWLINE_ }"
     end
 
     def __next_association

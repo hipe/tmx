@@ -3,12 +3,36 @@ module Skylab::TanMan
   class StackMagnetics_::Graph_via_ItemStream < Common_::Actor::Monadic
 
     def initialize st
-      @_graph = Graph___.new
+      @__item_stream = st
     end
 
     def execute
-      ok = true
-      ok && @_graph
+      st = remove_instance_variable :@__item_stream
+      gr = Graph___.new
+      begin
+        item = st.gets
+        item || break
+
+        sym = item.item_symbol
+
+        gr.add_item_by do |o|
+          o.item_symbol = sym
+          o.item_label = item.item_label
+          if item.is_first
+            o.add_attribute 'style', 'filled'
+            o.add_attribute 'color', 'grey'
+          end
+        end
+
+        a = item.dependency_symbols
+        if a
+          a.each do |sym_|
+            gr.add_association_via sym, sym_
+          end
+        end
+        redo
+      end while above
+      gr
     end
 
     # ==
@@ -16,15 +40,20 @@ module Skylab::TanMan
     class Graph___
 
       def initialize
-        a = []
-        a.push Association___.new( :A_node, :B_node )
-        a.push Association___.new( :C_node, :B_node )
-        @_associations = a
-        a = []
-        a.push Item___.new( :A_node, "the A node" )
-        a.push Item___.new( :B_node, "the B node" )
-        a.push Item___.new( :C_node, "the C node" )
-        @_items = a
+        @_associations = []
+        @_items = []
+      end
+
+      def add_item_by
+        item = Item___.new
+        yield item
+        @_items.push item
+        NIL
+      end
+
+      def add_association_via sym, sym_
+        @_associations.push Association___.new( sym, sym_ )
+        NIL
       end
 
       def to_association_stream
@@ -40,12 +69,16 @@ module Skylab::TanMan
 
     class Item___
 
-      def initialize sym, s
-        @item_label = s
-        @item_symbol = sym
+      def initialize
+        @attribute_pairs = nil
       end
 
-      attr_reader(
+      def add_attribute s, s_
+        ( @attribute_pairs ||= [] ).push [ s, s_ ] ; nil
+      end
+
+      attr_accessor(
+        :attribute_pairs,
         :item_label,
         :item_symbol,
       )
