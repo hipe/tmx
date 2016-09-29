@@ -33,6 +33,10 @@ module Skylab::TanMan
     Autoloader_[ self ]
   end
 
+  module StackMagnetics_
+    Autoloader_[ self ]
+  end
+
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end

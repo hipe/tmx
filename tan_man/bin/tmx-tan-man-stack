@@ -56,7 +56,7 @@ class Skylab::Stack
     end
 
     def __invite
-      @stderr.puts "use '#{ _pn } -h' for help"
+      @stderr.puts "use '#{ program_name } -h' for help"
       5
     end
 
@@ -70,7 +70,7 @@ class Skylab::Stack
 
       io.puts
 
-      io.puts "usage: #{ _pn } { #{ sym_a * ' | ' } } [opts] [args]"
+      io.puts "usage: #{ program_name } { #{ sym_a * ' | ' } } [opts] [args]"
 
       sym_a.each do | sym |
 
@@ -94,13 +94,13 @@ class Skylab::Stack
         end
 
         io.puts
-        io.puts "       #{ _pn } #{ sym }#{ _args }"
+        io.puts "       #{ program_name } #{ sym }#{ _args }"
 
       end
       0
     end
 
-    def _pn
+    def program_name
       ::File.basename @pn_s_a.last
     end
 
@@ -146,6 +146,11 @@ class Skylab::Stack
     def _expag
       @___expag ||= Expression_Agent___.new
     end
+
+    attr_reader(
+      :stderr,
+      :stdout,
+    )
   end
 
   class Expression_Agent___
@@ -169,6 +174,20 @@ class Skylab::Stack
   # ~
 
   class Models_::Stack
+
+    def __viz__component_operation
+
+      -> * tons_of_args do
+
+        p = method :_to_item_line_stream
+        require 'skylab/tan_man'
+
+        _ = ::Skylab::TanMan::Operations_::StackViz.new(
+          tons_of_args, p, self ).execute
+
+        _
+      end
+    end
 
     def __push__component_operation
 
