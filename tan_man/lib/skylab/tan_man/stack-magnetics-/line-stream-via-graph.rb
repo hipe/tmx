@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   class StackMagnetics_::LineStream_via_Graph < Common_::Actor::Monadic
 
+    WORD_WRAP_ASPECT_RATIO___ = [ 5, 1 ]
+
     def initialize g
       @_graph = g
     end
@@ -41,8 +43,27 @@ module Skylab::TanMan
 
       item_sym = item.item_symbol
       s = item.item_label
-      # ..
-      escaped_item_label = s
+
+      s_a = s.split SPACE_
+
+      # --
+
+      buffer = nil
+      p = -> line do
+        buffer = Sanitize__[ line ]
+        p = -> line_ do
+          buffer.concat "\\n#{ Sanitize__[ line_ ] }"
+        end
+      end
+      _y = ::Enumerator::Yielder.new do |line|
+        p[ line ]
+      end
+
+      Home_.lib_.basic::String.word_wrappers.calm.with(
+        :aspect_ratio, WORD_WRAP_ASPECT_RATIO___,
+        :downstream_yielder, _y,
+        :input_words, s_a,
+      )
 
       a = item.attribute_pairs
       if a
@@ -56,7 +77,7 @@ module Skylab::TanMan
 
       # --
 
-      "  #{ item_sym } [label=\"#{ escaped_item_label }\"#{ _ }]#{ NEWLINE_ }"
+      "  #{ item_sym } [label=\"#{ buffer }\"#{ _ }]#{ NEWLINE_ }"
     end
 
     def __next_association
@@ -73,6 +94,15 @@ module Skylab::TanMan
       NOTHING_
     end
 
+    Sanitize__ = -> line do
+      line.gsub! BACKSLASH_, EMPTY_S_   # meh
+      line.gsub! DOUBLE_QUOTE_, ESCAPED_QUOTE_
+      line
+    end
+
+    BACKSLASH_ = '\\'
+    ESCAPED_QUOTE_ = '\\"'
+    DOUBLE_QUOTE_ = '"'
     NOTHING_ = nil
   end
 end

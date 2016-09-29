@@ -1,6 +1,7 @@
-the big question - slicer
-factor out dir_pathname (!)
-insane experment with [sa] - convert every `should eql` to etc and see diff
-no more regret
-(fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`)
-look into better intergration of dev (click on stack frames)
+the big question - slicer (G)
+factor out dir_pathname (!) (D)->(A)
+insane experment with [sa] - convert every `should eql` to etc and see diff (C)->(A)
+no more regret (F)
+(fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`) (B)->(A)
+a little more coverage for [sa] (A)
+look into better intergration of dev (click on stack frames) (E)
