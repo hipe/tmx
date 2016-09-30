@@ -810,7 +810,7 @@ module Skylab::Common
 
         else
 
-          mod.respond_to? :dir_pathname and raise __say_not_idempotent( mod )
+          mod.respond_to? :dir_path and raise __say_not_idempotent( mod )
           mod.extend Methods__
         end
         mod
@@ -819,7 +819,7 @@ module Skylab::Common
 
       def __say_not_idempotent mod  # #not-idemponent
         "this operation is not idempotent. autoloader will not enhance #{
-          }an object that already responds to 'dir_pathname': #{ mod }"
+          }an object that already responds to 'dir_path': #{ mod }"
       end
     end  # >>
 
@@ -901,7 +901,7 @@ module Skylab::Common
 
       # ~
 
-      def __flush  # see #note-785
+      def __flush
 
         do_boxxy = @_do_boxxy ; do_common = @_do_common
         fs_entry = @_FS_entry_string ; path = @_path
@@ -924,12 +924,10 @@ module Skylab::Common
               raise ::ArgumentError
             end
 
-            if instance_variable_defined? :@dir_pathname
-
+            if instance_variable_defined? :@dir_path
               self._SANITY
             end
-
-            @dir_pathname = ::Pathname.new path
+            @dir_path = path
 
           elsif fs_entry
 
@@ -938,7 +936,7 @@ module Skylab::Common
 
           if do_boxxy
 
-            if ! respond_to? :dir_pathname
+            if ! respond_to? :dir_path
               extend Methods__
             end
 
@@ -949,44 +947,39 @@ module Skylab::Common
       end
     end
 
-    # ~ the dir_pathname feature & related (e.g child class)
+    # ~ the dir_path feature & related (e.g child class)
 
     module Methods__
 
       def dir_path
-        @____dir_path ||= dir_pathname.to_path
+        @___dir_path_is_known_is_known ||= __resolve_dir_path
+        @dir_path
       end
 
-      def dir_pathname
+      def __resolve_dir_path
 
-        @___dpn_is_known_is_known ||= __resolve_dir_pathname
-        @dir_pathname
-      end
-
-      def __resolve_dir_pathname
-
-        @dir_pathname ||= __produce_any_dir_pathname
+        @dir_path ||= __produce_any_dir_path
         true
       end
 
-      def __produce_any_dir_pathname
+      def __produce_any_dir_path
 
         _resolve_parent_module_and_filesystem_entry_name
 
         pmod = @_parent_module
 
-        if ! pmod.respond_to? :dir_pathname
-          raise ::NoMethodError, __autoloader_say_no_dirpathname( pmod )
+        if ! pmod.respond_to? :dir_path
+          raise ::NoMethodError, __autoloader_say_no_dirpath( pmod )
         end
 
-        dpn = pmod.dir_pathname
-        if dpn
-          dpn.join @_filesystem_entry_name.as_slug
+        parent_dir_path = pmod.dir_path
+        if parent_dir_path
+          ::File.join parent_dir_path, @_filesystem_entry_name.as_slug
         end
       end
 
-      def __autoloader_say_no_dirpathname mod
-        "needs 'dir_pathname': #{ mod }"
+      def __autoloader_say_no_dirpath mod
+        "needs 'dir_path': #{ mod }"
       end
 
       def _resolve_parent_module_and_filesystem_entry_name
@@ -1061,10 +1054,14 @@ module Skylab::Common
       end
 
       def __raise_uninitialized_constant_name_error
+
+        _tail = "#{ @name.as_slug }[#{ EXTNAME_ }]"
+        _path_like = ::File.join @mod.dir_path, _tail
+
         _say = "uninitialized constant #{
           }#{ @mod.name }::#{ @name.as_const } #{
-           }and no directory[file] #{
-            }#{ @mod.dir_pathname }/#{ @name.as_slug }[#{ EXTNAME_ }]"
+           }and no directory[file] #{ _path_like }"
+
         raise NameError_, _say
       end
 
@@ -1312,7 +1309,7 @@ module Skylab::Common
         end
       end
 
-      def some_dir_pathname
+      def _some_dir_pathname
         @dir_pn or self._NO_DIR_PATHNAME
       end
 
@@ -1327,7 +1324,7 @@ module Skylab::Common
 
         _is_module_esque = x.respond_to? :module_exec  # not all x are modules.
 
-        if _is_module_esque && ! x.respond_to?( :dir_pathname )
+        if _is_module_esque && ! x.respond_to?( :dir_path )
           Autoloader_[ x, np.some_dir_path ]  # some x wire themselves.
         end
 
@@ -1360,10 +1357,10 @@ module Skylab::Common
       end
 
       def some_dir_path
-        some_dir_pathname.to_path
+        _some_dir_pathname.to_path
       end
 
-      def some_dir_pathname
+      def _some_dir_pathname
         @dir_pn ||= __build_dir_pathname
       end
 
@@ -1375,9 +1372,11 @@ module Skylab::Common
     end
 
     class Entry_Tree_
+
       def has_directory
         true
       end
+
       def some_dir_path
         @dir_pn.to_path
       end
@@ -1419,10 +1418,9 @@ module Skylab::Common
         @any_built_entry_tree_ = if et
           et
         else
-
-          any_dpn = dir_pathname
-          if any_dpn
-            LOOKAHEAD_[ any_dpn ]
+          path = dir_path
+          if path
+            LOOKAHEAD_[ path ]
           end
         end
 
@@ -1434,9 +1432,7 @@ module Skylab::Common
 
       h = {}
 
-      -> pn do
-
-        path = pn.to_path
+      -> path do
 
         dir = ::File.dirname path
         entry = ::File.basename path

@@ -32,7 +32,7 @@ digraph g {
   no_regret -> clean_up_doctest
 
   dpn->no_regret
-  dpn [label="`dir_pathname` -> `dir_path`" style=filled fillcolor="#b5d5fb" ]
+  dpn [label="`dir_p{}athname` -> `dir_path`" style=filled fillcolor="#b5d5fb" ]
   sea [label="re-write search-replace\n" style=filled fillcolor=grey]
   sea->ACS_CLI
   sea->zerk

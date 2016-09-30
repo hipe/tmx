@@ -170,7 +170,7 @@ module Skylab::Common
 
       def __maybe_seek_current_pair_via_loading
 
-        if @_current_module.respond_to? :dir_pathname
+        if @_current_module.respond_to? :dir_path
 
           tree = ___tree
           if tree
@@ -193,9 +193,9 @@ module Skylab::Common
         if @_current_module.respond_to? :entry_tree
           tree = @_current_module.entry_tree
         else
-          dpn = @_current_module.dir_pathname
-          if dpn
-            tree = LOOKAHEAD_[ dpn ]
+          path = @_current_module.dir_path
+          if path
+            tree = LOOKAHEAD_[ path ]
           end
         end
         tree

@@ -83,13 +83,16 @@ module Skylab::Common
       end
 
       def load_host_file  # #stow-2
-        real_dpn = @mod.dir_pathname.join @core_relpath
+
+        real_path = ::File.join @mod.dir_path, @core_relpath
+
         @pn = if ! @mod_et.normpath_from_distilled @name.as_distilled_stem
-          real_dpn
+          ::Pathname.new real_path
         end
+
         @do_add_core_file = false
         np = produce_prepared_np
-        @load_file_path = real_dpn.to_path
+        @load_file_path = real_path
         if @do_add_core_file
           @load_file_path = "#{ @load_file_path }#{ PATH_SEP_ }#{ CORE_ENTRY_STEM }"
         end
@@ -181,29 +184,44 @@ module Skylab::Common
       end
 
       def produce_some_value
+
         np = @stwy_normpath
+
         if np.value_is_known && ! @do_add_core_file
-          x = np.known_value
+          np.known_value
         else
-          x = @const_missing.lookup_x_after_loaded
-          if @do_add_core_file
-            Autoloader[ x, np.some_dir_path ]
-            x.module_exec do
-              @entry_tree_is_known_is_known_ = true
-              @any_built_entry_tree_ = np
-            end
-          end
-          if x.respond_to?( :dir_pathname ) &&
-              x.dir_pathname != np.some_dir_pathname
-            np = Stowaway_Actors__::Resolve_relpath__[ @mod, x.dir_pathname ]
-            np.assert_state :loaded
-          end
-          if np.value_is_known
-            x.entry_tree.object_id == np.object_id or self._SANITY
-          else
-            @mod.autoloaderize_with_normpath_value np, x
+          __produce_some_value_when_was_not_known_or_do_add_core_file np
+        end
+      end
+
+      def __produce_some_value_when_was_not_known_or_do_add_core_file np
+
+        x = @const_missing.lookup_x_after_loaded
+
+        if @do_add_core_file
+          Autoloader[ x, np.some_dir_path ]
+          x.module_exec do
+            @entry_tree_is_known_is_known_ = true
+            @any_built_entry_tree_ = np
           end
         end
+
+        if x.respond_to?( :dir_path )
+          path = x.dir_path
+          _yes = np.some_dir_path != path
+        end
+
+        if _yes
+          np = Stowaway_Actors__::Resolve_relpath__[ @mod, path ]
+          np.assert_state :loaded
+        end
+
+        if np.value_is_known
+          x.entry_tree.object_id == np.object_id or self._SANITY
+        else
+          @mod.autoloaderize_with_normpath_value np, x
+        end
+
         x
       end
     end
@@ -212,7 +230,7 @@ module Skylab::Common
 
       Attributes_actor_.call( self,
         :mod,
-        :dpn,
+        :directory_path,
       )
 
       def execute
@@ -225,7 +243,7 @@ module Skylab::Common
 
       def init_ivars
         @existant_a = @mod.dir_path.split PATH_SEP_
-        @imagined_a = @dpn.to_path.split PATH_SEP_
+        @imagined_a = @directory_path.split PATH_SEP_
         @same_a = []
       end
 

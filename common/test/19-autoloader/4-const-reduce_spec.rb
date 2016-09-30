@@ -144,13 +144,13 @@ module Skylab::Common::TestSupport
 
     # (#tombstone for that one hack)
 
-    context "with an (autolaoded) node that resolves its own dir_pathname" do
+    context "with an (autolaoded) node that resolves its own dir_path" do
 
       it "make sure autoloading is not broken at this node" do
-        fixture_tree_.dir_pathname
+        fixture_tree_.dir_path || fail
       end
 
-      it "(loads, has dir_pathname, ancestor chain is not mutated)" do
+      it "(loads, has dir_path, ancestor chain is not mutated)" do
 
         mod = fixture_tree_::One_Skorlab
 

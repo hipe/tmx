@@ -57,10 +57,6 @@ module Skylab::Common::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
-
-    define_method :fixtures_dir_pn, ( Home_.memoize do
-      Home_::TestSupport.dir_pathname.join 'fixtures'
-    end )
   end
 
   LIB_ = ::Object.new

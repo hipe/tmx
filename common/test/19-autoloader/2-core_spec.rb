@@ -41,17 +41,17 @@ module Skylab::Common::TestSupport
       end
 
       it "3. (2 is pre-requisite on 3). the dir (but no core.#{}rb)" do
-        fixture_directories_.dir_pathname or fail
+        fixture_directories_.dir_path || fail
       end
 
       it "2. the dir with a core.#{}rb" do
         fixture_directories_::Five::OHAI.should eql :_hey_
         fixture_directories_::Five::OHAI.should eql :_hey_
-        fixture_directories_::Five.dir_pathname or fail
+        fixture_directories_::Five.dir_path || fail
       end
 
       it "2. the dir with a core.#{}rb that was loaded adjunctly" do
-        TS_::FixtureTree.dir_pathname
+        TS_::FixtureTree.dir_path || fail
       end
 
       it "2. WHATEVER" do

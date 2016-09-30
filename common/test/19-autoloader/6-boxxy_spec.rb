@@ -102,7 +102,7 @@ module Skylab::Common::TestSupport
 
         mod.const_defined?( :Lorca, false ) || fail
 
-        mod.dir_pathname || fail
+        mod.dir_path || fail
 
         begin
           mod::Lorca

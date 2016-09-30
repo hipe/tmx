@@ -79,7 +79,7 @@
 [#124]       (available)
 [#123]       #convention #pattern sub-product module 2-level pattern
 [#122]       oh boy. "tracking tag for everything not thread safe."
-             ( #was: #done #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname )
+             ( #was: #done #low-priority phase out ROOT_PATHNAME for Skylab.dir_p{}athname )
 [#121]       #pattern of CLI.new, API.invoke as facades hehe inv. of [#109]
 [#120]       #tracking-tag backticks that could be robustified
 [#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL

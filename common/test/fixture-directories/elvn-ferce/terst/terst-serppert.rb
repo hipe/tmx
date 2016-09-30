@@ -1,9 +1,14 @@
 module Skylab::Common::TestSupport
+
   module FixtureDirectories::Elvn_Ferce
+
     module TerstSerppert
+
       # we "simuate" what these test nodes
-      _dpn = FixtureDirectories::Elvn_Ferce.dir_pathname.join 'terst'
-      Autoloader_[ self, _dpn.to_path ]
+
+      _path = ::File.join FixtureDirectories::Elvn_Ferce.dir_path, 'terst'
+
+      Autoloader_[ self, _path ]
 
       stowaway :CIL, 'cil/terst-serppert'
     end
