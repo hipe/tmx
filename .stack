@@ -1,4 +1,15 @@
 the big question - slicer (G)->(B)
 insane experment with [sa] - convert every `should eql` to etc and see diff (C)
 fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`, memoize vs lazy) (B)
+improvements near autoloading and dir_pathname
 relative_path_from
+no more requiring of pathname univerally
+(-1) many stubs can be removed
+(-2) universal integration (all green)
+(-3) [co] as a sidesystem tests run
+(-4) local [co] test suite integration only -- run each a.l related file standalone
+(-5) rewrite boxxy
+(-6) rewrite const reduce
+(-7) rewrite stowaway
+(-8) rewrite core autoloading
+(-9) a commit that removes documentation
