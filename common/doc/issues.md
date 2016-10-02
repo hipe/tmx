@@ -15,7 +15,8 @@
 [#059]       [ bound call ]
              ( #was: #done #parent-node: [#044] "signal processing scans.." ) )
 
-[#058] #hole ( moved to [#fi-013] )
+[#058]       autoloading implementation
+             ( moved to [#fi-013] )
 
 [#057]       "the ideal mixed syntax.." (in [#fi-016] )
 
@@ -55,7 +56,8 @@
 [#042] #open easy refactor (see)
              ( #was: #moved-to [#fi-016] )
 
-[#041]       #parent-node: [#024] what are hybrid boxxy nodes?
+[#041] #hole
+             ( #was: #parent-node: [#024] what are hybrid boxxy nodes? )
 [#040]       #parent-node: [#023] the callback pattern
 [#039]       #parent-node: [#037] #in-situ the cb method naming conventions
 [#038]       #parent-node: [#037] #in-situ use readable method names for cb's

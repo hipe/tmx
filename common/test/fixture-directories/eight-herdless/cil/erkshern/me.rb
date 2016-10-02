@@ -1,2 +1,2 @@
 Skylab::Common::TestSupport::FixtureDirectories::
-    Eight_Herdless::CIL::Erkshern::ME = :_ok_you_
+    Eight_HERDLESS::CIL::Erkshern::ME = :_ok_you_

@@ -6,10 +6,13 @@ module Skylab::Common::TestSupport
 
     context "for a const_missing, in order it will try:" do
 
-      it "1. the eponymous leaf file (with a correction)" do
-        _x = TS_::Fixture
+      it "1. the eponymous leaf file" do
+
+        # (#tombstone-A: no more name correction)
+
+        _x = TS_::FIXTURE
         _x == :_yes_ || fail
-        _x = TS_::Fixture
+        _x = TS_::FIXTURE
         _x == :_yes_ || fail
       end
 
@@ -28,7 +31,7 @@ module Skylab::Common::TestSupport
 
       it "1. the eponymous leaf who fails to define - X" do
 
-        _rx = %r(\A.+::TestSupport::\( ~ foxture \) #{
+        _rx = %r(\A.+::TestSupport::Foxture #{
           }must be but does not appear to be defined in #{
            }.+test/foxture\.rb\z)
 
@@ -40,46 +43,59 @@ module Skylab::Common::TestSupport
         e.message =~ _rx || fail
       end
 
-      it "3. (2 is pre-requisite on 3). the dir (but no core.#{}rb)" do
-        fixture_directories_.dir_path || fail
+      it "if no corefile, AUTO VIVIFY BRANCH MODULE" do
+        _mod = fixture_directories_
+        _yes = _mod.dir_path
+        _yes || fail
       end
 
-      it "2. the dir with a core.#{}rb" do
-        fixture_directories_::Five::OHAI.should eql :_hey_
-        fixture_directories_::Five::OHAI.should eql :_hey_
-        fixture_directories_::Five.dir_path || fail
+      it "if corefile, use that" do
+        _mod = fixture_directories_
+        mod_ = _mod::Five
+        _x = mod_::OHAI
+        _x == :_hey_ || fail
+        mod_.dir_path || fail
       end
 
-      it "2. the dir with a core.#{}rb that was loaded adjunctly" do
-        TS_::FixtureTree.dir_path || fail
-      end
-
-      it "2. WHATEVER" do
+      it "2. when corefile, iff module then autoloaderized" do
         fixture_directories_::Thrtn_Herdless::Terxt
       end
 
       it "4. for a branch node, load any file (like even core.rb)" do
-        fixture_directories_::NINE::Peripheral.should eql :_nine_
+        fixture_directories_::NINE::Peripheral == :_nine_ || fail
       end
 
-      it "4. but when a directory has no valid leaf or branch" do
+      it "4. even if no corefile and no eponymous file, autovivify (this changed)" do
 
-        _rx = %r(\Acannot determine correct #{
-          }casing and scheme for [:A-Za-z]+::FixtureDirectories::\( ~ ten \) - #{
-           }directory is effectively empty: .+/fixture-directories/ten\z)
+        # (this changed at #tombstone-B)
+
+        _mod = fixture_directories_
+        mod_ = _mod::Ten
+        _hi = mod_.dir_path
+        /\bten\z/ =~ _hi || fail
+      end
+
+      it "insonconsistent const casing is not allowed" do
+
+        # (this changed at #tombstone-B)
+
+        # (the camel name is "correct")
+
+        mod = fixture_directories_
+        mod_camel = mod::SixBersic
+        mod_camel.name =~ /::FixtureDirectories::SixBersic\z/ || fail
 
         begin
-          fixture_directories_::Ten
+          mod::Six_Bersic
         rescue _name_error => e
         end
 
-        e.message =~ _rx || fail
-      end
+        e.message =~ /\Aincon.+\( \(then:\) SixBersic \(now:\) Six_Ber/ || fail
 
-      it "autovivifying as we know it either does or doesn't happen still" do
-
-        _mod = fixture_directories_::SixBersic
-        _mod.name =~ %r(::FixtureDirectories::Six_Bersic) || fail
+        # (not shown here but if you then try to reach the asset value in the
+        # asset fixture file, the same error will be raised again because of
+        # how it is cased in the file (the same way in the "correct" (but
+        # error-raising) way here.)
       end
 
       it "inheritence - child of autoloady parent" do
@@ -89,23 +105,17 @@ module Skylab::Common::TestSupport
         mod::Foo::YEP == :_yep_ || fail
       end
 
-      it "experimental trick with correction" do
-
-        _mod = fixture_directories_::Four
-
-        x = fixture_directories_::Four::Npl::Ne::Numbers
-
-        x.name == "#{ TS_.name }::FixtureDirectories::Four::NPL::NE::Numbers" || fail
-      end
+      # (test removed at #tombsone-A - "experimental trick with correction")
 
       it "collateral - nodes loaded along the way still get enhanced" do
 
         _mod_a = fixture_directories_::Eight_HERDLESS::CIL
         _mod_b = _mod_a::Erkshern
-        _x = _mod_b::Me
+        _x = _mod_b::ME
         _x == :_ok_you_ || fail
       end
 
+      if false
       it "a stowaway path that does not isomorph to a node is OK.." do
         _Face = fixture_directories_::Elvn_Ferce
         _Face::TerstSerppert
@@ -125,6 +135,7 @@ module Skylab::Common::TestSupport
       it "at the boundary of an integration with old :+[#027]" do
         fixture_directories_::Twlv_DLI::Glient
       end
+      end
     end
 
     def _name_error
@@ -136,3 +147,4 @@ module Skylab::Common::TestSupport
     end
   end
 end
+# #tombstone: #tombstone-A: no more name correction #tombstone-B: not autovivifying

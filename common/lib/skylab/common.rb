@@ -547,6 +547,14 @@ module Skylab::Common
 
   # knownnesses (see [#004])
 
+  Knownish__ = -> x do
+    if x
+      Known_Known[ x ]
+    else
+      KNOWN_UNKNOWN
+    end
+  end
+
   class Known_Unknown
 
     class << self
@@ -592,6 +600,18 @@ module Skylab::Common
   class Known_Known
 
     class << self
+
+      def yes_or_no x
+        x ? trueish_instance : falseish_instance
+      end
+
+      def falseish_instance
+        @___falseish_instance ||= new false
+      end
+
+      def trueish_instance
+        @___trueish_instance ||= new true
+      end
 
       alias_method :[], :new
       private :new
@@ -795,1171 +815,27 @@ module Skylab::Common
     attr_reader :args, :block, :method_name, :receiver
   end
 
+  Without_extension = -> path do
+    path[ 0 ... path.rindex( DOT_ ) ]
+  end
+
   DOT_ = '.'
-  EMPTY_H_ = {}.freeze
 
-  module Autoloader  # read [#024] the new autoloader narrative
+  DIR_PATH__ = Without_extension[ __FILE__ ]
 
-    class << self
-
-      def [] mod, * x_a, & p
-
-        if x_a.length.nonzero? || p
-
-          Effect_edit_session___.new( mod, x_a, & p ).execute
-
-        else
-
-          mod.respond_to? :dir_path and raise __say_not_idempotent( mod )
-          mod.extend Methods__
-        end
-        mod
-      end
-      alias_method :call, :[]
-
-      def __say_not_idempotent mod  # #not-idemponent
-        "this operation is not idempotent. autoloader will not enhance #{
-          }an object that already responds to 'dir_path': #{ mod }"
-      end
-    end  # >>
-
-    Methods__ = ::Module.new
-
-    self[ self ]  # eat our own dogfood as soon as possible for #grease
-
-    class Effect_edit_session___  # assume nonzero tokens
-
-      # this is the *only* way to apply "modifiers" to an autoloaderization
-
-      def initialize mod, x_a, & edit_p
-
-        @edit_p = edit_p
-        @in_st = if x_a.length.nonzero?
-          Polymorphic_Stream.via_array x_a
-        end
-        @mod = mod
-      end
-
-      def execute
-
-        @_do_boxxy = nil ; @_do_common = nil
-        @_FS_entry_string = nil
-        @_path = nil ; @_pmod = nil
-
-        if @edit_p
-          @edit_p[ self ]
-        end
-
-        if @in_st
-
-          x = @in_st.current_token
-          if x.respond_to? :ascii_only?
-            _process_path_phrase
-          end
-
-          while @in_st.unparsed_exists
-            send :"process__#{ @in_st.gets_one }__phrase"
-          end
-        end
-
-        __flush
-        NIL_
-      end
-
-      # ~ three idioms: `_internal`, `_internal_setter=`, `etc__public__etc`
-
-      def process__boxxy__phrase
-
-        @_do_boxxy = true
-      end
-
-      def _filesystem_entry_string= x
-        @_do_common = true
-        @_FS_entry_string = x
-        x
-      end
-
-      def process__methods__phrase
-
-        @_do_common = true
-      end
-
-      def _process_path_phrase
-
-        @_do_common = true
-        @_path = @in_st.gets_one
-      end
-
-      # alias_method :process__path__phrase, :_process_path_phrase  # makes it public
-
-      def _presumably_autoloaderized_parent_module= x
-
-        @_do_common = true
-        @_pmod = x
-        x
-      end
-
-      # ~
-
-      def __flush
-
-        do_boxxy = @_do_boxxy ; do_common = @_do_common
-        fs_entry = @_FS_entry_string ; path = @_path
-        pmod = @_pmod
-
-        @mod.module_exec do
-
-          if do_common
-            extend Methods__
-          end
-
-          if pmod
-            @_parent_module_is_known_is_known = true
-            @_parent_module = pmod
-          end
-
-          if path
-
-            if fs_entry
-              raise ::ArgumentError
-            end
-
-            if instance_variable_defined? :@dir_path
-              self._SANITY
-            end
-            @dir_path = path
-
-          elsif fs_entry
-
-            @_filesystem_entry_name = Name.via_slug fs_entry
-          end
-
-          if do_boxxy
-
-            if ! respond_to? :dir_path
-              extend Methods__
-            end
-
-            extend Autoloader_::Boxxy_::Methods
-          end
-        end
-        NIL_
-      end
-    end
-
-    # ~ the dir_path feature & related (e.g child class)
-
-    module Methods__
-
-      def dir_path
-        @___dir_path_is_known_is_known ||= __resolve_dir_path
-        @dir_path
-      end
-
-      def __resolve_dir_path
-
-        @dir_path ||= __produce_any_dir_path
-        true
-      end
-
-      def __produce_any_dir_path
-
-        _resolve_parent_module_and_filesystem_entry_name
-
-        pmod = @_parent_module
-
-        if ! pmod.respond_to? :dir_path
-          raise ::NoMethodError, __autoloader_say_no_dirpath( pmod )
-        end
-
-        parent_dir_path = pmod.dir_path
-        if parent_dir_path
-          ::File.join parent_dir_path, @_filesystem_entry_name.as_slug
-        end
-      end
-
-      def __autoloader_say_no_dirpath mod
-        "needs 'dir_path': #{ mod }"
-      end
-
-      def _resolve_parent_module_and_filesystem_entry_name
-
-        @_parent_module_is_known_is_known ||= _induce_parent_module
-
-        @_filesystem_entry_name ||= __isomoprh_filesystem_entry_name
-
-        NIL_
-      end
-
-      def _induce_parent_module  # memoizes another along the way
-
-        s_a = name.split CONST_SEP_
-        const_basename = s_a.pop
-
-        @_filesystem_entry_name ||= Name.via_const_string( const_basename )
-
-        @_parent_module = Const_value_via_parts[ s_a ]
-
-        true
-      end
-
-      def __isomoprh_filesystem_entry_name
-
-        s = name  # `::Module#name`
-        Home_::Name.via_const_string s[ s.rindex( CONST_SEP_ ) + 2 .. -1 ]
-      end
-    end
-
-    # :#the-file-story
-
-    module Methods__
-
-      def const_missing x  # we have to accept both
-        _ = Const_Missing__.new( self, x.to_s ).resolve_some_x
-        _
-      end
-    end
-
-    class Const_Missing__
-
-      def initialize mod, s
-
-        nf = Name.__via_valid_const_string s
-        nf or self._WHERE
-        @name = nf
-        @mod = mod
-      end
-
-      def resolve_some_x
-
-        stow_h = @mod.stowaway_h
-
-        if stow_h && stow_h[ @name.as_const ]
-          __result_when_stowaway
-        else
-
-          et = @mod.entry_tree
-
-          if et && et.has_directory
-            np = et.normpath_from_distilled( @name.as_distilled_stem )
-          end
-
-          if np
-            @normpath = np
-            send @normpath.method_name_for_state
-          else
-            __raise_uninitialized_constant_name_error
-          end
-        end
-      end
-
-      def __raise_uninitialized_constant_name_error
-
-        _tail = "#{ @name.as_slug }[#{ EXTNAME_ }]"
-        _path_like = ::File.join @mod.dir_path, _tail
-
-        _say = "uninitialized constant #{
-          }#{ @mod.name }::#{ @name.as_const } #{
-           }and no directory[file] #{ _path_like }"
-
-        raise NameError_, _say
-      end
-
-      def __result_when_not_loaded
-
-        if @normpath.can_produce_load_file_path
-          __result_via_normpath
-        else
-          __result_when_directory
-        end
-      end
-
-      def __result_via_normpath
-        _load_normpath
-        __result_after_loaded
-      end
-
-      def _load_normpath
-
-        if @normpath.value_is_known
-          self._README  # (see commit)
-        end
-        @normpath.change_state_to :loaded  # no autoviv. for this last one
-        @load_file_path = @normpath.get_load_file_path
-        load @load_file_path
-      end
-
-      def __result_after_loaded
-
-        x = lookup_x_after_loaded
-        @mod.autoloaderize_with_normpath_value @normpath, x
-        x
-      end
-
-      def lookup_x_after_loaded
-        const_i = name_as_const
-        if @mod.const_defined? const_i, false
-          @mod.const_get const_i, false
-        else
-          _fuzzy_lookup method :_result_via_different_casing_or_scheme
-        end
-      end
-
-      def name_as_const
-        @name.as_const
-      end
-
-      def _result_via_different_casing_or_scheme correct_i
-        # we don't cache it here (anymore), but we might cache this x elsewhere
-        @mod.const_get correct_i, false
-      end
-
-      def _fuzzy_lookup one_p, zero_p=nil, many_p=nil  # assume no exact match
-        fuzzy_lookup_name_in_module_ @name, @mod, one_p, zero_p, many_p
-      end
-
-      def fuzzy_lookup_name_in_module_ name, mod, one_p=nil, zero_p=nil, many_p=nil
-
-        a = []
-        stem = name.as_distilled_stem
-
-        mod.constants.each do | sym |
-          if stem == Distill_[ sym ]
-            a.push sym
-          end
-        end
-
-        case a.length <=> 1
-        when -1
-          if zero_p
-            zero_p[]
-          else
-            raise NameError_, __say_zero( name, mod )
-          end
-
-        when  0
-          if one_p
-            one_p[ a.first ]
-          else
-            mod.const_get a.first, false
-          end
-
-        when  1
-          if many_p
-            many_p[ a ]
-          else
-            raise NameError_, __say_ambiguous( a, name, mod )
-          end
-        end
-      end
-
-      def __say_zero name, mod
-
-        "#{ mod.name }::( ~ #{ name.as_slug } ) #{
-          }must be but does not appear to be defined in #{
-           }#{ @load_file_path }"
-      end
-
-      def __say_ambiguous const_a, name, mod
-
-        "unhandled ambiguity - #{ name.as_slug.inspect } resolves to #{
-         }#{ mod.name }::( #{ const_a * ' AND ' } )"
-      end
-    end
-
-    EXTNAME = EXTNAME_ = '.rb'.freeze
-
-    class Normpath_
-
-      def initialize parent_pn, file_entry, dir_entry
-
-        @file_entry = file_entry
-        @dir_entry = dir_entry
-
-        if block_given?
-          yield self
-        end
-
-        if file_entry
-          @norm_pathname = parent_pn.join file_entry.entry_s
-        end
-
-        if dir_entry
-          @dir_pn ||= parent_pn.join dir_entry.entry_s
-          @norm_pathname ||= @dir_pn
-        end
-
-        SANITY_CHECK__[ @norm_pathname ]
-
-        @parent_pn = parent_pn
-        @state_i = :not_loaded
-        @value_is_known = false
-      end
-
-      def to_path  # #todo:during-development
-        @norm_pathname.to_path
-      end
-
-      SANITY_CHECK__ = -> do
-        h = {}
-        -> pn do
-          h.fetch pn do
-            h[ pn ] = true ; false
-          end and raise "autoloader implementation failure: #{
-            }entry tree redundantly created for #{ pn }"
-        end
-      end.call
-
-      def can_produce_load_file_path
-        @file_entry || has_corefile
-      end
-
-      def get_load_file_path
-        @file_entry or self._NO_LOAD_FILE_PATH_BECAUSE_NO_FILE_ENTRY
-        @norm_pathname.to_path
-      end
-
-      # ~~ experimental association of normpath with node value
-
-      attr_reader :value_is_known
-
-      def set_value x
-        @value_is_known and raise __say_value_already_known( x )
-        @value_is_known = true
-        @value_x = x ; nil
-      end
-
-      def known_value
-        @value_is_known or self._VALUE_NOT_KNOWN
-        @value_x
-      end
-
-      def __say_value_already_known x
-        ick = -> x_ { ::Module === x_ ? x_ : "a #{ x_.class }" }
-        "can't associate normpath with #{ ick[ x ] }. it is already #{
-          }associated with #{ ick[ @value_x ] } (for #{ @norm_pathname })."
-      end
-    end
-
-    class File_Entry_
-      def initialize entry_s, corename
-        @corename = corename
-        @entry_s = entry_s
-      end
-      attr_reader :entry_s
-    end
-
-    class Dir_Entry_
-      def entry_s
-        @corename
-      end
-    end
-
-    class Entry_Tree_ < Normpath_  # read [#024]:introduction-to-the-entry-tree
-
-      def has_entry_for_slug s
-
-        if @h.key? s
-          true
-        else
-          @h.key? "#{ s }#{ EXTNAME_ }"
-        end
-      end
-
-      def has_entry s
-        @h.key? s
-      end
-
-      def to_stream_without_any__ entry_stem_symbol
-
-        @_did_index_all ||= _index_all
-        a = @stem_i_a
-
-        indexes = ( 0 ... a.length.to_i ).to_a
-
-        dd = a.index( entry_stem_symbol )
-        if dd
-          indexes[ dd, 1 ] = EMPTY_A_
-        end
-
-        d = -1 ; last = indexes.length - 1
-
-        Home_.stream do
-          if last != d
-            @normpath_lookup_p[ a.fetch indexes.fetch d += 1 ]
-          end
-        end
-      end
-
-      def to_stream  # :+#public-API, #the-fuzzily-unique-entry-scanner, #fuzzy-sibling-pairs
-        @_did_index_all ||= _index_all
-        a = @stem_i_a ; d = -1 ; last = a.length - 1
-        Home_.stream do
-          if last != d
-            @normpath_lookup_p[ a.fetch d += 1 ]
-          end
-        end
-      end
-
-      def get_load_file_path
-        if @h.key? CORE_FILE_
-          @dir_pn.join( CORE_FILE_ ).to_path  # only covered at #spot-2
-        else
-          super
-        end
-      end
-
-      def _some_dir_pathname
-        @dir_pn or self._NO_DIR_PATHNAME
-      end
-
-      SNGL_LTR = 'D'.freeze
-    end
-
-    module Methods__
-
-      def autoloaderize_with_normpath_value np, x
-
-        np.set_value x
-
-        _is_module_esque = x.respond_to? :module_exec  # not all x are modules.
-
-        if _is_module_esque && ! x.respond_to?( :dir_path )
-          Autoloader_[ x, np.some_dir_path ]  # some x wire themselves.
-        end
-
-        # all x with a corresponding dir must take this now so we can avoid
-        # redundant filesystem hits.
-
-        if np.has_directory and x.respond_to? :entry_tree_is_known_is_known_
-
-          if x.entry_tree_is_known_is_known_
-            # [#032] document why & when this gets here (e.g via the [sg] client)
-          else
-            # when dir exists but no file, WTF
-            x.___set_entry_tree np
-          end
-        end
-        NIL_
-      end
-
-      def ___set_entry_tree x
-        entry_tree_is_known_is_known_ and self._SANITY
-        @entry_tree_is_known_is_known_ = true
-        @any_built_entry_tree_ = x ; nil
-      end
-    end
-
-    class File_Normpath_ < Normpath_
-
-      def has_directory
-        false
-      end
-
-      def some_dir_path
-        _some_dir_pathname.to_path
-      end
-
-      def _some_dir_pathname
-        @dir_pn ||= __build_dir_pathname
-      end
-
-      def __build_dir_pathname
-        @parent_pn.join @file_entry.corename
-      end
-
-      SNGL_LTR = 'F'.freeze
-    end
-
-    class Entry_Tree_
-
-      def has_directory
-        true
-      end
-
-      def some_dir_path
-        @dir_pn.to_path
-      end
-    end
-
-    # ~ the entry tree sub-story
-
-    module Methods__
-
-      def entry_tree
-
-        @entry_tree_is_known_is_known_ ||= __resolve_entry_tree_by_looking_upwards
-        @any_built_entry_tree_
-      end
-
-      attr_reader :entry_tree_is_known_is_known_
-
-      def __resolve_entry_tree_by_looking_upwards
-
-        _resolve_parent_module_and_filesystem_entry_name
-
-        pmod = @_parent_module
-        pmod or self._HOLE
-
-        if pmod.respond_to? :entry_tree
-          pet = pmod.entry_tree
-        end
-
-        if pet
-
-          np = pet.normpath_from_distilled(
-            @_filesystem_entry_name.as_distilled_stem )
-
-          if np && np.has_directory
-            et = np
-          end
-        end
-
-        @any_built_entry_tree_ = if et
-          et
-        else
-          path = dir_path
-          if path
-            LOOKAHEAD_[ path ]
-          end
-        end
-
-        true
-      end
-    end
-
-    LOOKAHEAD_ = -> do  # #on-the-ugliness-of-global-caches
-
-      h = {}
-
-      -> path do
-
-        dir = ::File.dirname path
-        entry = ::File.basename path
-
-        et = h[ dir ]
-
-        if et
-          np = et.normpath_from_distilled Distill_[ entry ]
-          if np && np.has_directory
-            et_ = np
-          end
-        end
-
-        if et_
-          et_
-        else
-
-          h.fetch path do
-
-            h[ path ] = Entry_Tree_.new(
-              ::Pathname.new( dir ),
-              nil,
-              Dir_Entry_.new( entry ) )
-          end
-        end
-      end
-    end.call
-
-    class Dir_Entry_
-      def initialize entry_s
-        @corename = entry_s
-      end
-    end
-
-    class Entry_Tree_
-
-      def initialize parent_pn, file_entry, dir_entry
-        super parent_pn, file_entry, dir_entry  # trip sanity checks early
-        @normpath_lookup_p = -> i do
-          @_did_index_all = _index_all
-          @normpath_lookup_p[ i ]
-        end
-        __init_directory_listing_cache
-      end
-
-      def __init_directory_listing_cache
-
-        a = []
-        h = {}
-
-        __foreach_entry_s do |entry_s|
-
-          DOT__ == entry_s.getbyte( 0 ) and next
-
-          md = WHITE_DIR_ENTRY_RX__.match entry_s
-          md or next
-
-          _entry = if md[2]
-            File_Entry_.new md[0], md[1]
-          else
-            Dir_Entry_.new md[0]
-          end
-
-          a << entry_s
-
-          h[ entry_s ] = _entry
-        end
-
-        a.sort!  # #must-sort
-
-        @a = a.freeze
-        @h = h.freeze
-        NIL_
-      end
-
-      DOT__ = DOT_.getbyte 0
-
-      EXTNAME_RXS_ = ::Regexp.escape EXTNAME_
-
-      WHITE_DIR_ENTRY_RX__ = /\A([a-z][-_a-z0-9]*)(#{ EXTNAME_RXS_ })?\z/
-
-      def __foreach_entry_s & p
-
-        ::Dir.foreach @dir_pn.to_path, &p
-
-      rescue ::Errno::ENOENT, ::Errno::ENOTDIR
-      end
-    end
-
-    # ~ the indexing sub-story
-
-    class Entry_Tree_
-
-      def normpath_from_distilled stem_i
-        @normpath_lookup_p[ stem_i ]
-      end
-
-      def _index_all  # from the set of all entries eagerly build the set of
-        # all mutable norm paths (a set whose size will be lesser than or
-        # equal to the size of the input set). along the way also make note of
-        # the distilled stems that correspond to the three "any"'s. the actual
-        # norm paths are built and cached on demand.
-
-        stem_a = [] ; mnp_h = {}
-        touch_mnp = -> stem_i do
-          mnp_h.fetch stem_i do
-            stem_a << stem_i
-            mnp_h[ stem_i ] = Mutable_Normpath_.new @dir_pn
-          end
-        end
-        @any_corefile_i = @any_file_i = @any_dir_i = nil
-        @a.each do |entry_s|
-          entry = @h.fetch entry_s
-          stem_i = Distill_[ entry.corename ]
-          mnp = touch_mnp[ stem_i ]
-          if entry.looks_like_file
-            mnp.see_file_entry entry
-            if entry.is_corefile
-              @any_file_i = @any_corefile_i = stem_i
-            elsif ! @any_file_i
-              @any_file_i = stem_i
-            end
-          else
-            mnp.see_dir_entry entry
-            @any_dir_i ||= stem_i
-          end
-        end
-        normpath_h = ::Hash.new do |h, stem_i|
-          mnp = mnp_h[ stem_i ]
-          h[ stem_i ] = if mnp
-            file_entry, dir_entry = mnp.to_a
-            if dir_entry
-              Entry_Tree_.new @dir_pn, file_entry, dir_entry
-            else
-              File_Normpath_.new @dir_pn, file_entry, dir_entry
-            end
-          end
-        end
-        @normpath_lookup_p = -> stem_i do
-          normpath_h[ stem_i ]
-        end
-        @stem_i_a = stem_a
-        true
-      end
-    end
-
-    class File_Entry_
-      attr_reader :corename
-      def looks_like_file
-        true
-      end
-    end
-
-    class Dir_Entry_
-      attr_reader :corename
-      def looks_like_file
-        false
-      end
-    end
-
-    class Mutable_Normpath_
-      def initialize parent_pn
-        @dir_entry = @file_entry = nil
-        @parent_pn = parent_pn
-      end
-      def see_file_entry e
-        @file_entry and self._HOLE_too_many_entries_for_same_stem e
-        @file_entry = e
-      end
-      def see_dir_entry e
-        @dir_entry and self._HOLE_too_many_entries_for_same_stem e
-        @dir_entry = e
-      end
-      def to_a
-        [ @file_entry, @dir_entry ]
-      end
-    end
-
-    # ~ the state sub-story
-
-    class Normpath_
-
-      attr_reader :state_i
-
-      def method_name_for_state
-        METHODS__.fetch @state_i
-      end
-
-      METHODS__ = {
-        not_loaded: :__result_when_not_loaded,
-        loading: :__result_when_loading,
-        loaded: :__result_when_loaded
-      }
-
-      STATES__ = {
-        not_loaded: { loading: true, loaded: true },
-        loading: { loaded: true },
-        loaded: EMPTY_H_,
-      }
-
-      def assert_state i
-        @state_i == i or fail "expected state '#{ i }' had '#{ @state_i }' #{
-          }for node #{ @norm_pathname }"
-      end
-
-      def change_state_to i
-        STATES__.fetch( @state_i )[ i ] or raise __say_bad_state_transition( i )
-        @state_i = i ; nil
-      end
-
-      def __say_bad_state_transition i
-        a = STATES__[ @state_i ].keys
-        _s = if a.length.zero?
-          "'#{ i }' is a final state and does not transition to any others"
-        else
-          "valid state(s): (#{ a * ', ' })"
-        end
-        _s_ = " - #{ @norm_pathname }"
-        "cannot change state from '#{ @state_i }' to '#{ i }'. #{ _s }#{ _s_ }"
-      end
-    end
-
-    # ~ the loaded story
-
-    class Const_Missing__
-      def __result_when_loaded
-        _fuzzy_lookup method :_result_via_different_casing_or_scheme
-      end
-    end
-
-    # ~ the stowaway story [#031]
-
-    module Methods__
-
-      attr_reader :stowaway_h
-
-    private
-
-      def stowaway sym, * a, & p
-
-        if block_given?
-          __stowaway_when_block sym, * a, & p
-        else
-          __stowaway_when_relpath sym, * a
-        end
-      end
-
-      def __stowaway_when_relpath sym, relpath
-        ( @stowaway_h ||= {} )[ sym ] = relpath ; nil
-      end
-
-      def __stowaway_when_block sym, & p
-        ( @stowaway_h ||= {} )[ sym ] = p ; nil
-      end
-    end
-
-    class Const_Missing__
-
-      def __result_when_stowaway  # [cu] relies on this heavily
-
-        x = @mod.stowaway_h.fetch @name.as_const
-        if x.respond_to? :split
-          Autoloader_::Stowaway_Actors__::Produce_x[ self, x ]
-        else
-          x.call
-        end
-      end
-
-      attr_reader :name, :mod
-    end
-
-    class Normpath_
-
-      attr_reader :norm_pathname
-
-      def name_symbol  # :+#public-API
-        name_for_lookup_.as_variegated_symbol
-      end
-
-      def name  # :+#public-API
-        name_for_lookup_
-      end
-
-      def name_for_lookup_
-        @nm ||= Name.via_slug corename
-      end
-
-      def corename
-        ( @file_entry || @dir_entry ).corename
-      end
-    end
-
-    class Entry_Tree_
-
-      def add_imaginary_normpath_for_correct_name name, dpn=nil  # #stow-3
-        h = ( @imaginary_h ||= {} )
-        i = name.as_distilled_stem
-        h.key? i and self._NAME_COLLISION
-        _dir_entry = Dir_Entry_.new name.as_slug
-        et = Entry_Tree_.new @dir_pn, nil, _dir_entry do |et_|
-          dpn and et_.set_dir_pathname dpn
-        end
-        h[ i ] = et
-        et
-      end
-
-      attr_reader :imaginary_h
-
-      def set_dir_pathname dpn
-        @dir_pn = dpn ; nil
-      end
-    end
-
-    # ~ the loading story (bolsters two others)
-
-    class Const_Missing__
-
-      def __result_when_loading  # :#spot-1
-        @mod.__produce_autoloderized_module_for_const_missing self
-      end
-
-      def some_normpath
-        @normpath or self._NO_NORMPATH
-      end
-    end
-
-    module Methods__
-      def __produce_autoloderized_module_for_const_missing cm
-        # assume this is coming from code in a written file and so
-        # the received name is the correct casing / scheme
-        np = cm.some_normpath
-        np.change_state_to :loaded
-        new_mod = const_set cm.name_as_const, ::Module.new
-        autoloaderize_with_normpath_value np, new_mod
-        new_mod
-      end
-    end
-
-    # :#the-directory-story
-
-    class Const_Missing__
-
-    private
-
-      def __result_when_directory  # [#024]:find-some-file
-
-        make_adjunct_chain
-        __resolve_adjunct_value
-        @adjunct_chain.length > 1 and cleanup_adjuct_chain
-        @adjunct_value
-      end
-
-      def make_adjunct_chain
-        @normpath.change_state_to :loading
-        a = [ @normpath ]
-        node = @normpath
-        until node.can_produce_load_file_path
-          node_ = node.any_file_normpath
-          node_ ||= node.any_dir_normpath
-          node_ or raise NameError_, say_no_recurse( node )
-          node = node_
-          node.change_state_to :loading
-          a << node
-        end
-        @adjunct_chain = a ; nil
-      end
-
-      def say_no_recurse dir
-        "cannot determine correct casing and scheme for #{ @mod.name }::#{
-          }( ~ #{ @name.as_slug } ) - directory is effectively empty: #{
-           }#{ dir.norm_pathname }"
-      end
-
-      def get_load_file_path
-        @file_entry or self._NO_LOAD_FILE_PATH_BECAUSE_NO_FILE_ENTRY
-        @norm_pathname.to_path
-      end
-
-      def __resolve_adjunct_value
-
-        the_target_normpath = @normpath
-        @normpath = @adjunct_chain.last  # eew/meh
-        _load_normpath  # #spot-1
-        @normpath = the_target_normpath
-        @adjunct_value = lookup_x_after_loaded
-        @normpath = the_target_normpath
-        if ! @normpath.value_is_known
-          # #todo:covered-by-subsystem-not-node
-          @mod.autoloaderize_with_normpath_value @normpath, @adjunct_value
-          @normpath.change_state_to :loaded
-        end
-        @adjunct_value.entry_tree_is_known_is_known_ or self._SANITY
-        NIL_
-      end
-
-      def cleanup_adjuct_chain  # [#024]:created-modules
-        a = @adjunct_chain ; from_mod = @adjunct_value
-        d = 0 ; last = a.length - 1  # the first el we start on is the 2nd el!
-        while d < last
-          np = a.fetch d += 1
-          if np.value_is_known
-            mod = np.known_value
-          else  # e.g the file declared the module itself
-            if :loading == np.state_i
-              np.change_state_to :loaded
-            end
-            mod = fuzzy_lookup_name_in_module_ np.name_for_lookup_, from_mod
-            from_mod.autoloaderize_with_normpath_value np, mod
-          end
-          if np.has_directory and d < last ||
-              mod.respond_to?( :entry_tree_is_known_is_known_ )
-            mod.entry_tree_is_known_is_known_ or self._SANITY
-          end
-          np.assert_state :loaded
-          from_mod = mod
-        end
-        nil
-      end
-    end
-
-    class Normpath_
-      def represents_file_immediately
-        @file_entry
-      end
-    end
-
-    class Entry_Tree_
-
-      def any_file_normpath
-        @_did_index_all ||= _index_all
-        @any_file_i and normpath_from_distilled @any_file_i
-      end
-
-      def any_dir_normpath
-        @_did_index_all ||= _index_all
-        @any_dir_i and normpath_from_distilled @any_dir_i
-      end
-    end
-
-    # ~ the corefile story (:#the-corefile-story)
-
-    class Entry_Tree_
-    private
-      def has_corefile
-        @_did_index_all ||= _index_all
-        @any_corefile_i
-      end
-      # normpath_from_distilled @any_corefile_i
-    end
-
-    class Normpath_
-      def file_is_corefile
-        @file_entry.is_corefile
-      end
-    end
-
-    class File_Entry_
-      def is_corefile
-        CORE_ENTRY_STEM == @corename
-        # CORE_FILE_ == @entry_s
-      end
-    end
-
-    CORE_ENTRY_STEM = 'core'.freeze
-    CORE_FILE_ = "#{ CORE_ENTRY_STEM }#{ EXTNAME_ }".freeze
-
-    # ~ the const_reduce integration (see spec for tombstones)
-
-    def self.const_reduce *a, &p
-      self::Const_Reduction__.new( a, & p ).execute
-    end
-
-    class Entry_Tree_
-
-      def get_require_file_path
-
-        if @h.key? CORE_FILE_
-          "#{ @parent_pn.to_path }/#{ @dir_entry.corename }/#{ CORE_ENTRY_STEM }"
-        else
-          raise ::LoadError, __say_get_require_file_path
-        end
-      end
-
-      def __say_get_require_file_path
-        "cannot determine a path #{
-         }to require: #{ @dir_entry.corename }/#{ CORE_FILE_ } does not #{
-          }exist. did #{ @dir_entry.corename }#{ EXTNAME_ } fail to load? (#{
-           }in #{ @parent_pn })"
-      end
-    end
-
-    class File_Normpath_
-      def get_require_file_path
-        @parent_pn.join( @file_entry.corename ).to_path
-      end
-    end
-
-    Autoloader_ = self
-    NameError = ::Class.new ::NameError
-    NameError_ = NameError  # be more clear
-  end
-
-  Autoloader[ Actor ]
-  Autoloader[ Box ]
-
-  module Autoloader  # ~ service methods outside the immediate scope of a.l
-
-    module Methods__
-
-      def autoloaderize_child_node x  # 1x
-
-        Autoloader_.call x do | sess |
-          sess._presumably_autoloaderized_parent_module = self
-        end
-      end
-
-      def using_file_entry_string_autoloaderize_child_node s, x  # 1x
-
-        Autoloader_.call x do | sess |
-          sess._presumably_autoloaderized_parent_module = self
-          sess._filesystem_entry_string = s
-        end
+  Lazy = -> & p do  # etc
+    x = nil ; yes = true
+    -> do
+      if yes
+        yes = false
+        x = p[]
       end
+      x
     end
   end
+  Lazy_ = Lazy  # for use by this sidesystem
 
-  module Autoloader  # ~ service procs outside immediate scope of autoload.
+  module Autoloader  # [#024]
 
     class << self
 
@@ -1969,7 +845,7 @@ module Skylab::Common
       end
 
       def build_require_sidesystem_proc * i_a  # #open [#053]
-        proc_or_call_or_map i_a do |x|
+        _build_require_proc i_a do |x|
           Memoize.call do
             require_sidesystem x
           end
@@ -1977,24 +853,35 @@ module Skylab::Common
       end
 
       def build_require_stdlib_proc * i_a
-        proc_or_call_or_map i_a do |x|
+        _build_require_proc i_a do |x|
           Memoize.call do
             require_stdlib x
           end
         end
       end
-    private
-      def proc_or_call_or_map i_a, & p
+
+      def _build_require_proc i_a, & p
         case i_a.length <=> 1
         when -1 ; p
         when  0 ; p[ i_a.first ]
         when  1 ; i_a.map( & p.method( :call ) )
         end
       end
-    public
 
-      def default_core_file  # #n.c
-        CORE_FILE_
+      def require_quietly const_i_or_path_s
+        __without_warning do
+          if VALID_CONST_RX_ =~ const_i_or_path_s
+            require_stdlib const_i_or_path_s
+          else
+            require const_i_or_path_s
+          end
+        end
+      end
+
+      def __without_warning
+        prev = $VERBOSE ; $VERBOSE = nil
+        r = yield  # 'ensure' is out of scope
+        $VERBOSE = prev ; r
       end
 
       def each_const_value_method
@@ -2005,30 +892,17 @@ module Skylab::Common
         self::Boxxy_::NAMES_METHOD_P
       end
 
-      def require_quietly const_i_or_path_s
-        without_warning do
-          if VALID_CONST_RX_ =~ const_i_or_path_s
-            require_stdlib const_i_or_path_s
-          else
-            require const_i_or_path_s
-          end
-        end
-      end
-
-      def without_warning
-        prev = $VERBOSE ; $VERBOSE = nil
-        r = yield  # 'ensure' is out of scope
-        $VERBOSE = prev ; r
-      end
-
       define_method :require_sidesystem, -> do
 
-        require_via_const = -> const_i do
+        universal_top_level_entry = "skylab"
 
-          _compliant_slug = Name.via_const_symbol( const_i ).
-            as_lowercase_with_underscores_string
+        require_via_const = -> const_sym do  # assume not loaded
 
-          require "skylab/#{ _compliant_slug }"
+          _name_function = Name.via_const_symbol const_sym
+          _loadable_slug = _name_function.as_lowercase_with_underscores_string
+          _load_path = ::File.join universal_top_level_entry, _loadable_slug
+
+          require _load_path
         end
 
         produce_via_const = -> const_i do
@@ -2052,8 +926,204 @@ module Skylab::Common
         require const_i.downcase.to_s  # until it's useful to, no inflection
         ::Object.const_get const_i
       end
+
+      def [] mod, * x_a, & p
+
+        if x_a.length.nonzero? || block_given?
+          Autoloaderization___.new( mod, x_a, & p ).execute
+        else
+          mod.respond_to? :dir_path and raise Here_::Say_::Not_idempotent[ mod ]
+          mod.extend Methods__
+        end
+        mod
+      end
+
+      alias_method :call, :[]
+    end  # >>
+
+    class Autoloaderization___
+
+      def initialize mod, x_a, & p
+        @arguments = x_a
+        @block = p
+        @do_boxxy = nil
+        @do_extend_methods = nil
+        @FS_entry_string = nil
+        @mod = mod
+        @parent_module = nil
+        @path = nil
+      end
+
+      def execute
+        x_a = remove_instance_variable :@arguments
+        if x_a
+          __process_argument_stream x_a
+        end
+        p = remove_instance_variable :@block
+        if p
+          p[ self ]
+        end
+        __apply
+        NIL
+      end
+
+      def __process_argument_stream x_a
+
+        @argument_stream = Polymorphic_Stream.via_array x_a
+
+        if @argument_stream.current_token.respond_to? :ascii_only?
+          __when_path
+        end
+
+        while @argument_stream.unparsed_exists
+          send PROCESS_WHICH___.fetch @argument_stream.gets_one
+        end
+        NIL
+      end
+
+      def __when_path
+        @do_extend_methods = true
+        @path = @argument_stream.gets_one
+      end
+
+      PROCESS_WHICH___ = {
+        boxxy: :__when_boxxy,
+        methods: :__when_methods,
+      }
+
+      def __when_boxxy
+        @do_boxxy = true
+      end
+
+      def __when_methods
+        @do_extend_methods = true
+      end
+
+      def _filesystem_entry_string= x
+        @do_extend_methods = true
+        @FS_entry_string = x
+      end
+
+      def _presumably_autoloaderized_parent_module= x
+        @do_extend_methods = true
+        @parent_module = x
+      end
+
+      # ~
+
+      def __apply
+
+        do_boxxy = @do_boxxy ; do_extend_methods = @do_extend_methods
+        fs_entry = @FS_entry_string
+        parent_module = @parent_module ; path = @path
+
+        @mod.module_exec do
+
+          if do_extend_methods
+            extend Methods__
+          end
+
+          if parent_module
+            @_parent_module_knownness = Known_Known[ paren_module ]
+          end
+
+          if path
+            fs_entry and raise ::ArgumentError
+            instance_variable_defined? :@dir_path and self._SANITY
+            @dir_path = path
+
+          elsif fs_entry
+            @_entry_name = Name.via_slug fs_entry
+          end
+
+          if do_boxxy
+            if ! respond_to? :dir_path
+              extend Methods__
+            end
+            extend BoxxyPlaceholder___
+            # extend Here_::Boxxy_::Methods
+          end
+        end
+        NIL
+      end
     end
+
+    Here_ = self
+
+    module BoxxyPlaceholder___
+      def constants
+        self._XXX
+      end
+    end
+
+    module Methods__
+
+      Here_[ Here_ ]  # our own dogfood - as soon as this module is defined
+
+      # -- autoloader writing
+
+    private
+
+      def stowaway const_sym, relative_path
+        ( @stowaway_hash_ ||= {} )[ const_sym ] = relative_path
+      end
+
+      def lazily const_sym, & definition
+        ( @stowaway_hash_ ||= {} )[ const_sym ] = definition
+      end
+
+    public
+      attr_reader :stowaway_hash_  # :[#031]
+
+      # -- autoload "reading"
+
+      def const_missing x  # accept symbol or string
+        _ = Here_::ConstMissing___.new( x, self ).execute
+        _
+      end
+
+      def entry_tree
+        kn = ( @____file_tree_knownness ||= begin
+          Knownish__[ Here_::FileTree_::Via_module.new( self, File_tree_cache___ ).execute ]
+        end )
+        kn.value_x if kn.is_known_known
+      end
+
+      def parent_module
+        pedigree_.parent_module__
+      end
+
+      def pedigree_
+        @___pedigree ||= Here_::ComponentModels__::Pedigree_via_module[ self ]
+      end
+
+      def dir_path
+        @___dir_path_is_known_is_known ||= Here_::ComponentModels__::Touch_dir_path[ self ]
+        @dir_path  # can be nil
+      end
+    end
+
+    File_tree_cache___ = Lazy_.call do
+      Here_::FileTree_::Cache[ ::Dir ]
+    end
+
+    dir = ::File.join DIR_PATH__, 'autoloader'
+    autoload :ComponentModels__, ::File.join( dir, 'component-models--' )
+    autoload :ConstMissing___, ::File.join( dir, 'const-missing---' )
+    autoload :FileTree_, ::File.join( dir, 'file-tree-' )
+    autoload :Say_, ::File.join( dir, 'say-' )
+
+    EXTNAME = '.rb'.freeze
+
+    CORE_ENTRY_STEM = 'core'.freeze
+    CORE_FILE = "#{ CORE_ENTRY_STEM }#{ EXTNAME }".freeze
+    DOT_DOT_ = '..'
+    NameError = ::Class.new ::NameError
+    NODE_PATH_IVAR_ = :@dir_path
   end
+
+  Autoloader[ Actor ]
+  Autoloader[ Box ]
 
   class Name  # see [#060]
 
@@ -2143,15 +1213,11 @@ module Skylab::Common
           if VALID_CONST_RX_ =~ s
             Here_._via_normal_string_ s
           else
-            raise Autoloader::NameError, ___say_wrong_const_name( s )
+            raise Autoloader::NameError, Here_::Say_::Wrong_const_name[ s ]
           end
         end
 
-        def ___say_wrong_const_name x
-          "wrong constant name #{ x }"
-        end
-
-        def __via_valid_const_string s
+        def via_valid_const_string_ s
           Here_._via_normal_string_ s
         end
       end  # >>
@@ -2165,9 +1231,9 @@ module Skylab::Common
         o && o.as_const
       end
 
-      def as_distilled_stem
+      def as_approximation
         o = _const
-        o && o.as_distilled_stem
+        o && o.as_approximation
       end
 
       def _const
@@ -2229,12 +1295,11 @@ module Skylab::Common
       @value_x_as_symbol_ ||= @value_x_.intern
     end
 
-    def as_distilled_stem
-      @___distilled_stem ||= Distill_[ @value_x_ ]
+    def as_approximation
+      @___approximation ||= Distill_[ @value_x_ ]
     end
 
     def _titlecase_the_pieces
-
       @x_ = @x_.map do | s |
         s.sub UPCASER_RX___, & :upcase
       end ; nil
@@ -2381,11 +1446,6 @@ module Skylab::Common
           Here_._via_normal_symbol_ sym
         end
       end  # >>
-
-      def as_ivar= sym
-        self._K   # for irregulars
-        _vari.as_ivar = sym
-      end
 
       def as_ivar
         _vari.as_ivar
@@ -2563,18 +1623,6 @@ module Skylab::Common
     end
   end.call
 
-  Lazy = -> & p do  # etc
-    x = nil ; yes = true
-    -> do
-      if yes
-        yes = false
-        x = p[]
-      end
-      x
-    end
-  end
-  Lazy_ = Lazy  # for use by this sidesystem
-
   Memoize = -> & p do
     p_ = -> do
       x = p[]
@@ -2661,12 +1709,6 @@ module Skylab::Common
   SPACE_ = ' '.freeze
   UNABLE_ = false
 
-  Without_extension = -> path do
-
-    path[ 0 ... path.rindex( DOT_ ) ]
-  end
-
-  require 'pathname'  # eat our own dogfood. necessary before below.
-
-  Autoloader[ self, Without_extension[ __FILE__ ] ]
+  Autoloader[ self, DIR_PATH__ ]
+  # #dogfood
 end

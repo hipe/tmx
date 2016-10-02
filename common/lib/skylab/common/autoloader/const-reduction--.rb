@@ -1,4 +1,4 @@
-module Skylab::Common
+self._WILL_GET_JIMMIED
 
   module Autoloader
 

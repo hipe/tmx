@@ -49,12 +49,12 @@ module Skylab::TestSupport
 
       def _start_daemon_autonomously  # [#bs-029] name conventions are used
 
-        lib = Home_.lib_
+        # lib = Home_.lib_  allow regression of autoloading
 
         start_daemon_around(
           nil,  # stdin is never used by this app,
-          lib.stdout,
-          lib.stderr,
+          $stdout, # lib.stdout,
+          $stderr,  # lib.stderr,
           [ $PROGRAM_NAME ],
         )
       end
@@ -329,7 +329,7 @@ module Skylab::TestSupport
         UNABLE_
       end
 
-      Home_::Let[ self ]
+      # Home_::Let[ self ]
     end
 
     class Tagset__
