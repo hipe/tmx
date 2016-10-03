@@ -6,9 +6,9 @@ module Skylab::Common::TestSupport
 
       # we "simuate" what these test nodes
 
-      _path = ::File.join FixtureDirectories::Elvn_Ferce.dir_path, 'terst'
+      # _path = ::File.join FixtureDirectories::Elvn_Ferce.dir_path, 'terst'
 
-      Autoloader_[ self, _path ]
+      Autoloader_[ self ] # , _path ]
 
       stowaway :CIL, 'cil/terst-serppert'
     end

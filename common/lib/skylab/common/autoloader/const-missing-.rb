@@ -2,7 +2,7 @@ module Skylab::Common
 
   module Autoloader
 
-    class ConstMissing___
+    class ConstMissing_
 
       def initialize const_x, mod
         @const_string = const_x.to_s
@@ -14,7 +14,7 @@ module Skylab::Common
 
         if __I_have_a_stowaway_record_for_this_name
 
-          __value_via_stowaway_record
+          Here_::StowawayMagnetics__::Value_via_ConstMissing[ self ]
         else
           __value_via_lookup
         end
@@ -26,18 +26,8 @@ module Skylab::Common
         if h
           stow_x = h[ @const_symbol ]
           if stow_x
-            @__stow_x = stow_x ; ACHIEVED_
+            @stowaway_x__ = stow_x ; ACHIEVED_
           end
-        end
-      end
-
-      def __value_via_stowaway_record
-        self._BEGINNINGS_OF_A_SKETCH
-        stow_x = remove_instance_variable :@__stow_x
-        if stow_x.respond_to? :split
-          Here_::Stowaway_Actors__::Produce_x[ self, x ]
-        else
-          x.call
         end
       end
 
@@ -79,8 +69,7 @@ module Skylab::Common
         _sym = _name.as_approximation
         sm = @_file_tree.value_state_machine_via_approximation _sym
         if sm
-          @_state_machine = sm
-          @_entry_group = @_state_machine.entry_group
+          _receive_state_machine sm
           ACHIEVED_
         end
       end
@@ -92,28 +81,40 @@ module Skylab::Common
         raise Here_::NameError, _message
       end
 
-      def __maybe_load_then_cache_then_produce_the_value
+      def finish_via__ load_path, sm
 
-        __init_N_things  # N = 2
-        __maybe_autoloaderize_the_value
-        @_state_machine.write_value__ @_the_value, @const_symbol
-        $stderr.puts "autoloaded: #{ @module }::#{ @const_string }"
-        @_the_value
+        _receive_state_machine sm
+        @_load_path = load_path
+        _load_and_reach_reflection
+        _maybe_autoloaderize_the_value
+        cache_and_produce_value_ @_the_value
       end
 
-      def __maybe_autoloaderize_the_value
+      def __maybe_load_then_cache_then_produce_the_value
+
+        __reach_reflection_somehow
+        _maybe_autoloaderize_the_value
+        cache_and_produce_value_ @_the_value
+      end
+
+      def cache_and_produce_value_ x
+        @_state_machine.write_value__ x, @const_symbol
+        $stderr.puts "                       #{ @module }::#{ @const_string }"
+        x
+      end
+
+      def _receive_state_machine sm
+        @_state_machine = sm
+        @_entry_group = @_state_machine.entry_group ; nil
+      end
+
+      def _maybe_autoloaderize_the_value
 
         kn = @_whether_to_autoloaderize_module
         if ! kn
-          kn = if @_the_value.respond_to? :module_exec and
-              ! @_the_value.respond_to? NODE_PATH_IVAR_
-
-            Known_Known.trueish_instance
-          else
-            Known_Known.falseish_instance
-          end
+          _yes = Should_probably_autoloaderize_[ @_the_value ]
+          kn = Known_Known.yes_or_no _yes
         end
-
         if kn.value_x  # if yes
           __autoloaderize_the_module
         end
@@ -132,23 +133,23 @@ module Skylab::Common
         NIL
       end
 
-      def __init_N_things
+      def __reach_reflection_somehow
 
         if @_entry_group.includes_what_is_probably_a_file
-          __init_N_things_when_eponymous_file
+          __reach_reflection_when_eponymous_file
         else
-          __init_N_things_when_directory
+          __reach_reflection_when_directory
         end
       end
 
-      def __init_N_things_when_directory
+      def __reach_reflection_when_directory
 
-        @_child_file_tree = @_file_tree.child_file_tree__ @_state_machine
+        @_child_file_tree = @_file_tree.child_file_tree @_state_machine
 
         if __there_is_a_corefile
-          __init_N_things_via_loading_the_corefile
+          __reach_reflection_via_loading_the_corefile
         else
-          __init_N_things_via_autovivifying_a_module
+          __reach_reflection_via_autovivifying_a_module
         end
       end
 
@@ -160,7 +161,7 @@ module Skylab::Common
         end
       end
 
-      def __init_N_things_via_autovivifying_a_module
+      def __reach_reflection_via_autovivifying_a_module
 
         x = ::Module.new
         @module.const_set @const_symbol, x
@@ -169,29 +170,29 @@ module Skylab::Common
         NIL
       end
 
-      def __init_N_things_via_loading_the_corefile
+      def __reach_reflection_via_loading_the_corefile
 
         @_load_path = ::File.join(
           @_core_file_state_machine.parent_node_path,
           @_core_file_state_machine.entry_group.filesystem_entry_string
         )
 
-        _load_then_init_N_things
+        _load_and_reach_reflection
         NIL
       end
 
-      def __init_N_things_when_eponymous_file
+      def __reach_reflection_when_eponymous_file
 
         @_load_path = ::File.join(
           @_state_machine.parent_node_path,
           @_entry_group.filesystem_entry_string
         )
 
-        _load_then_init_N_things
+        _load_and_reach_reflection
         NIL
       end
 
-      def _load_then_init_N_things
+      def _load_and_reach_reflection  # init N things
 
         load @_load_path
 
@@ -209,8 +210,17 @@ module Skylab::Common
         @___name ||= Name.via_valid_const_string_ @const_string
       end
 
-      # ==
+      attr_reader(
+        :const_symbol,  # #sm
+        :module,  # #sm
+      )
+    end
 
+    Should_probably_autoloaderize_ = -> x do  # #stowaway
+      if x.respond_to? :module_exec
+        # (hi.)
+        ! x.respond_to? :dir_path
+      end
     end
   end
 end

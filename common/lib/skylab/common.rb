@@ -1078,7 +1078,7 @@ module Skylab::Common
       # -- autoload "reading"
 
       def const_missing x  # accept symbol or string
-        _ = Here_::ConstMissing___.new( x, self ).execute
+        _ = Here_::ConstMissing_.new( x, self ).execute
         _
       end
 
@@ -1109,7 +1109,7 @@ module Skylab::Common
 
     dir = ::File.join DIR_PATH__, 'autoloader'
     autoload :ComponentModels__, ::File.join( dir, 'component-models--' )
-    autoload :ConstMissing___, ::File.join( dir, 'const-missing---' )
+    autoload :ConstMissing_, ::File.join( dir, 'const-missing-' )
     autoload :FileTree_, ::File.join( dir, 'file-tree-' )
     autoload :Say_, ::File.join( dir, 'say-' )
 
@@ -1705,7 +1705,6 @@ module Skylab::Common
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
 
-  PATH_SEP_ = ::File::SEPARATOR
   SPACE_ = ' '.freeze
   UNABLE_ = false
 

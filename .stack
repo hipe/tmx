@@ -10,4 +10,3 @@ no more requiring of pathname univerally
 (-4) local [co] test suite integration only -- run each a.l related file standalone
 (-5) rewrite boxxy
 (-6) rewrite const reduce
-(-7) rewrite stowaway

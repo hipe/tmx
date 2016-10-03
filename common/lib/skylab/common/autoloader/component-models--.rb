@@ -15,7 +15,6 @@ module Skylab::Common
         def initialize mod
 
           s_a = mod.name.split CONST_SEP_
-          s_a.pop
 
           const_s = s_a.pop
 
@@ -46,8 +45,8 @@ module Skylab::Common
         # value (i.e none or unknown).
 
         def [] mod
-          if mod.instance_variable_defined? :@dir_path
-            if ! mod.instance_variable_get :@dir_path
+          if mod.instance_variable_defined? NODE_PATH_IVAR_
+            if ! mod.instance_variable_get NODE_PATH_IVAR_
               _descend mod
             end
           else
@@ -68,7 +67,7 @@ module Skylab::Common
                 self._COVER_ME_directory_was_falseish
               end
             else
-              raise ::NoMethodError, Home_::Say_::Needs_dir_path[ parent_module ]
+              raise ::NoMethodError, Here_::Say_::Needs_dir_path[ parent_mod ]
             end
           else
             self._COVER_ME_no_parent_module
@@ -77,7 +76,11 @@ module Skylab::Common
         end
 
         def __via_parent_directory dir, mod
-          ::Kernel._K
+
+          _slug = mod.pedigree_.node_path_entry_name_.as_slug
+          _node_path = ::File.join dir, _slug
+          mod.instance_variable_set NODE_PATH_IVAR_, _node_path
+          NIL
         end
       end ; end
     end

@@ -58,8 +58,6 @@ module Skylab::Common
         def __come_downwards_from_the_parent_entry_tree
           # the reason we do this is because [#058] #note-3
 
-          self._REVIEW
-
           _existed = @module.pedigree_
           _name = _existed.node_path_entry_name_
           _slug = _name.as_slug
@@ -68,8 +66,14 @@ module Skylab::Common
 
           sm = _ft.value_state_machine_via_head _slug
           if sm
-            ::Kernel._A
+            eg = sm.entry_group
+            if eg.includes_what_is_probably_a_directory
+              _make_my_own_tree
+            else
+              ::Kernel._C
+            end
           else
+            # (maybe only to cover legacy)
             ::Kernel._B
           end
         end
@@ -90,6 +94,7 @@ module Skylab::Common
         p = -> node_path do
           h.fetch node_path do
             node = FileTree_via_NodePath___.new( node_path, p, fs ).execute
+            $stderr.puts node_path
             h[ node_path ] = node
             node
           end
@@ -219,7 +224,7 @@ module Skylab::Common
           freeze
         end
 
-        def child_file_tree__ sm  # state machine
+        def child_file_tree sm  # state machine
 
           _child_node_path = ::File.join @node_path, sm.entry_group.head
 
@@ -246,7 +251,7 @@ module Skylab::Common
 
           entry_group = @_h[ head ]
           if entry_group
-            @_value_state_macine_cache.fetch head do
+            @_value_state_machine_cache.fetch head do
               _add_and_produce_state_machine entry_group, head
             end
           end
