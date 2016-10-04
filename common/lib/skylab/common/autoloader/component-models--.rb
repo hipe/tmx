@@ -59,7 +59,7 @@ module Skylab::Common
 
           parent_mod = mod.parent_module
           if parent_mod
-            if parent_mod.respond_to? :dir_path
+            if parent_mod.respond_to? NODE_PATH_METHOD_
               dir = parent_mod.dir_path
               if dir
                 __via_parent_directory dir, mod

@@ -8,7 +8,19 @@ module Skylab::Common
         @const_string = const_x.to_s
         @const_symbol = const_x.intern
         @module = mod
+        @on_const_missing_after_loaded_file = nil
+        @_whether_to_autoloaderize_module = nil
       end
+
+      def do_autoloaderize= x
+        @_whether_to_autoloaderize_module = Known_Known.yes_or_no x
+        x
+      end
+
+      attr_writer(
+        :file_tree,  # #cr
+        :on_const_missing_after_loaded_file,  # #cr
+      )
 
       def execute
 
@@ -37,13 +49,7 @@ module Skylab::Common
 
           if __the_file_tree_has_an_associated_filesystem_entry_group
 
-            if @_state_machine.value_is_known
-
-              __when_value_has_already_been_determined
-
-            else
-              __maybe_load_then_cache_then_produce_the_value
-            end
+            value_via_state_machine_
           else
             _msg = Here_::Say_::Uninitialized_constant[ _name, @module ]
             raise Here_::NameError, _msg
@@ -57,7 +63,7 @@ module Skylab::Common
 
         ft = @module.entry_tree
         if ft.is_file_tree
-          @_file_tree = ft ; ACHIEVED_
+          @file_tree = ft ; ACHIEVED_
         else
           self._DO_SOMETHING_WITH_the_fail_info_in_there
           UNABLE_
@@ -67,10 +73,20 @@ module Skylab::Common
       def __the_file_tree_has_an_associated_filesystem_entry_group
 
         _sym = _name.as_approximation
-        sm = @_file_tree.value_state_machine_via_approximation _sym
+        sm = @file_tree.value_state_machine_via_approximation _sym
         if sm
-          _receive_state_machine sm
+          self.state_machine = sm
           ACHIEVED_
+        end
+      end
+
+      def value_via_state_machine_
+
+        if @_state_machine.value_is_known
+
+          __when_value_has_already_been_determined
+        else
+          __maybe_load_then_cache_then_produce_the_value
         end
       end
 
@@ -83,7 +99,7 @@ module Skylab::Common
 
       def finish_via__ load_path, sm
 
-        _receive_state_machine sm
+        self.state_machine = sm
         @_load_path = load_path
         _load_and_reach_reflection
         _maybe_autoloaderize_the_value
@@ -103,7 +119,7 @@ module Skylab::Common
         x
       end
 
-      def _receive_state_machine sm
+      def state_machine= sm
         @_state_machine = sm
         @_entry_group = @_state_machine.entry_group ; nil
       end
@@ -144,7 +160,7 @@ module Skylab::Common
 
       def __reach_reflection_when_directory
 
-        @_child_file_tree = @_file_tree.child_file_tree @_state_machine
+        @_child_file_tree = @file_tree.child_file_tree @_state_machine
 
         if __there_is_a_corefile
           __reach_reflection_via_loading_the_corefile
@@ -166,7 +182,7 @@ module Skylab::Common
         x = ::Module.new
         @module.const_set @const_symbol, x
         @_the_value = x
-        @_whether_to_autoloaderize_module = Known_Known.trueish_instance
+        @_whether_to_autoloaderize_module ||= Known_Known.trueish_instance
         NIL
       end
 
@@ -196,30 +212,46 @@ module Skylab::Common
 
         load @_load_path
 
-        if @module.const_defined? @const_symbol, false
-          @_the_value = @module.const_get @const_symbol, false
-          @_whether_to_autoloaderize_module = nil
-          NIL
-        else
+        begin
+
+          if @module.const_defined? @const_symbol, false
+            @_the_value = @module.const_get @const_symbol, false
+            break
+          end
+
+          p = @on_const_missing_after_loaded_file
+          if p
+            @on_const_missing_after_loaded_file = nil
+            p[]
+            redo
+          end
+
           _message = Here_::Say_::Not_in_file[ @_load_path, @const_string, @module ]
           raise Here_::NameError, _message
-        end
+
+        end while above
+        NIL
       end
 
       def _name
         @___name ||= Name.via_valid_const_string_ @const_string
       end
 
+      def const_symbol= sym
+        @const_string = sym.id2name
+        @const_symbol = sym
+      end
+
       attr_reader(
-        :const_symbol,  # #sm
+        :const_symbol,  # #sm, #cr
         :module,  # #sm
       )
     end
 
     Should_probably_autoloaderize_ = -> x do  # #stowaway
-      if x.respond_to? :module_exec
+      if Looks_like_module_[ x ]
         # (hi.)
-        ! x.respond_to? :dir_path
+        ! x.respond_to? NODE_PATH_METHOD_
       end
     end
   end

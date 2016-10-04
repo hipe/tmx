@@ -20,7 +20,7 @@ module Skylab::Fields
 
   Autoloader_ = Common_::Autoloader
 
-  class Attributes < ::Module
+  class Attributes < ::Module  # :[#013]
 
     class << self
 

@@ -57,7 +57,7 @@ module Skylab::Common
         scn = et ? et.to_stream : Scn.the_empty_stream
         stem = Distill_[ i ]
         while (( np = scn.gets ))
-          stem == np.corename_as_distilled_stem or next
+          stem == np.corename_as_approximation or next
           :not_loaded == np.state_i and break found = true
           np.assert_state :loaded
         end
@@ -65,12 +65,14 @@ module Skylab::Common
       end
     end
 
-    class Normpath_
+    class FS_Node_  # #todo not ok - monkeypatching
+
       def corename_as_const
         name_for_lookup_.as_const
       end
-      def corename_as_distilled_stem
-        name_for_lookup_.as_distilled_stem
+
+      def corename_as_approximation
+        name_for_lookup_.as_approximation
       end
     end
 

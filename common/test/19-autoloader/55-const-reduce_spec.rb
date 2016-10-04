@@ -32,7 +32,7 @@ module Skylab::Common::TestSupport
       it "& it is infinitely extensible (one day) (long form, local ctx)" do
 
         _rx = %r(\Aname_error: uninitialized constant #{
-          }[A-Za-z:]+::X_a_c_Foo1::Bar_Biff::\( ~ cowabungaa \) \(cowabungaa\))
+          }[A-Za-z:]+::X_a_c_Foo1::Bar_Biff::\( ~ cowabungaa \))
 
         _ = _subject(
 
@@ -53,7 +53,7 @@ module Skylab::Common::TestSupport
 
         begin
           _subject %i( 123fml ), X_a_c_Foo1
-        rescue ::NameError => e
+        rescue _name_error_class => e
         end
 
         _expect_same_name_error e
@@ -72,7 +72,7 @@ module Skylab::Common::TestSupport
 
       def _expect_same_name_error e
 
-        ( ::NameError === e ) or fail
+        ( _name_error_class === e ) or fail
         e.message =~ %r(\Awrong constant name '123fml' for const reduce\z) or fail
       end
 
@@ -162,10 +162,10 @@ module Skylab::Common::TestSupport
 
       it "with a node that is not itself designed to autoload" do
 
-        pair = _subject(
+        pair = _subject_plus_real_file_tree_cache(
           :result_in_name_and_value,
           :from_module, fixture_tree_::One_Skorlab,
-          :path_x, :Infermation_Terktix,
+          :const_path, :Infermation_Terktix,
         )
 
         pair.name_x == :InfermationTerktix or fail
@@ -174,23 +174,23 @@ module Skylab::Common::TestSupport
 
       it "the same as above but value only (name correction)" do
 
-        _mod = _subject(
+        _mod = _subject_plus_real_file_tree_cache(
           :from_module, fixture_tree_::Two_Skorlab,
-          :path_x, :Infermation_Terktix,
+          :const_path, :Infermation_Terktix,
         )
 
         _mod.name =~ %r(FixtureTree::Two_Skorlab::InfermationTerktix\z) or fail
       end
 
-      it "if you want name correction on a boxxy module, you need one option" do
+      it "if you want name correction on a boxxy module, you need one option", wip: true do  # waiting for boxxy
 
         _a = fixture_tree_
 
         _b = _a::Tre_Skorlab  # #spot-2
 
-        _pair = _subject(
+        _pair = _subject_plus_real_file_tree_cache(
           :from_module, _b,
-          :path_x, :Infermation_Terktix,
+          :const_path, :Infermation_Terktix,
           :correct_the_name,
           :result_in_name_and_value,
         )
@@ -212,9 +212,17 @@ module Skylab::Common::TestSupport
 
       _Skylab = fixture_tree_::For_Skerlerb
 
-      _hi = _subject %i( Infermershern ), _Skylab
+      _hi = _subject_plus_real_file_tree_cache %i( Infermershern ), _Skylab
 
       _hi.name =~ %r(::Infermershern\z) or fail
+    end
+
+    def _subject_plus_real_file_tree_cache * x_a, & x_p
+
+      Home_::Autoloader::ConstReduction__.new(
+        x_a,
+        Autoloader_::File_tree_cache___,  # ..
+        & x_p ).execute
     end
 
     def _subject * x_a, & x_p
@@ -222,7 +230,11 @@ module Skylab::Common::TestSupport
       # (all the testing in this file forgoes the surface entrypoint
       # for the performer, but meh that's not the focus)
 
-      Home_::Autoloader::Const_Reduction__.new( x_a, & x_p ).execute
+      Home_::Autoloader::ConstReduction__.new( x_a, & x_p ).execute
+    end
+
+    def _name_error_class
+      Autoloader_::NameError
     end
 
     def fixture_tree_

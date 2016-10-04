@@ -932,7 +932,7 @@ module Skylab::Common
         if x_a.length.nonzero? || block_given?
           Autoloaderization___.new( mod, x_a, & p ).execute
         else
-          mod.respond_to? :dir_path and raise Here_::Say_::Not_idempotent[ mod ]
+          mod.respond_to? NODE_PATH_METHOD_ and raise Here_::Say_::Not_idempotent[ mod ]
           mod.extend Methods__
         end
         mod
@@ -1037,7 +1037,7 @@ module Skylab::Common
           end
 
           if do_boxxy
-            if ! respond_to? :dir_path
+            if ! respond_to? NODE_PATH_METHOD_
               extend Methods__
             end
             extend BoxxyPlaceholder___
@@ -1049,6 +1049,7 @@ module Skylab::Common
     end
 
     Here_ = self
+    NODE_PATH_METHOD_ = :dir_path
 
     module BoxxyPlaceholder___
       def constants
@@ -1105,6 +1106,10 @@ module Skylab::Common
 
     File_tree_cache___ = Lazy_.call do
       Here_::FileTree_::Cache[ ::Dir ]
+    end
+
+    Looks_like_module_ = -> x do
+      x.respond_to? :module_exec
     end
 
     dir = ::File.join DIR_PATH__, 'autoloader'

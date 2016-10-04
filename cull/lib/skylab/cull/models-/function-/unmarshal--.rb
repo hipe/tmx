@@ -106,7 +106,7 @@ module Skylab::Cull
       def when_one const
 
         pair = Autoloader_.const_reduce(
-          :path_x, const,
+          :const_path, const,
           :from_module, @box_mod,
           :correct_the_name,
           :result_in_name_and_value,
