@@ -7,5 +7,3 @@ no more requiring of pathname univerally
 (-1) many stubs can be removed, get rid of tombstones in [co] a.l tests
 (-2) universal integration (all green)
 (-3) [co] as a sidesystem tests run
-(-4) local [co] test suite integration only -- run each a.l related file standalone
-(-5) rewrite boxxy

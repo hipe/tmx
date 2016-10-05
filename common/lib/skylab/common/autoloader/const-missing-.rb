@@ -5,6 +5,7 @@ module Skylab::Common
     class ConstMissing_
 
       def initialize const_x, mod
+        @const_defined = nil
         @const_string = const_x.to_s
         @const_symbol = const_x.intern
         @module = mod
@@ -18,7 +19,8 @@ module Skylab::Common
       end
 
       attr_writer(
-        :file_tree,  # #cr
+        :const_defined,  # #bo
+        :file_tree,  # #cr, #bo
         :on_const_missing_after_loaded_file,  # #cr
       )
 
@@ -51,7 +53,7 @@ module Skylab::Common
 
             value_via_state_machine_
           else
-            _msg = Here_::Say_::Uninitialized_constant[ _name, @module ]
+            _msg = Here_::Say_::Uninitialized_constant[ name_, @module ]
             raise Here_::NameError, _msg
           end
         else
@@ -72,7 +74,7 @@ module Skylab::Common
 
       def __the_file_tree_has_an_associated_filesystem_entry_group
 
-        _sym = _name.as_approximation
+        _sym = name_.as_approximation
         sm = @file_tree.value_state_machine_via_approximation _sym
         if sm
           self.state_machine = sm
@@ -86,7 +88,7 @@ module Skylab::Common
 
           __when_value_has_already_been_determined
         else
-          __maybe_load_then_cache_then_produce_the_value
+          maybe_load_then_cache_then_produce_the_value_
         end
       end
 
@@ -106,7 +108,7 @@ module Skylab::Common
         cache_and_produce_value_ @_the_value
       end
 
-      def __maybe_load_then_cache_then_produce_the_value
+      def maybe_load_then_cache_then_produce_the_value_
 
         __reach_reflection_somehow
         _maybe_autoloaderize_the_value
@@ -214,7 +216,7 @@ module Skylab::Common
 
         begin
 
-          if @module.const_defined? @const_symbol, false
+          if __constant_is_defined
             @_the_value = @module.const_get @const_symbol, false
             break
           end
@@ -233,7 +235,16 @@ module Skylab::Common
         NIL
       end
 
-      def _name
+      def __constant_is_defined
+        p = @const_defined
+        if p
+          p[ @const_symbol, false ]
+        else
+          @module.const_defined? @const_symbol, false
+        end
+      end
+
+      def name_
         @___name ||= Name.via_valid_const_string_ @const_string
       end
 

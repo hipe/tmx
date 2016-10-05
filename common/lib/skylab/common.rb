@@ -1037,11 +1037,14 @@ module Skylab::Common
           end
 
           if do_boxxy
+
+            @boxxy_original_methods__ ||= BoxxyOriginalMethods___.__for self  # [#030] #note-1
+
             if ! respond_to? NODE_PATH_METHOD_
               extend Methods__
             end
-            extend BoxxyPlaceholder___
-            # extend Here_::Boxxy_::Methods
+
+            extend BoxxyMethods____
           end
         end
         NIL
@@ -1051,9 +1054,32 @@ module Skylab::Common
     Here_ = self
     NODE_PATH_METHOD_ = :dir_path
 
-    module BoxxyPlaceholder___
+    module BoxxyMethods____
+
       def constants
-        self._XXX
+        _boxxy_controller.constants__
+      end
+
+      def const_defined? sym, inherit=true
+        _boxxy_controller.const_is_defined__ sym, inherit
+      end
+
+      def const_missing sym
+        _boxxy_controller.const_missing__ sym
+      end
+
+      def _boxxy_controller
+        @___boxxy_controller ||= Here_::Boxxy_::Controller.new self
+      end
+
+      attr_reader(
+        :boxxy_original_methods__
+      )
+    end
+
+    BoxxyOriginalMethods___ = ::Struct.new :const_defined, :constants, :const_get do
+      def self.__for mod
+        new mod.method( :const_defined? ), mod.method( :constants ), mod.method( :const_get )
       end
     end
 

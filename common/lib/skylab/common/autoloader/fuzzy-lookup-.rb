@@ -5,6 +5,7 @@ module Skylab::Common
     class FuzzyLookup_
 
       def initialize
+        @constants = nil
         @method_name_when_exactly_one = nil
         @method_name_when_many = nil
         @method_name_when_zero = nil
@@ -18,6 +19,7 @@ module Skylab::Common
       end
 
       attr_writer(
+        :constants,
         :method_name_when_exactly_one,
         :method_name_when_many,
         :method_name_when_zero,
@@ -40,7 +42,7 @@ module Skylab::Common
         matches = []
         k = @name.as_approximation
 
-        @module.constants.each do |sym|
+        __constants.each do |sym|
           if k == Distill_[ sym ]
             matches.push sym
           end
@@ -55,6 +57,15 @@ module Skylab::Common
         when 1
           @matches = matches
           __when_multiple_matches
+        end
+      end
+
+      def __constants
+        a = @constants
+        if a
+          a
+        else
+          @module.constants
         end
       end
 

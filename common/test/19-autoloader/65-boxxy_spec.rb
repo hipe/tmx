@@ -9,7 +9,7 @@ module Skylab::Common::TestSupport
       before :all do
 
         module TS_::FixtureTreesVolatile::One
-          LoL = :weird_casing
+          LOL = nil
           Autoloader_[ self, :boxxy ]
         end
       end
@@ -19,14 +19,14 @@ module Skylab::Common::TestSupport
         mod = _subject_module
 
         _a = mod.constants
-        _a == %i( LoL Ncsa_Spy ) || fail
+        _a == %i( LOL Ncsa_Spy ) || fail
 
-        mod.const_defined?( :NcSa_spy ) || fail
+        mod.const_defined?( :NCSA_SPY ) || fail
 
         _x = mod.const_get :NCsa_spy, false
         _x == :_hello_yes_this_is_NCSA_Spy_ || fail
 
-        mod.constants == %i( LoL NCSA_Spy ) || fail
+        mod.constants == %i( LOL NCSA_Spy ) || fail
       end
 
       it "won't trip up and let invalid names pass, despite distillation" do
@@ -47,7 +47,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "when there is no directory, things are ok" do
+    context "when there is no directory, things are ok", wip: true do
 
       before :all do
         module TS_::Fuxtures
@@ -96,7 +96,7 @@ module Skylab::Common::TestSupport
         mod = _subject_module
 
        _rx = %r(\A[A-Za-z:]+#{
-          }::FixtureTreesVolatile::Two::\( ~ lorca \) #{
+          }::FixtureTreesVolatile::Two::Lorca #{
            }must be but does not appear to be defined in #{
             }.+/fixture-trees-volatile/two/lorca\.rb)
 
@@ -117,7 +117,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "boxxy goes deep on your startup whether you like it or not" do
+    context "boxxy does NOT autoloaderize downwards" do
 
       before :all do
         module TS_::FixtureTreesVolatile::Three
@@ -125,14 +125,25 @@ module Skylab::Common::TestSupport
         end
       end
 
-      it "for now boxxy is always recursively contagious" do
+      it "it only happens the once" do
 
         mod = TS_::FixtureTreesVolatile::Three
 
-        lvl_1 = mod::Level_1
-        lvl_1.const_defined? :Level_2 or fail
+        mod.constants == %i( Level_1 ) || fail
 
-        _x = lvl_1::Level_2::Leaf_3::SOME_CONST
+        lvl1 = mod::Level_1
+
+        _yes = lvl1.const_defined? :Level_2
+        _yes && fail
+
+        lvl2 = lvl1::Level_2
+
+        _yes = lvl2.const_defined? :Leaf_3
+        _yes && fail
+
+        _leaf3 = lvl2::Leaf_3
+        _x = _leaf3::SOME_CONST
+
         _x == :some_val || fail
       end
     end

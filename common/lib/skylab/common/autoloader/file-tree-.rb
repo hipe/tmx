@@ -237,13 +237,21 @@ module Skylab::Common
 
         CORE_KEY___ = CORE_ENTRY_STEM.intern
 
+        def to_state_machine_stream_proc__
+          d = -1 ; head_a = @_a ; last = head_a.length - 1
+          -> do
+            if last != d
+              d += 1
+              _value_state_machine_via_head head_a.fetch d
+            end
+          end
+        end
+
         def value_state_machine_via_approximation k
 
           head = @__head_via_approximation[ k ]
           if head
-            @_value_state_machine_cache.fetch head do
-              _add_and_produce_state_machine @_h.fetch( head ), head
-            end
+            _value_state_machine_via_head head
           end
         end
 
@@ -254,6 +262,12 @@ module Skylab::Common
             @_value_state_machine_cache.fetch head do
               _add_and_produce_state_machine entry_group, head
             end
+          end
+        end
+
+        def _value_state_machine_via_head head
+          @_value_state_machine_cache.fetch head do
+            _add_and_produce_state_machine @_h.fetch( head ), head
           end
         end
 
