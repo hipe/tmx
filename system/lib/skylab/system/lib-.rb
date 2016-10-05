@@ -9,7 +9,7 @@ module Skylab::System
     define_singleton_method :_memoize, Common_::Memoize
 
     Attributes_stack_frame = -> *a do
-      Fields[]::Attributes::Stack::Common_Frame.call_via_arglist a
+      Fields[]::Attributes::Stack::CommonFrame.call_via_arglist a
     end
 
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]

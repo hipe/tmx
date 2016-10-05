@@ -207,9 +207,9 @@ module Skylab::Plugin
         if eg.includes_what_is_probably_a_file
           @state_machine.get_filesystem_path
         else
-          self._YOU_CAN_DO_IT_almost_there
           sm = @file_tree.corefile_state_machine
           if sm
+            self._OK_probably_fine
             sm.get_filesystem_path
           end
         end

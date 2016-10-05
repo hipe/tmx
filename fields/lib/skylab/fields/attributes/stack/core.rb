@@ -5,9 +5,9 @@ module Skylab::Fields
     class << self
       def common_frame * a
         if a.length.zero?
-          Here_::Common_Frame
+          Here_::CommonFrame
         else
-          Here_::Common_Frame.call_via_arglist a
+          Here_::CommonFrame.call_via_arglist a
         end
       end
     end  # >>

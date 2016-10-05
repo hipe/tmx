@@ -8,7 +8,7 @@ module Skylab::Fields::TestSupport
 
       class X_a_s_cf_Inter_1
 
-        Home_::Attributes::Stack::Common_Frame.call self,
+        Home_::Attributes::Stack::CommonFrame.call self,
           :globbing, :processor, :initialize,
           :readable, :field, :foo,
           :required, :readable, :field, :bar

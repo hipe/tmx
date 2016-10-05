@@ -2,7 +2,7 @@ module Skylab::Human
 
   module NLP::EN::Sexp
 
-    class Expression_Sessions::Gerund_Phraseish < Expression_Sessions::Nounish::Redux_Abstract_Base  # ..
+    class Expression_Sessions::GerundPhraseish < Expression_Sessions::Nounish::Redux_Abstract_Base  # ..
 
       class << self
         alias_method :interpret_component_with_own_stream_, :new

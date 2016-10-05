@@ -5,7 +5,7 @@ module Skylab::Fields::TestSupport
   describe "[br] property - stack - common frame" do
 
     it "loads." do
-      Home_::Attributes::Stack::Common_Frame
+      Home_::Attributes::Stack::CommonFrame
     end
 
     it "whines on weirdness" do
@@ -14,7 +14,7 @@ module Skylab::Fields::TestSupport
 
       begin
         class X_a_s_cf_Intro_A
-          Home_::Attributes::Stack::Common_Frame.call self, :weirdness
+          Home_::Attributes::Stack::CommonFrame.call self, :weirdness
         end
       rescue ::ArgumentError => e
       end
@@ -28,7 +28,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_B
 
-          Home_::Attributes::Stack::Common_Frame.call(
+          Home_::Attributes::Stack::CommonFrame.call(
             self, :method, :foo_diddle, )
 
           def foo_diddle
@@ -63,7 +63,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_C
 
-          Home_::Attributes::Stack::Common_Frame.call self,
+          Home_::Attributes::Stack::CommonFrame.call self,
 
             :proc, :wiz_waz, -> do
               d = 0
@@ -92,7 +92,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_D
 
-          Home_::Attributes::Stack::Common_Frame.call self,
+          Home_::Attributes::Stack::CommonFrame.call self,
 
             :memoized, :proc, :wiz_wuz, -> do
               d = 0
@@ -123,7 +123,7 @@ module Skylab::Fields::TestSupport
         X_a_s_cf_xxx = ::Class.new
 
         begin
-          Home_::Attributes::Stack::Common_Frame.call X_a_s_cf_xxx, :memoized, :method, :jib_jab
+          Home_::Attributes::Stack::CommonFrame.call X_a_s_cf_xxx, :memoized, :method, :jib_jab
         rescue ::ArgumentError => e
         end
 
@@ -137,7 +137,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_E
 
-          Home_::Attributes::Stack::Common_Frame.call self,
+          Home_::Attributes::Stack::CommonFrame.call self,
 
             :inline_method, :dozer, -> do
               "zack #{ briff }"
@@ -167,7 +167,7 @@ module Skylab::Fields::TestSupport
 
           d = 0
 
-          Home_::Attributes::Stack::Common_Frame.call self,
+          Home_::Attributes::Stack::CommonFrame.call self,
             :memoized, :inline_method, :wowzaa, -> do
               "#{ fib_nibble  } #{ d += 1 }"
             end
@@ -197,7 +197,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_G
 
-          Home_::Attributes::Stack::Common_Frame.call self, :readable, :field, :dingle_woofer,
+          Home_::Attributes::Stack::CommonFrame.call self, :readable, :field, :dingle_woofer,
 
             :globbing, :processor, :initialize
 
@@ -226,7 +226,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_H
 
-          Home_::Attributes::Stack::Common_Frame.call self,
+          Home_::Attributes::Stack::CommonFrame.call self,
             :readable, :field, :foo,
             :field, :bar,
             :globbing, :processor, :initialize,
@@ -278,7 +278,7 @@ module Skylab::Fields::TestSupport
 
         class X_a_s_cf_Intro_I
 
-          Home_::Attributes::Stack::Common_Frame.call self,
+          Home_::Attributes::Stack::CommonFrame.call self,
             :required, :field, :foo,
             :globbing, :processor, :initialize
         end
