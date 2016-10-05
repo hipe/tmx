@@ -32,7 +32,7 @@ module Skylab::Common::TestSupport
     end
 
     def subject_API
-      Home_::CLI._application_kernel
+      Home_::CLI.application_kernel_
     end
   end
 end

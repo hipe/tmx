@@ -4,27 +4,37 @@ module Skylab::Common
 
     module ComponentModels__
 
-      Pedigree_via_module = -> mod do
-        PedigreeViaModule___.new mod
-      end  # >>
+      class Pedigree
 
-      # ==
+        class << self
 
-      class PedigreeViaModule___
+          def via_module__ mod
 
-        def initialize mod
+            s_a = mod.name.split CONST_SEP_
 
-          s_a = mod.name.split CONST_SEP_
+            const_s = s_a.pop
 
-          const_s = s_a.pop
+            _parent_module = if s_a.length.nonzero?
+              Const_value_via_parts[ s_a ]
+            end
 
-          @node_path_entry_name_ = Name.via_valid_const_string_ const_s
-
-          @parent_module__ = if s_a.length.nonzero?
-            Const_value_via_parts[ s_a ]
+            new const_s, _parent_module
           end
 
-          freeze
+          def via_module_and_parent_module__ mod, pmod
+
+            name = mod.name
+            d = name.rindex ':'  # COLON_
+            _const_s = name[ d+1 .. -1 ]
+            new _const_s, pmod
+          end
+
+          private :new
+        end  # >>
+
+        def initialize const_s, pmod
+          @node_path_entry_name_ = Name.via_valid_const_string_ const_s
+          @parent_module__ = pmod
         end
 
         attr_reader(

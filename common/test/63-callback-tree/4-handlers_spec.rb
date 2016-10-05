@@ -4,6 +4,9 @@ module Skylab::Common::TestSupport
 
   describe "[co] callback tree - handlers" do
 
+    TS_[ self ]
+    use :the_method_called_let
+
     context "a typical handlers tree" do
 
       it "on the money is on the money" do

@@ -29,7 +29,7 @@ module Skylab::TestSupport  # :[#021].
 
       build_curry = -> do
         Home_.lib_.plugin::Bundle::Fancy_lookup.new_with(
-          :stemname_filter, /_spec\z/,
+          :entry_group_head_filter, /_spec\z/,
         ).freeze
       end
       curry = nil
@@ -178,6 +178,7 @@ module Skylab::TestSupport  # :[#021].
   NEWLINE_ = "\n".freeze
   NOTHING_ = nil
   NIL_ = nil
+  stowaway :IO, 'io/spy--'
   SPACE_ = ' '.freeze
   TEST_DIR_FILENAME_ = 'test'.freeze
   UNABLE_ = false

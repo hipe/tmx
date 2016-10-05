@@ -2,8 +2,6 @@ module Skylab::TestSupport
 
   module Quickie
 
-    Sessions_ = ::Module.new
-
     class Sessions_::Execute
 
       def initialize y, test_file_path_a, pn_s_a

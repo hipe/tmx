@@ -2,7 +2,7 @@ class Skylab::Task
 
   class Eventpoint
 
-    class Find_Path___
+    class FindPath___
 
       include Worker_Methods_
 

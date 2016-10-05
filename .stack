@@ -6,4 +6,3 @@ relative_path_from
 no more requiring of pathname univerally
 (-1) many stubs can be removed, get rid of tombstones in [co] a.l tests
 (-2) universal integration (all green)
-(-3) [co] as a sidesystem tests run

@@ -4,6 +4,9 @@ module Skylab::Common::TestSupport
 
   describe "[co] callback tree - listeners" do
 
+    TS_[ self ]
+    use :the_method_called_let
+
     context "minimal normative example" do
 
       it "listener gets notified" do

@@ -2,7 +2,6 @@ module Skylab::Plugin
 
   class BaselessCollection
 
-    Modality_Adapters_ = ::Module.new
     class Modality_Adapters_::CLI
 
       # this two-way adapter provides a consistent interface for both

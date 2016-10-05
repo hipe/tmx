@@ -39,6 +39,10 @@ module Skylab::Common::TestSupport
         TestSupport_::Memoization_and_subject_sharing[ tcc ]
       end
 
+      cache[ :the_method_called_let ] = -> tcc do
+        TestSupport_::Let[ tcc ]
+      end
+
       -> sym do
         ( cache.fetch sym do
           cache[ sym ] = TestSupport_.fancy_lookup sym, TS_

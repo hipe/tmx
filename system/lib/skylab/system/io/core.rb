@@ -19,7 +19,7 @@ module Skylab::System
       def select
         IO_::Select__
       end
-    end
+    end  # >>
 
     Byte_Identifer_ = ::Class.new
 
@@ -106,5 +106,9 @@ module Skylab::System
       :truncate,  # idem
       :write
     ].freeze
+
+    Autoloader_[ self ]
+    stowaway :Mappers, 'mappers/filter'
+
   end
 end

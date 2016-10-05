@@ -173,7 +173,7 @@ module Skylab::Common
 
           __init_for_indexing
 
-          st = mod.entry_tree.to_state_machine_stream_proc__
+          st = mod.entry_tree.to_state_machine_stream_proc_
           begin
             sm = st.call
             sm || break

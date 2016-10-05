@@ -45,5 +45,4 @@ module Skylab::Plugin
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'
-
 end

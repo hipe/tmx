@@ -15,7 +15,7 @@ module Skylab::Common::TestSupport
       end
 
       _expect_state_faulure :record_time do
-        @event_log.set_hash_of_terminal_channels_to_ignore Home_::EMPTY_H_
+        @event_log.set_hash_of_terminal_channels_to_ignore Home_::EMPTY_P_
       end
     end
 

@@ -117,13 +117,14 @@ module Skylab::Common
 
       def cache_and_produce_value_ x
         @_state_machine.write_value__ x, @const_symbol
-        $stderr.puts "                       #{ @module }::#{ @const_string }"
+        $stderr.puts "#{ MARGIN___ }#{ @module }::#{ @const_string }"
         x
       end
 
+      MARGIN___ = "#{ SPACE_ * 22 } - "
+
       def state_machine= sm
         @_state_machine = sm
-        @_entry_group = @_state_machine.entry_group ; nil
       end
 
       def _maybe_autoloaderize_the_value
@@ -141,19 +142,14 @@ module Skylab::Common
 
       def __autoloaderize_the_module
 
-        _child_node_path = ::File.join(
-          @_state_machine.parent_node_path,
-          @_entry_group.head,
-        )
-
+        _child_node_path = @_state_machine.get_node_path
         Here_[ @_the_value, _child_node_path ]
-
         NIL
       end
 
       def __reach_reflection_somehow
 
-        if @_entry_group.includes_what_is_probably_a_file
+        if @_state_machine.entry_group.includes_what_is_probably_a_file
           __reach_reflection_when_eponymous_file
         else
           __reach_reflection_when_directory
@@ -173,7 +169,7 @@ module Skylab::Common
 
       def __there_is_a_corefile
 
-        sm = @_child_file_tree.corefile_state_machine__
+        sm = @_child_file_tree.corefile_state_machine
         if sm
           @_core_file_state_machine = sm ; ACHIEVED_
         end
@@ -190,22 +186,14 @@ module Skylab::Common
 
       def __reach_reflection_via_loading_the_corefile
 
-        @_load_path = ::File.join(
-          @_core_file_state_machine.parent_node_path,
-          @_core_file_state_machine.entry_group.filesystem_entry_string
-        )
-
+        @_load_path = @_core_file_state_machine.get_filesystem_path
         _load_and_reach_reflection
         NIL
       end
 
       def __reach_reflection_when_eponymous_file
 
-        @_load_path = ::File.join(
-          @_state_machine.parent_node_path,
-          @_entry_group.filesystem_entry_string
-        )
-
+        @_load_path = @_state_machine.get_filesystem_path
         _load_and_reach_reflection
         NIL
       end
@@ -260,7 +248,7 @@ module Skylab::Common
     end
 
     Should_probably_autoloaderize_ = -> x do  # #stowaway
-      if Looks_like_module_[ x ]
+      if Is_probably_module[ x ]
         # (hi.)
         ! x.respond_to? NODE_PATH_METHOD_
       end

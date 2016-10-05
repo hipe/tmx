@@ -146,7 +146,7 @@ module Skylab::Common
         @__discovered = tuple
 
         if @correct_the_name
-          ::Kernel._K
+          ::Kernel._K_wipped_but_we_can_bring_it_back  # #todo
         end
         NIL
       end
@@ -220,7 +220,7 @@ module Skylab::Common
         end
 
         def for_value x
-          if Looks_like_module_[ x ]
+          if Is_probably_module[ x ]
             ModuleFrame___.new x, self
           else
             NonModuleFrame___.new x, self

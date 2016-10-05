@@ -1,6 +1,21 @@
 module Skylab::Common
 
-  Models_ = ::Module.new
+  # wickedly loaded at #spot-3
+
+  # == payback
+
+  if const_defined? :Models_, false
+    self._OK_get_rid_of_this
+  end
+
+  module Models_
+    module Event
+      Autoloader[ self ]
+    end
+    Autoloader[ self ]
+  end
+
+  # == end payback
 
   Models_::Ping = -> pxy do
 

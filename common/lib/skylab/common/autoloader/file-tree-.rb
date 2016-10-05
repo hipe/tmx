@@ -86,6 +86,9 @@ module Skylab::Common
 
       # ==
 
+      do_debug = true
+      output_for_trace = nil
+
       Cache = -> fs do
 
         # build a new file tree cache (typically a singleton)
@@ -93,13 +96,69 @@ module Skylab::Common
         h = {}
         p = -> node_path do
           h.fetch node_path do
+            if do_debug
+              output_for_trace[ node_path ]
+            end
             node = FileTree_via_NodePath___.new( node_path, p, fs ).execute
-            $stderr.puts node_path
             h[ node_path ] = node
             node
           end
         end
         p
+      end
+
+      output_for_trace = -> path0 do
+
+        # paths that are in a file that are in an installed gem have leading
+        # cruft we want to ellipsify from every but the first such occurrence.
+        # detect the first such path hackishly, and then use this path somehow
+        # to decide how to detect and shorten subsequent such paths. exploratory
+
+        gem_needle = ::File.join EMPTY_S_, 'ruby', RUBY_VERSION, 'gems', EMPTY_S_
+        margin = "#{ SPACE_ * 18 } * "
+        sep = ::File::SEPARATOR
+        serr = $stderr
+
+        puts = -> line do
+          serr.puts "#{ margin }#{ line }"
+        end
+
+        rx = /\d+(?:\.\d+)+\.(?<short_part>[a-z]+)/
+
+        rx_ = /\A#{ ::File.join EMPTY_S_, 'lib', 'skylab', '[a-z_]+' }(?:#{ sep }(?<rest>.+))?/
+
+        output_for_trace = -> path1 do
+          puts[ path1 ]
+          d = path1.index gem_needle
+          if d
+            midpoint = d + gem_needle.length
+            head_range = 0 ... midpoint
+            tail_range = midpoint .. -1
+            head_needle = path1[ head_range ]
+            output_for_trace = -> path do
+              if head_needle == path[ head_range ]
+                shorter = path[ tail_range ]
+                d = shorter.index sep
+                gemdir = shorter[ 0, d ]
+                md = rx.match gemdir
+                if md
+                  gem_local_path = shorter[ d .. -1 ]
+                  md_ = rx_.match gem_local_path
+                  if md_
+                    s = md_[ :rest ]
+                    gem_local_path = ( " #{ s }" if s )
+                  end
+                  puts[ "[#{ md[ :short_part ] }]#{ gem_local_path }" ]
+                else
+                  puts[ "[..]/#{ shorter }" ]
+                end
+              else
+                puts[ path ]
+              end
+            end
+          end
+        end
+        output_for_trace[ path0 ]
       end
 
       # ==
@@ -231,13 +290,18 @@ module Skylab::Common
           @treer[ _child_node_path ]
         end
 
-        def corefile_state_machine__
+        def corefile_state_machine
           value_state_machine_via_approximation CORE_KEY___
         end
 
         CORE_KEY___ = CORE_ENTRY_STEM.intern
 
-        def to_state_machine_stream_proc__
+        def to_state_machine_stream
+          _ = to_state_machine_stream_proc_
+          _ = Home_.stream( & _ )
+        end
+
+        def to_state_machine_stream_proc_
           d = -1 ; head_a = @_a ; last = head_a.length - 1
           -> do
             if last != d
@@ -310,6 +374,18 @@ module Skylab::Common
 
         def const_symbol
           @_value_and_name.name_symbol
+        end
+
+        def get_node_path
+          ::File.join @parent_node_path, @entry_group.head
+        end
+
+        def get_filesystem_path
+          ::File.join @parent_node_path, @entry_group.filesystem_entry_string
+        end
+
+        def entry_group_head
+          @entry_group.head
         end
 
         attr_reader(

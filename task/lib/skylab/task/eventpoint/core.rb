@@ -317,7 +317,7 @@ class Skylab::Task
 
         def ___find_path
 
-          _ = Here_::Find_path___.new(
+          _ = Here_::FindPath___.new(
             @y, @graph, @before_symbol, @after_symbol, @sig_a )
 
           _common _

@@ -4,6 +4,9 @@ module Skylab::Common::TestSupport
 
   describe "[co] event - wrappers file utils message" do
 
+    TS_[ self ]
+    use :the_method_called_let
+
     context 'mkdir -p' do
 
       let :arg do

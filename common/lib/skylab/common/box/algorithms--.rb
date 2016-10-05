@@ -75,7 +75,7 @@ module Skylab::Common
           else_p[]
         else
           raise ::KeyError, "value not found matching #<Proc@#{
-            }#{ match_p.source_location.join ':' }>"
+            }#{ match_p.source_location.join ':' }>"  # COLON_
         end
       end
 

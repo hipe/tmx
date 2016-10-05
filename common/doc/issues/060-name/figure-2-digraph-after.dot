@@ -6,9 +6,9 @@ a scale path is clearer: add a new function or function family."
 
 node [style="filled" shape="rect" fillcolor="grey"]
 
+as_approximation->const_name
 as_const->const_name
 as_camelcase_const->const_name
-as_distilled_stem->const_name
 
 const_name->common
 const_name [label="const\nname" style="normal" shape="oval" ]

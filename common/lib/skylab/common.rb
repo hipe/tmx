@@ -945,12 +945,12 @@ module Skylab::Common
 
       def initialize mod, x_a, & p
         @arguments = x_a
+        @autoloaderized_parent_module = nil
         @block = p
         @do_boxxy = nil
         @do_extend_methods = nil
         @FS_entry_string = nil
         @mod = mod
-        @parent_module = nil
         @path = nil
       end
 
@@ -989,7 +989,14 @@ module Skylab::Common
       PROCESS_WHICH___ = {
         boxxy: :__when_boxxy,
         methods: :__when_methods,
+        autoloaderized_parent_module: :__when_autoloaderized_parent_module,
       }
+
+      def __when_autoloaderized_parent_module
+        @do_extend_methods = true
+        @autoloaderized_parent_module = @argument_stream.gets_one
+        NIL
+      end
 
       def __when_boxxy
         @do_boxxy = true
@@ -1004,18 +1011,14 @@ module Skylab::Common
         @FS_entry_string = x
       end
 
-      def _presumably_autoloaderized_parent_module= x
-        @do_extend_methods = true
-        @parent_module = x
-      end
-
       # ~
 
       def __apply
 
+        autoloaderized_parent_module = @autoloaderized_parent_module
         do_boxxy = @do_boxxy ; do_extend_methods = @do_extend_methods
         fs_entry = @FS_entry_string
-        parent_module = @parent_module ; path = @path
+        path = @path
 
         @mod.module_exec do
 
@@ -1023,8 +1026,10 @@ module Skylab::Common
             extend Methods__
           end
 
-          if parent_module
-            @_parent_module_knownness = Known_Known[ paren_module ]
+          if autoloaderized_parent_module
+            @_pedigree = Here_::ComponentModels__::Pedigree.
+              via_module_and_parent_module__(
+                self, autoloaderized_parent_module )
           end
 
           if path
@@ -1121,7 +1126,7 @@ module Skylab::Common
       end
 
       def pedigree_
-        @___pedigree ||= Here_::ComponentModels__::Pedigree_via_module[ self ]
+        @_pedigree ||= Here_::ComponentModels__::Pedigree.via_module__( self )
       end
 
       def dir_path
@@ -1134,7 +1139,7 @@ module Skylab::Common
       Here_::FileTree_::Cache[ ::Dir ]
     end
 
-    Looks_like_module_ = -> x do
+    Is_probably_module = -> x do
       x.respond_to? :module_exec
     end
 

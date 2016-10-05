@@ -5,9 +5,9 @@ of a circularly dependant (and confusing) graph of name function methods. \
 there was no clear scale path."
 
 
+as_approximation -> as_const
 as_camelcase_const -> as_const
 as_const -> as_variegated_symbol
-as_distilled_stem -> as_const
 as_doc_slug -> _as_normalized_const
 as_human -> as_slug
 as_ivar -> as_variegated_symbol

@@ -1,7 +1,5 @@
 module Skylab::Brazen
 
-  Entity::Meta_Meta_Meta_Properties = ::Module.new
-
   class Entity::Meta_Meta_Meta_Properties::Arity < ::Module
 
     # (the spec provides comprehensive documentation and 100% coverage)

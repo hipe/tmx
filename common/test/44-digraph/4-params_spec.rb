@@ -5,6 +5,7 @@ module Skylab::Common::TestSupport
   describe "[co] digraph params - when your handler takes" do
 
     TS_[ self ]
+    use :the_method_called_let
     use :digraph
 
     klas = instance_method :klass
