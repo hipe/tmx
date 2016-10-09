@@ -24,7 +24,9 @@ module Skylab::CodeMetrics
         # in a developmental (broken) state.
 
         et = ke.reactive_tree_seed.entry_tree
-        # assume `et.has_directory`
+
+        et.is_file_tree || self._SANITY
+
         if et.has_entry_for_slug nf.as_slug
           ke.reactive_tree_seed.const_get nf.as_const, false
         end

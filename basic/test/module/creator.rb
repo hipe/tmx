@@ -4,6 +4,8 @@ module Skylab::Basic::TestSupport
 
     Define_Klass = -> tcm, _BOX_MOD do
 
+      TestSupport_::Let[ tcm ]
+
       sbox_class_counter = 0
 
       tcm.send :define_singleton_method, :define_klass_ do | & eval_p |

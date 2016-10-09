@@ -1815,9 +1815,14 @@ module Skylab::Brazen
           if respond_to? :entry_tree
 
             _slug = Common_::Name.via_const_symbol( const ).as_slug
-            et = entry_tree
-            if et.has_directory and et.has_entry_for_slug _slug
-              _definitely_there self, const
+
+            ft = entry_tree
+
+            if ft.is_file_tree
+              _sm = ft.value_state_machine_via_head _slug
+              if _sm
+                _definitely_there self, const
+              end
             end
           end
         end

@@ -30,8 +30,9 @@ module Skylab::Basic
 
       def via sym, x, * x_a, & x_p
 
-        p_x = Tree_::Input_Adapters__.const_get(
-          Common_::Name.via_variegated_symbol( sym ).as_const, false )
+        _const = Common_::Name.via_variegated_symbol( sym ).as_const
+
+        p_x = Tree_::Input_Adapters__.const_get _const, false
 
         if x_a.length.nonzero? || block_given?
           x_a.push :upstream_x, x

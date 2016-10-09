@@ -2,7 +2,7 @@ module Skylab::Human
 
   module Sexp
 
-    class Expression_Sessions::List_through_Columnar_Aggregation < ::Module  # see [#055]
+    class Expression_Sessions::List_through_ColumnarAggregation < ::Module  # see [#055]
 
       Attributes_actor_[ self ]
 

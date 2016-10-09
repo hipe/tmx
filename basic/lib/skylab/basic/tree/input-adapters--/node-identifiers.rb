@@ -4,7 +4,7 @@ module Skylab::Basic
 
     # ->
 
-      Input_Adapters__::Node_identifiers = -> upstream_x do
+      Input_Adapters__::Node_Identifiers = -> upstream_x do
 
         root = Tree_::Mutable_.new
 

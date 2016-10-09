@@ -58,8 +58,7 @@ module Skylab::Human
         a.push cache[ st.gets_one ]
       end
 
-      # a.join UNDERSCORE_  # nah..
-      a.join EMPTY_S_
+      a.join UNDERSCORE_
     end
 
     # --

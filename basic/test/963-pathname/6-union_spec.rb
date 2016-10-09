@@ -8,6 +8,7 @@ module Skylab::Basic::TestSupport
     use :memoizer_methods
 
     it "you can build up the union progressively, one path at at time" do
+      require 'pathname'
       u = Home_::Pathname::Union.new
       u.length.should eql 0
       u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)

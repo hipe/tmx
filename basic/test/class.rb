@@ -6,6 +6,8 @@ module Skylab::Basic::TestSupport
 
       def [] tcm, box_mod
 
+        TestSupport_::Let[ tcm ]
+
         tcm.extend ModuleMethods
 
         tcm.let :o do

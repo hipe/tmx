@@ -8,6 +8,9 @@ describe "[ba] sexp - auto" do
 
   ::Skylab::TestSupport::Quickie.apply_experimental_specify_hack self
 
+  TS_[ self ]
+  use :the_method_called_let
+
   context "With a grammar for first names" do
 
     let :grammar do

@@ -4,8 +4,6 @@ module Skylab::Basic
 
     module Expression_Adapters__::Text
 
-      Actors = ::Module.new
-
       class Actors::Build_classified_stream
 
         Attributes_actor_.call( self,

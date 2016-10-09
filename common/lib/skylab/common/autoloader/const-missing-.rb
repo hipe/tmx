@@ -80,6 +80,7 @@ module Skylab::Common
 
       def __the_file_tree_has_an_associated_filesystem_entry_group
 
+        # open [#067] why do we do approximation why not etc
         _sym = name_.as_approximation
         sm = @file_tree.value_state_machine_via_approximation _sym
         if sm
@@ -153,6 +154,7 @@ module Skylab::Common
           @_state_machine.get_node_path
         end
 
+        # #open [#158] why not etc below
         Here_[ @the_asset_value_, _child_node_path ]
         NIL
       end

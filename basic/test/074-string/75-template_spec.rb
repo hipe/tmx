@@ -5,6 +5,7 @@ module Skylab::Basic::TestSupport
   describe "[ba] string - template" do
 
     TS_[ self ]
+    use :the_method_called_let
     use :string
 
     it "loads" do

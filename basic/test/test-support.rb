@@ -116,6 +116,10 @@ module Skylab::Basic
       end
     end
 
+    The_Method_Called_Let = -> tcc do
+      TestSupport_::Let[ tcc ]
+    end
+
     Home_ = ::Skylab::Basic
 
     Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
