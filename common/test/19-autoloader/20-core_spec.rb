@@ -115,20 +115,6 @@ module Skylab::Common::TestSupport
         _x == :_ok_you_ || fail
       end
 
-      it "a stowaway path that does not isomorph to a node is OK.." do
-        _Face = fixture_directories_::Elvn_Ferce
-        _Face::TerstSerppert
-      end
-
-      if false  # complicated, may no longer be useful
-      it "..and make sure that such a node can set its own dirpn" do
-        _Face = fixture_directories_::Elvn_Ferce
-        _TS = _Face::TerstSerppert
-        _eep = _TS::CIL
-        _eep.dir_path
-      end
-      end
-
       it "entry trees get hackishly built" do
         _TernMern = fixture_directories_::Frtrn_TM
         _TernMern::Kernel_::YEP.should eql :yep

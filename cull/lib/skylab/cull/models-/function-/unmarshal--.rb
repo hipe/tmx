@@ -108,7 +108,6 @@ module Skylab::Cull
         pair = Autoloader_.const_reduce(
           :const_path, const,
           :from_module, @box_mod,
-          :correct_the_name,
           :result_in_name_and_value,
         )
 

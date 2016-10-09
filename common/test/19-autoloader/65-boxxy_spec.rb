@@ -161,5 +161,26 @@ module Skylab::Common::TestSupport
         _i_a == %i( Red_Leader ) || fail  # wrong case b.c not loaded eek
       end
     end
+
+    context "integration with const-reduce" do
+
+      it "if you want name correction on a boxxy module, you need one option" do
+
+        _a = TS_::FixtureTree
+
+        _b = _a::Tre_Skorlab  # #spot-2
+
+        _pair = Autoloader_::ConstReduction__.new([
+          :from_module, _b,
+          :const_path, :Infermation_Terktix,  # this is conventioned incorrectly
+          :result_in_name_and_value,
+        ],
+          Autoloader_::File_tree_cache___,
+        ).execute
+
+        _pair.name_x == :InfermationTerktix || fail
+      end
+    end
   end
 end
+# #tombstone: `correct_the_name` now happens always

@@ -84,7 +84,7 @@ module Skylab::Common
         def __then_do_something_else
           a = @a
           @box.each_value do |pa|
-            a.push pa.name.as_const  # or maybe as_camelcase_const ..
+            a.push pa.name.as_const  # or maybe as_camelcase_const_string ..
           end
           NIL
         end

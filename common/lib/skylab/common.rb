@@ -839,6 +839,25 @@ module Skylab::Common
 
     class << self
 
+      def [] mod, * x_a, & p
+
+        if x_a.length.nonzero? || block_given?
+          Autoloaderization___.new( mod, x_a, & p ).execute
+        else
+          mod.respond_to? NODE_PATH_METHOD_ and raise Here_::Say_::Not_idempotent[ mod ]
+          mod.extend Methods__
+        end
+        mod
+      end
+
+      alias_method :call, :[]
+
+      def const_reduce * a, & p
+        Here_::ConstReduction__.new( a, File_tree_cache___, & p ).execute
+      end
+
+      # --
+
       def at *a
         @at_h ||= {}
         a.map { |i| @at_h.fetch( i ) { @at_h[ i ] = method i } }
@@ -884,14 +903,6 @@ module Skylab::Common
         $VERBOSE = prev ; r
       end
 
-      def each_const_value_method
-        self::Boxxy_::EACH_CONST_VALUE_METHOD_P
-      end
-
-      def names_method
-        self::Boxxy_::NAMES_METHOD_P
-      end
-
       define_method :require_sidesystem, -> do
 
         universal_top_level_entry = "skylab"
@@ -926,19 +937,6 @@ module Skylab::Common
         require const_i.downcase.to_s  # until it's useful to, no inflection
         ::Object.const_get const_i
       end
-
-      def [] mod, * x_a, & p
-
-        if x_a.length.nonzero? || block_given?
-          Autoloaderization___.new( mod, x_a, & p ).execute
-        else
-          mod.respond_to? NODE_PATH_METHOD_ and raise Here_::Say_::Not_idempotent[ mod ]
-          mod.extend Methods__
-        end
-        mod
-      end
-
-      alias_method :call, :[]
     end  # >>
 
     class Autoloaderization___
@@ -1126,7 +1124,7 @@ module Skylab::Common
       end
 
       def pedigree_
-        @_pedigree ||= Here_::ComponentModels__::Pedigree.via_module__( self )
+        @_pedigree ||= Here_::ComponentModels__::Pedigree.via_module__ self
       end
 
       def dir_path
@@ -1258,8 +1256,8 @@ module Skylab::Common
         end
       end  # >>
 
-      def as_camelcase_const
-        _const.as_camelcase_const
+      def as_camelcase_const_string
+        _const.as_camelcase_const_string
       end
 
       def as_const
@@ -1316,14 +1314,28 @@ module Skylab::Common
       s_a
     end
 
-    def as_camelcase_const
-      @___camelcase ||= ___build_camelcase
+    def as_camelcase_const_string
+      @___camelcase_string ||= ___build_camelcase_string
     end
 
-    def ___build_camelcase
+    def ___build_camelcase_string  # covered
+
       @x_ = _stem_._stem_value_x_
+
+      d = 0
+      while @x_.last.length.zero?
+        @x_.pop
+        d += 1
+      end
+
       _titlecase_the_pieces
+
       _join_using_ EMPTY_S_
+
+      if d.nonzero?
+        @x_.concat UNDERSCORE_ * d
+      end
+
       remove_instance_variable :@x_
     end
 

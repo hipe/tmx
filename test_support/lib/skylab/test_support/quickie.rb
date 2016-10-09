@@ -568,7 +568,11 @@ module Skylab::TestSupport
 
     def __build_option_parser
 
-      o = Home_::Library_::OptionParser.new
+      _lib = Home_::Library_
+
+      _lib || Home_._SANITY  # #todo - catch when "stowaways" breaks in this way, early
+
+      o = _lib::OptionParser.new
 
       o.on '-t', '--tag TAG[:VALUE]',
           '(tries to be like the option in rspec)' do |v|

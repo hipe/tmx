@@ -2,13 +2,13 @@ module Skylab::Common
 
   module Autoloader
 
-    StowawayMagnetics__ = ::Module.new
+    StowawayMagnetics__ = ::Module.new  # notes in [#031]
 
     StowawayMagnetics__::Value_via_ConstMissing = -> cm do
 
       stow_x = cm.remove_instance_variable :@stowaway_x__
       if stow_x.respond_to? :ascii_only?
-        Value_via_PathBased___[ stow_x, cm ]
+        Value_via_PathBased___.new( stow_x, cm ).execute
       else
         Value_via_ProcBased___[ stow_x, cm ]
       end
@@ -22,11 +22,15 @@ module Skylab::Common
           mod.const_set sym, x
         end
         # we do *not* autoloaderize - do it yourself if you want it
-        cm.cache_and_produce_value_ x
+        cm.cache_value_ x
+        x
       # -
     end
 
-    class Value_via_PathBased___ < Home_::Actor::Dyadic  # exactly [#031]
+    class Value_via_PathBased___
+
+      # #note-1 - how string-based stowaway specifiers are interpreted
+      # #note-2 - the autoloaderization contract when stowing away
 
       def initialize path_tail, cm
         @client = cm
@@ -34,119 +38,231 @@ module Skylab::Common
       end
 
       def execute
-        __init
-        __init_two_paths
-        x = @client.finish_via__ @__path_to_load, @_state_machine
-        __maybe_autoloaderize_the_main_thing
-        x
+        __for_each_path_tail_item_step_down_the_filesystem_tree
+        __load_the_file
+        __autoloaderize_the_host_asset
+        __the_target_asset
       end
 
-      def __maybe_autoloaderize_the_main_thing  # note-1
+      def __for_each_path_tail_item_step_down_the_filesystem_tree
 
-        mod = @client.module
-        nm = Name.via_slug @_piece
-        camel = nm.as_camelcase_const
-        if mod.const_defined? camel, false
-          const = camel
-        elsif mod.const_defined? nm.as_const, false
-          const = nm.as_const
-        else
-          const = camel.upcase
-          if ! mod.const_defined? const, false
-            const = nil
-          end
+        __init_for_loop
+
+        st = __stream_via_path_tail_pieces
+
+        frame = __first_frame_via st
+
+        until st.no_unparsed_exists
+
+          _see frame
+
+          frame = frame.next_frame st.gets_one
         end
 
-        if const
-          x = mod.const_get const, false
-          if Should_probably_autoloaderize_[ x ]
-            Here_[ x, @_node_path ]
-          end
-        end
+        _see frame
+
+        @_final_frame = frame
         NIL
       end
 
-      def __init_two_paths
+      def __load_the_file
 
-        @_node_path_buffer = @_file_tree.node_path.dup
+        @client.load_path = @_final_frame.__some_load_file_path
+        @client.load_the_file_
+        NIL
+      end
+
+      def __autoloaderize_the_host_asset
+
+        st = Polymorphic_Stream.via_array @_frames
+
+        fr = InferenceFrame__.new st.gets_one, @client.module
 
         begin
-          if __found_filesystem_node_for_piece
-            if __is_last_piece
-              if __corresponds_to_file
-                break __file
-              else
-                break self._TODO_EASY__directory
-              end
-            elsif __corresponds_to_directory
-              __step
-              redo
-            else
-              self._COVER_ME_bad_stowaway_path_file_too_early
-            end
-          else
-            self._COVER_ME_bad_stowaway_path_no_filesystem_node
-          end
+          fr.init_and_cache_and_autoloaderize_the_value
+          st.no_unparsed_exists && break
+          fr = fr.next_frame st.gets_one
+          redo
         end while above
 
-        @__path_to_load = remove_instance_variable :@_the_path_to_load
-        @_node_path = remove_instance_variable :@_node_path_buffer
-
         NIL
       end
 
-      def __file
+      def __the_target_asset
 
-        @_the_path_to_load = ::File.join(
-          @_file_tree.node_path,
-          @_state_machine.entry_group.filesystem_entry_string )
+        o = @client
+        o.reflect_
+        o.the_asset_value_
+      end
+
+      def __init_for_loop
+        @_frames = []
+        @__path_tail_pieces = @path_tail.split ::File::SEPARATOR
+        @_pieces = []
         NIL
       end
 
-      def __step
+      def __first_frame_via st
 
-        _sm = remove_instance_variable :@_state_machine
-        _ft_ = @_file_tree.child_file_tree _sm
-        @_file_tree = _ft_
+        _piece = st.gets_one  # implicit assertion of nonzero-length
+
+        _file_tree = @client.module.entry_tree
+
+        FilesystemNodeFrame__.new _piece, _file_tree
+      end
+
+      def _see frame
+        @_frames.push frame
+        @_pieces.push frame.piece_string
         NIL
       end
 
-      def __corresponds_to_file
-        @_state_machine.entry_group.includes_what_is_probably_a_file
+      def __stream_via_path_tail_pieces
+        Polymorphic_Stream.via_array @__path_tail_pieces
+      end
+    end
+
+    # ==
+
+    class Value_via_PathBased___::InferenceFrame__
+
+      def initialize fs_frame, mod
+        @frame = fs_frame
+        @module = mod
       end
 
-      def __corresponds_to_directory
-        @_state_machine.entry_group.includes_what_is_probably_a_directory
+      def next_frame fs_frame
+        if ! Is_probably_module[ @_the_value ]
+          self._COVER_ME_expected_module
+        end
+        Value_via_PathBased___::InferenceFrame__.new fs_frame, @_the_value
       end
 
-      def __found_filesystem_node_for_piece
+      def init_and_cache_and_autoloaderize_the_value
+        __assert_that_the_value_is_not_already_known
+        __init_value_via_inference
+        __cache
+        __maybe_autoloaderize
+      end
 
-        @_piece = @_st.gets_one
+      def __assert_that_the_value_is_not_already_known
 
-        @_state_machine = @_file_tree.value_state_machine_via_head @_piece
+        # if the host file (or any stem node in it) is already defined, then
+        # assume it would be already loaded, so assume that all stowaways in
+        # in were already loaded too so we should never have gotten here.
 
-        if @_state_machine
-          @_node_path_buffer.concat ::File::SEPARATOR
-          @_node_path_buffer.concat @_piece
-          ACHIEVED_
+        @_state_machine = @frame.state_machine
+        if @_state_machine.value_is_known
+          self._WHERE
+        end
+      end
+
+      def __maybe_autoloaderize
+        if Should_probably_autoloaderize_[ @_the_value ]
+          _path = @_state_machine.get_node_path
+          Here_[ @_the_value, _path, :autoloaderized_parent_module, @module ]
+          NIL
         else
-          UNABLE_
+          NIL  # covered obliquely
         end
       end
 
-      def __is_last_piece
-        yes = @_st.no_unparsed_exists
-        if yes
-          remove_instance_variable :@_st
-        end
-        yes
-      end
-
-      def __init
-        @_st = Polymorphic_Stream.via_array @path_tail.split ::File::SEPARATOR
-        @_file_tree = @client.module.entry_tree
+      def __cache
+        @_state_machine.write_value_ @_the_value, @_const
         NIL
       end
+
+      def __init_value_via_inference
+
+        if __const_is_defined_when_camelcase
+        elsif __const_is_defined_when_wide_camelcase
+        elsif __const_is_defined_when_all_caps
+        else __big_guns
+        end
+        @_the_value = @module.const_get @_const, false
+        NIL
+      end
+
+      def __const_is_defined_when_camelcase
+        @_name = Name.via_slug @frame.piece_string
+        _attempt_const @_name.as_camelcase_const_string
+      end
+
+      def __const_is_defined_when_wide_camelcase
+        @_wide_const = @_name.as_const
+        _attempt_const @_wide_const
+      end
+
+      def __const_is_defined_when_all_caps
+        _attempt_const @_wide_const.upcase
+      end
+
+      def _attempt_const const
+        if @module.const_defined? const, false
+          @_const = const.intern ; ACHIEVED_
+        end
+      end
+
+      def __big_guns
+        o = Here_::FuzzyLookup_.new
+        o.on_exactly_one = -> x { x }  # IDENTITY_
+        @_const = o.execute_for @module, @_name
+        NIL
+      end
+
+      attr_reader(
+        :frame,  # #todo
+        :module, # #todo
+      )
+    end
+
+    # ==
+
+    class Value_via_PathBased___::FilesystemNodeFrame__
+
+      def initialize piece, file_tree
+        @piece_string = piece
+        @file_tree = file_tree
+      end
+
+      def next_frame piece
+
+        sm = state_machine
+
+        if sm.entry_group.includes_what_is_probably_a_directory
+
+          _file_tree_ = @file_tree.child_file_tree sm
+
+          Value_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
+        else
+          self._HOLE_intermediate_tail_piece_is_not_directory
+        end
+      end
+
+      def __some_load_file_path
+        load_file = @file_tree.get_load_file_path_for__ @piece_string
+        if load_file
+          load_file
+        else
+          self._HOLE_no_load_file_for_final_path_tail_piece
+        end
+      end
+
+      def state_machine
+        @___sm ||= __state_machine
+      end
+
+      def __state_machine
+        sm = @file_tree.value_state_machine_via_head @piece_string
+        if ! sm
+          self._COVER_ME_bad_path_tail_piece__no_such_filesystem_node
+        end
+        sm
+      end
+
+      attr_reader(
+        :piece_string,
+      )
     end
   end
 end  # :#sm

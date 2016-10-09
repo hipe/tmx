@@ -5,6 +5,7 @@ module Skylab::Common
     class ConstMissing_
 
       def initialize const_x, mod
+        @__autoloaderization_node_path_knownness = nil
         @const_defined = nil
         @const_string = const_x.to_s
         @const_symbol = const_x.intern
@@ -13,8 +14,13 @@ module Skylab::Common
         @_whether_to_autoloaderize_module = nil
       end
 
-      def do_autoloaderize= x
+      def do_autoloaderize= x  # #cr
         @_whether_to_autoloaderize_module = Known_Known.yes_or_no x
+        x
+      end
+
+      def autoloaderization_node_path= x  # #sm
+        @__autoloaderization_node_path_knownness = Known_Known[ x ]
         x
       end
 
@@ -99,26 +105,23 @@ module Skylab::Common
         raise Here_::NameError, _message
       end
 
-      def finish_via__ load_path, sm
+      def maybe_load_then_cache_then_produce_the_value_  # #bo
 
-        self.state_machine = sm
-        @_load_path = load_path
-        _load_and_reach_reflection
-        _maybe_autoloaderize_the_value
-        cache_and_produce_value_ @_the_value
+        __reflect_somehow
+        maybe_autoloaderize_the_value_
+        cache_the_value_
+        @the_asset_value_
       end
 
-      def maybe_load_then_cache_then_produce_the_value_
-
-        __reach_reflection_somehow
-        _maybe_autoloaderize_the_value
-        cache_and_produce_value_ @_the_value
+      def cache_the_value_
+        cache_value_ @the_asset_value_
+        NIL
       end
 
-      def cache_and_produce_value_ x
-        @_state_machine.write_value__ x, @const_symbol
+      def cache_value_ x
+        @_state_machine.write_value_ x, @const_symbol
         $stderr.puts "#{ MARGIN___ }#{ @module }::#{ @const_string }"
-        x
+        NIL
       end
 
       MARGIN___ = "#{ SPACE_ * 22 } - "
@@ -127,11 +130,11 @@ module Skylab::Common
         @_state_machine = sm
       end
 
-      def _maybe_autoloaderize_the_value
+      def maybe_autoloaderize_the_value_
 
         kn = @_whether_to_autoloaderize_module
         if ! kn
-          _yes = Should_probably_autoloaderize_[ @_the_value ]
+          _yes = Should_probably_autoloaderize_[ @the_asset_value_ ]
           kn = Known_Known.yes_or_no _yes
         end
         if kn.value_x  # if yes
@@ -142,28 +145,35 @@ module Skylab::Common
 
       def __autoloaderize_the_module
 
-        _child_node_path = @_state_machine.get_node_path
-        Here_[ @_the_value, _child_node_path ]
+        kn = @__autoloaderization_node_path_knownness
+
+        _child_node_path = if kn
+          kn.value_x
+        else
+          @_state_machine.get_node_path
+        end
+
+        Here_[ @the_asset_value_, _child_node_path ]
         NIL
       end
 
-      def __reach_reflection_somehow
+      def __reflect_somehow
 
         if @_state_machine.entry_group.includes_what_is_probably_a_file
-          __reach_reflection_when_eponymous_file
+          __reflect_when_eponymous_file
         else
-          __reach_reflection_when_directory
+          __reflect_when_directory
         end
       end
 
-      def __reach_reflection_when_directory
+      def __reflect_when_directory
 
         @_child_file_tree = @file_tree.child_file_tree @_state_machine
 
         if __there_is_a_corefile
-          __reach_reflection_via_loading_the_corefile
+          __reflect_via_loading_the_corefile
         else
-          __reach_reflection_via_autovivifying_a_module
+          __reflect_via_autovivifying_a_module
         end
       end
 
@@ -175,37 +185,51 @@ module Skylab::Common
         end
       end
 
-      def __reach_reflection_via_autovivifying_a_module
+      def __reflect_via_autovivifying_a_module
 
         x = ::Module.new
         @module.const_set @const_symbol, x
-        @_the_value = x
+        @the_asset_value_ = x
         @_whether_to_autoloaderize_module ||= Known_Known.trueish_instance
         NIL
       end
 
-      def __reach_reflection_via_loading_the_corefile
+      def __reflect_via_loading_the_corefile
 
         @_load_path = @_core_file_state_machine.get_filesystem_path
-        _load_and_reach_reflection
+        _load_and_reflect
         NIL
       end
 
-      def __reach_reflection_when_eponymous_file
+      def __reflect_when_eponymous_file
 
         @_load_path = @_state_machine.get_filesystem_path
-        _load_and_reach_reflection
+        _load_and_reflect
         NIL
       end
 
-      def _load_and_reach_reflection  # init N things
+      def load_path= x  # #sm
+        @_load_path = x
+      end
 
-        load @_load_path
+      def _load_and_reflect  # init N things
+
+        load_the_file_
+        reflect_
+        NIL
+      end
+
+      def load_the_file_
+        ::Kernel.load @_load_path
+        NIL
+      end
+
+      def reflect_  # #sm
 
         begin
 
           if __constant_is_defined
-            @_the_value = @module.const_get @const_symbol, false
+            @the_asset_value_ = @module.const_get @const_symbol, false
             break
           end
 
@@ -244,6 +268,7 @@ module Skylab::Common
       attr_reader(
         :const_symbol,  # #sm, #cr
         :module,  # #sm
+        :the_asset_value_,  # #sm
       )
     end
 

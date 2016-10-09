@@ -6,7 +6,7 @@ there was no clear scale path."
 
 
 as_approximation -> as_const
-as_camelcase_const -> as_const
+as_camelcase_const_string -> as_const
 as_const -> as_variegated_symbol
 as_doc_slug -> _as_normalized_const
 as_human -> as_slug

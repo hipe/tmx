@@ -50,7 +50,7 @@ module Skylab::Fields
       #     foo.baz  # => "<5>"
       #     foo.baz.object_id  # => foo.baz.object_id
 
-      Common_Frame = Home_.lib_.brazen::Entity.call do
+      CommonFrame = Home_.lib_.brazen::Entity.call do
 
         # (really we want the below thing to be its own nonterminal mixed
         # in with the other nonterminals of the session, but we don't have
@@ -69,7 +69,7 @@ module Skylab::Fields
         )
       end
 
-      module Common_Frame
+      module CommonFrame
 
         Legacy_ = ::Skylab::Brazen::Entity
 

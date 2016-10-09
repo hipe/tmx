@@ -181,22 +181,6 @@ module Skylab::Common::TestSupport
 
         _mod.name =~ %r(FixtureTree::Two_Skorlab::InfermationTerktix\z) or fail
       end
-
-      it "if you want name correction on a boxxy module, you need one option", wip: true do  # waiting for boxxy
-
-        _a = fixture_tree_
-
-        _b = _a::Tre_Skorlab  # #spot-2
-
-        _pair = _subject_plus_real_file_tree_cache(
-          :from_module, _b,
-          :const_path, :Infermation_Terktix,
-          :correct_the_name,
-          :result_in_name_and_value,
-        )
-
-        _pair.name_x == :InfermationTerktix or fail
-      end
     end
 
     it "(reproduction)" do
@@ -242,7 +226,6 @@ module Skylab::Common::TestSupport
     end
   end
 end
-
 # :+#tombsone: integration with autoloader methods
 # :+#tombstone: curry
 # :+#tombstone: original issue

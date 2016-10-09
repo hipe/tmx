@@ -283,6 +283,23 @@ module Skylab::Common
           freeze
         end
 
+        def get_load_file_path_for__ head
+
+          sm = value_state_machine_via_head head
+          if sm
+            if sm.entry_group.includes_what_is_probably_a_file
+              sm.get_filesystem_path
+            else
+              # (hi.)
+              _ft = child_file_tree sm
+              sm_ = _ft.corefile_state_machine
+              if sm_
+                sm_.get_filesystem_path
+              end
+            end
+          end
+        end
+
         def child_file_tree sm  # state machine
 
           _child_node_path = ::File.join @node_path, sm.entry_group.head
@@ -362,7 +379,7 @@ module Skylab::Common
           @value_is_known = false
         end
 
-        def write_value__ x, sym
+        def write_value_ x, sym
           @_value_and_name = Pair.via_value_and_name x, sym
           @value_is_known = true
           freeze

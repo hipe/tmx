@@ -125,8 +125,7 @@ module Skylab::TestSupport
 
             ( tried_a ||= [] ).push corefile_as_nipple
 
-            corefile_as_corefile = ::File.join(
-              path, Home_.lib_.default_core_file )
+            corefile_as_corefile = ::File.join path, Autoloader_::CORE_FILE
 
             if ::File.exist? corefile_as_corefile
               break

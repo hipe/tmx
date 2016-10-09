@@ -4,7 +4,7 @@ module Skylab::Common::TestSupport
 
   describe "[co] name" do
 
-    context "const" do
+    context "via const" do
 
       context "as variegated symbol" do
 
@@ -29,7 +29,7 @@ module Skylab::Common::TestSupport
         end
       end
 
-      context "camel case" do
+      context "via const in camel case as variegated symbol" do
 
         it "FreiTag => frei-tag" do
 
@@ -45,13 +45,35 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "from variegated symbol" do
+    context "via variegated symbol" do
 
       it "as_const" do
 
         _nf = subject.via_variegated_symbol :merk_FS_lala
         _sym = _nf.as_const
         _sym.should eql :Merk_FS_Lala
+      end
+    end
+
+    context "via slug" do
+
+      define_singleton_method :shared_subject, TestSupport_::DANGEROUS_MEMOIZE
+
+      shared_subject :_name do
+        subject.via_slug 'wing-ding--'
+      end
+
+      it "as const" do
+        _expect :as_const, :Wing_Ding__
+      end
+
+      it "as camelcase const" do
+        _expect :as_camelcase_const_string, "WingDing__"
+      end
+
+      def _expect m, c
+        _exp = _name.send m
+        _exp.should eql c
       end
     end
 

@@ -8,7 +8,7 @@ node [style="filled" shape="rect" fillcolor="grey"]
 
 as_approximation->const_name
 as_const->const_name
-as_camelcase_const->const_name
+as_camelcase_const_string->const_name
 
 const_name->common
 const_name [label="const\nname" style="normal" shape="oval" ]

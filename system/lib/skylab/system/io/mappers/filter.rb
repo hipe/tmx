@@ -2,9 +2,7 @@ module Skylab::System
 
   module IO
 
-    Mappers = ::Module.new  # :+#stowaway
-
-    Autoloader_[ Mappers ]
+    Mappers = ::Module.new
 
     def Mappers.const_missing const
 

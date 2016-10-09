@@ -6,7 +6,6 @@ module Skylab::Common
 
       def initialize a, ftc=nil, & p
 
-        @correct_the_name = nil
         @file_tree_cacher = ftc
         @final_path_to_load = nil
         @listener = p
@@ -33,7 +32,6 @@ module Skylab::Common
 
       OPTIONS___ = {
         const_path: :_mixed_value,
-        correct_the_name: :_boolean,
         final_path_to_load: :_mixed_value,
         from_module: :_mixed_value,
         result_in_name_and_value: :_boolean,
@@ -142,12 +140,7 @@ module Skylab::Common
       end
 
       def __at_final_tuple tuple
-
         @__discovered = tuple
-
-        if @correct_the_name
-          ::Kernel._K_wipped_but_we_can_bring_it_back  # #todo
-        end
         NIL
       end
 

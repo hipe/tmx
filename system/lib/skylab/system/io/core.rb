@@ -109,6 +109,5 @@ module Skylab::System
 
     Autoloader_[ self ]
     stowaway :Mappers, 'mappers/filter'
-
   end
 end

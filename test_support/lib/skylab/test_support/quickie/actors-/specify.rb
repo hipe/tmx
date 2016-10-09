@@ -2,8 +2,6 @@ module Skylab::TestSupport
 
   module Quickie
 
-    Actors_ = ::Module.new
-
     module Actors_::Specify
 
       class << self

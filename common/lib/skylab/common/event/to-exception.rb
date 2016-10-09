@@ -52,12 +52,12 @@ module Skylab::Common
 
         Class_via_symbol = -> sym, & els do  # [hu]
 
-          first_guess_sym = Home_::Name.via_variegated_symbol( sym ).
-            as_camelcase_const
+          first_guess_s = Home_::Name.via_variegated_symbol( sym ).
+            as_camelcase_const_string
 
-          if ::Object.const_defined? first_guess_sym
+          if ::Object.const_defined? first_guess_s
 
-            ::Object.const_get first_guess_sym
+            ::Object.const_get first_guess_s
           else
 
             _s_a = sym.id2name.split UNDERSCORE_  # e.g `errno_enoent`
