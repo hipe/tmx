@@ -148,8 +148,7 @@ module Skylab::Plugin
 
       def __frame_when_load_final_node
 
-        _load_path = _any_load_file_path
-        ::Kernel.load _load_path
+        __load_the_asset
 
         x = @module.const_get @const, false
 
@@ -178,13 +177,21 @@ module Skylab::Plugin
         _build_frame_as_next_frame_for_this_module mod
       end
 
+      def __load_the_asset
+
+        load_path = _any_load_file_path
+        load_path || self._SANITY
+        ::Kernel.load load_path
+        NIL
+      end
+
       def __possibly_load_the_asset
 
         load_path = _any_load_file_path
-
         if load_path
           ::Kernel.load load_path
         end
+        NIL
       end
 
       def _build_frame_as_next_frame_for_this_module mod
@@ -201,18 +208,7 @@ module Skylab::Plugin
       end
 
       def _any_load_file_path
-
-        eg = @state_machine.entry_group
-
-        if eg.includes_what_is_probably_a_file
-          @state_machine.get_filesystem_path
-        else
-          sm = @file_tree.corefile_state_machine
-          if sm
-            self._OK_probably_fine
-            sm.get_filesystem_path
-          end
-        end
+        @file_tree.get_load_file_path_for_state_machine @state_machine
       end
 
       def __init_const

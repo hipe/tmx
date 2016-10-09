@@ -287,15 +287,20 @@ module Skylab::Common
 
           sm = value_state_machine_via_head head
           if sm
-            if sm.entry_group.includes_what_is_probably_a_file
-              sm.get_filesystem_path
-            else
-              # (hi.)
-              _ft = child_file_tree sm
-              sm_ = _ft.corefile_state_machine
-              if sm_
-                sm_.get_filesystem_path
-              end
+            get_load_file_path_for_state_machine sm
+          end
+        end
+
+        def get_load_file_path_for_state_machine sm  # [pl]
+
+          if sm.entry_group.includes_what_is_probably_a_file
+            sm.get_filesystem_path
+          else
+            # (hi.)
+            _ft = child_file_tree sm
+            sm_ = _ft.corefile_state_machine
+            if sm_
+              sm_.get_filesystem_path
             end
           end
         end

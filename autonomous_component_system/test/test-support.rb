@@ -128,6 +128,8 @@ module Skylab::Autonomous_Component_System::TestSupport
     Fixture_Top_ACS_Classes.const_get const, false
   end
 
+  NODE_PATH__ = ::File.dirname __FILE__
+
   module Fixture_Top_ACS_Classes
 
     class Class_01_Empty
@@ -172,7 +174,10 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    Autoloader__[ self ]
+    Autoloader__[ self, ::File.join( NODE_PATH__, 'fixture-top-ACS-classes' ) ]
+      # (a.l will no longer infer paths if they have any uppercase letters.
+      #  we have "grandfathered" in the above rather than renaming the dir.)
+
     Here_ = self
   end
 
@@ -217,7 +222,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
   end
 
-  Autoloader__[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader__[ self, NODE_PATH__ ]
 
   ACHIEVED_ = true
   Home_ = ::Skylab::Autonomous_Component_System

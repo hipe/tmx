@@ -4,8 +4,6 @@ module Skylab::Parse
 
     module Function_::Nonterminal
 
-      Sessions = ::Module.new
-
       class Sessions::Express
 
         class << self
