@@ -70,11 +70,10 @@ module Skylab::Common
             if eg.includes_what_is_probably_a_directory
               _make_my_own_tree
             else
-              ::Kernel._C
+              NOTHING_  # as covered, this value will be memoized
             end
           else
-            # (maybe only to cover legacy)
-            ::Kernel._B
+            NOTHING_  # as covered, (ditto)
           end
         end
 
@@ -180,6 +179,10 @@ module Skylab::Common
           else
             send @_when_failed
           end
+        end
+
+        def __when_enoent
+          NOTHING_  # as covered. be sure this gets cached. #coverpoint-1-1
         end
 
         def __init_index_via_hit_the_filesystem

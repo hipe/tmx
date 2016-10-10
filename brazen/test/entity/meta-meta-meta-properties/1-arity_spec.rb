@@ -8,6 +8,9 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
   TS_.describe "[br] entity - meta-meta-meta-properties - arity" do
 
+    ::Skylab::Brazen::TestSupport[ self ]
+    use :the_method_called_let
+
     context "an arity space when sent .." do
 
       before :all do

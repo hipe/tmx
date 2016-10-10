@@ -222,6 +222,8 @@ module Skylab::Brazen
 
     Parse = sidesys[ :Parse ]
 
+    Pathname = stdlib[ :Pathname ]
+
     Plugin = sidesys[ :Plugin ]
 
     Stdlib_option_parser = _memoize do

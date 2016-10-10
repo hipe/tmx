@@ -6,7 +6,7 @@ module Skylab::Brazen::TestSupport
   class << self
 
     def [] tcc
-      tcc.send :define_singleton_method, :use, Use_method
+      tcc.send :define_singleton_method, :use, Use_method___
       tcc.include Instance_Methods___
     end
 
@@ -27,9 +27,9 @@ module Skylab::Brazen::TestSupport
 
   extend TestSupport_::Quickie
 
-     Use_method = -> sym do
-      TS_.lib_( sym )[ self ]
-    end
+  Use_method___ = -> sym do
+    TS_.lib_( sym )[ self ]
+  end
 
   module Instance_Methods___
 
@@ -95,6 +95,10 @@ module Skylab::Brazen::TestSupport
 
     Memoizer_methods = -> tcc do
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    end
+
+    The_method_called_let = -> tcc do
+      TestSupport_::Let[ tcc ]
     end
 
     Tmpdir = Lazy_.call do

@@ -4,6 +4,8 @@ module Skylab::Common::TestSupport
 
   describe "[co] autoloader core" do
 
+    define_singleton_method :shared_subject, TestSupport_::DANGEROUS_MEMOIZE
+
     context "for a const_missing, in order it will try:" do
 
       it "1. the eponymous leaf file" do
@@ -98,13 +100,6 @@ module Skylab::Common::TestSupport
         # error-raising) way here.)
       end
 
-      it "inheritence - child of autoloady parent" do
-
-        mod = fixture_directories_::Seven_Son::Child
-        mod.dir_path =~ %r(/seven-son/child) || fail
-        mod::Foo::YEP == :_yep_ || fail
-      end
-
       # (test removed at #tombsone-A - "experimental trick with correction")
 
       it "collateral - nodes loaded along the way still get enhanced" do
@@ -122,6 +117,63 @@ module Skylab::Common::TestSupport
 
       it "at the boundary of an integration with old :+[#027]" do
         fixture_directories_::Twlv_DLI::Glient
+      end
+    end
+
+    context "inheritence - child of autoloady parent, child has dir" do
+
+      shared_subject :_module do
+        fixture_directories_::Seven_Son::Child
+      end
+
+      it "node path OK" do
+        _module.dir_path =~ %r(/seven-son/child\z) || fail
+      end
+
+      it "loads assets" do
+        _module::Foo::YEP == :_yep_ || fail
+      end
+    end
+
+    context "inheritence - child of autoloady parent, child has NO dir" do
+
+      shared_subject :_module do
+        fixture_directories_::Seven_Son::Child2
+      end
+
+      it "does child have node path?" do
+        _mod = _module
+        _hi = _mod.dir_path
+        _hi =~ %r(/seven-son/child2\z) || fail
+      end
+
+      it "does NOT have a file tree when you didn't ask for node path" do
+        _mod = fixture_directories_::Seven_Son::Child4
+        _mod.entry_tree && fail
+      end
+
+      it "does not have (same) when you did" do  # #coverpoint-1-1
+        mod = _module
+        mod.dir_path  # kick
+        mod.entry_tree && fail
+      end
+    end
+
+    context "inheritence - child of autoloady parent, child has NO filesystem node" do
+
+      shared_subject :_module do
+        fixture_directories_::Seven_Son::Parent::Child3
+      end
+
+      it "does child have node path?" do
+        _mod = _module
+        _hi = _mod.dir_path
+        _hi =~ %r(/seven-son/parent/child3\z) || fail
+      end
+
+      it "but does NOT have file tree" do
+        _mod = _module
+        _mod.entry_tree && fail
       end
     end
 

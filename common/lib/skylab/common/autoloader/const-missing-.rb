@@ -133,15 +133,27 @@ module Skylab::Common
 
       def maybe_autoloaderize_the_value_
 
-        kn = @_whether_to_autoloaderize_module
-        if ! kn
-          _yes = Should_probably_autoloaderize_[ @the_asset_value_ ]
-          kn = Known_Known.yes_or_no _yes
-        end
-        if kn.value_x  # if yes
+        if __should_autoloaderize_the_value
           __autoloaderize_the_module
         end
         NIL
+      end
+
+      def __should_autoloaderize_the_value  # #spot-4 does similar
+
+        kn = @_whether_to_autoloaderize_module
+        if kn
+          kn.value_x  # was decided externally. user's choice
+
+        elsif @_state_machine.entry_group.includes_what_is_probably_a_directory
+
+          if Is_probably_module[ @the_asset_value_ ]
+
+            ! @the_asset_value_.respond_to? NODE_PATH_METHOD_
+          end
+        else
+          UNABLE_  # hi.
+        end
       end
 
       def __autoloaderize_the_module
@@ -272,13 +284,6 @@ module Skylab::Common
         :module,  # #sm
         :the_asset_value_,  # #sm
       )
-    end
-
-    Should_probably_autoloaderize_ = -> x do  # #stowaway
-      if Is_probably_module[ x ]
-        # (hi.)
-        ! x.respond_to? NODE_PATH_METHOD_
-      end
     end
   end
 end

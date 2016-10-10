@@ -158,12 +158,25 @@ module Skylab::Common
       end
 
       def __maybe_autoloaderize
-        if Should_probably_autoloaderize_[ @_the_value ]
+
+        if __should_autoloaderize_the_value
+
           _path = @_state_machine.get_node_path
           Here_[ @_the_value, _path, :autoloaderized_parent_module, @module ]
           NIL
         else
           NIL  # covered obliquely
+        end
+      end
+
+      def __should_autoloaderize_the_value  # a near copy-paste of #spot-4
+
+        if @_state_machine.entry_group.includes_what_is_probably_a_directory
+
+          if Is_probably_module[ @_the_value ]
+
+            ! @_the_value.respond_to? NODE_PATH_METHOD_
+          end
         end
       end
 

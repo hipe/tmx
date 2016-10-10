@@ -113,8 +113,14 @@ module Skylab::Brazen
           #
           # maybe #wish-for-proper-autoloading
 
-          if sm.respond_to? :entry_tree and sm.entry_tree.has_entry _SLUG
-            sm.const_get :Modalities, false  # autoload it if necessary
+          if sm.respond_to? :entry_tree
+            ft = sm.entry_tree
+            if ft
+              _sm = ft.value_state_machine_via_head _SLUG
+              if _sm
+                sm.const_get :Modalities, false
+              end
+            end
           end
 
           # now that it has been loaded (when existent),

@@ -20,8 +20,8 @@ module Skylab::Common::TestSupport
         guest_asset_is_not_autoloaderized_
       end
 
-      it "host asset node path is right" do
-        expect_host_asset_node_path_ends_in_ 'host-1-as-eponymous-file'
+      it "host asset node path is not autoloaderized" do
+        host_asset_is_not_autoloaderized_
       end
 
       def guest_asset_const_
@@ -48,7 +48,7 @@ module Skylab::Common::TestSupport
       end
 
       it "host asset node path is right" do
-        expect_host_asset_node_path_ends_in_ 'host-2-as-corefile'
+        host_asset_node_path_ends_in_ 'host-2-as-corefile'
       end
 
       def guest_asset_const_
@@ -75,7 +75,7 @@ module Skylab::Common::TestSupport
       end
 
       it "host asset node path is right" do
-        expect_host_asset_node_path_ends_in_ 'host-3-as-hard-to-find-nsa-spy'
+        host_asset_is_not_autoloaderized_
       end
 
       def guest_asset_const_
@@ -100,12 +100,12 @@ module Skylab::Common::TestSupport
       it "guest asset IS autoloaderized" do
 
         _hi = guest_asset_value_
-        expect_asset_node_path_ends_in_ _hi, 'left-leg'
+        asset_node_path_ends_in_ _hi, 'left-leg'
       end
 
       it "host asset node path is right" do
 
-        expect_host_asset_node_path_ends_in_ 'left-leg/marsupial-foot--'
+        host_asset_node_path_ends_in_ 'left-leg/marsupial-foot--'
       end
 
       def lookup_host_asset_value_
@@ -140,16 +140,26 @@ module Skylab::Common::TestSupport
       _x.respond_to? Autoloader_::NODE_PATH_METHOD_ and fail
     end
 
+    def host_asset_is_not_autoloaderized_
+      _x = host_asset_value_
+      _x.respond_to? Autoloader_::NODE_PATH_METHOD_ and fail
+    end
+
+    def host_asset_value_
+      ad_hoc_state_  # #touch
+      lookup_host_asset_value_
+    end
+
     def guest_asset_value_
       _hi = ad_hoc_state_
       _hi.guest_asset
     end
 
-    def expect_host_asset_node_path_ends_in_ tail
+    def host_asset_node_path_ends_in_ tail
 
-      ad_hoc_state_  # #touch
-      _host_asset = lookup_host_asset_value_
-      expect_asset_node_path_ends_in_ _host_asset, tail
+      _host_asset = host_asset_value_
+
+      asset_node_path_ends_in_ _host_asset, tail
     end
 
     def lookup_host_asset_value_
@@ -171,7 +181,7 @@ module Skylab::Common::TestSupport
       _top.const_get _const, false
     end
 
-    def expect_asset_node_path_ends_in_ asset, tail
+    def asset_node_path_ends_in_ asset, tail
 
       _head = the_would_be_sidesystem_.send Autoloader_::NODE_PATH_METHOD_
       expected_node_path = ::File.join _head, tail

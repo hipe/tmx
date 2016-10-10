@@ -200,7 +200,7 @@ module Skylab::Brazen::TestSupport
     Tempdir_pathname = -> do
       p = -> do_dbg_p, io do
         require 'tmpdir'
-        pn = ::Pathname.new "#{ ::Dir.tmpdir }/brAzen"
+        pn = Home_.lib_.pathname.new "#{ ::Dir.tmpdir }/brAzen"
         if ! pn.exist?
           File_utils[ do_dbg_p, io ].mkdir pn.to_path
         end

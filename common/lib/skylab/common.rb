@@ -1752,6 +1752,7 @@ module Skylab::Common
   KEEP_PARSING_ = true
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
+  NOTHING_ = nil
 
   SPACE_ = ' '.freeze
   UNABLE_ = false

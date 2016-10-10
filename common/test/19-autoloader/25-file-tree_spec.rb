@@ -25,6 +25,15 @@ module Skylab::Common::TestSupport
       end
     end
 
+    context "edges" do
+
+      it "if no directory on the filesystem.." do
+
+        _mod = TS_::FixtureDirectories::Twlv_DLI::Agtion
+        _mod.respond_to? :entry_tree and fail
+      end
+    end
+
     shared_subject :_state_machine do
       st = _top_subject.send this_method
       _sm = st.gets
