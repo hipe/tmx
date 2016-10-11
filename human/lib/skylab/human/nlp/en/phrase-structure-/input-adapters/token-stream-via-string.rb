@@ -4,8 +4,6 @@ module Skylab::Human
 
     module Phrase_Structure_
 
-      Input_Adapters = ::Module.new
-
       class Input_Adapters::Token_Stream_via_String
 
         # just quick & dirty for an experiment, for now.

@@ -4,8 +4,6 @@ module Skylab::Human
 
     class NLP::EN::POS::Noun
 
-      Hacktors_ = ::Module.new
-
       class Hacktors_::Parse_noun_phrase
 
         class << self

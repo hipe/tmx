@@ -24,48 +24,59 @@ module Skylab::Human
         # be exhausted (i.e always reach the end). cache the reduction it
         # does so we do not repeat this work every time we have a lookup.
 
-        et = mod.entry_tree  # fail early
-
-        @_streamer = -> do
-
-          st = et.to_stream
-          cache = []
-
-          Common_.stream do  # hand-written map-reduce for clarity
-
-            begin
-              en = st.gets
-
-              if ! en  # once we reach the end, don't repeat this work.
-                @_streamer = -> do
-                  Common_::Stream.via_nonsparse_array cache
-                end
-                break
-              end
-
-              if WHITE_RX___ !~ en.corename  # the "reduce"
-                redo
-              end
-
-              x = mod.const_get en.name.as_const, false
-              cache.push x
-              break
-            end while nil
-            x
-          end
-        end
-
+        ft = mod.entry_tree
+        ft || fail
+        @__file_tree = ft
+        @__module = mod
+        @_stream = :__stream_first_time
         self
       end
 
+      def __stream_first_time
+
+        cache = []
+        mod = @__module
+        st = @__file_tree.to_state_machine_stream
+
+        Common_.stream do  # hand-written map-reduce for clarity
+
+          begin
+            sm = st.gets
+
+            if ! sm  # once we reach the end, don't repeat this work.
+              remove_instance_variable :@__file_tree
+              remove_instance_variable :@__module
+              @__module_cache = cache
+              @_stream = :__stream_subsequent_time
+              break
+            end
+
+            head = sm.entry_group_head
+            if WHITE_RX___ !~ head  # the "reduce"
+              redo
+            end
+
+            _const = Home_::Sexp::Const_via_Tokens_.via_head head
+            x = mod.const_get _const, false
+            cache.push x
+            break
+          end while above
+          x
+        end
+      end
+
       WHITE_RX___ = /\Awhen-/
+
+      def __stream_subsequent_time
+        Common_::Stream.via_nonsparse_array @__module_cache
+      end
 
       def expression_session_via_sexp_stream__ st
 
         best_match = nil
         idea = Here_::Idea_.new_via_sexp_stream__ st
 
-        st = @_streamer[]
+        st = send @_stream
         begin
           x = st.gets
           x or break

@@ -2,7 +2,7 @@ module Skylab::Human
 
   module NLP::EN::Sexp
 
-    class Expression_Sessions::List_through_Treeish_Aggregation
+    class Expression_Sessions::List_through_TreeishAggregation
 
       # (see comments below re: algorithm)
 

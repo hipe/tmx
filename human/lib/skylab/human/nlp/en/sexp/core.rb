@@ -52,7 +52,7 @@ module Skylab::Human
       end
 
       def _lookup_class st
-        _const = Home_::Sexp::Parse_expression_session_name[ st ]
+        _const = Home_::Sexp::Const_via_tokens_special_[ st ]
         Expression_Sessions.const_get _const, false
       end
     end  # >>

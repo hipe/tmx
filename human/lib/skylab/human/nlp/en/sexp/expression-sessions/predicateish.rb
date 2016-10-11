@@ -95,7 +95,7 @@ module Skylab::Human
 
       def _difference_against_counterpart_ x
 
-        Siblings_::List_through_Treeish_Aggregation::Phrase_diff[ self, x ]
+        Siblings_::List_through_TreeishAggregation::Phrase_diff[ self, x ]
       end
 
       def _aggregate_ diff_x, otr

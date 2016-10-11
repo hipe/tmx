@@ -109,7 +109,7 @@ module Skylab::Fields
 
       def __first_add_as_atom nf
 
-        @_atoms = Home_.lib_.human::NLP::EN::Sexp::Expression_Sessions::List_through_Treeish_Aggregation.begin
+        @_atoms = Home_.lib_.human::NLP::EN::Sexp::Expression_Sessions::List_through_TreeishAggregation.begin
         @_add_as_atom = method :__main_add_as_atom
         @_add_as_atom[ nf ]
       end
@@ -123,7 +123,7 @@ module Skylab::Fields
         end
         @_recurse_queue = []
 
-        @_recurses = Home_.lib_.human::NLP::EN::Sexp::Expression_Sessions::List_through_Treeish_Aggregation.begin
+        @_recurses = Home_.lib_.human::NLP::EN::Sexp::Expression_Sessions::List_through_TreeishAggregation.begin
 
         @_add_as_recurse = method :__main_add_as_recurse
         @_add_as_recurse[ x ]

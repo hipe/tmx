@@ -2,7 +2,7 @@ module Skylab::Human
 
   module NLP::EN::Sexp
 
-    class Expression_Sessions::List_through_Columnar_Aggregation_of_Statementishes  # docs in [#052]
+    class Expression_Sessions::List_through_ColumnarAggregation_of_Statementishes  # docs in [#052]
 
       # we are not sure how useful this will be outside of [cme] - here
       # it almost stands more as a proof of concept for its dependencies

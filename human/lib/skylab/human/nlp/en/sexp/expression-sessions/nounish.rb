@@ -185,7 +185,7 @@ module Skylab::Human
       # --
 
       def assimilate_with_same_type_ exp
-        Siblings_::List_through_Treeish_Aggregation::Assimilate[ self, exp ]
+        Siblings_::List_through_TreeishAggregation::Assimilate[ self, exp ]
       end
 
       def number
