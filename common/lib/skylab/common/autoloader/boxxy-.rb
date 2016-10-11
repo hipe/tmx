@@ -32,6 +32,7 @@ module Skylab::Common
           a
         end
 
+
         def name_value_pair_for_const_missing__ wrong_const
 
           if @_has_pool
