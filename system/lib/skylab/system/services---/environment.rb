@@ -13,7 +13,10 @@ module Skylab::System
         end,
 
         :memoized, :inline_method, :any_home_directory_pathname, -> do
-          s = any_home_directory_path and ::Pathname.new( s )
+          s = any_home_directory_path
+          if s
+            Home_.lib_.pathname.new s
+          end
         end
     end
 

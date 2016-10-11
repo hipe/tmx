@@ -250,8 +250,8 @@ module Skylab::System
 
     Struct_class_for_sorted_field_a___ = -> fld_a do
 
-      _const_sym_a = fld_a.map do | fld |
-        fld.name.as_camelcase_const
+      _const_s_a = fld_a.map do | fld |
+        fld.name.as_camelcase_const_string
       end
 
       const = _const_sym_a.join( UNDERSCORE_ ).intern

@@ -25,6 +25,9 @@ module Skylab::System
     Open3 = stdlib[ :Open3 ]
 
     Parse_lib = sidesys[ :Parse ]
+
+    Pathname = stdlib[ :Pathname ]
+
     Plugin = sidesys[ :Plugin ]
 
     Shellwords = stdlib[ :Shellwords ]

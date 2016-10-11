@@ -4,6 +4,8 @@ module Skylab::System
 
   module Filesystem
 
+    Home_.lib_.pathname
+
     class Tmpdir < ::Pathname  # (implementd as a frozen, dupable session)
 
       # (if we were to write this again today we would *not* subclass pathname)

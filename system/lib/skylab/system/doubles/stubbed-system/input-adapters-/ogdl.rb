@@ -2,8 +2,6 @@ module Skylab::System
 
   module Doubles::Stubbed_System
     # -
-      Input_Adapters_ = ::Module.new
-
       class Input_Adapters_::OGDL  # :[#029].
 
         class << self

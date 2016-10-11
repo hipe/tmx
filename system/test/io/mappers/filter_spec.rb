@@ -4,6 +4,9 @@ module Skylab::System::TestSupport
 
   describe "[sy] IO - mappers - filter" do
 
+    TS_[ self ]
+    use :the_method_called_let
+
     context "without a line boundary event handler" do
 
       it "leaves brittany alone" do
