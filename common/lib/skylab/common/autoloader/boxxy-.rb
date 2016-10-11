@@ -8,8 +8,14 @@ module Skylab::Common
 
         def initialize mod
 
-          @_has_pool = true
-          @_pool = Pool___.new mod
+          if mod.entry_tree
+            @_has_pool = true
+            @_pool = Pool___.new mod
+          else
+            @_has_pool = false
+          end
+
+          @__module = mod
 
           o = mod.boxxy_original_methods__
           @_orig_const_defined_method = o.const_defined
@@ -38,7 +44,17 @@ module Skylab::Common
           end
         end
 
-        def const_missing__ wrong_const
+        def name_value_pair_for_const_missing__ wrong_const
+
+          if @_has_pool
+            __name_value_pair_for_const_missing_normally wrong_const
+          else
+            _nf = Name.via_const_symbol wrong_const
+            raise Here_::NameError, Here_::Say_::No_filesystem_node[ _nf, @__module ]
+          end
+        end
+
+        def __name_value_pair_for_const_missing_normally wrong_const
 
           MyConstMissing___.new( wrong_const, @_pool, @_orig_constants_method ).execute
         end
@@ -139,9 +155,9 @@ module Skylab::Common
 
           @_cm.const_defined = method :__you_better_correct_that_name_boi
 
-          _xx = @_cm.maybe_load_then_cache_then_produce_the_value_
+          _kn = @_cm.name_value_pair_after_maybe_load_then_cache_
 
-          _xx  # #todo
+          _kn  # #todo
         end
 
         def __you_better_correct_that_name_boi(*)

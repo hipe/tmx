@@ -4,17 +4,17 @@ module Skylab::Common
 
     StowawayMagnetics__ = ::Module.new  # notes in [#031]
 
-    StowawayMagnetics__::Value_via_ConstMissing = -> cm do
+    StowawayMagnetics__::Knownness_via_ConstMissing = -> cm do
 
       stow_x = cm.remove_instance_variable :@stowaway_x__
       if stow_x.respond_to? :ascii_only?
-        Value_via_PathBased___.new( stow_x, cm ).execute
+        Knownness_via_PathBased___.new( stow_x, cm ).execute
       else
-        Value_via_ProcBased___[ stow_x, cm ]
+        Knownness_via_ProcBased___[ stow_x, cm ]
       end
     end
 
-    Value_via_ProcBased___ = -> stow_x, cm do
+    Knownness_via_ProcBased___ = -> stow_x, cm do
       # -
         sym = cm.const_symbol ; mod = cm.module
         x = stow_x.call
@@ -22,12 +22,12 @@ module Skylab::Common
           mod.const_set sym, x
         end
         # we do *not* autoloaderize - do it yourself if you want it
-        cm.cache_value_ x
-        x
+        self._REVIEW
+        cm.cache_and_produce_pair_via_value_ x
       # -
     end
 
-    class Value_via_PathBased___
+    class Knownness_via_PathBased___
 
       # #note-1 - how string-based stowaway specifiers are interpreted
       # #note-2 - the autoloaderization contract when stowing away
@@ -41,7 +41,7 @@ module Skylab::Common
         __for_each_path_tail_item_step_down_the_filesystem_tree
         __load_the_file
         __autoloaderize_the_host_asset
-        __the_target_asset
+        __known_of_the_guest_asset
       end
 
       def __for_each_path_tail_item_step_down_the_filesystem_tree
@@ -88,11 +88,10 @@ module Skylab::Common
         NIL
       end
 
-      def __the_target_asset
-
+      def __known_of_the_guest_asset
         o = @client
         o.reflect_
-        o.the_asset_value_
+        o.to_known__
       end
 
       def __init_for_loop
@@ -124,7 +123,7 @@ module Skylab::Common
 
     # ==
 
-    class Value_via_PathBased___::InferenceFrame__
+    class Knownness_via_PathBased___::InferenceFrame__
 
       def initialize fs_frame, mod
         @frame = fs_frame
@@ -135,7 +134,7 @@ module Skylab::Common
         if ! Is_probably_module[ @_the_value ]
           self._COVER_ME_expected_module
         end
-        Value_via_PathBased___::InferenceFrame__.new fs_frame, @_the_value
+        Knownness_via_PathBased___::InferenceFrame__.new fs_frame, @_the_value
       end
 
       def init_and_cache_and_autoloaderize_the_value
@@ -181,7 +180,7 @@ module Skylab::Common
       end
 
       def __cache
-        @_state_machine.write_value_ @_the_value, @_const
+        @PAIR = @_state_machine.write_and_produce_pair_ @_the_value, @_const
         NIL
       end
 
@@ -231,7 +230,7 @@ module Skylab::Common
 
     # ==
 
-    class Value_via_PathBased___::FilesystemNodeFrame__
+    class Knownness_via_PathBased___::FilesystemNodeFrame__
 
       def initialize piece, file_tree
         @piece_string = piece
@@ -246,7 +245,7 @@ module Skylab::Common
 
           _file_tree_ = @file_tree.child_file_tree sm
 
-          Value_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
+          Knownness_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
         else
           self._HOLE_intermediate_tail_piece_is_not_directory
         end

@@ -4,6 +4,8 @@ module Skylab::Common::TestSupport
 
   describe "[co] autoloader \"boxxy\"" do
 
+    define_singleton_method :shared_subject, TestSupport_::DANGEROUS_MEMOIZE
+
     context "this is a live test, must happen in one big story" do
 
       before :all do
@@ -47,12 +49,13 @@ module Skylab::Common::TestSupport
       end
     end
 
-    context "when there is no directory, things are ok", wip: true do
+    context "when there is no directory, things are ok" do
 
-      before :all do
-        module TS_::Fuxtures
+      shared_subject :_subject_module do
+        module TS_::X_a_b_Module1
           Wazlo = :heya
           Autoloader_[ self, :boxxy ]
+          self
         end
       end
 
@@ -76,10 +79,6 @@ module Skylab::Common::TestSupport
         end
 
         e.message =~ _rx || fail
-      end
-
-      def _subject_module
-        TS_::Fuxtures
       end
     end
 

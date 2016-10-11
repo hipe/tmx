@@ -34,7 +34,7 @@ module Skylab::Common
              }#{ mod }::( (then:) #{ then_sym } (now:) #{ now_sym } )"
       end
 
-      Uninitialized_constant = -> name, mod do  # const missing
+      No_filesystem_node = -> name, mod do  # (formerly Uninitialized_constant)
 
         _path_like = ::File.join mod.dir_path, "#{ name.as_slug }[#{ EXTNAME }]"
 

@@ -1068,7 +1068,12 @@ module Skylab::Common
       end
 
       def const_missing sym
-        _boxxy_controller.const_missing__ sym
+        kn = _boxxy_controller.name_value_pair_for_const_missing__ sym
+        if kn
+          kn.value_x
+        else
+          super
+        end
       end
 
       def _boxxy_controller
@@ -1108,8 +1113,12 @@ module Skylab::Common
       # -- autoload "reading"
 
       def const_missing x  # accept symbol or string
-        _ = Here_::ConstMissing_.new( x, self ).execute
-        _
+        kn = Here_::ConstMissing_.new( x, self ).execute
+        if kn
+          kn.value_x
+        else
+          super
+        end
       end
 
       def entry_tree

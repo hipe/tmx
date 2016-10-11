@@ -381,16 +381,17 @@ module Skylab::Common
       class ValueStateMachine___
 
         def initialize eg, node_path
-
           @entry_group = eg
           @parent_node_path = node_path
           @value_is_known = false
         end
 
-        def write_value_ x, sym
-          @_value_and_name = Pair.via_value_and_name x, sym
+        def write_and_produce_pair_ x, const_sym
+          pa = Pair.via_value_and_name x, const_sym
           @value_is_known = true
+          @_value_and_name = pa
           freeze
+          pa
         end
 
         def value_x

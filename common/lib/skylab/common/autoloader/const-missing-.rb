@@ -34,9 +34,9 @@ module Skylab::Common
 
         if __I_have_a_stowaway_record_for_this_name
 
-          Here_::StowawayMagnetics__::Value_via_ConstMissing[ self ]
+          Here_::StowawayMagnetics__::Knownness_via_ConstMissing[ self ]
         else
-          __value_via_lookup
+          __knownness_via_lookup
         end
       end
 
@@ -51,30 +51,30 @@ module Skylab::Common
         end
       end
 
-      def __value_via_lookup
+      def __knownness_via_lookup
 
         if __the_parent_module_has_an_associated_file_tree
 
           if __the_file_tree_has_an_associated_filesystem_entry_group
 
-            value_via_state_machine_
+            name_value_pair_via_state_machine_
           else
-            _msg = Here_::Say_::Uninitialized_constant[ name_, @module ]
+            _msg = Here_::Say_::No_filesystem_node[ name_, @module ]
             raise Here_::NameError, _msg
           end
         else
-          self._COVER_ME_when_the_parent_module_has_no_associated_file_tree
+          # the parent module has no associated file tree
+          NOTHING_  # covered, follow
         end
       end
 
       def __the_parent_module_has_an_associated_file_tree
 
         ft = @module.entry_tree
-        if ft.is_file_tree
+        if ft && ft.is_file_tree
           @file_tree = ft ; ACHIEVED_
         else
-          self._DO_SOMETHING_WITH_the_fail_info_in_there
-          UNABLE_
+          UNABLE_  # covered, follow
         end
       end
 
@@ -89,13 +89,13 @@ module Skylab::Common
         end
       end
 
-      def value_via_state_machine_
+      def name_value_pair_via_state_machine_  # #cr
 
         if @_state_machine.value_is_known
 
           __when_value_has_already_been_determined
         else
-          maybe_load_then_cache_then_produce_the_value_
+          name_value_pair_after_maybe_load_then_cache_
         end
       end
 
@@ -106,37 +106,26 @@ module Skylab::Common
         raise Here_::NameError, _message
       end
 
-      def maybe_load_then_cache_then_produce_the_value_  # #bo
+      def name_value_pair_after_maybe_load_then_cache_  # #bo
 
         __reflect_somehow
-        maybe_autoloaderize_the_value_
-        cache_the_value_
-        @the_asset_value_
+
+        if __should_autoloaderize_the_value
+          __autoloaderize_the_value
+        end
+
+        cache_and_produce_pair_via_value_ @the_asset_value_
       end
 
-      def cache_the_value_
-        cache_value_ @the_asset_value_
-        NIL
-      end
-
-      def cache_value_ x
-        @_state_machine.write_value_ x, @const_symbol
+      def cache_and_produce_pair_via_value_ x  # #sm
         $stderr.puts "#{ MARGIN___ }#{ @module }::#{ @const_string }"
-        NIL
+        @_state_machine.write_and_produce_pair_ x, @const_symbol
       end
 
       MARGIN___ = "#{ SPACE_ * 22 } - "
 
       def state_machine= sm
         @_state_machine = sm
-      end
-
-      def maybe_autoloaderize_the_value_
-
-        if __should_autoloaderize_the_value
-          __autoloaderize_the_module
-        end
-        NIL
       end
 
       def __should_autoloaderize_the_value  # #spot-4 does similar
@@ -156,7 +145,7 @@ module Skylab::Common
         end
       end
 
-      def __autoloaderize_the_module
+      def __autoloaderize_the_value
 
         kn = @__autoloaderization_node_path_knownness
 
@@ -236,6 +225,11 @@ module Skylab::Common
       def load_the_file_
         ::Kernel.load @_load_path
         NIL
+      end
+
+      def to_known__  # #sm
+        # (we could result in a pair, but why)
+        Known_Known[ @the_asset_value_ ]
       end
 
       def reflect_  # #sm

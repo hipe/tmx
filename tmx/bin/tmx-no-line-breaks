@@ -21,6 +21,22 @@ o << nil
 o << "          (there is some clever shell way of doing this - this work is"
 o << "          an :+#idea-kitestring on finding that.)"
 o << nil
+o << "          (UPDATE): using `awk` in the below manner is nearly equivalent,"
+o << "          and probably better because `awk` is so ubiquitously available."
+o << "          compare ours:"
+o << nil
+o << "              echo \"A\\nB\\nC\" | [this utility]  # => \"A B C\""
+o << nil
+o << "          and awk:"
+o << nil
+o << "              echo \"A\\nB\\nC\" | awk 'BEGIN{ORS=\" \"} {print}'  # => \"A B C \""
+o << nil
+o << "          whereas the above `awk` command puts the space (output record"
+o << "          separator) after *every* item (terminator semantics); the"
+o << "          subject utility employs *separator* semantics where there is"
+o << "          a space *between* each item but not after the final item."
+o << "          for all of our target use cases, the `awk` form is sufficient."
+o << "          but the subject utility is here in case it is ever not."
 
             es = 0
           else

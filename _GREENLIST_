@@ -1,0 +1,10 @@
+common/test
+fields/test
+basic/test
+plugin/test
+parse/test
+autonomous_component_system/test
+brazen/test
+human/test
+zerk/test
+system/test

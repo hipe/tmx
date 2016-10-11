@@ -123,7 +123,7 @@ module Skylab::Common
             __at_final_tuple tuple
           else
 
-            @_frame = @_frame_prototype.for_value tuple.mixed_value
+            @_frame = @_frame_prototype.for_value tuple.the_value
           end
 
           ACHIEVED_
@@ -153,9 +153,9 @@ module Skylab::Common
         di = remove_instance_variable :@__discovered
 
         if @result_in_name_and_value
-          Pair.via_value_and_name di.mixed_value, di.const_symbol
+          di.name_value_pair
         else
-          di.mixed_value
+          di.the_value
         end
       end
 
@@ -278,8 +278,8 @@ module Skylab::Common
         end
 
         def __tuple_for_matched_fuzzily
-          # (hi.)
-          _tuple_for_found
+          _nv = _to_name_value_pair
+          _tuple_for_found_via_name_value_pair _nv
         end
 
         # -- awkward
@@ -344,11 +344,13 @@ module Skylab::Common
           @_name_was_corrected = false  # this must get set, so default to
             # false for those cases where the name is already correct
 
-          cm.value_via_state_machine_  # if the const is not defined as-is,
+          _nv = cm.name_value_pair_via_state_machine_
+
+            # if at the time of the above line the const is not defined as-is,
             # triggers the name correction hook we set above. if after that
             # attempt at correction it's still not defined, ad hoc exception.
 
-          _tuple_for_found
+          _tuple_for_found_via_name_value_pair _nv
         end
 
         def __name_correction_when_loaded_awkwardly
@@ -369,8 +371,17 @@ module Skylab::Common
         # -- simple
 
         def __tuple_for_const_is_defined_as_is
+
+          _nv = _to_name_value_pair
           @_name_was_corrected = false
-          _tuple_for_found
+          _tuple_for_found_via_name_value_pair _nv
+        end
+
+        def _to_name_value_pair
+
+          sym = @_const_symbol
+          _x = @module.const_get sym, false
+          Pair.via_value_and_name _x, sym
         end
 
         # -- not
@@ -391,11 +402,9 @@ module Skylab::Common
           @_const_symbol = sym ; nil
         end
 
-        def _tuple_for_found
+        def _tuple_for_found_via_name_value_pair nv
 
-          _x = @module.const_get @_const_symbol, false
-
-          Discovered___.new _x, @_const_symbol do |o|
+          Discovered___.new nv do |o|
             yes = remove_instance_variable :@_name_was_corrected
             if yes
               o.NAME_WAS_CORRECTED = yes
@@ -404,7 +413,7 @@ module Skylab::Common
           end
         end
 
-        def mixed_value
+        def the_value
           @module
         end
 
@@ -420,7 +429,7 @@ module Skylab::Common
           @non_module = x
         end
 
-        def mixed_value
+        def the_value
           @non_module
         end
 
@@ -458,18 +467,23 @@ module Skylab::Common
 
       class Discovered___
 
-        def initialize mixed, sym
-          @const_symbol = sym
-          @mixed_value = mixed
+        def initialize nv
+          @name_value_pair = nv
           yield self
           freeze
         end
 
+        def the_value
+          @name_value_pair.value_x
+        end
+
         attr_accessor(
-          :const_symbol,
-          :mixed_value,
           :NAME_WAS_CORRECTED,
           :PREVIOUS_CONST_SYMBOL,
+        )
+
+        attr_reader(
+          :name_value_pair,
         )
 
         def found
