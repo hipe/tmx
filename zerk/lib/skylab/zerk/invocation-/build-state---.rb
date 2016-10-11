@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Invocation_::Build_state___
+  class Invocation_::BuildState___
 
     # [#013] has an introduction to why & how we cache graph node solutions
 

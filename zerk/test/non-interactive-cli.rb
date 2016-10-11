@@ -189,7 +189,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def expect_exitstatus_for k
-        _d = Home_::Non_Interactive_CLI::Exit_status_for___[ k ]
+        _d = Home_::NonInteractiveCLI::Exit_status_for___[ k ]
         exitstatus.should eql _d
       end
 

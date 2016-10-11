@@ -6,7 +6,7 @@ module Skylab::Zerk::TS_Visual
 
   z = ::Skylab::Zerk
 
-  CLI = z::Interactive_CLI.new do | rsx, & ev_p |
+  CLI = z::InteractiveCLI.new do | rsx, & ev_p |
 
     require_relative 'test-support'
 

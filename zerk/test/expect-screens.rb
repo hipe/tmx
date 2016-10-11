@@ -52,7 +52,7 @@ module Skylab::Zerk::TestSupport
 
       def build_interactive_CLI_classeque
 
-        cli = Home_::Interactive_CLI.begin
+        cli = Home_::InteractiveCLI.begin
 
         cli.root_ACS_by do  # ignore oes_p
           build_root_ACS_for_expect_screens

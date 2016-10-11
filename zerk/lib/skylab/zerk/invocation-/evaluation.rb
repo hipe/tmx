@@ -65,7 +65,7 @@ module Skylab::Zerk
 
       def ___establish_state
 
-        bs = Here_::Build_State___.new @_par, @_oi, @_pbc
+        bs = Here_::BuildState___.new @_par, @_oi, @_pbc
 
         @_cache[ @_k ] = bs  # do this before next line so we can detect cycles
 
