@@ -18,8 +18,6 @@ module Skylab::Common
           @__module = mod
 
           o = mod.boxxy_original_methods__
-          @_orig_const_defined_method = o.const_defined
-          @__orig_const_get_method = o.const_get
           @_orig_constants_method = o.constants
         end
 
@@ -32,16 +30,6 @@ module Skylab::Common
             end
           end
           a
-        end
-
-        def const_is_defined__ const, inherit
-
-          yes = @_orig_const_defined_method[ const, inherit ]
-          if yes
-            yes
-          elsif @_has_pool
-            @_pool.__probably const
-          end
         end
 
         def name_value_pair_for_const_missing__ wrong_const
@@ -225,10 +213,6 @@ module Skylab::Common
             @is_empty = true
           end
           a
-        end
-
-        def __probably const
-          @_box.has_name Head_via_const__[ const ]
         end
 
         def __probable_asset_via_head head

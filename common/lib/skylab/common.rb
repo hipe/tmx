@@ -1063,10 +1063,6 @@ module Skylab::Common
         _boxxy_controller.constants__
       end
 
-      def const_defined? sym, inherit=true
-        _boxxy_controller.const_is_defined__ sym, inherit
-      end
-
       def const_missing sym
         kn = _boxxy_controller.name_value_pair_for_const_missing__ sym
         if kn
@@ -1085,9 +1081,9 @@ module Skylab::Common
       )
     end
 
-    BoxxyOriginalMethods___ = ::Struct.new :const_defined, :constants, :const_get do
+    BoxxyOriginalMethods___ = ::Struct.new :constants do
       def self.__for mod
-        new mod.method( :const_defined? ), mod.method( :constants ), mod.method( :const_get )
+        new mod.method( :constants )
       end
     end
 
