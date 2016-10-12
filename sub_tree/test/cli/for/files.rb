@@ -1,12 +1,12 @@
 module Skylab::SubTree::TestSupport
 
-  module Models::Files::Modalities::CLI
+  module CLI::For::Files
 
     def self.[] tcc
       tcc.include self
     end
 
-    _ = TS_.lib_ :modality_integrations_CLI_expect_expression
+    _ = TS_.lib_ :CLI_expect_expression
 
     include _.instance_methods_module__
 
@@ -42,7 +42,7 @@ module Skylab::SubTree::TestSupport
     end
 
     def produce_action_specific_expag_safely_
-      Models::Files::Expag_for_tests[]
+      TS_::Operations::Files::Expag_for_tests[]
     end
 
     # ~ #hook-outs

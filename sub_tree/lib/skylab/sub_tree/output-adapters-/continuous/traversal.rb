@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  class Output_Adapters_::Continuous
+  class OutputAdapters_::Continuous
 
     class Traversal
 

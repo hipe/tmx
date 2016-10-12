@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport
 
   describe "[st] modality integration - CLI - canon" do
 
     TS_[ self ]
-    use :modality_integrations_CLI, :expect_expression
+    use :CLI, :expect_expression
 
     define_method :expect, instance_method( :expect )  # #because-rspec
 

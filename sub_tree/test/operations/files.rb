@@ -1,21 +1,20 @@
 module Skylab::SubTree::TestSupport
 
-  module Models::Files
+  module Operations::Files
 
     def self.[] tcc
       tcc.include self
     end
 
     head = nil
-    _MID = 'fixture-files'
 
     define_method :fixture_file do | sym |
 
-      head ||= Here_.dir_path
+      head ||= ::File.join TS_.dir_path, 'fixture-files'
 
       _tail = "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.output"
 
-      ::File.join head, _MID, _tail
+      ::File.join head, _tail
     end
 
     def build_string_IO

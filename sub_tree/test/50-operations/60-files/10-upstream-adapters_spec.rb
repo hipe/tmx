@@ -2,11 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::SubTree::TestSupport
 
-  describe "[st] models - files - upstream adapters" do
+  describe "[st] operations - files - upstream adapters" do
 
     TS_[ self ]
     use :expect_event
-    use :models_files
+    use :operations_files
 
     it "stdin and file - can't read from both stdin and file" do
 

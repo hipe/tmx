@@ -1,11 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport
 
-  describe "[st] models - files - CLI - cannon" do
+  describe "[st] CLI - files - cannon" do
 
     TS_[ self ]
-    use :models_files_modalities_CLI
+    use :CLI_for_files
 
     define_method :expect, instance_method( :expect )  # because rspec
 

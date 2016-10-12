@@ -365,7 +365,7 @@ module Skylab::SubTree
 
         def _init_traversal
 
-          @tr = Home_::Output_Adapters_::Continuous::Traversal.new_with(
+          @tr = Home_::OutputAdapters_::Continuous::Traversal.new_with(
 
             :output_proc, @downstream_p,
             :do_verbose_lines, @argument_box[ :show_lines ],

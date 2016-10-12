@@ -25,13 +25,12 @@ module Skylab::Common::TestSupport
 
       it "ok" do
 
-        n_a = [] ; v_a = []
+        v_a = []
 
-        _the_module._this_ do |k, x|
-          n_a.push k ; v_a.push x
+        _the_module._this_ do |x|
+          v_a.push x
         end
 
-        n_a == %i( Foo BAR ) || fail
         v_a == [ 1, 2 ] || fail
       end
     end

@@ -21,7 +21,9 @@ module Skylab::Common
       end
 
       Not_in_file = -> path, const_s, mod do
-        "#{ mod.name }::#{ const_s } #{
+        _s = mod.name
+        _s ||= '«module without const»'
+        "#{ _s }::#{ const_s } #{
          }must be but does not appear to be defined in #{ path }"
       end
 

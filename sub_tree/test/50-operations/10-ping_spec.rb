@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport
 
-  describe "[st] models (core)" do
+  describe "[st] operations -  ping" do
 
     TS_[ self ]
     use :expect_event
@@ -10,13 +10,11 @@ module Skylab::SubTree::TestSupport
     it "loads." do
 
       Home_::API
-
     end
 
     it "pings." do
 
       call_API :ping
-
     end
   end
 end

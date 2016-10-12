@@ -1,8 +1,6 @@
 module Skylab::SubTree
 
-  Output_Adapters_ = ::Module.new
-
-  class Output_Adapters_::Continuous
+  class OutputAdapters_::Continuous
 
     Attributes_actor_.call( self,
       :upstream_tree,

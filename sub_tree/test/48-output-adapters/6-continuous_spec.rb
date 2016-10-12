@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::SubTree::TestSupport
 
-  describe "[st] output adapters - minimal" do
+  describe "[st] output adapters - continuous" do
 
     TS_[ self ]
 
@@ -12,7 +12,7 @@ module Skylab::SubTree::TestSupport
 
       _tree = __build_tree
 
-      Home_::Output_Adapters_::Continuous.with(
+      Home_::OutputAdapters_::Continuous.with(
 
         :upstream_tree, _tree,
         :output_line_downstream_yielder, io,
@@ -37,14 +37,14 @@ module Skylab::SubTree::TestSupport
 
     def __build_tree
 
-      cls = Output_Adapters::Node
+      cls = X_oa_c::Node
 
       cls.new( :one,
         [ cls.new( :two_A, [ cls.new( :three ) ] ),
           cls.new( :two_B ) ] )
     end
 
-    module Output_Adapters  # our own sandbox namespace
+    module X_oa_c  # our own sandbox namespace
 
       class Node
 

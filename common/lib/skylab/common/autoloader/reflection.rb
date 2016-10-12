@@ -7,8 +7,7 @@ module Skylab::Common
       Each_const_value_method = -> & p do
 
         constants.each do |sym|
-          _x = const_get sym, false
-          p[ sym, _x ]
+          p[ const_get sym, false ]
         end
       end
     end

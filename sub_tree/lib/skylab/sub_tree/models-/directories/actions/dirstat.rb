@@ -1,5 +1,7 @@
 module Skylab::SubTree
 
+  Models_::Directories = ::Module.new  # assert creation, is registered stowaway
+
   module Models_::Directories
 
     Actions = ::Module.new

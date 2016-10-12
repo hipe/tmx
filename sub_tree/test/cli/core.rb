@@ -1,6 +1,6 @@
 module Skylab::SubTree::TestSupport
 
-  module Modality_Integrations::CLI
+  module CLI
 
     class << self
 

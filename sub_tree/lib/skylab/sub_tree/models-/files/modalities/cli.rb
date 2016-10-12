@@ -2,8 +2,6 @@ module Skylab::SubTree
 
   module Models_::Files
 
-    Modalities = ::Module.new
-
     module Modalities::CLI
 
       Actions = ::Module.new  # THE_EMPTY_MODULE_

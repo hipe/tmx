@@ -40,9 +40,14 @@ module Skylab::SubTree
 
   Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
+  module Models_
 
-  Autoloader_[ Models_ = ::Module.new, :boxxy ]
+    Autoloader_[ self, :boxxy ]
+
+    stowaway :Directories, 'directories/actions/dirstat'
+  end
+
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze
