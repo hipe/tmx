@@ -30,7 +30,7 @@ module Skylab::TestSupport
       # -- ..
 
       def begin_handler_expresser
-        CLI_support_[]::Expression_Agent::Handler_Expresser.new self
+        CLI_support_[]::ExpressionAgent::Handler_Expresser.new self
       end
 
       # --

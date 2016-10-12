@@ -91,6 +91,10 @@ module Skylab::TestSupport::TestSupport
     Home_::Memoization_and_subject_sharing[ tcc ]
   end
 
+  The_Method_Called_Let = -> tcc do
+    Home_::Let[ tcc ]
+  end
+
   # --
 
   Zerk_test_support_ = -> do

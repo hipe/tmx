@@ -1156,6 +1156,8 @@ module Skylab::Common
 
     CORE_ENTRY_STEM = 'core'.freeze
     CORE_FILE = "#{ CORE_ENTRY_STEM }#{ EXTNAME }".freeze
+    DEBUG_IO_ = $stderr
+    DO_DEBUG_ = false
     DOT_DOT_ = '..'
     NameError = ::Class.new ::NameError
     NODE_PATH_IVAR_ = :@dir_path

@@ -21,7 +21,7 @@ module Skylab::TestSupport
           end,
         }
 
-        cli.expression_agent = CLI::Expression_Agent.instance__
+        cli.expression_agent = CLI::ExpressionAgent.instance__
 
         yield cli
 

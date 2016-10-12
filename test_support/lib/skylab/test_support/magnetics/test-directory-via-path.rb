@@ -1,7 +1,5 @@
 module Skylab::TestSupport
-
-  Magnetics = ::Module.new
-
+  # -
     class Magnetics::TestDirectory_via_Path
 
       # our algorithm is particular enough that it can be served neither by
@@ -135,4 +133,5 @@ module Skylab::TestSupport
         end
       end
     end
+  # -
 end

@@ -21,6 +21,7 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] quickie" do
 
     TS_[ self ]
+    use :the_method_called_let
 
     last_id = 0
 

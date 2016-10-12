@@ -85,7 +85,6 @@ module Skylab::Common
 
       # ==
 
-      do_debug = true
       output_for_trace = nil
 
       Cache = -> fs do
@@ -95,7 +94,7 @@ module Skylab::Common
         h = {}
         p = -> node_path do
           h.fetch node_path do
-            if do_debug
+            if DO_DEBUG_
               output_for_trace[ node_path ]
             end
             node = FileTree_via_NodePath___.new( node_path, p, fs ).execute
@@ -116,7 +115,7 @@ module Skylab::Common
         gem_needle = ::File.join EMPTY_S_, 'ruby', RUBY_VERSION, 'gems', EMPTY_S_
         margin = "#{ SPACE_ * 18 } * "
         sep = ::File::SEPARATOR
-        serr = $stderr
+        serr = DEBUG_IO_
 
         puts = -> line do
           serr.puts "#{ margin }#{ line }"

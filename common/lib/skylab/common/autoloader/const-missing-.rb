@@ -121,11 +121,19 @@ module Skylab::Common
       end
 
       def cache_and_produce_pair_via_value_ x  # #sm
-        $stderr.puts "#{ MARGIN___ }#{ @module }::#{ @const_string }"
+
+        if DO_DEBUG_
+          __express_trace_info
+        end
+
         @_state_machine.write_and_produce_pair_ x, @const_symbol
       end
 
-      MARGIN___ = "#{ SPACE_ * 22 } - "
+      margin = nil
+      define_method :__express_trace_info do
+        margin ||= "#{ SPACE_ * 22 } - "
+        DEBUG_IO_.puts "#{ margin }#{ @module }::#{ @const_string }"
+      end
 
       def state_machine= sm
         @_state_machine = sm
