@@ -4,17 +4,17 @@ module Skylab::Common
 
     StowawayMagnetics__ = ::Module.new  # notes in [#031]
 
-    StowawayMagnetics__::Knownness_via_ConstMissing = -> cm do
+    StowawayMagnetics__::NameAndValue_via_ConstMissing = -> cm do
 
-      stow_x = cm.remove_instance_variable :@stowaway_x__
+      stow_x = cm.module.stowaway_hash_.fetch cm.const_symbol  # a given
       if stow_x.respond_to? :ascii_only?
-        Knownness_via_PathBased___.new( stow_x, cm ).execute
+        NameAndValue_via_PathBased___.new( stow_x, cm ).execute
       else
-        Knownness_via_ProcBased___[ stow_x, cm ]
+        NameAndValue_via_ProcBased___[ stow_x, cm ]
       end
     end
 
-    Knownness_via_ProcBased___ = -> stow_x, cm do
+    NameAndValue_via_ProcBased___ = -> stow_x, cm do
       # -
         sym = cm.const_symbol ; mod = cm.module
         x = stow_x.call
@@ -27,7 +27,7 @@ module Skylab::Common
       # -
     end
 
-    class Knownness_via_PathBased___
+    class NameAndValue_via_PathBased___
 
       # #note-1 - how string-based stowaway specifiers are interpreted
       # #note-2 - the autoloaderization contract when stowing away
@@ -90,8 +90,8 @@ module Skylab::Common
 
       def __known_of_the_guest_asset
         o = @client
-        o.reflect_
-        o.to_known__
+        o.become_loaded_assuming_assets_are_loaded_
+        o.to_known_
       end
 
       def __init_for_loop
@@ -123,7 +123,7 @@ module Skylab::Common
 
     # ==
 
-    class Knownness_via_PathBased___::InferenceFrame__
+    class NameAndValue_via_PathBased___::InferenceFrame__
 
       def initialize fs_frame, mod
         @frame = fs_frame
@@ -134,7 +134,7 @@ module Skylab::Common
         if ! Is_probably_module[ @_the_value ]
           self._COVER_ME_expected_module
         end
-        Knownness_via_PathBased___::InferenceFrame__.new fs_frame, @_the_value
+        NameAndValue_via_PathBased___::InferenceFrame__.new fs_frame, @_the_value
       end
 
       def init_and_cache_and_autoloaderize_the_value
@@ -209,9 +209,9 @@ module Skylab::Common
         _attempt_const @_wide_const.upcase
       end
 
-      def _attempt_const const
-        if @module.const_defined? const, false
-          @_const = const.intern ; ACHIEVED_
+      def _attempt_const const_x
+        if @module.const_defined? const_x, false
+          @_const = const_x.intern ; ACHIEVED_
         end
       end
 
@@ -230,7 +230,7 @@ module Skylab::Common
 
     # ==
 
-    class Knownness_via_PathBased___::FilesystemNodeFrame__
+    class NameAndValue_via_PathBased___::FilesystemNodeFrame__
 
       def initialize piece, file_tree
         @piece_string = piece
@@ -245,7 +245,7 @@ module Skylab::Common
 
           _file_tree_ = @file_tree.child_file_tree sm
 
-          Knownness_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
+          NameAndValue_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
         else
           self._HOLE_intermediate_tail_piece_is_not_directory
         end

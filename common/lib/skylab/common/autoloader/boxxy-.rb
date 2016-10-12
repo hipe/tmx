@@ -32,8 +32,7 @@ module Skylab::Common
           a
         end
 
-
-        def name_value_pair_for_const_missing__ wrong_const
+        def known_for_const_missing__ wrong_const
 
           if @_has_pool
             __name_value_pair_for_const_missing_normally wrong_const
@@ -75,7 +74,7 @@ module Skylab::Common
             seen[ real_const ] && next
             seen[ real_const ] = true
 
-            head = Head_via_const__[ real_const ]
+            head = Name.via_const_symbol( real_const ).as_slug
             pa_h.key? head or next
             ( remove_these ||= [] ).push head
           end
@@ -108,7 +107,7 @@ module Skylab::Common
           @wrong_const = sym
         end
 
-        def execute
+        def execute  # result in name value pair
           __for_now_we_will_assume_we_have_a_probable_asset_for_this_const
           __for_now_we_will_assume_that_the_value_is_not_known_for_this_asset
           __execute_that_real_const_missing
@@ -134,19 +133,84 @@ module Skylab::Common
             self._HAVE_FUN_readme
           end
 
-          @_cm.file_tree = @module.entry_tree
-
-          @_cm.state_machine = sm
+          o = @_cm
+          o.file_tree = @module.entry_tree
+          o.state_machine = sm
           NIL
         end
 
-        def __execute_that_real_const_missing
+        def __execute_that_real_const_missing  # result in name value pair
 
-          @_cm.const_defined = method :__you_better_correct_that_name_boi
+          o = @_cm
 
-          _kn = @_cm.name_value_pair_after_maybe_load_then_cache_
+          o.const_defined = method :__you_better_correct_that_name_boi
 
-          _kn  # #todo
+          if o.become_loaded_via_filesystem_
+
+            o.name_and_value_after_loaded_
+
+          elsif __match_a_stowaway_record_somehow
+            remove_instance_variable :@_name_and_value
+
+          else
+
+            # this case is covered, but is probably not ever used
+            # in production #feature-island (unconfirmed)
+
+            o.become_loaded_via_autovivifying_a_module_
+            o.name_and_value_after_loaded_
+          end
+        end
+
+        def __match_a_stowaway_record_somehow
+
+          # for an item under a boxxy that does not have one of the main two
+          # storage means (eponymous or corefile), rather than autovivifying
+          # outright, see first if you can correct the name thru stowaways.
+          # this is more "payback" work because we don't take stowaways into
+          # account eariler on the pipeline (as maybe we should) where we
+          # hack `constants` to infer things.. (but even if this could be
+          # improved, it's all just for one field edge case.)
+
+          o = @_cm
+          if o.has_stowaway_hash_
+            if o.has_stowaway_record_for_const_as_is_
+              @_name_and_value = o.name_and_value_via_stowaway_ ; ACHIEVED_
+            else
+              __try_this_crazy_money
+            end
+          end
+        end
+
+        def __try_this_crazy_money
+
+          # when there is a stowaway hash and there is no direct match
+          # for a name, try to fuzzy match on a stowaway entry egads
+
+          o = @_cm
+          _h = o.module.stowaway_hash_
+
+          fl = Here_::FuzzyLookup_.new
+
+          fl.constants = _h.keys
+
+          fl.on_exactly_one = -> sym do
+            @_cm.const_symbol = sym
+            ACHIEVED_
+          end
+
+          fl.on_zero = -> do
+            UNABLE_  # fall thru
+          end
+
+          _yes = fl.execute_for @module, @_cm.name_
+
+          if _yes
+            @_name_and_value = o.name_and_value_via_stowaway_
+            ACHIEVED_
+          else
+            UNABLE_
+          end
         end
 
         def __you_better_correct_that_name_boi(*)
@@ -178,11 +242,24 @@ module Skylab::Common
 
           __init_for_indexing
 
+          normally = method :__index_probable_asset
+
+          p = -> sm do
+            if CORE_ENTRY_STEM == sm.entry_group_head
+              # boxxy modules usually don't have a corefile but they might (covered)
+              p = normally
+              NOTHING_
+            else
+              normally[ sm ]
+              NIL
+            end
+          end
+
           st = mod.entry_tree.to_state_machine_stream_proc_
           begin
             sm = st.call
             sm || break
-            __index_probable_asset sm
+            p[ sm ]
             redo
           end while above
 
@@ -243,12 +320,6 @@ module Skylab::Common
           :name,
           :state_machine,
         )
-      end
-
-      # ==
-
-      Head_via_const__ = -> sym do
-        Name.via_const_symbol( sym ).as_slug
       end
 
       # ==

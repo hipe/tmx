@@ -4,6 +4,7 @@ fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`, memoize vs lazy) (B)
 improvements near autoloading and dir_pathname
 relative_path_from
 no more requiring of pathname univerally (#commit-related)
+explain things like eponymous/corefle in a ubiquitous languge file, and that one #note-4
 (-1) many stubs can be removed, get rid of tombstones in [co] a.l tests
 (-2) universal integration (all green)
 [tmx]
@@ -26,4 +27,3 @@ no more requiring of pathname univerally (#commit-related)
 [gi]
 [ts]
 [st] (subtree)
-cover boxxy plus stowaway

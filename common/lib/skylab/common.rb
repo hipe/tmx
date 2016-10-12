@@ -1064,7 +1064,7 @@ module Skylab::Common
       end
 
       def const_missing sym
-        kn = _boxxy_controller.name_value_pair_for_const_missing__ sym
+        kn = _boxxy_controller.known_for_const_missing__ sym
         if kn
           kn.value_x
         else

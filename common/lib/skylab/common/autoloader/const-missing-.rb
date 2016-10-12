@@ -31,24 +31,23 @@ module Skylab::Common
       )
 
       def execute
-
-        if __I_have_a_stowaway_record_for_this_name
-
-          Here_::StowawayMagnetics__::Knownness_via_ConstMissing[ self ]
+        if has_stowaway_hash_ && has_stowaway_record_for_const_as_is_
+          name_and_value_via_stowaway_
         else
           __knownness_via_lookup
         end
       end
 
-      def __I_have_a_stowaway_record_for_this_name
+      def has_stowaway_hash_  # #bo
+        @module.stowaway_hash_ && ACHIEVED_
+      end
 
-        h = @module.stowaway_hash_
-        if h
-          stow_x = h[ @const_symbol ]
-          if stow_x
-            @stowaway_x__ = stow_x ; ACHIEVED_
-          end
-        end
+      def has_stowaway_record_for_const_as_is_  # #bo
+        @module.stowaway_hash_[ @const_symbol ] && ACHIEVED_
+      end
+
+      def name_and_value_via_stowaway_  # #bo
+        Here_::StowawayMagnetics__::NameAndValue_via_ConstMissing[ self ]
       end
 
       def __knownness_via_lookup
@@ -95,7 +94,7 @@ module Skylab::Common
 
           __when_value_has_already_been_determined
         else
-          name_value_pair_after_maybe_load_then_cache_
+          __name_value_pair_after_maybe_load_then_cache
         end
       end
 
@@ -106,9 +105,13 @@ module Skylab::Common
         raise Here_::NameError, _message
       end
 
-      def name_value_pair_after_maybe_load_then_cache_  # #bo
+      def __name_value_pair_after_maybe_load_then_cache
 
-        __reflect_somehow
+        become_loaded_via_filesystem_ or become_loaded_via_autovivifying_a_module_
+        name_and_value_after_loaded_
+      end
+
+      def name_and_value_after_loaded_  # #bo
 
         if __should_autoloaderize_the_value
           __autoloaderize_the_value
@@ -160,27 +163,21 @@ module Skylab::Common
         NIL
       end
 
-      def __reflect_somehow
+      def become_loaded_via_filesystem_  # #bo
 
-        if @_state_machine.entry_group.includes_what_is_probably_a_file
-          __reflect_when_eponymous_file
-        else
-          __reflect_when_directory
+        if __has_eponymous_file
+          __become_loaded_when_eponymous_file
+
+        elsif __has_corefile
+          __become_loaded_when_corefile
         end
       end
 
-      def __reflect_when_directory
+      # ~ has means X to become loaded
+
+      def __has_corefile
 
         @_child_file_tree = @file_tree.child_file_tree @_state_machine
-
-        if __there_is_a_corefile
-          __reflect_via_loading_the_corefile
-        else
-          __reflect_via_autovivifying_a_module
-        end
-      end
-
-      def __there_is_a_corefile
 
         sm = @_child_file_tree.corefile_state_machine
         if sm
@@ -188,51 +185,56 @@ module Skylab::Common
         end
       end
 
-      def __reflect_via_autovivifying_a_module
+      def __has_eponymous_file
+        @_state_machine.entry_group.includes_what_is_probably_a_file
+      end
+
+      # ~ become loaded via X
+
+      def become_loaded_via_autovivifying_a_module_  # #bo
 
         x = ::Module.new
         @module.const_set @const_symbol, x
         @the_asset_value_ = x
         @_whether_to_autoloaderize_module ||= Known_Known.trueish_instance
-        NIL
+        ACHIEVED_
       end
 
-      def __reflect_via_loading_the_corefile
+      def __become_loaded_when_corefile
 
         @_load_path = @_core_file_state_machine.get_filesystem_path
-        _load_and_reflect
-        NIL
+        _become_loaded_via_load_path
       end
 
-      def __reflect_when_eponymous_file
+      def __become_loaded_when_eponymous_file
 
         @_load_path = @_state_machine.get_filesystem_path
-        _load_and_reflect
-        NIL
+        _become_loaded_via_load_path
       end
+
+      # ~
 
       def load_path= x  # #sm
         @_load_path = x
       end
 
-      def _load_and_reflect  # init N things
+      def _become_loaded_via_load_path  # init N things
 
         load_the_file_
-        reflect_
-        NIL
+        become_loaded_assuming_assets_are_loaded_
       end
 
-      def load_the_file_
+      def load_the_file_  # #sm
         ::Kernel.load @_load_path
         NIL
       end
 
-      def to_known__  # #sm
+      def to_known_  # #sm
         # (we could result in a pair, but why)
         Known_Known[ @the_asset_value_ ]
       end
 
-      def reflect_  # #sm
+      def become_loaded_assuming_assets_are_loaded_  # #sm
 
         begin
 
@@ -252,7 +254,7 @@ module Skylab::Common
           raise Here_::NameError, _message
 
         end while above
-        NIL
+        ACHIEVED_
       end
 
       def __constant_is_defined

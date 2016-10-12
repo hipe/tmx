@@ -167,6 +167,38 @@ module Skylab::Common::TestSupport
         _pair.name_x == :InfermationTerktix || fail
       end
     end
+
+    context "integration with stowaways (SORT OF)!" do
+
+      shared_subject :_custom_tuple do
+
+        _a = TS_::FixtureDirectories
+        mod = _a::SxtnBoxstow
+        _constants = mod.constants
+        [ mod, _constants ]
+      end
+
+      it "constants has right constituency, order" do  # #coverpoint-2-1
+        _actual = _the_module.constants
+        _actual == [ :Shammy_Jammy, :Shimmy_Jimmy ] || fail
+      end
+
+      it "the ordinary asset loads (use inaccurately inferred name)" do
+        _mod = _the_module
+        _xx = _mod::Shammy_Jammy  # name is as inferred, name is not as is
+        _xx == :_yes_ || fail
+      end
+
+      it "the foopilie asset loads (use inaccurately inferred name)" do
+        _mod = _the_module
+        _mod_ = _mod::Shimmy_Jimmy
+        _mod_.hello_shimmy_jimmy
+      end
+
+      def _the_module
+        TS_::FixtureDirectories::SxtnBoxstow
+      end
+    end
   end
 end
 # #tombstone: `const_defined?` is no longer overridden with fuzziness
