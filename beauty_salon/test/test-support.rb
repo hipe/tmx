@@ -82,7 +82,7 @@ module Skylab::BeautySalon::TestSupport
     end
   end
 
-  # ~ bundles
+  # -- bundles
 
   Expect_Event = -> tcc do
     Common_.test_support::Expect_Event[ tcc ]
@@ -92,17 +92,23 @@ module Skylab::BeautySalon::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  Modality_Integrations_CLI_Support = -> tcc do
+  CLI = -> tcc do
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
   end
 
-  # ~
+  # --
 
   def self._MY_BIN_PATH
     @___mbp ||= ::File.expand_path( '../../bin', __FILE__ )
   end
 
-  # ~
+  # --
+
+  Fixture_file_ = -> tail do  # 1x
+    ::File.join TS_.dir_path, 'fixture-files', tail
+  end
+
+  # --
 
   Home_ = ::Skylab::BeautySalon
   Common_ = ::Skylab::Common

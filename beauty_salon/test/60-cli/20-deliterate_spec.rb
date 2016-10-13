@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - delit - modalities - CLI" do
+  describe "[bs] CLI - deliterate" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :modality_integrations_CLI_support
+    use :CLI
 
     context "help" do
 
@@ -43,7 +43,7 @@ module Skylab::BeautySalon::TestSupport
 
     it "money" do
 
-      _path = __fixture_file '01-some-code.code'
+      _path = Fixture_file_[ '01-some-code.code' ]
 
       invoke 'deliterate', '3', '5', _path
 
@@ -52,14 +52,6 @@ module Skylab::BeautySalon::TestSupport
       expect :o, "      if @to_line < @from_line"
       expect :e, "for example, you could deliterate these lines."
       expect_succeeded
-    end
-
-    def __fixture_file s
-
-      ::File.join(
-        TS_.dir_path,
-        'models/deliterate/fixture-files',
-        s )
     end
   end
 end

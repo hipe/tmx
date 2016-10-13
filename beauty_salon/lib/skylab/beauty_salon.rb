@@ -26,7 +26,7 @@ module Skylab::BeautySalon
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
-  stowaway :CLI do
+  lazily :CLI do
 
     CLI = ::Class.new Home_.lib_.brazen::CLI
   end
@@ -45,6 +45,13 @@ module Skylab::BeautySalon
         bc and bc.receiver.send bc.method_name, * bc.args
       end
     end  # >>
+  end
+
+  module Models_
+
+    Autoloader_[ self, :boxxy ]
+
+    stowaway :Text, 'text/actions/wrap'
   end
 
   module Lib_
@@ -94,7 +101,6 @@ module Skylab::BeautySalon
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
   IDENTITY_ = -> x { x }          # for fun we track this
-  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]  # ask for it
   NEWLINE_ = "\n"
   NIL_ = nil  # to emphasize its use
   PROCEDE_ = true
@@ -103,5 +109,4 @@ module Skylab::BeautySalon
   THE_EMPTY_MODULE_ = ::Module.new.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
-
 end

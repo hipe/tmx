@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - deliterate (and ping)" do
+  describe "[bs] operations - deliterate" do
 
     TS_[ self ]
     use :expect_event

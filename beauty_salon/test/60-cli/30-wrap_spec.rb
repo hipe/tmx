@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] CLI wrap" do
+  describe "[bs] CLI - wrap" do
 
     TS_[ self ]
-    use :modality_integrations_CLI_support
+    use :CLI
 
     it "help screen has some customizations (fragile..)" do
 
@@ -56,7 +56,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _stdin_mocks
-      Home_.lib_.system.test_support::Mocks
+      Home_.lib_.system.test_support::MOCKS
     end
 
     def stdin_for_expect_stdout_stderr

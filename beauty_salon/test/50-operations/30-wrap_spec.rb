@@ -1,8 +1,8 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::BeautySalon::TestSupport
 
-  describe "[bs] models - text (wrap)" do
+  describe "[bs] operations - wrap" do
 
     TS_[ self ]
     use :expect_event

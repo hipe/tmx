@@ -1,5 +1,7 @@
 module Skylab::BeautySalon
 
+  Models_::Text = ::Module.new  # assert creation of declared stowaway
+
   module Models_::Text
 
     Actions = ::Module.new
