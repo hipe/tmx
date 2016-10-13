@@ -254,7 +254,7 @@ module Skylab::System
         fld.name.as_camelcase_const_string
       end
 
-      const = _const_sym_a.join( UNDERSCORE_ ).intern
+      const = _const_s_a.join( UNDERSCORE_ ).intern
 
       mod = Sandbox___
 

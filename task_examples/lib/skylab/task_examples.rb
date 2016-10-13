@@ -38,3 +38,4 @@ module Skylab::TaskExamples
   UNABLE_ = false
   UNRELIABLE_ = :_unreliable_from_te_
 end
+# #tombstone - CLI option parser (sort of) born 2011-11

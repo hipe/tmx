@@ -1,6 +1,3 @@
-[#008]       tracks NOT USED files that we are keeping around for now
-             for whatever reason..
-
 [#007]       is in-situ example of something referenced outside of lib
 
 [#006] #open no more @name and `@name_symbol` - this is wrong namespace

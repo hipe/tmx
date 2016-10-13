@@ -9,7 +9,7 @@ module Skylab::TaskExamples
 
     def _task_init
       @interpolated or interpolate! or return false
-      pathname = ::Pathname.new(build_tarball)
+      pathname = ::P_athname.new(build_tarball)
       dirname, basename_with_get_args = [pathname.dirname.to_s, pathname.basename.to_s]
       @basename = /\A([^?]+)/.match(basename_with_get_args)[1]
       @nodes = {

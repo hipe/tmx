@@ -15,13 +15,19 @@ module Skylab::TaskExamples
     def check
       execute true
     end
+
     def execute just_checking
+
       @just_checking = just_checking
-      ::Pathname.new(@configure_make_make_install).tap do |p|
-        dirname, basename = [p.dirname.to_s, p.basename.to_s]
-        basename = get_dir_basename(basename) or return false
-        @dir = ::File.join(dirname, basename)
+
+      path = @configure_make_make_install
+      dirname = ::File.dirname path
+      basename = ::File.basename path
+      basename_ = get_dir_basename( basename )
+      if basename_
+        @dir = ::File.join dirname, basename_
       end
+
       if ! ::File.directory? @dir
         if dry_run?
           _pretending "directory exists", @dir

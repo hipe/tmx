@@ -155,7 +155,7 @@ module Skylab::TaskExamples::TestSupport
     end
 
     def FIXTURES_DIR
-      ::File.join TS_.dir_path, 'fixtures'
+      ::File.join TS_.dir_path, 'fixture-files'
     end
   end
 
