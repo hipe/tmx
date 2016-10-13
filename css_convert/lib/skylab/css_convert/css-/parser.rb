@@ -1,7 +1,5 @@
 module Skylab::CSS_Convert
 
-  CSS_ = ::Module.new
-
   class CSS_::Parser < Home_::Parser_::Common_Base
 
     ENTITY_NOUN_STEM = 'css file'

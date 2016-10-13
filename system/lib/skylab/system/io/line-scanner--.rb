@@ -61,8 +61,12 @@ module Skylab::System
         @lineno = -> do
           count.nonzero?
         end
-        @pathname = ( ::Pathname.new( fh.path ) if fh.respond_to?( :path ) )
-        nil
+
+        @pathname = if fh.respond_to? :path
+          Home_.lib_.pathname.new fh.path
+        end
+
+        NIL
       end
 
       attr_reader :fh, :pathname

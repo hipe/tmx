@@ -126,8 +126,7 @@ module Skylab::CSS_Convert::TestSupport
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  FIXTURES_DIR___ = ::File.expand_path( '../fixtures', __FILE__ )
+  FIXTURES_DIR___ = ::File.expand_path( '../fixture-files', __FILE__ )
   NIL_ = nil
   TS_ = self
-
 end

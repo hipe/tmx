@@ -11,6 +11,10 @@ module Skylab::CSS_Convert
     def lib_
       @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
+
+    def sidesys_path_
+      @___ssp ||= ::File.expand_path '../../..', dir_path
+    end
   end  # >>
 
   Common_ = ::Skylab::Common
@@ -234,9 +238,17 @@ module Skylab::CSS_Convert
 
     def version
 
+      _path = ::File.join Home_.sidesys_path_, 'VERSION'
+
+      big_string = ::File.read _path
+      big_string.chomp!
+      _version_s = big_string  # or whatever
+
+      _prog_name = ::File.basename @resources.invocation_string_array.last
+
+      @resources.sout.puts "#{ _prog_name } #{ _version_s }"
+
       @_can_exit = true
-      _ = ::File.basename @resources.invocation_string_array.last
-      @resources.sout.puts "#{ _ } #{ Home_::VERSION }"
       @exitstatus ||= CLI::SUCCESS_EXITSTATUS  # result
       CLI::SUCCESS_EXITSTATUS
     end
@@ -583,5 +595,4 @@ module Skylab::CSS_Convert
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
-
 end

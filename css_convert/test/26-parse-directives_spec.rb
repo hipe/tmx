@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 describe "[cssc] when parsing directives" do
 
-  ::Skylab::CSS_Convert::TestSupport[ self ]
+  Skylab::CSS_Convert::TestSupport[ self ]
   use :expect_event
 
   it "should parse platonic ideal" do
@@ -12,7 +12,7 @@ describe "[cssc] when parsing directives" do
     tree.first.should eql(:merge_statement)
     itf, sif, su, ls = tree.children(
       :in_the_folder, :styles_in_files, :styles_under, :merge_list)
-    itf[:path].should eql("test/fixtures/css")
+    itf[:path].should eql("test/fixture-files/css")
     sif[:left].should eql("documentation.css")
     sif[:right].should eql("pygments.css")
     su[:left].should eql(".highlight")
