@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        class Scale_Adapters_::Quarterly < Scale_time_::Common_Scale_Adapter_
+    class Scale_Adapters_::Quarterly < Here_::CommonScaleAdapter_
 
           class << self
 
@@ -21,7 +17,7 @@ module Skylab::GitViz
 
           def within__4__ sumzn
 
-            _d = Time_Unit_Adapters[ INTERNAL_UNIT ].
+            _d = TimeUnitAdapters_[ INTERNAL_UNIT ].
               particular_offset_within_annual_cycle_of_datetime_(
                 sumzn.subject.normal_datetime )
 
@@ -42,8 +38,6 @@ module Skylab::GitViz
           SECOND_Q_IN_FOUR___ = '  Q2'
           THIRD_Q_IN_FOUR___ = '  Q3'
           FOURTH_Q_IN_FOUR___ = '  Q4'
-        end
-      end
     end
   end
 end

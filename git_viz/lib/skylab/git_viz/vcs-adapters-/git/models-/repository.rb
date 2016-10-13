@@ -36,7 +36,7 @@ module Skylab::GitViz
           NIL_
         else
 
-          Home_::Actors_::Relpath[ arg_path, project_path ]
+          Magnetics_::Relpath_via_Long_and_Short[ arg_path, project_path ]
         end
 
         @relative_path_of_interest = _rpoi || DOT_

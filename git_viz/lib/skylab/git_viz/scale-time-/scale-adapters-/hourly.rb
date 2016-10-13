@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        class Scale_Adapters_::Hourly < Scale_time_::Common_Scale_Adapter_
+    class Scale_Adapters_::Hourly < Here_::CommonScaleAdapter_
 
           class << self
 
@@ -44,8 +40,6 @@ module Skylab::GitViz
 
             self.class.within_ sumzn
           end
-        end
-      end
     end
   end
 end

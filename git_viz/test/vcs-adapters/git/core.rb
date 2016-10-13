@@ -1,12 +1,15 @@
 module Skylab::GitViz::TestSupport
 
-  module VCS_Adapters::Git::Support
+  module VCS_Adapters::Git
 
     class << self
 
       def [] tcc
-
         tcc.include Instance_Methods__
+      end
+
+      def at_ const
+        CONSTANTS__.lookup const
       end
     end  # >>
 
@@ -30,14 +33,13 @@ module Skylab::GitViz::TestSupport
       end
 
       def at_ sym
-
         CONSTANTS__.lookup sym
       end
     end
 
     # ~ bundles
 
-    Repository_Support = -> tcc do
+    Repository = -> tcc do
 
       TS_::Expect_Event[ tcc ]
       TS_::Stubbed_filesystem[ tcc ]
@@ -64,11 +66,11 @@ module Skylab::GitViz::TestSupport
       NIL_
     end
 
-    Bundle_Support = -> tcm do
+    Bundles = -> tcm do
 
       tcm.include Instance_Methods__  # for when nodes from outside our graph come in
 
-      Repository_Support[ tcm ]
+      Repository[ tcm ]
 
       tcm.send :define_method, :bundle_against_ do | abs |
 

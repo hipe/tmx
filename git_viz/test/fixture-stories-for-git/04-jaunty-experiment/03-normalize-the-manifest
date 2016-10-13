@@ -2,7 +2,7 @@
 
 load File.expand_path( '../../01-representative-renames/03-normalize-the-manifest', __FILE__ )
 
-o = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Normalize_the_manifest.new(
+o = Skylab::GitViz::TestSupport::FixtureStoriesForGit::Story_01::Normalize_the_manifest.new(
   $stdin, $stdout, $stderr, $PROGRAM_NAME, ARGV, __FILE__ )
 
 o.main_mock_repo_path = '/m04/repo'

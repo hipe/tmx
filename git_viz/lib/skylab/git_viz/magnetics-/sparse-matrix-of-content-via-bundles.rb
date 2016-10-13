@@ -2,58 +2,25 @@ module Skylab::GitViz
 
   class Models_::HistTree
 
-    module Modalities::CLI
+    module Magnetics_::SparseMatrix_of_Content_via_Bundles
 
-      Models_ = ::Module.new
+      class << self
 
-      class Models_::Sparse_Matrix_of_Content
-
-        class << self
-
-          def new_via_bundle_and_repository bu, re
-
-            Build___.new( bu, re ).execute
-          end
-        end  # >>
-
-        def initialize row_a
-          @rows = row_a
+        def call bu, re
+          Build___.new( bu, re ).execute
         end
 
-        def members
-          [ :rows ]
-        end
+        alias_method :[], :call
+      end  # >>
 
-        attr_reader :rows
+      # ==
 
-        class Row___
-
-          def initialize a, ttp
-            @to_a = a ; @to_tree_path = ttp
-          end
-
-          def members
-            [ :to_a, :to_tree_path ]
-          end
-
-          attr_reader :to_a, :to_tree_path
-        end
-
-        class Modality_Filechange__
-
+      class ModalityFilechange__
+        # -
           def initialize is_first, bundle_filechange
-
             @bundle_filechange_ = bundle_filechange
             @is_first = is_first
           end
-
-          def members
-            [ :author_datetime, :bundle_filechange_, :change_count,
-              :ci, :is_first ]
-          end
-
-          attr_reader :bundle_filechange_
-          attr_accessor :is_first
 
           def author_datetime
             @bundle_filechange_.ci.author_datetime
@@ -66,10 +33,22 @@ module Skylab::GitViz
           def ci
             @bundle_filechange_.ci
           end
-        end
 
-        class Build___
+        # -
 
+        attr_accessor(
+          :is_first,
+        )
+
+        attr_reader(
+          :bundle_filechange_,
+        )
+      end
+
+      # ==
+
+      class Build___
+        # -
           def initialize b, r
             @bundle = b
             @repository = r
@@ -95,12 +74,15 @@ module Skylab::GitViz
             ACHIEVED_
           end
 
-          def __flush
+        def __flush
 
-            Subject___.new( @matrix_.bundle.trails.map do | trail |
-              Row___.new( __row_array_via_trail( trail ), trail.path )
-            end )
+          _row_a = @matrix_.bundle.trails.map do |trail|
+            _row_a_ = __row_array_via_trail trail
+            Row___[ _row_a_, trail.path ]
           end
+
+          SparseMatrix___.new _row_a
+        end
 
           def __row_array_via_trail trail
 
@@ -114,7 +96,7 @@ module Skylab::GitViz
 
               row[ @order_box_h.fetch bundle_filechange.SHA.string ] =
 
-                Modality_Filechange__.new true, bundle_filechange
+                ModalityFilechange__.new true, bundle_filechange
 
               begin
 
@@ -122,17 +104,23 @@ module Skylab::GitViz
                 bundle_filechange or break
 
                 row[  @order_box_h.fetch bundle_filechange.SHA.string ] =
-                  Modality_Filechange__.new false, bundle_filechange
+                  ModalityFilechange__.new false, bundle_filechange
 
                 redo
               end while nil
             end
             row
           end
-        end
-
-        Subject___ = self
+        # -
       end
+
+      # ==
+
+      SparseMatrix___ = ::Struct.new :rows
+
+      Row___ = ::Struct.new :to_a, :to_tree_path
+
+      # ==
     end
   end
 end

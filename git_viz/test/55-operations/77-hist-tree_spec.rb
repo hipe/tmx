@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] models - hist-tree" do
+  describe "[gv] operations - hist-tree" do
 
     TS_[ self ]
-    use :models_support_hist_tree_model_support
+    use :operations_hist_tree_model
 
     it "absolute path no ent (mocked) - x" do
 

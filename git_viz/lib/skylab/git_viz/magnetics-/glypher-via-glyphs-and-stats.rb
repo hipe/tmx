@@ -1,12 +1,6 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
-
-    module Modalities::CLI
-
-      Sessions_ = ::Module.new
-
-      class Sessions_::Glyph_Mapper  # algorithm in [#026]
+  class Magnetics_::Glypher_via_Glyphs_and_Stats  # exactly [#026]
 
         class << self
 
@@ -133,7 +127,5 @@ module Skylab::GitViz
             end
           end
         end
-      end
-    end
   end
 end

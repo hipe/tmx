@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        class Common_Scale_Adapter_  # algorithm in [#029]
+        class CommonScaleAdapter_  # algorithm in [#029]
 
           class << self
 
@@ -29,7 +25,7 @@ module Skylab::GitViz
             end
 
             def _time_unit_adapter_
-              Scale_time_::Time_Unit_Adapters[ self::INTERNAL_UNIT ]
+              Here_::TimeUnitAdapters_[ self::INTERNAL_UNIT ]
             end
 
           end  # >>
@@ -137,7 +133,7 @@ module Skylab::GitViz
 
           def __render_headers
 
-            Scale_time_::Actors_::Render_headers.new(
+            Here_::Magnetics_::Expression_of_Headers_via_Arguments.new(
               @text_downstream,
               @row_bucket_boxes,
               @first_bucket_begin_datetime,
@@ -301,7 +297,5 @@ module Skylab::GitViz
             ACHIEVED_
           end
         end
-      end
-    end
   end
 end

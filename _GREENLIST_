@@ -21,3 +21,4 @@ bnf2treetop/test
 css_convert/test
 task/test
 task_examples/test
+git_viz/test

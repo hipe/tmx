@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Actors_::Unmarshal < Common_::Actor::Dyadic
+      class Magnetics_::Commit_via_LineStream < Common_::Actor::Dyadic
 
         # broad algorithm narrated in [#012], storypoints in [#009]
 

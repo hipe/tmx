@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        class Scale_Adapters_::Annual < Scale_time_::Common_Scale_Adapter_
+        class Scale_Adapters_::Annual < Here_::CommonScaleAdapter_
 
           class << self
 
@@ -37,9 +33,6 @@ module Skylab::GitViz
           DAYS_PER_BUCKET = 365  # :+#what-about-leap-year
 
           INTERNAL_UNIT = :year
-
         end
-      end
-    end
   end
 end

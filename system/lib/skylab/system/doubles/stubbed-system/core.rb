@@ -2,6 +2,13 @@ module Skylab::System
 
   module Doubles::Stubbed_System  # see [#028]
 
+    class << self
+      def readable_writable_via_OGDL_path path
+        # #todo not covered AT ALL - used in [gi] task
+        Here_::Readable_Writable_Based_.new path
+      end
+    end  # >>
+
     class MockSystem  # the sixth system double - fully documented at [#035].
 
       class << self

@@ -2,10 +2,10 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] models" do
+  describe "[gv] operations - intro" do
 
     TS_[ self ]
-    use :reactive_model_support
+    use :reactive_model
 
     it "loads" do
       Home_::API

@@ -5,7 +5,7 @@ module Skylab::GitViz::TestSupport
   describe "[gv] VCS adapters - git - models - repository" do
 
     TS_[ self ]
-    use :VCS_adapters_git_support_repository_support
+    use :VCS_adapters_git_repository
 
     it "builds" do
       front_

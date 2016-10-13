@@ -4,7 +4,9 @@ module Skylab::GitViz
 
     class Models_::Bundle
 
-      class Actors_::Build_trail
+      class Magnetics_::Trail_via_Paths_and_Repository
+
+        # (a VERY custom session interface)
 
         def initialize stats, repo, rsx, & oes_p
 
@@ -52,7 +54,7 @@ module Skylab::GitViz
             _ok = __via_output line
             _ok and __flush path
           else
-            i_a, ev_p = Bundle_::Events_.potential_event_for_log(
+            i_a, ev_p = Here_::Events_.potential_event_for_log(
               e, t, ::File.join( @repo.path, @normal_received_path ) )
 
             @on_event_selectively.call( * i_a,  ev_p )

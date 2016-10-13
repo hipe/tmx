@@ -10,7 +10,7 @@ module Skylab::GitViz
 
       module Actions
 
-        class Hist_Tree < Home_.lib_.brazen::CLI::Action_Adapter
+        class HistTree < Home_.lib_.brazen::CLI::Action_Adapter
 
           GLYPHS___ =
             # "\u2058",  # Four Dot Punctuation - ⁘
@@ -130,8 +130,8 @@ module Skylab::GitViz
 
           def __via_bundle_resolve_sparse_matrix_of_content
 
-            table = CLI_::Models_::Sparse_Matrix_of_Content.
-              new_via_bundle_and_repository @bundle, @repo
+            table = Home_::Magnetics_::SparseMatrix_of_Content_via_Bundles.call(
+              @bundle, @repo )
 
             table and begin
               @matrix = table
@@ -184,25 +184,23 @@ module Skylab::GitViz
 
           def __via_column_A_render
 
-            CLI_::Actors_::Scale_time[
+            _glypher = Home_::Magnetics_::Glypher_via_Glyphs_and_Stats.start(
+              * GLYPHS___ )
+
+            Home_::ScaleTime_.call(
               @column_B_rows,
               @column_A_max_width,
               @column_A,
               @width,
-              CLI_::Sessions_::Glyph_Mapper.start( * GLYPHS___ ),
-              @resources.sout ]
+              _glypher,
+              @resources.sout,
+            )
           end
         end
       end
-
-      Autoloader_[ self ]  # because it is parent module, not this one, that punches the load
-
-      CLI_ = self
-
     end
   end
 end
-
 # :+#tombstone:  o.base.long[ 'use-mocks' ] = ::OptionParser::Switch::NoArgument.new do  # :+#hidden-option
 # (keep this line for posterity - there was some AMAZING foolishness going
 # on circa early '12 that is a good use case for why autoloader (for [#ca-024])

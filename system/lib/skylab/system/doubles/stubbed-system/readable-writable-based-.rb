@@ -5,7 +5,6 @@ module Skylab::System
     class Readable_Writable_Based_  # :[#038].
 
       def initialize path
-
         @_lookup = :__first_lookup
         @path = path
       end

@@ -77,7 +77,7 @@ module Skylab::GitViz::TestSupport
 
   Common_ = ::Skylab::Common
 
-  Universal_cache___ = Common_.memoize do
+  Universal_cache___ = Common_::Lazy_.call do
     {}
   end
 
@@ -102,7 +102,7 @@ module Skylab::GitViz::TestSupport
     end
   end.call
 
-  module My_CLI_Expectations
+  module My_CLI
 
     class << self
 
@@ -156,7 +156,7 @@ module Skylab::GitViz::TestSupport
     Home_.lib_.system_lib::Doubles::Stubbed_System.enhance_client_class tcc
   end
 
-  module Reactive_Model_Support
+  module Reactive_Model
 
     def self.[] tcc
       Expect_Event[ tcc ]
@@ -185,7 +185,7 @@ module Skylab::GitViz::TestSupport
 
     module Lib____
 
-      stdlib = Common_::Autoloader.build_require_stdlib_proc
+      stdlib = Autoloader_.build_require_stdlib_proc
 
       String_IO = stdlib[ :StringIO ]
 
@@ -195,45 +195,36 @@ module Skylab::GitViz::TestSupport
 
   class CONSTANTS___ < TestSupport_::Lazy_Constants
 
-    define_method :GIT_STORY_03_PATHS_ do
-
-      ::File.join(
-        lookup( :GIT_FIXTURE_STORIES_ ),
-        '03-funky/paths.list' )
+    def GIT_STORY_03_PATHS_
+      ::File.join _git_fixture_stories, '03-funky/paths.list'
     end
 
-    define_method :GIT_STORY_03_COMMANDS_ do
-
-      ::File.join(
-         lookup( :GIT_FIXTURE_STORIES_ ),
-        '03-funky/commands.ogdl' )
+    def GIT_STORY_03_COMMANDS_
+      ::File.join _git_fixture_stories, '03-funky/commands.ogdl'
     end
 
-    define_method :GIT_STORY_04_PATHS_ do
-
-      ::File.join(
-        lookup( :GIT_FIXTURE_STORIES_ ),
-        '04-jaunty-experiment/paths.list' )
+    def GIT_STORY_04_PATHS_
+      ::File.join _git_fixture_stories, '04-jaunty-experiment/paths.list'
     end
 
-    define_method :GIT_STORY_04_COMMANDS_ do
-
-      ::File.join(
-        lookup( :GIT_FIXTURE_STORIES_ ),
-        '04-jaunty-experiment/commands.ogdl' )
+    def GIT_STORY_04_COMMANDS_
+      ::File.join _git_fixture_stories, '04-jaunty-experiment/commands.ogdl'
     end
 
-    define_method :GIT_FIXTURE_STORIES_ do
+    def _git_fixture_stories
+      lookup :GIT_FIXTURE_STORIES_
+    end
 
-      ::File.join(
-        TS_.dir_path,
-        'vcs-adapters/git/fixture-stories' )
+    def GIT_FIXTURE_STORIES_
+      ::File.join TS_.dir_path, 'fixture-stories-for-git'
     end
   end
 
   Home_ = ::Skylab::GitViz
+  Autoloader_ = Home_::Autoloader_
 
-  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   NIL_ = nil
   TS_ = self
 end

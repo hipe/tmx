@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Bundle
 
-      class Actors_::Build_matrix  # algorithm in [#006]
+      class Magnetics_::Matrix_via_Bundle  # algorithm in [#006]
 
         def initialize bundle, repo, rsx  # no events. all failure is exceptional
 

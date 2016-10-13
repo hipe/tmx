@@ -1,8 +1,8 @@
 module Skylab::GitViz::TestSupport
 
-  module VCS_Adapters::Git::Support
+  module VCS_Adapters::Git
 
-    module Commit_Support
+    module Commits
 
       class << self
 
@@ -11,7 +11,7 @@ module Skylab::GitViz::TestSupport
           TS_::Expect_Event[ tcc ]
           TS_::Stubbed_filesystem[ tcc ]
           TS_::Stubbed_system[ tcc ]
-          VCS_Adapters::Git::Support[ tcc ]
+          VCS_Adapters::Git[ tcc ]
 
           tcc.include self
         end

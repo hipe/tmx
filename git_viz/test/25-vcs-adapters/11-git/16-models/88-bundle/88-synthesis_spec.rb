@@ -5,7 +5,7 @@ module Skylab::GitViz::TestSupport
   describe "[gv] VCS adapters - git - models - bundle" do
 
     TS_[ self ]
-    use :VCS_adapters_git_support_bundle_support
+    use :VCS_adapters_git_bundles
 
     it "noent - soft error" do
 
@@ -53,7 +53,6 @@ module Skylab::GitViz::TestSupport
       bfc.SHA.string.should eql 'fafa003000000000000000000000000000000000'
       bfc.fc.insertion_count.should eql 3
       bfc.fc.deletion_count.should eql 2
-
     end
 
     def manifest_path_for_stubbed_FS

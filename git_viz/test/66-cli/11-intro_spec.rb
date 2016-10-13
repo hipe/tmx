@@ -2,10 +2,10 @@ require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] modality integrations - CLI" do
+  describe "[gv] CLI - intro" do
 
     TS_[ self ]
-    use :my_CLI_expectations
+    use :my_CLI
 
     define_method :expect, instance_method( :expect )  # because rspec
 

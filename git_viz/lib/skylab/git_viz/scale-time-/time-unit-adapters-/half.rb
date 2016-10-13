@@ -1,13 +1,8 @@
-
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        module Time_Unit_Adapters::Half
+    module TimeUnitAdapters_::Half
 
           extend Common_Time_Unit_Adapter_Module_Methods_
 
@@ -47,8 +42,6 @@ module Skylab::GitViz
           end  # >>
 
           UNITS_PER_YEAR = 2
-        end
-      end
     end
   end
 end

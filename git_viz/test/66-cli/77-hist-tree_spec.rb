@@ -1,13 +1,13 @@
-require_relative '../../../../test-support'
+require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] VCS adapters - git - models - hist-tree - CLI - integration" do
+  describe "[gv] CLI - hist tree" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :VCS_adapters_git_support_bundle_support
-    use :my_CLI_expectations  # order matters
+    use :VCS_adapters_git_bundles
+    use :my_CLI  # order matters
 
     context "help screen - expect [#br-042] back-to-front property mutation" do
 

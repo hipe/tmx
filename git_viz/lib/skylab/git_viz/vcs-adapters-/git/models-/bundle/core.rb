@@ -8,7 +8,7 @@ module Skylab::GitViz
 
         def build_bundle_via relpath, repo, rsx, filesystem, & oes_p
 
-          Actors_::Build.call(
+          Here_::Magnetics_::Bundle_via_Path_and_Repository.call(
             relpath,
             repo,
             rsx,
@@ -18,12 +18,10 @@ module Skylab::GitViz
         end
 
         def log_command_
-
           LOG_CMD___
         end
 
         def ls_files_command_
-
           LS_FILES_CMD___
         end
       end  # >>
@@ -38,14 +36,12 @@ module Skylab::GitViz
       attr_reader :ci_box, :statistics, :trails
 
       def build_matrix_via_repository repo
-        Actors_::Build_matrix.new( self, repo, @resources ).execute
+        Magnetics_::Matrix_via_Bundle.new( self, repo, @resources ).execute
       end
 
-      Autoloader_[ Actors_ = ::Module.new ]
-
-      Bundle_ = self
-
       GIT_EXE = GIT_EXE_
+
+      Here_ = self
 
       LOG_BASE_CMD_ = %w( log --find-renames --follow --pretty=format:%H -- ).freeze
 
@@ -54,7 +50,6 @@ module Skylab::GitViz
       LS_FILES_BASE_CMD_ = %w( ls-files -- . ).freeze
 
       LS_FILES_CMD___ = [ GIT_EXE_, * LS_FILES_BASE_CMD_ ].freeze
-
     end
   end
 end

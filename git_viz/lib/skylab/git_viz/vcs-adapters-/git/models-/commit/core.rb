@@ -8,7 +8,8 @@ module Skylab::GitViz
 
         def fetch_via_identifier__ id_s, repo, & x_p
 
-          Actors_::Fetch[ id_s, repo, & x_p ]
+          Commit_::Magnetics_::Commit_via_Identifier_and_Repository.call(
+            id_s, repo, & x_p )
         end
 
         def get_base_command_
@@ -51,13 +52,10 @@ module Skylab::GitViz
         Common_::Stream.via_nonsparse_array @filechanges
       end
 
-      Autoloader_[ Actors_ = ::Module.new ]
-
       BASE_CMD_ = %w( show --find-renames --numstat --pretty=tformat:%H%n%ai )
         # :[#012]:#the-git-show-command
 
       Commit_ = self
-
     end
   end
 end

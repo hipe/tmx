@@ -1,14 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        Actors_ = ::Module.new
-
-        class Actors_::Render_headers
+    class Magnetics_::Expression_of_Headers_via_Arguments
 
           def initialize *a
 
@@ -133,8 +127,6 @@ module Skylab::GitViz
             end
             NIL_
           end
-        end
-      end
     end
   end
 end

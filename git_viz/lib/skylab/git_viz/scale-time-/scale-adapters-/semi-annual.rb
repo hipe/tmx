@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        class Scale_Adapters_::Semi_Annual < Scale_time_::Common_Scale_Adapter_
+    class Scale_Adapters_::Semi_Annual < Here_::CommonScaleAdapter_
 
           class << self
 
@@ -36,8 +32,6 @@ module Skylab::GitViz
           end
 
           SECOND_HALF_IN_FOUR___ = "2nd\u00bd"  # ½ - Vulgar Fraction One Half
-        end
-      end
     end
   end
 end

@@ -1,17 +1,16 @@
 module Skylab::GitViz::TestSupport
 
-  module Models::Support
+  module Operations
 
     def self.[] tcc
-
-      TS_::Reactive_Model_Support[ tcc ]
+      TS_::Reactive_Model[ tcc ]
       TS_::Double_Decker_Memoize[ tcc ]
       NIL_
     end
 
     # ~ bundles
 
-    module Hist_Tree_Model_Support
+    module Hist_Tree_Model
 
       class << self
 
@@ -21,7 +20,7 @@ module Skylab::GitViz::TestSupport
           TS_::Stubbed_filesystem[ tcm ]
           TS_::Stubbed_system[ tcm ]
 
-          tcm.include TS_::Reactive_Model_Support[ self ]
+          tcm.include TS_::Reactive_Model[ self ]
           tcm.include self
 
           NIL_

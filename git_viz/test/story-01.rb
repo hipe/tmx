@@ -16,15 +16,26 @@ module Skylab::GitViz::TestSupport
     module Instance_Methods___
 
       define_method :manifest_path_for_stubbed_FS, ( Common_.memoize do
-        ::File.join STORY__, 'paths.list'
+        Fixture_file__[ 'paths.list' ]
       end )
 
       define_method :manifest_path_for_stubbed_system, ( Common_.memoize do
-        ::File.join STORY__, 'commands.ogdl'
+        Fixture_file__[ 'commands.ogdl' ]
       end )
     end
 
-    STORY__ = ::File.join TS_.dir_path,
-      'vcs-adapters/git/fixture-stories/01-representative-renames'
+    Fixture_file__ = -> do
+      p = -> tail0 do
+        _ = TS_.at_ :GIT_FIXTURE_STORIES_
+        head = ::File.join _, '01-representative-renames'
+        p = -> tail do
+          ::File.join head, tail
+        end
+        p[ tail0 ]
+      end
+      -> tail do
+        p[ tail ]
+      end
+    end.call
   end
 end

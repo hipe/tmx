@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Actors_::Fetch < Common_::Actor::Dyadic
+      class Magnetics_::Commit_via_Identifier_and_Repository < Common_::Actor::Dyadic
 
         def initialize s, o, & p
           @id_s = s
@@ -51,7 +51,7 @@ module Skylab::GitViz
           ok = false
           o = @o
           x = Commit_.new do
-            ok = Commit_::Actors_::Unmarshal[ self, o ]
+            ok = Commit_::Magnetics_::Commit_via_LineStream[ self, o ]
             ok && freeze
           end
           ok && x

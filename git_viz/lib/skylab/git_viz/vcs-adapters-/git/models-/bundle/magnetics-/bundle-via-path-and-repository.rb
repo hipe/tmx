@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Bundle
 
-      class Actors_::Build
+      class Magnetics_::Bundle_via_Path_and_Repository
 
         Attributes_actor_.call( self,
           :path,
@@ -21,7 +21,7 @@ module Skylab::GitViz
 
           statistics = []
 
-          @build_trail = Actors_::Build_trail.new(
+          @build_trail = Magnetics_::Trail_via_Paths_and_Repository.new(
             statistics, @repo, @rsx, & @on_event_selectively )
 
           @list_of_trails = []
@@ -92,7 +92,7 @@ module Skylab::GitViz
             @line = line
             ACHIEVED_
           else
-            i_a, ev_p = Bundle_::Events_.potential_event_for_ls_files(
+            i_a, ev_p = Here_::Events_.potential_event_for_ls_files(
               e, t, full_POI )
             @on_event_selectively.call( * i_a, & ev_p )
           end
@@ -135,7 +135,7 @@ module Skylab::GitViz
 
           @statistics.sort!.freeze
 
-          Bundle_.new( @statistics, @list_of_trails, bx, @rsx )
+          Here_.new( @statistics, @list_of_trails, bx, @rsx )
         end
       end
     end

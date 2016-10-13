@@ -1,8 +1,8 @@
-require_relative '../../../../../test-support'
+require_relative '../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] VCS adapters - git - models - hist-tree - CLI - sessions - glyph mapper:[#026]" do
+  describe "[gv] magnetics - glyphver via [..]" do
 
     TS_[ self ]
     use :double_decker_memoize
@@ -59,7 +59,7 @@ module Skylab::GitViz::TestSupport
 
     memoize_ :_mapper do
 
-      Home_::Models_::Hist_Tree::Modalities::CLI::Sessions_::Glyph_Mapper.
+      Home_::Magnetics_::Glypher_via_Glyphs_and_Stats.
         start 'Cr', 'A', 'B', 'C'
     end
 

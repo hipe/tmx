@@ -1,8 +1,8 @@
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz::TestSupport
 
-  module Story_01
+  module FixtureStoriesForGit::Story_01
 
-    class Actors_::Build_name_mappings < Common_::Actor::Monadic
+    class Magnetics_::NameMappings_via_Tmpdir < Common_::Actor::Monadic
 
       def initialize o
         @tmpdir = o

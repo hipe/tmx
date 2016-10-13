@@ -1,13 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
-
-    module Modalities::CLI
-
-      Actors_ = ::Module.new
-
-      class Actors_::Scale_time  # algorithm in [#029]
-
+  class ScaleTime_  # algorithm in [#029]
+    # -
+      # -
         Attributes_actor_.call( self,
           :column_B_rows,
           :column_A_max_width,
@@ -126,7 +121,7 @@ module Skylab::GitViz
           o.render
         end
 
-        module Time_Unit_Adapters
+        module TimeUnitAdapters_
           class << self
             def [] sym
               @h.fetch sym do
@@ -146,10 +141,9 @@ module Skylab::GitViz
 
         end
 
-        Autoloader_[ Scale_Adapters_ = ::Module.new ]
         FOUR_ = 4
-        Scale_time_ = self
-      end
-    end
+        Here_ = self
+      # -
+    # -
   end
 end

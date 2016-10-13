@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  Models_ = ::Module.new  # ~ :+#stowaway (IFF all models in this file)
+  Models_ = ::Module.new  # must create - is registered stowaway
 
-  Action_ = Home_.lib_.brazen::Action
-
-  # ->
-
-    Models_::Ping = -> on_channel=nil, secret_x=nil, bnd, & oes_p do
+  Models_::Ping = -> on_channel=nil, secret_x=nil, bnd, & oes_p do
 
       if secret_x
         "hi: #{ secret_x }"
@@ -26,9 +22,9 @@ module Skylab::GitViz
 
         :hello_from_git_viz
       end
-    end
+  end
 
-    # <-
+  Require_things_[]  # Action_
 
   class Models_::HistTree
 
@@ -44,7 +40,7 @@ module Skylab::GitViz
 
     Actions = ::Module.new
 
-    class Actions::Hist_Tree < Action_
+    class Actions::HistTree < Action_
 
       @is_promoted = true
 
@@ -66,7 +62,7 @@ module Skylab::GitViz
         ok = __resolve_VCS_adapter
         ok &&= __via_VCS_adapter_resolve_repo
         ok &&= __via_repo_resolve_mutable_VCS_bundle
-        ok and Hist_Tree_.new @mutable_VCS_bundle, @repo
+        ok and Models_::HistTree.new @mutable_VCS_bundle, @repo
       end
 
       def __resolve_VCS_adapter
@@ -111,7 +107,7 @@ module Skylab::GitViz
         _relpath = if @repo.path == path
           DOT_
         else
-          Home_::Actors_::Relpath[ path, @repo.path ]
+          Magnetics_::Relpath_via_Long_and_Short[ path, @repo.path ]
         end
 
         @mutable_VCS_bundle = @VCS_adapter.models::Bundle.build_bundle_via(
@@ -133,7 +129,5 @@ module Skylab::GitViz
 
       Ad_Hoc_Resources___ = ::Struct.new :stderr  # for now
     end
-
-    Hist_Tree_ = self
   end
 end

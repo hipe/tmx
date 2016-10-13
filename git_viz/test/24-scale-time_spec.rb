@@ -1,11 +1,11 @@
-require_relative '../../../../../test-support'
+require_relative 'test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] VCS adapters - git - models - hist-tree - CLI - actors - scale time - scale adapters" do
+  describe "[gv] scale time" do
 
     TS_[ self ]
-    use :models_support_mocks
+    use :operations_mocks
     use :double_decker_memoize
 
     it "annual - near minimal - one event" do
@@ -305,9 +305,8 @@ module Skylab::GitViz::TestSupport
 
     memoize_ :__glyph_mapper do
 
-      Home_::Models_::Hist_Tree::Modalities::CLI::Sessions_::
-        Glyph_Mapper.start nil, 'c', 'b', 'a'
-
+      Home_::Magnetics_::Glypher_via_Glyphs_and_Stats.start(
+        nil, 'c', 'b', 'a' )
     end
 
     def using_scale_adapter sym
@@ -350,7 +349,7 @@ module Skylab::GitViz::TestSupport
     end
 
     def __subject
-      Home_::Models_::Hist_Tree::Modalities::CLI::Actors_::Scale_time
+      Home_::ScaleTime_
     end
 
     def _expect_headers * s_a

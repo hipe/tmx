@@ -57,8 +57,13 @@ module Skylab::GitViz
     end
   end  # >>
 
-  Actors_ = ::Module.new
-  Actors_::Relpath = -> long, short do
+  stowaway :Models_, 'models-/hist-tree'  # it's all here, for now
+
+  module Magnetics_
+    Autoloader_[ self ]
+  end
+
+  Magnetics_::Relpath_via_Long_and_Short = -> long, short do
 
     d = short.length
     short == long[ 0, d ] or raise ::ArgumentError
@@ -78,6 +83,15 @@ module Skylab::GitViz
   Path_looks_absolute_ = -> path do
     Home_.lib_.system.path_looks_absolute path
   end
+
+  Lazy_ = Common_::Lazy
+
+  Require_things_ = Lazy_.call do
+    Action_ = Home_.lib_.brazen::Action
+    NIL
+  end
+
+  # --
 
   ACHIEVED_ = true
   CONTINUE_ = nil

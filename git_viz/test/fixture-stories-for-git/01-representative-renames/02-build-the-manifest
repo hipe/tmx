@@ -2,18 +2,16 @@
 
 require_relative '../../test-support'
 
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz
 
-  module Story_01
+  module TestSupport::FixtureStoriesForGit::Story_01
 
     class Build_the_manifest
 
       class << self
 
         def [] * a
-
           new( * a ).execute
-
         end
       end  # >>
 
@@ -44,7 +42,7 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
       def init_name_mappings
 
-        @name_mappings = Actors_::Build_name_mappings[ @tmpdir ]
+        @name_mappings = Here_::Magnetics_::NameMappings_via_Tmpdir[ @tmpdir ]
 
         NIL_
       end
@@ -134,22 +132,25 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
 
         @fh.close
         @serr.puts "wrote #{ @path }"
-        ACHIEVED_
+        true  # ACHIEVED_
       end
     end
 
+    Here_ = self
     Story_01_ = self
 
-    module Actors_
+    module Magnetics_
 
-      Autoloader_[ self, ::File.join( ::File.dirname( __FILE__ ), 'actors-' ) ]
+      _custom_path = ::File.expand_path '../magnetics-', __FILE__
+
+      Autoloader_[ self, _custom_path ]
     end
   end
 end
 
 if $PROGRAM_NAME == __FILE__
 
-  _ok = Skylab::GitViz::TestSupport::VCS_Adapters::Git::Story_01::Build_the_manifest[
+  _ok = Skylab::GitViz::TestSupport::FixtureStoriesForGit::Story_01::Build_the_manifest[
     $stdin, $stdout, $stderr, $PROGRAM_NAME, ARGV, __FILE__ ]
 
   exit( _ok ? 0 : 5 )

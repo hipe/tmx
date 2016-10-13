@@ -1,8 +1,8 @@
-module Skylab::GitViz::TestSupport::VCS_Adapters::Git
+module Skylab::GitViz  # eek get those constants
 
-  module Story_01
+  module TestSupport::FixtureStoriesForGit::Story_01
 
-    class Actors_::Normalize_command
+    class Magnetics_::Command_via_Arguments
 
       def initialize nm, td, s, io
         @main_mock_repo_path = s
@@ -217,5 +217,8 @@ module Skylab::GitViz::TestSupport::VCS_Adapters::Git
         @name_mappings.commit_moniker_via_SHA_head_h.fetch short_SHA
       end
     end
+
+    SHORT_SHA_LENGTH_ =
+      TestSupport::VCS_Adapters::Git.at_ :SHORT_SHA_LENGTH_
   end
 end

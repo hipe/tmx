@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        class Scale_Adapters_::Daily < Scale_time_::Common_Scale_Adapter_
+    class Scale_Adapters_::Daily < Here_::CommonScaleAdapter_
 
           class << self
 
@@ -160,8 +156,6 @@ module Skylab::GitViz
 
             self.class.day_of_week_within_ sumzn
           end
-        end
-      end
     end
   end
 end

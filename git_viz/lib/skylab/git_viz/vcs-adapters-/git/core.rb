@@ -48,10 +48,6 @@ module Skylab::GitViz
       end
     end
 
-    Autoloader_[ Actors_ = ::Module.new ]
-
-    Autoloader_[ Models_ = ::Module.new ]
-
     DESIST_ = false
 
     Git_ = self

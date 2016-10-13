@@ -1,12 +1,8 @@
 module Skylab::GitViz
 
-  class Models_::HistTree
+  class ScaleTime_
 
-    module Modalities::CLI
-
-      class Actors_::Scale_time
-
-        module Time_Unit_Adapters::Hour
+    module TimeUnitAdapters_::Hour
 
           extend Common_Time_Unit_Adapter_Module_Methods_
 
@@ -39,9 +35,6 @@ module Skylab::GitViz
             end
 
           end  # >>
-        end
-      end
     end
   end
 end
-

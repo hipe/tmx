@@ -2,11 +2,11 @@ require_relative '../../../../../test-support'
 
 module Skylab::GitViz::TestSupport
 
-  describe "[gv] VCS adapters - git - models - bundle - actors - build matrix" do
+  describe "[gv] VCS adapters - git - models - bundle - magnetics - matrix [..]" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :VCS_adapters_git_support_bundle_support
+    use :VCS_adapters_git_bundles
 
     it "the matrix box's keys are in order" do
 

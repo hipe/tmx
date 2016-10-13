@@ -122,6 +122,10 @@ module Skylab::System
         Home_.test_support
       end
 
+      def inspect
+        "#{ Home_.name }::Front___ «instance»"
+      end
+
       def nil?  # [dt] CLI client
         false
       end
