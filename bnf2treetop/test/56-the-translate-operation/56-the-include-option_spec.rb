@@ -1,6 +1,6 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-describe "[bnf2tt] API parameter - square" do
+describe "[bnf2tt] the translate operation - the `include` option" do
 
   Skylab::BNF2Treetop::TestSupport[ self ]
   use :API

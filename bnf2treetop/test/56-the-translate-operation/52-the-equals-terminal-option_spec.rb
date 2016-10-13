@@ -1,6 +1,6 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-describe "[bnf2tt] API parameter - `equals_terminal`" do
+describe "[bnf2tt] the translate operation - the `equals_terminal` option" do
 
   Skylab::BNF2Treetop::TestSupport[ self ]
   use :API

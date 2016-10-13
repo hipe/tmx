@@ -25,6 +25,10 @@ module Skylab::BNF2Treetop::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
+  The_Method_Called_Let = -> tcc do
+    TestSupport_::Let[ tcc ]
+  end
+
   Common_ = ::Skylab::Common
 
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]

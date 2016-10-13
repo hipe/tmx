@@ -118,7 +118,12 @@ module Skylab::Plugin
 
       def next_frame
 
-        @file_tree = @module.entry_tree
+        ft = @module.entry_tree
+        if ! ft
+          self._COVER_ME_module_does_not_have_a_corresponding_filesystem_node
+        end
+
+        @file_tree = ft
 
         # advance scanner to boundary between one node and the next (money):
 

@@ -1,6 +1,6 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-describe "[bnf2tt] API feature - output comment" do
+describe "[bnf2tt] the translate operation - comments are passed through" do
 
   Skylab::BNF2Treetop::TestSupport[ self ]
   use :API

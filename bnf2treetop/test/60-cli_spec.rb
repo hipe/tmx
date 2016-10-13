@@ -1,9 +1,10 @@
 require_relative 'test-support'
 
-describe "[bnf2tt] CLI integration" do
+describe "[bnf2tt] CLI" do
 
   Skylab::BNF2Treetop::TestSupport[ self ]
   use :CLI
+  use :the_method_called_let
 
   def error msg_re
     err.shift.should match(msg_re)

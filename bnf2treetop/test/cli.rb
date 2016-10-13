@@ -70,7 +70,7 @@ module Skylab::BNF2Treetop::TestSupport
 
   module CLI::Instance_Methods___
 
-    FIXTURES = ::File.join Home_.sidesystem_path, 'test/fixtures'
+    FIXTURES = ::File.join Home_.sidesystem_path, 'test/fixture-files'
 
     def debug! ; _frame.debug_p.call end
     def err    ; _frame.err_p.call   end
