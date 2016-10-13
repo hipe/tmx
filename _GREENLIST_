@@ -15,4 +15,6 @@ slicer/test
 permute/test
 treemap/test
 beauty_salon/test
+yacc2treetop/test
+flex2treetop/test
 bnf2treetop/test

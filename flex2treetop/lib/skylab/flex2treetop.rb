@@ -12,8 +12,8 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
-  stowaway :CLI do
-    CLI = ::Class.new Brazen_::CLI
+  lazily :CLI do
+    ::Class.new Brazen_::CLI
   end
 
   def self.translate * x_a, & x_p
