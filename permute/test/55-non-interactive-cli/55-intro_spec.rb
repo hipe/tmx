@@ -154,7 +154,7 @@ module Skylab::Permute::TestSupport
 
       shared_subject :_coarse_parse do
         _ = niCLI_state.lines
-        Zerk_test_support_[]::NonInteractiveCLI::Help_Screens::Coarse_Parse.new _
+        Zerk_test_support_[]::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _
       end
     end
 

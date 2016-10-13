@@ -52,9 +52,8 @@ module Skylab::Slicer
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
-  stowaway :CLI do
-
-    CLI = ::Class.new Brazen_::CLI
+  lazily :CLI do
+    ::Class.new Brazen_::CLI
   end
 
   ACHIEVED_ = true

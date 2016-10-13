@@ -11,3 +11,6 @@ system/test
 sub_tree/test
 test_support/test
 git/test
+slicer/test
+permute/test
+treemap/test

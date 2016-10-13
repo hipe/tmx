@@ -47,7 +47,7 @@ module Skylab::Permute::TestSupport
     class << self
 
       def [] tcc
-        Zerk_test_support_[]::NonInteractiveCLI[ tcc ]
+        Zerk_test_support_[]::Non_Interactive_CLI[ tcc ]
         # Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
         tcc.include self
       end

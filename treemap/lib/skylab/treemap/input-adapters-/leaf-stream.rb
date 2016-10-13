@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class Input_Adapters_::Leaf_stream  # full pseudocode at [#002]
+  class Input_Adapters_::Leaf_Stream  # full pseudocode at [#002]
 
     class << self
 
