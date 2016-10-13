@@ -10,3 +10,4 @@ zerk/test
 system/test
 sub_tree/test
 test_support/test
+git/test

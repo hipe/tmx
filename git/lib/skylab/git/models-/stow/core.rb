@@ -2,11 +2,11 @@ module Skylab::Git
 
   class Models_::Stow  # see [#010]
 
-    Bz__ = Home_.lib_.brazen
+    Require_brazen_[]
 
-    class Action_ < Bz__::Action
+    class Action_ < Brazen_::Action
 
-      Bz__::Modelesque.entity self
+      Brazen_::Modelesque.entity self
 
       # will re-open!
     end

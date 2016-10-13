@@ -1,14 +1,13 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] mode-integrations - CLI (core)" do
+  describe "[gi] CLI - intro" do
 
     TS_[ self ]
-    use :modality_integrations_CLI_support
+    use :CLI
 
     it "CLI client loads" do  # can be moved up when appropriate
-
       Home_::CLI
     end
 

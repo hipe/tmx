@@ -6,6 +6,45 @@ module Skylab::Common::TestSupport
 
     define_singleton_method :shared_subject, TestSupport_::DANGEROUS_MEMOIZE
 
+    context "proc-based" do
+
+      shared_subject :_jimmy do
+
+        module X_a_s_Jimmy
+
+          Autoloader_[ self ]
+
+          lazily :Ja_Blonk do
+            mod = ::Module.new
+            def mod.hello_ja_blonk ; end
+            mod
+          end
+
+          lazily :JaBronie do
+            module JaBronie
+              def self.hello_ja_bronie
+              end
+              :_no_see_
+            end
+          end
+
+          self
+        end
+      end
+
+      it "if the const does NOT become defined, result value is used" do
+        mod = _jimmy::Ja_Blonk
+        mod.hello_ja_blonk
+        mod.name =~ /Jimmy::Ja_Blonk\z/ || fail
+      end
+
+      it "if the const DOES become defined, that is used" do
+        mod = _jimmy::JaBronie
+        mod.hello_ja_bronie
+        mod.name =~ /Jimmy::JaBronie\z/ || fail
+      end
+    end
+
     context "the simplest case - guest in sibling eponymous host" do
 
       shared_subject :ad_hoc_state_ do

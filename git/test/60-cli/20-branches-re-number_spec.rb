@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] models - branches - re-number" do
+  describe "[gi] CLI - branches - re-number" do
 
     TS_[ self ]
     use :expect_event

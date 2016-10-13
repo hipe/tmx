@@ -1,6 +1,6 @@
 module Skylab::Git::TestSupport
 
-  module Models::Stow::Support
+  module Stow
 
     def self.[] tcc
 

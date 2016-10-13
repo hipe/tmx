@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Git::TestSupport
 
   describe "[gi] mode integrations - CLI - models - stow" do
 
     TS_[ self ]
-    use :modality_integrations_CLI_support
+    use :CLI
 
     it "list the known stows" do
 

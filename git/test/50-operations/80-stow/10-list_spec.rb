@@ -1,11 +1,11 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Git::TestSupport
 
-  describe "[gi] models - stow - actions - list" do
+  describe "[gi] operations - stow - list" do
 
     TS_[ self ]
-    use :models_stow_support
+    use :stow
 
     it "ping" do
 

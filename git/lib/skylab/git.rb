@@ -12,7 +12,7 @@ module Skylab::Git
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
-  stowaway :CLI do
+  lazily :CLI do
 
     class CLI < Home_.lib_.brazen::CLI
 
@@ -72,7 +72,25 @@ module Skylab::Git
   end
 
   module Models_
+
+    module Branches
+
+      module Actions
+
+        Autoloader_[ self, :boxxy ]
+      end
+
+      Autoloader_[ self ]
+    end
+
     Autoloader_[ self, :boxxy ]
+  end
+
+  Lazy_ = Common_::Lazy
+
+  Require_brazen_ = Lazy_.call do
+
+    Brazen_ = ::Skylab::Brazen
   end
 
   Process_ = ::Struct.new :in, :out, :err, :wait, :command
@@ -86,7 +104,6 @@ module Skylab::Git
   EMPTY_P_ = -> { NIL_ }
   GIT_EXE_ = 'git'
   KEEP_PARSING_ = true
-  Lazy_ = Common_::Lazy
   NIL_ = nil
   NOTHING_ = nil
   SPACE_ = ' '

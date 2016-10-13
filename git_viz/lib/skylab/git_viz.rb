@@ -19,7 +19,7 @@ module Skylab::GitViz
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
-  stowaway :CLI do
+  lazily :CLI do
 
     class CLI < Home_.lib_.brazen::CLI
 

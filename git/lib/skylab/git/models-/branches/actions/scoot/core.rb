@@ -2,7 +2,9 @@ module Skylab::Git
 
   module Models_::Branches
 
-    class Actions::Scoot < ::Skylab::Brazen::Action
+    Require_brazen_[]
+
+    class Actions::Scoot < Brazen_::Action
 
       @instance_description_proc = -> y do
         y << 'furloughed (used sunsetted plugins arch; no coverage at all)'

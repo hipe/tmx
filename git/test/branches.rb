@@ -1,6 +1,6 @@
 module Skylab::Git::TestSupport
 
-  module Models::Branches::Support
+  module Branches
 
     def self.[] tcc
 

@@ -1,10 +1,8 @@
 module Skylab::Git
 
-  module Models_::Branches  # create
+  module Models_::Branches
 
-    Brazen_ = ::Skylab::Brazen
-
-    Autoloader_[ ( Actions = ::Module.new ), :boxxy ]
+    Require_brazen_[]
 
     class Actions::ReNumber < Brazen_::Action  # :[#012].
 

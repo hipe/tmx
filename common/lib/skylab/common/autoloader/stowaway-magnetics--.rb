@@ -16,14 +16,28 @@ module Skylab::Common
 
     NameAndValue_via_ProcBased___ = -> stow_x, cm do
       # -
-        sym = cm.const_symbol ; mod = cm.module
+
+        mod = cm.module
+        const = cm.const_symbol
+
         x = stow_x.call
-        if ! mod.const_defined? sym, false  # aesthetics - oneline
-          mod.const_set sym, x
+
+        if mod.const_defined? const, false
+
+          # if you define the value in the block yourself, then we use that
+
+          x = mod.const_get const, false
+        else
+
+          # otherwise we use the result value, and do this:
+
+          mod.const_set const, x
         end
+
         # we do *not* autoloaderize - do it yourself if you want it
-        self._REVIEW
-        cm.cache_and_produce_pair_via_value_ x
+        # we do *not* associate the value w/ a filesystem node
+
+        Known_Known[ x ]
       # -
     end
 

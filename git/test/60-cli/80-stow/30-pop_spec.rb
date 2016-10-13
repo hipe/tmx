@@ -1,11 +1,11 @@
-require_relative '../../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Git::TestSupport
 
   describe "[gi] mode integrations - CLI - models - stow - pop" do
 
     TS_[ self ]
-    use :modality_integrations_CLI_support
+    use :CLI
 
     # expect ERR_I, /\A\(while listing stash.+no stashes found in /
 

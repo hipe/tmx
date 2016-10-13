@@ -1,6 +1,6 @@
 module Skylab::Git::TestSupport
 
-  module Modality_Integrations::CLI::Support
+  module CLI
 
     def self.[] tcc
       Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
