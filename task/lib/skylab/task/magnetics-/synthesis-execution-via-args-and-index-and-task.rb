@@ -1,16 +1,13 @@
 class Skylab::Task
 
-  class Synthesis_Dependencies___  # read [#008]
+  class Magnetics_::SynthesisExecution_via_Args_and_Index_and_Task  # read [#008]
 
     class << self
 
-      def _ task, args_a, index
+      def call task, args_a, index
         new( task, args_a, index ).execute
       end
-
-      alias_method :call, :_
-      alias_method :[], :_
-      remove_method :_
+      alias_method :[], :call
 
       private :new
     end  # >>

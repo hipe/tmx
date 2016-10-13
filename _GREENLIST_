@@ -19,3 +19,4 @@ yacc2treetop/test
 flex2treetop/test
 bnf2treetop/test
 css_convert/test
+task/test

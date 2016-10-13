@@ -1,6 +1,6 @@
 class Skylab::Task
 
-  class Actors_::Build_Index
+  class Magnetics_::Index_via_ParameterBox_and_TargetTask
 
     def initialize & oes_p
       @_oes_p = oes_p

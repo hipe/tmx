@@ -1,6 +1,6 @@
 class Skylab::Task
 
-  class Actors_::Build_Plan
+  class Magnetics_::Plan_via_Index
 
     # we're calling this the third known implementation of [#005] pathfinding.
 

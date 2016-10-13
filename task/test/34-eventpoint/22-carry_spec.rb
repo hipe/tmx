@@ -4,9 +4,10 @@ module Skylab::Task::TestSupport
 
   module Eventpoint_Namespace  # <-
 
-  TS_.describe "[ta] quickie possible carry" do
+  TS_.describe "[ta] eventpoint - carry" do
 
     TS_[ self ]
+    use :the_method_called_let
     use :eventpoint
 
     context "with a Y-shaped graph with two nodes" do

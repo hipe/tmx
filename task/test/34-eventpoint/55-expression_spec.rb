@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] eventpoint - articulator" do
+  describe "[ta] eventpoint - expression" do
 
     TS_[ self ]
     use :memoizer_methods

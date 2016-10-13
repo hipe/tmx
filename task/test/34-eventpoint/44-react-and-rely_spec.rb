@@ -7,6 +7,7 @@ module Skylab::Task::TestSupport
   TS_.describe "[ta] eventpoint - react and rely" do
 
     TS_[ self ]
+    use :the_method_called_let
     use :eventpoint
 
     context "with a triangle" do

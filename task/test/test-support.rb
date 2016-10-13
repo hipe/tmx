@@ -125,8 +125,22 @@ module Skylab::Task::TestSupport
     Common_.test_support::Expect_Event[ tcc ]
   end
 
+  module Magnetics_CLI
+    def self.[] tcc
+      Require_zerk_[]
+      Zerk_.test_support::Non_Interactive_CLI[ tcc ]
+      tcc.send :define_method, :subject_CLI do
+        Home_::Magnetics::CLI
+      end
+    end
+  end
+
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
+  The_Method_Called_Let = -> tcc do
+    TestSupport_::Let[ tcc ]
   end
 
   # --

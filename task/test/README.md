@@ -1,3 +1,29 @@
+## numbering scheme
+
+generally, and at the first level:
+
+  - 10s      support models
+  - 20s      support magnetics
+  - 30s      public models
+  - 40s      public magnetics
+  - 50s      operations (via API)
+  - 60s      CLI
+  - 70s      iCLI
+  - 80s      w
+  - 90s      i
+
+
+at this first level:
+
+  - X2 (12, 22 etc)   the (dependency) "task" sub-lib
+  - x4 (14, 24 etc)   the "eventpoint" sub-lib
+  - x6 (16, 26 etc)   the magnetics sub-lib
+
+
+
+
+(the below is kept for #posterity - probably the first time we did such a thing)
+
 ## intro
 
 experimentally we are planning for the testspace to be totally flat.

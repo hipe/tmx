@@ -95,7 +95,7 @@ because this call is (or could be, after some more DSL) called with
 arbitrary new parameters, it seems that it indeed it should be modeled
 as an isolated graph (because a task with different parameters is indeed
 a different task). but this must be used with some caution: know that
-tasked depended on by a "call" will get executed redudantly from those
+tasked depended on by a "call" will get executed redundantly from those
 behind the task that makes the call.
 
 

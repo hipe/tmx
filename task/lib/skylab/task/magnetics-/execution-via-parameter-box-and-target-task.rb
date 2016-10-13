@@ -1,8 +1,6 @@
 class Skylab::Task
 
-  Sessions = ::Module.new
-
-  class Sessions::Execute_Graph
+  class Magnetics_::Execution_via_ParameterBox_and_TargetTask
 
     def initialize & oes_p
       @_oes_p = oes_p
@@ -28,7 +26,7 @@ class Skylab::Task
 
     def __resolve_index
 
-      o = Home_::Actors_::Build_Index.new( & @_oes_p )
+      o = Home_::Magnetics_::Index_via_ParameterBox_and_TargetTask.new( & @_oes_p )
       o.parameter_box = @parameter_box
       o.target_task = @target_task
       index = o.execute
@@ -42,7 +40,7 @@ class Skylab::Task
 
     def __resolve_plan
 
-      o = Home_::Actors_::Build_Plan.new( & @_oes_p )
+      o = Home_::Magnetics_::Plan_via_Index.new( & @_oes_p )
       o.index = @_index  # remove_instance_variable :@_index
       plan = o.execute
       if plan

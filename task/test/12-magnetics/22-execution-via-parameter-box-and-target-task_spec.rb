@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::Task::TestSupport  # [#ts-010]
 
-  describe "[ta] task" do
+  describe "[ta] magnetics - execution via [..]" do
 
     TS_[ self ]
     use :memoizer_methods

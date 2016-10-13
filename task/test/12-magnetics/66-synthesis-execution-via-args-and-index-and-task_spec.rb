@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] the synthesis dependency" do
+  describe "[ta] magnetics - synthesis execution via [..]" do
 
     TS_[ self ]
     use :memoizer_methods

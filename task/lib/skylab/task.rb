@@ -86,7 +86,7 @@ class Skylab::Task
 
         # not for every task in the graph, only the "front" one
 
-        o = Home_::Sessions::Execute_Graph.new( & @_oes_p_ )
+        o = Home_::Magnetics_::Execution_via_ParameterBox_and_TargetTask.new( & @_oes_p_ )
 
         if instance_variable_defined? :@_params
           o.parameter_box = remove_instance_variable :@_params
@@ -237,7 +237,7 @@ class Skylab::Task
     end
 
     def execute_task__ task, index
-      Home_::Synthesis_Dependencies___[ task, @_a, index ]
+      Home_::Magnetics_::SynthesisExecution_via_Args_and_Index_and_Task[ task, @_a, index ]
     end
   end
 
