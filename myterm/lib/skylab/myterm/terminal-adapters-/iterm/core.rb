@@ -1,7 +1,5 @@
 module Skylab::MyTerm
 
-  Terminal_Adapters_ = ::Module.new  # ..
-
   class Terminal_Adapters_::Iterm
 
     # a "terminal mutation session"

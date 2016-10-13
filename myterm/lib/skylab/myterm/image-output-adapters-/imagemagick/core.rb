@@ -229,8 +229,5 @@ module Skylab::MyTerm
 
     Here_ = self
     IDENTITY_ = -> x { x }
-    module Magnetics_
-      Autoloader_[ self ]
-    end
   end
 end

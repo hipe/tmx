@@ -39,22 +39,13 @@ module Skylab::MyTerm
         end
       end
 
-      def ___load_and_autoloaderize_module const
+      def ___load_and_autoloaderize_module const_ish
 
-        if @file
-          self._WORKS_or_worked_BUT_IS_NOT_COVERED
-          load_path = @file[ 0 ... - Autoloader_::EXTNAME.length ]
-        else
-          load_path = ::File.join @dir, Autoloader_::CORE_ENTRY_STEM
-        end
+        # we used to autoloaderize manually (perhaps as an optimization),
+        # but it had issues (gave the wrong node path) and was otherwise
+        # redundant with this. (see tombstone)
 
-        require load_path  # ..
-
-        mod = @_box_mod.const_get const, false
-
-        Autoloader_[ mod, load_path ]
-
-        mod
+        Autoloader_.const_reduce [ const_ish ], @_box_mod
       end
 
       def adapter_name_const
@@ -108,3 +99,4 @@ module Skylab::MyTerm
     end
   end
 end
+# #tombstone - we used to autoload[erize] manually

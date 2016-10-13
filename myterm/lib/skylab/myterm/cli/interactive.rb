@@ -21,7 +21,7 @@ module Skylab::MyTerm
 
           Require_zerk_[]
 
-          cli = Zerk_::Interactive_CLI.begin
+          cli = Zerk_::InteractiveCLI.begin
 
           cli.root_ACS_by do  # #cold-model
             Home_.build_root_ACS_

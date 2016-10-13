@@ -6,7 +6,7 @@ module Skylab::MyTerm::TestSupport
     end
   end
 
-  module Stubs::System_Conduit_01_HI
+  module Stubs::System_Conduit_01_Hi
 
     _build_instance = -> do
 

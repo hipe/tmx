@@ -24,7 +24,7 @@ module Skylab::MyTerm
       # -- resolving the image
 
       def resolve_image_
-        _init_if_necessary :@image_, Magnetics_::Image_via_Appearance
+        _init_if_necessary :@image_, Here_::Magnetics_::Image_via_Appearance
       end
 
       attr_reader :image_
@@ -32,7 +32,7 @@ module Skylab::MyTerm
       # -- resolving the IM command
 
       def resolve_IM_command_
-        _init_if_necessary :@IM_command_, Magnetics_::Command_via_Appearance
+        _init_if_necessary :@IM_command_, Here_::Magnetics_::Command_via_Appearance
       end
 
       # --

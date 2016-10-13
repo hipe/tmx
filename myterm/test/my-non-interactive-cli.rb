@@ -172,7 +172,7 @@ module Skylab::MyTerm::TestSupport
       def exitstatus
 
         sym = @_st.gets_one
-        d = Home_::Zerk_::Non_Interactive_CLI::Exit_status_for___[ sym ]
+        d = Home_::Zerk_::NonInteractiveCLI::Exit_status_for___[ sym ]
         d or fail ___say_bad_es sym
         _expect_exitstatus d
       end

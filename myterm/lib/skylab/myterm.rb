@@ -160,10 +160,13 @@ module Skylab::MyTerm
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
+  module Image_Output_Adapters_
+    Autoloader_[ self, :boxxy ]
+  end
+
   ACHIEVED_ = true
   EMPTY_S_ = ''
   Home_ = self
-  Autoloader_[ Image_Output_Adapters_ = ::Module.new ]
   NIL_ = nil
   NOTHING_ = nil
   SPACE_ = ' '

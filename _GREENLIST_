@@ -23,3 +23,4 @@ task/test
 task_examples/test
 git_viz/test
 snag/test
+myterm/test
