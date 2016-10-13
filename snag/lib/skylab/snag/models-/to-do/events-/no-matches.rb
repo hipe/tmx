@@ -1,8 +1,6 @@
 module Skylab::Snag
 
-  class Models_::To_Do
-
-    Events_ = ::Module.new
+  class Models_::ToDo
 
     Events_::No_Matches = Common_::Event.prototype_with( :no_matches,
 

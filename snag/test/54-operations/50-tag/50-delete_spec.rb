@@ -1,14 +1,14 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - tag - actions - delete" do
+  describe "[sg] operations - tag - delete" do
 
     TS_[ self ]
     use :expect_event
     use :my_tmpdir_
     use :byte_up_and_downstreams
-    use :node_support
+    use :nodes
 
     context "(with this manifest)" do
 

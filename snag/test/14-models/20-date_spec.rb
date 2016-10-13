@@ -7,8 +7,7 @@ module Skylab::Snag::TestSupport
     TS_[ self ]
     use :expect_event
 
-    context 'Date' do
-
+    # -
       it "invalid" do
 
         subject 'foo'
@@ -31,6 +30,6 @@ module Skylab::Snag::TestSupport
 
         NIL_
       end
-    end
+    # -
   end
 end

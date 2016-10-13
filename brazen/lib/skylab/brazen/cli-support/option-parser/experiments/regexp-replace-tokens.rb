@@ -2,8 +2,6 @@ module Skylab::Brazen
 
   module CLI_Support
 
-    Option_Parser::Experiments = ::Module.new  # :+#stowaway
-
     class Option_Parser::Experiments::Regexp_Replace_Tokens  # see [#074]
 
       def initialize op, * pairs

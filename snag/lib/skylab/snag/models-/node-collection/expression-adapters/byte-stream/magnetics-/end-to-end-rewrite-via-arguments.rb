@@ -4,9 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      Sessions_ = ::Module.new
-
-      class Sessions_::Rewrite_Stream_End_to_End  # see [#038]
+      class Magnetics_::EndToEndRewrite_via_Arguments  # see [#038]
 
         def initialize & x_p
 
@@ -141,7 +139,7 @@ module Skylab::Snag
 
         def __resolve_the_entity_upstream
 
-          st = BS_::Actors_::Produce_node_upstream.with(
+          st = Here_::Magnetics_::NodeStream_via_LineStream.with(
 
             :simple_line_upstream, @_simple_line_upstream,
             :extended_content_adapter, @collection,
@@ -183,9 +181,9 @@ module Skylab::Snag
           x_p = @on_event_selectively
 
           if @subject_entity.ID
-            @expression_adapter_actor_box::Replace_node[ @_self, & x_p ]
+            @expression_adapter_actor_box::NodeReplacement_via_Session[ @_self, & x_p ]
           else
-            @expression_adapter_actor_box::Add_node[ @_self, & x_p ]
+            @expression_adapter_actor_box::NodeAddition_via_Session[ @_self, & x_p ]
           end
         end
 

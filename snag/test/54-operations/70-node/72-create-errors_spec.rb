@@ -1,8 +1,11 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - message (normalization)" do
+  describe "[sg] operations - node - create errors" do
+
+    # (this was originally positioned as the model test for Message but
+    # because of the manner in which is it tested it must be here instead.)
 
     TS_[ self ]
     use :expect_event

@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - criteria - library - funadmentals" do
 
     TS_[ self ]
-    use :criteria_library_support
+    use :criteria_magnetics
 
     it "loads" do
       subject_module_

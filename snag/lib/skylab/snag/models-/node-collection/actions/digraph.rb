@@ -51,7 +51,7 @@ module Skylab::Snag
 
         _us_id = @argument_box.fetch :upstream_identifier
 
-        nc = NC_.new_via_upstream_identifier _us_id, & p
+        nc = Here_.new_via_upstream_identifier _us_id, & p
 
         if nc
 
@@ -114,11 +114,11 @@ module Skylab::Snag
 
       def __produce_stream_for_output_body
 
-        o = NC_::Sessions_::Build_Digraph.new( & handle_event_selectively )
+        _p = handle_event_selectively
 
-        o.node_upstream = @_node_upstream
-
-        o.execute
+        Here_::Magnetics_::Digraph_via_NodeUpstream.call(
+          @_node_upstream,
+          & _p )
       end
 
       def __express_body_via_stream st

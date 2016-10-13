@@ -1,12 +1,10 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
     class Actions::Melt
 
-      Models_ = ::Module.new
-
-      class Models_::File_Unit_of_Work  # see [#068]:#note-110
+      class Models_::FileUnitOfWork # see [#068]:#note-110
 
         class << self
 

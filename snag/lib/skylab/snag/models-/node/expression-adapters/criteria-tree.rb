@@ -8,7 +8,7 @@ module Skylab::Snag
 
         def lookup_associated_model_ const_i_a
 
-          const_i_a.reduce CT_ do | m, const |
+          const_i_a.reduce Here___ do | m, const |
             m.const_get const, false
           end
         end
@@ -93,7 +93,7 @@ module Skylab::Snag
         end  # >>
       end
 
-      CT_ = self
+      Here___ = self
     end
   end
 end

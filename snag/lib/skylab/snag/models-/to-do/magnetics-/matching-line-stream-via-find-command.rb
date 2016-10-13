@@ -1,10 +1,12 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
-    module Actors_::Matching_line_stream_via_find_command
-      # <-
-    define_singleton_method :[] do | cmd,  system_conduit, & x_p |
+    module Magnetics_::MatchingLineStream_via_FindCommand
+
+      class << self
+
+        define_method :call do |cmd,  system_conduit, & x_p|
 
       p = -> do
 
@@ -12,7 +14,7 @@ module Skylab::Snag
 
         reinitialize_flyweight = -> line_s do
 
-          fly = To_Do_::Models_::Matched_Line.new line_s
+          fly = Here_::Models_::Matched_Line.new line_s
 
           reinitialize_flyweight = -> line_s_ do
             fly.reinitialize line_s_
@@ -49,8 +51,12 @@ module Skylab::Snag
       Common_.stream do
         p[]
       end
-    end
-    # ->
+        end
+
+        alias_method :[], :call
+      end  # >>
+
+      # ==
 
       When_error_line___ = -> line, e, & x_p do
 
@@ -60,6 +66,8 @@ module Skylab::Snag
 
         UNABLE_
       end
+
+      # ==
     end
   end
 end

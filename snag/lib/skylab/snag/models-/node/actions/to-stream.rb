@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    class Actions::To_Stream < Common_Action_
+    class Actions::ToStream < Common_Action_
 
       edit_entity_class(
 

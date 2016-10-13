@@ -53,7 +53,7 @@ module Skylab::Snag
 
       def expression_adapter_ modality_const
 
-        NC_::Expression_Adapters.const_get modality_const, false
+        Here_::Expression_Adapters.const_get modality_const, false
       end
     end  # >>
 
@@ -134,7 +134,6 @@ module Skylab::Snag
       ).find_any_nearest_surrounding_path
     end
 
-    NC_ = self
-
+    Here_ = self
   end
 end

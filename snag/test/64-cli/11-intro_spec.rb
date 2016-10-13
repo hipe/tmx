@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI core" do
+  describe "[sg] CLI - intro" do
 
     TS_[ self ]
 
-    use :expect_my_CLI
+    use :my_CLI
     use :my_tmpdir_
 
     expecting_rx = %r{\Aexpecting <action>\z}i

@@ -5,7 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - criteria - library - target ersatz" do
 
     TS_[ self ]
-    use :criteria_library_support
+    use :criteria_magnetics
 
     it "build" do
       _ersatz_domain

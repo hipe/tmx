@@ -1,13 +1,13 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node - actions - create" do
+  describe "[sg] operations - node - create" do
 
     TS_[ self ]
     use :expect_event
     use :byte_up_and_downstreams
-    use :node_support
+    use :nodes
 
     it "uses first available ID, placed in correct spot (integration)" do
 

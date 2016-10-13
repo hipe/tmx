@@ -135,7 +135,7 @@ module Skylab::Snag
           :@result_for_string, String_Piece )
 
         @result_for_hashtag = _build_piece_producer(
-          :@result_for_hashtag, ( @hashtag_class || Hashtag__ ) )
+          :@result_for_hashtag, ( @hashtag_class || Here__ ) )
 
         NIL_
       end
@@ -189,9 +189,9 @@ module Skylab::Snag
     end
 
     Piece__ = superclass
-    Hashtag__ = self
+    Here__ = self
 
-    class Hashtag__  # subclass of Piece__
+    class Here__  # subclass of Piece__
 
       def category_symbol
         :hashtag
@@ -357,7 +357,7 @@ module Skylab::Snag
       attr_writer :_name_r, :_value_r
     end
 
-    class Hashtag_Possibly_with_Value___ < Hashtag__
+    class Hashtag_Possibly_with_Value___ < Here__
 
       include Possibly_with_Value_Methods
     end

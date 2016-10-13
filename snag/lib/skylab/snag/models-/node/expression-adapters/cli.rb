@@ -12,7 +12,7 @@ module Skylab::Snag
 
           sess.register_properties do | o |
 
-            _rw = ACS_[]::Reader_Writer.for_componentesque first
+            _rw = ACS_[]::ReaderWriter.for_componentesque first
 
             comp_assoc_for = _rw.association_reader
 

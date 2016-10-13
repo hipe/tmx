@@ -1,13 +1,13 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
     class Actions::Melt  # see [#063]
 
       Home_.lib_.brazen::Modelesque.entity( self,
 
         :default_proc, -> do
-          To_Do_.default_pattern_strings
+          Here_.default_pattern_strings
         end,
         :argument_arity, :one_or_more, :property, :pattern,
 
@@ -124,7 +124,7 @@ module Skylab::Snag
 
         def __init_match_session
 
-          o = To_Do_::Sessions_::Collection.new( & @_oes_p )
+          o = Here_::Magnetics_::Collection_via_Arguments.new( & @_oes_p )
 
           o.filename_pattern_s_a = @names
           o.path_s_a = @paths
@@ -165,7 +165,7 @@ module Skylab::Snag
 
           # sr.downstream_identifier = @downstream_identifier
 
-          _Unit_of_Work = Melt_::Models_::File_Unit_of_Work.new_prototype do | o |
+          _Unit_of_Work = Here___::Models_::FileUnitOfWork.new_prototype do | o |
             o.is_dry = @is_dry
             o.filesystem_conduit = @filesystem_conduit
             o.kernel = @_kernel
@@ -265,7 +265,7 @@ module Skylab::Snag
 
         def __build_no_file_units_of_work_event
 
-          To_Do_::Events_::No_Matches.new_with(
+          Here_::Events_::No_Matches.new_with(
             :command, @_match_session.command,
             :patterns, @patterns,
             :number_of_matches, @_counts__number_of_seen_matches
@@ -301,10 +301,10 @@ module Skylab::Snag
            }#{ np_ o.number_of_files_seen_here, 'file' }"
       end
 
-      Autoloader_[ Melt_ = self,  # because [#026]
-        ::File.join(
-          ::File.dirname( __FILE__ ),
-          ::File.basename( __FILE__, Autoloader_::EXTNAME ) ) ]
+      # because [#026]:
+
+      Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
+      Here___ = self
     end
   end
 end

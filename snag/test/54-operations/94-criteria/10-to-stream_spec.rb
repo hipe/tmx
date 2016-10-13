@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - criteria - to-stream" do
+  describe "[sg] operations - criteria - to-stream" do
 
     TS_[ self ]
     use :expect_event
-    use :models_criteria_actions
+    use :criteria_operations
 
     it "`to_criteria_stream` lists the files that are in the folder" do
 

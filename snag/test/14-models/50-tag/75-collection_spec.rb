@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - tag collection" do
+  describe "[sg] models - tag - collection" do
 
     # currently there is no actual "tag collection" asset node
 

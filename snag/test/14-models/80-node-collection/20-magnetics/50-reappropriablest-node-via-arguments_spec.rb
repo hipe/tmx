@@ -65,7 +65,7 @@ module Skylab::Snag::TestSupport
     end
 
     def _subject
-      Home_::Models_::Node_Collection::Actors_::Find_reappropriablest_node
+      Home_::Models_::Node_Collection::Magnetics_::ReappropriablestNode_via_Arguments
     end
   end
 end

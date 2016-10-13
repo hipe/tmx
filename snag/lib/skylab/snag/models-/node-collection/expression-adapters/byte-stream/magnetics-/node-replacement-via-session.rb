@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Actors_::Replace_node < Common_::Actor::Monadic
+      class Magnetics_::NodeReplacement_via_Session < Common_::Actor::Monadic
 
         def initialize o
           @session = o

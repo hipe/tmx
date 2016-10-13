@@ -166,7 +166,7 @@ module Skylab::Snag
 
       def __prepare_backstream_for_report bx
 
-        o = Home_::Models_::Node_Collection::Sessions::Report_of_Open_Nodes.
+        o = Home_::Models_::Node_Collection::Magnetics::Expression_of_OpenNodes_via_Arguments.
           new( & @_oes_p )
 
         o.filesystem = @_filesystem
@@ -237,7 +237,7 @@ module Skylab::Snag
         hy = Hybrid___.new
 
         hy.left_unbound =
-          Home_::Models_::Node::Actions::To_Stream
+          Home_::Models_::Node::Actions::ToStream
 
         hy.right_unbound =
           Home_::Models_::Node::Actions::Open

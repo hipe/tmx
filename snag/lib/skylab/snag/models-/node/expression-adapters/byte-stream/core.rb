@@ -16,9 +16,9 @@ module Skylab::Snag
 
           if body.is_mutable
             if :Byte_Stream == body.modality_const
-              BS_::Sessions_::Delineate[ d, y, expag, node ]
+              Delineate__[][ d, y, expag, node ]
             else
-              BS_::Sessions_::Delineate.new_via( d, y, expag, node ).execute_agnostic
+              Delineate__[].new_via( d, y, expag, node ).execute_agnostic
             end
           else
             body.express_N_units_into_under_ d, y, expag
@@ -26,11 +26,17 @@ module Skylab::Snag
         end
       end  # >>
 
-      Autoloader_[ Actors_ = ::Module.new ]
+      Delineate__ = -> do
+        Magnetics_::ExpressDelineatedLines_via_Node
+      end
+
+      module Magnetics_
+        Autoloader_[ self ]
+      end
 
       the_language_extension_for_structures = nil
 
-      Actors_::Flyweighted_object_stream_via_substring = -> do
+      Magnetics_::FlyweightedObjectStream_via_Substring = -> do
 
         # to leverage (rather than be penalized by) the flyweighting that the
         # upstream provides (see), we must re-use the same stream object over
@@ -84,8 +90,8 @@ module Skylab::Snag
           main_p = nil
           nested_parens = -> open_d, deep_pc, string_pc do
 
-            o = BS_::Actors_::Nested::Parens[
-              open_d, deep_pc, string_pc, st, row_st ]
+            o = Magnetics_::ParseNestedParenthesis_via_Arguments.call(
+              open_d, deep_pc, string_pc, st, row_st )
 
             pc = o.piece
             pc_ = o.next_piece
@@ -231,7 +237,7 @@ module Skylab::Snag
         end
       end
 
-      BS_ = self
+      Here_ = self
     end
   end
 end

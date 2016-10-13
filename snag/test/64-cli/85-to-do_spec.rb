@@ -1,16 +1,14 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - to-do - actions - to stream" do
+  describe "[sg] CLI - to-do" do
 
     TS_[ self ]
-    use :expect_my_CLI
+    use :my_CLI
 
     it "regular style - works, is hard to read and boring" do
-
       invoke( * _action, '-p', _common_pattern, _some_todos )
-
       __expect_regular_style
     end
 

@@ -2,8 +2,6 @@ module Skylab::Basic
 
   module Regexp
 
-    Actors__ = ::Module.new
-
     class Actors__::Platform_string_via_grep_string < Common_::Actor::Monadic
 
       # currently covered..

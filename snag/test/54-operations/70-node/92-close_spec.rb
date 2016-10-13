@@ -1,13 +1,13 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node - actions - close" do
+  describe "[sg] operations - node - close" do
 
     TS_[ self ]
     use :expect_event
     use :byte_up_and_downstreams
-    use :node_support
+    use :nodes
 
     it "closing one with a funny looking name - whines gracefully" do
 

@@ -2,7 +2,7 @@ require_relative '../../../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node [..] delineate" do
+  describe "[sg] models - node - [..] - express delineated [..]" do
 
     TS_[ self ]
     use :byte_up_and_downstreams

@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - node - actions - open" do
+  describe "[sg] operations - node - open" do
 
     TS_[ self ]
     use :expect_event

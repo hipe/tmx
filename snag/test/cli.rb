@@ -1,6 +1,6 @@
 module Skylab::Snag::TestSupport
 
-  module Expect_CLI
+  module CLI
 
     class << self
 
@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport
 
         tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
         tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
-        tcm.include Expect_CLI_
+        tcm.include Here___
         @p_a.each do | p |
           p[ tcm ]
         end
@@ -122,7 +122,6 @@ module Skylab::Snag::TestSupport
         expect_failed
       end
     end
-
-    Expect_CLI_ = self
+    Here___ = self
   end
 end

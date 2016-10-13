@@ -6,7 +6,7 @@ module Skylab::Snag
 
       class Domain_Adapter
 
-        class Actors_::Interpret_criteria
+        class Magnetics_::CriteriaInterpretation_via_Arguments
 
           # ( local name convention: `resolve` ::= `interpret` `synthesize` )
 

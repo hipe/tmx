@@ -6,7 +6,7 @@ module Skylab::Snag::TestSupport
 
     TS_[ self ]
     use :expect_event
-    use :criteria_library_support
+    use :criteria_magnetics
 
     it "build this adapter" do
 

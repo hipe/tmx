@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - to-do - actions - to stream" do
+  describe "[sg] to-do - to stream" do
 
     TS_[ self ]
     use :expect_event, :ignore, :find_command_args

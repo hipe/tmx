@@ -2,17 +2,16 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
-    Sessions_ = ::Module.new
+    class Magnetics_::Digraph_via_NodeUpstream < Common_::Actor::Monadic
 
-    class Sessions_::Build_Digraph
+      def initialize nu, & x_p
 
-      def initialize & x_p
         if x_p
           @_oes_p = x_p
         end
-      end
 
-      attr_writer :node_upstream
+        @node_upstream = nu
+      end
 
       def execute
 

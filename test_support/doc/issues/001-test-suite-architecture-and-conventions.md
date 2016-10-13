@@ -1,5 +1,37 @@
 # test suite architecture and conventions :[#001]
 
+## synopsis & overview
+
+tests are architected into a file tree that confers a "regression friendly"
+order; an order that must be expressed solely by the use of leading integers
+in the filesystem node's entry name.
+
+this is to say, a priori knowledge of any (test or application) framework
+and its various conceptions of terms like "models", "features", "functions",
+"integration" etc must NOT be assumed when determining the "regression
+friendly" order of any given test filetree for a project.
+
+rather, the filetree of tests will generally try to follow the structure of
+the asset tree to the extent that it doesn't betray its numbering scheme.
+
+an arbitrarily deep filetree tree of nodes (each entry of which has a
+locally unique leading integer) is isomorphed into a flat list (stream) of
+test files in this manner: recursively from the root node, each node is
+visited in order according to its number (regardless of whether it is a
+branch or leaf node). as branch nodes are encountered in this manner they
+are descended into.
+
+this system for expressing a "regression friendly" order is both univerally
+applicable and arbitrarily customizable to the specific use-cases and
+architecture choices of the particular project, regardless of frameworks
+used, etc.
+
+  - subtrees of fixtures (of any shape) should generally occur
+    "flatly" one level under the "test" directory.
+
+
+
+
 ## introduction
 
 this fresh introduction (and most of the content nodes below) come after

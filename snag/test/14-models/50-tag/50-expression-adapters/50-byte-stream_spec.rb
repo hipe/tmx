@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - tag - expads - b.s - structured" do
+  describe "[sg] models - tag - expression adapters - byte stream" do
 
     TS_[ self ]
     use :expect_piece

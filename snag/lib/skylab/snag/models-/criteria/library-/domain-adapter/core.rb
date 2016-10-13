@@ -39,7 +39,7 @@ module Skylab::Snag
 
         def new_criteria_tree_via_word_array s_a, & x_p
 
-          DA_::Actors_::Interpret_criteria.new( s_a, self, & x_p ).execute
+          Here___::Magnetics_::CriteriaInterpretation_via_Arguments.new( s_a, self, & x_p ).execute
         end
 
         # ~ write
@@ -216,9 +216,7 @@ module Skylab::Snag
           attr_reader :__association_adapters
         end
 
-        Autoloader_[ Actors_ = ::Module.new ]
-
-        DA_ = self
+        Here___ = self
       end
     end
   end

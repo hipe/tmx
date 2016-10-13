@@ -68,7 +68,7 @@ module Skylab::Snag
         include Home_::Models::Hashtag::Possibly_with_Value_Methods
       end
 
-      BS_ = self
+      Here_ = self
     end
   end
 end

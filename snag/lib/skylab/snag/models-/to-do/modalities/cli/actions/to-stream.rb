@@ -1,14 +1,16 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
-    Modalities = ::Module.new
+    Modalities = ::Module.new  # assert creation because registered stowaway
+
+    Modalities::CLI = ::Module.new  # same
 
     module Modalities::CLI
 
-      Actions = ::Module.new
+      Actions = ::Module.new  # same
 
-      class Actions::To_Stream < Brazen_::CLI::Action_Adapter
+      class Actions::ToStream < Brazen_::CLI::Action_Adapter
 
         # we hack properties, do custom event handling, and hack expression
 
@@ -129,7 +131,7 @@ module Skylab::Snag
           st = bc.receiver.send bc.method_name, * bc.args, & handle_event_selectively
 
           st and begin
-            Actors_::Express_tree.with(
+            Magnetics_::TreeExpression_via_Arguments.with(
               :item_stream, st,
               :glyphset_category_symbol, :wide,  # narrow | wide
               :do_pretty, ( 1 < prettiness_d ),
@@ -141,11 +143,11 @@ module Skylab::Snag
           end
         end
 
-        Actors_ = ::Module.new
-
         # <- 2
 
-    class Actors_::Express_tree
+    Magnetics_ = ::Module.new
+
+    class Magnetics_::TreeExpression_via_Arguments
 
       Attributes_actor_.call( self,
         :item_stream,

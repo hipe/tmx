@@ -224,17 +224,15 @@ module Skylab::Snag
 
         def __run_against_state_machine * a, & x_p
 
-          AA_::State_Machine__.new( * a, & x_p ).execute
+          Here___::State_Machine__.new( * a, & x_p ).execute
         end
 
         attr_reader :named_functions_
 
         Autoloader_[ self ]
 
-        AA_ = self
-
+        Here___ = self
         Parse__ = LIB_.parse_lib
-
       end
     end
   end

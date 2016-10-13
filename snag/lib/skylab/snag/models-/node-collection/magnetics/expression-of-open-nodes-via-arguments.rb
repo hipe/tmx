@@ -2,9 +2,7 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
-    Sessions = ::Module.new
-
-    class Sessions::Report_of_Open_Nodes
+    class Magnetics::Expression_of_OpenNodes_via_Arguments
 
       def initialize & oes_p
         @oes_p = oes_p

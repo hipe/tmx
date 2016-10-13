@@ -18,7 +18,7 @@ module Skylab::Snag
 
         _oes_p = oes_p_p[ nil ]
 
-        arg = Tag_::Actors_::Normalize_stem[ arg_st.gets_one, & _oes_p ]
+        arg = Here_::Magnetics_::NormalizedStem_via_Token[ arg_st.gets_one, & _oes_p ]
         arg and begin
           new arg.value_x
         end
@@ -40,7 +40,7 @@ module Skylab::Snag
 
     def express_under expag
 
-      Tag_::Expression_Adapters::Byte_Stream.express_into_under_of_(
+      Here_::Expression_Adapters::Byte_Stream.express_into_under_of_(
         "", expag, self )
     end
 
@@ -50,7 +50,7 @@ module Skylab::Snag
       # no assistance from the expression adapter can we do this reach-down
       # but this is fragile, begin wholly dependant on that assumption.
 
-      Tag_::Expression_Adapters::Byte_Stream.express_into_under_of_(
+      Here_::Expression_Adapters::Byte_Stream.express_into_under_of_(
         y, nil, self )
     end
 
@@ -87,6 +87,6 @@ module Skylab::Snag
     end
 
     Brazen_ = Home_.lib_.brazen
-    Tag_ = self
+    Here_ = self
   end
 end

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models_::To_Do  # see [#003]
+  class Models_::ToDo  # see [#003]
 
     # :desc, 'actions that work with TODO-like tags'
 
@@ -114,7 +114,7 @@ module Skylab::Snag
 
     module Actions
 
-      To_Stream = Make_action_loader_[]
+      ToStream = Make_action_loader_[]
 
       Melt = Make_action_loader_[]
     end
@@ -123,10 +123,12 @@ module Skylab::Snag
       EN = nil
     end
 
-    Autoloader_[ Actors_ = ::Module.new ]
+    Autoloader_[ self ]
+
+    stowaway :Modalities, 'modalities/cli/actions/to-stream'
+
     Brazen_ = Home_.lib_.brazen
     PIPE_ = '|'.freeze
-    To_Do_ = self
-
+    Here_ = self
   end
 end

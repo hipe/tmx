@@ -27,7 +27,7 @@ module Skylab::Snag
         end
       end  # >>
 
-      class Native_Collection___ < NC_  # or whatever
+      class Native_Collection___ < Here_  # or whatever
 
         def initialize id
 
@@ -75,9 +75,9 @@ module Skylab::Snag
 
         def start_sessioner & x_p
 
-          o = BS_::Sessions_::Rewrite_Stream_End_to_End.new( & x_p )
+          o = Here_::Magnetics_::EndToEndRewrite_via_Arguments.new( & x_p )
           o.collection = self
-          o.expression_adapter_actor_box = BS_::Actors_
+          o.expression_adapter_actor_box = Here_::Magnetics_
           o.FS_adapter = @_FS_adapter
           o
         end
@@ -153,8 +153,8 @@ module Skylab::Snag
 
         def to_entity_stream & oes_p  #
 
-          BS_::Actors_::Produce_node_upstream[
-            self, @byte_upstream_ID, & oes_p ]
+          Here_::Magnetics_::NodeStream_via_LineStream.call(
+            self, @byte_upstream_ID, & oes_p )
         end
 
         def upstream_identifier
@@ -215,10 +215,8 @@ module Skylab::Snag
           ::String.new
         end
       end
-
-      Autoloader_[ Actors_ = ::Module.new ]
       Brazen_ = Home_.lib_.brazen
-      BS_ = self
+      Here_ = self
     end
   end
 end

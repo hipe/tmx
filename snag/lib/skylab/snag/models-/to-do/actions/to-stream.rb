@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
-    class Actions::To_Stream  #  #re-open because [#026]. descends from [br]
+    class Actions::ToStream  #  #re-open because [#026]. descends from [br]
 
       Brazen_::Modelesque.entity self,
 
@@ -34,7 +34,7 @@ module Skylab::Snag
 
         end,
         :default_proc, -> do
-          To_Do_.default_pattern_strings
+          Here_.default_pattern_strings
         end,
         :property, :pattern,
 
@@ -48,7 +48,7 @@ module Skylab::Snag
 
       def produce_result
 
-        o = To_Do_::Sessions_::Collection.new( & handle_event_selectively )
+        o = Here_::Magnetics_::Collection_via_Arguments.new( & handle_event_selectively )
 
         h = @argument_box.h_
         o.filename_pattern_s_a = h[ :name ]

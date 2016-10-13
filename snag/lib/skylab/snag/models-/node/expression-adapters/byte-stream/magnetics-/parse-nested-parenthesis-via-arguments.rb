@@ -4,11 +4,11 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Actors_::Nested
+      class Magnetics_::ParseNestedParenthesis_via_Arguments
 
         class << self
 
-          def [] * a
+          def call * a
             new( a ).execute
           end
         end  # >>
@@ -163,8 +163,6 @@ module Skylab::Snag
         CLOSE_PAREN__ = /[^)]*\)/
 
         EOL___ = /$/
-
-        Parens = ::Class.new self
       end
     end
   end

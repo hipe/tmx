@@ -1,8 +1,6 @@
 module Skylab::Snag
 
-  class Models_::To_Do
-
-    Models_ = ::Module.new
+  class Models_::ToDo
 
     class Models_::Matched_Line
 

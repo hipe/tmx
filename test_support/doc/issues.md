@@ -96,11 +96,12 @@
 [#005] #open #quickie #redundant s-tylize
              ( #was: confessions of an ambiguous grammar .. )
              ( #was: #done test/all should (whitelist) run the tests in the
-               proivded order, and not the lexical order? (see [#xxx].))
+               provided order, and not the lexical order? (see [#xxx].))
              ( #was: #done rename `all_specs.rb` -> all )
 [#004] #open quickie: module names into fashion (and now narrative)
 [#002]       coverage is a no fun zone ..
              ( #was: #done Constants too )
 
 [#001]       test-suite architecture and conventions..
+             (local keywords: regression order numbering scheme)
              (namespaces, modules) (also, cross-reference to [#fi-017])

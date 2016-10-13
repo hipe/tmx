@@ -2,8 +2,6 @@ module Skylab::Snag
 
   class Models_::Node_Identifier
 
-    Models_ = ::Module.new
-
     class Models_::Suffix  # described in the node identifier spec
 
       Interpret = -> scn, _, & x_p do
@@ -49,7 +47,7 @@ module Skylab::Snag
       include ::Comparable
 
       def <=> otr
-        if otr.kind_of? Suffix_
+        if otr.kind_of? Here___
 
           a = @to_a
           a_ = otr.to_a
@@ -234,7 +232,7 @@ module Skylab::Snag
         end
       end
 
-      Suffix_ = self
+      Here___ = self
     end
   end
 end

@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Sessions_::Delineate  # narrative at [#010]
+      class Magnetics_::ExpressDelineatedLines_via_Node  # exactly [#010]
 
         # try and keep the formatting intact of lines we don't mutate..
 

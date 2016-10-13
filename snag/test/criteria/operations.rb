@@ -1,7 +1,6 @@
-
 module Skylab::Snag::TestSupport
 
-  module Models::Criteria::Actions
+  module Criteria::Operations
 
     def self.[] tcc
       tcc.include self

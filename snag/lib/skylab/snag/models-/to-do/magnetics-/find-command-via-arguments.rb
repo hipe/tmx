@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
-    module Actors_::Build_the_find_command  # (was [#032] try to unify)
+    module Magnetics_::FindCommand_via_Arguments  # (was [#032] try to unify)
 
       # assume @filename_pattern_s_a, @path_s_a, @pattern_s_a
       # (but sanity-check their arities anyway)

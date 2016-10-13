@@ -27,7 +27,7 @@ module Skylab::Snag
         end
 
         def to_mutable
-          BS_::Mutable_Models_::Substring.new @begin, @end, @s.dup
+          Here_::Mutable_Models_::Substring.new @begin, @end, @s.dup
         end
 
         def detect_index_of_equivalent_object_ obj, row_st
@@ -57,7 +57,7 @@ module Skylab::Snag
           # for one line of one node, produce the strings and tags. this
           # will be used in whole-collection searched for tags, so etc..
 
-          BS_::Actors_::Flyweighted_object_stream_via_substring[ self, row_st ]
+          Here_::Magnetics_::FlyweightedObjectStream_via_Substring[ self, row_st ]
         end
       end
 
@@ -109,7 +109,7 @@ module Skylab::Snag
         end
 
         def to_mutable
-          BS_::Mutable_Models_::Body.
+          Here_::Mutable_Models_::Body.
             via_range_and_substring_array__( @_r, @_sstr_a.dup )
         end
 

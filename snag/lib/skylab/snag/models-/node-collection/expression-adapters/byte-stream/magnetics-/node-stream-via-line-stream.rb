@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Actors_::Produce_node_upstream
+      class Magnetics_::NodeStream_via_LineStream
 
         # parse the manifest file syntax: identifiers that start at column 1
 

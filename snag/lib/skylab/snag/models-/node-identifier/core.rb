@@ -182,7 +182,7 @@ module Skylab::Snag
 
       def __something_after_digit integer_d, id, scn, & x_p
 
-        sfx = NI_::Models_::Suffix::Interpret[ scn, :Byte_Stream, & x_p ]
+        sfx = Here_::Models_::Suffix::Interpret[ scn, :Byte_Stream, & x_p ]
 
         if sfx
           id.reinitialize sfx, integer_d
@@ -227,7 +227,7 @@ module Skylab::Snag
 
       yield :can, :set
 
-      NI_::Models_::Suffix
+      Here_::Models_::Suffix
     end
 
     def __integer__component_association
@@ -294,7 +294,7 @@ module Skylab::Snag
     include ::Comparable
 
     def <=> otr
-      if otr.kind_of? NI_
+      if otr.kind_of? Here_
         d = @to_i <=> otr.to_i
         if d.zero?
           o = @suffix
@@ -343,6 +343,6 @@ module Skylab::Snag
 
     Expression_Adapters::EN = nil
 
-    NI_ = self
+    Here_ = self
   end
 end

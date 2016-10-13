@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
-    class Actors_::To_do_stream_via_matching_line_stream < Common_::Actor::Dyadic
+    class Magnetics_::ToDoStream_via_MatchingLineStream < Common_::Actor::Dyadic
 
       def initialize st, psa, & p
         @on_event_selectively = p
@@ -123,7 +123,7 @@ module Skylab::Snag
         body_begin, body_end = md.offset d
         header_begin, header_end = md.offset( d - 1 )
 
-        Home_::Models_::To_Do.new do | o |
+        Home_::Models_::ToDo.new do | o |
 
           o.accept_matching_line my_line_o
           o.accept_header_range header_begin, header_end

@@ -1,18 +1,19 @@
 module Skylab::Snag
 
-  class Models_::To_Do
+  class Models_::ToDo
 
-    Sessions_ = ::Module.new
-
-    class Sessions_::Collection
+    class Magnetics_::Collection_via_Arguments
 
       def initialize & oes_p
         @on_event_selectively = oes_p
       end
 
-      attr_writer :filename_pattern_s_a, :path_s_a, :pattern_s_a,
-
-        :system_conduit
+      attr_writer(
+        :filename_pattern_s_a,
+        :path_s_a,
+        :pattern_s_a,
+        :system_conduit,
+      )
 
       def to_stream
 
@@ -23,13 +24,13 @@ module Skylab::Snag
 
           p = @on_event_selectively
 
-          st = Actors_::Matching_line_stream_via_find_command[
-            cmd, @system_conduit, & p ]
+          st = Magnetics_::MatchingLineStream_via_FindCommand.call(
+            cmd, @system_conduit, & p )
 
           st and begin
 
-            Actors_::To_do_stream_via_matching_line_stream[
-              st, @pattern_s_a, & p ]
+            Magnetics_::ToDoStream_via_MatchingLineStream.call(
+              st, @pattern_s_a, & p )
           end
         end
       end
@@ -39,7 +40,7 @@ module Skylab::Snag
       def build_system_command
 
         otr = dup
-        otr.extend To_Do_::Actors_::Build_the_find_command  # pattern #[#sl-003]
+        otr.extend Here_::Magnetics_::FindCommand_via_Arguments  # pattern #[#sl-003]
         otr.execute
       end
     end

@@ -59,10 +59,10 @@ module Skylab::Snag
       Try_to_reappropriate = -> node_, sess, & x_p do
 
         node =
-        Home_::Models_::Node_Collection::Actors_::Find_reappropriablest_node[
+        Home_::Models_::Node_Collection::Magnetics_::
+            ReappropriablestNode_via_Arguments.call(
           sess.entity_upstream,
-          & x_p
-        ]
+          & x_p )
 
         sess.reset_the_entity_upstream
 

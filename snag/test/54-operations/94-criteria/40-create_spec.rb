@@ -1,12 +1,12 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - criteria - create" do
+  describe "[sg] operations - criteria - create" do
 
     TS_[ self ]
     use :expect_event
-    use :models_criteria_actions
+    use :criteria_operations
 
     it "action has custom syntax: can't edit and save at the same time" do
 

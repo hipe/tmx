@@ -6,7 +6,7 @@ module Skylab::Snag
 
     Actions = ::Module.new
 
-    class Actions::To_Stream < Tag_Action__
+    class Actions::ToStream < Tag_Action__
 
       edit_entity_class(
 

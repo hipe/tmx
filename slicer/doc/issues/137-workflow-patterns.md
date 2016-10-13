@@ -104,6 +104,7 @@ it is the sweetspot between these two extremes that we are after, one
 that (for appropriate use-cases) we try to formalize somewhat here.
 
 
+
 ### justifying our weird order
 
 our order is based around introducing as little as possible new work in

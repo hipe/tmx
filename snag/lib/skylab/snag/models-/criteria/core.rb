@@ -75,7 +75,7 @@ module Skylab::Snag
 
       def __resolve_criteria
 
-        c = Criteria_.new_via_expression(
+        c = Here_.new_via_expression(
           @argument_box.fetch( :criteria ),
           @kernel,
           & handle_event_selectively )
@@ -179,7 +179,7 @@ module Skylab::Snag
 
           o.filesystem = Home_.lib_.system.filesystem
 
-          o.flyweight_class = Criteria_
+          o.flyweight_class = Here_
 
           o.kernel = kr
 
@@ -190,7 +190,7 @@ module Skylab::Snag
 
       def EN_domain_adapter
 
-        @__eda ||= Criteria_::Library_::Domain_Adapter.
+        @__eda ||= Here_::Library_::Domain_Adapter.
           new_via_kernel_and_NLP_const( @_kr, :EN )
       end
     end
@@ -216,7 +216,7 @@ module Skylab::Snag
 
           yield :can, :add, :remove
 
-          Criteria_
+          Here_
         end
 
         self
@@ -305,7 +305,7 @@ module Skylab::Snag
 
       def express_into__Filesystem__under col_x, fs, & x_p
 
-        Criteria_::Expression_Adapters::Filesystem[
+        Here_::Expression_Adapters::Filesystem[
           col_x, @_word_array, self, @_tmpfile_sessioner, fs, & x_p ]
       end
 
@@ -463,6 +463,6 @@ module Skylab::Snag
       Autoloader_[ self ]
     end
 
-    Criteria_ = self
+    Here_ = self
   end
 end
