@@ -4,6 +4,8 @@ module Skylab::System
 
     class File_Utils_Controller  # :[#011]
 
+      # there is perhaps an improved variant of this in [br], subject-tagged.
+
       # NOTE nowadays we want to deprecate this for the sorts of reasons
       # explained in [#009.A]. but nonetheless:
 

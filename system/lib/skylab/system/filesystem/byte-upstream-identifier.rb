@@ -2,7 +2,7 @@ module Skylab::System
 
   module Filesystem
 
-    class Byte_Upstream_Identifier  # [#011].
+    class Byte_Upstream_Identifier  # [#003].
 
       # a :+[#br-019] unified interface for accessing the bytes in a file.
 

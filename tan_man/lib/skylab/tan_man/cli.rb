@@ -62,7 +62,7 @@ module Skylab::TanMan
 
     # ~ could go away:
 
-    class Expression_Agent
+    class ExpressionAgent
 
       def initialize action_reflection
         @kernel = action_reflection.application_kernel

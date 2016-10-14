@@ -4,7 +4,7 @@ module Skylab::Brazen::TestSupport
 
     def self.[] tcc
 
-      TS_::TestLib_::Memoizer_methods[ tcc ]
+      TestLib_::Memoizer_methods[ tcc ]
 
       TS_.lib_( :CLI_support_expectations )[ tcc ]
 

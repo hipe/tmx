@@ -86,17 +86,33 @@ module Skylab::TestSupport
         x_a.each_slice 2 do | k, x |
           opt[ k ] = x
         end
-        a, a_ = opt.to_a
+        mutable_argv, prefix = opt.to_a
 
         init_invocation_for_expect_stdout_stderr
 
-        if a_
-          a[ 0, 0 ] = a_
+        if prefix
+          mutable_argv[ 0, 0 ] = prefix
         end
 
-        @exitstatus = @invocation.invoke a
+        path = working_directory_for_expect_stdout_stderr
+        if path
+          orig_pwd = ::Dir.pwd
+          do_debug and debug_IO.puts "cd #{ path }"
+          ::Dir.chdir path
+        end
 
-        NIL_
+        @exitstatus = @invocation.invoke mutable_argv
+
+        if orig_pwd
+          do_debug and debug_IO.puts "cd #{ orig_pwd }"
+          ::Dir.chdir orig_pwd
+        end
+
+        NIL
+      end
+
+      def working_directory_for_expect_stdout_stderr
+        NOTHING_
       end
 
       Options___ = ::Struct.new :mutable_argv, :prefix

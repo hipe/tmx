@@ -57,5 +57,5 @@ use that.
 otherwise, as a default case assume that "CLI support" has an
 appropriate value for this const.
 
-  (true for: `Expression_Agent`, `Actions` ..)
+  (true for: `ExpressionAgent`, `Actions` ..)
 _

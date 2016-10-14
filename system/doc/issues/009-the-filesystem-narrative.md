@@ -5,7 +5,7 @@
 
 our host platform (like many) integrates access to the filesystem as a
 ubiquitous given: kernel methods abound for opening files. standard
-library insturments like "pathname" (which models was it at essence an
+library insturments like "pathname" (which models what is at essence an
 immutable string) integrate access to the filesystem throughout.
 
 

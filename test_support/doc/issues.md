@@ -65,7 +65,8 @@
 [#019]       #node-point "tree walker" (became [#!gone:hl-176] then [#sy-018])
 [#018]       #quickie #in-situ
 
-[#017] #hole
+[#017] #open super-randomize: break test execution up into N workers,
+             based on per-sidesystem (or unit) cost calcuations!
              ( #was: the regret narrative )
 
 [#016]       #parent-node:[#017] why we do not include parent anchor module..

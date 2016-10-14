@@ -40,7 +40,7 @@ module Skylab::SubTree
       end
     end
 
-    class Expression_Agent
+    class ExpressionAgent
 
       def initialize ar
         @_action_reflection = ar

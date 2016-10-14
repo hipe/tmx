@@ -48,7 +48,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def prepared_tmpdir
-      td = TS_::TestLib_::Tmpdir[]
+      td = TestLib_::Tmpdir_controller_instance[]
       if do_debug
         if ! td.be_verbose
           td = td.new_with :be_verbose, true, :debug_IO, debug_IO
@@ -101,13 +101,18 @@ module Skylab::Brazen::TestSupport
       TestSupport_::Let[ tcc ]
     end
 
-    Tmpdir = Lazy_.call do
+    Tmpdir_controller_instance = Lazy_.call do
 
       sys = Home_::LIB_.system
 
       _path = ::File.join sys.defaults.dev_tmpdir_path, 'brzn'
 
       sys.filesystem.tmpdir :path, _path
+    end
+
+    System_tmpdir_path = Lazy_.call do
+      require 'tmpdir'
+      ::Dir.tmpdir
     end
 
     Zerk_test_support = -> do
@@ -191,6 +196,7 @@ module Skylab::Brazen::TestSupport
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = ''.freeze
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = ' '.freeze
   TS_ = self
 end

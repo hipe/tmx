@@ -419,7 +419,7 @@ module Skylab::CSS_Convert
 
   CLI.include Transitional___
 
-  class CLI::Expression_Agent < Brazen_::CLI_Support::ExpressionAgent
+  class CLI::ExpressionAgent < Brazen_::CLI_Support::ExpressionAgent
 
     # (this is a pedagogic example of taking the default expag from the
     # distribution and customizing it with in this case a specific color)

@@ -129,7 +129,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def __ws_tmpdir  # hacks only
-      TS_::TestLib_::Tmpdir[]
+      TestLib_::Tmpdir_controller_instance[]
     end
   end
 end

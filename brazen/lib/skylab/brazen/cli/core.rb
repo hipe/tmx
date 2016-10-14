@@ -11,11 +11,11 @@ module Skylab::Brazen
       end
 
       def expression_agent_instance
-        Home_::CLI_Support::Expression_Agent.instance
+        Home_::CLI_Support::ExpressionAgent.instance
       end
 
       def pretty_path x
-        Home_::CLI_Support::Expression_Agent::Pretty_path[ x ]
+        Home_::CLI_Support::ExpressionAgent::Pretty_path[ x ]
       end
 
       def some_screen_width
@@ -306,7 +306,7 @@ module Skylab::Brazen
       ## ~~ expag top-stopper
 
       def _expression_agent_class
-        const_get_magically_ :Expression_Agent
+        const_get_magically_ :ExpressionAgent
       end
 
       ## ~~ event receiving & sending

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI
 
-    class Expression_Agent
+    class ExpressionAgent
 
       # subclass Home_.lib_.CLI_lib::Pen::Minimal for less DIY
 
