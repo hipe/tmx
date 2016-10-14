@@ -6,6 +6,9 @@ module Skylab::Common
 
       def initialize a, ftc=nil, & p
 
+        @autoloaderize = false  # in keeping with the non-
+          # invasive spirit of this facility, default is false.
+
         @file_tree_cacher = ftc
         @final_path_to_load = nil
         @listener = p
@@ -31,6 +34,7 @@ module Skylab::Common
       end
 
       OPTIONS___ = {
+        autoloaderize: :_boolean,  # #covered-by [dt]
         const_path: :_mixed_value,
         final_path_to_load: :_mixed_value,
         from_module: :_mixed_value,
@@ -50,7 +54,7 @@ module Skylab::Common
       # --
 
       def __normalize
-        @_frame_prototype = Framer___.new @file_tree_cacher
+        @_frame_prototype = Framer___.new @file_tree_cacher, @autoloaderize
         x = remove_instance_variable :@const_path
         @__sanitized_const_path_mixed_array = ::Array.try_convert( x ) || [ x ]
 
@@ -208,7 +212,8 @@ module Skylab::Common
 
       class Framer___
 
-        def initialize ftc
+        def initialize ftc, yes
+          @do_autoloaderize = yes
           @file_tree_cacher = ftc
         end
 
@@ -221,6 +226,7 @@ module Skylab::Common
         end
 
         attr_reader(
+          :do_autoloaderize,
           :file_tree_cacher,
         )
       end
@@ -316,7 +322,7 @@ module Skylab::Common
             @__state_machine = sm
             ACHIEVED_
           else
-            self._HOLIO
+            UNABLE_  # #covered-by [dt]
           end
         end
 
@@ -332,9 +338,7 @@ module Skylab::Common
 
           cm.state_machine = _sm
 
-          cm.do_autoloaderize = false  # this could change, but for now in
-            # keeping with the non-invasive spirit of this facility, we
-            # do not enhance the (any) loaded module/class with autoloading.
+          cm.do_autoloaderize = @_frame_prototype.do_autoloaderize
 
           cm.on_const_missing_after_loaded_file = -> do
             @_const_missing = cm

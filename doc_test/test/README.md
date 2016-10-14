@@ -1,3 +1,7 @@
+## numbering scheme (see [#ts-001])
+
+we used something like this:
+
     func = -> zero=0, num_items, num_slots do
       width_per_item = 1.0 * num_slots / num_items
       two_buffers = width_per_item - 1
@@ -12,7 +16,6 @@
 
     func[ 9, 49 ]
 
-
 03       models
 09       asset document read magnetics
 14       ersatz parser
@@ -22,8 +25,8 @@
 36       output adapters
 41       recursion models
 47       recursion magnetics
-50-59    [reserverd for operations direct]
-60-69 65 API
-70-79 75 CLI
-80-89    [reserved]
-90-99    [reserved]
+  - 50s      [reserverd for operations direct]
+  - 60s      API
+  - 70s      CLI
+  - 80s      w
+  - 90s      i

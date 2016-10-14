@@ -74,9 +74,8 @@ module Skylab::DocTest::TestSupport
       context "when there IS a corresponding test, it finds it and says so" do
 
         shared_subject :_details do
-          _asset_path = "#{ _subject_mag.dir_path }#{ Autoloader_::EXTNAME }"
           _ind = _index
-          _ind.details_via_asset_path _asset_path
+          _ind.details_via_asset_path __subject_magnetic_would_be_asset_path
         end
 
         it "the details it results in say that a real path was found" do
@@ -142,6 +141,14 @@ module Skylab::DocTest::TestSupport
 
     def _subject_mag
       Home_::RecursionMagnetics_::CounterpartTestIndex_via_TestDirectory_and_CounterpartDirectory
+    end
+
+    memoize :__subject_magnetic_would_be_asset_path do
+      _head = ::File.join(
+        Home_::RecursionMagnetics_.dir_path,
+        'counterpart-test-index-via-test-directory-and-counterpart-directory',
+      )
+      "#{ _head }#{ Autoloader_::EXTNAME }"
     end
   end
 end

@@ -108,7 +108,7 @@ module Skylab::DocTest::TestSupport
 
     hafp = nil
     define_method :home_asset_file_path_ do
-      hafp ||= "#{ home_dir_path_ }#{ Autoloader_::EXTNAME_ }"
+      hafp ||= "#{ home_dir_path_ }#{ Autoloader_::EXTNAME }"
     end
 
     ssdp = nil

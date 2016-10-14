@@ -62,9 +62,9 @@ module Skylab::DocTest
 
           def call o, & l
 
-            md = Models_::String.match_quoted_string_literal o.asset_bytes_for_expected
+            md = Home_::Models_::String.match_quoted_string_literal o.asset_bytes_for_expected
             if md
-              s = Models_::String.unescape_quoted_string_literal_matchdata md do |*a, &p|
+              s = Home_::Models_::String.unescape_quoted_string_literal_matchdata md do |*a, &p|
                 # no matter what the emission is, downgrade it to an info. we never fail
                 # because of whatever happens here, we just keep moving down the chain.
                 a[0] = :info

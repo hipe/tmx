@@ -156,7 +156,7 @@ module Skylab::DocTest
       # --
 
       def to_stem_paraphernalia_given choices  # assume has magic copula
-        Models_::CopulaAssertion.via_code_line__ self, choices
+        Home_::Models_::CopulaAssertion.via_code_line__ self, choices
       end
 
       def to_line_stream

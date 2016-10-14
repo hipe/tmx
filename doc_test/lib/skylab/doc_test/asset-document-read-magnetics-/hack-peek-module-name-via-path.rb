@@ -63,14 +63,15 @@ module Skylab::DocTest
         _path = if COREFILE_TAIL__ == @path[ RANGE__ ]
           ::File.dirname @path
         else
-          ::Pathname.new( @path ).sub_ext( EMPTY_S_ ).to_path
+          d = ::File.extname( @path ).length
+          d.zero? ? @path : @path[ 0 ... - d ]
         end
 
         @_against_symbol = Distill__[ ::File.basename _path ]
         NIL_
       end
 
-      COREFILE_TAIL__ = "/#{ Autoloader_.default_core_file }"
+      COREFILE_TAIL__ = "/#{ Autoloader_::CORE_FILE }"
 
       RANGE__ = - COREFILE_TAIL__.length .. -1
 

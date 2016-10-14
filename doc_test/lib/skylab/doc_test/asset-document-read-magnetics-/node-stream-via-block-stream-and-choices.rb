@@ -65,7 +65,7 @@ module Skylab::DocTest
 
     def __assemble_whole_node_because_OE  # #coverpoint2-3
 
-      Models_::Context.via_valid_pair_array_and_choices__(
+      Home_::Models_::Context.via_valid_pair_array_and_choices__(
 
         remove_instance_variable( :@_pairs ),
         @__test_file_context_proc,
@@ -96,7 +96,7 @@ module Skylab::DocTest
         _discu_run = pair.discussion_run
         code_run.has_magic_copula or Home_._SANITY  # because then not flat
 
-        Models_::ExampleNode.via_runs_and_choices_ _discu_run, code_run, @choices
+        Home_::Models_::ExampleNode.via_runs_and_choices_ _discu_run, code_run, @choices
 
       else
         remove_instance_variable :@_cache_stream
@@ -107,7 +107,7 @@ module Skylab::DocTest
 
     def __thoroughly_index_comment_block cb
 
-      st = AssetDocumentReadMagnetics_::RunStream_via_CommentBlock[ cb ]
+      st = Home_::AssetDocumentReadMagnetics_::RunStream_via_CommentBlock[ cb ]
       pairs = nil
 
       run = st.gets

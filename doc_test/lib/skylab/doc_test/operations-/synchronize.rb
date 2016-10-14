@@ -54,7 +54,7 @@ module Skylab::DocTest
     def __resolve_modified_test_document_via_plan_and_test_document_index
       _plan = remove_instance_variable :@__plan
       _tdi = remove_instance_variable :@test_document_index
-      _ = TestDocumentMutationMagnetics_::
+      _ = Home_::TestDocumentMutationMagnetics_::
           TestDocument_via_Plan_and_TestDocumentIndex.new(
         _plan, _tdi, @choices, & @listener ).execute
       _ok :@__modified_test_document, _
@@ -62,7 +62,7 @@ module Skylab::DocTest
 
     def __resolve_plan_via_asset_nodes_and_test_document_index
       _st = remove_instance_variable :@__asset_nodes
-      _ = TestDocumentMutationMagnetics_::
+      _ = Home_::TestDocumentMutationMagnetics_::
           Plan_via_AssetNodes_and_TestDocumentIndex.new(
         _st, @test_document_index, & @listener ).execute
       _ok :@__plan, _
@@ -71,7 +71,7 @@ module Skylab::DocTest
     def __resolve_asset_nodes_via_asset_line_stream
       _tfcp = method :__test_file_context
       _ = remove_instance_variable :@asset_line_stream
-      o = AssetDocumentReadMagnetics_  # (near [#ta-005])
+      o = Home_::AssetDocumentReadMagnetics_  # (near [#ta-005])
       _bs = o::BlockStream_via_LineStream_and_Single_Line_Comment_Hack[ _ ]
       _ = o::NodeStream_via_BlockStream_and_Choices[ _bs, _tfcp, @choices ]
       _ok :@__asset_nodes, _
@@ -98,7 +98,7 @@ module Skylab::DocTest
     def __resolve_test_document_index_via_test_document
 
       _test_doc = remove_instance_variable :@__test_document
-      _ = TestDocumentReadMagnetics_::
+      _ = Home_::TestDocumentReadMagnetics_::
           TestDocumentIndex_via_Choices_and_TestDocument.
         new( _test_doc, @choices, & @listener ).execute
       _ok :@test_document_index, _
@@ -145,11 +145,27 @@ module Skylab::DocTest
             y << "conjunction with help, more options may appear."
       end
 
-    def __output_adapter_module
+    -> do
+      cache = {}
+      define_method :__output_adapter_module do
+        cache.fetch @output_adapter do
+          x = __lookup_output_adapter_module
+          if x
+            cache[ @output_adapter ] = x
+          else
+            NOTHING_  # #covered
+          end
+          x
+        end
+      end
+    end.call
+
+    def __lookup_output_adapter_module
       Autoloader_.const_reduce(
-            [ @output_adapter ],  # nil ok
-            Home_::OutputAdapters_,
-      & @listener )
+        :from_module, Home_::OutputAdapters_,
+        :const_path, [ @output_adapter ],
+        :autoloaderize,
+        & @listener )
     end
 
     def _ok ivar, x

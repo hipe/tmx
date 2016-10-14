@@ -100,7 +100,7 @@ module Skylab::DocTest
 
         tip = @_trees
 
-        scn  = RecursionModels_::EntryScanner.via_path_ local_path
+        scn  = Home_::RecursionModels_::EntryScanner.via_path_ local_path
         entry = scn.scan_entry
         entry_ = scn.scan_entry
         begin

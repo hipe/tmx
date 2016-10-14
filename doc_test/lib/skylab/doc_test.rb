@@ -116,13 +116,13 @@ module Skylab::DocTest
     end
   end  # >>
 
-  # --
+  # ==
 
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
   Lazy_ = Common_::Lazy
 
-  # --
+  # ==
 
   module Paraphernalia_
 
@@ -150,22 +150,7 @@ module Skylab::DocTest
     end
   end
 
-  # -- branch modules (alpha)
-
-  o = -> const do
-    Autoloader_[ const_set const, ::Module.new ]
-  end
-
-  o[ :AssetDocumentReadMagnetics_ ]
-  o[ :Models_ ]
-  o[ :Operations_ ]
-  o[ :OutputAdapters_ ]
-  o[ :RecursionMagnetics_ ]
-  o[ :RecursionModels_ ]
-  o[ :TestDocumentMutationMagnetics_ ]
-  o[ :TestDocumentReadMagnetics_ ]
-
-  # -- functions
+  # == functions
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
@@ -185,7 +170,7 @@ module Skylab::DocTest
     Common_::Stream.via_nonsparse_array nonsparse_a
   end
 
-  # --
+  # ==
 
   module Lib_  # # use this name per [sl] viz for now
 
@@ -215,7 +200,7 @@ module Skylab::DocTest
     Zerk = sidesys[ :Zerk ]
   end
 
-  # --
+  # ==
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   ACHIEVED_ = true

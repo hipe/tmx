@@ -27,7 +27,7 @@ module Skylab::DocTest
     end
 
     def begin_description_string_session
-      Models_::Description_String.via_discussion_run__ @_discussion_run, @_choices
+      Home_::Models_::DescriptionString.via_discussion_run__ @_discussion_run, @_choices
     end
 
     def to_code_run_line_object_stream

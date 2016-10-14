@@ -149,7 +149,7 @@ module Skylab::DocTest
 
         @_node_of_interest = no
 
-        _ = TestDocumentMutationMagnetics_::
+        _ = Home_::TestDocumentMutationMagnetics_::
             TransitionCharacterization_via_LeftNode_and_TestDocumentIndex.new(
           no, @test_document_index )
 

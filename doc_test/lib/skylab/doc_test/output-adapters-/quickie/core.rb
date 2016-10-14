@@ -55,7 +55,7 @@ module Skylab::DocTest
       end
 
       def some_original_test_line_stream
-        ViewControllers_::Starter.via_choices( self ).some_original_test_line_stream__
+        Here_::ViewControllers_::Starter.via_choices( self ).some_original_test_line_stream__
       end
 
       def begin_insert_into_empty_document doc, & p
@@ -91,7 +91,7 @@ module Skylab::DocTest
       end
 
       def _paraphernalia_class_for sym
-        @___PL ||= Home_::OutputAdapter_::Paraphernalia_Loader.new ViewControllers_
+        @___PL ||= Home_::OutputAdapter_::Paraphernalia_Loader.new Here_::ViewControllers_
         @___PL.paraphernalia_class_for sym
       end
 
@@ -113,16 +113,6 @@ module Skylab::DocTest
 
     Template_dir___ = Lazy_.call do
       ::File.join Here_.dir_path, 'templates-'
-    end
-
-    # ==
-
-    module DocumentWriteMagnetics_
-      Autoloader_[ self ]
-    end
-
-    module ViewControllers_
-      Autoloader_[ self ]
     end
 
     Here_ = self

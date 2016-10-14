@@ -30,9 +30,9 @@ module Skylab::DocTest
         discu_run = pair.discussion_run
 
         if code_run.has_magic_copula
-          Models_::ExampleNode.via_runs_and_choices_ discu_run, code_run, @_choices
+          Home_::Models_::ExampleNode.via_runs_and_choices_ discu_run, code_run, @_choices
         else
-          Models_::UnassertiveCodeNode.via_runs_and_choices_(
+          Home_::Models_::UnassertiveCodeNode.via_runs_and_choices_(
             discu_run, code_run, @__test_file_context_proc, @_choices )
         end
       end

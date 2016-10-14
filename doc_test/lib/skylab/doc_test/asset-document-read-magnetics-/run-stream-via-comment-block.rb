@@ -65,7 +65,7 @@ module Skylab::DocTest
 
     def _init_empty_discussion_run
 
-      @_discussion_run = Models_::Discussion::Run.new_empty__ ; nil
+      @_discussion_run = Home_::Models_::Discussion::Run.new_empty__ ; nil
     end
 
     def _finish_and_release_discussion_run  # mentor (template, even) to #here
@@ -128,7 +128,7 @@ module Skylab::DocTest
 
       # assume you have a current line that is a code line..
 
-      cr = Models_::Code::Run.begin_via_offsets__( * _release_code_line_args )
+      cr = Home_::Models_::Code::Run.begin_via_offsets__( * _release_code_line_args )
 
       # while there are more lines and the line is a code line, keep going
 

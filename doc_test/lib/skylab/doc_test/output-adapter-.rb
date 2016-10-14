@@ -25,7 +25,7 @@ module Skylab::DocTest
 
         _full_path = ::File.expand_path file_path, @dir_path
 
-        Models_::Template.via_full_path _full_path
+        Home_::Models_::Template.via_full_path _full_path
       end
     end
 

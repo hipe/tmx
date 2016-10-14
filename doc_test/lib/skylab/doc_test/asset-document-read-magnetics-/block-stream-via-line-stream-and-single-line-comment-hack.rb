@@ -29,11 +29,11 @@ module Skylab::DocTest
     end
 
     def __parse_a_comment_block
-      Models_::CommentBlock.via_parse__ @_parser
+      Home_::Models_::CommentBlock.via_parse__ @_parser
     end
 
     def __parse_a_static_block
-      Models_::StaticBlock.via_parse__ @_parser
+      Home_::Models_::StaticBlock.via_parse__ @_parser
     end
 
     class Parser___

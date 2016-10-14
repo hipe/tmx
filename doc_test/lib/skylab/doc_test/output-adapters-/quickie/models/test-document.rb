@@ -46,7 +46,7 @@ module Skylab::DocTest
 
       const_part = "(?<const>(?:::)?#{ part }(?:::#{ part })*)\\b"
 
-      quoted_string_part = Models_::String.quoted_string_regex_part
+      quoted_string_part = Home_::Models_::String.quoted_string_regex_part
 
       # --
 

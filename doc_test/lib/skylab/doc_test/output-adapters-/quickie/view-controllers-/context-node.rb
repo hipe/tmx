@@ -89,7 +89,7 @@ module Skylab::DocTest
 
         # --
 
-        body_line_st = AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ n_st, & p ]
+        body_line_st = Home_::AssetDocumentReadMagnetics_::LineStream_via_NodeStream[ n_st, & p ]
 
         # --
 

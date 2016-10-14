@@ -164,7 +164,7 @@ module Skylab::DocTest
       # extra filesystem hit by confirming the lib dir using the argument
       # path alone.
 
-      scn = RecursionModels_::EntryScanner.via_path_ @argument_path
+      scn = Home_::RecursionModels_::EntryScanner.via_path_ @argument_path
       scn.pos = len
       scn.expect_one_separator__
 

@@ -39,7 +39,7 @@ module Skylab::DocTest
 
     def execute
 
-      proto = RecursionModels_::UnitOfWork.prototype(
+      proto = Home_::RecursionModels_::UnitOfWork.prototype(
         @do_list,
         @VCS_reader,
         @filesystem,

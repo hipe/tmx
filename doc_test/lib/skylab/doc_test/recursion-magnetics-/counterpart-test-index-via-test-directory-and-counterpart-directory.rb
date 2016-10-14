@@ -99,7 +99,7 @@ module Skylab::DocTest
 
       tip = @_tree
 
-      scn = RecursionModels_::EntryScanner.via_path_ @_localize[ path ]
+      scn = Home_::RecursionModels_::EntryScanner.via_path_ @_localize[ path ]
       entry = scn.scan_entry
       entry_ = scn.scan_entry
       begin
