@@ -70,8 +70,8 @@ module Skylab::CodeMetrics
 
         _, o, e, w = @system_conduit.popen3 @_command_string  # (was [#004])
 
-        y = Home_::Throughput_Adapters_::Synchronous_Read[
-          [], nil, o, e, w, & @on_event_selectively ]
+        y = Home_::ThroughputAdapters_::SynchronousRead.call(
+          [], nil, o, e, w, & @on_event_selectively )
 
         if y
           @_output_lines = y

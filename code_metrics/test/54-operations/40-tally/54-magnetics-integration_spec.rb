@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] models - 4 - 3 performer integration" do
+  describe "[cm] operations - tally - magnetics integration" do
 
     TS_[ self ]
     use :memoizer_methods

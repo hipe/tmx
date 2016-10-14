@@ -109,7 +109,7 @@ module Skylab::CodeMetrics::TestSupport
 
   # -- for `use`
 
-  CLI_Support_Expectations = -> tcc do
+  CLI_Expectations = -> tcc do
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
   end
 

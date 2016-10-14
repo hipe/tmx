@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] tally - 1: CLI beginnings" do
+  describe "[cm] CLI - tally" do
 
     TS_[ self ]
-    use :CLI_support_expectations
+    use :CLI_expectations
 
     context "in toplevel helpscreen, the entry for this action.." do
 

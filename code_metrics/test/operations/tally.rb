@@ -1,9 +1,8 @@
 module Skylab::CodeMetrics::TestSupport
 
-  module Models::Tally::Magnetics
+  module Operations::Tally::Magnetics
 
     def self.[] tcc
-
       tcc.include self
     end
 

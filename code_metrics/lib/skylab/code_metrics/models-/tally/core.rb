@@ -169,9 +169,5 @@ module Skylab::CodeMetrics
         x
       end
     end
-
-    module Magnetics_
-      Autoloader_[ self ]
-    end
   end
 end

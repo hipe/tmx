@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] models - 1. line count" do
+  describe "[cm] operations - line count" do
 
     TS_[ self ]
     use :expect_event

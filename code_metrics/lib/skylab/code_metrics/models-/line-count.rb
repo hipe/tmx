@@ -2,7 +2,7 @@ module Skylab::CodeMetrics
 
   module Home_::Model_::Support
 
-    class Home_::Models_::Line_Count < Report_Action
+    class Home_::Models_::LineCount < Report_Action
 
       o = COMMON_PROPERTIES.method :fetch
 
@@ -129,7 +129,7 @@ module Skylab::CodeMetrics
 
         d = y.length
 
-        ok = Home_::Throughput_Adapters_::Synchronous_Read.call(
+        ok = Home_::ThroughputAdapters_::SynchronousRead.call(
           y, nil, sout, serr, wait
 
         ) do  | * i_a, & ev_p |

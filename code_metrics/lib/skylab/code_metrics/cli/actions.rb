@@ -188,7 +188,7 @@ module Skylab::CodeMetrics
 
       Actions = ::Module.new  # everything's here
 
-      class Actions::Line_Count < Action_Adapter
+      class Actions::LineCount < Action_Adapter
 
         _mutate_properties do | sess |
           sess.add_additional_properties(

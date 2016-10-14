@@ -1,12 +1,11 @@
 module Skylab::CodeMetrics
 
-  Throughput_Adapters_ = ::Module.new
-
-    class Throughput_Adapters_::Synchronous_Read
-
+  class ThroughputAdapters_::SynchronousRead
+    # -
       # read from STDOUT with timeout. behavior on stderr.
 
       class << self
+
         def call y, _, sout, serr, w, & oes_p
           o = new
           o.on_event_selectively = oes_p
@@ -91,6 +90,6 @@ module Skylab::CodeMetrics
 
         ok && @y
       end
-    end
-  # -
+    # -
+  end
 end

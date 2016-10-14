@@ -2,11 +2,11 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] tally - 2 - 5: graph structure" do
+  describe "[cm] tally - magnetics - graph structure" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :models_tally_magnetics
+    use :operations_tally_magnetics
 
     it "builds" do
       _state

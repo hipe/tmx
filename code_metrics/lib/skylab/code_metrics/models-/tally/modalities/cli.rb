@@ -2,7 +2,6 @@ module Skylab::CodeMetrics
 
   class Models_::Tally
 
-    Modalities = ::Module.new
     class Modalities::CLI < Brazen_::CLI::Action_Adapter
 
       # the below method definitions with [#bs-028] "public API"-looking

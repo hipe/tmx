@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] CLI - integration" do
+  describe "[cm] CLI - dirs and ex and linecount" do
 
     # the number of pluses that will display is a function of these factors:
     #
@@ -18,7 +18,7 @@ module Skylab::CodeMetrics::TestSupport
     # but is out of scope at the moment, so #open [#015]
 
     TS_[ self ]
-    use :CLI_support_expectations
+    use :CLI_expectations
     use :CLI
     use :CLI_classify_common_screen
 

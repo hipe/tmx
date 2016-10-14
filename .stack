@@ -5,9 +5,9 @@ improvements near autoloading and dir_pathname
 relative_path_from
 no more requiring of pathname univerally (#commit-related)
 explain things like eponymous/corefle in a ubiquitous languge file, and that one #note-4
+`is_file_tree` does or does not go away
 (-1) many stubs can be removed, get rid of tombstones in [co] a.l tests
 (-2) universal integration (all green)
 [tmx]
 [tm]
 [cu]
-[cm]

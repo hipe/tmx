@@ -152,8 +152,8 @@ module Skylab::CodeMetrics
 
         _, o, e, w = system_conduit_.popen3( * @_find_dirs_command.args )
 
-        y = Home_::Throughput_Adapters_::Synchronous_Read[
-          [], nil, o, e, w, & @on_event_selectively ]
+        y = Home_::ThroughputAdapters_::SynchronousRead.call(
+          [], nil, o, e, w, & @on_event_selectively )
 
         if y
           @_dirs = y

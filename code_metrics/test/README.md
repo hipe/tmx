@@ -1,11 +1,24 @@
-# about the taxonomy of the tests sibling to this file -
+## general numbering scheme (per [#ts-001])
 
-this node is for tests that test CLI integration for the original three
-actions of "file metrics": line count, "ext", and "dirs".
+  - 10s      private models
+  - 20s      private magnetics
+  - 30s      public models
+  - 40s      public magnetics
+  - 50s      operatoins (via API)
+  - 60s      CLI
+  - 70s      iCLI
+  - 80s      w
+  - 90s      i
 
-for actions beyond those, we recommend that we put the modality-specific
-tests under the appropriate reactive tree node. that is, now the gravity
-for reactive tree node is stronger than the gravity for modality.
 
-(but it makes sense to have the others near each other because of how
-much code they share, on both the asset and testing ends.)
+
+## numbering scheme under API, CLI; recursively..
+
+..is endpoints (operations) from least to most complex, distributed more
+or less evenly at the time of allocation (or using their historical 1-digit
+numbers with a zero added, i.e that number times ten).
+
+if there are ever deep endpoints this holds recursively, which prevents you
+from being able to express the relative complexity of two different
+endpoints in different branch nodes but meh, there are currently no
+deep endpoints.

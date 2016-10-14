@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] tally - 2 - 4: digraph" do
+  describe "[cm] tally - magnetics - digraph" do
 
     # this test is based around trying to generate a document that is
     # structurally similar to [#013]/document-1.
@@ -16,7 +16,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :models_tally_magnetics
+    use :operations_tally_magnetics
 
     it "loads" do
       _subject

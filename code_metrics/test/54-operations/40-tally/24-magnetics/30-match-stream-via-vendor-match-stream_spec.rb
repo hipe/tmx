@@ -2,11 +2,11 @@ require_relative '../../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cme] tally - 2 - 3: match stream via vendor match stream" do
+  describe "[cm] tally - magnetics - match stream via vendor match stream" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :models_tally_magnetics
+    use :operations_tally_magnetics
 
     it "loads" do
       _subject

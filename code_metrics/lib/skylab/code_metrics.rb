@@ -23,12 +23,15 @@ module Skylab::CodeMetrics
         # "tally" can perhaps still work while its sibling nodes are
         # in a developmental (broken) state.
 
-        et = ke.reactive_tree_seed.entry_tree
+        ft = ke.reactive_tree_seed.entry_tree
 
-        et.is_file_tree || self._SANITY
+        ft.is_file_tree || self._SANITY
 
-        if et.has_entry_for_slug nf.as_slug
-          ke.reactive_tree_seed.const_get nf.as_const, false
+        _head = nf.as_slug
+        _sm = ft.value_state_machine_via_head _head
+        if _sm
+          _const = nf.as_camelcase_const_string
+          ke.reactive_tree_seed.const_get _const, false
         end
       end
 
@@ -45,16 +48,29 @@ module Skylab::CodeMetrics
     end
   end  # >>
 
-  Totaller_ = -> do
-    Home_.lib_.basic::Tree::Totaller
-  end
+  # ==
 
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
 
+  # ==
+
+  module Models_
+
+    Autoloader_[ self, :boxxy ]
+  end
+
+  # ==
+
+  Totaller_ = -> do
+    Home_.lib_.basic::Tree::Totaller
+  end
+
   Require_brazen_ = Common_::Lazy.call do  # called only 2x
     Brazen_ = Home_.lib_.brazen ; NIL_
   end
+
+  # ==
 
   module Lib_
 
@@ -109,6 +125,10 @@ module Skylab::CodeMetrics
     Test_support = sidesys[ :TestSupport ]
   end
 
+  # ==
+
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
+
   ACHIEVED_ = true
   EMPTY_A_ = []
   EMPTY_P_ = -> {}
@@ -116,12 +136,9 @@ module Skylab::CodeMetrics
   Home_ = self
   IDENTITY_ = -> x { x }
   LIB_ = Home_.lib_
-  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n"
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
-
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 end
