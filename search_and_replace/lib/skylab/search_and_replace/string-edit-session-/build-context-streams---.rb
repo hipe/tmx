@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class String_Edit_Session_::Build_Context_Streams___
+  class StringEditSession_::Build_Context_Streams___
 
     # some axioms/theorems:
     #
@@ -126,7 +126,7 @@ module Skylab::SearchAndReplace
         st = Common_::Stream.the_empty_stream
       else
 
-        st = Home_::String_Edit_Session_::Build_Before_Context_Stream___.new(
+        st = Home_::StringEditSession_::Build_Before_Context_Stream___.new(
           remove_instance_variable( :@_rotating_buffer ),
           @match_controller,
           target_d,

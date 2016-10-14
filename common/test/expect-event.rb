@@ -276,7 +276,7 @@ module Skylab::Common::TestSupport
 
         br = Home_.lib_.brazen
         _expag = br::API.expression_agent_instance
-        o = br::CLI_Support::Expression_Agent::Handler_Expresser.new _expag
+        o = br::CLI_Support::ExpressionAgent::Handler_Expresser.new _expag
         o.downstream_stream = io
         o = o.finish
 

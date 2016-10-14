@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   module CLI_Support
 
-    class Expression_Agent
+    class ExpressionAgent
 
       class << self
 

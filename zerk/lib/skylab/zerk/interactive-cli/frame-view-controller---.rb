@@ -14,7 +14,7 @@ module Skylab::Zerk
       b9r = resources.boundarizer
       @_boundarizer = b9r
       @line_yielder = b9r.line_yielder
-      @expression_agent = Remote_CLI_lib_[]::Expression_Agent.new :_ze_NO_  # ..
+      @expression_agent = Remote_CLI_lib_[]::ExpressionAgent.new :_ze_NO_  # ..
       @produce_top_frame = top_frame_p
       @serr = resources.serr
 

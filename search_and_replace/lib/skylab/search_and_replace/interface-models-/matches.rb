@@ -41,7 +41,7 @@ module Skylab::SearchAndReplace
 
       _ = __build_read_only_file_session_stream
 
-      __write_trueish :@_file_session_stream, _
+      __store_trueish :@_file_session_stream, _
     end
 
     def __build_read_only_file_session_stream
@@ -68,18 +68,11 @@ module Skylab::SearchAndReplace
       o
     end
 
-    def __write_trueish ivar, x
-      if x
-        instance_variable_set ivar, x
-        ACHIEVED_
-      else
-        x
-      end
-    end
-
     def handle_event_selectively_for_zerk
       @_oes_p
     end
+
+    define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_
   end
 end
 # #history: this splintered off of node [#003]

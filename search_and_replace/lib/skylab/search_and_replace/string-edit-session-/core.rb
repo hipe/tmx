@@ -88,10 +88,6 @@ module Skylab::SearchAndReplace
       alias_method :next_block, :first_block
       protected :next_block
 
-      module Magnetics_
-        Autoloader_[ self ]
-      end
-
       Here_ = self
       NOTHING_ = nil  # in contrast with something
     end

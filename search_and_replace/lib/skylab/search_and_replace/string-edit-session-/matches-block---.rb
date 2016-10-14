@@ -195,7 +195,7 @@ module Skylab::SearchAndReplace
         end
 
         def to_throughput_atom_stream_  # #testpoint
-          Home_::Throughput_Magnetics_::
+          Home_::ThroughputMagnetics_::
             Throughput_Atom_Stream_via_Matches_Block.new( self ).execute
         end
 

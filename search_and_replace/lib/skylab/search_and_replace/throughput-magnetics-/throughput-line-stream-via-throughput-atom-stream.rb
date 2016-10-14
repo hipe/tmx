@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Throughput_Magnetics_::Throughput_Line_Stream_via_Throughput_Atom_Stream
+  class ThroughputMagnetics_::Throughput_Line_Stream_via_Throughput_Atom_Stream
 
     # chunk at each [#010] line while wrapping (mapping) it
     # in an ad-hoc structure that reflects particular metadata
@@ -161,7 +161,7 @@ module Skylab::SearchAndReplace
       end
 
       def to_unstyled_bytes_string_  # #testpoint
-        Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
+        ThroughputMagnetics_::Unstyled_String_via_Throughput_Atom_Stream.new(
           Common_::Stream.via_nonsparse_array @a ).execute
       end
 

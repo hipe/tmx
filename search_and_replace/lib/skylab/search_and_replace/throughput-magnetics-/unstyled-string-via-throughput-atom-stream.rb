@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Throughput_Magnetics_::Unstyled_String_via_Throughput_Atom_Stream
+  class ThroughputMagnetics_::Unstyled_String_via_Throughput_Atom_Stream
 
     def initialize st
       @stream = st

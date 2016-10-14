@@ -177,18 +177,13 @@ module Skylab::SearchAndReplace
 
       send :"__write_grep_options_for__#{ @for }__", a
 
-      gr = Home_.lib_.system.grep(
+      _gr = Home_.lib_.system.grep(
         :grep_extended_regexp_string, @grep_extended_regexp_string,
         :ruby_regexp, @ruby_regexp,
         :freeform_options, a,
         & @_oes_p )
 
-      if gr
-        @_grep_command = gr
-        ACHIEVED_
-      else
-        gr
-      end
+      __store_trueish :@_grep_command, _gr
     end
 
     def __write_grep_options_for__counts__ a
@@ -210,6 +205,8 @@ module Skylab::SearchAndReplace
     end
 
     FILES_WITH_MATCHES_OPTION___ = '--files-with-matches'.freeze
+
+    define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_
   end
 end
 # #tombstone: grep command head as inline event

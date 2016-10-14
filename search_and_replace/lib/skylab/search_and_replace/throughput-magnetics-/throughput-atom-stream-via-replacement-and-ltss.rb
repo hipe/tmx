@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Throughput_Magnetics_::Throughput_Atom_Stream_via_Replacement_and_LTSs
+  class ThroughputMagnetics_::Throughput_Atom_Stream_via_Replacement_and_LTSs
 
     def initialize mc, ltss
 
@@ -65,7 +65,7 @@ module Skylab::SearchAndReplace
       else
         @_cursor = 0
         @_end_charpos = d
-        @_LTS_stream = Home_::String_Edit_Session_::Line_Scanner_.new s
+        @_LTS_stream = Home_::StringEditSession_::Line_Scanner_.new s
         @_replacement_string = s
         @_state = :_next_line_or_done
         send @_state

@@ -276,7 +276,7 @@ module Skylab::SearchAndReplace
 
         def to_throughput_line_stream_
           _ = to_throughput_atom_stream_
-          Home_::Throughput_Magnetics_::
+          Home_::ThroughputMagnetics_::
             Throughput_Line_Stream_via_Throughput_Atom_Stream.new( _ ).execute
         end
 

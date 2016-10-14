@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Throughput_Magnetics_::Throughput_Atom_Stream_via_Match_and_LTSs
+  class ThroughputMagnetics_::Throughput_Atom_Stream_via_Match_and_LTSs
 
     def initialize mc, ltss
 

@@ -47,6 +47,15 @@ module Skylab::SearchAndReplace
     end  # >>
   end
 
+  METHOD_DEFINITION_FOR_STORE_TRUEISH_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x
+      ACHIEVED_
+    else
+      x
+    end
+  end
+
   class Root_Autonomous_Component_System_  # 1x by CLI and 1x by API
 
     Xxx = -> y do
@@ -365,11 +374,7 @@ module Skylab::SearchAndReplace
     Zerk = sidesys[ :Zerk ]
   end
 
-  Autoloader_[ Magnetics_ = ::Module.new ]
-
-  Autoloader_[ Throughput_Magnetics_ = ::Module.new ]
-
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   EMPTY_A_ = []

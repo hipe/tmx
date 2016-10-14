@@ -728,7 +728,7 @@ module Skylab::Zerk
     end
 
     def expression_agent
-      @__expag ||= Remote_CLI_lib_[]::Expression_Agent.new self
+      @__expag ||= Remote_CLI_lib_[]::ExpressionAgent.new self
     end
 
     def line_yielder

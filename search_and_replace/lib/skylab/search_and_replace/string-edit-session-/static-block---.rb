@@ -44,14 +44,14 @@ module Skylab::SearchAndReplace
         end
 
         def to_backwards_throughput_line_stream_
-          Home_::Throughput_Magnetics_::Reverse_Throughput_Line_Stream_via_Static_Block.new(
+          Home_::ThroughputMagnetics_::Reverse_Throughput_Line_Stream_via_Static_Block.new(
             @block_charpos,
             @_LTSs,
             @big_string_ ).execute
         end
 
         def to_throughput_atom_stream_  # #testpoint
-          Home_::Throughput_Magnetics_::Throughput_Atom_Stream_via_Static_Block.new(
+          Home_::ThroughputMagnetics_::Throughput_Atom_Stream_via_Static_Block.new(
             @block_charpos,
             @_LTSs,
             @big_string_ ).execute

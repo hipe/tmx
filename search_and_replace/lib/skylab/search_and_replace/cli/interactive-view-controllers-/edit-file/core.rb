@@ -488,7 +488,7 @@ module Skylab::SearchAndReplace
       end
 
       Buttonesque_view_controller__ = -> do
-        Zerk_::InteractiveCLI::Buttonesque_ViewController
+        Zerk_::InteractiveCLI::ButtonesqueViewController
       end
 
       Here_ = self

@@ -40,13 +40,9 @@ module Skylab::SearchAndReplace
 
       _producer_producer = FOR___.fetch( @for )[]
 
-      x = _producer_producer[ self, & @_oes_p ]
+      _x = _producer_producer[ self, & @_oes_p ]
 
-      if x
-        @_producer = x ; ACHIEVED_
-      else
-        x
-      end
+      __store_trueish :@_producer, _x
     end
 
     FOR___ = {
@@ -58,6 +54,8 @@ module Skylab::SearchAndReplace
         Home_::Magnetics_::ReadOnly_FileSession_Stream_via_FileSession_Stream  # 1x
       end,
     }
+
+    define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_
 
     Here__ = self
   end

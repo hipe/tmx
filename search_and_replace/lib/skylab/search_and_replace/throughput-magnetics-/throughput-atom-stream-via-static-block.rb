@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Throughput_Magnetics_::Throughput_Atom_Stream_via_Static_Block
+  class ThroughputMagnetics_::Throughput_Atom_Stream_via_Static_Block
 
     def initialize charpos, ltss, big_string
       @big_string = big_string

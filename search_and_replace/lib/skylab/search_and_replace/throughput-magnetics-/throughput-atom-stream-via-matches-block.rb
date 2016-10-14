@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class Throughput_Magnetics_::Throughput_Atom_Stream_via_Matches_Block
+  class ThroughputMagnetics_::Throughput_Atom_Stream_via_Matches_Block
 
     def initialize o
 
@@ -99,10 +99,10 @@ module Skylab::SearchAndReplace
       @_cursor = @_match.match_end_charpos
 
       @_atom_stream = if @_match.replacement_is_engaged
-        Home_::Throughput_Magnetics_::Throughput_Atom_Stream_via_Replacement_and_LTSs.
+        Home_::ThroughputMagnetics_::Throughput_Atom_Stream_via_Replacement_and_LTSs.
           new( @_match, @_LTS_stream ).execute
       else
-        Home_::Throughput_Magnetics_::Throughput_Atom_Stream_via_Match_and_LTSs.
+        Home_::ThroughputMagnetics_::Throughput_Atom_Stream_via_Match_and_LTSs.
           new( @_match, @_LTS_stream ).execute
       end
 

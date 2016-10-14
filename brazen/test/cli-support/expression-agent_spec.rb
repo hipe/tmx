@@ -66,7 +66,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _common_begin
-      he = Home_::CLI_Support::Expression_Agent.instance.begin_handler_expresser
+      he = Home_::CLI_Support::ExpressionAgent.instance.begin_handler_expresser
       he.downstream_yielder = []
       he
     end

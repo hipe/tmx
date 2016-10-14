@@ -2,9 +2,7 @@ module Skylab::SearchAndReplace
 
   module CLI
 
-    NonInteractive_ViewEffecters = ::Module.new
-
-    class NonInteractive_ViewEffecters::Replace_All_in_File
+    class NonInteractiveViewEffecters::Replace_All_in_File
 
       # may become dual-purpose - imagine using it in [ts] at our [#024]
 

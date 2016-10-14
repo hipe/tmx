@@ -1,6 +1,6 @@
 module Skylab::SearchAndReplace
 
-  class String_Edit_Session_::Build_Before_Context_Stream___
+  class StringEditSession_::Build_Before_Context_Stream___
 
     # implement exactly [#013] 'going backwards for more lines of "before" context'
 

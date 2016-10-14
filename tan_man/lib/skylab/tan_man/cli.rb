@@ -139,7 +139,7 @@ module Skylab::TanMan
           s = s.to_path
         end
         if DIR_SEP___ == s.getbyte( 0 )
-          Brazen_::CLI_Support::Expression_Agent.pretty_path s
+          Brazen_::CLI_Support::ExpressionAgent.pretty_path s
         else
           s
         end

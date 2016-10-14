@@ -18,7 +18,7 @@ module Skylab::SearchAndReplace
 
           @method_call_chain = @method_call_chain.map( & :intern )
 
-          @custom_i_a = @method_call_chain - BUILTIN_FUNCTION_NAMES__
+          @custom_symbols = @method_call_chain - BUILTIN_FUNCTION_NAMES__
 
           _ok = ___resolve_fulfiller
           _ok && __via_fulfiller
@@ -26,14 +26,14 @@ module Skylab::SearchAndReplace
 
         def ___resolve_fulfiller
 
-          if @custom_i_a.length.zero?
+          if @custom_symbols.length.zero?
 
             fu = BUILTIN_FUNCTIONS__
 
           elsif @functions_dir
 
             fu = Build_fulfiller___.call(
-              @custom_i_a,
+              @custom_symbols,
               @functions_dir,
               & @_oes_p )
 
@@ -41,16 +41,12 @@ module Skylab::SearchAndReplace
             fu = ___when_no_functions_directory
           end
 
-          if fu
-            @fulfiller = fu ; ACHIEVED_
-          else
-            fu
-          end
+          __store_trueish :@fulfiller, fu
         end
 
         def ___when_no_functions_directory
 
-          sym_a = @custom_i_a
+          sym_a = @custom_symbols
 
           @_oes_p.call(
 
@@ -76,6 +72,8 @@ module Skylab::SearchAndReplace
             @fulfiller,
           )
         end
+
+        define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_
 
         class Replace_Expression___
 
@@ -123,26 +121,29 @@ module Skylab::SearchAndReplace
           Common_::Event.selective_builder_sender_receiver self
 
           def initialize sym_a, path, & oes_p
-            @custom_i_a = sym_a
+            @custom_symbols = sym_a
             @functions_directory = path
             @_oes_p = oes_p
           end
 
           def execute
 
-            set = ::Hash[ @custom_i_a.map { |i| [ i, true ] } ]
+            set = ::Hash[ @custom_symbols.map { |i| [ i, true ] } ]
 
-            @functions_pn = ::Pathname.new @functions_directory
-
-            pn_a = @functions_pn.children false  # meh on ENOENT
+            _entries = ::Dir.entries @functions_directory  # meh on ENOENT
+            scn = Common_::Polymorphic_Stream.via_array _entries
+            scn.gets_one == '.' || fail  # DOT_
+            scn.gets_one == '..' || fail  # DOT_DOT_
 
             @method_name_to_file = {}
 
-            pn_a.each do |cx_file_pn|
-              _stem = cx_file_pn.sub_ext( EMPTY_S_ ).to_path
-              meth_i = Common_::Name.via_slug( _stem ).as_variegated_symbol
-              set.delete meth_i  # OK if it didn't exist in set.
-              @method_name_to_file[ meth_i ] = cx_file_pn.to_path
+            until scn.no_unparsed_exists
+              entry = scn.gets_one
+              d = ::File.extname( entry ).length
+              _stem = d.zero? ? entry : entry[ 0 ... -d ]
+              meth_sym = Common_::Name.via_slug( _stem ).as_variegated_symbol
+              set.delete meth_sym  # OK if it didn't exist in set.
+              @method_name_to_file[ meth_sym ] = entry
             end
 
             if set.length.zero?
@@ -168,13 +169,12 @@ module Skylab::SearchAndReplace
                 }#{ Common_::Autoloader::EXTNAME }"
             end
 
-            _functions_dir = @functions_pn.to_path
-
             build_not_OK_event_with(
                 :missing_function_definitions,
                 :name_i_a, @missing_i_a,
                 :file_s_a, _file_s_a,
-                :functions_dir, _functions_dir ) do |y, o|
+                :functions_dir, @functions_directory,
+            ) do |y, o|
 
               a = o.name_i_a.map do |i|
                 ick i
@@ -196,8 +196,8 @@ module Skylab::SearchAndReplace
             resolve_class
 
             ok = true
-            @custom_i_a.each do |i|
-              @custom_i = i
+            @custom_symbols.each do |i|
+              @custom_symbol = i
               ok = load_file
               ok or break
             end
@@ -205,7 +205,10 @@ module Skylab::SearchAndReplace
           end
 
           def load_file
-            @path = @functions_pn.join( @method_name_to_file.fetch @custom_i ).to_path
+
+            _tail = @method_name_to_file.fetch @custom_symbol
+            @path = ::File.join @functions_directory, _tail
+
             ok = resolve_tree_guess_via_path
             ok &&= load @path  # will load again, take complains about redefined consts
             ok and via_tree_guess_and_loaded_path_resolve_function
@@ -213,16 +216,11 @@ module Skylab::SearchAndReplace
 
           def resolve_tree_guess_via_path
 
-            tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
+            _tree = Home_.lib_.system.filesystem.hack_guess_module_tree(
               @path,
               & @_oes_p )
 
-            if tree
-              @tree = tree
-              ACHIEVED_
-            else
-              tree
-            end
+            __store_trueish :@tree, _tree
           end
 
           def via_tree_guess_and_loaded_path_resolve_function
@@ -239,10 +237,10 @@ module Skylab::SearchAndReplace
                 m.const_get i, false
               end
 
-              if const_i_a.last.downcase == @custom_i
+              if const_i_a.last.downcase == @custom_symbol
                 @func = x
               else
-                @func = Autoloader_.const_reduce [ @custom_i ], x do end
+                @func = Autoloader_.const_reduce [ @custom_symbol ], x do end
               end
 
               @func and break
@@ -250,7 +248,7 @@ module Skylab::SearchAndReplace
               node.value_x = x
             end
             if ! @func  # search at toplevel
-              @func = Autoloader_.const_reduce [ @custom_i ], ::Object do end
+              @func = Autoloader_.const_reduce [ @custom_symbol ], ::Object do end
             end
             if @func
               when_func
@@ -262,7 +260,7 @@ module Skylab::SearchAndReplace
           Item__ = ::Struct.new :mod, :const_i_a
 
           def resolve_class
-            @normal_path = @functions_pn.expand_path
+            @normal_path = ::File.expand_path @functions_directory
             h = CLASS_CACHE__
             @class = h.fetch @normal_path do
               h[ @normal_path ] = allocate_new_class
@@ -280,7 +278,7 @@ module Skylab::SearchAndReplace
           end.call
 
           def when_func
-            @class.__send__ :define_method, @custom_i, @func
+            @class.__send__ :define_method, @custom_symbol, @func
             ACHIEVED_
           end
 
@@ -290,6 +288,8 @@ module Skylab::SearchAndReplace
               h[ @normal_path ] = @class.new
             end
           end
+
+          define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_
         end
 
         FULFILLER_CACHE__ = {}

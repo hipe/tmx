@@ -49,7 +49,7 @@ module Skylab::SearchAndReplace
       module CustomEffecters
         module Search
           Replace = -> x, cli do
-            CLI::NonInteractive_ViewEffecters::Replace_All_in_File.via__( x, cli ).execute
+            CLI::NonInteractiveViewEffecters::Replace_All_in_File.via__( x, cli ).execute
           end
         end
       end
