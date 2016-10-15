@@ -1,5 +1,12 @@
 # the perist calls narrative
 
+## prerequisite
+
+see [#007] README for development.
+
+
+
+
 ## introduction
 
 this is complex because we made it that way. deletions and insertions
@@ -37,6 +44,7 @@ comment and placing this whole span e.g at the end or in some otherwise
 undefined place within the section.
 
 
+
 ### defining terms near "function"
 
 identity is not composition. the report may contain multiple instances
@@ -55,6 +63,8 @@ because of what is perhaps a false requirement that we want our
 persistence files to be human-readable *and* editable, we have to keep
 in mind this difference between identity and composition as we re-write
 the file.
+
+
 
 
 ## note-25

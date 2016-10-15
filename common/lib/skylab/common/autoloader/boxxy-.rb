@@ -52,8 +52,9 @@ module Skylab::Common
 
       class Supplant___
 
-        def initialize a, seen, box
-          @a = a ; @box = box ; @seen = seen
+        def initialize a, seen, box, mod
+          @a = a ; @box = box
+          @module = mod ; @seen = seen
         end
 
         def execute
@@ -86,9 +87,13 @@ module Skylab::Common
         end
 
         def __then_do_something_else
+
           a = @a
+          p = @module.method :boxxy_const_guess_via_name
           @box.each_value do |pa|
-            a.push pa.name.as_const  # or maybe as_camelcase_const_string ..
+            _const = p[ pa.name ]
+            _const.respond_to? :id2name or self._SANITY
+            a.push _const
           end
           NIL
         end
@@ -108,6 +113,17 @@ module Skylab::Common
         end
 
         def execute  # result in name value pair
+
+          @_cm = Here_::ConstMissing_.new @wrong_const, @module
+
+          if @_cm.has_stowaway_hash_ && @_cm.has_stowaway_record_for_const_as_is_
+            @_cm.name_and_value_via_stowaway_
+          else
+            __normally
+          end
+        end
+
+        def __normally
           __for_now_we_will_assume_we_have_a_probable_asset_for_this_const
           __for_now_we_will_assume_that_the_value_is_not_known_for_this_asset
           __execute_that_real_const_missing
@@ -115,7 +131,6 @@ module Skylab::Common
 
         def __for_now_we_will_assume_we_have_a_probable_asset_for_this_const
 
-          @_cm = Here_::ConstMissing_.new @wrong_const, @module
           _slug = @_cm.name_.as_slug
           pa = @pool.__probable_asset_via_head _slug
           if ! pa
@@ -286,7 +301,7 @@ module Skylab::Common
         end
 
         def __supplant a
-          Supplant___.new( a, @_real_const_seen, @_box ).execute
+          Supplant___.new( a, @_real_const_seen, @_box, @module ).execute
           if @_box.length.zero?
             @is_empty = true
           end

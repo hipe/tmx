@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - mutator actions" do
+  describe "[cu] operations - mutator actions" do
 
     TS_[ self ]
     use :expect_event

@@ -4,15 +4,13 @@ module Skylab::Cull
 
     class Models__::Report
 
-      Actors__ = ::Module.new
-
-      class Actors__::Persist_calls < Common_::Actor::Dyadic
+      class Actors__::Persist_calls < Common_::Actor::Dyadic  # 1x
 
         # [#005] algorithm decribed in full
 
         def initialize a, o, & p
           @call_a = a
-          @on_event_selectively = p
+          @_emit = p
           @section = o
         end
 
@@ -53,7 +51,7 @@ module Skylab::Cull
 
           if main_node
             func = Home_::Models_::Function_.unmarshal(
-              main_node.value_x, & @on_event_selectively )
+              main_node.value_x, & @_emit )
             if func
               __add_span func, node_a
             else
@@ -80,7 +78,7 @@ module Skylab::Cull
 
         def __rewrite
           @nodes = []
-          @call_a.each do | func |
+          @call_a.each do |func|
 
             composition = func.composition
 
@@ -99,7 +97,6 @@ module Skylab::Cull
 
               @added_nodes.push new_node
               @nodes.push new_node
-
             end
           end
 
@@ -156,35 +153,44 @@ module Skylab::Cull
 
           case 1 <=> @removed_nodes.length
           when  0
-
-            maybe_send_event :info, :removed_function_call do
-              build_event_with :removed_function_call,
-                :function_call, @removed_nodes.first.value_x, :ok, nil
-            end
-            ACHIEVED_
+            __when_removed_one
           when -1
             self._PLURAL_FORM_OF_THE_SAME_EVENT
             ACHIEVED_
           end
+        end
+
+        def __when_removed_one
+          @_emit.call :info, :removed_function_call do
+            Build_event_.call(
+              :remove_function_call,
+              :function_call, @removed_nodes.first.value_x,
+              :ok, nil,
+            )
+          end
+          ACHIEVED_
         end
 
         def __maybe_emit_add_event
-
           case 1 <=> @added_nodes.length
           when  0
-
-            maybe_send_event :info, :added_function_call do
-              build_event_with :added_function_call,
-                :function_call, @added_nodes.first.value_x, :ok, nil
-            end
-            ACHIEVED_
+            __when_added_one
           when -1
             self._PLURAL_FORM_OF_THE_SAME_EVENT
             ACHIEVED_
           end
         end
 
-        include Simple_Selective_Sender_Methods_
+        def __when_added_one
+          @_emit.call :info, :added_function_call do
+            Build_event_.call(
+              :added_function_call,
+              :function_call, @added_nodes.first.value_x,
+              :ok, nil,
+            )
+          end
+          ACHIEVED_
+        end
 
         NAME__ = Common_::Name.via_variegated_symbol :function
       end

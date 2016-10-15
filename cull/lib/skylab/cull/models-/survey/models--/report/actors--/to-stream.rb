@@ -11,7 +11,7 @@ module Skylab::Cull
         def initialize es, a, & p
           @call_a = a
           @entity_stream = es
-          @on_event_selectively = p
+          @_emit = p
         end
 
         def execute
@@ -109,7 +109,7 @@ module Skylab::Cull
               Common_.stream do
                 ent = estream.gets
                 if ent
-                  func[ ent, & @on_event_selectively ]
+                  func[ ent, & @_emit ]
                 end
                 ent
               end
@@ -117,7 +117,7 @@ module Skylab::Cull
               Common_.stream do
                 ent = estream.gets
                 if ent
-                  ent = func[ ent, & @on_event_selectively ]
+                  ent = func[ ent, & @_emit ]
                 end
                 ent
               end
@@ -128,9 +128,9 @@ module Skylab::Cull
               if ent
                 mapishes.each do | func_ |
                   if :mutator == func_.category_symbol
-                    func_[ ent, & @on_event_selectively ]
+                    func_[ ent, & @_emit ]
                   else
-                    ent = func_[ ent, & @on_event_selectively ]
+                    ent = func_[ ent, & @_emit ]
                     ent or break
                   end
                 end
@@ -143,7 +143,7 @@ module Skylab::Cull
         end
 
         def estream_via_agg_and_estream agg, estream
-          agg[ estream, & @on_event_selectively ]
+          agg[ estream, & @_emit ]
         end
       end
     end

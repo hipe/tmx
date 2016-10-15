@@ -5,25 +5,28 @@ module Skylab::Cull
     class Unmarshal__  # see #note-006 in [#006]
 
       def initialize & oes_p
-        @on_event_selectively = oes_p
+        @_emit = oes_p
       end
 
       def unmarshal s
+
         @scn = Home_.lib_.string_scanner s
         ok = parse_prefix_and_resolve_box_module
-        ok &&= parse_function_name_and_resolve_function
+        ok &&= _parse_function_name_and_resolve_function
         ok &&= parse_any_args
         ok and flush
       end
 
       def unmarshal_via_call_expression_and_module s, box_mod
+
         @box_mod = box_mod
 
-        @prefix_name = Common_::Name.via_module(
-          Home_.lib_.basic::Module.value_via_relative_path( box_mod, '..' ) )
+        _mod = Home_.lib_.basic::Module.value_via_relative_path box_mod, DOT_DOT_
+
+        @prefix_name = Common_::Name.via_module _mod
 
         @scn = Home_.lib_.string_scanner s
-        ok = parse_function_name_and_resolve_function
+        ok = _parse_function_name_and_resolve_function
         ok &&= parse_any_args
         ok and flush
       end
@@ -31,7 +34,7 @@ module Skylab::Cull
     private
 
       def flush
-        Function_.new @args, @defined_function, @prefix_name.as_lowercase_with_underscores_symbol
+        Here_.new @args, @defined_function, @prefix_name.as_lowercase_with_underscores_symbol
       end
 
       def parse_prefix_and_resolve_box_module
@@ -56,21 +59,23 @@ module Skylab::Cull
 
         @prefix_name = Common_::Name.via_slug @prefix
 
-        @box_mod = Home_::Models_.const_get(
-          @prefix_name.as_const,
-          false )::Items__
+        _const = @prefix_name.as_const
+
+        _mod = Home_::Models_.const_get _const, false
+
+        @box_mod = _mod::Items__
 
         ACHIEVED_
       end
 
-      def parse_function_name_and_resolve_function
-          parse_function_name and resolve_function
+      def _parse_function_name_and_resolve_function
+        __parse_function_name && __resolve_function
       end
 
-      def parse_function_name
+      def __parse_function_name
         s = @scn.scan FUNC_NAME_RX___
         if s
-          @function_name = s
+          @_function_slug_head = s
           ACHIEVED_
         else
           expecting :function_name, FUNC_NAME_RX___
@@ -79,46 +84,68 @@ module Skylab::Cull
 
       FUNC_NAME_RX___ = /[a-z](?:[a-z0-9-]+[a-z0-9])?/
 
-      def resolve_function
+      def __resolve_function
 
-        nm = Common_::Name.via_slug @function_name
-        i_a = @box_mod.constants
+        # in one way we are strict and in another way lenient. strictly:
+        #   - function consts in the code must be Function_cased
+        #   - function names in the files must be slug-cased
+        # but leniently:
+        #   - you need only provide a unique head of the function name
+        #     (i.e only the start of the slug not the full slug)
 
-        found_a = Home_.lib_.basic::Fuzzy.reduce_array_against_string(
-          i_a, nm.as_const.id2name.downcase )
+        o = Fuzzy_lookup_fuction_name_prototype___[].dup
 
-        case 1 <=> found_a.length
-        when  1 ; when_none nm, i_a
-        when  0 ; when_one found_a.first
+        o.stream = @box_mod.to_special_boxxy_item_name_stream__
+
+        o.string = @_function_slug_head
+
+        a = o.execute
+
+        case 1 <=> a.length
+        when  0 ; __when_one a.fetch 0
+        when  1 ; __when_zero
         when -1 ; self._DO_ME_when_ambiguous found_a, i_a
         end
       end
 
-      def when_none nm, i_a
-        maybe_send_event :error, :uninitialized_constant do
-          build_not_OK_event_with :uninitialized_constant, :constant, nm.as_const
+      Fuzzy_lookup_fuction_name_prototype___ = Lazy_.call do
+
+        Home_.lib_.basic::Fuzzy.prototype_by do |o|
+
+          o.candidate_map = -> name do
+            name.as_slug
+          end
+
+          o.result_map = -> name do
+            # this const should not be Wide_Camel_Cased but Function_cased
+            # (preserve the casing that the name function was constructed with)
+            name.as_const
+          end
+        end
+      end
+
+      def __when_zero
+
+        _name = Common_::Name.via_slug @_function_slug_head
+
+        _partial_const = FUNCTION_NAME_CONVENTION_[ _name ]
+
+        @_emit.call :error, :uninitialized_constant do
+
+          Build_not_OK_event_[ :uninitialized_constant, :constant, _partial_const ]
         end
         UNABLE_
       end
 
-      include Simple_Selective_Sender_Methods_
+      def __when_one const
 
-      def when_one const
-
-        pair = Autoloader_.const_reduce(
-          :const_path, const,
-          :from_module, @box_mod,
-          :result_in_name_and_value,
-        )
-
-        x, const = pair.to_a
+        x = @box_mod.const_get const, false
 
         @defined_function = if x.respond_to? :name
           x
         else
           Proc_Wrapper___.new x, const, @box_mod
         end
-
         ACHIEVED_
       end
 
@@ -257,6 +284,7 @@ module Skylab::Cull
         end
       end
 
+      DOT_DOT_ = '..'
       QUOTED_STRING_TAIL_RX___ = /(\\"|[^"])*(?=")/
     end
   end

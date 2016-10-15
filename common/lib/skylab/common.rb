@@ -1072,6 +1072,10 @@ module Skylab::Common
         end
       end
 
+      def boxxy_const_guess_via_name nf
+        nf.as_const  # or maybe as_camelcase_const_string ..
+      end
+
       def _boxxy_controller
         @___boxxy_controller ||= Here_::Boxxy_::Controller.new self
       end

@@ -257,7 +257,7 @@ module Skylab::Brazen
           x = @target_map[ x ]
         end
 
-        o = Home_.lib_.basic::Fuzzy.new
+        o = Home_.lib_.basic::Fuzzy.begin
         o.string = x
         o.stream = @stream_builder.call
         o.candidate_map = @name_map

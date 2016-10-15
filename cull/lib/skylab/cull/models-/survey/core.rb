@@ -54,6 +54,8 @@ module Skylab::Cull
       send sh.m, * sh.a
     end
 
+    # ==
+
     class Edit_Shell__
 
       def initialize
@@ -84,6 +86,8 @@ module Skylab::Cull
       end
     end
 
+    # ==
+
     def __create_via_mutable_qualified_knownness_box_and_look_path bx, path
       @_path = path
       @persist_step_a ||= []
@@ -108,7 +112,7 @@ module Skylab::Cull
 
       cfg = Brazen_.collections::Git_Config.parse_path(
         _config_path,
-        & handle_event_selectively )
+        & @on_event_selectively )
 
       cfg and begin
         @_path = ::File.dirname ws_path
@@ -117,8 +121,6 @@ module Skylab::Cull
         self
       end
     end
-
-    include Simple_Selective_Sender_Methods_  # for above `handle_event_selectively`
 
     def path
       @_path
@@ -134,11 +136,8 @@ module Skylab::Cull
         self
       else
 
-        _ok = Survey_::Actors__::Edit_associated_entities[
-          arg_a,
-          bx,
-          self,
-          & handle_event_selectively ]
+        _ok = Here_::Actors__::Edit_associated_entities.call(
+          arg_a, bx, self, & @on_event_selectively )
 
         _ok and self
       end
@@ -151,8 +150,7 @@ module Skylab::Cull
     def re_persist is_dry  # assume a config for read
 
       @cfg_for_write = Brazen_.collections::Git_Config::Mutable.parse_input_id(
-        @cfg_for_read.input_id,
-        & handle_event_selectively )
+        @cfg_for_read.input_id, & @on_event_selectively )
 
       @cfg_for_read = nil
 
@@ -172,7 +170,7 @@ module Skylab::Cull
 
         ::File.join( workspace_path_, CONFIG_FILENAME_ ),
         :is_dry, is_dry,
-        & handle_event_selectively )
+        & @on_event_selectively )
     end
 
     # ~~ interface for the persistence script
@@ -198,7 +196,7 @@ module Skylab::Cull
     def __create_editable_document
       @cfg_for_read = nil
       @cfg_for_write = Brazen_.collections::Git_Config::Mutable.new(
-        & handle_event_selectively )
+        & @on_event_selectively )
       ACHIEVED_
     end
 
@@ -310,13 +308,13 @@ module Skylab::Cull
 
       if delete_these.length.zero?
         name_sym = :"no_#{ section_sym }_set"
-        maybe_send_event :error, name_sym do
-          build_not_OK_event_with name_sym
+        @on_event_selectively.call :error, name_sym do
+          Build_not_OK_event_[ name_sym ]
         end
         UNABLE_
       else
         a = cfg.sections.delete_these_ones delete_these
-        maybe_send_event :info, :"deleted_#{ section_sym }" do
+        @on_event_selectively.call :info, :"deleted_#{ section_sym }" do
           bld_deleted_slotular a, section_sym
         end
         ACHIEVED_
@@ -325,10 +323,11 @@ module Skylab::Cull
 
     def bld_deleted_slotular a, sym
 
-      build_event_with :"deleted_#{ sym }#{ 's' if 1 != a.length }",
-          :symbol, sym,
-          :count, a.length, :ok, true do | y, o |
-
+      Build_event_.call( :"deleted_#{ sym }#{ 's' if 1 != a.length }",
+        :symbol, sym,
+        :count, a.length,
+        :ok, true,
+      ) do |y, o|
         if 1 == o.count
           y << "deleted #{ par o.symbol.id2name }"
         else
@@ -363,10 +362,11 @@ module Skylab::Cull
 
       if ! ent
 
-        ent = Models__.const_get(
-          Common_::Name.via_variegated_symbol( ent_sym ).as_const,
-          false
-        ).new self, & handle_event_selectively
+        _const_s = Common_::Name.via_variegated_symbol( ent_sym ).as_camelcase_const_string
+
+        _cls = Models__.const_get _const_s, false
+
+        ent = _cls.new self, & @on_event_selectively
 
         @entities[ ent_sym ] = ent
       end
@@ -377,12 +377,24 @@ module Skylab::Cull
     # ~ misc public API for actors and actions
 
     def to_datapoint_stream_for_synopsis
-      @cfg_for_read.to_section_stream( & handle_event_selectively ).map_by do | x |
-        Survey_::Models__::Section_Summary.new x
+      @cfg_for_read.to_section_stream( & @on_event_selectively ).map_by do | x |
+        Here_::Models__::SectionSummary.new x
       end
     end
 
+    # ==
+
+    module Actions
+      Autoloader_[ self, :boxxy ]
+    end
+
+    # ==
+
     module Models__
+
+      define_singleton_method :tricky_index__, ( Lazy_.call do
+        Build_tricky_index___[ self ]
+      end )
 
       Autoloader_[ self, :boxxy ]
 
@@ -402,6 +414,8 @@ module Skylab::Cull
         KEEP_PARSING_
       end
     end
+
+    # ==
 
     module Survey_Action_Methods_
 
@@ -471,14 +485,14 @@ module Skylab::Cull
 
         path = Models_::Survey.any_nearest_path_via_looking_upwards_from_path(
           _qualified_knownness,
-          & handle_event_selectively )
+          & @on_event_selectively )
 
         path and rslv_existent_survey_via_existent_path path
       end
 
       def rslv_existent_survey_via_existent_path path
 
-        sv = Models_::Survey.edit_entity @kernel, handle_event_selectively do | edit |
+        sv = Models_::Survey.edit_entity @kernel, @on_event_selectively do | edit |
           edit.retrieve_via_workspace_path path
         end
 
@@ -489,9 +503,37 @@ module Skylab::Cull
       end
     end
 
+    # ==
+
+    Build_tricky_index___ = -> mod do
+
+      # workaround for new autoloader - reflect on all nodes in filesystem
+      # plus all registered stowaways.
+      # (boxxy doesn't reflect on stowaways but maybe it should [#co-041])
+
+      h = {}
+
+      st = mod.entry_tree.to_state_machine_stream
+      begin
+        sm = st.gets
+        sm || break
+        h[ sm.entry_group_head ] = true
+        redo
+      end while nil
+
+      mod.stowaway_hash_.keys.each do |k|
+        _slug = Common_::Name.via_const_symbol( k ).as_slug
+        h[ _slug ] = true
+      end
+
+      h
+    end
+
+    # ==
+
     COMMON_PROPERTIES_ = Survey_Action_Methods_.properties.to_value_stream.to_a
     CONFIG_FILENAME_ = 'config'.freeze
     FILENAME_ = 'cull-survey'.freeze
-    Survey_ = self
+    Here_ = self
   end
 end

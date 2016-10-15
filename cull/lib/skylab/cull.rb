@@ -10,12 +10,10 @@ module Skylab::Cull
 
   Autoloader_ = Common_::Autoloader
 
-  Autoloader_[ Models_ = ::Module.new, :boxxy ]
-
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
-  stowaway :CLI do
-    CLI = ::Class.new Brazen_::CLI
+  lazily :CLI do
+    ::Class.new Brazen_::CLI
   end
 
   module API
@@ -27,6 +25,10 @@ module Skylab::Cull
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
     end  # >>
+  end
+
+  module Models_
+    Autoloader_[ self, :boxxy ]
   end
 
   Models_::Ping = -> bound, & oes_p do
@@ -43,9 +45,11 @@ module Skylab::Cull
     :hello_from_cull
   end
 
+  Lazy_ = Common_::Lazy
+
   class << self
 
-    define_method :application_kernel_, ( Common_.memoize do
+    define_method :application_kernel_, ( Lazy_.call do
       Brazen_::Kernel.new Home_
     end )
 
@@ -58,6 +62,8 @@ module Skylab::Cull
 
     Brazen_::Entity::Apply_entity[ Brazen_::Modelesque::Entity, x_a, & x_p ]
   end
+
+  # == METHODS
 
   HARD_CALL_METHOD_ = -> * values, arg_box, & oes_p do  # 1x
 
@@ -101,29 +107,60 @@ module Skylab::Cull
     o.execute
   end
 
-  module Simple_Selective_Sender_Methods_
-  private
-    def maybe_send_event * i_a, & ev_p
-      @on_event_selectively.call( * i_a, & ev_p )
-    end
-
-    def build_not_OK_event_with * i_a, & msg_p
-      i_a.push :ok, false
-      Common_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
-    end
-
-    def build_event_with * i_a, & msg_p
-      Common_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
-    end
-
-    def handle_event_selectively
-      @on_event_selectively
-    end
+  FUNCTION_NAME_CONVENTION_ = -> name do
+    s = name.as_lowercase_with_underscores_string
+    s[ 0 ] = s[ 0 ].upcase
+    s.intern
   end
+
+  module Special_boxxy_
+
+    # memoize special index information about its constituency *into* the
+    # module for use in unmarshaling
+
+    class << self
+      def call mod
+         Autoloader_[ mod, :boxxy ]
+         mod.extend self ; nil
+      end
+      alias_method :[], :call
+    end  # >>
+
+    def to_special_boxxy_item_name_stream__
+      _a = ( @___special_index ||= __build_item_index_array )
+      Common_::Stream.via_nonsparse_array _a
+    end
+
+    def __build_item_index_array
+
+      _hi = constants  # assume these are boxxy (some or all are inferred)
+
+      _hey = _hi.map do |const|
+        Common_::Name.via_const_symbol const
+      end
+
+      _hey.freeze
+    end
+
+    define_method :boxxy_const_guess_via_name, FUNCTION_NAME_CONVENTION_
+  end
+
+  # == FUNCTIONS
 
   Attributes_ = -> h do
     Home_.lib_.fields::Attributes[ h ]
   end
+
+  Build_not_OK_event_ = -> * i_a, & msg_p do
+    i_a.push :ok, false
+    Common_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+  end
+
+  Build_event_ = -> * i_a, & msg_p do
+    Common_::Event.inline_via_iambic_and_any_message_proc_to_be_defaulted i_a, msg_p
+  end
+
+  # ==
 
   module Lib_
 
@@ -156,6 +193,8 @@ module Skylab::Cull
     end
   end
 
+  # ==
+
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
   Action_ = Brazen_::Action
@@ -166,6 +205,4 @@ module Skylab::Cull
   Model_ = Brazen_::Model
   NIL_ = nil
   UNABLE_ = false
-
-
 end

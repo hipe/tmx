@@ -9,7 +9,7 @@ module Skylab::Cull
         @call_a = nil
 
         @survey = survey
-        @on_event_selectively = oes_p
+        @_emit = oes_p
 
         cfg = survey.config_for_read_
         if cfg
@@ -28,7 +28,7 @@ module Skylab::Cull
           :function == ast.external_normal_name_symbol or next  # for now
 
           func = Home_::Models_::Function_.unmarshal(
-            ast.value_x, & @on_event_selectively )
+            ast.value_x, & @_emit )
 
           if func
             @call_a.push func
@@ -98,14 +98,15 @@ module Skylab::Cull
       end
 
       def __maybe_send_not_found_event func
-        maybe_send_event :error, :function_call_not_found do
-          build_not_OK_event_with :function_call_not_found,
-            :function_identifier, func.marshal
+
+        @_emit.call :error, :function_call_not_found do
+          Build_not_OK_event_.call(
+            :function_call_not_found,
+            :function_identifier, func.marshal,
+          )
         end
         nil
       end
-
-      include Simple_Selective_Sender_Methods_
 
       def __remove indexes_to_nil_out_afterwards
         _ensure_persist
@@ -138,8 +139,9 @@ module Skylab::Cull
       end
 
       def __persist_calls
-        Report_::Actors__::Persist_calls[ @call_a, @section,
-          & handle_event_selectively ]
+
+        Me__::Actors__::Persist_calls.call(
+          @call_a, @section, & @_emit )
       end
 
       # ~
@@ -148,14 +150,13 @@ module Skylab::Cull
 
         if @call_a && @call_a.length.nonzero?
 
-          Report_::Actors__::To_stream[ st, @call_a, & @on_event_selectively ]
-
+          Me__::Actors__::To_stream[ st, @call_a, & @_emit ]
         else
           st
         end
       end
 
-      Report_ = self
+      Me__ = self
     end
   end
 end

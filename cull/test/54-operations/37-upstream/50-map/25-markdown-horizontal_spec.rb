@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - upstream map (markdown (horizontal)" do
+  describe "[cu] operations - upstream map (markdown (horizontal)" do
 
     TS_[ self ]
     use :expect_event

@@ -2,8 +2,6 @@ module Skylab::Cull
 
   class Models_::Upstream
 
-    Actions = ::Module.new
-
     class Actions::Map < Action_
 
       Brazen_::Modelesque.entity self,

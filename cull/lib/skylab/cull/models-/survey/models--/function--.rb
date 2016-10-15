@@ -6,7 +6,7 @@ module Skylab::Cull
 
       def initialize survey, & oes_p
         @survey = survey
-        @on_event_selectively = oes_p
+        @_emit = oes_p
       end
 
       def add arg, box
@@ -34,7 +34,7 @@ module Skylab::Cull
       def _batch arg, box, m
         ok = true
 
-        arg.value_x.each do | s |
+        arg.value_x.each do |s|
           ok = __parse s
           ok or break
           ok = send m, ok
@@ -48,7 +48,7 @@ module Skylab::Cull
         Home_::Models_::Function_.unmarshal_via_string_and_module(
           s,
           my_box_module,
-          & @on_event_selectively )
+          & @_emit )
       end
 
       def _report_associated_entity

@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey - aggregators" do
+  describe "[cu] operations - survey - aggregators" do
 
     TS_[ self ]
     use :expect_event
@@ -21,9 +21,12 @@ module Skylab::Cull::TestSupport
 
       td = prepare_tmpdir_with_patch_ :with_fuzz_biff
 
-      call_API :survey, :edit,
+      _path = td.to_path
+
+      call_API( :survey, :edit,
         :add_aggregator, 'unique-features',
-        :path, td.to_path
+        :path, _path,
+      )
 
       expect_neutral_event :added_function_call
 

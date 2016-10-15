@@ -47,7 +47,7 @@ module Skylab::Basic  # introduction at [#020]
 
       def reduce_array_against_string a, s, * p_a, & p
         p and p_a.push p
-        o = new
+        o = self.begin
         o.sparse_array = a
         o.string = s
         o.procs = p_a
@@ -56,12 +56,21 @@ module Skylab::Basic  # introduction at [#020]
 
       def reduce_to_array_stream_against_string st, s, * p_a, & p
         p and p_a.push p
-        o = new
+        o = self.begin
         o.stream = st
         o.string = s
         o.procs = p_a
         o.execute
       end
+
+      def prototype_by
+        o = self.begin
+        yield o
+        o.freeze
+      end
+
+      alias_method :begin, :new
+      undef_method :new
     end  # >>
 
     def initialize
@@ -75,7 +84,6 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def sparse_array= a
-
       _nonsparse_array = a.select( & IDENTITY_ ).to_a
       @stream = Common_::Stream.via_nonsparse_array _nonsparse_array
       a

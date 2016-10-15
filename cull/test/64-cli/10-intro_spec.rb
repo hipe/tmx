@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Cull::TestSupport
 
   describe "[cu] clients - CLI" do
 
     TS_[ self ]
-    use :clients_CLI
+    use :CLI
 
     it "0   no args" do
       invoke

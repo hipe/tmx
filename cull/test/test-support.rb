@@ -25,9 +25,11 @@ module Skylab::Cull::TestSupport
 
   extend TestSupport_::Quickie
 
+  # -
     The_use_method___ = -> sym do
       TS_.___lib( sym )[ self ]
     end
+  # -
 
   module Instance_Methods___
 
@@ -118,21 +120,27 @@ module Skylab::Cull::TestSupport
     end
   end
 
-  Common__ = ::Skylab::Common
+  # ==
 
-  Config_filename___ = Common__.memoize do
+  Home_ = ::Skylab::Cull
+
+  Lazy_ = Home_::Lazy_
+
+  Config_filename___ = Lazy_.call do
     o = Home_::Models_::Survey
     ::File.join o::FILENAME_, o::CONFIG_FILENAME_
   end
 
   Expect_Event = -> test_context_class do
-    Common__.test_support::Expect_Event[ test_context_class ]
+    Common___.test_support::Expect_Event[ test_context_class ]
   end
 
-  Common__::Autoloader[ self,  ::File.dirname( __FILE__ ) ]
+  Autoloader_ = Home_::Autoloader_
 
+  Autoloader_[ self,  ::File.dirname( __FILE__ ) ]
+
+  Common___ = ::Skylab::Common
   DASH_ = '-'
-  Home_ = ::Skylab::Cull
   NEWLINE_ = "\n"
   UNDERSCORE_ = '_'
   TS_ = self

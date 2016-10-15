@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Upstream
 
-    class Adapters__::Markdown < Upstream_::File_Based_Adapter_
+    class Adapters__::Markdown < Here_::FileBasedAdapter_
 
       EXTENSIONS = %w( .md .markdown )
 
@@ -19,11 +19,12 @@ module Skylab::Cull
       end
 
       def to_descriptive_event
-        build_event_with(
-            :markdown_upstream,
-            :path, @path,
-            :ok, true ) do | y, o |
 
+        Build_event_.call(
+          :markdown_upstream,
+          :path, @path,
+          :ok, true,
+        ) do |y, o|
           y << "markdown file: #{ pth o.path }"
         end
       end
@@ -40,15 +41,17 @@ module Skylab::Cull
 
         @line_stream = Home_.lib_.filesystem.line_stream_via_path @path
 
-        Self_::Table_scanner_via_line_stream__[ @line_stream, & @on_event_selectively ]
+        Me___::Table_scanner_via_line_stream__[ @line_stream, & @_emit ]
       end
 
       def event_for_fell_short_of_count wanted_number, had_number
 
-        build_not_OK_event_with :early_end_of_stream,
-            :stream_identifier, @line_stream.to_identifier,
-            :wanted_number, wanted_number,
-            :had_number, had_number do | y, o |
+        Build_not_OK_event_.call(
+          :early_end_of_stream,
+          :stream_identifier, @line_stream.to_identifier,
+          :wanted_number, wanted_number,
+          :had_number, had_number,
+        ) do |y, o|
 
           want = o.wanted_number
           had = o.had_number
@@ -71,7 +74,7 @@ module Skylab::Cull
         end
       end
 
-      Self_ = self
+      Me___ = self
     end
   end
 end

@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey - mutator" do
+  describe "[cu] operations - survey - mutator" do
 
     TS_[ self ]
     use :expect_event
@@ -65,15 +65,14 @@ module Skylab::Cull::TestSupport
 
     it "take an existing survey, add a function, run it (does not persist)" do
 
-      call_API :survey,
+      _path = dir :two_tables
 
+      call_API( :survey,
         :reduce,
-
         :add_mutator, 'split-and-promote-property(misc tags, yes, ",")',
-
         :table_number, 1,
-
-        :path, dir( :two_tables )
+        :path, _path,
+      )
 
       expect_no_events
       st = @result

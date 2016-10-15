@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    class Models__::Section_Summary
+    class Models__::SectionSummary
 
       # #hook-in [#br-021]
 

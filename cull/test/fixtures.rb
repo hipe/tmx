@@ -2,17 +2,18 @@ module Skylab::Cull::TestSupport
 
   module Fixtures
 
+    HEAD__ = TS_.dir_path
+
     module Directories
 
       class << self
         def [] sym
           _tail = sym.id2name.gsub UNDERSCORE_, DASH_
-          ::File.join dir_path, _tail
+          ::File.join @dir_path, _tail
         end
       end  # >>
 
-      Home_::Autoloader_[ self ]
-
+      Autoloader_[ self, ::File.join( HEAD__, 'fixture-directories' ) ]
     end
 
     module Files
@@ -21,16 +22,23 @@ module Skylab::Cull::TestSupport
 
         p = -> sym do
 
-          path = Files.dir_path
-          path_a = ::Dir.glob( "#{ path }/*" )
+          dir = Files.dir_path
+
+          path_a = ::Dir.glob( "#{ dir }/*" )
+
           h = {}
-          path_a.each do | path_ |
-            s = ::File.basename path_
-            h[ s.gsub( BLACK_RX__, UNDERSCORE_ ).intern ] = s
+
+          path_a.each do |path|
+
+            s = ::File.basename path
+            _key = s.gsub( BLACK_RX__, UNDERSCORE_ ).intern
+            h[ _key ] = s
           end
+
           p = -> sym_ do
-            ::File.join path, h.fetch( sym_ )
+            ::File.join dir, h.fetch( sym_ )
           end
+
           p[ sym ]
         end
 
@@ -41,8 +49,7 @@ module Skylab::Cull::TestSupport
 
       BLACK_RX__ = /[^[:alnum:]]/
 
-      Home_::Autoloader_[ self ]
-
+      Autoloader_[ self, ::File.join( HEAD__, 'fixture-files' ) ]
     end
 
     module Patches
@@ -50,12 +57,11 @@ module Skylab::Cull::TestSupport
       class << self
         def [] sym
           _tail = "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.patch"
-          ::File.join dir_path, _tail
+          ::File.join @dir_path, _tail
         end
       end  # >>
 
-      Home_::Autoloader_[ self ]
-
+      Autoloader_[ self, ::File.join( HEAD__, 'fixture-patches' ) ]
     end
 
     DOT_ = '.'.freeze

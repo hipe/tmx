@@ -6,7 +6,7 @@ module Skylab::Cull
 
       def initialize survey, & oes_p
         @survey = survey
-        @on_event_selectively = oes_p
+        @_emit = oes_p
 
         cfg = survey.config_for_read_
         if cfg
@@ -45,7 +45,7 @@ module Skylab::Cull
         end
 
         if bx.length.nonzero?
-          @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @on_event_selectively do | edit |
+          @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @_emit do | edit |
             edit.derelativizer @survey
             edit.mutable_value_box bx
           end
@@ -87,7 +87,7 @@ module Skylab::Cull
 
       def _set arg, bx
 
-        @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @on_event_selectively do | edit |
+        @_top_entity = Models_::Upstream.edit_entity @survey.kernel, @_emit do | edit |
           edit.derelativizer @survey
           edit.mutable_qualified_knownness_box bx
         end
@@ -117,7 +117,7 @@ module Skylab::Cull
       end
 
       def __maybe_send_set_event
-        @on_event_selectively.call :info, :set_upstream do
+        @_emit.call :info, :set_upstream do
           @_top_entity.to_event
         end
         ACHIEVED_

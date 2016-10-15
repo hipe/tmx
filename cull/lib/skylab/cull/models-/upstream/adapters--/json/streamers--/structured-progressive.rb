@@ -4,8 +4,6 @@ module Skylab::Cull
 
     class Adapters__::JSON
 
-      Streamers__ = ::Module.new
-
       class Streamers__::Structured_progressive
 
         class << self

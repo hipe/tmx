@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models_::Upstream
 
-      class File_Based_Adapter_
+      class FileBasedAdapter_
 
         class << self
 
@@ -13,10 +13,8 @@ module Skylab::Cull
 
         def initialize path, & oes_p
           @path = path
-          @on_event_selectively = oes_p
+          @_emit = oes_p
         end
-
-        include Simple_Selective_Sender_Methods_
 
         def to_mutable_marshal_box_for_survey_ survey
 
@@ -38,7 +36,7 @@ module Skylab::Cull
           if estream
             estream
           else
-            maybe_send_event :error, :early_end_of_stream do
+            @_emit.call :error, :early_end_of_stream do
               event_for_fell_short_of_count d, count
             end
           end

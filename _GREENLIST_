@@ -27,3 +27,4 @@ myterm/test
 doc_test/test
 search_and_replace/test
 code_metrics/test
+cull/test

@@ -1,6 +1,6 @@
 module Skylab::Cull::TestSupport
 
-  module Clients::CLI
+  module CLI
 
     def self.[] tcc
 

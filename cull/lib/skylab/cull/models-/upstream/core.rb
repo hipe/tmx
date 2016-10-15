@@ -63,10 +63,7 @@ module Skylab::Cull
 
     def _process_edit sh
 
-      x = Upstream_::Actors__::Produce_adapter[
-        sh.bx,
-        & @on_event_selectively ]
-
+      x = Here_::Actors__::Produce_adapter[ sh.bx, & @on_event_selectively ]
       x and begin
         @_adapter = x
         self
@@ -99,7 +96,18 @@ module Skylab::Cull
       @_adapter.event_for_fell_short_of_count needed_number, had_number
     end
 
-    Upstream_ = self
+    # ==
 
+    module Actions
+      Autoloader_[ self, :boxxy ]
+    end
+
+    module Adapters__
+      Autoloader_[ self, :boxxy ]
+    end
+
+    # ==
+
+    Here_ = self
   end
 end

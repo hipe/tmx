@@ -53,7 +53,7 @@ module Skylab::Cull
         def initialize ls, & p
           @is_inside_of_a_table = false
           @line_stream = ls
-          @on_event_selectively = p
+          @_emit = p
           @strscn = nil
         end
 
@@ -181,12 +181,12 @@ module Skylab::Cull
         HYPHEN_CEL_RX__ = /\A[ \t]*:?-+:?[ \t]*\z/
 
         def go_vertical sexp
-          Self_::Vertical__.new @line_stream, sexp, & @on_event_selectively
+          Self__::Vertical__.new @line_stream, sexp, & @_emit
         end
 
         def go_horizontal
-          Self_::Horizontal__.new @line_stream, @next_line, @line,
-            & @on_event_selectively
+          Self__::Horizontal__.new @line_stream, @next_line, @line,
+            & @_emit
         end
 
         def advance_by_one
@@ -259,8 +259,7 @@ module Skylab::Cull
 
         PIPE_S_ = '|'
 
-        Self_ = self
-
+        Self__ = self
       end
     end
   end

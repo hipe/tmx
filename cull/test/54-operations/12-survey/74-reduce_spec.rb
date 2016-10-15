@@ -1,8 +1,8 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - survey - reduce (integrate with markdown)" do
+  describe "[cu] operations - survey - reduce (integrate with markdown)" do
 
     TS_[ self ]
     use :expect_event

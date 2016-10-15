@@ -2,15 +2,13 @@ module Skylab::Cull
 
   class Models_::Survey
 
-    Autoloader_[ Actions = ::Module.new, :boxxy ]
-
     # ~ begin stowaways
 
     class Actions::Ping < Action_
 
       def produce_result
 
-        maybe_send_event :info, :ping do
+        @on_event_selectively.call :info, :ping do
           app_name = @kernel.app_name
           build_OK_event_with :ping do | y, o |
             y << "#{ app_name } says #{ highlight 'hello' }"
@@ -62,7 +60,7 @@ module Skylab::Cull
 
       def ___via_survey
 
-        ok = Survey_::Actors__::Create[ @_survey, @bx, & @on_event_selectively ]
+        ok = Here_::Actors__::Create[ @_survey, @bx, & @on_event_selectively ]
         if ok
 
           Common_::Emission.of :info, :created_survey do

@@ -59,7 +59,7 @@
 [#042] #open easy refactor (see)
              ( #was: #moved-to [#fi-016] )
 
-[#041] #hole
+[#041] #wish if boxxy ever reflects on stowaways
              ( #was: #parent-node: [#024] what are hybrid boxxy nodes? )
 [#040]       #parent-node: [#023] the callback pattern
 [#039]       #parent-node: [#037] #in-situ the cb method naming conventions

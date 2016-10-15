@@ -15,40 +15,64 @@ module Skylab::Cull
       )
 
       def execute
-        ok = ACHIEVED_
 
+        ok = ACHIEVED_
         st = Common_::Stream.via_nonsparse_array @passed_arg_a
 
-        while arg = st.gets
+        begin
+          @_arg = st.gets
+          @_arg || break
 
-          md = RX___.match arg.name_symbol
-
-          ok = if md
-
-            via_associated_entity( arg,
-              md[ :add ] ? :add : :remove,
-              md[ :stem ].intern )
-
-          elsif Models__.const_defined?( arg.name.as_const, false )
-
-            via_associated_entity( arg,
-              :set,
-              arg.name.as_lowercase_with_underscores_symbol )
-
+          ok = if __looks_verby
+            __when_verby
+          elsif __has_model
+            __when_model
           else
             KEEP_PARSING_
           end
-          ok or break
-        end
+
+          ok ? redo : break
+        end while above
         ok
+      end
+
+      def __looks_verby
+
+        md = RX___.match @_arg.name_symbol
+        if md
+          @__matchdata = md
+          ACHIEVED_
+        end
+      end
+
+      def __when_verby
+
+        md = remove_instance_variable :@__matchdata
+
+        _add_or_remove = md[ :add ] ? :add : :remove
+        _ok = _via_associated_entity _add_or_remove, md[ :stem ].intern
+        _ok  # #todo
+      end
+
+      def __has_model
+
+        _h = Models__.tricky_index__
+        _slug = @_arg.name.as_slug
+        _h[ _slug ]
+      end
+
+      def __when_model
+
+        _sym = @_arg.name.as_lowercase_with_underscores_symbol
+        _via_associated_entity :set, _sym
       end
 
       RX___ = /\A(?:(?<add>add_)|(?<remove>remove_))(?<stem>.+)/
 
-      def via_associated_entity arg, verb_sym, ent_sym
+      def _via_associated_entity verb_sym, ent_sym
 
         _ = @survey.touch_associated_entity_ ent_sym
-        _.send verb_sym, arg, @arg_box
+        _.send verb_sym, @_arg, @arg_box
       end
     end
   end

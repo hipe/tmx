@@ -1,5 +1,14 @@
 # the datamodel by way of an introduction
 
+## prerequisite
+
+see [#007] README for development.
+
+
+
+
+## overview
+
     +--------+      +---------------+
     | survey | ---- | entity stream |
     +--------+      +---------------+
@@ -66,7 +75,7 @@ perhaps being presented as well).
 ## the datamodel
 
 a "survey" is a component whose role is largely to provide
-encapsulation: it couples *one* "entity stream" with one "critera" to
+encapsulation: it couples *one* "entity stream" with one "criteria" to
 produce one "report". currently we are conceptualizing a "report" as an
 effemeral thing; i.e one that does not have direct representation as an
 "entity" (in the [br] sense) in our datamodel.

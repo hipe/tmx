@@ -2,9 +2,7 @@ module Skylab::Cull
 
   class Models_::Upstream
 
-      Autoloader_[ ( Adapters__ = ::Module.new ), :boxxy ]  # ~ stowaway
-
-      class Adapters__::JSON < Upstream_::File_Based_Adapter_
+      class Adapters__::JSON < Here_::FileBasedAdapter_
 
         EXTENSIONS = %w( .json )
 
@@ -13,11 +11,12 @@ module Skylab::Cull
         end
 
         def to_descriptive_event
-          build_event_with(
-              :json_upstream,
-              :path, @path,
-              :ok, true ) do | y, o |
 
+          Build_event_.call(
+            :json_upstream,
+            :path, @path,
+            :ok, true
+          ) do |y, o|
             y << "JSON file: #{ pth o.path }"
           end
         end
@@ -37,7 +36,7 @@ module Skylab::Cull
         def to_entity_stream
           fh = ::File.open @path, 'r'  # READ_MODE_
           if FIRST_LINE_LOOKS_LINE_STREAMING__ == fh.gets
-            JSON_::Streamers__::Structured_progressive[ fh, & @on_event_selectively ]
+            JSON_::Streamers__::Structured_progressive[ fh, & @_emit ]
           else
             fh.rewind
             self._DO_ME
@@ -51,10 +50,13 @@ module Skylab::Cull
 
         def event_for_fell_short_of_count wanted_number, had_number
 
-          build_not_OK_event_with :early_end_of_stream,
-              :stream_identifier, Home_.lib_.basic::Pathname.identifier.new( @path ),
-              :wanted_number, wanted_number,
-              :had_number, had_number do | y, o |
+          _pathname_ID = Home_.lib_.basic::Pathname.identifier.new @path
+          Build_not_OK_event_.call(
+            :early_end_of_stream,
+            :stream_identifier, _pathname_ID,
+            :wanted_number, wanted_number,
+            :had_number, had_number,
+          ) do |y, o|
 
             want = o.wanted_number
             had = o.had_number

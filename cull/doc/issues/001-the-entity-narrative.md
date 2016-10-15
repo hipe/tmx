@@ -1,5 +1,12 @@
 # the entity narrative :[#001]
 
+## prerequisite
+
+see [#007] README for development.
+
+
+
+
 ## introduction
 
 both because and in spite of the various exploitation that it receives

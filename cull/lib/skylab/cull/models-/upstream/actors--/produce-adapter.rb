@@ -20,7 +20,7 @@ module Skylab::Cull
       end  # >>
 
       def initialize & oes_p
-        @on_event_selectively = oes_p
+        @_emit = oes_p
       end
 
       def execute
@@ -59,15 +59,13 @@ module Skylab::Cull
 
       def when_prefix
 
-        maybe_send_event :error, :invalid_prefix do
+        @_emit.call :error, :invalid_prefix do
 
           _s_a = get_available_prefixes
 
           Home_.lib_.fields::Events::Extra.new_via [ @prefix ], _s_a, "prefix"
         end
       end
-
-      include Simple_Selective_Sender_Methods_
 
       def get_available_prefixes
         rx = /\Aprocess_as_([a-z_0-9]+)_identifier_string\z/
@@ -103,8 +101,9 @@ module Skylab::Cull
       end
 
       def when_relpath path
-        maybe_send_event :error, :path_must_be_absolute do
-          build_not_OK_event_with :path_must_be_absolute, :path, path
+
+        @_emit.call :error, :path_must_be_absolute do
+          Build_not_OK_event_[ :path_must_be_absolute, :path, path ]
         end
         UNABLE_
       end
@@ -114,7 +113,7 @@ module Skylab::Cull
         yes = Home_.lib_.system.filesystem.normalization( :Upstream_IO ).call(
           :path, path,
           :must_be_ftype, :FILE_FTYPE,
-          & @on_event_selectively )
+          & @_emit )
 
         if yes
           when_path_resolved_as_valid_one_time path
@@ -146,9 +145,9 @@ module Skylab::Cull
 
       def __class_via_extension ext
 
-        Upstream_::Adapters__.constants.reduce nil do | m, const |
+        Here_::Adapters__.constants.reduce nil do | m, const |
 
-          cls = Upstream_::Adapters__.const_get const, false
+          cls = Here_::Adapters__.const_get const, false
 
           cls::EXTENSIONS.include?( ext ) and break cls
 
@@ -168,14 +167,14 @@ module Skylab::Cull
       end
 
       def __class_via_const_guess x
-        Autoloader_.const_reduce( x, Upstream_::Adapters__ ) do  end
+        Autoloader_.const_reduce( x, Here_::Adapters__ ) do  end
       end
 
       def when_bad_extension extname
 
-        maybe_send_event :error, :invalid_extension do
+        @_emit.call :error, :invalid_extension do
 
-          _s_a = get_upstream_adapters_names.map do | nm |
+          _s_a = _get_upstream_adapters_names.map do | nm |
             ".#{ nm.as_slug }"
           end
 
@@ -187,9 +186,9 @@ module Skylab::Cull
 
       def when_bad_adapter sym
 
-        maybe_send_event :error, :invalid_adapter do
+        @_emit.call :error, :invalid_adapter do
 
-          _s_a = get_upstream_adapters_names.map do | nm |
+          _s_a = _get_upstream_adapters_names.map do | nm |
             nm.as_lowercase_with_underscores_symbol
           end
 
@@ -199,9 +198,9 @@ module Skylab::Cull
         UNABLE_
       end
 
-      def get_upstream_adapters_names
+      def _get_upstream_adapters_names
 
-        Upstream_::Adapters__.constants.reduce [] do | m, x |
+        Here_::Adapters__.constants.reduce [] do | m, x |
           m.push Common_::Name.via_const_symbol x
           m
         end
@@ -211,9 +210,9 @@ module Skylab::Cull
 
       def adapter_via_path_and_class path, cls
         if @table_number
-          cls.via_table_number_and_path @table_number, path, & @on_event_selectively
+          cls.via_table_number_and_path @table_number, path, & @_emit
         else
-          cls.via_path path, & @on_event_selectively
+          cls.via_path path, & @_emit
         end
       end
     end

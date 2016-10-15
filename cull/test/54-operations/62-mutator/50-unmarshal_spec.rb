@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Cull::TestSupport
 
-  describe "[cu] models - mutator - parse args (unit test)" do
+  describe "[cu] operations - mutator - parse args (unit test)" do
 
     TS_[ self ]
 

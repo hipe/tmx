@@ -18,7 +18,7 @@ module Skylab::Cull
       end  # >>
 
       def initialize & oes_p
-        @on_event_selectively = oes_p
+        @_emit = oes_p
       end
 
       def execute
@@ -36,7 +36,7 @@ module Skylab::Cull
 
           :create,
 
-          & @on_event_selectively )
+          & @_emit )
 
         if kn
 
