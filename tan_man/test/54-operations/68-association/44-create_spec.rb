@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models association create" do
+  describe "[tm] operations - association create" do
 
     TS_[ self ]
     use :expect_line
@@ -26,7 +26,7 @@ module Skylab::TanMan::TestSupport
       end
     end
 
-    using_input '../../node/fixtures/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
+    using_input '../fixture-dot-files-for-node/simple-prototype-and-graph-with/zero-but-with-leading-space.dot' do
 
       it 'associates nodes when neither exists, creating them' do
 

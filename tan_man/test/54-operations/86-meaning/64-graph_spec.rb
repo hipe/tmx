@@ -2,9 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - meaning graph (resolving (i.e expand NT into N T's))" do
+  describe "[tm] operations - meaning graph (resolving (i.e expand NT into N T's))" do
 
     TS_[ self ]
+    use :the_method_called_let
     use :models_meaning_graph
 
     context "with an empty graph" do
@@ -46,12 +47,15 @@ module Skylab::TanMan::TestSupport
       end
 
       it "the one meaning - nerp" do
+
         ev = nil
+
         arr = graph.meaning_values_via_meaning_name 'angry-color' do | *, & ev_p |
           ev = ev_p[]
-          :_hai_3_
+          :_TM_NO_SEE_
         end
-        arr.should eql :_hai_3_
+
+        arr == false || fail
         trail_a = ev.trail_a
         trail_a.length.should eql( 2 )
         trail_a.should eql( [ :'angry-color', :red ] )
@@ -124,12 +128,16 @@ module Skylab::TanMan::TestSupport
       end
 
       it "which is cool for rich error reporting" do
+
         ev = nil
+
         arr = graph.meaning_values_via_meaning_name 'finished' do | *, & ev_p |
           ev = ev_p[]
-          :_hai_2_
+          :_TM_NO_SEE_
         end
-        arr.should eql :_hai_2_
+
+        arr == false || fail
+
         trail_a = ev.trail_a
         stack_a = [ "#{ trail_a.last } has no meaning." ]
         if 1 < trail_a.length
@@ -160,12 +168,15 @@ module Skylab::TanMan::TestSupport
         exp = 'yin -> yang -> yin'
 
         it "- circular dependency: #{ exp }" do
+
           ev = nil
+
           arr = graph.meaning_values_via_meaning_name 'yin' do | *, & ev_p |
             ev = ev_p[]
-            :_ohai_
+            :_TM_NO_SEE_
           end
-          arr.should eql :_ohai_
+
+          arr == false || fail
           ev.reason.should eql :circular
           ev.trail_a.join( ' -> ' ).should eql exp
         end
@@ -188,9 +199,17 @@ module Skylab::TanMan::TestSupport
         exp = "fear -> anger -> hate -> suffering -> fear"
 
         it "- circ dep: #{ exp }" do
-          graph.meaning_values_via_meaning_name 'fear' do | *, & ev_p |
-            ev_p[]
-          end.trail_a.join( ' -> ' ).should eql exp
+
+          ev = nil
+          _x = graph.meaning_values_via_meaning_name 'fear' do | *, & ev_p |
+            ev = ev_p[]
+            :_TM_NO_SEE_
+          end
+
+          ev.trail_a.join( ' -> ' ) == exp || fail
+
+          _x == false || fail
+
         end
       end.call
     end

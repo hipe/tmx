@@ -35,8 +35,14 @@ module Skylab::TanMan
     # (as it should be!) of the idea of autoloading. experimental!
 
     def self.const_defined? const_x, look_up=true
-      super or begin
-        entry_tree.normpath_from_distilled Common_.distill[ const_x ]
+      _yes = super
+      if _yes
+        _yes
+      else
+        _ft = entry_tree
+        _slug = Common_::Name.via_const_symbol( const_x.intern ).as_slug
+        _sm = _ft.value_state_machine_via_head _slug
+        _sm ? ACHIEVED_ : UNABLE_
       end
     end
 
@@ -45,7 +51,6 @@ module Skylab::TanMan
     match_rx = %r{\A[[:space:]]*(?:#|/\*)} # #hack
 
     define_singleton_method :match_rx do match_rx end
-
   end
 
   # --*--

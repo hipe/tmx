@@ -29,7 +29,7 @@ issue as in testing. in testing we call "Require" once for each test, in
 order to produce a parser for the relevant grammar (there are several).
 
 in production we cache the parser class itself away somewhere reasonable
-(#todo - confirm this) so when we call "Require" it is when a load is
+(EDIT - confirm this) so when we call "Require" it is when a load is
 actuall necessary (i.e only the first time).
 
 

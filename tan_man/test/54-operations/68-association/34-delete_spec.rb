@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models association delete" do
+  describe "[tm] operations - association delete" do
 
     TS_[ self ]
     use :models_association

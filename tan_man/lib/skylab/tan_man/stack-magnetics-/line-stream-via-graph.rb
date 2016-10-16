@@ -108,6 +108,5 @@ module Skylab::TanMan
     BACKSLASH_ = '\\'
     ESCAPED_QUOTE_ = '\\"'
     DOUBLE_QUOTE_ = '"'
-    NOTHING_ = nil
   end
 end

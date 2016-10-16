@@ -60,14 +60,14 @@ module Skylab::TanMan
     end
 
     def line_stream_against_value_fetcher vfetch
-      Starter_::Actions__::Lines.via__(
+      Here_::Actions__::Lines.via__(
         vfetch, self, @kernel, & handle_event_selectively )
     end
 
     def to_path
 
       @__path ||= ::File.join(
-        Starter_.path_for_directory_as_collection_,
+        Here_.path_for_directory_as_collection_,
         property_value_via_symbol( :name ) )
     end
 
@@ -200,12 +200,7 @@ module Skylab::TanMan
         ent = @collection1.one_entity_against_natural_key_fuzzily_(
           arg_s, & @on_event_selectively )
 
-        if ent
-          @normal_entity = ent
-          ACHIEVED_
-        else
-          ent  # above emitted
-        end
+        _store :@normal_entity, ent
       end
 
       def __via_normal_entity_maybe_normalize_subject_entity
@@ -250,19 +245,21 @@ module Skylab::TanMan
 
         @workspace.persist_entity( * @arg, @entity, & @on_event_selectively )
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
     Build_collection__ = -> kr, & oes_p do
 
       Home_.lib_.system.filesystem.directory_as_collection do | o |
 
-        o.directory_path = Starter_.path_for_directory_as_collection_
-        o.flyweight_class = Starter_
+        o.directory_path = Here_.path_for_directory_as_collection_
+        o.flyweight_class = Here_
         o.kernel = kr
         o.on_event_selectively = oes_p
       end
     end
 
-    Starter_ = self
+    Here_ = self
   end
 end

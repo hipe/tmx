@@ -16,6 +16,8 @@ we used something like this:
 
     func[ 9, 49 ]
 
+(EDIT: the home of the above kind of thing is now [#ts-024].)
+
 03       models
 09       asset document read magnetics
 14       ersatz parser

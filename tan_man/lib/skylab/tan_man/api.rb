@@ -88,11 +88,10 @@ module Skylab::TanMan
       end
 
       def pth s
-        pn = ::Pathname.new "#{ s }"
-        if '.' == pn.dirname.to_s
+        if DOT_ == ::File.dirname(s)
           s
         else
-          pn.basename.to_path
+          ::File.basename s
         end
       end
 
@@ -126,5 +125,7 @@ module Skylab::TanMan
             :s, :sentence_phrase_via_mutable_iambic ] )
       end
     end
+
+    DOT_ = '.'
   end
 end

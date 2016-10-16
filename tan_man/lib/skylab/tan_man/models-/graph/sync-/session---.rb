@@ -36,13 +36,18 @@ module Skylab::TanMan
         end
 
         def __add_node id_s, label_s
-          @nc.add_node_via_id_and_label id_s, label_s and ACHIEVED_
+
+          _ok = @nc.add_node_via_id_and_label id_s, label_s
+          _ok && ACHIEVED_
         end
 
         def receive_edge from_id_s, to_id_s
-          @ac.touch_association_via_IDs(
+
+          _ok = @ac.touch_association_via_IDs(
             from_id_s.intern,
-            to_id_s.intern, & @on_event_selectively ) and ACHIEVED_
+            to_id_s.intern, & @on_event_selectively )
+
+          _ok && ACHIEVED_
         end
 
         def receive_finish

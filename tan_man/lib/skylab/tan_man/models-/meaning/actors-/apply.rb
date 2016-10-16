@@ -2,8 +2,6 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    Actors_ = ::Module.new
-
     class Actors_::Apply
 
       Attributes_actor_.call( self,
@@ -30,10 +28,12 @@ module Skylab::TanMan
       end
 
       def resolve_string_array
-        @s_a = Models_::Meaning::Graph__.new(  # yes, [#076] graph is a one-off
+
+        _s_a = Models_::Meaning::Graph__.new(  # yes, [#076] graph is a one-off
           @meaning_stream
         ).meaning_values_via_meaning_name @meaning.natural_key_string, & @on_event_selectively
-        @s_a and ACHIEVED_
+
+        _store :@s_a, _s_a
       end
 
       def process_each_string
@@ -70,6 +70,8 @@ module Skylab::TanMan
             y << "failed to parse #{ val o.input_string } - #{ o.failure_reason }"
           end
         end
+
+        UNABLE_
       end
 
       def process_list_item a_list1, s
@@ -165,6 +167,8 @@ module Skylab::TanMan
           [ atr, @asmt_a.fetch( d ).a_list1.equals.id.normalized_string ]
         end
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
   end
 end

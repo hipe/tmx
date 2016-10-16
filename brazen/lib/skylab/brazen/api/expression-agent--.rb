@@ -45,6 +45,10 @@ module Skylab::Brazen
         _NLP_agent.indefinite_noun lemma_s
       end
 
+      def lbl x
+        x
+      end
+
       def nm name
         "'#{ name.as_slug }'"
       end

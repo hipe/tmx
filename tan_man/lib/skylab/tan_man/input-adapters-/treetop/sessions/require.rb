@@ -78,17 +78,12 @@ module Skylab::TanMan
 
         _bound_attributes = Home_.lib_.fields::Attributes::Bounder[ self ]
 
-        uow_a = Treetop_::Actors_::Build_units_of_work.call(
+        _uow_a = Here_::Actors_::Build_units_of_work.call(
           _bound_attributes,
           @_filesystem,
           & @on_event_selectively )
 
-        if uow_a
-          @_units_of_work = uow_a
-          ACHIEVED_
-        else
-          uow_a
-        end
+        _store :@_units_of_work, _uow_a
       end
 
       # ~ compile
@@ -174,7 +169,8 @@ module Skylab::TanMan
 
         mkdir_p = uow.make_this_directory_minus_p
         if mkdir_p
-          @_filesystem.mkdir_p mkdir_p, & @on_event_selectively  # #todo
+          ::Home._COVER_ME
+          @_filesystem.mkdir_p mkdir_p, & @on_event_selectively
         else
           ACHIEVED_
         end
@@ -246,6 +242,8 @@ module Skylab::TanMan
         LOADED__.add uow.input_path, cls
         cls
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
   end
 end

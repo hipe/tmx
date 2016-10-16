@@ -9,6 +9,8 @@ numberspace. we want not to occupy 0 or 100 so:
 
 the below numbers are determined by the above numbers rounded.
 
+(a bit more than a month later the above approach becomes [#ts-024].)
+
 
 
 

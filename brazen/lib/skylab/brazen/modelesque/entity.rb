@@ -334,6 +334,7 @@ module Skylab::Brazen
           maybe_send_event :error, ev.terminal_channel_i do
             ev
           end
+          UNABLE_
         end
 
       ## ~~ name & related

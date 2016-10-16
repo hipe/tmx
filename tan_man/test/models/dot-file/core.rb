@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
 
       def [] tcc
 
-        Models[ tcc ]
+        TS_::Operations[ tcc ]
         tcc.include self
       end
 

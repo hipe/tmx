@@ -2,10 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - meaning" do
+  describe "[tm] operations - meaning" do
 
     TS_[ self ]
-    use :models
+    use :operations
 
     it "add - shell-style, after, in between - spacing mimics greatest lesser neighbor" do
       s = "digraph{}\n # cutie : patootey\n  # fazinkle: doo-dinkle\n"

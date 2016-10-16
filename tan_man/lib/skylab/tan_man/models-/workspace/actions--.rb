@@ -41,9 +41,11 @@ module Skylab::TanMan
           end
 
       def produce_result
+
         maybe_send_event :info, :ping do
           bld_ping_event
         end
+
         :hello_from_tan_man
       end
 

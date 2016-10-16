@@ -29,6 +29,7 @@ module Skylab::TanMan
                }must start with a-z followd by [-a-z0-9]"
             end
           end
+          UNABLE_
         end
 
         VALID_NAME_RX__ = /\A[a-z][-a-z0-9]*\z/
@@ -57,6 +58,7 @@ module Skylab::TanMan
               y << "value cannot contain newlines."
             end
           end
+          UNABLE_
         end
 
         def when_valid

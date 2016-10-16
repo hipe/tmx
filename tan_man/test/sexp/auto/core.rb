@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport
 
       Sexp[ tcc ]
       tcc.extend Module_Methods___
-      tcc.include Instance_Methods___
+      tcc.send :define_method, :assemble_fixtures_path_, Sexp::ASSEMBLE_FIXTURES_PATH_METHOD_DEFINITION_
     end
 
     module Module_Methods___
@@ -35,16 +35,6 @@ module Skylab::TanMan::TestSupport
             a.fetch( d ).to_s.should eql items.fetch( d )
           end
         end
-      end
-    end
-
-    module Instance_Methods___
-
-      def assemble_fixtures_path_
-
-        _tail = "sexp/grammars/#{ grammar_pathpart_ }/fixtures"
-
-        ::File.join TS_.dir_path, _tail
       end
     end
   end

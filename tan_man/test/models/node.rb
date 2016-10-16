@@ -3,18 +3,15 @@ module Skylab::TanMan::TestSupport
   module Models::Node
 
     def self.[] tcc
-      Models[ tcc ]
+      TS_::Operations[ tcc ]
       tcc.include Instance_Methods___
     end
     # <-
 
   module Instance_Methods___
 
-    define_method :fixtures_path_, ( Common_.memoize do
-
-      _path = Models::Node.dir_path
-
-      ::File.join _path, FIXTURES_ENTRY_
+    define_method :fixtures_path_, ( Lazy_.call do
+      ::File.join TS_.dir_path, 'fixture-dot-files-for-node'
     end )
 
     def stmt_list

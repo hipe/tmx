@@ -67,10 +67,10 @@ module Skylab::System
             end
           end
         else
-
           maybe_send_event :error, :strange_stat_error do
             __via_strange_stat_error_build_event
           end
+          UNABLE_
         end
       end
 
@@ -237,6 +237,7 @@ module Skylab::System
                 :directory_exists,
                 :path, path_ )
             end
+            UNABLE_
           else
 
             _build_normal_result
@@ -246,6 +247,7 @@ module Skylab::System
 
             build_wrong_ftype_event_ path_, @stat_, DIRECTORY_FTYPE
           end
+          UNABLE_
         end
       end
 

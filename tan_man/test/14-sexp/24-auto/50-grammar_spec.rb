@@ -4,6 +4,7 @@ describe "[tm] sexp auto list pattern (grammar 50)", g: true do
 
   Skylab::TanMan::TestSupport[ self ]
   use :sexp_auto
+  use :the_method_called_let
 
   using_grammar '50' do
     using_input '010-empty-digraph-no-ws.dot' do

@@ -175,7 +175,7 @@ module Skylab::TanMan
             s == stmt.label_or_node_id_normalized_string
           end
           if @do_fuzzy
-            @fuzzy_match_p = Node_.build_sexp_fuzzy_matcher_via_natural_key_fragment_ @name_s
+            @fuzzy_match_p = Here_.build_sexp_fuzzy_matcher_via_natural_key_fragment_ @name_s
             @match_p = @fuzzy_match_p
           else
             @match_p = @exact_match_p
@@ -289,19 +289,19 @@ module Skylab::TanMan
             Brazen_.event( :Component_Not_Found ).new_with(
 
               :component, _as_componet,
-              :component_association, Node_,
+              :component_association, Here_,
             )
           end
           UNABLE_
         end
 
         def resolve_new_node_without_id
-          proto = produce_prototype_node
-          new = proto._create_node_with_label @name_s, & handle_event_selectively
-          new and begin
-            @created_existing_or_destroyed_node = new
-            ACHIEVED_
-          end
+
+          _proto = produce_prototype_node
+
+          _new = _proto._create_node_with_label @name_s, & handle_event_selectively
+
+          _store :@created_existing_or_destroyed_node, _new
         end
 
         def produce_prototype_node
@@ -389,7 +389,7 @@ module Skylab::TanMan
 
           maybe_send_event normal_top_channel_via_OK_value( is_ok ), :found_existing_node do
 
-            lib = Node_::Events__
+            lib = Here_::Events__
 
             lib::Found_Existing_Node.new_with(
               :component, lib::Node_Statement_as_Component.new( one ),
@@ -506,6 +506,8 @@ module Skylab::TanMan
             UNABLE_
           end
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
         POSITIVE_NOTHINGNESS_ = true
       end

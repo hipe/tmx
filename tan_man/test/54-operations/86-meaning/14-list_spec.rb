@@ -2,10 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - meaning - list" do
+  describe "[tm] operations - meaning - list" do
 
     TS_[ self ]
-    use :models
+    use :operations
 
     it "C-style" do
 

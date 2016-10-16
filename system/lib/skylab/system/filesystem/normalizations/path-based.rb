@@ -306,6 +306,7 @@ module Skylab::System
 
           build_missing_required_properties_event_
         end
+        UNABLE_
       end
 
       def wrap_exception_ e, * xtra

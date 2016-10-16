@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport
       bx = Home_::Common_::Box.new
 
       bx.add sym, Common_::Qualified_Knownness.via_value_and_association( x,
-        Home_::Model_::Document_Entity::IO_PROPERTIES__.fetch( sym ) )
+        Home_::Model_::DocumentEntity::IO_PROPERTIES__.fetch( sym ) )
 
       Home_.application_kernel_.silo( :dot_file ).
         document_controller_via_qualified_knownness_box bx, & @on_event_selectively
@@ -42,5 +42,5 @@ module Skylab::TanMan::TestSupport
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ::Skylab::TanMan::TestSupport::Models::Dot_File::Client.new.invoke ARGV
+  ::Skylab::TanMan::TestSupport::Models::DotFile::Client.new.invoke ARGV
 end

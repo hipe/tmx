@@ -18,7 +18,7 @@ module Skylab::TanMan
 
         :inflect, :noun, nil, :verb, 'understand',
 
-        :reuse, Model_::Document_Entity.IO_properties,
+        :reuse, Model_::DocumentEntity.IO_properties,
 
         :flag, :property, :dry_run,
 
@@ -136,6 +136,8 @@ module Skylab::TanMan
             nil
           end
         end
+
+        UNABLE_
       end
     end
 

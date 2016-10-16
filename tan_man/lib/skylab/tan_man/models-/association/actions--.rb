@@ -29,7 +29,7 @@ module Skylab::TanMan
       class Add
 
         edit_entity_class(
-          :reuse, Model_::Document_Entity.IO_properties,
+          :reuse, Model_::DocumentEntity.IO_properties,
           :property, :attrs,
           :property, :prototype,
           :flag, :property, :ping
@@ -58,7 +58,7 @@ module Skylab::TanMan
 
         edit_entity_class(
 
-          :reuse, Model_::Document_Entity.IO_properties,
+          :reuse, Model_::DocumentEntity.IO_properties,
 
           :required, :property, :from_node_label,
           :required, :property, :to_node_label )
@@ -122,7 +122,7 @@ module Skylab::TanMan
       end
     end
 
-    class Collection_Controller___ < Model_::Document_Entity::Collection_Controller
+    class Collection_Controller___ < Model_::DocumentEntity::Collection_Controller
 
       def touch_association_via_node_labels src_lbl_s, dst_lbl_s, & oes_p
 
@@ -160,7 +160,7 @@ module Skylab::TanMan
 
       def _begin_association * x_a, & oes_p
 
-        Association_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
+        Here_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
           o.edit_via_iambic x_a
         end
       end
@@ -243,7 +243,7 @@ module Skylab::TanMan
                    :to_node_ID, h.fetch( :to_node_ID )
         end
 
-        _ok = Association_::Actors__::Mutate.call_via_iambic x_a, & _oes_p_
+        _ok = Here_::Actors__::Mutate.call_via_iambic x_a, & _oes_p_
         _ok and Info___[ did_mutate ]
       end
 
@@ -253,7 +253,7 @@ module Skylab::TanMan
 
         bx = action.argument_box
 
-        _ok = Association_::Actors__::Mutate.with(
+        _ok = Here_::Actors__::Mutate.with(
           :verb, :delete,
           :from_node_label, bx.fetch( :from_node_label ),
           :to_node_label, bx.fetch( :to_node_label ),
@@ -265,6 +265,6 @@ module Skylab::TanMan
       end
     end
 
-    Association_ = self
+    Here_ = self
   end
 end

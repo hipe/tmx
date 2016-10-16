@@ -44,6 +44,8 @@ module Skylab::Basic
 
     Parse_lib = sidesys[ :Parse ]
 
+    Pathname = stdlib[ :Pathname ]
+
     Plugin = sidesys[ :Plugin ]
 
     Scn_lib = -> do

@@ -2,10 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models workspace - `status`" do
+  describe "[tm] operations - workspace - `status`" do
 
     TS_[ self ]
-    use :models
+    use :operations
 
     it "dir w/o config file - is not failure, result is \"promise\"" do
 
@@ -20,8 +20,11 @@ module Skylab::TanMan::TestSupport
       _em = expect_OK_event :resource_not_found
       _ev = _em.cached_event_value
 
-      black_and_white( _ev ).should eql(
-        '"tanman-workspace/config" not found in dirs' )
+      _line = black_and_white _ev
+
+      _exp = '"tanman-workspace/config" not found in fixture-directories'
+
+      _line == _exp || fail
 
       expect_no_more_events
     end

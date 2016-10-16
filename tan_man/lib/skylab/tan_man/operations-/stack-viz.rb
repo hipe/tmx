@@ -1,7 +1,5 @@
 module Skylab::TanMan
 
-  Operations_ = ::Module.new
-
   class Operations_::StackViz
 
     def initialize argv, streamer, client
@@ -159,13 +157,7 @@ module Skylab::TanMan
       end ; nil
     end
 
-    def _store ivar, x
-      if x
-        instance_variable_set ivar, x ; ACHIEVED_
-      else
-        x
-      end
-    end
+    define_method :store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
     # ==
 

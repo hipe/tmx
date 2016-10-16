@@ -111,6 +111,7 @@ module Skylab::System
         maybe_send_event :error, :ambiguous_upstream_arguments do
           __build_ambiguous_upstream_arguments_event
         end
+        UNABLE_
       end
 
       def __build_ambiguous_upstream_arguments_event
@@ -184,10 +185,10 @@ module Skylab::System
 
           Common_::Known_Known[ ACHIEVED_ ]
         else
-
           maybe_send_event :error, :wrong_ftype do
             build_wrong_ftype_event_ path_, @stat_, @_expected_ftype
           end
+          UNABLE_
         end
       end
 
@@ -201,6 +202,7 @@ module Skylab::System
           maybe_send_event :error, :exception do
             wrap_exception_ @exception_
           end
+          UNABLE_
         end
       end
 

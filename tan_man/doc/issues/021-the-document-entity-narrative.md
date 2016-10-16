@@ -187,4 +187,4 @@ example, is impractically limiting.
 
 2) we have "compound", "indirect" stream entities that we express,
 namely, the workspace. the workspace can provide both an upstream
-and a downstream identifer, yet #todo
+and a downstream identifer, yet (EDIT)

@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models node prototypes" do
+  describe "[tm] operations - node prototypes" do
 
     TS_[ self ]
     use :models_node

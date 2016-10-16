@@ -33,8 +33,7 @@ module Skylab::TanMan
           @on_event_selectively.call :error, :hereput_and_output_waypoints_are_the_same
           UNABLE_
         else
-          @dc = _via_here_ID_build_document_controller
-          @dc && ACHIEVED_
+          _store :@dc, _via_here_ID_build_document_controller
         end
       end
 
@@ -262,6 +261,8 @@ module Skylab::TanMan
       def the_document_controller
         @dc
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
   end
 end

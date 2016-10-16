@@ -96,6 +96,7 @@ module Skylab::TanMan
             Interminable__.new_with :trail_a, trail_a
           end
         end
+        UNABLE_
       else
         terminal_a
       end

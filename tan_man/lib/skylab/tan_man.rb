@@ -7,10 +7,11 @@ module Skylab::TanMan
   end
 
   Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
 
   class << self
 
-    define_method :application_kernel_, ( Common_.memoize do
+    define_method :application_kernel_, ( Lazy_.call do
       Brazen_::Kernel.new Home_
     end )
 
@@ -29,21 +30,35 @@ module Skylab::TanMan
 
   Autoloader_ = Common_::Autoloader
 
-  module Input_Adapters_
-    Autoloader_[ self ]
+  # ==
+
+  # (reminder: `Models_` has an epoynymous file)
+
+  # ==
+
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
   end
 
-  module StackMagnetics_
-    Autoloader_[ self ]
-  end
+  # ==
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  Path_lib_ = Lazy_.call do
+    Home_.lib_.basic::Pathname
+  end
+
   Path_looks_relative_ = -> path do
     Home_.lib_.system.path_looks_relative path
   end
+
+  # ==
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
@@ -59,6 +74,7 @@ module Skylab::TanMan
   stowaway :Kernel_, 'models-'
   NEWLINE_ = "\n".freeze
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = ' '.freeze
   Home_ = self
   UNABLE_ = false

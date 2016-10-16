@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - association - hear" do
+  describe "[tm] operations - hear - association" do
 
     TS_[ self ]
     use :models_association

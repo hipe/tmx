@@ -1,6 +1,6 @@
 require_relative '../../../test-support'
 
-describe "[tm] sexp - auto - hacks - mutation", g: true do
+describe "[tm] sexp - auto - hacks - recursive rule mutation", g: true do
 
   Skylab::TanMan::TestSupport[ self ]
   use :sexp_auto_hacks

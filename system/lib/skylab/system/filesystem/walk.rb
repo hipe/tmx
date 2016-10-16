@@ -150,6 +150,8 @@ module Skylab::System
             )
             _
           end
+
+          UNABLE_
         end
 
         def __when_start_directory_does_not_exist e
@@ -164,6 +166,8 @@ module Skylab::System
             )
             _
           end
+
+          UNABLE_
         end
 
         def __find_any_nearest_file_when_start_path_exist
@@ -216,9 +220,12 @@ module Skylab::System
         end
 
         def __when_resource_not_found count
+
           maybe_send_event :error, :resource_not_found do
             __build_resource_not_found_event count
           end
+
+          UNABLE_
         end
 
         def __build_resource_not_found_event count

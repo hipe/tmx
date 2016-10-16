@@ -29,7 +29,7 @@ module Skylab::TanMan
         class << self
 
           def session k, oes_p, & edit_p
-            Starter_::Actions__::Lines::Session.new k, oes_p, & edit_p
+            Here_::Actions__::Lines::Session.new k, oes_p, & edit_p
           end
 
           def via__ value_fetcher, starter, k, & oes_p
@@ -150,6 +150,7 @@ module Skylab::TanMan
           @on_event_selectively.call :error, :resource_not_found do
             via_enoent_bld_event
           end
+          UNABLE_
         end
 
         def via_enoent_bld_event

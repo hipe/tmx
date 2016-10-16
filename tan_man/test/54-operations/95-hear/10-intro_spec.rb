@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - the hear front" do
+  describe "[tm] operations - hear - intro" do
 
     TS_[ self ]
 

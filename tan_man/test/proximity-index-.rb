@@ -67,7 +67,7 @@ module Skylab::TanMan::TestSupport
     #
     # ## symlinks
     #
-    # sadly the above elegance falls apart in pratice in cases where the
+    # sadly the above elegance falls apart in practice in cases where the
     # argument path is "really" under the "big tree", but symlinks are
     # present among the "big tree" path and/or argument path in an
     # asymmetrical way (that is, if one or the other uses them, or they both
@@ -182,20 +182,36 @@ module Skylab::TanMan::TestSupport
       end
     end
 
-    def ___lookup normpath
+    def ___lookup client_path
 
-      # insane - .. insane.
+      # we employ a strange convention whereby a file can be both a normal
+      # asset file and an executable. (this is so we can "visual test" a
+      # fixture grammar almost for free.) however, one cost of this is that
+      # the autoloader cannot load files like this because they "look like"
+      # directories. as such we have to do the loading here "by hand" with
+      # logic that once lived in "const reduce" but has been simplified out
+      # of it for now.
 
-      _local_path = normpath[ @assets_dir.length + 1 .. -1 ]
-      _x_a = _local_path.split ::File::SEPARATOR
+      _localizer = Home_::Path_lib_[]::Localizer[ @assets_dir ]
+      _local_path = _localizer[ client_path ]
+      _entries = _local_path.split ::File::SEPARATOR
 
-      x = Autoloader_.const_reduce(
-        :const_path, _x_a,
-        :from_module, @from_module,
-        :final_path_to_load, normpath,
-      )
-      x or self._COVER_ME
-      x
+      scn = Common_::Polymorphic_Stream.via_array _entries
+
+      mod = @from_module
+      begin
+        slug = scn.gets_one
+        is_last = scn.no_unparsed_exists
+        const = Common_::Name.via_slug( slug ).as_const
+
+        if is_last
+          ::Kernel.load client_path
+        end
+
+        mod = mod.const_get const, false
+      end until is_last
+
+      mod
     end
   end
 end

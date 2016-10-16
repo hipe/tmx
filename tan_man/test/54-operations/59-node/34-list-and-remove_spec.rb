@@ -9,8 +9,10 @@ module Skylab::TanMan::TestSupport
 
     it "a workspace without a graph value complains & invite" do
 
+      _dir = dir :with_freshly_initted_conf
+
       call_API :node, :ls,
-        :workspace_path, dir( :with_freshly_initted_conf ),
+        :workspace_path, _dir,
         :config_filename, 'tan-man.conf'
 
       ev = expect_not_OK_event( :property_not_found ).cached_event_value

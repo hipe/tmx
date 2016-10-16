@@ -36,9 +36,15 @@ module Skylab::TanMan::TestSupport
     using_input 'invalid-prototype' do
 
       it 'raises a runmun error at parse time' do
-        -> do
+
+        _exception_class = subject::Invalid_Prototype
+        begin
           result
-        end.should raise_error subject::Invalid_Prototype
+        rescue _exception_class => e
+        end
+
+        _head = 'when parsing your "node_list" prototype embedded in a comment: Expected one of'
+        e.message.include? _head or fail
       end
     end
 
@@ -78,7 +84,7 @@ module Skylab::TanMan::TestSupport
     end
   end
 
-  using_grammar '70-75-with-prototype' do
+  using_grammar '70-78-with-prototype' do
 
     using_input_string 'beginning ending', 'zero' do
 

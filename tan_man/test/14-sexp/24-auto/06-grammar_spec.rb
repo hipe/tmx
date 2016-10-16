@@ -4,6 +4,7 @@ describe "[tm] sexp auto list pattern (grammar 06)", g: true do
 
   Skylab::TanMan::TestSupport[ self ]
   use :sexp_auto
+  use :the_method_called_let
 
   using_grammar '06' do
     using_input '100-nerp' do

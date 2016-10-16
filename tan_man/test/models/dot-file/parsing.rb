@@ -9,9 +9,9 @@ module Skylab::TanMan::TestSupport
       tcc.include self
     end
 
-    define_method :fixtures_path_, ( Common_.memoize do
+    define_method :fixtures_path_, ( Lazy_.call do
 
-      ::File.expand_path "../#{ FIXTURES_ENTRY_ }", __FILE__
+      ::File.join TS_.dir_path, 'fixture-dot-files-for-parsing'
     end )
 
     def expect_digraph_document_sexp

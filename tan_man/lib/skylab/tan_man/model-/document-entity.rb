@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Model_
 
-    module Document_Entity
+    module DocumentEntity
 
       class << self
 
@@ -53,7 +53,8 @@ module Skylab::TanMan
           # logic play out. then with the result arguments, resolve from them
           # one input and (when applicable) one output means.
 
-          super && document_entity_normalize_
+          _ok = super
+          _ok && document_entity_normalize_
         end
 
         def document_entity_normalize_
@@ -586,13 +587,18 @@ module Skylab::TanMan
               flush_to_box_keyed_to_method( :name_symbol ),
               & oes_p )
 
-          ws and begin
-            @id_a = kr.silo(
-              @parent.model_cls_.document_in_workspace_identifier_symbol ).
-                produce_byte_stream_identifiers_at_in(
-                  @direction_symbols, ws, & oes_p )
+          if ws
+            _sym = @parent.model_cls_.document_in_workspace_identifier_symbol
+            _silo = kr.silo _sym
 
-            @id_a && ACHIEVED_
+            id_a = _silo.produce_byte_stream_identifiers_at_in(
+              @direction_symbols, ws, & oes_p )
+
+            id_a ||= UNABLE_  # downgrade nil to false
+
+            _store :@id_a, id_a
+          else
+            ws
           end
         end
 
@@ -602,6 +608,8 @@ module Skylab::TanMan
               @id_a.fetch( d )
           end ; nil
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
 
       CONST_VIA_DIRECTION = {

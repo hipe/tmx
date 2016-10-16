@@ -177,6 +177,7 @@ module Skylab::System
             maybe_send_event :error, :missing_required_properties do
               __build_missing_required_force_event
             end
+            UNABLE_
           end
         else
           _overwrite

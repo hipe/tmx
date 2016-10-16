@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class Models_::Meaning
 
-    class Collection_Controller__ <  Model_::Document_Entity::Collection_Controller
+    class Collection_Controller__ <  Model_::DocumentEntity::Collection_Controller
 
       class << self
 
@@ -23,7 +23,7 @@ module Skylab::TanMan
           bx[ :force ]
         end
 
-        _ok = Meaning_::Actors__::Persist.call(
+        _ok = Here_::Actors__::Persist.call(
           _build_session,
           _has_force,
           ent,
@@ -90,7 +90,7 @@ module Skylab::TanMan
           # metadata so we can mutate the strings in (1). this is never easy;
           # this is the third complete overhaul of how we do this.
 
-          fly = Meaning_::Flyweight__.new
+          fly = Here_::Flyweight__.new
 
           special_line_st = nil
 

@@ -1,6 +1,6 @@
 module Skylab::TanMan::TestSupport
 
-  module Models
+  module Operations
 
     def self.[] tcc
       tcc.include self
@@ -185,7 +185,7 @@ module Skylab::TanMan::TestSupport
     end
 
     def dirs
-      ::Skylab::TanMan::TestSupport::Fixtures::Dirs.dir_path
+      TS_::FixtureDirectories.dir_path
     end
 
     def cfn

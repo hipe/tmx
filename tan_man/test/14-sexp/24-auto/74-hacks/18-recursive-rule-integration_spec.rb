@@ -1,8 +1,8 @@
-require_relative '../../../../test-support'
+require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] sexp - auto - hacks - recursive rule (with production grammar)", g: true do
+  describe "[tm] sexp - auto - hacks - recursive rule integration", g: true do
 
     TS_[ self ]
     use :sexp_auto_hacks

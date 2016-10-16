@@ -38,6 +38,8 @@ module Skylab::TanMan
         super
       end
     end  # >>
+
+    Autoloader_[ self ]
   end
 
   # ~ this is :+[#br-065] a stubbing hack. a few notes in [#024].
@@ -157,6 +159,7 @@ module Skylab::TanMan
         maybe_send_event :error do
           ev
         end
+        UNABLE_  # important - the above is unreliable
       end
 
       def krnl
@@ -210,6 +213,7 @@ module Skylab::TanMan
 
     def receive_missing_required_properties_event ev  # #hook-in [br]
       receive_missing_required_properties_softly ev  # #experimental
+      UNABLE_
     end
   end
 
@@ -335,7 +339,17 @@ module Skylab::TanMan
 
   # ~
 
-  Autoloader_[ ( Models_ = ::Module.new ), :boxxy ]
+  module Models_
+
+    Autoloader_[ self, :boxxy ]
+
+    # old autoloader used to fall back to loading the lexically lowest file.
+    # that weirdness has been simplified away so now we must state the below
+    # explicitly. ugly until the next rearchitecting at #open [#096]
+
+    stowaway :Comment, 'comment/line-stream'
+    stowaway :Internal, 'internal/paths'
+  end
 
   class Models_::Workspace < Brazen_::Models_::Workspace
 
@@ -400,8 +414,9 @@ module Skylab::TanMan
 
       ad = asset_directory_
 
-      ad && path && path.length.nonzero? and begin
-        ::Pathname.new( path ).relative_path_from( ::Pathname.new ad ).to_path
+      if ad && path && path.length.nonzero?
+
+        Path_lib_[]::Relative_path_from[ path, ad ]
       end
     end
 
@@ -447,7 +462,7 @@ module Skylab::TanMan
     class << self
 
       def action_base_class  # #hook-in to [br]'s action factory
-        Home_::Model_::Document_Entity::Action
+        Home_::Model_::DocumentEntity::Action
       end
 
       def document_in_workspace_identifier_symbol  # #hook-out to doc.ent
@@ -492,7 +507,7 @@ module Skylab::TanMan
         self, & oes_p )
     end
 
-    Node_ = self
+    Here_ = self
   end
 
   class Models_::Association < Graph_Document_Entity__

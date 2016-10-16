@@ -92,7 +92,7 @@ module Skylab::TanMan
 
       def receive_qualified_knownness_box bx
 
-        o = Home_::Model_::Document_Entity::
+        o = Home_::Model_::DocumentEntity::
           Byte_Stream_Identifier_Resolver.new(
             @kernel, & @on_event_selectively )
 
@@ -116,14 +116,14 @@ module Skylab::TanMan
 
       def __via_BUID_resolve_graph_sexp
 
-        @graph_sexp = DotFile_.produce_parse_tree_with(
+        _gs = Here_.produce_parse_tree_with(
 
           :byte_upstream_identifier, @_BUID,
           :generated_grammar_dir_path, __GGD_path,
 
           & @on_event_selectively )
 
-        @graph_sexp && ACHIEVED_
+        _store :@graph_sexp, _gs
       end
 
       def __GGD_path
@@ -132,8 +132,10 @@ module Skylab::TanMan
 
       def __via_graph_sexp_produce_doc_controller
 
-        DotFile_::Controller__.new @graph_sexp, @_BUID, @kernel, & @on_event_selectively
+        Here_::Controller__.new @graph_sexp, @_BUID, @kernel, & @on_event_selectively
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
   end
 end

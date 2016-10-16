@@ -11,7 +11,7 @@ module Skylab::TanMan
 
       def produce_parse_tree_with * x_a, & oes_p
 
-        DotFile_::Sessions__::Produce_Parse_Tree.call_via_iambic x_a do | * i_a, & ev_p |
+        Here_::Sessions__::Produce_Parse_Tree.call_via_iambic x_a do | * i_a, & ev_p |
 
           # errors like file not found etc (that stem from path math errors)
           # have causes that are so hard to track down we throw them so that
@@ -46,27 +46,26 @@ module Skylab::TanMan
 
       def precondition_for action, id, box, & oes_p
 
-        o = DotFile_::Small_Time_::Sessions::Build_Document_Controller.new
+        o = Here_::Small_Time_::Sessions::Build_Document_Controller.new
         o.receive_document_action action
         o.produce_document_controller
       end
 
       def document_controller_via_byte_upstream_identifier id, & oes_p
 
-        o = DotFile_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
+        o = Here_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
         o.receive_byte_upstream_identifier id
         o.produce_document_controller
       end
 
       def document_controller_via_qualified_knownness_box bx, & oes_p
 
-        o = DotFile_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
+        o = Here_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
         o.receive_qualified_knownness_box bx
         o.produce_document_controller
       end
     end
 
-    DotFile_ = self
-
+    Here_ = self
   end
 end

@@ -2,10 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models starter list" do
+  describe "[tm] operations - starter list" do
 
     TS_[ self ]
-    use :models
+    use :operations
 
     it "lists the two items, from the filesystem" do
 

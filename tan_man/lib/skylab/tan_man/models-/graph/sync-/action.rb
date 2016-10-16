@@ -21,7 +21,7 @@ module Skylab::TanMan
 
           :flag, :property, :dry_run,
 
-          :reuse, Home_::Model_::Document_Entity.IO_properties,
+          :reuse, Home_::Model_::DocumentEntity.IO_properties,
 
           :for_direction, :hereput, :property, :hereput_string,
           :for_direction, :hereput, :property, :hereput_path
@@ -99,7 +99,7 @@ module Skylab::TanMan
           if miss_a
             __missing miss_a
           else
-            o = Graph_::Sync_.new in_ID, here_ID, out_ID, to_qualified_knownness_box_proxy,
+            o = Here_::Sync_.new in_ID, here_ID, out_ID, to_qualified_knownness_box_proxy,
               @kernel, & handle_event_selectively
 
             o.do_build_transient_graph = do_build_transient_graph

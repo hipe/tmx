@@ -1,14 +1,14 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - dot file - manipulating: labels" do
+  describe "[tm] operations - dot file - update label" do
 
     TS_[ self ]
     use :models_dot_file
 
     memoize :fixtures_path_ do
-      ::File.expand_path( '../label/fixtures', __FILE__ )
+      ::File.join TS_.dir_path, 'fixture-dot-files-for-label'
     end
 
     using_input '3.0-with-existing-label.dot' do

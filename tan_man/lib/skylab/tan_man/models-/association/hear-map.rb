@@ -86,10 +86,10 @@ module Skylab::TanMan
 
         def __resolve_document_controller
 
-          @dc = @kernel.silo( :dot_file ).document_controller_via_qualified_knownness_box(
+          _dc = @kernel.silo( :dot_file ).document_controller_via_qualified_knownness_box(
             @qualified_knownness_box, & @on_event_selectively )
 
-          @dc && ACHIEVED_
+          _store :@dc, _dc
         end
 
         def __via_document_controller_maybe_touch_nodes
@@ -147,11 +147,11 @@ module Skylab::TanMan
 
         def __do_persist
 
-          o = Home_::Model_::Document_Entity::
+          o = Home_::Model_::DocumentEntity::
             Byte_Stream_Identifier_Resolver.new(
               @kernel, & @on_event_selectively )
 
-          o.for_model Association_
+          o.for_model Here_
 
           o.against_qualified_knownness_box @qualified_knownness_box
 
@@ -180,6 +180,8 @@ module Skylab::TanMan
             :is_dry, is_dry,
             & @on_event_selectively
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
     end
   end

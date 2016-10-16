@@ -4,6 +4,11 @@
 
     16.times { |d| puts ( 100.0 * d  / 16 ).round  }
 
+(two weeks later we made [#ts-024] for this kind of thing.)
+
+
+
+
 ## dependent data structures then autoloading
 
   06. box

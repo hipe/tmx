@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] API" do
+  describe "[tm] operations - intro" do
 
     TS_[ self ]
 

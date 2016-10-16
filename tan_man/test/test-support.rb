@@ -208,15 +208,16 @@ module Skylab::TanMan::TestSupport
     def __resolve_grammar_class
       granule_s = grammar_pathpart_
       mod = grammars_module_
-      desired_module_const_i = bld_grammar_const granule_s
+      const = __build_grammar_const granule_s
 
-      if ! mod.const_defined? desired_module_const_i
-        _BASE_PATH_ = ::File.join mod.dir_path, granule_s
-        load ::File.join( _BASE_PATH_, CLIENT___ )
+      if ! mod.const_defined? const, false
         was_not_defined = true
+        _BASE_PATH_ = ::File.join mod.dir_path, granule_s
+        _load_path = ::File.join _BASE_PATH_, CLIENT___
+        load _load_path
       end
 
-      @grammar_class = mod.const_get desired_module_const_i, false
+      @grammar_class = mod.const_get const, false
       if was_not_defined
         @grammar_class.define_singleton_method :dir_path do
           _BASE_PATH_
@@ -226,7 +227,7 @@ module Skylab::TanMan::TestSupport
 
     CLIENT___ = 'client'
 
-    def bld_grammar_const granule_s
+    def __build_grammar_const granule_s
 
       md = GRANULE_TO_CONST_RX__.match granule_s
 
@@ -259,25 +260,34 @@ module Skylab::TanMan::TestSupport
       # but if you wanted to test for specific events here:
       # _oes_p = handle_event_selectively_
 
-      @parse = TS_::Parse.new _oes_p do | o |
+      _head = Localize_grammar_path___[ @grammar_class.dir_path ]
+      _path = ::File.join _head, ALWAYS_G1__
 
-        o.root_for_relative_paths_for_load TS_.dir_path
+      @parse = TS_::Parse.new _oes_p do |o|
+
+        o.root_for_relative_paths_for_load TS_.dir_path  # same as #here
 
         o.generated_grammar_dir_path existent_testing_GGD_path
 
-        _reference_pn = ::Pathname.new TS_.dir_path
-        _here_pn = ::Pathname.new @grammar_class.dir_path
-        _relative_pn = _here_pn.relative_path_from _reference_pn
-
-        _finally = ::File.join _relative_pn.to_path, ALWAYS_G1__
-
-        o.grammar_path _finally
+        o.grammar_path _path
       end
 
-      nil
+      NIL
     end
 
     ALWAYS_G1__ = 'g1.treetop'.freeze
+
+    Localize_grammar_path___ = -> do
+
+      p = -> path do
+        p = Home_::Path_lib_[]::Localizer[ TS_.dir_path ]  # #here
+        p[ path ]
+      end
+
+      -> path do
+        p[ path ]
+      end
+    end.call
 
     def existent_testing_GGD_path
       path = Memoized_GGD_path__[]
@@ -335,10 +345,6 @@ module Skylab::TanMan::TestSupport
       ::File.join _head, _tail
     end
 
-    def fixtures_path_
-      ::File.join @grammar_path.dir_path, FIXTURES_ENTRY_
-    end
-
     def produce_result_via_parse_method_i
       :"via_parse_via_#{ input_mechanism_i }_produce_result"
     end
@@ -388,11 +394,9 @@ module Skylab::TanMan::TestSupport
       CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__
     end
 
-
     CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = 'local-conf.d'.freeze
     CONFIG_FILENAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ = "#{
       CONFIG_DIRNAME_THAT_IS_NOT_A_DOTFILE_FOR_VISIBILITY__ }/conf.conf".freeze
-
 
     # ~ fs
 
@@ -401,28 +405,37 @@ module Skylab::TanMan::TestSupport
     end
   end
 
+  # ==
+
+  FixtureGraphs = -> do  # (here as if it is a module..)
+    p = -> sym0 do
+      dir_path = ::File.join TS_.dir_path, 'fixture-graphs'
+      p = -> sym do
+        _tail = "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.dot"
+        ::File.join dir_path, _tail
+      end
+      p[ sym0 ]
+    end
+    -> sym do
+      p[ sym ]
+    end
+  end.call
+
+  # ==
+
   Expect_Line = -> tcc do
     TestSupport_::Expect_line[ tcc ]
   end
 
+  The_Method_Called_Let = -> tcc do
+    TestSupport_::Let[ tcc ]
+  end
+
+  # ==
+
   Autoloader_ = Common_::Autoloader
 
-  module Fixtures
-    Autoloader_[ self ]
-
-    module Dirs
-      Autoloader_[ self ]
-    end
-
-    module Graphs
-      class << self
-        def [] sym
-          ::File.join dir_path, "#{ sym.id2name.gsub( UNDERSCORE_, DASH_ ) }.dot"
-        end
-      end
-      Autoloader_[ self ]
-    end
-  end
+  # (moved to _FLUX_)
 
   module TestLib_
 
@@ -458,12 +471,12 @@ module Skylab::TanMan::TestSupport
   DASH_ = Home_::DASH_
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
-  IDENTITY_= -> x { x }
   FIXTURES_ENTRY_ = 'fixtures'
+  IDENTITY_= -> x { x }
+  Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self
   UNDERSCORE_ = Home_::UNDERSCORE_
-
 end

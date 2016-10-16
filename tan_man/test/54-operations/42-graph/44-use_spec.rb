@@ -2,11 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models graph use" do
+  describe "[tm] operations - graph - use" do
 
     TS_[ self ]
     use :expect_line
-    use :models
+    use :operations
 
     context "when no workspace" do
 
@@ -170,9 +170,11 @@ module Skylab::TanMan::TestSupport
 
           _file = @ws_pn.join( 'open-this-yourself' ).open( ::File::CREAT | ::File::EXCL | ::File::WRONLY )
 
-          call_API :graph, :use,
+          call_API( :graph, :use,
             :digraph_path, _file,
-            :workspace_path, @ws_pn.to_path, :config_filename, cfn
+            :workspace_path, @ws_pn.to_path,
+            :config_filename, cfn,
+          )
 
           scn = @event_log.flush_to_scanner
 

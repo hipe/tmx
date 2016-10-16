@@ -81,9 +81,9 @@ module Skylab::Basic
           if x.respond_to? :relative_path_from
             x
           elsif x.respond_to? :to_path
-            ::Pathname.new x.to_path
+            Home_.lib_.pathname.new x.to_path
           else
-            ::Pathname.new x
+            Home_.lib_.pathname.new x
           end
         end
       end
@@ -104,10 +104,6 @@ module Skylab::Basic
 
       attr_reader :path
 
-      def members
-        [ :memers ] - self.class.instance_methods( false )
-      end
-
       def modality_const  # :+#experimental
         :Byte_Stream
       end
@@ -123,6 +119,17 @@ module Skylab::Basic
       def to_minimal_yielder
         @_IO
       end
+    end
+
+    # ==
+
+    Relative_path_from = -> subject_path, reference_path do
+
+      cls = Home_.lib_.pathname
+      _ref_pn = cls.new reference_path
+      _sub_pn = cls.new subject_path
+      _res_pn = _sub_pn.relative_path_from _ref_pn
+      _res_pn.to_path
     end
 
     # ==
@@ -145,7 +152,6 @@ module Skylab::Basic
       end
     end
 
-    # ==
 
     Path_matches_directory = -> path, dir do  # assume..
 

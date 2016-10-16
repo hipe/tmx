@@ -347,9 +347,13 @@ module Skylab::Brazen
         end
 
         def __via_identifier_resolve_subject_entity
-          @subject_entity = entity_collection.entity_via_intrinsic_key @identifier, & handle_event_selectively
-          @subject_entity ? ACHIEVED_ : UNABLE_
+
+          _col = entity_collection
+          _ent = _col.entity_via_intrinsic_key @identifier, & handle_event_selectively
+          _store :@subject_entity, _ent
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
 
       module Semi_Generated_Instance_Methods__

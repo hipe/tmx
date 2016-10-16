@@ -31,12 +31,15 @@ module Skylab::Brazen
     Actions = ::Module.new
 
     def initialize * a, & oes_p
+
       @did_resolve_mutable_document = false
       case a.length
       when 1
         kernel = a.first
       when 2
-        @document, kernel = a
+        doc, kernel = a
+        doc.is_mutable  # sanity check on type
+        @document = doc
       else
         raise ::ArgumentError
       end
@@ -106,16 +109,20 @@ module Skylab::Brazen
         x.subsect_name_s
 
       elsif oes_p
+
         oes_p.call :info, :property_not_found do
 
-          Common_::Event.inline_neutral_with :property_not_found,
-              :property_symbol, sym,
-              :input_identifier, _document.input_id do |y, o|
-
+          Common_::Event.inline_neutral_with(
+            :property_not_found,
+            :property_symbol, sym,
+            :input_identifier, _document.input_id,
+          ) do |y, o|
             y << "no #{ nm Common_::Name.via_variegated_symbol o.property_symbol } #{
               }property in #{ o.input_identifier.description_under self }"
           end
         end
+
+        NOTHING_
       end
     end
 
@@ -210,10 +217,10 @@ module Skylab::Brazen
 
       def receive_error_symbol_and_column_number_ sym, col_number
 
-        @result = @on_event_selectively.call :error, :config_parse_error do
+        @on_event_selectively.call :error, :config_parse_error do
           bld_config_parse_error sym, col_number
         end
-
+        @result = UNABLE_
         UNABLE_
       end
 

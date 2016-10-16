@@ -2,8 +2,6 @@ module Skylab::TanMan
 
   module Sexp_::Auto
 
-    Actors__ = ::Module.new
-
     class Actors__::Duplicate
 
       # synopsis:

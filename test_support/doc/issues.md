@@ -55,7 +55,8 @@
 [#026] #hole ( #moved-to: [#dt-XXX] )
 [#025] #hole ( #moved-to: [#dt-XXX] )
 
-[#024] #hole "verbosity" module REMOVED because ancient
+[#024]       [ the "subdivide" script ]
+             ( #was: "verbosity" module REMOVED because ancient )
              ( #was: #doc-node the graded verbosity narrative .. )
 
 [#023]       #doc-node #parent-node: [#020] "the IO spy"

@@ -45,6 +45,8 @@ be trivial on the theory and results presented here.)
 
 ## rough algebra
 
+    (EDIT: 3.5 months later, we finally make [#ts-024] the "subdivide" script.)
+
     five waypoints ("items")
 
     999 slots (1 thru 999 (not 0, not 1000))

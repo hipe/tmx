@@ -12,7 +12,7 @@ module Skylab::TanMan
 
       :required,
       :ad_hoc_normalizer, -> arg, & oes_p do
-        Node_::Controller__::Normalize_name[ self, arg, & oes_p ]
+        Here_::Controller__::Normalize_name[ self, arg, & oes_p ]
       end,
       :property, :name )
 
@@ -24,7 +24,7 @@ module Skylab::TanMan
 
         edit_entity_class(
           :flag, :property, :ping,
-          :reuse, Model_::Document_Entity.IO_properties )
+          :reuse, Model_::DocumentEntity.IO_properties )
 
       private
 
@@ -40,13 +40,13 @@ module Skylab::TanMan
       Ls = make_action_class :List do
 
         edit_entity_class(
-          :reuse, Model_::Document_Entity.input_properties )
+          :reuse, Model_::DocumentEntity.input_properties )
       end
 
       Rm = make_action_class :Delete do
 
         edit_entity_class(
-          :reuse, Model_::Document_Entity.IO_properties )
+          :reuse, Model_::DocumentEntity.IO_properties )
       end
     end
 
@@ -82,7 +82,7 @@ module Skylab::TanMan
       end
     end
 
-    class Collection_Controller__ < Model_::Document_Entity::Collection_Controller
+    class Collection_Controller__ < Model_::DocumentEntity::Collection_Controller
 
       include Common_Collection_Controller_Methods_
 
@@ -98,7 +98,7 @@ module Skylab::TanMan
 
       def entity_via_natural_key_fuzzily s
 
-        p = Node_.build_sexp_fuzzy_matcher_via_natural_key_fragment s
+        p = Here_.build_sexp_fuzzy_matcher_via_natural_key_fragment s
 
         st = to_node_sexp_stream
 
@@ -138,11 +138,16 @@ module Skylab::TanMan
 
           _entity_via_node node
 
-        elsif oes_p
+        else
+
+          if oes_p
           oes_p.call :info, :component_not_found do
             Common_::Event.inline_neutral_with :component_not_found,
               :entity_name_string, node_identifier.entity_name_string
           end
+          end
+
+          UNABLE_
         end
       end
 
@@ -191,7 +196,7 @@ module Skylab::TanMan
       end
 
       def _begin_node * x_a, & oes_p
-        Node_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
+        Here_.edit_entity @kernel, ( oes_p || @on_event_selectively ) do | o |
           o.edit_via_iambic x_a
         end
       end
@@ -212,7 +217,7 @@ module Skylab::TanMan
         byte_downstream_ID = action.document_entity_byte_downstream_identifier
         bx = action.argument_box
 
-        _ok = Node_::Actors__::Mutate::Via_entity.call(
+        _ok = Here_::Actors__::Mutate::Via_entity.call(
           :delete,
           ent,
           document_,
@@ -223,7 +228,7 @@ module Skylab::TanMan
 
       def _mutate_via_verb_and_entity verb_i, entity, & oes_p
 
-        Node_::Actors__::Mutate::Via_entity.call(
+        Here_::Actors__::Mutate::Via_entity.call(
           verb_i,
           entity,
           document_,

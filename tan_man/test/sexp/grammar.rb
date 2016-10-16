@@ -17,10 +17,6 @@ module Skylab::TanMan::TestSupport::Sexp
 
       TestSupport_::Let[ self ]
 
-      let :fixtures_dir_pathname do
-        ::File.expand_path '../fixtures', dir_path
-      end
-
       let :grammars_module do
         ::Skylab::TanMan.lib_.module_lib.expand_path_via_module '..', self
       end

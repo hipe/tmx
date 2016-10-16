@@ -2,11 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models starter set" do
+  describe "[tm] operations - starter set" do
 
     TS_[ self ]
     use :expect_line
-    use :models
+    use :operations
 
     it "when bad name - shows good names" do
 

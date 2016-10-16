@@ -1,4 +1,4 @@
-module Skylab::TanMan::TestSupport::Sexp::Prototype::Grammars::Namespace70_38
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70_38
   grammar Grammar70_38
     rule document
       s:s? node_list:node_list?

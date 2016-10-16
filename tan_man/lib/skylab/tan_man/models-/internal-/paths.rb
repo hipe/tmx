@@ -46,6 +46,8 @@ module Skylab::TanMan
         @on_event_selectively.call :error, :unrecognized_verb do
           _build_common_event :unrecognized_verb, :verb, @verb_x, /\Aexecute_(.+)_verb\z/
         end
+
+        UNABLE_
       end
 
       def when_bad_noun
@@ -53,6 +55,8 @@ module Skylab::TanMan
         @on_event_selectively.call :error, :unknown_path do
           _build_common_event :unknown_path, :path, @path_x, /\Aretrieve_(.+)_path\z/
         end
+
+        UNABLE_
       end
 
       def _build_common_event sym, * i_a, rx
@@ -140,7 +144,6 @@ module Skylab::TanMan
         lib = Home_.lib_
 
         ::File.join lib.dev_tmpdir_path, lib.tmpdir_stem
-
       end
     end
   end

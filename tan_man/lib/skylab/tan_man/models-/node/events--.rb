@@ -8,7 +8,7 @@ module Skylab::TanMan
 
       Found_Existing_Node = _.prototype_with( :found_existing_node,
 
-        :component_association, Node_,
+        :component_association, Here_,
         :did_mutate_document, false,
         :ok, nil
       )

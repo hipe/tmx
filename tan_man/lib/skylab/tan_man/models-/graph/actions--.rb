@@ -6,9 +6,11 @@ module Skylab::TanMan
 
       :persist_to, :graph,  # go thru our own custom c.c for now
 
-      :required, :property, :digraph_path )
+      :required, :property, :digraph_path,
 
-    DocEnt_ = Home_::Model_::Document_Entity
+    )
+
+    DocEnt_ = Home_::Model_::DocumentEntity
 
     Actions__ = make_action_making_actions_module
 
@@ -39,7 +41,7 @@ module Skylab::TanMan
       end
 
       Sync = Action_Stub_.new do
-        Graph_::Sync_::Action
+        Here_::Sync_::Action
       end
     end
 
@@ -47,7 +49,7 @@ module Skylab::TanMan
 
     def intrinsic_persist_before_persist_in_collection bx, & oes_p
 
-      Graph_::Actors__::Touch.call(
+      Here_::Actors__::Touch.call(
         bx[ :dry_run ],
         self,
         bx.fetch( :template_values_provider_ ),
@@ -68,8 +70,9 @@ module Skylab::TanMan
         path = path.path
       end
 
-      bx.add Brazen_::NAME_SYMBOL,
-        @preconditions.fetch( :workspace ).from_asset_directory_relativize_path__( path )
+      _ws = @preconditions.fetch :workspace
+      _relpath = _ws.from_asset_directory_relativize_path__ path
+      bx.add Brazen_::NAME_SYMBOL, _relpath
 
       bx.to_pair_stream
     end
@@ -117,7 +120,7 @@ module Skylab::TanMan
       def go
 
         @graph_path = @workspace.business_property_value(
-            Graph_.persist_to.full_name_symbol ) do | * i_a, & ev_p |
+            Here_.persist_to.full_name_symbol ) do | * i_a, & ev_p |
 
           if :property_not_found == i_a[ 1 ]
             __invite( i_a, & ev_p )
@@ -150,15 +153,12 @@ module Skylab::TanMan
 
           Brazen_::Collection.const_get(
 
-            Model_::Document_Entity::CONST_VIA_DIRECTION.fetch direction_symbol
+            Model_::DocumentEntity::CONST_VIA_DIRECTION.fetch direction_symbol
           ).via_path path
         end
       end
     end
 
-    Autoloader_[ Actors__ = ::Module.new ]
-
-    Graph_ = self
-
+    Here_ = self
   end
 end

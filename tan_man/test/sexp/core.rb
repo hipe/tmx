@@ -8,14 +8,27 @@ module Skylab::TanMan::TestSupport
       tcc.include self
     end
 
+    module Prototype
+      def self.[] tcc
+        Sexp[ tcc ]
+        tcc.send :define_method, :assemble_fixtures_path_, ASSEMBLE_FIXTURES_PATH_METHOD_DEFINITION_
+      end
+    end
+
+    ASSEMBLE_FIXTURES_PATH_METHOD_DEFINITION_ = -> do
+      _head = TS_::Sexp::Grammars.dir_path
+      _mid = grammar_pathpart_
+      ::File.join _head, _mid, FIXTURES_ENTRY_
+    end
+
     module Module_Methods___
 
-      def using_grammar _GRAMMAR_PATHPART_ , *tags, & p
+      def using_grammar _GRAMMAR_NUMBERISH_ , *tags, & p
 
-        context "using grammar #{ _GRAMMAR_PATHPART_ }", *tags do
+        context "using grammar #{ _GRAMMAR_NUMBERISH_ }", *tags do
 
           define_method :grammar_pathpart_ do
-            _GRAMMAR_PATHPART_
+            _GRAMMAR_NUMBERISH_
           end
 
           dangerous_memoize :fixtures_path_ do
@@ -44,7 +57,8 @@ module Skylab::TanMan::TestSupport
     end
 
     module Grammars
-      Autoloader_[ self ]
+      _path = ::File.join TS_.dir_path, 'fixture-grammars'
+      Autoloader_[ self, _path ]
     end
 
     class Grammar

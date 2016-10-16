@@ -153,10 +153,7 @@ module Skylab::Common::TestSupport
 
           if em.channel_symbol_array == sym_a
             if p
-              if em._needs_reification
-                __reify_emission_the_new_way em
-              end
-              p[ em.cached_event_value ]
+              p[ em._event_or_lines_ ]
             end
           else
             em.channel_symbol_array.should eql sym_a
@@ -266,25 +263,38 @@ module Skylab::Common::TestSupport
       end
     end  # will reopen
 
-      Debugging_listener_for___ = -> tc do
+    # ==
 
-        # eek - this is a tradeoff. when an API call is resulting in the
-        # "wrong" event, this level of detail can be helpful but at the
-        # cost of a large library footprint .. see tombstone
+    Debugging_listener_for___ = -> tc do
 
-        io = tc.debug_IO
+      # a series of tomstones. this replaces what is in #tombstone-C
 
-        br = Home_.lib_.brazen
-        _expag = br::API.expression_agent_instance
-        o = br::CLI_Support::ExpressionAgent::Handler_Expresser.new _expag
-        o.downstream_stream = io
-        o = o.finish
+      io = tc.debug_IO
 
-        -> i_a, & ev_p do
-          io.write "#{ i_a.inspect } "
-          o.handle i_a, & ev_p
+      br = Home_.lib_.brazen
+      _expag = br::API.expression_agent_instance
+      o = br::CLI_Support::ExpressionAgent::Handler_Expresser.new _expag
+      o.downstream_stream = io
+      o = o.finish
+
+      -> em do
+        chan = em.channel_symbol_array
+        io.write "#{ chan.inspect } "  # SPACE_
+        if em.is_expression
+          o.handle chan do |y|
+            calculate y, & em._expression_proc_
+          end
+        else
+          _ev = em.cached_event_value  # assume not ignored, because you're here
+          o.handle chan do
+            _ev
+          end
         end
+        UNRELIABLE_
       end
+    end
+
+    # ==
 
     module Test_Context_Instance_Methods  # re-opened
 
@@ -493,21 +503,6 @@ module Skylab::Common::TestSupport
       end
 
       # -- internal support
-
-      def __reify_emission_the_new_way em  # assume emission is not reified.
-
-        # there is a weirdly long discussion of this in the doc at #note-4.
-
-        if Looks_like_expression__[ em.channel_symbol_array ]
-          em._reify_when_expression_under _expev_upper_level_expression_agent
-        else
-          em._reify_when_event
-        end
-      end
-
-      def __expev_expag_for_reification
-        _expev_lower_level_expression_agent
-      end
 
       define_method :_expev_upper_level_expression_agent, -> do
 
@@ -730,28 +725,18 @@ module Skylab::Common::TestSupport
 
       def check_user_proc_alternately
 
-        # this experiment messes with state and reaches outside of silos
-        # for the convenience of getting an array of strings built under
-        # a particular expag when the emission is of shape "expression".
-        # it assume the emission has not been reified yet.
-
         p = @_expectation.alternate_user_proc
+
         em = @_emission
 
-        if Looks_like_expression__[ em.channel_symbol_array ]
-
+        if em.is_expression
           _expag = @_test_context._expev_lower_level_expression_agent
-
-          em.reify_by do | ev_p |
-            y = []
-            _expag.calculate y, & ev_p  # don't let the use block determine
-            # the result here - the result of those is formally unreliable.
-            y.freeze
-          end
+          _x = _expag.calculate [], & em._expression_proc_
+        else
+          _x = em.cached_event_value
         end
 
-        p[ em.cached_event_value ]
-
+        p[ _x ]
         UNRELIABLE_
       end
 
@@ -1113,11 +1098,10 @@ module Skylab::Common::TestSupport
         # ignoring means ignoring BUT if debugging is on then we ignore the
         # content but not the channel
 
-        -> sym_a, & ev_p do
+        -> sym_a, & _ev_p do
 
-          aux_chan_p.call [ :event_ignored, :expression, * sym_a ] do |y|
-            y << "(ignored this emission)"
-          end
+          _em = IgnoredEmission___.new sym_a
+          aux_chan_p[ _em ]
 
           UNRELIABLE_
         end
@@ -1158,11 +1142,9 @@ module Skylab::Common::TestSupport
 
         -> sym_a, & p do
 
-          record[ sym_a, & p ]
+          _em = record[ sym_a, & p ]
 
-          # DOUBLE-BUILDING
-
-          aux_chan_p.call sym_a, & p
+          aux_chan_p[ _em ]
 
           UNRELIABLE_
         end
@@ -1170,143 +1152,119 @@ module Skylab::Common::TestSupport
 
       def _handler_that_records em_a
 
-        -> sym_a, & ev_p do
+        -> chan, & em_p do
 
-          _em = Emission___.new ev_p, sym_a
-          em_a.push _em
-          UNRELIABLE_
+          em = if Looks_like_expression__[ chan ]
+            ExpressionEmission___.new em_p, sym_a
+          else
+            EventEmission___.new em_p, chan
+          end
+          em_a.push em
+          em
         end
       end
     end ; end
 
+    # (the class graph below is vaguely tracked by :[#045]., has mentees)
+
     # ==
 
-    class Emission___  # :[#045]. (has mentees)
+    class IgnoredEmission___
 
-      def initialize event_proc, channel_symbol_array
-
-        @channel_symbol_array = channel_symbol_array
-        @_needs_reification = true
-        @_x_p = event_proc
-      end
-
-      # -- IFF you know the emission is an expression
-
-      def expression_line_in_black_and_white
-        _be_careful :__black_and_white_line
-      end
-
-      def expression_line_codified
-        _be_careful :__codified_line
-      end
-
-      def _be_careful sym
-
-        if @_needs_reification
-
-          reify_by do |y_p|
-            __build_crazy_structure y_p
-          end
-        end
-
-        @_x.fetch( sym ).call
-      end
-
-      def __build_crazy_structure y_p
-
-        line_under = -> expag do
-          expag.calculate "", & y_p
-        end
-
-        black_and_white_line = Lazy_.call do
-          line_under[ Black_and_white_expression_agent__[] ]
-        end
-
-        codified_line = Lazy_.call do
-          line_under[ Codifying_expresion_agent__[] ]
-        end
-
-        {
-          __black_and_white_line: -> { black_and_white_line[] },
-          __codified_line: -> { codified_line[] },
-        }
-      end
-
-      # --
-
-      def cached_event_value
-        if @_needs_reification
-          __reify
-          @_needs_reification = false
-        end
-        @_x
-      end
-
-      def _reify_when_expression_under expag
-
-        reify_by do |act_y_p|
-          expag.calculate [], & act_y_p
-        end
-        NIL
-      end
-
-      def reify_by & do_this
-        _p = remove_instance_variable :@_x_p
-        @_needs_reification = false
-        @_x = do_this[ _p ]
-        NIL_
-      end
-
-      def __reify
-
-        if Looks_like_expression__[ @channel_symbol_array ]
-          _p = remove_instance_variable :@_x_p
-          @_x = Expression_as_Event___.new _p, @channel_symbol_array.last
-        else
-          __do_reify_when_event
-        end
-        NIL
-      end
-
-      def _reify_when_event
-        __do_reify_when_event
-        @_needs_reification = false
-      end
-
-      def __do_reify_when_event
-        @_x = remove_instance_variable( :@_x_p ).call
-        NIL
+      def initialize chan
+        @channel_symbol_array = [ :event_ignored, :expression, * chan ]
       end
 
       attr_reader(
         :channel_symbol_array,
-        :_needs_reification,
       )
+
+      def _expression_proc_
+        This___
+      end
+
+      This___ = -> y do
+        y << "«payload unavailable - this emission is ignored»"
+      end
+
+      def is_expression
+        true
+      end
     end
 
     # ==
 
-    class Expression_as_Event___
+    class EventEmission___
 
-      def initialize y_p, sym
-        @terminal_channel_symbol = sym
-        @_y_p = y_p
+      def initialize p, chan
+        @__event_proc = p
+        @channel_symbol_array = chan
       end
 
-      def express_into_under y, expag
-        expag.calculate y, & @_y_p
+      def _event_or_lines_
+        cached_event_value
+      end
+
+      def cached_event_value
+        ( @___event_knownness ||= ___build_event_knownness ).value_x
+      end
+
+      def ___build_event_knownness
+        _p = remove_instance_variable :@__event_proc
+        _ev = _p.call
+        Common_::Known_Known[ _ev ]
       end
 
       attr_reader(
-        :terminal_channel_symbol,
+        :channel_symbol_array,
       )
 
-      def to_event
-        self
+      def is_expression
+        false
+      end
+    end
+
+    # ==
+
+    class ExpressionEmission___
+
+      def initialize p, chan
+        @channel_symbol_array = chan
+        @_expression_proc_ = p
       end
 
-      def ok
-        NIL_
+      def _event_or_lines_
+        expression_line_in_black_and_white  # hi.
+      end
+
+      def expression_line_in_black_and_white
+        ( @___EL_BW ||= __build_expression_line_in_BW_knownness ).value_x
+      end
+
+      def __build_expression_line_in_BW_knownness
+        _line_knownness_under Black_and_white_expression_agent__[]
+      end
+
+      def expression_line_codified
+        ( @___EL_C ||= __build_expression_line_codified_knownness ).value_x
+      end
+
+      def __build_expression_line_codified_knownness
+        _line_knownness_under Codifying_expresion_agent__[]
+      end
+
+      def _line_knownness_under expag
+        _line = _expag.calculate "", & @_expression_proc_
+        Common_::Known_Known[ _line ]
+      end
+
+      attr_reader(
+        :channel_symbol_array,
+        :_expression_proc_,
+      )
+
+      def is_expression
+        true
       end
     end
 
@@ -1353,8 +1311,9 @@ module Skylab::Common::TestSupport
       }
     end
 
-    UNRELIABLE_ = false
+    UNRELIABLE_ = :_unreliable_from_expect_event_
   end
 end
+# #tombstone-C: no more double-building. now when debugging events, etc
 # #tombstone - event log was function soup
 # #tombstone - simple debugging output

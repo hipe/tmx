@@ -2,10 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - workspace create" do
+  describe "[tm] operations - workspace create" do
 
     TS_[ self ]
-    use :models
+    use :operations
 
     it "holy god" do
 

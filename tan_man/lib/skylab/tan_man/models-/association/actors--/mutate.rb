@@ -76,9 +76,10 @@ module Skylab::TanMan
       end
 
       def when_no_stmt_list
-        @result = maybe_send_event :error, :no_stmt_list do
+        maybe_send_event :error, :no_stmt_list do
           build_not_OK_event_with :no_stmt_list, :document, @document
         end
+        @result = UNABLE_
         UNABLE_
       end
 
@@ -101,13 +102,13 @@ module Skylab::TanMan
       end
 
       def rslv_from_node
-        @from_node = @touch_node_p.with :name, @from_node_label
-        @from_node and ACHIEVED_
+        _from_node = @touch_node_p.with :name, @from_node_label
+        _store :@from_node, _from_node
       end
 
       def rslv_to_node
-        @to_node = @touch_node_p.with :name, @to_node_label
-        @to_node and ACHIEVED_
+        _to_node = @touch_node_p.with :name, @to_node_label
+        _store :@to_node, _to_node
       end
 
       def node_verb_when_touch
@@ -236,9 +237,10 @@ module Skylab::TanMan
       end
 
       def when_no_protos
-        @result = maybe_send_event :error, :association_prototypes_not_found do
+        maybe_send_event :error, :association_prototypes_not_found do
           bld_association_prototypes_not_found_at_all
         end
+        @result = UNABLE_
         UNABLE_
       end
 
@@ -258,9 +260,10 @@ module Skylab::TanMan
       end
 
       def when_no_proto
-        @result = maybe_send_event :error, :association_prototypes_not_found do
+        maybe_send_event :error, :association_prototypes_not_found do
           bld_association_prototypes_not_found_with_that_name
         end
+        @result = UNABLE_
         UNABLE_
       end
 
@@ -284,7 +287,8 @@ module Skylab::TanMan
       end
 
       def resolve_hardcoded_prototype
-        @prototype = Proto__[ @parser ] and ACHIEVED_
+        _proto = Proto__[ @parser ]
+        _store :@prototype, _proto
       end
 
       Proto__ = -> do
@@ -394,7 +398,11 @@ module Skylab::TanMan
             :component_association, Models_::Association,
           )
         end
+
+        UNABLE_
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       class Conceptual_Association___
 

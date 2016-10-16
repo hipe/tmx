@@ -13,10 +13,10 @@ module Skylab::TanMan::TestSupport
   # case 7      Y  error - no output
   # case 8         error - no input, no output
 
-  describe "[tm] models - graph - sync" do
+  describe "[tm] operations - graph - sync" do
 
     TS_[ self ]
-    use :models
+    use :operations
 
     it "case 8 - error: no input, no output" do  #  indirectly case 3, case 6, case 7 too
       call_API :graph, :sync
@@ -58,7 +58,7 @@ module Skylab::TanMan::TestSupport
 
     it "case 5 - you can't copy a graph to the same waypoint" do
 
-      same_path = Home_::TestSupport::Fixtures::Graphs[ :the_empty_graph ]
+      same_path = Home_::TestSupport::FixtureGraphs[ :the_empty_graph ]
       same_path_ = same_path.dup
 
       call_API :graph, :sync,

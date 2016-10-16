@@ -112,6 +112,7 @@ module Skylab::Brazen
     # ~~ c r u d
 
     def persist_entity( x=nil, ent, & oes_p )
+
       doc = _document( & oes_p )
       doc and begin
         doc.persist_entity( * x, ent, & oes_p )

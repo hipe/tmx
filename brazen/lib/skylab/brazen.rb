@@ -165,7 +165,17 @@ module Skylab::Brazen
     Autoloader_[ self ]
   end
 
-  # --
+  # ==
+
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x
+    else
+      x
+    end
+  end
+
+  # ==
 
   Lazy_ = Common_::Lazy
 
@@ -181,10 +191,16 @@ module Skylab::Brazen
     Home_.lib_.system.path_looks_absolute path
   end
 
+  Path_looks_relative_ = -> path do
+    Home_.lib_.system.path_looks_absolute path
+  end
+
   Require_fields_lib_ = Lazy_.call do  # ..
     Field_ = Home_.lib_.fields
     NIL_
   end
+
+  # ==
 
   module Lib_
 
@@ -255,9 +271,7 @@ module Skylab::Brazen
     Zerk = sidesys[ :Zerk ]  # for testing only
   end
 
-  Path_looks_relative_ = -> path do
-    Home_.lib_.system.path_looks_absolute path
-  end
+  # ==
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 

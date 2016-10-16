@@ -3,12 +3,12 @@
 # require_relative '../../../../test-support'
 
 module Skylab::TanMan::TestSupport::Sexp
-  class Prototype::Grammars::Grammar70_75_WithPrototype < self::Grammar
+  class Grammars::Grammar70_78_WithPrototype < self::Grammar
     # everything is magic
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ::Skylab::TanMan::TestSupport::Sexp::Prototype::Grammars::
-    Grammar70_75_WithPrototype.new.invoke ::ARGV
+  ::Skylab::TanMan::TestSupport::Sexp::Grammars::
+    Grammar70_78_WithPrototype.new.invoke ::ARGV
 end

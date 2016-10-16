@@ -34,6 +34,7 @@ module Skylab::TanMan
         oes_p.call :error, :invalid_characters do
           __build_invalid_characters_event xtra_a.uniq
         end
+        UNABLE_
       else
         x
       end

@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby -w
+
+# is :[#024].
+
+program_name = -> do
+  ::File.basename $PROGRAM_NAME
+end
+
+serr = $stderr
+
+formal_arg = 'DIGIT'
+
+usage = -> do
+  serr.puts "usage: `#{ program_name[] } #{ formal_arg }`"
+end
+
+exit_with_usage = -> do
+  usage[]
+  exit 5
+end
+
+argv = ARGV
+case 1 <=> argv.length
+when -1
+  serr.puts "too many arguments"
+  exit_with_usage[]
+when 1
+  serr.puts "expecting #{ formal_arg }"
+  exit_with_usage[]
+end
+
+arg = argv.fetch 0
+
+if '-h' == arg
+  usage[]
+  serr.puts
+  serr.puts "summary: outputs numbers that \"subdivide\" the space"
+  serr.puts
+
+_body_string = <<-HERE
+if you had 2 items to fit into 1-99: there's always one buffer at the
+beginning and one at the end, and (N-1) * 2 buffers to account for the
+interceding buffers between adjacent items, so four buffers evenly
+spread between 99 (slot) items. (reminder: there is no '0' speace and
+no '100' space.)
+HERE
+
+  serr.puts "our \"formula\" for subdividing spaces:"
+
+_body_string.gsub! %r(^), '  '
+
+  serr.write _body_string
+  exit 0
+end
+
+md = /\A[1-9]\d*\z/.match arg
+if ! md
+  serr.puts "not a positive nonzero integer: #{ arg.inspect }"
+  exit_with_usage[]
+end
+
+_num_items = md[ 0 ].to_i
+
+    _go = -> num_items, spaces=99.0 do
+      buffers = 2 + ( ( num_items - 1 ) * 2 )
+      puts( spaces / buffers )
+      (( buffers - 3 ) / 2 ).times do |d|
+        puts( spaces / buffers * ( ( d * 2 ) + 3 ) )
+      end
+      puts( spaces / buffers * ( buffers - 1 ) )
+    end
+
+_go[ _num_items ]
+
+exit 0

@@ -2,8 +2,6 @@ module Skylab::TanMan
 
   module Models_::DotFile
 
-    Sessions__ = ::Module.new
-
     class Sessions__::Produce_Parse_Tree
 
       Attributes_actor_.call( self,
@@ -17,8 +15,8 @@ module Skylab::TanMan
         end
       end
 
-      DotFile_::SyntaxNodes.class
-      DotFile_::Sexp::InstanceMethods.class
+      Here_::SyntaxNodes.class
+      Here_::Sexp::InstanceMethods.class
 
       def execute
 

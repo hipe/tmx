@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-describe "[tm] models - dot-file parsing - examples 001 to 489" do
+describe "[tm] operations - dot-file parsing - examples 001 to 489" do
 
   TS_[ self ]
   use :models_dot_file_parsing

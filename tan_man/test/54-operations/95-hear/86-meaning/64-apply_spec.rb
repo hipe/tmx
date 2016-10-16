@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] models - meaning - hear map (integration, [br] frontier)" do
+  describe "[tm] operations - hear - meaning - apply" do
 
     TS_[ self ]
     use :expect_line

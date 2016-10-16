@@ -104,6 +104,7 @@ module Skylab::System
           maybe_send_event :error, :no_upstream do
             build_not_OK_event_with :no_upstream
           end
+          UNABLE_
         end
 
         def via_path_resolve_line_upstream

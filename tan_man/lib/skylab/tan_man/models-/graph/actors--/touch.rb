@@ -61,16 +61,12 @@ module Skylab::TanMan
 
         def __path_is_absolute
 
-          ok_arg = Home_.lib_.basic::Pathname.
-            normalization.new_with( :absolute ).normalize_qualified_knownness(
-              @_qkn, & @on_event_selectively )
+          _n11n = Path_lib_[].normalization.new_with :absolute
 
-          if ok_arg
-            @_qkn = ok_arg
-            ACHIEVED_
-          else
-            ok_arg
-          end
+          _ok_arg = _n11n.normalize_qualified_knownness(
+            @_qkn, & @on_event_selectively )
+
+          _store :@_qkn, _ok_arg
         end
 
         def __via_absolute_path_touch_path
@@ -79,8 +75,7 @@ module Skylab::TanMan
 
             if __path_exists
               ok = __path_is_file
-              ok or break
-              ok = _write_path_to_entity
+              ok &&= _write_path_to_entity
               break
             end
 
@@ -132,10 +127,10 @@ module Skylab::TanMan
             __build_adding_extension_event path
           end
 
-          @_qkn = @_qkn.new_with_value(
-            ::Pathname.new( @_qkn.value_x ).sub_ext( @ext ).to_path )
-
-          nil
+          d = ::File.extname( path ).length
+          _head = d.zero? ? path : path[ 0 ... - d ]
+          @_qkn = @_qkn.new_with_value "#{ _head }#{ @ext }"
+          NIL
         end
 
         def __build_adding_extension_event path_before
@@ -181,6 +176,8 @@ module Skylab::TanMan
           @__sys ||= Home_.lib_.system
         end
 
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
         include Common_::Event::Selective_Builder_Receiver_Sender_Methods
       end
 
@@ -196,8 +193,7 @@ module Skylab::TanMan
       def resolve_upstream_lines_
         otr = dup
         otr.extend Produce_upstream_lines___  # :+[#sl-106]
-        @up_lines = otr.execute
-        @up_lines && ACHIEVED_
+        _store :@up_lines, otr.execute
       end
 
       def flush_upstream_lines_to_file_ f  # assume @up_lines
@@ -231,6 +227,8 @@ module Skylab::TanMan
           y << "wrote #{ pth o.path } (#{ o.bytes }#{ _dry } bytes)"
         end
       end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       module Produce_upstream_lines___
 
