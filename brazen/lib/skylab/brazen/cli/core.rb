@@ -1818,7 +1818,7 @@ module Skylab::Brazen
 
             ft = entry_tree
 
-            if ft && ft.is_file_tree
+            if ft
               _sm = ft.value_state_machine_via_head _slug
               if _sm
                 _definitely_there self, const

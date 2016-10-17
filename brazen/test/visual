@@ -13,7 +13,6 @@ module Skylab::Brazen
     Branch_ = lib::Branch
 
     Autoloader_[ self ]
-
   end
 end
 

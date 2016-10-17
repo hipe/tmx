@@ -15,7 +15,7 @@ module Skylab::Common::TestSupport
 
           Foo = 1
 
-          define_singleton_method :_this_, Autoloader_::Reflection::Each_const_value_method
+          define_singleton_method :_this_, Autoloader_::Boxxy_::Reflection::Each_const_value_method
 
           BAR = 2
 

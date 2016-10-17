@@ -50,7 +50,7 @@ now, it is the case that we are optimizing to minimize trips to the
 filesystem. an operation available to us that is not used above is
 that of performing a directory listing.
 
-if we follow the assumptions of #note-4, we can minimize trips to the
+if we follow the assumptions of [#024] #note-2, we can minimize trips to the
 filesystem and still answer the above questions with an algorithm that
 looks nothing like the above. rather than ask the filesystem questions
 about individual files, we only ever make (and cache) directory listings.
@@ -73,13 +73,6 @@ to us at this point:
 with the information that comprises a "file tree", for any given would-be
 child node in that tree we can know if there is a corresponding
 eponymous file and/or a corresponding eponymous directory (or neither).
-
-
-
-
-## note :#note-4
-
-(EDIT)
 
 
 

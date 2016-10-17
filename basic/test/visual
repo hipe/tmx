@@ -13,7 +13,6 @@ module Skylab::Basic
     Client_ = lib::Client
 
     Branch_ = lib::Branch
-
   end
 end
 

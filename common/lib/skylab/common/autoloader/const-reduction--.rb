@@ -10,7 +10,6 @@ module Skylab::Common
           # invasive spirit of this facility, default is false.
 
         @file_tree_cacher = ftc
-        @final_path_to_load = nil
         @listener = p
         @result_in_name_and_value = nil
 
@@ -36,7 +35,6 @@ module Skylab::Common
       OPTIONS___ = {
         autoloaderize: :_boolean,  # #covered-by [dt]
         const_path: :_mixed_value,
-        final_path_to_load: :_mixed_value,
         from_module: :_mixed_value,
         result_in_name_and_value: :_boolean,
       }
@@ -57,10 +55,6 @@ module Skylab::Common
         @_frame_prototype = Framer___.new @file_tree_cacher, @autoloaderize
         x = remove_instance_variable :@const_path
         @__sanitized_const_path_mixed_array = ::Array.try_convert( x ) || [ x ]
-
-        if @final_path_to_load
-          self._KILL_ME
-        end
         NIL
       end
 
@@ -317,7 +311,7 @@ module Skylab::Common
           _node_path = @module.send NODE_PATH_METHOD_
           @_file_tree = @__file_tree_cache[ _node_path ]
           _sym = @_name.as_approximation
-          sm = @_file_tree.value_state_machine_via_approximation _sym
+          sm = @_file_tree.value_state_machine_via_approximation__ _sym
           if sm
             @__state_machine = sm
             ACHIEVED_

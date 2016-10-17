@@ -4,6 +4,16 @@ module Skylab::Common
 
     module Boxxy_  # [#030]
 
+      module Reflection  # a stowaway sort of
+
+        Each_const_value_method = -> & p do
+
+          constants.each do |sym|
+            p[ const_get sym, false ]
+          end
+        end
+      end
+
       class Controller
 
         def initialize mod

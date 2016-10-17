@@ -59,10 +59,6 @@ module Skylab::GitViz
 
   stowaway :Models_, 'models-/hist-tree'  # it's all here, for now
 
-  module Magnetics_
-    Autoloader_[ self ]
-  end
-
   Magnetics_::Relpath_via_Long_and_Short = -> long, short do
 
     d = short.length

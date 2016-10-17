@@ -1,6 +1,3 @@
-[#069] #open can get rid of `is_file_tree`
-[#068] #open same
-[#067] #open when thing done
 [#066]       #track emission conversion (this tag is semantically
              redundanty with something somewhere..)
              also track flip-flop emitting ..

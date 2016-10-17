@@ -68,18 +68,6 @@ module Skylab::Parse  # see [#001]
       Autoloader_[ self ]
     end
 
-    module Function_
-      Autoloader_[ self ]
-    end
-
-    module Functions_
-      Autoloader_[ self ]
-    end
-
-    module Input_Streams_
-      Autoloader_[ self ]
-    end
-
     Attributes_ = -> h do
       Home_.lib_.fields::Attributes[ h ]
     end

@@ -70,7 +70,7 @@ module Skylab::Common
       def __the_parent_module_has_an_associated_file_tree
 
         ft = @module.entry_tree
-        if ft && ft.is_file_tree
+        if ft
           @file_tree = ft ; ACHIEVED_
         else
           UNABLE_  # covered, follow
@@ -80,8 +80,8 @@ module Skylab::Common
       def __the_file_tree_has_an_associated_filesystem_entry_group
 
         # open [#067] why do we do approximation why not etc
-        _sym = name_.as_approximation
-        sm = @file_tree.value_state_machine_via_approximation _sym
+        _slug = name_.as_slug
+        sm = @file_tree.value_state_machine_via_head _slug
         if sm
           self.state_machine = sm
           ACHIEVED_

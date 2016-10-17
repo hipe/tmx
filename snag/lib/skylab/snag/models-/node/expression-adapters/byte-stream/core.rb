@@ -27,7 +27,7 @@ module Skylab::Snag
       end  # >>
 
       Delineate__ = -> do
-        Magnetics_::ExpressDelineatedLines_via_Node
+        Here_::Magnetics_::ExpressDelineatedLines_via_Node
       end
 
       module Magnetics_

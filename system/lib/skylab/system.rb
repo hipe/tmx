@@ -140,11 +140,6 @@ module Skylab::System
 
   module Filesystem  # (stowaway)
 
-    module Normalizations
-
-      Autoloader_[ self ]
-    end
-
     CONST_SEP_ = '::'
     DIRECTORY_FTYPE = 'directory'
     DOT_ = '.'

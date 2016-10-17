@@ -28,10 +28,6 @@ module Skylab::TestSupport
       end
     end
 
-    module Adapters_
-      Autoloader_[ self ]
-    end
-
     class Adapter_
 
       def initialize rsc, & oes_p

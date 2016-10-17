@@ -39,7 +39,19 @@ the filesystem hit and loading of asset file(s) for each item.
 ### 2. but at what cost?
 
 the main issue is with "isomorphic dissonance" between filesystem names
-and const names. (EDIT)
+and const names. generally we can infer the filesystem node name from
+a const name, but we cannot go the other way with certainty. for one
+example, the file `foo-bar.kode` might contain any of `FooBar`, `Foo_Bar`,
+`FOO_BAR`, or others. all of those constants *must* (generally) live in
+the file `foo-bar.kode`; however you don't know what constants that file
+defines just by looking at the filename.
+
+our "solution" for this in the case of boxxy is this: the result you get
+from calling `constants` on a boxxy module *might* contain "inferences".
+you have no way of knowing if it does and if so, what those inferences are.
+all you know is that if your asset tree follows the "rules" of [#024] #note-2,
+calling `const_get` on that module with any of the names in that array
+will produce a value.
 
 
 
@@ -59,7 +71,7 @@ between "constantspace" and filesystem: we allow that there can be arbitrary
 constants defined in the subject module that have no counterpart node in the
 filesystem. however, for the converse we *do* model as a strong
 isomorphicism: any "nodes" that we discover through the mechanism of
-[#058] #note-4, we model an inference of the existence of an "approximated"
+[#024] #note-1, we model an inference of the existence of an "approximated"
 const when a corresponding "concrete" const is not known.
 
 so the founding axioms are that we can (in one direction) go from a "const"

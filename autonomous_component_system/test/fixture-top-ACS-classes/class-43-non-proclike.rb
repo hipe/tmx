@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
   module Fixture_Top_ACS_Classes
 
-    class Class_43_Non_ProcLike
+    class Class_43_Non_Proclike
 
       class << self
         alias_method :new_cold_root_ACS_for_expect_root_ACS, :new

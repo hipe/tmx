@@ -160,11 +160,6 @@ module Skylab::Snag
     end
   end.call
 
-  module Model_
-    Autoloader_[ Collection = ::Module.new ]
-    Autoloader_[ self ]
-  end
-
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end

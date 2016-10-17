@@ -576,3 +576,4 @@ module Skylab::Snag
     Here_= self
   end
 end
+# #tombstone: events with one event

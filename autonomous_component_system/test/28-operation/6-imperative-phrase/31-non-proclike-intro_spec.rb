@@ -48,7 +48,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     end
 
     def subject_root_ACS_class
-      Fixture_top_ACS_class[ :Class_43_Non_ProcLike ]
+      Fixture_top_ACS_class[ :Class_43_Non_Proclike ]
     end
   end
 end

@@ -267,11 +267,11 @@ class Skylab::Task
 
       _attrs = as_attributes_
       _ = index.on_event_selectively
-      Models_::Parameter::Collection_as_Dependency.new @_sym, _attrs, & _
+      Home_::Models_::Parameter::Collection_as_Dependency.new @_sym, _attrs, & _
     end
 
     def as_attributes_
-      @___attrs ||= Models_::Parameter::Parse[ remove_instance_variable( :@_a ) ]
+      @___attrs ||= Home_::Models_::Parameter::Parse[ remove_instance_variable( :@_a ) ]
     end
   end
 
@@ -330,7 +330,7 @@ class Skylab::Task
 
       def collection_via_directory_object_and_module dir_o, mod
 
-        o = Magnetics_  # (wants [#005])
+        o = Home_::Magnetics::Magnetics_  # (wants [#005])
 
         _tss = o::TokenStreamStream_via_DirectoryObject[ dir_o ]
 
@@ -357,24 +357,8 @@ class Skylab::Task
       end
     end  # >>
 
-    module Magnetics
-      Autoloader_[ self ]
-    end
-
-    module Magnetics_
-      Autoloader_[ self ]
-    end
-
-    module Models_
-      Autoloader_[ self ]
-    end
-
     Autoloader_[ self ]
     Here_ = self
-  end
-
-  module Models_
-    Autoloader_[ self ]
   end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]

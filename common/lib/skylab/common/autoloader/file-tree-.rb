@@ -174,7 +174,7 @@ module Skylab::Common
           __init_index_via_hit_the_filesystem
           if @_ok
             @_a.sort!  # don't let the filesystem determine the order. tests flicker
-            FilesystemHit___.new @_h_, @_a, @_h, @node_path, @treer
+            FilesystemHit___.new @_a, @_h, @node_path, @treer
           else
             send @_when_failed
           end
@@ -197,7 +197,7 @@ module Skylab::Common
             p = main
           end
           p = -> entry do
-            @_a = [] ; @_h = {} ; @_h_ = {}
+            @_a = [] ; @_h = {}
             DOT_ == entry || self._SANITY
             p = dot_dot
           end
@@ -245,8 +245,6 @@ module Skylab::Common
 
             @_a.push k
 
-            @_h_[ Distill_[ k ] ] = k
-
             ent = if looks_like_file
               ProbablyFile___.new k, md.string
             else
@@ -275,14 +273,12 @@ module Skylab::Common
 
       class FilesystemHit___
 
-        def initialize h_, a, h, s, treer
+        def initialize a, h, s, treer
 
           @_a = a ; @_h = h
-          @__head_via_approximation = h_
           @node_path = s
           @_value_state_machine_cache = {}
           @treer = treer
-          freeze
         end
 
         def get_load_file_path_for__ head
@@ -315,10 +311,8 @@ module Skylab::Common
         end
 
         def corefile_state_machine
-          value_state_machine_via_approximation CORE_KEY___
+          value_state_machine_via_head CORE_ENTRY_STEM
         end
-
-        CORE_KEY___ = CORE_ENTRY_STEM.intern
 
         def to_state_machine_stream
           _ = to_state_machine_stream_proc_
@@ -335,12 +329,20 @@ module Skylab::Common
           end
         end
 
-        def value_state_machine_via_approximation k
+        def value_state_machine_via_approximation__ k
 
-          head = @__head_via_approximation[ k ]
+          head = ( @___head_via_approximation ||= __build_fuzzy_cache )[ k ]
           if head
             _value_state_machine_via_head head
           end
+        end
+
+        def __build_fuzzy_cache
+          h = {}
+          @_h.keys.each do |s|
+            h[ Distill_[s] ] = s
+          end
+          h
         end
 
         def value_state_machine_via_head head
@@ -364,10 +366,6 @@ module Skylab::Common
           sm = ValueStateMachine___.new entry_group, @node_path
           @_value_state_machine_cache[ head ] = sm
           sm
-        end
-
-        def is_file_tree
-          true
         end
 
         attr_reader(

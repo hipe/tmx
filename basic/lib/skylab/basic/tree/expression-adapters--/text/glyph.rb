@@ -32,7 +32,7 @@ module Skylab::Basic
 
     module Glyphs
 
-      define_singleton_method :each_value, Autoloader_::Reflection::Each_const_value_method
+      define_singleton_method :each_value, Autoloader_::Boxxy_::Reflection::Each_const_value_method
 
       -> g do
 

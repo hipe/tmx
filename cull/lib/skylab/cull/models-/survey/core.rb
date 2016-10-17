@@ -215,8 +215,9 @@ module Skylab::Cull
 
     def maybe_relativize_path path
 
-      relpath = ::Pathname.new( path ).relative_path_from(
-        ::Pathname.new( _workspace_path ) ).to_path
+      _from = _workspace_path
+
+      relpath = Home_.lib_.basic::Pathname::Relative_path_from[ path, _from ]
 
       if relpath.length < path.length
         relpath

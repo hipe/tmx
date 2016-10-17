@@ -1,7 +1,6 @@
 module Skylab::Fields
 
   module Events
-
     Autoloader_[ self ]
   end
 

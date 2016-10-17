@@ -63,14 +63,6 @@ module Skylab::Git
     end
   end  # >>
 
-  module Magnetics
-    Autoloader_[ self ]
-  end
-
-  module Models
-    Autoloader_[ self ]
-  end
-
   module Models_
 
     module Branches

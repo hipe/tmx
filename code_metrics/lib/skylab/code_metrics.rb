@@ -24,8 +24,7 @@ module Skylab::CodeMetrics
         # in a developmental (broken) state.
 
         ft = ke.reactive_tree_seed.entry_tree
-
-        ft.is_file_tree || self._SANITY
+        ft || Home_._COVER_ME
 
         _head = nf.as_slug
         _sm = ft.value_state_machine_via_head _head

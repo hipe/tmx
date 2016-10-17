@@ -448,10 +448,6 @@ module Skylab::Human
       Autoloader_[ self ]
     end
 
-    module Models_
-      Autoloader_[ self ]
-    end
-
     # ==
 
     Pipeline_Query___ = ::Struct.new(

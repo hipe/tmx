@@ -73,14 +73,6 @@ module Skylab::Common::TestSupport
 
   # --
 
-  module FixtureTreesVolatile
-    Autoloader_[ self ]
-  end
-
-  module FixtureFiles
-    Autoloader_[ self ]
-  end
-
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   # --

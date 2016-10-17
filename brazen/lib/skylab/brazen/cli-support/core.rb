@@ -180,6 +180,7 @@ module Skylab::Brazen
     end
 
     module Option_Parser
+      # (here because the would-be corefile is an orphan)
       Autoloader_[ self ]
     end
 

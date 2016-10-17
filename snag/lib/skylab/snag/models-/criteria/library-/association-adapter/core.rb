@@ -229,8 +229,6 @@ module Skylab::Snag
 
         attr_reader :named_functions_
 
-        Autoloader_[ self ]
-
         Here___ = self
         Parse__ = LIB_.parse_lib
       end
