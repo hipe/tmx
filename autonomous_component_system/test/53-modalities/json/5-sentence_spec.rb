@@ -39,19 +39,20 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       context "in an emission expression initiated by the component," do
 
-        shared_subject :_em do
+        shared_subject :_em_tuple do
+
+          em = only_emission
+          em.is_expression || fail
 
           _expag = expression_agent_for_expect_event
-          em = only_emission
-          em.reify_by do |p|
-            _expag.calculate [], & p
-          end
-          em
+          _lines = _expag.calculate [], & em.expression_proc
+
+          [ _lines, em ]
         end
 
         it "the channel that the component chose stays as-is" do
 
-          _em.channel_symbol_array.should eql [ :error, :expression, :nope ]
+          _em_tuple.last.channel_symbol_array.should eql [ :error, :expression, :nope ]
         end
 
         it "the predicate as expressed by the component is intact" do
@@ -85,11 +86,11 @@ module Skylab::Autonomous_Component_System::TestSupport
         end
 
         def _first_line
-          _em.cached_event_value.fetch 0
+          _em_tuple.first.fetch 0
         end
 
         def __last_line
-          _em.cached_event_value.fetch 1
+          _em_tuple.first.fetch 1
         end
       end
     end

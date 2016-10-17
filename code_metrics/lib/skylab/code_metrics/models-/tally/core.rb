@@ -90,7 +90,7 @@ module Skylab::CodeMetrics
 
     def __digraph_via_graph_structure_and_parameters
 
-      o = Magnetics_::Digraph_via_Graph_Structure_and_Parameters.new
+      o = Here_::Magnetics_::Digraph_via_Graph_Structure_and_Parameters.new
       o.features_section_label = 'Symbols'
       o.bucket_tree_section_label = 'Files'
       o.document_label = 'the occurrence of these symbol in these files'
@@ -110,7 +110,7 @@ module Skylab::CodeMetrics
 
     def __graph_structure_via_match_stream
 
-      o = Magnetics_::Graph_Structure_via_Match_Stream.new
+      o = Here_::Magnetics_::Graph_Structure_via_Match_Stream.new
       o.match_stream = remove_instance_variable :@_match_stream
       o.pattern_strings = @_pattern_strings
       _set_or_stop :@_graph_structure, o
@@ -118,7 +118,7 @@ module Skylab::CodeMetrics
 
     def __match_stream_via_vendor_stream
 
-      o = Magnetics_::Match_Stream_via_Vendor_Match_Stream.new
+      o = Here_::Magnetics_::Match_Stream_via_Vendor_Match_Stream.new
       o.pattern_strings = @_pattern_strings
       o.vendor_match_stream = remove_instance_variable :@_vendor_match_stream
       _set_or_stop :@_match_stream, o
@@ -128,7 +128,7 @@ module Skylab::CodeMetrics
 
       @_pattern_strings = @argument_box.fetch :word  # eek
 
-      o = Magnetics_::Vendor_Match_Stream_via_Files_Slice_Stream.
+      o = Here_::Magnetics_::Vendor_Match_Stream_via_Files_Slice_Stream.
         new( & @on_event_selectively )
 
       o.files_slice_stream = remove_instance_variable :@_files_slice_stream
@@ -145,7 +145,7 @@ module Skylab::CodeMetrics
       _o = @argument_box
       h = _o.h_
 
-      o = Magnetics_::Files_Slice_Stream_via_Parameters.new
+      o = Here_::Magnetics_::Files_Slice_Stream_via_Parameters.new
 
       o.chunk_size = 100  # etc #open [#014]  this is a thing
 
@@ -169,5 +169,7 @@ module Skylab::CodeMetrics
         x
       end
     end
+
+    Here_ = self
   end
 end

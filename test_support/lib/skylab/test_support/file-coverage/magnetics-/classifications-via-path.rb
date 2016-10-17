@@ -32,6 +32,7 @@ module Skylab::TestSupport
           Common_::Event.wrap.exception e,
             :path_hack, :terminal_channel_i, :resource_not_found
         end
+        UNABLE_
       end
 
       def __via_stat_determine_shape

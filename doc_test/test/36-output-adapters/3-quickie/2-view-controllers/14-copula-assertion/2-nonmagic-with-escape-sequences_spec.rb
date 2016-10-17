@@ -32,7 +32,7 @@ module Skylab::DocTest::TestSupport
 
         em.channel_symbol_array == [ :info, :expression, :unsupported_escape_sequence ] || fail
 
-        _ = em.expression_line_in_black_and_white
+        _ = em.black_and_white_expression_line
         _.include?(
           "in a double-quoted string, we don't know how to unescape \"y\" "
         ) || fail

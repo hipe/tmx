@@ -121,11 +121,14 @@ module Skylab::Basic
         if ok
           @qualified_knownness.to_knownness
 
-        elsif @on_event_selectively
-          @on_event_selectively.call :error, :not_in_range do
-            Explanation__.new_with QKN__, @qualified_knownness, :or_a, @or_a
-          end
         else
+
+          oes_p = @on_event_selectively
+          if oes_p
+            oes_p.call :error, :not_in_range do
+              Explanation__.new_with QKN__, @qualified_knownness, :or_a, @or_a
+            end
+          end
 
           UNABLE_
         end

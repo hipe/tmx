@@ -59,12 +59,10 @@ module Skylab::System
             _ok = __can_create
             _ok && __create
           else
-
             maybe_send_event :error, :enoent do
-
               Common_::Event.wrap.exception @exception_, :path_hack
-
             end
+            UNABLE_
           end
         else
           maybe_send_event :error, :strange_stat_error do
@@ -139,24 +137,30 @@ module Skylab::System
       def __cannot_create_because_path_too_deep
 
         maybe_send_event :error, :path_too_deep do
+          __build_path_too_deep_event
+        end
 
-          build_not_OK_event_with(
-            :path_too_deep,
-            :path, path_, :necessary_path, @_curr_pn.to_path,
-            :max_mkdirs, @_max_mkdirs,
-            :necessary_mkdirs, @_num_dirs_needed_to_create,
+        UNABLE_
+      end
 
-          ) do | y, o |
+      def __build_path_too_deep_event
 
-            _tgt_path = o.path[ o.necessary_path.length + 1 .. -1 ]
+        _ev = build_not_OK_event_with(
+          :path_too_deep,
+          :path, path_, :necessary_path, @_curr_pn.to_path,
+          :max_mkdirs, @_max_mkdirs,
+          :necessary_mkdirs, @_num_dirs_needed_to_create,
+        ) do |y, o|
+
+          _tgt_path = o.path[ o.necessary_path.length + 1 .. -1 ]
 
             y << "cannot create #{ ick _tgt_path } because #{
              }would have to create at least #{ o.necessary_mkdirs } #{
               }directories, only allowed to make #{ o.max_mkdirs }, and #{
                }#{ pth o.necessary_path } does not exist."
-          end
         end
-        UNABLE_
+
+        _ev  # hi.
       end
 
       def __can_create_via_stat_and_existent_pn

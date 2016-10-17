@@ -224,7 +224,7 @@ module Skylab::Basic
           redo
         end while nil
 
-        @_user_x
+        @_result
       end
 
       def _via_found_state_for_transition yes_x, sta
@@ -397,8 +397,7 @@ module Skylab::Basic
 
         _receive_next_state = sta
 
-        @_user_x = @_downstream
-        @_downstream = nil
+        @_result = remove_instance_variable :@_downstream
         NIL_
       end
 
@@ -439,14 +438,14 @@ module Skylab::Basic
       def _maybe_send_no_available_transition_among sta_a  # must result in nil
 
         if @_oes_p
-          @_user_x = @_oes_p.call :error, :case, :no_available_state_transition do
+          @_oes_p.call :error, :case, :no_available_state_transition do
             _build_no_available_transition sta_a
           end
-          NIL_
+          @_result = UNABLE_
+          NIL
         else
           raise _build_exception_around sta_a
         end
-        NIL_
       end
 
       def _build_exception_around sta_a

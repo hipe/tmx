@@ -122,16 +122,14 @@ module Skylab::Human::TestSupport
         a = remove_instance_variable( :@event_log ).flush_to_array
         1 == a.length or fail
         em = a.first
-        is_event = false
-        em.reify_by do |y_p|
-          if y_p.arity.zero?
-            is_event = true
-            y_p[]
-          else
-            expag.calculate [], & y_p
-          end
+
+        if em.is_expression
+          is_event = false
+          x = expag.calculate [], & em.expression_proc
+        else
+          is_event = true
+          x = em.cached_event_value
         end
-        x = em.cached_event_value
 
         # -- write the state
 

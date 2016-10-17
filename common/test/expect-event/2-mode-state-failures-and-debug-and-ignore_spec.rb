@@ -109,9 +109,9 @@ module Skylab::Common::TestSupport
 
           io = @debug_IO
           io.rewind
-          io.gets == "[:event_ignored, :expression, :zizzo] (ignored this emission)\n" or fail
+          io.gets == "[:event_ignored, :expression, :zizzo] «payload unavailable - this emission is ignored»\n" or fail
           io.gets == "[:zizzo, :expression, :zIZZo] ** zeez **\n" or fail  # not ignored
-          io.gets == "[:event_ignored, :expression, :hi, :zizzo] (ignored this emission)\n" or fail
+          io.gets == "[:event_ignored, :expression, :hi, :zizzo] «payload unavailable - this emission is ignored»\n" or fail
           io.gets and fail
         end
 

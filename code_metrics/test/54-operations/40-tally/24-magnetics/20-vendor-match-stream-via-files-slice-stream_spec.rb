@@ -20,11 +20,11 @@ module Skylab::CodeMetrics::TestSupport
       _ok = o.execute
       _ok.should eql false
 
-      _em = expect_neutral_event
+      _em = expect_not_OK_event
 
-      _ = black_and_white _em.cached_event_value
+      _act = _em.black_and_white_expression_line
 
-      _.should match %r(\Ainvalid pattern, must look [a-z ]+: "\[#foo-999\]"\z)
+      _act =~ %r(\Ainvalid pattern, must look [a-z ]+: "\[#foo-999\]"\z) || fail
     end
 
     it "but money is money" do

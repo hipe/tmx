@@ -65,6 +65,8 @@ module Skylab::Cull
 
           Home_.lib_.fields::Events::Extra.new_via [ @prefix ], _s_a, "prefix"
         end
+
+        UNABLE_
       end
 
       def get_available_prefixes
@@ -174,7 +176,7 @@ module Skylab::Cull
 
         @_emit.call :error, :invalid_extension do
 
-          _s_a = _get_upstream_adapters_names.map do | nm |
+          _s_a = _sorted_upstream_adapters_names.map do | nm |
             ".#{ nm.as_slug }"
           end
 
@@ -188,7 +190,7 @@ module Skylab::Cull
 
         @_emit.call :error, :invalid_adapter do
 
-          _s_a = _get_upstream_adapters_names.map do | nm |
+          _s_a = _sorted_upstream_adapters_names.map do | nm |
             nm.as_lowercase_with_underscores_symbol
           end
 
@@ -198,12 +200,21 @@ module Skylab::Cull
         UNABLE_
       end
 
-      def _get_upstream_adapters_names
+      def _sorted_upstream_adapters_names
+        These___[]
+      end
 
-        Here_::Adapters__.constants.reduce [] do | m, x |
-          m.push Common_::Name.via_const_symbol x
-          m
+      These___ = Lazy_.call do
+
+        name_a = Here_::Adapters__.constants.map do |const|
+          Common_::Name.via_const_symbol const
         end
+
+        name_a.sort_by! do |name|
+          name.as_const
+        end
+
+        name_a.freeze
       end
 
       # ~ end pairs

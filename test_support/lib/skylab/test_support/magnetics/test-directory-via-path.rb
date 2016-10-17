@@ -72,12 +72,16 @@ module Skylab::TestSupport
       end
 
       def __when_not_found num_dirs_looked
+
         @on_event_selectively.call :error, :resource_not_found do
+
           Home_.lib_.system.filesystem.walk.build_resource_not_found_event(
             @start_path,
             @filenames,
             num_dirs_looked )
         end
+
+        UNABLE_
       end
 
       def __init_find
@@ -102,6 +106,7 @@ module Skylab::TestSupport
           if yes
             @on_event_selectively[ * i_a, & ev_p ]
           end
+          NIL
         end
 
         NIL_

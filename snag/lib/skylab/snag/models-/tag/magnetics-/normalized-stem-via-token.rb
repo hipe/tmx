@@ -45,6 +45,7 @@ module Skylab::Snag
         @on_event_selectively.call :error, :invalid_tag_stem do
           __build_invalid_event
         end
+        UNABLE_
       end
 
       def __build_invalid_event

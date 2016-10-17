@@ -6,8 +6,6 @@ module Skylab::Cull
 
       def any_nearest_path_via_looking_upwards_from_path arg, & oes_p
 
-        result = nil
-
         fs = Home_.lib_.filesystem
 
         surrounding_path = fs.walk(
@@ -15,16 +13,13 @@ module Skylab::Cull
           :filename, FILENAME_,
           :ftype, fs.constants::DIRECTORY_FTYPE,
           :max_num_dirs_to_look, -1,
-          :prop, arg.association
-        ) do | * i_a, & ev_p |
-          result = oes_p[ * i_a, & ev_p ]
-          UNABLE_
-        end
+          :prop, arg.association,
+          & oes_p )
 
         if surrounding_path
           ::File.join surrounding_path, FILENAME_
         else
-          result
+          surrounding_path
         end
       end
     end  # >>
@@ -487,10 +482,10 @@ module Skylab::Cull
           _qualified_knownness,
           & @on_event_selectively )
 
-        path and rslv_existent_survey_via_existent_path path
+        path and ___resolve_existent_survey_via_existent_path path
       end
 
-      def rslv_existent_survey_via_existent_path path
+      def ___resolve_existent_survey_via_existent_path path
 
         sv = Models_::Survey.edit_entity @kernel, @on_event_selectively do | edit |
           edit.retrieve_via_workspace_path path
@@ -535,5 +530,6 @@ module Skylab::Cull
     CONFIG_FILENAME_ = 'config'.freeze
     FILENAME_ = 'cull-survey'.freeze
     Here_ = self
+    UNRELIABLE_ = :_cu_unreliable_
   end
 end

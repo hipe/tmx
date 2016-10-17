@@ -39,6 +39,7 @@ module Skylab::Cull
             @_emit.call :error, :early_end_of_stream do
               event_for_fell_short_of_count d, count
             end
+            UNABLE_
           end
         end
       end

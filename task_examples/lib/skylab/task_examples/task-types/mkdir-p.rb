@@ -26,7 +26,6 @@ module Skylab::TaskExamples
       ) do | * i_a, & ev_p |
         did_send_event = true
         send :"__on__#{ i_a.last }__", ev_p[]
-        UNRELIABLE_
       end
 
       if kn
@@ -44,7 +43,7 @@ module Skylab::TaskExamples
       @_oes_p_.call :error, :path_too_deep do
         ev
       end
-      NIL_
+      UNRELIABLE_
     end
 
     def _WASABOVE
@@ -62,7 +61,7 @@ module Skylab::TaskExamples
       @_oes_p_.call :info, :creating_directory do
         ev
       end
-      NIL_
+      UNRELIABLE_
     end
 
     attr_reader(

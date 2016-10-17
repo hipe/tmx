@@ -65,6 +65,7 @@ module Skylab::Snag
         @on_event_selectively.call :info, :did_not_match do
           __build_did_not_match_event line_o
         end
+        NOTHING_
       end
 
       def __build_did_not_match_event line_o
@@ -149,6 +150,7 @@ module Skylab::Snag
         d
       end
 
+      NOTHING_ = nil
       Rx_Lib__ = Home_.lib_.basic::Regexp
     end
   end

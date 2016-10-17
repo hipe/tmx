@@ -29,6 +29,8 @@ module Skylab::Autonomous_Component_System
 
           new_with :context_linked_list, sess.context_linked_list
         end
+
+        UNABLE_  # important
       end
     end
   # -

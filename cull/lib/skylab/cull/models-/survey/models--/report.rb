@@ -105,7 +105,7 @@ module Skylab::Cull
             :function_identifier, func.marshal,
           )
         end
-        nil
+        NOTHING_
       end
 
       def __remove indexes_to_nil_out_afterwards
@@ -157,6 +157,7 @@ module Skylab::Cull
       end
 
       Me__ = self
+      NOTHING_ = nil
     end
   end
 end

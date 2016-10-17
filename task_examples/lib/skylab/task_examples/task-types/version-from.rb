@@ -119,7 +119,7 @@ module Skylab::TaskExamples
             y << headerize[ s ]
           end
         end
-        UNRELIABLE_
+        y
       end
 
       ACHIEVED_

@@ -33,6 +33,7 @@ module Skylab::Fields
         maybe_send_event :error, :extra_properties do
           _build_extra_properties_event [ sym ]
         end
+        UNABLE_
       end
     end
 
@@ -79,6 +80,7 @@ module Skylab::Fields
       maybe_send_event :error, :extra_properties do
         _build_extra_properties_event xtra_a
       end
+      UNABLE_
     end
 
     def _build_extra_properties_event xtra_a

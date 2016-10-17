@@ -119,6 +119,7 @@ module Skylab::Snag
               oes_p.call :error, :component_not_found do
                 __build_enity_not_found_event id_o
               end
+              UNABLE_
             end
           end
         end

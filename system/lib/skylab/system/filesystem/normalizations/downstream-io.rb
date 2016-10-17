@@ -274,6 +274,7 @@ module Skylab::System
         maybe_send_event :error, :exception do
           wrap_exception_ @exception_
         end
+        UNABLE_
       end
 
       def byte_whichstream_identifier_

@@ -282,7 +282,7 @@ module Skylab::Common::TestSupport
         io.write "#{ chan.inspect } "  # SPACE_
         if em.is_expression
           o.handle chan do |y|
-            calculate y, & em._expression_proc_
+            calculate y, & em.expression_proc
           end
         else
           _ev = em.cached_event_value  # assume not ignored, because you're here
@@ -584,12 +584,12 @@ module Skylab::Common::TestSupport
 
       def ___check_trilean
 
-        if @_expectation.trilean_value != @_emission.cached_event_value.to_event.ok
+        if @_expectation.trilean_value != @_emission._trilean_
 
           _add_failure_by do
 
             _exp_x = @_expectation.trilean_value
-            _act_x = @_emission.cached_event_value.to_event.ok
+            _act_x = @_emission._trilean_
 
             "expected event's `ok` value to be #{ Say_trilean__[ _exp_x ] },#{
               } was #{ Say_not_trilean__[ _act_x ] }"
@@ -731,7 +731,7 @@ module Skylab::Common::TestSupport
 
         if em.is_expression
           _expag = @_test_context._expev_lower_level_expression_agent
-          _x = _expag.calculate [], & em._expression_proc_
+          _x = _expag.calculate [], & em.expression_proc
         else
           _x = em.cached_event_value
         end
@@ -761,7 +761,7 @@ module Skylab::Common::TestSupport
 
         _expag = @_test_context._expev_lower_level_expression_agent
 
-        _lines = @_emission.cached_event_value.express_into_under [], _expag
+        _lines = @_emission._express_into_under_ [], _expag
 
         _lines.join NEWLINE_
       end
@@ -1155,7 +1155,7 @@ module Skylab::Common::TestSupport
         -> chan, & em_p do
 
           em = if Looks_like_expression__[ chan ]
-            ExpressionEmission___.new em_p, sym_a
+            ExpressionEmission___.new em_p, chan
           else
             EventEmission___.new em_p, chan
           end
@@ -1179,7 +1179,7 @@ module Skylab::Common::TestSupport
         :channel_symbol_array,
       )
 
-      def _expression_proc_
+      def expression_proc
         This___
       end
 
@@ -1199,6 +1199,15 @@ module Skylab::Common::TestSupport
       def initialize p, chan
         @__event_proc = p
         @channel_symbol_array = chan
+      end
+
+      def _express_into_under_ y, expag
+        _ev = cached_event_value
+        _ev.express_into_under y, expag
+      end
+
+      def _trilean_
+        cached_event_value.to_event.ok
       end
 
       def _event_or_lines_
@@ -1230,37 +1239,40 @@ module Skylab::Common::TestSupport
 
       def initialize p, chan
         @channel_symbol_array = chan
-        @_expression_proc_ = p
+        @expression_proc = p
+      end
+
+      def _express_into_under_ y, expag
+        expag.calculate y, & @expression_proc
       end
 
       def _event_or_lines_
-        expression_line_in_black_and_white  # hi.
+        ( @___1 ||= _kn( [], Black_and_white_expression_agent__[] )).value_x
       end
 
-      def expression_line_in_black_and_white
-        ( @___EL_BW ||= __build_expression_line_in_BW_knownness ).value_x
+      def black_and_white_expression_line
+        ( @___2 ||= _kn( "", Black_and_white_expression_agent__[] )).value_x
       end
 
-      def __build_expression_line_in_BW_knownness
-        _line_knownness_under Black_and_white_expression_agent__[]
+      def _kn y, expag
+        _y_ = expag.calculate y, & @expression_proc
+        Common_::Known_Known[ _y_ ]
       end
 
-      def expression_line_codified
-        ( @___EL_C ||= __build_expression_line_codified_knownness ).value_x
+      def _trilean_
+        # ick not sure..
+        ICK_NOT_SURE___.fetch @channel_symbol_array.fetch 0
       end
 
-      def __build_expression_line_codified_knownness
-        _line_knownness_under Codifying_expresion_agent__[]
-      end
-
-      def _line_knownness_under expag
-        _line = _expag.calculate "", & @_expression_proc_
-        Common_::Known_Known[ _line ]
-      end
+      ICK_NOT_SURE___ = {
+        error: false,
+        info: NIL,
+        payload: NIL,  # EEK
+      }
 
       attr_reader(
         :channel_symbol_array,
-        :_expression_proc_,
+        :expression_proc,
       )
 
       def is_expression

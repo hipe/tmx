@@ -159,6 +159,7 @@ module Skylab::Fields
               :property, prp,
               :error_category, :name_error )
           end
+          UNABLE_
         end
 
         def knownness_via_association_ atr  # :[#028]. (has 1x redund)

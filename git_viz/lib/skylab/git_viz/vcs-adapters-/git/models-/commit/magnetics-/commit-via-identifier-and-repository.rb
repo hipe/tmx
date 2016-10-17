@@ -34,8 +34,8 @@ module Skylab::GitViz
           s = @e.gets
           i_a, ev_p = Commit_::Events_.any_potential_event_for s, @t
           if i_a
-
             @on_event_selectively[ * i_a, & ev_p ]
+            UNABLE_
           else
             self._DO_ME
           end

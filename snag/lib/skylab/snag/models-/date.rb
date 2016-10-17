@@ -14,10 +14,10 @@ module Skylab::Snag
 
             qkn.new_with_value new qkn.value_x
           else
-
             oes_p.call :error, :invalid_date do
               __build_invalid_date_event qkn.value_x
             end
+            UNABLE_
           end
         end
       end

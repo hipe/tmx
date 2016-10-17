@@ -95,6 +95,7 @@ module Skylab::GitViz
             i_a, ev_p = Here_::Events_.potential_event_for_ls_files(
               e, t, full_POI )
             @on_event_selectively.call( * i_a, & ev_p )
+            UNABLE_
           end
         end
 

@@ -150,7 +150,7 @@ module Skylab::TaskExamples::TestSupport
 
           s_a = []
           emission_array[ 1 .. -1 ].each do |em|
-            em.cached_event_value.express_into_under s_a, expag
+            expag.calculate s_a, & em.expression_proc
           end
 
           s_a.fetch( 0 ).should eql "x mginy/"

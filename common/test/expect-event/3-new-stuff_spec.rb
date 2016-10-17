@@ -20,7 +20,7 @@ module Skylab::Common::TestSupport
         yes = true
       end
 
-      _em = o::Emission___.new nil, [ :one, :two, :gamma, :potato ]
+      _em = o::EventEmission___.new nil, [ :one, :two, :gamma, :potato ]
 
       matcher.matches? _em
 

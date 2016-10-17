@@ -230,6 +230,7 @@ module Skylab::Parse
           _build_expecting_event _was_token, p
 
         end
+        UNABLE_
       end
 
       def _build_expecting_event was_token, p
