@@ -578,5 +578,6 @@ module Skylab::TanMan
     Models_::Internal_::Paths[ path, verb, call, & oes_p ]
   end
 end
+# #tombstone: remote add, list, rm (ancient, deprecated); check, which
 # :+#tombstone: this used to be bottom properties frame
 # :+#tombstone: remote model (3 lines)

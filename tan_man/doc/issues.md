@@ -117,7 +117,8 @@
 [#015] #open #feature remove association between nodes (see)
              ( #was: #done UI for dissociate (and prune nodes? - no, out of scope) )
 [#014]       #done UI for associate (labeled "depends on")
-[#013] #open unused files
+[#013] #hole
+             ( #was: unused files )
              ( #was: #DONE UI for chose example, then use example
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading )
