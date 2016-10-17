@@ -1,6 +1,6 @@
 module Skylab::TMX::TestSupport
 
-  module Models
+  module Operations
 
     Reactions = -> tcc do
       Common_.test_support::Expect_Event[ tcc ]

@@ -1,6 +1,6 @@
 module Skylab::TMX::TestSupport
 
-  module Modalities::CLI
+  module CLI
 
     def self.[] tcc
 

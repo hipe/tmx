@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
   describe "[tmx] models - front" do
 
     TS_[ self ]
-    use :models_reactions
+    use :operations_reactions
 
     # three laws all the way.
 

@@ -1,14 +1,14 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] models - front - modalities - CLI" do
+  describe "[tmx] CLI - operations" do
 
     TS_[ self ]
 
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ self ]
-    use :models_building
-    use :modalities_CLI
+    use :operations_building
+    use :CLI
 
     it "1.1 strange arg" do
 

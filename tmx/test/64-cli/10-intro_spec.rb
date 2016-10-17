@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] modality integrations - CLI" do
+  describe "[tmx] CLI - intro" do
 
     # (somewhat at odds with other nearby test nodes,
     #  this is testing *our* tmx, and not *the* tmx)
 
     TS_[ self ]
-    use :modalities_CLI
+    use :CLI
 
     _ARG = 'ping'.freeze
     _FLAG = '--ping'.freeze

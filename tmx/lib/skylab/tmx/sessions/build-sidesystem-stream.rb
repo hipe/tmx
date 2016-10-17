@@ -1,7 +1,5 @@
 module Skylab::TMX
 
-  Sessions = ::Module.new
-
   class Sessions::Build_Sidesystem_Stream
 
     attr_writer(

@@ -102,4 +102,5 @@ module Skylab::TMX
   EMPTY_S_ = ''
   NIL_ = nil
   Home_ = self
+  UNABLE_ = false
 end

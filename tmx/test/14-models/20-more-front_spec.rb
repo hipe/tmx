@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] models - front - 2" do
+  describe "[tmx] models - more front" do
 
     TS_[ self ]
-    use :models_reactions
+    use :operations_reactions
 
     context "with two nodes" do
 

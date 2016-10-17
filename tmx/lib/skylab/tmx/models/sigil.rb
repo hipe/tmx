@@ -1,7 +1,5 @@
 module Skylab::TMX
 
-  Models = ::Module.new
-
   module Models::Sigil
 
     # this node is classified as a "model" for taxonomics and future-

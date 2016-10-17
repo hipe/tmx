@@ -2,8 +2,6 @@ module Skylab::Plugin
 
   class Digraphic
 
-    Modality_Adapters_ = ::Module.new
-
     module Modality_Adapters_::ARGV
 
       class Monitor

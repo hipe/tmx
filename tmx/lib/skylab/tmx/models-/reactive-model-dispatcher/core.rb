@@ -54,6 +54,8 @@ module Skylab::TMX
       _emit :error, :missing_required_properties, :missing_first_argument do
         _build_event :Missing_First_Argument
       end
+
+      UNABLE_
     end
 
     def __when_some_arguments
@@ -73,6 +75,8 @@ module Skylab::TMX
         _emit :error, :no_such_reactive_node do
           _build_event :No_Such_Reactive_Node
         end
+
+        UNABLE_
       end
     end
 
