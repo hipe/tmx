@@ -19,10 +19,11 @@ module Skylab::TMX
           bc = remove_instance_variable :@__bound_call
           st = bc.receiver.send bc.method_name, * bc.args, & bc.block
           if st
+            y = ::Enumerator::Yielder.new( & @sout.method( :puts ) )
             begin
               x = st.gets
               x || break
-              @sout.puts x.get_filesystem_directory_entry_string
+              x.express_into y
               redo
             end while above
           end
@@ -135,79 +136,163 @@ module Skylab::TMX
         @exitstatus = 5
         UNABLE_
       end
-    end  # end CLI
 
-    # ==
+      # ==
 
-    class BoundCall_via_Dispatch
+      class BoundCall_via_Dispatch
 
-      def initialize scn, & emit
-        @scn = scn
-        @_emit = emit
-      end
+        def initialize scn, & emit
+          @scn = scn
+          @_emit = emit
+        end
 
-      def execute
-        if "map" == @scn.current_token
-          @scn.advance_one
-          if @scn.no_unparsed_exists
+        def execute
+          if "map" == @scn.current_token
+            @scn.advance_one
             __map_money
           else
-            __when_unexpected_arguments
+            __when_unrecognized_action
           end
-        else
-          __when_unrecognized_action
-        end
-      end
-
-      def __when_unexpected_arguments
-        scn = @scn
-        @_emit.call :error, :emission, :parse_error do |y|
-          y << "unexpected argument - #{ scn.current_token.inspect }"
-        end
-        UNABLE_
-      end
-
-      def __when_unrecognized_action
-        scn = @scn
-        @_emit.call :error, :emission, :parse_error do |y|
-          y << "unrecognized action #{ scn.current_token.inspect }"
-        end
-        UNABLE_
-      end
-
-      def __map_money
-
-        @_emit.call :eventpoint, :clear_argv
-
-        dir = ::File.expand_path '../../..', Home_.dir_path  # sidesys_path_
-
-        stat = ::File.lstat dir
-
-        if stat.symlink?
-          dir_ = ::File.readlink dir
-        else
-          dir_ = dir
         end
 
-        _yikes = ::File.dirname dir_
+        def when_unexpected_arguments
+          self._NOT_USED
+          scn = @scn
+          @_emit.call :error, :emission, :parse_error do |y|
+            y << "unexpected argument - #{ scn.current_token.inspect }"
+          end
+          UNABLE_
+        end
 
-        _rcvr = TheMapOperation___.new _yikes, ::Dir, & @_emit
+        def __when_unrecognized_action
+          scn = @scn
+          @_emit.call :error, :emission, :parse_error do |y|
+            y << "unrecognized action #{ scn.current_token.inspect }"
+          end
+          UNABLE_
+        end
 
-        Common_::Bound_Call[ nil, _rcvr, :execute ]
+        def __map_money
+
+          dir = ::File.expand_path '../../..', Home_.dir_path  # sidesys_path_
+
+          stat = ::File.lstat dir
+
+          if stat.symlink?
+            dir_ = ::File.readlink dir
+          else
+            dir_ = dir
+          end
+
+          _yikes = ::File.dirname dir_
+
+          _rcvr = TheMapOperation___.new @scn, _yikes, ::Dir, & @_emit
+
+          Common_::Bound_Call[ nil, _rcvr, :execute ]
+        end
       end
-    end
+    end  # end CLI
 
     # ==
 
     class TheMapOperation___
 
-      def initialize dir, filesystem, & p
+      def initialize scn, dir, filesystem, & p
         @dir = dir
         @_emit = p
         @filesystem = filesystem
+        @scn = scn
       end
 
       def execute
+
+        @_attribute_cache = AttributeCache___.new Home_::Attributes_
+
+        if @scn.no_unparsed_exists
+          _attempt_to_produce_stream
+        else
+          __stream_thru_modifiers
+        end
+      end
+
+      # --
+
+      def __stream_thru_modifiers
+        @_ok = true
+        @_additional_formal_attributes = nil
+        begin
+          if __front_argument_looks_like_primary
+            if ! __parse_primary
+              break
+            end
+          elsif ! __parse_map_term
+            break
+          end
+          @scn.no_unparsed_exists ? break : redo
+        end while above
+        @_ok && __flush_mapped_stream
+      end
+
+      def __front_argument_looks_like_primary
+        Looks_like_opt__[ @scn.current_token ]
+      end
+
+      def __parse_map_term
+
+        _normal_human_string = @scn.current_token
+
+        attr = @_attribute_cache.lookup_formal_attribute_via_normal_human_string(
+          _normal_human_string, & @_emit )
+
+        if attr
+          @scn.advance_one
+          ( @_additional_formal_attributes ||= [] ).push attr
+          ACHIEVED_
+        else
+          attr  # did whine
+        end
+      end
+
+      def __flush_mapped_stream
+
+        if _store :@__raw_stream, _attempt_to_produce_stream
+          __do_flush_mapped_stream
+        end
+      end
+
+      def __do_flush_mapped_stream
+
+        # for each entity, and then for each attribute (of each entity)..
+
+        require 'json'
+
+        a = remove_instance_variable :@_additional_formal_attributes
+
+        index = @_attribute_cache._index
+
+        remove_instance_variable( :@__raw_stream ).map_by do |node|
+
+          parsed_node = node.parse_against index, & @_emit
+
+          ProcBasedSimpleExpresser_.new do |y|
+
+            buff = node.get_filesystem_directory_entry_string
+
+            if parsed_node
+              a.each do |attr|
+                buff << SPACE_
+                attr.of( parsed_node ).express_into buff
+              end
+            end
+
+            y << buff
+          end
+        end
+      end
+
+      # --
+
+      def _attempt_to_produce_stream
         if __glob_produces_one_or_more_file
           __produce_stream
         else
@@ -237,23 +322,55 @@ module Skylab::TMX
 
       def __produce_stream
 
-        require 'json'
-
-        ac = AttributeCache___.new Home_::Attributes_
-
         Common_::Stream.via_nonsparse_array @__paths do |path|
-          Node___.new path, ac
+          Node___.new path
         end
       end
+
+      DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+        if x
+          instance_variable_set ivar, x ; ACHIEVED_
+        else
+          x
+        end
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
     # ==
 
     class Node___
 
-      def initialize json_file, ac
-        @_attribute_cache = ac
+      def initialize json_file
         @json_file = json_file
+      end
+
+      def parse_against index, & p
+
+        json_file = @json_file
+        _big_string = ::File.read json_file
+        begin
+          h = ::JSON.parse _big_string
+        rescue ::JSON::ParserError => e
+        end
+
+        if e
+          p.call :error, :emission, :parse_error do |y|
+            y << "    ( while parsing #{ json_file }"
+            s_a = e.message.split NEWLINE_
+            s_a.each do |s|
+              y << "      #{ s }"
+            end
+            y << "    )"
+          end
+        else
+          Home_::Models_::ParsedNode.via h, index, @json_file, & p
+        end
+      end
+
+      def express_into y
+        y << get_filesystem_directory_entry_string
       end
 
       def get_filesystem_directory_entry_string
@@ -268,6 +385,19 @@ module Skylab::TMX
       def initialize mod
         @module = mod
       end
+
+      def lookup_formal_attribute_via_normal_human_string str, & p
+        fo = _index.formal_via_human str
+        if fo
+          fo
+        else
+          @_index.levenshtein str, :as_human, & p
+        end
+      end
+
+      def _index
+        @_index ||= Home_::Models_::Attribute::Index.new @module
+      end
     end
 
     # ==
@@ -280,5 +410,17 @@ module Skylab::TMX
     end.call
 
     # ==
+
+    NEWLINE_ = "\n"
+    SPACE_ = ' '
   end
+
+  # ==
+
+  class ProcBasedSimpleExpresser_ < ::Proc  # stowaway!
+    alias_method :express_into, :call
+    undef_method :call
+  end
+
+  # ==
 end
