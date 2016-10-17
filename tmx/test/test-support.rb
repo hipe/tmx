@@ -37,7 +37,7 @@ module Skylab::TMX::TestSupport
     define_method :dangerous_memoize_, TestSupport_::DANGEROUS_MEMOIZE
 
     def memoize_ sym, & p
-      define_method sym, Common_.memoize( & p )
+      define_method sym, Lazy_.call( & p )
     end
   end
 

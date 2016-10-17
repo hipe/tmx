@@ -7,6 +7,7 @@ module Skylab::TMX
   end
 
   Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
 
   class << self
 
@@ -48,7 +49,7 @@ module Skylab::TMX
       installation_.to_sidesystem_load_ticket_stream
     end
 
-    define_method :application_kernel_, ( Common_.memoize do
+    define_method :application_kernel_, ( Lazy_.call do
       Home_.lib_.brazen::Kernel.new Home_
     end )
 

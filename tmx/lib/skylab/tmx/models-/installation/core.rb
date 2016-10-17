@@ -164,7 +164,7 @@ module Skylab::TMX
       end
     end
 
-    Gem_name_tools_ = Common_.memoize do
+    Gem_name_tools_ = Lazy_.call do
 
       # EGADS: it would be good to use whatever Gem does instead
 

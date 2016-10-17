@@ -2,7 +2,22 @@
 
 require 'skylab/tmx'
 
-Skylab::TMX::CLI.new(
-  $stdin, $stdout, $stderr,
-  [ ::File.basename( $PROGRAM_NAME ) ]
-).invoke ARGV
+if 'map' == ARGV[0]
+  # (life is easier)
+  _client_class = Skylab::TMX::Operations_::Map::FrontCLI
+else
+  # (heavy lift to legacy [br])
+  _client_class = Skylab::TMX::CLI
+end
+
+_pn_s_a = [ ::File.basename( $PROGRAM_NAME ) ]
+
+_cli = _client_class.new $stdin, $stdout, $stderr, _pn_s_a
+
+d = _cli.invoke ARGV
+
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit d

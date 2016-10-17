@@ -98,7 +98,9 @@ module Skylab::TMX
       ACHIEVED_
     end
 
-    Memoized_state_machine___ = Common_.memoize do  # see [#003]
+    Lazy_ = Common::Lazy
+
+    Memoized_state_machine___ = Lazy_.call do  # see [#003]
 
       o = Home_.lib_.basic::State::Machine::Edit_Session.new
 
