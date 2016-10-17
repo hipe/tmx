@@ -2,7 +2,7 @@ self._TODO  # add all files under tests - those guys need them
 
 require_relative 'lib/skylab/common'
 
-inf = Skylab::Common::Sessions::Gemspec_Inference.new
+inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.begin
 
 inf.gemspec_path = __FILE__
 

@@ -2,7 +2,7 @@ module Skylab::TMX
 
   class Models_::Installation
 
-    class Build_manifest_stream___
+    class ManifestStream_via_Installation___
 
       def self.[] o
         new( o ).execute
@@ -61,7 +61,7 @@ module Skylab::TMX
           gne.gem_name = gem_name
           gne.gem_path = prev_md[ :gem_path ]
 
-          Models_::Sidesystem::Manifest.new(
+          Models_::Node::Manifest.new(
             items, Load_Ticket_.new( gne ) )
         end
 

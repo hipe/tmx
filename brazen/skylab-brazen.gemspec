@@ -2,7 +2,7 @@ self._REDO  # test support is needed
 
 require 'skylab/common'
 
-inf = Skylab::Common::Sessions::Gemspec_Inference.new
+inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.begin
 
 inf.gemspec_path = __FILE__
 

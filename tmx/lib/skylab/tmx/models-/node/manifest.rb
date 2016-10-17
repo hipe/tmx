@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  module Models_::Sidesystem
+  module Models_::Node
 
     class Manifest
 

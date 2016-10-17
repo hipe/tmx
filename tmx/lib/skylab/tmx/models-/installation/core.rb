@@ -44,7 +44,7 @@ module Skylab::TMX
 
     def to_reflective_sidesystem_stream__
 
-      cls = Home_::Models_::Sidesystem::Reflective
+      cls = Home_::Models_::Node::Reflective
 
       to_sidesystem_load_ticket_stream.map_by do | lt |
         cls.via_load_ticket lt
@@ -53,7 +53,7 @@ module Skylab::TMX
 
     def to_sidesystem_manifest_stream
 
-      Here_::Build_manifest_stream___[ self ]
+      Here_::ManifestStream_via_Installation___[ self ]
     end
 
     def to_sidesystem_load_ticket_stream

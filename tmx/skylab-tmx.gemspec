@@ -1,7 +1,6 @@
 require 'skylab/common'
 
-inf = Skylab::Common::Sessions::Gemspec_Inference.new
-
+inf = Skylab::Common::Magnetics::GemspecInference_via_GemspecPath_and_Specification.begin
 inf.gemspec_path = __FILE__
 
 Gem::Specification.new do | s |

@@ -1,6 +1,8 @@
 module Skylab::TMX
 
-  class Sessions::Build_Sidesystem_Stream
+  class Magnetics::NodeStream_via_GemPassPrefix
+
+    self._NOT_USED  # #todo
 
     attr_writer(
       :const_path_prefix,

@@ -1,6 +1,11 @@
 module Skylab::Common
 
-  class Sessions::Gemspec_Inference
+  class Magneticis::GemspecInference_via_GemspecPath_and_Specification
+
+    class << self
+      alias_method :begin, :new
+      undef_method :new
+    end  # >>
 
     attr_writer(
       :gemspec_path,

@@ -77,6 +77,20 @@ module Skylab::TMX
 
   Autoloader_ = Common_::Autoloader
 
+  # ==
+
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
+  end
+
+  # ==
+
+  # ==
+
   module Lib_
 
     sidesys, _stdlib = Autoloader_.at(
@@ -92,10 +106,7 @@ module Skylab::TMX
     end
   end
 
-  module Models_
-    Autoloader_[ self ]
-    Sidesystem = Autoloader_[ ::Module.new ]
-  end
+  # ==
 
   ACHIEVED_ = true
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
