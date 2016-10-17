@@ -1,0 +1,6 @@
+{
+  "after":"autonomous_component_system",
+  "category":"more general libs",
+  "doc test manifest":".doc-test-manifest.list",
+  "is lib":true
+}

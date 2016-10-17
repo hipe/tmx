@@ -1,0 +1,6 @@
+{
+  "after":"zerk",
+  "category":"more general lib",
+  "doc test manifest":".doc-test-manifest.list",
+  "is lib":true
+}

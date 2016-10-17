@@ -1,7 +1,0 @@
-# items here are from from slicer/doc/punchlist.template.txt, arranged
-# more or less manually to take into account both balance of workload
-# and some sort of forwards-regression-friendly order (in that order).
-
-task task_examples git slicer permute treemap beauty_salon yacc2treetop flex2treetop bnf2treetop css_convert code_metrics cull git_viz snag tan_man tmx
-
-common fields basic plugin parse autonomous_component_system brazen human zerk system sub_tree test_support doc_test myterm search_and_replace

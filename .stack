@@ -6,3 +6,11 @@ no more call_API per se - frontload all expectations as a spy so you fail early
 [tm] change actors and sessions to magnetics
 [tm] no more Selective_Builder_Receiver_Sender_Methods
 utility to replace (generate) greenlist, etc. 'tmx-notes.json'
+-1 rewrite (simplify) the "test all" test runner to use this system
+-2 rewrite (simplify) the quickie recursive runner to use this system
+-3 write a task to update semi-real costs (a bash script loop)
+-4 add a randomize option to the below (for now only toplevel, later etc)
+-5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
+-6 regenerate the punchlist with that crazy algo (might require renaming)
+-7 map just the names of those sidesystems with the files
+-8 melt greenlist and slicer manifest into new format

@@ -11,3 +11,4 @@ o.sidesystem_load_ticket_stream_proc = -> do
 end
 
 o.execute
+# #tombstone: the static GREENLIST file

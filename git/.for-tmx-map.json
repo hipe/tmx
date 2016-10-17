@@ -1,0 +1,5 @@
+{
+  "after":"test_support",
+  "category":"ad-hoc libs",
+  "is lib": true
+}

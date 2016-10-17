@@ -1,6 +1,8 @@
 ## release 0.7.\* (in progress)
 
   + upgrade and prune all gem dependencies
+  - doc-test manifest, greenlist, punchlist #tombstone
+
 
 ## release 0.6.0 - last for ruby 1.9.3
 
