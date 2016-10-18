@@ -191,7 +191,11 @@ module Skylab::Common
 
     # ~ result in structures of lesser constituency (st's, ary's, bx's)
 
-    def join_into_with_using_by buff_o_x, separator_o_x, m, & p
+    def join_into_with_by buff_x, sep_x, & p
+      join_into_with_using_by buff_x, sep_x, :<<, & p
+    end
+
+    def join_into_with_using_by buff_x, separator_x, m, & p
 
       # #experimental
       # the simplest of the #[#047] - like Enumerator#join, but
@@ -201,19 +205,19 @@ module Skylab::Common
       if x
         x_ = p[ x ]
         if x_
-          buff_o_x.send m, x_
+          buff_x.send m, x_
         end
         begin
           x = gets
           x or break
           x_ = p[ x ]
           x_ or redo  # might change..
-          buff_o_x.send m, separator_o_x
-          buff_o_x.send m, x_
+          buff_x.send m, separator_x
+          buff_x.send m, x_
           redo
         end while nil
       end
-      buff_o_x
+      buff_x
     end
 
     def reduce_into_by m, & p  # comparable to platform `reduce`

@@ -1,6 +1,131 @@
 module Skylab::TMX
 
-  class CLI < Home_.lib_.brazen::CLI
+  class CLI
+
+    Invocation___ = self
+
+    class Invocation___
+
+      def initialize i, o, e, pn_s_a
+        @serr = e
+        @sout = o
+        @program_name_string_array = pn_s_a
+      end
+
+      def invoke argv
+        @exitstatus = 0
+        @argv = argv
+        bc = __bound_call
+        if bc
+          st = bc.receiver.send bc.method_name, * bc.args, & bc.block
+          if st
+            y = ::Enumerator::Yielder.new( & @sout.method( :puts ) )
+            begin
+              x = st.gets
+              x || break
+              x.express_into y
+              redo
+            end while above
+          end
+        end
+        @exitstatus
+      end
+
+      def __bound_call
+
+        if @argv.length.nonzero? && Looks_like_option[ @argv.first ]
+          __when_looks_like_option_at_front
+        else
+          __init_selective_listener
+          o = Home_::API.begin( & @_emit )
+          o.argument_scanner = ArgumentScanner___.new @argv
+          o.to_bound_call
+        end
+      end
+
+      def __when_looks_like_option_at_front  # assume 0 < argv length
+        if HELP_RX =~ @argv.first
+          __when_general_help
+        else
+          __when_unrecognized_option_at_front
+        end
+      end
+
+      def __when_unrecognized_option_at_front
+        @serr.puts "unrecognized option: #{ @argv.first.inspect }"
+        _invite_to_general_help
+      end
+
+      def __when_general_help
+        io = @serr
+        io.puts "usage #{ _program_name } #{ _formal_actions } [opts]"
+        io.puts
+        io.puts "description: experiment.."
+        NIL
+      end
+
+    # --
+
+      def __init_selective_listener
+
+        y = Lazy_.call do
+          ::Enumerator::Yielder.new do |s|
+            @serr.puts s
+          end
+        end
+
+        @_emit = -> * i_a, & p do
+          if :eventpoint == i_a[0]
+            send i_a.fetch 1
+          else
+            _expression_agent.calculate y[], & p
+            if :parse_error == i_a[2]
+              _invite_to_general_help
+            elsif :error == i_a.first
+              @exitstatus = FAILURE_EXITSTATUS__
+            end
+          end
+          NIL
+        end
+        NIL
+      end
+
+      def _invite_to_general_help
+        @serr.puts "try '#{ _program_name } -h'"
+        _failed
+      end
+
+      def _program_name
+        ::File.basename @program_name_string_array.last
+      end
+
+      def _formal_actions
+
+        _st = Home_::API.to_didactic_operation_name_stream__
+
+        _expression_agent.calculate do
+          say_formal_argument_alternation_ _st
+        end
+      end
+
+      def _expression_agent
+        ExpressionAgent___.instance
+      end
+
+      def _failed
+        @exitstatus = FAILURE_EXITSTATUS__
+        UNABLE_
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    end
+
+
+
+    # ==
+
+    Legacy_CLI_class___ = Lazy_.call do
+  class Legacy_CLI____ < Home_.lib_.brazen::CLI
 
     # we do not yet need and so are not yet worried about "our tmx" as a
     # back-leaning "reactive service". for now all of the below is in
@@ -150,5 +275,94 @@ module Skylab::TMX
         cli
       end
     end
+
+    self  # legacy CLI class
   end
+    end  # proc that wraps legacy CLI class
+
+    # ==
+
+    class ArgumentScanner___
+
+      # an attempt to allow implementation of the fully customized parsing
+      # syntax (that should not be abstracted) of the map operation in such
+      # a manner that allows the same syntax implementation to adapt to both
+      # the CLI and API modalities..
+
+      def initialize argv
+        if argv.length.zero?
+          @no_unparsed_exists = true
+        else
+          @scn = Common_::Polymorphic_Stream.via_array argv
+        end
+      end
+
+      def advance_one  # same as sibling
+        @scn.advance_one
+        @no_unparsed_exists = @scn.no_unparsed_exists
+        @_cache_ = nil
+      end
+
+      def head_as_agnostic
+        _head_as_name
+      end
+
+      define_singleton_method :cached, DEFINITION_FOR_THE_METHOD_CALLED_CACHED_
+
+      cached :head_as_normal_symbol do
+        _head_as_name.as_lowercase_with_underscores_symbol
+      end
+
+      cached :_head_as_name do
+        Common_::Name.via_slug @scn.current_token
+      end
+
+      attr_reader(
+        :no_unparsed_exists,
+      )
+    end
+
+    # ==
+
+    class ExpressionAgent___
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
+
+      alias_method :calculate, :instance_exec
+
+      def say_formal_argument_alternation_ st
+
+        _mid = st.join_into_with_by "", " | " do |name|
+          name.as_slug
+        end
+
+        "{ #{ _mid } }"
+      end
+
+      def say_agnostic_token_ name
+        name.as_slug.inspect
+      end
+    end
+
+    # ==
+
+     Looks_like_option = -> do
+      d = DASH_.getbyte 0  # DASH_BYTE_
+      -> s do
+        d == s.getbyte(0)
+      end
+    end.call
+
+    # ==
+
+    FAILURE_EXITSTATUS__ = 5
+    HELP_RX = /\A--?h(?:e(?:lp?)?)?\z/
+
+    # ==
+  end  # end new CLI class
 end

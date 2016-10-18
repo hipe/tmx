@@ -11,6 +11,25 @@ module Skylab::TMX
 
   class << self
 
+    def to_common_unparsed_node_stream__
+
+      dir = ::File.expand_path '../../..', dir_path  # sidesys_path_
+
+      stat = ::File.lstat dir
+
+      if stat.symlink?
+        dir_ = ::File.readlink dir
+      else
+        dir_ = dir
+      end
+
+      _yikes = ::File.dirname dir_
+
+      Home_::Magnetics::
+        UnparsedNodeStream_via::DevelopmentDirectory.call(
+          _yikes, ::Dir, ::File )
+    end
+
     def build_sigilized_sidesystem_stream_plus stem
 
       # what tmx reports as the "sidesystem stream" is based on the gems
@@ -78,6 +97,18 @@ module Skylab::TMX
   Autoloader_ = Common_::Autoloader
 
   # ==
+
+  DEFINITION_FOR_THE_METHOD_CALLED_CACHED_ = -> m, & p do
+
+    define_method m do
+      h = ( @_cache_ ||= {} )
+      h.fetch m do
+        x = instance_exec( & p )
+        h[ m ] = x
+        x
+      end
+    end
+  end
 
   DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
     if x

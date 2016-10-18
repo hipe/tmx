@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Models_::ParsedNode
+  class Models_::Node::Parsed
 
     class << self
 
@@ -19,7 +19,7 @@ module Skylab::TMX
         end
 
         if extra
-          p.call :error, :emission, :parse_error do |y|
+          p.call :error, :expression, :parse_error do |y|
             y << "unrecognized attribute(s) #{ extra.inspect } in #{ json_file }"
           end
           UNABLE_
@@ -31,13 +31,18 @@ module Skylab::TMX
       private :new
     end  # >>
 
-    def initialize box
-      @box = box
-    end
+    Parsed____ = self
 
-    attr_reader(
-      :box,
-    )
+    class Parsed____
+
+      def initialize box
+        @box = box
+      end
+
+      attr_reader(
+        :box,
+      )
+    end
 
     # ==
 
@@ -52,6 +57,51 @@ module Skylab::TMX
         :formal_attribute,
         :value_x,
       )
+    end
+
+    # ==
+
+    class Unparsed
+
+      class << self
+        alias_method :via_json_file_path, :new
+        undef_method :new
+      end  # >>
+
+      def initialize json_file
+        @json_file = json_file
+      end
+
+      def parse_against index, & p
+
+        json_file = @json_file
+        _big_string = ::File.read json_file
+        begin
+          h = ::JSON.parse _big_string
+        rescue ::JSON::ParserError => e
+        end
+
+        if e
+          p.call :error, :expression, :parse_error do |y|
+            y << "    ( while parsing #{ json_file }"
+            s_a = e.message.split NEWLINE_
+            s_a.each do |s|
+              y << "      #{ s }"
+            end
+            y << "    )"
+          end
+        else
+          Home_::Models_::Node::Parsed.via h, index, @json_file, & p
+        end
+      end
+
+      def express_into y
+        y << get_filesystem_directory_entry_string
+      end
+
+      def get_filesystem_directory_entry_string
+        ::File.basename ::File.dirname @json_file
+      end
     end
 
     # ==

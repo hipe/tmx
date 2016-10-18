@@ -57,8 +57,17 @@ module Skylab::TMX::TestSupport
   Common_ = ::Skylab::Common
   Home_ = ::Skylab::TMX
 
+  # ==
+
+    Memoizer_Methods = -> tcc do
+      TestSupport_::Memoization_and_subject_sharing[ tcc ]
+    end
+
+  # ==
+
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   NIL_ = nil
+  NOTHING_ = nil
   TS_ = self
 end

@@ -2,13 +2,7 @@
 
 require 'skylab/tmx'
 
-if 'map' == ARGV[0]
-  # (life is easier)
-  _client_class = Skylab::TMX::Operations_::Map::FrontCLI
-else
-  # (heavy lift to legacy [br])
-  _client_class = Skylab::TMX::CLI
-end
+_client_class = Skylab::TMX::CLI
 
 _pn_s_a = [ ::File.basename( $PROGRAM_NAME ) ]
 

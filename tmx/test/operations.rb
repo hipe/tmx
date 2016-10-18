@@ -2,6 +2,91 @@ module Skylab::TMX::TestSupport
 
   module Operations
 
+    def self.[] tcc
+      tcc.extend ModuleMethods___
+      tcc.include InstanceMethods___
+    end
+
+    module ModuleMethods___
+
+      def call_by & p
+
+        yes = true ; x = nil
+        define_method :operations_call_result_tuple do
+          if yes
+            yes = false
+            x = __produce_operations_call_result_tuple p
+          end
+          x
+        end
+      end
+
+      def expect_no_events
+        define_method :_build_event_log_for_operations do
+          NOTHING_
+        end
+      end
+    end
+
+    # ==
+
+    module InstanceMethods___
+
+      def fails
+        _tu = operations_call_result_tuple
+        _x = _tu.result
+        if false != _x
+          _x.should eql false
+        end
+      end
+
+      def only_emission
+        _tu = operations_call_result_tuple
+        em_a = _tu.emission_array
+        if 1 == em_a.length
+          em_a.fetch 0
+        else
+          em_a.length.should eql 1
+        end
+      end
+
+      def __produce_operations_call_result_tuple p
+        @operations_call_DSL_tuple = DSL_Values___.new
+        instance_exec( & p )
+        o = remove_instance_variable :@operations_call_DSL_tuple
+        el = _build_event_log_for_operations
+        if el
+          _p = el.handle_event_selectively
+        end
+        _x = Home_::API.call( * o.arguments_array, & _p )
+        if el
+          _em_a = el.release_to_mutable_array
+        end
+        CallResult____.new _em_a, _x
+      end
+
+      def call * x_a
+        @operations_call_DSL_tuple.arguments_array = x_a ; nil
+      end
+
+      def _build_event_log_for_operations
+        Common_.test_support::Expect_Event::EventLog.for self
+      end
+
+      def expect_event_debugging_expression_agent
+        Home_::API::ExpressionAgent___.instance
+      end
+
+      alias_method :expag_, :expect_event_debugging_expression_agent
+    end
+
+    # ==
+
+    CallResult____ = ::Struct.new :emission_array, :result
+    DSL_Values___ = ::Struct.new :arguments_array
+
+    # === LEGACY ([br]) BELOW
+
     Reactions = -> tcc do
       Common_.test_support::Expect_Event[ tcc ]
       Building[ tcc ]

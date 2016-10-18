@@ -265,15 +265,18 @@ module Skylab::Common::TestSupport
 
     # ==
 
+    debugging_expression_agent_for = nil
+
     Debugging_listener_for___ = -> tc do
 
       # a series of tomstones. this replaces what is in #tombstone-C
 
       io = tc.debug_IO
 
-      br = Home_.lib_.brazen
-      _expag = br::API.expression_agent_instance
-      o = br::CLI_Support::ExpressionAgent::Handler_Expresser.new _expag
+      _expag = debugging_expression_agent_for[ tc ]
+
+      _Brazen = Home_.lib_.brazen
+      o = _Brazen::CLI_Support::ExpressionAgent::Handler_Expresser.new _expag
       o.downstream_stream = io
       o = o.finish
 
@@ -291,6 +294,16 @@ module Skylab::Common::TestSupport
           end
         end
         UNRELIABLE_
+      end
+    end
+
+    debugging_expression_agent_for = -> tc do
+      if tc.respond_to? DEBUGGING_EXPEV_METHOD__
+        tc.send DEBUGGING_EXPEV_METHOD__
+      elsif tc.respond_to? BLACK_AND_WHITE_EXPEV_METHOD__
+        tc.send BLACK_AND_WHITE_EXPEV_METHOD__
+      else
+        Black_and_white_expression_agent__[]
       end
     end
 
@@ -504,35 +517,25 @@ module Skylab::Common::TestSupport
 
       # -- internal support
 
-      define_method :_expev_upper_level_expression_agent, -> do
-
-        m = :black_and_white_expression_agent_for_expect_event
-
-        -> do
-          if respond_to? m
-            send m
-          else
-            black_and_white_expression_agent_for_expect_event_normally
-          end
+      def _expev_upper_level_expression_agent
+        if respond_to? BLACK_AND_WHITE_EXPEV_METHOD__
+          send BLACK_AND_WHITE_EXPEV_METHOD__
+        else
+          black_and_white_expression_agent_for_expect_event_normally
         end
-      end.call
+      end
 
       def black_and_white_expression_agent_for_expect_event_normally
         Black_and_white_expression_agent__[]
       end
 
-      define_method :_expev_lower_level_expression_agent, -> do
-
-        m = :expression_agent_for_expect_event
-
-        -> do
-          if respond_to? m
-            send m
-          else
-            expression_agent_for_expect_event_normally
-          end
+      def _expev_lower_level_expression_agent
+        if respond_to? EXPEV_METHOD__
+          send EXPEV_METHOD__
+        else
+          expression_agent_for_expect_event_normally
         end
-      end.call
+      end
 
       def expression_agent_for_expect_event_normally
         Codifying_expresion_agent__[]
@@ -1242,9 +1245,11 @@ module Skylab::Common::TestSupport
         @expression_proc = p
       end
 
-      def _express_into_under_ y, expag
+      def express_into_under y, expag
         expag.calculate y, & @expression_proc
       end
+
+      alias_method :_express_into_under_, :express_into_under
 
       def _event_or_lines_
         ( @___1 ||= _kn( [], Black_and_white_expression_agent__[] )).value_x
@@ -1323,6 +1328,11 @@ module Skylab::Common::TestSupport
       }
     end
 
+    # ==
+
+    BLACK_AND_WHITE_EXPEV_METHOD__ = :black_and_white_expression_agent_for_expect_event
+    DEBUGGING_EXPEV_METHOD__ = :expect_event_debugging_expression_agent
+    EXPEV_METHOD__ = :expression_agent_for_expect_event
     UNRELIABLE_ = :_unreliable_from_expect_event_
   end
 end
