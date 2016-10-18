@@ -52,7 +52,7 @@ module Skylab::TMX
 
       _wow = ::Dir[ "#{ ::Gem.paths.home }/gems/#{ gem_pass_prefix }*" ]  # or .path (array))
 
-      Common_::Stream.via_nonsparse_array _wow do | path |
+      Stream_.call _wow do |path|
         p[ path ]
       end
     end

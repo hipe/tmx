@@ -52,7 +52,7 @@ module Skylab::TMX
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
-          _any_of_these = say_formal_argument_alternation_ st
+          _any_of_these = say_formal_operation_alternation_ st
 
           y << "expecting #{ _any_of_these }"
         end
@@ -78,7 +78,7 @@ module Skylab::TMX
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
           y << "currently, normal tmx is deactivated -"
-          y << "won't parse #{ say_agnostic_token_ x }"
+          y << "won't parse #{ say_arguments_head_ x }"
         end
         UNABLE_
       end
@@ -89,8 +89,6 @@ module Skylab::TMX
 
         o.argument_scanner = @argument_scanner
 
-        o.unparsed_node_stream = Home_.to_common_unparsed_node_stream__
-
         Common_::Bound_Call[ nil, o, :execute ]
       end
 
@@ -99,7 +97,7 @@ module Skylab::TMX
       end
 
       def _to_didactic_operation_name_stream
-        Common_::Stream.via_nonsparse_array %w( map BLAH ) do |s|
+        Stream_.call %w( map BLAH ) do |s|
           Common_::Name.via_slug s
         end
       end
@@ -120,6 +118,12 @@ module Skylab::TMX
         else
           @scn = Common_::Polymorphic_Stream.via_array x_a
         end
+      end
+
+      def gets_one_as_is  # same as sibling
+        x = @scn.current_token
+        advance_one
+        x
       end
 
       def advance_one  # same as sibling
@@ -194,16 +198,36 @@ module Skylab::TMX
 
       alias_method :calculate, :instance_exec
 
-      def say_formal_argument_alternation_ st
-
-        _mid = st.join_into_with_by "", " or " do |name|
-          say_agnostic_token_ name
-        end
-
-        "{ #{ _mid } }"
+      def say_formal_operation_alternation_ st
+        _say_name_alternation :__say_formal_operation, st
       end
 
-      def say_agnostic_token_ name
+      def say_primary_alternation_ st
+        _say_name_alternation :say_primary_, st
+      end
+
+      def _say_name_alternation m, st
+
+        p = method m
+
+        st.join_into_with_by "", " or " do |name|
+          p[ name ]
+        end
+      end
+
+      def __say_formal_operation name
+        _same name
+      end
+
+      def say_primary_ name
+        _same name
+      end
+
+      def say_arguments_head_ name
+        _same name
+      end
+
+      def _same name
         name.as_lowercase_with_underscores_symbol.inspect
       end
     end

@@ -1,0 +1,31 @@
+digraph g {
+
+  label="syntax digraph for the map API operation (not CLI).
+(not all modifiers are necessarily shown.)"
+
+  start
+
+  start->ors [label="operation\nname\nsymbol"]
+
+  ors [label="operation\nresolved\nstate"]
+
+  /* modifier A */
+
+  ors->p1 [label="select\nkeyword"]
+
+  p1 [label="parsing\nselect"]
+
+  p1->ors [label="attribute\nconst"]
+
+  /* modifier B */
+
+  ors->p2 [label="order\nkeyword"]
+
+  p2 [label="parsing\norder"]
+
+  p2->ors [label="attribute\nconst"]
+
+  /* end modifiers */
+
+  ors->end [label="(no more\ninput)"]
+}

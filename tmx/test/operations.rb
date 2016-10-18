@@ -32,6 +32,8 @@ module Skylab::TMX::TestSupport
 
     module InstanceMethods___
 
+      # -- expectations
+
       def fails
         _tu = operations_call_result_tuple
         _x = _tu.result
@@ -49,6 +51,8 @@ module Skylab::TMX::TestSupport
           em_a.length.should eql 1
         end
       end
+
+      # -- setup & support
 
       def __produce_operations_call_result_tuple p
         @operations_call_DSL_tuple = DSL_Values___.new
@@ -78,6 +82,26 @@ module Skylab::TMX::TestSupport
       end
 
       alias_method :expag_, :expect_event_debugging_expression_agent
+
+      # -- these
+
+      def json_files_stream_01_
+
+        # (if we wanted to, we could spike this with invaild paths..)
+
+        head = ::File.join TS_.dir_path, 'fixture-directories', '01-fake-top-of-the-universe'
+
+        # (the below are intentionally NOT in lexical order)
+
+        _these = %w(
+          zagnut/any-other-name.json
+          frim_frum/any-name.json
+        )
+
+        Stream_.call _these do |tail|
+          ::File.join head, tail
+        end
+      end
     end
 
     # ==

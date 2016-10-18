@@ -104,7 +104,7 @@ module Skylab::TMX
         _st = Home_::API.to_didactic_operation_name_stream__
 
         _expression_agent.calculate do
-          say_formal_argument_alternation_ _st
+          say_formal_operation_alternation_ _st
         end
       end
 
@@ -297,6 +297,12 @@ module Skylab::TMX
         end
       end
 
+      def gets_one_as_is  # same as sibling
+        x = @scn.current_token
+        advance_one
+        x
+      end
+
       def advance_one  # same as sibling
         @scn.advance_one
         @no_unparsed_exists = @scn.no_unparsed_exists
@@ -335,7 +341,7 @@ module Skylab::TMX
 
       alias_method :calculate, :instance_exec
 
-      def say_formal_argument_alternation_ st
+      def say_formal_operation_alternation_ st
 
         _mid = st.join_into_with_by "", " | " do |name|
           name.as_slug
@@ -344,7 +350,7 @@ module Skylab::TMX
         "{ #{ _mid } }"
       end
 
-      def say_agnostic_token_ name
+      def say_arguments_head_ name
         name.as_slug.inspect
       end
     end

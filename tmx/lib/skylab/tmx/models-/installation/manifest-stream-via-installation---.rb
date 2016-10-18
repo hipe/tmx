@@ -20,7 +20,7 @@ module Skylab::TMX
 
         # first, find every known exe (~40) thru one filesystem glob call.
 
-        exe_st = Common_::Stream.via_nonsparse_array(
+        exe_st = Stream_.call(
           ::Dir[ "#{ @gems_dir }/#{ @gem_pass_prefix }*/bin/#{ @exe_pfx }*" ] )
 
 

@@ -69,5 +69,6 @@ module Skylab::TMX::TestSupport
 
   NIL_ = nil
   NOTHING_ = nil
+  Stream_ = Home_::Stream_
   TS_ = self
 end

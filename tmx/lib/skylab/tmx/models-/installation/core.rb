@@ -72,7 +72,7 @@ module Skylab::TMX
         p[ path ]
       end
 
-      Common_::Stream.via_nonsparse_array _wow do | path |
+      Stream_.call _wow do |path|
         p[ path ]
       end
     end

@@ -11,7 +11,7 @@ module Skylab::TMX
 
       def via_reflective_sidesystem_array_ a
 
-        _st = Common_::Stream.via_nonsparse_array a
+        _st = Stream_[ a ]
         via_stemish_stream _st
       end
 

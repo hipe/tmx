@@ -15,3 +15,6 @@ utility to replace (generate) greenlist, etc. 'tmx-notes.json'
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
 -6 regenerate the punchlist with that crazy algo (might require renaming)
    you will need an internal, non-CLI, cross sidesystem API
+   you will need some proper coverage for CLI
+   order for API
+   select for API

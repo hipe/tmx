@@ -35,7 +35,7 @@ module Skylab::TMX::TestSupport
 
         mod = const_get :Models_, false
         _const_a = mod.constants
-        _st = Common_::Stream.via_nonsparse_array _const_a do | const |
+        _st = Stream_.call _const_a do |const|
 
           mod.const_get const, false
         end
@@ -45,7 +45,7 @@ module Skylab::TMX::TestSupport
           mod_ = mdl.const_get :Actions, false
           _const_a_ = mod_.constants
 
-          Common_::Stream.via_nonsparse_array _const_a_ do | const |
+          Stream_.call _const_a_ do |const|
 
             mod_.const_get const, false
           end

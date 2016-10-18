@@ -9,9 +9,7 @@ module Skylab::TMX
 
         _file_stream = file_stream_via[ dev_dir, fs_for_glob ]
 
-        _file_stream.map_by do |path|
-          Home_::Models_::Node::Parsed::Unparsed.via_json_file_path path
-        end
+        JSON_FileStream[ _file_stream ]
       end
 
       file_stream_via = -> dev_dir, fs_for_glob do
@@ -32,7 +30,16 @@ module Skylab::TMX
           end
         end
       end
+
+      JSON_FileStream = -> file_stream do
+
+        file_stream.map_by do |path|
+          Home_::Models_::Node::Parsed::Unparsed.via_json_file_path path
+        end
+      end
     end
+
+    # == constants defined below are not part of the public API
 
     FilesFromGlob___ = ::Struct.new :files, :glob
   end
