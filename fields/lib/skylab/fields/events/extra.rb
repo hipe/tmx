@@ -125,10 +125,10 @@ module Skylab::Fields
           :item, strange_x,
           :closest_N_items, closest_d,
           :items, good_x_a,
-          :aggregation_proc, -> x_a do
+          :aggregate_by, -> x_a do
             x_a  # just saying hello
           end,
-          :item_proc, -> x do
+          :map_result_items_by, -> x do
             x  # ibid
           end,
         )

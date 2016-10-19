@@ -8,7 +8,7 @@ module Skylab::Basic
         :item, k,
         :items, a,
         :closest_N_items, d,
-        :aggregation_proc, -> a_ { a_ * ' or ' } )
+        :aggregate_by, -> a_ { a_ * ' or ' } )
 
       if s
         _did_you_mean = " - did you mean #{ s }?"

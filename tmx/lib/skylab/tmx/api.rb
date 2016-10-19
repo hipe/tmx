@@ -219,6 +219,10 @@ module Skylab::TMX
         _same name
       end
 
+      def say_formal_attribute_ name
+        _same name
+      end
+
       def say_primary_ name
         _same name
       end

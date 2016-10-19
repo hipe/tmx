@@ -13,8 +13,8 @@ module Skylab::TMX
 
       def initialize & p
         @_emit = p
+        @_stream_modifiers_were_used = false
         @unparsed_node_stream = nil
-        @STREAM_MODIFIERS_WERE_USED = false
       end
 
       attr_writer(
@@ -24,8 +24,8 @@ module Skylab::TMX
       def execute
         if __parse_modifiers
           if __all_requireds_are_present
-            if @STREAM_MODIFIERS_WERE_USED
-              __something
+            if @_stream_modifiers_were_used
+              __modified_stream
             else
               @unparsed_node_stream
             end
@@ -37,7 +37,26 @@ module Skylab::TMX
         end
       end
 
-      # ~ hardcoded requireds check
+      # --
+
+      def __modified_stream
+
+        require 'json'  # meh
+
+        _s_a = remove_instance_variable :@_selected_attributes
+
+        _index = @_attribute_cache._index
+
+        node_parser = Home_::Models_::Node::Parsed::Parser.new(
+          _s_a, _index, & @_emit )
+
+        @unparsed_node_stream.map_reduce_by do |node|
+
+          node_parser.parse node
+        end
+      end
+
+      # -- hardcoded requireds check
 
       def __all_requireds_are_present
 
@@ -74,82 +93,9 @@ module Skylab::TMX
 
       # == BEGIN OFF
 
-      def __stream_thru_modifiers
-        @_ok = true
-        @_additional_formal_attributes = nil
-        begin
-          if __front_argument_looks_like_primary
-            if ! __parse_primary
-              break
-            end
-          elsif ! __parse_map_term
-            break
-          end
-          @scn.no_unparsed_exists ? break : redo
-        end while above
-        @_ok && __flush_mapped_stream
-      end
-
-      def __front_argument_looks_like_primary
-        Looks_like_opt__[ @scn.current_token ]
-      end
-
-      def __parse_map_term
-
-        _normal_human_string = @scn.current_token
-
-        attr = @_attribute_cache.lookup_formal_attribute_via_normal_human_string(
-          _normal_human_string, & @_emit )
-
-        if attr
-          @scn.advance_one
-          ( @_additional_formal_attributes ||= [] ).push attr
-          ACHIEVED_
-        else
-          attr  # did whine
-        end
-      end
-
-      def __flush_mapped_stream
-
-        if _store :@__raw_stream, _attempt_to_produce_stream
-          __do_flush_mapped_stream
-        end
-      end
-
-      def __do_flush_mapped_stream
-
-        # for each entity, and then for each attribute (of each entity)..
-
-        require 'json'
-
-        a = remove_instance_variable :@_additional_formal_attributes
-
-        index = @_attribute_cache._index
-
-        remove_instance_variable( :@__raw_stream ).map_by do |node|
-
-          parsed_node = node.parse_against index, & @_emit
-
-          ProcBasedSimpleExpresser_.new do |y|
-
-            buff = node.get_filesystem_directory_entry_string
-
-            if parsed_node
-              a.each do |attr|
-                buff << SPACE_
-                attr.of( parsed_node ).express_into buff
-              end
-            end
-
-            y << buff
-          end
-        end
-      end
-
       # == END OFF
 
-      # ~ parse modifiers
+      # -- parse modifiers
 
       def __parse_modifiers
         ok = true
@@ -200,6 +146,7 @@ module Skylab::TMX
 
       PRIMARIES__ = {
         json_file_stream: :__parse_json_file_stream,
+        select: :__parse_select_expression,
       }
 
       Hard_coded_magnetics_reflection___ = Lazy_.call do
@@ -217,14 +164,39 @@ module Skylab::TMX
         }
       end
 
+      def __parse_select_expression
+        @_stream_modifiers_were_used = true
+        if _parse_formal_attribute
+          ( @_selected_attributes ||= [] ).push remove_instance_variable :@_formal_attribute
+          ACHIEVED_
+        else
+          UNABLE_
+        end
+      end
+
       def __parse_json_file_stream
 
         x = _expect_trueish_primary_value
         if x
-
           _x_ = Home_::Magnetics::UnparsedNodeStream_via::JSON_FileStream[ x ]
-
           _store :@unparsed_node_stream, _x_
+        else
+          UNABLE_
+        end
+      end
+
+      def _parse_formal_attribute
+
+        _ac = ( @_attribute_cache ||= AttributeCache___.new Home_::Attributes_ )
+
+        _k = @argument_scanner.head_as_normal_symbol
+
+        attr = _ac.lookup_formal_attribute_via_normal_symbol__ _k, & @_emit
+
+        if attr
+          @argument_scanner.advance_one
+          @_formal_attribute = attr
+          ACHIEVED_
         else
           UNABLE_
         end
@@ -283,12 +255,11 @@ module Skylab::TMX
       end
 
       def lookup_formal_attribute_via_normal_symbol__ sym, & p
-        ::Kernel._K
-        fo = _index.formal_via_human str
-        if fo
-          fo
+        attr = _index.formal_via_normal_symbol sym
+        if attr
+          attr
         else
-          @_index.levenshtein str, :as_human, & p
+          @_index.levenshtein sym, & p
         end
       end
 

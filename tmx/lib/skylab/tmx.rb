@@ -139,6 +139,8 @@ module Skylab::TMX
     System = -> do
       _System_lib[].services
     end
+
+    Human = sidesys[ :Human ]
   end
 
   # ==

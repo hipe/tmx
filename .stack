@@ -17,4 +17,3 @@ utility to replace (generate) greenlist, etc. 'tmx-notes.json'
    you will need an internal, non-CLI, cross sidesystem API
    you will need some proper coverage for CLI
    order for API
-   select for API

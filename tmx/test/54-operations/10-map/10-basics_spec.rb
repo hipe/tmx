@@ -20,7 +20,7 @@ module Skylab::TMX::TestSupport
 
       it "explains" do
 
-        em = _expect_parse_error_emission
+        em = expect_parse_error_emission_
         _act = em.express_into_under "", expag_
         _act == "expecting :map or :blah" || fail
       end
@@ -38,7 +38,7 @@ module Skylab::TMX::TestSupport
 
       it "explains" do
 
-        em = _expect_parse_error_emission
+        em = expect_parse_error_emission_
         _act = em.express_into_under [], expag_
         _act.first.include? "currently, normal tmx is deacti" or fail
       end
@@ -63,7 +63,7 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_lines do
-        _em = _expect_parse_error_emission
+        _em = expect_parse_error_emission_
         _em.express_into_under [], expag_
       end
     end
@@ -79,7 +79,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "explains" do
-        em = _expect_parse_error_emission
+        em = expect_parse_error_emission_
         _act = em.express_into_under "", expag_
         _act == "unparsed node stream was not resolved. (use :json_file_stream.)" || fail
       end
@@ -114,13 +114,6 @@ module Skylab::TMX::TestSupport
         st = _tu.result
         [ st.gets, st.gets ]
       end
-    end
-
-    def _expect_parse_error_emission
-
-      em = only_emission
-      em.channel_symbol_array[ 2 ] == :parse_error || fail
-      em
     end
   end
 end

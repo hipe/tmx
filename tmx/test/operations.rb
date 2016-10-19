@@ -42,6 +42,13 @@ module Skylab::TMX::TestSupport
         end
       end
 
+      def expect_parse_error_emission_
+
+        em = only_emission
+        em.channel_symbol_array[ 2 ] == :parse_error || fail
+        em
+      end
+
       def only_emission
         _tu = operations_call_result_tuple
         em_a = _tu.emission_array
