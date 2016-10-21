@@ -57,7 +57,7 @@ module Skylab::TMX::TestSupport
         # (to be "random", the below are in alphabetical order when each
         # word is read from back to front)
 
-        _json_file_stream %w(
+        json_file_stream_via_ %w(
           deka
           dora
           guld
@@ -72,10 +72,10 @@ module Skylab::TMX::TestSupport
       end
 
       def json_file_stream_ * s_a
-        _json_file_stream s_a
+        json_file_stream_via_ s_a
       end
 
-      def _json_file_stream s_a
+      def json_file_stream_via_ s_a
         Stream_.call s_a, & These___[]
       end
     # -

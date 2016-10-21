@@ -186,11 +186,11 @@ module Skylab::TMX
 
       def __parse_order_expression
 
-        reo = Home_::Models_::Reorderation.via_parse_client__ self, & @_emit
-        if reo
-          _modifications.add_reorderation reo
+        plan = Home_::Models::Reorder::Plan_via_parse_client[ self, & @_emit ]
+        if plan
+          _modifications.add_reorder_plan plan
         else
-          reo
+          plan
         end
       end
 

@@ -27,7 +27,16 @@ module Skylab::TMX
       end
     end
 
-    Order_commonly__ = Home_::Models_::Attribute::Order_commonly
+    Order_commonly__ = -> cls do
+
+      key = cls.const_get :KEY, false
+
+      cls.send :define_method, :plan_for_reorder_via_reorder_request do |req|
+
+        Home_::Models::Reorder::CommonPlan.new req, key
+      end
+      NIL
+    end
 
     class Attributes_::After
 
@@ -98,13 +107,6 @@ module Skylab::TMX
       def initialize(*)
 
       end
-    end
-
-    # ==
-
-    class Reorderation__ < ::Proc
-
-      alias_method :group_list_via_item_list, :call
     end
 
     # ==

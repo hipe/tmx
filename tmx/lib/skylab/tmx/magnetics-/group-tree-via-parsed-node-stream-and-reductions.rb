@@ -93,7 +93,7 @@ module Skylab::TMX
           item_list = group.list
           item_list.is_terminal || Here_._SANITY
 
-          _pair_a = redu.group_list_via_item_list__ item_list.items
+          _pair_a = redu.group_list_via_item_list item_list.items
 
           _groups = _pair_a.map do |pair|
             # map from a generic type to our local custom type

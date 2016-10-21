@@ -12,12 +12,12 @@ module Skylab::TMX
 
     # -- write
 
-    def add_reorderation reorderation
+    def add_reorder_plan plan
 
-      _touch_effective_selection reorderation.attribute
+      _touch_effective_selection plan.attribute
 
       @has_reductions = true
-      ( @reductions ||= [] ).push reorderation
+      ( @reductions ||= [] ).push plan
 
       ACHIEVED_
     end

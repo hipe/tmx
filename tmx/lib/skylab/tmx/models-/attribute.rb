@@ -89,16 +89,16 @@ module Skylab::TMX
 
       # ~ 'order'
 
-      def reorderation_implementation_via_reorderation reo, & p
+      def plan_for_reorder_via_reorder_request__ reo, & p
 
         if @implementation.respond_to? REO__
-          @implementation.send REO__, reo
+          @implementation.send REO__, reo, & p
         else
           _when_no_implementation REO__, :order, & p
         end
       end
 
-      REO__ = :reorderation_implementation_via_reorderation
+      REO__ = :plan_for_reorder_via_reorder_request
 
       # --
 
@@ -124,31 +124,6 @@ module Skylab::TMX
         :name,
         :implementation,
       )
-    end
-
-    # ==
-
-    order_commonly = nil
-
-    Order_commonly = -> cls do
-
-      cls.send :define_method, :reorderation_implementation_via_reorderation, order_commonly[ cls::KEY ]
-    end
-
-    order_commonly = -> key do
-
-      -> reo do
-
-        Home_::Models_::Reorderation::By.new do |node_a|
-
-          o = Home_::Magnetics_::GroupList_via_ItemList_and_Key_and_Options.
-            begin( node_a, key )
-
-          o.is_forwards = reo.is_forwards
-
-          o.execute
-        end
-      end
     end
 
     # ==
