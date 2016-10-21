@@ -32,6 +32,7 @@ module Skylab::TMX::TestSupport
 
         call( :map,
           :json_file_stream, _st,
+          * real_attributes_,
           :order, :category,
           :order, :cost,
           :result_in_tree,  # put this anywhere, here for coverage

@@ -7,6 +7,22 @@ module Skylab::TMX
 
       # ==
 
+      When_::Contextually_missing = -> dep_sym, primary_sym, listener do
+
+        listener.call :error, :expression, :parse_error, :contextually_missing do |y|
+
+          _prim_name = Common_::Name.via_variegated_symbol primary_sym
+
+          _dep_name = Common_::Name.via_variegated_symbol dep_sym
+
+          y << "cannot use #{ say_primary_ _prim_name } without #{ say_primary_ _dep_name }"
+        end
+
+        UNABLE_
+      end
+
+      # ==
+
       When_::Contextually_invalid_primary = -> sym, listener do
 
         listener.call :error, :expression, :parse_error, :contextually_invalid do |y|

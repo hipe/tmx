@@ -12,7 +12,7 @@ module Skylab::TMX
     # -
 
       def initialize & p
-        @attributes_module_by = -> { Home_::Attributes_ }
+        @attributes_module_by = nil
         @_emit = p
         @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
         @_stream_modifiers_were_used = false
@@ -122,6 +122,7 @@ module Skylab::TMX
       end
 
       PRIMARIES_ = {
+        attributes_module_by: :__parse_attributes_module_by,
         order: :__parse_order_expression,
         json_file_stream: :__parse_json_file_stream,
         result_in_tree: :__parse_result_in_tree,
@@ -153,9 +154,13 @@ module Skylab::TMX
 
       # -- simple, argument-like primaries
 
+      def __parse_attributes_module_by
+        __parse_primary_value_into :@attributes_module_by
+      end
+
       def __parse_json_file_stream
 
-        x = _expect_trueish_primary_value
+        x = _parse_trueish_primary_value
         if x
           _x_ = Home_::Magnetics::UnparsedNodeStream_via::JSON_FileStream[ x ]
           _store :@unparsed_node_stream, _x_
@@ -197,7 +202,7 @@ module Skylab::TMX
           @_attribute_cache = AttributeCache___.new _mod
           ACHIEVED_
         else
-          Home_._COVER_ME_this_etc
+          Here_::When_::Contextually_missing[ :attributes_module_by, @_current_primary_symbol, @_emit ]
         end
       end
 
@@ -229,16 +234,34 @@ module Skylab::TMX
 
       # --
 
-      def _expect_trueish_primary_value
-        if @argument_scanner.no_unparsed_exists
-          self._COVER_ME_no_argument_for_primary @_current_primary_symbol
-        else
-          x = @argument_scanner.gets_one_as_is
+      def _parse_trueish_primary_value
+        kn = _parse_primary_value
+        if kn
+          x = kn.value_x
           if x
             x
           else
             self._COVER_ME_falseish_argument_value_when_expected_trueish @_current_primary_symbol
           end
+        else
+          UNABLE_
+        end
+      end
+
+      def __parse_primary_value_into ivar
+        kn = _parse_primary_value
+        if kn
+          instance_variable_set ivar, kn.value_x ; ACHIEVED_
+        else
+          UNABLE_
+        end
+      end
+
+      def _parse_primary_value
+        if @argument_scanner.no_unparsed_exists
+          self._COVER_ME_argument_value_not_provided_for @_current_primary_symbol
+        else
+          Common_::Known_Known[ @argument_scanner.gets_one_as_is ]
         end
       end
 

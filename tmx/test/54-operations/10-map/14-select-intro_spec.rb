@@ -7,10 +7,27 @@ module Skylab::TMX::TestSupport
     TS_[ self ]
     use :operations_map
 
+    context "no formal attribute collection" do
+
+      call_by do
+        call :map, :json_file_stream, Common_::Stream.the_empty_stream, :select, :wipple_wapper
+      end
+
+      it "hi" do
+        em = expect_parse_error_emission_
+        _act = em.express_into_under "", expag_
+        _act.include?( 'cannot use :select without :attributes_module_by' ) || fail
+      end
+    end
+
     context "bad attribute" do
 
       call_by do
-        call :map, :json_file_stream, json_file_stream_01_, :select, :wipple_wapper
+        call( :map,
+          :json_file_stream, json_file_stream_01_,
+          * real_attributes_,
+          :select, :wipple_wapper,
+        )
       end
 
       it "hi" do
@@ -23,7 +40,11 @@ module Skylab::TMX::TestSupport
     context "good attribute" do
 
       call_by do
-        call :map, :json_file_stream, json_file_stream_01_, :select, :category
+        call( :map,
+          :json_file_stream, json_file_stream_01_,
+          * real_attributes_,
+          :select, :category,
+        )
       end
 
       it "resultant items still do the name in the same way" do

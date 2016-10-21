@@ -12,7 +12,12 @@ module Skylab::TMX::TestSupport
       ordered_items_by do
 
         _st = json_file_stream_ 'tyris', 'trix'
-        call :map, :json_file_stream, _st, :order, :cost
+
+        call( :map,
+          * real_attributes_,
+          :json_file_stream, _st,
+          :order, :cost,
+        )
       end
 
       it "money" do
@@ -29,7 +34,12 @@ module Skylab::TMX::TestSupport
       ordered_items_by do
 
         _st = _same_three
-        call :map, :json_file_stream, _st, :order, :cost
+
+        call( :map,
+          :json_file_stream, _st,
+          * real_attributes_,
+          :order, :cost,
+        )
       end
 
       it "goes at *begining* (because nothing is always \"less than\" anything else)" do
@@ -42,7 +52,13 @@ module Skylab::TMX::TestSupport
       ordered_items_by do
 
         _st = json_file_stream_ 'trix', 'tyris'
-        call :map, :json_file_stream, _st, :order, :cost, :reverse
+
+        call( :map,
+          * real_attributes_,
+          :json_file_stream, _st,
+          :order, :cost,
+          :reverse,
+        )
       end
 
       it "goes at end" do
@@ -55,7 +71,13 @@ module Skylab::TMX::TestSupport
       ordered_items_by do
 
         _st = _same_three
-        call :map, :json_file_stream, _st, :order, :cost, :reverse
+
+        call( :map,
+          :json_file_stream, _st,
+          * real_attributes_,
+          :order, :cost,
+          :reverse,
+        )
       end
 
       it "the nil one is at the end" do

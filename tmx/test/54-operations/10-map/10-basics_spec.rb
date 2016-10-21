@@ -67,7 +67,7 @@ module Skylab::TMX::TestSupport
       end
     end
 
-    context "missing reqiured primary (for now)" do
+    context "missing required primary (for now)" do
 
       call_by do
         call :map

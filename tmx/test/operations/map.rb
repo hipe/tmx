@@ -78,6 +78,13 @@ module Skylab::TMX::TestSupport
       def json_file_stream_via_ s_a
         Stream_.call s_a, & These___[]
       end
+
+      def real_attributes_
+        REAL_ATTRIBUTES___
+      end
+
+      REAL_ATTRIBUTES___ = [ :attributes_module_by, -> { Home_::Attributes_ } ]
+
     # -
 
     # ==
