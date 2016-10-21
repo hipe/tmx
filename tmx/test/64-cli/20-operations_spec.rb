@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] CLI - operations" do
+  describe "[tmx] CLI - operations", wip: true do
 
     TS_[ self ]
 

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] models - more front" do
+  describe "[tmx] models - more front", wip: true do
 
     TS_[ self ]
     use :operations_reactions

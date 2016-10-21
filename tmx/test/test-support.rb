@@ -67,6 +67,7 @@ module Skylab::TMX::TestSupport
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  Lazy_ = Common_::Lazy
   NIL_ = nil
   NOTHING_ = nil
   Stream_ = Home_::Stream_

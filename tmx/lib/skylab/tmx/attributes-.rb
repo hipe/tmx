@@ -4,13 +4,10 @@ module Skylab::TMX
 
   module AttributesScratchSpace___
 
-    module StandIn___
-
-      def initialize x
-        @pnode = x
-      end
+    module Furloughed_NOT_USED_____
 
       def express_into y
+        # @pnode = parsed node
         aval = @pnode.box[ self.class::KEY ]
         if aval
           x = aval.value_x
@@ -30,27 +27,58 @@ module Skylab::TMX
       end
     end
 
+    Order_commonly__ = Home_::Models_::Attribute::Order_commonly
+
     class Attributes_::After
-      include StandIn___
-      KEY = "after"
+
+      def initialize(*)
+
+      end
     end
 
     class Attributes_::Category
-      include StandIn___
-      KEY = "category"
+
+      def initialize(*)
+
+      end
+
+      KEY = :category
+      Order_commonly__[ self ]
+    end
+
+    class Attributes_::Cost
+
+      def initialize(*)
+
+      end
+
+      KEY = :cost
+      Order_commonly__[ self ]
     end
 
     class Attributes_::DocTestManifest
-      include StandIn___
-      KEY = "doc test manifest"
+
+      def initialize(*)
+
+      end
+
+      KEY = :doc_test_manifest
+      Order_commonly__[ self ]  # in practice it is probably silly to want
+      # to sort by this filename, but this is for testing recursive ordering
     end
 
-    is_lib = "is lib"
-    say_is_lib = "lib"
+    class Attributes_::IsLib
 
-    Attributes_::IsLib = -> parsed_node do
+      def initialize(*)
 
-      ProcBasedSimpleExpresser_.new do |y|
+      end
+
+      is_lib = "is lib"
+      say_is_lib = "lib"
+
+      define_method :_FURLOUGHED_express_into_of do |y, parsed_node|
+
+        self._REVIEW_how_values_are_stored_and_accessed
 
         aval = parsed_node.box[ is_lib ]
         if aval
@@ -66,9 +94,20 @@ module Skylab::TMX
     end
 
     class Attributes_::IsPotentiallyInterestingApplication
-      include StandIn___
-      KEY = "is potentially interesting application"
+
+      def initialize(*)
+
+      end
     end
+
+    # ==
+
+    class Reorderation__ < ::Proc
+
+      alias_method :group_list_via_item_list, :call
+    end
+
+    # ==
 
     SAY_NO__ = 'no'
     SAY_NONE__ = '-'

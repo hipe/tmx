@@ -16,4 +16,4 @@ utility to replace (generate) greenlist, etc. 'tmx-notes.json'
 -6 regenerate the punchlist with that crazy algo (might require renaming)
    you will need an internal, non-CLI, cross sidesystem API
    you will need some proper coverage for CLI
-   order for API
+   order (custom per attribute)

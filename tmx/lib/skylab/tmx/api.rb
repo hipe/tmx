@@ -107,6 +107,8 @@ module Skylab::TMX
 
     class ArgumentScanner___
 
+      # so that API and CLI can share some subset of syntax, for custom syntaxes
+
       class << self
         alias_method :via_array, :new
         undef_method :new

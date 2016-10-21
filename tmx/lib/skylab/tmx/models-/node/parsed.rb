@@ -6,8 +6,8 @@ module Skylab::TMX
 
       class << self
 
-        def new sa, ind, & p
-          Parsed___.begin_prototype sa, ind, p
+        def new sel, ind, & p
+          Parsed___.begin_prototype sel, ind, p
         end
       end  # >>
     end
@@ -22,9 +22,10 @@ module Skylab::TMX
         undef_method :new
       end  # >>
 
-      def initialize sa, ind, p
+      def initialize sel, ind, p
+
         @index = ind
-        @selected_attributes = sa
+        @selected_attributes = sel.get_attributes_effectively_selected
         @_emit = p
       end
 
@@ -56,8 +57,7 @@ module Skylab::TMX
         remove_instance_variable :@index
 
         sa.each do |attr|
-          name = attr.name
-          _hum = name.as_human
+          _hum = attr.name.as_human
           had = true
           x = h.fetch _hum do
             had = false
@@ -66,7 +66,7 @@ module Skylab::TMX
             if x.nil?
               Home_._DECIDE
             else
-              box.add name.as_lowercase_with_underscores_symbol, x
+              box.add attr.normal_symbol, x
             end
           end
         end

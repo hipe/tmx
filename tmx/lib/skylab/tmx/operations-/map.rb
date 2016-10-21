@@ -41,14 +41,36 @@ module Skylab::TMX
 
       def __modified_stream
 
+        if @_modifications.has_reductions
+          if @result_in_tree
+            _map_reduced_tree
+          else
+            __map_reduced_stream
+          end
+        else
+          _mapped_stream
+        end
+      end
+
+      def __map_reduced_stream
+        _tree = _map_reduced_tree
+        _tree.to_node_stream
+      end
+
+      def _map_reduced_tree
+
+        _node_st = _mapped_stream
+
+        Home_::Magnetics_::GroupTree_via_ParsedNodeStream_and_Reductions[
+          _node_st, @_modifications.reductions ]
+      end
+
+      def _mapped_stream
+
         require 'json'  # meh
 
-        _s_a = remove_instance_variable :@_selected_attributes
-
-        _index = @_attribute_cache._index
-
         node_parser = Home_::Models_::Node::Parsed::Parser.new(
-          _s_a, _index, & @_emit )
+          @_modifications, @_attribute_cache._index, & @_emit )
 
         @unparsed_node_stream.map_reduce_by do |node|
 
@@ -71,19 +93,17 @@ module Skylab::TMX
 
         @_emit.call :error, :expression, :parse_error, :missing_required_arguments do |y|
 
-          h = Hard_coded_magnetics_reflection___[]
+          h = Misc_hard_coded_dependency_reflection__[]
 
           missing_ivar_a.each do |ivar|
 
-            sct = h.fetch ivar
+            means = h.fetch ivar
 
-            _name_st = Stream_.call sct.primary_symbols do |sym|
-              Common_::Name.via_variegated_symbol sym
-            end
+            _me = means.say_self_via_ivar ivar, self
 
-            _x_or_y = say_primary_alternation_ _name_st
+            _dep = means.say_dependency_under self
 
-            y << "#{ sct.as_human } was not resolved. (use #{ _x_or_y }.)"
+            y << "#{ _me } was not resolved. (use #{ _dep }.)"
           end
           y
         end
@@ -145,34 +165,47 @@ module Skylab::TMX
       end
 
       PRIMARIES__ = {
+        order: :__parse_order_expression,
         json_file_stream: :__parse_json_file_stream,
+        result_in_tree: :__parse_result_in_tree,
         select: :__parse_select_expression,
       }
 
-      Hard_coded_magnetics_reflection___ = Lazy_.call do
+      Misc_hard_coded_dependency_reflection__ = Lazy_.call do
 
-        # (hypothetically we can generate this sort of thing with the [ta]
-        # magnetics library but it's really not worth it for now)
+        # hypothetically we can generate some of this with [ta] magnetics meh
 
-        Means__ = ::Struct.new :as_human, :primary_symbols
+        o = Home_::Models_::Means
         {
-          :@unparsed_node_stream => Means__[
-            "unparsed node stream",
-            [
-              :json_file_stream,
-            ] ],
+          :result_in_tree => o[ :primary, :order, :primary ],
+          :@unparsed_node_stream => o[ :primary, :json_file_stream, :human ],
         }
       end
 
+      # -- the 'order' primary
+
+      def __parse_order_expression
+
+        reo = Home_::Models_::Reorderation.via_parse_client__ self, & @_emit
+        if reo
+          _modifications.add_reorderation reo
+        else
+          reo
+        end
+      end
+
+      # -- the 'select' primary
+
       def __parse_select_expression
-        @_stream_modifiers_were_used = true
         if _parse_formal_attribute
-          ( @_selected_attributes ||= [] ).push remove_instance_variable :@_formal_attribute
-          ACHIEVED_
+          _attr = remove_instance_variable :@_formal_attribute
+          _modifications.add_select _attr
         else
           UNABLE_
         end
       end
+
+      # -- simple, argument-like primaries
 
       def __parse_json_file_stream
 
@@ -185,7 +218,22 @@ module Skylab::TMX
         end
       end
 
+      def __parse_result_in_tree
+        if @_stream_modifiers_were_used
+          @result_in_tree = true ; ACHIEVED_
+        else
+          _when_contextually_invalid_primary
+        end
+      end
+
+      # -- support for primaries
+
       def _parse_formal_attribute
+
+        _store :@_formal_attribute, parse_formal_attribute_
+      end
+
+      def parse_formal_attribute_
 
         _ac = ( @_attribute_cache ||= AttributeCache___.new Home_::Attributes_ )
 
@@ -195,40 +243,38 @@ module Skylab::TMX
 
         if attr
           @argument_scanner.advance_one
-          @_formal_attribute = attr
-          ACHIEVED_
-        else
-          UNABLE_
         end
+        attr
       end
 
-      # --
+      def _when_contextually_invalid_primary
 
-      def __TO_USE_nonempty_unparsed_node_stream_via_unparsed_node_stream
+        sym = @_current_primary_symbol
 
-        st = @unparsed_node_stream
+        @_emit.call :error, :expression, :parse_error, :contextually_invalid do |y|
 
-        # nasty peek, it's this or peek the stream or don't check for this
+          means = Misc_hard_coded_dependency_reflection__[].fetch sym
 
-        if st.upstream.files.length.zero?
-          __when_empty_upstream
-        else
-          st  # wee
+          _me = means.say_self_via_symbol sym, self
+
+          _dep = means.say_dependency_under self
+
+          y << "#{ _me } must occur after #{ _dep }."
         end
-      end
-
-      def __when_empty_upstream
-
-        # more nasty peeking..
-
-        glob = @unparsed_node_stream.upstream.glob
-
-        @_emit.call :error, :expression, :zero_nodes do |y|
-          y << "found no files for #{ glob }"
-        end
-
         UNABLE_
       end
+
+      def _modifications
+        @_modifications ||= begin
+          @_stream_modifiers_were_used = true
+          @result_in_tree = false
+          Home_::Models_::MapModificationIndex.new
+        end
+      end
+
+      alias_method :modification_index_, :_modifications
+
+      # --
 
       def _expect_trueish_primary_value
         if @argument_scanner.no_unparsed_exists
@@ -244,6 +290,10 @@ module Skylab::TMX
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      attr_reader(
+        :argument_scanner,  # for collaborators
+      )
     # -
 
     # ==
@@ -264,7 +314,7 @@ module Skylab::TMX
       end
 
       def _index
-        @_index ||= Home_::Models_::Attribute::Index.new @module
+        @_index ||= Home_::Models_::Attribute::Index.new :_eg_args_from_oper_, @module
       end
     end
   end
@@ -278,3 +328,4 @@ module Skylab::TMX
 
   # ==
 end
+# #tombstone: temporary: report on no files found for glob

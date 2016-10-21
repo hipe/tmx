@@ -82,7 +82,7 @@ ourselves of these softwares we can't do without:
 
   • macvim
     • "janus" for same
-    • .vimrc.before, .vimrc.after, .gvimrc.after (#todo)
+    • .vimrc.before, .vimrc.after, .gvimrc.after (EDIT)
 
 
 

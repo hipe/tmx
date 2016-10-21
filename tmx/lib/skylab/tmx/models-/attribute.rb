@@ -2,9 +2,11 @@ module Skylab::TMX
 
   class Models_::Attribute
 
+    # ==
+
     class Index
 
-      def initialize mod
+      def initialize args, mod
 
         formals = []
         hum_h = {}
@@ -12,15 +14,12 @@ module Skylab::TMX
 
         mod.constants.each do |const|
 
-          name = Common_::Name.via_const_symbol const
-
-          _proto_x = mod.const_get const, false
-
-          attr = Here_.new _proto_x, name
-
+          _class = mod.const_get const, false
+          _implementation = _class.new args
+          attr = Here_.new _implementation, const
           d = formals.length
-          hum_h[ name.as_human ] = d
-          sym_h[ name.as_lowercase_with_underscores_symbol ] = d
+          hum_h[ attr.name.as_human ] = d
+          sym_h[ attr.normal_symbol ] = d
           formals.push attr
         end
 
@@ -81,14 +80,77 @@ module Skylab::TMX
     Here_ = self
     class Here_
 
-      def initialize proto_x, name
-        @name = name
-        @PROTOTYPE_X = proto_x  # we want to build it here
+      def initialize impl, const
+        @implementation = impl
+        @name = Common_::Name.via_const_symbol const
+      end
+
+      # -- specific modifiers
+
+      # ~ 'order'
+
+      def reorderation_implementation_via_reorderation reo, & p
+
+        if @implementation.respond_to? REO__
+          @implementation.send REO__, reo
+        else
+          _when_no_implementation REO__, :order, & p
+        end
+      end
+
+      REO__ = :reorderation_implementation_via_reorderation
+
+      # --
+
+      def _when_no_implementation m, primary_sym, & emit
+
+        me = self
+        emit.call :error, :expression, :parse_error, :no_implementation_for, primary_sym do |y|
+
+          _eew = Common_::Name.via_variegated_symbol primary_sym
+          _subj = say_formal_attribute_ me.name
+          _topic = say_primary_ _eew
+          y << "#{ _subj } has no implentation for #{ _topic }."
+          y << "(maybe defined `#{ m }` for #{ me.implementation.class }?)"
+        end
+        UNABLE_
+      end
+
+      def normal_symbol
+        @name.as_lowercase_with_underscores_symbol
       end
 
       attr_reader(
         :name,
+        :implementation,
       )
     end
+
+    # ==
+
+    order_commonly = nil
+
+    Order_commonly = -> cls do
+
+      cls.send :define_method, :reorderation_implementation_via_reorderation, order_commonly[ cls::KEY ]
+    end
+
+    order_commonly = -> key do
+
+      -> reo do
+
+        Home_::Models_::Reorderation::By.new do |node_a|
+
+          o = Home_::Magnetics_::GroupList_via_ItemList_and_Key_and_Options.
+            begin( node_a, key )
+
+          o.is_forwards = reo.is_forwards
+
+          o.execute
+        end
+      end
+    end
+
+    # ==
   end
 end

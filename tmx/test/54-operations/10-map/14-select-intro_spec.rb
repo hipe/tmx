@@ -5,13 +5,12 @@ module Skylab::TMX::TestSupport
   describe "[tmx] operations - map - select intro" do
 
     TS_[ self ]
-    use :memoizer_methods
-    use :operations
+    use :operations_map
 
     context "bad attribute" do
 
       call_by do
-        call :map, :json_file_stream, json_files_stream_01_, :select, :wipple_wapper
+        call :map, :json_file_stream, json_file_stream_01_, :select, :wipple_wapper
       end
 
       it "hi" do
@@ -24,7 +23,7 @@ module Skylab::TMX::TestSupport
     context "good attribute" do
 
       call_by do
-        call :map, :json_file_stream, json_files_stream_01_, :select, :category
+        call :map, :json_file_stream, json_file_stream_01_, :select, :category
       end
 
       it "resultant items still do the name in the same way" do

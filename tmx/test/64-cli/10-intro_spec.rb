@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] CLI - intro" do
+  describe "[tmx] CLI - intro", wip: true do
 
     # (somewhat at odds with other nearby test nodes,
     #  this is testing *our* tmx, and not *the* tmx)
