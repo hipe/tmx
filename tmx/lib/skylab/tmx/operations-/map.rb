@@ -12,7 +12,9 @@ module Skylab::TMX
     # -
 
       def initialize & p
+        @attributes_module_by = -> { Home_::Attributes_ }
         @_emit = p
+        @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
         @_stream_modifiers_were_used = false
         @unparsed_node_stream = nil
       end
@@ -85,35 +87,9 @@ module Skylab::TMX
         if @unparsed_node_stream
           ACHIEVED_
         else
-          __when_missing_requireds [ :@unparsed_node_stream ]  # pretend
+          Here_::When_::Missing_requireds[ [ :@unparsed_node_stream ], @_emit ]
         end
       end
-
-      def __when_missing_requireds missing_ivar_a
-
-        @_emit.call :error, :expression, :parse_error, :missing_required_arguments do |y|
-
-          h = Misc_hard_coded_dependency_reflection__[]
-
-          missing_ivar_a.each do |ivar|
-
-            means = h.fetch ivar
-
-            _me = means.say_self_via_ivar ivar, self
-
-            _dep = means.say_dependency_under self
-
-            y << "#{ _me } was not resolved. (use #{ _dep }.)"
-          end
-          y
-        end
-
-        UNABLE_
-      end
-
-      # == BEGIN OFF
-
-      # == END OFF
 
       # -- parse modifiers
 
@@ -130,7 +106,7 @@ module Skylab::TMX
       def __parse_argument_scanner_head
 
         k = @argument_scanner.head_as_normal_symbol
-        m = PRIMARIES__[ k ]
+        m = PRIMARIES_[ k ]
         if m
           @_current_primary_symbol = k
           @argument_scanner.advance_one
@@ -142,45 +118,15 @@ module Skylab::TMX
 
       def __when_unrecognized_primary
 
-        name = @argument_scanner.method :head_as_agnostic
-        st = method :__primaries_name_stream
-
-        @_emit.call :error, :expression, :parse_error, :unrecognized_primary do |y|
-
-          y << "unrecognized primary #{ say_primary_ name[] }"
-
-          _this_or_this_or_this = say_primary_alternation_ st[]
-
-          y << "expecting #{ _this_or_this_or_this }"
-        end
-
-        UNABLE_
+        Here_::When_::Unrecognized_primary[ @argument_scanner, @_emit ]
       end
 
-      def __primaries_name_stream
-        _ = Stream_.call PRIMARIES__.keys do |sym|
-          Common_::Name.via_variegated_symbol sym
-        end
-        _  # todo
-      end
-
-      PRIMARIES__ = {
+      PRIMARIES_ = {
         order: :__parse_order_expression,
         json_file_stream: :__parse_json_file_stream,
         result_in_tree: :__parse_result_in_tree,
         select: :__parse_select_expression,
       }
-
-      Misc_hard_coded_dependency_reflection__ = Lazy_.call do
-
-        # hypothetically we can generate some of this with [ta] magnetics meh
-
-        o = Home_::Models_::Means
-        {
-          :result_in_tree => o[ :primary, :order, :primary ],
-          :@unparsed_node_stream => o[ :primary, :json_file_stream, :human ],
-        }
-      end
 
       # -- the 'order' primary
 
@@ -197,9 +143,9 @@ module Skylab::TMX
       # -- the 'select' primary
 
       def __parse_select_expression
-        if _parse_formal_attribute
-          _attr = remove_instance_variable :@_formal_attribute
-          _modifications.add_select _attr
+        attr = parse_formal_attribute_
+        if attr
+          _modifications.add_select attr
         else
           UNABLE_
         end
@@ -228,18 +174,38 @@ module Skylab::TMX
 
       # -- support for primaries
 
-      def _parse_formal_attribute
-
-        _store :@_formal_attribute, parse_formal_attribute_
+      def parse_formal_attribute_
+        send @_parse_formal_attribute
       end
 
-      def parse_formal_attribute_
+      def __parse_formal_attribute_the_first_time
 
-        _ac = ( @_attribute_cache ||= AttributeCache___.new Home_::Attributes_ )
+        if __resolve_attribute_cache
+          @_parse_formal_attribute = :__parse_formal_attribute_normally
+          send @_parse_formal_attribute
+        else
+          UNABLE_
+        end
+      end
+
+      def __resolve_attribute_cache
+
+        p = remove_instance_variable :@attributes_module_by
+        if p
+          _mod = p[]
+          _mod || fail
+          @_attribute_cache = AttributeCache___.new _mod
+          ACHIEVED_
+        else
+          Home_._COVER_ME_this_etc
+        end
+      end
+
+      def __parse_formal_attribute_normally
 
         _k = @argument_scanner.head_as_normal_symbol
 
-        attr = _ac.lookup_formal_attribute_via_normal_symbol__ _k, & @_emit
+        attr = @_attribute_cache.lookup_formal_attribute_via_normal_symbol__ _k, & @_emit
 
         if attr
           @argument_scanner.advance_one
@@ -248,20 +214,7 @@ module Skylab::TMX
       end
 
       def _when_contextually_invalid_primary
-
-        sym = @_current_primary_symbol
-
-        @_emit.call :error, :expression, :parse_error, :contextually_invalid do |y|
-
-          means = Misc_hard_coded_dependency_reflection__[].fetch sym
-
-          _me = means.say_self_via_symbol sym, self
-
-          _dep = means.say_dependency_under self
-
-          y << "#{ _me } must occur after #{ _dep }."
-        end
-        UNABLE_
+        Here_::When_::Contextually_invalid_primary[ @_current_primary_symbol, @_emit ]
       end
 
       def _modifications
@@ -317,6 +270,10 @@ module Skylab::TMX
         @_index ||= Home_::Models_::Attribute::Index.new :_eg_args_from_oper_, @module
       end
     end
+
+    # ==
+
+    Here_ = self
   end
 
   # ==
@@ -328,4 +285,5 @@ module Skylab::TMX
 
   # ==
 end
+# #pending-rename: branch down
 # #tombstone: temporary: report on no files found for glob
