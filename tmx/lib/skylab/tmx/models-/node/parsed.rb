@@ -7,6 +7,9 @@ module Skylab::TMX
       class << self
 
         def new sel, ind, & p
+
+          Home_.lib_.JSON  # require 'json'
+
           Parsed___.begin_prototype sel, ind, p
         end
       end  # >>
@@ -24,8 +27,8 @@ module Skylab::TMX
 
       def initialize sel, ind, p
 
+        @__attributes_to_parse = sel.get_attributes_to_parse__
         @index = ind
-        @selected_attributes = sel.get_attributes_effectively_selected
         @_emit = p
       end
 
@@ -53,10 +56,9 @@ module Skylab::TMX
         box = Common_::Box.new
 
         h = remove_instance_variable :@_raw_hash
-        sa = remove_instance_variable :@selected_attributes
         remove_instance_variable :@index
 
-        sa.each do |attr|
+        remove_instance_variable( :@__attributes_to_parse ).each do |attr|
           _hum = attr.name.as_human
           had = true
           x = h.fetch _hum do
@@ -82,8 +84,9 @@ module Skylab::TMX
 
         extra = nil
         @_raw_hash.each_key do |s|
-          @index.has_via_human s and next
-          ( extra ||= [] ).push s
+          if ! @index.is_parsable_via_human__ s
+            ( extra ||= [] ).push s
+          end
         end
         if extra
           @__extra_humans = extra
@@ -95,18 +98,17 @@ module Skylab::TMX
 
       def __whine_about_unrecognized_attributes
 
-        s_a = remove_instance_variable :@__extra_humans
-        json_file = remove_instance_variable :@_json_file
+        _s_a = remove_instance_variable :@__extra_humans
+        _json_file = remove_instance_variable :@_json_file
 
-        @_emit.call :error, :expression, :parse_error do |y|
-          y << "unrecognized attribute(s) #{ s_a.inspect } in #{ json_file }"
-        end
+        @index.explain_why_is_not_parsable__ _s_a, _json_file, & @_emit
         UNABLE_
       end
 
       # --
 
       def __parse_json_file
+
         _big_string = ::File.read @_json_file
         begin
           h = ::JSON.parse _big_string

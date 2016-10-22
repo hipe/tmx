@@ -10,6 +10,7 @@ module Skylab::TMX
 
         formals = []
         hum_h = {}
+        nop_h = nil
         sym_h = {}
 
         mod.constants.each do |const|
@@ -18,53 +19,22 @@ module Skylab::TMX
           _implementation = _class.new args
           attr = Here_.new _implementation, const
           d = formals.length
-          hum_h[ attr.name.as_human ] = d
+
+          if attr.is_derived
+            nop_h ||= {}
+            nop_h[ attr.name.as_human ] = [ :_because_is_derived_, d ]  # #here
+          else
+            hum_h[ attr.name.as_human ] = d
+          end
+
           sym_h[ attr.normal_symbol ] = d
           formals.push attr
         end
 
         @_formal_attributes = formals
-        @_formal_via_human = hum_h
         @_formal_via_normal_symbol_hash = sym_h
-      end
-
-      def levenshtein k, & emit
-
-        attrs = @_formal_attributes
-
-        emit.call :error, :expression, :parse_error, :unknown_attribute do |y|
-
-          _st = Stream_.call attrs do |attr|
-            attr.name
-          end
-
-          _stringify_by = -> name do
-            name.as_lowercase_with_underscores_string
-          end
-
-          say_attr = method :say_formal_attribute_
-
-          _s_a = Home_.lib_.human::Levenshtein.with(
-            :item_string, k.id2name,
-            :items, _st,
-            :stringify_by, _stringify_by,
-            :map_result_items_by, say_attr,
-            :closest_N_items, 3,
-          )
-
-          _eew = Common_::Name.via_variegated_symbol k
-
-          _first_sentence = "unrecognized attribute \"#{ say_attr[ _eew ] }\"."
-          _second_sentence = "did you mean #{ Common_::Oxford_or[ _s_a ] }?"
-
-          y << "#{ _first_sentence } #{ _second_sentence }"
-        end
-
-        UNABLE_
-      end
-
-      def has_via_human hum
-        @_formal_via_human[ hum ]
+        @_nonparsable_reason_via_human = nop_h
+        @_parsable_formal_via_human = hum_h
       end
 
       def formal_via_normal_symbol k
@@ -72,6 +42,22 @@ module Skylab::TMX
         if d
           @_formal_attributes.fetch d
         end
+      end
+
+      def is_parsable_via_human__ hum
+        @_parsable_formal_via_human.key? hum
+      end
+
+      def explain_why_is_not_parsable__ s_a, json_file, & listener
+
+        Here_::When_::Unparsable_attributes_in_JSON_file.call(
+          s_a, json_file, @_nonparsable_reason_via_human, listener )
+        UNABLE_
+      end
+
+      def express_levenshtein__ k, & emit
+        Here_::When_::Unrecognized_attribute_levenshtein[ k, @_formal_attributes, emit ]
+        UNABLE_
       end
     end
 
@@ -81,7 +67,14 @@ module Skylab::TMX
     class Here_
 
       def initialize impl, const
+
+        if impl.respond_to? :derived_from
+          @is_derived = true
+          @derived_from_ = impl.derived_from
+        end
+
         @implementation = impl
+
         @name = Common_::Name.via_const_symbol const
       end
 
@@ -104,28 +97,26 @@ module Skylab::TMX
 
       def _when_no_implementation m, primary_sym, & emit
 
-        me = self
-        emit.call :error, :expression, :parse_error, :no_implementation_for, primary_sym do |y|
-
-          _eew = Common_::Name.via_variegated_symbol primary_sym
-          _subj = say_formal_attribute_ me.name
-          _topic = say_primary_ _eew
-          y << "#{ _subj } has no implentation for #{ _topic }."
-          y << "(maybe defined `#{ m }` for #{ me.implementation.class }?)"
-        end
+        Here_::When_::Has_no_implementation[ m, primary_sym, me, emit ]
         UNABLE_
       end
+
+      # -- read
 
       def normal_symbol
         @name.as_lowercase_with_underscores_symbol
       end
 
       attr_reader(
+        :derived_from_,
         :name,
         :implementation,
+        :is_derived,
       )
     end
 
     # ==
   end
+  Here_ = self
 end
+# #pending-rename: branch down

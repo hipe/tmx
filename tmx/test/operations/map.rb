@@ -9,6 +9,35 @@ module Skylab::TMX::TestSupport
       tcc.include self
     end
 
+    module Dir02
+
+      def self.[] tcc
+        tcc.include self
+      end
+
+      # -
+        def full_valid_json_file_stream_
+          _glob = ::File.join entities_dir_path_, '*', 'valid.json'
+          _files = ::Dir.glob _glob
+          Stream_[ _files ]
+        end
+
+        def entities_dir_path_
+          _mod = fixture_module_
+          _path = _mod.dir_path
+          ::File.join _path, 'entities'
+        end
+
+        def attributes_module_by_
+          [ :attributes_module_by, -> { fixture_module_::Attriboots } ]
+        end
+
+        def fixture_module_
+          TS_::FixtureDirectories::Dir_02_WithAttributes
+        end
+      # -
+    end
+
     # -
       DEFINITION_FOR_ETC___ = -> & p do
 

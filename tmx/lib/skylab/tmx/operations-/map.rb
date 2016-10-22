@@ -69,7 +69,17 @@ module Skylab::TMX
 
       def _mapped_stream
 
-        require 'json'  # meh
+        if @_modifications.has_derivations
+
+          _st = _mapped_stream_ignorant_of_derivations
+          Home_::Magnetics_::MappedStream_via_Derivations_and_MappedStream.call(
+            @_modifications, _st )
+        else
+          _mapped_stream_ignorant_of_derivations
+        end
+      end
+
+      def _mapped_stream_ignorant_of_derivations
 
         node_parser = Home_::Models_::Node::Parsed::Parser.new(
           @_modifications, @_attribute_cache._index, & @_emit )
@@ -146,7 +156,11 @@ module Skylab::TMX
       def __parse_select_expression
         attr = parse_formal_attribute_
         if attr
-          _modifications.add_select attr
+          if attr.is_derived
+            _modifications.add_derived__ attr, self
+          else
+            _modifications.add_nonderived_select__ attr
+          end
         else
           UNABLE_
         end
@@ -210,12 +224,15 @@ module Skylab::TMX
 
         _k = @argument_scanner.head_as_normal_symbol
 
-        attr = @_attribute_cache.lookup_formal_attribute_via_normal_symbol__ _k, & @_emit
-
+        attr = lookup_attribute_via_normal_symbol_ _k
         if attr
           @argument_scanner.advance_one
         end
         attr
+      end
+
+      def lookup_attribute_via_normal_symbol_ k
+        @_attribute_cache.lookup_formal_attribute_via_normal_symbol__ k, & @_emit
       end
 
       def _when_contextually_invalid_primary
@@ -285,7 +302,7 @@ module Skylab::TMX
         if attr
           attr
         else
-          @_index.levenshtein sym, & p
+          @_index.express_levenshtein__ sym, & p
         end
       end
 

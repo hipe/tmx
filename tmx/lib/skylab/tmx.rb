@@ -128,7 +128,7 @@ module Skylab::TMX
 
   module Lib_
 
-    sidesys, _stdlib = Autoloader_.at(
+    sidesys, stdlib = Autoloader_.at(
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
@@ -141,6 +141,8 @@ module Skylab::TMX
     end
 
     Human = sidesys[ :Human ]
+
+    JSON = stdlib[ :JSON ]
   end
 
   # ==
