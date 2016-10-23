@@ -41,6 +41,9 @@ module Skylab::TMX::TestSupport
     end
   end
 
+  Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
+
   module InstanceMethods___
 
     attr_reader :do_debug
@@ -52,9 +55,12 @@ module Skylab::TMX::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+
+    define_method :program_name_string_array, ( Lazy_.call do
+      %w( tmz )
+    end )
   end
 
-  Common_ = ::Skylab::Common
   Home_ = ::Skylab::TMX
 
   # ==
@@ -63,11 +69,21 @@ module Skylab::TMX::TestSupport
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end
 
+    Non_Interactive_CLI_Fail_Early = -> tcc do
+      Zerk_lib___[].test_support::Non_Interactive_CLI::Fail_Early[ tcc ]
+    end
+
   # ==
 
-  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  Zerk_lib___ = Lazy_.call do
+    Autoloader_.require_sidesystem :Zerk
+  end
 
-  Lazy_ = Common_::Lazy
+  # ==
+
+  Autoloader_ = Home_::Autoloader_
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   NIL_ = nil
   NOTHING_ = nil
   Stream_ = Home_::Stream_

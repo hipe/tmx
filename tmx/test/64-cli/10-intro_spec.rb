@@ -2,12 +2,40 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] CLI - intro", wip: true do
+  describe "[tmx] CLI - intro" do
+
+    TS_[ self ]
+    use :non_interactive_CLI_fail_early
+
+    it "strange argument - two lines of whining, then invite" do
+      invoke 'zazoozle'
+      expect_on_stderr "currently, normal tmx is deactivated -"
+      expect "won't parse \"zazoozle\""
+      _expect_failed_normally
+    end
+
+    it "strange option - explain, invite" do
+      invoke '-x'
+      expect_on_stderr "unrecognized option: \"-x\""
+      _expect_failed_normally
+    end
+
+    it "help (a stub for now)" do
+      invoke '-h'
+      expect_on_stderr "usage: tmz { map | BLAH } [opts]"
+      expect_empty_puts
+      expect "description: experiment.."
+      expect_succeeded
+    end
+
+    if false  # wip: true
+
+    # (eventually these are supposed to melt out to their
+    #  respective sidesystems)
 
     # (somewhat at odds with other nearby test nodes,
     #  this is testing *our* tmx, and not *the* tmx)
 
-    TS_[ self ]
     use :CLI
 
     _ARG = 'ping'.freeze
@@ -162,6 +190,20 @@ module Skylab::TMX::TestSupport
     end
 
     def subject_CLI
+      Home_::CLI
+    end
+    end  # if false
+
+    def _expect_failed_normally
+      expect "try 'tmz -h'"
+      expect_failed
+    end
+
+    def subject_CLI
+      _real_CLI
+    end
+
+    def _real_CLI
       Home_::CLI
     end
   end

@@ -5,6 +5,7 @@ try to simplify [ac]/[ze] procure bound call
 no more call_API per se - frontload all expectations as a spy so you fail early
 [tm] change actors and sessions to magnetics
 [tm] no more Selective_Builder_Receiver_Sender_Methods
+integration of sidesystems with TMX should happen in the sides, not TMX
 you have lots of pending renames
 unify other tmx node-centric services (that big dependency graph)
 unbreak [tmx]'s heart - use new API somehow to bring old tmx back

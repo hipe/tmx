@@ -105,3 +105,4 @@ module Skylab::TMX::TestSupport
     end
   end
 end
+# #pending-rename: after everything, this is just for the 'map' operation

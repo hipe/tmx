@@ -13,7 +13,6 @@ module Skylab::TMX
       end
 
       def invoke argv
-        @exitstatus = 0
         @argv = argv
         bc = __bound_call
         if bc
@@ -58,9 +57,10 @@ module Skylab::TMX
 
       def __when_general_help
         io = @serr
-        io.puts "usage #{ _program_name } #{ _formal_actions } [opts]"
+        io.puts "usage: #{ _program_name } #{ _formal_actions } [opts]"
         io.puts
         io.puts "description: experiment.."
+        @exitstatus = SUCCESS_EXITSTATUS__
         NIL
       end
 
@@ -368,6 +368,7 @@ module Skylab::TMX
 
     FAILURE_EXITSTATUS__ = 5
     HELP_RX = /\A--?h(?:e(?:lp?)?)?\z/
+    SUCCESS_EXITSTATUS__ = 0
 
     # ==
   end  # end new CLI class
