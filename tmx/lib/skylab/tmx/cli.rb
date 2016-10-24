@@ -12,6 +12,10 @@ module Skylab::TMX
         @program_name_string_array = pn_s_a
       end
 
+      def json_file_stream_by & p
+        @__json_file_stream_proc = p
+      end
+
       def invoke argv
         @argv = argv
         bc = __bound_call
@@ -32,14 +36,27 @@ module Skylab::TMX
 
       def __bound_call
 
-        if @argv.length.nonzero? && Looks_like_option[ @argv.first ]
+        if @argv.length.zero?
+          __when_no_args
+        elsif Looks_like_option[ @argv.first ]
           __when_looks_like_option_at_front
         else
-          __init_selective_listener
-          o = Home_::API.begin( & @_emit )
-          o.argument_scanner = ArgumentScanner___.new @argv
-          o.to_bound_call
+          __when_looks_like_operation_at_front
         end
+      end
+
+      def __when_no_args
+
+        st = _to_didactic_operation_name_stream
+
+        _parse_error_listener.call :error, :expression, :parse_error do |y|
+
+          _any_of_these = say_formal_operation_alternation_ st
+
+          y << "expecting #{ _any_of_these }"
+        end
+
+        UNABLE_
       end
 
       def __when_looks_like_option_at_front  # assume 0 < argv length
@@ -62,6 +79,48 @@ module Skylab::TMX
         io.puts "description: experiment.."
         @exitstatus = SUCCESS_EXITSTATUS__
         NIL
+      end
+
+      def __when_looks_like_operation_at_front
+
+        scn = Common_::Polymorphic_Stream.via_array @argv
+        m = OPERATIONS___[ scn.current_token.intern ]
+        if m
+          self._NOT_YET_COVERED
+          @__user_scanner = scn
+          scn.advance_one
+          send m
+        else
+          @serr.puts "currently, normal tmx is deactivated -"
+          @serr.puts "won't parse #{ scn.current_token.inspect }"
+          _invite_to_general_help
+        end
+      end
+
+      OPERATIONS___ = {
+        map: :__when_map,
+      }
+
+      def __when_map
+        __init_selective_listener
+        o = Home_::API.begin( & @_emit )
+        o.argument_scanner = __flush_argument_scanner_for_map
+        o.to_bound_call
+      end
+
+      def __flush_argument_scanner_for_map
+
+        _as = remove_instance_variable :@argument_scanner
+        o = _as.to_ETC
+
+        _ = remove_instance_variable( :@json_file_stream_proc ).call
+        o.subtract_primary :json_file_stream, _
+
+        o.subtract_primary :attributes_module_by, -> { Home_::Attributes_ }
+
+        o.subtract_primary :result_in_tree, false  # for now
+
+        o.finish
       end
 
     # --
@@ -101,10 +160,16 @@ module Skylab::TMX
 
       def _formal_actions
 
-        _st = Home_::API.to_didactic_operation_name_stream__
+        _st = _to_didactic_operation_name_stream
 
         _expression_agent.calculate do
           say_formal_operation_alternation_ _st
+        end
+      end
+
+      def _to_didactic_operation_name_stream
+        Stream_.call %w( map BLAH ) do |s|
+          Common_::Name.via_slug s
         end
       end
 
@@ -279,55 +344,6 @@ module Skylab::TMX
     self  # legacy CLI class
   end
     end  # proc that wraps legacy CLI class
-
-    # ==
-
-    class ArgumentScanner___
-
-      # an attempt to allow implementation of the fully customized parsing
-      # syntax (that should not be abstracted) of the map operation in such
-      # a manner that allows the same syntax implementation to adapt to both
-      # the CLI and API modalities..
-
-      def initialize argv
-        if argv.length.zero?
-          @no_unparsed_exists = true
-        else
-          @scn = Common_::Polymorphic_Stream.via_array argv
-        end
-      end
-
-      def gets_one_as_is  # same as sibling
-        x = @scn.current_token
-        advance_one
-        x
-      end
-
-      def advance_one  # same as sibling
-        @scn.advance_one
-        @no_unparsed_exists = @scn.no_unparsed_exists
-        @_cache_ = nil
-      end
-
-      def head_as_agnostic
-        _head_as_name
-      end
-
-      define_singleton_method :cached, DEFINITION_FOR_THE_METHOD_CALLED_CACHED_
-
-      cached :head_as_normal_symbol do
-        _head_as_name.as_lowercase_with_underscores_symbol
-      end
-
-      cached :_head_as_name do
-        Common_::Name.via_slug @scn.current_token
-      end
-
-      attr_reader(
-        :no_unparsed_exists,
-      )
-    end
-
     # ==
 
     class ExpressionAgent___

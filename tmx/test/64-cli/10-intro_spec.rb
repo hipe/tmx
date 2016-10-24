@@ -188,23 +188,11 @@ module Skylab::TMX::TestSupport
 
       expect_no_more_lines
     end
-
-    def subject_CLI
-      Home_::CLI
-    end
     end  # if false
 
     def _expect_failed_normally
       expect "try 'tmz -h'"
       expect_failed
-    end
-
-    def subject_CLI
-      _real_CLI
-    end
-
-    def _real_CLI
-      Home_::CLI
     end
   end
 end

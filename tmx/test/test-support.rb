@@ -56,6 +56,14 @@ module Skylab::TMX::TestSupport
       TestSupport_.debug_IO
     end
 
+    def subject_CLI
+      Home_::CLI
+    end
+
+    def prepare_CLI cli
+      NOTHING_
+    end
+
     define_method :program_name_string_array, ( Lazy_.call do
       %w( tmz )
     end )

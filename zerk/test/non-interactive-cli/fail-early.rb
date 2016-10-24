@@ -84,6 +84,8 @@ module Skylab::Zerk::TestSupport
           __pn_s_a,
         )
 
+        @test_context.prepare_CLI @_CLI
+
         @_spy = spy
         NIL
       end

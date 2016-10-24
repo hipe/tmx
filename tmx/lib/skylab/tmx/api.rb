@@ -68,16 +68,16 @@ module Skylab::TMX
           @argument_scanner.advance_one
           __when_map
         else
-          __when_not_yet
+          __when_not_map
         end
       end
 
-      def __when_not_yet
+      def __when_not_map
 
         x = @argument_scanner.head_as_agnostic
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
-          y << "currently, normal tmx is deactivated -"
+          y << "currently, \"map\" is the only operation."
           y << "won't parse #{ say_arguments_head_ x }"
         end
         UNABLE_
@@ -97,7 +97,7 @@ module Skylab::TMX
       end
 
       def _to_didactic_operation_name_stream
-        Stream_.call %w( map BLAH ) do |s|
+        Stream_.call %w( map ) do |s|
           Common_::Name.via_slug s
         end
       end
@@ -144,6 +144,10 @@ module Skylab::TMX
         else
           Common_::Name.via_slug x  # ..
         end
+      end
+
+      def head_as_normal_symbol_for_primary
+        @scn.current_token
       end
 
       def head_as_normal_symbol

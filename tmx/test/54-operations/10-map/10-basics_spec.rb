@@ -21,7 +21,7 @@ module Skylab::TMX::TestSupport
 
         em = expect_parse_error_emission_
         _act = em.express_into_under "", expag_
-        _act == "expecting :map or :blah" || fail
+        _act == "expecting :map" || fail
       end
     end
 
@@ -39,7 +39,7 @@ module Skylab::TMX::TestSupport
 
         em = expect_parse_error_emission_
         _act = em.express_into_under [], expag_
-        _act.first.include? "currently, normal tmx is deacti" or fail
+        _act.first.include? "currently, \"map\" is the only operation" or fail
       end
     end
 

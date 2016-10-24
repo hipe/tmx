@@ -115,7 +115,7 @@ module Skylab::TMX
 
       def __parse_argument_scanner_head
 
-        k = @argument_scanner.head_as_normal_symbol
+        k = @argument_scanner.head_as_normal_symbol_for_primary
         m = PRIMARIES_[ k ]
         if m
           @_current_primary_symbol = k
