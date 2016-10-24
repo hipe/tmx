@@ -4,29 +4,6 @@ module Skylab::TMX
 
   module AttributesScratchSpace___
 
-    module Furloughed_NOT_USED_____
-
-      def express_into y
-        # @pnode = parsed node
-        aval = @pnode.box[ self.class::KEY ]
-        if aval
-          x = aval.value_x
-          if x.nil?
-            y << SAY_NULL__
-          else
-            s = x.to_s
-            if s.include? SPACE_
-              y << s.inspect  # shyeah right
-            else
-              y << s
-            end
-          end
-        else
-          y << SAY_NONE__
-        end
-      end
-    end
-
     Order_commonly__ = -> cls do
 
       key = cls.const_get :KEY, false
@@ -82,24 +59,6 @@ module Skylab::TMX
 
       end
 
-      is_lib = "is lib"
-      say_is_lib = "lib"
-
-      define_method :_FURLOUGHED_express_into_of do |y, parsed_node|
-
-        self._REVIEW_how_values_are_stored_and_accessed
-
-        aval = parsed_node.box[ is_lib ]
-        if aval
-          if aval.value_x
-            y << say_is_lib
-          else
-            y << SAY_NO__
-          end
-        else
-          y << SAY_NONE__
-        end
-      end
     end
 
     class Attributes_::IsPotentiallyInterestingApplication
@@ -108,11 +67,5 @@ module Skylab::TMX
 
       end
     end
-
-    # ==
-
-    SAY_NO__ = 'no'
-    SAY_NONE__ = '-'
-    SAY_NULL__ = 'xxx'
   end
 end

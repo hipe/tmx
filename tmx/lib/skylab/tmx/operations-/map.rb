@@ -116,22 +116,34 @@ module Skylab::TMX
       def __parse_argument_scanner_head
 
         k = @argument_scanner.head_as_normal_symbol_for_primary
-        m = PRIMARIES_[ k ]
+        if k
+          __when_possibly_a_primary k
+        else
+          k
+        end
+      end
+
+      def __when_possibly_a_primary k
+        m = PRIMARIES__[ k ]
         if m
           @_current_primary_symbol = k
           @argument_scanner.advance_one
           send m
         else
-          __when_unrecognized_primary
+          _ = method :get_primary_keys
+          when_unrecognized_primary _, @_emit
         end
       end
 
-      def __when_unrecognized_primary
-
-        Here_::When_::Unrecognized_primary[ @argument_scanner, @_emit ]
+      def when_unrecognized_primary ks_p, listener
+        Here_::When_::Unrecognized_primary[ @argument_scanner, ks_p, listener ]
       end
 
-      PRIMARIES_ = {
+      def get_primary_keys
+        PRIMARIES__.keys
+      end
+
+      PRIMARIES__ = {
         attributes_module_by: :__parse_attributes_module_by,
         order: :__parse_order_expression,
         json_file_stream: :__parse_json_file_stream,
@@ -247,7 +259,12 @@ module Skylab::TMX
         end
       end
 
-      alias_method :modification_index_, :_modifications
+      def modification_index
+        # (do not autovivify. do not clutter ivar namespace with more state).
+        if instance_variable_defined? :@_modifications
+          @_modifications
+        end
+      end
 
       # --
 
@@ -315,15 +332,6 @@ module Skylab::TMX
 
     Here_ = self
   end
-
-  # ==
-
-  class ProcBasedSimpleExpresser_ < ::Proc  # stowaway!
-    alias_method :express_into, :call
-    undef_method :call
-  end
-
-  # ==
 end
 # #pending-rename: branch down
 # #tombstone: temporary: report on no files found for glob

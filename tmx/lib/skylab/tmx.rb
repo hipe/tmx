@@ -143,6 +143,8 @@ module Skylab::TMX
     Human = sidesys[ :Human ]
 
     JSON = stdlib[ :JSON ]
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   # ==
@@ -152,6 +154,7 @@ module Skylab::TMX
   DASH_ = '-'
   EMPTY_S_ = ''
   NIL_ = nil
+  NOTHING_ = nil
   Home_ = self
   UNABLE_ = false
 end

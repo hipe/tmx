@@ -64,17 +64,19 @@ module Skylab::TMX
 
       # ==
 
-      When_::Unrecognized_primary = -> argument_scanner, listener do
+      When_::Unrecognized_primary = -> argument_scanner, ks_p, listener do
 
         listener.call :error, :expression, :parse_error, :unrecognized_primary do |y|
 
           _name = argument_scanner.head_as_agnostic
 
-          _name_st = Stream_.call PRIMARIES_.keys do |sym|
+          _keys = ks_p[]
+
+          _name_st = Stream_.call _keys do |sym|
             Common_::Name.via_variegated_symbol sym
           end
 
-          y << "unrecognized primary #{ say_primary_ _name }"
+          y << "unrecognized primary #{ say_strange_primary_ _name }"
 
           _this_or_this_or_this = say_primary_alternation_ _name_st
 

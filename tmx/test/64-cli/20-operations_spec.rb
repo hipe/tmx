@@ -2,10 +2,86 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] CLI - operations", wip: true do
+  describe "[tmx] CLI - operations (all \"map\" for now)" do
 
     TS_[ self ]
+    use :CLI
+    use :non_interactive_CLI_fail_early
 
+    context "these three distinct cases have the same error message" do
+
+      it "strange primary" do
+        _expect_bad_primary '-strange'
+      end
+
+      it "non-primary when primary expected (FOR NOW)" do
+        _expect_bad_primary 'beepo'
+      end
+
+      it "try to access primary that is blacklisted" do
+        _expect_bad_primary '-json-file-stream'
+      end
+
+      def _expect_bad_primary same
+        invoke _subject_operation, same
+        expect_on_stderr "unrecognized primary \"#{ same }\""
+        expect "expecting { -order | -select }"
+        expect_failed_normally_
+      end
+    end
+
+    define_singleton_method :_given do |s_a|
+      define_method :prepare_CLI do |cli|
+        _st = TS_::Operations::Map::Dir01::JSON_file_stream_via[ s_a ]
+        cli.json_file_stream_by { _st } ; nil
+      end
+    end
+
+    context "names only, no modifiers" do
+
+      it "works" do
+        invoke _subject_operation
+        expect_on_stdout 'tyris'
+        expect 'deka'
+        expect_succeeded
+      end
+
+      _given %w( tyris deka )
+    end
+
+    context "select one additional attribute" do
+
+      context "when all values non-nil" do
+
+        it "works as expected (note default record separator is a SPACE)" do
+          _invoke_same
+          expect_on_stdout "damud 44"
+          expect "adder 33"
+          expect_succeeded
+        end
+
+        _given %w( damud adder )
+      end
+
+      context "when a value is not present" do
+
+        it "displays a DASH for the value" do
+          _invoke_same
+          expect_on_stdout "frim_frum -"
+          expect_succeeded
+        end
+
+        _given %w( frim_frum )
+      end
+
+      context "when a value is nil"  # #todo maybe
+
+      def _invoke_same
+        invoke _subject_operation, '-select', 'cost'
+      end
+    end
+
+    if false  # wip: true
     Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ self ]
     use :operations_building
     use :CLI
@@ -103,6 +179,28 @@ module Skylab::TMX::TestSupport
 
       mod
     end
+    end  # if false
+
+    def prepare_CLI cli
+      cli.json_file_stream_by { X_c_op_explosive_stream[] }
+      NIL
+    end
+
+
+    map = 'map'
+    define_method :_subject_operation do
+      map
+    end
+
+    # ==
+
+    X_c_op_explosive_stream = Lazy_.call do
+      Common_.stream do
+        TS_._EXPLICITLY_EXPECTING_NOT_TO_GET_TO_THE_POINT_OF_LISTING_JSON_FILES
+      end
+    end
+
+    # ==
   end
 end
 # #pending-rename: after everything, this is just for the 'map' operation

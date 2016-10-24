@@ -5,7 +5,7 @@ module Skylab::TMX::TestSupport
     def self.[] tcc
       TS_::Memoizer_Methods[ tcc ]
       Operations[ tcc ]
-      tcc.send :define_singleton_method, :ordered_items_by, DEFINITION_FOR_ETC___
+      tcc.send :define_singleton_method, :ordered_items_by, DEFINITION_FOR_ORDERED_ITEMS_BY___
       tcc.include self
     end
 
@@ -39,7 +39,7 @@ module Skylab::TMX::TestSupport
     end
 
     # -
-      DEFINITION_FOR_ETC___ = -> & p do
+      DEFINITION_FOR_ORDERED_ITEMS_BY___ = -> & p do
 
         call_by( & p )
 
@@ -78,7 +78,7 @@ module Skylab::TMX::TestSupport
 
         # intentionally in dis-lexical order
 
-        json_file_stream_ 'zagnut', 'frim_frum'
+        Dir01::JSON_file_stream_via[ %w( zagnut frim_frum ) ]
       end
 
       def json_file_stream_GA_
@@ -86,7 +86,7 @@ module Skylab::TMX::TestSupport
         # (to be "random", the below are in alphabetical order when each
         # word is read from back to front)
 
-        json_file_stream_via_ %w(
+        Dir01::JSON_file_stream_via.call %w(
           deka
           dora
           guld
@@ -101,11 +101,11 @@ module Skylab::TMX::TestSupport
       end
 
       def json_file_stream_ * s_a
-        json_file_stream_via_ s_a
+        Dir01::JSON_file_stream_via[ s_a ]
       end
 
-      def json_file_stream_via_ s_a
-        Stream_.call s_a, & These___[]
+      def json_file_stream_via_ * s_a
+        Dir01::JSON_file_stream_via[ s_a ]
       end
 
       def real_attributes_
@@ -116,9 +116,18 @@ module Skylab::TMX::TestSupport
 
     # -
 
+    module Dir01
+
+      JSON_file_stream_via = -> s_a do
+        Stream_.call s_a, & Dir_01_path_lookup_function___[]
+      end
+    end
+
     # ==
 
-    These___ = Lazy_.call do
+    fixture_dirs = nil
+
+    Dir_01_path_lookup_function___ = Lazy_.call do
 
       # yes, to achieve more or less this same structure we could just glob
       # against the real filesystem rather than writing it by hand here, but
@@ -128,7 +137,7 @@ module Skylab::TMX::TestSupport
 
       h = {}
 
-      dir = ::File.join FIXTURE_DIRECTORIES___, '01-fake-top-of-the-universe'
+      dir = ::File.join fixture_dirs[], '01-fake-top-of-the-universe'
 
       same = "this.json"
 
@@ -156,6 +165,10 @@ module Skylab::TMX::TestSupport
 
     # ==
 
-    FIXTURE_DIRECTORIES___ = ::File.join TS_.dir_path, 'fixture-directories'
+    fixture_dirs = Lazy_.call do
+      ::File.join TS_.dir_path, 'fixture-directories'
+    end
+
+    # ==
   end
 end

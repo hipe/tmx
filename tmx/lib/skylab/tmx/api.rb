@@ -89,6 +89,8 @@ module Skylab::TMX
 
         o.argument_scanner = @argument_scanner
 
+        @operation_session = o  # experiment
+
         Common_::Bound_Call[ nil, o, :execute ]
       end
 
@@ -101,6 +103,10 @@ module Skylab::TMX
           Common_::Name.via_slug s
         end
       end
+
+      attr_reader(
+        :operation_session,
+      )
     # -
 
     # ==
@@ -217,7 +223,7 @@ module Skylab::TMX
         p = method m
 
         st.join_into_with_by "", " or " do |name|
-          p[ name ]
+          p[ name ]  # hi.
         end
       end
 
@@ -226,6 +232,10 @@ module Skylab::TMX
       end
 
       def say_formal_attribute_ name
+        _same name
+      end
+
+      def say_strange_primary_ name
         _same name
       end
 

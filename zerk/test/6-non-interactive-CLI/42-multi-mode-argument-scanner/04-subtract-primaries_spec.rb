@@ -71,13 +71,81 @@ module Skylab::Zerk::TestSupport
         # - fail identically to unrecognized back primary
       end
 
-      it "when primary is expected but not provided"
+      it "when primary is expected but not provided" do
 
-      it "when use a primary that was subtracted"
+        el = event_log_.for self
+
+        scn = subject_module_.define do |o|
+
+          _ = Common_::Polymorphic_Stream.via_array %w( zing-bling zang )
+
+          o.user_scanner _
+
+          o.listener el.handle_event_selectively
+        end
+
+        _no = scn.head_as_normal_symbol_for_primary
+
+        false == _no || fail
+
+        em = el.gets
+
+        em.channel_symbol_array == %i( error expression parse_error unknown_primary_or_operator ) || fail
+
+        _act = em.express_into_under "", expag_
+        _act == 'unknown primary: "zing-bling"' || fail
+      end
+
+      it "when use a primary that was subtracted" do
+
+        el = event_log_.for self
+
+        scn = subject_module_.define do |o|
+
+          o.subtract_primary :ding_dong, :Dinger_Donger
+
+          _ = Common_::Polymorphic_Stream.via_array %w( -ding-dong zang )
+
+          o.user_scanner _
+
+          o.listener el.handle_event_selectively
+        end
+
+        _sym = scn.head_as_normal_symbol_for_primary
+        _sym == :ding_dong || fail
+
+        scn.advance_one
+
+        scn.no_unparsed_exists && fail
+
+        _sym = scn.head_as_normal_symbol
+        _sym == :Dinger_Donger || fail
+
+        scn.advance_one
+
+        scn.no_unparsed_exists && fail
+
+        _failed = scn.head_as_normal_symbol_for_primary
+        _failed == false || fail
+
+        em = el.gets
+
+        em.channel_symbol_array == %i( error expression parse_error subtracted_primary_referenced ) || fail
+
+        _act = em.express_into_under "", expag_
+        _act == 'unknown primary: "-ding-dong"' || fail
+      end
 
     # -
 
-    context "add priamary (other file)"
+    def expag_
+      X_niCLI_mmas_EXPAG
+    end
+
+    X_niCLI_mmas_EXPAG = class X_niCLI_mmas_Expag
+      alias_method :calculate, :instance_exec
+      new
+    end
 
     def subject_module_
       Home_::NonInteractiveCLI::MultiModeArgumentScanner

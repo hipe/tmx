@@ -93,7 +93,7 @@ module Skylab::TMX::TestSupport
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   NIL_ = nil
-  NOTHING_ = nil
+  NOTHING_ = Home_::NOTHING_
   Stream_ = Home_::Stream_
   TS_ = self
 end

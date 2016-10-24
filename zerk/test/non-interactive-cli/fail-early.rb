@@ -21,6 +21,11 @@ module Skylab::Zerk::TestSupport
         expect exp_x
       end
 
+      def expect_on_stdout exp_x
+        @_ze_last_stream = :sout
+        expect exp_x
+      end
+
       def expect exp_x
         @_ze_niCLI_setup.add_expectation exp_x, :puts, @_ze_last_stream
         NIL
@@ -224,7 +229,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def _common msg
-        [ ExpectationFailure___, msg ]
+        [ ExpectationFailure__, msg ]
       end
 
       # -- simple readers
@@ -237,10 +242,6 @@ module Skylab::Zerk::TestSupport
         @_sout_spy.stream_proxy
       end
     end
-
-    ExpectationFailure___ = ::Class.new ::RuntimeError  # publicize whenver if you really want to
-
-    # ==
 
     # ==
 
@@ -271,8 +272,9 @@ module Skylab::Zerk::TestSupport
 
       h = {}
 
-      expect_nothing = -> shape, stream_sym do
-        ::Kernel._K
+      expect_nothing = -> s, method_name, stream_sym do
+        _msg = "unexpected: #{ [ s, method_name, stream_sym ].inspect }"
+        raise ExpectationFailure__, _msg
       end
 
       -> sym do
@@ -343,6 +345,8 @@ module Skylab::Zerk::TestSupport
     end
 
     # ==
+
+    ExpectationFailure__ = ::Class.new ::RuntimeError  # publicize whenver if you really want to
 
     Result___ = ::Struct.new :exitstatus
 

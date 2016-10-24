@@ -54,6 +54,10 @@ module Skylab::Zerk::TestSupport
     def build_root_ACS  # cp from [ac]
       subject_root_ACS_class.new_cold_root_ACS_for_expect_root_ACS
     end
+
+    def event_log_
+      Common_.test_support::Expect_Event::EventLog
+    end
   # -
 
   # -- fixtures & mocks

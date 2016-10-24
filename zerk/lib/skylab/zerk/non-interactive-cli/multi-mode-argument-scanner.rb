@@ -69,12 +69,20 @@ module Skylab::Zerk
           @_builder.receive_front_scanner_tokens sym_a
         end
 
-        def subtract_primary sym, x
-          @_builder.receive_subtract_primary sym, x
+        def subtract_primary sym, * x_a
+          if x_a.length.zero?
+            @_builder.receive_subtract_primary_without_argument sym
+          else
+            @_builder.receive_subtract_primary_with_argument sym, * x_a
+          end
         end
 
         def user_scanner scn
           @_builder.receive_user_scanner scn
+        end
+
+        def listener x
+          @_builder.receive_listener x
         end
       end
 
@@ -83,6 +91,9 @@ module Skylab::Zerk
       class Builder___
 
         def initialize
+          @_front_tokens = nil
+          @_listener = nil
+          @_mid_scanner_pairs = nil
           @_subtracted = {}
           # --
           @_receive_front_scanner_tokens = :__receive_front_scanner_tokens
@@ -99,10 +110,15 @@ module Skylab::Zerk
           NIL
         end
 
-        def receive_subtract_primary sym, x
+        def receive_subtract_primary_with_argument sym, x
           ( @_mid_scanner_pairs ||= [] )
           @_subtracted[ sym ] = true
           @_mid_scanner_pairs.push Common_::Pair.via_value_and_name( x, sym )
+          NIL
+        end
+
+        def receive_subtract_primary_without_argument sym
+          @_subtracted[ sym ] = true
           NIL
         end
 
@@ -116,21 +132,36 @@ module Skylab::Zerk
           NIL
         end
 
+        def receive_listener x
+          @_listener = x ; nil
+        end
+
         def finish
 
-          _ft = remove_instance_variable :@_front_tokens
-          _msp = remove_instance_variable :@_mid_scanner_pairs
-          _sub = remove_instance_variable :@_subtracted
-          _us = remove_instance_variable :@_user_scanner
-
           a = []
-          a.push FrontTokens___.new _ft
+          ft = remove_instance_variable :@_front_tokens
+          if ft
+            a.push FrontTokens___.new ft
+          end
 
-          a.push FixedPrimaries___.new _msp
+          msp = remove_instance_variable :@_mid_scanner_pairs
+          sub = remove_instance_variable :@_subtracted
+          sub.freeze
 
-          a.push UserScanner___.new _sub, _us
+          if msp
+            a.push FixedPrimaries___.new msp
+          end
 
-          Here_.__new_multi_mode_argument_scanner a
+          us = remove_instance_variable :@_user_scanner
+          if ! us.no_unparsed_exists
+            a.push UserScanner___.new sub, us, @_listener
+          end
+
+          if a.length.zero?
+            self._COVER_ME_you_should_result_in_a_singleton_that_says :no_unparsed_exists
+          else
+            Here_.__new_multi_mode_argument_scanner a, sub
+          end
         end
       end
 
@@ -139,9 +170,10 @@ module Skylab::Zerk
       Here_ = self
       class Here_
 
-        def initialize a
+        def initialize a, h
           @_scn_scn = Common_::Polymorphic_Stream.via_array a
           @_scn = @_scn_scn.gets_one
+          @subtraction_hash = h
         end
 
         def head_as_normal_symbol_for_primary
@@ -150,6 +182,16 @@ module Skylab::Zerk
 
         def head_as_normal_symbol
           @_scn.head_as_normal_symbol_
+        end
+
+        def head_as_agnostic
+          @_scn.head_as_agnostic_
+        end
+
+        def gets_one_as_is
+          x = @_scn.head_as_is_
+          advance_one
+          x
         end
 
         def advance_one
@@ -168,6 +210,7 @@ module Skylab::Zerk
 
         attr_reader(
           :no_unparsed_exists,
+          :subtraction_hash,
         )
       end
 
@@ -180,6 +223,10 @@ module Skylab::Zerk
         end
 
         def head_as_normal_symbol_
+          @_real_scn.current_token
+        end
+
+        def head_as_is_
           @_real_scn.current_token
         end
 
@@ -222,13 +269,25 @@ module Skylab::Zerk
           end
         end
 
+        def head_as_is_
+          if @_is_pointing_at_name
+            @_real_scn.current_token.name_x
+          else
+            @_real_scn.current_token.value_x
+          end
+        end
+
         def advance_one_
           if @_is_pointing_at_name
             @_is_pointing_at_name = false
           else
             @_real_scn.advance_one
             if @_real_scn.no_unparsed_exists
+              remove_instance_variable :@_is_pointing_at_name
+              remove_instance_variable :@_real_scn
               @no_unparsed_exists_ = true
+            else
+              @_is_pointing_at_name = true
             end
           end
           NIL
@@ -243,7 +302,8 @@ module Skylab::Zerk
 
       class UserScanner___
 
-        def initialize sub_h, user_scn
+        def initialize sub_h, user_scn, listener
+          @_listener = listener
           @_real_scn = user_scn
           @_subtracted = sub_h
         end
@@ -251,15 +311,45 @@ module Skylab::Zerk
         def head_as_normal_symbol_for_primary_
           s = @_real_scn.current_token
           if DASH_BYTE_ == s.getbyte(0)
-            s[ 1..-1 ].gsub( DASH_, UNDERSCORE_ ).intern
+            sym = s[ 1..-1 ].gsub( DASH_, UNDERSCORE_ ).intern
+            if @_subtracted[ sym ]
+              __when_subtracted_primary_is_referenced
+            else
+              sym
+            end
           else
-            ::Kernel._B
+            __when_does_not_look_like_primary
           end
+        end
+
+        def __when_subtracted_primary_is_referenced
+          _when_bad_primary :subtracted_primary_referenced
+        end
+
+        def __when_does_not_look_like_primary
+          _when_bad_primary :unknown_primary_or_operator
+        end
+
+        def _when_bad_primary sym
+          s = @_real_scn.current_token
+          @_listener.call :error, :expression, :parse_error, sym do |y|
+            y << "unknown primary: #{ s.inspect }"
+          end
+          UNABLE_
         end
 
         def head_as_normal_symbol_
           _s = @_real_scn.current_token
           _s.gsub( DASH_, UNDERSCORE_ ).intern
+        end
+
+        def head_as_agnostic_
+          _s = @_real_scn.current_token
+          Common_::Name.via_slug _s
+        end
+
+        def head_as_is_
+          @_real_scn.current_token
         end
 
         def advance_one_

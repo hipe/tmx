@@ -5,19 +5,20 @@ module Skylab::TMX::TestSupport
   describe "[tmx] CLI - intro" do
 
     TS_[ self ]
+    use :CLI
     use :non_interactive_CLI_fail_early
 
     it "strange argument - two lines of whining, then invite" do
       invoke 'zazoozle'
       expect_on_stderr "currently, normal tmx is deactivated -"
       expect "won't parse \"zazoozle\""
-      _expect_failed_normally
+      expect_failed_normally_
     end
 
     it "strange option - explain, invite" do
       invoke '-x'
       expect_on_stderr "unrecognized option: \"-x\""
-      _expect_failed_normally
+      expect_failed_normally_
     end
 
     it "help (a stub for now)" do
@@ -189,10 +190,5 @@ module Skylab::TMX::TestSupport
       expect_no_more_lines
     end
     end  # if false
-
-    def _expect_failed_normally
-      expect "try 'tmz -h'"
-      expect_failed
-    end
   end
 end

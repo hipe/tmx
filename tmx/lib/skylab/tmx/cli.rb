@@ -2,6 +2,10 @@ module Skylab::TMX
 
   class CLI
 
+    # at the moment all the the code here falls decisively into either the
+    # "pre-map" or "post-map" era. "pre-map" is all commented out for now.
+    # "post-map" is largely a frontier playground for exciting adaptation experiments.
+
     Invocation___ = self
 
     class Invocation___
@@ -22,17 +26,31 @@ module Skylab::TMX
         if bc
           st = bc.receiver.send bc.method_name, * bc.args, & bc.block
           if st
-            y = ::Enumerator::Yielder.new( & @sout.method( :puts ) )
-            begin
-              x = st.gets
-              x || break
-              x.express_into y
-              redo
-            end while above
+            @exitstatus ||= SUCCESS_EXITSTATUS__
+            x = st.gets
+            if x
+
+              o = CLI::Magnetics_::
+                MapItemExpresser_via_Client_and_FirstItem_and_Options.begin(
+                  self, x )
+              # ..
+
+              express = o.execute
+
+              begin
+                express[ x ]
+                x = st.gets
+                x ? redo : break
+              end while above
+            else
+              @serr.puts "(no results.)"  # #not-covered
+            end
           end
         end
         @exitstatus
       end
+
+      # --
 
       def __bound_call
 
@@ -86,7 +104,6 @@ module Skylab::TMX
         scn = Common_::Polymorphic_Stream.via_array @argv
         m = OPERATIONS___[ scn.current_token.intern ]
         if m
-          self._NOT_YET_COVERED
           @__user_scanner = scn
           scn.advance_one
           send m
@@ -102,34 +119,148 @@ module Skylab::TMX
       }
 
       def __when_map
+
         __init_selective_listener
-        o = Home_::API.begin( & @_emit )
+
+        o = Home_::API.begin( & method( :__receive_map_emission ) )
+
         o.argument_scanner = __flush_argument_scanner_for_map
+
+        @API_invocation_ = o
+
         o.to_bound_call
       end
 
+      # the following method could stand as sort of a model for how this new,
+      # "multi-mode argument scanner" adaptation could go for customizing
+      # API operations as CLI operations generally. note this explanation
+      # is longer than the method itself.
+      #
+      #   - both because we had to parse the operation name off the ARGV
+      #     before we could know which operation we want to build the
+      #     adaptation for AND because it's more explicit, we tell our
+      #     adapter explicitly the path to the backend operation we are
+      #     calling with `front_scanner_tokens`.
+      #
+      #   - each `subtract_primary` has the effect of making that primary
+      #     not settable by the CLI. in most cases we provide a "fixed"
+      #     value for it that to the backend is indistinguishable from a
+      #     user-provided value.
+      #
+      #     (note for later: the way we used to do this in [br] was awful)
+      #
+      #   - finally with `user_scanner` we pass any remaining non-parsed
+      #     ARGV (which, of course, is written in a "CLI way"). the adapter
+      #     will attempt to interpret this scanner in an "API way".
+
       def __flush_argument_scanner_for_map
 
-        _as = remove_instance_variable :@argument_scanner
-        o = _as.to_ETC
+        as = Home_.lib_.zerk::NonInteractiveCLI::MultiModeArgumentScanner.define do |o|
 
-        _ = remove_instance_variable( :@json_file_stream_proc ).call
-        o.subtract_primary :json_file_stream, _
+          o.front_scanner_tokens :map  # invoke this operation when calling API
 
-        o.subtract_primary :attributes_module_by, -> { Home_::Attributes_ }
+          _ = remove_instance_variable( :@__json_file_stream_proc ).call
+          o.subtract_primary :json_file_stream, _
 
-        o.subtract_primary :result_in_tree, false  # for now
+          o.subtract_primary :attributes_module_by, -> { Home_::Attributes_ }
 
-        o.finish
+          o.subtract_primary :result_in_tree  # for now
+
+          o.user_scanner remove_instance_variable :@__user_scanner
+
+          o.listener method :__receive_argument_scanner_emission
+        end
+
+        @__argument_scanner = as
+
+        as
       end
 
-    # --
+      def __receive_argument_scanner_emission * i_a, & em_p
+        send WHEN__.fetch i_a.last
+      end
+
+      def __receive_map_emission * i_a, & ev_p
+        m = WHEN__[ i_a.last ]
+        if m
+          send m
+        else
+          @_emit[ * i_a, & ev_p ]
+        end
+        NIL
+      end
+
+      # --
+
+      # when any of:
+      #
+      #   - the [ze] argument scanner adapter (adapting from the "CLI way"
+      #     to the "API way") expects to scan a primary but the current
+      #     token doesn't start with a "-" (DASH) OR
+      #
+      #   - that same adapter encounters a well-formed primary-looking
+      #     token BUT the backend knows of no primary by that name OR
+      #
+      #   - that same adapter encounters a well-formed, existent primary
+      #     in the user ARGV but that primary has been "subtracted" from
+      #     use;
+      #
+      # we want that the expression behavior of our UI is *identitcal* for
+      # all the above cases. as such we need to override the default
+      # expression behavior that occurrs variously in the [ze] adapter and
+      # our own API operation for the above cases.
+      #
+      #   - for cases where the [ze] adapter would have done the expression,
+      #     we are overriding default, minimal ("stub") expression behavior.
+      #
+      #   - for cases where we are overriding our own backend API opertion
+      #     expression behavior, we are doing so in part because the API
+      #     operation does a levenshtein (or not) explication of all available
+      #     modifiers, including any that have been subtracted here. we don't
+      #     want the API space to have to know about what "subtraction" even
+      #     is, so instead we just override the emission, in a perfect (if
+      #     somewhat weedy) utilization of our event model.
+
+      WHEN__ = {
+        subtracted_primary_referenced: :__when_subtracted,
+        unknown_primary_or_operator: :__when_unknown,
+        unrecognized_primary: :__when_unrecognized,
+      }
+
+      def __when_subtracted
+        _when_bad_primary  # hi.
+      end
+
+      def __when_unknown
+        _when_bad_primary  # hi.
+      end
+
+      def __when_unrecognized
+        _when_bad_primary  # hi.
+      end
+
+      def _when_bad_primary
+
+        op = @API_invocation_.operation_session
+
+        subtract = @__argument_scanner.subtraction_hash
+
+        _use_these = op.get_primary_keys.reject do |sym|
+          subtract[ sym ]
+        end
+
+        op.when_unrecognized_primary -> { _use_these }, @_emit
+
+        NIL
+      end
+
+      # --
 
       def __init_selective_listener
 
         y = Lazy_.call do
           ::Enumerator::Yielder.new do |s|
-            @serr.puts s
+            @serr.puts s  # hi.
           end
         end
 
@@ -183,9 +314,12 @@ module Skylab::TMX
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      attr_reader(  # (for collaborators (e.g magnetics))
+        :API_invocation_,
+        :sout,
+      )
     end
-
-
 
     # ==
 
@@ -344,6 +478,7 @@ module Skylab::TMX
     self  # legacy CLI class
   end
     end  # proc that wraps legacy CLI class
+
     # ==
 
     class ExpressionAgent___
@@ -358,9 +493,19 @@ module Skylab::TMX
       alias_method :calculate, :instance_exec
 
       def say_formal_operation_alternation_ st
+        _say_name_alternation :_say_slug, st
+      end
+
+      def say_primary_alternation_ st
+        _say_name_alternation :say_primary_, st
+      end
+
+      def _say_name_alternation m, st
+
+        p = method m
 
         _mid = st.join_into_with_by "", " | " do |name|
-          name.as_slug
+          p[ name ]  # hi.
         end
 
         "{ #{ _mid } }"
@@ -368,6 +513,18 @@ module Skylab::TMX
 
       def say_arguments_head_ name
         name.as_slug.inspect
+      end
+
+      def say_primary_ name
+        "#{ DASH_ }#{ name.as_slug }"
+      end
+
+      def say_strange_primary_ name
+        name.as_slug.inspect
+      end
+
+      def _say_slug name
+        name.as_slug
       end
     end
 
