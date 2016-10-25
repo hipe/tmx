@@ -20,8 +20,16 @@ module Skylab::TMX::TestSupport
       it "explains" do
 
         em = expect_parse_error_emission_
+
         _act = em.express_into_under "", expag_
-        _act == "expecting :map" || fail
+
+        _rx = /\Aexpecting (:[a-z_]+(?:(?: or |, ):[a-z_]+)*)\z/
+        md = _rx.match( _act ) or fail
+
+        these = md[1].split " or "
+        these_ = these.uniq
+
+        these == these_ || fail
       end
     end
 
@@ -36,10 +44,17 @@ module Skylab::TMX::TestSupport
       end
 
       it "explains" do
+        _lines.first == "unknown operation :zingo" || fail
+      end
 
+      it "offers alternatives" do
+        _lines.last =~ /\Aavailable operations: .*\bmap\b/ || fail
+      end
+
+      shared_subject :_lines do
         em = expect_parse_error_emission_
         _act = em.express_into_under [], expag_
-        _act.first.include? "currently, \"map\" is the only operation" or fail
+        _act  # #todo
       end
     end
 

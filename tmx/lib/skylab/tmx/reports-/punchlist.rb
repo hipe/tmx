@@ -2,8 +2,24 @@ module Skylab::TMX
 
   class Reports_::Punchlist
 
-    def inititialize(*)
-      self._JUST_A_STUB
+    def initialize & emit
+      @_emit = emit
+    end
+
+    def execute
+
+      lines = []
+      lines << "# first three"
+      lines << "adder"
+      lines << ""
+      lines << "# second group"
+      lines << "dora"
+      lines << "gilius"
+      lines << ""
+      lines << "# third three"
+      lines << "stern"
+      _st = Stream_[ lines ]
+      _st
     end
   end
 end

@@ -222,6 +222,10 @@ module Skylab::Zerk
           @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
         end
 
+        def head_as_agnostic_
+          Common_::Name.via_variegated_symbol @_real_scn.current_token
+        end
+
         def head_as_normal_symbol_
           @_real_scn.current_token
         end

@@ -120,6 +120,22 @@ module Skylab::TMX
 
   # ==
 
+  Box_via_autoloaderized_module_ = -> mod do
+
+    # simplified and more rigid alternative to [co] "boxxy". memoize result.
+
+    bx = Common_::Box.new
+    st = mod.entry_tree.to_state_machine_stream
+    begin
+      sm = st.gets
+      sm || break
+      name = Common_::Name.via_slug sm.entry_group_head
+      bx.add name.as_lowercase_with_underscores_symbol, name
+      redo
+    end while above
+    bx
+  end
+
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end

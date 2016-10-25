@@ -29,14 +29,7 @@ module Skylab::TMX
             @exitstatus ||= SUCCESS_EXITSTATUS__
             x = st.gets
             if x
-
-              o = CLI::Magnetics_::
-                MapItemExpresser_via_Client_and_FirstItem_and_Options.begin(
-                  self, x )
-              # ..
-
-              express = o.execute
-
+              express = send ( remove_instance_variable :@_express ), x
               begin
                 express[ x ]
                 x = st.gets
@@ -104,7 +97,8 @@ module Skylab::TMX
         scn = Common_::Polymorphic_Stream.via_array @argv
         m = OPERATIONS___[ scn.current_token.intern ]
         if m
-          @__user_scanner = scn
+          __init_selective_listener
+          @_user_scanner = scn
           scn.advance_one
           send m
         else
@@ -116,19 +110,65 @@ module Skylab::TMX
 
       OPERATIONS___ = {
         map: :__when_map,
+        reports: :__when_reports,
       }
+
+      # -- reports
+
+      def __when_reports
+
+        @_express = :__express_reports
+
+        o = Home_::API.begin( & @_emit )
+
+        o.argument_scanner = _flush_multimode_argument_scanner do |as|
+          as.front_scanner_tokens :reports
+          as.user_scanner remove_instance_variable :@_user_scanner
+        end
+
+        _bound_call_via_API_invocation o
+      end
+
+      def __express_reports x
+
+        sout = @sout
+        if x.respond_to? :ascii_only?
+          -> line do
+            sout.puts line  # hi.
+          end
+        elsif x.respond_to? :as_slug
+          -> name do
+            sout.puts name.as_slug
+          end
+        else
+          _NO
+        end
+      end
+
+      # -- map
 
       def __when_map
 
-        __init_selective_listener
+        @_express = :__express_map
 
         o = Home_::API.begin( & method( :__receive_map_emission ) )
 
         o.argument_scanner = __flush_argument_scanner_for_map
 
-        @API_invocation_ = o
+        _bound_call_via_API_invocation o
+      end
 
-        o.to_bound_call
+      def __express_map x
+
+        x.respond_to? :get_filesystem_directory_entry_string || _NO
+
+        o = CLI::Magnetics_::
+          MapItemExpresser_via_Client_and_FirstItem_and_Options.begin(
+            self, x )
+
+        # ..
+
+        o.execute
       end
 
       # the following method could stand as sort of a model for how this new,
@@ -155,7 +195,7 @@ module Skylab::TMX
 
       def __flush_argument_scanner_for_map
 
-        as = Home_.lib_.zerk::NonInteractiveCLI::MultiModeArgumentScanner.define do |o|
+        _flush_multimode_argument_scanner do |o|
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
@@ -166,14 +206,10 @@ module Skylab::TMX
 
           o.subtract_primary :result_in_tree  # for now
 
-          o.user_scanner remove_instance_variable :@__user_scanner
+          o.user_scanner remove_instance_variable :@_user_scanner
 
           o.listener method :__receive_argument_scanner_emission
         end
-
-        @__argument_scanner = as
-
-        as
       end
 
       def __receive_argument_scanner_emission * i_a, & em_p
@@ -243,7 +279,7 @@ module Skylab::TMX
 
         op = @API_invocation_.operation_session
 
-        subtract = @__argument_scanner.subtraction_hash
+        subtract = @_argument_scanner.subtraction_hash
 
         _use_these = op.get_primary_keys.reject do |sym|
           subtract[ sym ]
@@ -252,6 +288,23 @@ module Skylab::TMX
         op.when_unrecognized_primary -> { _use_these }, @_emit
 
         NIL
+      end
+
+      # -- preparing calls to the backend
+
+      def _flush_multimode_argument_scanner & defn
+
+        as = Home_.lib_.zerk::NonInteractiveCLI::MultiModeArgumentScanner.
+          define( & defn )
+
+        @_argument_scanner = as
+
+        as
+      end
+
+      def _bound_call_via_API_invocation o
+        @API_invocation_ = o
+        o.to_bound_call
       end
 
       # --
@@ -511,8 +564,12 @@ module Skylab::TMX
         "{ #{ _mid } }"
       end
 
-      def say_arguments_head_ name
+      def say_strange_arguments_head_ name
         name.as_slug.inspect
+      end
+
+      def say_arguments_head_ name
+        name.as_slug
       end
 
       def say_primary_ name

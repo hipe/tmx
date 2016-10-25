@@ -21,7 +21,7 @@ module Skylab::TMX
       end
 
       def to_didactic_operation_name_stream__
-        self.begin._to_didactic_operation_name_stream
+        To_didactic_operation_name_stream__[]
       end
 
       alias_method :begin, :new
@@ -48,7 +48,7 @@ module Skylab::TMX
 
       def __when_no_args
 
-        st = _to_didactic_operation_name_stream
+        st = To_didactic_operation_name_stream__[]
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
@@ -64,28 +64,39 @@ module Skylab::TMX
 
         sym = @argument_scanner.head_as_normal_symbol
 
-        if :map == sym
+        bx = Operations_name_cache__[]
+
+        name = bx.h_[ sym ]
+        if name
           @argument_scanner.advance_one
-          __when_map
+          __when_operation_found name
         else
-          __when_not_map
+          __when_operation_not_found bx
         end
       end
 
-      def __when_not_map
+      def __when_operation_not_found bx
 
         x = @argument_scanner.head_as_agnostic
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
-          y << "currently, \"map\" is the only operation."
-          y << "won't parse #{ say_arguments_head_ x }"
+
+          y << "unknown operation #{ say_strange_arguments_head_ x }"
+
+          _st = bx.to_value_stream
+
+          y << "available operations: #{ say_formal_operation_alternation_ _st }"
         end
         UNABLE_
       end
 
-      def __when_map
+      def __when_operation_found name
 
-        o = Home_::Operations_::Map.begin( & @_emit )
+        _const = name.as_camelcase_const_string.intern
+
+        _operation_class = Home_::Operations_.const_get _const, false
+
+        o = _operation_class.begin( & @_emit )
 
         o.argument_scanner = @argument_scanner
 
@@ -96,12 +107,6 @@ module Skylab::TMX
 
       def _parse_error_listener
         @_emit || Parse_error_listener___
-      end
-
-      def _to_didactic_operation_name_stream
-        Stream_.call %w( map ) do |s|
-          Common_::Name.via_slug s
-        end
       end
 
       attr_reader(
@@ -243,6 +248,10 @@ module Skylab::TMX
         _same name
       end
 
+      def say_strange_arguments_head_ name
+        _same name
+      end
+
       def say_arguments_head_ name
         _same name
       end
@@ -250,6 +259,16 @@ module Skylab::TMX
       def _same name
         name.as_lowercase_with_underscores_symbol.inspect
       end
+    end
+
+    # ==
+
+    To_didactic_operation_name_stream__ = -> do
+      Operations_name_cache__[].to_value_stream
+    end
+
+    Operations_name_cache__ = Lazy_.call do
+      Box_via_autoloaderized_module_[ Home_::Operations_ ]
     end
 
     # ==

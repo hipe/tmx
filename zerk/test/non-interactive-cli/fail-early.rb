@@ -16,6 +16,21 @@ module Skylab::Zerk::TestSupport
         expect nil
       end
 
+      def expect_on_stderr_lines_in_big_string big_s
+        @_ze_last_stream = :serr
+        expect_lines_in_big_string big_s
+      end
+
+      def expect_on_stdout_lines_in_big_string big_s
+        @_ze_last_stream = :sout
+        expect_lines_in_big_string big_s
+      end
+
+      def expect_lines_in_big_string big_s
+        @_ze_niCLI_setup.add_big_string_based_expectation big_s, @_ze_last_stream
+        NIL
+      end
+
       def expect_on_stderr exp_x
         @_ze_last_stream = :serr
         expect exp_x
@@ -27,7 +42,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def expect exp_x
-        @_ze_niCLI_setup.add_expectation exp_x, :puts, @_ze_last_stream
+        @_ze_niCLI_setup.add_line_based_expectation exp_x, :puts, @_ze_last_stream
         NIL
       end
 
@@ -42,6 +57,12 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
+    DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__ = -> msg do
+      ::Kernel.fail ExpectationFailure__, msg
+    end
+
+    # ==
+
     class InvocationUnderExpectations__
 
       def initialize tc
@@ -52,27 +73,36 @@ module Skylab::Zerk::TestSupport
 
       def execute
         __init_CLI_and_spies
-        __invoke_under_expectations
+        @_exitstatus = @_CLI.invoke @setup.ARGV
+        remove_instance_variable( :@_spy ).finished_invoking_notify
         self
       end
 
+      # ~
+
       def __expect_failed
         if @_exitstatus.zero?
-          fail( * @_spy.__when_expected_failed )
+          __when_exitstatus_zero
         end
       end
+
+      def __when_exitstatus_zero
+        _fail_say "expected nonzero exitstatus, had zero"
+      end
+
+      # ~
 
       def __expect_succeeded
         if @_exitstatus.nonzero?
-          fail( * @_spy.__when_expected_succeeded )
+          __when_exitstatus_nonzero
         end
       end
 
-      def __invoke_under_expectations
-        @_exitstatus = @_CLI.invoke @setup.ARGV
-        @_spy.finished_invoking_notify
-        NIL
+      def __when_exitstatus_nonzero
+        _fail_say "expected zero exitstatus, had #{ @_exitstatus }"
       end
+
+      # ~
 
       def __init_CLI_and_spies
 
@@ -102,6 +132,8 @@ module Skylab::Zerk::TestSupport
           %w( ze-pnsa )
         end
       end
+
+      define_method :_fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
     end
 
     # ==
@@ -140,97 +172,78 @@ module Skylab::Zerk::TestSupport
           Expect_nothing_on__[ :serr ]
         end
 
+        @_is_using_multi_line_assertion = false
         @_sout_spy = _sout_spy
         @_serr_spy = _serr_spy
+        @_receive = :_receive_emission_normally
+        @test_context = tc
       end
 
       def _receive s, method_name, stream_sym
 
+        act = ActualEmission___.new s, method_name, stream_sym
+
         if @do_debug
-          @debug_IO.puts [ s, method_name, stream_sym ].inspect
+          act.express_debugging_into @debug_IO
         end
 
+        send @_receive, act
+        NIL
+      end
+
+      def __receive_emission_when_under_multi_line_assertion act
+
+        _no_unparsed_exists = @_multi_line_assertion.receive_emission act
+        if _no_unparsed_exists
+          remove_instance_variable :@_multi_line_assertion
+          @_is_using_multi_line_assertion = false
+          @_receive = :_receive_emission_normally
+        end
+        NIL
+      end
+
+      def _receive_emission_normally act
+
         if @_expectations_queue.no_unparsed_exists
-          fail( * __when_extra_emission( [ s, method_name, stream_sym ] ) )
+          NoMoreEmissionAssertion___.new( act, @test_context ).execute
         else
-          exp_x, exp_method_name, exp_stream_sym = @_expectations_queue.gets_one
-          if exp_stream_sym == stream_sym
-            if exp_method_name == method_name
-              if exp_x
-                if exp_x.respond_to? :ascii_only?
-                  if exp_x != s
-                    fail( * _when_wrong_content( [ s, method_name, stream_sym ], exp_x ) )
-                  end
-                elsif exp_x.respond_to? :named_captures
-                  if exp_x !~ s
-                    fail( * _when_wrong_content( [ s, method_name, stream_sym ], exp_x ) )
-                  end
-                else
-                  ::Kernel._K
-                end
-              else
-                if s
-                  fail( * __when_expected_empty( [ s, method_name, stream_sym ] ) )
-                end
-              end
-            else
-              fail( * __when_wrong_method( [ s, method_name, stream_sym ], exp_method_name ) )
-            end
+          exp = @_expectations_queue.gets_one
+          if exp.is_a_multi_line_expectation
+
+            @_is_using_multi_line_assertion = true
+            @_multi_line_assertion = exp.to_multi_line_assertion @test_context
+            @_receive = :__receive_emission_when_under_multi_line_assertion
+
+            send @_receive, act
           else
-            fail( * __when_wrong_stream( [ s, method_name, stream_sym ], exp_stream_sym ) )
+            exp.assert_against_under act, @test_context
           end
         end
         NIL
       end
 
-      def __when_expected_empty three
-        _common "expected a blank line for #{ three.inspect }"
-      end
-
-      def _when_wrong_content three, exp_x
-        _common_wrong :content, three, exp_x
-      end
-
-      def __when_wrong_method three, exp_x
-        _common_wrong :method, three, exp_x
-      end
-
-      def __when_wrong_stream three, exp_x
-        _common_wrong :stream, three, exp_x
-      end
-
-      def _common_wrong which_sym, three, exp_x
-        _common "expected #{ which_sym } to match #{ exp_x.inspect } of emission #{ three.inspect }"
-      end
-
       def finished_invoking_notify
-        if @_expectations_queue.no_unparsed_exists
-          NIL
-        else
-          fail( * __when_missing_emission )
+
+        if @_is_using_multi_line_assertion
+
+          @_multi_line_assertion.finished_invoking_notify
+          remove_instance_variable :@_multi_line_assertion
+        end
+
+        remove_instance_variable :@_is_using_multi_line_assertion
+        remove_instance_variable :@_receive
+
+        if ! @_expectations_queue.no_unparsed_exists
+          __when_missing_emission
         end
       end
 
       def __when_missing_emission
-        _tuple = @_expectations_queue.current_token
-        _common "missing expected emission: #{ tuple.inspect }"
+        _exp = @_expectations_queue.current_token
+        _fail_say "actual output ended when expecting: #{ _exp.inspect_expectation }"
       end
 
-      def __when_extra_emission tuple
-        _common "unexpected emission: #{ tuple.inspect }"
-      end
-
-      def __when_expected_succeeded
-        _common "expected zero exitstatus, had #{ @_exitstatus }"
-      end
-
-      def __when_expected_failed
-        _common "expected nonzero exitstatus, had zero"
-      end
-
-      def _common msg
-        [ ExpectationFailure__, msg ]
-      end
+      define_method :_fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
 
       # -- simple readers
 
@@ -245,6 +258,31 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
+    class ActualEmission___
+
+      def initialize s, m, sym
+        @method_name = m
+        @serr_or_sout = sym
+        @string = s
+      end
+
+      def express_debugging_into io
+        io.puts inspect_actual
+      end
+
+      def inspect_actual
+        [ @string, @method_name, @serr_or_sout ].inspect
+      end
+
+      attr_reader(
+        :method_name,
+        :serr_or_sout,
+        :string,
+      )
+    end
+
+    # ==
+
     class Setup___
 
       def initialize argv
@@ -253,9 +291,17 @@ module Skylab::Zerk::TestSupport
         @has = {}
       end
 
-      def add_expectation exp_x, method_name, sout_or_serr
-        @has[ sout_or_serr ] = true
-        @expectations.push [ exp_x, method_name, sout_or_serr ]  # here
+      def add_big_string_based_expectation big_s, serr_or_sout
+        _add BigStringBasedExpectation__.new( big_s, serr_or_sout ), serr_or_sout
+      end
+
+      def add_line_based_expectation exp_x, method_name, serr_or_sout
+        _add String_based_expectation___[ exp_x, method_name, serr_or_sout ], serr_or_sout
+      end
+
+      def _add exp, serr_or_sout
+        @has[ serr_or_sout ] = true
+        @expectations.push exp
         NIL
       end
 
@@ -264,6 +310,306 @@ module Skylab::Zerk::TestSupport
         :ARGV,
         :expectations,
       )
+    end
+
+    # == (forward declarations)
+
+    StringBasedExpectation__ = ::Class.new
+
+    StringBasedAssertion__ = StringBasedExpectation__  # #for-now
+
+    ExactStringBasedExpectation__ = ::Class.new StringBasedExpectation__
+
+    ExactStringBasedAssertion__ = ExactStringBasedExpectation__  # #for-now
+
+    # == (end forward declaration)
+
+    class BigStringBasedExpectation__
+
+      def initialize s, sym
+        @big_string = s
+        @serr_or_sout = sym
+      end
+
+      def to_multi_line_assertion tc
+        BigStringBasedAssertion___.new @big_string, @serr_or_sout, tc
+      end
+
+      def is_a_multi_line_expectation
+        true
+      end
+    end
+
+    class BigStringBasedAssertion___
+
+      def initialize s, sym, tc
+
+        @big_string = s
+        @test_context = tc
+        @serr_or_sout = sym
+
+        @_receive = :__receive_first_emission
+      end
+
+      def receive_emission em
+        send @_receive, em
+      end
+
+      def __receive_first_emission em
+
+        @_stream = Home_.lib_.basic::String.line_stream remove_instance_variable :@big_string
+
+        @_reusable_assertion = ReusableExactStringBasedAssertion__.new :puts, @serr_or_sout, @test_context
+
+        line = @_stream.gets
+        line || self._NO
+        line.chop!  # live dangerously
+        @_reusable_assertion.string = line
+
+        @_receive = :__receive
+        send @_receive, em
+      end
+
+      def __receive em
+
+        @_reusable_assertion.actual_emission = em
+        @_reusable_assertion.execute
+
+        line = @_stream.gets
+        if line
+          line.chop!  # live dangerously
+          @_reusable_assertion.string = line
+          NOTHING_
+        else
+          remove_instance_variable :@_receive
+          remove_instance_variable :@_reusable_assertion
+          ACHIEVED_
+        end
+      end
+
+      def finished_invoking_notify
+
+        # any time we're receiving this it means we were not removed from
+        # the parent which means we never reached our end
+
+        _ = @_reusable_assertion.inspect_expectation
+        _fail_say "actual output ended when expecting (in stream): #{ _ }"
+      end
+
+      define_method :_fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
+    end
+
+    # ==
+
+    class ReusableExactStringBasedAssertion__ < ExactStringBasedAssertion__
+
+      def initialize method_name, serr_or_sout, tc
+        __init_string_based_expectation method_name, serr_or_sout
+        @test_context = tc
+      end
+
+      attr_writer(
+        :actual_emission,
+        :string,
+      )
+
+      def execute
+        # hi.
+        super
+      end
+    end
+
+    # ==
+
+    class NoMoreEmissionAssertion___  # (exists only to explain failure)
+
+      def initialize act, tc
+        @actual_emission = act
+        @test_context = tc
+      end
+
+      def execute
+        _fail_say "when no more emissions were expected, had #{ @actual_emission.inspect_actual }"
+      end
+
+      define_method :_fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
+
+      def is_a_multi_line_expectation
+        false
+      end
+    end
+
+    String_based_expectation___ = -> x, m, sym do
+      if x
+        if x.respond_to? :ascii_only?
+          ExactStringBasedExpectation__.new x, m, sym
+        elsif x.respond_to? :named_captures
+          RegexpBasedStringExpectation___.new x, m, sym
+        else
+          TS_._NO
+        end
+      else
+        BlankLineExpectation___.new m, sym
+      end
+    end
+
+    class ExactStringBasedExpectation__ < StringBasedExpectation__
+
+      def initialize x, m, sym
+        @string = x
+        super m, sym
+      end
+    end
+
+    class ExactStringBasedAssertion__ < StringBasedAssertion__
+
+      def actual_string_matches_expected_string_
+        @actual_emission.string == @string
+      end
+
+      def say_expectation_preterite_infinitive_
+        @string.inspect
+      end
+
+      def inspectable_
+        @string
+      end
+    end
+
+    class BlankLineExpectation___ < StringBasedExpectation__
+
+      def actual_string_matches_expected_string_
+        ! @actual_emission.string
+      end
+
+      def say_expectation_preterite_infinitive_
+        "to be a blank line"
+      end
+
+      def inspectable_
+        EMPTY_S_
+      end
+    end
+
+    class RegexpBasedStringExpectation__ < StringBasedExpectation__
+
+      def initialize x, m, sym
+        @regexp = x
+        super m, sym
+      end
+    end
+
+    class RegexpBasedStringAssertion__ < StringBasedAssertion__
+
+      def actual_string_matches_expected_string_
+        @regexp =~ @actual_emission.string
+      end
+
+      def say_expectation_preterite_infinitive_
+
+        buff = ""
+        d = @regexp.options
+        o = ::Regexp
+        ( d & o::IGNORECASE ).zero? or buff << "i"
+        ( d & o::MULTILINE ).zero? or buff << "m"
+        ( d & o::EXTENDED ).zero? or buff << "x"
+        # FIXEDENCODING / NOENCODING is ignored
+
+        "to match /#{ @regexp.source }/#{ buff }"
+      end
+
+      def inspectable_
+        @regexp
+      end
+    end
+
+    class StringBasedExpectation__
+
+      def initialize m, sym
+        @method_name = m
+        @serr_or_sout = sym
+      end
+
+      alias_method :__init_string_based_expectation, :initialize
+
+      def assert_against_under act, tc
+        # ..
+        @actual_emission = act
+        @test_context = tc
+        execute
+      end
+
+      def inspect_expectation
+        [ inspectable_, @method_name, @serr_or_sout ].inspect
+      end
+
+      def is_a_multi_line_expectation
+        false
+      end
+    end
+
+    class StringBasedAssertion__
+
+      def execute
+        if __actual_stream_matches_expected_stream
+          if __actual_method_name_matches_expected_method_name
+            if ! actual_string_matches_expected_string_
+              __fail_because_actual_string_does_not_match_expected_string
+            end
+          else
+            __fail_because_actual_method_name_does_not_match_expected_method_name
+          end
+        else
+          __fail_because_actual_stream_does_not_match_expected_stream
+        end
+      end
+
+      # ~
+
+      def __actual_stream_matches_expected_stream
+        @actual_emission.serr_or_sout == @serr_or_sout
+      end
+
+      def __fail_because_actual_steam_does_not_match_expected_stream
+        _fail_say "expected emission on #{ @serr_or_sout }, #{
+          }was on #{ @actual_emission.serr_or_sout }: #{
+           }#{ _say_all_but :serr_or_sout }"
+      end
+
+      # ~
+
+      def __actual_method_name_matches_expected_method_name
+        @actual_emission.method_name == @method_name
+      end
+
+      def __fail_because_actual_method_name_does_not_match_expected_method_name
+        _fail_say "expected emission to use #{ @method_name }, #{
+          }used #{ @actual_emission.method_name }: #{
+           }#{ _say_all_but :method_name }"
+      end
+
+      # ~
+
+      def __fail_because_actual_string_does_not_match_expected_string
+
+        _fail_say "expected #{ say_expectation_preterite_infinitive_ }. had: #{
+          }#{ @actual_emission.string.inspect }"
+      end
+
+      # --
+
+      def _say_all_but sym
+        a = [ inspectable_ ]
+        sym_a = %i( method_name, serr_or_sout )
+        d = sym_a.index sym
+        sym_a[ d, 1 ] = EMPTY_A_
+        sym_a.each do |sym_|
+          a.push instance_variable_get "@#{ sym_ }"
+        end
+        a.inspect
+      end
+
+      define_method :_fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
     end
 
     # ==
@@ -280,7 +626,7 @@ module Skylab::Zerk::TestSupport
       -> sym do
         h.fetch sym do
           x = StreamSpy__.new do |o|
-            o.stream_symbol = sym
+            o.serr_or_sout = sym
             o.receive = expect_nothing
           end
           h[ sym ] = x
@@ -291,13 +637,13 @@ module Skylab::Zerk::TestSupport
 
     SoutSpy__ = Lazy_.call do
       StreamSpy__.new do |o|
-        o.stream_symbol = :sout
+        o.serr_or_sout = :sout
       end
     end
 
     SerrSpy__ = Lazy_.call do
       StreamSpy__.new do |o|
-        o.stream_symbol = :serr
+        o.serr_or_sout = :serr
       end
     end
 
@@ -315,17 +661,17 @@ module Skylab::Zerk::TestSupport
       end
 
       def receive= p
-        @stream_proxy = StreamProxy___.new p, @stream_symbol
+        @stream_proxy = StreamProxy___.new p, @serr_or_sout
         p
       end
 
       attr_writer(
-        :stream_symbol,
+        :serr_or_sout,
       )
 
       attr_reader(
         :stream_proxy,
-        :stream_symbol,
+        :serr_or_sout,
       )
     end
 

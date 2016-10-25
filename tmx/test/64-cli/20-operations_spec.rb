@@ -30,13 +30,6 @@ module Skylab::TMX::TestSupport
       end
     end
 
-    define_singleton_method :_given do |s_a|
-      define_method :prepare_CLI do |cli|
-        _st = TS_::Operations::Map::Dir01::JSON_file_stream_via[ s_a ]
-        cli.json_file_stream_by { _st } ; nil
-      end
-    end
-
     context "names only, no modifiers" do
 
       it "works" do
@@ -46,7 +39,7 @@ module Skylab::TMX::TestSupport
         expect_succeeded
       end
 
-      _given %w( tyris deka )
+      given_ %w( tyris deka )
     end
 
     context "select one additional attribute" do
@@ -60,7 +53,7 @@ module Skylab::TMX::TestSupport
           expect_succeeded
         end
 
-        _given %w( damud adder )
+        given_ %w( damud adder )
       end
 
       context "when a value is not present" do
@@ -71,7 +64,7 @@ module Skylab::TMX::TestSupport
           expect_succeeded
         end
 
-        _given %w( frim_frum )
+        given_ %w( frim_frum )
       end
 
       context "when a value is nil"  # #todo maybe
@@ -185,7 +178,6 @@ module Skylab::TMX::TestSupport
       cli.json_file_stream_by { X_c_op_explosive_stream[] }
       NIL
     end
-
 
     map = 'map'
     define_method :_subject_operation do
