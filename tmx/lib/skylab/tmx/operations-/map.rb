@@ -105,8 +105,7 @@ module Skylab::TMX
 
       def __parse_modifiers
         ok = true
-        st = @argument_scanner
-        until st.no_unparsed_exists
+        until @argument_scanner.no_unparsed_exists
           ok = __parse_argument_scanner_head
           ok || break
         end
@@ -115,31 +114,18 @@ module Skylab::TMX
 
       def __parse_argument_scanner_head
 
-        k = @argument_scanner.head_as_normal_symbol_for_primary
-        if k
-          __when_possibly_a_primary k
-        else
-          k
-        end
-      end
-
-      def __when_possibly_a_primary k
-        m = PRIMARIES__[ k ]
+        m = @argument_scanner.match_head_against_primaries_hash PRIMARIES__
         if m
-          @_current_primary_symbol = k
           @argument_scanner.advance_one
           send m
-        else
-          _ = method :get_primary_keys
-          when_unrecognized_primary _, @_emit
         end
       end
 
       def when_unrecognized_primary ks_p, listener
-        Here_::When_::Unrecognized_primary[ @argument_scanner, ks_p, listener ]
+        @argument_scanner.when_unrecognized_primary ks_p, & listener
       end
 
-      def get_primary_keys
+      def get_primary_keys__
         PRIMARIES__.keys
       end
 
@@ -181,12 +167,12 @@ module Skylab::TMX
       # -- simple, argument-like primaries
 
       def __parse_attributes_module_by
-        __parse_primary_value_into :@attributes_module_by
+        _parse_into :@attributes_module_by
       end
 
       def __parse_json_file_stream
 
-        x = _parse_trueish_primary_value
+        x = @argument_scanner.parse_primary_value :must_be_trueish
         if x
           _x_ = Home_::Magnetics::UnparsedNodeStream_via::JSON_FileStream[ x ]
           _store :@unparsed_node_stream, _x_
@@ -228,7 +214,7 @@ module Skylab::TMX
           @_attribute_cache = AttributeCache___.new _mod
           ACHIEVED_
         else
-          Here_::When_::Contextually_missing[ :attributes_module_by, @_current_primary_symbol, @_emit ]
+          Here_::When_::Contextually_missing[ :attributes_module_by, _current_primary_symbol, @_emit ]
         end
       end
 
@@ -248,7 +234,7 @@ module Skylab::TMX
       end
 
       def _when_contextually_invalid_primary
-        Here_::When_::Contextually_invalid_primary[ @_current_primary_symbol, @_emit ]
+        Here_::When_::Contextually_invalid_primary[ _current_primary_symbol, @_emit ]
       end
 
       def _modifications
@@ -268,36 +254,11 @@ module Skylab::TMX
 
       # --
 
-      def _parse_trueish_primary_value
-        kn = _parse_primary_value
-        if kn
-          x = kn.value_x
-          if x
-            x
-          else
-            self._COVER_ME_falseish_argument_value_when_expected_trueish @_current_primary_symbol
-          end
-        else
-          UNABLE_
-        end
+      def _current_primary_symbol
+        @argument_scanner.current_primary_symbol
       end
 
-      def __parse_primary_value_into ivar
-        kn = _parse_primary_value
-        if kn
-          instance_variable_set ivar, kn.value_x ; ACHIEVED_
-        else
-          UNABLE_
-        end
-      end
-
-      def _parse_primary_value
-        if @argument_scanner.no_unparsed_exists
-          self._COVER_ME_argument_value_not_provided_for @_current_primary_symbol
-        else
-          Common_::Known_Known[ @argument_scanner.gets_one_as_is ]
-        end
-      end
+      define_method :_parse_into, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 

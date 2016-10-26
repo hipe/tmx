@@ -78,14 +78,8 @@ module Skylab::TMX::TestSupport
     end
 
     Non_Interactive_CLI_Fail_Early = -> tcc do
-      Zerk_lib___[].test_support::Non_Interactive_CLI::Fail_Early[ tcc ]
+      Zerk_[].test_support::Non_Interactive_CLI::Fail_Early[ tcc ]
     end
-
-  # ==
-
-  Zerk_lib___ = Lazy_.call do
-    Autoloader_.require_sidesystem :Zerk
-  end
 
   # ==
 
@@ -96,4 +90,5 @@ module Skylab::TMX::TestSupport
   NOTHING_ = Home_::NOTHING_
   Stream_ = Home_::Stream_
   TS_ = self
+  Zerk_ = Home_::Zerk_
 end

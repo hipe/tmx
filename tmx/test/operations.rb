@@ -85,7 +85,7 @@ module Skylab::TMX::TestSupport
       end
 
       def expect_event_debugging_expression_agent
-        Home_::API::ExpressionAgent___.instance
+        Zerk_[]::API::ArgumentScannerExpressionAgent.instance
       end
 
       alias_method :expag_, :expect_event_debugging_expression_agent

@@ -444,7 +444,7 @@ module Skylab::Zerk::TestSupport
         if x.respond_to? :ascii_only?
           ExactStringBasedExpectation__.new x, m, sym
         elsif x.respond_to? :named_captures
-          RegexpBasedStringExpectation___.new x, m, sym
+          RegexpBasedStringExpectation__.new x, m, sym
         else
           TS_._NO
         end
@@ -498,6 +498,8 @@ module Skylab::Zerk::TestSupport
         super m, sym
       end
     end
+
+    RegexpBasedStringAssertion__ = RegexpBasedStringExpectation__
 
     class RegexpBasedStringAssertion__ < StringBasedAssertion__
 

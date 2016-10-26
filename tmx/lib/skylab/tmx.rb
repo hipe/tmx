@@ -98,15 +98,18 @@ module Skylab::TMX
 
   # ==
 
-  DEFINITION_FOR_THE_METHOD_CALLED_CACHED_ = -> m, & p do
+  DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_ = -> ivar, * x_a do
 
-    define_method m do
-      h = ( @_cache_ ||= {} )
-      h.fetch m do
-        x = instance_exec( & p )
-        h[ m ] = x
-        x
+    req = @argument_scanner.parse_parse_request x_a
+
+    x = @argument_scanner.parse_primary_value_via_parse_request req
+
+    if x
+      if ! req.must_be_trueish
+        x = x.value_x
       end
+      instance_variable_set ivar, x
+      ACHIEVED_
     end
   end
 
@@ -136,6 +139,10 @@ module Skylab::TMX
     bx
   end
 
+  Zerk_ = Lazy_.call do
+    Autoloader_.require_sidesystem :Zerk
+  end
+
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end
@@ -159,8 +166,6 @@ module Skylab::TMX
     Human = sidesys[ :Human ]
 
     JSON = stdlib[ :JSON ]
-
-    Zerk = sidesys[ :Zerk ]
   end
 
   # ==

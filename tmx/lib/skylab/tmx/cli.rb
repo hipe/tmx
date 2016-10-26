@@ -120,13 +120,24 @@ module Skylab::TMX
         @_express = :__express_reports
 
         o = Home_::API.begin( & @_emit )
-
-        o.argument_scanner = _flush_multimode_argument_scanner do |as|
-          as.front_scanner_tokens :reports
-          as.user_scanner remove_instance_variable :@_user_scanner
-        end
-
+        o.argument_scanner = __flush_argument_scanner_for_reports
         _bound_call_via_API_invocation o
+      end
+
+      def __flush_argument_scanner_for_reports
+
+        _flush_multimode_argument_scanner do |o|
+
+          o.front_scanner_tokens :reports
+
+          o.subtract_primary :json_file_stream, _flush_json_file_stream_proc
+
+          o.default_primary :execute
+
+          o.user_scanner remove_instance_variable :@_user_scanner
+
+          o.listener @_emit
+        end
       end
 
       def __express_reports x
@@ -191,7 +202,9 @@ module Skylab::TMX
       #
       #   - finally with `user_scanner` we pass any remaining non-parsed
       #     ARGV (which, of course, is written in a "CLI way"). the adapter
-      #     will attempt to interpret this scanner in an "API way".
+      #     attempts to make the underlying user arguments available to the
+      #     operation for it to read in an "API way" with name convention
+      #     translation as appropriate.
 
       def __flush_argument_scanner_for_map
 
@@ -199,8 +212,7 @@ module Skylab::TMX
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
-          _ = remove_instance_variable( :@__json_file_stream_proc ).call
-          o.subtract_primary :json_file_stream, _
+          o.subtract_primary :json_file_stream, _flush_json_file_stream_proc
 
           o.subtract_primary :attributes_module_by, -> { Home_::Attributes_ }
 
@@ -281,7 +293,7 @@ module Skylab::TMX
 
         subtract = @_argument_scanner.subtraction_hash
 
-        _use_these = op.get_primary_keys.reject do |sym|
+        _use_these = op.get_primary_keys__.reject do |sym|
           subtract[ sym ]
         end
 
@@ -294,12 +306,16 @@ module Skylab::TMX
 
       def _flush_multimode_argument_scanner & defn
 
-        as = Home_.lib_.zerk::NonInteractiveCLI::MultiModeArgumentScanner.
-          define( & defn )
+        as = Zerk_[]::NonInteractiveCLI::MultiModeArgumentScanner.define( & defn )
 
         @_argument_scanner = as
 
         as
+      end
+
+      def _flush_json_file_stream_proc
+        _ = remove_instance_variable( :@__json_file_stream_proc ).call
+        _  # #todo
       end
 
       def _bound_call_via_API_invocation o

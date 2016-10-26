@@ -11,7 +11,7 @@ module Skylab::TMX
       def call * x_a, & p
 
         o = self.begin( & p )
-        o.argument_scanner = ArgumentScanner___.via_array x_a
+        o.argument_scanner = Zerk_[]::API::ArgumentScanner.via_array x_a, & p
         bc = o.to_bound_call
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
@@ -116,62 +116,6 @@ module Skylab::TMX
 
     # ==
 
-    class ArgumentScanner___
-
-      # so that API and CLI can share some subset of syntax, for custom syntaxes
-
-      class << self
-        alias_method :via_array, :new
-        undef_method :new
-      end  # >>
-
-      def initialize x_a
-        if x_a.length.zero?
-          @no_unparsed_exists = true
-        else
-          @scn = Common_::Polymorphic_Stream.via_array x_a
-        end
-      end
-
-      def gets_one_as_is  # same as sibling
-        x = @scn.current_token
-        advance_one
-        x
-      end
-
-      def advance_one  # same as sibling
-        @scn.advance_one
-        @no_unparsed_exists = @scn.no_unparsed_exists
-        @_cache_ = nil
-      end
-
-      define_singleton_method :cached, DEFINITION_FOR_THE_METHOD_CALLED_CACHED_
-
-      cached :head_as_agnostic do
-
-        x = @scn.current_token
-        if x.respond_to? :id2name
-          Common_::Name.via_variegated_symbol x
-        else
-          Common_::Name.via_slug x  # ..
-        end
-      end
-
-      def head_as_normal_symbol_for_primary
-        @scn.current_token
-      end
-
-      def head_as_normal_symbol
-        @scn.current_token
-      end
-
-      attr_reader(
-        :no_unparsed_exists,
-      )
-    end
-
-    # ==
-
     Parse_error_listener___ = -> *, & expression_p do
 
       buffer = nil
@@ -197,69 +141,13 @@ module Skylab::TMX
         p[ line ]
       end
 
-      ExpressionAgent___.instance.calculate _y, & expression_p
+      Zerk_[]::API::ArgumentScannerExpressionAgent.instance.
+        calculate _y, & exp_p
 
       raise ArgumentError, buffer
     end
 
     ArgumentError = ::Class.new ::ArgumentError
-
-    class ExpressionAgent___
-
-      class << self
-        def instance
-          @___instance ||= new
-        end
-        private :new
-      end  # >>
-
-      alias_method :calculate, :instance_exec
-
-      def say_formal_operation_alternation_ st
-        _say_name_alternation :__say_formal_operation, st
-      end
-
-      def say_primary_alternation_ st
-        _say_name_alternation :say_primary_, st
-      end
-
-      def _say_name_alternation m, st
-
-        p = method m
-
-        st.join_into_with_by "", " or " do |name|
-          p[ name ]  # hi.
-        end
-      end
-
-      def __say_formal_operation name
-        _same name
-      end
-
-      def say_formal_attribute_ name
-        _same name
-      end
-
-      def say_strange_primary_ name
-        _same name
-      end
-
-      def say_primary_ name
-        _same name
-      end
-
-      def say_strange_arguments_head_ name
-        _same name
-      end
-
-      def say_arguments_head_ name
-        _same name
-      end
-
-      def _same name
-        name.as_lowercase_with_underscores_symbol.inspect
-      end
-    end
 
     # ==
 

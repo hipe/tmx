@@ -10,21 +10,37 @@ module Skylab::TMX::TestSupport
 
     context "(context)" do
 
-      it "list them" do
+      it "strange primary - whines" do
+        invoke _subject_operation, '-strange'
+        expect_on_stderr "unrecognized primary \"-strange\""
+        expect_on_stderr %r(\Aexpecting \{ -[a-z])
+        expect_failed_normally_
+      end
+
+      it "list because no args" do
         invoke _subject_operation
+        _expect_same_list
+      end
+
+      it "list because list primary" do
+        invoke _subject_operation, '-list'
+        _expect_same_list
+      end
+
+      def _expect_same_list
         expect_on_stdout "punchlist"
         expect_succeeded
       end
 
       it "bad name" do
-        invoke _subject_operation, 'floofie'
-        expect_on_stderr "unrecognized report: \"floofie\""
+        invoke _subject_operation, 'floofie-doofie'
+        expect_on_stderr "unrecognized report: \"floofie-doofie\""
         expect_on_stderr "available reports: (punchlist)"
-        expect_failed_normally_
+        expect_failed
       end
 
       it "wee CURRENTLY STUBBED AT OPERATION" do
-        invoke 'reports', 'punchlist'
+        invoke _subject_operation, 'punchlist'
         expect_on_stdout_lines_in_big_string __this_big_string
         expect_succeeded
       end

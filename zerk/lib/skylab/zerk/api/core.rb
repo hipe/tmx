@@ -14,11 +14,11 @@ module Skylab::Zerk
     #
     # (more notes would go in [#002])
 
-    Require_ACS_[]
-
     class << self
 
       def call args, acs, & pp
+
+        Require_ACS_[]
 
         if ! pp
           pp = ACS_.handler_builder_for acs

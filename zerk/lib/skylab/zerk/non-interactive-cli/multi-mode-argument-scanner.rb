@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     # ## scope
     #
-    # this is early-abstracted for a single use-case in [tmx] (at writing).
+    # this is being frontiered by [tmx].
     # we would like it possibly to be able to grow to accomodate the other
     # use cases near what is hinted at below.
     #
@@ -77,6 +77,10 @@ module Skylab::Zerk
           end
         end
 
+        def default_primary sym
+          @_builder.receive_default_primary sym
+        end
+
         def user_scanner scn
           @_builder.receive_user_scanner scn
         end
@@ -92,10 +96,12 @@ module Skylab::Zerk
 
         def initialize
           @_front_tokens = nil
+          @_has_default_primary = false
           @_listener = nil
           @_mid_scanner_pairs = nil
           @_subtracted = {}
           # --
+          @_receive_default_primary = :__receive_default_primary
           @_receive_front_scanner_tokens = :__receive_front_scanner_tokens
           @_receive_user_scanner = :__receive_user_scanner
         end
@@ -119,6 +125,17 @@ module Skylab::Zerk
 
         def receive_subtract_primary_without_argument sym
           @_subtracted[ sym ] = true
+          NIL
+        end
+
+        def receive_default_primary sym
+          send @_receive_default_primary, sym
+        end
+
+        def __receive_default_primary sym
+          @_receive_default_primary = :_CLOSED_
+          @_has_default_primary = true
+          @_default_primary_symbol = sym
           NIL
         end
 
@@ -154,13 +171,18 @@ module Skylab::Zerk
 
           us = remove_instance_variable :@_user_scanner
           if ! us.no_unparsed_exists
-            a.push UserScanner___.new sub, us, @_listener
+
+            if @_has_default_primary
+              _dp_kn = Common_::Known_Known[ @_default_primary_symbol ]
+            end
+
+            a.push UserScanner___.new sub, us, _dp_kn, @_listener
           end
 
           if a.length.zero?
             self._COVER_ME_you_should_result_in_a_singleton_that_says :no_unparsed_exists
           else
-            Here_.__new_multi_mode_argument_scanner a, sub
+            Here_.__new_multi_mode_argument_scanner a, sub, @_listener
           end
         end
       end
@@ -170,14 +192,33 @@ module Skylab::Zerk
       Here_ = self
       class Here_
 
-        def initialize a, h
+        def initialize a, h, l
+          @listener = l
           @_scn_scn = Common_::Polymorphic_Stream.via_array a
           @_scn = @_scn_scn.gets_one
           @subtraction_hash = h
         end
 
+        def match_head_against_primaries_hash h
+          Home_::ArgumentScanner::Magnetics::PrimaryNameValue_via_Hash[ self, h ]
+        end
+
+        def parse_primary_value * x_a
+          parse_primary_value_via_parse_request parse_parse_request x_a
+        end
+
+        def parse_parse_request x_a
+          Home_::ArgumentScanner::Magnetics::ParseRequest_via_Array[ x_a ]
+        end
+
+        def parse_primary_value_via_parse_request req
+          Home_::ArgumentScanner::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]
+        end
+
         def head_as_normal_symbol_for_primary
-          @_scn.head_as_normal_symbol_for_primary_
+          sym = @_scn.head_as_normal_symbol_for_primary_
+          @current_primary_symbol = sym
+          sym
         end
 
         def head_as_normal_symbol
@@ -188,10 +229,8 @@ module Skylab::Zerk
           @_scn.head_as_agnostic_
         end
 
-        def gets_one_as_is
-          x = @_scn.head_as_is_
-          advance_one
-          x
+        def current_token_as_is
+          @_scn.head_as_is_
         end
 
         def advance_one
@@ -208,7 +247,13 @@ module Skylab::Zerk
           NIL
         end
 
+        def when_unrecognized_primary ks_p, & emit
+          Home_::ArgumentScanner::When::Unrecognized_primary[ self, ks_p, emit ]
+        end
+
         attr_reader(
+          :current_primary_symbol,
+          :listener,
           :no_unparsed_exists,
           :subtraction_hash,
         )
@@ -261,6 +306,12 @@ module Skylab::Zerk
           _head_as_normal_symbol
         end
 
+        def head_as_agnostic_
+          _sym = _head_as_normal_symbol
+          _ = Common_::Name.via_variegated_symbol _sym
+          _  # #todo
+        end
+
         def _head_as_normal_symbol
           if @_is_pointing_at_name
             @_real_scn.current_token.name_x
@@ -306,13 +357,23 @@ module Skylab::Zerk
 
       class UserScanner___
 
-        def initialize sub_h, user_scn, listener
+        def initialize sub_h, user_scn, dp_kn, listener
+
+          if dp_kn
+            @_default_primary_was_read = false
+            @__default_primary_symbol = dp_kn.value_x
+            @_has_default_primary = true
+          else
+            @_has_default_primary = false
+          end
+
           @_listener = listener
           @_real_scn = user_scn
           @_subtracted = sub_h
         end
 
         def head_as_normal_symbol_for_primary_
+
           s = @_real_scn.current_token
           if DASH_BYTE_ == s.getbyte(0)
             sym = s[ 1..-1 ].gsub( DASH_, UNDERSCORE_ ).intern
@@ -321,6 +382,9 @@ module Skylab::Zerk
             else
               sym
             end
+          elsif @_has_default_primary
+            @_default_primary_was_read = true
+            @__default_primary_symbol
           else
             __when_does_not_look_like_primary
           end
@@ -357,6 +421,14 @@ module Skylab::Zerk
         end
 
         def advance_one_
+          if @_has_default_primary && @_default_primary_was_read
+            @_default_primary_was_read = false
+          else
+            __advance_one_normally
+          end
+        end
+
+        def __advance_one_normally
           @_real_scn.advance_one
           if @_real_scn.no_unparsed_exists
             @no_unparsed_exists_ = true
@@ -365,6 +437,7 @@ module Skylab::Zerk
         end
 
         attr_reader(
+          :current_primary_symbol,
           :no_unparsed_exists_,
         )
       end

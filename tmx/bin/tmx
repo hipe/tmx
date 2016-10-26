@@ -6,9 +6,13 @@ _client_class = Skylab::TMX::CLI
 
 _pn_s_a = [ ::File.basename( $PROGRAM_NAME ) ]
 
-_cli = _client_class.new $stdin, $stdout, $stderr, _pn_s_a
+cli = _client_class.new $stdin, $stdout, $stderr, _pn_s_a
 
-d = _cli.invoke ARGV
+cli.json_file_stream_by do
+  self._XX_enjoy
+end
+
+d = cli.invoke ARGV
 
 if d.nonzero?
   $stderr.puts "(exitstatus: #{ d })"
