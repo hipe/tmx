@@ -81,8 +81,11 @@ module Skylab::TMX
       def __when_head_is_json_file_stream
 
         @argument_scanner.advance_one
-
-        _parse_into :@_json_file_stream, :must_be_trueish
+        st = @argument_scanner.parse_primary_value :must_be_trueish
+        if st
+          ( @__for_reports ||= ForReports___.new ).json_file_stream = st
+          ACHIEVED_
+        end
       end
 
       # --
@@ -132,7 +135,7 @@ module Skylab::TMX
 
         _report_class = Home_::Reports_.const_get _const, false
 
-        _report = _report_class.new( & @_emit )
+        _report = _report_class.new( @__for_reports, & @_emit )
 
         _report.execute
       end
@@ -170,6 +173,8 @@ module Skylab::TMX
     Report_names_box___ = Lazy_.call do
       Box_via_autoloaderized_module_[ Home_::Reports_ ]
     end
+
+    ForReports___ = ::Struct.new :json_file_stream
 
     # ==
   end

@@ -73,7 +73,7 @@ module Skylab::TMX
             name.as_lowercase_with_underscores_string
           end
 
-          say_attr = method :say_formal_attribute_
+          say_attr = method :say_formal_component_
 
           _s_a = Home_.lib_.human::Levenshtein.with(
             :item_string, k.id2name,
@@ -101,7 +101,7 @@ module Skylab::TMX
         listener.call :error, :expression, :parse_error, :no_implementation_for, primary_sym do |y|
 
           _eew = Common_::Name.via_variegated_symbol primary_sym
-          _subj = say_formal_attribute_ me.name
+          _subj = say_formal_component_ me.name
           _topic = say_primary_ _eew
           y << "#{ _subj } has no implementation for #{ _topic }."
           y << "(maybe defined `#{ m }` for #{ me.implementation.class }?)"

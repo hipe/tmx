@@ -25,8 +25,8 @@ module Skylab::Common
         #
         #     My_thing = Lazy_.call do
         #       ThingDing.prototype_by do |o|
-        #         o.method_name_for_identifying_key = :name_value_for_order
-        #         o.method_name_for_reference_key = :after_name_value_for_order
+        #         o.identifying_key_by = :name_value_for_order.to_proc
+        #         o.reference_key_by = :after_name_value_for_order.to_proc
         #       end
         #     end
         #     # ..

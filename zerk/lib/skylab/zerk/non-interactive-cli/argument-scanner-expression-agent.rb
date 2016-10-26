@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  module API
+  class NonInteractiveCLI
 
     class ArgumentScannerExpressionAgent
 
@@ -14,7 +14,7 @@ module Skylab::Zerk
       alias_method :calculate, :instance_exec
 
       def say_formal_operation_alternation_ st
-        _say_name_alternation :__say_formal_operation, st
+        _say_name_alternation :_same, st
       end
 
       def say_primary_alternation_ st
@@ -25,37 +25,39 @@ module Skylab::Zerk
 
         p = method m
 
-        st.join_into_with_by "", " or " do |name|
+        _mid = st.join_into_with_by "", " | " do |name|
           p[ name ]  # hi.
         end
-      end
 
-      def __say_formal_operation name
-        _same name
-      end
-
-      def say_formal_component_ name
-        _same name
-      end
-
-      def say_strange_primary_ name
-        _same name
-      end
-
-      def say_primary_ name
-        _same name
+        "{ #{ _mid } }"
       end
 
       def say_strange_arguments_head_ name
-        _same name
+        _same_inspect name
       end
 
       def say_arguments_head_ name
         _same name
       end
 
+      def say_primary_ name
+        "#{ DASH_ }#{ _same name }"
+      end
+
+      def say_strange_primary_ name
+        _same_inspect name
+      end
+
+      def say_formal_component_ name
+        _same_inspect name  # usually it reads weirdly without the quotes
+      end
+
+      def _same_inspect name
+        _same( name ).inspect
+      end
+
       def _same name
-        name.as_lowercase_with_underscores_symbol.inspect
+        name.as_slug
       end
     end
   end

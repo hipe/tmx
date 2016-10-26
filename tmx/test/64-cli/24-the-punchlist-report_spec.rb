@@ -39,7 +39,7 @@ module Skylab::TMX::TestSupport
         expect_failed
       end
 
-      it "wee CURRENTLY STUBBED AT OPERATION" do
+      it "generate it against a small set of four fixture" do
         invoke _subject_operation, 'punchlist'
         expect_on_stdout_lines_in_big_string __this_big_string
         expect_succeeded

@@ -51,8 +51,8 @@ module Skylab::Common::TestSupport
 
     X_s_ovdt_prototype = Home_::Lazy.call do
       subject_module[].prototype_by do |o|
-        o.method_name_for_identifying_key = :_my_name
-        o.method_name_for_reference_key = :_i_go_after
+        o.identifying_key_by = :_my_name.to_proc
+        o.reference_key_by = :_i_go_after.to_proc
       end
     end
 

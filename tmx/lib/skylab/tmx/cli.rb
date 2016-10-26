@@ -374,7 +374,7 @@ module Skylab::TMX
       end
 
       def _expression_agent
-        ExpressionAgent___.instance
+        Zerk_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
       end
 
       def _failed
@@ -547,61 +547,6 @@ module Skylab::TMX
     self  # legacy CLI class
   end
     end  # proc that wraps legacy CLI class
-
-    # ==
-
-    class ExpressionAgent___
-
-      class << self
-        def instance
-          @___instance ||= new
-        end
-        private :new
-      end  # >>
-
-      alias_method :calculate, :instance_exec
-
-      def say_formal_operation_alternation_ st
-        _say_name_alternation :_say_slug, st
-      end
-
-      def say_primary_alternation_ st
-        _say_name_alternation :say_primary_, st
-      end
-
-      def _say_name_alternation m, st
-
-        p = method m
-
-        _mid = st.join_into_with_by "", " | " do |name|
-          p[ name ]  # hi.
-        end
-
-        "{ #{ _mid } }"
-      end
-
-      def say_strange_arguments_head_ name
-        name.as_slug.inspect
-      end
-
-      def say_arguments_head_ name
-        name.as_slug
-      end
-
-      def say_primary_ name
-        "#{ DASH_ }#{ name.as_slug }"
-      end
-
-      def say_strange_primary_ name
-        name.as_slug.inspect
-      end
-
-      def _say_slug name
-        name.as_slug
-      end
-    end
-
-    # ==
 
      Looks_like_option = -> do
       d = DASH_.getbyte 0  # DASH_BYTE_

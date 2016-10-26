@@ -97,7 +97,7 @@ module Skylab::TMX
 
       def _when_no_implementation m, primary_sym, & emit
 
-        Here_::When_::Has_no_implementation[ m, primary_sym, me, emit ]
+        Here_::When_::Has_no_implementation[ m, primary_sym, self, emit ]
         UNABLE_
       end
 

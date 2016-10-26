@@ -17,6 +17,14 @@ module Skylab::TMX
 
     # ==
 
+    DEFINITION_FOR__ = -> do
+      s = @_json_file
+      d = s.rindex( ::File::SEPARATOR ) - 1
+      s[ s.rindex( ::File::SEPARATOR, d ) + 1 .. d ]
+    end
+
+    # ==
+
     Parsed___ = self
     class Parsed___
 
@@ -135,13 +143,15 @@ module Skylab::TMX
 
       # --
 
+      def filesystem_directory_entry_string
+        @___normal_name_string ||= get_filesystem_directory_entry_string.freeze
+      end
+
+      define_method :get_filesystem_directory_entry_string, DEFINITION_FOR__
+
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # --
-
-      def get_filesystem_directory_entry_string
-        ::File.basename ::File.dirname @_json_file
-      end
 
       attr_reader(
         :box,
@@ -165,9 +175,7 @@ module Skylab::TMX
         y << get_filesystem_directory_entry_string
       end
 
-      def get_filesystem_directory_entry_string
-        ::File.basename ::File.dirname @_json_file
-      end
+      define_method :get_filesystem_directory_entry_string, DEFINITION_FOR__
 
       attr_reader(
         :_json_file,

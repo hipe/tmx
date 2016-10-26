@@ -5,7 +5,7 @@ require 'skylab/tmx'
 
 module Skylab::Slicer
 
-  class SS_Dep__ < Home_::Modality_Adapters_::CLI
+  class SS_Dep__ < Home_::Modality_Adapters_::CLI  # is :[#001].
 
     def initialize( * )
 

@@ -1,4 +1,5 @@
 {
+  "after":"dora",
   "category":"second group",
   "cost":4,
   "doc test manifest": "whatever"

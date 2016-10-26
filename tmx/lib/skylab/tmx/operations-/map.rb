@@ -15,6 +15,7 @@ module Skylab::TMX
         @attributes_module_by = nil
         @_emit = p
         @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
+        @_seen_last_reorder_plan = false
         @_stream_modifiers_were_used = false
         @unparsed_node_stream = nil
       end
@@ -143,7 +144,14 @@ module Skylab::TMX
 
         plan = Home_::Models::Reorder::Plan_via_parse_client[ self, & @_emit ]
         if plan
-          _modifications.add_reorder_plan plan
+          if @_seen_last_reorder_plan
+            self._COVER_ME_reorderings_are_closed
+          else
+            if plan.produces_final_group_list
+              @_seen_last_reorder_plan = true
+            end
+            _modifications.add_reorder_plan plan
+          end
         else
           plan
         end

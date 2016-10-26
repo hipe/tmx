@@ -2,7 +2,7 @@ module Skylab::TMX
 
   class Magnetics_::GroupList_via_ItemList_and_Key_and_Options
 
-    # (laying down a path now for jumanji flumanji)
+    # (a popular way to sort)
 
     class << self
       alias_method :begin, :new

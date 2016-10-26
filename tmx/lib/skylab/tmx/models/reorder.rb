@@ -90,6 +90,10 @@ module Skylab::TMX
       attr_reader(
         :attribute,
       )
+
+      def produces_final_group_list
+        false
+      end
     end
 
     # ==

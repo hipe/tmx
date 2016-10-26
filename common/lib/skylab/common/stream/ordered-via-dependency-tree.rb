@@ -30,8 +30,8 @@ module Skylab::Common
     end
 
     attr_writer(
-      :method_name_for_identifying_key,  # `name_value_for_order`
-      :method_name_for_reference_key,  # `after_name_value_for_order`
+      :identifying_key_by,  # `name_value_for_order`
+      :reference_key_by,  # `after_name_value_for_order`
       :upstream,
     )
 
@@ -51,7 +51,8 @@ module Skylab::Common
       begin
         item = @_ready_buffer_queue.first.gets
         if item
-          _see_item item, item.send( @method_name_for_identifying_key )
+          _x = @identifying_key_by[ item ]
+          _see_item item, _x
           break
         end
         @_ready_buffer_queue[ 0, 1 ] = EMPTY_A_
@@ -78,9 +79,9 @@ module Skylab::Common
           break
         end
 
-        my_name_x = item.send @method_name_for_identifying_key
+        my_name_x = @identifying_key_by[ item ]
 
-        i_go_after_this_x = item.send @method_name_for_reference_key
+        i_go_after_this_x = @reference_key_by[ item ]
 
         _i_may_go_now = if i_go_after_this_x
           @_went_h.key? i_go_after_this_x
@@ -124,7 +125,9 @@ module Skylab::Common
 
         _line_a = @waiting_h.each_pair.map do | i, a |
           _i_a = a.map do | item |
-            item.send @method_name_for_identifying_key
+
+          @identifying_key_by[ item ]
+
           end
           "#{ i } <- ( #{ _i_a * ', ' } )"
         end
