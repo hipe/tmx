@@ -12,7 +12,7 @@ module Skylab::TMX::TestSupport
 
       it "strange primary - whines" do
         invoke _subject_operation, '-strange'
-        expect_on_stderr "unrecognized primary \"-strange\""
+        expect_on_stderr "unknown primary: \"-strange\""
         expect_on_stderr %r(\Aexpecting \{ -[a-z])
         expect_failed_normally_
       end

@@ -24,7 +24,7 @@ module Skylab::TMX::TestSupport
 
       def _expect_bad_primary same
         invoke _subject_operation, same
-        expect_on_stderr "unrecognized primary \"#{ same }\""
+        expect_on_stderr "unknown primary: \"#{ same }\""
         expect "expecting { -order | -select }"
         expect_failed_normally_
       end

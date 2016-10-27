@@ -14,10 +14,10 @@ module Skylab::TMX
       def initialize & p
         @attributes_module_by = nil
         @_emit = p
+        @_has_means = false
         @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
         @_seen_last_reorder_plan = false
         @_stream_modifiers_were_used = false
-        @unparsed_node_stream = nil
       end
 
       attr_writer(
@@ -30,7 +30,7 @@ module Skylab::TMX
             if @_stream_modifiers_were_used
               __modified_stream
             else
-              @unparsed_node_stream
+              _flush_unparsed_node_stream
             end
           else
             UNABLE_
@@ -85,20 +85,28 @@ module Skylab::TMX
         node_parser = Home_::Models_::Node::Parsed::Parser.new(
           @_modifications, @_attribute_cache._index, & @_emit )
 
-        @unparsed_node_stream.map_reduce_by do |node|
+        _flush_unparsed_node_stream.map_reduce_by do |node|
 
           node_parser.parse node
         end
+      end
+
+      def _flush_unparsed_node_stream
+        _p = remove_instance_variable :@_json_file_stream_by
+        _st = _p.call
+        _st || self._SANITY_or_cover_this
+        _st_ = Home_::Magnetics::UnparsedNodeStream_via::JSON_FileStream[ _st ]
+        _st_  # #todo
       end
 
       # -- hardcoded requireds check
 
       def __all_requireds_are_present
 
-        if @unparsed_node_stream
+        if @_has_means
           ACHIEVED_
         else
-          Here_::When_::Missing_requireds[ [ :@unparsed_node_stream ], @_emit ]
+          Here_::When_::Missing_requireds[ [ :unparsed_node_stream ], @_emit ]
         end
       end
 
@@ -107,14 +115,13 @@ module Skylab::TMX
       def __parse_modifiers
         ok = true
         until @argument_scanner.no_unparsed_exists
-          ok = __parse_argument_scanner_head
+          ok = __parse_one_primary_term
           ok || break
         end
         ok
       end
 
-      def __parse_argument_scanner_head
-
+      def __parse_one_primary_term
         m = @argument_scanner.match_head_against_primaries_hash PRIMARIES__
         if m
           @argument_scanner.advance_one
@@ -122,18 +129,11 @@ module Skylab::TMX
         end
       end
 
-      def when_unrecognized_primary ks_p, listener
-        @argument_scanner.when_unrecognized_primary ks_p, & listener
-      end
-
-      def get_primary_keys__
-        PRIMARIES__.keys
-      end
-
       PRIMARIES__ = {
         attributes_module_by: :__parse_attributes_module_by,
         order: :__parse_order_expression,
         json_file_stream: :__parse_json_file_stream,
+        json_file_stream_by: :__parse_json_file_stream_by,
         result_in_tree: :__parse_result_in_tree,
         select: :__parse_select_expression,
       }
@@ -172,20 +172,23 @@ module Skylab::TMX
         end
       end
 
-      # -- simple, argument-like primaries
+      # -- parse primaries (most complicated to least)
 
-      def __parse_attributes_module_by
-        _parse_into :@attributes_module_by
+      def __parse_json_file_stream_by
+        p = @argument_scanner.parse_primary_value :must_be_trueish
+        if p
+          @_has_means = true
+          @_json_file_stream_by = p
+          ACHIEVED_
+        end
       end
 
       def __parse_json_file_stream
-
-        x = @argument_scanner.parse_primary_value :must_be_trueish
-        if x
-          _x_ = Home_::Magnetics::UnparsedNodeStream_via::JSON_FileStream[ x ]
-          _store :@unparsed_node_stream, _x_
-        else
-          UNABLE_
+        st = @argument_scanner.parse_primary_value :must_be_trueish
+        if st
+          @_has_means = true
+          @_json_file_stream_by = -> { st }
+          ACHIEVED_
         end
       end
 
@@ -195,6 +198,10 @@ module Skylab::TMX
         else
           _when_contextually_invalid_primary
         end
+      end
+
+      def __parse_attributes_module_by
+        _parse_into :@attributes_module_by
       end
 
       # -- support for primaries
@@ -260,7 +267,7 @@ module Skylab::TMX
         end
       end
 
-      # --
+      # -- meta-support for parsing primaries
 
       def _current_primary_symbol
         @argument_scanner.current_primary_symbol

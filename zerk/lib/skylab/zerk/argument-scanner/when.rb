@@ -28,28 +28,77 @@ module Skylab::Zerk
 
       # ==
 
-      When::Unrecognized_primary = -> argument_scanner, ks_p, listener=argument_scanner.listener do
+      class When::UnknownPrimary
 
-        listener.call(
-          :error, :expression, :parse_error, :unrecognized_primary
-        ) do |y|
+        # this does the levenshtein-like (but not levenshtein) thing where
+        # we explicate valid alternatives.
+        #
+        #   - CLI (not API) frequently makes use of the "subtraction hash"
+        #     which must decidedly be taken into account when effecting this
+        #     UI expression behavior.
+        #
+        #   - otherwise, we want this UI expression behavior between CLI
+        #     and API to be identical (or more accurately, different in
+        #     the regular way as per the respective expression agents).
+        #
 
-          _name = argument_scanner.head_as_agnostic
+        class << self
+          alias_method :begin, :new
+          undef_method :new
+        end  # >>
 
-          _keys = ks_p[]
-
-          _name_st = Stream_.call _keys do |sym|
-            Common_::Name.via_variegated_symbol sym
-          end
-
-          y << "unrecognized primary #{ say_strange_primary_ _name }"
-
-          _this_or_this_or_this = say_primary_alternation_ _name_st
-
-          y << "expecting #{ _this_or_this_or_this }"
+        def initialize
+          @recognizable_normal_symbols_proc = nil
+          @subtraction_hash = nil
+          @terminal_channel_symbol = nil
         end
 
-        UNABLE_
+        attr_writer(
+          :listener,
+          :name_by,
+          :recognizable_normal_symbols_proc,
+          :subtraction_hash,
+          :terminal_channel_symbol,
+        )
+
+        def execute
+
+          ks_p = @recognizable_normal_symbols_proc
+          name_p = @name_by
+          sub_h = @subtraction_hash
+
+          _tcs = ( @terminal_channel_symbol || :unknown_primary )
+
+          @listener.call :error, :expression, :parse_error, _tcs do |y|
+
+            buffer = "unknown primary"
+            _name = name_p[]
+            s = say_strange_primary_ _name
+            if COLON_BYTE_ != s.getbyte(0)
+              buffer << COLON_
+            end
+            buffer << SPACE_
+            buffer << s
+            y << buffer
+
+            if ks_p
+
+              _keys = ks_p[]
+              sub_h ||= MONADIC_EMPTINESS_
+
+              _name_st = Stream_[ _keys ].map_reduce_by do |sym|
+
+                if ! sub_h[ sym ]
+                  Common_::Name.via_variegated_symbol sym
+                end
+              end
+              _this_or_this_or_this = say_primary_alternation_ _name_st
+              y << "expecting #{ _this_or_this_or_this }"
+            end
+            y  # important, covered
+          end
+          UNABLE_
+        end
       end
 
       # ==
@@ -57,6 +106,11 @@ module Skylab::Zerk
       Stream_ = -> a, & p do
         Common_::Stream.via_nonsparse_array a, & p  # on stack to move up
       end
+
+      # ==
+
+      COLON_ = ':'
+      COLON_BYTE_ = COLON_.getbyte 0
     end
   end
 end

@@ -120,14 +120,14 @@ module Skylab::TMX
 
     def initialize o, & emit
       @_emit = emit
-      @__json_file_stream = o.json_file_stream
+      @__json_file_stream_by = o.json_file_stream_by
     end
 
     def execute
 
       @_item_stream = Home_::API.call(
         :map,
-        :json_file_stream, ( remove_instance_variable :@__json_file_stream ),
+        :json_file_stream_by, remove_instance_variable( :@__json_file_stream_by ),
         :attributes_module_by, -> { Home_::Attributes_ },
         :order, :after,
         :select, :category,

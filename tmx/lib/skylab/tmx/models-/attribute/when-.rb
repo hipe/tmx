@@ -112,8 +112,6 @@ module Skylab::TMX
       # ==
 
       # ==
-
-      MONADIC_EMPTINESS_ = -> _ { NOTHING }
     end
   end
 end

@@ -59,7 +59,7 @@ module Skylab::TMX
 
       PRIMARIES___ = {
         execute: :__when_head_is_execute,
-        json_file_stream: :__when_head_is_json_file_stream,
+        json_file_stream_by: :__when_head_is_json_file_stream_by,
         list: :__when_head_is_list,
       }
 
@@ -78,12 +78,12 @@ module Skylab::TMX
         _parse_mutex_operation
       end
 
-      def __when_head_is_json_file_stream
+      def __when_head_is_json_file_stream_by
 
         @argument_scanner.advance_one
-        st = @argument_scanner.parse_primary_value :must_be_trueish
-        if st
-          ( @__for_reports ||= ForReports___.new ).json_file_stream = st
+        p = @argument_scanner.parse_primary_value :must_be_trueish
+        if p
+          ( @__for_reports ||= ForReports___.new ).json_file_stream_by = p
           ACHIEVED_
         end
       end
@@ -174,7 +174,7 @@ module Skylab::TMX
       Box_via_autoloaderized_module_[ Home_::Reports_ ]
     end
 
-    ForReports___ = ::Struct.new :json_file_stream
+    ForReports___ = ::Struct.new :json_file_stream_by
 
     # ==
   end

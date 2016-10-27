@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module API
 
-    class ArgumentScanner
+    class ArgumentScanner < Home_::ArgumentScanner::CommonImplementation
 
       # (currently being frontiered by [tmx])
 
@@ -17,34 +17,52 @@ module Skylab::Zerk
         if x_a.length.zero?
           @no_unparsed_exists = true
         else
-          @listener = l
-          @scn = Common_::Polymorphic_Stream.via_array x_a
+          __initialize_normally x_a, l
         end
       end
 
-      def match_head_against_primaries_hash h
-        Home_::ArgumentScanner::Magnetics::PrimaryNameValue_via_Hash[ self, h ]
+      def __initialize_normally x_a, l
+
+        @_scn = Common_::Polymorphic_Stream.via_array x_a
+        @_current_token = @_scn.method :current_token
+
+        @__knownness_of_head_as_primary = method :__knownness_of_head_as_primary
+        @listener = l
+        NIL
       end
 
-      def parse_primary_value * x_a
-        parse_primary_value_via_parse_request parse_parse_request x_a
+      def pair_via_match_head_against_primaries_hash_ h
+
+        Home_::ArgumentScanner::Magnetics::FormalPrimary_via.begin(
+          @__knownness_of_head_as_primary,
+          self,
+        ).flush_to_pair_via_primaries_hash h
       end
 
-      def parse_parse_request x_a
-        Home_::ArgumentScanner::Magnetics::ParseRequest_via_Array[ x_a ]
+      def __knownness_of_head_as_primary
+
+        x = @_current_token.call
+        if x
+          Common_::Known_Known[ x ]
+        else
+          self._COVER_ME
+          Home_::ArgumentScanner::Known_unknown_with_reason.call(
+            :_falsish_value_when_token_expected_,
+          )
+        end
       end
 
-      def parse_primary_value_via_parse_request req
-        Home_::ArgumentScanner::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]
+      def head_as_primary_symbol_
+        @_current_token.call
       end
 
       def current_token_as_is
-        @scn.current_token
+        @_current_token.call
       end
 
       def advance_one
-        @scn.advance_one
-        @no_unparsed_exists = @scn.no_unparsed_exists
+        @_scn.advance_one
+        @no_unparsed_exists = @_scn.no_unparsed_exists
         @_cache_ = nil
       end
 
@@ -64,9 +82,9 @@ module Skylab::Zerk
 
       define_singleton_method :cached, DEFINITION_FOR_THE_METHOD_CALLED_CACHED_
 
-      cached :head_as_agnostic do
+      cached :head_as_strange_name do
 
-        x = @scn.current_token
+        x = @_scn.current_token
         if x.respond_to? :id2name
           Common_::Name.via_variegated_symbol x
         else
@@ -74,22 +92,11 @@ module Skylab::Zerk
         end
       end
 
-      def head_as_normal_symbol_for_primary
-        k = @scn.current_token
-        @current_primary_symbol = k
-        k
-      end
-
       def head_as_normal_symbol
-        @scn.current_token
-      end
-
-      def when_unrecognized_primary ks_p, & emit
-        Home_::ArgumentScanner::When::Unrecognized_primary[ self, ks_p, emit ]
+        @_scn.current_token
       end
 
       attr_reader(
-        :current_primary_symbol,
         :listener,
         :no_unparsed_exists,
       )

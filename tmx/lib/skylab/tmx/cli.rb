@@ -130,7 +130,7 @@ module Skylab::TMX
 
           o.front_scanner_tokens :reports
 
-          o.subtract_primary :json_file_stream, _flush_json_file_stream_proc
+          o.subtract_primary :json_file_stream_by, _release_json_file_stream_by
 
           o.default_primary :execute
 
@@ -212,7 +212,9 @@ module Skylab::TMX
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
-          o.subtract_primary :json_file_stream, _flush_json_file_stream_proc
+          o.subtract_primary :json_file_stream_by, _release_json_file_stream_by
+
+          o.subtract_primary :json_file_stream  # used in testing, never in UI
 
           o.subtract_primary :attributes_module_by, -> { Home_::Attributes_ }
 
@@ -225,80 +227,14 @@ module Skylab::TMX
       end
 
       def __receive_argument_scanner_emission * i_a, & em_p
-        send WHEN__.fetch i_a.last
-      end
-
-      def __receive_map_emission * i_a, & ev_p
-        m = WHEN__[ i_a.last ]
-        if m
-          send m
-        else
-          @_emit[ * i_a, & ev_p ]
-        end
+        # hi. (used to intercept & map)
+        @_emit.call( * i_a, & em_p )
         NIL
       end
 
-      # --
-
-      # when any of:
-      #
-      #   - the [ze] argument scanner adapter (adapting from the "CLI way"
-      #     to the "API way") expects to scan a primary but the current
-      #     token doesn't start with a "-" (DASH) OR
-      #
-      #   - that same adapter encounters a well-formed primary-looking
-      #     token BUT the backend knows of no primary by that name OR
-      #
-      #   - that same adapter encounters a well-formed, existent primary
-      #     in the user ARGV but that primary has been "subtracted" from
-      #     use;
-      #
-      # we want that the expression behavior of our UI is *identitcal* for
-      # all the above cases. as such we need to override the default
-      # expression behavior that occurrs variously in the [ze] adapter and
-      # our own API operation for the above cases.
-      #
-      #   - for cases where the [ze] adapter would have done the expression,
-      #     we are overriding default, minimal ("stub") expression behavior.
-      #
-      #   - for cases where we are overriding our own backend API opertion
-      #     expression behavior, we are doing so in part because the API
-      #     operation does a levenshtein (or not) explication of all available
-      #     modifiers, including any that have been subtracted here. we don't
-      #     want the API space to have to know about what "subtraction" even
-      #     is, so instead we just override the emission, in a perfect (if
-      #     somewhat weedy) utilization of our event model.
-
-      WHEN__ = {
-        subtracted_primary_referenced: :__when_subtracted,
-        unknown_primary_or_operator: :__when_unknown,
-        unrecognized_primary: :__when_unrecognized,
-      }
-
-      def __when_subtracted
-        _when_bad_primary  # hi.
-      end
-
-      def __when_unknown
-        _when_bad_primary  # hi.
-      end
-
-      def __when_unrecognized
-        _when_bad_primary  # hi.
-      end
-
-      def _when_bad_primary
-
-        op = @API_invocation_.operation_session
-
-        subtract = @_argument_scanner.subtraction_hash
-
-        _use_these = op.get_primary_keys__.reject do |sym|
-          subtract[ sym ]
-        end
-
-        op.when_unrecognized_primary -> { _use_these }, @_emit
-
+      def __receive_map_emission * i_a, & ev_p
+        # hi. (used to intercept & map)
+        @_emit.call( * i_a, & em_p )
         NIL
       end
 
@@ -313,9 +249,8 @@ module Skylab::TMX
         as
       end
 
-      def _flush_json_file_stream_proc
-        _ = remove_instance_variable( :@__json_file_stream_proc ).call
-        _  # #todo
+      def _release_json_file_stream_by
+        remove_instance_variable :@__json_file_stream_proc
       end
 
       def _bound_call_via_API_invocation o

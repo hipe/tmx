@@ -34,7 +34,7 @@ module Skylab::Zerk::TestSupport
         _no = scn.no_unparsed_exists
         _no && fail
 
-        _sym = scn.head_as_normal_symbol_for_primary
+        _sym = scn.head_as_primary_symbol
         _sym == :ding_dong || fail
 
         scn.advance_one
@@ -50,7 +50,7 @@ module Skylab::Zerk::TestSupport
         _no = scn.no_unparsed_exists
         _no && fail
 
-        _sym = scn.head_as_normal_symbol_for_primary
+        _sym = scn.head_as_primary_symbol
         _sym == :zing_bling || fail
 
         scn.advance_one
@@ -84,7 +84,7 @@ module Skylab::Zerk::TestSupport
           o.listener el.handle_event_selectively
         end
 
-        _no = scn.head_as_normal_symbol_for_primary
+        _no = scn.head_as_primary_symbol
 
         false == _no || fail
 
@@ -111,7 +111,7 @@ module Skylab::Zerk::TestSupport
           o.listener el.handle_event_selectively
         end
 
-        _sym = scn.head_as_normal_symbol_for_primary
+        _sym = scn.head_as_primary_symbol
         _sym == :ding_dong || fail
 
         scn.advance_one
@@ -125,7 +125,7 @@ module Skylab::Zerk::TestSupport
 
         scn.no_unparsed_exists && fail
 
-        _failed = scn.head_as_normal_symbol_for_primary
+        _failed = scn.head_as_primary_symbol
         _failed == false || fail
 
         em = el.gets
@@ -143,7 +143,13 @@ module Skylab::Zerk::TestSupport
     end
 
     X_niCLI_mmas_EXPAG = class X_niCLI_mmas_Expag
+
       alias_method :calculate, :instance_exec
+
+      def say_strange_primary_ name
+        name.as_slug.inspect
+      end
+
       new
     end
 

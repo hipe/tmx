@@ -40,7 +40,7 @@ module Skylab::TMX::TestSupport
       dangerous_memoize_ :front_ do
 
         o = subject_module_.new( & method( :fail ) )
-        o.fast_lookup = -> _ do end  # MONADIC_EMPTINESS_
+        o.fast_lookup = Home_::MONADIC_EMPTINESS_
         o.unbound_stream_builder = -> do
           Common_::Stream.the_empty_stream
         end

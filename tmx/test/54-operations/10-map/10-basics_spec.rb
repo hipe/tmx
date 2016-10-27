@@ -69,7 +69,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "explains" do
-        _lines.first == "unrecognized primary :zoingo" || fail
+        _lines.first == "unknown primary :zoingo" || fail
       end
 
       it "offers alternatives" do

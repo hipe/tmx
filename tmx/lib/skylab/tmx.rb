@@ -174,6 +174,7 @@ module Skylab::TMX
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
   EMPTY_S_ = ''
+  MONADIC_EMPTINESS_ = -> _ { NOTHING }
   NIL_ = nil
   NOTHING_ = nil
   Home_ = self

@@ -27,11 +27,13 @@ module Skylab::TMX
 
         listener.call :error, :expression, :parse_error, :contextually_invalid do |y|
 
-          means = Misc_hard_coded_dependency_reflection__[].fetch sym
+          _means = Misc_hard_coded_dependency_reflection__[].fetch sym
 
-          _me = means.say_self_via_symbol sym, self
+          exp = _means.sayer_under self
 
-          _dep = means.say_dependency_under self
+          _me = exp.say_self
+
+          _dep = exp.say_dependency
 
           y << "#{ _me } must occur after #{ _dep }."
         end
@@ -46,13 +48,13 @@ module Skylab::TMX
 
           h = Misc_hard_coded_dependency_reflection__[]
 
-          missing_ivar_a.each do |ivar|
+          missing_ivar_a.each do |key|
 
-            means = h.fetch ivar
+            exp = h.fetch( key ).sayer_under self
 
-            _me = means.say_self_via_ivar ivar, self
+            _me = exp.say_self
 
-            _dep = means.say_dependency_under self
+            _dep = exp.say_dependency
 
             y << "#{ _me } was not resolved. (use #{ _dep }.)"
           end
@@ -68,11 +70,24 @@ module Skylab::TMX
 
         # hypothetically we can generate some of this with [ta] magnetics meh
 
-        o = Home_::Models_::Means
-        {
-          :result_in_tree => o[ :primary, :order, :primary ],
-          :@unparsed_node_stream => o[ :primary, :json_file_stream, :human ],
-        }
+        h = {}
+
+        o = -> sym, & defn do
+          means = Home_::Models_::Means.define sym, & defn
+          h[ means.normal_symbol ] = means
+        end
+
+        o.call :result_in_tree do |y|
+          y.yield :is_expressed_as, :primary
+          y.yield :depends_on, :order, :which_is_expressed_as, :primary
+        end
+
+        o.call :unparsed_node_stream do |y|
+          y.yield :is_expressed_as, :human
+          y.yield :depends_on, :json_file_stream, :which_is_expressed_as, :primary
+        end
+
+        h
       end
 
       # ==

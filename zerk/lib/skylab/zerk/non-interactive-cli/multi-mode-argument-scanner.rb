@@ -44,7 +44,7 @@ module Skylab::Zerk
     #     add (or perhaps unintentionally mask) primaries not recognized by
     #     the back. this facility must be mostly transparent to the back.
 
-    class MultiModeArgumentScanner
+    class MultiModeArgumentScanner < Home_::ArgumentScanner::CommonImplementation
 
       class << self
         def define
@@ -199,34 +199,20 @@ module Skylab::Zerk
           @subtraction_hash = h
         end
 
-        def match_head_against_primaries_hash h
-          Home_::ArgumentScanner::Magnetics::PrimaryNameValue_via_Hash[ self, h ]
+        def pair_via_match_head_against_primaries_hash_ h
+          _begin_formal_primary_parser.flush_to_pair_via_primaries_hash h
         end
 
-        def parse_primary_value * x_a
-          parse_primary_value_via_parse_request parse_parse_request x_a
-        end
-
-        def parse_parse_request x_a
-          Home_::ArgumentScanner::Magnetics::ParseRequest_via_Array[ x_a ]
-        end
-
-        def parse_primary_value_via_parse_request req
-          Home_::ArgumentScanner::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]
-        end
-
-        def head_as_normal_symbol_for_primary
-          sym = @_scn.head_as_normal_symbol_for_primary_
-          @current_primary_symbol = sym
-          sym
+        def head_as_primary_symbol_
+          _begin_formal_primary_parser.flush_to_primary_symbol
         end
 
         def head_as_normal_symbol
           @_scn.head_as_normal_symbol_
         end
 
-        def head_as_agnostic
-          @_scn.head_as_agnostic_
+        def head_as_strange_name
+          @_scn.head_as_strange_name_
         end
 
         def current_token_as_is
@@ -235,7 +221,7 @@ module Skylab::Zerk
 
         def advance_one
           @_scn.advance_one_
-          if @_scn.no_unparsed_exists_
+          if @_scn._no_unparsed_exists_
             if @_scn_scn.no_unparsed_exists
               remove_instance_variable :@_scn_scn
               remove_instance_variable :@_scn
@@ -247,8 +233,14 @@ module Skylab::Zerk
           NIL
         end
 
-        def when_unrecognized_primary ks_p, & emit
-          Home_::ArgumentScanner::When::Unrecognized_primary[ self, ks_p, emit ]
+        def _begin_formal_primary_parser
+
+          o = Home_::ArgumentScanner::Magnetics::FormalPrimary_via.begin(
+            @_scn._knownness_of_head_as_primary_by_,
+            self,
+          )
+          o.subtraction_hash = @subtraction_hash
+          o
         end
 
         attr_reader(
@@ -263,11 +255,15 @@ module Skylab::Zerk
 
       class FrontTokens___
 
+        # these (if present) must be an array of symbols. they are merely
+        # for indicating to the backend API which operation we are trying
+        # to reach.
+
         def initialize front_tokens
           @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
         end
 
-        def head_as_agnostic_
+        def head_as_strange_name_
           Common_::Name.via_variegated_symbol @_real_scn.current_token
         end
 
@@ -281,11 +277,11 @@ module Skylab::Zerk
 
         def advance_one_
           @_real_scn.advance_one
-          @no_unparsed_exists_ = @_real_scn.no_unparsed_exists ; nil
+          @_no_unparsed_exists_ = @_real_scn.no_unparsed_exists ; nil
         end
 
         attr_reader(
-          :no_unparsed_exists_,
+          :_no_unparsed_exists_,
         )
       end
 
@@ -293,32 +289,37 @@ module Skylab::Zerk
 
       class FixedPrimaries___
 
+        # these are for implementing the other side of "subtraction"
+        # (and perhaps one day defaults).
+
         def initialize mid_scanner_pairs
-          @_real_scn = Common_::Polymorphic_Stream.via_array mid_scanner_pairs
+
           @_is_pointing_at_name = true
+          @_knownness_of_head_as_primary_by_ = method :__knownness_of_head_as_primary
+          @_real_scn = Common_::Polymorphic_Stream.via_array mid_scanner_pairs
         end
 
-        def head_as_normal_symbol_for_primary_
-          _head_as_normal_symbol
+        def __knownness_of_head_as_primary
+          if @_is_pointing_at_name
+            Common_::Known_Known[ @_real_scn.current_token.name_x ]
+          else
+            self._IF_EVER_THEN_WHY
+          end
         end
 
-        def head_as_normal_symbol_
-          _head_as_normal_symbol
-        end
-
-        def head_as_agnostic_
-          _sym = _head_as_normal_symbol
+        def head_as_strange_name_
+          _sym = head_as_normal_symbol_
           _ = Common_::Name.via_variegated_symbol _sym
           _  # #todo
         end
 
-        def _head_as_normal_symbol
+        def head_as_normal_symbol_
           if @_is_pointing_at_name
             @_real_scn.current_token.name_x
           else
             x = @_real_scn.current_token.value_x
             if ! x.respond_to? :id2name
-              Home_._MAYBE_CHECK_YOUR_VALUE
+              self._IF_EVER_THEN_WHY_2
             end
             x
           end
@@ -340,7 +341,7 @@ module Skylab::Zerk
             if @_real_scn.no_unparsed_exists
               remove_instance_variable :@_is_pointing_at_name
               remove_instance_variable :@_real_scn
-              @no_unparsed_exists_ = true
+              @_no_unparsed_exists_ = true
             else
               @_is_pointing_at_name = true
             end
@@ -349,13 +350,17 @@ module Skylab::Zerk
         end
 
         attr_reader(
-          :no_unparsed_exists_,
+          :_no_unparsed_exists_,
+          :_knownness_of_head_as_primary_by_,
         )
       end
 
       # ==
 
       class UserScanner___
+
+        # this is the workhorse internal parser - the one that translates
+        # CLI-shaped arguments to API-shaped ones.
 
         def initialize sub_h, user_scn, dp_kn, listener
 
@@ -368,42 +373,31 @@ module Skylab::Zerk
           end
 
           @_listener = listener
+          @_knownness_of_head_as_primary_by_ = method :__knownness_of_head_as_primary
           @_real_scn = user_scn
           @_subtracted = sub_h
         end
 
-        def head_as_normal_symbol_for_primary_
+        def __knownness_of_head_as_primary
 
           s = @_real_scn.current_token
           if DASH_BYTE_ == s.getbyte(0)
             sym = s[ 1..-1 ].gsub( DASH_, UNDERSCORE_ ).intern
             if @_subtracted[ sym ]
-              __when_subtracted_primary_is_referenced
+              _known_unknown_via_slug :_subtracted_, s
             else
-              sym
+              Common_::Known_Known[ sym ]
             end
           elsif @_has_default_primary
             @_default_primary_was_read = true
-            @__default_primary_symbol
+            Common_::Known_Known[ @__default_primary_symbol ]
           else
-            __when_does_not_look_like_primary
+            _known_unknown_via_slug :_malformed_surface_representation_, s
           end
         end
 
-        def __when_subtracted_primary_is_referenced
-          _when_bad_primary :subtracted_primary_referenced
-        end
-
-        def __when_does_not_look_like_primary
-          _when_bad_primary :unknown_primary_or_operator
-        end
-
-        def _when_bad_primary sym
-          s = @_real_scn.current_token
-          @_listener.call :error, :expression, :parse_error, sym do |y|
-            y << "unknown primary: #{ s.inspect }"
-          end
-          UNABLE_
+        def _known_unknown_via_slug sym, slug
+          Home_::ArgumentScanner::Known_unknown_with_reason[ sym ]
         end
 
         def head_as_normal_symbol_
@@ -411,7 +405,7 @@ module Skylab::Zerk
           _s.gsub( DASH_, UNDERSCORE_ ).intern
         end
 
-        def head_as_agnostic_
+        def head_as_strange_name_
           _s = @_real_scn.current_token
           Common_::Name.via_slug _s
         end
@@ -431,14 +425,15 @@ module Skylab::Zerk
         def __advance_one_normally
           @_real_scn.advance_one
           if @_real_scn.no_unparsed_exists
-            @no_unparsed_exists_ = true
+            @_no_unparsed_exists_ = true
           end
           NIL
         end
 
         attr_reader(
           :current_primary_symbol,
-          :no_unparsed_exists_,
+          :_knownness_of_head_as_primary_by_,
+          :_no_unparsed_exists_,
         )
       end
 

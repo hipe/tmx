@@ -77,7 +77,7 @@ module Skylab::TMX
 
       def __when_operation_not_found bx
 
-        x = @argument_scanner.head_as_agnostic
+        x = @argument_scanner.head_as_strange_name
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
