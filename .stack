@@ -16,4 +16,3 @@ utility to replace (generate) greenlist, etc. 'tmx-notes.json'
 -3 write a task to update semi-real costs (a bash script loop)
 -4 add a randomize option to the below (for now only toplevel, later etc)
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
--6 regenerate the punchlist with that crazy algo (might require renaming)

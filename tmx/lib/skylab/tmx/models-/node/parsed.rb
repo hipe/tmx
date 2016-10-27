@@ -162,6 +162,14 @@ module Skylab::TMX
 
     class Unparsed
 
+      # ==
+      Stream_via_json_file_stream = -> file_stream do
+        file_stream.map_by do |path|
+          Unparsed.via_json_file_path path
+        end
+      end
+      # ==
+
       class << self
         alias_method :via_json_file_path, :new
         undef_method :new

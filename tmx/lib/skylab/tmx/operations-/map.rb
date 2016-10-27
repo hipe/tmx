@@ -30,7 +30,7 @@ module Skylab::TMX
             if @_stream_modifiers_were_used
               __modified_stream
             else
-              _flush_unparsed_node_stream
+              _flush_to_unparsed_node_stream
             end
           else
             UNABLE_
@@ -85,18 +85,22 @@ module Skylab::TMX
         node_parser = Home_::Models_::Node::Parsed::Parser.new(
           @_modifications, @_attribute_cache._index, & @_emit )
 
-        _flush_unparsed_node_stream.map_reduce_by do |node|
-
-          node_parser.parse node
+        st = _flush_to_unparsed_node_stream
+        if st
+          st.map_reduce_by do |node|
+            node_parser.parse node
+          end
         end
       end
 
-      def _flush_unparsed_node_stream
+      def _flush_to_unparsed_node_stream
+
         _p = remove_instance_variable :@_json_file_stream_by
-        _st = _p.call
-        _st || self._SANITY_or_cover_this
-        _st_ = Home_::Magnetics::UnparsedNodeStream_via::JSON_FileStream[ _st ]
-        _st_  # #todo
+
+        st = _p.call( & @_emit )
+        if st
+          Home_::Models_::Node::Parsed::Unparsed::Stream_via_json_file_stream[ st ]
+        end
       end
 
       # -- hardcoded requireds check
@@ -310,4 +314,3 @@ module Skylab::TMX
   end
 end
 # #pending-rename: branch down
-# #tombstone: temporary: report on no files found for glob

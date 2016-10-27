@@ -8,8 +8,8 @@ _pn_s_a = [ ::File.basename( $PROGRAM_NAME ) ]
 
 cli = _client_class.new $stdin, $stdout, $stderr, _pn_s_a
 
-cli.json_file_stream_by do
-  self._XX_enjoy
+cli.json_file_stream_by do |&p|
+  Skylab::TMX.development_directory_json_file_stream__( & p )
 end
 
 d = cli.invoke ARGV

@@ -11,23 +11,18 @@ module Skylab::TMX
 
   class << self
 
-    def to_common_unparsed_node_stream__
-
-      dir = ::File.expand_path '../../..', dir_path  # sidesys_path_
-
-      stat = ::File.lstat dir
-
-      if stat.symlink?
-        dir_ = ::File.readlink dir
+    def development_directory_json_file_stream__ & emit
+      _dir = __lookup_development_directory
+      glob = ::File.join _dir, '*', '.for-tmx-map.json'
+      files = ::Dir.glob glob
+      if files.length.zero?
+        emit.call :error, :expression, :zero_nodes do |y|
+          y << "found no files for #{ glob }"
+        end
+        UNABLE_
       else
-        dir_ = dir
+        Stream_[ files ]
       end
-
-      _yikes = ::File.dirname dir_
-
-      Home_::Magnetics::
-        UnparsedNodeStream_via::DevelopmentDirectory.call(
-          _yikes, ::Dir, ::File )
     end
 
     def build_sigilized_sidesystem_stream_plus stem
@@ -86,6 +81,19 @@ module Skylab::TMX
       o.participating_exe_prefix = 'tmx-'
 
       o.done
+    end
+
+    def __lookup_development_directory
+
+      dir = ::File.expand_path '../../..', dir_path  # sidesys_path_
+
+      stat = ::File.lstat dir
+
+      if stat.symlink?  # #todo this is explained somewhere
+        dir = ::File.readlink dir
+      end
+
+      ::File.dirname dir
     end
 
     def lib_
