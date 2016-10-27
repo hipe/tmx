@@ -53,7 +53,8 @@
 
 [#027] #hole ( #moved-to: [#dt-XXX] )
 [#026] #hole ( #moved-to: [#dt-XXX] )
-[#025] #hole ( #moved-to: [#dt-XXX] )
+[#025]       slowie..
+             ( #moved-to: [#dt-XXX] )
 
 [#024]       [ the "subdivide" script ]
              ( #was: "verbosity" module REMOVED because ancient )
@@ -83,7 +84,8 @@
                (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
 
-[#012]       [ file coverage ]
+[#012] #open [ file coverage ] hasn't been working since whenever, do whenever,
+             see other nearby notes.
              (#moved-to: [xx])
              ( #was: [#xx-006] )
              ( #was: #done #parent-node: [#015] setup vs example? )

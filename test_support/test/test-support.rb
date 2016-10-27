@@ -108,6 +108,6 @@ module Skylab::TestSupport::TestSupport
 
   Lazy_ = Common_::Lazy
   TS_ = self
-
+  UNABLE_ = false
 end
 # :+tombstone: 'mock_FS' as bundle

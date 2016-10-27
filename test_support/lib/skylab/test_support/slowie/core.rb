@@ -1,9 +1,109 @@
-module Skylab
+module Skylab::TestSupport
 
-  module TestSupport
+  class Slowie  # intro at [#025]
 
-    class Tree_Runner
+    module API ; class << self
 
+      def call * a, & listener
+
+        _scn = _scanner_via_array a, listener
+
+        bc = API_Invocation__.new( _scn, listener ).to_bound_call
+        if bc
+          bc.receiver.send bc.method_name, * bc.args, & bc.block
+        else
+          UNABLE_
+        end
+      end
+
+      def _scanner_via_array a, l
+        Require_zerk_[]
+        Zerk_::API::ArgumentScanner.via_array a, & l
+      end
+    end ; end  # >>
+
+    API_Invocation__ = self
+
+    def initialize scn, l
+      @argument_scanner = scn
+      @listener = l
+    end
+
+    # -- ad-hoc operation routing
+
+    def to_bound_call
+      if @argument_scanner.no_unparsed_exists
+        self._COVER_ME_no_arguments
+      else
+        __to_bound_call_when_arguments
+      end
+    end
+
+    def __to_bound_call_when_arguments
+      tuple = @argument_scanner.match_head_against_primaries_hash Primaries_hash___[]
+      if tuple
+        send( * tuple )
+      end
+    end
+
+    Primaries_hash___ = Lazy_.call do
+
+      # like boxxy but more simplified and rigid and ad-hoc.
+      # tracked by #[#ze-050] (similar elsewhere).
+
+      h = {
+        ping: [ :__bound_call_via_method, :__invoke_ping ],
+      }
+
+      st = Here_::Operations.entry_tree.to_state_machine_stream
+      begin
+        sm = st.gets
+        sm || break
+        name = Common_::Name.via_slug sm.entry_group_head
+
+        h[ name.as_lowercase_with_underscores_symbol ] =
+          [ :__bound_call_for_item, name ]
+
+        redo
+      end while above
+      h
+    end
+
+    def __bound_call_for_item name
+
+      @argument_scanner.advance_one
+
+      _class = Here_::Operations.const_get name.as_camelcase_const_string, false
+
+      _operation = _class.new do
+        self  # whatever resources (listeners, argument scanners) (if any)
+              # the operation uses, it opts-in to reading them in this way.
+      end
+              # the only API that we assume on the operation is this:
+
+      Common_::Bound_Call.via_receiver_and_method_name _operation, :execute
+    end
+
+    def __bound_call_via_method m
+
+      Common_::Bound_Call.via_receiver_and_method_name self, m
+    end
+
+    # -- method-based operations
+
+    def __invoke_ping
+
+      # (note we don't bother checking if argscn is empty. it isn't)
+
+      @listener.call :info, :expression, :ping do |y|
+
+        y << "ping: #{ self.class.name }"
+      end
+
+      :_hello_from_slowie_
+    end
+
+      if false
       def initialize _, o, e, a, env
 
         @argv = a
@@ -257,10 +357,20 @@ module Skylab
       end
 
       COVERAGE_SWITCH___ = '--coverage'
+      end  # if false
 
       # ~
 
+    # -- for operations:
 
+    attr_reader(
+      :argument_scanner,
+      :listener,
+    )
+
+    # --
+
+    if false
     class Expression_Agent___  # #todo after :+#dev cull this
 
       alias_method :calculate, :instance_exec
@@ -348,7 +458,9 @@ module Skylab
         Home_.lib_.human::NLP::EN::POS
       end
     end
+    end  # if false
 
+      if false
       HERE_ = ::File.expand_path '..', __FILE__
 
       Plugins__= ::Module.new
@@ -356,6 +468,8 @@ module Skylab
       Tree_Runner_ = self
 
       UNDERSCORE_ = '_'.freeze  # we need our own because [#002]
-    end
+      end  # if false
+
+    Here_ = self
   end
 end

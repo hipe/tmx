@@ -175,4 +175,3 @@ module Skylab::TMX::TestSupport
 # ->
   end
 end
-# #pending-rename

@@ -1,10 +1,35 @@
 module Skylab::TestSupport
 
-  class Tree_Runner
+  class Slowie
 
-    class Plugins__::Express_Coverage
+    class Operations::Cover
 
-      class Back  # assume coverage has been requested
+      def initialize
+        o = yield
+        @_argument_scanner = o.argument_scanner
+        @_emit = o.listener
+      end
+
+      def execute
+        if @_argument_scanner.no_unparsed_exists
+          __express_furloughed
+        else
+          self._COVER_ME_extra_arguments
+        end
+      end
+
+      def __express_furloughed
+
+        @_emit.call :error, :expression, :furloughed do |y|
+          y << "\"cover\" is furloughed, probably won't be on for a while (is [#012])"
+        end
+
+        UNABLE_
+      end
+
+        if false
+
+        # assume coverage has been requested
 
         def initialize resources, & oes_p
 
@@ -49,7 +74,9 @@ module Skylab::TestSupport
           @serr.puts '(coverage plugin has seen the exit)'
           nil
         end
+        end  # if false
 
+        if false
         class Stateful_Matcher___
 
           # decide whether or not you want each file (whose paths are each
@@ -191,8 +218,9 @@ module Skylab::TestSupport
             end
           end
         end  # stateful matcher
-      end  # back
+        end  # if false
 
+      if false
       # ~ as plugin (we have to re-write looking like a plugin because [#002])
 
       class << self
@@ -217,7 +245,8 @@ module Skylab::TestSupport
       EMPTY_A_ = []
       SEP__ = ::File::SEPARATOR
       UNABLE_ = false
+      end  # if false
 
-    end
-  end
+    end  # this operation
+  end  # slowie
 end

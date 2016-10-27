@@ -1,4 +1,4 @@
-# a stem paraphernalia model :[#025]
+# the stem paraphernalia model :[#025]
 
 ## overview
 
@@ -87,5 +87,3 @@ test suite solutions and testing idioms pursuant to the user's choices.
 
 we are hacking the parse of the assignment operator because to do it
 correctly with regex is difficult..
-
-  - #pending-rename

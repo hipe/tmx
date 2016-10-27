@@ -81,7 +81,7 @@ module Skylab::Zerk
 
         _pxy = CLI_Proxy___.new @main_view_controller
 
-        o = Home_::NonInteractiveCLI::Express_Result___.new x, _pxy
+        o = Home_::CLI::ExpressResult.new x, _pxy
 
         o.puts = -> s do
           @serr.puts s

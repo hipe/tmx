@@ -1,8 +1,8 @@
 module Skylab::Zerk
 
-  class NonInteractiveCLI
+  module CLI
 
-    class Express_Result___ < Common_::Actor::Dyadic
+    class ExpressResult < Common_::Actor::Dyadic
 
       # #tracked-by [#022]: we no longer display the count of items when stream..
 
@@ -223,4 +223,3 @@ module Skylab::Zerk
     end
   end
 end
-# #pending-rename: promote up to CLI lib..

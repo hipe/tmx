@@ -132,7 +132,7 @@ module Skylab::Zerk
         if @__did_emit_error
           exitstatus_for_ :component_rejected_request  # observe [#026]
         else
-          Here_::Express_Result___[ x, self ]  # see
+          Home_::CLI::ExpressResult[ x, self ]  # see
           @_exitstatus
         end
       else

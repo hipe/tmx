@@ -61,7 +61,7 @@ module Skylab::Zerk
     end
 
     def make_view_maker__ event_loop, rsx
-      Here_::Frame_ViewController___.new(
+      Here_::MainViewController___.new(
         event_loop.method( :top_frame ),
         rsx,
         @_compound_frame_view_controller,

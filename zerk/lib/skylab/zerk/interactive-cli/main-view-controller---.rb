@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  class Frame_ViewController___
+  class MainViewController___
 
     # (built only by view maker maker. lives only in top client.)
 
@@ -143,4 +143,3 @@ module Skylab::Zerk
   end
   end
 end
-# #pending-rename: POSSIBLY to "main view controller"
