@@ -28,9 +28,12 @@ module Skylab::TMX
 
       _st = o.execute
 
-      _ary = _st.to_a
+      ary = _st.to_a
+      if ! @is_forwards
+        ary.reverse!
+      end
 
-      [ Common_::Pair.via_value_and_name( _ary, :_tmx_no_value_for_this_group_ ) ]
+      [ Common_::Pair.via_value_and_name( ary, :_tmx_no_value_for_this_group_ ) ]
     end
   end
 end

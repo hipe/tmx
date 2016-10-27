@@ -120,6 +120,7 @@ module Skylab::TMX
 
     def initialize o, & emit
       @_emit = emit
+      @__is_forwards = o.be_forwards
       @__json_file_stream_by = o.json_file_stream_by
     end
 
@@ -129,7 +130,7 @@ module Skylab::TMX
         :map,
         :json_file_stream_by, remove_instance_variable( :@__json_file_stream_by ),
         :attributes_module_by, -> { Home_::Attributes_ },
-        :order, :after,
+        :order, :after, * ( :reverse unless @__is_forwards ),
         :select, :category,
         & @_emit
       )

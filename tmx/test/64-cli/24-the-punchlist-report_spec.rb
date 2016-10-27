@@ -45,6 +45,12 @@ module Skylab::TMX::TestSupport
         expect_succeeded
       end
 
+      it "reverse" do
+        invoke _subject_operation, 'punchlist', '-reverse'
+        expect_on_stdout_lines_in_big_string __this_reversed_big_string
+        expect_succeeded
+      end
+
       given_ %w( gilius adder stern dora )  # weird order
 
       def __this_big_string
@@ -59,6 +65,21 @@ module Skylab::TMX::TestSupport
 
           # third three
           stern
+        HERE
+      end
+
+      def __this_reversed_big_string
+
+        <<-HERE.unindent
+          # third three
+          stern
+
+          # second group
+          gilius
+          dora
+
+          # first three
+          adder
         HERE
       end
     end

@@ -61,6 +61,7 @@ module Skylab::TMX
         execute: :__when_head_is_execute,
         json_file_stream_by: :__when_head_is_json_file_stream_by,
         list: :__when_head_is_list,
+        reverse: :__when_head_is_reverse,
       }
 
       def __when_head_is_execute
@@ -83,9 +84,25 @@ module Skylab::TMX
         @argument_scanner.advance_one
         p = @argument_scanner.parse_primary_value :must_be_trueish
         if p
-          ( @__for_reports ||= ForReports___.new ).json_file_stream_by = p
+          _add_for_reports p, :json_file_stream_by
           ACHIEVED_
         end
+      end
+
+      def __when_head_is_reverse
+        @argument_scanner.advance_one
+        _add_for_reports false, :be_forwards
+        ACHIEVED_
+      end
+
+      def _add_for_reports x, k
+        ( @__for_reports ||= __default_for_reports )[ k ] = x ; nil
+      end
+
+      def __default_for_reports
+        o = ForReports___.new
+        o.be_forwards = true
+        o
       end
 
       # --
@@ -174,7 +191,7 @@ module Skylab::TMX
       Box_via_autoloaderized_module_[ Home_::Reports_ ]
     end
 
-    ForReports___ = ::Struct.new :json_file_stream_by
+    ForReports___ = ::Struct.new :be_forwards, :json_file_stream_by
 
     # ==
   end
