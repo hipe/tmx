@@ -12,13 +12,7 @@ module Skylab::TestSupport::TestSupport
     it "for now (and probably always), can't list files without test directory" do
 
       call :list_files
-
-      expect :error, :expression, :operation_parse_error, :missing_required_arguments do |y|
-
-        y.first == "can't :list_files without test directories. (maybe use :test_directory.)" || fail
-      end
-
-      expect_result UNABLE_
+      fails_because_no_test_directories_ :list_files
     end
 
     it "test directory no ent EXPLORATORY" do

@@ -1,4 +1,6 @@
-[#050]       track simplified boxxy-like producers of primary hashes
+[#051]       track simplified boxxy-like producers of primary hashes
+
+[#050]       [unified table support]
 
 [#049] #open it would nice if ACS-as-operation could express the parameter
              arity of their components somehow

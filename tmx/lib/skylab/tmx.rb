@@ -137,7 +137,7 @@ module Skylab::TMX
   Box_via_autoloaderized_module_ = -> mod do
 
     # simplified and more rigid alternative to [co] "boxxy". memoize result.
-    # tracked by #[#ze-050] (similar elsewhere).
+    # tracked by #[#ze-051] (similar elsewhere).
 
     bx = Common_::Box.new
     st = mod.entry_tree.to_state_machine_stream

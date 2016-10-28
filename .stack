@@ -16,6 +16,7 @@ utility to replace (generate) greenlist, etc. 'tmx-notes.json'
 -3 write a task to update semi-real costs (a bash script loop)
 -4 add a randomize option to the below (for now only toplevel, later etc)
 look at this pending rename in [dt] - is it real?
+(maybe rewrite "test-all counts" (globber) to use two popen3 instead)
 test all - test all.
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
 -5.1 divvy
@@ -24,4 +25,3 @@ test all - test all.
 -5.3.1 help screen integration! needs heavy design. needs invite.
 -5.3.2 integrate with real globber from [tmx] (as default "argument") - keep [ts]'s knowledge of this abstract
 -5.3.3 render tables in CLI - a stream map against the meta-data (this will be the new center of unified table, maybe)
--5.3.4 basic result in table tuples (arrays) - meta-informational data emission, maybe abstract what list-files does for test dir names

@@ -6,6 +6,8 @@
 we almost called this "the omni table narrative", but didn't because our
 longerm goal is (or isn't) to unify all table implementions:
 
+    [#ze-050]  2016-10-28  the eventual home of unified table
+
     [#ze-047]  2016-08-28  "tuple pager" for long streams of data
 
     [#.D]  2013-03-13  ad-hoc for application. rewritten once.
@@ -21,6 +23,62 @@ because we are not there yet, this document is divided by horizontal
 
 we *certainly* want to make a [cu]-like feature comparison meta-table
 (that is, a table about tables :P ) and then reduce these down to one..
+
+
+## [ze] tables - the new "best practices" (overview)
+
+  - the production and expression of a table should be broken up cleanly
+    into those two disparate areas of concern: one area of concern is the
+    production of the data that goes into the table, and another (wholly
+    separate one) is the area of concern that expresses it (the "rendering
+    agent" or "client", as you like). this allows the same data to be
+    expressed in different modalities and to work with dynamic UI's
+    (in the spirit of MVC/MVVM). this idea might sound "nice" at first
+    glance, but it has far-reaching impact that will set the problem-space
+    for most of the work we do here.
+
+  - life is much better all around if we cleanly and consistently follow
+    one internal API for the data structures and behavior patterns to form
+    a "lingua franca" for how the producer expresses this data to the
+    consumer:
+
+  - this "lingua franca" has two compontents: 1) the "rows" of data
+    themselves are expressed by the producer as a *stream* of *arrays*.
+    more on this below. 2) the "schema" of the data should be expressed
+    by the producer as a passive event (actually data) emission [#co-011].
+    also more on this below.
+
+  - we want that the producer should only ever stream the data for the
+    hopefully obvious reason that it scales better without much cost:
+    for small sets of data, it is trivial to present an array (for example)
+    as a stream; however there is always a sufficiently large set of data
+    for which presenting it as one big array will be prohibitively expensive.
+    so streaming is an answer to the challenge of scaling to lots of items.
+    but this answer leads to its own challenges for rendering tables and
+    aggregating their data as we will see throughout; the "tuple pager"
+    being the quinessential outcome of this dynamic.
+
+  - the "tuple" that constitutes each item of the stream, we believe it
+    should be a pseudo-fixed-length array and not a hash, struct, business
+    object or ad-hoc internal object for these reasons:
+
+      - ad-hoc internal object: too much API with no real benefit
+
+      - business object (i.e user defined): too hard to do anything useful here
+
+      - hash: too costly? random access directly should not generally be
+        needed at this point. we're ignoring the fact that the platform
+        orders hashes. doesn't "feel" right. with the "schema" API, user
+        agent can have effectively random access anyway..
+
+      - struct: it's annoying (if not a showstopper) to generate these on the
+        fly for dynamic queries. otherwise they are near perfect for this.
+
+    this leaves arrays.
+
+  - the emission of a "table schema" as a data emission for a passive
+    listening model, this idea is minutes old at writing..
+
 
 
 

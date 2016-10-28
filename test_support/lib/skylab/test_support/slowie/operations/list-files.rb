@@ -15,18 +15,20 @@ module Skylab::TestSupport
         @argument_scanner = o.argument_scanner
         @globberer_by = o.method :globberer_by
         @_emit = o.listener
-        @_test_directories = nil
+
+        @_test_directory_collection = Here_::Models_::TestDirectoryCollection.
+          new :list_files, o
       end
 
       def execute
         if __normal
-          _flush_path_stream_normally
+          __flush_path_stream_normally
         else
-          UNABLE_  # (anything other than a stream is failure)
+          UNABLE_
         end
       end
 
-      def _flush_path_stream_normally
+      def __flush_path_stream_normally
 
         globber_st = __globber_stream
         if globber_st
@@ -42,27 +44,16 @@ module Skylab::TestSupport
           o.xx_example_globber_option_xx = :yy
         end
 
-        Stream_.call @_test_directories do |dir|
+        @_test_directory_collection.to_nonempty_test_directory_stream.map_by do |dir|
           globberer.globber_via_directory dir
         end
       end
 
-      # -- parsing arguments
+      # -- parsing arguments (do it yourself for clarity & flexibility)
 
       def __normal
         if __parse_args
-          __check_for_missing_required
-        end
-      end
-
-      def __check_for_missing_required
-        if @_test_directories
-          ACHIEVED_
-        else
-          @argument_scanner.when_missing_requireds(
-            :operation_path, :list_files,
-            :missing, [ :is_plural, "test directories", :use, :test_directory ]
-          )
+          @_test_directory_collection.check_for_missing_requireds
         end
       end
 
@@ -87,12 +78,7 @@ module Skylab::TestSupport
       }
 
       def __parse_test_directory
-        @argument_scanner.advance_one
-        dir = @argument_scanner.parse_primary_value :must_be_trueish
-        if dir
-          ( @_test_directories ||=[] ).push dir
-          ACHIEVED_
-        end
+        @_test_directory_collection.parse_test_directory
       end
     end
   end

@@ -1,77 +1,59 @@
 module Skylab::TestSupport
 
-  class Tree_Runner
+  class Slowie
 
-    class Plugins__::Count_The_Test_Files < Plugin_
+    class Operations::Counts
 
-      does :flush_the_test_files do | tr |
-
-        tr.transition_is_effected_by do | o |
-
-          o.on '--counts', 'show a report of the number of tests per subproduct'
-
-        end
-
-        tr.if_transition_is_effected do | o |
-
-          o.on '-v', '--verbose', 'show max share meter (experimental)' do
-            @verbosity_level += 1
-          end
-
-          o.on '-V', 'reduce verbosity level' do
-            @verbosity_level -= 1
-          end
-
-          o.on '-z', '--zero', 'display the zero values' do
-            @do_zero = true
-          end
-        end
+      if false
+        y  <<  "show a report of the number of tests per subproduct"
       end
 
-      def initialize( * )
-        @verbosity_level = 1
-        @do_zero = nil
-        super
+      def initialize
+        o = yield
+        @argument_scanner = o.argument_scanner
+        @_emit = o.listener
+        @globberer_by = o.method :globberer_by
+
+        @_test_directory_collection = Here_::Models_::TestDirectoryCollection.
+          new :counts, o
       end
 
-      def do__flush_the_test_files__
-
-        tall = Tallier____.new(
-          @on_event_selectively.call( :for_plugin, :test_file_stream ),
-          @on_event_selectively.call( :for_plugin, :sidesystem_box ),
-          @do_zero )
-
-        if 1 < @verbosity_level
-
-          field_extra = __build_max_share_meter_args
-
-          p = -> do
-            rec = tall.gets_record
-            if rec
-              [ rec.moniker, rec.count, rec.count ]
-            else
-              p = EMPTY_P_
-              [ '(total)', tall.upstream_item_count, nil ]
-            end
-          end
-
+      def execute
+        if __normal
+          __flush_table
         else
+          UNABLE_
+        end
+      end
 
-          p = -> do
-            rec = tall.gets_record
-            if rec
-              [ rec.moniker, rec.count ]
-            else
-              p = EMPTY_P_
-              [ '(total)', tall.upstream_item_count ]
-            end
-          end
+      def __flush_table
+        __emit_table_schema
+        __flush_table_stream
+      end
+
+      def __flush_table_stream
+
+        __globber_stream.map_by do |globber|
+
+          _count = globber.to_count
+          _dir = globber.directory
+
+          [ _dir, _count ]  # follow your schema's order per #here
+        end
+      end
+
+      def __globber_stream  # copy-pasted (at writing) for clarity
+
+        globberer = @globberer_by.call do |o|
+          o.xx_example_globber_option_xx = :yy
         end
 
-        _st = Common_.stream do
-          p[]
+        @_test_directory_collection.to_nonempty_test_directory_stream.map_by do |dir|
+          globberer.globber_via_directory dir
         end
+      end
 
+      if false
         CLI_support_[]::Table::Actor.call(
 
           :field, 'subproduct',
@@ -80,99 +62,59 @@ module Skylab::TestSupport
           :write_lines_to, @resources.sout,
           :read_rows_from, _st,
         )
-
-        if 1 == @verbosity_level
-          @resources.serr.puts '("-v" for visualization, "-V" hides this message)'
-        end
-
-        nil
       end
 
-      def __build_max_share_meter_args
+      # ~
 
-        _width = Home_.lib_.brazen::CLI.some_screen_width
-
-        [ :target_width, _width, :field, :fill,
-          :cel_renderer_builder, :max_share_meter ]
+      def __emit_table_schema
+        @_emit.call :data, :table_schema do
+          __build_table_schema
+        end
+        NIL
       end
 
-      class Tallier____
+      def __build_table_schema
 
-        def initialize st, bx, do_zero
-
-          box_d = 0
-
-          path = nil
-          p2 = nil
-          p = -> do
-            path = st.gets
-            if path
-              p = p2
-              p2[]
-            else
-              p = EMPTY_P_
-              nil
-            end
-          end
-
-          p2 = -> do
-            # makes at least two big assumptions
-
-            count = nil
-            begin
-              ss = bx.at_position box_d
-              box_d += 1
-              s = "#{ ss.path_to_gem }#{ ::File::SEPARATOR }"
-              len = s.length
-              if s == path[ 0, len ]
-                break
-              elsif do_zero
-                count = 0
-                break
-              else
-                redo
-              end
-            end while nil
-
-            if ! count
-              count = 1
-              begin
-                path = st.gets
-                if path
-                  if s == path[ 0, len ]
-                    count += 1
-                    redo
-                  else
-                    break
-                  end
-                else
-                  p = EMPTY_P_
-                  break
-                end
-              end while nil
-            end
-
-            if count
-              @upstream_item_count += count
-              Record___.new( ss.stem, count )
-            else
-              p2[]  # recurse
-            end
-          end
-
-          @upstream_item_count = 0
-
-          @gets_record = -> { p[] }
+        Zerk_::CLI::Table::Models::Schema.define do |o|
+          # (the below order must accord with :#here)
+          o.add_field_by_normal_name_symbol :test_directory
+          o.add_field_by_normal_name_symbol :number_of_test_files
         end
+      end
 
-        attr_reader :upstream_item_count
+      # -- parsing arguments (do it yourself for clarity & flexibility)
 
-        def gets_record
-          @gets_record[]
+      def __normal
+        if __parse_args
+          @_test_directory_collection.check_for_missing_requireds
         end
+      end
 
-        Record___ = ::Struct.new :moniker, :count
+      def __parse_args
+        ok = true
+        until @argument_scanner.no_unparsed_exists
+          ok = __parse_primary
+          ok || break
+        end
+        ok
+      end
+
+      def __parse_primary
+        m = @argument_scanner.match_head_against_primaries_hash PRIMARIES___
+        if m
+          send m
+        end
+      end
+
+      PRIMARIES___ = {
+        test_directory: :__parse_test_directory,
+      }
+
+      def __parse_test_directory
+        @_test_directory_collection.parse_test_directory
       end
     end
   end
 end
+# #tombstone (temporary): '-v', '--verbose', 'show max share meter (experimental)'
+# #tombstone (temporary): '-z', '--zero', 'display the zero values'

@@ -9,7 +9,7 @@ module Skylab::TestSupport
         Require_zerk_[]
         _as = Zerk_::API::ArgumentScanner.via_array a, & listener
 
-        _invo = invocation_via_argument_scanner as
+        _invo = invocation_via_argument_scanner _as
 
         bc = _invo.to_bound_call
 
@@ -58,7 +58,7 @@ module Skylab::TestSupport
     Primaries_hash___ = Lazy_.call do
 
       # like boxxy but more simplified and rigid and ad-hoc.
-      # tracked by #[#ze-050] (similar elsewhere).
+      # tracked by #[#ze-051] (similar elsewhere).
 
       h = {
         ping: [ :__bound_call_via_method, :__invoke_ping ],
