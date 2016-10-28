@@ -20,5 +20,3 @@ test all - test all.
 -5.2 require only
 -5.3 counts
 -5.4 integrate that with real tmx
--5.5 list files
--5.6 hello API by way of cover is wipped

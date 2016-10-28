@@ -14,7 +14,7 @@ module Skylab::Zerk
       alias_method :calculate, :instance_exec
 
       def say_formal_operation_alternation_ st
-        _say_name_alternation :__say_formal_operation, st
+        _say_name_alternation :say_formal_operation_, st
       end
 
       def say_primary_alternation_ st
@@ -30,7 +30,7 @@ module Skylab::Zerk
         end
       end
 
-      def __say_formal_operation name
+      def say_formal_operation_ name
         _same name
       end
 

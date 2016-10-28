@@ -14,7 +14,7 @@ module Skylab::Zerk
       alias_method :calculate, :instance_exec
 
       def say_formal_operation_alternation_ st
-        _say_name_alternation :_same, st
+        _say_name_alternation :say_formal_operation_, st
       end
 
       def say_primary_alternation_ st
@@ -32,6 +32,10 @@ module Skylab::Zerk
         "{ #{ _mid } }"
       end
 
+      def say_formal_operation_ name
+        _add_dash name
+      end
+
       def say_strange_arguments_head_ name
         _same_inspect name
       end
@@ -41,7 +45,7 @@ module Skylab::Zerk
       end
 
       def say_primary_ name
-        "#{ DASH_ }#{ _same name }"
+        _add_dash name
       end
 
       def say_strange_primary_ name
@@ -50,6 +54,10 @@ module Skylab::Zerk
 
       def say_formal_component_ name
         _same_inspect name  # usually it reads weirdly without the quotes
+      end
+
+      def _add_dash name
+        "#{ DASH_ }#{ _same name }"
       end
 
       def _same_inspect name

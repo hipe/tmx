@@ -31,7 +31,10 @@ module Skylab::TestSupport
 
   module Lib_
 
-    sidesys = Autoloader_.build_require_sidesystem_proc
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc,
+    )
 
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
@@ -45,6 +48,8 @@ module Skylab::TestSupport
         mtdp ||= Home_.constant( :TEST_DIR_NAME_A ).method( :include? )
       end
     end.call
+
+    Open3 = stdlib[ :Open3 ]
 
     Parse = sidesys[ :Parse ]  # only for 1 tree runner plugin (greenlist)
     Permute = sidesys[ :Permute ]

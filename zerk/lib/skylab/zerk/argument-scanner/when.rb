@@ -6,6 +6,93 @@ module Skylab::Zerk
 
     module WhenScratchSpace____
 
+      class When::MissingRequireds
+
+        def initialize x_a, as
+
+          @operation_path = nil
+          @tuples = []
+
+          scn = Common_::Polymorphic_Stream.via_array x_a
+          @_scn = scn
+          begin
+            send PRIMARIES___.fetch( @_scn.gets_one )
+          end until scn.no_unparsed_exists
+          remove_instance_variable :@_scn
+
+          @client = as
+        end
+
+        PRIMARIES___ = {
+          missing: :__parse_missing,
+          operation_path: :__parse_operation_path,
+        }
+
+        def __parse_operation_path
+          x = @_scn.gets_one
+          @operation_path = ::Array.try_convert( x ) || [x] ; nil
+        end
+
+        def __parse_missing
+          @tuples.push @_scn.gets_one ; nil
+        end
+
+        def execute
+
+          op_path = @operation_path
+          tuples = @tuples
+
+          @client.listener.call(
+            :error, :expression, :operation_parse_error, :missing_required_arguments
+          ) do |y|
+
+            subsequent_say = nil
+
+            say = -> is_plural, subject_s, primary_s do
+
+              _name = Common_::Name.via_variegated_symbol op_path.last   # meh
+              _op = say_formal_component_ _name
+
+              say = subsequent_say
+              y << "can't #{ _op } without #{ subject_s }. (maybe use #{ primary_s }.)"
+            end
+
+            subsequent_say = -> is_plural, subject_s, primary_s do
+              y << "also, must have #{ subject_s }. (maybe use #{ primary_s }.)"
+            end
+
+            st = Stream_[ tuples ]
+            begin
+              tuple = st.gets
+              tuple || break
+
+              singplur, subject_s, use_keyword, use_what = tuple
+
+              :use == use_keyword || fail
+
+              _name = Common_::Name.via_variegated_symbol use_what
+
+              _moniker = say_primary_ _name
+
+              _is_plural = IS_PLURAL___.fetch singplur  # not used for now but check anyway
+
+              say[ _is_plural, subject_s, _moniker ]
+              redo
+            end while above
+            y
+          end
+
+          UNABLE_
+        end
+
+        # ==
+        IS_PLURAL___ = {
+          is_plural: true,
+          is_singular: false,
+        }
+        # ==
+      end
+
       # ==
 
       When::Argument_value_not_provided = -> argument_scanner do

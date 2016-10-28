@@ -1,95 +1,100 @@
 module Skylab::TestSupport
 
-  class Tree_Runner
+  class Slowie
 
-    class Plugins__::List_The_Test_Files < Plugin_
+    class Operations::ListFiles
 
-      does :flush_the_test_files do | tr |
+      if false
+        y << "a stream of each test file path"
+      end
 
-        tr.transition_is_effected_by do | o |
+      # (if you don't know what a "globber" is, see #slowie-spot-1)
 
-          o.on '--list-files', 'write to stdout the path to each test file'
+      def initialize
+        o = yield
+        @argument_scanner = o.argument_scanner
+        @globberer_by = o.method :globberer_by
+        @_emit = o.listener
+        @_test_directories = nil
+      end
 
+      def execute
+        if __normal
+          _flush_path_stream_normally
+        else
+          UNABLE_  # (anything other than a stream is failure)
         end
+      end
 
-        tr.if_transition_is_effected do | o |
+      def _flush_path_stream_normally
 
-          o.on '-p', '--pretty', 'make the filenames \"pretty\" somehow' do
-            @do_pretty = true
-          end
-
-          o.on '-v', '--verbose', 'add additional information' do
-            @be_verbose = true
+        globber_st = __globber_stream
+        if globber_st
+          globber_st.expand_by do |globber|
+            globber.to_path_stream
           end
         end
       end
 
-      def initialize( * )
-        super
-        @do_pretty = @be_verbose = false
-      end
+      def __globber_stream
 
-      def do__flush_the_test_files__
-
-        # ~ the base callbacks
-
-        @receive_path = @resources.sout.method( :puts )
-
-        @at_end = EMPTY_P_
-
-        # ~ mutate the callbacks
-
-        if @be_verbose
-          __mutate_callbacks_for_be_verbose
+        globberer = @globberer_by.call do |o|
+          o.xx_example_globber_option_xx = :yy
         end
 
-        if @do_pretty
-          __mutate_callbacks_for_do_pretty
+        Stream_.call @_test_directories do |dir|
+          globberer.globber_via_directory dir
         end
-
-        # ~ flush output:
-
-        p = @receive_path
-        st = @on_event_selectively.call :for_plugin, :test_file_stream
-        begin
-          path = st.gets
-          path or break
-          p[ path ]
-          redo
-        end while nil
-
-        @at_end[]
-
-        ACHIEVED_
       end
 
-      def __mutate_callbacks_for_do_pretty
+      # -- parsing arguments
 
-        @receive_path = -> p do
-          -> path do
-            path = "(pretty: #{ path })"
-            p[ path ]
-          end
-        end.call @receive_path
-        nil
+      def __normal
+        if __parse_args
+          __check_for_missing_required
+        end
       end
 
-      def __mutate_callbacks_for_be_verbose
-
-        count = 0
-        @receive_path = -> p do
-          -> path do
-            count += 1
-            p[ path ]
-          end
-        end.call @receive_path
-
-        @at_end = -> do
-          @resources.serr.puts "(listed #{ count } spec file(s))"
-          nil
+      def __check_for_missing_required
+        if @_test_directories
+          ACHIEVED_
+        else
+          @argument_scanner.when_missing_requireds(
+            :operation_path, :list_files,
+            :missing, [ :is_plural, "test directories", :use, :test_directory ]
+          )
         end
-        nil
+      end
+
+      def __parse_args
+        ok = true
+        until @argument_scanner.no_unparsed_exists
+          ok = __parse_primary
+          ok || break
+        end
+        ok
+      end
+
+      def __parse_primary
+        m = @argument_scanner.match_head_against_primaries_hash PRIMARIES___
+        if m
+          send m
+        end
+      end
+
+      PRIMARIES___ = {
+        test_directory: :__parse_test_directory,
+      }
+
+      def __parse_test_directory
+        @argument_scanner.advance_one
+        dir = @argument_scanner.parse_primary_value :must_be_trueish
+        if dir
+          ( @_test_directories ||=[] ).push dir
+          ACHIEVED_
+        end
       end
     end
   end
 end
+# #tombstone: verbose behavior should probably not be implemented in the backend..

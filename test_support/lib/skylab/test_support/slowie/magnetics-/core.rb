@@ -1,10 +1,10 @@
-self._NOT_YET_USED  # #todo
 module Skylab::TestSupport
 
-  class Tree_Runner
+  class Slowie
 
-    class Plugins__::Produce_The_Sidesystems < Plugin_
+    Magnetics_ = ::Module.new
 
+      if false
       # this plugin is not activated by use of input arguments - it passively
       # makes these state traversals if no other plugin does.
 
@@ -77,6 +77,10 @@ module Skylab::TestSupport
 
       def __build_stream_of_test_files
 
+        # NOTE FROM THE PRESENT - this method is almost surely now or will
+        # be soon obviated by the "globber" model, but is here for reference
+        # for now..
+
         # in a stark reversal of the algorithm of our predecessor, we find
         # the test files on-demand once per sidesystem..
 
@@ -85,7 +89,7 @@ module Skylab::TestSupport
 
         st = __build_stream_of_test_directories
 
-        proto = __build_find_test_files_prototype
+        proto = __build_find_test_files_prototype  # moved
 
         base_p = p = -> do  # write our own map-expand stream
 
@@ -145,14 +149,6 @@ module Skylab::TestSupport
 
           ::File.join lt.path_to_gem, TEST_DIR_FILENAME_
         end
-      end
-
-      def __build_find_test_files_prototype
-
-        Lib_::System[].find.new_with(
-          :freeform_query_infix_words, %w'-type f',
-          :filename, '*_spec.rb',
-        )
       end
 
       # ~ whitelisting sidesystems
@@ -327,6 +323,7 @@ module Skylab::TestSupport
         @bx = bx
         bx
       end
-    end
+      end  # if false
+
   end
 end

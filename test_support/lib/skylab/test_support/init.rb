@@ -9,7 +9,6 @@ module Skylab
       # pull in any other files from this one, and don't expect to have
       # any accesss to any subsystem facilities here.
 
-
       _MEMBERS = []
 
       define_singleton_method :o, -> i, & p do
@@ -27,30 +26,31 @@ module Skylab
         end
       end
 
+      o :test_file_name_pattern do
+
+        "*#{ spec_rb }".freeze
+      end
+
       _EXTNAME = '.rb'.freeze
 
       o :spec_rb do
 
         "#{ test_file_basename_suffix_stem }#{ _EXTNAME }".freeze
-
       end
 
       o :test_file_basename_suffix_stem  do
 
         '_spec'.freeze
-
       end
 
       o :test_support_filenames do
 
         [ "#{ test_support_filestem }#{ _EXTNAME }".freeze ].freeze
-
       end
 
       o :test_support_filestem do
 
         'test-support'.freeze
-
       end
 
       _MEMBERS.freeze

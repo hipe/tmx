@@ -26,11 +26,15 @@ module Skylab::Zerk
       end
 
       def parse_parse_request x_a
-        Home_::ArgumentScanner::Magnetics::ParseRequest_via_Array[ x_a ]
+        Here_::Magnetics::ParseRequest_via_Array[ x_a ]
       end
 
       def parse_primary_value_via_parse_request req
-        Home_::ArgumentScanner::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]
+        Here_::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]
+      end
+
+      def when_missing_requireds * x_a
+        Here_::When::MissingRequireds.new( x_a, self ).execute
       end
 
       attr_reader(
@@ -52,6 +56,8 @@ module Skylab::Zerk
     Reasoning___ = ::Struct.new :reason_symbol, :name_proc
 
     # ==
+
+    Here_ = self
   end
 end
 # #history: abstracted from common *implementations* between first two

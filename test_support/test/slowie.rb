@@ -12,6 +12,11 @@ module Skylab::TestSupport::TestSupport
         ( @slowie_case ||= Case__.new ).receive_call x_a
       end
 
+      def ignore_emissions_whose_terminal_channel_symbol_is sym
+        @slowie_case.__ignore_etc sym
+        NIL
+      end
+
       def expect * chan, & recv_msg
         _exp = EmissionExpectation___.new recv_msg, chan
         @slowie_case.receive_emission_expectation _exp
@@ -19,10 +24,14 @@ module Skylab::TestSupport::TestSupport
       end
 
       def expect_result x
-        _flush_slowie_assertion.execute_expecting_result_of x
+        flush_to_case_assertion.execute_expecting_result_of x
       end
 
-      def _flush_slowie_assertion
+      def release_assertion
+        remove_instance_variable
+      end
+
+      def flush_to_case_assertion
         remove_instance_variable( :@slowie_case ).to_assertion_under self
       end
     end
@@ -42,6 +51,11 @@ module Skylab::TestSupport::TestSupport
         NIL
       end
 
+      def __ignore_etc sym
+        ( @ignore_these_terminal_channel_symbols ||= {} )[ sym ] = true
+        NIL
+      end
+
       def receive_emission_expectation ee
         @ee_array.push ee ; nil
       end
@@ -53,6 +67,7 @@ module Skylab::TestSupport::TestSupport
       attr_reader(
         :call_array,
         :ee_array,
+        :ignore_these_terminal_channel_symbols,
       )
     end
 
@@ -63,33 +78,30 @@ module Skylab::TestSupport::TestSupport
       def initialize tc, cse
         @call_array = cse.call_array
         @ee_array = cse.ee_array
+        @ignore_these_terminal_channel_symbols = cse.ignore_these_terminal_channel_symbols
         @test_context = tc
       end
 
-      def execute_expecting_result_of x
+      def execute_expecting_result_of expected_x
 
-        __send_call_and_assert_emission_expectations
-        __expect_result_of_call_equals x
+        @_user_x = flush_to_result
+        finish
+        __expect_result_of_call_equals expected_x
       end
 
-      def __send_call_and_assert_emission_expectations
+      def flush_to_result
 
-        do_debug = @test_context.do_debug
-        if do_debug
-          debug_IO = @test_context.debug_IO
-        end
+        channel_symbol_a = nil ; emission_p = nil
 
-        _em_a = remove_instance_variable :@ee_array
-        scn = Common_::Polymorphic_Stream.via_array _em_a
+        scn = __flush_emission_expectation_scanner
 
-        _x_a = remove_instance_variable :@call_array
-        @_user_x = @test_context.subject_API.call( * _x_a ) do |*x_a, & em_p|
+        do_see = -> do
 
-          if do_debug
-            debug_IO.puts x_a.inspect
+          ae = ActualEmission___.new emission_p, channel_symbol_a
+
+          if @test_context.do_debug
+            @test_context.debug_IO.puts channel_symbol_a.inspect
           end
-
-          ae = ActualEmission___.new em_p, x_a
 
           if scn.no_unparsed_exists
             fail AssertionFailed, ae.say_extra_emission
@@ -99,6 +111,43 @@ module Skylab::TestSupport::TestSupport
             :_ts_unreliable_
           end
         end
+
+        ignore_h = @ignore_these_terminal_channel_symbols
+
+        see = if ignore_h
+          -> do
+            if ignore_h[ channel_symbol_a.last ]
+              if @test_context.do_debug
+                @test_context.debug_IO.puts "(ignored: #{ channel_symbol_a.inspect })"
+              end
+              :_ts_unreliable_
+            else
+              do_see[]
+            end
+          end
+        else
+          do_see
+        end
+
+        _args = remove_instance_variable :@call_array
+        @test_context.subject_API.call( * _args ) do |*i_a, & em_p|
+          channel_symbol_a = i_a
+          emission_p = em_p
+          see[]
+        end
+      end
+
+      def __flush_emission_expectation_scanner
+
+        _em_a = remove_instance_variable :@ee_array
+        scn = Common_::Polymorphic_Stream.via_array _em_a
+        @__expected_emission_scanner = scn
+        scn
+      end
+
+      def finish
+
+        scn = remove_instance_variable :@__expected_emission_scanner
 
         if ! scn.no_unparsed_exists
           fail AssertionFailed, scn.current_token.say_missing_emission
@@ -171,11 +220,7 @@ module Skylab::TestSupport::TestSupport
       def execute
         if @channel_symbol_array == @actual_emission.channel_symbol_array
           if @receive_payload
-
-            _expag = @test_context.expression_agent
-            _msg_a = _expag.calculate [], & @actual_emission.emission_proc
-            @receive_payload[ _msg_a ]
-
+            __send_payload
           end
           NIL
         else
@@ -187,6 +232,28 @@ module Skylab::TestSupport::TestSupport
         @actual_emission.channel_symbol_array.should(
           @test_context.eql @channel_symbol_array )
         fail AssertionFailed
+      end
+
+      def __send_payload  # assumes channels are identical (otherwise change this)
+        if :expression == @channel_symbol_array[ 1 ]
+          __send_expression_payload
+        else
+          __send_event_payload
+        end
+        NIL
+      end
+
+      def __send_event_payload
+        _ev = @actual_emission.emission_proc.call
+        @receive_payload[ _ev ]
+        NIL
+      end
+
+      def __send_expression_payload
+        _expag = @test_context.expression_agent
+        _msg_a = _expag.calculate [], & @actual_emission.emission_proc
+        @receive_payload[ _msg_a ]
+        NIL
       end
     end
 

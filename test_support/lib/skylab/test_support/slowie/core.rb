@@ -27,6 +27,8 @@ module Skylab::TestSupport
     def initialize scn, l
       @argument_scanner = scn
       @listener = l
+      @system_conduit = nil
+      @test_file_name_pattern = nil
     end
 
     # -- ad-hoc operation routing
@@ -363,10 +365,35 @@ module Skylab::TestSupport
 
     # -- for operations:
 
+    def globberer_by & defn
+
+      # (for now we do all the work to "load" the default values even
+      # if they get overwritten by the caller but meh.)
+
+      _tfnp = @test_file_name_pattern || Home_::Init.test_file_name_pattern
+
+      _sc = @system_conduit || Home_.lib_.open3
+
+      Here_::Models_::Globber.prototype_by do |o|
+
+        o.test_file_name_pattern = _tfnp
+
+        o.system_conduit = _sc
+
+        o.listener = @listener
+
+        defn[ o ]
+      end
+    end
+
     attr_reader(
       :argument_scanner,
       :listener,
     )
+
+    def be_verbose
+     false  # not a thing yet, for the future
+    end
 
     # --
 
@@ -469,6 +496,14 @@ module Skylab::TestSupport
 
       UNDERSCORE_ = '_'.freeze  # we need our own because [#002]
       end  # if false
+    # ==
+
+    Stream_ = -> a, & p do
+      Common_::Stream.via_nonsparse_array a, & p
+    end
+
+    # ==
+
 
     Here_ = self
   end
