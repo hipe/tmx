@@ -24,20 +24,10 @@ module Skylab::TMX
         @argv = argv
         bc = __bound_call
         if bc
-          st = bc.receiver.send bc.method_name, * bc.args, & bc.block
-          if st
+          x = bc.receiver.send bc.method_name, * bc.args, & bc.block
+          if x
             @exitstatus ||= SUCCESS_EXITSTATUS__
-            x = st.gets
-            if x
-              express = send ( remove_instance_variable :@_express ), x
-              begin
-                express[ x ]
-                x = st.gets
-                x ? redo : break
-              end while above
-            else
-              @serr.puts "(no results.)"  # #not-covered
-            end
+            send ( remove_instance_variable :@_express ), x
           end
         end
         @exitstatus
@@ -95,7 +85,11 @@ module Skylab::TMX
       def __when_looks_like_operation_at_front
 
         scn = Common_::Polymorphic_Stream.via_array @argv
-        m = OPERATIONS___[ scn.current_token.intern ]
+
+        _key = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
+
+        m = OPERATIONS___[ _key ]
+
         if m
           __init_selective_listener
           @_user_scanner = scn
@@ -109,15 +103,35 @@ module Skylab::TMX
       end
 
       OPERATIONS___ = {
-        map: :__when_map,
-        reports: :__when_reports,
+        map: :__bound_call_for_map,
+        reports: :__bound_call_for_reports,
+        test_all: :__bound_call_for_test_all,
       }
+
+      # -- test all
+
+      def __bound_call_for_test_all
+
+        @_express = :_express_stream_of_string_or_name
+
+        _lib = Home_.lib_.test_support::Slowie
+
+        _as = _flush_multimode_argument_scanner do |o|
+          o.user_scanner remove_instance_variable :@_user_scanner
+          o.listener @_emit
+        end
+
+        invo = _lib::API.invocation_via_argument_scanner _as
+        # invo.xx = :yy
+        _bc = invo.to_bound_call
+        _bc  # #todo
+      end
 
       # -- reports
 
-      def __when_reports
+      def __bound_call_for_reports
 
-        @_express = :__express_reports
+        @_express = :_express_stream_of_string_or_name
 
         o = Home_::API.begin( & @_emit )
         o.argument_scanner = __flush_argument_scanner_for_reports
@@ -140,27 +154,11 @@ module Skylab::TMX
         end
       end
 
-      def __express_reports x
-
-        sout = @sout
-        if x.respond_to? :ascii_only?
-          -> line do
-            sout.puts line  # hi.
-          end
-        elsif x.respond_to? :as_slug
-          -> name do
-            sout.puts name.as_slug
-          end
-        else
-          _NO
-        end
-      end
-
       # -- map
 
-      def __when_map
+      def __bound_call_for_map
 
-        @_express = :__express_map
+        @_express = :__express_stream_of_map_nodes
 
         o = Home_::API.begin( & method( :__receive_map_emission ) )
 
@@ -169,7 +167,11 @@ module Skylab::TMX
         _bound_call_via_API_invocation o
       end
 
-      def __express_map x
+      def __express_stream_of_map_nodes st
+        _express_non_empty_stream :__express_map_item, st
+      end
+
+      def __express_map_item x
 
         x.respond_to? :get_filesystem_directory_entry_string || _NO
 
@@ -238,6 +240,43 @@ module Skylab::TMX
         NIL
       end
 
+      # -- support for expressing results (our version of [#ze-025])
+
+      def _express_stream_of_string_or_name st
+        _express_non_empty_stream :__expresser_for_string_or_name, st
+      end
+
+      def __expresser_for_string_or_name x
+
+        sout = @sout
+        if x.respond_to? :ascii_only?
+          -> line do
+            sout.puts line  # hi.
+          end
+        elsif x.respond_to? :as_slug
+          -> name do
+            sout.puts name.as_slug
+          end
+        else
+          _NO
+        end
+      end
+
+      def _express_non_empty_stream m, st
+        x = st.gets
+        if x
+          express = send m, x
+          begin
+            express[ x ]
+            x = st.gets
+            x ? redo : break
+          end while above
+        else
+          @serr.puts "(no results.)"  # #not-covered
+        end
+        NIL
+      end
+
       # -- preparing calls to the backend
 
       def _flush_multimode_argument_scanner & defn
@@ -262,26 +301,23 @@ module Skylab::TMX
 
       def __init_selective_listener
 
-        y = Lazy_.call do
-          ::Enumerator::Yielder.new do |s|
-            @serr.puts s  # hi.
-          end
-        end
-
-        @_emit = -> * i_a, & p do
-          if :eventpoint == i_a[0]
-            send i_a.fetch 1
-          else
-            _expression_agent.calculate y[], & p
-            if :parse_error == i_a[2]
-              _invite_to_general_help
-            elsif :error == i_a.first
-              @exitstatus = FAILURE_EXITSTATUS__
-            end
-          end
-          NIL
+        expsr = nil
+        @_emit = -> * sym_a, & em_p do
+          expsr ||= __build_emission_expresser
+          expsr.dup.invoke em_p, sym_a
         end
         NIL
+      end
+
+      def __build_emission_expresser  # only build when an emission is received
+
+        _expag = _expression_agent  # few (no?) emissions are expresssed without it
+        HardcodedEmissionExpresserForNow___.new(
+          method( :_invite_to_general_help ),
+          -> d { @exitstatus = d },
+          _expag,
+          @serr,
+        )
       end
 
       def _invite_to_general_help
@@ -482,6 +518,55 @@ module Skylab::TMX
     self  # legacy CLI class
   end
     end  # proc that wraps legacy CLI class
+
+    # ==
+
+    class HardcodedEmissionExpresserForNow___
+
+      def initialize * four
+
+        @invite, @write_exitstatus, @expression_agent, serr = four
+
+        @_y = ::Enumerator::Yielder.new do |s|
+          serr.puts s  # hi.
+        end
+        freeze
+      end
+
+      def invoke em_p, sym_a
+        @channel_symbol_array = sym_a
+        @emission_proc = em_p
+        if :expression == @channel_symbol_array[1]
+          __express_expression
+        else
+          __express_event
+        end
+        __maybe_invite
+        NIL
+      end
+
+      def __express_event
+        _ev = @emission_proc.call
+        _ev.express_into_under @_y, @expression_agent
+        NIL
+      end
+
+      def __express_expression
+        @expression_agent.calculate @_y, & @emission_proc
+        NIL
+      end
+
+      def __maybe_invite
+        if :parse_error == @channel_symbol_array[2]
+          @invite[]
+        elsif :error == @channel_symbol_array[0]
+          @write_exitstatus[ FAILURE_EXITSTATUS__ ]
+        end
+        NIL
+      end
+    end
+
+    # ==
 
      Looks_like_option = -> do
       d = DASH_.getbyte 0  # DASH_BYTE_

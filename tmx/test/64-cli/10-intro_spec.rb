@@ -23,7 +23,7 @@ module Skylab::TMX::TestSupport
 
     it "help (a stub for now)" do
       invoke '-h'
-      expect_on_stderr "usage: tmz { map | BLAH } [opts]"
+      expect_on_stderr "usage: tmz { -map | -BLAH } [opts]"
       expect_empty_puts
       expect "description: experiment.."
       expect_succeeded

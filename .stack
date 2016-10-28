@@ -1,5 +1,6 @@
 the big question - slicer (G)->(B)
 insane experment with [sa] - convert every `should eql` to etc and see diff (C)
+unify table under [ze] and then re-apply this to [tmx] counts
 fix [#ca-xx] => [#co-xx], • in md's, `_call`=>`call`, memoize vs lazy) (B)
 try to simplify [ac]/[ze] procure bound call
 [tm] change actors and sessions to magnetics
@@ -8,6 +9,7 @@ use [sa] to convert etc to Stream_
 integration of sidesystems with TMX should happen in the sides, not TMX
 unify other tmx node-centric services (that big dependency graph)
 unbreak [tmx]'s heart - use new API somehow to bring old tmx back
+consider using plain old glob instead of find, compare viability, performance
 utility to replace (generate) greenlist, etc. 'tmx-notes.json'
 -1 rewrite (simplify) the "test all" test runner to use this system
 -2 rewrite (simplify) the quickie recursive runner to use this system
@@ -17,6 +19,9 @@ look at this pending rename in [dt] - is it real?
 test all - test all.
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
 -5.1 divvy
--5.2 require only
+-5.2 require only (per test directory, per default globs)
 -5.3 counts
--5.4 integrate that with real tmx
+-5.3.1 help screen integration! needs heavy design. needs invite.
+-5.3.2 integrate with real globber from [tmx] (as default "argument") - keep [ts]'s knowledge of this abstract
+-5.3.3 render tables in CLI - a stream map against the meta-data (this will be the new center of unified table, maybe)
+-5.3.4 basic result in table tuples (arrays) - meta-informational data emission, maybe abstract what list-files does for test dir names

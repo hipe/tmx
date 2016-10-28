@@ -6,9 +6,13 @@ module Skylab::TestSupport
 
       def call * a, & listener
 
-        _scn = _scanner_via_array a, listener
+        Require_zerk_[]
+        _as = Zerk_::API::ArgumentScanner.via_array a, & listener
 
-        bc = API_Invocation__.new( _scn, listener ).to_bound_call
+        _invo = invocation_via_argument_scanner as
+
+        bc = _invo.to_bound_call
+
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
         else
@@ -16,17 +20,20 @@ module Skylab::TestSupport
         end
       end
 
-      def _scanner_via_array a, l
-        Require_zerk_[]
-        Zerk_::API::ArgumentScanner.via_array a, & l
+      def bound_call_via_argument_scanner as
+        __invocation_via_argument_scanner( as ).to_bound_call
+      end
+
+      def invocation_via_argument_scanner as
+        API_Invocation___.new as
       end
     end ; end  # >>
 
-    API_Invocation__ = self
+    API_Invocation___ = self
 
-    def initialize scn, l
+    def initialize scn
       @argument_scanner = scn
-      @listener = l
+      @listener = scn.listener
       @system_conduit = nil
       @test_file_name_pattern = nil
     end

@@ -99,7 +99,6 @@ module Skylab::TMX
           end
         end
       end
-      UNDERSCORE_ = '_'
     end
   end
 end

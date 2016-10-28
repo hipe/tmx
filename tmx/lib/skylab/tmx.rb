@@ -12,6 +12,9 @@ module Skylab::TMX
   class << self
 
     def development_directory_json_file_stream__ & emit
+
+      # (compare `installation_.to_sidesystem_load_ticket_stream`)
+
       _dir = __lookup_development_directory
       glob = ::File.join _dir, '*', '.for-tmx-map.json'
       files = ::Dir.glob glob
@@ -167,14 +170,16 @@ module Skylab::TMX
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
 
+    Human = sidesys[ :Human ]
+
     _System_lib = sidesys[ :System ]
     System = -> do
       _System_lib[].services
     end
 
-    Human = sidesys[ :Human ]
-
     JSON = stdlib[ :JSON ]
+
+    Test_support = sidesys[ :TestSupport ]
   end
 
   # ==
@@ -188,4 +193,5 @@ module Skylab::TMX
   NOTHING_ = nil
   Home_ = self
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 end
