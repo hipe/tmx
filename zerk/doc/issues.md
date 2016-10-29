@@ -1,3 +1,5 @@
+[#052]       argument scanner
+
 [#051]       track simplified boxxy-like producers of primary hashes
 
 [#050]       [unified table support]

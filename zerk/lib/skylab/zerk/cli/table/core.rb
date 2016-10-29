@@ -25,8 +25,8 @@ module Skylab::Zerk
             freeze
           end
 
-          def add_field_by_normal_name_symbol sym
-            send @_receive_field, Field___.via_normal_name_symbol( sym )
+          def add_field_via_normal_name_symbol sym, * meta
+            send @_receive_field, Field___.new( sym, meta )
             NIL
           end
 
@@ -50,26 +50,27 @@ module Skylab::Zerk
 
         class Field___
 
-          class << self
-
-            def via_normal_name_symbol sym
-              new do
-                @normal_name_symbol = sym
-              end
+          def initialize sym, rest
+            @normal_name_symbol = sym
+            if rest.length.nonzero?
+              @_scn = Common_::Polymorphic_Stream.via_array rest
+              begin
+                instance_exec( & FIELD_META___.fetch( @_scn.gets_one ) )
+              end until @_scn.no_unparsed_exists
+              remove_instance_variable :@_scn
             end
-
-            private :new
-          end  # >>
-
-          def initialize & init
-            instance_exec( & init )
           end
+
+          FIELD_META___ = {
+            numeric: -> { @is_numeric = true },
+          }
 
           def name
             @name ||= Common_::Name.via_variegated_symbol @normal_name_symbol
           end
 
           attr_reader(
+            :is_numeric,
             :normal_name_symbol,
           )
         end

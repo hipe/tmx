@@ -9,6 +9,7 @@ module Skylab::Zerk::TestSupport
     # -
 
       def invoke * argv
+        @_ze_last_method = :puts
         @_ze_niCLI_setup = Setup___.new argv ; nil
       end
 
@@ -16,33 +17,52 @@ module Skylab::Zerk::TestSupport
         expect nil
       end
 
-      def expect_on_stderr_lines_in_big_string big_s
+      def expect_on_stderr_lines_in_big_string m=nil, big_s
+        @_ze_last_method = m if m
         @_ze_last_stream = :serr
-        expect_lines_in_big_string big_s
+        _ze_add_big_string_based_expectation big_s
       end
 
-      def expect_on_stdout_lines_in_big_string big_s
+      def expect_on_stdout_lines_in_big_string m=nil, big_s
+        @_ze_last_method = m if m
         @_ze_last_stream = :sout
-        expect_lines_in_big_string big_s
+        _ze_add_big_string_based_expectation big_s
       end
 
-      def expect_lines_in_big_string big_s
-        @_ze_niCLI_setup.add_big_string_based_expectation big_s, @_ze_last_stream
+      def expect_lines_in_big_string m=nil, big_s
+        @_ze_last_method = m if m
+        _ze_add_big_string_based_expectation big_s
         NIL
       end
 
-      def expect_on_stderr exp_x
+      def _ze_add_big_string_based_expectation big_s
+
+        @_ze_niCLI_setup.add_big_string_based_expectation(
+          big_s, @_ze_last_method, @_ze_last_stream )
+        NIL
+      end
+
+      def expect_on_stderr m=nil, exp_x
+        @_ze_last_method = m if m
         @_ze_last_stream = :serr
-        expect exp_x
+        _ze_add_line_based_expectation exp_x
       end
 
-      def expect_on_stdout exp_x
+      def expect_on_stdout m=nil, exp_x
+        @_ze_last_method = m if m
         @_ze_last_stream = :sout
-        expect exp_x
+        _ze_add_line_based_expectation exp_x
       end
 
-      def expect exp_x
-        @_ze_niCLI_setup.add_line_based_expectation exp_x, :puts, @_ze_last_stream
+      def expect m=nil, exp_x
+        @_ze_last_method = m if m
+        _ze_add_line_based_expectation exp_x
+      end
+
+      def _ze_add_line_based_expectation exp_x
+
+        @_ze_niCLI_setup.add_line_based_expectation(
+          exp_x, @_ze_last_method, @_ze_last_stream )
         NIL
       end
 
@@ -291,8 +311,8 @@ module Skylab::Zerk::TestSupport
         @has = {}
       end
 
-      def add_big_string_based_expectation big_s, serr_or_sout
-        _add BigStringBasedExpectation__.new( big_s, serr_or_sout ), serr_or_sout
+      def add_big_string_based_expectation big_s, m, serr_or_sout
+        _add BigStringBasedExpectation__.new( big_s, m, serr_or_sout ), serr_or_sout
       end
 
       def add_line_based_expectation exp_x, method_name, serr_or_sout
@@ -326,13 +346,14 @@ module Skylab::Zerk::TestSupport
 
     class BigStringBasedExpectation__
 
-      def initialize s, sym
+      def initialize s, m, sym
         @big_string = s
+        @method_name = m
         @serr_or_sout = sym
       end
 
       def to_multi_line_assertion tc
-        BigStringBasedAssertion___.new @big_string, @serr_or_sout, tc
+        BigStringBasedAssertion___.new @big_string, @method_name, @serr_or_sout, tc
       end
 
       def is_a_multi_line_expectation
@@ -342,11 +363,12 @@ module Skylab::Zerk::TestSupport
 
     class BigStringBasedAssertion___
 
-      def initialize s, sym, tc
+      def initialize s, m, sym, tc
 
         @big_string = s
-        @test_context = tc
+        @method_name = m
         @serr_or_sout = sym
+        @test_context = tc
 
         @_receive = :__receive_first_emission
       end
@@ -689,6 +711,10 @@ module Skylab::Zerk::TestSupport
       def puts s=nil
         @_receive[ s, :puts, @_stream_symbol ]
         NIL
+      end
+
+      def << s
+        @_receive[ s, :<<, @_stream_symbol ]
       end
     end
 

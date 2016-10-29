@@ -4,15 +4,17 @@ module Skylab::Brazen
 
     class << self
 
-      same = -> * x_a, & p do
+      def call * x_a, & p
+        call_via_arguments x_a, & p
+      end
+
+      alias_method :[], :call
+
+      def call_via_arguments x_a, & p
         o = new( & p )
         o._init_arg_upstream_and_depdendencies x_a
         o._execute
       end
-
-      define_method :[], same
-
-      define_method :call, same
 
       def curry * x_a
         o = new

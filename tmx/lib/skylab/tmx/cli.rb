@@ -11,6 +11,8 @@ module Skylab::TMX
     class Invocation___
 
       def initialize i, o, e, pn_s_a
+        @_BE_VERBOSE = false  # ..
+        @_end_of_stream = :_noop
         @serr = e
         @sout = o
         @program_name_string_array = pn_s_a
@@ -70,7 +72,7 @@ module Skylab::TMX
 
       def __when_unrecognized_option_at_front
         @serr.puts "unrecognized option: #{ @argv.first.inspect }"
-        _invite_to_general_help
+        invite_to_general_help
       end
 
       def __when_general_help
@@ -98,7 +100,7 @@ module Skylab::TMX
         else
           @serr.puts "currently, normal tmx is deactivated -"
           @serr.puts "won't parse #{ scn.current_token.inspect }"
-          _invite_to_general_help
+          invite_to_general_help
         end
       end
 
@@ -112,7 +114,12 @@ module Skylab::TMX
 
       def __bound_call_for_test_all
 
-        @_express = :_express_stream_of_string_or_name
+        @routes = {
+          find_command_args: :__receive_find_command_args,
+        }
+
+        @_table_schema = nil
+        @_express = :__express_trueish_result_for_test_all
 
         _lib = Home_.lib_.test_support::Slowie
 
@@ -127,6 +134,23 @@ module Skylab::TMX
         _bc  # #todo
       end
 
+      def __receive_find_command_args em_p, chan
+        if @_BE_VERBOSE
+          @_emit[ * chan, & em_p ]
+        end
+        NIL
+      end
+
+      def __express_trueish_result_for_test_all x
+
+        if @_table_schema
+          __attempt_to_render_a_table_in_a_general_way x
+        else
+          _express_stream_of_string_or_name x
+        end
+        NIL
+      end
+
       # -- reports
 
       def __bound_call_for_reports
@@ -138,7 +162,7 @@ module Skylab::TMX
         _bound_call_via_API_invocation o
       end
 
-      def __flush_argument_scanner_for_reports
+      def __flush_argument_scanner_for_reports  # see [#ze-052]
 
         _flush_multimode_argument_scanner do |o|
 
@@ -160,7 +184,7 @@ module Skylab::TMX
 
         @_express = :__express_stream_of_map_nodes
 
-        o = Home_::API.begin( & method( :__receive_map_emission ) )
+        o = Home_::API.begin( & @_emit )
 
         o.argument_scanner = __flush_argument_scanner_for_map
 
@@ -184,31 +208,7 @@ module Skylab::TMX
         o.execute
       end
 
-      # the following method could stand as sort of a model for how this new,
-      # "multi-mode argument scanner" adaptation could go for customizing
-      # API operations as CLI operations generally. note this explanation
-      # is longer than the method itself.
-      #
-      #   - both because we had to parse the operation name off the ARGV
-      #     before we could know which operation we want to build the
-      #     adaptation for AND because it's more explicit, we tell our
-      #     adapter explicitly the path to the backend operation we are
-      #     calling with `front_scanner_tokens`.
-      #
-      #   - each `subtract_primary` has the effect of making that primary
-      #     not settable by the CLI. in most cases we provide a "fixed"
-      #     value for it that to the backend is indistinguishable from a
-      #     user-provided value.
-      #
-      #     (note for later: the way we used to do this in [br] was awful)
-      #
-      #   - finally with `user_scanner` we pass any remaining non-parsed
-      #     ARGV (which, of course, is written in a "CLI way"). the adapter
-      #     attempts to make the underlying user arguments available to the
-      #     operation for it to read in an "API way" with name convention
-      #     translation as appropriate.
-
-      def __flush_argument_scanner_for_map
+      def __flush_argument_scanner_for_map  # see [#ze-052]
 
         _flush_multimode_argument_scanner do |o|
 
@@ -224,30 +224,90 @@ module Skylab::TMX
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
-          o.listener method :__receive_argument_scanner_emission
+          o.listener @_emit
         end
       end
 
-      def __receive_argument_scanner_emission * i_a, & em_p
-        # hi. (used to intercept & map)
-        @_emit.call( * i_a, & em_p )
-        NIL
-      end
-
-      def __receive_map_emission * i_a, & ev_p
-        # hi. (used to intercept & map)
-        @_emit.call( * i_a, & em_p )
-        NIL
-      end
-
       # -- support for expressing results (our version of [#ze-025])
+
+      def __attempt_to_render_a_table_in_a_general_way row_st
+
+        # just a sketch
+
+        defn = []
+
+        d = 0 ; yes = false
+
+        _ts = remove_instance_variable :@_table_schema
+        box = _ts.field_box
+        box.each_value do |fld|
+
+          if fld.is_numeric
+            d += 1
+            yes = true
+          else
+            yes = false
+          end
+
+          defn.push :field, :right, :label, UC_first___[ fld.name.as_human ]
+        end
+
+        if yes && 1 == d
+
+          # for now we render "lipstick" only if and always if there is
+          # exactly one numeric field, and it is last. later we will do it
+          # over some --verbose threshold.
+
+          # add a whole cel to each row dedicated to being rendered as lipstick:
+
+          read_rows_from = row_st.map_by do |muta_a|
+            muta_a.push muta_a.last
+            muta_a
+          end
+
+          _width = Home_.lib_.brazen::CLI.some_screen_width
+
+          defn.push(
+            :target_width, _width,
+            :field, :gather_statistics,
+            :max_share_meter,
+              :of_column, box.length,  # selfsame column
+              :glyph, '*',
+              :background_glyph, '-',
+          )
+        else
+          read_rows_from = row_st
+        end
+
+        defn.push(
+          :read_rows_from, read_rows_from,
+          :write_lines_to, @sout,
+        )
+        CLI_support_[]::Table::Actor.call_via_arguments defn
+        NIL
+      end
 
       def _express_stream_of_string_or_name st
         _express_non_empty_stream :__expresser_for_string_or_name, st
       end
 
-      def __expresser_for_string_or_name x
+      def _express_non_empty_stream m, st
+        x = st.gets
+        if x
+          express = send m, x
+          begin
+            express[ x ]
+            x = st.gets
+            x ? redo : break
+          end while above
+          send @_end_of_stream
+        else
+          @serr.puts "(no results.)"  # #not-covered
+        end
+        NIL
+      end
 
+      def __expresser_for_string_or_name x
         sout = @sout
         if x.respond_to? :ascii_only?
           -> line do
@@ -260,21 +320,6 @@ module Skylab::TMX
         else
           _NO
         end
-      end
-
-      def _express_non_empty_stream m, st
-        x = st.gets
-        if x
-          express = send m, x
-          begin
-            express[ x ]
-            x = st.gets
-            x ? redo : break
-          end while above
-        else
-          @serr.puts "(no results.)"  # #not-covered
-        end
-        NIL
       end
 
       # -- preparing calls to the backend
@@ -301,26 +346,15 @@ module Skylab::TMX
 
       def __init_selective_listener
 
-        expsr = nil
+        expsr = nil  # only build it once an emission is received
         @_emit = -> * sym_a, & em_p do
-          expsr ||= __build_emission_expresser
+          expsr ||= HardcodedEmissionExpresserForNow___.new self
           expsr.dup.invoke em_p, sym_a
         end
         NIL
       end
 
-      def __build_emission_expresser  # only build when an emission is received
-
-        _expag = _expression_agent  # few (no?) emissions are expresssed without it
-        HardcodedEmissionExpresserForNow___.new(
-          method( :_invite_to_general_help ),
-          -> d { @exitstatus = d },
-          _expag,
-          @serr,
-        )
-      end
-
-      def _invite_to_general_help
+      def invite_to_general_help
         @serr.puts "try '#{ _program_name } -h'"
         _failed
       end
@@ -333,7 +367,7 @@ module Skylab::TMX
 
         _st = _to_didactic_operation_name_stream
 
-        _expression_agent.calculate do
+        expression_agent.calculate do
           say_formal_operation_alternation_ _st
         end
       end
@@ -344,7 +378,7 @@ module Skylab::TMX
         end
       end
 
-      def _expression_agent
+      def expression_agent
         Zerk_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
       end
 
@@ -353,10 +387,28 @@ module Skylab::TMX
         UNABLE_
       end
 
+      def _noop
+        NOTHING_
+      end
+
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-      attr_reader(  # (for collaborators (e.g magnetics))
+      # -- for collaborators (e.g emission expresser, magnetics)
+
+      def receive_data_emission data_p, channel
+        :table_schema == channel[1] || fail
+        @_table_schema = data_p[]
+        NIL
+      end
+
+      attr_writer(
+        :exitstatus,
+      )
+
+      attr_reader(
         :API_invocation_,
+        :routes,
+        :serr,
         :sout,
       )
     end
@@ -364,6 +416,7 @@ module Skylab::TMX
     # ==
 
     Legacy_CLI_class___ = Lazy_.call do
+      self._NOT_USED
   class Legacy_CLI____ < Home_.lib_.brazen::CLI
 
     # we do not yet need and so are not yet worried about "our tmx" as a
@@ -523,21 +576,29 @@ module Skylab::TMX
 
     class HardcodedEmissionExpresserForNow___
 
-      def initialize * four
+      # this stays very close to its only client. is a separate class only
+      # so that it can have a clean, dedicated ivar space per emission.
+      #
+      # (everything is built lazily because the variety of shapes of
+      # emission we receive (event, expression, data) all use different
+      # resources.)
 
-        @invite, @write_exitstatus, @expression_agent, serr = four
-
-        @_y = ::Enumerator::Yielder.new do |s|
-          serr.puts s  # hi.
-        end
-        freeze
+      def initialize client
+        @_ = client
+        @_info_yielder = Lazy_.call { Build_info_yielder___[ client.serr ] }  # share the same across dups
+        @routes = client.routes || MONADIC_EMPTINESS_
       end
 
       def invoke em_p, sym_a
         @channel_symbol_array = sym_a
         @emission_proc = em_p
-        if :expression == @channel_symbol_array[1]
+        m = @routes[ @channel_symbol_array.last ]
+        if m
+          @_.send m, em_p, sym_a
+        elsif :expression == @channel_symbol_array[1]
           __express_expression
+        elsif :data == @channel_symbol_array[0]
+          __send_data
         else
           __express_event
         end
@@ -547,23 +608,40 @@ module Skylab::TMX
 
       def __express_event
         _ev = @emission_proc.call
-        _ev.express_into_under @_y, @expression_agent
+        _ev.express_into_under @_info_yielder[], @_.expression_agent
         NIL
       end
 
       def __express_expression
-        @expression_agent.calculate @_y, & @emission_proc
+        @_.expression_agent.calculate @_info_yielder[], & @emission_proc
         NIL
       end
 
       def __maybe_invite
         if :parse_error == @channel_symbol_array[2]
-          @invite[]
+          @_.invite_to_general_help  # ..
         elsif :error == @channel_symbol_array[0]
-          @write_exitstatus[ FAILURE_EXITSTATUS__ ]
+          @_.exitstatus = FAILURE_EXITSTATUS__
         end
         NIL
       end
+
+      def __send_data
+        @_.receive_data_emission @emission_proc, @channel_symbol_array
+        NIL
+      end
+    end
+
+    # ==
+
+    Build_info_yielder___ = -> serr do
+      ::Enumerator::Yielder.new do |s|
+        serr.puts s  # hi.
+      end
+    end
+
+    UC_first___ = -> s do
+      "#{ s[0].upcase }#{ s[1..-1] }"
     end
 
     # ==
@@ -574,6 +652,12 @@ module Skylab::TMX
         d == s.getbyte(0)
       end
     end.call
+
+    # ==
+
+    CLI_support_ = Lazy_.call do
+      Home_.lib_.brazen::CLI_Support
+    end
 
     # ==
 

@@ -53,17 +53,6 @@ module Skylab::TestSupport
         end
       end
 
-      if false
-        CLI_support_[]::Table::Actor.call(
-
-          :field, 'subproduct',
-          :field, 'num test files',
-          * field_extra,
-          :write_lines_to, @resources.sout,
-          :read_rows_from, _st,
-        )
-      end
-
       # ~
 
       def __emit_table_schema
@@ -75,10 +64,12 @@ module Skylab::TestSupport
 
       def __build_table_schema
 
+        Require_zerk_[]  # [tmx]
+
         Zerk_::CLI::Table::Models::Schema.define do |o|
           # (the below order must accord with :#here)
-          o.add_field_by_normal_name_symbol :test_directory
-          o.add_field_by_normal_name_symbol :number_of_test_files
+          o.add_field_via_normal_name_symbol :test_directory
+          o.add_field_via_normal_name_symbol :number_of_test_files, :numeric
         end
       end
 

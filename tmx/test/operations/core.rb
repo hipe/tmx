@@ -98,6 +98,7 @@ module Skylab::TMX::TestSupport
 
     # === LEGACY ([br]) BELOW
 
+    if false
     Reactions = -> tcc do
       Common_.test_support::Expect_Event[ tcc ]
       Building[ tcc ]
@@ -172,6 +173,7 @@ module Skylab::TMX::TestSupport
       NIL_
     end
   end
+    end  # if false
 # ->
   end
 end

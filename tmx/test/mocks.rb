@@ -1,3 +1,5 @@
+self._TO_KILL
+
 module Skylab::TMX::TestSupport
 
   module Mocks
