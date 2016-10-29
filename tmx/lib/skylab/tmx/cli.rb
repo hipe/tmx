@@ -119,20 +119,31 @@ module Skylab::TMX
         }
 
         @_table_schema = nil
-        @_express = :__express_trueish_result_for_test_all
+        @_express = :__express_for_test_all
 
         _lib = Home_.lib_.test_support::Slowie
 
-        _as = _flush_multimode_argument_scanner do |o|
+        as = _flush_multimode_argument_scanner do |o|
           o.user_scanner remove_instance_variable :@_user_scanner
           o.listener @_emit
         end
 
-        invo = _lib::API.invocation_via_argument_scanner _as
-        # invo.xx = :yy
-        _bc = invo.to_bound_call
-        _bc  # #todo
+        bc = _lib::API.bound_call_via_argument_scanner as
+
+        if bc
+          op = bc.receiver
+          if op.respond_to? :test_directory_collection
+            __do_the_thing_for_test_directories op.test_directory_collection
+          end
+          bc
+        end
       end
+
+      def __do_the_thing_for_test_directories tdc
+        # (this is next, see forthcoming [#006])
+      end
+
+      # ~ emissions
 
       def __receive_find_command_args em_p, chan
         if @_BE_VERBOSE
@@ -141,10 +152,12 @@ module Skylab::TMX
         NIL
       end
 
-      def __express_trueish_result_for_test_all x
+      def __express_for_test_all x
 
         if @_table_schema
           __attempt_to_render_a_table_in_a_general_way x
+        elsif x.respond_to? :id2name
+          @sout.puts x.to_s  # for `ping`
         else
           _express_stream_of_string_or_name x
         end
@@ -339,7 +352,7 @@ module Skylab::TMX
 
       def _bound_call_via_API_invocation o
         @API_invocation_ = o
-        o.to_bound_call
+        o.to_bound_call_of_operator
       end
 
       # --

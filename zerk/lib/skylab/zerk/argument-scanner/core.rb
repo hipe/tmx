@@ -5,13 +5,22 @@ module Skylab::Zerk
     class CommonImplementation
 
       def match_head_against_primaries_hash h
+        pair = pair_via_match_head_against_primaries_hash h
+        if pair
+          pair.value_x
+        else
+          pair
+        end
+      end
+
+      def pair_via_match_head_against_primaries_hash h
         pair = pair_via_match_head_against_primaries_hash_ h
         if pair
           @current_primary_symbol = pair.name_symbol
-          pair.value_x
+          pair
         else
-          @current_primary_symbol = UNABLE_
-          UNABLE_
+          @current_primary_symbol = pair
+          pair
         end
       end
 

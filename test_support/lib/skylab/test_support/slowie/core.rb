@@ -9,9 +9,7 @@ module Skylab::TestSupport
         Require_zerk_[]
         _as = Zerk_::API::ArgumentScanner.via_array a, & listener
 
-        _invo = invocation_via_argument_scanner _as
-
-        bc = _invo.to_bound_call
+        bc = bound_call_via_argument_scanner _as
 
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
@@ -21,11 +19,7 @@ module Skylab::TestSupport
       end
 
       def bound_call_via_argument_scanner as
-        __invocation_via_argument_scanner( as ).to_bound_call
-      end
-
-      def invocation_via_argument_scanner as
-        API_Invocation___.new as
+        API_Invocation___.new( as ).to_bound_call_of_operator
       end
     end ; end  # >>
 
@@ -40,7 +34,7 @@ module Skylab::TestSupport
 
     # -- ad-hoc operation routing
 
-    def to_bound_call
+    def to_bound_call_of_operator
       if @argument_scanner.no_unparsed_exists
         self._COVER_ME_no_arguments
       else
@@ -71,14 +65,14 @@ module Skylab::TestSupport
         name = Common_::Name.via_slug sm.entry_group_head
 
         h[ name.as_lowercase_with_underscores_symbol ] =
-          [ :__bound_call_for_item, name ]
+          [ :__bound_call_for_operation, name ]
 
         redo
       end while above
       h
     end
 
-    def __bound_call_for_item name
+    def __bound_call_for_operation name
 
       @argument_scanner.advance_one
 
@@ -398,12 +392,6 @@ module Skylab::TestSupport
       :listener,
     )
 
-    def be_verbose
-     false  # not a thing yet, for the future
-    end
-
-    # --
-
     if false
     class Expression_Agent___  # #todo after :+#dev cull this
 
@@ -510,7 +498,6 @@ module Skylab::TestSupport
     end
 
     # ==
-
 
     Here_ = self
   end

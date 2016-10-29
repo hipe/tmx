@@ -151,6 +151,12 @@ module Skylab::Zerk::TestSupport
 
   # --
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  # --
+
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true

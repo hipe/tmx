@@ -12,7 +12,7 @@ module Skylab::TMX
 
         o = self.begin( & p )
         o.argument_scanner = Zerk_[]::API::ArgumentScanner.via_array x_a, & p
-        bc = o.to_bound_call
+        bc = o.to_bound_call_of_operator
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
         else
@@ -38,7 +38,7 @@ module Skylab::TMX
         :argument_scanner,
       )
 
-      def to_bound_call
+      def to_bound_call_of_operator
         if @argument_scanner.no_unparsed_exists
           __when_no_args
         else
