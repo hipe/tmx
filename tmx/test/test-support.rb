@@ -55,18 +55,6 @@ module Skylab::TMX::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
-
-    def subject_CLI
-      Home_::CLI
-    end
-
-    def prepare_CLI cli
-      NOTHING_
-    end
-
-    define_method :program_name_string_array, ( Lazy_.call do
-      %w( tmz )
-    end )
   end
 
   Home_ = ::Skylab::TMX
@@ -78,7 +66,7 @@ module Skylab::TMX::TestSupport
     end
 
     Non_Interactive_CLI_Fail_Early = -> tcc do
-      Zerk_[].test_support::Non_Interactive_CLI::Fail_Early[ tcc ]
+      Zerk_lib_[].test_support::Non_Interactive_CLI::Fail_Early[ tcc ]
     end
 
   # ==
@@ -86,9 +74,10 @@ module Skylab::TMX::TestSupport
   Autoloader_ = Home_::Autoloader_
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
   NIL_ = nil
   NOTHING_ = Home_::NOTHING_
   Stream_ = Home_::Stream_
   TS_ = self
-  Zerk_ = Home_::Zerk_
+  Zerk_lib_ = Home_::Zerk_lib_
 end

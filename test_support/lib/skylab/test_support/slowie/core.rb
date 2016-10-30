@@ -14,7 +14,7 @@ module Skylab::TestSupport
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
         else
-          UNABLE_
+          UNABLE_  # "downgrading" all `nil` to false saves typing in operations
         end
       end
 
@@ -491,6 +491,19 @@ module Skylab::TestSupport
 
       UNDERSCORE_ = '_'.freeze  # we need our own because [#002]
       end  # if false
+    # ==
+
+    class OperationIdentifier_
+
+      def initialize * s_a
+        @path = s_a.freeze
+      end
+
+      attr_reader(
+        :path,
+      )
+    end
+
     # ==
 
     Stream_ = -> a, & p do

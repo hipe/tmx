@@ -17,17 +17,23 @@ module Skylab::TMX
         @_has_means = false
         @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
         @_seen_last_reorder_plan = false
-        @_stream_modifiers_were_used = false
+        @stream_modifiers_were_used = false
+      end
+
+      def json_file_stream_by= x  # for [#006]
+        @_has_means = true
+        @json_file_stream_by = x
       end
 
       attr_writer(
         :argument_scanner,
+        :attributes_module_by,  # for [#006]
       )
 
       def execute
         if __parse_modifiers
           if __all_requireds_are_present
-            if @_stream_modifiers_were_used
+            if @stream_modifiers_were_used
               __modified_stream
             else
               _flush_to_unparsed_node_stream
@@ -95,7 +101,7 @@ module Skylab::TMX
 
       def _flush_to_unparsed_node_stream
 
-        _p = remove_instance_variable :@_json_file_stream_by
+        _p = remove_instance_variable :@json_file_stream_by
 
         st = _p.call( & @_emit )
         if st
@@ -131,6 +137,15 @@ module Skylab::TMX
           @argument_scanner.advance_one
           send m
         end
+      end
+
+      def parse_primary_at_head sym
+        @argument_scanner.advance_one
+        send PRIMARIES__.fetch sym
+      end
+
+      def to_primary_normal_name_stream  # for [#006]
+        Stream_[ PRIMARIES__.keys ]
       end
 
       PRIMARIES__ = {
@@ -182,7 +197,7 @@ module Skylab::TMX
         p = @argument_scanner.parse_primary_value :must_be_trueish
         if p
           @_has_means = true
-          @_json_file_stream_by = p
+          @json_file_stream_by = p
           ACHIEVED_
         end
       end
@@ -191,13 +206,13 @@ module Skylab::TMX
         st = @argument_scanner.parse_primary_value :must_be_trueish
         if st
           @_has_means = true
-          @_json_file_stream_by = -> { st }
+          @json_file_stream_by = -> { st }
           ACHIEVED_
         end
       end
 
       def __parse_result_in_tree
-        if @_stream_modifiers_were_used
+        if @stream_modifiers_were_used
           @result_in_tree = true ; ACHIEVED_
         else
           _when_contextually_invalid_primary
@@ -258,7 +273,7 @@ module Skylab::TMX
 
       def _modifications
         @_modifications ||= begin
-          @_stream_modifiers_were_used = true
+          @stream_modifiers_were_used = true
           @result_in_tree = false
           Home_::Models_::MapModificationIndex.new
         end
@@ -283,6 +298,7 @@ module Skylab::TMX
 
       attr_reader(
         :argument_scanner,  # for collaborators
+        :stream_modifiers_were_used,  # for [#006]
       )
     # -
 

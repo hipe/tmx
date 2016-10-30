@@ -114,40 +114,37 @@ module Skylab::TMX
 
       def __bound_call_for_test_all
 
-        @routes = {
+        @_express = :__express_for_test_all
+
+        @routes = {  # how we ignore particular emissions
           find_command_args: :__receive_find_command_args,
         }
 
-        @_table_schema = nil
-        @_express = :__express_for_test_all
+        @_table_schema = nil  # gets set by an emission if relevant
 
         _lib = Home_.lib_.test_support::Slowie
 
-        as = _flush_multimode_argument_scanner do |o|
+        _init_multimode_argument_scanner do |o|
           o.user_scanner remove_instance_variable :@_user_scanner
-          o.listener @_emit
+          o.listener @listener
         end
 
-        bc = _lib::API.bound_call_via_argument_scanner as
+        bc = _lib::API.bound_call_via_argument_scanner @argument_scanner
 
         if bc
-          op = bc.receiver
-          if op.respond_to? :test_directory_collection
-            __do_the_thing_for_test_directories op.test_directory_collection
+          if bc.receiver.respond_to? :test_directory_collection
+            CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation[ bc, self ]
+          else
+            bc
           end
-          bc
         end
-      end
-
-      def __do_the_thing_for_test_directories tdc
-        # (this is next, see forthcoming [#006])
       end
 
       # ~ emissions
 
       def __receive_find_command_args em_p, chan
         if @_BE_VERBOSE
-          @_emit[ * chan, & em_p ]
+          @listener[ * chan, & em_p ]
         end
         NIL
       end
@@ -170,25 +167,30 @@ module Skylab::TMX
 
         @_express = :_express_stream_of_string_or_name
 
-        o = Home_::API.begin( & @_emit )
-        o.argument_scanner = __flush_argument_scanner_for_reports
+        o = Home_::API.begin( & @listener )
+
+        __init_argument_scanner_for_reports
+
+        o.argument_scanner = @argument_scanner
+
         _bound_call_via_API_invocation o
       end
 
-      def __flush_argument_scanner_for_reports  # see [#ze-052]
+      def __init_argument_scanner_for_reports  # see [#ze-052]
 
-        _flush_multimode_argument_scanner do |o|
+        _init_multimode_argument_scanner do |o|
 
           o.front_scanner_tokens :reports
 
-          o.subtract_primary :json_file_stream_by, _release_json_file_stream_by
+          o.subtract_primary :json_file_stream_by, release_json_file_stream_by_
 
           o.default_primary :execute
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
-          o.listener @_emit
+          o.listener @listener
         end
+        NIL
       end
 
       # -- map
@@ -197,9 +199,11 @@ module Skylab::TMX
 
         @_express = :__express_stream_of_map_nodes
 
-        o = Home_::API.begin( & @_emit )
+        o = Home_::API.begin( & @listener )
 
-        o.argument_scanner = __flush_argument_scanner_for_map
+        __init_argument_scanner_for_map
+
+        o.argument_scanner = @argument_scanner
 
         _bound_call_via_API_invocation o
       end
@@ -221,13 +225,13 @@ module Skylab::TMX
         o.execute
       end
 
-      def __flush_argument_scanner_for_map  # see [#ze-052]
+      def __init_argument_scanner_for_map  # see [#ze-052]
 
-        _flush_multimode_argument_scanner do |o|
+        _init_multimode_argument_scanner do |o|
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
-          o.subtract_primary :json_file_stream_by, _release_json_file_stream_by
+          o.subtract_primary :json_file_stream_by, release_json_file_stream_by_
 
           o.subtract_primary :json_file_stream  # used in testing, never in UI
 
@@ -237,8 +241,9 @@ module Skylab::TMX
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
-          o.listener @_emit
+          o.listener @listener
         end
+        NIL
       end
 
       # -- support for expressing results (our version of [#ze-025])
@@ -337,16 +342,14 @@ module Skylab::TMX
 
       # -- preparing calls to the backend
 
-      def _flush_multimode_argument_scanner & defn
+      def _init_multimode_argument_scanner & defn
 
-        as = Zerk_[]::NonInteractiveCLI::MultiModeArgumentScanner.define( & defn )
-
-        @_argument_scanner = as
-
-        as
+        @argument_scanner =
+          Zerk_lib_[]::NonInteractiveCLI::MultiModeArgumentScanner.define( & defn )
+        NIL
       end
 
-      def _release_json_file_stream_by
+      def release_json_file_stream_by_
         remove_instance_variable :@__json_file_stream_proc
       end
 
@@ -360,7 +363,7 @@ module Skylab::TMX
       def __init_selective_listener
 
         expsr = nil  # only build it once an emission is received
-        @_emit = -> * sym_a, & em_p do
+        @listener = -> * sym_a, & em_p do
           expsr ||= HardcodedEmissionExpresserForNow___.new self
           expsr.dup.invoke em_p, sym_a
         end
@@ -392,7 +395,7 @@ module Skylab::TMX
       end
 
       def expression_agent
-        Zerk_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
+        Zerk_lib_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
       end
 
       def _failed
@@ -419,7 +422,9 @@ module Skylab::TMX
       )
 
       attr_reader(
+        :argument_scanner,
         :API_invocation_,
+        :listener,
         :routes,
         :serr,
         :sout,

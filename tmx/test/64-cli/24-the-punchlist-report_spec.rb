@@ -51,7 +51,7 @@ module Skylab::TMX::TestSupport
         expect_succeeded
       end
 
-      given_ %w( gilius adder stern dora )  # weird order
+      given_test_directories %w( gilius adder stern dora )  # weird order
 
       def __this_big_string
 

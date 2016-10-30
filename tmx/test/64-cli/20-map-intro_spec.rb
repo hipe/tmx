@@ -8,6 +8,10 @@ module Skylab::TMX::TestSupport
     use :CLI
     use :non_interactive_CLI_fail_early
 
+    class << self
+      alias_method :given_, :given_test_directories
+    end  # >>
+
     context "these three distinct cases have the same error message" do
 
       it "strange primary" do

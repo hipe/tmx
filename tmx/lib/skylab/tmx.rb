@@ -151,8 +151,10 @@ module Skylab::TMX
     bx
   end
 
-  Zerk_ = Lazy_.call do
-    Autoloader_.require_sidesystem :Zerk
+  Zerk_lib_ = Lazy_.call do
+    mod = Autoloader_.require_sidesystem :Zerk
+    Zerk_ = mod
+    mod
   end
 
   Stream_ = -> a, & p do

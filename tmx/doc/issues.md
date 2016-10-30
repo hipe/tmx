@@ -1,4 +1,4 @@
-[#006]       ..
+[#006]       [ the glue that glues together the centralest things ]
 [#005]       [ the punchlist report ]  (much documentation/theory in-situ)
 [#004]       syntax for the "map" operation
 [#003]       the help screen narrative ..

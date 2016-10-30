@@ -16,7 +16,7 @@ module Skylab::TMX
       # select an attribute in order to function, this attribute will not be
       # expressed in the output unless it also appears in a "-select" term.
       #
-      # fortunately we don't need to get be quite so "weedy" here: the
+      # fortunately we don't need to yet be quite so "weedy" here: the
       # "map modification index" is suppposed to hide all of that from us,
       # giving us only the (any) attributes we need to display (in order).
       #

@@ -5,18 +5,26 @@ module Skylab::TestSupport
     class Operations::Counts
 
       if false
-        y  <<  "show a report of the number of tests per subproduct"
+        y  << "show a report of the number of tests per subproduct"
       end
 
       def initialize
-        o = yield
-        @argument_scanner = o.argument_scanner
-        @_emit = o.listener
-        @globberer_by = o.method :globberer_by
 
-        @_test_directory_collection = Here_::Models_::TestDirectoryCollection.
-          new :counts, o
+        o = yield
+        _op_id = OperationIdentifier_.new :counts
+
+        @__emit = o.listener
+
+        @_syntax = Here_::Models_::HashBasedSyntax.new(
+          o.argument_scanner, PRIMARIES___, self )
+
+        @test_directory_collection = Here_::Models_::TestDirectoryCollection.new(
+          _op_id, o )
       end
+
+      attr_reader(  # for pre-execution syntax hacks
+        :test_directory_collection,
+      )
 
       def execute
         if __normal
@@ -33,7 +41,7 @@ module Skylab::TestSupport
 
       def __flush_table_stream
 
-        __globber_stream.map_by do |globber|
+        @test_directory_collection.to_globber_stream.map_by do |globber|
 
           _count = globber.to_count
           _dir = globber.directory
@@ -42,21 +50,8 @@ module Skylab::TestSupport
         end
       end
 
-      def __globber_stream  # copy-pasted (at writing) for clarity
-
-        globberer = @globberer_by.call do |o|
-          o.xx_example_globber_option_xx = :yy
-        end
-
-        @_test_directory_collection.to_nonempty_test_directory_stream.map_by do |dir|
-          globberer.globber_via_directory dir
-        end
-      end
-
-      # ~
-
       def __emit_table_schema
-        @_emit.call :data, :table_schema do
+        @__emit.call :data, :table_schema do
           __build_table_schema
         end
         NIL
@@ -73,36 +68,32 @@ module Skylab::TestSupport
         end
       end
 
-      # -- parsing arguments (do it yourself for clarity & flexibility)
+      # == mostly boilerplate below (here for clarity)
 
       def __normal
-        if __parse_args
-          @_test_directory_collection.check_for_missing_requireds
-        end
+        _yes = @_syntax.parse_arguments
+        _yes &&= @test_directory_collection.check_for_missing_requireds
+        _yes  # #todo
       end
 
-      def __parse_args
-        ok = true
-        until @argument_scanner.no_unparsed_exists
-          ok = __parse_primary
-          ok || break
-        end
-        ok
+      # -- for [#006]
+
+      def parse_primary_at_head sym
+        @_syntax.parse_primary_at_head sym
       end
 
-      def __parse_primary
-        m = @argument_scanner.match_head_against_primaries_hash PRIMARIES___
-        if m
-          send m
-        end
+      def to_primary_normal_name_stream
+        @_syntax.to_primary_normal_name_stream
       end
+
+      # --
 
       PRIMARIES___ = {
         test_directory: :__parse_test_directory,
       }
 
       def __parse_test_directory
-        @_test_directory_collection.parse_test_directory
+        @test_directory_collection.parse_test_directory
       end
     end
   end

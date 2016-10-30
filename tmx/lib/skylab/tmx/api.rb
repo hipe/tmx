@@ -11,7 +11,7 @@ module Skylab::TMX
       def call * x_a, & p
 
         o = self.begin( & p )
-        o.argument_scanner = Zerk_[]::API::ArgumentScanner.via_array x_a, & p
+        o.argument_scanner = Zerk_lib_[]::API::ArgumentScanner.via_array x_a, & p
         bc = o.to_bound_call_of_operator
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
@@ -141,7 +141,7 @@ module Skylab::TMX
         p[ line ]
       end
 
-      Zerk_[]::API::ArgumentScannerExpressionAgent.instance.
+      Zerk_lib_[]::API::ArgumentScannerExpressionAgent.instance.
         calculate _y, & exp_p
 
       raise ArgumentError, buffer

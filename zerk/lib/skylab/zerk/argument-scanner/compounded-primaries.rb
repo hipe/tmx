@@ -47,7 +47,7 @@ module Skylab::Zerk
         ok
       end
 
-      # -- definition-time
+      # -- define-time
 
       def add_operation op
 
