@@ -19,7 +19,15 @@ module Skylab::TMX
       end
 
       def json_file_stream_by & p
-        @__json_file_stream_proc = p
+        @__json_file_stream_by = p
+      end
+
+      def test_directory_entry_name_by & p
+        @__test_directory_entry_name_by = p
+      end
+
+      def test_file_name_pattern_by & p
+        @__test_file_name_pattern_by = p
       end
 
       def invoke argv
@@ -122,14 +130,21 @@ module Skylab::TMX
 
         @_table_schema = nil  # gets set by an emission if relevant
 
-        _lib = Home_.lib_.test_support::Slowie
-
         _init_multimode_argument_scanner do |o|
           o.user_scanner remove_instance_variable :@_user_scanner
           o.listener @listener
         end
 
-        bc = _lib::API.bound_call_via_argument_scanner @argument_scanner
+        _lib = Home_.lib_.test_support::Slowie
+
+        _api = _lib::API.begin_invocation_by @argument_scanner do |api|
+
+          _ = remove_instance_variable :@__test_file_name_pattern_by
+
+          api.test_file_name_pattern_by( & _ )
+        end
+
+        bc = _api.to_bound_call_of_operator
 
         if bc
           if bc.receiver.respond_to? :test_directory_collection
@@ -350,7 +365,11 @@ module Skylab::TMX
       end
 
       def release_json_file_stream_by_
-        remove_instance_variable :@__json_file_stream_proc
+        remove_instance_variable :@__json_file_stream_by
+      end
+
+      def release_test_directory_entry_name_by__
+        remove_instance_variable :@__test_directory_entry_name_by
       end
 
       def _bound_call_via_API_invocation o

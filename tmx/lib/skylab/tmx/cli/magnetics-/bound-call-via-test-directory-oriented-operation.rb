@@ -12,6 +12,7 @@ module Skylab::TMX
         @_remote_operation = bc.receiver
         @_result_in_the_same_bound_call_we_stared_with = bc
         @_test_directory_collection = @_remote_operation.test_directory_collection
+        @__test_directory_entry_name_by = cli.release_test_directory_entry_name_by__
       end
 
       def execute
@@ -43,8 +44,11 @@ module Skylab::TMX
 
           once = -> do
             once = nil
+
+            dir = remove_instance_variable( :@__test_directory_entry_name_by ).call
+
             st.map_by do |node|
-              node.get_filesystem_directory_entry_string
+              ::File.join node.get_filesystem_directory, dir
             end
           end
 

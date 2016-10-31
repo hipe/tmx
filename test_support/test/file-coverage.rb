@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport
       cache = {}
       define_method :fixture_tree_test_dir_for_ do |sym|
         cache.fetch sym do
-          x = fixture_tree sym, Home_::TEST_DIR_FILENAME_
+          x = fixture_tree sym, Home_::Init.test_directory_entry_name
           cache[ sym ] = x
           x
         end

@@ -9,7 +9,14 @@ module Skylab::TestSupport
         Require_zerk_[]
         _as = Zerk_::API::ArgumentScanner.via_array a, & listener
 
-        bc = bound_call_via_argument_scanner _as
+        _invo = begin_invocation_by _as do |api|
+
+          api.test_file_name_pattern_by do
+            Home_::Init.test_file_name_pattern
+          end
+        end
+
+        bc = _invo.to_bound_call_of_operator
 
         if bc
           bc.receiver.send bc.method_name, * bc.args, & bc.block
@@ -18,18 +25,23 @@ module Skylab::TestSupport
         end
       end
 
-      def bound_call_via_argument_scanner as
-        API_Invocation___.new( as ).to_bound_call_of_operator
+      def begin_invocation_by as, & givens
+        API_Invocation___.new givens, as
       end
     end ; end  # >>
 
     API_Invocation___ = self
 
-    def initialize scn
+    def initialize givens, scn
+
+      givens[ self ]
+
       @argument_scanner = scn
       @listener = scn.listener
-      @system_conduit = nil
-      @test_file_name_pattern = nil
+    end
+
+    def test_file_name_pattern_by & p
+      @__test_file_name_pattern_by = p ; nil
     end
 
     # -- ad-hoc operation routing
@@ -371,9 +383,11 @@ module Skylab::TestSupport
       # (for now we do all the work to "load" the default values even
       # if they get overwritten by the caller but meh.)
 
-      _tfnp = @test_file_name_pattern || Home_::Init.test_file_name_pattern
+      _tfnp = @__test_file_name_pattern_by.call
 
-      _sc = @system_conduit || Home_.lib_.open3
+      _sc = Home_.lib_.open3
+      # you don't want to expose this as an option because of all the
+      # craziness going on in #slo-spot-1
 
       Here_::Models_::Globber.prototype_by do |o|
 

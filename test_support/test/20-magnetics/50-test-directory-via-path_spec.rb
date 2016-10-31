@@ -130,7 +130,7 @@ module Skylab::TestSupport::TestSupport
     exp = nil
     define_method :expect_that_the_root_is_found do
 
-      exp ||= ::File.join _fixture_tree, Home_::TEST_DIR_FILENAME_
+      exp ||= ::File.join _fixture_tree, Home_::Init.test_directory_entry_name
       @result == exp || fail
     end
 

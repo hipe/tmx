@@ -78,12 +78,13 @@ module Skylab::TestSupport
         # in the stream (without needing ever to know the actual path of
         # each test file).
         #
-        # since `find` (resonably) doesn't have any such counting aggretation
-        # function of its own, what we would do is pipe the output of the
-        # `find` command into `wc -l` (wordcount, lines). in this process
-        # chain, the same sort of "waste" that is described above still
-        # occurs, but is handled more efficiently by the operating system's
-        # inter-process communication facility.
+        # since `find` (reasonably) doesn't have any such counting
+        # aggregation function of its own, what we normally do from a
+        # UNIX-like shell is something like: pipe the output of the `find`
+        # command into `wc -l` (wordcount, lines). in this process chain,
+        # the same sort of "waste" that is described above still occurs,
+        # but is handled more efficiently by the operating system's
+        # considerable inter-process communication subsystem.
         #
         # to be sure, to get this "weedy" is an early optimization and
         # certainly hinders the portability/robustity of this, but it is
@@ -91,6 +92,10 @@ module Skylab::TestSupport
         # "what if" scenario if not for this than for other use cases
         # where scaling is an issue. if needed we could fall back on our
         # single line in-ruby solution (`stream.flush_to_count`).
+        #
+        # note this hinders our ability to mock the system as we normally
+        # do because all of the different interleaving accesspoints we use.
+        # :#slo-spot-1.
 
         read_find_err, write_find_err = ::IO.pipe  # we wanted string IO but not allowed.
 

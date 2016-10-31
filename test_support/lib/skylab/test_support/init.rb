@@ -53,6 +53,11 @@ module Skylab
         'test-support'.freeze
       end
 
+      o :test_directory_entry_name do
+
+        'test'.freeze
+      end
+
       _MEMBERS.freeze
 
       define_singleton_method :members, -> do

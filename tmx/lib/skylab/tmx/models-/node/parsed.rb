@@ -15,15 +15,7 @@ module Skylab::TMX
       end  # >>
     end
 
-    # ==
-
-    DEFINITION_FOR__ = -> do
-      s = @_json_file
-      d = s.rindex( ::File::SEPARATOR ) - 1
-      s[ s.rindex( ::File::SEPARATOR, d ) + 1 .. d ]
-    end
-
-    # ==
+    PathMethods__ = ::Module.new
 
     Parsed___ = self
     class Parsed___
@@ -45,7 +37,7 @@ module Skylab::TMX
       end
 
       def __execute unparsed
-        @_json_file = unparsed._json_file
+        @_json_file_ = unparsed._json_file_
         if __parse_json_file
           if __there_are_no_unrecognized_components
             __place_the_selected_components_into_a_box
@@ -107,7 +99,7 @@ module Skylab::TMX
       def __whine_about_unrecognized_attributes
 
         _s_a = remove_instance_variable :@__extra_humans
-        _json_file = remove_instance_variable :@_json_file
+        _json_file = remove_instance_variable :@_json_file_
 
         @index.explain_why_is_not_parsable__ _s_a, _json_file, & @_emit
         UNABLE_
@@ -117,7 +109,7 @@ module Skylab::TMX
 
       def __parse_json_file
 
-        _big_string = ::File.read @_json_file
+        _big_string = ::File.read @_json_file_
         begin
           h = ::JSON.parse _big_string
         rescue ::JSON::ParserError => @__exception
@@ -128,7 +120,7 @@ module Skylab::TMX
       def __whine_about_failed_to_parse
 
         e = remove_instance_variable :@__exception
-        json_file = remove_instance_variable :@_json_file
+        json_file = remove_instance_variable :@_json_file_
 
         @_emit.call :error, :expression, :parse_error do |y|
           y << "    ( while parsing #{ json_file }"
@@ -147,7 +139,7 @@ module Skylab::TMX
         @___normal_name_string ||= get_filesystem_directory_entry_string.freeze
       end
 
-      define_method :get_filesystem_directory_entry_string, DEFINITION_FOR__
+      include PathMethods__
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
@@ -176,18 +168,35 @@ module Skylab::TMX
       end  # >>
 
       def initialize json_file
-        @_json_file = json_file
+        @_json_file_ = json_file
       end
 
       def express_into y
         y << get_filesystem_directory_entry_string
       end
 
-      define_method :get_filesystem_directory_entry_string, DEFINITION_FOR__
+      include PathMethods__
 
       attr_reader(
-        :_json_file,
+        :_json_file_,
       )
+    end
+
+    # ==
+
+    module PathMethods__
+
+      # (the methods names are per [#bs-028]:B)
+
+      def get_filesystem_directory_entry_string
+        s = @_json_file_
+        d = s.rindex( ::File::SEPARATOR ) - 1
+        s[ s.rindex( ::File::SEPARATOR, d ) + 1 .. d ]
+      end
+
+      def get_filesystem_directory
+        ::File.dirname @_json_file_
+      end
     end
 
     # ==

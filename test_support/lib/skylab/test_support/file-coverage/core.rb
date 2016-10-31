@@ -286,7 +286,7 @@ module Skylab::TestSupport
     Lazy_ = Common_::Lazy
 
     Test_directory_filename__ = -> do
-      TEST_DIR_FILENAME_
+      Home_::Init.test_directory_entry_name
     end
 
     Test_file_suffix_array__ = Lazy_.call do

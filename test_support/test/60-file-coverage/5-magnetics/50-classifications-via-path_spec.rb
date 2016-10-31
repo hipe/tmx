@@ -117,7 +117,7 @@ module Skylab::TestSupport::TestSupport
     end
 
     def _same sym
-      fixture_tree sym, Home_::TEST_DIR_FILENAME_
+      fixture_tree sym, Home_::Init.test_directory_entry_name
     end
 
     def expect testiness_symbol, shape_symbol, rootiness_symbol=nil

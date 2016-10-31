@@ -145,9 +145,11 @@ module Skylab::TestSupport
 
       def _stream bx
 
-        bx.to_value_stream.map_by do | lt |
+        tail = Home_::Init.test_directory_entry_name
 
-          ::File.join lt.path_to_gem, TEST_DIR_FILENAME_
+        bx.to_value_stream.map_by do |lt|
+
+          ::File.join lt.path_to_gem, tail
         end
       end
 

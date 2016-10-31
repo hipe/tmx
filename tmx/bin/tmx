@@ -12,6 +12,14 @@ cli.json_file_stream_by do |&p|
   Skylab::TMX.development_directory_json_file_stream__( & p )
 end
 
+cli.test_file_name_pattern_by do
+  Skylab::TMX.lib_.test_support::Init.test_file_name_pattern
+end
+
+cli.test_directory_entry_name_by do
+  Skylab::TMX.lib_.test_support::Init.test_directory_entry_name
+end
+
 d = cli.invoke ARGV
 
 if d.nonzero?

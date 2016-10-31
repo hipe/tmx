@@ -180,7 +180,6 @@ module Skylab::TestSupport  # :[#021].
   NIL_ = nil
   stowaway :IO, 'io/spy--'
   SPACE_ = ' '.freeze
-  TEST_DIR_FILENAME_ = 'test'.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 end

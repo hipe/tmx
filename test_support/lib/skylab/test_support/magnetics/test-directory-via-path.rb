@@ -18,7 +18,9 @@ module Skylab::TestSupport
         :max_num_dirs_to_look,
       )
 
-      FILENAMES___ = [ TEST_DIR_FILENAME_ ]
+      Filenames___ = Lazy_.call do
+        [ Home_::Init.test_directory_entry_name ]
+      end
 
       def initialize & p
         @be_verbose = false
@@ -27,7 +29,7 @@ module Skylab::TestSupport
 
       def execute
 
-        @filenames ||= FILENAMES___
+        @filenames ||= Filenames___[]
 
         __init_find
 
