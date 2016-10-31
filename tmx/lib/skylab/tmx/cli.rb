@@ -66,7 +66,7 @@ module Skylab::TMX
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
-          _any_of_these = say_formal_operation_alternation_ st
+          _any_of_these = say_formal_operation_alternation st
 
           y << "expecting #{ _any_of_these }"
         end
@@ -88,10 +88,19 @@ module Skylab::TMX
       end
 
       def __when_general_help
-        io = @serr
-        io.puts "usage: #{ _program_name } #{ _formal_actions } [opts]"
-        io.puts
-        io.puts "description: experiment.."
+
+        CLI::HelpScreen::ForBranch.express_into @serr do |o|
+
+          o.operation_description_hash OPERATION_DESCRIPTIONS__
+
+          o.usage _program_name
+
+          o.description_by do |y|
+            y << "experiment.."
+          end
+
+          o.express_operation_descriptions_against self
+        end
         @exitstatus = SUCCESS_EXITSTATUS__
         NIL
       end
@@ -102,7 +111,7 @@ module Skylab::TMX
 
         _key = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
 
-        m = OPERATIONS___[ _key ]
+        m = OPERATIONS__[ _key ]
 
         if m
           __init_selective_listener
@@ -116,13 +125,23 @@ module Skylab::TMX
         end
       end
 
-      OPERATIONS___ = {
+      OPERATIONS__ = {
         map: :__bound_call_for_map,
         reports: :__bound_call_for_reports,
         test_all: :__bound_call_for_test_all,
       }
 
+      OPERATION_DESCRIPTIONS__ = {
+        test_all: :__describe_test_all,
+        reports: :__describe_reports,
+        map: :__describe_map,
+      }
+
       # -- test all
+
+      def __describe_test_all y
+        y << "[ts] \"slowie\"'s high level test running and reporting operations"
+      end
 
       def __bound_call_for_test_all
 
@@ -182,6 +201,10 @@ module Skylab::TMX
 
       # -- reports
 
+      def __describe_reports y
+        y << "currently just one, to generate the \"punchlist\""
+      end
+
       def __bound_call_for_reports
 
         @_express = :_express_stream_of_string_or_name
@@ -213,6 +236,11 @@ module Skylab::TMX
       end
 
       # -- map
+
+      def __describe_map y
+        y << "produces streams of nodes given queries"
+        y << "(the underlying mechanics of most of the above)"
+      end
 
       def __bound_call_for_map
 
@@ -411,13 +439,13 @@ module Skylab::TMX
         _st = _to_didactic_operation_name_stream
 
         expression_agent.calculate do
-          say_formal_operation_alternation_ _st
+          say_formal_operation_alternation _st
         end
       end
 
       def _to_didactic_operation_name_stream
-        Stream_.call %w( map BLAH ) do |s|
-          Common_::Name.via_slug s
+        Stream_.call OPERATION_DESCRIPTIONS__.keys do |sym|
+          Common_::Name.via_variegated_symbol sym
         end
       end
 

@@ -13,7 +13,7 @@ module Skylab::Zerk
 
       alias_method :calculate, :instance_exec
 
-      def say_formal_operation_alternation_ st
+      def say_formal_operation_alternation st
         _say_name_alternation :say_formal_operation_, st
       end
 
@@ -32,8 +32,8 @@ module Skylab::Zerk
         "{ #{ _mid } }"
       end
 
-      def say_formal_operation_ name
-        _add_dash name
+      def say_formal_operation_ name  # NO DASH
+        _same name
       end
 
       def say_strange_arguments_head_ name

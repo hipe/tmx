@@ -52,7 +52,7 @@ module Skylab::TMX
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
-          _any_of_these = say_formal_operation_alternation_ st
+          _any_of_these = say_formal_operation_alternation st
 
           y << "expecting #{ _any_of_these }"
         end
@@ -85,7 +85,7 @@ module Skylab::TMX
 
           _st = bx.to_value_stream
 
-          y << "available operations: #{ say_formal_operation_alternation_ _st }"
+          y << "available operations: #{ say_formal_operation_alternation _st }"
         end
         UNABLE_
       end

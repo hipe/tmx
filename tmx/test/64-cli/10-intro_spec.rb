@@ -23,10 +23,37 @@ module Skylab::TMX::TestSupport
 
     it "help (a stub for now)" do
       invoke '-h'
-      expect_on_stderr "usage: tmz { -map | -BLAH } [opts]"
+      expect_on_stderr %r(\Ausage: tmz \{ test-all \| )
       expect_empty_puts
       expect "description: experiment.."
+      expect_empty_puts
+      expect "operations:"
+
+      _a = "reporting operations", "generate the", "streams of nodes"
+      scn = Common_::Polymorphic_Stream.via_array _a
+
+      p = -> line do
+        if line
+          exp = scn.current_token
+          if line.include? exp
+            scn.advance_one
+            if scn.no_unparsed_exists
+              p = MONADIC_EMPTINESS_
+            end
+          end
+        end
+        NIL
+      end
+
+      expect_each_by do |line|
+        p[ line ]
+      end
+
       expect_succeeded
+
+      if ! scn.no_unparsed_exists
+        fail "never found: #{ scn.current_token.inspect }"
+      end
     end
 
     if false  # wip: true

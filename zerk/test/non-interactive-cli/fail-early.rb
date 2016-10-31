@@ -28,6 +28,11 @@ module Skylab::Zerk::TestSupport
         _ze_add_proc_based_expectation p
       end
 
+      def expect_each_by m=nil, & p
+        @_ze_last_method = m if m
+        _ze_add_proc_based_expectation p
+      end
+
       def expect_on_stderr_lines_in_big_string m=nil, big_s
         @_ze_last_method = m if m
         @_ze_last_stream = :serr
