@@ -22,6 +22,10 @@ module Skylab::TMX
         @__json_file_stream_by = p
       end
 
+      def metadata_filename_by & p
+        @__metadata_filename_by = p
+      end
+
       def test_directory_entry_name_by & p
         @__test_directory_entry_name_by = p
       end
@@ -366,6 +370,10 @@ module Skylab::TMX
 
       def release_json_file_stream_by_
         remove_instance_variable :@__json_file_stream_by
+      end
+
+      def release_metadata_filename__
+        remove_instance_variable( :@__metadata_filename_by ).call
       end
 
       def release_test_directory_entry_name_by__

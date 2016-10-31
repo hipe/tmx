@@ -12,6 +12,10 @@ cli.json_file_stream_by do |&p|
   Skylab::TMX.development_directory_json_file_stream__( & p )
 end
 
+cli.metadata_filename_by do
+  Skylab::TMX::METADATA_FILENAME  # probably only needed when whitelisting
+end
+
 cli.test_file_name_pattern_by do
   Skylab::TMX.lib_.test_support::Init.test_file_name_pattern
 end

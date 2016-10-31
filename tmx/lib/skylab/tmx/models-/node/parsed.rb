@@ -38,14 +38,18 @@ module Skylab::TMX
 
       def __execute unparsed
         @_json_file_ = unparsed._json_file_
-        if __parse_json_file
-          if __there_are_no_unrecognized_components
-            __place_the_selected_components_into_a_box
+        if __read_big_string
+          if __parse_json_file
+            if __there_are_no_unrecognized_components
+              __place_the_selected_components_into_a_box
+            else
+              __whine_about_unrecognized_attributes
+            end
           else
-            __whine_about_unrecognized_attributes
+            __whine_about_failed_to_parse
           end
         else
-          __whine_about_failed_to_parse
+          __whine_about_enoent
         end
       end
 
@@ -107,19 +111,33 @@ module Skylab::TMX
 
       # --
 
-      def __parse_json_file
+      def __read_big_string
+        @__big_string = ::File.read @_json_file_
+        ACHIEVED_
+      rescue ::Errno::ENOENT => @__enoent
+        UNABLE_
+      end
 
-        _big_string = ::File.read @_json_file_
-        begin
-          h = ::JSON.parse _big_string
-        rescue ::JSON::ParserError => @__exception
+      def __whine_about_enoent
+        e = remove_instance_variable :@__enoent
+        @_emit.call :error, :expression, :enoent do |y|
+          # we have a thing for this somewhere but meh
+          # ("No such file or directory")
+          y << ( e.message.sub ' @ rb_sysopen - ', ' - ' )
         end
-        _store :@_raw_hash, h
+        UNABLE_
+      end
+
+      def __parse_json_file
+        @_raw_hash = ::JSON.parse @__big_string
+        ACHIEVED_
+      rescue ::JSON::ParserError => @__json_parse_error
+        UNABLE_
       end
 
       def __whine_about_failed_to_parse
 
-        e = remove_instance_variable :@__exception
+        e = remove_instance_variable :@__json_parse_error
         json_file = remove_instance_variable :@_json_file_
 
         @_emit.call :error, :expression, :parse_error do |y|
@@ -140,8 +158,6 @@ module Skylab::TMX
       end
 
       include PathMethods__
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # --
 

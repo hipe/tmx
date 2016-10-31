@@ -10,9 +10,18 @@ module Skylab::TestSupport
 
         @argument_scanner = top_client.argument_scanner
         @__globberer_by = top_client.method :globberer_by
+        @__operation_identifier = operation_identifier
+        _common_clear
+      end
+
+      def clear
+        remove_instance_variable :@_test_directories
+        _common_clear
+      end
+
+      def _common_clear
         @has_explicitly_named_directories = false
         @has_streamer = false
-        @__operation_identifier = operation_identifier
         @_receive_directory = :__receive_first_directory
         @_receive_streamer = :__receive_only_streamer
         @_to_stream = nil

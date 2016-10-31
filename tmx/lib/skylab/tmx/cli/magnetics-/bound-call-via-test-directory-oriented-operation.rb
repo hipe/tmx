@@ -19,7 +19,7 @@ module Skylab::TMX
         if __parse_ALL_ARGUMENTS_using_the_compounded_primaries
           if __directories_were_named_explicitly
             if __map_related_primaries_were_used
-              self.__this_gets_crazy
+              __when_both_map_options_are_used_AND_directories_are_named_explicitly
             else
               _use_the_remote_operation_as_is
             end
@@ -31,6 +31,39 @@ module Skylab::TMX
 
       # -- consequences
 
+      def __when_both_map_options_are_used_AND_directories_are_named_explicitly
+
+        # don't get the list of json files as normal. derive their presumable
+        # location by back-inferring them from the argument test directories.
+
+        map_op = @_map_operation
+        test_dir_collection = @_test_directory_collection
+
+        dir_st = test_dir_collection.to_test_directory_stream
+
+        test_dir_collection.clear
+
+        json_file_stream_once = -> do
+          json_file_stream_once = nil
+
+          _metadata_filename = @CLI.release_metadata_filename__
+
+          dir_st.map_by do |test_dir|
+
+            _eek = ::File.dirname test_dir
+
+            ::File.join _eek, _metadata_filename
+          end
+        end
+
+        map_op.json_file_stream_by = -> { json_file_stream_once[] }
+
+        st = map_op.execute
+        if st
+          _use_this_mapped_stream_for_the_remote_operation st
+        end
+      end
+
       def __use_map_as_is  # ASSUME directories were not named explicitly
 
         # whether or not map-specific primaries were used, we do the same thing:
@@ -41,23 +74,27 @@ module Skylab::TMX
 
         st = map_op.execute
         if st
-
-          once = -> do
-            once = nil
-
-            dir = remove_instance_variable( :@__test_directory_entry_name_by ).call
-
-            st.map_by do |node|
-              ::File.join node.get_filesystem_directory, dir
-            end
-          end
-
-          @_test_directory_collection.test_directory_stream_once_by do
-            once[]  # just as sanity check for now
-          end
-
-          _use_the_remote_operation_as_is
+          _use_this_mapped_stream_for_the_remote_operation st
         end
+      end
+
+      def _use_this_mapped_stream_for_the_remote_operation node_st
+
+        test_directory_stream_once = -> do
+          test_directory_stream_once = nil
+
+          dir = remove_instance_variable( :@__test_directory_entry_name_by ).call
+
+          node_st.map_by do |node|
+            ::File.join node.get_filesystem_directory, dir
+          end
+        end
+
+        @_test_directory_collection.test_directory_stream_once_by do
+          test_directory_stream_once[]
+        end
+
+        _use_the_remote_operation_as_is
       end
 
       def _use_the_remote_operation_as_is

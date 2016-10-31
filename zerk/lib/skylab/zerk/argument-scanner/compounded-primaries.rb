@@ -89,6 +89,11 @@ module Skylab::Zerk
           see[]
           redo
         end while above
+
+        if not_these_mutable_hash && not_these_mutable_hash.length.nonzero?
+          self._PRIMARIES_were_expressed_that_were_not_present_in_any_operation
+        end
+
         NIL
       end
 

@@ -113,11 +113,11 @@ module Skylab::TMX::TestSupport
         end
 
         def prepare_CLI cli
-          _prepare_CLI_for_hacked_universe_with cli, %w( tyris trix )  # revere alpha
+          _prepare_CLI_for_hacked_universe cli, %w( tyris trix )
         end
       end
 
-      context "provide `map` modifiers only" do
+      context "provide map modifiers only" do
 
         given do
           _invoke '-order', 'cost'
@@ -129,11 +129,47 @@ module Skylab::TMX::TestSupport
         end
 
         def prepare_CLI cli
-          _prepare_CLI_for_hacked_universe_with cli, %w( tyris trix )  # same as above
+          _prepare_CLI_for_hacked_universe cli, %w( tyris trix )
         end
       end
 
-      context "this is the crazy thing (needs new code) - when you have both"
+      context "the crazy case - when you pass a path that leads to noent" do
+
+        given do
+
+          _noent = ::File.join ::Skylab::TestSupport::Fixtures.directory( :not_here ), 'fugazi', 'torst'
+          _invoke '-order', 'cost', '-test-directory', _noent
+        end
+
+        it "says noent (new in this edition - no raising exception)" do
+
+          invoke_it
+          expect_on_stderr %r(\ANo such file or directory - .+\bfugazi\b)
+          expect "(no results.)"
+        end
+      end
+
+      context "the crazy case when money" do
+
+        given do
+
+          _json_file = TS_::Operations::Map::Dir01[ 'tyris' ]
+          _test_dir = ::File.expand_path ::File.join( '..', 'torsts' ), _json_file
+          _invoke '-order', 'cost', '-test-directory', _test_dir
+        end
+
+        it "cache money" do
+
+          _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10
+        end
+
+        def prepare_CLI cli
+
+          _prepare_CLI_for_hacked_universe cli
+
+          cli.metadata_filename_by { 'this.json' }
+        end
+      end
 
       def _invoke * plus
         plus[0,0] = _subject_operation
@@ -204,20 +240,29 @@ module Skylab::TMX::TestSupport
       end
     end
 
-    def _prepare_CLI_for_hacked_universe_with cli, s_a
+    define_method :_prepare_CLI_for_hacked_universe, ( -> do
 
-      cli.json_file_stream_by do
-        TS_::Operations::Map::Dir01::JSON_file_stream_via[ s_a ]
-      end
+      glob = '*-speg.kd'
+      test_dir = 'torsts'
 
-      cli.test_directory_entry_name_by do
-        'torsts'
-      end
+      -> cli, s_a=nil do
 
-      cli.test_file_name_pattern_by do
-        '*-speg.kd'
+        if s_a
+          cli.json_file_stream_by do
+            TS_::Operations::Map::Dir01::JSON_file_stream_via[ s_a ]
+          end
+        end
+
+        cli.test_directory_entry_name_by do
+          test_dir
+        end
+
+        cli.test_file_name_pattern_by do
+          glob
+        end
+        NIL
       end
-    end
+    end.call )
 
     def _prepare_CLI_as_real cli
 

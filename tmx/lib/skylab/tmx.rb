@@ -16,7 +16,7 @@ module Skylab::TMX
       # (compare `installation_.to_sidesystem_load_ticket_stream`)
 
       _dir = __lookup_development_directory
-      glob = ::File.join _dir, '*', '.for-tmx-map.json'
+      glob = ::File.join _dir, '*', METADATA_FILENAME
       files = ::Dir.glob glob
       if files.length.zero?
         emit.call :error, :expression, :zero_nodes do |y|
@@ -190,6 +190,7 @@ module Skylab::TMX
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
   EMPTY_S_ = ''
+  METADATA_FILENAME = '.for-tmx-map.json'
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
   NOTHING_ = nil

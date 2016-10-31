@@ -23,7 +23,3 @@ test all - test all.
 -5.2 require only (per test directory, per default globs)
 -5.3 counts
 -5.3.1 help screen integration! needs heavy design. needs invite.
--5.3.2 integrate with real globber from [tmx] (as default "argument") - keep [ts]'s knowledge of this abstract
-check if the shriking pool is empty after
-verbose option
-that cool summary thing for table

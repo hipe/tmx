@@ -118,8 +118,12 @@ module Skylab::TMX::TestSupport
 
     module Dir01
 
+      def self.[] s
+        Dir_01_path_lookup_function__[][ s ]
+      end
+
       JSON_file_stream_via = -> s_a do
-        Stream_.call s_a, & Dir_01_path_lookup_function___[]
+        Stream_.call s_a, & Dir_01_path_lookup_function__[]
       end
     end
 
@@ -127,7 +131,7 @@ module Skylab::TMX::TestSupport
 
     fixture_dirs = nil
 
-    Dir_01_path_lookup_function___ = Lazy_.call do
+    Dir_01_path_lookup_function__ = Lazy_.call do
 
       # yes, to achieve more or less this same structure we could just glob
       # against the real filesystem rather than writing it by hand here, but
