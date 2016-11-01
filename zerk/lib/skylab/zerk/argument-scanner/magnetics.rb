@@ -27,7 +27,7 @@ module Skylab::Zerk
             kn.value_x, @primaries_hash )
         else
           @is_well_formed = false
-          @_terminal_channel_symbol = kn.reasoning.reason_symbol
+          _receive_known_unknown_reasoning kn.reasoning
         end
         kn
       end
@@ -51,7 +51,7 @@ module Skylab::Zerk
           @__user_route = kn.value_x
         else
           @route_was_found = false
-          @_terminal_channel_symbol = kn.reasoning.reason_symbol
+          _receive_known_unknown_reasoning kn.reasoning
         end
         kn
       end
@@ -64,14 +64,34 @@ module Skylab::Zerk
 
       # ~
 
-      def to_common_pair_about_route_that_was_found
-        Common_::Pair.via_value_and_name(
-          @__user_route, @formal_primary_request.well_formed_symbol )
+      def route
+        @__user_route
       end
 
       # --
 
+      def _receive_known_unknown_reasoning rsn
+        p = rsn.behavior_by
+        if p
+          @_custom_behaivor_was_provided = true
+          @__behavior_by = p
+        else
+          @_custom_behaivor_was_provided = false
+          @__terminal_channel_symbol = rsn.reason_symbol
+        end
+        NIL
+      end
+
       def _always_whine_in_the_same_way
+        if @_custom_behaivor_was_provided
+          _user_x = @__behavior_by[ @argument_scanner.listener ]
+          _user_x  # #todo
+        else
+          __whine_in_the_typical_fashion
+        end
+      end
+
+      def __whine_in_the_typical_fashion
 
         o = Here_::When::UnknownPrimary.begin
 
@@ -86,7 +106,7 @@ module Skylab::Zerk
           NOTHING_  # #feature-island #scn-coverpoint-2
         end
 
-        o.terminal_channel_symbol = @_terminal_channel_symbol
+        o.terminal_channel_symbol = @__terminal_channel_symbol
 
         o.listener = @argument_scanner.listener
 

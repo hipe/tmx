@@ -20,10 +20,18 @@ module Skylab::TestSupport
       end
 
       def __parse_primary
-        m = @argument_scanner.match_head_against_primaries_hash @hash
-        if m
-          @operation.send m
+        route = @argument_scanner.match_primary_route_against @hash
+        if route
+          send ROUTES___.fetch( route.route_category_symbol ), route.value
         end
+      end
+
+      ROUTES___ = {
+        route_that_is_primary_hash_value_based: :__parse_primary_normally,
+      }
+
+      def __parse_primary_normally m
+        @operation.send m
       end
 
       def parse_primary_at_head sym

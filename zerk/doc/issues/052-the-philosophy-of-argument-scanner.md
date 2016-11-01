@@ -21,6 +21,14 @@ but of course we said, "if we can implement such a syntax for a CLI,
 can we instead implement a similar syntax for an API operation, and
 from that infer how it would be expressed for CLI?"
 
+if there is a "founding principle" of this sub-library, it is that the
+the backend operation can realize any syntax it is able to bound only by
+the constraints of our semi-standard (but still in flux) internal
+scanner interface.
+
+we can then adapt the operation to a particular modality by "injecting"
+into the operation an argument scanner adapted to the particular modality.
+
 
 
 
@@ -75,6 +83,41 @@ in various ways for years) is to meet these design objectives:
     attempts to make the underlying user arguments available to the
     operation for it to read in an "API way" with name convention
     translation as appropriate.
+
+
+
+
+## "all about parsing added primaries" :#note-2
+
+assume that some caller is the backend operation driving the
+whole parse (pursuant to our [#052] founding principle). it
+will (reasonably) break if we pass it a route for a primary it
+doesn't know about, and that's exacty what "added" primaries are
+(typically but not necessarily - but the following handling
+still holds regardless).
+
+as such they must be parsed by us and not the backend. because
+added primaries could occur anywhere in the argument stream, and
+because the subject method is typically the workhorse that the
+backend uses to drive parsing logic, we sneak this handling of
+added primaries here in this method as something of a hacky
+stowaway.
+
+an added primary has the option of interrupting "normal" program
+flow by resulting in false-ish. otherwise its palpable effects
+must all be in the side-effects effected by its proc when called.
+
+the idealized target use cases are for parsing '--help' and parsing
+'--verbose' variously: implementations for the former typically
+flow around normal execution and those for the latter typically
+don't.
+
+as for parsing the argument values to these primares as necessary,
+we can still realize "arbitrary" syntaxes for frontend-only primaries
+using the same techniques available to us on the back, it's just that
+A) the code is on the front and B) you might be able to make some more
+assumptions because of your more narrow modal scope (i.e if you are on
+CLI you can assume all elements of ARGV are strings).
 
 
 

@@ -55,7 +55,7 @@ module Skylab::TestSupport
     end
 
     def __to_bound_call_when_arguments
-      tuple = @argument_scanner.match_head_against_primaries_hash Primaries_hash___[]
+      tuple = @argument_scanner.match_primary_route_value_against Primaries_hash___[]
       if tuple
         send( * tuple )
       end

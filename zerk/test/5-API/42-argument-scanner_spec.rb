@@ -31,7 +31,7 @@ module Skylab::Zerk::TestSupport
         _as = __build_argument_scanner "x"
 
         call_by do
-          _as.match_head_against_primaries_hash x: :_no_see_, y: :_no_see_
+          _as.match_primary_route_value_against x: :_no_see_, y: :_no_see_
         end
 
         y = nil
@@ -48,17 +48,17 @@ module Skylab::Zerk::TestSupport
 
       _as = _build_argument_scanner_without_listener :x, :_no_see_
 
-      _xx = _as.match_head_against_primaries_hash x: :_money_
+      _x = _as.match_primary_route_value_against x: :_money_
 
-      _xx == :_money_ || fail
+      _x == :_money_ || fail
     end
 
     it "parse that value" do
 
       as = _build_argument_scanner_without_listener :x, :_money_two_
 
-      _k = as.match_head_against_primaries_hash x: :_money_one_
-      _k == :_money_one_ || fail  # redundant with previous test
+      _x = as.match_primary_route_value_against x: :_money_one_
+      _x == :_money_one_ || fail  # redundant with previous test
 
       as.advance_one
 

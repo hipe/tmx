@@ -23,4 +23,3 @@ test all - test all.
 -5.2 require only (per test directory, per default globs)
 -5.3 counts
 -5.3.1 help screen integration! needs heavy design. needs invite.
-cover CLI argument scanner for `add_primary`

@@ -29,7 +29,7 @@ module Skylab::Zerk
         NIL
       end
 
-      def pair_via_match_head_against_primaries_hash_ h
+      def match_primary_route_against_ h
 
         o = Home_::ArgumentScanner::
             Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
@@ -42,7 +42,7 @@ module Skylab::Zerk
 
           if o.route_was_found
 
-            o.to_common_pair_about_route_that_was_found
+            o.route
           else
             o.whine_about_how_route_was_not_found
           end
@@ -56,16 +56,17 @@ module Skylab::Zerk
         if x.respond_to? :id2name
           Common_::Known_Known[ x ]
         else
-          Home_::ArgumentScanner::Known_unknown_with_reason[ :expected_symbol ]
+          Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ :expected_symbol ]
         end
       end
 
       def __route_knownness_via_request req
-        x = req.primaries_hash[ req.well_formed_symbol ]
+        k = req.well_formed_symbol
+        x = req.primaries_hash[ k ]
         if x
-          Common_::Known_Known[ x ]
+          Common_::Known_Known[ Home_::ArgumentScanner::PrimaryHashValueBasedRoute.new x, k ]
         else
-          Home_::ArgumentScanner::Known_unknown_with_reason[ :unknown_primary ]
+          Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ :unknown_primary ]
         end
       end
 

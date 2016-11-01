@@ -4,28 +4,25 @@ module Skylab::Zerk
 
     class CommonImplementation
 
-      def match_head_against_primaries_hash h
-        pair = pair_via_match_head_against_primaries_hash h
-        if pair
-          pair.value_x
+      def match_primary_route_value_against h
+        route = match_primary_route_against h
+        if route
+          route.value
         else
-          pair
+          route
         end
       end
 
-      def pair_via_match_head_against_primaries_hash h
-        pair = pair_via_match_head_against_primaries_hash_ h
-        if pair
-          @current_primary_symbol = pair.name_symbol
-          pair
-        else
-          @current_primary_symbol = pair
-          pair
+      def match_primary_route_against h
+        route = match_primary_route_against_ h
+        if route
+          @current_primary_symbol = route.primary_normal_symbol
         end
+        route
       end
 
       def head_as_primary_symbol
-        k = self.head_as_well_formed_potential_primary_symbol_
+        k = head_as_well_formed_potential_primary_symbol_
         @current_primary_symbol = k
         k
       end
@@ -53,16 +50,53 @@ module Skylab::Zerk
 
     # ==
 
-    Known_unknown_with_reason = -> sym, & name_proc do
+    Known_unknown_via_reason_symbol = -> sym do
 
-      _reasoning = Reasoning___.new sym, name_proc
-
-      Common_::Known_Unknown.via_reasoning _reasoning
+      Common_::Known_Unknown.via_reasoning Reasoning.new sym
     end
 
     # ==
 
-    Reasoning___ = ::Struct.new :reason_symbol, :name_proc
+    class Reasoning
+
+      def initialize sym=nil, & p
+        @behavior_by = p
+        @reason_symbol = sym
+      end
+
+      attr_reader(
+        :behavior_by,
+        :reason_symbol,
+      )
+    end
+
+    # ==
+
+    Route = ::Class.new
+
+    class PrimaryHashValueBasedRoute < Route
+
+      def route_category_symbol
+        :route_that_is_primary_hash_value_based
+      end
+
+      def is_more_backey_than_frontey
+        true
+      end
+    end
+
+    class Route
+
+      def initialize x, k
+        @primary_normal_symbol = k
+        @value = x
+      end
+
+      attr_reader(
+        :primary_normal_symbol,
+        :value,
+      )
+    end
 
     # ==
 

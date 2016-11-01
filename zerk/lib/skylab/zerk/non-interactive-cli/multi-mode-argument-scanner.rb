@@ -40,9 +40,8 @@ module Skylab::Zerk
           end
         end
 
-        def add_primary sym
-          $stderr.puts "IGNORING ADD PRIMARY FOR NW"  # #WHEN:`add_primary`
-          ACHIEVED_
+        def add_primary sym, & p
+          @_builder.receive_add_primary p, sym
         end
 
         def default_primary sym
@@ -63,6 +62,7 @@ module Skylab::Zerk
       class Builder___
 
         def initialize
+          @_added_h = nil
           @_front_tokens = nil
           @_has_default_primary = false
           @_listener = nil
@@ -82,6 +82,10 @@ module Skylab::Zerk
           @_receive_front_scanner_tokens = :_CLOSED_
           @_front_tokens = sym_a
           NIL
+        end
+
+        def receive_add_primary p, sym
+          ( @_added_h ||= {} )[ sym ] = p ; nil
         end
 
         def receive_subtract_primary_with_argument sym, x
@@ -142,7 +146,7 @@ module Skylab::Zerk
               _dp_kn = Common_::Known_Known[ @_default_primary_symbol ]
             end
 
-            a.push UserScanner___.new @_subtracted_h, us, _dp_kn, @_listener
+            a.push UserScanner___.new @_added_h, @_subtracted_h, us, _dp_kn, @_listener
           end
 
           if a.length.zero?
@@ -164,7 +168,36 @@ module Skylab::Zerk
           @_scn = @_scn_scn.gets_one
         end
 
-        def pair_via_match_head_against_primaries_hash_ h
+        def match_primary_route_against_ h
+
+          #  "all about parsing added primaries" ([#052] #note-2) explains it all
+
+          begin
+            route = __match_niCLI_route_against h
+            route || break
+            if route.is_more_backey_than_frontey
+              break
+            end
+
+            _keep_parsing = route.value.call
+            if _keep_parsing  # as described at #scn-coverpoint-1-B
+
+              # NOTE we give the client autonomy over its parsing technique
+              # (e.g name-based vs type-based) at this cost: the client MUST
+              # `advance_one` the scanner herself. if she does not we infinite
+              # loop here.
+
+              redo
+            end
+
+            route = _keep_parsing  # as described at #scn-coverpoint-1-A
+            break
+          end while above
+
+          route
+        end
+
+        def __match_niCLI_route_against h
 
           o = Home_::ArgumentScanner::
               Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
@@ -177,7 +210,7 @@ module Skylab::Zerk
 
             if o.route_was_found
 
-              o.to_common_pair_about_route_that_was_found
+              o.route
             else
               o.whine_about_how_route_was_not_found
             end
@@ -286,8 +319,12 @@ module Skylab::Zerk
         end
 
         def _route_knownness_via_request_ req
+
           # assume our immediately following method resulted in a known known.
-          Common_::Known_Known[ req.primaries_hash.fetch req.well_formed_symbol ]
+
+          k = req.well_formed_symbol
+          _x = req.primaries_hash.fetch k
+          Common_::Known_Known[ DefaultedBasedRoute___.new _x, k ]
         end
 
         def _well_formed_knownness_
@@ -346,7 +383,7 @@ module Skylab::Zerk
         # this is the workhorse parser implementation - the one that
         # translates CLI-shaped arguments to API-shaped ones.
 
-        def initialize h, user_scn, dp_kn, listener
+        def initialize add_h, sub_h, user_scn, dp_kn, listener
 
           if dp_kn
             @_default_primary_was_read = false
@@ -356,7 +393,8 @@ module Skylab::Zerk
             @_has_default_primary = false
           end
 
-          @_is_subtracted = h || MONADIC_EMPTINESS_
+          @_added_h = add_h
+          @_is_subtracted = sub_h || MONADIC_EMPTINESS_
           @_listener = listener
           @_real_scn = user_scn
         end
@@ -366,11 +404,44 @@ module Skylab::Zerk
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          user_x = req.primaries_hash[ req.well_formed_symbol ]
-          if user_x
-            Common_::Known_Known[ user_x ]
+          k = req.well_formed_symbol
+          h = @_added_h
+          if h
+            x = h[ k ]
+          end
+          if x
+            route = AddedBasedRoute___.new x, k
           else
-            _known_unknown_with_reason :unknown_primary
+            h_ = req.primaries_hash
+            x = h_[ k ]
+            if x
+              route = PrimaryHashValueBasedRoute___.new x, k
+            end
+          end
+          if route
+            Common_::Known_Known[ route ]
+          else
+            a = nil
+            rx = /\A#{ ::Regexp.escape k }/
+            if h
+              h.keys.each do |k_|
+                rx =~ k_ or next
+                ( a ||= [] ).push AddedBasedRoute___.new( h[k_], k_ )
+              end
+            end
+            h_.keys.each do |k_|
+              rx =~ k_ or next
+              ( a ||= [] ).push PrimaryHashValueBasedRoute___.new( h[k_], k_ )
+            end
+            if a
+              if 1 == a.length
+                Common_::Known_Known[ a.fetch 0 ]
+              else
+                Known_unknown_when_ambiguous___[ a, k ]
+              end
+            else
+              _known_unknown_with_reason :unknown_primary
+            end
           end
         end
 
@@ -420,14 +491,14 @@ module Skylab::Zerk
         end
 
         def _known_unknown_with_reason sym
-          Home_::ArgumentScanner::Known_unknown_with_reason[ sym ]
+          Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ sym ]
         end
 
         def _available_primary_name_stream_via_hash_ h
 
           is_subtracted = @_is_subtracted
 
-          st = Stream_.call( h.keys ).map_reduce_by do |sym|
+          st = Stream_[ h.keys ].map_reduce_by do |sym|
 
             if is_subtracted[ sym ]
               NOTHING_  # skip
@@ -436,7 +507,15 @@ module Skylab::Zerk
             end
           end
 
-          # #WHEN:`add_primary` ..
+          add_h = @_added_h
+          if add_h
+
+            _plus_these_stream = Stream_.call add_h.keys do |sym|
+              Common_::Name.via_variegated_symbol sym
+            end
+
+            st = st.concat_by _plus_these_stream
+          end
 
           st
         end
@@ -486,6 +565,61 @@ module Skylab::Zerk
           p[ s ]
         end
       end.call
+
+      # ==
+
+      Known_unknown_when_ambiguous___ = -> a, k do
+
+        _reasoning = Home_::ArgumentScanner::Reasoning.new do |emit|
+
+          emit.call :error, :expression, :parse_error, :ambiguous do |y|
+
+            cheap = -> sym do
+              "\"-#{ sym.id2name.gsub UNDERSCORE_, DASH_ }\""
+            end
+
+            y << "ambiguous primary #{ cheap[ k ] }."
+
+            buffer = "did you mean "
+
+            Stream_[ a ].join_into_with_by buffer, " or " do |route|
+              cheap[ route.primary_normal_symbol ]
+            end
+
+            buffer << "?"
+
+            y << buffer
+          end
+
+          UNABLE_
+        end
+
+        Common_::Known_Unknown.via_reasoning _reasoning
+      end
+
+      # ==
+
+      base = Home_::ArgumentScanner::Route
+
+      class AddedBasedRoute___ < base
+        def route_category_symbol
+          :route_that_is_added_based
+        end
+        def is_more_backey_than_frontey
+          false
+        end
+      end
+
+      class DefaultedBasedRoute___ < base
+        def route_category_symbol
+          :route_that_is_defaulted_based
+        end
+        def is_more_backey_than_frontey
+          true
+        end
+      end
+
+      PrimaryHashValueBasedRoute___ = Home_::ArgumentScanner::PrimaryHashValueBasedRoute
 
       # ==
     end

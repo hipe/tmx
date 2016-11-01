@@ -39,15 +39,14 @@ module Skylab::Zerk::TestSupport
 
         h = { hi: :_was_hi_, cant_touch_this: :_no_see_ }
 
-        _sym = as.match_head_against_primaries_hash h
-
-        _sym == :_was_hi_ || fail
+        _x = as.match_primary_route_value_against h
+        _x == :_was_hi_ || fail
 
         as.advance_one
 
         spy.call_by do
 
-          as.match_head_against_primaries_hash h
+          as.match_primary_route_value_against h
         end
 
         y = nil
@@ -73,16 +72,16 @@ module Skylab::Zerk::TestSupport
 
       h = { cant_touch_this_either: :_hi_1_, joopie: :_hi_2_ }
 
-      _ = as.match_head_against_primaries_hash h
-      _ == :_hi_1_ || fail
+      _m = as.match_primary_route_value_against h
+      _m == :_hi_1_ || fail
 
       as.advance_one
 
       _ = as.parse_primary_value :must_be_trueish
       _ == :zazlow || fail
 
-      _ = as.match_head_against_primaries_hash h
-      _ == :_hi_2_ || fail
+      _m = as.match_primary_route_value_against h
+      _m == :_hi_2_ || fail
 
       as.advance_one
 
@@ -92,7 +91,5 @@ module Skylab::Zerk::TestSupport
 
       as.no_unparsed_exists || fail
     end
-
-    context "add primary"  # `add_primary` o.add_primary(:help) { xxx }
   end
 end

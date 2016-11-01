@@ -30,14 +30,14 @@ module Skylab::Zerk
         op_a = @_operations
         until argument_scanner.no_unparsed_exists
 
-          pair = argument_scanner.pair_via_match_head_against_primaries_hash h
-          if ! pair
-            ok = pair
+          route = argument_scanner.match_primary_route_against h
+          if ! route
+            ok = route
             break
           end
 
-          _d = pair.value_x
-          _sym = pair.name_symbol
+          _d = route.value
+          _sym = route.primary_normal_symbol
 
           _operation = op_a.fetch _d
 

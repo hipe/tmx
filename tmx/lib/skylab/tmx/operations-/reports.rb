@@ -39,7 +39,7 @@ module Skylab::TMX
       end
 
       def __parse_one_primary_term
-        m = @argument_scanner.match_head_against_primaries_hash PRIMARIES___
+        m = @argument_scanner.match_primary_route_value_against PRIMARIES___
         if m
           _ok = send m
           _ok  # #todo
