@@ -6,8 +6,8 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_emission_fail_early
     use :slowie
-    use :slowie_fail_fast
 
     it "loads" do
       Home_::Slowie

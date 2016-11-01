@@ -4,112 +4,93 @@ module Skylab::Zerk
 
     Magnetics = ::Module.new
 
-    class Magnetics::FormalPrimary_via
+    class Magnetics::FormalPrimary_via_PrimariesHash
+
+      # this "faciliator" has a strange, session-heavy interface because [#052] #note-1
 
       class << self
         alias_method :begin, :new
         undef_method :new
       end  # >>
 
-      def initialize p, client
-        @client = client
-        @primaries_hash = nil
-        @proc_for_knownness_of_head_as_primary = p
-        @subtraction_hash = nil
+      def initialize h, as
+        @argument_scanner = as
+        @primaries_hash = h
       end
 
-      attr_writer(
-        :subtraction_hash,
+      # ~
+
+      def well_formed_potential_primary_symbol_knownness= kn
+        if kn.is_known_known
+          @is_well_formed = true
+          @formal_primary_request = FormalPrimaryRequest___.new(
+            kn.value_x, @primaries_hash )
+        else
+          @is_well_formed = false
+          @_terminal_channel_symbol = kn.reasoning.reason_symbol
+        end
+        kn
+      end
+
+      FormalPrimaryRequest___ = ::Struct.new :well_formed_symbol, :primaries_hash
+
+      def whine_about_how_it_is_not_well_formed
+        _always_whine_in_the_same_way  # hi.
+      end
+
+      attr_reader(
+        :formal_primary_request,
+        :is_well_formed,
       )
 
-      def flush_to_pair_via_primaries_hash h
-        @primaries_hash = h
-        if _the_argument_stream_head_is_well_formed
-          if __the_argument_stream_head_corresponds_to_a_known_primary
-            __result_in_the_appropriate_pair
-          else
-            __whine_about_how_there_is_no_such_modifier
-          end
-        else
-          _whine_about_it_for_its_reason
-        end
-      end
-
-      def flush_to_primary_symbol
-        if _the_argument_stream_head_is_well_formed
-          @_well_formed_symbol
-        else
-          _whine_about_it_for_its_reason
-        end
-      end
-
       # ~
 
-      def _the_argument_stream_head_is_well_formed
-
-        kn = @proc_for_knownness_of_head_as_primary.call
+      def route_knownness= kn
         if kn.is_known_known
-          @_well_formed_symbol = kn.value_x
-          ACHIEVED_
+          @route_was_found = true
+          @__user_route = kn.value_x
         else
-          reasoning = kn.reasoning
-          @_terminal_channel_symbol = TCS___.fetch reasoning.reason_symbol
-          UNABLE_
+          @route_was_found = false
+          @_terminal_channel_symbol = kn.reasoning.reason_symbol
         end
+        kn
       end
 
-      TCS___ = {
-        _malformed_surface_representation_:  :unknown_primary_or_operator,
-        _subtracted_:  :subtracted_primary_referenced,
-      }
-
-      def _whine_about_it_for_its_reason
-        _whine  # hi.
+      def whine_about_how_route_was_not_found
+        _always_whine_in_the_same_way  # hi.
       end
+
+      attr_reader :route_was_found
 
       # ~
 
-      def __the_argument_stream_head_corresponds_to_a_known_primary
-
-        x = @primaries_hash[ @_well_formed_symbol ]
-        if x
-          # (we must not do subtraction here - that must be handled by client)
-          @__user_value = x
-          ACHIEVED_
-        else
-          @_terminal_channel_symbol = NIL  # use default
-          UNABLE_
-        end
+      def to_common_pair_about_route_that_was_found
+        Common_::Pair.via_value_and_name(
+          @__user_route, @formal_primary_request.well_formed_symbol )
       end
 
-      def __whine_about_how_there_is_no_such_modifier
-        _whine  # hi.
-      end
+      # --
 
-      # ~
-
-      def _whine
+      def _always_whine_in_the_same_way
 
         o = Here_::When::UnknownPrimary.begin
 
-        h = @primaries_hash
-        if h
-          o.recognizable_normal_symbols_proc = h.method :keys
+        o.strange_primary_value_by = @argument_scanner.method :head_as_is
+
+        if @primaries_hash
+          _p = @argument_scanner.method :available_primary_name_stream_via_hash
+          o.available_primary_name_stream_by = -> do
+            _p[ @primaries_hash ]
+          end
+        else
+          NOTHING_  # #feature-island #scn-coverpoint-2
         end
-
-        o.name_by = @client.method :head_as_strange_name
-
-        o.subtraction_hash = @subtraction_hash  # if any
 
         o.terminal_channel_symbol = @_terminal_channel_symbol
 
-        o.listener = @client.listener
+        o.listener = @argument_scanner.listener
 
         o.execute
-      end
-
-      def __result_in_the_appropriate_pair
-        Common_::Pair.via_value_and_name @__user_value, @_well_formed_symbol
       end
     end
 
@@ -142,7 +123,7 @@ module Skylab::Zerk
         x = if m
           @argument_scanner.send m
         else
-          @argument_scanner.current_token_as_is
+          @argument_scanner.head_as_is
         end
 
         if @must_be_trueish
@@ -160,7 +141,7 @@ module Skylab::Zerk
 
       def __when_supposed_to_be_trueish_but_is_not
         _sym = @argument_scanner.current_primary_symbol
-        _x = @argument_scanner.current_token_as_is
+        _x = @argument_scanner.head_as_is
         self._COVER_ME_falseish_argument_value_when_expected_trueish
       end
     end

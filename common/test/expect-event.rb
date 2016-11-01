@@ -1336,6 +1336,7 @@ module Skylab::Common::TestSupport
     UNRELIABLE_ = :_unreliable_from_expect_event_
   end
 end
+# #pending-rename: to "expect emission"
 # #tombstone-C: no more double-building. now when debugging events, etc
 # #tombstone - event log was function soup
 # #tombstone - simple debugging output

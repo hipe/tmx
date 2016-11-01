@@ -77,11 +77,11 @@ module Skylab::TMX
 
       def __when_operation_not_found bx
 
-        x = @argument_scanner.head_as_strange_name
+        x = @argument_scanner.head_as_is
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
-          y << "unknown operation #{ say_strange_arguments_head_ x }"
+          y << "unknown operation #{ say_strange_value x }"
 
           _st = bx.to_value_stream
 

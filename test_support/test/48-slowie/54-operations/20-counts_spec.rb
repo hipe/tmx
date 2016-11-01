@@ -6,8 +6,8 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_emission_fail_early
     use :slowie
-    use :slowie_fail_fast
 
     it "test directories are required" do
       call :counts
@@ -68,8 +68,8 @@ module Skylab::TestSupport::TestSupport
 
         ignore_emissions_whose_terminal_channel_symbol_is :find_command_args
 
-        ca = flush_to_case_assertion
-        _st = ca.flush_to_result
+        _st = execute
+
         _rows = _st.to_a
 
         [ _rows, table_schema ]

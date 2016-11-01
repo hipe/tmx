@@ -5,8 +5,8 @@ module Skylab::TestSupport::TestSupport
   describe "[ts] slowie - operations - cover" do
 
     TS_[ self ]
+    use :expect_emission_fail_early
     use :slowie
-    use :slowie_fail_fast
 
     it "coverage is disabled, but at least it tells you this" do
 

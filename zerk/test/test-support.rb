@@ -128,6 +128,10 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    Expect_emission_fail_early = -> tcc do
+      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+    end
+
     Expect_event = -> tcc do
       Common_.test_support::Expect_Event[ tcc ]
     end

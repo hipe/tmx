@@ -6,8 +6,8 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :expect_emission_fail_early
     use :slowie
-    use :slowie_fail_fast
 
     it "for now (and probably always), can't list files without test directory" do
 
@@ -31,13 +31,9 @@ module Skylab::TestSupport::TestSupport
         ev2 = ev_
       end
 
-      ca = flush_to_case_assertion
-
-      _st = ca.flush_to_result
-
-      _hi = _st.gets
-
-      ca.finish
+      _hi = finish_by do |st|
+        st.gets
+      end
 
       _hi.nil? || fail
     end
@@ -52,13 +48,9 @@ module Skylab::TestSupport::TestSupport
 
       ignore_emissions_whose_terminal_channel_symbol_is :find_command_args
 
-      ca = flush_to_case_assertion
-
-      _st = ca.flush_to_result
-
-      paths = _st.to_a
-
-      ca.finish
+      paths = finish_by do |st|
+        st.to_a
+      end
 
       ( 3 .. 5 ).include? paths.length or fail
 

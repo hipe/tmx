@@ -83,6 +83,10 @@ module Skylab::TestSupport::TestSupport
 
   # --
 
+  Expect_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  end
+
   Expect_Event = -> tcc do
     Common_.test_support::Expect_Event[ tcc ]
   end

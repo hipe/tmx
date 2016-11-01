@@ -25,7 +25,7 @@ module Skylab::Zerk
       end
 
       def head_as_primary_symbol
-        k = self.head_as_primary_symbol_
+        k = self.head_as_well_formed_potential_primary_symbol_
         @current_primary_symbol = k
         k
       end

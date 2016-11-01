@@ -25,74 +25,70 @@ module Skylab::Zerk
 
         @_scn = Common_::Polymorphic_Stream.via_array x_a
         @_current_token = @_scn.method :current_token
-
-        @__knownness_of_head_as_primary = method :__knownness_of_head_as_primary
         @listener = l
         NIL
       end
 
       def pair_via_match_head_against_primaries_hash_ h
 
-        Home_::ArgumentScanner::Magnetics::FormalPrimary_via.begin(
-          @__knownness_of_head_as_primary,
-          self,
-        ).flush_to_pair_via_primaries_hash h
-      end
+        o = Home_::ArgumentScanner::
+            Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
 
-      def __knownness_of_head_as_primary
+        o.well_formed_potential_primary_symbol_knownness = __well_formed_knownness
 
-        x = @_current_token.call
-        if x
-          Common_::Known_Known[ x ]
+        if o.is_well_formed
+
+          o.route_knownness = __route_knownness_via_request o.formal_primary_request
+
+          if o.route_was_found
+
+            o.to_common_pair_about_route_that_was_found
+          else
+            o.whine_about_how_route_was_not_found
+          end
         else
-          self._COVER_ME
-          Home_::ArgumentScanner::Known_unknown_with_reason.call(
-            :_falsish_value_when_token_expected_,
-          )
+          o.whine_about_how_it_is_not_well_formed
         end
       end
 
-      def head_as_primary_symbol_
-        @_current_token.call
+      def __well_formed_knownness
+        x = @_current_token.call
+        if x.respond_to? :id2name
+          Common_::Known_Known[ x ]
+        else
+          Home_::ArgumentScanner::Known_unknown_with_reason[ :expected_symbol ]
+        end
       end
 
-      def current_token_as_is
+      def __route_knownness_via_request req
+        x = req.primaries_hash[ req.well_formed_symbol ]
+        if x
+          Common_::Known_Known[ x ]
+        else
+          Home_::ArgumentScanner::Known_unknown_with_reason[ :unknown_primary ]
+        end
+      end
+
+      def available_primary_name_stream_via_hash h
+        Stream_.call h.keys do |sym|
+          Common_::Name.via_variegated_symbol sym
+        end
+      end
+
+      def head_as_well_formed_potential_primary_symbol_
         @_current_token.call
       end
 
       def advance_one
         @_scn.advance_one
         @no_unparsed_exists = @_scn.no_unparsed_exists
-        @_cache_ = nil
-      end
-
-      # ((
-      DEFINITION_FOR_THE_METHOD_CALLED_CACHED_ = -> m, & p do
-
-        define_method m do
-          h = ( @_cache_ ||= {} )
-          h.fetch m do
-            x = instance_exec( & p )
-            h[ m ] = x
-            x
-          end
-        end
-      end
-      # ))
-
-      define_singleton_method :cached, DEFINITION_FOR_THE_METHOD_CALLED_CACHED_
-
-      cached :head_as_strange_name do
-
-        x = @_scn.current_token
-        if x.respond_to? :id2name
-          Common_::Name.via_variegated_symbol x
-        else
-          Common_::Name.via_slug x  # ..
-        end
       end
 
       def head_as_normal_symbol
+        @_scn.current_token
+      end
+
+      def head_as_is
         @_scn.current_token
       end
 

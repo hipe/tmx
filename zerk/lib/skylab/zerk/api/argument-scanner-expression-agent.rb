@@ -38,20 +38,20 @@ module Skylab::Zerk
         _same name
       end
 
-      def say_strange_primary_ name
-        _same name
+      def say_strange_primary_value_ x
+        x.inspect
       end
 
       def say_primary_ name
         _same name
       end
 
-      def say_strange_arguments_head_ name
+      def say_arguments_head_ name
         _same name
       end
 
-      def say_arguments_head_ name
-        _same name
+      def _ick name
+        self._WAHT
       end
 
       def _same name

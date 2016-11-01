@@ -134,7 +134,7 @@ module Skylab::TMX
 
           _name = Common_::Name.via_variegated_symbol sym
 
-          y << "unrecognized report: #{ say_strange_arguments_head_ _name }"
+          y << "unknown report: #{ _name.as_human.inspect }"
 
           _p = method :say_arguments_head_
 

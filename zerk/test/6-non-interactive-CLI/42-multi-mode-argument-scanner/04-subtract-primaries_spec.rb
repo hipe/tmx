@@ -84,15 +84,16 @@ module Skylab::Zerk::TestSupport
           o.listener el.handle_event_selectively
         end
 
-        _no = scn.head_as_primary_symbol
+        _no = scn.head_as_primary_symbol  # might be #feature-island #scn-coverpoint-2
 
         false == _no || fail
 
         em = el.gets
 
-        em.channel_symbol_array == %i( error expression parse_error unknown_primary_or_operator ) || fail
+        em.channel_symbol_array == %i( error expression parse_error primary_had_poor_surface_form ) || fail
 
         _act = em.express_into_under "", expag_
+
         _act == 'unknown primary: "zing-bling"' || fail
       end
 
@@ -130,7 +131,7 @@ module Skylab::Zerk::TestSupport
 
         em = el.gets
 
-        em.channel_symbol_array == %i( error expression parse_error subtracted_primary_referenced ) || fail
+        em.channel_symbol_array == %i( error expression parse_error subtracted_primary_was_referenced ) || fail
 
         _act = em.express_into_under "", expag_
         _act == 'unknown primary: "-ding-dong"' || fail
@@ -146,8 +147,9 @@ module Skylab::Zerk::TestSupport
 
       alias_method :calculate, :instance_exec
 
-      def say_strange_primary_ name
-        name.as_slug.inspect
+      def say_strange_primary_value_ x
+        x.respond_to? :ascii_only? or self._WHERE
+        x.inspect
       end
 
       new

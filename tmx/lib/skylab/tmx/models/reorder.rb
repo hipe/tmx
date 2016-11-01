@@ -41,7 +41,7 @@ module Skylab::TMX
         if scn.no_unparsed_exists
           @is_forwards = true
         else
-          _sym = scn.head_as_normal_symbol
+          _sym = scn.head_as_primary_symbol
           if :reverse == _sym
             scn.advance_one
             @is_forwards = false

@@ -36,10 +36,6 @@ module Skylab::Zerk
         _same name
       end
 
-      def say_strange_arguments_head_ name
-        _same_inspect name
-      end
-
       def say_arguments_head_ name
         _same name
       end
@@ -48,8 +44,8 @@ module Skylab::Zerk
         _add_dash name
       end
 
-      def say_strange_primary_ name
-        _same_inspect name
+      def say_strange_primary_value_ x
+        x.inspect
       end
 
       def say_formal_component_ name

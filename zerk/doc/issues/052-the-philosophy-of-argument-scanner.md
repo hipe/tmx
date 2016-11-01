@@ -1,3 +1,59 @@
+# argument scanner (in theory and in practice) :[#052]
+
+## (document scope)
+
+(current everything is in here: code notes, adapter notes, everything.)
+
+
+
+
+## scope
+
+this is a fun experiment being frontiered by [tmx] but being housed here
+in [ze] as an optimism about its potentially more broad utility.
+
+at its design and creation, it was meant to accomodate a CLI syntax
+that a bit resembles that of the unix `find` command. specifically,
+this is where we get the term "primary" is from that oft-used (but
+unexplained) term in the manpage of `find`.
+
+but of course we said, "if we can implement such a syntax for a CLI,
+can we instead implement a similar syntax for an API operation, and
+from that infer how it would be expressed for CLI?"
+
+
+
+
+## the design objectives
+
+the grand hack here (a proposed solution to a problem we've been solving
+in various ways for years) is to meet these design objectives:
+
+  - allow the ad-hoc syntax of an API operation to be expressed for
+    CLI in a more-or-less straightforward, regular way token-per-token
+    so if you become familar with one syntax, learning to use the other
+    is almost trivial. (the "almost" is the subject of the next points.)
+
+  - towards the above, allow the backend API to interpret arguments in
+    an "API way" when those arguments are represented in a "CLI way".
+    typically this means converting "primary" names "-like-this" to
+    names `:like_this` (that is, strings to symbols and the rest), and
+    perhaps some ad-hoc translations of value terms, typically from
+    certain string name conventions to symbol name conventions similar
+    to that example.
+
+  - facilitate a sort of blacklist capability where particular primaries
+    are designated to be non-accessible to the user, and are typically
+    (although not necessarily) given a semi-hard-coded value instead;
+    a process all of which should be fully transparent to the user.
+    (below, primaries like these are referred to as "fixed primaries".)
+
+  - facilitate a "front list" capability where the frontend (CLI) can
+    add (or perhaps unintentionally mask) primaries not recognized by
+    the back. this facility must be mostly transparent to the back.
+
+
+
 
 ## here is a description for all "multi-mode" argument scanner constructions:
 
@@ -19,3 +75,33 @@
     attempts to make the underlying user arguments available to the
     operation for it to read in an "API way" with name convention
     translation as appropriate.
+
+
+
+
+## on the interface of the subject "faciliator" performer :#note-1
+
+TL;DR: strange, session-heavy inteface for reasons
+
+given the particular argument scanner's head and a "route hash",
+the (two) various argument scanner implementations probably solve
+for a formal primary in more or less the same way from some certain
+high level. and regardless, in cases of failure they should express
+with the same expression behavior in the interest of DRYness (all
+else being equal).
+
+HOWEVER, there is no central `execute` method here: rather, that
+sequence of steps that each client is expected (more or less) to
+take is manifested here as a series of method exposures. it is the
+responsibility of the client to fill a logical "skeleton" of
+calls to these methods:
+
+  - with arguments appropriate to that client
+
+  - honoring the implicit assumptions some of these methods make
+    about side effects existing from logically previous methods
+
+we have architected this in such a manner only because when we
+did it the "other" way it was a tangled soup of many (many)
+"hook-out" methods, made more tangled by the adapter architecture
+of CLI's muli-mode argument scanner.

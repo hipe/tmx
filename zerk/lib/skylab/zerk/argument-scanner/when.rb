@@ -135,32 +135,28 @@ module Skylab::Zerk
         end  # >>
 
         def initialize
-          @recognizable_normal_symbols_proc = nil
-          @subtraction_hash = nil
+          @available_primary_name_stream_by = nil
           @terminal_channel_symbol = nil
         end
 
         attr_writer(
+          :available_primary_name_stream_by,
           :listener,
-          :name_by,
-          :recognizable_normal_symbols_proc,
-          :subtraction_hash,
+          :strange_primary_value_by,
           :terminal_channel_symbol,
         )
 
         def execute
 
-          ks_p = @recognizable_normal_symbols_proc
-          name_p = @name_by
-          sub_h = @subtraction_hash
+          available_primary_name_st_p = @available_primary_name_stream_by  # any
+          strange_primary_value_p = @strange_primary_value_by
 
           _tcs = ( @terminal_channel_symbol || :unknown_primary )
 
           @listener.call :error, :expression, :parse_error, _tcs do |y|
 
             buffer = "unknown primary"
-            _name = name_p[]
-            s = say_strange_primary_ _name
+            s = say_strange_primary_value_ strange_primary_value_p[]
             if COLON_BYTE_ != s.getbyte(0)
               buffer << COLON_
             end
@@ -168,30 +164,18 @@ module Skylab::Zerk
             buffer << s
             y << buffer
 
-            if ks_p
+            if available_primary_name_st_p
 
-              _keys = ks_p[]
-              sub_h ||= MONADIC_EMPTINESS_
-
-              _name_st = Stream_[ _keys ].map_reduce_by do |sym|
-
-                if ! sub_h[ sym ]
-                  Common_::Name.via_variegated_symbol sym
-                end
-              end
-              _this_or_this_or_this = say_primary_alternation_ _name_st
+              _available_name_st = available_primary_name_st_p[]
+              _this_or_this_or_this = say_primary_alternation_ _available_name_st
               y << "expecting #{ _this_or_this_or_this }"
+
             end
             y  # important, covered
           end
+
           UNABLE_
         end
-      end
-
-      # ==
-
-      Stream_ = -> a, & p do
-        Common_::Stream.via_nonsparse_array a, & p  # on stack to move up
       end
 
       # ==

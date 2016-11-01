@@ -33,11 +33,15 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
+
+  # == functions
+
   Begin_fuzzy_retrieve_ = -> & any_oes_p do
     Home_.lib_.brazen::Collection::Common_fuzzy_retrieve.new( & any_oes_p )
   end
-
-  Common_ = ::Skylab::Common
 
   Is_listy_ = -> sym do  # assume Field_
     if sym
@@ -56,7 +60,11 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
-  Lazy_ = Common_::Lazy
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p  # on stack to move up
+  end
+
+  # == requirers
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS
@@ -68,7 +76,14 @@ module Skylab::Zerk  # intro in [#001] README
     NIL_
   end
 
-  Autoloader_ = Common_::Autoloader
+  # == orphanic stowaways
+
+  module Invocation_
+    Autoloader_[ self ]
+    Here_ = self
+  end
+
+  # == canonic
 
   module Lib_
 
@@ -97,11 +112,6 @@ module Skylab::Zerk  # intro in [#001] README
     System = -> do
       system_lib[].services
     end
-  end
-
-  module Invocation_
-    Autoloader_[ self ]
-    Here_ = self
   end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]

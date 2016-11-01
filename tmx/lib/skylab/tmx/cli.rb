@@ -286,6 +286,8 @@ module Skylab::TMX
 
           o.subtract_primary :result_in_tree  # for now
 
+          o.add_primary(:help) { xxx }
+
           o.user_scanner remove_instance_variable :@_user_scanner
 
           o.listener @listener

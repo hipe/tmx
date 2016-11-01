@@ -24,9 +24,11 @@ more detail as referenced.
 
     as_above_and_it_is_only_ever_called_from_this_one_code_location__  # #tier-1.5
 
-    this_method_is_only_called_from_tests___  # #tier-1.7 (see)
+    this_method_is_only_called_from_tests___  # #tier-1.7 (see) (deprecating)
 
     _this_method_is_only_called_from_this_file  # #tier-2
+
+    _this_method_is_only_called_from_this_file_in_a_hook_out_manner_  # #tier-2 (again)
 
     __as_above_and_it_is_only_ever_called_from_this_one_code_location  # #tier-3
 
@@ -36,7 +38,7 @@ more detail as referenced.
 
     this_method_has_a__generated_portion__  # see #A
 
-    _a_method_like_this_  # ..is for when the other is a business namespace  # #tier-0.5
+    _public_API_method_variant_  # ..is for when the other is a business namespace and/or..  # #tier-0.5
 
 
 
@@ -49,7 +51,7 @@ is taggged with [#]  (the subject doc node).
 
 (another good example is [#hu-037], also cross-tagged to here.)
 
-the "trained eye" can see immediately that it has it has (at writing)
+the "trained eye" can see immediately that it has (at writing)
 several methods that part of its public API (or hook-outs/hooks-ins to
 some public API elsewhere); one method that has "library" (in this case
 "app") scope, a few that are "cozy" scope and a few "one-off (for the
@@ -81,12 +83,19 @@ whole paragraph may change.
 
 
 
-### :#tier-0.5: stay out of the way scope
+### :#tier-0.5: "public API variant" (probably deprecating)
 
-methods `_named_like_this_` are part of some public API (like above) but
-they stay out of the way of the "normal" method names which might need
-to be wide open for business. this is perhaps a smell, which is why we
-don't fully explain what we mean by all of this.
+(this same surface convention is instead used more frequently these days
+for different semantics, as desribed at #tier-2.)
+
+this convention is (perhaps deprecatedly) used in cases where the method
+is part of the implementing module's public API (so, exactly #tier-0)
+but the `public_method_name` convention cannot be used because that method
+"namespace" is explictly reserved for arbirary, ad-hoc business needs
+(simlar to the way a ::Struct sub-class's name space should be).
+
+it is probably a smell to employ this "pattern"; it is probably deprecating.
+
 
 
 
@@ -147,6 +156,20 @@ defined in. "one-off scope" is cozy scope but furthermore the method is
 only ever called from one place. the significance of these tiers
 corresponds exactly to the same tiers described in [#029].
 
+
+
+### about `_this_convention_` as #tier-2 :.F
+
+as exactly a portmanteau of `library_scope_` and `_file_scope`,
+`_this_convention_` might confer this:
+
+  - this method is only ever called from this same file it's defined in.
+
+  - this method is part of a frontend/implementation (shell/kernel)
+    adapter-type relationship, where there is a coordinating agent
+    that "hooks out" to an implementing agent by calling this method.
+    as such it can be the case that there are multiple definitions but
+    only a single location of call for such a method.
 
 
 
