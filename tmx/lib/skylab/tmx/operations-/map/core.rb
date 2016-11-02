@@ -148,6 +148,34 @@ module Skylab::TMX
         Stream_[ PRIMARIES__.keys ]
       end
 
+      Description_proc_reader___ = Lazy_.call do
+
+        {
+          order: -> y do
+            y << "<attribute name>  uses the ordering schema (if any) for"
+            y << "that attribute. multiple order modifiers may be chained together"
+            y << "to the extent allowed by the participating attributes."
+          end,
+
+          result_in_tree: -> y do
+            y << "when `order` is used, internally successive orderings"
+            y << "are represented in a tree structure with each branch node"
+            y << "being a grouping of the multiple nodes with the same value"
+            y << "for the attribute being ordered by. ordinarily this tree"
+            y << "is flattened to produce the end result of nodes. this"
+            y << "option returns the raw tree as a value rather than such"
+            y << "a stream of nodes."
+          end,
+
+          select: -> y do
+            y << "<attribute name>  similar to the SQL term of the same name,"
+            y << "adds (if necessary) this attribute to the set of attributes"
+            y << "that will be populated with values in the nodes of the"
+            y << "resulting stream"
+          end,
+        }
+      end
+
       PRIMARIES__ = {
         attributes_module_by: :__parse_attributes_module_by,
         order: :__parse_order_expression,
@@ -300,6 +328,20 @@ module Skylab::TMX
         :argument_scanner,  # for collaborators
         :stream_modifiers_were_used,  # for [#006]
       )
+
+      # -- help screen boilerplate
+
+      def is_branchy
+        false
+      end
+
+      def to_primary_normal_symbol_stream
+        Stream_[ PRIMARIES__.keys ]
+      end
+
+      def to_description_proc_reader
+        Description_proc_reader___[]
+      end
     # -
 
     # ==

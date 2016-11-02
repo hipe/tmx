@@ -72,6 +72,7 @@ regular patterns of inflection.
 interestingly, here we do not (yet) offer a formal, concrete
 representation for some sort of "deep name". really the "deep name" is
 just the imaginary node floating in the middle of all these other nodes.
+(EDIT: this may have changed.)
 
 what interests us is how we can transform these "surface names" to
 one another. our answer to this is the "name function":

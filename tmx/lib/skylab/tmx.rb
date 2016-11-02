@@ -190,11 +190,12 @@ module Skylab::TMX
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
   EMPTY_S_ = ''
+  Home_ = self
   METADATA_FILENAME = '.for-tmx-map.json'
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NIL_ = nil
   NOTHING_ = nil
-  Home_ = self
+  SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'
 end

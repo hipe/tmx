@@ -12,7 +12,7 @@ module Skylab::TMX
 
       def initialize i, o, e, pn_s_a
         @_BE_VERBOSE = false  # ..
-        @_end_of_stream = :_noop
+        @_end_of_stream = :__noop
         @serr = e
         @sout = o
         @program_name_string_array = pn_s_a
@@ -87,36 +87,19 @@ module Skylab::TMX
         invite_to_general_help
       end
 
-      def __when_general_help
-
-        CLI::HelpScreen::ForBranch.express_into @serr do |o|
-
-          o.operation_description_hash OPERATION_DESCRIPTIONS__
-
-          o.usage _program_name
-
-          o.description_by do |y|
-            y << "experiment.."
-          end
-
-          o.express_operation_descriptions_against self
-        end
-        @exitstatus = SUCCESS_EXITSTATUS__
-        NIL
-      end
-
       def __when_looks_like_operation_at_front
 
         scn = Common_::Polymorphic_Stream.via_array @argv
 
-        _key = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
+        key = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
 
-        m = OPERATIONS__[ _key ]
+        m = OPERATIONS__[ key ]
 
         if m
           __init_selective_listener
-          @_user_scanner = scn
           scn.advance_one
+          @__operation_normal_symbol = key
+          @_user_scanner = scn
           send m
         else
           @serr.puts "currently, normal tmx is deactivated -"
@@ -125,13 +108,18 @@ module Skylab::TMX
         end
       end
 
+      def _description_proc_for sym
+        _m = OPERATION_DESCRIPTIONS___.fetch sym
+        method _m
+      end
+
       OPERATIONS__ = {
         map: :__bound_call_for_map,
         reports: :__bound_call_for_reports,
         test_all: :__bound_call_for_test_all,
       }
 
-      OPERATION_DESCRIPTIONS__ = {
+      OPERATION_DESCRIPTIONS___ = {
         test_all: :__describe_test_all,
         reports: :__describe_reports,
         map: :__describe_map,
@@ -154,7 +142,11 @@ module Skylab::TMX
         @_table_schema = nil  # gets set by an emission if relevant
 
         _init_multimode_argument_scanner do |o|
+
           o.user_scanner remove_instance_variable :@_user_scanner
+
+          o.add_primary :help, method( :__induce_branch_help_EXPERIMENT ), Describe_help__  # #coverpoint-1-C OPEN
+
           o.listener @listener
         end
 
@@ -230,6 +222,8 @@ module Skylab::TMX
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
+          o.add_primary :help, method( :_induce_help ), Describe_help__  # #coverpoint-1-A OPEN
+
           o.listener @listener
         end
         NIL
@@ -238,8 +232,8 @@ module Skylab::TMX
       # -- map
 
       def __describe_map y
-        y << "produces streams of nodes given queries"
-        y << "(the underlying mechanics of most of the above)"
+        y << "given a query, produce a stream of nodes."
+        y << "(the underlying mechanics of most of the other operations)"
       end
 
       def __bound_call_for_map
@@ -286,7 +280,7 @@ module Skylab::TMX
 
           o.subtract_primary :result_in_tree  # for now
 
-          o.add_primary(:help) { xxx }
+          o.add_primary :help, method( :_induce_help ), Describe_help__  # #coverpoint-1-B OPEN
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
@@ -296,6 +290,79 @@ module Skylab::TMX
       end
 
       # -- support for expressing results (our version of [#ze-025])
+
+      def _induce_help
+
+        op = @API_invocation_.operation_session
+
+        if op.is_branchy
+
+          __express_help_for_branchy_node op
+        else
+          __express_help_for_endpoint_node op
+        end
+      end
+
+      def __when_general_help
+
+        CLI_support_[]::When::Help::ScreenForBranch.express_into @serr do |o|
+
+          o.operation_normal_symbol_stream to_operation_normal_symbol_stream
+
+          o.express_usage_section _get_program_name
+
+          o.express_description_section_by do |y|
+            y << "experiment.."
+          end
+
+          o.express_items_section method :_description_proc_for
+        end
+
+        @exitstatus = SUCCESS_EXITSTATUS__
+        NIL
+      end
+
+      def __express_help_for_branchy_node op
+
+        CLI_support_[]::When::Help::ScreenForBranch.express_into @serr do |o|
+          _same_help_screen_setup o, op
+        end
+        _same_help_finish
+      end
+
+      def __express_help_for_endpoint_node op
+
+        CLI_support_[]::When::Help::ScreenForEndpoint.express_into @serr do |o|
+          _same_help_screen_setup o, op
+        end
+        _same_help_finish
+      end
+
+      def _same_help_screen_setup o, op
+
+        as = @argument_scanner
+        op_sym = @__operation_normal_symbol
+
+        _st = op.to_primary_normal_symbol_stream
+        _st = as.altered_primary_normal_symbol_stream_via _st
+        o.primary_normal_symbol_stream _st
+
+        _slug = Common_::Name.via_variegated_symbol( op_sym ).as_slug
+        o.express_usage_section "#{ _get_program_name } #{ _slug }"
+
+        o.express_description_section _description_proc_for op_sym
+
+        _p = op.to_description_proc_reader
+        _p = as.altered_description_proc_reader_via _p
+        o.express_items_section _p
+
+        NIL
+      end
+
+      def _same_help_finish
+        @exitstatus = SUCCESS_EXITSTATUS__
+        NOTHING_  # stop parsing without failing
+      end
 
       def __attempt_to_render_a_table_in_a_general_way row_st
 
@@ -428,11 +495,11 @@ module Skylab::TMX
       end
 
       def invite_to_general_help
-        @serr.puts "try '#{ _program_name } -h'"
+        @serr.puts "try '#{ _get_program_name } -h'"
         _failed
       end
 
-      def _program_name
+      def _get_program_name
         ::File.basename @program_name_string_array.last
       end
 
@@ -446,9 +513,14 @@ module Skylab::TMX
       end
 
       def _to_didactic_operation_name_stream
-        Stream_.call OPERATION_DESCRIPTIONS__.keys do |sym|
+
+        to_operation_normal_symbol_stream.map_by do |sym|
           Common_::Name.via_variegated_symbol sym
         end
+      end
+
+      def to_operation_normal_symbol_stream
+        Stream_[ OPERATIONS__.keys ]
       end
 
       def expression_agent
@@ -460,7 +532,7 @@ module Skylab::TMX
         UNABLE_
       end
 
-      def _noop
+      def __noop
         NOTHING_
       end
 
@@ -709,6 +781,10 @@ module Skylab::TMX
 
     # ==
 
+    Describe_help__ = -> y do
+      y << "this screen."
+    end
+
     Build_info_yielder___ = -> serr do
       ::Enumerator::Yielder.new do |s|
         serr.puts s  # hi.
@@ -721,7 +797,7 @@ module Skylab::TMX
 
     # ==
 
-     Looks_like_option = -> do
+    Looks_like_option = -> do
       d = DASH_.getbyte 0  # DASH_BYTE_
       -> s do
         d == s.getbyte(0)

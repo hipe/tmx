@@ -1282,16 +1282,16 @@ module Skylab::Common
       end
 
       def _const
-        _stem_.___const_when_stem
+        _center_name_.___const_when_center_name
       end
 
-      def ___const_when_stem
+      def ___const_when_center_name
         @___did_attempt_const ||= ___attempt_const
         @_const
       end
 
       def ___attempt_const
-        @_const = Here_._via_stem_ self
+        @_const = Here_._via_center_name_ self
         ACHIEVED_
       end
     end
@@ -1314,7 +1314,7 @@ module Skylab::Common
 
       # for each trailing underscore, we want one trailing empty string
 
-      s_a = @value_x_.split SPLITTER_RX___, -1
+      s_a = @surface_value_.split SPLITTER_RX___, -1
 
       # downcase the piece IFF it doesn't look like an acroynym
 
@@ -1331,7 +1331,7 @@ module Skylab::Common
 
     def ___build_camelcase_string  # covered
 
-      @x_ = _stem_._stem_value_x_
+      @x_ = _center_name_._deep_value_
 
       d = 0
       while @x_.last.length.zero?
@@ -1351,11 +1351,11 @@ module Skylab::Common
     end
 
     def as_const  # symbol
-      @value_x_as_symbol_ ||= @value_x_.intern
+      @surface_value_as_symbol_ ||= @surface_value_.intern
     end
 
     def as_approximation
-      @___approximation ||= Distill_[ @value_x_ ]
+      @___approximation ||= Distill_[ @surface_value_ ]
     end
 
     def _titlecase_the_pieces
@@ -1395,11 +1395,11 @@ module Skylab::Common
       end
 
       def _LwU
-        _stem_.___LwU_when_stem
+        _center_name_.___LwU_when_center_name
       end
 
-      def ___LwU_when_stem
-        @___LwU ||= Here_._via_stem_ self
+      def ___LwU_when_center_name
+        @___LwU ||= Here_._via_center_name_ self
       end
     end
 
@@ -1410,15 +1410,15 @@ module Skylab::Common
     end
 
     def _express_
-      @value_x_.split UNDERSCORE_  # NOTE trailing separators lost
+      @surface_value_.split UNDERSCORE_  # NOTE trailing separators lost
     end
 
     def as_lowercase_with_underscores_symbol
-      @value_x_as_symbol_ ||= @value_x_.intern
+      @surface_value_as_symbol_ ||= @surface_value_.intern
     end
 
     def as_lowercase_with_underscores_string
-      @value_x_
+      @surface_value_
     end
   end
 
@@ -1434,11 +1434,11 @@ module Skylab::Common
       end  # >>
 
       def as_human
-        _stem_.___human_when_stem.as_human
+        _center_name_.___human_when_center_name.as_human
       end
 
-      def ___human_when_stem
-        @___human ||= Here_._via_stem_ self
+      def ___human_when_center_name
+        @___human ||= Here_._via_center_name_ self
       end
     end  # >>
 
@@ -1448,11 +1448,11 @@ module Skylab::Common
     end
 
     def _express_
-      @value_x_.split SPACE_
+      @surface_value_.split SPACE_
     end
 
     def as_human
-      @value_x_
+      @surface_value_
     end
   end
 
@@ -1467,12 +1467,21 @@ module Skylab::Common
         end
       end  # >>
 
-      def as_slug
-        _stem_.___slug_when_stem.as_slug
+      def as_slug= s  # #experimental
+        o = _center_name_
+        if o.instance_variable_defined? :@_slug
+          o._slug_when_center_name.as_slug = s
+        else
+          o.instance_variable_set :@_slug, Here_.via_slug( s )  # ..
+        end
       end
 
-      def ___slug_when_stem
-        @___slug ||= Here_._via_stem_ self
+      def as_slug
+        _center_name_._slug_when_center_name.as_slug
+      end
+
+      def _slug_when_center_name
+        @_slug ||= Here_._via_center_name_ self
       end
     end  # >>
 
@@ -1483,11 +1492,15 @@ module Skylab::Common
     end
 
     def _express_
-      @value_x_.split DASH_, -1  # NOTE keep trailing separators
+      @surface_value_.split DASH_, -1  # NOTE keep trailing separators
+    end
+
+    def as_slug= s
+      @surface_value_ = s
     end
 
     def as_slug
-      @value_x_
+      @surface_value_
     end
   end
 
@@ -1527,11 +1540,11 @@ module Skylab::Common
       end
 
       def _vari
-        _stem_.___variegated_when_stem
+        _center_name_.___variegated_when_center_name
       end
 
-      def ___variegated_when_stem
-        @___variegated ||= Here_._via_stem_ self
+      def ___variegated_when_center_name
+        @___variegated ||= Here_._via_center_name_ self
       end
     end
 
@@ -1544,7 +1557,7 @@ module Skylab::Common
 
       # perserve trailing separators IFF they were in the original symbol [sg]
 
-      @value_x_.split UNDERSCORE_, -1
+      @surface_value_.split UNDERSCORE_, -1
     end
 
     def as_ivar= x
@@ -1552,19 +1565,19 @@ module Skylab::Common
     end
 
     def as_ivar
-      @_ivar ||= :"@#{ @value_x_ }"
+      @_ivar ||= :"@#{ @surface_value_ }"
     end
 
     def as_parts
-      _stem_._stem_value_x_
+      _center_name_._deep_value_
     end
 
     def as_variegated_string
-      @value_x_  # eek
+      @surface_value_  # eek
     end
 
     def as_variegated_symbol
-      @value_x_as_symbol_ ||= @value_x_.intern
+      @surface_value_as_symbol_ ||= @surface_value_.intern
     end
   end
 
@@ -1572,8 +1585,8 @@ module Skylab::Common
 
     class << self
 
-      def _via_stem_ stem
-        new.__via_stem stem
+      def _via_center_name_ nm
+        new.__via_center_name nm
       end
 
       def _via_normal_string_ s
@@ -1587,14 +1600,19 @@ module Skylab::Common
       private :new
     end  # >>
 
-    def __via_stem stem
+    def initialize
+      @_center_name_via = :__center_name_when_unknown
+    end
 
-      @x_ = stem._stem_value_x_
+    def __via_center_name nm
+
+      @x_ = nm._deep_value_
       self._interpret_
       x = remove_instance_variable :@x_
       if x
-        @value_x_ = x
-        @_stem = stem
+        @surface_value_ = x
+        @_center_name_via = :__center_name_via_ivar
+        @_center_name = nm
         self
       else
         x  # cannot produce a name for this context from this stem
@@ -1602,32 +1620,36 @@ module Skylab::Common
     end
 
     def finish_via_normal_symbol sym
-      @value_x_as_symbol_ = sym
+      @surface_value_as_symbol_ = sym
       finish_via_normal_string sym.id2name
     end
 
     def finish_via_normal_string s
-      @value_x_ = s ; self
+      @surface_value_ = s ; self
     end
 
-    def _stem_
-      x = ( @_stem ||= ___resolve_stem )
-      if true == x  # ick but prettier graphs
-        self
-      else
-        x
-      end
+    def _center_name_
+      send @_center_name_via
     end
 
-    def ___resolve_stem
-      x = self._express_
+    def __center_name_when_unknown
+      x = _express_
       x or fail
-      @stem_value_x_ = x
-      true
+      @deep_value_ = x
+      @_center_name_via = :__center_name_via_self
+      self
     end
 
-    def _stem_value_x_
-      @stem_value_x_
+    def __center_name_via_self
+      self
+    end
+
+    def __center_name_via_ivar
+      @_center_name
+    end
+
+    def _deep_value_
+      @deep_value_
     end
 
     def _no_trailing_separators_  # assume at least 1 piece, not all empty

@@ -141,10 +141,6 @@ module Skylab::TMX
       end
 
       # ==
-
-      SPACE_ = ' '
-
-      # ==
     end
   end
 end

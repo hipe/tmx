@@ -2,6 +2,256 @@ module Skylab::Brazen
 
   module CLI_Support
 
+    class When::Help < As_Bound_Call  # (fwd declaration)
+#==FROM
+
+      # (at writing used only by [tmx] only for [ze] "argument scanner" related) (etc)
+
+      ScreenForWhichever__ = ::Class.new
+
+      class ScreenForBranch < ScreenForWhichever__
+
+        def operation_normal_symbol_stream st
+          @items_section_label = "operations"
+          receive_item_stream Operation_name_via_symbol__, st
+          NIL
+        end
+
+        def primary_normal_symbol_stream st
+          @items_section_label = "primaries"
+          receive_item_stream Primary_name_via_symbol__, st
+          NIL
+        end
+
+        def express_usage_section program_name
+
+          @express_boundary[]
+
+          buffer = "usage: #{ program_name }"
+          st = to_node_name_stream
+          one = st.gets
+          if one
+            buffer << " { " << one.as_slug
+            begin
+              nm = st.gets
+              nm || break
+              buffer << PIPEY___ << nm.as_slug
+              redo
+            end while above
+            buffer << " }"
+          end
+          buffer << " [opts]"
+          @puts.call buffer
+          NIL
+        end
+      end
+
+      class ScreenForEndpoint < ScreenForWhichever__
+
+        def primary_normal_symbol_stream st
+          @items_section_label = "primaries"
+          receive_item_stream Primary_name_via_symbol__, st
+          NIL
+        end
+
+        def express_usage_section program_name
+
+          @express_boundary[]
+
+          buffer = "usage: #{ program_name }"
+
+          countdown = 3  # max number of primaries to show up here
+          st = to_node_name_stream
+          nm = st.gets
+
+          if nm && countdown.nonzero?
+            say = -> name do
+              "[ #{ name.as_slug } ..]"
+            end
+            begin
+              countdown -= 1
+              buffer << SPACE_ << say[ nm ]
+              nm = st.gets
+              nm || break
+              if countdown.zero?
+                buffer << " .."
+                break
+              end
+              redo
+            end while above
+          end
+          @puts.call buffer
+          NIL
+        end
+      end
+
+      class ScreenForWhichever__
+
+        class << self
+          def express_into io
+            yield new io
+          end
+          private :new
+        end  # >>
+
+        def initialize io
+
+          puts = io.method :puts
+
+          @express_boundary = -> do
+            @express_boundary = puts ; nil
+          end
+
+          @express_blank_line = puts
+          @puts = puts
+        end
+
+        def express_description_section_by & user_p
+          express_description_section user_p
+        end
+
+        def express_description_section user_p
+          express_section_simply_via_header_and_message_proc "description", user_p
+        end
+
+        def express_items_section_by & p
+          express_items_section p
+        end
+
+        def express_items_section description_proc_for
+
+          # (catalyzes the rendering of the items section)
+
+          @express_boundary[]
+
+          puts = @puts
+
+          puts.call "#{ @items_section_label }:"
+
+          two_spaces = "  "
+
+          fmt = "#{ two_spaces }%#{ @max_name_width }s"
+
+          indent_with_spaces = fmt % nil
+
+          subsequent_line = -> line do
+            puts.call "#{ indent_with_spaces }#{ two_spaces }#{ line }"
+          end
+
+          buffer = ""
+          p = nil
+
+          first_line = -> line do
+            buffer << two_spaces
+            buffer << line
+            puts.call buffer
+            p = subsequent_line
+          end
+
+          y = ::Enumerator::Yielder.new do |line|
+            p[ line ]
+          end
+
+          item = -> nm do
+
+            buffer = fmt % nm.as_slug
+
+            desc_p = description_proc_for[ nm.as_variegated_symbol ]
+            if desc_p
+              p = first_line
+              desc_p[ y ]
+            end
+            NIL
+          end
+
+          subsequent_boundary = -> do
+            buffer.clear
+            @express_blank_line[]
+          end
+
+          boundary = -> do
+            boundary = subsequent_boundary
+          end
+
+          st = to_node_name_stream
+          begin
+            nm = st.gets
+            nm || break
+            boundary[]
+            item[ nm ]
+            redo
+          end while nil
+          NIL
+        end
+
+        def express_section_simply_via_header_and_message_proc hdr, msg_p
+
+          @express_boundary[]
+
+          p = -> line do
+            p = @puts
+            @puts.call "#{ hdr }: #{ line }"
+          end
+
+          _y = ::Enumerator::Yielder.new do |line|
+            p[ line ]
+          end
+
+          msg_p[ _y ]
+          NIL
+        end
+        private :express_section_simply_via_header_and_message_proc
+
+        # -- write-on-receive (then read)
+
+        def receive_item_stream name_via_normal_symbol, st
+
+          a = []
+          max = 0
+          begin
+            sym = st.gets
+            sym || break
+            name = name_via_normal_symbol[ sym ]
+            len = name.as_slug.length
+            max = len if max < len
+            a.push name
+            redo
+          end while above
+          @max_name_width = max
+          @names = a
+          NIL
+        end
+        private :receive_item_stream
+
+        def to_node_name_stream
+          Stream_[ @names ]
+        end
+      end
+
+      # ==
+
+      Primary_name_via_symbol__ = -> sym do
+        nm = Common_::Name.via_variegated_symbol sym
+        nm.as_slug = "-#{ nm.as_slug }"
+        nm
+      end
+
+      Operation_name_via_symbol__ = -> sym do
+        Common_::Name.via_variegated_symbol sym
+      end
+
+      # ==
+
+      Stream_ = -> a, & p do  # ..
+        Common_::Stream.via_nonsparse_array a, & p
+      end
+
+      # ==
+
+      PIPEY___ = ' | '
+#==TO
+    end
+
     class When::Help < As_Bound_Call  # abstract
 
       def initialize

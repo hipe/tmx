@@ -40,8 +40,9 @@ module Skylab::Zerk
           end
         end
 
-        def add_primary sym, & p
-          @_builder.receive_add_primary p, sym
+        def add_primary sym, * p_a, & p
+          p_a.push p if block_given?
+          @_builder.receive_add_primary p_a, sym
         end
 
         def default_primary sym
@@ -62,7 +63,8 @@ module Skylab::Zerk
       class Builder___
 
         def initialize
-          @_added_h = nil
+          @_added_box = nil
+          @_description_proc_for_added_h = nil
           @_front_tokens = nil
           @_has_default_primary = false
           @_listener = nil
@@ -84,8 +86,43 @@ module Skylab::Zerk
           NIL
         end
 
-        def receive_add_primary p, sym
-          ( @_added_h ||= {} )[ sym ] = p ; nil
+        def receive_add_primary p_a, sym
+
+          # for now (and don't expect this to stay this way forever
+          # necessarily), we can model the definition for an added primary
+          # as a set (here, list) of only procs:
+          #
+          #   - one callback proc for handling the parse
+          #     (this proc must be niladic)
+          #
+          #   - zero or one proc for expressing the primary's description
+          #     (this proc if provided must be monadic)
+          #
+          # given that in the above structural signature the formal procs
+          # happen to have arities that are unique to their formal argument,
+          # we can allow that the argument procs are provided in any order,
+          # using only their arities to infer the intent of the argument.
+          #
+          # we can furthermore treat any passed block indifferently to a
+          # positional argument. all of this together is meant to expose a
+          # loose, natural syntax where the user can use the block argument
+          # for whichever (if any) purpose "feels better" for the use case.
+          #
+          # for now (in part) because this is so experimental, we take
+          # safeguards to ensure that what is required is provided, and that
+          # the procs do not clobber each other.
+
+          box = Common_::Box.new
+          p_a.each do |p|
+            box.add p.arity, p
+          end
+          ( @_added_box ||= Common_::Box.new ).add sym, box.remove( 0 )
+          p = box.remove( 1 ) { }
+          if p
+            ( @_description_proc_for_added_h ||= {} )[ sym ] = p
+          end
+          box.length.zero? or raise ::ArgumentError
+          NIL
         end
 
         def receive_subtract_primary_with_argument sym, x
@@ -139,6 +176,8 @@ module Skylab::Zerk
             a.push FixedPrimaries___.new msp
           end
 
+          shared = Shared___.new @_added_box, @_subtracted_h
+
           us = remove_instance_variable :@_user_scanner
           if ! us.no_unparsed_exists
 
@@ -146,13 +185,14 @@ module Skylab::Zerk
               _dp_kn = Common_::Known_Known[ @_default_primary_symbol ]
             end
 
-            a.push UserScanner___.new @_added_h, @_subtracted_h, us, _dp_kn, @_listener
+            a.push UserScanner___.new shared, us, _dp_kn, @_listener
           end
 
           if a.length.zero?
             self._COVER_ME_you_should_result_in_a_singleton_that_says :no_unparsed_exists
           else
-            Here_.__new_multi_mode_argument_scanner a, @_listener
+            Here_.__new_multi_mode_argument_scanner(
+              a, @_description_proc_for_added_h, shared, @_listener )
           end
         end
       end
@@ -162,11 +202,33 @@ module Skylab::Zerk
       Here_ = self
       class Here_
 
-        def initialize a, l
+        def initialize a, d_h, shared, l
+          @_description_proc_for_added_h = d_h
           @listener = l
           @_scn_scn = Common_::Polymorphic_Stream.via_array a
           @_scn = @_scn_scn.gets_one
+          @_shared = shared
         end
+
+        # -- reflection (for etc)
+
+        def altered_description_proc_reader_via remote
+
+          # given the description proc reader produced by the remote
+          # operation, produce a new reader that includes also those for
+          # added primaries. (note we don't take into account subtraction).
+
+          added = @_description_proc_for_added_h
+          if added
+            -> k do
+              added[ k ] || remote[ k ]
+            end
+          else
+            remote
+          end
+        end
+
+        # --
 
         def match_primary_route_against_ h
 
@@ -236,7 +298,36 @@ module Skylab::Zerk
         end
 
         def available_primary_name_stream_via_hash h
-          @_scn._available_primary_name_stream_via_hash_ h
+
+          altered_primary_normal_symbol_stream_via( Stream_[ h.keys ] ).map_by do |sym|
+            Common_::Name.via_variegated_symbol sym
+          end
+        end
+
+        def altered_primary_normal_symbol_stream_via remote_sym_st
+
+          # given a stream of primary normal symbols as produced by the
+          # remote operation, produce a new stream (drawing from the
+          # argument stream) that reduces from it any subtracted primaries
+          # and concats to it the stream symbols for any added primaries.
+
+          shared = @_shared
+
+          sub_h = shared.subtracted_hash
+          reduced_st = if sub_h
+            remote_sym_st.reduce_by do |sym|
+              ! sub_h[ sym ]
+            end
+          else
+            remote_sym_st
+          end
+
+          added_box = shared.added_box
+          if added_box
+            reduced_st.concat_by added_box.to_name_stream
+          else
+            reduced_st
+          end
         end
 
         def head_as_normal_symbol
@@ -383,7 +474,7 @@ module Skylab::Zerk
         # this is the workhorse parser implementation - the one that
         # translates CLI-shaped arguments to API-shaped ones.
 
-        def initialize add_h, sub_h, user_scn, dp_kn, listener
+        def initialize shared, user_scn, dp_kn, listener
 
           if dp_kn
             @_default_primary_was_read = false
@@ -393,8 +484,15 @@ module Skylab::Zerk
             @_has_default_primary = false
           end
 
-          @_added_h = add_h
-          @_is_subtracted = sub_h || MONADIC_EMPTINESS_
+          bx = shared.added_box
+          if bx
+            @_has_added = true
+            @_added_box = bx
+          else
+            @_has_added = false
+          end
+
+          @__is_subtracted = shared.subtracted_hash || MONADIC_EMPTINESS_
           @_listener = listener
           @_real_scn = user_scn
         end
@@ -404,44 +502,58 @@ module Skylab::Zerk
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          k = req.well_formed_symbol
-          h = @_added_h
-          if h
-            x = h[ k ]
-          end
-          if x
-            route = AddedBasedRoute___.new x, k
-          else
-            h_ = req.primaries_hash
-            x = h_[ k ]
-            if x
-              route = PrimaryHashValueBasedRoute___.new x, k
-            end
-          end
+          route = __search_for_route_via_exact_match req
           if route
             Common_::Known_Known[ route ]
           else
-            a = nil
-            rx = /\A#{ ::Regexp.escape k }/
-            if h
-              h.keys.each do |k_|
-                rx =~ k_ or next
-                ( a ||= [] ).push AddedBasedRoute___.new( h[k_], k_ )
-              end
+            __lookup_route_with_fuzzy_match req
+          end
+        end
+
+        def __search_for_route_via_exact_match req
+
+          k = req.well_formed_symbol
+          # -- do we have a primary by this exact name (as normal or as added?)
+
+          if @_has_added
+            x = @_added_box[ k ]
+          end
+          if x
+            AddedBasedRoute___.new x, k
+          else
+            x = req.primaries_hash[ k ]
+            if x
+              PrimaryHashValueBasedRoute___.new x, k
             end
-            h_.keys.each do |k_|
-              rx =~ k_ or next
-              ( a ||= [] ).push PrimaryHashValueBasedRoute___.new( h[k_], k_ )
+          end
+        end
+
+        def __lookup_route_with_fuzzy_match req  # result in a knownness
+
+          a = nil
+          sym = req.well_formed_symbol
+          rx = /\A#{ ::Regexp.escape sym }/
+
+          if @_has_added
+            @_added_box.each_pair do |k, x|
+              rx =~ k || next
+              ( a ||= [] ).push AddedBasedRoute___.new( x, k )
             end
-            if a
-              if 1 == a.length
-                Common_::Known_Known[ a.fetch 0 ]
-              else
-                Known_unknown_when_ambiguous___[ a, k ]
-              end
+          end
+
+          req.primaries_hash.each_pair do |k, x|
+            rx =~ k || next
+            ( a ||= [] ).push PrimaryHashValueBasedRoute___.new( x, k )
+          end
+
+          if a
+            if 1 == a.length
+              Common_::Known_Known[ a.fetch 0 ]
             else
-              _known_unknown_with_reason :unknown_primary
+              Known_unknown_when_ambiguous___[ a, sym ]
             end
+          else
+            _known_unknown_with_reason :unknown_primary
           end
         end
 
@@ -458,7 +570,7 @@ module Skylab::Zerk
 
             sym = s[ _d .. -1 ].gsub( DASH_, UNDERSCORE_ ).intern
 
-            if @_is_subtracted[ sym ]
+            if @__is_subtracted[ sym ]
 
               # for now we do the check of "subtracted" here at not at the
               # latter step only so that subtraction *would be* reflected
@@ -492,32 +604,6 @@ module Skylab::Zerk
 
         def _known_unknown_with_reason sym
           Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ sym ]
-        end
-
-        def _available_primary_name_stream_via_hash_ h
-
-          is_subtracted = @_is_subtracted
-
-          st = Stream_[ h.keys ].map_reduce_by do |sym|
-
-            if is_subtracted[ sym ]
-              NOTHING_  # skip
-            else
-              Common_::Name.via_variegated_symbol sym
-            end
-          end
-
-          add_h = @_added_h
-          if add_h
-
-            _plus_these_stream = Stream_.call add_h.keys do |sym|
-              Common_::Name.via_variegated_symbol sym
-            end
-
-            st = st.concat_by _plus_these_stream
-          end
-
-          st
         end
 
         def _head_as_is_
@@ -620,6 +706,10 @@ module Skylab::Zerk
       end
 
       PrimaryHashValueBasedRoute___ = Home_::ArgumentScanner::PrimaryHashValueBasedRoute
+
+      # ==
+
+      Shared___ = ::Struct.new :added_box, :subtracted_hash
 
       # ==
     end

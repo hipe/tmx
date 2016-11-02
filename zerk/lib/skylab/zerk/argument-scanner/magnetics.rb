@@ -131,9 +131,7 @@ module Skylab::Zerk
       end
 
       def __when_argument_value_not_provided
-
-        Here_::When::Argument_value_not_provided.call(
-          @argument_scanner, @argument_scanner.listener )
+        Here_::When::Argument_value_not_provided[ @argument_scanner ]
       end
 
       def __when_argument_is_provided

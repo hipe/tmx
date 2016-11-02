@@ -96,8 +96,7 @@ module Skylab::Zerk
       # ==
 
       When::Argument_value_not_provided = -> argument_scanner do
-
-        self._COVER_ME_just_a_sketch
+        # #cover-me
 
         sym = argument_scanner.current_primary_symbol
 

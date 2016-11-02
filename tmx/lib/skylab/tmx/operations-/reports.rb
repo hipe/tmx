@@ -39,7 +39,7 @@ module Skylab::TMX
       end
 
       def __parse_one_primary_term
-        m = @argument_scanner.match_primary_route_value_against PRIMARIES___
+        m = @argument_scanner.match_primary_route_value_against PRIMARIES__
         if m
           _ok = send m
           _ok  # #todo
@@ -57,10 +57,35 @@ module Skylab::TMX
         send TERMINAL_OPERATIONS___.fetch _term_op_sym
       end
 
-      PRIMARIES___ = {
+      Description_proc_reader___ = Lazy_.call do
+        {
+          list: -> y do
+            y << "stream the available reports"
+          end,
+
+          execute: -> y do
+            y << "<report name>   execute a particular report"
+          end,
+
+          json_file_stream_by: -> y do
+            y << "which item collection to use to populate the report."
+          end,
+
+          reverse: -> y do
+            y << "(where available) in the lines of output of the report, the"
+            y << "order of the items is reversed so the item that used to"
+            y << "appear first will now appear last, and so on. (typically this"
+            y << "is not exactly the same as simply reversing the order in which"
+            y << "the resulting lines are produced, because of spacing, sections.)"
+          end,
+        }
+      end
+
+      PRIMARIES__ = {
+        # (for now, ordered aesthetically)
+        list: :__when_head_is_list,
         execute: :__when_head_is_execute,
         json_file_stream_by: :__when_head_is_json_file_stream_by,
-        list: :__when_head_is_list,
         reverse: :__when_head_is_reverse,
       }
 
@@ -185,6 +210,20 @@ module Skylab::TMX
       define_method :_parse_into, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # -- help screen boilerplate
+
+      def is_branchy
+        false
+      end
+
+      def to_primary_normal_symbol_stream
+        Stream_[ PRIMARIES__.keys ]
+      end
+
+      def to_description_proc_reader
+        Description_proc_reader___[]
+      end
     # -
 
     Report_names_box___ = Lazy_.call do
