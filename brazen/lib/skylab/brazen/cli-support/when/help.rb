@@ -103,6 +103,7 @@ module Skylab::Brazen
           end
 
           @express_blank_line = puts
+          @margin = TWO_SPACES___
           @puts = puts
         end
 
@@ -128,21 +129,19 @@ module Skylab::Brazen
 
           puts.call "#{ @items_section_label }:"
 
-          two_spaces = "  "
-
-          fmt = "#{ two_spaces }%#{ @max_name_width }s"
+          fmt = "#{ @margin }%#{ @max_name_width }s"
 
           indent_with_spaces = fmt % nil
 
           subsequent_line = -> line do
-            puts.call "#{ indent_with_spaces }#{ two_spaces }#{ line }"
+            puts.call "#{ indent_with_spaces }#{ line }"
           end
 
           buffer = ""
           p = nil
 
           first_line = -> line do
-            buffer << two_spaces
+            buffer << @margin
             buffer << line
             puts.call buffer
             p = subsequent_line
@@ -159,13 +158,13 @@ module Skylab::Brazen
             desc_p = description_proc_for[ nm.as_variegated_symbol ]
             if desc_p
               p = first_line
-              desc_p[ y ]
+              nil.instance_exec y, & desc_p  # #no-expag for now (1 of 2)
             end
             NIL
           end
 
           subsequent_boundary = -> do
-            buffer.clear
+            buffer = ""  # (we used to just clear it, but that botches some tests)
             @express_blank_line[]
           end
 
@@ -184,20 +183,30 @@ module Skylab::Brazen
           NIL
         end
 
-        def express_section_simply_via_header_and_message_proc hdr, msg_p
+        def express_section_simply_via_header_and_message_proc hdr, user_p
 
           @express_boundary[]
 
+          subsequent_line = nil
+
           p = -> line do
-            p = @puts
+            p = subsequent_line
             @puts.call "#{ hdr }: #{ line }"
+          end
+
+          subsequent_line = -> line do
+            if line
+              @puts.call "#{ @margin }#{ line }"
+            else
+              @puts.call line
+            end
           end
 
           _y = ::Enumerator::Yielder.new do |line|
             p[ line ]
           end
 
-          msg_p[ _y ]
+          nil.instance_exec _y, & user_p  # #no-expag for now (2 of 2)
           NIL
         end
         private :express_section_simply_via_header_and_message_proc
@@ -249,6 +258,7 @@ module Skylab::Brazen
       # ==
 
       PIPEY___ = ' | '
+      TWO_SPACES___ = '  '.freeze
 #==TO
     end
 

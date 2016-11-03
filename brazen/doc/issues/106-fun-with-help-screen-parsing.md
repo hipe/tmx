@@ -7,10 +7,14 @@ implementations elsewhere in this universe that do something like parse
 help screens.
 
 at writing we know of at least four:
-  • [#045] the "expect section" help screen parse tree (2 parsers)
-  • the asset node tracked by the subject identifier
-  • one in [tmx]
-  • a bespoke one in [ze]
+
+  - born 2016-04-02 [#ze-054]  zerk/test/non-interactive-cli/help-screens.rb
+
+  - born 2015-07-07 [#tmx-007] tmx/lib/skylab/tmx/modalities/cli/input-adapters/help-screen.rb
+
+  - born 2013-11-15 [#file]    brazen/lib/skylab/brazen/cli/isomorphic-methods-client/models-/help-screen.rb
+
+  - born 2013-09-21 [#045]     brazen/test/cli-support/expect-section.rb
 
 
 despite this, this node was preserved during the sunsetting [hl] largely

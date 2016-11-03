@@ -2,6 +2,8 @@ module Skylab::TMX
 
   class Modalities::CLI::Input_Adapters::Help_Screen
 
+    # the third of four facilities, this is :[#007] of #[#br-106]
+
     attr_reader(
       :number_of_lines,
     )

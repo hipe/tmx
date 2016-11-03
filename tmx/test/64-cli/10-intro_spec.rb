@@ -29,7 +29,7 @@ module Skylab::TMX::TestSupport
       expect_empty_puts
       expect "operations:"
 
-      _a = "reporting operations", "generate the", "streams of nodes"
+      _a = "reporting operations", "generate the", "stream of nodes"
       scn = Common_::Polymorphic_Stream.via_array _a
 
       p = -> line do

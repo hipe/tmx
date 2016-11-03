@@ -31,21 +31,9 @@ module Skylab::Zerk::TestSupport
         end
 
         def the_empty_real_scanner_
-          EMPTY_SCANNER___
+          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
         end
       # -
-
-      # ==
-
-      module EMPTY_SCANNER____
-        class << self
-          def no_unparsed_exists
-            true
-          end
-        end
-      end
-
-      # ==
     end
   end
 end

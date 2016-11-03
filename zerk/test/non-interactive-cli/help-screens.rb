@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   module Non_Interactive_CLI::Help_Screens
 
-    # [#br-045] / #[#br-106] blind rewrite!
+    # the fourth of four facilities, this is :[#054] of [#br-106] (blind rewrite)
 
     def self.[] tcc
       Use_::Memoizer_methods[ tcc ]

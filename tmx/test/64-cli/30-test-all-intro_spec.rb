@@ -60,7 +60,7 @@ module Skylab::TMX::TestSupport
         it "gives you a compounded ~\"did you mean..\"" do
           invoke_it
           expect_on_stderr 'unknown primary: "-strange"'
-          expect "expecting { -order | -test-directory }"
+          expect "expecting { -order | -test-directory | -help }"
           expect_failed_normally_
         end
 

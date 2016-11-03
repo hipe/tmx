@@ -382,7 +382,7 @@ module Skylab::Common
     class << self
 
       def the_empty_polymorphic_stream
-        @__teps ||= via_array EMPTY_A_
+        THE_EMPTY_POLYMORPHIC_SCANNER___
       end
 
       def try_convert x  # :+[#056]
@@ -543,6 +543,14 @@ module Skylab::Common
     attr_accessor :x_a_length
 
     self
+  end
+
+  module THE_EMPTY_POLYMORPHIC_SCANNER___
+    class << self
+      def no_unparsed_exists
+        true
+      end
+    end
   end
 
   # knownnesses (see [#004])

@@ -114,9 +114,10 @@ module Skylab::TMX
       end
 
       OPERATIONS__ = {
-        map: :__bound_call_for_map,
-        reports: :__bound_call_for_reports,
+        # (currently the below order determines help screen order)
         test_all: :__bound_call_for_test_all,
+        reports: :__bound_call_for_reports,
+        map: :__bound_call_for_map,
       }
 
       OPERATION_DESCRIPTIONS___ = {
@@ -307,7 +308,7 @@ module Skylab::TMX
 
         CLI_support_[]::When::Help::ScreenForBranch.express_into @serr do |o|
 
-          o.operation_normal_symbol_stream to_operation_normal_symbol_stream
+          o.operation_normal_symbol_stream _to_operation_normal_symbol_stream
 
           o.express_usage_section _get_program_name
 
@@ -320,6 +321,10 @@ module Skylab::TMX
 
         @exitstatus = SUCCESS_EXITSTATUS__
         NIL
+      end
+
+      def __induce_branch_help_EXPERIMENT
+        ::Kernel._K
       end
 
       def __express_help_for_branchy_node op
@@ -514,12 +519,12 @@ module Skylab::TMX
 
       def _to_didactic_operation_name_stream
 
-        to_operation_normal_symbol_stream.map_by do |sym|
+        _to_operation_normal_symbol_stream.map_by do |sym|
           Common_::Name.via_variegated_symbol sym
         end
       end
 
-      def to_operation_normal_symbol_stream
+      def _to_operation_normal_symbol_stream
         Stream_[ OPERATIONS__.keys ]
       end
 

@@ -2,7 +2,9 @@ module Skylab::Brazen
 
   class CLI::Isomorphic_Methods_Client
 
-    class Models_::Help_Screen  # see [#106]
+    class Models_::Help_Screen
+
+      # the second of four facilities, this is :[#106] of #[#106] (sic). see.
 
       class << self
 

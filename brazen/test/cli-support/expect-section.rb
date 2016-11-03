@@ -1,13 +1,20 @@
 module Skylab::Brazen::TestSupport
 
-  module CLI_Support::Expect_Section  # :[#045]. :+[#106]
+  module CLI_Support::Expect_Section
+
+    # the first of four similar facilities, this is :[#045] of #[#106]
+
+    # this also contains a fifth addition to the family strain, a
+    # "fail early"-modeled one.
+
+    # the oldschool based one:
 
     # in one go, parse a whole "screen" with indentation-sensitive syntax
     # reminiscent of a super simplified python or OGDL. the result data
     # structure is geared towards assertion.
 
     # :#gotcha #subscribed - if the treeifier encounters a blank like (i.e
-    # only a newline), what it does is context dependant: if it's in  the
+    # only a newline), what it does is context dependant: if it's in the
     # middle of a multiline node, it adds it to that node. otherwise it
     # counts the newline as its own toplevel item. this annoys some clients
     # and might change somehow, but for now it is just being watched ..
@@ -24,6 +31,314 @@ module Skylab::Brazen::TestSupport
         o.tree
       end
     end  # >>
+
+#==FROM
+  class FailEarly
+
+    class << self
+
+      def define
+        if block_given?
+          o = new
+          yield o
+          o.finish
+        else
+          new
+        end
+      end
+
+      private :new
+    end  # >>
+
+    # -
+      def initialize
+        @_expectations = []
+      end
+
+      def expect_section header_s, & p
+        @_expectations.push SectionExpectation___.new p, header_s ; nil
+      end
+
+      def finish
+        self
+      end
+
+      def to_spy_under test_context
+        Spy___.new test_context, @_expectations
+      end
+    # -
+
+    # ==
+
+    class Spy___
+
+      def initialize tc, exp_a
+
+        @_expectation_scanner = Common_::Polymorphic_Stream.via_array exp_a
+        @spying_IO = Spying_IO___.new self
+        @test_context = tc
+        _reinit_state
+      end
+
+      def receive_emission data, method_name
+
+        @_current_emission = ActualEmission___.new data, method_name
+
+        if @test_context.do_debug
+          __express_debugging_for_emission
+        end
+
+        send @_step
+        NIL
+      end
+
+      def __express_debugging_for_emission
+        @test_context.debug_IO.puts @_current_emission._inspect_
+        NIL
+      end
+
+      def __dispatch_emission_to_assertion
+        _directive_symbol = @_assertion.receive_emission @_current_emission
+        send DIRECTIVES___.fetch _directive_symbol
+        NIL
+      end
+
+      DIRECTIVES___ = {
+        _finished_: :_when_assertion_is_finished,
+        _pop_: :__pop,
+        _stay_: :__no_op,
+      }
+
+      def __pop
+        _when_assertion_is_finished
+        send @_step
+        NIL
+      end
+
+      def _when_assertion_is_finished
+        remove_instance_variable :@_assertion
+        @_expectation_scanner.advance_one
+        _reinit_state
+      end
+
+      def __no_op
+        NOTHING_
+      end
+
+      def _reinit_state
+
+        if @_expectation_scanner.no_unparsed_exists
+          @_step = :__process_emission_when_expecting_no_more_emissions
+        else
+          @_assertion = @_expectation_scanner.current_token.begin_assertion_under @test_context
+          @_step = :__dispatch_emission_to_assertion
+        end
+        NIL
+      end
+
+      def __process_emission_when_expecting_no_more_emissions
+        fail AssertionFailed, "expected no more emissions, had: #{ @_current_emission._inspect_ }"
+      end
+
+      def finish
+        remove_instance_variable( :@_assertion ).finish
+        @_expectation_scanner.advance_one
+        if @_expectation_scanner.no_unparsed_exists
+          remove_instance_variable :@_expectation_scanner
+          NIL
+        else
+          fail AssertionFailed, __say_unresolved_expectation
+        end
+      end
+
+      def __say_unresolved_expectation
+        _ = @_expectation_scanner.current_token.noun_phrase
+        "at end of output, expected but never reached #{ _ }"
+      end
+
+      attr_reader(
+        :spying_IO,
+      )
+    end
+
+    # ==
+
+    class Spying_IO___
+
+      def initialize o
+        @client = o
+      end
+
+      def puts s=nil
+        @client.receive_emission s, :puts
+        NIL
+      end
+    end
+
+    # ==
+
+    class SectionAssertion___
+
+      def initialize tc, rs_p, header_s
+        @emissions = []
+        @header_string = header_s
+        @_receive = :__receive_first_emission
+        @receive_section = rs_p
+        @test_context = tc
+      end
+
+      def receive_emission em
+        send @_receive, em
+      end
+
+      def __receive_first_emission em
+        s = em.string
+        if s
+          md = SECTION_OPENER_RX___.match s
+          if md
+            if @header_string == md[ :header ]
+              @emissions.push em
+              @_receive = :_receive_subsequent_emission_normally
+              :_stay_
+            else
+              fail AssertionFailed, __say_expected_header( md[ :header ] )
+            end
+          else
+            fail AssertionFailed, __say_expecting_match(s)
+          end
+        else
+          fail AssertionFailed, __say_expecting_string_but_had_none
+        end
+      end
+
+      def __say_expected_header s
+        "expected header of #{ @header_string.inspect }, had #{ s.inspect }"
+      end
+
+      def __say_expecting_match s
+        "expected opening of section, had: #{ s.inspect }"
+      end
+
+      def __say_expecting_string_but_had_none
+        "expected section with header #{ @header_string.inspect }, had blank line"
+      end
+
+      def _receive_subsequent_emission_normally em
+
+        s = em.string
+        if s
+          if INDENTED_RX__ =~ s
+            @emissions.push em
+            :_stay_
+          else
+            fail AssertionFailed, __say_annoying(s)
+          end
+        else
+          __receive_locally_first_blank_line em
+        end
+      end
+
+      def __receive_locally_first_blank_line em
+        # this blank line, we don't know if it separates a section or
+        # a subsection until we get the next line. life is easer if we:
+        @emissions.push em
+        @_receive = :__receive_line_after_mystery_blank_line
+        :_stay_
+      end
+
+      def __receive_line_after_mystery_blank_line em
+        s = em.string
+        s || self._SANITY  # two blank lines in a row is perhaps unheard of
+        if INDENTED_RX__ =~ s
+          @emissions.push em
+          @_receive = :_receive_subsequent_emission_normally
+          :_stay_
+        else
+          _become_finised
+          :_pop_
+        end
+      end
+
+      def __say_annoying s
+        "this might change later, but for now, unexpected not indented line: #{ s.inspect }"
+      end
+
+      def finish
+        _become_finised  # hi.
+      end
+
+      def _become_finised
+        remove_instance_variable :@_receive
+        remove_instance_variable :@test_context
+        @emissions.freeze
+        remove_instance_variable( :@receive_section )[ self ]
+        NIL
+      end
+
+      attr_reader(
+        :emissions,
+      )
+    end
+
+    # ==
+
+    class ActualEmission___
+
+      def initialize string, m
+        @method_name = m
+        @string = string
+      end
+
+      def _inspect_
+        [ @method_name, @string ].inspect
+      end
+
+      attr_reader(
+        :method_name,
+        :string,
+      )
+    end
+
+    # ==
+
+    class SectionExpectation___
+
+      def initialize p, header
+        @header_string = header
+        @receive_section = p
+      end
+
+      def begin_assertion_under tc
+        SectionAssertion___.new tc, @receive_section, @header_string
+      end
+
+      def noun_phrase
+        "a section with header #{ @header_string.inspect }"
+      end
+    end
+
+    # ==
+
+    SECTION_OPENER_RX___ = /\A
+      (?<header> [a-z] [-a-z_ 0-9]+ )
+      (?:
+          :?$  # optionally a colon, and then the end of the line OR
+        |
+
+          :[ ]+(?<rest>[^ ].*)
+               # necessarily a colon, one or more space, then some content
+      )
+    /ix
+
+    INDENTED_RX__ = /\A {2,}[^ ]/
+
+    # ==
+
+    AssertionFailed = ::Class.new ::RuntimeError
+
+    # ==
+  end
+#==TO
 
     # -- (forward declarations)
 
