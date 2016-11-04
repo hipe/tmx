@@ -4,9 +4,17 @@ module Skylab::TestSupport
 
     class Operations::ListFiles
 
-      if false
+      DESCRIPTION = -> y do
         y << "a stream of each test file path"
       end
+
+      DESCRIPTIONS = {
+        test_directory: DESCRIPTION_FOR_TEST_DIRECTORY_,
+      }
+
+      PRIMARIES = {
+        test_directory: :__parse_test_directory,
+      }
 
       # (if you don't know what a "globber" is, see #slowie-spot-1)
 
@@ -16,7 +24,7 @@ module Skylab::TestSupport
         _op_id = OperationIdentifier_.new :list_files
 
         @_syntax = Here_::Models_::HashBasedSyntax.new(
-          o.argument_scanner, PRIMARIES___, self )
+          o.argument_scanner, PRIMARIES, self )
 
         @test_directory_collection = Here_::Models_::TestDirectoryCollection.new(
           _op_id, o )
@@ -47,7 +55,7 @@ module Skylab::TestSupport
         _yes  # #todo
       end
 
-      # -- for [#006]
+      # -- for [#tmx-006]
 
       def parse_primary_at_head sym
         @_syntax.parse_primary_at_head sym
@@ -58,10 +66,6 @@ module Skylab::TestSupport
       end
 
       # --
-
-      PRIMARIES___ = {
-        test_directory: :__parse_test_directory,
-      }
 
       def __parse_test_directory
         @test_directory_collection.parse_test_directory

@@ -4,6 +4,14 @@ module Skylab::TestSupport
 
     class Operations::Cover
 
+      DESCRIPTION = -> y do
+        y << "«furloughed for a while»"
+      end
+
+      DESCRIPTIONS = nil
+
+      PRIMARIES = nil
+
       def initialize
         o = yield
         @_argument_scanner = o.argument_scanner

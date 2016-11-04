@@ -21,5 +21,3 @@ test all - test all.
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
 -5.1 divvy
 -5.2 require only (per test directory, per default globs)
--5.3 counts
--5.3.1 help screen integration! needs heavy design. needs invite.

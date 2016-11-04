@@ -1,3 +1,5 @@
+[#055]       [ didactics ]  (currently spliced into [#br-089]  )
+
 [#054]       [track help screen test library]
 
 [#053]       compound parse..

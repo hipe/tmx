@@ -101,9 +101,11 @@ module Skylab::Brazen::TestSupport
 
       Home_::CLI_Support::When::Help::ScreenForEndpoint.express_into io do |o|
 
-        _st = Stream_[ [ :remote_primary_one, :remote_primary_two ] ]
-        _st = as.altered_primary_normal_symbol_stream_via _st
-        o.primary_normal_symbol_stream _st
+        _raw_st = Stream_.call [ :remote_primary_one, :remote_primary_two ] do |sym|
+          [ :primary, sym ]
+        end
+
+        o.item_normal_tuple_stream as.altered_normal_tuple_stream_via _raw_st
 
         o.express_usage_section "kansas witchita"
 
@@ -124,7 +126,7 @@ module Skylab::Brazen::TestSupport
         }
 
         _p = as.altered_description_proc_reader_via _p
-        o.express_items_section _p
+        o.express_items_sections _p
         NIL
       end
     end

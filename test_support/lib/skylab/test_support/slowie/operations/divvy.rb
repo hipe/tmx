@@ -1,9 +1,18 @@
 module Skylab::TestSupport
 
-  class Tree_Runner
+  class Slowie
 
-    class Plugins__::Divide_The_Sidesystems < Plugin_
+    class Operations::Divvy
 
+      DESCRIPTION = -> y do
+        y << "«soon»"
+      end
+
+      DESCRIPTIONS = nil
+
+      PRIMARIES = nil
+
+      if false
       does :flush_the_sidesystem_tree do | st |
 
         st.transition_is_effected_by do | o |
@@ -13,6 +22,7 @@ module Skylab::TestSupport
           end
 
         end
+      end
       end
 
       def initialize( * )

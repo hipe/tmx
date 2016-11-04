@@ -18,6 +18,10 @@ module Skylab::TestSupport::TestSupport
         expect_result UNABLE_
       end
 
+      def ignore_these_common_emissions_
+        ignore_emissions_whose_terminal_channel_symbol_is :operator_resolved
+      end
+
       def subject_API
         Home_::Slowie::API
       end

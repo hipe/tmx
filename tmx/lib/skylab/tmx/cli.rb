@@ -11,6 +11,11 @@ module Skylab::TMX
     class Invocation___
 
       def initialize i, o, e, pn_s_a
+
+        @selection_stack = [ RootFrame___.new do
+          Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
+        end ]
+
         @_BE_VERBOSE = false  # ..
         @_end_of_stream = :__noop
         @serr = e
@@ -62,11 +67,13 @@ module Skylab::TMX
 
       def __when_no_args
 
-        st = _to_didactic_operation_name_stream
-
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
-          _any_of_these = say_formal_operation_alternation st
+          _st = Stream_.call OPERATIONS__.keys do |sym|
+            Common_::Name.via_variegated_symbol sym
+          end
+
+          _any_of_these = say_formal_operation_alternation _st
 
           y << "expecting #{ _any_of_these }"
         end
@@ -76,7 +83,7 @@ module Skylab::TMX
 
       def __when_looks_like_option_at_front  # assume 0 < argv length
         if HELP_RX =~ @argv.first
-          __when_general_help
+          _express_help
         else
           __when_unrecognized_option_at_front
         end
@@ -91,14 +98,14 @@ module Skylab::TMX
 
         scn = Common_::Polymorphic_Stream.via_array @argv
 
-        key = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
+        sym = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
 
-        m = OPERATIONS__[ key ]
+        m = OPERATIONS__[ sym ]
 
         if m
           __init_selective_listener
           scn.advance_one
-          @__operation_normal_symbol = key
+          @__operation_symbol = sym
           @_user_scanner = scn
           send m
         else
@@ -108,22 +115,17 @@ module Skylab::TMX
         end
       end
 
-      def _description_proc_for sym
-        _m = OPERATION_DESCRIPTIONS___.fetch sym
-        method _m
-      end
+      OPERATION_DESCRIPTIONS___ = {
+        test_all: :__describe_test_all,
+        reports: :__describe_reports,
+        map: :__describe_map,
+      }
 
       OPERATIONS__ = {
         # (currently the below order determines help screen order)
         test_all: :__bound_call_for_test_all,
         reports: :__bound_call_for_reports,
         map: :__bound_call_for_map,
-      }
-
-      OPERATION_DESCRIPTIONS___ = {
-        test_all: :__describe_test_all,
-        reports: :__describe_reports,
-        map: :__describe_map,
       }
 
       # -- test all
@@ -136,35 +138,49 @@ module Skylab::TMX
 
         @_express = :__express_for_test_all
 
-        @routes = {  # how we ignore particular emissions
+        @emission_routes = {  # how we ignore particular emissions
           find_command_args: :__receive_find_command_args,
         }
 
         @_table_schema = nil  # gets set by an emission if relevant
 
-        _init_multimode_argument_scanner do |o|
+        arg_scn = _multimode_argument_scanner_by do |o|
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
-          o.add_primary :help, method( :__induce_branch_help_EXPERIMENT ), Describe_help__  # #coverpoint-1-C OPEN
+          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
           o.listener @listener
         end
 
         _lib = Home_.lib_.test_support::Slowie
 
-        _api = _lib::API.begin_invocation_by @argument_scanner do |api|
+        api = _lib::API.begin_invocation_by arg_scn do |o|
 
           _ = remove_instance_variable :@__test_file_name_pattern_by
 
-          api.test_file_name_pattern_by( & _ )
+          o.test_file_name_pattern_by( & _ )
         end
 
-        bc = _api.to_bound_call_of_operator
+        # (perhaps the only time we need to "hand write" a push is when
+        #  we "mount" another service. (just for help screens)):
 
+        _push_frame do |y|
+
+          y.yield :name_symbol, :test_all
+          y.yield :argument_scanner, arg_scn
+
+          y.yield :define_didactics_by, -> dida_y do
+            Zerk_::Models::Didactics.define_conventionaly dida_y, api
+          end
+        end
+
+        bc = api.to_bound_call_of_operator
         if bc
           if bc.receiver.respond_to? :test_directory_collection
-            CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation[ bc, self ]
+
+            CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation.new(
+              bc, @selection_stack.last.__argument_scanner, self ).execute  # :#here
           else
             bc
           end
@@ -204,16 +220,14 @@ module Skylab::TMX
 
         o = Home_::API.begin( & @listener )
 
-        __init_argument_scanner_for_reports
-
-        o.argument_scanner = @argument_scanner
+        o.argument_scanner = __argument_scanner_for_reports
 
         _bound_call_via_API_invocation o
       end
 
-      def __init_argument_scanner_for_reports  # see [#ze-052]
+      def __argument_scanner_for_reports  # see [#ze-052]
 
-        _init_multimode_argument_scanner do |o|
+        _multimode_argument_scanner_by do |o|
 
           o.front_scanner_tokens :reports
 
@@ -223,11 +237,10 @@ module Skylab::TMX
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
-          o.add_primary :help, method( :_induce_help ), Describe_help__  # #coverpoint-1-A OPEN
+          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
 
           o.listener @listener
         end
-        NIL
       end
 
       # -- map
@@ -243,9 +256,7 @@ module Skylab::TMX
 
         o = Home_::API.begin( & @listener )
 
-        __init_argument_scanner_for_map
-
-        o.argument_scanner = @argument_scanner
+        o.argument_scanner = __argument_scanner_for_map
 
         _bound_call_via_API_invocation o
       end
@@ -267,9 +278,9 @@ module Skylab::TMX
         o.execute
       end
 
-      def __init_argument_scanner_for_map  # see [#ze-052]
+      def __argument_scanner_for_map  # see [#ze-052]
 
-        _init_multimode_argument_scanner do |o|
+        _multimode_argument_scanner_by do |o|
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
@@ -281,93 +292,66 @@ module Skylab::TMX
 
           o.subtract_primary :result_in_tree  # for now
 
-          o.add_primary :help, method( :_induce_help ), Describe_help__  # #coverpoint-1-B OPEN
+          o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-B OPEN
 
           o.user_scanner remove_instance_variable :@_user_scanner
 
           o.listener @listener
         end
-        NIL
       end
 
       # -- support for expressing results (our version of [#ze-025])
 
-      def _induce_help
+      def _express_help
 
-        op = @API_invocation_.operation_session
+        di = @selection_stack.last.to_didactics  # buckle up
 
-        if op.is_branchy
+        _lib_mod = CLI_support_[]::When::Help.const_get(
+          di.is_branchy ? :ScreenForBranch : :ScreenForEndpoint, false )
 
-          __express_help_for_branchy_node op
-        else
-          __express_help_for_endpoint_node op
-        end
-      end
+        _lib_mod.express_into @serr do |o|
 
-      def __when_general_help
+          o.item_normal_tuple_stream di.item_normal_tuple_stream_by[]
 
-        CLI_support_[]::When::Help::ScreenForBranch.express_into @serr do |o|
+          o.express_usage_section Program_name_via_client___[ self ]
 
-          o.operation_normal_symbol_stream _to_operation_normal_symbol_stream
+          o.express_description_section di.description_proc
 
-          o.express_usage_section _get_program_name
-
-          o.express_description_section_by do |y|
-            y << "experiment.."
-          end
-
-          o.express_items_section method :_description_proc_for
+          o.express_items_sections di.description_proc_reader
         end
 
         @exitstatus = SUCCESS_EXITSTATUS__
-        NIL
-      end
 
-      def __induce_branch_help_EXPERIMENT
-        ::Kernel._K
-      end
-
-      def __express_help_for_branchy_node op
-
-        CLI_support_[]::When::Help::ScreenForBranch.express_into @serr do |o|
-          _same_help_screen_setup o, op
-        end
-        _same_help_finish
-      end
-
-      def __express_help_for_endpoint_node op
-
-        CLI_support_[]::When::Help::ScreenForEndpoint.express_into @serr do |o|
-          _same_help_screen_setup o, op
-        end
-        _same_help_finish
-      end
-
-      def _same_help_screen_setup o, op
-
-        as = @argument_scanner
-        op_sym = @__operation_normal_symbol
-
-        _st = op.to_primary_normal_symbol_stream
-        _st = as.altered_primary_normal_symbol_stream_via _st
-        o.primary_normal_symbol_stream _st
-
-        _slug = Common_::Name.via_variegated_symbol( op_sym ).as_slug
-        o.express_usage_section "#{ _get_program_name } #{ _slug }"
-
-        o.express_description_section _description_proc_for op_sym
-
-        _p = op.to_description_proc_reader
-        _p = as.altered_description_proc_reader_via _p
-        o.express_items_section _p
-
-        NIL
-      end
-
-      def _same_help_finish
-        @exitstatus = SUCCESS_EXITSTATUS__
         NOTHING_  # stop parsing without failing
       end
+
+      # ~ (near) boilerplate for help
+
+      def is_branchy
+        true
+      end
+
+      def describe_into y
+        y << "experiment.."
+      end
+
+      def description_proc_reader
+        -> sym do
+          method OPERATION_DESCRIPTIONS___.fetch sym
+        end
+      end
+
+      def to_item_normal_tuple_stream
+        Stream_.call OPERATIONS__.keys do |sym|
+          [ :operator, sym ]
+        end
+      end
+
+      def argument_scanner  # because we are top, we don't alter our stream
+        NOTHING_
+      end
+
+      # --
 
       def __attempt_to_render_a_table_in_a_general_way row_st
 
@@ -463,11 +447,8 @@ module Skylab::TMX
 
       # -- preparing calls to the backend
 
-      def _init_multimode_argument_scanner & defn
-
-        @argument_scanner =
-          Zerk_lib_[]::NonInteractiveCLI::MultiModeArgumentScanner.define( & defn )
-        NIL
+      def _multimode_argument_scanner_by & defn
+        Zerk_lib_[]::NonInteractiveCLI::MultiModeArgumentScanner.define( & defn )
       end
 
       def release_json_file_stream_by_
@@ -500,32 +481,12 @@ module Skylab::TMX
       end
 
       def invite_to_general_help
-        @serr.puts "try '#{ _get_program_name } -h'"
+        @serr.puts "try '#{ get_program_name } -h'"
         _failed
       end
 
-      def _get_program_name
+      def get_program_name
         ::File.basename @program_name_string_array.last
-      end
-
-      def _formal_actions
-
-        _st = _to_didactic_operation_name_stream
-
-        expression_agent.calculate do
-          say_formal_operation_alternation _st
-        end
-      end
-
-      def _to_didactic_operation_name_stream
-
-        _to_operation_normal_symbol_stream.map_by do |sym|
-          Common_::Name.via_variegated_symbol sym
-        end
-      end
-
-      def _to_operation_normal_symbol_stream
-        Stream_[ OPERATIONS__.keys ]
       end
 
       def expression_agent
@@ -543,11 +504,31 @@ module Skylab::TMX
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-      # -- for collaborators (e.g emission expresser, magnetics)
+      # -- for magentics & other collaborators (e.g emission expresser)
 
       def receive_data_emission data_p, channel
-        :table_schema == channel[1] || fail
-        @_table_schema = data_p[]
+        send RECEIVE_DATA___.fetch( channel.fetch(1) ), & data_p
+      end
+
+      RECEIVE_DATA___ = {
+        operator_resolved: :_push_frame,
+        table_schema: :__receive_table_schema,
+      }
+
+      def _push_frame  # exactly [#ze-008] #note-1, #note-2
+
+        _frame = NonRootFrame___.new @selection_stack.last.didactics_by do |fr|
+          yield( ::Enumerator::Yielder.new do |k, x|
+            fr.receive x, k  # hi.
+          end )
+        end
+
+        @selection_stack.push _frame
+        NIL
+      end
+
+      def __receive_table_schema
+        @_table_schema = yield
         NIL
       end
 
@@ -556,10 +537,10 @@ module Skylab::TMX
       )
 
       attr_reader(
-        :argument_scanner,
         :API_invocation_,
         :listener,
-        :routes,
+        :emission_routes,
+        :selection_stack,
         :serr,
         :sout,
       )
@@ -738,13 +719,13 @@ module Skylab::TMX
       def initialize client
         @_ = client
         @_info_yielder = Lazy_.call { Build_info_yielder___[ client.serr ] }  # share the same across dups
-        @routes = client.routes || MONADIC_EMPTINESS_
+        @emission_routes = client.emission_routes || MONADIC_EMPTINESS_
       end
 
       def invoke em_p, sym_a
         @channel_symbol_array = sym_a
         @emission_proc = em_p
-        m = @routes[ @channel_symbol_array.last ]
+        m = @emission_routes[ @channel_symbol_array.last ]
         if m
           @_.send m, em_p, sym_a
         elsif :expression == @channel_symbol_array[1]
@@ -754,22 +735,23 @@ module Skylab::TMX
         else
           __express_event
         end
-        __maybe_invite
         NIL
       end
 
       def __express_event
         _ev = @emission_proc.call
         _ev.express_into_under @_info_yielder[], @_.expression_agent
+        _maybe_invite
         NIL
       end
 
       def __express_expression
         @_.expression_agent.calculate @_info_yielder[], & @emission_proc
+        _maybe_invite
         NIL
       end
 
-      def __maybe_invite
+      def _maybe_invite
         if :parse_error == @channel_symbol_array[2]
           @_.invite_to_general_help  # ..
         elsif :error == @channel_symbol_array[0]
@@ -785,6 +767,27 @@ module Skylab::TMX
     end
 
     # ==
+
+    name_stream_via_selection_stack = nil
+
+    Program_name_via_client___ = -> client do
+
+      buffer = client.get_program_name
+      st = name_stream_via_selection_stack[ client.selection_stack ]
+      begin
+        nm = st.gets
+        nm || break
+        buffer << SPACE_ << nm.as_slug
+        redo
+      end while nil
+      buffer
+    end
+
+    name_stream_via_selection_stack = -> ss do
+      Common_::Stream.via_range( 1  ... ss.length ).map_by do |d|
+        ss.fetch( d ).name
+      end
+    end
 
     Describe_help__ = -> y do
       y << "this screen."
@@ -808,6 +811,68 @@ module Skylab::TMX
         d == s.getbyte(0)
       end
     end.call
+
+    # ==
+
+    class NonRootFrame___
+
+      def initialize above_dida_p
+        @__above_didactics_by = above_dida_p
+        yield self
+      end
+
+      def receive x, k
+        instance_variable_set WRITABLE___.fetch( k ), x
+      end
+
+      WRITABLE___ = {
+        argument_scanner: :@__argument_scanner,
+        define_didactics_by: :@define_didactics_by,
+        name: :@name,
+        name_symbol: :@__name_symbol,
+        operator_instance: :@__operator_instance,
+      }
+
+      def didactics_by
+        method :to_didactics
+      end
+
+      def to_didactics
+        Zerk_::Models::Didactics.non_rootly__ @define_didactics_by, name, @__above_didactics_by
+      end
+
+      def name
+        @name ||= __if_name_wasnt_set_then_name_symbol_must_have_been_set
+      end
+
+      def __if_name_wasnt_set_then_name_symbol_must_have_been_set
+        Common_::Name.via_variegated_symbol(
+          remove_instance_variable :@__name_symbol )
+      end
+
+      def __argument_scanner  # for [#006] the feature injection magnetic (#here)
+        @__argument_scanner
+      end
+
+      def operator_instance__  # special needs only
+        @__operator_instance
+      end
+    end
+
+    class RootFrame___
+
+      def initialize & p
+        @didactics_by = p
+      end
+
+      def to_didactics
+        @didactics_by.call
+      end
+
+      attr_reader(
+        :didactics_by,
+      )
+    end
 
     # ==
 

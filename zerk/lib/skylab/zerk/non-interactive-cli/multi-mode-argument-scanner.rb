@@ -299,12 +299,16 @@ module Skylab::Zerk
 
         def available_primary_name_stream_via_hash h
 
-          altered_primary_normal_symbol_stream_via( Stream_[ h.keys ] ).map_by do |sym|
-            Common_::Name.via_variegated_symbol sym
+          _st = Stream_.call h.keys do |sym|
+            [ :primary, sym ]
+          end
+
+          altered_normal_tuple_stream_via( _st ).map_by do |tuple|
+            Common_::Name.via_variegated_symbol tuple.fetch 1
           end
         end
 
-        def altered_primary_normal_symbol_stream_via remote_sym_st
+        def altered_normal_tuple_stream_via remote_normal_tuple_st
 
           # given a stream of primary normal symbols as produced by the
           # remote operation, produce a new stream (drawing from the
@@ -315,16 +319,19 @@ module Skylab::Zerk
 
           sub_h = shared.subtracted_hash
           reduced_st = if sub_h
-            remote_sym_st.reduce_by do |sym|
-              ! sub_h[ sym ]
+            remote_normal_tuple_st.reduce_by do |tuple|
+              ! sub_h[ tuple.fetch(1) ]
             end
           else
-            remote_sym_st
+            remote_normal_tuple_st
           end
 
           added_box = shared.added_box
           if added_box
-            reduced_st.concat_by added_box.to_name_stream
+            _add_these = added_box.to_name_stream.map_by do |sym|
+              [ :primary, sym ]
+            end
+            reduced_st.concat_by _add_these
           else
             reduced_st
           end

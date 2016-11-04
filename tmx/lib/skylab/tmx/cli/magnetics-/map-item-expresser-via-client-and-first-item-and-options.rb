@@ -59,7 +59,9 @@ module Skylab::TMX
       end
 
       def __there_is_a_modification_index
-        _ = @client.API_invocation_.operation_session.modification_index
+
+        _operation = @client.selection_stack.last.operator_instance__
+        _ = _operation.modification_index
         _store :@__map_modification_index, _
       end
 

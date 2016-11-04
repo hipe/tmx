@@ -48,6 +48,8 @@ module Skylab::TestSupport::TestSupport
         y.first == "ping: Skylab::Zerk::API::ArgumentScannerExpressionAgent" || fail
       end
 
+      ignore_emissions_whose_terminal_channel_symbol_is :operator_resolved
+
       expect_result :_hello_from_slowie_
     end
   end

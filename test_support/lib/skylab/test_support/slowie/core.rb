@@ -55,19 +55,19 @@ module Skylab::TestSupport
     end
 
     def __to_bound_call_when_arguments
-      tuple = @argument_scanner.match_primary_route_value_against Primaries_hash___[]
-      if tuple
-        send( * tuple )
+      sct = @argument_scanner.match_primary_route_value_against Primaries_hash__[]
+      if sct
+        send sct.bound_call_method_name, sct
       end
     end
 
-    Primaries_hash___ = Lazy_.call do
+    Primaries_hash__ = Lazy_.call do
 
       # like boxxy but more simplified and rigid and ad-hoc.
       # tracked by #[#ze-051] (similar elsewhere).
 
       h = {
-        ping: [ :__bound_call_via_method, :__invoke_ping ],
+        ping: ViaMethods___.new( :__invoke_ping, :__describe_ping ),
       }
 
       st = Here_::Operations.entry_tree.to_state_machine_stream
@@ -75,48 +75,172 @@ module Skylab::TestSupport
         sm = st.gets
         sm || break
         name = Common_::Name.via_slug sm.entry_group_head
-
-        h[ name.as_lowercase_with_underscores_symbol ] =
-          [ :__bound_call_for_operation, name ]
-
+        h[ name.as_lowercase_with_underscores_symbol ] = ViaAssetNode___.new name
         redo
       end while above
       h
     end
 
-    def __bound_call_for_operation name
+    ViaAssetNode___ = ::Struct.new :name do
+
+      def didactics_method_name
+        :__didactics_for_class_based_operation
+      end
+
+      def description_method_name
+        :__description_proc_for_class_based_operation
+      end
+
+      def bound_call_method_name
+        :__bound_call_for_class_based_operation
+      end
+
+      def has_name
+        false
+      end
+
+    end
+
+    ViaMethods___ = ::Struct.new :invocation_method_name, :description_proc_method_name do
+
+      def didactics_method_name
+        :__didactics_for_method_based_operation
+      end
+
+      def description_method_name
+        :_desc_proc_for_method_based_operation
+      end
+
+      def bound_call_method_name
+        :__bound_call_for_method_based_operation
+      end
+    end
+
+    # ~
+
+    def __didactics_for_class_based_operation y, sct
+
+      cls = _operation_class_via_name sct.name
+
+      y.yield :is_branchy, false
+
+      y.yield :description_proc, cls::DESCRIPTION
+
+      y.yield :description_proc_reader, cls::DESCRIPTIONS
+
+      y.yield :item_normal_tuple_stream_by, -> do
+        h = cls::PRIMARIES
+        if h
+          Stream_.call h.keys do |sym|
+            [ :primary, sym ]
+          end
+        else
+          self._FOLLOW
+        end
+      end
+    end
+
+    def __didactics_for_method_based_operation y, sct
+
+      y.yield :is_branchy, false
+
+      y.yield :description_proc, _desc_proc_for_method_based_operation( sct )
+
+      y.yield :description_proc_reader, -> k do
+        ::Kernel._K  # no primaries yet for ping
+      end
+
+      y.yield :item_normal_tuple_stream_by, -> do
+        ::Kernel._K
+        NOTHING_
+      end
+    end
+
+    # ~
+
+    def __description_proc_for_class_based_operation sct
+      _operation_class_via_name( sct.name )::DESCRIPTION
+    end
+
+    def _desc_proc_for_method_based_operation sct
+      method sct.description_proc_method_name
+    end
+
+    # ~
+
+    def __bound_call_for_class_based_operation sct
 
       @argument_scanner.advance_one
 
-      _class = Here_::Operations.const_get name.as_camelcase_const_string, false
+      _class = _operation_class_via_name sct.name
 
-      _operation = _class.new do
-        self  # whatever resources (listeners, argument scanners) (if any)
-              # the operation uses, it opts-in to reading them in this way.
+      op = _class.new { self }  # any resources operator needs, it must ask
+
+      _emit_operator_resolved sct do |y|
+        y.yield :name, sct.name
+        y.yield :operator_instance, op
       end
-              # the only API that we assume on the operation is this:
 
-      Common_::Bound_Call.via_receiver_and_method_name _operation, :execute
+      Common_::Bound_Call.via_receiver_and_method_name op, :execute
     end
 
-    def __bound_call_via_method m
-
-      Common_::Bound_Call.via_receiver_and_method_name self, m
+    def _operation_class_via_name name
+      Here_::Operations.const_get name.as_camelcase_const_string, false
     end
 
-    # -- method-based operations
+    def __bound_call_for_method_based_operation sct
+
+      _emit_operator_resolved sct do |y|
+        y.yield :name_symbol, @argument_scanner.current_primary_symbol
+        y.yield :operator_instance, :_ts_not_a_class_based_operation_  # in case you ask
+      end
+
+      Common_::Bound_Call.via_receiver_and_method_name self, sct.invocation_method_name
+    end
+
+    def _emit_operator_resolved sct
+
+      # tell the remote client that we have resolved an operator (necessary
+      # for help screens, for other reflection of current operator instance)
+
+      @listener.call :data, :operator_resolved do |y|
+
+        y.yield :argument_scanner, @argument_scanner
+
+        y.yield :define_didactics_by, -> dida_y do
+          send sct.didactics_method_name, dida_y, sct
+        end
+      end
+      NIL
+    end
+
+    # -- particular method-based operations
+
+    def __describe_ping y
+      y << "a minimal operation for whatever"
+    end
 
     def __invoke_ping
 
-      # (note we don't bother checking if argscn is empty. it isn't)
+      @argument_scanner.advance_one
+      if ! @argument_scanner.no_unparsed_exists
+        had = true
+        x = @argument_scanner.head_as_is
+      end
 
       @listener.call :info, :expression, :ping do |y|
 
         y << "ping: #{ self.class.name }"
+        if had
+          y << "(\"ping\" does not parse arguments. ignoring: #{ x.inspect } [..])"
+        end
+        y
       end
 
       :_hello_from_slowie_
     end
+
+    # --
 
       if false
       def initialize _, o, e, a, env
@@ -376,6 +500,29 @@ module Skylab::TestSupport
 
       # ~
 
+    # -- boilerplate for help
+
+    def is_branchy
+      true
+    end
+
+    def description_proc_reader
+      -> k do
+        sct = Primaries_hash__[][ k ]
+        if sct
+          send sct.description_method_name, sct
+        else
+          NOTHING_  # ick when help is injected or ..?
+        end
+      end
+    end
+
+    def to_item_normal_tuple_stream
+      Stream_.call Primaries_hash__[].keys do |sym|
+        [ :primary, sym ]
+      end
+    end
+
     # -- for operations:
 
     def globberer_by & defn
@@ -405,6 +552,8 @@ module Skylab::TestSupport
       :argument_scanner,
       :listener,
     )
+
+    # --
 
     if false
     class Expression_Agent___  # #todo after :+#dev cull this
@@ -505,6 +654,13 @@ module Skylab::TestSupport
 
       UNDERSCORE_ = '_'.freeze  # we need our own because [#002]
       end  # if false
+
+    # ==
+
+    DESCRIPTION_FOR_TEST_DIRECTORY_ = -> y do
+      y << "add test directory in which to search for test files"
+    end
+
     # ==
 
     class OperationIdentifier_

@@ -68,7 +68,6 @@ module Skylab::TMX
 
         name = bx.h_[ sym ]
         if name
-          @argument_scanner.advance_one
           __when_operation_found name
         else
           __when_operation_not_found bx
@@ -92,17 +91,30 @@ module Skylab::TMX
 
       def __when_operation_found name
 
+        as = @argument_scanner
+
         _const = name.as_camelcase_const_string.intern
 
         _operation_class = Home_::Operations_.const_get _const, false
 
-        o = _operation_class.begin( & @_emit )
+        op = _operation_class.begin( & @_emit )
 
-        o.argument_scanner = @argument_scanner
+        op.argument_scanner = as
 
-        @operation_session = o  # experiment
+        @_emit.call :data, :operator_resolved do |y|
 
-        Common_::Bound_Call[ nil, o, :execute ]
+          y.yield :name, name
+          y.yield :argument_scanner, as
+          y.yield :operator_instance, op
+
+          y.yield :define_didactics_by, -> dida_y do
+            Zerk_::Models::Didactics.define_conventionaly dida_y, op
+          end
+        end
+
+        @argument_scanner.advance_one
+
+        Common_::Bound_Call[ nil, op, :execute ]
       end
 
       def _parse_error_listener

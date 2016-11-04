@@ -2,12 +2,12 @@ module Skylab::TMX
 
   class CLI
 
-    class Magnetics_::BoundCall_via_TestDirectoryOrientedOperation < Common_::Actor::Dyadic
+    class Magnetics_::BoundCall_via_TestDirectoryOrientedOperation  # 1x
 
       # [#006]
 
-      def initialize bc, cli
-        @argument_scanner = cli.argument_scanner
+      def initialize bc, as, cli
+        @argument_scanner = as
         @CLI = cli
         @_remote_operation = bc.receiver
         @_result_in_the_same_bound_call_we_stared_with = bc

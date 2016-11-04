@@ -1,3 +1,177 @@
+#==FROM
+
+# didactics conceived :[#ze-055]  STOWED AWAY HERE
+
+## objective & scope
+
+a "didactics" is an experimentally standard structure meant to
+contain and expose (almost) all the components necessary to express
+a help screen. to imagine it in MVC terms, if the particular
+expression behavior of the help screen is the "view" logic then the
+"didactics" is the model.
+
+hypothetically the subject could be used towards expression in
+any arbitrary modality that wants to express such a structure, but
+for now the only consumer of this is a CLI-expressing agent for
+render help screens.
+
+the subject is an abstraction meant to decouple us from both any
+particular help screen expression facility and any stringent
+requirements that particular "operators" must follow - with an
+agreed upon "didactics" structure as an intermediary, it is not the
+case that each particular operation (etc) need to fulfill a long
+laundry list of reflection methods.
+
+rather, the particular remote application can implement the
+production of a standard "didactics" structure in whatever way best
+fits the particular remote architecture (for example, a proc-heavy
+vs. class heavy model, a shared operator base class or no, hook-in
+methods vs. constants, etc). as new "best practices" are explored,
+they can be applied without needing to alter the code of the higher-
+level client(s).
+
+
+
+
+## the constituency of the membership in detail
+
+here's the four members of the structure, then a critique of each:
+
+  - `is_branchy`
+  - `description_proc`
+  - `description_proc_reader`
+  - `item_normal_tuple_stream_by`
+
+
+
+### `is_branchy`
+
+the degree to which this boolean impacts the expression of the
+screen is a point of some experimentation. in the old days this was
+a very strong structural distinction to make of an interface node;
+however these days because of the rough-and-tumble nature of
+"argument-scanner"-driven architectures, the expressive distinction
+between "branchy" and not is diminishing, but may not have yet
+disappeared completely.
+
+
+
+### `description_proc`
+
+for the subject node itself. exactly like its forebears, might
+one day execute under some "expression agent" with a standard
+inteface.
+
+
+
+### `description_proc_reader`
+
+this object must respond to `[]` which will receive (in its perhaps
+mutiple calls) any one of the symbols produced by the member
+described next. the producer of the subject will typically
+implement this with a hash or proc, but it could be anything that
+responds to monadic calls to `[]`.
+
+these calls must either result in a description proc or a false-ish.
+the particular behavior for what the expressing agent will do with
+false-ish is not proscribed, but it is guaranteed not to cause failure.
+
+
+
+### `item_normal_tuple_stream_by`
+
+an "item normal tuple" is experimentally:
+    [ { :primary | :operator }, normal-name-symbol ]
+
+this is modeled as a "streamer" instead of a "stream" so that this
+otherwise stateless subject structure can remain so.
+
+
+
+
+## about the exclusion of the constituency of the membership
+
+note the didactics does not maintain any sort of "name" for the
+subject node itself. we used to include the string `program_name`
+in the membership, but we do no longer for two reasons:
+
+  1. this was the only component of the struct that was
+     heavily "modality centric".
+
+  2. we model it as *not* within the responsibility of the "didactics"
+     itself to represent the "name" of the operator, but rather as
+     a detail of the invocation. at present, name information is
+     emitted directly in the `operator_resolved` emission that the
+     service emits at the time of resolution.
+
+
+
+
+## notes
+
+### :#note-1
+
+experimental, this is the remote service telling us that it
+succeeded in resolving a next opera*tor* from the head of the
+argument stream that we handed off to [wherever]. if now or
+at any point in the future we will want the associated normal
+name symbol (or any derivative thereof), we've got to grab it
+now because the argument scanner is mutable and in motion..
+
+
+
+### :#note-2
+
+the structure of this selection stack was once simple and lazy.
+(it used to be a chain of zero or more symbols and alway as the
+"last" element one proc that produced a didactic structure.)
+but now it's more a traditional "selection stack" structure, so
+that A) we preserve the name object created anyway by the far
+remote service, and B) we can put the operator somewhere where
+reflection is necessary to ask business-specific things when
+customizing expression.
+
+
+
+
+### :#note-3
+
+in opposition to [ac]'s whole "autonomous" "component" philosophy,
+we are wedging this in here to see how it feels: we see if the
+subject operator has a "parent". (by "parent" we mean an operator
+(necessarily "branchy") that lives one level below the subject
+operator on the selection stack.)
+
+if the operator has a parent, we let the parent act as a sort of
+"curator" that particpates in expressing the subject operator.
+in this "curator" model, it is the parent and not the subject
+operator that decides:
+
+  - the subject's name (slug)
+  - the subject's description (proc)
+
+any parent may then defer back to the child to let it describe
+itself.
+
+the advantage to the "curator" model is that the descriptions
+that go into one "splay" are all near each other in easy to
+read methods (typically); and the parent doesn't need to load
+each child node to produce its splay.
+
+the main disadvantage to this model is that we lose the "drop-in"
+feel of autonomy, and that built-in to the parent must be knowledge
+of child's means of exposing description (where appropriate).
+
+mainly this was conceived so that we can allow our help screen
+system to recurse but not have to re-architect our code; and as
+an experiment of course.
+
+it's worth mentioning this is a throwback to [#br-098] "ouroboros".
+
+
+
+
+#==TO
 # ouroboros - a snake eating its own tail is a thing in cultures :[#098]
 
 

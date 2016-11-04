@@ -12,6 +12,7 @@ module Skylab::TestSupport::TestSupport
     it "for now (and probably always), can't list files without test directory" do
 
       call :list_files
+      ignore_these_common_emissions_
       fails_because_no_test_directories_ :list_files
     end
 
@@ -31,6 +32,8 @@ module Skylab::TestSupport::TestSupport
         ev2 = ev_
       end
 
+      ignore_these_common_emissions_
+
       _hi = finish_by do |st|
         st.gets
       end
@@ -45,6 +48,8 @@ module Skylab::TestSupport::TestSupport
       _this_real_thing = ::File.dirname this_file
 
       call :list_files, :test_directory, _this_real_thing
+
+      ignore_these_common_emissions_
 
       ignore_emissions_whose_terminal_channel_symbol_is :find_command_args
 

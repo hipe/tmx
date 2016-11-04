@@ -11,24 +11,12 @@ module Skylab::Brazen
 
       class ScreenForBranch < ScreenForWhichever__
 
-        def operation_normal_symbol_stream st
-          @items_section_label = "operations"
-          receive_item_stream Operation_name_via_symbol__, st
-          NIL
-        end
-
-        def primary_normal_symbol_stream st
-          @items_section_label = "primaries"
-          receive_item_stream Primary_name_via_symbol__, st
-          NIL
-        end
-
         def express_usage_section program_name
 
           @express_boundary[]
 
           buffer = "usage: #{ program_name }"
-          st = to_node_name_stream
+          st = to_item_name_stream
           one = st.gets
           if one
             buffer << " { " << one.as_slug
@@ -48,12 +36,6 @@ module Skylab::Brazen
 
       class ScreenForEndpoint < ScreenForWhichever__
 
-        def primary_normal_symbol_stream st
-          @items_section_label = "primaries"
-          receive_item_stream Primary_name_via_symbol__, st
-          NIL
-        end
-
         def express_usage_section program_name
 
           @express_boundary[]
@@ -61,7 +43,7 @@ module Skylab::Brazen
           buffer = "usage: #{ program_name }"
 
           countdown = 3  # max number of primaries to show up here
-          st = to_node_name_stream
+          st = to_item_name_stream
           nm = st.gets
 
           if nm && countdown.nonzero?
@@ -116,25 +98,34 @@ module Skylab::Brazen
         end
 
         def express_items_section_by & p
-          express_items_section p
+          express_items_sections p
         end
 
-        def express_items_section description_proc_for
+        def express_items_sections description_proc_for
 
-          # (catalyzes the rendering of the items section)
+          to_item_group_stream.each do |group|
+
+            __express_items_section group, description_proc_for
+          end
+          NIL
+        end
+
+      private
+
+        def __express_items_section group, description_proc_for
 
           @express_boundary[]
 
           puts = @puts
 
-          puts.call "#{ @items_section_label }:"
+          puts.call "#{ LABEL_FOR___.fetch group.normal_item_type_symbol }:"
 
           fmt = "#{ @margin }%#{ @max_name_width }s"
 
           indent_with_spaces = fmt % nil
 
           subsequent_line = -> line do
-            puts.call "#{ indent_with_spaces }#{ line }"
+            puts.call "#{ indent_with_spaces }#{ @margin }#{ line }"
           end
 
           buffer = ""
@@ -172,7 +163,7 @@ module Skylab::Brazen
             boundary = subsequent_boundary
           end
 
-          st = to_node_name_stream
+          st = group.to_item_name_stream
           begin
             nm = st.gets
             nm || break
@@ -182,6 +173,11 @@ module Skylab::Brazen
           end while nil
           NIL
         end
+
+        LABEL_FOR___ = {
+          operator: "operations",  # misnomer, meh
+          primary: "primaries",
+        }
 
         def express_section_simply_via_header_and_message_proc hdr, user_p
 
@@ -209,44 +205,86 @@ module Skylab::Brazen
           nil.instance_exec _y, & user_p  # #no-expag for now (2 of 2)
           NIL
         end
-        private :express_section_simply_via_header_and_message_proc
 
         # -- write-on-receive (then read)
 
-        def receive_item_stream name_via_normal_symbol, st
+        def item_normal_tuple_stream st
 
-          a = []
+          current_item_group_normal_sym = nil
+          item_groups_cache = []
           max = 0
+
           begin
-            sym = st.gets
-            sym || break
-            name = name_via_normal_symbol[ sym ]
+            tuple = st.gets
+            tuple || break
+            type_sym, normal_sym = tuple
+            name = NAME_FOR___.fetch( type_sym )[ normal_sym ]
+
+            # -- maybe increase max width
+
             len = name.as_slug.length
             max = len if max < len
-            a.push name
+
+            # -- add to groups
+
+            if current_item_group_normal_sym != type_sym
+              g = ItemGroup___.new type_sym
+              item_groups_cache.push g
+              current_item_array = g.item_array
+              current_item_group_normal_sym = type_sym
+            end
+
+            current_item_array.push name
             redo
           end while above
+
+          @item_groups = item_groups_cache
           @max_name_width = max
-          @names = a
           NIL
         end
-        private :receive_item_stream
+        public :item_normal_tuple_stream
 
-        def to_node_name_stream
-          Stream_[ @names ]
+        def to_item_name_stream
+          to_item_group_stream.expand_by do |group|
+            group.to_item_name_stream
+          end
+        end
+
+        def to_item_group_stream
+          Stream_[ @item_groups ]
         end
       end
 
       # ==
 
-      Primary_name_via_symbol__ = -> sym do
-        nm = Common_::Name.via_variegated_symbol sym
-        nm.as_slug = "-#{ nm.as_slug }"
-        nm
-      end
+      NAME_FOR___ = {
+        operator: -> sym do
+          Common_::Name.via_variegated_symbol sym
+        end,
+        primary: -> sym do
+          nm = Common_::Name.via_variegated_symbol sym
+          nm.as_slug = "-#{ nm.as_slug }"
+          nm
+        end,
+      }
 
-      Operation_name_via_symbol__ = -> sym do
-        Common_::Name.via_variegated_symbol sym
+      # ==
+
+      class ItemGroup___
+
+        def initialize type_sym
+          @item_array = []
+          @normal_item_type_symbol = type_sym
+        end
+
+        def to_item_name_stream
+          Stream_[ @item_array ]
+        end
+
+        attr_reader(
+          :item_array,
+          :normal_item_type_symbol,
+        )
       end
 
       # ==

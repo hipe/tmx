@@ -17,6 +17,8 @@ module Skylab::TestSupport::TestSupport
         y.first.include? '"cover" is furloughed' or fail
       end
 
+      ignore_these_common_emissions_
+
       expect_result UNABLE_
     end
   end

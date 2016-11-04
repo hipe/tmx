@@ -1,9 +1,18 @@
 module Skylab::TestSupport
 
-  class Tree_Runner
+  class Slowie
 
-    class Plugins__::Load_The_Test_Files < Plugin_
+    class Operations::RequireOnly
 
+      DESCRIPTION = -> y do
+        y << "only load the test files, do not run the tests"
+      end
+
+      DESCRIPTIONS = nil
+
+      PRIMARIES = nil
+
+      if false
       can :flush_the_test_files do | tr |
 
         tr.if_transition_is_effected do | o |
@@ -16,6 +25,7 @@ module Skylab::TestSupport
 
           o.on '-v', '--verbose', 'output each path right before it is loaded'
         end
+      end
       end
 
       def initialize( * )

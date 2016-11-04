@@ -335,12 +335,14 @@ module Skylab::TMX
         false
       end
 
-      def to_primary_normal_symbol_stream
-        Stream_[ PRIMARIES__.keys ]
+      def description_proc_reader
+        Description_proc_reader___[]
       end
 
-      def to_description_proc_reader
-        Description_proc_reader___[]
+      def to_item_normal_tuple_stream
+        Stream_.call PRIMARIES__.keys do |sym|
+          [ :primary, sym ]
+        end
       end
     # -
 

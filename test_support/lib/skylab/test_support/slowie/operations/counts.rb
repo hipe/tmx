@@ -4,9 +4,17 @@ module Skylab::TestSupport
 
     class Operations::Counts
 
-      if false
+      DESCRIPTION = -> y do
         y  << "show a report of the number of tests per subproduct"
       end
+
+      DESCRIPTIONS = {
+        test_directory: DESCRIPTION_FOR_TEST_DIRECTORY_,
+      }
+
+      PRIMARIES = {
+        test_directory: :__parse_test_directory,
+      }
 
       def initialize
 
@@ -16,7 +24,7 @@ module Skylab::TestSupport
         @__emit = o.listener
 
         @_syntax = Here_::Models_::HashBasedSyntax.new(
-          o.argument_scanner, PRIMARIES___, self )
+          o.argument_scanner, PRIMARIES, self )
 
         @test_directory_collection = Here_::Models_::TestDirectoryCollection.new(
           _op_id, o )
@@ -76,7 +84,7 @@ module Skylab::TestSupport
         _yes  # #todo
       end
 
-      # -- for [#006]
+      # -- for [#tmx-006]
 
       def parse_primary_at_head sym
         @_syntax.parse_primary_at_head sym
@@ -87,10 +95,6 @@ module Skylab::TestSupport
       end
 
       # --
-
-      PRIMARIES___ = {
-        test_directory: :__parse_test_directory,
-      }
 
       def __parse_test_directory
         @test_directory_collection.parse_test_directory

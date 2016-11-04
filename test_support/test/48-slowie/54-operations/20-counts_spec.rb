@@ -11,6 +11,7 @@ module Skylab::TestSupport::TestSupport
 
     it "test directories are required" do
       call :counts
+      ignore_these_common_emissions_
       fails_because_no_test_directories_ :counts
     end
 
@@ -67,6 +68,7 @@ module Skylab::TestSupport::TestSupport
         end
 
         ignore_emissions_whose_terminal_channel_symbol_is :find_command_args
+        ignore_these_common_emissions_
 
         _st = execute
 
