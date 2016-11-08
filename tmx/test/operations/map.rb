@@ -54,6 +54,10 @@ module Skylab::TMX::TestSupport
 
       # -- assertions
 
+      def expect_these_ * s_a
+        ExpectThese___.new( s_a, self ).execute
+      end
+
       def order_is_ * exp_s_a
 
         _nodes = presumably_ordered_items_
@@ -177,6 +181,64 @@ module Skylab::TMX::TestSupport
 
     fixture_dirs = Lazy_.call do
       ::File.join TS_.dir_path, 'fixture-directories'
+    end
+
+    # ==
+
+    class ExpectThese___
+
+      def initialize s_a, tc
+        @expect_string_array = s_a
+        @test_context = tc
+      end
+
+      def execute
+
+        tc = @test_context
+
+        exp_scn = Common_::Polymorphic_Stream.via_array @expect_string_array
+        tc.ignore_common_post_operation_emissions_
+        _st = tc.send_subject_call
+
+        actual_st = _st.map_by do |node|
+          node.get_filesystem_directory_entry_string
+        end
+
+        begin
+          actual_s = actual_st.gets
+          if ! actual_s
+            if exp_scn.no_unparsed_exists
+              break  # win
+            end
+            fail __say_expected exp_scn.current_token
+          end
+          if exp_scn.no_unparsed_exists
+            fail __say_extra actual_s
+          end
+          if actual_s == exp_scn.current_token
+            exp_scn.advance_one
+            redo
+          end
+          fail __say_not_the_same( actual_s, exp_scn.current_token )
+        end while above
+        NIL
+      end
+
+      def __say_not_the_same act_s, exp_s
+        "expected #{ exp_s.inspect }, had #{ act_s.inspect }"
+      end
+
+      def __say_extra act_s
+        "unexpected extra item: #{ act_s.inspect }"
+      end
+
+      def __say_expected exp_s
+        "at end of page, expected #{ exp_s.inspect }"
+      end
+
+      def fail s
+        @test_context.send :fail, s  # meh
+      end
     end
 
     # ==

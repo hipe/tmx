@@ -5,8 +5,8 @@ module Skylab::TMX
     class Pager___
       # -
         def initialize o
-          @clent = o
           @argument_scanner = o.argument_scanner
+          @listener = @argument_scanner.listener
         end
 
         def execute
@@ -24,12 +24,25 @@ module Skylab::TMX
 
         FIRST_BRANCH___ = {
           page_size: :__at_page_size,
+          page_size_denominator: :__at_page_size_denominator,
         }
 
-        def __at_page_size
-          if __parse_non_negative_nonzero_integer
-            _at ONLY_ONE_PRIMARY_AVAILABLE_HERE___
+        def __at_page_size_denominator
+          @_build = :__build_divided_item_count_pager
+          if _parse_non_negative_nonzero_integer
+            _currently_there_is_one_required_term_from_here
           end
+        end
+
+        def __at_page_size
+          @_build = :__build_simple_item_count_pager
+          if _parse_non_negative_nonzero_integer
+            _currently_there_is_one_required_term_from_here
+          end
+        end
+
+        def _currently_there_is_one_required_term_from_here
+          _at ONLY_ONE_PRIMARY_AVAILABLE_HERE___
         end
 
         ONLY_ONE_PRIMARY_AVAILABLE_HERE___ = {
@@ -38,13 +51,21 @@ module Skylab::TMX
 
         def __at_page_offset
           if __parse_non_negative_integer
-            FIRST_EVER_PAGER.new( @page_offset, @page_size, & @argument_scanner.listener )
+            send @_build
           end
+        end
+
+        def __build_divided_item_count_pager
+          DividedItemCountPager___.new @page_offset, @page_size_denominator, & @listener
+        end
+
+        def __build_simple_item_count_pager
+          SimpleItemCountPager___.new @page_offset, @page_size, & @listener
         end
 
         # --
 
-        def __parse_non_negative_nonzero_integer
+        def _parse_non_negative_nonzero_integer
           _parse_one_such_number :number_set, :integer, :minimum, 1
         end
 
@@ -76,9 +97,116 @@ module Skylab::TMX
 
       # -
 
+      class DividedItemCountPager___
+
+        # make sense of requests like "first third", "fourth quarter", etc.
+        # NOTE - in order to chunk into pages this must know the page size.
+        # in order to determine the page size it must know the total number
+        # of items. in order to know *that* it must "gulp" ALL of the items
+        # and memoize EVERY one (even though it is producing only a slice of
+        # them). as such this pager does not scale to large result streams.
+
+        def initialize d, d_, & p
+          @listener = p
+          @page_offset = d
+          @page_size_denominator = d_
+        end
+
+        attr_writer(
+          :stream,
+        )
+
+        def execute
+
+          @_item_array = @stream.to_a
+          @_item_count = @_item_array.length
+          case 1 <=> @_item_count
+          when -1 ; __normally
+          when 0 ; Common_::Stream.via_item @_item_array.first
+          when 1 ; Common_::Stream.the_empty_stream
+          end
+        end
+
+        def __normally
+
+          d = @page_offset
+          r_st = __range_stream
+
+          begin
+            couple = r_st.gets
+            if ! couple
+              __emit_this_other_thing d
+              x = UNABLE_
+              break
+            end
+            if d.zero?
+              x = Stream_[ @_item_array[ * couple ] ]
+              break
+            end
+            d -= 1
+            redo
+          end while above
+
+          x
+        end
+
+        def __emit_this_other_thing d
+
+          @listener.call :error, :expression, :page_content_ended_early do |y|
+            y << "stream content ended before reaching target page (#{ d += 1 } page(s) short)"
+          end
+          NIL
+        end
+
+        def __range_stream  # exactly [#br-073.B]
+
+          len = @_item_count
+
+          real_page_size = Rational( len ) / Rational( @page_size_denominator )
+          whole, fraction = real_page_size.divmod 1
+
+          one = Rational( 1 )  # meh
+          rolling_surplus = Rational( 0 )
+
+          current_begin = 0
+
+          p = -> do
+
+            # ~ is this a normal jump or a wide jump?
+
+            width = whole
+
+            rolling_surplus += fraction
+            if one <= rolling_surplus
+              width += 1
+              rolling_surplus -= one
+            end
+
+            # ~
+
+            this_begin = current_begin
+            current_begin += width
+
+            case current_begin <=> len
+            when -1 ; NOTHING_
+            when 0  ; p = EMPTY_P_
+            else    ; self._SANITY  # extra cautious for now. "should" never happen
+            end
+
+            # ~
+
+            [ this_begin, width ]
+          end
+
+          Common_.stream do
+            p[]
+          end
+        end
+      end
+
       # ==
 
-      class FIRST_EVER_PAGER
+      class SimpleItemCountPager___
 
         def initialize d, d_, & p
           @listener = p

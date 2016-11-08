@@ -48,7 +48,7 @@ render its particular lipstick string.
 the floaty numbers we calculate are "continuous", but the pixels or
 character columns we render into are "discrete". to make floats fit into
 these discrete integer "slots", we round down. but consider if we wanted
-to render four segments that were each 25% width, in an expession area
+to render four segments that were each 25% width in an exrpession area
 that is ten discrete units wide:
 
     |<--   ten slots (think of a slot as a pixel or column) -->|

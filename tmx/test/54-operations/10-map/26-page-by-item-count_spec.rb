@@ -14,7 +14,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "ok" do
-        _expect_these "deka", "dora", "guld"
+        expect_these_ "deka", "dora", "guld"
       end
     end
 
@@ -25,7 +25,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "ok" do
-        _expect_these "damud", "goah", "adder"
+        expect_these_ "damud", "goah", "adder"
       end
     end
 
@@ -36,7 +36,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "ok" do
-        _expect_these "trix"  # 1 is N modulo 3
+        expect_these_ "trix"  # 1 is N modulo 3
       end
     end
 
@@ -93,47 +93,6 @@ module Skylab::TMX::TestSupport
 
         _x == false || fail
       end
-    end
-
-    def _expect_these * s_a
-
-      exp_scn = Common_::Polymorphic_Stream.via_array s_a
-      ignore_common_post_operation_emissions_
-      _st = send_subject_call
-
-      actual_st = _st.map_by do |node|
-        node.get_filesystem_directory_entry_string
-      end
-
-      begin
-        actual_s = actual_st.gets
-        if ! actual_s
-          if exp_scn.no_unparsed_exists
-            break  # win
-          end
-          fail __say_expected exp_scn.current_token
-        end
-        if exp_scn.no_unparsed_exists
-          fail __say_extra actual_s
-        end
-        if actual_s == exp_scn.current_token
-          exp_scn.advance_one
-          redo
-        end
-        fail __say_not_the_same( actual_s, exp_scn.current_token )
-      end while above
-    end
-
-    def __say_not_the_same act_s, exp_s
-      "expected #{ exp_s.inspect }, had #{ act_s.inspect }"
-    end
-
-    def __say_extra act_s
-      "unexpected extra item: #{ act_s.inspect }"
-    end
-
-    def __say_expected exp_s
-      "at end of page, expected #{ exp_s.inspect }"
     end
 
     def _same
