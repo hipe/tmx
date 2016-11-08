@@ -19,7 +19,35 @@ module Skylab::Common::TestSupport
         tcc.include self
       end
 
+      # -- (push these to dispatcher if you really have to)
+
+      def only_line_via_this_kind_of_failure * sym_a
+        a = lines_via_this_kind_of_failure_via_array sym_a
+        1 == a.length || fail
+        a.fetch 0
+      end
+
+      def lines_via_this_kind_of_failure * sym_a
+        lines_via_this_kind_of_failure_via_array sym_a
+      end
+
+      def lines_via_this_kind_of_failure_via_array sym_a
+        lines = nil
+        expect_on_channel sym_a do |y|
+          lines = y
+        end
+        _x = self.send_subject_call
+        _x == false || fail
+        lines
+      end
+
+      # --
+
       def call * x_a
+        _EEFE_dispatcher.receive_call x_a
+      end
+
+      def call_via_array x_a
         _EEFE_dispatcher.receive_call x_a
       end
 
@@ -37,6 +65,11 @@ module Skylab::Common::TestSupport
       end
 
       def expect * chan, & recv_msg
+        _EEFE_dispatcher.receive_emission_expectation recv_msg, chan
+        NIL
+      end
+
+      def expect_on_channel chan, & recv_msg
         _EEFE_dispatcher.receive_emission_expectation recv_msg, chan
         NIL
       end

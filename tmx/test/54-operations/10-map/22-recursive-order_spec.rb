@@ -10,23 +10,32 @@ module Skylab::TMX::TestSupport
     context "can't use :result_in_tree unless it's relevant" do
 
       call_by do
+
+        ignore_common_post_operation_emissions_
+
         call :map, :result_in_tree
       end
 
       it "fails" do
-        fails
+        _line
       end
 
       it "explain" do
-        em = expect_parse_error_emission_
-        _act = em.express_into_under "", expag_
-        _act == ":result_in_tree must occur after :order." || fail
+        _line == ":result_in_tree must occur after :order." || fail
+      end
+
+      shared_subject :_line do
+
+        only_line_via_this_kind_of_failure(
+          :error, :expression, :parse_error, :contextually_invalid )
       end
     end
 
     context "egads" do
 
       call_by do
+
+        ignore_common_post_operation_emissions_
 
         _st = json_file_stream_GA_
 
@@ -39,8 +48,6 @@ module Skylab::TMX::TestSupport
           :order, :doc_test_manifest,
         )
       end
-
-      expect_no_events
 
       it "egads" do
 
@@ -74,7 +81,7 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :__result_tree do
-        operations_call_result_tuple.result
+        send_subject_call
       end
     end
   end

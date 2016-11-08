@@ -44,7 +44,7 @@ module Skylab::Zerk
         _add_dash name
       end
 
-      def say_strange_primary_value_ x
+      def say_strange_primary_value x
         x.inspect
       end
 

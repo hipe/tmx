@@ -10,12 +10,15 @@ module Skylab::TMX::TestSupport
     context "no formal attribute collection" do
 
       call_by do
+
+        ignore_common_post_operation_emissions_
+
         call :map, :json_file_stream, Common_::Stream.the_empty_stream, :select, :wipple_wapper
       end
 
       it "hi" do
-        em = expect_parse_error_emission_
-        _act = em.express_into_under "", expag_
+        _act = only_line_via_this_kind_of_failure(
+          :error, :expression, :parse_error, :contextually_missing )
         _act.include?( 'cannot use :select without :attributes_module_by' ) || fail
       end
     end
@@ -23,6 +26,9 @@ module Skylab::TMX::TestSupport
     context "bad attribute" do
 
       call_by do
+
+        ignore_common_post_operation_emissions_
+
         call( :map,
           :json_file_stream, json_file_stream_01_,
           * real_attributes_,
@@ -31,8 +37,9 @@ module Skylab::TMX::TestSupport
       end
 
       it "hi" do
-        em = expect_parse_error_emission_
-        _act = em.express_into_under "", expag_
+
+        _act = only_line_via_this_kind_of_failure(
+          :error, :expression, :parse_error, :unknown_attribute )
         _act.include?( 'unrecognized attribute ":wipple_wapper". did you mean :' ) || fail
       end
     end
@@ -40,6 +47,9 @@ module Skylab::TMX::TestSupport
     context "good attribute" do
 
       call_by do
+
+        ignore_common_post_operation_emissions_
+
         call( :map,
           :json_file_stream, json_file_stream_01_,
           * real_attributes_,
@@ -60,7 +70,7 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_two_items do
-        st = operations_call_result_tuple.result
+        st = send_subject_call
         [ st.gets, st.gets ]
       end
     end

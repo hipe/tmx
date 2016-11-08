@@ -44,7 +44,7 @@ module Skylab::TMX::TestSupport
         call_by( & p )
 
         shared_subject :presumably_ordered_items_ do
-          _pray = operations_call_result_tuple.result
+          _pray = send_subject_call
           _pray.to_a
         end
       end

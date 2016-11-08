@@ -1,3 +1,4 @@
+[#008] #wish smarter descriptions for added primaries - can we reach the s.s?
 [#007]       [ track legacy thing: help screens testing thing ]
 [#006] #open feature-injected features are not reflected in help screens
              [ the glue that glues together the centralest things ]

@@ -12,6 +12,8 @@ module Skylab::TMX::TestSupport
 
       call_by do
 
+        ignore_common_post_operation_emissions_
+
         _json_file = ::File.join entities_dir_path_, 'entity_four', 'not-valid.json'
         _st = Common_::Stream.via_item _json_file
 
@@ -23,25 +25,39 @@ module Skylab::TMX::TestSupport
       end
 
       it "NOTE we probably just skipped it" do
-        _st = operations_call_result_tuple.result
+        _st = _result_and_lines.first
         _x = _st.gets
         _x && fail
       end
 
       it "explains" do
-        em = expect_parse_error_emission_
-        _act = em.express_into_under "", expag_
+
+        _y = _result_and_lines.last
+
         _rx = /\A"square" is a derived attribute - #{
           }cannot be assigned directly \(in .+not-valid\.json\)\z/
-        if _rx !~ _act
-          _act.should match _rx
+
+        _y.first =~ _rx || fail
+      end
+
+      shared_subject :_result_and_lines do
+
+        lines = nil
+        expect :error, :expression, :parse_error do |y|
+          lines = y
         end
+
+        x = send_subject_call
+
+        [ x, lines ]
       end
     end
 
     context "when you select a derived attribute" do
 
       ordered_items_by do
+
+        ignore_common_post_operation_emissions_
 
         _st = full_valid_json_file_stream_
 

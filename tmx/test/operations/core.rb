@@ -3,98 +3,69 @@ module Skylab::TMX::TestSupport
   module Operations
 
     def self.[] tcc
+      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
       tcc.extend ModuleMethods___
-      tcc.include InstanceMethods___
+      tcc.include InstanceMethods__
     end
+
+    # ==
 
     module ModuleMethods___
 
-      def call_by & p
+      def call_by & define
 
-        yes = true ; x = nil
-        define_method :operations_call_result_tuple do
-          if yes
-            yes = false
-            x = __produce_operations_call_result_tuple p
-          end
-          x
+        once = -> do
+          once = nil
+          @operations_DSL_value_struct = DSL_Values___.new
+          instance_exec( & define )
+          remove_instance_variable( :@operations_DSL_value_struct ).call_array
         end
-      end
 
-      def expect_no_events
-        define_method :_build_event_log_for_operations do
-          NOTHING_
+        define_method :__realease_operations_call_array do
+          instance_exec( & once )
         end
       end
     end
 
     # ==
 
-    module InstanceMethods___
+    DSL_Values___ = ::Struct.new :call_array
 
-      # -- expectations
+    # ==
 
-      def fails
-        _tu = operations_call_result_tuple
-        _x = _tu.result
-        if false != _x
-          _x.should eql false
-        end
-      end
+    module InstanceMethods__
 
-      def expect_parse_error_emission_
+      # -- DSL
 
-        em = only_emission
-        em.channel_symbol_array[ 2 ] == :parse_error || fail
-        em
-      end
-
-      def only_emission
-        _tu = operations_call_result_tuple
-        em_a = _tu.emission_array
-        if 1 == em_a.length
-          em_a.fetch 0
-        else
-          em_a.length.should eql 1
-        end
-      end
-
-      # -- setup & support
-
-      def __produce_operations_call_result_tuple p
-        @operations_call_DSL_tuple = DSL_Values___.new
-        instance_exec( & p )
-        o = remove_instance_variable :@operations_call_DSL_tuple
-        el = _build_event_log_for_operations
-        if el
-          _p = el.handle_event_selectively
-        end
-        _x = Home_::API.call( * o.arguments_array, & _p )
-        if el
-          _em_a = el.release_to_mutable_array
-        end
-        CallResult____.new _em_a, _x
+      def ignore_common_post_operation_emissions_
+        ignore_emissions_whose_terminal_channel_symbol_is :operator_resolved
       end
 
       def call * x_a
-        @operations_call_DSL_tuple.arguments_array = x_a ; nil
+        @operations_DSL_value_struct.call_array = x_a
       end
 
-      def _build_event_log_for_operations
-        Common_.test_support::Expect_Event::EventLog.for self
+      # -- expectations & hook-outs
+
+      def expect_parse_error_emission_lines_
+        lines_via_this_kind_of_failure_via_array GENERIC_PARSE_ERROR_CHANNEL___
       end
 
-      def expect_event_debugging_expression_agent
-        Zerk_lib_[]::API::ArgumentScannerExpressionAgent.instance
+      def send_subject_call
+        _x_a = __realease_operations_call_array
+        call_via_array _x_a
+        execute
       end
 
-      alias_method :expag_, :expect_event_debugging_expression_agent
+      def expression_agent
+        _ = Zerk_lib_[]::API::ArgumentScannerExpressionAgent.instance
+        _  # #todo
+      end
+
+      def subject_API
+        Home_::API
+      end
     end
-
-    # ==
-
-    CallResult____ = ::Struct.new :emission_array, :result
-    DSL_Values___ = ::Struct.new :arguments_array
 
     # === LEGACY ([br]) BELOW
 
@@ -174,6 +145,12 @@ module Skylab::TMX::TestSupport
     end
   end
     end  # if false
+
+    # ==
+
+    GENERIC_PARSE_ERROR_CHANNEL___ =  [ :error, :expression, :parse_error ]
+
+    # ==
 # ->
   end
 end

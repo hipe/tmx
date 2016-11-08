@@ -13,23 +13,20 @@ module Skylab::TMX::TestSupport
         call
       end
 
-      it "fails" do
-        fails
+      it "explains saying \"expected FOO or BAR\"" do
+        _matchdata or fail
       end
 
-      it "explains" do
+      it "list of what is expected is unique" do
+        these = _matchdata[1].split " or "
+        _these_ = these.uniq
+        these == _these_ || fail
+      end
 
-        em = expect_parse_error_emission_
-
-        _act = em.express_into_under "", expag_
-
+      shared_subject :_matchdata do
+        _lines = expect_parse_error_emission_lines_
         _rx = /\Aexpecting (:[a-z_]+(?:(?: or |, ):[a-z_]+)*)\z/
-        md = _rx.match( _act ) or fail
-
-        these = md[1].split " or "
-        these_ = these.uniq
-
-        these == these_ || fail
+        _rx.match _lines.fetch 0
       end
     end
 
@@ -40,7 +37,7 @@ module Skylab::TMX::TestSupport
       end
 
       it "fails" do
-        fails
+        _lines
       end
 
       it "explains" do
@@ -52,20 +49,19 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_lines do
-        em = expect_parse_error_emission_
-        _act = em.express_into_under [], expag_
-        _act  # #todo
+        expect_parse_error_emission_lines_
       end
     end
 
     context "bad primary" do
 
       call_by do
+        ignore_common_post_operation_emissions_
         call :map, :zoingo
       end
 
       it "fails" do
-        fails
+        _lines
       end
 
       it "explains" do
@@ -77,35 +73,42 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_lines do
-        _em = expect_parse_error_emission_
-        _em.express_into_under [], expag_
+
+        lines_via_this_kind_of_failure(
+          :error, :expression, :parse_error, :unknown_primary )
       end
     end
 
     context "missing required primary (for now)" do
 
       call_by do
+        ignore_common_post_operation_emissions_
         call :map
       end
 
       it "fails" do
-        fails
+        _line
       end
 
       it "explains" do
-        em = expect_parse_error_emission_
-        _act = em.express_into_under "", expag_
-        _act == "unparsed node stream was not resolved. (use :json_file_stream.)" || fail
+        _line == "unparsed node stream was not resolved. (use :json_file_stream.)" || fail
+      end
+
+      shared_subject :_line do
+
+        only_line_via_this_kind_of_failure(
+          :error, :expression, :parse_error, :missing_required_arguments )
       end
     end
 
     context "no modifiers (except..) - just straight stream of unparsed nodes" do
 
       call_by do
+
+        ignore_common_post_operation_emissions_
+
         call :map, :json_file_stream, json_file_stream_01_
       end
-
-      expect_no_events
 
       it "you can get the name of the node (order is system order)" do
 
@@ -123,9 +126,7 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_one_two do
-
-        _tu = operations_call_result_tuple
-        st = _tu.result
+        st = send_subject_call
         [ st.gets, st.gets ]
       end
     end

@@ -80,7 +80,7 @@ module Skylab::TMX
 
         _parse_error_listener.call :error, :expression, :parse_error do |y|
 
-          y << "unknown operation #{ say_strange_value x }"
+          y << "unknown operation #{ say_strange_primary_value x }"  # meh
 
           _st = bx.to_value_stream
 

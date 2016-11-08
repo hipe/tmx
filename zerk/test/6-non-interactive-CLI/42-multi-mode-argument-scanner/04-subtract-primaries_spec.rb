@@ -147,7 +147,7 @@ module Skylab::Zerk::TestSupport
 
       alias_method :calculate, :instance_exec
 
-      def say_strange_primary_value_ x
+      def say_strange_primary_value x
         x.respond_to? :ascii_only? or self._WHERE
         x.inspect
       end

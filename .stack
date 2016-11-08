@@ -21,3 +21,12 @@ test all - test all.
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)
 -5.1 divvy
 -5.2 require only (per test directory, per default globs)
+-run-tests is the same as -require-only but one boolean
+notify quickie that we will run tests
+notify rspec that we will run tests
+notify quickie that we will load only
+notify rspec that we wil load only
+with no v's, one dot per file loaded (i think, this might change)
+with one v', list every file (mild rewrite in "require only" operation)
+with two v's, show the find file commands
+design and cover "pager"-ish

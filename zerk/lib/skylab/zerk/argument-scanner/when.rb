@@ -155,7 +155,7 @@ module Skylab::Zerk
           @listener.call :error, :expression, :parse_error, _tcs do |y|
 
             buffer = "unknown primary"
-            s = say_strange_primary_value_ strange_primary_value_p[]
+            s = say_strange_primary_value strange_primary_value_p[]
             if COLON_BYTE_ != s.getbyte(0)
               buffer << COLON_
             end
