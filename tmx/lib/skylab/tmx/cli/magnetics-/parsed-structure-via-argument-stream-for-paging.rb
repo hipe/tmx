@@ -1,0 +1,157 @@
+module Skylab::TMX
+
+  class CLI
+
+    class Magnetics_::ParsedStructure_via_ArgumentStream_for_Paging
+
+      DESCRIPTION___ = -> y do
+        y << "for use under test-directory-oriented operations, is syntactic"
+        y << "sugar that expands expressions like:"
+        y << nil
+        y << "    -slice first half"
+        y << nil
+        y << "to something like:"
+        y << nil
+        y << "  -page-by item-count -page-offset 0 -page-size-denominator 2"
+      end
+
+      def initialize cli
+        @CLI = cli
+      end
+
+      def execute
+        @argument_scanner = @CLI.selection_stack.last._argument_scanner_
+        @argument_scanner.advance_one
+        if HELP_RX =~ @argument_scanner.head_as_is
+          DESCRIPTION___[ @CLI.line_yielder_for_info ]
+          NOTHING_  # stop normal flow
+        else
+          if __parse_ordinal
+            if __parse_denominator
+              __money
+            else
+              UNABLE_
+            end
+          else
+            UNABLE_
+          end
+        end
+      end
+
+      def __money
+        remove_instance_variable :@CLI
+        remove_instance_variable :@argument_scanner
+        freeze
+      end
+
+      def __parse_ordinal
+        _parse_trueish_and :__do_parse_ordinal
+      end
+
+      def __parse_denominator
+        _parse_trueish_and :__do_parse_denominator
+      end
+
+      def __do_parse_ordinal s
+
+        en_ord_rx = /\A(?:
+          (first)|(second)|(third)|(fourth)|(fifth)|(sixth)  # etc
+        )\z/x
+
+        md = en_ord_rx.match s
+          # (we have a more complete version of the above somewhere but meh)
+
+        if md
+          _receive_ordinal_counting_integer ( 1..10 ).detect { |d| md[ d ] }
+        else
+
+          easy_ord_rx = /\A(?<digits>[0-9]+)(?:st|nd|rd|th)\z/
+
+          md = easy_ord_rx.match s
+
+          if md
+            _receive_ordinal_counting_integer md[ :digits ].to_i
+          else
+            __whine_about_ordinal s, en_ord_rx, easy_ord_rx
+          end
+        end
+      end
+
+      def __whine_about_ordinal s, en_ord_rx, easy_ord_rx
+
+        say = method :_say_regexp
+        _emit :error, :expression, :particular_parse_error, :unrecognized_ordinal do |y|
+
+          y << "unrecognized ordinal #{ s.inspect } - #{
+            }expecting #{ say[ en_ord_rx ] } or #{ say[ easy_ord_rx ] }"
+        end
+        UNABLE_
+      end
+
+      def __do_parse_denominator s
+
+        en_denom_rx = /\A(?:
+          (half)|(third)|(quarter)  # etc
+        )\z/x
+
+        md = en_denom_rx.match s
+
+        if md
+          __receive_denominator ( 1..3 ).detect { |d| md[ d ] } + 1
+        else
+          __whine_about_denominator s, en_denom_rx
+        end
+      end
+
+      def __whine_about_denominator s, en_denom_rx
+
+        say = method :_say_regexp
+        _emit :error, :expression, :particular_parse_error, :unrecognized_denominator do |y|
+
+          y << "unrecognized denominator #{ s.inspect } - #{
+            }expecting #{ say[ en_denom_rx ] }"
+        end
+        UNABLE_
+      end
+
+      # --
+
+      def _receive_ordinal_counting_integer d
+        @ordinal_offset = d - 1 ; true
+      end
+
+      def __receive_denominator d
+        @denominator = d ; true
+      end
+
+      def _parse_trueish_and m
+        s = @argument_scanner.parse_primary_value :must_be_trueish
+        if s
+          send m, s
+        else
+          s
+        end
+      end
+
+      def _emit * sym_a, & msg_p
+        @argument_scanner.listener[ * sym_a, & msg_p ]
+        NIL
+      end
+
+      def _say_regexp rx
+        buff = rx.source
+        buff.gsub! %r([[:space:]]+), SPACE_  # for now
+        buff = "/#{ buff }/"
+        s = Home_.lib_.basic::Regexp.options_via_regexp( rx ).to_string
+        s and buff << s
+        buff
+      end
+
+      attr_reader(
+        :denominator,
+        :ordinal_offset,
+      )
+    end
+  end
+end
+# #history: rename & rewrite of "use the greenlist"

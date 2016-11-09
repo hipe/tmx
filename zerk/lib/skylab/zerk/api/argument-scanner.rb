@@ -24,6 +24,7 @@ module Skylab::Zerk
       def __initialize_normally x_a, l
 
         @_scn = Common_::Polymorphic_Stream.via_array x_a
+        @no_unparsed_exists = @_scn.no_unparsed_exists
         @_current_token = @_scn.method :current_token
         @listener = l
         NIL
@@ -33,6 +34,15 @@ module Skylab::Zerk
 
         o = Home_::ArgumentScanner::
             Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
+
+        if @no_unparsed_exists
+          o.whine_about_how_argument_scanner_ended_early
+        else
+          __match_primary_route_against_head_normally o
+        end
+      end
+
+      def __match_primary_route_against_head_normally o
 
         o.well_formed_potential_primary_symbol_knownness = __well_formed_knownness
 

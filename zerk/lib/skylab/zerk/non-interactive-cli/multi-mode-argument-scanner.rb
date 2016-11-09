@@ -164,10 +164,12 @@ module Skylab::Zerk
 
         def finish
 
+          rm = RouteMaker___.new @_added_box, @_subtracted_h
+
           a = []
           ft = remove_instance_variable :@_front_tokens
           if ft
-            a.push FrontTokens___.new ft
+            a.push FrontTokens__.new ft, rm
           end
 
           msp = remove_instance_variable :@_mid_scanner_pairs
@@ -176,7 +178,6 @@ module Skylab::Zerk
             a.push FixedPrimaries___.new msp
           end
 
-          shared = Shared___.new @_added_box, @_subtracted_h
 
           us = remove_instance_variable :@_user_scanner
           if ! us.no_unparsed_exists
@@ -185,14 +186,14 @@ module Skylab::Zerk
               _dp_kn = Common_::Known_Known[ @_default_primary_symbol ]
             end
 
-            a.push UserScanner___.new shared, us, _dp_kn, @_listener
+            a.push UserScanner___.new us, _dp_kn, rm, @_listener
           end
 
           if a.length.zero?
             self._COVER_ME_you_should_result_in_a_singleton_that_says :no_unparsed_exists
           else
             Here_.__new_multi_mode_argument_scanner(
-              a, @_description_proc_for_added_h, shared, @_listener )
+              a, @_description_proc_for_added_h, rm, @_listener )
           end
         end
       end
@@ -202,12 +203,34 @@ module Skylab::Zerk
       Here_ = self
       class Here_
 
-        def initialize a, d_h, shared, l
+        def initialize a, d_h, route_maker, l
           @_description_proc_for_added_h = d_h
           @listener = l
+          @no_unparsed_exists = false
+          @_route_maker = route_maker
           @_scn_scn = Common_::Polymorphic_Stream.via_array a
           @_scn = @_scn_scn.gets_one
-          @_shared = shared
+        end
+
+        # -- run-time mutation
+
+        def insert_at_head * x_a
+
+          # hack that says "whatever you're doing, do this instead".
+          # this hack is certain to break for certain cases
+
+          scn = FrontTokens__.new x_a, @_route_maker
+
+          if @no_unparsed_exists
+            @no_unparsed_exists = false
+            @_scn_scn = Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+            @_scn = scn
+          else
+            @_scn_scn.current_index -= 1  # walk back the current scanner
+            @_scn = scn
+          end
+
+          NIL
         end
 
         # -- reflection (for etc)
@@ -232,31 +255,37 @@ module Skylab::Zerk
 
         def match_primary_route_against_ h
 
-          #  "all about parsing added primaries" ([#052] #note-2) explains it all
+          # "all about parsing added primaries" ([#052] #note-2) explains it all
 
           begin
-            route = __match_niCLI_route_against h
-            route || break
+            x = __match_niCLI_route_against h
+            x || break
+            route = x
+
             if route.is_more_backey_than_frontey
+              break  # "backey" route is found - done.
+            end
+
+            x = route.value.call
+            if ! x  # custom frontend proc interrupts flow #scn-coverpoint-1-A
               break
             end
 
-            _keep_parsing = route.value.call
-            if _keep_parsing  # as described at #scn-coverpoint-1-B
-
-              # NOTE we give the client autonomy over its parsing technique
-              # (e.g name-based vs type-based) at this cost: the client MUST
-              # `advance_one` the scanner herself. if she does not we infinite
-              # loop here.
-
-              redo
+            if ! @no_unparsed_exists
+              redo  # NOTE if client did not advance scanner herself, infinite loop
             end
 
-            route = _keep_parsing  # as described at #scn-coverpoint-1-A
+            # EEK - when we reach the end of the argument scanner and we
+            # ended on a "frontey" primary, then it's hard to hide the
+            # existence of this hack completely from the backend. we are
+            # in effect trying to tell the backend "we did not fail, but
+            # this is not a route." experimental :#scn-note-1 :#here
+            # #not-covered - hits IFF `-verbose` at end
+
+            x = The_no_op_route___[]
             break
           end while above
-
-          route
+          x
         end
 
         def __match_niCLI_route_against h
@@ -264,7 +293,15 @@ module Skylab::Zerk
           o = Home_::ArgumentScanner::
               Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
 
-          o.well_formed_potential_primary_symbol_knownness = @_scn._well_formed_knownness_
+          if @no_unparsed_exists
+            o.whine_about_how_argument_scanner_ended_early
+          else
+            o.well_formed_potential_primary_symbol_knownness = @_scn._well_formed_knownness_
+            __match_niCLI_route_normally o
+          end
+        end
+
+        def __match_niCLI_route_normally o
 
           if o.is_well_formed
 
@@ -315,9 +352,9 @@ module Skylab::Zerk
           # argument stream) that reduces from it any subtracted primaries
           # and concats to it the stream symbols for any added primaries.
 
-          shared = @_shared
+          o = @_route_maker
 
-          sub_h = shared.subtracted_hash
+          sub_h = o.subtracted_hash
           reduced_st = if sub_h
             remote_normal_tuple_st.reduce_by do |tuple|
               ! sub_h[ tuple.fetch(1) ]
@@ -326,7 +363,7 @@ module Skylab::Zerk
             remote_normal_tuple_st
           end
 
-          added_box = shared.added_box
+          added_box = o.added_box
           if added_box
             _add_these = added_box.to_name_stream.map_by do |sym|
               [ :primary, sym ]
@@ -367,14 +404,21 @@ module Skylab::Zerk
 
       # ==
 
-      class FrontTokens___
+      class FrontTokens__
 
         # these (if present) must be an array of symbols. they are merely
         # for indicating to the backend API which operation we are trying
-        # to reach.
+        # to reach, or other hacks.
 
-        def initialize front_tokens
+        def initialize front_tokens, rm
+
           @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
+          @_route_maker = rm
+        end
+
+        def _route_knownness_via_request_ req
+
+          @_route_maker.route_knownness_via_exact_match req
         end
 
         def _well_formed_knownness_
@@ -481,7 +525,7 @@ module Skylab::Zerk
         # this is the workhorse parser implementation - the one that
         # translates CLI-shaped arguments to API-shaped ones.
 
-        def initialize shared, user_scn, dp_kn, listener
+        def initialize user_scn, dp_kn, route_maker, listener
 
           if dp_kn
             @_default_primary_was_read = false
@@ -491,17 +535,10 @@ module Skylab::Zerk
             @_has_default_primary = false
           end
 
-          bx = shared.added_box
-          if bx
-            @_has_added = true
-            @_added_box = bx
-          else
-            @_has_added = false
-          end
-
-          @__is_subtracted = shared.subtracted_hash || MONADIC_EMPTINESS_
+          @__is_subtracted = route_maker.subtracted_hash || MONADIC_EMPTINESS_
           @_listener = listener
           @_real_scn = user_scn
+          @_route_maker = route_maker
         end
 
         def _route_knownness_via_request_ req
@@ -509,29 +546,11 @@ module Skylab::Zerk
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          route = __search_for_route_via_exact_match req
-          if route
-            Common_::Known_Known[ route ]
+          kn = @_route_maker.route_knownness_via_exact_match req
+          if kn
+            kn
           else
             __lookup_route_with_fuzzy_match req
-          end
-        end
-
-        def __search_for_route_via_exact_match req
-
-          k = req.well_formed_symbol
-          # -- do we have a primary by this exact name (as normal or as added?)
-
-          if @_has_added
-            x = @_added_box[ k ]
-          end
-          if x
-            AddedBasedRoute___.new x, k
-          else
-            x = req.primaries_hash[ k ]
-            if x
-              PrimaryHashValueBasedRoute___.new x, k
-            end
           end
         end
 
@@ -541,8 +560,9 @@ module Skylab::Zerk
           sym = req.well_formed_symbol
           rx = /\A#{ ::Regexp.escape sym }/
 
-          if @_has_added
-            @_added_box.each_pair do |k, x|
+          bx = @_route_maker.added_box
+          if bx
+            bx.each_pair do |k, x|
               rx =~ k || next
               ( a ||= [] ).push AddedBasedRoute___.new( x, k )
             end
@@ -640,6 +660,53 @@ module Skylab::Zerk
 
       # ==
 
+      class RouteMaker___
+
+        def initialize bx, h
+
+          if bx
+            @added_box = bx
+            @_has_added = true
+          else
+            @_has_added = false
+          end
+
+          @subtracted_hash = h
+        end
+
+        def route_knownness_via_exact_match req
+          route = __search_for_route_via_exact_match req
+          if route
+            Common_::Known_Known[ route ]
+          end
+        end
+
+        def __search_for_route_via_exact_match req
+
+          k = req.well_formed_symbol
+          # -- do we have a primary by this exact name (as normal or as added?)
+
+          if @_has_added
+            x = @added_box[ k ]
+          end
+          if x
+            AddedBasedRoute___.new x, k
+          else
+            x = req.primaries_hash[ k ]
+            if x
+              PrimaryHashValueBasedRoute___.new x, k
+            end
+          end
+        end
+
+        attr_reader(
+          :added_box,
+          :subtracted_hash,
+        )
+      end
+
+      # ==
+
       Ultra_normalize___ = -> do
         p = -> ss do
           abnormal = %r([^_a-z0-9]+)i
@@ -694,6 +761,15 @@ module Skylab::Zerk
 
       base = Home_::ArgumentScanner::Route
 
+      The_no_op_route___ = Lazy_.call do
+        class NoOpRoute___
+          def is_the_no_op_route  # always for #scn-note-1 #here
+            true
+          end
+          new
+        end
+      end
+
       class AddedBasedRoute___ < base
         def route_category_symbol
           :route_that_is_added_based
@@ -713,10 +789,6 @@ module Skylab::Zerk
       end
 
       PrimaryHashValueBasedRoute___ = Home_::ArgumentScanner::PrimaryHashValueBasedRoute
-
-      # ==
-
-      Shared___ = ::Struct.new :added_box, :subtracted_hash
 
       # ==
     end

@@ -18,6 +18,12 @@ module Skylab::Zerk
         @primaries_hash = h
       end
 
+      def whine_about_how_argument_scanner_ended_early
+        @_custom_behaivor_was_provided = false
+        @_terminal_channel_symbol = :missing_required_primary
+        _always_whine_in_the_same_way
+      end
+
       # ~
 
       def well_formed_potential_primary_symbol_knownness= kn
@@ -77,7 +83,7 @@ module Skylab::Zerk
           @__behavior_by = p
         else
           @_custom_behaivor_was_provided = false
-          @__terminal_channel_symbol = rsn.reason_symbol
+          @_terminal_channel_symbol = rsn.reason_symbol
         end
         NIL
       end
@@ -95,7 +101,9 @@ module Skylab::Zerk
 
         o = Here_::When::UnknownPrimary.begin
 
-        o.strange_primary_value_by = @argument_scanner.method :head_as_is
+        if ! @argument_scanner.no_unparsed_exists
+          o.strange_primary_value_by = @argument_scanner.method :head_as_is
+        end
 
         if @primaries_hash
           _p = @argument_scanner.method :available_primary_name_stream_via_hash
@@ -106,7 +114,7 @@ module Skylab::Zerk
           NOTHING_  # #feature-island #scn-coverpoint-2
         end
 
-        o.terminal_channel_symbol = @__terminal_channel_symbol
+        o.terminal_channel_symbol = @_terminal_channel_symbol
 
         o.listener = @argument_scanner.listener
 

@@ -210,6 +210,8 @@ module Skylab::TestSupport
         y.yield :define_didactics_by, -> dida_y do
           send sct.didactics_method_name, dida_y, sct
         end
+
+        yield y
       end
       NIL
     end
@@ -548,6 +550,14 @@ module Skylab::TestSupport
       end
     end
 
+    def build_test_directory_collection
+
+      _sym = @argument_scanner.current_primary_symbol
+      _sym || self._SANITY
+      _op_id = OperationIdentifier___.new _sym
+      Here_::Models_::TestDirectoryCollection.new _op_id, self
+    end
+
     attr_reader(
       :argument_scanner,
       :listener,
@@ -663,7 +673,7 @@ module Skylab::TestSupport
 
     # ==
 
-    class OperationIdentifier_
+    class OperationIdentifier___
 
       def initialize * s_a
         @path = s_a.freeze

@@ -36,6 +36,10 @@ module Skylab::Zerk
             break
           end
 
+          if route.is_the_no_op_route
+            next
+          end
+
           _d = route.value
           _sym = route.primary_normal_symbol
 

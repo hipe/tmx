@@ -135,6 +135,14 @@ module Skylab::Basic
         freeze
       end
 
+      def to_string
+        buffer = ""
+        buffer << "i" if @is_ignorecase
+        buffer << "m" if @is_multiline
+        buffer << "x" if @is_extended
+        buffer if buffer.length.nonzero?
+      end
+
       attr_reader :is_ignorecase, :is_multiline, :is_extended
     end
 

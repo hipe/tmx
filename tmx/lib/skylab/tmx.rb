@@ -194,6 +194,7 @@ module Skylab::TMX
   Home_ = self
   METADATA_FILENAME = '.for-tmx-map.json'
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
+  NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil
   SPACE_ = ' '

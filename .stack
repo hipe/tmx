@@ -28,3 +28,5 @@ notify rspec that we wil load only
 with no v's, one dot per file loaded (i think, this might change)
 with one v', list every file (mild rewrite in "require only" operation)
 with two v's, show the find file commands
+plan for how to customize custom verbosities (etc) per operation
+syntax for pager

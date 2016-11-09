@@ -16,11 +16,11 @@ module Skylab::TMX
           Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
         end ]
 
-        @_BE_VERBOSE = false  # ..
         @_end_of_stream = :__noop
         @serr = e
         @sout = o
         @program_name_string_array = pn_s_a
+        @_verbosity_level_integer = 0
       end
 
       def json_file_stream_by & p
@@ -47,7 +47,11 @@ module Skylab::TMX
           if x
             @exitstatus ||= SUCCESS_EXITSTATUS__
             send ( remove_instance_variable :@_express ), x
+          elsif x.nil?
+            @exitstatus ||= SUCCESS_EXITSTATUS__
           end
+        elsif bc.nil?
+          @exitstatus ||= SUCCESS_EXITSTATUS__
         end
         @exitstatus
       end
@@ -131,14 +135,18 @@ module Skylab::TMX
       # -- test all
 
       def __describe_test_all y
-        y << "[ts] \"slowie\"'s high level test running and reporting operations"
+        y << "[ts] \"slowie\"'s high-level test running and reporting operations"
+        y << "with some trivial adaptations (e.g verbosity)"
       end
 
       def __bound_call_for_test_all
 
         @_express = :__express_for_test_all
 
-        @emission_routes = {  # how we ignore particular emissions
+        @_emission_handler_methods_ = {
+
+          # how we ignore certain kinds of emissions/implement verbosity
+
           find_command_args: :__receive_find_command_args,
         }
 
@@ -147,6 +155,10 @@ module Skylab::TMX
         arg_scn = _multimode_argument_scanner_by do |o|
 
           o.user_scanner remove_instance_variable :@_user_scanner
+
+          o.add_primary :slice, method( :__at_slice ), Describe_slice___
+
+          o.add_primary :verbose, method( :__add_one_unit_of_verbosity ), Describe_verbosity___
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
@@ -180,7 +192,7 @@ module Skylab::TMX
           if bc.receiver.respond_to? :test_directory_collection
 
             CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation.new(
-              bc, @selection_stack.last.__argument_scanner, self ).execute  # :#here
+              bc, @selection_stack.last._argument_scanner_, self ).execute  # :#here
           else
             bc
           end
@@ -189,9 +201,9 @@ module Skylab::TMX
 
       # ~ emissions
 
-      def __receive_find_command_args em_p, chan
-        if @_BE_VERBOSE
-          @listener[ * chan, & em_p ]
+      def __receive_find_command_args
+        if 2 <= @_verbosity_level_integer
+          @__emission_expression._express_normally_
         end
         NIL
       end
@@ -300,24 +312,72 @@ module Skylab::TMX
         end
       end
 
+      # -- support for wierd added primaries
+
+      def __at_slice
+        sct = CLI::Magnetics_::ParsedStructure_via_ArgumentStream_for_Paging.
+          new( self ).execute
+        if sct
+          @selection_stack.last._argument_scanner_.insert_at_head(
+            :page_by, :item_count,
+            :page_size_denominator, sct.denominator,
+            :page_offset, sct.ordinal_offset,
+          )
+          ACHIEVED_
+        else
+          sct  # #cover-me (covered visually)
+        end
+      end
+
+      Describe_slice___ = -> y do
+        y << "experimental \"fun\" version of -page-by."
+        y << "(\"-help\" as its first argument shows modifier-specific help)"
+      end
+
+      # -- support for common ("officious") added primaries
+
+      def __add_one_unit_of_verbosity
+
+        @selection_stack.last._argument_scanner_.advance_one
+        @_verbosity_level_integer += 1
+        ACHIEVED_
+      end
+
       # -- support for expressing results (our version of [#ze-025])
 
       def _express_help
 
-        di = @selection_stack.last.to_didactics  # buckle up
+        top = @selection_stack.last
+        di = top.to_didactics  # buckle up
 
-        _lib_mod = CLI_support_[]::When::Help.const_get(
+        # -- derive things from the didactics
+
+        _help_screen_mod = CLI_support_[]::When::Help.const_get(
           di.is_branchy ? :ScreenForBranch : :ScreenForEndpoint, false )
 
-        _lib_mod.express_into @serr do |o|
+        desc_reader = di.description_proc_reader
 
-          o.item_normal_tuple_stream di.item_normal_tuple_stream_by[]
+        items = di.item_normal_tuple_stream_by[]
+
+        # -- maybe alter things by the argument scanner
+
+        if 1 != @selection_stack.length
+          as = top._argument_scanner_
+          desc_reader = as.altered_description_proc_reader_via desc_reader
+          # items = as.altered_normal_tuple_stream_via items  # #todo - already happening. why?
+        end
+
+        # --
+
+        _help_screen_mod.express_into @serr do |o|
+
+          o.item_normal_tuple_stream items
 
           o.express_usage_section Program_name_via_client___[ self ]
 
           o.express_description_section di.description_proc
 
-          o.express_items_sections di.description_proc_reader
+          o.express_items_sections desc_reader
         end
 
         @exitstatus = SUCCESS_EXITSTATUS__
@@ -475,7 +535,9 @@ module Skylab::TMX
         expsr = nil  # only build it once an emission is received
         @listener = -> * sym_a, & em_p do
           expsr ||= HardcodedEmissionExpresserForNow___.new self
-          expsr.dup.invoke em_p, sym_a
+          eh = expsr.dup
+          @__emission_expression = eh
+          eh.invoke em_p, sym_a
         end
         NIL
       end
@@ -532,6 +594,10 @@ module Skylab::TMX
         NIL
       end
 
+      def line_yielder_for_info
+        @___line_yielder_for_info ||= Build_info_yielder___[ @serr ]
+      end
+
       attr_writer(
         :exitstatus,
       )
@@ -539,7 +605,7 @@ module Skylab::TMX
       attr_reader(
         :API_invocation_,
         :listener,
-        :emission_routes,
+        :_emission_handler_methods_,
         :selection_stack,
         :serr,
         :sout,
@@ -718,17 +784,23 @@ module Skylab::TMX
 
       def initialize client
         @_ = client
-        @_info_yielder = Lazy_.call { Build_info_yielder___[ client.serr ] }  # share the same across dups
-        @emission_routes = client.emission_routes || MONADIC_EMPTINESS_
+        @_info_yielder = client.method :line_yielder_for_info
+        @__emission_handler_methods = client._emission_handler_methods_ || MONADIC_EMPTINESS_
       end
 
       def invoke em_p, sym_a
         @channel_symbol_array = sym_a
         @emission_proc = em_p
-        m = @emission_routes[ @channel_symbol_array.last ]
+        m = @__emission_handler_methods[ @channel_symbol_array.last ]
         if m
-          @_.send m, em_p, sym_a
-        elsif :expression == @channel_symbol_array[1]
+          @_.send m  # no args - client should have an ivar holding self
+        else
+          _express_normally_
+        end
+      end
+
+      def _express_normally_
+        if :expression == @channel_symbol_array[1]
           __express_expression
         elsif :data == @channel_symbol_array[0]
           __send_data
@@ -787,6 +859,10 @@ module Skylab::TMX
       Common_::Stream.via_range( 1  ... ss.length ).map_by do |d|
         ss.fetch( d ).name
       end
+    end
+
+    Describe_verbosity___ = -> y do
+      y << "adds verbosity to the operation (for some operations)"
     end
 
     Describe_help__ = -> y do
@@ -850,7 +926,8 @@ module Skylab::TMX
           remove_instance_variable :@__name_symbol )
       end
 
-      def __argument_scanner  # for [#006] the feature injection magnetic (#here)
+      def _argument_scanner_
+        # this file only, e.g [#006] feature injection magnetic (#here)
         @__argument_scanner
       end
 
@@ -883,7 +960,7 @@ module Skylab::TMX
     # ==
 
     FAILURE_EXITSTATUS__ = 5
-    HELP_RX = /\A--?h(?:e(?:lp?)?)?\z/
+    HELP_RX = /\A-{0,2}h(?:e(?:lp?)?)?\z/
     SUCCESS_EXITSTATUS__ = 0
 
     # ==

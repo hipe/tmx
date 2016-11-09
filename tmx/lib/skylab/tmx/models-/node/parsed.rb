@@ -153,6 +153,10 @@ module Skylab::TMX
 
       # --
 
+      def express_into y  # #not-covered  (do CLI map with order from tmx client)
+        y << filesystem_directory_entry_string
+      end
+
       def filesystem_directory_entry_string
         @___normal_name_string ||= get_filesystem_directory_entry_string.freeze
       end

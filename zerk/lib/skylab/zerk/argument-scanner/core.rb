@@ -34,7 +34,7 @@ module Skylab::Zerk
 
       def match_primary_route_against h
         route = match_primary_route_against_ h
-        if route
+        if route && ! route.is_the_no_op_route
           @current_primary_symbol = route.primary_normal_symbol
         end
         route
@@ -115,6 +115,10 @@ module Skylab::Zerk
         :primary_normal_symbol,
         :value,
       )
+
+      def is_the_no_op_route
+        false
+      end
     end
 
     # ==

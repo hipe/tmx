@@ -19,15 +19,13 @@ module Skylab::TestSupport
       def initialize
 
         o = yield
-        _op_id = OperationIdentifier_.new :counts
 
         @__emit = o.listener
 
         @_syntax = Here_::Models_::HashBasedSyntax.new(
           o.argument_scanner, PRIMARIES, self )
 
-        @test_directory_collection = Here_::Models_::TestDirectoryCollection.new(
-          _op_id, o )
+        @test_directory_collection = o.build_test_directory_collection
       end
 
       attr_reader(  # for pre-execution syntax hacks

@@ -135,6 +135,7 @@ module Skylab::Zerk
 
         def initialize
           @available_primary_name_stream_by = nil
+          @strange_primary_value_by = nil
           @terminal_channel_symbol = nil
         end
 
@@ -148,27 +149,33 @@ module Skylab::Zerk
         def execute
 
           available_primary_name_st_p = @available_primary_name_stream_by  # any
-          strange_primary_value_p = @strange_primary_value_by
+          strange_primary_value_by = @strange_primary_value_by
 
           _tcs = ( @terminal_channel_symbol || :unknown_primary )
 
           @listener.call :error, :expression, :parse_error, _tcs do |y|
 
-            buffer = "unknown primary"
-            s = say_strange_primary_value strange_primary_value_p[]
-            if COLON_BYTE_ != s.getbyte(0)
-              buffer << COLON_
+            if strange_primary_value_by
+
+              buffer = "unknown primary"
+              s = say_strange_primary_value strange_primary_value_by[]
+              if COLON_BYTE_ != s.getbyte(0)
+                buffer << COLON_
+              end
+              buffer << SPACE_
+              buffer << s
+              y << buffer
+              buffer = ""
+            else
+              buffer = "missing required primary: "
             end
-            buffer << SPACE_
-            buffer << s
-            y << buffer
 
             if available_primary_name_st_p
 
               _available_name_st = available_primary_name_st_p[]
               _this_or_this_or_this = say_primary_alternation_ _available_name_st
-              y << "expecting #{ _this_or_this_or_this }"
-
+              buffer << "expecting #{ _this_or_this_or_this }"
+              y << buffer
             end
             y  # important, covered
           end
