@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     Magnetics = ::Module.new
 
-    class Magnetics::FormalPrimary_via_PrimariesHash
+    class Magnetics::BranchItem_via_BranchHash
 
       # this "faciliator" has a strange, session-heavy interface because [#052] #note-1
 
@@ -13,24 +13,30 @@ module Skylab::Zerk
         undef_method :new
       end  # >>
 
-      def initialize h, as
+      def initialize shape_sym, h, as
         @argument_scanner = as
-        @primaries_hash = h
+        @branch_hash = h
+        @shape_symbol = shape_sym
       end
 
       def whine_about_how_argument_scanner_ended_early
         @_custom_behaivor_was_provided = false
-        @_terminal_channel_symbol = :missing_required_primary
+        case @shape_symbol
+        when :primary
+          @_terminal_channel_symbol = :missing_required_primary
+        when :business_branch_item
+          @_terminal_channel_symbol = :missing_required_argument
+        end
         _always_whine_in_the_same_way
       end
 
       # ~
 
-      def well_formed_potential_primary_symbol_knownness= kn
+      def well_formed_potential_symbol_knownness= kn
         if kn.is_known_known
           @is_well_formed = true
-          @formal_primary_request = FormalPrimaryRequest___.new(
-            kn.value_x, @primaries_hash )
+          @formal_symbol_request = FormalSymbolRequest___.new(
+            kn.value_x, @shape_symbol, @branch_hash )
         else
           @is_well_formed = false
           _receive_known_unknown_reasoning kn.reasoning
@@ -38,40 +44,42 @@ module Skylab::Zerk
         kn
       end
 
-      FormalPrimaryRequest___ = ::Struct.new :well_formed_symbol, :primaries_hash
+      FormalSymbolRequest___ = ::Struct.new(
+        :well_formed_symbol, :shape_symbol, :branch_hash )
 
       def whine_about_how_it_is_not_well_formed
         _always_whine_in_the_same_way  # hi.
       end
 
       attr_reader(
-        :formal_primary_request,
+        :formal_symbol_request,
         :is_well_formed,
+        :shape_symbol,
       )
 
       # ~
 
-      def route_knownness= kn
+      def item_knownness= kn
         if kn.is_known_known
-          @route_was_found = true
-          @__user_route = kn.value_x
+          @item_was_found = true
+          @__item_structure = kn.value_x
         else
-          @route_was_found = false
+          @item_was_found = false
           _receive_known_unknown_reasoning kn.reasoning
         end
         kn
       end
 
-      def whine_about_how_route_was_not_found
+      def whine_about_how_item_was_not_found
         _always_whine_in_the_same_way  # hi.
       end
 
-      attr_reader :route_was_found
+      attr_reader :item_was_found
 
       # ~
 
-      def route
-        @__user_route
+      def item
+        @__item_structure
       end
 
       # --
@@ -99,20 +107,24 @@ module Skylab::Zerk
 
       def __whine_in_the_typical_fashion
 
-        o = Here_::When::UnknownPrimary.begin
+        o = Here_::When::UnknownBranchItem.begin
 
         if ! @argument_scanner.no_unparsed_exists
-          o.strange_primary_value_by = @argument_scanner.method :head_as_is
+          o.strange_value_by = @argument_scanner.method :head_as_is
         end
 
-        if @primaries_hash
-          _p = @argument_scanner.method :available_primary_name_stream_via_hash
-          o.available_primary_name_stream_by = -> do
-            _p[ @primaries_hash ]
+        if @branch_hash
+
+          _p = @argument_scanner.method :available_branch_item_name_stream_via_hash
+
+          o.available_item_name_stream_by = -> do
+            _p[ @branch_hash, @shape_symbol ]
           end
         else
           NOTHING_  # #feature-island #scn-coverpoint-2
         end
+
+        o.shape_symbol = @shape_symbol
 
         o.terminal_channel_symbol = @_terminal_channel_symbol
 

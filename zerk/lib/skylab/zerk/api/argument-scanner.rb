@@ -30,31 +30,32 @@ module Skylab::Zerk
         NIL
       end
 
-      def match_primary_route_against_ h
+      def branch_item_via_match_ shape_sym, h  # MUST set @current_primary_symbol as appropriate
 
         o = Home_::ArgumentScanner::
-            Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
+            Magnetics::BranchItem_via_BranchHash.begin shape_sym, h, self
 
         if @no_unparsed_exists
           o.whine_about_how_argument_scanner_ended_early
         else
-          __match_primary_route_against_head_normally o
+          __branch_item_via_match_primary_against_head_normally o
         end
       end
 
-      def __match_primary_route_against_head_normally o
+      def __branch_item_via_match_primary_against_head_normally o  # MUST set @current_primary_symbol as appropriate
 
-        o.well_formed_potential_primary_symbol_knownness = __well_formed_knownness
+        o.well_formed_potential_symbol_knownness = __well_formed_knownness
 
         if o.is_well_formed
 
-          o.route_knownness = __route_knownness_via_request o.formal_primary_request
+          o.item_knownness = __branch_item_knownness_via_request o.formal_symbol_request
 
-          if o.route_was_found
-
-            o.route
+          if o.item_was_found
+            item = o.item
+            @current_primary_symbol = item.branch_item_normal_symbol
+            item
           else
-            o.whine_about_how_route_was_not_found
+            o.whine_about_how_item_was_not_found
           end
         else
           o.whine_about_how_it_is_not_well_formed
@@ -66,24 +67,28 @@ module Skylab::Zerk
         if x.respond_to? :id2name
           Common_::Known_Known[ x ]
         else
-          Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ :expected_symbol ]
+          Home_::ArgumentScanner::Known_unknown[ :expected_symbol ]
         end
       end
 
-      def __route_knownness_via_request req
+      def __branch_item_knownness_via_request req
         k = req.well_formed_symbol
-        x = req.primaries_hash[ k ]
+        x = req.branch_hash[ k ]
         if x
-          Common_::Known_Known[ Home_::ArgumentScanner::PrimaryHashValueBasedRoute.new x, k ]
+          Common_::Known_Known[ Home_::ArgumentScanner::BranchHashEntry.new x, k ]
         else
-          Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ :unknown_primary ]
+          Home_::ArgumentScanner::Known_unknown[ :unknown_primary ]
         end
       end
 
-      def available_primary_name_stream_via_hash h
+      def available_branch_item_name_stream_via_hash h, _  # 1x
         Stream_.call h.keys do |sym|
           Common_::Name.via_variegated_symbol sym
         end
+      end
+
+      def added_primary_normal_name_symbols
+        NOTHING_
       end
 
       def head_as_well_formed_potential_primary_symbol_

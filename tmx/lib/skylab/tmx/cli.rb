@@ -16,11 +16,10 @@ module Skylab::TMX
           Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
         end ]
 
-        @_end_of_stream = :__noop
+        @_end_of_stream = :_no_op
         @serr = e
         @sout = o
         @program_name_string_array = pn_s_a
-        @_verbosity_level_integer = 0
       end
 
       def json_file_stream_by & p
@@ -71,7 +70,9 @@ module Skylab::TMX
 
       def __when_no_args
 
-        _parse_error_listener.call :error, :expression, :parse_error do |y|
+        _init_selective_listener
+
+        @listener.call :error, :expression, :parse_error do |y|
 
           _st = Stream_.call OPERATIONS__.keys do |sym|
             Common_::Name.via_variegated_symbol sym
@@ -107,7 +108,7 @@ module Skylab::TMX
         m = OPERATIONS__[ sym ]
 
         if m
-          __init_selective_listener
+          _init_selective_listener
           scn.advance_one
           @__operation_symbol = sym
           @_user_scanner = scn
@@ -141,13 +142,13 @@ module Skylab::TMX
 
       def __bound_call_for_test_all
 
+        @_do_lipstick = false
+
         @_express = :__express_for_test_all
 
         @_emission_handler_methods_ = {
-
-          # how we ignore certain kinds of emissions/implement verbosity
-
-          find_command_args: :__receive_find_command_args,
+          # (special handling of emissions by terminal channel name symbol)
+          find_command_args: :_no_op,
         }
 
         @_table_schema = nil  # gets set by an emission if relevant
@@ -155,10 +156,6 @@ module Skylab::TMX
         arg_scn = _multimode_argument_scanner_by do |o|
 
           o.user_scanner remove_instance_variable :@_user_scanner
-
-          o.add_primary :slice, method( :__at_slice ), Describe_slice___
-
-          o.add_primary :verbose, method( :__add_one_unit_of_verbosity ), Describe_verbosity___
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
@@ -192,19 +189,26 @@ module Skylab::TMX
           if bc.receiver.respond_to? :test_directory_collection
 
             CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation.new(
-              bc, @selection_stack.last._argument_scanner_, self ).execute  # :#here
+              bc, @selection_stack.last.argument_scanner, self ).execute  # :#here
           else
             bc
           end
         end
       end
 
+      def receive_notification_that_you_should_express_find_commands
+        @_emission_handler_methods_[ :find_command_args ] = :__express_current_find_command
+        ACHIEVED_
+      end
+
+      def receive_notification_that_you_should_add_lipstick_column
+        @_do_lipstick = true ; ACHIEVED_
+      end
+
       # ~ emissions
 
-      def __receive_find_command_args
-        if 2 <= @_verbosity_level_integer
-          @__emission_expression._express_normally_
-        end
+      def __express_current_find_command
+        @__emission_expression._express_normally_
         NIL
       end
 
@@ -292,7 +296,7 @@ module Skylab::TMX
 
       def __argument_scanner_for_map  # see [#ze-052]
 
-        _multimode_argument_scanner_by do |o|
+        as = _multimode_argument_scanner_by do |o|
 
           o.front_scanner_tokens :map  # invoke this operation when calling API
 
@@ -310,37 +314,10 @@ module Skylab::TMX
 
           o.listener @listener
         end
-      end
 
-      # -- support for wierd added primaries
+        Add_slice_primary_[ 0, as, self ]
 
-      def __at_slice
-        sct = CLI::Magnetics_::ParsedStructure_via_ArgumentStream_for_Paging.
-          new( self ).execute
-        if sct
-          @selection_stack.last._argument_scanner_.insert_at_head(
-            :page_by, :item_count,
-            :page_size_denominator, sct.denominator,
-            :page_offset, sct.ordinal_offset,
-          )
-          ACHIEVED_
-        else
-          sct  # #cover-me (covered visually)
-        end
-      end
-
-      Describe_slice___ = -> y do
-        y << "experimental \"fun\" version of -page-by."
-        y << "(\"-help\" as its first argument shows modifier-specific help)"
-      end
-
-      # -- support for common ("officious") added primaries
-
-      def __add_one_unit_of_verbosity
-
-        @selection_stack.last._argument_scanner_.advance_one
-        @_verbosity_level_integer += 1
-        ACHIEVED_
+        as
       end
 
       # -- support for expressing results (our version of [#ze-025])
@@ -362,9 +339,9 @@ module Skylab::TMX
         # -- maybe alter things by the argument scanner
 
         if 1 != @selection_stack.length
-          as = top._argument_scanner_
+          as = top.argument_scanner
           desc_reader = as.altered_description_proc_reader_via desc_reader
-          # items = as.altered_normal_tuple_stream_via items  # #todo - already happening. why?
+          items = as.altered_normal_tuple_stream_via items
         end
 
         # --
@@ -435,7 +412,7 @@ module Skylab::TMX
           defn.push :field, :right, :label, UC_first___[ fld.name.as_human ]
         end
 
-        if yes && 1 == d
+        if @_do_lipstick && 1 == d
 
           # for now we render "lipstick" only if and always if there is
           # exactly one numeric field, and it is last. later we will do it
@@ -530,7 +507,7 @@ module Skylab::TMX
 
       # --
 
-      def __init_selective_listener
+      def _init_selective_listener
 
         expsr = nil  # only build it once an emission is received
         @listener = -> * sym_a, & em_p do
@@ -560,7 +537,7 @@ module Skylab::TMX
         UNABLE_
       end
 
-      def __noop
+      def _no_op
         NOTHING_
       end
 
@@ -773,6 +750,36 @@ module Skylab::TMX
 
     # ==
 
+    Add_slice_primary_ = -> d, as, cli do
+
+      _at_slice = -> do
+
+        sct = CLI::Magnetics_::ParsedStructure_via_ArgumentStream_for_Paging.
+          new( cli ).execute
+
+        if sct
+          as.insert_at_head(
+            :page_by, :item_count,
+            :page_size_denominator, sct.denominator,
+            :page_offset, sct.ordinal_offset,
+          )
+          ACHIEVED_
+        else
+          sct  # #cover-me (covered visually)
+        end
+      end
+
+      as.add_primary_at_position d, :slice, _at_slice, Describe_slice___
+      NIL
+    end
+
+    Describe_slice___ = -> y do
+      y << "experimental \"fun\" version of -page-by."
+      y << "(\"-help\" as its first argument shows modifier-specific help)"
+    end
+
+    # ==
+
     class HardcodedEmissionExpresserForNow___
 
       # this stays very close to its only client. is a separate class only
@@ -861,10 +868,6 @@ module Skylab::TMX
       end
     end
 
-    Describe_verbosity___ = -> y do
-      y << "adds verbosity to the operation (for some operations)"
-    end
-
     Describe_help__ = -> y do
       y << "this screen."
     end
@@ -917,6 +920,10 @@ module Skylab::TMX
         Zerk_::Models::Didactics.non_rootly__ @define_didactics_by, name, @__above_didactics_by
       end
 
+      def name_symbol
+        @name_symbol ||= name.as_variegated_symbol  # risk of inf. loop
+      end
+
       def name
         @name ||= __if_name_wasnt_set_then_name_symbol_must_have_been_set
       end
@@ -926,8 +933,7 @@ module Skylab::TMX
           remove_instance_variable :@__name_symbol )
       end
 
-      def _argument_scanner_
-        # this file only, e.g [#006] feature injection magnetic (#here)
+      def argument_scanner
         @__argument_scanner
       end
 

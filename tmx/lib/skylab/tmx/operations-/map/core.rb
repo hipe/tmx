@@ -152,21 +152,14 @@ module Skylab::TMX
       end
 
       def __parse_one_primary_term
-        m = @argument_scanner.match_primary_route_value_against PRIMARIES__
+        m = @argument_scanner.branch_value_via_match_primary_against PRIMARIES__
         if m
           @argument_scanner.advance_one
           send m
         end
       end
 
-      def parse_primary_at_head sym
-        @argument_scanner.advance_one
-        send PRIMARIES__.fetch sym
-      end
-
-      def to_primary_normal_name_stream  # for [#006]
-        Stream_[ PRIMARIES__.keys ]
-      end
+      # --
 
       Description_proc_reader___ = Lazy_.call do
 
@@ -199,6 +192,26 @@ module Skylab::TMX
           end,
         }
       end
+
+      # -- for [#006]
+
+      def syntax_front
+        @___sf ||= ___build_syntax_front
+      end
+
+      def ___build_syntax_front
+        ::Skylab::TestSupport::Slowie::Models_::HashBasedSyntax.new(
+          @argument_scanner, PRIMARIES__, self
+        ) do |o|
+          o.always_advance_scanner
+        end
+      end
+
+      def parse_present_primary_for_syntax_front_via_branch_hash_value m
+        send m
+      end
+
+      # --
 
       PRIMARIES__ = {
 
@@ -373,6 +386,8 @@ module Skylab::TMX
       define_method :_parse_into, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # --
 
       attr_reader(
         :argument_scanner,  # for collaborators

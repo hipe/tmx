@@ -32,7 +32,7 @@ module Skylab::Brazen
             Executable_as_Unbound___.new( path[ range ], path, _s_a )
           end
 
-          _stream_1.concat_by _stream_2
+          _stream_1.concat_stream _stream_2
         end
       end
 

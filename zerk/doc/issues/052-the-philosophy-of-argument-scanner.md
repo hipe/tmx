@@ -91,7 +91,7 @@ in various ways for years) is to meet these design objectives:
 
 assume that some caller is the backend operation driving the
 whole parse (pursuant to our [#052] founding principle). it
-will (reasonably) break if we pass it a route for a primary it
+will (reasonably) break if we pass it a formal branch item for a primary it
 doesn't know about, and that's exacty what "added" primaries are
 (typically but not necessarily - but the following handling
 still holds regardless).
@@ -126,7 +126,7 @@ CLI you can assume all elements of ARGV are strings).
 
 TL;DR: strange, session-heavy inteface for reasons
 
-given the particular argument scanner's head and a "route hash",
+given the particular argument scanner's head and a "branch hash",
 the (two) various argument scanner implementations probably solve
 for a formal primary in more or less the same way from some certain
 high level. and regardless, in cases of failure they should express

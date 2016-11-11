@@ -55,7 +55,7 @@ module Skylab::TestSupport
     end
 
     def __to_bound_call_when_arguments
-      sct = @argument_scanner.match_primary_route_value_against Primaries_hash__[]
+      sct = @argument_scanner.branch_value_via_match_primary_against Primaries_hash__[]
       if sct
         send sct.bound_call_method_name, sct
       end

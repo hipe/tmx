@@ -31,7 +31,7 @@ module Skylab::Zerk::TestSupport
         _as = __build_argument_scanner "x"
 
         call_by do
-          _as.match_primary_route_value_against x: :_no_see_, y: :_no_see_
+          _as.branch_value_via_match_primary_against x: :_no_see_, y: :_no_see_
         end
 
         y = nil
@@ -48,7 +48,7 @@ module Skylab::Zerk::TestSupport
 
       _as = _build_argument_scanner_without_listener :x, :_no_see_
 
-      _x = _as.match_primary_route_value_against x: :_money_
+      _x = _as.branch_value_via_match_primary_against x: :_money_
 
       _x == :_money_ || fail
     end
@@ -57,7 +57,7 @@ module Skylab::Zerk::TestSupport
 
       as = _build_argument_scanner_without_listener :x, :_money_two_
 
-      _x = as.match_primary_route_value_against x: :_money_one_
+      _x = as.branch_value_via_match_primary_against x: :_money_one_
       _x == :_money_one_ || fail  # redundant with previous test
 
       as.advance_one

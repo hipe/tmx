@@ -126,18 +126,6 @@ module Skylab::Common
       NIL_
     end
 
-    def add_to_front k, x
-      had = true
-      @h.fetch k do
-        @a[ 0, 0 ] = [ k ]
-        @h[ k ] = x
-        had = nil
-      end
-      if had
-        raise ::KeyError, _say_wont_clobber( k )
-      end
-    end
-
     def add_or_replace k, add_p, replace_p
       had = true
       x = @h.fetch k do
@@ -212,12 +200,28 @@ module Skylab::Common
       end
     end
 
+    def add_to_front k, x
+      add_at_position 0, k, x
+    end
+
     def add k, x
       had = true
       @h.fetch k do
-        had = false
         @a.push k
-        @h[ k ] = x ; nil
+        @h[ k ] = x
+        had = false
+      end
+      if had
+        raise ::KeyError, _say_wont_clobber( k )
+      end
+    end
+
+    def add_at_position d, k, x
+      had = true
+      @h.fetch k do
+        @a[ d, 0 ] = [ k ]
+        @h[ k ] = x
+        had = false
       end
       if had
         raise ::KeyError, _say_wont_clobber( k )

@@ -19,7 +19,7 @@ module Skylab::TMX::TestSupport
         ::Dir.exist? dir2 || fail
 
         same = '-test-directory'
-        invoke( * _subject_operation, same, dir2, same, dir )
+        invoke( * _subject_operation, same, dir2, same, dir, '-verbose' )  # (exactly one v is necessary)
 
         expect_on_stdout :<<, %r(\A\| +Test directory \| Number of test files \|  \|\n\z)  # KNOWN ISSUE
 
@@ -58,10 +58,35 @@ module Skylab::TMX::TestSupport
         end
 
         it "gives you a compounded ~\"did you mean..\"" do
+          _seen
+        end
+
+        it "has help (and some others)" do
+          h = _seen
+          h[ '-help' ] || fail
+          h[ '-verbose' ] || fail
+          h[ '-slice' ] || fail
+          h[ '-order' ] || fail
+          h[ '-test-directory' ] || fail
+          h[ '-page-by' ] || fail
+        end
+
+        shared_subject :_seen do
+
           invoke_it
+
           expect_on_stderr 'unknown primary: "-strange"'
-          expect "expecting { -page-by | -order | -test-directory | -slice | -verbose | -help }"  # ..
+
+          md = nil
+          expect_line_by do |line|
+            md = %r(\Aexpecting \{ ([^\}]+) \}\z).match line
+          end
+
           expect_failed_normally_
+
+          seen = {}
+          md[1].split(' | ').each { |s| seen[s] = true }
+          seen
         end
 
         def prepare_CLI cli

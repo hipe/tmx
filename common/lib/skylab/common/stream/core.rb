@@ -364,7 +364,7 @@ module Skylab::Common
 
     # ~ result in structures of greater constitency
 
-    def unshift_by * x_a
+    def unshift_stream * x_a
 
       st = Stream_.via_nonsparse_array x_a
 
@@ -383,12 +383,12 @@ module Skylab::Common
       end
     end
 
-    def push_by * x_a
+    def push_stream * x_a
 
-      concat_by Stream_.via_nonsparse_array x_a
+      concat_stream Stream_.via_nonsparse_array x_a
     end
 
-    def concat_by st_
+    def concat_stream st_
 
       st = self
       p = -> do

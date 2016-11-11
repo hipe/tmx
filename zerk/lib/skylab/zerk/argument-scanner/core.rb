@@ -23,21 +23,18 @@ module Skylab::Zerk
         end
       end
 
-      def match_primary_route_value_against h
-        route = match_primary_route_against h
-        if route
-          route.value
-        else
-          route
-        end
+      def branch_value_via_match_primary_against h
+        item = branch_item_via_match_ :primary, h
+        item && item.value
       end
 
-      def match_primary_route_against h
-        route = match_primary_route_against_ h
-        if route && ! route.is_the_no_op_route
-          @current_primary_symbol = route.primary_normal_symbol
-        end
-        route
+      def branch_value_via_match_business_item_against h
+        item = branch_item_via_match_ :business_branch_item, h
+        item && item.value
+      end
+
+      def branch_item_via_match_primary_against h
+        branch_item_via_match_ :primary, h
       end
 
       def head_as_primary_symbol
@@ -69,12 +66,33 @@ module Skylab::Zerk
 
     # ==
 
-    Known_unknown_via_reason_symbol = -> sym do
+    Known_unknown = -> sym do
+      _rsn = SimpleStructuredReason__.new sym
+      Common_::Known_Unknown.via_reasoning _rsn
+    end
 
-      Common_::Known_Unknown.via_reasoning Reasoning.new sym
+    Known_unknown_because = -> & p do
+      Common_::Known_Unknown.via_reasoning BehaviorBasedReason___.new p
     end
 
     # ==
+
+    class SimpleStructuredReason__
+
+      def initialize sym
+        @reason_symbol = sym
+      end
+
+      attr_reader(
+        :reason_symbol,
+      )
+
+      def behavior_by
+        NOTHING_
+      end
+    end
+
+    BehaviorBasedReason___ = ::Struct.new :behavior_by
 
     class Reasoning
 
@@ -91,12 +109,12 @@ module Skylab::Zerk
 
     # ==
 
-    Route = ::Class.new
+    BranchItem = ::Class.new
 
-    class PrimaryHashValueBasedRoute < Route
+    class BranchHashEntry < BranchItem
 
-      def route_category_symbol
-        :route_that_is_primary_hash_value_based
+      def item_category_symbol
+        :item_that_is_primary_hash_value_based
       end
 
       def is_more_backey_than_frontey
@@ -104,19 +122,19 @@ module Skylab::Zerk
       end
     end
 
-    class Route
+    class BranchItem
 
       def initialize x, k
-        @primary_normal_symbol = k
+        @branch_item_normal_symbol = k
         @value = x
       end
 
       attr_reader(
-        :primary_normal_symbol,
+        :branch_item_normal_symbol,
         :value,
       )
 
-      def is_the_no_op_route
+      def is_the_no_op_branch_item
         false
       end
     end

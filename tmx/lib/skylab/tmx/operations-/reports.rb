@@ -39,7 +39,7 @@ module Skylab::TMX
       end
 
       def __parse_one_primary_term
-        m = @argument_scanner.match_primary_route_value_against PRIMARIES__
+        m = @argument_scanner.branch_value_via_match_primary_against PRIMARIES__
         if m
           _ok = send m
           _ok  # #todo
@@ -155,7 +155,7 @@ module Skylab::TMX
         box = @_report_name_box
         sym = @_report_normal_symbol
 
-        @_emit.call :error, :expression, :operation_parse_error, :unrecognized_report do |y|
+        @_emit.call :error, :expression, :operator_parse_error, :unrecognized_report do |y|
 
           _name = Common_::Name.via_variegated_symbol sym
 

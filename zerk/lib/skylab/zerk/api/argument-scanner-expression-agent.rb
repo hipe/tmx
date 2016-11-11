@@ -21,6 +21,10 @@ module Skylab::Zerk
         _say_name_alternation :say_primary_, st
       end
 
+      def say_business_branch_item_alternation_ st
+        _say_name_alternation :_same, st
+      end
+
       def _say_name_alternation m, st
 
         p = method m
@@ -38,8 +42,12 @@ module Skylab::Zerk
         _same name
       end
 
-      def say_strange_primary_value x
+      def say_strange_branch_item x
         x.inspect
+      end
+
+      def prim sym
+        say_primary_ Common_::Name.via_variegated_symbol sym
       end
 
       def say_primary_ name

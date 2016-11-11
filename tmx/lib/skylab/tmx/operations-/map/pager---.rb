@@ -10,7 +10,10 @@ module Skylab::TMX
         end
 
         def execute
-          _at THESE___
+          m = @argument_scanner.branch_value_via_match_business_item_against THESE___
+          if m
+            send m
+          end
         end
 
         THESE___ = {
@@ -19,7 +22,7 @@ module Skylab::TMX
 
         def __when_item_count
           _advance_one
-          _at FIRST_BRANCH___
+          _primary FIRST_BRANCH___
         end
 
         FIRST_BRANCH___ = {
@@ -42,7 +45,7 @@ module Skylab::TMX
         end
 
         def _currently_there_is_one_required_term_from_here
-          _at ONLY_ONE_PRIMARY_AVAILABLE_HERE___
+          _primary ONLY_ONE_PRIMARY_AVAILABLE_HERE___
         end
 
         ONLY_ONE_PRIMARY_AVAILABLE_HERE___ = {
@@ -84,8 +87,8 @@ module Skylab::TMX
           end
         end
 
-        def _at h
-          m = @argument_scanner.match_primary_route_value_against h
+        def _primary h
+          m = @argument_scanner.branch_value_via_match_primary_against h
           if m
             send m
           end

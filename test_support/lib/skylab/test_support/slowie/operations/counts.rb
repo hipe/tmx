@@ -22,7 +22,7 @@ module Skylab::TestSupport
 
         @__emit = o.listener
 
-        @_syntax = Here_::Models_::HashBasedSyntax.new(
+        @syntax_front = Here_::Models_::HashBasedSyntax.new(
           o.argument_scanner, PRIMARIES, self )
 
         @test_directory_collection = o.build_test_directory_collection
@@ -77,22 +77,20 @@ module Skylab::TestSupport
       # == mostly boilerplate below (here for clarity)
 
       def __normal
-        _yes = @_syntax.parse_arguments
+        _yes = @syntax_front.parse_arguments
         _yes &&= @test_directory_collection.check_for_missing_requireds
         _yes  # #todo
       end
 
-      # -- for [#tmx-006]
+      # [#tmx-006] and friends
 
-      def parse_primary_at_head sym
-        @_syntax.parse_primary_at_head sym
+      attr_reader(
+        :syntax_front,
+      )
+
+      def parse_present_primary_for_syntax_front_via_branch_hash_value m
+        send m
       end
-
-      def to_primary_normal_name_stream
-        @_syntax.to_primary_normal_name_stream
-      end
-
-      # --
 
       def __parse_test_directory
         @test_directory_collection.parse_test_directory
@@ -100,5 +98,4 @@ module Skylab::TestSupport
     end
   end
 end
-# #tombstone (temporary): '-v', '--verbose', 'show max share meter (experimental)'
 # #tombstone (temporary): '-z', '--zero', 'display the zero values'

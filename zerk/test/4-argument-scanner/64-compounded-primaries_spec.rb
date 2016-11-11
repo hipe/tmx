@@ -134,8 +134,17 @@ module Skylab::Zerk::TestSupport
           @argument_scanner = fake_as
         end
 
-        def parse_primary_at_head sym
-          send TYPES___.fetch self.class::PRIMARIES.fetch sym
+        def syntax_front
+          @___sf ||= __build_syntax_front
+        end
+
+        def __build_syntax_front
+          ::Skylab::TestSupport::Slowie::Models_::HashBasedSyntax.new(
+            @argument_scanner, self.class::PRIMARIES, self )
+        end
+
+        def parse_present_primary_for_syntax_front_via_branch_hash_value k
+          send TYPES___.fetch k
         end
 
         TYPES___ = {
@@ -160,10 +169,6 @@ module Skylab::Zerk::TestSupport
           _sym = :"@#{ @argument_scanner.current_primary_symbol }"
           @argument_scanner.advance_one
           _sym
-        end
-
-        def to_primary_normal_name_stream
-          Stream_[ self.class::PRIMARIES.keys ]
         end
       end
 

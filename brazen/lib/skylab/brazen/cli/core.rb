@@ -764,7 +764,7 @@ module Skylab::Brazen
 
         _bx = Home_::CLI_Support.standard_action_property_box_
         _help = _bx.fetch :help
-        to_property_stream.push_by _help
+        to_property_stream.push_stream _help
       end
 
       def to_property_stream

@@ -11,11 +11,17 @@ module Skylab::TMX
         @CLI = cli
         @_remote_operation = bc.receiver
         @_result_in_the_same_bound_call_we_stared_with = bc
+        @selection_stack = cli.selection_stack
         @_test_directory_collection = @_remote_operation.test_directory_collection
         @__test_directory_entry_name_by = cli.release_test_directory_entry_name_by__
       end
 
       def execute
+
+        Add_slice_primary_[ SECOND_TO_LAST_POSITION_, @argument_scanner, @CLI ]
+
+        __add_verbose_primary_maybe
+
         if __parse_ALL_ARGUMENTS_using_the_compounded_primaries
           if __directories_were_named_explicitly
             if __map_related_primaries_were_used
@@ -118,13 +124,29 @@ module Skylab::TMX
         _ok  # #todo
       end
 
+      # -- this
+
+      def __add_verbose_primary_maybe
+        _k = @selection_stack.last.name_symbol
+        p = VERBOSITIES___.fetch _k
+        if p
+          vh = VerbosityHandler___.new @CLI
+          @argument_scanner.add_primary_at_position(
+            SECOND_TO_LAST_POSITION_, :verbose, vh.on_primary, vh.on_help )
+          p[ vh ]
+        end
+        NIL
+      end
+
       # -- initing the compunded primaries parser
 
       def __init_map_operation_and_compounded_primaries
 
         map_op = Home_::Operations_::Map.begin( & @CLI.listener )
 
-        map_op.argument_scanner = @argument_scanner
+        as = @argument_scanner
+
+        map_op.argument_scanner = as
 
         map_op.attributes_module_by = -> { Home_::Attributes_ }  # necessary for it to be able to parse '-order' primary
 
@@ -147,6 +169,145 @@ module Skylab::TMX
         NIL
       end
 
+      # ==
+
+      VERBOSITIES___ = {
+
+        # (operations are high-level to low-level.)
+        # (verbosity increments are sequential (1, 2, etc))
+
+        counts: -> v do
+          v.add_one(
+            -> y do
+              y << "add table column for \"lipstick\" visualization"
+            end,
+            -> cli do
+              cli.receive_notification_that_you_should_add_lipstick_column
+            end,
+          )
+          v.add_one(
+            -> y do
+              y << "show the find commands used"
+            end,
+            -> cli do
+              cli.receive_notification_that_you_should_express_find_commands
+            end,
+          )
+        end,
+
+        list_files: -> v do
+          v.add_one(
+            -> y do
+              y << "show the find commands used"
+            end,
+            -> cli do
+              cli.receive_notification_that_you_should_express_find_commands
+            end,
+          )
+        end,
+      }
+
+      # ==
+
+      class VerbosityHandler___
+
+        def initialize cli
+
+          me = self
+
+          @on_help = -> y do
+            # (ignoring this context, which is expag)
+            me.__describe_into y
+          end
+
+          @CLI = cli
+          @current_verbosity_COUNT = 0
+          @_desc_a = []
+          @_handle_a = []
+          @on_primary = method :__at_verbose
+        end
+
+        # -- define
+
+        def add_one desc_p, handler_p
+          @_desc_a.push desc_p
+          @_handle_a.push handler_p ; nil
+        end
+
+        # -- use (mutate)
+
+        def __at_verbose
+          max_count = @_handle_a.length
+          if max_count == @current_verbosity_COUNT
+            __when_hit_max max_count
+          else
+            @CLI.selection_stack.last.argument_scanner.advance_one
+            d = @current_verbosity_COUNT
+            @current_verbosity_COUNT = d + 1
+            @_handle_a.fetch( d )[ @CLI ]
+          end
+        end
+
+        def __when_hit_max d
+
+          @CLI.listener.call :error, :expression, :operator_parse_error do |y|
+            y << "ineffectual #{ prim :verbose } primary (max: #{ d })"
+          end
+          UNABLE_
+        end
+
+        # -- read
+
+        def __describe_into y
+          case 1 <=> @_desc_a.length
+          when 1
+            __describe_into_when_none y
+          when 0
+            __describe_into_when_one y
+          when -1
+            __describe_into_when_more_than_one y
+          end
+          y
+        end
+
+        def __describe_into_when_none y
+          y << "adds verbosity to the operation (for some operations)"
+        end
+
+        def __describe_into_when_more_than_one y
+          count = 0
+          p = nil
+          my_y = ::Enumerator::Yielder.new do |line|
+            p[ line ]
+          end
+          subsequent_line = -> line do
+            y << "     #{ line }"
+          end
+          first_line = -> line do
+            p = subsequent_line
+            y << "#{ count }x - #{ line }"
+          end
+          @_desc_a.each do |user_p|
+            count += 1
+            p = first_line
+            user_p[ my_y ]
+          end
+        end
+
+        def __describe_into_when_one y
+          @_desc_a.first[ y ]
+        end
+
+        attr_reader(
+          :on_help,
+          :on_primary,
+        )
+      end
+
+      SECOND_TO_LAST_POSITION_ = -2  # (a popular location for
+      # for items - we usually want to leave -help at the end.)
+
+      # ==
     end
   end
 end

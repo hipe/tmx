@@ -28,7 +28,7 @@ module Skylab::Zerk::TestSupport
         doopie: :_no_see_,
       }
 
-      _route = as.match_primary_route_against h
+      _route = as.branch_item_via_match_primary_against h
       _route == false || fail
 
       yay == :_hi_ || fail
@@ -56,14 +56,14 @@ module Skylab::Zerk::TestSupport
         flopey: :_hi_2_,
       }
 
-      _sym = as.match_primary_route_value_against h
+      _sym = as.branch_value_via_match_primary_against h
       _sym == :_hi_1_ || fail
 
       v_count == 1 || fail
 
       as.advance_one
 
-      _sym = as.match_primary_route_value_against h
+      _sym = as.branch_value_via_match_primary_against h
       _sym == :_hi_2_ || fail
 
       v_count == 2 || fail
@@ -88,7 +88,7 @@ module Skylab::Zerk::TestSupport
 
       h = {}  # EMPTY_H_
 
-      _x = as.match_primary_route_value_against h
+      _x = as.branch_value_via_match_primary_against h
       _x == NIL || fail
 
       yay == :_hi_ || fail
@@ -135,7 +135,7 @@ module Skylab::Zerk::TestSupport
         end
 
         spy.call_by do
-          as.match_primary_route_value_against h
+          as.branch_value_via_match_primary_against h
         end
 
         _x = spy.execute_under self

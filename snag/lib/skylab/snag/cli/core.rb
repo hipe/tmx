@@ -13,7 +13,7 @@ module Skylab::Snag
       # this is :[#br-066] currently the only example of the code
       # necessary to expose & implement a modality-only action adatper..
 
-      super.unshift_by CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
+      super.unshift_stream CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
     end
 
     class Action_Adapter < Action_Adapter

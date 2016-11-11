@@ -22,6 +22,11 @@ module Skylab::Zerk::TestSupport
         expect nil
       end
 
+      def expect_line_by m=nil, & p
+        @_ze_last_method = m if m
+        __ze_add_proc_for_line_based_expectation p
+      end
+
       def expect_each_on_stdout_by m=nil, & p
         @_ze_last_method = m if m
         @_ze_last_stream = :sout
@@ -48,6 +53,13 @@ module Skylab::Zerk::TestSupport
       def expect_lines_in_big_string m=nil, big_s
         @_ze_last_method = m if m
         _ze_add_big_string_based_expectation big_s
+        NIL
+      end
+
+      def __ze_add_proc_for_line_based_expectation p
+
+        @_ze_niCLI_setup.add_proc_for_line_based_expectation(
+          p, @_ze_last_method, @_ze_last_stream )
         NIL
       end
 
@@ -346,6 +358,10 @@ module Skylab::Zerk::TestSupport
         _add String_based_expectation___[ exp_x, method_name, serr_or_sout ], serr_or_sout
       end
 
+      def add_proc_for_line_based_expectation p, m, serr_or_sout
+        _add ProcForLineBasedExpectation___.new( p, m, serr_or_sout ), serr_or_sout
+      end
+
       def _add exp, serr_or_sout
         @has[ serr_or_sout ] = true
         @expectations.push exp
@@ -639,6 +655,40 @@ module Skylab::Zerk::TestSupport
 
       def _inspectable_
         @regexp
+      end
+    end
+
+    class ProcForLineBasedExpectation___
+
+      def initialize p, m, sym
+        @method_name = m
+        @proc = p
+        @serr_or_sout = sym
+      end
+
+      def assert_against_under em, tc
+        ProcForLineBasedAssertion___.new( em, @proc, @method_name, @serr_or_sout, tc ).execute
+      end
+
+      def is_multi_emission_expectation
+        false
+      end
+    end
+
+    class ProcForLineBasedAssertion___ < MethodAndStreamAssertion__
+
+      def initialize ae, p, m, sym, tc
+        @actual_emission = ae
+        @proc = p
+        @method_name = m
+        @serr_or_sout = sym
+        @test_context = tc
+      end
+
+      def execute
+        super
+        @proc[ @actual_emission.string ]
+        NIL
       end
     end
 

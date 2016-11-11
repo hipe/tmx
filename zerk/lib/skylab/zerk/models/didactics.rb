@@ -37,18 +37,9 @@ module Skylab::Zerk
 
     def define_conventionaly y, op
 
-      # -- for "item normal tuple stream", maybe route through argument scanner
+      # -- (not thing ding here)
 
-      raw_tuple_st_by = op.method :to_item_normal_tuple_stream
-
-      as = op.argument_scanner
-      if as
-        _ = -> { as.altered_normal_tuple_stream_via raw_tuple_st_by[] }
-      else
-        _ = raw_tuple_st_by
-      end
-
-      y.yield :item_normal_tuple_stream_by, _
+      y.yield :item_normal_tuple_stream_by, op.method( :to_item_normal_tuple_stream )  # #tombstone #temporary
 
 
 

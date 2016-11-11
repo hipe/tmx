@@ -20,21 +20,20 @@ module Skylab::TMX
       end
 
       def execute
-        @argument_scanner = @CLI.selection_stack.last._argument_scanner_
-        @argument_scanner.advance_one
-        if HELP_RX =~ @argument_scanner.head_as_is
+        as = @CLI.selection_stack.last.argument_scanner
+        as.advance_one
+        @argument_scanner = as
+        if ! as.no_unparsed_exists && HELP_RX =~ as.head_as_is
           DESCRIPTION___[ @CLI.line_yielder_for_info ]
           NOTHING_  # stop normal flow
-        else
-          if __parse_ordinal
-            if __parse_denominator
-              __money
-            else
-              UNABLE_
-            end
+        elsif __parse_ordinal
+          if __parse_denominator
+            __money
           else
             UNABLE_
           end
+        else
+          UNABLE_
         end
       end
 
@@ -80,7 +79,7 @@ module Skylab::TMX
       def __whine_about_ordinal s, en_ord_rx, easy_ord_rx
 
         say = method :_say_regexp
-        _emit :error, :expression, :particular_parse_error, :unrecognized_ordinal do |y|
+        _emit :error, :expression, :operator_parse_error, :unrecognized_ordinal do |y|
 
           y << "unrecognized ordinal #{ s.inspect } - #{
             }expecting #{ say[ en_ord_rx ] } or #{ say[ easy_ord_rx ] }"
@@ -106,7 +105,7 @@ module Skylab::TMX
       def __whine_about_denominator s, en_denom_rx
 
         say = method :_say_regexp
-        _emit :error, :expression, :particular_parse_error, :unrecognized_denominator do |y|
+        _emit :error, :expression, :operator_parse_error, :unrecognized_denominator do |y|
 
           y << "unrecognized denominator #{ s.inspect } - #{
             }expecting #{ say[ en_denom_rx ] }"

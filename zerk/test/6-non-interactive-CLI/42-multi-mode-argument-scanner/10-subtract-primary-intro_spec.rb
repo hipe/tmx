@@ -39,14 +39,14 @@ module Skylab::Zerk::TestSupport
 
         h = { hi: :_was_hi_, cant_touch_this: :_no_see_ }
 
-        _x = as.match_primary_route_value_against h
+        _x = as.branch_value_via_match_primary_against h
         _x == :_was_hi_ || fail
 
         as.advance_one
 
         spy.call_by do
 
-          as.match_primary_route_value_against h
+          as.branch_value_via_match_primary_against h
         end
 
         y = nil
@@ -72,7 +72,7 @@ module Skylab::Zerk::TestSupport
 
       h = { cant_touch_this_either: :_hi_1_, joopie: :_hi_2_ }
 
-      _m = as.match_primary_route_value_against h
+      _m = as.branch_value_via_match_primary_against h
       _m == :_hi_1_ || fail
 
       as.advance_one
@@ -80,7 +80,7 @@ module Skylab::Zerk::TestSupport
       _ = as.parse_primary_value :must_be_trueish
       _ == :zazlow || fail
 
-      _m = as.match_primary_route_value_against h
+      _m = as.branch_value_via_match_primary_against h
       _m == :_hi_2_ || fail
 
       as.advance_one

@@ -114,7 +114,7 @@ module Skylab::Zerk
 
       # ==
 
-      class When::UnknownPrimary
+      class When::UnknownBranchItem
 
         # this does the levenshtein-like (but not levenshtein) thing where
         # we explicate valid alternatives.
@@ -134,31 +134,36 @@ module Skylab::Zerk
         end  # >>
 
         def initialize
-          @available_primary_name_stream_by = nil
-          @strange_primary_value_by = nil
-          @terminal_channel_symbol = nil
+          @available_item_name_stream_by = nil
+          @strange_value_by = nil
         end
 
         attr_writer(
-          :available_primary_name_stream_by,
+          :available_item_name_stream_by,
           :listener,
-          :strange_primary_value_by,
+          :shape_symbol,
+          :strange_value_by,
           :terminal_channel_symbol,
         )
 
         def execute
 
-          available_primary_name_st_p = @available_primary_name_stream_by  # any
-          strange_primary_value_by = @strange_primary_value_by
+          available_item_name_stream_by = @available_item_name_stream_by  # any
+          shape_sym = @shape_symbol
+          strange_value_by = @strange_value_by
 
-          _tcs = ( @terminal_channel_symbol || :unknown_primary )
+          _tcs = @terminal_channel_symbol
 
           @listener.call :error, :expression, :parse_error, _tcs do |y|
 
-            if strange_primary_value_by
+            if strange_value_by
 
-              buffer = "unknown primary"
-              s = say_strange_primary_value strange_primary_value_by[]
+              case shape_sym
+              when :primary ; buffer = "unknown primary"
+              when :business_branch_item ; buffer = "unknown item"
+              end
+
+              s = say_strange_branch_item strange_value_by[]
               if COLON_BYTE_ != s.getbyte(0)
                 buffer << COLON_
               end
@@ -167,16 +172,28 @@ module Skylab::Zerk
               y << buffer
               buffer = ""
             else
-              buffer = "missing required primary: "
+
+              case shape_sym
+              when :primary ; buffer = "missing required primary: "
+              when :business_branch_item ; buffer = "missing required argument: "
+              end
             end
 
-            if available_primary_name_st_p
+            if available_item_name_stream_by
 
-              _available_name_st = available_primary_name_st_p[]
-              _this_or_this_or_this = say_primary_alternation_ _available_name_st
+              _available_name_st = available_item_name_stream_by[]
+
+              case shape_sym
+              when :primary
+                _this_or_this_or_this = say_primary_alternation_ _available_name_st
+              when :business_branch_item
+                _this_or_this_or_this = say_business_branch_item_alternation_ _available_name_st
+              end
+
               buffer << "expecting #{ _this_or_this_or_this }"
               y << buffer
             end
+
             y  # important, covered
           end
 

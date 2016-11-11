@@ -164,12 +164,12 @@ module Skylab::Zerk
 
         def finish
 
-          rm = RouteMaker___.new @_added_box, @_subtracted_h
+          itemer = Itemer___.new @_added_box, @_subtracted_h
 
           a = []
           ft = remove_instance_variable :@_front_tokens
           if ft
-            a.push FrontTokens__.new ft, rm
+            a.push FrontTokens__.new ft, itemer
           end
 
           msp = remove_instance_variable :@_mid_scanner_pairs
@@ -178,7 +178,6 @@ module Skylab::Zerk
             a.push FixedPrimaries___.new msp
           end
 
-
           us = remove_instance_variable :@_user_scanner
           if ! us.no_unparsed_exists
 
@@ -186,14 +185,14 @@ module Skylab::Zerk
               _dp_kn = Common_::Known_Known[ @_default_primary_symbol ]
             end
 
-            a.push UserScanner___.new us, _dp_kn, rm, @_listener
+            a.push UserScanner___.new us, _dp_kn, itemer, @_listener
           end
 
           if a.length.zero?
             self._COVER_ME_you_should_result_in_a_singleton_that_says :no_unparsed_exists
           else
             Here_.__new_multi_mode_argument_scanner(
-              a, @_description_proc_for_added_h, rm, @_listener )
+              a, @_description_proc_for_added_h, itemer, @_listener )
           end
         end
       end
@@ -203,11 +202,11 @@ module Skylab::Zerk
       Here_ = self
       class Here_
 
-        def initialize a, d_h, route_maker, l
+        def initialize a, d_h, itemer, l
           @_description_proc_for_added_h = d_h
           @listener = l
           @no_unparsed_exists = false
-          @_route_maker = route_maker
+          @_itemer = itemer
           @_scn_scn = Common_::Polymorphic_Stream.via_array a
           @_scn = @_scn_scn.gets_one
         end
@@ -219,7 +218,7 @@ module Skylab::Zerk
           # hack that says "whatever you're doing, do this instead".
           # this hack is certain to break for certain cases
 
-          scn = FrontTokens__.new x_a, @_route_maker
+          scn = FrontTokens__.new x_a, @_itemer
 
           if @no_unparsed_exists
             @no_unparsed_exists = false
@@ -230,6 +229,13 @@ module Skylab::Zerk
             @_scn = scn
           end
 
+          NIL
+        end
+
+        def add_primary_at_position d, sym, do_by, desc_by
+
+          @_description_proc_for_added_h[ sym ] = desc_by
+          @_itemer.__late_add_ d, sym, do_by
           NIL
         end
 
@@ -253,20 +259,22 @@ module Skylab::Zerk
 
         # --
 
-        def match_primary_route_against_ h
+        def branch_item_via_match_ shape_sym, h  # MUST set @current_primary_symbol as appropriate
 
           # "all about parsing added primaries" ([#052] #note-2) explains it all
 
           begin
-            x = __match_niCLI_route_against h
+            x = __match_niCLI_item_against shape_sym, h
             x || break
-            route = x
+            item = x
 
-            if route.is_more_backey_than_frontey
-              break  # "backey" route is found - done.
+            @current_primary_symbol = item.branch_item_normal_symbol
+
+            if item.is_more_backey_than_frontey
+              break  # "backey" item is found - done.
             end
 
-            x = route.value.call
+            x = item.value.call
             if ! x  # custom frontend proc interrupts flow #scn-coverpoint-1-A
               break
             end
@@ -279,39 +287,49 @@ module Skylab::Zerk
             # ended on a "frontey" primary, then it's hard to hide the
             # existence of this hack completely from the backend. we are
             # in effect trying to tell the backend "we did not fail, but
-            # this is not a route." experimental :#scn-note-1 :#here
+            # this is not a item." experimental :#scn-note-1 :#here
             # #not-covered - hits IFF `-verbose` at end
 
-            x = The_no_op_route___[]
+            x = The_no_op_item___[]
             break
           end while above
           x
         end
 
-        def __match_niCLI_route_against h
+        def __match_niCLI_item_against shape_sym, h
 
           o = Home_::ArgumentScanner::
-              Magnetics::FormalPrimary_via_PrimariesHash.begin h, self
+              Magnetics::BranchItem_via_BranchHash.begin shape_sym, h, self
 
           if @no_unparsed_exists
             o.whine_about_how_argument_scanner_ended_early
           else
-            o.well_formed_potential_primary_symbol_knownness = @_scn._well_formed_knownness_
-            __match_niCLI_route_normally o
+            __match_niCLI_item_normally o
           end
         end
 
-        def __match_niCLI_route_normally o
+        def __match_niCLI_item_normally o
+
+          case o.shape_symbol
+          when :primary
+            m1 = :_well_formed_primary_knownness_
+            m2 = :_primary_branch_item_knownness_via_request_
+          when :business_branch_item
+            m1 = :_well_formed_business_branch_item_knownness_
+            m2 = :_business_branch_item_knownness_via_request_
+          end
+
+          o.well_formed_potential_symbol_knownness = @_scn.send m1
 
           if o.is_well_formed
 
-            o.route_knownness = @_scn._route_knownness_via_request_ o.formal_primary_request
+            o.item_knownness = @_scn.send m2, o.formal_symbol_request
 
-            if o.route_was_found
+            if o.item_was_found
 
-              o.route
+              o.item
             else
-              o.whine_about_how_route_was_not_found
+              o.whine_about_how_item_was_not_found
             end
           else
             o.whine_about_how_it_is_not_well_formed
@@ -321,20 +339,31 @@ module Skylab::Zerk
         def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
 
           o = Home_::ArgumentScanner::
-              Magnetics::FormalPrimary_via_PrimariesHash.begin NOTHING_, self
+            Magnetics::BranchItem_via_BranchHash.begin :primary, NOTHING_, self
 
-          o.well_formed_potential_primary_symbol_knownness = @_scn._well_formed_knownness_
+          o.well_formed_potential_symbol_knownness = @_scn._well_formed_primary_knownness_
 
           if o.is_well_formed
 
-            o.formal_primary_request.well_formed_symbol
+            o.formal_symbol_request.well_formed_symbol
 
           else
             o.whine_about_how_it_is_not_well_formed
           end
         end
 
-        def available_primary_name_stream_via_hash h
+        # --
+
+        def available_branch_item_name_stream_via_hash h, shape_sym
+          send THESE_3__.fetch( shape_sym ), h
+        end
+
+        THESE_3__ = {
+          business_branch_item: :__available_etc,
+          primary: :__available_primary_name_stream_via_hash,
+        }
+
+        def __available_primary_name_stream_via_hash h
 
           _st = Stream_.call h.keys do |sym|
             [ :primary, sym ]
@@ -345,6 +374,14 @@ module Skylab::Zerk
           end
         end
 
+        def __available_etc h
+          Stream_.call h.keys do |sym|
+            Common_::Name.via_variegated_symbol sym
+          end
+        end
+
+        # --
+
         def altered_normal_tuple_stream_via remote_normal_tuple_st
 
           # given a stream of primary normal symbols as produced by the
@@ -352,7 +389,7 @@ module Skylab::Zerk
           # argument stream) that reduces from it any subtracted primaries
           # and concats to it the stream symbols for any added primaries.
 
-          o = @_route_maker
+          o = @_itemer
 
           sub_h = o.subtracted_hash
           reduced_st = if sub_h
@@ -368,10 +405,14 @@ module Skylab::Zerk
             _add_these = added_box.to_name_stream.map_by do |sym|
               [ :primary, sym ]
             end
-            reduced_st.concat_by _add_these
+            reduced_st.concat_stream _add_these
           else
             reduced_st
           end
+        end
+
+        def added_primary_normal_name_symbols
+          @_itemer.__added_primary_normal_name_symbols_
         end
 
         def head_as_normal_symbol
@@ -410,18 +451,25 @@ module Skylab::Zerk
         # for indicating to the backend API which operation we are trying
         # to reach, or other hacks.
 
-        def initialize front_tokens, rm
+        def initialize front_tokens, itemer
 
           @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
-          @_route_maker = rm
+          @_itemer = itemer
         end
 
-        def _route_knownness_via_request_ req
-
-          @_route_maker.route_knownness_via_exact_match req
+        def _primary_branch_item_knownness_via_request_ req
+          @_itemer.primary_branch_item_knownness_via_exact_match req
         end
 
-        def _well_formed_knownness_
+        def _business_branch_item_knownness_via_request_ req
+          @_itemer.business_branch_item_knownness_via_request req
+        end
+
+        def _well_formed_business_branch_item_knownness_
+          Common_::Known_Known[ _head ]
+        end
+
+        def _well_formed_primary_knownness_
           Common_::Known_Known[ _head ]
         end
 
@@ -460,16 +508,16 @@ module Skylab::Zerk
           @_real_scn = Common_::Polymorphic_Stream.via_array mid_scanner_pairs
         end
 
-        def _route_knownness_via_request_ req
+        def _primary_branch_item_knownness_via_request_ req
 
           # assume our immediately following method resulted in a known known.
 
           k = req.well_formed_symbol
-          _x = req.primaries_hash.fetch k
-          Common_::Known_Known[ DefaultedBasedRoute___.new _x, k ]
+          _x = req.branch_hash.fetch k
+          Common_::Known_Known[ DefaultedBranchItem___.new _x, k ]
         end
 
-        def _well_formed_knownness_
+        def _well_formed_primary_knownness_
           if @_is_pointing_at_name
             Common_::Known_Known[ @_real_scn.current_token.name_x ]
           else
@@ -525,7 +573,7 @@ module Skylab::Zerk
         # this is the workhorse parser implementation - the one that
         # translates CLI-shaped arguments to API-shaped ones.
 
-        def initialize user_scn, dp_kn, route_maker, listener
+        def initialize user_scn, dp_kn, itemer, listener
 
           if dp_kn
             @_default_primary_was_read = false
@@ -535,56 +583,40 @@ module Skylab::Zerk
             @_has_default_primary = false
           end
 
-          @__is_subtracted = route_maker.subtracted_hash || MONADIC_EMPTINESS_
+          @__is_subtracted = itemer.subtracted_hash || MONADIC_EMPTINESS_
+          @_itemer = itemer
           @_listener = listener
           @_real_scn = user_scn
-          @_route_maker = route_maker
         end
 
-        def _route_knownness_via_request_ req
+        def _primary_branch_item_knownness_via_request_ req
 
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          kn = @_route_maker.route_knownness_via_exact_match req
-          if kn
-            kn
-          else
-            __lookup_route_with_fuzzy_match req
-          end
+          _kn = @_itemer.primary_branch_item_knownness_via_exact_match req
+          _kn or __lookup_primary_branch_item_with_fuzzy_match req
         end
 
-        def __lookup_route_with_fuzzy_match req  # result in a knownness
+        def _business_branch_item_knownness_via_request_ req
+          @_itemer.business_branch_item_knownness_via_request req
+        end
 
-          a = nil
-          sym = req.well_formed_symbol
-          rx = /\A#{ ::Regexp.escape sym }/
+        def __lookup_primary_branch_item_with_fuzzy_match req  # result in a knownness
 
-          bx = @_route_maker.added_box
+          fuz = Fuzz__.new req
+
+          bx = @_itemer.added_box
           if bx
-            bx.each_pair do |k, x|
-              rx =~ k || next
-              ( a ||= [] ).push AddedBasedRoute___.new( x, k )
-            end
+            fuz.visit AddedBranchItem__, bx
           end
 
-          req.primaries_hash.each_pair do |k, x|
-            rx =~ k || next
-            ( a ||= [] ).push PrimaryHashValueBasedRoute___.new( x, k )
-          end
+          fuz.visit BranchHashEntry__, req.branch_hash
 
-          if a
-            if 1 == a.length
-              Common_::Known_Known[ a.fetch 0 ]
-            else
-              Known_unknown_when_ambiguous___[ a, sym ]
-            end
-          else
-            _known_unknown_with_reason :unknown_primary
-          end
+          fuz.maybe_finish or _known_unknown_primary_with_reason :unknown_primary
         end
 
-        def _well_formed_knownness_
+        def _well_formed_primary_knownness_
 
           s = @_real_scn.current_token
 
@@ -603,7 +635,7 @@ module Skylab::Zerk
               # latter step only so that subtraction *would be* reflected
               # in the old-style of parsing (not with hashes)
 
-              _known_unknown_with_reason :subtracted_primary_was_referenced
+              _known_unknown_primary_with_reason :subtracted_primary_was_referenced
             else
               Common_::Known_Known[ sym ]
             end
@@ -613,7 +645,22 @@ module Skylab::Zerk
             Common_::Known_Known[ @__default_primary_symbol ]
 
           else
-            _known_unknown_with_reason :primary_had_poor_surface_form
+            _known_unknown_primary_with_reason :primary_had_poor_surface_form
+          end
+        end
+
+        def _well_formed_business_branch_item_knownness_  # (rough sketch)
+
+          s = @_real_scn.current_token
+
+          if DASH_BYTE_ == s.getbyte(0)
+            Home_::ArgumentScanner::Known_unknown_because.call do | emit |
+              emit.call :error, :expression, :operator_parse_error do |y|
+                y << "looks like primary, must not: #{ s.inspect }"
+              end
+            end
+          else
+            Common_::Known_Known[ s.gsub( DASH_, UNDERSCORE_ ).intern ]
           end
         end
 
@@ -629,8 +676,8 @@ module Skylab::Zerk
           Ultra_normalize___[ s ]
         end
 
-        def _known_unknown_with_reason sym
-          Home_::ArgumentScanner::Known_unknown_via_reason_symbol[ sym ]
+        def _known_unknown_primary_with_reason sym
+          Home_::ArgumentScanner::Known_unknown[ sym ]
         end
 
         def _head_as_is_
@@ -660,7 +707,7 @@ module Skylab::Zerk
 
       # ==
 
-      class RouteMaker___
+      class Itemer___
 
         def initialize bx, h
 
@@ -674,28 +721,71 @@ module Skylab::Zerk
           @subtracted_hash = h
         end
 
-        def route_knownness_via_exact_match req
-          route = __search_for_route_via_exact_match req
-          if route
-            Common_::Known_Known[ route ]
+        def __late_add_ d, sym, do_by
+
+          if @_has_added
+            bx = @added_box
+          else
+            @_has_added = true
+            bx = Common_::Box.new
+            @added_box = bx
           end
+
+          len = bx.length
+
+          if 0 > d
+            if -len > d
+              d = -len
+            end
+          elsif len < d
+            d = len
+          end
+
+          bx.add_at_position d, sym, do_by
+          NIL
         end
 
-        def __search_for_route_via_exact_match req
+        def primary_branch_item_knownness_via_exact_match req
 
           k = req.well_formed_symbol
-          # -- do we have a primary by this exact name (as normal or as added?)
 
           if @_has_added
             x = @added_box[ k ]
           end
           if x
-            AddedBasedRoute___.new x, k
+            item = AddedBranchItem__.new x, k
           else
-            x = req.primaries_hash[ k ]
+            x = req.branch_hash[ k ]
             if x
-              PrimaryHashValueBasedRoute___.new x, k
+              item = BranchHashEntry__.new x, k
             end
+          end
+
+          item && Common_::Known_Known[ item ]
+        end
+
+        def business_branch_item_knownness_via_request req
+
+          k = req.well_formed_symbol
+          x = req.branch_hash[ k ]
+          if x
+            Common_::Known_Known[ BranchHashEntry__.new( x, k ) ]
+          else
+            fuz = Fuzz__.new req
+            fuz.visit BranchHashEntry__, req.branch_hash
+            kn = fuz.maybe_finish
+            if kn
+              kn
+            else
+              Home_::ArgumentScanner::Known_unknown[ :unknown_business_branch_item ]
+            end
+          end
+        end
+
+        def __added_primary_normal_name_symbols_
+          if @_has_added
+            _ = @added_box.a_
+            _  # #todo
           end
         end
 
@@ -703,6 +793,38 @@ module Skylab::Zerk
           :added_box,
           :subtracted_hash,
         )
+      end
+
+      # ==
+
+      class Fuzz__
+
+        def initialize req
+
+          sym = req.well_formed_symbol
+
+          @a = nil
+          @rx = /\A#{ ::Regexp.escape sym }/
+          @symbol = sym
+        end
+
+        def visit cls, bx
+          bx.each_pair do |k, x|
+            @rx =~ k || next
+            ( @a ||= [] ).push cls.new( x, k )
+          end
+          NIL
+        end
+
+        def maybe_finish
+          if @a
+            if 1 == @a.length
+              Common_::Known_Known[ @a.fetch 0 ]
+            else
+              Known_unknown_when_ambiguous___[ @a, @symbol ]
+            end
+          end
+        end
       end
 
       # ==
@@ -742,8 +864,8 @@ module Skylab::Zerk
 
             buffer = "did you mean "
 
-            Stream_[ a ].join_into_with_by buffer, " or " do |route|
-              cheap[ route.primary_normal_symbol ]
+            Stream_[ a ].join_into_with_by buffer, " or " do |item|
+              cheap[ item.branch_item_normal_symbol ]
             end
 
             buffer << "?"
@@ -759,36 +881,36 @@ module Skylab::Zerk
 
       # ==
 
-      base = Home_::ArgumentScanner::Route
+      base = Home_::ArgumentScanner::BranchItem
 
-      The_no_op_route___ = Lazy_.call do
-        class NoOpRoute___
-          def is_the_no_op_route  # always for #scn-note-1 #here
+      The_no_op_item___ = Lazy_.call do
+        class NoOpBranchItem___
+          def is_the_no_op_branch_item  # always for #scn-note-1 #here
             true
           end
           new
         end
       end
 
-      class AddedBasedRoute___ < base
-        def route_category_symbol
-          :route_that_is_added_based
+      class AddedBranchItem__ < base
+        def item_category_symbol
+          :item_that_is_added_based
         end
         def is_more_backey_than_frontey
           false
         end
       end
 
-      class DefaultedBasedRoute___ < base
-        def route_category_symbol
-          :route_that_is_defaulted_based
+      class DefaultedBranchItem___ < base
+        def item_category_symbol
+          :item_that_is_defaulted_based
         end
         def is_more_backey_than_frontey
           true
         end
       end
 
-      PrimaryHashValueBasedRoute___ = Home_::ArgumentScanner::PrimaryHashValueBasedRoute
+      BranchHashEntry__ = Home_::ArgumentScanner::BranchHashEntry
 
       # ==
     end

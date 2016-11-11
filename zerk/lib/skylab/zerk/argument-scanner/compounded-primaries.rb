@@ -30,22 +30,19 @@ module Skylab::Zerk
         op_a = @_operations
         until argument_scanner.no_unparsed_exists
 
-          route = argument_scanner.match_primary_route_against h
-          if ! route
-            ok = route
+          item = argument_scanner.branch_item_via_match_primary_against h
+          if ! item
+            ok = item
             break
           end
 
-          if route.is_the_no_op_route
+          if item.is_the_no_op_branch_item
             next
           end
 
-          _d = route.value
-          _sym = route.primary_normal_symbol
-
-          _operation = op_a.fetch _d
-
-          ok = _operation.parse_primary_at_head _sym
+          _d = item.value
+          _sym = item.branch_item_normal_symbol
+          ok = op_a.fetch( _d ).syntax_front.parse_present_primary _sym
           ok || break
         end
         ok
@@ -60,8 +57,6 @@ module Skylab::Zerk
           yield options
           not_these_mutable_hash = options.not_these_mutable_hash
         end
-
-        st = op.to_primary_normal_name_stream
 
         sym = nil
 
@@ -87,12 +82,12 @@ module Skylab::Zerk
           see = see_normally
         end
 
-        begin
-          sym = st.gets
-          sym || break
+        _syntax_front = op.syntax_front
+
+        _syntax_front.GET_INTRINSIC_PRIMARY_NORMALS.each do |sym_|
+          sym = sym_
           see[]
-          redo
-        end while above
+        end
 
         if not_these_mutable_hash && not_these_mutable_hash.length.nonzero?
           self._PRIMARIES_were_expressed_that_were_not_present_in_any_operation

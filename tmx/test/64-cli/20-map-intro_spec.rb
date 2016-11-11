@@ -27,9 +27,15 @@ module Skylab::TMX::TestSupport
       end
 
       def _expect_bad_primary same
+
         invoke _subject_operation, same
+
         expect_on_stderr "unknown primary: \"#{ same }\""
-        expect "expecting { -page-by | -order | -select | -help }"
+
+        _ = '-[a-z]+(?:-[a-z]+)*'
+
+        expect %r(\Aexpecting \{ #{ _ }(?: \| #{ _ }){4,} \}\z)
+
         expect_failed_normally_
       end
     end
