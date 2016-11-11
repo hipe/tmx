@@ -74,7 +74,7 @@ module Skylab::TestSupport
         end
       end
 
-      # == mostly boilerplate below (here for clarity)
+      # == boilerplate
 
       def __normal
         _yes = @syntax_front.parse_arguments

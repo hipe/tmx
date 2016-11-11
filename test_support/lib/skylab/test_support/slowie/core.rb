@@ -527,6 +527,10 @@ module Skylab::TestSupport
 
     # -- for operations:
 
+    def MEDIATOR
+      @___mediator ||= MEDIATOR.new
+    end
+
     def globberer_by & defn
 
       # (for now we do all the work to "load" the default values even
@@ -562,6 +566,18 @@ module Skylab::TestSupport
       :argument_scanner,
       :listener,
     )
+
+    # ==
+
+    DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+      if x
+        instance_variable_set ivar, x ; ACHIEVED_
+      else
+        x
+      end
+    end
+
+    # ==
 
     # --
 
@@ -667,6 +683,26 @@ module Skylab::TestSupport
 
     # ==
 
+    class MEDIATOR
+
+      # (because so far it's orphanic, rewrote and moved here from #tombstone-A)
+
+      def receive_notification_of_intention_to_run_tests
+        self._FOR_EXAMPLE
+        ::Kernel.require 'rspec/autoloader'
+        NIL
+      end
+
+      def receive_notification_of_intention_to_require_only
+        if ! defined? ::Rspec
+          Autoloader_.require_stdlib :RSpec
+        end
+        NIL
+      end
+    end
+
+    # ==
+
     DESCRIPTION_FOR_TEST_DIRECTORY_ = -> y do
       y << "add test directory in which to search for test files"
     end
@@ -695,3 +731,4 @@ module Skylab::TestSupport
     Here_ = self
   end
 end
+# #tombstone-A: sunset orphanic, storied "relish" adapter (b. 2013-07-03)

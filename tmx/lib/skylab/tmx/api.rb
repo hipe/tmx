@@ -140,7 +140,7 @@ module Skylab::TMX
           punct_rx = /[-.?!]\z/
           p = -> line do
             if punct_rx !~ last_line
-              buffer << '.'  # DOT_
+              buffer << DOT_
             end
             last_line = line
             buffer << " #{ line }"

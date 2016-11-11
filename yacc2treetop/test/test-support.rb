@@ -127,7 +127,10 @@ module Skylab::Yacc2Treetop::TestSupport
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  _TEST_DIR = ::File.join( Home_.sidesys_path_, TestSupport_::TEST_DIR_FILENAME_ )
+  _head = Home_.sidesys_path_
+  _tail = TestSupport_::Init.test_directory_entry_name
+
+  _TEST_DIR = ::File.join _head, _tail
 
   FIXTURES_PATH = ::File.join _TEST_DIR, 'fixtures'
 

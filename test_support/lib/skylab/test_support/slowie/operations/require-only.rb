@@ -8,70 +8,111 @@ module Skylab::TestSupport
         y << "only load the test files, do not run the tests"
       end
 
-      DESCRIPTIONS = nil
+      DESCRIPTIONS = {
+        test_directory: DESCRIPTION_FOR_TEST_DIRECTORY_,
+      }
 
-      PRIMARIES = nil
+      PRIMARIES = {
+        test_directory: :__parse_test_directory,
+      }
 
-      if false
-      can :flush_the_test_files do | tr |
+      def initialize
 
-        tr.if_transition_is_effected do | o |
+        o = yield
 
-          o.on '--require-only',
-              "require() each file, but do not require 'r#{}spec/autorun'" do
+        @__mediator = o.MEDIATOR
 
-            @require_only = true
+        @_emit = o.listener
+
+        @syntax_front = Here_::Models_::HashBasedSyntax.new(
+          o.argument_scanner, PRIMARIES, self )
+
+        @test_directory_collection = o.build_test_directory_collection
+      end
+
+      attr_reader(  # for pre-execution syntax hacks
+        :test_directory_collection,
+      )
+
+      def execute
+        if __normal
+          if __resolve_test_file_stream
+            __tell_mediator_what_we_are_going_to_do
+            __do_something_to_each_file
           end
-
-          o.on '-v', '--verbose', 'output each path right before it is loaded'
-        end
-      end
-      end
-
-      def initialize( * )
-        @be_verbose = false
-        @require_only = false
-        super
-      end
-
-      def do__flush_the_test_files__
-
-        if @require_only
-          @on_event_selectively.call( :for_plugin, :adapter, :relish ).load_core_if_necessary
-            # without this, quickie tries to run the tests.
         else
-          require 'rspec/autorun'  # etc
+          UNABLE_
+        end
+      end
+
+      def __do_something_to_each_file
+
+        st = remove_instance_variable :@__test_file_stream
+
+        count = 0
+        begin
+          path = st.gets
+          path || break
+          count += 1
+
+          @_emit.call( :data, :test_file_path ) { path }
+
+          ::Kernel.load path  # no need ever to `require` instead (right?)
+
+          redo
+        end while above
+
+        @_emit.call :data, :end_of_list
+
+        @_emit.call :info, :expression, :summary do |y|
+          y << "(total files loaded: #{ count })"
         end
 
-        st = @on_event_selectively.call :for_plugin, :test_file_stream
-        st and begin
+        NOTHING_
+      end
 
-          serr = @resources.serr
-          path = nil
-          about_to_load_path = if @be_verbose
-            s = nil
-            @on_event_selectively.call :info, :expression do | _y |
-              s = em '  >>>> '
-            end
-            -> do
-              serr.puts "#{ s }#{ path }"
-            end
-          else
-            -> do
-              serr.write DOT_
-            end
+      def __tell_mediator_what_we_are_going_to_do
+
+        _mediator = remove_instance_variable :@__mediator
+        if true
+          _mediator.receive_notification_of_intention_to_require_only
+        else
+          _mediator.receive_notification_of_intention_to_run_tests
+        end
+        NIL
+      end
+
+      def __resolve_test_file_stream
+
+        globber_st = @test_directory_collection.to_globber_stream
+        if globber_st
+          @__test_file_stream = globber_st.expand_by do |globber|
+            globber.to_path_stream
           end
-
-          begin
-            path = st.gets
-            path or break
-            about_to_load_path[]
-            require path
-            redo
-          end while nil
-
-          ACHIEVED_  # (was historically marked with what is now [#dt-002])
+          ACHIEVED_
         end
+      end
+
+      # == boilerplate
+
+      def __normal
+        _yes = @syntax_front.parse_arguments
+        _yes &&= @test_directory_collection.check_for_missing_requireds
+        _yes  # #todo
+      end
+
+      # [#tmx-006] and friends
+
+      attr_reader(
+        :syntax_front,
+      )
+
+      def parse_present_primary_for_syntax_front_via_branch_hash_value m
+        send m
+      end
+
+      def __parse_test_directory
+        @test_directory_collection.parse_test_directory
       end
     end
   end

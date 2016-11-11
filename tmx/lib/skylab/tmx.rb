@@ -189,6 +189,7 @@ module Skylab::TMX
   ACHIEVED_ = true
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
+  DOT_ = '.'
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self

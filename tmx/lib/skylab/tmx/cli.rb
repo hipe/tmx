@@ -208,7 +208,7 @@ module Skylab::TMX
       # ~ emissions
 
       def __express_current_find_command
-        @__emission_expression._express_normally_
+        @_current_emission_expression._express_normally_
         NIL
       end
 
@@ -318,6 +318,24 @@ module Skylab::TMX
         Add_slice_primary_[ 0, as, self ]
 
         as
+      end
+
+      # -- support for customizing emissions
+
+      def on_this_do_this k, & p  # k = terminal_channel_symbol
+
+        @_emission_handler_methods_[ k ] = :__on_this_do_this
+        ( @__on_this_do_this ||= {} )[ k ] = p
+
+        NIL
+      end
+
+      def __on_this_do_this
+
+        _k = @_current_emission_expression.channel_symbol_array.last
+        _p = @__on_this_do_this.fetch _k
+        _p[ remove_instance_variable( :@_current_emission_expression ) ]  # ..
+        NIL
       end
 
       # -- support for expressing results (our version of [#ze-025])
@@ -512,9 +530,9 @@ module Skylab::TMX
         expsr = nil  # only build it once an emission is received
         @listener = -> * sym_a, & em_p do
           expsr ||= HardcodedEmissionExpresserForNow___.new self
-          eh = expsr.dup
-          @__emission_expression = eh
-          eh.invoke em_p, sym_a
+          ee = expsr.dup
+          @_current_emission_expression = ee
+          ee.invoke em_p, sym_a
         end
         NIL
       end
@@ -790,7 +808,7 @@ module Skylab::TMX
       # resources.)
 
       def initialize client
-        @_ = client
+        @CLI = client
         @_info_yielder = client.method :line_yielder_for_info
         @__emission_handler_methods = client._emission_handler_methods_ || MONADIC_EMPTINESS_
       end
@@ -800,7 +818,7 @@ module Skylab::TMX
         @emission_proc = em_p
         m = @__emission_handler_methods[ @channel_symbol_array.last ]
         if m
-          @_.send m  # no args - client should have an ivar holding self
+          @CLI.send m  # no args - client should have an ivar holding self
         else
           _express_normally_
         end
@@ -819,30 +837,35 @@ module Skylab::TMX
 
       def __express_event
         _ev = @emission_proc.call
-        _ev.express_into_under @_info_yielder[], @_.expression_agent
+        _ev.express_into_under @_info_yielder[], @CLI.expression_agent
         _maybe_invite
         NIL
       end
 
       def __express_expression
-        @_.expression_agent.calculate @_info_yielder[], & @emission_proc
+        @CLI.expression_agent.calculate @_info_yielder[], & @emission_proc
         _maybe_invite
         NIL
       end
 
       def _maybe_invite
         if :parse_error == @channel_symbol_array[2]
-          @_.invite_to_general_help  # ..
+          @CLI.invite_to_general_help  # ..
         elsif :error == @channel_symbol_array[0]
-          @_.exitstatus = FAILURE_EXITSTATUS__
+          @CLI.exitstatus = FAILURE_EXITSTATUS__
         end
         NIL
       end
 
       def __send_data
-        @_.receive_data_emission @emission_proc, @channel_symbol_array
+        @CLI.receive_data_emission @emission_proc, @channel_symbol_array
         NIL
       end
+
+      attr_reader(
+        :channel_symbol_array,
+        :emission_proc,
+      )
     end
 
     # ==

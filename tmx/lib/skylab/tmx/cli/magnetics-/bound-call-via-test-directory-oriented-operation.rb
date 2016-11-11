@@ -171,12 +171,67 @@ module Skylab::TMX
 
       # ==
 
+      show_the_find_commands = [
+        -> y do
+          y << "show the find commands used"
+        end,
+        -> cli do
+          cli.receive_notification_that_you_should_express_find_commands
+        end,
+      ]
+
       VERBOSITIES___ = {
 
         # (operations are high-level to low-level.)
         # (verbosity increments are sequential (1, 2, etc))
 
+        require_only: -> v do
+
+          cli = v.CLI
+          serr = cli.serr
+          stabby = '  >>>> '
+
+          # - (at zero)
+
+            cli.on_this_do_this :test_file_path do
+              serr.write DOT_
+              NIL
+            end
+
+            cli.on_this_do_this :end_of_list do
+              serr.puts
+              NIL
+            end
+
+          # -
+
+          v.add_one(
+
+            -> y do
+              y << "emit every file just before it is loaded"
+            end,
+
+            -> _ do
+
+              cli.on_this_do_this :test_file_path do |ee|
+                serr.write stabby
+                serr.puts ee.emission_proc.call
+                NIL
+              end
+
+              cli.on_this_do_this :end_of_list do
+                NOTHING_  # but absorb the emission so it doesn't propagate
+              end
+
+              ACHIEVED_
+            end,
+          )
+
+          v.add_one( * show_the_find_commands )
+        end,
+
         counts: -> v do
+
           v.add_one(
             -> y do
               y << "add table column for \"lipstick\" visualization"
@@ -185,25 +240,13 @@ module Skylab::TMX
               cli.receive_notification_that_you_should_add_lipstick_column
             end,
           )
-          v.add_one(
-            -> y do
-              y << "show the find commands used"
-            end,
-            -> cli do
-              cli.receive_notification_that_you_should_express_find_commands
-            end,
-          )
+
+          v.add_one( * show_the_find_commands )
         end,
 
         list_files: -> v do
-          v.add_one(
-            -> y do
-              y << "show the find commands used"
-            end,
-            -> cli do
-              cli.receive_notification_that_you_should_express_find_commands
-            end,
-          )
+
+          v.add_one( * show_the_find_commands )
         end,
       }
 
@@ -299,6 +342,7 @@ module Skylab::TMX
         end
 
         attr_reader(
+          :CLI,
           :on_help,
           :on_primary,
         )
@@ -306,8 +350,6 @@ module Skylab::TMX
 
       SECOND_TO_LAST_POSITION_ = -2  # (a popular location for
       # for items - we usually want to leave -help at the end.)
-
-      # ==
     end
   end
 end
