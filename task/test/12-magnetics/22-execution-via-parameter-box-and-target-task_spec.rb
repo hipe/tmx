@@ -86,7 +86,8 @@ module Skylab::Task::TestSupport  # [#ts-010]
       context "with no parameters and without handler" do
 
         shared_subject :state_ do
-          build_exception_throwing_state_
+
+          build_exception_throwing_state_() { ::Skylab::Fields::MissingRequiredAttributes }
         end
 
         def handler_

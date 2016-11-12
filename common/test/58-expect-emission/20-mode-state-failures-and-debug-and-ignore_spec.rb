@@ -2,11 +2,11 @@ require_relative '../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] expect event - (2) mode state failure, debug, ignore" do
+  describe "[co] expect emission - mode state failures, debug, ignore" do
 
     TS_[ self ]
-    use :expect_event_meta
-    use :expect_event
+    use :expect_emission_meta
+    use :expect_emission
 
     it "mode-state failure - you can't set an option after the first emission" do
 
@@ -53,7 +53,7 @@ module Skylab::Common::TestSupport
         _this_same_ignoration_test
       end
 
-      attr_reader :ignore_for_expect_event  # 1 of 2
+      attr_reader :ignore_for_expect_emission  # 1 of 2
     end
 
     context "when `do_debug` is on" do
@@ -115,7 +115,7 @@ module Skylab::Common::TestSupport
           io.gets and fail
         end
 
-        attr_reader :ignore_for_expect_event  # 2 of 2
+        attr_reader :ignore_for_expect_emission  # 2 of 2
       end
     end
 
@@ -123,7 +123,7 @@ module Skylab::Common::TestSupport
 
     define_method :_this_same_ignoration_test do
 
-      @ignore_for_expect_event = _IGNORE_ZIZZO
+      @ignore_for_expect_emission = _IGNORE_ZIZZO
 
       send_potential_event_ :zizzo do
         self._NEVER

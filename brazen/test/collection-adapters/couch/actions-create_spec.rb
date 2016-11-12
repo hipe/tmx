@@ -10,18 +10,22 @@ module Skylab::Brazen::TestSupport
     it "with no name: mersing required attr: argument error" do
 
       _rx = /\bmissing required attributes 'workspace-path' and 'name'/
+
       begin
         call_API :collection, :couch, :create
-      rescue ::ArgumentError => e
+      rescue Home_::Field_::MissingRequiredAttributes => e
       end
+
       e.message.should match _rx
     end
 
     it "with no workspace path: mersing required attr: argument error" do
+
       begin
         call_API :collection, :couch, :create, :name, 'zeep'
-      rescue ::ArgumentError => e
+      rescue Home_::Field_::MissingRequiredAttributes => e
       end
+
       e.message.should match %r(\bmissing required attribute 'workspace-path')
     end
 

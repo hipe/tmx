@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] expect event - (1) legacy stream-based interface" do
+  describe "[co] expect emission - legacy stream-based interface" do
 
     # NOTE - reading tests that test libraries intended to be used for tests
     # is always confusing, but fortunately our naming conventions help
@@ -23,8 +23,8 @@ module Skylab::Common::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event_meta
-    use :expect_event
+    use :expect_emission_meta
+    use :expect_emission
 
     def _expev_fail msg  # "trap" these ("crude") kinds of failures  BE CAREFUL
 

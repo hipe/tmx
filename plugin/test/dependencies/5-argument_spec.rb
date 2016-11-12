@@ -159,7 +159,7 @@ module Skylab::Plugin::TestSupport
 
         begin
           o.process_polymorphic_stream_fully st
-        rescue ::ArgumentError => e
+        rescue ::Skylab::Fields::ArgumentError => e
         end
 
         e.message.should eql "unrecognized attribute 'howzaa'"

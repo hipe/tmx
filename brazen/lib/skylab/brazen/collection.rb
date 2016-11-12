@@ -310,12 +310,15 @@ module Skylab::Brazen
 
           d = @levenshtein_number
           if d
+
             _Lev = Home_.lib_.human::Levenshtein
+
             a = _Lev.with(
-              :item, kn.value_x,
+              :item_string, kn.value_x,
               :items, did_you_mean_s_a,
               :closest_N_items, d,
             )
+
             if a && a.length.nonzero?
               did_you_mean_s_a = a
             end

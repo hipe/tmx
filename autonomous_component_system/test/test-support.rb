@@ -72,7 +72,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       [ "{}\n" ]
     end
 
-    def state_for_expect_event
+    def state_for_expect_emission
       root_ACS_state
     end
 

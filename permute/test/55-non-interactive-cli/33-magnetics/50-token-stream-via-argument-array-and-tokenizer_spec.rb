@@ -147,7 +147,7 @@ module Skylab::Permute::TestSupport
       TS_::X_nicli_mags_tsvaaats = ::Struct.new :_argv, :result, :emission_array
     end
 
-    def state_for_expect_event
+    def state_for_expect_emission
       _this
     end
   end

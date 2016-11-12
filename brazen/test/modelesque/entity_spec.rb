@@ -149,7 +149,7 @@ module Skylab::Brazen::TestSupport
           _subject_class.new do
             process_and_normalize_for_test_ :bif, :x, :baz, :y
           end
-        rescue ::ArgumentError => e
+        rescue Home_::Field_::MissingRequiredAttributes => e
         end
 
         e.message.should eql "missing required attributes 'foo' and 'bar'"

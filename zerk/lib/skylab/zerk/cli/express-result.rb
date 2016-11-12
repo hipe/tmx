@@ -79,7 +79,7 @@ module Skylab::Zerk
       def __special_thing_for_stream_of_structs st  # result in stream
 
         @shape = :stringish
-        o = Here_::TuplePager.begin
+        o = Home_::NonInteractiveCLI::TuplePager.begin
         o.first_tuple = @x
         o.tuple_stream = st
 
@@ -135,7 +135,7 @@ module Skylab::Zerk
 
       def __custom_effection_or_bust x
 
-        found = Here_::Custom_Effection___::Find.call x, @CLI
+        found = Home_::NonInteractiveCLI::Custom_Effection___::Find.call x, @CLI
 
         if found.ok
           @_do_set_exitstatus = false

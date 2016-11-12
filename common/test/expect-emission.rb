@@ -25,7 +25,7 @@ module Skylab::Common::TestSupport
       end
     end  # >>
 
-    IGNORE_METHOD__ = :ignore_for_expect_event
+    IGNORE_METHOD__ = :ignore_for_expect_emission
 
     OPTS___ = {
 
@@ -417,7 +417,7 @@ module Skylab::Common::TestSupport
       # -- the newschool ways (matcher-based) (frontiered by [ze] for now..)
 
       def fails
-        _state = state_for_expect_event
+        _state = state_for_expect_emission
         expect_failure_value _state.result
       end
 
@@ -426,7 +426,7 @@ module Skylab::Common::TestSupport
       end
 
       def result_is_nothing
-        state = state_for_expect_event
+        state = state_for_expect_emission
         state.result.nil? || fail( "needed nil had #{ String_via_mixed__[ state.result ] }" )
       end
 
@@ -465,7 +465,7 @@ module Skylab::Common::TestSupport
       end
 
       def emission_array
-        state_for_expect_event.emission_array
+        state_for_expect_emission.emission_array
       end
 
       def be_emission_beginning_with * x_a, & x_p
@@ -1330,9 +1330,9 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    BLACK_AND_WHITE_EXPEV_METHOD__ = :black_and_white_expression_agent_for_expect_event
+    BLACK_AND_WHITE_EXPEV_METHOD__ = :black_and_white_expression_agent_for_expect_emission
     DEBUGGING_EXPEV_METHOD__ = :expect_event_debugging_expression_agent
-    EXPEV_METHOD__ = :expression_agent_for_expect_event
+    EXPEV_METHOD__ = :expression_agent_for_expect_emission
     UNRELIABLE_ = :_unreliable_from_expect_event_
   end
 end

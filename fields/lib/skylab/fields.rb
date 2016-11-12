@@ -631,7 +631,9 @@ module Skylab::Fields
 
   # --
 
-  MissingRequiredAttributes = ::Class.new ::ArgumentError
+  ArgumentError = ::Class.new ::ArgumentError
+
+  MissingRequiredAttributes = ::Class.new ArgumentError
 
   # --
 

@@ -55,7 +55,7 @@ module Skylab::Plugin::TestSupport
           Subject_[ self ]
           delegate :to_method, :bar, %i( frik frak )
         end
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
       e.message.should match _rx
     end

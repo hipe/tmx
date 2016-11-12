@@ -54,7 +54,9 @@ module Skylab::TanMan
 
         @k = k
 
-        _st = Common_::Stream.ordered __to_definition_stream
+        _st_ = __to_definition_stream
+
+        _st = Brazen_::Ordered_stream_via_participating_stream[ _st_ ]
 
         @definition_collection =
           _st.flush_to_immutable_with_random_access_keyed_to_method(

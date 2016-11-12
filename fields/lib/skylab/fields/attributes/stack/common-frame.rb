@@ -413,7 +413,7 @@ module Skylab::Fields
             def [] prp
               Edit_property_common__[ prp ]
               if prp.is_memoized
-                raise ::ArgumentError, __say_no_memo_meth
+                raise Home_::ArgumentError, __say_no_memo_meth
               else
                 write_external_read_proc prp
                 ACHIEVED_
@@ -588,6 +588,7 @@ module Skylab::Fields
           Common_::Event.inline_not_OK_with(
 
             :missing_required_properties,
+            :exception_class_by, -> { Home_::ArgumentError },
             :error_category, :argument_error,
             :miss_a, miss_prp_a
 

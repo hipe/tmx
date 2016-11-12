@@ -72,7 +72,7 @@ module Skylab::Plugin
           _touch_instance d
         end
       else
-        raise ::ArgumentError, _say_strange_role( sym )
+        raise Home_::ArgumentError, _say_strange_role( sym )
       end
     end
 
@@ -88,7 +88,7 @@ module Skylab::Plugin
         end
         NIL_
       else
-        raise ::ArgumentError, _say_strange_channel( sym )
+        raise Home_::ArgumentError, _say_strange_channel( sym )
       end
     end
 
@@ -276,7 +276,7 @@ module Skylab::Plugin
       if offset
         offset
       else
-        raise ::ArgumentError, self._TODO_say_not_and_owned_dependency( impl_ )
+        raise Home_::ArgumentError, self._TODO_say_not_and_owned_dependency( impl_ )
       end
     end
 
@@ -296,7 +296,7 @@ module Skylab::Plugin
       o = Role_Edit_Session___.new
 
       o.when_collision = -> d_, d, sym do
-        raise ::ArgumentError, __say_role_collision( d_, d, sym )
+        raise Home_::ArgumentError, __say_role_collision( d_, d, sym )
       end
 
       o.when_init = -> d_, d, sym do
@@ -305,7 +305,7 @@ module Skylab::Plugin
       end
 
       o.when_strange_role = -> sym do
-        raise ::ArgumentError, _say_strange_role( sym )
+        raise Home_::ArgumentError, _say_strange_role( sym )
       end
 
       o.when_write = -> d_, sym do
@@ -358,7 +358,7 @@ module Skylab::Plugin
         if had
           a
         else
-          raise ::ArgumentError, _say_strange_channel( sym )
+          raise Home_::ArgumentError, _say_strange_channel( sym )
         end
       end
       pxy

@@ -493,7 +493,7 @@ module Skylab::Brazen
         end while nil
 
         if ! did
-          raise ::ArgumentError, "unrecognized property '#{ st.current_token }'"
+          raise Home_::ArgumentError, "unrecognized property '#{ st.current_token }'"
         end
         kp
       end
@@ -521,7 +521,7 @@ module Skylab::Brazen
           @_expected_suffix = s
           KEEP_PARSING_
         else
-          raise ::ArgumentError, _say_expected_value_for_here
+          raise Home_::ArgumentError, _say_expected_value_for_here
         end
       end
 
@@ -719,7 +719,7 @@ module Skylab::Brazen
       def _exit
 
         if @_floating
-          raise ::ArgumentError, __say_floating
+          raise Home_::ArgumentError, __say_floating
         end
 
         NIL_

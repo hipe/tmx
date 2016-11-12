@@ -24,7 +24,7 @@ module Skylab::Basic
             if p
               p[ @x, @mo_, @x_ ]
             else
-              raise ::ArgumentError, say_does_not_merge
+              raise Home_::ArgumentError, say_does_not_merge
             end
           end
 
@@ -112,9 +112,9 @@ module Skylab::Basic
                case mo.shape_i
                when :nil  ; x
                when :bool ; x == y or
-                 raise ::ArgumentError, say_merge_conflict[ "boolean #{ y }", x ]
+                 raise Home_::ArgumentError, say_merge_conflict[ "boolean #{ y }", x ]
                else
-                 raise ::ArgumentError, say_merge_conflict[ mo.shape_i, 'bool' ]
+                 raise Home_::ArgumentError, say_merge_conflict[ mo.shape_i, 'bool' ]
                end
              end,
              :dupe, IDENTITY_ ]

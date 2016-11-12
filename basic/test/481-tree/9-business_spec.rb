@@ -26,7 +26,7 @@ module Skylab::Basic::TestSupport
         cls = _class
         begin
           cls.new :one, :two
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
         e.message.should match %r(\bwrong number.+\(2 for 1\))
       end

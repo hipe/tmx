@@ -106,7 +106,7 @@ module Skylab::Brazen::TestSupport
       em.category.should eql [ :info, :summary ]
       ev = em.emission_value_proc.call
 
-      ev.express_into_under y=[], black_and_white_expression_agent_for_expect_event
+      ev.express_into_under y=[], black_and_white_expression_agent_for_expect_emission
       scn = Home_::Common_::Stream.via_nonsparse_array y
       scn.gets.should match %r(\Asummary of «.+#{ ::Regexp.escape cfg_filename }»:\z)
       scn.gets.should match %r(\A[^[:alnum:]]*2 poet or authors\z)

@@ -42,7 +42,7 @@ module Skylab::Basic::TestSupport
       _rx = /'list' doesn't `merge_atomic`/
       begin
         _subject.merge_atomic [], 1
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
       e.message.should match _rx
     end
@@ -52,7 +52,7 @@ module Skylab::Basic::TestSupport
       _rx = /won't merge an int into a bo/
       begin
         _subject.merge_atomic true, 1
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
       e.message.should match _rx
     end

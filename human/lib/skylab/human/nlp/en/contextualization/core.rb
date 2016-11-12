@@ -69,6 +69,7 @@ module Skylab::Human
     WRITE_ONLY_BY_USER_AND_READ_ONLY_BY_FUNCTIONS__ = [
       :downstream_selective_listener_proc,
       :emission_proc,
+      :exception_class,  # [ac]
       :expression_agent,
       :idiom_for_failure,  # [dt]
       :idiom_for_neutrality,  # [ba]
@@ -136,10 +137,13 @@ module Skylab::Human
       NIL_
     end
 
-    def to_exception  # assume e.g `given_emission` was called
+    def to_exception
+
+      # assume e.g `given_emission` was called
       # probably the last solution for #[#ca-066] emission-to-exception pattern
 
       # (we would push this up higher but it hasn't been needed yet)
+
       if ! _magnetic_value_is_known_ :expression_agent
         @expression_agent = Home_.lib_.brazen::API.expression_agent_instance
       end

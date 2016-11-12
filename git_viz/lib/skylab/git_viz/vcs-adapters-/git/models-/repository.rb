@@ -96,7 +96,7 @@ module Skylab::GitViz
 
             __money
           else
-            raise ::ArgumentError, __say
+            raise Home_::ArgumentError, __say
           end
         end
 

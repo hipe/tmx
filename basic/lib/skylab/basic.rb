@@ -234,6 +234,8 @@ module Skylab::Basic  # introduction at [#020]
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  ArgumentError = ::Class.new ::ArgumentError
+
   ACHIEVED_ = true
   CLI = nil  # for host
   CONST_SEP_ = '::'.freeze

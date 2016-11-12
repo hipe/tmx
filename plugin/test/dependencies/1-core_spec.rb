@@ -25,7 +25,7 @@ module Skylab::Plugin::TestSupport
 
         begin
           o.index_dependency cls
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message.should eql(
@@ -57,7 +57,7 @@ module Skylab::Plugin::TestSupport
         mod = De2
         begin
           o.index_dependencies_in_module mod
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message.should match (
@@ -79,14 +79,15 @@ module Skylab::Plugin::TestSupport
       it "whine about strange subscription" do
 
         o = subject_class_.new
-        o.emits = [ :sai, :sei, :soi, :sui ]
+        o.emits = [ :sai, :sei, :soi, :ziff, :sui ]
         mod = De3
         begin
           o.index_dependency mod
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
+
         e.message.should eql(
-          "emission channel 'szoi' not found - did you mean soi or sai or sei?" )
+          "emission channel 'szoi' not found - did you mean soi or sai or sei or sui?" )
       end
     end
 
@@ -131,7 +132,7 @@ module Skylab::Plugin::TestSupport
 
         begin
           _o[ :fungs ]
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
         e.message.should eql(
           "role 'fungs' not found - did you mean lungs or heart?" )

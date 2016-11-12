@@ -25,7 +25,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             class MPE_EOI
               MPE_Extmod[ self, :aruty, :whatever ]
             end
-          rescue ::ArgumentError => e
+          rescue Home_::ArgumentError => e
           end
 
           e.message.should _be_same
@@ -38,7 +38,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
                 o :aruty, :whatever
               end
             end
-          rescue ::ArgumentError => e
+          rescue Home_::ArgumentError => e
           end
 
           e.message.should _be_same

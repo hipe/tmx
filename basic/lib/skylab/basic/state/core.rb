@@ -144,10 +144,12 @@ module Skylab::Basic
       end
 
       def entered_by_regex=
-        _RX = gets_one_polymorphic_value
-        _accept_entered_by do | st |
 
-          if st.unparsed_exists
+        _RX = gets_one_polymorphic_value
+
+        _accept_entered_by do |st|
+
+          unless st.no_unparsed_exists
 
             md = _RX.match st.current_token
             if md
@@ -455,11 +457,11 @@ module Skylab::Basic
 
       def _build_no_available_transition sta_a
 
-        if @upstream.unparsed_exists
+        if @upstream.no_unparsed_exists
+          had_more = false
+        else
           had_more = true
           x = @upstream.current_token
-        else
-          had_more = false
         end
 
         Here_::Events_::No_Available_State_Transition.new_with(

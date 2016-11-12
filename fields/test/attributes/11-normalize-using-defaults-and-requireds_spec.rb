@@ -34,7 +34,7 @@ module Skylab::Fields::TestSupport
           o = _guy.new
           begin
             _subject[ o ]
-          rescue ::ArgumentError => e
+          rescue Home_::ArgumentError => e
           end
 
           e.message.should eql _msg

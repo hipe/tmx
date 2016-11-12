@@ -179,7 +179,7 @@ module Skylab::Basic
         end
 
         def when_missing i_a
-          ::Kernel.raise ::ArgumentError, say_missing( i_a )
+          ::Kernel.raise Home_::ArgumentError, say_missing( i_a )
         end
 
         def say_missing i_a

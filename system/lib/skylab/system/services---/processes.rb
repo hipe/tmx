@@ -156,7 +156,7 @@ module Skylab::System
 
       def __send_and_receive
 
-        $stderr.puts "CMD: #{ @_command.join SPACE_ }"
+        # $stderr.puts "CMD: #{ @_command.join SPACE_ }"
 
         _i, @_o, @_e, @_w = @_mama.popen3( * @_command )
 

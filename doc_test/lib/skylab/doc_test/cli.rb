@@ -166,9 +166,9 @@ module Skylab::DocTest
 
         x = op.execute
         if x.respond_to? :gets
-          $stderr.puts "(looks ok in CLI client)"  # #todo
+          # $stderr.puts "(looks ok in CLI client)"  # #todo
         else
-          $stderr.puts "(something funny in CLI client)"  # #todo
+          # $stderr.puts "(something funny in CLI client)"  # #todo
           x = NIL  # CLI should output nothing, not "no"
         end
         x

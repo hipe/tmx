@@ -52,7 +52,13 @@
              ( #was: #done borked quickie architecture near constants )k
 
 [#027] #hole ( #moved-to: [#dt-XXX] )
-[#026] #hole ( #moved-to: [#dt-XXX] )
+
+[#025] #wish consider using plain old glob instead of find, compare viability,
+             performance. replace if better, or make adapters out of them.
+             (for the thing that finds test files)
+
+             ( #was:  #moved-to: [#dt-XXX] )
+
 [#025]       slowie..
              ( #moved-to: [#dt-XXX] )
 

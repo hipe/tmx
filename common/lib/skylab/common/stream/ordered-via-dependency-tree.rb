@@ -21,6 +21,7 @@ module Skylab::Common
     end  # >>
 
     def initialize
+      NOTHING_  # hi.
     end
 
     def execute_against item_stream

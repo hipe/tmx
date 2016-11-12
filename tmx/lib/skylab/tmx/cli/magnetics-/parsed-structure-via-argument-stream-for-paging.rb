@@ -89,16 +89,25 @@ module Skylab::TMX
 
       def __do_parse_denominator s
 
-        en_denom_rx = /\A(?:
-          (half)|(third)|(quarter)|(fifth)|(sixth)|(seventh)|(eighth)  # etc
-        )\z/x
+        # BE CAREFUL
 
-        _LOOK = 7  # #NOTE corresponds to how many above
+        x = '(?:th|nd)'
+        en_denom_rx = /\A(?:
+          (half)             |     (third)           |       (quarter)       |
+          ( 6#{x} | sixth )  |   ( 8#{x} | eighth )  |   ( 10#{x} | tenth )  |
+          ( 16#{x} | sixteenth )         |       ( 32#{x} | thirty-second )
+        )\z/x
 
         md = en_denom_rx.match s
 
         if md
-          __receive_denominator ( 1 .. _LOOK ).detect { |d| md[ d ] } + 1
+          _d = ( 1..8 ).detect { |d| md[ d ] }
+          _denom = case _d
+          when 1 ; 2 ; when 2 ; 3 ; when 3 ; 4
+          when 4 ; 6 ; when 5 ; 8 ; when 6 ; 10
+          when 7 ; 16         ; when 8 ; 32
+          end
+          __receive_denominator _denom
         else
           __whine_about_denominator s, en_denom_rx
         end

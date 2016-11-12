@@ -162,6 +162,11 @@ module Skylab::TMX
           o.listener @listener
         end
 
+        arg_scn.on_first_branch_item_not_found do
+          arg_scn.insert_at_head :require_only, :but_actually_run
+          NIL
+        end
+
         _lib = Home_.lib_.test_support::Slowie
 
         api = _lib::API.begin_invocation_by arg_scn do |o|
@@ -593,6 +598,10 @@ module Skylab::TMX
         @___line_yielder_for_info ||= Build_info_yielder___[ @serr ]
       end
 
+      def rewrite_ARGV * s_a
+        @argv.replace s_a ; nil
+      end
+
       attr_writer(
         :exitstatus,
       )
@@ -995,3 +1004,4 @@ module Skylab::TMX
     # ==
   end  # end new CLI class
 end
+# #tombstone: orphan test-all executable binary (meta-tombtone: orig GREENLIST)

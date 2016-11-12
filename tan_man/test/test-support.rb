@@ -159,7 +159,7 @@ module Skylab::TanMan::TestSupport
       event_log.handle_event_selectively
     end
 
-    def black_and_white_expression_agent_for_expect_event
+    def black_and_white_expression_agent_for_expect_emission
       Home_::API::expression_agent_instance
     end
 

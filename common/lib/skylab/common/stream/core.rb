@@ -14,25 +14,6 @@ module Skylab::Common
         Stream_::As_::Mutable_with_Random_Access
       end
 
-      def ordered st
-        self._README_no_problem
-        # at the time of this commit the API for this facility changed and
-        # we did not integrate it universally at that same time for reasons.
-        # whenever you see this error probably means it is time to integrate.
-        # look at the spec that is added with #this-commit (but use it in its
-        # state that is current with when you read this) to add something
-        # like the below *closer to the client where it is used* (probably [br]):
-        #
-        #     My_thing = Lazy_.call do
-        #       ThingDing.prototype_by do |o|
-        #         o.identifying_key_by = :name_value_for_order.to_proc
-        #         o.reference_key_by = :after_name_value_for_order.to_proc
-        #       end
-        #     end
-        #     # ..
-        #     My_thing[].execute_against upstream  # => result stream
-      end
-
       def via_item x, & p
         p_ = -> do
           p_ = EMPTY_P_

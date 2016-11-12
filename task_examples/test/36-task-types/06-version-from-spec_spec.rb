@@ -245,7 +245,7 @@ module Skylab::TaskExamples::TestSupport
       info_expression_message_.should eql "version ok: #{ s }"
     end
 
-    def expression_agent_for_expect_event
+    def expression_agent_for_expect_emission
       common_expression_agent_for_expect_event_
     end
   end

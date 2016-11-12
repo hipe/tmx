@@ -67,7 +67,7 @@ module Skylab::Basic::TestSupport
 
         begin
           _class.new zerpie: :herpie
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message =~ _rx || fail

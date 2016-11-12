@@ -43,7 +43,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       end
     end
 
-    def expression_agent_for_expect_event
+    def expression_agent_for_expect_emission
       codifying_expag_
     end
 

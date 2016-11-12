@@ -80,7 +80,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
           end
         end
-      rescue ::ArgumentError => e
+      rescue Home_::Field_::ArgumentError => e
       end
 
       e.message.should match _rx

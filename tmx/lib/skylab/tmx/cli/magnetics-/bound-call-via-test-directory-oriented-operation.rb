@@ -200,6 +200,7 @@ module Skylab::TMX
 
             cli.on_this_do_this :end_of_list do
               serr.puts
+              cli.rewrite_ARGV '--format', 'progress'  # dots
               NIL
             end
 
@@ -220,6 +221,7 @@ module Skylab::TMX
               end
 
               cli.on_this_do_this :end_of_list do
+                cli.rewrite_ARGV '--format', 'documentation'
                 NOTHING_  # but absorb the emission so it doesn't propagate
               end
 

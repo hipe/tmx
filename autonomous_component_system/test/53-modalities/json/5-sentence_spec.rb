@@ -44,7 +44,7 @@ module Skylab::Autonomous_Component_System::TestSupport
           em = only_emission
           em.is_expression || fail
 
-          _expag = expression_agent_for_expect_event
+          _expag = expression_agent_for_expect_emission
           _lines = _expag.calculate [], & em.expression_proc
 
           [ _lines, em ]
@@ -143,7 +143,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       o
     end
 
-    def expression_agent_for_expect_event
+    def expression_agent_for_expect_emission
       clean_expag_
     end
 

@@ -46,7 +46,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
         begin
           Foo_Iamb.with :wiz
-        rescue ::ArgumentError => e
+        rescue Home_::Field_::ArgumentError => e
         end
 
         e.message.should _be_this_msg
@@ -65,7 +65,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         class FooI_Pity
           Subject_[][ self, :VAG_rounded ]
         end
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message.should _be_this_msg
@@ -77,7 +77,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         class FooI_PityVal
           Subject_[][ self, :polymorphic_writer_method_name_suffix ]
         end
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message.should match %r(\bexpecting a value for 'polymorphic_)

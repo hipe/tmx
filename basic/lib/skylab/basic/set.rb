@@ -41,21 +41,37 @@ module Skylab::Basic
     end
 
     With_members__ = -> x do
-      module_exec x, & (
-        if x.respond_to? :each_with_index then With_members_as_a__
-        elsif x.respond_to? :call then With_members_as_p__
-        else raise ::ArgumentError,
-          "member set? #{ Home_::String.via_mixed x }" end ) ; nil
+
+      _p = if x.respond_to? :each_with_index
+        With_members_as_a__
+      elsif x.respond_to? :call
+        With_members_as_p__
+      end
+
+      if _p
+        module_exec x, & _p
+      else
+        _msg = "member set? #{ Home_::String.via_mixed x }"
+        raise Home_::ArgumentError, _msg
+      end
+      NIL
     end
+
     With_members_as_a__ = -> a do
-      a.frozen? or raise ::ArgumentError, "when providing an array to #{
-        }use as the member list, it must be frozen"
+
+      if ! a.frozen?
+        raise Home_::ArgumentError, "when providing an array to #{
+          }use as the member list, it must be frozen"
+      end
+
       p = -> do
         set = Home_.lib_.set( a ).freeze
         p = -> { set } ; set
       end
+
       define_method :basic_set_member_set do p[] end
     end
+
     With_members_as_p__ = -> p do
       define_method :basic_set_member_set do
         self.class.basic_set_member_set_from_p do
@@ -95,7 +111,7 @@ module Skylab::Basic
           end
         else
           -> ev do
-            raise ::ArgumentError, ev.string
+            raise Home_::ArgumentError, ev.string
           end
         end
       end

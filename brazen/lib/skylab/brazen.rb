@@ -79,6 +79,26 @@ module Skylab::Brazen
     end
   end  # >>
 
+  # --
+
+  Lazy_ = Common_::Lazy
+
+  Ordered_stream_via_participating_stream = -> do  # 1x here, 1x [tm]
+
+    prototype = Lazy_.call do
+      Common_::Stream::Ordered_via_DependencyTree.prototype_by do |o|
+        o.identifying_key_by = :name_value_for_order.to_proc
+        o.reference_key_by = :after_name_value_for_order.to_proc
+      end
+    end
+
+    -> st do
+      prototype[].execute_against st
+    end
+  end.call
+
+  # --
+
   PPSF_METHOD_ = -> st, & x_p do  # "process polymorphic stream fully"
 
     kp = process_polymorphic_stream_passively st, & x_p
@@ -177,8 +197,6 @@ module Skylab::Brazen
 
   # ==
 
-  Lazy_ = Common_::Lazy
-
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
@@ -199,6 +217,10 @@ module Skylab::Brazen
     Field_ = Home_.lib_.fields
     NIL_
   end
+
+  # ==
+
+  ArgumentError = ::Class.new ::ArgumentError
 
   # ==
 

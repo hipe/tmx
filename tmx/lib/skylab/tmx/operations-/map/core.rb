@@ -345,13 +345,16 @@ module Skylab::TMX
 
       def __parse_formal_attribute_normally
 
-        _k = @argument_scanner.head_as_normal_symbol
-
-        attr = lookup_attribute_via_normal_symbol_ _k
-        if attr
-          @argument_scanner.advance_one
+        sym = @argument_scanner.head_as_normal_symbol
+        if sym
+          attr = lookup_attribute_via_normal_symbol_ sym
+          if attr
+            @argument_scanner.advance_one
+          end
+          attr
+        else
+          sym
         end
-        attr
       end
 
       def lookup_attribute_via_normal_symbol_ k

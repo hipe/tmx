@@ -177,7 +177,7 @@ module Skylab::Human
     end
 
     def _build_candidate
-      Candidate__.new( @_distance, @_item_x )
+      Candidate__.new @_distance, @_item_x
     end
 
     def __no_op

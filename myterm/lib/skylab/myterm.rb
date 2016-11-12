@@ -133,6 +133,10 @@ module Skylab::MyTerm
     NIL_
   end
 
+  # --
+
+  ArgumentError = ::Class.new ::ArgumentError
+
   # -- Standard support
 
   module Lib_

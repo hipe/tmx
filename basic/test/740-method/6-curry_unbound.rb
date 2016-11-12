@@ -33,7 +33,7 @@ module Skylab::Basic::TestSupport
         class X_m_cu_Wazzerly
           Home_::Method.curry.unbound instance_method :not_curriable
         end
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message =~ _rx || fail
@@ -45,7 +45,7 @@ module Skylab::Basic::TestSupport
 
       begin
         X_m_cu_WAZZERLY.reuben :one
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message =~ _rx || fail
@@ -57,7 +57,7 @@ module Skylab::Basic::TestSupport
 
       begin
         X_m_cu_WAZZERLY.reuben :one, :two, :three
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message =~ _rx || fail

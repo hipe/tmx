@@ -89,6 +89,10 @@ module Skylab::GitViz
 
   # --
 
+  ArgumentError = ::Class.new ::ArgumentError
+
+  # --
+
   ACHIEVED_ = true
   CONTINUE_ = nil
   DASH_ = '-'.freeze

@@ -205,6 +205,7 @@ module Skylab::Zerk
         def initialize a, d_h, itemer, l
           @_description_proc_for_added_h = d_h
           @listener = l
+          @on_first_branch_item_not_found = nil
           @no_unparsed_exists = false
           @_itemer = itemer
           @_scn_scn = Common_::Polymorphic_Stream.via_array a
@@ -230,6 +231,10 @@ module Skylab::Zerk
           end
 
           NIL
+        end
+
+        def on_first_branch_item_not_found & p
+          @on_first_branch_item_not_found = p ; nil
         end
 
         def add_primary_at_position d, sym, do_by, desc_by
@@ -263,9 +268,22 @@ module Skylab::Zerk
 
           # "all about parsing added primaries" ([#052] #note-2) explains it all
 
+          if @on_first_branch_item_not_found
+            @_has_relevant_default = true
+            @__relevant_default = @on_first_branch_item_not_found
+            @on_first_branch_item_not_found = nil
+          else
+            @_has_relevant_default = false
+          end
+
           begin
             x = __match_niCLI_item_against shape_sym, h
             x || break
+
+            if x.is_the_no_op_branch_item
+              redo
+            end
+
             item = x
 
             @current_primary_symbol = item.branch_item_normal_symbol
@@ -290,7 +308,7 @@ module Skylab::Zerk
             # this is not a item." experimental :#scn-note-1 :#here
             # #not-covered - hits IFF `-verbose` at end
 
-            x = The_no_op_item___[]
+            x = The_no_op_item__[]
             break
           end while above
           x
@@ -302,7 +320,11 @@ module Skylab::Zerk
               Magnetics::BranchItem_via_BranchHash.begin shape_sym, h, self
 
           if @no_unparsed_exists
-            o.whine_about_how_argument_scanner_ended_early
+            if @_has_relevant_default
+              _use_relevant_default
+            else
+              o.whine_about_how_argument_scanner_ended_early
+            end
           else
             __match_niCLI_item_normally o
           end
@@ -328,12 +350,24 @@ module Skylab::Zerk
             if o.item_was_found
 
               o.item
+            elsif @_has_relevant_default
+              _use_relevant_default
             else
               o.whine_about_how_item_was_not_found
             end
+          elsif @_has_relevant_default
+            _use_relevant_default
           else
             o.whine_about_how_it_is_not_well_formed
           end
+        end
+
+        def _use_relevant_default
+          _p = remove_instance_variable :@__relevant_default
+          @_has_relevant_default = false
+          _p[ self ]  # you better work
+          _ = The_no_op_item__[]
+          _  # #todo
         end
 
         def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
@@ -654,10 +688,8 @@ module Skylab::Zerk
           s = @_real_scn.current_token
 
           if DASH_BYTE_ == s.getbyte(0)
-            Home_::ArgumentScanner::Known_unknown_because.call do | emit |
-              emit.call :error, :expression, :operator_parse_error do |y|
-                y << "looks like primary, must not: #{ s.inspect }"
-              end
+            Home_::ArgumentScanner::Known_unknown_because.call do |emit|
+              _whine_into_about_primary emit, s
             end
           else
             Common_::Known_Known[ s.gsub( DASH_, UNDERSCORE_ ).intern ]
@@ -669,12 +701,20 @@ module Skylab::Zerk
           # for example the name of a report (in tmx reports)
 
           s = @_real_scn.current_token
-          if DASH_BYTE_ == s.getbyte( 0 )
-            self._COVER_ME_design_me
+          if DASH_BYTE_ == s.getbyte(0)
+            _whine_into_about_primary @_listener, s  # #not-covered
+          else
+            Ultra_normalize___[ s ]
           end
-
-          Ultra_normalize___[ s ]
         end
+
+        def _whine_into_about_primary emit, s
+          emit.call :error, :expression, :operator_parse_error do |y|
+            y << "looks like primary, must not: #{ s.inspect }"
+          end
+          UNABLE_
+        end
+
 
         def _known_unknown_primary_with_reason sym
           Home_::ArgumentScanner::Known_unknown[ sym ]
@@ -883,7 +923,7 @@ module Skylab::Zerk
 
       base = Home_::ArgumentScanner::BranchItem
 
-      The_no_op_item___ = Lazy_.call do
+      The_no_op_item__ = Lazy_.call do
         class NoOpBranchItem___
           def is_the_no_op_branch_item  # always for #scn-note-1 #here
             true

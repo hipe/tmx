@@ -9,16 +9,20 @@ module Skylab::TestSupport
       end
 
       DESCRIPTIONS = {
+        but_actually_run: NOTHING_,
         test_directory: DESCRIPTION_FOR_TEST_DIRECTORY_,
       }
 
       PRIMARIES = {
+        but_actually_run: :__parse_but_actually_run,
         test_directory: :__parse_test_directory,
       }
 
       def initialize
 
         o = yield
+
+        @_actually_run = false
 
         @__mediator = o.MEDIATOR
 
@@ -35,6 +39,7 @@ module Skylab::TestSupport
       )
 
       def execute
+
         if __normal
           if __resolve_test_file_stream
             __tell_mediator_what_we_are_going_to_do
@@ -43,6 +48,12 @@ module Skylab::TestSupport
         else
           UNABLE_
         end
+      end
+
+      def __parse_but_actually_run
+        @syntax_front.argument_scanner.advance_one
+        @_actually_run = true
+        ACHIEVED_
       end
 
       def __do_something_to_each_file
@@ -65,7 +76,7 @@ module Skylab::TestSupport
         @_emit.call :data, :end_of_list
 
         @_emit.call :info, :expression, :summary do |y|
-          y << "(total files loaded: #{ count })"
+          y << "(loaded #{ count } test file#{ 's' unless 1 == count })"
         end
 
         NOTHING_
@@ -74,10 +85,11 @@ module Skylab::TestSupport
       def __tell_mediator_what_we_are_going_to_do
 
         _mediator = remove_instance_variable :@__mediator
-        if true
-          _mediator.receive_notification_of_intention_to_require_only
-        else
+
+        if @_actually_run
           _mediator.receive_notification_of_intention_to_run_tests
+        else
+          _mediator.receive_notification_of_intention_to_require_only
         end
         NIL
       end

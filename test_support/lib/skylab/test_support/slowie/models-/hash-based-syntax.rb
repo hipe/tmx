@@ -59,11 +59,13 @@ module Skylab::TestSupport
         @hash.fetch sym
       end
 
-      def GET_INTRINSIC_PRIMARY_NORMALS
+      def GET_INTRINSIC_PRIMARY_NORMALS  # a = @argument_scanner.added_primary_normal_name_symbols
         @hash.keys
       end
 
-      # a = @argument_scanner.added_primary_normal_name_symbols
+      attr_reader(
+        :argument_scanner,
+      )
     end
   end
 end

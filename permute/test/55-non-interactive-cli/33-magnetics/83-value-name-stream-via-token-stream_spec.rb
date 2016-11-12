@@ -71,7 +71,7 @@ module Skylab::Permute::TestSupport
       _mags::ValueNameStream_via_TokenStream[ _ts, & oes_p ]
     end
 
-    def state_for_expect_event
+    def state_for_expect_emission
       _this
     end
   end

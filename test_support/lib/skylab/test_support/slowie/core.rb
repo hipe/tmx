@@ -688,8 +688,7 @@ module Skylab::TestSupport
       # (because so far it's orphanic, rewrote and moved here from #tombstone-A)
 
       def receive_notification_of_intention_to_run_tests
-        self._FOR_EXAMPLE
-        ::Kernel.require 'rspec/autoloader'
+        require 'rspec/autorun'
         NIL
       end
 

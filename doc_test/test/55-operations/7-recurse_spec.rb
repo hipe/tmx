@@ -272,7 +272,7 @@ module Skylab::DocTest::TestSupport
     end
 
     h = { find_command_args: true }
-    define_method :ignore_for_expect_event do
+    define_method :ignore_for_expect_emission do
       h
     end
   end

@@ -61,7 +61,7 @@ module Skylab::Brazen::TestSupport
     end
 
     expag = nil
-    define_method :black_and_white_expression_agent_for_expect_event do
+    define_method :black_and_white_expression_agent_for_expect_emission do
       expag ||= Home_::API.expression_agent_class.new Home_.application_kernel_  # ..no..
     end
 

@@ -23,7 +23,7 @@ module Skylab::Fields
       def initialize
         @adjective = INVALID___
         @event_name_symbol = :invalid_property_value
-        @exception_class_by = nil
+        @exception_class_by = -> { Home_::ArgumentError }
         @predicate_string = nil
         @valid_value_mapper_from = nil
       end

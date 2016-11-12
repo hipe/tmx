@@ -74,7 +74,7 @@ module Skylab::Fields::TestSupport
         @session_ = @class_.new
         begin
           process_polymorphic_stream_fully_via_ :zoik
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
         e.message.should eql "unrecognized attribute 'zoik'"
       end

@@ -101,7 +101,7 @@ module Skylab::Fields
         )
       end
 
-      Process_polymorphic_stream_passively_ = -> st, sess, formals, meths, & x_p do
+      Process_polymorphic_stream_passively_ = -> st, sess, formals, meths, & x_p do  # 1x
 
         sess.instance_variable_set ARG_STREAM_IVAR_, st  # as we do
 
@@ -204,15 +204,13 @@ module Skylab::Fields
 
           read = __formal_attribute_reader
 
-          see_formal_attr = @argument_stream.method :advance_one  # ..
-
           st = @argument_stream
 
           until st.no_unparsed_exists
 
             @_attribute = read[]
             if @_attribute
-              see_formal_attr[]
+              st.advance_one
               kp = @_attribute._interpret self, & oes_p  # result is "keep parsing"
               kp and next
               break

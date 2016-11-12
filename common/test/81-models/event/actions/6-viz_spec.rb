@@ -5,7 +5,7 @@ module Skylab::Common::TestSupport
   describe "[co] [..] viz" do
 
     TS_[ self ]
-    use :expect_event
+    use :expect_emission
 
     it "with the ideal case - works" do
 

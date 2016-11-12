@@ -2,12 +2,12 @@ require_relative '../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] expect event - (3) new stuff" do
+  describe "[co] expect emission - new stuff" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :expect_event_meta
-    use :expect_event
+    use :expect_emission_meta
+    use :expect_emission
 
     it "fail to match the full category" do
 

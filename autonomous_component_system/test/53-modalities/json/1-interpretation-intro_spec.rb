@@ -200,7 +200,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       root_ACS_result.should be_common_result_for_failure
     end
 
-    def expression_agent_for_expect_event
+    def expression_agent_for_expect_emission
       clean_expag_
     end
 

@@ -309,7 +309,7 @@ module Skylab::Autonomous_Component_System
           fo = @nr_.formal_
           unava_p = p[ fo ]
           if unava_p
-            Here_::When_Not_Available::Act[ @on_unavailable, unava_p, fo ]
+            Here_::WhenNotAvailable::Act[ @on_unavailable, unava_p, fo ]
           else
             ACHIEVED_
           end

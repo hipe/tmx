@@ -78,7 +78,7 @@ module Skylab::Fields::TestSupport
       Home_.lib_.brazen::API.expression_agent_instance
     end
 
-    def state_for_expect_event
+    def state_for_expect_emission
       state_
     end
   end

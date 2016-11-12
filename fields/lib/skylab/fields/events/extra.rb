@@ -14,6 +14,7 @@ module Skylab::Fields
       :lemma, nil,  # string or symbol OK
       :adj, nil,
       :invite_to_action, nil,
+      :exception_class_by, -> { Home_::ArgumentError },
       :error_category, :argument_error,
       :ok, false,
 

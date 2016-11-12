@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Operation
 
-    module When_Not_Available
+    class WhenNotAvailable < ::ArgumentError
 
       Require_fields_lib_[]
 
@@ -27,7 +27,11 @@ module Skylab::Autonomous_Component_System
             ( * sym_a, ev_p ) = x
 
             o = Home_.lib_.human::NLP::EN::Contextualization.begin
+
             o.given_emission sym_a, & ev_p
+
+            o.exception_class = WhenNotAvailable
+
             _ev = o.to_exception
 
           else

@@ -60,7 +60,7 @@ module Skylab::TaskExamples::TestSupport
       false == _x or fail
     end
 
-    def state_for_expect_event
+    def state_for_expect_emission
       state_
     end
   end

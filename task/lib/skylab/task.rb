@@ -361,6 +361,8 @@ class Skylab::Task
     Here_ = self
   end
 
+  ArgumentError = ::Class.new ::ArgumentError
+
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true

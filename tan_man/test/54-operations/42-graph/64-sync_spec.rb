@@ -164,8 +164,8 @@ module Skylab::TanMan::TestSupport
 
     ignore_these_events :using_parser_files
 
-    def expression_agent_for_expect_event
-      black_and_white_expression_agent_for_expect_event  # BE CAREFUL
+    def expression_agent_for_expect_emission
+      black_and_white_expression_agent_for_expect_emission  # BE CAREFUL
     end
   end
 end

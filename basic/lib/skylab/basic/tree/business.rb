@@ -76,7 +76,7 @@ module Skylab::Basic
       len = bx.length
 
       if a.length > len
-        raise ::ArgumentError, __say( a, len )
+        raise Home_::ArgumentError, __say( a, len )
       end
 
       a.each_with_index do | x, d |

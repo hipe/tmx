@@ -96,7 +96,7 @@ module Skylab::Fields::TestSupport
 
         begin
           attrs.index_
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message.should match _rx

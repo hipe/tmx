@@ -544,7 +544,8 @@ module Skylab::Brazen
       # --
 
       def wrap_adapter_stream_with_ordering_buffer st
-        Common_::Stream.ordered st
+
+        Home_::Ordered_stream_via_participating_stream[ st ]
       end
 
       def _bound_call_for_unrecognized_via token

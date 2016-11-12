@@ -33,7 +33,7 @@ module Skylab::Snag::TestSupport
       expect_neutralled
     end
 
-    def expression_agent_for_expect_event
+    def expression_agent_for_expect_emission
       black_and_white_expression_agent_for_expect_event_normally
     end
 

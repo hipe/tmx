@@ -293,7 +293,7 @@ module Skylab::Plugin
       def some_method_name_array
 
         if @for_single_method && 1 < @method_name_a.length
-          raise ::ArgumentError, __say_single
+          raise Home_::ArgumentError, __say_single
         end
 
         @method_name_a

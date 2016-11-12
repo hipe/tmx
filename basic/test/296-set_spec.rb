@@ -18,7 +18,7 @@ module Skylab::Basic::TestSupport
           class X_s_Wont_Work
             Home_::Set[ self, :with_members, %i( foo bar ) ]
           end
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message =~ _rx || fail
@@ -48,7 +48,7 @@ module Skylab::Basic::TestSupport
 
         begin
           foo.initialize_basic_set_with_hash foo: true
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message =~ _MISSING_REQUIRED_RX || fail
@@ -60,7 +60,7 @@ module Skylab::Basic::TestSupport
 
         begin
           foo.initialize_basic_set_with_hash foo: true, bar: true, baz: nil
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message =~ _UNREC_PARAM_RX || fail

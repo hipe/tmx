@@ -14,6 +14,8 @@ module Skylab::Plugin
 
   Autoloader_ = Common_::Autoloader
 
+  ArgumentError = ::Class.new ::ArgumentError
+
   module Lib_
 
     sidesys, _stdlib = Autoloader_.at :build_require_sidesystem_proc,

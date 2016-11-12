@@ -39,7 +39,7 @@ module Skylab::Fields::TestSupport
       stack.push_frame_with :a, :X, :b, :Y
       begin
         stack.push_frame_with :derp, :Z, :b, :B, :nerp, :Q
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
       e.message.should match %r(\Aunrecognized attributes 'derp' and 'nerp')
     end

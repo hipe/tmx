@@ -14,7 +14,7 @@ module Skylab::MyTerm::TestSupport
         begin
           call :adapter, COMMON_ADAPTER_CONST_,
             :imagemagick_command
-        rescue ::ArgumentError => e
+        rescue Home_::ACS_::Operation::WhenNotAvailable => e
         end
 
         e

@@ -5,10 +5,14 @@ module Skylab::Basic
     Say_not_found = -> d, a, k do
 
       s = Home_.lib_.human::Levenshtein.with(
-        :item, k,
+        :item_string, k.id2name,
         :items, a,
+        :stringify_by, -> x do
+          x.id2name
+        end,
         :closest_N_items, d,
-        :aggregate_by, -> a_ { a_ * ' or ' } )
+        :aggregate_by, -> a_ { a_ * ' or ' },
+      )
 
       if s
         _did_you_mean = " - did you mean #{ s }?"

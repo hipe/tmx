@@ -95,7 +95,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       _shoe_model.new_cold_root_ACS_for_expect_root_ACS
     end
 
-    def expression_agent_for_expect_event
+    def expression_agent_for_expect_emission
       clean_expag_
     end
 

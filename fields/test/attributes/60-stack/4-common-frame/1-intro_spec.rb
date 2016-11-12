@@ -16,7 +16,7 @@ module Skylab::Fields::TestSupport
         class X_a_s_cf_Intro_A
           Home_::Attributes::Stack::CommonFrame.call self, :weirdness
         end
-      rescue ::ArgumentError => e
+      rescue ::Skylab::Brazen::ArgumentError => e
       end
 
       e.message.should match _rx
@@ -124,7 +124,7 @@ module Skylab::Fields::TestSupport
 
         begin
           Home_::Attributes::Stack::CommonFrame.call X_a_s_cf_xxx, :memoized, :method, :jib_jab
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message.should match _rx
@@ -265,7 +265,7 @@ module Skylab::Fields::TestSupport
 
         begin
           X_a_s_cf_Intro_H.new
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message.should match _rx
@@ -295,7 +295,7 @@ module Skylab::Fields::TestSupport
 
         begin
           X_a_s_cf_Intro_I.new
-        rescue ::ArgumentError => e
+        rescue Home_::ArgumentError => e
         end
 
         e.message.should match _rx

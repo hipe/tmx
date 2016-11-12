@@ -45,12 +45,12 @@ module Skylab::Task::TestSupport
 
     # -- SETUP
 
-    def build_exception_throwing_state_
+    def build_exception_throwing_state_ & cls_p
 
       o = _setup_state
       begin
         o.execute_as_front_task
-      rescue ::ArgumentError => e
+      rescue cls_p[] => e
       end
 
       if e
@@ -108,7 +108,7 @@ module Skylab::Task::TestSupport
       state_.message
     end
 
-    def state_for_expect_event
+    def state_for_expect_emission
       state_
     end
   end

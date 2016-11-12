@@ -63,6 +63,10 @@ module Skylab::TMX
       def __when_args
 
         sym = @argument_scanner.head_as_normal_symbol
+        sym and __when_args_via_normal_symbol sym
+      end
+
+      def __when_args_via_normal_symbol sym
 
         bx = Operations_name_cache__[]
 

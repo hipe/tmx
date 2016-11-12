@@ -33,7 +33,7 @@ module Skylab::GitViz::TestSupport
     def __expect_relative_paths_are_not_honored_here
       begin
         yield
-      rescue ::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
       e.message.should eql "relative paths are not honored here - anything"
     end
