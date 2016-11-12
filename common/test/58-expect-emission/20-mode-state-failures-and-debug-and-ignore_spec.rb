@@ -40,7 +40,7 @@ module Skylab::Common::TestSupport
 
       begin
         yield
-      rescue TS_::Expect_Event::MethodNotAvailableFromCurrentState => e
+      rescue TS_::Expect_Emission::MethodNotAvailableFromCurrentState => e
       end
 
       e.message.include? "has moved to '#{ sym }' state" or fail

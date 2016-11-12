@@ -214,7 +214,7 @@ module Skylab::Autonomous_Component_System::TestSupport
   module TestLib_
 
     Expect_event = -> tcc do
-      Common_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Emission[ tcc ]
     end
 
     Memoizer_methods = -> tcc do

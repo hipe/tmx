@@ -232,7 +232,7 @@ module Skylab::SearchAndReplace::TestSupport
   end
 
   Expect_Event = -> tcc do
-    Common_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Emission[ tcc ]
   end
 
   Zerk_Help_Screens = -> tcc do

@@ -82,7 +82,7 @@ module Skylab::Permute::TestSupport
   module Use__
 
     Expect_event = -> tcm do
-      Common_.test_support::Expect_Event[ tcm ]
+      Common_.test_support::Expect_Emission[ tcm ]
     end
 
     Memoizer_methods = -> tcm do

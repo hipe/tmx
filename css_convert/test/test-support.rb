@@ -28,7 +28,7 @@ module Skylab::CSS_Convert::TestSupport
   USE___ = {
 
     expect_event: -> tcc do
-      Home_::Common_.test_support::Expect_Event[ tcc ]
+      Home_::Common_.test_support::Expect_Emission[ tcc ]
     end,
 
     my_CLI_expectations: -> tcc do

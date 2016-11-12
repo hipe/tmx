@@ -1,23 +1,22 @@
 module Skylab::Common::TestSupport
 
-  module Future_Expect  # READ [#065]:"future expect vs. expect event"
-
-    def self.[] tcc
-      Load_legacy___[]
-      tcc.include self ; nil
-    end
-
-#==FROM
-
-  module Expect_Emission_Fail_Early_STOWAWAY
+  module Expect_Emission_Fail_Early  # [#065]:"future expect vs. expect event"
 
     # (this is a would-be replacement for the legacy facility that is
     # in this selfsame file EEK)
 
-    # -
+    def self.[] tcc
+      tcc.include self
+    end
+
+    module Legacy
       def self.[] tcc
-        tcc.include self
+        Load_legacy___[]
+        tcc.include self ; nil
       end
+    end
+
+    # -
 
       # -- (push these to dispatcher if you really have to)
 
@@ -538,11 +537,11 @@ module Skylab::Common::TestSupport
         fail "cannot `#{ _loc.label }` because you are in #{ _mode_description_ } mode"
       end
     end
-  end
-#==TO
 
 #==FROM
     Load_legacy___ = Lazy_.call do
+
+      module Legacy
 
     def future_expect * a, & p
       add_future_expect a, & p
@@ -734,6 +733,7 @@ module Skylab::Common::TestSupport
     Say_expected_one_thing_had_many_things__ = -> exp_a, d do
       "expected 1 had #{ d } of #{ exp_a.inspect }"
     end
+      end  # end Legacy module
     end  # end lazy
 #==TO
 
@@ -759,5 +759,4 @@ module Skylab::Common::TestSupport
     NOTHING_ = nil
   end
 end
-# #pending-rename: to "expect emission fail early"
 # #history: one rewrite of this abstracted from [ts] "slowie"

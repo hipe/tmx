@@ -44,7 +44,7 @@ module Skylab::Plugin::TestSupport
 
   Expect_Event = -> tcc do
 
-    Common_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Emission[ tcc ]
 
     NIL_
   end

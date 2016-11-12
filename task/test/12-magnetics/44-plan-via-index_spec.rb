@@ -88,7 +88,7 @@ module Skylab::Task::TestSupport
       shared_subject :state_ do
 
         _nodes
-        el = Home_::Common_.test_support::Expect_Event::EventLog.new
+        el = Home_::Common_.test_support::Expect_Emission::Log.new
         _ = el.handle_event_selectively
         _task = X_G_Circ_A.new( & _ )
         x = _task.execute_as_front_task

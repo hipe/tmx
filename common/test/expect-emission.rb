@@ -1,6 +1,6 @@
 module Skylab::Common::TestSupport
 
-  module Expect_Event  # some notes in [#065]
+  module Expect_Emission  # some notes in [#065]
 
     # per name conventions, all method *and ivar* names with neither leading
     # nor trailing underscores are part of the [sub-]subject's public API.
@@ -248,7 +248,7 @@ module Skylab::Common::TestSupport
 
       def build_event_log
 
-        log = EventLog.for self
+        log = Log.for self
 
         h = send IGNORE_METHOD__
         if h
@@ -877,7 +877,7 @@ module Skylab::Common::TestSupport
 
     # ==
 
-    class EventLog  # exactly #note-5 (see).
+    class Log  # exactly #note-5 (see).
 
       class << self
 
@@ -1336,7 +1336,6 @@ module Skylab::Common::TestSupport
     UNRELIABLE_ = :_unreliable_from_expect_event_
   end
 end
-# #pending-rename: to "expect emission"
 # #tombstone-C: no more double-building. now when debugging events, etc
 # #tombstone - event log was function soup
 # #tombstone - simple debugging output

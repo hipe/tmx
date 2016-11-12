@@ -18,7 +18,7 @@ module Skylab::Treemap::TestSupport
 
     Use_method___ = -> sym do
       :expect_event == sym or fail
-      Home_::Common_.test_support::Expect_Event[ self ]
+      Home_::Common_.test_support::Expect_Emission[ self ]
     end
   # -
 

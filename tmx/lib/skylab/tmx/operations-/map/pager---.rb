@@ -1,121 +1,171 @@
-module Skylab::TestSupport
+module Skylab::TMX
 
-  class Slowie
+  class Operations_::Map
 
-    class Operations::Divvy
+    class Pager___
+      # -
+        def initialize o
+          @clent = o
+          @argument_scanner = o.argument_scanner
+        end
 
-      DESCRIPTION = -> y do
-        y << "«soon»"
-      end
+        def execute
+          _at THESE___
+        end
 
-      DESCRIPTIONS = nil
+        THESE___ = {
+          item_count: :__when_item_count,
+        }
 
-      PRIMARIES = nil
+        def __when_item_count
+          _advance_one
+          _at FIRST_BRANCH___
+        end
 
-      if false
-      does :flush_the_sidesystem_tree do | st |
+        FIRST_BRANCH___ = {
+          page_size: :__at_page_size,
+        }
 
-        st.transition_is_effected_by do | o |
+        def __at_page_size
+          if __parse_non_negative_nonzero_integer
+            _at ONLY_ONE_PRIMARY_AVAILABLE_HERE___
+          end
+        end
 
-          o.on '--divide N', "output the sidesystems into N smaller systems" do | s |
-            @N = s
+        ONLY_ONE_PRIMARY_AVAILABLE_HERE___ = {
+          page_offset: :__at_page_offset,
+        }
+
+        def __at_page_offset
+          if __parse_non_negative_integer
+            FIRST_EVER_PAGER.new( @page_offset, @page_size, & @argument_scanner.listener )
+          end
+        end
+
+        # --
+
+        def __parse_non_negative_nonzero_integer
+          _parse_one_such_number :number_set, :integer, :minimum, 1
+        end
+
+        def __parse_non_negative_integer
+          _parse_one_such_number :number_set, :integer, :minimum, 0
+        end
+
+        def _parse_one_such_number * a
+
+          as = @argument_scanner
+          sym = as.current_primary_symbol
+          kn = as.parse_primary_value_as_one_such_number_via_mutable_array a
+          if kn
+            instance_variable_set :"@#{ sym }", kn.value_x
+            ACHIEVED_
+          end
+        end
+
+        def _at h
+          m = @argument_scanner.match_primary_route_value_against h
+          if m
+            send m
+          end
+        end
+
+        def _advance_one
+          @argument_scanner.advance_one
+        end
+
+      # -
+
+      # ==
+
+      class FIRST_EVER_PAGER
+
+        def initialize d, d_, & p
+          @listener = p
+          @page_offset = d
+          @page_size = d_
+        end
+
+        attr_writer(
+          :stream,
+        )
+
+        def execute
+
+          countdown = @page_size
+          current_page_offset = 0
+          money_time = nil
+          p = nil
+          real_st = @stream
+          skippy_time = nil
+
+          decidey_time = -> do
+            if @page_offset == current_page_offset
+              p = money_time
+              p[]
+            else
+              p = skippy_time
+              p[]
+            end
           end
 
-        end
-      end
-      end
+          money_time = -> do
+            x = real_st.gets
+            if x
+              countdown -= 1
+              if countdown.zero?
+                us = real_st.upstream
+                if us
+                  self._README
+                  # if you wanted to close the stream it would happen here
+                end
+                p = EMPTY_P_
+              end
+            else
+              p = EMPTY_P_
+            end
+            x
+          end
 
-      def initialize( * )
-        super
-        @N = nil
-      end
+          skippy_time = -> do
 
-      def do__flush_the_sidesystem_tree__
-        ok = __normalize_number
-        ok &&= __resolve_SS_box
-        ok && __via_SS_box
-      end
+            big_countdown = @page_size * @page_offset
+            begin
+              _node = real_st.gets
+              if ! _node
+                __emit_this_one_thing big_countdown
+                x = UNABLE_
+                break
+              end
+              big_countdown -= 1
+              if big_countdown.nonzero?
+                redo
+              end
+              p = money_time
+              x = p[]
+              break
+            end while above
+            x
+          end
 
-      def __normalize_number
+          p = decidey_time
 
-        _qkn = Common_::Qualified_Knownness.via_value_and_symbol @N, :number
-
-        qkn_ = Lib_::Basic[]::Number.normalization.with(
-          :qualified_knownness, _qkn,
-          :minimum, 1,
-          & @on_event_selectively )
-
-        if qkn_
-          @d = qkn_.value_x
-          ACHIEVED_
-        else
-          qkn_
-        end
-      end
-
-      def __resolve_SS_box
-        @bx = @on_event_selectively.call :for_plugin, :sidesystem_box
-        @bx && ACHIEVED_
-      end
-
-      def __via_SS_box
-
-        _s = @on_event_selectively.call :for_plugin, :program_name
-        @head_s = "#{ _s } "
-
-        @num_pieces = @bx.length
-
-        if @d > @num_pieces
-          __when_too_big
-        else
-          _via_OK_count
-        end
-      end
-
-      def __when_too_big
-
-        d = @d ; num_pieces = @num_pieces
-
-        @on_event_selectively.call :info, :expression do | y |
-
-          y << "#{ ick d } is larger than the number of pieces #{
-            }(#{ num_pieces }) - reducing the count to that number"
-
+          Common_.stream do
+            p[]
+          end
         end
 
-        @d = @num_pieces
-        _via_OK_count
-      end
+        def __emit_this_one_thing big_countdown
 
-      def _via_OK_count
-
-        lesser_chunk_size = @num_pieces / @d
-        num_chunks_with_the_greater_chunk_size = @num_pieces % @d
-        num_chunks_with_the_lesser_chunk_size = @d - num_chunks_with_the_greater_chunk_size
-
-        num_chunks_with_the_lesser_chunk_size.times do | d |
-          _express_chunk d * lesser_chunk_size, lesser_chunk_size
+          @listener.call :error, :expression, :page_content_ended_early do |y|
+            y << "stream content ended before reaching target page (had #{ big_countdown } to go)"
+          end
+          NIL
         end
-
-        greater_chunk_size = lesser_chunk_size + 1
-        offset = num_chunks_with_the_lesser_chunk_size * lesser_chunk_size
-
-        num_chunks_with_the_greater_chunk_size.times do | d |
-          _express_chunk offset + ( d * greater_chunk_size ), greater_chunk_size
-        end
-
-        ACHIEVED_
       end
 
-      def _express_chunk d, d_
-
-        _ = ( d ... ( d + d_ ) ).map do | d__ |
-          @bx.at_position( d__ ).stem
-        end * SPACE_
-
-        @resources.serr.puts "#{ @head_s }#{ _ }"
-      end
-
+      # ==
     end
   end
 end
+# #history: fully repurposed from old [ts] slowie "divvy" operation

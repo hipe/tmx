@@ -146,7 +146,7 @@ module Skylab::Zerk::TestSupport
         root_ACS_state
       end
 
-      define_method :expression_agent_for_expect_event, ( Lazy_.call do
+      define_method :expression_agent_for_expect_emission, ( Lazy_.call do
         Home_.lib_.brazen::API.expression_agent_instance
       end )
 

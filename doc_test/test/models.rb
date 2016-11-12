@@ -14,7 +14,7 @@ module Skylab::DocTest::TestSupport
         _cae = __copula_assertion_entity_via_code_line _cl
         _cac = __copula_assertion_controller_via_copula_assertion_entity _cae
 
-        el = Common_.test_support::Expect_Event::EventLog.for self
+        el = Common_.test_support::Expect_Emission::Log.for self
 
         _l = el.handle_event_selectively
 

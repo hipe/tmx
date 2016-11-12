@@ -122,8 +122,6 @@ module Skylab::TMX
           p[]
         end
       end
-
-      EMPTY_P_ = -> { NIL_ }
     end
   end
 end

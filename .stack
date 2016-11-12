@@ -15,7 +15,6 @@ utility to replace (generate) greenlist, etc. 'tmx-notes.json'
 -2 rewrite (simplify) the quickie recursive runner to use this system
 -3 write a task to update semi-real costs (a bash script loop)
 -4 add a randomize option to the below (for now only toplevel, later etc)
-look at this pending rename in [dt] - is it real?
 (maybe rewrite "test-all counts" (globber) to use two popen3 instead)
 test all - test all.
 -5 break up into N greenlist using imaginary costs, or a costs files (take into acct order)

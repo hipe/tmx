@@ -19,7 +19,7 @@ module Skylab::Zerk::TestSupport
         end
 
         def begin_emission_spy_
-          Common_.test_support::Future_Expect::Expect_Emission_Fail_Early_STOWAWAY::Spy.new
+          Common_.test_support::Expect_Emission_Fail_Early::Spy.new
         end
 
         def expression_agent

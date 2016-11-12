@@ -85,7 +85,7 @@ module Skylab::Brazen::TestSupport
   module TestLib_
 
     Expect_event = -> test_context_cls do
-      Common_.test_support::Expect_Event[ test_context_cls ]
+      Common_.test_support::Expect_Emission[ test_context_cls ]
     end
 
     Fileutils = Lazy_.call do

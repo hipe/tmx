@@ -45,5 +45,4 @@ module Skylab::DocTest
 
   end
 end
-# #pending-rename: probably etc because of [ta] needing this
 # #history: broke out of output adapters quickie test document parser

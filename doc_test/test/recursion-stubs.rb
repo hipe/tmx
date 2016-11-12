@@ -74,7 +74,7 @@ module Skylab::DocTest::TestSupport
 
         _asset_st = __asset_stream_via_filesystem fs
 
-        event_log = Common_.test_support::Expect_Event::EventLog.for self
+        event_log = Common_.test_support::Expect_Emission::Log.for self
 
         _oes_p = event_log.handle_event_selectively
 

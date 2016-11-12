@@ -97,12 +97,12 @@ module Skylab::Basic
 
     Expect_Event = -> test_context_class do
 
-      Home_::Common_.test_support::Expect_Event[ test_context_class ]
+      Home_::Common_.test_support::Expect_Emission[ test_context_class ]
     end
 
     Future_Expect = -> tcc do
 
-      Home_::Common_.test_support::Future_Expect[ tcc ]
+      Home_::Common_.test_support::Expect_Emission_Fail_Early::Legacy[ tcc ]
     end
 
     Memoizer_Methods = -> tcc do

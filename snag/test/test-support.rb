@@ -133,7 +133,7 @@ module Skylab::Snag::TestSupport
 
     class << self
       def [] tcm, x_a=nil
-        Common_.test_support::Expect_Event[ tcm, x_a ]
+        Common_.test_support::Expect_Emission[ tcm, x_a ]
         tcm.include self
       end
     end  # >>

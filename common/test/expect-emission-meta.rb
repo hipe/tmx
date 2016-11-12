@@ -126,7 +126,7 @@ module Skylab::Common::TestSupport
       end
 
       def subject_
-        Home_::TestSupport::Expect_Event
+        Home_::TestSupport::Expect_Emission
       end
     # -
   end

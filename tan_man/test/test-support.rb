@@ -50,7 +50,7 @@ module Skylab::TanMan::TestSupport
 
   TestSupport_::Quickie.enable_kernel_describe
 
-  Expect_Event__ = Common_.test_support::Expect_Event
+  Expect_Event__ = Common_.test_support::Expect_Emission
 
   module Module_Methods___
 

@@ -100,7 +100,7 @@ module Skylab::Git::TestSupport
 
   Expect_Event = -> tcc do
 
-    Common_.test_support::Expect_Event[ tcc ]
+    Common_.test_support::Expect_Emission[ tcc ]
   end
 
   Memoizer_Methods = -> tcc do

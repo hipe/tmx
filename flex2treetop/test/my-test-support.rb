@@ -125,7 +125,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def [] tcm
 
-        tcm.include Common_.test_support::Expect_Event::Test_Context_Instance_Methods
+        tcm.include Common_.test_support::Expect_Emission::Test_Context_Instance_Methods
         tcm.include self
       end
     end  # >>

@@ -14,6 +14,7 @@ module Skylab::TMX
       def initialize & p
         @attributes_module_by = nil
         @_emit = p
+        @_has_pager = false
         @_has_means = false
         @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
         @_seen_last_reorder_plan = false
@@ -33,10 +34,10 @@ module Skylab::TMX
       def execute
         if __parse_modifiers
           if __all_requireds_are_present
-            if @stream_modifiers_were_used
-              __modified_stream
+            if @_has_pager
+              __flush_paged_stream
             else
-              _flush_to_unparsed_node_stream
+              _flush_non_paged_stream
             end
           else
             UNABLE_
@@ -47,6 +48,25 @@ module Skylab::TMX
       end
 
       # --
+
+      def __flush_paged_stream
+        st = _flush_non_paged_stream
+        if st
+          pager = @__pager
+          pager.stream = st
+          pager.execute
+        else
+          UNABLE_
+        end
+      end
+
+      def _flush_non_paged_stream
+        if @stream_modifiers_were_used
+          __modified_stream
+        else
+          _flush_to_unparsed_node_stream
+        end
+      end
 
       def __modified_stream
 
@@ -151,6 +171,10 @@ module Skylab::TMX
       Description_proc_reader___ = Lazy_.call do
 
         {
+          page_by: -> y do
+            y << "experimental.."
+          end,
+
           order: -> y do
             y << "<attribute name>  uses the ordering schema (if any) for"
             y << "that attribute. multiple order modifiers may be chained together"
@@ -177,6 +201,9 @@ module Skylab::TMX
       end
 
       PRIMARIES__ = {
+
+        page_by: :__parse_page_by,  # break alpha. order - higher-level higher
+
         attributes_module_by: :__parse_attributes_module_by,
         order: :__parse_order_expression,
         json_file_stream: :__parse_json_file_stream,
@@ -201,6 +228,25 @@ module Skylab::TMX
           end
         else
           plan
+        end
+      end
+
+      # -- PAGE BY
+
+      def __parse_page_by
+        if @_has_pager
+          self._COVER_ME_cannot_have_multiple_pagers
+        elsif @stream_modifiers_were_used && @result_in_tree
+          self._COVER_ME_cannot_have_pager_and_result_in_tree
+        else
+          pager = Here_::Pager___.new( self ).execute
+          if pager
+            @_has_pager = true
+            @__pager = pager
+            ACHIEVED_
+          else
+            pager
+          end
         end
       end
 
@@ -241,7 +287,11 @@ module Skylab::TMX
 
       def __parse_result_in_tree
         if @stream_modifiers_were_used
-          @result_in_tree = true ; ACHIEVED_
+          if @_has_pager
+            self._COVER_ME_not_with_pager
+          else
+            @result_in_tree = true ; ACHIEVED_
+          end
         else
           _when_contextually_invalid_primary
         end

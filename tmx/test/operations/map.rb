@@ -72,6 +72,12 @@ module Skylab::TMX::TestSupport
         presumably_ordered_items_.fetch( -1 )
       end
 
+      # -- execution under test runtime
+
+      def oldschool_jimmy_
+        OldschoolJimmy___.instance
+      end
+
       # -- setup
 
       def json_file_stream_01_
@@ -171,6 +177,28 @@ module Skylab::TMX::TestSupport
 
     fixture_dirs = Lazy_.call do
       ::File.join TS_.dir_path, 'fixture-directories'
+    end
+
+    # ==
+
+    class OldschoolJimmy___
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
+
+      alias_method :calculate, :instance_exec
+
+      def par sym
+        sym.inspect
+      end
+
+      def ick x
+        x.inspect
+      end
     end
 
     # ==

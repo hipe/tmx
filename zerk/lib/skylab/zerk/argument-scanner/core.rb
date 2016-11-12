@@ -4,6 +4,25 @@ module Skylab::Zerk
 
     class CommonImplementation
 
+      def parse_primary_value_as_one_such_number_via_mutable_array mutable_a
+
+        sym = @current_primary_symbol
+        advance_one
+        x = parse_primary_value :must_be_trueish
+        if x
+
+          _qkn = Common_::Qualified_Knownness.via_value_and_association x, sym
+
+          mutable_a.push :qualified_knownness, _qkn
+
+          _n11n = Home_.lib_.basic::Number.normalization.new_via_iambic(
+            mutable_a, & @listener )
+
+          _kn = _n11n.execute
+          _kn  # #todo
+        end
+      end
+
       def match_primary_route_value_against h
         route = match_primary_route_against h
         if route

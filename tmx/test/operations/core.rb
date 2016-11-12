@@ -21,7 +21,7 @@ module Skylab::TMX::TestSupport
           remove_instance_variable( :@operations_DSL_value_struct ).call_array
         end
 
-        define_method :__realease_operations_call_array do
+        define_method :realease_operations_call_array do
           instance_exec( & once )
         end
       end
@@ -52,7 +52,7 @@ module Skylab::TMX::TestSupport
       end
 
       def send_subject_call
-        _x_a = __realease_operations_call_array
+        _x_a = realease_operations_call_array
         call_via_array _x_a
         execute
       end
@@ -71,7 +71,7 @@ module Skylab::TMX::TestSupport
 
     if false
     Reactions = -> tcc do
-      Common_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Emission[ tcc ]
       Building[ tcc ]
     end
 

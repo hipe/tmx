@@ -56,7 +56,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def event_log_
-      Common_.test_support::Expect_Event::EventLog
+      Common_.test_support::Expect_Emission::Log
     end
   # -
 
@@ -133,7 +133,7 @@ module Skylab::Zerk::TestSupport
     end
 
     Expect_event = -> tcc do
-      Common_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Emission[ tcc ]
     end
 
     Expect_stdout_stderr = -> tcc do

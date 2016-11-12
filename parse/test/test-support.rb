@@ -68,7 +68,7 @@ module Skylab::Parse::TestSupport
   module Test_Support_Bundles___
 
     Expect_Event = -> tcm do
-      Common_.test_support::Expect_Event[ tcm ]
+      Common_.test_support::Expect_Emission[ tcm ]
     end
 
     Memoizer_Methods = -> tcc do

@@ -61,12 +61,6 @@ module Skylab::Common::TestSupport
 
   # --
 
-  Expect_Emission_Fail_Early = -> tcc do  # REMINDER this is b.c pending rename
-    TS_::Future_Expect::Expect_Emission_Fail_Early_STOWAWAY[ tcc ]
-  end
-
-  # --
-
   LIB_ = ::Object.new
   class << LIB_
 

@@ -132,7 +132,7 @@ module Skylab::Cull::TestSupport
   end
 
   Expect_Event = -> test_context_class do
-    Common___.test_support::Expect_Event[ test_context_class ]
+    Common___.test_support::Expect_Emission[ test_context_class ]
   end
 
   Autoloader_ = Home_::Autoloader_

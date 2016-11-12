@@ -55,7 +55,7 @@ module Skylab::SubTree::TestSupport
 
   Expect_Event = -> tcc do
 
-    tcc.include Common_.test_support::Expect_Event::Test_Context_Instance_Methods
+    tcc.include Common_.test_support::Expect_Emission::Test_Context_Instance_Methods
   end
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]

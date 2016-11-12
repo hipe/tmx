@@ -30,7 +30,7 @@ module Skylab::Yacc2Treetop::TestSupport
     end
 
     o[ :expect_event ] = -> tcc do
-      Common_.test_support::Expect_Event[ tcc ]
+      Common_.test_support::Expect_Emission[ tcc ]
     end
 
     o[ :memoizer_methods ] = -> tcc do

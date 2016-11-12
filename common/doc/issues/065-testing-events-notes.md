@@ -142,6 +142,8 @@ the received line through the VCS.
 
 (this is written on the subject of "future expect")
 
+(EDIT: this is again our favorite thing. previously:)
+
 NOTE - this is "almost" deprecated but not quite: this was written as
 an experimental simplification and re-conception of "expect event"
 (but before "expect event" has its own excellent rewrite). the

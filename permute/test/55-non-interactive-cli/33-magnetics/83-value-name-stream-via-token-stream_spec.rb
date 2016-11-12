@@ -59,7 +59,7 @@ module Skylab::Permute::TestSupport
 
       _xx = _send Expect_no_emission_, argv
 
-      Home_::Common_::TestSupport::Expect_Event::State.new _xx
+      Home_::Common_::TestSupport::Expect_Emission::State.new _xx
     end
 
     def _send oes_p, argv
