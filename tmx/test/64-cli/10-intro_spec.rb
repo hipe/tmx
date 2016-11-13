@@ -81,18 +81,6 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    # -14
-    it "breakup - capture3" do
-      _against 'git', 'breakup', _FLAG
-      _expect_succeeded
-    end
-
-    # -14
-    it "citxt" do
-      _against 'git', 'citxt', _FLAG
-      _expect_succeeded
-    end
-
     # -5
     it "code metrics" do
       _against 'code-metrics', _ARG
@@ -119,28 +107,11 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    # -14
-    it "git" do
-      _against 'git', _ARG
-      _expect_common
-    end
-
     # -12
     it "permute" do
       _against 'permute', _ARG
       _expect_common_start
       @exitstatus.zero? || fail
-    end
-
-    # -15
-    it "quickie", wip: true do
-
-      invoke 'test-support', 'quickie', '-ping'
-
-      expect :e, /\bquickie daemon is already running\b/
-      expect "hello from quickie."
-      expect_no_more_lines
-      @exitstatus.should eql 0
     end
 
     # -13
@@ -155,20 +126,6 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    # -16
-    it "sub tree" do
-
-      _against 'sub-tree', _ARG
-      expect :styled, :e, "hello from sub tree."
-      @exitstatus.should eql :hello_from_sub_tree
-    end
-
-    # -15
-    it "test support", wip: true do
-      _against 'test-support', _ARG
-      _expect_common
-    end
-
     # -2
     it "tan man" do
       _against 'tan-man', _ARG
@@ -179,12 +136,6 @@ module Skylab::TMX::TestSupport
     it "treemap" do
       _against 'treemap', _ARG
       _expect_common
-    end
-
-    # -14
-    it "uncommit" do
-      _against 'git', 'uncommit', _FLAG
-      _expect_succeeded
     end
 
     # -1

@@ -200,9 +200,7 @@ module Skylab::Zerk
 
     # ==
 
-    Remote_CLI_lib_ = Lazy_.call do  # 2nd
-      Home_.lib_.brazen::CLI_Support
-    end
+    Remote_CLI_lib_ = Home_::CLI_::Remote_lib
 
     Here_ = self
     NUMBER_OF_LINES_PER_ITEM_ = 2

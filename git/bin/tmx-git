@@ -2,7 +2,12 @@
 
 require 'skylab/git'
 
-_x = Skylab::Git::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+d = Skylab::Git::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
-$stderr.puts "(exitstatus: #{ _x })"
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit d

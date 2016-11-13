@@ -11,7 +11,7 @@
   # EDIT: just use Gitx on a file with uncommitted changes. you can
   # selectively chose hunks to add to the commit.
 
-program = -> _, _, stderr, pn_s_a, argv do
+program = -> argv, _, _, stderr, pn_s_a do
 
   exit_status = 0
   writemode = ::File::WRONLY | ::File::CREAT | ::File::TRUNC
@@ -20,13 +20,13 @@ program = -> _, _, stderr, pn_s_a, argv do
 
   y = kbd = program_name = nil
 
+  _SPACE = ' '
+
   src_pn = -> do  # resolve the source pathname (some e.g source file)
 
     fn = argv[ 0 ]
 
     y = ::Enumerator::Yielder.new { |line| stderr.puts line }
-
-    _SPACE = ' '
 
     program_name = -> do
       x = nil
@@ -247,7 +247,7 @@ program = -> _, _, stderr, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Git_breakup = program
+  Skylab::Git_breakup = program  # [#br-083] determines name
 end

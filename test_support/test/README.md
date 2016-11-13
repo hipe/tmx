@@ -17,5 +17,5 @@ this is the rationale for the regression order of the toplevel nodes -
     - permute (#70)
 
   - "hard to test" (2)
-    - cover (#80)
-    - servers (#90)
+    - cover (#90)
+    - servers (#!90) (no tests here, needs number rename, accidental collision with above)

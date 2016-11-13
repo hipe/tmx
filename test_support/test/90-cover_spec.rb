@@ -4,6 +4,8 @@ module Skylab::TestSupport::TestSupport
 
   describe "[ts] operations - simplecov" do
 
+    TS_[ self ]
+
     it "SO BEAUTIFUL / SO UGLY : test simplecov CLI integration in a #sub-process", wip: true do  # #old-wip:2015-10
 
       self._HEY_this_is_WIPPED_until_simplecov_is_back
@@ -82,5 +84,50 @@ module Skylab::TestSupport::TestSupport
       io.puts ">>\n\n\n"
       nil
     end
+
+    # --
+
+    it "(stowaway - tmx integration - top)" do
+
+      cli = _same
+
+      cli.invoke 'test-support', 'ping'
+
+      cli.on_stream :serr
+
+      cli.expect_line_by do |line|
+        cli.unstyle_styled( line ).should eql "pong from [ts]!"
+      end
+
+      cli.expect_succeeded_under self
+    end
+
+    it "(stowaway - tmx integration - quickie) README", wip: true do
+
+      # we transferred this test out of [tmx] and refactored it to this new
+      # testing idiom *while* the test was wipped. as such the test could
+      # not be completed and is just a sketch. it looks like "quickie" has
+      # not been available under the general [ts] CLI client for a while so
+      # either do the nonzero work to expose it there or remove this test
+
+      cli = _same
+
+      cli.invoke 'test-support', 'quickie', '-ping'
+
+      cli.expect_on_stderr %r(\bquickie daemon is already running\b)
+
+      cli.expect "hello from quickie."
+
+      cli.expect_succeeded_under self
+    end
+
+    def _same
+
+      Autoloader_.require_sidesystem :TMX
+
+      ::Skylab::TMX.test_support.begin_CLI_expectation_client
+    end
+
+    # --
   end
 end

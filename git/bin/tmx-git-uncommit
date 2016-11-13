@@ -7,7 +7,7 @@
 
 exit_status = 0
 
-program = -> _, stdout_, stderr_, pn_s_a, _ARGV do
+program = -> _ARGV, _, stdout_, stderr_, pn_s_a do
 
   stay = true
 
@@ -230,7 +230,7 @@ program = -> _, stdout_, stderr_, pn_s_a, _ARGV do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Git_uncommit = program
+  Skylab::Git_uncommit = program  # [#br-083] determines name
 end

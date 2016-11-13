@@ -96,6 +96,23 @@ describe "[st] CLI - files - main" do
     HERE
 
   end
+
+    it "(stowaway - tmx integration)" do
+
+      Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'sub-tree', 'ping'
+
+      cli.on_stream :serr
+
+      cli.expect_line_by do |line|
+        cli.unstyle_styled( line ) == "hello from sub tree.\n" || fail
+      end
+
+      cli.expect_succeeded_under self
+    end
 end
 
   # ->

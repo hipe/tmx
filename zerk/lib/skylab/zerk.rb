@@ -17,6 +17,9 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end  # >>
 
+  Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
+
   module CLI_
 
     class Prototype_as_Classesque
@@ -32,11 +35,11 @@ module Skylab::Zerk  # intro in [#001] README
         otr.finish
       end
     end
-  end
 
-  Common_ = ::Skylab::Common
-  Autoloader_ = Common_::Autoloader
-  Lazy_ = Common_::Lazy
+    Remote_lib = Lazy_.call do
+      Home_.lib_.brazen::CLI_Support
+    end
+  end
 
   # == functions
 
@@ -78,6 +81,8 @@ module Skylab::Zerk  # intro in [#001] README
   end
 
   # == orphanic stowaways
+
+  Autoloader_ = Common_::Autoloader
 
   module Invocation_
     Autoloader_[ self ]

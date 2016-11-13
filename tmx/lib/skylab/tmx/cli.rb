@@ -613,6 +613,15 @@ module Skylab::TMX
 
       # -- for magentics & other collaborators (e.g emission expresser)
 
+      # ~ for "mounting"
+
+      def filesystem_proc  # [ts]
+        _always_needed = Home_.lib_.system.filesystem
+        -> { _always_needed }
+      end
+
+      # ~
+
       def receive_data_emission data_p, channel
         send RECEIVE_DATA___.fetch( channel.fetch(1) ), & data_p
       end

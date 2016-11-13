@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     class << self
 
-      def new argv, sin, sout, serr, pn_s_a
+      def new argv, sin, sout, serr, pn_s_a, & p
 
         Require_zerk_[]
 
@@ -25,9 +25,19 @@ module Skylab::TestSupport
 
         cli.expression_agent = CLI::ExpressionAgent.instance__
 
-        yield cli
+        if 1 == p.arity  # yuck - better for testing..
+          yield cli
+          fs_p = cli.filesystem_proc
+          fs_p || CLI._SANITY
 
-        fs_p = cli.filesystem_proc or CLI._SANITY
+        else  # ..better for mouting:
+          up_cli = yield
+
+          fs_p = up_cli.filesystem_proc
+          fs_p || CLI._SANITY
+
+          cli.write_exitstatus = up_cli.method :exitstatus=
+        end
 
         cli.root_ACS_by do
           Home_::API::Root_Autonomous_Component_System.new fs_p

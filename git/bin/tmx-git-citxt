@@ -1,18 +1,29 @@
 #!/usr/bin/env ruby -w
 
 # one-off for writing git commit messages (like git-flow)
+# (an antique - not used - just here for coverage - #todo)
 
 module Skylab
+  # might be re-opening, might not. assume might be either
 end
 
-module Skylab::Git_citxt
+class Skylab::Git_citxt  # [#br-083] determines name
 
-  CLI = ::Class.new ::Class.new
-  class CLI
+  class << self
+    def call * standard_five
+      new( * standard_five ).execute
+    end
+    alias_method :[], :call
+  end  # >>
+
+  # -
 
     def initialize argv, i, o, e, pn_s_a
-      super
+
+      __init_as_CLI_client argv, i, o, e, pn_s_a
+
       @is_finished = @pwd = @git_dir_pathname = @dir_pathname_raw = nil
+
       @is_dry_run = @be_verbose = nil
     end
 
@@ -59,7 +70,7 @@ module Skylab::Git_citxt
           @infostream.puts "unexpected arg(s): #{ argv.inspect }"
           ERROR_
         else
-          execute
+          __do_execute
         end
       end
     end
@@ -184,10 +195,10 @@ module Skylab::Git_citxt
     end
 
     def dir_pathname_expanded  # assumes `dir_pathname_raw`
-      @dir_pathname_expanded ||= dir_pathname_raw.expand_path
+      @dir_pathname_expanded ||= @dir_pathname_raw.expand_path
     end
 
-    define_method :execute do
+    define_method :__do_execute do
       res = nil
       begin
         @git_dir_pathname = find_git_dir or break
@@ -284,17 +295,15 @@ module Skylab::Git_citxt
     define_method :usage_line do
       "#{ em 'usage:' } #{ program_name } [-h] [-v] [ #{ param_label } ]"
     end
-  end
 
-  CLI::Client = CLI.superclass
-  class CLI::Client
-  private
+    # == (used to be a superclass)
 
-    def initialize argv, _i, o, e, pn_s_a
+    def __init_as_CLI_client argv, _i, o, e, pn_s_a
       @argv = argv
       @infostream = e
       @paystream = o
       @pn_s_a = pn_s_a
+      NIL
     end
 
     def em str
@@ -336,7 +345,8 @@ module Skylab::Git_citxt
     def __build_program_name
       [ ::File.basename( @pn_s_a.first ), * @pn_s_a[ 1 .. -1 ] ] * ' '
     end
-  end
+  # -
+
   ERROR_ = 5
   NIL_ = nil
 end

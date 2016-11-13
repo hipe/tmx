@@ -97,7 +97,7 @@ module Skylab::Brazen
       def __execute_plus
         x = execute
         if x.respond_to? :bit_length
-          @__write_exitstatus[ _d ]
+          @__write_exitstatus[ x ]
         end
         NOTHING_
       end

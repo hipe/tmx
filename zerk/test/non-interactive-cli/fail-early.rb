@@ -189,6 +189,12 @@ module Skylab::Zerk::TestSupport
       def _invocation_under tc
         InvocationUnderExpectations__.new @_setup, tc
       end
+
+      # -- convenience functions
+
+      def unstyle_styled line
+        Home_::CLI_::Remote_lib[]::Styling::Unstyle_styled[ line ]
+      end
     end
 
     # ==

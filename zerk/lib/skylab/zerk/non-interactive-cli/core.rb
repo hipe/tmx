@@ -79,6 +79,7 @@ module Skylab::Zerk
       :produce_reader_for_root_by,
       :root_ACS_proc,
       :system_conduit_proc,
+      :write_exitstatus,
       :when_head_argument_looks_like_option,
     )
 
@@ -121,6 +122,16 @@ module Skylab::Zerk
     # as for `@_top` - see "why linked list" in [#024]
 
     # -- invocation
+
+    def to_bound_call  # for [tmx]
+      Common_::Bound_Call.via_receiver_and_method_name self, :__execute_plus
+    end
+
+    def __execute_plus
+      _d = execute
+      @write_exitstatus[ _d ]
+      NOTHING_
+    end
 
     def execute  # *always* result in an exitstatus
 
@@ -846,9 +857,7 @@ module Skylab::Zerk
       Remote_CLI_lib_[]::When
     end
 
-    Remote_CLI_lib_ = Lazy_.call do
-      Home_.lib_.brazen::CLI_Support
-    end
+    Remote_CLI_lib_ = Home_::CLI_::Remote_lib
 
     DASH_ = '-'
     DASH_BYTE_ = DASH_.getbyte 0

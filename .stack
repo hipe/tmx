@@ -23,7 +23,3 @@ use [sa] to convert etc to Stream_
 -4.11 treemap
 -4.12 permute
 -4.13 slicer
--4.14 git
--4.15 test_support
--4.16 sub_tree
--4.17 common

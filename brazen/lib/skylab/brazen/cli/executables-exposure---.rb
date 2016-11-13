@@ -125,6 +125,8 @@ module Skylab::Brazen
             sub_const = "#{ const_pfx[ 1 .. -1 ].join( UNDERSCORE_ ) }#{
               }_#{ name.as_lowercase_with_underscores_symbol }"
 
+            # the above is :[#083] the spot that realizes this name convention
+
             # there is at least one case where the executable has been loaded
             # already: if you are using the test runner to test itself
 
@@ -142,12 +144,13 @@ module Skylab::Brazen
 
             o = fr.resources
 
-            a = o.invocation_string_array.dup
-            a.push name.as_slug
+            _pn_s_a = [ * o.invocation_string_array.dup, name.as_slug ]
 
             _top_module = ::Object.const_get top_const, false
+
             _func = _top_module.const_get sub_const, false
-            _func[ o.sin, o.sout, o.serr, a, o.argv ]
+
+            _func[ o.argv, o.sin, o.sout, o.serr, _pn_s_a ]
           end
         end
       end

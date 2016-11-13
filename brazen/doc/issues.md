@@ -60,7 +60,10 @@
                ignored for the greater good, for usability
 [#085] #hole (#was: (#moved-to: [#ba-052]))
 [#084]       +#wishlist a `flag` meta-meta property
-[#083] #hole ( #moved-to: [#hu-043] contextualization )
+
+[#083]       track this spot that does [tmx] mounting for one-off scripts
+             ( #was: #moved-to: [#hu-043] contextualization )
+
              ( #was: #done workspace `init` action should not default to '.' in API )
 [#082]       #track meta-meta-property candidates (list, enum etc)
 [#081]       #track experimental extensions to Actor (1x)
