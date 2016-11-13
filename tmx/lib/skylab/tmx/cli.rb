@@ -2,9 +2,13 @@ module Skylab::TMX
 
   class CLI
 
-    # at the moment all the the code here falls decisively into either the
-    # "pre-map" or "post-map" era. "pre-map" is all commented out for now.
-    # "post-map" is largely a frontier playground for exciting adaptation experiments.
+    # primarily "tmx" (the CLI client) is for the high-level test-runner
+    # ("test-all"). a need for high availability is one reason we have
+    # rolled our own client rather than using a framework. as a side-
+    # effect this is the frontier of argument-scanner-based clients.
+
+    # secondarily (but in what used to be the primary function) this client
+    # tries to "mount" and "expose" other participating related sidesystems.
 
     Invocation___ = self
 
@@ -12,13 +16,14 @@ module Skylab::TMX
 
       def initialize argv, i, o, e, pn_s_a
 
-        @argv = argv
+        @argv = Common_::Polymorphic_Stream.via_array argv
 
         @selection_stack = [ RootFrame___.new do
           Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
         end ]
 
         @_end_of_stream = :_no_op
+        @sin = i
         @serr = e
         @sout = o
         @program_name_string_array = pn_s_a
@@ -41,6 +46,7 @@ module Skylab::TMX
       end
 
       def execute
+
         bc = __bound_call
         if bc
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block
@@ -60,16 +66,31 @@ module Skylab::TMX
 
       def __bound_call
 
-        if @argv.length.zero?
+        if @argv.no_unparsed_exists
           __when_no_args
-        elsif Looks_like_option[ @argv.first ]
-          __when_looks_like_option_at_front
+
+        elsif Looks_like_option[ @argv.current_token ]
+          __when_head_looks_like_option
+
+        elsif __head_is_intrinsic_operator
+          __bound_call_for_intrinsic_operator
+
+        elsif __head_is_mountable_operator
+          __bound_call_for_mountable_operator
+
         else
-          __when_looks_like_operation_at_front
+          __whine_about_no_such_operator
         end
       end
 
+      def __whine_about_no_such_operator
+        @serr.puts "DOOTILY MY FOOTILY #{ @argv.current_token.inspect }"
+        invite_to_general_help
+      end
+
       def __when_no_args
+
+        self._PROBABLY_CHANGE_THIS_TO_BE_MORE_INCLUSIVE
 
         _init_selective_listener
 
@@ -87,8 +108,8 @@ module Skylab::TMX
         UNABLE_
       end
 
-      def __when_looks_like_option_at_front  # assume 0 < argv length
-        if HELP_RX =~ @argv.first
+      def __when_head_looks_like_option  # assume 0 < argv length
+        if HELP_RX =~ @_current_token
           _express_help
         else
           __when_unrecognized_option_at_front
@@ -96,29 +117,26 @@ module Skylab::TMX
       end
 
       def __when_unrecognized_option_at_front
-        @serr.puts "unrecognized option: #{ @argv.first.inspect }"
+        @serr.puts "unrecognized option: #{ @argv.current_token.inspect }"
         invite_to_general_help
       end
 
-      def __when_looks_like_operation_at_front
+      def __head_is_intrinsic_operator
 
-        scn = Common_::Polymorphic_Stream.via_array @argv
+        entry = @argv.current_token.gsub DASH_, UNDERSCORE_
 
-        sym = scn.current_token.gsub( DASH_, UNDERSCORE_ ).intern
-
-        m = OPERATIONS__[ sym ]
-
-        if m
-          _init_selective_listener
-          scn.advance_one
-          @__operation_symbol = sym
-          @_user_scanner = scn
-          send m
+        if _store :@__operation_method_name, OPERATIONS__[ entry.intern ]
+          ACHIEVED_
         else
-          @serr.puts "currently, normal tmx is deactivated -"
-          @serr.puts "won't parse #{ scn.current_token.inspect }"
-          invite_to_general_help
+          @__possible_entry = entry
+          UNABLE_
         end
+      end
+
+      def __bound_call_for_intrinsic_operator
+        @argv.advance_one
+        _init_selective_listener
+        send remove_instance_variable :@__operation_method_name
       end
 
       OPERATION_DESCRIPTIONS___ = {
@@ -156,7 +174,7 @@ module Skylab::TMX
 
         arg_scn = _multimode_argument_scanner_by do |o|
 
-          o.user_scanner remove_instance_variable :@_user_scanner
+          o.user_scanner remove_instance_variable :@argv
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
@@ -257,7 +275,7 @@ module Skylab::TMX
 
           o.default_primary :execute
 
-          o.user_scanner remove_instance_variable :@_user_scanner
+          o.user_scanner remove_instance_variable :@argv
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
 
@@ -316,7 +334,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-B OPEN
 
-          o.user_scanner remove_instance_variable :@_user_scanner
+          o.user_scanner remove_instance_variable :@argv
 
           o.listener @listener
         end
@@ -324,6 +342,31 @@ module Skylab::TMX
         Add_slice_primary_[ 0, as, self ]
 
         as
+      end
+
+      # -- generic mounting
+
+      # when the front element of the ARGV directly corresponds to a
+      # sidesystem (gem), then resolution of the intended recipient is much
+      # more straightforward than having to load possibly the whole tree.
+
+      def __head_is_mountable_operator
+
+        mounter = CLI::Magnetics_::BoundCall_via_MountAnyInstalledSidesystem.new(
+          remove_instance_variable( :@__possible_entry ),
+          self,
+          Home_.installation_,
+        )
+
+        # (we could extend this "optimization" to the executables but meh)
+
+        if mounter.match_head_as_participating_gem
+          @__mounter = mounter ; ACHIEVED_
+        end
+      end
+
+      def __bound_call_for_mountable_operator
+        remove_instance_variable( :@__mounter ).bound_call_for_participating_sidesystem
       end
 
       # -- support for customizing emissions
@@ -403,6 +446,7 @@ module Skylab::TMX
       end
 
       def to_item_normal_tuple_stream
+        self._PROBABLY_CHANGE_THIS_TO_BE_MORE_INCLUSIVE
         Stream_.call OPERATIONS__.keys do |sym|
           [ :operator, sym ]
         end
@@ -600,7 +644,12 @@ module Skylab::TMX
       end
 
       def rewrite_ARGV * s_a
-        @argv.replace s_a ; nil
+        release_ARGV.array_for_read.replace s_a
+        NIL
+      end
+
+      def release_ARGV
+        remove_instance_variable :@argv
       end
 
       attr_writer(
@@ -611,81 +660,16 @@ module Skylab::TMX
         :API_invocation_,
         :listener,
         :_emission_handler_methods_,
+        :program_name_string_array,
         :selection_stack,
         :serr,
+        :sin,
         :sout,
       )
     end
 
     # ==
-
-    Legacy_CLI_class___ = Lazy_.call do
-      self._NOT_USED
-  class Legacy_CLI____ < Home_.lib_.brazen::CLI
-
-    # we do not yet need and so are not yet worried about "our tmx" as a
-    # back-leaning "reactive service". for now all of the below is in
-    # service of *our* tmx CLI client. a more abstract such construction
-    # is a false requirement for today. but we do have these requirements:
-    #
-    #   • there must be *no* sidesystem-specific knowledge *anywhere* here.
-
-    def initialize i, o, e, pn_s_a
-
-      disp = Home_::Models_::Reactive_Model_Dispatcher.new
-
-      disp.fast_lookup = method :__fast_lookup
-
-      disp.unbound_stream_builder = method :__to_unbound_stream
-
-      super i, o, e, pn_s_a, :back_kernel, disp.to_kernel_adapter
-    end
-
-    expose_executables_with_prefix 'tmx-'
-
-    def __fast_lookup nf
-
-      # when the front element of the ARGV directly corresponds to a
-      # sidesystem (gem), then resolution of the intended recipient is much
-      # more straightforward than having to load possibly the whole tree.
-
-      _ = Home_.installation_.participating_gem_prefix[ 0 .. -2 ]  # "skylab"
-
-      possible_gem_path = ::File.join _, nf.as_slug
-
-      _ok = ::Gem.try_activate possible_gem_path
-      if _ok
-        ___fast_lookup_when_gem possible_gem_path, nf
-      else
-
-        # (we could extend this "optimization" to the executables but meh)
-
-        NIL_
-      end
-    end
-
-    def ___fast_lookup_when_gem path, nf
-
-      require path
-
-      sym_a = Home_.installation_.participating_gem_const_path_head.dup
-
-      sym_a.push nf.as_const  # EEK
-
-      ss_mod = Autoloader_.const_reduce sym_a, ::Object
-
-      _cli_class = ss_mod.const_get :CLI, false  # :+#hook-out
-
-      if _cli_class
-
-        _nf = Common_::Name.via_module ss_mod
-
-        Home_::Model_::Showcase_as_Unbound.new _nf, ss_mod
-      else
-        self._COVER_ME
-      end
-    end
-
+    if false
     def __to_unbound_stream
 
       _st = Home_.installation_.to_sidesystem_manifest_stream
@@ -698,83 +682,7 @@ module Skylab::TMX
         manifest.to_unboundish_stream
       end
     end
-
-    def init_properties
-      super
-      # (typically, is a frozen const-like thing so..)
-
-      bx = @front_properties.dup  # (.. and not `to_mutable_box_like_proxy`)
-
-      bx.replace_by :action do | prp |
-        prp.dup_by do
-          @name = Common_::Name.via_variegated_symbol :reactive_node
-        end
-      end
-      @front_properties = bx
-      NIL_
     end
-
-    class Showcase_as_Bound
-
-      include Home_::Model_::Common_Bound_Methods
-
-      # make the top client look like a reactive node! eek
-
-      def initialize bound_parent_action, nf, ss_mod, & oes_p
-        @_bound_parent = bound_parent_action
-        @nf_ = nf
-        @_ss_mod = ss_mod
-      end
-
-      def receive_show_help parent
-
-        _cli = _build_new_CLI_for_under parent
-
-        _cli.invoke [ '--help' ]  # le meh
-      end
-
-      def description_proc_for_summary_under _
-        description_proc
-      end
-
-      def description_proc
-        ss_mod = @_ss_mod
-        -> y do
-          ss_mod.describe_into_under y, self
-        end
-      end
-
-      def bound_call_under ada
-
-        _cli = _build_new_CLI_for_under ada
-
-        _args = [ ada.resources.argv ]
-
-        Common_::Bound_Call[ _args, _cli, :invoke ]
-      end
-
-      def _build_new_CLI_for_under ada
-
-        rsx = ada.resources
-
-        _slug = @nf_.as_slug
-
-        _s_a = [ * rsx.invocation_string_array, _slug ]
-
-        cli = @_ss_mod::CLI.new rsx.sin, rsx.sout, rsx.serr, _s_a
-
-        if rsx.has_bridges
-          self._TRIVIALLY_WRITE_AND_COVER_ME
-          cli.resources.share_bridge_resources_of rsx
-        end
-
-        cli
-      end
-    end
-
-    self  # legacy CLI class
-  end
-    end  # proc that wraps legacy CLI class
 
     # ==
 

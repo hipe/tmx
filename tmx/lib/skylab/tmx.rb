@@ -99,6 +99,12 @@ module Skylab::TMX
       ::File.dirname dir
     end
 
+    def test_support  # #[#ts-035]
+      @___test_support ||= begin
+        require_relative '../../test/test-support' ; Home_::TestSupport
+      end
+    end
+
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )

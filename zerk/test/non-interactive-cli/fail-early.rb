@@ -9,106 +9,187 @@ module Skylab::Zerk::TestSupport
     # -
 
       def invoke * argv
-        @_ze_last_method = :puts
-        @_ze_niCLI_setup = Setup___.new argv ; nil
+        _ze_niCLI_client.invoke_via_argv argv
       end
 
       def invoke_via_argv argv
-        @_ze_last_method = :puts
-        @_ze_niCLI_setup = Setup___.new argv ; nil
+        _ze_niCLI_client.invoke_via_argv argv
       end
 
       def expect_empty_puts
-        expect nil
+        @ze_niCLI_client.expect nil
       end
 
       def expect_line_by m=nil, & p
-        @_ze_last_method = m if m
-        __ze_add_proc_for_line_based_expectation p
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_line_by( & p )
       end
 
       def expect_each_on_stdout_by m=nil, & p
-        @_ze_last_method = m if m
-        @_ze_last_stream = :sout
-        _ze_add_proc_based_expectation p
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_each_on_stdout_by( & p )
       end
 
       def expect_each_by m=nil, & p
-        @_ze_last_method = m if m
-        _ze_add_proc_based_expectation p
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_each_by( & p )
       end
 
       def expect_on_stderr_lines_in_big_string m=nil, big_s
-        @_ze_last_method = m if m
-        @_ze_last_stream = :serr
-        _ze_add_big_string_based_expectation big_s
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_on_stderr_lines_in_big_string big_s
       end
 
       def expect_on_stdout_lines_in_big_string m=nil, big_s
-        @_ze_last_method = m if m
-        @_ze_last_stream = :sout
-        _ze_add_big_string_based_expectation big_s
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_on_stdout_lines_in_big_string big_s
       end
 
       def expect_lines_in_big_string m=nil, big_s
-        @_ze_last_method = m if m
-        _ze_add_big_string_based_expectation big_s
-        NIL
-      end
-
-      def __ze_add_proc_for_line_based_expectation p
-
-        @_ze_niCLI_setup.add_proc_for_line_based_expectation(
-          p, @_ze_last_method, @_ze_last_stream )
-        NIL
-      end
-
-      def _ze_add_proc_based_expectation p
-
-        @_ze_niCLI_setup.add_proc_based_expectation(
-          p, @_ze_last_method, @_ze_last_stream )
-        NIL
-      end
-
-      def _ze_add_big_string_based_expectation big_s
-
-        @_ze_niCLI_setup.add_big_string_based_expectation(
-          big_s, @_ze_last_method, @_ze_last_stream )
-        NIL
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_lines_in_big_string big_s
       end
 
       def expect_on_stderr m=nil, exp_x
-        @_ze_last_method = m if m
-        @_ze_last_stream = :serr
-        _ze_add_line_based_expectation exp_x
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_on_stderr exp_x
       end
 
       def expect_on_stdout m=nil, exp_x
-        @_ze_last_method = m if m
-        @_ze_last_stream = :sout
-        _ze_add_line_based_expectation exp_x
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_on_stdout exp_x
       end
 
       def expect m=nil, exp_x
-        @_ze_last_method = m if m
-        _ze_add_line_based_expectation exp_x
-      end
-
-      def _ze_add_line_based_expectation exp_x
-
-        @_ze_niCLI_setup.add_line_based_expectation(
-          exp_x, @_ze_last_method, @_ze_last_stream )
-        NIL
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect exp_x
       end
 
       def expect_failed
-        InvocationUnderExpectations__.new( self ).execute.__expect_failed
+        @ze_niCLI_client.expect_failed_under self
       end
 
       def expect_succeeded
-        InvocationUnderExpectations__.new( self ).execute.__expect_succeeded
+        @ze_niCLI_client.expect_succeeded_under self
+      end
+
+      def _ze_niCLI_client
+        @ze_niCLI_client ||= Client_for_Expectations_of_Invocation.new
       end
     # -
+
+    # ==
+
+    class Client_for_Expectations_of_Invocation
+
+      def initialize
+        @_method = :puts
+        @_setup = Setup___.new
+      end
+
+      def program_name_string_array= x
+        @_setup.program_name_string_array= x
+      end
+
+      def subject_CLI_by & p
+        @_setup.subject_CLI_by = p ; nil
+      end
+
+      def using_method m
+        @_method = m ; nil
+      end
+
+      def on_stream serr_or_sout
+        @_stream = serr_or_sout ; nil
+      end
+
+      def invoke * argv
+        invoke_via_argv argv
+      end
+
+      def invoke_via_argv argv
+        @_setup.ARGV = argv ; nil
+      end
+
+      def expect_line_by & p
+        __add_proc_for_line_based_expectation p
+      end
+
+      def expect_each_on_stdout_by & p
+        @_stream = :sout
+        _add_proc_based_expectation p
+      end
+
+      def expect_each_by & p
+        _add_proc_based_expectation p
+      end
+
+      def expect_on_stderr_lines_in_big_string big_s
+        @_stream = :serr
+        _add_big_string_based_expectation big_s
+      end
+
+      def expect_on_stdout_lines_in_big_string big_s
+        @_stream = :sout
+        _add_big_string_based_expectation big_s
+      end
+
+      def expect_lines_in_big_string big_s
+        _add_big_string_based_expectation big_s
+        NIL
+      end
+
+      def __add_proc_for_line_based_expectation p
+
+        @_setup.add_proc_for_line_based_expectation p, @_method, @_stream
+        NIL
+      end
+
+      def _add_proc_based_expectation p
+
+        @_setup.add_proc_based_expectation p, @_method, @_stream
+        NIL
+      end
+
+      def _add_big_string_based_expectation big_s
+
+        @_setup.add_big_string_based_expectation big_s, @_method, @_stream
+        NIL
+      end
+
+      def expect_on_stderr exp_x
+        @_stream = :serr
+        _add_line_based_expectation exp_x
+      end
+
+      def expect_on_stdout exp_x
+        @_stream = :sout
+        _add_line_based_expectation exp_x
+      end
+
+      def expect m=nil, exp_x
+        @_method = m if m
+        _add_line_based_expectation exp_x
+      end
+
+      def _add_line_based_expectation exp_x
+
+        @_setup.add_line_based_expectation exp_x, @_method, @_stream
+        NIL
+      end
+
+      def expect_failed_under tc
+        _invocation_under( tc ).execute.__expect_failed
+      end
+
+      def expect_succeeded_under tc
+        _invocation_under( tc ).execute.__expect_succeeded
+      end
+
+      def _invocation_under tc
+        InvocationUnderExpectations__.new @_setup, tc
+      end
+    end
 
     # ==
 
@@ -120,9 +201,8 @@ module Skylab::Zerk::TestSupport
 
     class InvocationUnderExpectations__
 
-      def initialize tc
-
-        @setup = tc.remove_instance_variable :@_ze_niCLI_setup
+      def initialize setup, tc
+        @setup = setup
         @test_context = tc
       end
 
@@ -161,23 +241,38 @@ module Skylab::Zerk::TestSupport
 
       def __init_CLI_and_spies argv
 
-        _CLI_class_ish = @test_context.subject_CLI
+        setup = @setup ; tc = @test_context
 
-        spy = Spy___.new @setup, @test_context
+        p = setup.subject_CLI_by
+        if p
+          classish = p.call
+        else
+          classish_came_from_test_context = true
+          classish = tc.subject_CLI
+        end
 
-        __pn_s_a = __program_name_string_array
+        kn = setup.program_name_string_array_knownness
+        _pn_s_a = if kn
+          kn.value_x
+        else
+          __program_name_string_array
+        end
 
-        @_CLI = _CLI_class_ish.new(
+        spy = Spy___.new setup, tc
+
+        cli = classish.new(
           argv,
           :_ze_NO_,
           spy.sout_stream_proxy,
           spy.serr_stream_proxy,
-          __pn_s_a,
+          _pn_s_a,
         )
 
-        @test_context.prepare_CLI @_CLI
+        if classish_came_from_test_context
+          tc.prepare_CLI cli
+        end
 
-        @_spy = spy
+        @_CLI = cli ; @_spy = spy
         NIL
       end
 
@@ -341,10 +436,14 @@ module Skylab::Zerk::TestSupport
 
     class Setup___
 
-      def initialize argv
-        @ARGV = argv
+      def initialize
         @expectations = []
         @has = {}
+      end
+
+      def program_name_string_array= x
+        @program_name_string_array_knownness = Common_::Known_Known[ x ]
+        x
       end
 
       def add_proc_based_expectation p, m, serr_or_sout
@@ -369,10 +468,17 @@ module Skylab::Zerk::TestSupport
         NIL
       end
 
-      attr_reader(
-        :has,
+      attr_writer(
         :ARGV,
+        :subject_CLI_by,
+      )
+
+      attr_reader(
+        :ARGV,
+        :has,
         :expectations,
+        :program_name_string_array_knownness,
+        :subject_CLI_by,
       )
     end
 

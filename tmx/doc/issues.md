@@ -1,3 +1,7 @@
+[#017] #wish here's guys that don't have "mounting" in tmx that might want it -
+             [sa], [dt], [my], [gv]
+
+
 [#016] #open unbreak [tmx]'s heart - use new API somehow to bring old tmx back
                - integration of sidesystems with TMX should happen in the sides, not TMX
 

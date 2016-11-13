@@ -22,6 +22,19 @@ module Skylab::Common::TestSupport
       end
     end
 
+    it "(stowaway - tmx integration)" do
+
+      Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'common', 'ping'
+
+      cli.expect_on_stderr "hello from common.\n"
+
+      cli.expect_succeeded_under self
+    end
+
     def expect expect_s
       s = fu_output_message_for cmd, arg
       md = _subject.match s

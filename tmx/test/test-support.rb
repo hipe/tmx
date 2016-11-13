@@ -4,10 +4,20 @@ require 'skylab/test_support'
 module Skylab::TMX::TestSupport
 
   class << self
+
+    def begin_CLI_expectation_client
+      o = Zerk_lib_[].test_support::Non_Interactive_CLI::Fail_Early::
+        Client_for_Expectations_of_Invocation.new
+      o.program_name_string_array = %w(xmt)
+      o.subject_CLI_by { Home_::CLI }
+      o
+    end
+
     def [] tcc
       tcc.extend ModuleMethods___
       tcc.include InstanceMethods___
     end
+
   end  # >>
 
   TestSupport_ = ::Skylab::TestSupport

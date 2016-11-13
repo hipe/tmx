@@ -36,6 +36,11 @@ module Skylab::Brazen
 
         @__argv = argv
 
+        if block_given?
+          p = yield.method :exitstatus=
+        end
+        @__write_exitstatus = p
+
         if x_a.length.zero?
           h = EMPTY_H_
         else
@@ -83,6 +88,18 @@ module Skylab::Brazen
 
       def _receive_resource sym, x
         ( @_resource_components ||= [] ).push sym, x ; nil
+      end
+
+      def to_bound_call
+        Common_::Bound_Call.via_receiver_and_method_name self, :__execute_plus
+      end
+
+      def __execute_plus
+        x = execute
+        if x.respond_to? :bit_length
+          @__write_exitstatus[ _d ]
+        end
+        NOTHING_
       end
 
       def execute

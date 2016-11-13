@@ -1,33 +1,83 @@
 module Skylab::TMX
 
-  class Models_::Reactive_Model_Dispatcher
+  class CLI
 
-    def initialize & oes_p
-      @on_event_selectively = oes_p
-    end
+    class Magnetics_::BoundCall_via_MountAnyInstalledSidesystem  # 1x
 
-    # ~ modality adaptation
+      # -
 
-    def to_kernel_adapter
+        def initialize possible_entry, cli, inst
+          @CLI = cli
+          @entry = possible_entry
+          @installation = inst
+        end
 
-      As_Kernel___.new self
-    end
+        def match_head_as_participating_gem
 
-    # ~ direct call & support
+          _head = @installation.participating_gem_prefix[ 0...-1 ]  # # => "skylab"
+          gem_path = ::File.join _head, @entry
+          _yes = ::Gem.try_activate gem_path
+          if _yes
+            @__gem_path = gem_path
+            ACHIEVED_
+          end
+        end
 
-    def call * x_a, & oes_p
+        def bound_call_for_participating_sidesystem
 
-      otr = dup
-      otr.__receive_call x_a, & oes_p
-      bc = otr.__execute
-      if bc
-        bc.receiver.send bc.method_name, * bc.args, & bc.block
-      else
-        bc
-      end
-    end
+          # tons of assumptions about names and interfaces.. #hook-out
 
-  protected
+          o = @CLI
+          argv_scn = o.release_ARGV
+          _tok = argv_scn.current_token
+          argv_scn.advance_one
+          argv = argv_scn.flush_remaining_to_array
+
+          _ss_mod = __sidesystem_module
+
+          _cli_class = _ss_mod.const_get :CLI, false
+
+          _pn_s_a = [ * o.program_name_string_array, _tok ]
+
+          _cli = _cli_class.new argv, o.sin, o.sout, o.serr, _pn_s_a do
+            o
+          end
+
+          _ = _cli.to_bound_call  # ..
+          _  # #todo
+        end
+
+        def __sidesystem_module
+
+          # EEK only because it just so happens that none of our sidesystems'
+          # toplevel const names ever use any acronyms (and they all otherwise
+          # follow the most conventional convention) can we do this in such
+          # a straightforward way. if this were not the case, we would need
+          # to leverage the name correction of `Autoloader_.const_reduce`.
+
+          require remove_instance_variable :@__gem_path
+
+          _const_a = __sidesystem_module_const_path
+
+          _const_a.inject ::Object do |mod, const|
+            mod.const_get const, false
+          end
+        end
+
+        def __sidesystem_module_const_path
+
+          _heads = @installation.participating_gem_const_path_head
+
+          _nf = Common_::Name.via_lowercase_with_underscores_string @entry
+
+          _tail = _nf.as_camelcase_const_string
+
+          [ * _heads, _tail ]
+        end
+
+      # -
+
+      module MAYBE_SALVAGE_ME
 
     def __receive_call x_a, & oes_p
 
@@ -140,8 +190,34 @@ module Skylab::TMX
       def reactive_tree_seed
         self._ONLY_for_respond_to
       end
+    end  # As_Kernel___
+
+    #==FROM
+
+    module Common_Bound_Methods
+
+      # because we aren't mucking with brazen reactive node API, redundant
+
+      def is_visible
+        true
+      end
+
+      def name_value_for_order
+        @nf_.as_const  # b.c already calculated
+      end
+
+      def after_name_value_for_order
+        NIL_
+      end
+
+      def name
+        @nf_
+      end
     end
 
-    Me_ = self
+    #==TO
+
+      end  # MAYBE_SALVAGE_ME
+    end
   end
 end

@@ -2,7 +2,8 @@
 
 require 'skylab/common'
 
-_x = Skylab::Common::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+_x = Skylab::Common::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
 $stderr.puts "(exitstatus: #{ _x })"
