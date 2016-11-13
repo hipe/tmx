@@ -7,25 +7,20 @@ end
 
 module Skylab::Git_citxt
 
-  class << self
-    def _call i, o, e, pn_s_a, argv
-      CLI.new( i, o, e, pn_s_a ).invoke argv
-    end
-    alias_method :[], :_call
-    alias_method :[], :_call
-  end  # >>
-
   CLI = ::Class.new ::Class.new
   class CLI
 
-    def initialize i, o, e, pn_s_a
+    def initialize argv, i, o, e, pn_s_a
       super
       @is_finished = @pwd = @git_dir_pathname = @dir_pathname_raw = nil
       @is_dry_run = @be_verbose = nil
     end
 
-    def invoke argv
+    def execute
+
       # we can't do this simply because o.p exits after help
+
+      argv = remove_instance_variable :@argv
 
       @do_show_help = false
       if argv.length.nonzero?
@@ -295,7 +290,8 @@ module Skylab::Git_citxt
   class CLI::Client
   private
 
-    def initialize _i, o, e, pn_s_a
+    def initialize argv, _i, o, e, pn_s_a
+      @argv = argv
       @infostream = e
       @paystream = o
       @pn_s_a = pn_s_a
@@ -347,5 +343,5 @@ end
 
 if __FILE__ == $PROGRAM_NAME
 
-  Skylab::Git_citxt.call $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV
+  Skylab::Git_citxt.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
 end

@@ -6,11 +6,13 @@ class Skylab::Task
 
       class << self
 
-        def new sin, sout, serr, pn_s_a
+        def new argv, sin, sout, serr, pn_s_a
 
           Require_zerk_[]
 
           cli = Zerk_::HybridCLI.begin
+
+          cli.argv = argv
 
           cli.root_ACS_by do
             Root_Autonomous_Component_System_.new cli

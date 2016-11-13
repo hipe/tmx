@@ -11,9 +11,9 @@ class Skylab::Stack
 
   class Models_::Stack
 
-    def initialize * a
+    def initialize *six
 
-      @stdin, @stdout, @stderr, @pn_s_a, @_filesystem = a
+      @argv, @stdin, @stdout, @stderr, @pn_s_a, @_filesystem = six
 
       y = nil
       @_oes_p = -> * i_a, & ev_p do
@@ -26,7 +26,9 @@ class Skylab::Stack
       end
     end
 
-    def invoke argv
+    def execute
+
+      argv = remove_instance_variable :@argv
 
       if argv.length.zero?
         _do_execute_operation :list
@@ -537,9 +539,9 @@ end
 
 # ~
 
-_ = Skylab::Stack.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File )
-
-d = _.invoke ::ARGV
+d = Skylab::Stack.new(
+  ::ARGV, nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File
+).execute
 
 if d.nonzero?
   $stderr.puts "(exitstatus: #{ d })"

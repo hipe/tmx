@@ -4,9 +4,11 @@ module Skylab::Permute
 
     class << self
 
-      def new sin, sout, serr, pn_s_a
+      def new argv, sin, sout, serr, pn_s_a
 
         o = Zerk_lib_[]::NonInteractiveCLI.begin
+
+        o.argv = argv
 
         o.universal_CLI_resources sin, sout, serr, pn_s_a
 

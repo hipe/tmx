@@ -15,13 +15,10 @@ module Skylab::Git
 
   class Impl___
 
-    def self.new i, o, e
-      Client_.new i, o, e
-    end
-
     class Really_Basic_CLI_Client__
 
-      def initialize sin, sout, serr
+      def initialize argv, sin, sout, serr
+        @argv = argv
         @exitstatus = ERROR_CODE_
         @stderr_IO = serr
         @y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
@@ -29,8 +26,8 @@ module Skylab::Git
 
       attr_accessor :program_name
 
-      def invoke argv
-        @argv = argv ; @do_procede = true
+      def execute
+        @do_procede = true
         Home_::Library_::OptionParser.class  # #touch
         ok = preparse_opts
         ok &&= parse_opts

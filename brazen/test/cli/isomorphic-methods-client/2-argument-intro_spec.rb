@@ -16,11 +16,6 @@ module Skylab::Brazen::TestSupport
         client_class_
       end
 
-      it "builds" do
-
-        init_invocation_for_expect_stdout_stderr
-      end
-
       it "0 args - no output, result is result" do
 
         invoke

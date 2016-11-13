@@ -29,9 +29,9 @@ module Skylab::Zerk
 
         cli.universal_CLI_resources sin, sout, serr, pn_s_a
 
-        _fake_class = cli.finish
+        cli.argv = argv
 
-        _fake_class.invoke argv
+        cli.finish.execute
       end
 
       alias_method :[], :call
@@ -69,6 +69,7 @@ module Skylab::Zerk
     end
 
     attr_writer(
+      :argv,
       :compound_custom_sections,
       :compound_usage_strings,
       :invite,
@@ -121,9 +122,9 @@ module Skylab::Zerk
 
     # -- invocation
 
-    def invoke argv  # *always* result in an exitstatus
+    def execute  # *always* result in an exitstatus
 
-      @_arg_st = Common_::Polymorphic_Stream.via_array argv
+      @_arg_st = Common_::Polymorphic_Stream.via_array remove_instance_variable :@argv
 
       bc = ___bound_call
       if bc

@@ -145,8 +145,8 @@ module Skylab::BNF2Treetop
 
     include Headless::Client_InstanceMethods
 
-    def initialize sin, sout, serr, pn_s_a
-
+    def initialize argv, sin, sout, serr, pn_s_a
+      @__argv = argv
       @infostream = serr
       @paystream = sout
       @upstream = sin
@@ -154,8 +154,8 @@ module Skylab::BNF2Treetop
       @result = UNABLE_
     end
 
-    def invoke argv
-      if parse_argv! argv
+    def execute
+      if parse_argv! remove_instance_variable :@__argv
         @headless_client.execute
       else
         @result
@@ -352,7 +352,7 @@ module Skylab::BNF2Treetop
 
   class CLI
 
-    def initialize sin, sout, serr, pn_s_a
+    def initialize argv, sin, sout, serr, pn_s_a
 
       super
       @headless_client = Headless::Client.new self
@@ -1049,6 +1049,13 @@ end
 
 if $PROGRAM_NAME == __FILE__
 
-  Skylab::BNF2Treetop::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-    invoke ARGV
+  d = Skylab::BNF2Treetop::CLI.new(
+    ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ).execute
+
+  if d.nonzero?
+    $stderr.puts "(exitstatus: #{ d })"
+  end
+
+  exit d
 end

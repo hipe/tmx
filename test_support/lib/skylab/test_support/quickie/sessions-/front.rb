@@ -59,7 +59,7 @@ module Skylab::TestSupport
         @y = nil
       end
 
-      def invoke argv
+      def receive_argv__ argv
 
         @_do_execute = false
 

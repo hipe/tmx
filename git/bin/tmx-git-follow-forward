@@ -2,7 +2,8 @@
 
 class Skylab_Git__follow_forward__one_off
 
-    def initialize sin, sout, serr, pn_s_a
+    def initialize argv, sin, sout, serr, pn_s_a
+      @__argv = argv
       @program_name_string_array = pn_s_a
       @serr = serr
       @sin = sin
@@ -16,8 +17,8 @@ class Skylab_Git__follow_forward__one_off
       @system_proc = p ; nil
     end
 
-    def invoke a
-
+    def execute
+      a = remove_instance_variable :@__argv
       len = a.length
       if len.nonzero?
         v = '-v'
@@ -281,7 +282,7 @@ end
 if __FILE__ == $PROGRAM_NAME
 
   exit Skylab_Git__follow_forward__one_off.new(
-    $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
-  ).invoke ::ARGV
+    ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ).execute
 
 end

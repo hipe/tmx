@@ -55,13 +55,11 @@ module Skylab::Git::TestSupport
           the_system_conduit_
         end
 
-        _cli = _cli_class.new nil, _sout, _serr, PN_S_A___ do |o|
+        _es = _cli_class.new argv, nil, _sout, _serr, PN_S_A___ do |o|
           o.system_by do
             system_once[]
           end
-        end
-
-        _es = _cli.invoke argv
+        end.execute
 
         _lines = g.release_lines
 

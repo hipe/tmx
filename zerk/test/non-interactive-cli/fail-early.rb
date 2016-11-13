@@ -127,8 +127,8 @@ module Skylab::Zerk::TestSupport
       end
 
       def execute
-        __init_CLI_and_spies
-        @_exitstatus = @_CLI.invoke @setup.ARGV
+        __init_CLI_and_spies @setup.ARGV
+        @_exitstatus = @_CLI.execute
         remove_instance_variable( :@_spy ).finished_invoking_notify
         self
       end
@@ -159,7 +159,7 @@ module Skylab::Zerk::TestSupport
 
       # ~
 
-      def __init_CLI_and_spies
+      def __init_CLI_and_spies argv
 
         _CLI_class_ish = @test_context.subject_CLI
 
@@ -168,6 +168,7 @@ module Skylab::Zerk::TestSupport
         __pn_s_a = __program_name_string_array
 
         @_CLI = _CLI_class_ish.new(
+          argv,
           :_ze_NO_,
           spy.sout_stream_proxy,
           spy.serr_stream_proxy,

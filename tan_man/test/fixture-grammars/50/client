@@ -11,5 +11,5 @@ module Skylab::TanMan::TestSupport::Sexp
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ::Skylab::TanMan::TestSupport::Sexp::Grammars::Grammar50.new.invoke ARGV
+  Skylab::TanMan::TestSupport::Sexp::Grammars::Grammar50.new( ARGV ).execute
 end

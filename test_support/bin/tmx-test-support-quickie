@@ -2,7 +2,7 @@
 
 require 'skylab/test_support'
 
-program = -> i, o, e, pn_a, argv, & p do
+program = -> argv, i, o, e, pn_a, & p do
 
   _Q = Skylab::TestSupport::Quickie
 
@@ -50,7 +50,7 @@ Skylab::TestSupport_quickie = program
 
 if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
 
-  _d = program.call( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ) do | dae |
+  _d = program.call ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] do |dae|
     dae.listen
   end
 

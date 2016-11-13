@@ -148,9 +148,9 @@ module Skylab::DocTest::TestSupport
     end
     # -
 
-      def build_invocation_for_expect_stdout_stderr sin, sout, serr, pn_s_a, * xtra
+      def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra
 
-        Home_::CLI.new sin, sout, serr, pn_s_a do |cli|
+        Home_::CLI.new argv, sin, sout, serr, pn_s_a do |cli|
 
           cli.filesystem_by do
             this_filesystem_

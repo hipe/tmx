@@ -2,6 +2,11 @@
 
 require 'skylab/myterm'
 
-Skylab::MyTerm::CLI.new(
-  $stdin, $stdout, $stderr, [ ::File.basename( $PROGRAM_NAME ) ]
-).invoke ARGV
+d = Skylab::MyTerm::CLI.call(
+  ::ARGV, $stdin, $stdout, $stderr, [ ::File.basename( $PROGRAM_NAME ) ] )
+
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit d

@@ -10,20 +10,20 @@ module Skylab::Git_head
 
   def self.call i, o, e, pn_s_a, argv
 
-    CLI___.new( i, o, e, pn_s_a ).invoke argv
+    CLI___.new( arg, i, o, e, pn_s_a ).execute
   end
 
   class CLI___
 
-    def initialize i, o, e, pn_s_a
+    def initialize argv, i, o, e, pn_s_a
 
+      @argv = argv
       @branch_name = nil
       @pn_s_a = pn_s_a
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
     end
 
-    def invoke argv
-      @argv = argv
+    def execute
       _es = parse_opts_and_args
       _es || procede
     end

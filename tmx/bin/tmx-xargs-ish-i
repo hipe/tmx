@@ -8,7 +8,7 @@
   # (the bulk of this "one-off" turned into a goof-off exercise in functional
   # text formatting, the frontier that it is. no ivars, no classes.)
 
-program = -> _, stdout_, stderr_, pn_s_a, argv do
+program = -> argv, _, stdout_, stderr_, pn_s_a do
 
   #         ~ some pseudo-constants ~
 
@@ -697,7 +697,7 @@ program = -> _, stdout_, stderr_, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
   Skylab::TMX_xargs_ish_i = program
 end

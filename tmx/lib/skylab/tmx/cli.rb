@@ -10,7 +10,9 @@ module Skylab::TMX
 
     class Invocation___
 
-      def initialize i, o, e, pn_s_a
+      def initialize argv, i, o, e, pn_s_a
+
+        @argv = argv
 
         @selection_stack = [ RootFrame___.new do
           Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
@@ -38,8 +40,7 @@ module Skylab::TMX
         @__test_file_name_pattern_by = p
       end
 
-      def invoke argv
-        @argv = argv
+      def execute
         bc = __bound_call
         if bc
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block

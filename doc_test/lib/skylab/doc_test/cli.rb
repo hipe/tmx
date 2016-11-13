@@ -20,11 +20,13 @@ module Skylab::DocTest
 
     class << self
 
-      def new sin, sout, serr, pn_s_a
+      def new argv, sin, sout, serr, pn_s_a
 
         o = My_noninteractive_CLI_prototype___[].dup
 
         yield o
+
+        o.argv = argv
 
         o.universal_CLI_resources sin, sout, serr, pn_s_a
 

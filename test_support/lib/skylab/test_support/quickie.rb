@@ -244,7 +244,7 @@ module Skylab::TestSupport
         # currently the "recursive runner" is different than the "file runner"
         #
 
-        touch_mutable_session_.invoke argv
+        touch_mutable_session_.receive_argv__ argv
       end
 
       def touch_mutable_session_

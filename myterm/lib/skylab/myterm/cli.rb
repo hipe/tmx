@@ -7,7 +7,8 @@ module Skylab::MyTerm
     # to review, [ze] will "generate" for us (#todo  [#015])
     # we want to leverage the [ze] generated CLI to
 
-    def initialize sin, sout, serr, pn_s_a
+    def initialize argv, sin, sout, serr, pn_s_a
+      @_argv = argv
       @_FS_qk = nil
       @_SC_qk = nil
       @sin = sin ; @sout = sout ; @serr = serr ; @pn_s_a = pn_s_a
@@ -21,21 +22,21 @@ module Skylab::MyTerm
       @_SC_qk = Common_::Known_Known[ x ] ; x
     end
 
-    def invoke argv
+    def execute
 
-      if argv.length.zero?
+      if @_argv.length.zero?
 
         cli = Here_::Interactive.begin_CLI_
         cli.universal_CLI_resources @sin, @sout, @serr, @pn_s_a
         cli = cli.finish  # (does nothing at writing)
 
-        cli.invoke argv  # argv is empty. result is exitstatus
+        cli.invoke @_argv  # argv is empty. result is exitstatus
       else
-        __invoke_non_interactive argv
+        __invoke_non_interactive
       end
     end
 
-    def __invoke_non_interactive argv
+    def __invoke_non_interactive
 
       Require_zerk_[]
 
@@ -77,9 +78,11 @@ module Skylab::MyTerm
 
       cli.universal_CLI_resources @sin, @sout, @serr, @pn_s_a
 
+      cli.argv = @_argv
+
       cli.finish
 
-      cli.invoke argv
+      cli.execute
     end
 
     class Attempt_parse_etc___

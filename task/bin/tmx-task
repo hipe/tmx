@@ -3,13 +3,13 @@
 require 'skylab/task'
 
 cli = Skylab::Task::Magnetics::CLI.new(
-  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 )
 
 cli.filesystem_by do
   ::Dir
 end
 
-_ = cli.invoke ARGV
+_ = cli.execute
 
 $stderr.puts "(exitstatus: #{ _.inspect })"

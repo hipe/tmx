@@ -83,9 +83,9 @@ module Skylab::TestSupport::TestSupport
       Home_::CLI_support_[]::GENERIC_ERROR_EXITSTATUS
     end
 
-    def build_invocation_for_expect_stdout_stderr sin, sout, serr, pn_s_a
+    def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a
 
-      Home_::CLI.new sin, sout, serr, pn_s_a do |o|
+      Home_::CLI.new argv, sin, sout, serr, pn_s_a do |o|
 
         o.filesystem_by do
           Home_.lib_.system.filesystem

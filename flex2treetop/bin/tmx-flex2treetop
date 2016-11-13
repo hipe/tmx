@@ -2,8 +2,8 @@
 
 require 'skylab/flex2treetop'
 
-_x = Skylab::Flex2Treetop::CLI.new(
-  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
-).invoke ARGV
+_d = Skylab::Flex2Treetop::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
-$stderr.puts "(exitstatus: #{ _x })"
+$stderr.puts "(exitstatus: #{ _d })"

@@ -6,7 +6,7 @@ _client_class = Skylab::TMX::CLI
 
 _pn_s_a = [ ::File.basename( $PROGRAM_NAME ) ]
 
-cli = _client_class.new $stdin, $stdout, $stderr, _pn_s_a
+cli = _client_class.new ARGV, $stdin, $stdout, $stderr, _pn_s_a
 
 cli.json_file_stream_by do |&p|
   Skylab::TMX.development_directory_json_file_stream__( & p )
@@ -24,7 +24,7 @@ cli.test_directory_entry_name_by do
   Skylab::TMX.lib_.test_support::Init.test_directory_entry_name
 end
 
-d = cli.invoke ARGV
+d = cli.execute
 
 if d.nonzero?
   $stderr.puts "(exitstatus: #{ d })"

@@ -47,11 +47,11 @@ module Skylab::MyTerm::TestSupport
           add_line[ [ :e, s ] ]
         end
 
-        cli = subject_CLI.new nil, _sout, _serr, ['mt']
+        cli = subject_CLI.new argv, nil, _sout, _serr, ['mt']
 
         prepare_CLI_for_niCLI_ cli
 
-        _es = cli.invoke argv
+        _es = cli.execute
 
         State___.new _es, lines
       end

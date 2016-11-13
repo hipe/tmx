@@ -255,7 +255,9 @@ module Skylab::Zerk::TestSupport
           fake.sout = SOUT_CANARY___
         end
 
-        cli = __expscr_build_CLI fake
+        _CLI_class = subject_CLI
+
+        cli = _CLI_class.new EMPTY_A_, fake.sin, fake.sout, fake.serr, PN_S_A___
 
         prepare_CLI_for_expect_screens(
           cli, sct.__filesystem_conduit, sct.__system_conduit )
@@ -273,7 +275,7 @@ module Skylab::Zerk::TestSupport
 
         _got_to_end = catch :__expscr_freeze_where_you_are__ do
 
-          x = cli.invoke EMPTY_A_
+          x = cli.execute
           ACHIEVED_
         end
 
@@ -313,13 +315,6 @@ module Skylab::Zerk::TestSupport
       end
 
       Event_Loop_State___ = ::Struct.new :frame_stack_length
-
-      def __expscr_build_CLI fake
-
-        _CLI_class = subject_CLI
-
-        _CLI_class.new fake.sin, fake.sout, fake.serr, PN_S_A___
-      end
 
       PN_S_A___ = [ 'ziz' ]  # no see
 

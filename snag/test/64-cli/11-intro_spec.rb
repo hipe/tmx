@@ -17,9 +17,7 @@ module Skylab::Snag::TestSupport
 
     deeper_invite_rx = %r{\Ause 'sn0g -h <action>' for help on that action.\n\z}
 
-    context "the CLI canon (with the same memoized client!) - lvls 0 & 1 ui" do
-
-      use_memoized_client
+    context "the CLI canon lvls 0 & 1 ui" do
 
       it "0.0  (no args) - expecting / usage / invite" do
 
@@ -168,5 +166,5 @@ module Skylab::Snag::TestSupport
     end
   end
 end
-
+# #tombstone: no more memoized client
 # :+#tombstone: specs for the old "numbers" action

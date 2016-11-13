@@ -42,5 +42,5 @@ module Skylab::TanMan::TestSupport
 end
 
 if __FILE__ == $PROGRAM_NAME
-  ::Skylab::TanMan::TestSupport::Models::DotFile::Client.new.invoke ARGV
+  ::Skylab::TanMan::TestSupport::Models::DotFile::Client.new( ARGV ).execute
 end

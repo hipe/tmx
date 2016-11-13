@@ -25,9 +25,10 @@ module Skylab::Zerk  # intro in [#001] README
         @_prototype = x
       end
 
-      def new sin, sout, serr, pn_s_a
+      def new argv, sin, sout, serr, pn_s_a
         otr = @_prototype.dup
         otr.universal_CLI_resources sin, sout, serr, pn_s_a
+        otr.argv = argv
         otr.finish
       end
     end

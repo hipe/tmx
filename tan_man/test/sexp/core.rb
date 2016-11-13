@@ -68,3 +68,4 @@ module Skylab::TanMan::TestSupport
     Here_ = self
   end
 end
+# #tombstone: "grammar" node (base class for test grammars)

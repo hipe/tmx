@@ -88,11 +88,11 @@ module Skylab::TestSupport
         end
         mutable_argv, prefix = opt.to_a
 
-        init_invocation_for_expect_stdout_stderr
-
         if prefix
           mutable_argv[ 0, 0 ] = prefix
         end
+
+        init_invocation_for_expect_stdout_stderr mutable_argv
 
         path = working_directory_for_expect_stdout_stderr
         if path
@@ -101,7 +101,7 @@ module Skylab::TestSupport
           ::Dir.chdir path
         end
 
-        @exitstatus = @invocation.invoke mutable_argv
+        @exitstatus = @invocation.execute
 
         if orig_pwd
           do_debug and debug_IO.puts "cd #{ orig_pwd }"
@@ -117,7 +117,7 @@ module Skylab::TestSupport
 
       Options___ = ::Struct.new :mutable_argv, :prefix
 
-      def init_invocation_for_expect_stdout_stderr
+      def init_invocation_for_expect_stdout_stderr argv
 
         g = __build_IO_spy_group_for_expect_stdout_stderr
         @IO_spy_group_for_expect_stdout_stderr = g
@@ -127,7 +127,7 @@ module Skylab::TestSupport
         _x = self.CLI_options_for_expect_stdout_stderr
 
         invo = build_invocation_for_expect_stdout_stderr(
-          * g.values_at( :i, :o, :e ), _s_a, * _x )
+          argv, * g.values_at( :i, :o, :e ), _s_a, * _x )
 
         if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
           @for_expect_stdout_stderr_prepare_invocation[ invo ]
@@ -140,9 +140,9 @@ module Skylab::TestSupport
         NIL
       end
 
-      def build_invocation_for_expect_stdout_stderr sin, sout, serr, pn_s_a, * xtra
+      def build_invocation_for_expect_stdout_stderr argv, sin, sout, serr, pn_s_a, * xtra
 
-        subject_CLI.new( sin, sout, serr, pn_s_a, * xtra )  # #hook-out
+        subject_CLI.new( argv, sin, sout, serr, pn_s_a, * xtra )  # #hook-out
       end
 
       def __build_IO_spy_group_for_expect_stdout_stderr

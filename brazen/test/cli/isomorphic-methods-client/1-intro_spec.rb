@@ -14,11 +14,6 @@ module Skylab::Brazen::TestSupport
         client_class_
       end
 
-      it "build" do
-
-        init_invocation_for_expect_stdout_stderr
-      end
-
       it "2.3. invoke (just the arg)" do
 
         invoke 'yuan-jia', 'hua'

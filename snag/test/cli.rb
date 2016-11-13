@@ -20,8 +20,6 @@ module Skylab::Snag::TestSupport
 
       def [] tcm
 
-        tcm.extend Module_Methods___
-
         tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
         tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
         tcm.include Here___
@@ -73,39 +71,6 @@ module Skylab::Snag::TestSupport
         end
       end
     end  # >>
-
-    module Module_Methods___
-
-      def use_memoized_client  # a crime
-
-        p = -> tc do
-
-          # the first time:
-
-          tc.init_invocation_for_expect_stdout_stderr_  # call the original
-
-          g = tc.IO_spy_group_for_expect_stdout_stderr
-          invo = tc.invocation
-
-          p = -> tc_ do  # subsequent times
-
-            g.lines and fail
-            g.line_a = []
-
-            tc_.invocation = invo
-            tc_.IO_spy_group_for_expect_stdout_stderr = g
-
-            NIL_
-          end
-          NIL_
-        end
-
-        define_method :init_invocation_for_expect_stdout_stderr do
-          p[ self ]
-          NIL_
-        end
-      end
-    end
 
     def invoke * argv
       using_expect_stdout_stderr_invoke_via_argv argv

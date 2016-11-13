@@ -2,9 +2,9 @@
 
 require 'skylab/doc_test'
 
-Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
+Skylab::Doc_test = -> argv, i, o, e, pn_s_a do
 
-  _cli = Skylab::DocTest::CLI.new i, o, e, pn_s_a do |cli_|
+  Skylab::DocTest::CLI.new argv, i, o, e, pn_s_a do |cli_|
 
     cli_.filesystem_by do
       Skylab::DocTest.lib_.system.filesystem
@@ -13,13 +13,11 @@ Skylab::Doc_test = -> i, o, e, pn_s_a, argv do
     cli_.system_conduit_by do
       Skylab::DocTest.lib_.system
     end
-  end
-
-  _cli.invoke argv
+  end.execute
 end
 
 if __FILE__ == $PROGRAM_NAME
-  d = Skylab::Doc_test[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  d = Skylab::Doc_test[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
   if d.nonzero?
     $stderr.puts "(exitstatus: #{ d })"
   end

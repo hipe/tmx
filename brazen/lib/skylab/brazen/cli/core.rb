@@ -32,7 +32,9 @@ module Skylab::Brazen
     class Top_Invocation__
     private
 
-      def initialize i, o, e, pn_s_a, * x_a  # pn_s_a = program name string array
+      def initialize argv, i, o, e, pn_s_a, * x_a  # pn_s_a = program name string array
+
+        @__argv = argv
 
         if x_a.length.zero?
           h = EMPTY_H_
@@ -78,20 +80,19 @@ module Skylab::Brazen
       def receive_system_conduit x
         _receive_resource :system_conduit, x
       end
-    private
 
       def _receive_resource sym, x
         ( @_resource_components ||= [] ).push sym, x ; nil
       end
 
-      def invoke argv
+      def execute
+
+        argv = remove_instance_variable :@__argv
 
         rsx = @resources
 
         if rsx._is_finished
-          # #experimental! subsequent invocation [sg]
-          @resources = rsx.new argv
-          @_expression = nil  # eew
+          self._REENTRANCY_WAS_ONCE_COVERED_BUT_IS_NO_LONGER
         else
           rsx._finish argv, remove_instance_variable( :@_resource_components )
         end
@@ -116,6 +117,8 @@ module Skylab::Brazen
           @exitstatus
         end
       end
+
+    private
 
       def ___express_result_emission em
 
@@ -351,7 +354,6 @@ module Skylab::Brazen
         :application_kernel,
         :branch_adapter_class_,
         :_expression_agent_class,
-        :invoke,
         :leaf_adapter_class_,
         :maybe_use_exit_status,
         :outbound_line_yielder_for__payload__,  # [gi]
@@ -2180,3 +2182,4 @@ module Skylab::Brazen
     When_ = -> { o::When }
   end
 end
+# #tombstone: re-entrancy

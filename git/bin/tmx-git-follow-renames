@@ -2,8 +2,9 @@
 
 class Skylab_Git__follow_renames__one_off
 
-    def initialize _sin, sout, serr, pn_s_a
+    def initialize argv, _sin, sout, serr, pn_s_a
       block_given? and yield self
+      @__argv = argv
       @system_proc ||= -> { require 'open3' ; ::Open3 }
       @sout = sout
       @serr = serr
@@ -14,8 +15,8 @@ class Skylab_Git__follow_renames__one_off
       @system_proc = p ; nil
     end
 
-    def invoke a
-
+    def execute
+      a = remove_instance_variable :@__argv
       len = a.length
       if len.nonzero?
         v = '-v'
@@ -313,6 +314,6 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   exit Skylab_Git__follow_renames__one_off.new(
-    $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
-  ).invoke ::ARGV
+    ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ).execute
 end

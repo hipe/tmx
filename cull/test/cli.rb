@@ -26,7 +26,7 @@ module Skylab::Cull::TestSupport
 
       @IO_spy_group_for_expect_stdout_stderr = g
 
-      @exitstatus = Home_::CLI.new( nil, * g.values_at( :o, :e ), [ 'kul' ] ).invoke argv
+      @exitstatus = Home_::CLI.new( argv, nil, * g.values_at( :o, :e ), [ 'kul' ] ).execute
 
       nil
     end

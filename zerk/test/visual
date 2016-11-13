@@ -19,6 +19,6 @@ end
 
 Skylab::Zerk::TS_Visual::CLI.new(
 
-  $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 
-).invoke ::ARGV
+).execute

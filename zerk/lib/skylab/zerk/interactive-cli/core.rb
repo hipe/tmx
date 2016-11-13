@@ -33,6 +33,7 @@ module Skylab::Zerk
     end
 
     attr_writer(
+      :argv,
       :design,
       :on_event_loop,
     )
@@ -70,7 +71,9 @@ module Skylab::Zerk
       :system_conduit_known_known,
     )
 
-    def invoke argv
+    def execute
+
+      argv = remove_instance_variable :@argv
 
       if argv.length.zero?
         invoke_when_zero_length_argv

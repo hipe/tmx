@@ -4,9 +4,10 @@ module Skylab::SearchAndReplace
 
     class << self
 
-      def new sin, sout, serr, pn_s_a
+      def new argv, sin, sout, serr, pn_s_a
 
         inst = Hybrid_Prototype___[].dup
+        inst.argv = argv
         inst.universal_CLI_resources sin, sout, serr, pn_s_a
         inst.finish
       end

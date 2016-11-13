@@ -23,6 +23,7 @@ module Skylab::BNF2Treetop::TestSupport
           MOCKS.noninteractive_STDIN_instance
 
         cli = Home_::CLI.new(
+          argv,
           _stdin,
           outstream,
           errstream,
@@ -35,7 +36,7 @@ module Skylab::BNF2Treetop::TestSupport
 
         collapsed_p = -> do
           oo = ::Struct.new(:err, :out, :result).new
-          oo.result = cli.invoke argv
+          oo.result = cli.execute
           oo.out = outstream.string.split("\n")
           oo.err = errstream.string.split("\n")
           (collapsed_p = ->{ oo }).call

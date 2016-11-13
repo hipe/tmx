@@ -31,9 +31,9 @@ module Skylab::Basic::TestSupport_Visual
 
       _pn_s_a = [ 'fake', 'name' ]
 
-      _CLI = ::Skylab::Brazen::CLI.new i, sout, e, _pn_s_a, :back_kernel, _kernel
-
-      _x = _CLI.invoke argv
+      _x = ::Skylab::Brazen::CLI.new(
+        argv, i, sout, e, _pn_s_a, :back_kernel, _kernel
+      ).execute
 
       e.puts "(exited with: #{ _x.inspect })"
 

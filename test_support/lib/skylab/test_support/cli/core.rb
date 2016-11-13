@@ -4,11 +4,13 @@ module Skylab::TestSupport
 
     class << self
 
-      def new sin, sout, serr, pn_s_a
+      def new argv, sin, sout, serr, pn_s_a
 
         Require_zerk_[]
 
         cli = Zerk_::NonInteractiveCLI.begin
+
+        cli.argv = argv
 
         cli.universal_CLI_resources sin, sout, serr, pn_s_a
 

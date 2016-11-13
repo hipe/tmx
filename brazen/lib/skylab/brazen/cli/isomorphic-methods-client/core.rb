@@ -75,9 +75,9 @@ module Skylab::Brazen
 
     # ~ execution phase
 
-    def initialize i, o, e, pn_s_a
+    def initialize argv, i, o, e, pn_s_a
 
-      super i, o, e, pn_s_a, :back_kernel, User_Utility_as_Kernel___.new( self )
+      super argv, i, o, e, pn_s_a, :back_kernel, User_Utility_as_Kernel___.new( self )
     end
 
     def send_invitation ev
