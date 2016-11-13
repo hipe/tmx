@@ -163,6 +163,19 @@ describe "[y2] CLI integration" do
       end
     end
 
+    it "[tmx] integration (stowaway)" do
+
+      ::Skylab::Common::Autoloader.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'yacc2treetop', '--ping'
+
+      cli.expect_on_stderr "hello from yacc2treetop."
+
+      cli.expect_succeeded_under self
+    end
+
     # (the below is experimental fringe to feed into [#br-007])
 
     # -- the general shape of invocation (exitstatus)

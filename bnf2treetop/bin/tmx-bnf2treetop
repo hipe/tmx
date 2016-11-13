@@ -146,12 +146,30 @@ module Skylab::BNF2Treetop
     include Headless::Client_InstanceMethods
 
     def initialize argv, sin, sout, serr, pn_s_a
+
+      if block_given?
+        @__send_exitstatus = yield.method :exitstatus=
+      end
+
       @__argv = argv
       @infostream = serr
       @paystream = sout
       @upstream = sin
       @pn_s_a = pn_s_a
       @result = UNABLE_
+    end
+
+    def to_bound_call
+      ::Skylab::Common::Bound_Call.via_receiver_and_method_name self, :__execute_plus
+    end
+
+    def __execute_plus
+      x = execute
+      if ! x.respond_to? :id2name
+        x.respond_to? :bit_length or self._SANITY
+        @__send_exitstatus[ x ]
+      end
+      nil  # NOTHING_
     end
 
     def execute
@@ -1049,13 +1067,16 @@ end
 
 if $PROGRAM_NAME == __FILE__
 
-  d = Skylab::BNF2Treetop::CLI.new(
+  x = Skylab::BNF2Treetop::CLI.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
   ).execute
 
-  if d.nonzero?
-    $stderr.puts "(exitstatus: #{ d })"
+  if x.respond_to? :id2name
+    $stderr.puts "(result: #{ x })"
+  else
+    if x.nonzero?
+      $stderr.puts "(exitstatus: #{ x })"
+    end
+    exit x
   end
-
-  exit d
 end

@@ -1,3 +1,5 @@
+[#067] #wish constify names like like (in [tmx])
+
 [#066]       #track emission conversion (this tag is semantically
              redundanty with something somewhere..)
              also track flip-flop emitting ..

@@ -2,6 +2,15 @@ require 'skylab/brazen'
 
 module Skylab::Slicer
 
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
+
+  lazily :CLI do
+    ::Class.new Brazen_::CLI
+  end
+
   module API
 
     class << self
@@ -37,10 +46,6 @@ module Skylab::Slicer
     end
   end  # >>
 
-  Common_ = ::Skylab::Common
-
-  Autoloader_ = Common_::Autoloader
-
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
@@ -50,16 +55,9 @@ module Skylab::Slicer
     TMX = sidesys[ :TMX ]
   end
 
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
-
-  lazily :CLI do
-    ::Class.new Brazen_::CLI
-  end
-
   ACHIEVED_ = true
   Brazen_ = Autoloader_.require_sidesystem :Brazen
   NIL_ = nil
   Home_ = self
   UNABLE_ = false
-
 end

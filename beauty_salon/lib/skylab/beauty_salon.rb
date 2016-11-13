@@ -3,6 +3,8 @@ require 'skylab/common'
 module Skylab::BeautySalon
 
   Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   class << self
 
@@ -22,13 +24,8 @@ module Skylab::BeautySalon
     end
   end  # >>
 
-  Autoloader_ = Common_::Autoloader
-
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
-
   lazily :CLI do
-
-    CLI = ::Class.new Home_.lib_.brazen::CLI
+    ::Class.new Home_.lib_.brazen::CLI
   end
 
   module API

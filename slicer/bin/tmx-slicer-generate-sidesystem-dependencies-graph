@@ -98,4 +98,4 @@ module Skylab::Slicer
   end
 end
 
-Skylab::Slicer::SS_Dep__.new( nil, $stdout, $stderr, ::ARGV ).execute
+Skylab::Slicer::SS_Dep__.new( ::ARGV, nil, $stdout, $stderr ).execute

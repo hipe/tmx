@@ -17,5 +17,18 @@ module Skylab::Treemap::TestSupport
 
       expect_no_more_events
     end
+
+    it "tmx integration (stowaway)" do
+
+      Home_::Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'treemap', 'ping'
+
+      cli.expect_on_stderr "hello from treemap.\n"
+
+      cli.expect_succeeded_under self
+    end
   end
 end

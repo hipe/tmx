@@ -49,30 +49,30 @@ module Skylab::TMX
 
         def __sidesystem_module
 
-          # EEK only because it just so happens that none of our sidesystems'
-          # toplevel const names ever use any acronyms (and they all otherwise
-          # follow the most conventional convention) can we do this in such
-          # a straightforward way. if this were not the case, we would need
-          # to leverage the name correction of `Autoloader_.const_reduce`.
+          # we avoid using `const_reduce` (for name correction) unless we
+          # need to (for no good reason).
+          # this is near but not the same as [#br-083]
 
           require remove_instance_variable :@__gem_path
 
-          _const_a = __sidesystem_module_const_path
+          _const_a = @installation.participating_gem_const_path_head
 
-          _const_a.inject ::Object do |mod, const|
+          up_mod = _const_a.reduce ::Object do |mod, const|
             mod.const_get const, false
           end
-        end
 
-        def __sidesystem_module_const_path
+          const = if DIGITS___ =~ @entry  # workaround until #wish [#co-067]
+            @entry.gsub( %r(_?(?<![a-z])([a-z0-9])) ) { $1.upcase }
+          else
+            _nf = Common_::Name.via_lowercase_with_underscores_string @entry
+            _nf.as_camelcase_const_string
+          end
 
-          _heads = @installation.participating_gem_const_path_head
-
-          _nf = Common_::Name.via_lowercase_with_underscores_string @entry
-
-          _tail = _nf.as_camelcase_const_string
-
-          [ * _heads, _tail ]
+          if up_mod.const_defined? const, false
+            up_mod.const_get const, false
+          else
+            Autoloader_.const_reduce [ const ], up_mod
+          end
         end
 
       # -
@@ -218,6 +218,12 @@ module Skylab::TMX
     #==TO
 
       end  # MAYBE_SALVAGE_ME
+
+      # ==
+
+      DIGITS___ = /[0-9]/
+
+      # ==
     end
   end
 end

@@ -81,4 +81,21 @@ describe "[bnf2tt] CLI" do
       out.last.should eql('  end')
     end
   end
+
+  it "[tmx] integration (stowaway)" do
+
+    ::Skylab::Common::Autoloader.require_sidesystem :TMX
+
+    cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+    cli.invoke 'bnf2treetop', '--ping'
+
+    cli.expect_on_stderr "hello from bnf2treetop."
+
+    cli.expect_succeeded_under self
+  end
+
+  def do_debug
+    false  # #spot-1
+  end
 end

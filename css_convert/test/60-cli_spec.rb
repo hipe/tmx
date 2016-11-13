@@ -40,6 +40,19 @@ module Skylab::CSS_Convert::TestSupport
       @exitstatus.should eql Home_::Brazen_::API.exit_statii.fetch :resource_not_found
     end
 
+    it "[tmx] integration" do
+
+      Home_::Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'css-convert', 'convert', '--ping'
+
+      cli.expect_on_stderr "hello from css convert."
+
+      cli.expect_succeeded_under self
+    end
+
     def _expect_specific_usaged_and_invited
 
       expect :styled, :e, /\Ausage: czz convert \[-[a-z]\b.+ <directives-file>\z/

@@ -55,6 +55,19 @@ module Skylab::BeautySalon::TestSupport
       expect_failed
     end
 
+    it "[tmx] integration (stowaway)" do
+
+      Home_::Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'beauty-salon', 'ping'
+
+      cli.expect_on_stderr "hello from beauty salon.\n"
+
+      cli.expect_succeeded_under self
+    end
+
     def _stdin_mocks
       Home_.lib_.system.test_support::MOCKS
     end

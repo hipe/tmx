@@ -77,6 +77,19 @@ module Skylab::Flex2Treetop::MyTestSupport
         __expect_all_this
       end
 
+      it "[tmx] integration (stowaway)" do
+
+        Home_::Autoloader_.require_sidesystem :TMX
+
+        cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+        cli.invoke 'flex2treetop', 'ping'
+
+        cli.expect_on_stderr "hello from flex2treetop.\n"
+
+        cli.expect_succeeded_under self
+      end
+
       def __expect_all_this
 
         @line_stream_for_expect_line =

@@ -69,54 +69,15 @@ module Skylab::TMX::TestSupport
     _ARG = 'ping'.freeze
     _FLAG = '--ping'.freeze
 
-    # -10
-    it "beauty salon" do
-      _against 'beauty-salon', _ARG
-      _expect_common
-    end
-
-    # -7
-    it "bnf2treetop" do
-      _against 'bnf2treetop', _FLAG
-      _expect_common
-    end
-
     # -5
     it "code metrics" do
       _against 'code-metrics', _ARG
       _expect_common
     end
 
-    # -6
-    it "css-convert" do
-
-      _against 'css-convert', 'convert', _FLAG
-      @_slug = 'css-convert'
-      _expect_common
-    end
-
     # -4
     it "cull" do
       _against 'cull', _ARG
-      _expect_common
-    end
-
-    # -8
-    it "flex2treetop" do
-      _against 'flex2treetop', _ARG
-      _expect_common
-    end
-
-    # -12
-    it "permute" do
-      _against 'permute', _ARG
-      _expect_common_start
-      @exitstatus.zero? || fail
-    end
-
-    # -13
-    it "slicer" do
-      _against 'slicer', _ARG
       _expect_common
     end
 
@@ -132,22 +93,10 @@ module Skylab::TMX::TestSupport
       _expect_common
     end
 
-    # -11
-    it "treemap" do
-      _against 'treemap', _ARG
-      _expect_common
-    end
-
     # -1
     it "xargs-ish-i" do
       _against 'xargs-ish-i', _FLAG
       _expect_succeeded
-    end
-
-    # -9
-    it "yacc2treetop" do
-      _against 'yacc2treetop', _FLAG
-      _expect_common
     end
 
     def _against * argv

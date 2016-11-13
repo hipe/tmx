@@ -2,7 +2,12 @@
 
 require 'skylab/treemap'
 
-_x = Skylab::Treemap::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+x = Skylab::Treemap::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
-$stderr.puts "(exitstatus: #{ _x })"
+if x.respond_to? :id2name
+  $stderr.puts "(result: #{ x })"
+elsif x.nonzero?
+  $stderr.puts "(exitstatus: #{ x })"
+end

@@ -5,6 +5,7 @@ module Skylab::BNF2Treetop::TestSupport
 
   def self.[] tcc
     tcc.send :define_singleton_method, :use, Use___
+    # (there is no do_debug but see #spot-1)
   end
 
   _TS = self

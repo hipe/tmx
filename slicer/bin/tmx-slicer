@@ -2,8 +2,15 @@
 
 require 'skylab/slicer'
 
-_x = Skylab::Slicer::CLI.new(
-  $stdin, $stdout, $stderr, [ ::File.basename( $PROGRAM_NAME ) ] ).
-    invoke ARGV
+d = Skylab::Slicer::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ ::File.basename( $PROGRAM_NAME ) ]
+).execute
 
-$stderr.puts "(exitstatus: #{ _x })"
+if ! d.respond_to? :id2name  # (throwback to ancient [br] - symbol from ping)
+
+  if d.nonzero?
+    $stderr.puts "(exitstatus: #{ d })"
+  end
+
+  exit d
+end

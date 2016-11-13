@@ -23,6 +23,10 @@ module Skylab::Permute
           end,
         }
 
+        if block_given?
+          o.write_exitstatus = yield.method :exitstatus=
+        end
+
         o.finish
       end
     end

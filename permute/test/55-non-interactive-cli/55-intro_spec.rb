@@ -56,6 +56,19 @@ module Skylab::Permute::TestSupport
         first_line_string == "hello from permute.\n" || fail
         1 == number_of_lines || fail
       end
+
+      it "tmx integration" do
+
+        Home_::Autoloader_.require_sidesystem :TMX
+
+        cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+        cli.invoke 'permute', 'ping'
+
+        cli.expect_on_stderr "hello from permute."
+
+        cli.expect_succeeded_under self
+      end
     end
 
     _CMD = 'generate'

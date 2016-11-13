@@ -4,11 +4,11 @@ module Skylab::Slicer
 
   class Modality_Adapters_::CLI
 
-    def initialize _, o, e, a
+    def initialize argv, _, o, e, a
 
+      @argv = argv
       @stdout = o
       @stderr = e
-      @argv = a
     end
 
   private
