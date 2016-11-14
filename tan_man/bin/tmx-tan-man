@@ -2,7 +2,14 @@
 
 require 'skylab/tan_man'
 
-_x = Skylab::TanMan::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+x = Skylab::TanMan::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
-$stderr.puts "(exitstatus: #{ _x })"
+if x.respond_to? :id2name
+  $stderr.puts "(result: #{ x })"
+  x = 0
+elsif x.nonzero?
+  $stderr.puts "(exitstatus: #{ x })"
+end
+exit x

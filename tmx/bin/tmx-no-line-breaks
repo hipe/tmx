@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby -w
 
       work = nil
-      program = -> i, o, e, pn_a, argv do
+      program = -> argv, i, o, e, pn_a do
 
         if argv.length.zero?
 
@@ -79,9 +79,7 @@ o << "          but the subject utility is here in case it is ever not."
 
 if __FILE__ == $PROGRAM_NAME
 
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
-
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-
-  Skylab::No_line_breaks = program
+  Skylab::TMX_no_line_breaks = program  # (comply name to [#br-083])
 end

@@ -6,7 +6,10 @@
 
 [#052]       argument scanner
 
-[#051]       track simplified boxxy-like producers of primary hashes
+[#051]       now: towards a unified solution for an operator branch via
+             filesystem directory. was: track simplified boxxy-like
+             producers of primary hashes. (1x [ze] 1x [ts] 1x here)
+             (currently being spliced into [br]!)
 
 [#050]       [unified table support]
 

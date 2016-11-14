@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-program = -> stdin, stdout, stderr, pn_s_a, argv do
+program = -> argv, stdin, stdout, stderr, pn_s_a do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
   _OK = 0 ; _NO = 1 ; done = nil
@@ -100,6 +100,11 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
 
       y << lbl[ "options:" ]
       op.summarize( y )
+      done = _OK
+    end
+
+    o.on '--ping', "(just for testing)" do
+      y << "hello from shallowify"
       done = _OK
     end
   end
@@ -307,7 +312,8 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
+
   exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
-  Skylab::Shallowify = program
+  Skylab::TMX_shallowify = program  # (comply name with [#br-083])
 end

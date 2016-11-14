@@ -58,9 +58,8 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
 
-    def sidesys_path_
-      @___sidesys_path ||=
-        ::File.expand_path( '../../..', dir_path )
+    def sidesystem_path_
+      @___ssp ||= ::File.expand_path '../../..', dir_path
     end
   end  # >>
 
@@ -136,7 +135,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
       Actions::List = -> act_pxy do
 
-        _path = ::File.join Home_.sidesys_path_, 'test/fixture-files'
+        _path = ::File.join Home_.sidesystem_path_, 'test/fixture-files'
 
         path_a = ::Dir.glob( "#{ _path }/*.flex", ::File::FNM_PATHNAME )
 

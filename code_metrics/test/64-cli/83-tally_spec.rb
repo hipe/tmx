@@ -39,6 +39,19 @@ module Skylab::CodeMetrics::TestSupport
       end
     end
 
+    it "[tmx] integration (stowaway)" do
+
+      Home_::Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'code-metrics', 'ping'
+
+      cli.expect_on_stderr "hello from code metrics.\n"
+
+      cli.expect_succeeded_under self
+    end
+
     # -- etc
 
     def invocation_strings_for_expect_stdout_stderr

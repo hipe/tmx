@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-program = -> _, _, stderr, pn_s_a, argv do
+program = -> argv, _, _, stderr, pn_s_a do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
@@ -214,7 +214,8 @@ program = -> _, _, stderr, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+
+  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
-  Skylab::Ungood = program
+  Skylab::TMX_ungood = program  # (comply name with [#br-083])
 end

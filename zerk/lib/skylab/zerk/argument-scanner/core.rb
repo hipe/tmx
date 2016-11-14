@@ -24,17 +24,17 @@ module Skylab::Zerk
       end
 
       def branch_value_via_match_primary_against h
-        item = branch_item_via_match_ :primary, h
+        item = match_branch_item :primary, h
         item && item.value
       end
 
       def branch_value_via_match_business_item_against h
-        item = branch_item_via_match_ :business_branch_item, h
+        item = match_branch_item :business_branch_item, h
         item && item.value
       end
 
       def branch_item_via_match_primary_against h
-        branch_item_via_match_ :primary, h
+        match_branch_item :primary, h
       end
 
       def head_as_primary_symbol
@@ -111,7 +111,7 @@ module Skylab::Zerk
 
     BranchItem = ::Class.new
 
-    class BranchHashEntry < BranchItem
+    class OperatorBranchEntry < BranchItem
 
       def item_category_symbol
         :item_that_is_primary_hash_value_based

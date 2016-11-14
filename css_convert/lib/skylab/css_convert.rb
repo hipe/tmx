@@ -12,7 +12,7 @@ module Skylab::CSS_Convert
       @lib ||= Common_.produce_library_shell_via_library_and_app_modules Lib_, self
     end
 
-    def sidesys_path_
+    def sidesystem_path_
       @___ssp ||= ::File.expand_path '../../..', dir_path
     end
   end  # >>
@@ -238,7 +238,7 @@ module Skylab::CSS_Convert
 
     def version
 
-      _path = ::File.join Home_.sidesys_path_, 'VERSION'
+      _path = ::File.join Home_.sidesystem_path_, 'VERSION'
 
       big_string = ::File.read _path
       big_string.chomp!

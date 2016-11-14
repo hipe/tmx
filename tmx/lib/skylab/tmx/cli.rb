@@ -22,10 +22,9 @@ module Skylab::TMX
           Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
         end ]
 
-        @_end_of_stream = :_no_op
         @sin = i
-        @serr = e
         @sout = o
+        @serr = e
         @program_name_string_array = pn_s_a
       end
 
@@ -51,8 +50,8 @@ module Skylab::TMX
         if bc
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block
           if x
-            @exitstatus ||= SUCCESS_EXITSTATUS__
             send ( remove_instance_variable :@_express ), x
+            @exitstatus ||= SUCCESS_EXITSTATUS__
           elsif x.nil?
             @exitstatus ||= SUCCESS_EXITSTATUS__
           end
@@ -75,8 +74,11 @@ module Skylab::TMX
         elsif __head_is_intrinsic_operator
           __bound_call_for_intrinsic_operator
 
-        elsif __head_is_mountable_operator
+        elsif __head_matches_mountable_operator
           __bound_call_for_mountable_operator
+
+        elsif __head_matches_mountable_one_off_executable
+          __bound_call_for_mountable_one_off_executable
 
         else
           __whine_about_no_such_operator
@@ -84,7 +86,11 @@ module Skylab::TMX
       end
 
       def __whine_about_no_such_operator
-        @serr.puts "DOOTILY MY FOOTILY #{ @argv.current_token.inspect }"
+
+        # (this is where #open [#020] "did you mean.." would go )
+
+        @serr.puts "currently, normal tmx is deactivated -"
+        @serr.puts "won't parse #{ @argv.current_token.inspect }"
         invite_to_general_help
       end
 
@@ -109,7 +115,7 @@ module Skylab::TMX
       end
 
       def __when_head_looks_like_option  # assume 0 < argv length
-        if HELP_RX =~ @_current_token
+        if HELP_RX =~ @argv.current_token
           _express_help
         else
           __when_unrecognized_option_at_front
@@ -174,7 +180,7 @@ module Skylab::TMX
 
         arg_scn = _multimode_argument_scanner_by do |o|
 
-          o.user_scanner remove_instance_variable :@argv
+          o.user_scanner @argv
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
@@ -275,7 +281,7 @@ module Skylab::TMX
 
           o.default_primary :execute
 
-          o.user_scanner remove_instance_variable :@argv
+          o.user_scanner @argv
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
 
@@ -334,7 +340,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-B OPEN
 
-          o.user_scanner remove_instance_variable :@argv
+          o.user_scanner @argv
 
           o.listener @listener
         end
@@ -344,24 +350,95 @@ module Skylab::TMX
         as
       end
 
+      # -- (experimental) mounting of one-off executables
+
+      def __head_matches_mountable_one_off_executable
+
+        col = __build_one_off_operator_branch
+
+        _init_selective_listener
+
+        _as = _multimode_argument_scanner_by do |o|
+          o.user_scanner @argv
+          o.listener @listener
+        end
+
+        o = _as.match_branch_item(
+          :business_branch_item, :passively, :exactly, col )
+
+        if o
+          @__one_off_branch_value = o ; ACHIEVED_
+        else
+          @__one_off_dir_operator_branch = col ; UNABLE_
+        end
+      end
+
+      def __build_one_off_operator_branch
+
+        remove_instance_variable :@__installation  # #todo
+
+        _cls = Home_.lib_.brazen::CLI::Executables_Exposure___::Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
+
+        _cls.define do |o|
+
+          o.directory ::File.join( Home_.sidesystem_path_, 'bin' )
+
+          o.parent_module_of_executables Home_
+
+          o.mandatory_prefix_to_disregard 'tmx-'
+
+          o.filesystem_function_implementors ::Dir, ::File, ::Kernel
+        end
+      end
+
+      def __bound_call_for_mountable_one_off_executable
+
+        @argv.advance_one
+
+        _branch = remove_instance_variable :@__one_off_branch_value
+
+        one_off = _branch.value
+
+        one_off.terminal_name
+
+        _pn_s_a = [ * @program_name_string_array, one_off.terminal_name.as_slug ]
+
+        _argv = remove_instance_variable( :@argv ).flush_remaining_to_array
+
+        @_express = :__express_result_of_one_off_executable
+
+        one_off.to_bound_call_via_standard_five_resources(
+          _argv, @sin, @sout, @serr, _pn_s_a )
+      end
+
+      def __express_result_of_one_off_executable d
+        d.respond_to? :bit_length || self._NON_COMPLIANT_ONE_OFF_EXECUTABLE
+        @exitstatus = d
+        NIL
+      end
+
       # -- generic mounting
 
       # when the front element of the ARGV directly corresponds to a
       # sidesystem (gem), then resolution of the intended recipient is much
       # more straightforward than having to load possibly the whole tree.
 
-      def __head_is_mountable_operator
+      def __head_matches_mountable_operator
+
+        inst = Home_.installation_
 
         mounter = CLI::Magnetics_::BoundCall_via_MountAnyInstalledSidesystem.new(
           remove_instance_variable( :@__possible_entry ),
           self,
-          Home_.installation_,
+          inst,
         )
 
         # (we could extend this "optimization" to the executables but meh)
 
         if mounter.match_head_as_participating_gem
           @__mounter = mounter ; ACHIEVED_
+        else
+          @__installation = inst ; UNABLE_
         end
       end
 
@@ -446,7 +523,7 @@ module Skylab::TMX
       end
 
       def to_item_normal_tuple_stream
-        self._PROBABLY_CHANGE_THIS_TO_BE_MORE_INCLUSIVE
+        $stderr.puts "(the below is what will change at [#018] [tmx])"
         Stream_.call OPERATIONS__.keys do |sym|
           [ :operator, sym ]
         end
@@ -528,7 +605,6 @@ module Skylab::TMX
             x = st.gets
             x ? redo : break
           end while above
-          send @_end_of_stream
         else
           @serr.puts "(no results.)"  # #not-covered
         end
@@ -653,11 +729,21 @@ module Skylab::TMX
       end
 
       def rewrite_ARGV * s_a
-        release_ARGV.array_for_read.replace s_a
+
+        # 2x tagged by :#spot-3 we hackishly rewrite the *REAL* `ARGV`
+        # (the global array) to pass parameters into rspec EEW
+
+        _argv_scn = remove_instance_variable :@argv
+        _argv_scn.array_for_read.replace s_a
         NIL
       end
 
-      def release_ARGV
+      def release_ARGV__
+
+        # (when having succeeded in mounting a participating sidesystem,
+        #  we want to make it clear that we ourselves are totally done
+        #  parsing (or otherwise referencing) arguments)
+
         remove_instance_variable :@argv
       end
 

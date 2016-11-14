@@ -11,7 +11,7 @@ module Skylab::TestSupport::TestSupport
     end
 
     def doc_path_ s
-      @___doc_path ||= ::File.join( _sidesys_path, 'doc' )
+      @___doc_path ||= ::File.join( _sidesystem_path, 'doc' )
       ::File.join @___doc_path, s
     end
 
@@ -20,13 +20,12 @@ module Skylab::TestSupport::TestSupport
     end
 
     def test_path_ s
-      @___test_path ||= ::File.join( _sidesys_path, 'test' )
+      @___test_path ||= ::File.join( _sidesystem_path, 'test' )
       ::File.join @___test_path, s
     end
 
-    def _sidesys_path
-      @___sidesys_path ||= ::File.expand_path(
-        '../../..', Home_.dir_path )
+    def _sidesystem_path
+      @___ssp ||= ::File.expand_path '../../..', Home_.dir_path
     end
 
     cache = {}

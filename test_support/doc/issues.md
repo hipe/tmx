@@ -51,7 +51,8 @@
              ( #was: "possible" #moved-to: [#ta-004]  ("eventpoint"))
              ( #was: #done borked quickie architecture near constants )k
 
-[#027] #hole ( #moved-to: [#dt-XXX] )
+[#027]       track adapters for test suite solutions
+             ( #was: #moved-to: [#dt-XXX] )
 
 [#025] #wish consider using plain old glob instead of find, compare viability,
              performance. replace if better, or make adapters out of them.
@@ -109,7 +110,11 @@
                provided order, and not the lexical order? (see [#xxx].))
              ( #was: #done rename `all_specs.rb` -> all )
 [#004] #open quickie: module names into fashion (and now narrative)
-[#002]       coverage is a no fun zone ..
+
+[#002] #open coverage is waiting for [#tmx-011] upgrade rspec
+             (and presumably some other things.._
+
+             coverage is a no fun zone ..
              ( #was: #done Constants too )
 
 [#001]       test-suite architecture and conventions..

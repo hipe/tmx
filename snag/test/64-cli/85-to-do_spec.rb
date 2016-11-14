@@ -61,6 +61,19 @@ module Skylab::Snag::TestSupport
       _expect_common_finish
     end
 
+    it "[tmx] integration (stowaway)" do
+
+      Home_::Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'snag', 'ping'
+
+      cli.expect_on_stderr "hello from snag.\n"
+
+      cli.expect_succeeded_under self
+    end
+
     define_method :_action, -> do
       a = [ 'to-do', 'to-stream' ]
       -> do

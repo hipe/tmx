@@ -264,9 +264,23 @@ module Skylab::Zerk
 
         # --
 
-        def branch_item_via_match_ shape_sym, h  # MUST set @current_primary_symbol as appropriate
+        def match_branch_item * a  # MUST set @current_primary_symbol as appropriate
 
           # "all about parsing added primaries" ([#052] #note-2) explains it all
+
+          h = a.pop
+          shape_sym = a.shift
+
+          mag = Home_::ArgumentScanner::
+              Magnetics::BranchItem_via_OperatorBranch.begin shape_sym, h, self
+
+          if a.length.nonzero?
+            st = Common_::Polymorphic_Stream.via_array a
+            pool = These_options___[ st, mag ]
+            begin
+              pool.fetch( st.gets_one ).call
+            end until st.no_unparsed_exists
+          end
 
           if @on_first_branch_item_not_found
             @_has_relevant_default = true
@@ -277,7 +291,7 @@ module Skylab::Zerk
           end
 
           begin
-            x = __match_niCLI_item_against shape_sym, h
+            x = __match_niCLI_item_against mag
             x || break
 
             if x.is_the_no_op_branch_item
@@ -314,10 +328,20 @@ module Skylab::Zerk
           x
         end
 
-        def __match_niCLI_item_against shape_sym, h
+        These_options___ = -> st, mag do
+          h = {
+            exactly: -> do
+              h.delete :exactly
+              mag.do_fuzzy_lookup = false ; nil
+            end,
+            passively: -> do
+              h.delete :passively  # or not, just an eg.
+              mag.be_passive = true ; nil
+            end,
+          }
+        end
 
-          o = Home_::ArgumentScanner::
-              Magnetics::BranchItem_via_BranchHash.begin shape_sym, h, self
+        def __match_niCLI_item_against o
 
           if @no_unparsed_exists
             if @_has_relevant_default
@@ -348,13 +372,18 @@ module Skylab::Zerk
             o.item_knownness = @_scn.send m2, o.formal_symbol_request
 
             if o.item_was_found
-
               o.item
+
             elsif @_has_relevant_default
               _use_relevant_default
+
+            elsif o.be_passive
+              NOTHING_
+
             else
               o.whine_about_how_item_was_not_found
             end
+
           elsif @_has_relevant_default
             _use_relevant_default
           else
@@ -373,7 +402,7 @@ module Skylab::Zerk
         def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
 
           o = Home_::ArgumentScanner::
-            Magnetics::BranchItem_via_BranchHash.begin :primary, NOTHING_, self
+            Magnetics::BranchItem_via_OperatorBranch.begin :primary, NOTHING_, self
 
           o.well_formed_potential_symbol_knownness = @_scn._well_formed_primary_knownness_
 
@@ -547,7 +576,7 @@ module Skylab::Zerk
           # assume our immediately following method resulted in a known known.
 
           k = req.well_formed_symbol
-          _x = req.branch_hash.fetch k
+          _x = req.operator_branch.fetch k
           Common_::Known_Known[ DefaultedBranchItem___.new _x, k ]
         end
 
@@ -602,6 +631,12 @@ module Skylab::Zerk
 
       # ==
 
+      DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__ = -> sym do
+        Home_::ArgumentScanner::Known_unknown[ sym ]
+      end
+
+      # ==
+
       class UserScanner___
 
         # this is the workhorse parser implementation - the one that
@@ -645,9 +680,9 @@ module Skylab::Zerk
             fuz.visit AddedBranchItem__, bx
           end
 
-          fuz.visit BranchHashEntry__, req.branch_hash
+          fuz.visit OperatorBranchEntry__, req.operator_branch
 
-          fuz.maybe_finish or _known_unknown_primary_with_reason :unknown_primary
+          fuz.maybe_finish or _unknown_because :unknown_primary
         end
 
         def _well_formed_primary_knownness_
@@ -669,7 +704,7 @@ module Skylab::Zerk
               # latter step only so that subtraction *would be* reflected
               # in the old-style of parsing (not with hashes)
 
-              _known_unknown_primary_with_reason :subtracted_primary_was_referenced
+              _unknown_because :subtracted_primary_was_referenced
             else
               Common_::Known_Known[ sym ]
             end
@@ -679,7 +714,7 @@ module Skylab::Zerk
             Common_::Known_Known[ @__default_primary_symbol ]
 
           else
-            _known_unknown_primary_with_reason :primary_had_poor_surface_form
+            _unknown_because :primary_had_poor_surface_form
           end
         end
 
@@ -688,7 +723,7 @@ module Skylab::Zerk
           s = @_real_scn.current_token
 
           if DASH_BYTE_ == s.getbyte(0)
-            Home_::ArgumentScanner::Known_unknown_because.call do |emit|
+            Home_::ArgumentScanner::known_because.call do |emit|
               _whine_into_about_primary emit, s
             end
           else
@@ -715,10 +750,7 @@ module Skylab::Zerk
           UNABLE_
         end
 
-
-        def _known_unknown_primary_with_reason sym
-          Home_::ArgumentScanner::Known_unknown[ sym ]
-        end
+        define_method :_unknown_because, DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__
 
         def _head_as_is_
           @_real_scn.current_token
@@ -795,9 +827,9 @@ module Skylab::Zerk
           if x
             item = AddedBranchItem__.new x, k
           else
-            x = req.branch_hash[ k ]
+            x = req.operator_branch[ k ]
             if x
-              item = BranchHashEntry__.new x, k
+              item = OperatorBranchEntry__.new x, k
             end
           end
 
@@ -807,20 +839,37 @@ module Skylab::Zerk
         def business_branch_item_knownness_via_request req
 
           k = req.well_formed_symbol
-          x = req.branch_hash[ k ]
+          x = req.operator_branch[ k ]
           if x
-            Common_::Known_Known[ BranchHashEntry__.new( x, k ) ]
+            Common_::Known_Known[ OperatorBranchEntry__.new( x, k ) ]
+          elsif req.do_fuzzy_lookup
+            __business_branch_item_knownness_fuzzily req
           else
-            fuz = Fuzz__.new req
-            fuz.visit BranchHashEntry__, req.branch_hash
-            kn = fuz.maybe_finish
-            if kn
-              kn
-            else
-              Home_::ArgumentScanner::Known_unknown[ :unknown_business_branch_item ]
-            end
+            _when_unknown req
           end
         end
+
+        def __business_branch_item_knownness_fuzzily req
+
+          fuz = Fuzz__.new req
+          fuz.visit OperatorBranchEntry__, req.operator_branch
+          kn = fuz.maybe_finish
+          if kn
+            kn
+          else
+            _when_unknown req
+          end
+        end
+
+        def _when_unknown req
+          if req.be_passive
+            Common_::KNOWN_UNKNOWN
+          else
+            __unknown_because :unknown_business_branch_item
+          end
+        end
+
+        define_method :__unknown_because, DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__
 
         def __added_primary_normal_name_symbols_
           if @_has_added
@@ -950,7 +999,7 @@ module Skylab::Zerk
         end
       end
 
-      BranchHashEntry__ = Home_::ArgumentScanner::BranchHashEntry
+      OperatorBranchEntry__ = Home_::ArgumentScanner::OperatorBranchEntry
 
       # ==
     end

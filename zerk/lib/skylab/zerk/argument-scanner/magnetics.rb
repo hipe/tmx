@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     Magnetics = ::Module.new
 
-    class Magnetics::BranchItem_via_BranchHash
+    class Magnetics::BranchItem_via_OperatorBranch
 
       # this "faciliator" has a strange, session-heavy interface because [#052] #note-1
 
@@ -13,9 +13,11 @@ module Skylab::Zerk
         undef_method :new
       end  # >>
 
-      def initialize shape_sym, h, as
+      def initialize shape_sym, ob, as
         @argument_scanner = as
-        @branch_hash = h
+        @be_passive = false
+        @do_fuzzy_lookup = true
+        @operator_branch = ob
         @shape_symbol = shape_sym
       end
 
@@ -30,28 +32,50 @@ module Skylab::Zerk
         _always_whine_in_the_same_way
       end
 
+      attr_writer(
+        :be_passive,
+        :do_fuzzy_lookup,
+      )
+
       # ~
 
       def well_formed_potential_symbol_knownness= kn
+
         if kn.is_known_known
+
           @is_well_formed = true
+
           @formal_symbol_request = FormalSymbolRequest___.new(
-            kn.value_x, @shape_symbol, @branch_hash )
+            kn.value_x,
+            @shape_symbol,
+            @do_fuzzy_lookup,
+            @be_passive,
+            @operator_branch,
+          )
         else
+
           @is_well_formed = false
           _receive_known_unknown_reasoning kn.reasoning
         end
+
         kn
       end
 
       FormalSymbolRequest___ = ::Struct.new(
-        :well_formed_symbol, :shape_symbol, :branch_hash )
+        :well_formed_symbol,
+        :shape_symbol,
+        :do_fuzzy_lookup,
+        :be_passive,
+        :operator_branch
+      )
 
       def whine_about_how_it_is_not_well_formed
         _always_whine_in_the_same_way  # hi.
       end
 
       attr_reader(
+        :be_passive,
+        :do_fuzzy_lookup,
         :formal_symbol_request,
         :is_well_formed,
         :shape_symbol,
@@ -65,7 +89,11 @@ module Skylab::Zerk
           @__item_structure = kn.value_x
         else
           @item_was_found = false
-          _receive_known_unknown_reasoning kn.reasoning
+          rsn = kn.reasoning
+          if rsn
+            _receive_known_unknown_reasoning rsn
+          end
+          # (otherwise assume passive mode)
         end
         kn
       end
@@ -113,12 +141,12 @@ module Skylab::Zerk
           o.strange_value_by = @argument_scanner.method :head_as_is
         end
 
-        if @branch_hash
+        if @operator_branch
 
           _p = @argument_scanner.method :available_branch_item_name_stream_via_hash
 
           o.available_item_name_stream_by = -> do
-            _p[ @branch_hash, @shape_symbol ]
+            _p[ @operator_branch, @shape_symbol ]
           end
         else
           NOTHING_  # #feature-island #scn-coverpoint-2

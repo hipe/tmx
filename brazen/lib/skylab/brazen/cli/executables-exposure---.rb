@@ -4,6 +4,72 @@ module Skylab::Brazen
 
     module Executables_Exposure___
 
+#==FROM
+
+    # (this new work is being spliced into this old file because it's
+    # an exact replacement for the old node and one day etc.)
+
+    class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
+
+      # exactly [#ze-051] the essay "the operator branch structure pattern"
+
+      class << self
+        alias_method :define, :new
+        undef_method :new
+      end  # >>
+
+      def initialize
+        @prefix = nil
+        yield self
+        freeze
+      end
+
+      # -- definition time
+
+      def directory dir
+        @directory = dir ; nil
+      end
+
+      def parent_module_of_executables mod
+
+        # (for now we are optimistic that this will result in a read success)
+
+        @__up_const_path = mod.name.split CONST_SEP_
+        NIL
+      end
+
+      def mandatory_prefix_to_disregard s
+        @prefix = s ; nil
+      end
+
+      def filesystem_function_implementors globber, fs, loader
+        @filesystem = fs
+        @globber = globber
+        @loader = loader ; nil
+      end
+
+      # -- read time
+
+      def [] k  # (interface will change when [#subject])
+
+        name = Common_::Name.via_lowercase_with_underscores_symbol k
+
+        path = ::File.join @directory, "#{ @prefix }#{ name.as_slug }"
+
+        if @filesystem.file? path
+
+          OneOff___.new path, name, @__up_const_path, @loader
+        end
+      end
+    end
+
+    # ==
+
+    Stream_ = -> a, & p do
+      Common_::Stream.via_nonsparse_array a, & p
+    end
+#==TO
+
       # [br] CLI is an adaptation of a reactive model to a particular
       # modality. this is an adaption of of scripts written "natively"
       # in that modality into .. the [br] CLI. yes, it's CLI for CLI.
@@ -109,51 +175,88 @@ module Skylab::Brazen
 
         # ~ needed to invoke
 
-        def bound_call_under fr, & oes_p  # [tmx]
+        def bound_call_under fr, & _oes_p  # [tmx]
 
-          Common_::Bound_Call.by do
+          _one_off = __build_one_off
+
+          o = fr.resources
+
+          _one_off.to_bound_call_via_standard_five_resources(
+            o.argv, o.sin, o.sout, o.serr, o.invocation_string_array )
+        end
+
+        def __build_one_off
+
+          o = @_bound
+          OneOff___.new o.__path, o.name_function, o.__const_pfx, ::Kernel
+        end
+      end
+#==BEGIN KEEP
+
+      class OneOff___
 
             # when it comes time to invoke the executable, it must follow a
             # few rules in order to be exposed by this [br]-integrated
             # modality face.
 
-            const_pfx = @_bound.__const_pfx
-            name = @_bound.name_function
+        def initialize path, name, up_const_path, loader
 
-            top_const = const_pfx.fetch 0
+          st = Common_::Polymorphic_Stream.via_array up_const_path
 
-            sub_const = "#{ const_pfx[ 1 .. -1 ].join( UNDERSCORE_ ) }#{
-              }_#{ name.as_lowercase_with_underscores_symbol }"
+          _head_const = st.gets_one
+
+          buffer = ""
+          begin
+            buffer << "#{ st.gets_one }#{ UNDERSCORE_ }"
+          end until st.no_unparsed_exists
+          buffer << name.as_lowercase_with_underscores_string
 
             # the above is :[#083] the spot that realizes this name convention
 
-            # there is at least one case where the executable has been loaded
-            # already: if you are using the test runner to test itself
+          @_tail_const = buffer
 
-            if ! ( ::Object.const_defined? top_const, false and
+          @__universe_module = ::Object.const_get _head_const, false
 
-                ::Object.const_get( top_const ).const_defined? sub_const, false )
+          @loader = loader
+          @path = path
+          @terminal_name = name
+        end
 
-              load @_bound.__path
+        def to_bound_call_via_standard_five_resources argv, i, o, e, up_pn_s_a
+
+          _proc_ish = __proc_like_loaded_if_necessary
+
+          _pn_s_a = [ * up_pn_s_a, @terminal_name.as_slug ]
+
+          _standard_five = [ argv, i, o, e, _pn_s_a ]
+
+          Common_::Bound_Call[ _standard_five, _proc_ish, :call ]
+        end
 
               # we cannot simply `require` it because it is not an ordinary
               # ruby library file. hypothetically we could `eval` it but
               # then it is harder to develop because no stack traces.
 
-            end
+        def __proc_like_loaded_if_necessary
 
-            o = fr.resources
+          # (the resource may have been loaded already if for example
+          # you are using the test runner to test itself)
 
-            _pn_s_a = [ * o.invocation_string_array.dup, name.as_slug ]
+          univ_mod = @__universe_module
+          const = @_tail_const
 
-            _top_module = ::Object.const_get top_const, false
-
-            _func = _top_module.const_get sub_const, false
-
-            _func[ o.argv, o.sin, o.sout, o.serr, _pn_s_a ]
+          if ! univ_mod.const_defined? const, false
+            @loader.load @path
           end
+
+          univ_mod.const_get const, false
         end
+
+        attr_reader(
+          :terminal_name,
+        )
       end
+#==END KEEP
     end
   end
 end

@@ -30,10 +30,10 @@ module Skylab::Zerk
         NIL
       end
 
-      def branch_item_via_match_ shape_sym, h  # MUST set @current_primary_symbol as appropriate
+      def match_branch_item shape_sym, h  # MUST set @current_primary_symbol as appropriate
 
         o = Home_::ArgumentScanner::
-            Magnetics::BranchItem_via_BranchHash.begin shape_sym, h, self
+            Magnetics::BranchItem_via_OperatorBranch.begin shape_sym, h, self
 
         if @no_unparsed_exists
           o.whine_about_how_argument_scanner_ended_early
@@ -73,9 +73,9 @@ module Skylab::Zerk
 
       def __branch_item_knownness_via_request req
         k = req.well_formed_symbol
-        x = req.branch_hash[ k ]
+        x = req.operator_branch[ k ]
         if x
-          Common_::Known_Known[ Home_::ArgumentScanner::BranchHashEntry.new x, k ]
+          Common_::Known_Known[ Home_::ArgumentScanner::OperatorBranchEntry.new x, k ]
         else
           Home_::ArgumentScanner::Known_unknown[ :unknown_primary ]
         end

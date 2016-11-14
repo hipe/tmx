@@ -93,7 +93,7 @@ module Skylab::TMX
 
         x = '(?:th|nd)'
         en_denom_rx = /\A(?:
-          (half)             |     (third)           |       (quarter)       |
+          (half)             |   ( 3rd | third )     |  ( 4#{x} | quarter )  |
           ( 6#{x} | sixth )  |   ( 8#{x} | eighth )  |   ( 10#{x} | tenth )  |
           ( 16#{x} | sixteenth )         |       ( 32#{x} | thirty-second )
         )\z/x

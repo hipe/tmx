@@ -34,6 +34,19 @@ module Skylab::Cull::TestSupport
       @exitstatus.should eql :hello_from_cull
     end
 
+    it "[tmx] integration" do
+
+      Home_::Autoloader_.require_sidesystem :TMX
+
+      cli = ::Skylab::TMX.test_support.begin_CLI_expectation_client
+
+      cli.invoke 'cull', 'ping'
+
+      cli.expect_on_stderr "hello from cull.\n"
+
+      cli.expect_succeeded_under self
+    end
+
     def expect_top_invite_line
       expect :styled, /\Ause 'kul -h' for help\z/i
     end

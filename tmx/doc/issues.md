@@ -1,10 +1,40 @@
+[#020] #open omni "did you mean.."
+             precursor to: [#019] & [#018]
+             the "did you mean.." expression should reflect the availble
+             operations across the whole omni operator branch.
+
+
+[#019] #wish omni fuzzy resolution
+             new tests to cover this
+             (related: [#018] the omni help system (design these together).)
+             tmx CLI fuzzy resolution for the first token must not happen
+             at the level of a single operator branch (for #here these
+             three categories). rather, the fuzzy search must happen across
+             all N sources in series, for it to work correctly.
+
+
+[#018] #wish omni help screen/system
+             new tests to cover this:
+             (related: [#019] the omni fuzzy search (design these together).)
+             the tmx help system for its top level must reflect operators
+             available from all sources: first the "intrisic" operations
+             (test-all, reports, map), then the "mounted sidesystem"
+             operators (etc many), then the "mounted one-off executables"
+             that exist in [tmx] (in its `bin/` directory). a major implementation
+             decision is whether to build the "omni branch" early for all
+             invocations or whether to build it lazily, only for "did you mean.."
+             a major design decision is whether to express the omni splay
+             outright or whether..
+
+
 [#017] #wish here's guys that don't have "mounting" in tmx that might want it -
              [sa], [dt], [my], [gv]
 
 
-[#016] #open unbreak [tmx]'s heart - use new API somehow to bring old tmx back
-               - integration of sidesystems with TMX should happen in the sides, not TMX
-
+[#016] #hole
+             ( #was: unbreak [tmx]'s heart - use new API somehow to bring
+               old tmx back
+                - integration of sidesystems with TMX should happen in the sides, not TMX )
 
 [#015] #wish unify other tmx node-centric services (that big dependency graph)
 
@@ -25,7 +55,8 @@
 [#012] #wish the cost-driven divvy algorithm (greenlist supreme)..
 
 
-[#011] #wish update your life to the latest stable rspec
+[#011] #wish (precursor to: [#ts-002] coverage)
+             update your life to the latest stable rspec
 
 
 [#010] #wish write a task to update semi-real costs (a bash script loop).
@@ -38,7 +69,7 @@
 [#009] #wish approach a design for a randomize feature (at both the macro
              level (among nodes) and in progressively more mirco levels
              (perhaps files within a node, perhaps examples within a file).
-             imagine integration with the costs caculation strategy of [#XXX]
+             imagine integration with the costs caculation strategy of [#010]
              so that a fleet of process-plans could be designed that runs
              efficiently but is still randomized.
 
@@ -48,6 +79,10 @@
 [#007]       [ track legacy thing: help screens testing thing ]
 
 [#006] #open feature-injected features are not reflected in help screens
+
+             (acceptance: the '-order' switch should appear in the
+             test-directory-oriented remote operations)
+
              [ the glue that glues together the centralest things ]
 [#005]       [ the punchlist report ]  (much documentation/theory in-situ)
 [#004]       syntax for the "map" operation

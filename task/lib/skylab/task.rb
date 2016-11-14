@@ -16,7 +16,7 @@ class Skylab::Task
     end
 
     def sidesystem_path_
-      @___sidesys_path ||= ::File.expand_path( '../../..', __FILE__ )
+      @___ssp ||= ::File.expand_path '../../..', __FILE__
     end
   end  # >>
 

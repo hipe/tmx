@@ -88,7 +88,7 @@ module Skylab::TMX
 
     def __lookup_development_directory
 
-      dir = ::File.expand_path '../../..', dir_path  # sidesys_path_
+      dir = sidesystem_path_
 
       stat = ::File.lstat dir
 
@@ -108,6 +108,10 @@ module Skylab::TMX
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
         self::Lib_, self )
+    end
+
+    def sidesystem_path_
+      @___ssp ||= ::File.expand_path '../../..', dir_path
     end
   end  # >>
 

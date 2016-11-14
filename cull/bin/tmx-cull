@@ -2,7 +2,14 @@
 
 require 'skylab/cull'
 
-_x = Skylab::Cull::CLI.new( nil, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+x = Skylab::Cull::CLI.new(
+  ARGV, nil, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
-$stderr.puts "(exitstatus: #{ _x })"
+if x.respond_to? :id2name
+  $stderr.puts "(result: #{ x })"
+  x = 0
+elsif x.nonzero?
+  $stderr.puts "(exitstatus: #{ x })"
+end
+exit x

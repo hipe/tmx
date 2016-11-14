@@ -6,8 +6,7 @@
 
     cls = class Skylab__Some_App_Some_Model__Partition____
 
-      def initialize i, o, e, pn_s_a, a
-
+      def initialize a, i, o, e, pn_s_a
         @argv = a
         @pn_s_a = pn_s_a
         @serr = e
@@ -22,11 +21,12 @@
 
         ok = __parse_argv
         if ok
-          __work
+          ok = __work
+          ok ? 0 : 55
         elsif @_did_show_help
           0
         else
-          ok
+          66
         end
       end
 
@@ -393,7 +393,8 @@ program = -> i, o, e, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Partition = program
+  Skylab::TMX_partition = program  # (comply name to [#br-083])
 end

@@ -4,9 +4,9 @@ out = $stdout
 serr = $stderr
 argv = ::ARGV
 
-sidesys_path = ::File.expand_path '../../../..', __FILE__
+sidesystem_path = ::File.expand_path '../../../..', __FILE__
 
-require ::File.join( sidesys_path, 'lib/skylab/git' )
+require ::File.join( sidesystem_path, 'lib/skylab/git' )
 
 if argv.length.nonzero?
   serr.puts "this script takes no arguments (had: #{ argv.first.inspect })"
@@ -106,7 +106,7 @@ out.puts "]"
 
 if out.tty?
 
-  _dest = ::File.join sidesys_path, 'test/fixture-data/story-1.snippet.rb'
+  _dest = ::File.join sidesystem_path, 'test/fixture-data/story-1.snippet.rb'
 
   serr.puts "(to \"run\" this, redirect its output to #{ _dest })"
 

@@ -156,7 +156,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   Home_ = ::Skylab::Flex2Treetop
 
-  _test_dir = ::File.join Home_.sidesys_path_, 'test'
+  _test_dir = ::File.join Home_.sidesystem_path_, 'test'
 
   FIXTURE_FILES_DIR_ = ::File.join( _test_dir, 'fixture-files' )
 

@@ -8,6 +8,12 @@ module Skylab::TMX::TestSupport
     use :CLI
     use :non_interactive_CLI_fail_early
 
+    # IN PROGRESS - several of these tests have wipped legacy counterparts
+    # over in the sibling file (next level up by number). (they are there
+    # and not here for historical reasons). once dust settles, eliminate
+    # those others. but while #open/#wish [#018] [#019] [#020] they are
+    # being kept there for reference.
+
     it "strange argument - two lines of whining, then invite" do
       invoke 'zazoozle'
       expect_on_stderr "currently, normal tmx is deactivated -"
@@ -55,82 +61,5 @@ module Skylab::TMX::TestSupport
         fail "never found: #{ scn.current_token.inspect }"
       end
     end
-
-    if false  # wip: true
-
-    # (eventually these are supposed to melt out to their
-    #  respective sidesystems)
-
-    # (somewhat at odds with other nearby test nodes,
-    #  this is testing *our* tmx, and not *the* tmx)
-
-    use :CLI
-
-    _ARG = 'ping'.freeze
-    _FLAG = '--ping'.freeze
-
-    # -5
-    it "code metrics" do
-      _against 'code-metrics', _ARG
-      _expect_common
-    end
-
-    # -4
-    it "cull" do
-      _against 'cull', _ARG
-      _expect_common
-    end
-
-    # -3
-    it "snag" do
-      _against 'snag', _ARG
-      _expect_common
-    end
-
-    # -2
-    it "tan man" do
-      _against 'tan-man', _ARG
-      _expect_common
-    end
-
-    # -1
-    it "xargs-ish-i" do
-      _against 'xargs-ish-i', _FLAG
-      _expect_succeeded
-    end
-
-    def _against * argv
-
-      invoke( * argv )
-      @_argv = argv
-      NIL_
-    end
-
-    _SPACE = ' '
-    _UNDERSCORE = '_'
-
-    define_method :_expect_common do
-
-      _expect_common_start
-
-      @exitstatus.should eql :"hello_from_#{ @_s_a.join _UNDERSCORE }"
-    end
-
-    define_method :_expect_succeeded do
-
-      _expect_common_start
-      @exitstatus.should be_zero
-    end
-
-    define_method :_expect_common_start do
-
-      @_slug ||= @_argv.fetch( -2 )
-      @_s_a = @_slug.split Home_::DASH_
-
-      expect :e, "hello from #{ @_s_a.join _SPACE }."
-
-      expect_no_more_lines
-    end
-    end  # if false
   end
 end

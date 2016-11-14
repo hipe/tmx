@@ -9,9 +9,3 @@ use [sa] to convert etc to Stream_
 -1 script to calculate costs [#tmx-011] then [#tmx-010]
 -2 the cost-driven divvy algorithm [#tmx-012]
 -3 unify other tmx node-centric services [#tmx-015]
--4 unbreak [tmx]'s heart [#tmx-016] (can get rid of all "models" tests in [tmx])
--4.1 tmx
--4.2 tan_man
--4.3 snag
--4.4 cull
--4.5 code_metrics

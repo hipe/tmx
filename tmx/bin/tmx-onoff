@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-program = -> _, _, stderr, pn_s_a, argv do
+program = -> argv, _, _, stderr, pn_s_a do
 
 if (( idx = argv.index '-n' ))
   argv[ idx, 1 ] = [ ]
@@ -96,11 +96,13 @@ if from_dir_pn.children.empty?
 end
 
 y << "turned #{ stem } #{ say_did }."
+
+0
 end
 
 if __FILE__ == $PROGRAM_NAME
 
-  program[ nil, nil, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, nil, nil, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Onoff = program
+  Skylab::TMX_onoff = program  # (comply name to [#br-083])
 end

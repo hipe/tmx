@@ -18,7 +18,7 @@ module Skylab::TestSupport
         @pth_mod = mod::TestSupport
         @viz_mod = mod::TestSupport_Visual
 
-        @_dir_path = ::File.expand_path '../../../test', mod.dir_path  # `sidesys_path_`
+        @_dir_path = ::File.expand_path '../../../test', mod.dir_path  # `sidesystem_path_`
       end
 
       def execute
