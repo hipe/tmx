@@ -21,7 +21,7 @@ module Skylab::Zerk
         _say_name_alternation :say_primary_, st
       end
 
-      def say_business_branch_item_alternation_ st
+      def say_business_item_alternation_ st
         _say_name_alternation :_same, st
       end
 

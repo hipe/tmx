@@ -65,8 +65,8 @@ module Skylab::Zerk
         def initialize
           @_added_box = nil
           @_description_proc_for_added_h = nil
+          @_DP_kn_kn = nil
           @_front_tokens = nil
-          @_has_default_primary = false
           @_listener = nil
           @_mid_scanner_pairs = nil
           @_subtracted_h = nil
@@ -143,8 +143,7 @@ module Skylab::Zerk
 
         def __receive_default_primary sym
           @_receive_default_primary = :_CLOSED_
-          @_has_default_primary = true
-          @_default_primary_symbol = sym
+          @_DP_kn_kn = Common_::Known_Known[ sym ]
           NIL
         end
 
@@ -181,11 +180,7 @@ module Skylab::Zerk
           us = remove_instance_variable :@_user_scanner
           if ! us.no_unparsed_exists
 
-            if @_has_default_primary
-              _dp_kn = Common_::Known_Known[ @_default_primary_symbol ]
-            end
-
-            a.push UserScanner___.new us, _dp_kn, itemer, @_listener
+            a.push UserScanner___.new us, @_DP_kn_kn, itemer, @_listener
           end
 
           if a.length.zero?
@@ -264,23 +259,11 @@ module Skylab::Zerk
 
         # --
 
-        def match_branch_item * a  # MUST set @current_primary_symbol as appropriate
+        def match_branch * a  # MUST set @current_primary_symbol as appropriate
 
           # "all about parsing added primaries" ([#052] #note-2) explains it all
 
-          h = a.pop
-          shape_sym = a.shift
-
-          mag = Home_::ArgumentScanner::
-              Magnetics::BranchItem_via_OperatorBranch.begin shape_sym, h, self
-
-          if a.length.nonzero?
-            st = Common_::Polymorphic_Stream.via_array a
-            pool = These_options___[ st, mag ]
-            begin
-              pool.fetch( st.gets_one ).call
-            end until st.no_unparsed_exists
-          end
+          o = _begin_match_branch a
 
           if @on_first_branch_item_not_found
             @_has_relevant_default = true
@@ -291,7 +274,7 @@ module Skylab::Zerk
           end
 
           begin
-            x = __match_niCLI_item_against mag
+            x = __match_niCLI_item_against o
             x || break
 
             if x.is_the_no_op_branch_item
@@ -325,20 +308,12 @@ module Skylab::Zerk
             x = The_no_op_item__[]
             break
           end while above
-          x
-        end
 
-        These_options___ = -> st, mag do
-          h = {
-            exactly: -> do
-              h.delete :exactly
-              mag.do_fuzzy_lookup = false ; nil
-            end,
-            passively: -> do
-              h.delete :passively  # or not, just an eg.
-              mag.be_passive = true ; nil
-            end,
-          }
+          if x && o.request.do_result_in_value
+            x = x.value
+          end
+
+          x
         end
 
         def __match_niCLI_item_against o
@@ -356,20 +331,20 @@ module Skylab::Zerk
 
         def __match_niCLI_item_normally o
 
-          case o.shape_symbol
+          case o.request.shape_symbol
           when :primary
             m1 = :_well_formed_primary_knownness_
-            m2 = :_primary_branch_item_knownness_via_request_
-          when :business_branch_item
-            m1 = :_well_formed_business_branch_item_knownness_
-            m2 = :_business_branch_item_knownness_via_request_
+            m2 = :_primary_branch_item_knownness_via_facilitator_
+          when :business_item
+            m1 = :_well_formed_business_item_knownness_
+            m2 = :_business_item_knownness_via_facilitator_
           end
 
           o.well_formed_potential_symbol_knownness = @_scn.send m1
 
           if o.is_well_formed
 
-            o.item_knownness = @_scn.send m2, o.formal_symbol_request
+            o.item_knownness = @_scn.send m2, o
 
             if o.item_was_found
               o.item
@@ -377,7 +352,7 @@ module Skylab::Zerk
             elsif @_has_relevant_default
               _use_relevant_default
 
-            elsif o.be_passive
+            elsif o.request.be_passive
               NOTHING_
 
             else
@@ -401,34 +376,80 @@ module Skylab::Zerk
 
         def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
 
-          o = Home_::ArgumentScanner::
-            Magnetics::BranchItem_via_OperatorBranch.begin :primary, NOTHING_, self
+          o = _begin_match_branch [ :primary ]
 
           o.well_formed_potential_symbol_knownness = @_scn._well_formed_primary_knownness_
 
           if o.is_well_formed
 
-            o.formal_symbol_request.well_formed_symbol
+            o.well_formed_symbol
 
           else
             o.whine_about_how_it_is_not_well_formed
           end
         end
 
+        def _begin_match_branch a
+
+          o = Home_::ArgumentScanner::Magnetics::
+              BranchItem_via_OperatorBranch.begin a, Request___[]
+
+          o.receive_argument_scanner self
+          o
+        end
+
+        # ~(
+
+        Request___ = Lazy_.call do
+
+          class Request____ < Home_::ArgumentScanner::Magnetics::
+              BranchItem_via_OperatorBranch::Request
+
+            o = superclass.const_get( :HASH, false ).dup
+            o[ :exactly ] = :__at_exactly
+            o[ :passively ] = :__at_passively
+            HASH = o
+
+            def initialize( * )
+              @do_fuzzy_lookup = true
+              super
+            end
+
+            def __at_exactly
+              @_arglist_.advance_one
+              @do_fuzzy_lookup = false
+            end
+
+            def __at_passively
+              @_arglist_.advance_one
+              @be_passive = true
+            end
+
+            attr_reader(
+              :be_passive,
+              :do_fuzzy_lookup,
+            )
+
+            self
+          end
+        end
+
+        # )~
+
         # --
 
-        def available_branch_item_name_stream_via_hash h, shape_sym
-          send THESE_3__.fetch( shape_sym ), h
+        def available_branch_item_name_stream_via_operator_branch ob, shape_sym
+          send THESE_3__.fetch( shape_sym ), ob
         end
 
         THESE_3__ = {
-          business_branch_item: :__available_etc,
-          primary: :__available_primary_name_stream_via_hash,
+          business_item: :__available_etc,
+          primary: :__available_primary_name_stream_via_operator_branch,
         }
 
-        def __available_primary_name_stream_via_hash h
+        def __available_primary_name_stream_via_operator_branch ob
 
-          _st = Stream_.call h.keys do |sym|
+          _st = ob.to_normal_symbol_stream do |sym|
             [ :primary, sym ]
           end
 
@@ -452,9 +473,9 @@ module Skylab::Zerk
           # argument stream) that reduces from it any subtracted primaries
           # and concats to it the stream symbols for any added primaries.
 
-          o = @_itemer
+          itr = @_itemer
 
-          sub_h = o.subtracted_hash
+          sub_h = itr.subtracted_hash
           reduced_st = if sub_h
             remote_normal_tuple_st.reduce_by do |tuple|
               ! sub_h[ tuple.fetch(1) ]
@@ -463,12 +484,13 @@ module Skylab::Zerk
             remote_normal_tuple_st
           end
 
-          added_box = o.added_box
-          if added_box
-            _add_these = added_box.to_name_stream.map_by do |sym|
+          if itr.has_addeds
+
+            _ = itr.addeds_as_operator_branchish.to_normal_symbol_stream do |sym|
               [ :primary, sym ]
             end
-            reduced_st.concat_stream _add_these
+
+            reduced_st.concat_stream _
           else
             reduced_st
           end
@@ -520,15 +542,15 @@ module Skylab::Zerk
           @_itemer = itemer
         end
 
-        def _primary_branch_item_knownness_via_request_ req
-          @_itemer.primary_branch_item_knownness_via_exact_match req
+        def _primary_branch_item_knownness_via_facilitator_ o
+          @_itemer.primary_branch_item_knownness_via_exact_match o
         end
 
-        def _business_branch_item_knownness_via_request_ req
-          @_itemer.business_branch_item_knownness_via_request req
+        def _business_item_knownness_via_facilitator_ o
+          @_itemer.business_item_knownness_via_facilitator o
         end
 
-        def _well_formed_business_branch_item_knownness_
+        def _well_formed_business_item_knownness_
           Common_::Known_Known[ _head ]
         end
 
@@ -571,17 +593,26 @@ module Skylab::Zerk
           @_real_scn = Common_::Polymorphic_Stream.via_array mid_scanner_pairs
         end
 
-        def _primary_branch_item_knownness_via_request_ req
+        def _primary_branch_item_knownness_via_facilitator_ o
 
-          # assume our immediately following method resulted in a known known.
+          # assume that #here.
 
-          k = req.well_formed_symbol
-          _x = req.operator_branch.fetch k
-          Common_::Known_Known[ DefaultedBranchItem___.new _x, k ]
+          # although we have a name-value pair, we are only resulting in
+          # a derivative of the name (nothing of the value) here.
+
+          k = @_real_scn.current_token.name_x
+          k == o.well_formed_symbol || self._SANITY
+
+          _x = o.operator_branch.entry_value k
+
+          _dbi = DefaultedBranchItem___.new _x, k
+
+          Common_::Known_Known[ _dbi ]
         end
 
         def _well_formed_primary_knownness_
           if @_is_pointing_at_name
+            # :#here.
             Common_::Known_Known[ @_real_scn.current_token.name_x ]
           else
             self._IF_EVER_THEN_WHY
@@ -658,31 +689,51 @@ module Skylab::Zerk
           @_real_scn = user_scn
         end
 
-        def _primary_branch_item_knownness_via_request_ req
+        def _primary_branch_item_knownness_via_facilitator_ o
 
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          _kn = @_itemer.primary_branch_item_knownness_via_exact_match req
-          _kn or __lookup_primary_branch_item_with_fuzzy_match req
-        end
-
-        def _business_branch_item_knownness_via_request_ req
-          @_itemer.business_branch_item_knownness_via_request req
-        end
-
-        def __lookup_primary_branch_item_with_fuzzy_match req  # result in a knownness
-
-          fuz = Fuzz__.new req
-
-          bx = @_itemer.added_box
-          if bx
-            fuz.visit AddedBranchItem__, bx
+          kn = @_itemer.primary_branch_item_knownness_via_exact_match o
+          if kn
+            kn
+          elsif o.request.do_fuzzy_lookup
+            __lookup_primary_branch_item_with_fuzzy_match o
+          else
+            _when_unknown_primary o
           end
+        end
 
-          fuz.visit OperatorBranchEntry__, req.operator_branch
+        def _business_item_knownness_via_facilitator_ o
+          @_itemer.business_item_knownness_via_facilitator o
+        end
 
-          fuz.maybe_finish or _unknown_because :unknown_primary
+        def __lookup_primary_branch_item_with_fuzzy_match o  # result in a knownness
+
+          fuz = Fuzz__.new o
+
+          itr = @_itemer
+          if itr.has_addeds
+            fuz.visit AddedBranchItem__, itr.addeds_as_operator_branchish
+          end
+          itr = nil
+
+          fuz.visit OperatorBranchEntry__, o.operator_branch
+
+          x = fuz.maybe_finish
+          if x
+            x
+          else
+            _when_unknown_primary o
+          end
+        end
+
+        def _when_unknown_primary o
+          if o.request.be_passive
+            self._WALK_THRU_WITH_ME
+          else
+            _unknown_because :unknown_primary
+          end
         end
 
         def _well_formed_primary_knownness_
@@ -718,7 +769,7 @@ module Skylab::Zerk
           end
         end
 
-        def _well_formed_business_branch_item_knownness_  # (rough sketch)
+        def _well_formed_business_item_knownness_  # (rough sketch)
 
           s = @_real_scn.current_token
 
@@ -784,10 +835,10 @@ module Skylab::Zerk
         def initialize bx, h
 
           if bx
-            @added_box = bx
-            @_has_added = true
+            @_addeds_box = bx
+            @has_addeds = true
           else
-            @_has_added = false
+            @has_addeds = false
           end
 
           @subtracted_hash = h
@@ -795,12 +846,12 @@ module Skylab::Zerk
 
         def __late_add_ d, sym, do_by
 
-          if @_has_added
-            bx = @added_box
+          if @has_addeds
+            bx = @_addeds_box
           else
-            @_has_added = true
+            @has_addeds = true
             bx = Common_::Box.new
-            @added_box = bx
+            @_addeds_box = bx
           end
 
           len = bx.length
@@ -817,17 +868,21 @@ module Skylab::Zerk
           NIL
         end
 
-        def primary_branch_item_knownness_via_exact_match req
+        def addeds_as_operator_branchish
+          @___AaOB ||= Addeds_as_OperatorBranch___.new @_addeds_box
+        end
 
-          k = req.well_formed_symbol
+        def primary_branch_item_knownness_via_exact_match o
 
-          if @_has_added
-            x = @added_box[ k ]
+          k = o.well_formed_symbol
+
+          if @has_addeds
+            p = @_addeds_box[ k ]
           end
-          if x
-            item = AddedBranchItem__.new x, k
+          if p
+            item = AddedBranchItem__.new p, k
           else
-            x = req.operator_branch[ k ]
+            x = o.operator_branch.lookup_softly k
             if x
               item = OperatorBranchEntry__.new x, k
             end
@@ -836,72 +891,95 @@ module Skylab::Zerk
           item && Common_::Known_Known[ item ]
         end
 
-        def business_branch_item_knownness_via_request req
+        def business_item_knownness_via_facilitator o
 
-          k = req.well_formed_symbol
-          x = req.operator_branch[ k ]
+          k = o.well_formed_symbol
+          x = o.operator_branch.lookup_softly k
           if x
             Common_::Known_Known[ OperatorBranchEntry__.new( x, k ) ]
-          elsif req.do_fuzzy_lookup
-            __business_branch_item_knownness_fuzzily req
+          elsif o.request.do_fuzzy_lookup
+            __business_item_knownness_fuzzily o
           else
-            _when_unknown req
+            _when_unknown_business_item o
           end
         end
 
-        def __business_branch_item_knownness_fuzzily req
+        def __business_item_knownness_fuzzily o
 
-          fuz = Fuzz__.new req
-          fuz.visit OperatorBranchEntry__, req.operator_branch
+          fuz = Fuzz__.new o
+          fuz.visit OperatorBranchEntry__, o.operator_branch
           kn = fuz.maybe_finish
           if kn
             kn
           else
-            _when_unknown req
+            _when_unknown_business_item o
           end
         end
 
-        def _when_unknown req
-          if req.be_passive
+        def _when_unknown_business_item o
+          if o.request.be_passive
             Common_::KNOWN_UNKNOWN
           else
-            __unknown_because :unknown_business_branch_item
+            __unknown_because :unknown_business_item
           end
         end
 
         define_method :__unknown_because, DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__
 
         def __added_primary_normal_name_symbols_
-          if @_has_added
-            _ = @added_box.a_
+          if @has_addeds
+            _ = @_addeds_box.a_
             _  # #todo
           end
         end
 
         attr_reader(
-          :added_box,
+          :has_addeds,
           :subtracted_hash,
         )
       end
 
       # ==
 
+      class Addeds_as_OperatorBranch___
+
+        def initialize bx
+          @_box = bx
+        end
+
+        def to_pair_stream
+          @_box.to_pair_stream
+        end
+
+        def to_normal_symbol_stream & p
+          @_box.to_name_stream( & p )
+        end
+      end
+
+      # ==
+
       class Fuzz__
 
-        def initialize req
+        def initialize o
 
-          sym = req.well_formed_symbol
+          sym = o.well_formed_symbol
 
           @a = nil
           @rx = /\A#{ ::Regexp.escape sym }/
           @symbol = sym
         end
 
-        def visit cls, bx
-          bx.each_pair do |k, x|
-            @rx =~ k || next
-            ( @a ||= [] ).push cls.new( x, k )
-          end
+        def visit cls, branchish
+
+          st = branchish.to_pair_stream
+          begin
+            pair = st.gets
+            pair || break
+            k = pair.name_symbol
+            @rx =~ k || redo
+            ( @a ||= [] ).push cls.new( pair.value_x, pair.name_symbol )
+            redo
+          end while above
           NIL
         end
 

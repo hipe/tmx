@@ -9,3 +9,11 @@ use [sa] to convert etc to Stream_
 -1 script to calculate costs [#tmx-011] then [#tmx-010]
 -2 the cost-driven divvy algorithm [#tmx-012]
 -3 unify other tmx node-centric services [#tmx-015]
+-3.2 omni help screen system [#tmx-018]
+-3.3 omni fuzzy resolution [#tmx-019]
+-3.4 omni "did you mean.." [#tmx-020]
+-3.5 first whack at omni operator branch (list not set)
+-3.6 refactor into directory adapter at those two spots
+-3.7 break hash-based parse method into a parser builder
+-3.8 clean up how [ze] niCLI argument scanner is built
+-3.9 refactor with new extensible syntax, adapter for directories

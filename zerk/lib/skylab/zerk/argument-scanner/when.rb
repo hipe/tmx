@@ -160,7 +160,7 @@ module Skylab::Zerk
 
               case shape_sym
               when :primary ; buffer = "unknown primary"
-              when :business_branch_item ; buffer = "unknown item"
+              when :business_item ; buffer = "unknown item"
               end
 
               s = say_strange_branch_item strange_value_by[]
@@ -175,7 +175,7 @@ module Skylab::Zerk
 
               case shape_sym
               when :primary ; buffer = "missing required primary: "
-              when :business_branch_item ; buffer = "missing required argument: "
+              when :business_item ; buffer = "missing required argument: "
               end
             end
 
@@ -186,8 +186,8 @@ module Skylab::Zerk
               case shape_sym
               when :primary
                 _this_or_this_or_this = say_primary_alternation_ _available_name_st
-              when :business_branch_item
-                _this_or_this_or_this = say_business_branch_item_alternation_ _available_name_st
+              when :business_item
+                _this_or_this_or_this = say_business_item_alternation_ _available_name_st
               end
 
               buffer << "expecting #{ _this_or_this_or_this }"

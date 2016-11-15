@@ -24,17 +24,15 @@ module Skylab::Zerk
       end
 
       def branch_value_via_match_primary_against h
-        item = match_branch_item :primary, h
-        item && item.value
+        match_branch :primary, :value, :against_hash, h
       end
 
       def branch_value_via_match_business_item_against h
-        item = match_branch_item :business_branch_item, h
-        item && item.value
+        match_branch :business_item, :value, :against_hash, h
       end
 
       def branch_item_via_match_primary_against h
-        match_branch_item :primary, h
+        match_branch :primary, :against_hash, h
       end
 
       def head_as_primary_symbol

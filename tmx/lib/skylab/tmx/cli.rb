@@ -363,8 +363,8 @@ module Skylab::TMX
           o.listener @listener
         end
 
-        o = _as.match_branch_item(
-          :business_branch_item, :passively, :exactly, col )
+        o = _as.match_branch(
+          :business_item, :passively, :exactly, :against_branch, col )
 
         if o
           @__one_off_branch_value = o ; ACHIEVED_
@@ -377,15 +377,17 @@ module Skylab::TMX
 
         remove_instance_variable :@__installation  # #todo
 
-        _cls = Home_.lib_.brazen::CLI::Executables_Exposure___::Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
+        cls = Home_.lib_.brazen::CLI::Executables_Exposure___::Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
 
-        _cls.define do |o|
+        cls.define do |o|
 
           o.directory ::File.join( Home_.sidesystem_path_, 'bin' )
 
           o.parent_module_of_executables Home_
 
           o.mandatory_prefix_to_disregard 'tmx-'
+
+          o.item_class cls::OneOff  # ..
 
           o.filesystem_function_implementors ::Dir, ::File, ::Kernel
         end

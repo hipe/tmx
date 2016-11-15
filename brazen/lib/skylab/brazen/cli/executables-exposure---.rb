@@ -42,6 +42,10 @@ module Skylab::Brazen
         @prefix = s ; nil
       end
 
+      def item_class cls
+        @item_class = cls ; nil
+      end
+
       def filesystem_function_implementors globber, fs, loader
         @filesystem = fs
         @globber = globber
@@ -50,16 +54,32 @@ module Skylab::Brazen
 
       # -- read time
 
-      def [] k  # (interface will change when [#subject])
+      def lookup_softly k
 
-        name = Common_::Name.via_lowercase_with_underscores_symbol k
-
-        path = ::File.join @directory, "#{ @prefix }#{ name.as_slug }"
+        name = _name_via_key k
+        path = _path_via_name name
 
         if @filesystem.file? path
-
-          OneOff___.new path, name, @__up_const_path, @loader
+          _item_via path, name
         end
+      end
+
+      def entry_value k
+
+        name = _name_via_key k
+        _item_via _path_via_name( name ), name
+      end
+
+      def _item_via path, nm
+        @item_class.new path, nm, @__up_const_path, @loader
+      end
+
+      def _path_via_name nm
+        ::File.join @directory, "#{ @prefix }#{ nm.as_slug }"
+      end
+
+      def _name_via_key k
+        Common_::Name.via_lowercase_with_underscores_symbol k
       end
     end
 
@@ -188,12 +208,14 @@ module Skylab::Brazen
         def __build_one_off
 
           o = @_bound
-          OneOff___.new o.__path, o.name_function, o.__const_pfx, ::Kernel
+
+          Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff.
+            new( o.__path, o.name_function, o.__const_pfx, ::Kernel )
         end
       end
 #==BEGIN KEEP
 
-      class OneOff___
+      class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff
 
             # when it comes time to invoke the executable, it must follow a
             # few rules in order to be exposed by this [br]-integrated

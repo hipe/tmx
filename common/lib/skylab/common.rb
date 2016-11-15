@@ -305,8 +305,8 @@ module Skylab::Common
       NIL_
     end
 
-    def to_name_stream
-      Home_::Stream.via_nonsparse_array @a
+    def to_name_stream & p
+      Home_::Stream.via_nonsparse_array @a, & p
     end
 
     # ~ ..of values

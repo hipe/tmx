@@ -6,36 +6,91 @@ module Skylab::Zerk
 
     class Magnetics::BranchItem_via_OperatorBranch
 
-      # this "faciliator" has a strange, session-heavy interface because [#052] #note-1
+      # this "facilitator" has a strange, session-heavy interface because [#052] #note-1
 
       class << self
         alias_method :begin, :new
         undef_method :new
       end  # >>
 
-      def initialize shape_sym, ob, as
-        @argument_scanner = as
-        @be_passive = false
-        @do_fuzzy_lookup = true
-        @operator_branch = ob
-        @shape_symbol = shape_sym
+      def initialize arglist, request_class
+        @request = request_class.new arglist
+      end
+
+      # ~(
+
+      class Request
+
+        def initialize arglist
+          st = Common_::Polymorphic_Stream.via_array arglist
+          h = self.class::HASH
+          @_arglist_ = st
+          begin
+            send h.fetch st.current_token
+          end until st.no_unparsed_exists
+          remove_instance_variable :@_arglist_
+          freeze
+        end
+
+        HASH = {
+          against_branch: :__at_against_branch,
+          against_hash: :__at_against_hash,
+          business_item: :_accept_shape_symbol,
+          passively: :__at_passively,
+          primary: :_accept_shape_symbol,
+          value: :__at_value,
+        }
+
+        def __at_against_hash
+          @_arglist_.advance_one
+          @operator_branch = OperatorBranch_via_Hash___.new @_arglist_.gets_one
+          NIL
+        end
+
+        def __at_against_branch
+          @_arglist_.advance_one
+          @operator_branch = @_arglist_.gets_one
+          NIL
+        end
+
+        def _accept_shape_symbol
+          @shape_symbol = @_arglist_.gets_one ; nil
+        end
+
+        def __at_passively
+          @_arglist_.advance_one
+          @be_passive = true ; nil
+        end
+
+        def __at_value
+          @_arglist_.advance_one
+          @do_result_in_value = true ; nil
+        end
+
+        attr_reader(
+          :be_passive,
+          :do_result_in_value,
+          :operator_branch,
+          :shape_symbol,
+        )
+      end
+
+      # )~
+
+      def receive_argument_scanner as
+        @argument_scanner = as ; nil
       end
 
       def whine_about_how_argument_scanner_ended_early
         @_custom_behaivor_was_provided = false
-        case @shape_symbol
+        case @request.shape_symbol
         when :primary
           @_terminal_channel_symbol = :missing_required_primary
-        when :business_branch_item
+        when :business_item
           @_terminal_channel_symbol = :missing_required_argument
         end
         _always_whine_in_the_same_way
       end
-
-      attr_writer(
-        :be_passive,
-        :do_fuzzy_lookup,
-      )
 
       # ~
 
@@ -44,14 +99,7 @@ module Skylab::Zerk
         if kn.is_known_known
 
           @is_well_formed = true
-
-          @formal_symbol_request = FormalSymbolRequest___.new(
-            kn.value_x,
-            @shape_symbol,
-            @do_fuzzy_lookup,
-            @be_passive,
-            @operator_branch,
-          )
+          @__well_formed_known_known = kn
         else
 
           @is_well_formed = false
@@ -61,24 +109,16 @@ module Skylab::Zerk
         kn
       end
 
-      FormalSymbolRequest___ = ::Struct.new(
-        :well_formed_symbol,
-        :shape_symbol,
-        :do_fuzzy_lookup,
-        :be_passive,
-        :operator_branch
-      )
-
       def whine_about_how_it_is_not_well_formed
         _always_whine_in_the_same_way  # hi.
       end
 
+      def well_formed_symbol
+        @__well_formed_known_known.value_x
+      end
+
       attr_reader(
-        :be_passive,
-        :do_fuzzy_lookup,
-        :formal_symbol_request,
         :is_well_formed,
-        :shape_symbol,
       )
 
       # ~
@@ -102,13 +142,13 @@ module Skylab::Zerk
         _always_whine_in_the_same_way  # hi.
       end
 
-      attr_reader :item_was_found
-
       # ~
 
       def item
         @__item_structure
       end
+
+      attr_reader :item_was_found
 
       # --
 
@@ -135,30 +175,69 @@ module Skylab::Zerk
 
       def __whine_in_the_typical_fashion
 
+        req = @request
+        ob = req.operator_branch
+        shape_sym = req.shape_symbol
+        req = nil
+
         o = Here_::When::UnknownBranchItem.begin
 
         if ! @argument_scanner.no_unparsed_exists
           o.strange_value_by = @argument_scanner.method :head_as_is
         end
 
-        if @operator_branch
+        if ob
 
-          _p = @argument_scanner.method :available_branch_item_name_stream_via_hash
+          _p = @argument_scanner.method :available_branch_item_name_stream_via_operator_branch
 
           o.available_item_name_stream_by = -> do
-            _p[ @operator_branch, @shape_symbol ]
+            _p[ ob, shape_sym ]
           end
         else
           NOTHING_  # #feature-island #scn-coverpoint-2
         end
 
-        o.shape_symbol = @shape_symbol
+        o.shape_symbol = shape_sym
 
         o.terminal_channel_symbol = @_terminal_channel_symbol
 
         o.listener = @argument_scanner.listener
 
         o.execute
+      end
+
+      def operator_branch
+        @request.operator_branch
+      end
+
+      attr_reader(
+        :request,
+      )
+    end
+
+    class Magnetics::BranchItem_via_OperatorBranch::OperatorBranch_via_Hash___
+
+      def initialize h
+        @hash = h
+      end
+
+      def lookup_softly k
+        @hash[ k ]
+      end
+
+      def entry_value k
+        @hash.fetch k
+      end
+
+      def to_pair_stream
+        h = @hash
+        to_normal_symbol_stream do |k|
+          Common_::Pair.via_value_and_name h.fetch( k ), k
+        end
+      end
+
+      def to_normal_symbol_stream & p
+        Stream_[ @hash.keys, & p ]
       end
     end
 

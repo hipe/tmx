@@ -36,6 +36,8 @@ module Skylab::Zerk::TestSupport
 
     it "if your `add_primary` results in true-ish, \"normal\" flow of execution." do
 
+      # NOTE this also tests fuzzy-ness for perhaps the first time :/
+
       # (#scn-coverpoint-1-B)
 
       v_count = 0

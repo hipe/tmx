@@ -30,14 +30,15 @@ module Skylab::Zerk
         NIL
       end
 
-      def match_branch_item shape_sym, h  # MUST set @current_primary_symbol as appropriate
+      def match_branch * a  # MUST set @current_primary_symbol as appropriate
 
-        o = Home_::ArgumentScanner::
-            Magnetics::BranchItem_via_OperatorBranch.begin shape_sym, h, self
+        mod = Home_::ArgumentScanner::Magnetics::BranchItem_via_OperatorBranch
+        o = mod.begin a, mod::Request
 
         if @no_unparsed_exists
           o.whine_about_how_argument_scanner_ended_early
         else
+          o.receive_argument_scanner self
           __branch_item_via_match_primary_against_head_normally o
         end
       end
@@ -48,12 +49,19 @@ module Skylab::Zerk
 
         if o.is_well_formed
 
-          o.item_knownness = __branch_item_knownness_via_request o.formal_symbol_request
+          o.item_knownness = __branch_item_knownness_via_facilitator o
 
           if o.item_was_found
+
             item = o.item
+
             @current_primary_symbol = item.branch_item_normal_symbol
-            item
+
+            if o.request.do_result_in_value
+              item.value
+            else
+              item
+            end
           else
             o.whine_about_how_item_was_not_found
           end
@@ -71,18 +79,22 @@ module Skylab::Zerk
         end
       end
 
-      def __branch_item_knownness_via_request req
-        k = req.well_formed_symbol
-        x = req.operator_branch[ k ]
+      def __branch_item_knownness_via_facilitator o
+
+        k = o.well_formed_symbol
+        x = o.operator_branch.lookup_softly k
         if x
-          Common_::Known_Known[ Home_::ArgumentScanner::OperatorBranchEntry.new x, k ]
+          _obe = Home_::ArgumentScanner::OperatorBranchEntry.new x, k
+          Common_::Known_Known[ _obe ]
         else
           Home_::ArgumentScanner::Known_unknown[ :unknown_primary ]
         end
       end
 
-      def available_branch_item_name_stream_via_hash h, _  # 1x
-        Stream_.call h.keys do |sym|
+      def available_branch_item_name_stream_via_operator_branch ob, _
+
+        ob.to_normal_symbol_stream do |sym|
+
           Common_::Name.via_variegated_symbol sym
         end
       end

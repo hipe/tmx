@@ -126,7 +126,7 @@ CLI you can assume all elements of ARGV are strings).
 
 TL;DR: strange, session-heavy inteface for reasons
 
-given the particular argument scanner's head and a "branch hash",
+given the particular argument scanner's head and a "operator branch",
 the (two) various argument scanner implementations probably solve
 for a formal primary in more or less the same way from some certain
 high level. and regardless, in cases of failure they should express
