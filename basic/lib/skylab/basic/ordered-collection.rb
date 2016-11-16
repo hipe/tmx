@@ -68,10 +68,19 @@ module Skylab::Basic
         new_tail_link = left._insert_to_the_right_ _cmp
 
         if new_tail_link
+          self._WHY_REVIEW
           @_tail_link = new_tail_link
         end
 
         NIL
+      end
+
+      def remove_head_comparable
+        if @_head_link.next.is_tail
+          self._DESIGN_ME_slash_COVER_ME
+        else
+          @_head_link.__remove_to_the_right_
+        end
       end
 
       def head_item
@@ -184,7 +193,7 @@ module Skylab::Basic
 
         my_former_next_link = my_former_next_kn.value_x
 
-        _ = my_former_next_link.__change_previous_knownness do |me_kn|
+        _ = my_former_next_link._change_previous_knownness do |me_kn|
 
           _new_link = This__._new me_kn, cmp, my_former_next_kn
 
@@ -196,13 +205,41 @@ module Skylab::Basic
         NOTHING_
       end
 
-      def __change_previous_knownness
+      def __remove_to_the_right_  # assume..
+
+        # assume the going away piece is not the tail piece.
+
+        # me [gakn]    [mekn] going-away [farkn]    [gakn2] far
+
+        _going_away_kn = remove_instance_variable :@_next_known
+        going_away = _going_away_kn.value_x
+        going_away.is_tail && fail
+
+        me_kn = going_away.remove_instance_variable :@_prev_known
+        far_kn = going_away.remove_instance_variable :@_next_known
+
+        object_id == me_kn.value_x.object_id || self._SANITY
+
+        far = far_kn.value_x
+
+        far._change_previous_knownness { me_kn }
+
+        @_next_known = far_kn
+
+        # me [farkn]   [mekn] far
+
+        going_away.comparable
+      end
+
+      def _change_previous_knownness
         _former_prev_kn = remove_instance_variable :@_prev_known
         new_prev_kn = yield _former_prev_kn
         new_prev_kn.value_x || self._SANITY
         @_prev_known = new_prev_kn
         new_prev_kn
       end
+
+      protected :_change_previous_knownness
 
       def prev
         @_prev_known.value_x
