@@ -74,8 +74,10 @@
 [#005]       #track-node all String Templating-like nerks
 [#004]       #doc-node the pathname narrative.. (was IO scanner, moved to [#sy-013])
 
-[#003] #hole ( #was: #branch-node, field sub-node (#meta-fields) .. )
+[#003]       #track sic
+             ( #was: #branch-node, field sub-node (#meta-fields) .. )
 
 [#002]       #branch-node, list sub-node
              :[#]:LL tracks what would be clients of a common linked list lib
+             see also [#003]
 [#001]       #branch-node, tree sub-node

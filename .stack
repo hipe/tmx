@@ -16,4 +16,4 @@ use [sa] to convert etc to Stream_
 -3.6 refactor into directory adapter at those two spots
 -3.7 break hash-based parse method into a parser builder
 -3.8 clean up how [ze] niCLI argument scanner is built
--3.9 refactor with new extensible syntax, adapter for directories
+-3.8.B linked-list type thing
