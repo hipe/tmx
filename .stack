@@ -18,4 +18,3 @@ use [sa] to convert etc to Stream_
 -3.8 clean up how [ze] niCLI argument scanner is built
 -3.8.B linked-list type thing
 -3.8.C refactor into that test support lib
--3.8.D "snap"

@@ -89,7 +89,7 @@ module Skylab::TestSupport
         # to be sure, to get this "weedy" is an early optimization and
         # certainly hinders the portability/robustity of this, but it is
         # an excercize so we are comfortable with our answer to this
-        # "what if" scenario if not for this than for other use cases
+        # "what if" scenario if not for this then for other use cases
         # where scaling is an issue. if needed we could fall back on our
         # single line in-ruby solution (`stream.flush_to_count`).
         #
@@ -99,7 +99,7 @@ module Skylab::TestSupport
 
         read_find_err, write_find_err = ::IO.pipe  # we wanted string IO but not allowed.
 
-        write_wc, read_wc_out, read_wc_err, wc_wait = ::Open3.popen3(  * WORDCOUNT_COMMAND___ )
+        write_wc, read_wc_out, read_wc_err, wc_wait = ::Open3.popen3( * WORDCOUNT_COMMAND___ )
           # ::Open3 is @system_conduit, but we are being clear we cannot mock this
 
         _command = @_find_command.args

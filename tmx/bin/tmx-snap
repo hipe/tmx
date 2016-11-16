@@ -43,14 +43,18 @@ class TMX_snap
         elsif HELP_RX__ =~ @argv.current_token
           @exitstatus = YEP__
           __express_help
+
         elsif __parse_operation_name
           @exitstatus = YEP__
-          _m = remove_instance_variable :@__operation_method_name
-          _common_init
-          Common_::Bound_Call[ nil, self, _m ]
+          _flush_bound_call_via_operation_method_name
+
+        elsif __this_hacky_thing
+          @exitstatus = YEP__
+          _flush_bound_call_via_operation_method_name
+
         else
           @exitstatus = NOPE__
-          __whine_about_unknown_operation
+          __bork_about_unknown_operation
         end
       end
 
@@ -63,14 +67,14 @@ class TMX_snap
           @argv.advance_one
           @__operation_symbol = k
           @_operation_slug = tok
-          @__operation_method_name = m
+          @_operation_method_name = m
           ACHIEVED_
         else
           UNABLE_
         end
       end
 
-      def __whine_about_unknown_operation
+      def __bork_about_unknown_operation
 
         tok = @argv.current_token
         @serr.puts "unrecognized operation: #{ tok.inspect }"
@@ -128,6 +132,7 @@ class TMX_snap
       DESCRIPTIONS__ = {
         add: :__describe_add,
         list: :__describe_list,
+        commit: :__describe_commit,
       }
 
       # --
@@ -142,7 +147,7 @@ class TMX_snap
 
       def __at_list
         if @argv.no_unparsed_exists
-          if __resolve_file_open_for_read
+          if _resolve_file_open_for_read
             __do_list
           end
         else
@@ -194,8 +199,7 @@ class TMX_snap
 
         if @argv.no_unparsed_exists
 
-          _whine_about_expecting_argument '<file>'
-          _invite_to_operation_help
+          _bork_about_expecting_argument '<file>'
 
         elsif HELP_RX__ =~ @argv.current_token
 
@@ -226,7 +230,189 @@ class TMX_snap
         NIL
       end
 
-      def __resolve_file_open_for_read
+      # --
+
+      def __describe_commit
+        @serr.puts "(..)"
+        NIL
+      end
+
+      def __this_hacky_thing
+
+        # if there is one token left in the ARGV and it "looks like" a
+        # commit message (see regex), interpret this to be a shorthand for
+        # `commit`. (incidentally this use case is the exact inspiration for
+        # making this one-off script instead of just using the simple alias
+        # is so that we could annonate our "snap" commits.)
+        #
+        # eek - peek the length of the remainder of the buffer (ARGV)
+        # before you `gets` it.
+
+        eek = @argv
+        d = eek.current_index
+        s_a = eek.array_for_read
+        if d == s_a.length - 1
+
+          tok = @argv.current_token
+
+          if COMMIT_MESSAGE_WIDE_RX__ =~ tok && HELP_RX__ !~ tok
+
+            @_commit_message = @argv.gets_one
+            @_operation_method_name = :_try_commit
+            ACHIEVED_
+          end
+        end
+      end
+
+      def __at_commit
+
+        if @argv.no_unparsed_exists
+
+          _bork_about_expecting_argument '<commitmsg>'
+
+        elsif HELP_RX__ =~ @argv.current_token
+
+          _when_operation_help_requested
+
+        else
+          @_commit_message = @argv.gets_one
+          if @argv.no_unparsed_exists
+            _try_commit
+          else
+            _bork_about_unexpected_argument_for_operation
+          end
+        end
+      end
+
+      def _try_commit  # assume at least one token.
+
+        if _resolve_file_open_for_read
+          __do_commit
+        end
+      end
+
+      def __do_commit
+
+        files_ok = []
+        files_not_ok = nil
+
+        up_io = @_file_io
+        fs = @_filesystem
+        begin
+          line = up_io.gets
+          line || break
+          line.chomp!
+          if fs.exist? line
+            files_ok.push line
+            redo
+          end
+          ( files_not_ok ||= [] ).push line
+          redo
+        end while above
+        up_io.close
+
+        if files_not_ok
+          __when_files_not_ok files_not_ok
+
+        elsif files_ok.length.zero?
+          @exitstatus = NOPE__
+          @serr.puts "(no files to commit)"
+          NIL
+        else
+          _msg = remove_instance_variable :@_commit_message
+          __commit_money _msg, files_ok
+        end
+      end
+
+      def __when_files_not_ok files
+        @exitstatus = NOPE__
+        @serr.puts "(won't commit because these files don't exit)"
+        files.each do |file|
+          @sout.puts file
+        end
+        @serr.puts "(you MIGHT be able to fix this with this line:)"
+        @serr.puts "    #{ _program_name } list > x ; mv x #{ @_file }"
+        NIL
+      end
+
+      def __commit_money msg, files
+
+        require 'shellwords'
+
+        ok = nil
+        git = "git"
+
+        money = -> * s_a do
+          s_a.unshift git
+          _eew = [ * s_a[ 0 .. -2 ], ::Shellwords.shellescape( s_a.last ) ]
+          @serr.puts "  >>>> #{ _eew.join ' ' }"  # SPACE_
+
+          _EEEGADS s_a
+        end
+
+        files.each do |file|
+          ok = money[ "add", file ]
+          ok || break
+        end
+
+        if ok
+          money[ "commit", "-m", msg ]
+        end
+
+        if ! ok
+          @exitstatus ||= NOPE__
+        end
+        NIL
+      end
+
+      def _EEEGADS command_s_a
+
+        # command_s_a.unshift 'echo'  # hackish way to get dry run
+
+        guy = command_s_a.first  # ..
+
+        o_r, o_w = ::IO.pipe
+        e_r, e_w = ::IO.pipe
+
+        pid = ::Kernel.spawn( * command_s_a, out: o_w, err: e_w )
+
+        o_w.close
+        e_w.close
+
+        ok = true
+        s = e_r.gets
+        if s
+          ok = false
+          begin
+            @serr.puts "  <<<< (#{ guy } err:) #{ s }"
+            s = e_r.gets
+          end while s
+        else
+          s = o_r.gets
+          if s
+            begin
+              @serr.puts "  <<<< (#{ guy } out:) #{ s }"
+              s = o_r.gets
+            end while s
+          end
+        end
+
+        ::Process.wait pid
+        _status = $?
+        d = _status.exitstatus
+
+        if d.nonzero?
+          ok = false
+        end
+
+        @exitstatus = d
+
+        ok
+      end
+
+      # --
+
+      def _resolve_file_open_for_read
         _resolve_file_open_for ::File::RDONLY
       end
 
@@ -248,27 +434,26 @@ class TMX_snap
 
       # --
 
-      def _whine_about_expecting_argument moniker
+      def _bork_about_expecting_argument moniker
 
         @serr.puts "expecting #{ moniker } for #{ @_operation_slug }"
-
-        NIL
+        _invite_to_operation_help
       end
 
       def __maybe_operation_help  # assume nonzero-length argv
 
-        tok = @argv.current_token
-
-        if HELP_RX__ =~ tok
+        if HELP_RX__ =~ @argv.current_token
           _when_operation_help_requested
         else
-          __whine_about_unexpected_argument_for_operation
+          _bork_about_unexpected_argument_for_operation
         end
       end
 
-      def __whine_about_unexpected_argument_for_operation
+      def _bork_about_unexpected_argument_for_operation
 
-        @serr.puts "unexpected argument #{ tok.inspect } for #{ @_operation_slug }"
+        @serr.puts "unexpected argument #{ @argv.current_token.inspect } #{
+          }for #{ @_operation_slug }"
+
         _invite_to_operation_help
       end
 
@@ -301,12 +486,19 @@ class TMX_snap
         ::File.basename @program_name_string_array.last
       end
 
+      def _flush_bound_call_via_operation_method_name
+        _m = remove_instance_variable :@_operation_method_name
+        _common_init
+        Common_::Bound_Call[ nil, self, _m ]
+      end
+
       # --
     # -
 
     # ==
 
     ACHIEVED_ = true
+    COMMIT_MESSAGE_WIDE_RX__ = %r([^ ][ ]+[^ ])
     HELP_RX__ = %r(\A--?h(?:e(?:l(?:p)?)?)?\z)
     NOPE__ = 5
     NOTHING_ = nil
