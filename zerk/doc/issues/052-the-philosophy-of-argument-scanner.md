@@ -244,3 +244,14 @@ for whichever (if any) purpose "feels better" for the use case.
 for now (in part) because this is so experimental, we take
 safeguards to ensure that what is required is provided, and that
 the procs do not clobber each other.
+
+
+
+
+# :#note-4
+
+EEK - when we reach the end of the argument scanner and we
+ended on a "frontey" primary, then it's hard to hide the
+existence of this hack completely from the backend. we are
+in effect trying to tell the backend "we did not fail, but
+this is not a item."

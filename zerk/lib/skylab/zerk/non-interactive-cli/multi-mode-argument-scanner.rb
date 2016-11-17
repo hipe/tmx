@@ -277,6 +277,27 @@ module Skylab::Zerk
 
         # -- READERS
 
+        def match_branch * a  # MUST set @current_primary_symbol as appropriate
+          _matcher_via_array( a ).gets
+        end
+
+        def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
+
+          o = __matcher_for :primary
+          _x  = o.__to_well_formed_symbol_
+          _x  # #todo
+        end
+
+        def __matcher_for * a
+          _matcher_via_array a
+        end
+
+        def _matcher_via_array a
+          Matcher___.new self, a
+        end
+
+        # --
+
         def altered_description_proc_reader_via remote
 
           # given the description proc reader produced by the remote
@@ -292,187 +313,6 @@ module Skylab::Zerk
             remote
           end
         end
-
-        # --
-
-        def match_branch * a  # MUST set @current_primary_symbol as appropriate
-
-          # "all about parsing added primaries" ([#052] #note-2) explains it all
-
-          o = _begin_match_branch a
-
-          if @_first_time_only_match_hook
-            @__relevant_default = @_first_time_only_match_hook
-            @_first_time_only_match_hook = nil
-            @_has_relevant_default = true
-          else
-            @_has_relevant_default = false
-          end
-
-          begin
-            x = __match_niCLI_item_against o
-            x || break
-
-            if x.is_the_no_op_branch_item
-              redo
-            end
-
-            item = x
-
-            @current_primary_symbol = item.branch_item_normal_symbol
-
-            if item.is_more_backey_than_frontey
-              break  # "backey" item is found - done.
-            end
-
-            x = item.value.call
-            if ! x  # custom frontend proc interrupts flow #scn-coverpoint-1-A
-              break
-            end
-
-            if ! @no_unparsed_exists
-              redo  # NOTE if client did not advance scanner herself, infinite loop
-            end
-
-            # EEK - when we reach the end of the argument scanner and we
-            # ended on a "frontey" primary, then it's hard to hide the
-            # existence of this hack completely from the backend. we are
-            # in effect trying to tell the backend "we did not fail, but
-            # this is not a item." experimental :#scn-note-1 :#here2
-            # #not-covered - hits IFF `-verbose` at end
-
-            x = The_no_op_item__[]
-            break
-          end while above
-
-          if x && o.request.do_result_in_value
-            x = x.value
-          end
-
-          x
-        end
-
-        def __match_niCLI_item_against o
-
-          if @no_unparsed_exists
-            if @_has_relevant_default
-              _use_relevant_default
-            else
-              o.whine_about_how_argument_scanner_ended_early
-            end
-          else
-            __match_niCLI_item_normally o
-          end
-        end
-
-        def __match_niCLI_item_normally o
-
-          case o.request.shape_symbol
-          when :primary
-            m1 = :_well_formed_primary_knownness_
-            m2 = :_primary_branch_item_knownness_via_facilitator_
-          when :business_item
-            m1 = :_well_formed_business_item_knownness_
-            m2 = :_business_item_knownness_via_facilitator_
-          end
-
-          o.well_formed_potential_symbol_knownness = @_scanners.head_item.send m1
-
-          if o.is_well_formed
-
-            o.item_knownness = @_scanners.head_item.send m2, o
-
-            if o.item_was_found
-              o.item
-
-            elsif @_has_relevant_default
-              _use_relevant_default
-
-            elsif o.request.be_passive
-              NOTHING_
-
-            else
-              o.whine_about_how_item_was_not_found
-            end
-
-          elsif @_has_relevant_default
-            _use_relevant_default
-          else
-            o.whine_about_how_it_is_not_well_formed
-          end
-        end
-
-        def _use_relevant_default
-          _p = remove_instance_variable :@__relevant_default
-          @_has_relevant_default = false
-          _p[ self ]  # you better work
-          _ = The_no_op_item__[]
-          _  # #todo
-        end
-
-        def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
-
-          o = _begin_match_branch [ :primary ]
-
-          _kn = @_scanners.head_item._well_formed_primary_knownness_
-
-          o.well_formed_potential_symbol_knownness = _kn
-
-          if o.is_well_formed
-
-            o.well_formed_symbol
-
-          else
-            o.whine_about_how_it_is_not_well_formed
-          end
-        end
-
-        def _begin_match_branch a
-
-          o = Home_::ArgumentScanner::Magnetics::
-              BranchItem_via_OperatorBranch.begin a, Request___[]
-
-          o.receive_argument_scanner self
-          o
-        end
-
-        # ~(
-
-        Request___ = Lazy_.call do
-
-          class Request____ < Home_::ArgumentScanner::Magnetics::
-              BranchItem_via_OperatorBranch::Request
-
-            o = superclass.const_get( :HASH, false ).dup
-            o[ :exactly ] = :__at_exactly
-            o[ :passively ] = :__at_passively
-            HASH = o
-
-            def initialize( * )
-              @do_fuzzy_lookup = true
-              super
-            end
-
-            def __at_exactly
-              @_arglist_.advance_one
-              @do_fuzzy_lookup = false
-            end
-
-            def __at_passively
-              @_arglist_.advance_one
-              @be_passive = true
-            end
-
-            attr_reader(
-              :be_passive,
-              :do_fuzzy_lookup,
-            )
-
-            self
-          end
-        end
-
-        # )~
 
         # --
 
@@ -573,6 +413,43 @@ module Skylab::Zerk
 
         # --
 
+        # ~
+
+        def __tick_
+          if @_first_time_only_match_hook
+            @__relevant_default = @_first_time_only_match_hook
+            @_first_time_only_match_hook = nil
+            @_has_relevant_default = true
+          else
+            @_has_relevant_default = false
+          end
+          NIL
+        end
+
+        def __has_relevant_default_
+          @_has_relevant_default
+        end
+
+        def __release_relevant_default_
+          _p = remove_instance_variable :@__relevant_default
+          @_has_relevant_default = false
+          _p
+        end
+
+        # ~
+
+        def __receive_CPS_ sym
+          @current_primary_symbol = sym ; nil
+        end
+
+        # ~
+
+        def _head_scanner_
+          @_scanners.head_item
+        end
+
+        # --
+
         attr_reader(
           :listener,
           :no_unparsed_exists,
@@ -602,6 +479,219 @@ module Skylab::Zerk
 
       # ==
 
+      class Matcher___
+
+        def initialize as, req_a
+          @argument_scanner = as
+          @request = Request___[].new req_a
+        end
+
+        def gets
+          Search___.new( @request, @argument_scanner ).execute
+        end
+
+        def __to_well_formed_symbol_
+          Search___.new( @request, @argument_scanner ).__do_well_formed_symbol_
+        end
+      end
+
+      # ==
+
+      class Search___
+
+        # "all about parsing added primaries" [#052] #note-2
+
+        def initialize req, as
+
+          @argument_scanner = as
+          @request = req
+
+          @_ = AS_Lib__::Magnetics
+
+          freeze
+        end
+
+        def execute
+
+          as = @argument_scanner
+          as.__tick_
+
+          begin
+            x = __step
+            x || break
+            if x.is_the_no_op_branch_item
+              redo
+            end
+            item = x
+
+            as.__receive_CPS_ item.branch_item_normal_symbol
+
+            if item.is_more_backey_than_frontey
+              break  # "backey" item is found - done.
+            end
+
+            x = item.value.call
+            if ! x  # custom frontend proc interrupts flow #scn-coverpoint-1-A
+              break
+            end
+
+            if ! as.no_unparsed_exists
+              redo  # NOTE if client did not advance scanner infinite loop
+            end
+
+            x = The_no_op_item__[]  # EEK #note-4
+              #not-covered - hits IFF `-verbose` at end
+              #experimental :#scn-note-1 :#here2
+
+            break
+          end while above
+
+          if x && @request.do_result_in_value
+            x = x.value
+          end
+
+          x
+        end
+
+        def __step
+
+          if @argument_scanner.no_unparsed_exists
+            if _has_relevant_default
+              _use_relevant_default
+            else
+              @_.whine_about_how_argument_scanner_ended_early self
+            end
+          else
+            __money_step
+          end
+        end
+
+        def __money_step
+
+          catzn = _well_formed_categorization
+
+          if catzn.is_well_formed
+
+            catzn = __search_categorization catzn.well_formed_symbol
+
+            if catzn
+
+              if catzn.item_was_found
+                catzn.item
+
+              elsif _has_relevant_default
+                _use_relevant_default
+
+              else
+                catzn.whine_about_how_item_was_not_found self
+              end
+            else
+              @request.be_passive || self._SANITY  # #here4
+              NOTHING_
+            end
+
+          elsif _has_relevant_default
+            _use_relevant_default
+          else
+            catzn.whine_about_how_it_is_not_well_formed self
+          end
+        end
+
+        def __do_well_formed_symbol_
+
+          catzn = _well_formed_categorization
+
+          if catzn.is_well_formed
+
+            catzn.well_formed_symbol
+          else
+            catzn.whine_about_how_it_is_not_well_formed self
+          end
+        end
+
+        def __search_categorization sym
+
+          _scn = @argument_scanner._head_scanner_
+          _wfr = WellFormedRequest___[ sym, @request ]
+          _search_catzn = SC___.fetch @request.shape_symbol
+          _catzn = _scn.send _search_catzn, _wfr
+          _catzn  # #todo
+        end
+
+        WellFormedRequest___ = ::Struct.new :well_formed_symbol, :request
+
+        SC___ = {
+          business_item: :_business_categorization_via_WFR_,
+          primary: :_primary_categorization_via_WFR_,
+        }
+
+        def _well_formed_categorization
+
+          _scn = @argument_scanner._head_scanner_
+          _well_formed_catzn = WFC___.fetch @request.shape_symbol
+          _catzn = _scn.send _well_formed_catzn
+          _catzn  # #todo
+        end
+
+        WFC___ = {
+          business_item: :_well_formed_business_item_categorization_,
+          primary: :_well_formed_primary_categorization_,
+        }
+
+        def _has_relevant_default
+          @argument_scanner.__has_relevant_default_
+        end
+
+        def _use_relevant_default
+          _p = @argument_scanner.__release_relevant_default_
+          _p[]  # you better work
+          _ = The_no_op_item__[]
+          _  # #todo
+        end
+
+        attr_reader(
+          :argument_scanner,
+          :request,
+        )
+      end
+
+      # ==
+
+      Request___ = Lazy_.call do
+
+        class Request____ < AS_Lib__::Magnetics::Request_via_Array
+
+          o = superclass.const_get( :HASH, false ).dup
+          o[ :exactly ] = :__at_exactly
+          o[ :passively ] = :__at_passively
+          HASH = o
+
+          def initialize s_a
+            @do_fuzzy_lookup = true
+            super
+          end
+
+          def __at_exactly
+            @_arglist_.advance_one
+            @do_fuzzy_lookup = false
+          end
+
+          def __at_passively
+            @_arglist_.advance_one
+            @be_passive = true
+          end
+
+          attr_reader(
+            :be_passive,
+            :do_fuzzy_lookup,
+          )
+
+          self
+        end
+      end
+
+      # ==
+
       class FrontTokens__
 
         # these (if present) must be an array of symbols. they are merely
@@ -622,28 +712,28 @@ module Skylab::Zerk
         # where the below 2 methods are called, subject has alread done that
         # and all that is left to is is pass thru to itemer.
 
-        def _primary_branch_item_knownness_via_facilitator_ o
-          _sanity o
-          @_itemer.primary_item_knownness_via_exact_match o
+        def _primary_categorization_via_WFR_ wfr
+          _sanity wfr
+          @_itemer._do_primary_categorization_thru_exact_match_via_WFR_ wfr
         end
 
-        def _business_item_knownness_via_facilitator_ o
-          _sanity o
-          @_itemer.business_item_knownness_via_facilitator o
+        def _business_categorization_via_WFR_ wfr
+          _sanity wfr
+          @_itemer._do_business_categorization_via_WFR_ wfr
         end
 
-        def _sanity o
-          o.well_formed_symbol == _head || fail
+        def _sanity wfr
+          wfr.well_formed_symbol == _head || fail
         end
 
         # --
 
-        def _well_formed_business_item_knownness_
-          KnKn__[ _head ]
+        def _well_formed_business_item_categorization_
+          AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _head ]
         end
 
-        def _well_formed_primary_knownness_
-          KnKn__[ _head ]
+        def _well_formed_primary_categorization_
+          AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _head ]
         end
 
         def _head_as_normal_symbol_
@@ -681,7 +771,7 @@ module Skylab::Zerk
           @_real_scn = Common_::Polymorphic_Stream.via_array pairs
         end
 
-        def _primary_branch_item_knownness_via_facilitator_ o
+        def _primary_categorization_via_WFR_ wfr
 
           # assume that #here1.
 
@@ -689,19 +779,20 @@ module Skylab::Zerk
           # a derivative of the name (nothing of the value) here.
 
           k = @_real_scn.current_token.name_x
-          k == o.well_formed_symbol || self._SANITY
+          k == wfr.well_formed_symbol || self._SANITY
 
-          _x = o.operator_branch.entry_value k
+          _x = wfr.request.operator_branch.entry_value k
 
           _dbi = DefaultedBranchItem___.new _x, k
 
-          KnKn__[ _dbi ]
+          AS_Lib__::Magnetics::ItemFound_via_Item[ _dbi ]
         end
 
-        def _well_formed_primary_knownness_
+        def _well_formed_primary_categorization_
           if @_is_pointing_at_name
             # :#here1.
-            KnKn__[ @_real_scn.current_token.name_x ]
+            _sym = @_real_scn.current_token.name_x
+            AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _sym ]
           else
             self._IF_EVER_THEN_WHY
           end
@@ -751,7 +842,7 @@ module Skylab::Zerk
       # ==
 
       DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__ = -> sym do
-        Home_::ArgumentScanner::Known_unknown[ sym ]
+        AS_Lib__::Magnetics::ItemNotFound_via_ReasoningSymbol[ sym ]
       end
 
       # ==
@@ -770,28 +861,28 @@ module Skylab::Zerk
           @_real_scn = user_scn
         end
 
-        def _primary_branch_item_knownness_via_facilitator_ o
+        def _primary_categorization_via_WFR_ wfr
 
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          kn = @_itemer.primary_item_knownness_via_exact_match o
-          if kn
-            kn
-          elsif o.request.do_fuzzy_lookup
-            __lookup_primary_branch_item_with_fuzzy_match o
+          catzn = @_itemer._do_primary_categorization_thru_exact_match_via_WFR_ wfr
+          if catzn
+            catzn
+          elsif wfr.request.do_fuzzy_lookup
+            __lookup_primary_branch_item_with_fuzzy_match wfr
           else
-            _when_unknown_primary o
+            _when_unknown_primary wfr
           end
         end
 
-        def _business_item_knownness_via_facilitator_ o
-          @_itemer.business_item_knownness_via_facilitator o
+        def _business_categorization_via_WFR_ wfr
+          @_itemer._do_business_categorization_via_WFR_ wfr
         end
 
-        def __lookup_primary_branch_item_with_fuzzy_match o  # result in a knownness
+        def __lookup_primary_branch_item_with_fuzzy_match wfr  # result in a xx
 
-          fuz = Fuzz__.new o
+          fuz = Fuzz__.new wfr.well_formed_symbol
 
           itr = @_itemer
           if itr.has_addeds
@@ -799,25 +890,26 @@ module Skylab::Zerk
           end
           itr = nil
 
-          fuz.visit OperatorBranchEntry__, o.operator_branch
+          fuz.visit OperatorBranchEntry__, wfr.request.operator_branch
 
-          x = fuz.maybe_finish
-          if x
-            x
+          catzn = fuz.maybe_finish
+          if catzn
+            catzn
           else
-            _when_unknown_primary o
+            _when_unknown_primary wfr
           end
         end
 
-        def _when_unknown_primary o
-          if o.request.be_passive
+        def _when_unknown_primary wfr
+          if wfr.request.be_passive
             self._WALK_THRU_WITH_ME
           else
-            _unknown_because :unknown_primary
+            AS_Lib__::Magnetics::ItemNotFound_via_ReasoningSymbol.call(
+              :unknown_primary )
           end
         end
 
-        def _well_formed_primary_knownness_
+        def _well_formed_primary_categorization_
 
           s = @_real_scn.current_token
 
@@ -836,31 +928,34 @@ module Skylab::Zerk
               # latter step only so that subtraction *would be* reflected
               # in the old-style of parsing (not with hashes)
 
-              _unknown_because :subtracted_primary_was_referenced
+              AS_Lib__::Magnetics::NotWellFormed_via_ReasonSymbol.call(
+                :subtracted_primary_was_referenced )
             else
-              KnKn__[ sym ]
+              AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ sym ]
             end
 
           elsif @_itemer.has_default_primary
             _sym = @_itemer.default_primary_symbol
             @_payback_the_use_of_default_primary = true
-            KnKn__[ _sym ]
+            AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _sym ]
 
           else
-            _unknown_because :primary_had_poor_surface_form
+            AS_Lib__::Magnetics::NotWellFormed_via_ReasonSymbol.call(
+              :primary_had_poor_surface_form )
           end
         end
 
-        def _well_formed_business_item_knownness_  # (rough sketch)
+        def _well_formed_business_item_categorization_  # (rough sketch)
 
           s = @_real_scn.current_token
 
           if DASH_BYTE_ == s.getbyte(0)
-            Home_::ArgumentScanner::known_because.call do |emit|
+            AS_Lib__::known_because.call do |emit|
               _whine_into_about_primary emit, s
             end
           else
-            KnKn__[ s.gsub( DASH_, UNDERSCORE_ ).intern ]
+            _sym = s.gsub( DASH_, UNDERSCORE_ ).intern
+            AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _sym ]
           end
         end
 
@@ -882,8 +977,6 @@ module Skylab::Zerk
           end
           UNABLE_
         end
-
-        define_method :_unknown_because, DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__
 
         def _head_as_is_
           @_real_scn.current_token
@@ -938,7 +1031,7 @@ module Skylab::Zerk
 
           if sym
             @has_default_primary = true
-            @__default_primary_knownness = KnKn__[ sym ]
+            @__default_primary_knownness = Common_::Known_Known[ sym ]
           end
         end
 
@@ -981,9 +1074,9 @@ module Skylab::Zerk
           @___AaOB ||= Addeds_as_OperatorBranch___.new @_addeds_box
         end
 
-        def primary_item_knownness_via_exact_match o
+        def _do_primary_categorization_thru_exact_match_via_WFR_ wfr
 
-          k = o.well_formed_symbol
+          k = wfr.well_formed_symbol
 
           if @has_addeds
             p = @_addeds_box[ k ]
@@ -991,49 +1084,50 @@ module Skylab::Zerk
           if p
             item = AddedBranchItem__.new p, k
           else
-            x = o.operator_branch.lookup_softly k
+            x = wfr.request.operator_branch.lookup_softly k
             if x
               item = OperatorBranchEntry__.new x, k
             end
           end
 
-          item && KnKn__[ item ]
+          item && AS_Lib__::Magnetics::ItemFound_via_Item[ item ]
         end
 
-        def business_item_knownness_via_facilitator o
+        def _do_business_categorization_via_WFR_ wfr
 
-          k = o.well_formed_symbol
-          x = o.operator_branch.lookup_softly k
+          req = wfr.request
+
+          k = wfr.well_formed_symbol
+          x = req.operator_branch.lookup_softly k
           if x
-            KnKn__[ OperatorBranchEntry__.new( x, k ) ]
-          elsif o.request.do_fuzzy_lookup
-            __business_item_knownness_fuzzily o
+            _item = OperatorBranchEntry__.new x, k
+            AS_Lib__::Magnetics::ItemFound_via_Item[ _item ]
+          elsif req.do_fuzzy_lookup
+            __business_categorization_fuzzily wfr
           else
-            _when_unknown_business_item o
+            _categorization_when_unknown_business_item wfr
           end
         end
 
-        def __business_item_knownness_fuzzily o
+        def __business_categorization_fuzzily wfr
 
-          fuz = Fuzz__.new o
-          fuz.visit OperatorBranchEntry__, o.operator_branch
-          kn = fuz.maybe_finish
-          if kn
-            kn
+          fuz = Fuzz__.new wfr.well_formed_symbol
+          fuz.visit OperatorBranchEntry__, wfr.request.operator_branch
+          catzn = fuz.maybe_finish
+          if catzn
+            catzn
           else
-            _when_unknown_business_item o
+            _categorization_when_unknown_business_item wfr
           end
         end
 
-        def _when_unknown_business_item o
-          if o.request.be_passive
-            Common_::KNOWN_UNKNOWN
+        def _categorization_when_unknown_business_item wfr
+          if wfr.request.be_passive
+            NOTHING_  # #here4
           else
-            __unknown_because :unknown_business_item
+            DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__[ :unknown_business_item ]
           end
         end
-
-        define_method :__unknown_because, DEFINITION_FOR_THE_METHOD_CALLED_UNKNOWN_BECAUSE__
 
         def __added_primary_normal_name_symbols_
           if @has_addeds
@@ -1075,13 +1169,11 @@ module Skylab::Zerk
 
       class Fuzz__
 
-        def initialize o
-
-          sym = o.well_formed_symbol
+        def initialize well_formed_symbol
 
           @a = nil
-          @rx = /\A#{ ::Regexp.escape sym }/
-          @symbol = sym
+          @rx = /\A#{ ::Regexp.escape well_formed_symbol }/
+          @symbol = well_formed_symbol
         end
 
         def visit cls, branchish
@@ -1101,9 +1193,10 @@ module Skylab::Zerk
         def maybe_finish
           if @a
             if 1 == @a.length
-              KnKn__[ @a.fetch 0 ]
+              AS_Lib__::Magnetics::ItemFound_via_Item[ @a.fetch 0 ]
             else
-              Known_unknown_when_ambiguous___[ @a, @symbol ]
+              _rsn = Reasoning_when_ambiguous___[ @a, @symbol ]
+              AS_Lib__::Magnetics::ItemNotFound_via_Reasoning[ _rsn ]
             end
           end
         end
@@ -1132,9 +1225,9 @@ module Skylab::Zerk
 
       # ==
 
-      Known_unknown_when_ambiguous___ = -> a, k do
+      Reasoning_when_ambiguous___ = -> a, k do
 
-        _reasoning = Home_::ArgumentScanner::Reasoning.new do |emit|
+        AS_Lib__::Reasoning.new do |emit|
 
           emit.call :error, :expression, :parse_error, :ambiguous do |y|
 
@@ -1157,13 +1250,13 @@ module Skylab::Zerk
 
           UNABLE_
         end
-
-        Common_::Known_Unknown.via_reasoning _reasoning
       end
 
       # ==
 
-      base = Home_::ArgumentScanner::BranchItem
+      AS_Lib__ = Home_::ArgumentScanner
+
+      base = AS_Lib__::BranchItem
 
       The_no_op_item__ = Lazy_.call do
         class NoOpBranchItem___
@@ -1192,13 +1285,7 @@ module Skylab::Zerk
         end
       end
 
-      OperatorBranchEntry__ = Home_::ArgumentScanner::OperatorBranchEntry
-
-      # ==
-
-      KnKn__ = Common_::Known_Known
-
-      # ==
+      OperatorBranchEntry__ = AS_Lib__::OperatorBranchEntry
     end
   end
 end

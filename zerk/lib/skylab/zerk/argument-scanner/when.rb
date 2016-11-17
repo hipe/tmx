@@ -114,6 +114,65 @@ module Skylab::Zerk
 
       # ==
 
+      When::Argument_scanner_ended_early_via_search = -> sea do
+
+        req = sea.request
+
+        _tcs_ = {
+          primary: :missing_required_primary,
+          argument: :missing_required_argument,
+        }.fetch req.shape_symbol
+
+        When::Unknown_branch_item_via_two__[ _tcs, sea ]
+      end
+
+      # ==
+
+      When::Unified_whine_via_reasoning = -> rsn, sea do
+
+        p = rsn.behavior_by
+        if p
+          _user_x = p[ sea.argument_scanner.listener ]
+          _user_x    # #todo
+        else
+          _tcs = rsn.reason_symbol  # terminal channel symbol
+          When::Unknown_branch_item_via_two__[ _tcs, sea ]
+        end
+      end
+
+      # ==
+
+      When::Unknown_branch_item_via_two__ = -> terminal_channel_symbol, sea do
+
+        o = When::UnknownBranchItem.begin
+
+        req = sea.request
+
+        as = sea.argument_scanner
+        if ! as.no_unparsed_exists
+          o.strange_value_by = as.method :head_as_is
+        end
+
+        shape_sym = req.shape_symbol
+        ob = req.operator_branch
+        if ob
+          _p = as.method :available_branch_item_name_stream_via_operator_branch
+
+          o.available_item_name_stream_by = -> do
+            _p[ ob, shape_sym ]
+          end
+        else
+          NOTHING_  # #feature-island #scn-coverpoint-2
+        end
+
+        o.shape_symbol = shape_sym
+        o.terminal_channel_symbol = terminal_channel_symbol
+        o.listener = as.listener
+        o.execute
+      end
+
+      # ==
+
       class When::UnknownBranchItem
 
         # this does the levenshtein-like (but not levenshtein) thing where

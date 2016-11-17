@@ -2,24 +2,28 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    Magnetics = ::Module.new
+    module Here_::MagneticsScratchSpace__
+      class Monadic
+        class << self
+          alias_method :call, :new
+          alias_method :[], :call
+          private :new
+        end  # >>
+      end
+    end
 
-    class Magnetics::BranchItem_via_OperatorBranch
-
-      # this "facilitator" has a strange, session-heavy interface because [#052] #note-1
+    module Magnetics
 
       class << self
-        alias_method :begin, :new
-        undef_method :new
+
+        def whine_about_how_argument_scanner_ended_early search
+          Home_::When::Argument_scanner_ended_early_via_search[ search ]
+        end
       end  # >>
 
-      def initialize arglist, request_class
-        @request = request_class.new arglist
-      end
+      same = MagneticsScratchSpace__::Monadic
 
-      # ~(
-
-      class Request
+      class Request_via_Array
 
         def initialize arglist
           st = Common_::Polymorphic_Stream.via_array arglist
@@ -43,7 +47,7 @@ module Skylab::Zerk
 
         def __at_against_hash
           @_arglist_.advance_one
-          @operator_branch = OperatorBranch_via_Hash___.new @_arglist_.gets_one
+          @operator_branch = Magnetics::OperatorBranch_via_Hash.new @_arglist_.gets_one
           NIL
         end
 
@@ -75,68 +79,26 @@ module Skylab::Zerk
         )
       end
 
-      # )~
+#==FROM
+
+    class BranchItem_via_OperatorBranch
+
+      # this "facilitator" has a strange, session-heavy interface because [#052] #note-1
+
+      class << self
+        alias_method :begin, :new
+        undef_method :new
+      end  # >>
+
+      def initialize arglist, request_class
+        @request = request_class.new arglist
+      end
 
       def receive_argument_scanner as
         @argument_scanner = as ; nil
       end
 
-      def whine_about_how_argument_scanner_ended_early
-        @_custom_behaivor_was_provided = false
-        case @request.shape_symbol
-        when :primary
-          @_terminal_channel_symbol = :missing_required_primary
-        when :business_item
-          @_terminal_channel_symbol = :missing_required_argument
-        end
-        _always_whine_in_the_same_way
-      end
-
       # ~
-
-      def well_formed_potential_symbol_knownness= kn
-
-        if kn.is_known_known
-
-          @is_well_formed = true
-          @__well_formed_symbol_known = kn
-        else
-
-          @is_well_formed = false
-          _receive_known_unknown_reasoning kn.reasoning
-        end
-
-        kn
-      end
-
-      def whine_about_how_it_is_not_well_formed
-        _always_whine_in_the_same_way  # hi.
-      end
-
-      def well_formed_symbol
-        @__well_formed_symbol_known.value_x
-      end
-
-      attr_reader(
-        :is_well_formed,
-      )
-
-      # ~
-
-      def item_knownness= kn
-        if kn.is_known_known
-          @item_was_found = true
-          @__item_structure = kn.value_x
-        else
-          @item_was_found = false
-          rsn = kn.reasoning
-          if rsn
-            _receive_known_unknown_reasoning rsn
-          end
-          # (otherwise assume passive mode)
-        end
-        kn
-      end
 
       def whine_about_how_item_was_not_found
         _always_whine_in_the_same_way  # hi.
@@ -152,60 +114,6 @@ module Skylab::Zerk
 
       # --
 
-      def _receive_known_unknown_reasoning rsn
-        p = rsn.behavior_by
-        if p
-          @_custom_behaivor_was_provided = true
-          @__behavior_by = p
-        else
-          @_custom_behaivor_was_provided = false
-          @_terminal_channel_symbol = rsn.reason_symbol
-        end
-        NIL
-      end
-
-      def _always_whine_in_the_same_way
-        if @_custom_behaivor_was_provided
-          _user_x = @__behavior_by[ @argument_scanner.listener ]
-          _user_x  # #todo
-        else
-          __whine_in_the_typical_fashion
-        end
-      end
-
-      def __whine_in_the_typical_fashion
-
-        req = @request
-        ob = req.operator_branch
-        shape_sym = req.shape_symbol
-        req = nil
-
-        o = Here_::When::UnknownBranchItem.begin
-
-        if ! @argument_scanner.no_unparsed_exists
-          o.strange_value_by = @argument_scanner.method :head_as_is
-        end
-
-        if ob
-
-          _p = @argument_scanner.method :available_branch_item_name_stream_via_operator_branch
-
-          o.available_item_name_stream_by = -> do
-            _p[ ob, shape_sym ]
-          end
-        else
-          NOTHING_  # #feature-island #scn-coverpoint-2
-        end
-
-        o.shape_symbol = shape_sym
-
-        o.terminal_channel_symbol = @_terminal_channel_symbol
-
-        o.listener = @argument_scanner.listener
-
-        o.execute
-      end
-
       def operator_branch
         @request.operator_branch
       end
@@ -215,7 +123,7 @@ module Skylab::Zerk
       )
     end
 
-    class Magnetics::BranchItem_via_OperatorBranch::OperatorBranch_via_Hash___
+    class OperatorBranch_via_Hash
 
       def initialize h
         @hash = h
@@ -241,7 +149,7 @@ module Skylab::Zerk
       end
     end
 
-    class Magnetics::PrimaryValue_via_ParseRequest < Common_::Actor::Dyadic
+    class PrimaryValue_via_ParseRequest < Common_::Actor::Dyadic
 
       def initialize as, req
         @argument_scanner = as
@@ -291,7 +199,7 @@ module Skylab::Zerk
       end
     end
 
-    class Magnetics::ParseRequest_via_Array < Common_::Actor::Monadic
+    class ParseRequest_via_Array < Common_::Actor::Monadic
 
       def initialize x_a
         @option_array = x_a
@@ -337,6 +245,89 @@ module Skylab::Zerk
         :must_be_trueish,
         :use_method,
       )
+    end
+#==TO
+
+      # ==
+
+      ItemNotFound_via_ReasoningSymbol = -> sym do
+
+        _rsn = Here_::SimpleStructuredReason.new sym
+        ItemNotFound_via_Reasoning[ _rsn ]
+      end
+
+      class ItemNotFound_via_Reasoning < same
+
+        def initialize rsn
+          @reasoning = rsn
+        end
+
+        def whine_about_how_item_was_not_found sea
+          Here_::When::Unified_whine_via_reasoning[ @reasoning, sea ]
+        end
+
+        def item_was_found
+          false
+        end
+      end
+
+      module ITEM_NOT_FOUND_WITHOUT_REASONING___ ; class << self
+
+        def whine_about_how_item_was_not_found sea
+          ::Kernel._K
+        end
+
+        def item_was_found
+          false
+        end
+      end ; end
+
+      class ItemFound_via_Item < same
+
+        def initialize x
+          @item = x
+        end
+
+        attr_reader :item
+
+        def item_was_found
+          true
+        end
+      end
+
+      # ==
+
+      class NotWellFormed_via_ReasonSymbol < same
+
+        def initialize sym
+          @reasoning = Here_::SimpleStructuredReason.new sym
+        end
+
+        def is_well_formed
+          false
+        end
+
+        def whine_about_how_it_is_not_well_formed sea
+          Here_::When::Unified_whine_via_reasoning[ @reasoning, sea ]
+        end
+      end
+
+      class WellFormed_via_WellFormedSymbol < same
+
+        # replaces: well_formed_potential_symbol_knownness=
+
+        def initialize sym
+          @well_formed_symbol = sym
+        end
+
+        attr_reader :well_formed_symbol
+
+        def is_well_formed
+          true
+        end
+      end
+
+      # ==
     end
   end
 end

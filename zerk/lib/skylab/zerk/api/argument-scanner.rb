@@ -25,70 +25,20 @@ module Skylab::Zerk
 
         @_scn = Common_::Polymorphic_Stream.via_array x_a
         @no_unparsed_exists = @_scn.no_unparsed_exists
-        @_current_token = @_scn.method :current_token
         @listener = l
         NIL
       end
 
       def match_branch * a  # MUST set @current_primary_symbol as appropriate
-
-        mod = Home_::ArgumentScanner::Magnetics::BranchItem_via_OperatorBranch
-        o = mod.begin a, mod::Request
-
-        if @no_unparsed_exists
-          o.whine_about_how_argument_scanner_ended_early
-        else
-          o.receive_argument_scanner self
-          __branch_item_via_match_primary_against_head_normally o
-        end
+        _matcher_via_array( a ).gets
       end
 
-      def __branch_item_via_match_primary_against_head_normally o  # MUST set @current_primary_symbol as appropriate
-
-        o.well_formed_potential_symbol_knownness = __well_formed_knownness
-
-        if o.is_well_formed
-
-          o.item_knownness = __branch_item_knownness_via_facilitator o
-
-          if o.item_was_found
-
-            item = o.item
-
-            @current_primary_symbol = item.branch_item_normal_symbol
-
-            if o.request.do_result_in_value
-              item.value
-            else
-              item
-            end
-          else
-            o.whine_about_how_item_was_not_found
-          end
-        else
-          o.whine_about_how_it_is_not_well_formed
-        end
+      def MATCHER_FOR * a
+        _matcher_via_array a
       end
 
-      def __well_formed_knownness
-        x = @_current_token.call
-        if x.respond_to? :id2name
-          Common_::Known_Known[ x ]
-        else
-          Home_::ArgumentScanner::Known_unknown[ :expected_symbol ]
-        end
-      end
-
-      def __branch_item_knownness_via_facilitator o
-
-        k = o.well_formed_symbol
-        x = o.operator_branch.lookup_softly k
-        if x
-          _obe = Home_::ArgumentScanner::OperatorBranchEntry.new x, k
-          Common_::Known_Known[ _obe ]
-        else
-          Home_::ArgumentScanner::Known_unknown[ :unknown_primary ]
-        end
+      def _matcher_via_array a
+        Matcher___.new self, a
       end
 
       def available_branch_item_name_stream_via_operator_branch ob, _
@@ -104,7 +54,7 @@ module Skylab::Zerk
       end
 
       def head_as_well_formed_potential_primary_symbol_
-        @_current_token.call
+        _real_scanner_current_token_
       end
 
       def advance_one
@@ -113,17 +63,126 @@ module Skylab::Zerk
       end
 
       def head_as_normal_symbol
-        @_scn.current_token
+        _real_scanner_current_token_
       end
 
       def head_as_is
+        _real_scanner_current_token_
+      end
+
+      def _real_scanner_current_token_
         @_scn.current_token
+      end
+
+      def __receive_CPS_ sym
+        @current_primary_symbol = sym ; nil
       end
 
       attr_reader(
         :listener,
         :no_unparsed_exists,
       )
+
+      # ==
+
+      class Matcher___
+
+        def initialize as, req_a
+          @argument_scanner = as
+          @request = Home_::ArgumentScanner::Magnetics::Request_via_Array.new req_a
+        end
+
+        def gets
+          Search___.new( @request, @argument_scanner ).execute
+        end
+      end
+
+      # ==
+
+      class Search___
+
+        def initialize req, as
+
+          @argument_scanner = as
+          @request = req
+          @_ = Home_::ArgumentScanner::Magnetics
+          freeze
+        end
+
+        def execute  # MUST set @current_primary_symbol as appropriate
+
+          if @argument_scanner.no_unparsed_exists
+            @_.whine_about_how_argument_scanner_ended_early self
+          else
+            __when_argument_scan_is_not_empty
+          end
+        end
+
+        def __when_argument_scan_is_not_empty
+
+          # replaces: receive_argument_scanner
+
+          o = __well_formed_categorization
+
+          if o.is_well_formed
+
+            __when_well_formed_symbol o.well_formed_symbol
+          else
+            o.whine_about_how_it_is_not_well_formed self
+          end
+        end
+
+        def __well_formed_categorization
+
+          x = @argument_scanner._real_scanner_current_token_
+          if x.respond_to? :id2name
+            @_::WellFormed_via_WellFormedSymbol[ x ]
+          else
+            @_::NotWellFormed_via_ReasonSymbol[ :expected_symbol ]
+          end
+        end
+
+        def __when_well_formed_symbol sym
+
+          o = __branch_item_categorization_via_normal_symbol sym
+
+          if o.item_was_found
+
+            __when_item_was_found o.item
+          else
+            o.whine_about_how_item_was_not_found self
+          end
+        end
+
+        def __branch_item_categorization_via_normal_symbol k
+
+          x = @request.operator_branch.lookup_softly k
+          if x
+            _obe = Home_::ArgumentScanner::OperatorBranchEntry.new x, k
+            @_::ItemFound_via_Item[ _obe ]
+          else
+            @_::ItemNotFound_via_ReasoningSymbol[ :unknown_primary ]
+          end
+        end
+
+        def __when_item_was_found item
+
+          @argument_scanner.__receive_CPS_ item.branch_item_normal_symbol
+
+          if @request.do_result_in_value
+            item.value
+          else
+            item
+          end
+        end
+
+        attr_reader(
+          :argument_scanner,
+          :request,
+        )
+      end
+
+      # ==
     end
   end
 end

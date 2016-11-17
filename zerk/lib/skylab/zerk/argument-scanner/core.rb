@@ -65,7 +65,7 @@ module Skylab::Zerk
     # ==
 
     Known_unknown = -> sym do
-      _rsn = SimpleStructuredReason__.new sym
+      _rsn = SimpleStructuredReason.new sym
       Common_::Known_Unknown.via_reasoning _rsn
     end
 
@@ -75,7 +75,7 @@ module Skylab::Zerk
 
     # ==
 
-    class SimpleStructuredReason__
+    class SimpleStructuredReason
 
       def initialize sym
         @reason_symbol = sym
