@@ -86,10 +86,12 @@ module Skylab::Zerk
         end
 
         # ==
+
         IS_PLURAL___ = {
           is_plural: true,
           is_singular: false,
         }
+
         # ==
       end
 
@@ -120,10 +122,10 @@ module Skylab::Zerk
 
         _tcs = {
           primary: :missing_required_primary,
-          argument: :missing_required_argument,
+          business_item: :missing_required_argument,
         }.fetch req.shape_symbol
 
-        When::Unknown_branch_item_via_two__[ _tcs, sea ]
+        When::Unknown_branch_item_via_two__[ _tcs, sea ].execute
       end
 
       # ==
@@ -136,127 +138,69 @@ module Skylab::Zerk
           _user_x    # #todo
         else
           _tcs = rsn.reason_symbol  # terminal channel symbol
-          When::Unknown_branch_item_via_two__[ _tcs, sea ]
+          When::Unknown_branch_item_via_two__[ _tcs, sea ].execute
         end
       end
 
       # ==
 
-      When::Unknown_branch_item_via_two__ = -> terminal_channel_symbol, sea do
+      class When::Unknown_branch_item_via_two__ < Common_::Actor::Dyadic
 
-        o = When::UnknownBranchItem.begin
+        def initialize sym, search
 
-        req = sea.request
-
-        as = sea.argument_scanner
-        if ! as.no_unparsed_exists
-          o.strange_value_by = as.method :head_as_is
+          @_argument_scanner = search.argument_scanner
+          @_request = search.request
+          @_shape_symbol = @_request.shape_symbol
+          @__terminal_channel_symbol = sym
         end
-
-        shape_sym = req.shape_symbol
-        ob = req.operator_branch
-        if ob
-          _p = as.method :available_branch_item_name_stream_via_operator_branch
-
-          o.available_item_name_stream_by = -> do
-            _p[ ob, shape_sym ]
-          end
-        else
-          NOTHING_  # #feature-island #scn-coverpoint-2
-        end
-
-        o.shape_symbol = shape_sym
-        o.terminal_channel_symbol = terminal_channel_symbol
-        o.listener = as.listener
-        o.execute
-      end
-
-      # ==
-
-      class When::UnknownBranchItem
-
-        # this does the levenshtein-like (but not levenshtein) thing where
-        # we explicate valid alternatives.
-        #
-        #   - CLI (not API) frequently makes use of the "subtraction hash"
-        #     which must decidedly be taken into account when effecting this
-        #     UI expression behavior.
-        #
-        #   - otherwise, we want this UI expression behavior between CLI
-        #     and API to be identical (or more accurately, different in
-        #     the regular way as per the respective expression agents).
-        #
-
-        class << self
-          alias_method :begin, :new
-          undef_method :new
-        end  # >>
-
-        def initialize
-          @available_item_name_stream_by = nil
-          @strange_value_by = nil
-        end
-
-        attr_writer(
-          :available_item_name_stream_by,
-          :listener,
-          :shape_symbol,
-          :strange_value_by,
-          :terminal_channel_symbol,
-        )
 
         def execute
 
-          available_item_name_stream_by = @available_item_name_stream_by  # any
-          shape_sym = @shape_symbol
-          strange_value_by = @strange_value_by
+          When::UnknownBranchItem.define do |o|
+            @out = o
+            __populate_idea
+          end
+        end
 
-          _tcs = @terminal_channel_symbol
+        def __populate_idea
 
-          @listener.call :error, :expression, :parse_error, _tcs do |y|
+          @out.listener = @_argument_scanner.listener
+          @out.shape_symbol = @_shape_symbol
+          @out.terminal_channel_symbol = @__terminal_channel_symbol
 
-            if strange_value_by
-
-              case shape_sym
-              when :primary ; buffer = "unknown primary"
-              when :business_item ; buffer = "unknown item"
-              end
-
-              s = say_strange_branch_item strange_value_by[]
-              if COLON_BYTE_ != s.getbyte(0)
-                buffer << COLON_
-              end
-              buffer << SPACE_
-              buffer << s
-              y << buffer
-              buffer = ""
-            else
-
-              case shape_sym
-              when :primary ; buffer = "missing required primary: "
-              when :business_item ; buffer = "missing required argument: "
-              end
-            end
-
-            if available_item_name_stream_by
-
-              _available_name_st = available_item_name_stream_by[]
-
-              case shape_sym
-              when :primary
-                _this_or_this_or_this = say_primary_alternation_ _available_name_st
-              when :business_item
-                _this_or_this_or_this = say_business_item_alternation_ _available_name_st
-              end
-
-              buffer << "expecting #{ _this_or_this_or_this }"
-              y << buffer
-            end
-
-            y  # important, covered
+          if __has_operator_branch
+            __populate_splayer
           end
 
-          UNABLE_
+          if @_argument_scanner.no_unparsed_exists
+            NOTHING_  # #feature-island #scn-coverpoint-2
+          else
+            @out.strange_value_by = @_argument_scanner.method :head_as_is
+          end
+
+          NIL
+        end
+
+        def __has_operator_branch
+          ob = @_request.operator_branch
+          if ob
+            @_operator_branch = ob  # `_store` DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+            @out.talker = ob  # sneak this in here
+            ACHIEVED_
+          end
+        end
+
+        def __populate_splayer
+
+          _p = @_argument_scanner.method(
+            :available_branch_item_name_stream_via_operator_branch )
+
+          ob = @_operator_branch ; sym = @_shape_symbol
+
+          @out.available_item_name_stream_by = -> do
+            _p[ ob, sym ]
+          end
+          NIL
         end
       end
 
@@ -264,7 +208,9 @@ module Skylab::Zerk
 
       COLON_ = ':'
       COLON_BYTE_ = COLON_.getbyte 0
+      DOT_ = '.'
     end
   end
 end
+# #pending-rename: bd
 # #history: abstracted from the "when" node of the [tmx] map operation

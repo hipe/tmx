@@ -321,7 +321,7 @@ module Skylab::Zerk
         end
 
         THESE_3__ = {
-          business_item: :__available_etc,
+          business_item: :__available_business_name_stream_via_operation_branch,
           primary: :__available_primary_name_stream_via_operator_branch,
         }
 
@@ -336,8 +336,9 @@ module Skylab::Zerk
           end
         end
 
-        def __available_etc h
-          Stream_.call h.keys do |sym|
+        def __available_business_name_stream_via_operation_branch ob
+
+          ob.to_normal_symbol_stream do |sym|
             Common_::Name.via_variegated_symbol sym
           end
         end

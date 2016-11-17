@@ -34,8 +34,8 @@ module Skylab::TMX::TestSupport
 
       it "bad name" do
         invoke _subject_operation, 'floofie-doofie'
-        expect_on_stderr "unknown report: \"floofie doofie\""
-        expect_on_stderr "available reports: (punchlist)"
+        expect_on_stderr "unknown report: \"floofie-doofie\""
+        expect_on_stderr "available reports: { punchlist }"
         expect_failed
       end
 

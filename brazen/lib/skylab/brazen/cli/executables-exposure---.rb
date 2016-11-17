@@ -11,7 +11,7 @@ module Skylab::Brazen
 
     class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
 
-      # exactly [#ze-051] the essay "the operator branch structure pattern"
+      # an adaptation of #[#ze-051] for directories (probably "bin/"-like)
 
       class << self
         alias_method :define, :new
@@ -53,6 +53,10 @@ module Skylab::Brazen
       end
 
       # -- read time
+
+      def emit_idea_by
+        NOTHING_  # use default expression. (can be exposed if needed.)
+      end
 
       def lookup_softly k
 

@@ -57,6 +57,11 @@ module Skylab::Zerk::TestSupport
         _sym = spy.execute_under self
 
         _sym == false || fail
+
+        if 1 == y.length
+          y = Hackily_unwrap_wrapped_line_[ y[0] ]
+        end
+
         y
       end
     end

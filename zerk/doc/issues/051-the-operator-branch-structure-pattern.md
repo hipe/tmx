@@ -24,9 +24,11 @@ a small sliver of strain, however, appeared when we wanted to apply
 this useful pattern to cases where the "representational structure"
 was "normal", but something other than a hash.
 
-(specifically we mean a filesystem directory: instances of this
-strain were tracked by [#051]. at writing instances are
-1x [ze] and 1x [ts]).
+(speficially, we mean filesystem directories and/or autoloaderized
+modules. at writing these use-cases are undergoing full overhaul to
+be corraled into this new moving-target API. implementors are tracked
+with [#subject]. even more volatile information than this should be
+the manifest entry ("issues.md" file) for this document.)
 
 as such, we now conceptualize the above described hash as a concrete
 example of an abstract "structure-pattern" endemic to parsing with

@@ -14,18 +14,18 @@ module Skylab::Zerk
       end  # >>
 
       def initialize x_a, & l
+        @listener = l
         if x_a.length.zero?
           @no_unparsed_exists = true
         else
-          __initialize_normally x_a, l
+          __initialize_normally x_a
         end
       end
 
-      def __initialize_normally x_a, l
+      def __initialize_normally x_a
 
         @_scn = Common_::Polymorphic_Stream.via_array x_a
         @no_unparsed_exists = @_scn.no_unparsed_exists
-        @listener = l
         NIL
       end
 

@@ -144,23 +144,6 @@ module Skylab::TMX
 
   # ==
 
-  Box_via_autoloaderized_module_ = -> mod do
-
-    # simplified and more rigid alternative to [co] "boxxy". memoize result.
-    # tracked by #[#ze-051] (similar elsewhere).
-
-    bx = Common_::Box.new
-    st = mod.entry_tree.to_state_machine_stream
-    begin
-      sm = st.gets
-      sm || break
-      name = Common_::Name.via_slug sm.entry_group_head
-      bx.add name.as_lowercase_with_underscores_symbol, name
-      redo
-    end while above
-    bx
-  end
-
   Zerk_lib_ = Lazy_.call do
     mod = Autoloader_.require_sidesystem :Zerk
     Zerk_ = mod

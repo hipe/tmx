@@ -125,8 +125,14 @@ module Skylab::Zerk
 
     class OperatorBranch_via_Hash
 
+      # frontier adaptation of #[#051] (hashes)
+
       def initialize h
         @hash = h
+      end
+
+      def emit_idea_by
+        NOTHING_
       end
 
       def lookup_softly k

@@ -26,7 +26,8 @@ module Skylab::TMX
 
       def __init
         @_found_operation = false
-        @_report_name_box = Report_names_box___[]
+        # @_MARKED_report_name_box = Report_names_box___[]
+
         NIL
       end
 
@@ -97,11 +98,24 @@ module Skylab::TMX
       def __when_head_is_execute
 
         if _parse_mutex_operation
+          __parse_report_load_ticket_from_head
+        end
+      end
 
-          _parse_into( :@_report_normal_symbol,
-            :must_be_trueish,
-            :use_method, :head_as_normal_symbol,
-          )
+      def __parse_report_load_ticket_from_head
+
+        _COL = _report_name_collection
+
+        lt = @argument_scanner.match_branch(
+          :business_item, :value, :against_branch, _COL
+        )
+
+        if lt
+          @argument_scanner.advance_one
+          @__report_load_ticket = lt
+          ACHIEVED_
+        else
+          lt
         end
       end
 
@@ -139,56 +153,30 @@ module Skylab::TMX
 
       TERMINAL_OPERATIONS___ = {
         execute: :__execute_report,
-        list: :_list,
+        list: :__list,
       }
 
       def __execute_report
 
-        if __find_report
-          __execute_found_report
-        else
-          __when_unrecognized_report
-        end
-      end
+        lt = remove_instance_variable :@__report_load_ticket
 
-      def __find_report
-        _store :@_found_report_name, @_report_name_box.h_[ @_report_normal_symbol ]
-      end
+        _nm = Common_::Name.via_slug lt.state_machine.entry_group_head
 
-      def __when_unrecognized_report
+        _const = _nm.as_camelcase_const_string
 
-        box = @_report_name_box
-        sym = @_report_normal_symbol
-
-        @_emit.call :error, :expression, :operator_parse_error, :unrecognized_report do |y|
-
-          _name = Common_::Name.via_variegated_symbol sym
-
-          y << "unknown report: #{ _name.as_human.inspect }"
-
-          _p = method :say_arguments_head_
-
-          _buffer = box.to_value_stream.join_into_with_by "", ", ", & _p
-
-          y << "available reports: (#{ _buffer })"
-        end
-
-        UNABLE_
-      end
-
-      def __execute_found_report
-
-        _const = @_found_report_name.as_camelcase_const_string
-
-        _report_class = Home_::Reports_.const_get _const, false
+        _report_class = lt.module.const_get _const, false
 
         _report = _report_class.new( @__for_reports, & @_emit )
 
         _report.execute
       end
 
-      def _list
-        @_report_name_box.to_value_stream
+      def __list
+        _report_name_collection.to_slug_stream
+      end
+
+      def _report_name_collection
+        Report_name_collection___[]
       end
 
       # -- parsing suppport
@@ -212,10 +200,6 @@ module Skylab::TMX
         end
       end
 
-      define_method :_parse_into, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-
       # -- help screen boilerplate
 
       def is_branchy
@@ -236,9 +220,33 @@ module Skylab::TMX
 
     # -
 
-    Report_names_box___ = Lazy_.call do
-      Box_via_autoloaderized_module_[ Home_::Reports_ ]
+    # ==
+
+    Report_name_collection___ = Lazy_.call do
+
+      Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define(
+
+        Home_::Reports_
+
+      ) do |defn|
+
+        defn.channel_for_unknown_by do |idea|
+
+          chan = idea.get_channel
+          d = 2
+          chan[ d ] = { parse_error: :operator_parse_error }.fetch chan.fetch d
+          chan
+        end
+
+        defn.express_unknown_by do |o|
+
+          o.express_unknown_item_smart_prefixed "unknown report"
+          o.express_via_template "available reports: {{ say_splay }}"
+        end
+      end
     end
+
+    # ==
 
     ForReports___ = ::Struct.new :be_forwards, :json_file_stream_by
 

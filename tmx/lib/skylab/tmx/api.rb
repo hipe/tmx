@@ -38,68 +38,51 @@ module Skylab::TMX
         :argument_scanner,
       )
 
+#==FROM (experimental use of a [#ze-051])
+
       def to_bound_call_of_operator
-        if @argument_scanner.no_unparsed_exists
-          __when_no_args
+
+        _ada = Operations_module_operator_branch___[]
+
+        item = @argument_scanner.match_branch(
+          :business_item, :against_branch, _ada )
+
+        if item
+          __when_operation_found item
         else
-          __when_args
+          item
         end
       end
 
-      def __when_no_args
+      Operations_module_operator_branch___ = Lazy_.call do
 
-        st = To_didactic_operation_name_stream__[]
+        Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define(
+          Home_::Operations_
+        ) do |defn|
 
-        _parse_error_listener.call :error, :expression, :parse_error do |y|
-
-          _any_of_these = say_formal_operation_alternation st
-
-          y << "expecting #{ _any_of_these }"
-        end
-
-        UNABLE_
-      end
-
-      def __when_args
-
-        sym = @argument_scanner.head_as_normal_symbol
-        sym and __when_args_via_normal_symbol sym
-      end
-
-      def __when_args_via_normal_symbol sym
-
-        bx = Operations_name_cache__[]
-
-        name = bx.h_[ sym ]
-        if name
-          __when_operation_found name
-        else
-          __when_operation_not_found bx
+          defn.express_unknown_by do |o|
+            o.express_unknown_item_smart_prefixed "unknown operation"
+            o.express_via_template "available operations: {{ say_splay }}"
+          end
         end
       end
+#==TO
 
-      def __when_operation_not_found bx
+      def __when_operation_found branch_item
 
-        x = @argument_scanner.head_as_is
+        # branch_item.branch_item_normal_symbol  # => normal symbol
 
-        _parse_error_listener.call :error, :expression, :parse_error do |y|
+        o = branch_item.value
 
-          y << "unknown operation #{ say_strange_branch_item x }"  # meh
+        name = Common_::Name.via_slug o.state_machine.entry_group_head
 
-          _st = bx.to_value_stream
+        _const = name.as_camelcase_const_string
 
-          y << "available operations: #{ say_formal_operation_alternation _st }"
-        end
-        UNABLE_
-      end
+        _operation_class = o.module.const_get _const, false
 
-      def __when_operation_found name
+        o = nil
 
         as = @argument_scanner
-
-        _const = name.as_camelcase_const_string.intern
-
-        _operation_class = Home_::Operations_.const_get _const, false
 
         op = _operation_class.begin( & @_emit )
 
@@ -129,6 +112,8 @@ module Skylab::TMX
         :operation_session,
       )
     # -
+
+    # ==
 
     # ==
 
@@ -164,16 +149,6 @@ module Skylab::TMX
     end
 
     ArgumentError = ::Class.new ::ArgumentError
-
-    # ==
-
-    To_didactic_operation_name_stream__ = -> do
-      Operations_name_cache__[].to_value_stream
-    end
-
-    Operations_name_cache__ = Lazy_.call do
-      Box_via_autoloaderized_module_[ Home_::Operations_ ]
-    end
 
     # ==
   end

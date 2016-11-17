@@ -47,8 +47,15 @@ module Skylab::TMX::TestSupport
 
       # -- expectations & hook-outs
 
-      def expect_parse_error_emission_lines_
-        lines_via_this_kind_of_failure_via_array GENERIC_PARSE_ERROR_CHANNEL___
+      def expect_parse_error_emission_lines_ * sym_a
+
+        if sym_a.length.nonzero?
+          _a = [ * GENERIC_PARSE_ERROR_CHANNEL___, * sym_a ]
+        else
+          _a = GENERIC_PARSE_ERROR_CHANNEL___
+        end
+
+        lines_via_this_kind_of_failure_via_array _a
       end
 
       def send_subject_call

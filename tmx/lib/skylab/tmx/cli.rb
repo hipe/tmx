@@ -377,7 +377,7 @@ module Skylab::TMX
 
         remove_instance_variable :@__installation  # #todo
 
-        cls = Home_.lib_.brazen::CLI::Executables_Exposure___::Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
+        cls = Zerk_lib_[]::ArgumentScanner.__OperatorBranch_via_Directory  # [#ze-052]
 
         cls.define do |o|
 

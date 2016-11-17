@@ -859,12 +859,10 @@ module Skylab::Zerk
 
     Remote_CLI_lib_ = Home_::CLI_::Remote_lib
 
-    DASH_ = '-'
     DASH_BYTE_ = DASH_.getbyte 0
     ELLIPSIS_PART = '[..]'
     Here_ = self
     SHORT_HELP_OPTION = '-h'
     STOP_PARSING_ = false
-    UNDERSCORE_ = '_'
   end
 end

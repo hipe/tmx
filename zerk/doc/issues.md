@@ -4,12 +4,20 @@
 
 [#053]       compound parse..
 
-[#052]       argument scanner
+[#052]       argument scanner ("a.s")
 
-[#051]       now: towards a unified solution for an operator branch via
-             filesystem directory. was: track simplified boxxy-like
-             producers of primary hashes. (1x [ze] 1x [ts] 1x here)
-             (currently being spliced into [br]!)
+[#051]       now: the moving-target "operator branch" API, with at least
+             three implementors. justification in document.
+
+             the comprehensive manifest of implementors is:
+
+       #open        lingering old case (code) in [ts]
+               - 1x hash-based here
+               - 1x for autoloaderized modules here
+               - 1x currently spliced into [br]
+
+
+             was: track simplified boxxy-like producers of primary hashes.
 
 [#050]       [unified table support]
 

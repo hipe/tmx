@@ -41,6 +41,11 @@ module Skylab::Zerk::TestSupport
         end
 
         expect_result UNABLE_
+
+        if 1 == y.length
+          y = Hackily_unwrap_wrapped_line_[ y[0] ]
+        end
+
         y
       end
     end

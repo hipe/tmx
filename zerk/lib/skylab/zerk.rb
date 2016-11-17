@@ -123,6 +123,7 @@ module Skylab::Zerk  # intro in [#001] README
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
+  DASH_ = '-'
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
@@ -138,5 +139,6 @@ module Skylab::Zerk  # intro in [#001] README
   SUCCESS_EXITSTATUS = 0
   SPACE_ = ' '
   UNABLE_ = false
+  UNDERSCORE_ = '_'
   UNRELIABLE_ = :_unreliable_  # if you're evaluating this, you shouldn't be
 end

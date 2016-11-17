@@ -105,6 +105,13 @@ module Skylab::Zerk::TestSupport
 
   # -- mode-specific
 
+  Hackily_unwrap_wrapped_line_ = -> line do
+    # (when you're not sure if you're gonna keep the line-unwrapping behavior)
+    md = %r(\A(.+)\. (.+)\z).match line
+    md or fail "\". \" -- #{ line.inspect }"
+    [ md[1], md[2] ]
+  end
+
   Remote_CLI_lib_ = Lazy_.call do
     # (in the asset tree we keep mention of "CLI" out of the toplevel, but for
     # the 2/3 of tests that need this, it's too annoying not to put it here)
