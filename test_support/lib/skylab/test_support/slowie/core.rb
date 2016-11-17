@@ -55,7 +55,10 @@ module Skylab::TestSupport
     end
 
     def __to_bound_call_when_arguments
-      sct = @argument_scanner.branch_value_via_match_primary_against Primaries_hash__[]
+
+      sct = @argument_scanner.match_branch(
+        :primary, :value, :against_hash, Primaries_hash__[] )
+
       if sct
         send sct.bound_call_method_name, sct
       end
@@ -354,110 +357,6 @@ module Skylab::TestSupport
 
     # ==
 
-    # --
-
-    if false
-    class Expression_Agent___  # #todo after :+#dev cull this
-
-      alias_method :calculate, :instance_exec
-
-      # ~ style-related classifications
-
-      def _curry x
-        CLI_support_[]::Styling::Stylify.curry[ [ * x ] ]
-      end
-
-      def ick msg  # e.g divide
-        "\"#{ msg }\""
-      end
-
-      def hdr msg  # e.g help
-        ( @hdr ||= _curry :green )[ msg ]
-      end
-
-      def par x  # e.g divide
-
-        _nm = if x.respond_to?( :ascii_only? ) || x.respond_to?( :id2name )
-          Common_::Name.via_slug x
-        else
-          x.name
-        end
-
-        "<#{ _nm.as_slug }>"
-      end
-
-      # ~ linguistic- (and EN-) related classifications of string
-
-      def sp_ * x_a
-
-        x_a[ 0, 0 ] = [ :when, :syntactic_category, :sentence_phrase ]
-
-        _fr = Home_.lib_.human::NLP::EN::Sexp.expression_session_via_sexp x_a
-
-        _fr.express_into ""
-      end
-
-      def and_ s_a
-        # #covered-by: in tree runner, list files and do counts
-        Common_::Oxford_and[ s_a ]
-      end
-
-      def both x
-        # #covered-by: same as above
-        Home_.lib_.human::NLP::EN.both x
-      end
-
-      def indefinite_noun s
-        self._WHERE
-        _NLP_agent.indefinite_noun[ s ]
-      end
-
-      def or_ s_a
-        Common_::Oxford_or[ s_a ]
-      end
-
-      def progressive_verb s
-        _inflect_first_word s, :progressive_verb
-      end
-
-      def s * x_a
-        Home_.lib_.human::NP::EN.s( * x_a )
-      end
-
-      def third_person s
-        self._WHERE
-        _inflect_first_word s, :third_person
-      end
-
-      def val x
-        x.inspect
-      end
-
-      def _inflect_first_word s, m
-
-        s_a = s.split SPACE_
-        s_a[ 0 ] = _NLP_agent.send m, s_a.fetch( 0 )
-        s_a * SPACE_
-      end
-
-      def _NLP_agent
-        Home_.lib_.human::NLP::EN::POS
-      end
-    end
-    end  # if false
-
-      if false
-      HERE_ = ::File.expand_path '..', __FILE__
-
-      Plugins__= ::Module.new
-
-      Tree_Runner_ = self
-
-      UNDERSCORE_ = '_'.freeze  # we need our own because [#002]
-      end  # if false
-
-    # ==
-
     class MEDIATOR
 
       # tracked by [#027].
@@ -507,5 +406,6 @@ module Skylab::TestSupport
     Here_ = self
   end
 end
+# #tombstone-C: well-rounded, linguistic expression agent
 # #tombstone-B: sunset orphanic adapter base class (adpaters are [#027])
 # #tombstone-A: sunset orphanic, storied "relish" adapter (b. 2013-07-03)

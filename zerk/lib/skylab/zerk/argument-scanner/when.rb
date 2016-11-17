@@ -118,7 +118,7 @@ module Skylab::Zerk
 
         req = sea.request
 
-        _tcs_ = {
+        _tcs = {
           primary: :missing_required_primary,
           argument: :missing_required_argument,
         }.fetch req.shape_symbol

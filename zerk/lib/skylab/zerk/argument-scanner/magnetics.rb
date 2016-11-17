@@ -17,7 +17,7 @@ module Skylab::Zerk
       class << self
 
         def whine_about_how_argument_scanner_ended_early search
-          Home_::When::Argument_scanner_ended_early_via_search[ search ]
+          Here_::When::Argument_scanner_ended_early_via_search[ search ]
         end
       end  # >>
 

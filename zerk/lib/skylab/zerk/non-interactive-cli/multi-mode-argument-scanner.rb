@@ -283,12 +283,12 @@ module Skylab::Zerk
 
         def head_as_well_formed_potential_primary_symbol_  # #feature-island, probably
 
-          o = __matcher_for :primary
+          o = matcher_for :primary
           _x  = o.__to_well_formed_symbol_
           _x  # #todo
         end
 
-        def __matcher_for * a
+        def matcher_for * a
           _matcher_via_array a
         end
 

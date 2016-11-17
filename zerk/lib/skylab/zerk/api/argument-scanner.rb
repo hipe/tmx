@@ -33,7 +33,7 @@ module Skylab::Zerk
         _matcher_via_array( a ).gets
       end
 
-      def MATCHER_FOR * a
+      def matcher_for * a
         _matcher_via_array a
       end
 

@@ -116,11 +116,11 @@ module Skylab::Basic
           head = This__.allocate.instance_exec do
             @is_head = true
             @is_tail = false
-            @_next_known = KnKn__[ tail ]
+            @next = tail
             self
           end
 
-          tail.instance_variable_set :@_prev_known, KnKn__[ head ]
+          tail.instance_variable_set :@prev, head
 
           [ head, tail ]
         end
@@ -129,31 +129,31 @@ module Skylab::Basic
         undef_method :new
       end  # >>
 
-      def initialize pkn, cmp, nkn
-        if pkn
-          if nkn
+      def initialize prev, cmp, nxt
+        if prev
+          if nxt
             if cmp
               @is_head = false
-              @_prev_known = pkn
+              @prev = prev
               _accept_comparable cmp
-              @_next_known = nkn
+              @next = nxt
               @is_tail = false
             else
               fail  # must have cmp if have neighbor
             end
           elsif cmp
             @is_head = false
-            @_prev_known = pkn
+            @prev = prev
             _accept_comparable cmp
             @is_tail = true
           else
             fail  # same
           end
-        elsif nkn  # no pkn
+        elsif nxt  # no prev
           if cmp
             @is_head = true
             _accept_comparable cmp
-            @_next_known = nkn
+            @next = nxt
             @is_tail = false
           else
             fail  # same
@@ -166,7 +166,7 @@ module Skylab::Basic
       end
 
       def _accept_comparable x
-        @_comparable_known = KnKn__[ x ]
+        @comparable = x
         NIL
       end
 
@@ -181,26 +181,20 @@ module Skylab::Basic
 
       def __untail cmp
 
-        new_link = This__._new KnKn__[ self ], cmp, NOTHING_
-        @_next_known = KnKn__[ new_link ]
+        new_link = This__._new self, cmp, NOTHING_
+        @next = new_link
         @is_tail = false
         new_link
       end
 
       def __do_insert_to_the_right cmp
 
-        my_former_next_kn = remove_instance_variable :@_next_known
+        my_former_next_link = remove_instance_variable :@next
 
-        my_former_next_link = my_former_next_kn.value_x
+        @next = my_former_next_link._change_previous do |me|
 
-        _ = my_former_next_link._change_previous_knownness do |me_kn|
-
-          _new_link = This__._new me_kn, cmp, my_former_next_kn
-
-          KnKn__[ _new_link ]
+          This__._new me, cmp, my_former_next_link
         end
-
-        @_next_known = _
 
         NOTHING_
       end
@@ -209,48 +203,45 @@ module Skylab::Basic
 
         # assume the going away piece is not the tail piece.
 
-        # me [gakn]    [mekn] going-away [farkn]    [gakn2] far
+        # me [ga]    [me] going-away [far]    [ga] far
 
-        _going_away_kn = remove_instance_variable :@_next_known
-        going_away = _going_away_kn.value_x
+        going_away = remove_instance_variable :@next
         going_away.is_tail && fail
 
-        me_kn = going_away.remove_instance_variable :@_prev_known
-        far_kn = going_away.remove_instance_variable :@_next_known
+        me = going_away.remove_instance_variable :@prev
+        far = going_away.remove_instance_variable :@next
 
-        object_id == me_kn.value_x.object_id || self._SANITY
+        object_id == me.object_id || self._SANITY
 
-        far = far_kn.value_x
+        far._change_previous { me }
 
-        far._change_previous_knownness { me_kn }
+        @next = far
 
-        @_next_known = far_kn
-
-        # me [farkn]   [mekn] far
+        # me [far]   [me] far
 
         going_away.comparable
       end
 
-      def _change_previous_knownness
-        _former_prev_kn = remove_instance_variable :@_prev_known
-        new_prev_kn = yield _former_prev_kn
-        new_prev_kn.value_x || self._SANITY
-        @_prev_known = new_prev_kn
-        new_prev_kn
+      def _change_previous
+        _former_prev = remove_instance_variable :@prev
+        new_prev = yield _former_prev
+        new_prev || self._SANITY
+        @prev = new_prev
+        new_prev
       end
 
-      protected :_change_previous_knownness
+      protected :_change_previous
 
       def prev
-        @_prev_known.value_x
+        @prev
       end
 
       def comparable
-        @_comparable_known.value_x
+        @comparable
       end
 
       def next
-        @_next_known.value_x
+        @next
       end
 
       attr_reader(
@@ -260,10 +251,6 @@ module Skylab::Basic
 
       This__ = self
     end
-
-    # ==
-
-    KnKn__ = Common_::Known_Known
 
     # ==
   end

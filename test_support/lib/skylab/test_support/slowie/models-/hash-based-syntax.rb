@@ -19,16 +19,27 @@ module Skylab::TestSupport
       end
 
       def parse_arguments
+
         ok = true
-        until @argument_scanner.no_unparsed_exists
-          ok = __parse_primary
-          ok || break
+
+        if ! @argument_scanner.no_unparsed_exists
+
+          @__matcher = @argument_scanner.matcher_for(
+            :primary, :against_hash, @hash )
+
+          begin
+            ok = __parse_primary
+            ok || break
+          end until @argument_scanner.no_unparsed_exists
         end
+
         ok
       end
 
       def __parse_primary
-        item = @argument_scanner.branch_item_via_match_primary_against @hash
+
+        item = @__matcher.gets
+
         if item
           send ROUTES___.fetch( item.item_category_symbol ), item.value
         end

@@ -27,19 +27,19 @@ module Skylab::Basic::TestSupport
         _o = subject_instance_
         left = _o.instance_variable_get :@_head_link
 
-        left.instance_variable_defined? :@_prev_known and false
+        left.instance_variable_defined? :@prev and false
         left.is_head || fail
 
         begin
           # assume always there is a next (although the next might be tail)
 
-          left.instance_variable_defined? :@_next_known or fail
+          left.instance_variable_defined? :@next or fail
           right = left.next
 
           right.prev.object_id == left.object_id || fail
 
           if right.is_tail
-            right.instance_variable_defined? :@_next_known and fail
+            right.instance_variable_defined? :@next and fail
             break
           end
 
@@ -54,8 +54,8 @@ module Skylab::Basic::TestSupport
 
       def expect_prev_and_next_ exp_prev, link, exp_next
 
-        _expect_one_side link, :is_head, :@_prev_known, exp_prev, :prev
-        _expect_one_side link, :is_tail, :@_next_known, exp_next, :next
+        _expect_one_side link, :is_head, :@prev, exp_prev, :prev
+        _expect_one_side link, :is_tail, :@next, exp_next, :next
         NIL
       end
 

@@ -14,4 +14,3 @@ use [sa] to convert etc to Stream_
 -3.4 omni "did you mean.." [#tmx-020]
 -3.5 first whack at omni operator branch (list not set)
 -3.6 refactor into directory adapter at those two spots
-maybe get rid of kn in linked list

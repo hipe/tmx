@@ -10,6 +10,10 @@ module Skylab::Zerk::TestSupport
 
       # -
 
+        def branch_value_via_match_primary_against_ as, h
+          as.match_branch :primary, :value, :against_hash, h
+        end
+
         def real_scanner_for_ * s_a
           Common_::Polymorphic_Stream.via_array s_a
         end

@@ -26,11 +26,14 @@ module Skylab::Zerk
 
         ok = ACHIEVED_
 
-        h = @_box.h_
+        matcher = argument_scanner.matcher_for(
+          :primary, :against_hash, @_box.h_ )
+
         op_a = @_operations
         until argument_scanner.no_unparsed_exists
 
-          item = argument_scanner.branch_item_via_match_primary_against h
+          item = matcher.gets
+
           if ! item
             ok = item
             break

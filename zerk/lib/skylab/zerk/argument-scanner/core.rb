@@ -23,18 +23,6 @@ module Skylab::Zerk
         end
       end
 
-      def branch_value_via_match_primary_against h
-        match_branch :primary, :value, :against_hash, h
-      end
-
-      def branch_value_via_match_business_item_against h
-        match_branch :business_item, :value, :against_hash, h
-      end
-
-      def branch_item_via_match_primary_against h
-        match_branch :primary, :against_hash, h
-      end
-
       def head_as_primary_symbol
         k = head_as_well_formed_potential_primary_symbol_
         @current_primary_symbol = k

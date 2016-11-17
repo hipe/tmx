@@ -10,7 +10,10 @@ module Skylab::TMX
         end
 
         def execute
-          m = @argument_scanner.branch_value_via_match_business_item_against THESE___
+
+          m = @argument_scanner.match_branch(
+            :business_item, :value, :against_hash, THESE___ )
+
           if m
             send m
           end
@@ -88,7 +91,7 @@ module Skylab::TMX
         end
 
         def _primary h
-          m = @argument_scanner.branch_value_via_match_primary_against h
+          m = @argument_scanner.match_branch :primary, :value, :against_hash, h
           if m
             send m
           end

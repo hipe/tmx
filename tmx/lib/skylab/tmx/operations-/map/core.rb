@@ -143,16 +143,26 @@ module Skylab::TMX
       # -- parse modifiers
 
       def __parse_modifiers
+
         ok = true
-        until @argument_scanner.no_unparsed_exists
-          ok = __parse_one_primary_term
-          ok || break
+
+        if ! @argument_scanner.no_unparsed_exists
+
+          @__matcher = @argument_scanner.matcher_for(
+            :primary, :value, :against_hash, PRIMARIES__ )
+
+          begin
+            ok = __parse_one_primary_term
+            ok || break
+          end until @argument_scanner.no_unparsed_exists
         end
+
         ok
       end
 
       def __parse_one_primary_term
-        m = @argument_scanner.branch_value_via_match_primary_against PRIMARIES__
+
+        m = @__matcher.gets
         if m
           @argument_scanner.advance_one
           send m

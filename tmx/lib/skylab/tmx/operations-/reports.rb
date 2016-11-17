@@ -31,15 +31,20 @@ module Skylab::TMX
       end
 
       def __parse_all_primary_terms
+
+        @_matcher = @argument_scanner.matcher_for(
+          :primary, :value, :against_hash, PRIMARIES__ )
+
         begin
           ok = __parse_one_primary_term
           ok || break
         end until @argument_scanner.no_unparsed_exists
+
         ok
       end
 
       def __parse_one_primary_term
-        m = @argument_scanner.branch_value_via_match_primary_against PRIMARIES__
+        m = @_matcher.gets
         if m
           _ok = send m
           _ok  # #todo
