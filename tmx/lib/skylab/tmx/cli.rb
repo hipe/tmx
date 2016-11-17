@@ -184,7 +184,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
-          o.listener @listener
+          o.emit_into @listener
         end
 
         arg_scn.on_first_branch_item_not_found do
@@ -285,7 +285,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
 
-          o.listener @listener
+          o.emit_into @listener
         end
       end
 
@@ -342,7 +342,7 @@ module Skylab::TMX
 
           o.user_scanner @argv
 
-          o.listener @listener
+          o.emit_into @listener
         end
 
         Add_slice_primary_[ 0, as, self ]
@@ -360,7 +360,7 @@ module Skylab::TMX
 
         _as = _multimode_argument_scanner_by do |o|
           o.user_scanner @argv
-          o.listener @listener
+          o.emit_into @listener
         end
 
         o = _as.match_branch(
@@ -791,6 +791,10 @@ module Skylab::TMX
           new( cli ).execute
 
         if sct
+
+          # (this is [#016] a place where we add tokens back into the scanner
+          # after it became empty. (remote lib must cover this.)
+
           as.insert_at_head(
             :page_by, :item_count,
             :page_size_denominator, sct.denominator,

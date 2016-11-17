@@ -4,191 +4,171 @@ module Skylab::Zerk
 
     class MultiModeArgumentScanner < Home_::ArgumentScanner::CommonImplementation
 
-      # currently the "flagship" (more complex) argument scanner
-      # implementation. (general introduction and notes at [#052].)
+      # the "flagship" and more complicated of the two argument scanner
+      # implementations, this is a compound scanner made up of up to 3
+      # kinds of sub-scanners that.. (see [#052] "the multi-mode..")
 
-      # ([#bs-028].F `_this_method_name_convention_` is employed heavily.)
+      # (reminder: we might make use of the obscure name convention of
+      # [#bs-028] #tier-2B (`__this_convention_`).)
 
       class << self
+
         def define
-          bld = Builder___.new
-          o = DSL___.new bld
-          yield o
-          bld.finish
+          store = ConstraintsAndMutableStore___.new
+          yield DSL__.new store
+          new( * store.flush_to_array )
         end
-        alias_method :__new_multi_mode_argument_scanner, :new
-        undef_method :new
+
+        private :new  # #here3
       end  # >>
 
       # ==
 
-      class DSL___
+      Oncer__ = -> do  # #note-2
 
-        def initialize bld
-          @_builder = bld
-        end
+        awful = -1
 
-        def front_scanner_tokens * sym_a
-          @_builder.receive_front_scanner_tokens sym_a
-        end
+        -> m, & impl do
 
-        def subtract_primary sym, * x_a
-          if x_a.length.zero?
-            @_builder.receive_subtract_primary_without_argument sym
-          else
-            @_builder.receive_subtract_primary_with_argument sym, * x_a
+          once_m = ( awful += 1 ).to_s.intern
+          define_method once_m, & impl
+
+          define_method m do |*a, &p|
+            h = @_lockout_
+            if h.fetch( m ) { h[ m ] = nil ; true }
+              send once_m, * a, & p
+            else
+              self._CLOSED_
+            end
           end
-        end
-
-        def add_primary sym, * p_a, & p
-          p_a.push p if block_given?
-          @_builder.receive_add_primary p_a, sym
-        end
-
-        def default_primary sym
-          @_builder.receive_default_primary sym
-        end
-
-        def user_scanner scn
-          @_builder.receive_user_scanner scn
-        end
-
-        def listener x
-          @_builder.receive_listener x
         end
       end
 
       # ==
 
-      class Builder___
+      class DSL__
+
+        # (it must be that at least one intermediary between where the
+        # defintion is read and when the final front scanner is constructed
+        # because, for exampe, sub-scanners typically need to be constructed
+        # with the emission listener but the emission listener might be set
+        # after the sub-scanners are defined.)
+
+        def initialize store
+          @_store = store
+        end
+
+        def default_primary sym
+          @_store.__receive_default_primary_ sym
+        end
+
+        def add_primary sym, * p_a, & p
+          p_a.push p if block_given?
+          @_store.__receive_add_primary_ sym, p_a
+        end
+
+        def subtract_primary sym, * x_a
+          if x_a.length.zero?
+            @_store.__receive_subtract_primary_without_default_ sym
+          else
+            @_store.__receive_subtract_primary_with_default_( * x_a, sym )
+          end
+        end
+
+        def front_scanner_tokens * sym_a, sym
+          sym_a.push sym
+          @_store.__receive_front_scanner_tokens_ sym_a
+        end
+
+        def user_scanner real_scn
+          @_store.__receive_user_scanner_ real_scn
+        end
+
+        def emit_into p
+          @_store.__receive_listener_ p
+        end
+      end
+
+      # ==
+
+      class ConstraintsAndMutableStore___
 
         def initialize
-          @_added_box = nil
-          @_description_proc_for_added_h = nil
-          @_DP_kn_kn = nil
-          @_front_tokens = nil
+
+          @_initial_front_scanner_tokens = nil
+          @_itemer = Itemer___.new
+          @_fixed_primary_name_value_pairs_array = nil
           @_listener = nil
-          @_mid_scanner_pairs = nil
-          @_subtracted_h = nil
-          # --
-          @_receive_default_primary = :__receive_default_primary
-          @_receive_front_scanner_tokens = :__receive_front_scanner_tokens
-          @_receive_user_scanner = :__receive_user_scanner
+          @_lockout_ = {}
+          @_real_user_scanner = nil
         end
 
-        def receive_front_scanner_tokens sym_a
-          send @_receive_front_scanner_tokens, sym_a
+        define_singleton_method :once, Oncer__[]
+
+        once :flush_to_array do  # #here3
+          [
+            @_initial_front_scanner_tokens,
+            @_itemer,
+            @_fixed_primary_name_value_pairs_array,
+            @_listener,
+            @_real_user_scanner,
+          ]
         end
 
-        def __receive_front_scanner_tokens sym_a
-          @_receive_front_scanner_tokens = :_CLOSED_
-          @_front_tokens = sym_a
-          NIL
+        once :__receive_on_first_branch_item_not_found__ do |p|
+          @_on_first_branch_item_not_found = p
         end
 
-        def receive_add_primary p_a, sym
+        def __receive_default_primary_ sym
+          @_itemer.__do_receive_default_primary_ sym
+        end
 
-          # for now (and don't expect this to stay this way forever
-          # necessarily), we can model the definition for an added primary
-          # as a set (here, list) of only procs:
-          #
-          #   - one callback proc for handling the parse
-          #     (this proc must be niladic)
-          #
-          #   - zero or one proc for expressing the primary's description
-          #     (this proc if provided must be monadic)
-          #
-          # given that in the above structural signature the formal procs
-          # happen to have arities that are unique to their formal argument,
-          # we can allow that the argument procs are provided in any order,
-          # using only their arities to infer the intent of the argument.
-          #
-          # we can furthermore treat any passed block indifferently to a
-          # positional argument. all of this together is meant to expose a
-          # loose, natural syntax where the user can use the block argument
-          # for whichever (if any) purpose "feels better" for the use case.
-          #
-          # for now (in part) because this is so experimental, we take
-          # safeguards to ensure that what is required is provided, and that
-          # the procs do not clobber each other.
+        def __receive_add_primary_ sym, p_a
 
-          box = Common_::Box.new
+          # temporarily we can take liberties with the signature .. #note-3
+
+          bx = Common_::Box.new
+
           p_a.each do |p|
-            box.add p.arity, p
+            bx.add p.arity, p
           end
-          ( @_added_box ||= Common_::Box.new ).add sym, box.remove( 0 )
-          p = box.remove( 1 ) { }
-          if p
-            ( @_description_proc_for_added_h ||= {} )[ sym ] = p
-          end
-          box.length.zero? or raise ::ArgumentError
+
+          _action_p = bx.remove 0
+          _desc_p = bx.remove( 1 ) { }
+          bx.length.zero? || self._ARGUMENT_ERROR
+
+          @_itemer._add_primary_at_position_( -1, sym, _action_p, _desc_p )
+
           NIL
         end
 
-        def receive_subtract_primary_with_argument sym, x
-          ( @_mid_scanner_pairs ||= [] )
-          @_mid_scanner_pairs.push Common_::Pair.via_value_and_name( x, sym )
-          receive_subtract_primary_without_argument sym
-          NIL
+        def __receive_subtract_primary_with_default_ x, sym
+
+          _ = Common_::Pair.via_value_and_name x, sym
+
+          ( @_fixed_primary_name_value_pairs_array ||= [] ).push _
+
+          @_itemer.subtract_primary sym
         end
 
-        def receive_subtract_primary_without_argument sym
-          ( @_subtracted_h ||= {} )[ sym ] = true
-          NIL
+        def __receive_subtract_primary_without_default_ sym
+
+          @_itemer.subtract_primary sym
         end
 
-        def receive_default_primary sym
-          send @_receive_default_primary, sym
+        once :__receive_front_scanner_tokens_ do |sym_a|
+
+          # (locks out only to preserve its historical symantics for now)
+
+          @_initial_front_scanner_tokens = sym_a
         end
 
-        def __receive_default_primary sym
-          @_receive_default_primary = :_CLOSED_
-          @_DP_kn_kn = Common_::Known_Known[ sym ]
-          NIL
+        once :__receive_user_scanner_ do |real_scn|
+          @_real_user_scanner = real_scn
         end
 
-        def receive_user_scanner scn
-          send @_receive_user_scanner, scn
-        end
-
-        def __receive_user_scanner scn
-          @_receive_user_scanner = :_CLOSED_
-          @_user_scanner = scn
-          NIL
-        end
-
-        def receive_listener x
-          @_listener = x ; nil
-        end
-
-        def finish
-
-          itemer = Itemer___.new @_added_box, @_subtracted_h
-
-          a = []
-          ft = remove_instance_variable :@_front_tokens
-          if ft
-            a.push FrontTokens__.new ft, itemer
-          end
-
-          msp = remove_instance_variable :@_mid_scanner_pairs
-
-          if msp
-            a.push FixedPrimaries___.new msp
-          end
-
-          us = remove_instance_variable :@_user_scanner
-          if ! us.no_unparsed_exists
-
-            a.push UserScanner___.new us, @_DP_kn_kn, itemer, @_listener
-          end
-
-          if a.length.zero?
-            self._COVER_ME_you_should_result_in_a_singleton_that_says :no_unparsed_exists
-          else
-            Here_.__new_multi_mode_argument_scanner(
-              a, @_description_proc_for_added_h, itemer, @_listener )
-          end
+        once :__receive_listener_ do |p|
+          @_listener = p
         end
       end
 
@@ -197,49 +177,105 @@ module Skylab::Zerk
       Here_ = self
       class Here_
 
-        def initialize a, d_h, itemer, l
-          @_description_proc_for_added_h = d_h
+        def initialize ifst, itmr, fpnvpa, l, rus  # :#here3
+
           @listener = l
-          @on_first_branch_item_not_found = nil
-          @no_unparsed_exists = false
-          @_itemer = itemer
-          @_scn_scn = Common_::Polymorphic_Stream.via_array a
-          @_scn = @_scn_scn.gets_one
+          @no_unparsed_exists = true
+
+          @_itemer = itmr
+          @_first_time_only_match_hook = nil
+          @_scanners = Home_.lib_.basic::OrderedCollection.begin_empty ComparableScanner___
+
+          # --
+
+          # ~ initial front scanner tokens
+
+          if ifst
+            _touch_front_scanner_tokens ifst
+          end
+
+          # ~ fixed primary name value pair array
+
+          if fpnvpa
+            __init_fixed_primaries_scanner fpnvpa
+          end
+
+          # ~ real user scanner (polymorphic scanner)
+
+          if ! rus.no_unparsed_exists
+            # this ..
+            __init_user_scanner rus
+          end
         end
 
-        # -- run-time mutation
+        # -- mutators
 
-        def insert_at_head * x_a
+        def on_first_branch_item_not_found & p
+          @_first_time_only_match_hook = p
+        end
+
+        def insert_at_head *sym_a, sym
 
           # hack that says "whatever you're doing, do this instead".
           # this hack is certain to break for certain cases
 
-          scn = FrontTokens__.new x_a, @_itemer
-
-          if @no_unparsed_exists
-            @no_unparsed_exists = false
-            @_scn_scn = Common_::Polymorphic_Stream.the_empty_polymorphic_stream
-            @_scn = scn
-          else
-            @_scn_scn.current_index -= 1  # walk back the current scanner
-            @_scn = scn
-          end
-
-          NIL
+          sym_a.push sym
+          _touch_front_scanner_tokens sym_a
         end
 
-        def on_first_branch_item_not_found & p
-          @on_first_branch_item_not_found = p ; nil
+        def _touch_front_scanner_tokens sym_a  # assume nonzero length
+
+          _insert_or_retrieve_sub_scanner :_front_tokens_,
+            -> _k do
+              FrontTokens__.new sym_a, @_itemer
+            end,
+            -> xx do
+              ::Kernel._K
+            end
+          NIL
         end
 
         def add_primary_at_position d, sym, do_by, desc_by
 
-          @_description_proc_for_added_h[ sym ] = desc_by
-          @_itemer.__late_add_ d, sym, do_by
+          @_itemer._add_primary_at_position_ d, sym, do_by, desc_by
           NIL
         end
 
-        # -- reflection (for etc)
+        def __init_fixed_primaries_scanner pair_a
+
+          _sub_scn = FixedPrimaries___.new pair_a
+          _place_sub_scanner :_fixed_primaries_, _sub_scn
+          NIL
+        end
+
+        def __init_user_scanner real_scn
+
+          _sub_scn = UserScanner___.new real_scn, @_itemer, @listener
+          _place_sub_scanner :_user_scanner_, _sub_scn
+          NIL
+        end
+
+        # --
+
+        def _place_sub_scanner k, x
+
+          @_scanners.insert_or_retrieve( k ) { x }
+
+          @no_unparsed_exists = false
+
+          NIL
+        end
+
+        def _insert_or_retrieve_sub_scanner k, p, p_
+
+          @_scanners.insert_or_retrieve k, p, p_
+
+          @no_unparsed_exists = false
+
+          NIL
+        end
+
+        # -- READERS
 
         def altered_description_proc_reader_via remote
 
@@ -247,10 +283,10 @@ module Skylab::Zerk
           # operation, produce a new reader that includes also those for
           # added primaries. (note we don't take into account subtraction).
 
-          added = @_description_proc_for_added_h
-          if added
+          h = @_itemer.description_proc_for_addeds_hash
+          if h
             -> k do
-              added[ k ] || remote[ k ]
+              h[ k ] || remote[ k ]
             end
           else
             remote
@@ -265,10 +301,10 @@ module Skylab::Zerk
 
           o = _begin_match_branch a
 
-          if @on_first_branch_item_not_found
+          if @_first_time_only_match_hook
+            @__relevant_default = @_first_time_only_match_hook
+            @_first_time_only_match_hook = nil
             @_has_relevant_default = true
-            @__relevant_default = @on_first_branch_item_not_found
-            @on_first_branch_item_not_found = nil
           else
             @_has_relevant_default = false
           end
@@ -302,7 +338,7 @@ module Skylab::Zerk
             # ended on a "frontey" primary, then it's hard to hide the
             # existence of this hack completely from the backend. we are
             # in effect trying to tell the backend "we did not fail, but
-            # this is not a item." experimental :#scn-note-1 :#here
+            # this is not a item." experimental :#scn-note-1 :#here2
             # #not-covered - hits IFF `-verbose` at end
 
             x = The_no_op_item__[]
@@ -340,11 +376,11 @@ module Skylab::Zerk
             m2 = :_business_item_knownness_via_facilitator_
           end
 
-          o.well_formed_potential_symbol_knownness = @_scn.send m1
+          o.well_formed_potential_symbol_knownness = @_scanners.head_item.send m1
 
           if o.is_well_formed
 
-            o.item_knownness = @_scn.send m2, o
+            o.item_knownness = @_scanners.head_item.send m2, o
 
             if o.item_was_found
               o.item
@@ -378,7 +414,9 @@ module Skylab::Zerk
 
           o = _begin_match_branch [ :primary ]
 
-          o.well_formed_potential_symbol_knownness = @_scn._well_formed_primary_knownness_
+          _kn = @_scanners.head_item._well_formed_primary_knownness_
+
+          o.well_formed_potential_symbol_knownness = _kn
 
           if o.is_well_formed
 
@@ -501,32 +539,66 @@ module Skylab::Zerk
         end
 
         def head_as_normal_symbol
-          @_scn._head_as_normal_symbol_
+          @_scanners.head_item._head_as_normal_symbol_
         end
 
         def head_as_is
-          @_scn._head_as_is_
+          @_scanners.head_item._head_as_is_
         end
 
         def advance_one
-          @_scn._advance_one_
-          if @_scn._no_unparsed_exists_
-            if @_scn_scn.no_unparsed_exists
-              remove_instance_variable :@_scn_scn
-              remove_instance_variable :@_scn
+
+          o = @_scanners.head_item
+          o._advance_one_
+          if o._no_unparsed_exists_
+
+            o = @_scanners
+            o.remove_head_comparable
+            if o.is_empty
+
+              # #cover-me :[#tmx-016]:
+              # this trips only when we run "test-all" in our usual way
+              #
+              # do not remove :@_scanners here - even though we have reached
+              # the end of the scan, the particular outer client
+              # implementation may want to customize the call to the remote
+              # operation by prepending new tokens to the front of the
+              # scanner.
+
               @no_unparsed_exists = true
-            else
-              @_scn = @_scn_scn.gets_one
             end
           end
           NIL
         end
+
+        # --
 
         attr_reader(
           :listener,
           :no_unparsed_exists,
         )
       end
+
+      # ==
+
+      class ComparableScanner___
+
+        def initialize k, item
+          @item = item
+          @___precedence_integer = ORD__.fetch k
+        end
+
+        def compare_against_key k
+          @___precedence_integer <=> ORD__.fetch( k )
+        end
+
+        attr_reader(
+          :item,
+        )
+      end
+
+      _order = [ :_front_tokens_, :_fixed_primaries_, :_user_scanner_ ]
+      ORD__ = ::Hash[ _order.each_with_index.map { |*a| a } ]
 
       # ==
 
@@ -538,24 +610,40 @@ module Skylab::Zerk
 
         def initialize front_tokens, itemer
 
-          @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
           @_itemer = itemer
+          @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
         end
 
+        # --
+
+        # subject's primary responsibility is to present the plain old
+        # head token (symbol) of its internal real scanner as a well-formed
+        # primary or business item (indifferently). once we get to the point
+        # where the below 2 methods are called, subject has alread done that
+        # and all that is left to is is pass thru to itemer.
+
         def _primary_branch_item_knownness_via_facilitator_ o
-          @_itemer.primary_branch_item_knownness_via_exact_match o
+          _sanity o
+          @_itemer.primary_item_knownness_via_exact_match o
         end
 
         def _business_item_knownness_via_facilitator_ o
+          _sanity o
           @_itemer.business_item_knownness_via_facilitator o
         end
 
+        def _sanity o
+          o.well_formed_symbol == _head || fail
+        end
+
+        # --
+
         def _well_formed_business_item_knownness_
-          Common_::Known_Known[ _head ]
+          KnKn__[ _head ]
         end
 
         def _well_formed_primary_knownness_
-          Common_::Known_Known[ _head ]
+          KnKn__[ _head ]
         end
 
         def _head_as_normal_symbol_
@@ -587,15 +675,15 @@ module Skylab::Zerk
         # these are for implementing the other side of "subtraction"
         # (and perhaps one day defaults).
 
-        def initialize mid_scanner_pairs
+        def initialize pairs
 
           @_is_pointing_at_name = true
-          @_real_scn = Common_::Polymorphic_Stream.via_array mid_scanner_pairs
+          @_real_scn = Common_::Polymorphic_Stream.via_array pairs
         end
 
         def _primary_branch_item_knownness_via_facilitator_ o
 
-          # assume that #here.
+          # assume that #here1.
 
           # although we have a name-value pair, we are only resulting in
           # a derivative of the name (nothing of the value) here.
@@ -607,13 +695,13 @@ module Skylab::Zerk
 
           _dbi = DefaultedBranchItem___.new _x, k
 
-          Common_::Known_Known[ _dbi ]
+          KnKn__[ _dbi ]
         end
 
         def _well_formed_primary_knownness_
           if @_is_pointing_at_name
-            # :#here.
-            Common_::Known_Known[ @_real_scn.current_token.name_x ]
+            # :#here1.
+            KnKn__[ @_real_scn.current_token.name_x ]
           else
             self._IF_EVER_THEN_WHY
           end
@@ -673,19 +761,12 @@ module Skylab::Zerk
         # this is the workhorse parser implementation - the one that
         # translates CLI-shaped arguments to API-shaped ones.
 
-        def initialize user_scn, dp_kn, itemer, listener
-
-          if dp_kn
-            @_default_primary_was_read = false
-            @__default_primary_symbol = dp_kn.value_x
-            @_has_default_primary = true
-          else
-            @_has_default_primary = false
-          end
+        def initialize user_scn, itemer, listener
 
           @__is_subtracted = itemer.subtracted_hash || MONADIC_EMPTINESS_
           @_itemer = itemer
           @_listener = listener
+          @_payback_the_use_of_default_primary = false
           @_real_scn = user_scn
         end
 
@@ -694,7 +775,7 @@ module Skylab::Zerk
           # assume our immediately following method resulted in a known
           # known. as such we don't need to check subtracted here.
 
-          kn = @_itemer.primary_branch_item_knownness_via_exact_match o
+          kn = @_itemer.primary_item_knownness_via_exact_match o
           if kn
             kn
           elsif o.request.do_fuzzy_lookup
@@ -757,12 +838,13 @@ module Skylab::Zerk
 
               _unknown_because :subtracted_primary_was_referenced
             else
-              Common_::Known_Known[ sym ]
+              KnKn__[ sym ]
             end
 
-          elsif @_has_default_primary
-            @_default_primary_was_read = true
-            Common_::Known_Known[ @__default_primary_symbol ]
+          elsif @_itemer.has_default_primary
+            _sym = @_itemer.default_primary_symbol
+            @_payback_the_use_of_default_primary = true
+            KnKn__[ _sym ]
 
           else
             _unknown_because :primary_had_poor_surface_form
@@ -778,7 +860,7 @@ module Skylab::Zerk
               _whine_into_about_primary emit, s
             end
           else
-            Common_::Known_Known[ s.gsub( DASH_, UNDERSCORE_ ).intern ]
+            KnKn__[ s.gsub( DASH_, UNDERSCORE_ ).intern ]
           end
         end
 
@@ -808,8 +890,9 @@ module Skylab::Zerk
         end
 
         def _advance_one_
-          if @_has_default_primary && @_default_primary_was_read
-            @_default_primary_was_read = false
+
+          if @_payback_the_use_of_default_primary
+            @_payback_the_use_of_default_primary = false
           else
             __advance_one_normally
           end
@@ -832,26 +915,46 @@ module Skylab::Zerk
 
       class Itemer___
 
-        def initialize bx, h
+        # called "itemer" because it produces (primary or business) items.
+        #
+        # a façade that stands in front of the real operator branch,
+        # serving lookup requests of it while effecting addeds and removeds.
+        #
+        # encapsulates the storage of addeds and removeds so that is
+        # insulated from any one sub-scanner implementation.
 
-          if bx
-            @_addeds_box = bx
-            @has_addeds = true
-          else
-            @has_addeds = false
-          end
-
-          @subtracted_hash = h
+        def initialize
+          @has_addeds = false
+          @_lockout_ = {}
         end
 
-        def __late_add_ d, sym, do_by
+        define_singleton_method :once, Oncer__[]
+
+        once :__do_receive_default_primary_ do |sym|
+
+          # (hypothetically we could change the default primary mid-scan
+          #  but you MUST cover the `default_primary` feature directly
+          #  to try such a stunt)
+
+          if sym
+            @has_default_primary = true
+            @__default_primary_knownness = KnKn__[ sym ]
+          end
+        end
+
+        def _add_primary_at_position_ d, sym, do_by, desc_by
 
           if @has_addeds
             bx = @_addeds_box
           else
             @has_addeds = true
             bx = Common_::Box.new
+            @description_proc_for_addeds_hash = {}
             @_addeds_box = bx
+          end
+
+          if desc_by
+            @description_proc_for_addeds_hash[ sym ] = desc_by
           end
 
           len = bx.length
@@ -868,11 +971,17 @@ module Skylab::Zerk
           NIL
         end
 
+        def subtract_primary sym
+          ( @subtracted_hash ||= {} )[ sym ] = true ; nil
+        end
+
+        # -- readers
+
         def addeds_as_operator_branchish
           @___AaOB ||= Addeds_as_OperatorBranch___.new @_addeds_box
         end
 
-        def primary_branch_item_knownness_via_exact_match o
+        def primary_item_knownness_via_exact_match o
 
           k = o.well_formed_symbol
 
@@ -888,7 +997,7 @@ module Skylab::Zerk
             end
           end
 
-          item && Common_::Known_Known[ item ]
+          item && KnKn__[ item ]
         end
 
         def business_item_knownness_via_facilitator o
@@ -896,7 +1005,7 @@ module Skylab::Zerk
           k = o.well_formed_symbol
           x = o.operator_branch.lookup_softly k
           if x
-            Common_::Known_Known[ OperatorBranchEntry__.new( x, k ) ]
+            KnKn__[ OperatorBranchEntry__.new( x, k ) ]
           elsif o.request.do_fuzzy_lookup
             __business_item_knownness_fuzzily o
           else
@@ -933,8 +1042,14 @@ module Skylab::Zerk
           end
         end
 
+        def default_primary_symbol  # assume has default primary
+          @__default_primary_knownness.value_x
+        end
+
         attr_reader(
+          :description_proc_for_addeds_hash,
           :has_addeds,
+          :has_default_primary,
           :subtracted_hash,
         )
       end
@@ -986,7 +1101,7 @@ module Skylab::Zerk
         def maybe_finish
           if @a
             if 1 == @a.length
-              Common_::Known_Known[ @a.fetch 0 ]
+              KnKn__[ @a.fetch 0 ]
             else
               Known_unknown_when_ambiguous___[ @a, @symbol ]
             end
@@ -1052,7 +1167,7 @@ module Skylab::Zerk
 
       The_no_op_item__ = Lazy_.call do
         class NoOpBranchItem___
-          def is_the_no_op_branch_item  # always for #scn-note-1 #here
+          def is_the_no_op_branch_item  # always for #scn-note-1 #here2
             true
           end
           new
@@ -1078,6 +1193,10 @@ module Skylab::Zerk
       end
 
       OperatorBranchEntry__ = Home_::ArgumentScanner::OperatorBranchEntry
+
+      # ==
+
+      KnKn__ = Common_::Known_Known
 
       # ==
     end

@@ -34,7 +34,7 @@ module Skylab::Zerk::TestSupport
 
           o.user_scanner real_scanner_for_( "-hi", "-cant-touch-this" )
 
-          o.listener spy.listener
+          o.emit_into spy.listener
         end
 
         h = { hi: :_was_hi_, cant_touch_this: :_no_see_ }

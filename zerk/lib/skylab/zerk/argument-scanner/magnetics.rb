@@ -99,7 +99,7 @@ module Skylab::Zerk
         if kn.is_known_known
 
           @is_well_formed = true
-          @__well_formed_known_known = kn
+          @__well_formed_symbol_known = kn
         else
 
           @is_well_formed = false
@@ -114,7 +114,7 @@ module Skylab::Zerk
       end
 
       def well_formed_symbol
-        @__well_formed_known_known.value_x
+        @__well_formed_symbol_known.value_x
       end
 
       attr_reader(

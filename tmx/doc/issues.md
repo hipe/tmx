@@ -31,7 +31,7 @@
              [sa], [dt], [my], [gv]
 
 
-[#016] #hole
+[#016]       #track - not covered feature of [ze] a.s
              ( #was: unbreak [tmx]'s heart - use new API somehow to bring
                old tmx back
                 - integration of sidesystems with TMX should happen in the sides, not TMX )

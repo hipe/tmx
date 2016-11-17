@@ -122,7 +122,7 @@ module Skylab::Zerk::TestSupport
 
           o.user_scanner real_scanner_for_( "-he", "doopie" )
 
-          o.listener spy.listener
+          o.emit_into spy.listener
         end
 
         h = {

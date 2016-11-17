@@ -81,7 +81,7 @@ module Skylab::Zerk::TestSupport
 
           o.user_scanner _
 
-          o.listener el.handle_event_selectively
+          o.emit_into el.handle_event_selectively
         end
 
         _no = scn.head_as_primary_symbol  # might be #feature-island #scn-coverpoint-2
@@ -109,7 +109,7 @@ module Skylab::Zerk::TestSupport
 
           o.user_scanner _
 
-          o.listener el.handle_event_selectively
+          o.emit_into el.handle_event_selectively
         end
 
         _sym = scn.head_as_primary_symbol

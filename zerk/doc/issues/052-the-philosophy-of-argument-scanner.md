@@ -62,8 +62,48 @@ in various ways for years) is to meet these design objectives:
 
 
 
+## "the multi-mode argument scanner"
 
-## here is a description for all "multi-mode" argument scanner constructions:
+### a proper introduction
+
+the "flagship" and more complicated of the two argument scanner
+implementations, this is a compound scanner made up of up to 3
+kinds of sub-scanners that parse the argument stream (or give the
+appearance of doing so) in ways that achieve CLI-specific needs
+while still looking like an argument scanner that a backend API
+operation can draw from.
+
+as each next sub-scanner is exhausted in the queue, the next one
+becomes the active. the typical scan is complete when the last token
+is drawn from the last sub-scanner.
+
+hypothetically this scanner could function with any permutation of
+the below three sub-scanners being variously active or not; but
+the sub-scanners will always execute in the following order relative
+to each other:
+
+  - front tokens
+  - fixed primary pairs
+  - user scanner
+
+the first is for (in effect) prepending plain old symbols to the
+argument stream, for use in routing the request to a particular
+backend operation.
+
+the second is how we implement default values (probably as a resulf
+of primary subtraction).
+
+the third wraps the ARGV and effects the CLI-specific form of
+"primary" syntax.
+
+
+
+
+### (EDIT comments from the original construction site)
+
+(EDIT the below are drawn from comments from the original construction
+of the first argument scanners. although they are still relevant, the
+previous section is now better written and prehaps redundant.)
 
   - both because we had to parse the operation name off the ARGV
     before we could know which operation we want to build the
@@ -148,3 +188,59 @@ we have architected this in such a manner only because when we
 did it the "other" way it was a tangled soup of many (many)
 "hook-out" methods, made more tangled by the adapter architecture
 of CLI's muli-mode argument scanner.
+
+
+
+
+## this hacky "oncer" implementation :#note-2
+
+a `once` method (here) is a method defined on a module (class probably)
+that when called defines a method on that class that is intended to be
+called at most one time per instance.
+
+the subject proc produces a proc meant to constitute the method
+definition body for such a method. such a proc must be produced once
+per particpating class.
+
+the participating instance must initialize its own `@_lockout_` ivar
+with a plain old empty, mutable hash. (we have opted to go this route
+instead of mutating the participant's singleton class at runtime.)
+
+the implementation is more hacky than it would otherwise need to be
+(with the awful use of sequential integers to generate method names
+to serve as the actual implementing method to be called at most once)
+because `instance_exec` can't send a block argument to its block argument
+(sic), yet we want the participating methods to be able to use block
+arguments.
+
+do not let this hack leave this file without finding a better solution
+for this.
+
+
+
+
+## for now we can take liberties with the :#note-3
+
+for now (and don't expect this to stay this way forever
+necessarily), we can model the definition for an added primary
+as a set (here, list) of only procs:
+
+  - one callback proc for handling the parse
+    (this proc must be niladic)
+
+  - zero or one proc for expressing the primary's description
+    (this proc if provided must be monadic)
+
+given that in the above structural signature the formal procs
+happen to have arities that are unique to their formal argument,
+we can allow that the argument procs are provided in any order,
+using only their arities to infer the intent of the argument.
+
+we can furthermore treat any passed block indifferently to a
+positional argument. all of this together is meant to expose a
+loose, natural syntax where the user can use the block argument
+for whichever (if any) purpose "feels better" for the use case.
+
+for now (in part) because this is so experimental, we take
+safeguards to ensure that what is required is provided, and that
+the procs do not clobber each other.

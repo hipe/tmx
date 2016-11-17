@@ -1,44 +1,69 @@
 # name conventions for functions and methods :[#028]
 
-## synopsis
+## introduction & synopsis
+
+you might be familiar with the (perlish?) convention where a method
+with a name `_like_this` is in some way "private". knowing this, if
+you were then to see a method `__like_this` you might deduce that
+that method is somehow "even more private".
+
+the convention system we describe in this document is this general
+principle taken to an absurdly detailed degree.
 
 at the highest level, in this universe we see every method that we
 define as having a scope that is either "public API", "library-scope",
 or "file-private". within these broad categories we make further, more
 fine-grained distinctions of scope. every method we define expresses its
-membership to the particular one of these categories through its use of
-leading or trailing underscores in its name. (it's typically one or the
-other or neither - the exception is described below.)
+membership to the particular one of these categories through its
+combination of leading and/or trailing (eek!) underscores in its name.
+
+
+
+
+## cost & benefit (overview)
 
 the primary value of this (arguably convoluted) naming convention is
 that it produces code that is optimized for refactoring: we can know
 immedatiately the "cost of refactoring" a method only be looking at its
 name.
 
-here's the overview of all the categories. each one may be described in
-more detail as referenced.
+as for the cost of using this convention itself, it is mitigated by
+these two characteristics:
 
-    this_is_a_public_API_method   # #tier-0: no leading or trailing underscores
+  1) the system is generally consistent with its own expressive
+     patterns, so a superficial understanding of the system will
+     help reinforce understanding of it at progressively more
+     detailed levels.
 
-    this_method_is_only_called_from_this_library_  # #tier-1
+  2) even if the reader has *no* familiarity with the byzantine
+     conventions described here, the code that utilizes them
+     can still be read and generally understood.
 
-    as_above_and_it_is_only_ever_called_from_this_one_code_location__  # #tier-1.5
 
-    this_method_is_only_called_from_tests___  # #tier-1.7 (see) (deprecating)
 
-    _this_method_is_only_called_from_this_file  # #tier-2
 
-    _this_method_is_only_called_from_this_file_in_a_hook_out_manner_  # #tier-2 (again)
+## overview
 
-    __as_above_and_it_is_only_ever_called_from_this_one_code_location  # #tier-3
+the following table tries to summarize comprehensively all the
+method name conventions in this system.
 
-    ___as_above_and_the_call_is_in_the_method_defined_immediately_above_this_one
+these narrow columns of the table are:
+A) the number of leading underscores
+B) the number of trailing underscores
 
-    # ..
-
-    this_method_has_a__generated_portion__  # see #A
-
-    _public_API_method_variant_  # ..is for when the other is a business namespace and/or..  # #tier-0.5
+  | A | B |             | example/decription                                |
+  |--
+  | 0 | 0 | #tier-0     | `this_is_a_public_API_method`                     |
+  | 0 | 1 | #tier-1     | `this_method_is_only_called_from_this_library_`   |
+  | 0 | 2 | #tier-1B    | `only_from_lib_AND_only_called_in_one_place__`    |
+  | 0 | 3 | #tier-1C    | `typically_a_reader_for_testing_only___`          |
+  | 1 | 0 | #tier-2     | `_this_method_is_only_called_from_this_file`      |
+  | 1 | 1 | #tier-2     | `_only_from_this_file_in_hook_out_manner_`        |
+  | 1 | 1 | #tier-0.5   | `_public_API_method_variant_`  (visually same)    |
+  | 2 | 1 | #tier-2B    | `__only_this_file_AND_hook_out_AND_one_place_`    |
+  | 2 | 0 | #tier-3     | `__only_called_from_this_file_AND_only_1_place_`  |
+  | 3 | 0 | #deprecated | `___this_file_AND_1x_AND_defined_immedately_above`|
+  | - | - | see #A      | `this_method_has_a__generated_portion__`          |
 
 
 
@@ -47,7 +72,7 @@ more detail as referenced.
 
 although we haven't explained what they all mean yet, a good example of
 that employs several of the above name conventions is a file in [sa] that
-is taggged with [#]  (the subject doc node).
+is taggged with [#subject]  (the identifier of this document).
 
 (another good example is [#hu-037], also cross-tagged to here.)
 
@@ -66,32 +91,48 @@ of this document.
 
 ### :#tier-0: "public API"
 
-this method is part of the public API of the node that defines it. as
-such, we *must not* change this method in terms of its name, signature
-or effective behavior without upgrading the major version number of the
-surrounding library (per our interpretation of semver.org).
+this method is part of the public API of the node (i.e class or
+module) that defines it.
 
-note that this scope is only with respect to the node itself. if there
-is a "public API" method defined on a node that is itself private to a
-library, the method does *not* then become part of the public API of the
-library. the scope of the node itself [#031] is a sort of "contract"
-between the node and its intended audience. the scope of the methods
-on the node is a sort of "sub-contract" with this same audience. this
-whole paragraph may change.
+one implication of this is that if the node itself is itself part
+of the public API of the surrounding library, then we *must not* change
+the method (in terms of its name, in terms of its signature, maybe even
+in terms of its behavior) without upgrading the major version number of
+the surrouding library (per our interpretation of semver.org).
+
+if this sounds costly, it is! this is why we try to minimize public
+exposure and why we strive for "good design" of our public API's.
+
+the above hinted at a concept that applies more generally to this
+convention system: the degree of API exposure of a node (i.e a class
+or module) "cascades downward" to influence the semantics of the
+degree of exposure of the methods it defines.
+
+i.e the way method name conventions are to be interpreted is a function
+of the level of API exposure of the defining node :[#031]. so for example
+if a method looks like the convention being described here (i.e a
+`public_API_method`) but it is part of a non-public node (for the various
+degrees of API exposure), it is not the case that this method is part of
+the public API of the surrounding library.
+
+rather, just as the level of API exposure of a node is a sort of
+"contract" between the node and its intended audience, the scope of the
+methods it defines is sort of a "sub-contract" with the same audience.
 
 (EDIT: the above should have an example if we stick with it.)
+
 
 
 
 ### :#tier-0.5: "public API variant" (probably deprecating)
 
 (this same surface convention is instead used more frequently these days
-for different semantics, as desribed at #tier-2.)
+for the semantics desribed at #tier-2.)
 
 this convention is (perhaps deprecatedly) used in cases where the method
 is part of the implementing module's public API (so, exactly #tier-0)
 but the `public_method_name` convention cannot be used because that method
-"namespace" is explictly reserved for arbirary, ad-hoc business needs
+"namespace" is explictly reserved for arbitrary, ad-hoc business needs
 (simlar to the way a ::Struct sub-class's name space should be).
 
 it is probably a smell to employ this "pattern"; it is probably deprecating.
@@ -129,7 +170,7 @@ meanings:
 
 
 
-### :#tier-1.5:
+### :#tier-1B:
 
 a method name with two trailing dashes (that is not employing the
 convention for methods with generated names) is used to indicate that
@@ -140,12 +181,20 @@ tier-1.
 
 
 
-### :#tier-1.7:
+### :#tier-1C:
 
 a method whose name has *three* trailing underscores is provisionally
 used ONLY in tests. also such a method definition *must* be tagged with
 `#testpoint`. it *may* be considered a smell to "litter" asset code with
 code desiged only for testing, so use this pattern judiciously.
+
+because this is so ugly (not just visually but from the standpoint of
+keeping test-only code out of production code), we recommend avoiding
+this (both as a visual phenomenon and as a semantic category of method)
+except for methods that are defined on test paraphernalia (like a sort
+of mock) when you want to emphasize that the method is there to make the
+test easier to test but is not part of any API requirement.
+
 
 
 
@@ -175,7 +224,6 @@ as exactly a portmanteau of `library_scope_` and `_file_scope`,
 
 
 ## introduction
-
 
 we say "function" to give these ideas a bit of platform independence;
 however in the context of the current host platform, when we say "function"
