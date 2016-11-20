@@ -59,7 +59,7 @@ module Skylab::TanMan
       def execute
         @equals = @node._label_sexp[ :content ][ :equals ]
         @str = @equals[ :id ].normalized_string
-        if Home_.lib_.string_lib.template.string_has_variable @str, :label
+        if Home_.lib_.basic::String::Template.string_has_variable @str, :label
           when_template_parameters
         else
           when_no_template_parameters
@@ -69,7 +69,7 @@ module Skylab::TanMan
       def when_template_parameters
         s = @equals[ :id ]._escape_string @label, & @on_event_selectively
         s and begin
-          _tmpl = Home_.lib_.string_lib.template.via_string @str
+          _tmpl = Home_.lib_.basic::String::Template.via_string @str
           out_s = _tmpl.call label: s
 
           # NOTE you lose information above -- you cannot now go back and re-

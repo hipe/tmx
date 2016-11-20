@@ -135,7 +135,7 @@ module Skylab::Zerk
 
       def __custom_effection_or_bust x
 
-        found = Home_::NonInteractiveCLI::Custom_Effection___::Find.call x, @CLI
+        found = Home_::CLI::CustomEffection_via_Client_and_MixedResult::Find.call x, @CLI
 
         if found.ok
           @_do_set_exitstatus = false

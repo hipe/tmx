@@ -22,7 +22,7 @@ module Skylab::TMX
 
         __add_verbose_primary_maybe
 
-        if __parse_ALL_ARGUMENTS_using_the_compounded_primaries
+        if __parse_ALL_ARGUMENTS_using_the_compound_operator_branch
           if __directories_were_named_explicitly
             if __map_related_primaries_were_used
               __when_both_map_options_are_used_AND_directories_are_named_explicitly
@@ -117,10 +117,12 @@ module Skylab::TMX
         @_test_directory_collection.has_explicitly_named_directories
       end
 
-      def __parse_ALL_ARGUMENTS_using_the_compounded_primaries
+      def __parse_ALL_ARGUMENTS_using_the_compound_operator_branch
 
-        __init_map_operation_and_compounded_primaries
-        _ok = @__compounded_primaries.parse_against @argument_scanner
+        __init_map_operation_and_compound_operator_branch
+
+        _ok = @__MY_COMPOUNDED_BRANCH.parse_all_from @argument_scanner
+
         _ok  # #todo
       end
 
@@ -138,9 +140,13 @@ module Skylab::TMX
         NIL
       end
 
-      # -- initing the compunded primaries parser
+      # -- initing the compounded primaries parser
 
-      def __init_map_operation_and_compounded_primaries
+      def __init_map_operation_and_compound_operator_branch
+
+        # this is perhaps close to the center of [#006] "feature injection":
+        # of primaries that will appear to be under one operation, we
+        # describe how to parse them into two unrelated value stores.
 
         map_op = Home_::Operations_::Map.begin( & @CLI.listener )
 
@@ -148,21 +154,26 @@ module Skylab::TMX
 
         map_op.argument_scanner = as
 
-        map_op.attributes_module_by = -> { Home_::Attributes_ }  # necessary for it to be able to parse '-order' primary
+        map_op.attributes_module_by = -> { Home_::Attributes_ }
+          # necessary for it to be able to parse '-order' primary
 
-        @__compounded_primaries = Zerk_::ArgumentScanner::CompoundedPrimaries.define do |o|
+        lib = Zerk_::ArgumentScanner
 
-          o.add_operation map_op do |op|
-            op.not(
+        _ob = lib::OperatorBranch_via_OtherBranch.define map_op.operator_branch do |o|
+            o.not(
               :attributes_module_by,  # only ever the one set below
               :json_file_stream,  # only ever the one set below
               :json_file_stream_by,  # dito
               :result_in_tree,  # we don't ever produce the tree here
               :select,  # we don't select multiple fields here
             )
-          end
+        end
 
-          o.add_operation @_remote_operation
+        @__MY_COMPOUNDED_BRANCH = lib::OperatorBranch_via_MultipleEntities.define do |o|
+
+          o.add_entity_and_operator_branch map_op, _ob
+
+          o.add_entity_and_operator_branch @_remote_operation, @_remote_operation.operator_branch
         end
 
         @_map_operation = map_op

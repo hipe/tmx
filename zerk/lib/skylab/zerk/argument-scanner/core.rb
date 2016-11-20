@@ -107,7 +107,7 @@ module Skylab::Zerk
 
     BranchItem = ::Class.new
 
-    class OperatorBranchEntry < BranchItem
+    class OperatorBranchItem < BranchItem  # >= 2x
 
       def item_category_symbol
         :item_that_is_primary_hash_value_based
@@ -120,14 +120,19 @@ module Skylab::Zerk
 
     class BranchItem
 
+      class << self
+        alias_method :via_user_value_and_normal_symbol, :new
+        undef_method :new
+      end  # >>
+
       def initialize x, k
         @branch_item_normal_symbol = k
-        @value = x
+        @branch_item_value = x
       end
 
       attr_reader(
         :branch_item_normal_symbol,
-        :value,
+        :branch_item_value,
       )
 
       def is_the_no_op_branch_item

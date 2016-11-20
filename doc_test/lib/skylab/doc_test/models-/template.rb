@@ -69,7 +69,7 @@ module Skylab::DocTest
 
     template_cache = {}
     Lookup_cached_template_function___ = -> normal_path do
-      _vt = Home_.lib_.basic::String.template.via_path normal_path
+      _vt = Home_.lib_.basic::String::Template.via_path normal_path
       x = TemplateFunction___.new _vt
       template_cache[ normal_path ] = x
       x

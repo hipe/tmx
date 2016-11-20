@@ -218,6 +218,7 @@ module Skylab::Brazen
             tuple = st.gets
             tuple || break
             type_sym, normal_sym = tuple
+            normal_sym || ::Kernel._OOPS  # #todo
             name = NAME_FOR___.fetch( type_sym )[ normal_sym ]
 
             # -- maybe increase max width

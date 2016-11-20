@@ -18,6 +18,7 @@ module Skylab::Zerk
 
         def initialize mod
 
+          @item_class = LoadTicketIsh___
           @module = mod
 
           @_custom_emitter = nil
@@ -45,152 +46,76 @@ module Skylab::Zerk
 
         def _maybe_customize p, m
           if p
-            @_custom_emitter ||= CustomEmitter___.new
+            @_custom_emitter ||= Here_::CustomEmitter.new
             @_custom_emitter.send m, p
             NIL
           end
+        end
+
+        def item_class cls
+          @item_class = cls ; nil
         end
 
         # -- read
 
         def lookup_softly k
 
-          key_as_slug = k.id2name.gsub UNDERSCORE_, DASH_
-
-          st = _to_state_machine_stream
-          begin
-            sm = st.gets
-            sm || break
-            if key_as_slug == sm.entry_group_head
-              break
-            end
-            redo
-          end while above
-
+          sm = @module.entry_tree.value_state_machine_via_head Slug_via_symbol__[k]
           if sm
-            _item sm
+            _item_via_state_machine sm
           end
+        end
+
+        def dereference k
+
+          _slug = Slug_via_symbol__[ k ]
+
+          @module.entry_tree.dereference_value_state_machine_via_head _slug
         end
 
         def to_pair_stream
 
-          _to_state_machine_stream do |sm|
+          @module.entry_tree.to_state_machine_stream.map_by do |sm|
 
-            _k = sm.entry_group_head.gsub( DASH_, UNDERSCORE_ ).intern
-
-            Common_::Pair.via_value_and_name _item( sm ), _k
+            Common_::Pair.via_value_and_name(
+              _item_via_state_machine( sm ),
+              Symbol_via_slug__[ sm.entry_group_head ] )
           end
         end
 
-        def _item sm
-          LoadTicketIsh___.new sm, @module
-        end
+        def to_normal_symbol_stream
 
-        def to_normal_symbol_stream & p
-
-          st = _to_state_machine_stream do |sm|
-
-            sm.entry_group_head.gsub( DASH_, UNDERSCORE_ ).intern
-          end
-
-          if block_given?
-            st.map_by( & p )
-          else
-            st
+          @module.entry_tree.to_state_machine_stream.map_by do |sm|
+            Symbol_via_slug__[ sm.entry_group_head ]
           end
         end
+
+
 
         def to_slug_stream  # 1x for [tmx]. not an API #hook-out
 
-          _to_state_machine_stream( & :entry_group_head )
+          @module.entry_tree.to_state_machine_stream.map_by do |sm|
+            sm.entry_group_head
+          end
         end
 
-        def _to_state_machine_stream & p
-          if block_given?
-            @module.entry_tree.to_state_machine_stream.map_by( & p )
-          else
-            @module.entry_tree.to_state_machine_stream
-          end
+        def _item_via_state_machine sm
+          @item_class.new sm, @module
         end
 
         attr_reader(
           :emit_idea_by,
         )
       # -
-#==FROM
-
-      class CustomEmitter___
-
-        # if the client wants to customize how the emissions "express"
-        # (but not how they emit) this does all the lower-level writing.
-
-        def initialize
-          @channel_for_unknown_by = nil
-          @express_unknown_by = nil
-        end
-
-        attr_writer(
-          :channel_for_unknown_by,
-          :express_unknown_by,
-        )
-
-        def finish
-          freeze
-        end
-
-        def call idea
-          dup.__init( idea ).execute
-        end
-
-        alias_method :[], :call
-
-        def __init idea
-          @idea = idea
-          freeze
-        end
-
-        def execute
-
-          if @idea.is_about_unknown_item && ( x = __customizations_about_unknown )  # etc
-            __emit_customly x
-          else
-            @idea.emit_normally
-          end
-        end
-
-        def __emit_customly x
-
-          channel_by, express_idea_by = x
-          idea = @idea
-
-          channel = if channel_by
-            channel_by[ idea ]
-          else
-            idea.get_channel
-          end
-
-          idea.listener.call( * channel ) do |y|
-
-            expr = idea.to_expression_into_under y, self
-
-            if express_idea_by
-              express_idea_by[ expr ]
-            else
-              expr.express_normally
-            end
-          end
-
-          UNABLE_
-        end
-
-        def __customizations_about_unknown
-          @channel_for_unknown_by || @express_unknown_by and
-            [ @channel_for_unknown_by, @express_unknown_by ]
-        end
-
-      end
-#==TO
       # ==
+
+      Slug_via_symbol__ = -> k do
+        k.id2name.gsub UNDERSCORE_, DASH_
+      end
+
+      Symbol_via_slug__ = -> s do
+        s.gsub( DASH_, UNDERSCORE_ ).intern
+      end
 
       class LoadTicketIsh___
 

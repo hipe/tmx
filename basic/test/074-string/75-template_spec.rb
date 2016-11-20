@@ -90,7 +90,7 @@ module Skylab::Basic::TestSupport
     end
 
     def subject
-      subject_module_.template
+      subject_module_::Template
     end
   end
 end

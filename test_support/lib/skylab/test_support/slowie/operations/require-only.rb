@@ -20,26 +20,21 @@ module Skylab::TestSupport
 
       def initialize
 
+        @_actually_run = false
+        @operator_branch = Zerk_::ArgumentScanner::OperatorBranch_via_Hash[ PRIMARIES ]
+
         o = yield
 
-        @_actually_run = false
+        @_argument_scanner = o.argument_scanner
 
         @__mediator = o.MEDIATOR
 
         @_emit = o.listener
 
-        @syntax_front = Here_::Models_::HashBasedSyntax.new(
-          o.argument_scanner, PRIMARIES, self )
-
         @test_directory_collection = o.build_test_directory_collection
       end
 
-      attr_reader(  # for pre-execution syntax hacks
-        :test_directory_collection,
-      )
-
       def execute
-
         if __normal
           if __resolve_test_file_stream
             __tell_mediator_what_we_are_going_to_do
@@ -51,7 +46,7 @@ module Skylab::TestSupport
       end
 
       def __parse_but_actually_run
-        @syntax_front.argument_scanner.advance_one
+        @_argument_scanner.advance_one  # :#here
         @_actually_run = true
         ACHIEVED_
       end
@@ -107,25 +102,24 @@ module Skylab::TestSupport
 
       # == boilerplate
 
-      def __normal
-        _yes = @syntax_front.parse_arguments
-        _yes &&= @test_directory_collection.check_for_missing_requireds
-        _yes  # #todo
+      def at_from_syntaxish bi
+        send bi.branch_item_value
       end
 
-      # [#tmx-006] and friends
-
-      attr_reader(
-        :syntax_front,
-      )
-
-      def parse_present_primary_for_syntax_front_via_branch_hash_value m
-        send m
+      def __normal
+        ok = Parse_any_remaining_[ self, @_argument_scanner ]
+        remove_instance_variable :@_argument_scanner  # b.c #here
+        ok && @test_directory_collection.check_for_missing_requireds
       end
 
       def __parse_test_directory
         @test_directory_collection.parse_test_directory
       end
+
+      attr_reader(  # for pre-execution syntax hacks
+        :operator_branch,
+        :test_directory_collection,
+      )
     end
   end
 end

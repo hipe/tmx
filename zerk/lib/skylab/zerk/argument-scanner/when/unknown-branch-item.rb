@@ -99,7 +99,7 @@ module Skylab::Zerk
 
           def express_via_template tmpl_s
 
-            _tmpl_cls = Home_.lib_.basic::String.template
+            _tmpl_cls = Home_.lib_.basic::String::Template
             _tmpl = _tmpl_cls.via_string tmpl_s
 
             _big_string = _tmpl.express_into_against "", self

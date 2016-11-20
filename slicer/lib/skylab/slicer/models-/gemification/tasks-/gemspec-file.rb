@@ -50,7 +50,7 @@ module Skylab::Slicer
       def __make_file
 
         _str = Template_string___[]
-        _template = Home_.lib_.basic::String.template.via_string _str
+        _template = Home_.lib_.basic::String::Template.via_string _str
         _output = _template.call(
           author: 'hipe',
           email: 'my@email.com',

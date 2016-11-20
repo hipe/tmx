@@ -70,7 +70,7 @@ module Skylab::TestSupport
 
       def to_count
 
-        # (TL;DR: early optimization used system IPC instead of one ruby line)
+        # (TL;DR: early optimization uses system IPC instead of one ruby line)
         #
         # for thousands of test files, we consider it needlessly wasteful
         # to ask ruby to allocate memory for one string for each test file

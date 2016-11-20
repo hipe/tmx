@@ -31,7 +31,7 @@ module Skylab::TanMan
       KEYWORD__ = 'example'.freeze
 
       def line_rx
-        Home_.lib_.string_lib.regex_for_line_scanning
+        Home_.lib_.basic::String.regex_for_line_scanning
       end
 
       def rex * a

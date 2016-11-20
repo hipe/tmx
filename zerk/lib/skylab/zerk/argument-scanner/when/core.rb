@@ -212,5 +212,4 @@ module Skylab::Zerk
     end
   end
 end
-# #pending-rename: bd
 # #history: abstracted from the "when" node of the [tmx] map operation

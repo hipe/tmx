@@ -154,10 +154,8 @@ module Skylab::Zerk::TestSupport
 
   # --
 
-  Future_expect_nothing_ = Lazy_.call do
-    -> * i_a do
+  Expect_no_emission_ = -> * i_a do
       fail "unexpected: #{ i_a.inspect }"
-    end
   end
 
   # --

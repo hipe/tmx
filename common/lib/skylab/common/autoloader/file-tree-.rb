@@ -324,7 +324,7 @@ module Skylab::Common
           -> do
             if last != d
               d += 1
-              _value_state_machine_via_head head_a.fetch d
+              dereference_value_state_machine_via_head head_a.fetch d
             end
           end
         end
@@ -333,7 +333,7 @@ module Skylab::Common
 
           head = ( @___head_via_approximation ||= __build_fuzzy_cache )[ k ]
           if head
-            _value_state_machine_via_head head
+            dereference_value_state_machine_via_head head
           end
         end
 
@@ -355,7 +355,7 @@ module Skylab::Common
           end
         end
 
-        def _value_state_machine_via_head head
+        def dereference_value_state_machine_via_head head
           @_value_state_machine_cache.fetch head do
             _add_and_produce_state_machine @_h.fetch( head ), head
           end

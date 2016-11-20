@@ -72,7 +72,7 @@ module Skylab::TMX
 
         # branch_item.branch_item_normal_symbol  # => normal symbol
 
-        o = branch_item.value
+        o = branch_item.branch_item_value
 
         name = Common_::Name.via_slug o.state_machine.entry_group_head
 

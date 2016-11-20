@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Template__  # see [#028]
+    class Template  # see [#028]
 
       class << self
 
@@ -321,5 +321,4 @@ module Skylab::Basic
     end
   end
 end
-# #pending-rename: just do it
 # #note-110 :+#tombstone

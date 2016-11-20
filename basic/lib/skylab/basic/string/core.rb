@@ -141,10 +141,6 @@ module Skylab::Basic
         String_::Succ__
       end
 
-      def template
-        String_::Template__
-      end
-
       def unparenthesize_message_string * a
         if a.length.zero?
           String_::Small_Time_Actors__::Unparenthesize_message_string

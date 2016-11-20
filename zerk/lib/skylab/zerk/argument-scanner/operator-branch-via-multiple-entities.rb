@@ -2,120 +2,183 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class CompoundedPrimaries
+    class OperatorBranch_via_MultipleEntities
 
-      # form one parsing syntax by merging multiple operation *instances* SOMEHOW
+      # #[#051] :[#053] - this is currently *the* center of implementation
+      # for "feature injection". (theory at document.)
+      #
+      # is an operator branch that is an aggregation of N different other
+      # operator branches. each branch that goes into the definition of the
+      # subject must be associated with a "value store".
+      #
+      # the subject exposes special method for parsing, outside of the API
+      # of normal operator branches (discussed below). this parsing will
+      # dispatch each "at" occurrence to the appropriate value store to
+      # further process that portion of the argument stream head it is
+      # interested in.
+      #
+      # (typically the value stores are operations, but really they could
+      # be anything that responds to `at_from_syntaxish`.).
+      #
+      #
+      #
+      #
+      # ## about our "mutability model" :#note-2
+      #
+      # most adaptations of operator branches seem to adhere to a
+      # "mutability model" whereby they themselves are immutable (or could
+      # be) and also their member objects are immutable too, recursively.
+      #
+      # this mutability model makes these adaptations amenable to the
+      # "dup-and-mutate" pattern; and more generally is a byproduct of
+      # their simplicity, which in turn is a nod to the [#sl-129]
+      # "single responsibilty principle".
+      #
+      # the subject, however, holds *as* its member data the very
+      # value stores that its parses are to write into. to attempt to do
+      # othewise would make for a substantially more complex interface.
+      #
+      # the main uptake of this is that the subject is distinct among
+      # its sibling adaptations in that it can expose a method that parses
+      # that needs only one argument: the argument stream (because the
+      # subject already has the value stores as members).
+      #
+      #
+      #
+      #
+      # # #note-1 is about what happens with hash collisions between
+      # branches.
+      #
+      # (#a.s-coverpoint-1)
 
       class << self
         alias_method :define, :new
         undef_method :new
       end  # >>
 
-      def initialize
-        @_box = Common_::Box.new
-        @_operations = []
-        yield self
-        @_box.freeze
-        @_operations.freeze
-        freeze
-      end
+      # -
 
-      # -- parse-time
-
-      def parse_against argument_scanner
-
-        ok = ACHIEVED_
-
-        matcher = argument_scanner.matcher_for(
-          :primary, :against_hash, @_box.h_ )
-
-        op_a = @_operations
-        until argument_scanner.no_unparsed_exists
-
-          item = matcher.gets
-
-          if ! item
-            ok = item
-            break
-          end
-
-          if item.is_the_no_op_branch_item
-            next
-          end
-
-          _d = item.value
-          _sym = item.branch_item_normal_symbol
-          ok = op_a.fetch( _d ).syntax_front.parse_present_primary _sym
-          ok || break
-        end
-        ok
-      end
-
-      # -- define-time
-
-      def add_operation op
-
-        if block_given?
-          options = OperationOptions___.new
-          yield options
-          not_these_mutable_hash = options.not_these_mutable_hash
+        def initialize
+          @_count = 0
+          @_operator_braches = []
+          @_value_stores = []
+          yield self
         end
 
-        sym = nil
+        # -- define time
 
-        operation_offset = @_operations.length
-        @_operations.push op
-
-        see_normally = -> do
-          @_box.add sym, operation_offset
+        def add_entity_and_operator_branch vs, ob
+          d = @_count
+          @_count += 1
+          @_operator_braches[d] = ob
+          @_value_stores[d] = vs
+          NIL
         end
 
-        if not_these_mutable_hash
-          see = -> do
-            had = not_these_mutable_hash.delete sym
-            if had
-              if not_these_mutable_hash.length.zero?
-                see = see_normally
-              end
-            else
-              see_normally[]
+        # -- read-time
+
+        def parse_all_from argument_scanner
+
+          # (normally you wouldn't expose a method like this, but for #note-2)
+
+          _ = Here_::Syntaxish.via_operator_branch self
+
+          _ok = _.parse_all_into_from(
+            DISPATCHING_VALUE_RECEIVER___, argument_scanner )
+
+          _ok  # #todo
+        end
+
+        def emit_idea_by
+          NOTHING_
+        end
+
+        def lookup_softly k
+
+          user_x = nil ; x = nil
+          @_count.times do |d|
+            user_x = @_operator_braches[d].lookup_softly k
+            if user_x
+              x = _special_value @_value_stores.fetch(d), user_x
+              break
             end
           end
-        else
-          see = see_normally
+          x
         end
 
-        _syntax_front = op.syntax_front
+        def to_pair_stream
 
-        _syntax_front.GET_INTRINSIC_PRIMARY_NORMALS.each do |sym_|
-          sym = sym_
-          see[]
+          # for help screen, for fuzzy lookup.
+          #
+          # produce a stream that will produce one item per associative
+          # entry given at definition time. each such item will be another
+          # stream whose items are the pairs. finally, flatten this first
+          # stream so that the end result is a stream of the pairs.
+
+          Common_::Stream.via_times @_count do |d|
+
+            ob = @_operator_braches.fetch d
+
+            vs = @_value_stores.fetch d
+
+            p = ob.method :dereference
+
+            ob.to_normal_symbol_stream.map_by do |k|
+
+              Common_::Pair.via_value_and_name( _special_value( vs, p[k] ), k )
+            end
+
+          end.expand_by do |st|
+
+            st  # (this is how you flatten a stream of streams into a stream of items)
+          end
         end
 
-        if not_these_mutable_hash && not_these_mutable_hash.length.nonzero?
-          self._PRIMARIES_were_expressed_that_were_not_present_in_any_operation
+        def to_normal_symbol_stream
+
+          Common_::Stream.via_times @_count do |d|
+            @_operator_braches.fetch d
+          end.expand_by do |ob|
+            ob.to_normal_symbol_stream
+          end
         end
 
-        NIL
-      end
+        def _special_value x, xx
+          ValueStoreAndUserValue___.new x, xx
+        end
+      # -
 
       # ==
 
-      class OperationOptions___
+      module DISPATCHING_VALUE_RECEIVER___; class << self
 
-        def not * sym_a
-          h = ( @not_these_mutable_hash ||= {} )
-          sym_a.each do |sym|
-            h[ sym ] = true
-          end ; nil
+        # because we store the target value store *in* the routing struct,
+        # the receiver of this method call can be both stateless AND
+        # memberless, so a singleton like this.
+
+        def at_from_syntaxish o
+
+          routing = o.branch_item_value
+
+          _value_store = routing.value_store
+
+          _user_x = routing.mixed_user_value
+
+          _item_again = Here_::OperatorBranchItem.
+            via_user_value_and_normal_symbol(
+              _user_x, o.branch_item_normal_symbol )
+
+          _value_store.at_from_syntaxish _item_again
         end
+      end ; end
 
-        attr_reader(
-          :not_these_mutable_hash,
-        )
-      end
+      # ==
+
+      ValueStoreAndUserValue___ = ::Struct.new :value_store, :mixed_user_value
+        # (the above members are public API ([tmx]))
 
       # ==
     end
   end
 end
+# #history: "compounded primaries" reconceived as operator branch

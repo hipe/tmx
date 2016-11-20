@@ -1,84 +1,95 @@
-module Skylab::TestSupport
+module Skylab::Zerk
 
-  class Slowie
+  module ArgumentScanner
 
-    class Models_::HashBasedSyntax
+    class Syntaxish  # :[#056]
 
-      # (this will probably move to [ze])
+      # one level of abstraction higher than an operator branch, exposes
+      # and bundles together methods for techniques commonly associated
+      # with operator branches.
+      #
+      # meant to help DRY up a fleet of operations thru composition not
+      # inheritance - the operations init a member variable with the
+      # subject and delegate to it those common implementation choices.
+      #
+      # be able to dup-and-mutate, maybe.
+      #
+      # this was originally called "hash-based syntax" then "syntax choices".
+      # for now we are keeping its current horrible name to make it explicit
+      # that this both has proximity to and is distinct from any concrete
+      # conception of "syntax", which itself doesn't make clear at first
+      # glance whether it should or shouldn't be expected to parse anything,
+      # and whether or not it is tied to any single modality. with this
+      # strange name, we reserve ourself some space for these choices.
+      #
+      # #a.s-coverpoint-2
 
-      def initialize as, h, op
-        @argument_scanner = as
-        @hash = h
-        @operation = op
-        @_fetch = :__fetch_idempotently
-        yield self if block_given?
-      end
+      class << self
+        alias_method :via_operator_branch, :new
+        undef_method :new
+      end  # >>
 
-      def always_advance_scanner
-        @_fetch = :__fetch_by_advancing
-      end
+      # -
 
-      def parse_arguments
-
-        ok = true
-
-        if ! @argument_scanner.no_unparsed_exists
-
-          @__matcher = @argument_scanner.matcher_for(
-            :primary, :against_hash, @hash )
-
-          begin
-            ok = __parse_primary
-            ok || break
-          end until @argument_scanner.no_unparsed_exists
+        def initialize ob
+          @operator_branch = ob
         end
 
-        ok
-      end
+        def parse_all_into_from operation, argument_scanner
+          Parse___.new(
+            operation,
+            argument_scanner,
+            NOTHING_,  # coming soon
+            @operator_branch
+          ).execute
+        end
 
-      def __parse_primary
+        attr_reader(
+          :operator_branch,
+        )
+      # -
 
-        item = @__matcher.gets
+      # ==
 
-        if item
-          send ROUTES___.fetch( item.item_category_symbol ), item.value
+      class Parse___
+
+        def initialize op, as, _COMING_SOON, ob
+          @argument_scanner = as
+          @operator_branch = ob
+          @operation = op
+        end
+
+        def execute
+          if @argument_scanner.no_unparsed_exists
+            ACHIEVED_
+          else
+            @__matcher = @argument_scanner.matcher_for(
+              :primary, :against_branch, @operator_branch )
+            begin
+              ok = __parse_primary
+              ok || break
+            end until @argument_scanner.no_unparsed_exists
+            ok
+          end
+        end
+
+        def __parse_primary
+          item = @__matcher.gets
+          if item
+            if item.is_the_no_op_branch_item
+              ACHIEVED_
+            else
+              @operation.at_from_syntaxish item
+            end
+          else
+            item
+          end
         end
       end
 
-      ROUTES___ = {
-        item_that_is_primary_hash_value_based: :__parse_primary_normally,
-      }
-
-      def parse_present_primary sym
-        _user_x = send @_fetch, sym
-        @operation.parse_present_primary_for_syntax_front_via_branch_hash_value(
-          _user_x )
-      end
-
-      def __parse_primary_normally m
-        @operation.send m
-      end
-
-      def __fetch_by_advancing sym
-        @argument_scanner.advance_one
-        @hash.fetch sym
-      end
-
-      def __fetch_idempotently sym
-        # NOTE - here we do NOT advance scanner head because it is assumed
-        # that it is done by the operation when the below method is called
-        @hash.fetch sym
-      end
-
-      def GET_INTRINSIC_PRIMARY_NORMALS  # a = @argument_scanner.added_primary_normal_name_symbols
-        @hash.keys
-      end
-
-      attr_reader(
-        :argument_scanner,
-      )
+      # ==
     end
   end
 end
-# #pending-rename: make public and put in [ze]
+# #history: moved to [ze] from slowie
 # #history: abstracted from two operations

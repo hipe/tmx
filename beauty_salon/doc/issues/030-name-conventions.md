@@ -124,13 +124,13 @@ what is in that particular name.
   the state of the reciever, but that is not to say that they should
   always be used for methods that do! (#todo this is an area of active
   inquiry)
-_
+
     + they should be used as as shorthand for a boolean setter (`debug!`
     that sets a @do_debug for example) (`debug` by the way is a good
     example of a bad method name: is it a boolean? is it a function to
     call when debugging? is it the stream to write out to for debugging?
     is it an integer debug level?)
-_
+
     + they should be used for a method that autovivifies the thing:
       `current_definition!.add_description desc`
 
@@ -150,4 +150,3 @@ _
   probably be way too shouty (consdier basics like `push`). A world
   where there were always few side effects from method calls would also
   be interesting (..)
-_

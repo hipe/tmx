@@ -22,14 +22,12 @@ module Skylab::TestSupport::TestSupport
 
       call :list_files, :test_directory, _test_directory_no_exist
 
-      ev = nil
-      expect :info, :event, :find_command_args do |ev_|
-        ev = ev_
+      expect :info, :event, :find_command_args do |ev|
+        ev || fail
       end
 
-      ev2 = nil
-      expect :error, :find_error do |ev_|
-        ev2 = ev_
+      expect :error, :find_error do |ev|
+        ev || fail
       end
 
       ignore_these_common_emissions_

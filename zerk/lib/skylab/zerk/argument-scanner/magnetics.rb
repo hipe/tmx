@@ -47,7 +47,7 @@ module Skylab::Zerk
 
         def __at_against_hash
           @_arglist_.advance_one
-          @operator_branch = Magnetics::OperatorBranch_via_Hash.new @_arglist_.gets_one
+          @operator_branch = Here_::OperatorBranch_via_Hash[ @_arglist_.gets_one ]
           NIL
         end
 
@@ -121,38 +121,6 @@ module Skylab::Zerk
       attr_reader(
         :request,
       )
-    end
-
-    class OperatorBranch_via_Hash
-
-      # frontier adaptation of #[#051] (hashes)
-
-      def initialize h
-        @hash = h
-      end
-
-      def emit_idea_by
-        NOTHING_
-      end
-
-      def lookup_softly k
-        @hash[ k ]
-      end
-
-      def entry_value k
-        @hash.fetch k
-      end
-
-      def to_pair_stream
-        h = @hash
-        to_normal_symbol_stream do |k|
-          Common_::Pair.via_value_and_name h.fetch( k ), k
-        end
-      end
-
-      def to_normal_symbol_stream & p
-        Stream_[ @hash.keys, & p ]
-      end
     end
 
     class PrimaryValue_via_ParseRequest < Common_::Actor::Dyadic

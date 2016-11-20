@@ -43,7 +43,7 @@ module Skylab::Zerk
 
       def available_branch_item_name_stream_via_operator_branch ob, _
 
-        ob.to_normal_symbol_stream do |sym|
+        ob.to_normal_symbol_stream.map_by do |sym|
 
           Common_::Name.via_variegated_symbol sym
         end
@@ -158,7 +158,7 @@ module Skylab::Zerk
 
           x = @request.operator_branch.lookup_softly k
           if x
-            _obe = Home_::ArgumentScanner::OperatorBranchEntry.new x, k
+            _obe = Home_::ArgumentScanner::OperatorBranchItem.via_user_value_and_normal_symbol x, k
             @_::ItemFound_via_Item[ _obe ]
           else
             @_::ItemNotFound_via_ReasoningSymbol[ :unknown_primary ]
@@ -170,7 +170,7 @@ module Skylab::Zerk
           @argument_scanner.__receive_CPS_ item.branch_item_normal_symbol
 
           if @request.do_result_in_value
-            item.value
+            item.branch_item_value
           else
             item
           end

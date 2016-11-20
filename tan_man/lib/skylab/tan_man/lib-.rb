@@ -46,10 +46,6 @@ module Skylab::TanMan
 
     String_IO = stdlib[ :StringIO ]
 
-    String_lib = -> do
-      Basic[]::String
-    end
-
     String_scanner = Common_.memoize do
       require 'strscan'
       ::StringScanner

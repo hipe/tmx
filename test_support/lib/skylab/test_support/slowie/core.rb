@@ -7,6 +7,7 @@ module Skylab::TestSupport
       def call * a, & listener
 
         Require_zerk_[]
+
         _as = Zerk_::API::ArgumentScanner.via_array a, & listener
 
         _invo = begin_invocation_by _as do |api|
@@ -38,6 +39,8 @@ module Skylab::TestSupport
 
       @argument_scanner = scn
       @listener = scn.listener
+
+      __init_operator_branch
     end
 
     def test_file_name_pattern_by & p
@@ -56,74 +59,22 @@ module Skylab::TestSupport
 
     def __to_bound_call_when_arguments
 
-      sct = @argument_scanner.match_branch(
-        :primary, :value, :against_hash, Primaries_hash__[] )
+      item_of_compound_branch = @argument_scanner.match_branch(
+        :primary, :value, :against_branch, @_operator_branch )
 
-      if sct
-        send sct.bound_call_method_name, sct
-      end
-    end
+      if item_of_compound_branch
 
-    Primaries_hash__ = Lazy_.call do
+        ro = item_of_compound_branch.mixed_user_value  # #here
 
-      # like boxxy but more simplified and rigid and ad-hoc.
-      # tracked by #[#ze-051] (similar elsewhere).
-
-      h = {
-        ping: ViaMethods___.new( :__invoke_ping, :__describe_ping ),
-      }
-
-      st = Here_::Operations.entry_tree.to_state_machine_stream
-      begin
-        sm = st.gets
-        sm || break
-        name = Common_::Name.via_slug sm.entry_group_head
-        h[ name.as_lowercase_with_underscores_symbol ] = ViaAssetNode___.new name
-        redo
-      end while above
-      h
-    end
-
-    ViaAssetNode___ = ::Struct.new :name do
-
-      def didactics_method_name
-        :__didactics_for_class_based_operation
-      end
-
-      def description_method_name
-        :__description_proc_for_class_based_operation
-      end
-
-      def bound_call_method_name
-        :__bound_call_for_class_based_operation
-      end
-
-      def has_name
-        false
-      end
-
-    end
-
-    ViaMethods___ = ::Struct.new :invocation_method_name, :description_proc_method_name do
-
-      def didactics_method_name
-        :__didactics_for_method_based_operation
-      end
-
-      def description_method_name
-        :_desc_proc_for_method_based_operation
-      end
-
-      def bound_call_method_name
-        :__bound_call_for_method_based_operation
+        send ro.bound_call_method_name, ro
       end
     end
 
     # ~
 
-    def __didactics_for_class_based_operation y, sct
+    def __didactics_for_class_based_operation y, ro
 
-      cls = _operation_class_via_name sct.name
+      cls = ro.operation_class
 
       y.yield :is_branchy, false
 
@@ -143,11 +94,11 @@ module Skylab::TestSupport
       end
     end
 
-    def __didactics_for_method_based_operation y, sct
+    def __didactics_for_method_based_operation y, ro
 
       y.yield :is_branchy, false
 
-      y.yield :description_proc, _desc_proc_for_method_based_operation( sct )
+      y.yield :description_proc, _desc_proc_for_method_based_operation( ro )
 
       y.yield :description_proc_reader, -> k do
         ::Kernel._K  # no primaries yet for ping
@@ -161,47 +112,43 @@ module Skylab::TestSupport
 
     # ~
 
-    def __description_proc_for_class_based_operation sct
-      _operation_class_via_name( sct.name )::DESCRIPTION
+    def __description_proc_for_class_based_operation ro
+      ro.operation_class::DESCRIPTION
     end
 
-    def _desc_proc_for_method_based_operation sct
-      method sct.description_proc_method_name
+    def _desc_proc_for_method_based_operation ro
+      method ro.description_proc_method_name
     end
 
     # ~
 
-    def __bound_call_for_class_based_operation sct
+    def __bound_call_for_class_based_operation ro
 
       @argument_scanner.advance_one
 
-      _class = _operation_class_via_name sct.name
+      _class = ro.operation_class
 
       op = _class.new { self }  # any resources operator needs, it must ask
 
-      _emit_operator_resolved sct do |y|
-        y.yield :name, sct.name
+      _emit_operator_resolved ro do |y|
+        y.yield :name, ro.name
         y.yield :operator_instance, op
       end
 
       Common_::Bound_Call.via_receiver_and_method_name op, :execute
     end
 
-    def _operation_class_via_name name
-      Here_::Operations.const_get name.as_camelcase_const_string, false
-    end
+    def __bound_call_for_method_based_operation ro
 
-    def __bound_call_for_method_based_operation sct
-
-      _emit_operator_resolved sct do |y|
+      _emit_operator_resolved ro do |y|
         y.yield :name_symbol, @argument_scanner.current_primary_symbol
         y.yield :operator_instance, :_ts_not_a_class_based_operation_  # in case you ask
       end
 
-      Common_::Bound_Call.via_receiver_and_method_name self, sct.invocation_method_name
+      Common_::Bound_Call.via_receiver_and_method_name self, ro.invocation_method_name
     end
 
-    def _emit_operator_resolved sct
+    def _emit_operator_resolved ro
 
       # tell the remote client that we have resolved an operator (necessary
       # for help screens, for other reflection of current operator instance)
@@ -211,7 +158,7 @@ module Skylab::TestSupport
         y.yield :argument_scanner, @argument_scanner
 
         y.yield :define_didactics_by, -> dida_y do
-          send sct.didactics_method_name, dida_y, sct
+          send ro.didactics_method_name, dida_y, ro
         end
 
         yield y
@@ -288,9 +235,14 @@ module Skylab::TestSupport
 
     def description_proc_reader
       -> k do
-        sct = Primaries_hash__[][ k ]
-        if sct
-          send sct.description_method_name, sct
+
+        item_of_compound_branch = @_operator_branch.lookup_softly k
+
+        if item_of_compound_branch
+
+          ro = item_of_compound_branch.mixed_user_value  # #here
+
+          send ro.description_method_name, ro
         else
           NOTHING_  # ick when help is injected or ..?
         end
@@ -298,7 +250,8 @@ module Skylab::TestSupport
     end
 
     def to_item_normal_tuple_stream
-      Stream_.call Primaries_hash__[].keys do |sym|
+
+      @_operator_branch.to_normal_symbol_stream.map_by do |sym|
         [ :primary, sym ]
       end
     end
@@ -340,12 +293,51 @@ module Skylab::TestSupport
       Here_::Models_::TestDirectoryCollection.new _op_id, self
     end
 
+    # --
+
+    def __init_operator_branch
+
+      Require_zerk_[]
+
+      lib = Zerk_::ArgumentScanner
+
+      _ping_ob = lib::OperatorBranch_via_FREEFORM.define do |defn|
+        defn.add :ping, MethodBasedRouting___.new( :__invoke_ping, :__describe_ping )
+      end
+
+      _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define(
+        Here_::Operations
+      ) do |o|
+        o.item_class ModuleBasedRouting___
+      end
+
+      @_operator_branch = lib::OperatorBranch_via_MultipleEntities.define do |o|
+
+        o.add_entity_and_operator_branch :_ignored_ts_, _main_ob
+
+        o.add_entity_and_operator_branch :_ignored_ts_, _ping_ob
+      end
+
+      NIL
+    end
+
+    # --
+
     attr_reader(
       :argument_scanner,
       :listener,
     )
 
     # ==
+
+    Parse_any_remaining_ = -> op, as do
+      if as.no_unparsed_exists
+        ACHIEVED_
+      else
+        _ = Zerk_::ArgumentScanner::Syntaxish.via_operator_branch op.operator_branch
+        _.parse_all_into_from op, as
+      end
+    end
 
     DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
       if x
@@ -393,6 +385,61 @@ module Skylab::TestSupport
       attr_reader(
         :path,
       )
+    end
+
+    # == (would go up) :#here
+
+    class ModuleBasedRouting___
+
+      def initialize sm, mod
+        @module = mod
+        @name = Common_::Name.via_slug sm.entry_group_head
+      end
+
+      def operation_class
+        @module.const_get @name.as_camelcase_const_string, false
+      end
+
+      def didactics_method_name
+        :__didactics_for_class_based_operation
+      end
+
+      def description_method_name
+        :__description_proc_for_class_based_operation
+      end
+
+      def bound_call_method_name
+        :__bound_call_for_class_based_operation
+      end
+
+      attr_reader(
+        :name,
+      )
+    end
+
+    class MethodBasedRouting___
+
+      def initialize _, __
+        @description_proc_method_name = __
+        @invocation_method_name = _
+      end
+
+      attr_reader(
+        :description_proc_method_name,
+        :invocation_method_name,
+      )
+
+      def didactics_method_name
+        :__didactics_for_method_based_operation
+      end
+
+      def description_method_name
+        :_desc_proc_for_method_based_operation
+      end
+
+      def bound_call_method_name
+        :__bound_call_for_method_based_operation
+      end
     end
 
     # ==

@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
 
         begin
           argv 'wittgenshtein', 'nopeka'
-        rescue Home_::NonInteractiveCLI::Custom_Effection___::Find::No => e
+        rescue Home_::CLI::CustomEffection_via_Client_and_MixedResult::Find::No => e
         end
 
         e

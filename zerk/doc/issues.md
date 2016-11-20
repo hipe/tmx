@@ -1,8 +1,10 @@
+[#056]       [ syntaxish ]
+
 [#055]       [ didactics ]  (currently spliced into [#br-089]  )
 
 [#054]       [track help screen test library]
 
-[#053]       compound parse..
+[#053]       feature injection through compounded primaries..
 
 [#052]       argument scanner ("a.s")
 

@@ -16,21 +16,17 @@ module Skylab::TestSupport
         test_directory: :__parse_test_directory,
       }
 
-      # (if you don't know what a "globber" is, see #slowie-spot-1)
+      # (a "globber" is .. #slowie-spot-1)
 
       def initialize
 
+        @operator_branch = Zerk_::ArgumentScanner::OperatorBranch_via_Hash[ PRIMARIES ]
+
         o = yield
 
-        @syntax_front = Here_::Models_::HashBasedSyntax.new(
-          o.argument_scanner, PRIMARIES, self )
-
+        @__argscn = o.argument_scanner
         @test_directory_collection = o.build_test_directory_collection
       end
-
-      attr_reader(  # for pre-execution syntax hacks
-        :test_directory_collection,
-      )
 
       def execute
         if __normal
@@ -47,25 +43,23 @@ module Skylab::TestSupport
 
       # == boilerplate
 
-      def __normal
-        _yes = @syntax_front.parse_arguments
-        _yes &&= @test_directory_collection.check_for_missing_requireds
-        _yes  # #todo
+      def at_from_syntaxish bi
+        send bi.branch_item_value
       end
 
-      # [#tmx-006] and friends
-
-      attr_reader(
-        :syntax_front,
-      )
-
-      def parse_present_primary_for_syntax_front_via_branch_hash_value m
-        send m
+      def __normal
+        _ok = Parse_any_remaining_[ self, remove_instance_variable( :@__argscn ) ]
+        _ok && @test_directory_collection.check_for_missing_requireds
       end
 
       def __parse_test_directory
         @test_directory_collection.parse_test_directory
       end
+
+      attr_reader(  # for pre-execution syntax hacks
+        :operator_branch,
+        :test_directory_collection,
+      )
     end
   end
 end

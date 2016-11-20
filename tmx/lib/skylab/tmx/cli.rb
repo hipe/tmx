@@ -219,7 +219,7 @@ module Skylab::TMX
           if bc.receiver.respond_to? :test_directory_collection
 
             CLI::Magnetics_::BoundCall_via_TestDirectoryOrientedOperation.new(
-              bc, @selection_stack.last.argument_scanner, self ).execute  # :#here
+              bc, @selection_stack.last.argument_scanner, self ).execute
           else
             bc
           end
@@ -268,7 +268,7 @@ module Skylab::TMX
 
         o.argument_scanner = __argument_scanner_for_reports
 
-        _bound_call_via_API_invocation o
+        o.to_bound_call_of_operator
       end
 
       def __argument_scanner_for_reports  # see [#ze-052]
@@ -304,7 +304,7 @@ module Skylab::TMX
 
         o.argument_scanner = __argument_scanner_for_map
 
-        _bound_call_via_API_invocation o
+        o.to_bound_call_of_operator
       end
 
       def __express_stream_of_map_nodes st
@@ -367,7 +367,7 @@ module Skylab::TMX
           :business_item, :passively, :exactly, :against_branch, col )
 
         if o
-          @__one_off_branch_value = o ; ACHIEVED_
+          @__one_off_branch_item = o ; ACHIEVED_
         else
           @__one_off_dir_operator_branch = col ; UNABLE_
         end
@@ -397,9 +397,9 @@ module Skylab::TMX
 
         @argv.advance_one
 
-        _branch = remove_instance_variable :@__one_off_branch_value
+        _branch = remove_instance_variable :@__one_off_branch_item
 
-        one_off = _branch.value
+        one_off = _branch.branch_item_value
 
         one_off.terminal_name
 
@@ -471,6 +471,15 @@ module Skylab::TMX
       def _express_help
 
         top = @selection_stack.last
+        is_root = 1 == @selection_stack.length
+
+        if ! is_root
+          as = top.argument_scanner
+          # #changed-recently:  #todo
+          HELP_RX =~ as.head_as_is || self._CHANGED_RECENTLY
+          as.advance_one
+        end
+
         di = top.to_didactics  # buckle up
 
         # -- derive things from the didactics
@@ -484,8 +493,7 @@ module Skylab::TMX
 
         # -- maybe alter things by the argument scanner
 
-        if 1 != @selection_stack.length
-          as = top.argument_scanner
+        if ! is_root
           desc_reader = as.altered_description_proc_reader_via desc_reader
           items = as.altered_normal_tuple_stream_via items
         end
@@ -562,8 +570,8 @@ module Skylab::TMX
         if @_do_lipstick && 1 == d
 
           # for now we render "lipstick" only if and always if there is
-          # exactly one numeric field, and it is last. later we will do it
-          # over some --verbose threshold.
+          # exactly one numeric field, and it is last, and the -verbose
+          # primary was used past some threshold number of times.
 
           # add a whole cel to each row dedicated to being rendered as lipstick:
 
@@ -644,11 +652,6 @@ module Skylab::TMX
 
       def release_test_directory_entry_name_by__
         remove_instance_variable :@__test_directory_entry_name_by
-      end
-
-      def _bound_call_via_API_invocation o
-        @API_invocation_ = o
-        o.to_bound_call_of_operator
       end
 
       # --
@@ -754,7 +757,6 @@ module Skylab::TMX
       )
 
       attr_reader(
-        :API_invocation_,
         :listener,
         :_emission_handler_methods_,
         :program_name_string_array,

@@ -327,7 +327,7 @@ module Skylab::Zerk
 
         def __available_primary_name_stream_via_operator_branch ob
 
-          _st = ob.to_normal_symbol_stream do |sym|
+          _st = ob.to_normal_symbol_stream.map_by do |sym|
             [ :primary, sym ]
           end
 
@@ -338,7 +338,7 @@ module Skylab::Zerk
 
         def __available_business_name_stream_via_operation_branch ob
 
-          ob.to_normal_symbol_stream do |sym|
+          ob.to_normal_symbol_stream.map_by do |sym|
             Common_::Name.via_variegated_symbol sym
           end
         end
@@ -365,7 +365,7 @@ module Skylab::Zerk
 
           if itr.has_addeds
 
-            _ = itr.addeds_as_operator_branchish.to_normal_symbol_stream do |sym|
+            _ = itr.addeds_as_operator_branchish.to_normal_symbol_stream.map_by do |sym|
               [ :primary, sym ]
             end
 
@@ -525,13 +525,14 @@ module Skylab::Zerk
             end
             item = x
 
-            as.__receive_CPS_ item.branch_item_normal_symbol
-
             if item.is_more_backey_than_frontey
+
+              as.__receive_CPS_ item.branch_item_normal_symbol
+
               break  # "backey" item is found - done.
             end
 
-            x = item.value.call
+            x = item.branch_item_value.call
             if ! x  # custom frontend proc interrupts flow #scn-coverpoint-1-A
               break
             end
@@ -548,7 +549,7 @@ module Skylab::Zerk
           end while above
 
           if x && @request.do_result_in_value
-            x = x.value
+            x = x.branch_item_value
           end
 
           x
@@ -782,9 +783,9 @@ module Skylab::Zerk
           k = @_real_scn.current_token.name_x
           k == wfr.well_formed_symbol || self._SANITY
 
-          _x = wfr.request.operator_branch.entry_value k
+          _x = wfr.request.operator_branch.dereference k
 
-          _dbi = DefaultedBranchItem___.new _x, k
+          _dbi = DefaultedBranchItem___.via_user_value_and_normal_symbol _x, k
 
           AS_Lib__::Magnetics::ItemFound_via_Item[ _dbi ]
         end
@@ -891,7 +892,7 @@ module Skylab::Zerk
           end
           itr = nil
 
-          fuz.visit OperatorBranchEntry__, wfr.request.operator_branch
+          fuz.visit OperatorBranchItem__, wfr.request.operator_branch
 
           catzn = fuz.maybe_finish
           if catzn
@@ -1083,11 +1084,11 @@ module Skylab::Zerk
             p = @_addeds_box[ k ]
           end
           if p
-            item = AddedBranchItem__.new p, k
+            item = AddedBranchItem__.via_user_value_and_normal_symbol p, k
           else
             x = wfr.request.operator_branch.lookup_softly k
             if x
-              item = OperatorBranchEntry__.new x, k
+              item = OperatorBranchItem__.via_user_value_and_normal_symbol x, k
             end
           end
 
@@ -1101,7 +1102,7 @@ module Skylab::Zerk
           k = wfr.well_formed_symbol
           x = req.operator_branch.lookup_softly k
           if x
-            _item = OperatorBranchEntry__.new x, k
+            _item = OperatorBranchItem__.via_user_value_and_normal_symbol x, k
             AS_Lib__::Magnetics::ItemFound_via_Item[ _item ]
           elsif req.do_fuzzy_lookup
             __business_categorization_fuzzily wfr
@@ -1113,7 +1114,7 @@ module Skylab::Zerk
         def __business_categorization_fuzzily wfr
 
           fuz = Fuzz__.new wfr.well_formed_symbol
-          fuz.visit OperatorBranchEntry__, wfr.request.operator_branch
+          fuz.visit OperatorBranchItem__, wfr.request.operator_branch
           catzn = fuz.maybe_finish
           if catzn
             catzn
@@ -1161,8 +1162,8 @@ module Skylab::Zerk
           @_box.to_pair_stream
         end
 
-        def to_normal_symbol_stream & p
-          @_box.to_name_stream( & p )
+        def to_normal_symbol_stream
+          @_box.to_name_stream
         end
       end
 
@@ -1185,7 +1186,9 @@ module Skylab::Zerk
             pair || break
             k = pair.name_symbol
             @rx =~ k || redo
-            ( @a ||= [] ).push cls.new( pair.value_x, pair.name_symbol )
+            ( @a ||= [] ).push(
+              cls.via_user_value_and_normal_symbol(
+                pair.value_x, pair.name_symbol ) )
             redo
           end while above
           NIL
@@ -1286,7 +1289,7 @@ module Skylab::Zerk
         end
       end
 
-      OperatorBranchEntry__ = AS_Lib__::OperatorBranchEntry
+      OperatorBranchItem__ = AS_Lib__::OperatorBranchItem
     end
   end
 end

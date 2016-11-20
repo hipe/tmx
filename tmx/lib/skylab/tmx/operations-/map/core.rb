@@ -12,6 +12,7 @@ module Skylab::TMX
     # -
 
       def initialize & p
+
         @attributes_module_by = nil
         @_emit = p
         @_has_pager = false
@@ -19,6 +20,9 @@ module Skylab::TMX
         @_parse_formal_attribute = :__parse_formal_attribute_the_first_time
         @_seen_last_reorder_plan = false
         @stream_modifiers_were_used = false
+
+        @operator_branch = Zerk_::ArgumentScanner::
+          OperatorBranch_via_Hash[ PRIMARIES___ ]
       end
 
       def json_file_stream_by= x  # for [#006]
@@ -149,7 +153,7 @@ module Skylab::TMX
         if ! @argument_scanner.no_unparsed_exists
 
           @__matcher = @argument_scanner.matcher_for(
-            :primary, :value, :against_hash, PRIMARIES__ )
+            :primary, :value, :against_branch, @operator_branch )
 
           begin
             ok = __parse_one_primary_term
@@ -203,27 +207,9 @@ module Skylab::TMX
         }
       end
 
-      # -- for [#006]
-
-      def syntax_front
-        @___sf ||= ___build_syntax_front
-      end
-
-      def ___build_syntax_front
-        ::Skylab::TestSupport::Slowie::Models_::HashBasedSyntax.new(
-          @argument_scanner, PRIMARIES__, self
-        ) do |o|
-          o.always_advance_scanner
-        end
-      end
-
-      def parse_present_primary_for_syntax_front_via_branch_hash_value m
-        send m
-      end
-
       # --
 
-      PRIMARIES__ = {
+      PRIMARIES___ = {
 
         page_by: :__parse_page_by,  # break alpha. order - higher-level higher
 
@@ -234,6 +220,11 @@ module Skylab::TMX
         result_in_tree: :__parse_result_in_tree,
         select: :__parse_select_expression,
       }
+
+      def at_from_syntaxish item
+        @argument_scanner.advance_one  # per our own local parse model
+        send item.branch_item_value
+      end
 
       # -- the 'order' primary
 
@@ -321,7 +312,7 @@ module Skylab::TMX
       end
 
       def __parse_attributes_module_by
-        _parse_into :@attributes_module_by
+        __parse_into :@attributes_module_by
       end
 
       # -- support for primaries
@@ -396,16 +387,9 @@ module Skylab::TMX
         @argument_scanner.current_primary_symbol
       end
 
-      define_method :_parse_into, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_
+      define_method :__parse_into, DEFINITION_FOR_THE_METHOD_CALLED_PARSE_INTO_
 
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-
-      # --
-
-      attr_reader(
-        :argument_scanner,  # for collaborators
-        :stream_modifiers_were_used,  # for [#006]
-      )
+      # == boilerplate
 
       # -- help screen boilerplate
 
@@ -418,10 +402,18 @@ module Skylab::TMX
       end
 
       def to_item_normal_tuple_stream
-        Stream_.call PRIMARIES__.keys do |sym|
+        @operator_branch.to_normal_symbol_stream.map_by do |sym|
           [ :primary, sym ]
         end
       end
+
+      # ~
+
+      attr_reader(
+        :argument_scanner,  # for collaborators
+        :operator_branch,  # for [#006] feature injection
+        :stream_modifiers_were_used,  # ditto
+      )
     # -
 
     # ==

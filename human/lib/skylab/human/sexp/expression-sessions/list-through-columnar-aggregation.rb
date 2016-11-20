@@ -47,7 +47,7 @@ module Skylab::Human
 
       def template=
 
-        @nucleus.template = Home_.lib_.basic::String.template.via_string(
+        @nucleus.template = Home_.lib_.basic::String::Template.via_string(
           gets_one_polymorphic_value )
 
         via_template_parse_remainder_of_polymorphic_stream polymorphic_upstream

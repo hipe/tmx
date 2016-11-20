@@ -1,8 +1,8 @@
 module Skylab::Zerk
 
-  class NonInteractiveCLI
+  module CLI
 
-    module Custom_Effection___  # code notes in [#037]
+    module CustomEffection_via_Client_and_MixedResult
 
       class Find < Common_::Actor::Dyadic
 
@@ -12,7 +12,6 @@ module Skylab::Zerk
         end
 
         def execute
-
           __orient
           __determine_from_module_and_maybe_reorient
           _ok = __attempt_to_resolve_value_for_const_array
@@ -131,4 +130,3 @@ module Skylab::Zerk
     end
   end
 end
-# #pending-rename (look at usage in this lib)
