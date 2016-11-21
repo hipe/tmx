@@ -136,7 +136,7 @@ module Skylab::Brazen
 
         fld_a = @_fld_a
 
-        # see [#096.J] the cel pipeline
+        # see [#001.J] the cel pipeline
 
         # converts user datapoints into the arguments passed to celifiers:
 

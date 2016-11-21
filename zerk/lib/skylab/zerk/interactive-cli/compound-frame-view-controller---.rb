@@ -84,7 +84,7 @@ module Skylab::Zerk
 
     class Express_as_table___
 
-      # render a two-column table with names and "item text"  #[#br-096]
+      # render a two-column table with names and "item text"  #[#tab-001]
 
       def initialize y, _
 

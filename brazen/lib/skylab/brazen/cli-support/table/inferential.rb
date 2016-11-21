@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  module CLI_Support::Table::Inferential  # [#096.C]
+  module CLI_Support::Table::Inferential  # [#001.C]
 
     # emigrated from [hl] - this file has some ANCIENT style in it...
 

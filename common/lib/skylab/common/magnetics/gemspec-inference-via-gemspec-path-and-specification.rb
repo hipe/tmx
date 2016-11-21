@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  class Magneticis::GemspecInference_via_GemspecPath_and_Specification
+  class Magnetics::GemspecInference_via_GemspecPath_and_Specification
 
     class << self
       alias_method :begin, :new

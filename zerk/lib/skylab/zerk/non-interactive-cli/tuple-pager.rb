@@ -18,7 +18,7 @@ module Skylab::Zerk
       # a string. the onus is on the client to convert non-strings to string
       # representation and populate nil fields with the empty string.
       #
-      # as happens in four or five [#br-096] previous table implementations,
+      # as happens in four or five [#tab-001] previous table implementations,
       # the tuples are traversed in a double-pass so that each column's width
       # is determined by the widest string in that column. but UNLIKE any of
       # those, we avoid assuming that there's infinite memory by placing a

@@ -53,7 +53,7 @@ module Skylab::Brazen
       def __when_at_least_one_row
 
         # a ball-of-mud synopsis of the general algorithm of this whole
-        # lib (explained obliquely at [#096.J]):
+        # lib (explained obliquely at [#001.J]):
 
         am = @_am
         maxes = ::Hash.new 0
@@ -80,7 +80,7 @@ module Skylab::Brazen
 
         celifiers = {}
         maxes.each_pair do | d, w |
-          fmt = "%-#{ w }s"  # [#096.F] the default is to align left
+          fmt = "%-#{ w }s"  # [#001.F] the default is to align left
           celifiers[ d ] = -> s do
             fmt % s
           end

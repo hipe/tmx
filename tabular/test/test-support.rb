@@ -1,13 +1,14 @@
-module Skylab::Brazen::TestSupport
+require 'skylab/tabular'
+require 'skylab/test_support'
 
-  module CLI_Support::Table::Actor
+module Skylab::Tabular::TestSupport
 
-    class << self
+  Home_ = ::Skylab::Tabular
+  TestSupport_ = ::Skylab::TestSupport
 
-      def [] tcc
-        tcc.include self
-      end
-    end  # >>
+  extend TestSupport_::Quickie
+
+    if false  # while #open [#002]
 
     def subject_
       Home_::CLI_Support::Table::Actor
@@ -30,5 +31,5 @@ module Skylab::Brazen::TestSupport
     def done_
       ( @_d + 1 ) == @_y.length or fail "extra line"
     end
-  end
+    end
 end

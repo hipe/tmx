@@ -37,7 +37,7 @@
 [#098]       ouroboros ..
 [#097] #hole
              ( #was: get this ellipsis hack out )
-[#096] #open the (CLI) table narrative ..
+[#096] #hole ( #was: open the (CLI) table narrative )
 [#095] #hole (#was: old o.p notes)
              (#was: features that [fa] has that you don't #universal)
 [#094]       expression agents adjunct notes ..

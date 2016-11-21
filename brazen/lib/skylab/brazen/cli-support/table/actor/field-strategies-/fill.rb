@@ -20,7 +20,7 @@ module Skylab::Brazen
         self._DESIGN_ME
       end
 
-      def receive_stream_after__fill__ st  # see article [#096.I]
+      def receive_stream_after__fill__ st  # see article [#001.I]
 
         _fill = Fill_Model.new_via_polymorphic_stream_passively st
 

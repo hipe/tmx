@@ -2,7 +2,8 @@
 
 require 'skylab/git_viz'
 
-_x = Skylab::GitViz::CLI.new( $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).
-  invoke ARGV
+_x = Skylab::GitViz::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
 
 $stderr.puts "(exitstatus: #{ _x })"

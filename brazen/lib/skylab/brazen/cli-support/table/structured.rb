@@ -2,7 +2,7 @@ module Skylab::Brazen
 
   # -> 2
 
-      class CLI_Support::Table::Structured  # see [#096.D]
+      class CLI_Support::Table::Structured  # see [#001.D]
 
         # ~ defining a table
 

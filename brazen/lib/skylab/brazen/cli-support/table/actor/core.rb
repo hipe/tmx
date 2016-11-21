@@ -1,6 +1,6 @@
 module Skylab::Brazen
 
-  class CLI_Support::Table::Actor  # see [#096.B]
+  class CLI_Support::Table::Actor  # see [#001.B]
 
     class << self
 

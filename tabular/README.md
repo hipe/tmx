@@ -1,4 +1,43 @@
-# the table narrative :[#096]
+# the table narrative :[#001]
+
+## objective & scope
+
+"tabular" is a toolkit for table-oriented transformations on streams.
+its canonic and minimally interesting use case is to help produce an
+ASCII table with columns justified from tuples of data.
+
+
+
+
+## brief history
+
+this library is a culmination and full overhaul and distillation of six
+(6) other disparate libraries that did more or less the same thing (or
+different aspects of the same kind of thing).
+
+there are very old paragraphs interspersed with very new ones in this
+document. as they are not always cleanly contiguous, we will have the
+work of the final (EDIT) for after we have achieved full overhaul
+and unification.
+
+
+
+
+## approach
+
+rather than hide the (mostly mundane) compuation of typical use-cases
+behind a black box "power function" that does everything transparently,
+we prefer to make the focus of this library this: to expose a disjoint
+collection of highly modular (and small!) independant but mutually-
+compatible building blocks that can be pieced together in obvious ways
+to produce a variety of table-oriented stream-shaped data for a variety
+of use-cases and [#br-002] modalities, suitable for both user-facing
+output and maybe even internal map-reduce and sort-related techniques.
+
+(there probably *will* be a black-box god-like function somewhere at
+the front of this, but we just perfer not to make it the focus of the
+library.)
+
 
 
 ## about this document & the many tables

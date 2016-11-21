@@ -37,7 +37,7 @@ module Skylab::Brazen
 
       class Dynamic_Dependency
 
-        # if you are tempted to simplify this out, read [#096.I]: because
+        # if you are tempted to simplify this out, read [#001.I]: because
         # fields are re-used and inheritable, we must do this all at once,
         # discretely.
 

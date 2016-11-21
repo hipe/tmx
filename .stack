@@ -12,3 +12,14 @@ use [sa] to convert etc to Stream_
 -3.2 omni help screen system [#tmx-018]
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
+git rebase and squash around the other guys appropriately
+make report showing the relative weights of the changesets
+CLI-invoked general table renderer
+join [#tab-002] (several sub-items here)
+one by one, rewrite the components
+rename everything
+decide also how the tests will be renamed accordingly
+decide how each element under (legacy) [br] table actor will fit (other guys too)
+think about tabular architecture (streams, modalities, etc)
+start tabular gem
+look into awk tricks
