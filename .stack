@@ -20,6 +20,3 @@ one by one, rewrite the components
 rename everything
 decide also how the tests will be renamed accordingly
 decide how each element under (legacy) [br] table actor will fit (other guys too)
-think about tabular architecture (streams, modalities, etc)
-start tabular gem
-look into awk tricks
