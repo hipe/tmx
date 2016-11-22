@@ -8,8 +8,8 @@ module Skylab::Tabular::TestSupport
 
       pipe = Home_::Pipeline.define do |o|
         o << :StringifiedTupleStream_via_MixedTupleStream
-        o << :JustifiedCollection_via_StringifiedTupleStream
-        o << :LineStream_via_JustifiedCollection
+        o << :JustifiedPage_via_StringifiedTupleStream
+        o << :LineStream_via_JustifiedPage
       end
 
       _tu_st = Home_::Common_::Stream.via_nonsparse_array(

@@ -83,5 +83,6 @@ module Skylab::Tabular::TestSupport
   # -
   # ==
 
+  NOTHING_ = nil
   TS_ = self
 end

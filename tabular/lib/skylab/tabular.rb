@@ -6,8 +6,8 @@ module Skylab::Tabular
   #
   #     pipe = Home_::Pipeline.define do |o|
   #       o << :StringifiedTupleStream_via_MixedTupleStream
-  #       o << :JustifiedCollection_via_StringifiedTupleStream
-  #       o << :LineStream_via_JustifiedCollection
+  #       o << :JustifiedPage_via_StringifiedTupleStream
+  #       o << :LineStream_via_JustifiedPage
   #     end
   #
   #     _tu_st = Home_::Common_::Stream.via_nonsparse_array(
@@ -52,9 +52,12 @@ module Skylab::Tabular
     alias_method :[], :call
   end
 
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+
   module Magnetics
 
-    LineStream_via_JustifiedCollection = -> jc do
+    LineStream_via_JustifiedPage = -> jc do
 
       # (this could be said to replace what was once [#001.A], a feature island)
 
@@ -117,7 +120,7 @@ module Skylab::Tabular
       format
     end
 
-    JustifiedCollection_via_StringifiedTupleStream = -> st do
+    JustifiedPage_via_StringifiedTupleStream = -> st do
 
       schema = Models::Schema.__new_mutable_
       stringified_tuples = []
@@ -132,7 +135,7 @@ module Skylab::Tabular
         redo
       end while above
 
-      Models_::JustifiedCollection.new schema, stringified_tuples
+      Models_::JustifiedPage.new schema, stringified_tuples
     end
 
     StringifiedTupleStream_via_MixedTupleStream = -> st do
@@ -144,14 +147,19 @@ module Skylab::Tabular
         end
       end
     end
+
+    Autoloader_[ self ]
   end
 
-  Models = ::Module.new
+  module Models
+    Autoloader_[ self ]
+  end
+
   Models_ = ::Module.new
 
     # ==
 
-    class Models_::JustifiedCollection
+    class Models_::JustifiedPage
 
       def initialize schema, stringified_tuples
         @schema = schema
@@ -364,13 +372,34 @@ module Skylab::Tabular
 
   # ==
 
+  class << self
+
+    def lib_
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Lib___, self )
+    end
+
+  end  # >>
+
+  # ==
+
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end
 
   # ==
 
-  Common_ = ::Skylab::Common
+  module Lib___
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Basic = sidesys[ :Basic ]
+  end
+
+  # ==
+
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
+
   Home_ = self
   NOTHING_ = nil
 end
