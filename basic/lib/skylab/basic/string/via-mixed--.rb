@@ -2,218 +2,168 @@ module Skylab::Basic
 
   module String
 
-    class Via_Mixed__  # :[#019] #:+[#hu-002] summarization (trivial)
+    module ViaMixed__  # :[#019] #:+[#hu-002] summarization (trivial)
 
       # conceptually similar to sending `inspect` to some mystery value
-      # but configurable: based on the shape and charactersitics of the
-      # value, different callbacks are called effecting ad-hoc behavior
-      # for example ellipsifying long strings, formatting floats, etc.
+      # but has some specialized behavioral "consequences" for certain
+      # "shape categories" - for example if the mixed value is a string
+      # and it is beyond some certain length, the result is ellipsified.
       #
-      # middleface: the instance method called `instance` only
-      #
-      # historical background: the previous olschool implementation was
-      # as a simple curry-intentioned 2-arg proc which made hard-coded
-      # expression decisions and exposed one configurability: the max
-      # width of the output string. the newchool implementation is ..
-      #
-      # design considerations:
-      #
-      #   • all aspects of this should be in the context of the performer.
-      #     avoid plain old procs because there is a chance that we will
-      #     make even shape classification configurable.
+      # this specialized behavior is itself configurable to a certain
+      # degree, and it can be exposed arbitrarily further as needed.
 
       class << self
-        private :new
+
+        def call_via_arglist a
+          if a.length.zero?
+            POLICY__
+          else
+            POLICY__.against( * a )
+          end
+        end
+      end  # >>
+
+      class Policy___
+
+        class << self
+          alias_method :define, :new
+          undef_method :new
+        end  # >>
+
+        def initialize hm
+          yield self
+          @_hook_mesh = hm  # (or before the yield, when needed)
+          freeze
+        end
+
+        def initialize_copy _
+          NOTHING_  # hi. :#here
+        end
+
+        # -- (re) define
+
+        # :#here:
+
+        def non_long_string_by= inspect_p
+          __receive_hook_mutation :non_long_string, inspect_p
+        end
+
+        def __receive_hook_mutation hook_sym, inspect_p  # assume..
+
+          # we assume this is a mutable dup (deprecated). (if it is not the
+          # below ivar assignment will fail.) we make the deep dup of the
+          # hook mesh only lazily (if it is actually necessary) instead of
+          # doing it eagerly (and occasionally wastefully) #here.
+
+          if @_hook_mesh.frozen?
+            @_hook_mesh = @_hook_mesh.dup
+          end
+
+          @_hook_mesh.replace hook_sym do |o|
+            inspect_p[ o.value ]
+          end
+
+          NIL
+        end
+
+        # ~
+
+        attr_writer(
+          :max_width,
+        )
+
+        # -- apply
+
+        def to_proc
+          method :against
+        end
+
+        def against x
+          @_hook_mesh.against_value_and_choices x, self
+        end
+
+        attr_reader(
+          :max_width,
+          :value,
+        )
       end
 
-      define_singleton_method :instance, ( Lazy_.call do
+      _orig = Home_::OMNI_TYPE_CLASSIFICATION_HOOK_MESH_PROTOTYPE
 
-        o = new
-        o.max_width = A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
+      _hook_mesh = _orig.redefine do |defn|
 
-        # (all of the below use attr writers generated at end of file.)
-
-        # ~
-
-        p = -> x, _ do
-          x.inspect
-        end
-        o.on_false = p
-        o.on_nil = p
-        o.on_moduleish = p
-        o.on_nonlong_stringish = p
-        o.on_numericish = p
-        o.on_true = p
-        p = nil
-
-        # ~
-
-        o.on_long_stringish = -> s, o_ do
-
-          _ = String_.ellipsify s, o_.max_width
-          o_.on_nonlong_stringish[ _, o_ ]
+        defn.replace :falseish do |o|
+          o.when( :default )[ o ]
         end
 
-        simple_rx = /\A[[:alnum:] _]+\z/
+        defn.add :symbol do |o|
+          o.when( :default )[ o ]
+        end
 
-        o.on_symbolish = -> sym, _ do
+        defn.add :true do |o|
+          o.when( :default )[ o ]
+        end
 
-          s = sym.id2name
-          if simple_rx =~ s
-            "'#{ s }'"
+        defn.add :zero do |o|
+          o.when( :default )[ o ]
+        end
+
+        defn.replace :numeric do |o|
+          o.when( :default )[ o ]
+        end
+
+        defn.replace :string do |o|
+
+          if o.choices.max_width < o.value.length
+            o.when( :long_string )[ o ]
           else
-            "'#{ s.inspect[ 1 .. -2 ] }'"  # pretend we are JS, meh
+            o.when( :non_long_string )[ o ]
           end
         end
 
-        _qqq = '???'
-        o.on_other = -> x, _ do
+        defn.add :non_long_string do |o|
+          o.when( :default )[ o ]
+        end
 
+        defn.add :long_string do |o|
+
+          _moniker = String_.ellipsify o.value, o.choices.max_width
+
+          o.when( :default )[ o.new_with_value( _moniker ) ]
+        end
+
+        _simple_rx = /\A[[:alnum:] _]+\z/
+
+        defn.replace :symbol do |o|
+
+          sym = o.value
+          if _simple_rx =~ sym
+            "'#{ sym.id2name }'"
+          else
+            sym.inspect
+          end
+        end
+
+        defn.add :other do |o|
+
+          x = o.value
           if x.respond_to? :class
             "< a #{ x.class } >"
           else
-            _qqq
+            '???'
           end
         end
 
-        o.to_proc  # eek - write the ivar before freeze :/
-        o.freeze
-      end )
-
-      def initialize
-        # (hi.)
-      end
-
-      def initialize_copy _
-        @_as_proc = nil  # note below
-      end
-
-      attr_accessor(  # ~ hard-coded configurables
-        :max_width,
-      )
-
-      # -- invocation
-
-      def call_via_arglist a
-
-        Dispatcher___[ 1 <=> a.length ][ * a, self ]
-      end
-
-      Dispatcher___ = {
-
-        -1 => -> d, x, o do
-          o_ = o.dup  # a lot of ivars to dup for one call :/
-          o_.max_width = d
-          o._say_for x
-        end,
-
-        0 => -> x, o do
-          o._say_for x
-        end,
-
-        1 => IDENTITY_
-
-      }.method :fetch
-
-      def to_proc
-
-        # it's crucial that we remember to nilify the below ivar on
-        # dup because it is bound to the instance that creates it.
-        # also we can't just make a method reflection. it has to be
-        # a real proc (so others can use it as their own definition.)
-
-        @_as_proc ||= ___build_proc
-      end
-
-      def ___build_proc
-        me = self  # because proc used as method definition elsewhere
-        -> x do
-          me._say_for x
+        defn.add :default do |o|
+          o.value.inspect
         end
       end
 
-      def _say_for x
+      POLICY__ = Policy___.define _hook_mesh do |o|
 
-        # (this actual invocation method is kept private so that we
-        # internalize the choice of whether or not we implement as a
-        # traditional session with mutable state. for now, we don't.)
-
-        _cx = ___classify x
-        _ivar = _cx.__as_ivar
-        _proc = instance_variable_get _ivar
-        _ = _proc[ x, self ]
-        _
+        o.max_width = A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
       end
-
-      def ___classify x  # (very likely to expose this)
-
-        if x
-          if x.respond_to? :ascii_only?
-
-            if @max_width < x.length
-              LONG_STRINGISH___
-            else
-              NONLONG_STRINISH___
-            end
-
-          elsif x.respond_to? :id2name
-            SYMBOLISH___
-
-          elsif x.respond_to? :divmod
-            NUMERICISH___
-
-          elsif true == x
-            TRUE___
-
-          elsif x.respond_to? :included_modules
-            MODULEISH___
-
-          else
-            OTHER___
-          end
-
-        elsif x.nil?
-          NIL___
-
-        else
-          FALSE___
-        end
-      end
-
-      # -- the shape model
-
-      class Shape___
-
-        def initialize sym
-
-          # we don't use [#bs-028]#A because (and IFF) the
-          # genarated names appear somewhere in this document.
-
-          @_on_foo = :"on_#{ sym }"
-        end
-
-        def __as_ivar
-          @___as_ivar ||= :"@#{ @_on_foo }"
-        end
-
-        attr_reader :_on_foo
-      end
-
-      o = -> sym do
-        shape = Shape___.new sym
-        attr_accessor shape._on_foo
-        shape
-      end
-
-      FALSE___ = o[ :false ]
-      LONG_STRINGISH___ = o[ :long_stringish ]
-      MODULEISH___ = o[ :moduleish ]
-      NIL___ = o[ :nil ]
-      NONLONG_STRINISH___ = o[ :nonlong_stringish ]
-      NUMERICISH___ = o[ :numericish ]
-      OTHER___ = o[ :other ]
-      SYMBOLISH___ = o[ :symbolish ]
-      TRUE___ = o[ :true ]
     end
   end
 end
+# #history: full overhaul to use "hook mesh"

@@ -128,6 +128,7 @@ module Skylab::Basic
     EMPTY_A_ = Home_::EMPTY_A_
     EMPTY_S_ = Home_::EMPTY_S_
     NIL_ = nil
+    NOTHING_ = nil
     TS_ = self
 
     module Constants

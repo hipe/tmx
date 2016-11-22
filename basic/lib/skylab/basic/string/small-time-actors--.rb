@@ -69,10 +69,10 @@ module Skylab::Basic
 
           if @max_width >= @input_string.length
             @input_string
-          elsif @glyph.length > @max_width
-            silly
-          else
+          elsif @glyph.length < @max_width
             work
+          else
+            silly
           end
         end
 

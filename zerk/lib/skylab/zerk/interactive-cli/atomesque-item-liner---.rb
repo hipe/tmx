@@ -78,7 +78,7 @@ module Skylab::Zerk
 
         o = Home_.lib_.basic::String.via_mixed.dup
 
-        o.on_nonlong_stringish = -> s, _ do
+        o.non_long_string_by = -> s do
 
           if _QUOTEWORTHY_RX =~ s
             s.inspect

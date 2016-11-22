@@ -78,7 +78,7 @@ module Skylab::GitViz
 
     strange = Common_::Lazy.call do
 
-      o = Basic[]::String.via_mixed.instance.dup
+      o = Basic[]::String.via_mixed.dup
       o.max_width = 120
       o.to_proc
     end
