@@ -20,3 +20,11 @@ one by one, rewrite the components
 rename everything
 decide also how the tests will be renamed accordingly
 decide how each element under (legacy) [br] table actor will fit (other guys too)
+acceptance: code metrics
+come up with final architecture for lipstick
+move structured to [ze], get basics down (all but lipstick)
+come up with API for pluggable aggregator functions (e.g total)
+renew type inference (before [ze] CLI client)
+we want clients (like [ze]) to be able to provide their own mesh and their own hooks and their own type model
+injection of hooks - a hook mesh that acts as an aggregator
+ghost leg amidajuki / sadaritagi lib
