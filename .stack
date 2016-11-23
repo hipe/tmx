@@ -29,3 +29,4 @@ make tuple pager ([ze]) fit in with statistics
 we want clients (like [ze]) to be able to provide their own mesh and their own hooks and their own type model
 second inference spec
 first inference spec
+numeric characteristics via (floats, ints)

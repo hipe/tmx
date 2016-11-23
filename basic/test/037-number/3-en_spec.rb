@@ -4,7 +4,68 @@ module Skylab::Basic::TestSupport
 
   # <-
 
-describe "[ba] number en" do
+describe "[ba] number en (and stowed-away essentials too)" do
+
+  it "(number) `of_digits_in_positive_integer`" do
+
+    # -
+      p = Home_::Number.method :of_digits_in_positive_integer
+
+      p[ 0 ] == 1 || fail
+      p[ 9 ] == 1 || fail
+      p[ 12 ] == 2 || fail
+      p[ 200 ] == 3 || fail
+    # -
+  end
+
+  context "(number) `of_digits_before_and_after_decimal_in_positive_float` DANGER HERE" do
+
+    it "quintessential normal minimal" do
+
+      d, d_ = _against 3.14
+      d == 1 || fail
+      d_ == 2 || fail
+    end
+
+    it "dangertown - use a sanity max" do
+
+      d, d_ = _against 2.0/3, 5
+      d == 1 || fail
+      d_ == 5 || fail
+    end
+
+    it "edge case: something point zero - it counts the zero as a place" do
+
+      d, d_ = _against 12.0
+      d == 2 || fail
+      d_ == 1 || fail
+    end
+
+    it "same for left of the decimal point - zero counts as a place" do
+
+      d, d_ = _against 0.3056
+      d == 1 || fail
+      d_ == 4 || fail
+    end
+
+    it "integeration - 0.0" do
+
+      d, d_ = _against 0.0
+      d == 1 || fail
+      d_ == 1 || fail
+    end
+
+    it "UH OH: - 1.11 NASTY - we can't use this approach" do
+
+      d, d_ = _against 1.11, 5
+      d == 1 || fail
+      d_ == 5 || fail
+    end
+
+    def _against f, sanity=nil
+      Home_::Number.of_digits_before_and_after_decimal_in_positive_float f, sanity
+    end
+  end
 
   -> do
 
@@ -35,3 +96,4 @@ describe "[ba] number en" do
 end
 # ->
 end
+# #pending-rename - this became core (look at visual too)
