@@ -55,11 +55,11 @@ describe "[ba] number en (and stowed-away essentials too)" do
       d_ == 1 || fail
     end
 
-    it "UH OH: - 1.11 NASTY - we can't use this approach" do
+    it "(FIXED - edge case that made us use round instead of arithmetic)" do
 
       d, d_ = _against 1.11, 5
       d == 1 || fail
-      d_ == 5 || fail
+      d_ == 2 || fail
     end
 
     def _against f, sanity=nil
@@ -96,4 +96,5 @@ describe "[ba] number en (and stowed-away essentials too)" do
 end
 # ->
 end
+# #tombstone - is rounding the solution to the floating point error?
 # #pending-rename - this became core (look at visual too)
