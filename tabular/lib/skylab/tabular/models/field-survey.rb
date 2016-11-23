@@ -32,7 +32,6 @@ module Skylab::Tabular
       def see_value x
         @number_of_cels += 1
         @__mesh.against_value_and_choices x, self
-        NIL
       end
 
       def increment_number_of_booleans

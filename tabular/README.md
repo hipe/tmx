@@ -45,11 +45,11 @@ library.)
 we almost called this "the omni table narrative", but didn't because our
 longerm goal is (or isn't) to unify all table implementions:
 
-    [#ze-050]  2016-10-28  the eventual home of unified table
+    [#ze-047]    2016-08-28  "tuple pager" for long streams of data
 
-    [#ze-047]  2016-08-28  "tuple pager" for long streams of data
-
-    [#.D]  2013-03-13  ad-hoc for application. rewritten once.
+    [#ze-050]    2013-03-13  ad-hoc for application. rewritten once.
+                             now the root node for the [ze] CLI table lib.
+                             was once [#.D].
 
     [#.C]  2012-03-16  the old functional experiment
 

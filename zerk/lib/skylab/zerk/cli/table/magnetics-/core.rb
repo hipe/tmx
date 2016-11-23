@@ -1,3 +1,294 @@
+module Skylab::Zerk
+
+  module CLI::Table
+
+    module Magnetics_
+
+      # ==
+
+      class LineStream_via_MixedTupleStream_and_Design < Common_::Actor::Dyadic
+
+        def initialize mt_st, de
+          @mixed_tuple_stream = mt_st
+          @design = de
+        end
+
+        def execute
+          @_state = :__any_first_line_ever
+          Common_.stream do
+            send @_state
+          end
+        end
+
+        # two things to remember here throughout: 1) you're always rendering
+        # a line until you close. 2) always think about when to change @_state.
+
+        def __any_first_line_ever
+
+          remove_instance_variable :@_state
+
+          pa_st = __page_stream
+          page = pa_st.gets
+          if page
+            @_notes = Here_::Models_::Notes.new
+            @_page_stream = pa_st
+            @_page = page
+            __on_first_page_ever
+          else
+            NOTHING_  # hi.
+          end
+        end
+
+        def __page_stream
+
+          Tabular_::Magnetics::PageStream_via_PageSize_and_Etc.call(
+            remove_instance_variable( :@mixed_tuple_stream ),
+            @design.page_size,
+            Tabular_::Magnetics::SurveyedPage_via_MixedTupleStream,
+          )
+        end
+
+        def __on_first_page_ever
+
+          if __do_display_header_row
+            __make_a_note_of_the_widths_of_each_any_field_label
+            _reinit_line_renderer_via_page
+            __header_row
+          else
+            _on_page
+          end
+        end
+
+        def __do_display_header_row
+
+          if @design.has_fields
+            @_notes.see_this_number_of_columns @design.fields.length
+            @design.has_at_least_one_field_label
+          end
+        end
+
+        def __make_a_note_of_the_widths_of_each_any_field_label
+
+          @design.fields.each_with_index do |fld, d|
+            label = fld.label
+            label || next
+            @_notes.for_field( d ).widest_width_ever = label.length
+          end
+          NIL
+        end
+
+        def __header_row
+
+          fields = @design.fields  # at least one with a label somewhere
+
+          _d = @_notes.the_most_number_of_columns_ever_seen
+
+          _st = Common_::Stream.via_times _d do |d|
+
+            fld = fields.fetch d  # ..
+
+              label = fld.label
+
+            Tabular_::Models::TypifiedMixed.new :string, ( label || EMPTY_S_ )
+          end
+
+          @_state = :_on_line_renderer_and_page
+
+          @_line_via_typified_mixed_stream[ _st ]
+        end
+
+        def _on_page
+          _reinit_line_renderer_via_page
+          _on_line_renderer_and_page
+        end
+
+        def _on_line_renderer_and_page
+          _page = remove_instance_variable :@_page  # (or not)
+          @_typified_tuple_stream = _page.to_typified_tuple_stream
+          @_state = :__another_line_via_typified_tuples
+          send @_state
+        end
+
+        def __another_line_via_typified_tuples
+          typi_tuple = @_typified_tuple_stream.gets
+          if typi_tuple
+            _typi_mixed_st = typi_tuple.to_typified_mixed_stream
+            @_line_via_typified_mixed_stream[ _typi_mixed_st ]
+          else
+            __at_end_of_page
+          end
+        end
+
+        def __at_end_of_page
+
+          # (one day maybe aggregate statistical information of the whole
+          # page e.g for totals)
+
+          # (sanity cleanup for now)
+          remove_instance_variable :@_line_via_typified_mixed_stream
+          remove_instance_variable :@_state
+          remove_instance_variable :@_typified_tuple_stream
+          pa = @_page_stream.gets
+          if pa
+            @_page = pa
+            _on_page
+          else
+            remove_instance_variable :@_page_stream
+            # (one day maybe summary row hooks)
+            NOTHING_
+          end
+        end
+
+        def _reinit_line_renderer_via_page
+
+          @_notes.see_this_number_of_columns @_page.number_of_fields
+
+            @_line_via_typified_mixed_stream =
+          LineRenderer_via_Page_and_Notes_and_Display___.call(
+            @_page, @_notes, @design
+          )
+          NIL
+        end
+      end
+
+      # ==
+
+      LineRenderer_via_Page_and_Notes_and_Display___ = -> (
+        page, notes, design
+      ) do
+
+        number_of_fields = notes.the_most_number_of_columns_ever_seen
+
+        field_surveys = page.field_surveys
+
+        cel_renderers = number_of_fields.times.map do |d|
+
+          CelRenderer_via_FieldNote_and_FieldSurvey_and_Design___.new(
+            notes.for_field( d ),
+            field_surveys.fetch( d ),  # ..
+            design,
+          ).execute
+        end
+
+        this_many_times = number_of_fields.zero? ? 0 : number_of_fields - 1
+
+        -> typi_st do
+
+          buffer = "#{ design.left_separator }"
+
+          d = -1
+          write_cel = -> do
+            d += 1
+            use_typi = typi_st.gets
+            # ..
+            buffer << cel_renderers.fetch( d )[ use_typi ]
+            NIL
+          end
+
+          write_cel[]
+
+          this_many_times.times do
+            buffer << design.inner_separator
+            write_cel[]
+          end
+
+          buffer << design.right_separator
+        end
+      end
+
+      # ==
+
+      class CelRenderer_via_FieldNote_and_FieldSurvey_and_Design___
+
+        def initialize fn, fs, de
+          @design = de
+          @field_note = fn
+          @field_survey = fs
+        end
+
+        def execute
+
+          fs = @field_survey
+          typecount = 0
+
+          if fs.number_of_strings.nonzero?
+            has_strings = true
+            typecount +=1
+          end
+
+          if fs.number_of_numerics.nonzero?
+            typecount += 1
+          end
+
+          if fs.number_of_symbols.nonzero?
+            typecount += 1
+          end
+
+          if fs.number_of_booleans.nonzero?
+            typecount += 1
+          end
+
+          if fs.number_of_others.nonzero?
+            typecount +=1
+          end
+
+          @_has_nils = fs.number_of_nils.nonzero?
+
+          if 1 == typecount
+            if has_strings
+              __when_uniformly_string
+            else
+              self._HAVE_FUN
+            end
+          else
+            self._HAVE_FUN
+          end
+        end
+
+        def __when_uniformly_string
+
+          h = {}
+
+          _w = __widest_string
+
+          _is_right = @design.field_is_aligned_right_explicitly(
+            @field_note.field_offset )
+
+          format = "%#{ DASH_ unless _is_right }#{ _w }s"
+
+          h[ :string ] = -> s do
+            format % s
+          end
+
+          if @_has_nils
+            h[ :nil ] = h[ :string ]
+          end
+
+          _final_proc_via h
+        end
+
+        def __widest_string
+          w = @field_note.widest_width_ever
+          w_ = @field_survey.width_of_widest_string
+          if w < w_
+            @field_note.widest_width_ever = w_
+            # #open [#050] this "widening" was the central mechanical innovation
+            # of (there). eventually DRY up that with this.
+            w_
+          else
+            w
+          end
+        end
+
+        def _final_proc_via value_renderer_via_type
+          -> typi do
+            value_renderer_via_type.fetch( typi.typeish_symbol )[ typi.value ]
+          end
+        end
+      end
+
+      # ==
+
     if false  # keep while #open [#tab-003]
 
   FLOAT_DETAIL_RX__ = /\A(-?\d+)((?:\.\d+)?)\z/  # used 2x
@@ -105,6 +396,10 @@
     end
   end
     end   # if false
+      # ==
+    end
+  end
+end
 # #tombstone: was once [#001.C]
 # #tombstone: one last external use of :employ_DSL_for_digraph_emitter
 # #tombstone: at full rewrite, early field class, "census" class, "type stats" class

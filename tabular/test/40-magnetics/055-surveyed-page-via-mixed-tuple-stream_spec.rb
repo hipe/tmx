@@ -121,7 +121,7 @@ module Skylab::Tabular::TestSupport
       _st = Home_::Stream_[ a ]
       _surveyed_page = _[ _st ]
       _hi = _surveyed_page
-      _hi.FIELD_SURVEYS
+      _hi.field_surveys
     end
 
     memoize :_same_pipe do

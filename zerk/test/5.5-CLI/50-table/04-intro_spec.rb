@@ -1,121 +1,160 @@
-require_relative '../../../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - table - actor" do
+  describe "[ze] CLI table - overview" do
 
     TS_[ self ]
     use :memoizer_methods
+    use :CLI_table
 
-    context "it is a pesudo-proc .." do
+    it "loads" do
+      table_module_ || fail
+    end
 
-      before :all do
-        X_cs_t_a_fs_s_m_Table = Home_::CLI_Support::Table::Actor
+    context "the default design" do
+
+      it "rendering a table with no tuples results in no lines" do
+
+        against_stream_expect_lines_ Common_::Stream.the_empty_stream do |y|
+          NOTHING_
+        end
       end
 
-      it "call it with nothing ane it renders nothing" do
-        X_cs_t_a_fs_s_m_Table[].should eql nil
+      it "default styling is evident in this minimal non-empty table" do
+
+        against_tuples_expect_lines_ %w( a ) do |y|
+          y << "|  a  |"
+        end
       end
 
-      it "that is, an array of atoms won't fly either" do
-        _rx = ::Regexp.new "\\Aundefined\\ method\\ `each_wi"
+      it "with one more row and one more column, we can see columns line up" do
 
-        begin
-          X_cs_t_a_fs_s_m_Table[ [ :a, :b ] ]
-        rescue NoMethodError => e
+        against_tuples_expect_lines_ %w( Food Drink ), %w( donuts coffee ) do |y|
+          y << "|  Food   |  Drink   |"
+          y << "|  donuts |  coffee  |"
+        end
+      end
+
+      def design_ish_
+        table_module_  # careful
+      end
+    end
+
+    context "customize your design: separators" do
+
+      it "builds" do
+        design_ish_
+      end
+
+      it "probably fine" do
+        des = design_ish_
+        _ = [ des.left_separator, des.inner_separator, des.right_separator ].join
+        _ == '(,)' || fail
+      end
+
+      shared_subject :design_ish_ do
+
+        table_module_.default_design.redefine do |defn|
+
+          defn.separator_glyphs '(', ',', ')'
+
+        end
+      end
+    end
+
+    context "customize your design: specify field labels for a header row" do
+
+      it "build" do
+        design_ish_
+      end
+
+      it "money" do
+
+        against_tuples_expect_lines_ %w( donuts coffee ) do |y|
+          y << "(Eat   ,Swallow)"
+          y << "(donuts,coffee )"
+        end
+      end
+
+      shared_subject :design_ish_ do
+
+        table_module_.default_design.redefine do |defn|
+
+          defn.separator_glyphs '(', ',', ')'
+
+          defn.add_field :label, "Eat"
+
+          defn.add_field :label, "Swallow"
+        end
+      end
+    end
+
+    context "customize your design: change default alignment " do
+
+      it "builds" do
+        design_ish_
+      end
+
+      it "money" do
+
+        against_tuples_expect_lines_ %w( donuts coffee ), %w( kale tea ) do |y|
+          y << "(    Eat, Swallow )"
+          y << "( donuts, coffee  )"
+          y << "(   kale, tea     )"
+        end
+      end
+
+      context "if you really wanted to, you can customize a customized design" do
+
+        it "builds" do
+          design_ish_
         end
 
-        e.message.should match _rx
+        it "money" do
+
+          _matr = [
+            %w( aaaa bb ccc ),
+            %w( ddddd e f )
+          ]
+
+          against_matrix_expect_lines_ _matr do |y|
+
+            y << "->   Eat;  Mouth;   hi <-"
+            y << "->  aaaa;     bb;  ccc <-"
+            y << "-> ddddd;      e;    f <-"
+          end
+        end
+
+        shared_subject :design_ish_ do
+
+          _otr = __this_design
+
+          _otr.redefine do |defn|
+
+            defn.separator_glyphs '-> ', ';  ', ' <-'
+
+            defn.redefine_field 1, :right, :label, "Mouth"
+
+            defn.add_field :label, "hi", :right
+          end
+        end
       end
 
-      it "here is the smallest table you can render, which is boring" do
-        ( X_cs_t_a_fs_s_m_Table[ [] ] ).should eql ''
+      shared_subject :design_ish_ do
+
+        table_module_.default_design.redefine do |defn|
+
+          defn.separator_glyphs '( ', ', ', ' )'
+
+          defn.add_field :label, "Eat", :right
+
+          defn.add_field :label, "Swallow"
+        end
       end
 
-      it "default styling (\"| \", \" |\") is evident in this minimal non-empty table" do
-        ( X_cs_t_a_fs_s_m_Table[ [ [ 'a' ] ] ] ).should eql "| a |\n"
-      end
-
-      it "minimal normative example" do
-
-        _act = X_cs_t_a_fs_s_m_Table[ [ [ 'Food', 'Drink' ], [ 'donuts', 'coffee' ] ] ]
-
-        _exp = <<-HERE.gsub %r<^ +>, EMPTY_S_
-           | Food   | Drink  |
-           | donuts | coffee |
-        HERE
-
-        _act.should eql _exp
-      end
-    end
-
-    it "specify custom headers, separators, and output functions" do
-
-      a = []
-
-      _x = Home_::CLI_Support::Table::Actor.call(
-
-        :field, 'Food', :field, 'Drink',
-
-        :left, '(', :sep, ',', :right, ')',
-
-        :read_rows_from, [[ 'nut', 'pomegranate' ]],
-
-        :write_lines_to, a,
-      )
-
-      _x.object_id.should eql a.object_id
-
-      ( a * 'X' ).should eql "(Food,Drink      )X(nut ,pomegranate)"
-    end
-
-    it "add field modifiers between the `field` keyword and its label (left/right)" do
-
-      _str = Home_::CLI_Support::Table::Actor.call(
-        :field, :right, :label, "Subproduct",
-        :field, :left, :label, "num test files",
-        :read_rows_from, [ [ 'face', 100 ], [ 'headless', 99 ] ],
-      )
-
-      _exp = <<-HERE.unindent
-        | Subproduct | num test files |
-        |       face | 100            |
-        |   headless | 99             |
-      HERE
-
-      _str.should eql _exp
-    end
-
-    context "but the real fun begins with currying" do
-
-      before :all do
-        X_cs_t_a_fs_s_m_P = Home_::CLI_Support::Table::Actor.curry :left, '<', :sep, ',', :right, ">"
-      end
-
-      it "and then use it in another place" do
-        ( X_cs_t_a_fs_s_m_P[ [ %w(a b), %w(c d) ] ] ).should eql "<a,b>\n<c,d>\n"
-      end
-
-      it "you can optionally modify the properties for your call" do
-        ( X_cs_t_a_fs_s_m_P[ :sep, ';', :read_rows_from, [%w(a b), %w(c d)] ] ).should eql "<a;b>\n<c;d>\n"
-      end
-
-      shared_subject :q do
-        X_cs_t_a_fs_s_m_P.curry :sep, '_'
-      end
-
-      it "call the curry with one dootiy-hah" do
-        q.call(
-          :read_rows_from, [ %w'a b' ],
-        ).should eql "<a_b>\n"
-      end
-
-      it "call the curry with the other dootily-hah" do
-        q.call(
-          :read_rows_from, [ %w'c d' ],
-          :left, 'HUZZAH ',
-        ).should eql "HUZZAH c_d>\n"
-      end
+      alias_method :__this_design, :design_ish_
     end
   end
 end
+# #history: full rewrite during unification. came from [br]. was [dt]-synced.

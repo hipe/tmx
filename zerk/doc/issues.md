@@ -21,7 +21,9 @@
 
              was: track simplified boxxy-like producers of primary hashes.
 
-[#050] #hole (was: the eventual home of unified table support. now: [#ta-001])
+[#050] #open new table rendering logic as indicated is redundant with [#this]
+             as indicated in this sidesystem.
+             ( #was: the eventual home of unified table support. now: [#tab-001] )
 
 [#049] #open it would nice if ACS-as-operation could express the parameter
              arity of their components somehow

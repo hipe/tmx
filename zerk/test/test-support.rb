@@ -122,6 +122,10 @@ module Skylab::Zerk::TestSupport
 
   module Use_
 
+    CLI_table = -> tcc do
+      TS_::CLI_Table[ tcc ]
+    end
+
     module My_API
 
       def self.[] tcc

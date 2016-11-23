@@ -148,14 +148,48 @@ module Skylab::Tabular
       end
     end
 
+    # -- (above is for in-file example..)
+
+    stream_via_stream_and_page_size = nil
+    PageStream_via_PageSize_and_Etc = -> tu_st, page_size, page_magnet do
+
+      p = -> do
+
+        _shortened_tu_st = stream_via_stream_and_page_size[ tu_st, page_size ]
+
+        _page = page_magnet[ _shortened_tu_st ]
+
+        _page  # #todo
+      end
+
+      Common_.stream do
+        p[]
+      end
+    end
+
+    stream_via_stream_and_page_size = -> st, page_size do
+      if page_size < 0
+        st
+      else
+        d = page_size
+        Common_.stream do
+          if d.nonzero?
+            d -= 1
+            st.gets
+          end
+        end
+      end
+    end
+
     Autoloader_[ self ]
   end
 
   module Models
     Autoloader_[ self ]
   end
-
-  Models_ = ::Module.new
+  module Models_
+    # (no autoloader necessary yet)
+  end
 
     # ==
 
@@ -369,6 +403,31 @@ module Skylab::Tabular
         :string_width,
       )
     end
+
+    # ==
+
+    class Models_::TypifiedMixedTuple
+
+      # (we use parallel arrays internally, but clients should never need
+      # random access to this. enforcing a stream interface for reads has
+      # advantages elsewhere, outside this lib (e.g headers at [#ze-050.1]).)
+
+      def initialize types, values
+        @__types = types
+        @__values = values
+      end
+
+      def to_typified_mixed_stream
+
+        types = @__types ; values = @__values
+
+        Common_::Stream.via_times types.length do |d|
+          Models::TypifiedMixed[ types.fetch( d ), values.fetch( d ) ]
+        end
+      end
+    end
+
+    Models::TypifiedMixed = ::Struct.new :typeish_symbol, :value
 
   # ==
 

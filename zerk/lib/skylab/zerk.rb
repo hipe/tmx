@@ -118,6 +118,8 @@ module Skylab::Zerk  # intro in [#001] README
     System = -> do
       system_lib[].services
     end
+
+    Tabular = sidesys[ :Tabular ]
   end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]

@@ -4,6 +4,8 @@ module Skylab::Zerk
 
     class TuplePager  # :[#047]. 3 laws. a better version of [#br-064]
 
+      # #open [#050] someone is looking for you
+
       # the subject is given a list of tuples in the form of one item
       # (representing the first item in the list) and a stream holding the
       # remaining zero or more items. (the interface is like this for the

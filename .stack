@@ -13,6 +13,7 @@ use [sa] to convert etc to Stream_
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
 git rebase and squash around the other guys appropriately
+join #open [#tab-003], is the acceptance of the below two.
 make report showing the relative weights of the changesets
 CLI-invoked general table renderer
 join [#tab-002] (several sub-items here)
@@ -22,8 +23,9 @@ decide also how the tests will be renamed accordingly
 decide how each element under (legacy) [br] table actor will fit (other guys too)
 acceptance: code metrics
 come up with final architecture for lipstick
-move structured to [ze], get basics down (all but lipstick)
 come up with API for pluggable aggregator functions (e.g total)
 renew type inference (before [ze] CLI client)
 make tuple pager ([ze]) fit in with statistics
 we want clients (like [ze]) to be able to provide their own mesh and their own hooks and their own type model
+second inference spec
+first inference spec
