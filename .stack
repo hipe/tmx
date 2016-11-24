@@ -23,6 +23,5 @@ decide also how the tests will be renamed accordingly
 decide how each element under (legacy) [br] table actor will fit (other guys too)
 acceptance: code metrics
 come up with final architecture for lipstick
-come up with API for pluggable aggregator functions (e.g total)
 make tuple pager ([ze]) fit in with statistics
 second inference spec

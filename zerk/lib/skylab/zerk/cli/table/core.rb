@@ -26,6 +26,16 @@ module Skylab::Zerk
         @_ = de
       end
 
+      def add_field_observer * x_a, & p
+        Require_tabular__[]
+        @_.__receive_field_observer_ Tabular_::Models::FieldObserver.new p, x_a
+      end
+
+      def add_summary_row & p
+        _sr = Here_::Models_::SummaryRow::Definition.new p
+        @_.__receive_summary_row_ _sr
+      end
+
       def redefine_field d, * x_a
         @_.__redefine_field_ d, x_a
       end
@@ -55,11 +65,13 @@ module Skylab::Zerk
       def initialize
 
         @_accept_field = :__accept_first_field
+        @field_observers = nil
         @has_fields = false
         @inner_separator = SPACE_
         @left_separator = nil
         @page_size = 50
         @right_separator = nil
+        @summary_rows = nil
 
         yield Design_DSL__.new self
         finish
@@ -79,6 +91,17 @@ module Skylab::Zerk
       end
 
       # -- write
+
+      def __receive_field_observer_ fo
+        ( @field_observers ||=
+            Tabular_::Models::FieldObserver::Collection.new ) << fo
+        NIL
+      end
+
+      def __receive_summary_row_ srd
+        ( @summary_rows ||=
+           Here_::Models_::SummaryRow::DefinitionCollection.new ) << srd
+      end
 
       def __redefine_field_ d, x_a
         @fields[ d ] = @fields.fetch( d ).redefine__ x_a
@@ -101,10 +124,12 @@ module Skylab::Zerk
       end
 
       attr_accessor(
+        :field_observers,
         :inner_separator,
         :left_separator,
         :page_size,
         :right_separator,
+        :summary_rows,
       )
 
       def finish
@@ -146,7 +171,9 @@ module Skylab::Zerk
       end
 
       def freeze
+        @field_observers and @field_observers.freeze
         @has_fields and @fields.freeze
+        @summary_rows and @summary_rows.freeze
         super
       end
 
@@ -154,7 +181,7 @@ module Skylab::Zerk
 
       def line_stream_via_mixed_tuple_stream st
 
-        Require_tabular___[]
+        Require_tabular__[]
 
         Here_::Magnetics_::LineStream_via_MixedTupleStream_and_Design[ st, self ]
       end
@@ -181,7 +208,7 @@ module Skylab::Zerk
 
     # ==
 
-    Require_tabular___ = Lazy_.call do
+    Require_tabular__ = Lazy_.call do
       Tabular_ = Home_.lib_.tabular ; nil
     end
 

@@ -2,11 +2,31 @@ module Skylab::Tabular
 
   class Models::FieldSurvey
 
+    # as it works out, this becomes the the authoritative source for how
+    # mixed values are "typified" under this system.
+    #
+    # users could always inject over the hook mesh and/or the subject class
+    # and "typify" the arbitrary values in arbitrary ways.
+
     class << self
       alias_method :begin, :new
       undef_method :new
     end  # >>
 
+    # ==
+
+    IS_NUMERIC = {  # use `fetch` to reflect with confidence
+      string: false,
+      symbol: false,
+      nonzero_float: true,
+      nonzero_integer: true,
+      zero: true,
+      boolean: false,
+      nil: false,
+      other: false,
+    }
+
+    # ==
     # -
 
       def initialize mesh

@@ -1,11 +1,61 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  C_EF_T_S_Struct__ = ::Struct.new :x, :y  # meh
+  describe "[ze] CLI table - field observers and summary rows intro" do
 
-  describe "[br] - CLI support - table - structured" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :CLI_table
 
+    context "build field observers and summary row into the design" do
+
+      it "builds" do
+        design_ish_
+      end
+
+      it "here is the longhand form of making a \"total\" cel (summary row)" do
+
+        _matr = [
+          [ 'coffee', 7.23 ],
+          [ 'donut', 2.78 ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y << '| coffee    |  7.23 |'
+          y << '| donut     |  2.78 |'
+          y << '| (total)   | 10.01 |'
+        end
+      end
+
+      shared_subject :design_ish_ do
+
+        table_module_.default_design.redefine do |defn|
+
+          defn.separator_glyphs '| ', '   | ', ' |'
+
+          defn.add_field_observer :zizzio, :observe_field, 1 do |o|
+            total = 0.0
+            o.on_typified_mixed do |tm|
+              if tm.is_numeric
+                total += tm.value
+              end
+            end
+            o.retrieve_by do
+              total
+            end
+          end
+
+          defn.add_summary_row do |o|
+            o << "(total)"
+            o << o.read_observer( :zizzio )
+          end
+
+        end  # design
+      end  # shared subject
+    end  # context
+
+    if false
     it "summary. map. data tree." do
 
       tbl = _begin_table
@@ -99,24 +149,10 @@ module Skylab::Brazen::TestSupport
       t
     end )
 
-    def _fake_data_stream * s_a_a
-
-      _a = s_a_a.map do | s_a |
-        C_EF_T_S_Struct__.new( * s_a )
-      end
-
-      Common_::Stream.via_nonsparse_array _a
-    end
-
     def _begin_table
       Home_::CLI_Support::Table::Structured.new
     end
-
-    def _line_expector_via_array y
-
-      _st = Common_::Stream.via_nonsparse_array y
-
-      TestSupport_::Expect_Line::Scanner.via_stream _st
-    end
+    end  # if false
   end
 end
+# #history: arrived in new home during unification

@@ -1,3 +1,4 @@
+if false
 require_relative '../../../../test-support'
 
 module Skylab::Brazen::TestSupport
@@ -41,3 +42,4 @@ module Skylab::Brazen::TestSupport
   end
 end
 # #history: tests related to type inference corralled into sibling file
+end

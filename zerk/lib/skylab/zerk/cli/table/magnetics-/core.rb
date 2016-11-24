@@ -8,19 +8,11 @@ module Skylab::Zerk
 
       # ==
 
-      class LineStream_via_MixedTupleStream_and_Design
-
-        class << self
-          def call _1, _2
-            new( _1, _2 ).execute
-          end
-          alias_method :[], :call
-          private :new
-        end  # >>
+      class LineStream_via_MixedTupleStream_and_Design < Common_::Actor::Dyadic
 
         def initialize mt_st, de
-          @mixed_tuple_stream = mt_st
           @design = de
+          @mixed_tuple_stream = mt_st
         end
 
         def execute
@@ -37,40 +29,20 @@ module Skylab::Zerk
 
           remove_instance_variable :@_state
 
-          pa_st = __page_stream
-          page = pa_st.gets
-          if page
-            __init_notes
-            @_page_stream = pa_st
-            @_page = page
-            __on_first_page_ever
-          else
-            NOTHING_  # hi.
-          end
-        end
-
-        def __init_notes
-
-          if @design.has_fields
-            num_cols = @design.fields.length
-            if @design.has_at_least_one_field_label
-              yes_header_row = true
-            end
-          end
-
-          @_notes = Here_::Models_::Notes.new yes_header_row, num_cols
-          NIL
-        end
-
-        def __page_stream
-
-          _cx = Here_::Models_::FieldSurvey::Choices.new @design.page_size
-
-          Tabular_::Magnetics::PageStream_via_Choices_and_Etc.call(
+          @_invocation = Here_::Models_::Invocation.new(
             remove_instance_variable( :@mixed_tuple_stream ),
-            _cx,
-            Tabular_::Magnetics::SurveyedPage_via_MixedTupleStream,
+            @design,
           )
+
+          @_page_scanner = @_invocation.page_scanner
+
+          if @_page_scanner.no_unparsed_exists
+            NOTHING_  # hi.
+          else
+            @_notes = @_invocation.notes
+            @_page = @_page_scanner.gets_one
+            __on_first_page_ever
+          end
         end
 
         def __on_first_page_ever
@@ -85,7 +57,7 @@ module Skylab::Zerk
         end
 
         def __do_display_header_row
-          @_notes.do_display_header_row
+          @_invocation.do_display_header_row
         end
 
         def __make_a_note_of_the_widths_of_each_any_field_label
@@ -110,7 +82,7 @@ module Skylab::Zerk
 
               label = fld.label
 
-            Tabular_::Models::TypifiedMixed.new :string, ( label || EMPTY_S_ )
+            Tabular_::Models::Typified::Mixed.new :string, ( label || EMPTY_S_ )
           end
 
           @_state = :_on_line_renderer_and_page
@@ -149,14 +121,13 @@ module Skylab::Zerk
           remove_instance_variable :@_line_via_typified_mixed_stream
           remove_instance_variable :@_state
           remove_instance_variable :@_typified_tuple_stream
-          pa = @_page_stream.gets
-          if pa
-            @_page = pa
-            _on_page
-          else
-            remove_instance_variable :@_page_stream
+
+          if @_page_scanner.no_unparsed_exists
             # (one day maybe summary row hooks)
             NOTHING_
+          else
+            @_page = @_page_scanner.gets_one
+            _on_page
           end
         end
 
@@ -165,8 +136,8 @@ module Skylab::Zerk
           @_notes.see_this_number_of_columns @_page.number_of_fields
 
             @_line_via_typified_mixed_stream =
-          LineRenderer_via_Page_and_Notes_and_Display___.call(
-            @_page, @_notes, @design
+          LineRenderer_via_Page_and_Invocation___.call(
+            @_page, @_invocation,
           )
           NIL
         end
@@ -174,11 +145,9 @@ module Skylab::Zerk
 
       # ==
 
-      LineRenderer_via_Page_and_Notes_and_Display___ = -> (
-        page, notes, design
-      ) do
+      LineRenderer_via_Page_and_Invocation___ = -> page, invo do
 
-        number_of_fields = notes.the_most_number_of_columns_ever_seen
+        number_of_fields = invo.notes.the_most_number_of_columns_ever_seen
 
         field_surveys = page.field_surveys
 
@@ -187,12 +156,13 @@ module Skylab::Zerk
           Magnetics_::TypifiedMixedRenderer_via_FieldSurvey.new(
             d,
             field_surveys.fetch( d ),  # ..
-            notes,
-            design,
+            invo,
           ).execute
         end
 
         this_many_times = number_of_fields.zero? ? 0 : number_of_fields - 1
+
+        design = invo.design
 
         -> typi_st do
 

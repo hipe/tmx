@@ -60,12 +60,11 @@ module Skylab::Zerk
 
     class Models_::Notes  # 1x
 
-      def initialize yes, cols
+      # mutable guy for aggregating statistical information about the table
 
+      def initialize d
         @_a = []
-
-        @do_display_header_row = yes
-        @the_most_number_of_columns_ever_seen = cols || 0
+        @the_most_number_of_columns_ever_seen = d || 0
       end
 
       def see_this_number_of_columns d

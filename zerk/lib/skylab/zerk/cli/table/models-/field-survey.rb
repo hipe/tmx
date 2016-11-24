@@ -6,8 +6,10 @@ module Skylab::Zerk
 
       class Choices
 
-        def initialize ps
-          @page_size = ps
+        def initialize foa, at_end_p, design
+          @field_observers_array = foa
+          @hook_for_end_of_mixed_tuple_stream = at_end_p
+          @page_size = design.page_size
         end
 
         def field_survey_class
@@ -18,7 +20,13 @@ module Skylab::Zerk
           NOTHING_  # use default
         end
 
+        def page_magnetic_function
+          NOTHING_  # use default
+        end
+
         attr_reader(
+          :field_observers_array,
+          :hook_for_end_of_mixed_tuple_stream,
           :page_size,
         )
       end

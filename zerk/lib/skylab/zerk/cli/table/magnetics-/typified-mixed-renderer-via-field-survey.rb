@@ -85,13 +85,12 @@ module Skylab::Zerk
 
       # -
 
-        def initialize d, fs, notes, design
+        def initialize d, fs, invo
 
-          @field_note = notes.for_field d
+          @field_note = invo.notes.for_field d
 
-          @design = design
           @field_survey = fs
-          @notes = notes
+          @invocation = invo
         end
 
         def execute
@@ -108,13 +107,14 @@ module Skylab::Zerk
             # innovation of (there). eventually DRY up that with this.
           end
 
-          _1 = @notes.do_display_header_row
+          _1 = @invocation.do_display_header_row
           _2 = fs.number_of_symbols.nonzero?
           _3 = fs.number_of_strings.nonzero?
 
           _do_stringishes = _1 || _2 || _3
 
           @proc_box = Common_::Box.new
+          @_design = @invocation.design
 
           # (do numerics before all others because #here-1)
 
@@ -197,11 +197,11 @@ module Skylab::Zerk
         end
 
         def is_align_left_explicitly
-          @design.field_is_aligned_left_explicitly @field_note.field_offset
+          @_design.field_is_aligned_left_explicitly @field_note.field_offset
         end
 
         def is_align_right_explicitly
-          @design.field_is_aligned_right_explicitly @field_note.field_offset
+          @_design.field_is_aligned_right_explicitly @field_note.field_offset
         end
 
         def widest_width_ever
