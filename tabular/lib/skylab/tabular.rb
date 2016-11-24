@@ -378,19 +378,20 @@ module Skylab::Tabular
 
   class Models_::TypifiedMixedTuple
 
-    # (we used to use two store two parallel arrays and make the structs
-    # lazily, now we use a single array of those structs made early;
-    # but the client should never need to know this.)
-    #
     # enforcing a stream interface for reads has advantages elsewhere,
     # outside this lib (e.g headers at [#ze-050.1]).)
 
     def initialize typi_a
-      @__typified_mixed_array = typi_a
+      @_typified_mixed_array = typi_a
+    end
+
+    def replace_array_by
+      @_typified_mixed_array = yield @_typified_mixed_array
+      NIL
     end
 
     def to_typified_mixed_stream
-      Stream_[ @__typified_mixed_array ]
+      Stream_[ @_typified_mixed_array ]
     end
   end
 

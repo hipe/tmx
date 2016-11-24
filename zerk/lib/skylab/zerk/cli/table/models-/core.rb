@@ -8,22 +8,35 @@ module Skylab::Zerk
 
     class Models_::Field
 
-      def initialize x_a
-        _define_or_redefine x_a
+      def initialize p, x_a
+        _define_or_redefine p, x_a
       end
 
-      def redefine__ x_a
-        dup._define_or_redefine x_a
+      def redefine__ p, x_a
+        dup._define_or_redefine p, x_a
       end
 
-      def _define_or_redefine x_a
+      def _define_or_redefine p, x_a
+
+        if p
+          @_argument_proc = p
+        end
 
         @_scn = Common_::Polymorphic_Stream.via_array x_a
         begin
           send OPTIONS___.fetch @_scn.current_token
         end until @_scn.no_unparsed_exists
+
+        if p and instance_variable_defined? :@_argument_proc
+          fail __say_not_used p  # #todo
+        end
+
         remove_instance_variable :@_scn
         freeze
+      end
+
+      def __say_not_used p
+        "proc was passed but was never processed by any parameters (#{ p })"
       end
 
       def initialize_copy _
@@ -37,7 +50,18 @@ module Skylab::Zerk
         left: :_at_align,
         label: :__at_label,
         right: :_at_align,
+        summary_field: :__at_summary_field,
       }
+
+      def __at_summary_field
+        @_scn.advance_one
+        d = @_scn.gets_one
+        d.respond_to? :integer? or fail
+        @summary_field_ordinal = d
+        @is_summary_field = true
+        @summary_field_proc = remove_instance_variable( :@_argument_proc )
+      end
+
 
       def __at_label
         @_scn.advance_one
@@ -52,7 +76,10 @@ module Skylab::Zerk
 
       attr_reader(
         :align,  # :left | :right
+        :is_summary_field,
         :label,
+        :summary_field_ordinal,
+        :summary_field_proc,
       )
     end
 

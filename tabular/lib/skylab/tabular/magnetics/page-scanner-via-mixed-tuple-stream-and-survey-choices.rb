@@ -17,6 +17,7 @@ module Skylab::Tabular
         mt = mixed_tuple_st.gets
         if mt
           @_gets_one = :__gets_one_page
+          @_hook_for_end_of_page = survey_choices.hook_for_end_of_page
           @_mixed_tuple_on_deck = mt
           @_mixed_tuple_stream = mixed_tuple_st
           @no_unparsed_exists = false

@@ -12,16 +12,14 @@ use [sa] to convert etc to Stream_
 -3.2 omni help screen system [#tmx-018]
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
+make tuple pager ([ze]) fit in with statistics
 git rebase and squash around the other guys appropriately
 join #open [#tab-003], is the acceptance of the below two.
 make report showing the relative weights of the changesets
 CLI-invoked general table renderer
 join [#tab-002] (several sub-items here)
-one by one, rewrite the components
-rename everything
-decide also how the tests will be renamed accordingly
-decide how each element under (legacy) [br] table actor will fit (other guys too)
 acceptance: code metrics
+melt remaining legacy tests
 come up with final architecture for lipstick
-make tuple pager ([ze]) fit in with statistics
-second inference spec
+'sprintf_format' macro
+one commit for summary fields just as you have so far

@@ -1,45 +1,65 @@
-if false
-require_relative '../../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - table - actor - stats" do
+  describe "[ze] CLI table - field observers and summary fields intro" do
 
     TS_[ self ]
-    use :CLI_support_table_actor
+    use :memoizer_methods
+    use :CLI_table
 
-    _SUBJECT_SYMBOL = :gather_statistics
+    context "with a field observer and a summary field.." do
 
-    it "minimal example of a formula" do
+      it "(builds)" do
+        design_ish_
+      end
 
-      subject_[
+      it "..you can do calculations over the whole page" do
 
-        :left, '( ', :right, ' )', :sep, ' - ',
+        _matr = [
+          [ 'coffee', 7.23 ],
+          [ 'donut', 2.78 ],
+        ]
 
-        :header, :none,
-
-        :field,
-          _SUBJECT_SYMBOL,
-
-        :field,
-          :formula,
-          -> row, cols do
-
-            1.0 * row[ 0 ] / cols.column_at( 0 )[ :stats ].numeric_max
-          end,
-
-        :read_rows_from,
-          [ [ 1, nil ],
-            [ 2, nil ] ],
-
-        :write_lines_to, write_lines_to_,
-      ]
-
-      _expect "( 1 - 0.5 )"
-      _expect "( 2 - 1.0 )"
-      done_
+        against_matrix_expect_lines_ _matr do |y|
+          y << '|  coffee |  0.7223 |  7.23  |'
+          y << '|  donut  |  0.2777 |  2.78  |'
+        end
+      end
     end
-  end
-end
+
+    shared_subject :design_ish_ do
+
+      table_module_.default_design.redefine do |defn|
+
+        defn.add_field_observer :zazzio, :observe_field, 1 do |o|
+          total = 0.0
+          o.on_typified_mixed do |tm|
+            if tm.is_numeric
+              total += tm.value
+            end
+          end
+          o.retrieve_by do
+            total
+          end
+        end
+
+        defn.add_field  # nothing
+
+        defn.add_field :summary_field, 0 do |o|
+
+          total = o.read_observer :zazzio
+
+          tm = o.row_typified_mixed_at 2  # use the index after stretching
+          if tm.is_numeric
+            tm.value.to_f / total
+          end
+        end
+
+        defn.add_field  # nothing
+
+      end  # redefine (table)
+    end  # shared subject
+  end  # describe
+end  # module
 # #history: tests related to type inference corralled into sibling file
-end

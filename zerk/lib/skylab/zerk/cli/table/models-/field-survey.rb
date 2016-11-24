@@ -6,9 +6,10 @@ module Skylab::Zerk
 
       class Choices
 
-        def initialize foa, at_end_p, design
+        def initialize foa, at_page_end_p, at_end_p, design
           @field_observers_array = foa
           @hook_for_end_of_mixed_tuple_stream = at_end_p
+          @hook_for_end_of_page = at_page_end_p
           @page_size = design.page_size
         end
 
@@ -27,6 +28,7 @@ module Skylab::Zerk
         attr_reader(
           :field_observers_array,
           :hook_for_end_of_mixed_tuple_stream,
+          :hook_for_end_of_page,
           :page_size,
         )
       end

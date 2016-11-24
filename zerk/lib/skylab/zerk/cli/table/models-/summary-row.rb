@@ -118,7 +118,7 @@ module Skylab::Zerk
         end
 
         def read_observer sym
-          @invocation.read_observer__ sym
+          @invocation.read_observer_ sym
         end
       end
 

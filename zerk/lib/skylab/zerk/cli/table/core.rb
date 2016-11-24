@@ -36,12 +36,15 @@ module Skylab::Zerk
         @_.__receive_summary_row_ _sr
       end
 
-      def redefine_field d, * x_a
-        @_.__redefine_field_ d, x_a
+      def redefine_field d, * x_a, & p
+        @_.__redefine_field_ d, p, x_a
       end
 
-      def add_field * x_a
-        @_.__accept_field_ Here_::Models_::Field.new x_a
+      def add_field * x_a, & p
+        if x_a.length.nonzero?
+          _fld = Here_::Models_::Field.new p, x_a
+        end
+        @_.__accept_field_ _fld
       end
 
       def separator_glyphs lef, inn, rig
@@ -71,6 +74,7 @@ module Skylab::Zerk
         @left_separator = nil
         @page_size = 50
         @right_separator = nil
+        @summary_fields = nil
         @summary_rows = nil
 
         yield Design_DSL__.new self
@@ -84,9 +88,15 @@ module Skylab::Zerk
       end
 
       def initialize_copy _
+
         if @has_fields
           @fields = @fields.dup
         end
+
+        if @summary_rows || @summary_fields
+          self._COVER_ME
+        end
+
         NOTHING_  # hi.
       end
 
@@ -103,8 +113,8 @@ module Skylab::Zerk
            Here_::Models_::SummaryRow::DefinitionCollection.new ) << srd
       end
 
-      def __redefine_field_ d, x_a
-        @fields[ d ] = @fields.fetch( d ).redefine__ x_a
+      def __redefine_field_ d, p, x_a
+        @fields[ d ] = @fields.fetch( d ).redefine__ p, x_a
         NIL
       end
 
@@ -120,7 +130,14 @@ module Skylab::Zerk
       end
 
       def __accept_subsequent_field fld
-        @fields.push fld ; nil
+
+        if fld && fld.is_summary_field
+          @summary_fields ||= []
+          ( @summary_fields[ @fields.length ] ||= [] ).push fld
+        else
+          @fields.push fld ; nil
+        end
+        NIL
       end
 
       attr_accessor(
@@ -129,6 +146,7 @@ module Skylab::Zerk
         :left_separator,
         :page_size,
         :right_separator,
+        :summary_fields,
         :summary_rows,
       )
 
@@ -151,13 +169,16 @@ module Skylab::Zerk
             nil => EMPTY_P_,
           }
           begin
+            d.zero? && break
             d -= 1
             fld = @fields.fetch d
+            fld || redo
             align.fetch( fld.align ).call
             if fld.label
               one_has_label = true
             end
-          end until d.zero?
+            redo
+          end while above
         else
           left = MONADIC_EMPTINESS_
           right = MONADIC_EMPTINESS_
@@ -174,6 +195,7 @@ module Skylab::Zerk
         @field_observers and @field_observers.freeze
         @has_fields and @fields.freeze
         @summary_rows and @summary_rows.freeze
+        @summary_fields and @summary_fields.freeze  # ..
         super
       end
 

@@ -37,6 +37,7 @@ module Skylab::Tabular
         if cx
           fo = cx.field_observers_array
           fld_survey_cls = cx.field_survey_class
+          hfeop = cx.hook_for_end_of_page
           mesh = cx.hook_mesh
         end
 
@@ -45,6 +46,7 @@ module Skylab::Tabular
 
         @__field_observers_array = fo
         @__field_survey_class = fld_survey_cls || Home_::Models::FieldSurvey
+        @__hook_for_end_of_page = hfeop
         @__mesh = mesh || HOOK_MESH___
       end
 
@@ -70,10 +72,17 @@ module Skylab::Tabular
 
         end while mixed_tuple
 
-        fs = remove_instance_variable :@field_surveys
+        fs = @field_surveys  # do not remove, used by hook out
+        tt = remove_instance_variable :@_typified_tuples
+
+        p = remove_instance_variable :@__hook_for_end_of_page
+        if p
+          p[ Whatever_You_Need___.new( fs, tt, self ) ]
+        end
+
         fs.each( & :finish )
 
-        SurveyedPage___.new fs, remove_instance_variable( :@_typified_tuples )
+        SurveyedPage___.new fs, tt
       end
 
       def __seer
@@ -97,10 +106,20 @@ module Skylab::Tabular
         times = to_length - @field_surveys.length
 
         times.times do
-          @field_surveys.push @__field_survey_class.begin @__mesh
+          @field_surveys.push _build_field_survey_
         end
         @the_most_cels_ever = @field_surveys.length
         NIL
+      end
+
+      def _build_field_survey_
+        @__field_survey_class.begin @__mesh
+      end
+
+      def _typified_mixed_via_value_and_index_ x, d
+
+        _typeish_symbol = @field_surveys.fetch( d ).see_value x
+        Home_::Models::Typified::Mixed[ _typeish_symbol, x ]
       end
 
       def push_typified_mixed_tuple tmt
@@ -150,15 +169,14 @@ module Skylab::Tabular
 
         @_typified_mixeds = []
 
-        field_surveys = @_client.field_surveys
         len = @_number_of_cels
         mixed_tuple = remove_instance_variable :@mixed_tuple
         d = 0
 
         until len == d
-          x = mixed_tuple.fetch d
-          _typeish_symbol = field_surveys.fetch( d ).see_value x
-          send @_push, Home_::Models::Typified::Mixed[ _typeish_symbol, x ]
+          _x = mixed_tuple.fetch d
+          _typi = @_client._typified_mixed_via_value_and_index_ _x, d
+          send @_push, _typi
           d += 1
         end
 
@@ -192,6 +210,28 @@ module Skylab::Tabular
       def _push_normally typified_mixed
         @_typified_mixeds.push typified_mixed
       end
+    end
+
+    # ==
+
+    class Whatever_You_Need___
+
+      # summary fields are nasty
+
+      def initialize fs, tt, o
+        @field_survey_by = o.method :_build_field_survey_
+        @field_surveys = fs
+        @typified_mixed_via_value_and_index_by =
+          o.method :_typified_mixed_via_value_and_index_
+        @typified_tuples = tt
+      end
+
+      attr_reader(
+        :field_survey_by,
+        :field_surveys,
+        :typified_mixed_via_value_and_index_by,
+        :typified_tuples,
+      )
     end
 
     # ==
