@@ -1,3 +1,5 @@
+[#012] #open inline regex.. ([ze])
+
 [#011] #open all this time we assumed `array.reverse!` was better
              on resources, but perhaps not now that we think about it
 

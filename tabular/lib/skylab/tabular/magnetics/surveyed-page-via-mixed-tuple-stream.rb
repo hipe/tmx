@@ -1,6 +1,6 @@
 module Skylab::Tabular
 
-  class Magnetics::SurveyedPage_via_MixedTupleStream < Common_::Actor::Monadic
+  class Magnetics::SurveyedPage_via_MixedTupleStream
 
     class SurveyedPage___
 
@@ -23,10 +23,26 @@ module Skylab::Tabular
     end
 
     # -
-      def initialize tu_st
+
+      class << self
+        def call tu_st, cx=nil
+          new( tu_st, cx ).execute
+        end
+        alias_method :[], :call
+        private :new
+      end  # >>
+
+      def initialize tu_st, cx
+
+        if cx
+          fld_survey_cls = cx.field_survey_class
+          mesh = cx.hook_mesh
+        end
+
         @mixed_tuple_stream = tu_st
 
-        @__mesh = MESH___
+        @__field_survey_class = fld_survey_cls || Home_::Models::FieldSurvey
+        @__mesh = mesh || HOOK_MESH___
       end
 
       def execute
@@ -40,9 +56,10 @@ module Skylab::Tabular
 
       def __when_one mixed_tuple
 
-        typified_tuples = []
         field_surveys = []
+        typified_tuples = []
 
+        field_survey_class = remove_instance_variable :@__field_survey_class
         mixed_tuple_st = remove_instance_variable :@mixed_tuple_stream
         mesh = remove_instance_variable :@__mesh
 
@@ -50,7 +67,7 @@ module Skylab::Tabular
           if field_surveys.length < mixed_tuple.length
 
             ( mixed_tuple.length - field_surveys.length ).times do
-              field_surveys.push Home_::Models::FieldSurvey.begin mesh
+              field_surveys.push field_survey_class.begin mesh
             end
           end
 
@@ -76,72 +93,59 @@ module Skylab::Tabular
 
     # ==
 
-      MESH___ =
+      HOOK_MESH___ =
     Home_.lib_.basic::OMNI_TYPE_CLASSIFICATION_HOOK_MESH_PROTOTYPE.redefine do |defn|
 
       defn.add :nil do |o|
-        o.choices.increment_number_of_nils
-        :nil
+        o.observer.on_typeish_nil
       end
 
       defn.add :false do |o|
-        o.choices.increment_number_of_booleans
-        :boolean
+        o.observer.on_typeish_boolean o.value
       end
 
       defn.add :symbol do |o|
-        o.choices.increment_number_of_symbols
-        :symbol
+        o.observer.on_typeish_symbol o.value
       end
 
       defn.add :true do |o|
-        o.choices.increment_number_of_booleans
-        :boolean
+        o.observer.on_typeish_boolean o.value
       end
 
       defn.add :other do |o|
-        o.choices.increment_number_of_others
-        :other
+        o.observer.on_typeish_other o.value
       end
 
       defn.add :nonblank_string do |o|
-        o.choices.on_nonblank_string o.value
-        :string
+        o.observer.on_typeish_string_nonblank o.value
       end
 
       defn.add :zero_length_string do |o|
-        o.choices.on_zero_length_string
-        :string
+        o.observer.on_typeish_string_zero_length
       end
 
       defn.add :nonzero_length_blank_string do |o|
-        o.choices.on_nonzero_length_blank_string o.value
-        :string
+        o.observer.on_typeish_string_nonzero_length_blank o.value
       end
 
       defn.add :zero do |o|
-        o.choices.on_zero
-        :zero
-      end
-
-      defn.add :positive_nonzero_integer do |o|
-        o.choices.on_positive_nonzero_integer
-        :nonzero_integer
+        o.observer.on_typeish_zero o.value
       end
 
       defn.add :negative_nonzero_integer do |o|
-        o.choices.on_negative_nonzero_integer
-        :nonzero_integer
+        o.observer.on_typeish_negative_nonzero_integer o.value
       end
 
-      defn.add :positive_nonzero_float do |o|
-        o.choices.on_positive_nonzero_float
-        :nonzero_float
+      defn.add :positive_nonzero_integer do |o|
+        o.observer.on_typeish_positive_nonzero_integer o.value
       end
 
       defn.add :negative_nonzero_float do |o|
-        o.choices.on_negative_nonzero_float
-        :nonzero_float
+        o.observer.on_typeish_negative_nonzero_float o.value
+      end
+
+      defn.add :positive_nonzero_float do |o|
+        o.observer.on_typeish_positive_nonzero_float o.value
       end
     end
 

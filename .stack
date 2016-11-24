@@ -24,9 +24,5 @@ decide how each element under (legacy) [br] table actor will fit (other guys too
 acceptance: code metrics
 come up with final architecture for lipstick
 come up with API for pluggable aggregator functions (e.g total)
-renew type inference (before [ze] CLI client)
 make tuple pager ([ze]) fit in with statistics
-we want clients (like [ze]) to be able to provide their own mesh and their own hooks and their own type model
 second inference spec
-first inference spec
-numeric characteristics via (floats, ints)

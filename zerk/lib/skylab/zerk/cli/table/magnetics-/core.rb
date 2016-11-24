@@ -4,9 +4,19 @@ module Skylab::Zerk
 
     module Magnetics_
 
+      Autoloader_[ self ]
+
       # ==
 
-      class LineStream_via_MixedTupleStream_and_Design < Common_::Actor::Dyadic
+      class LineStream_via_MixedTupleStream_and_Design
+
+        class << self
+          def call _1, _2
+            new( _1, _2 ).execute
+          end
+          alias_method :[], :call
+          private :new
+        end  # >>
 
         def initialize mt_st, de
           @mixed_tuple_stream = mt_st
@@ -30,7 +40,7 @@ module Skylab::Zerk
           pa_st = __page_stream
           page = pa_st.gets
           if page
-            @_notes = Here_::Models_::Notes.new
+            __init_notes
             @_page_stream = pa_st
             @_page = page
             __on_first_page_ever
@@ -39,11 +49,26 @@ module Skylab::Zerk
           end
         end
 
+        def __init_notes
+
+          if @design.has_fields
+            num_cols = @design.fields.length
+            if @design.has_at_least_one_field_label
+              yes_header_row = true
+            end
+          end
+
+          @_notes = Here_::Models_::Notes.new yes_header_row, num_cols
+          NIL
+        end
+
         def __page_stream
 
-          Tabular_::Magnetics::PageStream_via_PageSize_and_Etc.call(
+          _cx = Here_::Models_::FieldSurvey::Choices.new @design.page_size
+
+          Tabular_::Magnetics::PageStream_via_Choices_and_Etc.call(
             remove_instance_variable( :@mixed_tuple_stream ),
-            @design.page_size,
+            _cx,
             Tabular_::Magnetics::SurveyedPage_via_MixedTupleStream,
           )
         end
@@ -60,11 +85,7 @@ module Skylab::Zerk
         end
 
         def __do_display_header_row
-
-          if @design.has_fields
-            @_notes.see_this_number_of_columns @design.fields.length
-            @design.has_at_least_one_field_label
-          end
+          @_notes.do_display_header_row
         end
 
         def __make_a_note_of_the_widths_of_each_any_field_label
@@ -163,9 +184,10 @@ module Skylab::Zerk
 
         cel_renderers = number_of_fields.times.map do |d|
 
-          CelRenderer_via_FieldNote_and_FieldSurvey_and_Design___.new(
-            notes.for_field( d ),
+          Magnetics_::TypifiedMixedRenderer_via_FieldSurvey.new(
+            d,
             field_surveys.fetch( d ),  # ..
+            notes,
             design,
           ).execute
         end
@@ -195,99 +217,6 @@ module Skylab::Zerk
           buffer << design.right_separator
         end
       end
-
-      # ==
-
-      class CelRenderer_via_FieldNote_and_FieldSurvey_and_Design___
-
-        def initialize fn, fs, de
-          @design = de
-          @field_note = fn
-          @field_survey = fs
-        end
-
-        def execute
-
-          fs = @field_survey
-          typecount = 0
-
-          if fs.number_of_strings.nonzero?
-            has_strings = true
-            typecount +=1
-          end
-
-          if fs.number_of_numerics.nonzero?
-            typecount += 1
-          end
-
-          if fs.number_of_symbols.nonzero?
-            typecount += 1
-          end
-
-          if fs.number_of_booleans.nonzero?
-            typecount += 1
-          end
-
-          if fs.number_of_others.nonzero?
-            typecount +=1
-          end
-
-          @_has_nils = fs.number_of_nils.nonzero?
-
-          if 1 == typecount
-            if has_strings
-              __when_uniformly_string
-            else
-              self._HAVE_FUN
-            end
-          else
-            self._HAVE_FUN
-          end
-        end
-
-        def __when_uniformly_string
-
-          h = {}
-
-          _w = __widest_string
-
-          _is_right = @design.field_is_aligned_right_explicitly(
-            @field_note.field_offset )
-
-          format = "%#{ DASH_ unless _is_right }#{ _w }s"
-
-          h[ :string ] = -> s do
-            format % s
-          end
-
-          if @_has_nils
-            h[ :nil ] = h[ :string ]
-          end
-
-          _final_proc_via h
-        end
-
-        def __widest_string
-          w = @field_note.widest_width_ever
-          w_ = @field_survey.width_of_widest_string
-          if w < w_
-            @field_note.widest_width_ever = w_
-            # #open [#050] this "widening" was the central mechanical innovation
-            # of (there). eventually DRY up that with this.
-            w_
-          else
-            w
-          end
-        end
-
-        def _final_proc_via value_renderer_via_type
-          -> typi do
-            value_renderer_via_type.fetch( typi.typeish_symbol )[ typi.value ]
-          end
-        end
-      end
-
-      # ==
 
     if false  # keep while #open [#tab-003]
 

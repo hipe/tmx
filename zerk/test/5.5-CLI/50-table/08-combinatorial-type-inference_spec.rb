@@ -1,130 +1,204 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - table - inferrential" do
+  describe "[ze] CLI table - combinatorial type inference" do
 
-    it "_when_rendering( [] ){ .. } - renders the empty table" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :CLI_table
 
-      y = []
-      x = _when_rendering [] do | o |
-        o.on_text do | s |
-          y.push s
+    context "(elements)" do
+
+      it "type inference happens - by default, strings align L, ints R" do
+
+        _matr = [
+          [ 'a',  1 ],
+          [ 'bbb', 2222 ],
+          [ 'cc',  33],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y << "( a  ;    1 )"
+          y << "( bbb; 2222 )"
+          y << "( cc ;   33 )"
         end
       end
 
-      y.join.should eql "(empty)"
-      x.should be_nil
-    end
+      it "if any integer is negative, it will \"push\" the column wider by one" do
 
-    it "without the block - string result" do
+        _matr = [
+          [ 'a',  1 ],
+          [ 'bbb', -2222 ],
+        ]
 
-      _when_rendering( [] ).should eql "(empty)\n"
-    end
-
-    it "2 x 2 table - align left (trailing blanks in cels!)" do
-
-      data = [ %w(derp mcderperson),
-               %w(herper mcderpertino) ]
-
-      _when_rendering( data ).should eql( <<-O.unindent )
-        derp   mcderperson 
-        herper mcderpertino
-      O
-    end
-
-    it "options as param_h - works" do
-
-      s = _when_rendering [['a','b'], ['c','dd']],
-        head: '<<', tail: '>>', separator: ' | '
-
-      s.should eql( <<-O.unindent )
-        <<a | b >>
-        <<c | dd>>
-      O
-    end
-
-    it "options via the proxy knob thing - works" do
-
-      y = []
-      _when_rendering [['a','b'], ['c','dd']] do |o|
-
-        o.head = '<<'
-        o.separator = ' | '
-        o.tail = '>>'
-
-        o.on_text do | s |
-          y.push "#{ s }#{ Home_::NEWLINE_ }"
+        against_matrix_expect_lines_ _matr do |y|
+          y << "( a  ;     1 )"
+          y << "( bbb; -2222 )"
         end
       end
 
-      y.join.should eql <<-O.unindent
-        <<a | b >>
-        <<c | dd>>
-      O
-    end
+      it "floats are detected, line up on the decimal, get trailing zeros" do
 
-    context 'infers types of columns and renders accordingly' do
+        _matr = [
+          [ 'a',  1.11 ],
+          [ 'bbb', 222.2 ],
+          [ 'cc',  33.0 ],
+        ]
 
-      it "with everyday ordinary strings - aligns left" do
-        row_enum =
-         [['meep', 'mop'],
-          ['pee',  'poo']]
-
-        _when_rendering( row_enum ).should eql( <<-O.unindent )
-          meep mop
-          pee  poo
-        O
+        against_matrix_expect_lines_ _matr do |y|
+          y << "( a  ;   1.11 )"
+          y << "( bbb; 222.2  )"
+          y << "( cc ;  33.0  )"
+        end
       end
 
-      it "if column's *every value* is an integer-like string - align right" do
+      it "a negative such float can \"push\" the column wider by one" do
 
-        row_enum =
-         [['123', '4567'],
-          ['6789', '-0']]
+        _matr = [
+          [ 'a',  1.11 ],
+          [ 'bbb', -222.2 ],
+        ]
 
-        _when_rendering( row_enum ).should eql( <<-O.gsub( /^[ ]{10}/, '' ) )
-           123 4567
-          6789   -0
-        O
+        against_matrix_expect_lines_ _matr do |y|
+          y << "( a  ;    1.11 )"
+          y << "( bbb; -222.2  )"
+        end
       end
 
-      it "when you have floating-point like doo-hahs - #{
-          }something magical happens" do
+      it "if mix of integers and floats, lined up on IMAGINARY decimal point" do
 
-        row_enum =
-         [['-1.1122', 'blah'],
-          ['1', '2'],
-          ['34.5','56'],
-          ['1.348', '-3.14'],
-          ['1234.567891', '0']]
+        _matr = [
+          [ 1.230 ],
+          [ 4 ],
+          [ 56.789 ],
+        ]
 
-        _when_rendering( row_enum ).should eql( <<-O.gsub( /^[ ]{10}/, '' ) )
-            -1.1122    blah
-             1            2
-            34.5         56
-             1.348    -3.14
-          1234.567891     0
-        O
+        against_matrix_expect_lines_ _matr do |y|
+          y << "(  1.23  )"
+          y << "(  4     )"
+          y << "( 56.789 )"
+        end
       end
 
-      it "when you have a mixed \"type\" column - IT USES THE MODE" do
+      it "how are booleans lined up? to the R (unlike strings)"  do
 
-        row_enum =
-         [['0123',  '0123',    '01233', '3.1415'],
-          ['',      'meeper',  'eff',   '3.14'],
-          ['012',   '01.2',    'ef',    '23.1415'],
-          ['01',    '01',      'e',     '0']]
+        _matr = [
+          [ true ],
+          [ false ],
+        ]
 
-        _when_rendering( row_enum ).should eql( <<-O.unindent )
-          0123   0123 01233  3.1415
-               meeper eff    3.14  
-           012   01.2 ef    23.1415
-            01     01 e      0     
-        O
+        against_matrix_expect_lines_ _matr do |y|
+          y << "(  true )"
+          y << "( false )"
+        end
       end
     end
 
+    context "(combinatorials)" do
+
+      it "a mix of nil, false, true, strings and integers" do
+
+        _matr = [
+            [ 'wolulu' ],
+            [ nil ],
+            [ 123 ],
+            [ 'pishnu vanathay' ],
+            [ 45 ],
+            [ false ],
+            [ true ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y <<  '( wolulu          )'
+          y <<  '(                 )'
+          y <<  '(             123 )'
+          y <<  '( pishnu vanathay )'
+          y <<  '(              45 )'
+          y <<  '(           false )'
+          y <<  '(            true )'
+        end
+      end
+
+      it "the decimal line up, intermixed with strings" do
+
+        _matr = [
+            [ 0.123, 4.56 ],
+            [ 'hi', 78.9 ],
+            [ 45.6, 'hey' ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y <<  '(  0.123;  4.56 )'
+          y <<  '( hi    ; 78.9  )'
+          y <<  '( 45.6  ; hey   )'
+        end
+      end
+
+      it "just strings and just integers, with nil-holes" do
+
+        _matr = [
+            [ 'foo', -4567 ],
+            [ nil, 89 ],
+            [ 'bo', nil ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y <<  '( foo; -4567 )'
+          y <<  '(    ;    89 )'
+          y <<  '( bo ;       )'
+        end
+      end
+    end
+
+    context "(mixed integration tests LEGACY)" do
+
+      it "[..] something magical happens" do
+
+        _matr = [
+          [ -1.1122, 'blah' ],
+          [ 1, 2 ],
+          [ 34.5, 56 ],
+          [ 1.348, -3.14 ],
+          [ 1234.567891, 0 ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y << '  -1.1122 blah '
+          y << '   1       2   '
+          y << '  34.5    56   '
+          y << '   1.348  -3.14'
+          y << '1234.5679  0   '  # NOTE it got chomped - 5 is max
+        end
+      end
+
+      it "when you have a mixed \"type\" column - used to use the mode, no longer" do
+
+        _matr = [
+          [ 123,  123,       1233,   3.1415 ],
+          [ 'j',  'meeper',  'eff',  3.14 ],
+          [ 12,   1.2,       'ef',   23.1415 ],
+          [ 1,    1,         'e',    0 ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y << '123  123   1233  3.1415'
+          y << 'j   meeper eff   3.14  '
+          y << ' 12    1.2 ef   23.1415'
+          y << '  1    1   e     0.0   '
+        end
+      end
+
+      shared_subject :design_ish_ do
+
+        table_module_.default_design.redefine do |defn|
+
+          defn.separator_glyphs EMPTY_S_, SPACE_, EMPTY_S_
+        end
+      end
+    end
+
+    if false  # #open [#050.A]
     it "optionally format input dynamically with e.g. ascii escape sequences" do
 
       row_enum = [
@@ -150,11 +224,16 @@ module Skylab::Brazen::TestSupport
 
       _lengths.uniq.length.should eql 1
     end
+    end  # # if false
 
-    def _when_rendering * ea_and_h, & edit_p
+    shared_subject :design_ish_ do
 
-      Home_::CLI_Support::Table::Inferential.
-        render( * ea_and_h, & edit_p )
+      table_module_.default_design.redefine do |defn|
+
+        defn.separator_glyphs '( ', '; ', ' )'
+      end
     end
   end
 end
+# #tombstone: pulled in a test that used to use the mode, does no longer
+# #history: rewrote during unification.

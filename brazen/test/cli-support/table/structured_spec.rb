@@ -6,50 +6,6 @@ module Skylab::Brazen::TestSupport
 
   describe "[br] - CLI support - table - structured" do
 
-    it "by default it aligns right with reasonable glyphs. label." do
-
-      tbl = _begin_table
-
-      tbl.edit_table(
-        :field, :named, :x,
-        :field, :named, :y, :label, 'Hi'
-      )
-
-      _st = _fake_data_stream [ 'x1', 'y11' ], [ 'x2', 'y2' ]
-
-      _y = tbl.express_into_line_context_data_object_stream [], _st
-
-      o = _line_expector_via_array _y
-      o << '|   X |   Hi |'
-      o << '|  x1 |  y11 |'
-      o << '|  x2 |   y2 |'
-      o.expect_no_more_lines
-    end
-
-    it "it does NOT line up the decimals out of the box. glyphs. left align." do
-
-      tbl = _begin_table
-
-      tbl.edit_table(
-
-        :left, '( ',
-        :sep, ' ; ',
-        :field, :named, :x,
-        :left_aligned, :field, :named, :y,
-        :right, ' )'
-      )
-
-      _st = _fake_data_stream [ 1.125, 2 ], [ 3.3, 44 ]
-
-      _y = tbl.express_into_line_context_data_object_stream [], _st
-
-      o = _line_expector_via_array _y
-      o << '(     X ; Y  )'
-      o << '( 1.125 ; 2  )'
-      o << '(   3.3 ; 44 )'
-      o.expect_no_more_lines
-    end
-
     it "summary. map. data tree." do
 
       tbl = _begin_table

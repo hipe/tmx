@@ -2,7 +2,9 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    Models_ = ::Module.new
+    module Models_
+      Autoloader_[ self ]
+    end
 
     class Models_::Field
 
@@ -58,9 +60,12 @@ module Skylab::Zerk
 
     class Models_::Notes  # 1x
 
-      def initialize
+      def initialize yes, cols
+
         @_a = []
-        @the_most_number_of_columns_ever_seen = 0
+
+        @do_display_header_row = yes
+        @the_most_number_of_columns_ever_seen = cols || 0
       end
 
       def see_this_number_of_columns d
@@ -74,6 +79,7 @@ module Skylab::Zerk
       end
 
       attr_reader(
+        :do_display_header_row,
         :the_most_number_of_columns_ever_seen,
       )
     end

@@ -25,6 +25,9 @@
              as indicated in this sidesystem.
              ( #was: the eventual home of unified table support. now: [#tab-001] )
 
+       #open [#050.A] some ancient tests are awaiting grind-down for
+             custom formulizer thing
+
 [#049] #open it would nice if ACS-as-operation could express the parameter
              arity of their components somehow
 

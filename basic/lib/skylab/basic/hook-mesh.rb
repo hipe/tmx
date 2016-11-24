@@ -73,9 +73,9 @@ module Skylab::Basic
 
     class Invocation___
 
-      def initialize x, cx, h
-        @choices = cx
+      def initialize x, obs, h
         @__hash = h
+        @observer = obs
         @value = x
       end
 
@@ -92,9 +92,11 @@ module Skylab::Basic
       end
 
       attr_reader(
-        :choices,
+        :observer,
         :value,
       )
+
+      alias_method :choices, :observer  # your choice  :/
     end
     # ==
   end

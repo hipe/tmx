@@ -82,6 +82,7 @@
 
 [#015]       #to-benchmark (in-situ in [dt])
              (#moved-to: [#dt-001])
+             reminder: "benchmarks" are in [sl]
 
 [#014]       file-coverage [ big tree ]
              ( #was: #moved-to: [#dt-XXX])

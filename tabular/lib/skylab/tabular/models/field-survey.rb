@@ -34,68 +34,93 @@ module Skylab::Tabular
         @__mesh.against_value_and_choices x, self
       end
 
-      def increment_number_of_booleans
-        @number_of_booleans += 1
-      end
+      # -- probable calls back from above
 
-      def increment_number_of_nils
-        @number_of_nils += 1
-      end
+      # ~ strings
 
-      def increment_number_of_others
-        @number_of_others += 1
-      end
-
-      def increment_number_of_symbols
-        @number_of_symbols += 1
-      end
-
-      # ~
-
-      def on_nonblank_string s
-        _maybe_widen_widest_string s
-        @number_of_nonblank_strings += 1
-      end
-
-      def on_nonzero_length_blank_string s
-        _maybe_widen_widest_string s
+      def on_typeish_string_nonzero_length_blank s
+        maybe_widen_width_of_widest_string s.length
         @number_of_nonzero_length_blank_strings += 1
+        :string
       end
 
-      def _maybe_widen_widest_string s
-        d = s.length
-        if d > @width_of_widest_string
-          @width_of_widest_string = d
+      def on_typeish_string_nonblank s
+        maybe_widen_width_of_widest_string s.length
+        @number_of_nonblank_strings += 1
+        :string
+      end
+
+      def on_typeish_string_zero_length
+        @number_of_zero_length_strings += 1
+        :string
+      end
+
+      def on_typeish_symbol sym  # (like string but less indexing here)
+        @number_of_symbols += 1
+        :symbol
+      end
+
+      def maybe_widen_width_of_widest_string len
+        if @width_of_widest_string < len
+          @width_of_widest_string = len
         end
       end
 
-      def on_zero_length_string
-        @number_of_zero_length_strings += 1
+      # ~ floats
+
+      def on_typeish_negative_nonzero_float f
+
+        @number_of_negatives += 1
+        @number_of_nonzero_floats += 1
+        :nonzero_float
+      end
+
+      def on_typeish_positive_nonzero_float f
+
+        @number_of_nonzero_floats += 1
+        :nonzero_float
+      end
+
+      # ~ ints
+
+      def on_typeish_negative_nonzero_integer d
+
+        @number_of_negatives += 1
+        @number_of_nonzero_integers += 1
+        :nonzero_integer
+      end
+
+      def on_typeish_positive_nonzero_integer d
+
+        @number_of_nonzero_integers += 1
+        :nonzero_integer
       end
 
       # ~
 
-      def on_zero
+      def on_typeish_zero number
         @number_of_zeros += 1
+        :zero
       end
 
-      def on_negative_nonzero_integer
-        @number_of_negatives += 1
-        @number_of_nonzero_integers += 1
+      # ~
+
+      def on_typeish_boolean b
+        @number_of_booleans += 1
+        :boolean
       end
 
-      def on_positive_nonzero_integer
-        @number_of_nonzero_integers += 1
+      def on_typeish_nil
+        @number_of_nils += 1
+        :nil
       end
 
-      def on_negative_nonzero_float
-        @number_of_negatives += 1
-        @number_of_nonzero_floats += 1
+      def on_typeish_other x
+        @number_of_others += 1
+        :other
       end
 
-      def on_positive_nonzero_float
-        @number_of_nonzero_floats += 1
-      end
+      # --
 
       def finish
 

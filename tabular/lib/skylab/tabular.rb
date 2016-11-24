@@ -151,13 +151,13 @@ module Skylab::Tabular
     # -- (above is for in-file example..)
 
     stream_via_stream_and_page_size = nil
-    PageStream_via_PageSize_and_Etc = -> tu_st, page_size, page_magnet do
+    PageStream_via_Choices_and_Etc = -> tu_st, cx, page_magnet do
 
       p = -> do
 
-        _shortened_tu_st = stream_via_stream_and_page_size[ tu_st, page_size ]
+        _shortened_tu_st = stream_via_stream_and_page_size[ tu_st, cx.page_size ]
 
-        _page = page_magnet[ _shortened_tu_st ]
+        _page = page_magnet[ _shortened_tu_st, cx ]
 
         _page  # #todo
       end
