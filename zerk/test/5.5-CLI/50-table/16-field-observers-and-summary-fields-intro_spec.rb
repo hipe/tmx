@@ -32,25 +32,27 @@ module Skylab::Zerk::TestSupport
 
       table_module_.default_design.redefine do |defn|
 
-        defn.add_field_observer :zazzio, :observe_field, 1 do |o|
+        defn.add_field_observer :zazzio, :observe_input_at_offset, 1 do |o|
           total = 0.0
           o.on_typified_mixed do |tm|
             if tm.is_numeric
               total += tm.value
             end
           end
-          o.retrieve_by do
+          o.read_observer_by do
             total
           end
         end
 
         defn.add_field  # nothing
 
-        defn.add_field :summary_field, 0 do |o|
+        defn.add_field :summary_field, :order_of_operation, 0 do |o|
 
           total = o.read_observer :zazzio
 
           tm = o.row_typified_mixed_at 2  # use the index after stretching
+            # (justification at [#050.B])
+
           if tm.is_numeric
             tm.value.to_f / total
           end

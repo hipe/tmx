@@ -385,8 +385,8 @@ module Skylab::Tabular
       @_typified_mixed_array = typi_a
     end
 
-    def replace_array_by
-      @_typified_mixed_array = yield @_typified_mixed_array
+    def mutate_array_by
+      yield @_typified_mixed_array
       NIL
     end
 

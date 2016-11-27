@@ -4,181 +4,236 @@ module Skylab::Zerk
 
     module Models_::SummaryField
 
-      # summary fields are crazy: first, they are stored in a sparse
-      # array in "packs". here are four fields in three packs:
+      # given the axioms,
       #
-      #       [f1], [ f2, f3 ], nil, [f4]
+      #   - plain fields and summary fields are stored together inline
+      #     in one array, with their positions isomorphic to their
+      #     positions in the final, rendered output table.
       #
-      # each *typified* tuple:
+      #   - plain fields and summary fields can occur in any arrangement,
+      #     provided that there is at least one plain field.
       #
-      #            [A][B][C]
+      #   - a plain field with no metadata is represented as `nil`
+
+      # imagine an as-stored sparse list of defined fields with some
+      # summary fields.
       #
-      # is expanded to to fit the N packs and each of their M elements:
+      #     [ f0, nil, f2, sf1, f3, nil, sf3, sf4, f5 ]
       #
-      #         [ ][A][ ][ ][B][C][ ]
+      # given the axioms, we can induce that the (imaginary) subset
+      # list of plain fields looks like
       #
-      # each pack (slot) represents an insertion into the array. the offset
-      # of the pack is the offset of the insertion point. the number of
-      # items in the pack is how many blank spaces are inserted there.
+      #     [ f0, nil, f2, f3, nil, f5 ]
       #
-      # now we have the fully expanded, sparse "typified tuple".
+      # which is simply the as-stored list with the summary fields removed.
       #
-      # then the procs of the summary fields are called in the order of
-      # their ordinal integer (arbitrary order, user-provided) to populate
-      # the expanded typified tuple as necessary.
+      # these six plain fields correspond to six assumed elements of
+      # each incoming mixed tuple.
       #
-      #        [f1][A][f2][f3][B][C][f4]
+      #     [ x0, x1, x2, x3, x4, x5 ]
       #
-      # in one *row* each proc gets *the same* "row-controller instance".
-      # (but a new row controller is created for each row). through this
-      # controller the invocation can be reached, as well as those cels
-      # of the row that have been caculated already.
+      # any N-tuple has the N+1 possible "insertion points".
+      #
+      #      0   1   2   3   4   5  6
+      #
+      # (that is; you can insert before the first element, after the
+      # last element, or between any adjacent elements.) (yes, it is
+      # then not accurate to call this structure a "tuple".)
+      #
+      # now, given the original array, group contiguous spans of summary
+      # fields by their insertion point
+      #
+      #      0   1    2   3        4    5            6
+      #     [ f0, nil, f2, sf1, f3, nil, sf3, sf4, f5 ]
+      #
+      # at insertion point 3 there is ONE summary field to insert
+      # at insertion point 5 there are TWO summary fields to insert
+      #
+      # (in the code we may refer to this grouping of one insertion
+      # point with its 1-N summary fields as a "pack".)
+      #
+      # from all this, we derive our "expander data" as one list of
+      # "insertion points"
+      #
+      #     [ 5, 3 ]  # insertion points (we insert from end to beginning)
+      #
+      # and one PARALLEL list of "empty arrays"
+      #
+      #     [ [nil, nil], [nil] ]  # empty arrays
+      #
+      # which we use to convert
+      #
+      #      # 0   1   2   3   4   5
+      #       [ x0, x1, x2, x3, x4, x5 ]
+      # to
+      #
+      #     [ x0, x1, x2, nil, x3, x4, nil, nil, x5 ]
+      #
+      # which finally becomes
+      #
+      #     [ x0, x1, x2, SF1, x3, x4, SF2, SF3, x5 ]
+
+      class Index
+
+        class << self
+          alias_method :begin, :new
+          undef_method :new
+        end  # >>
+
+        def initialize
+
+          @_empty_arrays = []
+          @_insertion_points = []
+          @_last_insertion_point = -1
+          @_last_summary_field_index = nil
+          @_ord_array = []
+          @_summary_field_count = 0
+        end
+
+        def receive_NEXT_summary_field fld, d
+
+          __maybe_begin_pack d
+
+          @_empty_arrays.last.push NOTHING_
+
+          @_summary_field_count += 1
+          ord_d = fld.summary_field_ordinal
+          @_ord_array[ ord_d ] and fail self._COVER_ME__say_collision( ord_d )  # #todo
+          @_ord_array[ ord_d ] = d
+
+          NIL
+        end
+
+        def __maybe_begin_pack d
+
+          _is_subsequent_in_pack = ( d - 1 ) == @_last_summary_field_index
+          @_last_summary_field_index = d
+
+          if ! _is_subsequent_in_pack
+            __begin_pack d
+          end
+        end
+
+        def __begin_pack d
+
+          this_insertion_point = d - @_last_insertion_point - 1
+
+          @_last_insertion_point = this_insertion_point
+
+          @_insertion_points.push this_insertion_point
+
+          @_empty_arrays.push []
+
+          NIL
+        end
+
+        def finish
+
+          if @_summary_field_count != @_ord_array.length
+            fail self._COVER_ME__say_missing_ordinals  # #todo
+          end
+
+          @_last_index = @_insertion_points.length - 1
+
+          if @_last_index.nonzero?
+            self._WALK_THROUGH_ALL_OF_THIS_VERY_CAREFULLY_README
+            # we "feel" like 95% certain that it's all going to work as
+            # intended, but it it doesn't it will be annoying to trace it
+            # back to here so #cover-me
+          end
+
+          @indexes_of_summary_fields_in_visitation_order =
+            remove_instance_variable( :@_ord_array )
+
+          remove_instance_variable :@_last_insertion_point
+          remove_instance_variable :@_last_summary_field_index
+          remove_instance_variable :@_summary_field_count
+
+          self
+        end
+
+        def visit_subtractively__ participant
+          _visit :at_index_subtract_N_items, participant
+          NIL
+        end
+
+        def visit_additively__ participant
+          _visit :at_index_add_N_items, participant
+          NIL
+        end
+
+        def _visit m, participant
+          @_last_index.downto 0 do |d|
+            participant.send( m,
+              @_insertion_points.fetch( d ),
+              @_empty_arrays.fetch( d ).length,
+            )
+          end
+          NIL
+        end
+
+        def expand_array mutable_a
+          d = @_last_index
+          begin
+            mutable_a[ @_insertion_points.fetch( d ), 0 ] = @_empty_arrays.fetch d
+            d.zero? && break
+            d -= 1
+            redo
+          end while above
+          NIL
+        end
+
+        attr_reader(
+          :indexes_of_summary_fields_in_visitation_order,
+        )
+      end
 
       class CollectionController
 
-        def initialize sf_def, invo
-          @crazy_array = sf_def
-          @invocation = invo
+        def initialize index, invo
+          @_index = index
+          @__invocation = invo
         end
 
         def mutate_page_data page_data
-          Money___.new( page_data, @crazy_array, @invocation ).execute
+
+          __expand_and_populate_the_field_surveys page_data
+          __expand_and_populate_every_typified_tuple page_data
           NIL
         end
-      end
 
-      # ==
+        def __expand_and_populate_the_field_surveys page_data
 
-      class Money___
-
-        def initialize sct, cr_a, invo
-          @build_field_survey = sct.field_survey_by
-          @crazy_array = cr_a
-          @field_surveys = sct.field_surveys
-          @invocation = invo
-          @typified_mixed_via_value_and_index = sct.typified_mixed_via_value_and_index_by
-          @typified_tuples = sct.typified_tuples
+          @_index.visit_additively__ page_data.field_survey_writer
+          NIL
         end
 
-        def execute
+        def __expand_and_populate_every_typified_tuple page_data
 
-          empty_arrays = []              # [[nil], [nil,nil], [nil]]
-          insertion_offsets = []         # [0, 1, 3]
+          idx = @_index
+          invo = @__invocation
 
-          flat_guys = []                 # [f1][ ][f2][f3][ ][ ][f4]
-          indexes_into_flat_guys = []    # [0,2,3,6]
+          d_a = idx.indexes_of_summary_fields_in_visitation_order
+          fields = invo.design.all_defined_fields
+          fsw = page_data.field_survey_writer
 
-          @crazy_array.each_with_index do |fi_a, d|
-            if fi_a
-              empty_a = []
-              fi_a.each do |fi|
-                empty_a.push nil
-                indexes_into_flat_guys.push flat_guys.length
-                flat_guys.push fi
+          page_data.typified_tuples.each do |tuple|
+
+            tuple.mutate_array_by do |mutable_a|
+
+              idx.expand_array mutable_a
+
+              row_cont = RowController___.new mutable_a, invo
+
+              d_a.each do |d|
+                _x = fields.fetch( d ).summary_field_proc[ row_cont ]
+                mutable_a.fetch( d ) && self._SANITY  # #todo
+                mutable_a[ d ] = fsw.typified_mixed_via_value_and_index _x, d
               end
-              empty_arrays.push empty_a
-              insertion_offsets.push d
-            end
-            flat_guys.push nil
-          end
 
-          @_flat_guys = flat_guys
-          @_indexes_into_flat_guys = indexes_into_flat_guys
-          __init_visitation_order
-
-          # --
-
-          start_at_end = insertion_offsets.length - 1
-
-          stretch_this_array = -> arr do
-            d = start_at_end
-            begin
-              arr[ insertion_offsets.fetch( d ), 0 ] = empty_arrays.fetch d
-              if d.zero?
-                break
-              end
-              d -= 1
-              redo
-            end while above
-          end
-
-          # --
-
-          stretch_this_array[ @field_surveys ]
-
-          indexes_into_flat_guys.each do |d|
-            x = @field_surveys.fetch d
-            x && fail
-            @field_surveys[ d ] = @build_field_survey[]
-          end
-
-          # --
-
-          @typified_tuples.each do |tuple|
-
-            tuple.replace_array_by do |arr|
-              arr = arr.dup
-              stretch_this_array[ arr ]
-              __mutate_tuple_array arr
-              arr
+              NIL
             end
           end
-
-          NIL
-        end
-
-        def __init_visitation_order
-
-          a = []
-          count = 0
-
-          @_indexes_into_flat_guys.each do |d_|
-            count += 1
-
-            hi = @_flat_guys.fetch d_
-
-            ord = hi.summary_field_ordinal
-
-            d = a[ord]
-            if d
-              fail __say_collision ord
-            end
-            a[ ord ] = d_
-          end
-
-          if count != a.length
-            fail __say_sparse a
-          end
-
-          @__visitation_order = a
-
-          NIL
-        end
-
-        def __mutate_tuple_array arr
-
-          row_controller = RowController___.new arr, @invocation
-
-          @__visitation_order.each do |guy_d|
-
-            _field = @_flat_guys.fetch guy_d
-
-            arr[ guy_d ] && self._SANITY
-
-            _x = _field.summary_field_proc[ row_controller ]
-
-            __accept_value arr, _x, guy_d
-          end
-          NIL
-        end
-
-        def __accept_value arr, x, guy_d
-
-          _tm = @typified_mixed_via_value_and_index[ x, guy_d ]
-
-          arr[ guy_d ] = _tm
-
-          NIL
         end
       end
 

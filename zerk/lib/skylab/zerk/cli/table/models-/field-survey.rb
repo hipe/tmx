@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     class Models_::FieldSurvey < Tabular_::Models::FieldSurvey
 
-      class Choices
+      class Choices  # 1x
 
         def initialize foa, at_page_end_p, at_end_p, design
           @field_observers_array = foa
@@ -59,7 +59,7 @@ module Skylab::Zerk
           d, d_ = _thing_ding( -f )
           _see_left_side_etc( d + 1 )
           _see_right_side_etc d_
-          maybe_widen_width_of_widest_string d + d_ + 2  # sign, decimal
+          # see [#050.A] widths of columns with floats
           super
         end
 
@@ -68,7 +68,7 @@ module Skylab::Zerk
           d, d_ = _thing_ding f
           _see_left_side_etc d
           _see_right_side_etc d_
-          maybe_widen_width_of_widest_string d + d_ + 1  # decimal
+          # see [#050.A] widths of columns with floats
           super
         end
 

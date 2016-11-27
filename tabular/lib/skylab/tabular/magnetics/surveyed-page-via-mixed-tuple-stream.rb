@@ -5,25 +5,24 @@ module Skylab::Tabular
     class SurveyedPage___
 
       def initialize fs_a, cts
+        @every_survey_of_every_field = fs_a  # frozen.
         @__typified_tuples = cts
-        @field_surveys = fs_a
       end
 
       def to_typified_tuple_stream
         Stream_[ @__typified_tuples ]
       end
 
-      def number_of_fields
-        @field_surveys.length
+      def number_of_all_fields
+        @every_survey_of_every_field.length
       end
 
       attr_reader(
-        :field_surveys,
+        :every_survey_of_every_field,
       )
     end
 
     # -
-
       class << self
         def call tu_st, cx=nil
           new( tu_st, cx ).execute
@@ -35,203 +34,185 @@ module Skylab::Tabular
       def initialize tu_st, cx
 
         if cx
-          fo = cx.field_observers_array
+          fo_a = cx.field_observers_array
           fld_survey_cls = cx.field_survey_class
           hfeop = cx.hook_for_end_of_page
           mesh = cx.hook_mesh
         end
 
-        @mixed_tuple_stream = tu_st
-        @the_most_cels_ever = 0
+        if fo_a
+          @__field_observers_array = fo_a
+          @_receive_typified = :__receive_typified_when_some_fields_are_observed
+        else
+          @_receive_typified = :_receive_typified_normally
+        end
 
-        @__field_observers_array = fo
-        @__field_survey_class = fld_survey_cls || Home_::Models::FieldSurvey
+        @_field_survey_writer = FieldSurveys___.new mesh, fld_survey_cls
         @__hook_for_end_of_page = hfeop
-        @__mesh = mesh || HOOK_MESH___
+        @__mixed_tuple_stream = tu_st
+        @_the_most_number_of_cels_seen_on_this_page = 0
+        @__typified_tuples = []
       end
 
       def execute
-        mixed_tuple = @mixed_tuple_stream.gets
+        st = remove_instance_variable :@__mixed_tuple_stream
+        mixed_tuple = st.gets
         if mixed_tuple
-          __build_page mixed_tuple
+          __see_every_input_tuple mixed_tuple, st
+          __flush_page
         else
-          NOTHING_
+          NOTHING_  # hi.
         end
       end
 
-      def __build_page mixed_tuple
-
-        seer = __seer
-
-        mixed_tuple_st = remove_instance_variable :@mixed_tuple_stream
-
+      def __see_every_input_tuple mixed_tuple, mixed_tuple_st
         begin
-          seer.see mixed_tuple
-
+          __see_mixed_tuple mixed_tuple
           mixed_tuple = mixed_tuple_st.gets
-
         end while mixed_tuple
+        NIL
+      end
 
-        fs = @field_surveys  # do not remove, used by hook out
-        tt = remove_instance_variable :@_typified_tuples
+      def __flush_page
+
+        # now that we have traversed the whole page of input, the array's
+        # positions no longer must correspond to positions of input tuples.
+        # now, the hook-in can expand this array at arbitrary positions.
+
+        fsw = remove_instance_variable :@_field_survey_writer
+
+        tt = remove_instance_variable :@__typified_tuples
 
         p = remove_instance_variable :@__hook_for_end_of_page
         if p
-          p[ Whatever_You_Need___.new( fs, tt, self ) ]
+          p[ Only_What_You_Need___.new( tt, fsw ) ]
         end
 
-        fs.each( & :finish )
+        _final_surveys = fsw.finish
 
-        SurveyedPage___.new fs, tt
+        SurveyedPage___.new _final_surveys, tt
       end
 
-      def __seer
+      def __see_mixed_tuple mixed_tuple
 
-        @field_surveys = []  # one per column
-        @_typified_tuples = []  # one per row
-
-        TraversalOfOneMixedTuple___.new self
-      end
-
-      def release_field_observers_array
-        remove_instance_variable :@__field_observers_array
-      end
-
-      def widen to_length
-
-        # any given tuple might have more or less items than any previous
-        # tuple. (whether or not this is allowed is outside our scope).
-        # but typically this is called only ever at the first tuple.
-
-        times = to_length - @field_surveys.length
-
-        times.times do
-          @field_surveys.push _build_field_survey_
+        len = mixed_tuple.length
+        if @_the_most_number_of_cels_seen_on_this_page < len
+          __widen_to len
         end
-        @the_most_cels_ever = @field_surveys.length
-        NIL
-      end
-
-      def _build_field_survey_
-        @__field_survey_class.begin @__mesh
-      end
-
-      def _typified_mixed_via_value_and_index_ x, d
-
-        _typeish_symbol = @field_surveys.fetch( d ).see_value x
-        Home_::Models::Typified::Mixed[ _typeish_symbol, x ]
-      end
-
-      def push_typified_mixed_tuple tmt
-        @_typified_tuples.push tmt ; nil
-      end
-
-      attr_reader(
-        :field_surveys,
-        :the_most_cels_ever,
-      )
-    # -
-
-    # ==
-
-    class TraversalOfOneMixedTuple___
-
-      # dup-and-mutate pattern
-
-      def initialize cl
-
-        @_client = cl
-
-        fo_a = cl.release_field_observers_array
-        if fo_a
-          @__field_observers_array = fo_a
-          @_push = :__push_when_some_fields_are_observed
-        else
-          @_push = :_push_normally
-        end
-
-        freeze
-      end
-
-      def see mt
-        dup.__init( mt ).execute
-      end
-
-      def __init mt
-        @mixed_tuple = mt
-        @_number_of_cels = mt.length
-        self
-      end
-
-      def execute
-
-        __maybe_widen
 
         @_typified_mixeds = []
 
-        len = @_number_of_cels
-        mixed_tuple = remove_instance_variable :@mixed_tuple
-        d = 0
-
-        until len == d
-          _x = mixed_tuple.fetch d
-          _typi = @_client._typified_mixed_via_value_and_index_ _x, d
-          send @_push, _typi
-          d += 1
+        @_offset = len
+        until @_offset.zero?
+          @_offset -= 1
+          _x = mixed_tuple.fetch @_offset
+          _typi = @_field_survey_writer.
+            typified_mixed_via_value_and_index _x, @_offset
+          send @_receive_typified, _typi
         end
 
-        @_client.push_typified_mixed_tuple(
-          Home_::Models_::TypifiedMixedTuple.new(
-            remove_instance_variable( :@_typified_mixeds ).freeze ) )
+        _tm_a = remove_instance_variable :@_typified_mixeds
+        @__typified_tuples.push Home_::Models_::TypifiedMixedTuple.new _tm_a
 
         NIL
       end
 
-      def __maybe_widen
-        if @_number_of_cels > @_client.the_most_cels_ever
-          @_client.widen @_number_of_cels
-        end
-      end
+      def __receive_typified_when_some_fields_are_observed tm
 
-      def __push_when_some_fields_are_observed typified_mixed
-
-        p = @__field_observers_array[ @_typified_mixeds.length ]
+        p = @__field_observers_array[ @_offset ]
 
         # we MUST accept that the above array could change at any time
         # (so that :#spot-1 can work)
 
         if p
-          p[ typified_mixed ]
+          p[ tm ]
         end
 
-        _push_normally typified_mixed
+        _receive_typified_normally tm
       end
 
-      def _push_normally typified_mixed
-        @_typified_mixeds.push typified_mixed
+      def _receive_typified_normally tm
+        @_typified_mixeds[ @_offset ] = tm
       end
-    end
+
+      def __widen_to len
+
+        # any given tuple might have more or less items than any previous
+        # tuple. (whether or not this is allowed is outside our scope).
+        # typically this is only called once per page, at the first tuple.
+
+        _times = len - @_the_most_number_of_cels_seen_on_this_page
+        @_the_most_number_of_cels_seen_on_this_page = len
+        _times.times do
+          @_field_survey_writer.__push_new_survey_
+        end
+        NIL
+      end
+    # -
 
     # ==
 
-    class Whatever_You_Need___
+    class Only_What_You_Need___  # summary fields are nasty
 
-      # summary fields are nasty
-
-      def initialize fs, tt, o
-        @field_survey_by = o.method :_build_field_survey_
-        @field_surveys = fs
-        @typified_mixed_via_value_and_index_by =
-          o.method :_typified_mixed_via_value_and_index_
+      def initialize tt, fsw
+        @field_survey_writer = fsw
         @typified_tuples = tt
       end
 
       attr_reader(
-        :field_survey_by,
-        :field_surveys,
-        :typified_mixed_via_value_and_index_by,
+        :field_survey_writer,
         :typified_tuples,
       )
+    end
+
+    # ==
+
+    class FieldSurveys___
+
+      # while field surveys are editable they are editable,
+      # but once the are not they are not.
+
+      def initialize mesh, cls
+        @_array = []
+        @__field_survey_class = cls || Home_::Models::FieldSurvey
+        @__hook_mesh = mesh || HOOK_MESH___
+      end
+
+      def at_index_add_N_items d, n  # [ze]
+        @_array[ d, 0 ] = n.times.map do
+          _build_new_survey
+        end
+      end
+
+      def __push_new_survey_
+        @_array.push _build_new_survey
+        NIL
+      end
+
+      def _build_new_survey
+        @__field_survey_class.begin @__hook_mesh
+      end
+
+      # -- read
+
+      def typified_mixed_via_value_and_index x, d  # [ze]
+        _typeish_symbol = @_array.fetch( d ).see_value x
+        Home_::Models::Typified::Mixed[ _typeish_symbol, x ]
+      end
+
+      # --
+
+      def finish
+
+        # (tell each field survey that it can make its final tallies of
+        #  derived values (eg. totals) etc.)
+
+        remove_instance_variable :@__field_survey_class
+        remove_instance_variable :@__hook_mesh
+        arr = remove_instance_variable :@_array
+        arr.each( & :finish )
+        arr.freeze
+      end
     end
 
     # ==

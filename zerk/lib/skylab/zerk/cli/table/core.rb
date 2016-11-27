@@ -14,7 +14,7 @@ module Skylab::Zerk
 
     Default_design___ = Lazy_.call do
 
-      Design___.define do |defn|
+      Design.define do |defn|
 
         defn.separator_glyphs '|  ', ' |  ', '  |'
       end
@@ -58,7 +58,7 @@ module Skylab::Zerk
       end
     end
 
-    class Design___  # (you can expose if wanted)
+    class Design
 
       class << self
         alias_method :define, :new
@@ -69,12 +69,11 @@ module Skylab::Zerk
 
         @_accept_field = :__accept_first_field
         @field_observers = nil
-        @has_fields = false
+        @_has_defined_fields = false
         @inner_separator = SPACE_
         @left_separator = nil
         @page_size = 50
         @right_separator = nil
-        @summary_fields = nil
         @summary_rows = nil
 
         yield Design_DSL__.new self
@@ -89,11 +88,11 @@ module Skylab::Zerk
 
       def initialize_copy _
 
-        if @has_fields
-          @fields = @fields.dup
+        if @_has_defined_fields
+          @_defined_fields = @_defined_fields.dup
         end
 
-        if @summary_rows || @summary_fields
+        if @summary_rows
           self._COVER_ME
         end
 
@@ -114,7 +113,7 @@ module Skylab::Zerk
       end
 
       def __redefine_field_ d, p, x_a
-        @fields[ d ] = @fields.fetch( d ).redefine__ p, x_a
+        @_defined_fields[ d ] = @_defined_fields.fetch( d ).redefine__ p, x_a
         NIL
       end
 
@@ -123,20 +122,15 @@ module Skylab::Zerk
       end
 
       def __accept_first_field fld
-        @has_fields = true
+        @_has_defined_fields = true
+        @_defined_fields = []
         @_accept_field = :__accept_subsequent_field
-        @fields = []
         send @_accept_field, fld
       end
 
       def __accept_subsequent_field fld
-
-        if fld && fld.is_summary_field
-          @summary_fields ||= []
-          ( @summary_fields[ @fields.length ] ||= [] ).push fld
-        else
-          @fields.push fld ; nil
-        end
+        # (argument can be nil - it's a "field" with no metadata)
+        @_defined_fields.push fld
         NIL
       end
 
@@ -146,7 +140,6 @@ module Skylab::Zerk
         :left_separator,
         :page_size,
         :right_separator,
-        :summary_fields,
         :summary_rows,
       )
 
@@ -156,46 +149,86 @@ module Skylab::Zerk
         # on field add (for example) in part because they have to work
         # across the dup-mutate boundary - a redesign could remove/alter fields
 
-        if @has_fields
+        if @_has_defined_fields
 
-          one_has_label = nil
-          len = @fields.length
+          defined_fields = @_defined_fields
+          len = defined_fields.length
+          d = -1
+
+          # ~ summary fields
+
+          summary_fields = nil
+
+          # ~ header row
+
+          one_has_label = false
+
+          # ~ alignment
+
           left = ::Array.new len
           right = left.dup
-          d = len
           align = {
             left: -> { left[d] = true },
             right: -> { right[d] = true },
-            nil => EMPTY_P_,
           }
+
           begin
-            d.zero? && break
-            d -= 1
-            fld = @fields.fetch d
+            d += 1
+            len == d && break
+            fld = defined_fields.fetch d
             fld || redo
-            align.fetch( fld.align ).call
-            if fld.label
+
+            # ~ summary fields
+
+            if fld.is_summary_field
+              summary_fields ||= Here_::Models_::SummaryField::Index.begin
+              summary_fields.receive_NEXT_summary_field fld, d
+            end
+
+            # ~ header row
+
+            if ! one_has_label && fld.label
               one_has_label = true
+            end
+
+            # ~ alignment
+
+            sym = fld.align
+            if sym
+              align.fetch( sym ).call
             end
             redo
           end while above
+
+          if summary_fields
+            summary_fields = summary_fields.finish
+
+            # (if we were to want to use the same position system for field
+            # observers as we do for summary field implememtations, we would
+            # do the below. but we discovered that we do not. see [#050.B])
+
+            if false && @field_observers
+              summary_fields.visit_subtractively__ @field_observers
+            end
+          end
+
         else
           left = MONADIC_EMPTINESS_
           right = MONADIC_EMPTINESS_
         end
 
-        @has_at_least_one_field_label = one_has_label
+        @__has_at_least_one_field_label = one_has_label
         @__left_explicitly = left
         @__right_explicitly = right
+        @__summary_fields_index = summary_fields
 
         freeze
       end
 
       def freeze
         @field_observers and @field_observers.freeze
-        @has_fields and @fields.freeze
+        @_has_defined_fields and @_defined_fields.freeze
         @summary_rows and @summary_rows.freeze
-        @summary_fields and @summary_fields.freeze  # ..
         super
       end
 
@@ -218,14 +251,36 @@ module Skylab::Zerk
         @__right_explicitly[ d ]
       end
 
-      def fields
-        @fields  # for warnings
+      def for_field d
+        # (allow that field-specifics possibly haven't been defined at all;
+        # but if they have, enforce the assumption that *something* (maybe
+        # nil) is at that offset.)
+        if @_has_defined_fields
+          @_defined_fields.fetch d
+        end
       end
 
-      attr_reader(
-        :has_at_least_one_field_label,
-        :has_fields,
-      )
+      # ~ (emphasize the single points of contact (R [W]) for refactorability)
+
+      def summary_fields_index__
+        @__summary_fields_index
+      end
+
+      def has_at_least_one_field_label__
+        @__has_at_least_one_field_label
+      end
+
+      def anticipated_final_number_of_columns_per_defined_fields__  # assume.
+        @_defined_fields.length
+      end
+
+      def all_defined_fields  # assume.
+        @_defined_fields
+      end
+
+      def has_defined_fields__
+        @_has_defined_fields
+      end
     end
 
     # ==

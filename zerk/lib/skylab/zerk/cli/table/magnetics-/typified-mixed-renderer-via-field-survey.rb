@@ -2,58 +2,40 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Magnetics_::TypifiedMixedRenderer_via_FieldSurvey
+    class Magnetics_::TypifiedMixedRenderer_via_FieldSurvey  # 1x
 
       # for this centralest of features of this sub-library (lining up
       # columns), we tend to rely on this general techinque: taking into
       # account what *will be* the widest width of any content once
-      # stringified in the column, produce a formatting string for use by
-      # `String#%` tailor made to the "type" of the particular value
-      # (different types can occur in the same column), and whether the
-      # column is align left or right.
+      # stringified in the column (this (sometimes hypothetical) string
+      # being called the "value-as-string"), we produce a formatting string
+      # for use by `String#%` (same as `Kernel#sprintf`, right?) that
+      #
+      #   - expresses the align-left or align-right-ness of the column AND
+      #
+      #   - is tailor made to the "type" of the particular value
+      #     (different types can occur in the same column)
+      #
       #
       # this technique (or one like it) has been the central feature of the
       # many libraries in this strain since their beginning (and it predates
       # this file by years and years). but new in this version:
-      #
-      #   - we arrive at a pre-calculation of how much width particular
-      #     values will need as strings without actually converting them
-      #     to strings, through a technique we call "a priori inference"
-      #     explained in the next section.
-      #
-      #     this technique replaces an older technique that had a higher
-      #     cost of memory and processing: in the old way we would in one
-      #     pass traverse the whole page converting each value to string
-      #     "early", and by noting the width of each value-as-string we
-      #     would determine what is the widest of these strings. then after
-      #     this maximum is found we would "flush" the matrix for a final
-      #     pass, converting these values-as-strings (somehow) to space-
-      #     padded strings in a final rendering pass.
-      #
-      #     this technique required that we store that whole matrix (page)
-      #     of values-as-strings in memory while we gathered the maximum
-      #     widths for use in generating cel-renderers for a final pass,
-      #     which is now seen as unnecessarily wasteful. (imagine a large
-      #     matrix of booleans or floats, for example, all being stored
-      #     in memory as strings.)
-      #
-      #     in the new technique this intermediate storage of strings is
-      #     avoided - the matrix is instead one of "typified mixed values",
-      #     where all we store in the matrix is the value tupled with a
-      #     symbol about its type. because we can predict (or, to the extent
-      #     that we can predict) the width of the content string before we
-      #     actually make the string, the value is never actually converted
-      #     to to a string until it is actually rendered and immediately
-      #     produced as a streamed item.
-      #
       #
       #   - this is the first application of this general techinque
       #     made to be compatible with #paging. (#todo some details are
       #     not preserved across the page boundary still, and we may leave
       #     it that way..)
       #
+      #   - our whole rendering pipeline has been both simplified and made
+      #     a universal, so that it uses less memory but still facilitates
+      #     or various advanced features.
       #
-      # ## a priori string width inference overview
+      # a detailed justification and of the new rendering pipeline starts at
+      # "justification of the new way" [#050]. the next section is the
+      # lowest level detail of that rearchitecting, directly relevent to
+      # the code in this node.
+
+      # ## a priori string width inference overview :#table-spot-2
       #
       # here's a summary of our "a priori inference" technique per type to
       # predict the necessary width withot converting it to a string:
@@ -75,54 +57,42 @@ module Skylab::Zerk
       #   |                 |
       #   | boolean         | this one's, well, pragmatic (see code).
       #   |                 |
-      #   | nil             | the content itself is always zero-width.
-      #   |                 |   (or we could do it like `true`/`false`)
+      #   | nil             | the "string-as-value" is always the empty
+      #   |                 | string. (or we could do it like `true`/`false`)
       #   |                 |
       #   | other           | we don't care about supporting arbitrary
       #   |                 |   objects here. that's seen as out of scope.
       #
       #  :#table-spot-1.
 
+      ClientMethods__ = ::Module.new
+
       # -
+
+        include ClientMethods__
 
         def initialize d, fs, invo
 
-          @field_note = invo.notes.for_field d
+          @_session_ = ClientSession___.new d, fs, invo
 
           @field_survey = fs
-          @invocation = invo
+
+          @__do_display_header_row = invo.do_display_header_row
         end
 
         def execute
 
-          fn = @field_note
-          fs = @field_survey
-
-          w = fn.widest_width_ever
-          w_ = fs.width_of_widest_string
-
-          if w < w_
-            fn.widest_width_ever = w_
-            # #open [#050] this "widening" was the central mechanical
-            # innovation of (there). eventually DRY up that with this.
-          end
-
-          _1 = @invocation.do_display_header_row
-          _2 = fs.number_of_symbols.nonzero?
-          _3 = fs.number_of_strings.nonzero?
-
-          _do_stringishes = _1 || _2 || _3
-
-          @proc_box = Common_::Box.new
-          @_design = @invocation.design
-
           # (do numerics before all others because #here-1)
 
+          __maybe_widen_field_note_width
+
+          fs = @field_survey
+
           if fs.number_of_numerics.nonzero?
-            _visit_maven :TypeMaven_for_Numerics
+            TypeMaven_for_Numerics___.new( @_session_ ).execute
           end
 
-          if _do_stringishes
+          if __do_stringishes
             __contribute_renderer_for_stringishes
           end
 
@@ -139,6 +109,35 @@ module Skylab::Zerk
           end
 
           __flush_final_proc
+        end
+
+        def __maybe_widen_field_note_width
+
+          # the field survey pertains only to this page but the field note
+          # is forever. we haven't yet widened the one with the other; we
+          # do it here.
+          #
+          # it goes in the one direction but not the other (the survey
+          # writes to the notes), so we've got to be sure that we only read
+          # the note and not the survey after here.
+          #
+          # this "widening" across pages was the central mechanical innovation
+          # of [tagged]. eventually we'll dry that up with this. :[#050].
+
+          maybe_make_field_note_width_wider(
+            @field_survey.width_of_widest_string )
+          NIL
+        end
+
+        def __do_stringishes
+
+          # for sanity check, maintain contact with all of them
+
+          _2 = @field_survey.number_of_symbols.nonzero?
+
+          _3 = @field_survey.number_of_strings.nonzero?
+
+          @__do_display_header_row || _2 || _3
         end
 
         def __contribute_renderer_for_stringishes
@@ -184,64 +183,21 @@ module Skylab::Zerk
 
         def __flush_final_proc
 
-          value_renderer_via_type = remove_instance_variable( :@proc_box ).h_
+          value_renderer_via_type = @_session_.__release_proc_box_.h_
 
           -> typi do
             value_renderer_via_type.fetch( typi.typeish_symbol )[ typi.value ]
           end
         end
-
-        def _visit_maven const
-          This_.const_get( const, false ).new( self ).execute
-          NIL
-        end
-
-        def is_align_left_explicitly
-          @_design.field_is_aligned_left_explicitly @field_note.field_offset
-        end
-
-        def is_align_right_explicitly
-          @_design.field_is_aligned_right_explicitly @field_note.field_offset
-        end
-
-        def widest_width_ever
-          @field_note.widest_width_ever
-        end
-
-        def on sym, & p
-          @proc_box.add sym, p ; nil
-        end
-
-        attr_reader(
-          :design,
-          :field_note,
-          :field_survey,
-          :proc_box,
-        )
       # -
-      # ==
 
-      class TypeMaven_for_Numerics
+      class TypeMaven_for_Numerics___
 
-        def initialize _
-          @_ = _
-        end
+        include ClientMethods__
 
         def execute
 
-          fs = @_.field_survey
-
-          @_left_width = fs.
-            the_maximum_number_of_characters_ever_seen_left_of_the_decimal
-
-          @_right_width = fs.
-            the_maximum_number_of_digits_ever_seen_to_the_right_of_the_decimal
-
-          @_widest_width = fs.width_of_widest_string
-
-          seen_ints = fs.number_of_nonzero_integers.nonzero?
-          seen_floats = @_right_width.nonzero?
-          seen_zeros = fs.number_of_zeros.nonzero?
+          # (here's what we mean by "combinatorial..)
 
           if seen_floats
 
@@ -262,7 +218,6 @@ module Skylab::Zerk
             if seen_zeros
               _reuse_handler_for_ints_as_handler_for_zeros
             end
-
           elsif seen_zeros
             __contribute_static_string_handler_for_zeros
           end
@@ -271,14 +226,80 @@ module Skylab::Zerk
 
         def __contribute_handler_for_floats
 
-          my_width = @_left_width + 1 + @_right_width  # 1 for '.'
+          NonzeroFloatMaven___.new( @_session_ ).execute
+        end
 
-          _inner_format = "%#{ my_width }.#{ @_right_width }f"
+        def __contribute_handler_for_ints_with_invisible_floating_point
 
-          float_format = _pad_with_spaces_default_align_right my_width, _inner_format
+          NonzeroIntegerWithInvisibleFloatingPoint___.new( @_session_ ).execute
+        end
 
-          @_.on :nonzero_float do |f|
+        def __contribute_handler_for_ints_simply
 
+          NonzeroIntegerMaven___.new( @_session_ ).execute
+        end
+
+        def __reuse_handler_for_floats_as_handler_for_zeros
+
+          on :zero, & proc_box.fetch( :nonzero_float )
+        end
+
+        def _reuse_handler_for_ints_as_handler_for_zeros
+
+          on :zero, & proc_box.fetch( :nonzero_integer )
+        end
+
+        def __contribute_static_string_handler_for_zeros
+
+          ::Kernel._COVER_ME_code_sketch
+
+          static_string = pad_with_spaces_default_align_right 1, '0'
+
+          on :zero do
+            static_string
+          end
+        end
+      end
+
+      # ==
+
+      NumericMaven__ = ::Class.new
+
+      class NonzeroFloatMaven___ < NumericMaven__
+
+        def initialize( * )
+          super
+          __maybe_widen_only_now_that_we_are_at_the_end_of_the_page
+        end
+
+        def __maybe_widen_only_now_that_we_are_at_the_end_of_the_page
+
+          # you must read [#050.A]. widening the thing :#here-2 is ick but meh.
+
+          _left_width = widest_left_in_field_survey
+
+          _right_width = widest_right_in_field_survey
+
+          sum = _left_width + 1 + _right_width  # 1 for '.'
+
+          @_width_of_imaginary_content_column = sum
+
+          maybe_make_field_note_width_wider sum
+        end
+
+        def _proc_
+
+          if COMING_SOON__
+          else
+            _proc_normally_
+          end
+        end
+
+        def _proc_normally_
+
+          float_format = _final_format_string_
+
+          -> f do
             _ = float_format % f
 
             # hack to remove trailing zeros while still using `format` :(
@@ -286,83 +307,122 @@ module Skylab::Zerk
             _ = _.gsub %r((?<!\.)(0+)\z) do |hi|  # #open [#bm-012] (in [sl])
               SPACE_ * hi.length
             end
-            _
+            _  # #todo
           end
         end
 
-        def __contribute_handler_for_ints_with_invisible_floating_point
+        def _inner_format_string_
 
-          width_of_right_part = 1 + @_right_width   # 1 for '.'
+          _right_width = widest_right_in_field_survey
 
-          _my_width = @_left_width + width_of_right_part
+          "%#{ @_width_of_imaginary_content_column }.#{ _right_width }f"
+        end
 
-          _spaces_instead_of_decimal_etc = SPACE_ * width_of_right_part
+        def _width_of_imaginary_content_column_
 
-          _inner_format = "%#{ @_left_width }d#{ _spaces_instead_of_decimal_etc }"
+          @_width_of_imaginary_content_column
+        end
 
-          int_format = _pad_with_spaces_default_align_right _my_width, _inner_format
+        def _name_symbol_
+          :nonzero_float
+        end
+      end
 
-          @_.on :nonzero_integer do |d|
+      # ==
+
+      class NonzeroIntegerWithInvisibleFloatingPoint___ < NumericMaven__
+
+        def _proc_
+
+          right_width = 1 + widest_right_in_field_survey  # 1 for '.'
+
+          left_width = widest_left_in_field_survey
+
+          _my_width = left_width + right_width
+
+          _spaces_instead_of_decimal_etc = SPACE_ * right_width
+
+          _inner_format = "%#{ left_width }d#{ _spaces_instead_of_decimal_etc }"
+
+          int_format = pad_with_spaces_default_align_right _my_width, _inner_format
+
+          -> d do
             int_format % d
           end
         end
 
-        def __contribute_handler_for_ints_simply
+        def _name_symbol_
+          :nonzero_integer  # a repeat
+        end
+      end
 
-          my_width = @_left_width
+      # ==
 
-          _inner_format = "%#{ my_width }d"
+      class NonzeroIntegerMaven___ < NumericMaven__
 
-          int_format = _pad_with_spaces_default_align_right my_width, _inner_format
+        def _proc_
 
-          @_.on :nonzero_integer do |d|
-            int_format % d
+          format = _final_format_string_
+
+          -> d do
+            format % d
           end
         end
 
-        def __contribute_static_string_handler_for_zeros
+        def _inner_format_string_
 
-          static_string = _pad_with_spaces_default_align_right 1, '0'
+          _w = widest_left_in_field_survey
 
-          @_.on :zero do
-            ::Kernel._K
-            static_string
-          end
+          "%#{ _w }d"
         end
 
-        def __reuse_handler_for_floats_as_handler_for_zeros
-
-          @_.on :zero, & @_.proc_box.fetch( :nonzero_float )
+        def _width_of_imaginary_content_column_
+          widest_left_in_field_survey  # ..
         end
 
-        def _reuse_handler_for_ints_as_handler_for_zeros
+        def _name_symbol_
+          :nonzero_integer
+        end
+      end
 
-          @_.on :zero, & @_.proc_box.fetch( :nonzero_integer )
+      # ==
+
+      class NumericMaven__
+
+        include ClientMethods__
+
+        def execute
+          _p = _proc_
+          _k = _name_symbol_
+          on _k, & _p
+          NIL
         end
 
-        def _pad_with_spaces_default_align_right width_of_inner_string, inner_string
+        def _final_format_string_
 
-          # NOTE that the would-be width of the formatted string (which is
-          # expressed as the first argument above) CAN BE wider than the
-          # "widest width ever" seen to date - imagine 1.11 and 22.2:
-          # each of those says (correctly) that its value-as-string width
-          # is 4. however, if you stack them atop one another and line up
-          # the decimals, your column needs to be 5 characters wide:
-          #    -----
-          #     1.11
-          #    22.20
-          #    -----
-          # so when floats are in play, the width needed is the sum
-          # of the widest width ever seen for a left part plus the widest
-          # width ever seen for a right part. whew!  :#here-1
+          _w = _width_of_imaginary_content_column_
 
-          w = @_.widest_width_ever
+          _s = _inner_format_string_
+
+          pad_with_spaces_default_align_right _w, _s
+        end
+      end
+
+      # ==
+
+      module ClientMethods__
+
+        def initialize sess  # ..
+          @_session_ = sess
+        end
+
+        def pad_with_spaces_default_align_right width_of_inner_string, inner_string
+
+          w = widest_width_ever
           case w <=> width_of_inner_string
           when -1
-            # push the width wider. no extra padding here.
 
-            @_.field_note.widest_width_ever = width_of_inner_string
-            inner_string
+            self._NEVER  # see #here-2
 
           when 0
             # no extra padding. widest width ever is correct as-is
@@ -376,16 +436,110 @@ module Skylab::Zerk
 
             padding = SPACE_ * ( w - width_of_inner_string )
 
-            if @_.is_align_left_explicitly
+            if is_align_left_explicitly
               "#{ inner_string }#{ padding }"
             else
               "#{ padding }#{ inner_string }"
             end
           end
         end
+
+        def maybe_make_field_note_width_wider now
+          @_session_.__maybe_make_field_note_width_wider_ now
+          NIL
+        end
+
+        def widest_width_ever
+          @_session_.field_note.widest_width_ever
+        end
+
+        def widest_left_in_field_survey  # ..
+          @_session_.field_survey.
+            the_maximum_number_of_characters_ever_seen_left_of_the_decimal
+        end
+
+        def widest_right_in_field_survey  # ..
+          @_session_.field_survey.
+            the_maximum_number_of_digits_ever_seen_to_the_right_of_the_decimal
+        end
+
+        def is_align_left_explicitly
+          @_session_.__is_align_left_explicitly_
+        end
+
+        def is_align_right_explicitly
+          @_session_.__is_align_right_explicitly_
+        end
+
+        def seen_ints
+          @_session_.field_survey.number_of_nonzero_integers.nonzero?
+        end
+
+        def seen_floats
+          @_session_.field_survey.number_of_nonzero_floats.nonzero?
+        end
+
+        def seen_zeros
+          @_session_.field_survey.number_of_zeros.nonzero?
+        end
+
+        def on sym, & p
+          @_session_.proc_box.add sym, p ; nil
+        end
+
+        def proc_box
+          @_session_.proc_box
+        end
+      end
+
+      class ClientSession___
+
+        def initialize d, fs, invo
+          @proc_box = Common_::Box.new
+          design = invo.design
+          @design = design
+          @field_design = design.for_field d
+          @field_note = invo.notes.for_field d
+          @field_survey = fs
+        end
+
+        def __maybe_make_field_note_width_wider_ now
+
+          ever = @field_note.widest_width_ever
+
+          if ever < now
+            make_field_note_width_wider now
+          end
+          NIL
+        end
+
+        def make_field_note_width_wider now  # CAREFUL
+          @field_note.widest_width_ever = now
+          NIL
+        end
+
+        def __is_align_left_explicitly_
+          @design.field_is_aligned_left_explicitly @field_note.field_offset
+        end
+
+        def __is_align_right_explicitly_
+          @design.field_is_aligned_right_explicitly @field_note.field_offset
+        end
+
+        def __release_proc_box_
+          remove_instance_variable :@proc_box
+        end
+
+        attr_reader(
+          :field_note,
+          :field_survey,
+          :proc_box,
+        )
       end
 
       # ==
+
+      COMING_SOON__ = false
 
       This_ = self
     end

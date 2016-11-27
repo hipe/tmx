@@ -11,7 +11,7 @@ module Skylab::Zerk
 
           @design = design
 
-          _my_choices = __page_survey_choices
+          _my_choices = __init_and_page_survey_choices
 
           @page_scanner = Tabular_::Magnetics::
               PageScanner_via_MixedTupleStream_and_SurveyChoices.call(
@@ -19,9 +19,9 @@ module Skylab::Zerk
             _my_choices,
           )
 
-          if design.has_fields
-            num_cols = design.fields.length
-            if design.has_at_least_one_field_label
+          if design.has_defined_fields__
+            num_cols = design.anticipated_final_number_of_columns_per_defined_fields__
+            if design.has_at_least_one_field_label__
               yes_header_row = true
             end
           end
@@ -30,32 +30,71 @@ module Skylab::Zerk
           @notes = Here_::Models_::Notes.new num_cols
         end
 
-        def __page_survey_choices
+        def __init_and_page_survey_choices
 
-          design = @design
+          _at_page_end = __init_and_any_page_end_hook
 
-          fo_def = design.field_observers
-          if fo_def
-            @has_field_observers = true
-            _fo_a = __field_observers_array_via fo_def
+          _fo_a = __init_and_any_field_observers_array
+
+          _at_invocation_end = __any_at_invocation_end_hook
+
+          Here_::Models_::FieldSurvey::Choices.new(  # 1x
+            _fo_a, _at_page_end, _at_invocation_end, @design )
+        end
+
+        # ~
+
+        def __init_and_any_page_end_hook  # BEFORE that other one #here
+
+          index = design.summary_fields_index__
+          if index
+
+            @__summary_fields_guy =
+              Here_::Models_::SummaryField::CollectionController.new(
+                index, self )
+
+            method :__hack_page_data_for_summary_fields
           else
-            @has_field_observers = false
+            @_has_summary_fields = false
+            NOTHING_
           end
+        end
 
-          sf_def = design.summary_fields
-          if sf_def
-            __when_summary_fields sf_def
-            _at_page_end = method :__hack_page_data_for_summary_fields
-          end
+        def __hack_page_data_for_summary_fields eek
+          @__summary_fields_guy.mutate_page_data eek
+          NIL
+        end
 
-          srs_def = design.summary_rows
+        # ~
+
+        def __any_at_invocation_end_hook
+
+          srs_def = @design.summary_rows
           if srs_def
             @__summary_row_definition_collection = srs_def
-            _at_end_p = method :__mixed_tuple_stream_for_summary_rows_at_end_of_user_data
+            method :__mixed_tuple_stream_for_summary_rows_at_end_of_user_data
           end
+        end
 
-          Here_::Models_::FieldSurvey::Choices.new(
-            _fo_a, _at_page_end, _at_end_p, @design )
+        def __mixed_tuple_stream_for_summary_rows_at_end_of_user_data _hello_from_tab
+
+          _col = remove_instance_variable :@__summary_row_definition_collection
+
+          _col.build_tuple_stream_for_summary_rows_at_end_of_user_data self
+        end
+
+        # ~
+
+        def __init_and_any_field_observers_array  # AFTER that other one #here
+
+          fo_def = @design.field_observers
+          if fo_def
+            @has_field_observers = true
+            __field_observers_array_via fo_def
+          else
+            @has_field_observers = false
+            NOTHING_
+          end
         end
 
         def __field_observers_array_via field_observers
@@ -67,23 +106,7 @@ module Skylab::Zerk
           field_observers_controller.field_observers_array
         end
 
-        def __when_summary_fields srs_def
-          @__summary_fields_guy =
-            Here_::Models_::SummaryField::CollectionController.new(
-              srs_def, self )
-        end
-
-        def __hack_page_data_for_summary_fields eek
-          @__summary_fields_guy.mutate_page_data eek
-          NIL
-        end
-
-        def __mixed_tuple_stream_for_summary_rows_at_end_of_user_data _hello_from_tab
-
-          _col = remove_instance_variable :@__summary_row_definition_collection
-
-          _col.build_tuple_stream_for_summary_rows_at_end_of_user_data self
-        end
+        # ~
 
         def read_observer_ sym  # assume
           @field_observers_controller.read_observer sym

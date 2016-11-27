@@ -62,7 +62,7 @@ module Skylab::Zerk
 
         def __make_a_note_of_the_widths_of_each_any_field_label
 
-          @design.fields.each_with_index do |fld, d|
+          @design.all_defined_fields.each_with_index do |fld, d|
             label = fld.label
             label || next
             @_notes.for_field( d ).widest_width_ever = label.length
@@ -72,7 +72,7 @@ module Skylab::Zerk
 
         def __header_row
 
-          fields = @design.fields  # at least one with a label somewhere
+          fields = @design.all_defined_fields  # at least one with a label somewhere
 
           _d = @_notes.the_most_number_of_columns_ever_seen
 
@@ -114,16 +114,12 @@ module Skylab::Zerk
 
         def __at_end_of_page
 
-          # (one day maybe aggregate statistical information of the whole
-          # page e.g for totals)
-
           # (sanity cleanup for now)
           remove_instance_variable :@_line_via_typified_mixed_stream
           remove_instance_variable :@_state
           remove_instance_variable :@_typified_tuple_stream
 
           if @_page_scanner.no_unparsed_exists
-            # (one day maybe summary row hooks)
             NOTHING_
           else
             @_page = @_page_scanner.gets_one
@@ -133,7 +129,7 @@ module Skylab::Zerk
 
         def _reinit_line_renderer_via_page
 
-          @_notes.see_this_number_of_columns @_page.number_of_fields
+          @_notes.see_this_number_of_columns @_page.number_of_all_fields
 
             @_line_via_typified_mixed_stream =
           LineRenderer_via_Page_and_Invocation___.call(
@@ -149,11 +145,11 @@ module Skylab::Zerk
 
         number_of_fields = invo.notes.the_most_number_of_columns_ever_seen
 
-        field_surveys = page.field_surveys
+        field_surveys = page.every_survey_of_every_field
 
         cel_renderers = number_of_fields.times.map do |d|
 
-          Magnetics_::TypifiedMixedRenderer_via_FieldSurvey.new(
+          Magnetics_::TypifiedMixedRenderer_via_FieldSurvey.new(  # 1x
             d,
             field_surveys.fetch( d ),  # ..
             invo,

@@ -16,6 +16,8 @@ module Skylab::Zerk::TestSupport
 
       it "here is the longhand form of making a \"total\" cel (summary row)" do
 
+        # there is no shorthand yet, not sure if there ever will be #track [#057]
+
         _matr = [
           [ 'coffee', 7.23 ],
           [ 'donut', 2.78 ],
@@ -34,14 +36,14 @@ module Skylab::Zerk::TestSupport
 
           defn.separator_glyphs '| ', '   | ', ' |'
 
-          defn.add_field_observer :zizzio, :observe_field, 1 do |o|
+          defn.add_field_observer :zizzio, :observe_input_at_offset, 1 do |o|
             total = 0.0
             o.on_typified_mixed do |tm|
               if tm.is_numeric
                 total += tm.value
               end
             end
-            o.retrieve_by do
+            o.read_observer_by do
               total
             end
           end

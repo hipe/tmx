@@ -18,16 +18,16 @@ module Skylab::Tabular
       end
 
       PARAMETERS___ = {
-        observe_field: :__at_observe_field,
+        observe_input_at_offset: :__at_observe_field,
       }
 
       def __at_observe_field
         @_scn.advance_one
-        @field_offset = @_scn.gets_one ; nil
+        @input_tuple_offset = @_scn.gets_one ; nil
       end
 
       attr_reader(
-        :field_offset,
+        :input_tuple_offset,
         :__invocation_definition_proc_,
         :name_symbol,
       )
@@ -40,23 +40,28 @@ module Skylab::Tabular
       def initialize
 
         @_box = Common_::Box.new
-        @_keys_via_field_offset = []
+        @_keys_via_input_tuple_offset = []
       end
 
       def << fo
         @_box.add fo.name_symbol, fo
-        ( ( @_keys_via_field_offset ||= [] )[ fo.field_offset ] ||= [] ).push fo.name_symbol
+        ( ( @_keys_via_input_tuple_offset ||= [] )[ fo.input_tuple_offset ] ||= [] ).push fo.name_symbol
         self
+      end
+
+      def at_index_subtract_N_items d, n
+        @_keys_via_input_tuple_offset[ d, n ] = EMPTY_A_
+        NIL
       end
 
       def freeze
         @_box.freeze
-        @_keys_via_field_offset.freeze
+        @_keys_via_input_tuple_offset.freeze
         super
       end
 
       def build_controller
-        FieldObserversController___.new @_keys_via_field_offset, @_box
+        FieldObserversController___.new @_keys_via_input_tuple_offset, @_box
       end
     end
 
@@ -64,14 +69,14 @@ module Skylab::Tabular
 
     class FieldObserversController___
 
-      def initialize keys_via_field_offset, box
+      def initialize keys_via_input_tuple_offset, box
 
         @field_observers_array = []
 
         h = box.h_
-        keys_via_field_offset.length.times do |d|
+        keys_via_input_tuple_offset.length.times do |d|
 
-          keys = keys_via_field_offset.fetch d
+          keys = keys_via_input_tuple_offset.fetch d
           keys || next
 
           __populate_observers_for_column keys, h, d
@@ -154,7 +159,7 @@ module Skylab::Tabular
         @_observation_invocation.__write_see_typified_mixed_by_ p ; nil
       end
 
-      def retrieve_by & p
+      def read_observer_by & p
         @_observation_invocation.__write_retrieve_by_ p ; nil
       end
     end
@@ -185,6 +190,10 @@ module Skylab::Tabular
         :__see_typified_mixed_by_,
       )
     end
+
+    # ==
+
+    EMPTY_A_ = []
 
     # ==
   end
