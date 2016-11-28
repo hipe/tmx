@@ -41,7 +41,10 @@ module Skylab::Tabular
 
       def initialize mesh
         @hook_mesh = mesh
+        clear_survey
+      end
 
+      def clear_survey
         @number_of_booleans = 0
         @number_of_cels = 0
         @number_of_negatives = 0
@@ -55,6 +58,7 @@ module Skylab::Tabular
         @number_of_zero_length_strings = 0
         @number_of_zeros = 0
         @width_of_widest_string = 0
+        NIL
       end
 
       # -- mutate

@@ -61,17 +61,22 @@ module Skylab::Zerk
           if field
             sprintf_h = field.sprintf_hash
           end
-          @_sprintf_hash = sprintf_h || MONADIC_EMPTINESS_
+          @_sprintf_hash = sprintf_h  # can be nil
+
+          super mesh
+        end
+
+        def clear_survey  # called 1x during initialize, Nx after
+
+          @_custom_format_related = nil
 
           @_see_positive_nonzero_float = :__see_first_positive_nonzero_float
           @_see_negative_nonzero_float = :__see_first_negative_nonzero_float
 
-
-          @_custom_float_format_was_used = false
           @the_maximum_number_of_characters_ever_seen_left_of_the_decimal = 0
           @the_maximum_number_of_digits_ever_seen_to_the_right_of_the_decimal = 0
 
-          super mesh
+          super
         end
 
         # ~ strings (nothing else needed)
@@ -115,28 +120,24 @@ module Skylab::Zerk
         end
 
         def _has_custom_float_formatter
-          x = @_sprintf_hash[ :nonzero_float ]
-          if x
-            @HAS_CUSTOM_FLOAT_FORMAT = true
-            @CUSTOM_FLOAT_FORMAT = x ; ACHIEVED_
-          end
+          @_sprintf_hash and @_sprintf_hash.key? :nonzero_float
         end
 
         def _see_this_and_future_floats_via_custom_formatter f
 
           # "the delicate art of custom formats" :[#050.D]
 
-          @_custom_float_format_was_used = true
+          format = @_sprintf_hash.fetch :nonzero_float
 
-          _throwaway = @CUSTOM_FLOAT_FORMAT % f
-
-          w = _throwaway.length
+          _throwaway = format % f
 
           # maybe_widen_width_of_widest_string w  happens #here
 
-          @WIDTH_OF_VALUE_AS_STRING_FROM_CUSTOM_FLOAT_FORMAT = w
+          ( @_custom_format_related ||= {} )[ :nonzero_float ] =
+            CustomFormatRelated___.new _throwaway.length, format
 
           _see_floats_normally
+
           if 0.0 < f  # calculation repeated. meh
             send @_see_positive_nonzero_float, f
           else
@@ -226,9 +227,11 @@ module Skylab::Zerk
 
           if @number_of_nonzero_floats.nonzero?
 
-            if @_custom_float_format_was_used
+            if self.CUSTOM_FLOAT_FORMAT_WAS_USED
 
-              maybe_widen_width_of_widest_string @WIDTH_OF_VALUE_AS_STRING_FROM_CUSTOM_FLOAT_FORMAT
+              _w = self.WIDTH_OF_VALUE_AS_STRING_FROM_CUSTOM_FLOAT_FORMAT
+
+              maybe_widen_width_of_widest_string _w  # :#here
 
             else
               __finish_measuring_floats_normally
@@ -255,7 +258,20 @@ module Skylab::Zerk
           NIL
         end
 
-        # --
+        # -- read
+
+        def WIDTH_OF_VALUE_AS_STRING_FROM_CUSTOM_FLOAT_FORMAT
+          @_custom_format_related[ :nonzero_float ].
+            presumably_representative_width_of_value_as_string
+        end
+
+        def CUSTOM_FLOAT_FORMAT_WAS_USED  # in caps because VERY experimental
+          @_custom_format_related && @_custom_format_related[ :nonzero_float ]
+        end
+
+        def CUSTOM_FLOAT_FORMAT  # assume
+          @_custom_format_related.fetch( :nonzero_float ).format
+        end
 
         def width_of_imaginary_content_column_
           @__WoICC_kn.value_x
@@ -264,12 +280,26 @@ module Skylab::Zerk
         attr_reader(
           :the_maximum_number_of_characters_ever_seen_left_of_the_decimal,
           :the_maximum_number_of_digits_ever_seen_to_the_right_of_the_decimal,
-
-          :CUSTOM_FLOAT_FORMAT,
-          :HAS_CUSTOM_FLOAT_FORMAT,
-          :WIDTH_OF_VALUE_AS_STRING_FROM_CUSTOM_FLOAT_FORMAT,
         )
       # -
+      # ==
+
+      class CustomFormatRelated___
+
+        # (these members used to be stored flatly in the parent subject,
+        #  but clearing them out on `clear_survey` (on init) was pretty awful)
+
+        def initialize d, fmt
+          @presumably_representative_width_of_value_as_string = d
+          @format = fmt
+        end
+
+        attr_reader(
+          :format,
+          :presumably_representative_width_of_value_as_string,
+        )
+      end
+
       # ==
 
       Basic_ = Home_.lib_.basic

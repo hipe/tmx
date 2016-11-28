@@ -54,6 +54,7 @@ module Skylab::Zerk
       # -- write
 
       OPTIONS___ = {
+        in_place_of_input_field: :__at_in_place_of_input_field,
         left: :_at_align,
         label: :__at_label,
         right: :_at_align,
@@ -95,10 +96,16 @@ module Skylab::Zerk
         @align = @_scn.gets_one
       end
 
+      def __at_in_place_of_input_field
+        @_scn.advance_one
+        @is_in_place_of_input_field =  true
+      end
+
       # -- read
 
       attr_reader(
         :align,  # :left | :right
+        :is_in_place_of_input_field,
         :is_summary_field,
         :label,
         :sprintf_hash,

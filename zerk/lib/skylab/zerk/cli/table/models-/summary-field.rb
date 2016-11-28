@@ -73,7 +73,9 @@ module Skylab::Zerk
       #
       #     [ x0, x1, x2, SF1, x3, x4, SF2, SF3, x5 ]
 
-      class Index
+      CommonIndex__ = ::Class.new
+
+      class Index < CommonIndex__
 
         class << self
           alias_method :begin, :new
@@ -83,6 +85,7 @@ module Skylab::Zerk
         def initialize
 
           @_empty_arrays = []
+          @_indexes_of_overwriters_ = nil
           @_insertion_points = []
           @_last_insertion_point = -1
           @_last_summary_field_index = nil
@@ -92,9 +95,14 @@ module Skylab::Zerk
 
         def receive_NEXT_summary_field fld, d
 
-          __maybe_begin_pack d
+          if fld.is_in_place_of_input_field
+            ( @_indexes_of_overwriters_ ||= [] ).push d
+          else
 
-          @_empty_arrays.last.push NOTHING_
+            __maybe_begin_pack d
+
+            @_empty_arrays.last.push NOTHING_
+          end
 
           @_summary_field_count += 1
           ord_d = fld.summary_field_ordinal
@@ -127,37 +135,57 @@ module Skylab::Zerk
           NIL
         end
 
+        # -- finish
+
         def finish
 
           if @_summary_field_count != @_ord_array.length
             fail self._COVER_ME__say_missing_ordinals  # #todo
           end
 
-          @_last_index = @_insertion_points.length - 1
+          case @_insertion_points.length <=> 1
 
-          if @_last_index.nonzero?
+          when 0  # one insertion point
+
+            __finish_when_one_EVENTUALLY_MULTIPLE_insertion_point
+
+          when 1  # multiple insertion points
             self._WALK_THROUGH_ALL_OF_THIS_VERY_CAREFULLY_README
             # we "feel" like 95% certain that it's all going to work as
             # intended, but it it doesn't it will be annoying to trace it
             # back to here so #cover-me
-          end
 
-          @indexes_of_summary_fields_in_visitation_order =
-            remove_instance_variable( :@_ord_array )
+          when -1
+            __finish_when_no_insertion_points
+          end
+        end
+
+        def __finish_when_one_EVENTUALLY_MULTIPLE_insertion_point
+
+          @_last_index = @_insertion_points.length - 1
+
+          @_indexes_of_summary_fields_in_visitation_order_ =
+            remove_instance_variable( :@_ord_array ).freeze  # just renamed
 
           remove_instance_variable :@_last_insertion_point
           remove_instance_variable :@_last_summary_field_index
           remove_instance_variable :@_summary_field_count
 
-          self
+          @_empty_arrays.freeze
+          @_insertion_points.freeze
+          freeze
         end
 
-        def visit_subtractively__ participant
-          _visit :at_index_subtract_N_items, participant
-          NIL
+        def __finish_when_no_insertion_points
+          NonExpandingIndex___.new(
+            @_indexes_of_overwriters_.freeze,
+            @_ord_array.freeze,
+          )
         end
 
-        def visit_additively__ participant
+        # -- read/use
+
+        def visit_additively_ participant
           _visit :at_index_add_N_items, participant
           NIL
         end
@@ -184,7 +212,32 @@ module Skylab::Zerk
         end
 
         attr_reader(
-          :indexes_of_summary_fields_in_visitation_order,
+          :_indexes_of_overwriters_,
+          :_indexes_of_summary_fields_in_visitation_order_,
+        )
+      end
+
+      class NonExpandingIndex___
+
+        # if you don't need to insert any summary fields, don't do
+        # any work at all in the places where you otherwise would.
+
+        def initialize a, a_
+          @_indexes_of_overwriters_ = a
+          @_indexes_of_summary_fields_in_visitation_order_ = a_  # frozen
+        end
+
+        def visit_additively_ _
+          NOTHING_  # hi.
+        end
+
+        def expand_array _
+          NOTHING_  # hi.
+        end
+
+        attr_reader(
+          :_indexes_of_overwriters_,
+          :_indexes_of_summary_fields_in_visitation_order_,
         )
       end
 
@@ -204,7 +257,7 @@ module Skylab::Zerk
 
         def __expand_and_populate_the_field_surveys page_data
 
-          @_index.visit_additively__ page_data.field_survey_writer
+          @_index.visit_additively_ page_data.field_survey_writer
           NIL
         end
 
@@ -213,9 +266,14 @@ module Skylab::Zerk
           idx = @_index
           invo = @__invocation
 
-          d_a = idx.indexes_of_summary_fields_in_visitation_order
+          d_a = idx._indexes_of_summary_fields_in_visitation_order_
           fields = invo.design.all_defined_fields
           fsw = page_data.field_survey_writer
+
+          d_a_ = idx._indexes_of_overwriters_
+          if d_a_
+            fsw.clear_these d_a_
+          end
 
           page_data.typified_tuples.each do |tuple|
 
@@ -226,8 +284,16 @@ module Skylab::Zerk
               row_cont = RowController___.new mutable_a, invo
 
               d_a.each do |d|
-                _x = fields.fetch( d ).summary_field_proc[ row_cont ]
-                mutable_a.fetch( d ) && self._SANITY  # #todo
+
+                fld = fields.fetch d
+
+                _x = fld.summary_field_proc[ row_cont ]
+
+                if fld.is_in_place_of_input_field
+                  mutable_a.fetch( d ) || self._SANITY
+                else
+                  mutable_a.fetch( d ) && self._SANITY
+                end
                 mutable_a[ d ] = fsw.typified_mixed_via_value_and_index _x, d
               end
 

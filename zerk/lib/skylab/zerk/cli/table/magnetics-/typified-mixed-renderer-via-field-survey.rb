@@ -202,7 +202,7 @@ module Skylab::Zerk
 
           if seen_floats
 
-            if has_custom_float_format
+            if custom_float_format_was_used
               __use_custom_handler_for_floats
             else
               __contribute_generated_handler_for_floats
@@ -351,7 +351,7 @@ module Skylab::Zerk
 
         def _proc_
 
-          if has_custom_float_format
+          if custom_float_format_was_used
             __proc_wickedly
           else
             __proc_normally
@@ -527,8 +527,8 @@ module Skylab::Zerk
           @_session_.__is_align_right_explicitly_
         end
 
-        def has_custom_float_format
-          @_session_.field_survey.HAS_CUSTOM_FLOAT_FORMAT
+        def custom_float_format_was_used
+          @_session_.field_survey.CUSTOM_FLOAT_FORMAT_WAS_USED
         end
 
         def seen_floats

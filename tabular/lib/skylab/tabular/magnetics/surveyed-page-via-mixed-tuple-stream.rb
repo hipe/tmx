@@ -194,6 +194,13 @@ module Skylab::Tabular
         @__field_surveyor = field_surveyor
       end
 
+      def clear_these d_a
+        d_a.each do |d|
+          @_array.fetch( d ).clear_survey
+        end
+        NIL
+      end
+
       def at_index_add_N_items at_index, n_times  # [ze]
 
         @_array[ at_index, 0 ] = n_times.times.map do

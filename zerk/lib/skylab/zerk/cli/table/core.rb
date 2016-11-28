@@ -135,19 +135,23 @@ module Skylab::Zerk
             self._COVER_ME_argument_error_cant_have_proc_without_arguments  # #todo
           end
 
-          is_plain_field = true
+          treat_as_plain_field = true
         else
 
           fld = Here_::Models_::Field.new p, x_a
 
-          is_plain_field = ! fld.is_summary_field
+          if fld.is_summary_field
+            treat_as_plain_field = fld.is_in_place_of_input_field
+          else
+            treat_as_plain_field = true
+          end
         end
 
         # a field with no metadata is only ever represented by `nil`, and
         # `nil` (in this context) only ever represents a field with no
         # metadata. :[#050.D]
 
-        if is_plain_field
+        if treat_as_plain_field
           @_defined_field_offset_via_input_offset.push @_defined_fields.length
         end
 
@@ -223,14 +227,6 @@ module Skylab::Zerk
 
           if summary_fields
             summary_fields = summary_fields.finish
-
-            # (if we were to want to use the same position system for field
-            # observers as we do for summary field implememtations, we would
-            # do the below. but we discovered that we do not. see [#050.B])
-
-            if false && @field_observers
-              summary_fields.visit_subtractively__ @field_observers
-            end
           end
 
         else

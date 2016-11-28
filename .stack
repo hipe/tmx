@@ -20,4 +20,10 @@ CLI-invoked general table renderer
 join [#tab-002] (several sub-items here)
 acceptance: code metrics
 melt remaining legacy tests
+integrate all three components to finish the lipstick stack
+integrate lipstick renderer with spillover algorithm
+cover just the spillover algorithm (in [ba])
+cover just the lipstick renderer (mocked at first)
 come up with final architecture for lipstick
+architect/restore "fill" columns (with mock lipsticker or similar) which:
+get this "in place of" thing green
