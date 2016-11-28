@@ -21,4 +21,3 @@ join [#tab-002] (several sub-items here)
 acceptance: code metrics
 melt remaining legacy tests
 come up with final architecture for lipstick
-'sprintf_format' macro

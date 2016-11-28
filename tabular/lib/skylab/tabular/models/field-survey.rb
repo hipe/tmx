@@ -8,6 +8,16 @@ module Skylab::Tabular
     # users could always inject over the hook mesh and/or the subject class
     # and "typify" the arbitrary values in arbitrary ways.
 
+    # *all* defined methods in the subject have [#bs-028.0.0] public-API
+    # names. as well, *all* the ivar names use this same convention, which
+    # here we intend to hold the same semantics: that these names are part
+    # of the node's public-API. furthermore we state as a point of
+    # #public-API that these points will remain through this major strain.
+    #
+    # this leaves the namespace of non-public-API names wide open for the
+    # client to use in a manner that is guarateed future-proof against
+    # all future minor versions of this node.
+
     class << self
       alias_method :begin, :new
       undef_method :new
@@ -30,7 +40,7 @@ module Skylab::Tabular
     # -
 
       def initialize mesh
-        @__mesh = mesh
+        @hook_mesh = mesh
 
         @number_of_booleans = 0
         @number_of_cels = 0
@@ -51,7 +61,7 @@ module Skylab::Tabular
 
       def see_value x
         @number_of_cels += 1
-        @__mesh.against_value_and_choices x, self
+        @hook_mesh.against_value_and_choices x, self
       end
 
       # -- probable calls back from above
@@ -155,7 +165,7 @@ module Skylab::Tabular
           @number_of_nonzero_integers +
           @number_of_nonzero_floats
 
-        remove_instance_variable :@__mesh
+        remove_instance_variable :@hook_mesh
 
         freeze ; nil
       end

@@ -37,33 +37,34 @@ these two characteristics:
 
   2) even if the reader has *no* familiarity with the byzantine
      conventions described here, the code that utilizes them
-     can still be read and generally understood.
+     can still be read and generally understood, because the occurrence
+     of extra underscores do not inhibit reading comprehension.
 
 
 
 
 ## overview
 
-the following table tries to summarize comprehensively all the
-method name conventions in this system.
+the following table tries to cover comprehensively and then summarize
+every method name convention at use in this system.
 
 these narrow columns of the table are:
 A) the number of leading underscores
 B) the number of trailing underscores
 
-  | A | B |             | example/decription                                |
+  | A | B | summary as example                                | further reading
   |--
-  | 0 | 0 | #tier-0     | `this_is_a_public_API_method`                     |
-  | 0 | 1 | #tier-1     | `this_method_is_only_called_from_this_library_`   |
-  | 0 | 2 | #tier-1B    | `only_from_lib_AND_only_called_in_one_place__`    |
-  | 0 | 3 | #tier-1C    | `typically_a_reader_for_testing_only___`          |
-  | 1 | 0 | #tier-2     | `_this_method_is_only_called_from_this_file`      |
-  | 1 | 1 | #tier-2     | `_only_from_this_file_in_hook_out_manner_`        |
-  | 1 | 1 | #tier-0.5   | `_public_API_method_variant_`  (visually same)    |
-  | 2 | 1 | #tier-2B    | `__only_this_file_AND_hook_out_AND_one_place_`    |
-  | 2 | 0 | #tier-3     | `__only_called_from_this_file_AND_only_1_place_`  |
-  | 3 | 0 | #deprecated | `___this_file_AND_1x_AND_defined_immedately_above`|
-  | - | - | see #A      | `this_method_has_a__generated_portion__`          |
+  | 0 | 0 | `this_is_a_public_API_method`                     | [#here.0.0]
+  | 0 | 1 | `this_method_is_only_called_from_this_library_`   | [#here.0.1]
+  | 0 | 2 | `only_from_lib_AND_only_called_in_one_place__`    | [#here.0.2]
+  | 0 | 3 | `typically_a_reader_for_testing_only___`          | [#here.0.3]
+  | 1 | 0 | `_this_method_is_only_called_from_this_file`      | [#here.1.0]
+  | 1 | 1 | `_only_from_this_file_in_hook_out_manner_`        | [#here.1.1]
+  | 1 | 1 | `_public_API_method_variant_`  (visually same)    | [#here.1.1.2]
+  | 2 | 0 | `__only_called_from_this_file_AND_only_1_place`   | [#here.2.0]
+  | 2 | 1 | `__only_this_file_AND_hook_out_AND_one_place_`    | [#here.2.1]
+  | 3 | 0 | `___this_file_AND_1x_AND_defined_immedately_above`| #deprecated
+  | - | - | `this_method_has_a__generated_portion__`          | see [#here.5]
 
 
 
@@ -89,7 +90,7 @@ of this document.
 ## sneak preview of scopes
 
 
-### :#tier-0: "public API"
+### "public API" :[#here.0.0]
 
 this method is part of the public API of the node (i.e class or
 module) that defines it.
@@ -124,13 +125,13 @@ methods it defines is sort of a "sub-contract" with the same audience.
 
 
 
-### :#tier-0.5: "public API variant" (probably deprecating)
+### "public API variant" (probably deprecating) :[#here.1.1.2]
 
 (this same surface convention is instead used more frequently these days
-for the semantics desribed at #tier-2.)
+for the semantics described at [#here.1.0].)
 
 this convention is (perhaps deprecatedly) used in cases where the method
-is part of the implementing module's public API (so, exactly #tier-0)
+is part of the implementing module's public API (so, exactly [#here.0.0])
 but the `public_method_name` convention cannot be used because that method
 "namespace" is explictly reserved for arbitrary, ad-hoc business needs
 (simlar to the way a ::Struct sub-class's name space should be).
@@ -140,7 +141,7 @@ it is probably a smell to employ this "pattern"; it is probably deprecating.
 
 
 
-### :#tier-1: "library scope"
+### "library scope" :[#here.0.1]
 
 this strange looking but often used convention has a variety of similar
 meanings:
@@ -170,14 +171,16 @@ meanings:
 
 
 
-### :#tier-1B:
+### `like_this__` :[#here.1.2]
 
 a method name with two trailing dashes (that is not employing the
 convention for methods with generated names) is used to indicate that
-although this method is used by this library only (like in tier 1),
-it is only called from one location outside of this file. so it
-indicates that the cost of changing this method is lower than if it were
-tier-1.
+although this method is used by this library only (like in [#here.0.1]),
+it is only called from *one* location, and that one location is outside
+of the file that defines it.
+
+so it indicates that the cost of changing this method is lower than if
+it were [#here.0.1].
 
 
 
@@ -198,7 +201,9 @@ test easier to test but is not part of any API requirement.
 
 
 
-## :#tier-2 and :#tier-3
+## :[#here.1.0] and and :#tier-3
+
+"cozy scope" 
 
 "cozy scope" means the method is not called outside of the file it is
 defined in. "one-off scope" is cozy scope but furthermore the method is
@@ -207,7 +212,7 @@ corresponds exactly to the same tiers described in [#029].
 
 
 
-### about `_this_convention_` as #tier-2 :.F
+### about `_this_convention_` as [#here.1.0]
 
 as exactly a portmanteau of `library_scope_` and `_file_scope`,
 `_this_convention_` might confer this:
@@ -233,11 +238,11 @@ this is a re-creation of a document lost in the [#br-092] fire. it will be
 better this time.
 
 
-## the list of conventional method prefixes/suffixes/names.. :[#.A]
+## the list of conventional method prefixes/suffixes/names.. :[#here.5]
 
 ..and an introduction to their semantics.
 
-+ `build_` (and often `bld_` per [#.D]) - result is a new instance of a
++ `build_` (and often `bld_` per [#here.8]) - result is a new instance of a
   class (either library, stdlib or corelib) that is not one of the
   classes described by `get_` below. the object may or may not be
   initialized in some special way as decribed by the method name. this
@@ -259,7 +264,7 @@ better this time.
 + `call` - for proc-like objects (typically [#fi-016] actors or
   [#br-001] entities), must do the same as `[]` for this object.
   in these kind of objects, arguments are a (non-iambic) (positional)
-  arglist. must not be used for non-proc-like classes. :+[#.E]
+  arglist. must not be used for non-proc-like classes. #[#here.9]
 
 + `curry_with` - see the #iambic family of method name conventions
 
@@ -271,7 +276,7 @@ better this time.
   one #hook-out method the client must supply. it must take no
   arguments. [#fi-016] actors exemplify these semantics, as well as many
   of the base-classes called something like "action" in many of our
-  frameworks :+[#.E]
+  frameworks #[#here.9]
 
 + `[..]_for_[..]` - this is becoming a convention for "#hook-out"
   methods (defined somewhere): e.g `foo_bar_for_biff_baz` is a method that
@@ -286,7 +291,7 @@ better this time.
 + `get_` - result is the result object of having allocated new memory
   for and initialized an object that is either of a native "primitive
   data structure or type" or a ubiquitous low-level utilty class (stream,
-  box, hash, array etc). see [#.B] dedicated section on this. this method
+  box, hash, array etc). see [#here.6] dedicated section on this. this method
   must have no side-effects.
 
 + `flush` is our "go-to" name for something that cannot fail and
@@ -319,7 +324,7 @@ better this time.
 + `invoke` - deprecated as a bareword method name. used a lot in legacy
   frameworks to be an entrypoint method that takes arguments. it is
   deprecated because it expresses neither what it accepts or what shape
-  its result is. :+[#.E]
+  its result is. #[#here.9]
 
 + `lookup_` - this word (or whatever we change it to) has reserved
   meaning: a method that contains this word is for retrieving one
@@ -346,7 +351,7 @@ better this time.
   a new object of the same class but with the indicated member(s)
   being set by the parameters (as possible).
 
-+ `on_` see [#.C] method naming conventions around events below.
++ `on_` see [#here.7] method naming conventions around events below.
 
 + `produce_`, `_produce[_]` - result is the subject object as described
   by the rest of the method name. whether or not new memory is being
@@ -359,7 +364,7 @@ better this time.
 
 + `resolve_` - has a dedicated [#031] document that needs a rewrite.
 
-+ `run`, `run_` - reserved for starting a long-running process :+[#.E]
++ `run`, `run_` - reserved for starting a long-running process #[#here.9]
 
 + `to_`, `_to_` -
 
@@ -423,7 +428,7 @@ better this time.
 
 
 
-### the `get_` prefix semantics as a nod to an ObjC convention :B
+### the `get_` prefix semantics as a nod to an ObjC convention :[#here.6]
 
 (NOTE: there is some spurious confusion btwn this node and [#bs-031.B] )
 
@@ -445,7 +450,7 @@ made specifically for the caller, implying in turn that it is mutable.
 
 
 
-## :[#.E]
+## :[#here.9]
 
 `invoke` `execute` `run`, and ( `call`, `[]` ) have distinct meanings and
 consistent signatures within modalities. these are reserved names in the
@@ -456,7 +461,7 @@ at which a semantic proscribement for each name can be found.
 
 
 
-## naming conventions around events :[#.C]
+## naming conventions around events :[#here.7]
 
 because most of these are method naming conventions we put this node
 here but there are some that are not.
@@ -836,7 +841,7 @@ we must follow suit with the existing word, so please see `reduce_with`.
 
 
 
-## the method naming shibbloleth :[#.D]
+## the method naming shibboleth :[#here.8]
 
 
 ### edit: half redundant with an earlier section
@@ -893,7 +898,7 @@ to change). they are:
     methods should be removed so we don't have a special convention for
     them.) as such, this method is the cheapest to refactor.
 
-  • `a_method_with__some_part__nested_in_double_underscores`  # :#A
+  • `a_method_with__some_part__nested_in_double_underscores`  # :[#here-5]
 
     (this convention is described elsewhere -
      that definition should be moved here #todo (sorry).
@@ -903,6 +908,11 @@ to change). they are:
 
 
 ### the original version
+
+(EDIT: this older style (which uses abbreviated words in method names
+but otherwise has obvious parallels to the current convention system)
+is VERY deprecated, but there is still some ancient code somewhere that
+uses this probably..)
 
 this convention is not pretty, but that is not its point: it evolved
 pragmatically (and quite suddenly) as a way to build code optimized for
@@ -1095,7 +1105,7 @@ visibiy have semantics similar but not the same as the three levels of
 visibility decribed by [#029.G] the trailing underscore convention for
 const names.)
 
-recall from [#.B] that when we say "node" in the context of the
+recall from [#here.6] that when we say "node" in the context of the
 native platform usually (but not always) mean "module" (e.g "class").
 
 an "API public" method is part of the "public API" of the node as is

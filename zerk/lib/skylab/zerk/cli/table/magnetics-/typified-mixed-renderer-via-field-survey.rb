@@ -16,7 +16,6 @@ module Skylab::Zerk
       #   - is tailor made to the "type" of the particular value
       #     (different types can occur in the same column)
       #
-      #
       # this technique (or one like it) has been the central feature of the
       # many libraries in this strain since their beginning (and it predates
       # this file by years and years). but new in this version:
@@ -27,18 +26,21 @@ module Skylab::Zerk
       #     it that way..)
       #
       #   - our whole rendering pipeline has been both simplified and made
-      #     a universal, so that it uses less memory but still facilitates
-      #     or various advanced features.
+      #     universal, so that it uses less memory that the old way (one of
+      #     them, anyway) but still facilitates our complete panoply of
+      #     "advanced" features.
       #
-      # a detailed justification and of the new rendering pipeline starts at
-      # "justification of the new way" [#050]. the next section is the
-      # lowest level detail of that rearchitecting, directly relevent to
-      # the code in this node.
+      # a detailed justification of the new rendering pipeline starts at
+      # [#050.C] "justification of the new way". there too can be found
+      # an explanation of same.
+      #
+      # the next section is the lowest level detail of that rearchitecting,
+      # directly relevent to the code in this node.
 
       # ## a priori string width inference overview :#table-spot-2
       #
       # here's a summary of our "a priori inference" technique per type to
-      # predict the necessary width withot converting it to a string:
+      # predict the necessary width without converting it to a string:
       #
       #   |  type-ish       |  how we infer the would-be string width
       #   |=                |
@@ -52,8 +54,9 @@ module Skylab::Zerk
       #   |                 |   counts the number of digits (in [ba] Number).
       #   |                 |   + 1 if it's negative (for the '-' character).
       #   |                 |
-      #   | nonzero float   | this one's a little scarier but we have a
-      #   |                 |   function that seems to work next to above.
+      #   | nonzero float   | this one's a little scarier in two regards, but
+      #   |                 |  1) we have a function in [ba] that we *think*
+      #   |                 |  overcomes a well-known problem and 2) #table-spot-3
       #   |                 |
       #   | boolean         | this one's, well, pragmatic (see code).
       #   |                 |
@@ -81,8 +84,6 @@ module Skylab::Zerk
         end
 
         def execute
-
-          # (do numerics before all others because #here-1)
 
           __maybe_widen_field_note_width
 
@@ -197,13 +198,18 @@ module Skylab::Zerk
 
         def execute
 
-          # (here's what we mean by "combinatorial..)
+          # (this is what we mean by "combinatorial..)
 
           if seen_floats
 
-            __contribute_handler_for_floats
+            if has_custom_float_format
+              __use_custom_handler_for_floats
+            else
+              __contribute_generated_handler_for_floats
+            end
 
             if seen_ints
+
               __contribute_handler_for_ints_with_invisible_floating_point
 
               if seen_zeros
@@ -224,7 +230,12 @@ module Skylab::Zerk
           NIL
         end
 
-        def __contribute_handler_for_floats
+        def __use_custom_handler_for_floats
+
+          UseCustomHandlerForFloats__.new( @_session_ ).execute
+        end
+
+        def __contribute_generated_handler_for_floats
 
           NonzeroFloatMaven___.new( @_session_ ).execute
         end
@@ -265,37 +276,44 @@ module Skylab::Zerk
 
       NumericMaven__ = ::Class.new
 
-      class NonzeroFloatMaven___ < NumericMaven__
-
-        def initialize( * )
-          super
-          __maybe_widen_only_now_that_we_are_at_the_end_of_the_page
-        end
-
-        def __maybe_widen_only_now_that_we_are_at_the_end_of_the_page
-
-          # you must read [#050.A]. widening the thing :#here-2 is ick but meh.
-
-          _left_width = widest_left_in_field_survey
-
-          _right_width = widest_right_in_field_survey
-
-          sum = _left_width + 1 + _right_width  # 1 for '.'
-
-          @_width_of_imaginary_content_column = sum
-
-          maybe_make_field_note_width_wider sum
-        end
+      class UseCustomHandlerForFloats__ < NumericMaven__
 
         def _proc_
 
-          if COMING_SOON__
+          # it's entirely possible that the strings produced by a custom
+          # format are narrower than value-as-strings produced for values
+          # of other types in the column. if we detect that this is the
+          # case, we "widen" this strange format (more correctly we attempt
+          # to widen the strings it produces) the same way we do elsewhere
+          # here when working with our natively generated format strings.
+          # this is the only place where we assume that a strange "format"
+          # is a string..
+
+          fs = @_session_.field_survey
+
+          format = fs.CUSTOM_FLOAT_FORMAT
+
+          w = fs.WIDTH_OF_VALUE_AS_STRING_FROM_CUSTOM_FLOAT_FORMAT
+
+          use_format = if w < widest_width_ever
+            pad_with_spaces_default_align_right w, format
           else
-            _proc_normally_
+            format
+          end
+
+          -> float_or_integer do
+            use_format % float_or_integer
           end
         end
 
-        def _proc_normally_
+        def _name_symbol_
+          :nonzero_float
+        end
+      end
+
+      class NonzeroFloatMaven___ < NumericMaven__
+
+        def _proc_
 
           float_format = _final_format_string_
 
@@ -315,12 +333,11 @@ module Skylab::Zerk
 
           _right_width = widest_right_in_field_survey
 
-          "%#{ @_width_of_imaginary_content_column }.#{ _right_width }f"
+          "%#{ _width_of_imaginary_content_column_ }.#{ _right_width }f"
         end
 
         def _width_of_imaginary_content_column_
-
-          @_width_of_imaginary_content_column
+          @_session_.field_survey.width_of_imaginary_content_column_
         end
 
         def _name_symbol_
@@ -334,9 +351,48 @@ module Skylab::Zerk
 
         def _proc_
 
-          right_width = 1 + widest_right_in_field_survey  # 1 for '.'
+          if has_custom_float_format
+            __proc_wickedly
+          else
+            __proc_normally
+          end
+        end
+
+        def __proc_wickedly
+
+          fs = @_session_.field_survey
+
+          left_w = widest_left_in_field_survey
+
+          canary_d = 10 ** ( left_w.zero? ? 1 : left_w - 1 )
+
+          formatted_s = fs.CUSTOM_FLOAT_FORMAT % canary_d
+          formatted_w = formatted_s.length
+
+          one = '1'
+          pos = formatted_s.index one
+          pos_ = formatted_s.index one
+          pos == pos_ || self._HACK_FAILED  # #todo
+
+          _head_space = SPACE_ * pos
+
+          _tail_space = SPACE_ * ( formatted_w - pos - left_w )
+
+          _inner_format = "#{ _head_space }%#{ left_w }d#{ _tail_space }"
+
+          int_format = pad_with_spaces_default_align_right formatted_w, _inner_format
+
+          -> d do
+
+            int_format % d
+          end
+        end
+
+        def __proc_normally
 
           left_width = widest_left_in_field_survey
+
+          right_width = 1 + widest_right_in_field_survey  # 1 for '.'
 
           _my_width = left_width + right_width
 
@@ -422,7 +478,7 @@ module Skylab::Zerk
           case w <=> width_of_inner_string
           when -1
 
-            self._NEVER  # see #here-2
+            self._NEVER  # see #table-spot-3
 
           when 0
             # no extra padding. widest width ever is correct as-is
@@ -471,12 +527,16 @@ module Skylab::Zerk
           @_session_.__is_align_right_explicitly_
         end
 
-        def seen_ints
-          @_session_.field_survey.number_of_nonzero_integers.nonzero?
+        def has_custom_float_format
+          @_session_.field_survey.HAS_CUSTOM_FLOAT_FORMAT
         end
 
         def seen_floats
           @_session_.field_survey.number_of_nonzero_floats.nonzero?
+        end
+
+        def seen_ints
+          @_session_.field_survey.number_of_nonzero_integers.nonzero?
         end
 
         def seen_zeros
@@ -519,11 +579,11 @@ module Skylab::Zerk
         end
 
         def __is_align_left_explicitly_
-          @design.field_is_aligned_left_explicitly @field_note.field_offset
+          @design.field_is_aligned_left_explicitly @field_note.defined_field_offset
         end
 
         def __is_align_right_explicitly_
-          @design.field_is_aligned_right_explicitly @field_note.field_offset
+          @design.field_is_aligned_right_explicitly @field_note.defined_field_offset
         end
 
         def __release_proc_box_
@@ -531,6 +591,7 @@ module Skylab::Zerk
         end
 
         attr_reader(
+          :field_design,
           :field_note,
           :field_survey,
           :proc_box,
@@ -538,8 +599,6 @@ module Skylab::Zerk
       end
 
       # ==
-
-      COMING_SOON__ = false
 
       This_ = self
     end

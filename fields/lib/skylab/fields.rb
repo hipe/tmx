@@ -167,7 +167,7 @@ module Skylab::Fields
 
       module Module_Methods__
 
-        # ~ ways to call your actor (pursuant to [#bs-028.A] name conventions)
+        # ~ ways to call your actor (pursuant to [#bs-028.5] name conventions)
 
         def with * x_a, & x_p  # #[#bs-028] reserved method name.
           call_via_iambic x_a, & x_p

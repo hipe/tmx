@@ -36,7 +36,7 @@ module Skylab::Zerk::TestSupport
 
           defn.separator_glyphs '| ', '   | ', ' |'
 
-          defn.add_field_observer :zizzio, :observe_input_at_offset, 1 do |o|
+          defn.add_field_observer :zizzio, :for_input_at_offset, 1 do |o|
             total = 0.0
             o.on_typified_mixed do |tm|
               if tm.is_numeric
@@ -74,10 +74,10 @@ module Skylab::Zerk::TestSupport
       _y = tbl.express_into_line_context_data_tree [], _common_tree
 
       o = _line_expector_via_array _y
-      o << '|   Slug |  Count |'
-      o << '|      B |    {3} |'
-      o << '|      A |    {2} |'
-      o << '|  (hi5) |        |'
+      o << '|  Slug | Count |'
+      o << '|     B |   {3} |'
+      o << '|     A |   {2} |'
+      o << '| (hi5) |       |'
       o.expect_no_more_lines
     end
 
@@ -127,9 +127,9 @@ module Skylab::Zerk::TestSupport
       _y = tbl.express_into_line_context_data_tree [], _common_tree
 
       o = _line_expector_via_array _y
-      o << '|  Slug |  (             ) |'
-      o << '|     B |  (100.00% of 17) |'
-      o << '|     A |  ( 66.67% of 17) |'
+      o << '| Slug | (             ) |'
+      o << '|    B | (100.00% of 17) |'
+      o << '|    A | ( 66.67% of 17) |'
       o.expect_no_more_lines
     end
 

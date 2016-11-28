@@ -16,7 +16,7 @@ module Skylab::Zerk
 
       Design.define do |defn|
 
-        defn.separator_glyphs '|  ', ' |  ', '  |'
+        defn.separator_glyphs '| ', ' | ', ' |'
       end
     end
 
@@ -41,10 +41,7 @@ module Skylab::Zerk
       end
 
       def add_field * x_a, & p
-        if x_a.length.nonzero?
-          _fld = Here_::Models_::Field.new p, x_a
-        end
-        @_.__accept_field_ _fld
+        @_.__add_field p, x_a
       end
 
       def separator_glyphs lef, inn, rig
@@ -89,6 +86,8 @@ module Skylab::Zerk
       def initialize_copy _
 
         if @_has_defined_fields
+          @_defined_field_offset_via_input_offset =
+            @_defined_field_offset_via_input_offset.dup
           @_defined_fields = @_defined_fields.dup
         end
 
@@ -117,19 +116,41 @@ module Skylab::Zerk
         NIL
       end
 
-      def __accept_field_ fld
-        send @_accept_field, fld
+      def __add_field p, x_a
+        send @_accept_field, p, x_a
       end
 
-      def __accept_first_field fld
+      def __accept_first_field p, x_a
         @_has_defined_fields = true
+        @_defined_field_offset_via_input_offset = []
         @_defined_fields = []
         @_accept_field = :__accept_subsequent_field
-        send @_accept_field, fld
+        send @_accept_field, p, x_a
       end
 
-      def __accept_subsequent_field fld
-        # (argument can be nil - it's a "field" with no metadata)
+      def __accept_subsequent_field p, x_a
+
+        if x_a.length.zero?
+          if p
+            self._COVER_ME_argument_error_cant_have_proc_without_arguments  # #todo
+          end
+
+          is_plain_field = true
+        else
+
+          fld = Here_::Models_::Field.new p, x_a
+
+          is_plain_field = ! fld.is_summary_field
+        end
+
+        # a field with no metadata is only ever represented by `nil`, and
+        # `nil` (in this context) only ever represents a field with no
+        # metadata. :[#050.D]
+
+        if is_plain_field
+          @_defined_field_offset_via_input_offset.push @_defined_fields.length
+        end
+
         @_defined_fields.push fld
         NIL
       end
@@ -222,12 +243,20 @@ module Skylab::Zerk
         @__right_explicitly = right
         @__summary_fields_index = summary_fields
 
+        @left_separator ||= EMPTY_S_  # so we don't have to check for
+        @right_separator ||= EMPTY_S_  # nils where it is used
+
         freeze
       end
 
       def freeze
+
+        if @_has_defined_fields
+          @_defined_field_offset_via_input_offset.freeze
+          @_defined_fields.freeze
+        end
+
         @field_observers and @field_observers.freeze
-        @_has_defined_fields and @_defined_fields.freeze
         @summary_rows and @summary_rows.freeze
         super
       end
@@ -252,9 +281,11 @@ module Skylab::Zerk
       end
 
       def for_field d
+
         # (allow that field-specifics possibly haven't been defined at all;
         # but if they have, enforce the assumption that *something* (maybe
         # nil) is at that offset.)
+
         if @_has_defined_fields
           @_defined_fields.fetch d
         end
@@ -272,6 +303,22 @@ module Skylab::Zerk
 
       def anticipated_final_number_of_columns_per_defined_fields__  # assume.
         @_defined_fields.length
+      end
+
+      def defined_field_for_input_offset__ d
+
+        # this does not assume that there are any defined fields, but if
+        # there are, this enforces the assumption (for now) that the width
+        # of any input mixed tuple will not exceed that of the number of
+        # defined, non-summary fields. but per [#050.D], the `nil` value
+        # represents one kind of "defined field" so if that's the result
+        # here, that's what it means.
+
+        d || self._SANITY  # #todo
+
+        if @_has_defined_fields
+          @_defined_fields.fetch @_defined_field_offset_via_input_offset.fetch d
+        end
       end
 
       def all_defined_fields  # assume.

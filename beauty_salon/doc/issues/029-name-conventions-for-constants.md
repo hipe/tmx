@@ -218,7 +218,7 @@ a const name indicates how private the value is:
 #### a const with no trailing uderscores is..
 
 .. part of the surrounding node's public API. (for a review of what we
-mean by "node" see [#028.B].)
+mean by "node" see [#028.6].)
 
 this means that the characters that make up this const's name and the
 semantics of what this const references must not change during this

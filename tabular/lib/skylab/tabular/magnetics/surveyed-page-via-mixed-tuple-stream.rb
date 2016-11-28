@@ -35,9 +35,8 @@ module Skylab::Tabular
 
         if cx
           fo_a = cx.field_observers_array
-          fld_survey_cls = cx.field_survey_class
+          field_surveyor = cx.field_surveyor
           hfeop = cx.hook_for_end_of_page
-          mesh = cx.hook_mesh
         end
 
         if fo_a
@@ -47,7 +46,11 @@ module Skylab::Tabular
           @_receive_typified = :_receive_typified_normally
         end
 
-        @_field_survey_writer = FieldSurveys___.new mesh, fld_survey_cls
+        if ! field_surveyor
+          field_surveyor = FieldSurveyor___.new HOOK_MESH
+        end
+
+        @_field_survey_writer = FieldSurveys___.new field_surveyor
         @__hook_for_end_of_page = hfeop
         @__mixed_tuple_stream = tu_st
         @_the_most_number_of_cels_seen_on_this_page = 0
@@ -152,6 +155,19 @@ module Skylab::Tabular
 
     # ==
 
+    class FieldSurveyor___
+
+      def initialize mesh
+        @__hook_mesh = mesh
+      end
+
+      def build_new_survey_for_input_offset _ignored
+        Home_::Models::FieldSurvey.begin @__hook_mesh
+      end
+    end
+
+    # ==
+
     class Only_What_You_Need___  # summary fields are nasty
 
       def initialize tt, fsw
@@ -172,25 +188,26 @@ module Skylab::Tabular
       # while field surveys are editable they are editable,
       # but once the are not they are not.
 
-      def initialize mesh, cls
+      def initialize field_surveyor
+
         @_array = []
-        @__field_survey_class = cls || Home_::Models::FieldSurvey
-        @__hook_mesh = mesh || HOOK_MESH___
+        @__field_surveyor = field_surveyor
       end
 
-      def at_index_add_N_items d, n  # [ze]
-        @_array[ d, 0 ] = n.times.map do
-          _build_new_survey
+      def at_index_add_N_items at_index, n_times  # [ze]
+
+        @_array[ at_index, 0 ] = n_times.times.map do
+          _build_new_survey_for_input_offset NOTHING_
         end
       end
 
       def __push_new_survey_
-        @_array.push _build_new_survey
+        @_array.push _build_new_survey_for_input_offset @_array.length
         NIL
       end
 
-      def _build_new_survey
-        @__field_survey_class.begin @__hook_mesh
+      def _build_new_survey_for_input_offset d
+        @__field_surveyor.build_new_survey_for_input_offset d
       end
 
       # -- read
@@ -207,8 +224,7 @@ module Skylab::Tabular
         # (tell each field survey that it can make its final tallies of
         #  derived values (eg. totals) etc.)
 
-        remove_instance_variable :@__field_survey_class
-        remove_instance_variable :@__hook_mesh
+        remove_instance_variable :@__field_surveyor
         arr = remove_instance_variable :@_array
         arr.each( & :finish )
         arr.freeze
@@ -217,7 +233,7 @@ module Skylab::Tabular
 
     # ==
 
-      HOOK_MESH___ =
+      HOOK_MESH =
     Home_.lib_.basic::OMNI_TYPE_CLASSIFICATION_HOOK_MESH_PROTOTYPE.redefine do |defn|
 
       defn.add :nil do |o|

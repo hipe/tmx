@@ -1,4 +1,4 @@
-# the stratified event production model :[#028]
+# the stratified event production model :[#!028]
 
 to explain the model we put it int terms of CLI because that is what is
 familiar, but the deeer principles behind this will hopefully hold accross

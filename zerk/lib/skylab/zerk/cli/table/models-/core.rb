@@ -9,7 +9,7 @@ module Skylab::Zerk
     class Models_::Field
 
       def initialize p, x_a
-        @sprintf_formats = nil
+        @sprintf_hash = nil
         _define_or_redefine p, x_a
       end
 
@@ -44,9 +44,9 @@ module Skylab::Zerk
         # @align  as-is
         # @is_summary_field  as-is
         # @label  as-if (as long as..)
-        if @sprintf_formats
+        if @sprintf_hash
           self._CODE_SKETCH_cover_this
-          @sprintf_formats = @sprintf_formats.dup
+          @sprintf_hash = @sprintf_hash.dup
         end
         # @summary_field_ordinal  as-is
       end
@@ -57,9 +57,7 @@ module Skylab::Zerk
         left: :_at_align,
         label: :__at_label,
         right: :_at_align,
-        sprintf_format_string_for_nonzero_floats: :_at_sprintf,
-        sprintf_format_string_for_nonzero_integers: :_at_sprintf,
-        sprintf_format_string_for_zeros: :_at_sprintf,
+        sprintf_format_string_for_nonzero_floats: :__at_sprintf_format_string,
         summary_field: :__at_summary_field,
       }
 
@@ -77,14 +75,20 @@ module Skylab::Zerk
         @summary_field_proc = remove_instance_variable( :@_argument_proc )
       end
 
+      def __at_sprintf_format_string
+
+        _h = ( @sprintf_hash ||= {} )
+
+        _use_key = SPRINTF_LOCAL_KEY_VIA_DSL_KEY___.fetch @_scn.gets_one
+
+        _h[ _use_key ] ||= @_scn.gets_one
+
+        NIL
+      end
+
       def __at_label
         @_scn.advance_one
         @label = @_scn.gets_one
-      end
-
-      def _at_sprintf
-        ( @sprintf_formats ||= {} )[ @_scn.gets_one ] = @_scn.gets_one  # kiss here
-        NIL
       end
 
       def _at_align
@@ -97,10 +101,16 @@ module Skylab::Zerk
         :align,  # :left | :right
         :is_summary_field,
         :label,
-        :sprintf_formats,
+        :sprintf_hash,
         :summary_field_ordinal,
         :summary_field_proc,
       )
+
+      # --
+
+      SPRINTF_LOCAL_KEY_VIA_DSL_KEY___ = {
+        sprintf_format_string_for_nonzero_floats: :nonzero_float,
+      }
     end
 
     # ==
@@ -135,7 +145,7 @@ module Skylab::Zerk
       # preserves across pages.
 
       def initialize d
-        @field_offset = d
+        @defined_field_offset = d
         @widest_width_ever = 0
       end
 
@@ -144,10 +154,14 @@ module Skylab::Zerk
       )
 
       attr_reader(
-        :field_offset,
+        :defined_field_offset,
         :widest_width_ever,
       )
     end
+
+    # ==
+
+    # ==
   end
 end
 # #tombstone: at full rewrite for [tab], field class, abstruse dep. injection fw

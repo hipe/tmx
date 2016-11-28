@@ -320,7 +320,7 @@ module Skylab::Human
     #    magnetic pipeline stack is executed. every method here MUST:
     #
     #      - use `_named_like_this_` to keep the namespace of ordinary-
-    #        looking names wide-open for business (see [#bs-028]:#tier-0.5)
+    #        looking names wide-open for business (see [#bs-028.1.1.2])
     #
     #      - match the regex /(\A|_)magnetic_value(\z|_)/
 

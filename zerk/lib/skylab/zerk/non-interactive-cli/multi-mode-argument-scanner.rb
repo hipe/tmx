@@ -9,7 +9,7 @@ module Skylab::Zerk
       # kinds of sub-scanners that.. (see [#052] "the multi-mode..")
 
       # (reminder: we might make use of the obscure name convention of
-      # [#bs-028] #tier-2B (`__this_convention_`).)
+      # [#bs-028.2.1] (`__this_convention_`).)
 
       class << self
 

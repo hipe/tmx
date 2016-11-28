@@ -206,7 +206,7 @@ module Skylab::TMX
 
     module PathMethods__
 
-      # (the methods names are per [#bs-028]:B)
+      # (the methods names are per [#bs-028.6])
 
       def get_filesystem_directory_entry_string
         s = @_json_file_

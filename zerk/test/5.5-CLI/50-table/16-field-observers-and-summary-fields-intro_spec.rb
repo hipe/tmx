@@ -22,8 +22,8 @@ module Skylab::Zerk::TestSupport
         ]
 
         against_matrix_expect_lines_ _matr do |y|
-          y << '|  coffee |  0.7223 |  7.23  |'
-          y << '|  donut  |  0.2777 |  2.78  |'
+          y << '| coffee | 0.7223 | 7.23 |'
+          y << '| donut  | 0.2777 | 2.78 |'
         end
       end
     end
@@ -32,7 +32,7 @@ module Skylab::Zerk::TestSupport
 
       table_module_.default_design.redefine do |defn|
 
-        defn.add_field_observer :zazzio, :observe_input_at_offset, 1 do |o|
+        defn.add_field_observer :zazzio, :for_input_at_offset, 1 do |o|
           total = 0.0
           o.on_typified_mixed do |tm|
             if tm.is_numeric

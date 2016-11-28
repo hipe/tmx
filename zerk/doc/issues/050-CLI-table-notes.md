@@ -29,7 +29,7 @@ mechanism of "type inference" (and column statistics) with the more
 mundane, ordinary "rendering pipeline" of the simplest of aligned tables.
 
 on first analysis this felt cavalier to predicate the simple on top of
-the complex. hoewver, the current thinking is that with a "unified pipeline"
+the complex. however the current thinking is that with a "unified pipeline"
 everything makes the most sense, and the cost is the lowest it's ever been
 to still have all these features.
 
@@ -45,7 +45,7 @@ at most once per cel. but in detail:
 
 
 
-### new way vs. old way in a bit more detail..
+### new way vs. old way in a bit more detail.. :[#here.C]
 
 we arrive at a pre-calculation of how much width particular
 values will need as strings without actually converting them
@@ -74,13 +74,13 @@ where all we store in the matrix is the value tupled with a
 symbol about its type. because we can predict (or, to the extent
 that we can predict) the width of the content string before we
 actually make the string, the value is never actually converted
-to to a string until it is actually rendered and immediately
+to a string until it is actually rendered and immediately
 produced as a streamed item.
 
 
 
 
-## finding the width of columsn with floats :[#here.A]
+## finding the width of columns with floats :[#here.A]
 
 for any column that contains more than one float, it is NOT the
 case that we can achieve the correct "widening" merely by
@@ -123,7 +123,7 @@ sign so we don't have to deal with it here.) whew!
 
 
 
-## why the position systems are different.. [#050.B]
+## why the position systems are different.. [#here.B]
 
 if you design a table that uses both field observers and summary
 fields (we're looking at you, [cm]), it would be reasonable for
@@ -140,3 +140,50 @@ summary field.
 but alas, (EDIT)
 
 given this, it's more poka-yoke (EDIT)
+
+
+
+
+## #internal-API-point :[#here.D]
+
+in the internal "defined fields" array of "table design" instances,
+a field with no metadata is only ever represented by `nil`, and `nil`
+(in this context) only ever represented a field with no metadata.
+
+
+
+
+## "the delicate art of custom formats" :[#here.E]
+
+we assume that any given format always produces strings of the
+same width (with respect to the particular format). (note this
+is a fragile assumption; the onus is on the user to provide
+formats appropriate for the range characteristics of the data
+ #table-coverpoint-E-1.)
+
+so because we have a format, if we discover the value-as-string
+for this first (in page) value of this typeish, we assume that
+the width of that string will be the same as the width of every
+future string produced by every future same-typeish value in
+this page of input against this same format.
+
+as such: when we have custom formats we need not (and must not)
+do the same kind of work that we do normally for floats. what we
+do instead is this:
+
+we format this first such value against the format just to get
+the width of the value-as-string. we note this width and throw
+away the string. the work of creating this same string is done
+again redundantly in the second pass, but it is redundant only
+for this first such cel in the page.
+
+then, future occurrences of values of this type-ish in this
+column in this page will effectively be a no-op. (but the
+default statistical gathering our parent class does is still
+effected, because somewehere we call `super`.) (or, we will
+continue to gather some statistics on it of our own, we're
+not sure.)
+
+what happens here vis-a-vis integers will be a challenge..
+we know what we want but not necessarily how best to get there.
+(#table-coverpoint-E-2 we got there wickedly.)

@@ -54,7 +54,7 @@ module Skylab::Tabular
       end
 
       def __page_magnetic_function
-        _ = @_survey_choices.page_magnetic_function ||
+        _ = @_survey_choices.page_magnetic_function
         _ || Home_::Magnetics::SurveyedPage_via_MixedTupleStream
       end
 

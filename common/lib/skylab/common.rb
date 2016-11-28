@@ -294,7 +294,7 @@ module Skylab::Common
 
     # ~ ..of names
 
-    def get_names  # #[#bs-028]B
+    def get_names  # #[#bs-028.6]
       @a.dup
     end
 

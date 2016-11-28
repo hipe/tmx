@@ -24,15 +24,15 @@ module Skylab::Zerk::TestSupport
       it "default styling is evident in this minimal non-empty table" do
 
         against_tuples_expect_lines_ %w( a ) do |y|
-          y << "|  a  |"
+          y << "| a |"
         end
       end
 
       it "with one more row and one more column, we can see columns line up" do
 
         against_tuples_expect_lines_ %w( Food Drink ), %w( donuts coffee ) do |y|
-          y << "|  Food   |  Drink   |"
-          y << "|  donuts |  coffee  |"
+          y << "| Food   | Drink  |"
+          y << "| donuts | coffee |"
         end
       end
 

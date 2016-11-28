@@ -18,10 +18,10 @@ module Skylab::Tabular
       end
 
       PARAMETERS___ = {
-        observe_input_at_offset: :__at_observe_field,
+        for_input_at_offset: :__at_input_offset,
       }
 
-      def __at_observe_field
+      def __at_input_offset
         @_scn.advance_one
         @input_tuple_offset = @_scn.gets_one ; nil
       end
