@@ -1,3 +1,5 @@
+[#058] #open the fix for a summary row (total) and a summary field (fill) is nasty
+
 [#057] #track table: shorthand version of a total field? probably not.
 
 [#056]       [ syntaxish ]

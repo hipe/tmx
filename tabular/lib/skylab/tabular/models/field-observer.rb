@@ -126,7 +126,10 @@ module Skylab::Tabular
       end
 
       def close_all_observation
-        # the only way this will work is in cooperation with :#spot-1
+
+        # the only way this will work is if where the array of observers
+        # is read, it is always read passively and read anew on each row :#spot-1
+
         @field_observers_array.clear
         @field_observers_array.freeze
         @field_observation_is_on = false

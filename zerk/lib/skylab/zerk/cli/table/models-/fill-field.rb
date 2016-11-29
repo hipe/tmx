@@ -250,6 +250,7 @@ module Skylab::Zerk
         def __DISTRIBUTE_THE_WIDTH_TO_THE_CELS_USING_THE_SPILLOVER_ALGORITHM
 
           sparse_widths = []
+          cel_renderers = []
 
           st = __discrete_stream
           begin
@@ -265,9 +266,19 @@ module Skylab::Zerk
 
             sparse_widths[ field_offset ] = w
 
+            fld = @_all_defined_fields.fetch field_offset
+
+            _ins = ColumnBasedResourcesForClient___.new w, @__invocation
+
+            p = fld.fill_field_proc[ _ins ]
+            p.respond_to? :call or self._COVER_ME__strange_shape  # #todo
+
+            cel_renderers[ field_offset ] = p
+
             redo
           end while nil
 
+          @_cel_renderers = cel_renderers
           @_sparse_widths = sparse_widths
           self
         end
@@ -283,7 +294,7 @@ module Skylab::Zerk
 
             use_total = tot
 
-            thing_stream = Stream_.call @_my_order_array do |field_offset|
+            num_st = Stream_.call @_my_order_array do |field_offset|
 
               _field = @_all_defined_fields.fetch field_offset
 
@@ -292,53 +303,84 @@ module Skylab::Zerk
           else
             use_total = @_number_of_fill_fields
 
-            thing_stream = Stream_.call @_my_order_array do |field_offset|
+            num_st = Stream_.call @_my_order_array do |field_offset|
 
               Common_::Pair.via_value_and_name 1, field_offset
             end
           end
 
-          __discrete_stream_via thing_stream, @_width_in_discrete_pool, use_total
+          __discrete_stream_via num_st, @_width_in_discrete_pool, use_total
         end
 
         def __discrete_stream_via num_stream, discrete_pool, denominator
 
+          # the only reason we're mocking this for now is because we're
+          # experimentally finishing this project top-down instead of bottom-up
+          # but yeah, the weight of code here is approaching that of the real thing
+
           result = []
 
-          easier = num_stream.to_a
+          do_this = -> h do
 
-          these = []
-          names = []
-          easier.each do |o|
-            these.push o.value_x
-            names.push o.name_x
-          end
+            exp_d = h.fetch :expect_denominator
+            if exp_d != denominator
+              fail "hardcoded mock failed: for #{ discrete_pool } discrete size, #{
+                }expected denominator of #{ exp_d }, had #{ denominator }"
+            end
 
-          thing_1 = -> do
-            1 == denominator || self._THIS_IS_A_HARDCODED_MOCK
-            [1] == these || self._THIS_IS_A_HARDCODED_MOCK
+            pool = h.fetch( :value_map )
+            h.delete :value_map  # sanity
+
+            begin
+              pair = num_stream.gets
+              pair || break
+              field_offset = pair.name_x
+              numerator = pair.value_x
+
+              output_value = pool.fetch numerator
+              pool.delete numerator
+
+              _pair = Common_::Pair.via_value_and_name output_value, field_offset
+              result.push _pair
+              redo
+            end while above
           end
 
           case discrete_pool
           when 7
-            thing_1[]
-            result.push [ 7, names.fetch( 0 )]
+            do_this.call(
+              expect_denominator: 1,
+              value_map: {
+                1 => 7,
+              }
+            )
           when 1
-            thing_1[]
-            result.push [ 1, names.fetch( 0 )]
+            do_this.call(
+              expect_denominator: 1,
+              value_map: {
+                1 => 1,
+              }
+            )
           when 22
-
-            11 == denominator || self._THIS_IS_A_HARDCODED_MOCK
-            [4, 7] == these || self._THIS_IS_A_HARDCODED_MOCK
-            result.push [ 8, names.fetch( 0 )]
-            result.push [ 14, names.fetch( 1 )]
+            do_this.call(
+              expect_denominator: 11,
+              value_map: {
+                4 => 8,
+                7 => 14,
+              }
+            )
+          when 28
+            do_this.call(
+              expect_denominator: 1,
+              value_map: {
+                1 => 15,
+              }
+            )
           else
-            fail "make a thing for thing: #{ discrete_pool }"
+            fail "make a mock entry for discrete pool of size: #{ discrete_pool }"
           end
 
-          Stream_.call result do |a|
-            Common_::Pair.via_value_and_name( * a )
-          end
+          Stream_[ result ]
         end
 
         def __discrete_stream_via_AT_INTEGRATION num_stream, discrete_pool, denominator
@@ -354,15 +396,15 @@ module Skylab::Zerk
 
         def populate_or_overwrite_typified_cels mutable_a
 
+          row_rsx = RowBasedResourcesForClient___.new mutable_a
+
           @_my_order_array.each do |d|
 
-            w = @_sparse_widths.fetch d
+            _w = @_sparse_widths.fetch d
 
             fld = @_all_defined_fields.fetch d
 
-            _cc = CelControllerForClient__.new w, mutable_a, @__invocation
-
-            s = fld.fill_field_proc[ _cc ]
+            s = @_cel_renderers.fetch( d )[ row_rsx ]
 
             if fld.is_in_place_of_input_field  # #table-spot-5 repetition
               mutable_a.fetch( d ) || self._SANITY
@@ -374,7 +416,7 @@ module Skylab::Zerk
               self._COVER_ME__produced_fill_value_was_not_a_string__  # #todo
             end
 
-            if w != s.length
+            if _w != s.length
               self._COVER_ME__length_of_produced_fill_string_was_not_the_right_length_  # #todo
             end
 
@@ -386,16 +428,13 @@ module Skylab::Zerk
 
       # ==
 
-      class CelControllerForClient__  # (similar to #table-spot-4)
+      # (vaguely similar to #table-spot-4)
 
-        def initialize w, arr, invo
-          @__arr = arr
-          @available_width_for_this_column = w
+      class ColumnBasedResourcesForClient___
+
+        def initialize w, invo
           @__invo = invo
-        end
-
-        def row_typified_mixed_at d
-          @__arr.fetch d
+          @width_allocated_for_this_column = w
         end
 
         def read_observer sym
@@ -403,8 +442,19 @@ module Skylab::Zerk
         end
 
         attr_reader(
-          :available_width_for_this_column,
+          :width_allocated_for_this_column,
         )
+      end
+
+      class RowBasedResourcesForClient___
+
+        def initialize arr
+          @__arr = arr
+        end
+
+        def row_typified_mixed_at d
+          @__arr.fetch d
+        end
       end
 
       # ==

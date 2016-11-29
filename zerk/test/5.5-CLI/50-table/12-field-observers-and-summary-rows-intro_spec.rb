@@ -36,6 +36,8 @@ module Skylab::Zerk::TestSupport
 
           defn.separator_glyphs '| ', '   | ', ' |'
 
+          # (the below work of totaling is beginning to abstract into #spot-8)
+
           defn.add_field_observer :zizzio, :for_input_at_offset, 1 do |o|
             total = 0.0
             o.on_typified_mixed do |tm|

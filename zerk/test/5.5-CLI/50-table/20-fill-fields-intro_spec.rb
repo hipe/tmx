@@ -8,51 +8,59 @@ module Skylab::Zerk::TestSupport
     use :memoizer_methods
     use :CLI_table
 
-    repeat_the_string_at_column = -> col_offset, o do
+    build_string_repeater = -> col_offset, col_rsx do
 
-      w = o.available_width_for_this_column
+      w = col_rsx.width_allocated_for_this_column
 
-      s = o.row_typified_mixed_at( col_offset ).value
+      -> cel_rsx do
 
-      s.length.nonzero? || fail
+        s = cel_rsx.row_typified_mixed_at( col_offset ).value
 
-      buffer = s.dup
-      while w > buffer.length
-        buffer << s
+        s.length.nonzero? || fail
+
+        buffer = s.dup
+        while w > buffer.length
+          buffer << s
+        end
+
+        if buffer.length > w
+          buffer[ w .. -1 ] = EMPTY_S_
+        end
+
+        buffer
       end
-
-      if buffer.length > w
-        buffer[ w .. -1 ] = EMPTY_S_
-      end
-
-      buffer
     end
 
-    do_the_arrow_thing = -> col_offset, o do
-      w = o.available_width_for_this_column
-      s = o.row_typified_mixed_at( col_offset  ).value
+    build_arrow_thinger = -> col_offset, col_rsx do
 
-      d = w - s.length
-      d > 0 || fail
+      w = col_rsx.width_allocated_for_this_column
 
-      left_buffer = '>'
-      d -= 1
-      if d.nonzero?
-        right_buffer = '<'
+      -> cel_rsx do
+
+        s = cel_rsx.row_typified_mixed_at( col_offset ).value
+
+        d = w - s.length
+        d > 0 || fail
+
+        left_buffer = '>'
         d -= 1
-        begin
-          d.zero? && break
-          left_buffer << '-'
+        if d.nonzero?
+          right_buffer = '<'
           d -= 1
-          d.zero? && break
-          right_buffer << '-'
-          d -= 1
-          redo
-        end while above
-      end
+          begin
+            d.zero? && break
+            left_buffer << '-'
+            d -= 1
+            d.zero? && break
+            right_buffer << '-'
+            d -= 1
+            redo
+          end while above
+        end
 
-      left_buffer = left_buffer.reverse
-      "#{ left_buffer }#{ s }#{ right_buffer }"
+        left_buffer = left_buffer.reverse
+        "#{ left_buffer }#{ s }#{ right_buffer }"
+      end
     end
 
     context "a fill field can be used to take up any remaining width" do
@@ -107,8 +115,8 @@ module Skylab::Zerk::TestSupport
           defn.add_field(
             :fill_field,
             :order_of_operation, 0,
-          ) do |o|
-            repeat_the_string_at_column[ 1, o ]
+          ) do |col_rsx|
+            build_string_repeater[ 1, col_rsx ]
           end
 
           defn.add_field
@@ -135,6 +143,13 @@ module Skylab::Zerk::TestSupport
           y << '| -->yayayaya<-- | yayayaya | ya  |'
           y << '| -->yesyesye<-- | yesyesye | yes |'
         end
+
+        # target width is 35. take away all separators (10 width), leaves 25.
+        # width for input data cel is 3, leaves 22. distribute 22 among
+        # 7 parts and 4 parts. 7+4 = 11, the denominator.
+        #
+        #     7.0 / 11 * 22    # => 14.0
+        #     4.0 / 11 * 22    # => 8.0
       end
 
       it "if there's not enough room for both of them, we won't pick favorites" do
@@ -162,16 +177,16 @@ module Skylab::Zerk::TestSupport
             :fill_field,
             :order_of_operation, 1,
             :parts, 7,
-          ) do |o|
-            do_the_arrow_thing[ 1, o ]
+          ) do |col_rsx|
+            build_arrow_thinger[ 1, col_rsx ]
           end
 
           defn.add_field(
             :fill_field,
             :order_of_operation, 0,
             :parts, 4,
-          ) do |o|
-            repeat_the_string_at_column[ 2, o ]
+          ) do |col_rsx|
+            build_string_repeater[ 2, col_rsx ]
           end
 
           defn.add_field

@@ -44,8 +44,10 @@ module Skylab::Zerk::TestSupport
       NIL
     end
 
-    def __say_expected_had_none s
-      "exepected line but had no more lines: #{ s.inspect }"
+    # (none of these "sayers" are covered)
+
+    def __say_missing s
+      "had no more lines but was expecing line: #{ s.inspect }"
     end
 
     def __say_extra s

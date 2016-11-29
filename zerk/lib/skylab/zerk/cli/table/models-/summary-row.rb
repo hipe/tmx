@@ -90,13 +90,13 @@ module Skylab::Zerk
         end
 
         def to_mixed_tuple_for invo
-          MixedTuple_via_Proc_and_Invocation___.new( @_definition_proc, invo ).execute
+          RowControllerForClient__.new( @_definition_proc, invo ).execute
         end
       end
 
       # ==
 
-      class MixedTuple_via_Proc_and_Invocation___
+      class RowControllerForClient__  # now a pattern, #table-spot-4
 
         def initialize p, invo
           @definition_proc = p
