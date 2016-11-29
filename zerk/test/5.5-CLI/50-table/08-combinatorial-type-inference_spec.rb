@@ -198,34 +198,6 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    if false  # #open [#050.A]
-    it "optionally format input dynamically with e.g. ascii escape sequences" do
-
-      row_enum = [
-        [[:header, 'name'], 'hipe'],
-        [[:header, 'favorite fruits'], 'banana'],
-        [nil, 'pear']
-      ]
-
-      a = []
-
-      _when_rendering row_enum, separator: "\t" do |o|
-
-        o.field!( :header ).style =
-          Home_::CLI.expression_agent_instance.method( :hdr )
-
-        o.on_row do |txt|
-          a.push Home_::CLI_Support::Styling.unstyle txt
-        end
-      end
-
-      rx = /^[^\t]*/
-      _lengths = a.map { |s| rx.match( s )[0].length }
-
-      _lengths.uniq.length.should eql 1
-    end
-    end  # # if false
-
     shared_subject :design_ish_ do
 
       table_module_.default_design.redefine do |defn|
@@ -235,5 +207,6 @@ module Skylab::Zerk::TestSupport
     end
   end
 end
+# #tombstone: test for styled header
 # #tombstone: pulled in a test that used to use the mode, does no longer
 # #history: rewrote during unification.
