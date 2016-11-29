@@ -1,105 +1,4 @@
-module Skylab::Brazen
-
-  class CLI_Support::Table::Actor
-
-    class Field_Strategies_::Fill
-
-      ARGUMENTS = [
-        :argument_arity, :custom, :property, :fill,
-      ]
-
-      ROLES = nil
-
-      Table_Impl_::Strategy_::Has_arguments[ self ]
-
-      def initialize x
-        @parent = x
-      end
-
-      def dup
-        self._DESIGN_ME
-      end
-
-      def receive_stream_after__fill__ st  # see article [#001.I]
-
-        _fill = Fill_Model.new_via_polymorphic_stream_passively st
-
-        @parent.current_field.add_component :fill, _fill
-
-        @parent.field_parent.touch_dynamic_dependency Dynamic_Dependency
-
-        KEEP_PARSING_
-      end
-
-      class Fill_Model  # (this is so great how simple it is)
-
-        Attributes_actor_.call( self,
-          background_glyph: nil,
-          from_right: [ :flag, :ivar, :@do_from_right ],
-          glyph: nil,
-          parts: :custom_interpreter_method,
-        )
-
-        class << self
-          private :new
-        end  # >>
-
-        def initialize
-          @background_glyph = SPACE_
-        end
-
-        def normalize
-          self._NEVER  # because #spot-1
-        end
-
-      private
-
-        def parts=
-          x = gets_one_polymorphic_value
-          @parts_float = if x
-            x.to_f
-          end
-          KEEP_PARSING_
-        end
-
-      public
-
-        attr_reader(
-          :background_glyph,
-          :do_from_right,
-          :glyph,
-          :parts_float,
-        )
-      end
-
-      class Dynamic_Dependency  # adapt to [pl]
-
-        def initialize _
-          freeze
-        end
-
-        def dup _
-          self
-        end
-
-        def roles
-          [ :unused_width_consumer ]
-        end
-
-        def subscriptions
-          NIL_
-        end
-
-        def receive_unused_width w, client
-
-          o = Width_Distribution_Calculation___.new
-          o.fields = client.field_array
-          o.unused_width = w
-          o.mutable_column_widths = client.mutable_column_widths
-          o.execute
-          NIL_
-        end
-      end
+      # ==
 
       class Width_Distribution_Calculation___
 
@@ -175,6 +74,6 @@ module Skylab::Brazen
           NIL_
         end
       end
-    end
-  end
-end
+
+      # ==
+# #tombstone: no more `background_glyph`; chunk of doc explaining old fill issues

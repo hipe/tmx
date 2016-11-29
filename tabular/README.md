@@ -294,58 +294,6 @@ becomes an individual rendered "cel" in the finished output:
 
 
 
-## the tricky implementation of fill [#.I]
-
-the point of fill fields is that we distribute unused remaining width
-to them; but we cannot do this until all of:
-
-  • the target width is known
-  • all formal fields are known
-  • all user data has pushed the column widths outward
-
-furthermore, this may be the first ever fill field for this table or it
-may be a subsequent one. this table may have inherited other fill fields
-from a curry, and likewise this table may itself become a curry. so note
-this field may be used across several tables and so should not directly
-hold for example procs that close around this particular table or any
-part of its dependency tree.
-
-all of the above means we certainly cannot process this fill field
-fully now, at the moment after it is created. it is a model use-case for
-an event: an event should be emitted by the top node when all the above
-preconditions are met, and a subscriber (which must itself be a node
-in our dependency tree) should handle distributing the remaining width
-out to all fill fields all at once.
-
-however, we don't want to re-subscribe to the same event channel more
-that once, which is what would happen if we subscribe each time we hit a
-fill field and there are multiple fill fields. what we want is a
-subscription that:
-
-  • fits in cleanly as part of the dependency tree (duping for free)
-
-  • persists across dups (so no closures)
-
-  • is only added as a subscription once per table.
-
-
-our solution for this is to use the dependency tree, but we create a
-custom dependecy class for this specific behavior:
-
-  • once we get it into the dependency tree it will persist across
-    the dup boundary
-
-  • if we make the class model an immutable (i.e stateless) object,
-    we get the correct dup behavior "for free"
-
-  • for now we need to hack something to guarantee we only add such
-    a thing once per table..
-
-we achieve the last point above by introducing the mechanism of
-"dynamic dependencies" which we are formulating presently..
-
-
-
 
 ## (method documentation) :[#.H]
 
@@ -355,7 +303,6 @@ executable dup of a curry.
 
 the *whole* dependencies tree must be duped recursively in a non-
 trivial manner implemented ad-hoc as appropriate for each node.
-
 
 
 
