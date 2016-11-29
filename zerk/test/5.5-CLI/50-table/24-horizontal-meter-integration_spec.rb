@@ -1,3 +1,6 @@
+$stderr.puts "\n\n\n#{ '>' * 80 }\nDON'T FORGET: totally commented out: #{ __FILE__ }"
+$stderr.puts "#{ '<' * 80 }\n\n\n\n"
+if false
 require_relative '../../../../test-support'
 
 module Skylab::Brazen::TestSupport
@@ -95,4 +98,5 @@ module Skylab::Brazen::TestSupport
       done_
     end
   end
+end
 end

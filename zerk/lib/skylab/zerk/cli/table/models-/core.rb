@@ -41,39 +41,57 @@ module Skylab::Zerk
       end
 
       def initialize_copy _
-        # @align  as-is
-        # @is_summary_field  as-is
-        # @label  as-if (as long as..)
         if @sprintf_hash
           self._CODE_SKETCH_cover_this
           @sprintf_hash = @sprintf_hash.dup
         end
-        # @summary_field_ordinal  as-is
       end
 
       # -- write
 
       OPTIONS___ = {
+        fill_field: :__at_fill_field,
         in_place_of_input_field: :__at_in_place_of_input_field,
         left: :_at_align,
         label: :__at_label,
+        parts: :__at_parts,
         right: :_at_align,
         sprintf_format_string_for_nonzero_floats: :__at_sprintf_format_string,
         summary_field: :__at_summary_field,
       }
 
+      def __at_fill_field
+        @_scn.advance_one
+        _parse_required_field_summary_field_ordinal
+        @is_summary_field = true
+        @is_summary_field_fill_field = true
+        @fill_field_proc = remove_instance_variable( :@_argument_proc )
+
+        # .. probably parse more fill-specific options here ..
+
+        NIL
+      end
+
       def __at_summary_field
         @_scn.advance_one
+        _parse_required_field_summary_field_ordinal
+        @is_summary_field = true
+        @summary_field_proc = remove_instance_variable( :@_argument_proc )
+        NIL
+      end
+
+      def _parse_required_field_summary_field_ordinal
         _required_keyword = @_scn.current_token
         if :order_of_operation != _required_keyword
-          fail self._COVER_ME_missing_required_keyword  # #todo
+          self._COVER_ME_missing_required_keyword__order_of_operation__  # #todo
         end
         @_scn.advance_one
         d = @_scn.gets_one
-        d.respond_to? :integer? or fail
+        if ! d.respond_to? :integer?
+          self._COVER_ME__order_of_operation__argument_must_be_an_integer  # #todo
+        end
         @summary_field_ordinal = d
-        @is_summary_field = true
-        @summary_field_proc = remove_instance_variable( :@_argument_proc )
+        NIL
       end
 
       def __at_sprintf_format_string
@@ -85,6 +103,16 @@ module Skylab::Zerk
         _h[ _use_key ] ||= @_scn.gets_one
 
         NIL
+      end
+
+      def __at_parts
+        @_scn.advance_one
+        d = @_scn.gets_one
+        d.integer? or raise ::TypeError  # #wont-cover
+        if ! @is_summary_field_fill_field
+          self._COVER_ME__you_cannot_specify_parts_unless_it_is_a_fill_field__  # #todo
+        end
+        @parts = d
       end
 
       def __at_label
@@ -105,9 +133,12 @@ module Skylab::Zerk
 
       attr_reader(
         :align,  # :left | :right
+        :fill_field_proc,
         :is_in_place_of_input_field,
         :is_summary_field,
+        :is_summary_field_fill_field,
         :label,
+        :parts,
         :sprintf_hash,
         :summary_field_ordinal,
         :summary_field_proc,

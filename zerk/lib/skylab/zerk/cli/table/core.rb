@@ -50,6 +50,10 @@ module Skylab::Zerk
         @_.right_separator = rig ; nil
       end
 
+      def target_final_width d
+        @_.target_final_width = d
+      end
+
       def page_size d
         @_.page_size = d
       end
@@ -72,6 +76,7 @@ module Skylab::Zerk
         @page_size = 50
         @right_separator = nil
         @summary_rows = nil
+        @target_final_width = nil
 
         yield Design_DSL__.new self
         finish
@@ -141,6 +146,7 @@ module Skylab::Zerk
           fld = Here_::Models_::Field.new p, x_a
 
           if fld.is_summary_field
+
             treat_as_plain_field = fld.is_in_place_of_input_field
           else
             treat_as_plain_field = true
@@ -166,6 +172,7 @@ module Skylab::Zerk
         :page_size,
         :right_separator,
         :summary_rows,
+        :target_final_width,
       )
 
       def finish
@@ -206,7 +213,7 @@ module Skylab::Zerk
             # ~ summary fields
 
             if fld.is_summary_field
-              summary_fields ||= Here_::Models_::SummaryField::Index.begin
+              summary_fields ||= Here_::Models_::SummaryField.begin_index
               summary_fields.receive_NEXT_summary_field fld, d
             end
 
@@ -225,9 +232,13 @@ module Skylab::Zerk
             redo
           end while above
 
+          defined_fields.freeze
+
           if summary_fields
-            summary_fields = summary_fields.finish
+            summary_fields = summary_fields.finish defined_fields
           end
+
+          @_defined_field_offset_via_input_offset.freeze
 
         else
           left = MONADIC_EMPTINESS_
@@ -242,20 +253,13 @@ module Skylab::Zerk
         @left_separator ||= EMPTY_S_  # so we don't have to check for
         @right_separator ||= EMPTY_S_  # nils where it is used
 
+        @field_observers and @field_observers.freeze
+        @summary_rows and @summary_rows.freeze
+
         freeze
       end
 
-      def freeze
-
-        if @_has_defined_fields
-          @_defined_field_offset_via_input_offset.freeze
-          @_defined_fields.freeze
-        end
-
-        @field_observers and @field_observers.freeze
-        @summary_rows and @summary_rows.freeze
-        super
-      end
+      private :freeze
 
       # -- use
 

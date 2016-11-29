@@ -4,8 +4,6 @@ module Skylab::Zerk
 
     module Magnetics_
 
-      Autoloader_[ self ]
-
       # ==
 
       class LineStream_via_MixedTupleStream_and_Design < Common_::Actor::Dyadic

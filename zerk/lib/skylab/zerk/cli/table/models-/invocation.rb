@@ -49,9 +49,7 @@ module Skylab::Zerk
           index = design.summary_fields_index__
           if index
 
-            @__summary_fields_guy =
-              Here_::Models_::SummaryField::CollectionController.new(
-                index, self )
+            @__summary_fields_index = index
 
             method :__hack_page_data_for_summary_fields
           else
@@ -61,8 +59,8 @@ module Skylab::Zerk
         end
 
         def __hack_page_data_for_summary_fields eek
-          @__summary_fields_guy.mutate_page_data eek
-          NIL
+
+          @__summary_fields_index.mutate_page_data eek, self
         end
 
         # ~

@@ -224,6 +224,14 @@ module Skylab::Tabular
         Home_::Models::Typified::Mixed[ _typeish_symbol, x ]
       end
 
+      def to_field_survey_scanner  # CAREFUL - don't use this while it dups
+        Common_::Polymorphic_Stream.via_array @_array
+      end
+
+      def dereference field_offset
+        @_array.fetch field_offset
+      end
+
       # --
 
       def finish
