@@ -499,7 +499,7 @@ y << "target distance must be at a minimum N-1."
           # move. the last items's move distance is defined as being equal
           # to the argument amount of change. that leaves the remaining
           # zero or more items as needing some kind of "scale down". we
-          # attempt something like [#br-073.B] the spillover algorithm.
+          # attempt something like [#ba-057.2] the spillover algorithm.
 
           moves = []
 

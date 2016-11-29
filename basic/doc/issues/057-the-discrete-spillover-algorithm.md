@@ -1,4 +1,11 @@
-# lipstick :[#073]
+# the discrete/spillover algorithm :[#057]
+
+(once called "lipstick")
+
+(EDIT: this has been moved here from its home in modality library
+ because it serves as a good introduction to this algorithm,
+ found at [#here.2]. we should divide this non-algorithm-related
+ content back out to somewhere..)
 
 (note the text predates the creation of this document by years..)
 
@@ -43,7 +50,7 @@ render its particular lipstick string.
 
 
 
-### the "remainder threshold" algorithm :[#.B]
+### the "remainder threshold" algorithm :[#here.2]
 
 the floaty numbers we calculate are "continuous", but the pixels or
 character columns we render into are "discrete". to make floats fit into
@@ -87,7 +94,7 @@ whatever current segment we are calculating.
 
 
 
-## :[#.A]
+## track visual tests :[#here.A]  (was: :[#here.1])
 
 synopsis: this tag suffix tracks aspects of unit tests that should be
 broken out into visual tests.
@@ -107,3 +114,12 @@ this note for now.
 
 on that subject, although ncurses integration would be ideal, it is seen
 as auxiliary to the central work that the subject facility does.
+
+
+
+
+## #open issues :[#here.9]
+
+### :[#here.9.1]
+
+there exists a code fragment in [tmx] that is exactly the impl. we want.

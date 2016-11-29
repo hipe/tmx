@@ -4,9 +4,10 @@
 
 this skylab sidesystem called "basic" ("[ba]") houses those general
 reusable data-structures and simple behavioral classes generic enough
-to be reused arcross skylab projects. examples are tree-ish and table-ish
-concerns. (note that the *most* frequently used data-structures are
-housed not here but in the omnipresent [co] for convenience.)
+to be reused arcross skylab projects.
+
+note that the *most* frequently used data-structures are
+housed not here but in the omnipresent [co] for convenience.
 
 the namespace immediately below the "Basic" module is reserved strictly
 for such structures & concepts -- generally they are nouns.

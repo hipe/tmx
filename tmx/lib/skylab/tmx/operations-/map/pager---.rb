@@ -164,7 +164,7 @@ module Skylab::TMX
           NIL
         end
 
-        def __range_stream  # exactly [#br-073.B]
+        def __range_stream  # #open [#ba-057.9.1]
 
           len = @_item_count
 

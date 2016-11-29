@@ -1,3 +1,6 @@
+[#057] #open (see document)
+             the discrete/spillover algorithm (once called "lipstick")..
+
 [#056]       [ yielder mapper ]
 [#055]       [ hotstrings ]
 [#054]       [ the "classify list" algorithm ]

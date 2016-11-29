@@ -22,4 +22,3 @@ acceptance: code metrics
 integrate all three components to finish the lipstick stack
 -1 integrate spillover magnet will max share meter (not fill)
 -2 integrate spillover magnet with fill (not max share meter)
--3 cover just the spillover algorithm (in [ba])
