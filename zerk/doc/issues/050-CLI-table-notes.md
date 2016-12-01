@@ -225,3 +225,17 @@ headers, we want our headers to report their widths to the field
 surveys after that array has been expanded..
 
 (the rest is in an inline comment.)
+
+
+
+
+## (placeholder for anything) :[#here.G]
+
+
+
+
+## hotfixes :[#here.H]
+
+  - there was a tiny bug :[#here.H.1]
+
+  - changing widths (shrinking widths) hotfixes :[#here.H.2]

@@ -219,7 +219,7 @@ module Skylab::CodeMetrics::TestSupport
           num_pluses = []
 
           col_index = @column_index
-          unstyle = Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled
+          # unstyle = Home_.lib_.brazen::CLI_Support::Styling::Unstyle_styled
           sm = @string_matrix
           r = @row_range
           last = r.end
@@ -233,7 +233,7 @@ module Skylab::CodeMetrics::TestSupport
             if s.length.zero?
               self._OOPS
             end
-            s = unstyle[ s ]
+            # s = unstyle[ s ]
             num_pluses.push RX___.match( s )[ 0 ].length
           end
 

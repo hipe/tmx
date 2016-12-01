@@ -144,6 +144,8 @@ module Skylab::Zerk
 
         design = invo.design
 
+        blank_cels = nil
+
         -> typi_st do
 
           buffer = "#{ design.left_separator }"
@@ -152,8 +154,20 @@ module Skylab::Zerk
           write_cel = -> do
             d += 1
             use_typi = typi_st.gets
-            # ..
-            buffer << cel_renderers.fetch( d )[ use_typi ]
+            if use_typi
+              buffer << cel_renderers.fetch( d )[ use_typi ]
+            else
+              # hotfix [#050.H.2] ..
+              a = ( blank_cels ||= [] )
+              s = a[d]
+              if ! s
+                _w = page.every_survey_of_every_field.fetch( d ).
+                  width_of_widest_string
+                s = SPACE_ * _w
+                a[d] = s
+              end
+              buffer << s
+            end
             NIL
           end
 

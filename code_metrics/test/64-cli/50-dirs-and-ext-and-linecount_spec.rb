@@ -168,8 +168,8 @@ module Skylab::CodeMetrics::TestSupport
           end
         end
 
-        column[ 0 ].should eql %w(
-          fixture-files-one fixture-files-two Total: )
+        column[ 0 ].should eql [
+          "fixture-files-one", "fixture-files-two", "Total: 2" ]
 
         column[ 1 ].should eql %w( 3 2 5 )
 

@@ -49,10 +49,7 @@ module Skylab::CodeMetrics
 
       # -- misc support for our action adapters
 
-      fmt = "%0.2f%%"
-      Common_percent_formatting = -> f do
-        fmt % ( f * 100 )
-      end
+      PERCENT_FORMAT__ = "%6.2f%%"
 
         # -- our default hook-in behavior for particular shared events
 
@@ -204,37 +201,105 @@ module Skylab::CodeMetrics
 
         def __express_totals_as_table out, totes
 
-          percent = Common_percent_formatting
+          # TABLE 1
 
-          tbl = _begin_table
+          # 1. declare these pseudo constants
 
-          tbl.edit_table(
+          column_for_path = 0
+          column_for_count = 1
+          column_for_total_share = 2
+          column_for_normal_share = 3
+          number_of_columns = 4
 
-            :field, :named, :slug,
-              :label, 'File',
-              :summary, -> totes_ do
-                "Total: #{ totes_.children_count }"
-              end,
+          # 2. map each "totaller" object into a plain old array, lined up
 
-            :field, :named, :count,
-              :label, 'Lines',
-              :summary, -> totes_ do
-                "%d" % totes_.sum_of( :count )
-              end,
+          _mixed_tuple_stream = totes.to_value_stream.map_by do |subnode|
+            a = ::Array.new number_of_columns
+            a[ column_for_path ] = subnode.slug
+            a[ column_for_count ] = subnode.count
+            a[ column_for_total_share ] = subnode.total_share * 100  # e.g 0.25
+            a[ column_for_normal_share ] = subnode.normal_share * 100  # e.g 0.5
+            a
+          end
 
-            :field, :named, :total_share, :map, percent,
+          # 3. "design" the table (lining up the fields with above)
 
-            :field, :named, :normal_share, :map, percent,
+          _target_final_width = _lookup_expression_width
 
-            :field, :named, :_lipstick_,
-              :label, EMPTY_S_,
-              :edit, Home_::CLI::Build_custom_lipstick_field )
+          Home_.lib_.zerk
 
-          tbl.expression_width = _lookup_expression_width
+          _design = ::Skylab::Zerk::CLI::Table::Design.define do |defn|
 
-          _y = tbl.express_into_IO_data_tree out, totes
+            defn.separator_glyphs '| ', ' | ', ' |'
 
-          _y && ACHIEVED_
+            defn.add_field(  # `slug`, column 0
+              :label, "File",
+            )
+
+            defn.add_field(  # `count`, column 1
+              :label, "Lines",
+            )
+
+            defn.add_field(  # `total_share`, column 2
+              :label, "Total share",
+              :sprintf_format_string_for_nonzero_floats, PERCENT_FORMAT__,
+            )
+
+            defn.add_field(  # `normal_share`, column 3
+              :label, "Normal share",
+              :sprintf_format_string_for_nonzero_floats, PERCENT_FORMAT__,
+            )
+
+            Add_lipstick_field_[ defn, column_for_count ]
+
+            defn.add_field_observer(
+              :_observer_for_path_column_,
+              :for_input_at_offset, column_for_path,
+            ) do |o|
+              count = 0
+              o.on_typified_mixed do |tm|
+                if :string == tm.typeish_symbol  # probably not necessary
+                  count += 1  # LOOK
+                end
+              end
+              o.read_observer_by do
+                count
+              end
+            end
+
+            defn.add_field_observer(
+              :_observer_for_count_column_,
+              :for_input_at_offset, column_for_count,
+            ) do |o|
+              total = 0
+              o.on_typified_mixed do |tm|
+                if tm.is_numeric
+                  total += tm.value
+                end
+              end
+              o.read_observer_by do
+                total
+              end
+            end
+
+            defn.add_summary_row do |o|
+
+              _total_0 = o.read_observer :_observer_for_path_column_
+              o << "Total: #{ _total_0 }"  # (hurts from lack of formatting)
+
+              _total_1 = o.read_observer :_observer_for_count_column_
+              o << _total_1  # ok as integer
+            end
+
+            defn.target_final_width _target_final_width
+          end
+
+          _out_st = _design.line_stream_via_mixed_tuple_stream(
+            _mixed_tuple_stream )
+
+          Flush_stream_into_[ out, _out_st ]
+
+          ACHIEVED_
         end
       end
 
@@ -255,39 +320,105 @@ module Skylab::CodeMetrics
 
         def __express_totals_as_table out, totes
 
-          percent = Common_percent_formatting
+          # TABLE 2
 
-          tbl = _begin_table
+          # 1. declare these pseudo constants
 
-          tbl.edit_table(
+          column_for_extension = 0
+          column_for_count = 1
+          column_for_total_share = 2
+          column_for_normal_share = 3
+          number_of_columns = 4
 
-            :field, :named, :slug,
-              :label, 'Extension',
-              :summary, -> totes_ do
-                "Total: #{ totes_.children_count }"
-              end,
+          # 2. map each "totaller" object into a plain old array, lined up
 
-            :field, :named, :count,
-              :label, 'Num Files',
-              :summary, -> totes_ do
-                "%d" % totes_.sum_of( :count )
-              end,
+          _mixed_tuple_stream = totes.to_value_stream.map_by do |subnode|
+            a = ::Array.new number_of_columns
+            a[ column_for_extension ] = subnode.slug
+            a[ column_for_count ] = subnode.count
+            a[ column_for_total_share ] = subnode.total_share * 100  # e.g 0.25
+            a[ column_for_normal_share ] = subnode.normal_share * 100  # e.g 0.5
+            a
+          end
 
-            :field, :named, :total_share,
-              :map, percent,
+          # 3. "design" the table (lining up the fields with above)
 
-            :field, :named, :normal_share,
-              :map, percent,
+          _target_final_width = _lookup_expression_width
 
-            :field, :named, :_lipstick_,
-              :label, EMPTY_S_,
-              :edit, Home_::CLI::Build_custom_lipstick_field )
+          Home_.lib_.zerk
 
-          tbl.expression_width = _lookup_expression_width
+          _design = ::Skylab::Zerk::CLI::Table::Design.define do |defn|
 
-          y = tbl.express_into_IO_data_tree out, totes
+            defn.separator_glyphs '| ', ' | ', ' |'
 
-          y && ACHIEVED_  # important - don't result in the output context
+            defn.add_field(  # `slug`, column 0
+              :label, "Extension",
+            )
+
+            defn.add_field(  # `count`, column 1
+              :label, "Num Files",
+            )
+
+            defn.add_field(  # `total_share`, column 2
+              :label, "Total share",
+              :sprintf_format_string_for_nonzero_floats, PERCENT_FORMAT__,
+            )
+
+            defn.add_field(  # `normal_share`, column 3
+              :label, "Normal share",
+              :sprintf_format_string_for_nonzero_floats, PERCENT_FORMAT__,
+            )
+
+            Add_lipstick_field_[ defn, column_for_count ]
+
+            defn.add_field_observer(
+              :_observer_for_extension_column_,
+              :for_input_at_offset, column_for_extension,
+            ) do |o|
+              count = 0
+              o.on_typified_mixed do |tm|
+                if :string == tm.typeish_symbol  # probably not necessary
+                  count += 1  # LOOK
+                end
+              end
+              o.read_observer_by do
+                count
+              end
+            end
+
+            defn.add_field_observer(
+              :_observer_for_count_column_,
+              :for_input_at_offset, column_for_count,
+            ) do |o|
+              total = 0
+              o.on_typified_mixed do |tm|
+                if tm.is_numeric
+                  total += tm.value
+                end
+              end
+              o.read_observer_by do
+                total
+              end
+            end
+
+            defn.add_summary_row do |o|
+
+              _total_0 = o.read_observer :_observer_for_extension_column_
+              o << "Total: #{ _total_0 }"  # (hurts from lack of formatting)
+
+              _total_1 = o.read_observer :_observer_for_count_column_
+              o << _total_1  # ok as integer
+            end
+
+            defn.target_final_width _target_final_width
+          end
+
+          _out_st = _design.line_stream_via_mixed_tuple_stream(
+            _mixed_tuple_stream )
+
+          Flush_stream_into_[ out, _out_st ]
+
+          ACHIEVED_  # important - don't result in the output context
         end
       end
 
@@ -308,61 +439,135 @@ module Skylab::CodeMetrics
 
         def __express_totals_as_table out, totes
 
-          integer_format = '%d'
-          integer = -> x do
-            integer_format % x
+          # TABLE 3
+
+          # 1. declare these pseudo constants
+
+          column_for_directory = 0
+          column_for_num_files = 1
+          column_for_num_lines = 2
+          column_for_total_share = 3
+          column_for_normal_share = 4
+          number_of_columns = 5
+
+          # 2. map each "totaller" object into a plain old array, lined up
+
+          _mixed_tuple_stream = totes.to_value_stream.map_by do |subnode|
+            a = ::Array.new number_of_columns
+            a[ column_for_directory ] = subnode.slug
+            a[ column_for_num_files ] = subnode.num_files
+            a[ column_for_num_lines ] = subnode.num_lines
+            a[ column_for_total_share ] = subnode.total_share * 100  # e.g 0.25
+            a[ column_for_normal_share ] = subnode.normal_share * 100  # e.g 0.5
+            a
           end
 
-          percent = Common_percent_formatting
+          # 3. "design" the table (lining up the fields with above)
 
-          tbl = _begin_table
+          _target_final_width = _lookup_expression_width
 
-          tbl.edit_table(
+          Home_.lib_.zerk
 
-            :field, :named, :slug,
-              :label, 'Directory',
-              :summary, -> totes_ do
-                'Total: '
-              end,
+          _design = ::Skylab::Zerk::CLI::Table::Design.define do |defn|
 
-            :field, :named, :num_files,
-              :map, integer,
-              :summary, -> totes_ do
-                integer_format % totes_.sum_of( :num_files )
-              end,
+            defn.separator_glyphs '| ', ' | ', ' |'
 
-            :field, :named, :num_lines,
-              :map, integer,
-              :summary, -> totes_ do
-                integer_format % totes_.sum_of( :num_lines )
-              end,
+            defn.add_field(  # `slug`, column 0
+              :label, "Directory",
+            )
 
-            :field, :named, :total_share,
-              :map, percent,
+            defn.add_field(  # `num_files`, column 1
+              :label, "Num Files",
+            )
 
-            :field, :named, :normal_share,
-              :map, percent,
+            defn.add_field(  # `num_lines`, column 2
+              :label, "Num Lines",
+            )
 
-            :field, :named, :_lipstick_,
-              :label, EMPTY_S_,
-              :edit, Home_::CLI::Build_custom_lipstick_field
-          )
+            defn.add_field(  # `total_share`, column 3
+              :label, "Total share",
+              :sprintf_format_string_for_nonzero_floats, PERCENT_FORMAT__,
+            )
 
-          tbl.expression_width = _lookup_expression_width
+            defn.add_field(  # `normal_share`, column 4
+              :label, "Normal share",
+              :sprintf_format_string_for_nonzero_floats, PERCENT_FORMAT__,
+            )
 
-          y = tbl.express_into_IO_data_tree out, totes
+            Add_lipstick_field_[ defn, column_for_num_files ]
 
-          y && ACHIEVED_  # important - don't result in the output context
+            defn.add_field_observer(
+              :_observer_for_dir_column_,
+              :for_input_at_offset, column_for_directory,
+            ) do |o|
+              count = 0
+              o.on_typified_mixed do |tm|
+                if :string == tm.typeish_symbol  # probably not necessary
+                  count += 1  # LOOK
+                end
+              end
+              o.read_observer_by do
+                count
+              end
+            end
+
+            defn.add_field_observer(
+              :_observer_for_num_files_column_,
+              :for_input_at_offset, column_for_num_files,
+            ) do |o|
+              total = 0
+              o.on_typified_mixed do |tm|
+                if tm.is_numeric
+                  total += tm.value
+                end
+              end
+              o.read_observer_by do
+                total
+              end
+            end
+
+            defn.add_field_observer(
+              :_observer_for_num_lines_column_,
+              :for_input_at_offset, column_for_num_lines,
+            ) do |o|
+              total = 0
+              o.on_typified_mixed do |tm|
+                if tm.is_numeric
+                  total += tm.value
+                end
+              end
+              o.read_observer_by do
+                total
+              end
+            end
+
+            defn.add_summary_row do |o|
+
+              _total_0 = o.read_observer :_observer_for_dir_column_
+              o << "Total: #{ _total_0 }"  # (hurts from lack of formatting)
+
+              _total_1 = o.read_observer :_observer_for_num_files_column_
+              o << _total_1  # ok as integer
+
+              _total_1 = o.read_observer :_observer_for_num_lines_column_
+              o << _total_1  # ok as integer
+            end
+
+            defn.target_final_width _target_final_width
+          end
+
+          _out_st = _design.line_stream_via_mixed_tuple_stream(
+            _mixed_tuple_stream )
+
+          Flush_stream_into_[ out, _out_st ]
+
+          ACHIEVED_  # important - don't result in the output context
         end
       end
 
       class Action_Adapter  # re-open shared base class
 
         # -- support for table rendering
-
-        def _begin_table
-          Brazen_::CLI_Support::Table::Structured.new
-        end
 
         def _lookup_expression_width
           Home_::CLI::HARD_CODED_WIDTH_

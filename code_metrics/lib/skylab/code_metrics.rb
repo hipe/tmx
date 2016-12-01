@@ -122,6 +122,8 @@ module Skylab::CodeMetrics
     System_lib__ = sidesys[ :System ]
 
     Test_support = sidesys[ :TestSupport ]
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   # ==

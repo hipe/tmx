@@ -72,6 +72,7 @@ module Skylab::Tabular
       def initialize keys_via_input_tuple_offset, box
 
         @field_observers_array = []
+        @field_observer_invocation_box = Common_::Box.new
 
         h = box.h_
         keys_via_input_tuple_offset.length.times do |d|
@@ -88,7 +89,6 @@ module Skylab::Tabular
 
       def __populate_observers_for_column keys, h, col_d
 
-        foi_box = Common_::Box.new
         p_a = []
 
         keys.each do |k|
@@ -104,7 +104,7 @@ module Skylab::Tabular
 
           p_a.push oi.__see_typified_mixed_by_
 
-          foi_box.add k, oi
+          @field_observer_invocation_box.add k, oi
         end
 
         _this_proc = if 1 == keys.length
@@ -119,8 +119,6 @@ module Skylab::Tabular
         end
 
         @field_observers_array[ col_d ] = _this_proc
-
-        @field_observer_invocation_box = foi_box
 
         NIL
       end
