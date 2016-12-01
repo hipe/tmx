@@ -137,13 +137,21 @@ to discover what we are about to say here).
 
 "position system" simply refers to what the offsets mean when
 offsets are used to refer to columns: are the the columns *before*
-summary fields have been added, or after? because the answer will
-impact how we reference every column that occurrs after any
+summary fields have been added, or after? the answer will
+impact how we reference every column that occurs after any
 summary field.
 
-but alas, (EDIT)
+the solution we arrived at was counter to instinct: we use
+"input offsets" when appropriate, and otherwise we use "field offsets".
+our instinct was to avoid using two position systems in the same design
+specifications, but it turns out there is a very real benefit to
+doing so:
 
-given this, it's more poka-yoke (EDIT)
+using both position systems is more poka-yoke: our pipeline is
+hard-coded to be two-pass only. so you can only create a field observer
+on an input field, not a derived field. using the position system of
+input offsets enforces this idea, by disallowing you to refer to a
+field that hasn't been "expanded" into the tuple yet.
 
 
 

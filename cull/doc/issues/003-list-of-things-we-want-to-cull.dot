@@ -19,11 +19,9 @@ most difficult-ish is at top
 
   + there are numerous event base classes
 
-  + there are numerous CLI table libs (hubbed at [#tab-001])
-
   + IO select: [#sy-006] and [#sy-025]
 
-
+  + there WERE like 4 or 5 table rendering libs
   + there WERE two name libs
   + there WERE at least 3 box libs
 */

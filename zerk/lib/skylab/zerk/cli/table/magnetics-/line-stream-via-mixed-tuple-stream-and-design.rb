@@ -232,9 +232,9 @@ module Skylab::Zerk
 
     STRING = Field_Type__.new :string, rx: //, align: :left, render: common
 
-
-    BLANK = Field_Type__.new :blank, ancestor: :string,
-                                   rx: /\A[[:space:]]*\z/, render: common
+    # this RX moved #table-spot-temp-1
+    # BLANK = Field_Type__.new :blank, ancestor: :string,
+    #                               rx: /\A[[:space:]]*\z/, render: common
 
     FLOAT = Field_Type__.new :float, ancestor: :string,
                                    rx: /\A-?\d+(?:\.\d+)?\z/, render: float

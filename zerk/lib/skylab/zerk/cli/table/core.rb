@@ -27,8 +27,13 @@ module Skylab::Zerk
       end
 
       def add_field_observer * x_a, & p
+
         Require_tabular__[]
-        @_.__receive_field_observer_ Tabular_::Models::FieldObserver.new p, x_a
+
+        _fo = Tabular_::Models::FieldObserver.new( p, x_a,
+          Here_::Models_::SummaryRow::Dereference_common_field_observer )  # 1x (both)
+
+        @_.__receive_field_observer_ _fo
       end
 
       def add_summary_row & p

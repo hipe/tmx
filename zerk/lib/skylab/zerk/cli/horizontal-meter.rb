@@ -132,6 +132,8 @@ module Skylab::Zerk
 
       For_table_page_column_build_new_observation_of_max = -> o do
 
+        # (you might want to push this up to be a common observation function :#spot-8)
+
         max = 0.0  # (might change to integer whenever)
 
         o.on_typified_mixed do |tm|
@@ -149,35 +151,19 @@ module Skylab::Zerk
 
       For_table_design_add_total_summary_row_for_column = -> defn, col, label do
 
-        # (stowaway in proximity to above. is :#spot-8)
-
         observer_key = :"_total_of_column__#{ col }__"  # hopefully unique name
-
-        # --
 
         defn.add_summary_row do |o|
           o << "(total)"
           o << o.read_observer( observer_key )
         end
 
-        # -- (will probably snip)
+        defn.add_field_observer(
+          observer_key,
+          :do_this, :SumTheNumerics,
+          :for_input_at_offset, col,
+        )
 
-        defn.add_field_observer observer_key, :for_input_at_offset, col do |o|
-
-          total = 0.0
-
-          o.on_typified_mixed do |tm|
-            if tm.is_numeric
-              total += tm.value
-            end
-          end
-
-          o.read_observer_by do
-            total
-          end
-        end
-
-        # -- (end will probably snip)
         NIL
       end
 

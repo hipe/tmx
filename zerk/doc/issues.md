@@ -1,6 +1,12 @@
 [#058] #open the fix for a summary row (total) and a summary field (fill) is nasty
 
-[#057] #track table: shorthand version of a total field? probably not.
+[#057] #wish how hard would it be to access the hook mesh pipeline and
+             rendering guys when making the summary results (in #table)?
+             so you could say `o << "Total: #{ wahoo[ f ] }"` and have the
+             `wahoo` infer the typeish of `f` and use whatever existing cel
+             renderer was established for the others? caveats etc
+
+             ( #was: track table: shorthand version of a total field? probably not. )
 
 [#056]       [ syntaxish ]
 

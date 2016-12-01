@@ -226,9 +226,7 @@ module Skylab::CodeMetrics
 
           _target_final_width = _lookup_expression_width
 
-          Home_.lib_.zerk
-
-          _design = ::Skylab::Zerk::CLI::Table::Design.define do |defn|
+          _design = Home_.lib_.zerk::CLI::Table::Design.define do |defn|
 
             defn.separator_glyphs '| ', ' | ', ' |'
 
@@ -255,40 +253,22 @@ module Skylab::CodeMetrics
             defn.add_field_observer(
               :_observer_for_path_column_,
               :for_input_at_offset, column_for_path,
-            ) do |o|
-              count = 0
-              o.on_typified_mixed do |tm|
-                if :string == tm.typeish_symbol  # probably not necessary
-                  count += 1  # LOOK
-                end
-              end
-              o.read_observer_by do
-                count
-              end
-            end
+              :do_this, :CountTheNonEmptyStrings,
+            )
 
             defn.add_field_observer(
               :_observer_for_count_column_,
               :for_input_at_offset, column_for_count,
-            ) do |o|
-              total = 0
-              o.on_typified_mixed do |tm|
-                if tm.is_numeric
-                  total += tm.value
-                end
-              end
-              o.read_observer_by do
-                total
-              end
-            end
+              :do_this, :SumTheNumerics,
+            )
 
             defn.add_summary_row do |o|
 
-              _total_0 = o.read_observer :_observer_for_path_column_
-              o << "Total: #{ _total_0 }"  # (hurts from lack of formatting)
+              _d = o.read_observer :_observer_for_path_column_
+              o << "Total: #{ _d }"  # (hurts from lack of formatting)
 
-              _total_1 = o.read_observer :_observer_for_count_column_
-              o << _total_1  # ok as integer
+              _d = o.read_observer :_observer_for_count_column_
+              o << _d  # ok as integer
             end
 
             defn.target_final_width _target_final_width
@@ -345,9 +325,7 @@ module Skylab::CodeMetrics
 
           _target_final_width = _lookup_expression_width
 
-          Home_.lib_.zerk
-
-          _design = ::Skylab::Zerk::CLI::Table::Design.define do |defn|
+          _design = Home_.lib_.zerk::CLI::Table::Design.define do |defn|
 
             defn.separator_glyphs '| ', ' | ', ' |'
 
@@ -374,40 +352,22 @@ module Skylab::CodeMetrics
             defn.add_field_observer(
               :_observer_for_extension_column_,
               :for_input_at_offset, column_for_extension,
-            ) do |o|
-              count = 0
-              o.on_typified_mixed do |tm|
-                if :string == tm.typeish_symbol  # probably not necessary
-                  count += 1  # LOOK
-                end
-              end
-              o.read_observer_by do
-                count
-              end
-            end
+              :do_this, :CountTheNonEmptyStrings,
+            )
 
             defn.add_field_observer(
               :_observer_for_count_column_,
               :for_input_at_offset, column_for_count,
-            ) do |o|
-              total = 0
-              o.on_typified_mixed do |tm|
-                if tm.is_numeric
-                  total += tm.value
-                end
-              end
-              o.read_observer_by do
-                total
-              end
-            end
+              :do_this, :SumTheNumerics,
+            )
 
             defn.add_summary_row do |o|
 
-              _total_0 = o.read_observer :_observer_for_extension_column_
-              o << "Total: #{ _total_0 }"  # (hurts from lack of formatting)
+              _d = o.read_observer :_observer_for_extension_column_
+              o << "Total: #{ _d }"  # (hurts from lack of formatting)
 
-              _total_1 = o.read_observer :_observer_for_count_column_
-              o << _total_1  # ok as integer
+              _d = o.read_observer :_observer_for_count_column_
+              o << _d  # ok as integer
             end
 
             defn.target_final_width _target_final_width
@@ -466,9 +426,7 @@ module Skylab::CodeMetrics
 
           _target_final_width = _lookup_expression_width
 
-          Home_.lib_.zerk
-
-          _design = ::Skylab::Zerk::CLI::Table::Design.define do |defn|
+          _design = Home_.lib_.zerk::CLI::Table::Design.define do |defn|
 
             defn.separator_glyphs '| ', ' | ', ' |'
 
@@ -499,58 +457,31 @@ module Skylab::CodeMetrics
             defn.add_field_observer(
               :_observer_for_dir_column_,
               :for_input_at_offset, column_for_directory,
-            ) do |o|
-              count = 0
-              o.on_typified_mixed do |tm|
-                if :string == tm.typeish_symbol  # probably not necessary
-                  count += 1  # LOOK
-                end
-              end
-              o.read_observer_by do
-                count
-              end
-            end
+              :do_this, :CountTheNonEmptyStrings,
+            )
 
             defn.add_field_observer(
               :_observer_for_num_files_column_,
               :for_input_at_offset, column_for_num_files,
-            ) do |o|
-              total = 0
-              o.on_typified_mixed do |tm|
-                if tm.is_numeric
-                  total += tm.value
-                end
-              end
-              o.read_observer_by do
-                total
-              end
-            end
+              :do_this, :SumTheNumerics,
+            )
 
             defn.add_field_observer(
               :_observer_for_num_lines_column_,
               :for_input_at_offset, column_for_num_lines,
-            ) do |o|
-              total = 0
-              o.on_typified_mixed do |tm|
-                if tm.is_numeric
-                  total += tm.value
-                end
-              end
-              o.read_observer_by do
-                total
-              end
-            end
+              :do_this, :SumTheNumerics,
+            )
 
             defn.add_summary_row do |o|
 
-              _total_0 = o.read_observer :_observer_for_dir_column_
-              o << "Total: #{ _total_0 }"  # (hurts from lack of formatting)
+              _d = o.read_observer :_observer_for_dir_column_
+              o << "Total: #{ _d }"  # (hurts from lack of formatting)
 
-              _total_1 = o.read_observer :_observer_for_num_files_column_
-              o << _total_1  # ok as integer
+              _d = o.read_observer :_observer_for_num_files_column_
+              o << _d  # ok as integer
 
-              _total_1 = o.read_observer :_observer_for_num_lines_column_
-              o << _total_1  # ok as integer
+              _d = o.read_observer :_observer_for_num_lines_column_
+              o << _d  # ok as integer
             end
 
             defn.target_final_width _target_final_width

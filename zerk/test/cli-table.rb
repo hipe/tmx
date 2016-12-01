@@ -18,9 +18,36 @@ module Skylab::Zerk::TestSupport
       against_stream_expect_lines_ Home_::Stream_[ a_a ], & p
     end
 
-    def against_stream_expect_lines_ tuple_st
+    def against_stream_expect_lines_ tuple_st, & p
 
       act_st = design_ish_.line_stream_via_mixed_tuple_stream tuple_st
+
+      if do_debug
+        __flush_to_debug_IO_and_exit act_st
+      else
+        __against_this_expect_lines act_st, & p
+      end
+    end
+
+    def __flush_to_debug_IO_and_exit act_st
+
+      io = debug_IO
+
+      io.puts "(there is no proper debug mode for tables.)"
+      io.puts "(instead we flush the table and exit..)\n\n.\n"
+
+      begin
+        line = act_st.gets
+        line || break
+        io.puts line
+        redo
+      end while above
+
+      io.puts ".\n\n#{ '>' * 80 }\nEXITING from #{ __FILE__ }\n#{ '<' * 80 }\n\n"
+      exit 0
+    end
+
+    def __against_this_expect_lines act_st
 
       _yielder = ::Enumerator::Yielder.new do |exp_line|
 
@@ -52,13 +79,6 @@ module Skylab::Zerk::TestSupport
 
     def __say_extra s
       "unexpected extra line: #{ s.inspect }"
-    end
-
-    def out_via_tuples_ * a_a
-      out_via_in_
-    end
-
-    def out_via_in_ tuple_st
     end
 
     def table_module_

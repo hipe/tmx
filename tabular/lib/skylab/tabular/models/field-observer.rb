@@ -4,22 +4,43 @@ module Skylab::Tabular
 
     # -
 
-      def initialize p, x_a
+      def initialize p, x_a, dereference_common_implementation
 
+        @_user_provided_block = p
         @_scn = Common_::Polymorphic_Stream.via_array x_a
+        @_dereference_common_implementation = dereference_common_implementation
+
         @name_symbol = @_scn.gets_one
+
         begin
           send PARAMETERS___.fetch @_scn.current_token
         end until @_scn.no_unparsed_exists
+
+        remove_instance_variable :@_dereference_common_implementation
         remove_instance_variable :@_scn
 
-        @__invocation_definition_proc_ = p
+        _p = remove_instance_variable :@_user_provided_block
+        _p ||= remove_instance_variable :@__proc_for_block_from_common_etc
+        @__invocation_definition_proc_ = _p
+
         freeze
       end
 
       PARAMETERS___ = {
+        do_this: :__at_do_this,
         for_input_at_offset: :__at_input_offset,
       }
+
+      def __at_do_this
+        @_scn.advance_one
+        _const = @_scn.current_token
+        _block = @_dereference_common_implementation[ _const ]
+        if @_user_provided_block
+          self._COVER_ME__you_cant_pass_a_block_and_indicate_a_common_implementation__  # #todo
+        end
+        @__proc_for_block_from_common_etc = _block
+        @_scn.advance_one
+      end
 
       def __at_input_offset
         @_scn.advance_one

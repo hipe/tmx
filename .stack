@@ -17,5 +17,3 @@ git rebase and squash around the other guys appropriately
 join #open [#tab-003], is the acceptance of the below two.
 make report showing the relative weights of the changesets
 CLI-invoked general table renderer
-join [#tab-002] (several sub-items here)
-acceptance: code metrics
