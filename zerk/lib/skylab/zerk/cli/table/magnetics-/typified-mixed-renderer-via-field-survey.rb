@@ -80,7 +80,7 @@ module Skylab::Zerk
 
           @field_survey = fs
 
-          @__do_display_header_row = invo.do_display_header_row
+          @__do_display_header_row = invo.design.do_display_header_row
         end
 
         def execute
@@ -116,7 +116,7 @@ module Skylab::Zerk
 
           # the field survey pertains only to this page but the field note
           # is forever. we haven't yet widened the one with the other; we
-          # do it here.
+          # do it here. :#table-spot-6
           #
           # it goes in the one direction but not the other (the survey
           # writes to the notes), so we've got to be sure that we only read
@@ -125,8 +125,15 @@ module Skylab::Zerk
           # this "widening" across pages was the central mechanical innovation
           # of [tagged]. eventually we'll dry that up with this. :[#050].
 
-          maybe_make_field_note_width_wider(
-            @field_survey.width_of_widest_string )
+          now = @field_survey.width_of_widest_string
+
+          fn = @_session_.field_note
+
+          ever = fn.widest_width_ever
+
+          if ever < now
+            fn.widest_width_ever = now
+          end
           NIL
         end
 
@@ -500,11 +507,6 @@ module Skylab::Zerk
           end
         end
 
-        def maybe_make_field_note_width_wider now
-          @_session_.__maybe_make_field_note_width_wider_ now
-          NIL
-        end
-
         def widest_width_ever
           @_session_.field_note.widest_width_ever
         end
@@ -561,16 +563,6 @@ module Skylab::Zerk
           @field_design = design.for_field d
           @field_note = invo.notes.for_field d
           @field_survey = fs
-        end
-
-        def __maybe_make_field_note_width_wider_ now
-
-          ever = @field_note.widest_width_ever
-
-          if ever < now
-            make_field_note_width_wider now
-          end
-          NIL
         end
 
         def make_field_note_width_wider now  # CAREFUL

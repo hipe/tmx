@@ -14,18 +14,18 @@ module Skylab::Zerk
         end
 
         def execute
-          @_state = :__any_first_line_ever
+          @_gets_one_line = :__any_first_line_ever
           Common_.stream do
-            send @_state
+            send @_gets_one_line
           end
         end
 
         # two things to remember here throughout: 1) you're always rendering
-        # a line until you close. 2) always think about when to change @_state.
+        # a line until you close. 2) always think about when to change @_gets_one_line.
 
         def __any_first_line_ever
 
-          remove_instance_variable :@_state
+          remove_instance_variable :@_gets_one_line
 
           @_invocation = Here_::Models_::Invocation.new(
             remove_instance_variable( :@mixed_tuple_stream ),
@@ -46,8 +46,7 @@ module Skylab::Zerk
         def __on_first_page_ever
 
           if __do_display_header_row
-            __make_a_note_of_the_widths_of_each_any_field_label
-            _reinit_line_renderer_via_page
+            _init_or_reinit_line_renderer_via_page
             __header_row
           else
             _on_page
@@ -55,49 +54,36 @@ module Skylab::Zerk
         end
 
         def __do_display_header_row
-          @_invocation.do_display_header_row
-        end
-
-        def __make_a_note_of_the_widths_of_each_any_field_label
-
-          @design.all_defined_fields.each_with_index do |fld, d|
-            label = fld.label
-            label || next
-            @_notes.for_field( d ).widest_width_ever = label.length
-          end
-          NIL
+          @_invocation.design.do_display_header_row
         end
 
         def __header_row
 
-          fields = @design.all_defined_fields  # at least one with a label somewhere
+          # :#table-spot-7
 
-          _d = @_notes.the_most_number_of_columns_ever_seen
+          _tm_a = @_invocation.release_typified_mixed_tuple_for_header_row__
 
-          _st = Common_::Stream.via_times _d do |d|
-
-            fld = fields.fetch d  # ..
-
-              label = fld.label
-
-            Tabular_::Models::Typified::Mixed.new :string, ( label || EMPTY_S_ )
+          if @_notes.the_most_number_of_columns_ever_seen > @design.all_defined_fields.length
+            self._FUN_decide_how_to_handle_this
           end
 
-          @_state = :_on_line_renderer_and_page
+          _st = Stream_[ _tm_a ]
+
+          @_gets_one_line = :_on_line_renderer_and_page
 
           @_line_via_typified_mixed_stream[ _st ]
         end
 
         def _on_page
-          _reinit_line_renderer_via_page
+          _init_or_reinit_line_renderer_via_page
           _on_line_renderer_and_page
         end
 
         def _on_line_renderer_and_page
           _page = remove_instance_variable :@_page  # (or not)
           @_typified_tuple_stream = _page.to_typified_tuple_stream
-          @_state = :__another_line_via_typified_tuples
-          send @_state
+          @_gets_one_line = :__another_line_via_typified_tuples
+          send @_gets_one_line
         end
 
         def __another_line_via_typified_tuples
@@ -114,7 +100,7 @@ module Skylab::Zerk
 
           # (sanity cleanup for now)
           remove_instance_variable :@_line_via_typified_mixed_stream
-          remove_instance_variable :@_state
+          remove_instance_variable :@_gets_one_line
           remove_instance_variable :@_typified_tuple_stream
 
           if @_page_scanner.no_unparsed_exists
@@ -125,7 +111,7 @@ module Skylab::Zerk
           end
         end
 
-        def _reinit_line_renderer_via_page
+        def _init_or_reinit_line_renderer_via_page
 
           @_notes.see_this_number_of_columns @_page.number_of_all_fields
 

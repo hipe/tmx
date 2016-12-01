@@ -64,6 +64,10 @@ module Skylab::Tabular
       # -- mutate
 
       def see_value x
+
+        # to follow the rules this has public API scope, but in practice
+        # it's only called from [tab]
+
         @number_of_cels += 1
         @hook_mesh.against_value_and_choices x, self
       end

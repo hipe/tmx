@@ -34,44 +34,72 @@ module Skylab::Zerk
         end
 
         THESE__ = [
+          :background_glyph,
           :denominator,
+          :foreground_glyph,
+          :target_final_width,
+        ]  # #here
+
+        def denominator= x
+          @_user_denominator_rational = Rational( x )
+          x
+        end
+
+        attr_writer(  # :#here
           :background_glyph,
           :foreground_glyph,
           :target_final_width,
-        ]
-
-        attr_writer( * THESE__ )
+        )
 
         def % x
 
-          _ratio = ( x.to_f / @denominator )
+          # (this method name is as it is only because of `String#%`)
 
-          left_count_f = _ratio * @target_final_width
+          user_x_rational = Rational( x )
 
-          left_count_d = left_count_f.to_i
+          user_width_of_right_hand_side_rational =
+            @_user_denominator_rational - user_x_rational
 
-          if left_count_f != left_count_d
-            $stderr.puts "#{ '<' * 80 }\n  [ze] dropping modulo for now - eventually use etc here \n#{ '>'* 80 }\n\n"
-          end
-
-          left_count_f = nil
-
-          if left_count_d > @target_final_width
-
-            # ICK workaround for total cels until #open [#058]
-
-            buffer = "(!#{ x }!)"
-            if buffer.length > @target_final_width
-              buffer[ 0, @target_final_width ]
-            else
-              buffer << ( SPACE_ * ( @target_final_width - buffer.length ) )
-            end
+          if 0 > user_width_of_right_hand_side_rational
+            ::Kernel._K  # see #tombstone-B
           else
-
-            buffer = @foreground_glyph * left_count_d
-
-            buffer << ( @background_glyph * ( @target_final_width - left_count_d ) )
+            __normally user_x_rational, user_width_of_right_hand_side_rational
           end
+        end
+
+        def __normally user_x_rational, user_width_of_right_hand_side_rational
+
+          # even though it's a trivial case, as a #contact-exercise
+          # we're using this guy because this is squarely its domain.
+
+          # if the below gives us trouble, we can simplify it so that we
+          # close the gap between the left side and the rest with plain
+          # old subtraction of integers. instead, to stress-test the remote
+          # node we want to see if it lands on the end cleanly on its own..
+
+          _always_2 = [ user_x_rational, user_width_of_right_hand_side_rational ]
+
+          _number_stream = Stream_[ _always_2 ]
+
+            st = Home_.lib_.basic::Algorithm::
+          DiscreteStream_via_NumeratorStream_and_DiscretePool_and_Denominator[
+            _number_stream,
+            @target_final_width,
+            @_user_denominator_rational,
+          ]
+
+          _left_width = st.gets
+          right_width = st.gets  # moneyshot
+          _no = st.gets
+          _no && fail
+
+          buffer = @foreground_glyph * _left_width  # might be zero
+
+          if right_width.nonzero?
+            buffer << ( @background_glyph * right_width )
+          end
+
+          buffer
         end
       # -
 
@@ -268,4 +296,5 @@ module Skylab::Zerk
     end
   end
 end
+# #tombstone-B: we used to have a thing that rendered an error string here
 # #tombstone: full rewrite/reconception during unification

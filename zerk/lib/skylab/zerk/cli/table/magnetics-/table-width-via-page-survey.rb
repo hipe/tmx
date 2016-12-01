@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Magnetics_::TableWidth_via_PageSurvey
+    class Magnetics_::TableWidth_via_PageSurvey  # 1x
 
       # our formula for determining table width is probably:
       #
@@ -10,7 +10,7 @@ module Skylab::Zerk
       #
       #     the width of every field +
       #
-      #     ( 2 > num fields ? 0 : ( num fields - 1 * width of inner separator )
+      #     ( 2 > num fields ? 0 : ( num fields - 1 * width of inner separator ) +
       #
       #     width of right separator
       #
@@ -18,9 +18,17 @@ module Skylab::Zerk
       # (the name of this magnetic is not accurate but is meant to sound
       # more obvious and literate than if it had a more literal name.)
 
+      # this implementation takes one side the other on the [#050.F]
+      # ever-widening vs. reclaiming width debate - is the "table width"
+      # a function of just this page, or is it a function of those maxes
+      # we accumulate over all the pages?
+      #
+      # as the subject name suggests, it is for now the former. that is,
+      # this effects "reclaiming" (and not ever-widening) behavior..
+
       class << self
-        def call * a
-          new( * a ).execute
+        def call _1, _2
+          new( _1, _2 ).execute
         end
         alias_method :[], :call
         private :new
@@ -69,8 +77,11 @@ module Skylab::Zerk
           fs.width_of_widest_string.zero? || fs._SANITY  # #todo
         else
           d = fs.width_of_widest_string
-          d.nonzero? || fs._SANITY  # todo
-          @_total += d
+          if d.zero?
+            NOTHING_  # hi.  - happens when you have a header over a fill column
+          else
+            @_total += d
+          end
         end
         NIL
       end

@@ -5,6 +5,9 @@ module Skylab::Tabular
     # the client can know whether or not any "current page" is the last
     # page (ever) without us having to keep two entire pages in memory.
 
+    # likewise we track internally whether this is the first page ever,
+    # and we pass this boolean to the page building function.
+
     class << self
       alias_method :call, :new
       alias_method :[], :call
@@ -16,25 +19,51 @@ module Skylab::Tabular
 
         mt = mixed_tuple_st.gets
         if mt
-          @_gets_one = :__gets_one_page
-          @_hook_for_end_of_page = survey_choices.hook_for_end_of_page
           @_mixed_tuple_on_deck = mt
           @_mixed_tuple_stream = mixed_tuple_st
-          @no_unparsed_exists = false
           @_survey_choices = survey_choices
+          __initialize_normally
         else
           @no_unparsed_exists = true
           freeze
         end
       end
 
-      def gets_one
-        send @_gets_one
+      def __initialize_normally
+
+        page_size = @_survey_choices.page_size
+        0 < page_size || self._SANITY
+        @__page_size = page_size
+
+        _ = @_survey_choices.page_magnetic_function
+        _ ||= Home_::Magnetics::SurveyedPage_via_MixedTupleStream
+        @__page_function = _
+
+        @_gets_one_page = :__gets_first_page_ever
+        @no_unparsed_exists = false
       end
 
-      def __gets_one_page
+      # -- read
 
-        @_user_tuple_countdown = __page_size
+      def gets_one
+        send @_gets_one_page
+      end
+
+      def __gets_first_page_ever
+        @_is_first_page = true
+        @_gets_one_page = :__gets_second_page_ever
+        _gets_one_page_universal
+      end
+
+      def __gets_second_page_ever
+        @_is_first_page = false
+        @_gets_one_page = :_gets_one_page_universal
+        _gets_one_page_universal
+      end
+
+      def _gets_one_page_universal
+
+        @_user_tuple_countdown = @__page_size
 
         @_gets_one_mixed_tuple = :__gets_one_mixed_tuple
 
@@ -42,20 +71,7 @@ module Skylab::Tabular
           send @_gets_one_mixed_tuple
         end
 
-        _page_via = __page_magnetic_function
-
-        _page_via[ _use_mixed_tuple_stream, @_survey_choices ]
-      end
-
-      def __page_size
-        page_size = @_survey_choices.page_size
-        0 < page_size || self._SANITY
-        page_size
-      end
-
-      def __page_magnetic_function
-        _ = @_survey_choices.page_magnetic_function
-        _ || Home_::Magnetics::SurveyedPage_via_MixedTupleStream
+        @__page_function[ @_is_first_page, @_survey_choices, _use_mixed_tuple_stream ]
       end
 
       def __gets_one_mixed_tuple
@@ -116,7 +132,7 @@ module Skylab::Tabular
 
       def _close
         @no_unparsed_exists = true
-        remove_instance_variable :@_gets_one
+        remove_instance_variable :@_gets_one_page
         @_gets_one_mixed_tuple = :_nothing
         freeze
       end

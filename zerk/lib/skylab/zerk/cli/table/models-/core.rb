@@ -173,7 +173,6 @@ module Skylab::Zerk
       end
 
       attr_reader(
-        :do_display_header_row,
         :the_most_number_of_columns_ever_seen,
       )
     end

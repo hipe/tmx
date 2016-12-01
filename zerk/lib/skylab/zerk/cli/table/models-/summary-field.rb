@@ -264,6 +264,11 @@ module Skylab::Zerk
           end
           d_a = nil
 
+          for_header = @_page_data.HEADER_THING  # see "egads" [#050.1]
+          if for_header
+            for_header[ @_page_data ]
+          end
+
           if @_plain_index
 
             @_plain_page_editor = @_plain_index.
@@ -377,7 +382,7 @@ module Skylab::Zerk
               mutable_a.fetch( d ) && self._SANITY
             end
 
-            mutable_a[ d ] = fsw.typified_mixed_via_value_and_index _x, d
+            mutable_a[ d ] = fsw.see_then_typified_mixed_via_value_and_index _x, d
           end
 
           NIL

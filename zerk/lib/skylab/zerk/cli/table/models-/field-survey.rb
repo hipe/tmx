@@ -6,11 +6,12 @@ module Skylab::Zerk
 
       class Choices  # 1x
 
-        def initialize foa, at_page_end_p, at_end_p, design
+        def initialize foa, eofpe_p, at_page_end_p, at_end_p, design
 
           @field_surveyor = MyFieldSurveyor___.new design
 
           @field_observers_array = foa
+          @hook_for_special_headers_spot_in_first_page_ever = eofpe_p
           @hook_for_end_of_mixed_tuple_stream = at_end_p
           @hook_for_end_of_page = at_page_end_p
           @page_size = design.page_size
@@ -25,6 +26,7 @@ module Skylab::Zerk
           :field_surveyor,
           :hook_for_end_of_mixed_tuple_stream,
           :hook_for_end_of_page,
+          :hook_for_special_headers_spot_in_first_page_ever,
           :page_size,
         )
       end

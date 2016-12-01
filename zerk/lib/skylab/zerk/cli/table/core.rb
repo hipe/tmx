@@ -297,7 +297,11 @@ module Skylab::Zerk
         @__summary_fields_index
       end
 
-      def has_at_least_one_field_label__
+      def do_display_header_row
+
+        # (used to be an option, back when header rows could be
+        # derived from hash keys of input tuple or structs or whatever)
+
         @__has_at_least_one_field_label
       end
 

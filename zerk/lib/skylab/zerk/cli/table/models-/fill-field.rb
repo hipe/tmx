@@ -178,8 +178,8 @@ module Skylab::Zerk
         # the string to populate the fill cel with.
 
         class << self
-          def factory * a
-            new( * a ).__factory
+          def factory _1, _2, _3
+            new( _1, _2, _3 ).__factory
           end
           private :new
         end  # >>
@@ -252,7 +252,7 @@ module Skylab::Zerk
           sparse_widths = []
           cel_renderers = []
 
-          st = __discrete_stream
+          st = __discrete_width_pair_stream
           begin
             pair = st.gets
             pair || break
@@ -283,7 +283,7 @@ module Skylab::Zerk
           self
         end
 
-        def __discrete_stream
+        def __discrete_width_pair_stream
 
           tot = @_total_parts
 
@@ -292,106 +292,42 @@ module Skylab::Zerk
 
           if tot
 
-            use_total = tot
+            use_denominator = tot
 
-            num_st = Stream_.call @_my_order_array do |field_offset|
+            real_st = Common_::Stream.via_times @_number_of_fill_fields do |dd|
 
-              _field = @_all_defined_fields.fetch field_offset
-
-              Common_::Pair.via_value_and_name _field.parts, field_offset
+              @_all_defined_fields.fetch( @_my_order_array.fetch dd ).parts
             end
           else
-            use_total = @_number_of_fill_fields
 
-            num_st = Stream_.call @_my_order_array do |field_offset|
+            use_denominator = @_number_of_fill_fields
 
-              Common_::Pair.via_value_and_name 1, field_offset
+            real_st = Common_::Stream.via_times @_number_of_fill_fields do
+              1
             end
           end
 
-          __discrete_stream_via num_st, @_width_in_discrete_pool, use_total
-        end
+            width_integer_st = Home_.lib_.basic::Algorithm::
 
-        def __discrete_stream_via num_stream, discrete_pool, denominator
-
-          # the only reason we're mocking this for now is because we're
-          # experimentally finishing this project top-down instead of bottom-up
-          # but yeah, the weight of code here is approaching that of the real thing
-
-          result = []
-
-          do_this = -> h do
-
-            exp_d = h.fetch :expect_denominator
-            if exp_d != denominator
-              fail "hardcoded mock failed: for #{ discrete_pool } discrete size, #{
-                }expected denominator of #{ exp_d }, had #{ denominator }"
-            end
-
-            pool = h.fetch( :value_map )
-            h.delete :value_map  # sanity
-
-            begin
-              pair = num_stream.gets
-              pair || break
-              field_offset = pair.name_x
-              numerator = pair.value_x
-
-              output_value = pool.fetch numerator
-              pool.delete numerator
-
-              _pair = Common_::Pair.via_value_and_name output_value, field_offset
-              result.push _pair
-              redo
-            end while above
-          end
-
-          case discrete_pool
-          when 7
-            do_this.call(
-              expect_denominator: 1,
-              value_map: {
-                1 => 7,
-              }
-            )
-          when 1
-            do_this.call(
-              expect_denominator: 1,
-              value_map: {
-                1 => 1,
-              }
-            )
-          when 22
-            do_this.call(
-              expect_denominator: 11,
-              value_map: {
-                4 => 8,
-                7 => 14,
-              }
-            )
-          when 28
-            do_this.call(
-              expect_denominator: 1,
-              value_map: {
-                1 => 15,
-              }
-            )
-          else
-            fail "make a mock entry for discrete pool of size: #{ discrete_pool }"
-          end
-
-          Stream_[ result ]
-        end
-
-        def __discrete_stream_via_AT_INTEGRATION num_stream, discrete_pool, denominator
-
-          _ = Home_.lib_.basic::
           DiscreteStream_via_NumeratorStream_and_DiscretePool_and_Denominator.call(
-            num_stream,
-            @discrete_pool,  # an integer
-            denominator,
+            real_st,
+            @_width_in_discrete_pool,  # an integer
+            use_denominator,
           )
-          _  # todo
+
+          # because we simplified the above to be a plain old stream of
+          # integers and not qualified pairs, we gotta pay it back here
+
+          dd = -1
+
+          Common_.stream do
+
+            width_d = width_integer_st.gets
+            if width_d
+              dd += 1
+              Common_::Pair.via_value_and_name width_d, @_my_order_array.fetch( dd )
+            end
+          end
         end
 
         def populate_or_overwrite_typified_cels mutable_a
@@ -420,7 +356,8 @@ module Skylab::Zerk
               self._COVER_ME__length_of_produced_fill_string_was_not_the_right_length_  # #todo
             end
 
-            mutable_a[ d ] = @_field_survey_writer.typified_mixed_via_value_and_index s, d
+            mutable_a[ d ] = @_field_survey_writer.
+              see_then_typified_mixed_via_value_and_index s, d
           end
           NIL
         end
@@ -482,7 +419,7 @@ module Skylab::Zerk
             end
 
             mutable_a[ d ] = @__field_survey_writer.
-              typified_mixed_via_value_and_index EMPTY_S_, d
+              see_then_typified_mixed_via_value_and_index EMPTY_S_, d
           end
           NIL
         end

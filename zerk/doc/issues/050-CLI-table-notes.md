@@ -77,6 +77,10 @@ actually make the string, the value is never actually converted
 to a string until it is actually rendered and immediately
 produced as a streamed item.
 
+exactly how we predict these value-as-string widths without
+producing the strings is explained at #table-spot-2,
+"a priori string width inference overview".
+
 
 
 
@@ -187,3 +191,37 @@ not sure.)
 what happens here vis-a-vis integers will be a challenge..
 we know what we want but not necessarily how best to get there.
 (#table-coverpoint-E-2 we got there wickedly.)
+
+
+
+
+## ever-widening vs. reclaiming width :[#here.F]
+
+it's up for debate whether we want columns to be ever-widening
+across pages, or whether we want to allow columns to shrink
+back down to content (to "reclaim width") from page to page.
+
+"ever-widening" will generally look better at first, because there
+are less visible adjustments between pages generally. however
+if the table ever gets "too wide" it never shrinks back down.
+
+to restate the same from the opposite perspective, if we
+"reclaim width" then the transitions between pages will generally
+be choppier (because each page is rendered to fit only its
+content); however we don't have the problem of an ever-growing
+table.
+
+since we aren't sure which we want but we have good arguments
+on both sides (and we might even make this a configurable boolean
+in the design), we'll ..
+
+
+
+
+## egads - :[#here.1]
+
+in cases where we have summary fields (imagine fill fields) *and*
+headers, we want our headers to report their widths to the field
+surveys after that array has been expanded..
+
+(the rest is in an inline comment.)

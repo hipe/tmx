@@ -4,9 +4,9 @@ module Skylab::Tabular
 
     class SurveyedPage___
 
-      def initialize fs_a, cts
+      def initialize fs_a, tt_a
         @every_survey_of_every_field = fs_a  # frozen.
-        @__typified_tuples = cts
+        @__typified_tuples = tt_a
       end
 
       def to_typified_tuple_stream
@@ -24,16 +24,22 @@ module Skylab::Tabular
 
     # -
       class << self
-        def call tu_st, cx=nil
-          new( tu_st, cx ).execute
+
+        def call is_first=true, cx=nil, tu_st
+          new( is_first, cx, tu_st ).execute
         end
         alias_method :[], :call
         private :new
       end  # >>
 
-      def initialize tu_st, cx
+      def initialize is_first, cx, tu_st
 
         if cx
+
+          if is_first
+            hfh = cx.hook_for_special_headers_spot_in_first_page_ever
+          end
+
           fo_a = cx.field_observers_array
           field_surveyor = cx.field_surveyor
           hfeop = cx.hook_for_end_of_page
@@ -46,18 +52,18 @@ module Skylab::Tabular
           @_receive_typified = :_receive_typified_normally
         end
 
-        if ! field_surveyor
-          field_surveyor = FieldSurveyor___.new HOOK_MESH
-        end
+        field_surveyor ||= FieldSurveyor___.new HOOK_MESH
 
-        @_field_survey_writer = FieldSurveys___.new field_surveyor
+        @_field_survey_writer = FieldSurveyWriter___.new field_surveyor
         @__hook_for_end_of_page = hfeop
+        @__hook_for_headers = hfh
         @__mixed_tuple_stream = tu_st
         @_the_most_number_of_cels_seen_on_this_page = 0
         @__typified_tuples = []
       end
 
       def execute
+
         st = remove_instance_variable :@__mixed_tuple_stream
         mixed_tuple = st.gets
         if mixed_tuple
@@ -86,9 +92,18 @@ module Skylab::Tabular
 
         tt = remove_instance_variable :@__typified_tuples
 
-        p = remove_instance_variable :@__hook_for_end_of_page
-        if p
-          p[ Only_What_You_Need___.new( tt, fsw ) ]
+        hfeop = remove_instance_variable :@__hook_for_end_of_page
+        hfh = remove_instance_variable :@__hook_for_headers
+
+        if hfeop
+
+          hfeop[ HookServicesForClient__.new( hfh, tt, fsw ) ]
+
+        elsif hfh
+
+          # (if you have headers but no summary fields, near [#050.1])
+
+          hfh[ HookServicesForClient__.new( NOTHING_, tt, fsw ) ]
         end
 
         _final_surveys = fsw.finish
@@ -110,7 +125,7 @@ module Skylab::Tabular
           @_offset -= 1
           _x = mixed_tuple.fetch @_offset
           _typi = @_field_survey_writer.
-            typified_mixed_via_value_and_index _x, @_offset
+            see_then_typified_mixed_via_value_and_index _x, @_offset
           send @_receive_typified, _typi
         end
 
@@ -168,22 +183,24 @@ module Skylab::Tabular
 
     # ==
 
-    class Only_What_You_Need___  # summary fields are nasty
+    class HookServicesForClient__  # summary fields are nasty
 
-      def initialize tt, fsw
+      def initialize pp, tt, fsw
         @field_survey_writer = fsw
+        @HEADER_THING = pp
         @typified_tuples = tt
       end
 
       attr_reader(
         :field_survey_writer,
+        :HEADER_THING,
         :typified_tuples,
       )
     end
 
     # ==
 
-    class FieldSurveys___
+    class FieldSurveyWriter___
 
       # while field surveys are editable they are editable,
       # but once the are not they are not.
@@ -219,7 +236,7 @@ module Skylab::Tabular
 
       # -- read
 
-      def typified_mixed_via_value_and_index x, d  # [ze]
+      def see_then_typified_mixed_via_value_and_index x, d  # [ze]
         _typeish_symbol = @_array.fetch( d ).see_value x
         Home_::Models::Typified::Mixed[ _typeish_symbol, x ]
       end

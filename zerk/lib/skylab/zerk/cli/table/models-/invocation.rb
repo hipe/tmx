@@ -21,16 +21,16 @@ module Skylab::Zerk
 
           if design.has_defined_fields__
             num_cols = design.anticipated_final_number_of_columns_per_defined_fields__
-            if design.has_at_least_one_field_label__
-              yes_header_row = true
-            end
           end
 
-          @do_display_header_row = yes_header_row
           @notes = Here_::Models_::Notes.new num_cols
         end
 
         def __init_and_page_survey_choices
+
+          if @design.do_display_header_row
+            _etc = method :__init_header_MTs_and_register_header_widths
+          end
 
           _at_page_end = __init_and_any_page_end_hook
 
@@ -39,14 +39,62 @@ module Skylab::Zerk
           _at_invocation_end = __any_at_invocation_end_hook
 
           Here_::Models_::FieldSurvey::Choices.new(  # 1x
-            _fo_a, _at_page_end, _at_invocation_end, @design )
+            _fo_a,
+            _etc,
+            _at_page_end,
+            _at_invocation_end,
+            @design )
+        end
+
+        # ~
+
+        def __init_header_MTs_and_register_header_widths page_surveyish
+
+          # egads :[#050.1]:
+          #
+          # we need to report header widths post-expansion because that's
+          # the position system that headers use (headers can be specified
+          # for any kind of field, input-related or derived alike).
+          #
+          # however, we need to report header widths before we calculate
+          # things for fill fields, because fill fields need to know the
+          # present projected total table width, and headers can certainly
+          # push this width.
+
+          all_defined_fields = @design.all_defined_fields
+
+          tm_a = ::Array.new all_defined_fields.length
+
+          field_survey_writer = page_surveyish.field_survey_writer
+
+          all_defined_fields.each_with_index do |fld, d|
+
+            if fld
+              label = fld.label
+            end
+
+            _tm = field_survey_writer.see_then_typified_mixed_via_value_and_index(
+              label, d )
+
+            # we rely on #table-spot-6 that we don't have to write it to notes..
+
+            tm_a[ d ] = _tm
+          end
+
+          @__typified_mixed_tuple_for_header_row = tm_a
+
+          NIL
+        end
+
+        def release_typified_mixed_tuple_for_header_row__
+          remove_instance_variable :@__typified_mixed_tuple_for_header_row
         end
 
         # ~
 
         def __init_and_any_page_end_hook  # BEFORE that other one #here
 
-          index = design.summary_fields_index__
+          index = @design.summary_fields_index__
           if index
 
             @__summary_fields_index = index
@@ -58,9 +106,9 @@ module Skylab::Zerk
           end
         end
 
-        def __hack_page_data_for_summary_fields eek
+        def __hack_page_data_for_summary_fields page_data
 
-          @__summary_fields_index.mutate_page_data eek, self
+          @__summary_fields_index.mutate_page_data page_data, self
         end
 
         # ~
@@ -112,7 +160,6 @@ module Skylab::Zerk
 
         attr_reader(
           :design,
-          :do_display_header_row,
           :field_observers_controller,
           :has_field_observers,
           :notes,

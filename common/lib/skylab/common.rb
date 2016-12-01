@@ -1792,7 +1792,7 @@ module Skylab::Common
   ACHIEVED_ = true
   CONST_SEP_ = '::'.freeze
   EMPTY_A_ = [].freeze
-  EMPTY_P_ = -> {}
+  EMPTY_P_ = -> { NOTHING_ }  # to say hi
   EMPTY_S_ = ''.freeze  # think of all the memory you'll save
   KEEP_PARSING_ = true
   NIL_ = nil

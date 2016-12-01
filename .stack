@@ -19,6 +19,3 @@ make report showing the relative weights of the changesets
 CLI-invoked general table renderer
 join [#tab-002] (several sub-items here)
 acceptance: code metrics
-integrate all three components to finish the lipstick stack
--1 integrate spillover magnet will max share meter (not fill)
--2 integrate spillover magnet with fill (not max share meter)
