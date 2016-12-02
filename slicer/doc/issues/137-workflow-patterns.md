@@ -302,6 +302,37 @@ we call this the "St. Louis Arch" technique in reference to the last
 phase in building the arch where they needed to link-up the two towers,
 which resembles this process.
 
+(we have since expanded this label to encompass general development
+planning, and we're calling it "yo-yo":)
+
+
+
+
+## yo-yo
+
+this techinque is in the same spirit of the "st. louis arch" technique
+above, but applied to full stack develpment:
+
+  [ start with just a user
+    interface that feels
+    like it's doing your
+    essential operation,
+    but it's all fully                        [ integrate each next level
+    mocked. cover this. ]                       of coupling with its real
+                \                               dependenc{y/ies} and cover.
+                 V                              either replace mocking code
+          [ if you're imagining dependency      or interleave the same test,
+            injection, pick a normative         mock version then real, etc. ]
+            implementation. mock this                   ^
+            and cover this, one compoent                 \
+            at a time.]                                   \
+                      \                            [ when this is done,
+                       V                             integrate it with its
+                [ one by one, implement the     ->   depender in the depender's
+                  things that things depend on       test. probably delete
+                  down to the bottom-most            hardcoded mock code. (or
+                  lowest-level component.]           see next.) ]
+
 
 
 

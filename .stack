@@ -20,5 +20,10 @@ CLI-invoked general table renderer
 -1 integrate with modality
 -2 integrate this pipeline functionally
 -3 implement each one
--4 decide how to break each element up into performers
--5 describe algorithm in a doc
+-3.1 real end-to-end
+-3.2 design from real page survey
+-3.4 "tuple via line and parser" (in "tuple stream via line stream")
+-3.5 get the page survey from plain old tuples
+-3.6  "table design via page survey and inference"
+-3.7 integrate a mocked table design and page survey to UI
+-3.8 mock the UI

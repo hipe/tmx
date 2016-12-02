@@ -75,3 +75,54 @@ with some algortim something like this:
     then, we could have two or three etc summary rows:
       - min/max
       - total
+
+
+
+
+## performer breakdown
+
+(this section is to aid in implementation.)
+
+  - tuple stream via line stream
+    - tuple via line and parser
+
+  - page survey via tuple stream
+
+  - table design via page survey and inference
+
+  - flush:
+    line stream via mixed tuple stream and page design
+
+
+
+
+## imagined crazy yo-yo sequence:
+
+all of the below will be mocking (or actually doing)
+a "user storey" that is a a minimal super-case.
+
+  -8. mock UI with a failure case (how?) and success
+      this makes the executable binary and some
+      CLI client file.
+
+  -7. brute force a table design and a page survey
+      and get it to integrate with the above case.
+
+  -6. try to produce the above page design thru
+      a page survey. (this is the central thing.)
+      i.e use the threshold and the statistics, etc.
+      this makes
+      "table design via page survey and inference"
+
+  -5. get the page survey from plain old tuples.
+
+  -4. secondmost big money shot: mixed tuples from
+      strings. this makes:
+      "tuple via line and parser"
+      (in "tuple stream via line stream")
+
+  -3. get the page survey from lines
+
+  -2. get the design from the real page survey
+
+  -1. real end-to-end case
