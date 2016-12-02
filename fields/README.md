@@ -99,6 +99,8 @@ feature summary:
   • does have meta-attributes DSL
 
 
-
+## historical records
 
 # #tombstone: history & detail of ~ 13 attribute libraries (tabular) archived
+
+  - [#tab-005.1]  (a tombstone) may be the oldest known node in this strain
