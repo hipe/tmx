@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Models_::FieldSurvey < Tabular_::Models::FieldSurvey
+    class Models::FieldSurvey < Tabular_::Models::FieldSurvey
 
       class Choices  # 1x
 
@@ -40,7 +40,7 @@ module Skylab::Zerk
           @__design = design
 
           @__hook_mesh =
-            Tabular_::Magnetics::SurveyedPage_via_MixedTupleStream::HOOK_MESH
+            Tabular_::Magnetics::PageSurvey_via_MixedTupleStream::HOOK_MESH
         end
 
         def build_new_survey_for_input_offset d

@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Models_::Invocation
+    class Models::Invocation
 
       # hide "field observers" from the main rendering logic as much as possible
 
@@ -14,7 +14,7 @@ module Skylab::Zerk
           _my_choices = __init_and_page_survey_choices
 
           @page_scanner = Tabular_::Magnetics::
-              PageScanner_via_MixedTupleStream_and_SurveyChoices.call(
+              PageScanner_via_MixedTupleStream_and_SurveyChoiceser.call(
             mixed_tuple_st,
             _my_choices,
           )
@@ -38,7 +38,7 @@ module Skylab::Zerk
 
           _at_invocation_end = __any_at_invocation_end_hook
 
-          Here_::Models_::FieldSurvey::Choices.new(  # 1x
+          Here_::Models::FieldSurvey::Choices.new(  # 1x
             _fo_a,
             _etc,
             _at_page_end,

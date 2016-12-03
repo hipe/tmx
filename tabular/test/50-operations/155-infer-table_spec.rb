@@ -1,3 +1,6 @@
+$stderr.puts "\n\n#{ '>' * 60 }\nuse this or don't: #{ __FILE__ })\n#{ '<' * 60 }\n\n"
+
+if false
 require File.expand_path('./support.rb',File.dirname(__FILE__))
 
 module Hipe
@@ -17,4 +20,5 @@ module Hipe
       end
     end
   end
+end
 end

@@ -296,6 +296,14 @@ module Skylab::Zerk
           Matcher___.new self, a
         end
 
+        def parse_integer_  # assume nonempty. caller emits IFF result is nil
+          s = head_as_is
+          if %r(\A-?\d+\z) =~ s  # ..
+            advance_one
+            s.to_i
+          end
+        end
+
         # --
 
         def altered_description_proc_reader_via remote

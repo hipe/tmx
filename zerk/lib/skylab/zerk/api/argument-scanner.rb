@@ -53,6 +53,14 @@ module Skylab::Zerk
         NOTHING_
       end
 
+      def parse_integer_  # assume nonempty. caller emits IFF result is NIL
+        x = head_as_is
+        if x.respond_to? :bit_length
+          advance_one
+          x
+        end
+      end
+
       def head_as_well_formed_potential_primary_symbol_
         _real_scanner_current_token_
       end

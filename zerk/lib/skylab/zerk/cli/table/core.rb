@@ -272,7 +272,7 @@ module Skylab::Zerk
 
         Require_tabular__[]
 
-        Here_::Magnetics_::LineStream_via_MixedTupleStream_and_Design[ st, self ]
+        Here_::Magnetics_::LineStream_via_Invocation[ st, self ]
       end
 
       # -- read
@@ -337,6 +337,13 @@ module Skylab::Zerk
       def has_defined_fields__
         @_has_defined_fields
       end
+    end
+
+    # ==
+
+    module Models_
+      Autoloader_[ self ]
+      stowaway :Notes, 'field'  # NOTE - only for one commit
     end
 
     # ==

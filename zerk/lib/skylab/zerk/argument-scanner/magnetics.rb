@@ -126,9 +126,20 @@ module Skylab::Zerk
     class PrimaryValue_via_ParseRequest < Common_::Actor::Dyadic
 
       def initialize as, req
+
+        sym = req.typeish_symbol
+        m = req.use_method
+        yes = req.must_be_trueish
+
+        # (for now, kiss)
+        if sym
+          yes || m and self._COVER_ME_not_like_this_not_for_now  # #todo
+        end
+
         @argument_scanner = as
-        @must_be_trueish = req.must_be_trueish
-        @use_method = req.use_method
+        @must_be_trueish = yes
+        @typeish_symbol = sym
+        @use_method =  m
       end
 
       def execute
@@ -144,25 +155,55 @@ module Skylab::Zerk
       end
 
       def __when_argument_is_provided
-
-        m = @use_method
-
-        x = if m
-          @argument_scanner.send m
+        if @typeish_symbol
+          send THESE___.fetch @typeish_symbol
         else
-          @argument_scanner.head_as_is
+          __when_no_typeish_symbol
         end
+      end
 
+      THESE___ =  {
+        positive_nonzero_integer: :__positive_nonzero_integer,
+      }
+
+      def __positive_nonzero_integer
+        d = __parse_integer
+        if d
+          if 0 < d
+            d
+          else
+            self._COVER_ME__integer_was_not_positive_nonzero  # #todo
+          end
+        else
+          d
+        end
+      end
+
+      def __parse_integer
+
+        # (super hacky - if client results in `false`, she emitted.
+        # if nil, we must emit.)
+
+        d = @argument_scanner.parse_integer_
+        if d
+          d
+        elsif d.nil?
+          self._COVER_ME_we_gotta_emit_that_it_wasnt_an_integer
+        else
+          d
+        end
+      end
+
+      def __when_no_typeish_symbol
+        x = __peek_head
         if @must_be_trueish
           if x
-            @argument_scanner.advance_one  # #here
-            x
+            _final_value x
           else
             __when_supposed_to_be_trueish_but_is_not
           end
         else
-          @argument_scanner.advance_one  # #here
-          Common_::Known_Known[ x ]
+          _final_value Common_::Known_Known[ x ]
         end
       end
 
@@ -171,11 +212,25 @@ module Skylab::Zerk
         _x = @argument_scanner.head_as_is
         self._COVER_ME_falseish_argument_value_when_expected_trueish
       end
+
+      def __peek_head
+        if @use_method
+          @argument_scanner.send @use_method
+        else
+          @argument_scanner.head_as_is
+        end
+      end
+
+      def _final_value x
+        @argument_scanner.advance_one
+        x
+      end
     end
 
     class ParseRequest_via_Array < Common_::Actor::Monadic
 
       def initialize x_a
+        @__typeish_mutex = nil
         @option_array = x_a
       end
 
@@ -204,8 +259,15 @@ module Skylab::Zerk
 
       OPTIONS___ = {
         must_be_trueish: :__flag,
+        positive_nonzero_integer: :_typeish_slot,
         use_method: :__takes_one_argument,
       }
+
+      def _typeish_slot
+        remove_instance_variable :@__typeish_mutex
+        @typeish_symbol = @_scn.gets_one
+        NIL
+      end
 
       def __flag
         instance_variable_set :"@#{ @_scn.gets_one }", true
@@ -218,6 +280,7 @@ module Skylab::Zerk
       attr_reader(
         :must_be_trueish,
         :use_method,
+        :typeish_symbol,
       )
     end
 #==TO

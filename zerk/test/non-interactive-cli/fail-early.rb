@@ -76,8 +76,11 @@ module Skylab::Zerk::TestSupport
       def _ze_niCLI_client
         @ze_niCLI_client ||= Client_for_Expectations_of_Invocation.new
       end
-    # -
 
+      def zerk_niCLI_fail_early_stdin
+        :_ze_NO_
+      end
+    # -
     # ==
 
     class Client_for_Expectations_of_Invocation
@@ -266,9 +269,11 @@ module Skylab::Zerk::TestSupport
 
         spy = Spy___.new setup, tc
 
+        _stdin = tc.zerk_niCLI_fail_early_stdin
+
         cli = classish.new(
           argv,
-          :_ze_NO_,
+          _stdin,
           spy.sout_stream_proxy,
           spy.serr_stream_proxy,
           _pn_s_a,

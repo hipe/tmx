@@ -20,21 +20,19 @@ module Skylab::Tabular::TestSupport
 
     The_method_called_use___ = -> do
 
-      say = -> sym_ do
-        "do this right (like your siblings) - not defined IN THIS FILE - #{ sym_ }"
-      end
-
       cache = {}
 
       -> sym do
 
         _callable = cache.fetch sym do
 
-          sym_ = sym.capitalize
+          const = sym.capitalize
 
-          TS_.const_defined? sym_, false or fail say[ sym_ ]
-
-          x = TS_.const_get sym_, false
+          x = if TS_.const_defined? const, false
+            TS_.const_get const, false
+          else
+            TestSupport_.fancy_lookup sym, TS_
+          end
           cache[ sym ] = x
           x
         end
@@ -83,6 +81,11 @@ module Skylab::Tabular::TestSupport
   # -
   # ==
 
+  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  Common_ = Home_::Common_
+  Lazy_ = Common_::Lazy
   NOTHING_ = nil
+  Stream_ = Home_::Stream_
   TS_ = self
 end

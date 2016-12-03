@@ -118,7 +118,7 @@ module Skylab::Tabular::TestSupport
     def stats_via_these_ a
 
       _ = _same_pipe
-      _st = Home_::Stream_[ a ]
+      _st = Stream_[ a ]
       _surveyed_page = _[ _st ]
       _hi = _surveyed_page
       _hi.every_survey_of_every_field
@@ -126,7 +126,7 @@ module Skylab::Tabular::TestSupport
 
     memoize :_same_pipe do
       Home_::Pipeline.define do |o|
-        o << :SurveyedPage_via_MixedTupleStream
+        o << :PageSurvey_via_MixedTupleStream
         # ..
       end
     end

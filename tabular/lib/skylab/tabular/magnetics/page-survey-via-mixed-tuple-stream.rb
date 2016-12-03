@@ -1,6 +1,6 @@
 module Skylab::Tabular
 
-  class Magnetics::SurveyedPage_via_MixedTupleStream
+  class Magnetics::PageSurvey_via_MixedTupleStream
 
     class SurveyedPage___
 

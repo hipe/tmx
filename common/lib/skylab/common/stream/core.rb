@@ -212,7 +212,6 @@ module Skylab::Common
     end
 
     def reduce_by & p
-
       new do
         begin
           x = gets
@@ -226,7 +225,6 @@ module Skylab::Common
     end
 
     def map_reduce_by & p
-
       new do
         begin
           x = gets
@@ -266,23 +264,7 @@ module Skylab::Common
 
     # ~ result in structures of same length as constituency (st's, ary's, bx's)
 
-    def each
-
-      if block_given?
-        begin
-          x = gets
-          x or break
-          yield x
-          redo
-        end while nil
-        NIL_
-      else
-        to_enum
-      end
-    end
-
     def map & p
-
       a = []
       begin
         x = gets
@@ -294,7 +276,6 @@ module Skylab::Common
     end
 
     def map_by & p
-
       new do
         x = gets
         if x
@@ -305,7 +286,6 @@ module Skylab::Common
     end
 
     def to_a
-
       a = []
       begin
         x = gets
@@ -437,6 +417,17 @@ module Skylab::Common
       self.class.new @upstream, & p
     end
     private :new
+
+    def each
+      block_given? || self._REFACTOR_ME_easy_just_say_this__readme__  # just say o.to_enum instead
+      begin
+        x = gets
+        x || break
+        yield x
+        redo
+      end while above
+      NIL
+    end
 
     class Resource_Releaser < ::Proc
 

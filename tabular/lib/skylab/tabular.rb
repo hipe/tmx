@@ -444,6 +444,8 @@ module Skylab::Tabular
     sidesys = Autoloader_.build_require_sidesystem_proc
 
     Basic = sidesys[ :Basic ]
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   # ==

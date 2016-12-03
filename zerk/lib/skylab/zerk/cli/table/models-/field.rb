@@ -2,10 +2,6 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    module Models_
-      Autoloader_[ self ]
-    end
-
     class Models_::Field
 
       def initialize p, x_a

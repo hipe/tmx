@@ -6,7 +6,7 @@ module Skylab::Zerk
 
       # ==
 
-      class LineStream_via_MixedTupleStream_and_Design < Common_::Actor::Dyadic
+      class LineStream_via_Invocation < Common_::Actor::Dyadic
 
         def initialize mt_st, de
           @design = de
@@ -27,7 +27,7 @@ module Skylab::Zerk
 
           remove_instance_variable :@_gets_one_line
 
-          @_invocation = Here_::Models_::Invocation.new(
+          @_invocation = Here_::Models::Invocation.new(
             remove_instance_variable( :@mixed_tuple_stream ),
             @design,
           )

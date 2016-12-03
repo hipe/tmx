@@ -83,15 +83,15 @@ with some algortim something like this:
 
 (this section is to aid in implementation.)
 
-  - tuple stream via line stream
+  - mixed tuple stream via line stream
     - tuple via line and parser
 
-  - page survey via tuple stream
+  - page survey via mixed tuple stream
 
   - table design via page survey and inference
 
   - flush:
-    line stream via mixed tuple stream and page design
+    line stream via mixed tuple stream and table design
 
 
 
@@ -103,7 +103,7 @@ a "user storey" that is a a minimal super-case.
 
   -8. mock UI with a failure case (how?) and success
       this makes the executable binary and some
-      CLI client file.
+      CLI client file. this produces a test file.
 
   -7. brute force a table design and a page survey
       and get it to integrate with the above case.
@@ -113,6 +113,7 @@ a "user storey" that is a a minimal super-case.
       i.e use the threshold and the statistics, etc.
       this makes
       "table design via page survey and inference"
+      this produces a test file
 
   -5. get the page survey from plain old tuples.
 
@@ -120,6 +121,7 @@ a "user storey" that is a a minimal super-case.
       strings. this makes:
       "tuple via line and parser"
       (in "tuple stream via line stream")
+      the produces a test file
 
   -3. get the page survey from lines
 

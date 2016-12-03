@@ -1,6 +1,6 @@
 module Skylab::Tabular
 
-  class Magnetics::PageScanner_via_MixedTupleStream_and_SurveyChoices
+  class Magnetics::PageScanner_via_MixedTupleStream_and_SurveyChoiceser
 
     # the client can know whether or not any "current page" is the last
     # page (ever) without us having to keep two entire pages in memory.
@@ -36,7 +36,7 @@ module Skylab::Tabular
         @__page_size = page_size
 
         _ = @_survey_choices.page_magnetic_function
-        _ ||= Home_::Magnetics::SurveyedPage_via_MixedTupleStream
+        _ ||= Home_::Magnetics::PageSurvey_via_MixedTupleStream
         @__page_function = _
 
         @_gets_one_page = :__gets_first_page_ever

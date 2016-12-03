@@ -1,9 +1,14 @@
-#!/usr/bin/env ruby
-#!/usr/bin/ruby
+#!/usr/bin/env ruby -w
 
-root = File.expand_path('../lib',File.dirname(__FILE__))
-$LOAD_PATH.unshift(root) unless $LOAD_PATH.include?(root)
+require 'skylab/tabular'
 
-require 'assess'
-require 'assess/commands'
-Hipe::Assess::Commands.invoke ARGV
+d = Skylab::Tabular::Operations_::InferTable::CLI.new(
+  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+).execute
+
+if d.nonzero?
+  $stderr.puts "(exitstatus: #{ d })"
+end
+
+exit 0
+# #tombstone: rewrite ancient version
