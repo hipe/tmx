@@ -21,6 +21,10 @@ module Skylab::Zerk
           NOTHING_  # hi.
         end
 
+        def initialize_copy _
+          NOTHING_  # hi.
+        end
+
         def redefine
           otr = dup
           yield DSL__.new otr
@@ -33,22 +37,24 @@ module Skylab::Zerk
           freeze
         end
 
-        THESE__ = [
+        plain_old_writers = [
           :background_glyph,
-          :denominator,
           :foreground_glyph,
           :target_final_width,
-        ]  # #here
+        ]
+
+        METER_ATTRIBUTES___ = [
+          :denominator,
+          * plain_old_writers,
+        ]
 
         def denominator= x
           @_user_denominator_rational = Rational( x )
           x
         end
 
-        attr_writer(  # :#here
-          :background_glyph,
-          :foreground_glyph,
-          :target_final_width,
+        attr_writer(
+          * plain_old_writers
         )
 
         def % x
@@ -111,7 +117,7 @@ module Skylab::Zerk
           @_ = _
         end
 
-        THESE__.each do |sym|
+        METER_ATTRIBUTES___.each do |sym|
           define_method sym do |x|
             @_.send :"#{ sym }=", x
             NIL
@@ -122,13 +128,141 @@ module Skylab::Zerk
 #==BEGIN TABLE-SPECIFIC
 
       class << self
-        def add_max_share_meter_field_to_table_design design_dsl, & p
-          TableIntegrationSession___.new design_dsl do |dsl|
-            p[ dsl ]
-          end.execute
+
+        def add_max_share_meter_field_to_table_design table_design_DSL
+          sess = AddToTable.begin table_design_DSL
+          yield sess
+          sess.finish
           NIL
         end
       end  # >>
+
+      # ==
+
+      class AddToTable
+
+        class << self
+          alias_method :begin, :new
+          undef_method :new
+        end  # >>
+
+        def initialize table_design_DSL
+
+          @__mutable_meter_mutex = nil
+          @_receive_meter_attribute = :__receive_first_meter_attribute
+
+          @table_design_DSL = table_design_DSL
+        end
+
+        # -- writers (all "DSL" style)
+
+        def __receive_first_meter_attribute x, sym
+          mutable_meter_prototype Here_._begin_
+          send @_receive_meter_attribute, x, sym
+        end
+
+        def mutable_meter_prototype o
+          remove_instance_variable :@__mutable_meter_mutex
+          @_receive_meter_attribute = :__receive_first_meter_attribute_when_have_prototype
+          @_finish_meter_prototype = :__finish_meter_prototype_when_mutable
+          @mutable_meter_prototype = o
+          NIL
+        end
+
+        def meter_prototype o
+          remove_instance_variable :@__mutable_meter_mutex
+          @_receive_meter_attribute = :__CLOSED
+          @_finish_meter_prototype = :__no_op
+          @meter_prototype = o
+          NIL
+        end
+
+        METER_ATTRIBUTES___.each do |sym|
+          define_method sym do |x|
+            send @_receive_meter_attribute, x, sym
+          end
+        end
+
+        def __receive_first_meter_attribute_when_have_prototype x, sym
+          @_meter_DSL = DSL__.new @mutable_meter_prototype
+          @_receive_meter_attribute = :__receive_meter_attribute_normally
+          send @_receive_meter_attribute, x, sym
+        end
+
+        def __receive_meter_attribute_normally x, sym
+          @_meter_DSL.send sym, x
+          NIL
+        end
+
+        def for_input_at_offset d
+          @observer_key = :"_max_for_column__#{ d }__"  # ..
+          @for_input_at_offset = d
+          NIL
+        end
+
+        # --
+
+        def finish
+          send @_finish_meter_prototype
+          add_field_observer
+          __add_field
+          NIL
+        end
+
+        def __finish_meter_prototype_when_mutable
+          @_finish_meter_prototype = :__FINISHED_A
+          remove_instance_variable :@_meter_DSL
+          o = remove_instance_variable :@mutable_meter_prototype
+          o._normalize_and_freeze_
+          @meter_prototype = o
+          NIL
+        end
+
+        def add_field_observer
+          @table_design_DSL.add_field_observer(
+            @observer_key,
+            :for_input_at_offset, @for_input_at_offset,
+            & For_table_page_column_build_new_observation_of_max
+          )
+          NIL
+        end
+
+        def __add_field
+
+          _observer_key = @observer_key
+
+          add_field_using_denominator_by do |col_rsx|
+            col_rsx.read_observer _observer_key
+          end
+          NIL
+        end
+
+        def add_field_using_denominator_by
+
+          @table_design_DSL.add_field(
+            :fill_field,
+            :order_of_operation, 0  #todo #soon
+          ) do |col_rsx|
+
+            _cel_width = col_rsx.width_allocated_for_this_column
+
+            _denominator = yield col_rsx
+
+            Build_cel_renderer___.call(
+              _cel_width,
+              _denominator,
+              @for_input_at_offset,
+              @meter_prototype,
+            )
+          end
+        end
+
+        def __no_op
+          NOTHING_
+        end
+      end
+
+      # ==
 
       For_table_page_column_build_new_observation_of_max = -> o do
 
@@ -167,108 +301,42 @@ module Skylab::Zerk
         NIL
       end
 
-      class TableIntegrationSession___
-
-        def initialize dsl
-
-          @table_design_DSL = dsl
-
-          @_meter_prototype = Here_._begin_
-          @_meter_DSL = DSL__.new @_meter_prototype
-
-          yield TableIntegrationDSL___.new self
-
-          remove_instance_variable :@_meter_DSL
-
-          @_meter_prototype._normalize_and_freeze_
-        end
-
-        def __receive_meter_DSL_parameter_ x, sym
-          @_meter_DSL.send sym, x
-        end
-
-        attr_writer(
-          :for_input_at_offset,
-        )
-
-        # --
-
-        def execute
-
-          hopefully_unique_name = :"_max_for_column__#{ @for_input_at_offset }__"
-
-          @for_input_at_offset || self._COVER_ME_missing_required_argument  # #todo
-
-          @table_design_DSL.add_field_observer(
-            hopefully_unique_name,
-            :for_input_at_offset, @for_input_at_offset,
-            & For_table_page_column_build_new_observation_of_max
-          )
-
-          @table_design_DSL.add_field(
-            :fill_field,
-            :order_of_operation, 0,  # .. needs reflection API from table #todo
-          ) do |col_rsx|
-
-            w = col_rsx.width_allocated_for_this_column
-
-            denom = col_rsx.read_observer hopefully_unique_name
-
-            meter_format = @_meter_prototype.redefine do |o|
-
-              o.denominator denom
-
-              o.target_final_width w
-            end
-
-            empty_placeholder = SPACE_ * w
-
-            -> row_rsx do
-
-              tm = row_rsx.row_typified_mixed_at @for_input_at_offset
-              if tm.is_numeric
-                d_or_f = tm.value
-
-                if denom < d_or_f
-
+      # ==
                   # watching this nastiness - #open [#058] this happens when
                   # we add a summary row and have fill fields - we can't
                   # discern easily that this is a summary row and that we
                   # should not give it the same visualization (because
                   # presumably it's a max share viz. and not a total share viz.)
+                  # :#here-2
 
-                  empty_placeholder
-                else
-                  meter_format % d_or_f
-                end
-              else
-                empty_placeholder
-              end
+      Build_cel_renderer___ = -> cel_width, denom, input_offset, meter_prototype do
+
+        meter_format = meter_prototype.redefine do |o|
+          o.denominator denom
+          o.target_final_width cel_width
+        end
+
+        empty_placeholder = SPACE_ * cel_width
+
+        -> row_rsx do
+
+          tm = row_rsx.row_typified_mixed_at input_offset
+          if tm.is_numeric
+            d_or_f = tm.value
+
+            if denom < d_or_f  # :#here2
+
+              empty_placeholder
+            else
+              meter_format % d_or_f
             end
+          else
+            empty_placeholder
           end
-
-          NIL
         end
       end
 
       # ==
-
-      class TableIntegrationDSL___
-
-        def initialize _
-          @_ = _
-        end
-
-        def for_input_at_offset d
-          @_.for_input_at_offset = d
-        end
-
-        THESE__.each do |sym|
-          define_method sym do |x|
-            @_.__receive_meter_DSL_parameter_ x, sym
-          end
-        end
-      end
 
 #==END TABLE-SPECIFIC
 

@@ -2,7 +2,7 @@ module Skylab::Tabular
 
   class Magnetics::PageSurvey_via_MixedTupleStream
 
-    class SurveyedPage___
+    class PageSurvey___
 
       def initialize fs_a, tt_a
         @every_survey_of_every_field = fs_a  # frozen.
@@ -25,14 +25,21 @@ module Skylab::Tabular
     # -
       class << self
 
-        def call is_first=true, cx=nil, tu_st
-          new( is_first, cx, tu_st ).execute
+        def call( * none_or_all, tu_st )
+
+          case none_or_all.length
+          when 2, 0  # :#here
+          else raise ::ArgumentError
+          end
+
+          new( * none_or_all, tu_st ).execute
         end
+
         alias_method :[], :call
         private :new
       end  # >>
 
-      def initialize is_first, cx, tu_st
+      def initialize is_first=nil, cx=nil, tu_st  # none or all per #here
 
         if cx
 
@@ -52,7 +59,7 @@ module Skylab::Tabular
           @_receive_typified = :_receive_typified_normally
         end
 
-        field_surveyor ||= FieldSurveyor___.new HOOK_MESH
+        field_surveyor ||= Field_surveyor___[]
 
         @_field_survey_writer = FieldSurveyWriter___.new field_surveyor
         @__hook_for_end_of_page = hfeop
@@ -60,6 +67,12 @@ module Skylab::Tabular
         @__mixed_tuple_stream = tu_st
         @_the_most_number_of_cels_seen_on_this_page = 0
         @__typified_tuples = []
+      end
+
+      Field_surveyor___ = Lazy_.call do
+        Field_surveyor_prototype_[].redefine do |o|
+          o.hook_mesh = HOOK_MESH
+        end
       end
 
       def execute
@@ -75,10 +88,12 @@ module Skylab::Tabular
       end
 
       def __see_every_input_tuple mixed_tuple, mixed_tuple_st
+
         begin
           __see_mixed_tuple mixed_tuple
           mixed_tuple = mixed_tuple_st.gets
         end while mixed_tuple
+
         NIL
       end
 
@@ -101,14 +116,14 @@ module Skylab::Tabular
 
         elsif hfh
 
-          # (if you have headers but no summary fields, near [#050.1])
+          # (if you have headers but no summary fields, near [#ze-050.1])
 
           hfh[ HookServicesForClient__.new( NOTHING_, tt, fsw ) ]
         end
 
         _final_surveys = fsw.finish
 
-        SurveyedPage___.new _final_surveys, tt
+        PageSurvey___.new _final_surveys, tt
       end
 
       def __see_mixed_tuple mixed_tuple
@@ -140,7 +155,7 @@ module Skylab::Tabular
         p = @__field_observers_array[ @_offset ]
 
         # we MUST accept that the above array could change at any time
-        # (so that :#spot-1 can work)
+        # (so that #spot-1 can work)
 
         if p
           p[ tm ]
@@ -167,19 +182,6 @@ module Skylab::Tabular
         NIL
       end
     # -
-
-    # ==
-
-    class FieldSurveyor___
-
-      def initialize mesh
-        @__hook_mesh = mesh
-      end
-
-      def build_new_survey_for_input_offset _ignored
-        Home_::Models::FieldSurvey.begin @__hook_mesh
-      end
-    end
 
     # ==
 

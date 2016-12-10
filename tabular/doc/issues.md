@@ -1,3 +1,5 @@
+[#006] #wish summary row for "infer table"
+
 [#005]       tombstones - see
 
 [#004]       "infer table" untility

@@ -59,10 +59,11 @@ module Skylab::Zerk
 
         def __gets_first_one
 
-          invo = @invocation
-          if invo.has_field_observers
-            invo.field_observers_controller.close_all_observation
+          foc = @invocation.field_observers_controller__
+          if foc
+            foc.close_all_observation
           end
+
           @_definition_stream = Common_::Stream.via_nonsparse_array @definitions
           @_gets = :__gets_normally
           send @_gets

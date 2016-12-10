@@ -25,4 +25,3 @@ CLI-invoked general table renderer
 -3.4 "tuple via line and parser" (in "tuple stream via line stream")
 -3.5 get the page survey from plain old tuples
 -3.6  "table design via page survey and inference"
--3.7 integrate a mocked table design and page survey to UI

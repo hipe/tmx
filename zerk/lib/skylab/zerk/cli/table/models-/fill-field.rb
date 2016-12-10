@@ -187,13 +187,13 @@ module Skylab::Zerk
         def initialize page_data, invo, index
 
           @_all_defined_fields = index._all_defined_fields__
-          @_design = invo.design
           @_field_survey_writer = page_data.field_survey_writer
-          @__invocation = invo
           @_my_order_array = index._my_order_array__
           @_total_parts = index._total_parts__
 
           @_number_of_fill_fields = @_my_order_array.length
+
+          @invocation = invo
         end
 
         def __factory
@@ -229,7 +229,7 @@ module Skylab::Zerk
 
           current_table_width = __current_table_width
 
-          target_final_width = @_design.target_final_width
+          target_final_width = @invocation.design.target_final_width
 
           if ! target_final_width
             self._COVER_ME__decide_on_some_default_and_cover_it_for_target_final_width  # #todo
@@ -242,7 +242,7 @@ module Skylab::Zerk
 
           _  = Here_::Magnetics_::TableWidth_via_PageSurvey.call(
             @_field_survey_writer,
-            @_design,
+            @invocation.design,
           )
           _  # #todo
         end
@@ -268,7 +268,7 @@ module Skylab::Zerk
 
             fld = @_all_defined_fields.fetch field_offset
 
-            _ins = ColumnBasedResourcesForClient___.new w, @__invocation
+            _ins = ColumnBasedResourcesForClient___.new w, @invocation
 
             p = fld.fill_field_proc[ _ins ]
             p.respond_to? :call or self._COVER_ME__strange_shape  # #todo

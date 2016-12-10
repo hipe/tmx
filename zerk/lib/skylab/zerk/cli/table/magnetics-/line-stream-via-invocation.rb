@@ -2,49 +2,36 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    module Magnetics_
+    class Magnetics_::LineStream_via_Invocation < Common_::Actor::Monadic
 
-      # ==
-
-      class LineStream_via_Invocation < Common_::Actor::Dyadic
-
-        def initialize mt_st, de
-          @design = de
-          @mixed_tuple_stream = mt_st
+      # -
+        def initialize invo
+          @invocation = invo
         end
 
         def execute
-          @_gets_one_line = :__any_first_line_ever
+          @_gets_line = :__any_first_line_ever
           Common_.stream do
-            send @_gets_one_line
+            send @_gets_line
           end
         end
 
-        # two things to remember here throughout: 1) you're always rendering
-        # a line until you close. 2) always think about when to change @_gets_one_line.
-
         def __any_first_line_ever
 
-          remove_instance_variable :@_gets_one_line
+          scn = @invocation.page_scanner
 
-          @_invocation = Here_::Models::Invocation.new(
-            remove_instance_variable( :@mixed_tuple_stream ),
-            @design,
-          )
-
-          @_page_scanner = @_invocation.page_scanner
-
-          if @_page_scanner.no_unparsed_exists
+          if scn.no_unparsed_exists
+            remove_instance_variable :@invocation  # sanity/cover me
             NOTHING_  # hi.
           else
-            @_notes = @_invocation.notes
-            @_page = @_page_scanner.gets_one
+            @_page_scanner = scn
+            @_notes = @invocation.notes
+            @_page = scn.gets_one
             __on_first_page_ever
           end
         end
 
         def __on_first_page_ever
-
           if __do_display_header_row
             _init_or_reinit_line_renderer_via_page
             __header_row
@@ -54,22 +41,30 @@ module Skylab::Zerk
         end
 
         def __do_display_header_row
-          @_invocation.design.do_display_header_row
+
+          hfl = @invocation.features_shared_store_read(
+            :_feature_lifecycle_for_headers_ )
+
+          if hfl
+            @__typified_mixed_tuple_for_header_row =
+              hfl.remove_typified_mixed_tuple_for_header_row__
+            ACHIEVED_
+          end
         end
 
-        def __header_row
+        def __header_row  # :#table-spot-7
 
-          # :#table-spot-7
+          _tm_a = remove_instance_variable :@__typified_mixed_tuple_for_header_row
 
-          _tm_a = @_invocation.release_typified_mixed_tuple_for_header_row__
+          _d = @invocation.design.all_defined_fields.length
 
-          if @_notes.the_most_number_of_columns_ever_seen > @design.all_defined_fields.length
+          if @_notes.the_most_number_of_columns_ever_seen > _d
             self._FUN_decide_how_to_handle_this
           end
 
           _st = Stream_[ _tm_a ]
 
-          @_gets_one_line = :_on_line_renderer_and_page
+          @_gets_line = :_on_line_renderer_and_page
 
           @_line_via_typified_mixed_stream[ _st ]
         end
@@ -82,8 +77,8 @@ module Skylab::Zerk
         def _on_line_renderer_and_page
           _page = remove_instance_variable :@_page  # (or not)
           @_typified_tuple_stream = _page.to_typified_tuple_stream
-          @_gets_one_line = :__another_line_via_typified_tuples
-          send @_gets_one_line
+          @_gets_line = :__another_line_via_typified_tuples
+          send @_gets_line
         end
 
         def __another_line_via_typified_tuples
@@ -100,7 +95,7 @@ module Skylab::Zerk
 
           # (sanity cleanup for now)
           remove_instance_variable :@_line_via_typified_mixed_stream
-          remove_instance_variable :@_gets_one_line
+          remove_instance_variable :@_gets_line
           remove_instance_variable :@_typified_tuple_stream
 
           if @_page_scanner.no_unparsed_exists
@@ -116,15 +111,14 @@ module Skylab::Zerk
           @_notes.see_this_number_of_columns @_page.number_of_all_fields
 
             @_line_via_typified_mixed_stream =
-          LineRenderer_via_Page_and_Invocation___.call(
-            @_page, @_invocation,
-          )
+          LineRenderer_via_Page_and_Invocation___[ @_page, @invocation ]
+
           NIL
         end
-      end
-
+      # -
       # ==
 
+      # ==
       LineRenderer_via_Page_and_Invocation___ = -> page, invo do
 
         number_of_fields = invo.notes.the_most_number_of_columns_ever_seen
@@ -181,6 +175,7 @@ module Skylab::Zerk
           buffer << design.right_separator
         end
       end
+      # ==
 
     if false  # keep while #open [#tab-003]
 
@@ -288,8 +283,7 @@ module Skylab::Zerk
       end
     end
   end
-    end   # if false
-      # ==
+    end  # if false
     end
   end
 end

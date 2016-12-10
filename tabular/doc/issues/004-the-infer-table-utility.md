@@ -32,9 +32,9 @@ as a "page" of table data using [ze].  finally the fun part:
 
 
 
-## table design inference
+## table design inference :[#here.A]
 
-with our "page survey" of all the data we *infer* a table design
+with our "page survey" of all the data, we *infer* a table design
 with some algortim something like this:
 
   - for each field in the survey,
@@ -54,6 +54,8 @@ with some algortim something like this:
 
       (preserve this "yes"/"no" for other summary calculations to
        be discussed below.)
+
+      this threshold term has a dedicated section [#here.B] here.
 
 
   - "how to add a max share meter"
@@ -75,6 +77,33 @@ with some algortim something like this:
     then, we could have two or three etc summary rows:
       - min/max
       - total
+
+
+### this one threshold term :[#here.B]
+
+this value is (vaguely) the inverse of the golden ratio. for now
+we just want somewhere between 0.5 and 1.0 (exclusive/inclusive).
+
+what this threshold for is this: if under any given column you take
+that proportion of cels that are "numeric", whether or not that
+proporion meets or exceeds this threshold determines whether or not
+the column is categoried as "numeric".
+
+(if it's numeric we add an additional column for quantitative
+visualization (e.g a max-share meter).)
+
+for example:
+
+    Column A    Column B
+         foo         1.3
+           7         bar
+         baz           2
+
+of the three cels under column A, one of them its numeric, so its
+proportion is 0.333[..]. column B has two cels out of three that
+are numeric so its proportion is 0.666[..]. 0.666[..] exceeds
+our threshold but 0.333[..] does not, so column B is classifed
+as numeric but column A is not.
 
 
 

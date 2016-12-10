@@ -1,30 +1,204 @@
-require 'json'
-require 'assess/proto/model'
-require 'assess/util/sexpesque'
+module Skylab::Tabular
 
-module Hipe
-  module Assess
-    module JsonSchemaGuess
-      extend self
+  class Magnetics::TableDesign_via_PageSurvey_and_Inference  # 1x
 
-      def process_analyze_request sin, sout
-        summary = analyze sin
-        sout.write summary.jsonesque
+    # this is perhaps *the* essential magnetic of table inference.
+    # it is exactly the implementation of the pseudocode algorithm
+    # outlined at [#004.A].
+
+    # the main thing here is is that whereas in the past we start with
+    # a table design (written "by hand") and then feed mixed tuples
+    # in to it to make a table, here we first survey the tuples, then
+    # generate a design from them.
+
+    # the last section of this file is a snippet of ANCIENT code that
+    # is interesting and obliquely relevant.
+
+    class << self
+      def call _1, _2, _3, _4
+        new( _1, _2, _3, _4 ).execute
+      end
+      alias_method :[], :call
+      private :new
+    end  # >>
+
+    # -
+      def initialize is_first, is_last, ps, inf
+        @inference = inf
+        @is_first_page = is_first
+        @is_last_page = is_last
+        @page_surveyish = ps
+        @target_final_width = inf.target_final_width
       end
 
-      def analyze sin
-        metrics = entity_metrics sin
-        summary = metrics.entity_summary
-        summary
+      def execute
+        _key = @inference.SECRET_MOCK_KEY
+        send MOCKS___.fetch _key
       end
 
-      def process_protomodel_request sin, sout, entity_name
-        metrics = self.entity_metrics sin
-        model = protomodel_from_metrics metrics, entity_name
-        sout.write model.jsonesque
-        nil
+      MOCKS___ = {
+        :"1" => :__make_this_one_hardcoded_table_design_FOR_MOCK,
+      }
+
+      def __make_this_one_hardcoded_table_design_FOR_MOCK
+
+        _w = remove_instance_variable :@target_final_width
+
+        offsets_of_fields_that_are_etc = []
+
+        design = @inference.define_table__ do |defn|
+
+          defn.add_field  # not numeric
+
+          defn.add_field  # numeric
+
+          att = Zerk_::CLI::HorizontalMeter::AddToTable.begin defn
+
+          _mp = @inference.max_share_meter_prototype__
+
+          att.meter_prototype _mp
+
+          att.for_input_at_offset 1  # the offset of the above num. column
+
+          _fs = @page_surveyish.field_survey_writer.dereference 1
+
+          _denom = _fs.minmax_max  # there's a lot that could be said here
+
+          att.add_field_using_denominator_by do
+            # ("column based resources" are available to you if you want them)
+            _denom
+          end
+
+          offsets_of_fields_that_are_etc.push 2
+
+          defn.target_final_width _w
+        end
+
+        sf_idx = design.summary_fields_index__  # #todo - name change
+
+        if sf_idx
+          sf_idx.mutate_page_data @page_surveyish, SimplifiedInvocation___[ design ]
+        end
+
+        design
       end
 
+      SimplifiedInvocation___ = ::Struct.new :design  # we don't need to read observers here
+
+      def execute_COMING_SOON
+
+        mutable_design = MutableDesign___.new @inference
+
+        scn = @page_surveyish.field_survey_writer.to_field_survey_scanner
+
+        begin
+
+          _field_survey = scn.gets_one
+
+          DesignedFields_via_FieldSurvey___.call(
+            mutable_design,
+            _field_survey,
+            @inference,
+          )
+
+        end until scn.no_unparsed_exists
+
+        mutable_design.flush_to_table_design
+      end
+    # -
+
+    # ==
+
+    DesignedFields_via_FieldSurvey___ = -> (
+      mutable_design, fs, inference  # field survey
+    ) do
+
+      # typically (always, probably) one field survey yields either one
+      # or two "designed fields" - one to express the mixed value, and
+      # maybe another to be the max share meter.
+      #
+      # for now, we write these designed fields as intermediate internal
+      # structures that will ultimately turn into calls to the `add_field`
+      # method in a table design. be prepared to flip on this, where the
+      # subject writes to the design DSL directly.
+
+      # -
+
+        _actual_ratio = fs.number_of_numerics.to_f / fs.number_of_cels
+
+        if inference.threshold_for_whether_a_column_is_numeric <= _actual_ratio
+          mutable_design.add_field_pair_corresponding_to_numeric_input_field
+        else
+          mutable_design.add_field_corresponding_to_non_numeric_input_field
+        end
+        NIL
+      # -
+    end
+
+    # ==
+
+    class MutableDesign___
+
+      # keep track of A) thing ding and B) tring ding.
+
+      # we are contemplating making this write to the table design DSL
+      # within its define time
+
+      def initialize inference
+        @_field_addition_directives = []
+        @inference = inference
+      end
+
+      def add_field_pair_corresponding_to_numeric_input_field
+        @_field_addition_directives.push :__add_numeric_field
+        NIL
+      end
+
+      def add_field_corresponding_to_non_numeric_input_field
+        @_field_addition_directives.push :__add_non_numeric_field
+        NIL
+      end
+
+      def flush_to_table_design
+
+        @inference.SHIMMY_DIMMY_define_table do |defn|
+          @_table_design_definition = defn
+          @_input_field_count = 0
+          _sym_a = remove_instance_variable :@_field_addition_directives
+          _sym_a.each do |m|
+            send m
+          end
+        end
+      end
+
+      def __add_numeric_field
+
+        @_table_design_definition.add_field
+        input_offset_of_the_field_we_just_added = @_input_field_count
+        @_input_field_count += 1
+
+        # --
+
+        _proto = @inference.max_share_meter_prototype
+
+        o = Zerk_::CLI::HorizontalMeter::AddToTable.begin(
+          @_table_design_definition,
+        )
+
+        o.for_input_at_offset input_offset_of_the_field_we_just_added
+
+        NIL
+      end
+
+      def __add_non_numeric_field
+        @_table_design_definition.add_field
+        @_input_field_count += 1
+        NIL
+      end
+    end
+
+#==BEGIN interesting
+      if false
       def entity_metrics sin
         json_str = sin.read
         structo = JSON.parse json_str
@@ -162,12 +336,12 @@ module Hipe
           counts.map.count{|(v,c)| Blank !~ v && c > 1 }
         end
         def repeat_pairs
-          counts.select do |(value, count)|
+          counts.select do |(_value, count)|
             count > 1
           end
         end
         def nonblank_repeat_pairs
-          repeat_pairs.reject do |(value, count)|
+          repeat_pairs.reject do |(value, _count)|
             Blank =~ value
           end
         end
@@ -235,66 +409,8 @@ module Hipe
       private
         def s; Sexpesque end
       end
-
-      def new_single_column_prototable model, field, table_name
-        table = model.create_and_add_table table_name
-        table.create_and_add_data_column field.name, field.type_guess.to_sym
-        table
-      end
-
-      def new_prototable_from_entity_metrics model, metrics, entity_name
-        table = model.create_and_add_table(entity_name)
-        metrics.each_field do |(name,field)|
-          new_prototable_or_column model, table, field
-        end
-        table
-      end
-
-      def new_prototable_or_column model, table, field
-        # this is the key
-        hf = field.height_factor
-        if :Nan==hf && !field.many?
-          fail 'do me'  # step into this one
-          field.height_factor
-        end
-        if field.many? || hf > 0
-          if field.many?
-            # this field is definately another table, because of the
-            # structure of the source data.  We definately have many of it
-            # and it is likely (why?) that it has many of us.
-            # (this could be verified in the analysis phase but whatever)
-            metrics = field.many_guy
-            new_table = new_prototable_from_entity_metrics(
-              model, metrics, field.name
-            )
-            Proto::Association.associate(
-              :many_to_many,
-              table,
-              new_table
-            )
-            nil
-          else
-            # we have a column that has values that repeat during the lifetime
-            # of all the known data.  Because they repeat they belong in a
-            # separate table, but since each row only pointed to one such
-            # entity (as this is not field.many? above), it is a belongs to.
-            foreign = new_single_column_prototable(
-              model, field, "#{table.name}_#{field.name}"
-            )
-            Proto::Association.associate(
-              :belongs_to,
-              table,
-              foreign
-            )
-            nil
-          end
-        else
-          # this field has no (non emtpy) repeats.  add a field
-          table.create_and_add_data_column(
-            field.name, field.type_guess.to_sym
-          )
-        end
-      end
-    end
+      end  # if false
+#==END interesing
   end
 end
+# #tombstone: begin to overwrite ancient [as] node (first half)

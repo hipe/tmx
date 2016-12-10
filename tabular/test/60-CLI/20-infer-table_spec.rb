@@ -104,7 +104,7 @@ module Skylab::Tabular::TestSupport
       end
     end
 
-    context "non-interactive yes options yes input MOCKED" do
+    context "non-interactive yes options yes input" do
 
       given do
         non_interactive do |y|
@@ -114,11 +114,11 @@ module Skylab::Tabular::TestSupport
         argv '-w', '40'
       end
 
-      it "very mocked" do
+      it "(somewhat mocked)" do
 
                           #one456789ten3456789twenty6789thirty6789f
-        expect_on_stdout  "secret-mock-key-1    32  +++++++++++++++"
-        expect_on_stdout  "an-other-alterative  16  +++++++        "
+        expect_on_stdout  "secret-mock-key-1     32  ++++++++++++++"
+        expect_on_stdout  "an-other-alternative  16  +++++++       "
 
         # (summaries later, probably as an option.)
         expect_succeeded

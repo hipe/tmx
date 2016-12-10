@@ -2,53 +2,316 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Models::Invocation
+    class Models::Invocation < SimpleModel_  # 1x here, 1x [tab]
 
-      # hide "field observers" from the main rendering logic as much as possible
+      # the subject's objective is to keep the main rendering logic as
+      # ignorant as possible about everything to do with setting up and
+      # responding to all the various hooks triggered during the (hence
+      # the name) invocation of the entire table render. these include
+      # concerns such as summary fields, summary rows, headers..
 
       # -
-        def initialize mixed_tuple_st, design
+        def initialize
 
+          @_features_shared_store_box = nil
+          @_receive_design = :__receive_design
+          @_receive_mixed_tuple_stream = :__receive_mixed_tuple_stream
+          @_receive_notes = :__receive_notes
+          @_receive_page_scanner = :__receive_page_scanner
+
+          @_post_define = nil
+
+          yield self
+
+          m_a = remove_instance_variable :@_post_define
+          if m_a
+            m_a.each( & method( :send ) )
+          end
+
+          @notes ||= Here_::Models::Notes.new
+          NIL
+        end
+
+        def design= x
+          send @_receive_design, x
+        end
+
+        def mixed_tuple_stream= x
+          send @_receive_mixed_tuple_stream, x
+        end
+
+        def notes= x
+          send @_receive_notes, x
+        end
+
+        def the_only_page_survey= x
+          _scn = Common_::Polymorphic_Stream.via x
+          send @_receive_page_scanner, _scn
+        end
+
+        # ~ design
+
+        def __receive_design design
+
+          remove_instance_variable :@_receive_design
+
+          @_typified_mixed_tuple_for_header_row = nil
           @design = design
+        end
 
-          _my_choices = __init_and_page_survey_choices
+        # ~ mixed tuple stream
+
+        def __receive_mixed_tuple_stream mt_st
+
+          _close_both_of_these
+          ( @_post_define ||= [] ).push :__init_page_scanner_via_two_hops
+          @__mixed_tuple_stream = mt_st
+        end
+
+        def __init_page_scanner_via_two_hops
+
+          _mixed_tuple_st = remove_instance_variable :@__mixed_tuple_stream
+
+          aof = Application_of_Features___.new self
+          aof.execute
+          page_survey_choices = aof.page_survey_choices
+          @_features_shared_store_box = aof.features_shared_store_box
+
+          _survey_choiceser = -> do
+            page_survey_choices
+          end
 
           @page_scanner = Tabular_::Magnetics::
               PageScanner_via_MixedTupleStream_and_SurveyChoiceser.call(
-            mixed_tuple_st,
-            _my_choices,
+            _mixed_tuple_st,
+            _survey_choiceser,
           )
-
-          if design.has_defined_fields__
-            num_cols = design.anticipated_final_number_of_columns_per_defined_fields__
-          end
-
-          @notes = Here_::Models_::Notes.new num_cols
+          NIL
         end
 
-        def __init_and_page_survey_choices
+        # ~ page scanner
 
-          if @design.do_display_header_row
-            _etc = method :__init_header_MTs_and_register_header_widths
-          end
+        def __receive_page_scanner ps
 
-          _at_page_end = __init_and_any_page_end_hook
-
-          _fo_a = __init_and_any_field_observers_array
-
-          _at_invocation_end = __any_at_invocation_end_hook
-
-          Here_::Models::FieldSurvey::Choices.new(  # 1x
-            _fo_a,
-            _etc,
-            _at_page_end,
-            _at_invocation_end,
-            @design )
+          _close_both_of_these
+          @page_scanner = ps
         end
 
-        # ~
+        # ~ notes
 
-        def __init_header_MTs_and_register_header_widths page_surveyish
+        def __receive_notes x
+          remove_instance_variable :@_receive_notes
+          @notes = x
+        end
+
+        # -- support for above
+
+        def _close_both_of_these
+          remove_instance_variable :@_receive_mixed_tuple_stream
+          remove_instance_variable :@_receive_page_scanner ; nil
+        end
+
+        # -- runtime
+
+        def flush_to_line_stream
+          Here_::Magnetics_::LineStream_via_Invocation[ self ]
+        end
+
+        def features_shared_store_read k
+          bx = @_features_shared_store_box
+          if bx
+            bx[ k ]
+          end
+        end
+
+        def features_shared_store_dereference k
+          @_features_shared_store_box.fetch k
+        end
+
+        # --
+
+        attr_reader(
+          :design,
+          :notes,
+          :page_scanner,
+        )
+      # -
+      # ==
+
+      class Application_of_Features___
+
+        # now that it's possible to have invocations that do not make the
+        # survey pass, experimentally breaking the responsibility out to here
+
+        def initialize invo
+          @invocation = invo
+        end
+
+        def execute
+          Tabular_::Models::PageSurveyChoices.define do |o|
+            @page_survey_choices = o
+            __boogey_down
+          end
+          NIL
+        end
+
+        def __boogey_down
+          branch_mod = Features__
+          branch_mod.constants.each do |const|
+            mod = branch_mod.const_get const, false
+            x = mod.match_feature @invocation
+            if x
+              __apply_feature x, mod
+            end
+          end
+          NIL
+        end
+
+        def __apply_feature x, mod
+          args = [ self ]
+          meth = mod.method :apply_feature
+          if 1 != meth.arity
+            args.push x
+          end
+          meth.call( * args )
+          NIL
+        end
+
+        # NOTE - the subject node is now doing 3 disparate responsibilities:
+        # 1 is implement the application of features, 2 is be a services-for-
+        # client for the features, and 3 is expose members that represent
+        # the result of this application of features. these can be broken
+        # out trivially as needed.
+
+        def features_shared_store_add x, k
+          ( @features_shared_store_box ||= Common_::Box.new ).add k, x
+          NIL
+        end
+
+        def design
+          @invocation.design
+        end
+
+        attr_reader(
+          :features_shared_store_box,
+          :invocation,
+          :page_survey_choices,
+        )
+      end
+
+      Features__ = ::Module.new
+
+      # ==
+
+      module Features__::X__Hook_for_End_of_Mixed_Tuple_Stream__
+
+        class << self
+
+          def match_feature invo
+            invo.design.summary_rows  # `srs_def`
+          end
+
+          def apply_feature ap, srs_def
+
+            invo = ap.invocation
+
+            ap.page_survey_choices.add_by(
+              :hook_for_end_of_mixed_tuple_stream
+            ) do |_hello_from_table|
+
+              _field_observers_controller =
+                invo.features_shared_store_dereference(
+                  :_feature_lifecycle_for_field_observers_ )
+
+              _svcs = FeatureServicesForClientFor_EoTS___.new(
+                _field_observers_controller )
+
+              _mt_st = srs_def.
+                build_tuple_stream_for_summary_rows_at_end_of_user_data(
+                  _svcs )
+
+              _mt_st  # #todo
+            end
+            NIL
+          end
+        end  # >>
+
+        class FeatureServicesForClientFor_EoTS___
+
+          def initialize foc
+            @_ = foc
+          end
+
+          def read_observer_ sym
+            @_.read_observer sym
+          end
+
+          def field_observers_controller__
+            @_
+          end
+        end
+      end
+
+      # ==
+
+      module Features__::X__End_of_Page_Hook__
+
+        class << self
+
+          def match_feature invo
+
+            invo.design.summary_fields_index__  # `sf_idx`
+          end
+
+          def apply_feature ap, sf_idx
+
+            invo = ap.invocation
+
+            _design = ap.design
+
+            ap.page_survey_choices.add_by :hook_for_end_of_page do |page_data|
+
+              fofl = invo.features_shared_store_read(
+                :_feature_lifecycle_for_field_observers_ )
+
+              _svcs = if fofl
+                FeatureServicesForClientFor_EoP_Plus___.new fofl, _design
+              else
+                FeatureServicesForClientFor_EoP_Minus__.new _design
+              end
+
+              _hi = sf_idx.mutate_page_data page_data, _svcs
+
+              _hi  # #todo
+            end
+            NIL
+          end
+        end  # >>
+
+        class FeatureServicesForClientFor_EoP_Minus__
+          def initialize design
+            @design = design
+          end
+          attr_reader :design
+        end
+
+        class FeatureServicesForClientFor_EoP_Plus___ <
+            FeatureServicesForClientFor_EoP_Minus__
+
+          def initialize lc, design
+            @__lifecycle = lc
+            super design
+          end
+
+          def read_observer_ sym
+            @__lifecycle.read_observer sym
+          end
+        end
+      end
+
+      # ==
+
+      module Features__::X__Headers_thru_Hook__
 
           # egads :[#050.1]:
           #
@@ -61,8 +324,37 @@ module Skylab::Zerk
           # present projected total table width, and headers can certainly
           # push this width.
 
-          all_defined_fields = @design.all_defined_fields
+        class << self
 
+          def match_feature invo
+            invo.design.do_display_header_row
+          end
+
+          def apply_feature ap
+
+            all_defined_fields = ap.design.all_defined_fields
+            hfl = FeatureLifecycleForHeaders___.new
+
+            ap.page_survey_choices.add_by(
+              :hook_for_special_headers_spot_in_first_page_ever
+            ) do |page_surveyish|
+
+              _wee = TypifiedMixedTupleForHeaderRow_via_etc___.call(
+                page_surveyish, all_defined_fields )
+
+              hfl.__receive_typified_mixed_tuple_for_header_row_ _wee
+              NIL
+            end
+
+            ap.features_shared_store_add hfl, :_feature_lifecycle_for_headers_
+
+            NIL
+          end
+        end  # >>
+
+        TypifiedMixedTupleForHeaderRow_via_etc___ = -> (
+          page_surveyish, all_defined_fields
+        ) do
           tm_a = ::Array.new all_defined_fields.length
 
           field_survey_writer = page_surveyish.field_survey_writer
@@ -80,92 +372,106 @@ module Skylab::Zerk
 
             tm_a[ d ] = _tm
           end
-
-          @__typified_mixed_tuple_for_header_row = tm_a
-
-          NIL
+          tm_a
         end
 
-        def release_typified_mixed_tuple_for_header_row__
-          remove_instance_variable :@__typified_mixed_tuple_for_header_row
-        end
+        class FeatureLifecycleForHeaders___
 
-        # ~
+          def initialize
+            @_receive = :__receive_initial
+            @_remove = :__NOT_YET_SET
+          end
 
-        def __init_and_any_page_end_hook  # BEFORE that other one #here
+          def __receive_typified_mixed_tuple_for_header_row_ x
+            send @_receive, x
+          end
 
-          index = @design.summary_fields_index__
-          if index
+          def __receive_initial x
+            remove_instance_variable :@_receive
+            @_remove = :__do_remove
+            @__value = x ; nil
+          end
 
-            @__summary_fields_index = index
+          def remove_typified_mixed_tuple_for_header_row__
+            send @_remove
+          end
 
-            method :__hack_page_data_for_summary_fields
-          else
-            @_has_summary_fields = false
-            NOTHING_
+          def __do_remove
+            remove_instance_variable :@__value
           end
         end
+      end
 
-        def __hack_page_data_for_summary_fields page_data
+      # ==
 
-          @__summary_fields_index.mutate_page_data page_data, self
-        end
+      module Features__::X__Field_Observers__
 
-        # ~
+        class << self
 
-        def __any_at_invocation_end_hook
-
-          srs_def = @design.summary_rows
-          if srs_def
-            @__summary_row_definition_collection = srs_def
-            method :__mixed_tuple_stream_for_summary_rows_at_end_of_user_data
+          def match_feature invo
+            invo.design.field_observers
           end
-        end
 
-        def __mixed_tuple_stream_for_summary_rows_at_end_of_user_data _hello_from_tab
+          def apply_feature ap, field_observers
 
-          _col = remove_instance_variable :@__summary_row_definition_collection
+            co = field_observers.build_controller
 
-          _col.build_tuple_stream_for_summary_rows_at_end_of_user_data self
-        end
+            _fo_a = co.field_observers_array
 
-        # ~
+            ap.page_survey_choices.field_observers_array = _fo_a
 
-        def __init_and_any_field_observers_array  # AFTER that other one #here
+            ap.features_shared_store_add(
+              co, :_feature_lifecycle_for_field_observers_ )
 
-          fo_def = @design.field_observers
-          if fo_def
-            @has_field_observers = true
-            __field_observers_array_via fo_def
-          else
-            @has_field_observers = false
-            NOTHING_
+            NIL
           end
-        end
+        end  # >>
+      end
 
-        def __field_observers_array_via field_observers
+      # ==
 
-          field_observers_controller = field_observers.build_controller
+      module Features__::X__Field_Surveyor__
 
-          @field_observers_controller = field_observers_controller
+        class << self
 
-          field_observers_controller.field_observers_array
-        end
+          def match_feature invo
+            true
+          end
 
-        # ~
+          def apply_feature ap
 
-        def read_observer_ sym  # assume
-          @field_observers_controller.read_observer sym
-        end
+            _field_surveyor = Here_::Models::FieldSurvey::MyFieldSurveyor.new(
+              ap.design )
 
-        attr_reader(
-          :design,
-          :field_observers_controller,
-          :has_field_observers,
-          :notes,
-          :page_scanner,
-        )
-      # -
+            ap.page_survey_choices.field_surveyor = _field_surveyor
+
+            NIL
+          end
+        end  # >>
+      end
+
+      # ==
+
+      module Features__::X__Page_Size__
+
+        class << self
+
+          def match_feature invo
+            true
+          end
+
+          def apply_feature ap
+
+            design = ap.design
+            _page_size = design.page_size
+            _page_size || design._SANITY
+
+            ap.page_survey_choices.page_size = _page_size
+            NIL
+          end
+        end  # >>
+      end
+
       # ==
     end
   end

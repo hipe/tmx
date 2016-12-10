@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Tabular::TestSupport
 
-  describe "[tab] magnetics - surveyed page via mixed tuple stream" do
+  describe "[tab] magnetics - page survey via mixed tuple stream" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -66,7 +66,7 @@ module Skylab::Tabular::TestSupport
         a << [ :xx, true ]
         a << [ nil, " four  " ]
         a << [ :xx, false ]
-        a << [ TS_, "" ]  # EMPTY_S_
+        a << [ TS_, EMPTY_S_ ]
         stats_via_these_ a
       end
     end

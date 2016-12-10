@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class HookMesh
+  class HookMesh  # :[#058]
 
     class << self
       alias_method :define, :new

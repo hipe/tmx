@@ -2,38 +2,11 @@ module Skylab::Zerk
 
   module CLI::Table
 
+    Require_tabular_[]
+
     class Models::FieldSurvey < Tabular_::Models::FieldSurvey
 
-      class Choices  # 1x
-
-        def initialize foa, eofpe_p, at_page_end_p, at_end_p, design
-
-          @field_surveyor = MyFieldSurveyor___.new design
-
-          @field_observers_array = foa
-          @hook_for_special_headers_spot_in_first_page_ever = eofpe_p
-          @hook_for_end_of_mixed_tuple_stream = at_end_p
-          @hook_for_end_of_page = at_page_end_p
-          @page_size = design.page_size
-        end
-
-        def page_magnetic_function
-          NOTHING_  # use default
-        end
-
-        attr_reader(
-          :field_observers_array,
-          :field_surveyor,
-          :hook_for_end_of_mixed_tuple_stream,
-          :hook_for_end_of_page,
-          :hook_for_special_headers_spot_in_first_page_ever,
-          :page_size,
-        )
-      end
-
-      # ==
-
-      class MyFieldSurveyor___
+      class MyFieldSurveyor  # 1x
 
         def initialize design
 

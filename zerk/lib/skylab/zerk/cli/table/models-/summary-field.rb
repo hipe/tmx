@@ -243,13 +243,14 @@ module Skylab::Zerk
         def initialize page_data, invo, idx
 
           @_page_data = page_data
-          @_invocation = invo
           @__OCD_method_name = idx._OCD_method__
 
           @_array_expander = idx._array_expander__
           @__offsets_of_overwriters = idx._offsets_of_overwriters__
           @_plain_index = idx._plain_index__
           @_fill_index = idx._fill_index__
+
+          @invocation = invo
         end
 
         def execute
@@ -272,14 +273,14 @@ module Skylab::Zerk
           if @_plain_index
 
             @_plain_page_editor = @_plain_index.
-              to_tuple_mutator_for_XX @_page_data, @_invocation
+              to_tuple_mutator_for_XX @_page_data, @invocation
 
           end
 
           if @_fill_index
 
             @_fill_page_editor = @_fill_index.
-              to_tuple_mutator_for_XX @_page_data, @_invocation
+              to_tuple_mutator_for_XX @_page_data, @invocation
           end
 
           ocd_method_name = @__OCD_method_name

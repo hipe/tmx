@@ -146,52 +146,6 @@ module Skylab::Zerk
         sprintf_format_string_for_nonzero_floats: :nonzero_float,
       }
     end
-
-    # ==
-
-    class Models_::Notes  # 1x
-
-      # mutable guy for aggregating statistical information about the table
-
-      def initialize d
-        @_a = []
-        @the_most_number_of_columns_ever_seen = d || 0
-      end
-
-      def see_this_number_of_columns d
-        if @the_most_number_of_columns_ever_seen < d
-          @the_most_number_of_columns_ever_seen = d
-        end
-      end
-
-      def for_field d
-        @_a[ d ] ||= Models_::Note___.new d
-      end
-
-      attr_reader(
-        :the_most_number_of_columns_ever_seen,
-      )
-    end
-
-    class Models_::Note___
-
-      # preserves across pages.
-
-      def initialize d
-        @defined_field_offset = d
-        @widest_width_ever = 0
-      end
-
-      attr_writer(
-        :widest_width_ever,
-      )
-
-      attr_reader(
-        :defined_field_offset,
-        :widest_width_ever,
-      )
-    end
-
     # ==
 
     # ==

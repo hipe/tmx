@@ -103,7 +103,7 @@ module Skylab::Tabular
 
         n = 8  # meh
         first_line_format = "  -%#{ n }s    %s"
-        subsequent_line_format = "#{ ' ' * ( n + 7 ) }%s"
+        subsequent_line_format = "#{ SPACE_ * ( n + 7 ) }%s"
 
         _init_operation
         st = @_operation.__to_primary_description_stream_
@@ -235,6 +235,7 @@ module Skylab::Tabular
       # stack is..
 
       def initialize arg_scn
+        @_ = Magnetics
         @args = arg_scn
         @_listener = arg_scn.listener
       end
@@ -255,6 +256,7 @@ module Skylab::Tabular
           ok = send ok.branch_item_value
           ok || break
         end until @args.no_unparsed_exists
+        remove_instance_variable :@args
         ok
       end
 
@@ -269,43 +271,10 @@ module Skylab::Tabular
       )
 
       def execute
-        ok = __resolve_mixed_tuple_stream_via_line_stream
-        ok &&= __resolve_page_survey_via_mixed_tuple_stream
-        ok &&= __resolve_table_design_via_page_survey
-        ok && finish
+
+        @_inference = Hardcoded_inference_instance_for_now___[]
+        self
       end
-
-      def __resolve_table_design_via_page_survey
-        ACHIEVED_
-      end
-
-      def __resolve_page_survey_via_mixed_tuple_stream
-        ACHIEVED_
-      end
-
-      def __resolve_mixed_tuple_stream_via_line_stream
-        ACHIEVED_
-      end
-
-      def finish
-        # (this little clump of mockiness will definitely move around..)
-
-        first_line = @line_upstream.gets
-        if first_line
-          _matchdata = %r(\Asecret-mock-key-([-a-z0-9A-Z_.]+)).match first_line
-          @__mock_method_name = MOCKS__.fetch _matchdata[1]
-          self
-        else
-          @_listener.call :info, :expression, :no_lines_in_input do |y|
-            y << "(no lines in input. done.)"
-          end
-          NOTHING_
-        end
-      end
-
-      MOCKS__ = {
-        '1' => :__the_first_mock,
-      }
 
       def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
         if x
@@ -318,15 +287,17 @@ module Skylab::Tabular
       # -- read
 
       def to_line_stream
-        send @__mock_method_name
-      end
 
-      def __the_first_mock
-        _a = [
-          "secret-mock-key-1    32  +++++++++++++++",
-          "an-other-alterative  16  +++++++        ",
-        ]
-        Stream_[ _a ]
+        _mt_st = _mixed_tuple_stream = @_::
+          MixedTupleStream_via_LineStream_and_Inference.
+            call( @line_upstream, @_inference, & @_listener )
+
+        _scn = @_::PageScanner_via_MixedTupleStream_and_Inference.call(  # 1x
+          _mt_st, @_inference, & @_listener )
+
+        _ = _scn.flush_to_line_stream
+
+        _  # #todo
       end
     end
 
@@ -345,15 +316,72 @@ module Skylab::Tabular
 
     # ==
 
-    Lazy_ = Common_::Lazy
-    Zerk_lib_ = Lazy_.call do
-      Home_.lib_.zerk
+    Hardcoded_inference_instance_for_now___ = Lazy_.call do
+
+      # (one day we anticipate making this configurable somehow.)
+
+      Models_Inference___.define do |o|
+
+        o.page_size = 2
+
+        o.target_final_width = 40
+
+        o.threshold_for_whether_a_column_is_numeric = 0.618  # explained fully at [#004.B]
+      end
+    end
+
+    Max_share_meter_prototype___ = Lazy_.call do
+
+      Zerk_lib_[]::CLI::HorizontalMeter.define do |o|
+        o.foreground_glyph '+'
+        o.background_glyph SPACE_
+      end
+    end
+
+    class Models_Inference___ < SimpleModel_
+
+      # this is a "full stack" "injector". it both provides runtime
+      # parameters that are in some way variable (or not) and corrals
+      # external resources (classes). this same instance threads throughout
+      # many of the performers in one invocation, so that as implementation
+      # details change, the centrality of this does not.
+
+      def SECRET_MOCK_KEY= x
+        @__secret_mock_key_knownness = Common_::Known_Known[ x ]
+      end
+
+      def SECRET_MOCK_KEY
+        @__secret_mock_key_knownness.value_x
+      end
+
+      attr_accessor(
+        :page_size,
+        :target_final_width,
+        :threshold_for_whether_a_column_is_numeric,  # explained fully at [#004.B]
+      )
+
+      def freeze  # only while SECRET_MOCK_KEY
+        NOTHING_
+      end
+
+      def define_table__ & defn_p
+
+        _table_lib = Zerk_lib_[]::CLI::Table
+
+        _table_lib::Design.define do |o|
+
+          o.separator_glyphs EMPTY_S_, SPACE_ * 2, EMPTY_S_
+
+          defn_p[ o ]
+        end
+      end
+
+      def max_share_meter_prototype__
+        Max_share_meter_prototype___[]
+      end
     end
 
     # ==
-
-    ACHIEVED_ = true
-    UNABLE_ = false
 
     # ==
   end

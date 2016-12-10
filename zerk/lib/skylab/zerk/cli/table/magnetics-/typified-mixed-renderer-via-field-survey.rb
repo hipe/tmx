@@ -35,7 +35,7 @@ module Skylab::Zerk
       # an explanation of same.
       #
       # the next section is the lowest level detail of that rearchitecting,
-      # directly relevent to the code in this node.
+      # directly relevant to the code in this node.
 
       # ## a priori string width inference overview :#table-spot-2
       #

@@ -7,9 +7,9 @@ module Skylab::Tabular::TestSupport
     it "here's an example of making a pipeline and then using it" do
 
       pipe = Home_::Pipeline.define do |o|
-        o << :StringifiedTupleStream_via_MixedTupleStream
-        o << :JustifiedPage_via_StringifiedTupleStream
-        o << :LineStream_via_JustifiedPage
+        o << :StringifiedTupleStream_via_MixedTupleStream_and_Demo
+        o << :JustifiedPage_via_StringifiedTupleStream_and_Demo
+        o << :LineStream_via_JustifiedPage_and_Demo
       end
 
       _tu_st = Home_::Common_::Stream.via_nonsparse_array(

@@ -33,7 +33,7 @@ module Skylab::Tabular::TestSupport
 
       shared_subject :_schema do
 
-        Home_::Models::Schema.define do |o|
+        Home_::Models::TableSchema.define do |o|
 
           o.add_field_via_normal_name_symbol :test_directory
           o.add_field_via_normal_name_symbol :number_of_test_files, :numeric

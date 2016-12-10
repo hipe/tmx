@@ -3,6 +3,7 @@ module Skylab::Zerk
   module CLI::Table
 
     class << self
+
       def line_stream_via_mixed_tuple_stream st
         default_design.line_stream_via_mixed_tuple_stream st
       end
@@ -28,7 +29,7 @@ module Skylab::Zerk
 
       def add_field_observer * x_a, & p
 
-        Require_tabular__[]
+        Require_tabular_[]
 
         _fo = Tabular_::Models::FieldObserver.new( p, x_a,
           Here_::Models_::SummaryRow::Dereference_common_field_observer )  # 1x (both)
@@ -268,11 +269,24 @@ module Skylab::Zerk
 
       # -- use
 
-      def line_stream_via_mixed_tuple_stream st
+      def line_stream_via_mixed_tuple_stream mt_st
 
-        Require_tabular__[]
+        _invo = to_invocation_by do |o|
+          o.mixed_tuple_stream = mt_st
+        end
 
-        Here_::Magnetics_::LineStream_via_Invocation[ st, self ]
+        _invo.flush_to_line_stream
+      end
+
+      def to_invocation_by
+
+        Require_tabular_[]
+
+        _ = Here_::Models::Invocation.define do |o|  # 1x here
+          yield o
+          o.design = self
+        end
+        _  # #todo
       end
 
       # -- read
@@ -310,10 +324,6 @@ module Skylab::Zerk
         @__has_at_least_one_field_label
       end
 
-      def anticipated_final_number_of_columns_per_defined_fields__  # assume.
-        @_defined_fields.length
-      end
-
       def defined_field_for_input_offset__ d
 
         # this does not assume that there are any defined fields, but if
@@ -333,22 +343,30 @@ module Skylab::Zerk
       def all_defined_fields  # assume.
         @_defined_fields
       end
+    end
 
-      def has_defined_fields__
-        @_has_defined_fields
+    # ==
+
+    class SimpleModel_  # EXPERIMENT import from [tab]
+
+      class << self
+        alias_method :define, :new
+        undef_method :new
+      end  # >>
+
+      def initialize  # (a suggestion)
+        yield self
+        freeze
       end
+
+      # redefine ..
+
+      private :dup
     end
 
     # ==
 
-    module Models_
-      Autoloader_[ self ]
-      stowaway :Notes, 'field'  # NOTE - only for one commit
-    end
-
-    # ==
-
-    Require_tabular__ = Lazy_.call do
+    Require_tabular_ = Lazy_.call do
       Tabular_ = Home_.lib_.tabular ; nil
     end
 
