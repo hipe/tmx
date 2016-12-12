@@ -116,7 +116,7 @@ module Skylab::Zerk::TestSupport
 
             -> row_rsx do
 
-              tm = row_rsx.row_typified_mixed_at 1
+              tm = row_rsx.row_typified_mixed_at_field_offset 1
               if tm.is_numeric
                 meter_format % tm.value
               else

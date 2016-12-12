@@ -32,55 +32,107 @@ module Skylab::Tabular
       end
 
       def execute
-        _key = @inference.SECRET_MOCK_KEY
+
+        # (this entire body changes when no more mocks)
+
+        inf = @inference
+        _key = if inf.SECRET_MOCK_KEY_IS_KNOWN
+          @inference.SECRET_MOCK_KEY
+        else
+          _s = @page_surveyish.peek_first_first_FOR_MOCK
+          _md = SECRET_MOCK_KEY_RX_.match _s
+          _md[ :key ].intern
+        end
+
         send MOCKS___.fetch _key
       end
 
       MOCKS___ = {
         :"1" => :__make_this_one_hardcoded_table_design_FOR_MOCK,
+        :"2" => :__make_this_other_hardcoded_table_design_FOR_MOCK,
       }
 
       def __make_this_one_hardcoded_table_design_FOR_MOCK
 
+        _make_this_table_design :not_numeric, :numeric
+      end
+
+      def __make_this_other_hardcoded_table_design_FOR_MOCK
+
+        _make_this_table_design :not_numeric, :numeric, :not_numeric, :numeric
+      end
+
+      def _make_this_table_design * sym_a
+
         _w = remove_instance_variable :@target_final_width
 
-        offsets_of_fields_that_are_etc = []
+        design = @inference.define_table_design__ do |defn|
 
-        design = @inference.define_table__ do |defn|
+          @_table_design_in_progress = defn
 
-          defn.add_field  # not numeric
-
-          defn.add_field  # numeric
-
-          att = Zerk_::CLI::HorizontalMeter::AddToTable.begin defn
-
-          _mp = @inference.max_share_meter_prototype__
-
-          att.meter_prototype _mp
-
-          att.for_input_at_offset 1  # the offset of the above num. column
-
-          _fs = @page_surveyish.field_survey_writer.dereference 1
-
-          _denom = _fs.minmax_max  # there's a lot that could be said here
-
-          att.add_field_using_denominator_by do
-            # ("column based resources" are available to you if you want them)
-            _denom
+          sym_a.each_with_index do |sym, d|
+            @_current_input_offset = d
+            send MOCK_OP_H___.fetch sym
           end
 
-          offsets_of_fields_that_are_etc.push 2
-
+          remove_instance_variable :@_current_input_offset
+          remove_instance_variable :@_table_design_in_progress
           defn.target_final_width _w
         end
 
         sf_idx = design.summary_fields_index__  # #todo - name change
+
+        # our numeric visualizations are expressed through summary fields
+        # (and this is the only way that summary fields are ever employed
+        # by our generated table designs); so summary fields are employed
+        # IFF one or more columns in the page was classified as numeric.
+        # note that this is a function of the input data, so it's possible
+        # that there are no numeric columns.
 
         if sf_idx
           sf_idx.mutate_page_data @page_surveyish, SimplifiedInvocation___[ design ]
         end
 
         design
+      end
+
+      MOCK_OP_H___ = {
+        not_numeric: :__add_non_numeric_field,
+        numeric: :__add_numeric_field,
+      }
+
+      def __add_numeric_field
+
+        defn = @_table_design_in_progress
+
+        defn.add_field  # numeric
+
+        att = Zerk_::CLI::HorizontalMeter::AddToTable.begin defn
+
+        _mp = @inference.max_share_meter_prototype__
+
+        att.meter_prototype _mp
+
+        input_offset_of_this_numeric_column = @_current_input_offset
+
+        att.for_input_at_offset input_offset_of_this_numeric_column
+
+        _fs = @page_surveyish.field_survey_writer.dereference(
+          input_offset_of_this_numeric_column )
+
+        _denom = _fs.minmax_max  # there's a lot that could be said here
+
+        att.add_field_using_denominator_by do
+          # ("column based resources" are available to you if you want them)
+          _denom
+        end
+        NIL
+      end
+
+      def __add_non_numeric_field
+
+        @_table_design_in_progress.add_field
+        NIL
       end
 
       SimplifiedInvocation___ = ::Struct.new :design  # we don't need to read observers here

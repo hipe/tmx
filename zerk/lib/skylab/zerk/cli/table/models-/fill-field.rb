@@ -29,24 +29,28 @@ module Skylab::Zerk
       #        of width is the "discrete pool". distribute this pool to the
       #        participants using the "spillover" algorithm of [ba].
       #
-      # the above forms the foundation for the logic #here.
+      # the above forms the foundation for the logic #here-1.
 
       class << self
 
-        def build_index fill_a, ord_a, fields
-          BuildIndex___.new( fill_a, ord_a, fields ).execute
+        def build_index_by & p
+          BuildIndex___.new( & p ).execute
         end
       end  # >>
 
       # ==
 
-      class BuildIndex___
+      class BuildIndex___  # near SimpleModel_
 
-        def initialize fill_a, ord_a, fields
-          @_all_defined_fields = fields
-          @_fill_field_offsets = fill_a
-          @_order_array = ord_a
+        def initialize
+          yield self
         end
+
+        attr_accessor(
+          :all_defined_fields,
+          :input_to_output_offset_map,
+          :order_array,
+        )
 
         def execute
 
@@ -54,18 +58,24 @@ module Skylab::Zerk
 
           if @_plain_field_count.zero?
 
-            my_ord_a = @_order_array
+            my_ord_a = @order_array
           else
 
-            ord_a = @_order_array[ 0, @_plain_field_count ]
-            my_ord_a = @_order_array[ @_plain_field_count .. -1 ].freeze
+            ord_a = @order_array[ 0, @_plain_field_count ]
+            my_ord_a = @order_array[ @_plain_field_count .. -1 ].freeze
           end
 
           if @_parts_mode
-            _total_parts = @_total_parts
+            _total_parts = @total_parts
           end
 
-          Index___.new _total_parts, ord_a, my_ord_a, @_all_defined_fields
+          FillFieldIndex___.define do |o|
+            o.all_defined_fields = @all_defined_fields
+            o.input_to_output_offset_map = @input_to_output_offset_map
+            o.my_order_array = my_ord_a
+            o.plain_order_of_operations_offset_array = ord_a
+            o.total_parts = _total_parts
+          end
         end
 
         def __validate_positions_and_prepare_to_slice
@@ -80,8 +90,8 @@ module Skylab::Zerk
 
           @_plain_field_count = 0
 
-          fields = @_all_defined_fields
-          @_order_array.each do |d|
+          fields = @all_defined_fields
+          @order_array.each do |d|
             fld = fields.fetch d
             if fld.is_summary_field_fill_field
               send @_on_fill_field, fld
@@ -107,7 +117,7 @@ module Skylab::Zerk
           x = fld.parts
           if x
             @_parts_mode = true
-            @_total_parts = x
+            @total_parts = x
             @_on_fill_field = :__on_fill_field_expect_parts
           else
             @_parts_mode = false
@@ -130,7 +140,7 @@ module Skylab::Zerk
         def __on_fill_field_expect_parts fld
           x = fld.parts
           if x
-            @_total_parts += x
+            @total_parts += x
           else
             self._COVER_ME__expected_parts_but_had_no_parts__  # #todo
           end
@@ -143,27 +153,18 @@ module Skylab::Zerk
 
       # ==
 
-      class Index___
-
-        def initialize total_parts, ord_a, my_ord_a, all_defined_fields
-
-          @_all_defined_fields__ = all_defined_fields
-          @_my_order_array__ = my_ord_a
-          @_total_parts__ = total_parts
-
-          @plain_order_of_operations_offset_array = ord_a
-        end
+      class FillFieldIndex___ < SimpleModel_
 
         def to_tuple_mutator_for_XX page_data, invo
-
-          TupleMutator___.factory page_data, invo, self
+          TupleMutator___.factory page_data, self, invo
         end
 
-        attr_reader(
-          :_all_defined_fields__,
-          :_my_order_array__,
+        attr_accessor(
+          :all_defined_fields,
+          :input_to_output_offset_map,
+          :my_order_array,
           :plain_order_of_operations_offset_array,
-          :_total_parts__,
+          :total_parts,
         )
       end
 
@@ -179,27 +180,28 @@ module Skylab::Zerk
 
         class << self
           def factory _1, _2, _3
-            new( _1, _2, _3 ).__factory
+            new( _1, _2, _3 ).__flush_to_tuple_mutator
           end
           private :new
         end  # >>
 
-        def initialize page_data, invo, index
+        def initialize page_data, index, invo
 
-          @_all_defined_fields = index._all_defined_fields__
           @_field_survey_writer = page_data.field_survey_writer
-          @_my_order_array = index._my_order_array__
-          @_total_parts = index._total_parts__
+          @__input_to_output_offset_map = index.input_to_output_offset_map
 
-          @_number_of_fill_fields = @_my_order_array.length
-
+          @all_defined_fields = index.all_defined_fields
           @invocation = invo
+          @my_order_array = index.my_order_array
+          @total_parts = index.total_parts
+
+          @_number_of_fill_fields = @my_order_array.length
         end
 
-        def __factory
+        def __flush_to_tuple_mutator
 
           # the bulk of this will attempt to be a faithful
-          # implementation of the pseudocode :#here.
+          # implementation of the pseudocode :#here-1.
 
           if __there_is_enough_extra_width_available_to_go_around
             __DISTRIBUTE_THE_WIDTH_TO_THE_CELS_USING_THE_SPILLOVER_ALGORITHM
@@ -222,7 +224,7 @@ module Skylab::Zerk
 
         def __since_there_is_not_enough_width_you_get_NOTHING
 
-          BlankWriter___.new @_my_order_array, @_all_defined_fields, @_field_survey_writer
+          BlankWriter___.new @my_order_array, @all_defined_fields, @_field_survey_writer
         end
 
         def __total_available_width_for_pool
@@ -266,9 +268,10 @@ module Skylab::Zerk
 
             sparse_widths[ field_offset ] = w
 
-            fld = @_all_defined_fields.fetch field_offset
+            fld = @all_defined_fields.fetch field_offset
 
-            _ins = ColumnBasedResourcesForClient___.new w, @invocation
+            _ins = ColumnBasedResourcesForClient___.new(
+              w, @__input_to_output_offset_map, @invocation )
 
             p = fld.fill_field_proc[ _ins ]
             p.respond_to? :call or self._COVER_ME__strange_shape  # #todo
@@ -285,7 +288,7 @@ module Skylab::Zerk
 
         def __discrete_width_pair_stream
 
-          tot = @_total_parts
+          tot = @total_parts
 
           # we validated that the use of `parts` is all-or-nothing #here-2.
           # it's "all" if `tot` is true-ish, otherwise "nothing".
@@ -296,7 +299,7 @@ module Skylab::Zerk
 
             real_st = Common_::Stream.via_times @_number_of_fill_fields do |dd|
 
-              @_all_defined_fields.fetch( @_my_order_array.fetch dd ).parts
+              @all_defined_fields.fetch( @my_order_array.fetch dd ).parts
             end
           else
 
@@ -325,7 +328,7 @@ module Skylab::Zerk
             width_d = width_integer_st.gets
             if width_d
               dd += 1
-              Common_::Pair.via_value_and_name width_d, @_my_order_array.fetch( dd )
+              Common_::Pair.via_value_and_name width_d, @my_order_array.fetch( dd )
             end
           end
         end
@@ -334,11 +337,11 @@ module Skylab::Zerk
 
           row_rsx = RowBasedResourcesForClient___.new mutable_a
 
-          @_my_order_array.each do |d|
+          @my_order_array.each do |d|
 
             _w = @_sparse_widths.fetch d
 
-            fld = @_all_defined_fields.fetch d
+            fld = @all_defined_fields.fetch d
 
             s = @_cel_renderers.fetch( d )[ row_rsx ]
 
@@ -369,13 +372,19 @@ module Skylab::Zerk
 
       class ColumnBasedResourcesForClient___
 
-        def initialize w, invo
+        def initialize w, a, invo
+
           @__invo = invo
+          @__input_to_output_offset_map = a
           @width_allocated_for_this_column = w
         end
 
         def read_observer sym
           @__invo.read_observer_ sym
+        end
+
+        def field_offset_via_input_offset__ dd
+          @__input_to_output_offset_map.fetch dd
         end
 
         attr_reader(
@@ -389,7 +398,7 @@ module Skylab::Zerk
           @__arr = arr
         end
 
-        def row_typified_mixed_at d
+        def row_typified_mixed_at_field_offset d
           @__arr.fetch d
         end
       end
@@ -424,7 +433,6 @@ module Skylab::Zerk
           NIL
         end
       end
-
 
       # ==
 

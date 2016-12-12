@@ -6,6 +6,8 @@
 
 [#003] #open major milestone (in stack) (referended in [ze])
 
-[#002] #hole ( #was: joinpoints for final unification )
+[#002] #open investigate redundancy between old schema
+             after: [#003]
+             ( #was: joinpoints for final unification )
 
 [#001]       [ README ]

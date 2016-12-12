@@ -193,6 +193,10 @@ module Skylab::Tabular
         @typified_tuples = tt
       end
 
+      def peek_first_first_FOR_MOCK
+        @typified_tuples.fetch( 0 ).peek_first_FOR_MOCK
+      end
+
       attr_reader(
         :field_survey_writer,
         :HEADER_THING,

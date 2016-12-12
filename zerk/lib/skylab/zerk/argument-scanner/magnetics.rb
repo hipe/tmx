@@ -163,20 +163,47 @@ module Skylab::Zerk
       end
 
       THESE___ =  {
-        positive_nonzero_integer: :__positive_nonzero_integer,
+        integer_that_is_postive_nonzero: :__positive_nonzero_integer__,
+        integer_that_is_non_negative: :__non_negative_integer__,
       }
 
-      def __positive_nonzero_integer
+      def __positive_nonzero_integer__
+        _integer_which do |d|
+          0 < d
+        end
+      end
+
+      def __non_negative_integer__
+        _integer_which do |d|
+          0 <= d
+        end
+      end
+
+      def _integer_which
         d = __parse_integer
         if d
-          if 0 < d
+          if yield d
             d
           else
-            self._COVER_ME__integer_was_not_positive_nonzero  # #todo
+            _loc = caller_locations( 1, 1 ).fetch 0  # CAREFUL
+            __when_integer_did_not_match d, _loc
           end
-        else
-          d
         end
+      end
+
+      def __when_integer_did_not_match d, loc
+
+        # e.g "non negative integer"
+        # e.g "positive nonzero integer"
+
+        _slug = /\A__(.+)__\z/.match( loc.base_label )[ 1 ]
+        _human = _slug.gsub UNDERSCORE_, SPACE_
+
+        @argument_scanner.listener.call :error, :expression, :invalid_integer_value do |y|
+          y << "needed #{ _human }, had #{ d }"
+        end
+        self._THE_ABOVE_IS_A_CODE_SKETCH_THAT_NEEDS_TO_BE_COVERED  # #todo
+        UNABLE_
       end
 
       def __parse_integer
@@ -258,8 +285,9 @@ module Skylab::Zerk
       end
 
       OPTIONS___ = {
+        integer_that_is_postive_nonzero: :_typeish_slot,
+        integer_that_is_non_negative: :_typeish_slot,
         must_be_trueish: :__flag,
-        positive_nonzero_integer: :_typeish_slot,
         use_method: :__takes_one_argument,
       }
 

@@ -77,16 +77,27 @@ module Skylab::Zerk
       end
 
       def _parse_required_field_summary_field_ordinal
-        _required_keyword = @_scn.current_token
-        if :order_of_operation != _required_keyword
-          self._COVER_ME_missing_required_keyword__order_of_operation__  # #todo
-        end
-        @_scn.advance_one
+        send ORDER_OF_OPERATION_SOMEHOW___.fetch @_scn.gets_one
+      end
+
+      ORDER_OF_OPERATION_SOMEHOW___ = {
+        order_of_operation: :__parse_order_of_operation,
+        order_of_operation_next: :__parse_order_of_operation_next,
+      }
+
+      def __parse_order_of_operation_next
+        @summary_field_ordinal_means = :ordinal_via_next
+        NIL
+      end
+
+      def __parse_order_of_operation
+
         d = @_scn.gets_one
-        if ! d.respond_to? :integer?
-          self._COVER_ME__order_of_operation__argument_must_be_an_integer  # #todo
+        if ! d.respond_to? :integer?  # reminder: this isn't an argument scanner nor an operation
+          self._ARGUMENT_ERROR__order_of_operation__argument_must_be_an_integer  # #todo
         end
-        @summary_field_ordinal = d
+        @summary_field_ordinal_means = :ordinal_via_literal_integer
+        @summary_field_ordinal_value = d
         NIL
       end
 
@@ -136,7 +147,8 @@ module Skylab::Zerk
         :label,
         :parts,
         :sprintf_hash,
-        :summary_field_ordinal,
+        :summary_field_ordinal_means,
+        :summary_field_ordinal_value,
         :summary_field_proc,
       )
 

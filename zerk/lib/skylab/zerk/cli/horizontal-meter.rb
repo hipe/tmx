@@ -4,6 +4,16 @@ module Skylab::Zerk
 
     class HorizontalMeter
 
+      # formerly known as a "lipstick", this simple ASCII visualization is
+      # typically used to show a "max share meter" in a table (which is
+      # visually similar to the "+" and "-" visualization that appears in
+      # for example `git log -1 --stat`).
+
+      # because the parts having to do with CLI tables are hypothetically
+      # distinct and certainly more specialized than just the concerns of
+      # the generic "meter", they have been "cordoned off" in this file;
+      # however in practice we only ever use such meters in tables.
+
       class << self
 
         def define
@@ -241,17 +251,19 @@ module Skylab::Zerk
 
           @table_design_DSL.add_field(
             :fill_field,
-            :order_of_operation, 0  #todo #soon
+            :order_of_operation_next,
           ) do |col_rsx|
 
             _cel_width = col_rsx.width_allocated_for_this_column
 
             _denominator = yield col_rsx
 
+            _field_offset = col_rsx.field_offset_via_input_offset__ @for_input_at_offset
+
             Build_cel_renderer___.call(
               _cel_width,
               _denominator,
-              @for_input_at_offset,
+              _field_offset,
               @meter_prototype,
             )
           end
@@ -309,7 +321,7 @@ module Skylab::Zerk
                   # presumably it's a max share viz. and not a total share viz.)
                   # :#here-2
 
-      Build_cel_renderer___ = -> cel_width, denom, input_offset, meter_prototype do
+      Build_cel_renderer___ = -> cel_width, denom, field_offset, meter_prototype do
 
         meter_format = meter_prototype.redefine do |o|
           o.denominator denom
@@ -320,7 +332,7 @@ module Skylab::Zerk
 
         -> row_rsx do
 
-          tm = row_rsx.row_typified_mixed_at input_offset
+          tm = row_rsx.row_typified_mixed_at_field_offset field_offset
           if tm.is_numeric
             d_or_f = tm.value
 

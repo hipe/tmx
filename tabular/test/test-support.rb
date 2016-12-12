@@ -7,6 +7,7 @@ module Skylab::Tabular::TestSupport
 
     def [] tcc
       tcc.send :define_singleton_method, :use, The_method_called_use___
+      tcc.include InstanceMethods___
       NIL
     end
   end  # >>
@@ -43,36 +44,42 @@ module Skylab::Tabular::TestSupport
     end.call
   # -
 
-  # -
+  module InstanceMethods___
 
-    if false  # while #open [#002]
-    def subject_
-      Home_::CLI_Support::Table::Actor
+    def debug!
+      @do_debug = true
     end
 
-    def common_args_
-      [ :write_lines_to, write_lines_to_, :left, EMPTY_S_, :right, EMPTY_S_ ]
+    attr_reader :do_debug
+
+    def debug_IO
+      TestSupport_.debug_IO
+    end
+  end
+
+  # ==
+
+  module Operation_one_day_operations
+
+    def self.[] tcc
+      Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+      tcc.include self
     end
 
-    def write_lines_to_
-      @_y ||= []
+    def expression_agent
+      _ = Home_::Zerk_::API::ArgumentScannerExpressionAgent.instance
+      _  # #todo
     end
 
-    def gets_
-      @_d ||= -1
-      @_d += 1
-      @_y.fetch @_d
+    def subject_API
+      Home_::API
     end
-
-    def done_
-      ( @_d + 1 ) == @_y.length or fail "extra line"
-    end
-    end
-
-  # -
+  end
 
   # ==
   # -
+
+    # Operation_one_day_operations  (above)
 
     Memoizer_methods = -> tcc do
       TestSupport_::Memoization_and_subject_sharing[ tcc ]

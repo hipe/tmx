@@ -27,7 +27,7 @@ module Skylab::Zerk::TestSupport
 
       total = o.read_observer observer_sym
 
-      tm = o.row_typified_mixed_at numerator_index
+      tm = o.row_typified_mixed_at_field_offset numerator_index
 
       if tm.is_numeric
         tm.value.to_f / total

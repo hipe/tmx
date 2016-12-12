@@ -282,7 +282,8 @@ module Skylab::Zerk
 
               _hi = sf_idx.mutate_page_data page_data, _svcs
 
-              _hi  # #todo
+              # #todo (`_hi` is nil)
+              NIL
             end
             NIL
           end

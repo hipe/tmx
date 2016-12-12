@@ -17,81 +17,28 @@ module Skylab::Tabular
       end
 
       def execute
-        if _is_interactive
-          if _has_arguments
-            if _parse_arguments
-              if _is_finished
-                SUCCESS_EXITSTATUS__
-              else
-                _whine_about_expecting_STDIN
-              end
-            else
-              @_exitstatus
-            end
-          else
-            _whine_about_expecting_STDIN
-          end
-        elsif _has_arguments
-          if _parse_arguments
-            if _is_finished
-              SUCCESS_EXITSTATUS__
-            else
-              _send_request
-            end
-          else
-            @_exitstatus
-          end
-        else
-          _init_operation
-          _send_request
-        end
-      end
 
-      def _is_interactive
-        @stdin.tty?
-      end
+        __init_operation
 
-      def _has_arguments
-        @ARGV.length.nonzero?
-      end
-
-      def _is_finished
-
-        # must be set whenever had arguments, will only be read once.
-        # is how we short-circuit out of normal processing when e.g help
-
-        remove_instance_variable :@_is_finished
-      end
-
-      def _parse_arguments
-
-        if HELP_RX__ =~ @ARGV.first || 1 < @ARGV.length && HELP_RX__ =~ @ARGV.last
+        if __match_help
           __express_help
         else
-          __do_parse_arguments
+          if @_operation.parse_arguments_for_operation_
+            __send_request
+          else
+            _express_usage_and_invite_to_help
+          end
         end
       end
 
-      def __do_parse_arguments
-        _init_operation
-        ok = @_operation._parse_arguments__
-        if ok
-          @_is_finished = false
-          ok
-        else
-          remove_instance_variable :@_operation
-          @_exitstatus = GENERIC_ERROR_EXITSTATUS__
-          _express_usage_and_invite_to_help
-          UNABLE_
-        end
+      def __match_help
+        argv = remove_instance_variable :@ARGV
+        argv.length.nonzero? and
+          HELP_RX__ =~ argv.first ||
+          1 < argv.length && HELP_RX__ =~ argv.last
       end
 
       # -- consequences
-
-      def _whine_about_expecting_STDIN
-        @stderr.puts "expecting STDIN"
-        _express_usage_and_invite_to_help
-      end
 
       def __express_help
 
@@ -105,7 +52,6 @@ module Skylab::Tabular
         first_line_format = "  -%#{ n }s    %s"
         subsequent_line_format = "#{ SPACE_ * ( n + 7 ) }%s"
 
-        _init_operation
         st = @_operation.__to_primary_description_stream_
         begin
           pa = st.gets
@@ -131,45 +77,73 @@ module Skylab::Tabular
           redo
         end while above
 
-        @_is_finished = true
-        ACHIEVED_
+        SUCCESS_EXITSTATUS__
       end
 
-      def _send_request
-        @_operation.line_upstream = remove_instance_variable :@stdin
+      def __send_request
         @_exitstatus = SUCCESS_EXITSTATUS__
         tabler = @_operation.execute
         if tabler
-          tabler.to_line_stream.each( & @stdout.method( :puts ) )
+          st = tabler.to_line_stream
+          if st
+            st.each( & @stdout.method( :puts ) )
+          end
         end
         @_exitstatus
       end
 
       # -- highest level support
 
-      def _init_operation
+      def __init_operation
 
-        _argv = remove_instance_variable :@ARGV
+        @listener = method :__receive_emission
 
-        _real_arg_scn = Common_::Polymorphic_Stream.via_array _argv
+        _real_arg_scn = Common_::Polymorphic_Stream.via_array @ARGV
 
-        __init_listener
+        _line_upstreamer = method :__procure_line_upstream
 
         _arg_scn =
             Zerk_lib_[]::NonInteractiveCLI::MultiModeArgumentScanner.
         define do |o|
+
           o.user_scanner _real_arg_scn
-          # o.add_primary :help, method( :_express_help ), Describe_help__
+
+          o.subtract_primary :line_upstreamer, _line_upstreamer
+
+          o.subtract_primary :mixed_tuple_upstream
+
           o.emit_into @listener
         end
 
-        @_operation = Operation___.new _arg_scn
+        @_operation = Operation___.begin_operation_ _arg_scn
         NIL
       end
 
-      def __init_listener
-        @listener = method :__receive_emission
-        NIL
+      def __procure_line_upstream
+
+        # error messages emitted by plain old argument parsing are generally
+        # easier to understand than those emitted here; so for those cases
+        # where errors from both categories would occur, we want that the
+        # easier to understand messages get precedence over this one.
+        #
+        # as a hack to realize this desired effect of precedence, we take
+        # a `line_upstreamer` instead of a `line_upstream` which allows us
+        # to defer the resolution of the line upstream to after the parsing
+        # of the other individual arguments.
+        #
+        # also, in a hypothetical world where we accept a filename as a
+        # means to a line upstream, we would likewise want to defer the
+        # validation of the line upstream until later than the first-pass
+        # of argument normalization. :#here-1
+
+        stdin = remove_instance_variable :@stdin  # always and only ever here
+        if stdin.tty?
+          @stderr.puts "expecting STDIN"
+          @_exitstatus = _express_usage_and_invite_to_help
+          UNABLE_
+        else
+          stdin
+        end
       end
 
       # -- emission handling
@@ -228,16 +202,34 @@ module Skylab::Tabular
 
     # ==
 
+    Operation___ = self
     class Operation___
 
-      # a separation from [#br-002] "modality" clients will be largely
-      # artificial because of how monospace-string-centric the whole
-      # stack is..
+      # the degree to which this operation is decoupled from one or another
+      # (read: CLI) [#br-002] "modality" client is in flux:
+      #
+      # presently input decoupling is good i.e this can process an
+      # "upstream" in both a CLI-centric and API-centric ways (namely,
+      # line upstream and mixed tuple upstream respectively).
+      #
+      # decoupling for output, however, has only the groundwork laid.
+      # because there is presently no way to express a table into any
+      # modality other than CLI, the point would be fully moot were it not
+      # for it being an #exercise in architecture.
+
+      class << self
+        alias_method :begin_operation_, :new
+        undef_method :new
+      end  # >>
 
       def initialize arg_scn
+
         @_ = Magnetics
-        @args = arg_scn
+        @_has_MTUer = false
         @_listener = arg_scn.listener
+        @_receive_MTUer = :__receive_MTUer_initially
+        @_args = arg_scn
+        @width = nil
       end
 
       def __to_primary_description_stream_
@@ -247,84 +239,133 @@ module Skylab::Tabular
         end
       end
 
-      def _parse_arguments__  # assume some FOR NOW
+      def parse_arguments_for_operation_
+        if __process_arguments
+          __normalize
+        end
+      end
 
-        matcher = @args.matcher_for :primary, :against_hash, OPTIONS___
-        begin
-          ok = matcher.gets
-          ok || break
-          ok = send ok.branch_item_value
-          ok || break
-        end until @args.no_unparsed_exists
-        remove_instance_variable :@args
+      def __normalize
+        if @_has_MTUer
+          ACHIEVED_
+        else
+          @_listener.call :error, :expression, :missing_required_parameter do |y|
+            y << "must have a mixed tuple upstream means (e.g `line_upstreamer`)"  # meh
+          end
+          UNABLE_
+        end
+      end
+
+      def __process_arguments
+        ok = if @_args.no_unparsed_exists
+          ACHIEVED_
+        else
+          __parse_some_arguments
+        end
+        remove_instance_variable :@_args
         ok
       end
 
-      def __at_width
-        @args.advance_one
-        _ = @args.parse_primary_value :positive_nonzero_integer
+      def __parse_some_arguments
+
+        matcher = @_args.matcher_for :primary, :against_hash, OPTIONS___
+        begin
+          ok = matcher.gets
+          ok || break
+          @_args.advance_one
+          ok = send ok.branch_item_value
+          ok || break
+        end until @_args.no_unparsed_exists
+        ok
+      end
+
+      OPTIONS___ = {
+        line_upstreamer: :__parse_line_upstreamer,  # justified at #here-1
+        mixed_tuple_upstream: :__parse_mixed_tuple_upstream,
+        width: :__parse_width,
+      }
+
+      OPTION_DESCRIPTIONS___ = {
+        width: -> y do
+          y << "jamaican me crazy"
+          y << "you really are"
+        end,
+      }
+
+      def __parse_line_upstreamer
+        x = @_args.parse_primary_value :must_be_trueish
+        x and _receive_MTUer x, :__mixed_tuple_upstream_via_line_upstreamer
+      end
+
+      def __parse_mixed_tuple_upstream
+        us = @_args.parse_primary_value :must_be_trueish
+        us and _receive_MTUer us, :__mixed_tuple_upstream_via_same
+      end
+
+      def _receive_MTUer x, m
+        send @_receive_MTUer, x, m
+      end
+
+      def __receive_MTUer_initially x, m
+        @_has_MTUer = true
+        @_receive_MTUer = :_COVER_ME__sanity_check__wont_overwrite_multiple_argument_values__  # #todo
+        @__MTU_method_name = m
+        @_MTU_value = x
+        ACHIEVED_
+      end
+
+      def __parse_width
+        _ = @_args.parse_primary_value :integer_that_is_postive_nonzero
         _store :@width, _
       end
 
-      attr_writer(
-        :line_upstream,
-      )
-
       def execute
-
-        @_inference = Hardcoded_inference_instance_for_now___[]
+        @_inference = Inference_via___[ @width ]
+        # (all the money is in `to_line_stream` etc)
         self
       end
 
-      def _store ivar, x  # DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-        if x
-          instance_variable_set ivar, x  ; ACHIEVED_
-        else
-          x
-        end
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # -- read
 
       def to_line_stream
 
-        _mt_st = _mixed_tuple_stream = @_::
-          MixedTupleStream_via_LineStream_and_Inference.
-            call( @line_upstream, @_inference, & @_listener )
+        x = send @__MTU_method_name
 
-        _scn = @_::PageScanner_via_MixedTupleStream_and_Inference.call(  # 1x
-          _mt_st, @_inference, & @_listener )
+        x &&= @_::PageScanner_via_MixedTupleStream_and_Inference.call(  # 1x
+          x, @_inference, & @_listener )
 
-        _ = _scn.flush_to_line_stream
+        x &&= x.flush_to_line_stream
 
-        _  # #todo
+        x  # #todo
+      end
+
+      def __mixed_tuple_upstream_via_line_upstreamer
+
+        _proc = remove_instance_variable :@_MTU_value
+        io = _proc.call
+        if io
+          _ = @_::MixedTupleStream_via_LineStream_and_Inference.
+            call( io, @_inference, & @_listener )
+          _  # #todo
+        end
+      end
+
+      def __mixed_tuple_upstream_via_same
+        remove_instance_variable :@_MTU_value
       end
     end
 
     # ==
 
-    OPTIONS___ = {
-      width: :__at_width,
-    }
-
-    OPTION_DESCRIPTIONS___ = {
-      width: -> y do
-        y << "jamaican me crazy"
-        y << "you really are"
-      end,
-    }
-
-    # ==
-
-    Hardcoded_inference_instance_for_now___ = Lazy_.call do
-
-      # (one day we anticipate making this configurable somehow.)
+    Inference_via___ = -> width do
 
       Models_Inference___.define do |o|
 
         o.page_size = 2
 
-        o.target_final_width = 40
+        o.target_final_width = width || 40
 
         o.threshold_for_whether_a_column_is_numeric = 0.618  # explained fully at [#004.B]
       end
@@ -346,12 +387,21 @@ module Skylab::Tabular
       # many of the performers in one invocation, so that as implementation
       # details change, the centrality of this does not.
 
+      def initialize
+        @_secret_mock_key_knownness = nil
+        super
+      end
+
+      def SECRET_MOCK_KEY_IS_KNOWN
+        @_secret_mock_key_knownness && true
+      end
+
       def SECRET_MOCK_KEY= x
-        @__secret_mock_key_knownness = Common_::Known_Known[ x ]
+        @_secret_mock_key_knownness = Common_::Known_Known[ x ] ; x
       end
 
       def SECRET_MOCK_KEY
-        @__secret_mock_key_knownness.value_x
+        @_secret_mock_key_knownness.value_x
       end
 
       attr_accessor(
@@ -364,7 +414,7 @@ module Skylab::Tabular
         NOTHING_
       end
 
-      def define_table__ & defn_p
+      def define_table_design__ & defn_p
 
         _table_lib = Zerk_lib_[]::CLI::Table
 

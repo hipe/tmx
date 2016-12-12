@@ -35,9 +35,9 @@ module Skylab::Tabular
 
       def __when_one_line first_line
 
-        _matchdata = %r(\Asecret-mock-key-([-a-z0-9A-Z_.]+)).match first_line
+        _matchdata = SECRET_MOCK_KEY_RX_.match first_line
 
-        key = _matchdata[ 1 ].intern
+        key = _matchdata[ :key ].intern
 
         @inference.SECRET_MOCK_KEY = key
 

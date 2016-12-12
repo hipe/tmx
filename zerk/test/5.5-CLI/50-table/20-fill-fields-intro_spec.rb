@@ -14,7 +14,7 @@ module Skylab::Zerk::TestSupport
 
       -> cel_rsx do
 
-        s = cel_rsx.row_typified_mixed_at( col_offset ).value
+        s = cel_rsx.row_typified_mixed_at_field_offset( col_offset ).value
 
         s.length.nonzero? || fail
 
@@ -37,7 +37,7 @@ module Skylab::Zerk::TestSupport
 
       -> cel_rsx do
 
-        s = cel_rsx.row_typified_mixed_at( col_offset ).value
+        s = cel_rsx.row_typified_mixed_at_field_offset( col_offset ).value
 
         d = w - s.length
         d > 0 || fail

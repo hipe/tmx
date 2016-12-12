@@ -52,9 +52,34 @@ module Skylab::Tabular
     alias_method :[], :call
   end
 
+  # ==
+
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
   Lazy_ = Common_::Lazy
+
+  # ==
+
+  # (T.O.C: 1. operations  2. magentics  3. models  4. functions)
+
+  # == operations
+
+  module Operations_
+
+    Ping = -> as do  # argument scanner
+      if ! as.no_unparsed_exists
+        self._COVER_ME
+      end
+      as.listener.call :info, :expression, :ping do |y|
+        y << "hello from tabular!"
+      end
+      :_ping_from_tabular_
+    end
+
+    Autoloader_[ self, :boxxy ]
+  end
+
+  # == magnetics
 
   module Magnetics
     Autoloader_[ self ]
@@ -70,15 +95,7 @@ module Skylab::Tabular
     )
   end
 
-  module Models
-    Autoloader_[ self ]
-  end
-
-  module Models_
-    # sic
-  end
-
-  # ==
+  # == models & support
 
   class SimpleModel_
 
@@ -103,13 +120,12 @@ module Skylab::Tabular
     private :dup
   end
 
-  # ==
+  module Models
+    Autoloader_[ self ]
+  end
 
-  Field_surveyor_prototype_ = Lazy_.call do  # 1x
-
-    Models_::FieldSurveyor.define do |o|
-      o.field_survey_class = Models::FieldSurvey
-    end
+  module Models_
+    # sic
   end
 
   class Models_::FieldSurveyor < SimpleModel_  # OK to publicize
@@ -124,8 +140,6 @@ module Skylab::Tabular
     end
   end
 
-  # ==
-
   class Models_::TypifiedMixedTuple
 
     # enforcing a stream interface for reads has advantages elsewhere,
@@ -135,7 +149,12 @@ module Skylab::Tabular
       @_typified_mixed_array = typi_a
     end
 
-    def mutate_array_by
+    def replace_array_by  # 1x [ze]
+      @_typified_mixed_array = yield @_typified_mixed_array
+      NIL
+    end
+
+    def mutate_array_by  # 1x [ze]
       yield @_typified_mixed_array
       NIL
     end
@@ -143,9 +162,11 @@ module Skylab::Tabular
     def to_typified_mixed_stream
       Stream_[ @_typified_mixed_array ]
     end
-  end
 
-  # ==
+    def peek_first_FOR_MOCK
+      @_typified_mixed_array.fetch( 0 ).value
+    end
+  end
 
   Models::Typified = ::Module.new
   class Models::Typified::Mixed
@@ -170,18 +191,26 @@ module Skylab::Tabular
     )
   end
 
-  # ==
+  # == singletons, methods, functions & lib
 
-  class << self
+  Field_surveyor_prototype_ = Lazy_.call do  # 1x
 
-    def lib_
-      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
-        Lib___, self )
+    Models_::FieldSurveyor.define do |o|
+      o.field_survey_class = Models::FieldSurvey
     end
+  end
 
-  end  # >>
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
+  end
 
-  # ==
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
 
   Zerk_lib_ = Lazy_.call do
     _ = Home_.lib_.zerk
@@ -189,13 +218,12 @@ module Skylab::Tabular
     _
   end
 
-  # ==
-
-  Stream_ = -> a, & p do
-    Common_::Stream.via_nonsparse_array a, & p
-  end
-
-  # ==
+  class << self
+    def lib_
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Lib___, self )
+    end
+  end  # >>
 
   module Lib___
 
@@ -216,5 +244,6 @@ module Skylab::Tabular
   Home_ = self
   NOTHING_ = nil
   UNABLE_ = false
+  SECRET_MOCK_KEY_RX_ = %r(\Asecret-mock-key-(?<key>[-a-z0-9A-Z_.]+))
   SPACE_ = ' '
 end

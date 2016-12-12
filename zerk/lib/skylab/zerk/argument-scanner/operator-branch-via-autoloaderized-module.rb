@@ -90,8 +90,6 @@ module Skylab::Zerk
           end
         end
 
-
-
         def to_slug_stream  # 1x for [tmx]. not an API #hook-out
 
           @module.entry_tree.to_state_machine_stream.map_by do |sm|

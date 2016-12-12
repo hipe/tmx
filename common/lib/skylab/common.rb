@@ -1279,6 +1279,16 @@ module Skylab::Common
         end
       end  # >>
 
+      def as_const_symbol= sym  # #experimental (as #here)
+        o = _center_name_
+        if o.instance_variable_defined? :@_const
+          o.instance_variable_get( :@_const ).as_const_symbol = sym
+        else
+          o.__receive_const_when_none sym
+          sym
+        end
+      end
+
       def as_camelcase_const_string
         _const.as_camelcase_const_string
       end
@@ -1294,17 +1304,22 @@ module Skylab::Common
       end
 
       def _const
-        _center_name_.___const_when_center_name
+        _center_name_.__const_when_center_name
       end
 
-      def ___const_when_center_name
-        @___did_attempt_const ||= ___attempt_const
+      def __const_when_center_name
+        @_did_attempt_const ||= __attempt_const
         @_const
       end
 
-      def ___attempt_const
+      def __attempt_const
         @_const = Here_._via_center_name_ self
         ACHIEVED_
+      end
+
+      def __receive_const_when_none sym
+        @_did_attempt_const = true
+        @_const = Here_.via_const_symbol sym ; nil
       end
     end
 
@@ -1360,6 +1375,10 @@ module Skylab::Common
       end
 
       remove_instance_variable :@x_
+    end
+
+    def as_const_symbol= sym
+      @surface_value_as_symbol_ = sym
     end
 
     def as_const  # symbol
@@ -1479,7 +1498,7 @@ module Skylab::Common
         end
       end  # >>
 
-      def as_slug= s  # #experimental
+      def as_slug= s  # #experimental (:#here)
         o = _center_name_
         if o.instance_variable_defined? :@_slug
           o._slug_when_center_name.as_slug = s
