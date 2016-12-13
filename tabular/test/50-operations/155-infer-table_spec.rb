@@ -75,8 +75,56 @@ module Skylab::Tabular::TestSupport
       end
     end
 
-    it "negatives" do
+    it "edge - empty second page" do  # #coverpoint-1-1 - an empty PAGE
+
+      # (this happens in nature if you say `echo "a b\nc d\n" | [..]` -
+      #  `echo` appends *another* newline to the end of the string so..)
+
+      _mt_st = _mixed_tuple_stream_via(
+        [ "one", "two" ],
+        [ "three", "four" ],
+        EMPTY_A_,
+      )
+
+      call( :infer_table,
+        :mixed_tuple_upstream, _mt_st,
+        :page_size, 2,  # for #coverpoint-1-1
+      )
+
+      finish_by do |op|
+        _act_st = op.to_line_stream
+        exp = TestSupport_::Expect_Line::Scanner.via_stream _act_st
+        exp << "one    two "
+        exp << "three  four"
+        exp << "           "
+        exp.expect_no_more_lines
+      end
     end
+
+    it "an \"hourglass\" page" do
+
+      _mt_st = _mixed_tuple_stream_via(
+        [ "one", "two" ],
+        [ "three" ],
+      )
+
+      call( :infer_table,
+        :mixed_tuple_upstream, _mt_st,
+        :page_size, 3,
+        :left_separator, '| ',
+        :right_separator, ' |',
+        :inner_separator, ' | ',
+      )
+
+      finish_by do |op|
+        _act_st = op.to_line_stream
+        exp = TestSupport_::Expect_Line::Scanner.via_stream _act_st
+        exp << "| one   | two |"
+        exp << "| three |     |"
+        exp.expect_no_more_lines
+      end
+    end
+
 
     def _mixed_tuple_stream_via * a_a
       Stream_[ a_a ]

@@ -25,6 +25,19 @@ module Skylab::Tabular::TestSupport
       end
     end
 
+    it "minimal normative (adds newlines)" do
+
+      _init_stream_against_these_lines(
+        "one 2\n",
+        "three 4\n",
+      )
+
+      _expect_these_mixed_tuples do |y|
+        y.yield 'one', 2
+        y.yield 'three', 4
+      end
+    end
+
     it "negatives regression" do
 
       _init_stream_against_these_lines(
@@ -79,7 +92,20 @@ module Skylab::Tabular::TestSupport
       end
     end
 
-    it "unclosed - fails" do
+    it "empty line is as expected" do
+
+      _init_stream_against_these_lines(
+        "something\n",
+        "\n",
+      )
+
+      _expect_these_mixed_tuples do |y|
+        y << 'something'
+        y.yield
+      end
+    end
+
+    it "unclosed quot - fails" do
 
       spy = _begin_failure_spy_via_lines(
         '3 "double quo',

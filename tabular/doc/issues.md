@@ -1,7 +1,12 @@
+[#008]       #coverpoint-1-1 when you encounter a narrower page
+
 [#007]       internal. (as soon as you want to publicize any of these,
              give them a toplevel number)
-       #wish :[#this.A]: take `min` into account in max-share meters
+       #open :[#this.A]: take `min` into account in max-share meters
+             negative numbers in target use case currently bork
        #wish :[#this.B]: probably largely redundant with OGDL parser
+       #open :[#this.C]: invalid numbers in operation options (e.g -width)
+       #open :[#this.D]: we probably should not be rolling our own help screen
 
 [#006] #wish summary row for "infer table"
 

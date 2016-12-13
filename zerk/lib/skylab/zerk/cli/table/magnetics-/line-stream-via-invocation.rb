@@ -110,71 +110,14 @@ module Skylab::Zerk
 
           @_notes.see_this_number_of_columns @_page.number_of_all_fields
 
-            @_line_via_typified_mixed_stream =
-          LineRenderer_via_Page_and_Invocation___[ @_page, @invocation ]
+          @_line_via_typified_mixed_stream = Magnetics_::
+            LineRenderer_via_Page_and_Invocation[ @_page, @invocation ]  # 1x
 
           NIL
         end
       # -
       # ==
 
-      # ==
-      LineRenderer_via_Page_and_Invocation___ = -> page, invo do
-
-        number_of_fields = invo.notes.the_most_number_of_columns_ever_seen
-
-        field_surveys = page.every_survey_of_every_field
-
-        cel_renderers = number_of_fields.times.map do |d|
-
-          Magnetics_::TypifiedMixedRenderer_via_FieldSurvey.new(  # 1x
-            d,
-            field_surveys.fetch( d ),  # ..
-            invo,
-          ).execute
-        end
-
-        this_many_times = number_of_fields.zero? ? 0 : number_of_fields - 1
-
-        design = invo.design
-
-        blank_cels = nil
-
-        -> typi_st do
-
-          buffer = "#{ design.left_separator }"
-
-          d = -1
-          write_cel = -> do
-            d += 1
-            use_typi = typi_st.gets
-            if use_typi
-              buffer << cel_renderers.fetch( d )[ use_typi ]
-            else
-              # hotfix [#050.H.2] ..
-              a = ( blank_cels ||= [] )
-              s = a[d]
-              if ! s
-                _w = page.every_survey_of_every_field.fetch( d ).
-                  width_of_widest_string
-                s = SPACE_ * _w
-                a[d] = s
-              end
-              buffer << s
-            end
-            NIL
-          end
-
-          write_cel[]
-
-          this_many_times.times do
-            buffer << design.inner_separator
-            write_cel[]
-          end
-
-          buffer << design.right_separator
-        end
-      end
       # ==
 
     if false  # keep while #open [#tab-003]

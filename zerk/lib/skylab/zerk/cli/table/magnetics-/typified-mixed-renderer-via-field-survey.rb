@@ -9,7 +9,7 @@ module Skylab::Zerk
       # account what *will be* the widest width of any content once
       # stringified in the column (this (sometimes hypothetical) string
       # being called the "value-as-string"), we produce a formatting string
-      # for use by `String#%` (same as `Kernel#sprintf`, right?) that
+      # for use by `String#%` (same as `Kernel#sprintf`) that
       #
       #   - expresses the align-left or align-right-ness of the column AND
       #

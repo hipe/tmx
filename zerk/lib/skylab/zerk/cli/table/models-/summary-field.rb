@@ -16,7 +16,7 @@ module Skylab::Zerk
       #     "max-share meter" visualization.)
       #
       #   - it's possible for a summary field to derive from other summary
-      #     fields values in the row. (#ordinals dictate the order in which
+      #     field values in the row. (#ordinals dictate the order in which
       #     summary fields are calculated.)
       #
       #   - when we say "plain field" in this document, we mean a field that
@@ -298,6 +298,7 @@ module Skylab::Zerk
           @_plain_index = idx.plain_index
           @_fill_index = idx.fill_index
 
+          # @grow_not_shrink = invo.grow_not_shrink
           @invocation = invo
         end
 
@@ -306,6 +307,7 @@ module Skylab::Zerk
           if @_array_expander
             @_array_expander.__visit_additively_ @_page_data.field_survey_writer
           end
+          # else @_ensure_width = __build_ensure_width
 
           d_a = @__offsets_of_overwriters
           if d_a
@@ -370,6 +372,7 @@ module Skylab::Zerk
 
         def OCD_no_yes_yes tuple
           tuple.mutate_array_by do |a|
+            # @_ensure_width[ a ]
             @_plain_page_editor.populate_or_overwrite_typified_cels a
             @_fill_page_editor.populate_or_overwrite_typified_cels a
           end
@@ -378,6 +381,7 @@ module Skylab::Zerk
 
         def OCD_no_yes_no tuple
           tuple.mutate_array_by do |a|
+            # @_ensure_width[ a ]
             @_plain_page_editor.populate_or_overwrite_typified_cels a
           end
           NIL
@@ -385,6 +389,7 @@ module Skylab::Zerk
 
         def OCD_no_no_yes tuple
           tuple.mutate_array_by do |a|
+            # @_ensure_width[ a ]
             @_fill_page_editor.populate_or_overwrite_typified_cels a
           end
           NIL
@@ -461,8 +466,8 @@ module Skylab::Zerk
           @__invo = invo
         end
 
-        def row_typified_mixed_at_field_offset d
-          @__arr.fetch d
+        def row_typified_mixed_at_field_offset_softly d  # 2 defs here, 1x [ze]
+          @__arr[ d ]
         end
 
         def read_observer sym
@@ -510,12 +515,29 @@ module Skylab::Zerk
 
           len = aa.length
           a = ::Array.new len + @expansion_field_count
-          @input_to_output_offset_map.each_with_index do |d, dd|
-            a[ d ] = aa.fetch dd
+
+          under = @__expected_input_tuple_length - len
+          case 0 <=> under
+          when -1
+
+            # when your input tuple is short,
+            # truncate your map to how short it is..
+
+            use_map = @input_to_output_offset_map[ 0, len ]
+
+            under.times do
+              a.push NOTHING_  # ..
+            end
+
+          when 0
+            use_map = @input_to_output_offset_map
+
+          when 1
+            self._COVER_ME__no_problem_you_just_have_a_wide_input_tuple
           end
 
-          if @__expected_input_tuple_length < len
-            self._COVER_ME__no_problem_you_just_have_a_wide_input_tuple
+          use_map.each_with_index do |d, dd|
+            a[ d ] = aa.fetch dd
           end
 
           a

@@ -23,6 +23,10 @@ module Skylab::Zerk
           @_a[ d ] ||= Note___.new d
         end
 
+        def dereference_for_field d
+          @_a.fetch d
+        end
+
         attr_reader(
           :the_most_number_of_columns_ever_seen,
         )

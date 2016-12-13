@@ -43,39 +43,49 @@ module Skylab::Tabular
       def __express_help
 
         _express_usage
-
         @stderr.puts
-
         @stderr.puts "options:"
 
-        n = 8  # meh
-        first_line_format = "  -%#{ n }s    %s"
-        subsequent_line_format = "#{ SPACE_ * ( n + 7 ) }%s"
+        # #open [#007.D] we probably should not be rolling our own help screen
 
-        st = @_operation.__to_primary_description_stream_
-        begin
-          pa = st.gets
-          pa || break
+        _DASH = '-' ; _UNDERSCORE = '_'  # DASH_ UNDERSCORE_
 
-          p = -> line do
+        widest = 0 ; monikers = [] ; desc_procs = []
+        @_operation.__to_primary_description_stream_.each do |pa|
+          moniker = "-#{ pa.name_x.id2name.gsub _UNDERSCORE, _DASH }"
+          len = moniker.length
+          widest < len and widest = len
+          monikers.push moniker ; desc_procs.push pa.value_x
+        end
 
-            p = -> line_ do
-              @stderr.puts subsequent_line_format % line_
-            end
+        moniker_only = "#{ SPACE_ * 2 }%#{ widest }s"
+        first_line_format = "#{ moniker_only }#{ SPACE_ * 3 }%s"
+        subsequent_line_format = first_line_format % [ nil, '%s' ]  # wee
 
-            _slug = Common_::Name.via_lowercase_with_underscores_symbol(
-              pa.name_x ).as_slug
-
-            @stderr.puts first_line_format % [ _slug, line ]
+        express_both = -> desc_p, moniker do
+          subsequent_p = -> line do
+            @stderr.puts subsequent_line_format % line
           end
-
+          p = -> line do
+            p = subsequent_p
+            @stderr.puts first_line_format % [ moniker, line ]
+          end
           _y = ::Enumerator::Yielder.new do |line|
             p[ line ]
           end
+          NOTHING_.instance_exec _y, & desc_p  # no expag until we need one
+        end
 
-          NOTHING_.instance_exec _y, & pa.value_x  # no expag until we need one
-          redo
-        end while above
+        monikers.length.times do |d|
+          moniker = monikers.fetch d
+          desc_p = desc_procs.fetch d
+
+          if desc_p
+            express_both[ desc_p, moniker ]
+          else
+            @stderr.puts moniker_only % moniker
+          end
+        end
 
         SUCCESS_EXITSTATUS__
       end
@@ -229,6 +239,8 @@ module Skylab::Tabular
         @_listener = arg_scn.listener
         @_receive_MTUer = :__receive_MTUer_initially
         @_args = arg_scn
+        @page_size = nil
+        @separators = nil
         @width = nil
       end
 
@@ -272,7 +284,6 @@ module Skylab::Tabular
         begin
           ok = matcher.gets
           ok || break
-          @_args.advance_one
           ok = send ok.branch_item_value
           ok || break
         end until @_args.no_unparsed_exists
@@ -280,24 +291,63 @@ module Skylab::Tabular
       end
 
       OPTIONS___ = {
-        line_upstreamer: :__parse_line_upstreamer,  # justified at #here-1
-        mixed_tuple_upstream: :__parse_mixed_tuple_upstream,
-        width: :__parse_width,
+        left_separator: :_at_separator,
+        line_upstreamer: :__at_line_upstreamer,  # justified at #here-1
+        inner_separator: :_at_separator,
+        mixed_tuple_upstream: :__at_mixed_tuple_upstream,
+        page_size: :__at_page_size,
+        right_separator: :_at_separator,
+        width: :__at_width,
       }
 
       OPTION_DESCRIPTIONS___ = {
+
         width: -> y do
           y << "jamaican me crazy"
-          y << "you really are"
+          y << "(default: #{ TARGET_WIDTH___ })"
+        end,
+
+        page_size: -> y do
+          y << "how many tuples (rows) are read before a page"
+          y << "(and visualizations) are flushed (default: #{ PAGE_SIZE___ })."
+        end,
+
+        left_separator: -> y do
+          y << "default: #{ Left_separator__[].inspect }"
+        end,
+
+        inner_separator: -> y do
+          y << "default: #{ Inner_separator__[].inspect }"
+        end,
+
+        right_separator: -> y do
+          y << "default: #{ Right_separator__[].inspect }"
         end,
       }
 
-      def __parse_line_upstreamer
+      def _at_separator
+        _which = @_args.current_primary_symbol
+        @_args.advance_one
+        x = @_args.head_as_is
+        @_args.advance_one
+        d = case _which
+        when :left_separator ; 0
+        when :inner_separator ; 1
+        when :right_separator ; 2
+        else self._SANITY
+        end
+        ( @separators ||= [] )[ d ] = x
+        ACHIEVED_
+      end
+
+      def __at_line_upstreamer
+        @_args.advance_one
         x = @_args.parse_primary_value :must_be_trueish
         x and _receive_MTUer x, :__mixed_tuple_upstream_via_line_upstreamer
       end
 
-      def __parse_mixed_tuple_upstream
+      def __at_mixed_tuple_upstream
+        @_args.advance_one
         us = @_args.parse_primary_value :must_be_trueish
         us and _receive_MTUer us, :__mixed_tuple_upstream_via_same
       end
@@ -314,13 +364,45 @@ module Skylab::Tabular
         ACHIEVED_
       end
 
-      def __parse_width
+      def __at_width
+        @_args.advance_one
         _ = @_args.parse_primary_value :integer_that_is_postive_nonzero
         _store :@width, _
       end
 
+      def __at_page_size
+        @_args.advance_one
+        d = @_args.parse_primary_value :integer_that_is_postive_nonzero
+        if d
+          __validate_page_size d
+        end
+      end
+
+      def __validate_page_size d
+        if PAGE_SIZE_MINIMUM__ <= d
+          @page_size = d ; ACHIEVED_
+        else
+          @_args.listener.call :error, :expression, :integer_out_of_range do |y|
+            PAGE_SIZE_MINIMUM__
+          end
+          UNABLE_
+        end
+      end
+
       def execute
-        @_inference = Inference_via___[ @width ]
+
+        @_inference = Models_Inference___.define do |o|
+
+          o.separators = @separators  # nil OK
+
+          o.target_final_width = @width || TARGET_WIDTH___
+
+          o.page_size = @page_size || PAGE_SIZE___
+
+          o.threshold_for_whether_a_column_is_numeric =
+            NUMERIC_COLUMN_THRESHOLD___
+        end
+
         # (all the money is in `to_line_stream` etc)
         self
       end
@@ -359,18 +441,6 @@ module Skylab::Tabular
 
     # ==
 
-    Inference_via___ = -> width do
-
-      Models_Inference___.define do |o|
-
-        o.page_size = 2
-
-        o.target_final_width = width || 40
-
-        o.threshold_for_whether_a_column_is_numeric = 0.618  # explained fully at [#004.B]
-      end
-    end
-
     Max_share_meter_prototype___ = Lazy_.call do
 
       Zerk_lib_[]::CLI::HorizontalMeter.define do |o|
@@ -387,19 +457,30 @@ module Skylab::Tabular
       # many of the performers in one invocation, so that as implementation
       # details change, the centrality of this does not.
 
+      def initialize
+        @separators = nil
+        super
+      end
+
       attr_accessor(
         :page_size,
+        :separators,
         :target_final_width,
         :threshold_for_whether_a_column_is_numeric,  # explained fully at [#004.B]
       )
 
       def define_table_design__ & defn_p
 
+        a = [ * @separators ]
+        a[ 0 ] ||= Left_separator__[]
+        a[ 1 ] ||= Inner_separator__[]
+        a[ 2 ] ||= Right_separator__[]
+
         _table_lib = Zerk_lib_[]::CLI::Table
 
         _table_lib::Design.define do |o|
 
-          o.separator_glyphs EMPTY_S_, SPACE_ * 2, EMPTY_S_
+          o.separator_glyphs( * a )
 
           defn_p[ o ]
         end
@@ -411,6 +492,17 @@ module Skylab::Tabular
     end
 
     # ==
+
+    Left_separator__ = -> { EMPTY_S_ }
+    Inner_separator__ = Lazy_.call { SPACE_ * 2 }
+    Right_separator__ = -> { EMPTY_S_ }
+
+    # ==
+
+    NUMERIC_COLUMN_THRESHOLD___ = 0.618  # explained fully at [#004.B]
+    PAGE_SIZE___ = 8  # don't test around this
+    PAGE_SIZE_MINIMUM__ = 2
+    TARGET_WIDTH___ = 40  # not sure if we test around this
 
     # ==
   end

@@ -73,18 +73,28 @@ module Skylab::Tabular
       end
 
       def execute
-        _skip_any_whitespace
+
+        _skip_whitespace
+
         @_a = []
+        @_done = false
+
         begin
-          _ok = _parse_cel
-          _ok || break
+          _parse_cel
+          @_done && break
+
+          if _skip_whitespace
+            redo
+          end
+
+          if _skip_line_terminator
+            break
+          end
+
           if _no_unparsed_exists
             break
           end
-          _skip_mandatory_whitespace
-          if _no_unparsed_exists
-            break
-          end
+
           redo
         end while above
 
@@ -97,16 +107,13 @@ module Skylab::Tabular
 
       def _parse_cel
         if __looks_like_it_might_be_a_number
-          if __parse_number
-            ACHIEVED_
-          else
-            _maybe_accept_as_string
+          if ! __parse_number
+            _attempt_to_accept_as_string
           end
-        elsif __parse_boolean
-          ACHIEVED_
-        else
-          _maybe_accept_as_string
+        elsif ! __parse_boolean
+          _attempt_to_accept_as_string
         end
+        NIL
       end
 
       def __looks_like_it_might_be_a_number
@@ -133,23 +140,21 @@ module Skylab::Tabular
         end
       end
 
-      def _maybe_accept_as_string
+      def _attempt_to_accept_as_string
         if @_scn.match? QUOT___
           __quote_time
         else
           s = @_scn.scan STRING_SIMPLE___
           if s
             _accept_mixed s
+          elsif _skip_line_terminator
+            # kinda gross, this ends the parsing of the line
+            _stop
           else
-            # hi.
-            if @_scn.skip LINE_TERMINATOR_SEQUENCE___
-              # kinda gross, this ends the parsing of the line
-              ACHIEVED_
-            else
-              self._COVER_ME__invalid_characters__
-            end
+            self._COVER_ME__invalid_characters__
           end
         end
+        NIL
       end
 
       def __quote_time
@@ -164,6 +169,7 @@ module Skylab::Tabular
         else
           __when_unquoting_failed
         end
+        NIL
       end
 
       def __when_unquoting_failed
@@ -177,18 +183,15 @@ module Skylab::Tabular
         end
 
         @_a = UNABLE_
-        UNABLE_
-      end
-
-      def _skip_mandatory_whitespace
-        d = _skip_any_whitespace
-        if ! d
-          self._COVER_ME
-        end
+        _stop
         NIL
       end
 
-      def _skip_any_whitespace
+      def _skip_line_terminator
+        @_scn.skip LINE_TERMINATOR_SEQUENCE___
+      end
+
+      def _skip_whitespace
         @_scn.skip SOME_WHITESPACE___
       end
 
@@ -196,14 +199,21 @@ module Skylab::Tabular
         @_scn.eos?
       end
 
+      def _stop
+        @_done = true ; nil
+      end
+
       def _accept_mixed x
-        @_a.push x ; ACHIEVED_
+        @_a.push x
+        ACHIEVED_  # used sometimes, not others
       end
     end
 
     # ==
 
-    BOOLEAN_MATCHER___ = /(?:true|false|yes|no)(?=[ \t]|\z)/i
+    ce = '(?=[[:space:]]|\z)'  # common end
+
+    BOOLEAN_MATCHER___ = /(?:true|false|yes|no)#{ ce }/i
     BOOLEAN_CONVERTER___ = /\A(?: (?<true>true|yes) | (?<false>false|no) )\z/ix
 
     LINE_TERMINATOR_SEQUENCE___ = /(?:\n|\r\n?)\z/
@@ -211,8 +221,8 @@ module Skylab::Tabular
     QUOT___ = /['"]/
 
     NUMBER_LOOKS_LIKE_BEGINNING_OF___ = /-?\d/
-    NUMBER_SIMPLE_INTEGER___ = /-?\d+(?=[ \t]|\z)/
-    NUMBER_SIMPLE_FLOAT___ = /-?\d+\.\d+(?=[ \t]|\z)/
+    NUMBER_SIMPLE_INTEGER___ = /-?\d+#{ ce }/
+    NUMBER_SIMPLE_FLOAT___ = /-?\d+\.\d+#{ ce }/
 
     SOME_WHITESPACE___ = /[ \t]+/
 

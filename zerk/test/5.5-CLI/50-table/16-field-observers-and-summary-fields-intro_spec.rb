@@ -27,10 +27,12 @@ module Skylab::Zerk::TestSupport
 
       total = o.read_observer observer_sym
 
-      tm = o.row_typified_mixed_at_field_offset numerator_index
+      tm = o.row_typified_mixed_at_field_offset_softly numerator_index
 
-      if tm.is_numeric
-        tm.value.to_f / total
+      if tm
+        if tm.is_numeric
+          tm.value.to_f / total
+        end
       end
     end
 
@@ -53,6 +55,38 @@ module Skylab::Zerk::TestSupport
         end
       end
 
+      it "what if martini-glass (narrowening page)" do
+
+        # trying to hit #table-coverpoint-F-1
+
+        _matr = [
+          [ 'coffee', 7.23 ],
+          [ 'header x' ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y << '| coffee   | 1.0 | 7.23 |'
+          y << '| header x |     |      |'
+        end
+      end
+
+      it "what if martini-glass across a page hop - WIDENING" do
+
+        # trying to hit #table-coverpoint-F-1
+
+        _matr = [
+          [ 'coffee', 7.23 ],
+          [ 'donut', 2.78 ],
+          [ 'header x' ],  # (assumes #here page_size of 2)
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+          y << '| coffee | 0.7223 | 7.23 |'
+          y << '| donut  | 0.2777 | 2.78 |'
+          y << '| header x |        |      |'
+        end
+      end
+
       shared_subject :design_ish_ do
 
         table_module_.default_design.redefine do |defn|
@@ -69,6 +103,8 @@ module Skylab::Zerk::TestSupport
           end
 
           defn.add_field  # nothing (not necessary)
+
+          defn.page_size 2  # for #here
         end
       end
     end

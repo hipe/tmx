@@ -8,7 +8,7 @@ module Skylab::Tabular::TestSupport
     use :memoizer_methods
     use :magnetics_for_infer_table
 
-    context "(context)" do
+    context "minimal normative" do
 
       it "builds" do
         _table_design || fail
@@ -19,9 +19,7 @@ module Skylab::Tabular::TestSupport
       end
 
       it "last field is fill field" do
-        fld = _table_design.all_defined_fields.fetch( 2 )
-        fld.is_summary_field || fail
-        fld.is_summary_field_fill_field || fail
+        _last_field_is_a_fill_field
       end
 
       shared_subject :_table_design do
@@ -30,6 +28,34 @@ module Skylab::Tabular::TestSupport
           [ 'zleepie', 99 ],
         )
       end
+    end
+
+    context "with trailing zero length tuple" do
+
+      it "builds" do
+        _table_design || fail
+      end
+
+      it "3 defined fields" do
+        _table_design.all_defined_fields.length == 3 || fail
+      end
+
+      it "last field is fill field" do
+        _last_field_is_a_fill_field
+      end
+
+      shared_subject :_table_design do
+        first_table_design_via_(
+          [ 'jleep', 77 ],
+          EMPTY_A_,
+        )
+      end
+    end
+
+    def _last_field_is_a_fill_field
+      fld = _table_design.all_defined_fields.fetch( -1 )
+      fld.is_summary_field || fail
+      fld.is_summary_field_fill_field || fail
     end
 
     def is_first_page

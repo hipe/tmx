@@ -5,6 +5,7 @@ module Skylab::Tabular::TestSupport
   describe "[tmx] CLI - intro" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :CLI_non_interactive_CLI_fail_early
     use :CLI
 
@@ -114,7 +115,7 @@ module Skylab::Tabular::TestSupport
         argv '-w', '40'
       end
 
-      it "(somewhat mocked)" do
+      it "looks good" do
 
                           #one456789ten3456789twenty6789thirty6789f
         expect_on_stdout  "jumanny-fumanny-1     32  ++++++++++++++"
@@ -126,16 +127,22 @@ module Skylab::Tabular::TestSupport
     end
 
     def _expect_help_etc
+
       expect_usage_line_
       expect_empty_puts
       expect 'options:'
-      d = 0
+
+      spy = _once_asserter.once
+      p = spy.proc
+
       expect_each_by do |line|
-        d += 1
-        NIL
+        p[ line ]
+        NOTHING_
       end
+
       expect_succeeded
-      2 == d || fail  # ..
+
+      spy.close
     end
 
     def _expect_no_lines_in_input
@@ -144,13 +151,28 @@ module Skylab::Tabular::TestSupport
     end
 
     def _expect_unknown_option_zoopie_etc
-      expect_on_stderr %r(\Aunknown primary: "--zoopie\". expecting \{)
+      expect_on_stderr %r(\Aunknown primary: "--zoopie\"\z)
+      expect_on_stderr %r(\Aexpecting \{)
       expect_invite_etc_
     end
 
     def _expect_expecting_STDIN_etc
       expect_on_stderr "expecting STDIN"
       expect_invite_etc_
+    end
+
+    shared_subject :_once_asserter do
+
+      _lib = Home_::Zerk_lib_[].test_support
+      _lib = _lib::Non_Interactive_CLI::HelpScreenSimplePool
+
+      _lib.define do |o|
+        o.mandatory_pool(
+          :width,
+          :page_size,
+          :left_separator, :inner_separator, :right_separator,
+        )
+      end
     end
   end
 end

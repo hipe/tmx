@@ -43,7 +43,9 @@ module Skylab::Tabular
 
         scn = @page_surveyish.field_survey_writer.to_field_survey_scanner
 
-        begin
+        # #coverpoint-1-1: empty page
+
+        until scn.no_unparsed_exists
 
           _field_survey = scn.gets_one
 
@@ -52,7 +54,7 @@ module Skylab::Tabular
             _field_survey,
             @inference,
           )
-        end until scn.no_unparsed_exists
+        end
 
         mutable_design.flush_to_table_design
       end
@@ -97,6 +99,7 @@ module Skylab::Tabular
       def initialize ps, inference
 
         @_add_field = :__add_first_field
+        @_has_fields = false
 
         @inference = inference
         @page_surveyish = ps
@@ -120,6 +123,7 @@ module Skylab::Tabular
       end
 
       def __add_first_field defn_sym_a
+        @_has_fields = true
         @_input_offset_incrementor = Incrementor__.new 0
         @_mutable_will_add_fields = []
         @_add_field = :__add_field_during_edit
@@ -145,7 +149,10 @@ module Skylab::Tabular
             send fld.method_name
           end
 
-          remove_instance_variable :@_current_field_offset
+          if @_has_fields
+            remove_instance_variable :@_current_field_offset
+          end
+
           remove_instance_variable :@_table_design_in_progress
           remove_instance_variable :@_will_add_fields
 
@@ -162,10 +169,16 @@ module Skylab::Tabular
       end
 
       def __close
+
         remove_instance_variable :@_add_field
-        remove_instance_variable :@_input_offset_incrementor
-        @_will_add_fields =
-          remove_instance_variable( :@_mutable_will_add_fields ).freeze
+
+        if @_has_fields
+          remove_instance_variable :@_input_offset_incrementor
+          @_will_add_fields =
+            remove_instance_variable( :@_mutable_will_add_fields ).freeze
+        else
+          @_will_add_fields = EMPTY_A_
+        end
         NIL
       end
 

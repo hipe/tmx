@@ -332,8 +332,10 @@ module Skylab::Zerk
 
         -> row_rsx do
 
-          tm = row_rsx.row_typified_mixed_at_field_offset field_offset
-          if tm.is_numeric
+          tm = row_rsx.row_typified_mixed_at_field_offset_softly field_offset
+
+          if tm && tm.is_numeric
+
             d_or_f = tm.value
 
             if denom < d_or_f  # :#here2

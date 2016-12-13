@@ -18,3 +18,5 @@ join #open [#tab-003], is the acceptance of the below two.
 make report showing the relative weights of the changesets
 CLI-invoked general table renderer
 -1 integrate with modality
+[#tab-007.C] invalid numbers for -width, -page-size
+[#tab-007.A] negative numbers in target use case

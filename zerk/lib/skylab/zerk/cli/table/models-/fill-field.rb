@@ -398,8 +398,8 @@ module Skylab::Zerk
           @__arr = arr
         end
 
-        def row_typified_mixed_at_field_offset d
-          @__arr.fetch d
+        def row_typified_mixed_at_field_offset_softly d  # 2 defs here, 1x [ze]
+          @__arr[ d ]
         end
       end
 

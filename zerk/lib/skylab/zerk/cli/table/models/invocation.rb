@@ -135,6 +135,12 @@ module Skylab::Zerk
           :notes,
           :page_scanner,
         )
+
+        def grow_not_shrink
+          # "shrink" behavior [#050.F] is a parital code sketch.
+          # life will melt if you just flip this. this is just imaginary.
+          true
+        end
       # -
       # ==
 
@@ -265,43 +271,57 @@ module Skylab::Zerk
 
           def apply_feature ap, sf_idx
 
-            invo = ap.invocation
-
-            _design = ap.design
-
             ap.page_survey_choices.add_by :hook_for_end_of_page do |page_data|
 
-              fofl = invo.features_shared_store_read(
-                :_feature_lifecycle_for_field_observers_ )
+              # don't read from the features shared store until here -
+              # out above is isn't written yet.
 
-              _svcs = if fofl
-                FeatureServicesForClientFor_EoP_Plus___.new fofl, _design
-              else
-                FeatureServicesForClientFor_EoP_Minus__.new _design
-              end
-
-              _hi = sf_idx.mutate_page_data page_data, _svcs
-
-              # #todo (`_hi` is nil)
+              __apply_features_to_page page_data, ap, sf_idx
               NIL
             end
+          end
+
+          def __apply_features_to_page page_data, ap, sf_idx
+
+            invo = ap.invocation
+            b = invo.grow_not_shrink
+            design = ap.design
+
+            fofl = invo.features_shared_store_read(
+              :_feature_lifecycle_for_field_observers_ )
+
+            svcs = if fofl
+              FeatureServicesForClientFor_EoP_Plus___.new fofl, b, design
+            else
+              FeatureServicesForClientFor_EoP_Minus__.new b, design
+            end
+
+            _hi = sf_idx.mutate_page_data page_data, svcs
+
+            # #todo (`_hi` is nil)
             NIL
           end
         end  # >>
 
         class FeatureServicesForClientFor_EoP_Minus__
-          def initialize design
+
+          def initialize yes, design
             @design = design
+            @grow_not_shrink = yes
           end
-          attr_reader :design
+
+          attr_reader(
+            :grow_not_shrink,
+            :design,
+          )
         end
 
         class FeatureServicesForClientFor_EoP_Plus___ <
             FeatureServicesForClientFor_EoP_Minus__
 
-          def initialize lc, design
+          def initialize lc, yes, design
             @__lifecycle = lc
-            super design
+            super yes, design
           end
 
           def read_observer_ sym

@@ -115,13 +115,31 @@ module Skylab::Tabular::TestSupport
       end
     end
 
+    it "one empty tuple - nil" do
+      _wat = stats_via_these_ EMPTY_A_
+      _wat.nil? || fail
+    end
+
+    it "empty tuple and not empty tuple - as expected" do
+      a = []
+      a << [ 77, 'eightyeight' ]
+      a << EMPTY_A_
+      colA, colB = stats_via_these_ a
+      colA.number_of_numerics == 1 || fail
+      colB.number_of_cels == 1 || fail
+    end
+
     def stats_via_these_ a
 
       _ = _same_pipe
       _st = Stream_[ a ]
       _surveyed_page = _[ _st ]
-      _hi = _surveyed_page
-      _hi.every_survey_of_every_field
+      sp = _surveyed_page
+      if sp
+        sp.every_survey_of_every_field
+      else
+        sp
+      end
     end
 
     memoize :_same_pipe do
