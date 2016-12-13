@@ -51,6 +51,10 @@ module Skylab::Tabular::TestSupport
         :_target_final_width_was_not_specified_
       end
 
+      def the_empty_expression_agent_
+        THE_EMPTY_EXPRESSION_AGENT___
+      end
+
       def mags_
         Home_::Magnetics
       end
@@ -85,6 +89,12 @@ module Skylab::Tabular::TestSupport
 
       user_x
     end
+
+    # ==
+
+    module THE_EMPTY_EXPRESSION_AGENT___ ; class << self
+      alias_method :calculate, :instance_exec
+    end ; end
 
     # ==
   end

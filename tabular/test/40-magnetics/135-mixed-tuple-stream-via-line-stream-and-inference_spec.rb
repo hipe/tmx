@@ -66,6 +66,56 @@ module Skylab::Tabular::TestSupport
       end
     end
 
+    it "simple double quote, simple single quote" do
+
+      _init_stream_against_these_lines(
+        '"double quotes"',
+        "'single quotes'",
+      )
+
+      _expect_these_mixed_tuples do |y|
+        y << 'double quotes'
+        y << 'single quotes'
+      end
+    end
+
+    it "unclosed - fails" do
+
+      spy = _begin_failure_spy_via_lines(
+        '3 "double quo',
+      )
+
+      spy.expect :error, :expression, :parse_error, :non_terminated_quote do |y|
+        y.first == 'non terminated quote? "\"double quo"' || fail
+      end
+
+      _finish_failure_spy spy
+    end
+
+    def _begin_failure_spy_via_lines * lines
+
+      spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+
+      spy.call_by do |x|
+
+        _line_upstream = Stream_[ lines ]
+
+        _st = _subject_module.call(
+          _line_upstream, :_inference_not_yet_needed_, & spy.listener )
+
+        _should_be_unable = _st.gets
+
+        _should_be_unable  # #todo
+      end
+
+      spy
+    end
+
+    def _finish_failure_spy spy
+      _x = spy.execute_under self
+      _x == false || fail
+    end
+
     def _init_stream_against_these_lines * lines
 
       @__mt_st = _mixed_tuple_via_lines lines
@@ -100,6 +150,10 @@ module Skylab::Tabular::TestSupport
       if mt
         fail "expected no more but had #{ mt.inspect }"
       end
+    end
+
+    def expression_agent
+      the_empty_expression_agent_
     end
 
     def _subject_module
