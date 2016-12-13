@@ -43,6 +43,14 @@ module Skylab::Tabular::TestSupport
         end
       end
 
+      def page_size
+        :_page_size_was_not_specified_
+      end
+
+      def target_final_width
+        :_target_final_width_was_not_specified_
+      end
+
       def mags_
         Home_::Magnetics
       end

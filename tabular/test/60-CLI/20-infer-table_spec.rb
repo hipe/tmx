@@ -108,7 +108,7 @@ module Skylab::Tabular::TestSupport
 
       given do
         non_interactive do |y|
-          y << "secret-mock-key-1 32"
+          y << "jumanny-fumanny-1 32"
           y << "an-other-alternative 16"
         end
         argv '-w', '40'
@@ -117,7 +117,7 @@ module Skylab::Tabular::TestSupport
       it "(somewhat mocked)" do
 
                           #one456789ten3456789twenty6789thirty6789f
-        expect_on_stdout  "secret-mock-key-1     32  ++++++++++++++"
+        expect_on_stdout  "jumanny-fumanny-1     32  ++++++++++++++"
         expect_on_stdout  "an-other-alternative  16  +++++++       "
 
         # (summaries later, probably as an option.)

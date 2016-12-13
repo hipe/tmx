@@ -214,10 +214,6 @@ module Skylab::Tabular
     end
 
     # ==
-
-    EMPTY_A_ = []
-
-    # ==
   end
 end
 # #born during unification to replace ancient architecture that did similar

@@ -227,6 +227,11 @@ module Skylab::Tabular
 
     Basic = sidesys[ :Basic ]
 
+    String_scanner = Lazy_.call do
+      require 'strscan'
+      ::StringScanner
+    end
+
     Zerk = sidesys[ :Zerk ]
   end
 
@@ -235,6 +240,7 @@ module Skylab::Tabular
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
+  EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self

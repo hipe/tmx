@@ -59,7 +59,7 @@ module Skylab::Tabular::TestSupport
 
       _mt_st = _mixed_tuple_stream_via(
 
-        [ "secret-mock-key-2", 77, 'thing 1B', 12 ],
+        [ "jumanny-fumanny-2", 77, 'thing 1B', 12 ],
         [ "thing-2",           99, 'thing 2B', 16 ],
       )
 
@@ -69,7 +69,7 @@ module Skylab::Tabular::TestSupport
 
         _act_st = op.to_line_stream
         exp = TestSupport_::Expect_Line::Scanner.via_stream _act_st
-        exp << "secret-mock-key-2  77  +++   thing 1B  12  +++ "
+        exp << "jumanny-fumanny-2  77  +++   thing 1B  12  +++ "
         exp << "thing-2            99  ++++  thing 2B  16  ++++"
         exp.expect_no_more_lines
       end
