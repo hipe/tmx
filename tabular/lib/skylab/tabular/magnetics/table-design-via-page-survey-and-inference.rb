@@ -15,8 +15,8 @@ module Skylab::Tabular
     # is interesting and obliquely relevant.
 
     class << self
-      def call _1, _2, _3, _4
-        new( _1, _2, _3, _4 ).execute
+      def call is_first_page, is_last_page, ps, inf
+        new( is_first_page, is_last_page, ps, inf ).execute
       end
       alias_method :[], :call
       private :new
@@ -28,59 +28,9 @@ module Skylab::Tabular
         @is_first_page = is_first
         @is_last_page = is_last
         @page_surveyish = ps
-        @target_final_width = inf.target_final_width
       end
 
       def execute
-
-        # (this entire body changes when no more mocks)
-
-        inf = @inference
-        _key = if inf.SECRET_MOCK_KEY_IS_KNOWN
-          @inference.SECRET_MOCK_KEY
-        else
-          _s = @page_surveyish.peek_first_first_FOR_MOCK
-          _md = SECRET_MOCK_KEY_RX_.match _s
-          _md[ :key ].intern
-        end
-
-        send MOCKS___.fetch _key
-      end
-
-      MOCKS___ = {
-        :"1" => :__make_this_one_hardcoded_table_design_FOR_MOCK,
-        :"2" => :__make_this_other_hardcoded_table_design_FOR_MOCK,
-      }
-
-      def __make_this_one_hardcoded_table_design_FOR_MOCK
-
-        _make_this_table_design :not_numeric, :numeric
-      end
-
-      def __make_this_other_hardcoded_table_design_FOR_MOCK
-
-        _make_this_table_design :not_numeric, :numeric, :not_numeric, :numeric
-      end
-
-      def _make_this_table_design * sym_a
-
-        _w = remove_instance_variable :@target_final_width
-
-        design = @inference.define_table_design__ do |defn|
-
-          @_table_design_in_progress = defn
-
-          sym_a.each_with_index do |sym, d|
-            @_current_input_offset = d
-            send MOCK_OP_H___.fetch sym
-          end
-
-          remove_instance_variable :@_current_input_offset
-          remove_instance_variable :@_table_design_in_progress
-          defn.target_final_width _w
-        end
-
-        sf_idx = design.summary_fields_index__  # #todo - name change
 
         # our numeric visualizations are expressed through summary fields
         # (and this is the only way that summary fields are ever employed
@@ -89,57 +39,7 @@ module Skylab::Tabular
         # note that this is a function of the input data, so it's possible
         # that there are no numeric columns.
 
-        if sf_idx
-          sf_idx.mutate_page_data @page_surveyish, SimplifiedInvocation___[ design ]
-        end
-
-        design
-      end
-
-      MOCK_OP_H___ = {
-        not_numeric: :__add_non_numeric_field,
-        numeric: :__add_numeric_field,
-      }
-
-      def __add_numeric_field
-
-        defn = @_table_design_in_progress
-
-        defn.add_field  # numeric
-
-        att = Zerk_::CLI::HorizontalMeter::AddToTable.begin defn
-
-        _mp = @inference.max_share_meter_prototype__
-
-        att.meter_prototype _mp
-
-        input_offset_of_this_numeric_column = @_current_input_offset
-
-        att.for_input_at_offset input_offset_of_this_numeric_column
-
-        _fs = @page_surveyish.field_survey_writer.dereference(
-          input_offset_of_this_numeric_column )
-
-        _denom = _fs.minmax_max  # there's a lot that could be said here
-
-        att.add_field_using_denominator_by do
-          # ("column based resources" are available to you if you want them)
-          _denom
-        end
-        NIL
-      end
-
-      def __add_non_numeric_field
-
-        @_table_design_in_progress.add_field
-        NIL
-      end
-
-      SimplifiedInvocation___ = ::Struct.new :design  # we don't need to read observers here
-
-      def execute_COMING_SOON
-
-        mutable_design = MutableDesign___.new @inference
+        mutable_design = MutableDesign___.new @page_surveyish, @inference
 
         scn = @page_surveyish.field_survey_writer.to_field_survey_scanner
 
@@ -152,7 +52,6 @@ module Skylab::Tabular
             _field_survey,
             @inference,
           )
-
         end until scn.no_unparsed_exists
 
         mutable_design.flush_to_table_design
@@ -176,7 +75,8 @@ module Skylab::Tabular
 
       # -
 
-        _actual_ratio = fs.number_of_numerics.to_f / fs.number_of_cels
+        _number_of_numerics = fs.calculate_number_of_numerics
+        _actual_ratio = _number_of_numerics.to_f / fs.number_of_cels
 
         if inference.threshold_for_whether_a_column_is_numeric <= _actual_ratio
           mutable_design.add_field_pair_corresponding_to_numeric_input_field
@@ -191,64 +91,209 @@ module Skylab::Tabular
 
     class MutableDesign___
 
-      # keep track of A) thing ding and B) tring ding.
-
       # we are contemplating making this write to the table design DSL
       # within its define time
 
-      def initialize inference
-        @_field_addition_directives = []
+      def initialize ps, inference
+
+        @_add_field = :__add_first_field
+
         @inference = inference
+        @page_surveyish = ps
       end
 
       def add_field_pair_corresponding_to_numeric_input_field
-        @_field_addition_directives.push :__add_numeric_field
+
+        _add_field :field_corresponding_to_input
+        _add_field :max_share_visualization_of_previous_input_field
         NIL
       end
 
       def add_field_corresponding_to_non_numeric_input_field
-        @_field_addition_directives.push :__add_non_numeric_field
+
+        _add_field :field_corresponding_to_input
+        NIL
+      end
+
+      def _add_field * defn_sym_a
+        send @_add_field, defn_sym_a
+      end
+
+      def __add_first_field defn_sym_a
+        @_input_offset_incrementor = Incrementor__.new 0
+        @_mutable_will_add_fields = []
+        @_add_field = :__add_field_during_edit
+        send @_add_field, defn_sym_a
+      end
+
+      def __add_field_during_edit defn_sym_a
+        _fld = WillAddField___.new defn_sym_a, @_input_offset_incrementor
+        @_mutable_will_add_fields.push _fld
         NIL
       end
 
       def flush_to_table_design
 
-        @inference.SHIMMY_DIMMY_define_table do |defn|
-          @_table_design_definition = defn
-          @_input_field_count = 0
-          _sym_a = remove_instance_variable :@_field_addition_directives
-          _sym_a.each do |m|
-            send m
+        __close
+
+        design = @inference.define_table_design__ do |defn|
+
+          @_table_design_in_progress = defn
+
+          @_will_add_fields.each_with_index do |fld, d|
+            @_current_field_offset = d
+            send fld.method_name
           end
+
+          remove_instance_variable :@_current_field_offset
+          remove_instance_variable :@_table_design_in_progress
+          remove_instance_variable :@_will_add_fields
+
+          defn.target_final_width @inference.target_final_width
         end
+
+        sf_idx = design.summary_fields_index
+
+        if sf_idx
+          sf_idx.mutate_page_data @page_surveyish, SimplifiedInvocation___[ design ]
+        end
+
+        design
       end
 
-      def __add_numeric_field
+      def __close
+        remove_instance_variable :@_add_field
+        remove_instance_variable :@_input_offset_incrementor
+        @_will_add_fields =
+          remove_instance_variable( :@_mutable_will_add_fields ).freeze
+        NIL
+      end
 
-        @_table_design_definition.add_field
-        input_offset_of_the_field_we_just_added = @_input_field_count
-        @_input_field_count += 1
+      def __add_field_for_max_share_visualiztion_of_previous_field
 
-        # --
+        _prev_field = @_will_add_fields.fetch @_current_field_offset - 1
 
-        _proto = @inference.max_share_meter_prototype
+        d = _prev_field.input_offset  # d = input offset of referrant field
 
-        o = Zerk_::CLI::HorizontalMeter::AddToTable.begin(
-          @_table_design_definition,
-        )
+        att = Zerk_::CLI::HorizontalMeter::AddToTable.begin(
+          @_table_design_in_progress )
 
-        o.for_input_at_offset input_offset_of_the_field_we_just_added
+        att.meter_prototype @inference.max_share_meter_prototype__
+
+        att.for_input_at_offset d
+
+        _fs = @page_surveyish.field_survey_writer.dereference d
+
+        _denom = _fs.minmax_max  # there's a lot that could be said here
+
+        att.add_field_using_denominator_by do
+          # ("column based resources" are available to you if you want them)
+          _denom
+        end
 
         NIL
       end
 
-      def __add_non_numeric_field
-        @_table_design_definition.add_field
-        @_input_field_count += 1
+      def __add_field_corresponding_to_input
+        @_table_design_in_progress.add_field  # same for numeric or non-numeric
         NIL
       end
     end
 
+    # ==
+
+    SimplifiedInvocation___ = ::Struct.new :design  # we don't need to read observers here
+
+    # ==
+
+    class WillAddField___
+
+      def initialize defn_sym_a, counter
+        @_input_offset_incrementor = counter
+        @_did = false
+        @_mutex = nil
+        defn_sym_a.each do |sym|
+          send OP___.fetch sym
+        end
+        remove_instance_variable( :@_did ) || fail
+        remove_instance_variable :@_input_offset_incrementor
+        freeze
+      end
+
+      OP___ = {
+        field_corresponding_to_input: :__parse_field_corresponding_to_input,
+        max_share_visualization_of_previous_input_field:
+          :__parse_max_share_visualization_of_previous_input_field,
+      }
+
+      def __parse_max_share_visualization_of_previous_input_field
+        _mutex
+        @method_name = :__add_field_for_max_share_visualiztion_of_previous_field
+        NIL
+      end
+
+      def __parse_field_corresponding_to_input
+        _mutex
+        @_input_offset_incrementor.increment
+        _offset = @_input_offset_incrementor.read
+        @__input_offset_knownness = Common_::Known_Known[ _offset ]
+        @method_name = :__add_field_corresponding_to_input
+        NIL
+      end
+
+      def _mutex
+        remove_instance_variable :@_mutex
+        @_did = true ; nil
+      end
+
+      # -- read
+
+      def input_offset
+        @__input_offset_knownness.value_x
+      end
+
+      attr_reader(
+        :method_name,
+      )
+    end
+
+    # ==
+
+    class Incrementor__
+
+      def initialize d
+        @__initial_value = d
+        @_read = :__CANNOT_READ_WHEN_HAS_NOT_BEEN_INCREMENTED_ONCE
+        @_increment = :__first_increment
+      end
+
+      def increment
+        send @_increment
+      end
+
+      def __first_increment
+        @_integer = remove_instance_variable :@__initial_value
+        @_read = :__read_normally
+        @_increment = :__subsequent_increment
+        NIL
+      end
+
+      def __subsequent_increment
+        @_integer += 1 ; nil
+      end
+
+      def read
+        send @_read
+      end
+
+      def __read_normally
+        @_integer
+      end
+    end
+
+    # ==
+
+    # (keep while #open [#003]:)
 #==BEGIN interesting
       if false
       def entity_metrics sin

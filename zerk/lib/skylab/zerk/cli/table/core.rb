@@ -99,7 +99,7 @@ module Skylab::Zerk
         if @_has_defined_fields
           @_defined_field_offset_via_input_offset =
             @_defined_field_offset_via_input_offset.dup
-          @_defined_fields = @_defined_fields.dup
+          @all_defined_fields = @all_defined_fields.dup
         end
 
         if @summary_rows
@@ -123,7 +123,7 @@ module Skylab::Zerk
       end
 
       def __redefine_field_ d, p, x_a
-        @_defined_fields[ d ] = @_defined_fields.fetch( d ).redefine__ p, x_a
+        @all_defined_fields[ d ] = @all_defined_fields.fetch( d ).redefine__ p, x_a
         NIL
       end
 
@@ -134,7 +134,7 @@ module Skylab::Zerk
       def __accept_first_field p, x_a
         @_has_defined_fields = true
         @_defined_field_offset_via_input_offset = []
-        @_defined_fields = []
+        @all_defined_fields = []
         @_accept_field = :__accept_subsequent_field
         send @_accept_field, p, x_a
       end
@@ -164,10 +164,10 @@ module Skylab::Zerk
         # metadata. :[#050.D]
 
         if treat_as_plain_field
-          @_defined_field_offset_via_input_offset.push @_defined_fields.length
+          @_defined_field_offset_via_input_offset.push @all_defined_fields.length
         end
 
-        @_defined_fields.push fld
+        @all_defined_fields.push fld
         NIL
       end
 
@@ -189,7 +189,7 @@ module Skylab::Zerk
 
         if @_has_defined_fields
 
-          defined_fields = @_defined_fields
+          defined_fields = @all_defined_fields
           len = defined_fields.length
           d = -1
 
@@ -306,13 +306,13 @@ module Skylab::Zerk
         # nil) is at that offset.)
 
         if @_has_defined_fields
-          @_defined_fields.fetch d
+          @all_defined_fields.fetch d
         end
       end
 
       # ~ (emphasize the single points of contact (R [W]) for refactorability)
 
-      def summary_fields_index__
+      def summary_fields_index  # [ze] 1x, 1x here
         @__summary_fields_index
       end
 
@@ -336,12 +336,12 @@ module Skylab::Zerk
         d || self._SANITY  # #todo
 
         if @_has_defined_fields
-          @_defined_fields.fetch @_defined_field_offset_via_input_offset.fetch d
+          @all_defined_fields.fetch @_defined_field_offset_via_input_offset.fetch d
         end
       end
 
       def all_defined_fields  # assume.
-        @_defined_fields
+        @all_defined_fields
       end
     end
 

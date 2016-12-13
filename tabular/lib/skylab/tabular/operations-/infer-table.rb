@@ -379,7 +379,7 @@ module Skylab::Tabular
       end
     end
 
-    class Models_Inference___ < SimpleModel_
+    class Models_Inference___ < SimpleModel_  # #testpoint, too
 
       # this is a "full stack" "injector". it both provides runtime
       # parameters that are in some way variable (or not) and corrals
@@ -387,32 +387,11 @@ module Skylab::Tabular
       # many of the performers in one invocation, so that as implementation
       # details change, the centrality of this does not.
 
-      def initialize
-        @_secret_mock_key_knownness = nil
-        super
-      end
-
-      def SECRET_MOCK_KEY_IS_KNOWN
-        @_secret_mock_key_knownness && true
-      end
-
-      def SECRET_MOCK_KEY= x
-        @_secret_mock_key_knownness = Common_::Known_Known[ x ] ; x
-      end
-
-      def SECRET_MOCK_KEY
-        @_secret_mock_key_knownness.value_x
-      end
-
       attr_accessor(
         :page_size,
         :target_final_width,
         :threshold_for_whether_a_column_is_numeric,  # explained fully at [#004.B]
       )
-
-      def freeze  # only while SECRET_MOCK_KEY
-        NOTHING_
-      end
 
       def define_table_design__ & defn_p
 

@@ -260,7 +260,7 @@ module Skylab::Zerk
 
           def match_feature invo
 
-            invo.design.summary_fields_index__  # `sf_idx`
+            invo.design.summary_fields_index  # `sf_idx`
           end
 
           def apply_feature ap, sf_idx

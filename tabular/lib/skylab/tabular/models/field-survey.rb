@@ -169,9 +169,7 @@ module Skylab::Tabular
         @number_of_strings = @number_of_blank_strings +
           @number_of_nonblank_strings
 
-        @number_of_numerics = @number_of_zeros +
-          @number_of_nonzero_integers +
-          @number_of_nonzero_floats
+        @number_of_numerics = calculate_number_of_numerics
 
         remove_instance_variable :@hook_mesh
 
@@ -179,6 +177,15 @@ module Skylab::Tabular
       end
 
       # -- read
+
+      def calculate_number_of_numerics
+
+        # ([tab] needs to peek this before the page survey is finished)
+
+        @number_of_zeros +
+        @number_of_nonzero_integers +
+        @number_of_nonzero_floats
+      end
 
       attr_reader(
         :number_of_booleans,

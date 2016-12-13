@@ -35,13 +35,11 @@ module Skylab::Tabular
 
       def __when_one_line first_line
 
-        _matchdata = SECRET_MOCK_KEY_RX_.match first_line
+        _matchdata = SECRET_MOCK_KEY_RX___.match first_line
 
-        key = _matchdata[ :key ].intern
+        _key = _matchdata[ :key ].intern
 
-        @inference.SECRET_MOCK_KEY = key
-
-        wee = send MOCKS__.fetch key
+        wee = send MOCKS__.fetch _key
 
         p = -> do
           p = -> do
@@ -73,6 +71,13 @@ module Skylab::Tabular
         end
       end
     # -
+
+    # ==
+
+    SECRET_MOCK_KEY_RX___ = %r(\Asecret-mock-key-(?<key>[-a-z0-9A-Z_.]+))
+
+    # ==
+
 #==END coded just for mocking
   end
 end

@@ -11,10 +11,10 @@ module Skylab::Tabular
     #
     # justification
     #
-    # to render (for example) a max-share column requires aggragative,
+    # to render (for example) a max-share column requires aggregative,
     # "vertically derived" information that pertains to the whole "column"
     # (for some definition of column); in this case a max (and maybe one day
-    # a min).
+    # a min (#wish [#007.A])).
     #
     # normally a table design is defined statically, and then a stream of
     # page surveys is passed through the table design (in effect).
@@ -32,9 +32,9 @@ module Skylab::Tabular
     # rather than adding another pass to our pipeline just to solve for
     # "infer table", we solve this by injecting the subject into the survey
     # phase: we gather statistical information "optimistically" on the
-    # first pass; for every mixed cel that we read from the upstream (when
-    # that cel ends up being numeric); regardless of whether the final field
-    # ends up being numeric.
+    # first pass for every mixed cel that we read from the upstream (when
+    # that cel ends up being numeric), regardless of whether the final field
+    # (column) ends up being numeric.
     #
     # (note that any column could become a numeric column at any time based
     # on how `threshold_for_whether_a_column_is_numeric` works - you won't
@@ -42,8 +42,9 @@ module Skylab::Tabular
     # of the survey.)
     #
     # it's unlikely, but you might ask why don't we just push this
-    # functionality up into our field survey base class. the only reason we
-    # don't is so we have something to #exercise this field survey class
+    # functionality up into our field survey base class. the reason we don't
+    # is one of design: it's bad style to cram special-interest needs into
+    # our base class. instead we #exercise this field survey class
     # injection facility and field observer facility for inferred tables
     # and not, variously and respectively.
     #

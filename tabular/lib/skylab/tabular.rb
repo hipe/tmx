@@ -162,10 +162,6 @@ module Skylab::Tabular
     def to_typified_mixed_stream
       Stream_[ @_typified_mixed_array ]
     end
-
-    def peek_first_FOR_MOCK
-      @_typified_mixed_array.fetch( 0 ).value
-    end
   end
 
   Models::Typified = ::Module.new
@@ -244,6 +240,5 @@ module Skylab::Tabular
   Home_ = self
   NOTHING_ = nil
   UNABLE_ = false
-  SECRET_MOCK_KEY_RX_ = %r(\Asecret-mock-key-(?<key>[-a-z0-9A-Z_.]+))
   SPACE_ = ' '
 end
