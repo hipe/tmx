@@ -53,10 +53,10 @@ module Skylab::Zerk
         NOTHING_
       end
 
-      def parse_integer_  # assume nonempty. caller emits IFF result is NIL
+      def match_integer_
+        # 2 defs one call. assume nonempty. caller emits IFF result is nil #[#007.E]
         x = head_as_is
         if x.respond_to? :bit_length
-          advance_one
           x
         end
       end
@@ -84,6 +84,10 @@ module Skylab::Zerk
 
       def __receive_CPS_ sym
         @current_primary_symbol = sym ; nil
+      end
+
+      def expression_agent
+        API::ArgumentScannerExpressionAgent.instance
       end
 
       attr_reader(

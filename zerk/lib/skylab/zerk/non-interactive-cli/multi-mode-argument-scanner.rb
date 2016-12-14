@@ -296,10 +296,10 @@ module Skylab::Zerk
           Matcher___.new self, a
         end
 
-        def parse_integer_  # assume nonempty. caller emits IFF result is nil
+        def match_integer_
+          # 2 defs 1 call. assume nonempty. caller emits IFF result is nil #[#007.E]
           s = head_as_is
           if %r(\A-?\d+\z) =~ s  # ..
-            advance_one
             s.to_i
           end
         end
@@ -463,6 +463,11 @@ module Skylab::Zerk
           :listener,
           :no_unparsed_exists,
         )
+
+        def expression_agent
+          # (only for compat with [#007.D] primary value normalization)
+          NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
+        end
       end
 
       # ==

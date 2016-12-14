@@ -89,7 +89,7 @@ this facility is sensitive to:
     express this stack in a variety of ways.
 
   • the session can derive a "trilean" "polarity" (i.e negative,
-    neutral or postive) from a variety of characteristics of the
+    neutral or positive) from a variety of characteristics of the
     emission channel and/or (when event) the event properties.
 
     with this trilean value and a verb "lemma" that it derives

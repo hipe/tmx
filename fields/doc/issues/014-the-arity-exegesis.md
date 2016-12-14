@@ -60,7 +60,7 @@ parameter arity and "argument arity" (introduced below) with regards to
 the "polyadic arities", i.e having more than one thing.
 
 although at its essence an arity is formally defined (by us) to be a
-series of non-overlapping unbound postive ranges, in practice we often
+series of non-overlapping unbound positive ranges, in practice we often
 model arities as a [#hu-003] "category of exponents", i.e something like
 an "enum".
 

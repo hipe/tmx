@@ -103,13 +103,14 @@ module Skylab::Zerk
         sym = argument_scanner.current_primary_symbol
 
         argument_scanner.listener.call(
-          :error, :expression, :parse_error, :primary_value_not_provided
+          :error, :expression, :primary_parse_error, :primary_value_not_provided
         ) do |y|
 
-          _name = Common_::Name.via_variegated_symbol sym
-
-          y << "#{ say_primary_ _name } must be followed by an argument"
-
+          if sym
+            y << "#{ prim sym } must be followed by an argument"
+          else
+            y << "expected a value when input ended"
+          end
         end
         UNABLE_
       end

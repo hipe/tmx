@@ -137,6 +137,8 @@
 [#009] #in-progress this rewrite (and new architecture..)
 [#008] #open eventually de-dup this with [#sy-029] OGDL
 [#007]       "threads" (tracking tags for experimentals towards public API)
+             [#this.E] - this microconvention of nil-vs-false semantics (see)
+             [#this.D] - primary value parsing API
              #thread-three - nils vs. false
              #thread-two - `gets` resulting in `nil` == interrupt
              #!thread-one - used to be "hot model", now we use cold model

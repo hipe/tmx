@@ -39,7 +39,10 @@ module Skylab::Zerk
         k
       end
 
-      def parse_primary_value * x_a
+      def parse_primary_value * x_a, & p
+        if p
+          x_a.push p
+        end
         parse_primary_value_via_parse_request parse_parse_request x_a
       end
 
@@ -48,7 +51,7 @@ module Skylab::Zerk
       end
 
       def parse_primary_value_via_parse_request req
-        Here_::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]
+        Here_::Magnetics::PrimaryValue_via_ParseRequest[ self, req ]  # 1x
       end
 
       def when_missing_requireds * x_a

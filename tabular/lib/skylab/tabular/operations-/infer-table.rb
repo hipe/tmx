@@ -26,7 +26,7 @@ module Skylab::Tabular
           if @_operation.parse_arguments_for_operation_
             __send_request
           else
-            _express_usage_and_invite_to_help
+            _maybe_express_usage_and_invite_to_help
           end
         end
       end
@@ -149,7 +149,8 @@ module Skylab::Tabular
         stdin = remove_instance_variable :@stdin  # always and only ever here
         if stdin.tty?
           @stderr.puts "expecting STDIN"
-          @_exitstatus = _express_usage_and_invite_to_help
+          @_parse_error_symbol = :parse_error
+          @_exitstatus = _maybe_express_usage_and_invite_to_help
           UNABLE_
         else
           stdin
@@ -163,6 +164,7 @@ module Skylab::Tabular
         :expression == i_a.fetch( 1 ) || self._DO_ME
 
         if :error == i_a.first
+          @_parse_error_symbol = i_a.fetch 2
           @_exitstatus ||= GENERIC_ERROR_EXITSTATUS__
         end
 
@@ -182,9 +184,25 @@ module Skylab::Tabular
 
       # -- support
 
-      def _express_usage_and_invite_to_help
-        _express_usage
-        __invite_to_help
+      def _maybe_express_usage_and_invite_to_help
+
+        usage = true ; invite = true
+        case @_parse_error_symbol
+
+        when :primary_parse_error
+          # then a specific message was already emitted
+          usage = false
+
+        when :parse_error
+          # full monty
+
+        else
+          self._DECIDE_ME
+        end
+
+        usage and _express_usage
+        invite and __invite_to_help
+        GENERIC_ERROR_EXITSTATUS__
       end
 
       def _express_usage
@@ -366,27 +384,28 @@ module Skylab::Tabular
 
       def __at_width
         @_args.advance_one
-        _ = @_args.parse_primary_value :integer_that_is_postive_nonzero
+        _ = @_args.parse_primary_value :must_be_integer_that_is_positive_nonzero
         _store :@width, _
       end
 
       def __at_page_size
-        @_args.advance_one
-        d = @_args.parse_primary_value :integer_that_is_postive_nonzero
-        if d
-          __validate_page_size d
-        end
-      end
 
-      def __validate_page_size d
-        if PAGE_SIZE_MINIMUM__ <= d
-          @page_size = d ; ACHIEVED_
-        else
-          @_args.listener.call :error, :expression, :integer_out_of_range do |y|
-            PAGE_SIZE_MINIMUM__
+        @_args.advance_one
+
+        min = PAGE_SIZE_MINIMUM__
+
+        _d = @_args.parse_primary_value :must_be_integer, :must_be do |d, o|
+          if min <= d
+            d
+          else
+            o.primary_parse_error :custom_int_range do |y|
+              _ = o.subject_moniker
+              y << "#{ _ } must be at least #{ min } (had #{ d })"
+            end
           end
-          UNABLE_
         end
+
+        _store :@page_size, _d
       end
 
       def execute

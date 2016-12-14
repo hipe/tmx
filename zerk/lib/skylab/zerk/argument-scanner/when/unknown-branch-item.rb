@@ -16,7 +16,6 @@ module Skylab::Zerk
         #   - otherwise, we want this UI expression behavior between CLI
         #     and API to be identical (or more accurately, different in
         #     the regular way as per the respective expression agents).
-        #
 
         class << self
           alias_method :define, :new
