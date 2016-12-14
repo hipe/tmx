@@ -190,6 +190,24 @@ module Skylab::Zerk::TestSupport
         end
       end
 
+      it "how to negative" do
+
+        _matr = [
+          [ 'face', -20 ],
+          [ 'headless', 44.0 ],
+          [ 'zerk',  66 ],
+        ]
+
+        against_matrix_expect_lines_ _matr do |y|
+
+          y << "Subproduct  num test files                 "
+          y << "      face           -20    ---------------"
+          y << "  headless            44.0  •••••••••••----"
+          y << "      zerk            66    •••••••••••••••"
+          y << "   (total)            90.0                 "
+        end
+      end
+
       shared_subject :design_ish_ do
 
         table_module_.default_design.redefine do |defn|

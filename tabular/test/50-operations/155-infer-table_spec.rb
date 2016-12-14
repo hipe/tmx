@@ -55,6 +55,28 @@ module Skylab::Tabular::TestSupport
       expect_result NIL
     end
 
+    it "negatives OK" do
+
+      # we have our own adaptation to do for [#ze-050.2] (maybe a stub)
+      # and [#ze-059.1] "negative minimums"
+
+      _mt_st = _mixed_tuple_stream_via(
+        [ -20, "too cold to bike" ],
+        [ 0, "barely OK" ],
+        [ 30, "OK to bike" ],
+      )
+
+      call :infer_table, :mixed_tuple_upstream, _mt_st, :width, 28
+
+      finish_by do |op|
+        exp = _expecter_via_operation op
+        exp << "-20         too cold to bike"
+        exp << "  0  ++     barely OK       "
+        exp << " 30  +++++  OK to bike      "
+        exp.expect_no_more_lines
+      end
+    end
+
     it "double money" do
 
       _mt_st = _mixed_tuple_stream_via(
@@ -66,9 +88,7 @@ module Skylab::Tabular::TestSupport
       call :infer_table, :mixed_tuple_upstream, _mt_st, :width, 47
 
       finish_by do |op|
-
-        _act_st = op.to_line_stream
-        exp = TestSupport_::Expect_Line::Scanner.via_stream _act_st
+        exp = _expecter_via_operation op
         exp << "jumanny-fumanny-2  77  +++   thing 1B  12  +++ "
         exp << "thing-2            99  ++++  thing 2B  16  ++++"
         exp.expect_no_more_lines
@@ -92,8 +112,7 @@ module Skylab::Tabular::TestSupport
       )
 
       finish_by do |op|
-        _act_st = op.to_line_stream
-        exp = TestSupport_::Expect_Line::Scanner.via_stream _act_st
+        exp = _expecter_via_operation op
         exp << "one    two "
         exp << "three  four"
         exp << "           "
@@ -117,14 +136,17 @@ module Skylab::Tabular::TestSupport
       )
 
       finish_by do |op|
-        _act_st = op.to_line_stream
-        exp = TestSupport_::Expect_Line::Scanner.via_stream _act_st
+        exp = _expecter_via_operation op
         exp << "| one   | two |"
         exp << "| three |     |"
         exp.expect_no_more_lines
       end
     end
 
+    def _expecter_via_operation op
+      _act_st = op.to_line_stream
+      TestSupport_::Expect_Line::Scanner.via_stream _act_st
+    end
 
     def _mixed_tuple_stream_via * a_a
       Stream_[ a_a ]

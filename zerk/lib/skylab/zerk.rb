@@ -41,6 +41,25 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
+  # == model support
+
+  class SimpleModel_  # EXPERIMENT import from [tab]
+
+    class << self
+      alias_method :define, :new
+      undef_method :new
+    end  # >>
+
+    def initialize  # (a suggestion)
+      yield self
+      freeze
+    end
+
+    # redefine ..
+
+    private :dup
+  end
+
   # == functions
 
   Begin_fuzzy_retrieve_ = -> & any_oes_p do

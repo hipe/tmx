@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI
 
-    class HorizontalMeter
+    class HorizontalMeter  # notes at [#059]
 
       # formerly known as a "lipstick", this simple ASCII visualization is
       # typically used to show a "max share meter" in a table (which is
@@ -28,6 +28,7 @@ module Skylab::Zerk
 
       # -
         def initialize
+          @_additive_normalizer_rational = nil
           NOTHING_  # hi.
         end
 
@@ -55,8 +56,17 @@ module Skylab::Zerk
 
         METER_ATTRIBUTES___ = [
           :denominator,
+          :negative_minimum,
           * plain_old_writers,
         ]
+
+        def negative_minimum= d  # see [#059.A] about topic
+          if -1 < d
+            self._ARGUMENT_ERROR__negative_minimum_must_be_negative
+          end
+          @_additive_normalizer_rational = Rational( -d )
+          d
+        end
 
         def denominator= x
           @_user_denominator_rational = Rational( x )
@@ -72,6 +82,10 @@ module Skylab::Zerk
           # (this method name is as it is only because of `String#%`)
 
           user_x_rational = Rational( x )
+
+          if @_additive_normalizer_rational
+            user_x_rational += @_additive_normalizer_rational
+          end
 
           user_width_of_right_hand_side_rational =
             @_user_denominator_rational - user_x_rational
@@ -232,7 +246,7 @@ module Skylab::Zerk
           @table_design_DSL.add_field_observer(
             @observer_key,
             :for_input_at_offset, @for_input_at_offset,
-            & For_table_page_column_build_new_observation_of_max
+            & For_table_page_column_build_new_observation_of_max___
           )
           NIL
         end
@@ -241,31 +255,46 @@ module Skylab::Zerk
 
           _observer_key = @observer_key
 
-          add_field_using_denominator_by do |col_rsx|
+          add_field_derived_from_min_and_max_by do |col_rsx|
             col_rsx.read_observer _observer_key
           end
           NIL
         end
 
-        def add_field_using_denominator_by
+        def add_field_derived_from_min_and_max_by  # 1x [tab] 1x here
 
           @table_design_DSL.add_field(
             :fill_field,
             :order_of_operation_next,
           ) do |col_rsx|
 
-            _cel_width = col_rsx.width_allocated_for_this_column
+            # what we do now with the min and max is exactly the subject
+            # of [#059.1] "negative minimums", and [#050.2] (maybe a stub)
 
-            _denominator = yield col_rsx
+            min, max = yield col_rsx
+
+            if 0 > min
+
+              min_rational = Rational( min )
+              denominator = Rational( max ) - min_rational  # ..
+              negative_minimum = min_rational
+            else
+
+              denominator = max
+              negative_minimum = NOTHING_
+            end
 
             _field_offset = col_rsx.field_offset_via_input_offset__ @for_input_at_offset
 
-            Build_cel_renderer___.call(
-              _cel_width,
-              _denominator,
-              _field_offset,
-              @meter_prototype,
-            )
+            _cel_width = col_rsx.width_allocated_for_this_column
+
+            BuildCelRenderer___.define do |o|
+              o.cel_width = _cel_width
+              o.denominator = denominator
+              o.field_offset = _field_offset
+              o.meter_prototype = @meter_prototype
+              o.negative_minimum = negative_minimum
+            end.execute
           end
         end
 
@@ -276,20 +305,33 @@ module Skylab::Zerk
 
       # ==
 
-      For_table_page_column_build_new_observation_of_max = -> o do
+      For_table_page_column_build_new_observation_of_max___ = -> o do
 
         # (you might want to push this up to be a common observation function :#spot-8)
 
-        max = 0.0  # (might change to integer whenever)
+        min = nil ; max = nil
+
+        see_normally = -> num do
+          if max < num
+            max = num
+          elsif min > num
+            min = num
+          end
+        end
+
+        see = -> num do
+          min = num ; max = num
+          see = see_normally
+        end
 
         o.on_typified_mixed do |tm|
-          if tm.is_numeric && max < tm.value
-            max = tm.value
+          if tm.is_numeric
+            see[ tm.value ]
           end
         end
 
         o.read_observer_by do
-          max
+          [ min, max ]  # #here-1
         end
 
         NIL
@@ -321,14 +363,30 @@ module Skylab::Zerk
                   # presumably it's a max share viz. and not a total share viz.)
                   # :#here-2
 
-      Build_cel_renderer___ = -> cel_width, denom, field_offset, meter_prototype do
+      class BuildCelRenderer___ < SimpleModel_
 
-        meter_format = meter_prototype.redefine do |o|
-          o.denominator denom
-          o.target_final_width cel_width
+        def initialize
+          @negative_minimum = nil
+          super
         end
 
-        empty_placeholder = SPACE_ * cel_width
+        attr_writer(
+          :cel_width,
+          :denominator,
+          :field_offset,
+          :meter_prototype,
+          :negative_minimum,
+        )
+
+        def execute
+
+          field_offset = @field_offset
+          meter_format = __meter_format
+          max = __max
+
+        # -
+
+        empty_placeholder = SPACE_ * @cel_width
 
         -> row_rsx do
 
@@ -338,7 +396,7 @@ module Skylab::Zerk
 
             d_or_f = tm.value
 
-            if denom < d_or_f  # :#here2
+            if max < d_or_f  # :#here-2
 
               empty_placeholder
             else
@@ -346,6 +404,32 @@ module Skylab::Zerk
             end
           else
             empty_placeholder
+          end
+        end
+        # -
+        end
+
+        def __meter_format
+
+          @meter_prototype.redefine do |o|
+
+            d = @negative_minimum
+            if d
+              o.negative_minimum d
+            end
+
+            o.denominator @denominator
+            o.target_final_width @cel_width
+          end
+        end
+
+        def __max
+          max = @denominator
+          d = @negative_minimum
+          if d
+            max + d
+          else
+            max
           end
         end
       end

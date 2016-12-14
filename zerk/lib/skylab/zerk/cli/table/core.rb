@@ -347,25 +347,6 @@ module Skylab::Zerk
 
     # ==
 
-    class SimpleModel_  # EXPERIMENT import from [tab]
-
-      class << self
-        alias_method :define, :new
-        undef_method :new
-      end  # >>
-
-      def initialize  # (a suggestion)
-        yield self
-        freeze
-      end
-
-      # redefine ..
-
-      private :dup
-    end
-
-    # ==
-
     Require_tabular_ = Lazy_.call do
       Tabular_ = Home_.lib_.tabular ; nil
     end

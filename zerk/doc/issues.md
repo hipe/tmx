@@ -1,3 +1,5 @@
+[#059]       horizontal meter (née "lipstick")
+
 [#058] #open the fix for a summary row (total) and a summary field (fill) is nasty
 
 [#057] #wish how hard would it be to access the hook mesh pipeline and
@@ -34,9 +36,6 @@
 [#050] #open new table rendering logic as indicated is redundant with [#this]
              as indicated in this sidesystem.
              ( #was: the eventual home of unified table support. now: [#tab-001] )
-
-       #open [#050.A] some ancient tests are awaiting grind-down for
-             custom formulizer thing
 
 [#049] #open it would nice if ACS-as-operation could express the parameter
              arity of their components somehow

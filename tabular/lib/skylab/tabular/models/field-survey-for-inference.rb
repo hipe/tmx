@@ -13,8 +13,8 @@ module Skylab::Tabular
     #
     # to render (for example) a max-share column requires aggregative,
     # "vertically derived" information that pertains to the whole "column"
-    # (for some definition of column); in this case a max (and maybe one day
-    # a min (#wish [#007.A])).
+    # (for some definition of column); in this case the min and max numeric
+    # values seen in the column (tracked here under [#ze-059.1]).
     #
     # normally a table design is defined statically, and then a stream of
     # page surveys is passed through the table design (in effect).
@@ -104,7 +104,7 @@ module Skylab::Tabular
     end
 
     def on_typeish_zero number
-      send @_see_minmax, d
+      send @_see_minmax, number
       super
     end
 

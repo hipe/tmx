@@ -195,13 +195,25 @@ module Skylab::Tabular
 
         att.for_input_at_offset d
 
-        _fs = @page_surveyish.field_survey_writer.dereference d
+        fs = @page_surveyish.field_survey_writer.dereference d
 
-        _denom = _fs.minmax_max  # there's a lot that could be said here
+        # what we do now with the min and max is exactly the subject
+        # of [#059.1] "negative minimums", and [#050.2] (maybe a stub).
+        # but you see none of that here. it all happens there.
 
-        att.add_field_using_denominator_by do
+        _min = fs.minmax_min
+        _max = fs.minmax_max
+
+        min_and_max_once_sanity = -> do
+          min_and_max_once_sanity = nil
+          [ _min, _max ]
+        end
+
+        att.add_field_derived_from_min_and_max_by do
+
           # ("column based resources" are available to you if you want them)
-          _denom
+
+          min_and_max_once_sanity[]
         end
 
         NIL

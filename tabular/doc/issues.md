@@ -2,8 +2,8 @@
 
 [#007]       internal. (as soon as you want to publicize any of these,
              give them a toplevel number)
-       #open :[#this.A]: take `min` into account in max-share meters
-             negative numbers in target use case currently bork
+       #open :[#this.A]: what's going on with "wider" tables? my request
+                         for width 80 is giving me 82. meh minor.
        #wish :[#this.B]: probably largely redundant with OGDL parser
        #hole :[#this.C]:
        #open :[#this.D]: we probably should not be rolling our own help screen

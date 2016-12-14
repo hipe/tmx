@@ -219,9 +219,13 @@ be choppier (because each page is rendered to fit only its
 content); however we don't have the problem of an ever-growing
 table.
 
-since we aren't sure which we want but we have good arguments
-on both sides (and we might even make this a configurable boolean
-in the design), we'll ..
+presently the rendering pipeline is semi hard coded to effect
+the "ever-widening" behavior model. there is a reader method
+(on the design? on the invocation?) to indicate which model to
+use, and if it were to be flipped to say to use the other model,
+some parts might work (unfinished code sketch) but ultimately
+it would almost certain melt down somewhere. longer term we would
+like to support both.
 
 
 
@@ -250,3 +254,10 @@ surveys after that array has been expanded..
   - there was a tiny bug :[#here.H.1]
 
   - changing widths (shrinking widths) hotfixes :[#here.H.2]
+
+
+
+## the fill column API near a denominator term :[#here.2]
+
+  - used to be just "denominator", now is a two-tuple..
+  - for now, we want "min" and "max" but this is in flux
