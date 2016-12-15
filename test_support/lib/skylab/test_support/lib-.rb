@@ -64,6 +64,7 @@ module Skylab::TestSupport
     end
 
     System_lib = sidesys[ :System ]
+    Tabular = sidesys[ :Tabular ]
     Task = sidesys[ :Task ]
     TMX = sidesys[ :TMX ]
     Zerk = sidesys[ :Zerk ]

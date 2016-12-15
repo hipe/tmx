@@ -1,6 +1,7 @@
 [#033]       explaining the enhance method ..
 [#024]       the bundle fancy lookup exegesis ..
 [#023]       baseless collection ..
+[#011] #open legacy table for a help screen is not covered
 [#010]       bundle defined ..
 [#009]       pros and const of the add method pattern
 [#008]       delegation ..

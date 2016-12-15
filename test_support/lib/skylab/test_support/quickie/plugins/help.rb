@@ -47,6 +47,8 @@ module Skylab::TestSupport
 
       def beginning_eventpoint_notify
 
+        self._THIS_TABLE_IS_NOT_COVERED__and_needs_to_be_modernized__  # open [#030]
+
         usage
 
         @y << "options:"

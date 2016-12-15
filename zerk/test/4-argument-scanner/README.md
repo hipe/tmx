@@ -1,3 +1,4 @@
+  40s - public magnetics
   50 - etc via hash
   52 - etc via participating operation
   54 - etc via a.l module

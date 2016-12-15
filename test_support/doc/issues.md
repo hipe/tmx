@@ -43,7 +43,8 @@
 [#031] #open sunset io spy `qualified_knownness` for io spy group, re-purpose former to house mocks
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 
-[#030] #hole ( #moved-to: [#dt-xxx] )
+[#030] #open legacy table rendering of some help screen is not covered
+             ( #was: #moved-to: [#dt-xxx] )
 
 [#029]       #track the 'expect' omnibus and narrative ..
 [#028]   #watching what do we have to do to get our custom predicates to

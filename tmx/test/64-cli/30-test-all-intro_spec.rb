@@ -21,9 +21,9 @@ module Skylab::TMX::TestSupport
         same = '-test-directory'
         invoke( * _subject_operation, same, dir2, same, dir, '-verbose' )  # (exactly one v is necessary)
 
-        expect_on_stdout :<<, %r(\A\| +Test directory \| Number of test files \|  \|\n\z)  # KNOWN ISSUE
+        expect_on_stdout %r(\A[ ]+Test directory[ ][ ]Number of test files[ ]{3,}\z)
 
-        same = %r(\A\| +[^ ]+ \| +\d+ \| [*-]+ \|\n\z)
+        same = %r(\A[ ]*[^ ]+[ ]{2,}\d+[ ][ ][-*]+\z)
         expect same
         expect same
 

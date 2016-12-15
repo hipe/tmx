@@ -12,7 +12,3 @@ use [sa] to convert etc to Stream_
 -3.2 omni help screen system [#tmx-018]
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
-make tuple pager ([ze]) fit in with statistics
-git rebase and squash around the other guys appropriately
-join #open [#tab-003], is the acceptance of the below two.
-make report showing the relative weights of the changesets

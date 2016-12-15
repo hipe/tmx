@@ -31,6 +31,8 @@ module Skylab::SubTree
       _System_lib[].services
     end
 
+    Zerk = sidesys[ :Zerk ]
+
     INSTANCE = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )  # at the end
 

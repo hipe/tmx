@@ -1405,7 +1405,7 @@ module Skylab::Brazen
 
       def _help_syntax_string  # (2x here)
 
-        help = _to_full_inferred_property_stream.each.detect do | prp |
+        help = _to_full_inferred_property_stream.to_enum.detect do |prp|
           :help == prp.name_symbol
         end
 

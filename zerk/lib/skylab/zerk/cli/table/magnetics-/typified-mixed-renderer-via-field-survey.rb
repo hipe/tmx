@@ -123,7 +123,10 @@ module Skylab::Zerk
           # the note and not the survey after here.
           #
           # this "widening" across pages was the central mechanical innovation
-          # of [tagged]. eventually we'll dry that up with this. :[#050].
+          # of #open [#058] (as referenced). eventually we'll dry that up with
+          # this by making that use this.
+          #
+          # dedicated doc node on widening vs reclaiming: [#050.F]
 
           now = @field_survey.width_of_widest_string
 

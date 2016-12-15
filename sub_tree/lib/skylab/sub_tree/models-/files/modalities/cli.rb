@@ -25,7 +25,7 @@ module Skylab::SubTree
 
         def ___build_row_string_array
 
-          row_s_a = []
+          string_matrix = []
 
           @line_item_array.each do | line_item |
 
@@ -45,30 +45,34 @@ module Skylab::SubTree
               EMPTY_S_
             end )
 
-            row_s_a.push cel_a
+            string_matrix.push cel_a
           end
 
-          row_s_a
+          string_matrix
         end
 
         TWO_SPACES___ = '  '
 
-        def __render_table_via_row_string_array row_s_a
+        def __render_table_via_row_string_array string_matrix
 
-          _ = Home_.lib_.brazen::CLI_Support::Table::Actor
+          _Zerk_lib = Home_.lib_.zerk
 
-          _[
+          _design = _Zerk_lib::CLI::Table::Design.define do |o|
 
-            :left, EMPTY_S_, :sep, EMPTY_S_, :right, NEWLINE_,
+            o.separator_glyphs EMPTY_S_, EMPTY_S_, NEWLINE_
 
-            :header, :none,
-            :field, :left,
-            :field, :left,
+            o.add_field :left
+            o.add_field :left
+          end
 
-            :read_rows_from, row_s_a,
+          _mt_st = Common_::Stream.via_nonsparse_array string_matrix
 
-            :write_lines_to, @downstream_yielder,
-          ]
+          st = _design.line_stream_via_mixed_tuple_stream _mt_st
+          y = @downstream_yielder
+          while line = st.gets
+            y << line
+          end
+          y
         end
       end
     end

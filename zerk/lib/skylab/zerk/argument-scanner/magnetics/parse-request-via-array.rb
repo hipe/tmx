@@ -22,9 +22,13 @@ module Skylab::Zerk
 
         def __has_options
           x_a = remove_instance_variable :@option_array
-          if x_a.length.nonzero?
+          if x_a.length.zero?
+            @successful_result_will_be_wrapped = true
+            false
+          else
             @_scn = Common_::Polymorphic_Stream.via_array x_a
-            ACHIEVED_
+            @successful_result_will_be_wrapped = false
+            true
           end
         end
 
@@ -121,6 +125,7 @@ module Skylab::Zerk
 
         attr_reader(
           :normalization_chain,
+          :successful_result_will_be_wrapped,
           :use_method,
         )
       # -

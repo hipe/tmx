@@ -1,6 +1,6 @@
 # CLI table notes :[#050]
 
-## scope of this documet
+## scope of this document
 
 the official toolkit for tables is [tab] and so the central document
 for modality-agnostic tablism is [#tab-001]. what is here is only for
@@ -205,6 +205,8 @@ we know what we want but not necessarily how best to get there.
 
 ## ever-widening vs. reclaiming width :[#here.F]
 
+(additional relevant comments in code reference this tag.)
+
 it's up for debate whether we want columns to be ever-widening
 across pages, or whether we want to allow columns to shrink
 back down to content (to "reclaim width") from page to page.
@@ -261,3 +263,9 @@ surveys after that array has been expanded..
 
   - used to be just "denominator", now is a two-tuple..
   - for now, we want "min" and "max" but this is in flux
+
+
+
+## nasty case of a "total" cel plus visualization [#here.I]
+
+explanation is inline. :#table-coverpoint-I-1

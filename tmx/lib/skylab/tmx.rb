@@ -126,7 +126,7 @@ module Skylab::TMX
     x = @argument_scanner.parse_primary_value_via_parse_request req
 
     if x
-      if ! req.must_be_trueish
+      if req.successful_result_will_be_wrapped
         x = x.value_x
       end
       instance_variable_set ivar, x

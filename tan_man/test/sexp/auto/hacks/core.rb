@@ -193,7 +193,7 @@ module Skylab::TanMan::TestSupport
 
   Find_new_before_this_item__ = -> recursive_list, string, k do  # (was once same as [#071])
 
-    node = recursive_list.to_node_stream_.each.detect do | node_ |
+    node = recursive_list.to_node_stream_.to_enum.detect do | node_ |
 
       if node_[ k ]  # else might be an artificial empty starter stub
         -1 == ( string <=> node_[ k ].unparse )

@@ -1,6 +1,8 @@
 [#059]       horizontal meter (née "lipstick")
 
-[#058] #open the fix for a summary row (total) and a summary field (fill) is nasty
+[#058] #open make tuple pager ([ze]) fit in with statistics
+             new table rendering logic as indicated is redundant with [#this]
+             as indicated in this sidesystem.
 
 [#057] #wish how hard would it be to access the hook mesh pipeline and
              rendering guys when making the summary results (in #table)?
@@ -33,9 +35,9 @@
 
              was: track simplified boxxy-like producers of primary hashes.
 
-[#050] #open new table rendering logic as indicated is redundant with [#this]
-             as indicated in this sidesystem.
+[#050]       [ CLI table notes ]  (closely related: [#tab-001])
              ( #was: the eventual home of unified table support. now: [#tab-001] )
+
 
 [#049] #open it would nice if ACS-as-operation could express the parameter
              arity of their components somehow
@@ -136,6 +138,7 @@
 [#009] #in-progress this rewrite (and new architecture..)
 [#008] #open eventually de-dup this with [#sy-029] OGDL
 [#007]       "threads" (tracking tags for experimentals towards public API)
+       #wish [#this.F] (crossreference to [#050.I]) total cels plus viz
              [#this.E] - this microconvention of nil-vs-false semantics (see)
              [#this.D] - primary value parsing API
              #thread-three - nils vs. false

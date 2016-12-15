@@ -61,9 +61,9 @@ module Skylab::TestSupport
 
       def __build_table_schema
 
-        Require_zerk_[]  # [tmx]
+        _Tabular = Home_.lib_.tabular
 
-        Zerk_::CLI::Table::Models::Schema.define do |o|
+        _Tabular::Models::TableSchema.define do |o|
           # (the below order must accord with :#here)
           o.add_field_via_normal_name_symbol :test_directory
           o.add_field_via_normal_name_symbol :number_of_test_files, :numeric

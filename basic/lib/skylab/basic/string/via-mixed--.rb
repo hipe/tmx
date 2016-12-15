@@ -75,7 +75,15 @@ module Skylab::Basic
         # -- apply
 
         def to_proc
-          method :against
+
+          # (you can't just say `method :against` - result must be an actual
+          # proc so that it can be used as an argument to `define_method`.)
+          # (covered by [st])
+
+          me = self
+          -> x do
+            me.against x
+          end
         end
 
         def against x

@@ -361,7 +361,7 @@ module Skylab::Zerk
                   # discern easily that this is a summary row and that we
                   # should not give it the same visualization (because
                   # presumably it's a max share viz. and not a total share viz.)
-                  # :#here-2
+                  # :#table-coverpoint-I-2
 
       class BuildCelRenderer___ < SimpleModel_
 
@@ -396,8 +396,8 @@ module Skylab::Zerk
 
             d_or_f = tm.value
 
-            if max < d_or_f  # :#here-2
-
+            if max < d_or_f
+              # probably nasty case :#table-coverpoint-I-1, a total cel
               empty_placeholder
             else
               meter_format % d_or_f

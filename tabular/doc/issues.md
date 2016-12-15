@@ -14,11 +14,13 @@
 
 [#004]       "infer table" untility
 
-[#003] #open major milestone (in stack) (referended in [ze])
-             is the target use case of "infer-table" (has internal asset nodes too)
+[#003] #open cross-reference: [#ze-058]  (the work is more theirs than ours)
+             make tuple pager ([ze]) fit in with statistics
+
+             (#was: major milestone (in stack) (referended in [ze])
+             is the target use case of "infer-table" (has internal asset nodes too) )k
 
 [#002] #open investigate redundancy between old schema
-             after: [#003]
              ( #was: joinpoints for final unification )
 
 [#001]       [ README ]

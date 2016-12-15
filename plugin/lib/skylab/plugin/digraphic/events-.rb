@@ -195,6 +195,8 @@ module Skylab
 
           def __render_options
 
+            self._NOT_COVERED__and_when_you_do_you_need_to_modernize_the_table__  # #open [#011]
+
             y = @y
 
             @content_has_been_displayed and y << "\n"

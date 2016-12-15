@@ -51,7 +51,7 @@ module Skylab::CodeMetrics
         if ok
 
           totes = @_totes
-          _d = totes.to_child_stream.each.reduce 0 do | m, cx |
+          _d = totes.to_child_stream.to_enum.reduce 0 do | m, cx |
             m + cx.count
           end
           totes.count = _d

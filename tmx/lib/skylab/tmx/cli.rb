@@ -547,58 +547,49 @@ module Skylab::TMX
 
       def __attempt_to_render_a_table_in_a_general_way row_st
 
-        # just a sketch
+        # experimental - make a table design from the emitted table
+        # schema, including "max share meters"
 
-        defn = []
+        _design = Zerk_::CLI::Table::Design.define do |defn|
 
-        d = 0 ; yes = false
+          defn.separator_glyphs NOTHING_, SPACE_ * 2 , NOTHING_
 
-        _ts = remove_instance_variable :@_table_schema
-        box = _ts.field_box
-        box.each_value do |fld|
+          _ts = remove_instance_variable :@_table_schema
+          _bx = _ts.field_box
+          _bx.to_enum( :each_value ).each_with_index do |fld, input_offset|
 
-          if fld.is_numeric
-            d += 1
-            yes = true
-          else
-            yes = false
+            label = UC_first___[ fld.name.as_human ]
+
+            if fld.is_numeric
+
+              defn.add_field :right, :label, label
+
+              if @_do_lipstick
+
+                Zerk_::CLI::HorizontalMeter.
+                    add_max_share_meter_field_to_table_design defn do |o|
+
+                  o.for_input_at_offset input_offset
+                  o.foreground_glyph '*'
+                  o.background_glyph DASH_
+                end
+              end
+            else
+              defn.add_field :right, :label, label
+            end
+
+            _width = Home_.lib_.brazen::CLI.some_screen_width
+
+            defn.target_final_width _width
           end
-
-          defn.push :field, :right, :label, UC_first___[ fld.name.as_human ]
         end
 
-        if @_do_lipstick && 1 == d
+        st = _design.line_stream_via_mixed_tuple_stream row_st
 
-          # for now we render "lipstick" only if and always if there is
-          # exactly one numeric field, and it is last, and the -verbose
-          # primary was used past some threshold number of times.
-
-          # add a whole cel to each row dedicated to being rendered as lipstick:
-
-          read_rows_from = row_st.map_by do |muta_a|
-            muta_a.push muta_a.last
-            muta_a
-          end
-
-          _width = Home_.lib_.brazen::CLI.some_screen_width
-
-          defn.push(
-            :target_width, _width,
-            :field, :gather_statistics,
-            :max_share_meter,
-              :of_column, box.length,  # selfsame column
-              :glyph, '*',
-              :background_glyph, '-',
-          )
-        else
-          read_rows_from = row_st
+        while line = st.gets
+          @sout.puts line
         end
 
-        defn.push(
-          :read_rows_from, read_rows_from,
-          :write_lines_to, @sout,
-        )
-        CLI_support_[]::Table::Actor.call_via_arguments defn
         NIL
       end
 

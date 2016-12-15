@@ -76,10 +76,6 @@ module Skylab::Zerk::TestSupport
       def _ze_niCLI_client
         @ze_niCLI_client ||= Client_for_Expectations_of_Invocation.new
       end
-
-      def zerk_niCLI_fail_early_stdin
-        :_ze_NO_
-      end
     # -
     # ==
 
@@ -269,7 +265,15 @@ module Skylab::Zerk::TestSupport
 
         spy = Spy___.new setup, tc
 
-        _stdin = tc.zerk_niCLI_fail_early_stdin
+        _stdin = if tc.respond_to? :zerk_niCLI_fail_early_stdin
+
+          # mocking stdin is something that is done so rarely in practice
+          # that we make this a #hook-in not #hook-out so that test contexts
+          # can test under themselves without needing to define this method.
+          tc.zerk_niCLI_fail_early_stdin
+        else
+          :_ze_stdin_is_NOT_mocked_but_could_be_
+        end
 
         cli = classish.new(
           argv,
@@ -905,7 +909,7 @@ module Skylab::Zerk::TestSupport
 
       def say_all_but sym
         a = [ _inspectable_ ]
-        sym_a = %i( method_name, serr_or_sout )
+        sym_a = %i( method_name serr_or_sout )
         d = sym_a.index sym
         sym_a[ d, 1 ] = EMPTY_A_
         sym_a.each do |sym_|
