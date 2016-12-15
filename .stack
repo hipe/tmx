@@ -18,4 +18,3 @@ use [sa] to convert etc to Stream_
 ((-4     [cm] tree data via const path ))
 ((-5     [cm] shapes-layers via hard-coded tree data ))
 ((-6     [cm] ASCII matrix via hard-coded shapes-layers ))
-((-7     [cm] mocked CLI client that outputs hard-coded ASCII matrix ))

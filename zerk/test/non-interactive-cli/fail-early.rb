@@ -641,6 +641,11 @@ module Skylab::Zerk::TestSupport
 
       def __receive em
 
+        s = em.string
+        if ! s.frozen?
+          s.chomp!  # we become indifferent!! EEK for [cm] #todo
+        end
+
         @_reusable_assertion.actual_emission = em
         @_reusable_assertion.execute
 

@@ -226,7 +226,7 @@ module Skylab::CodeMetrics
 
           _target_final_width = _lookup_expression_width
 
-          _design = Home_.lib_.zerk::CLI::Table::Design.define do |defn|
+          _design = Zerk_lib_[]::CLI::Table::Design.define do |defn|
 
             defn.separator_glyphs '| ', ' | ', ' |'
 
@@ -325,7 +325,7 @@ module Skylab::CodeMetrics
 
           _target_final_width = _lookup_expression_width
 
-          _design = Home_.lib_.zerk::CLI::Table::Design.define do |defn|
+          _design = Zerk_lib_[]::CLI::Table::Design.define do |defn|
 
             defn.separator_glyphs '| ', ' | ', ' |'
 
@@ -426,7 +426,7 @@ module Skylab::CodeMetrics
 
           _target_final_width = _lookup_expression_width
 
-          _design = Home_.lib_.zerk::CLI::Table::Design.define do |defn|
+          _design = Zerk_lib_[]::CLI::Table::Design.define do |defn|
 
             defn.separator_glyphs '| ', ' | ', ' |'
 

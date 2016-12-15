@@ -56,17 +56,61 @@ module Skylab::CodeMetrics
 
   module Models_
 
+    class Mondrian
+      # ==begin temporary mess for [br]
+      Actions = nil
+      def self.adapter_class_for _modality_symbol
+        self
+      end
+      def initialize _self_class, _upper_bnd
+        NOTHING_
+      end
+      def bound_call_under cli
+        o = cli.resources
+        _op = Home_::Operations_::Mondrian::CLI.new(
+          o.argv, o.sin, o.sout, o.serr, o.invocation_string_array,
+          cli.method( :maybe_use_exit_status ),
+        )
+        _op.to_bound_call_of_operator
+      end
+      def expression_agent
+        self
+      end
+      alias_method :calculate, :instance_exec
+      def plural_noun s
+        "#{ s }s"
+      end
+      # ==end temporary mess for [br]
+    end
     Autoloader_[ self, :boxxy ]
   end
 
   # ==
 
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x
+    else
+      x
+    end
+  end
+
+  # ==
+
+  Lazy_ = Common_::Lazy
+
   Totaller_ = -> do
     Home_.lib_.basic::Tree::Totaller
   end
 
-  Require_brazen_ = Common_::Lazy.call do  # called only 2x
+  Require_brazen_ = Lazy_.call do  # called only 2x
     Brazen_ = Home_.lib_.brazen ; NIL_
+  end
+
+  Zerk_lib_ = Lazy_.call do
+    mod = Home_.lib_.zerk
+    Zerk_ = mod
+    mod
   end
 
   # ==
@@ -139,6 +183,7 @@ module Skylab::CodeMetrics
   LIB_ = Home_.lib_
   MONADIC_TRUTH_ = -> _ { true }
   NEWLINE_ = "\n"
+  NOTHING_ = nil
   NIL_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false

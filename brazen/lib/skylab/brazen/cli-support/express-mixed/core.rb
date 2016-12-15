@@ -86,7 +86,9 @@ module Skylab::Brazen
 
       def ___resolve_name
 
-        @_name = if @_item.respond_to? :name  # #open [#107] will change this name
+        @_name = if @_item.respond_to? :ascii_only?
+          NOTHING_
+        elsif @_item.respond_to? :name  # #open [#107] will change this name
           @_item.name
         else
 
@@ -202,20 +204,24 @@ module Skylab::Brazen
           else
             lexeme.plural
           end
-        elsif 1 == d
-          nm.as_human
-        else
-          @expression_agent.calculate do
-            plural_noun nm.as_human
+        elsif nm
+          if 1 == d
+            nm.as_human
+          else
+            @expression_agent.calculate do
+              plural_noun nm.as_human
+            end
           end
         end
 
+        if surface  # #tombstone-A (not sure we want to keep this)
         @expression_agent.calculate do
           if 1 == d
             serr.puts "(one #{ surface } total)"
           else
             serr.puts "(#{ d } #{ surface } total)"
           end
+        end
         end
 
         if @_keep_looping
@@ -229,3 +235,4 @@ module Skylab::Brazen
     end
   end
 end
+# #tombstone-A: no more (total: N strings)
