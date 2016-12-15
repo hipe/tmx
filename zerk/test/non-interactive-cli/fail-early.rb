@@ -30,6 +30,11 @@ module Skylab::Zerk::TestSupport
         @ze_niCLI_client.expect_each_on_stdout_by( & p )
       end
 
+      def expect_each_on_stderr_by m=nil, & p
+        m and @ze_niCLI_client.using_method m
+        @ze_niCLI_client.expect_each_on_stderr_by( & p )
+      end
+
       def expect_each_by m=nil, & p
         m and @ze_niCLI_client.using_method m
         @ze_niCLI_client.expect_each_by( & p )
@@ -65,6 +70,10 @@ module Skylab::Zerk::TestSupport
         @ze_niCLI_client.expect exp_x
       end
 
+      def on_stream sym
+        @ze_niCLI_client.on_stream sym
+      end
+
       def expect_failed
         @ze_niCLI_client.expect_failed_under self
       end
@@ -98,10 +107,6 @@ module Skylab::Zerk::TestSupport
         @_method = m ; nil
       end
 
-      def on_stream serr_or_sout
-        @_stream = serr_or_sout ; nil
-      end
-
       def invoke * argv
         invoke_via_argv argv
       end
@@ -116,6 +121,11 @@ module Skylab::Zerk::TestSupport
 
       def expect_each_on_stdout_by & p
         @_stream = :sout
+        _add_proc_based_expectation p
+      end
+
+      def expect_each_on_stderr_by & p
+        @_stream = :serr
         _add_proc_based_expectation p
       end
 
@@ -175,6 +185,10 @@ module Skylab::Zerk::TestSupport
 
         @_setup.add_line_based_expectation exp_x, @_method, @_stream
         NIL
+      end
+
+      def on_stream serr_or_sout
+        @_stream = serr_or_sout ; nil
       end
 
       def expect_failed_under tc

@@ -6,10 +6,6 @@ module Skylab::TMX::TestSupport
 
       tcc.extend ModuleMethods___
       tcc.include InstanceMethods___
-
-      if false
-      Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
-      end
     end
 
     module ModuleMethods___
@@ -81,14 +77,6 @@ module Skylab::TMX::TestSupport
       def subject_CLI
         Home_::CLI
       end
-    end
-
-    if false
-    # ~ hook-outs
-
-    def get_invocation_strings_for_expect_stdout_stderr
-      [ 'zizzy' ]  # client freezes
-    end
     end
   end
 end

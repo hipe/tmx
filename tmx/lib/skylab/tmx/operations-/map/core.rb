@@ -36,7 +36,12 @@ module Skylab::TMX
       )
 
       def execute
-        if __parse_modifiers
+
+        # #coverpoint-1-D needs nil on help (because client)
+        # #coverpoint-1-E needs false on fails because API
+
+        x = __parse_modifiers
+        if x
           if __all_requireds_are_present
             if @_has_pager
               __flush_paged_stream
@@ -47,7 +52,7 @@ module Skylab::TMX
             UNABLE_
           end
         else
-          UNABLE_
+          x
         end
       end
 
@@ -170,6 +175,8 @@ module Skylab::TMX
         if m
           @argument_scanner.advance_one
           send m
+        else
+          m  # #coverpoint-1-D/#coverpoint-1-E
         end
       end
 

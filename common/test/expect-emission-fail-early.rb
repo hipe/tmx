@@ -35,9 +35,13 @@ module Skylab::Common::TestSupport
         expect_on_channel sym_a do |y|
           lines = y
         end
-        _x = self.send_subject_call
-        _x == false || fail
+        x = self.send_subject_call
+        x == false or fail __say_not_false( x )
         lines
+      end
+
+      def __say_not_false x
+        "expected false had #{ x.class }"  # ..
       end
 
       # --

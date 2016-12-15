@@ -55,6 +55,8 @@ module Skylab::TMX::TestSupport
 
     context "bad primary" do
 
+      # :#coverpoint-1-E
+
       call_by do
         ignore_common_post_operation_emissions_
         call :map, :zoingo
@@ -73,7 +75,6 @@ module Skylab::TMX::TestSupport
       end
 
       shared_subject :_lines do
-
         lines_via_this_kind_of_failure(
           :error, :expression, :parse_error, :unknown_primary )
       end

@@ -759,22 +759,6 @@ module Skylab::TMX
     end
 
     # ==
-    if false
-    def __to_unbound_stream
-
-      _st = Home_.installation_.to_sidesystem_manifest_stream
-
-      # sess.number_of_synopsis_lines = 2
-      # sess.program_name_string_array = pn_s_a
-
-      _st.expand_by do | manifest |
-
-        manifest.to_unboundish_stream
-      end
-    end
-    end
-
-    # ==
 
     Add_slice_primary_ = -> d, as, cli do
 
@@ -795,7 +779,7 @@ module Skylab::TMX
           )
           ACHIEVED_
         else
-          sct  # #cover-me (covered visually)
+          NIL  # nil not false, #coverpoint-1-C
         end
       end
 
