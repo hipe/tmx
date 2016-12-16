@@ -17,7 +17,9 @@
 [#008]       mondrian ..
              ( #was: model suppport )
              ( #was: #wormhole )
-[#007]       #doc-point - during tests, we physically `cd` into (whererver)
+[#007]       mixed internal trackpoints that do NOT leave this sidesystem.
+             [#here.A] (probably defunct) during tests, we physically `cd`
+               into (whererver)
                because although ugly, we *really* like the simplicity of
                always showing the raw filepaths in the application code.
 [#006]       #tracking-tag all the places where you do self-reflexive tests

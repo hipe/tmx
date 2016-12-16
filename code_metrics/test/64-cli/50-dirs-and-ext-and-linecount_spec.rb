@@ -74,7 +74,7 @@ module Skylab::CodeMetrics::TestSupport
 
       memoize_output_lines_ do
 
-        # (was [#006], [#007])
+        # (was [#006], [#007.A])
 
         invoke 'line-count', Fixture_file_directory_[], '-vvv'
       end

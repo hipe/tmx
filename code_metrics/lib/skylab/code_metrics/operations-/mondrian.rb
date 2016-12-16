@@ -171,7 +171,7 @@ module Skylab::CodeMetrics
 
       def __express_ascii_matrix_via_shapes_layers
         _sl = remove_instance_variable :@__shapes_layers
-        st = @_mags::AsciiMatrix_via_ShapesLayers[ _sl ]
+        st = @_mags::AsciiMatrix_via_ShapesLayers[ _sl, :_no_cx_ ]
         if st
           # ..
           st

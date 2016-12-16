@@ -52,7 +52,40 @@ module Skylab::CodeMetrics
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
 
+  # == model support
+
+  class SimpleModel_
+
+    class << self
+      alias_method :define, :new
+      undef_method :new
+    end
+
+    def initialize  # suggestion
+      yield self
+      freeze
+    end
+
+    private :dup
+  end
+
   # ==
+
+  module Models
+
+    class MondrianAsciiChoices < SimpleModel_
+
+      attr_accessor(
+        :background_fill_glyph,
+        :corner_pixel,
+        :horizontal_line_pixel,
+        :vertical_line_pixel,
+        :pixels_wide,
+        :pixels_high,
+      )
+    end
+    Autoloader_[ self ]
+  end
 
   module Models_
 
@@ -98,6 +131,10 @@ module Skylab::CodeMetrics
   # ==
 
   Lazy_ = Common_::Lazy
+
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
 
   Totaller_ = -> do
     Home_.lib_.basic::Tree::Totaller

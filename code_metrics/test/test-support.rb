@@ -149,6 +149,7 @@ module Skylab::CodeMetrics::TestSupport
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
   EMPTY_S_ = Home_::EMPTY_S_
+  Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   SPACE_ = Home_::SPACE_

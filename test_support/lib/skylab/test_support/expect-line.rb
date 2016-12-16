@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  class Expect_line
+  class Expect_line  # :[#038]
 
     # assumes @output_s
 
@@ -186,8 +186,146 @@ module Skylab::TestSupport
 
   module Expect_Line
 
+    # ==
+
+    # :[#here.1]: the unicode character ("¦") in the "big strings" is NOT
+    # part of the expected visualization - it demarcates the beginning and
+    # ending of each such line in the test file. we demarcate the lines in
+    # this manner because A) the ubiquitous `unindent` won't work for us
+    # here because we have significant leading whitespace in some first
+    # lines, B) we don't want significant trailing whitespace to be bare in
+    # files because it typically generates various annoyances visual and
+    # otherwise, and C) this way we can more clearly see where the beginning
+    # boundary is without having to write a custom regex each time to
+    # de-indent (de-dent?) it. whew!
+
+    class DemarcatedBigString  # < SimpleModel_
+
+      # the idea here is that this *can* be used multiple times but it
+      # doesn't expect to be. so it itself is stateless and so reentrant,
+      # but we don't cache any of the parsing (and meta-validation) of
+      # each line, so this isn't as efficient as it could be for the case
+      # of using the same expectation againt multiple cases. but since in
+      # practice we rarely do that, we haven't optimized for that.
+
+      class << self
+        alias_method :define, :new
+        undef_method :new
+      end  # >>
+
+      def initialize
+        @have_the_effect_of_chomping_lines = false
+        yield self
+        freeze
+      end
+
+      attr_writer(
+        :demarcator_string,
+        :have_the_effect_of_chomping_lines,
+      )
+
+      def new big_s
+        dup.__init big_s
+      end
+
+      private :dup
+
+      def __init big_s
+        @big_string = big_s
+        freeze
+      end
+
+      def expect_against_line_stream_under act_st, tc
+
+        _exp_st = __to_expected_line_stream
+
+        Streams_have_same_content[ act_st, _exp_st, tc ]
+      end
+
+      def __to_expected_line_stream
+
+        p = nil ; first_p = nil ; subsequent_p = nil
+        rx = nil ; scn = nil ; lts_used = nil ; line_via_matchdata = nil
+
+        first_p = -> do
+          scn = Home_::Library_::StringScanner.new @big_string
+          first_line = scn.scan LINE_RX__
+
+          dem = ::Regexp.escape @demarcator_string
+
+          _find_demarcators_rx = %r(
+            \A
+            (?<leading_white>[ \t]*)
+            #{ dem }
+            (?<content_characters>(?:(?!#{ dem }).)*)
+            #{ dem }
+            $
+            (?<lts>#{ LINE_TERMINATION_SEQUENCE_RXS__ })
+          )x
+
+          md = _find_demarcators_rx.match first_line
+          md or fail __say_didnt_find_demarcators first_line
+
+          lts_used = md[ :lts ]
+
+          rx = %r(
+            #{ ::Regexp.escape md[ :leading_white ] }
+            #{ dem }
+            (?<line_content>.{#{ md[ :content_characters ].length }})
+            #{ dem }
+            #{ ::Regexp.escape lts_used }
+          )x
+
+          scn.pos = 0
+          p = subsequent_p
+          p[]
+        end
+
+        subsequent_p = -> do
+
+          line = scn.scan LINE_RX__
+          md = rx.match line
+          md or fail __say_didnt_match_derived_pattern( line, rx )
+
+          if scn.eos?
+            p = EMPTY_P_
+          end
+
+          line_via_matchdata[ md ]
+        end
+
+        line_via_matchdata = if @have_the_effect_of_chomping_lines
+          -> md do
+            md[ :line_content ]
+          end
+        else
+          -> md do
+            md[ :line_content ] << lts_used
+          end
+        end
+
+        p = first_p
+
+        Common_.stream do
+          p[]
+        end
+      end
+
+      def __say_didnt_match_derived_pattern line, _rx
+        "demarcators established in the first line #{
+          }were not followed by this subsequent line: #{ line.inspect }"
+      end
+
+      def __say_didnt_find_demarcators first_line
+        "demarcators (#{ @demarcator_string.inspect }) #{
+          }not present or incorrectly used in first line - #{ first_line.inspect }"
+      end
+    end
+
+    # ==
+
     say_not_same = -> act_s, exp_s do
-      "expected, had: #{ exp_s.inspect }, #{ act_s.inspect }"
+      "(expected, had): (#{ exp_s.inspect }, #{ act_s.inspect })"
     end
     say_unexpected = -> s do
       "unexpected extra line - #{ s.inspect }"
@@ -213,6 +351,9 @@ module Skylab::TestSupport
         act_s = actual_st.gets
         exp_s = expected_st.gets
         if act_s
+          if context.do_debug
+            context.debug_IO.puts act_s.inspect
+          end
           if exp_s
             if exp_s == act_s
               redo
@@ -231,6 +372,8 @@ module Skylab::TestSupport
       end while nil
       NIL_
     end
+
+    # ==
 
     class Scanner
 
@@ -614,5 +757,12 @@ module Skylab::TestSupport
     end
 
     Expect_line::Expect_Line_ = self
+
+    # ==
+
+    LINE_TERMINATION_SEQUENCE_RXS__ = '(?:\n|\r\n?|\z)'
+    LINE_RX__ = /[^\r\n]*#{ LINE_TERMINATION_SEQUENCE_RXS__ }/
+
+    # ==
   end
 end
