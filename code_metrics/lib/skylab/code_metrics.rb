@@ -144,6 +144,11 @@ module Skylab::CodeMetrics
     Brazen_ = Home_.lib_.brazen ; NIL_
   end
 
+  Require_basic_ = Lazy_.call do  # 1x
+    Basic_ = Home_.lib_.basic
+    NIL
+  end
+
   Zerk_lib_ = Lazy_.call do
     mod = Home_.lib_.zerk
     Zerk_ = mod
@@ -203,6 +208,8 @@ module Skylab::CodeMetrics
     System_lib__ = sidesys[ :System ]
 
     Test_support = sidesys[ :TestSupport ]
+
+    Treemap = sidesys[ :Treemap ]
 
     Zerk = sidesys[ :Zerk ]
   end

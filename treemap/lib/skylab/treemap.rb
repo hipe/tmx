@@ -3,6 +3,8 @@ require 'skylab/common'
 module Skylab::Treemap
 
   Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
 
   class << self
 
@@ -10,7 +12,14 @@ module Skylab::Treemap
       y << "solid but impcomplete experiment with test coverage visualization"
     end
 
-    define_method :application_kernel_, ( Common_.memoize do
+    def test_support  # #[#ts-035]
+      if ! Home_.const_defined? :TestSupport
+        require_relative '../../test/test-support'
+      end
+      Home_::TestSupport
+    end
+
+    define_method :application_kernel_, ( Lazy_.call do
 
       Home_.lib_.brazen::Kernel.new Home_
     end )
@@ -22,9 +31,11 @@ module Skylab::Treemap
     end
   end  # >>
 
+  # == model support
+
   module Model_
 
-    define_singleton_method :common_action_class, ( Common_.memoize do
+    define_singleton_method :common_action_class, ( Lazy_.call do
 
       class Common_Action_Class___ < Home_.lib_.brazen::Action
 
@@ -35,7 +46,26 @@ module Skylab::Treemap
     end )
   end
 
-  Autoloader_ = Common_::Autoloader
+  # ==
+
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
+
+  stowaway :Models, 'models-/node'  # currently only 1 public model.. (see #spot-1)
+
+  # == functions
+
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  # ==
+
+  Require_basic_ = Lazy_.call do
+    Basic_ = Home_.lib_.basic
+    NIL
+  end
+
+  # ==
 
   module Lib_
 
@@ -50,10 +80,7 @@ module Skylab::Treemap
     end
 
     System_lib___ = sidesys[ :System ]
-
   end
-
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
   Autoloader_[ Input_Adapters_ = ::Module.new ]
@@ -65,5 +92,4 @@ module Skylab::Treemap
   SPACE_ = ' '
   Home_ = self
   UNABLE_ = false
-
 end

@@ -223,6 +223,10 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   Lazy_ = Common_::Lazy
 
   Assume_ACS_ = Lazy_.call do

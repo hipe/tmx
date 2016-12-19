@@ -16,9 +16,20 @@ module Skylab::Treemap::TestSupport
 
   # -
 
+    eek = {
+      common_magnets_and_models: -> tcc do
+        TS_::Common_Magnets_And_Models[ tcc ]
+      end,
+      expect_event: -> tcc do
+        Home_::Common_.test_support::Expect_Emission[ tcc ]
+      end,
+      memoizer_methods: -> tcc do
+        TestSupport_::Memoization_and_subject_sharing[ tcc ]
+      end,
+    }
+
     Use_method___ = -> sym do
-      :expect_event == sym or fail
-      Home_::Common_.test_support::Expect_Emission[ self ]
+      eek.fetch( sym )[ self ]
     end
   # -
 

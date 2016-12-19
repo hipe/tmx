@@ -1,8 +1,13 @@
+[#016]       a test case is "shared" for [tr] too
+
 [#015] #open currently hard-coded screen width in tests (or not)
 
 [#014] #open #in-situ about argv limits in shells..
+
 [#013]       the tally visualation (assets)
+
 [#012]     #gotcha inline - flickering near helpscreens
+
 [#011]    #investigate how to pipe from one process to another from ruby
              not with this string command
 
@@ -18,6 +23,16 @@
              ( #was: model suppport )
              ( #was: #wormhole )
 [#007]       mixed internal trackpoints that do NOT leave this sidesystem.
+
+       #idea  [#here.E]: vertical centering (correctly) automatically for label
+
+       #open :[#here.D]: confused understanding of coordinate systems
+
+       #idea :[#here.C]: latticework (foresight references)
+             (this relates to that one paper about it)
+
+       #wish :[#here.B]: whitespace for whitespace. (foresight references here)
+
              [#here.A] (probably defunct) during tests, we physically `cd`
                into (whererver)
                because although ugly, we *really* like the simplicity of

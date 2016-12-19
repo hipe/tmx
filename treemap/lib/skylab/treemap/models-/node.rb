@@ -1,5 +1,67 @@
 module Skylab::Treemap
 
+  Models = ::Module.new
+    # (currently only 1 public model,
+    #  and it might eventually merge with this private node :#spot-1)
+
+  class Models::Node  # < SimpleModel_
+
+    # (this is a fresh take on it, 5 years later, for another thing)
+
+    class << self
+      alias_method :define, :new
+      undef_method :new
+    end  # >>
+
+    def initialize
+      @_children = nil
+      yield self
+      if @_children
+        @has_children = true
+        @_children.freeze
+      else
+        remove_instance_variable :@_children
+      end
+      freeze
+    end
+
+    private :dup
+
+    def add_item s, num
+      add_child_by do |o|
+        o.main_quantity = num
+        o.label_string = s
+      end
+      NIL
+    end
+
+    def add_child_by & p
+      _child = self.class.define( & p )
+      ( @_children ||= [] ).push _child
+      NIL
+    end
+
+    attr_accessor(
+      :label_string,
+      :main_quantity,
+    )
+
+    # -- read
+
+    def to_classified_stream  # for testing only :(
+      _Tree = Home_.lib_.basic::Tree
+      _Tree::Actors__::Build_classified_stream.new( self ).execute
+    end
+
+    def to_child_stream
+      Stream_[ @_children ]
+    end
+
+    attr_reader(
+      :has_children,
+    )
+  end
+
   class Models_::Node
 
     # for both efficency of memory usage and our own mental sanity (along one
@@ -151,3 +213,4 @@ module Skylab::Treemap
     Actions = nil
   end
 end
+# #pending-rename..

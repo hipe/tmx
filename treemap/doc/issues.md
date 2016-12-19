@@ -1,5 +1,7 @@
 [#056]       #doc-point towards an event wiring pattern..
+
 [#055] #hole ( #was: #hookback - let [cb] know when ridiculous is ready )
+
 [#054]       #tracking-tag slug
 [#053] #open (or #tracking-tag) load file when desc lines are necessary, maybe
 [#052]       #done invert is broken so stops are broken
@@ -51,11 +53,19 @@
 [#010] #open #tracking-tag once we get hl sub-client in here
 [#009]       #doc-point (ticket changed) `o-ption_parser_blocks` is sweetened
 [#008]       #done audit public / private
-[#007]       #done existing tests working again
+
+[#007]       local only
+             :[#here.A]: whitespace for [cm]
+             ( #was: #done existing tests working again )
+
 [#006]       #done get CLI working again
 [#005] #open verbose mode
 [#004]       #done rid of Skylab constants everywhere
-[#003]       #while name collision with [m-h]
+
+[#003]       the treemap algorithm / divvy / algorithm notes
+
+             ( was: #while name collision with [m-h] )
+
 [#002]       the build leaf stream narrative ..
              ( #was: #done make core.rb )
 [#001]       [ reserved for introduction ]

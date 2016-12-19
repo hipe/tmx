@@ -20,7 +20,7 @@ module Skylab::CodeMetrics
       end
 
       def add_label x, y, w, h, s
-        @mutable_model._push_shape_ Label___.new s, x, y, w, h
+        @mutable_model._push_shape_ Label___.new x, y, w, h, s
         NIL
       end
 
@@ -55,14 +55,24 @@ module Skylab::CodeMetrics
     # ==
 
     Rectangle__ = ::Class.new
-    class Label___ < Rectangle__
 
-      def initialize s, * four
+    class Label___ < Rectangle__  # near [#007.E] (follow to its end)
 
-        @label_string = s.freeze
+      def initialize * four, s
+
+        @label_string = if s.frozen?
+          s
+        else
+          # for now, if you don't pass a frozen string,
+          # punished by having your string frozen on you.
+          s.freeze
+        end
+
         super( * four )
       end
+
       attr_reader :label_string
+
       def category_symbol
         :label
       end

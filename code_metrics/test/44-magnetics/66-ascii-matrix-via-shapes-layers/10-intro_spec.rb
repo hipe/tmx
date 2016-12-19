@@ -28,6 +28,7 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       given_shapes_layers do
+
         Home_::Models::ShapesLayers.define do |sls|
 
           sls.width_height 2, 2
@@ -74,6 +75,37 @@ module Skylab::CodeMetrics::TestSupport
       end
     end
 
+    context "scale up" do
+
+      will_expect_big_string do
+        <<-HERE
+          ¦+--------+¦
+          ¦|        |¦
+          ¦|        |¦
+          ¦|        |¦
+          ¦+--------+¦
+        HERE
+      end
+
+      given_choices do |o|
+        o.pixels_wide = 10
+        o.pixels_high = 5
+      end
+
+      given_shapes_layers do |sls|
+
+        sls.width_height 3, 3
+
+        sls.add_layer do |o|
+          o.add_rect 0, 0, 3, 3
+        end
+      end
+
+      it "every byte is correct" do
+        expect_every_byte_is_correct_
+      end
+    end
+
     context "scale up, label, float as world coordinate" do
 
       will_expect_big_string do
@@ -97,7 +129,7 @@ module Skylab::CodeMetrics::TestSupport
 
         sls.add_layer do |o|
           o.add_rect 0, 0, 3, 3
-          o.add_label 1, 1.3, 1, 1, 'xyz'
+          o.add_label 0, 0, 3, 3, 'xyz'
         end
       end
 
@@ -132,7 +164,7 @@ module Skylab::CodeMetrics::TestSupport
 
         sls.add_layer do |o|
           o.add_rect 12, 6, 19, 9
-          o.add_label 15, 8, 14, 2, 'frufamshi'
+          o.add_label 12, 6, 19, 9, 'frufamshi'
         end
       end
 
@@ -147,7 +179,7 @@ module Skylab::CodeMetrics::TestSupport
         method_definition_for_big_stringer_for do
       <<-HERE
          ¦  +------------+            ¦
-         ¦  |   jumanji  |            ¦
+         ¦  |  jumanji   |            ¦
          ¦  |       +--------------+  ¦
          ¦  +-------|  frufamshi   |  ¦
          ¦          +--------------+  ¦
@@ -168,12 +200,12 @@ module Skylab::CodeMetrics::TestSupport
 
         sls.add_layer do |o|
           o.add_rect 3, 0, 17, 12
-          o.add_label 6, 4, 11, 2, 'jumanji'
+          o.add_label 3, 0, 17, 12, 'jumanji'
         end
 
         sls.add_layer do |o|
           o.add_rect 12, 6, 19, 9
-          o.add_label 15, 8, 14, 2, 'frufamshi'
+          o.add_label 12, 6, 19, 9, 'frufamshi'
         end
       end
 

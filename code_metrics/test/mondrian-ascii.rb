@@ -9,37 +9,55 @@ module Skylab::CodeMetrics::TestSupport
 
     module ModuleMethods___
 
+      def given_mondrian_tree & p  # assumes [#016] that you are `use`ing something else
+        yes = true ; sl = nil
+        once = -> tc do
+          yes = false ; once = nil
+          _mt = tc.instance_exec( & p )
+          sl = Home_::Magnetics::ShapesLayers_via_MondrianTree[ _mt ]
+          NIL
+        end
+        define_method :_mondrian_ASCII_shapes_layers do
+          yes && once[ self ]
+          sl
+        end
+      end
+
       def given_choices & p
-        yes = true ; x = nil
-        define_method :__mondrian_ASCII_choices do
-          if yes
-            yes = false
-            x = if p.arity.zero?
-              p[]
-            else
-              Home_::Models::MondrianAsciiChoices.define do |o|
-                p[ o ]
-              end
+        yes = true ; cx = nil
+        once = -> do
+          yes = false ; once = nil
+          cx = if p.arity.zero?
+            p[]
+          else
+            Home_::Models::MondrianAsciiChoices.define do |o|
+              p[ o ]
             end
           end
-          x
+          NIL
+        end
+        define_method :_mondrian_ASCII_choices do
+          yes && once[]
+          cx
         end
       end
 
       def given_shapes_layers & p
-        yes = true ; x = nil
-        define_method :__mondrian_ASCII_shapes_layers do
-          if yes
-            yes = false
-            x = if p.arity.zero?
-              p[]
-            else
-              Home_::Models::ShapesLayers.define do |o|
-                p[ o ]
-              end
+        yes = true ; sl = nil
+        once = -> do
+          yes = false ; once = nil
+          sl = if p.arity.zero?
+            p[]
+          else
+            Home_::Models::ShapesLayers.define do |o|
+              p[ o ]
             end
           end
-          x
+          NIL
+        end
+        define_method :_mondrian_ASCII_shapes_layers do
+          yes && once[]
+          sl
         end
       end
 
@@ -49,13 +67,15 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       def method_definition_for_big_stringer_for & p
-        yes = true ; x = nil
+        yes = true ; proto = nil
+        once = -> do
+          yes = false ; once = nil
+          proto = Big_stringer_prototype___[].new p[]
+          NIL
+        end
         -> do
-          if yes
-            yes = false
-            x = Big_stringer_prototype___[].new p[]
-          end
-          x
+          yes && once[]
+          proto
         end
       end
     end
@@ -70,35 +90,32 @@ module Skylab::CodeMetrics::TestSupport
 
     module InstanceMethods___
 
-      def _DEBUG_BY_FLUSHING
-        @__DO_DEBUG_BY_FLUSHING = true
-      end
+      def _DEBUG_BY_FLUSH_AND_EXIT
 
-      attr_reader( :__DO_DEBUG_BY_FLUSHING )
+        act_st = _mondrian_ASCII_build_line_stream
+
+        io = debug_IO
+        io.puts "_____"
+        while line = act_st.gets
+          io.puts line
+        end
+        io.puts "---- (EXIT by [cm]!)"
+        exit 0
+      end
 
       def expect_every_byte_is_correct_
 
-        _act_st = __mondrian_ASCII_build_line_stream
-
-        if __DO_DEBUG_BY_FLUSHING
-          io = debug_IO
-          io.puts "_____"
-          while line = _act_st.gets
-            io.puts line
-          end
-          io.puts "----"
-          exit 0
-        end
+        _act_st = _mondrian_ASCII_build_line_stream
 
         _exp = big_stringer
 
         _exp.expect_against_line_stream_under _act_st, self
       end
 
-      def __mondrian_ASCII_build_line_stream
+      def _mondrian_ASCII_build_line_stream
 
-        _sl = __mondrian_ASCII_shapes_layers
-        _cx = __mondrian_ASCII_choices
+        _sl = _mondrian_ASCII_shapes_layers
+        _cx = _mondrian_ASCII_choices
 
         mondrian_ASCII_subject_module_[ _sl, _cx ]
       end

@@ -29,3 +29,19 @@ stack we just made for ourselves:
   1. get "tree data" from a const path
   1. build "shapes layers" from tree data
   1. render "ASCII matrix" from shapes layers
+
+
+
+## this one ratio :[#here.A]
+
+on my screen (in a terminal), this appears as "close enough" to square:
+
+    +---------+
+    |         |
+    |         |
+    |         |
+    |         |
+    +---------+
+
+and it's 11 x 6. this will of course vary based on the font-related display
+settings of the terminal.

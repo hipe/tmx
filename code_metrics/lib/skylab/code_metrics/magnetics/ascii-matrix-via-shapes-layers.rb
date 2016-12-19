@@ -26,14 +26,14 @@ module Skylab::CodeMetrics
         +------+
       HERE
 
-      _st = Home_.lib_.basic::String.line_stream _big_string
+      _st = Basic_::String.line_stream _big_string
 
       _st   # #todo
     end
 
       def __do_real_execute
         __init_pixel_matrix
-        __init_point_scalers
+        __init_normal_point_scaler
         __init_glyphs
         __write_pixels
         __flush_to_stream
@@ -96,14 +96,19 @@ module Skylab::CodeMetrics
         @pixel_matrix = matrix ; nil
       end
 
-      def __init_point_scalers
+      def __init_normal_point_scaler
 
-        ascii = @ascii_choices
-        world = @shapes_layers
+        cx = @ascii_choices
+        wo = @shapes_layers
 
-        @_scale_x = ascii.pixels_wide.to_f / world.width
-        @_scale_y = ascii.pixels_high.to_f / world.height
-
+        @__normal_rectangular_pixelator =
+            Basic_::Rasterized::NormalRectangularPixelator.
+        via_screen_vector_and_world_vector(
+          cx.pixels_wide,
+          cx.pixels_high,
+          wo.width,
+          wo.height,
+        )
         NIL
       end
     # -
@@ -114,33 +119,87 @@ module Skylab::CodeMetrics
 
     class DrawLabel___ < DrawRectangular__
 
+      # :[#007.E] vertical centering (& related) is a moving-target
+      # micro-API. consider this an experimental version of it:
+      #
+      # the rectangular coordinates that accompany a label definition
+      # correspond to the rectangular shape or area the label refers to.
+      #
+      # this is, they do *not* indicate the horizontal or vertical
+      # span of space the label is meant to "fill" or "stretch" into.
+      #
+      # rather, the modality is on its own to decide the appropriate
+      # positioning, clipping, truncation, horizontal stretching, and
+      # (imaginarily) font & font size for the label as appropriate to
+      # the modality and shape being labeled.
+
+      # here in ASCII-land, that means these translational dynamics:
+      #
+      #   - for now we're not gonna mess with some novelty act like
+      #     horizontal stretching (allà `[[ i n c e p t i o n ]]`).
+      #
+      #   - likewise we're not even gonna think about a `banner` or
+      #     `figlet` type external service..
+      #
+      # tricks like these are so out of scope that they would take
+      # us backwards: by adding any such complexity they miss the point
+      # entirely of the ASCII target (notwithstanding a change of our
+      # would-be (non-written) mission statement).
+      #
+      # so for now it's always monospaced, letter-per-letter spacing.
+      # in the other direction:
+      #
+      #   - because of the definitional axiom (that the label's rect *is*
+      #     the rect being described), we would sometimes overprint the edge
+      #     decoration of rectangles except that we take steps to avoid it
+      #     :#here-2. (this workaround, in turn, will cause frustrating
+      #     behavior if ever we label something other that rects (e.g empty
+      #     space or an arc between them) but for now we don't..
+      #
+      #   - our implementation of "ellipsifying" strings that are too long
+      #     is as crude as can be, but see comment above about "missing
+      #     the point".
+
       def initialize shape, surface
         @label_string = shape.label_string
         super
       end
 
       def execute
+        @_drawable_width = @screen_width - TWO__
+        @_drawable_height = @screen_height - TWO__
 
-        x = @screen_x ; s = @label_string ; w = @screen_width
+        if 0 < @_drawable_width && 0 < @_drawable_height
+          __draw_something
+        end
+      end
 
-        number_of_blank_spaces = w - s.length
+      def __draw_something
+
+        # as it works out, this function is concerned with horizontal
+        # centering and the callee will deal with vertical centering.
+
+        s = @label_string
+        leftmost_x = @screen_x + 1
+
+        number_of_blank_spaces = @_drawable_width - s.length
 
         case number_of_blank_spaces <=> 0
 
         when -1  # too many characters to fit..
 
-          _write_string x, s[ 0, w ] # meh
+          _write_string leftmost_x, s[ 0, @_drawable_width ] # see "crude" above
 
         when 0   # exactly enough characters to fit
 
-          _write_string x, s
+          _write_string leftmost_x, s
 
         when 1   # more space than there is characters..
 
           _indent_by_this_much = number_of_blank_spaces / 2
             # when number is odd it nudges to the left which is better
 
-          _use_x = x + _indent_by_this_much
+          _use_x = leftmost_x + _indent_by_this_much
 
           _write_string _use_x, s
         end
@@ -149,11 +208,22 @@ module Skylab::CodeMetrics
 
       def _write_string x, str
 
-        row = @surface.pixel_matrix.fetch @screen_y
-        col = x - 1
+        # @screen_y is the row with the edge decoration.
+
+        # when drawable height is 1, use_y is @screen_y + 1
+        # when drawable height is 2, (same)
+        # when drawable height is 3, use_y is @screen_y + 2
+        # when drawable height is 4, (same)
+        # ..
+
+        _add_this = ( @_drawable_height - 1 ) / 2 + 1
+          # plus one for "never draw over the top edge decoration"
+
+        _use_y = @screen_y + _add_this
+
+        row = @surface.pixel_matrix.fetch _use_y
         str.length.times do |d|
-          col += 1
-          row[ col ] = str[ d ]
+          row[ x + d ] = str[ d ]
         end
         NIL
       end
@@ -190,7 +260,7 @@ module Skylab::CodeMetrics
     class DrawRectangular__
 
       # the only lesson learned so far that we didn't forsee in pseudocode
-      # is that you should scale once and scale early. if you scale late,x
+      # is that you should scale once and scale early. if you scale late,
       # rounding issues can put holes in your shape outlines between the
       # arcs and the corners. (and scaling the same x's or y'x more than
       # once in the same "draw" feels wrong.) :#here-1
@@ -201,11 +271,12 @@ module Skylab::CodeMetrics
       # coordinates so it can know the discrete pixels it's making trade-
       # off choices around..
 
-      def initialize shape, surface
+      def initialize normal_shape, surface
 
         @screen_x, @screen_y, @screen_width, @screen_height =
-          surface.__scale_rectangular_ shape
+          surface.__pixelate_normal_rectangular normal_shape
 
+        @normal_shape = normal_shape
         @surface = surface
       end
 
@@ -254,13 +325,13 @@ module Skylab::CodeMetrics
 
         case w <=> 0
         when 1  # width is positive
-          if 2 < w
+          if TWO__ < w
             @surface._horizontal_inner_line_ @x, @y, w
           end
           @x += ( w - 1 )
         when -1  # width is negative
           x_ = @x + w + 1
-          if -2 > w
+          if -TWO__ > w
             @surface._horizontal_inner_line_ x_, @y, -w
           end
           @x = x_
@@ -274,13 +345,13 @@ module Skylab::CodeMetrics
 
         case hi <=> 0
         when 1  # height is positive
-          if 2 < hi
+          if TWO__ < hi
             @surface._vertical_inner_line_ @x, @y, hi
           end
           @y += ( hi - 1 )
         when -1  # height is negative
           y_ = @y + hi + 1
-          if -2 > hi
+          if -TWO__ > hi
             @surface._vertical_inner_line_ @x, y_, -hi
           end
           @y = y_
@@ -310,11 +381,11 @@ module Skylab::CodeMetrics
         # if a rectangle is the smallest it can be (2 pixels) along either
         # (or both) axes, it has width but no inside pixels, so skip fill.
 
-        if 2 < w && 2 < hi
+        if TWO__ < w && TWO__ < hi
 
           p = _horizontal_liner(
             o.screen_x + 1,
-            w - 2,
+            w - TWO__,
             @background_fill_glyph,
           )
 
@@ -329,11 +400,11 @@ module Skylab::CodeMetrics
 
       def _horizontal_inner_line_ screen_x, screen_y, screen_w
 
-        2 < screen_w || sanity
+        TWO__ < screen_w || sanity
 
         _horizontal_liner(
           screen_x + 1,
-          screen_w - 2,
+          screen_w - TWO__,
           @horizontal_line_pixel,
         )[ screen_y ]
         NIL
@@ -341,11 +412,11 @@ module Skylab::CodeMetrics
 
       def _vertical_inner_line_ screen_x, screen_y, screen_hi
 
-        2 < screen_hi || sanity
+        TWO__ < screen_hi || sanity
         _vertical_line(
           screen_x,
           screen_y + 1,
-          screen_hi - 2,
+          screen_hi - TWO__,
           @vertical_line_pixel,
         )
         NIL
@@ -380,18 +451,13 @@ module Skylab::CodeMetrics
         NIL
       end
 
-      def __scale_rectangular_ rect
+      def __pixelate_normal_rectangular rect
 
-        # (we lose precision by collapsing to integers what we could
-        #  keep as floats until later, but we're following #here-1
-        #  and KISS for now.)
+        # (this is the point at which we collapse from rational numbers
+        #  to integers for the ASCII raster. we have to do it now because
+        #  of #here-1 rounding issues that can put holes in shape edges.)
 
-        [
-          ( @_scale_x * rect.x ).to_i,
-          ( @_scale_y * rect.y ).to_i,
-          ( @_scale_x * rect.width ).to_i,
-          ( @_scale_y * rect.height ).to_i,
-        ]
+        @__normal_rectangular_pixelator.pixelate_world_rectangular rect
       end
 
       attr_reader(
@@ -401,9 +467,14 @@ module Skylab::CodeMetrics
     # -
     # ==
 
+    Require_basic_[]
+
+    # ==
+
     EMPTY_PIXEL__ = ' '
     GENERIC_CORNER_PIXEL___ = '+'
     HORIZONTAL_LINE_PIXEL___ = '-'
+    TWO__ = 2  # when used to take into account "edge decoration"
     VERTICAL_LINE_PIXEL___ = '|'
 
     # ==

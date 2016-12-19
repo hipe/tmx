@@ -118,12 +118,6 @@ module Skylab::Basic
 
     # ==
 
-    Stream_ = -> a, & p do
-      Common_::Stream.via_nonsparse_array a, & p
-    end
-
-    # ==
-
     RATIONAL_ZERO___ = Rational( 0 )
     THRESHOLD__ = Rational( 1 )
 
