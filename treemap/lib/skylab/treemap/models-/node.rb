@@ -57,6 +57,10 @@ module Skylab::Treemap
       Stream_[ @_children ]
     end
 
+    def first_child  # debugging, probably
+      @_children.fetch 0
+    end
+
     attr_reader(
       :has_children,
     )

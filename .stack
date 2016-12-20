@@ -15,4 +15,3 @@ use [sa] to convert etc to Stream_
 ((-1     [cm] CLI client that outputs real ascii-matrix ))
 ((-2     [cm] ASCII matrix via real shapes-layers ))
 ((-3     [cm] shapes-layers via real tree-data ))
-((-4     [cm] tree data via const path ))

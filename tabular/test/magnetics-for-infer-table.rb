@@ -52,7 +52,7 @@ module Skylab::Tabular::TestSupport
       end
 
       def the_empty_expression_agent_
-        THE_EMPTY_EXPRESSION_AGENT___
+        TestSupport_::THE_EMPTY_EXPRESSION_AGENT
       end
 
       def mags_
@@ -89,12 +89,6 @@ module Skylab::Tabular::TestSupport
 
       user_x
     end
-
-    # ==
-
-    module THE_EMPTY_EXPRESSION_AGENT___ ; class << self
-      alias_method :calculate, :instance_exec
-    end ; end
 
     # ==
   end

@@ -24,6 +24,8 @@
              ( #was: #wormhole )
 [#007]       mixed internal trackpoints that do NOT leave this sidesystem.
 
+       #wish :[#here.F]: hax for procs (`constants` and byte-processing files)
+
        #idea  [#here.E]: vertical centering (correctly) automatically for label
 
        #open :[#here.D]: confused understanding of coordinate systems

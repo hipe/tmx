@@ -28,6 +28,7 @@ module Skylab::CodeMetrics::TestSupport
   Home_ = ::Skylab::CodeMetrics
 
   Common_ = Home_::Common_
+  Autoloader_ = Common_::Autoloader
 
   module Instance_Methods___
 
@@ -117,6 +118,10 @@ module Skylab::CodeMetrics::TestSupport
     Common_.test_support::Expect_Emission[ tcc ]
   end
 
+  Expect_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  end
+
   Expect_Stdout_Stderr = -> tcc do
     tcc.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
   end
@@ -128,12 +133,10 @@ module Skylab::CodeMetrics::TestSupport
   # --
 
   Fixture_file_ = -> s do
-
     ::File.join Fixture_file_directory_[], s
   end
 
   Fixture_file_directory_ = Common_.memoize do
-
     ::File.join Fixture_tree_directory_[], 'fixture-files-one'
   end
 
@@ -142,12 +145,20 @@ module Skylab::CodeMetrics::TestSupport
   end
 
   Fixture_tree_two_ = Common_::Lazy.call do
-
     ::File.join TS_.dir_path, 'fixture-trees/fixture-tree-two'
   end
 
-  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
+  # --
 
+  module FixtureAssetNodesToLoadOnce
+    Autoloader_[ self ]
+  end
+
+  # --
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
+  CONST_SEP_ = '::'
   EMPTY_S_ = Home_::EMPTY_S_
   Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_

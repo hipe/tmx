@@ -32,6 +32,7 @@ module Skylab::Brazen
 
     teea = nil
     build_the_empty_expression_agent = -> do
+      # also see [ts]::THE_EMPTY_EXPRESSION_AGENT
       class Empty_Expag < ::BasicObject
         def calculate y, & p
           instance_exec y, & p

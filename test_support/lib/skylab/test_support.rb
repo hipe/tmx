@@ -81,6 +81,12 @@ module Skylab::TestSupport  # :[#021].
     end
   end
 
+  # --
+
+  module THE_EMPTY_EXPRESSION_AGENT ; class << self
+    alias_method :calculate, :instance_exec
+  end ; end
+
   # -- (see discussion of "dangerous memoize" at [#042])
 
   DANGEROUS_MEMOIZE = -> m, & p do
