@@ -60,7 +60,7 @@ module Skylab::CodeMetrics::TestSupport
         mondrian_tree_by_mondrian_choices_and_build_node_tree(
           -> o do
             o.target_rectangle = 120, 100
-            o.portrait_landscape_threshold_rational = Rational( 3 ) / Rational( 11 )
+            o.portrait_landscape_threshold_rational = squareish_in_ASCII_
           end,
           -> o do
             o.add_item 'xbox 360', 150

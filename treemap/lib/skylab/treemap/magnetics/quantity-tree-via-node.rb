@@ -34,20 +34,47 @@ module Skylab::Treemap
 
         m = @main_quantity_method_name
 
-        recurse = -> branch do
+        recurse = -> node_that_is_branch do
+
+          node_that_is_branch.has_children || self._SANITY  # #todo
 
           total = nil
           new_children = []
 
-          st = branch.to_child_stream
+          st = node_that_is_branch.to_child_stream
+
+          inc_total = -> num do
+            total = num + total  # remote value can change local type
+          end
+
+          see_branch_normally = -> no do
+            br = recurse[ no ]
+            inc_total[ br.total ]
+            br
+          end
 
           see_terminal_normally = -> no do
             _num = no.send m
-            total = _num + total  # remote value can change local type
+            inc_total[ _num ]
+          end
+
+          done_with_first = nil
+
+          see_branch = -> no do
+            br = recurse[ no ]
+            total = br.total
+            done_with_first[]
+            br
           end
 
           see_terminal = -> no do
             total = no.send m
+            done_with_first[]
+          end
+
+          done_with_first = -> do
+            done_with_first = nil
+            see_branch = see_branch_normally
             see_terminal = see_terminal_normally
           end
 
@@ -56,7 +83,8 @@ module Skylab::Treemap
             no || break
 
             if no.has_children
-              ::Kernel._K
+              _bn = see_branch[ no ]
+              new_children.push _bn
             else
               see_terminal[ no ]
               new_children.push no
@@ -65,9 +93,12 @@ module Skylab::Treemap
             redo
           end while above
 
-          declared_total = branch.main_quantity
-          if declared_total && total > declared_total
-            self._COVER_ME__declared_total_is_less_than_derived_total__
+          declared_total = node_that_is_branch.main_quantity
+          if declared_total
+            self._WHY_THO
+            if total > declared_total
+              self._COVER_ME__declared_total_is_less_than_derived_total__
+            end
           end
 
           BranchNode___.new total, declared_total, new_children.freeze
@@ -82,6 +113,7 @@ module Skylab::Treemap
     class BranchNode___
 
       def initialize num, num_, cx_a
+        cx_a.length.zero? && self._SANITY  # #here
         @_children = cx_a  # frozen
         @child_count = cx_a.length
         @declared_total = num_
@@ -96,13 +128,25 @@ module Skylab::Treemap
         Stream_[ @_children ]
       end
 
+      def main_quantity
+        @declared_total || @total  # ..
+      end
+
       attr_reader(
         :child_count,
         :declared_total,
         :total,
       )
 
-      def has_children
+      def has_children  # #here
+        true
+      end
+
+      def is_branch
+        true
+      end
+
+      def IS_QUANTITY_TREE__  # temp sanity check
         true
       end
     end

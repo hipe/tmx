@@ -190,59 +190,91 @@ module Skylab::Treemap
         # (probably you end up never splitting vertically, so probably
         # you end up with a mesh that looks like a wide ladder with
         # many rungs.)
-
       )
 
       def execute
 
-        bucketer = __bucketer
+        # the trick is, although we do the clever thing with subdividing
+        # rects *in half* by bucketing a list of items into two buckets
+        # (and so on recursively), we don't want the produced mesh to
+        # reflect this always-by-two division. rather, any two terminal
+        # data nodes that are siblings in the data should always correspond
+        # to sub-rectangles that are siblings in the same parent rectangle.
+        # (not that they should be physically close, just that the tree
+        # structure of the mesh should follow the same structure of the data,
+        # not the recursive execution path of our algorithm.)
 
-        descend  = nil
-        recurse = -> bucketish, rect do
+        bucketser = __bucketer
 
-          case 1 <=> bucketish.child_count
-          when 0
-            AssociatedTerminalNode___.new rect, bucketish.first_child
-          when -1
-            descend[ bucketish, rect ]
+        denominator_for = -> quant_tree do
+          if quant_tree.declared_total
+            self._FUN__declared_total__
           else
-            self._COVER_ME__no_children_in_bucketish__probably_error__
+            quant_tree.total
           end
         end
 
-        descend = -> bucketish, rect do
+        subdivide_along_buckets = nil
 
-          # (#optimization possible here - if 2 == number of buckets and..)
+        recurse_into_quant = -> quant_tree, normal_rect do  # 2x
 
-          _cx_st = bucketish.to_child_stream
+          # (#optimization possible here - if 2 == number of children and..)
 
-          buckets = bucketer[ _cx_st ]
+          quant_tree.is_branch || self._SANITY
 
-          if bucketish.declared_total
-            self._FUN__declared_total__
-          else
-            _use_denom = bucketish.total
+          _buckets = bucketser[ quant_tree.to_child_stream ]
+
+          _denom = denominator_for[ quant_tree ]
+
+          assoced_a = []
+
+          subdivide_along_buckets[ assoced_a, _buckets, _denom, normal_rect ]
+
+          AssociatedNonterminalNode___.new normal_rect, assoced_a.freeze
+        end
+
+        recurse_into_tall_bucket = nil
+
+        subdivide_along_buckets = -> assoced_a, buckets, denom, normal_rect do  # 2x
+
+          subd = normal_rect.build_sequential_subdivider__ buckets.length, denom
+
+          buckets.each do |bucket|
+            sub_rect = subd[ bucket.total ]
+            case 1 <=> bucket.child_count
+            when 0
+              node = bucket.first_child
+              if node.has_children
+                node.IS_QUANTITY_TREE__ || fail  # #todo temp sanity
+                _bn = recurse_into_quant[ node, sub_rect ]
+                assoced_a.push _bn
+              else
+                _an = AssociatedTerminalNode___.new sub_rect, node
+                assoced_a.push _an
+              end
+            when -1
+              recurse_into_tall_bucket[ assoced_a, sub_rect, bucket ]
+            else
+              self._COVER_ME__zero_children_in_bucketish__probably_error__
+            end
           end
+          NIL
+        end
 
-          subd = rect._build_sequential_subdivider__ buckets.length, _use_denom
+        recurse_into_tall_bucket = -> assoced_a, normal_rect, bucket do
 
-          associated_node_a = []
-          bucket_st = Stream_[ buckets ]
-          begin
-            bucket = bucket_st.gets
-            bucket || break
-            _sub_rect = subd[ bucket.total ]
-            _associated_node = recurse[ bucket, _sub_rect ]
-            associated_node_a.push _associated_node
-            redo
-          end while above
+          1 < bucket.child_count || self._ASSUMPTION_FAILED
 
-          AssociatedNonterminalNode___.new rect, associated_node_a.freeze
+          _buckets = bucketser[ bucket.to_child_stream ]
+
+          subdivide_along_buckets[ assoced_a, _buckets, bucket.total, normal_rect ]
+
+          NIL
         end
 
         _initial_rect = __initial_normal_rect
 
-        _associated_node = recurse[ @quantity_tree, _initial_rect ]
+        _associated_node = recurse_into_quant[ @quantity_tree, _initial_rect ]
 
         MondrianTree___.new _associated_node, @_scaler_translator
       end

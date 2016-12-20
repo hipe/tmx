@@ -91,5 +91,38 @@ module Skylab::Treemap::TestSupport
 
     # (what was once the next test here moved to [#cm-016] because
     #  it was too much eyeblood not to test it visuo-automatedly)
+
+    context "introduce depth (integrate (covered) deep quantity tree)" do
+
+      it "mondrian tree builds" do
+        _mondrian_tree || fail
+      end
+
+      it "those branch nodes in the data MUST correspond to visual branch nodes.." do
+
+        an = _mondrian_tree.associated_node
+
+        an.is_branch || fail
+
+        an.associated_nodes.length == 3 || fail
+
+        _hi = an.associated_nodes.map do |an_|
+          an_.is_branch
+        end
+
+        _hi == [ true, true, false ]
+      end
+
+      # (see you in the [#cm-016] ascii tests..)
+
+      shared_subject :_mondrian_tree do
+
+        _qt = groceries_A_quantity_tree
+
+        mondrian_tree_via_quantity_tree _qt do |o|
+          o.target_rectangle = 20, 10, 800, 123
+        end
+      end
+    end
   end
 end

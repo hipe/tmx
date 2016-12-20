@@ -120,6 +120,10 @@ module Skylab::CodeMetrics::TestSupport
         mondrian_ASCII_subject_module_[ _sl, _cx ]
       end
 
+      def squareish_in_ASCII_
+        Rational( 6 ) / Rational( 11 )
+      end
+
       def mondrian_ASCII_subject_module_
         Home_::Magnetics::AsciiMatrix_via_ShapesLayers
       end

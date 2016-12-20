@@ -44,6 +44,7 @@ module Skylab::CodeMetrics
       associated_node.normal_rectangle  # IGNORED - #contact-exercise
 
       associated_node.associated_nodes.each do |an|
+
         if an.is_branch
           _recurse an
         else

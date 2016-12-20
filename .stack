@@ -16,4 +16,3 @@ use [sa] to convert etc to Stream_
 ((-2     [cm] ASCII matrix via real shapes-layers ))
 ((-3     [cm] shapes-layers via real tree-data ))
 ((-4     [cm] tree data via const path ))
-((-5     [cm] shapes-layers via hard-coded tree data ))

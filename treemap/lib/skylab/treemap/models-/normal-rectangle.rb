@@ -16,7 +16,7 @@ module Skylab::Treemap
         @_threshold = thx
       end
 
-      def _build_sequential_subdivider__ num_buckets, denom
+      def build_sequential_subdivider__ num_buckets, denom
 
         _is_portrait = __flush_is_portrait_not_landscape
         if _is_portrait
