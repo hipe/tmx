@@ -1008,7 +1008,7 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def execute
-        scn = PathScanner__.via @path
+        scn = PathScanner.via @path
         if scn.is_absolute
           if scn.no_unparsed_exists
             __when_root
@@ -1187,7 +1187,7 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    class PathScanner__
+    class PathScanner
 
       # process each part of a path with a familiar interface
 
@@ -1196,15 +1196,17 @@ require 'strscan'  # for ::StringScanner below
           scn = ::StringScanner.new path
           if scn.skip SEP__
             NOTHING_ while scn.skip SEP__
-            new scn
+            new true, scn
           else
-            IS_NOT_ABSOLUTE___
+            new false, scn
           end
         end
         private :new
       end  # >>
 
-      def initialize scn
+      def initialize yes, scn
+        @is_absolute = yes
+
         if scn.eos?
           @no_unparsed_exists = true
           freeze
@@ -1261,20 +1263,12 @@ require 'strscan'  # for ::StringScanner below
       SEP__ = /#{ esc }/
 
       attr_reader(
+        :current_token,
         :ended_with_separator,
+        :is_absolute,
         :no_unparsed_exists,
       )
-
-      def is_absolute
-        true
-      end
     end
-
-    module IS_NOT_ABSOLUTE___ ; class << self
-      def is_absolute
-        false
-      end
-    end ; end
 
     # ==
 

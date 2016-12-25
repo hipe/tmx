@@ -126,6 +126,11 @@ module Skylab::CodeMetrics
   end
 
   module Models_
+
+    module Path  # #anemic
+      Path_tailerer = Tailerer_via_separator_[ ::File::SEPARATOR ]
+    end
+
     # (away at #open [#010])
     Autoloader_[ self, :boxxy ]
   end

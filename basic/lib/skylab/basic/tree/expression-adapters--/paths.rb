@@ -2,6 +2,67 @@ module Skylab::Basic
 
   module Tree
 
+    module Magnetics_
+    end
+    Magnetics_::PreOrderNormalPathStream_via_Tree = -> root do
+
+      recurse = -> tree, tree_path do
+
+        proc_for_leaf = -> do
+          once = -> do
+            once = EMPTY_P_
+            tree_path
+          end
+          -> do
+            once[]
+          end
+        end
+
+        proc_for_branch = -> do
+          p = nil
+          cx_st = nil
+          then_children = -> do
+            cx = cx_st.gets
+            if cx
+              _cx_path = [ * tree_path, cx.slug ].freeze
+              cx_path_st = recurse[ cx, _cx_path ]
+              p = -> do
+                pathx = cx_path_st.call
+                if pathx
+                  pathx
+                else
+                  p = then_children
+                  p[]
+                end
+              end
+              p[]
+            end
+          end
+          p = -> do
+            cx_st = tree.to_child_stream
+            p = then_children
+            tree_path
+          end
+          -> do
+            p[]
+          end
+        end
+        if tree.has_children
+          proc_for_branch[]
+        else
+          proc_for_leaf[]
+        end
+      end
+
+      hm = recurse[ root, EMPTY_A_ ]
+
+      st = Common_.stream do
+        hm[]
+      end
+      _waste = st.gets
+      st
+    end
+
     module Expression_Adapters__::Paths
 
       module Actors

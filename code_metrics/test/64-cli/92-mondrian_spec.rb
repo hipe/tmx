@@ -49,7 +49,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def prepare_CLI cli
-      NIL  # NOTHING_
+      NOTHING_
     end
   end
 end

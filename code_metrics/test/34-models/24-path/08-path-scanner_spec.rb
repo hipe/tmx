@@ -73,7 +73,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     Subject___ = Lazy_.call do
-      Home_::Mondrian_[]::PathScanner__
+      Home_::Mondrian_[]::PathScanner
     end
   end
 end

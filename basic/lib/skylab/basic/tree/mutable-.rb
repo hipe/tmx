@@ -66,6 +66,11 @@ module Skylab::Basic
         _expad( x_a, i )::Actors::Build_classified_stream.call_via_iambic x_a
       end
 
+      def to_pre_order_normal_path_stream
+        Tree::Expression_Adapters__.const_get :Paths, false  # below is hard stowaway in here
+        Tree::Magnetics_::PreOrderNormalPathStream_via_Tree[ self ]
+      end
+
       def to_stream_of moda_sym, * x_a
 
         _expad( x_a, moda_sym )::Actors::Build_stream.call_via_iambic x_a
@@ -214,7 +219,7 @@ module Skylab::Basic
         NIL_
       end
 
-      class Frugal < self  # as-is (not complete), for [sg]
+      class Frugal < self  # as-is (not complete), for [sg] (now [cm] too)
 
         def initialize slug=nil
           @a = nil
@@ -250,3 +255,4 @@ module Skylab::Basic
     end
   end
 end
+# #pending-rename: public

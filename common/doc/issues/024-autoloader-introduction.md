@@ -26,7 +26,7 @@ next section.)
 
 
 
-## the isomorphicism you must follow to use this autoloading (:#note-2)
+## the isomorphicism you must follow to use this autoloading (:#note-2) :[#here.2]
 
 the general convention is this: code "assets" that you want autoloaded
 (often classes, but just as possibly non-class modules or any other value)

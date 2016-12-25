@@ -98,10 +98,6 @@ module Skylab::CodeMetrics::TestSupport
       o
     end )
 
-    define_method :path_tailerer, ( Lazy_.call do
-      Home_::Tailerer_via_separator_[ ::File::SEPARATOR ]
-    end )
-
     def subject_API
       Home_.application_kernel_
     end
@@ -175,6 +171,7 @@ module Skylab::CodeMetrics::TestSupport
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
+  NOTHING_ = nil
   SPACE_ = Home_::SPACE_
   TS_ = self
 end
