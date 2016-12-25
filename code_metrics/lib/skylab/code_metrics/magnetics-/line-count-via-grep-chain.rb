@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-    class Magnetics_::Line_Count_via_Grep_Chain
+    class Magnetics_::LineCount_via_GrepChain
 
       attr_writer(
         :file_array,

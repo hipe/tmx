@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  class Sessions_::Resolve_Module  # :[#068].
+  class Sessions_::Resolve_Module  # :[#068]. (improvement in [cm] maybe)
 
     attr_writer(
       :path,

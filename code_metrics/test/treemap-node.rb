@@ -3,18 +3,35 @@ module Skylab::CodeMetrics::TestSupport
   module Treemap_Node
 
     def self.[] tcc
-      tcc.send :define_singleton_method, :given_request, Defn_for_meth_called_given_request___
+      tcc.extend ModuleMethods___
       tcc.include InstanceMethods___
       tcc.include ConstantsAndInstances__
     end
 
-    # -
-      Defn_for_meth_called_given_request___ = -> & p do
-        define_method :__mondrian_lowlevel_proc_for_definition_of_request do
-          p
+    module ModuleMethods___
+
+      def given_paths_for_load_tree & p
+        x = nil ; once = -> do
+          once = nil
+          x = __mondrian_lowlevel_build_load_tree p
+        end
+        define_method :load_tree_ do
+          once && instance_exec( & once )
+          x
         end
       end
-    # -
+
+      def given_request & p
+        x = nil ; once = -> do
+          once = nil
+          x = __mondrian_lowlevel_build_request p
+        end
+        define_method :operation_request_ do
+          once && instance_exec( & once )
+          x
+        end
+      end
+    end
 
     module InstanceMethods___
 
@@ -41,11 +58,29 @@ module Skylab::CodeMetrics::TestSupport
 
       # -- setup support
 
-      def build_request
-        _p = __mondrian_lowlevel_proc_for_definition_of_request
+      def __mondrian_lowlevel_build_load_tree p
+        _s_a = __mondrian_lowlevel_build_string_array p
+        _st = Home_::Stream_[ _s_a ]
+        _req = operation_request_
+        _p = event_listener_
+        _head_path = _req.head_path
+        _wee = Home_::Magnetics_::LoadTree_via_PathStream[ _st, _head_path, & _p ]
+        _wee  # #todo
+      end
+
+      def __mondrian_lowlevel_build_request p
         Home_::Mondrian_[]::Request___.define do |o|
-          instance_exec o, & _p
+          instance_exec o, & p
         end
+      end
+
+      def __mondrian_lowlevel_build_string_array p
+        s_a = []
+        _y = ::Enumerator::Yielder.new do |path|
+          s_a.push path
+        end
+        instance_exec _y, & p
+        s_a
       end
     end
 

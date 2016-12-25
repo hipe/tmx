@@ -63,7 +63,7 @@ module Skylab::CodeMetrics
 
         h = @argument_box.h_
 
-        o = Home_::Magnetics_::Line_Count_via_Arguments.new
+        o = Home_::Magnetics_::LineCount_via_Arguments.new
 
         o.count_blank_lines = ! h[ :without_blank_lines ]
         o.count_comment_lines = ! h[ :without_comment_lines ]

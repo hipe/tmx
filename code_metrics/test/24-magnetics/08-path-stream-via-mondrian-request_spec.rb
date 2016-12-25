@@ -121,8 +121,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def build_path_stream_
-      _req = build_request
-      _subject[ _req ]
+      _subject[ operation_request_ ]
     end
 
     def _subject

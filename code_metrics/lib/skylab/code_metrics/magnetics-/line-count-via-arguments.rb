@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-    class Magnetics_::Line_Count_via_Arguments
+    class Magnetics_::LineCount_via_Arguments
 
       attr_writer(
         :count_blank_lines,
@@ -19,9 +19,9 @@ module Skylab::CodeMetrics
         has_filters = filter_a.length.nonzero?
 
         o = if has_filters
-          Magnetics_::Line_Count_via_Grep_Chain.new
+          Magnetics_::LineCount_via_GrepChain.new
         else
-          Magnetics_::Line_Count_via_WC.new
+          Magnetics_::LineCount_via_WC.new
         end
 
         o.label = @label

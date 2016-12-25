@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-    class Magnetics_::Line_Count_via_WC  # read [#001]
+    class Magnetics_::LineCount_via_WC  # read [#001]
 
       attr_writer(
 

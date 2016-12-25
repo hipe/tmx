@@ -12,24 +12,13 @@ module Skylab::CodeMetrics::TestSupport
       _subject
     end
 
-    def self._given_paths & p
-      x = nil ; once = -> do
-        once = nil
-        x = __load_tree_via_this_one_proc p
-      end
-      define_method :load_tree_ do
-        once && instance_exec( & once )
-        x
-      end
-    end
-
     context "shimmy" do
 
       given_request do |o|
         o.head_path = '/a'
       end
 
-      _given_paths do |y|
+      given_paths_for_load_tree do |y|
         y << '/a/one.x'
         y << '/a/one/two.x'
       end
@@ -53,7 +42,7 @@ module Skylab::CodeMetrics::TestSupport
         o.head_path = '/a'
       end
 
-      _given_paths do |y|
+      given_paths_for_load_tree do |y|
         y << '/a/one/two.x'
         y << '/a/one.x'
       end
@@ -85,26 +74,7 @@ module Skylab::CodeMetrics::TestSupport
 
     # -- setup support
 
-    def __load_tree_via_this_one_proc p
-      _s_a = __string_array_via_this_one_proc p
-      _st = Home_::Stream_[ _s_a ]
-      _req = build_request
-      _p = _event_listener_
-      _head_path = _req.head_path
-      _wee = _subject[ _st, _head_path, & _p ]
-      _wee  # #todo
-    end
-
-    def __string_array_via_this_one_proc p
-      s_a = []
-      _y = ::Enumerator::Yielder.new do |path|
-        s_a.push path
-      end
-      instance_exec _y, & p
-      s_a
-    end
-
-    def _event_listener_
+    def event_listener_
       NOTHING_
     end
 

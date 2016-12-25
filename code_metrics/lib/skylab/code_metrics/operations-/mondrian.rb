@@ -1191,6 +1191,8 @@ require 'strscan'  # for ::StringScanner below
 
       # process each part of a path with a familiar interface
 
+      # (compare the more general [#ta-010] "token stream")
+
       class << self
         def via path
           scn = ::StringScanner.new path

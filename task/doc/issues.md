@@ -2,7 +2,7 @@
 
 [#011]       magnetics item syntax..
 
-[#010] #hole
+[#010]       [token stream]  (#track, referenced by [cm])
              ( #was: `./task/bin/tmx-task mag ./search_and_replace/lib/skylab/search_and_replace/magnetics-` )
              (why are we getting that empty node and label)
 
