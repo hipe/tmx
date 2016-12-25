@@ -103,7 +103,7 @@ module Skylab::DocTest
         end.to_a
       end
 
-    def test_support_  # #[#ts-035]
+    def test_support  # #[#ts-035]
       if ! Home_.const_defined? :TestSupport, false
         require_relative '../../test/test-support'
       end

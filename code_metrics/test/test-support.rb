@@ -12,6 +12,11 @@ module Skylab::CodeMetrics::TestSupport
 
   extend TestSupport_::Quickie
 
+  Home_ = ::Skylab::CodeMetrics
+  Common_ = Home_::Common_
+  Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy_
+
   module Module_Methods___
 
     cache = {}
@@ -24,11 +29,6 @@ module Skylab::CodeMetrics::TestSupport
       _[ self ]
     end
   end
-
-  Home_ = ::Skylab::CodeMetrics
-
-  Common_ = Home_::Common_
-  Autoloader_ = Common_::Autoloader
 
   module Instance_Methods___
 
@@ -89,6 +89,19 @@ module Skylab::CodeMetrics::TestSupport
       [ s ]  # some places need this as mutable (to build sub-program name)
     end
 
+    define_method :doc_test_fixtures, ( Lazy_.call do
+
+      _DocTest = Autoloader_.require_sidesystem :DocTest
+
+      o = DOC_TEST_FIXTURES____ = ::Module.new
+      o.extend _DocTest.test_support::Fixture_Files
+      o
+    end )
+
+    define_method :path_tailerer, ( Lazy_.call do
+      Home_::Tailerer_via_separator_[ ::File::SEPARATOR ]
+    end )
+
     def subject_API
       Home_.application_kernel_
     end
@@ -144,7 +157,7 @@ module Skylab::CodeMetrics::TestSupport
     ::File.join TS_.dir_path, 'fixture-trees', 'fixture-tree-one'
   end
 
-  Fixture_tree_two_ = Common_::Lazy.call do
+  Fixture_tree_two_ = Lazy_.call do
     ::File.join TS_.dir_path, 'fixture-trees/fixture-tree-two'
   end
 
@@ -160,7 +173,6 @@ module Skylab::CodeMetrics::TestSupport
 
   CONST_SEP_ = Home_::CONST_SEP_
   EMPTY_S_ = Home_::EMPTY_S_
-  Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_
   NIL_ = nil
   SPACE_ = Home_::SPACE_

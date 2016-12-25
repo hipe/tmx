@@ -66,7 +66,7 @@ require 'strscan'  # for ::StringScanner below
 
         @exitstatus = 0
 
-        _ss = SystemServices___.new
+        _ss = SystemServices___.instance
 
         o = Operation__.new( _scn, _ss ).execute
         if o
@@ -362,11 +362,22 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    class SystemServices___
+    class SystemServices___  # #testpoint
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
 
       def normalize_user_path path
-        # for now , we assume these paths do not contain symblinks
+        # for now , we assume these paths do not contain symlinks
         ::File.expand_path path
+      end
+
+      def glob path
+        ::Dir.glob path
       end
     end
 

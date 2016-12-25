@@ -86,7 +86,9 @@
              ( #was: #parent-node: [#001] "re-architect.." )
              ( #was: [#ts-034] )
 
-[#007] #open in CLI, a verbose option
+[#007]       assorted internals
+             :[#here.B]: a rename of some fixtures (see [cm])
+       #open in CLI, a verbose option
              ( #was: rename spec files that use real-looking asset file names )
              ( #wontfix - too much work to be worth it. using filesystem is OK)
              ( #was: [#ts-030] )

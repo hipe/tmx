@@ -55,7 +55,7 @@ module Skylab::CodeMetrics
 
   # == small magnets
 
-  Tailerer_via_sep_ = -> sep do
+  Tailerer_via_separator_ = -> sep do
 
     # a "tail" is the second half of a string (e.g path) split meaningfully
     # in two. a "tailer" is a function that produces tails. so a "tailerer"..
@@ -142,9 +142,9 @@ module Skylab::CodeMetrics
 
   # ==
 
-  Require_operations_mondrian_early_interpreter_ = Lazy_.call do
+  Mondrian_ = Lazy_.call do
     require 'skylab/code_metrics/operations-/mondrian'  # 2 of 2
-    NIL
+    ::Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
   end
 
   # ==

@@ -45,8 +45,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def subject_CLI
-      Home_::Require_operations_mondrian_early_interpreter_[]
-      ::Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
+      Home_::Mondrian_[]
     end
 
     def prepare_CLI cli

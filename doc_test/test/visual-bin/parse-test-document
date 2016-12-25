@@ -150,7 +150,7 @@ do_path = -> path do
 
   _omg = _HOME::OutputAdapters_::Quickie::Models::TestDocument.via_line_stream _st
 
-  _HOME.test_support_::Ersatz_Parser::Show_structure_into[ sout, _omg.nodes ]
+  _HOME.test_support::Ersatz_Parser::Show_structure_into[ sout, _omg.nodes ]
 end
 
 do_batch_mode = -> do

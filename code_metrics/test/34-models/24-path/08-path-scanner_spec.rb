@@ -73,8 +73,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     Subject___ = Lazy_.call do
-      Home_::Require_operations_mondrian_early_interpreter_[]
-      ::Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter::PathScanner__
+      Home_::Mondrian_[]::PathScanner__
     end
   end
 end

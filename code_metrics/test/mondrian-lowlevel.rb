@@ -3,11 +3,22 @@ module Skylab::CodeMetrics::TestSupport
   module Mondrian_Lowlevel
 
     def self.[] tcc
+      tcc.send :define_singleton_method, :given_request, Defn_for_meth_called_given_request___
       tcc.include InstanceMethods___
       tcc.include ConstantsAndInstances__
     end
 
+    # -
+      Defn_for_meth_called_given_request___ = -> & p do
+        define_method :__mondrian_lowlevel_proc_for_definition_of_request do
+          p
+        end
+      end
+    # -
+
     module InstanceMethods___
+
+      # -- expectations
 
       def expect_of_every_non_root_child_
 
@@ -26,6 +37,15 @@ module Skylab::CodeMetrics::TestSupport
 
         _hi = treemap_node_
         recurse[ _hi, 0 ]
+      end
+
+      # -- setup support
+
+      def build_request
+        _p = __mondrian_lowlevel_proc_for_definition_of_request
+        Home_::Mondrian_[]::Request___.define do |o|
+          instance_exec o, & _p
+        end
       end
     end
 
