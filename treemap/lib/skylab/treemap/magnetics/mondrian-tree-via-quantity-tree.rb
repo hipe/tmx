@@ -96,8 +96,7 @@ module Skylab::Treemap
     #     you're going to split this rectangle into two in proportions
     #     relative to the data. but first we have to decide whether to
     #     split it vertically or horizontally. to do this we'll use our
-    #     "portrait-landscape-threshold" concept which is described at
-    #     #note-3 and behaves mostly as expected.
+    #     "portrait-landscape-threshold" concept explained #here-1.
     #
     #     so, if the rectangle (per its aspect ratio) is categorized as
     #     "portrait", we'll split it with the split running (um)
@@ -163,13 +162,15 @@ module Skylab::Treemap
 
         :portrait_landscape_threshold_rational,
 
+        # :[#003.2]: :#note-3:
+        #
         # this positive rational number determines when a rectangle is
         # considered "portrait" vs. "landscape", which in turn determines
         # whether a rectangle is split horizontally or vertically.
         #
         # the current rectangle's height divided by its width is compared
-        # against this threshold. if this ratio meets or exceeds this
-        # threshold, it's classified as portrait otherwise landscape.
+        # against this threshold. if the actual ratio meets or exceeds this
+        # formal threshold, it's classified as portrait otherwise landscape.
         #
         # when a rectangle needs to be divided, the "slice" will be made
         # along the horizontal axis IFF the rectangle is classified as

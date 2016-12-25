@@ -51,6 +51,44 @@ module Skylab::CodeMetrics
 
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
+
+  # == small magnets
+
+  Tailerer_via_sep_ = -> sep do
+
+    # a "tail" is the second half of a string (e.g path) split meaningfully
+    # in two. a "tailer" is a function that produces tails. so a "tailerer"..
+
+    # this is a supertreatment of [ba]::Pathname::Localizer
+
+    -> head do
+      head_len = head.length
+      head_plus_sep = "#{ head }#{ sep }"
+      head_plus_sep_len = head_plus_sep.length
+      r = head_plus_sep_len .. -1
+
+      -> s, & els do
+        len = s.length
+        case head_len <=> len
+        when -1
+          if head_plus_sep == s[ 0, head_plus_sep_len ]
+            s[ r ]
+          else
+            els[]
+          end
+        when 0
+          if head == s
+            EMPTY_S_
+          else
+            els[]
+          end
+        else
+          els[]
+        end
+      end
+    end
+  end
 
   # == model support
 
@@ -88,33 +126,7 @@ module Skylab::CodeMetrics
   end
 
   module Models_
-
-    class Mondrian
-      # ==begin temporary mess for [br]
-      Actions = nil
-      def self.adapter_class_for _modality_symbol
-        self
-      end
-      def initialize _self_class, _upper_bnd
-        NOTHING_
-      end
-      def bound_call_under cli
-        o = cli.resources
-        _op = Home_::Operations_::Mondrian::CLI.new(
-          o.argv, o.sin, o.sout, o.serr, o.invocation_string_array,
-          cli.method( :maybe_use_exit_status ),
-        )
-        _op.to_bound_call_of_operator
-      end
-      def expression_agent
-        self
-      end
-      alias_method :calculate, :instance_exec
-      def plural_noun s
-        "#{ s }s"
-      end
-      # ==end temporary mess for [br]
-    end
+    # (away at #open [#010])
     Autoloader_[ self, :boxxy ]
   end
 
@@ -130,7 +142,12 @@ module Skylab::CodeMetrics
 
   # ==
 
-  Lazy_ = Common_::Lazy
+  Require_operations_mondrian_early_interpreter_ = Lazy_.call do
+    require 'skylab/code_metrics/operations-/mondrian'  # 2 of 2
+    NIL
+  end
+
+  # ==
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
@@ -207,6 +224,8 @@ module Skylab::CodeMetrics
 
     System_lib__ = sidesys[ :System ]
 
+    Task = sidesys[ :Task ]
+
     Test_support = sidesys[ :TestSupport ]
 
     Treemap = sidesys[ :Treemap ]
@@ -219,6 +238,7 @@ module Skylab::CodeMetrics
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
+  CONST_SEP_ = '::'
   EMPTY_A_ = []
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze

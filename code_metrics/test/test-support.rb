@@ -158,7 +158,7 @@ module Skylab::CodeMetrics::TestSupport
 
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  CONST_SEP_ = '::'
+  CONST_SEP_ = Home_::CONST_SEP_
   EMPTY_S_ = Home_::EMPTY_S_
   Lazy_ = Common_::Lazy
   NEWLINE_ = Home_::NEWLINE_

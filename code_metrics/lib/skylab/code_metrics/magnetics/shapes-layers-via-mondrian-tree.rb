@@ -22,6 +22,10 @@ module Skylab::CodeMetrics
 
     def execute
 
+      if :_stub_of_mondrian_tree_ == @mondrian_tree  # #[#007.H]
+        return :_stub_of_shapes_layers_
+      end
+
       Home_::Models::ShapesLayers.define do |sls|
 
         @_same_shapes_layers = sls

@@ -75,13 +75,14 @@ as far as we understand).
 
 
 
-## portrait vs landscape classification :#note-3
+## portrait vs landscape classification :[#here.2] :#note-3
 
 in general it's very simple: a rectangle that is wider than it is tall is
 "landscape", otherwise it's portrait. note this classifies the square as
 portrait too.
 
-but the interesting thing is (EDIT)
+but under the surface it's more intersting: we make this boundary between
+"portrait" and "landscape" configurable. more inline under this tag.
 
 
 

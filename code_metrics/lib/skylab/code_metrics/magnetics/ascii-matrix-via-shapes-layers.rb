@@ -10,7 +10,7 @@ module Skylab::CodeMetrics
       end
 
       def execute
-        if :_shapes_layers_stub_ == @shapes_layers
+        if :_stub_of_shapes_layers_ == @shapes_layers  # #[#007.H]
           __do_stub
         else
           __do_real_execute

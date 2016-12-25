@@ -92,7 +92,7 @@ module Skylab::TMX
 
       stat = ::File.lstat dir
 
-      if stat.symlink?  # #todo this is explained somewhere
+      if stat.symlink?  # explained at [#tm-013.1]
         dir = ::File.readlink dir
       end
 

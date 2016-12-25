@@ -603,6 +603,10 @@ module Skylab::Zerk::TestSupport
         BigStringBasedAssertion___.new @big_string, @method_name, @serr_or_sout, tc
       end
 
+      def inspect_expectation
+        [ "«big string»", @serr_or_sout, @method_name ].inspect
+      end
+
       def is_multi_emission_expectation
         true
       end

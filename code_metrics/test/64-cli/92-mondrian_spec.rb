@@ -23,14 +23,14 @@ module Skylab::CodeMetrics::TestSupport
 
       invoke me
 
-      expect_on_stderr "missing required parameter: -path"
+      expect_on_stderr %r(\Afor now, required: -path and\b)
 
       expect_failed
     end
 
     it "money (mocked)" do
 
-      invoke me, 'some-path.code'
+      invoke me, '-head-const', 'xx', 'mock-path-1.code'
 
       _big_string = <<-HERE.unindent
         +------+
@@ -44,8 +44,13 @@ module Skylab::CodeMetrics::TestSupport
       expect_succeeded
     end
 
+    def subject_CLI
+      Home_::Require_operations_mondrian_early_interpreter_[]
+      ::Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
+    end
+
     def prepare_CLI cli
-      NIL
+      NIL  # NOTHING_
     end
   end
 end

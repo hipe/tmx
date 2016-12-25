@@ -121,7 +121,7 @@ module Skylab::CodeMetrics::TestSupport
       end
 
       def squareish_in_ASCII_
-        Rational( 6 ) / Rational( 11 )
+        Rational( 6 ) / Rational( 11 )  # see also #mon-spot-1
       end
 
       def mondrian_ASCII_subject_module_

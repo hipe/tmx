@@ -78,6 +78,7 @@ module Skylab::Common::TestSupport
   KEEP_PARSING_ = true
   Lazy_ = Home_::Lazy
   NEWLINE_ = "\n".freeze
+  NOTHING_ = nil
   NIL_ = nil
   TS_ = self
   UNABLE_ = false

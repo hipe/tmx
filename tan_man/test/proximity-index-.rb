@@ -1,6 +1,6 @@
 module Skylab::TanMan::TestSupport
 
-  class Proximity_Index_
+  class Proximity_Index_  # :[#013] (mainly for an issue)
 
     # given both
     #
@@ -65,7 +65,7 @@ module Skylab::TanMan::TestSupport
     #
     #
     #
-    # ## symlinks
+    # ## symlinks :[#here.1]
     #
     # sadly the above elegance falls apart in practice in cases where the
     # argument path is "really" under the "big tree", but symlinks are
@@ -78,6 +78,9 @@ module Skylab::TanMan::TestSupport
     # heuristically normalize-out such cases based on how we use symlinks
     # in our devlopement. this makes the subject node "impure" (i.e not fit
     # for general use), but does not diminish its merit as proof of concept.
+    #
+    # (we have since created [#cm-017] "path normalizer" to solve
+    # this exact problem.)
 
     def initialize head, entry, middle, mod
 

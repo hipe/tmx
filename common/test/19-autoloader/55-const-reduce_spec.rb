@@ -201,6 +201,53 @@ module Skylab::Common::TestSupport
       _hi.name =~ %r(::Infermershern\z) or fail
     end
 
+    context "`autoloaderize`" do
+
+      context "without this flag, the loaded thing is not autoloaderized" do
+
+        def _const_path
+          :FIV_SAME_TWEEDLE_DEE
+        end
+
+        def _yes_no
+          NOTHING_
+        end
+
+        it "sic" do
+          _loaded_subject.respond_to?( :dir_path ) && fail
+        end
+      end
+
+      context "with this flag, the loaded thing is autoloaderized" do
+
+        def _const_path
+          :FIV_SAME_TWEEDLE_DUM
+        end
+
+        def _yes_no
+          :autoloaderize
+        end
+
+        it "sic" do
+          _loaded_subject.respond_to?( :dir_path ) || fail
+        end
+      end
+
+      def _loaded_subject
+
+        _from_here = fixture_tree_
+        _use_const_path = _const_path
+
+        _mod = _subject_plus_real_file_tree_cache(
+          :from_module, _from_here,
+          :const_path, _use_const_path,
+          * _yes_no,
+        )
+
+        _mod  # #todo
+      end
+    end
+
     def _subject_plus_real_file_tree_cache * x_a, & x_p
 
       Home_::Autoloader::ConstReduction__.new(

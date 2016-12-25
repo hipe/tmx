@@ -1,3 +1,5 @@
+[#017]       the path normalizer (referenced by [tm])
+
 [#016]       a test case is "shared" for [tr] too
 
 [#015] #open currently hard-coded screen width in tests (or not)
@@ -24,11 +26,19 @@
              ( #was: #wormhole )
 [#007]       mixed internal trackpoints that do NOT leave this sidesystem.
 
+             :[#here.J]: argument potpourri
+
+             :[#here.I]: track TracePoint based adapters
+
+       #open :[#here.H]: tracks traces of stubbing to be removed
+
+       #open :[#here.G]: mondrian help screen
+
        #wish :[#here.F]: hax for procs (`constants` and byte-processing files)
 
        #idea  [#here.E]: vertical centering (correctly) automatically for label
 
-       #open :[#here.D]: confused understanding of coordinate systems
+       #refa :[#here.D]: confused understanding of coordinate systems
 
        #idea :[#here.C]: latticework (foresight references)
              (this relates to that one paper about it)

@@ -15,3 +15,8 @@ use [sa] to convert etc to Stream_
 ((-1     [cm] CLI client that outputs real ascii-matrix ))
 ((-2     [cm] ASCII matrix via real shapes-layers ))
 ((-3     [cm] shapes-layers via real tree-data ))
+((-1.10  [cm] playback the recording to make shapes layers ))
+((-1.30  [cm] recording model (maybe [un] serialize) ))
+((-1.50  [cm] tracepoint load adapter via load tree ))
+((-1.70  [cm] load tree via path stream ))
+((-1.90  [cm] path stream via request ))

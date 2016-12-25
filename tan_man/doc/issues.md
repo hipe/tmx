@@ -118,7 +118,7 @@
 [#015] #open #feature remove association between nodes (see)
              ( #was: #done UI for dissociate (and prune nodes? - no, out of scope) )
 [#014]       #done UI for associate (labeled "depends on")
-[#013] #hole
+[#013]       #track why symlinks (once here, once outside)
              ( #was: unused files )
              ( #was: #DONE UI for chose example, then use example
               1. unify & modernify autoloading

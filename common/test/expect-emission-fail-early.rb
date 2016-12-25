@@ -760,7 +760,6 @@ module Skylab::Common::TestSupport
     # ==
 
     MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
-    NOTHING_ = nil
   end
 end
 # #history: one rewrite of this abstracted from [ts] "slowie"
