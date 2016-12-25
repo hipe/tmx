@@ -6,7 +6,7 @@ module Skylab::Basic
 
       Input_Adapters__::Paths = -> upstream_x do
 
-        root = Tree_::Mutable_.new
+        root = Tree_::Mutable.new
 
         upstream_x.each do | path |
 

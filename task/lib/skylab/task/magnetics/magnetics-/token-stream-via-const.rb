@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    o = Here_::Models_::TokenStream.begin
+    o = Here_::Models::TokenStream.begin
     o.word_regex = /[A-Z][a-z]+|[a-z][a-z]+/
     o.separator_regex = /_/
     token_stream_prototoype = o.finish

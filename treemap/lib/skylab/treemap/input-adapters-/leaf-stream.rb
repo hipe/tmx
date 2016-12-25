@@ -196,7 +196,7 @@ module Skylab::Treemap
       def receive_is_branch d
 
         d.zero? or self._SANITY
-        extend Home_::Models_::Node::Branch_Methods
+        extend Home_::Models::Node::Legacy::Branch_Methods
         @_branch_number = d
         NIL_
       end

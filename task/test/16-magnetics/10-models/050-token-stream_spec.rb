@@ -161,7 +161,7 @@ module Skylab::Task::TestSupport
     end
 
     def _subject_module
-      models_module_::TokenStream
+      Home_::Magnetics::Models::TokenStream
     end
   end
 end

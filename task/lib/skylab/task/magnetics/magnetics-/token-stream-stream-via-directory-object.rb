@@ -23,7 +23,7 @@ class Skylab::Task
 
       def __init_token_stream_prototype
 
-        o = Here_::Models_::TokenStream.begin
+        o = Here_::Models::TokenStream.begin
 
         o.add_head_anchored_skip_regex %r(_)
 

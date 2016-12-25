@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::Node_for_Treemap_via_ConstLoadTicket < Common_::Actor::Monadic
+  class Magnetics_::Node_for_Treemap_via_Recording < Common_::Actor::Monadic
 
     # the least hacky way we can accomplish what we're after (as far as
     # we've found) is to use `TracePoint` which can notify us when certain

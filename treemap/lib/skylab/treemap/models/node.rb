@@ -1,9 +1,5 @@
 module Skylab::Treemap
 
-  Models = ::Module.new
-    # (currently only 1 public model,
-    #  and it might eventually merge with this private node :#spot-1)
-
   class Models::Node  # < SimpleModel_
 
     # (this is a fresh take on it, 5 years later, for another thing)
@@ -50,7 +46,7 @@ module Skylab::Treemap
 
     def to_classified_stream  # for testing only :(
       _Tree = Home_.lib_.basic::Tree
-      _Tree::Actors__::Build_classified_stream.new( self ).execute
+      _Tree::Magnetics::ClassifiedStream_via_Tree[ self ]
     end
 
     def to_child_stream
@@ -66,7 +62,7 @@ module Skylab::Treemap
     )
   end
 
-  class Models_::Node
+  class Models::Node::Legacy
 
     # for both efficency of memory usage and our own mental sanity (along one
     # axis), we are experimentally cramming lots of concerns from different
@@ -217,4 +213,3 @@ module Skylab::Treemap
     Actions = nil
   end
 end
-# #pending-rename..

@@ -6,7 +6,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :expect_emission_fail_early
-    use :mondrian_lowlevel  # for only one method
+    use :treemap_node  # for only one method
 
     it "loads" do
       _subject_module || fail

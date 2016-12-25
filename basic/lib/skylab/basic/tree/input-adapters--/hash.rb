@@ -10,7 +10,7 @@ module Skylab::Basic
 
       def execute
 
-        @node_class = Tree_::Mutable_
+        @node_class = Tree_::Mutable
         _work @node_class.new, @upstream_x
       end
 

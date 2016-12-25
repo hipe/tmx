@@ -106,7 +106,9 @@ module Skylab::DocTest::TestSupport
       call_by do
 
         _fs = the_real_filesystem_
-        @_path = tree_path_via_dir_ 'tree-03-gemish'
+
+        @_path = TestSupport_::Fixtures.tree_path_via_entry 'tree-05-gemish'
+
         _sc = mock_system_for_tree_03_gemish__
 
         call(

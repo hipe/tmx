@@ -50,8 +50,6 @@ module Skylab::Treemap
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
-  stowaway :Models, 'models-/node'  # currently only 1 public model.. (see #spot-1)
-
   # == functions
 
   Stream_ = -> a, & p do

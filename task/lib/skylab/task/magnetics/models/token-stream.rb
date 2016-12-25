@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Models_::TokenStream
+    class Models::TokenStream
 
       # (yes, a tokenizer seems like a different kind of performer
       # (a session maybe) rather than a model, but bear with us..)

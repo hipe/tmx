@@ -97,4 +97,3 @@ end
 # ->
 end
 # #tombstone - is rounding the solution to the floating point error?
-# #pending-rename - this became core (look at visual too)

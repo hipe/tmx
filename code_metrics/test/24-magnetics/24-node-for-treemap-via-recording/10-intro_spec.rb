@@ -2,14 +2,14 @@ require_relative '../../test-support'
 
 module Skylab::CodeMetrics::TestSupport
 
-  describe "[cm] magnetics (private) - node for treemap via [..]" do
+  describe "[cm] magnetics (private) - node for treemap via recording" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :mondrian_lowlevel
+    use :treemap_node
 
     it "loads" do
-      node_for_treemap_via_const_load_ticket_module || fail
+      Home_::Magnetics_::Node_for_Treemap_via_Recording || fail
     end
 
     context "work one" do

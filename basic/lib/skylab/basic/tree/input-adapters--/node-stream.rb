@@ -4,7 +4,7 @@ module Skylab::Basic
 
     Input_Adapters__::Node_Stream = -> in_st do
 
-      root = Tree_::Mutable_.new
+      root = Tree_::Mutable.new
 
       begin
         id = in_st.gets

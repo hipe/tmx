@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Mutable_ < Common_::Box
+    class Mutable < Common_::Box
 
       # experiment: a mutable tree based on "box".
 
@@ -62,7 +62,6 @@ module Skylab::Basic
       end
 
       def to_classified_stream_for i, * x_a
-
         _expad( x_a, i )::Actors::Build_classified_stream.call_via_iambic x_a
       end
 
@@ -89,8 +88,7 @@ module Skylab::Basic
       end
 
       def to_classified_stream
-
-        Tree_::Actors__::Build_classified_stream.new( self ).execute
+        Tree_::Magnetics::ClassifiedStream_via_Tree[ self ]
       end
 
       def longest_common_base_path
@@ -255,4 +253,3 @@ module Skylab::Basic
     end
   end
 end
-# #pending-rename: public

@@ -65,7 +65,7 @@ module Skylab::Treemap
       Common_::Scn.new do
         line_s = line_upstream.gets
         if line_s
-          Models_::Node.new line_s, line_upstream.lineno
+          Home_::Models::Node::Legacy.new line_s, line_upstream.lineno
         end
       end
     end

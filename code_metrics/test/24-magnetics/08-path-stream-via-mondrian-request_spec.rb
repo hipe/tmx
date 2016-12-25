@@ -6,7 +6,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :mondrian_lowlevel
+    use :treemap_node
 
     it "loads" do
       _subject
@@ -27,13 +27,12 @@ module Skylab::CodeMetrics::TestSupport
 
     context "two glob-likes and one path" do
 
-      same_03 = 'tree-03-gemish'
-
       given_request do |o|
 
-        _ = doc_test_fixtures
-
-        pather = _.fixture_tree_pather same_03
+        dirname = TestSupport_::Fixtures.tree_path_via_entry 'tree-05-gemish'
+        pather = -> path do
+          ::File.join dirname, path
+        end
 
         o.paths = [
           pather[ 'lib/zerby-derby/**/*[a-z]-[fr]*.ko' ],

@@ -5,7 +5,7 @@ module Skylab::Basic
     class << self
 
       def frugal_node
-        Tree_::Mutable_::Frugal
+        Tree_::Mutable::Frugal
       end
 
       def immutable_node
@@ -21,7 +21,7 @@ module Skylab::Basic
       end
 
       def mutable_node
-        Tree_::Mutable_
+        Tree_::Mutable
       end
 
       def unicode

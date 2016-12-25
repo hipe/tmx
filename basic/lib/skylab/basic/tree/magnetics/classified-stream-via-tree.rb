@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Actors__::Build_classified_stream  # :[#053]
+    class Magnetics::ClassifiedStream_via_Tree < Common_::Actor::Monadic  # :[#053]
 
       def initialize node
         @node = node

@@ -16,6 +16,10 @@ module Skylab::TestSupport
         ::File.join @trees_path, __trees_box.fetch( sym )
       end
 
+      def tree_path_via_entry s
+        ::File.join @trees_path, s
+      end
+
       attr_reader(
         :dirs_path,
         :files_path,

@@ -89,15 +89,6 @@ module Skylab::CodeMetrics::TestSupport
       [ s ]  # some places need this as mutable (to build sub-program name)
     end
 
-    define_method :doc_test_fixtures, ( Lazy_.call do
-
-      _DocTest = Autoloader_.require_sidesystem :DocTest
-
-      o = DOC_TEST_FIXTURES____ = ::Module.new
-      o.extend _DocTest.test_support::Fixture_Files
-      o
-    end )
-
     def subject_API
       Home_.application_kernel_
     end

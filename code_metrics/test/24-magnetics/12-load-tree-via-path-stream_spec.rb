@@ -6,7 +6,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :mondrian_lowlevel
+    use :treemap_node
 
     it "loads" do
       _subject

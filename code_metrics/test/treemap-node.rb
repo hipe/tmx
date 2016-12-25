@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics::TestSupport
 
-  module Mondrian_Lowlevel
+  module Treemap_Node
 
     def self.[] tcc
       tcc.send :define_singleton_method, :given_request, Defn_for_meth_called_given_request___
@@ -73,7 +73,7 @@ module Skylab::CodeMetrics::TestSupport
 
         const_load_ticket || fail
 
-        _hi = node_for_treemap_via_const_load_ticket const_load_ticket
+        _hi = Home_::Magnetics_::Node_for_Treemap_via_Recording[ const_load_ticket ]
 
         _hi  # #todo
       end
@@ -87,18 +87,10 @@ module Skylab::CodeMetrics::TestSupport
 
     module ConstantsAndInstances__
 
-      def node_for_treemap_via_const_load_ticket nt, & p
-        node_for_treemap_via_const_load_ticket_module[ nt, & p ]
-      end
-
       def const_load_ticket_via_const_path_and_require_path cp, rp, & p
 
         const_load_ticket_module.via_const_path_and_require_path(
           cp, rp, & p )
-      end
-
-      def node_for_treemap_via_const_load_ticket_module
-        Home_::Magnetics_::Node_for_Treemap_via_ConstLoadTicket
       end
 
       def const_load_ticket_module

@@ -34,10 +34,6 @@ module Skylab::DocTest::TestSupport
         ::File.expand_path path, _fixture_trees_directory
       end
 
-      def tree_path_via_dir_ dir
-        ::File.join _fixture_trees_directory, dir
-      end
-
       def fixture_file_ file
         ::File.join _fixture_files_directory, file
       end
@@ -58,5 +54,4 @@ module Skylab::DocTest::TestSupport
     Here___ = self
   end
 end
-# #pending-rename: not this file but see 'tree-03-gemish' in [cm] - move to [ts]. is [#007.B]
 # #tombstone: "path cache" that mapped short symbols to paths
