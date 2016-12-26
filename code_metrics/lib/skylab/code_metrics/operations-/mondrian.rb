@@ -456,6 +456,7 @@ require 'strscan'  # for ::StringScanner below
 
       attr_accessor(
         :be_verbose,
+        :do_paginate,
         :debug_IO,
         :head_const,
         :head_path,
@@ -463,10 +464,6 @@ require 'strscan'  # for ::StringScanner below
         :require_paths,
         :system_services,
       )
-
-      def do_paginate
-        false  # code sketch..
-      end
     end
 
     # ==

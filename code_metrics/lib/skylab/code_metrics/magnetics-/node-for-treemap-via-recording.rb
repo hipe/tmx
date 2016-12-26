@@ -29,8 +29,6 @@ module Skylab::CodeMetrics
       def __when_file_box_has_multiple_items
         bx = remove_instance_variable :@_file_box
         if @request.do_paginate
-          self._CODE_SKETCH__pagination_might_look_something_like_this__
-
           bx.to_value_stream.map_by do |file|
             file.to_node_for_treemap
           end

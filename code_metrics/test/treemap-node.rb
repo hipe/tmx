@@ -36,39 +36,49 @@ module Skylab::CodeMetrics::TestSupport
 
       def build_treemap_node_statistics_
 
+        __TMN_build_treemap_node_statistics_of treemap_node_
+      end
+
+      def __TMN_build_treemap_node_statistics_of root_node
+
+        st = _TMN_non_root_stream_of root_node
+
         max_depth = 0
         number_of_leaf_nodes = 0
-
-        recurse = -> node, my_depth do
-          depth_of_my_children = my_depth + 1
-          if depth_of_my_children > max_depth
-            max_depth = depth_of_my_children
+        begin
+          tuple = st.gets
+          tuple || break
+          node, _column, depth = tuple
+          if depth > max_depth
+            max_depth = depth
           end
-          st = node.to_child_stream
-          while node_ = st.gets
-            if node_.has_children
-              recurse[ node_, depth_of_my_children ]
-            else
-              number_of_leaf_nodes += 1
-            end
+          if ! node.has_children
+            number_of_leaf_nodes += 1
           end
-        end
-
-        _ = treemap_node_
-        recurse[ _, 1 ]
+          redo
+        end while above
 
         Statistics___.new max_depth, number_of_leaf_nodes
       end
 
       def expect_every_non_root_terminal_child_has_weights_
 
-        _TMN_expect_of_every_non_root_child do |tr|
-          if ! tr.has_children
-            d = tr.main_quantity
-            d || fail
-            d.zero? && fail
-          end
+        __TMN_expect_of_every_leaf_child_of treemap_node_ do |tr|
+          d = tr.main_quantity
+          d || fail
+          d.zero? && fail
         end
+      end
+
+      def __TMN_expect_of_every_leaf_child_of root_node
+
+        st = _TMN_leaf_child_stream_of root_node
+        begin
+          node = st.gets
+          node || break
+          yield node
+          redo
+        end while above
       end
 
       def expect_every_non_root_child_has_a_short_name_
@@ -96,23 +106,60 @@ module Skylab::CodeMetrics::TestSupport
         ( 2..6 ).include? _d or fail  # shallowest is six
       end
 
-      def _TMN_expect_of_every_non_root_child
+      def number_of_leaf_nodes_of_ node
+        _TMN_leaf_child_stream_of( node ).flush_to_count
+      end
 
-        recurse = -> tree, depth do
-          depth_ = depth + 1
-          st = tree.to_child_stream
-          col = -1
-          while tr=st.gets
-            col += 1
-            yield tr, col, depth_
-            if tr.has_children
-              recurse[ tr, depth_ ]
+      def _TMN_leaf_child_stream_of root_node
+
+        recurse = -> parent_node do
+
+          parent_node.to_child_stream.expand_by do |child_node|
+            if child_node.has_children
+              recurse[ child_node ]
+            else
+              Common_::Stream.via_item child_node
             end
           end
         end
 
-        _hi = treemap_node_
-        recurse[ _hi, 0 ]
+        recurse[ root_node ]
+      end
+
+      def _TMN_expect_of_every_non_root_child & p
+
+        __TMN_expect_of_every_non_root_child_of treemap_node_, & p
+      end
+
+      def __TMN_expect_of_every_non_root_child_of root_node
+
+        st = _TMN_non_root_stream_of root_node
+        begin
+          tuple = st.gets
+          tuple || break
+          yield( * tuple )  # 3
+          redo
+        end while above
+      end
+
+      def _TMN_non_root_stream_of root_node
+
+        recurse = -> parent_node, parent_depth do
+
+          col = -1
+          child_depth = parent_depth + 1
+
+          parent_node.to_child_stream.expand_by do |child_node|
+            col += 1
+            if child_node.has_children
+              recurse[ child_node, child_depth ]
+            else
+              Common_::Stream.via_item [ child_node, col, child_depth ]
+            end
+          end
+        end
+
+        recurse[ root_node, 1 ]
       end
 
       # -- shared subjects
