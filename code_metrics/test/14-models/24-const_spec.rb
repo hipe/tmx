@@ -103,11 +103,11 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def _sub_subject_via s, & p
-      const_scanner_model.via_string s, & p
+      _subject_module::ConstScanner.via_string s, & p
     end
 
     def _subject_module
-      const_model
+      Home_::Models_::Const
     end
   end
 end

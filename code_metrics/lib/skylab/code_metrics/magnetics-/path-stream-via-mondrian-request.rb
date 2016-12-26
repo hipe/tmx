@@ -2,12 +2,29 @@ module Skylab::CodeMetrics
 
   class Magnetics_::PathStream_via_MondrianRequest < Common_::Actor::Monadic
 
-    # -
-      def initialize req, svcs=nil & p
+    # if any of the paths contain metacharacters that suggest globbing,
+    # produce an expanded stream of real file names that accords with the
+    # original order of the file globs:
+    #
+    #
+    #     user enters:                           this stream produces:
+    #
+    #                         +-->           plain/file/one
+    #                        /
+    #    plain/file/one  -- +    +-->        file-1-from-glob-1/eg/wee
+    #                           /
+    #    *glob-1/**/wee   -----+---->        file-2-from-glob-1/eg/wee
+    #
+    #    plain/file/two   -------->          plain/file/two
+    #
+    #    *glob-2          ---+-->            file-1-from-glob-2
+    #                        \
+    #                        +--->           file-2-from-glob-2
 
-        @__system_services = svcs || Mondrian_[]::SystemServices___.instance
+      def initialize req, & p
 
         @_listener = p
+        @__system_services = req.system_services
         # @head_const = req.head_const
         # @head_path = req.head_path
         @paths = req.paths

@@ -18,7 +18,7 @@ module Skylab::CodeMetrics::TestSupport
         o.head_path = '/a'
       end
 
-      given_paths_for_load_tree do |y|
+      given_expanded_path_stream do |y|
         y << '/a/one.x'
         y << '/a/one/two.x'
       end
@@ -42,7 +42,7 @@ module Skylab::CodeMetrics::TestSupport
         o.head_path = '/a'
       end
 
-      given_paths_for_load_tree do |y|
+      given_expanded_path_stream do |y|
         y << '/a/one/two.x'
         y << '/a/one.x'
       end

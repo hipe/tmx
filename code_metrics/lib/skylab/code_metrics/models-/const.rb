@@ -2,43 +2,7 @@ module Skylab::CodeMetrics
 
   class Models_::Const
 
-    class LoadTicket
-
-      class << self
-
-        def via_const_path_and_require_path cp, rp, & p
-
-          scn = Scanner.via_string cp, & p
-          if scn
-            __begin( scn, rp, & p ).__init
-          else
-            scn
-          end
-        end
-
-        alias_method :__begin, :new
-        undef_method :new
-      end  # >>
-
-      def initialize scn, require_path, & p
-        @const_scanner = scn
-        @require_path = require_path
-        @_listener = p
-      end
-
-      def __init
-        self  # ..
-      end
-
-      attr_reader(
-        :const_scanner,
-        :require_path,
-      )
-    end
-
-    # ==
-
-    class Scanner
+    class ConstScanner
 
       # why don't we just `split` and `const_get`, you ask? we want
       # the option of failing gracefully with detailed error message
@@ -75,6 +39,7 @@ module Skylab::CodeMetrics
       end
 
       def _at_normal_head
+        @no_unparsed_exists = false
         if _parse_const
           @_advance_one = :__advance_one_normally
           if _end_of_scan
@@ -87,6 +52,24 @@ module Skylab::CodeMetrics
         else
           _when_failed_to_parse_const
         end
+      end
+
+      def flush_to_value
+        if @no_unparsed_exists
+          fail
+        else
+          __flush_to_value
+        end
+      end
+
+      def __flush_to_value
+        mod = ::Object
+        begin
+          _mod_ = mod.const_get current_token, false
+          mod = _mod_
+          advance_one
+        end until @no_unparsed_exists
+        Common_::Known_Known[ mod ]
       end
 
       def gets_one
@@ -188,4 +171,5 @@ module Skylab::CodeMetrics
     # ==
   end
 end
+# #tombstone-A: furlough const-based load adapter
 # #born for mondrian

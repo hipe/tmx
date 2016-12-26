@@ -3,15 +3,22 @@ require 'strscan'  # for ::StringScanner below
 # -
   class Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
 
-    # the central implementation mechanic of this visualization is that
-    # TracePoint ("[the] facility") is used to determine the lines-of-code
-    # size for module elements (e.g classes).
+    # the least hacky way we can accomplish what we're after (as far as
+    # we've found) is to use `TracePoint` ("[the] facility") which can
+    # notify us when certain events of interest occur like when a module
+    # (e.g class) is opened, or when the same module's scope again closes
+    # (with an `end` keyword).
+    #
+    # (this facility is usable to us because it tells us line numbers
+    # (otherwise we'd have to go much darker); however we can't get
+    # notified of the blocks used when defining procs yet. we might hack
+    # something awful for that.)
     #
     # the caveat to using the facility for this objective is that the
     # facility communicates events of interest *while* the files of interest
     # are loaded (parsed), so you cannot (straightforwardly) apply this
     # technique to files that have already been loaded into your runtime
-    # once you begin "listening".
+    # before you begin "recording".
     #
     # (a workaround might be to load the files of interest twice, but we
     # anticipate this as carrying significant hidden future costs, as we
@@ -19,9 +26,10 @@ require 'strscan'  # for ::StringScanner below
     # also what we attempt here accords more cleanly with our next wish,
     # which is file globs.)
     #
-    # so this becomes a bootstrapping challenge, similar to trying to
-    # produce code coverage over files that are involved in processing
-    # a request:
+    # so the above described dynamic becomes *the* central mechanic of
+    # the whole implementation of this visualization. it is a familiar
+    # bootstrapping challenge, similar to trying to produce code coverage
+    # over files that are involved in processing the request for coverage.
     #
     # since there are no code nodes we have ever written that we cannot
     # imagine wanting this visualization for, we cut the gordian knot
@@ -52,7 +60,7 @@ require 'strscan'  # for ::StringScanner below
 
         remove_instance_variable :@stdin  # assert never used
         argv = remove_instance_variable :@ARGV
-        'mondrian' == argv[0] || fail  # ..
+        'm' == argv[0][0] || fail  # ..
 
         listener = method :__receive_emission
 
@@ -66,9 +74,7 @@ require 'strscan'  # for ::StringScanner below
 
         @exitstatus = 0
 
-        _ss = SystemServices___.instance
-
-        o = Operation__.new( _scn, _ss ).execute
+        o = Operation__.new( _scn ).execute
         if o
           st = o.release_line_stream
           while line = st.gets
@@ -123,9 +129,16 @@ require 'strscan'  # for ::StringScanner below
 
       def initialize
         yield self
+        freeze
       end
 
       private :dup
+
+      def redefine
+        otr = dup
+        yield otr
+        otr.freeze
+      end
     end
 
     # ==
@@ -144,20 +157,21 @@ require 'strscan'  # for ::StringScanner below
 
     class Operation__
 
-      def initialize scn, ss
+      def initialize scn
         @__scn = scn
-        @_system_services = ss
       end
 
       def execute
-        if __parse_arguments
-
-          if 'mock-path-1.code' == ::File.basename( @__request.paths.last )  # #[#007.H]
+        ok = true
+        ok &&= __parse_arguments
+        if ok
+          if 'mock-path-1.code' == ::File.basename( @_request.paths.last )  # #[#007.H]
             return __result_for_mock_one
           end
-
-          __produce_recording
         end
+        ok &&= __resolve_recording
+        ok &&= __resolve_node_for_treemap_via_recording
+        ok && self._SOMETHING_VIA_RECORDING
       end
 
       def __result_for_mock_one
@@ -166,21 +180,33 @@ require 'strscan'  # for ::StringScanner below
         LineStreamReleaser___.new _st
       end
 
-      def __produce_recording
-        _request = remove_instance_variable :@__request
-        recorder = Recorder___.new _request, @_system_services, @_listener
-        $stderr.puts "SCOTT BAYO" ; if false
+      def __resolve_node_for_treemap_via_recording  # #testpoint (see #mon-spot-2)
+        _rec = remove_instance_variable :@__recording
+        _ = @_mags::Node_for_Treemap_via_Recording.call(
+          _rec, @_request, & @_listener )
+        _store :@__node_for_tremap, _
+      end
+
+      def __resolve_recording  # #testpoint (see #mon-spot-2 again)
+        recorder = Recorder___.new @_request, @_listener
         recorder.enable
+        @_mags = Code_metrics_[]::Magnetics_  # only after we are recording
+        __load_all_assets_and_support
         recorder.disable
-        end
-        NOTHING_
+        _store :@__recording, recorder.flush_recording
+      end
+
+      def __load_all_assets_and_support
+        la = @_mags::LoadAdapter_via_Request[ @_request, & @_listener ]
+        la && la.load_all_assets_and_support
+        NIL
       end
 
       def __parse_arguments
         scn = remove_instance_variable :@__scn
         @_listener = scn.listener
-        _ = Request_via_Scanner___.new( scn, @_system_services ).execute
-        _store :@__request, _
+        _ = Request_via_Scanner___.new( scn ).execute
+        _store :@_request, _
       end
 
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
@@ -190,12 +216,47 @@ require 'strscan'  # for ::StringScanner below
 
     class Request_via_Scanner___
 
-      def initialize scn, ss
-        @_args = scn
-        @_listener = scn.listener
-        @_system_services = ss
+      # the only weird thing about this is the dependency of
+      # system services ("topic") on request parsing:
+      #
+      #   - to normalize filesystem paths we need topic
+      #   - we try to keep things immutable generally so
+      #   - to build topic we need to know if debugging is on
+      #
+      # as such, we can't allow that debugging mode gets turned on
+      # after topic has been built because the topic would then
+      # "miss" this configuration. possible "fixes":
+      #
+      #   - if topic is already built when debugging gets turned on,
+      #     just build a new one over it (A)
+      #
+      #   - change topic to be mutable (B)
+      #
+      #   - topic could emit emissions instead of writing to IO
+      #     (but how does the expresser know when debugging is on?
+      #     not until all primaries are parsed, right?)
+      #
+      #   - don't use topic to normalize paths as they are encountered
+      #     during input parsing; rather break out a second pass
+      #
+      #   - manage state so that we whine and exit if debugging mode is
+      #     turned on after topic is built.
+      #
+      # for now we're going with the final option so the user begins to
+      # think about whether they would want debugging on or off for each
+      # particular primary expression. this way we have an upgrade path
+      # to (A) or (B) without an abrubt change in behavior.
+      #
+      def initialize scn
 
-        @DO_TRACE = true
+        @_listener = scn.listener
+        @_stderr = scn.stderr  # :#here-1
+
+        @_args = scn
+        @_be_verbose = false
+        @_system_services = :__system_services_initially
+        @_system_services_is_built = false
+
         @head_const = nil
         @head_path = nil
         @paths = nil
@@ -205,15 +266,21 @@ require 'strscan'  # for ::StringScanner below
       def execute
         if __process_arguments
           if __ensure_these :@paths, :@head_const
-            Request___.define do |o|
-              o.debug_IO = $stderr  # ..
-              o.do_debug = remove_instance_variable :@DO_TRACE
-              o.head_const = remove_instance_variable :@head_const
-              o.head_path = remove_instance_variable :@head_path
-              o.paths = remove_instance_variable :@paths
-              o.require_paths = remove_instance_variable :@require_paths
-            end
+            __flush
           end
+        end
+      end
+
+      def __flush
+        _svcs = send @_system_services
+        Request___.define do |o|
+          o.be_verbose = remove_instance_variable :@_be_verbose
+          o.debug_IO = remove_instance_variable :@_stderr
+          o.head_const = remove_instance_variable :@head_const
+          o.head_path = remove_instance_variable :@head_path
+          o.paths = remove_instance_variable :@paths
+          o.require_paths = remove_instance_variable :@require_paths
+          o.system_services = _svcs
         end
       end
 
@@ -263,7 +330,31 @@ require 'strscan'  # for ::StringScanner below
         path: :_at_path_list_item,
         ping: :__at_ping,
         require_path: :_at_path_list_item,
+        verbose: :__at_verbose,
       }
+
+      def __at_verbose
+        if @_system_services_is_built
+          __whine_about_verbose
+        else
+          _advance_one
+          if @_be_verbose
+            @_listener.call :info, :expression do |y|
+              y << "(for now there is only one level of versosity.)"
+            end
+          else
+            @_be_verbose = true
+          end
+          ACHIEVED_
+        end
+      end
+
+      def __whine_about_verbose
+        _whine_ do |y|
+          y << "for now, can't turn on #{ prim :verbose } after paths are processed."
+          y << "try putting the flag earlier in the request."
+        end
+      end
 
       def _at_path_list_item
         x = _gets_path
@@ -282,7 +373,7 @@ require 'strscan'  # for ::StringScanner below
       def _gets_path
         x = _gets_trueish
         if x
-          x = @_system_services.normalize_user_path x
+          x = send( @_system_services ).normalize_user_path x
           x  # hi.
         end
       end
@@ -295,15 +386,27 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def __at_ping
-        _maybe_advance
+        _advance_one
         @_listener.call :info, :expression, :ping do |y|
           y << "hello from mondrian"
         end
         EARLY_END_
       end
 
+      def __system_services_initially
+        ss = SystemServices___.new @_be_verbose, @_stderr
+        @_system_services_is_built = true
+        @_system_services = :__system_services_subsequently
+        @___system_services = ss
+        ss
+      end
+
+      def __system_services_subsequently
+        @___system_services
+      end
+
       def _gets_trueish
-        _maybe_advance
+        _advance_one
         @_args.gets_trueish
       end
 
@@ -335,7 +438,7 @@ require 'strscan'  # for ::StringScanner below
         end
       end
 
-      def _maybe_advance
+      def _advance_one
         if @_current_primary.do_advance
           @_args.advance_one
         end
@@ -349,31 +452,39 @@ require 'strscan'  # for ::StringScanner below
       end
     end
 
-    class Request___ < SimpleModel_  # (should be) #testpoint
+    class Request___ < SimpleModel_  # #testpoint
+
       attr_accessor(
+        :be_verbose,
         :debug_IO,
-        :do_debug,
         :head_const,
         :head_path,
         :paths,
         :require_paths,
+        :system_services,
       )
+
+      def do_paginate
+        false  # code sketch..
+      end
     end
 
     # ==
 
     class SystemServices___  # #testpoint
 
-      class << self
-        def instance
-          @___instance ||= new
-        end
-        private :new
-      end  # >>
+      def initialize do_debug, debug_IO
+        @__path_normalizer = PathNormalizer___.new do_debug, debug_IO
+      end
 
       def normalize_user_path path
         # for now , we assume these paths do not contain symlinks
+        # BUT WE WILL LIKELY MERGE THESE TWO METHODS
         ::File.expand_path path
+      end
+
+      def normalize_system_path path
+        @__path_normalizer.__normalize_path_ path
       end
 
       def glob path
@@ -400,52 +511,177 @@ require 'strscan'  # for ::StringScanner below
 
     class Recorder___
 
-      def initialize req, svcs, l
+      # do as little as possible while your tracepoint listening is enabled:
+      # it's really easy to get hopelessly twisted into yourself if your
+      # event handling routines cause more events to be triggered.
+      #
+      # load the target files (and whatever files they load, and whatever
+      # files are loaded in suppport of this effort) while ignoring all the
+      # events triggered for files outside the files of interest.
+      #
+      # for those events originating from inside one of your files of
+      # interest, note the event type, path, line number and particpating
+      # module (thru `tracepoint.binding.receiver`).) we call these four
+      # points an "event tuple" and represent them as simple lines:
+      #
+      #     "  123  class Wing::Ding::Fing  /my/code/wing/ding/fing.rb\n"
+      #
+      #      lineno event fully-qualified-const absolute-path newline
+      #
+      # these lines are then written to an array for subsequent "playback"
+      # after we end the "recording session", at which point we can be
+      # reckless again.
+      #
+      # also this format avails itself well to testing.
 
-        do_debug = req.do_debug; debug_IO = req.debug_IO
+      def initialize req, l
+
+        be_verbose = req.be_verbose
+        debug_IO = req.debug_IO
+
+        @_path_matcher = CachingPathMatcher___.define do |o|
+          o.do_debug = be_verbose
+          o.debug_IO = debug_IO
+          o.paths = req.paths
+          o.system_services = req.system_services
+        end
 
         @_tracepoint = TracePoint.new :class, :end do
           @_path = @_tracepoint.path
-          case @_tracepoint.event
-          when :class
-            send @_on_class
-          when :end
-            send @_on_end
-          else never
-          end
+          send ON_CLASS_OR_END___.fetch @_tracepoint.event
         end
 
-        @_path_matcher = CachingPathMatcher___.define do |o|
-          o.do_debug = do_debug
-          o.debug_IO = debug_IO
-          o.paths = req.paths
-          o.system_services = svcs
-        end
-
-        @_on_class = :__on_class_ALWAYS
-        @_on_end = :__on_end_ALWAYS
-
-        @_CAN_HAVE_SYSTEM_SERVICES = true
-        @_debug_IO = debug_IO
+        @_recording = LeftShiftBasedRecording___.new [], be_verbose, debug_IO
       end
 
+      ON_CLASS_OR_END___ = {
+        class: :__on_class,
+        end: :__on_end,
+      }
+
       def enable
-        @_tracepoint.enable
+        _old_val = @_tracepoint.enable
+        _old_val && self._SANITY__was_already_enabled__
+        # (the recording stays as-is)
+        NIL
       end
 
       def disable
-        @_tracepoint.disable
+        _old_val = @_tracepoint.disable
+        _old_val || self._SANITY__was_already_disabled__
+        # (the recording stays as-is)
+        NIL
       end
 
-      def __on_class_ALWAYS
-        if @_path_matcher =~ @_path
-          @_debug_IO.puts "WAHOO matched class on line #{ @_tracepoint.lineno }"
+      def __on_class
+        path = @_path_matcher.normalize_and_match @_path
+        if path
+          @_recording.receive_class_event path, @_tracepoint
         end
+        NIL
       end
 
-      def __on_end_ALWAYS
-        if @_path_matcher =~ @_path
-          @_debug_IO.puts "WAHOO matched end on line #{ @_tracepoint.lineno }"
+      def __on_end
+        path = @_path_matcher.normalize_and_match @_path
+        if path
+          @_recording.receive_end_event path, @_tracepoint
+        end
+        NIL
+      end
+
+      def flush_recording
+        _rec = remove_instance_variable :@_recording
+        remove_instance_variable :@_path_matcher
+        remove_instance_variable :@_tracepoint
+        _rec.finish
+      end
+    end
+
+    # ==
+
+    class LeftShiftBasedRecording___
+
+      # during record time the "recording medium" is written to using only
+      # the "left shift" (`<<`) medium, which receives tuples-as-strings.
+
+      # then hackily but aptly, only at the end as a sort of lazily-
+      # evaluated factory pattern, we determine if this recording is:
+      #
+      #   - memory-based (array)
+      #   - IO-based (IO of open filehandle (file on filesystem))
+      #   - could be $stdout or $stderr too (code sketch)
+      #
+      # and produce an appropriate (frozen) "recording" object (or not)
+      # based solely on the shape of the medium argument #here-2
+
+      def initialize medium, do_debug, debug_IO
+
+        if do_debug
+          @_via_line = :__via_line_expressively
+          @__debug_IO = debug_IO
+        else
+          @_via_line = :_via_line_normally
+        end
+
+        @__event_format = EVENT_FORMAT___
+        @__lineno_format = LINENO_FORMAT___
+
+        @_medium = medium
+      end
+
+      def receive_class_event path, tp
+        _receive_event :class, path, tp
+      end
+
+      def receive_end_event path, tp
+        _receive_event :end, path, tp
+      end
+
+      def _receive_event ev_sym, path, tp
+
+        send @_via_line, "#{
+          }#{ @__lineno_format % tp.lineno }#{ SPACE_
+          }#{ @__event_format % ev_sym }#{ SPACE_
+          }#{ tp.binding.receiver.name }#{ SPACE_
+          }#{ path }\n"
+        NIL
+      end
+
+      def __via_line_expressively line
+        @__debug_IO.write "YAY: #{ line }"
+        _via_line_normally line
+      end
+
+      def _via_line_normally line
+        @_medium << line ; nil
+      end
+
+      eek_h = {
+        class: "class",
+        end:   "  end",
+      }
+      class << eek_h
+        alias_method :%, :fetch
+      end  # >>
+      EVENT_FORMAT___ = eek_h
+
+      LINENO_FORMAT___ = '%4d'
+
+      # --
+
+      def finish  # :#here-2
+        _CM = Code_metrics_[]
+        x = remove_instance_variable :@_medium
+        if x.respond_to? :tty?
+          if x.tty?
+            # (don't close stdout/stderr. you can but you don't want to.)
+            NOTHING_
+          else
+            x.close
+            _CM::Models_::Recording::ByFile.new x.path
+          end
+        else
+          _CM::Models_::Recording::ByArray.new x.freeze
         end
       end
     end
@@ -528,6 +764,7 @@ require 'strscan'  # for ::StringScanner below
 
       attr_reader(
         :default_primary_symbol,
+        :stderr,  # #here-1
       )
 
       def can_fuzzy
@@ -717,6 +954,11 @@ require 'strscan'  # for ::StringScanner below
         :stdout,
       )
 
+      def initialize
+        yield self
+        # (but don't freeze)
+      end
+
       def execute
 
         is_error = :error == @channel.fetch(0)
@@ -867,18 +1109,14 @@ require 'strscan'  # for ::StringScanner below
 
         yield self
 
-        do_debug = remove_instance_variable :@do_debug
+        _do_debug = remove_instance_variable :@do_debug
 
-        @__path_normalizer = PathNormalizer___.new do_debug, @debug_IO
-
-        if do_debug
-          @_work_method_name = :__work_expressively
+        if _do_debug
+          @_normalize_and_match = :__normalize_and_match_expressively
         else
           remove_instance_variable :@debug_IO
-          @_work_method_name = :_work
+          @_normalize_and_match = :_normalize_and_match_normally
         end
-
-        remove_instance_variable :@system_services  # NOT_USED_YET
 
         @_path_cache = {}
       end
@@ -890,17 +1128,16 @@ require 'strscan'  # for ::StringScanner below
         :system_services,
       )
 
-      def =~ path
-        m = @_work_method_name
+      def normalize_and_match path
         @_path_cache.fetch path do
-          x = send m, path
+          x = send @_normalize_and_match, path
           @_path_cache[ path ] = x
           x
         end
       end
 
-      def __work_expressively path
-        yes = _work path
+      def __normalize_and_match_expressively path
+        yes = _normalize_and_match_normally path
         if yes
           @debug_IO.puts "MATCHED: #{ path }"
         else
@@ -909,11 +1146,12 @@ require 'strscan'  # for ::StringScanner below
         yes
       end
 
-      def _work path
-
-        real_path = @__path_normalizer.normalize_path path
+      def _normalize_and_match_normally path
 
         did_match = false
+
+        real_path = @system_services.normalize_system_path path
+
         @paths.each do |formal_path|
 
           if ::File.fnmatch formal_path, real_path
@@ -921,7 +1159,8 @@ require 'strscan'  # for ::StringScanner below
             break
           end
         end
-        did_match
+
+        did_match && real_path
       end
     end
 
@@ -953,7 +1192,7 @@ require 'strscan'  # for ::StringScanner below
         @_tree_cache_ = {}
       end
 
-      def normalize_path path
+      def __normalize_path_ path
         send @_normalize_path, path
       end
 
@@ -1358,6 +1597,15 @@ require 'strscan'  # for ::StringScanner below
     # ==
 
     Pair__ = ::Struct.new :mixed_value, :name_symbol
+
+    # ==
+
+    Code_metrics_ = Lazy_.call do
+      # don't load normal-space until recording is enabled, otherwise you
+      # won't be able to generate viz for any nodes loaded. see top of file.
+      require 'skylab/code_metrics'
+      ::Skylab::CodeMetrics
+    end
 
     # ==
 

@@ -39,6 +39,8 @@ module Skylab::CodeMetrics::TestSupport
           pather[ 'no-ent.hi' ],
           pather[ 'test/**/cerebus*' ],
         ]
+
+        o.system_services = Build_real_system_services_[ o ]
       end
 
       it "the multiple items of a single glob expand into multiple paths" do

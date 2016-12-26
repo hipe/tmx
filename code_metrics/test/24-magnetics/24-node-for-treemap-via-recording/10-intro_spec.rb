@@ -12,27 +12,57 @@ module Skylab::CodeMetrics::TestSupport
       Home_::Magnetics_::Node_for_Treemap_via_Recording || fail
     end
 
-    context "work one" do
+    context "case zero - first ever use of model" do
 
-      it "works" do
+      given_request do |o|
+        o.head_const = 'Weeble'
+      end
+
+      it "builds" do
         treemap_node_ || fail
       end
 
-      it "root node has a long const name" do
-
-        s = treemap_node_.label_string
-        s || fail
-        __const_name_is_this_long s, 4..6
-      end
-
       it "every non-root child has a short name" do
-
-        __expect_every_non_root_child_has_a_short_name
+        expect_every_non_root_child_has_a_short_name_
       end
 
       it "terminal nodes have weights" do
+        expect_every_non_root_terminal_child_has_weights_
+      end
 
-        __expect_every_non_root_terminal_child_has_weights
+      it "root node has an appropriate label string" do
+        expect_root_node_has_an_appropriate_label_string_
+      end
+
+      shared_subject :treemap_node_ do
+
+        build_treemap_node_via_recording_lines_ do |y|
+          y << " 1 class Weeble::Deeble /fliff/flaff\n"
+          y << " 3 class Weeble::Deeble::Dopp /fliff/flaff\n"
+          y << " 7 end Weeble::Deeble::Dopp /fliff/flaff\n"
+          y << " 9 class Weeble::Deeble::Doop /fliff/flaff\n"
+          y << "12 end Weeble::Deeble::Doop /fliff/flaff\n"
+          y << "14 end Weeble::Deeble /fliff/flaff\n"
+        end
+      end
+    end
+
+    context "case one - load a real file" do
+
+      it "builds" do
+        treemap_node_ || fail
+      end
+
+      it "every non-root child has a short name" do
+        expect_every_non_root_child_has_a_short_name_
+      end
+
+      it "terminal nodes have weights" do
+        expect_every_non_root_terminal_child_has_weights_
+      end
+
+      it "root node has an appropriate label string" do
+        expect_root_node_has_an_appropriate_label_string_
       end
 
       def treemap_node_
@@ -40,36 +70,8 @@ module Skylab::CodeMetrics::TestSupport
       end
     end
 
-    def __expect_every_non_root_terminal_child_has_weights
-
-      expect_of_every_non_root_child_ do |tr|
-        if ! tr.has_children
-          d = tr.main_quantity
-          d || fail
-          d.zero? && fail
-        end
-      end
-    end
-
-    def __expect_every_non_root_child_has_a_short_name
-
-      expect_of_every_non_root_child_ do |tr|
-        s = tr.label_string
-        if ! s
-          fail "no label at depth #{ depth_ }"
-        end
-        if s.include? CONST_SEP_
-          fail "why include const sep? #{ s.inspect }"
-        end
-      end
-    end
-
-    def __const_name_is_this_long s, r
-
-      _d = Home_.lib_.basic::String.count_occurrences_in_string_of_string(
-        s, CONST_SEP_ )
-
-      r.include? _d || fail
+    def event_listener_
+      NOTHING_
     end
   end
 end

@@ -135,7 +135,8 @@ module Skylab::CodeMetrics
 
       def __when_tailer_fail path
 
-        msg = "must but did not start with #{ @head_path.inspect } - #{ path }"
+        msg = "path expanded by input must but did not start with #{
+          }#{ @head_path.inspect } - #{ path }"
         p = @__listener
         if p
           p.call :error, :expression, :blah_blah do |y|

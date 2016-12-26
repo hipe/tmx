@@ -108,6 +108,14 @@ module Skylab::CodeMetrics::TestSupport
     end
   end
 
+  # --
+
+  Build_real_system_services_ = -> o do
+    Home_::Mondrian_[]::SystemServices___.new o.be_verbose, o.debug_IO
+  end
+
+  Stream_ = Home_::Stream_
+
   # -- for `use`
 
   CLI_Expectations = -> tcc do

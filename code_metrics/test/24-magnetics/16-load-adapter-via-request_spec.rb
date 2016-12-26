@@ -23,7 +23,7 @@ module Skylab::CodeMetrics::TestSupport
         o.head_const = 'Skylab::CodeMetrics'
       end
 
-      given_paths_for_load_tree do |y|
+      given_expanded_path_stream do |y|
         head = ::File.join same[], 'magnetics'
         o = -> tail do
           ::File.join head, tail
@@ -38,14 +38,24 @@ module Skylab::CodeMetrics::TestSupport
 
       it "loads files of interest" do
         _la = _load_adapter
-        _ok = _la.load_files_of_interest
+        _ok = _la.load_all_assets_and_support
         _ok || fail
       end
 
       shared_subject :_load_adapter do
+
         _req = operation_request_
-        _lt = load_tree_
-        _subject[ _lt, _req, & event_listener_ ]
+
+        eek = _subject.send :new, _req, & event_listener_
+
+        s_a = get_string_array_for_expanded_path_stream_
+
+        eek.send :define_singleton_method, :__resolve_path_stream_via_modified_request do
+          @__path_stream = Stream_[ s_a ]
+          true  # ACHIEVED_
+        end
+
+        eek.execute
       end
     end
 

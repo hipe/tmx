@@ -25,7 +25,6 @@ module Skylab::CodeMetrics
     end
 
     HARD_CODED_WIDTH_ = 150
-    MONADIC_EMPTINESS_ = -> _ { NIL_ }
     PLUS___ = '+'
   end
 end

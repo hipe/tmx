@@ -7,6 +7,7 @@ of number of lines they take up.
 
   - for now we're talking modules and classes, but one day we would
     like to include proc definitions and method definitions.
+    (#wish [#007.F] with one inline peppering..)
 
 the purpose of this would be to know how large or small the various
 components are so as to decide how to break up a large file into
@@ -26,7 +27,7 @@ yes, treemap.
 this extremely rough pseudocode is more or less based on the milestone
 stack we just made for ourselves:
 
-  1. get "tree data" from a const path
+  1. get "tree data" from a filetree (maybe one maybe disjoint files)
   1. build "shapes layers" from tree data
   1. render "ASCII matrix" from shapes layers
 
@@ -45,3 +46,11 @@ on my screen (in a terminal), this appears as "close enough" to square:
 
 and it's 11 x 6. this will of course vary based on the font-related display
 settings of the terminal.
+
+
+
+## unified language
+
+why "head path" and "head const" and not "path head" and "const head"?
+it's because these identifiers are meant to signifiy a legitimate path
+and const in their own right, as well as being used to filter streams.

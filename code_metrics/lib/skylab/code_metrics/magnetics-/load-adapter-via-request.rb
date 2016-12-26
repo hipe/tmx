@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::LoadAdapter_via_Request < Common_::Actor::Dyadic  # :[#007.H]
+  class Magnetics_::LoadAdapter_via_Request < Common_::Actor::Monadic  # :[#007.H]
 
     # the "load adapter" is what the recording session uses to ensure that
     # all files of interest are loaded.
@@ -15,30 +15,38 @@ module Skylab::CodeMetrics
     # such an adapter will be the means to do it by.
 
     # -
-      def initialize load_tree, req, & p
-        @_listener = p
-        @load_tree = load_tree
+      def initialize req, & li
+
+        @_be_verbose = req.be_verbose
+        @_debug_IO = req.debug_IO
+
+        @_listener = li
+        @_request = req
+
         @require_paths = req.require_paths
         @head_const = req.head_const
-        @head_path = req.head_path
       end
+
+      # (the division between what happens in one vs. the other is arbitrary)
 
       def execute
-        ok = true
-        ok &&= __validate
-        ok && self
+        __resolve_const_scanner && self
       end
 
-      def load_files_of_interest
+      def load_all_assets_and_support
+        @_mags = Home_::Magnetics_
         ok = true
         ok &&= __require_any_require_paths
-        ok &&= __load_head_const
+        ok &&= __resolve_head_module
+        ok &&= __resolve_head_path
+        ok &&= __resolve_path_stream_via_modified_request
+        ok &&= __resolve_load_tree_via_path_stream
         ok &&= __load_load_tree
         ok
       end
 
       def __load_load_tree
-        _lt = remove_instance_variable :@load_tree
+        _lt = remove_instance_variable :@__load_tree
         st = _lt.to_pre_order_normal_path_stream
         ok = true
         begin
@@ -53,27 +61,77 @@ module Skylab::CodeMetrics
 
       def __load s_a
 
+        if @_be_verbose
+          @_debug_IO.write "const reduce: #{ s_a.inspect } .."
+        end
+
         ok = true
         _ = Autoloader_.const_reduce(
           :const_path, s_a,
-          :from_module, @__head_module,
+          :from_module, @_head_module,
           :autoloaderize,
         ) do |*chan, &msg|
           ok = false
           @_listener[ *chan, &msg ]
         end
+
+        if @_be_verbose
+          if ok
+            @_debug_IO.puts " done."
+          else
+            @_debug_IO.puts EMPTY_S_
+          end
+        end
+
         ok
       end
 
-      def __load_head_const
-        mod = ::Object
-        scn = remove_instance_variable :@__const_scanner
-        begin
-          _mod_ = mod.const_get scn.current_token, false
-          mod = _mod_
-          scn.advance_one
-        end until scn.no_unparsed_exists
-        @__head_module = mod
+      def __resolve_load_tree_via_path_stream
+        _path_st = remove_instance_variable :@__path_stream
+        _ = @_mags::LoadTree_via_PathStream.call(
+          _path_st, @_request.head_path, & @_listener )
+        _store :@__load_tree, _
+      end
+
+      def __resolve_path_stream_via_modified_request  # #testpoint
+        _ = @_mags::PathStream_via_MondrianRequest[ @_request, & @_listener ]
+        _store :@__path_stream, _
+      end
+
+      def __resolve_head_path
+        if @_request.head_path
+          ACHIEVED_
+        else
+          __resolve_head_path_via_head_module
+        end
+      end
+
+      def __resolve_head_path_via_head_module
+        dir_path = @_head_module.dir_path  # ..
+        if dir_path
+          _use = @_request.system_services.normalize_system_path dir_path
+          @_request = @_request.redefine do |o|
+            o.head_path = _use
+          end
+          ACHIEVED_
+        else
+          __whine_about_no_head_path
+        end
+      end
+
+      def __whine_about_no_head_path__
+        self._CODE_SKETCH__needs_coverage__  # #todo
+        mod = @_head_module
+        @_listener.call :error, :expression, :primary_parse_error do |y|
+          y << "unable to resolve a `dir_path` from #{ mod.name } alone."
+          y << "use #{ prim :head_path }"
+        end
+        UNABLE_
+      end
+
+      def __resolve_head_module
+        _scn = remove_instance_variable :@__const_scanner
+        @_head_module = _scn.flush_to_value.value_x
         ACHIEVED_
       end
 
@@ -87,10 +145,10 @@ module Skylab::CodeMetrics
         ACHIEVED_
       end
 
-      def __validate
+      def __resolve_const_scanner
         s = remove_instance_variable :@head_const
         if s
-          _ = Home_::Models_::Const::Scanner.via_string s, & @_listener
+          _ = Home_::Models_::Const::ConstScanner.via_string s, & @_listener
           _store :@__const_scanner, _
         else
           __whine_about_no_head_const
@@ -107,6 +165,7 @@ module Skylab::CodeMetrics
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     # -
     # ==
+
     # ==
   end
 end

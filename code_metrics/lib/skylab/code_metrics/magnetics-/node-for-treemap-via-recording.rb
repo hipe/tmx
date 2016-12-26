@@ -1,70 +1,88 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::Node_for_Treemap_via_Recording < Common_::Actor::Monadic
+  class Magnetics_::Node_for_Treemap_via_Recording < Common_::Actor::Dyadic
 
-    # the least hacky way we can accomplish what we're after (as far as
-    # we've found) is to use `TracePoint` which can notify us when certain
-    # events of interest occur like a module (e.g class) being opened, or
-    # such a module's scope again closing.
-
-    # pleasingly this gives us line numbers (otherwise we'd have to go much
-    # darker); however we can't get notified of the blocks used to define
-    # procs yet. we might hack something awful for that.
+    # turn a flat list (stream) of events (modules, files, line numbers)
+    # into a data tree suitable for a treemap visualiztion.
 
     # -
-
-      def initialize const_load_ticket, & p
-
-        @const_load_ticket = const_load_ticket
-        @_listener = p
+      def initialize rec, req, & li
+        @_listener = li
+        @head_const = req.head_const
+        @recording = rec
+        @request = req
       end
 
       def execute
-
-        __maybe_require_something
-
-        __advance_to_the_last_element_in_the_const_path
-
-        tr = TraceRecording_via_Const_and_Module___.call(
-          remove_instance_variable( :@__const_to_load ),
-          remove_instance_variable( :@__parent_module ),
-        )
-
-        _st = MatchingFrameStream_via_TraceRecording___[ tr ]
-
-        _ma = ModuleAnnotation_via_MatchingFrameStream___[ _st, tr ]
-
-        NodeForTreemap_via_ModuleAnnotation___[ _ma, tr ]
-      end
-
-      def __advance_to_the_last_element_in_the_const_path
-
-        current_parent_module = ::Object
-        _lt = remove_instance_variable :@const_load_ticket
-        scn = _lt.const_scanner
-
-        until scn.is_last
-          const = scn.current_token
-          next_value = current_parent_module.const_get const, false
-          scn.advance_one
-          current_parent_module = next_value
-        end
-
-        @__parent_module = current_parent_module
-        @__const_to_load = scn.gets_one
-        NIL
-      end
-
-      def __maybe_require_something
-        rp = @const_load_ticket.require_path
-        if rp
-          self._EASY__but_cover_it__
+        if __resolve_file_box_via_recording
+          case 1 <=> @_file_box.length
+          when 0
+            __when_file_box_has_one_item
+          when -1
+            __when_file_box_has_multiple_items
+          else
+            __when_file_box_has_no_items
+          end
         end
       end
+
+      def __when_file_box_has_multiple_items
+        bx = remove_instance_variable :@_file_box
+        if @request.do_paginate
+          self._CODE_SKETCH__pagination_might_look_something_like_this__
+
+          bx.to_value_stream.map_by do |file|
+            file.to_node_for_treemap
+          end
+        else
+          self._CODE_SKETCH__globular_aggregation_might_look_something_like_this__
+          _st = bx.to_value_stream.expand_by do |file|
+            file.to_frame_stream
+          end
+          _ma = ModuleAnnotation_via_FrameStream__[ _st, @head_const ]
+          _root_label = "(#{ bx.length files })"
+          NodeForTreemap_via_ModuleAnnotation__[ _ma, _root_label ]
+        end
+      end
+
+      def __when_file_box_has_one_item
+        bx = remove_instance_variable :@_file_box
+        bx.fetch( bx.first_name ).to_node_for_treemap
+      end
+
+      def __resolve_file_box_via_recording
+        _rec = remove_instance_variable :@recording
+        _ = FileBox_via_Recording__[ _rec, @request ]
+        _store :@_file_box, _
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     # -
     # ==
 
-    NodeForTreemap_via_ModuleAnnotation___ = -> module_annotation, tr do
+    class File___
+
+      def initialize frz, path, hc
+        @__frames = frz
+        @head_const = hc
+        @path = path
+        freeze
+      end
+
+      def to_node_for_treemap
+        _st = to_frame_stream
+        _ma = ModuleAnnotation_via_FrameStream__[ _st, @head_const ]
+        NodeForTreemap_via_ModuleAnnotation__[ _ma, @path ]
+      end
+
+      def to_frame_stream
+        FrameStream_via_FramesOfFile___[ @__frames ]
+      end
+    end
+
+    # ==
+
+    NodeForTreemap_via_ModuleAnnotation__ = -> module_annotation, root_label do
 
       _Treemap = Home_.lib_.treemap  # 1x
 
@@ -94,7 +112,7 @@ module Skylab::CodeMetrics
 
       _Treemap::Models::Node.define do |defn|
 
-        defn.label_string = tr.module_of_interest_name
+        defn.label_string = root_label
 
         recurse[ defn, module_annotation ]
       end
@@ -102,22 +120,23 @@ module Skylab::CodeMetrics
 
     # ==
 
-    ModuleAnnotation_via_MatchingFrameStream___ = -> frame_st, tr do
+    const_tailer_via_head = Tailerer_via_separator_[ CONST_SEP_ ]
+
+    ModuleAnnotation_via_FrameStream__ = -> frame_st, head_const do
 
       # for each module that is the module of interest or is taxonomically
       # a child of it, shorten its module name so it's only the any tail..
 
       # (see also the model)
+      # (below is very similar to [ba]::Pathname::Localizer
 
       # -
-
-        head = tr.module_of_interest_name
-        len = head.length
-        head_r = 0 ... len
-        tail_r = len + 2 .. -1
-        tailer = -> mod_name do
-          head == mod_name[ head_r ] || self._SANITY
-          mod_name[ tail_r ]
+        tailer = if head_const
+          const_tailer_via_head[ head_const ]
+        else
+          -> const_s do
+            const_s  # hi. if no head_const, all consts pass and be full.
+          end
         end
 
         root = ModuleAnnotation__.new
@@ -127,20 +146,17 @@ module Skylab::CodeMetrics
 
           curr = root
 
-          mod_name = frame.module_name
-
-          if head != mod_name
-
-            _tail = tailer[ mod_name ]
-
-            scn = Home_::Models_::Const::Scanner.via_string _tail
-
+          # ~
+          _as_s = frame.qualified_const_symbol.id2name
+          tail = tailer.call( _as_s ) { NOTHING_ }
+          if tail
+            scn = Home_::Models_::Const::ConstScanner.via_string tail
             begin
-
-              curr = curr.touch scn.gets_one.intern
-
+              _const = scn.gets_one.intern
+              curr = curr.touch _const
             end until scn.no_unparsed_exists
           end
+          # ~
 
           curr.add_line_span frame
           redo
@@ -158,7 +174,8 @@ module Skylab::CodeMetrics
       # spans under the module, and also each of its the child modules.
 
       # it's not quite simple enough to pass to the mondrian renderer.
-      # it's almost complex enough that we could use it for [#007.F].
+      # it's almost complex enough that we could use it for [#007.F]
+      # the hack we imagine for procs thru consts.
 
       def initialize
         @_receive_line_span = :__receive_initial_line_span
@@ -231,16 +248,34 @@ module Skylab::CodeMetrics
 
     # ==
 
-    MatchingFrameStream_via_TraceRecording___ = -> trace_recording do
+    FrameStream_via_FramesOfFile___ = -> frames_of_file do
+
+      # (in the following paragraph we describe a means of filtering out
+      # modules that are not within our "module of interest" - we discarded
+      # this feature when we scaled up to supporting file globs because no
+      # longer were we indicating a single "module of interest" but rather
+      # a whole tree of files. and this feature was never really practical
+      # anyway - by default the visualization expresses only leaf nodes so
+      # the effect of extraneous-feeling "wrapper modules" (lexical branch
+      # nodes) should be imperceptible anyway, maybe.) but we are leaving
+      # the implementing code mostly intact because it is inert enough, the
+      # comment is food for thought, and maybe we'll bring the feature back
+      # one day. #tombstone-A)
 
       # a file can open and then close any arbitrary modules. and any
       # arbitrary module can be opened and then closed inside any other
       # module. we are only interested in modules that are under
-      # (taxonomically not lexically) the module of interset so filter
+      # (taxonomically not lexically) the module of interest so filter
       # out the others.
 
       # -
-        rx = /\A#{ trace_recording.module_of_interest_name }(?=::|\z)/
+
+        pass = MONADIC_TRUTH_  # while this feature is furloughed. imagine:
+
+        # rx = /\A#{ request.module_of_interest_name }(?=::|\z)/
+        # pass = -> frame do
+        #   rx =~ frame.qualified_const_symbol
+        # end
 
         stream_via_frame = nil
         stream_via_frames = -> frames do
@@ -250,7 +285,7 @@ module Skylab::CodeMetrics
         end
 
         stream_via_frame = -> frame do
-          if rx =~ frame.module_name
+          if pass[ frame ]
             if frame.has_children
               p = nil
               q = -> do
@@ -270,190 +305,166 @@ module Skylab::CodeMetrics
           end
         end
 
-        stream_via_frames[ trace_recording.frames ]
+        stream_via_frames[ frames_of_file ]
       # -
     end
 
     # ==
 
-    class TraceRecording_via_Const_and_Module___ < Common_::Actor::Dyadic
+    class FileBox_via_Recording__ < Common_::Actor::Dyadic
 
-      # the most fragile part. pain when an error occurs during recording,
-      # it often makes the recording twist around on itself.
+      # the stream of tuples can jump around among files as one file loads
+      # another file and so on. but towards our objective we see each file
+      # as building its own tree - that's what we're after in the
+      # visualiztion (A) and (B) we consider monkey-patching an abhorrent
+      # practice.
+      #
+      # then within each file (path), manage a frame stack that pushes and
+      # pops with each `class` and `end` event in that file. at the "end"
+      # of each file (and we never know when we reach the end of a file,
+      # because there is no such event for this, so at the end end) assert
+      # that each stack for each file collapsed back down to its root.
+      #
+      # at the end with no errors we have one root frame per file..
 
-      def initialize ctl, pm
-        @_DO_TRACE = false
-        @const_to_load = ctl
-        @parent_module = pm
+      def initialize rec, req
+        @__recording = rec
+        @__request = req
       end
 
       def execute
-        trace = TracePoint.new :class, :end do
-          @_path = @_tracepoint.path
-          case @_tracepoint.event
-          when :class
-            send @_on_class
-          when :end
-            send @_on_end
-          else never
-          end
-        end
-        @_on_class = :__on_class_initially
-        @_on_end = :__on_end_initially
-        @_tracepoint = trace
-        trace.enable
-        x = @parent_module.const_get @const_to_load, false
-        trace.disable
-        _ = remove_instance_variable :@_recorded_frames  # ..
-        TraceRecording___.new x.name.freeze, _
-      end
-
-      TraceRecording___ = ::Struct.new :module_of_interest_name, :frames
-
-      def __on_class_initially
-
-        # when the file of interest is loaded, it can load arbitrary other
-        # files that define arbitrary other modules. a naive approach here
-        # to push and pop elements to stack would at best waste a lot of r.
-        #
-        # since we cannot know the path of interest until the const value
-        # of interest is loaded, the only way to know the path of interest:
-
-        if @parent_module.const_defined? @const_to_load, false
-          __begin_recording
+        if __resolve_initial_box
+          __finish
         end
       end
 
-      def __on_end_initially
-        _some_stderr.puts "#{ _lineno }: why is this end initially happening"
-        _panic
+      def __finish
+        ok = true
+        bx = remove_instance_variable :@__initial_box
+        bx.each_pair do |k, mf|
+          ok = mf.finish
+          ok || break
+          bx.replace k, ok  # or just make a new box
+        end
+        ok && bx.freeze
       end
 
-      def __begin_recording
+      def __resolve_initial_box
+        ok = true
+        box = Common_::Box.new
+        st = remove_instance_variable( :@__recording ).to_event_tuple_stream
+        begin
+          tu = st.gets
+          tu || break
+          ok = box.touch tu.path do
+            StackInProgress___.new tu.path, @__request
+          end.push_or_pop tu
+          ok || break
+          redo
+        end while above
+        if ok
+          @__initial_box = box
+        end
+        ok
+      end
+    end
 
-        # KISS: once we know the path of interest, we use it (and the
-        # stack size) to be the sole determiner of if we mutate the stack
+    class StackInProgress___
+
+      def initialize path, req
+        @__do_debug = req.be_verbose
+        @__debug_IO = req.debug_IO
 
         @_stack = []
-        _on_push_normally
-        @_path_of_interest = @_path
-        @_on_class = :__on_class_normally
-        @_on_end = :__on_end_normally
-        @_on_push = :_on_push_normally
-        @_on_pop = :_on_pop_normally
+
+        @head_const = req.head_const
+        @path = path
       end
 
-      def __on_class_normally
-        if @_path == @_path_of_interest
-          send @_on_push
-        else
-          # _some_stderr.puts "(doing nothing on `class` open for strange path - #{ @_path }"
-          self._COVER_ME__but_probably_fine__on_class_in_strange_path__
-        end
+      def push_or_pop tu
+        send ON_WHAT__.fetch( tu.event_symbol ), tu
       end
 
-      def __on_end_normally
-        if @_path == @_path_of_interest
-          send @_on_pop
-        else
-          _trace { "(doing nothing on `end` for strange path - #{ @_path }" }
-          # self._COVER_ME__but_probably_fine__on_end_in_strange_path__
-        end
+      ON_WHAT__ = {
+        class: :__on_class,
+        end: :__on_end,
+      }
+
+      def __on_class tu
+        _trace { "#{ LNF__ % tu.lineno }: push atop #{ @_stack.length }" }
+        fr = Frame__.new tu.qualified_const_symbol
+        fr.change_state_to_open tu.lineno
+        @_stack.push fr
+        ACHIEVED_
       end
 
-      def __on_push_when_reopening
-        _trace { "#{ _lineno }: push atop #{ @_stack.length }." }
-        _do_push
-        @_on_push = :_on_push_normally
-        @_on_pop = :_on_pop_normally
-      end
-
-      def __on_pop_when_ignored
-        _trace { "#{ _lineno }: IGNORING A POP" }
-      end
-
-      def _on_push_normally
-        _trace { "#{ _lineno }: push atop #{ @_stack.length }" }
-        _do_push
-      end
-
-      def _do_push
-        rf = RecordingFrame__.new @_tracepoint.binding.receiver
-        rf.change_state_to_open @_tracepoint.lineno
-        @_stack.push rf
-      end
-
-      def _on_pop_normally
+      def __on_end tu
         top = @_stack.fetch( -1 )
-        exp_mod = top.module
-        act_mod = @_tracepoint.binding.receiver
+        exp_mod = top.qualified_const_symbol
+        act_mod = tu.qualified_const_symbol
         if exp_mod == act_mod
-          _do_pop
-          d = @_stack.length
-          _trace do
-            "#{ _lineno }: pop  now  #{ d }#{ '.' if d.zero? }"
-          end
-          if d.zero?
-            @_on_push = :__on_push_when_reopening
-            @_on_pop = :__on_pop_when_ignored
-          end
+          __do_pop tu
         else
-          io = _some_stderr
-          io << "#{ _lineno }: RECORDING HACK FAILED on pop)"
-          _panic
-          # io << "(expected #{ exp_mod }, had #{ act_mod })"
-          # _panic_and_exit
+          __when_bad_pop exp_mod, act_mod, tu
         end
       end
 
-      def _do_pop
-        rf = @_stack.pop
-        rf.change_state_to_closed @_tracepoint.lineno
+      def __when_bad_pop exp_mod, act_mod, tu
+        self.__COVER_ME__code_sketch_of_corrupt_pop__
+        _msg = "expected #{ exp_mod }, had #{ act_mod } #{
+          }in #{ tu.path }#{ tu.lineno }"
+        fail _msg
+      end
+
+      def __do_pop tu
+
+        fr = @_stack.pop
+        fr.change_state_to_closed tu.lineno
         if @_stack.length.zero?
-          ( @_recorded_frames ||= [] ).push rf.finish
+          ( @_frames ||= [] ).push fr.finish
         else
-          @_stack.last.add_child rf.finish
+          @_stack.last.add_child fr.finish
         end
-      end
-
-      def _panic_and_exit
-        _some_stderr.puts "EXITING BECAUSE PANIC from [cm]"
-        _panic ; exit 0
-      end
-
-      def _panic
-        @_tracepoint.disable
-      end
-
-      def _lineno
-        '%3d' % @_tracepoint.lineno
+        d = @_stack.length
+        _trace { "#{ LNF__ % tu.lineno }: pop  now  #{ d }#{ '.' if d.zero? }" }
+        ACHIEVED_
       end
 
       def _trace
-        if @_DO_TRACE
-          _some_stderr.puts yield
+        if @__do_debug
+          @__debug_IO.puts yield
+        end
+        NIL
+      end
+
+      def finish
+        if @_stack.length.zero?
+          remove_instance_variable :@_stack
+          @_frames.freeze
+          File___.new remove_instance_variable( :@_frames ), @path, @head_const
+        else
+          self._COVER_ME__unexpected_end_of_input__
         end
       end
 
-      def _trace_by
-        if @_DO_TRACE
-          yield _some_stderr
-        end
-      end
-
-      def _some_stderr
-        $stderr
-      end
+      LNF__ = '%4d'  # line number format
     end
 
     # ==
 
-    class RecordingFrame__
+    class Frame__
 
-      def initialize mod
+      # for now, a structure (mutable at write time) for holding *one* line
+      # span. originally was intended to hold multiple re-openings of the
+      # same module, but now this merging happens later in this document
+      # so that we attempt to do less work during record (fragile) time.
+      # (was.)
+
+      def initialize qcs
         @_receive_child = :__receive_first_child
-        @module = mod
         @_state = :beginning
+
+        @qualified_const_symbol = qcs
       end
 
       def change_state_to_open d
@@ -504,7 +515,6 @@ module Skylab::CodeMetrics
       def finish
         remove_instance_variable :@_receive_child
         remove_instance_variable :@_state
-        @module_name = @module.name
         freeze
       end
 
@@ -516,12 +526,14 @@ module Skylab::CodeMetrics
         :beginning_line_number,
         :ending_line_number,
         :has_children,
-        :module,
-        :module_name,
+        :qualified_const_symbol,
       )
     end
 
     # ==
+
+    # ==
   end
 end
+# #tombstone-A: no longer filter out modules based on module of interest
 # #born for mondrian
