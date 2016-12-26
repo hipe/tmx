@@ -490,6 +490,10 @@ require 'strscan'  # for ::StringScanner below
       def glob path
         ::Dir.glob path
       end
+
+      def open_file_read_only path
+        ::File.open path, ::File::RDONLY
+      end
     end
 
     # ==

@@ -1,0 +1,31 @@
+# this guy is hand-written but meant to mimic exactly the structure of
+# two of our private magnets at the time of writing. we have chosen the
+# (at writing) most complex one (in terms of number of modules) and then
+# another one..
+
+  1 class Sealab::KerMerm /x/y/one.kd
+  3 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco /x/y/one.kd
+ 63 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::Foil___ /x/y/one.kd
+ 81   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::Foil___ /x/y/one.kd
+ 85 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::NerdferTrerm_via_MA__ /x/y/one.kd
+119   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::NerdferTrerm_via_MA__ /x/y/one.kd
+119 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::MerdAnno_viaFermSterm__ /x/y/one.kd
+167   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::MerdAnno_viaFermSterm__ /x/y/one.kd
+171 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::MerduleAnnertertion__ /x/y/one.kd
+241   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::MerduleAnnertertion__ /x/y/one.kd
+251 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::FermSterm_via_FermsErv__ /x/y/one.kd
+312   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::FermSterm_via_FermsErv__ /x/y/one.kd
+314 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::FerlBerx_via_Rerkerding__ /x/y/one.kd
+370   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::FerlBerx_via_Rerkerding__ /x/y/one.kd
+372 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::SterkErnPrergrerss__ /x/y/one.kd
+451   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::SterkErnPrergrerss__ /x/y/one.kd
+455 class Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::Frerm__ /x/y/one.kd
+531   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco::Frerm__ /x/y/one.kd
+536   end Sealab::KerMerm::Mergs_::Nerd_fer_Trerm_via_Reco /x/y/one.kd
+537   end Sealab::KerMerm /x/y/one.kd
+  1 class Sealab::KerMerm /x/y/two.kd
+  3 class Sealab::KerMerm::Mergs_::LerTer_via_PerSter /x/y/two.kd
+169 class Sealab::KerMerm::Mergs_::LerTer_via_PerSter::LerdTrer___ /x/y/two.kd
+182   end Sealab::KerMerm::Mergs_::LerTer_via_PerSter::LerdTrer___ /x/y/two.kd
+183   end Sealab::KerMerm::Mergs_::LerTer_via_PerSter /x/y/two.kd
+186   end Sealab::KerMerm /x/y/two.kd

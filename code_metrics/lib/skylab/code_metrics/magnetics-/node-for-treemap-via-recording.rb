@@ -35,12 +35,11 @@ module Skylab::CodeMetrics
             file.to_node_for_treemap
           end
         else
-          self._CODE_SKETCH__globular_aggregation_might_look_something_like_this__
           _st = bx.to_value_stream.expand_by do |file|
             file.to_frame_stream
           end
           _ma = ModuleAnnotation_via_FrameStream__[ _st, @head_const ]
-          _root_label = "(#{ bx.length files })"
+          _root_label = "(#{ bx.length } files)"
           NodeForTreemap_via_ModuleAnnotation__[ _ma, _root_label ]
         end
       end

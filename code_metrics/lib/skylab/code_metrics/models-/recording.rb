@@ -10,17 +10,34 @@ module Skylab::CodeMetrics
       end
 
       def to_event_tuple_stream
-        self._CODE_SKETCH__needs_coverage_add_that_method_to_system_services__
+
         p = nil ; io = nil
-        main = -> do
-          line = io.gets
-          if line
-            Tuple_via_line__[ line ]
-          else
-            io.close
-            p = EMPTY_P_ ; NOTHING_
-          end
+
+        close = -> do
+          io.close
+          p = EMPTY_P_
         end
+
+        skip_rx = /\A[ ]*(?:#|\n\z)/
+
+        path_cache = {}
+
+        main = -> do
+          begin
+            line = io.gets
+            if ! line
+              close[]
+              break
+            end
+            if skip_rx =~ line
+              redo
+            end
+            x = Tuple_via_line__[ line, path_cache ]
+            break
+          end while above
+          x
+        end
+
         p = -> do
           io = @__system_services.open_file_read_only @__path
           p = main

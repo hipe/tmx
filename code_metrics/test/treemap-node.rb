@@ -34,6 +34,32 @@ module Skylab::CodeMetrics::TestSupport
 
       # -- expectations
 
+      def build_treemap_node_statistics_
+
+        max_depth = 0
+        number_of_leaf_nodes = 0
+
+        recurse = -> node, my_depth do
+          depth_of_my_children = my_depth + 1
+          if depth_of_my_children > max_depth
+            max_depth = depth_of_my_children
+          end
+          st = node.to_child_stream
+          while node_ = st.gets
+            if node_.has_children
+              recurse[ node_, depth_of_my_children ]
+            else
+              number_of_leaf_nodes += 1
+            end
+          end
+        end
+
+        _ = treemap_node_
+        recurse[ _, 1 ]
+
+        Statistics___.new max_depth, number_of_leaf_nodes
+      end
+
       def expect_every_non_root_terminal_child_has_weights_
 
         _TMN_expect_of_every_non_root_child do |tr|
@@ -97,14 +123,25 @@ module Skylab::CodeMetrics::TestSupport
 
       # -- setup support
 
+      def build_treemap_node_via_recording_file_ path
+        _svcs = Home_::Mondrian_[]::SystemServices___.new(
+          do_debug, debug_IO )
+        _rec = Home_::Models_::Recording::ByFile.new path, _svcs
+        _TMN_node_via_recording _rec
+      end
+
       def build_treemap_node_via_recording_lines_
         a = []
         yield ::Enumerator::Yielder.new( & a.method( :push ) )
         _rec = Home_::Models_::Recording::ByArray.new a
+        _TMN_node_via_recording _rec
+      end
+
+      def _TMN_node_via_recording rec
         _req = operation_request_
         _li = event_listener_
         _ = Home_::Magnetics_::Node_for_Treemap_via_Recording.call(
-          _rec, _req, & _li )
+          rec, _req, & _li )
         _  # #todo
       end
 
@@ -189,6 +226,10 @@ module Skylab::CodeMetrics::TestSupport
         fail
       end
     end
+
+    # ==
+
+    Statistics___ = ::Struct.new :max_depth, :number_of_leaf_nodes
 
     # ==
 
