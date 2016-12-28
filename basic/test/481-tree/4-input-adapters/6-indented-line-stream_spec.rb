@@ -20,11 +20,11 @@ module Skylab::Basic::TestSupport
       HERE
       @tree.value_x.should be_nil
       @tree.parent.should be_nil
-      @tree.child_count.should eql 1
+      @tree.children_count.should eql 1
       tree = @tree.children.first
       tree.value_x.should eql "beeble\n"
       tree.parent.object_id.should eql @tree.object_id
-      tree.child_count.should be_zero
+      tree.children_count.should be_zero
       tree.children.should be_nil
       expect_no_events
     end
@@ -47,15 +47,15 @@ module Skylab::Basic::TestSupport
          + foo
          + bar
       HERE
-      @tree.child_count.should eql 2
+      @tree.children_count.should eql 2
       @tree.children.length.should eql 2
       o, x = @tree.children
       o.value_x.should eql "foo\n"
       x.value_x.should eql "bar\n"
       o.parent.object_id.should eql x.parent.object_id
       o.parent.object_id.should eql @tree.object_id
-      o.child_count.should be_zero
-      x.child_count.should be_zero
+      o.children_count.should be_zero
+      x.children_count.should be_zero
       o.children.should be_nil
       x.children.should be_nil
     end
@@ -75,11 +75,11 @@ module Skylab::Basic::TestSupport
           + foo
               + bar
       HERE
-      @tree.child_count.should eql 1
+      @tree.children_count.should eql 1
       o = @tree.children.first
-      o.child_count.should eql 1
+      o.children_count.should eql 1
       x = o.children.first
-      x.child_count.should be_zero
+      x.children_count.should be_zero
       x.value_x.should eql "bar\n"
     end
 

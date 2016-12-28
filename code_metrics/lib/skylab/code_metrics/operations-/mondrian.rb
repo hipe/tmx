@@ -64,7 +64,7 @@ require 'strscan'  # for ::StringScanner below
 
         listener = method :__receive_emission
 
-        _scn = ArgumentScanner_for_CLI___.define do |o|
+        scn = ArgumentScanner_for_CLI___.define do |o|
           o.default_primary_symbol = :path
           o.initial_ARGV_offset = 1
           o.ARGV = argv
@@ -74,13 +74,21 @@ require 'strscan'  # for ::StringScanner below
 
         @exitstatus = 0
 
-        o = Operation__.new( _scn ).execute
-        if o
-          st = o.release_line_stream
-          while line = st.gets
-            @stdout.puts line
+        node_plus = Operation__.new( scn ).execute
+        if node_plus
+
+          require 'skylab/code_metrics/cli/line-stream-via-node-plus'
+            # the above while open [#010] brazen
+
+          st = ::Skylab::CodeMetrics::CLI__LineStream_via_NodePlus.call(
+            node_plus, & scn.listener )
+          if st
+            while line=st.gets
+              @stdout.puts line
+            end
           end
         end
+
         @exitstatus
       end
 
@@ -166,40 +174,40 @@ require 'strscan'  # for ::StringScanner below
         ok &&= __parse_arguments
         if ok
           if 'mock-path-1.code' == ::File.basename( @_request.paths.last )  # #[#007.H]
-            return __result_for_mock_one
+            return NodePlus___.new :_stub_of_node_for_treemap_
           end
         end
         ok &&= __resolve_recording
         ok &&= __resolve_node_for_treemap_via_recording
-        ok && self._SOMETHING_VIA_RECORDING
+        ok && __FLUSH_SOMETHING_FOR_RESULT
       end
 
-      def __result_for_mock_one
-        _st = ::Skylab::CodeMetrics::Magnetics::AsciiMatrix_via_ShapesLayers.call(
-          :_stub_of_shapes_layers_, NOTHING_ )
-        LineStreamReleaser___.new _st
+      def __FLUSH_SOMETHING_FOR_RESULT
+        _ = remove_instance_variable :@__node_for_treemap
+        NodePlus___.new _, @_request
       end
+
+      NodePlus___ = ::Struct.new :node, :request
 
       def __resolve_node_for_treemap_via_recording  # #testpoint (see #mon-spot-2)
         _rec = remove_instance_variable :@__recording
         _ = @_mags::Node_for_Treemap_via_Recording.call(
           _rec, @_request, & @_listener )
-        _store :@__node_for_tremap, _
+        _store :@__node_for_treemap, _
       end
 
       def __resolve_recording  # #testpoint (see #mon-spot-2 again)
         recorder = Recorder___.new @_request, @_listener
         recorder.enable
         @_mags = Code_metrics_[]::Magnetics_  # only after we are recording
-        __load_all_assets_and_support
+        ok = __load_all_assets_and_support
         recorder.disable
-        _store :@__recording, recorder.flush_recording
+        ok and _store :@__recording, recorder.flush_recording
       end
 
       def __load_all_assets_and_support
         la = @_mags::LoadAdapter_via_Request[ @_request, & @_listener ]
         la && la.load_all_assets_and_support
-        NIL
       end
 
       def __parse_arguments
@@ -491,21 +499,6 @@ require 'strscan'  # for ::StringScanner below
       def open_file_read_only path
         ::File.open path, ::File::RDONLY
       end
-    end
-
-    # ==
-
-    Squareish_ratio__________ = Lazy_.call do
-
-      # this is :#mon-spot-1.
-      # how this ratio works is [#tm-003.2]
-      # why it is this value (or near this value) is exactly [#008.A]
-
-      # 6/11 (hi/w) is a "square" on screen.
-      # we may stray from this value to achieve some amount of
-      # "cheating" to some design end.
-
-      Rational( 6 ) / Rational( 12 )
     end
 
     # ==
@@ -1019,17 +1012,6 @@ require 'strscan'  # for ::StringScanner below
 
       def prim sym
         "-#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
-      end
-    end
-
-    class LineStreamReleaser___
-      # (a stub for a possible future interface for a modality-agnostic response)
-      def initialize line_st
-        @__line_stream = line_st
-      end
-
-      def release_line_stream
-        remove_instance_variable :@__line_stream
       end
     end
 

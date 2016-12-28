@@ -80,7 +80,7 @@ module Skylab::DocTest
         dist_i_a = [] ; leaf_a = []
 
         @tree.children_depth_first do |node|
-          if node.child_count.zero?
+          if node.children_count.zero?
             leaf_a.push node
             dist_i_a.push Distill__[ node.value_x.last ]
           end
@@ -114,7 +114,7 @@ module Skylab::DocTest
         dist_i_a = [] ; branch_a = []
 
         @tree.children_depth_first do |node|
-          if node.child_count.nonzero?
+          if node.children_count.nonzero?
             branch_a.push node
             dist_i_a.push Distill__[ node.value_x.last ]
           end

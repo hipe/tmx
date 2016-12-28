@@ -105,3 +105,10 @@ same result mesh is reached in either case.)
 but this is also a function of the "portrait-landscape-threshold" and so
 it complicates the algorithm even more. so we're holding off on this for
 now until we get good coverage for the simpler algorithm.
+
+
+
+## :#note-5
+
+for now we go thru the divvyer even when the user data branch node has
+only one child node..

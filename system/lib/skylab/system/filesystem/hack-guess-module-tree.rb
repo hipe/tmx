@@ -255,7 +255,7 @@ module Skylab::System
             me.build_each_immutable_child tops, self do |x|
               cx_a.push x
             end
-            @child_count = cx_a.length
+            @children_count = cx_a.length
             @children = cx_a.freeze
           end
         end
@@ -271,10 +271,10 @@ module Skylab::System
                 me.build_each_immutable_child item.children, self do |x|
                   cx_a.push x
                 end
-                @child_count = cx_a.length
+                @children_count = cx_a.length
                 @children = cx_a.freeze
               else
-                @child_count = 0
+                @children_count = 0
               end
             end
             yield _node

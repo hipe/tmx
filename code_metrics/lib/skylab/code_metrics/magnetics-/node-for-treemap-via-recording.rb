@@ -26,25 +26,59 @@ module Skylab::CodeMetrics
         end
       end
 
-      def __when_file_box_has_multiple_items
-        bx = remove_instance_variable :@_file_box
-        if @request.do_paginate
-          bx.to_value_stream.map_by do |file|
-            file.to_node_for_treemap
+      def __when_file_box_has_no_items  # #cover-me (tested visually only)
+        num = @request.paths.length
+        @_listener.call :info, :expression, :no_files_matched do |y|
+          _ = if 1 == num
+            "that path"
+          else
+            "those #{ num } paths"
           end
-        else
-          _st = bx.to_value_stream.expand_by do |file|
-            file.to_frame_stream
-          end
-          _ma = ModuleAnnotation_via_FrameStream__[ _st, @head_const ]
-          _root_label = "(#{ bx.length } files)"
-          NodeForTreemap_via_ModuleAnnotation__[ _ma, _root_label ]
+          y << "(no files are matched by #{ _ }.)"
         end
+        NOTHING_
+      end
+
+      def __when_file_box_has_multiple_items
+        if @request.do_paginate
+          __flush_stream_for_paginate
+        else
+          __flush_to_omni_box
+        end
+      end
+
+      def __flush_stream_for_paginate
+        _bx = remove_instance_variable :@_file_box
+        _bx.to_value_stream.map_by do |file|
+          file.to_node_for_treemap( & @_listener )
+        end
+      end
+
+      def __flush_to_omni_box
+        _ok = __resolve_module_annoation_for_omni_box
+        _ok && __node_for_treemap_for_omni_box_via_module_annotation
+      end
+
+      def __resolve_module_annoation_for_omni_box
+
+        _st = @_file_box.to_value_stream.expand_by do |file|
+          file.to_frame_stream
+        end
+
+        _ = ModuleAnnotation_via_FrameStream__[ _st, @head_const, & @_listener ]
+        _store :@__module_annotation, _
+      end
+
+      def __node_for_treemap_for_omni_box_via_module_annotation
+        _bx = remove_instance_variable :@_file_box
+        _ma = remove_instance_variable :@__module_annotation
+        _root_label = "(#{ _bx.length } files)"
+        NodeForTreemap_via_ModuleAnnotation__[ _ma, _root_label ]
       end
 
       def __when_file_box_has_one_item
         bx = remove_instance_variable :@_file_box
-        bx.fetch( bx.first_name ).to_node_for_treemap
+        bx.fetch( bx.first_name ).to_node_for_treemap( & @_listener )
       end
 
       def __resolve_file_box_via_recording
@@ -66,10 +100,10 @@ module Skylab::CodeMetrics
         freeze
       end
 
-      def to_node_for_treemap
+      def to_node_for_treemap & l
         _st = to_frame_stream
-        _ma = ModuleAnnotation_via_FrameStream__[ _st, @head_const ]
-        NodeForTreemap_via_ModuleAnnotation__[ _ma, @path ]
+        ma = ModuleAnnotation_via_FrameStream__[ _st, @head_const, & l ]
+        ma && NodeForTreemap_via_ModuleAnnotation__[ ma, @path ]
       end
 
       def to_frame_stream
@@ -119,7 +153,7 @@ module Skylab::CodeMetrics
 
     const_tailer_via_head = Tailerer_via_separator_[ CONST_SEP_ ]
 
-    ModuleAnnotation_via_FrameStream__ = -> frame_st, head_const do
+    ModuleAnnotation_via_FrameStream__ = -> frame_st, head_const, & li do
 
       # for each module that is the module of interest or is taxonomically
       # a child of it, shorten its module name so it's only the any tail..
@@ -136,6 +170,7 @@ module Skylab::CodeMetrics
           end
         end
 
+        ok = true
         root = ModuleAnnotation__.new
         begin
           frame = frame_st.gets
@@ -146,8 +181,12 @@ module Skylab::CodeMetrics
           # ~
           _as_s = frame.qualified_const_symbol.id2name
           tail = tailer.call( _as_s ) { NOTHING_ }
-          if tail
-            scn = Home_::Models_::Const::ConstScanner.via_string tail
+          if tail && tail.length.nonzero?
+            scn = Home_::Models_::Const::ConstScanner.via_string tail, & li
+            if ! scn
+              ok = scn
+              break
+            end
             begin
               _const = scn.gets_one.intern
               curr = curr.touch _const
@@ -159,7 +198,7 @@ module Skylab::CodeMetrics
           redo
         end while above
 
-        root.finish
+        ok && root.finish
       # -
     end
 

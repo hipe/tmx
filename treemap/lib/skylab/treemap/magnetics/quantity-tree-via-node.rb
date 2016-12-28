@@ -115,7 +115,7 @@ module Skylab::Treemap
       def initialize num, num_, cx_a
         cx_a.length.zero? && self._SANITY  # #here
         @_children = cx_a  # frozen
-        @child_count = cx_a.length
+        @children_count = cx_a.length
         @declared_total = num_
         @total = num
       end
@@ -133,7 +133,7 @@ module Skylab::Treemap
       end
 
       attr_reader(
-        :child_count,
+        :children_count,
         :declared_total,
         :total,
       )

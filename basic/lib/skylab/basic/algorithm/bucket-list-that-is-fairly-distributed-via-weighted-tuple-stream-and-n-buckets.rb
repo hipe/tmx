@@ -90,31 +90,43 @@ module Skylab::Basic
     class << self
 
       def call st, d
-        new do |o|
+        _define do |o|
           o.number_of_buckets = d
           o.upstream = st
         end.execute
       end
 
+      alias_method :[], :call
+
       def prototype
-        new do |o|
+        _define do |o|
           yield o
-        end.__freeze_
+        end._freeze
       end
 
-      alias_method :[], :call
-      private :new
+      def _define & p
+        new( & p )._validate
+      end
+
+      private :new  # 1x
     end  # >>
 
     # -
 
+      def new_by
+        otr = dup
+        yield otr
+        otr._validate._freeze
+      end
+
       def initialize
         @main_quantity_method_name = :main_quantity
+        @number_of_buckets = nil
         yield self
       end
 
-      alias_method :__freeze_, :freeze
-      private :freeze
+      alias_method :_freeze, :freeze
+      undef_method :freeze
 
       private :dup
 
@@ -131,9 +143,24 @@ module Skylab::Basic
       end
       alias_method :[], :call
 
-      def execute
+      def _validate
+        if @number_of_buckets
+          if 0 < @number_of_buckets
+            self
+          else
+            raise __say
+          end
+        else
+          self
+        end
+      end
 
-        0 < @number_of_buckets || self._SANITY__number_of_buckets_must_be_positive_nonzero
+      def __say
+        "`number_of_buckets` must be positive nonzero #{
+          }(had #{ @number_of_buckets })"
+      end
+
+      def execute
 
         @__one_thru_index_of_last_bucket = 1 ... @number_of_buckets
 
@@ -144,6 +171,8 @@ module Skylab::Basic
         # )
 
         @_buckets = @number_of_buckets.times.map { THE_EMPTY_BUCKET___ }
+
+        @_offset_of_last_zero_placement = nil
 
         __flush_sorted_tuples.each do |rec|
           send @_place_in_bucket, rec
@@ -156,13 +185,57 @@ module Skylab::Basic
 
         if @_offset_of_final_bucket == @_offset_of_current_bucket
           remove_instance_variable :@_offset_of_current_bucket
-          remove_instance_variable :@_offset_of_final_bucket
-          @_place_in_bucket = :__place_in_bucket_normally
+          @_place_in_bucket = :__place_in_bucket_after_first_pass
           send @_place_in_bucket, rec
         else
           @_offset_of_current_bucket += 1
+          if rec.number.zero?
+            @_offset_of_last_zero_placement = @_offset_of_current_bucket
+          end
           @_buckets[ @_offset_of_current_bucket ] = Bucket___.new rec
         end
+        NIL
+      end
+
+      def __place_in_bucket_after_first_pass rec
+        # one you have placed things in the N buckets
+        case 0 <=> rec.number
+        when -1
+          __place_in_bucket_normally rec
+        when 0
+          __place_zero_in_some_bucket rec
+        else
+          self._DESIGN_ME_COVER_ME_negatives_  # #here-1
+        end
+        NIL
+      end
+
+      def __place_zero_in_some_bucket rec
+
+        # OCD - if you have more than one zero-numbered node and we did not
+        # do this special treatment, all those zero-numbered nodes would
+        # always be placed in whatever the lightest bucket happens to be
+        # at that moment. (the records are sorted, so all zero-numbered
+        # nodes are adjacent. each zero-numbered node adds no weight to the
+        # total of the bucket, so whichever bucket happens to be lightest
+        # at the moment stays the lightest while these items are added.)
+        #
+        # with more than one zero-numbered item, this would produce a
+        # divvy with (subjectively) an arbitrary or unbalanced-feeling
+        # distribution of *items* (if not weight). so we simply round-robin
+        # distribute the zeros, like a dealer dealing cards to players.
+
+        d = if @_offset_of_last_zero_placement
+          if @_offset_of_final_bucket == @_offset_of_last_zero_placement
+            0
+          else
+            @_offset_of_last_zero_placement + 1
+          end
+        else
+          0
+        end
+        @_buckets[ d ].add_tuple rec
+        @_offset_of_last_zero_placement = d
         NIL
       end
 
@@ -186,13 +259,24 @@ module Skylab::Basic
       def __flush_sorted_tuples
 
         m = remove_instance_variable :@main_quantity_method_name
-        _up_st = remove_instance_variable :@upstream
-
-        _up_st.map_by do |tuple|
+        a = []
+        up_st = remove_instance_variable :@upstream
+        begin
+          tuple = up_st.gets
+          tuple || break
           num = tuple.send m
-          0 < num || self._DESIGN_ME_COVER_ME__main_quantity_is_below_zero__
-          Record___[ num, tuple ]
-        end.to_enum.sort_by do |rec|
+          case 0 <=> num
+          when -1
+            a.push Record___[ num, tuple ]
+          when 0
+            # hi.
+            a.push Record___[ num, tuple ]
+          else
+            self._DESIGN_ME_COVER_ME__main_quantity_is_below_zero__  # #here-1
+          end
+          redo
+        end while above
+        a.sort_by do |rec|
           - rec.number
         end
       end
@@ -223,7 +307,7 @@ module Skylab::Basic
         @_tuples.fetch 0
       end
 
-      def child_count
+      def children_count
         @_tuples.length
       end
 

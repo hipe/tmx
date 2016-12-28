@@ -33,7 +33,7 @@ module Skylab::System::TestSupport
       root = __subject :line_upstream, _lines
 
       o = root
-      o.child_count.should eql 1
+      o.children_count.should eql 1
       o = o.children.first
       o.value_x.should eql [ :Jazzmatazz ]
       o.children.length.should eql 3

@@ -261,7 +261,7 @@ module Skylab::CodeMetrics::TestSupport
 
         op.__resolve_recording || fail
         op.__resolve_node_for_treemap_via_recording || fail
-        op.remove_instance_variable :@__node_for_tremap
+        op.remove_instance_variable :@__node_for_treemap
       end
 
       def __emergency_doo_hah * i_a, & msg_p

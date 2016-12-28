@@ -135,13 +135,11 @@ module Skylab::Treemap
     # but remember #note-4 which is about how all of this might change.
 
       def initialize qt
-
+        Init_these_consts_lazily___[]
+        @portrait_landscape_threshold_rational = nil
         @quantity_tree = qt
+        @target_rectangle = nil
         yield self
-        @portrait_landscape_threshold_rational ||= Rational( 1 )  # ..
-        @target_rectangle ||= [ 0, 0, 1, 1 ]
-        __init_scaler_translator
-        freeze
       end
 
       attr_writer(
@@ -195,128 +193,225 @@ module Skylab::Treemap
 
       def execute
 
+        scaler_translator = __flush_scaler_translator
+
+        _initial_normal_rectangle = __flush_initial_normal_rectangle(
+          scaler_translator.normal_rectangle_height )
+
+        _mb = MeshBranch_via__.new(
+          @quantity_tree,
+          _initial_normal_rectangle,
+        ).execute
+
+        MondrianTree___.new _mb, scaler_translator
+      end
+
+      def __flush_scaler_translator
+        user_a = remove_instance_variable :@target_rectangle
+        if user_a
+          case user_a.length
+          when 4
+            four = user_a
+          when 2
+            four = [ 0, 0, * user_a ]
+          else
+            self._ARGUMENT_ERROR__rectangle_must_have_two_or_four_components__
+          end
+        else
+          four = [ 0, 0, 1, 1 ]
+        end
+        Basic_::Rasterized::ScalerTranslator.via_normal_rectangle( * four )
+      end
+
+      def __flush_initial_normal_rectangle height
+
+        ra = remove_instance_variable :@portrait_landscape_threshold_rational
+        ra ||= Rational( 1 )
+        Home_::Models_::NormalRectangle.new 0, 0, 1, height, ra
+      end
+    # -
+
         # the trick is, although we do the clever thing with subdividing
         # rects *in half* by bucketing a list of items into two buckets
         # (and so on recursively), we don't want the produced mesh to
-        # reflect this always-by-two division. rather, any two terminal
-        # data nodes that are siblings in the data should always correspond
+        # reflect this always-by-two division. rather, any two data nodes
+        # (branch or item) are siblings in the data should always correspond
         # to sub-rectangles that are siblings in the same parent rectangle.
         # (not that they should be physically close, just that the tree
         # structure of the mesh should follow the same structure of the data,
         # not the recursive execution path of our algorithm.)
 
-        bucketser = __bucketer
+    # ==
 
-        denominator_for = -> quant_tree do
-          if quant_tree.declared_total
-            self._FUN__declared_total__
-          else
-            quant_tree.total
-          end
-        end
+    class MeshBranch_via__
 
-        subdivide_along_buckets = nil
+      def initialize qt, nr
 
-        recurse_into_quant = -> quant_tree, normal_rect do  # 2x
+        qt.is_branch || self._SANITY
 
-          # (#optimization possible here - if 2 == number of children and..)
-
-          quant_tree.is_branch || self._SANITY
-
-          _buckets = bucketser[ quant_tree.to_child_stream ]
-
-          _denom = denominator_for[ quant_tree ]
-
-          assoced_a = []
-
-          subdivide_along_buckets[ assoced_a, _buckets, _denom, normal_rect ]
-
-          AssociatedNonterminalNode___.new normal_rect, assoced_a.freeze
-        end
-
-        recurse_into_tall_bucket = nil
-
-        subdivide_along_buckets = -> assoced_a, buckets, denom, normal_rect do  # 2x
-
-          subd = normal_rect.build_sequential_subdivider__ buckets.length, denom
-
-          buckets.each do |bucket|
-            sub_rect = subd[ bucket.total ]
-            case 1 <=> bucket.child_count
-            when 0
-              node = bucket.first_child
-              if node.has_children
-                node.IS_QUANTITY_TREE__ || fail  # #todo temp sanity
-                _bn = recurse_into_quant[ node, sub_rect ]
-                assoced_a.push _bn
-              else
-                _an = AssociatedTerminalNode___.new sub_rect, node
-                assoced_a.push _an
-              end
-            when -1
-              recurse_into_tall_bucket[ assoced_a, sub_rect, bucket ]
-            else
-              self._COVER_ME__zero_children_in_bucketish__probably_error__
-            end
-          end
-          NIL
-        end
-
-        recurse_into_tall_bucket = -> assoced_a, normal_rect, bucket do
-
-          1 < bucket.child_count || self._ASSUMPTION_FAILED
-
-          _buckets = bucketser[ bucket.to_child_stream ]
-
-          subdivide_along_buckets[ assoced_a, _buckets, bucket.total, normal_rect ]
-
-          NIL
-        end
-
-        _initial_rect = __initial_normal_rect
-
-        _associated_node = recurse_into_quant[ @quantity_tree, _initial_rect ]
-
-        MondrianTree___.new _associated_node, @_scaler_translator
+        @normal_rectangle = nr
+        @quantity_tree = qt
       end
 
-      def __initial_normal_rect
-
-        Home_::Models_::NormalRectangle.new( 0, 0, 1,
-          @_scaler_translator.normal_rectangle_height,
-          @portrait_landscape_threshold_rational,
-        )
-      end
-
-      def __bucketer
-
-        _ = Basic_::Algorithm::
-        BucketList_that_is_FairlyDistributed_via_WeightedTupleStream_and_N_Buckets.
-            prototype(
-        ) do |o|
-          o.number_of_buckets = 2  # #note-4
-          o.main_quantity_method_name = :main_quantity
-        end
-        _  # #todo
-      end
-
-      def __init_scaler_translator
-
-        user_a = @target_rectangle
-        case user_a.length
-        when 2
-          user_a = [ 0, 0, * user_a ]
-        when 4
+      def execute
+        if @quantity_tree.declared_total
+          self._FUN__declared_total__
         else
-          self._ARGUMENT_ERROR__rectangle_must_have_two_or_four_components__
+          @_user_weight = @quantity_tree.total
+          __via_use_total
+        end
+      end
+
+      def __via_use_total
+        case 0 <=> @_user_weight
+        when -1
+          _via_non_negative_weight
+        when 0
+          # hi.
+          _via_non_negative_weight
+        else
+          self._NEGATIVE_TOTAL
+        end
+      end
+
+      def _via_non_negative_weight
+
+        case 1 <=> @quantity_tree.children_count
+        when -1 ; __when_many_children
+        when 0 ; __when_one_child
+        else __when_no_children
+        end
+      end
+
+      def __when_many_children
+        _via_bucketser Two_bucketser__
+      end
+
+      def __when_one_child  # #note-5 when one child
+        _via_bucketser One_bucketser___
+      end
+
+      def _via_bucketser bucketser
+        _buckets = bucketser[ @quantity_tree.to_child_stream ]
+        write_array = []
+        WriteNodesIntoArray__.new(
+          write_array,
+          @_user_weight,
+          _buckets,
+          @normal_rectangle,
+        ).execute
+        MeshBranch___.new @normal_rectangle, write_array.freeze
+      end
+    end
+
+    # ==
+
+    class WriteNodesIntoArray__
+
+      def initialize a, bux_weight, bux, nr
+
+        length = bux.length
+        case 0 <=> bux_weight
+        when -1
+          @_subrecter =
+            nr.flush_sequential_spatial_distributor_for_nonzero_weight__(
+              bux_weight, length )
+        when 0
+          @_subrecter =
+            nr.flush_sequential_spatial_distributor_for_zero_weight__(
+              length )
+        else never
         end
 
-        @_scaler_translator = Basic_::Rasterized::ScalerTranslator.
-          via_normal_rectangle( * user_a )
+        @buckets = bux
+        @normal_rectangle = nr
+        @write_array = a
+      end
 
+      def execute
+        @buckets.each do |bucket|
+          case 1 <=> bucket.children_count
+          when -1
+            __when_bucket_with_many bucket
+          when 0
+            __when_bucket_with_one_item bucket.first_child
+          else
+            self._COVER_ME__zero_children_in_bucketish__probably_error__
+          end
+        end
         NIL
       end
-    # -
+
+      def __when_bucket_with_many bucket
+
+        weight = bucket.total
+
+        _sub_rect = @_subrecter[ weight ]
+        _buckets = Two_bucketser__[ bucket.to_child_stream ]
+
+        WriteNodesIntoArray__.new(
+          @write_array,
+          weight,
+          _buckets,
+          _sub_rect,
+        ).execute
+        NIL
+      end
+
+      def __when_bucket_with_one_item node  # treemap node
+
+        case 0 <=> node.main_quantity
+        when -1
+          _when_one_item_with_zero_or_nonzero_weight node
+        when 0
+          # hi.
+          _when_one_item_with_zero_or_nonzero_weight node
+        else
+          self._NEGATIVE_WEIGHT
+        end
+      end
+
+      def _when_one_item_with_zero_or_nonzero_weight node
+
+        sub_rect = @_subrecter[ node.main_quantity ]
+        if node.has_children
+          node.IS_QUANTITY_TREE__ || fail  # #todo temp sanity
+
+          if sub_rect.has_zero_volume
+            self._DESIGN_ME__walk_through_subdividing_a_rect_with_zero_volume__
+          end
+
+          nt_or_t = MeshBranch_via__.new( node, sub_rect ).execute
+        else
+          nt_or_t = MeshItem___.new sub_rect, node
+        end
+        @write_array.push nt_or_t
+        NIL
+      end
+    end
+
+    # ==
+
+    Init_these_consts_lazily___ = Lazy_.call do
+
+      _Lib = Basic_::Algorithm::
+      BucketList_that_is_FairlyDistributed_via_WeightedTupleStream_and_N_Buckets
+
+      proto = _Lib.prototype do |o|
+        o.main_quantity_method_name = :main_quantity
+      end
+
+      Two_bucketser__ = proto.new_by do |o|
+        o.number_of_buckets = 2  # #note-4
+      end
+
+      One_bucketser___ = proto.new_by do |o|
+        o.number_of_buckets = 1  # #note-5
+      end
+
+      NIL
+    end
+
     # ==
 
     # NOTE for the convenience of writing during development, some
@@ -324,31 +419,33 @@ module Skylab::Treemap
 
     # ==
 
+    # ==
+
     class MondrianTree___
 
-      def initialize an, ts
-        @associated_node = an
+      def initialize mn, ts
+        @mesh_node = mn
         @scaler_translator = ts
       end
 
       attr_reader(
-        :associated_node,
+        :mesh_node,
         :scaler_translator,
       )
     end
 
     # ==
 
-    class AssociatedNonterminalNode___
+    class MeshBranch___
 
       def initialize rect, a
-        @associated_nodes = a
         @normal_rectangle = rect
+        @mesh_nodes = a
       end
 
       attr_reader(
-        :associated_nodes,
         :normal_rectangle,
+        :mesh_nodes,
       )
 
       def is_branch
@@ -358,7 +455,7 @@ module Skylab::Treemap
 
     # ==
 
-    class AssociatedTerminalNode___
+    class MeshItem___
 
       def initialize rect, tuple  # (tuple is a Models::Node)
         @normal_rectangle = rect

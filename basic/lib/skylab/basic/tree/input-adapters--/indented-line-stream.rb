@@ -36,7 +36,7 @@ module Skylab::Basic
           end
           if ok
             @children = cx_a.freeze
-            @child_count = cx_a.length
+            @children_count = cx_a.length
           end
         end
         ok && node
@@ -82,9 +82,9 @@ module Skylab::Basic
             end
             if cx_a
               @children = cx_a.freeze
-              @child_count = cx_a.length
+              @children_count = cx_a.length
             else
-              @child_count = 0
+              @children_count = 0
             end
           end
           ok or break

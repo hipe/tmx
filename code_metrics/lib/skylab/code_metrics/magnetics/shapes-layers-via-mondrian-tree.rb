@@ -32,7 +32,7 @@ module Skylab::CodeMetrics
 
         __send_width_and_height
 
-        _an = @mondrian_tree.associated_node
+        _an = @mondrian_tree.mesh_node
 
         sls.add_layer do |sl|
           @_same_shape_layer = sl
@@ -43,29 +43,29 @@ module Skylab::CodeMetrics
       end
     end
 
-    def _recurse associated_node
+    def _recurse mesh_branch
 
-      associated_node.normal_rectangle  # IGNORED - #contact-exercise
+      mesh_branch.normal_rectangle  # IGNORED - #contact-exercise
 
-      associated_node.associated_nodes.each do |an|
+      mesh_branch.mesh_nodes.each do |mn|
 
-        if an.is_branch
-          _recurse an
+        if mn.is_branch
+          _recurse mn
         else
-          __when_terminal_item an
+          __when_terminal_item mn
         end
       end
       NIL
     end
 
-    def __when_terminal_item associated_node
+    def __when_terminal_item mesh_node
 
-      four = associated_node.normal_rectangle.to_four
+      four = mesh_node.normal_rectangle.to_four
 
       @_same_shape_layer.add_rect( * four )
         # would change at [#007.C] - latticework not squares
 
-      _label_string = associated_node.tuple.label_string
+      _label_string = mesh_node.tuple.label_string
 
       @_same_shape_layer.add_label( * four, _label_string )  # near #[#007.E]
 

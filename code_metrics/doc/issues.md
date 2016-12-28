@@ -26,6 +26,8 @@
              ( #was: #wormhole )
 [#007]       mixed internal trackpoints that do NOT leave this sidesystem.
 
+       #open :[#here.K]: small cover-me's (hashtag-cover-me)
+
              :[#here.J]: argument potpourri
 
              :[#here.I]: track TracePoint based adapters
