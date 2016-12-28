@@ -5,6 +5,10 @@ module Skylab::Brazen
     class When::Help < As_Bound_Call  # (fwd declaration)
 #==FROM
 
+      # of the 8 or so help-support-like files at writing, this is the
+      # second oldest. "isomorphic method client" is older but has less
+      # interesting history. yadda yadda unification
+
       # (at writing used only by [tmx] only for [ze] "argument scanner" related) (etc)
 
       ScreenForWhichever__ = ::Class.new
@@ -16,8 +20,12 @@ module Skylab::Brazen
           @express_boundary[]
 
           buffer = "usage: #{ program_name }"
-          st = to_item_name_stream
-          one = st.gets
+
+          if @has_item_groups
+            st = to_item_name_stream
+            one = st.gets
+          end
+
           if one
             buffer << " { " << one.as_slug
             begin
@@ -43,8 +51,11 @@ module Skylab::Brazen
           buffer = "usage: #{ program_name }"
 
           countdown = 3  # max number of primaries to show up here
-          st = to_item_name_stream
-          nm = st.gets
+
+          if @has_item_groups
+            st = to_item_name_stream
+            nm = st.gets
+          end
 
           if nm && countdown.nonzero?
             say = -> name do
@@ -62,6 +73,7 @@ module Skylab::Brazen
               redo
             end while above
           end
+
           @puts.call buffer
           NIL
         end
@@ -85,6 +97,7 @@ module Skylab::Brazen
           end
 
           @express_blank_line = puts
+          @has_item_groups = false
           @margin = TWO_SPACES___
           @puts = puts
         end
@@ -207,6 +220,15 @@ module Skylab::Brazen
         end
 
         # -- write-on-receive (then read)
+      public
+
+        def primary_symbols ks
+          _st = Stream_.call ks do |k|
+            [ :primary, k ]
+          end
+          item_normal_tuple_stream _st
+          NIL
+        end
 
         def item_normal_tuple_stream st
 
@@ -239,11 +261,13 @@ module Skylab::Brazen
             redo
           end while above
 
+          @has_item_groups = true
           @item_groups = item_groups_cache
           @max_name_width = max
           NIL
         end
-        public :item_normal_tuple_stream
+
+      private
 
         def to_item_name_stream
           to_item_group_stream.expand_by do |group|
@@ -286,12 +310,6 @@ module Skylab::Brazen
           :item_array,
           :normal_item_type_symbol,
         )
-      end
-
-      # ==
-
-      Stream_ = -> a, & p do  # ..
-        Common_::Stream.via_nonsparse_array a, & p
       end
 
       # ==

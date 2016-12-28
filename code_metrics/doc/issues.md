@@ -34,7 +34,7 @@
 
        #open :[#here.H]: tracks traces of stubbing to be removed
 
-       #open :[#here.G]: mondrian help screen
+       #hole :[#here.G]: (was help screen)
 
        #wish :[#here.F]: hax for procs (`constants` and byte-processing files)
 

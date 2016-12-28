@@ -88,10 +88,6 @@ module Skylab::Brazen
     end
 
     # ==
-
-    Stream_ = -> a, & p do
-      Common_::Stream.via_nonsparse_array a, & p
-    end
 #==TO
 
       # [br] CLI is an adaptation of a reactive model to a particular

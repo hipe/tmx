@@ -45,6 +45,8 @@ module Skylab::CodeMetrics
       @___lib ||= Common_.
         produce_library_shell_via_library_and_app_modules Lib_, self
     end
+
+    attr_accessor :ridiculous_  # while [#010]
   end  # >>
 
   # ==

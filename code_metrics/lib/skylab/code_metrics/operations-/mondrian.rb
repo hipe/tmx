@@ -92,11 +92,28 @@ require 'strscan'  # for ::StringScanner below
         @exitstatus
       end
 
+      def __receive_signal p, chan
+        _ok = send :"__receive__#{ chan.fetch 1 }__signal", * chan[ 2..-1 ], & p
+        _ok  # #todo
+      end
+
+      def __receive__help__signal h
+        Home_::Require_brazen_[]
+        _Help = Home_::Brazen_::CLI_Support::When::Help
+        _Help::ScreenForEndpoint.express_into @stderr do |o|
+          o.primary_symbols h.keys
+          o.express_usage_section @program_name_string_array.join SPACE_
+          o.express_items_sections h
+        end
+        ACHIEVED_  # determines exitstatus
+      end
+
       def __receive_emission * chan, & msg_p
 
         refl = Express_for_CLI_via_Expression___.define do |o|
           o.channel = chan
           o.emission_proc = msg_p
+          o.signal_by = method :__receive_signal
           o.stdout = @stdout
           o.stderr = @stderr
         end.execute
@@ -115,7 +132,7 @@ require 'strscan'  # for ::StringScanner below
         if x
           instance_variable_set ivar, x ; true
         else
-          UNABLE_
+          x
         end
       end
 
@@ -730,14 +747,17 @@ require 'strscan'  # for ::StringScanner below
           lu  # as pair
         elsif :invalid == lu.category_symbol &&
             /\A--?h(?:e(?:l(?:p)?)?)?\z/ =~ @_real_scanner_.current_token
-          __express_help_for h
+          __when_help
         else
           lu.execute
         end
       end
 
-      def __express_help_for h
-        @stderr.puts "usage: help #open [#007.H]. for now just pass a nonsense arg: -xyzzy"
+      def __when_help
+        Code_metrics_[]
+        Home_.ridiculous_ = true
+        require 'skylab/code_metrics/cli/core'
+        @listener.call :signal, :help, Home_::PRIMARY_DESCRIPTIONS_
         EARLY_END_
       end
 
@@ -944,6 +964,7 @@ require 'strscan'  # for ::StringScanner below
       attr_writer(
         :channel,
         :emission_proc,
+        :signal_by,
         :stderr,
         :stdout,
       )
@@ -954,17 +975,37 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def execute
-
-        is_error = :error == @channel.fetch(0)
-        if :expression == @channel.fetch(1)
+        is_signal = false
+        FIRST_CHANNEL___.fetch( @channel.fetch 0 )[ binding ]
+        if is_signal
+          __when_signal
+        elsif :expression == @channel.fetch(1)
           __when_expression
         else
           __when_event
         end
-        Result___.new is_error
+        Result___.new @_was_error
       end
 
+      FIRST_CHANNEL___ = {
+        error: -> bnd do
+          bnd.receiver.instance_variable_set :@_was_error, true
+        end,
+        info: -> bnd do
+          bnd.receiver.instance_variable_set :@_was_error, false
+        end,
+        signal: -> bnd do
+          bnd.local_variable_set :is_signal, true
+        end,
+      }
+
       Result___ = ::Struct.new :was_error
+
+      def __when_signal
+        _ok = @signal_by[ @emission_proc, @channel ]
+        @_was_error = ! _ok
+        EARLY_END_
+      end
 
       def __when_event
         _ev = remove_instance_variable( :@emission_proc ).call
@@ -1587,7 +1628,9 @@ require 'strscan'  # for ::StringScanner below
       # don't load normal-space until recording is enabled, otherwise you
       # won't be able to generate viz for any nodes loaded. see top of file.
       require 'skylab/code_metrics'
-      ::Skylab::CodeMetrics
+      x = ::Skylab::CodeMetrics
+      Here_.const_set :Home_, x
+      x
     end
 
     # ==
@@ -1596,6 +1639,7 @@ require 'strscan'  # for ::StringScanner below
     DASH_ = '-'
     EARLY_END_ = nil
     EMPTY_S_ = ''
+    Here_ = self
     NOTHING_ = nil
     SING_PROB___ = "«singleton probably»"
     SPACE_ = ' '
