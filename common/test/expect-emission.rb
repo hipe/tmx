@@ -1252,11 +1252,20 @@ module Skylab::Common::TestSupport
       alias_method :_express_into_under_, :express_into_under
 
       def _event_or_lines_
-        ( @___1 ||= _kn( [], Black_and_white_expression_agent__[] )).value_x
+        ( @___1 ||= _kn( [], _black_and_white_expag )).value_x
+      end
+
+      def to_black_and_white_lines
+        _expag = _black_and_white_expag
+        _expag.calculate [], & @expression_proc
       end
 
       def black_and_white_expression_line
-        ( @___2 ||= _kn( "", Black_and_white_expression_agent__[] )).value_x
+        ( @___2 ||= _kn( "", _black_and_white_expag )).value_x
+      end
+
+      def _black_and_white_expag
+        Black_and_white_expression_agent__[]
       end
 
       def _kn y, expag

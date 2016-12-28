@@ -21,7 +21,6 @@ module Skylab::CodeMetrics
         elsif @request.do_paginate
           self._ENJOY__pagination
         else
-          self._DEVELOPED_VISUALLY__work_in_progress__
           __execute_normally
         end
       end
@@ -36,15 +35,15 @@ module Skylab::CodeMetrics
         ok
       end
 
-      def __ascii_matrix_expresser_via_shapes_layers
+      def __ascii_matrix_expresser_via_choices_and_shapes_layers
+
+        _cx = remove_instance_variable :@__mondrian_ascii_choices
+
+        if :_no_cx_from_cm_ == _cx  # #[#007.H]
+          self._WHAT
+        end
 
         _sl = remove_instance_variable :@__shapes_layers
-
-        _cx = if :_stub_of_shapes_layers_ == _sl  # #[#007.H]
-          :_no_cx_from_cm_
-        else
-          __build_mondrian_ascii_choices
-        end
 
         st = Home_::Magnetics::AsciiMatrix_via_ShapesLayers[ _sl, _cx ]
 
@@ -57,6 +56,7 @@ module Skylab::CodeMetrics
       def __resolve_mondrian_ascii_choices
 
         if :_stub_of_shapes_layers_ == @__shapes_layers
+          @__mondrian_ascii_choices = :_no_cx_from_cm_
           return ACHIEVED_
         end
 

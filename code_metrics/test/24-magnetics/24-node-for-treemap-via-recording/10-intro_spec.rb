@@ -47,6 +47,34 @@ module Skylab::CodeMetrics::TestSupport
       end
     end
 
+    context "case zero.50 - sing classes" do
+      # #mon-testpoint-1-1
+
+      given_request do |o|
+        o.head_const = 'Weeble'
+      end
+
+      it "hm .. for now for pragmatic reasons we'll skip them" do
+        _x = treemap_node_
+        _st = _x.to_child_stream
+        a = _st.to_a
+        1 == a.length || fail
+        a.fetch(0).label_string == "Deeble" || fail
+      end
+
+      shared_subject :treemap_node_ do
+
+        build_treemap_node_via_recording_lines_ do |y|
+          y << "  1 class Weeble::Deeble /fliff/flaff\n"
+          y << "  6 class «singleton class» /fliff/flaff\n"
+          y << " 14 end «singleton class» /fliff/flaff\n"
+          y << " 18 class Weeble::Deeble::Momma /fliff/flaff\n"
+          y << " 22 end Weeble::Deeble::Momma /fliff/flaff\n"
+          y << " 26 end Weeble::Deeble /fliff/flaff\n"
+        end
+      end
+    end
+
     context "case one - load a real file" do
 
       it "builds" do

@@ -135,6 +135,12 @@ module Skylab::CodeMetrics
     Autoloader_[ self, :boxxy ]
   end
 
+  module ThroughputAdapters_
+    # (curious case that sorta makes sense but is confusing - only if this
+    # is loaded with const reduce, it assigns the wrong name for this.)
+    Autoloader_[ self, :boxxy ]
+  end
+
   # ==
 
   DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do

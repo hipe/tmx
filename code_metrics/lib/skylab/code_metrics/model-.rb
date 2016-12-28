@@ -1,5 +1,7 @@
 module Skylab::CodeMetrics
 
+  Require_brazen_[]  # might not be necessary for production, but is for viz
+
   Model_ = ::Module.new
   module Model_::Support  # #[#sl-155] scope stack trick
 

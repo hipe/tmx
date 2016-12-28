@@ -12,8 +12,7 @@ use [sa] to convert etc to Stream_
 -3.2 omni help screen system [#tmx-018]
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
-((-1     [cm] CLI client that outputs real ascii-matrix ))
-((-2     [cm] ASCII matrix via real shapes-layers ))
-((-3     [cm] shapes-layers via real tree-data ))
 ((-1.16 [cm] maybe one of your fixture trees as paginated (( NN )) ))
 ((-1.31 [cm] maybe one of your fixture trees as omni tree (( NN )) ))
+(see if you can get omni tree visually after width/height as options)
+(width/height as CLI options)

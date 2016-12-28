@@ -636,7 +636,7 @@ require 'strscan'  # for ::StringScanner below
         send @_via_line, "#{
           }#{ @__lineno_format % tp.lineno }#{ SPACE_
           }#{ @__event_format % ev_sym }#{ SPACE_
-          }#{ tp.binding.receiver.name }#{ SPACE_
+          }#{ tp.binding.receiver.name || SING_PROB___ }#{ SPACE_
           }#{ path }\n"
         NIL
       end
@@ -1597,6 +1597,7 @@ require 'strscan'  # for ::StringScanner below
     EARLY_END_ = nil
     EMPTY_S_ = ''
     NOTHING_ = nil
+    SING_PROB___ = "«singleton probably»"
     SPACE_ = ' '
     UNABLE_ = false
     UNDERSCORE_ = '_'

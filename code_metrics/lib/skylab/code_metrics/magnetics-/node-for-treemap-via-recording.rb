@@ -176,10 +176,15 @@ module Skylab::CodeMetrics
           frame = frame_st.gets
           frame || break
 
+          o = frame.receiverish
+          if o.is_special
+            # what happens if we just ignore these?  #mon-testpoint-1-1
+            redo
+          end
+
           curr = root
 
-          # ~
-          _as_s = frame.qualified_const_symbol.id2name
+          _as_s = o.moniker
           tail = tailer.call( _as_s ) { NOTHING_ }
           if tail && tail.length.nonzero?
             scn = Home_::Models_::Const::ConstScanner.via_string tail, & li
@@ -310,7 +315,8 @@ module Skylab::CodeMetrics
 
         # rx = /\A#{ request.module_of_interest_name }(?=::|\z)/
         # pass = -> frame do
-        #   rx =~ frame.qualified_const_symbol
+        #   o = frame.receiverish
+        #   rx =~ ( o.is_const_module && o.qualified_const_symbol )
         # end
 
         stream_via_frame = nil
@@ -428,7 +434,7 @@ module Skylab::CodeMetrics
 
       def __on_class tu
         _trace { "#{ LNF__ % tu.lineno }: push atop #{ @_stack.length }" }
-        fr = Frame__.new tu.qualified_const_symbol
+        fr = Frame__.new tu.receiverish
         fr.change_state_to_open tu.lineno
         @_stack.push fr
         ACHIEVED_
@@ -436,18 +442,20 @@ module Skylab::CodeMetrics
 
       def __on_end tu
         top = @_stack.fetch( -1 )
-        exp_mod = top.qualified_const_symbol
-        act_mod = tu.qualified_const_symbol
-        if exp_mod == act_mod
+        if top.receiverish == tu.receiverish
           __do_pop tu
         else
-          __when_bad_pop exp_mod, act_mod, tu
+          __when_bad_pop top, tu
         end
       end
 
-      def __when_bad_pop exp_mod, act_mod, tu
+      def __when_bad_pop top, tu
+
         self.__COVER_ME__code_sketch_of_corrupt_pop__
-        _msg = "expected #{ exp_mod }, had #{ act_mod } #{
+
+        _exp_mod = top.receiverish.moniker
+        _act_mod = tu.receiverish.moniker
+        _msg = "expected #{ _exp_mod }, had #{ _act_mod } #{
           }in #{ tu.path }#{ tu.lineno }"
         fail _msg
       end
@@ -496,11 +504,11 @@ module Skylab::CodeMetrics
       # so that we attempt to do less work during record (fragile) time.
       # (was.)
 
-      def initialize qcs
+      def initialize receiverish
         @_receive_child = :__receive_first_child
         @_state = :beginning
 
-        @qualified_const_symbol = qcs
+        @receiverish = receiverish
       end
 
       def change_state_to_open d
@@ -562,7 +570,7 @@ module Skylab::CodeMetrics
         :beginning_line_number,
         :ending_line_number,
         :has_children,
-        :qualified_const_symbol,
+        :receiverish,
       )
     end
 

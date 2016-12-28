@@ -65,7 +65,7 @@ module Skylab::CodeMetrics
 
     # ==
 
-    class Tuple_via_line__ < Common_::Actor::Dyadic
+    class Tuple_via_line__ < Common_::Actor::Dyadic  # #tespoint
 
       def initialize line, pc, & p
         @listener = p
@@ -111,6 +111,8 @@ module Skylab::CodeMetrics
             instance_variable_set which.ivar, kn.value_x
           end
           ACHIEVED_
+        else
+          kn
         end
       end
 
@@ -118,7 +120,7 @@ module Skylab::CodeMetrics
         Tuple___.new(
           remove_instance_variable( :@lineno ),
           remove_instance_variable( :@event_symbol ),
-          remove_instance_variable( :@qualified_const_symbol ),
+          remove_instance_variable( :@receiverish ),
           remove_instance_variable( :@path ),
         )
       end
@@ -138,14 +140,14 @@ module Skylab::CodeMetrics
         @event_symbol = sym
         @lineno = d
         @path = path
-        @qualified_const_symbol = qcs
+        @receiverish = qcs
       end
 
       attr_reader(
         :event_symbol,
         :lineno,
         :path,
-        :qualified_const_symbol,
+        :receiverish,
       )
     end
 
@@ -192,9 +194,79 @@ module Skylab::CodeMetrics
     end
 
     c = '[A-Z][a-zA-Z0-9_]*'
-    _rx = %r(#{ c }(?: :: #{ c })*)x
-    MODULE___ = RegexpBased__.new _rx, :@qualified_const_symbol do |s|
-      Common_::Known_Known[ s.intern ]
+    _const_rx = %r(#{ c }(?: :: #{ c })* | «[^»]+»)x
+
+    const_rx_ = %r(\A
+      (?<const> #{ c }(?: :: #{ c })* ) |
+      « (?<special> [^»]+  ) »
+    \z)x
+    MODULE___ = RegexpBased__.new _const_rx, :@receiverish do |s|
+      md = const_rx_.match s
+      const = md[ :const ]
+      if const
+        CLASS_CACHE___[ const.intern ]
+      else
+        _sym = md[ :special ].gsub( SPACE_, UNDERSCORE_ ).intern
+        SPECIAL_CACHE___[ _sym ]
+      end
+    end
+
+    CLASS_CACHE___ = ::Hash.new do |h, k|
+      x = Common_::Known_Known[ Class___.new k ]
+      h[ k ] = x
+      x
+    end
+
+    SPECIAL_CACHE___ = ::Hash.new do |h, k|
+      x = Common_::Known_Known[ Special___.new k ]
+      h[ k ] = x
+      x
+    end
+
+    class Class___
+
+      def initialize qcs
+        @qualified_const_symbol = qcs
+      end
+
+      def moniker
+        @___moniker ||= @qualified_const_symbol.id2name.freeze
+      end
+
+      attr_reader :qualified_const_symbol
+
+      def is_special
+        false
+      end
+
+      def is_const_module
+        true
+      end
+    end
+
+    class Special___
+
+      def initialize sym
+        @category_symbol = sym
+      end
+
+      def moniker
+        @___moniker ||= __build_moniker
+      end
+
+      def __build_moniker
+        "«#{ @category_symbol.id2name.gsub UNDERSCORE_, SPACE_ }»".freeze
+      end
+
+      attr_reader :category_symbol
+
+      def is_special
+        true
+      end
+
+      def is_const_module
+        false
+      end
     end
 
     PATH___ = RegexpBased__.new %r(/[^[:space:]]+), :@path do |s, scan|
@@ -236,7 +308,6 @@ module Skylab::CodeMetrics
       end
 
       def _whine scan
-        self._CODE_SKETCH__needs_coverage_might_be_OK_
 
         _scn = scan.string_scanner
         _moniker = __name_as_human
@@ -264,6 +335,8 @@ module Skylab::CodeMetrics
     # ==
 
     Home_.lib_.string_scanner
+
+    UNDERSCORE_ = '_'
 
     # ==
   end

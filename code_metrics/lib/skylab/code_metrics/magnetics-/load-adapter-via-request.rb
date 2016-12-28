@@ -61,8 +61,19 @@ module Skylab::CodeMetrics
 
       def __load s_a
 
+        has = Autoloader_::CORE_ENTRY_STEM == s_a.last
+
         if @_be_verbose
-          @_debug_IO.write "const reduce: #{ s_a.inspect } .."
+          if has
+            @_debug_IO.write "const reduce: #{ s_a.inspect } .. #{
+              }('core' element will not be used in const path) .."
+          else
+            @_debug_IO.write "const reduce: #{ s_a.inspect } .."
+          end
+        end
+
+        if has
+          s_a = s_a[ 0 .. -2 ]
         end
 
         ok = true
@@ -73,6 +84,10 @@ module Skylab::CodeMetrics
         ) do |*chan, &msg|
           ok = false
           @_listener[ *chan, &msg ]
+          @_listener.call :error, :expression, :autoload_error do |y|
+            y << "the above \"abstract path\" inferred from a filename #{
+              }failed resolve to a const value."
+          end
         end
 
         if @_be_verbose
@@ -88,9 +103,9 @@ module Skylab::CodeMetrics
 
       def __resolve_load_tree_via_path_stream
         _path_st = remove_instance_variable :@__path_stream
-        _ = @_mags::LoadTree_via_PathStream.call(
+        _s_a = @_mags::LoadTree_via_PathStream.call(
           _path_st, @_request.head_path, & @_listener )
-        _store :@__load_tree, _
+        _store :@__load_tree, _s_a
       end
 
       def __resolve_path_stream_via_modified_request  # #testpoint
