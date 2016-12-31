@@ -1,28 +1,47 @@
 module Skylab::CodeMetrics
 
-  class CLI__LineStream_via_NodePlus < Common_::Actor::Monadic
+  class CLI__LineStream_via_NodePlus
     # while #open [#010] (brazen away) not actually under `CLI`
 
+    class << self
+      def call_by & p
+        new( & p ).execute
+      end
+      private :new
+    end  #>>
+
     # -
-
-      def initialize np, & li
-
-        @_listener = p
+      def initialize
+        yield self
+        np = remove_instance_variable :@node_plus
         @__node_for_treemap = np.node
-
         @request = np.request
       end
+
+      def width_and_height w, hi
+        @height = hi
+        @width = w ; nil
+      end
+
+      attr_writer(
+        :node_plus,
+      )
 
       def execute
 
         if :_stub_of_node_for_treemap_ == @__node_for_treemap
-          ::Skylab::CodeMetrics::Magnetics::AsciiMatrix_via_ShapesLayers.call(
-            :_stub_of_shapes_layers_, NOTHING_ )
+          __flush_stub
         elsif @request.do_paginate
           self._ENJOY__pagination
         else
           __execute_normally
         end
+      end
+
+      def __flush_stub
+        _eek = [ :_stub_of_shapes_layers_, @width ]
+        ::Skylab::CodeMetrics::Magnetics::AsciiMatrix_via_ShapesLayers.call(
+          _eek, NOTHING_ )
       end
 
       def __execute_normally
@@ -104,7 +123,14 @@ module Skylab::CodeMetrics
       end
 
       def __init_screen_rectangle
-        @_screen_rectangle = 5, 2, 52, 20
+
+        # (last line-of-defense defaulting - probably never used)
+
+        _width = @width || Mondrian_[]::WIDTH
+        _height = @height || Mondrian_[]::HEIGHT
+
+        @_screen_rectangle = 5, 2, _width, _height
+          # #todo it appears these x, y have no effect but meh
         NIL
       end
 

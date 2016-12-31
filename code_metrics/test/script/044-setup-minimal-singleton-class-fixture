@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby -w
+
+# (this is not currently used to generate any fixtures but it's useful
+#  for trying out new things and compatibilty/regression troubleshooting)
+
+io = $stderr
+
+tp = TracePoint.new :class, :end do |o|
+
+  io.write "  #{ o.lineno }  #{ o.event }  #{ o.binding.receiver.name || "«sing»" }\n"
+end
+
+tp.enable
+
+class Foo
+  class << self
+    self.class
+  end  # >>
+end
+
+tp.disable

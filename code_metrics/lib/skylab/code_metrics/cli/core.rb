@@ -5,16 +5,70 @@ module Skylab::CodeMetrics
   if ridiculous_
     @ridiculous_ = false
 
-      PRIMARY_DESCRIPTIONS_ = {
+    class CLI__ExpressMondrianHelp_via_  # SimpleModel_
+
+      class << self
+        def call_by
+          o = new
+          yield o
+          o.execute
+        end
+        private :new
+      end  # >>
+
+      attr_writer(
+        :expression_agent,
+        :program_name_string_array,
+        :stderr,
+      )
+
+      def execute
+
+        Require_brazen_[]
+        _Help = Brazen_::CLI_Support::When::Help
+
+        h = PRIMARY_DESCRIPTIONS___
+
+        _Help::ScreenForEndpoint.express_into @stderr do |o|
+          o.expression_agent @expression_agent
+          o.primary_symbols h.keys
+          o.express_usage_section @program_name_string_array.join SPACE_
+          o.express_items_sections h
+        end
+        ACHIEVED_  # probably ignored
+      end
+
+      _Low = ::Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
+
+      PRIMARY_DESCRIPTIONS___ = {
+
+        # (only because no other modality currently expresses this help
+        # content, the descriptions for primaries from the two different
+        # concerns are mixed together "by hand" here. an added "benefit"
+        # to this is we can control relative position (order) plainly.)
 
         path: -> y do
           y << "typically one path"
           y << "one day many"
-          y << "if you use globs, put them in single quotes"
+          y << "if you use globs, put them in single quotes."
+          y << "because this is the default primary, using the `-path`"
+          y << "switch explicitly is probably never necessary."
+        end,
+
+        width: -> y do
+          y << "how wide the outermost rectangle is"
+          y << "(in characters) (default: #{ _Low::WIDTH })"
+        end,
+
+        height: -> y do
+          y << "how high the outermost rectangle is"
+          y << "(in characters) (default: #{ _Low::HEIGHT })"
         end,
 
         head_const: -> y do
-          y << "necessary for some reason.."
+          y << "for now, is necessary for some reason #todo."
+          y << "modules that are not under this module are filtered out."
+          y << "for now, #{ prim :head_path } is derived from this."
         end,
 
         head_path: -> y do
@@ -34,9 +88,9 @@ module Skylab::CodeMetrics
           y << "to see if it's working"
         end,
       }
-
+    end
   else
-#==
+#== that was ridiculous
   Require_brazen_[]  # 2 of 2
 
   class CLI < Brazen_::CLI

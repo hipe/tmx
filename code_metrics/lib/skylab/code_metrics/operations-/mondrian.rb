@@ -57,6 +57,39 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def execute
+        @exitstatus = 0
+        ok = __parse_arguments
+        ok &&= __resolve_node_plus
+        ok &&= __resolve_line_stream_via_node_plus
+        if ok
+          st = remove_instance_variable :@__line_stream
+          while line=st.gets
+            @stdout.puts line
+          end
+        end
+        @exitstatus
+      end
+
+      def __resolve_line_stream_via_node_plus
+        require 'skylab/code_metrics/cli/line-stream-via-node-plus'
+          # the above while open [#010] brazen
+
+        _ = ::Skylab::CodeMetrics::CLI__LineStream_via_NodePlus.call_by do |o|
+          o.node_plus = remove_instance_variable :@__node_plus
+          o.width_and_height @width, @height
+        end
+        _store :@__line_stream, _
+      end
+
+      def __resolve_node_plus
+        _op = remove_instance_variable :@_operation
+        _store :@__node_plus, _op.execute
+      end
+
+      def __parse_arguments
+
+        @height = HEIGHT
+        @width = WIDTH
 
         remove_instance_variable :@stdin  # assert never used
         argv = remove_instance_variable :@ARGV
@@ -64,32 +97,25 @@ require 'strscan'  # for ::StringScanner below
 
         listener = method :__receive_emission
 
-        scn = ArgumentScanner_for_CLI___.define do |o|
+        scn = ArgumentScanner_for_CLI___.define do |o|  # resource will move
           o.default_primary_symbol = :path
           o.initial_ARGV_offset = 1
           o.ARGV = argv
-          o.stderr = @stderr
           o.listener = listener
         end
 
-        @exitstatus = 0
+        # frontier an experimental pattern - aggregate
+        # primary sets of different stakeholders here
 
-        node_plus = Operation__.new( scn ).execute
-        if node_plus
-
-          require 'skylab/code_metrics/cli/line-stream-via-node-plus'
-            # the above while open [#010] brazen
-
-          st = ::Skylab::CodeMetrics::CLI__LineStream_via_NodePlus.call(
-            node_plus, & scn.listener )
-          if st
-            while line=st.gets
-              @stdout.puts line
-            end
-          end
+        op = Operation__.new scn, @stderr
+        @_scn = scn
+        @_operation = op
+        _ok = ParseArguments_via___.call_by do |o|
+          o.argument_scanner scn
+          o.add_primaries_injection Operation__::PRIMARIES, op
+          o.add_primaries_injection CLI_PRIMARIES___, self
         end
-
-        @exitstatus
+        _ok  # #todo
       end
 
       def __receive_signal p, chan
@@ -97,15 +123,33 @@ require 'strscan'  # for ::StringScanner below
         _ok  # #todo
       end
 
-      def __receive__help__signal h
-        Home_::Require_brazen_[]
-        _Help = Home_::Brazen_::CLI_Support::When::Help
-        _Help::ScreenForEndpoint.express_into @stderr do |o|
-          o.primary_symbols h.keys
-          o.express_usage_section @program_name_string_array.join SPACE_
-          o.express_items_sections h
+      # -- process primaries
+
+      def __when_help
+
+        Code_metrics_[]
+
+        # -- begin ridiculous loading only while #open [#010]
+        const = :CLI__ExpressMondrianHelp_via_
+        if ! Here_.const_defined? const, false
+          # (if this check is ever necessary, it is only because testing)
+          Home_.ridiculous_ = true
+          require 'skylab/code_metrics/cli/core'
+          Home_.const_defined? const, false or self._FIXME__load_not_require_but_how__
         end
-        ACHIEVED_  # determines exitstatus
+        _lib = Home_.const_get const, false
+        # -- end
+
+        _lib.call_by do |o|
+          o.expression_agent = _expression_agent
+          o.program_name_string_array = @program_name_string_array
+          o.stderr = @stderr
+        end
+        EARLY_END_  # always stop
+      end
+
+      def _parse_positive_nonzero_integer
+        _store @_scn.current_primary_as_ivar, @_scn.parse_positive_nonzero_integer
       end
 
       def __receive_emission * chan, & msg_p
@@ -113,6 +157,7 @@ require 'strscan'  # for ::StringScanner below
         refl = Express_for_CLI_via_Expression___.define do |o|
           o.channel = chan
           o.emission_proc = msg_p
+          o.expression_agent_by = method :_expression_agent
           o.signal_by = method :__receive_signal
           o.stdout = @stdout
           o.stderr = @stderr
@@ -126,6 +171,10 @@ require 'strscan'  # for ::StringScanner below
         end
 
         NIL
+      end
+
+      def _expression_agent
+        Expression_agent_for_CLI___.instance
       end
 
       DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
@@ -142,6 +191,17 @@ require 'strscan'  # for ::StringScanner below
         :stderr,
       )
     # -
+
+    # ==
+
+    CLI_PRIMARIES___ = {
+      help: :__when_help,
+      height: :_parse_positive_nonzero_integer,
+      width: :_parse_positive_nonzero_integer,
+    }
+
+    HEIGHT = 20
+    WIDTH = 52
 
     # ==
 
@@ -180,67 +240,6 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    class Operation__
-
-      def initialize scn
-        @__scn = scn
-      end
-
-      def execute
-        ok = true
-        ok &&= __parse_arguments
-        if ok
-          if 'mock-path-1.code' == ::File.basename( @_request.paths.last )  # #[#007.H]
-            return NodePlus___.new :_stub_of_node_for_treemap_
-          end
-        end
-        ok &&= __resolve_recording
-        ok &&= __resolve_node_for_treemap_via_recording
-        ok && __FLUSH_SOMETHING_FOR_RESULT
-      end
-
-      def __FLUSH_SOMETHING_FOR_RESULT
-        _ = remove_instance_variable :@__node_for_treemap
-        NodePlus___.new _, @_request
-      end
-
-      NodePlus___ = ::Struct.new :node, :request
-
-      def __resolve_node_for_treemap_via_recording  # #testpoint (see #mon-spot-2)
-        _rec = remove_instance_variable :@__recording
-        _ = @_mags::Node_for_Treemap_via_Recording.call(
-          _rec, @_request, & @_listener )
-        _store :@__node_for_treemap, _
-      end
-
-      def __resolve_recording  # #testpoint (see #mon-spot-2 again)
-        recorder = Recorder___.new @_request, @_listener
-        recorder.enable
-        @_mags = Code_metrics_[]::Magnetics_  # only after we are recording
-        ok = __load_all_assets_and_support
-        recorder.disable
-        ok and _store :@__recording, recorder.flush_recording
-      end
-
-      def __load_all_assets_and_support
-        la = @_mags::LoadAdapter_via_Request[ @_request, & @_listener ]
-        la && la.load_all_assets_and_support
-      end
-
-      def __parse_arguments
-        scn = remove_instance_variable :@__scn
-        @_listener = scn.listener
-        _ = Request_via_Scanner___.new( scn ).execute
-        _store :@_request, _
-      end
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-    end
-
-    # ==
-
-    class Request_via_Scanner___
-
       # the only weird thing about this is the dependency of
       # system services ("topic") on request parsing:
       #
@@ -272,154 +271,143 @@ require 'strscan'  # for ::StringScanner below
       # particular primary expression. this way we have an upgrade path
       # to (A) or (B) without an abrubt change in behavior.
       #
-      def initialize scn
 
+    # ==
+
+    class Operation__
+
+      def initialize scn, debug_IO
+
+        @_debug_IO = debug_IO
         @_listener = scn.listener
-        @_stderr = scn.stderr  # :#here-1
+        @_scn = scn
 
-        @_args = scn
-        @_be_verbose = false
         @_system_services = :__system_services_initially
         @_system_services_is_built = false
 
+        @be_verbose = nil
         @head_const = nil
         @head_path = nil
         @paths = nil
         @require_paths = nil
       end
 
-      def execute
-        if __process_arguments
-          if __ensure_these :@paths, :@head_const
-            __flush
+      PRIMARIES = {
+        head_const: :__parse_item,
+        head_path: :_parse_path_item,
+        path: :_parse_path_list_item,
+        ping: :__when_ping,
+        require_path: :_parse_path_list_item,
+        verbose: :__when_verbose,
+      }
+
+      def execute  # assume normal
+        ok = __normalize
+        ok &&= __resolve_request
+        if ok
+          if 'mock-path-1.code' == ::File.basename( @_request.paths.last )  # #[#007.H]
+            return NodePlus___.new :_stub_of_node_for_treemap_, @_request
           end
         end
+        ok &&= __resolve_recording
+        ok &&= __resolve_node_for_treemap_via_recording
+        ok && __flush_node_plus
       end
 
-      def __flush
-        _svcs = send @_system_services
-        Request___.define do |o|
-          o.be_verbose = remove_instance_variable :@_be_verbose
-          o.debug_IO = remove_instance_variable :@_stderr
+      def __normalize
+        Check_requireds___[ self, :@paths, :@head_const, & @_listener ]
+      end
+
+      def __flush_node_plus
+        _ = remove_instance_variable :@__node_for_treemap
+        NodePlus___.new _, @_request
+      end
+
+      NodePlus___ = ::Struct.new :node, :request
+
+      def __resolve_node_for_treemap_via_recording  # #testpoint (see #mon-spot-2)
+        _rec = remove_instance_variable :@__recording
+        _ = @_mags::Node_for_Treemap_via_Recording.call(
+          _rec, @_request, & @_listener )
+        _store :@__node_for_treemap, _
+      end
+
+      def __resolve_recording  # #testpoint (see #mon-spot-2 again)
+        recorder = Recorder___.new @_request, @_listener
+        recorder.enable
+        @_mags = Code_metrics_[]::Magnetics_  # only after we are recording
+        ok = __load_all_assets_and_support
+        recorder.disable
+        ok and _store :@__recording, recorder.flush_recording
+      end
+
+      def __load_all_assets_and_support
+        la = @_mags::LoadAdapter_via_Request[ @_request, & @_listener ]
+        la && la.load_all_assets_and_support
+      end
+
+      def __resolve_request
+
+        _sy_svcs = send @_system_services
+
+        _ = Request___.define do |o|
+          o.be_verbose = remove_instance_variable :@be_verbose
+          o.do_paginate = false  # on day soon-ish..
+          o.debug_IO = @_debug_IO
           o.head_const = remove_instance_variable :@head_const
           o.head_path = remove_instance_variable :@head_path
           o.paths = remove_instance_variable :@paths
           o.require_paths = remove_instance_variable :@require_paths
-          o.system_services = _svcs
+          o.system_services = _sy_svcs
         end
+
+        _store :@_request, _
       end
 
-      def __ensure_these * ivars
-        missing = nil
-        ivars.each do |ivar|
-          if ! instance_variable_get ivar
-            _sym = ivar.id2name.gsub( %r(\A@|s\z), EMPTY_S_ ).intern # sneaky
-            ( missing ||= [] ).push _sym
-          end
-        end
-        if missing
-          _whine_ do |y|
-            _scn = Scanner_via_Array__.call missing  do |sym|
-              prim sym
-            end
-            _and = oxford_and _scn
-            y << "for now, required: #{ _and }"
-          end
-        else
-          ACHIEVED_
-        end
-      end
+      # -- processing primaries
 
-      def __process_arguments
-        ok = true
-        @_current_primary = nil
-        begin
-          if @_args.no_unparsed_exists
-            remove_instance_variable :@_args
-            remove_instance_variable :@_current_primary
-            break
-          end
-          ok = @_args.lookup_primary_symbol_against PRIMARIES___
-          ok || break
-          @_current_primary = ok
-          ok = send ok.mixed_value
-          ok || break
-          redo
-        end while above
-        ok
-      end
-
-      PRIMARIES___ = {
-        head_const: :_at_item,
-        head_path: :_at_path_item,
-        path: :_at_path_list_item,
-        ping: :__at_ping,
-        require_path: :_at_path_list_item,
-        verbose: :__at_verbose,
-      }
-
-      def __at_verbose
-        if @_system_services_is_built
-          __whine_about_verbose
-        else
-          _advance_one
-          if @_be_verbose
-            @_listener.call :info, :expression do |y|
-              y << "(for now there is only one level of versosity.)"
-            end
-          else
-            @_be_verbose = true
-          end
-          ACHIEVED_
-        end
-      end
-
-      def __whine_about_verbose
-        _whine_ do |y|
-          y << "for now, can't turn on #{ prim :verbose } after paths are processed."
-          y << "try putting the flag earlier in the request."
-        end
-      end
-
-      def _at_path_list_item
-        x = _gets_path
-        if x
-          _push_to_list x
-        end
-      end
-
-      def _at_path_item
-        x = _gets_path
-        if x
-          _set_as_only_item x
-        end
-      end
-
-      def _gets_path
-        x = _gets_trueish
-        if x
-          x = send( @_system_services ).normalize_user_path x
-          x  # hi.
-        end
-      end
-
-      def _at_item
-        x = _gets_trueish
-        if x
-          _set_as_only_item x
-        end
-      end
-
-      def __at_ping
-        _advance_one
+      def __when_ping
         @_listener.call :info, :expression, :ping do |y|
           y << "hello from mondrian"
         end
         EARLY_END_
       end
 
+      def __when_verbose
+        if @_system_services_is_built
+          __whine_about_verbose
+        else
+          if @be_verbose
+            __info_about_verb_levels
+          else
+            @be_verbose = true
+          end
+          ACHIEVED_
+        end
+      end
+
+      def __whine_about_verbose
+        @_scn.no_because do |y|
+          y << "for now, can't turn on {{ prim }} after paths are processed."
+          y << "try putting the flag earlier in the request."
+        end
+      end
+
+      def __info_about_verb_levels
+        @_listener.call :info, :expression do |y|
+          y << "(for now there is only one level of versosity.)"
+        end
+      end
+
+      def _parse_path_list_item
+        @_scn.map_value_by do |s|
+          path = send( @_system_services ).normalize_user_path s
+          path and _accept_list_item path
+        end
+      end
+
       def __system_services_initially
-        ss = SystemServices___.new @_be_verbose, @_stderr
+        ss = SystemServices___.new @be_verbose, @_debug_IO
         @_system_services_is_built = true
         @_system_services = :__system_services_subsequently
         @___system_services = ss
@@ -430,65 +418,44 @@ require 'strscan'  # for ::StringScanner below
         @___system_services
       end
 
-      def _gets_trueish
-        _advance_one
-        @_args.gets_trueish
-      end
-
-      def _push_to_list x
-        ivar = :"@#{ @_current_primary.name_symbol }s"
-        a = instance_variable_get ivar
-        if ! a
-          a = []
-          instance_variable_set ivar, a
-        end
-        a.push x ; true
-      end
-
-      def _set_as_only_item x
-        ivar = :"@#{ @_current_primary.name_symbol }"
-        prev = instance_variable_get ivar
-        if prev
-          __when_value_is_arleady_set
-        else
-          instance_variable_set ivar, x ; true
+      def __parse_item
+        @_scn.map_value_by do |s|
+          ivar = @_scn.current_primary_as_ivar
+          if instance_variable_defined? ivar
+            x = instance_variable_get ivar
+          end
+          if x.nil?
+            @_scn.advance_one
+            instance_variable_set ivar, s
+            ACHIEVED_
+          else
+            __when_value_is_already_set x
+          end
         end
       end
 
-      def __when_value_is_arleady_set
-        sym = @_current_primary.name_symbol
-        _whine_ do |y|
+      def __when_value_is_already_set x
+        sym = @_scn.current_primary_symbol
+        @_scn.no_because do |y|
           y << "ambiguous: #{ prim sym } specified multiple times #{
             }but takes only one value"
         end
       end
 
-      def _advance_one
-        if @_current_primary.do_advance
-          @_args.advance_one
+      def _accept_list_item x
+        @_scn.advance_one
+        ivar = :"#{ @_scn.current_primary_as_ivar }s"
+        if instance_variable_defined? ivar
+          a = instance_variable_get ivar
         end
+        if ! a
+          instance_variable_set ivar, ( a=[] )
+        end
+        a.push x
+        ACHIEVED_
       end
 
-      def _whine_ & msg_p
-        @_listener.call :error, :expression, :primary_parse_error do |y|
-          calculate y, & msg_p
-        end
-        UNABLE_
-      end
-    end
-
-    class Request___ < SimpleModel_  # #testpoint
-
-      attr_accessor(
-        :be_verbose,
-        :do_paginate,
-        :debug_IO,
-        :head_const,
-        :head_path,
-        :paths,
-        :require_paths,
-        :system_services,
-      )
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
     # ==
@@ -699,27 +666,51 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    CommonScannerMethods__ = ::Module.new
+    class Request___ < SimpleModel_  # #testpoint
+
+      attr_accessor(
+        :be_verbose,
+        :do_paginate,
+        :debug_IO,
+        :head_const,
+        :head_path,
+        :paths,
+        :require_paths,
+        :system_services,
+      )
+    end
+
+    # ==
 
     class ArgumentScanner_for_CLI___ < SimpleModel_
 
-      include CommonScannerMethods__
+      class << self
+        def new s_a
+          define do |o|
+            o.ARGV = s_a
+          end
+        end
+      end  # >>
 
       def initialize
+
+        @_read_CPS = :__read_CPS_initially
+        @_write_CPS = :__write_CPS_initially
+
+        @initial_ARGV_offset = 0
+        @default_primary_symbol = nil
+        @listener = nil
         yield self
-
-        scn = Scanner_via_Array__.new(
-          remove_instance_variable( :@initial_ARGV_offset ),
-          remove_instance_variable( :@ARGV ),
-        )
-
-        if scn.no_unparsed_exists
+        s_a = remove_instance_variable :@ARGV
+        len = s_a.length
+        d = remove_instance_variable :@initial_ARGV_offset
+        if len == d
           @no_unparsed_exists = true
-          remove_instance_variable :@stderr
           freeze
         else
-          @no_unparsed_exists = false
-          @_real_scanner_ = scn
+          @_array = s_a
+          @_current_index = d
+          @_last_index = s_a.length - 1
         end
       end
 
@@ -728,235 +719,200 @@ require 'strscan'  # for ::StringScanner below
         :default_primary_symbol,
         :initial_ARGV_offset,
         :listener,
-        :stderr,
       )
 
-      def lookup_fuzzily k, h
-        rx = /\A#{ ::Regexp.escape k.id2name }/
-        a = []
-        h.keys.each do |sym|
-          rx =~ sym or next
-          a.push Pair__.new( h.fetch( sym ), sym )
-        end
-        a
-      end
+      # --
 
-      def lookup_primary_symbol_against h
-        lu = LookupPrimarySymbol__.new( h, self ).execute
-        if lu.ok
-          lu  # as pair
-        elsif :invalid == lu.category_symbol &&
-            /\A--?h(?:e(?:l(?:p)?)?)?\z/ =~ @_real_scanner_.current_token
-          __when_help
-        else
-          lu.execute
-        end
-      end
-
-      def __when_help
-        Code_metrics_[]
-        Home_.ridiculous_ = true
-        require 'skylab/code_metrics/cli/core'
-        @listener.call :signal, :help, Home_::PRIMARY_DESCRIPTIONS_
-        EARLY_END_
-      end
-
-      def match_well_formed_primary_symbol  # assume some
-        md = RX___.match @_real_scanner_.current_token
+      def parse_primary  # exactly as [#ze-052.1] canon
+        s = head_as_is
+        md = RX___.match s
         if md
-          md[ :slug ].gsub( DASH_, UNDERSCORE_ ).intern
-        end
-      end
-
-      RX___ = /\A--*(?<slug>.+)\z/
-
-      def surface_primary_scanner_of_under hash, expag
-        expag.calculate do
-          Scanner_via_Array__.call( hash.keys ) { |sym| prim sym }
-        end
-      end
-
-      attr_reader(
-        :default_primary_symbol,
-        :stderr,  # #here-1
-      )
-
-      def can_fuzzy
-        true
-      end
-    end
-
-    class LookupPrimarySymbol__
-
-      def initialize h, scn
-        @hash = h
-        @scanner = scn
-      end
-
-      def execute
-        if __match_well_formed_primary_symbol
-          if __find_well_formed_primary_symbol
-            @_found
-          elsif @scanner.can_fuzzy
-            __attempt_fuzzy
-          else
-            _when_invalid
-          end
-        elsif __has_default_primary_symbol
-          __use_default_primary_symbol
+          _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
+          send @_write_CPS, _
+          advance_one
+          ACHIEVED_
+        elsif @default_primary_symbol
+          # #not-covered - blind faith
+          send @_write_CPS, @default_primary_symbol
+          ACHIEVED_
         else
-          WhenNotWellFormed___.new @hash, @scanner
+          __when_malformed_primary s
         end
       end
 
-      def __attempt_fuzzy
-        a = @scanner.lookup_fuzzily @_unsanitized_primary_symbol, @hash
+      RX___ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
+
+      def __write_CPS_initially sym
+        @_read_CPS = :__read_CPS_normally
+        @_write_CPS = :__write_CPS_normally
+        send @_write_CPS, sym
+      end
+
+      def __write_CPS_normally sym
+        @_current_primary_symbol = sym ; nil
+      end
+
+      def __read_CPS_initially
+        raise ScannerIsNotInThatState,
+          "cannot read `current_primary_symbol` from beginning state"
+      end
+
+      def __read_CPS_normally
+        @_current_primary_symbol
+      end
+
+      # --
+
+      def fuzzy_lookup_or_fail h  # assume CPS
+
+        rx = /\A#{ ::Regexp.escape current_primary_symbol.id2name }/
+        a = []
+        h.keys.each do |k|
+          rx =~ k or next
+          a.push k
+        end
         case 1 <=> a.length
         when 0
-          pair = a.fetch 0
-          WhenFound__.new pair.mixed_value, pair.name_symbol
+          k = a.fetch 0
+          @_current_primary_symbol = k
+          h.fetch k
         when 1
-          _when_invalid
+          __when_not_found h
         else
-          WhenAmbiguous___.new(
-            @_unsanitized_primary_symbol, a, @hash, @scanner )
+          __when_ambiguous a
         end
       end
 
-      def __find_well_formed_primary_symbol
-        x = @hash[ @_unsanitized_primary_symbol ]
-        if x
-          _k = remove_instance_variable :@_unsanitized_primary_symbol
-          @_found = WhenFound__.new x, _k ; true
-        end
+      def parse_positive_nonzero_integer
+        d = __integer_that { |d_| 0 < d_ }
+        d && advance_one
+        d
       end
 
-      def __has_default_primary_symbol
-        _store :@__default_primary_symbol, @scanner.default_primary_symbol
-      end
-
-      def __use_default_primary_symbol
-        sym = remove_instance_variable :@__default_primary_symbol
-        _x = @hash.fetch sym
-        WhenFound__.new false, _x, sym
-      end
-
-      def __match_well_formed_primary_symbol
-        _ = @scanner.match_well_formed_primary_symbol
-        _store :@_unsanitized_primary_symbol, _
-      end
-
-      def _when_invalid
-        WhenInvalid___.new @_unsanitized_primary_symbol, @hash, @scanner
-      end
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
-    end
-
-    When__ = ::Class.new
-
-    class WhenAmbiguous___ < When__
-
-      def initialize sym, pair_a, * a
-        @__pairs = pair_a
-        @__unsanitized_primary_symbol = sym
-        super( * a )
-      end
-
-      def execute
-        a = @__pairs
-        sym = @__unsanitized_primary_symbol
-
-        _whine_ do |y|
-
-          _scn = Scanner_via_Array__.call a do |pair|
-            prim pair.name_symbol
+      def __integer_that & p
+        d = __head_as_integer
+        if d
+          if yield d
+            d
+          else
+            __when_integer_is_not d, caller_locations( 1, 1 )[ 0 ]
           end
+        end
+      end
 
-          y << "ambiguous primary #{ ick_prim sym } - #{
+      def __when_integer_is_not d, loc
+        _s = %r(\Aparse_(.+)_integer\z).match( loc.base_label )[ 1 ]
+        _human = _s.gsub UNDERSCORE_, SPACE_
+        no_because { "{{ prim }} must be #{ _human } (had #{ d })" }
+      end
+
+      def __head_as_integer
+        map_value_by do |s|
+          if %r(\A-?\d+\z) =~ s
+            s.to_i
+          else
+            no_because { "{{ prim }} must be an integer (had #{ s.inspect })" }
+          end
+        end
+      end
+
+      def map_value_by
+        if no_unparsed_exists
+          no_because { "{{ prim }} requires an argument" }
+        else
+          yield head_as_is
+        end
+      end
+
+      # --
+
+      def __when_ambiguous a
+        k = current_primary_symbol
+        no_because do |y|
+          _scn = Scanner_via_Array__.call( a ) { |sym| prim sym }
+          y << "ambiguous primary #{ ick_prim k } - #{
             }did you mean #{ oxford_or _scn }?"
         end
       end
 
-      def category_symbol
-        :ambiguous
-      end
-    end
-
-    class WhenInvalid___ < When__
-      def initialize k, * a
-        @__unsanitized_primary_symbol = k
-        super( * a )
-      end
-      def execute
-        k = @__unsanitized_primary_symbol
-        me = self
-        _whine_ do |y|
-          _scn = me._surface_primary_scanner_under_ self
+      def __when_not_found h
+        k = current_primary_symbol
+        no_because do |y|
+          _scn = Scanner_via_Array__.call( h.keys ) { |sym| prim sym }
           y << "unknown primary: #{ ick_prim k }"
           y << "available primaries: #{ oxford_and _scn }"
         end
       end
-      def category_symbol
-        :invalid
-      end
-    end
 
-    class WhenNotWellFormed___ < When__
-      def execute
-        s = @scanner.current_token
-        _whine_ do |y|
+      def __when_malformed_primary s
+        no_because do |y|
           y << "does not look like primary: #{ s.inspect }"
         end
       end
-      def category_symbol
-        :not_well_formed
-      end
-    end
 
-    class WhenFound__
+      def no_because reason=:primary_parse_error, & msg_p
 
-      def initialize do_advance=true, x, sym
-        @do_advance = do_advance
-        @mixed_value = x
-        @name_symbol = sym
-      end
+        me = self
+        @listener.call :error, :expression, reason do |y|
 
-      attr_reader(
-        :do_advance,
-        :mixed_value,
-        :name_symbol,
-      )
+          map = -> sym do
+            case sym
+            when :prim
+              prim me.current_primary_symbol
+            end
+          end
 
-      def ok
-        true
-      end
-    end
+          _y = ::Enumerator::Yielder.new do |line|
+            y << ( line.gsub %r(\{\{[ ]*([a-z_]+)[ ]*\}\}) do
+              map[ $~[1].intern ]
+            end )
+          end
 
-    class When__
-
-      def initialize h, scn
-        @hash = h ; @scanner = scn
-      end
-
-      def _whine_ & msg_p
-        __listener.call :error, :expression, :primary_parse_error do |y|
-          calculate y, & msg_p
+          if msg_p.arity.zero?
+            _y << calculate( & msg_p )
+          else
+            calculate _y, & msg_p
+          end
+          y
         end
         UNABLE_
       end
 
-      def _surface_primary_scanner_under_ expag
-        @scanner.surface_primary_scanner_of_under @hash, expag
+      # --
+
+      def advance_one
+        if @_last_index == @_current_index
+          remove_instance_variable :@_array
+          remove_instance_variable :@_current_index
+          remove_instance_variable :@_last_index
+          @no_unparsed_exists = true
+          freeze
+        else
+          @_current_index += 1
+        end
+        NIL
       end
 
-      def __listener
-        @scanner.listener
+      # --
+
+      def current_primary_as_ivar
+        :"@#{ current_primary_symbol }"
       end
 
-      def ok
-        false
+      def current_primary_symbol
+        send @_read_CPS
       end
+
+      def head_as_is
+        @_array.fetch @_current_index
+      end
+
+      attr_reader(
+        :listener,
+        :no_unparsed_exists,
+      )
+
+      ScannerIsNotInThatState = ::Class.new ::RuntimeError
     end
 
     class Express_for_CLI_via_Expression___ < SimpleModel_
@@ -964,6 +920,7 @@ require 'strscan'  # for ::StringScanner below
       attr_writer(
         :channel,
         :emission_proc,
+        :expression_agent_by,
         :signal_by,
         :stderr,
         :stdout,
@@ -1022,7 +979,7 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def _expression_agent
-        Expression_agent_for_CLI___.instance
+        @expression_agent_by.call
       end
 
       def _yielder_via_channel
@@ -1058,34 +1015,103 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    module CommonScannerMethods__
+    class ParseArguments_via___  # #testpoint
 
-      def gets_trueish
-        if @no_unparsed_exists
-          self._COVER_ME__attempt_to_read_trueish_at_end_of_argument_stream__
-        else
-          x = @_real_scanner_.current_token
-          if x
-            @_real_scanner_.advance_one
-            if @_real_scanner_.no_unparsed_exists
-              @no_unparsed_exists = true
-            end
-            x
-          else
-            self._COVER_ME__attempt_to_read_trueish_but_had_falseish__
+      class << self
+        def call_by & p
+          new( & p ).execute
+        end
+        private :new
+      end  # >>
+
+      def initialize
+        @_add_primaries_injection = :__add_first_primaries_injection
+        yield self
+        remove_instance_variable :@_add_primaries_injection
+      end
+
+      def argument_scanner as
+        @__argument_scanner = as ; nil
+      end
+
+      def add_primaries_injection h, injector
+        send @_add_primaries_injection, h, injector
+      end
+
+      def __add_first_primaries_injection h, inj
+        h_ = {}
+        h.each_pair do |k, m|
+          h_[ k ] = [ 0, m ]  # ..
+        end
+        @_primaries = h_
+        @_injectors = [ inj ]
+        @_add_primaries_injection = :__add_subsequent_primaries_injection
+        NIL
+      end
+
+      def __add_subsequent_primaries_injection h, inj
+        h_ = @_primaries
+        idx = @_injectors.length
+        h.each_pair do |k, m|
+          h_[ k ] = [ idx, m ]  # meh for now just overwrite
+        end
+        @_injectors[idx] = inj
+        NIL
+      end
+
+      def execute
+        args = remove_instance_variable :@__argument_scanner
+        a = remove_instance_variable :@_injectors
+        h = remove_instance_variable :@_primaries
+        ok = true
+        until args.no_unparsed_exists
+          ok = args.parse_primary
+          ok || break
+          tuple = h[ args.current_primary_symbol ]
+          if ! tuple
+            tuple = args.fuzzy_lookup_or_fail h
           end
+          if ! tuple
+            ok = tuple ; break
+          end
+          ok = a.fetch( tuple[0] ).send tuple[1]
+          ok || break
+        end
+        ok
+      end
+    end
+
+    # ==
+
+    Check_requireds___ = -> o, * ivars, & p do
+      when_missing = nil
+      missing = nil
+      main = -> do
+        ivars.each do |ivar|
+          if ! o.instance_variable_get ivar
+            _sym = ivar.id2name.gsub( %r(\A@|s\z), EMPTY_S_ ).intern # sneaky
+            ( missing ||= [] ).push _sym
+          end
+        end
+        if missing
+          when_missing[]
+        else
+          ACHIEVED_
         end
       end
 
-      def advance_one
-        @_real_scanner_.advance_one
-        @no_unparsed_exists = @_real_scanner_.no_unparsed_exists ; nil
+      when_missing = -> do
+        p.call :error, :expression, :primary_parse_error do |y|
+          _scn = Scanner_via_Array__.call missing do |sym|
+            prim sym
+          end
+          _and = oxford_and _scn
+          y << "for now, required: #{ _and }"
+        end
+        UNABLE_
       end
 
-      attr_reader(
-        :no_unparsed_exists,
-        :listener,
-      )
+      main[]
     end
 
     # ==

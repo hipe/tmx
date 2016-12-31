@@ -10,13 +10,36 @@ module Skylab::CodeMetrics::TestSupport
 
     me = 'mondrian'
 
-    it "hi." do
+    it "ping" do
 
       invoke me, '-ping'
-
       expect_on_stderr 'hello from mondrian'
-
       expect_succeeded
+    end
+
+    it "strange primary - unknown // available" do
+
+      invoke me, '-ziz-wiz'
+      expect_on_stderr "unknown primary: \"-ziz-wiz\""
+      expect %r(\Aavailable primaries: .*(?<![[:alnum:]])-width\b)
+        # the above is currently very long but meh
+      _expect_failed_commonly
+    end
+
+    ambi_N = 4
+    it "ambiguous primary - in one line, splays #{ ambi_N } alternatives" do
+
+      invoke me, '-he'
+      on_stream :serr
+      _rx = %r(\Aambiguous primary "-he" - did you mean (.+)\?\z)
+      md = nil
+      expect_line_by do |line|
+        md = _rx.match line
+      end
+      _expect_failed_commonly
+
+      _these = md[1].split %r(,[ ]| or )
+      ambi_N == _these.length or fail  # ..
     end
 
     it "path is required" do
@@ -25,7 +48,7 @@ module Skylab::CodeMetrics::TestSupport
 
       expect_on_stderr %r(\Afor now, required: -path and\b)
 
-      expect_failed
+      _expect_failed_commonly
     end
 
     it "money (mocked)" do
@@ -42,6 +65,48 @@ module Skylab::CodeMetrics::TestSupport
       expect_on_stdout_lines_in_big_string _big_string
 
       expect_succeeded
+    end
+
+    context "numeric option" do
+
+      same = '-width'
+
+      it "argument stream end early - talkin bout expecting" do
+
+        invoke me, same
+        expect_on_stderr "#{ same } requires an argument"
+        _expect_failed_commonly
+      end
+
+      it "not look like an integer" do
+
+        invoke me, same, '1.0'
+        expect_on_stderr "#{ same } must be an integer (had \"1.0\")"
+        _expect_failed_commonly
+      end
+
+      it "not positive nonzero (clever thing with method names)" do
+
+        invoke me, same, '0'
+        expect_on_stderr "#{ same } must be positive nonzero (had 0)"
+        _expect_failed_commonly
+      end
+
+      it "money" do
+
+        invoke me, same, '313', '-head-const', 'xx', 'mock-path-1.code'
+
+        _big_string = <<-HERE.unindent
+          +----------+
+          | pretend  |
+          | i am 313 |
+          | wide     |
+          +----------+
+        HERE
+
+        expect_on_stdout_lines_in_big_string _big_string
+        expect_succeeded
+      end
     end
 
     it "help" do
@@ -69,7 +134,7 @@ module Skylab::CodeMetrics::TestSupport
       stack = [
         %r((?<![a-z])-head-const(?!-)),
         %r(\Aprimaries:$),
-        %r(\Ausage: ze-pnsa.*(?<![a-z])-head-path(?!-)),
+        %r(\Ausage: ze-pnsa.*(?<![a-z])-path(?!-)),
       ]
 
       expect_succeeded
@@ -77,6 +142,12 @@ module Skylab::CodeMetrics::TestSupport
       if stack.length.nonzero?
         fail
       end
+    end
+
+    def _expect_failed_commonly
+      # expect "try 'ze-pnsa -h'
+        # for now, no invites just to be like `find`
+      expect_failed
     end
 
     def subject_CLI

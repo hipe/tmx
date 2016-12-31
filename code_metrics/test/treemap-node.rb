@@ -254,7 +254,7 @@ module Skylab::CodeMetrics::TestSupport
       def execute  # #mon-spot-2 - massively hack the operation object
 
         req = remove_instance_variable :@__request
-        op = Home_::Mondrian_[]::Operation__.new :_no_arg_scn_
+        op = Home_::Mondrian_[]::Operation__.new MOCK_SCN___, :_no_stdin_cm_
 
         op.instance_variable_set :@_listener, method( :__emergency_doo_hah )
         op.instance_variable_set :@_request, req
@@ -273,6 +273,12 @@ module Skylab::CodeMetrics::TestSupport
         fail
       end
     end
+
+    module MOCK_SCN___ ; class << self
+      def listener
+        :_no_listener_cm_
+      end
+    end ; end
 
     # ==
 

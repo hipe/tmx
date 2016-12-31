@@ -131,6 +131,7 @@ module Skylab::CodeMetrics
 
     module Path  # #anemic
       Path_tailerer = Tailerer_via_separator_[ ::File::SEPARATOR ]
+      Actions = nil  # only for [#010]
     end
 
     # (away at #open [#010])

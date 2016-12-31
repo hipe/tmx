@@ -25,24 +25,10 @@ module Skylab::Brazen
         @expag ||= expression_agent_class.new :_no_kernel_
       end
 
-      def members
-        singleton_class.instance_methods( false ) - [ :members ]
+      def the_empty_expression_agent
+        THE_EMPTY_EXPRESSION_AGENT_
       end
     end  # >>
-
-    teea = nil
-    build_the_empty_expression_agent = -> do
-      # also see [ts]::THE_EMPTY_EXPRESSION_AGENT
-      class Empty_Expag < ::BasicObject
-        def calculate y, & p
-          instance_exec y, & p
-        end
-        new
-      end
-    end
-    API.send :define_singleton_method, :the_empty_expression_agent do
-      teea ||= build_the_empty_expression_agent[]
-    end
 
     Exit_statii___ = Common_::Lazy.call do
 

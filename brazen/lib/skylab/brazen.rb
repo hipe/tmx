@@ -79,6 +79,12 @@ module Skylab::Brazen
     end
   end  # >>
 
+  # -- singletons
+
+  module THE_EMPTY_EXPRESSION_AGENT_ ; class << self  # c.p from [ts]
+    alias_method :calculate, :instance_exec
+  end ; end
+
   # --
 
   Lazy_ = Common_::Lazy

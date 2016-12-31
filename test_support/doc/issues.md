@@ -30,7 +30,8 @@
              is called, ruby will load the file redundantly which under
              some autoloaderifications will bork apparently flickeresquely
 
-[#034] #hole ( #moved-to: [#dt-XXX] )
+[#034] #open what is the r.s equivalent to this? [ canon ]
+             ( #moved-to: [#dt-XXX] )
 
 [#033]       #historical #done fix test globbing .. [#xx-009]
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )

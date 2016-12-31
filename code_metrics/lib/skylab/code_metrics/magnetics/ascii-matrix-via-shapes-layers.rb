@@ -10,26 +10,56 @@ module Skylab::CodeMetrics
       end
 
       def execute
-        if :_stub_of_shapes_layers_ == @shapes_layers  # #[#007.H]
-          __do_stub
+
+        #== begin #[#007.H]
+
+        a = ::Array.try_convert @shapes_layers
+        if a
+          is_stub = true
+          stub_tuple = a
+        end
+
+        #== end
+
+        if is_stub
+          __do_stub stub_tuple
         else
           __do_real_execute
         end
       end
 
-    def __do_stub
+      def __do_stub stub_tuple
 
-      _big_string = <<-HERE.unindent
+        _, width = stub_tuple
+
+        _big_string = if width == Mondrian_[]::WIDTH
+          __stubbed_big_string_normally
+        else
+          __stubbed_big_string_via_width width
+        end
+
+        Basic_::String.line_stream _big_string
+      end
+
+      def __stubbed_big_string_via_width w
+        _wee = <<-HERE.unindent
+          +----------+
+          | pretend  |
+          | i am #{ '%3d' % w } |
+          | wide     |
+          +----------+
+        HERE
+        _wee
+      end
+
+      def __stubbed_big_string_normally
+        <<-HERE.unindent
         +------+
         | flim |
         | flam |
         +------+
-      HERE
-
-      _st = Basic_::String.line_stream _big_string
-
-      _st   # #todo
-    end
+        HERE
+      end
 
       def __do_real_execute
         __init_pixel_matrix

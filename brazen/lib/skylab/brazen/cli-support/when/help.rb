@@ -82,13 +82,16 @@ module Skylab::Brazen
       class ScreenForWhichever__
 
         class << self
-          def express_into io
-            yield new io
-          end
-          private :new
+          alias_method :express_into, :new
+          undef_method :new
         end  # >>
 
         def initialize io
+
+          # because the same user block that is used to supply parameters
+          # is the one that specifies the expression (order, et), and
+          # because for parsimony expression happens in real time, there
+          # is no place for use to supply defaults in the typical way..
 
           puts = io.method :puts
 
@@ -97,9 +100,17 @@ module Skylab::Brazen
           end
 
           @express_blank_line = puts
+          @expression_agent = nil
           @has_item_groups = false
+          @expression_agent = nil
           @margin = TWO_SPACES___
           @puts = puts
+
+          yield self
+        end
+
+        def expression_agent x
+          @expression_agent = x ; nil
         end
 
         def express_description_section_by & user_p
@@ -155,6 +166,7 @@ module Skylab::Brazen
             p[ line ]
           end
 
+          expag = @expression_agent || THE_EMPTY_EXPRESSION_AGENT_
           item = -> nm do
 
             buffer = fmt % nm.as_slug
@@ -162,7 +174,7 @@ module Skylab::Brazen
             desc_p = description_proc_for[ nm.as_variegated_symbol ]
             if desc_p
               p = first_line
-              nil.instance_exec y, & desc_p  # #no-expag for now (1 of 2)
+              expag.instance_exec y, & desc_p  # #no-expag for now (1 of 2)
             end
             NIL
           end

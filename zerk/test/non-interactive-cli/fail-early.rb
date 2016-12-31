@@ -951,7 +951,8 @@ module Skylab::Zerk::TestSupport
       h = {}
 
       expect_nothing = -> s, method_name, stream_sym do
-        _msg = "unexpected: #{ [ s, method_name, stream_sym ].inspect }"
+        _msg = "was not expecting anything on '#{ stream_sym }' #{
+          } (had: #{ [ s, method_name, stream_sym ].inspect })"
         raise ExpectationFailure__, _msg
       end
 

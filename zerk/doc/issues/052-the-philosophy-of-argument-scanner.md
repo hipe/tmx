@@ -12,6 +12,8 @@
 this is a fun experiment being frontiered by [tmx] but being housed here
 in [ze] as an optimism about its potentially more broad utility.
 
+(and EDIT a redux is spiking in [cm].)
+
 at its design and creation, it was meant to accomodate a CLI syntax
 that a bit resembles that of the unix `find` command. specifically,
 this is where we get the term "primary" is from that oft-used (but
@@ -59,6 +61,108 @@ in various ways for years) is to meet these design objectives:
   - facilitate a "front list" capability where the frontend (CLI) can
     add (or perhaps unintentionally mask) primaries not recognized by
     the back. this facility must be mostly transparent to the back.
+
+
+
+## the argument scanner "canon" :[#here.1]
+
+(new for [cm], needs to be more evenly integrated into the docs..)
+
+
+### the `parse_primary` method
+
+  - assume some unparsed exists
+
+  - result is always `false`/`true`, representing whether it
+    did not/did successfully parse a primary-*looking* token
+    from the scanner head.
+
+  - when false, *no* state is changed at all (as far as is
+    perceptible). more below.
+
+  - otherwise (and true), the scanner is advanced (as applicable)
+    and the effective result of the parse is memoized and
+    available (only) under `current_primary_symbol`. (see below.)
+
+details/corollaries:
+
+  - the `current_primary_symbol` is an "unsantized normal symbol",
+    meaning *not* that it's necessarily "valid" for whatever the
+    client is parsing (that's the client's domain, not the
+    subject's); but rather it means that the scanner considers
+    whatever was as the head as being "well-formed" enough to be
+    placed under consideration to this end. what *this* means, in
+    turn, varies from modality to modality.
+
+  - since the result produced by `current_primary_symbol` is only
+    ever (and always) affected by a call to the subject method
+    that results in `true`, a call to `current_primary_symbol` will
+    (typically) only ever be invalid before you've ever parsed any
+    primaries, and forever after that it will always (typically)
+    produce some symbol.
+
+  - see "why does.." next
+
+
+
+#### why does `parse_primary` advance the scanner?
+
+as an implied byproduct of `parse_primary` having produced a `true`
+result, the subject (not client) will have advanced the scanner head
+just *past* the relevant token (where applicable). why we keep
+saying "where applicable" is explained here:
+
+the general convention is that scanner is *not* advanced past
+the relevant portions of the input stream until the corresponding
+structure being produced by the parse is validated as being "correct".
+
+advantanges to this approach can include but aren't necessarily
+limited to:
+
+  - it can be easier to implement error reporting that is scoped
+    to a desired level of granularity when the scanner head is
+    pointing to just after whatever was last (validly) parsed.
+
+  - this convention can make it easier to implement grammers with
+    a certain amount of ambiguity without ever having to backtrack.
+
+following this convention, then, it would make sense that the
+scanner head having moved over the primary token would signify that
+the whole primary expression had been parsed successfully.
+
+because it's decidedly outside of the subject's domain to know
+what "correct" is for any given business domain, it would then
+follow that the client (not subject) should be the one to move
+the scanner head over the primary token (in effect "signing off"
+that that part of the parse is complete).
+
+however (finally), we discard this convention in the case of
+primaries because for clients that expose a `default_primary_symbol`,
+the above semantics create confusion at these multiple points:
+
+the confusing question becomes, "if the last primary produced
+was arrived at by defaulting, should the next call to `advance_one`
+move over the imaginary token that in reality wasn't there, or the
+real next token (that doesn't correspond to the primary you just
+'parsed')?"
+
+if the answer is the latter, then it is almost guaranteed that
+some clients would accidentally hop over a token they didn't intend
+to. but if the answer is the former (probably the more natural
+choice), then it becomes fragile state that the scanner implementation
+has to manage ("what's that you say? advance one? well if the last
+primary I produced was defaulted, then i'm going to ignore this and
+note that I did this by resetting my state back to normal."). this
+situation itself seems guaranteed to trip some clients up.
+
+our cutting of this gordian knot comes in the form of avoiding the
+question entirely by saying instead, "if there was ever any primary
+token to advance over, we have certainly done it already."
+
+the cleanliness of this solution, then, becomes shorter in code
+to implement than the documentation we produce explaining it.
+
+
 
 
 
