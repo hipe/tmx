@@ -15,3 +15,6 @@ use [sa] to convert etc to Stream_
 ((-1.16 [cm] maybe one of your fixture trees as paginated (( NN )) ))
 ((-1.31 [cm] maybe one of your fixture trees as omni tree (( NN )) ))
 (see if you can get omni tree visually after width/height as options)
+((-1.33 get [cm] green as was with this ))
+((-1.36 move it to "zerk/lib/skylab/no-dependencies-zerk.rb", plus tests ))
+((-1.38 erase it ("will rewrite") (commit) ))
