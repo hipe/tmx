@@ -17,4 +17,3 @@ use [sa] to convert etc to Stream_
 (see if you can get omni tree visually after width/height as options)
 ((-1.33 get [cm] green as was with this ))
 ((-1.36 move it to "zerk/lib/skylab/no-dependencies-zerk.rb", plus tests ))
-((-1.38 erase it ("will rewrite") (commit) ))
