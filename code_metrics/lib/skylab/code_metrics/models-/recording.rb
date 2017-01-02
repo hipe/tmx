@@ -336,6 +336,7 @@ module Skylab::CodeMetrics
 
     Home_.lib_.string_scanner
 
+    Actions = NOTHING_  # while #open [#010] [br]
     UNDERSCORE_ = '_'
 
     # ==

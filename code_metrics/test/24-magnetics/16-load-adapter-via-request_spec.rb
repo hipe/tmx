@@ -51,7 +51,7 @@ module Skylab::CodeMetrics::TestSupport
         s_a = get_string_array_for_expanded_path_stream_
 
         eek.send :define_singleton_method, :__resolve_path_stream_via_modified_request do
-          @__path_stream = Stream_[ s_a ]
+          @_path_stream = Stream_[ s_a ]
           true  # ACHIEVED_
         end
 

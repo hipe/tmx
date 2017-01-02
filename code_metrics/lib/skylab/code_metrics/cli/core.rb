@@ -48,11 +48,10 @@ module Skylab::CodeMetrics
         # to this is we can control relative position (order) plainly.)
 
         path: -> y do
-          y << "typically one path"
-          y << "one day many"
+          y << "adds this path to the list of paths to be loaded."
           y << "if you use globs, put them in single quotes."
           y << "because this is the default primary, using the `-path`"
-          y << "switch explicitly is probably never necessary."
+          y << "switch itself is probably never necessary."
         end,
 
         width: -> y do
@@ -78,6 +77,11 @@ module Skylab::CodeMetrics
         require_path: -> y do
           y << "any path that you would require from a script"
           y << "can be expressed multiple times"
+        end,
+
+        list_nodes_to_load: -> y do
+          y << "skips normal output; just shows the \"nodes\""
+          y << "that would be loaded"
         end,
 
         verbose: -> y do

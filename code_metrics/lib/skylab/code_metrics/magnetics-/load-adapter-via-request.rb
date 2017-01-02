@@ -30,24 +30,43 @@ module Skylab::CodeMetrics
       # (the division between what happens in one vs. the other is arbitrary)
 
       def execute
+        @_mags = Home_::Magnetics_
         __resolve_const_scanner && self
       end
 
       def load_all_assets_and_support
-        @_mags = Home_::Magnetics_
         ok = true
         ok &&= __require_any_require_paths
-        ok &&= __resolve_head_module
-        ok &&= __resolve_head_path
-        ok &&= __resolve_path_stream_via_modified_request
-        ok &&= __resolve_load_tree_via_path_stream
+        ok &&= _resolve_load_tree
         ok &&= __load_load_tree
         ok
       end
 
+      def to_normal_paths
+        ok = _resolve_load_tree
+        ok && __flush_normal_paths
+      end
+
+      def __flush_normal_paths
+        NormalPaths__.new(
+          _load_tree.method( :to_pre_order_normal_path_stream ),
+          @_request.head_path,
+        )
+      end
+
+      NormalPaths__ = ::Struct.new :to_normal_path_stream_by, :head_path
+
+      def _resolve_load_tree
+        ok = true
+        ok &&= __resolve_head_module
+        ok &&= __resolve_head_path
+        ok &&= __resolve_path_stream_via_modified_request
+        ok &&= __resolve_load_tree_via_path_stream
+        ok
+      end
+
       def __load_load_tree
-        _lt = remove_instance_variable :@__load_tree
-        st = _lt.to_pre_order_normal_path_stream
+        st = _load_tree.to_pre_order_normal_path_stream
         ok = true
         begin
           x = st.gets
@@ -57,6 +76,10 @@ module Skylab::CodeMetrics
           redo
         end while above
         ok
+      end
+
+      def _load_tree
+        remove_instance_variable :@__load_tree
       end
 
       def __load s_a
@@ -102,7 +125,7 @@ module Skylab::CodeMetrics
       end
 
       def __resolve_load_tree_via_path_stream
-        _path_st = remove_instance_variable :@__path_stream
+        _path_st = remove_instance_variable :@_path_stream  # ivar name is #testpoint :(
         _s_a = @_mags::LoadTree_via_PathStream.call(
           _path_st, @_request.head_path, & @_listener )
         _store :@__load_tree, _s_a
@@ -110,7 +133,7 @@ module Skylab::CodeMetrics
 
       def __resolve_path_stream_via_modified_request  # #testpoint
         _ = @_mags::PathStream_via_MondrianRequest[ @_request, & @_listener ]
-        _store :@__path_stream, _
+        _store :@_path_stream, _
       end
 
       def __resolve_head_path
@@ -153,8 +176,9 @@ module Skylab::CodeMetrics
       def __require_any_require_paths
         a = remove_instance_variable :@require_paths
         if a
-          a.each do |path|
-            ::Kernel.require path
+          a.each do |path_for_require|
+            require path_for_require
+              # (not `::Kernel.require`, you need the rubygems one)
           end
         end
         ACHIEVED_

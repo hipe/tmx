@@ -152,7 +152,7 @@ module Skylab::Zerk::TestSupport
         end
 
         def __whine_about_not_a_primary sym
-          @_listener.call :error, :expression, :parse_error do |y|
+          @listener.call :error, :expression, :parse_error do |y|
             y << "does not look like a primary: #{ sym.inspect }"
           end
           NIL

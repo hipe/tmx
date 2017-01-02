@@ -145,10 +145,12 @@ module Skylab::CodeMetrics
       # if the (power) user awfully has filenames that contain these
       # special characters, she can write a `fnmatch`-compatible pattern
       # that matches only this path, so no power is lost.
+      # :#mon-spot-3
 
       fnmatch_pattern_probably_rx =~ path
     end
-    fnmatch_pattern_probably_rx = /[\\*?\[]/
+
+    fnmatch_pattern_probably_rx = Mondrian_[]::FNMATCH_PATTERN_PROBABLY_RX
 
     # ==
   end

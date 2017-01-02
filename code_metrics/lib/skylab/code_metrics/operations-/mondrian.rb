@@ -60,15 +60,25 @@
       def execute
         @exitstatus = 0
         ok = __parse_arguments
-        ok &&= __resolve_node_plus
-        ok &&= __resolve_line_stream_via_node_plus
+        ok &&= __resolve_line_stream_via_operation
         if ok
-          st = remove_instance_variable :@__line_stream
+          st = remove_instance_variable :@_line_stream
           while line=st.gets
             @stdout.puts line
           end
         end
         @exitstatus
+      end
+
+      def __resolve_line_stream_via_operation
+
+        if @_operation.do_list_etc
+          _ = _operation.execute
+          _store :@_line_stream, _
+        else
+          _ok = _store :@__node_plus, _operation.execute
+          _ok && __resolve_line_stream_via_node_plus
+        end
       end
 
       def __resolve_line_stream_via_node_plus
@@ -79,12 +89,7 @@
           o.node_plus = remove_instance_variable :@__node_plus
           o.width_and_height @width, @height
         end
-        _store :@__line_stream, _
-      end
-
-      def __resolve_node_plus
-        _op = remove_instance_variable :@_operation
-        _store :@__node_plus, _op.execute
+        _store :@_line_stream, _
       end
 
       def __parse_arguments
@@ -117,6 +122,10 @@
           o.add_primaries_injection CLI_PRIMARIES___, self
         end
         _ok  # #todo
+      end
+
+      def _operation
+        remove_instance_variable :@_operation
       end
 
       def __receive_signal p, chan
@@ -208,13 +217,9 @@
 
     require 'no-dependencies-zerk'
     lib = ::NoDependenciesZerk
-    Interface__ = lib
+    Interface__ = lib  # #testpoint
 
     SimpleModel_ = lib::SimpleModel
-
-    # ==
-
-    Lazy_ = lib::Lazy
 
     # ==
 
@@ -252,11 +257,12 @@
 
     # ==
 
-    class Operation__
+    class Operation__  # #testpoint
 
       def initialize scn, debug_IO
 
         @_debug_IO = debug_IO
+        @_is_mock_run = false
         @_listener = scn.listener
         @_scn = scn
 
@@ -264,6 +270,7 @@
         @_system_services_is_built = false
 
         @be_verbose = nil
+        @do_list_etc = nil
         @head_const = nil
         @head_path = nil
         @paths = nil
@@ -273,9 +280,10 @@
       PRIMARIES = {
         head_const: :__parse_item,
         head_path: :_parse_path_item,
+        list_nodes_to_load: :__when_list_etc,
         path: :_parse_path_list_item,
         ping: :__when_ping,
-        require_path: :_parse_path_list_item,
+        require_path: :__parse_list_item,
         verbose: :__when_verbose,
       }
 
@@ -283,18 +291,42 @@
         ok = __normalize
         ok &&= __resolve_request
         if ok
-          if 'mock-path-1.code' == ::File.basename( @_request.paths.last )  # #[#007.H]
+          if @_is_mock_run
             return NodePlus___.new :_stub_of_node_for_treemap_, @_request
           end
         end
+        ok && __via_request
+      end
+
+      def __via_request
+        if @do_list_etc
+          ok = _resolve_load_adapter
+          ok and _store :@__normal_paths, _load_adapter.to_normal_paths
+          ok && __flush_file_list
+        else
+          __the_rest_normally
+        end
+      end
+
+      def __flush_file_list
+        o = remove_instance_variable :@__normal_paths
+        head = o.head_path
+        o.to_normal_path_stream_by.call.map_by do |s_a|
+          ::File.join head, * s_a
+        end
+      end
+
+      def __the_rest_normally
+        ok = true
         ok &&= __resolve_recording
         ok &&= __resolve_node_for_treemap_via_recording
         ok && __flush_node_plus
       end
 
       def __normalize
-        Interface__::Check_requireds.call(
-          self, :@paths, :@head_const, & @_listener )
+        these = %i( @paths )
+          these.push :@head_const
+        Interface__::Check_requireds.call self, these, & @_listener
       end
 
       def __flush_node_plus
@@ -314,15 +346,20 @@
       def __resolve_recording  # #testpoint (see #mon-spot-2 again)
         recorder = Recorder___.new @_request, @_listener
         recorder.enable
-        @_mags = Code_metrics_[]::Magnetics_  # only after we are recording
-        ok = __load_all_assets_and_support
+        ok = _resolve_load_adapter
+        ok &&= _load_adapter.load_all_assets_and_support
         recorder.disable
         ok and _store :@__recording, recorder.flush_recording
       end
 
-      def __load_all_assets_and_support
-        la = @_mags::LoadAdapter_via_Request[ @_request, & @_listener ]
-        la && la.load_all_assets_and_support
+      def _resolve_load_adapter  # only after we are recording (as applicable)
+        @_mags = Code_metrics_[]::Magnetics_
+        _ = @_mags::LoadAdapter_via_Request[ @_request, & @_listener ]
+        _store :@__load_adapter, _
+      end
+
+      def _load_adapter
+        remove_instance_variable :@__load_adapter
       end
 
       def __resolve_request
@@ -380,10 +417,17 @@
 
       def _parse_path_list_item
         @_scn.map_value_by do |s|
+          if MOCK_PATH_ONE___ == s
+            @_is_mock_run = true
+            _accept_list_item :_mock_path_1_
+          else
           path = send( @_system_services ).normalize_user_path s
           path and _accept_list_item path
+          end
         end
       end
+
+      MOCK_PATH_ONE___ = 'mock-path-1.code'  # #[#007.H]
 
       def __system_services_initially
         ss = SystemServices___.new @be_verbose, @_debug_IO
@@ -397,7 +441,27 @@
         @___system_services
       end
 
+      # ~ candidates to push up to [ze] somehow
+
+      def __parse_list_item
+
+        #  - curate that the argument scanner is non-empty
+        #  - if not initialized, create a mutable array in the ivar
+        #  - acccept the head argument into the array (even if the
+        #    head argument is a blank string (e.g the empty string)).
+
+        @_scn.map_value_by do |s|
+          _accept_list_item s
+        end
+      end
+
       def __parse_item
+
+        #  - curate that the argument scanner is non-empty
+        #  - curate there is not already a non-nil value in the ivar "slot"
+        #  - acccept the head argument into the slot (even if the
+        #    head argument is a blank string (e.g the empty string)).
+
         @_scn.map_value_by do |s|
           ivar = @_scn.current_primary_as_ivar
           if instance_variable_defined? ivar
@@ -434,6 +498,15 @@
         ACHIEVED_
       end
 
+      def __when_list_etc
+        @do_list_etc = true
+        ACHIEVED_
+      end
+
+      attr_reader(
+        :do_list_etc,
+      )
+
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
@@ -442,17 +515,20 @@
     class SystemServices___  # #testpoint
 
       def initialize do_debug, debug_IO
-        @__path_normalizer = PathNormalizer___.new do_debug, debug_IO
+        @_path_normalizer = PathNormalizer___.new do_debug, debug_IO
       end
 
       def normalize_user_path path
-        # for now , we assume these paths do not contain symlinks
-        # BUT WE WILL LIKELY MERGE THESE TWO METHODS
-        ::File.expand_path path
+
+        # in real life, if this path is coming from a user on a terminal
+        # it probaly does *not* employ symlinks; however if the path was
+        # derived programmatically for a test then it probably does.
+
+        @_path_normalizer.__normalize_path_softly_ ::File.expand_path path
       end
 
       def normalize_system_path path
-        @__path_normalizer.__normalize_path_ path
+        @_path_normalizer.__normalize_path_ path
       end
 
       def glob path
@@ -837,12 +913,17 @@
         @_tree_cache_ = {}
       end
 
-      def __normalize_path_ path
-        send @_normalize_path, path
+      def __normalize_path_softly_ path
+        send @_normalize_path, Request__[ path, true ]
       end
 
-      def __normalize_path_expressively path
-        path_ = _normalize_path path
+      def __normalize_path_ path
+        send @_normalize_path, Request__[ path ]
+      end
+
+      def __normalize_path_expressively req
+        path = req.original_path
+        path_ = _normalize_path req
         if path_ == path
           @_debug_IO.puts "same: #{ path_ }"
         else
@@ -851,14 +932,14 @@
         path_
       end
 
-      def _normalize_path path
-        lu = _lookup_path_ path
+      def _normalize_path req
+        lu = @_prototype.lookup_via_request req
         # ..
-        lu.real_path
+        lu and lu.real_path
       end
 
-      def _lookup_path_ path
-        @_prototype.__lookup_path_ path
+      def __lookup_path_ path
+        @_prototype.lookup_via_request Request__[ path ]
       end
 
       attr_reader(
@@ -867,6 +948,8 @@
         :_symlink_node_via_offset_,
         :_symlink_offset_via_path_,
       )
+
+      Request__ = ::Struct.new :original_path, :is_softly
     end
 
     # ==
@@ -883,12 +966,14 @@
 
       private :dup
 
-      def __lookup_path_ path
-        dup.__init( path ).execute
+      def lookup_via_request req
+        dup.__init( req ).execute
       end
 
-      def __init path
-        @path = path ; self
+      def __init req
+        @path = req.original_path
+        @is_softly = req.is_softly  # NOTE - not implemented
+        self
       end
 
       def execute
@@ -906,10 +991,20 @@
       end
 
       def __work  # assume at least one
+
         @_normal_path_buffer = ""
         @_current_tree = @_path_normalizer._tree_cache_
+
         begin
-          node = _gets_node
+          @_current_path = nil
+          @_current_part = @_scn.gets_one
+
+          if FNMATCH_PATTERN_PROBABLY_RX =~ @_current_part
+            __flush_the_rest  # see
+            break
+          end
+
+          node = __gets_node_via_current_part
           @_current_node = node
           if node.is_real_directory
             __update_path_and_tree_via_real_directory
@@ -925,6 +1020,33 @@
       end
 
       Lookup___ = ::Struct.new :real_path, :node
+
+      def __flush_the_rest
+
+        # the general premise for this path-normalizing utility is that
+        # for the argument path and every parent directory of it, we ask
+        # the filesystem (efficiently) if that path is a symlink.
+        #
+        # as such, this facility assumes that the argument path is a
+        # plain-old path (containing symlinks or not) that points to an
+        # existent resource.
+        #
+        # if any of these paths were to contain wildcard/glob elements
+        # (near #mon-spot-3), this would (as it should) cause a no-ent
+        # to be thrown under `lstat`;
+        #
+        # yet we (now) want this facility to be robust enough to accomodate
+        # a path that contains these meta-characters. for such paths we
+        # want to normalize the head of the path up to the part that contains
+        # the meta-characters.
+
+        _add_part remove_instance_variable :@_current_part
+
+        until @_scn.no_unparsed_exists
+          _add_part @_scn.gets_one
+        end
+        NIL
+      end
 
       def __update_path_and_tree_via_real_directory
         _update_normal_path_buffer
@@ -949,14 +1071,18 @@
         if path
           @_normal_path_buffer = path
         else
-          @_normal_path_buffer << ::File::SEPARATOR
-          @_normal_path_buffer << @_current_part
+          _add_part remove_instance_variable :@_current_part
         end
+        NIL
       end
 
-      def _gets_node
-        @_current_part = @_scn.gets_one
-        @_current_path = nil
+      def _add_part part
+        @_normal_path_buffer << ::File::SEPARATOR
+        @_normal_path_buffer << part
+        NIL
+      end
+
+      def __gets_node_via_current_part
         node = @_current_tree[ @_current_part ]
         node ||= __lookup_and_cache_node
         remove_instance_variable :@_current_tree
@@ -1004,7 +1130,7 @@
 
         h[ new_sym_path ] = :_LOCKED_
         _mid_target_path = ::File.readlink new_sym_path
-        lu = @_path_normalizer._lookup_path_ _mid_target_path
+        lu = @_path_normalizer.__lookup_path_ _mid_target_path
         real_path = lu.real_path
         h_[ real_path ] ||= lu.node
         node = Symlink___.new real_path
@@ -1159,7 +1285,7 @@
 
     # ==
 
-    Code_metrics_ = Lazy_.call do
+    Code_metrics_ = lib::Lazy.call do
       # don't load normal-space until recording is enabled, otherwise you
       # won't be able to generate viz for any nodes loaded. see top of file.
       require 'skylab/code_metrics'
@@ -1172,6 +1298,7 @@
 
     ACHIEVED_ = true
     EARLY_END_ = nil
+    FNMATCH_PATTERN_PROBABLY_RX = /[\\*?\[]/  # long comment at #mon-spot-3
     Here_ = self
     NOTHING_ = nil
     SING_PROB___ = "«singleton probably»"

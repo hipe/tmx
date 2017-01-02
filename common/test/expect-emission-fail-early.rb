@@ -362,7 +362,7 @@ module Skylab::Common::TestSupport
           end
 
           if @expected_emission_scanner.no_unparsed_exists
-            fail AssertionFailed, ae.say_extra_emission
+            fail AssertionFailed, __say_extra_emission( ae )
           else
             _ee = @expected_emission_scanner.gets_one
             _ee.execute_assertion_of_under ae, @test_context
@@ -370,6 +370,26 @@ module Skylab::Common::TestSupport
         end
 
         :_co_unreliable_
+      end
+
+      def __say_extra_emission ae
+
+        buffer = ae.say_extra_emission
+        if Looks_like_expression__[ ae.channel_symbol_array ]
+          __peek_first_line_of_expression_HACKISHLY buffer, ae
+        end
+        buffer
+      end
+
+      def __peek_first_line_of_expression_HACKISHLY buffer, ae
+        _expag = @test_context.expression_agent
+        _y = ::Enumerator::Yielder.new do |line|
+          throw :eek, line
+        end
+        _wee = catch :eek do
+          _expag.calculate _y, & ae.emission_proc
+        end
+        buffer << " (first line: #{ _wee.inspect })"
       end
 
       def now_we_are_finished_with_the_execution
@@ -462,7 +482,7 @@ module Skylab::Common::TestSupport
       end
 
       def __send_payload  # assumes channels are identical (otherwise change this)
-        if :expression == @channel_symbol_array[ 1 ]
+        if Looks_like_expression__[ @channel_symbol_array ]
           __send_expression_payload
         else
           __send_event_payload
@@ -707,7 +727,7 @@ module Skylab::Common::TestSupport
 
     Assert_procs__ = -> act_p, act_a, exp_p do
 
-      if :expression == act_a[ 1 ]  # be :+[#br-023] aware
+      if Looks_like_expression__[ act_a ]
         exp_p[ Build_lines___[ & act_p ] ]
       else
         exp_p[ act_p[] ]
@@ -752,6 +772,12 @@ module Skylab::Common::TestSupport
         p[ x ]
       end
     end.call
+
+    # ==
+
+    Looks_like_expression__ = -> chan do
+      :expression == chan[ 1 ]  # be :+[#br-023] aware
+    end
 
     # ==
 

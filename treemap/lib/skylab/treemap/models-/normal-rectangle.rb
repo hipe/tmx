@@ -203,6 +203,7 @@ module Skylab::Treemap
     # -
     # ==
 
+    Actions = nil  # NOTHING_  # while #open [#057] [br]
     WorldRectangle___ = ::Struct.new :x, :y, :width, :height
 
     # ==

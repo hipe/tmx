@@ -168,6 +168,8 @@ module Skylab::CodeMetrics
 
     # ==
 
+    Actions = NOTHING_  # while #open [#010] [br]
+
     # ==
   end
 end

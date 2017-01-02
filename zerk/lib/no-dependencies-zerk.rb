@@ -7,6 +7,7 @@ module NoDependenciesZerk
   # single-file implementation of the basics needed to make API & CLI
 
   # -
+
     Lazy = -> & p do
       yes = true ; x = nil
       -> do
@@ -17,11 +18,15 @@ module NoDependenciesZerk
       end
     end
 
-    SimpleModel = ::Class.new  # re-opens below
+    SimpleModel = ::Class.new  # forward declaration
 
     # = CLI life
 
+    ArgumentScannerMethods__ = ::Module.new  # forward declaration
+
     class CLI_ArgumentScanner < SimpleModel
+
+      include ArgumentScannerMethods__
 
       def initialize
 
@@ -108,7 +113,7 @@ module NoDependenciesZerk
           @_current_primary_symbol = k
           h.fetch k
         when 1
-          __when_not_found h
+          When_not_found__[ h, self ]
         else
           __when_ambiguous a
         end
@@ -147,14 +152,6 @@ module NoDependenciesZerk
         end
       end
 
-      def map_value_by
-        if no_unparsed_exists
-          no_because { "{{ prim }} requires an argument" }
-        else
-          yield head_as_is
-        end
-      end
-
       # --
 
       def __when_ambiguous a
@@ -166,47 +163,10 @@ module NoDependenciesZerk
         end
       end
 
-      def __when_not_found h
-        k = current_primary_symbol
-        no_because do |y|
-          _scn = Scanner_via_Array.call( h.keys ) { |sym| prim sym }
-          y << "unknown primary: #{ ick_prim k }"
-          y << "available primaries: #{ oxford_and _scn }"
-        end
-      end
-
       def __when_malformed_primary s
         no_because do |y|
           y << "does not look like primary: #{ s.inspect }"
         end
-      end
-
-      def no_because reason=:primary_parse_error, & msg_p
-
-        me = self
-        @listener.call :error, :expression, reason do |y|
-
-          map = -> sym do
-            case sym
-            when :prim
-              prim me.current_primary_symbol
-            end
-          end
-
-          _y = ::Enumerator::Yielder.new do |line|
-            y << ( line.gsub %r(\{\{[ ]*([a-z_]+)[ ]*\}\}) do
-              map[ $~[1].intern ]
-            end )
-          end
-
-          if msg_p.arity.zero?
-            _y << calculate( & msg_p )
-          else
-            calculate _y, & msg_p
-          end
-          y
-        end
-        UNABLE_
       end
 
       # --
@@ -217,7 +177,7 @@ module NoDependenciesZerk
           remove_instance_variable :@_current_index
           remove_instance_variable :@_last_index
           @no_unparsed_exists = true
-          freeze
+          # can't freeze because the current primary may be set
         else
           @_current_index += 1
         end
@@ -225,10 +185,6 @@ module NoDependenciesZerk
       end
 
       # --
-
-      def current_primary_as_ivar
-        :"@#{ current_primary_symbol }"
-      end
 
       def current_primary_symbol
         send @_read_CPS
@@ -248,9 +204,9 @@ module NoDependenciesZerk
 
     # ==
 
-    ExpressionAgent___ = ::Class.new  # forward declaration
+    ExpressionAgent__ = ::Class.new  # forward declaration
 
-    class CLI_ExpressionAgent < ExpressionAgent___
+    class CLI_ExpressionAgent < ExpressionAgent__
 
       def ick_prim sym
         prim( sym ).inspect
@@ -265,9 +221,12 @@ module NoDependenciesZerk
 
     class API_ArgumentScanner
 
+      include ArgumentScannerMethods__
+
       def initialize a, & l
         @_current_primary = :__current_primary_invalid
         @_receive_current_primary = :__receive_first_ever_current_primary
+        @listener = l  # not used here presently, just a courtesy
         if a.length.zero?
           @no_unparsed_exists = true
           freeze
@@ -275,7 +234,6 @@ module NoDependenciesZerk
           @_array = a
           @_current_index = 0
           @_last_index = a.length - 1
-          @_listener = l
         end
       end
 
@@ -294,6 +252,10 @@ module NoDependenciesZerk
 
       def __receive_current_primary_normally sym
         @__current_primary_value = sym ; nil
+      end
+
+      def fuzzy_lookup_or_fail h
+        When_not_found__[ h, self ]
       end
 
       def current_primary_symbol
@@ -327,6 +289,7 @@ module NoDependenciesZerk
       end
 
       attr_reader(
+        :listener,
         :no_unparsed_exists,
       )
 
@@ -337,9 +300,22 @@ module NoDependenciesZerk
       # ===
     end
 
+    # ==
+
+    class API_ExpressionAgent < ExpressionAgent__
+
+      def ick_prim sym
+        prim sym
+      end
+
+      def prim sym
+        "'#{ sym.id2name }'"
+      end
+    end
+
     # = modality-agnostic life
 
-    Check_requireds = -> o, * ivars, & p do
+    Check_requireds = -> o, ivars, & p do
       when_missing = nil
       missing = nil
       main = -> do
@@ -436,9 +412,60 @@ module NoDependenciesZerk
       end
     end
 
-    # ==
+    module ArgumentScannerMethods__
 
-    class ExpressionAgent___  # ..
+      def current_primary_as_ivar
+        :"@#{ current_primary_symbol }"
+      end
+
+      def map_value_by
+        if no_unparsed_exists
+          no_because { "{{ prim }} requires an argument" }
+        else
+          yield head_as_is
+        end
+      end
+
+      def no_because reason_symbol=:primary_parse_error, & msg_p
+
+        scn = self
+        @listener.call :error, :expression, reason_symbol do |y|
+
+          map = -> sym do
+            case sym
+            when :prim
+              prim scn.current_primary_symbol
+            end
+          end
+
+          _y = ::Enumerator::Yielder.new do |line|
+            y << ( line.gsub %r(\{\{[ ]*([a-z_]+)[ ]*\}\}) do
+              map[ $~[1].intern ]
+            end )
+          end
+
+          if msg_p.arity.zero?
+            _y << calculate( & msg_p )
+          else
+            calculate _y, & msg_p
+          end
+          y
+        end
+
+        UNABLE_
+      end
+    end
+
+    When_not_found__ = -> h, scn do
+      k = scn.current_primary_symbol
+      scn.no_because do |y|
+        _scn = Scanner_via_Array.call( h.keys ) { |sym| prim sym }
+        y << "unknown primary: #{ ick_prim k }"
+        y << "available primaries: #{ oxford_and _scn }"
+      end
+    end
+
+    class ExpressionAgent__
 
       class << self
         def instance
