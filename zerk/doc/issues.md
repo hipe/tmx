@@ -1,3 +1,5 @@
+[#060]       [ no dependencies zerk ]
+
 [#059]       horizontal meter (née "lipstick")
 
 [#058] #open make tuple pager ([ze]) fit in with statistics

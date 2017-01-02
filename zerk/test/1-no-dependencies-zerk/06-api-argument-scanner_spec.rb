@@ -1,15 +1,13 @@
 require_relative '../test-support'
 
-module Skylab::CodeMetrics::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[cm] models (public) - argument scanner (would-be API scanner)" do
+  describe "[ze] API argument scanner" do
 
     TS_[ self ]
-    use :primaries_injections
+    use :no_dependencies_zerk
 
-    # this work falls under the mandate of [#ze-053] (and is based exactly
-    # on architecture designed and specified there) but see that document
-    # for why this test is here for now.
+    # for [#051.1] the no-dependencies file
 
     # we're experimenting with a new style (to us) of effecting a "canon".
     # this crunchy style is probably not going to stick.
@@ -103,8 +101,8 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def scanner_class
-      TS_::Primaries_Injections::ArgumentScannerForTesting
+      TS_::No_Dependencies_Zerk::Argument_scanner_for_testing[]
     end
   end
 end
-# (this file referenced elsewhere as #future-spot-1)
+# (this file referenced elsewhere as #nodeps-spot-1)

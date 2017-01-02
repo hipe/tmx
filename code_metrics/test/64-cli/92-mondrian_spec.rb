@@ -46,7 +46,7 @@ module Skylab::CodeMetrics::TestSupport
 
       invoke me
 
-      expect_on_stderr %r(\Afor now, required: -path and\b)
+      expect_on_stderr %r(\Arequired: -path and\b)
 
       _expect_failed_commonly
     end

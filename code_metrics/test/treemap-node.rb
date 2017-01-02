@@ -236,8 +236,13 @@ module Skylab::CodeMetrics::TestSupport
       "#{ Home_.name }::TestSupport::FixtureAssetNodesToLoadOnce".freeze
     end
 
-    common_path_head = -> do
-      FixtureAssetNodesToLoadOnce.dir_path
+    common_path_head = Lazy_.call do
+
+      # whether the test(s) were invoked with a relative or absoute path,
+      # ensure that the below path is absolute so that tests don't flicker
+
+      _ = FixtureAssetNodesToLoadOnce.dir_path
+      ::File.expand_path _
     end
 
     # ==

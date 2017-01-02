@@ -1,13 +1,13 @@
 require_relative '../test-support'
 
-module Skylab::CodeMetrics::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[cm] CLI - argument scanner" do
+  describe "[ze] no dependencies zerk - CLI argument scanner" do
 
-    # exactly as #future-spot-1
+    # exactly as #nodeps-spot-1
 
     TS_[ self ]
-    use :primaries_injections
+    use :no_dependencies_zerk
 
     desc, canon = begin_scanner_canon
 
@@ -100,7 +100,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def scanner_class
-      Home_::Mondrian_[]::ArgumentScanner_for_CLI___
+      subject_library_::CLI_ArgumentScanner
     end
   end
 end

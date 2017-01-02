@@ -1,10 +1,10 @@
-module Skylab::CodeMetrics::TestSupport
+module Skylab::Zerk::TestSupport
 
-  module Primaries_Injections
+  module No_Dependencies_Zerk
 
     def self.[] tcc
       tcc.send :define_singleton_method, :begin_scanner_canon, MM_01___
-      tcc.send :define_method, :library_one_, IM_01___
+      tcc.include InstaceMethods___
     end
 
     # -
@@ -14,12 +14,16 @@ module Skylab::CodeMetrics::TestSupport
       end
     # -
 
-    # -
+    module InstaceMethods___
 
-      IM_01___ = -> do
+      def library_one_
         Library_one___
       end
-    # -
+
+      def subject_library_
+        Subject_library__[]
+      end
+    end
 
     # ==
 
@@ -126,101 +130,36 @@ module Skylab::CodeMetrics::TestSupport
 
     # ==
 
-    class ArgumentScannerForTesting
+    Argument_scanner_for_testing = Lazy_.call do
 
-      # strange but valuable: at the moment this is the bleeding edge
-      # implementation of our working "canon" specification at [#ze-052.1].
-      # its main function at the moment is to stand as a proven baseline
-      # implemention of features to show them (and the "cannon tests")
-      # working. (note there is hard-coded mock behavior here)
-      #
-      # but this is also a would-be startingpoint implementation of a
-      # scanner for an API-client modality library. but such an effort
-      # should be merged in to [ze] and that is well outside of our scope
-      # at this second.
+      # there are parts of the argument scanner "canon" that we don't
+      # actually want to bother implementing in the API argument scanner.
+      # so for now we make a subclass of that with stub implementations
+      # to get a sense for how it would look.
 
-      def initialize a, & l
-        @_current_primary = :__current_primary_invalid
-        @_receive_current_primary = :__receive_first_ever_current_primary
-        if a.length.zero?
-          @no_unparsed_exists = true
-          freeze
-        else
-          @_array = a
-          @_current_index = 0
-          @_last_index = a.length - 1
-          @_listener = l
+      Subject_library__[]
+
+      class ArgumentScannerForTesting___ < ::NoDependenciesZerk::API_ArgumentScanner
+
+        def parse_primary
+          sym = head_as_is
+          if :_not_a_primary_ == sym
+            __whine_about_not_a_primary sym
+            false
+          else
+            super
+          end
         end
-      end
 
-      def parse_primary
-        sym = head_as_is
-        if :_not_a_primary_ == sym
-          __whine_about_not_a_primary sym
-          false
-        else
-          send @_receive_current_primary, sym
-          advance_one
-          true
+        def __whine_about_not_a_primary sym
+          @_listener.call :error, :expression, :parse_error do |y|
+            y << "does not look like a primary: #{ sym.inspect }"
+          end
+          NIL
         end
+
+        self
       end
-
-      def __whine_about_not_a_primary sym
-        @_listener.call :error, :expression, :parse_error do |y|
-          y << "does not look like a primary: #{ sym.inspect }"
-        end
-        NIL
-      end
-
-      def __receive_first_ever_current_primary sym
-        @_current_primary = :__current_primary_normally
-        @_receive_current_primary = :__receive_current_primary_normally
-        send @_receive_current_primary, sym
-      end
-
-      def __receive_current_primary_normally sym
-        @__current_primary_value = sym ; nil
-      end
-
-      def current_primary_symbol
-        send @_current_primary
-      end
-
-      def __current_primary_invalid
-        raise ScannerIsNotInThatState,
-          "cannot read `current_primary_symbol` from beginning state"
-      end
-
-      def __current_primary_normally
-        @__current_primary_value
-      end
-
-      def advance_one
-        if @_last_index == @_current_index
-          remove_instance_variable :@_array
-          remove_instance_variable :@_current_index
-          remove_instance_variable :@_last_index
-          @no_unparsed_exists = true
-          freeze
-        else
-          @_current_index += 1
-        end
-        NIL
-      end
-
-      def head_as_is
-        @_array.fetch @_current_index
-      end
-
-      attr_reader(
-        :no_unparsed_exists,
-      )
-
-      # ===
-
-      ScannerIsNotInThatState = ::Class.new ::RuntimeError
-
-      # ===
     end
 
     # ==
@@ -258,6 +197,13 @@ module Skylab::CodeMetrics::TestSupport
           :shape,
         )
       end
+    end
+
+    # ==
+
+    Subject_library__ = Lazy_.call do
+      require 'no-dependencies-zerk'
+      ::NoDependenciesZerk
     end
 
     # ==

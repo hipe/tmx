@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::CodeMetrics::TestSupport
+module Skylab::Zerk::TestSupport
 
   describe "[cm] models (public) - primaries injections" do
 
@@ -10,7 +10,7 @@ module Skylab::CodeMetrics::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :primaries_injections
+    use :no_dependencies_zerk
 
     context "no crossover in primaries, two primaries only" do
 
@@ -72,8 +72,8 @@ module Skylab::CodeMetrics::TestSupport
 
     def given_arguments_ * x_a, & p
 
-      @ARG_SCN = TS_::Primaries_Injections::ArgumentScannerForTesting.
-        new x_a, & p
+      _cls = TS_::No_Dependencies_Zerk::Argument_scanner_for_testing[]
+      @ARG_SCN = _cls.new x_a, & p
       NIL
     end
 
@@ -113,7 +113,7 @@ module Skylab::CodeMetrics::TestSupport
     X_pmo_pi_execution_result = ::Struct.new :result, :clientesque, :operationesque
 
     def _subject_module
-      Home_::Mondrian_[]::ParseArguments_via___
+      subject_library_::ParseArguments_via_PrimariesInjections
     end
   end
 end

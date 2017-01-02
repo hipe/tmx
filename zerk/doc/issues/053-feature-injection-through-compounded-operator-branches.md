@@ -1,18 +1,6 @@
 # feature injection through compounded operator branches :[#053]
 
 
-## new for [cm]
-
-this work is to supplement and guide forward those parts of the
-no-dependency operation "mondrian" in regards to how it processes
-arguments. we would like for these ideas to see life outside of that
-scope, perhaps abstracting up into a no-dependency file housed in
-"zerk" but positioned as a dependency *for* it, not a dependency *of*
-it.
-
-here are the axioms, postulates, and requirements; most of which bear
-strong similarity to [ze]'s argument scanner work but tightened:
-
 ## brief statement of the problem
 
   - a same "option space" needs to be shared by multiple concerns

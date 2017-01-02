@@ -1,5 +1,3 @@
-require 'strscan'  # for ::StringScanner below
-
 # -
   class Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
 
@@ -48,6 +46,9 @@ require 'strscan'  # for ::StringScanner below
     #
     #   4. represent the relevant "recording" of same in some way that
     #      can be "played back" to the rest of the implementation.
+    #
+    # EDIT: the lightweight "framework" we made for the above ended
+    # up becoming [#ze-060] the "no dependencies zerk" file
 
     # -
 
@@ -97,7 +98,7 @@ require 'strscan'  # for ::StringScanner below
 
         listener = method :__receive_emission
 
-        scn = ArgumentScanner_for_CLI___.define do |o|  # resource will move
+        scn = Interface__::CLI_ArgumentScanner.define do |o|  # resource will move
           o.default_primary_symbol = :path
           o.initial_ARGV_offset = 1
           o.ARGV = argv
@@ -110,7 +111,7 @@ require 'strscan'  # for ::StringScanner below
         op = Operation__.new scn, @stderr
         @_scn = scn
         @_operation = op
-        _ok = ParseArguments_via___.call_by do |o|
+        _ok = Interface__::ParseArguments_via_PrimariesInjections.call_by do |o|
           o.argument_scanner scn
           o.add_primaries_injection Operation__::PRIMARIES, op
           o.add_primaries_injection CLI_PRIMARIES___, self
@@ -174,7 +175,7 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def _expression_agent
-        Expression_agent_for_CLI___.instance
+        Interface__::CLI_ExpressionAgent.instance
       end
 
       DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
@@ -205,38 +206,15 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    class SimpleModel_  # (necessarily repeated)
+    require 'no-dependencies-zerk'
+    lib = ::NoDependenciesZerk
+    Interface__ = lib
 
-      class << self
-        alias_method :define, :new
-        private :new
-      end  # >>
-
-      def initialize
-        yield self
-        freeze
-      end
-
-      private :dup
-
-      def redefine
-        otr = dup
-        yield otr
-        otr.freeze
-      end
-    end
+    SimpleModel_ = lib::SimpleModel
 
     # ==
 
-    Lazy_ = -> & p do
-      yes = true ; x = nil
-      -> do
-        if yes
-          yes = false ; x = p[]
-        end
-        x
-      end
-    end
+    Lazy_ = lib::Lazy
 
     # ==
 
@@ -315,7 +293,8 @@ require 'strscan'  # for ::StringScanner below
       end
 
       def __normalize
-        Check_requireds___[ self, :@paths, :@head_const, & @_listener ]
+        Interface__::Check_requireds.call(
+          self, :@paths, :@head_const, & @_listener )
       end
 
       def __flush_node_plus
@@ -682,239 +661,6 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    class ArgumentScanner_for_CLI___ < SimpleModel_
-
-      class << self
-        def new s_a
-          define do |o|
-            o.ARGV = s_a
-          end
-        end
-      end  # >>
-
-      def initialize
-
-        @_read_CPS = :__read_CPS_initially
-        @_write_CPS = :__write_CPS_initially
-
-        @initial_ARGV_offset = 0
-        @default_primary_symbol = nil
-        @listener = nil
-        yield self
-        s_a = remove_instance_variable :@ARGV
-        len = s_a.length
-        d = remove_instance_variable :@initial_ARGV_offset
-        if len == d
-          @no_unparsed_exists = true
-          freeze
-        else
-          @_array = s_a
-          @_current_index = d
-          @_last_index = s_a.length - 1
-        end
-      end
-
-      attr_writer(
-        :ARGV,
-        :default_primary_symbol,
-        :initial_ARGV_offset,
-        :listener,
-      )
-
-      # --
-
-      def parse_primary  # exactly as [#ze-052.1] canon
-        s = head_as_is
-        md = RX___.match s
-        if md
-          _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
-          send @_write_CPS, _
-          advance_one
-          ACHIEVED_
-        elsif @default_primary_symbol
-          # #not-covered - blind faith
-          send @_write_CPS, @default_primary_symbol
-          ACHIEVED_
-        else
-          __when_malformed_primary s
-        end
-      end
-
-      RX___ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
-
-      def __write_CPS_initially sym
-        @_read_CPS = :__read_CPS_normally
-        @_write_CPS = :__write_CPS_normally
-        send @_write_CPS, sym
-      end
-
-      def __write_CPS_normally sym
-        @_current_primary_symbol = sym ; nil
-      end
-
-      def __read_CPS_initially
-        raise ScannerIsNotInThatState,
-          "cannot read `current_primary_symbol` from beginning state"
-      end
-
-      def __read_CPS_normally
-        @_current_primary_symbol
-      end
-
-      # --
-
-      def fuzzy_lookup_or_fail h  # assume CPS
-
-        rx = /\A#{ ::Regexp.escape current_primary_symbol.id2name }/
-        a = []
-        h.keys.each do |k|
-          rx =~ k or next
-          a.push k
-        end
-        case 1 <=> a.length
-        when 0
-          k = a.fetch 0
-          @_current_primary_symbol = k
-          h.fetch k
-        when 1
-          __when_not_found h
-        else
-          __when_ambiguous a
-        end
-      end
-
-      def parse_positive_nonzero_integer
-        d = __integer_that { |d_| 0 < d_ }
-        d && advance_one
-        d
-      end
-
-      def __integer_that & p
-        d = __head_as_integer
-        if d
-          if yield d
-            d
-          else
-            __when_integer_is_not d, caller_locations( 1, 1 )[ 0 ]
-          end
-        end
-      end
-
-      def __when_integer_is_not d, loc
-        _s = %r(\Aparse_(.+)_integer\z).match( loc.base_label )[ 1 ]
-        _human = _s.gsub UNDERSCORE_, SPACE_
-        no_because { "{{ prim }} must be #{ _human } (had #{ d })" }
-      end
-
-      def __head_as_integer
-        map_value_by do |s|
-          if %r(\A-?\d+\z) =~ s
-            s.to_i
-          else
-            no_because { "{{ prim }} must be an integer (had #{ s.inspect })" }
-          end
-        end
-      end
-
-      def map_value_by
-        if no_unparsed_exists
-          no_because { "{{ prim }} requires an argument" }
-        else
-          yield head_as_is
-        end
-      end
-
-      # --
-
-      def __when_ambiguous a
-        k = current_primary_symbol
-        no_because do |y|
-          _scn = Scanner_via_Array__.call( a ) { |sym| prim sym }
-          y << "ambiguous primary #{ ick_prim k } - #{
-            }did you mean #{ oxford_or _scn }?"
-        end
-      end
-
-      def __when_not_found h
-        k = current_primary_symbol
-        no_because do |y|
-          _scn = Scanner_via_Array__.call( h.keys ) { |sym| prim sym }
-          y << "unknown primary: #{ ick_prim k }"
-          y << "available primaries: #{ oxford_and _scn }"
-        end
-      end
-
-      def __when_malformed_primary s
-        no_because do |y|
-          y << "does not look like primary: #{ s.inspect }"
-        end
-      end
-
-      def no_because reason=:primary_parse_error, & msg_p
-
-        me = self
-        @listener.call :error, :expression, reason do |y|
-
-          map = -> sym do
-            case sym
-            when :prim
-              prim me.current_primary_symbol
-            end
-          end
-
-          _y = ::Enumerator::Yielder.new do |line|
-            y << ( line.gsub %r(\{\{[ ]*([a-z_]+)[ ]*\}\}) do
-              map[ $~[1].intern ]
-            end )
-          end
-
-          if msg_p.arity.zero?
-            _y << calculate( & msg_p )
-          else
-            calculate _y, & msg_p
-          end
-          y
-        end
-        UNABLE_
-      end
-
-      # --
-
-      def advance_one
-        if @_last_index == @_current_index
-          remove_instance_variable :@_array
-          remove_instance_variable :@_current_index
-          remove_instance_variable :@_last_index
-          @no_unparsed_exists = true
-          freeze
-        else
-          @_current_index += 1
-        end
-        NIL
-      end
-
-      # --
-
-      def current_primary_as_ivar
-        :"@#{ current_primary_symbol }"
-      end
-
-      def current_primary_symbol
-        send @_read_CPS
-      end
-
-      def head_as_is
-        @_array.fetch @_current_index
-      end
-
-      attr_reader(
-        :listener,
-        :no_unparsed_exists,
-      )
-
-      ScannerIsNotInThatState = ::Class.new ::RuntimeError
-    end
-
     class Express_for_CLI_via_Expression___ < SimpleModel_
 
       attr_writer(
@@ -995,157 +741,6 @@ require 'strscan'  # for ::StringScanner below
           @stderr
         else fail
         end
-      end
-    end
-
-    # ==
-
-    Expression_Agent__ = ::Class.new
-
-    class Expression_agent_for_CLI___ < Expression_Agent__
-
-      def ick_prim sym
-        prim( sym ).inspect
-      end
-
-      def prim sym
-        "-#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
-      end
-    end
-
-    # ==
-
-    class ParseArguments_via___  # #testpoint
-
-      class << self
-        def call_by & p
-          new( & p ).execute
-        end
-        private :new
-      end  # >>
-
-      def initialize
-        @_add_primaries_injection = :__add_first_primaries_injection
-        yield self
-        remove_instance_variable :@_add_primaries_injection
-      end
-
-      def argument_scanner as
-        @__argument_scanner = as ; nil
-      end
-
-      def add_primaries_injection h, injector
-        send @_add_primaries_injection, h, injector
-      end
-
-      def __add_first_primaries_injection h, inj
-        h_ = {}
-        h.each_pair do |k, m|
-          h_[ k ] = [ 0, m ]  # ..
-        end
-        @_primaries = h_
-        @_injectors = [ inj ]
-        @_add_primaries_injection = :__add_subsequent_primaries_injection
-        NIL
-      end
-
-      def __add_subsequent_primaries_injection h, inj
-        h_ = @_primaries
-        idx = @_injectors.length
-        h.each_pair do |k, m|
-          h_[ k ] = [ idx, m ]  # meh for now just overwrite
-        end
-        @_injectors[idx] = inj
-        NIL
-      end
-
-      def execute
-        args = remove_instance_variable :@__argument_scanner
-        a = remove_instance_variable :@_injectors
-        h = remove_instance_variable :@_primaries
-        ok = true
-        until args.no_unparsed_exists
-          ok = args.parse_primary
-          ok || break
-          tuple = h[ args.current_primary_symbol ]
-          if ! tuple
-            tuple = args.fuzzy_lookup_or_fail h
-          end
-          if ! tuple
-            ok = tuple ; break
-          end
-          ok = a.fetch( tuple[0] ).send tuple[1]
-          ok || break
-        end
-        ok
-      end
-    end
-
-    # ==
-
-    Check_requireds___ = -> o, * ivars, & p do
-      when_missing = nil
-      missing = nil
-      main = -> do
-        ivars.each do |ivar|
-          if ! o.instance_variable_get ivar
-            _sym = ivar.id2name.gsub( %r(\A@|s\z), EMPTY_S_ ).intern # sneaky
-            ( missing ||= [] ).push _sym
-          end
-        end
-        if missing
-          when_missing[]
-        else
-          ACHIEVED_
-        end
-      end
-
-      when_missing = -> do
-        p.call :error, :expression, :primary_parse_error do |y|
-          _scn = Scanner_via_Array__.call missing do |sym|
-            prim sym
-          end
-          _and = oxford_and _scn
-          y << "for now, required: #{ _and }"
-        end
-        UNABLE_
-      end
-
-      main[]
-    end
-
-    # ==
-
-    class Expression_Agent__
-
-      class << self
-        def instance
-          @___instance ||= new
-        end
-      end
-
-      alias_method :calculate, :instance_exec
-
-      def oxford_or scn
-        _oxford_join scn, ' or ', ', '
-      end
-
-      def oxford_and scn
-        _oxford_join scn, ' and ', ', '
-      end
-
-      def _oxford_join scn, ult, nonult
-        buff = scn.gets_one.dup
-        if ! scn.no_unparsed_exists
-          begin
-            s = scn.gets_one
-            scn.no_unparsed_exists && break
-            buff << nonult << s
-            redo
-          end while above
-          buff << ult << s
-        end
-        buff
       end
     end
 
@@ -1484,6 +1079,7 @@ require 'strscan'  # for ::StringScanner below
 
       class << self
         def via path
+          require 'strscan'
           scn = ::StringScanner.new path
           if scn.skip SEP__
             NOTHING_ while scn.skip SEP__
@@ -1563,93 +1159,6 @@ require 'strscan'  # for ::StringScanner below
 
     # ==
 
-    class Mapped_Scanner___
-
-      def initialize p, scn
-        @_proc = p
-        @_scn = scn
-      end
-
-      def gets_one
-        @_proc[ @_scn.gets_one ]
-      end
-
-      def current_token  # ..
-        @_proc[ @_scn.current_token ]
-      end
-
-      def advance_one
-        @_scn.advance_one
-      end
-
-      def no_unparsed_exists
-        @_scn.no_unparsed_exists
-      end
-    end
-
-    # ==
-
-    class Scanner_via_Array__
-
-      class << self
-        def call d=nil, a, & p
-          scn = new d, a
-          if block_given?
-            Mapped_Scanner___.new p, scn
-          else
-            scn
-          end
-        end
-        alias_method :[], :call
-      end  # >>
-
-      def initialize d=nil, a
-        d ||= 0
-        len = a.length
-        if len == d
-          @no_unparsed_exists = true ; freeze
-        else
-          @_array = a
-          @_len = len
-          @_pos = d
-        end
-      end
-
-      def gets_one
-        x = current_token
-        advance_one
-        x
-      end
-
-      def advance_one
-        d = @_pos + 1
-        if @_len == d
-          @no_unparsed_exists = true
-          remove_instance_variable :@_array
-          remove_instance_variable :@_len
-          remove_instance_variable :@_pos
-          freeze
-        else
-          @_pos = d
-        end
-        NIL
-      end
-
-      def current_token
-        @_array.fetch @_pos
-      end
-
-      attr_reader(
-        :no_unparsed_exists,
-      )
-    end
-
-    # ==
-
-    Pair__ = ::Struct.new :mixed_value, :name_symbol
-
-    # ==
-
     Code_metrics_ = Lazy_.call do
       # don't load normal-space until recording is enabled, otherwise you
       # won't be able to generate viz for any nodes loaded. see top of file.
@@ -1662,15 +1171,11 @@ require 'strscan'  # for ::StringScanner below
     # ==
 
     ACHIEVED_ = true
-    DASH_ = '-'
     EARLY_END_ = nil
-    EMPTY_S_ = ''
     Here_ = self
     NOTHING_ = nil
     SING_PROB___ = "«singleton probably»"
     SPACE_ = ' '
-    UNABLE_ = false
-    UNDERSCORE_ = '_'
 
     # ==
   end
