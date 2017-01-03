@@ -86,7 +86,7 @@ module Skylab::TMX
         end
 
         if @_args.no_unparsed_exists
-          CLI::When_::No_arguments[ o, self ]
+          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ o ]
         elsif o.parse_operator_softly
           lu = o.flush_to_lookup_operator
           lu and send lu.injector, lu.mixed_business_value
@@ -728,7 +728,11 @@ module Skylab::TMX
       end
 
       def expression_agent
+        # WOOP pain ahead
+        if false
         Zerk_lib_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
+        end
+        Interface__::CLI_ExpressionAgent.instance
       end
 
       def _failed
@@ -977,9 +981,6 @@ module Skylab::TMX
       Interface__ = ::NoDependenciesZerk
       NIL
     end
-
-    Autoloader_[ self ]
-    stowaway :When_, 'events-/mount-related'
 
     # ==
 

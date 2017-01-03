@@ -41,10 +41,71 @@ module Skylab::Zerk::TestSupport
         _against_CLI_arguments 'xx-yy2', 'zz'
         _flush_parsation
       end
+    end
 
-      def _subject_omni
-        _frozen_omni_one
+    context "against CLI head that looks like operator but isn't" do
+
+      context "parsing softly" do
+
+        it "succeeded" do
+          _parsation.result || fail
+        end
+
+        it "advances scanner" do
+          _parsation.scanner.head_as_is == "zz" || fail
+        end
       end
+
+      context "but the lookup" do
+
+        it "did not find" do
+          _findation.result && fail
+        end
+
+        it "emits a `parse_error` (not a primary parse error)" do
+
+          _emission.channel_symbol_array.last == :parse_error || fail
+        end
+
+        it "unrec as first line" do
+          _lines.first == "unrecognized operator: \"xx-yy3\"" || fail
+        end
+
+        it "full splay as second and final line" do
+
+          a = _lines
+
+          a.last =~ %r(\Aavailable (?:operat(?:ion|or)|action|node|feature)s: #{
+            }xx, xx-yy1, he-ha and xx-yy2\z) || fail
+
+          2 == a.length || fail
+        end
+
+        shared_subject :_lines do
+          _emission.express_into_under [], expression_agent
+        end
+
+        shared_subject :_emission do
+          log = _findation.log
+          em = log.gets
+          log.gets and fail
+          em
+        end
+      end
+
+      shared_subject :_findation do
+        _flush_findation
+      end
+
+      shared_subject :_parsation do
+        log = _build_new_event_log
+        _against_CLI_arguments 'xx-yy3', 'zz', & log.handle_event_selectively
+        _flush_parsation log
+      end
+    end
+
+    def _subject_omni
+      _frozen_omni_one
     end
 
     # == shared singletons
@@ -118,6 +179,10 @@ module Skylab::Zerk::TestSupport
 
     def argument_scanner
       @argument_scanner
+    end
+
+    def expression_agent
+      ::NoDependenciesZerk::CLI_ExpressionAgent.instance
     end
 
     # --

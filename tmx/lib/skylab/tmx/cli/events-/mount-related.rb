@@ -1,64 +1,7 @@
 module Skylab::TMX
 
-  class CLI
+  self._NOT_USED  # #todo
 
-    class When_
-
-      class << self
-        def call * x_a
-          new( * x_a ).execute
-        end
-        alias_method :[], :call
-        private :new
-      end  # >>
-
-      class No_arguments < self
-
-        def initialize omni, cli
-          _receive_omni omni
-          super cli
-        end
-
-        def execute
-
-          o = @omni
-          @listener.call :error, :expression, :parse_error do |y|
-            if o.has_operators
-              if o.has_primaries
-                buff = "available operators and primaries: "
-                scn = o.to_operation_symbol_scanner.concat o.to_primary_symbol_scanner
-              else
-                buff = "available operators: "
-                scn = o.to_operation_symbol_scanner
-              end
-            else
-              buff = "available primaries: "
-              scn = o.to_primary_symbol_scanner
-            end
-            scn = scn.map_by do |sym|
-              prim sym
-            end
-            scn.oxford_join buff, ' and ', ', '
-            y << buff
-          end
-          UNABLE_
-        end
-      end
-
-      # -
-
-        def initialize cli
-          @CLI = cli
-        end
-
-        def _receive_omni omni
-          @listener = omni.argument_scanner.listener
-          @omni = omni ; nil
-        end
-      # -
-    end
-
-  if false
   class Models_::Reactive_Model_Dispatcher
 
     Events_ = ::Module.new
@@ -134,9 +77,4 @@ module Skylab::TMX
 
     Events_::No_Such_Reactive_Node = cls
   end
-  end  # if false
-
-    Events_::Mount_Related = ::Module.new  # until the pending rename #here
-  end
 end
-# #pending-rename: when-  (and see #here)

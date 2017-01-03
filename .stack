@@ -14,15 +14,14 @@ say_formal_operation_alternation
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
 -3.207 i & m.o & mountable one-offs, help
--3.220 i & m.o & mountable one-offs, fuzzy
+-3.220 i & m.o & mountable one-offs, fuzzy - mock something for ambiguity
 -3.233 i & m.o & mountable one-offs, unrec
 -3.247 i & m.o & mountable one-offs, no arg
 -3.260 i & m.o & mountable one-offs, call
+-3.266 CLI::When_::Looks_strange[ @_omni ]
 -3.273 intrinsics & mountable operators, help
 -3.287 intrinsics & mountable operators, fuzzy
 -3.300 intrinsics & mountable operators, unrec
 -3.313 intrinsics & mountable operators, no arg
 -3.327 intrinsics & mountable operators, call
 -3.340 only intrinsics, help
--3.353 only intrinsics, fuzzy
--3.367 only intrinsics, unrec

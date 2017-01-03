@@ -11,19 +11,24 @@ module Skylab::TMX::TestSupport
 
     it "ping the top" do
       invoke 'ping'
-      expect_on_stderr "hello from tmx"
-      expect_succeeded
+      _expect_pinged
     end
 
     it "no arg - intrinsics are listed" do
-      _these[ :ping ] || fail
+      __no_arg.index_of_splay.offset_via_operator_symbol[ :ping ] || fail
     end
 
-    it "strange operator-looking argument - two lines of whining, then invite", wip: true do
-      invoke 'zazoozle'
-      expect_on_stderr "currently, normal tmx is deactivated -"
-      expect "won't parse \"zazoozle\""
-      expect_failed_normally_
+    it "strange operator - whines" do
+      _strange_oper_arg.reason_line == "unrecognized operator: \"zazoozle\"" || fail
+    end
+
+    it "strange operator - splays intrinsics" do
+      _strange_oper_arg.index_of_splay.offset_via_operator_symbol[ :ping ] || fail
+    end
+
+    it "through fuzzy reach an intrinsic" do
+      invoke "pin"
+      _expect_pinged
     end
 
     it "strange option - explain, invite", wip: true do
@@ -32,44 +37,14 @@ module Skylab::TMX::TestSupport
       expect_failed_normally_
     end
 
-    shared_subject :_these do
+    def __no_arg
       invoke
-      line = nil
-      expect_each_on_stderr_by do |line_|
-        line = line_
-        TRUE
-      end
-      expect_failed_normally_
-      __eek_hash_via_line line
+      finish_with_common_machine_
     end
 
-    def __eek_hash_via_line line
-      h = {}
-      scn = TestSupport_::Library_::StringScanner.new line
-      scn.skip( /available operators: / ) || TS_._youve_been_waiting_for_this
-      dash = /-/ ; slug = /[a-z][a-z0-9]*(?:-[a-z0-9]+)*/
-      _DASH = '-' ; _UNDERSCORE = '_'  # DASH_ UNDERSCORE_
-      one = -> do
-        scn.skip dash or fail
-        s = scn.scan slug
-        s || fail
-        h[ s.gsub( _DASH, _UNDERSCORE ).intern ] = true
-      end
-      one[]
-      if ! scn.eos?
-        comma_rx = /, /
-        begin
-          if scn.skip comma_rx
-            one[]
-            redo
-          end
-          scn.scan( / and / ) || fail
-          break
-        end while above
-        one[]
-        scn.eos? || fail
-      end
-      h
+    shared_subject :_strange_oper_arg do
+      invoke 'zazoozle'
+      finish_with_common_machine_
     end
 
     it "help (a stub for now)", wip: true do
@@ -105,6 +80,11 @@ module Skylab::TMX::TestSupport
       if ! scn.no_unparsed_exists
         fail "never found: #{ scn.current_token.inspect }"
       end
+    end
+
+    def _expect_pinged
+      expect_on_stderr "hello from tmx"
+      expect_succeeded
     end
   end
 end

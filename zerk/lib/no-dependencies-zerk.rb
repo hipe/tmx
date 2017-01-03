@@ -5,8 +5,10 @@ module NoDependenciesZerk
   # when you need to make a client that doesn't load a lot of files
   # (like one that turns on coverage testing or similar), this is a
   # single-file implementation of the basics needed to make API & CLI
-
-  # on parse failures it allows itself to load arbitrary other files..
+  #
+  # but NOTE [ze] may be loaded to handle the follwing circumstances:
+  #
+  #   - to express a parse failure
 
   # -
 
@@ -386,12 +388,20 @@ module NoDependenciesZerk
 
     class CLI_ExpressionAgent < ExpressionAgent__
 
+      def ick_oper sym
+        oper( sym ).inspect
+      end
+
       def ick_prim sym
         prim( sym ).inspect
       end
 
+      def oper sym
+        sym.id2name.gsub UNDERSCORE_, DASH_
+      end
+
       def prim sym
-        "-#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
+        "-#{ oper sym }"
       end
     end
 
@@ -493,11 +503,23 @@ module NoDependenciesZerk
 
     class API_ExpressionAgent < ExpressionAgent__
 
+      def ick_oper sym
+        _same sym
+      end
+
       def ick_prim sym
-        prim sym
+        _same sym
+      end
+
+      def oper sym
+        _same sym
       end
 
       def prim sym
+        _same sym
+      end
+
+      def _same sym
         "'#{ sym.id2name }'"
       end
     end
@@ -615,7 +637,8 @@ module NoDependenciesZerk
         #  - assume above method succeeded
         #  - assume there are some operators injections
         #
-        #  result is a FOO NANI if found, and a POO NANI if failed
+        #  result is a "found tuple" if found, and FOR NOW
+        #  on failure we emit here and resutt in false.
 
         sym = @argument_scanner.current_operator_symbol
         scn = _to_operations_injections_scanner
@@ -640,31 +663,26 @@ module NoDependenciesZerk
         # rather than map-expand we loop inside loop but this might change
         a = []
         rx = @argument_scanner.current_operator_as_matcher
-        scn = _to_operations_injections_scanner
+        injections = _to_operations_injections_scanner
         begin
-          ijn = scn.gets_one
-          ijn = ijn.injection
-          scn_ = ijn.to_normal_symbol_scanner
+          ijn = injections.gets_one.injection
+          symbols = ijn.to_normal_symbol_scanner
           begin
-            if rx =~ scn_.current_token
-              a.push Found__[ ijn.injector, scn_.current_token ]
+            if rx =~ symbols.current_token
+              _mixed_business_value = ijn.dereference symbols.current_token
+              a.push Found__[ ijn.injector, _mixed_business_value ]
             end
-            scn_.advance_one
-          end until scn_.no_unparsed_exists
-        end until scn.no_unparsed_exists
+            symbols.advance_one
+          end until symbols.no_unparsed_exists
+        end until injections.no_unparsed_exists
         case 1 <=> a.length
         when 0  # when found
           a.fetch 0
         when 1  # when not found
-          __when_primary_not_found
+          Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ self ]
         else  # when ambiguous
           self._COVER_ME__when_ambiguous__  # rejoin with legacy
         end
-      end
-
-      def __when_primary_not_found
-        _scn = to_operation_symbol_scanner
-        self._WORKED_ONCE
       end
 
       def to_operation_symbol_scanner
@@ -741,6 +759,9 @@ module NoDependenciesZerk
       def to_normal_symbol_scanner
         Scanner_via_Stream__.new @operators.to_normal_symbol_stream
       end
+      def dereference k
+        @operators.dereference k
+      end
     end
 
     class HashBasedOperatorsInjection___
@@ -756,6 +777,9 @@ module NoDependenciesZerk
       end
       def to_normal_symbol_scanner
         Scanner_via_Array[ @_hash.keys ]
+      end
+      def dereference k
+        @_hash.fetch k
       end
       attr_reader(
         :injector,
@@ -994,7 +1018,6 @@ module NoDependenciesZerk
       end
     end
 
-
     # ==
 
     class SimpleModel
@@ -1016,6 +1039,13 @@ module NoDependenciesZerk
         yield otr
         otr.freeze
       end
+    end
+
+    # ==
+
+    Zerk_lib_ = Lazy.call do
+      require 'skylab/zerk'
+      ::Skylab::Zerk
     end
 
     # ==

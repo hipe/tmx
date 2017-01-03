@@ -207,6 +207,128 @@ module Skylab::Zerk
 
       # ==
 
+      Simplified__ = ::Class.new
+
+      class When::Unknown_operator < Simplified__
+
+        def initialize omni
+          _receive_omni_ omni
+        end
+
+        def execute
+          me = self
+          @listener.call :error, :expression, :parse_error do |y|
+            o = me.for y, self
+            o.__express_unrecognized_operator
+            o.__express_splay_of_available_operators
+          end
+          UNABLE_
+        end
+      end
+
+      class When::No_arguments < Simplified__
+
+        def initialize omni
+          _receive_omni_ omni
+        end
+
+        def execute
+          me = self
+          @listener.call :error, :expression, :parse_error do |y|
+            me.for( y, self ).__express_splay_of_available_features
+          end
+          UNABLE_
+        end
+      end
+
+      class Simplified__
+
+        class << self
+          def call * x_a
+            new( * x_a ).execute
+          end
+          alias_method :[], :call
+          private :new
+        end  # >>
+
+        def _receive_omni_ omni
+          @listener = omni.argument_scanner.listener
+          @omni = omni ; nil
+        end
+
+        def for y, expag
+          dup.__init_for_expression y, expag
+        end
+
+        def __init_for_expression y, expag
+          extend SimplifiedExpressionMethods___
+          @expression_agent = expag ; @y = y ; self
+        end
+      end
+
+      module SimplifiedExpressionMethods___
+
+        def __express_unrecognized_operator
+          sym = @omni.argument_scanner.current_operator_symbol ; y = @y
+          @expression_agent.calculate do
+            y << "unrecognized operator: #{ ick_oper sym }"
+          end
+        end
+
+        def __express_splay_of_available_features
+          o = @omni
+          if o.has_operators
+            if o.has_primaries
+              buff = "available operators and primaries: "
+              scn = _to_operation_and_primary_moniker_scanner
+            else
+              buff = "available operators: "
+              scn = _to_operation_moniker_scanner
+            end
+          else
+            buff = "available primaries: "
+            scn = _to_primary_moniker_scanner
+          end
+          _oxford_and buff, scn
+          @y << buff
+        end
+
+        def __express_splay_of_available_operators
+          buff = "available operators: "
+          _scn = _to_operation_moniker_scanner
+          _oxford_and buff, _scn
+          @y << buff
+        end
+
+        def _to_operation_and_primary_moniker_scanner
+          _to_operation_moniker_scanner.concat _to_primary_moniker_scanner
+        end
+
+        def _to_operation_moniker_scanner
+          scn = @omni.to_operation_symbol_scanner
+          @expression_agent.calculate do
+            scn = scn.map_by do |sym|
+              oper sym
+            end
+          end
+        end
+
+        def _to_primary_moniker_scanner
+          scn = @omni.to_primary_symbol_scanner
+          @expression_agent.calculate do
+            scn = scn.map_by do |sym|
+              prim sym
+            end
+          end
+        end
+
+        def _oxford_and buff, scn
+          scn.oxford_join buff, ' and ', ', '
+        end
+      end
+
+      # ==
+
       COLON_ = ':'
       COLON_BYTE_ = COLON_.getbyte 0
       DOT_ = '.'
