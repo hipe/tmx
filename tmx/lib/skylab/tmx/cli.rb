@@ -14,18 +14,32 @@ module Skylab::TMX
 
     class Invocation___
 
-      def initialize argv, i, o, e, pn_s_a
+      def initialize argv, sin, sout, serr, pn_s_a
 
-        @argv = Common_::Polymorphic_Stream.via_array argv
+        Require_interface_lib___[]
 
-        @selection_stack = [ RootFrame___.new do
-          Zerk_lib_[]::Models::Didactics.via_participating_operator__ self
-        end ]
+        @_emission_handler_methods = nil
+        @listener = method :__receive_emission
+        @_args = __argument_scanner_via_argv_and_listener argv
+        @selection_stack = [ __build_root_frame ]
 
-        @sin = i
-        @sout = o
-        @serr = e
+        @sin = sin
+        @sout = sout
+        @stderr = serr
         @program_name_string_array = pn_s_a
+      end
+
+      def __argument_scanner_via_argv_and_listener argv
+        Interface__::CLI_ArgumentScanner.define do |o|
+          o.ARGV = argv
+          o.listener = @listener
+        end
+      end
+
+      def __build_root_frame
+        RootFrame___.new do
+          Zerk_lib_[]::Models::Didactics.via_participating_operator self
+        end
       end
 
       def json_file_stream_by & p
@@ -65,6 +79,30 @@ module Skylab::TMX
 
       def __bound_call
 
+        o = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
+          fi.argument_scanner = @_args
+          fi.add_hash_based_operators_injection(
+            OPERATIONS__, :__bound_call_via_intrinsic_operation )
+        end
+
+        if @_args.no_unparsed_exists
+          CLI::When_::No_arguments[ o, self ]
+        elsif o.parse_operator_softly
+          lu = o.flush_to_lookup_operator
+          lu and send lu.injector, lu.mixed_business_value
+        elsif o._PARSE_PRIMARY_SOFTLY
+          __when_looks_like_primary
+        else
+          self._COVER_ME__when_token_looks_totally_strange__
+        end
+      end
+
+      def __bound_call_via_intrinsic_operation m
+        send m
+      end
+
+      def __WAS_bound_call
+
         if @argv.no_unparsed_exists
           __when_no_args
 
@@ -72,7 +110,7 @@ module Skylab::TMX
           __when_head_looks_like_option
 
         elsif __head_is_intrinsic_operator
-          __bound_call_for_intrinsic_operator
+          __bound_call_for_intrinsic_operator_DONE
 
         elsif __head_matches_mountable_operator
           __bound_call_for_mountable_operator
@@ -81,18 +119,11 @@ module Skylab::TMX
           __bound_call_for_mountable_one_off_executable
 
         else
-          __whine_about_no_such_operator
+          __whine_about_no_such_operator_DONE
         end
       end
 
-      def __whine_about_no_such_operator
 
-        # (this is where #open [#020] "did you mean.." would go )
-
-        @serr.puts "currently, normal tmx is deactivated -"
-        @serr.puts "won't parse #{ @argv.current_token.inspect }"
-        invite_to_general_help
-      end
 
       def __when_no_args
 
@@ -124,25 +155,19 @@ module Skylab::TMX
 
       def __when_unrecognized_option_at_front
         @serr.puts "unrecognized option: #{ @argv.current_token.inspect }"
-        invite_to_general_help
+        invite_to_general_help_and_failed
       end
 
-      def __head_is_intrinsic_operator
+      def __head_is_intrinsic_operator_GONE
 
         entry = @argv.current_token.gsub DASH_, UNDERSCORE_
 
         if _store :@__operation_method_name, OPERATIONS__[ entry.intern ]
           ACHIEVED_
         else
-          @__possible_entry = entry
+          @__possible_entry_REFERENCE = entry
           UNABLE_
         end
-      end
-
-      def __bound_call_for_intrinsic_operator
-        @argv.advance_one
-        _init_selective_listener
-        send remove_instance_variable :@__operation_method_name
       end
 
       OPERATION_DESCRIPTIONS___ = {
@@ -156,6 +181,11 @@ module Skylab::TMX
         test_all: :__bound_call_for_test_all,
         reports: :__bound_call_for_reports,
         map: :__bound_call_for_map,
+        ping: :__bound_call_for_ping,
+      }
+
+      PRIMARIES___ = {
+        help: :_express_help,
       }
 
       # -- test all
@@ -171,7 +201,7 @@ module Skylab::TMX
 
         @_express = :__express_for_test_all
 
-        @_emission_handler_methods_ = {
+        @_emission_handler_methods = {
           # (special handling of emissions by terminal channel name symbol)
           find_command_args: :_no_op,
         }
@@ -180,7 +210,7 @@ module Skylab::TMX
 
         arg_scn = _multimode_argument_scanner_by do |o|
 
-          o.user_scanner @argv
+          o.user_scanner @_args
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
@@ -227,7 +257,7 @@ module Skylab::TMX
       end
 
       def receive_notification_that_you_should_express_find_commands
-        @_emission_handler_methods_[ :find_command_args ] = :__express_current_find_command
+        @_emission_handler_methods[ :find_command_args ] = :__express_current_find_command
         ACHIEVED_
       end
 
@@ -238,7 +268,7 @@ module Skylab::TMX
       # ~ emissions
 
       def __express_current_find_command
-        @_current_emission_expression._express_normally_
+        @_current_emission_expression.express_normally
         NIL
       end
 
@@ -281,7 +311,7 @@ module Skylab::TMX
 
           o.default_primary :execute
 
-          o.user_scanner @argv
+          o.user_scanner @_args
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
 
@@ -340,7 +370,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-B OPEN
 
-          o.user_scanner @argv
+          o.user_scanner @_args
 
           o.emit_into @listener
         end
@@ -348,6 +378,19 @@ module Skylab::TMX
         Add_slice_primary_[ 0, as, self ]
 
         as
+      end
+
+      # -- ping
+
+      def __bound_call_for_ping
+        Common_::Bound_Call[ nil, self, :__do_ping ]
+      end
+
+      def __do_ping
+        @listener.call :info, :expression, :ping do |y|
+          y << "hello from tmx"
+        end
+        NOTHING_
       end
 
       # -- (experimental) mounting of one-off executables
@@ -430,7 +473,7 @@ module Skylab::TMX
         inst = Home_.installation_
 
         mounter = CLI::Magnetics_::BoundCall_via_MountAnyInstalledSidesystem.new(
-          remove_instance_variable( :@__possible_entry ),
+          remove_instance_variable( :@__possible_entry_REFERENCE ),
           self,
           inst,
         )
@@ -452,7 +495,7 @@ module Skylab::TMX
 
       def on_this_do_this k, & p  # k = terminal_channel_symbol
 
-        @_emission_handler_methods_[ k ] = :__on_this_do_this
+        @_emission_handler_methods[ k ] = :__on_this_do_this
         ( @__on_this_do_this ||= {} )[ k ] = p
 
         NIL
@@ -460,7 +503,7 @@ module Skylab::TMX
 
       def __on_this_do_this
 
-        _k = @_current_emission_expression.channel_symbol_array.last
+        _k = @_current_emission_expression.channel.last
         _p = @__on_this_do_this.fetch _k
         _p[ remove_instance_variable( :@_current_emission_expression ) ]  # ..
         NIL
@@ -500,7 +543,7 @@ module Skylab::TMX
 
         # --
 
-        _help_screen_mod.express_into @serr do |o|
+        _help_screen_mod.express_into @stderr do |o|
 
           o.item_normal_tuple_stream items
 
@@ -607,7 +650,7 @@ module Skylab::TMX
             x ? redo : break
           end while above
         else
-          @serr.puts "(no results.)"  # #not-covered
+          @stderr.puts "(no results.)"  # #not-covered
         end
         NIL
       end
@@ -647,21 +690,37 @@ module Skylab::TMX
 
       # --
 
-      def _init_selective_listener
+      def __receive_emission * chan, & em_p
 
-        expsr = nil  # only build it once an emission is received
-        @listener = -> * sym_a, & em_p do
-          expsr ||= HardcodedEmissionExpresserForNow___.new self
-          ee = expsr.dup
-          @_current_emission_expression = ee
-          ee.invoke em_p, sym_a
+        expr = Interface__::CLI_Express_via_Emission.define do |o|
+          o.emission_proc = em_p
+          o.channel = chan
+          o.emission_handler_methods = @_emission_handler_methods
+          o.client = self
+            # emissions of `emission_handler_methods`, `data`, `expression_agent`
         end
+
+        @_current_emission_expression = expr
+
+        rslt = expr.execute
+        if rslt && rslt.was_error
+          if :parse_error == chan[2]
+            _invite_to_general_help
+          end
+          _failed
+        end
+
         NIL
       end
 
-      def invite_to_general_help
-        @serr.puts "try '#{ get_program_name } -h'"
+      def invite_to_general_help_and_failed
+        _invite_to_general_help
         _failed
+      end
+
+      def _invite_to_general_help
+        @stderr.puts "try '#{ get_program_name } -h'"
+        NIL
       end
 
       def get_program_name
@@ -673,7 +732,7 @@ module Skylab::TMX
       end
 
       def _failed
-        @exitstatus = FAILURE_EXITSTATUS__
+        @exitstatus ||= FAILURE_EXITSTATUS__  # EEK
         UNABLE_
       end
 
@@ -721,7 +780,7 @@ module Skylab::TMX
       end
 
       def line_yielder_for_info
-        @___line_yielder_for_info ||= Build_info_yielder___[ @serr ]
+        @___line_yielder_for_info ||= Build_info_yielder___[ @stderr ]
       end
 
       def rewrite_ARGV * s_a
@@ -729,7 +788,9 @@ module Skylab::TMX
         # 2x tagged by :#spot-3 we hackishly rewrite the *REAL* `ARGV`
         # (the global array) to pass parameters into rspec EEW
 
-        _argv_scn = remove_instance_variable :@argv
+        self._NEEDS_REWRITING
+
+        _argv_scn = remove_instance_variable :@_args
         _argv_scn.array_for_read.replace s_a
         NIL
       end
@@ -740,7 +801,9 @@ module Skylab::TMX
         #  we want to make it clear that we ourselves are totally done
         #  parsing (or otherwise referencing) arguments)
 
-        remove_instance_variable :@argv
+        self._REVEW
+
+        remove_instance_variable :@_args
       end
 
       attr_writer(
@@ -749,10 +812,9 @@ module Skylab::TMX
 
       attr_reader(
         :listener,
-        :_emission_handler_methods_,
         :program_name_string_array,
         :selection_stack,
-        :serr,
+        :stderr,
         :sin,
         :sout,
       )
@@ -909,6 +971,17 @@ module Skylab::TMX
     CLI_support_ = Lazy_.call do
       Home_.lib_.brazen::CLI_Support
     end
+
+    Require_interface_lib___ = Lazy_.call do
+      require 'no-dependencies-zerk'
+      Interface__ = ::NoDependenciesZerk
+      NIL
+    end
+
+    Autoloader_[ self ]
+    stowaway :When_, 'events-/mount-related'
+
+    # ==
 
     # ==
 

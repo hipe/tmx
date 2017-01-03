@@ -88,14 +88,18 @@ module Skylab::Common
 
       def __autoloaderize_the_host_asset
 
-        st = Polymorphic_Stream.via_array @_frames
+        scn = Polymorphic_Stream.via_array @_frames
 
-        fr = InferenceFrame__.new st.gets_one, @client.module
+        fr = InferenceFrame__.new scn.gets_one, @client.module
 
         begin
-          fr.init_and_cache_and_autoloaderize_the_value
-          st.no_unparsed_exists && break
-          fr = fr.next_frame st.gets_one
+          if scn.no_unparsed_exists
+            fr.init_and_cache_and_autoloaderize_terminal_node
+            break
+          end
+          fr.init_and_cache_and_autoloaderize_nonterminal_node
+          scn.no_unparsed_exists && break
+          fr = fr.next_frame scn.gets_one
           redo
         end while above
 
@@ -151,24 +155,53 @@ module Skylab::Common
         NameAndValue_via_PathBased___::InferenceFrame__.new fs_frame, @_the_value
       end
 
-      def init_and_cache_and_autoloaderize_the_value
-        __assert_that_the_value_is_not_already_known
+      # ~
+
+      # the host file for the stowaway implies a host node (i.e a value
+      # reachable by a fully qualified const). if that host node is already
+      # defined when we get here, then it's reasonable to assume that the
+      # host file had already been loaded. if that's the case then the
+      # stowaway(s) that were in that file should already be loaded too
+      # so autoloading should never have triggered for the target node, so
+      # something's wrong. the assertion raised #here checks this.
+      #
+      # but note this assumption only holds for the *terminal* node of
+      # a host node. under some circumstances it's possible for the
+      # nonterminal nodes to already be defined when we get here. in those
+      # cases we check for this and avoid redundantly autoloaderizing them.
+      # (this additional detail was (re-?) added at #tombstone-B)
+
+      def init_and_cache_and_autoloaderize_terminal_node
+        _init_and_cache_and_autoloaderize_or_if_value_is_known do
+          self._WHERE  # #here
+        end
+        NIL
+      end
+
+      def init_and_cache_and_autoloaderize_nonterminal_node
+        _init_and_cache_and_autoloaderize_or_if_value_is_known do
+          NOTHING_
+        end
+        NIL
+      end
+
+      def _init_and_cache_and_autoloaderize_or_if_value_is_known
+        @_state_machine = @frame.state_machine
+        if @_state_machine.value_is_known
+          yield
+          @_the_value = @_state_machine.value_x
+        else
+          __init_and_cache_and_autoloaderize
+        end
+      end
+
+      def __init_and_cache_and_autoloaderize
         __init_value_via_inference
         __cache
         __maybe_autoloaderize
       end
 
-      def __assert_that_the_value_is_not_already_known
-
-        # if the host file (or any stem node in it) is already defined, then
-        # assume it would be already loaded, so assume that all stowaways in
-        # in were already loaded too so we should never have gotten here.
-
-        @_state_machine = @frame.state_machine
-        if @_state_machine.value_is_known
-          self._WHERE
-        end
-      end
+      # ~
 
       def __maybe_autoloaderize
 
@@ -292,4 +325,5 @@ module Skylab::Common
     end
   end
 end  # :#sm
+# #tombstone-B: added a finer point to autoloaderizing host nodes
 # #tombstone: full rewrite

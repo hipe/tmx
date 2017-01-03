@@ -9,6 +9,7 @@ use [sa] to convert etc to Stream_
 -1 script to calculate costs [#tmx-011] then [#tmx-010]
 -2 the cost-driven divvy algorithm [#tmx-012]
 -3 unify other tmx node-centric services [#tmx-015]
+say_formal_operation_alternation
 -3.2 omni help screen system [#tmx-018]
 -3.3 omni fuzzy resolution [#tmx-019]
 -3.4 omni "did you mean.." [#tmx-020]
@@ -25,6 +26,3 @@ use [sa] to convert etc to Stream_
 -3.340 only intrinsics, help
 -3.353 only intrinsics, fuzzy
 -3.367 only intrinsics, unrec
--3.380 only intrinsics, no arg
--3.393 only intrinsics, call
--3.398 beginning of coverage for features injections

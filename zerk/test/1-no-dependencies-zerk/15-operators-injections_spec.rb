@@ -108,7 +108,7 @@ module Skylab::Zerk::TestSupport
     def _dup_and_mutate_omni
       _omni = _subject_omni
       mutable = _omni.send :dup  # eew
-      mutable.argument_scanner argument_scanner
+      mutable.argument_scanner = argument_scanner
       mutable
     end
 

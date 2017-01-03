@@ -52,7 +52,7 @@ module Skylab::Zerk::TestSupport
         _prim_for_client = clientesque_primaries_
 
         _xx = subject_library_::ParseArguments_via_FeaturesInjections.define do |o|
-          o.argument_scanner arg_scn
+          o.argument_scanner = arg_scn
           o.add_primaries_injection _prim_for_op, op
           o.add_primaries_injection _prim_for_client, cli
         end.flush_to_parse_primaries

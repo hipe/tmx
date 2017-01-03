@@ -199,7 +199,7 @@ module Skylab::TMX
         require_only: -> v do
 
           cli = v.CLI
-          serr = cli.serr
+          serr = cli.stderr
           stabby = '  >>>> '
 
           # - (at zero)

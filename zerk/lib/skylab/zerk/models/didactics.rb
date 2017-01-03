@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  Models::Didactics = ::Struct.new(  # explained at [#055]  (currently [#br-098])
+  Models::Didactics = ::Struct.new(  # explained at [#055]  (currently at [#br-098], top)
     :is_branchy,
     :description_proc,
     :description_proc_reader,
@@ -20,7 +20,7 @@ module Skylab::Zerk
       end
     end
 
-    def via_participating_operator__ op
+    def via_participating_operator op  # [tmx] only, 1x
 
       _create_by do |dida_y|
         define_conventionaly dida_y, op

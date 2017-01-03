@@ -117,7 +117,7 @@
         @_scn = scn
         @_operation = op
         _o = Interface__::ParseArguments_via_FeaturesInjections.define do |o|
-          o.argument_scanner scn
+          o.argument_scanner = scn
           o.add_primaries_injection Operation__::PRIMARIES, op
           o.add_primaries_injection CLI_PRIMARIES___, self
         end

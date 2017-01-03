@@ -39,7 +39,7 @@ module Skylab::TMX
 
           _pn_s_a = [ * o.program_name_string_array, _tok ]
 
-          _cli = _cli_class.new argv, o.sin, o.sout, o.serr, _pn_s_a do
+          _cli = _cli_class.new argv, o.sin, o.sout, o.stderr, _pn_s_a do
             o
           end
 

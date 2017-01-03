@@ -213,7 +213,7 @@ module NoDependenciesZerk
         end
       end
 
-      OPERATOR_RX___ = /\A[a-z][a-z0-9](?:-[a-z0-9]+)*\z/i
+      OPERATOR_RX___ = /\A[a-z][a-z0-9]*(?:-[a-z0-9]+)*\z/i
 
       def current_operator_as_matcher
         %r(\A#{ ::Regexp.escape current_operator_symbol.id2name })i
@@ -551,13 +551,14 @@ module NoDependenciesZerk
       end  # >>
 
       def initialize
-        @_primary_injectors = []
+        @_add_operators_injection = :__add_first_operators_injection
+        @_add_primaries_injection = :__add_first_primaries_injection
         yield self
       end
 
-      def argument_scanner as
-        @_argument_scanner = as ; nil
-      end
+      attr_writer(
+        :argument_scanner,
+      )
 
       def add_hash_based_operators_injection h, injector
         _add_operators_injection HashBasedOperatorsInjection___.new( h, injector )
@@ -568,28 +569,45 @@ module NoDependenciesZerk
       end
 
       def _add_operators_injection ada
-        ( @_operators_injections ||= [] ).push ada
-        NIL
+        send @_add_operators_injection, ada
+      end
+
+      def __add_first_operators_injection ada
+        @has_operators = true
+        @_operators_injections = []
+        @_add_operators_injection = :__add_operators_injection_normally
+        send @_add_operators_injection, ada
+      end
+
+      def __add_operators_injection_normally ada
+        @_operators_injections.push ada ; nil
       end
 
       def add_primaries_injection h, injector
+        send @_add_primaries_injection, h, injector
+      end
 
-        index_h = ( @_primaries ||= {} )
+      def __add_first_primaries_injection h, injector
+        @has_primaries = true
+        @_primaries = {}
+        @_primary_injectors = []
+        @_add_primaries_injection = :__add_primaries_injection_normally
+        send @_add_primaries_injection, h, injector
+      end
 
+      def __add_primaries_injection_normally h, injector
+        index_h = @_primaries
         inj_d = @_primary_injectors.length
-
         h.each_pair do |k, m|
           index_h[ k ] = [ inj_d, m ]  # meh for now just overwrite
         end
-
-        @_primary_injectors[ inj_d ] = injector
-        NIL
+        @_primary_injectors[ inj_d ] = injector ; nil
       end
 
       # -- NOTE the below might break out
 
       def parse_operator_softly  # see next method
-        @_argument_scanner._parse_operator_softly_
+        @argument_scanner._parse_operator_softly_
       end
 
       def flush_to_lookup_operator  # assume:
@@ -599,7 +617,7 @@ module NoDependenciesZerk
         #
         #  result is a FOO NANI if found, and a POO NANI if failed
 
-        sym = @_argument_scanner.current_operator_symbol
+        sym = @argument_scanner.current_operator_symbol
         scn = _to_operations_injections_scanner
 
         begin
@@ -610,7 +628,7 @@ module NoDependenciesZerk
         end until scn.no_unparsed_exists
         if x
           Found__[ ijn.injector, x ]
-        elsif @_argument_scanner.can_fuzzy
+        elsif @argument_scanner.can_fuzzy
           __fuzzy_lookup_operator
         else
           self._COVER_ME__easy_probably__
@@ -621,7 +639,7 @@ module NoDependenciesZerk
 
         # rather than map-expand we loop inside loop but this might change
         a = []
-        rx = @_argument_scanner.current_operator_as_matcher
+        rx = @argument_scanner.current_operator_as_matcher
         scn = _to_operations_injections_scanner
         begin
           ijn = scn.gets_one
@@ -645,11 +663,11 @@ module NoDependenciesZerk
       end
 
       def __when_primary_not_found
-        _scn = _to_flat_operation_symbol_scanner
+        _scn = to_operation_symbol_scanner
         self._WORKED_ONCE
       end
 
-      def _to_flat_operation_symbol_scanner
+      def to_operation_symbol_scanner
         _to_operations_injections_scanner.expand_by do |ijn|
           ijn.to_normal_symbol_scanner
         end
@@ -666,7 +684,7 @@ module NoDependenciesZerk
         # if there are any tokens remaining on the scanner,
         # parse them as primaries or whine appropriately
 
-        args = remove_instance_variable :@_argument_scanner
+        args = remove_instance_variable :@argument_scanner
         a = remove_instance_variable :@_primary_injectors
         h = remove_instance_variable :@_primaries
         ok = true
@@ -685,6 +703,16 @@ module NoDependenciesZerk
         end
         ok
       end
+
+      def to_primary_symbol_scanner  # assume
+        Scanner_via_Array[ @_primaries.keys ]
+      end
+
+      attr_reader(
+        :argument_scanner,
+        :has_operators,
+        :has_primaries,
+      )
     end
 
     # --
@@ -800,25 +828,11 @@ module NoDependenciesZerk
       alias_method :calculate, :instance_exec
 
       def oxford_or scn
-        _oxford_join scn, ' or ', ', '
+        scn.oxford_join '', ' or ', ', '
       end
 
       def oxford_and scn
-        _oxford_join scn, ' and ', ', '
-      end
-
-      def _oxford_join scn, ult, nonult
-        buff = scn.gets_one.dup
-        if ! scn.no_unparsed_exists
-          begin
-            s = scn.gets_one
-            scn.no_unparsed_exists && break
-            buff << nonult << s
-            redo
-          end while above
-          buff << ult << s
-        end
-        buff
+        scn.oxford_join '', ' and ', ', '
       end
     end
 
@@ -850,10 +864,6 @@ module NoDependenciesZerk
           @_len = len
           @_pos = d
         end
-      end
-
-      def map_by & p
-        Mapped_Scanner__.new p, self
       end
 
       def advance_one
@@ -935,6 +945,20 @@ module NoDependenciesZerk
 
     class Scanner__
 
+      def oxford_join buff, ult, sep  # assume some
+        buff << gets_one
+        unless no_unparsed_exists
+          begin
+            s = gets_one
+            no_unparsed_exists && break
+            buff << sep << s
+            redo
+          end while above
+          buff << ult << s
+        end
+        buff
+      end
+
       def expand_by & expand_by
         main = nil ; p = nil ; scn = nil
         advance = -> do
@@ -959,12 +983,17 @@ module NoDependenciesZerk
         end )
       end
 
+      def map_by & p
+        Mapped_Scanner__.new p, self
+      end
+
       def gets_one
         x = current_token
         advance_one
         x
       end
     end
+
 
     # ==
 
