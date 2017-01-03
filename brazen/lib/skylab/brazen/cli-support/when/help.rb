@@ -105,6 +105,7 @@ module Skylab::Brazen
           @expression_agent = nil
           @margin = TWO_SPACES___
           @puts = puts
+          @__stderr = io
 
           yield self
         end
@@ -133,8 +134,6 @@ module Skylab::Brazen
           end
           NIL
         end
-
-      private
 
         def __express_items_section group, description_proc_for
 
@@ -166,7 +165,6 @@ module Skylab::Brazen
             p[ line ]
           end
 
-          expag = @expression_agent || THE_EMPTY_EXPRESSION_AGENT_
           item = -> nm do
 
             buffer = fmt % nm.as_slug
@@ -174,7 +172,7 @@ module Skylab::Brazen
             desc_p = description_proc_for[ nm.as_variegated_symbol ]
             if desc_p
               p = first_line
-              expag.instance_exec y, & desc_p  # #no-expag for now (1 of 2)
+              _express_into y, desc_p
             end
             NIL
           end
@@ -227,12 +225,34 @@ module Skylab::Brazen
             p[ line ]
           end
 
-          nil.instance_exec _y, & user_p  # #no-expag for now (2 of 2)
+          _express_into _y, user_p
           NIL
         end
 
+        def express_freeform_section io_p
+          @express_boundary[]
+          _expression_agent.calculate @__stderr, & io_p
+          NIL
+        end
+
+        def _express_into y, user_p
+
+          expag = _expression_agent
+
+          if user_p.arity.zero?
+            _line = expag.calculate( & user_p )
+            y << _line
+          else
+            expag.calculate y, & user_p
+          end
+          NIL
+        end
+
+        def _expression_agent
+          @expression_agent || THE_EMPTY_EXPRESSION_AGENT_
+        end
+
         # -- write-on-receive (then read)
-      public
 
         def primary_symbols ks
           _st = Stream_.call ks do |k|

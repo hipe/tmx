@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] no dependencies zerk - CLI argument scanner" do
+  describe "[ze] no deps - CLI argument scanner" do
 
     # exactly as #nodeps-spot-1
 

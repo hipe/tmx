@@ -2,74 +2,179 @@
 
 # is :[#024].
 
-program_name = -> do
-  ::File.basename $PROGRAM_NAME
-end
+one_off = ::Object.new
+class << one_off
+  # -
+    def new a, _sin, o, e, pn_s_a
 
-serr = $stderr
+      require 'no-dependencies-zerk'
+      @_lib = ::NoDependenciesZerk
+      @_listener = method :__receive_emission
+      @_args = @_lib::CLI_ArgumentScanner.new a, & @_listener
 
-formal_arg = 'DIGIT'
+      @sout = o ; @stderr = e ; @program_name_string_array = pn_s_a
+      self
+    end
 
-usage = -> do
-  serr.puts "usage: `#{ program_name[] } #{ formal_arg }`"
-end
+    def execute
+      @exitstatus = 0
+      ok = true
+      ok &&= __parse_arguments
+      ok &&= __check_required_arguments
+      ok &&= __normalize_and_validate
+      ok && __execute_normally
+      @exitstatus
+    end
 
-exit_with_usage = -> do
-  usage[]
-  exit 5
-end
+    def __normalize_and_validate
+      @begin ||= BEGIN__
+      @next_begin ||= NEXT_BEGIN___
+      if @next_begin <= @begin
+        @_listener.call :error, :expression do |y|
+          y << "#{ prim :next_begin } must be after #{ prim :begin }"
+        end
+        UNABLE_
+      else
+        ACHIEVED_
+      end
+    end
 
-argv = ARGV
-case 1 <=> argv.length
-when -1
-  serr.puts "too many arguments"
-  exit_with_usage[]
-when 1
-  serr.puts "expecting #{ formal_arg }"
-  exit_with_usage[]
-end
+    def __check_required_arguments
+      @_lib::Check_requireds[ self, %i( @number_of_items ), & @_listener ]
+    end
 
-arg = argv.fetch 0
+    def __parse_arguments
+      @_lib::ParseArguments_via_FeaturesInjections.call @_args, PRIMARIES___, self
+    end
 
-if '-h' == arg
-  usage[]
-  serr.puts
-  serr.puts "summary: outputs numbers that \"subdivide\" the space"
-  serr.puts
+    PRIMARIES_DESCRIPTIONS___ = {
+      begin: -> y do
+        y << "default: #{ BEGIN__ }"
+      end,
+      next_begin: -> y do
+        y << "default: #{ NEXT_BEGIN___ }"
+      end,
+      number_of_items: -> y do
+        y << "required. positive nonzero integer."
+        y << "(one day maybe this will be a regular argument)"
+      end,
+      help: -> { "this screen" },
+    }
 
-_body_string = <<-HERE
+    PRIMARIES___ = {
+      begin: :_parse_non_neg_integer,
+      next_begin: :_parse_non_neg_integer,
+      number_of_items: :__parse_positive_nonzero_integer,
+      help: :__express_help,
+    }
+
+    def __express_help
+
+      require 'skylab/test_support'
+      _Help = ::Skylab::TestSupport.lib_.brazen::CLI_Support::When::Help
+
+      h = PRIMARIES_DESCRIPTIONS___
+
+      _Help::ScreenForEndpoint.express_into @stderr do |o|
+        o.primary_symbols h.keys
+        o.express_usage_section _program_name
+        o.express_freeform_section __freeform_description_by
+        o.express_items_sections h
+      end
+
+      NIL  # EARLY_END_
+    end
+
+    def __freeform_description_by
+
+      -> serr do
+
+        _body_string = <<-HERE
 if you had 2 items to fit into 1-99: there's always one buffer at the
 beginning and one at the end, and (N-1) * 2 buffers to account for the
 interceding buffers between adjacent items, so four buffers evenly
-spread between 99 (slot) items. (reminder: there is no '0' speace and
+spread between 99 (slot) items. (reminder: there is no '0' space and
 no '100' space.)
-HERE
+        HERE
 
-  serr.puts "our \"formula\" for subdividing spaces:"
-
-_body_string.gsub! %r(^), '  '
-
-  serr.write _body_string
-  exit 0
-end
-
-md = /\A[1-9]\d*\z/.match arg
-if ! md
-  serr.puts "not a positive nonzero integer: #{ arg.inspect }"
-  exit_with_usage[]
-end
-
-_num_items = md[ 0 ].to_i
-
-    _go = -> num_items, spaces=99.0 do
-      buffers = 2 + ( ( num_items - 1 ) * 2 )
-      puts( spaces / buffers )
-      (( buffers - 3 ) / 2 ).times do |d|
-        puts( spaces / buffers * ( ( d * 2 ) + 3 ) )
+        serr.puts "our \"formula\" for subdividing spaces:"
+        serr.puts
+        serr.write _body_string
+        ACHIEVED_
       end
-      puts( spaces / buffers * ( buffers - 1 ) )
     end
 
-_go[ _num_items ]
+    def __parse_positive_nonzero_integer
+      _store @_args.current_primary_as_ivar, @_args.parse_positive_nonzero_integer
+    end
 
-exit 0
+    def _parse_non_neg_integer
+      _store @_args.current_primary_as_ivar, @_args.parse_non_negative_integer
+    end
+
+    def __receive_emission * chan, & em_p
+      rslt = @_lib::CLI_Express_via_Emission[ em_p, chan, self ]
+      if rslt && rslt.was_error
+        @stderr.puts "see `#{ _program_name } -help`"
+      end
+      NIL
+    end
+
+    def _program_name
+      @program_name_string_array.join SPACE_
+    end
+
+    def __execute_normally
+
+      # (all numbers are rational until final output)
+
+      sout = @sout
+      item = -> ra do
+        sout.puts ra.to_f
+      end
+
+      begin_rational = Rational( @begin )
+
+      _end_rational = Rational( @next_begin )
+
+      _full_distance = _end_rational - begin_rational
+
+      number_of_buffers = ( @number_of_items - 1 ) * 2 + 2
+
+      buffer_distance = _full_distance / number_of_buffers
+
+      jump_distance = buffer_distance * 2
+
+      first_point = begin_rational + buffer_distance
+
+      @number_of_items.times do |d|
+        item[ first_point + ( jump_distance * d ) ]
+      end
+
+      NIL
+    end
+
+    def _store ivar, x
+      if x
+        instance_variable_set ivar, x ; ACHIEVED_
+      else
+        x
+      end
+    end
+
+    attr_reader(
+      :stderr,
+    )
+
+    # ==
+
+    ACHIEVED_ = true
+    BEGIN__ = 0
+    NEXT_BEGIN___ = 1
+    SPACE_ = ' '
+    UNABLE_ = false
+    # ==
+  # -
+end
+
+exit one_off.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute

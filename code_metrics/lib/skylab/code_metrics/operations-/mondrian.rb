@@ -116,11 +116,12 @@
         op = Operation__.new scn, @stderr
         @_scn = scn
         @_operation = op
-        _ok = Interface__::ParseArguments_via_PrimariesInjections.call_by do |o|
+        _o = Interface__::ParseArguments_via_FeaturesInjections.define do |o|
           o.argument_scanner scn
           o.add_primaries_injection Operation__::PRIMARIES, op
           o.add_primaries_injection CLI_PRIMARIES___, self
         end
+        _ok = _o.flush_to_parse_primaries
         _ok  # #todo
       end
 
@@ -164,14 +165,13 @@
 
       def __receive_emission * chan, & msg_p
 
-        refl = Express_for_CLI_via_Expression___.define do |o|
+        refl = Interface__::CLI_Express_via_Emission.call_by do |o|
           o.channel = chan
           o.emission_proc = msg_p
           o.expression_agent_by = method :_expression_agent
           o.signal_by = method :__receive_signal
-          o.stdout = @stdout
           o.stderr = @stderr
-        end.execute
+        end
 
         if refl.was_error
           if @exitstatus.zero?
@@ -733,91 +733,6 @@
         :require_paths,
         :system_services,
       )
-    end
-
-    # ==
-
-    class Express_for_CLI_via_Expression___ < SimpleModel_
-
-      attr_writer(
-        :channel,
-        :emission_proc,
-        :expression_agent_by,
-        :signal_by,
-        :stderr,
-        :stdout,
-      )
-
-      def initialize
-        yield self
-        # (but don't freeze)
-      end
-
-      def execute
-        is_signal = false
-        FIRST_CHANNEL___.fetch( @channel.fetch 0 )[ binding ]
-        if is_signal
-          __when_signal
-        elsif :expression == @channel.fetch(1)
-          __when_expression
-        else
-          __when_event
-        end
-        Result___.new @_was_error
-      end
-
-      FIRST_CHANNEL___ = {
-        error: -> bnd do
-          bnd.receiver.instance_variable_set :@_was_error, true
-        end,
-        info: -> bnd do
-          bnd.receiver.instance_variable_set :@_was_error, false
-        end,
-        signal: -> bnd do
-          bnd.local_variable_set :is_signal, true
-        end,
-      }
-
-      Result___ = ::Struct.new :was_error
-
-      def __when_signal
-        _ok = @signal_by[ @emission_proc, @channel ]
-        @_was_error = ! _ok
-        EARLY_END_
-      end
-
-      def __when_event
-        _ev = remove_instance_variable( :@emission_proc ).call
-        _y = _yielder_via_channel
-        _ev.express_into_under _y, _expression_agent
-        NIL
-      end
-
-      def __when_expression
-        _y = _yielder_via_channel
-        _msg_p = remove_instance_variable :@emission_proc
-        _expression_agent.calculate _y, & _msg_p
-        NIL
-      end
-
-      def _expression_agent
-        @expression_agent_by.call
-      end
-
-      def _yielder_via_channel
-        io = __IO_via_channel
-        ::Enumerator::Yielder.new do |line|
-          io.puts line
-        end
-      end
-
-      def __IO_via_channel
-        case remove_instance_variable( :@channel ).fetch(0)
-        when :error, :info
-          @stderr
-        else fail
-        end
-      end
     end
 
     # ==

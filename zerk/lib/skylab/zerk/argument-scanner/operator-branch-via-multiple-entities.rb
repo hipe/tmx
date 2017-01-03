@@ -150,7 +150,7 @@ module Skylab::Zerk
 
       # ==
 
-      module DISPATCHING_VALUE_RECEIVER___; class << self
+      module DISPATCHING_VALUE_RECEIVER___ ; class << self
 
         # because we store the target value store *in* the routing struct,
         # the receiver of this method call can be both stateless AND

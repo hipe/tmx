@@ -55,13 +55,13 @@ module Skylab::CodeMetrics::TestSupport
         _scn = _Interface::API_ArgumentScanner.new x_a, & p
         op = _Mondrian::Operation__.new _scn, debug_IO
 
-        _ok = _Interface::ParseArguments_via_PrimariesInjections.call_by do |o|
+        _ok = _Interface::ParseArguments_via_FeaturesInjections.define do |o|
           o.argument_scanner _scn
           o.add_primaries_injection op.class::PRIMARIES, op
-        end
+        end.flush_to_parse_primaries
 
         _ = _ok && op.execute
-        _  # #hi.
+        _  # hi.
       end
     end
 

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Zerk::TestSupport
 
-  describe "[ze] API argument scanner" do
+  describe "[ze] no deps - API argument scanner" do
 
     TS_[ self ]
     use :no_dependencies_zerk
