@@ -35,7 +35,7 @@ module Skylab::Zerk
 
         def effect_help_screen_
 
-          _vendor_help = Remote_when_[]::Help::For_Branch.new
+          _vendor_help = Here_::Help::For_Branch.new
 
           _ada = Vendor_Adapter___.new @_modality_frame, @_session.CLI_
 
@@ -93,7 +93,7 @@ module Skylab::Zerk
 
           def express_sections_by  # for above
 
-            o = Remote_CLI_lib_[]::Section::DSL.new self
+            o = Home_::CLI::Section::DSL.new self
             yield o
             o.finish
           end

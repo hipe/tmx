@@ -57,7 +57,7 @@ module Skylab::Permute::TestSupport
         1 == number_of_lines || fail
       end
 
-      it "tmx integration" do
+      it "tmx integration", TMX_CLI_integration: true do
 
         Home_::Autoloader_.require_sidesystem :TMX
 
@@ -167,7 +167,7 @@ module Skylab::Permute::TestSupport
 
       shared_subject :_coarse_parse do
         _ = niCLI_state.lines
-        Zerk_test_support_[]::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _
+        Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse.new _
       end
     end
 

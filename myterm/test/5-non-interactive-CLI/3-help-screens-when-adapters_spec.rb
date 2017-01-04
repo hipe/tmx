@@ -10,8 +10,7 @@ module Skylab::MyTerm::TestSupport
 
     include TS_::My_Non_Interactive_CLI::InstanceMethods
 
-    _ = Home_.lib_.zerk.test_support::Non_Interactive_CLI::Help_Screens
-    _[ self ]
+    Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse[ self ]
 
     def for_expect_stdout_stderr_prepare_invocation invo
       prepare_CLI_for_niCLI_ invo

@@ -208,7 +208,7 @@ module Skylab::Zerk::TestSupport
         using_expect_stdout_stderr_invoke_via_argv argv
         # (result is nil. ivars are set.)
         _lines = release_lines_for_expect_stdout_stderr
-        TS_::Non_Interactive_CLI::Help_Screens::Coarse_Parse.new _lines
+        TS_::CLI::Expect_Section_Coarse_Parse.new _lines
       end
 
       def argv * argv  # see DSL tombstone

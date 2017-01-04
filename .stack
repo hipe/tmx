@@ -24,4 +24,3 @@ say_formal_operation_alternation
 -3.300 intrinsics & mountable operators, unrec
 -3.313 intrinsics & mountable operators, no arg
 -3.327 intrinsics & mountable operators, call
--3.340 only intrinsics, help

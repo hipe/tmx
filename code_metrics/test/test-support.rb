@@ -41,7 +41,7 @@ module Skylab::CodeMetrics::TestSupport
       _x.children.each do | cx |
 
         # #gotacha :[#012]: this is nasty: what the treeifier does with blank
-        # lines is context-dependant for now (#watching [#br-045]A.) now
+        # lines is context-dependant for now (#watching [#ze-054.1-1].) now
         # consider the following three (at present) facts put together:
         #
         #   • "ping" has no desc lines.

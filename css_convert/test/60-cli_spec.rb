@@ -40,7 +40,7 @@ module Skylab::CSS_Convert::TestSupport
       @exitstatus.should eql Home_::Brazen_::API.exit_statii.fetch :resource_not_found
     end
 
-    it "[tmx] integration" do
+    it "[tmx] integration", TMX_CLI_integration: true do
 
       Home_::Autoloader_.require_sidesystem :TMX
 

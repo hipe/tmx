@@ -17,7 +17,7 @@ module Skylab::Zerk
         @_n11n.formals
       end
 
-      def the_custom_section__ & p  # only for help - use [#br-058]
+      def the_custom_section__ & p  # only for help - use [#061.2]
 
         # IFF there is at least one item, start the section. otherwise
         # don't write the header line (and don't invoke the interpreter).

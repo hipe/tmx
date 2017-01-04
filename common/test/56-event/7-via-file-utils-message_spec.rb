@@ -22,7 +22,7 @@ module Skylab::Common::TestSupport
       end
     end
 
-    it "(stowaway - tmx integration)" do
+    it "(stowaway - tmx integration)", TMX_CLI_integration: true do
 
       Autoloader_.require_sidesystem :TMX
 

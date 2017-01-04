@@ -1,19 +1,19 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - section - DSL" do
+  describe "[ze] CLI - section - DSL" do
 
     TS_[ self ]
     use :memoizer_methods
-    use :CLI_support_section_DSL
+    use :CLI_section_DSL
 
     context "(long story)" do
 
       shared_subject :_state do
 
-        # currently this serves as the only documentation for [#058].
-        # reviewing [#002]/figure-3 will assist in understanding the
+        # currently this serves as the only documentation for [#061.2].
+        # reviewing [#br-002]/figure-3 will assist in understanding the
         # conceptual document structure.
         #
         # look at the below `yield_` calls and image they are real yields.
@@ -53,7 +53,7 @@ module Skylab::Brazen::TestSupport
 
         _x = @subject.finish
 
-        _cls = TestLib_::Zerk_test_support[]::Non_Interactive_CLI::Help_Screens::Coarse_Parse
+        _cls = TS_::CLI::Expect_Section_Coarse_Parse
 
         sta.screen = _cls.new sta.lines
 
@@ -123,3 +123,4 @@ module Skylab::Brazen::TestSupport
     end
   end
 end
+# #history: moved here from [br]

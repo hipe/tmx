@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TMX::TestSupport
 
-  describe "[tmx] CLI - smalls" do
+  describe "[tmx] CLI - mount one-offs ", wip: true do
 
     TS_[ self ]
 
@@ -26,6 +26,8 @@ module Skylab::TMX::TestSupport
     # because it is the one script we still use one in a while, with the
     # exception of "no-line-breaks" which explains its own obsolescence
     # there.
+    #
+    #   - also "partition" has been useful lately
     #
     # at writing, all FIVE (5) other scripts showed their help screens
     # when invoked through mounting. we haven't covered them here mainly

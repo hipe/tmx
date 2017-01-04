@@ -237,7 +237,7 @@ module Skylab::SearchAndReplace::TestSupport
 
   Zerk_Help_Screens = -> tcc do
     Require_zerk__[]
-    Zerk_.test_support::Non_Interactive_CLI::Help_Screens[ tcc ]
+    Zerk_.test_support::CLI::Expect_Section_Coarse_Parse[ tcc ]
   end
 
   # --

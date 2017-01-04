@@ -43,9 +43,8 @@ module Skylab::TestSupport::TestSupport
 
       shared_subject :__coarse_parse do
         _invoke '-h', _ACTION
-        _HS = Zerk_test_support_[]::Non_Interactive_CLI::Help_Screens
         _lines = release_lines_for_expect_stdout_stderr
-        _HS::Coarse_Parse.new _lines
+        Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse.new _lines
       end
     end
 

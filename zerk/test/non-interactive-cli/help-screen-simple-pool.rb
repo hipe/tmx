@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   class Non_Interactive_CLI::HelpScreenSimplePool
 
-    # the fifth of the [#br-106] facilities, this is :[#054.2]
+    # the fifth of the [#054] facilities, this is :[#054.2]
 
     # it is not a general replacement for the others
 
@@ -99,11 +99,6 @@ module Skylab::Zerk::TestSupport
       end
 
     end ; end
-
-    # ==
-
-    DASH_ = '-'
-    UNDERSCORE_ = '_'
 
     # ==
   end

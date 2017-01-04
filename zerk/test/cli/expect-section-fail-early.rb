@@ -1,6 +1,6 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  module CLI_Support::Expect_Section
+  class CLI::Expect_Section_Fail_Early
 
     # the first of four similar facilities, this is :[#045] of #[#106]
 
@@ -18,6 +18,7 @@ module Skylab::Brazen::TestSupport
     # middle of a multiline node, it adds it to that node. otherwise it
     # counts the newline as its own toplevel item. this annoys some clients
     # and might change somehow, but for now it is just being watched ..
+    # :[#here.1-1].
 
     PUBLIC = true
 
@@ -33,7 +34,6 @@ module Skylab::Brazen::TestSupport
     end  # >>
 
 #==FROM
-  class FailEarly
 
     class << self
 
@@ -141,7 +141,7 @@ module Skylab::Brazen::TestSupport
       end
 
       def finish
-        remove_instance_variable( :@_assertion ).finish
+        remove_instance_variable( :@_assertion )._become_finished
         @_expectation_scanner.advance_one
         if @_expectation_scanner.no_unparsed_exists
           remove_instance_variable :@_expectation_scanner
@@ -177,7 +177,7 @@ module Skylab::Brazen::TestSupport
 
     # ==
 
-    class SectionAssertion___
+    class BuildSection___
 
       def initialize tc, rs_p, header_s
         @emissions = []
@@ -254,7 +254,7 @@ module Skylab::Brazen::TestSupport
           @_receive = :_receive_subsequent_emission_normally
           :_stay_
         else
-          _become_finised
+          _become_finished
           :_pop_
         end
       end
@@ -263,20 +263,89 @@ module Skylab::Brazen::TestSupport
         "this might change later, but for now, unexpected not indented line: #{ s.inspect }"
       end
 
-      def finish
-        _become_finised  # hi.
+      def _become_finished
+
+        remove_instance_variable :@_receive
+
+        _tc = remove_instance_variable :@test_context
+        _em = remove_instance_variable( :@emissions ).freeze
+        _p = remove_instance_variable :@receive_section
+
+        _p[ Section___.new( _em, _tc ) ]
+
+        NIL
+      end
+    end
+
+    # ==
+
+    class Section___
+
+      def initialize em_a, tc
+        @emissions = em_a
+        @_test_context = tc
       end
 
-      def _become_finised
-        remove_instance_variable :@_receive
-        remove_instance_variable :@test_context
-        @emissions.freeze
-        remove_instance_variable( :@receive_section )[ self ]
-        NIL
+      def to_index_of_common_branch_usage_line  # 1x [tmx]
+        Magnetics__[]::CommonBranchUsageLineIndex_via_Line[ _first_line ]
+      end
+
+      def to_index_of_common_operator_usage_line
+        Magnetics__[]::CommonOperatorUsageLineIndex_via_Line[ _first_line ]
+      end
+
+      def to_index_of_common_item_list
+
+        muta = nil
+        _st = Stream_.call @emissions do |em|
+          em.string || ( muta ||= "" )
+        end
+        # (because `chomp!` is used, string can't be the frozen EMPTY_S_)
+
+        Magnetics__[]::CommonItemsSection_via_LineStream[ _st ]
+      end
+
+      def to_index_of_common_operator_item_list
+        ::Kernel._K
+      end
+
+      def expect_exactly_one_line
+        expect_number_of_lines 1
+        _first_line
+      end
+
+      def _first_line
+        @emissions.fetch( 0 ).string
+      end
+
+      def expect_number_of_lines d
+        expect_range_of_lines d..d
+      end
+
+      def expect_range_of_lines r
+        d = number_of_lines
+        if r.include? d
+          true
+        else
+          fail __say_range( d, r )
+        end
+      end
+
+      def __say_range d, r
+        _ = r.end == r.begin ? r.begin.to_s : r.inspect
+        "expected #{ _ } line(s) in section had #{ d }"
+      end
+
+      def number_of_lines
+        num = @emissions.length
+        if ! @emissions.last.string
+          num -= 1
+        end
+        num
       end
 
       attr_reader(
-        :emissions,
+        :emissions
       )
     end
 
@@ -309,7 +378,7 @@ module Skylab::Brazen::TestSupport
       end
 
       def begin_assertion_under tc
-        SectionAssertion___.new tc, @receive_section, @header_string
+        BuildSection___.new tc, @receive_section, @header_string
       end
 
       def noun_phrase
@@ -337,7 +406,6 @@ module Skylab::Brazen::TestSupport
     AssertionFailed = ::Class.new ::RuntimeError
 
     # ==
-  end
 #==TO
 
     # -- (forward declarations)
@@ -492,7 +560,7 @@ module Skylab::Brazen::TestSupport
 
     # --
 
-    class Help_Screen_State
+    class Help_Screen_State  # PUBLIC
 
       # encapsulate the parse tree, an index into its sections,
       # and an exitstatus.
@@ -931,11 +999,11 @@ module Skylab::Brazen::TestSupport
       end
 
       def unstyled_content
-        @___uc ||= Home_::CLI_Support::Styling.unstyle line_content
+        @___uc ||= Remote_CLI_lib_[]::Styling.unstyle line_content
       end
 
       def unstyled
-        @___unst ||= Home_::CLI_Support::Styling.unstyle @string
+        @___unst ||= Remote_CLI_lib_[]::Styling.unstyle @string
       end
 
       def line_content
@@ -1063,6 +1131,10 @@ module Skylab::Brazen::TestSupport
       end
 
       attr_accessor :children
+    end
+
+    Magnetics__ = -> do
+      CLI::Expect_Section_Magnetics
     end
 
     EMPTY_P_ = Home_::EMPTY_P_

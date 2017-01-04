@@ -2,7 +2,7 @@ module Skylab::Common
 
   class Stream
 
-    class As_::Polymorphic  # #[#fi-034]
+    class As_::Polymorphic  # #[#co-069]
 
       # etc.
 

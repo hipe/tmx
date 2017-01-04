@@ -31,11 +31,84 @@ module Skylab::TMX::TestSupport
       _expect_pinged
     end
 
-    it "strange option - explain, invite", wip: true do
+    it "strange option - explain, splay, invite" do
       invoke '-x'
-      expect_on_stderr "unrecognized option: \"-x\""
-      expect_failed_normally_
+      expect_on_stderr "unknown primary: \"-x\""
+      expect_on_stderr "available primaries: -help"
+      expect_failed_normally_  # #coverpoint-1-F
     end
+
+    context "help" do
+
+      it "usage - head and tail" do
+        o = _usage
+        o.head == "usage: tmz " || fail
+        o.tail == " [opts]" || fail
+      end
+
+      it "usage - items - intrinsics are present" do
+        h = _usage.item_index
+        h[ :ping ] || fail
+        h[ :map ] || fail
+      end
+
+      it "description" do
+        _sections.description.emissions.first.string.include? 'experiment' or fail
+      end
+
+      it "items section - intrinsics are present" do
+
+        h = _items.item_offset_via_key
+        h[ :ping ] || fail
+        h[ :map ] || fail
+      end
+
+      # (we don't bother checking for descriptions because
+      # the state machine parser requires them presently)
+
+      shared_subject :_items do
+        _sections.items.to_index_of_common_item_list
+      end
+
+      shared_subject :_usage do
+        sect = _sections.usage
+        sect.expect_exactly_one_line
+        sect.to_index_of_common_branch_usage_line
+      end
+
+      shared_subject :_sections do
+
+        invoke '-h'
+
+        expect_common_help_screen_sections_by_ do |sct, o|
+
+          o.expect_section "usage" do |sect|
+            sct.usage = sect
+          end
+
+          o.expect_section "description" do |sect|
+            sct.description = sect
+          end
+
+          o.expect_section "operations" do |sect|
+            sct.items = sect
+          end
+        end
+      end
+    end
+
+    # ==
+
+    # ==
+
+    # -- expectations
+
+    def _expect_pinged
+      expect_on_stderr "hello from tmx"
+      expect_succeeded
+    end
+
+    # -- setup
 
     def __no_arg
       invoke
@@ -45,46 +118,6 @@ module Skylab::TMX::TestSupport
     shared_subject :_strange_oper_arg do
       invoke 'zazoozle'
       finish_with_common_machine_
-    end
-
-    it "help (a stub for now)", wip: true do
-      invoke '-h'
-      expect_on_stderr %r(\Ausage: tmz \{ test-all \| )
-      expect_empty_puts
-      expect "description: experiment.."
-      expect_empty_puts
-      expect "operations:"
-
-      _a = "reporting operations", "generate the", "stream of nodes"
-      scn = Common_::Polymorphic_Stream.via_array _a
-
-      p = -> line do
-        if line
-          exp = scn.current_token
-          if line.include? exp
-            scn.advance_one
-            if scn.no_unparsed_exists
-              p = MONADIC_EMPTINESS_
-            end
-          end
-        end
-        NIL
-      end
-
-      expect_each_by do |line|
-        p[ line ]
-      end
-
-      expect_succeeded
-
-      if ! scn.no_unparsed_exists
-        fail "never found: #{ scn.current_token.inspect }"
-      end
-    end
-
-    def _expect_pinged
-      expect_on_stderr "hello from tmx"
-      expect_succeeded
     end
   end
 end

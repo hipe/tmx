@@ -30,10 +30,9 @@ module Skylab::TestSupport
         _expect_section.tree_via :state, _state, :stream, :e
       end
 
-      x = nil
-      define_method :_expect_section do
-        x ||= Home_.lib_.brazen.test_support.lib :CLI_support_expect_section
-      end
+      define_method :_expect_section, ( Lazy_.call do
+        Home_.lib_.zerk.test_support::CLI::Expect_Section_Fail_Early
+      end )
 
       def flush_frozen_state_from_expect_stdout_stderr
 

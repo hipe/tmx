@@ -1,4 +1,11 @@
-# the help screen narrative :[#003]
+# synopsis lines via help screen :[#021]
+
+## synopsis
+
+furloughed but interesting. might come back for #open [#018], [#019] & [#020]
+
+
+
 
 ## intro
 
@@ -10,7 +17,7 @@ lines of this help screen.
 
 these are some disparate algorithmic axiomatic and other points:
 
-  • something very similar to this was done at the ancient [#br-106],
+  • something very similar to this was done at the ancient [#054.1],
     (originally from [hl]), but it doesn't use
     [#ba-044] our preferred state machine lib so we have rewritten it.
 

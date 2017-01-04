@@ -78,7 +78,7 @@ module Skylab::Zerk
         o.invocation_expression = ada
         o.invocation_reflection = ada
         # o.command_string = .. hm..
-        d = o.produce_result
+        d = o.execute  # formerly `produce_result`
         d.zero?  # sanity - assert shape
         @CLI.init_exitstatus_ d
         NIL_

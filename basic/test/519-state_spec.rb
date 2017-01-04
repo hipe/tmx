@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport
         Common_::Pair.via_value_and_name v_x, n_x
       end
 
-      o = Home_::State::Machine::Edit_Session.new
+      o = Home_::State::Machine.begin_definition
 
       o.add_state :beginning,
         :can_transition_to, [ :long_switch ]
@@ -92,7 +92,7 @@ module Skylab::Basic::TestSupport
           NIL_  # you must declare that you have no next state
         end
 
-      _SM = o.flush_to_state_machine
+      _SM = o.finish
 
     end
 

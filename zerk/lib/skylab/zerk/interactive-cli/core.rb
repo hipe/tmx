@@ -112,7 +112,7 @@ module Skylab::Zerk
 
       ___init_expression_agent
 
-      @boundarizer = Remote_CLI_lib_[]::Section::Boundarizer.new line_yielder
+      @boundarizer = Home_::CLI::Section::Boundarizer.new line_yielder
 
       vmm = Here_::View_Maker_Maker___.instance
 

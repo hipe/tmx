@@ -29,7 +29,7 @@ implementation surface area is near perfect in that it touches a lot of
 different kinds of mechanisms used by bigger applications without being
 a bigger application itself:
 
-  • it does or will integrate with a [#br-098] "tall stack of turtles".
+  • it does or will integrate with a [#ze-055] "tall stack of turtles".
 
   • it does or will have a non-trivial modality-specific implementation
     ("client") that talks to a modality-non-specific "reactive model"

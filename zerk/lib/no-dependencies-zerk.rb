@@ -44,11 +44,13 @@ module NoDependenciesZerk
         end
       end  # >>
 
+      def emission_proc_and_channel p, chan
+        @channel = chan ; @emission_proc = p ; nil
+      end
+
       attr_writer(
         :client,  # only for `data`
-        :channel,
         :emission_handler_methods,
-        :emission_proc,
         :expression_agent_by,
         :signal_by,
         :stderr,
@@ -79,10 +81,15 @@ module NoDependenciesZerk
           send method_name
         elsif :expression == @channel.fetch(1)
           __express_expression
+          _flush_result
         else
           __express_event
+          _flush_result
         end
-        Result___.new @_was_error
+      end
+
+      def _flush_result
+        Result___.new remove_instance_variable :@_was_error
       end
 
       Result___ = ::Struct.new :was_error
@@ -123,7 +130,7 @@ module NoDependenciesZerk
       end
 
       def __when_data
-        @client.receive_data_emission @emission_proc, @chanel
+        @client.receive_data_emission @emission_proc, @channel
         NIL  # EARLY_END
       end
 
@@ -152,6 +159,8 @@ module NoDependenciesZerk
         else fail
         end
       end
+
+      attr_reader :channel
     end
 
     # ==
@@ -211,7 +220,7 @@ module NoDependenciesZerk
           advance_one
           ACHIEVED_
         else
-          self._COVER_just_dont_result_in_anything
+          NIL  # #nodeps-coverpoint-1
         end
       end
 
@@ -230,8 +239,15 @@ module NoDependenciesZerk
       end
 
       def parse_primary  # exactly as [#ze-052.1] canon
-        s = head_as_is
-        md = PRIMARY_RX___.match s
+        if _parse_primary_softly_
+          ACHIEVED_
+        else
+          __when_malformed_primary
+        end
+      end
+
+      def _parse_primary_softly_
+        md = PRIMARY_RX___.match head_as_is
         if md
           _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
           send @_write_CPS, _
@@ -242,7 +258,7 @@ module NoDependenciesZerk
           send @_write_CPS, @default_primary_symbol
           ACHIEVED_
         else
-          __when_malformed_primary s
+          NIL  # #nodeps-coverpoint-2
         end
       end
 
@@ -290,21 +306,18 @@ module NoDependenciesZerk
       end
 
       def parse_positive_nonzero_integer
-        d = __integer_that { |d_| 0 < d_ }
-        d && advance_one
-        d
+        _integer_that { |d_| 0 < d_ }
       end
 
       def parse_non_negative_integer
-        d = __integer_that { |d_| -1 < d_ }
-        d && advance_one
-        d
+        _integer_that { |d_| -1 < d_ }
       end
 
-      def __integer_that & p
+      def _integer_that & p
         d = __head_as_integer
         if d
           if yield d
+            advance_one
             d
           else
             __when_integer_is_not d, caller_locations( 1, 1 )[ 0 ]
@@ -339,7 +352,8 @@ module NoDependenciesZerk
         end
       end
 
-      def __when_malformed_primary s
+      def __when_malformed_primary
+        s = head_as_is
         no_because do |y|
           y << "does not look like primary: #{ s.inspect }"
         end
@@ -349,15 +363,27 @@ module NoDependenciesZerk
 
       def advance_one
         if @_last_index == @_current_index
-          remove_instance_variable :@_array
-          remove_instance_variable :@_current_index
-          remove_instance_variable :@_last_index
+          close
           @no_unparsed_exists = true
           # can't freeze because the current primary may be set
         else
           @_current_index += 1
         end
         NIL
+      end
+
+      def close_and_release__  # #experiment
+        @is_closed = true
+        remove_instance_variable :@_last_index
+        [ remove_instance_variable( :@_current_index ),
+          remove_instance_variable( :@_array ) ]
+      end
+
+      def close
+        @is_closed = true
+        remove_instance_variable :@_array
+        remove_instance_variable :@_current_index
+        remove_instance_variable :@_last_index ; nil
       end
 
       # --
@@ -371,6 +397,7 @@ module NoDependenciesZerk
       end
 
       attr_reader(
+        :is_closed,
         :listener,
         :no_unparsed_exists,
       )
@@ -565,7 +592,7 @@ module NoDependenciesZerk
       class << self
         def call scn, prim_h, client
           define do |o|
-            o.argument_scanner scn
+            o.argument_scanner = scn
             o.add_primaries_injection prim_h, client
           end.flush_to_parse_primaries
         end
@@ -627,6 +654,10 @@ module NoDependenciesZerk
       end
 
       # -- NOTE the below might break out
+
+      def parse_primary_softly
+        @argument_scanner._parse_primary_softly_
+      end
 
       def parse_operator_softly  # see next method
         @argument_scanner._parse_operator_softly_
@@ -702,24 +733,46 @@ module NoDependenciesZerk
         # if there are any tokens remaining on the scanner,
         # parse them as primaries or whine appropriately
 
-        args = remove_instance_variable :@argument_scanner
-        a = remove_instance_variable :@_primary_injectors
-        h = remove_instance_variable :@_primaries
-        ok = true
-        until args.no_unparsed_exists
+        args = @argument_scanner
+        if args.no_unparsed_exists
+          _close_primaries
+          ACHIEVED_
+        else
+          ok = args.parse_primary
+          if ok
+            flush_to_lookup_current_and_parse_remaining_primaries
+          else
+            _close_primaries
+            ok
+          end
+        end
+      end
+
+      def flush_to_lookup_current_and_parse_remaining_primaries
+
+        # assume grammar has primaries, and one primary is parsed and on deck
+
+        ok = true ; args = @argument_scanner
+        a = @_primary_injectors ; h = @_primaries
+        begin
+          ok = h[ args.current_primary_symbol ]
+          ok ||= args.fuzzy_lookup_primary_or_fail h
+          ok || break
+          ok = a.fetch( ok[0] ).send ok[1]  # ok is a tuple
+          ok || break
+          args.no_unparsed_exists && break
           ok = args.parse_primary
           ok || break
-          tuple = h[ args.current_primary_symbol ]
-          if ! tuple
-            tuple = args.fuzzy_lookup_primary_or_fail h
-          end
-          if ! tuple
-            ok = tuple ; break
-          end
-          ok = a.fetch( tuple[0] ).send tuple[1]
-          ok || break
-        end
+          redo
+        end while above
+        _close_primaries
         ok
+      end
+
+      def _close_primaries
+        remove_instance_variable :@_primary_injectors
+        remove_instance_variable :@_primaries
+        NIL
       end
 
       def to_primary_symbol_scanner  # assume
@@ -757,7 +810,7 @@ module NoDependenciesZerk
         @operators.lookup_softly k
       end
       def to_normal_symbol_scanner
-        Scanner_via_Stream__.new @operators.to_normal_symbol_stream
+        Scanner_by__.new( & @operators.to_normal_symbol_stream )
       end
       def dereference k
         @operators.dereference k
@@ -862,9 +915,9 @@ module NoDependenciesZerk
 
     # = support
 
-    Scanner__ = ::Class.new
+    ScannerMethods__ = ::Module.new
 
-    class Scanner_via_Array < Scanner__
+    class Scanner_via_Array ; include ScannerMethods__
 
       class << self
         def call d=nil, a, & p
@@ -913,7 +966,7 @@ module NoDependenciesZerk
       )
     end
 
-    class Mapped_Scanner__ < Scanner__
+    class Mapped_Scanner__ ; include ScannerMethods__
 
       def initialize p, scn
         @_proc = p
@@ -933,13 +986,13 @@ module NoDependenciesZerk
       end
     end
 
-    class Scanner_via_Stream__ < Scanner__
-      def initialize st
-        x = st.call  # same as `.gets`
+    class Scanner_by__ ; include ScannerMethods__
+      def initialize & p
+        x = p.call  # same as `.gets`
         if x
           @__current_token = x
           @_current_token = :__current_token_normally
-          @_stream = st
+          @_stream = p
         else
           @no_unparsed_exists = true
         end
@@ -967,7 +1020,7 @@ module NoDependenciesZerk
       )
     end
 
-    class Scanner__
+    module ScannerMethods__
 
       def oxford_join buff, ult, sep  # assume some
         buff << gets_one
@@ -981,6 +1034,31 @@ module NoDependenciesZerk
           buff << ult << s
         end
         buff
+      end
+
+      def concat_scanner tail_scn
+        if no_unparsed_exists
+          tail_scn
+        elsif tail_scn.no_unparsed_exists
+          self
+        else
+          # (we haven't generalized this for N scanners yet for lack of interest)
+          concat_by = -> scn, & after do
+            -> do
+              x = scn.gets_one
+              if scn.no_unparsed_exists
+                after[]
+              end
+              x
+            end
+          end
+          p = concat_by.call self do
+            p = concat_by.call tail_scn do
+              p = -> { NIL }  # EMPTY_P_
+            end
+          end
+          Scanner_by__.new() { p[] }
+        end
       end
 
       def expand_by & expand_by
@@ -997,14 +1075,11 @@ module NoDependenciesZerk
           if scn.no_unparsed_exists
             ( p = advance )[]
           else
-            _wahoo = scn.gets_one
-            _wahoo
+            scn.gets_one
           end
         end
         p = advance
-        Scanner_via_Stream__.new( -> do
-          p[]
-        end )
+        Scanner_by__.new(){ p[] }
       end
 
       def map_by & p

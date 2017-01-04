@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  module CLI
 
     Section = ::Module.new
 
-    class Section::Expression
+    class Section::Expression  # :[#061.1].
 
       # use the same one for the lifetime of your screen rendering
 
@@ -139,7 +139,7 @@ module Skylab::Brazen
               cached_tuple = nil
               express_tuple[ tuple_ ]
               p = express_tuple
-              NIL_
+              NIL
             end
           else
             p = express_tuple
@@ -264,7 +264,7 @@ module Skylab::Brazen
         end
 
         @_line_yielder << _
-        NIL_
+        NIL
       end
 
       def _express_tight_first_line line
@@ -274,11 +274,11 @@ module Skylab::Brazen
         header = @_header_s
 
         _ = @_expression_agent.calculate do
-          "#{ hdr header }#{ HEADER_COLON__ }#{ line }"  # :[#072].
+          "#{ hdr header }#{ HEADER_COLON__ }#{ line }"  # :[#061.3].
         end
 
         @_line_yielder << _
-        NIL_
+        NIL
       end
 
       def __raw
@@ -324,7 +324,7 @@ module Skylab::Brazen
       # exactly to the expression of one screen (or super-section, document,
       # etc.), because visual separation between sections is important and
       # only relevant in the context of one such node (perhaps by definition,
-      # see [#002]/figure-3)). (or call `clear` between "screens" to re-use
+      # see [#br-002]/figure-3)). (or call `clear` between "screens" to re-use
       # this same boundarizer.)
 
       def initialize y
@@ -343,7 +343,7 @@ module Skylab::Brazen
           @_touch_boundary = EMPTY_P_
           p = when_at_top
 
-          NIL_
+          NIL
         end
 
         when_at_top = -> s do
@@ -359,7 +359,7 @@ module Skylab::Brazen
           end
 
           y << s
-          NIL_
+          NIL
         end
 
         has_visible_content = -> s do
@@ -407,3 +407,4 @@ module Skylab::Brazen
     end
   end
 end
+# #history: used to live in [br]

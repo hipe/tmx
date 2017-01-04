@@ -58,9 +58,13 @@ module Skylab::Brazen::TestSupport
 
       x_a.push :state, _state, :stream, :e
 
-      _cls = TS_.lib_( :CLI_support_expect_section )::Help_Screen_State
+      _cls = This_lib___[]::Help_Screen_State
 
       _cls.via_iambic x_a
+    end
+
+    This_lib___ = Lazy_.call do
+      Home_::Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early
     end
 
     def expect_section_ k, exp  # assume `state_`

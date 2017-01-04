@@ -15,7 +15,7 @@ module Skylab::Slicer::TestSupport
       @exitstatus.should eql :hello_from_slicer
     end
 
-    it "[tmx] integration" do
+    it "[tmx] integration", TMX_CLI_integration: true do
 
       Home_::Autoloader_.require_sidesystem :TMX
 

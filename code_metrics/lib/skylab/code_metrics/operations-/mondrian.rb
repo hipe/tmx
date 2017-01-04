@@ -166,8 +166,7 @@
       def __receive_emission * chan, & msg_p
 
         refl = Interface__::CLI_Express_via_Emission.call_by do |o|
-          o.channel = chan
-          o.emission_proc = msg_p
+          o.emission_proc_and_channel msg_p, chan
           o.expression_agent_by = method :_expression_agent
           o.signal_by = method :__receive_signal
           o.stderr = @stderr

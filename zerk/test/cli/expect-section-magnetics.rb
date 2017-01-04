@@ -1,80 +1,412 @@
-module Skylab::Brazen
+module Skylab::Zerk::TestSupport
 
-  class CLI::Isomorphic_Methods_Client
+  module CLI::ExpectSectionMagneticsSupport__  # #[#sl-155]
 
-    class Models_::Help_Screen
+  module CLI::Expect_Section_Magnetics  # :[#054.2]
 
-      # the second of four facilities, this is :[#106] of #[#106] (sic). see.
+    # the second ever in the #[#054] strain, this was the first ever
+    # to parse a help screen with a state machine. the scope of the file
+    # has been broadened to become general support for the siblings.
+
+    module CommonBranchUsageLineIndex_via_Line
+
+      # parse a line like this:
+      #
+      #     "shipple dipple { homunculous | wiff-wub | zeep } !@#$"
+      #
+      # into a structure like this:
+      #
+      #     index.head  # => "shipple dipple "
+      #     index.tail  # => " !@#$"
+      #
+      #     index.item_index  # =>
+      #       { homunculous:  0,
+      #         wiff_wub:     1,
+      #         zeep:         2, }
+
+      class << self
+        def call line
+          md = /\A(?<A>[^{]+)\{ (?<B>[^}]*) \}(?<C>[^{}]*)\z/.match line
+          # ..
+          CommonBranchUsageLine___.new( * md.captures )
+        end
+        alias_method :[], :call
+      end  # >>
+
+      class CommonBranchUsageLine___
+
+        def initialize head, mid, tail
+          @_item_index = :__item_index_initially
+          @head = head ; @mid = mid ; @tail = tail
+        end
+
+        def item_index
+          send @_item_index
+        end
+
+        def __item_index_initially
+          h = {}
+          @mid.split( ' | ' ).each_with_index do |s, d|
+            h[ Normal_symbol_via_slug__[ s ] ] = d
+          end
+          @__item_index = h.freeze
+          @_item_index = :__item_index_normally
+          send @_item_index
+        end
+
+        def __item_index_normally
+          @__item_index
+        end
+
+        attr_reader :head, :mid, :tail
+      end
+    end
+
+    module CommonOperatorUsageLineIndex_via_Line
+
+      # parse a line like this:
+      #
+      #     "foobie doobie ploobie [ -wiff-wang ..] [ -wib ..] [ -x ..] .."
+      #
+      # into a structure like this:
+      #
+      #     index.head  # => "foobie doobie ploobie "
+      #
+      #     index.item_index  # =>
+      #       { wiff_wang: #<struct offset=0, had_ellipsis=true>,
+      #         wib:       #<struct offset=1, had_ellipsis=false>,
+      #         x:         #<struct offset=2, had_ellipsis=true> }
+      #
+      #     index.had_ellipsis  # => true
 
       class << self
 
-        def write_to_array_sections_from_line_stream a, st
+        def call line
 
-          Parse_sections___[ a, st ]
+          md = %r(\A[^\[]+).match line
+          _head = md[0]
+          _tail = md.post_match
+
+          s_a = _tail.split %r((?<=\])[ ])   # "[ -jif-jaf ..] [ -wib ..] [ -xx ..] .."
+          if '..' == s_a.last  # DOT_DOT_
+            had = true
+            s_a.pop
+          end
+          h = {}
+          rx = /\A\[ -(?<slug>[-a-z0-9]+) (?<el>\.\.)?\]\z/
+          s_a.each_with_index do |s, d|
+            md = rx.match s
+            if md.offset(:el)[0]
+              _had = true
+            end
+            _k = Normal_symbol_via_slug__[ md[:slug] ]
+            h[ _k ] = Item___.new d, _had
+          end
+          CommonBranchUsageLine___.new had, h, _head
         end
+        alias_method :[], :call
       end  # >>
 
-      Models = ::Module.new
-      Models_ = ::Module.new
+      class CommonBranchUsageLine___
 
-      class Models::Description
-
-        class << self
-
-          def of_instance inst
-
-            if inst.class.const_defined? :DESCRIPTION_BLOCK_
-              new inst
-            else
-              THE_EMPTY_DESCRIPTION___
-            end
-          end
-          private :new
-        end  # >>
-
-        def initialize inst
-          @__description_proc = inst.class.const_get :DESCRIPTION_BLOCK_
+        def initialize had, h, head
+          @had = had
+          @head = head
+          @item_index = h
         end
-
-        def instance_description_proc
-          @__description_proc  # (hi.)
-        end
-      end
-
-      THE_EMPTY_DESCRIPTION___ = class Models_::The_Empty_Description____
-
-        def instance_description_proc
-          NIL_
-        end
-
-        self
-      end.new
-
-      class Models_::Section
 
         attr_reader(
-          :header,
-          :lines,
+          :had_ellipsis,
+          :head,
+          :item_index,
+        )
+      end
+
+      Item___ = ::Struct.new :offset, :had_ellipsis
+    end
+
+    class CommonItemsSection_via_LineStream < Common_::Actor::Monadic  # 1x
+
+      # parse the help screens that are newest at the time of writing -
+      # the only tricky thing we do here is that in effect we write the
+      # grammar as it's being parsed - we don't know the tab stops until
+      # a first line with description is read..
+
+      def initialize st
+        @line_stream = st
+      end
+
+      def execute
+
+        st = remove_instance_variable :@line_stream
+        # ..
+        _scn = st.flush_to_polymorphic_stream
+        _sm = __build_state_machine
+        _memo = _sm.against _scn, Memo___.new
+        _memo.finish
+      end
+
+      def __build_state_machine
+
+
+        o = Home_.lib_.basic::State::Machine.begin_definition
+
+        o.add_state(
+          :beginning,
+          :can_transition_to, [
+            :only_header_line,
+          ],
         )
 
-        attr_writer(
-          :header,
+        o.add_state(
+          :only_header_line, :entered_by_regex, %r(\A(?<header>[^:]+):\z),
+          :on_entry, -> mu, md do
+            mu.__receive_header_ md
+            :first_item_line
+          end,
         )
 
-        def initialize header, lines
+        _first_item_line_rx = %r(\A
+          (?<margin>[ ]{2,})
 
-          @header = header
-          @lines = lines
+          (?<moniker> (?:(?![ ]{2}).)+ )
+
+          (?<spacer>[ ]{2,})
+
+          (?<desc1>[^ ].*)
+        $)x
+
+        same = [
+          :additional_desc_line,
+          :blank_line,
+          :nonfirst_item_line,
+          :ending,
+        ]
+
+        use_additional_desc_rx = nil
+        use_nonfirst_item_rx = nil
+        setup_shop = -> md do
+          setup_shop = nil
+
+          beg, en = md.offset( :spacer )
+
+          use_nonfirst_item_rx = %r(\A
+            (?<column_one>.{#{ beg }})
+            [ ]{2}
+            (?<desc1>[^ ].*)
+          $)x
+
+          use_additional_desc_rx = %r(\A
+            [ ]{#{ en }}
+            (?<desc>[^ ].*)
+          $)x
+
         end
 
-        def any_nonzero_length_line_a
-          if @lines.length.nonzero?
-            @lines
-          end
+        o.add_state(
+          :first_item_line, :entered_by_regex, _first_item_line_rx,
+          :on_entry, -> mu, md do
+            setup_shop[ md ]
+            mu._receive_column_one_and_desc_ md[:moniker], md[:desc1]
+            NOTHING_
+          end,
+          :can_transition_to, same,
+        )
+
+        _additional_desc_rx = Matcher__.new do |s|
+          use_additional_desc_rx.match s
+        end
+
+        o.add_state(
+          :additional_desc_line, :entered_by_regex, _additional_desc_rx,
+          :on_entry, -> mu, md do
+            mu.__receive_additional_description_content_ md[:desc]
+            NOTHING_
+          end,
+          :can_transition_to, [
+            :additional_desc_line,
+            :blank_line,
+            :nonfirst_item_line,
+          ],
+        )
+
+        o.add_state(
+          :blank_line, :entered_by_regex, %r(\A$),
+          :on_entry, -> _mu, _md do
+            # you could somehow "close" the item, but why?
+            # separator lines are cosmetic and not guaranteed
+            NOTHING_
+          end,
+          :can_transition_to, [
+            :nonfirst_item_line,
+          ],
+        )
+
+        _nonfirst_item_rx = Matcher__.new do |s|
+          use_nonfirst_item_rx.match s
+        end
+
+        o.add_state(
+          :nonfirst_item_line, :entered_by_regex, _nonfirst_item_rx,
+          :on_entry, -> mu, md do
+            mu._receive_column_one_and_desc_ md[:column_one], md[:desc1]
+            NOTHING_
+          end,
+          :can_transition_to, same,
+        )
+
+        o.add_state(
+
+          :ending,
+          :entered_by, -> scn do
+            if scn.no_unparsed_exists
+              # any state that indicated this as a possible next
+              # state may enter without barrier from this state
+              :_trueish_
+            else
+              # (this sub-state might indicate that a parse error is about to happen..)
+              UNABLE_
+            end
+          end,
+
+          :on_entry, -> mu, st do
+            NOTHING_  # you must declare that you have no next state
+          end,
+        )
+
+        o.finish
+      end
+
+      # ==
+
+      class Memo___
+
+        def initialize
+          @_h = {}
+          @_items = []
+          @_rcoad = :__receive_first_ever_coad
+          @_rh = :__receive_header_once_ever
+        end
+
+        def __receive_header_ md
+          send @_rh, md
+        end
+
+        def __receive_header_once_ever md
+          remove_instance_variable :@_rh
+          @__header_md = md ; nil
+        end
+
+        def _receive_column_one_and_desc_ col_A, desc
+          send @_rcoad, col_A, desc
+        end
+
+        def __receive_first_ever_coad col_A, desc
+          _init_item col_A, desc
+          @_rcoad = :__receive_subsequent_coad ; nil
+        end
+
+        def __receive_subsequent_coad col_A, desc
+          _swallow_item
+          _init_item col_A, desc
+        end
+
+        def _init_item col_A, desc
+          @_col_A = col_A ; @_desc_pieces = [ desc ] ; nil
+        end
+
+        def __receive_additional_description_content_ s
+          @_desc_pieces.push s ; nil
+        end
+
+        def finish
+          _swallow_item
+          ItemSection___.new(
+            remove_instance_variable( :@_h ),
+            remove_instance_variable( :@__header_md ),
+            remove_instance_variable( :@_items ),
+          )
+        end
+
+        def _swallow_item
+
+          moniker = remove_instance_variable( :@_col_A ).strip
+
+          _md = %r(\A-*).match moniker
+
+          _key = Key_via_moniker__[ _md.post_match ]
+
+          _ary = remove_instance_variable :@_desc_pieces
+
+          @_h[ _key ] = @_items.length
+          @_items.push Item___.new _ary
+          NIL
         end
       end
 
-      # <-
+      # ==
+
+      class ItemSection___
+
+        def initialize h, md, a
+          @item_offset_via_key = h
+          @_header_md = md
+          @items = a
+        end
+
+        def label_content
+          @_header_md[ :header ]
+        end
+
+        def label_line
+          @_header_md.string
+        end
+
+        attr_reader(
+          :item_offset_via_key,
+          :items,
+        )
+      end
+
+      # ==
+
+      class Item___
+
+        def initialize s_a
+          @desc_string_array = s_a
+        end
+
+        attr_reader(
+          :desc_string_array,
+        )
+      end
+
+      # ==
+    end
+
+    module SectionsOldSchool_via_LineStream
+
+      # the second of five facilities, this is :[#054.2] of #[#054]
+      # very short, very opaque, somewhat intriguing
+
+      # #feature-island, not used, but #legacy-coverpoint-1:
+
+      # we tried to use this for new work (another state machine in
+      # this file) - although this was doing *something* (and apparently
+      # working as advertised), it was not the parse we wanted. yes we
+      # should probably archive it..
+
+      class << self
+        def call st
+          Require_olschool_state_machine__[]
+          Parse_sections___[ [], st ]
+        end
+        alias_method :[], :call
+      end  # >>
+
+      # ==
+  Require_olschool_state_machine__ = Lazy_.call do
+    # (we might need to build the below once per parse if ..)
 
     state_h = { }  # das state machine
 
@@ -97,7 +429,7 @@ module Skylab::Brazen
     Parse_sections___ = -> sections, lines do
       stat = state_h[ :initial ]  # (var meaning change!!)
       section = line = nil
-      push = -> { sections << ( section = Models_::Section.new nil, [] )  }
+      push = -> { sections << ( section = Section___.new nil, [] )  }
       trigger_h = {
         desc:    -> { push[] ; section.lines << [ :line, line ] },
         section: -> { push[] ; section.header = line },
@@ -114,12 +446,49 @@ module Skylab::Brazen
         end
         trigger_h.fetch( name_i ).call
         stat = state_h.fetch name_i
-      end ; nil
+      end
+      sections
     end
-
-    # ~ end legacy
-
-  # ->
-    end
+    NIL
   end
+      # ==
+
+      # ==
+
+      Section___ = ::Struct.new :header, :lines  # 1 of #[#054.A]
+
+      # ==
+
+    end  # end magnet
+  end  # magnetics
+
+  # (you're in support now)
+
+    # ==
+
+    Key_via_moniker__ = -> moniker do
+      if CLEAN_RX___ =~ moniker
+        Normal_symbol_via_slug__[ moniker ]
+      else
+        moniker
+      end
+    end
+
+    Normal_symbol_via_slug__ = -> s do
+      s.gsub( DASH_, UNDERSCORE_ ).intern
+    end
+
+    # ==
+
+    class Matcher__ < ::Proc
+      alias_method :match, :call
+    end
+
+    # ==
+
+    CLEAN_RX___ = /\A[-a-z0-9]+\z/i
+
+    # ==
+
+  end  # support
 end

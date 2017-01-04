@@ -10,7 +10,8 @@
              the actor at all to pollute the namespace of builder
              methods. (edit: probably throu using attrs alone, no actor)
 
-[#034]       track redundant or near-redudnant polymorphic stream
+[#034] #hole ( #moved-to: [#co-xxx] )
+[#034] #hole ( #was: track redundant or near-redundant polymorphic stream )
 
 [#033]       iambics..
 

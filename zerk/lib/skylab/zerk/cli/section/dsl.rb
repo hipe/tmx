@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  module CLI
 
-    class Section::DSL  # :[#058].
+    class Section::DSL  # :[#061.2].
 
       Require_fields_lib_[]
 
@@ -14,7 +14,7 @@ module Skylab::Brazen
 
         @_has_open_section = false
         @_invex = invex
-        @_num_lines = Here_::MAX_DESC_LINES
+        @_num_lines = MAX_DESC_LINES__
       end
 
       def yield * x_a
@@ -40,7 +40,7 @@ module Skylab::Brazen
         if do_it
           process_polymorphic_stream_fully st
         end
-        NIL_
+        NIL
       end
 
     private
@@ -56,7 +56,7 @@ module Skylab::Brazen
           @_has_open_section = true
           @_section = Section___.new( @_st, @_num_lines, @_invex ).execute
         end
-        NIL_
+        NIL
       end
 
     public
@@ -73,7 +73,7 @@ module Skylab::Brazen
         section = remove_instance_variable :@_section
         @_last_x = section.flush
         @_has_open_section = false
-        NIL_
+        NIL
       end
 
       # ==
@@ -161,7 +161,7 @@ module Skylab::Brazen
         def descriptor=
           _atr = @_st.gets_one
           @description_proc = Field_::Has_description[ _atr ]  # ABUSE
-          NIL_
+          NIL
         end
 
         def description=
@@ -201,7 +201,7 @@ module Skylab::Brazen
           # (rewriting this common method as bespoke)
           @_st = st
           via_polymorphic_stream_parse_fully
-          NIL_
+          NIL
         end
 
         def via_polymorphic_stream_parse_fully
@@ -209,9 +209,16 @@ module Skylab::Brazen
             send :"#{ @_st.gets_one }="
           end until @_st.no_unparsed_exists
           remove_instance_variable :@_st
-          NIL_
+          NIL
         end
       end
+
+      # ==
+
+      MAX_DESC_LINES__ = 2  # for now dup
+
+      # ==
     end
   end
 end
+# #history: moved here from [br]

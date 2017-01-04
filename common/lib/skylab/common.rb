@@ -381,7 +381,7 @@ module Skylab::Common
     end
   end
 
-  class Polymorphic_Stream  # mentor :[#fi-034]
+  class Polymorphic_Stream  # :[#069], #[#069]
 
     class << self
 
@@ -549,13 +549,11 @@ module Skylab::Common
     self
   end
 
-  module THE_EMPTY_POLYMORPHIC_SCANNER___
-    class << self
-      def no_unparsed_exists
-        true
-      end
+  module THE_EMPTY_POLYMORPHIC_SCANNER___ ; class << self
+    def no_unparsed_exists
+      true
     end
-  end
+  end ; end
 
   # knownnesses (see [#004])
 

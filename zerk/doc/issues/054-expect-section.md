@@ -1,4 +1,4 @@
-# fun with help screen parsing :[#106]
+# fun with help screen parsing :[#054]
 
 ## intro
 
@@ -8,13 +8,13 @@ help screens.
 
 at writing we know of at least four:
 
-  - born 2016-04-02 [#ze-054]  zerk/test/non-interactive-cli/help-screens.rb
+  - born 2016-04-02 [#here.4]  was: zerk/test/non-interactive-cli/help-screens.rb
 
-  - born 2015-07-07 [#tmx-007] tmx/lib/skylab/tmx/modalities/cli/input-adapters/help-screen.rb
+  - born 2015-07-07 [#tmx-021]      tmx/lib/skylab/tmx/modalities/cli/input-adapters/help-screen.rb
 
-  - born 2013-11-15 [#file]    brazen/lib/skylab/brazen/cli/isomorphic-methods-client/models-/help-screen.rb
+  - born 2013-11-15 [#here.2]  was: brazen/lib/skylab/brazen/cli/isomorphic-methods-client/models-/help-screen.rb
 
-  - born 2013-09-21 [#045]     brazen/test/cli-support/expect-section.rb
+  - born 2013-09-21 [#here.1]  was: brazen/test/cli-support/expect-section.rb
 
 
 despite this, this node was preserved during the sunsetting [hl] largely

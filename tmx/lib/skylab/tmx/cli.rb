@@ -21,6 +21,7 @@ module Skylab::TMX
         @_emission_handler_methods = nil
         @listener = method :__receive_emission
         @_args = __argument_scanner_via_argv_and_listener argv
+        @__presumably_real_ARGV = argv
         @selection_stack = [ __build_root_frame ]
 
         @sin = sin
@@ -37,7 +38,7 @@ module Skylab::TMX
       end
 
       def __build_root_frame
-        RootFrame___.new do
+        RootFrame___.new @_args do
           Zerk_lib_[]::Models::Didactics.via_participating_operator self
         end
       end
@@ -80,18 +81,29 @@ module Skylab::TMX
       def __bound_call
 
         o = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
+
           fi.argument_scanner = @_args
+
           fi.add_hash_based_operators_injection(
             OPERATIONS__, :__bound_call_via_intrinsic_operation )
+
+          fi.add_primaries_injection PRIMARIES___, self
         end
 
         if @_args.no_unparsed_exists
           Zerk_lib_[]::ArgumentScanner::When::No_arguments[ o ]
         elsif o.parse_operator_softly
           lu = o.flush_to_lookup_operator
-          lu and send lu.injector, lu.mixed_business_value
-        elsif o._PARSE_PRIMARY_SOFTLY
-          __when_looks_like_primary
+          lu && send( lu.injector, lu.mixed_business_value )
+        elsif o.parse_primary_softly
+
+          # (life is easier because there are no universal primaries..)
+          # (really, help is an operation that looks like a primary.)
+
+          ok = o.flush_to_lookup_current_and_parse_remaining_primaries
+          ok && self._SANITY__expected_early_exit_from_toplevel_primary
+          ok
+
         else
           self._COVER_ME__when_token_looks_totally_strange__
         end
@@ -122,8 +134,6 @@ module Skylab::TMX
           __whine_about_no_such_operator_DONE
         end
       end
-
-
 
       def __when_no_args
 
@@ -174,6 +184,7 @@ module Skylab::TMX
         test_all: :__describe_test_all,
         reports: :__describe_reports,
         map: :__describe_map,
+        ping: :__describe_ping,
       }
 
       OPERATIONS__ = {
@@ -210,7 +221,7 @@ module Skylab::TMX
 
         arg_scn = _multimode_argument_scanner_by do |o|
 
-          o.user_scanner @_args
+          o.user_scanner _user_scanner
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
@@ -311,7 +322,7 @@ module Skylab::TMX
 
           o.default_primary :execute
 
-          o.user_scanner @_args
+          o.user_scanner _user_scanner
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-A OPEN
 
@@ -370,7 +381,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-B OPEN
 
-          o.user_scanner @_args
+          o.user_scanner _user_scanner
 
           o.emit_into @listener
         end
@@ -384,6 +395,10 @@ module Skylab::TMX
 
       def __bound_call_for_ping
         Common_::Bound_Call[ nil, self, :__do_ping ]
+      end
+
+      def __describe_ping y
+        y << "(a minimal operation to test wiring)"
       end
 
       def __do_ping
@@ -402,7 +417,7 @@ module Skylab::TMX
         _init_selective_listener
 
         _as = _multimode_argument_scanner_by do |o|
-          o.user_scanner @argv
+          o.user_scanner _user_scanner
           o.emit_into @listener
         end
 
@@ -512,51 +527,7 @@ module Skylab::TMX
       # -- support for expressing results (our version of [#ze-025])
 
       def _express_help
-
-        top = @selection_stack.last
-        is_root = 1 == @selection_stack.length
-
-        if ! is_root
-          as = top.argument_scanner
-          # #changed-recently:  #todo
-          HELP_RX =~ as.head_as_is || self._CHANGED_RECENTLY
-          as.advance_one
-        end
-
-        di = top.to_didactics  # buckle up
-
-        # -- derive things from the didactics
-
-        _help_screen_mod = CLI_support_[]::When::Help.const_get(
-          di.is_branchy ? :ScreenForBranch : :ScreenForEndpoint, false )
-
-        desc_reader = di.description_proc_reader
-
-        items = di.item_normal_tuple_stream_by[]
-
-        # -- maybe alter things by the argument scanner
-
-        if ! is_root
-          desc_reader = as.altered_description_proc_reader_via desc_reader
-          items = as.altered_normal_tuple_stream_via items
-        end
-
-        # --
-
-        _help_screen_mod.express_into @stderr do |o|
-
-          o.item_normal_tuple_stream items
-
-          o.express_usage_section Program_name_via_client___[ self ]
-
-          o.express_description_section di.description_proc
-
-          o.express_items_sections desc_reader
-        end
-
-        @exitstatus = SUCCESS_EXITSTATUS__
-
-        NOTHING_  # stop parsing without failing
+        CLI::When_::Help[ self ]
       end
 
       # ~ (near) boilerplate for help
@@ -571,7 +542,7 @@ module Skylab::TMX
 
       def description_proc_reader
         -> sym do
-          method OPERATION_DESCRIPTIONS___.fetch sym
+          method OPERATION_DESCRIPTIONS___.fetch sym  # or don't fetch
         end
       end
 
@@ -688,34 +659,85 @@ module Skylab::TMX
         remove_instance_variable :@__test_directory_entry_name_by
       end
 
+      def _user_scanner
+        scn = @_args
+        if scn.no_unparsed_exists
+          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+        else
+          d, a = scn.close_and_release__
+          scn.freeze  # experiment
+          Common_::Polymorphic_Stream.via_start_index_and_array d, a
+        end
+      end
+
       # --
 
       def __receive_emission * chan, & em_p
 
+        _HORRIBLE = -> do
+
+          # this is #open [#007.A] (related) until we make maximal expags
+          # subclass minimal expags, we have to guess at which is right.
+          # if such a time comes, we could just only ever use maximal.
+          # or keep this craziness, but this just ain't right
+
+          if 1 == @selection_stack.length
+            __expression_agent_for_minimal
+          else
+            __expression_agent_for_maximal
+          end
+        end
+
         expr = Interface__::CLI_Express_via_Emission.define do |o|
-          o.emission_proc = em_p
-          o.channel = chan
+
+          o.expression_agent_by = -> do
+            _HORRIBLE[]
+          end
+
+          o.emission_proc_and_channel em_p, chan
           o.emission_handler_methods = @_emission_handler_methods
           o.client = self
-            # emissions of `emission_handler_methods`, `data`, `expression_agent`
+            # emissions of `emission_handler_methods`, `data`
         end
 
         @_current_emission_expression = expr
 
         rslt = expr.execute
         if rslt && rslt.was_error
-          if :parse_error == chan[2]
-            _invite_to_general_help
-          end
-          _failed
+          __when_result_was_error chan
         end
 
         NIL
       end
 
+      def __when_result_was_error chan
+
+        case chan[2]
+        when :parse_error
+          _invite_to_general_help
+
+        when :primary_parse_error
+          # :#coverpoint-1-F: for now, on a primary parse error, we invite
+          # to a help IFF it presumably belongs to the root. in future etc.
+          if 1 == @selection_stack.length
+            _invite_to_general_help  # #coverpoint-1-F
+          end
+        end
+
+        _failed ; nil
+      end
+
       def invite_to_general_help_and_failed
         _invite_to_general_help
         _failed
+      end
+
+      def __expression_agent_for_maximal
+        Zerk_lib_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
+      end
+
+      def __expression_agent_for_minimal
+        Interface__::CLI_ExpressionAgent.instance
       end
 
       def _invite_to_general_help
@@ -725,14 +747,6 @@ module Skylab::TMX
 
       def get_program_name
         ::File.basename @program_name_string_array.last
-      end
-
-      def expression_agent
-        # WOOP pain ahead
-        if false
-        Zerk_lib_[]::NonInteractiveCLI::ArgumentScannerExpressionAgent.instance
-        end
-        Interface__::CLI_ExpressionAgent.instance
       end
 
       def _failed
@@ -766,7 +780,7 @@ module Skylab::TMX
         table_schema: :__receive_table_schema,
       }
 
-      def _push_frame  # exactly [#ze-008] #note-1, #note-2
+      def _push_frame  # exactly [#ze-055] #note-1, #note-2
 
         _frame = NonRootFrame___.new @selection_stack.last.didactics_by do |fr|
           yield( ::Enumerator::Yielder.new do |k, x|
@@ -792,10 +806,15 @@ module Skylab::TMX
         # 2x tagged by :#spot-3 we hackishly rewrite the *REAL* `ARGV`
         # (the global array) to pass parameters into rspec EEW
 
-        self._NEEDS_REWRITING
+        real = remove_instance_variable :@__presumably_real_ARGV
 
-        _argv_scn = remove_instance_variable :@_args
-        _argv_scn.array_for_read.replace s_a
+        scn = remove_instance_variable :@_args
+        if ! scn.is_closed
+          _, a = scn.close_and_release__
+          a.object_id == real.object_id || self._SANITY
+        end
+
+        real.replace s_a
         NIL
       end
 
@@ -856,29 +875,6 @@ module Skylab::TMX
     Describe_slice___ = -> y do
       y << "experimental \"fun\" version of -page-by."
       y << "(\"-help\" as its first argument shows modifier-specific help)"
-    end
-
-    # ==
-
-    name_stream_via_selection_stack = nil
-
-    Program_name_via_client___ = -> client do
-
-      buffer = client.get_program_name
-      st = name_stream_via_selection_stack[ client.selection_stack ]
-      begin
-        nm = st.gets
-        nm || break
-        buffer << SPACE_ << nm.as_slug
-        redo
-      end while nil
-      buffer
-    end
-
-    name_stream_via_selection_stack = -> ss do
-      Common_::Stream.via_range( 1  ... ss.length ).map_by do |d|
-        ss.fetch( d ).name
-      end
     end
 
     Describe_help__ = -> y do
@@ -957,7 +953,8 @@ module Skylab::TMX
 
     class RootFrame___
 
-      def initialize & p
+      def initialize scn, & p
+        @argument_scanner = scn
         @didactics_by = p
       end
 
@@ -966,6 +963,7 @@ module Skylab::TMX
       end
 
       attr_reader(
+        :argument_scanner,
         :didactics_by,
       )
     end

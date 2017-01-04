@@ -61,7 +61,7 @@ module Skylab::Snag::TestSupport
       _expect_common_finish
     end
 
-    it "[tmx] integration (stowaway)" do
+    it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
 
       Home_::Autoloader_.require_sidesystem :TMX
 

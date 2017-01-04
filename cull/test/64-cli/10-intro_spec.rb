@@ -34,7 +34,7 @@ module Skylab::Cull::TestSupport
       @exitstatus.should eql :hello_from_cull
     end
 
-    it "[tmx] integration" do
+    it "[tmx] integration", TMX_CLI_integration: true do
 
       Home_::Autoloader_.require_sidesystem :TMX
 

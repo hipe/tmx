@@ -64,6 +64,29 @@ module Skylab::TMX::TestSupport
         NIL
       end
 
+      # -- setup structures for assertion
+
+      def expect_common_help_screen_sections_by_
+
+        sct = HelpScreenCommonThreeSections___.new
+
+        o = Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early.define
+
+        yield sct, o
+
+        spy = o.finish.to_spy_under self
+        io = spy.spying_IO
+        expect_each_on_stderr_by do |line|
+          io.puts line
+          NIL  # keep parsing
+        end
+        expect_succeeded  # big money
+
+        spy.finish
+
+        sct
+      end
+
       # -- assert
 
       def expect_failed_normally_
@@ -85,6 +108,11 @@ module Skylab::TMX::TestSupport
         Home_::CLI
       end
     end
+
+    # ==
+
+    HelpScreenCommonThreeSections___ =
+      ::Struct.new :usage, :description, :items
 
     # ==
 

@@ -1,6 +1,8 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  module CLI_Support::Section::DSL
+  # (currently CLI::Section is produced by the node loader)
+
+  module CLI::Section::DSL
 
     def self.[] tcc
       tcc.include self
@@ -25,11 +27,13 @@ module Skylab::Brazen::TestSupport
       end
 
       def begin_invex_ sta
-        Invex___.new sta, common_expag_, self
+        _expag = Home_.lib_.brazen::API.expression_agent_instance
+        # we need it because `highlight`
+        Invex___.new sta, _expag, self
       end
 
       def subject_class_
-        Home_::CLI_Support::Section::DSL
+        Subject_library__[]::DSL
       end
 
       def _My_State
@@ -69,7 +73,7 @@ module Skylab::Brazen::TestSupport
           line_a.push Line___.new s
         end
 
-        @_vendor = Home_::CLI_Support::Section::Expression.new _y, ex
+        @_vendor = Subject_library__[]::Expression.new _y, ex
       end
 
       def express_section * x_a, & x_p
@@ -165,5 +169,12 @@ module Skylab::Brazen::TestSupport
     end
 
     # ==
+
+    Subject_library__ = -> do
+      Home_::CLI::Section
+    end
+
+    # ==
   end
 end
+# #history: moved here from [br]

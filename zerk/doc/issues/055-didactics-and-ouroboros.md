@@ -1,6 +1,4 @@
-#==FROM
-
-# didactics conceived :[#ze-055]  STOWED AWAY HERE
+# didactics :[#055]
 
 ## objective & scope
 
@@ -166,7 +164,15 @@ mainly this was conceived so that we can allow our help screen
 system to recurse but not have to re-architect our code; and as
 an experiment of course.
 
-it's worth mentioning this is a throwback to [#br-098] "ouroboros".
+
+
+
+## connection to history
+
+it's worth mentioning that this is a throwback to a much older
+idea called "ouroboros". in fact we have spliced this new content
+into the ancient document about the same, whose original content
+now follows:
 
 
 
@@ -189,7 +195,7 @@ whether they are the root or a child node of a tree.
 ## about this document
 
 this document bridges together content whose sources are years apart. as
-it stands now, it is not yet fully integrated into one seemless
+it stands now, it is not yet fully integrated into one seamless
 narrative. not all the dots below are connected as they should be..
 
 

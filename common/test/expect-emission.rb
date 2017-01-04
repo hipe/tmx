@@ -302,6 +302,8 @@ module Skylab::Common::TestSupport
         tc.send DEBUGGING_EXPEV_METHOD__
       elsif tc.respond_to? BLACK_AND_WHITE_EXPEV_METHOD__
         tc.send BLACK_AND_WHITE_EXPEV_METHOD__
+      elsif tc.respond_to? EXPEV_METHOD__
+        tc.send EXPEV_METHOD__
       else
         Black_and_white_expression_agent__[]
       end
@@ -530,8 +532,8 @@ module Skylab::Common::TestSupport
       end
 
       def _expev_lower_level_expression_agent
-        if respond_to? EXPEV_METHOD__
-          send EXPEV_METHOD__
+        if respond_to? MY_EXPEV_METHOD__
+          send MY_EXPEV_METHOD__
         else
           expression_agent_for_expect_event_normally
         end
@@ -1341,7 +1343,8 @@ module Skylab::Common::TestSupport
 
     BLACK_AND_WHITE_EXPEV_METHOD__ = :black_and_white_expression_agent_for_expect_emission
     DEBUGGING_EXPEV_METHOD__ = :expect_event_debugging_expression_agent
-    EXPEV_METHOD__ = :expression_agent_for_expect_emission
+    EXPEV_METHOD__ = :expression_agent
+    MY_EXPEV_METHOD__ = :expression_agent_for_expect_emission
     UNRELIABLE_ = :_unreliable_from_expect_event_
   end
 end

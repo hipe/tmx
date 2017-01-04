@@ -77,7 +77,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         __expect_all_this
       end
 
-      it "[tmx] integration (stowaway)" do
+      it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
 
         Home_::Autoloader_.require_sidesystem :TMX
 

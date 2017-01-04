@@ -1,3 +1,5 @@
+[#021]       help screen scraper furloughed. is also tracked by [#ze-054.3]
+
 [#020] #open omni "did you mean.."
              precursor to: [#019] & [#018]
              the "did you mean.." expression should reflect the availble
@@ -76,7 +78,9 @@
 
 [#008] #wish smarter descriptions for added primaries - can we reach the s.s?
 
-[#007]       [ track legacy thing: help screens testing thing ]
+[#007]       internal issues that are not public
+
+       #open [#here.A] maximal expag should encompass minimal expag
 
 [#006] #open feature-injected features are not reflected in help screens
 
@@ -86,7 +90,10 @@
              [ the glue that glues together the centralest things ]
 [#005]       [ the punchlist report ]  (much documentation/theory in-situ)
 [#004]       syntax for the "map" operation
-[#003]       the help screen narrative ..
+
+[#003]       ( #moved-to: [#ze-054] )
+             ( #was: the help screen narrative .. )
+
 [#002]       what is the front model? ..
 [#001]       "the problem with tmx" is where it hard-codes assumptions about
              a full or particular constituency of non-essential sidesystems..

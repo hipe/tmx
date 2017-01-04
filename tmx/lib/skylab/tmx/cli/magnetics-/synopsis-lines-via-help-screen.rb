@@ -1,8 +1,17 @@
+self._NEVER_USED  # but read intro below
+
 module Skylab::TMX
 
   class Modalities::CLI::Input_Adapters::Help_Screen
 
-    # the third of four facilities, this is :[#007] of #[#br-106]
+    # this is :[#021]
+    # but is also tracked by [#ze-054.3] in the [#ze-054] strain
+    # (being the third in a strain of five facilities).
+    #
+    # this was once used in production to scrape synopsis lines from
+    # arbitrary one-off scripts and mounted remote operators alike..
+    #
+    # although this is no longer used, we sing its praises in its document.
 
     attr_reader(
       :number_of_lines,
@@ -100,11 +109,9 @@ module Skylab::TMX
       ACHIEVED_
     end
 
-    Lazy_ = Common::Lazy
-
     Memoized_state_machine___ = Lazy_.call do  # see [#003]
 
-      o = Home_.lib_.basic::State::Machine::Edit_Session.new
+      o = Home_.lib_.basic::State::Machine.begin_definition
 
       o.add_state( :beginning,
 
@@ -244,7 +251,7 @@ module Skylab::TMX
         end,
       )
 
-      o.flush_to_state_machine
+      o.finish
     end
 
     def lines_by & receive_proxy

@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  Models::Didactics = ::Struct.new(  # explained at [#055]  (currently at [#br-098], top)
+  Models::Didactics = ::Struct.new(  # explained at [#055]
     :is_branchy,
     :description_proc,
     :description_proc_reader,

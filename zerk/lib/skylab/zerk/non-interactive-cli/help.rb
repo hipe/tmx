@@ -1,15 +1,18 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  class NonInteractiveCLI
 
-    class When::Help < As_Bound_Call  # (fwd declaration)
-#==FROM
+    class Help
+
+#==BEGIN just for [tmx]/[ze]
 
       # of the 8 or so help-support-like files at writing, this is the
       # second oldest. "isomorphic method client" is older but has less
       # interesting history. yadda yadda unification
 
       # (at writing used only by [tmx] only for [ze] "argument scanner" related) (etc)
+
+      # ==
 
       ScreenForWhichever__ = ::Class.new
 
@@ -79,35 +82,51 @@ module Skylab::Brazen
         end
       end
 
-      class ScreenForWhichever__
+      # ==
+
+      class ScreenForWhichever__  # SimpleModel_
 
         class << self
-          alias_method :express_into, :new
+          def express_into io, & p
+            define do |o|
+              o.downstream_IO = io
+              o.express_by = p
+            end.execute
+          end
+          alias_method :define, :new
           undef_method :new
         end  # >>
 
-        def initialize io
+        def initialize
 
-          # because the same user block that is used to supply parameters
-          # is the one that specifies the expression (order, et), and
-          # because for parsimony expression happens in real time, there
-          # is no place for use to supply defaults in the typical way..
-
-          puts = io.method :puts
-
-          @express_boundary = -> do
-            @express_boundary = puts ; nil
-          end
-
-          @express_blank_line = puts
           @expression_agent = nil
           @has_item_groups = false
           @expression_agent = nil
           @margin = TWO_SPACES___
-          @puts = puts
-          @__stderr = io
 
           yield self
+        end
+
+        def downstream_IO= io
+
+          puts = io.method :puts
+
+          @express_boundary = -> do
+            @express_boundary = puts
+            NOTHING_  # do nothing only the first time it is called
+          end
+
+          @express_blank_line = puts
+          @puts = puts
+          @downstream_IO = io  # 1x
+        end
+
+        attr_writer(
+          :express_by,
+        )
+
+        def execute
+          remove_instance_variable( :@express_by )[ self ]
         end
 
         def expression_agent x
@@ -231,7 +250,7 @@ module Skylab::Brazen
 
         def express_freeform_section io_p
           @express_boundary[]
-          _expression_agent.calculate @__stderr, & io_p
+          _expression_agent.calculate @downstream_IO, & io_p
           NIL
         end
 
@@ -249,7 +268,7 @@ module Skylab::Brazen
         end
 
         def _expression_agent
-          @expression_agent || THE_EMPTY_EXPRESSION_AGENT_
+          @expression_agent || THE_EMPTY_EXPRESSION_AGENT___
         end
 
         # -- write-on-receive (then read)
@@ -348,10 +367,7 @@ module Skylab::Brazen
 
       PIPEY___ = ' | '
       TWO_SPACES___ = '  '.freeze
-#==TO
-    end
-
-    class When::Help < As_Bound_Call  # abstract
+#==END  just for [tmx]/[ze]
 
       def initialize
         @command_string = nil
@@ -375,11 +391,12 @@ module Skylab::Brazen
 
         express_items_
       end
-    end
 
-    class When::Help::For_Branch < When::Help
+      # ==
 
-      def produce_result
+    class For_Branch < self
+
+      def execute  # formerly `produce_result`
 
         if @command_string
           ___when_command_string
@@ -514,7 +531,7 @@ module Skylab::Brazen
 
             _p = ada.description_proc_for_summary_under exp
 
-            _desc_lines = Field_::N_lines_via_proc[ MAX_DESC_LINES, expag, _p ]
+            _desc_lines = Field_::N_lines_via_proc[ MAX_DESC_LINES__, expag, _p ]
           end
 
           y.yield ada.name.as_slug, ( _desc_lines || EMPTY_A_ )
@@ -523,9 +540,11 @@ module Skylab::Brazen
       end
     end
 
-    class When::Help::For_Action < When::Help
+      # ==
 
-      def produce_result
+    class For_Action < self
+
+      def execute  # formerly `produce_result`
         _express_common_screen
       end
 
@@ -553,14 +572,14 @@ module Skylab::Brazen
       end
     end
 
-    class When::Help
+      # ==
 
       def express_any_custom_sections_
 
         intr = nil
 
         p = -> xx_aa do
-          intr = Here_::Section::DSL.new @invocation_expression
+          intr = Home_::CLI::Section::DSL.new @invocation_expression
           p = -> x_a do
             intr.receive x_a
           end
@@ -577,6 +596,40 @@ module Skylab::Brazen
           NOTHING_
         end
       end
+
+      # ==BEGIN only while #open [#007.G] [br] look like a [br] Bound_Call
+
+      def receiver
+        self
+      end
+
+      def method_name
+        :execute  # formerly `produce_result`
+      end
+
+      def args
+        NOTHING_
+      end
+
+      def block
+        NOTHING_
+      end
+
+      # ==END
+
+      # ==
+
+      module THE_EMPTY_EXPRESSION_AGENT___ ; class << self  # cp from [ts]
+        alias_method :calculate, :instance_exec
+      end ; end
+
+      # ==
+
+      # ==
+
+      MAX_DESC_LINES__ = 2  # for now this is duped both here and in [br]
+
+      # ==
     end
   end
 end

@@ -1,13 +1,20 @@
 module Skylab::Zerk::TestSupport
 
-  module Non_Interactive_CLI::Help_Screens
+  class CLI::Expect_Section_Coarse_Parse
 
-    # the fourth of four facilities, this is :[#054] of [#br-106] (blind rewrite)
-    # (there is a fifth one, [#054.2])
+    # the fourth of #[#054], this is :[#054.4] (a blind rewrite)
+    #
+    # the subject's philosophy is encapsulated succinctly #here-2.
+    #
+    # (although there is a fifth in this strain, subject is last ever file.)
+    #
+    # as a test file enhancement it's used (~13x) in [ze] and ~3x in [cm].
+    #
+    # but its "coarse parse" function sees wide use also, hence its name change
 
     def self.[] tcc
       Use_::Memoizer_methods[ tcc ]
-      Non_Interactive_CLI[ tcc ]
+      TS_::Non_Interactive_CLI[ tcc ]
       tcc.send :define_singleton_method, :given_screen, Given_screen___
       tcc.include Instance_Methods__
     end
@@ -28,6 +35,8 @@ module Skylab::Zerk::TestSupport
       end
     # -
 
+    Magnetics = ::Module.new  # for here and sibling (maybe not used there)
+
     module Instance_Methods__
 
       # -- methods that produce subjects
@@ -44,16 +53,32 @@ module Skylab::Zerk::TestSupport
       end
 
       def build_index_of_this_unstyled_usage_line mutable_s
+        Magnetics::SlugIndexBox_via_MutableString[ mutable_s ]
+      end
+    end
 
+    module Magnetics
+
+      SlugIndexBox_via_MutableString = -> s do
+        SlugIndexBox_via_SlugArray[ SlugArray_via_MutableString[ s ] ]
+      end
+
+      SlugArray_via_MutableString = -> mutable_s do
         mutable_s.chomp!
         _s_a = mutable_s.split %r([ ](?=(?:[-a-z:]+|\[[^\]]+|<[^>]+)))  # #open [#bm-002] (benchmarks)
+        _s_a
+      end
 
+      SlugIndexBox_via_SlugArray = -> _s_a do
         bx = Common_::Box.new
         _s_a.each do |s_|
           bx.add s_, s_
         end
         bx
       end
+    end
+
+    module Instance_Methods__
 
       # ~ options
 
@@ -68,9 +93,15 @@ module Skylab::Zerk::TestSupport
     class Section__  # #re-opens
 
       def to_option_index
+        Magnetics::OptionIndex_via_LineEmissionStream[ to_line_stream ]
+      end
+    end
+
+    module Magnetics
+
+      OptionIndex_via_LineEmissionStream = -> st do
 
         bx = Common_::Box.new
-        st = to_line_stream
         st.gets  # skip header line
         ol = nil  # implicitly enforces a syntax
         begin
@@ -107,6 +138,9 @@ module Skylab::Zerk::TestSupport
         end while nil
         bx
       end
+    end
+
+    # ==
 
       OPTION_LINE_RX__ = %r(\A
           [ ]{2,}
@@ -114,8 +148,6 @@ module Skylab::Zerk::TestSupport
           (?<long>--(?:(?![ ][ ]).)+)
           (?:[ ]{2,}(?<rest>[^ ].+))?
         \n\z)x
-
-      # ==
 
       class Option_Item___
 
@@ -144,7 +176,6 @@ module Skylab::Zerk::TestSupport
           :was_styled,
         )
       end
-    end
 
     # ==
 
@@ -155,7 +186,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def __build_hsz_screen
-        Coarse_Parse.new niCLI_state.lines
+        CoarseParse___.new niCLI_state.lines
       end
 
       # -- methods that produce predicates (matchers)
@@ -231,7 +262,8 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Coarse_Parse
+    CoarseParse___ = self
+    class CoarseParse___  # also PUBLIC
 
       def initialize lines
         bx = Coarse_pass___[ lines ]
@@ -838,9 +870,11 @@ module Skylab::Zerk::TestSupport
 
     Coarse_pass___ = -> lines do
 
+      # :#here-2:
+      #
       # this is a way dumbed-down, bespoke variant of aforementioned mentors:
-      # the object is global infallibility with local fallibility: we parse
-      # the whole screen in one "coarse pass" with a syntax that is
+      # the objective is global infallibility with local fallibility: we
+      # parse the whole screen in one "coarse pass" with a syntax that is
       # relatively lenient: it requires only that there is at least one line
       # and that the first line's first byte is [a-z].
       #

@@ -57,7 +57,7 @@ module Skylab::Brazen
 
       def hdr s
 
-        # (trailing colon must not happen here but at [#072])
+        # (trailing colon must not happen here but at [#051.1])
 
         _stylize HIGHLIGHT_STYLE__, "#{ s }"
       end

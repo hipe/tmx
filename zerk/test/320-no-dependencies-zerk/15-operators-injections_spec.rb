@@ -9,57 +9,46 @@ module Skylab::Zerk::TestSupport
     use :no_dependencies_zerk
     use :no_dependencies_zerk_features_injections
 
-    context "against CLI head that looks like operator and is" do
+    # == 1
+
+    context "against CLI head that looks like a primary" do
 
       context "parsing softly" do
 
-        it "succeeds" do
-          _parsation.result || fail
+        it "does not parse" do
+          parsation_.result.nil? || fail  # :#nodeps-coverpoint-1
         end
 
-        it "advances scanner" do
-          _parsation.scanner.head_as_is == "zz" || fail
-        end
-      end
-
-      context "and the lookup" do
-
-        it "you can see the business value from the find result" do
-          _findation.result.mixed_business_value == :zzz || fail
-        end
-
-        it "you can reach the injector from the find result" do
-          _findation.result.injector == :_INJECTOR_2_ || fail
+        it "does not advances scanner" do
+          parsation_.scanner.head_as_is == "-xx-yy2" || fail
         end
       end
 
-      shared_subject :_findation do
-        _flush_findation
-      end
-
-      shared_subject :_parsation do
-        _against_CLI_arguments 'xx-yy2', 'zz'
+      shared_subject :parsation_ do
+        against_CLI_arguments_ '-xx-yy2', 'zz'
         _flush_parsation
       end
     end
+
+    # == 2
 
     context "against CLI head that looks like operator but isn't" do
 
       context "parsing softly" do
 
         it "succeeded" do
-          _parsation.result || fail
+          parsation_.result || fail
         end
 
         it "advances scanner" do
-          _parsation.scanner.head_as_is == "zz" || fail
+          parsation_.scanner.head_as_is == "zz" || fail
         end
       end
 
       context "but the lookup" do
 
         it "did not find" do
-          _findation.result && fail
+          findation_.result && fail
         end
 
         it "emits a `parse_error` (not a primary parse error)" do
@@ -67,11 +56,11 @@ module Skylab::Zerk::TestSupport
           _emission.channel_symbol_array.last == :parse_error || fail
         end
 
-        it "unrec as first line" do
+        it "first line - unrec" do
           _lines.first == "unrecognized operator: \"xx-yy3\"" || fail
         end
 
-        it "full splay as second and final line" do
+        it "second and final line - full splay" do
 
           a = _lines
 
@@ -86,110 +75,82 @@ module Skylab::Zerk::TestSupport
         end
 
         shared_subject :_emission do
-          log = _findation.log
-          em = log.gets
-          log.gets and fail
-          em
+          flush_one_emission_via_findation_
         end
       end
 
-      shared_subject :_findation do
+      shared_subject :findation_ do
         _flush_findation
       end
 
-      shared_subject :_parsation do
-        log = _build_new_event_log
-        _against_CLI_arguments 'xx-yy3', 'zz', & log.handle_event_selectively
+      shared_subject :parsation_ do
+        log = build_new_event_log_
+        against_CLI_arguments_ 'xx-yy3', 'zz', & log.handle_event_selectively
         _flush_parsation log
       end
     end
 
-    def _subject_omni
-      _frozen_omni_one
-    end
+    # == 3
 
-    # == shared singletons
+    context "against CLI head that looks like operator and is" do
 
-    shared_subject :_frozen_omni_one do
+      context "parsing softly" do
 
-      _OPERATIONS = {
-        xx: :yy,
-      }
-
-      _PRIMARIES = {
-        zz: :qq,
-      }
-
-      _ = subject_library_::ParseArguments_via_FeaturesInjections.define do |fi|
-
-        fi.add_hash_based_operators_injection _OPERATIONS, :_no_
-
-        fi.add_lazy_operators_injection_by do |o|
-          _h = {
-            xx_yy1: :xxx,
-            he_ha: :yyy,
-          }
-          o.operators = Home_::ArgumentScanner::OperatorBranch_via_Hash[ _h ]
-          o.injector = :_INJECTOR_1_
+        it "succeeds" do
+          parsation_.result || fail
         end
 
-        fi.add_lazy_operators_injection_by do |o|
-          _h = {
-            xx_yy2: :zzz,
-          }
-          o.operators = Home_::ArgumentScanner::OperatorBranch_via_Hash[ _h ]
-          o.injector = :_INJECTOR_2_
+        it "advances scanner" do
+          parsation_.scanner.head_as_is == "zz" || fail
         end
-
-        fi.add_primaries_injection _PRIMARIES, :_nerp_
       end
 
-      _.freeze
+      context "and the lookup" do
+
+        it "you can see the business value from the find result" do
+          findation_.result.mixed_business_value == :zzz || fail
+        end
+
+        it "you can reach the injector from the find result" do
+          findation_.result.injector == :_INJECTOR_2_ || fail
+        end
+      end
+
+      shared_subject :findation_ do
+        _flush_findation
+      end
+
+      shared_subject :parsation_ do
+        against_CLI_arguments_ 'xx-yy2', 'zz'
+        _flush_parsation
+      end
+    end
+
+    # ==
+
+    def _flush_parsation log=nil
+      omni = dup_and_mutate_omni_
+      _x = omni.parse_operator_softly
+      parsation_via_ _x, omni, log
+    end
+
+    def subject_omni_
+      frozen_omni_one_
     end
 
     # == setup support
 
-    def _against_CLI_arguments * s_a, & p
-      @argument_scanner = subject_library_::CLI_ArgumentScanner.new s_a, & p
-      NIL
-    end
-
     def _flush_findation
-      o = _parsation
+      o = parsation_
       _x = o.omni.flush_to_lookup_operator
-      X_ndz_oi_Findation[ _x, o.log ]
-    end
-
-    def _flush_parsation log=nil
-      omni = _dup_and_mutate_omni
-      _x = omni.parse_operator_softly
-      X_ndz_oi_Parsation[ log, @argument_scanner, omni, _x ]
-    end
-
-    def _dup_and_mutate_omni
-      _omni = _subject_omni
-      mutable = _omni.send :dup  # eew
-      mutable.argument_scanner = argument_scanner
-      mutable
-    end
-
-    def _build_new_event_log
-      Common_.test_support::Expect_Emission::Log.for self
-    end
-
-    def argument_scanner
-      @argument_scanner
+      findation_via_ _x, o.omni, o.log
     end
 
     def expression_agent
-      ::NoDependenciesZerk::CLI_ExpressionAgent.instance
+      No_deps_zerk_[]::CLI_ExpressionAgent.instance
     end
 
-    # --
-
-    X_ndz_oi_Findation = ::Struct.new :result, :log
-    X_ndz_oi_Parsation = ::Struct.new :log, :scanner, :omni, :result
-
+    # ==
     # ==
   end
 end

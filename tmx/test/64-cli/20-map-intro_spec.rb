@@ -5,6 +5,7 @@ module Skylab::TMX::TestSupport
   describe "[tmx] CLI - operations (all \"map\" for now)" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :CLI
     use :non_interactive_CLI_fail_early
 
@@ -37,6 +38,69 @@ module Skylab::TMX::TestSupport
         expect %r(\Aexpecting \{ #{ _ }(?: \| #{ _ }){4,} \}\z)
 
         expect_failed_normally_
+      end
+    end
+
+    context "help for subject node" do
+
+      it "usage - head and tail" do
+        _ui = _usage_index
+        _ui.head == "usage: tmz map " || fail
+      end
+
+      these_two = -> h do
+        h[ :page_by ] || fail
+        h[ :order ] || fail
+      end
+
+      it "usage - items - first two primaries are present" do
+        _ui = _usage_index
+        _h = _ui.item_index
+        these_two[ _h ]
+      end
+
+      it "description" do
+        _line = _sections.description.emissions.first.string
+        _line.include? 'produce a stream' or fail
+      end
+
+      it "items section - primaries are present" do
+
+        _section = _sections.items
+
+        _big_index = _section.to_index_of_common_item_list
+
+        _h = _big_index.item_offset_via_key
+
+        these_two[ _h ]
+      end
+
+      # (we don't bother checking for descriptions because
+      # the state machine parser requires them presently)
+
+      shared_subject :_usage_index do
+        _sections.usage.to_index_of_common_operator_usage_line
+      end
+
+      shared_subject :_sections do
+
+        invoke _subject_operation, '-help'
+        # self.DEBUG_ALL_BY_FLUSH_AND_EXIT
+
+        expect_common_help_screen_sections_by_ do |sct, o|
+
+          o.expect_section "usage" do |sect|
+            sct.usage = sect
+          end
+
+          o.expect_section "description" do |sect|
+            sct.description = sect
+          end
+
+          o.expect_section "primaries" do |sect|  # NOTE the name
+            sct.items = sect
+          end
+        end
       end
     end
 

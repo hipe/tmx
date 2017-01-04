@@ -1,15 +1,15 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - when - help - screen for branch" do
-
-    # (we hate this placement (the node should be in e.g [ze] eventually)
-    # but it is placed here for now to mirror its subject; it's out
-    # of scope to rename for now so a #pending-rename.)
+  describe "[ze] niCLI - MMAS - integrate with help" do  # (was in [br])
 
     TS_[ self ]
     use :memoizer_methods
+
+    it "loads" do
+      _subject_module || fail
+    end
 
     context "(please be a representative case.)" do
 
@@ -77,7 +77,7 @@ module Skylab::Brazen::TestSupport
 
       def __build_this_one_spy_around sects_h
 
-        o = TS_::CLI_Support::Expect_Section::FailEarly.define
+        o = TS_::CLI::Expect_Section_Fail_Early.define
 
         o.expect_section "usage" do |sect|
           sects_h[ :usage ] = sect
@@ -99,7 +99,7 @@ module Skylab::Brazen::TestSupport
 
     def __express_branch_help_screen io, as
 
-      Home_::CLI_Support::When::Help::ScreenForEndpoint.express_into io do |o|
+      _subject_module::ScreenForEndpoint.express_into io do |o|
 
         _raw_st = Stream_.call [ :remote_primary_one, :remote_primary_two ] do |sym|
           [ :primary, sym ]
@@ -135,7 +135,7 @@ module Skylab::Brazen::TestSupport
 
       never_call = -> { fail }
 
-      Home_.lib_.zerk::NonInteractiveCLI::MultiModeArgumentScanner.define do |o|
+      Home_::NonInteractiveCLI::MultiModeArgumentScanner.define do |o|
 
         o.subtract_primary :remote_primary_one
 
@@ -143,20 +143,21 @@ module Skylab::Brazen::TestSupport
           y << "hello i am the added primary"
         end
 
-        o.user_scanner X_cs_w_STUB_NOT_EMPTY_SCANNER
+        o.user_scanner X_nicli_h_STUB_NOT_EMPTY_SCANNER
       end
     end
 
-    module X_cs_w_STUB_NOT_EMPTY_SCANNER ; class << self
+    def _subject_module
+      Home_::NonInteractiveCLI::Help
+    end
+
+    module X_nicli_h_STUB_NOT_EMPTY_SCANNER ; class << self
       def no_unparsed_exists
         false
       end
     end ; end
 
-    Stream_ = -> a, & p do  # until etc
-      Common_::Stream.via_nonsparse_array a, & p
-    end
-
+    # ==
     # ==
   end
 end

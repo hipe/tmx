@@ -4,7 +4,13 @@ module Skylab::Basic
 
     class Machine
 
-      class Edit_Session
+      class << self
+        def begin_definition
+          Definition___.new
+        end
+      end  # >>
+
+      class Definition___
 
         def initialize
 
@@ -36,16 +42,16 @@ module Skylab::Basic
           end
         end
 
-        def flush_to_state_machine
-          bx = remove_instance_variable :@_bx
-          bx.freeze
-          Here_::Machine.new bx
+        def finish
+          Here_::Machine.new _flush_box
         end
 
-        def flush_to_grammar
-          bx = remove_instance_variable :@_bx
-          bx.freeze
-          Grammar___.new bx
+        def flush_to_grammar  # 1x [pe]
+          Grammar___.new _flush_box
+        end
+
+        def _flush_box
+          remove_instance_variable( :@_bx ).freeze
         end
       end
     end
@@ -284,8 +290,8 @@ module Skylab::Basic
 
             if @_state.has_proc_for_on_entry
 
+              self._CODE_SKETCH__needs_work
               _x = @_state.handle_entry[]
-              self._COVER_ME
             end
 
             break
@@ -293,12 +299,6 @@ module Skylab::Basic
           self._FUU
         end while nil
         NIL_
-      end
-
-      def __step_via_matched_state_that_has_no_on_entry_proc
-
-        # exerimentally we stay..
-        @_state.name_symbol
       end
     end
 
@@ -341,6 +341,9 @@ module Skylab::Basic
           if sym
             _receive_next_state @box.fetch sym
             sym
+          elsif @_state.can_transition
+            _ = _step_via_find_entry
+            _  # #todo
           else
             self._MISBEHAVED_STATE_MACHINE
           end
@@ -371,6 +374,12 @@ module Skylab::Basic
         else
           __when_no_available_transition
         end
+      end
+
+      def __step_via_matched_state_that_has_no_on_entry_proc
+
+        # exerimentally we stay..
+        @_state.name_symbol
       end
 
       def _via_found_state_for_transition yes_x, sta
@@ -485,7 +494,7 @@ module Skylab::Basic
             sta.can_transition_to_state_symbol_array
           end
 
-          Common_::Stream.via_nonsparse_array _sym_a do | sym |
+          Stream_.call _sym_a do |sym|
             @box.fetch sym
           end
         else
@@ -506,16 +515,17 @@ module Skylab::Basic
         NIL_
       end
 
-      def unparsed_exists
-        true
-      end
-
       def advance_one
         if @current_token
           @current_token = nil
         else
           self._COVER_ME
         end
+      end
+
+      def no_unparsed_exists
+        self._COVER_ME
+        false
       end
     end
   end

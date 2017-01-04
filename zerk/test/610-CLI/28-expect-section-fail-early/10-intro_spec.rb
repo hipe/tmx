@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - expect section (inspired by OGDL)" do
+  describe "[ze] CLI (test test) - expect section fail early (inspired by OGDL)" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -94,9 +94,8 @@ module Skylab::Brazen::TestSupport
       root.only_child
     end
 
-    x = nil
-    subject = -> do
-      x ||= TS_.lib_ :CLI_support_expect_section
+    subject = Lazy_.call do
+      TS_::CLI::Expect_Section_Fail_Early
     end
   end
 end

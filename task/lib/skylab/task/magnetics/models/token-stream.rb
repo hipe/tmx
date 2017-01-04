@@ -277,4 +277,3 @@ class Skylab::Task
     end
   end
 end
-# #pending-rename: publicize (for [cm])

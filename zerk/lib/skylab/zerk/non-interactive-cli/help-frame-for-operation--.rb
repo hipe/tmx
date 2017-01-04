@@ -41,7 +41,7 @@ module Skylab::Zerk
 
         def effect_help_screen_
 
-          _vendor_help = Remote_when_[]::Help::For_Action.new
+          _vendor_help = Here_::Help::For_Action.new
 
           _ada = Vendor_Adapter___.new @_modality_frame, @_session.CLI_
 
@@ -102,7 +102,7 @@ module Skylab::Zerk
 
           # -- ad-hoc sections
 
-          def custom_sections & p  # [#br-058]
+          def custom_sections & p  # [#061.2]
 
             @modality_frame_.operation_syntax_.custom_section__( & p )
           end

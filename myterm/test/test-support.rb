@@ -63,7 +63,7 @@ module Skylab::MyTerm::TestSupport
     def self.[] tcc
 
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
-      _ = Zerk_test_lib__[].lib :expect_screens
+      _ = Zerk_test_support_[].lib :expect_screens
       _[ tcc ]
       tcc.include self
     end
@@ -104,7 +104,7 @@ module Skylab::MyTerm::TestSupport
   module My_API
 
     def self.[] tcc
-      @_ ||= Zerk_test_lib__[].lib :API
+      @_ ||= Zerk_test_support_[].lib :API
       @_[ tcc ]
       tcc.include self
     end
@@ -171,7 +171,7 @@ module Skylab::MyTerm::TestSupport
 
   # ==
 
-  Zerk_test_lib__ = -> do
+  Zerk_test_support_ = -> do
     Home_.lib_.zerk.test_support
   end
 

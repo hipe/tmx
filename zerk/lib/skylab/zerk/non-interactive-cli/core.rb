@@ -181,7 +181,10 @@ module Skylab::Zerk
     end
 
     def when_no_arguments_
-      __remote_when Remote_when_[]::No_Arguments.new node_formal_property_, self
+
+      _No_Arguments = Remote_CLI_lib_[]::When::No_Arguments
+      _when = _No_Arguments.new node_formal_property_, self
+      __remote_when _when
     end
 
     def __when_head_argument_looks_like_option
@@ -736,7 +739,7 @@ module Skylab::Zerk
     end
 
     def ___build_SE
-      Remote_CLI_lib_[]::Section::Expression.new line_yielder, expression_agent
+      Home_::CLI::Section::Expression.new line_yielder, expression_agent
     end
 
     def expression_agent
@@ -851,10 +854,6 @@ module Skylab::Zerk
 
     Begins_with_dash_ = -> s do
       DASH_BYTE_ == s.getbyte( 0 )
-    end
-
-    Remote_when_ = -> do
-      Remote_CLI_lib_[]::When
     end
 
     Remote_CLI_lib_ = Home_::CLI_::Remote_lib

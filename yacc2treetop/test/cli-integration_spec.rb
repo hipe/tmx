@@ -163,7 +163,7 @@ describe "[y2] CLI integration" do
       end
     end
 
-    it "[tmx] integration (stowaway)" do
+    it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
 
       ::Skylab::Common::Autoloader.require_sidesystem :TMX
 

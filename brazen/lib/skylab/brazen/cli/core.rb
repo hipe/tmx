@@ -557,7 +557,7 @@ module Skylab::Brazen
 
       def __view_controller_class_for__help__option
 
-        When_[]::Help::For_Branch
+        When_help__[]::For_Branch
       end
 
       # --
@@ -698,13 +698,13 @@ module Skylab::Brazen
 
         prepare_for_employment_under otr
 
-        o = When_[]::Help::For_Action.new
+        o = When_help__[]::For_Action.new
         o.invocation_expression = _expression
         o.invocation_reflection = self
-        o.produce_result
+        o.execute
       end
 
-      def custom_sections  # this is the frontier of burgeoning [#058]:
+      def custom_sections  # this is the frontier of burgeoning [#ze-061.2]:
 
         # for each category of item, and then for each item within each
         # category, use the [#] DSL, *while* reducing over the catogories
@@ -833,7 +833,7 @@ module Skylab::Brazen
 
       def __view_controller_class_for__help__option
 
-        When_[]::Help::For_Action
+        When_help__[]::For_Action
       end
 
       def bound_call_from_parse_arguments  # (see other for extent)
@@ -957,10 +957,10 @@ module Skylab::Brazen
       def receive_show_help otr  # as branch, contrast with leaf, see [#]note-930
 
         prepare_for_employment_under otr
-        o = When_[]::Help::For_Branch.new
+        o = When_help__[]::For_Branch.new
         o.invocation_expression = _expression
         o.invocation_reflection = self
-        o.produce_result
+        o.execute
       end
 
       public(
@@ -2190,6 +2190,11 @@ module Skylab::Brazen
     end
 
     o = Home_::CLI_Support
+
+
+    When_help__ = -> do
+      Zerk_lib_[]::NonInteractiveCLI::Help
+    end
 
     CLI_ = self
     DASH_BYTE_ = DASH_.getbyte 0

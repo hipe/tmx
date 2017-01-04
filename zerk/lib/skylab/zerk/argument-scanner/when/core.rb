@@ -301,13 +301,13 @@ module Skylab::Zerk
         end
 
         def _to_operation_and_primary_moniker_scanner
-          _to_operation_moniker_scanner.concat _to_primary_moniker_scanner
+          _to_operation_moniker_scanner.concat_scanner _to_primary_moniker_scanner
         end
 
         def _to_operation_moniker_scanner
           scn = @omni.to_operation_symbol_scanner
           @expression_agent.calculate do
-            scn = scn.map_by do |sym|
+            scn.map_by do |sym|
               oper sym
             end
           end
@@ -316,7 +316,7 @@ module Skylab::Zerk
         def _to_primary_moniker_scanner
           scn = @omni.to_primary_symbol_scanner
           @expression_agent.calculate do
-            scn = scn.map_by do |sym|
+            scn.map_by do |sym|
               prim sym
             end
           end

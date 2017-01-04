@@ -81,7 +81,7 @@ module Skylab::Brazen
 
   # -- singletons
 
-  module THE_EMPTY_EXPRESSION_AGENT_ ; class << self  # c.p from [ts]
+  module THE_EMPTY_EXPRESSION_AGENT_ ; class << self  # c.p from [ts]. 1x here
     alias_method :calculate, :instance_exec
   end ; end
 
@@ -226,6 +226,10 @@ module Skylab::Brazen
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Zerk_lib_ = Lazy_.call do
+    Home_.lib_.zerk
   end
 
   # ==

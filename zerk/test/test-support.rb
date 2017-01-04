@@ -170,9 +170,17 @@ module Skylab::Zerk::TestSupport
 
   # --
 
+  No_deps_zerk_ = Lazy_.call do
+    require 'no-dependencies-zerk'
+    ::NoDependenciesZerk
+  end
+
+  # --
+
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
+  DASH_ = '-'
   EMPTY_A_ = []
   EMPTY_P_ = Home_::EMPTY_P_
   EMPTY_S_ = "".freeze
@@ -183,4 +191,6 @@ module Skylab::Zerk::TestSupport
   SPACE_ = Home_::SPACE_
   TS_ = self
   UNABLE_ = false
+  UNDERSCORE_ = '_'
+
 end

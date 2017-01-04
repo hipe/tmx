@@ -6,7 +6,7 @@ module Skylab::Zerk::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :non_interactive_CLI_help_screens
+    use :CLI_expect_section_coarse_parse
 
     context "singplur in opts - help" do
 

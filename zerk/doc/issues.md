@@ -1,3 +1,8 @@
+[#061]       [ section ]  (imported from [br])
+             [#here.3]: tracking where colons are added
+             [#here.2]: the DSL node
+             [#here.1]: the main asset node
+
 [#060]       [ no dependencies zerk ]
 
 [#059]       horizontal meter (née "lipstick")
@@ -16,9 +21,13 @@
 
 [#056]       [ syntaxish ]
 
-[#055]       [ didactics ]  (currently spliced into [#br-089]  )
+[#055]       didactics / ouroboros ..
 
 [#054]       [track help screen test library]
+             [#here.4] "coarse parse"
+             [#here.3] actually in [tmx], furloughed at writing
+             [#here.2] from ancient [br], now "magnetics"
+             [#here.1] now "fail fast" [#here.1-1] #subscribed-by [cm] (see in-line)
 
 [#053]       feature injection through compounded primaries..
 
@@ -139,13 +148,17 @@
 [#010]       custom view controllers
 [#009] #in-progress this rewrite (and new architecture..)
 [#008] #open eventually de-dup this with [#sy-029] OGDL
-[#007]       "threads" (tracking tags for experimentals towards public API)
+
+[#007] "threads" (tracking tags for experimentals towards public API)
+
+             :[#this.G] - waiting for [br] to sunset
        #wish [#this.F] (crossreference to [#050.I]) total cels plus viz
              [#this.E] - this microconvention of nil-vs-false semantics (see)
              [#this.D] - primary value parsing API
              #thread-three - nils vs. false
              #thread-two - `gets` resulting in `nil` == interrupt
              #!thread-one - used to be "hot model", now we use cold model
+
 [#006]       expect screens ..
 [#005]       [the view maker maker]
 

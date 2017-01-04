@@ -1,3 +1,5 @@
+[#069]       #track similar implementations of "polymorphic stream"
+
 [#068]       #track ancient resolve module (similar in [cm])
 
 [#067] #wish constify names like like (in [tmx])

@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   describe "[ze] non-interactive CLI - help permutations for component" do
 
     TS_[ self ]
-    use :non_interactive_CLI_help_screens
+    use :CLI_expect_section_coarse_parse
 
     context "ask for help of bad node in first frame (as arg)" do
 

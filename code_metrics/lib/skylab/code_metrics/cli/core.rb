@@ -24,8 +24,7 @@ module Skylab::CodeMetrics
 
       def execute
 
-        Require_brazen_[]
-        _Help = Brazen_::CLI_Support::When::Help
+        _Help = Zerk_lib_[]::NonInteractiveCLI::Help
 
         h = PRIMARY_DESCRIPTIONS___
 

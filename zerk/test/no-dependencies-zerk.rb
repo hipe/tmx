@@ -21,7 +21,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def subject_library_
-        Subject_library__[]
+        Subject_library_[]
       end
     end
 
@@ -137,7 +137,7 @@ module Skylab::Zerk::TestSupport
       # so for now we make a subclass of that with stub implementations
       # to get a sense for how it would look.
 
-      Subject_library__[]
+      Subject_library_[]
 
       class ArgumentScannerForTesting___ < ::NoDependenciesZerk::API_ArgumentScanner
 
@@ -201,10 +201,7 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    Subject_library__ = Lazy_.call do
-      require 'no-dependencies-zerk'
-      ::NoDependenciesZerk
-    end
+    Subject_library_ = No_deps_zerk_
 
     # ==
   end

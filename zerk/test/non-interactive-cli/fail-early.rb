@@ -74,6 +74,10 @@ module Skylab::Zerk::TestSupport
         @ze_niCLI_client.on_stream sym
       end
 
+      def DEBUG_ALL_BY_FLUSH_AND_EXIT
+        @ze_niCLI_client.__FLUSH_AND_EXIT_UNDER_ self
+      end
+
       def expect_failed
         @ze_niCLI_client.expect_failed_under self
       end
@@ -191,6 +195,24 @@ module Skylab::Zerk::TestSupport
         @_stream = serr_or_sout ; nil
       end
 
+      def __FLUSH_AND_EXIT_UNDER_ tc
+
+        @_stream ||= :serr
+        io = tc.debug_IO
+        if tc.do_debug
+          io.puts "(because debugging is on we're not to echo line output)"
+          p = MONADIC_EMPTINESS_
+        else
+          io.puts "(going to flush and exit the lines from #{ @_stream })"
+          p = io.method :puts
+        end
+        expect_each_by( & p )
+        invo = _invocation_under( tc ).execute
+        d = invo.exitstatus
+        io.puts "(exitstatus: #{ d } from invocation under test -- GOODBYE FROM [ze])"
+        ::Kernel.exit 0
+      end
+
       def expect_failed_under tc
         _invocation_under( tc ).execute.__expect_failed
       end
@@ -227,7 +249,7 @@ module Skylab::Zerk::TestSupport
 
       def execute
         __init_CLI_and_spies @setup.ARGV
-        @_exitstatus = @_CLI.execute
+        @exitstatus = @_CLI.execute
         remove_instance_variable( :@_spy ).finished_invoking_notify
         self
       end
@@ -235,7 +257,7 @@ module Skylab::Zerk::TestSupport
       # ~
 
       def __expect_failed
-        if @_exitstatus.zero?
+        if @exitstatus.zero?
           __when_exitstatus_zero
         end
       end
@@ -247,13 +269,13 @@ module Skylab::Zerk::TestSupport
       # ~
 
       def __expect_succeeded
-        if @_exitstatus.nonzero?
+        if @exitstatus.nonzero?
           __when_exitstatus_nonzero
         end
       end
 
       def __when_exitstatus_nonzero
-        fail_say "expected zero exitstatus, had #{ @_exitstatus }"
+        fail_say "expected zero exitstatus, had #{ @exitstatus }"
       end
 
       # ~
@@ -312,6 +334,10 @@ module Skylab::Zerk::TestSupport
           %w( ze-pnsa )
         end
       end
+
+      attr_reader(
+        :exitstatus,
+      )
 
       define_method :fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
     end

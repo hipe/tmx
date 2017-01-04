@@ -1,8 +1,10 @@
-require_relative '../../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI - iso. - models - help screen (parsing)" do
+  describe "[ze] CLI - expect section magnetics (might be #feature-island)" do
+
+    # #legacy-coverpoint-1
 
     it "no lines" do
       _parse <<-O
@@ -116,14 +118,11 @@ module Skylab::Brazen::TestSupport
 
       _scn = Home_.lib_.basic::String.line_stream s
 
-      a = []
+      @sections =
+        TS_::CLI::Expect_Section_Magnetics::SectionsOldSchool_via_LineStream.call(
+        _scn )
 
-      @sections = a
-
-      Home_::CLI::Isomorphic_Methods_Client::Models_::Help_Screen.
-        write_to_array_sections_from_line_stream a, _scn
-
-      NIL_
+      NIL
     end
   end
 end

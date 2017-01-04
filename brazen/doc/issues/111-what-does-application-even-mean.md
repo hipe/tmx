@@ -2,7 +2,7 @@
 
 (EDIT: etc.)
 
-this is part of the [#098] disussion of ouroboros, which in turn is really
+this is part of the [#ze-055] disussion of ouroboros, which in turn is really
 about trees of turtles.
 
 disjoint thoughts for now, maybe this will be developed further later:

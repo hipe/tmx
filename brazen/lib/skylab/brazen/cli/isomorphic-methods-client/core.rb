@@ -216,7 +216,7 @@ module Skylab::Brazen
       end
 
       def __build_description_model
-        Here_::Models_::Help_Screen::Models::Description.of_instance self
+        Description___.of_instance self
       end
 
       def name
@@ -339,10 +339,48 @@ module Skylab::Brazen
       end
     end
 
+    # ==
+
+    # ==
+
+    class Description___  # ancient, moved here from [#ze-054.2] at #tombstone-A
+
+      class << self
+
+        def of_instance inst
+
+          if inst.class.const_defined? :DESCRIPTION_BLOCK_
+            new inst
+          else
+            THE_EMPTY_DESCRIPTION___
+          end
+        end
+        private :new
+      end  # >>
+
+      def initialize inst
+        @__description_proc = inst.class.const_get :DESCRIPTION_BLOCK_
+      end
+
+      def instance_description_proc
+        @__description_proc  # (hi.)
+      end
+    end
+
+    module THE_EMPTY_DESCRIPTION___ ; class << self
+      def instance_description_proc
+        NOTHING_
+      end
+    end ; end
+
+    # ==
+
+    # ==
+
     CLI_ = CLI
     Here_ = self
     Autoloader_[ Models_ = ::Module.new ]
     When_ = CLI::When_
-
   end
 end
+# #tombstone-A: model node used to be in remote node

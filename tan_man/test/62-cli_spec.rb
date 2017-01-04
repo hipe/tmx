@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
 
     # NOTE - apparently we don't have any other modality integration testing?
 
-    it "[tmx] integration (stowaway)" do
+    it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
 
       Home_::Autoloader_.require_sidesystem :TMX
 

@@ -35,9 +35,9 @@ not invited to our party. just kidding, everyone is.
 
 
 
-## the argument syntax isomorphicism ( more at [#105] )
+## the argument syntax isomorphicism ( more at [#ze-054.1] )
 
-implemented by [#106] the argument node, this is even crazier and more fun.
+implemented by the argument node, this is even crazier and more fun.
 it is what it sounds like. every single category of parameter that ruby
 supports (except 'block') have analogs in the world of the command line:
 

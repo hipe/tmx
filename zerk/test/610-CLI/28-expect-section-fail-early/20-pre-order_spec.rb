@@ -1,8 +1,8 @@
 require_relative '../../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - expect section - .." do
+  describe "[ze] CLI (test test) - expect section fail early - pre-order" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -38,7 +38,7 @@ module Skylab::Brazen::TestSupport
     end
 
     memoize :_subject do
-      TS_.lib_( :CLI_support_expect_section )
+      TS_::CLI::Expect_Section_Fail_Early
     end
   end
 end

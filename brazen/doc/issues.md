@@ -26,7 +26,10 @@
 [#107]       `name` should not be the name used here
              #after:[#sa-119]
              (piggyback: `terminal_channel_i` too)
-[#106]       fun with help screen parsing ..
+
+[#106] #hole ( #moved-to: [#ze-064] )
+             ( #was fun with help screen parsing .. )
+
 [#105]       the isomorphic method argument narrative ..
 [#104]       the isomorphic methods client narrative ..
 [#103]       the CLI isomorphic methods client narrative ..
@@ -34,7 +37,9 @@
 [#101]       #investigation - how to architect.
 [#100]       an introduction to a reactive model ..
 [#099]       [ branch node for historical documents ]
-[#098]       ouroboros ..
+
+[#098] #hole ( #was: ouroboros. #moved-to: [#ze-055] )
+
 [#097] #hole
              ( #was: get this ellipsis hack out )
 [#096] #hole ( #was: open the (CLI) table narrative )
@@ -87,7 +92,9 @@
              ( #was: #done awareness of system environment does not belong in the model - )
              front clients should do this mapping somehow..
              ( was: #parent-node: [#011] selective event listening via methods )
-[#072]       where the colon goes on headers! #parent-node: [#002]
+
+[#072]       ( #moved-to: [#ze-061.3] )
+             ( #was: where the colon goes on headers! #parent-node: [#002] )
              ( #was: #done `is_silo` can probably go away )
              ( #was: modernize this interface )
 [#071]       #tracking-tag wrap
@@ -118,7 +125,8 @@
              ( #was: #done issue with parsing properties )
 [#059]       #doc-node names
 
-[#058]       the help screen DSL - spec is only usage documentation
+[#058]       ( #moved-to: [#ze-061.2] )
+             ( #was: the help screen DSL - spec is only usage documentation )
              ( #was: #parent-node: [#057] the default frame )
 
 [#057]       [ arguments ]  (normalization)
@@ -138,7 +146,7 @@
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
-[#045]   #subscribed - :A - (see in asset node) [ expect section ]
+[#045] #hole ( #moved-to: [#ze-054.1] )
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 
 [#044] #open integrate new pretty path with all [br] CLI clients

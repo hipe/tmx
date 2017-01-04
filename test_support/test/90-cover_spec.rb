@@ -87,7 +87,7 @@ module Skylab::TestSupport::TestSupport
 
     # --
 
-    it "(stowaway - tmx integration - top)" do
+    it "(stowaway - tmx integration - top)", TMX_CLI_integration: true do
 
       cli = _same
 

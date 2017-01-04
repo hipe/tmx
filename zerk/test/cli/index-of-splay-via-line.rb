@@ -46,7 +46,7 @@ module Skylab::Zerk::TestSupport
         end
         bx = remove_instance_variable :@_primaries_box
         if bx
-          @offset_via_operator_symbol = bx.h_.freeze
+          @offset_via_primary_symbol = bx.h_.freeze
         end
 
         @number_of_features =
@@ -99,7 +99,7 @@ module Skylab::Zerk::TestSupport
         s = @_scn.scan SLUG___
         s || fail
         _d = ( @_offset_of_last_feature += 1 )
-        _sym = s.gsub( DASH_CHAR___, UNDERSCORE_CHAR___ ).intern
+        _sym = s.gsub( DASH_, UNDERSCORE_ ).intern
 
         ( if was_primary
           @_primaries_box ||= Common_::Box.new
@@ -134,10 +134,8 @@ module Skylab::Zerk::TestSupport
     AND___ = / and /
     COMMA___ = /, /
     DASH___ = /-/
-    DASH_CHAR___ = '-'  # DASH_
     OR___ = / or /
     SLUG___ = /[a-z][a-z0-9]*(?:-[a-z0-9]+)*/
-    UNDERSCORE_CHAR___ = '_'  # UNDERSCORE_
 
     # ==
   end
