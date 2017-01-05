@@ -19,8 +19,6 @@ say_formal_operation_alternation
 -3.247 i & m.o & mountable one-offs, no arg
 -3.260 i & m.o & mountable one-offs, call
 -3.266 CLI::When_::Looks_strange[ @_omni ]
+old code in cli
 -3.273 intrinsics & mountable operators, help
 -3.287 intrinsics & mountable operators, fuzzy
--3.300 intrinsics & mountable operators, unrec
--3.313 intrinsics & mountable operators, no arg
--3.327 intrinsics & mountable operators, call

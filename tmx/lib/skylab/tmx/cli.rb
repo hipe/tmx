@@ -81,20 +81,13 @@ module Skylab::TMX
       def __bound_call
 
         o = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
-
-          fi.argument_scanner = @_args
-
-          fi.add_hash_based_operators_injection(
-            OPERATIONS__, :__bound_call_via_intrinsic_operation )
-
-          fi.add_primaries_injection PRIMARIES___, self
+          __inject_features fi
         end
-
         if @_args.no_unparsed_exists
           Zerk_lib_[]::ArgumentScanner::When::No_arguments[ o ]
         elsif o.parse_operator_softly
           lu = o.flush_to_lookup_operator
-          lu && send( lu.injector, lu.mixed_business_value )
+          lu and send lu.injector, lu.mixed_business_value
         elsif o.parse_primary_softly
 
           # (life is easier because there are no universal primaries..)
@@ -103,14 +96,46 @@ module Skylab::TMX
           ok = o.flush_to_lookup_current_and_parse_remaining_primaries
           ok && self._SANITY__expected_early_exit_from_toplevel_primary
           ok
-
         else
           self._COVER_ME__when_token_looks_totally_strange__
         end
       end
 
+      def __inject_features fi
+
+        fi.argument_scanner = @_args
+
+        fi.add_hash_based_operators_injection(
+          OPERATIONS__, :__bound_call_via_intrinsic_operation )
+
+        fi.add_lazy_operators_injection_by do |o|
+          __add_sidesystem_mounter_lazily o
+        end
+
+        fi.add_primaries_injection PRIMARIES___, self
+      end
+
+      def __add_sidesystem_mounter_lazily fi
+
+        _inst = Home_.installation_
+
+        ssm = CLI::Magnetics_::OperatorBranch_via_InstalledSidesystems.define do |o|
+          o.CLI = self
+          o.installation = _inst
+        end
+
+        fi.operators = ssm
+        fi.injector = :__bound_call_via_mounted_sidesystem
+        @__sidesys_mounter = ssm ; nil
+      end
+
       def __bound_call_via_intrinsic_operation m
         send m
+      end
+
+      def __bound_call_via_mounted_sidesystem _GEM_PATH
+        _ssm = remove_instance_variable :@__sidesys_mounter
+        _ssm.bound_call_via_load_ticket__ _GEM_PATH
       end
 
       def __WAS_bound_call
@@ -664,7 +689,7 @@ module Skylab::TMX
         if scn.no_unparsed_exists
           Common_::Polymorphic_Stream.the_empty_polymorphic_stream
         else
-          d, a = scn.close_and_release__
+          d, a = scn.close_and_release
           scn.freeze  # experiment
           Common_::Polymorphic_Stream.via_start_index_and_array d, a
         end
@@ -818,13 +843,11 @@ module Skylab::TMX
         NIL
       end
 
-      def release_ARGV__
+      def release_argument_scanner_for_sidesystem_mount__
 
         # (when having succeeded in mounting a participating sidesystem,
         #  we want to make it clear that we ourselves are totally done
         #  parsing (or otherwise referencing) arguments)
-
-        self._REVEW
 
         remove_instance_variable :@_args
       end

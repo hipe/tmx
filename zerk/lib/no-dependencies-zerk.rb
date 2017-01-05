@@ -372,7 +372,7 @@ module NoDependenciesZerk
         NIL
       end
 
-      def close_and_release__  # #experiment
+      def close_and_release  # #experiment  1x here 1x [tmx]
         @is_closed = true
         remove_instance_variable :@_last_index
         [ remove_instance_variable( :@_current_index ),
@@ -614,7 +614,7 @@ module NoDependenciesZerk
       end
 
       def add_lazy_operators_injection_by & p
-        _add_operators_injection LazyOperatorsInjection___.new p
+        _add_operators_injection LazyOperatorsInjectionTicket___.new p
       end
 
       def _add_operators_injection ada
@@ -698,13 +698,14 @@ module NoDependenciesZerk
         begin
           ijn = injections.gets_one.injection
           symbols = ijn.to_normal_symbol_scanner
-          begin
+          # allow the injection to produce the empty stream (for now only for hack disabling)
+          until symbols.no_unparsed_exists
             if rx =~ symbols.current_token
               _mixed_business_value = ijn.dereference symbols.current_token
               a.push Found__[ ijn.injector, _mixed_business_value ]
             end
             symbols.advance_one
-          end until symbols.no_unparsed_exists
+          end
         end until injections.no_unparsed_exists
         case 1 <=> a.length
         when 0  # when found
@@ -717,8 +718,8 @@ module NoDependenciesZerk
       end
 
       def to_operation_symbol_scanner
-        _to_operations_injections_scanner.expand_by do |ijn|
-          ijn.to_normal_symbol_scanner
+        _to_operations_injections_scanner.expand_by do |injt|
+          injt.injection.to_normal_symbol_scanner
         end
       end
 
@@ -788,7 +789,7 @@ module NoDependenciesZerk
 
     # --
 
-    class LazyOperatorsInjection___
+    class LazyOperatorsInjectionTicket___
       def initialize p
         @_injection = :__injection_initially
         @__proc = p
@@ -797,15 +798,19 @@ module NoDependenciesZerk
         send @_injection
       end
       def __injection_initially
-        remove_instance_variable( :@__proc )[ self ]  # meh
+        _p = remove_instance_variable :@__proc
+        @__injection = LazyOperatorsInjectionRealized___.define( & _p )
         @_injection = :__injection_normally
         freeze
+        send @_injection
       end
+      def __injection_normally
+        @__injection
+      end
+    end
+    class LazyOperatorsInjectionRealized___ < SimpleModel
       attr_writer :operators
       attr_accessor :injector
-      def __injection_normally
-        self
-      end
       def lookup_softly k
         @operators.lookup_softly k
       end
