@@ -10,7 +10,7 @@ module Skylab::TMX
         @_load_ticket = load_ticket
         @_gne = load_ticket.gem_name_elements
 
-        _slug = @_gne.stem.gsub UNDERSCORE_, DASH_
+        _slug = @_gne.entry_string.gsub UNDERSCORE_, DASH_
 
         _conventional_entrypoint_entry = "#{ @_gne.exe_prefix }#{ _slug }"
 

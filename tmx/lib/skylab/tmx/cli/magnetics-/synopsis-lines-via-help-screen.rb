@@ -111,7 +111,7 @@ module Skylab::TMX
 
     Memoized_state_machine___ = Lazy_.call do  # see [#003]
 
-      o = Home_.lib_.basic::State::Machine.begin_definition
+      o = Basic_[]::State::Machine.begin_definition
 
       o.add_state( :beginning,
 
@@ -311,7 +311,7 @@ module Skylab::TMX
 
         sess = sm.begin guy
 
-        _String = Home_.lib_.basic::String
+        _String = Basic_[]::String
 
         receive_paragraph = -> para_s do
 

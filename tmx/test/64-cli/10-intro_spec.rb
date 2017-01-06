@@ -34,7 +34,7 @@ module Skylab::TMX::TestSupport
     it "strange option - explain, splay, invite" do
       invoke '-x'
       expect_on_stderr "unknown primary: \"-x\""
-      expect_on_stderr "available primaries: -help"
+      expect_on_stderr "available primaries: -help and -verbose"
       expect_failed_normally_  # #coverpoint-1-F
     end
 
@@ -56,18 +56,29 @@ module Skylab::TMX::TestSupport
         _sections.description.emissions.first.string.include? 'experiment' or fail
       end
 
-      it "items section - intrinsics are present" do
+      it "operators section - intrinsics are present" do
 
-        h = _items.item_offset_via_key
+        h = _main_items.item_offset_via_key
         h[ :ping ] || fail
         h[ :map ] || fail
+      end
+
+      it "primaries - intrinsics are present" do
+
+        h = _secondary_items.item_offset_via_key
+        h[ :help ] || fail
+        h[ :verbose ] || fail
       end
 
       # (we don't bother checking for descriptions because
       # the state machine parser requires them presently)
 
-      shared_subject :_items do
-        _sections.items.to_index_of_common_item_list
+      shared_subject :_main_items do
+        _sections.main_items.to_index_of_common_item_list
+      end
+
+      shared_subject :_secondary_items do
+        _sections.secondary_items.to_index_of_common_item_list
       end
 
       shared_subject :_usage do
@@ -91,7 +102,11 @@ module Skylab::TMX::TestSupport
           end
 
           o.expect_section "operations" do |sect|
-            sct.items = sect
+            sct.main_items = sect
+          end
+
+          o.expect_section "primaries" do |sect|
+            sct.secondary_items = sect
           end
         end
       end

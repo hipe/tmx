@@ -72,17 +72,17 @@ module Skylab::TestSupport
 
     # ~
 
-    def __didactics_for_class_based_operation y, ro
+    def __didactics_for_class_based_operation dida, ro
 
       cls = ro.operation_class
 
-      y.yield :is_branchy, false
+      dida.is_branchy = false
 
-      y.yield :description_proc, cls::DESCRIPTION
+      dida.description_proc = cls::DESCRIPTION
 
-      y.yield :description_proc_reader, cls::DESCRIPTIONS
+      dida.description_proc_reader = cls::DESCRIPTIONS
 
-      y.yield :item_normal_tuple_stream_by, -> do
+      dida.item_normal_tuple_stream_by = -> do
         h = cls::PRIMARIES
         if h
           Stream_.call h.keys do |sym|
@@ -94,17 +94,17 @@ module Skylab::TestSupport
       end
     end
 
-    def __didactics_for_method_based_operation y, ro
+    def __didactics_for_method_based_operation dida, ro
 
-      y.yield :is_branchy, false
+      dida.is_branchy = false
 
-      y.yield :description_proc, _desc_proc_for_method_based_operation( ro )
+      dida.description_proc = _desc_proc_for_method_based_operation( ro )
 
-      y.yield :description_proc_reader, -> k do
+      dida.description_proc_reader = -> k do
         ::Kernel._K  # no primaries yet for ping
       end
 
-      y.yield :item_normal_tuple_stream_by, -> do
+      dida.item_normal_tuple_stream_by = -> do
         ::Kernel._K
         NOTHING_
       end
@@ -130,9 +130,9 @@ module Skylab::TestSupport
 
       op = _class.new { self }  # any resources operator needs, it must ask
 
-      _emit_operator_resolved ro do |y|
-        y.yield :name, ro.name
-        y.yield :operator_instance, op
+      _emit_operator_resolved ro do |frame|
+        frame.name = ro.name
+        frame.operator_instance = op
       end
 
       Common_::Bound_Call.via_receiver_and_method_name op, :execute
@@ -140,9 +140,9 @@ module Skylab::TestSupport
 
     def __bound_call_for_method_based_operation ro
 
-      _emit_operator_resolved ro do |y|
-        y.yield :name_symbol, @argument_scanner.current_primary_symbol
-        y.yield :operator_instance, :_ts_not_a_class_based_operation_  # in case you ask
+      _emit_operator_resolved ro do |frame|
+        frame.name_symbol = @argument_scanner.current_primary_symbol
+        frame.operator_instance = :_ts_not_a_class_based_operation_  # in case you ask
       end
 
       Common_::Bound_Call.via_receiver_and_method_name self, ro.invocation_method_name
@@ -153,15 +153,15 @@ module Skylab::TestSupport
       # tell the remote client that we have resolved an operator (necessary
       # for help screens, for other reflection of current operator instance)
 
-      @listener.call :data, :operator_resolved do |y|
+      @listener.call :data, :operator_resolved do |frame|
 
-        y.yield :argument_scanner, @argument_scanner
+        frame.argument_scanner = @argument_scanner
 
-        y.yield :define_didactics_by, -> dida_y do
-          send ro.didactics_method_name, dida_y, ro
+        frame.define_didactics_by do |dida|
+          send ro.didactics_method_name, dida, ro
         end
 
-        yield y
+        yield frame
       end
       NIL
     end
@@ -233,7 +233,7 @@ module Skylab::TestSupport
       true
     end
 
-    def description_proc_reader
+    def description_proc_reader_for_didactics
       -> k do
 
         item_of_compound_branch = @_operator_branch.lookup_softly k
@@ -249,7 +249,7 @@ module Skylab::TestSupport
       end
     end
 
-    def to_item_normal_tuple_stream
+    def to_item_normal_tuple_stream_for_didactics
 
       @_operator_branch.to_normal_symbol_stream.map_by do |sym|
         [ :primary, sym ]

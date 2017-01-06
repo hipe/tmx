@@ -3,8 +3,25 @@ module Skylab::Zerk::TestSupport
   module No_Dependencies_Zerk::Features_Injections
 
     def self.[] tcc
+      tcc.send :define_singleton_method, :given, Given___
       tcc.include InstanceMethods___
     end
+
+    # -
+
+      Given___ = -> & p do
+        yes = true ; x = nil
+        define_method :executed_parse_state do
+          if yes
+            yes = false
+            @ze_FI_DSL_parameters_for_parse = ParametersforParse___.new
+            instance_exec( & p )
+            x = __ze_FI_flush_executed_parse_state
+          end
+          x
+        end
+      end
+    # -
 
     module InstanceMethods___
 
@@ -20,6 +37,46 @@ module Skylab::Zerk::TestSupport
 
       def operationesque_
         executed_tuple_.operationesque
+      end
+
+      # -- DSL
+
+      # ~ setup
+
+      def args * s_a
+        @ze_FI_DSL_parameters_for_parse.args = s_a ; nil
+      end
+
+      def expect_failure
+        @ze_FI_DSL_parameters_for_parse.do_expect_failure = true ; nil
+      end
+
+      # ~ assert
+
+      def index_is_at_ d
+        _args = executed_parse_state.parser.args
+        _args.instance_variable_get( :@_current_index ) == d || fail
+      end
+
+      def __ze_FI_flush_executed_parse_state
+
+        params = remove_instance_variable :@ze_FI_DSL_parameters_for_parse
+        _cls = parser_class_
+
+        if params.do_expect_failure
+          log = Common_.test_support::Expect_Emission::Log.for self
+          p = log.handle_event_selectively
+        end
+
+        _NoDeps = subject_library_
+
+        _args = _NoDeps::CLI_ArgumentScanner.new params.args, & p
+
+        parser = _cls.new _args
+
+        _result = parser.execute
+
+        ParseResultState___.new log, _result, parser
       end
 
       # -- shared state support
@@ -100,6 +157,10 @@ module Skylab::Zerk::TestSupport
       def argument_scanner_
         remove_instance_variable :@argument_scanner
       end
+
+      def expression_agent_for_nodeps_CLI_
+        No_deps_zerk_[]::CLI_ExpressionAgent.instance
+      end
     end
 
     # ==
@@ -113,7 +174,6 @@ module Skylab::Zerk::TestSupport
       _PRIMARIES = {
         zz: :__parse_zz,
       }
-
 
       _lib = No_Dependencies_Zerk::Subject_library_[]
 
@@ -143,6 +203,12 @@ module Skylab::Zerk::TestSupport
 
       _.freeze
     end
+
+    # ==
+
+    ParametersforParse___ = ::Struct.new :args, :do_expect_failure
+
+    ParseResultState___ = ::Struct.new :log, :result, :parser
 
     # ==
 

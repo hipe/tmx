@@ -25,16 +25,16 @@ module Skylab::Zerk
           buffer = "usage: #{ program_name }"
 
           if @has_item_groups
-            st = to_item_name_stream
+            st = to_item_stream
             one = st.gets
           end
 
           if one
-            buffer << " { " << one.as_slug
+            buffer << " { " << one.name.as_slug
             begin
-              nm = st.gets
-              nm || break
-              buffer << PIPEY___ << nm.as_slug
+              pa = st.gets
+              pa || break
+              buffer << PIPEY___ << pa.name.as_slug
               redo
             end while above
             buffer << " }"
@@ -56,19 +56,19 @@ module Skylab::Zerk
           countdown = 3  # max number of primaries to show up here
 
           if @has_item_groups
-            st = to_item_name_stream
-            nm = st.gets
+            st = to_item_stream
+            pa = st.gets
           end
 
-          if nm && countdown.nonzero?
+          if pa && countdown.nonzero?
             say = -> name do
               "[ #{ name.as_slug } ..]"
             end
             begin
               countdown -= 1
-              buffer << SPACE_ << say[ nm ]
-              nm = st.gets
-              nm || break
+              buffer << SPACE_ << say[ pa.name ]
+              pa = st.gets
+              pa || break
               if countdown.zero?
                 buffer << " .."
                 break
@@ -184,11 +184,12 @@ module Skylab::Zerk
             p[ line ]
           end
 
-          item = -> nm do
+          item = -> pa do
 
-            buffer = fmt % nm.as_slug
+            name = pa.name
+            buffer = fmt % name.as_slug
 
-            desc_p = description_proc_for[ nm.as_variegated_symbol ]
+            desc_p = description_proc_for[ pa.load_ticket ]
             if desc_p
               p = first_line
               _express_into y, desc_p
@@ -205,12 +206,12 @@ module Skylab::Zerk
             boundary = subsequent_boundary
           end
 
-          st = group.to_item_name_stream
+          st = group.to_item_stream
           begin
-            nm = st.gets
-            nm || break
+            pa = st.gets
+            pa || break
             boundary[]
-            item[ nm ]
+            item[ pa ]
             redo
           end while nil
           NIL
@@ -290,8 +291,9 @@ module Skylab::Zerk
           begin
             tuple = st.gets
             tuple || break
-            type_sym, normal_sym = tuple
-            normal_sym || ::Kernel._OOPS  # #todo
+            type_sym, load_ticket = tuple
+            load_ticket || ::Kernel._OOPS  # #todo
+            normal_sym = load_ticket.intern
             name = NAME_FOR___.fetch( type_sym )[ normal_sym ]
 
             # -- maybe increase max width
@@ -308,7 +310,7 @@ module Skylab::Zerk
               current_item_group_normal_sym = type_sym
             end
 
-            current_item_array.push name
+            current_item_array.push Item___.new( name, load_ticket )
             redo
           end while above
 
@@ -320,9 +322,9 @@ module Skylab::Zerk
 
       private
 
-        def to_item_name_stream
+        def to_item_stream
           to_item_group_stream.expand_by do |group|
-            group.to_item_name_stream
+            group.to_item_stream
           end
         end
 
@@ -353,7 +355,7 @@ module Skylab::Zerk
           @normal_item_type_symbol = type_sym
         end
 
-        def to_item_name_stream
+        def to_item_stream
           Stream_[ @item_array ]
         end
 
@@ -361,6 +363,22 @@ module Skylab::Zerk
           :item_array,
           :normal_item_type_symbol,
         )
+      end
+
+      class Item___
+        def initialize nm, lt
+          @load_ticket = lt
+          @name = nm
+        end
+        if false
+        def intern # [#ze-062] (the other side)
+          @load_ticket.intern
+        end
+        end
+        attr_reader :name, :load_ticket
+        def _IS_ITEM_SANITY_CHECK_ze_  # [tmx] too
+          true
+        end
       end
 
       # ==

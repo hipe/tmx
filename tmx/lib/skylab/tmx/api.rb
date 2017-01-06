@@ -88,14 +88,14 @@ module Skylab::TMX
 
         op.argument_scanner = as
 
-        @_emit.call :data, :operator_resolved do |y|
+        @_emit.call :data, :operator_resolved do |fr|
 
-          y.yield :name, name
-          y.yield :argument_scanner, as
-          y.yield :operator_instance, op
+          fr.name = name
+          fr.argument_scanner = as
+          fr.operator_instance = op
 
-          y.yield :define_didactics_by, -> dida_y do
-            Zerk_::Models::Didactics.define_conventionaly dida_y, op
+          fr.define_didactics_by do |dida|
+            Zerk_::Models::Didactics.define_conventionaly dida, op
           end
         end
 

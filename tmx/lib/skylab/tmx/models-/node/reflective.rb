@@ -126,8 +126,8 @@ module Skylab::TMX
       @_lt.path_to_gem
     end
 
-    def stem
-      @_lt.stem
+    def entry_string
+      @_lt.entry_string
     end
   end
 # ->

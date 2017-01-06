@@ -38,7 +38,7 @@ here's the four members of the structure, then a critique of each:
   - `is_branchy`
   - `description_proc`
   - `description_proc_reader`
-  - `item_normal_tuple_stream_by`
+  - `to_item_normal_tuple_stream`
 
 
 
@@ -76,7 +76,7 @@ false-ish is not proscribed, but it is guaranteed not to cause failure.
 
 
 
-### `item_normal_tuple_stream_by`
+### `to_item_normal_tuple_stream`
 
 an "item normal tuple" is experimentally:
     [ { :primary | :operator }, normal-name-symbol ]

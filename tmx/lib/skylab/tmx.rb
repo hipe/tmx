@@ -3,7 +3,8 @@ require 'skylab/common'
 module Skylab::TMX
 
   def self.describe_into_under y, _
-    y << "uh.."
+    y << "an attempt at making command-line apps of the skylab universe"
+    y << "accessible from one entrypoint."
   end
 
   Common_ = ::Skylab::Common
@@ -15,7 +16,7 @@ module Skylab::TMX
 
       # (compare `installation_.to_sidesystem_load_ticket_stream`)
 
-      _dir = __lookup_development_directory
+      _dir = __development_directory
       glob = ::File.join _dir, '*', METADATA_FILENAME
       files = ::Dir.glob glob
       if files.length.zero?
@@ -39,12 +40,12 @@ module Skylab::TMX
       bx = Common_::Box.new
       begin
         lt = st.gets
-        bx.add lt.stem, lt
+        bx.add lt.entry_string, lt
       end while nil
 
       if stem and ! bx.has_name stem
         stemmish = Stemmish___[ stem ]
-        bx.add stemmish.stem, stemmish
+        bx.add stemmish.entry_string, stemmish
       end
 
       _anything = Home_::Models::Sigil.via_stemish_box bx
@@ -86,24 +87,27 @@ module Skylab::TMX
       o.done
     end
 
-    def __lookup_development_directory
+    define_method :__development_directory, ( Lazy_.call do
 
-      dir = sidesystem_path_
+      _dir = Home_.sidesystem_path_
 
-      stat = ::File.lstat dir
+      _norm_dir = Home_.path_normalizer_.normalize_absolute_path _dir
 
-      if stat.symlink?  # explained at [#tm-013.1]
-        dir = ::File.readlink dir
-      end
-
-      ::File.dirname dir
-    end
+      ::File.dirname _norm_dir
+    end )
 
     def test_support  # #[#ts-035]
       @___test_support ||= begin
         require_relative '../../test/test-support' ; Home_::TestSupport
       end
     end
+
+    define_method :path_normalizer_, ( Lazy_.call do
+      # see [#tm-013.1] and [#cm-017]
+      require 'skylab/code_metrics/operations-/mondrian'  # yikes
+      _Lib = ::Skylab_CodeMetrics_Operations_Mondrian_EarlyInterpreter
+      _Lib::PathNormalizer.new nil, nil  # do_debug, debug_IO
+    end )
 
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
@@ -142,6 +146,23 @@ module Skylab::TMX
     end
   end
 
+  # == model support
+
+  class SimpleModel_  # EXPERIMENT import from [tab]
+
+    class << self
+      alias_method :define, :new
+      undef_method :new
+    end  # >>
+
+    def initialize  # (a suggestion)
+      yield self
+      freeze
+    end
+
+    private :dup
+  end
+
   # ==
 
   Zerk_lib_ = Lazy_.call do
@@ -152,6 +173,10 @@ module Skylab::TMX
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Basic_ = Lazy_.call do
+    lib_.basic
   end
 
   # ==
@@ -183,6 +208,7 @@ module Skylab::TMX
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
   DASH_ = '-'
   DOT_ = '.'
+  EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self

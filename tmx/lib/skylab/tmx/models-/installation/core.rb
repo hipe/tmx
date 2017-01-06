@@ -21,28 +21,32 @@ module Skylab::TMX
       freeze  # or not..
     end
 
-    def lookup_reflective_sidesystem__ stem
+    def lookup_reflective_sidesystem__ entry_string
 
       # assume that `stem` is isomorphic with a sidesystem in the
       # installation.
 
-      gem_name = "#{ @participating_gem_prefix }#{ stem }"
+      gem_name = "#{ @participating_gem_prefix }#{ entry_string }"
 
-      gne = Gem_Name_Elements_.new
+      gne = GemNameElements_.new
 
-      gne.stem = stem
+      gne.entry_string = entry_string
       gne.gem_name = gem_name
-      gne.const_a = @participating_gem_const_path_head
+      gne.const_head_path = @participating_gem_const_path_head
       gne.exe_prefix = @participating_exe_prefix
 
       _sp = Gem::Specification.find_by_name gem_name, '>= 0.pre'
       _entry = "#{ gem_name }-#{ _sp.version }"
       gne.gem_path = ::File.join @single_gems_dir, _entry
 
-      Load_Ticket_.new gne
+      LoadTicket_.new gne
     end
 
     def to_reflective_sidesystem_stream__
+
+      # 2x [sli] both times probably not covered:
+      # 1x to make the sidesystem dependencies graph
+      # 1x a not covered one-off for symlinking gems to a dev dir
 
       cls = Home_::Models_::Node::Reflective
 
@@ -58,21 +62,30 @@ module Skylab::TMX
 
     def to_sidesystem_load_ticket_stream
 
-      _wow = __build_filesystem_listing_of_all_participating_gems
+      # if you would want the same results as what we see in the `map`
+      # operation, see discussion at [#007.B] (inline)
+
+      name_elements_for = nil
+
+      main = -> path do
+
+        # you actually do *not* want `path_normalizer_` here - it can
+        # strip from the directory path gem-related information we need
+
+        _ne = name_elements_for[ path ]
+        LoadTicket_.new _ne
+      end
 
       p = -> path do
 
-        name_elements_for = Name_elementser___[ path, self ]
+        name_elements_for = Name_elementser__[ path, self ]
 
-        p = -> path_ do
-
-          Load_Ticket_.new name_elements_for[ path_ ]
-        end
-
-        p[ path ]
+        ( p = main )[ path ]
       end
 
-      Stream_.call _wow do |path|
+      _big_list = __build_filesystem_listing_of_all_participating_gems
+
+      Stream_.call _big_list do |path|
         p[ path ]
       end
     end
@@ -82,15 +95,32 @@ module Skylab::TMX
       ::Dir[ ::File.join( @single_gems_dir, "#{ @participating_gem_prefix }*" ) ]
     end
 
+    def load_ticket_via_gem_name gem_require_path
+
+      gem_name = gem_require_path.gsub ::File::SEPARATOR, DASH_
+
+      _tailerer = Basic_[]::String::Tailerer_via_separator[ EMPTY_S_ ]
+      _tailer = _tailerer[ @participating_gem_prefix ]
+      _tail = _tailer[ gem_name ]
+
+      ne = GemNameElements_.new
+      ne.entry_string = _tail
+      ne.gem_name = gem_name
+      ne.gem_path = :_ALREADY_LOADED_tmx_
+      ne.const_head_path = @participating_gem_const_path_head
+      ne.exe_prefix = @participating_exe_prefix
+
+      LoadTicket_.new ne
+    end
+
     # our coupling to the gem API (and beyond) is both tight and
     # ephemeral, so we try to hide all of that here.
 
-    Name_elementser___ = -> path, inst do
+    Name_elementser__ = -> path, inst do
 
       exe_pfx = inst.participating_exe_prefix
       gem_prefix = inst.participating_gem_prefix
-      const_a = inst.participating_gem_const_path_head
-
+      const_head_path = inst.participating_gem_const_path_head
 
       # assume that the first path is like all the others in this respect,
       # so cache some details from it so that we don't recalculate the
@@ -101,48 +131,48 @@ module Skylab::TMX
 
       gem_name_via_entry = Gem_name_tools_[].Gem_name_via_entry
 
-      proto = Gem_Name_Elements_.new nil, nil, nil, const_a, exe_pfx
+      proto = GemNameElements_.new nil, nil, nil, const_head_path, exe_pfx
 
       -> path_ do
 
         gemname = gem_name_via_entry[ path_[ basename_via_range ] ]
 
         gne = proto.dup
-        gne.stem = gemname[ stem_via_range ]
+        gne.entry_string = gemname[ stem_via_range ]
         gne.gem_name = gemname
         gne.gem_path = path_
         gne
       end
     end
 
-    Gem_Name_Elements_ = ::Struct.new(
-      :stem, :gem_name, :gem_path, :const_a, :exe_prefix )
+    GemNameElements_ = ::Struct.new(
+      :entry_string, :gem_name, :gem_path, :const_head_path, :exe_prefix )
 
-    class Load_Ticket_
+    class LoadTicket_
 
-      attr_reader(
-        :const_path_array_guess,
-        :gem_name_elements,
-        :require_path,
-      )
-
-      def initialize gne  # Gem_Name_Elements_
+      def initialize gne  # GemNameElements_
 
         @require_path = gne.gem_name.gsub DASH_, ::File::SEPARATOR
 
-        cpa = gne.const_a.dup
+        const_path_guess = []
 
-        gne.stem.split( DASH_ ).each do | segment |
-          cpa.push segment.gsub( WORD_SEP_RX___ ){ $1.upcase }.intern
+        gne.gem_name.split( DASH_ ).each do |segment|
+          const_path_guess.push segment.gsub( WORD_SEP_RX___ ){ $1.upcase }.intern
         end
 
-        @const_path_array_guess = cpa
+        gne.const_head_path.each_with_index do |sym, d|
+          const_path_guess.fetch( d ) == sym && next
+          self._NAME_SANITY
+        end
+
+        @const_path_array_guess = const_path_guess.freeze
 
         @gem_name_elements = gne
-
       end
 
-      WORD_SEP_RX___ = /(?:(?<=^|\d)|_)([a-z])/
+      WORD_SEP_RX___ = %r((?:(?<=^|\d)|_)([a-z]))
+      # also worked: %r(_?(?<![a-z])([a-z0-9]))
+      # see #tombstone-C, was #wish [#co-067]
 
       def require_sidesystem_module
         @____sidesys_mod ||= __induce_sidesystem_module
@@ -152,15 +182,47 @@ module Skylab::TMX
 
         require @require_path
 
-        Autoloader_.const_reduce @const_path_array_guess, ::Object
+        # we avoid using `const_reduce` (for name correction) unless we
+        # need to (for no good reason).
+        # this is near but not the same as [#br-083]
+
+        mod = ::Object
+        sym_a = const_path_array_guess
+        ( sym_a.length - 1 ).times do |d|
+          mod = mod.const_get sym_a.fetch d  # until it fails
+        end
+
+        const = sym_a.fetch( -1 )
+
+        if mod.const_defined? const, false
+          mod.const_get const, false
+        else
+          # (strange - probably a holdover from when we had old toplevel names)
+          _ = Autoloader_.const_reduce [ const ], mod
+          _
+        end
       end
 
       def path_to_gem
         @gem_name_elements.gem_path
       end
 
-      def stem
-        @gem_name_elements.stem
+      def intern
+        @___as_intern ||= @gem_name_elements.entry_string.intern
+      end
+
+      def entry_string
+        @gem_name_elements.entry_string
+      end
+
+      attr_reader(
+        :const_path_array_guess,
+        :gem_name_elements,
+        :require_path,
+      )
+
+      def IS_LOAD_TICKET_tmx_  # temporary
+        true
       end
     end
 
@@ -195,9 +257,9 @@ module Skylab::TMX
       end
     end
 
-    DASH_ = '-'
     Here_ = self
   end
 end
+# #tombstone-C: got rid of name fix hack
 # :#tombstone: again
 # :#tombstone: was rewritten

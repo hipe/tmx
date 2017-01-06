@@ -247,4 +247,9 @@ module Skylab::Tabular
   NOTHING_ = nil
   UNABLE_ = false
   SPACE_ = ' '
+
+  def self.describe_into_under y, _
+    y << "a toolkit for table-oriented transformations on streams."
+    y << "in practice it's usually used to render ASCII tables"
+  end
 end

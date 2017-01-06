@@ -377,6 +377,10 @@ class Skylab::Task
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'
+
+  def self.describe_into_under y, _
+    y << "experiments with dependency graphs. now home of the \"magnetics\" dream."
+  end
 end
 # #tombstone: we no longer subclass rake task
 # #tombstone: (temporary) Home_.lib_.fields::Attribute::DSL[ self ]

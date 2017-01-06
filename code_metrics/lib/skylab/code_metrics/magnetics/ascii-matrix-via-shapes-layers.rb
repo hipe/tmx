@@ -38,7 +38,7 @@ module Skylab::CodeMetrics
           __stubbed_big_string_via_width width
         end
 
-        Basic_::String.line_stream _big_string
+        Basic_[]::String.line_stream _big_string
       end
 
       def __stubbed_big_string_via_width w
@@ -132,7 +132,7 @@ module Skylab::CodeMetrics
         wo = @shapes_layers
 
         @__normal_rectangular_pixelator =
-            Basic_::Rasterized::NormalRectangularPixelator.
+            Basic_[]::Rasterized::NormalRectangularPixelator.
         via_screen_vector_and_world_vector(
           cx.pixels_wide,
           cx.pixels_high,
@@ -496,8 +496,6 @@ module Skylab::CodeMetrics
 
     # -
     # ==
-
-    Require_basic_[]
 
     # ==
 

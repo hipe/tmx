@@ -148,7 +148,6 @@ module Skylab::Zerk::TestSupport
 
       def __build_state_machine
 
-
         o = Home_.lib_.basic::State::Machine.begin_definition
 
         o.add_state(
@@ -223,11 +222,7 @@ module Skylab::Zerk::TestSupport
             mu.__receive_additional_description_content_ md[:desc]
             NOTHING_
           end,
-          :can_transition_to, [
-            :additional_desc_line,
-            :blank_line,
-            :nonfirst_item_line,
-          ],
+          :can_transition_to, same,
         )
 
         o.add_state(
@@ -239,6 +234,7 @@ module Skylab::Zerk::TestSupport
           end,
           :can_transition_to, [
             :nonfirst_item_line,
+            :ending,  # this happens only with a section followed by another section
           ],
         )
 

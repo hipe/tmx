@@ -388,6 +388,11 @@ module Skylab::SearchAndReplace
   SPACE_ = ' '
   SPACE_SPAN_RX_ = /[[:space:]]+/
   UNABLE_ = false
+
+  def self.describe_into_under y, _
+    y << "it started as a one-off, then it grew to become the flagship"
+    y << "application of \"zerk\" interactive."
+  end
 end
 
 # #tombstone: removed some unavailability rigging

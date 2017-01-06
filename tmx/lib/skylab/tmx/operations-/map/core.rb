@@ -404,11 +404,11 @@ module Skylab::TMX
         false
       end
 
-      def description_proc_reader
+      def description_proc_reader_for_didactics
         Description_proc_reader___[]
       end
 
-      def to_item_normal_tuple_stream
+      def to_item_normal_tuple_stream_for_didactics
         @operator_branch.to_normal_symbol_stream.map_by do |sym|
           [ :primary, sym ]
         end

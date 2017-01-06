@@ -151,7 +151,7 @@ module Skylab::CodeMetrics
 
     # ==
 
-    const_tailer_via_head = Tailerer_via_separator_[ CONST_SEP_ ]
+    const_tailer_via_head = Basic_[]::String::Tailerer_via_separator[ CONST_SEP_ ]
 
     ModuleAnnotation_via_FrameStream__ = -> frame_st, head_const, & li do
 

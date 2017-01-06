@@ -43,7 +43,7 @@ module Skylab::Slicer
       h = {}
       _st.each do | s10n |
 
-        h[ s10n.stem ] = s10n.sigil
+        h[ s10n.entry_string ] = s10n.sigil
 
         graph_viz_labeller << s10n
       end
@@ -87,11 +87,11 @@ module Skylab::Slicer
 
       sigils = @_sigils
 
-      lhs = "  #{ sigils.fetch ss.stem } -> "
+      lhs = "  #{ sigils.fetch ss.entry_string } -> "
 
       ss.inferred_dependencies.each do | sym |
 
-        @stdout.puts "#{ lhs }#{ sigils.fetch @h.fetch( sym ).stem }"
+        @stdout.puts "#{ lhs }#{ sigils.fetch @h.fetch( sym ).entry_string }"
       end
       NIL_
     end

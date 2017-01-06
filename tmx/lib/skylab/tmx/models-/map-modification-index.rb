@@ -145,7 +145,5 @@ module Skylab::TMX
     INVOLVED_ATTRIBUTES__ = :@___involved_attributes
 
     # ==
-
-    EMPTY_A_ = [].freeze
   end
 end

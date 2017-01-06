@@ -9,7 +9,7 @@ that lib proper, but some of its facilities were still needed by some legacy
 applications.
 
 but when we moved [#024] the "fancy lookup" proc to here, [pl] became an
-essential member of The Pantheon of skylab support libraries.  as such,
+essential member of The Pantheon of skylab support libraries. as such,
 the subject has become *the* home for all plugin-like solutions.
 
 

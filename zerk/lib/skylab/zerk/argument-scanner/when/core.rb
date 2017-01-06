@@ -305,19 +305,19 @@ module Skylab::Zerk
         end
 
         def _to_operation_moniker_scanner
-          scn = @omni.to_operation_symbol_scanner
-          @expression_agent.calculate do
-            scn.map_by do |sym|
-              oper sym
-            end
-          end
+          _scn = @omni.to_operator_symbol_scanner
+          _map_by_expag_method :oper, _scn
         end
 
         def _to_primary_moniker_scanner
-          scn = @omni.to_primary_symbol_scanner
+          _scn = @omni.to_primary_symbol_scanner
+          _map_by_expag_method :prim, _scn
+        end
+
+        def _map_by_expag_method m, scn
           @expression_agent.calculate do
             scn.map_by do |sym|
-              prim sym
+              send m, sym.intern  # respect [#062]
             end
           end
         end

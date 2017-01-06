@@ -147,7 +147,7 @@ module Skylab::Zerk::TestSupport
     end
 
     def expression_agent
-      No_deps_zerk_[]::CLI_ExpressionAgent.instance
+      expression_agent_for_nodeps_CLI_
     end
 
     # ==

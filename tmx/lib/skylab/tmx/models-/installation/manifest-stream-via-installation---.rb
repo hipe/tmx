@@ -23,7 +23,6 @@ module Skylab::TMX
         exe_st = Stream_.call(
           ::Dir[ "#{ @gems_dir }/#{ @gem_pass_prefix }*/bin/#{ @exe_pfx }*" ] )
 
-
         sep = ::Regexp.escape ::File::SEPARATOR
         _rxs = Gem_name_tools_[].RXS
 
@@ -49,7 +48,7 @@ module Skylab::TMX
 
         stem_via_range = @gem_pass_prefix.length .. -1
 
-        proto = Gem_Name_Elements_.new(
+        proto = GemNameElements_.new(
           nil, nil, nil, @const_path_head, @exe_pfx )
 
         flush = -> do
@@ -57,12 +56,12 @@ module Skylab::TMX
           gem_name = prev_md[ :gem_name ]
 
           gne = proto.dup
-          gne.stem = gem_name[ stem_via_range ]
+          gne.entry_string = gem_name[ stem_via_range ]
           gne.gem_name = gem_name
           gne.gem_path = prev_md[ :gem_path ]
 
           Models_::Node::Manifest.new(
-            items, Load_Ticket_.new( gne ) )
+            items, LoadTicket_.new( gne ) )
         end
 
         body_p = nil

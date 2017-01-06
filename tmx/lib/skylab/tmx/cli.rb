@@ -20,9 +20,10 @@ module Skylab::TMX
 
         @_emission_handler_methods = nil
         @listener = method :__receive_emission
-        @_args = __argument_scanner_via_argv_and_listener argv
+        @args = __argument_scanner_via_argv_and_listener argv
         @__presumably_real_ARGV = argv
         @selection_stack = [ __build_root_frame ]
+        @verbose_count_ = 0
 
         @sin = sin
         @sout = sout
@@ -38,13 +39,20 @@ module Skylab::TMX
       end
 
       def __build_root_frame
-        RootFrame___.new @_args do
-          Zerk_lib_[]::Models::Didactics.via_participating_operator self
+        RootFrame___.define do |rf|
+          rf.didactics_by = -> do
+            CLI::Magnetics_::HelpScreenDidactics_via_TMX_HostClient[ self ]
+          end
+          rf.argument_scanner = @args
         end
       end
 
       def json_file_stream_by & p
         @__json_file_stream_by = p
+      end
+
+      def json_file_stream_by__  # NOTE EXPERIMENT
+        @__json_file_stream_by
       end
 
       def metadata_filename_by & p
@@ -83,30 +91,41 @@ module Skylab::TMX
         o = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
           __inject_features fi
         end
-        if @_args.no_unparsed_exists
-          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ o ]
+        @omni = o
+        if @args.no_unparsed_exists
+          _when_no_arguments
         elsif o.parse_operator_softly
           lu = o.flush_to_lookup_operator
-          lu and send lu.injector, lu.mixed_business_value
+          lu and __bound_call_via_found_operator lu
         elsif o.parse_primary_softly
-
-          # (life is easier because there are no universal primaries..)
-          # (really, help is an operation that looks like a primary.)
-
-          ok = o.flush_to_lookup_current_and_parse_remaining_primaries
-          ok && self._SANITY__expected_early_exit_from_toplevel_primary
-          ok
+          __when_primary_at_head
         else
           self._COVER_ME__when_token_looks_totally_strange__
         end
       end
 
+      def __when_primary_at_head
+        # help probably
+        ok = @omni.flush_to_lookup_current_and_parse_remaining_primaries
+        if ok
+          if @verbose_count_.nonzero?
+            @stderr.puts "(-verbose is for -help)"
+          end
+          _when_no_arguments  # assume parsed -v but no -h
+        else
+          ok  # assume EARLY_END from help
+        end
+      end
+
+      def _when_no_arguments
+        Zerk_lib_[]::ArgumentScanner::When::No_arguments[ @omni ]
+      end
+
       def __inject_features fi
 
-        fi.argument_scanner = @_args
+        fi.argument_scanner = @args
 
-        fi.add_hash_based_operators_injection(
-          OPERATIONS__, :__bound_call_via_intrinsic_operation )
+        fi.add_hash_based_operators_injection OPERATORS___, :tmx_intrinsic
 
         fi.add_lazy_operators_injection_by do |o|
           __add_sidesystem_mounter_lazily o
@@ -115,7 +134,7 @@ module Skylab::TMX
         fi.add_primaries_injection PRIMARIES___, self
       end
 
-      def __add_sidesystem_mounter_lazily fi
+      def __add_sidesystem_mounter_lazily inj
 
         _inst = Home_.installation_
 
@@ -124,95 +143,38 @@ module Skylab::TMX
           o.installation = _inst
         end
 
-        fi.operators = ssm
-        fi.injector = :__bound_call_via_mounted_sidesystem
+        inj.operators = ssm
+        inj.injector = :tmx_mountable_sidesystem
         @__sidesys_mounter = ssm ; nil
       end
 
-      def __bound_call_via_intrinsic_operation m
-        send m
-      end
+      def __bound_call_via_found_operator lu
 
-      def __bound_call_via_mounted_sidesystem _GEM_PATH
-        _ssm = remove_instance_variable :@__sidesys_mounter
-        _ssm.bound_call_via_load_ticket__ _GEM_PATH
+        case lu.injector
+        when :tmx_intrinsic
+          send lu.mixed_business_value
+        when :tmx_mountable_sidesystem
+          _ssm = remove_instance_variable :@__sidesys_mounter
+          _ssm.bound_call_via_load_ticket__ lu.mixed_business_value
+        else etc
+        end
       end
 
       def __WAS_bound_call
-
-        if @argv.no_unparsed_exists
-          __when_no_args
-
-        elsif Looks_like_option[ @argv.current_token ]
-          __when_head_looks_like_option
-
-        elsif __head_is_intrinsic_operator
-          __bound_call_for_intrinsic_operator_DONE
-
-        elsif __head_matches_mountable_operator
-          __bound_call_for_mountable_operator
-
-        elsif __head_matches_mountable_one_off_executable
+        # ..
+        if __head_matches_mountable_one_off_executable
           __bound_call_for_mountable_one_off_executable
-
-        else
-          __whine_about_no_such_operator_DONE
         end
       end
 
-      def __when_no_args
-
-        self._PROBABLY_CHANGE_THIS_TO_BE_MORE_INCLUSIVE
-
-        _init_selective_listener
-
-        @listener.call :error, :expression, :parse_error do |y|
-
-          _st = Stream_.call OPERATIONS__.keys do |sym|
-            Common_::Name.via_variegated_symbol sym
-          end
-
-          _any_of_these = say_formal_operation_alternation _st
-
-          y << "expecting #{ _any_of_these }"
-        end
-
-        UNABLE_
-      end
-
-      def __when_head_looks_like_option  # assume 0 < argv length
-        if HELP_RX =~ @argv.current_token
-          _express_help
-        else
-          __when_unrecognized_option_at_front
-        end
-      end
-
-      def __when_unrecognized_option_at_front
-        @serr.puts "unrecognized option: #{ @argv.current_token.inspect }"
-        invite_to_general_help_and_failed
-      end
-
-      def __head_is_intrinsic_operator_GONE
-
-        entry = @argv.current_token.gsub DASH_, UNDERSCORE_
-
-        if _store :@__operation_method_name, OPERATIONS__[ entry.intern ]
-          ACHIEVED_
-        else
-          @__possible_entry_REFERENCE = entry
-          UNABLE_
-        end
-      end
-
-      OPERATION_DESCRIPTIONS___ = {
+      OPERATOR_DESCRIPTIONS = {
         test_all: :__describe_test_all,
         reports: :__describe_reports,
         map: :__describe_map,
         ping: :__describe_ping,
       }
 
-      OPERATIONS__ = {
+      OPERATORS___ = {
         # (currently the below order determines help screen order)
         test_all: :__bound_call_for_test_all,
         reports: :__bound_call_for_reports,
@@ -220,8 +182,14 @@ module Skylab::TMX
         ping: :__bound_call_for_ping,
       }
 
+      PRIMARY_DESCRIPTIONS = {
+        help: :__describe_help,
+        verbose: :__describe_verbose,
+      }
+
       PRIMARIES___ = {
         help: :_express_help,
+        verbose: :_process_verbose,
       }
 
       # -- test all
@@ -270,13 +238,13 @@ module Skylab::TMX
         # (perhaps the only time we need to "hand write" a push is when
         #  we "mount" another service. (just for help screens)):
 
-        _push_frame do |y|
+        _push_frame do |fr|
 
-          y.yield :name_symbol, :test_all
-          y.yield :argument_scanner, arg_scn
+          fr.name_symbol = :test_all
+          fr.argument_scanner = arg_scn
 
-          y.yield :define_didactics_by, -> dida_y do
-            Zerk_::Models::Didactics.define_conventionaly dida_y, api
+          fr.define_didactics_by do |dida|
+            Zerk_::Models::Didactics.define_conventionaly dida, api
           end
         end
 
@@ -502,35 +470,6 @@ module Skylab::TMX
         NIL
       end
 
-      # -- generic mounting
-
-      # when the front element of the ARGV directly corresponds to a
-      # sidesystem (gem), then resolution of the intended recipient is much
-      # more straightforward than having to load possibly the whole tree.
-
-      def __head_matches_mountable_operator
-
-        inst = Home_.installation_
-
-        mounter = CLI::Magnetics_::BoundCall_via_MountAnyInstalledSidesystem.new(
-          remove_instance_variable( :@__possible_entry_REFERENCE ),
-          self,
-          inst,
-        )
-
-        # (we could extend this "optimization" to the executables but meh)
-
-        if mounter.match_head_as_participating_gem
-          @__mounter = mounter ; ACHIEVED_
-        else
-          @__installation = inst ; UNABLE_
-        end
-      end
-
-      def __bound_call_for_mountable_operator
-        remove_instance_variable( :@__mounter ).bound_call_for_participating_sidesystem
-      end
-
       # -- support for customizing emissions
 
       def on_this_do_this k, & p  # k = terminal_channel_symbol
@@ -551,34 +490,36 @@ module Skylab::TMX
 
       # -- support for expressing results (our version of [#ze-025])
 
+      def __describe_help y
+        y << "(this screen.)"
+      end
+
       def _express_help
         CLI::When_::Help[ self ]
       end
 
-      # ~ (near) boilerplate for help
-
-      def is_branchy
-        true
+      def __describe_verbose y
+        y << "includes \"mountable sidesystems\" in the help listing"
       end
+
+      def _process_verbose
+        max = MAX_NUMBER_OF_VERBOSES___
+        if max == @verbose_count_
+          @stderr.puts "maximum verbosity level: #{ max }. reduce the number & try again"
+          _failed
+        else
+          @verbose_count_ += 1 ; ACHIEVED_
+        end
+      end
+
+      # ~ (near) boilerplate for help
 
       def describe_into y
         y << "experiment.."
       end
 
-      def description_proc_reader
-        -> sym do
-          method OPERATION_DESCRIPTIONS___.fetch sym  # or don't fetch
-        end
-      end
-
-      def to_item_normal_tuple_stream
-        $stderr.puts "(the below is what will change at [#018] [tmx])"
-        Stream_.call OPERATIONS__.keys do |sym|
-          [ :operator, sym ]
-        end
-      end
-
       def argument_scanner  # because we are top, we don't alter our stream
+        self._CONTACT_CHECK
         NOTHING_
       end
 
@@ -685,14 +626,8 @@ module Skylab::TMX
       end
 
       def _user_scanner
-        scn = @_args
-        if scn.no_unparsed_exists
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
-        else
-          d, a = scn.close_and_release
-          scn.freeze  # experiment
-          Common_::Polymorphic_Stream.via_start_index_and_array d, a
-        end
+        d, a = @args.close_and_release
+        Common_::Polymorphic_Stream.via_start_index_and_array d, a
       end
 
       # --
@@ -807,10 +742,9 @@ module Skylab::TMX
 
       def _push_frame  # exactly [#ze-055] #note-1, #note-2
 
-        _frame = NonRootFrame___.new @selection_stack.last.didactics_by do |fr|
-          yield( ::Enumerator::Yielder.new do |k, x|
-            fr.receive x, k  # hi.
-          end )
+        _frame = NonRootFrame___.define do |fr|
+          fr.below_didactics_by = @selection_stack.last.didactics_by
+          yield fr
         end
 
         @selection_stack.push _frame
@@ -833,7 +767,7 @@ module Skylab::TMX
 
         real = remove_instance_variable :@__presumably_real_ARGV
 
-        scn = remove_instance_variable :@_args
+        scn = remove_instance_variable :@args
         if ! scn.is_closed
           _, a = scn.close_and_release__
           a.object_id == real.object_id || self._SANITY
@@ -849,7 +783,7 @@ module Skylab::TMX
         #  we want to make it clear that we ourselves are totally done
         #  parsing (or otherwise referencing) arguments)
 
-        remove_instance_variable :@_args
+        remove_instance_variable :@args
       end
 
       attr_writer(
@@ -857,12 +791,15 @@ module Skylab::TMX
       )
 
       attr_reader(
+        :args,
         :listener,
+        :omni,
         :program_name_string_array,
         :selection_stack,
         :stderr,
         :sin,
         :sout,
+        :verbose_count_,
       )
     end
 
@@ -916,40 +853,35 @@ module Skylab::TMX
 
     # ==
 
-    Looks_like_option = -> do
-      d = DASH_.getbyte 0  # DASH_BYTE_
-      -> s do
-        d == s.getbyte(0)
-      end
-    end.call
+    class NonRootFrame___ < SimpleModel_
 
-    # ==
-
-    class NonRootFrame___
-
-      def initialize above_dida_p
-        @__above_didactics_by = above_dida_p
+      def initialize
         yield self
+        # can't freeze b.s name vs name_symbol
       end
 
-      def receive x, k
-        instance_variable_set WRITABLE___.fetch( k ), x
+      def define_didactics_by & p
+        @__define_didactics = p
       end
 
-      WRITABLE___ = {
-        argument_scanner: :@__argument_scanner,
-        define_didactics_by: :@define_didactics_by,
-        name: :@name,
-        name_symbol: :@__name_symbol,
-        operator_instance: :@__operator_instance,
-      }
+      attr_writer(
+        :argument_scanner,  # @__argument_scanner
+        :below_didactics_by,
+        :name,  # k
+        :name_symbol,  # :@__name_symbol
+        :operator_instance,  # @__operator_instance
+      )
 
       def didactics_by
         method :to_didactics
       end
 
       def to_didactics
-        Zerk_::Models::Didactics.non_rootly__ @define_didactics_by, name, @__above_didactics_by
+        Zerk_::Models::Didactics.define do |o|
+          @__define_didactics[ o ]
+          o.name = name
+          o.below_didactics_by = @below_didactics_by
+        end
       end
 
       def name_symbol
@@ -961,34 +893,28 @@ module Skylab::TMX
       end
 
       def __if_name_wasnt_set_then_name_symbol_must_have_been_set
-        Common_::Name.via_variegated_symbol(
-          remove_instance_variable :@__name_symbol )
-      end
-
-      def argument_scanner
-        @__argument_scanner
+        Common_::Name.via_variegated_symbol @name_symbol
       end
 
       def operator_instance__  # special needs only
-        @__operator_instance
-      end
-    end
-
-    class RootFrame___
-
-      def initialize scn, & p
-        @argument_scanner = scn
-        @didactics_by = p
-      end
-
-      def to_didactics
-        @didactics_by.call
+        @operator_instance
       end
 
       attr_reader(
         :argument_scanner,
+      )
+    end
+
+    class RootFrame___ < SimpleModel_
+
+      attr_accessor(
+        :argument_scanner,
         :didactics_by,
       )
+
+      def to_didactics
+        @didactics_by.call
+      end
     end
 
     # ==
@@ -1005,10 +931,9 @@ module Skylab::TMX
 
     # ==
 
-    # ==
-
     FAILURE_EXITSTATUS__ = 5
     HELP_RX = /\A-{0,2}h(?:e(?:lp?)?)?\z/
+    MAX_NUMBER_OF_VERBOSES___ = 2
     SUCCESS_EXITSTATUS__ = 0
 
     # ==

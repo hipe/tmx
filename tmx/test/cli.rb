@@ -68,7 +68,7 @@ module Skylab::TMX::TestSupport
 
       def expect_common_help_screen_sections_by_
 
-        sct = HelpScreenCommonThreeSections___.new
+        sct = HelpScreenCommonFourSections___.new
 
         o = Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early.define
 
@@ -111,8 +111,8 @@ module Skylab::TMX::TestSupport
 
     # ==
 
-    HelpScreenCommonThreeSections___ =
-      ::Struct.new :usage, :description, :items
+    HelpScreenCommonFourSections___ =
+      ::Struct.new :usage, :description, :main_items, :secondary_items
 
     # ==
 

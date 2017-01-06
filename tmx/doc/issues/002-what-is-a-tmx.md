@@ -13,8 +13,9 @@ be true:
 
   3) the gem must have one or more executables in its `bin` directory
      that have the prefix "tmx-".
+     (this may have changed somewhat..)
 
 the bulk of the implementation here is just jumping thru hoops to make
-the [br] client allow us to "mount" "top clients" as if they were
+a CLI client that "mounts" the remote sidesystems as if they were
 reactive nodes in our own model.
 _

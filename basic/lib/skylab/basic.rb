@@ -261,4 +261,9 @@ module Skylab::Basic  # introduction at [#020]
   UNABLE_ = false
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
+
+  def self.describe_into_under y, _
+    y << "generic data structures (and some algorithms) common enough to be"
+    y << "used across projects but not so common that they are in \"common\""
+  end
 end

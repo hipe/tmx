@@ -162,4 +162,9 @@ module Skylab::Zerk  # intro in [#001] README
   UNABLE_ = false
   UNDERSCORE_ = '_'
   UNRELIABLE_ = :_unreliable_  # if you're evaluating this, you shouldn't be
+
+  def self.describe_into_under y, _
+    y << "a goofy, fun series of experiments for command-like apps"
+    y << "both interactive and not."
+  end
 end

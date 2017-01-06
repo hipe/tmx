@@ -66,7 +66,7 @@ module Skylab::Zerk::TestSupport
     end
 
     shared_subject :_the_empty_scanner do
-      _scn = _subject_library::Scanner_by__.new( & EMPTY_P_ )
+      _scn = _subject_library::Scanner_by.new( & EMPTY_P_ )
       _scn
     end
 

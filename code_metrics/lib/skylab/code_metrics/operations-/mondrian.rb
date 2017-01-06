@@ -514,7 +514,7 @@
     class SystemServices___  # #testpoint
 
       def initialize do_debug, debug_IO
-        @_path_normalizer = PathNormalizer___.new do_debug, debug_IO
+        @_path_normalizer = PathNormalizer.new do_debug, debug_IO
       end
 
       def normalize_user_path path
@@ -527,7 +527,7 @@
       end
 
       def normalize_system_path path
-        @_path_normalizer.__normalize_path_ path
+        @_path_normalizer.normalize_absolute_path path
       end
 
       def glob path
@@ -801,7 +801,7 @@
 
     # ==
 
-    class PathNormalizer___  # :[#017]
+    class PathNormalizer  # :[#017]
 
       # dereference all symbolic link nodes in an absolute path recursively.
 
@@ -809,7 +809,7 @@
       # correspond to paths associated with asset nodes in our gems, and so
       # all events are filtered out during recording.)
 
-      # (near [#tm-013.1])
+      # ([#tm-013.1] explains more fully but solves more hackily (inline comment))
 
       def initialize do_debug, debug_IO
 
@@ -831,7 +831,7 @@
         send @_normalize_path, Request__[ path, true ]
       end
 
-      def __normalize_path_ path
+      def normalize_absolute_path path  # [tmx]
         send @_normalize_path, Request__[ path ]
       end
 

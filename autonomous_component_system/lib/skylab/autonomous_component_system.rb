@@ -622,6 +622,11 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
     SPACE_ = ' '.freeze
     UNABLE_ = false
   # -
+
+  def self.describe_into_under y, _
+    y << "experiment in independent but cooperative, reactive interface"
+    y << "building blocks. the underpinnings of early \"zerk\"."
+  end
 end
 # #tombstone: `caching_method_based_reader_for`
 # #tombstone (maybe) - how parts of this file is/were structured is/was [#bs-039]

@@ -184,6 +184,11 @@ module Skylab::System
   NOTHING_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
+
+  def self.describe_into_under y, _
+    y << "abstraction layer for accessing facilities on the underlying system,"
+    y << "most commonly the filesystem, `find` and `grep`"
+  end
 end
 
 # :#tombstone: failed to start service

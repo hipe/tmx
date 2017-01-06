@@ -15,4 +15,4 @@ for such structures & concepts -- generally they are nouns.
 some such sub-nodes are more conceptual (for example there is a "List"
 sub-node that has facilities useful for working with lists, however it does
 not itself model a list structure); and others are more concrete (for
-example the "Sexp" sub-node models an actual S-expression)
+example the "Sexp" sub-node models an actual S-expression).

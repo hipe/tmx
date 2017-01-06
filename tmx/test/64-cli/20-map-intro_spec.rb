@@ -66,7 +66,7 @@ module Skylab::TMX::TestSupport
 
       it "items section - primaries are present" do
 
-        _section = _sections.items
+        _section = _sections.main_items
 
         _big_index = _section.to_index_of_common_item_list
 
@@ -98,7 +98,7 @@ module Skylab::TMX::TestSupport
           end
 
           o.expect_section "primaries" do |sect|  # NOTE the name
-            sct.items = sect
+            sct.main_items = sect
           end
         end
       end

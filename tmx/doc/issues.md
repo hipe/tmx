@@ -80,6 +80,9 @@
 
 [#007]       internal issues that are not public
 
+       #reme [#here.B] using the development dir & json files to populate
+                       tmx won't fly for a production version
+
        #open [#here.A] maximal expag should encompass minimal expag
 
 [#006] #open feature-injected features are not reflected in help screens

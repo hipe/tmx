@@ -314,7 +314,10 @@ module Skylab::Zerk
 
           h = @_itemer.description_proc_for_addeds_hash
           if h
-            -> k do
+            -> symbol_or_load_ticket do
+              # when a primary of a remote "mounted" operator, is symbol
+              ::Symbol === symbol_or_load_ticket or self._OK_FINE
+              k = symbol_or_load_ticket  # [#062] might be symbol, might be object
               h[ k ] || remote[ k ]
             end
           else

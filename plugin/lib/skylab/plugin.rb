@@ -47,4 +47,8 @@ module Skylab::Plugin
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'
+
+  def self.describe_into_under y, _
+    y << "plugin/bundle frameworks. dependency injection. nothing very hot."
+  end
 end

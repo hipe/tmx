@@ -5,7 +5,7 @@ module Skylab::SubTree
   Common_ = ::Skylab::Common
 
   def self.describe_into_under y, _
-    y << "an umbrella node for varous operations on a filesystem tree.."
+    y << "an umbrella node for varous operations on a filesystem tree"
   end
 
   module API

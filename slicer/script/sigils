@@ -7,5 +7,5 @@
   _st = ::Skylab::TMX.build_sigilized_sidesystem_stream_plus nil
 
   _st.each do | ss |
-    sout.puts "#{ ss.sigil } #{ ss.stem }"
+    sout.puts "#{ ss.sigil } #{ ss.entry_string }"
   end

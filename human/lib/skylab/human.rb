@@ -65,4 +65,8 @@ module Skylab::Human  # :[#001].
   KEEP_PARSING_ = true
   SPACE_ = ' '
   UNDERSCORE_ = '_'
+
+  def self.describe_into_under y, _
+    y << "rudimentary but good enough NLP hacks for textual language production"
+  end
 end

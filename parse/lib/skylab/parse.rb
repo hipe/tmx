@@ -95,6 +95,10 @@ module Skylab::Parse  # see [#001]
     NIL_ = nil
     Home_ = self
     UNABLE_ = false
-
   # <-
+
+  def self.describe_into_under y, _
+    y << "support for modeling grammars and implementing parsers"
+    y << "(used to be used to implement some wacky DSL's)"
+  end
 end

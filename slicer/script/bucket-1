@@ -49,7 +49,7 @@ else
 
     ss_a = ::Skylab::TMX.build_sigilized_list
     ss_a.each do | ss |
-      h[ ss.stem ] = ss
+      h[ ss.entry_string ] = ss
     end
 
     map_entry_to_sidesystem = h
@@ -94,7 +94,7 @@ else
     ok = true
     uow_box.each_value do | ss |
 
-      ok = command[ 'add', '--update', ss.stem ]
+      ok = command[ 'add', '--update', ss.entry_string ]
 
       ok &&= command[ 'commit', '-m', "([#{ ss.sigil }] bucket)" ]
 

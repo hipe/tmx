@@ -6,7 +6,7 @@
 
 [#014] #open #in-situ about argv limits in shells..
 
-[#013]       the tally visualation (assets)
+[#013]       the tally visualization (assets)
 
 [#012]     #gotcha inline - flickering near helpscreens
 

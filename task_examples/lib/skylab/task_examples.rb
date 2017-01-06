@@ -37,5 +37,9 @@ module Skylab::TaskExamples
   Textual_Old_Event_ = ::Struct.new :text, :stream_symbol
   UNABLE_ = false
   UNRELIABLE_ = :_unreliable_from_te_
+
+  def self.describe_into_under y, _
+    y << "ancient (ancient) proof-of-concept of \"task\""
+  end
 end
 # #tombstone - CLI option parser (sort of) born 2011-11

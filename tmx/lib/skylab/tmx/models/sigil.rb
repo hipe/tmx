@@ -120,7 +120,7 @@ module Skylab::TMX
 
       def ___build_medallion_with_two_initials up_x
 
-        pieces = up_x.stem.split SPLITTER_RX___, 2
+        pieces = up_x.entry_string.split SPLITTER_RX___, 2
 
         _very_short_string = if 1 == pieces.length
           pieces.first[ 0, 2 ]
@@ -346,8 +346,8 @@ module Skylab::TMX
 
         attr_writer :sigil
 
-        def stem
-          @x.stem
+        def entry_string
+          @x.entry_string
         end
 
         attr_reader(

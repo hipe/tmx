@@ -454,10 +454,51 @@ module Skylab::Basic
       end
     end
 
+    # ==
+
+    Tailerer_via_separator = -> sep do
+
+      # a "tail" is the second half of a string (e.g path) split meaningfully
+      # in two. a "tailer" is a function that produces tails. so a "tailerer"..
+
+      # this is a supertreatment of [ba]::Pathname::Localizer
+
+      -> head, & els do
+        head_len = head.length
+        head_plus_sep = "#{ head }#{ sep }"
+        head_plus_sep_len = head_plus_sep.length
+        r = head_plus_sep_len .. -1
+
+        -> s, & els_ do
+
+          len = s.length
+          case head_len <=> len
+          when -1
+            if head_plus_sep == s[ 0, head_plus_sep_len ]
+              s[ r ]
+            else
+              ( els || els_ )[]
+            end
+          when 0
+            if head == s
+              EMPTY_S_
+            else
+              ( els || els_ )[]
+            end
+          else
+            ( els || els_ )[]
+          end
+        end
+      end
+    end
+
+    # ==
+
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
     LINE_RX_  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
     String_ = self
   end
 end
+# #history: "tailer via separator" moved here from [cm]
 # #history: quoted string literal library moved here from [dt] models/string

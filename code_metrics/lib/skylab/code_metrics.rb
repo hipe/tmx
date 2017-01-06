@@ -39,6 +39,7 @@ module Skylab::CodeMetrics
 
     def describe_into_under y, _expag
       y << "gathers and presents statistics about source lines of code & more"
+      y << "home to the excellent \"mondrian\" visualization"
     end
 
     def lib_
@@ -56,41 +57,6 @@ module Skylab::CodeMetrics
   Lazy_ = Common_::Lazy
 
   # == small magnets
-
-  Tailerer_via_separator_ = -> sep do
-
-    # a "tail" is the second half of a string (e.g path) split meaningfully
-    # in two. a "tailer" is a function that produces tails. so a "tailerer"..
-
-    # this is a supertreatment of [ba]::Pathname::Localizer
-
-    -> head do
-      head_len = head.length
-      head_plus_sep = "#{ head }#{ sep }"
-      head_plus_sep_len = head_plus_sep.length
-      r = head_plus_sep_len .. -1
-
-      -> s, & els do
-        len = s.length
-        case head_len <=> len
-        when -1
-          if head_plus_sep == s[ 0, head_plus_sep_len ]
-            s[ r ]
-          else
-            els[]
-          end
-        when 0
-          if head == s
-            EMPTY_S_
-          else
-            els[]
-          end
-        else
-          els[]
-        end
-      end
-    end
-  end
 
   # == model support
 
@@ -130,7 +96,16 @@ module Skylab::CodeMetrics
   module Models_
 
     module Path  # #anemic
-      Path_tailerer = Tailerer_via_separator_[ ::File::SEPARATOR ]
+
+      Path_tailerer = -> do
+        tailerer = Lazy_.call do
+          Basic_[]::String::Tailerer_via_separator[ ::File::SEPARATOR ]
+        end
+        -> head, & p do
+          tailerer[][ head, & p ]
+        end
+      end.call
+
       Actions = nil  # only for [#010]
     end
 
@@ -163,6 +138,10 @@ module Skylab::CodeMetrics
 
   # ==
 
+  Basic_ = Lazy_.call do
+    lib_.basic
+  end
+
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end
@@ -173,11 +152,6 @@ module Skylab::CodeMetrics
 
   Require_brazen_ = Lazy_.call do  # called only 2x
     Brazen_ = Home_.lib_.brazen ; NIL_
-  end
-
-  Require_basic_ = Lazy_.call do  # 1x
-    Basic_ = Home_.lib_.basic
-    NIL
   end
 
   Zerk_lib_ = Lazy_.call do

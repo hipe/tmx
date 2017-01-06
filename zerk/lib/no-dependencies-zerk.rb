@@ -197,7 +197,7 @@ module NoDependenciesZerk
           freeze
         else
           @_array = s_a
-          @_current_index = d
+          @_current_index = d  # name is #testpoint
           @_last_index = s_a.length - 1
         end
       end
@@ -239,14 +239,14 @@ module NoDependenciesZerk
       end
 
       def parse_primary  # exactly as [#ze-052.1] canon
-        if _parse_primary_softly_
+        if parse_primary_softly
           ACHIEVED_
         else
           __when_malformed_primary
         end
       end
 
-      def _parse_primary_softly_
+      def parse_primary_softly
         md = PRIMARY_RX___.match head_as_is
         if md
           _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
@@ -285,24 +285,15 @@ module NoDependenciesZerk
 
       # --
 
-      def fuzzy_lookup_primary_or_fail h  # assume CPS
-
+      def _all_fuzzily_matching_primary_symbols_against_symbol_enumerator_ enum
+        # assume: a `current_primary_symbol` with no exact match
         rx = /\A#{ ::Regexp.escape current_primary_symbol.id2name }/
         a = []
-        h.keys.each do |k|
+        enum.each do |k|
           rx =~ k or next
           a.push k
         end
-        case 1 <=> a.length
-        when 0
-          k = a.fetch 0
-          @_current_primary_symbol = k
-          h.fetch k
-        when 1
-          When_primary_not_found__[ h, self ]
-        else
-          __when_ambiguous a
-        end
+        a
       end
 
       def parse_positive_nonzero_integer
@@ -343,14 +334,7 @@ module NoDependenciesZerk
 
       # --
 
-      def __when_ambiguous a
-        k = current_primary_symbol
-        no_because do |y|
-          _scn = Scanner_via_Array.call( a ) { |sym| prim sym }
-          y << "ambiguous primary #{ ick_prim k } - #{
-            }did you mean #{ oxford_or _scn }?"
-        end
-      end
+      # WAS __when_ambiguous
 
       def __when_malformed_primary
         s = head_as_is
@@ -361,9 +345,20 @@ module NoDependenciesZerk
 
       # --
 
+      def retreat_one  # we don't clear current_primary_symbol !
+        if no_unparsed_exists
+          @no_unparsed_exists = false
+          @_current_index = @_last_index
+        else
+          @_current_index.zero? && self._SANITY
+          @_current_index -= 1 ; nil
+        end
+        NIL
+      end
+
       def advance_one
         if @_last_index == @_current_index
-          close
+          @_current_index += 1  # #nodeps-coverpoint-4
           @no_unparsed_exists = true
           # can't freeze because the current primary may be set
         else
@@ -375,15 +370,10 @@ module NoDependenciesZerk
       def close_and_release  # #experiment  1x here 1x [tmx]
         @is_closed = true
         remove_instance_variable :@_last_index
-        [ remove_instance_variable( :@_current_index ),
+        a = [ remove_instance_variable( :@_current_index ),
           remove_instance_variable( :@_array ) ]
-      end
-
-      def close
-        @is_closed = true
-        remove_instance_variable :@_array
-        remove_instance_variable :@_current_index
-        remove_instance_variable :@_last_index ; nil
+        freeze
+        a
       end
 
       # --
@@ -476,7 +466,14 @@ module NoDependenciesZerk
         @__current_primary_value = sym ; nil
       end
 
-      def fuzzy_lookup_primary_or_fail h
+      def _all_fuzzily_matching_primary_symbols_against_symbol_enumerator_ _
+        # assume: a `current_primary_symbol` with no exact match
+        LENGTH_ZERO___
+      end
+
+      module LENGTH_ZERO___ ; class << self ; def length ; 0 end end end
+
+      def _fuzzy_lookup_primary_or_fail h
         When_primary_not_found__[ h, self ]
       end
 
@@ -639,24 +636,24 @@ module NoDependenciesZerk
       def __add_first_primaries_injection h, injector
         @has_primaries = true
         @_primaries = {}
-        @_primary_injectors = []
+        @primary_injectors = []
         @_add_primaries_injection = :__add_primaries_injection_normally
         send @_add_primaries_injection, h, injector
       end
 
       def __add_primaries_injection_normally h, injector
         index_h = @_primaries
-        inj_d = @_primary_injectors.length
+        inj_d = @primary_injectors.length
         h.each_pair do |k, m|
           index_h[ k ] = [ inj_d, m ]  # meh for now just overwrite
         end
-        @_primary_injectors[ inj_d ] = injector ; nil
+        @primary_injectors[ inj_d ] = injector ; nil
       end
 
       # -- NOTE the below might break out
 
       def parse_primary_softly
-        @argument_scanner._parse_primary_softly_
+        @argument_scanner.parse_primary_softly
       end
 
       def parse_operator_softly  # see next method
@@ -672,16 +669,16 @@ module NoDependenciesZerk
         #  on failure we emit here and resutt in false.
 
         sym = @argument_scanner.current_operator_symbol
-        scn = _to_operations_injections_scanner
+        scn = to_operators_injections_scanner
 
         begin
-          ijn = scn.gets_one
-          ijn = ijn.injection
-          x = ijn.lookup_softly sym
+          inj = scn.gets_one
+          inj = inj.injection
+          x = inj.lookup_softly sym
           x && break
         end until scn.no_unparsed_exists
         if x
-          Found__[ ijn.injector, x ]
+          OperatorFound__[ inj.injector, x ]
         elsif @argument_scanner.can_fuzzy
           __fuzzy_lookup_operator
         else
@@ -690,23 +687,7 @@ module NoDependenciesZerk
       end
 
       def __fuzzy_lookup_operator
-
-        # rather than map-expand we loop inside loop but this might change
-        a = []
-        rx = @argument_scanner.current_operator_as_matcher
-        injections = _to_operations_injections_scanner
-        begin
-          ijn = injections.gets_one.injection
-          symbols = ijn.to_normal_symbol_scanner
-          # allow the injection to produce the empty stream (for now only for hack disabling)
-          until symbols.no_unparsed_exists
-            if rx =~ symbols.current_token
-              _mixed_business_value = ijn.dereference symbols.current_token
-              a.push Found__[ ijn.injector, _mixed_business_value ]
-            end
-            symbols.advance_one
-          end
-        end until injections.no_unparsed_exists
+        a = __all_fuzzily_matching_operators_found
         case 1 <=> a.length
         when 0  # when found
           a.fetch 0
@@ -717,17 +698,48 @@ module NoDependenciesZerk
         end
       end
 
-      def to_operation_symbol_scanner
-        _to_operations_injections_scanner.expand_by do |injt|
+      def __all_fuzzily_matching_operators_found
+        a = []
+        rx = @argument_scanner.current_operator_as_matcher
+        scn = to_operator_load_ticket_scanner
+        until scn.no_unparsed_exists
+          if rx =~ scn.current_token.intern  # honor [#062]
+            a.push scn.to_found
+          end
+          scn.advance_one
+        end
+        a
+      end
+
+      def dereference_operator sym
+        ::Symbol === sym or raise ::TypeError
+        # (because we never make an index of all operators across all injections)
+        scn = to_operators_injections_scanner
+        begin
+          injn = scn.gets_one.injection
+          user_x = injn.lookup_softly sym
+          user_x && break
+          redo
+        end while above
+        OperatorFound__[ injn.injector, user_x ]
+      end
+
+      def to_operator_load_ticket_scanner
+        OperatorLoadTicketScanner___.define do |o|
+          yield o if block_given?
+          o.injections = to_operators_injections_scanner
+        end
+      end
+
+      def to_operator_symbol_scanner
+        to_operators_injections_scanner.expand_by do |injt|
           injt.injection.to_normal_symbol_scanner
         end
       end
 
-      def _to_operations_injections_scanner
+      def to_operators_injections_scanner
         Scanner_via_Array.new @_operators_injections
       end
-
-      Found__ = ::Struct.new :injector, :mixed_business_value
 
       def flush_to_parse_primaries
 
@@ -736,14 +748,12 @@ module NoDependenciesZerk
 
         args = @argument_scanner
         if args.no_unparsed_exists
-          _close_primaries
           ACHIEVED_
         else
           ok = args.parse_primary
           if ok
             flush_to_lookup_current_and_parse_remaining_primaries
           else
-            _close_primaries
             ok
           end
         end
@@ -752,28 +762,97 @@ module NoDependenciesZerk
       def flush_to_lookup_current_and_parse_remaining_primaries
 
         # assume grammar has primaries, and one primary is parsed and on deck
-
-        ok = true ; args = @argument_scanner
-        a = @_primary_injectors ; h = @_primaries
+        ok = false
         begin
-          ok = h[ args.current_primary_symbol ]
-          ok ||= args.fuzzy_lookup_primary_or_fail h
-          ok || break
-          ok = a.fetch( ok[0] ).send ok[1]  # ok is a tuple
-          ok || break
-          args.no_unparsed_exists && break
-          ok = args.parse_primary
-          ok || break
-          redo
+          o = lookup_current_primary_symbol_semi_softly
+          o.had_unrecoverable_error_which_was_expressed && break
+          if ! o.was_found
+            __whine_about_primary_not_found
+            break
+          end
+          ok_ = @primary_injectors.fetch( o.injector_offset ).
+            send o.injector_method_name
+          if ! ok_
+            ok = ok_ ; break
+          end
+          if @argument_scanner.no_unparsed_exists
+            ok = true
+            break
+          end
+          @argument_scanner.parse_primary ? redo : break
         end while above
-        _close_primaries
         ok
       end
 
-      def _close_primaries
-        remove_instance_variable :@_primary_injectors
-        remove_instance_variable :@_primaries
-        NIL
+      # some of the below for #nodeps-coverpoint-3
+
+      def lookup_current_primary_symbol_semi_softly
+
+        # assume grammar has primaries and one primary is parsed and on deck
+        # result is always of a tuple strain:
+        #   `had_unrecoverable_error_which_was_expressed` t/f (currently for ambiguous only)
+        #   if above,
+        #     this is the only case where something is expressed (not soft, hence semi-soft)
+        #   otherwise
+        #     `was_found` t/f
+        #     if found,
+        #       injector_method_name`, `primary_symbol`, `injector_offset`
+
+        k = @argument_scanner.current_primary_symbol
+        tuple = @_primaries[ k ]
+        if tuple
+          PrimaryFound__.new tuple.fetch(1), k, tuple.fetch(0)
+        else
+          __when_primary_not_found_by_exact_match
+        end
+      end
+
+      def __when_primary_not_found_by_exact_match
+        a = @argument_scanner.
+          _all_fuzzily_matching_primary_symbols_against_symbol_enumerator_(
+            @_primaries.keys )
+        case 1 <=> a.length
+        when 0  # when exactly one found
+          k = a.fetch 0
+          tuple = @_primaries.fetch k
+          PrimaryFound__.new tuple.fetch(1), k, tuple.fetch(0)
+        when 1  # when none found
+          NOT_FOUND___
+        when -1  # when ambiguous
+          __when_ambiguous_primary_symbol a
+        end
+      end
+
+      module NOT_FOUND___ ; class << self
+        def was_found ; false end
+        def had_unrecoverable_error_which_was_expressed ; false end
+      end ; end
+
+      PrimaryFound__ = ::Struct.new(
+        :injector_method_name, :primary_symbol, :injector_offset
+      ) do
+        def was_found ; true end
+        def had_unrecoverable_error_which_was_expressed ; false end
+      end
+
+      def __when_ambiguous_primary_symbol a
+        args = @argument_scanner
+        k = args.current_primary_symbol
+        args.no_because do |y|
+          _scn = Scanner_via_Array.call( a ) { |sym| prim sym }
+          y << "ambiguous primary #{ ick_prim k } - #{
+            }did you mean #{ oxford_or _scn }?"
+        end
+        UNRECOVERABLE___
+      end
+
+      module UNRECOVERABLE___ ; class << self
+        def had_unrecoverable_error_which_was_expressed ; true end
+      end end
+
+      def __whine_about_primary_not_found
+        _avail_prim_scn = Scanner_via_Array.new @_primaries.keys
+        When_primary_not_found___[ _avail_prim_scn, @argument_scanner ]
       end
 
       def to_primary_symbol_scanner  # assume
@@ -784,8 +863,84 @@ module NoDependenciesZerk
         :argument_scanner,
         :has_operators,
         :has_primaries,
+        :primary_injectors,
       )
     end
+
+    # --
+
+    ScannerMethods__ = ::Module.new
+
+    class OperatorLoadTicketScanner___ < SimpleModel
+      include ScannerMethods__
+
+      # a custom scanner that traverses over all operators of all
+      # injections, exposing the current injection at any point
+
+      def initialize
+        @big_step_pass_filter = nil
+        yield self
+        @current_injection = @current_token = nil
+        advance_big
+      end
+
+      attr_writer(
+        :injections,
+        :big_step_pass_filter,
+      )
+
+      def advance_one
+        send @_advance
+      end
+
+      def advance_big
+        if @injections.no_unparsed_exists
+          remove_instance_variable :@injections
+          remove_instance_variable :@_advance
+          @no_unparsed_exists = true
+          remove_instance_variable :@current_token
+          remove_instance_variable :@current_injection
+          freeze ; nil
+        else
+          injection = @injections.gets_one.injection
+          load_tickets = injection.to_normal_symbol_scanner
+          if load_tickets.no_unparsed_exists
+            advance_big
+          else
+            @current_injection = injection
+            if ( ! @big_step_pass_filter ) || @big_step_pass_filter[ self ]
+              @_load_tickets = load_tickets
+              @_advance = :_advance_small
+              _advance_small
+            else
+              @_advance = nil
+              advance_big
+            end
+          end
+        end
+      end
+
+      def _advance_small
+        @current_token = @_load_tickets.gets_one
+        if @_load_tickets.no_unparsed_exists
+          remove_instance_variable :@_load_tickets
+          @_advance = :advance_big ; nil
+        end
+      end
+
+      def to_found
+        _mixed_business_value = @current_injection.dereference @current_token
+        OperatorFound__[ @current_injection.injector, _mixed_business_value ]
+      end
+
+      attr_reader(
+        :current_injection,
+        :current_token,
+        :no_unparsed_exists,
+      )
+    end
+
+    OperatorFound__ = ::Struct.new :injector, :mixed_business_value
 
     # --
 
@@ -815,7 +970,7 @@ module NoDependenciesZerk
         @operators.lookup_softly k
       end
       def to_normal_symbol_scanner
-        Scanner_by__.new( & @operators.to_normal_symbol_stream )
+        Scanner_by.new( & @operators.to_normal_symbol_stream )
       end
       def dereference k
         @operators.dereference k
@@ -890,10 +1045,10 @@ module NoDependenciesZerk
       end
     end
 
-    When_primary_not_found__ = -> h, scn do
-      k = scn.current_primary_symbol
-      scn.no_because do |y|
-        _scn = Scanner_via_Array.call( h.keys ) { |sym| prim sym }
+    When_primary_not_found___ = -> avail_prim_scn, args do
+      k = args.current_primary_symbol
+      args.no_because do |y|
+        _scn = avail_prim_scn.map_by { |sym| prim sym }
         y << "unknown primary: #{ ick_prim k }"
         y << "available primaries: #{ oxford_and _scn }"
       end
@@ -920,15 +1075,13 @@ module NoDependenciesZerk
 
     # = support
 
-    ScannerMethods__ = ::Module.new
-
     class Scanner_via_Array ; include ScannerMethods__
 
       class << self
         def call d=nil, a, & p
           scn = new d, a
           if block_given?
-            Mapped_Scanner__.new p, scn
+            MappedScanner__.new p, scn
           else
             scn
           end
@@ -971,7 +1124,7 @@ module NoDependenciesZerk
       )
     end
 
-    class Mapped_Scanner__ ; include ScannerMethods__
+    class MappedScanner__ ; include ScannerMethods__
 
       def initialize p, scn
         @_proc = p
@@ -991,7 +1144,7 @@ module NoDependenciesZerk
       end
     end
 
-    class Scanner_by__ ; include ScannerMethods__
+    class Scanner_by ; include ScannerMethods__
       def initialize & p
         x = p.call  # same as `.gets`
         if x
@@ -1062,7 +1215,7 @@ module NoDependenciesZerk
               p = -> { NIL }  # EMPTY_P_
             end
           end
-          Scanner_by__.new() { p[] }
+          Scanner_by.new() { p[] }
         end
       end
 
@@ -1084,11 +1237,19 @@ module NoDependenciesZerk
           end
         end
         p = advance
-        Scanner_by__.new(){ p[] }
+        Scanner_by.new(){ p[] }
       end
 
       def map_by & p
-        Mapped_Scanner__.new p, self
+        MappedScanner__.new p, self
+      end
+
+      def to_minimal_stream
+        MinimalStream___.new do
+          unless no_unparsed_exists
+            gets_one
+          end
+        end
       end
 
       def gets_one
@@ -1097,6 +1258,8 @@ module NoDependenciesZerk
         x
       end
     end
+
+    class MinimalStream___ < ::Proc ; alias_method :gets, :call ; end
 
     # ==
 
@@ -1140,3 +1303,4 @@ module NoDependenciesZerk
     # ==
   # -
 end
+# #tombstone: (temporary) used to close primaries

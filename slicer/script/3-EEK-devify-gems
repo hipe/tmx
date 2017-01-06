@@ -14,7 +14,7 @@ h = {}
 begin
   ni = st.gets
   ni or break
-  h[ ni.stem ] = ni
+  h[ ni.entry_string ] = ni
   redo
 end while nil
 

@@ -664,5 +664,9 @@ module Skylab::Fields
   NOTHING_ = nil
   SPACE_ = ' '
   UNABLE_ = false
+
+  def self.describe_into_under y, _
+    y << "for modeling { arguments | attributes | parameters | properties }"
+  end
 end
 # #history - backwards_curry moved

@@ -152,7 +152,7 @@ module Skylab::TMX
         buff = rx.source
         buff.gsub! %r([[:space:]]+), SPACE_  # for now
         buff = "/#{ buff }/"
-        s = Home_.lib_.basic::Regexp.options_via_regexp( rx ).to_string
+        s = Basic_[]::Regexp.options_via_regexp( rx ).to_string
         s and buff << s
         buff
       end

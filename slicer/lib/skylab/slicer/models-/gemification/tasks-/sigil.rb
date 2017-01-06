@@ -14,7 +14,7 @@ module Skylab::Slicer
         _st = Home_.lib_.TMX.build_sigilized_sidesystem_stream_plus stem
 
         _sigilization = _st.flush_until_detect do | s10n |
-          stem == s10n.stem
+          stem == s10n.entry_string
         end
 
         @sigil = _sigilization.sigil

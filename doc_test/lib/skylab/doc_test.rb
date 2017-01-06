@@ -219,6 +219,11 @@ module Skylab::DocTest
   NOTHING_ = nil
   UNABLE_ = false
   ZERO_LENGTH_LINE_RX_ = /\A$/
+
+  def self.describe_into_under y, _
+    y << "a black-box reconception of python's tool of the same name,"
+    y << "infers test code from example code in comments in code files."
+  end
 end
 # #tombstone: old self-test doc body copy
 # #tombstone: dedicated API file

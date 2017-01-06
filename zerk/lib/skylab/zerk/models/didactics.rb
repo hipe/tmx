@@ -1,99 +1,64 @@
 module Skylab::Zerk
 
-  Models::Didactics = ::Struct.new(  # explained at [#055]
-    :is_branchy,
-    :description_proc,
-    :description_proc_reader,
-    :item_normal_tuple_stream_by,
-  )
+  class Models::Didactics < SimpleModel_  # explained at [#055]
 
-  class Models::Didactics ; class << self
+    class << self
 
-    # NOTE - [tmx] only at writing VERY experimental
-
-    def non_rootly__ defn_by, name, below_by
-
-      _cura = Curation___.new name, below_by
-
-      _create_by _cura do |dida_y|
-        defn_by[ dida_y ]
+      def define_conventionaly dida, op
+        dida.operator = op
+        NIL
       end
-    end
+    end  # >>
 
-    def via_participating_operator op  # [tmx] only, 1x
+    # -
 
-      _create_by do |dida_y|
-        define_conventionaly dida_y, op
-      end
-    end
+      def initialize
+        @below_didactics_by = nil
+        @operator = nil
+        yield self
 
-    def _create_by curation=nil
-      o = new
-      yield( DidacticYielder___.new( curation ) do |k, x|
-        o[ k ] = x
-      end )
-      o
-    end
+        oper = remove_instance_variable :@operator
+        if oper
 
-    def define_conventionaly y, op
+          @__to_item_normal_tuple_stream =
+            oper.method :to_item_normal_tuple_stream_for_didactics  # #tombstone #temporary
 
-      # -- (not thing ding here)
+          description_proc_reader =
+            oper.description_proc_reader_for_didactics  # #note-3 (curator can delegate)
 
-      y.yield :item_normal_tuple_stream_by, op.method( :to_item_normal_tuple_stream )  # #tombstone #temporary
-
-
-
-      # -- subject description is "curated" IFF parent is known #note-3
-
-      cura = y.curation
-      if cura
-
-        _parent_dida = cura.below_didactics_by.call
-
-        _desc_p = _parent_dida.description_proc_reader[ cura.name.as_lowercase_with_underscores_symbol ]
-
-      else
-        _desc_p = op.method( :describe_into )
-      end
-
-      y.yield :description_proc, _desc_p
-
-
-
-      # -- (the others are straightforward)
-
-      y.yield :is_branchy, op.is_branchy
-
-      y.yield :description_proc_reader, op.description_proc_reader  # #note-3 (curator can delegate)
-
-      NIL
-    end
-
-    undef_method :[]  # from struct, only would add confusion to use it here
-    private :new
-  end ; end
-
-  class Models::Didactics
-
-    # ==
-
-    class DidacticYielder___ < ::Enumerator::Yielder
-      def initialize cura=nil, & p
-        if cura
-          @curation = cura
+          is_branchy = oper.is_branchy
         end
-        super( & p )
+
+        parent_by = remove_instance_variable :@below_didactics_by
+        if parent_by
+          _parent_dida = parent_by.call
+          _k = @name.as_lowercase_with_underscores_symbol
+          desc_p = _parent_dida.description_proc_for _k
+          # subject description is "curated" IFF parent is known #note-3
+        else
+          desc_p = oper.method :describe_into  # balls
+        end
+
+        @description_proc = desc_p
+        @description_proc_reader = description_proc_reader
+        @is_branchy = is_branchy
+      end
+
+      attr_writer(
+        :below_didactics_by,
+        :name,
+        :operator,
+      )
+
+      def to_item_normal_tuple_stream
+        @__to_item_normal_tuple_stream.call
       end
 
       attr_reader(
-        :curation,
+        :is_branchy,
+        :description_proc,
+        :description_proc_reader,
       )
-    end
-
-    # ==
-
-    Curation___ = ::Struct.new :name, :below_didactics_by
-
-    # ==
+    # -
   end
 end

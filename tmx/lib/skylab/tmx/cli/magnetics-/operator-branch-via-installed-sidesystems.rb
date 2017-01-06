@@ -5,6 +5,10 @@ module Skylab::TMX
     class Magnetics_::OperatorBranch_via_InstalledSidesystems <  # 1x
         ::NoDependenciesZerk::SimpleModel
 
+      # when the front element of the ARGV directly corresponds to a
+      # sidesystem (gem), then resolution of the remote operator is much
+      # more straightforward than having to load possibly the whole tree.
+
       # tons of assumptions about names and interfaces.. #hook-out
 
       # -
@@ -20,95 +24,64 @@ module Skylab::TMX
           :installation,
         )
 
-        def to_normal_symbol_stream
-          $stderr.puts "\n«YIKES don't forget - this stub in [tmx] - no fuzzy for sidesystem yet»\n\n"
-          EMPTY_P_
-        end
-
         def lookup_softly sym
           entry = sym.id2name  # keep underscores for gem names
-          gem_path = ::File.join @__head, entry  # "skylab/punjabi"
-          _yes = ::Gem.try_activate gem_path
+          gem_name = ::File.join @__head, entry  # "skylab/punjabi"
+          _yes = ::Gem.try_activate gem_name
           if _yes
-            _slug = entry.gsub UNDERSCORE_, DASH_
-            LoadTicket___.new gem_path, _slug, entry, @installation
+            _lt = @installation.load_ticket_via_gem_name gem_name
+            _lt
           end
         end
 
-        def bound_call_via_load_ticket__ load_ticket
-          load_ticket.bound_call_for @CLI
+        def to_normal_symbol_stream
+
+          # this comports with "no-deps" [ze] which nominally works in
+          # symbols but actually (and experimentally) we use load tickets
+
+          # because this is so experimental, we map the stream to itself
+          # just so this touches down here at each step.
+
+          lt_st = @installation.to_sidesystem_load_ticket_stream
+          -> do
+            lt_st.gets  # hi.
+          end
+        end
+
+        def __CODE_SKETCH__
+
+          # :[#007.B]: if you're wondering how you might reach the same
+          # sort of stream we see in the `map` operation, it might look
+          # like this (it worked until we hit a wall with needing load
+          # tickets to get descriptions).
+          #
+          # the main reason we backed off from this approach was the idea
+          # that what's more approprite for The TMX is that it uses the gems
+          # that happen to be installed at the moment, and not the
+          # directories that happen to be in the "development" directory.
+          #
+          # details: the `map` operation is populated by the results of a
+          # glob derived from the *development directory* (which is derived
+          # from the home directory of [tmx] which, in turn, is deep-
+          # normalized to dereference all symlinks from it). longterm this
+          # approach wouldn't fly, because this technique wouldn't be useful
+          # for "normal" installations.
+
+          st = @CLI.json_file_stream_by__.call( & @CLI.listener )
+          if st
+            _st_ = Home_::Models_::Node::Parsed::Unparsed::Stream_via_json_file_stream[ st ]
+            _st_.reduce_by do |node|
+              node.get_filesystem_directory_entry_string.intern
+            end
+          end
+        end
+
+        def bound_call_via_load_ticket__ lt
+          Magnetics_::BoundCall_via_LoadTicket[ lt, @CLI ]
         end
       # -
 
-      class LoadTicket___
-
-        def initialize gp, sl, entry, inst
-          @entry = entry
-          @gem_path = gp
-          @installation = inst
-          @slug = sl
-          freeze
-        end
-
-        def bound_call_for o  # CLI
-
-          scn = o.release_argument_scanner_for_sidesystem_mount__
-          if scn.is_closed
-            argv = EMPTY_A_
-          else
-            d, argv = scn.close_and_release
-            argv[ 0, d ] = EMPTY_A_
-          end
-
-          _ss_mod = __sidesystem_module
-
-          _cli_class = _ss_mod.const_get :CLI, false
-
-          _pn_s_a = [ * o.program_name_string_array, @slug ]
-
-          _cli = _cli_class.new argv, o.sin, o.sout, o.stderr, _pn_s_a do
-            o
-          end
-
-          _ = _cli.to_bound_call  # ..
-          _  # #todo
-        end
-
-        def __sidesystem_module
-
-          # we avoid using `const_reduce` (for name correction) unless we
-          # need to (for no good reason).
-          # this is near but not the same as [#br-083]
-
-          require @gem_path
-
-          _const_a = @installation.participating_gem_const_path_head
-
-          up_mod = _const_a.reduce ::Object do |mod, const|
-            mod.const_get const, false
-          end
-
-          const = if DIGITS___ =~ @entry# workaround until #wish [#co-067]
-            @entry.gsub( %r(_?(?<![a-z])([a-z0-9])) ) { $1.upcase }
-          else
-            _nf = Common_::Name.via_lowercase_with_underscores_string @entry
-            _nf.as_camelcase_const_string
-          end
-
-          if up_mod.const_defined? const, false
-            up_mod.const_get const, false
-          else
-            _ = Autoloader_.const_reduce [ const ], up_mod
-            _
-          end
-        end
-      end
-
       # ==
-
-      DIGITS___ = /[0-9]/
-      EMPTY_A_ = [].freeze
-
       # ==
     end
   end
