@@ -32,8 +32,7 @@ module NoDependenciesZerk
 
         def call p, a, cli
           call_by do |o|
-            o.emission_proc = p
-            o.channel = a
+            o.emission_proc_and_channel p, a
             o.client = cli
           end
         end
@@ -678,7 +677,7 @@ module NoDependenciesZerk
           x && break
         end until scn.no_unparsed_exists
         if x
-          OperatorFound__[ inj.injector, x ]
+          OperatorFound__[ inj.injector, x, sym ]
         elsif @argument_scanner.can_fuzzy
           __fuzzy_lookup_operator
         else
@@ -694,7 +693,10 @@ module NoDependenciesZerk
         when 1  # when not found
           Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ self ]
         else  # when ambiguous
-          self._COVER_ME__when_ambiguous__  # rejoin with legacy
+          _scn = Scanner_via_Array.call a do |of|
+            of.load_ticket.intern  # [#ze-062]
+          end
+          Ambiguous__[ _scn, :_operator_, @argument_scanner ]
         end
       end
 
@@ -721,7 +723,7 @@ module NoDependenciesZerk
           user_x && break
           redo
         end while above
-        OperatorFound__[ injn.injector, user_x ]
+        OperatorFound__[ injn.injector, user_x, sym ]
       end
 
       def to_operator_load_ticket_scanner
@@ -819,7 +821,9 @@ module NoDependenciesZerk
         when 1  # when none found
           NOT_FOUND___
         when -1  # when ambiguous
-          __when_ambiguous_primary_symbol a
+          _scn = Scanner_via_Array.new a
+          Ambiguous__[ _scn, :_primary_, @argument_scanner ]
+          UNRECOVERABLE___
         end
       end
 
@@ -833,17 +837,6 @@ module NoDependenciesZerk
       ) do
         def was_found ; true end
         def had_unrecoverable_error_which_was_expressed ; false end
-      end
-
-      def __when_ambiguous_primary_symbol a
-        args = @argument_scanner
-        k = args.current_primary_symbol
-        args.no_because do |y|
-          _scn = Scanner_via_Array.call( a ) { |sym| prim sym }
-          y << "ambiguous primary #{ ick_prim k } - #{
-            }did you mean #{ oxford_or _scn }?"
-        end
-        UNRECOVERABLE___
       end
 
       module UNRECOVERABLE___ ; class << self
@@ -867,7 +860,21 @@ module NoDependenciesZerk
       )
     end
 
-    # --
+    Ambiguous__ = -> sym_scn, which, argument_scanner do
+      case which
+      when :_operator_
+        ick_m, good_m, curr_m = :ick_oper, :oper, :current_operator_symbol
+      when :_primary_
+        ick_m, good_m, curr_m = :ick_prim, :prim, :current_primary_symbol
+      end
+      k = argument_scanner.send curr_m
+      # (or load [ze] for this instead:)
+      argument_scanner.no_because do |y|
+        _scn = sym_scn.map_by { |sym| send good_m, sym }
+        y << "ambiguous primary #{ send ick_m, k } - #{
+          }did you mean #{ oxford_or _scn }?"
+      end
+    end
 
     ScannerMethods__ = ::Module.new
 
@@ -930,7 +937,7 @@ module NoDependenciesZerk
 
       def to_found
         _mixed_business_value = @current_injection.dereference @current_token
-        OperatorFound__[ @current_injection.injector, _mixed_business_value ]
+        OperatorFound__[ @current_injection.injector, _mixed_business_value, @current_token ]
       end
 
       attr_reader(
@@ -940,7 +947,7 @@ module NoDependenciesZerk
       )
     end
 
-    OperatorFound__ = ::Struct.new :injector, :mixed_business_value
+    OperatorFound__ = ::Struct.new :injector, :mixed_business_value, :load_ticket
 
     # --
 

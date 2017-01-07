@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Models_::Installation
+  class Models_::Installation < SimpleModel_
 
     # NOTE "installation" is a confusing name only at first: it does not
     # involve the act of installing anything. we mean it in the sense of
@@ -10,6 +10,21 @@ module Skylab::TMX
     # holds basic configuration-like parameters and brings to life the rest
     # of the graph from that. see [#002] "tmx theory" for more.
 
+    # local unified language:
+    # what we're calling a "gem name" is a list of "segments" each of which
+    # is a list of "pieces". per some published standard we saw once, in a
+    # "gem name" the segments should be separated by dashes and the pieces
+    # should be separated by underscores:
+
+    # so in the project "sea lab" is the library "mip mop"
+    # the "gem name" would be:
+    #
+    #     sea_lab-mip_mop
+    #
+    # (and you would require this:)
+    #
+    #     require "sea_lab/mip_mop"
+
     attr_accessor(
       :participating_gem_const_path_head,
       :participating_gem_prefix,
@@ -17,11 +32,9 @@ module Skylab::TMX
       :single_gems_dir,
     )
 
-    def done
-      freeze  # or not..
-    end
-
     def lookup_reflective_sidesystem__ entry_string
+
+      self._NOT_USED__but_should_be__
 
       # assume that `stem` is isomorphic with a sidesystem in the
       # installation.
@@ -43,6 +56,8 @@ module Skylab::TMX
     end
 
     def to_reflective_sidesystem_stream__
+
+      self._NOT_USED__was_once__
 
       # 2x [sli] both times probably not covered:
       # 1x to make the sidesystem dependencies graph
@@ -95,6 +110,21 @@ module Skylab::TMX
       ::Dir[ ::File.join( @single_gems_dir, "#{ @participating_gem_prefix }*" ) ]
     end
 
+    def load_ticket_via_normal_symbol_softly sym  # 1x here
+
+      _entry = sym.id2name  # gem name segments (like normal symbols) use underscores
+
+      _head_entry = @participating_gem_prefix[ 0...-1 ]  # "sea_lab" not "sea_lab-"
+
+      gem_name = ::File.join _head_entry, _entry  # "skylab/derk_terst
+
+      _yes = ::Gem.try_activate gem_name
+      if _yes
+        _lt = load_ticket_via_gem_name gem_name
+        _lt
+      end
+    end
+
     def load_ticket_via_gem_name gem_require_path
 
       gem_name = gem_require_path.gsub ::File::SEPARATOR, DASH_
@@ -112,6 +142,7 @@ module Skylab::TMX
 
       LoadTicket_.new ne
     end
+
 
     # our coupling to the gem API (and beyond) is both tight and
     # ephemeral, so we try to hide all of that here.
@@ -147,8 +178,9 @@ module Skylab::TMX
 
     GemNameElements_ = ::Struct.new(
       :entry_string, :gem_name, :gem_path, :const_head_path, :exe_prefix )
+    # #testpoint all above
 
-    class LoadTicket_
+    class LoadTicket_  # #testpoint
 
       def initialize gne  # GemNameElements_
 
@@ -178,7 +210,7 @@ module Skylab::TMX
         @____sidesys_mod ||= __induce_sidesystem_module
       end
 
-      def __induce_sidesystem_module
+      def __induce_sidesystem_module  # #testpoint
 
         require @require_path
 

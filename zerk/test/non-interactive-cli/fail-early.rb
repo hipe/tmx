@@ -8,6 +8,10 @@ module Skylab::Zerk::TestSupport
 
     # -
 
+      def prepare_CLI_by & p
+        _ze_niCLI_client.prepare_CLI_by = p
+      end
+
       def invoke * argv
         _ze_niCLI_client.invoke_via_argv argv
       end
@@ -105,6 +109,10 @@ module Skylab::Zerk::TestSupport
 
       def subject_CLI_by & p
         @_setup.subject_CLI_by = p ; nil
+      end
+
+      def prepare_CLI_by= p
+        @_setup.prepare_CLI_by = p ; nil
       end
 
       def using_method m
@@ -319,7 +327,11 @@ module Skylab::Zerk::TestSupport
           _pn_s_a,
         )
 
-        if classish_came_from_test_context
+        p = setup.prepare_CLI_by
+
+        if p
+          p[ cli ]
+        elsif classish_came_from_test_context
           tc.prepare_CLI cli
         end
 
@@ -525,6 +537,7 @@ module Skylab::Zerk::TestSupport
 
       attr_writer(
         :ARGV,
+        :prepare_CLI_by,
         :subject_CLI_by,
       )
 
@@ -532,6 +545,7 @@ module Skylab::Zerk::TestSupport
         :ARGV,
         :has,
         :expectations,
+        :prepare_CLI_by,
         :program_name_string_array_knownness,
         :subject_CLI_by,
       )

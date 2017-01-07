@@ -5,8 +5,8 @@ module Skylab::TMX::TestSupport
   describe "[tmx] CLI - the punchlist report (integrates almost everything so far)" do
 
     TS_[ self ]
-    use :CLI
     use :non_interactive_CLI_fail_early
+    use :CLI
 
     context "(context)" do
 

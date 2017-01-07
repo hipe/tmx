@@ -6,8 +6,8 @@ module Skylab::TMX::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :CLI
     use :non_interactive_CLI_fail_early
+    use :CLI
 
     it "ping the top" do
       invoke 'ping'

@@ -2,8 +2,7 @@ module Skylab::TMX
 
   class CLI
 
-    class Magnetics_::OperatorBranch_via_InstalledSidesystems <  # 1x
-        ::NoDependenciesZerk::SimpleModel
+    class Magnetics_::OperatorBranch_via_InstalledSidesystems < SimpleModel_ # 1x
 
       # when the front element of the ARGV directly corresponds to a
       # sidesystem (gem), then resolution of the remote operator is much
@@ -13,25 +12,19 @@ module Skylab::TMX
 
       # -
 
-        def initialize
-          yield self
-          @__head = @installation.participating_gem_prefix[ 0...-1 ]  # "skylab"
-          freeze
-        end
-
         attr_writer(
           :CLI,
           :installation,
         )
 
         def lookup_softly sym
-          entry = sym.id2name  # keep underscores for gem names
-          gem_name = ::File.join @__head, entry  # "skylab/punjabi"
-          _yes = ::Gem.try_activate gem_name
-          if _yes
-            _lt = @installation.load_ticket_via_gem_name gem_name
-            _lt
-          end
+          _ = @installation.load_ticket_via_normal_symbol_softly sym
+          _  # #todo
+        end
+
+        def dereference symbol_or_load_ticket
+          symbol_or_load_ticket.IS_LOAD_TICKET_tmx_ || self._OK_FINE  # [#ze-062]
+          symbol_or_load_ticket
         end
 
         def to_normal_symbol_stream

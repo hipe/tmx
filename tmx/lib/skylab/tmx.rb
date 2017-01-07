@@ -56,6 +56,7 @@ module Skylab::TMX
     Stemmish___ = ::Struct.new :stem
 
     def lookup_sidesystem entry_s
+      self._NOT_USED
       installation_.lookup_reflective_sidesystem__ entry_s
     end
 
@@ -77,14 +78,16 @@ module Skylab::TMX
 
     def __build_installation
 
-      o = Home_::Models_::Installation.new
+      Home_::Models_::Installation.define do |o|
+        __ o
+      end
+    end
 
+    def __ o
       o.single_gems_dir = ::File.join ::Gem.paths.home, 'gems'
       o.participating_gem_prefix = 'skylab-'
       o.participating_gem_const_path_head = [ :Skylab ]
       o.participating_exe_prefix = 'tmx-'
-
-      o.done
     end
 
     define_method :__development_directory, ( Lazy_.call do

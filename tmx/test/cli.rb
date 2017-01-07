@@ -64,6 +64,11 @@ module Skylab::TMX::TestSupport
         NIL
       end
 
+      def define_mock_installation_ & p
+        # a convenience exposure of this lower-level thing
+        TS_::Installation::StubInstallation.define( & p )
+      end
+
       # -- setup structures for assertion
 
       def expect_common_help_screen_sections_by_
@@ -153,7 +158,7 @@ module Skylab::TMX::TestSupport
       def __init_index_of_splay_via_splay_line
         _line = remove_instance_variable :@_splay_line
         _Index_of_etc = Zerk_lib_[].test_support::CLI::IndexOfSplay_via_Line
-        @index_of_splay = _Index_of_etc.new( _line ).execute
+        @index_of_splay = _Index_of_etc[ _line ]
         NIL
       end
 

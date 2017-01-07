@@ -11,6 +11,10 @@ module Skylab::Common
           }#{ mod.name }::( #{ const_a * ' AND ' } )"
       end
 
+      Zero = -> name, mod do
+        "not found: #{ mod.name }::( ~ #{ name.as_slug.inspect })"
+      end
+
       Needs_dir_path = -> mod do
         "needs `dir_path`: #{ mod }"
       end
@@ -47,7 +51,6 @@ module Skylab::Common
       Wrong_const_name = -> x do
         "wrong constant name #{ x }"
       end
-
     end
   end
 end

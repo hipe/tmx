@@ -6,8 +6,8 @@ module Skylab::TMX::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
-    use :CLI
     use :non_interactive_CLI_fail_early
+    use :CLI
 
     context "(counts)" do
 
@@ -108,7 +108,7 @@ module Skylab::TMX::TestSupport
         it "finds a reaonsable number of files" do
 
           _count = _line_survey.total_line_count
-          _count == 5 or fail "expected five test files had #{ _count } (was a test file added?)"  # be jerks at first
+          _count == 6 or fail "expected six test files had #{ _count } (was a test file added?)"  # be jerks at first
         end
 
         it "all other output lines look like SOME test file" do

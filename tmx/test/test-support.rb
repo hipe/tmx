@@ -68,6 +68,8 @@ module Skylab::TMX::TestSupport
   end
 
   Home_ = ::Skylab::TMX
+  Autoloader_ = Home_::Autoloader_
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   # ==
 
@@ -81,8 +83,15 @@ module Skylab::TMX::TestSupport
 
   # ==
 
-  Autoloader_ = Home_::Autoloader_
-  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  stowaway :Installation, 'mocks'  # remove at #pending-rename
+
+  # --
+
+  Zerk_test_support_ = Lazy_.call do
+    Zerk_lib_[].test_support
+  end
+
+  # --
 
   MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
   NIL_ = nil

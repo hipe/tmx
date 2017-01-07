@@ -1,12 +1,15 @@
 module Skylab::Zerk::TestSupport
 
-  class CLI::IndexOfSplay_via_Line
+  class CLI::IndexOfSplay_via_Line < Home_::SimpleModel_
 
     # for our purposes here, a "splay" line is something like:
     #
     #     "waboozie foozie: fipple, dipple-doople, doppel or -flopple"
     #
-    # as far as we're concerned such a line must contain:
+    # or
+    #     'weeple deople "dopple" - wotunda foopie "doop", "loop" or "koop"?"
+    #
+    # as far as we're concerned (and by default) such a line must contain:
     #
     #   - one nonzero-length string of "introductory text"
     #     (the part up to and including the first colon and its space).
@@ -25,10 +28,31 @@ module Skylab::Zerk::TestSupport
     #
     #   - however if there's a repeat of the same name in any one set,
     #     this indexing will fail unobscurely.
+    #
+    # there are undocumented features with semi-obvious names below
+    # to fine-tune the above expectations..
 
+    class << self
+      def call line
+        define do |o|
+          o.line = line
+        end.execute
+      end
+      alias_method :[], :call
+    end  # >>
     # -
 
-      def initialize line
+      def initialize
+        @head_regexp = nil
+        yield self
+        # can't freeze because memoizes details at waypoints
+      end
+
+      attr_writer(
+        :head_regexp,
+      )
+
+      def line= line
         @_scn = Home_.lib_.string_scanner.new line
       end
 
@@ -53,12 +77,14 @@ module Skylab::Zerk::TestSupport
           ( remove_instance_variable :@_offset_of_last_feature ) + 1
 
         remove_instance_variable :@_scn
+        remove_instance_variable :@head_regexp
         freeze
       end
 
       def __parse_introductory_head
 
-        s = @_scn.scan %r((?:(?!:[ ]).)+:[ ])
+        _use_rx = @head_regexp || %r((?:(?!:[ ]).)+:[ ])
+        s = @_scn.scan _use_rx
         s || fail
         @introductory_head = s.freeze
         if false  # code sketch
@@ -67,15 +93,16 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def __parse_splay
+      def __parse_splay  # curates the assumption of at least one item
 
         @_offset_of_last_feature = -1
         @_operators_box = nil
         @_primaries_box = nil
 
         _parse_one_feature
-        scn = @_scn
-        if ! scn.eos?
+
+        if ! _done
+          scn = @_scn
           begin
             if scn.skip COMMA___
               _parse_one_feature
@@ -86,9 +113,26 @@ module Skylab::Zerk::TestSupport
           end while above
           _parse_one_feature
 
-          scn.eos? || fail
+          if ! _done
+            fail
+          end
         end
         NIL
+      end
+
+      def _done
+        if @_scn.eos?
+          TRUE
+        elsif @_scn.skip %r(\?)
+          @ended_in_question_mark = true
+          if @_scn.eos?
+            TRUE
+          else
+            fail self.__SAY__encountered_question_mark_in_non_final_position
+          end
+        else
+          FALSE
+        end
       end
 
       def _parse_one_feature
@@ -111,10 +155,10 @@ module Skylab::Zerk::TestSupport
       end
 
       def __parse_and_or_or
-        if @_scn.skip AND___
-          @and_not_or = true
-        elsif @_scn.skip OR___
+        if @_scn.skip OR___
           @and_not_or = false
+        elsif @_scn.skip AND___
+          @and_not_or = true
         else
           fail
         end

@@ -67,6 +67,14 @@ module Skylab::TMX
         @__test_file_name_pattern_by = p
       end
 
+      def to_bound_call
+        # (for now we're doing it this way but if we wanted to we could
+        #  probably make it work the weird way, like stop at 3 levels or etc)
+        Common_::Bound_Call.by do
+          @stderr.puts "haha no (we could but why?)" ; NOTHING_
+        end
+      end
+
       def execute
 
         bc = __bound_call
@@ -136,7 +144,7 @@ module Skylab::TMX
 
       def __add_sidesystem_mounter_lazily inj
 
-        _inst = Home_.installation_
+        _inst = __installation
 
         ssm = CLI::Magnetics_::OperatorBranch_via_InstalledSidesystems.define do |o|
           o.CLI = self
@@ -146,6 +154,10 @@ module Skylab::TMX
         inj.operators = ssm
         inj.injector = :tmx_mountable_sidesystem
         @__sidesys_mounter = ssm ; nil
+      end
+
+      def __installation  # #testpoint
+        Home_.installation_
       end
 
       def __bound_call_via_found_operator lu
