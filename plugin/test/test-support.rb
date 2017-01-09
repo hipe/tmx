@@ -49,7 +49,7 @@ module Skylab::Plugin::TestSupport
     NIL_
   end
 
-  Memoizers = -> tcc do
+  Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 

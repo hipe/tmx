@@ -11,8 +11,29 @@ module Skylab::Plugin
   end  # >>
 
   Common_ = ::Skylab::Common
-
   Autoloader_ = Common_::Autoloader
+
+  # ==
+
+  class SimpleModel_  # as seen in [tab]
+    class << self
+      alias_method :define, :new
+      private :new
+    end  # >>
+    def initialize
+      yield self
+      freeze
+    end
+    private :dup
+  end
+
+  # ==
+
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  # ==
 
   ArgumentError = ::Class.new ::ArgumentError
 

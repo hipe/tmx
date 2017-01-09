@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Plugin::TestSupport
 
@@ -7,7 +7,7 @@ module Skylab::Plugin::TestSupport
   TS_.describe "[pl] baseless collection" do
 
     TS_[ self ]
-    use :memoizers
+    use :memoizer_methods
     use :baseless_collection
 
     context "normative - three dependencies" do

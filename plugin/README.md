@@ -70,19 +70,20 @@ is outside the scope of this document `^_^ #yolo ¯\_(ツ)_/¯`
 
 ## a one-line summary of each item
 
- 7. [pl] digraph-powered simplification of below Feb.,  2015  active
- 6. [  ] import [gv]'s custom facility           Jan.,  2014  sunsetted
- 5. [pl] quickie rolls a custom solution         June,  2013  active (custom)
- 4. [fa] the forgettable `Services_`             June,  2013  sunsetting
- 3. [  ] Plugin abstracted out of test/all       April, 2013  sunsetted
- 2. [tr] "adapter" (plugin) facility             June,  2012  paved
- 1. [as] an "assesss" take on plugins            March, 2010  antique
+( hopelessly confused, needs rewrite, waiting for #open [#gi-014] #tmp-tombstone-A )
+( we should be able to use the above utility to trace renames, but it breaks at some )
+
+
+
+
+## library 8 of N: filesystem-based
+
+an abstraction of what [sy] did..
+
 
 
 
 ## library 7 of N: digraph-powered simplification of predecessor
-
-
 
 this is a synopsis of what is at [#004]:
 
@@ -144,7 +145,7 @@ of what we are doing "now" was established by this point.
 
 
 
-## library 4 of N: [fa] "Services_"
+## library 4 of N: [fa] `Services_`
 
 shortly after the previous library, something calling itself "basically
 a miniature version of [hl] Plugin" emerges, but it looks to us now like
@@ -181,3 +182,10 @@ re-usable from it but this is being considered if we ever get back to finishing
 but for completeness we include whatever it is that it did in this list,
 because it referred to its things as "plugins". interestingly some of the code
 there looks totally alien, while other parts seem reasonably acceptable.
+
+
+
+
+## document meta
+
+  - #tombstone-A: got rid of confused list

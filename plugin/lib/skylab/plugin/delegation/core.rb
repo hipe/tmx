@@ -1,6 +1,6 @@
 module Skylab::Plugin
 
-  module Delegation  # see [#010]
+  module Delegation  # :[#010] (see)
 
     class << self
 

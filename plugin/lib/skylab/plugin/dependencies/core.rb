@@ -1,6 +1,6 @@
 module Skylab::Plugin
 
-  class Dependencies  # see [#007]
+  class Dependencies  # :[#007] (see)
 
     def initialize * args_to_all, & x_p
 

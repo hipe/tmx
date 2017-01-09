@@ -1,6 +1,6 @@
 module Skylab::Plugin
 
-  class Digraphic  # see [#004]
+  class Digraphic  # :[#004] (see)
 
     class Base_Dispatcher___  # meh - this used to be in our topmost ..
 

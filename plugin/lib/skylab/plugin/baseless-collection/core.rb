@@ -1,6 +1,6 @@
 module Skylab::Plugin
   # ->
-    class BaselessCollection  # backstory in [#023]
+    class BaselessCollection  # :[#023] (see)
 
       # -- initialization
 
