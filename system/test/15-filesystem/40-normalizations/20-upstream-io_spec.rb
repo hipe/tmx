@@ -70,7 +70,7 @@ module Skylab::System::TestSupport
     end
 
     def _non_interactive_stdin
-      Home_.services.test_support.mocks.noninteractive_STDIN_instance
+      Home_.services.test_support::STUBS.noninteractive_STDIN_instance
     end
 
     def subject_

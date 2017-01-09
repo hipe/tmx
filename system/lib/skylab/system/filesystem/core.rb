@@ -1,9 +1,8 @@
 module Skylab::System
 
-  const_get :Filesystem, false
   module Filesystem  # #[#sl-155]
 
-  class Services___::Filesystem  # see [#009]
+  class Service  # see [#009]
 
     def initialize _svx
     end
@@ -213,5 +212,15 @@ module Skylab::System
 
     # - end core services
   end
+
+    # ==
+
+    CONST_SEP_ = '::'
+    DIRECTORY_FTYPE = 'directory'
+    DOT_ = '.'
+    DOT_DOT_ = '..'
+    FILE_FTYPE = 'file'
+
+    # ==
   end
 end

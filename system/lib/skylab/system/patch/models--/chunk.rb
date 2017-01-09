@@ -1,8 +1,6 @@
 module Skylab::System
 
-  class Services___::Patch
-
-  class Models__::Chunk
+  class Patch::Models__::Chunk
 
     attr_reader :left
     attr_reader :right
@@ -126,7 +124,6 @@ module Skylab::System
       @begin = nil
       @end = nil
     end
-  end
-  end
-  end
+  end  # range
+  end  # chunk
 end

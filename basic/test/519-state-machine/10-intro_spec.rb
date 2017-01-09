@@ -1,4 +1,4 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::Basic::TestSupport
 
@@ -28,7 +28,7 @@ module Skylab::Basic::TestSupport
         Common_::Pair.via_value_and_name v_x, n_x
       end
 
-      o = Home_::State::Machine.begin_definition
+      o = Home_::StateMachine.begin_definition
 
       o.add_state :beginning,
         :can_transition_to, [ :long_switch ]

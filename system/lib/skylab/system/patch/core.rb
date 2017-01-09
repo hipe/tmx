@@ -1,6 +1,8 @@
 module Skylab::System
-  # -
-    class Services___::Patch
+
+  module Patch
+
+    class Service
 
       # using the host system's `patch` utility (whatever it is (if any)),
       # apply a patch specified in a string or via a path to the specified
@@ -285,8 +287,7 @@ module Skylab::System
           line
         end
       end
-
-      Patch_ = self
     end
-  # -
+    Patch_ = self
+  end
 end

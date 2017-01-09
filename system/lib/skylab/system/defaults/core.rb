@@ -1,8 +1,8 @@
 module Skylab::System
 
-  class Services___::Defaults  # read [#001] #section-3 - the introduction to the def..
+  module Defaults  # read [#001] #section-3 - the introduction to the def..
 
-    # ->
+    class Service
 
       def initialize svx
 
@@ -44,6 +44,6 @@ module Skylab::System
 
       CACHE_FILE__ = 'sl.skylab'.freeze  # covered
 
-      # <-
+    end
   end
 end

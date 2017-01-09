@@ -44,7 +44,11 @@ module Skylab::Plugin
     class Collection___ < SimpleModel_
 
       def initialize
+
+        @_is_finished_caching = false
+        @_load_ticket_box = Common_::Box.new
         @_to_LTS = :__to_load_ticket_stream_initially
+
         yield self
         # can't freeze because caches state modes
       end
@@ -54,6 +58,28 @@ module Skylab::Plugin
         :entry,
         :system,
       )
+
+      def dereference sym
+        if @_is_finished_caching
+          @_load_ticket_box.fetch sym
+        else
+          __dereference_when_no_yet_cached sym
+        end
+      end
+
+      def __dereference_when_no_yet_cached sym
+        h = @_load_ticket_box.h_
+        x = h[ sym ]
+        if ! x
+          st = to_load_ticket_stream
+          begin
+            x = st.gets
+            x.normal_symbol == sym && break
+            redo
+          end while above
+        end
+        x
+      end
 
       def to_load_ticket_stream
         send @_to_LTS
@@ -76,9 +102,6 @@ module Skylab::Plugin
 
         @__long_path_scanner = scn
         @_to_LTS = :__to_load_ticket_stream_midway
-
-        bx = Common_::Box.new
-        @_load_ticket_box = bx
 
         _to_this_one_stream
       end
@@ -105,13 +128,16 @@ module Skylab::Plugin
         scn = @__long_path_scanner
         p = -> do
           _long_path = scn.gets_one
-          lt = LoadTicket_via_Path___.new _long_path, @branch_module
+          lt = LoadTicket_via_Path___.new _long_path
+          bx.add lt.normal_symbol, lt
           if scn.no_unparsed_exists
             @_to_LTS = :__to_load_ticket_stream_finally
             remove_instance_variable :@__long_path_scanner
+            @_is_finished_caching = true
+            freeze
+            bx.freeze
             p = EMPTY_P_
           end
-          bx.add lt.normal_symbol, lt
           lt
         end
         Common_.stream do
@@ -128,11 +154,10 @@ module Skylab::Plugin
 
     class LoadTicket_via_Path___
 
-      def initialize path, parent_mod
+      def initialize path
         @normal_symbol =
           ::File.basename( ::File.dirname path ).gsub( DASH_, UNDERSCORE_ ).intern
             # (above is faster than regexp per benchmark [#bm-014])
-        @parent_module = parent_mod
       end
 
       attr_reader(

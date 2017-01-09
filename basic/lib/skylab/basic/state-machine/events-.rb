@@ -1,6 +1,6 @@
 module Skylab::Basic
 
-  class State
+  class StateMachine
 
     Events_ = ::Module.new
 

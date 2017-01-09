@@ -1,7 +1,7 @@
 module Skylab::System
-  # -
-    class Services___::Grep  # [#017] (presently no content in document)
 
+  class Grep  # [#017] (presently no content in document)
+    # -
       PARAMS___ = Attributes_actor_.call( self,
         do_ignore_case: [ :known_known, :optional ],
         freeform_options: :optional,
@@ -225,6 +225,6 @@ module Skylab::System
         end
         UNABLE_
       end
-    end
-  # -
+    # -
+  end
 end

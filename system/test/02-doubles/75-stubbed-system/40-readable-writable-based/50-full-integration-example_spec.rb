@@ -29,8 +29,7 @@ module Skylab::System::TestSupport
 
         define_method :manifest_path_for_stubbed_system, ( Common_.memoize do
 
-          lib::Fixture_path_for[ 'ogdl-commands-5.ogdl' ]
-
+          Fixture_file_[ 'ogdl-commands.05.ogdl' ]
         end )
       end
     end

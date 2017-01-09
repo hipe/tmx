@@ -29,7 +29,7 @@ module Skylab::System::TestSupport
 
       define_method :COMMON_STUBBED_FS_MANIFEST_PATH_ do
 
-        ::File.join TS_.dir_path, 'doubles', 'stubbed-filesystem', 'fixtures', 'paths.manifest'
+        Fixture_file_[ 'paths-manifest.01.manifest' ]
       end
     end
   end

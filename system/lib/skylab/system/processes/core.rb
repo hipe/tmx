@@ -1,6 +1,8 @@
 module Skylab::System
 
-  class Services___::Processes  # [#031].
+  Processes = ::Module.new
+
+  class Processes::Service  # [#031].
 
     # hack a façade for this. a placeholder for whatever the right way is
 
@@ -354,6 +356,5 @@ module Skylab::System
     end
 
     Sandbox___ = self
-    UNDERSCORE_ = '_'
   end
 end

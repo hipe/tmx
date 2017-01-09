@@ -71,7 +71,7 @@ module Skylab::System::TestSupport
 
       shared_subject :_subject_array do
 
-        _path = path_for_ 'fixture-data/story-1.snippet.rb'
+        _path = fixture_file_ 'stubbed-system-snippet.01.snippet.rb'
 
         _sycond = _subject_class.via_path _path
 

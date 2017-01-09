@@ -1,6 +1,8 @@
 module Skylab::System
-  # -
-    class Services___::Find
+
+  class Find
+
+    # -
 
       Expression_Adapters::Event = Common_::Event.prototype_with(
          :find_command_args,
@@ -28,6 +30,6 @@ module Skylab::System
           end
         end  # >>
       end
-    end
-  # -
+    # -
+  end
 end

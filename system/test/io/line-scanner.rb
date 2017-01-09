@@ -4,21 +4,19 @@ module Skylab::System::TestSupport
 
     class << self
       def [] tcm
+        tcm.send :define_singleton_method, :with, Definition_for_method_called_with___
         tcm.extend Module_Methods__
         tcm.include Instance__Methods__
       end
     end  # >>
 
-    # <-
-
-  module Module_Methods__
-
-    def with path_s, & o_p
+    Definition_for_method_called_with___ = -> path_s, & o_p do
       define_method :pathname do
         @pathname ||= resolve_some_pathname path_s, o_p
       end
     end
-  end
+
+    # <-
 
   module Instance__Methods__
 

@@ -1,6 +1,6 @@
 module Skylab::System
 
-  class Services___::Patch
+  module Patch
 
     class Models__::Mutable_Progressive  # builds a patch progressively.
 

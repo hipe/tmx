@@ -22,7 +22,7 @@ module Skylab::SubTree::TestSupport
     end
 
     def mock_noninteractive_IO_
-      Home_.lib_.system.test_support.mocks.noninteractive_IO_instance
+      Home_.lib_.system.test_support::STUBS.noninteractive_IO_instance
     end
 
     def black_and_white_expression_agent_for_expect_emission

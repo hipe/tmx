@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::System::TestSupport
 
@@ -87,8 +87,7 @@ module Skylab::System::TestSupport
     end
 
     memoize :_here_path do
-
-      ::File.join TS_.dir_path, 'services/71-grep_spec.rb'
+      ::File.join TS_.dir_path, '71-grep_spec.rb'
     end
 
     def _parent_subject

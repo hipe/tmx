@@ -1,6 +1,8 @@
 module Skylab::System
-  # -
-    class Services___::Find
+
+  class Find
+
+    # -
 
       module Expression_Adapters::EN
 
@@ -45,6 +47,6 @@ module Skylab::System
           end
         end  # >>
       end
-    end
-  # -
+    # -
+  end
 end

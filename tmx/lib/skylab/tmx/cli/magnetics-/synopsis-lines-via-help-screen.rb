@@ -111,7 +111,7 @@ module Skylab::TMX
 
     Memoized_state_machine___ = Lazy_.call do  # see [#003]
 
-      o = Basic_[]::State::Machine.begin_definition
+      o = Basic_[]::StateMachine.begin_definition
 
       o.add_state( :beginning,
 

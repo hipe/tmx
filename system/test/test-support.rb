@@ -11,10 +11,6 @@ module Skylab::System::TestSupport
       tcc.include Instance_Methods__ ; nil
     end
 
-    def mocks
-      TS_::MOCKS
-    end
-
     def tmpdir_path_
       @___tmpdir_path ||= ___assemble_tmpdir_path
     end
@@ -47,6 +43,10 @@ module Skylab::System::TestSupport
     define_method :memoize, & TestSupport_::MEMOIZE
 
     define_method :dangerous_memoize, & TestSupport_::DANGEROUS_MEMOIZE
+  end
+
+  Fixture_file_ = -> tail do
+    ::File.join TS_.dir_path, 'fixture-files', tail
   end
 
   module Instance_Methods__
@@ -92,6 +92,8 @@ module Skylab::System::TestSupport
     def handle_event_selectively_
       event_log.handle_event_selectively
     end
+
+    define_method :fixture_file_, Fixture_file_
   end
 
   # -- test library nodes
@@ -145,6 +147,5 @@ module Skylab::System::TestSupport
   NIL_ = Home_::NIL_
   TS_ = self
 end
-
 # (point of history - what used to be this node became [#br-xxx])
 # (which is now [#pl-024] the "fancy lookup" algorithm)

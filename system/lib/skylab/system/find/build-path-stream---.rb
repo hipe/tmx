@@ -1,8 +1,6 @@
 module Skylab::System
-  # -
-    class Services___::Find
 
-      # <-
+  class Find
 
     class Build_path_stream___ < Common_::Actor::Dyadic
 
@@ -76,8 +74,6 @@ module Skylab::System
         nil
       end
     end
-    # ->
-    end
-  # -
+  end
 end
 # #tombstone: we used to let the defalt inline event expression happen

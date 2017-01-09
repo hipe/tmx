@@ -81,10 +81,6 @@ module Skylab::TMX::TestSupport
       Zerk_lib_[].test_support::Non_Interactive_CLI::Fail_Early[ tcc ]
     end
 
-  # ==
-
-  stowaway :Installation, 'mocks'  # remove at #pending-rename
-
   # --
 
   Zerk_test_support_ = Lazy_.call do

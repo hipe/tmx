@@ -1,14 +1,14 @@
 module Skylab::Basic
 
-  class State  # intro at [#044]
+  class StateMachine  # intro at [#044]
 
-    class Machine
+    class << self
+      def begin_definition
+        Definition___.new
+      end
+    end  # >>
 
-      class << self
-        def begin_definition
-          Definition___.new
-        end
-      end  # >>
+    # ==
 
       class Definition___
 
@@ -29,7 +29,7 @@ module Skylab::Basic
 
         def __state__component_association
           yield :can, :add
-          Here_
+          State___
         end
 
         def __add__component qk, & _x_p
@@ -43,7 +43,7 @@ module Skylab::Basic
         end
 
         def finish
-          Here_::Machine.new _flush_box
+          StateMachine__.new _flush_box
         end
 
         def flush_to_grammar  # 1x [pe]
@@ -54,19 +54,21 @@ module Skylab::Basic
           remove_instance_variable( :@_bx ).freeze
         end
       end
-    end
+
+    # ==
 
     class Grammar___
       def initialize bx
         @_bx = bx
       end
       def build_state_machine
-        Here_::Machine.new @_bx
+        StateMachine__.new @_bx
       end
     end
 
-    Here_ = self
-    class Here_
+    # ==
+
+    class State___
 
       class << self
         def [] st
@@ -180,7 +182,10 @@ module Skylab::Basic
       end
     end
 
-    class Machine
+    # ==
+
+    StateMachine__ = self
+    class StateMachine__
 
       def initialize bx
         @_bx = bx
@@ -200,6 +205,8 @@ module Skylab::Basic
         sess
       end
     end
+
+    # ==
 
     Session__ = ::Class.new
 
@@ -258,6 +265,8 @@ module Skylab::Basic
       end
     end
 
+    # ==
+
     class Passive_Session___ < Session__
 
       def _receive_begin
@@ -301,6 +310,8 @@ module Skylab::Basic
         NIL_
       end
     end
+
+    # ==
 
     class Session__
 
@@ -504,6 +515,8 @@ module Skylab::Basic
       end
     end
 
+    # ==
+
     class Passive_Upstream_Proxy___  # (mentors something in [pa])
 
       def current_token
@@ -528,5 +541,9 @@ module Skylab::Basic
         false
       end
     end
+
+    # ==
+
+    Here_ = self
   end
 end

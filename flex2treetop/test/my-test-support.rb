@@ -151,7 +151,7 @@ module Skylab::Flex2Treetop::MyTestSupport
   Mock_Resources_ = ::Struct.new :sin, :sout, :serr
 
   Mock_interactive_stdin_ = Common_.memoize do
-    Home_.lib_.system.test_support.mocks.interactive_STDIN_instance
+    Home_.lib_.system.test_support::STUBS.interactive_STDIN_instance
   end
 
   Home_ = ::Skylab::Flex2Treetop

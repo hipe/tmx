@@ -50,7 +50,7 @@ developement at one point). but:
 
 ## now
 
-..with our superior rewrite of [#sy-007], and our newfound confidence
+..with our superior rewrite of [#sy-034] hack-guess module tree and our newfound confidence
 in it because it remarkably worked on 33 files in our manifest list on
 the first try, we in fact feel that it is simpler to use this hack than
 to autoload the node.

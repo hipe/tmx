@@ -69,7 +69,7 @@ module Skylab::BeautySalon::TestSupport
     end
 
     def _stdin_mocks
-      Home_.lib_.system.test_support::MOCKS
+      Home_.lib_.system.test_support::STUBS
     end
 
     def stdin_for_expect_stdout_stderr

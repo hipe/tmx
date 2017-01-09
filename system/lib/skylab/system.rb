@@ -13,7 +13,7 @@ module Skylab::System
     end
 
     def services
-      Services_front___[]
+      Services___.instance
     end
 
     def test_support  # #[#ts-035]
@@ -26,29 +26,38 @@ module Skylab::System
 
   Common_ = ::Skylab::Common
 
-  Services_front___ = Common_.memoize do  # #section-2 intro to the front
+  # -
 
-    class Front___ < ::BasicObject
+    class Services___
+
+      # #section-2 intro to what was formerly calle the "front"
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end
 
       def initialize
-        @_h = {}
+        @_dereference = :__dereference_initially
       end
 
       def defaults
-        _common :Defaults
+        _service :Defaults
       end
 
       def diff
-        _common :Diff
+        _service :Diff
       end
 
       def environment
-        _common :Environment
+        _service :Environment
       end
 
       def filesystem * x_a, & x_p
 
-        _common( :Filesystem ).for_mutable_args_ x_a, & x_p
+        _service( :Filesystem ).for_mutable_args_ x_a, & x_p
       end
 
       def find * x_a, & x_p
@@ -62,7 +71,7 @@ module Skylab::System
       end
 
       def IO
-        _common( :IO )
+        _service :IO
       end
 
       def new_pather
@@ -80,7 +89,7 @@ module Skylab::System
 
       def patch * x_a, & x_p
 
-        _common( :Patch ).call_via_arglist x_a, & x_p
+        _service( :Patch ).call_via_arglist x_a, & x_p  # Patch
       end
 
       def path_looks_absolute path  # ..
@@ -100,54 +109,67 @@ module Skylab::System
       end
 
       def processes
-        _common :Processes
+        _service :Processes
       end
 
       def which s
-        _common( :Which ).call s
-      end
-
-      def _common sym
-
-        @_h.fetch sym do
-          @_h[ sym ] = _lib( sym ).new self
-        end
-      end
-
-      def _lib sym
-        Services___.const_get sym, false
+        _service( :Which ).call s
       end
 
       def test_support  # :+[#ts-035]
         Home_.test_support
       end
 
-      def inspect
-        "#{ Home_.name }::Front___ «instance»"
+      # --
+
+      def _service const
+        send @_dereference, const
       end
 
-      def nil?  # [dt] CLI client
-        false
+      def __dereference_initially const
+
+        @_branch_module = Home_
+        @_load_tickets = Home_.lib_.plugin::FilesystemBased.define do |o|
+          # NOTE - the *only* this this does for use now is constituency validation
+          o.system = ::Dir
+          o.entry = 'service.rb'
+          o.branch_module = @_branch_module
+        end
+        @_service_cache = ::Hash.new do |h, k|
+          x = __build_service k
+          h[k] = x
+          x
+        end
+        @_dereference = :__dereference_subsequently
+        send @_dereference, const
       end
 
-      self
-    end.new
-  end
+      def __dereference_subsequently const
+        @_service_cache[ const ]
+      end
+
+      def __build_service const
+
+        _normal_symbol = const.downcase  # ..
+
+        @_load_tickets.dereference _normal_symbol
+
+        _subsystem_mod = @_branch_module.const_get const, false
+
+        _service = _subsystem_mod.const_get( :Service, false ).new self
+
+        _service  # hi.
+      end
+
+      def _lib sym
+        Home_.const_get sym, false
+      end
+    end
+  # -
 
   # ==
 
   Autoloader_ = Common_::Autoloader
-
-  module Filesystem  # (stowaway)
-
-    CONST_SEP_ = '::'
-    DIRECTORY_FTYPE = 'directory'
-    DOT_ = '.'
-    DOT_DOT_ = '..'
-    FILE_FTYPE = 'file'
-
-    Autoloader_[ self ]
-  end
 
   # ==
 
@@ -169,10 +191,9 @@ module Skylab::System
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
-  Autoloader_[ Services___ = ::Module.new ]
-
   ACHIEVED_ = true
   CLI = nil  # for host
+  DASH_ = '-'
   EMPTY_A_ = [].freeze
   EMPTY_S_ = ''.freeze
   FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
@@ -184,12 +205,12 @@ module Skylab::System
   NOTHING_ = nil
   SPACE_ = ' '.freeze
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 
   def self.describe_into_under y, _
     y << "abstraction layer for accessing facilities on the underlying system,"
     y << "most commonly the filesystem, `find` and `grep`"
   end
 end
-
 # :#tombstone: failed to start service
 # :#tombstone: we used to build getters dynamically for the toplevel services

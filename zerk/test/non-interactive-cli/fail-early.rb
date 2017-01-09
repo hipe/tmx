@@ -83,15 +83,25 @@ module Skylab::Zerk::TestSupport
       end
 
       def expect_failed
-        @ze_niCLI_client.expect_failed_under self
+        _ze_niCLI_release_client.expect_failed_under self
       end
 
       def expect_succeeded
-        @ze_niCLI_client.expect_succeeded_under self
+        _ze_niCLI_release_client.expect_succeeded_under self
       end
 
       def _ze_niCLI_client
         @ze_niCLI_client ||= Client_for_Expectations_of_Invocation.new
+      end
+
+      def _ze_niCLI_release_client
+
+        # (for those places where this method is called, the only reason
+        #  we release the client is for one test that multiple invocations
+        #  (to compare them) from the same test context (test case)), so
+        #  that for the subsequent logical case it starts anew..)
+
+        remove_instance_variable :@ze_niCLI_client
       end
     # -
     # ==

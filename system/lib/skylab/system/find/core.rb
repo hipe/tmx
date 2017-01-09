@@ -1,6 +1,6 @@
 module Skylab::System
 
-  class Services___::Find  # see [#016].
+  class Find  # see [#016].
     # -
       # -
         # synopsis:
@@ -454,7 +454,6 @@ module Skylab::System
         :to_proc,
       )
     end
-    # ==
   end
 end
 # :+#posterity :+#tombstone `collapse` was an early ancestor of the n11n pattern

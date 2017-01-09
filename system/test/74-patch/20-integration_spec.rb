@@ -1,4 +1,4 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
@@ -99,16 +99,12 @@ module Skylab::System::TestSupport
     # ~ patches
 
     def patch_file_for_file
-      ::File.join _my_fixtures_dirname, 'one-line.patch'
+      fixture_file_ 'patch.04-one-line.patch'
     end
 
     def patch_file_for_directory
-      ::File.join _my_fixtures_dirname, 'minimal-deep.patch'
+      fixture_file_ 'patch.08-minimal-deep.patch'
     end
-
-    define_method :_my_fixtures_dirname, ( Lazy_.call do
-      ::File.join TS_.dir_path, 'services/74-patch/fixtures'
-    end )
 
     # ~ execution
 

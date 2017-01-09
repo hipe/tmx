@@ -1,7 +1,8 @@
 module Skylab::System
 
-
-    class Services___::Which
+  Which = ::Module.new
+  # -
+    class Which::Service
 
       def initialize x
         @_mama = x
@@ -30,5 +31,5 @@ module Skylab::System
         end
       end
     end
-
+  # -
 end

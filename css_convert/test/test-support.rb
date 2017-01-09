@@ -114,7 +114,7 @@ module Skylab::CSS_Convert::TestSupport
     end
 
     def sin
-      Home_.lib_.system.test_support::MOCKS.interactive_STDIN_instance
+      Home_.lib_.system.test_support::STUBS.interactive_STDIN_instance
     end
 
     def sout

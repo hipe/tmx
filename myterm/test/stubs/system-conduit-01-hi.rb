@@ -12,7 +12,7 @@ module Skylab::MyTerm::TestSupport
 
       empty = Common_::Stream.the_empty_stream
 
-      _wait = Home_.lib_.system.test_support::MOCKS.successful_wait
+      _wait = Home_.lib_.system.test_support::STUBS.successful_wait
 
       success = [
         nil,  # stdin

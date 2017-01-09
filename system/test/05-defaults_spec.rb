@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::System::TestSupport
 
@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
       foo = "FOO"
 
       _target = ::File.join(
-        Home_::Services___::Defaults::CACHE_FILE__,
+        Home_::Defaults::Service::CACHE_FILE__,
         foo
       )
       _actual = ::File.join path, foo

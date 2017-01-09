@@ -18,14 +18,6 @@ module Skylab::System::TestSupport
       Home_.lib_.string_IO.new
     end
 
-    def fixture_path_for__ x
-      Fixture_path_for[ x ]
-    end
-
-    def path_for_ x
-      Path_for[ x ]
-    end
-
     def subject_
       Subject[]
     end
@@ -35,29 +27,6 @@ module Skylab::System::TestSupport
     end
 
     _Here = self
-
-    Fixture_path_for = -> x do
-      ::File.join Path_for[ 'fixture-data' ], x
-    end
-
-    Path_for = -> do
-
-      p = nil
-      p_p = -> do
-        p_p = nil
-
-        head_s = _Here.dir_path
-
-        p = -> tail_s do
-          ::File.join head_s, tail_s
-        end
-      end
-
-      -> tail_s do
-        p_p && p_p[]
-        p[ tail_s ]
-      end
-    end.call
 
     OGDL = -> tcm do
 

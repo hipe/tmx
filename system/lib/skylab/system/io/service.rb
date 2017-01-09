@@ -1,7 +1,6 @@
 module Skylab::System
-
-
-    class Services___::IO
+  # -
+    class IO::Service
 
       def initialize _services
       end
@@ -33,4 +32,5 @@ module Skylab::System
 
       end.call
     end
+  # -
 end

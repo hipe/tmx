@@ -20,7 +20,7 @@ module Skylab::BNF2Treetop::TestSupport
         outstream = TestSupport_::IO.spy.new
 
         _stdin = CLI::TestLib__::System_lib[].test_support::
-          MOCKS.noninteractive_STDIN_instance
+          STUBS.noninteractive_STDIN_instance
 
         cli = Home_::CLI.new(
           argv,

@@ -152,9 +152,5 @@ module Skylab::TMX::TestSupport
       Home_::Models_::Installation
     end
   end
-
-  Mocks = ::Module.new  # get rid of after rename :#here
-
 end
-# #pending-rename: to "installation.rb" from "mocks.rb" (see #here when you do)
 # #history: full rewrite, clobbering [br]-era "mocks"

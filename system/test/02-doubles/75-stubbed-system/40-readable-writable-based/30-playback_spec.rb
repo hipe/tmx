@@ -25,6 +25,8 @@ module Skylab::System::TestSupport
 
     it "OK (note STDIN mock is never created, other are IFF present)" do
 
+      _manifest_A = fixture_file_ 'ogdl-commands.03.ogdl'
+
       cond = conduit_for_RW_.new( _manifest_A )
 
       i, o, e, w = cond.popen3 'echo', "it's", '"fun"'
@@ -41,11 +43,6 @@ module Skylab::System::TestSupport
 
     memoize :_no_ent_path do
       ::File.join TS_.dir_path, 'no-ent'
-    end
-
-    dangerous_memoize :_manifest_A do
-
-      fixture_path_for__ 'ogdl-commands-3.ogdl'
     end
   end
 end

@@ -31,8 +31,8 @@ some non-designed boundaries have emerged:
     00 to 09 - not really relying on the system per se.
                maybe just adjunct or support or taxonomically near.
 
-    10 to 19 - platform recognition exists for these facilities
-               in the stdlib.
+    10 to 19 - as well as in this sidesystem, these facilities have
+               some sort of recognition by the platform's stdlib.
 
     20 to 29 - a unix shell builtin for which we are hacking our
                own adapter to (and no platform stdlib recognition).

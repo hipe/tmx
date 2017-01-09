@@ -25,7 +25,17 @@
 [#004]       #parent-node: [#010] the normalizers ..
 [#005]       the path tools narrative ..
 [#006]       #track universal uses of `select`-style operations
-[#007]       [ hack guess module tree ] #parent-node: [#009]
+
+[#007]       track internal issues
+
+             :[#007.A]: shallowify everything. the "services" idiom isn't
+             valuable enough to justify itself. or maybe hack something for
+             it like:
+                 [sidesystem]/lib/skylab/system/bundle-1/service.rb
+                 [sidesystem]/lib/skylab/system/bundle-2/service.rb
+
+             ( #was: hack guess module tree )
+
 [#008]       #in-situ hard-coded in-project tmpdir path!
 [#009]       #parent-node: [#001]. the filesystem narrative ..
 [#010]       [ IO ]  ( #was: #moved-to: [#001] )

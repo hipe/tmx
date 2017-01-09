@@ -15,6 +15,6 @@ of the recursive buck stopping somewhere even if it perhaps doesn't
 need to.  (i.e.: yes i know, and i'm considering it.)
 
 
-somehow, going back years [#sy-007] has existed alongside this. that is
+somehow, going back years [#sy-034] "hack guess module tree" has existed alongside this. that is
 now better than this so as soon as this gives you any trouble, use that
 instead of this.

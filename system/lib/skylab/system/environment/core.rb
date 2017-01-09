@@ -1,12 +1,14 @@
 module Skylab::System
 
+  module Environment
 
-    class Services___::Environment
+    class Service
 
       def initialize _
+        NOTHING_
       end
 
-      Home_.lib_.attributes_stack_frame self,
+      Home_.lib_.attributes_stack_frame( self,
 
         :memoized, :proc, :any_home_directory_path, -> do
           ::ENV[ 'HOME' ]
@@ -17,7 +19,8 @@ module Skylab::System
           if s
             Home_.lib_.pathname.new s
           end
-        end
+        end,
+      )
     end
-
+  end
 end

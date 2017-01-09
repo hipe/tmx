@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::System::TestSupport
 
@@ -73,7 +73,7 @@ module Skylab::System::TestSupport
     end
 
     def _subject_module
-      Home_::Services___::Filesystem
+      Home_::Filesystem::Service
     end
 
     def _parent_subject

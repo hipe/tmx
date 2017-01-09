@@ -1,6 +1,6 @@
 module Skylab::System
 
-  module TestSupport::MOCKS  # :[#024].
+  module TestSupport::STUBS  # :[#024].
 
     class << self
 
