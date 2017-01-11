@@ -2,6 +2,8 @@ module Skylab::Basic
 
   class Range::Positive::List::Scanner
 
+    # ancient, hand-rolled #[#ba-044.2] state machine:
+
     State_ = ::Struct.new :i, :rx, :a, :act
 
     Dsc_ = { '\d+' => 'integer' }

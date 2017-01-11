@@ -145,7 +145,7 @@ module Skylab::TMX
 
         :entered_by_regex, /\A[[:space:]]*[^[:space:]]+[[:space:]]/,
 
-        :on_entry, -> _guy, _md do
+        :on_entry, -> _sm, _md do
 
           :beginning  # OR `after_section` (as needed)
         end,
@@ -155,9 +155,9 @@ module Skylab::TMX
 
         :entered_by_regex, BLANK_RX_,
 
-        :on_entry, -> guy, _md do
+        :on_entry, -> sm, _md do
 
-          _stay = guy.close_section
+          _stay = sm.downstream.close_section
           if _stay
             :after_section
           else
@@ -171,10 +171,11 @@ module Skylab::TMX
         :entered_by_regex,
           /\A (?<hdr> [a-z]+ ): [[:space:]]+ (?<rest> .+) \z/ix,
 
-        :on_entry, -> guy, md do
+        :on_entry, -> sm, md do
 
-          guy.receive_header md[ :hdr ]
-          _stay = guy.receive_content_line md[ :rest ]
+          ds = sm.downstream
+          ds.receive_header md[ :hdr ]
+          _stay = ds.receive_content_line md[ :rest ]
           if _stay
             :after_common_section_line
           else
@@ -188,9 +189,9 @@ module Skylab::TMX
         :entered_by_regex,
           /\A (?<hdr> [a-z]+ ):? \z/ix,
 
-        :on_entry, -> guy, md do
+        :on_entry, -> sm, md do
 
-          guy.receive_header md[ :hdr ]
+          sm.downstream.receive_header md[ :hdr ]
           :after_dedicated_header_line
         end,
       )
@@ -209,9 +210,9 @@ module Skylab::TMX
             (?<content> [^[:space:]:]+\b (?! : ) .* )  # any non-header looking line
           ) \z/ix,
 
-        :on_entry, -> guy, md do
+        :on_entry, -> sm, md do
 
-          _stay = guy.receive_content_line md[ :content ]
+          _stay = sm.downstream.receive_content_line md[ :content ]
           if _stay
             :after_common_section_line
           else
@@ -246,8 +247,8 @@ module Skylab::TMX
           :_trueish_
         end,
 
-        :on_entry, -> ob, st do
-          NIL_  # you must declare that you have no next state
+        :on_entry, -> sm, st do
+          sm.receive_end_of_solution  # declare that you have no next state
         end,
       )
 
@@ -309,7 +310,7 @@ module Skylab::TMX
 
         sm = @_state_machine
 
-        sess = sm.begin guy
+        sess = sm.begin_passive_session guy
 
         _String = Basic_[]::String
 

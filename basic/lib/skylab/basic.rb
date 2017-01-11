@@ -130,6 +130,20 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
+  class SimpleModel_  # like in [tab]
+    class << self
+      alias_method :define, :new
+      private :new
+    end  # >>
+    def initialize
+      yield self
+      freeze
+    end
+    private :dup
+  end
+
+  # (put `Process` back here)
+
   class Minimal_Property
 
     class << self

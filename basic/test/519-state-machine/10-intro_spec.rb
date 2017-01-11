@@ -5,10 +5,10 @@ module Skylab::Basic::TestSupport
   describe "[ba] state" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :expect_event
 
-    _SM = nil
-    before :all do
+    shared_subject :_state_machine do
 
       # (based off of the frontier production use-case)
 
@@ -38,13 +38,13 @@ module Skylab::Basic::TestSupport
 
       o.add_state :long_switch,
         :entered_by_regex, _LONG_RX___,
-        :on_entry, -> ob, md do
+        :on_entry, -> sm, md do
           sw, arg = md.captures
 
-          ob << pair[ sw, :long_switch ]
+          sm.downstream << pair[ sw, :long_switch ]
 
           if arg
-            ob << pair[ arg, :value ]
+            sm.downstream << pair[ arg, :value ]
             :after_a_pair
           else
             :value
@@ -53,13 +53,13 @@ module Skylab::Basic::TestSupport
 
       o.add_state :short_switch,
         :entered_by_regex, _SHORT_RX___,
-        :on_entry, -> ob, md do
+        :on_entry, -> sm, md do
           sw, arg = md.captures
 
-          ob << pair[ sw, :short_switch ]
+          sm.downstream << pair[ sw, :short_switch ]
 
           if arg
-            ob << pair[ arg, :value ]
+            sm.downstream << pair[ arg, :value ]
             :after_a_pair
           else
             :value
@@ -72,9 +72,9 @@ module Skylab::Basic::TestSupport
             st
           end
         end,
-        :on_entry, -> ob, st do
+        :on_entry, -> sm, st do
 
-          ob << pair[ st.gets_one, :value ]
+          sm.downstream << pair[ st.gets_one, :value ]
 
           :after_a_pair
         end
@@ -88,16 +88,15 @@ module Skylab::Basic::TestSupport
           :_trueish_
         end,
 
-        :on_entry, -> ob, st do
-          NIL_  # you must declare that you have no next state
+        :on_entry, -> sm, st do
+          sm.receive_end_of_solution  # declare that there is no next state
         end
 
-      _SM = o.finish
-
+      o.finish
     end
 
     it "builds" do
-      _SM or fail
+      _state_machine || fail
     end
 
     it "no input" do
@@ -107,7 +106,7 @@ module Skylab::Basic::TestSupport
       _expect_failed_with "expecting long switch at end of input"
     end
 
-    it "bad inpput " do
+    it "bad input " do
 
       st = _upstream '-foo', 'bar'
       _against st
@@ -161,10 +160,12 @@ module Skylab::Basic::TestSupport
       Common_::Polymorphic_Stream.via_array s_a
     end
 
-    define_method :_against do | st |
+    def _against st
 
-      @result = _SM.against st, & handle_event_selectively_
-      NIL_
+      _sm = _state_machine
+      _p = handle_event_selectively_
+      @result = _sm.solve_against st, & _p
+      NIL
     end
 
     def _expect_failed_with s

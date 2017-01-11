@@ -172,7 +172,9 @@ module Skylab::Plugin
 
       # ~ dispatcher ancillaries
 
-      class State_Machine___  # ( :+[#ba-044] mentor )
+      class State_Machine___
+
+        # (this was a mentor to #[#ba-044.2]. the student has surpassed the teacher)
 
         def initialize tuples
           @state_symbol = :started

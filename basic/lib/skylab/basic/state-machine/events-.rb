@@ -4,7 +4,7 @@ module Skylab::Basic
 
     Events_ = ::Module.new
 
-    Events_::No_Available_State_Transition = Common_::Event.prototype_with(
+    cls = Common_::Event.prototype_with(
 
       :no_available_state_transition,
       :x, nil,
@@ -13,7 +13,7 @@ module Skylab::Basic
       :error_category, :argument_error,
       :ok, false,
 
-    ) do | y, o |
+    ) do |y, o|
 
       s_a = []
       o.possible_state_array.each do | sta |
@@ -34,5 +34,27 @@ module Skylab::Basic
 
       y << "expecting #{ _expecting }#{ _context }"
     end
+
+    def cls.via upstream, sta_st
+
+      if upstream.no_unparsed_exists
+        had_more = false
+      else
+        had_more = true
+        x = upstream.current_token
+      end
+
+      _sta_a = sta_st.to_a
+
+      new_with(
+        :x, x,
+        :had_more, had_more,
+        :possible_state_array, _sta_a,
+      )
+    end
+
+    Events_::NoAvailableStateTransition = cls
+
+    # ==
   end
 end

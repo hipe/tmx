@@ -92,9 +92,8 @@ module Skylab::Permute
 
       def __resolve_pair_stream
 
-        _grammar = Magnetics_::Tokenizer[]
-        _sm = _grammar.build_state_machine
-        x = _sm.against @_st, & @_on_event_selectively
+        _sm = Magnetics_::Tokenizer[]
+        x = _sm.solve_against @_st, & @_on_event_selectively
         if x
           # (left as array for now #todo)
           _close_parsing

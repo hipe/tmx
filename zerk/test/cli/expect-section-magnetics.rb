@@ -142,7 +142,7 @@ module Skylab::Zerk::TestSupport
         # ..
         _scn = st.flush_to_polymorphic_stream
         _sm = __build_state_machine
-        _memo = _sm.against _scn, Memo___.new
+        _memo = _sm.solve_into_against Memo___.new, _scn
         _memo.finish
       end
 
@@ -159,8 +159,8 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :only_header_line, :entered_by_regex, %r(\A(?<header>[^:]+):\z),
-          :on_entry, -> mu, md do
-            mu.__receive_header_ md
+          :on_entry, -> sm, md do
+            sm.downstream.__receive_header_ md
             :first_item_line
           end,
         )
@@ -204,9 +204,9 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :first_item_line, :entered_by_regex, _first_item_line_rx,
-          :on_entry, -> mu, md do
+          :on_entry, -> sm, md do
             setup_shop[ md ]
-            mu._receive_column_one_and_desc_ md[:moniker], md[:desc1]
+            sm.downstream._receive_column_one_and_desc_ md[:moniker], md[:desc1]
             NOTHING_
           end,
           :can_transition_to, same,
@@ -218,8 +218,8 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :additional_desc_line, :entered_by_regex, _additional_desc_rx,
-          :on_entry, -> mu, md do
-            mu.__receive_additional_description_content_ md[:desc]
+          :on_entry, -> sm, md do
+            sm.downstream.__receive_additional_description_content_ md[:desc]
             NOTHING_
           end,
           :can_transition_to, same,
@@ -227,7 +227,7 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :blank_line, :entered_by_regex, %r(\A$),
-          :on_entry, -> _mu, _md do
+          :on_entry, -> _sm, _md do
             # you could somehow "close" the item, but why?
             # separator lines are cosmetic and not guaranteed
             NOTHING_
@@ -244,8 +244,8 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :nonfirst_item_line, :entered_by_regex, _nonfirst_item_rx,
-          :on_entry, -> mu, md do
-            mu._receive_column_one_and_desc_ md[:column_one], md[:desc1]
+          :on_entry, -> sm, md do
+            sm.downstream._receive_column_one_and_desc_ md[:column_one], md[:desc1]
             NOTHING_
           end,
           :can_transition_to, same,
@@ -265,8 +265,8 @@ module Skylab::Zerk::TestSupport
             end
           end,
 
-          :on_entry, -> mu, st do
-            NOTHING_  # you must declare that you have no next state
+          :on_entry, -> sm, _st do
+            sm.receive_end_of_solution  # you must declare that you have no next state
           end,
         )
 

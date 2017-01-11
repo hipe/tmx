@@ -4,7 +4,9 @@ module Skylab::Snag
 
     module Library_
 
-      class Association_Adapter::State_Machine__  # ( :+[#ba-044] mentor )
+      class Association_Adapter::State_Machine__
+
+        # (this was a mentor to #[#ba-044.2]. student has surpassed teacher.)
 
         def initialize * a, & oes_p
 

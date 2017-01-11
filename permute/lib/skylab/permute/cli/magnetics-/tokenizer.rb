@@ -30,10 +30,10 @@ module Skylab::Permute
 
       o.add_state :long_switch,
         :entered_by_regex, _LONG_RX___,
-        :on_entry, -> ob, md do
+        :on_entry, -> sm, md do
           sw, arg = md.captures
 
-          ob << pair[ sw, :long_switch ]
+          sm.downstream << pair[ sw, :long_switch ]
 
           if arg
             ob << pair[ arg, :value ]
@@ -45,13 +45,13 @@ module Skylab::Permute
 
       o.add_state :short_switch,
         :entered_by_regex, _SHORT_RX___,
-        :on_entry, -> ob, md do
+        :on_entry, -> sm, md do
           sw, arg = md.captures
 
-          ob << pair[ sw, :short_switch ]
+          sm.downstream << pair[ sw, :short_switch ]
 
           if arg
-            ob << pair[ arg, :value ]
+            sm.downstream << pair[ arg, :value ]
             :after_a_pair
           else
             :value
@@ -64,9 +64,9 @@ module Skylab::Permute
             st
           end
         end,
-        :on_entry, -> ob, st do
+        :on_entry, -> sm, st do
 
-          ob << pair[ st.gets_one, :value ]
+          sm.downstream << pair[ st.gets_one, :value ]
 
           :after_a_pair
         end
@@ -80,11 +80,11 @@ module Skylab::Permute
           :_trueish_
         end,
 
-        :on_entry, -> ob, st do
-          NIL_  # you must declare that you have no next state
+        :on_entry, -> sm, _md do
+          sm.receive_end_of_solution  # declare that there is no next state
         end
 
-      o.flush_to_grammar
+      o.finish
     end
   end
 end
