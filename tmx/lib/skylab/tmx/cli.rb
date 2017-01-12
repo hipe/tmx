@@ -18,6 +18,7 @@ module Skylab::TMX
 
         Require_interface_lib___[]
 
+        @_do_dispatch_help = false
         @_emission_handler_methods = nil
         @listener = method :__receive_emission
         @args = __argument_scanner_via_argv_and_listener argv
@@ -76,7 +77,6 @@ module Skylab::TMX
       end
 
       def execute
-
         bc = __bound_call
         if bc
           x = bc.receiver.send bc.method_name, * bc.args, & bc.block
@@ -96,19 +96,18 @@ module Skylab::TMX
 
       def __bound_call
 
-        o = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
+        @omni = Interface__::ParseArguments_via_FeaturesInjections.define do |fi|
           __inject_features fi
         end
-        @omni = o
         if @args.no_unparsed_exists
           _when_no_arguments
-        elsif o.parse_operator_softly
-          lu = o.flush_to_lookup_operator
+        elsif _parse_operator_softly
+          lu = @omni.flush_to_lookup_operator
           lu and __bound_call_via_found_operator lu
-        elsif o.parse_primary_softly
+        elsif _parse_primary_softly
           __when_primary_at_head
         else
-          self._COVER_ME__when_token_looks_totally_strange__
+          _fail_about_strange
         end
       end
 
@@ -120,6 +119,14 @@ module Skylab::TMX
             @stderr.puts "(-verbose is for -help)"
           end
           _when_no_arguments  # assume parsed -v but no -h
+        elsif @_do_dispatch_help
+          # assume nonempty argument scanner
+          if _parse_operator_softly
+            lu = @omni.flush_to_lookup_operator
+            lu and __bound_call_via_found_operator_when_dispatch_help lu
+          else
+            _fail_about_strange
+          end
         else
           ok  # assume EARLY_END from help
         end
@@ -160,15 +167,26 @@ module Skylab::TMX
         Home_.installation_
       end
 
-      def __bound_call_via_found_operator lu
+      def _fail_about_strange
+        self._COVER_ME__when_token_looks_totally_strange__
+      end
 
+      def __bound_call_via_found_operator_when_dispatch_help lu
+        _to_operator_adapter_for( lu ).to_bound_call_for_help
+      end
+
+      def __bound_call_via_found_operator lu
+        _to_operator_adapter_for( lu ).to_bound_call_for_invocation
+      end
+
+      def _to_operator_adapter_for lu
         case lu.injector
         when :tmx_intrinsic
-          send lu.mixed_business_value
+          OperatorAdapter_for_Intrinsic___.new lu, self
         when :tmx_mountable_sidesystem
-          _ssm = remove_instance_variable :@__sidesys_mounter
-          _ssm.bound_call_via_load_ticket__ lu.mixed_business_value
-        else etc
+          OperatorAdapter_for_MountableSidesystem___.new lu, self
+        else
+          self._ETC__easy_esque__
         end
       end
 
@@ -177,6 +195,14 @@ module Skylab::TMX
         if __head_matches_mountable_one_off_executable
           __bound_call_for_mountable_one_off_executable
         end
+      end
+
+      def _parse_operator_softly
+        @args.parse_operator_softly
+      end
+
+      def _parse_primary_softly
+        @args.parse_primary_softly
       end
 
       OPERATOR_DESCRIPTIONS = {
@@ -500,6 +526,10 @@ module Skylab::TMX
         NIL
       end
 
+      def do_dispatch_help_= x
+        @_do_dispatch_help = x
+      end
+
       # -- support for expressing results (our version of [#ze-025])
 
       def __describe_help y
@@ -639,6 +669,13 @@ module Skylab::TMX
 
       def _user_scanner
         d, a = @args.close_and_release
+        if @_do_dispatch_help  # :#here-1
+          HELP_RX =~ a.first || self._SANITY
+          d == 2 || self._HMM
+          a[0] = a[1]  # probably not useful
+          a[1] = '-help'  # like HELP_SWITCH_LONG_ but assert our way
+          d -= 1
+        end
         Common_::Polymorphic_Stream.via_start_index_and_array d, a
       end
 
@@ -861,6 +898,46 @@ module Skylab::TMX
 
     UC_first___ = -> s do
       "#{ s[0].upcase }#{ s[1..-1] }"
+    end
+
+    # ==
+
+    class OperatorAdapter_for_Intrinsic___
+
+      def initialize lu, cli
+        @lookup = lu
+        @CLI = cli
+      end
+
+      def to_bound_call_for_help
+        # (the work is done #here-1)
+        @CLI.do_dispatch_help_ = true
+        to_bound_call_for_invocation
+      end
+
+      def to_bound_call_for_invocation
+        @CLI.send @lookup.mixed_business_value
+      end
+    end
+
+    class OperatorAdapter_for_MountableSidesystem___
+
+      def initialize lu, cli
+        @lookup = lu
+        @sidesystem_mounter = cli.remove_instance_variable :@__sidesys_mounter
+      end
+
+      def to_bound_call_for_help
+        @sidesystem_mounter.bound_call_for_help_via_load_ticket__ _LT
+      end
+
+      def to_bound_call_for_invocation
+        @sidesystem_mounter.bound_call_for_invocation_via_load_ticket__ _LT
+      end
+
+      def _LT
+        @lookup.mixed_business_value
+      end
     end
 
     # ==

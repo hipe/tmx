@@ -210,7 +210,7 @@ module NoDependenciesZerk
 
       # --
 
-      def _parse_operator_softly_
+      def parse_operator_softly
         s = head_as_is
         if OPERATOR_RX___ =~ s
           _ = s.gsub( DASH_, UNDERSCORE_ ).intern
@@ -656,7 +656,7 @@ module NoDependenciesZerk
       end
 
       def parse_operator_softly  # see next method
-        @argument_scanner._parse_operator_softly_
+        @argument_scanner.parse_operator_softly
       end
 
       def flush_to_lookup_operator  # assume:

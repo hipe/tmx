@@ -133,10 +133,11 @@ module Skylab::Zerk  # intro in [#001] README
       ::StringScanner
     end
 
-    system_lib = sidesys[ :System ]
     System = -> do
-      system_lib[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
 
     Tabular = sidesys[ :Tabular ]
   end

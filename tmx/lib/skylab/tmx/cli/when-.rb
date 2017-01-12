@@ -61,8 +61,14 @@ module Skylab::TMX
 
       def execute
         if __is_root
-          if __parse_arguments
+          if _argument_scanner_is_empty
             _money
+          elsif _parse_primary_softly
+            if __parse_primaries
+              _money
+            end
+          elsif
+            __drop_back
           end
         else
           _money
@@ -71,6 +77,11 @@ module Skylab::TMX
 
       def __is_root
         1 == @CLI.selection_stack.length
+      end
+
+      def __drop_back
+        @CLI.do_dispatch_help_ = true
+        NOTHING_  # we want KEEP_PARSING_ but we need early exit to get out of the nodeps primary parisng
       end
 
       def _money
@@ -154,7 +165,7 @@ module Skylab::TMX
 
       # == [ze] #nodeps-Coverpoint-5 was created to cover this.
 
-      def __parse_arguments
+      def __parse_primaries
 
         # generally, parse the zero or more contiguous tokens immediately
         # following the ~"-h" token that look like verboses. perhaps only
@@ -165,14 +176,6 @@ module Skylab::TMX
         #   - too many verboses (because verifying expected semantics is important)
 
         begin
-          if __argument_scanner_is_empty
-            _show_help_screen
-            break
-          end
-          if ! __parse_primary_softly
-            _show_help_screen
-            break
-          end
           __lookup_primary
           if __lookup_was_ambiguous
             break
@@ -191,17 +194,26 @@ module Skylab::TMX
             __whine_about_too_many_verbose
             break
           end
+          if _argument_scanner_is_empty
+            _show_help_screen
+            break
+          end
+          if ! _parse_primary_softly
+            self._COVER_ME__say_something_about_going_to_ignore_this_term__
+            _show_help_screen
+            break
+          end
           redo
         end while above
 
         remove_instance_variable :@_ok
       end
 
-      def __argument_scanner_is_empty
+      def _argument_scanner_is_empty
         @args.no_unparsed_exists
       end
 
-      def __parse_primary_softly
+      def _parse_primary_softly
         @args.parse_primary_softly
       end
 
@@ -251,84 +263,6 @@ module Skylab::TMX
 
       include WhenSupport_
     end
-
-  if false
-  class Models_::Reactive_Model_Dispatcher
-
-    Events_ = ::Module.new
-
-    cls = Common_::Event.prototype_with(
-
-      :missing_first_argument,
-      :unbound_stream_builder, nil,
-      :error_category, :argument_error,
-      :ok, false,
-
-    ) do | y, o |
-
-      st = o.unbound_stream_builder[]
-      o = st.gets
-      if o
-        y << "missing first argument."
-      else
-        y << "there are no reactive nodes."
-      end
-    end
-
-    def cls.[] guy
-      super(
-        guy.unbound_stream_builder,
-      )
-    end
-
-    Events_::Missing_First_Argument = cls
-
-    cls = Common_::Event.prototype_with(
-
-      :no_such_reactive_node,
-      :argument_x, nil,
-      :unbound_stream_builder, nil,
-      :error_category, :argument_error,
-      :ok, false,
-
-    ) do | y, o |
-
-      y << "unrecognized argument #{ ick o.argument_x }"
-
-      st = o.unbound_stream_builder[]
-      o = st.gets
-      if o
-
-        p = -> unbound do
-          unbound.description_under self
-        end
-
-        s_a = [ p[ o ] ]
-        o_ = st.gets
-        if o_
-          o__ = st.gets
-          if o__
-            s_a.push ', ', p[ o_ ], ', etc.'
-          else
-            s_a.push ' or ', p[ o_ ]
-          end
-        end
-        y << "expecting #{ s_a.join }"
-      else
-        y << "there are no reactive nodes."
-      end
-    end
-
-    def cls.[] guy
-      super(
-        guy.first_argument,
-        guy.unbound_stream_builder,
-      )
-    end
-
-    Events_::No_Such_Reactive_Node = cls
-  end
-  end  # if false
 
     module WhenSupport_
 

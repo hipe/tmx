@@ -38,7 +38,7 @@ module Skylab::TMX::TestSupport
       expect_failed_normally_  # #coverpoint-1-F
     end
 
-    context "help" do
+    context "help for root" do
 
       it "usage - head and tail" do
         o = _usage
@@ -111,8 +111,6 @@ module Skylab::TMX::TestSupport
         end
       end
     end
-
-    # ==
 
     # ==
 

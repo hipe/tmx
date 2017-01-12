@@ -20,5 +20,3 @@ say_formal_operation_alternation
 -3.247 i & m.o & mountable one-offs, no arg
 -3.260 i & m.o & mountable one-offs, call
 -3.266 CLI::When_::Looks_strange[ @_omni ]
-old code in cli (near if false)
--3.273 intrinsics & mountable operators, help

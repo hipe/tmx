@@ -75,7 +75,7 @@ module Skylab::TMX::TestSupport
 
         sct = HelpScreenCommonFourSections___.new
 
-        o = Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early.define
+        o = Zerk_test_support_[]::CLI::Expect_Section_Fail_Early.define
 
         yield sct, o
 
@@ -116,8 +116,16 @@ module Skylab::TMX::TestSupport
 
     # ==
 
-    HelpScreenCommonFourSections___ =
-      ::Struct.new :usage, :description, :main_items, :secondary_items
+    HelpScreenCommonFourSections___ = ::Struct.new(
+      :usage,
+      :description,
+      :main_items,
+      :secondary_items,
+    ) do
+      def diff_against other
+        Zerk_test_support_[]::CLI::ExpectSectionDiff_via_TwoScreens[ self, other ]
+      end
+    end
 
     # ==
 

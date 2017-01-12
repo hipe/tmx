@@ -75,14 +75,29 @@ module Skylab::TMX::TestSupport
       end
     end
 
-    it "successfull call (mocked)" do
+    it "successfull call to mounted sidesystem (dummy)" do
       invoke 'wolly-polly'
-      _prepare_CLI_to_use_mock_installation
       expect_on_stderr "hello from dummy ZimZum::WollyPolly::CLI"
       expect_succeeded
     end
 
-    context "help - the big stig"
+    context "help for mounted sidesystem (dummy)" do
+
+      it "all lines from the easy way" do
+        invoke 'mocking-jay', '-h'
+        _expect_same_help_for_mocking_jay
+      end
+
+      it "all lines from the hard way" do
+        invoke '-h', 'mocking-jay'
+        _expect_same_help_for_mocking_jay
+      end
+
+      def _expect_same_help_for_mocking_jay
+        expect_on_stderr "i am help for tmz mocking-jay"
+        expect_succeeded
+      end
+    end
 
     # -- assertions
 
@@ -102,6 +117,7 @@ module Skylab::TMX::TestSupport
     end
 
     def _some_primaries
+
       h = _the_primaries_hash
       h[ :help ] || fail
       h[ :verbose ] || fail
@@ -146,7 +162,6 @@ module Skylab::TMX::TestSupport
         NIL
       end
 
-      _prepare_CLI_to_use_mock_installation
       expect_failed_normally_
 
       Zerk_test_support_[]::CLI::IndexOfSplay_via_Line.define do |o|
@@ -155,15 +170,14 @@ module Skylab::TMX::TestSupport
       end.execute
     end
 
-    def _prepare_CLI_to_use_mock_installation
+    def prepare_CLI cli
 
       mock_inst = mock_installation_
 
-      prepare_CLI_by do |cli|
-        cli.send :define_singleton_method, :__installation do
-          mock_inst
-        end
+      cli.send :define_singleton_method, :__installation do
+        mock_inst
       end
+
       NIL
     end
 

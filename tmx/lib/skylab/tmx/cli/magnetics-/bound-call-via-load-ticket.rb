@@ -2,14 +2,31 @@ module Skylab::TMX
 
   class CLI
 
-    class Magnetics_::BoundCall_via_LoadTicket < Common_::Actor::Dyadic  # 1x
+    class Magnetics_::BoundCall_via_LoadTicket < SimpleModel_  # 2x here
+
+      class << self
+        def call lt, cli
+          define do |o|
+            o.CLI = cli
+            o.load_ticket = lt
+          end.execute
+        end
+        alias_method :[], :call
+      end  # >>
 
       # -
 
-        def initialize lt, cli
-          @CLI = cli
-          @load_ticket = lt
+        def initialize
+          @is_for_help = false
+          yield self
+          # don't freeze because memoizes for waypoints
         end
+
+        attr_writer(
+          :CLI,
+          :is_for_help,
+          :load_ticket,
+        )
 
         def execute
           __init_sidesystem_module
@@ -38,7 +55,11 @@ module Skylab::TMX
 
           _scn = @CLI.release_argument_scanner_for_sidesystem_mount__
           d, argv = _scn.close_and_release
-          argv[ 0, d ] = EMPTY_A_
+          if @is_for_help
+            argv.replace [ HELP_SWITCH_LONG_, * argv[ d .. -1 ] ]
+          else
+            argv[ 0, d ] = EMPTY_A_
+          end
           @__ARGV_for_sidesystem = argv
           NIL
         end
@@ -72,6 +93,12 @@ module Skylab::TMX
           NIL
         end
       # -
+
+      # ==
+
+      HELP_SWITCH_LONG_ = '--help'
+
+      # ==
     end
   end
 end

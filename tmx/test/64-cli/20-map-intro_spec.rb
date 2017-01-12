@@ -82,10 +82,30 @@ module Skylab::TMX::TestSupport
         _sections.usage.to_index_of_common_operator_usage_line
       end
 
-      shared_subject :_sections do
+      def _sections
+        _sections_for_help_screen_normally
+      end
+    end
 
-        invoke _subject_operation, '-help'
-        # self.DEBUG_ALL_BY_FLUSH_AND_EXIT
+    it "help for subject the other way works the same" do
+
+      invoke '-help', _subject_operation
+      _actual = _expect_common_help_screen_sections
+      _expected = _sections_for_help_screen_normally
+
+      diff = _expected.diff_against _actual
+      if ! diff.is_the_empty_diff_of_screens
+        fail diff.to_exception_message
+      end
+    end
+
+    shared_subject :_sections_for_help_screen_normally do
+
+      invoke _subject_operation, '-help'
+      _expect_common_help_screen_sections
+    end
+
+    def _expect_common_help_screen_sections
 
         expect_common_help_screen_sections_by_ do |sct, o|
 
@@ -101,7 +121,6 @@ module Skylab::TMX::TestSupport
             sct.main_items = sect
           end
         end
-      end
     end
 
     context "names only, no modifiers" do

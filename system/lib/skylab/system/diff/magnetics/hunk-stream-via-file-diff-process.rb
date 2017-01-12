@@ -288,9 +288,13 @@ module Skylab::System
         end
 
         def to_line_stream
-          Stream_[ @_runs ].expand_by do |run|
+          to_run_stream.expand_by do |run|
             run.to_line_stream
           end
+        end
+
+        def to_run_stream
+          Stream_[ @_runs ]
         end
       end
 

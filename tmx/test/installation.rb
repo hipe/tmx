@@ -119,6 +119,7 @@ module Skylab::TMX::TestSupport
       def initialize argv, sin, sout, serr, pnsa, names
         @argv = argv
         @names = names
+        @program_name_string_array = pnsa
         @serr = serr
         @sout = sout
       end
@@ -130,15 +131,33 @@ module Skylab::TMX::TestSupport
       def execute
         if @argv.length.zero?
           __when_zero
+        elsif Home_::CLI::HELP_RX =~ @argv.first
+          __when_help
         else
-          self.__WHEN_not_zero
+          self.__WHEN_not_zero_not_help
+        end
+      end
+
+      def __when_help
+        if 1 == @argv.length
+          @serr.puts "i am help for #{ _program_name }"
+          NOTHING_
+        else
+          self.__HELP_WITH_ARGUMENTS
         end
       end
 
       def __when_zero
-        _ = "#{ [ * @names.const_path_array_guess, :CLI ] * '::' }"
-        @serr.puts "hello from dummy #{ _ }"
+        @serr.puts "hello from #{ _moniker }"
         NOTHING_
+      end
+
+      def _program_name
+        @program_name_string_array * Home_::SPACE_
+      end
+
+      def _moniker
+        "dummy #{ [ * @names.const_path_array_guess, :CLI ] * '::' }"
       end
     end
 

@@ -69,7 +69,15 @@ module Skylab::TMX
           end
         end
 
-        def bound_call_via_load_ticket__ lt
+        def bound_call_for_help_via_load_ticket__ lt
+          Magnetics_::BoundCall_via_LoadTicket.define do |o|
+            o.is_for_help = true
+            o.load_ticket = lt
+            o.CLI = @CLI
+          end.execute
+        end
+
+        def bound_call_for_invocation_via_load_ticket__ lt
           Magnetics_::BoundCall_via_LoadTicket[ lt, @CLI ]
         end
       # -
