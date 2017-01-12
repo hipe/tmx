@@ -22,6 +22,7 @@
 [#044]       [ state machine ]
              [#here.2]: track other state machines in the universe (~3)
              [#here.1]: ways to "pause" a parse for stream-oriented parsing
+             [#here.A]: SHOUTCASE while experimental API
 [#043]       [ tree from indented line stream ] #parent-node: [#001]
 [#042]       #parent-node: [#033] calm wordwrap "continuous" mode is
                a partially implemented feature

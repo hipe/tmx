@@ -10,6 +10,32 @@ module Skylab::Basic
 
     # ==
 
+    DEFINITION_FOR_THE_METHOD_CALLED_FAIL_BECAUSE_ = -> & p do
+
+      # such a failure is *not* for when an input fails to parse against a
+      # grammar. rather, this is for when the grammar itself behaves
+      # ambiguously. as such it is not appropriate to "express" such a
+      # failure to an end-user but rather we raise an exception the intended
+      # audience for which is the developer.
+      #
+      # because of weak typing and the dynamic nature of state handlers,
+      # (which can call any directive(s) and produce any result) we cannot
+      # effect such checks until parse-time.
+
+      # (this is #not-covered but the below magnet is)
+
+      _msg = ExpandedBuffer_via_MessageProc_.call_by do |o|  # see
+        o.buffer = ""
+        o.separator = SPACE_
+        o.message_proc = p
+        o.session = self
+      end
+
+      raise StateMachineBehaviorError, _msg
+    end
+
+    # ==
+
       class DefineStateMachine___
 
         def initialize
@@ -60,7 +86,7 @@ module Skylab::Basic
       end
 
       def solve_against upstream, & p
-        begin_session_by do |o|
+        _begin_active_session_by do |o|
           o.downstream = []
           o.upstream = upstream
           o.listener = p
@@ -68,34 +94,33 @@ module Skylab::Basic
       end
 
       def solve_into_against downstream, upstream, & p
-        begin_session_by do |o|
+        _begin_active_session_by do |o|
           o.downstream = downstream
           o.upstream = upstream
           o.listener = p
         end.execute
       end
 
-      def begin_session_by
+      def begin_passive_session_by
+        as = _begin_active_session_by do |o|
+          yield o
+        end
+        ps = PassiveSession___.new as
+        as.page_listener = ps  # ick/meh
+        ps
+      end
+
+      def _begin_active_session_by
         ActiveSession___.define do |o|
           yield o
           o.box = @_bx
         end
       end
-
-      def begin_passive_session downstream, & p
-        sess = PassiveSession___.define do |o|
-          o.downstream = downstream
-          o.box = @_bx
-          o.listener = p
-        end
-        sess._receive_begin_solution
-        sess
-      end
     end
 
     # ==
 
-    class State___
+    class State___  # #testpoint
 
       class << self
 
@@ -119,7 +144,8 @@ module Skylab::Basic
 
       def can_transition_to=
 
-        a = gets_one_polymorphic_value
+        x = gets_one_polymorphic_value
+        a = x.respond_to?( :id2name ) ? [ x ] : x
 
         if a
           case 1 <=> a.length
@@ -183,12 +209,8 @@ module Skylab::Basic
         @__barrier_to_entry[ us ]
       end
 
-      def __next_symbol_via_nothing
-        @_on_entry.call
-      end
-
-      def __next_symbol_via_machine_and_user_matchata sm, umd
-        @_on_entry[ sm, umd ]
+      def next_symbol_via_exposures_proxy___ sm
+        @_on_entry[ sm ]
       end
 
       def description
@@ -198,7 +220,7 @@ module Skylab::Basic
       end
 
       def description_under _expag
-        Common_::Name.via_variegated_symbol( @name_symbol ).as_human
+        @name_symbol.id2name.gsub UNDERSCORE_, SPACE_
       end
 
       attr_reader(
@@ -212,6 +234,10 @@ module Skylab::Basic
         :name_symbol,
       )
     end
+
+    # ==
+
+    StateMachineBehaviorError = ::Class.new ::RuntimeError
 
     # ==
 

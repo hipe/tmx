@@ -5,7 +5,7 @@ module Skylab::Basic
     class ActiveSession___ < SimpleModel_
 
       # things to remember about grammars here:
-      #   - to be a formal transition target, the state must have a a barrier to entry
+      #   - to be a formal transition target, the state must have a barrier to entry
 
       def initialize
         @downstream = nil
@@ -19,17 +19,18 @@ module Skylab::Basic
         :downstream,
         :downstream_by,
         :listener,
+        :page_listener,
         :upstream,
       )
 
       def execute
 
-        @downstream || _reinit_downstream
-        @_state = @box.fetch :beginning
+        @downstream || reinit_downstream
+        init_state
         @_user_matchdata = nil
 
         begin
-          _keep_parsing = _step
+          _keep_parsing = step
           # (having the variable as a symbol can be useful for debugging here.)
           _keep_parsing ? redo : break
         end while above
@@ -37,52 +38,77 @@ module Skylab::Basic
         remove_instance_variable :@_result
       end
 
-      def _step
-        if @_state.has_handler
+      def init_state
+        @state = @box.fetch :beginning
+        NIL
+      end
+
+      # --
+
+      def step
+        if @state.has_handler
           __step_via_handler
-        elsif @_state.has_at_least_one_formal_transition
-          _step_via_find_transition
+        elsif @state.has_at_least_one_formal_transition
+          step_via_find_transition
         else
-          __fail_because_none_of_the_three_version_two
+          __fail_because_none_of_the_two
         end
       end
 
       def __step_via_handler
         _md = remove_instance_variable :@_user_matchdata
         o = Here_::HandlerInvocation_via_Session_.
-          new( _md, @_state, @downstream ).execute
+          new( _md, @state, self ).execute
         if o.set_a_directive
           __step_when_directive o
         elsif o.had_a_trueish_result
-          if @_state.has_at_least_one_formal_transition
+          if @state.has_at_least_one_formal_transition
             __fail_because_result_and_formals
           else
             __step_via_handler_result o.trueish_result
           end
-        elsif @_state.has_at_least_one_formal_transition
-          _step_via_find_transition  # [tmx]
+        elsif @state.has_at_least_one_formal_transition
+          step_via_find_transition
         else
           __fail_because_none_of_the_three
         end
       end
 
       def __step_when_directive o
-
-        if o.had_a_trueish_result
-          __fail_because_directive_and_result
-        elsif @_state.has_at_least_one_formal_transition
-          __fail_because_directive_and_transitions
-        else
-          send DIRECTIVES___.fetch o.directive_symbol
-        end
+        send DIRECTIVES___.fetch( o.directive_symbol ), o
       end
 
       DIRECTIVES___ = {
         _end_: :__step_at_end,
+        _end_when_paginated_: :__step_at_end_when_paginated,
+        _turn_page_over_: :__step_at_turn_page_over,
       }
 
-      def __step_at_end
-        @_result = remove_instance_variable :@downstream
+      def immediate_notification_for_turn_page_over__
+        @page_listener.immediate_notification_for_turn_page_over
+        NIL
+      end
+
+      def __step_at_turn_page_over o
+        @page_listener.step_after_turn_page_over o
+      end
+
+      def __step_at_end_when_paginated o
+        @page_listener.step_at_end o
+      end
+
+      def __step_at_end o
+        if o.had_a_trueish_result
+          _fail_because_end_and_result
+        elsif @state.has_at_least_one_formal_transition
+          fail_because_end_and_transitions
+        else
+          __do_end
+        end
+      end
+
+      def __do_end
+        @_result = release_downstream
         STOP_PARSING_
       end
 
@@ -93,19 +119,19 @@ module Skylab::Basic
           md = sta._user_matchdata_via_upstream @upstream
           if md
             @_user_matchdata = md
-            @_state = sta
+            @state = sta
             sym
           else
             _ = Common_::Stream.via_item sta
             _whine_via_splay_stream _
           end
         else
-          @_state = sta
+          @state = sta
           sym
         end
       end
 
-      def _step_via_find_transition
+      def step_via_find_transition
 
         st = _to_possible_next_state_stream
 
@@ -119,17 +145,21 @@ module Skylab::Basic
 
         if sta
           @_user_matchdata = md
-          @_state = sta
+          @state = sta
           sta.name_symbol  # or KEEP_PARSING_
         else
           _whine_via_splay_stream _to_possible_next_state_stream
         end
       end
 
-      def _reinit_downstream
+      def reinit_downstream
         p = @downstream_by
         @downstream = p ? p[] : []
         NIL
+      end
+
+      def release_downstream
+        remove_instance_variable :@downstream
       end
 
       # -- whines
@@ -152,8 +182,21 @@ module Skylab::Basic
 
       # -- fails
 
-      def __fail_because_none_of_the_three
+      def fail_because_end_and_result
+        _fail_because do |y|
+          y << "{{ state }} handler invoked an `end` directive"
+          y << "and also resulted in trueish - cannot do both."
+        end
+      end
 
+      def fail_because_end_and_transitions
+        _fail_because do |y|
+          y << "{{ state }} handler invoked an `end` directive"
+          y << "and also defines transitions - cannot do both."
+        end
+      end
+
+      def __fail_because_none_of_the_three
         _fail_because do |y|
           y << "{{ state }} handler neither invoked a directive nor"
           y << "resulted in trueish, and state does not define transisions."
@@ -161,19 +204,13 @@ module Skylab::Basic
         end
       end
 
-      def __fail_because_directive_and_result
+      def __fail_because_none_of_the_two
         _fail_because do |y|
-          y << "{{ state }} handler invoked a directive"
-          y << "and also resulted in trueish - cannot do both."
+          y << "{{ state }} does not define a handler nor transitions."
+          y << "it must define one of these."
         end
       end
 
-      def __fail_because_directive_and_transitions
-        _fail_because do |y|
-          y << "{{ state }} handler invoked a directive"
-          y << "and also defines transitions - cannot do both."
-        end
-      end
 
       def __fail_because_result_and_formals
         _fail_because do |y|
@@ -182,10 +219,12 @@ module Skylab::Basic
         end
       end
 
+      define_method :_fail_because, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_BECAUSE_
+
       # -- read
 
       def _to_possible_next_state_stream
-        sta = @_state
+        sta = @state
         if sta.has_at_least_one_formal_transition
           h = @box.h_
           if sta.has_exactly_one_formal_transition
@@ -200,8 +239,12 @@ module Skylab::Basic
         end
       end
 
-      # ==
+      attr_reader(
+        :downstream,
+        :state,
+      )
 
+      # ==
 
       # ==
     end

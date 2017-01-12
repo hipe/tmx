@@ -273,6 +273,7 @@ module Skylab::Basic  # introduction at [#020]
   PROCEDE_ = true
   SPACE_ = ' '.freeze
   UNABLE_ = false
+  UNDERSCORE_ = '_'
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 

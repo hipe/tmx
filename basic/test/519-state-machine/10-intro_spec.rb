@@ -38,8 +38,8 @@ module Skylab::Basic::TestSupport
 
       o.add_state :long_switch,
         :entered_by_regex, _LONG_RX___,
-        :on_entry, -> sm, md do
-          sw, arg = md.captures
+        :on_entry, -> sm do
+          sw, arg = sm.user_matchdata.captures
 
           sm.downstream << pair[ sw, :long_switch ]
 
@@ -53,8 +53,8 @@ module Skylab::Basic::TestSupport
 
       o.add_state :short_switch,
         :entered_by_regex, _SHORT_RX___,
-        :on_entry, -> sm, md do
-          sw, arg = md.captures
+        :on_entry, -> sm do
+          sw, arg = sm.user_matchdata.captures
 
           sm.downstream << pair[ sw, :short_switch ]
 
@@ -72,9 +72,9 @@ module Skylab::Basic::TestSupport
             st
           end
         end,
-        :on_entry, -> sm, st do
+        :on_entry, -> sm do
 
-          sm.downstream << pair[ st.gets_one, :value ]
+          sm.downstream << pair[ sm.user_matchdata.gets_one, :value ]
 
           :after_a_pair
         end
@@ -88,7 +88,7 @@ module Skylab::Basic::TestSupport
           :_trueish_
         end,
 
-        :on_entry, -> sm, st do
+        :on_entry, -> sm do
           sm.receive_end_of_solution  # declare that there is no next state
         end
 

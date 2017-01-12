@@ -159,8 +159,8 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :only_header_line, :entered_by_regex, %r(\A(?<header>[^:]+):\z),
-          :on_entry, -> sm, md do
-            sm.downstream.__receive_header_ md
+          :on_entry, -> sm do
+            sm.downstream.__receive_header_ sm.user_matchdata
             :first_item_line
           end,
         )
@@ -204,7 +204,8 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :first_item_line, :entered_by_regex, _first_item_line_rx,
-          :on_entry, -> sm, md do
+          :on_entry, -> sm do
+            md = sm.user_matchdata
             setup_shop[ md ]
             sm.downstream._receive_column_one_and_desc_ md[:moniker], md[:desc1]
             NOTHING_
@@ -218,8 +219,9 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :additional_desc_line, :entered_by_regex, _additional_desc_rx,
-          :on_entry, -> sm, md do
-            sm.downstream.__receive_additional_description_content_ md[:desc]
+          :on_entry, -> sm do
+            sm.downstream.__receive_additional_description_content_(
+              sm.user_matchdata[:desc] )
             NOTHING_
           end,
           :can_transition_to, same,
@@ -227,7 +229,7 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :blank_line, :entered_by_regex, %r(\A$),
-          :on_entry, -> _sm, _md do
+          :on_entry, -> _sm do
             # you could somehow "close" the item, but why?
             # separator lines are cosmetic and not guaranteed
             NOTHING_
@@ -244,7 +246,8 @@ module Skylab::Zerk::TestSupport
 
         o.add_state(
           :nonfirst_item_line, :entered_by_regex, _nonfirst_item_rx,
-          :on_entry, -> sm, md do
+          :on_entry, -> sm do
+            md = sm.user_matchdata
             sm.downstream._receive_column_one_and_desc_ md[:column_one], md[:desc1]
             NOTHING_
           end,
@@ -265,7 +268,7 @@ module Skylab::Zerk::TestSupport
             end
           end,
 
-          :on_entry, -> sm, _st do
+          :on_entry, -> sm do
             sm.receive_end_of_solution  # you must declare that you have no next state
           end,
         )

@@ -145,7 +145,7 @@ module Skylab::TMX
 
         :entered_by_regex, /\A[[:space:]]*[^[:space:]]+[[:space:]]/,
 
-        :on_entry, -> _sm, _md do
+        :on_entry, -> _sm do
 
           :beginning  # OR `after_section` (as needed)
         end,
@@ -155,7 +155,7 @@ module Skylab::TMX
 
         :entered_by_regex, BLANK_RX_,
 
-        :on_entry, -> sm, _md do
+        :on_entry, -> sm do
 
           _stay = sm.downstream.close_section
           if _stay
@@ -171,8 +171,9 @@ module Skylab::TMX
         :entered_by_regex,
           /\A (?<hdr> [a-z]+ ): [[:space:]]+ (?<rest> .+) \z/ix,
 
-        :on_entry, -> sm, md do
+        :on_entry, -> sm do
 
+          md = sm.user_matchdata
           ds = sm.downstream
           ds.receive_header md[ :hdr ]
           _stay = ds.receive_content_line md[ :rest ]
@@ -189,9 +190,9 @@ module Skylab::TMX
         :entered_by_regex,
           /\A (?<hdr> [a-z]+ ):? \z/ix,
 
-        :on_entry, -> sm, md do
+        :on_entry, -> sm do
 
-          sm.downstream.receive_header md[ :hdr ]
+          sm.downstream.receive_header sm.user_matchdata[ :hdr ]
           :after_dedicated_header_line
         end,
       )
@@ -210,9 +211,9 @@ module Skylab::TMX
             (?<content> [^[:space:]:]+\b (?! : ) .* )  # any non-header looking line
           ) \z/ix,
 
-        :on_entry, -> sm, md do
+        :on_entry, -> sm do
 
-          _stay = sm.downstream.receive_content_line md[ :content ]
+          _stay = sm.downstream.receive_content_line sm.user_matchdata[ :content ]
           if _stay
             :after_common_section_line
           else
@@ -247,7 +248,7 @@ module Skylab::TMX
           :_trueish_
         end,
 
-        :on_entry, -> sm, st do
+        :on_entry, -> sm do
           sm.receive_end_of_solution  # declare that you have no next state
         end,
       )

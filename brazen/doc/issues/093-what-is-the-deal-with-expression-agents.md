@@ -62,6 +62,7 @@ for your business concerns.
 
 + `human_escape` - legacy. "smart quotes" as described in `val`.
           basically use quotes IFF necessary (né smart_quotes).
+          (now this is done manually where it is needed. tracked with [#ze-040.1]
 
 + `ick` - render an invalid value (for your business definition of invalid).
           `x` is any value. distant ancestor of [#ba-019] the `strange`
@@ -109,7 +110,7 @@ for your business concerns.
 
 + `val` - render a business value. if `lbl` (or `par`) represents one
           side of a key-value pair, this is for the other. compare to
-          `ick`, here for strings we might do "smart quotes", i.e
+          `ick`, here for strings we might do [#ze-041.1] "smart quotes", i.e
           quoting the string only if it has a space in it. for black and
           whites, rendering `x` as-is is a common choice too, which
           looks good nexted to a styled `lbl` (or `par`) tag, but can look

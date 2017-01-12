@@ -6,41 +6,73 @@ module Skylab::Basic
 
       # isolated ivarspace for each time a handler is called
 
-      def initialize umd, sta, ds
-        @downstream = ds
+      def initialize umd, sta, sess
         @user_matchdata = umd
-        @state = sta
+        @__state = sta
+        @_session = sess
       end
 
       def execute
-        @_mutex_because_you_can_only_receive_one_directive = true
-        _umd = remove_instance_variable :@user_matchdata
-        _sta = remove_instance_variable :@state
-        x = _sta.__next_symbol_via_machine_and_user_matchata self, _umd
-        if x
-          @had_a_trueish_result = true
-          @trueish_result = x
+        Outcome___.new do |o|
+          @_outcome = o
+          x = remove_instance_variable( :@__state ).
+            next_symbol_via_exposures_proxy___ self
+          if x
+            o.had_a_trueish_result = true
+            o.trueish_result = x
+          end
         end
-        freeze
+      end
+
+      def TURN_PAGE_OVER  # shoutcase while [#044.A]
+        @_session.immediate_notification_for_turn_page_over__
+        @_outcome._mutex :_turn_page_over_
+      end
+
+      def receive_end_of_solution_when_paginated
+        @_outcome._mutex :_end_when_paginated_
       end
 
       def receive_end_of_solution
-        _mutex :_end_
+        @_outcome._mutex :_end_
       end
 
-      def _mutex sym
-        remove_instance_variable :@_mutex_because_you_can_only_receive_one_directive
-        @set_a_directive = true
-        @directive_symbol = sym ; nil
+      def downstream
+        @_session.downstream
       end
 
       attr_reader(
-        :downstream,
-        :directive_symbol,
-        :had_a_trueish_result,
-        :set_a_directive,
-        :trueish_result,
+        :user_matchdata,
       )
+
+      # ==
+
+      class Outcome___
+
+        def initialize
+          @_mutex_because_you_can_only_receive_one_directive = true
+          yield self
+          freeze
+        end
+
+        def _mutex sym
+          remove_instance_variable :@_mutex_because_you_can_only_receive_one_directive
+          @set_a_directive = true
+          @directive_symbol = sym ; nil
+        end
+
+        attr_accessor(
+          :had_a_trueish_result,
+          :trueish_result,
+        )
+
+        attr_reader(
+          :directive_symbol,
+          :set_a_directive,
+        )
+      end
+
+      # ==
     end
   end
 end
