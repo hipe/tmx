@@ -6,7 +6,7 @@ module Skylab::TMX
 
       # the name "host client" instead of "CLI" is meant to accentuate
       # that although for now this is always the root tmx client, it
-      # couldn't just as soon be any other "tmx"
+      # could just as soon be any other "tmx"
 
       class << self
         def call cli

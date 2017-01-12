@@ -12,7 +12,7 @@
              event of creating the tmpdir breaks the comprehensive test run
              (tricky because the test that is the first to build the
              grammar files varies based on "how" we're running the tests..)
-[#085]       #done #list-API make methods conform to [#bs-029.E]
+[#085]       #done #list-API make methods conform to [#bs-029.5]
 [#084]       #parent-node: [#024] of node ..
 [#083]       #doc-node kernel
 [#082]       #parent-node: [#083] the kernel properties narrative ..

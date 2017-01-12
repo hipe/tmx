@@ -9,7 +9,7 @@ phases we have gone through. there are some ancient muddy patches from
 our foray into functionalism which remain there today both because
 they have no known issues and because they are amusing to read.
 
-we strictly follow [#bs-029.G] the name conventions for const visibility
+we strictly follow [#bs-029.7] the name conventions for const visibility
 because it has compelling merit in its self-documentation; but the
 effect to the the uninitiated may be jarring with all the trailing
 underscores in the const names.

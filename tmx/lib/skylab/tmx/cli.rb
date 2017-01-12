@@ -107,7 +107,7 @@ module Skylab::TMX
         elsif _parse_primary_softly
           __when_primary_at_head
         else
-          _fail_about_strange
+          _fail_about_unknown_primary_or_operator
         end
       end
 
@@ -125,11 +125,15 @@ module Skylab::TMX
             lu = @omni.flush_to_lookup_operator
             lu and __bound_call_via_found_operator_when_dispatch_help lu
           else
-            _fail_about_strange
+            _fail_about_unknown_primary_or_operator
           end
         else
           ok  # assume EARLY_END from help
         end
+      end
+
+      def _fail_about_unknown_primary_or_operator
+        @args.when_malformed_primary_or_operator
       end
 
       def _when_no_arguments
@@ -165,10 +169,6 @@ module Skylab::TMX
 
       def __installation  # #testpoint
         Home_.installation_
-      end
-
-      def _fail_about_strange
-        self._COVER_ME__when_token_looks_totally_strange__
       end
 
       def __bound_call_via_found_operator_when_dispatch_help lu

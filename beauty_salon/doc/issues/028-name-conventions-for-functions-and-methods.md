@@ -203,8 +203,6 @@ test easier to test but is not part of any API requirement.
 
 ## :[#here.1.0] and and :#tier-3
 
-"cozy scope" 
-
 "cozy scope" means the method is not called outside of the file it is
 defined in. "one-off scope" is cozy scope but furthermore the method is
 only ever called from one place. the significance of these tiers
@@ -929,7 +927,7 @@ shorthand. this section describes both the pattern behind this chaos
 and the utility of it.
 
 in summary the pattern has to do with visibility and at some level is
-comparable to the [#029.G] three levels of visibility as expressed by
+comparable to the [#029.7] three levels of visibility as expressed by
 trailing underscores of const names. what we mean by "visiblity" and how
 this may be different than the visibility you are familiar with will be
 explained below.
@@ -1102,7 +1100,7 @@ of the following section.
 
 (spoiler alert for the eager and precocious: these three levels of
 visibiy have semantics similar but not the same as the three levels of
-visibility decribed by [#029.G] the trailing underscore convention for
+visibility decribed by [#029.7] the trailing underscore convention for
 const names.)
 
 recall from [#here.6] that when we say "node" in the context of the

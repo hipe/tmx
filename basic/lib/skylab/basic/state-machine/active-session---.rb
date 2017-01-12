@@ -56,21 +56,29 @@ module Skylab::Basic
       end
 
       def __step_via_handler
-        _md = remove_instance_variable :@_user_matchdata
-        o = Here_::HandlerInvocation_via_Session_.
-          new( _md, @state, self ).execute
+        o = invoke_handler_via_user_matchdata
         if o.set_a_directive
           __step_when_directive o
         elsif o.had_a_trueish_result
-          if @state.has_at_least_one_formal_transition
-            __fail_because_result_and_formals
-          else
-            __step_via_handler_result o.trueish_result
-          end
+          step_when_trueish_result o.trueish_result
         elsif @state.has_at_least_one_formal_transition
           step_via_find_transition
         else
           __fail_because_none_of_the_three
+        end
+      end
+
+      def invoke_handler_via_user_matchdata
+        _md = remove_instance_variable :@_user_matchdata
+        Here_::HandlerInvocation_via_Session_.
+          new( _md, @state, self ).execute
+      end
+
+      def step_when_trueish_result sym
+        if @state.has_at_least_one_formal_transition
+          __fail_because_result_and_formals
+        else
+          __step_via_handler_result sym
         end
       end
 
@@ -95,6 +103,11 @@ module Skylab::Basic
 
       def __step_at_end_when_paginated o
         @page_listener.step_at_end o
+      end
+
+      def send_any_previous_and_reinit_downstream__  # for driven
+        @page_listener.send_any_previous_and_reinit_downstream
+        NIL
       end
 
       def __step_at_end o

@@ -18,6 +18,13 @@ module Skylab::TMX::TestSupport
       __no_arg.index_of_splay.offset_via_operator_symbol[ :ping ] || fail
     end
 
+    it "strange looking operator" do
+      invoke "ip_man"
+      on_stream :serr
+      expect "unknown primary or operator: \"ip_man\" (did you mean ip-man?)"
+      expect_failed_normally_
+    end
+
     it "strange operator - whines" do
       _strange_oper_arg.reason_line == "unrecognized operator: \"zazoozle\"" || fail
     end

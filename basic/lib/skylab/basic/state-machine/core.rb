@@ -110,6 +110,15 @@ module Skylab::Basic
         ps
       end
 
+      def begin_driven_session_by
+        DrivenSession___.define do |o|
+          yield o
+          o.active_session = _begin_active_session_by do |as|
+            o.define_active_session__ as
+          end
+        end.execute
+      end
+
       def _begin_active_session_by
         ActiveSession___.define do |o|
           yield o

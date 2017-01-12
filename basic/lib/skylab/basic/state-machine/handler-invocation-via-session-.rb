@@ -29,6 +29,10 @@ module Skylab::Basic
         @_outcome._mutex :_turn_page_over_
       end
 
+      def send_any_previous_and_reinit_downstream
+        @_session.send_any_previous_and_reinit_downstream__ ; nil
+      end
+
       def receive_end_of_solution_when_paginated
         @_outcome._mutex :_end_when_paginated_
       end

@@ -5,7 +5,7 @@
 [#121]       #tracking this wrapping algo
 [#120] #hole
              (#moved-to: [#ac-008])
-             (note [#083]#X1 is related but is not the same)
+             (note [#!083]#X1 is related but is not the same)
 [#119]       track expression of ACS associations into brazen unbound tree
              ( #was: get [fm] out of test (see) )
 [#118]       do we want the ability to have a model-less-action? for now, no
@@ -66,7 +66,9 @@
 [#085] #hole (#was: (#moved-to: [#ba-052]))
 [#084]       +#wishlist a `flag` meta-meta property
 
-[#083]       track this spot that does [tmx] mounting for one-off scripts
+[#083] #hole
+             ( #moved-to: [#tmx-018.1] mounting one-offs )
+             ( #was: track this spot that does [tmx] mounting for one-off scripts )
              ( #was: #moved-to: [#hu-043] contextualization )
 
              ( #was: #done workspace `init` action should not default to '.' in API )

@@ -127,9 +127,9 @@ dimensions:
 the name we choose will assume different "inflection" based on whether,
 variously, it references
 
-  • [#.E] a non-class module,
+  • [#here.5] a non-class module,
   • [#.F] a class,
-  • [#.C] a proc or proc-like
+  • [#here.3] a proc or proc-like
   • or [#.B] any other value not in the above list.
 
 we will present the conventions here in order from "smallest" to "biggest",
@@ -148,14 +148,14 @@ constituent words are separated by underscores:
 the above is an example of a const that holds a regex.
 
 in practice, we will often see our const names containing one or more
-[#.G] trailing underscores because of [#xxx] "rounded API's".
+[#here.7] trailing underscores because of [#xxx] "rounded API's".
 
 that is all.
 
 
 
 
-#### the name conventions for proc-like consts :.C
+#### the name conventions for proc-like consts :[#here.3]
 
 
 for a proc when that proc is assigned to a const, or other proc-like
@@ -193,7 +193,7 @@ is sometimes lossy, and always ugly.
 
 
 
-##### the const name conventions for a non-class module :.E
+##### the const name conventions for a non-class module :[#here.5]
 
 
 
@@ -207,7 +207,7 @@ is sometimes lossy, and always ugly.
 
 
 
-### scope is reflected in const names by trailing underscores :.G
+### scope is reflected in const names by trailing underscores :[#here.7]
 
 perhaps the most visually prominent name convention of them all in this
 universe, we employ this convention heavily: how many underscores trail

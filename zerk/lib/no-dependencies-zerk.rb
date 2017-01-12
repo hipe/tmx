@@ -333,7 +333,15 @@ module NoDependenciesZerk
 
       # --
 
-      # WAS __when_ambiguous
+      def when_malformed_primary_or_operator  # courtesy, for proximity to below
+        s = head_as_is
+        no_because do |y|
+          if s.include? UNDERSCORE_ and %r(\A[a-z0-9_]+\z) =~ s
+            _hint = " (did you mean #{ s.gsub UNDERSCORE_, DASH_ }?)"
+          end
+          y << "unknown primary or operator: #{ s.inspect }#{ _hint }"
+        end
+      end
 
       def __when_malformed_primary
         s = head_as_is

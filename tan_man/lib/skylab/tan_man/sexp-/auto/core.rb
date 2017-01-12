@@ -218,7 +218,7 @@ module Skylab::TanMan
 
   module InstanceMethods
 
-    # all methods defined here must end in a '_' per [#bs-029.E] - methods that
+    # all methods defined here must end in a '_' per [#bs-029.5] - methods that
     # look "normal" is a namespace left open entirely for business (i.e rules
     # in the grammar).
 
