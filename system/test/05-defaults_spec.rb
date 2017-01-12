@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - defaults" do
+  describe "[sy] defaults" do
 
     TS_[ self ]
 

@@ -95,7 +95,7 @@ module Skylab::System
       end
 
       def __express_unindented_and_reindented mutable_big_s
-        _String = Home_.lib_.basic::String
+        _String = Basic_[]::String
         _String.mutate_by_unindenting mutable_big_s
         st = _String.line_stream mutable_big_s
         begin

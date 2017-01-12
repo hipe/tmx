@@ -25,7 +25,7 @@ module Skylab::Git
         @_command
       end
 
-      _process = Process_.new( * @system.popen3( * @_command ), @_command )
+      _process = Process_[ * @system.popen3( * @_command ), @_command ]
 
       o = Magnetics::OneLine_via_Process.new _process, & @listener
 

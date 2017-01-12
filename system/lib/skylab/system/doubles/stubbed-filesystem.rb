@@ -56,7 +56,7 @@ module Skylab::System
           end
         end
 
-        @_tree = Home_.lib_.basic::Tree.via :node_stream, _st
+        @_tree = Basic_[]::Tree.via :node_stream, _st
 
         fh.close
         freeze

@@ -49,7 +49,7 @@ module Skylab::System
       end
 
       def description_under expr
-        Home_.lib_.basic::Pathname.description_under_of_path expr, @path
+        Basic_[]::Pathname.description_under_of_path expr, @path
       end
 
       def name

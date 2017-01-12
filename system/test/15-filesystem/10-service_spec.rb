@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - filesystem (stub)" do
+  describe "[sy] filesystem (stub)" do
 
     TS_[ self ]
 

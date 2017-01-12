@@ -1,3 +1,4 @@
+self._NOT_USED  # here for reference and possible future use
 module Skylab::TanMan
 
   class Services::Diff::Command < ::Struct.new :file_path_before,

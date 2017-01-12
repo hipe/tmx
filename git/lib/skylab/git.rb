@@ -85,7 +85,9 @@ module Skylab::Git
     Brazen_ = ::Skylab::Brazen
   end
 
-  Process_ = ::Struct.new :in, :out, :err, :wait, :command
+  Process_ = -> * five do
+    Home_.lib_.basic::Process.via_five( * five )
+  end
 
   ProcLike_ = Common_::Actor::ProcLike
 

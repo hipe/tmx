@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - which" do
+  describe "[sy] which" do
 
     TS_[ self ]
 

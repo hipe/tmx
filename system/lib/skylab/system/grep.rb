@@ -57,7 +57,7 @@ module Skylab::System
 
       def ___resolve_regexp_via_ruby_regexp
 
-          opts = Home_.lib_.basic::Regexp.options_via_regexp @ruby_regexp
+          opts = Basic_[]::Regexp.options_via_regexp @ruby_regexp
           xtra_i_a = nil
           if opts.is_multiline
             ( xtra_i_a ||= [] ).push :MULTILINE

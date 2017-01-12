@@ -24,7 +24,7 @@ module Skylab::Git
       @_on_event_selectively.call( :info, :command ) { cmd }
 
       _a = * remove_instance_variable( :@system ).popen3( * cmd )
-      @_process = Process_.new( * _a, cmd )
+      @_process = Process_[ * _a, cmd ]
 
       @_method = :__first_gets
       Common_.stream do

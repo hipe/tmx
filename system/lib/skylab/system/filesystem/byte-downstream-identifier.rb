@@ -16,7 +16,7 @@ module Skylab::System
       end
 
       def description_under expag
-        Home_.lib_.basic::Pathname.description_under_of_path expag, @path
+        Basic_[]::Pathname.description_under_of_path expag, @path
       end
 
       def EN_preposition_lexeme

@@ -365,7 +365,7 @@ module Skylab::System
 
       Stream__ = -> x do
         if x
-          Home_.lib_.basic::String.line_stream x
+          Basic_[]::String.line_stream x
         else
           Common_::Stream.the_empty_stream
         end

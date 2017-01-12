@@ -142,7 +142,55 @@ module Skylab::Basic  # introduction at [#020]
     private :dup
   end
 
-  # (put `Process` back here)
+  class Process < SimpleModel_  # [gi], [sy]
+
+    class << self
+      def via_five * five
+        define do |o|
+          o.__init_via_five five
+        end
+      end
+    end  # >>
+
+    def initialize
+      yield self
+    end
+
+    def pid= pid
+      @wait = ProcessWaiter___.new pid ; pid
+    end
+
+    def __init_via_five five
+      @in, @out, @err, @wait, @command = five
+      freeze
+    end
+
+    attr_accessor :in, :out, :err, :command
+
+    attr_reader :wait
+
+    # ==
+
+    class ProcessWaiter___  # trying to make our own `::Process::Waiter` because ???
+      def initialize pid
+        @pid = pid
+        @_value = :__value_initially
+      end
+      def value
+        send @_value
+      end
+      def __value_initially
+        ::Process.wait @pid  # result is same pid
+        @__value = $?  # EEW - `::Process::Status`
+        @_value = :__value_normally
+        send @_value
+      end
+      def __value_normally
+        @__value
+      end
+    end
+    # ==
+  end
 
   class Minimal_Property
 

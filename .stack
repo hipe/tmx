@@ -22,4 +22,3 @@ say_formal_operation_alternation
 -3.266 CLI::When_::Looks_strange[ @_omni ]
 old code in cli (near if false)
 -3.273 intrinsics & mountable operators, help
--3.274 mocked diff thing not using popen3

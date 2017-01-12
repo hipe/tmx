@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - patch - models" do
+  describe "[sy] patch - models" do
 
     TS_[ self ]
 

@@ -4,7 +4,7 @@ module Skylab::Common
 
     class << self
 
-      def try_convert x  # :+[#056]
+      def try_convert x  # #[#056.1] strain: similar try-convert's for stream
 
         if x.respond_to? :each_index
           Home_.lib_.basic::List.line_stream x

@@ -19,7 +19,13 @@
 
 [#038]       expect line
 
-[#037] #hole ( #moved-to: [#dt-XXX] )
+[#037]       fixtures
+
+             [#here.1] (not referenced) [#sy-008.1] expects the two files in
+               this tree to have identical content: fixture-trees/one
+               [st] expects that same tree to have only those files.
+
+             ( #moved-to: [#dt-XXX] )
 
 [#036] #ongoing   indentation in quickie
 

@@ -390,7 +390,7 @@ module Skylab::Git
       def __build_process
         @__listener.call( :info, :command ) { @_command }
         _a = remove_instance_variable( :@__system ).popen3( * @_command )
-        Process_.new( * _a, @_command )
+        Process_[ * _a, @_command ]
       end
 
       # ==

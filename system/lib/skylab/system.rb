@@ -25,6 +25,7 @@ module Skylab::System
   end  # >>
 
   Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
 
   # -
 
@@ -169,6 +170,20 @@ module Skylab::System
 
   # ==
 
+  class SimpleModel_
+    class << self
+      alias_method :define, :new
+      undef_method :new
+    end  # >>
+    def initialize
+      yield self
+      freeze
+    end
+    private :dup
+  end
+
+  # ==
+
   Autoloader_ = Common_::Autoloader
 
   # ==
@@ -189,12 +204,21 @@ module Skylab::System
     Home_.services.path_looks_relative path
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Basic_ = Lazy_.call do
+    Home_.lib_.basic
+  end
+
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   CLI = nil  # for host
   DASH_ = '-'
   EMPTY_A_ = [].freeze
+  EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''.freeze
   FILE_SEPARATOR_BYTE_ = ::File::SEPARATOR.getbyte 0
   Home_ = self

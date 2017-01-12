@@ -58,7 +58,7 @@ module Skylab::System::TestSupport
 
     def _against s
 
-      _st = Home_.lib_.basic::String.line_stream s
+      _st = Basic_[]::String.line_stream s
 
       @st = popen3_result_for_RW_.unmarshalling_stream _st, :OGDL
 

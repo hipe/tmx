@@ -10,7 +10,7 @@ module Skylab::Basic::TestSupport
 
     shared_subject :_state_machine do
 
-      # (an ultra-simplified derivative of the target use-case)
+      # (an ultra-simplified derivative of the target use-case, [#sy-023.1] diff)
 
       o = Home_::StateMachine.begin_definition
 

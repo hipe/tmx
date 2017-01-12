@@ -38,4 +38,3 @@ some non-designed boundaries have emerged:
                own adapter to (and no platform stdlib recognition).
 
     30 to 99 - a unix utility that (same)
-               (73 is reserved for `diff`)

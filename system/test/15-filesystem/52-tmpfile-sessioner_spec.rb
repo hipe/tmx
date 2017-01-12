@@ -91,13 +91,13 @@ module Skylab::System::TestSupport
     def _common_setup_two
 
       td = memoized_tmpdir_.clear
-      o = _subject.new
-
+      _subject.define do |o|
+        # <-
       o.tmpdir_path ::File.join( td.path, 'one/two' )
       o.create_at_most_N_directories 2
       o.using_filesystem services_.filesystem
-
-      o
+      # ->
+      end
     end
 
     def _expect_good_session o
@@ -117,7 +117,7 @@ module Skylab::System::TestSupport
     end
 
     def _subject
-      Home_::Filesystem::Tmpfile_Sessioner
+      Home_::Filesystem::TmpfileSessioner
     end
   end
 end

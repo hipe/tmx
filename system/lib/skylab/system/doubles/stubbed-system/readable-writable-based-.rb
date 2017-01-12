@@ -113,13 +113,13 @@ module Skylab::System
 
         def __to_mock_stdout
           if @stdout_string
-            Home_.lib_.basic::String.line_stream @stdout_string
+            Basic_[]::String.line_stream @stdout_string
           end
         end
 
         def __to_mock_stderr
           if @stderr_string
-            Home_.lib_.basic::String.line_stream @stderr_string
+            Basic_[]::String.line_stream @stderr_string
           end
         end
 

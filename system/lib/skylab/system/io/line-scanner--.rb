@@ -71,15 +71,13 @@ module Skylab::System
 
       attr_reader :fh, :pathname
 
-      LINE_RX__ = Home_.lib_.basic::String.regex_for_line_scanning
+      LINE_RX__ = Basic_[]::String.regex_for_line_scanning
 
       # ~
 
       def to_identifier
-        Home_.lib_.basic::Pathname.identifier @pathname
+        Basic_[]::Pathname.identifier @pathname
       end
-
-      EMPTY_P_ = -> {}
     end
   end
 end

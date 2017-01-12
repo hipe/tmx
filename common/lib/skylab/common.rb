@@ -389,7 +389,7 @@ module Skylab::Common
         THE_EMPTY_POLYMORPHIC_SCANNER___
       end
 
-      def try_convert x  # :+[#056]
+      def try_convert x  # #[#056.1] strain: similar try-convert's for stream
 
         if x.respond_to? :gets
 

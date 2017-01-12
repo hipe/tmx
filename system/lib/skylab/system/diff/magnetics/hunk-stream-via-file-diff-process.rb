@@ -1,35 +1,355 @@
-module Skylab::TanMan
+module Skylab::System
 
-  class Services::Diff::Changeset  < ::Struct.new :command, :num # (do *not*
-                                  # rely on these members not changing! rely
-                                  # instead on the public methods.)
-    def << line
-      chr = nil
-      if line
-       chr = line[0]
+  class Diff
+
+    class Magnetics::HunkStream_via_FileDiffProcess < Common_::Actor::Monadic
+
+      # a state machine for parsing a unified diff of two files
+
+      # -
+        def initialize pcs
+          @process = pcs
+        end
+
+        def execute
+          @_gets_hunk = :__gets_first_hunk
+          Common_.stream do
+            send @_gets_hunk
+          end
+        end
+
+        def __gets_first_hunk
+
+          out = @process.out
+          line_scn = Common_.stream do
+            out.gets
+          end.flush_to_polymorphic_stream
+
+          # if we can peek now that the output from the diff command is no
+          # output, then we save ourselves the trip to the state macine.
+
+          if line_scn.no_unparsed_exists
+            @_expected_exitstatus = 0
+            _check_and_close
+          else
+            @_expected_exitstatus = 1
+            __gets_first_hunk_normally line_scn
+          end
+        end
+
+        def __gets_first_hunk_normally line_scn
+
+          @__hunk_stream = HunkStream_via_LineScanner___[ line_scn ]
+          @_gets_hunk = :__gets_hunk
+          send @_gets_hunk
+        end
+
+        def __gets_hunk
+          hunk = @__hunk_stream.gets
+          if hunk
+            hunk
+          else
+            remove_instance_variable :@__hunk_stream
+            remove_instance_variable :@_gets_hunk
+            _check_and_close
+          end
+        end
+
+        def _check_and_close
+          ok = __check_err
+          ok &&= __check_exitstatus
+          ok && __close
+        end
+
+        def __check_err
+          s = @process.err.gets
+          if s
+            self._COVER_ME__unexpected_stderr_output__
+          else
+            ACHIEVED_
+          end
+        end
+
+        def __check_exitstatus
+          act_d = @process.wait.value.exitstatus
+          exp_d = remove_instance_variable :@_expected_exitstatus
+          if exp_d == act_d
+            ACHIEVED_  # normal result for diff when there is a difference
+          else
+            self._COVER_ME__exitstatus_was_unexpected__
+          end
+        end
+
+        def __close
+          @_gets_hunk = :__NOTHING
+          remove_instance_variable :@process
+          freeze
+          send @_gets_hunk
+        end
+
+        def __NOTHING
+          NOTHING_
+        end
+      # -
+
+      # ==
+
+      HunkStream_via_LineScanner___ = -> line_scn do
+
+        # (we would normally memoize the state machine but at the last
+        # minute we had to flip the script to accomodate storing those
+        # first two lines we parse in a structure that is not a hunk.
+        # this required that we alter what class we use for the downstream
+        # mid-parse, a stunt that is not covered.)
+
+        o = Home_.lib_.basic::StateMachine.begin_definition
+
+        o.add_state(
+          :beginning,
+          :can_transition_to, :minus_minus_minus,
+        )
+
+        appropriate_downstream_normally = -> do
+          Hunk___.new
+        end
+
+        appropriate_downstream = -> do
+          appropriate_downstream = nil  # sanity
+          DiffHeader___.new
+        end
+
+        o.add_state(
+          :minus_minus_minus,
+          :entered_by_regex, %r(\A---[ ]),
+          :on_entry, -> sm do
+            sm.downstream.__receive_diff_header_line_one_ sm.user_matchdata
+            :plus_plus_plus
+          end,
+        )
+
+        o.add_state(
+          :plus_plus_plus,
+          :entered_by_regex, %r(\A\+\+\+[ ]),
+          :on_entry, -> sm do
+            sm.downstream.__receive_diff_header_line_two_ sm.user_matchdata
+            appropriate_downstream = appropriate_downstream_normally
+            sm.TURN_PAGE_OVER
+            NIL
+          end,
+          :can_transition_to, :first_ever_hunk_header,
+        )
+
+        hunk_rx = %r(\A@@ -\d+,\d+ \+\d+,\d+ @@$)
+        hunk_transitions = [
+          :context_line,
+          :minus_line,
+          :plus_line,
+        ]
+
+        o.add_state(
+          :first_ever_hunk_header,
+          :entered_by_regex, hunk_rx,
+          :on_entry, -> sm do
+            sm.downstream._receive_hunk_header_ sm.user_matchdata
+            NIL
+          end,
+          :can_transition_to, hunk_transitions
+        )
+
+        these = [
+          * hunk_transitions,
+          :A_NONFIRST_hunk_header,
+          :my_end,
+        ]
+
+        o.add_state(
+          :context_line,
+          :entered_by_regex, %r(\A[ ]),
+          :on_entry, -> sm do
+            sm.downstream.__receive_context_line_ sm.user_matchdata
+            NIL
+          end,
+          :can_transition_to, these,
+        )
+
+        o.add_state(
+          :minus_line,
+          :entered_by_regex, %r(\A-),
+          :on_entry, -> sm do
+            sm.downstream.__receive_remove_line_ sm.user_matchdata
+            NIL
+          end,
+          :can_transition_to, these,
+        )
+
+        o.add_state(
+          :plus_line,
+          :entered_by_regex, %r(\A\+),
+          :on_entry, -> sm do
+            sm.downstream.__receive_add_line_ sm.user_matchdata
+            NIL
+          end,
+          :can_transition_to, these,
+        )
+
+        o.add_state(
+          :A_NONFIRST_hunk_header,
+          :entered_by_regex, hunk_rx,
+          :on_entry, -> sm do
+            sm.TURN_PAGE_OVER
+            sm.downstream._receive_hunk_header_ sm.user_matchdata
+            NIL
+          end,
+          :can_transition_to, hunk_transitions,
+        )
+
+        o.add_state(
+          :my_end,
+          :entered_by, -> st do
+            # (you can enter the 'end' state IFF the upstream is empty)
+            st.no_unparsed_exists
+          end,
+          :on_entry, -> sm do
+            sm.receive_end_of_solution_when_paginated
+          end,
+        )
+
+        _sm_definition = o.finish
+
+        _sm_definition.begin_passive_session_by do |sess|
+
+          sess.upstream = line_scn
+
+          sess.downstream_by = -> do
+            appropriate_downstream[]
+          end
+        end
       end
-      case chr
-      when '>' ; num.lines_added += 1
-      when '<' ; num.lines_removed += 1
+
+      # ==
+
+      class DiffHeader___
+        def initialize
+          @__mutex_1 = @__mutex_2 = nil
+        end
+        def __receive_diff_header_line_one_ md
+          remove_instance_variable :@__mutex_1
+          @_line_1_matchdata = md ; nil
+        end
+        def __receive_diff_header_line_two_ md
+          remove_instance_variable :@__mutex_2
+          @_line_2_matchdata = md
+          freeze ; nil
+        end
+        def to_line_stream
+          Stream_[ [ @_line_1_matchdata.string, @_line_2_matchdata.string ] ]
+        end
+        def finish_when_paginated
+          self
+        end
       end
-      nil
-    end
 
-    def num_lines_added
-      num.lines_added
-    end
+      class Hunk___
 
-    def num_lines_removed
-      num.lines_removed
-    end
+        def initialize
+          NOTHING_
+        end
 
-  private
+        def _receive_hunk_header_ md
+          @_runs = [ Header___.new( md ) ]
+        end
 
-    num_struct = ::Struct.new :lines_removed, :lines_added
+        def __receive_context_line_ md
+          _add( :context,  md ) { ContextRun__ }
+        end
 
-    define_method :initialize do |command|
-      self[:command] = command
-      self[:num] = num_struct.new 0, 0
+        def __receive_remove_line_ md
+          _add( :remove,  md ) { RemoveRun__ }
+        end
+
+        def __receive_add_line_ md
+          _add( :add,  md ) { AddRun__ }
+        end
+
+        def _add sym, md
+          run = @_runs.last
+          if run.category_symbol ||= sym
+            run.close
+            run = yield.new
+            @_runs.push run
+          end
+          run.accept md
+          NIL
+        end
+
+        def finish_when_paginated
+          @_runs.freeze
+          freeze
+        end
+
+        def to_line_stream
+          Stream_[ @_runs ].expand_by do |run|
+            run.to_line_stream
+          end
+        end
+      end
+
+      Run__ = ::Class.new
+
+      class Header___
+        def initialize md
+          @_md = md
+        end
+        def category_symbol
+          :header
+        end
+        def close
+          NOTHING_
+        end
+        def to_line_stream
+          Common_::Stream.via_item @_md.string
+        end
+      end
+
+      class ContextRun__ < Run__
+        def category_symbol
+          :context
+        end
+      end
+
+      class RemoveRun__ < Run__
+        def category_symbol
+          :remove
+        end
+      end
+
+      class AddRun__ < Run__
+        def category_symbol
+          :add
+        end
+      end
+
+      class Run__
+        def initialize
+          @_matchdata_array = []
+        end
+        def accept md
+          @_matchdata_array.push md ; nil
+        end
+        def close
+          @_matchdata_array.freeze
+          freeze ; nil
+        end
+        def to_line_stream
+          Stream_.call @_matchdata_array do |md|
+            md.string
+          end
+        end
+      end
+
+      # ==
+
     end
   end
 end
+# #history: full rewrite of ancient [tm] thing

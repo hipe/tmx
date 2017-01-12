@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::System::TestSupport
 
-  describe "[sy] services - patch" do
+  describe "[sy] patch - integration" do
 
     TS_[ self ]
     use :expect_event

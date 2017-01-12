@@ -8,7 +8,7 @@ module Skylab::System
 
       if :Tee == const
 
-        cls = Home_.lib_.basic::Proxy::Makers::Tee.
+        cls = Basic_[]::Proxy::Makers::Tee.
           call_via_arglist IO_::METHOD_I_A_  # see [#014]
 
         Mappers.const_set :Tee, cls

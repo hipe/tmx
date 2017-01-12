@@ -72,10 +72,6 @@ module Skylab::System
 
     # ~ session exposures
 
-    def tmpfile_sessioner
-      Home_::Filesystem::Tmpfile_Sessioner
-    end
-
     def walk * x_a, & oes_p
       Home_::Filesystem::Walk.for_mutable_args_ x_a, & oes_p
     end

@@ -142,6 +142,7 @@ module Skylab::System::TestSupport
 
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
+  Basic_ = Home_::Basic_
   EMPTY_A_ = Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = Home_::NIL_

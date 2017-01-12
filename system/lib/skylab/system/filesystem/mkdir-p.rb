@@ -32,7 +32,7 @@ module Skylab::System
 
         path = remove_instance_variable :@path
 
-        scn = Home_.lib_.basic::String.reverse_scanner path, FILE_SEPARATOR_BYTE_
+        scn = Basic_[]::String.reverse_scanner path, FILE_SEPARATOR_BYTE_
         s = scn.gets
 
         if s.length.zero?  # then path had a trailing separator. ignorable

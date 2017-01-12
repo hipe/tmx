@@ -2,7 +2,7 @@ module Skylab::System
 
   module Filesystem
 
-    class Tmpfile_Sessioner
+    class TmpfileSessioner < SimpleModel_
 
       # ->
 
@@ -25,6 +25,8 @@ module Skylab::System
 
         def initialize
           @_max_number_of_simulatenous_files = 3  # etc
+          yield self
+          # can't freeze
         end
 
         # ~ writers
@@ -153,7 +155,7 @@ module Skylab::System
 
           max = @_max_number_of_simulatenous_files
 
-          _ = Home_.lib_.basic::Number.of_digits_in_positive_integer max
+          _ = Basic_[]::Number.of_digits_in_positive_integer max
           fmt = "%0#{ _ }d"
           fs = @_FS
           pth = @_tmpdir_path

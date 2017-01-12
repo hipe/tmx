@@ -97,7 +97,12 @@ module Skylab::Snag
 
       def __build_tmpfile_sessioner
 
-        o = Home_.lib_.system.filesystem.tmpfile_sessioner.new
+        Home_.lib_.system_lib::Filesystem::TmpfileSessioner.define do |o|
+          __define_tmpfile_sessioner o
+        end
+      end
+
+      def __define_tmpfile_sessioner o
 
         o.tmpdir_path ::File.join(
           Home_.lib_.system.defaults.dev_tmpdir_path,
@@ -107,8 +112,6 @@ module Skylab::Snag
         o.create_at_most_N_directories 2  # etc
 
         o.using_filesystem @filesystem
-
-        o
       end
     end
 

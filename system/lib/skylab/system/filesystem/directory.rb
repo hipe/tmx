@@ -138,7 +138,7 @@ module Skylab::System
       # this is only exploraory - we emit an event on success
 
       o = qk.value_x
-      succ = Home_.lib_.basic::String.succ.with(
+      succ = Basic_[]::String.succ.with(
 
         :beginning_width, 2,
         :first_item_does_not_use_number,

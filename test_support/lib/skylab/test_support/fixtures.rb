@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  module Fixtures
+  module Fixtures  # :[#037] (manifest has some notes about content guarantees)
 
     class << self
 

@@ -53,7 +53,7 @@ module Skylab::Brazen
 
     Byte_downstream_identifier_via_mixed = -> x do
 
-      # the counterpart to [#ca-056]
+      # the counterpart to [#co-056.1] similar try-convert's for streams
 
       if x.respond_to? :push
 
