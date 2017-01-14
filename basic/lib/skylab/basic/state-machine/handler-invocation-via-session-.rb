@@ -33,6 +33,14 @@ module Skylab::Basic
         @_session.send_any_previous_and_reinit_downstream__ ; nil
       end
 
+      def send_downstream
+        @_session.send_downstream__ ; nil
+      end
+
+      def reinit_downstream
+        @_session.reinit_downstream ; nil
+      end
+
       def receive_end_of_solution_when_paginated
         @_outcome._mutex :_end_when_paginated_
       end

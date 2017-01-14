@@ -1,0 +1,20 @@
+[31;1mNAME[0m
+[31;1mtmz tmx xargs-ish-i[0m -- a stupid-simplified interactive-ified xargs-ish.
+
+[31;1mSYNOPSIS[0m
+[31mtmz tmx xargs-ish-i[0m [4mfile[0m [31m-J[0m [4mreplstr[0m [4mutility[0m [4margument[0m [[4m...[0m]
+
+[31;1mDESCRIPTION[0m
+The [31mtmz tmx xargs-ish-i[0m utility is hacked, pared-down, stupid-simplified goof-off one-off inspired by [31mxargs[0m (see!) that, for each line of [4mfile[0m, builds the command produced by substituting-in that line for [4mreplstr[0m in the command template created by [4mutility[0m [4margument[0m [[4m...[0m], and for each such command gives you a "yes/no" prompt letting you decide whether or not to execute that command.
+
+The "option" is as follows:
+
+     [31;1m-J[0m [4mreplstr[0m
+             The first occurence of [4mreplstr[0m in your command string ([4mutility[0m [4margument[0m [[4m...[0m]) will get replaced with each line (chomped) from [4mfile[0m.
+
+[31;1mEXAMPLE[0m
+imagine a world free from disease
+
+   $this is a hack
+
+   $so is this

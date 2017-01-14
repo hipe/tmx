@@ -6,11 +6,11 @@ module Skylab::TMX
     # involve the act of installing anything. we mean it in the sense of
     # *your* installation of tmx on *your* system at this moment.
 
-    # the "installation" is the first step towards being a tmx instance: it
-    # holds basic configuration-like parameters and brings to life the rest
-    # of the graph from that. see [#002] "tmx theory" for more.
+    # the "installation" is the first step towards reifying a tmx instance:
+    # it holds basic configuration-like parameters and brings to life the
+    # rest of the graph from that. see [#002] "tmx theory" for more.
 
-    # local unified language:
+    # local unified language (:[#002.A]:)
     # what we're calling a "gem name" is a list of "segments" each of which
     # is a list of "pieces". per some published standard we saw once, in a
     # "gem name" the segments should be separated by dashes and the pieces
@@ -88,7 +88,7 @@ module Skylab::TMX
         # strip from the directory path gem-related information we need
 
         _ne = name_elements_for[ path ]
-        LoadTicket_.new _ne
+        Models_::LoadTicket.new _ne
       end
 
       p = -> path do
@@ -140,9 +140,8 @@ module Skylab::TMX
       ne.const_head_path = @participating_gem_const_path_head
       ne.exe_prefix = @participating_exe_prefix
 
-      LoadTicket_.new ne
+      Models_::LoadTicket.new ne
     end
-
 
     # our coupling to the gem API (and beyond) is both tight and
     # ephemeral, so we try to hide all of that here.
@@ -179,84 +178,6 @@ module Skylab::TMX
     GemNameElements_ = ::Struct.new(
       :entry_string, :gem_name, :gem_path, :const_head_path, :exe_prefix )
     # #testpoint all above
-
-    class LoadTicket_  # #testpoint
-
-      def initialize gne  # GemNameElements_
-
-        @require_path = gne.gem_name.gsub DASH_, ::File::SEPARATOR
-
-        const_path_guess = []
-
-        gne.gem_name.split( DASH_ ).each do |segment|
-          const_path_guess.push segment.gsub( WORD_SEP_RX___ ){ $1.upcase }.intern
-        end
-
-        gne.const_head_path.each_with_index do |sym, d|
-          const_path_guess.fetch( d ) == sym && next
-          self._NAME_SANITY
-        end
-
-        @const_path_array_guess = const_path_guess.freeze
-
-        @gem_name_elements = gne
-      end
-
-      WORD_SEP_RX___ = %r((?:(?<=^|\d)|_)([a-z]))
-      # also worked: %r(_?(?<![a-z])([a-z0-9]))
-      # see #tombstone-C, was #wish [#co-067]
-
-      def require_sidesystem_module
-        @____sidesys_mod ||= __induce_sidesystem_module
-      end
-
-      def __induce_sidesystem_module  # #testpoint
-
-        require @require_path
-
-        # we avoid using `const_reduce` (for name correction) unless we
-        # need to (for no good reason).
-        # this is near but not the same as [#br-083]
-
-        mod = ::Object
-        sym_a = const_path_array_guess
-        ( sym_a.length - 1 ).times do |d|
-          mod = mod.const_get sym_a.fetch d  # until it fails
-        end
-
-        const = sym_a.fetch( -1 )
-
-        if mod.const_defined? const, false
-          mod.const_get const, false
-        else
-          # (strange - probably a holdover from when we had old toplevel names)
-          _ = Autoloader_.const_reduce [ const ], mod
-          _
-        end
-      end
-
-      def path_to_gem
-        @gem_name_elements.gem_path
-      end
-
-      def intern
-        @___as_intern ||= @gem_name_elements.entry_string.intern
-      end
-
-      def entry_string
-        @gem_name_elements.entry_string
-      end
-
-      attr_reader(
-        :const_path_array_guess,
-        :gem_name_elements,
-        :require_path,
-      )
-
-      def IS_LOAD_TICKET_tmx_  # temporary
-        true
-      end
-    end
 
     Gem_name_tools_ = Lazy_.call do
 

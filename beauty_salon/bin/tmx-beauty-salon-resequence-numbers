@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-program = -> sin, sout, serr, pn_s_a, argv do
+program = -> argv, sin, sout, serr, pn_s_a do
 
   es = nil ; _OK = 0 ; _NOPE = 1
 
@@ -90,9 +90,16 @@ program = -> sin, sout, serr, pn_s_a, argv do
         _cols = _a.min
 
         yy = _String_lib.word_wrappers.crazy.curry '', _cols, y
+        yy.indent = _INDENT
+
+        y << "#{ lbl 'synopsis:' }"
+        yy << "a particular near-one-off for rewriting number identifers"
+        yy << "in a document so that they are in order of first occurrence."
+        yy << "(for [sg] probably, but could be for #note-100, #note-200,"
+        yy << "etc. hasn't been used in years."
+        yy << nil
 
         y << "#{ lbl 'description:' }"
-        yy.indent = _INDENT
         yy << "#{ ph 'replstr' } is a reference #{
           }pattern with a digit placeholder \"#{ _PD }\" in it, #{
           }e.g 'foo-#{ _PD }' #{
@@ -408,7 +415,7 @@ program = -> sin, sout, serr, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Resequence_numbers = program
+  Skylab::TMX::OneOffs::Beauty_salon_resequence_numbers = program  # #[#tmx-018.1] mountable one-off
 end

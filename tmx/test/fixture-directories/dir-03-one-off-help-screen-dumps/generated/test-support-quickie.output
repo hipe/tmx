@@ -1,0 +1,4 @@
+usage: quickie [-cover] [-help] [-list] [-verbose] [-tree] [-wip-them-all] [-depth=<[M-]N>] [-order=M-N] [<path> [..]] [-tag=<tag>]
+options:
+  -some-opt-1  (broken while #open [#030])
+  -some-opt-2

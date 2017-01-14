@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby -w
 
-program = -> stdin, stdout, stderr, pn_s_a, argv do
+program = -> argv, stdin, stdout, stderr, pn_s_a do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
   es = nil ; _OK = 0 ; _NO = 1  # exit statii
+
+  _EMPTY_S = ''
 
   _PROCEDE = nil  # not an exit stautus - the absence of one
 
@@ -56,7 +58,7 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
     o.on '-h', '--help', 'this screen.' do ||
       argv.length.nonzero? and ignoring[]
       pen[].instance_exec do
-        _USAGE = 'usage: '
+        _USAGE = 'usage:'
         _IND = _SPACE * _USAGE.length
         y << "#{ lbl _USAGE } #{ progname[] } #{ syntax[] }"
         y << nil
@@ -67,12 +69,20 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
         _cols_ = _DEFAULT_COLS
         _cols = [ _cols_, _MAX_COLS ].min
 
-        yy = _String_lib.word_wrappers.crazy.curry '', _cols, y
+        yy = _String_lib.word_wrappers.crazy.curry _EMPTY_S, _cols, y
 
-        yy << "#{ lbl 'description:' } #{ kw 'search' } is any string that #{
-          }contains exactly one occurrence of #{ kw 'replstr' }."
+        # yy.indent = _IND
+
+        yy << "#{ lbl 'synopsis:' } a quite particular near-one-off"
         yy.indent = _IND
-        yy << "for each line of input (from the #{ kw 'file' }(s) or from"
+        yy << "for creating more space in (probably) [sg] number identifiers."
+        yy << "(hasn't been used in years..)"
+        yy.indent = _EMPTY_S
+        yy << nil
+        yy << "#{ lbl 'description:' } #{ kw 'search' } is any string that #{
+          }contains exactly one occurrence of"
+        yy.indent = _IND
+        yy << "#{ kw 'replstr' }. for each line of input (from the #{ kw 'file' }(s) or from"
         yy << "each line of stdin), for every occurrence of #{ kw 'search' }"
         yy << "found in the input lines, the purpose of this utility is to"
         yy << "change selectively such digits based on the following:"
@@ -271,7 +281,7 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
     lineno = nil
     flush = -> do
       s_a.length.zero? and break
-      output_stream.write( s_a * '' )
+      output_stream.write( s_a * _EMPTY_S )
       s_a.clear ; nil
     end
     prev_lineno = nil
@@ -323,7 +333,7 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Slide_numbers = program
+  Skylab::TMX::OneOffs::Beauty_salon_slide_numbers = program  # #[#tmx-018.1] mountable one-off
 end

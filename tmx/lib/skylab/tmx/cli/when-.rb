@@ -81,7 +81,7 @@ module Skylab::TMX
 
       def __drop_back
         @CLI.do_dispatch_help_ = true
-        NOTHING_  # we want KEEP_PARSING_ but we need early exit to get out of the nodeps primary parisng
+        NOTHING_  # we want KEEP_PARSING_ but we need early exit to get out of the nodeps primary parsing
       end
 
       def _money

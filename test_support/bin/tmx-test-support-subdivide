@@ -89,6 +89,12 @@ class << one_off
 
       -> serr do
 
+        serr.puts "synopsis: choses numbers for N items given a numberpace"
+        serr.puts
+
+        serr.puts "our \"formula\" for subdividing spaces:"
+        serr.puts
+
         _body_string = <<-HERE
 if you had 2 items to fit into 1-99: there's always one buffer at the
 beginning and one at the end, and (N-1) * 2 buffers to account for the
@@ -97,8 +103,6 @@ spread between 99 (slot) items. (reminder: there is no '0' space and
 no '100' space.)
         HERE
 
-        serr.puts "our \"formula\" for subdividing spaces:"
-        serr.puts
         serr.write _body_string
         ACHIEVED_
       end
@@ -177,4 +181,10 @@ no '100' space.)
   # -
 end
 
-exit one_off.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
+if __FILE__ == $PROGRAM_NAME
+  exit one_off.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
+else
+  Skylab::TMX::OneOffs::Test_support_subdivide = -> * five do  # #[#tmx-018.1] mountable one-off
+    one_off.new( * five ).execute
+  end
+end

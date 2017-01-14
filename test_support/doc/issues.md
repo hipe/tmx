@@ -50,14 +50,15 @@
 [#031] #open sunset io spy `qualified_knownness` for io spy group, re-purpose former to house mocks
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 
-[#030] #open legacy table rendering of some help screen is not covered
+[#030] #open quickie plugin arch needs rearch - too confusing
+       #open legacy table rendering of some help screen is not covered
              ( #was: #moved-to: [#dt-xxx] )
 
 [#029]       #track the 'expect' omnibus and narrative ..
 [#028]   #watching what do we have to do to get our custom predicates to
              work in both
              ( #was: "possible" #moved-to: [#ta-004]  ("eventpoint"))
-             ( #was: #done borked quickie architecture near constants )k
+             ( #was: #done borked quickie architecture near constants )
 
 [#027]       track adapters for test suite solutions
              ( #was: #moved-to: [#dt-XXX] )
@@ -78,7 +79,9 @@
 [#023]       #doc-node #parent-node: [#020] "the IO spy"
 [#022]       #parent-node:[#021] "when to extlib and not to extlib.."
 [#021]       #doc-node the core node narrative ..
+
 [#020]       #doc-node the IO spy composite types narrative ..
+
 [#019]       #node-point "tree walker" (became [#!gone:hl-176] then [#sy-018])
 [#018]       #quickie #in-situ
 

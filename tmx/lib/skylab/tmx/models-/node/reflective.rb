@@ -122,8 +122,8 @@ module Skylab::TMX
       @_nf.as_const
     end
 
-    def path_to_gem
-      @_lt.path_to_gem
+    def gem_path
+      @_lt.gem_path
     end
 
     def entry_string

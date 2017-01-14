@@ -1,0 +1,8 @@
+[1;32musage:[0m tmz git citxt [-h] [-v] [ <dir_to_create_file_in> ]
+
+[1;32msynopsis:[0m old script to help create a commit message
+
+[1;32moptions:[0m
+    -h, --help                       this screen.
+    -n, --dry-run                    dry run.
+    -v, --verbose                    be verbose.

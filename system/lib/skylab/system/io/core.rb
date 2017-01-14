@@ -5,21 +5,48 @@ module Skylab::System
     class << self
 
       def dry_stub
-        IO::Dry_Stub__
+        Here_::Dry_Stub__
       end
 
       def dry_stub_instance
-        IO::DRY_STUB__
+        Here_::DRY_STUB__
       end
 
       def line_stream io, num_bytes=nil
-        IO_::Line_Scanner__.new io, num_bytes
+        Here_::Line_Scanner__.new io, num_bytes
       end
 
       def select
-        IO_::Select__
+        Here_::Select__
       end
     end  # >>
+
+    # ==
+
+    class DownstreamProxy < SimpleModel_
+
+      # the final, favorite of many #[#039.1] similar proxies
+
+      attr_writer(
+        :listener,
+        :stream_identifier,
+      )
+
+      def puts s=nil
+        @listener[ s, :puts, @stream_identifier ]
+        NIL
+      end
+      def << s
+        @listener[ s, :<<, @stream_identifier ]
+        self
+      end
+      def write s
+        @listener[ s, :write, @stream_identifier ]
+        s.length
+      end
+    end
+
+    # ==
 
     Byte_Identifer_ = ::Class.new
 
@@ -92,9 +119,7 @@ module Skylab::System
       end
     end
 
-    IO_ = self
-
-    MAXLEN_ = 4096  # ( 2 ** 12), or the number of bytes in about 50 lines
+    # ==
 
     METHOD_I_A_ = [
       :<<,
@@ -109,5 +134,12 @@ module Skylab::System
 
     Autoloader_[ self ]
     stowaway :Mappers, 'mappers/filter'
+
+    # ==
+
+    Here_ = self
+    MAXLEN_ = 4096  # (2 ** 12), or the number of bytes in about 50 lines
+
+    # ==
   end
 end

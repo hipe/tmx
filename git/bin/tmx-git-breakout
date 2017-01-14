@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-program = -> stdin, stdout, stderr, pn_s_a, argv do
+program = -> argv, stdin, stdout, stderr, pn_s_a do
 
   y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
@@ -69,9 +69,11 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
 
     o.on '-h', '--help', 'this screen.' do ||
 
+      first_header = 'usage:'
+
       argv.length.nonzero? and ignoring[]
       p_a = syntaces[] ; p = p_a.shift
-      y << "#{ lbl[ 'usage:' ] } #{ progname[] } #{ p[] }"
+      y << "#{ lbl[ first_header] } #{ progname[] } #{ p[] }"
 
       begin
         p = p_a.shift
@@ -81,19 +83,37 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
       end while nil
 
       y << nil
-      y << "#{ lbl[ 'description:' ] } 'add' files progressively. they are then"
-      yy = build_indenter[ _SPACE * 7, y ]
-      yy << "(breakout) staged. check your status with (breakout) 'status'"
-      yy << "if you like. (breakout) 'commit'ting this will add a git commit"
-      yy << "thta UNDOES whatever changes occurred to those files in the"
-      yy << "HEAD commit. and THEN breakout will re-apply the changes back"
-      yy << "again to those files and 'git add' those files, so they are"
-      yy << "(git) staged for a (git) commit. if you commit this with git"
-      yy << "you will have effectively created two commits: one that reverses"
-      yy << "the changes and one that re-applies them. if you squash the"
-      yy << "HEAD~1 commit onto the previous, you will then be left with one"
-      yy << "commit that contains only those changes to those files having"
-      yy << "been isolated from the commit you started with. IT'S EASY!"
+
+      _margin = _SPACE * ( first_header.length + 1 )
+      yy = build_indenter[ _margin, y ]
+
+      y << "#{ lbl[ 'synopsis:' ] } break up one large commit into two smaller commits by"
+      yy << "specifying which files to break out of the larger commit."
+
+      y << nil
+
+      y << "#{ lbl[ 'usage:' ] } `add` files progressively. they are then (breakout) staged."
+      yy << "check your status with (breakout) `status` if you like."
+      y << nil
+      yy << "(breakout) `commit`ting this will add a git commit that UNDOES"
+      yy << "whatever changes occurred to those files in the HEAD commit."
+      yy << "THEN breakout will re-apply the changes back again to those files"
+      yy << "and `git add` those files, so they are (git) staged for a (git)"
+      yy << "commit."
+      y << nil
+      yy << "if you commit the above with git, you will have effectively"
+      yy << "created two commits, one that reverses the changes and one that"
+      yy << "re-applies them."
+      y << nil
+      yy << "if you then squash the HEAD~1 commit onto the previous, you will"
+      yy << "be left with one commit that contains only those changes to those"
+      yy << "files having been isolated from the commit you started with."
+      yy << "it's that easy."
+      y << nil
+      yy << "whatever better way there is of doing this, we didn't know it"
+      yy << "at the time we wrote this one-off, but we probably do now."
+
+      y << nil
 
       y << lbl[ 'options:' ]
       op.summarize y
@@ -626,13 +646,10 @@ program = -> stdin, stdout, stderr, pn_s_a, argv do
      }expecting {#{ ( cmd_h.keys - %i( flush ) ) * '|' }}" ]
   argv.shift
   p.call
-
 end
 
 if __FILE__ == $PROGRAM_NAME   # (or broader)
-
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-
-  Skylab::Git_breakout = program
+  Skylab::TMX::OneOffs::Git_breakout = program  # #[#tmx-018.1] mountable one-off
 end

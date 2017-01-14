@@ -73,7 +73,7 @@ module Skylab::TMX
     RX2___ = /(?:(?<=^|\d)|_)([a-z])/
 
     Sidesystem_Name_Inference___ = ::Struct.new(
-      :const_path_array, :stem, :require_path, :path_to_gem )
+      :const_path_array, :stem, :require_path, :gem_path )
 
   end
 end

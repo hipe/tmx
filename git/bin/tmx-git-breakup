@@ -46,6 +46,7 @@ program = -> argv, _, _, stderr, pn_s_a do
       y << "#{ hdr[ 'usage:' ] } #{ program_name[] } path/to/file.rb"
       y << "#{ hdr[ 'description:' ] } #{
         }break a commit into 2 smaller steps with opendiff"
+      y << "(we would just use gitx for this nowadays)"
 
       break
     end
@@ -249,5 +250,6 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Git_breakup = program  # [#br-083] determines name
+  Skylab::Git_breakup = program  # while [#br-083]
+  Skylab::TMX::OneOffs::Git_breakup = program  # #[#tmx-018.1] mountable one-off
 end

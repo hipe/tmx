@@ -1,0 +1,28 @@
+beauty-salon-resequence-numbers.output 29 C
+beauty-salon-slide-numbers.output 40 C
+git-breakout.output 25 C
+git-breakup.output 3 C
+git-citxt.output 8 C  # #coverpoint-2-3
+git-follow-forward.output 13 b
+git-follow-renames.output 10 b
+git-head.output 8 b
+git-stash-untracked.output 19 C
+git-step.output 7 b
+git-uncommit.output 5 b
+git-unrename.output 15 b  # #coverpoint-2-4 (special treatment)
+slicer-generate-sidesystem-dependencies-graph.output 1 b
+tan-man-stack.output 16 b  # #coverpoint-2-5
+test-support-cover.output 1 b
+test-support-quickie.output 4 b
+test-support-subdivide.output 21 b
+test-support-summarize.output 4 b  # #coverpoint-2-2 (no test)
+tmx-grh.output 2 b
+tmx-infer-table.output 10 b
+tmx-no-line-breaks.output 23 b
+tmx-onoff.output 3 b
+tmx-partition.output 27 b
+tmx-sg-doc-normalize.output 11 C
+tmx-shallowify.output 11 C
+tmx-snap.output 6 b
+tmx-ungood.output 14 b
+tmx-xargs-ish-i.output 20 c  # #coverpoint-2-6

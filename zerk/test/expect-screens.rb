@@ -942,7 +942,7 @@ module Skylab::Zerk::TestSupport
 
     class Fake_Writable_IO__ < ::BasicObject
 
-      # #[#ts-020] watch and learn
+      # #[#sy-039.1] one of many such proxies
 
       attr_writer(
         :on_puts,

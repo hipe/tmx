@@ -195,10 +195,11 @@ module Skylab::TMX
 
     Human = sidesys[ :Human ]
 
-    _System_lib = sidesys[ :System ]
     System = -> do
-      _System_lib[].services
+      System_lib[].services
     end
+
+    System_lib = sidesys[ :System ]
 
     JSON = stdlib[ :JSON ]
 
@@ -215,6 +216,7 @@ module Skylab::TMX
   EMPTY_P_ = -> { NOTHING_ }
   EMPTY_S_ = ''
   Home_ = self
+  KEEP_PARSING_ = true
   METADATA_FILENAME = '.for-tmx-map.json'
   MONADIC_EMPTINESS_ = -> _ { NOTHING_ }
   NEWLINE_ = "\n"

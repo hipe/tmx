@@ -41,15 +41,15 @@ compare = -> a, b do  # `a` and `b` are arrays of comparables.  find which
   res
 end
 
-stderr = ::STDERR  # (avoid accessing resources as globals/constants)
+serr = ::STDERR  # (avoid accessing resources as globals/constants)
 
 error = -> msg do
-  stderr.puts msg
+  serr.puts msg
   nil
 end
 
 notice = -> msg do
-  stderr.puts "notice: #{ msg }"
+  serr.puts "notice: #{ msg }"
   nil
 end
 
@@ -83,11 +83,23 @@ if false == res
   error[ "sorry, #{ program_name[ ] } couldn't load because of #{
     }the above issue(s)." ]
   exit 1 # just being cute
-elsif res
+elsif res.nil?
+  # nothing
+else
+  basename = ::File.basename $PROGRAM_NAME
+  require 'skylab/git'
+  if 'git-stash-untracked' == basename
+    d = Skylab::Git::CLI.new(
+      ARGV, :_no_stdin_for_git_etc_, $stdout, serr, [ basename ]
+    ).execute
 
-  require_relative 'core'
-  module ::Skylab::Git
-    Home_::CLI.new( nil, * lib_.CLI_std_two ).
-      invoke( [ 'stash-untracked', * ::ARGV ] )
+    if d.nonzero?
+      serr.puts "(exitstatus: #{ d })"
+    end
+    exit d
+  else
+    Skylab::TMX::OneOffs::Git_stash_untracked = -> * five do  # #[#tmx-018.1] mountable one-off
+      Skylab::Git::CLI.new( * five ).execute
+    end
   end
 end

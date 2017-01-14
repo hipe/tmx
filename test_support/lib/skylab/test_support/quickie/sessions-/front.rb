@@ -185,16 +185,20 @@ module Skylab::TestSupport
 
       def __via_plugins_resolve_signatures argv
 
-        argv_ = argv.dup.freeze
+        if '--help' == argv[0]  # while #open [#030]
+          argv[0] = '-help'
+        end
+
+        frozen_argv = argv.dup.freeze
 
         a = []
 
         @_plugins.accept do | de |
-          a.push de.prepare argv_
+          a.push de.prepare frozen_argv
         end
 
-        if a.length.zero?
-          if argv_.length.zero?
+        if ! a.any?  # not a.lenght.zero?
+          if frozen_argv.length.zero?
             @y << "nothing to do."
             @y << invite_string
             NIL_
@@ -208,8 +212,9 @@ module Skylab::TestSupport
 
       def __check_if_ARGV_is_completely_parsed_via_sigs  # assume any
 
-        st = Common_::Polymorphic_Stream.via_array @_sig_a
-        sig = Next_trueish__[ st ]   # assume one
+        scn = Common_::Polymorphic_Stream.via_array @_sig_a
+
+        sig = Next_trueish__[ scn ]   # assume one
 
         xtra_a = ::Array.new sig.input.length, true
 
@@ -223,7 +228,7 @@ module Skylab::TestSupport
             end
           end
 
-          sig = Next_trueish__[ st ]
+          sig = Next_trueish__[ scn ]
 
           sig or break
           redo
@@ -237,12 +242,12 @@ module Skylab::TestSupport
         end
       end
 
-      Next_trueish__ = -> st do
+      Next_trueish__ = -> scn do
         begin
-          if st.no_unparsed_exists
+          if scn.no_unparsed_exists
             break
           end
-          x = st.gets_one
+          x = scn.gets_one
           x and break
           redo
         end while nil

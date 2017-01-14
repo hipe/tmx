@@ -1,3 +1,6 @@
+[#022]       borrowing/lending coverage
+       #open [#here.1]: we are lending coverage to [#ba-060.1]
+
 [#021]       help screen scraper furloughed. is also tracked by [#ze-054.3]
 
 [#020] #open omni "did you mean.."
@@ -28,6 +31,8 @@
              a major design decision is whether to express the omni splay
              outright or whether..
 
+             [#here.B]: our "mega-listing" help screen
+             [#here.1]: mounted one-off API
 
 [#017] #wish here's guys that don't have "mounting" in tmx that might want it -
              [sa], [dt], [my], [gv]

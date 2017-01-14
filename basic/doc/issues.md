@@ -1,3 +1,6 @@
+[#060]       borrowing/lending coverage
+       #open [#here.1]: we are borrowing coverage from [#tmx-022.1]
+
 [#059]       [ divvy ]
 
 [#058]       [ hook mesh ]

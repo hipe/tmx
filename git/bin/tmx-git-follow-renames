@@ -316,4 +316,8 @@ if __FILE__ == $PROGRAM_NAME
   exit Skylab_Git__follow_renames__one_off.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
   ).execute
+else
+  Skylab::TMX::OneOffs::Git_follow_renames = -> * five do  # #[#tmx-018.1] mountable one-off
+    Skylab_Git__follow_renames__one_off.new( * five ).execute
+  end
 end

@@ -1,12 +1,11 @@
 module Skylab::Slicer
 
-  Modality_Adapters_ = ::Module.new
-
   class Modality_Adapters_::CLI
 
     def initialize argv, _, o, e, a
 
       @argv = argv
+      @program_name_string_array = a
       @stdout = o
       @stderr = e
     end
@@ -14,8 +13,9 @@ module Skylab::Slicer
   private
 
     def express_usage
-      @stderr.puts "usage: #{ ::File.basename $PROGRAM_NAME }#{ usage_suffix_ }"
-      NIL_
+      _ = @program_name_string_array.join ' '  # SPACE_
+      @stderr.puts "usage: #{ _ }#{ usage_suffix_ }"
+      0
     end
 
     def usage_suffix_

@@ -27,6 +27,8 @@ program = -> argv, i, o, e, pn_a, & p do
     x = inst.receive_argv argv
     if x.nil?
       0
+    elsif true == x
+      0
     else
       x
     end
@@ -55,4 +57,6 @@ if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
   end
 
   exit _d
+else
+  Skylab::TMX::OneOffs::Test_support_quickie = program  # #[#tmx-018.1] mountable one-off
 end

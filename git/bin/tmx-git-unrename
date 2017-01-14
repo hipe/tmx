@@ -8,7 +8,7 @@
 
 cls = class Skylab_Git_Models_Whatever_Unrename
 
-        def initialize i, o, e, pn_s_a, a
+        def initialize a, i, o, e, pn_s_a
 
           @argv = a
           @do_forward = true
@@ -308,7 +308,7 @@ program = -> i, o, e, pn_s_a, argv do
 end
 
 if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
-  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Git_unrename = program
+  Skylab::TMX::OneOffs::Git_unrename = program  # #[#tmx-018.1] mountable one-off
 end

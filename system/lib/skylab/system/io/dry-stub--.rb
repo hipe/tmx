@@ -4,6 +4,8 @@ module Skylab::System
 
     DRY_STUB__ = class Dry_Stub__  # getting a good dry run
 
+      # a bespoke #[#039.1] one of many such proxies
+
       def open mode
 
         if mode.respond_to? :ascii_only?

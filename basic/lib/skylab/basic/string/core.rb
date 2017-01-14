@@ -332,6 +332,8 @@ module Skylab::Basic
 
     class Receiver::As_IO < Receiver
 
+      # a bespoke #[#sy-039.1] one of many such proxies
+
       def << s
         @receive_string[ s ]
         self

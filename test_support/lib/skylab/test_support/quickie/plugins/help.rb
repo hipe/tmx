@@ -47,11 +47,15 @@ module Skylab::TestSupport
 
       def beginning_eventpoint_notify
 
-        self._THIS_TABLE_IS_NOT_COVERED__and_needs_to_be_modernized__  # open [#030]
-
         usage
 
         @y << "options:"
+        @y << "  -some-opt-1  (broken while #open [#030])"
+        @y << "  -some-opt-2"
+        NIL
+      end
+
+      def _WAS
 
         row_a = []
         @adapter.plugins.accept do | da |

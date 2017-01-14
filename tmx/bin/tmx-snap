@@ -98,7 +98,8 @@ class TMX_snap
         io = @serr
         io.puts
 
-        io.puts "decription: experiment.."
+        io.puts "description: experiment for commiting a small, fixed set of file quickly and repeatedly."
+        io.puts "             meant to be used during three-laws development, to take a \"snapshot\" after each test."
 
         io.puts
         io.puts "(try -h after the individual operations)"
@@ -512,7 +513,7 @@ class TMX_snap
   Common_ = ::Skylab::Common
 end
 
-if ::File.basename( $PROGRAM_NAME ) == ::File.basename( __FILE__ )
+if __FILE__ == $PROGRAM_NAME
 
   d = TMX_snap.new(
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
@@ -523,4 +524,8 @@ if ::File.basename( $PROGRAM_NAME ) == ::File.basename( __FILE__ )
   end
 
   exit d
+else
+  Skylab::TMX::OneOffs::TMX_snap = -> * five do  # #[#tmx-018.1] mountable one-off
+    TMX_snap.new( * five ).execute
+  end
 end

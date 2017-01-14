@@ -9,7 +9,7 @@ _OK = 0
 _SCRIPT_ISSUE = 2
 y = nil  # EEK
 
-_core_program = -> _, _, stderr, pn_s_a, argv do
+_core_program = -> argv, _, _, stderr, pn_s_a do
 
   require 'open3'
 
@@ -40,7 +40,12 @@ _core_program = -> _, _, stderr, pn_s_a, argv do
   if argv.length.nonzero?
     y << "usage: #{ program_name[] }"
     y << "description: does 'git reset HEAD~1' IFF \"wip\" appears in HEAD commit"
-    break bork[ _INPUT_ISSUE, "unexpected argument #{ argv[ 0 ].inspect }" ]
+
+    if %r(\A--?h(?:e(?:l(?:p)?)?)?\z) =~ argv[0]
+      break _OK
+    else
+      break bork[ _INPUT_ISSUE, "unexpected argument #{ argv[ 0 ].inspect }" ]
+    end
   end
 
   process3 = -> o, e, w, p do
@@ -130,7 +135,7 @@ program = -> i, o, e, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Git_grh = program
+  Skylab::TMX::OneOffs::TMX_grh = program  # #[#tmx-018.1] mountable one-off
 end

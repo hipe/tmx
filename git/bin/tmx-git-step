@@ -9,8 +9,8 @@ class Skylab::Git_step
 
     class << self
 
-      def _call i, o, e, pn_s_a, a
-        new( i, o, e, pn_s_a, a ).execute
+      def _call a, i, o, e, pn_s_a
+        new( a, i, o, e, pn_s_a ).execute
       end
 
       alias_method :[], :_call
@@ -18,7 +18,7 @@ class Skylab::Git_step
 
     end  # >>
 
-    def initialize i, o, e, pn_s_a, a
+    def initialize a, i, o, e, pn_s_a
 
       @argv = a
       @pn_s_a = pn_s_a
@@ -42,6 +42,7 @@ y << nil
 y << 'synopsis: the first form commits all the changes in "the file", making'
 y << 'commit messages like "(step 1)", "(step 2)", etc., intended for later'
 y << 'rebasing/squashing etc. the second form sets "the file".'
+y << "(it seems that \"snap\" is similar to this, and post-dates it by years..)"
 
           SUCCEEDED_
         else
@@ -216,5 +217,7 @@ y << 'rebasing/squashing etc. the second form sets "the file".'
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit Skylab::Git_step[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit Skylab::Git_step[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
+else
+  Skylab::TMX::OneOffs::Git_step = Skylab::Git_step  # #[#tmx-018.1] mountable one-off
 end

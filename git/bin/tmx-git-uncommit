@@ -1,13 +1,10 @@
 #!/usr/bin/env ruby -w
 
   #                             ~ uncommit ~
-  # move a single file one commit backwards in history - remove the changeset
-  # of a single file and **amend the commit!** and turn that changeset into
-  # a patch named after the file.
 
 exit_status = 0
 
-program = -> _ARGV, _, stdout_, stderr_, pn_s_a do
+program = -> argv, _, stdout_, stderr_, pn_s_a do
 
   stay = true
 
@@ -35,7 +32,7 @@ program = -> _ARGV, _, stdout_, stderr_, pn_s_a do
     stay = false
   end
 
-  if 1 != (( argv = _ARGV )).length
+  if 1 != argv.length
     break usage[]
   end
 
@@ -44,6 +41,15 @@ program = -> _ARGV, _, stdout_, stderr_, pn_s_a do
   if '-' == tok[ 0, 1 ]
     if '--ping' == tok
       y << "hello from #{ _MONIKER }."
+      break 0
+    end
+
+    if %r(--?h(?:e(?:l(?:p)?)?)?\z) =~ tok
+      usage[]
+      y << nil
+      y << "description: move a single file one commit backwards in history -"
+      y << "  remove the changeset of a single file and **amend the commit!** and"
+      y << "  turn that changeset into a patch named after the file. (no longer used..)"
       break 0
     end
     usage[]
@@ -232,5 +238,6 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Git_uncommit = program  # [#br-083] determines name
+  Skylab::Git_uncommit = program  # while [#br-083]
+  Skylab::TMX::OneOffs::Git_uncommit = program  # #[#tmx-018.1] mountable one-off
 end

@@ -76,6 +76,10 @@
           io.puts "usage: #{ _program_name } <file>"
           io.puts
 
+io.puts "synopsis: write the tail of each line of a file into other"
+y << "files based on the head \"token\" of each line."
+io.puts
+
         #12345_(10)12345_(20)12345_(30)12345_(40)12345_(50)12345_(60)12345_(70)12345_(80)
 io.puts 'description: for every nonblank line in <file>, the first "word"'
 
@@ -419,7 +423,6 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
       CEASE_ = nil
       DEFAULT_ETC__ = 'UNCATEGORIZED'
       NIL_ = nil
-      KEEP_PARSING_ = true
       Me_ = self
       NEWLINE_ = "\n"
       SPACE_ = ' '
@@ -437,5 +440,5 @@ if __FILE__ == $PROGRAM_NAME
 
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX_partition = program  # (comply name to [#br-083])
+  Skylab::TMX::OneOffs::TMX_partition = program  # #[#tmx-018.1] mountable one-off
 end

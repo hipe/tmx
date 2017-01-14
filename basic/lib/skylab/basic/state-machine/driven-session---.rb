@@ -53,11 +53,11 @@ module Skylab::Basic
 
         def execute  # i.e init
           @_.init_state
-          @_page = :__page_initially
           self
         end
 
         def puts token
+
           @__current_token = token
           @_current_token = :__CT_yes
           @_advance_token = :__AT_yes
@@ -66,6 +66,14 @@ module Skylab::Basic
           _ok || self._PARSE_FAILED  # we don't have listener so should fail anyway
           if @_.state.has_handler
             __step_via_handler
+          elsif @_.state.has_more_than_one_formal_transition
+            # #open [#060.1] we are borrowing coverage from [#tmx-022.1]
+
+            # you found a state from the above transitions and it has no
+            # handler, but other transitions. you can't go any further until
+            # you get a next token so leave the state as-is for now..
+
+            NOTHING_  # hi.
           else
             ::Kernel._K
           end
@@ -86,33 +94,38 @@ module Skylab::Basic
         end
 
         def send_any_previous_and_reinit_downstream
-          send @_page
-        end
 
-        def __page_initially
-          @_page = :__page_normally
-          @_.reinit_downstream
-          NIL
-        end
+          # we used to be rigid about this, state-wise: the first time it
+          # was called we would assume there was no current downstream; and
+          # on each successive call we would assume that there was. now,
+          # we loosen our expectations so that in the grammar, a node can
+          # release and send a downstream in one state without necessarily
+          # initing it again; expecting that the next node that needs a d.s
+          # will in effect check for its existence here. :#tombstone-A)
 
-        def __page_normally
-          _release_and_send_current_downstream
+          _if_has_downstream_release_and_send_downstream
           @_.reinit_downstream
           NIL
         end
 
         def close
-          _release_and_send_current_downstream
+          _if_has_downstream_release_and_send_downstream
           @_current_token = :_CLOSED
           @_advance_token = :_CLOSED
           remove_instance_variable :@page_listener
-          remove_instance_variable :@_page
           remove_instance_variable :@_
           freeze
           NIL
         end
 
-        def _release_and_send_current_downstream
+        def _if_has_downstream_release_and_send_downstream
+          if @_.downstream
+            send_downstream
+          end
+          NIL
+        end
+
+        def send_downstream
           _ds = @_.release_downstream
           @page_listener[ _ds ]  # NOTE not the same as ivar of same name in sibling
           NIL
@@ -128,7 +141,9 @@ module Skylab::Basic
           @_advance_token = :_LOCKED
         end
       # -
+
       # ==
+
       class UpstreamProxy___
 
         def initialize p, p_
@@ -145,11 +160,14 @@ module Skylab::Basic
         end
 
         def no_unparsed_exists
+          # this proxy always thinks it has more to parse (for now)
           false
         end
       end
+
       # ==
     end
   end
 end
+# #tombstone-A (temporary OK) we used to be more rigid with existence state
 # #born:

@@ -207,42 +207,52 @@ module Skylab::Brazen
 
         def __build_one_off
 
-          o = @_bound
+          bo = @_bound
 
           Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff.
-            new( o.__path, o.name_function, o.__const_pfx, ::Kernel )
+              new do |o|
+            o.path = bo.__path
+            o.terminal_name = bo.name_function
+            o.up_const_path = bo.__const_pfx
+            o.loader = ::Kernel
+          end
         end
       end
 #==BEGIN KEEP
 
-      class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff
+      class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff  # SimpleModel_
 
             # when it comes time to invoke the executable, it must follow a
             # few rules in order to be exposed by this [br]-integrated
             # modality face.
 
-        def initialize path, name, up_const_path, loader
+        def initialize
 
-          st = Common_::Polymorphic_Stream.via_array up_const_path
+          yield self
 
-          _head_const = st.gets_one
+          scn = Common_::Polymorphic_Stream.via_array @up_const_path
+
+          _head_const = scn.gets_one
 
           buffer = ""
           begin
-            buffer << "#{ st.gets_one }#{ UNDERSCORE_ }"
-          end until st.no_unparsed_exists
-          buffer << name.as_lowercase_with_underscores_string
+            buffer << "#{ scn.gets_one }#{ UNDERSCORE_ }"
+          end until scn.no_unparsed_exists
+          buffer << @terminal_name.as_lowercase_with_underscores_string
 
-            # the above is :[#083] the spot that realizes this name convention
+          # the above is the predecessor to nascent [#tmx-018.1]
 
           @_tail_const = buffer
 
           @__universe_module = ::Object.const_get _head_const, false
-
-          @loader = loader
-          @path = path
-          @terminal_name = name
         end
+
+        attr_writer(
+          :loader,
+          :path,
+          :terminal_name,
+          :up_const_path,
+        )
 
         def to_bound_call_via_standard_five_resources argv, i, o, e, up_pn_s_a
 
@@ -268,6 +278,7 @@ module Skylab::Brazen
           const = @_tail_const
 
           if ! univ_mod.const_defined? const, false
+            Touch_these_modules___[]
             @loader.load @path
           end
 
@@ -278,7 +289,20 @@ module Skylab::Brazen
           :terminal_name,
         )
       end
+
+      # ==
+
+      Touch_these_modules___ = Lazy_.call do
+        module ::Skylab::TMX
+          module OneOffs
+            # while #nascent [#tmx-018.1]
+          end
+        end
+      end
+
+      # ==
 #==END KEEP
     end
   end
 end
+# #pending-rename

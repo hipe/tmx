@@ -1062,6 +1062,10 @@ module Skylab::Zerk::TestSupport
 
     class StreamProxy___
 
+      # #[#sy-039.1] one of many such proxies, the subject was the
+      # inspiration the current favorite (in remote), but is kept intact
+      # here for now..
+
       def initialize p, k
         @_receive = p
         @_stream_symbol = k

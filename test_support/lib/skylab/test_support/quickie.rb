@@ -254,7 +254,9 @@ module Skylab::TestSupport
 
       def __build_mutable_session
 
-        Here_::Sessions_::Front.new self
+        o = Here_::Sessions_::Front.new self
+        o.program_moniker = @_program_name_s_a.last
+        o
       end
 
       def receive_mixed_client_ cli

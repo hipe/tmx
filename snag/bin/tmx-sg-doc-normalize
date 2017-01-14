@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-program = -> sin, sout, serr, pn_s_a, argv do
+program = -> argv, sin, sout, serr, pn_s_a do
 
   y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
   _OK = 0 ; _NOPE = 1
@@ -354,7 +354,7 @@ program = -> sin, sout, serr, pn_s_a, argv do
 end
 
 if __FILE__ == $PROGRAM_NAME
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Sg_doc_normalize = program
+  Skylab::TMX::OneOffs::TMX_sg_doc_normalize = program  # #[#tmx-018.1] mountable one-off
 end

@@ -1,0 +1,16 @@
+description: manage the lines of a file like a stack.
+             (for simple, short-term task management)
+
+usage: stack { viz | push | pop | list | top | swap } [opts] [args]
+
+       stack viz <tons-of-args>
+
+       stack push <text>
+
+       stack pop
+
+       stack list
+
+       stack top <num>
+
+       stack swap <item-number-A> <item-number-B>

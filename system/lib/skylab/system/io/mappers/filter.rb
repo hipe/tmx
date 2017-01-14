@@ -9,7 +9,7 @@ module Skylab::System
       if :Tee == const
 
         cls = Basic_[]::Proxy::Makers::Tee.
-          call_via_arglist IO_::METHOD_I_A_  # see [#014]
+          call_via_arglist METHOD_I_A_  # see [#014]
 
         Mappers.const_set :Tee, cls
 
@@ -30,6 +30,8 @@ module Skylab::System
 
       # intercept write-like messages intended for an ::IO, but do something
       # magical with the content. Don't forget to call `flush!` at the end.
+
+      # a bespoke #[#039.1] one of many such proxies
 
       Attributes_actor_.call( self,
         downstream_IO: nil,

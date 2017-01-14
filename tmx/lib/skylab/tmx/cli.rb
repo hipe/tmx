@@ -8,7 +8,8 @@ module Skylab::TMX
     # effect this is the frontier of argument-scanner-based clients.
 
     # secondarily (but in what used to be the primary function) this client
-    # tries to "mount" and "expose" other participating related sidesystems.
+    # tries to "expose" through "mounting" participating installed
+    # sidesystems, and also the one-off executables from ours and other `bin/`
 
     Invocation___ = self
 
@@ -1007,10 +1008,6 @@ module Skylab::TMX
     end
 
     # ==
-
-    CLI_support_ = Lazy_.call do
-      Home_.lib_.brazen::CLI_Support
-    end
 
     Require_interface_lib___ = Lazy_.call do
       require 'no-dependencies-zerk'

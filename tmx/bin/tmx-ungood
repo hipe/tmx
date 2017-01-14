@@ -217,5 +217,5 @@ if __FILE__ == $PROGRAM_NAME
 
   exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
 else
-  Skylab::TMX_ungood = program  # (comply name with [#br-083])
+  Skylab::TMX::OneOffs::TMX_ungood = program  # #[#tmx-018.1] mountable one-off
 end

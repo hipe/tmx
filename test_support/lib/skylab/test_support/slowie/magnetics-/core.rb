@@ -149,7 +149,7 @@ module Skylab::TestSupport
 
         bx.to_value_stream.map_by do |lt|
 
-          ::File.join lt.path_to_gem, tail
+          ::File.join lt.gem_path, tail
         end
       end
 

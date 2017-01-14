@@ -44,14 +44,14 @@ begin
     redo
   end
 
-  stat = ::File.lstat ni.path_to_gem
+  stat = ::File.lstat ni.gem_path
 
   if stat.symlink?
-    serr.puts "IS ALREADY SYMLINK! skipping - #{ ni.path_to_gem }"
+    serr.puts "IS ALREADY SYMLINK! skipping - #{ ni.gem_path }"
     redo
   end
 
-  cmd = [ "rm", "-rf", ni.path_to_gem ]
+  cmd = [ "rm", "-rf", ni.gem_path ]
 
   serr.puts "OH MY GOD: #{ cmd * ' ' }"
 
@@ -61,7 +61,7 @@ begin
   end
 
   exists = ::File.join top_of_universe, item
-  want = ni.path_to_gem
+  want = ni.gem_path
 
   cmd = "ln -s #{ exists } #{ want }"
   serr.puts cmd

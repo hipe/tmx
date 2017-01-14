@@ -270,6 +270,9 @@ module Skylab::TestSupport
         Models_ = ::Module.new
 
         class Puts_Proxy___  # surpsingly we didn't see another like this
+
+          # #[#sy-039.1] one of many such proxies
+
           def initialize
             @_a = []
           end

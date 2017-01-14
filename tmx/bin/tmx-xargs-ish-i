@@ -697,8 +697,7 @@ program = -> argv, _, stdout_, stderr_, pn_s_a do
 end
 
 if __FILE__ == $PROGRAM_NAME
-
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX_xargs_ish_i = program  # (comply name with [#br-083])
+  Skylab::TMX::OneOffs::TMX_xargs_ish_i = program  # #[#tmx-018.1] mountable one-off
 end

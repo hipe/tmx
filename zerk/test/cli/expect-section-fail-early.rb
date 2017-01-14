@@ -163,7 +163,7 @@ module Skylab::Zerk::TestSupport
 
     # ==
 
-    class Spying_IO___
+    class Spying_IO___  # an ultra-simple form of #[#sy-039.1] such proxies
 
       def initialize o
         @client = o

@@ -97,6 +97,15 @@ module Skylab::Common
         st
       end
 
+      def via_scanner scn
+        # for [ze] no-deps scanners
+        new do
+          unless scn.no_unparsed_exists
+            scn.gets_one
+          end
+        end
+      end
+
       def with_random_access
         Stream_::With_Random_Access__
       end

@@ -49,7 +49,7 @@ module Skylab::TMX::TestSupport
 
       def __Build_load_ticket_from_fake_sidesys_entry_string entry_string
 
-        gne = Real_node__[]::GemNameElements_.new
+        gne = Home_::Models_::Installation::GemNameElements_.new
         gne.entry_string = entry_string
         gne.gem_path = :_NOT_USED_tmx_
         gne.gem_name = "#{ ZIM_ZUM_ }#{ entry_string }"
@@ -72,7 +72,7 @@ module Skylab::TMX::TestSupport
 
     Require_mocked_load_ticket___ = Lazy_.call do
 
-      class DummyLoadTicket___ < Real_node__[]::LoadTicket_
+      class DummyLoadTicket___ < Home_::Models_::LoadTicket
 
         def __induce_sidesystem_module
           _names = Names___.new @const_path_array_guess, @gem_name_elements
@@ -166,10 +166,6 @@ module Skylab::TMX::TestSupport
     Names___ = ::Struct.new :const_path_array_guess, :gem_name_elements
 
     # ==
-
-    Real_node__ = -> do
-      Home_::Models_::Installation
-    end
   end
 end
 # #history: full rewrite, clobbering [br]-era "mocks"

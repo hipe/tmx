@@ -2,22 +2,19 @@
 
 program = -> argv, _, _, stderr, pn_s_a do
 
-if (( idx = argv.index '-n' ))
-  argv[ idx, 1 ] = [ ]
-  is_dry_run = true
-end
-
-dir, file = argv[ 0, 2 ]
-
 y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
 
 progname = -> do
-  x = nil
   p = -> do
-    x = [ ::File.basename( pn_s_a.first ), * pn_s_a[ 1 .. -1 ] ] * ' '
+    a = []
+    a.push ::File.basename pn_s_a.first
+    a.concat pn_s_a[ 1 .. -1 ]
+    s = a.join ' '
+    p = -> { s }
+    s
   end
   -> do
-    x || p[]
+    p[]
   end
 end.call
 
@@ -26,8 +23,26 @@ bork = -> msg do
   exit 0
 end
 
-if ! file
+usage = -> do
   y << "usage: #{ progname[] } <dir> <file>"
+end
+
+if argv.detect( & %r(\A--?h(?:e(?:l(?:p)?)?)?\z).method( :=~ ) )
+  usage[]
+  y << ""
+  y << "description: hack to \"turn\" a file \"on\" or \"off\" thru renaming"
+  return 0
+end
+
+if (( idx = argv.index '-n' ))
+  argv[ idx, 1 ] = [ ]
+  is_dry_run = true
+end
+
+dir, file = argv[ 0, 2 ]
+
+if ! file
+  usage[]
   return 0
 end
 
@@ -101,8 +116,7 @@ y << "turned #{ stem } #{ say_did }."
 end
 
 if __FILE__ == $PROGRAM_NAME
-
   exit program[ ARGV, nil, nil, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX_onoff = program  # (comply name to [#br-083])
+  Skylab::TMX::OneOffs::TMX_onoff = program  # #[#tmx-018.1] mountable one-off
 end

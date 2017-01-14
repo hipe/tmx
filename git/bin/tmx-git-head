@@ -8,10 +8,12 @@ module Skylab::Git_head
 
   # read [#gi-011] the git.. narrative
 
-  def self.call i, o, e, pn_s_a, argv
-
-    CLI___.new( arg, i, o, e, pn_s_a ).execute
-  end
+  class << self
+    def call argv, i, o, e, pn_s_a
+      CLI___.new( argv, i, o, e, pn_s_a ).execute
+    end
+    alias_method :[], :call
+  end  # >>
 
   class CLI___
 
@@ -518,8 +520,7 @@ module Skylab::Git_head
 end
 
 if __FILE__ == $PROGRAM_NAME
-
-  Skylab::Git_head.call(
-
-    $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV )
+  Skylab::Git_head.call( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] )
+else
+  Skylab::TMX::OneOffs::Git_head = Skylab::Git_head  # #[#tmx-018.1] mountable one-off
 end

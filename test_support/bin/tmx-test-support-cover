@@ -2,15 +2,12 @@
 
 # (see also spots marked [#002]. at writing all coverage is borked.)
 
-$stderr.puts "no way."
-exit 7
-
 if __FILE__ == $PROGRAM_NAME
 
   # for fun and regressability we allow this to be run as a standalone script
   # as well as from within our [br]-powered API. below hacks accomodate this.
 
-  is_standalone = true
+  is_invocation_of_one_off = true
 
   module Skylab
     module TestSupport
@@ -43,6 +40,9 @@ module Skylab::TestSupport
     # for typical coverage measurement of a test or test suite. for such
     # standard use, please see the simplecov gem's README.md
 
+    module Models_
+    end
+
     class Models_::Simplecov
 
       Actions = ::Module.new
@@ -73,13 +73,27 @@ module Skylab::TestSupport
             @__nf__ ||= Common_::Name.via_module self
           end
 
+          alias_method :define, :new
+          undef_method :new
         end  # >>
 
+        if false
         Brazen_::Modelesque.entity self,
-
           :required, :argument_arity, :one_or_more, :property, :arg
+        end
 
-        def initialize _boundish, & oes_p
+        def initialize
+          yield self
+        end
+
+        attr_writer(
+          :argv,
+          :invocation_string_array,
+          :serr,
+          :sout,
+        )
+
+        def _WAS_initialize _boundish, & oes_p
 
           @on_event_selectively = oes_p
         end
@@ -125,10 +139,6 @@ module Skylab::TestSupport
           Common_::Bound_Call.via_receiver_and_method_name self, :execute
         end
 
-        attr_accessor :invocation_string_array, :serr, :sout
-
-        attr_writer :argv  # for standalone mode only
-
         def execute
           if @argv.length.zero?
             _usage
@@ -148,7 +158,7 @@ module Skylab::TestSupport
           @serr.puts "usage: #{ _program_name } #{
             }[ <white-path-fragment> [ <white-path-fragment> [..] ] -- ] <a-ruby-file>"
 
-          ACHIEVED_
+          SUCCESS_EXITSTATUS__
         end
 
         def __nonzero_argv
@@ -263,7 +273,7 @@ module Skylab::TestSupport
         end
 
         def _program_name
-          @__pn__ ||= "#{ @invocation_string_array * SPACE_ } cover".freeze
+          @__pn__ ||= "#{ @invocation_string_array * SPACE_ }".freeze
         end
       end
 
@@ -271,20 +281,26 @@ module Skylab::TestSupport
 
       ACHIEVED_ = true
       SPACE_ = ' '.freeze
+      SUCCESS_EXITSTATUS__ = 0
       UNABLE_ = false
     end
   end
 end
 
-if is_standalone
+cls = Skylab::TestSupport::API::Models_::Simplecov::Actions::Cover
+if is_invocation_of_one_off
 
-  o = Skylab::TestSupport::Models_::Simplecov::Actions::Cover.new nil
+  cls.define do |o|
   o.invocation_string_array = [ $PROGRAM_NAME ]
   o.sout = $stdout
   o.serr = $stderr
   o.argv = ::ARGV
-  o.execute
-
+  end.execute
+else
+  Skylab::TMX::OneOffs::Test_support_cover = -> * five do  # #[#tmx-018.1] mountable one-off
+    cls.define do |o|
+      o.argv, _, o.sout, o.serr, o.invocation_string_array = five
+    end.execute
+  end
 end
-
 # :+#tombstone: rspec integration (ancient)

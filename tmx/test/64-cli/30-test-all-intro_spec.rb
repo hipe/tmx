@@ -108,7 +108,7 @@ module Skylab::TMX::TestSupport
         it "finds a reaonsable number of files" do
 
           _count = _line_survey.total_line_count
-          _count == 6 or fail "expected six test files had #{ _count } (was a test file added?)"  # be jerks at first
+          _count == 7 or fail "expected six test files had #{ _count } (was a test file added?)"  # be jerks at first
         end
 
         it "all other output lines look like SOME test file" do

@@ -2,13 +2,21 @@
 
 require 'skylab/tabular'
 
-d = Skylab::Tabular::Operations_::InferTable::CLI.new(
-  ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
-).execute
+if __FILE__ == $PROGRAM_NAME
 
-if d.nonzero?
-  $stderr.puts "(exitstatus: #{ d })"
+  d = Skylab::Tabular::Operations_::InferTable::CLI.new(
+    ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+  ).execute
+
+  if d.nonzero?
+    $stderr.puts "(exitstatus: #{ d })"
+  end
+
+  exit d
+else
+  Skylab::TMX::OneOffs::TMX_infer_table = -> * five do  # #[#tmx-018.1] mountable one-off
+
+    Skylab::Tabular::Operations_::InferTable::CLI.new( * five ).execute
+  end
 end
-
-exit 0
 # #tombstone: rewrite ancient version

@@ -9,7 +9,7 @@
 
 execute = nil
 
-program = -> in_io, out_io, err_io, pn_s_a, argv do
+program = -> argv, in_io, out_io, err_io, pn_s_a do
 
   if argv.length.zero?
 
@@ -28,12 +28,12 @@ program = -> in_io, out_io, err_io, pn_s_a, argv do
       err_io.puts "synopsis: reads an ad-hoc undocumented format from STDIN"
       err_io.puts "          at ouputs summary info used in our commit mesages"
 
-      nil
+      0
     else
 
       err_io.puts "unexpected argument: #{ argv[ 0 ].inspect }"
       err_io.puts "try '#{ progname[] } -h' for help"
-      nil
+      5
     end
   end
 end
@@ -93,9 +93,7 @@ out_io.puts "(#{ num_chunks } in #{ seconds })"
 end
 
 if __FILE__ == $PROGRAM_NAME
-
-  program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
-
+  program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::Test_summarize = program
+  Skylab::TMX::OneOffs::Test_support_summarize = program  # #[#tmx-018.1] mountable one-off
 end

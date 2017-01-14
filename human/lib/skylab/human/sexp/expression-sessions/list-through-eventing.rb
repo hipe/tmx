@@ -10,6 +10,8 @@ module Skylab::Human
 
         # see other (even simpler) similar facilities, tracked with #[#ca-047])
 
+        # a bespoke #[#sy-039.1] writable IO proxy
+
         class << self
           alias_method :begin, :new
           undef_method :new

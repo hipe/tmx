@@ -1,0 +1,377 @@
+#!/usr/bin/env ruby -w
+
+sout = $stdout
+serr = $stderr
+
+do_invite = nil
+exitstatus = nil
+
+error_exitstatus = 5
+
+program_name = -> do
+  s = ::File.basename $PROGRAM_NAME
+  ( program_name = -> { s } )[]
+end
+
+usage = -> do
+  serr.puts "usage: #{ program_name[] } [options]"
+end
+
+begin_at_key = '-begin-at'
+end_on_key = '-end-on'
+files_key = '-write-to'
+load_only_key = '-load-only'
+money_key = '-money'
+only_key = '-only'
+
+express_help = -> do
+  usage[]
+  serr.puts
+  serr.puts "description: writes to output the outputs of ALL \"one-off\" helps"
+  serr.puts "             (used to generate a fixture file here, probably)"
+  serr.puts
+  serr.puts "options:"
+  serr.puts "  -load-only         does not request the help screen"
+  serr.puts "  -begin-at <DIGIT>  ordinal (not offset) of first one-off to do"
+  serr.puts "  -end-on   <DIGIT>  won't do one-offs with order greater than this."
+  serr.puts "  -only     <DIGIT>  macro for '-begin-at D -end-at D'"
+  serr.puts "  -write-to <DIR>    one file per one-off. filename derived somehow."
+  serr.puts "                     directory must exist. will not clobber."
+  serr.puts "  -money             try this crazy thing"
+end
+
+invite_string = -> do
+  "see '#{ program_name[] } -h'"
+end
+
+unexpected = -> token do
+  serr.puts "unexpected: #{ token.inspect }. #{ invite_string[] }"
+  exitstatus = error_exitstatus
+end
+
+# -- high level control flow
+
+sandbox_module = nil
+
+begin_at = nil
+do_money = nil
+end_on = nil
+write_to_directory = nil
+
+# -- serr for one off
+
+dash = '-'
+mode = ::File::CREAT | ::File::EXCL | ::File::WRONLY
+underscore = '_'
+
+serr_for_one_off_when_write_to_directory = -> one_off, & p do
+
+  _ = one_off.sub_top_level_const_guess.id2name.downcase.gsub underscore, dash
+  _ << ".output"
+  path = ::File.join write_to_directory, _
+  serr.write "(writing #{ path } .. "
+  io = ::File.open path, mode
+  x = p[ io ]
+  io.close
+  serr.puts "done.)"
+  x
+end
+
+serr_for_one_off_normally = -> _, &p do
+  p[ sout ]
+end
+
+serr_for_one_off = -> one_off, & p do
+  if write_to_directory
+    serr_for_one_off = serr_for_one_off_when_write_to_directory
+  else
+    serr_for_one_off = serr_for_one_off_normally
+  end
+  serr_for_one_off[ one_off, & p ]
+end
+
+# -- send request for help
+
+dummy_sin = -> do
+  FALSE
+end
+class << dummy_sin
+  alias_method :tty?, :call
+end
+
+listener = nil
+require_listener = -> do
+  require_listener = nil
+  listener = -> * channel, & p do
+    if :expression == channel[1]
+      # assume one line
+      p[ serr ]
+      serr.write $/  # NEWLINE_
+    else
+      err.pust "(emission: #{ channel.inspect })"
+    end
+    NIL
+  end
+end
+
+money_thing = nil
+prepare_for_the_crazy_thing = -> do
+
+  require_listener[]
+
+    money_thing =
+  Skylab::TMX::CLI::Magnetics_::SynopsisLines_via_HelpScreen.define do |o|
+    o.number_of_synopsis_lines = 3  # meh
+    o.listener = listener
+  end
+  NIL
+end
+
+do_the_crazy_thing = -> argv, pns_a, proc_like, one_off do
+
+  _lines = money_thing.synopsis_lines_by do |downstream_proxy|
+    proc_like[ argv, dummy_sin, :_no_sout_tmx_, downstream_proxy, pns_a ]
+  end
+
+  _lines.each do |line|
+    sout.puts "    #{ line.inspect }"
+  end
+
+  TRUE
+end
+
+do_something_normally = -> argv, pns_a, proc_like, one_off do
+
+  es = serr_for_one_off.call one_off do |downstream|
+    proc_like[ argv, dummy_sin, :_no_sout_tmx_, downstream, pns_a ]
+  end
+  if es.nonzero?
+    fail
+  else
+    TRUE
+  end
+end
+
+do_something = -> * fourish do
+  if do_money
+    prepare_for_the_crazy_thing[]
+    do_something = do_the_crazy_thing
+  else
+    do_something = do_something_normally
+  end
+  do_something[ * fourish ]
+end
+
+help_argv = %w(--help).freeze
+fake_pnsa_head = [ 'tmz' ].freeze
+
+request_help = -> proc_like, one_off do
+
+  _pnsa = [ * fake_pnsa_head, one_off.load_ticket.slug, one_off.slug ]
+
+  _mutable_argv = help_argv.dup  # those that use optparse need it
+
+  _ok = do_something[ _mutable_argv, _pnsa, proc_like, one_off ]
+  _ok
+end
+
+# -- load one offs
+
+fmt = '%2d'
+special_prefix = '# '
+
+get_really_busy = -> counter, one_off do
+
+  _path = one_off.path
+  const = one_off.sub_top_level_const_guess
+
+  sout.puts "#{ special_prefix }one off #{ fmt % counter }: #{ const } for #{ one_off.slug }"
+  ::Kernel.load _path
+  _proc_like = sandbox_module.const_get const, false
+
+  request_help[ _proc_like, one_off ]
+end
+
+# -- main
+
+go = -> do
+
+  exitstatus = 0
+
+  require 'skylab/tmx'
+  st = Skylab::TMX.to_sidesystem_load_ticket_stream
+
+  sandbox_module = ::Module.new
+  Skylab::TMX::OneOffs = sandbox_module  # #[#tmx-018.A] place 1 of 2
+
+  counter = 0
+  stay = true
+
+  range_OK_end = -> do
+    if end_on < counter
+      stay = false ; false
+    else
+      TRUE
+    end
+  end
+  range_OK_begin = -> do
+    begin_at <= counter
+  end
+  range_OK_both = -> do
+    range_OK_begin[] && range_OK_end[]
+  end
+  range_always_OK = -> do
+    true
+  end
+  range_OK = -> do
+    if begin_at
+      if end_on
+        range_OK = range_OK_both
+      else
+        range_OK = range_OK_begin
+      end
+    elsif end_on
+      range_OK_end
+    else
+      range_OK = range_always_OK
+    end
+    range_OK[]
+  end
+
+  begin
+    ss = st.gets
+    ss || break
+    scn = ss.to_one_off_scanner_via_filesystem ::Dir
+    if scn.no_unparsed_exists
+      redo
+    end
+    sout.puts "#{ special_prefix }(sidesystem: #{ ss.slug })"
+    begin
+      one_off = scn.gets_one
+      counter += 1
+      if range_OK[]
+        stay = get_really_busy[ counter, one_off ]
+      end
+      stay || break
+      scn.no_unparsed_exists && break
+      redo
+    end while above
+    stay ? redo : break
+  end while above
+end
+
+argv = ARGV
+
+if argv.length.zero?
+  go[]
+elsif argv.detect( & %r(\A--?h(?:e(?:l(?:p)?)?)?\z).method( :=~ ) )
+  express_help[]
+  exitstatus = 0
+else
+  ok = true
+  whine = -> msg do
+    do_invite = true
+    serr.puts msg
+    ok = false
+    exitstatus = 5
+    FALSE
+  end
+  offset = 0
+  len = argv.length
+  current_primary = nil
+
+  closed = -> do
+    whine[ "cannot use #{ current_primary } because of an option that came before it" ]
+  end
+
+  parse_any_value = -> do
+    if len == offset
+      whine[ "argument expected for #{ current_primary }" ]
+    else
+      token = argv.fetch offset
+      offset += 1
+      token
+    end
+  end
+
+  parse_positive_integer = -> do
+    s = parse_any_value[]
+    if s
+      if /\A\d+\z/ =~ s
+        s.to_i
+      else
+        whine[ "not a digit: #{ s }" ]
+      end
+    end
+  end
+
+  o = {}
+  o[ load_only_key ] = -> do
+    o[ files_key ] = closed
+    o[ money_key ] = closed
+    request_help = -> * { TRUE }
+  end
+  o[ begin_at_key ] = -> do
+    o[ only_key ] = closed
+    begin_at = parse_positive_integer[]
+    if begin_at && end_on && begin_at > end_on
+      whine[ "can't begin after it ends" ]
+    end
+  end
+  o[ end_on_key ] = -> do
+    o[ only_key ] = closed
+    end_on = parse_positive_integer[]
+    if end_on && begin_at && begin_at > end_on
+      whine[ "can't end before it begins" ]
+    end
+  end
+  o[ only_key ] = -> do
+    o[ only_key ] = closed
+    o[ begin_at_key ] = closed
+    o[ end_on_key ] = closed
+    d = parse_positive_integer[]
+    if d
+      begin_at = d
+      end_on = d
+    end
+  end
+  o[ files_key ] = -> do
+    o[ load_only_key ] = closed
+    o[ money_key ] = closed
+    s = parse_any_value[]
+    if s
+      write_to_directory = s
+    end
+  end
+  o[ money_key ] = -> do
+    o[ files_key ] = closed
+    o[ load_only_key ] = closed
+    do_money = true
+  end
+
+  begin
+    len == offset && break
+    token = argv.fetch offset
+    p = o[ token ]
+    if ! p
+      unexpected[ token ]
+      ok = false
+      break
+    end
+    current_primary = token
+    offset += 1
+    p[]
+    ok ? redo : break
+  end while above
+  ok && go[]
+end
+
+if do_invite
+  serr.puts invite_string[]
+elsif exitstatus.zero?
+  serr.puts "(loading (and calling?) one-offs exiting normally.)"
+else
+  serr.puts "(loading (and calling?) one-offs had errors (exitstatus: #{ exitstatus }))"
+end
+
+exit exitstatus

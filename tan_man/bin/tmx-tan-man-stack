@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby -w
 
-Skylab = ::Module.new
+module Skylab
+  # (it might or might not already exist, depending on if we are being mounted
+end
 
 class Skylab::Stack
 
@@ -539,12 +541,19 @@ end
 
 # ~
 
-d = Skylab::Stack.new(
-  ::ARGV, nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File
-).execute
+if __FILE__ == $PROGRAM_NAME
 
-if d.nonzero?
-  $stderr.puts "(exitstatus: #{ d })"
+  d = Skylab::Stack.new(
+    ::ARGV, nil, $stdout, $stderr, [ $PROGRAM_NAME ], ::File
+  ).execute
+
+  if d.nonzero?
+    $stderr.puts "(exitstatus: #{ d })"
+  end
+
+  exit d
+else
+  Skylab::TMX::OneOffs::Tan_man_stack = -> * five do  # #[#tmx-018.1] mountable one-off
+    Skylab::Stack.new( * five, ::File ).execute
+  end
 end
-
-exit d

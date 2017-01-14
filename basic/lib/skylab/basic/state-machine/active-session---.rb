@@ -110,6 +110,11 @@ module Skylab::Basic
         NIL
       end
 
+      def send_downstream__
+        @page_listener.send_downstream
+        NIL
+      end
+
       def __step_at_end o
         if o.had_a_trueish_result
           _fail_because_end_and_result
@@ -223,7 +228,6 @@ module Skylab::Basic
           y << "it must define one of these."
         end
       end
-
 
       def __fail_because_result_and_formals
         _fail_because do |y|

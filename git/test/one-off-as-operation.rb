@@ -131,16 +131,27 @@ module Skylab::Git::TestSupport
 
     Load_oneoff_as_operation___ = -> entry do
 
-      _ = Sidesystem_path__[]
-      load ::File.join _, 'bin', entry
-
       # go from this: tmx-git-ferllew-ferwerd
       # to this:      Skylab_Git__ferllew_ferwerd__one_off
 
-      md = rx.match entry
-      _const_stem = md[ :stem ].gsub( DASH_, UNDERSCORE_ )
-      _const = :"Skylab_Git__#{ _const_stem }__one_off"
-      ::Object.const_get _const, false
+      _md = rx.match entry
+      const = :"Skylab_Git__#{ _md[ :stem ].gsub DASH_, UNDERSCORE_ }__one_off"
+
+      # just because it's not cached here doesn't mean it hasn't been loaded
+
+      if ! ::Object.const_defined? const
+
+        module ::Skylab::TMX
+          module OneOffs
+            # [#tmx-018.1] is nascent..
+          end
+        end
+
+        _path =  ::File.join Sidesystem_path__[], 'bin', entry
+        load _path
+      end
+
+      ::Object.const_get const, false
     end
 
     Sidesystem_path__ = Lazy_.call do
