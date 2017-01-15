@@ -19,15 +19,15 @@ module Skylab::TMX
       # help switch against a particular set of design objectives, of which
       # there are surprisingly many needed to make this behave unsurprisingly:
       #
-      #   - distinctive of [tmx], the presence of a verbose modifiers
-      #     alters expression of help.
+      #   - distinctive of a tmx is that the presence of verbose modifiers
+      #     alters the particular help expression behavior.
       #
-      #   - perhaps unique to [tmx], the *number* of verboses has semantic
+      #   - perhaps unique to a tmx, the *number* of verboses has semantic
       #     importance with regard to how help is expressed. (there are
       #     discrete tiers, and the number of supported tiers will change
       #     over development time.)
       #
-      #   - with the exceptions that following this point, it must be the
+      #   - with the exceptions that follow this point, it must be the
       #     case that the expression of help is executed even when a full
       #     argument scan would otherwise fail to parse because: often we
       #     come asking for help when we have some primary parse error,
@@ -60,7 +60,8 @@ module Skylab::TMX
       end
 
       def execute
-        if __is_root
+        @_is_root = __is_root
+        if @_is_root
           if _argument_scanner_is_empty
             _money
           elsif _parse_primary_softly
@@ -84,10 +85,27 @@ module Skylab::TMX
         NOTHING_  # we want KEEP_PARSING_ but we need early exit to get out of the nodeps primary parsing
       end
 
-      def _money
+      def _money  # express some kind of help screen
 
-        __resolve_is_multimode
-        __resolve_didactics
+        # because a tree-like help screen is fundamentally different
+        # structurally, detect that that's what we're doing early..
+
+        if 1 < @CLI.verbose_count_
+          if @_is_root
+            CLI::Magnetics_::ExpressDeepHelp_via_Client[ @CLI ]
+          else
+            @CLI.stderr.puts "(deep help is only for root for now)"  # meh
+            UNABLE_
+          end
+        else
+          __express_a_classic_help_screen
+        end
+      end
+
+      def __express_a_classic_help_screen
+
+        __init_is_multimode
+        __init_didactics
 
         __help_screen_module.express_into __stderr do |o|
 
@@ -127,7 +145,7 @@ module Skylab::TMX
         rdr
       end
 
-      def __resolve_is_multimode
+      def __init_is_multimode
 
         top = @CLI.selection_stack.last
 
@@ -154,7 +172,7 @@ module Skylab::TMX
         @_didactics.description_proc
       end
 
-      def __resolve_didactics
+      def __init_didactics
         @_didactics = @CLI.selection_stack.last.to_didactics  # buckle up
         NIL
       end

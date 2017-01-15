@@ -51,6 +51,9 @@ module Skylab::TMX
         end
 
         def execute
+          if 1 < _verbose_count
+            self._SANITY___never_get_this_far_when_very_verbose__
+          end
           self
         end
 
@@ -107,18 +110,17 @@ module Skylab::TMX
 
           # whether or not to display a group of operators per injection
 
-          d = @client.verbose_count_
-          if d.nonzero?
-            # one verbose turns on these
-            do_show_mountable_sidesystems = true
-            if 1 < d
-              @client.stderr.puts "(nothing yet implemented for two verboses)"
-            end
+          if _verbose_count.nonzero?
+            _do_show_mountable_sidesystems = true
           end
           {
             tmx_intrinsic: true,
-            tmx_mountable_sidesystem: do_show_mountable_sidesystems,
+            tmx_mountable_sidesystem: _do_show_mountable_sidesystems,
           }
+        end
+
+        def _verbose_count
+          @client.verbose_count_
         end
 
         def __to_primary_normal_tuple_scanner  # assume has primaries

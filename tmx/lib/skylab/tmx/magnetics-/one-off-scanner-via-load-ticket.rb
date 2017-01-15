@@ -138,6 +138,10 @@ module Skylab::TMX
         "#{ @load_ticket.one_off_const_head }#{ UNDERSCORE_ }#{ _ }".intern
       end
 
+      def program_name_tail_string_array
+        [ @load_ticket.slug, slug ]
+      end
+
       def slug
         send @_slug
       end
