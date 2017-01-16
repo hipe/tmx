@@ -314,7 +314,7 @@ module Skylab::Brazen
   ACHIEVED_ = true
   ACTIONS_CONST = :Actions
   Box_ = Common_::Box
-  CONST_SEP_ = Common_.const_sep
+  CONST_SEP_ = Common_::CONST_SEPARATOR
   DASH_ = '-'.freeze
   DOT_DOT_ = '..'
   EMPTY_A_ = [].freeze

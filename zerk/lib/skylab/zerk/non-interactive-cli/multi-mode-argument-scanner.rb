@@ -184,7 +184,7 @@ module Skylab::Zerk
 
           @_itemer = itmr
           @_first_time_only_match_hook = nil
-          @_scanners = Home_.lib_.basic::OrderedCollection.begin_empty ComparableScanner___
+          @_scanners = Basic_[]::OrderedCollection.begin_empty ComparableScanner___
 
           # --
 

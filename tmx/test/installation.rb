@@ -49,13 +49,18 @@ module Skylab::TMX::TestSupport
 
       def __Build_load_ticket_from_fake_sidesys_entry_string entry_string
 
-        gne = Home_::Models_::Installation::GemNameElements_.new
+        _ = Home_::Models_::GemNameElements.define do |gne|
+          __define_gem_name_elements gne, entry_string
+        end
+        DummyLoadTicket___.new _
+      end
+
+      def __define_gem_name_elements gne, entry_string
         gne.entry_string = entry_string
         gne.gem_path = :_NOT_USED_tmx_
         gne.gem_name = "#{ ZIM_ZUM_ }#{ entry_string }"
         gne.const_head_path = CPH___
         gne.exe_prefix = "EXE_PREFIX"
-        DummyLoadTicket___.new gne
       end
 
       def participating_gem_prefix

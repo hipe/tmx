@@ -99,6 +99,10 @@ module Skylab::Zerk  # intro in [#001] README
     NIL_
   end
 
+  Basic_ = Lazy_.call do
+    Home_.lib_.basic
+  end
+
   # == orphanic stowaways
 
   Autoloader_ = Common_::Autoloader

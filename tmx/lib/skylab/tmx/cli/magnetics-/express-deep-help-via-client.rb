@@ -147,7 +147,7 @@ module Skylab::TMX
 
         def __init_synopsiser
 
-          @__syno = CLI::Magnetics_::SynopsisLines_via_HelpScreen.define do |o|
+          @__syno = Zerk_lib_[]::CLI::SynopsisLines_via_HelpScreen.define do |o|
             o.number_of_synopsis_lines = 3
           end
 
@@ -193,11 +193,9 @@ module Skylab::TMX
       # ==
 
       One_off_branch_module___ = Lazy_.call do
-        module ::Skylab::TMX
-          module OneOffs
-            # while #nascent [#018.1]
-            self
-          end
+        module ::Skylab__Zerk__OneOffs
+          # while #nascent [#ze-063.1]
+          self
         end
       end
 

@@ -45,7 +45,7 @@ module Skylab::Zerk
 
       def finish
 
-        _hs_a = Home_.lib_.basic::Hash::Hotstrings[ @_black, @_slug_a ]
+        _hs_a = Basic_[]::Hash::Hotstrings[ @_black, @_slug_a ]
 
         _hs_a.each_with_index do | sct, slug_d |
 

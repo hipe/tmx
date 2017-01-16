@@ -10,11 +10,26 @@
 
 ## objective of this fixture directory (tree)
 
-to confirm and validate that our [#021] help screen scraper works as
+to confirm and validate that our [#063.2] help screen scraper works as
 intended on the full scope of input cases it will face, we "quarrantine"
 particular help screen outputs into plain text files (one file per screen)
 so that these tests can operate (and the subject can be developed)
 independently of the agents that produce the screens.
+
+
+
+
+## its context in the universe
+
+this fixture node and corresponding asset node was born in [tmx] but
+moved to [ze] when we generalized the ability for loading and reflecting
+of one-offs, such that these operations can be performed by arbitrary
+sidesytesm, not just [tmx]  (for their own mounting of their own one-offs).
+
+as such, to generate these fixtures anew as described near the "manifest"
+here would require a full "tmx universe" installation; but since [ze] does
+not formally require [tmx]  (nor should it), the ability to re-create these
+fixtures as-is isn't guaranteed with a lone installation of [ze].
 
 
 

@@ -277,7 +277,7 @@ module Skylab::Zerk
 
       # ==
 
-      Basic_ = Home_.lib_.basic
+      Basic_ = Basic_[]
       MAX_RIGHT_DIGITS__ = 4  # this could be refined to take into acct range
       This_ = self
     end

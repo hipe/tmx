@@ -525,7 +525,7 @@ if __FILE__ == $PROGRAM_NAME
 
   exit d
 else
-  Skylab::TMX::OneOffs::TMX_snap = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::TMX_snap = -> * five do  # #[#ze-063.1] mountable one-off
     TMX_snap.new( * five ).execute
   end
 end

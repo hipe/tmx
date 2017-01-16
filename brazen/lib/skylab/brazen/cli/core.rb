@@ -5,8 +5,10 @@ module Skylab::Brazen
     class << self
 
       def expose_executables_with_prefix s
-        define_method :to_unordered_selection_stream,
-          CLI_::Executables_Exposure___::Action_stream_method[ s ]
+
+          _proc = Zerk_lib_[]::Models::OneOff::
+        Definition_for_the_LEGACY_method_called_to_unordered_selection_stream[ s ]
+        define_method :to_unordered_selection_stream, _proc
         NIL_
       end
 

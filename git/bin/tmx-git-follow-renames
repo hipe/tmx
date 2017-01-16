@@ -317,7 +317,7 @@ if __FILE__ == $PROGRAM_NAME
     ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
   ).execute
 else
-  Skylab::TMX::OneOffs::Git_follow_renames = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Git_follow_renames = -> * five do  # #[#ze-063.1] mountable one-off
     Skylab_Git__follow_renames__one_off.new( * five ).execute
   end
 end

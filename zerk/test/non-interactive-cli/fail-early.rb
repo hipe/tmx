@@ -680,7 +680,7 @@ module Skylab::Zerk::TestSupport
 
       def __receive_first_emission em
 
-        @_stream = Home_.lib_.basic::String.line_stream remove_instance_variable :@big_string
+        @_stream = Basic_[]::String.line_stream remove_instance_variable :@big_string
 
         @_reusable_assertion = ReusableExactStringBasedAssertion__.new :puts, @serr_or_sout, @test_context
 

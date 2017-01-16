@@ -219,5 +219,5 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit Skylab::Git_step[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX::OneOffs::Git_step = Skylab::Git_step  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Git_step = Skylab::Git_step  # #[#ze-063.1] mountable one-off
 end

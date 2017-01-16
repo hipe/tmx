@@ -10,7 +10,7 @@ module Skylab::Common
 
           def via_module__ mod
 
-            s_a = mod.name.split CONST_SEP_
+            s_a = mod.name.split CONST_SEPARATOR
 
             const_s = s_a.pop
 

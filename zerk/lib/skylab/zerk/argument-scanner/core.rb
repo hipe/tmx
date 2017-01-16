@@ -8,7 +8,7 @@ module Skylab::Zerk
 
         # #[#051] - until far into the future, currently spliced into [br]
 
-        Home_.lib_.brazen::CLI::Executables_Exposure___::Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
+        Home_::ArgumentScanner::OperatorBranch_via_Directory
       end
     end  # >>
 
@@ -25,7 +25,7 @@ module Skylab::Zerk
 
           mutable_a.push :qualified_knownness, _qkn
 
-          _n11n = Home_.lib_.basic::Number.normalization.new_via_iambic(
+          _n11n = Basic_[]::Number.normalization.new_via_iambic(
             mutable_a, & @listener )
 
           _kn = _n11n.execute

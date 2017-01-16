@@ -67,7 +67,7 @@
 [#084]       +#wishlist a `flag` meta-meta property
 
 [#083] #almost-hole ..
-             ( #moved-to: [#tmx-018.1] mounting one-offs )
+             ( #moved-to: [#ze-063.1] mounting one-offs )
              ( #was: track this spot that does [tmx] mounting for one-off scripts )
              ( #was: #moved-to: [#hu-043] contextualization )
 

@@ -80,5 +80,5 @@ o << "          but the subject utility is here in case it is ever not."
 if __FILE__ == $PROGRAM_NAME
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX::OneOffs::TMX_no_line_breaks = program  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::TMX_no_line_breaks = program  # #[#ze-063.1] mountable one-off
 end

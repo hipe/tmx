@@ -61,7 +61,7 @@ module Skylab::Zerk::TestSupport
 
       _act_st = @session.execute
 
-      _exp_st = Home_.lib_.basic::String.line_stream big_str
+      _exp_st = Basic_[]::String.line_stream big_str
 
       TestSupport_::Expect_Line::Streams_have_same_content[ _act_st, _exp_st, self ]
       NIL

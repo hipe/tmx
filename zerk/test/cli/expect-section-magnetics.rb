@@ -148,7 +148,7 @@ module Skylab::Zerk::TestSupport
 
       def __build_state_machine
 
-        o = Home_.lib_.basic::StateMachine.begin_definition
+        o = Basic_[]::StateMachine.begin_definition
 
         o.add_state(
           :beginning,

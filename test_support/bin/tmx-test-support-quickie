@@ -58,5 +58,5 @@ if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
 
   exit _d
 else
-  Skylab::TMX::OneOffs::Test_support_quickie = program  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Test_support_quickie = program  # #[#ze-063.1] mountable one-off
 end

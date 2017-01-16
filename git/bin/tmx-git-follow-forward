@@ -286,7 +286,7 @@ if __FILE__ == $PROGRAM_NAME
   ).execute
 
 else
-  Skylab::TMX::OneOffs::Git_follow_forward = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Git_follow_forward = -> * five do  # #[#ze-063.1] mountable one-off
     Skylab_Git__follow_forward__one_off.new( * five ).execute
   end
 end

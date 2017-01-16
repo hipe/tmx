@@ -553,7 +553,7 @@ if __FILE__ == $PROGRAM_NAME
 
   exit d
 else
-  Skylab::TMX::OneOffs::Tan_man_stack = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Tan_man_stack = -> * five do  # #[#ze-063.1] mountable one-off
     Skylab::Stack.new( * five, ::File ).execute
   end
 end

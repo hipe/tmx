@@ -651,5 +651,5 @@ end
 if __FILE__ == $PROGRAM_NAME   # (or broader)
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX::OneOffs::Git_breakout = program  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Git_breakout = program  # #[#ze-063.1] mountable one-off
 end

@@ -1,17 +1,12 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  class CLI
+  class Models::OneOff < SimpleModel_
 
-    module Executables_Exposure___
+    # ==
 
-#==FROM
+    class NOT_COVERED__ArgumentScanner__OperatorBranch_via_Directory
 
-    # (this new work is being spliced into this old file because it's
-    # an exact replacement for the old node and one day etc.)
-
-    class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory
-
-      # an adaptation of #[#ze-051] for directories (probably "bin/"-like)
+      # an adaptation of #[#051] for directories (probably "bin/"-like)
 
       class << self
         alias_method :define, :new
@@ -34,7 +29,7 @@ module Skylab::Brazen
 
         # (for now we are optimistic that this will result in a read success)
 
-        @__up_const_path = mod.name.split CONST_SEP_
+        @__up_const_path = mod.name.split Common_::CONST_SEPARATOR
         NIL
       end
 
@@ -88,13 +83,97 @@ module Skylab::Brazen
     end
 
     # ==
-#==TO
+
+    # -
+      def initialize
+        yield self
+        @_slug = :__slug_initially
+      end
+
+      attr_writer(
+        :load_ticket,  # instance of the model
+        :path,         # e.g "/Users/haxor/.gem/ruby/[..]/bin/tmx-meep-mop-frob-jibbers
+        :slug_tail,    # e.g "frob-jibbers"
+      )
+
+      def sub_top_level_const_guess
+        @___STLCG ||= __sub_top_level_const_guess
+      end
+
+      def __sub_top_level_const_guess
+        if @slug_tail
+          __sub_top_level_const_guess_normally
+        else
+          __sub_top_level_const_guess_when_weird_name
+        end
+      end
+
+      def __sub_top_level_const_guess_when_weird_name
+
+        # for weird one-offs whose filename entry didn't match the expected
+        # head (a.k.a prefix), generally we derive a name from the whole
+        # filename entry inflected to look like a [#bs-029.3] "function-like
+        # const" (e.g from the file entry "git-stash-untracked" we would
+        # derive `Git_stash_untracked`).
+        #
+        # however if this name has an acronym-looking piece for the first
+        # piece, we don't want to downcase the nonfirst letters (e.g !"Tmx"
+        # for "tmx"). so for the first piece we always use the VERY heuristic
+        # function below...
+
+        pieces = slug.split DASH_
+        _s = @load_ticket.class::Const_guess_via_piece[ pieces.first ]  # meh
+        pieces[0] = _s
+        pieces.join( UNDERSCORE_ ).intern
+      end
+
+      def __sub_top_level_const_guess_normally
+
+        # for one-offs whole filename followe convention, assume:
+
+        _ = @slug_tail.gsub DASH_, UNDERSCORE_
+        "#{ @load_ticket.one_off_const_head }#{ UNDERSCORE_ }#{ _ }".intern
+      end
+
+      def program_name_tail_string_array
+        [ @load_ticket.slug, slug ]
+      end
+
+      def slug
+        send @_slug
+      end
+
+      def __slug_initially
+        if @slug_tail
+          @_slug = :__slug_using_tail
+        else
+          @__slug_derived = ::File.basename( @path ).freeze
+          @_slug = :__slug_derived_from_path
+        end
+        send @_slug
+      end
+
+      def __slug_using_tail
+        @slug_tail
+      end
+
+      def __slug_derived_from_path
+        @__slug_derived
+      end
+
+      attr_reader(
+        :load_ticket,
+        :path,
+      )
+    # -
+
+    # ==
 
       # [br] CLI is an adaptation of a reactive model to a particular
       # modality. this is an adaption of of scripts written "natively"
       # in that modality into .. the [br] CLI. yes, it's CLI for CLI.
 
-      Action_stream_method = -> s do
+      Definition_for_the_LEGACY_method_called_to_unordered_selection_stream = -> s do
 
         # result is the method body for a `to_unordered_selection_stream`
         # that exposes all the executable files in the usual location that
@@ -111,7 +190,7 @@ module Skylab::Brazen
 
           range = glob.length - 1 .. -1
 
-          _s_a = ss_mod.name.split CONST_SEP_
+          _s_a = ss_mod.name.split Common_::CONST_SEPARATOR
 
           _stream_2 = Common_::Stream.via_nonsparse_array( ::Dir[ glob ] ) do | path |
 
@@ -121,6 +200,8 @@ module Skylab::Brazen
           _stream_1.concat_stream _stream_2
         end
       end
+
+      # ===
 
       class Executable_as_Unbound___
 
@@ -149,6 +230,8 @@ module Skylab::Brazen
           :__path,
         )
       end
+
+      # ===
 
       class Executable_as_Bound___
 
@@ -209,8 +292,7 @@ module Skylab::Brazen
 
           bo = @_bound
 
-          Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff.
-              new do |o|
+          ONE_OFF_LEGACY_MODEL___.define do |o|
             o.path = bo.__path
             o.terminal_name = bo.name_function
             o.up_const_path = bo.__const_pfx
@@ -218,9 +300,10 @@ module Skylab::Brazen
           end
         end
       end
-#==BEGIN KEEP
 
-      class Skylab__Zerk__ArgumentScanner__OperatorBranch_via_Directory::OneOff  # SimpleModel_
+      # ===
+
+      class ONE_OFF_LEGACY_MODEL___ < SimpleModel_
 
             # when it comes time to invoke the executable, it must follow a
             # few rules in order to be exposed by this [br]-integrated
@@ -240,7 +323,7 @@ module Skylab::Brazen
           end until scn.no_unparsed_exists
           buffer << @terminal_name.as_lowercase_with_underscores_string
 
-          # the above is the predecessor to nascent [#tmx-018.1]
+          # the above is the predecessor to nascent [#063.1]
 
           @_tail_const = buffer
 
@@ -278,7 +361,7 @@ module Skylab::Brazen
           const = @_tail_const
 
           if ! univ_mod.const_defined? const, false
-            Touch_these_modules___[]
+            Touch_this_module___[]
             @loader.load @path
           end
 
@@ -292,17 +375,15 @@ module Skylab::Brazen
 
       # ==
 
-      Touch_these_modules___ = Lazy_.call do
-        module ::Skylab::TMX
-          module OneOffs
-            # while #nascent [#tmx-018.1]
-          end
+      Touch_this_module___ = Lazy_.call do
+        module ::Skylab__Zerk__OneOffs
         end
+        NIL
       end
 
-      # ==
-#==END KEEP
-    end
+      # ===
+
+    # ==
   end
 end
-# #pending-rename
+# #history: moved from [br] to [ze], took content from (now) "magnetics-/one off scanner via.."

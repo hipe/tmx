@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::TMX::TestSupport
+module Skylab::Zerk::TestSupport
 
   describe "[tmx] CLI - synopsis lines" do
 
@@ -114,11 +114,11 @@ module Skylab::TMX::TestSupport
     end
 
     memoize :_thing_directory do
-      ::File.join TS_.dir_path, 'fixture-directories', 'dir-03-one-off-help-screen-dumps', 'generated'
+      ::File.join TS_.dir_path, 'fixture-directories', 'dir-01-one-off-help-screen-dumps', 'generated'
     end
 
     def _subject_module
-      Home_::CLI::Magnetics_::SynopsisLines_via_HelpScreen
+      Home_::CLI::SynopsisLines_via_HelpScreen
     end
   end
 end

@@ -113,7 +113,7 @@ module Skylab::Common
           #
           #     ::Foo::Bar_::Baz_Exception__ => :bar_baz_exception
 
-          s_a = @exception.class.name.split Home_.const_sep
+          s_a = @exception.class.name.split CONST_SEPARATOR
 
           sub_slice = s_a[ -2, 2 ]
 

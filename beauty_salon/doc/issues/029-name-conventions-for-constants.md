@@ -7,56 +7,91 @@
 we use these conventions not because they are pretty (they are not) but
 because they pack a lot of self-documentation into a small space.
 
-a const's style exhibits both is "scope" and the kind of object it
-references. here is a summary of the N tiers of scope:
+a const's style exhibits both is "scope" and the kind of object it references.
 
-    Public_API  # this const assignment is part of your (semver) pub. API
+(when we say "node", we typically mean "module (e.g class)".)
+a node's scope is expressed by the number of trailing underscores
+in its const name:
 
-    Library_Scope_  # may be used by this node (file) and any child nodes
+    PublicAPI  # :[#here.0]: this node is part of your public API (see semver.org),
+               # and so cannot change without a major version change of your gem.
 
-    Cozy_Scope__  # (2) this const is used *only* by this file
+    LibraryScope_  # :[#here.1] a const named like this is visible (only)
+                   # to scope-wise child nodes that can "see" it. (more later)
 
-    One_Off_Scope___  # (3) is as (2) and also referenced exactly once
+    CozyScope__  # :[#here.2]: this node is used *only* by a single other node
+                 # (and only from one file). (note the node itself can be
+                 # defined in a dedicated file separate from the file that
+                 # uses it.) probably the most common convention.
 
-    Singleton_Scope____   # (4) this const (as string) only exists in 1 place
+    OneOffScope___  # :[#here.3] exactly as [#here.2] and also it is only
+                    # ever referenced from one code location. used frequently.
 
-    Flagged_for_Elimination_____  # (5) referrant is not used. OK to remove
+    SingletonScope____   # :[#here.4] as a const name in this const scope you
+                         # will only find this string in one place. typically
+                         # used in a kind of ugly older way to implement singletons.
+
+apart from the underscores that trail a const name, there is also convention
+around how interceding underscores are used in const names. here is a
+cursory overview of this, with in-depth explanations to follow in this
+document. (in the below example we use "cozy scope" because it is common):
+
+    ThisIsThePlatformConventionAndOurCurrentConvention__
+
+    Some_Legacy_Classes_Are_Named_Like_This__   # called "camelcase with underscores". deprecated.
+                                                # but further explanation justifies some use-cases
+
+    This_casing_is_reserved_for_proc_likes_eg_actors__  # as a rule
+
+    ANY_OBJECT_TREATED_AS_A_VALUE__  # even when we use a module to implement a singleton
 
 
-here is an overview of how the "shape" of the referenced object inflects
-the name (we will use "cozy" scope becuase it is common):
-
-    Module_eg_Class_in_Contemorary_Style__
-
-    ModuleOrClassInLegacyStyle__
-
-    This_casing_is_reserved_for_proc_likes_eg_actors__
-
-    ANY_OBJECT_TREATED_AS_A_VALUE__
 
 
+## when do we use the weird-looking `Camel_Case_With_Underscores`?
+
+  - we will use underscores if any piece of the const name is an acronym,
+
+        API_Key  # better
+        APIKey   # worse
+
+    probably we only use the underscores to separate the piece that is
+    an acronym; it's not whole-hog:
+
+        Invalid_HTTP_RequestResponse   # better
+        Invalid_HTTP_Request_Response  # worse
 
 
-## quick side-note: what happened to good old CamelCase?
+  - we use this convention for names of some modules whose files are
+    loaded with simplified autoloading (e.g test support nodes) because
+    it's trivial to implement inflectors for this kind of name translation,
+    and we don't like our test code having extraneous dependencies.
 
-we use `This_Convention` insted of `CamelCase`:
+       :some_test_suppport_node  => `Some_Test_Support_Node`
 
-  • generally not always. sidesystem names still use the classic
-    camelcase names out of deference to the strong platform idiom.
-    we may also use it when it has some sort of expressive utility
-    to do so.
+    this has a side-benefit of allowing us to search for a public-API
+    "asset code" node without getting hits for its test support node
+    (for those names with multiple pieces).
 
-  • (A) this solves the problem of acronyms in const names,
-    e.g: better: `API_Key`, worse: `APIKey`.
 
-  • (B) conceptually we think of `_` as being halfway to `::`.
+  - we use underscores mixed in with conventional looking class name
+    elements as special higher-level syntactic separators, like
+    for [#ta-005] "magnetics":
+
+        SomeThing_via_OneIngredient_and_OtherIngredient
+
+    (this is a quite bespoke convention.)
+
+
+  - at one point we adopted this as the default for typical classes
+    and modules (reasons don't matter); so there is still a lot of
+    mid-legacy code with this convetion, with the old justification:
+
+    conceptually we though of `_` as being halfway to `::`.
     if you have a name like `API_Key` are you sure you don't want
     it to be `API::Key` instead? using the underscore as an imaginary
     ersatz for a `::` is a visual reminder that we should be planning
     for our name graphs to grow.
-
-  • we don't yet have a good name for this convention.
-    `Titlecase_with_Underscores` is .. meh.
 
 
 

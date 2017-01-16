@@ -116,7 +116,7 @@ module Skylab::Zerk::TestSupport
 
     def _parse s
 
-      _scn = Home_.lib_.basic::String.line_stream s
+      _scn = Basic_[]::String.line_stream s
 
       @sections =
         TS_::CLI::Expect_Section_Magnetics::SectionsOldSchool_via_LineStream.call(

@@ -98,7 +98,7 @@ else
     end
     exit d
   else
-    Skylab::TMX::OneOffs::Git_stash_untracked = -> * five do  # #[#tmx-018.1] mountable one-off
+    Skylab__Zerk__OneOffs::Git_stash_untracked = -> * five do  # #[#ze-063.1] mountable one-off
       Skylab::Git::CLI.new( * five ).execute
     end
   end

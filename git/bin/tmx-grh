@@ -137,5 +137,5 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX::OneOffs::TMX_grh = program  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::TMX_grh = program  # #[#ze-063.1] mountable one-off
 end

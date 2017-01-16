@@ -219,7 +219,7 @@ module Skylab::Zerk
         slug = md[ :shorter ] || md[ :longer ]
         human = slug.gsub UNDERSCORE_, SPACE_
 
-        ick = Home_.lib_.basic::String.via_mixed x
+        ick = Basic_[]::String.via_mixed x
           # (or `say_strange_branch_item` from the expag if desired)
 
         _reason_sym = :"not_#{ slug }"

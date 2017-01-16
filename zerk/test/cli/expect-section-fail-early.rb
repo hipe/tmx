@@ -705,7 +705,7 @@ module Skylab::Zerk::TestSupport
 
       def one_big_string= s
 
-        scn = Home_.lib_.basic::String.line_stream s
+        scn = Basic_[]::String.line_stream s
 
         _em_st = Common_.stream do
 

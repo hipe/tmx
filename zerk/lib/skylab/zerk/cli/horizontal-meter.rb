@@ -111,7 +111,7 @@ module Skylab::Zerk
 
           _number_stream = Stream_[ _always_2 ]
 
-            st = Home_.lib_.basic::Algorithm::
+            st = Basic_[]::Algorithm::
           DiscreteStream_via_NumeratorStream_and_DiscretePool_and_Denominator[
             _number_stream,
             @target_final_width,

@@ -180,6 +180,7 @@ module Skylab::Zerk::TestSupport
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
 
   ACHIEVED_ = true
+  Basic_ = Home_::Basic_
   DASH_ = '-'
   EMPTY_A_ = []
   EMPTY_P_ = Home_::EMPTY_P_

@@ -10,50 +10,15 @@ module Skylab::TMX
     # it holds basic configuration-like parameters and brings to life the
     # rest of the graph from that. see [#002] "tmx theory" for more.
 
-    # local unified language (:[#002.A]:)
-    # what we're calling a "gem name" is a list of "segments" each of which
-    # is a list of "pieces". per some published standard we saw once, in a
-    # "gem name" the segments should be separated by dashes and the pieces
-    # should be separated by underscores:
-
-    # so in the project "sea lab" is the library "mip mop"
-    # the "gem name" would be:
-    #
-    #     sea_lab-mip_mop
-    #
-    # (and you would require this:)
-    #
-    #     require "sea_lab/mip_mop"
+    # see [#ze-030] "unified language" (under "sidesystems") for what
+    # "gem name" means and related..
 
     attr_accessor(
-      :participating_gem_const_path_head,
+      :participating_gem_const_head_path,
       :participating_gem_prefix,
       :participating_exe_prefix,
       :single_gems_dir,
     )
-
-    def lookup_reflective_sidesystem__ entry_string
-
-      self._NOT_USED__but_should_be__
-
-      # assume that `stem` is isomorphic with a sidesystem in the
-      # installation.
-
-      gem_name = "#{ @participating_gem_prefix }#{ entry_string }"
-
-      gne = GemNameElements_.new
-
-      gne.entry_string = entry_string
-      gne.gem_name = gem_name
-      gne.const_head_path = @participating_gem_const_path_head
-      gne.exe_prefix = @participating_exe_prefix
-
-      _sp = Gem::Specification.find_by_name gem_name, '>= 0.pre'
-      _entry = "#{ gem_name }-#{ _sp.version }"
-      gne.gem_path = ::File.join @single_gems_dir, _entry
-
-      LoadTicket_.new gne
-    end
 
     def to_reflective_sidesystem_stream__
 
@@ -133,14 +98,15 @@ module Skylab::TMX
       _tailer = _tailerer[ @participating_gem_prefix ]
       _tail = _tailer[ gem_name ]
 
-      ne = GemNameElements_.new
-      ne.entry_string = _tail
-      ne.gem_name = gem_name
-      ne.gem_path = :_ALREADY_LOADED_tmx_
-      ne.const_head_path = @participating_gem_const_path_head
-      ne.exe_prefix = @participating_exe_prefix
+      _gne = Models_::GemNameElements.define do |ne|
+        ne.entry_string = _tail
+        ne.gem_name = gem_name
+        ne.gem_path = :_ALREADY_LOADED_tmx_
+        ne.const_head_path = @participating_gem_const_head_path
+        ne.exe_prefix = @participating_exe_prefix
+      end
 
-      Models_::LoadTicket.new ne
+      Models_::LoadTicket.new _gne
     end
 
     # our coupling to the gem API (and beyond) is both tight and
@@ -150,7 +116,7 @@ module Skylab::TMX
 
       exe_pfx = inst.participating_exe_prefix
       gem_prefix = inst.participating_gem_prefix
-      const_head_path = inst.participating_gem_const_path_head
+      const_head_path = inst.participating_gem_const_head_path
 
       # assume that the first path is like all the others in this respect,
       # so cache some details from it so that we don't recalculate the
@@ -161,23 +127,22 @@ module Skylab::TMX
 
       gem_name_via_entry = Gem_name_tools_[].Gem_name_via_entry
 
-      proto = GemNameElements_.new nil, nil, nil, const_head_path, exe_pfx
+      proto = Models_::GemNameElements.define do |ne|
+        ne.const_head_path = const_head_path
+        ne.exe_prefix = exe_pfx
+      end
 
       -> path_ do
 
         gemname = gem_name_via_entry[ path_[ basename_via_range ] ]
 
-        gne = proto.dup
-        gne.entry_string = gemname[ stem_via_range ]
-        gne.gem_name = gemname
-        gne.gem_path = path_
-        gne
+        proto.dup_by do |ne|
+          ne.entry_string = gemname[ stem_via_range ]
+          ne.gem_name = gemname
+          ne.gem_path = path_
+        end
       end
     end
-
-    GemNameElements_ = ::Struct.new(
-      :entry_string, :gem_name, :gem_path, :const_head_path, :exe_prefix )
-    # #testpoint all above
 
     Gem_name_tools_ = Lazy_.call do
 

@@ -10,7 +10,7 @@ module Skylab::TMX
 
       def initialize inst
 
-        @const_path_head = inst.participating_gem_const_path_head
+        @const_head_path = inst.participating_gem_const_head_path
         @exe_pfx = inst.participating_exe_prefix
         @gems_dir = inst.single_gems_dir
         @gem_pass_prefix = inst.participating_gem_prefix
@@ -48,8 +48,10 @@ module Skylab::TMX
 
         stem_via_range = @gem_pass_prefix.length .. -1
 
-        proto = GemNameElements_.new(
-          nil, nil, nil, @const_path_head, @exe_pfx )
+        proto = Models_::GemNameElements.define do |gne|
+          gne.const_head_path = @const_head_path
+          gne.exe_prefix = @exe_pfx
+        end
 
         flush = -> do
 

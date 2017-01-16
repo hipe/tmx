@@ -297,7 +297,7 @@ if is_invocation_of_one_off
   o.argv = ::ARGV
   end.execute
 else
-  Skylab::TMX::OneOffs::Test_support_cover = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Test_support_cover = -> * five do  # #[#ze-063.1] mountable one-off
     cls.define do |o|
       o.argv, _, o.sout, o.serr, o.invocation_string_array = five
     end.execute

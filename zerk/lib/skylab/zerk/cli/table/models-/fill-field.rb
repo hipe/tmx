@@ -310,7 +310,7 @@ module Skylab::Zerk
             end
           end
 
-            width_integer_st = Home_.lib_.basic::Algorithm::
+            width_integer_st = Basic_[]::Algorithm::
 
           DiscreteStream_via_NumeratorStream_and_DiscretePool_and_Denominator.call(
             real_st,

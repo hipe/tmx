@@ -56,6 +56,43 @@ in niCLI the (selection stack) frame holds a lot of responsibility..
 
 
 
+## "sidesystem" and related  :[#here.1]
+
+this was originally solely the domain of [tmx], but we broadened it
+to here so that sidesystems could integrate "one-off" scripts as
+if they are (like) operators; without needing to depend on [tmx]:
+
+what we're calling a "gem name" is a list of "segments" each of which
+is a list of "pieces". per some published standard we saw once, in a
+"gem name" the segments should be separated by dashes and the pieces
+should be separated by underscores:
+
+so in the broad project "sea lab", if there is a library (gem)
+"mip mop", the "gem name" would be:
+
+    sea_lab-mip_mop
+
+and we can break out down like this:
+
+    sea_lab-mip_mop
+       |           \
+       v            v
+    "sea lab"    "mip mop"
+    segment        segment
+       |   \           \   \
+       v    v           v    v
+
+    "sea"   "lab"        "mip"   "mop"
+    piece   piece        piece   piece
+
+
+to `require` this gem, you simply exchange the dash for a slash:
+
+    require "sea_lab/mip_mop"
+
+
+
+
 ## evaluations, reasonings, emissions, and states
 
   • a "reasoning" (:#A) is structure that can be used to help explain

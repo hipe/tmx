@@ -1,12 +1,12 @@
-module Skylab::TMX
+module Skylab::Zerk
 
-  class CLI
+  module CLI
 
-    class Magnetics_::SynopsisLines_via_HelpScreen < SimpleModel_  # :[#021]
+    class SynopsisLines_via_HelpScreen < SimpleModel_  # :[#063.2]
 
       # in a manner that is variously violent, efficient and beautiful;
       # attempt to derive N (eg. 2) "synopsis lines" from any agent that
-      # expresses a help screen for use in [#018.B] deep listings, based
+      # expresses a help screen for use in [#tmx-018.2] deep listings, based
       # on a set of axiomatic heuristics detailed in our document.
 
       # we implement this through a state-machine-based parser written to
@@ -51,7 +51,7 @@ module Skylab::TMX
       # special requirements, we brute-force this early exit in such a
       # manner. but note this isn't future-safe.
 
-      # this is also tracked by :[#ze-054.3] being that it is in this
+      # this is also tracked by :[#054.3] being that it is in this
       # strain of facilities that parse similar such documents. (this is
       # the third of five facilities in that strain.)
 
@@ -235,9 +235,9 @@ module Skylab::TMX
         )
       end
 
-      # ==SNIP_ONE
+    #===
 
-    Memoized_state_machine___ = Lazy_.call do  # see [#003]
+    Memoized_state_machine___ = Lazy_.call do
 
       o = Basic_[]::StateMachine.begin_definition
 
@@ -390,7 +390,7 @@ module Skylab::TMX
 
       o.add_state( :early_ending,
         :on_entry, -> _sm do
-          SynopsisLines_via_HelpScreen._THIS_CHANGED__do_it_earlier__
+          self._THIS_CHANGED__do_it_earlier__  # #tombstone-A
         end,
       )
 
@@ -411,7 +411,7 @@ module Skylab::TMX
       o.finish
     end
 
-      #==SNIP2
+    #===
 
       # ==
 

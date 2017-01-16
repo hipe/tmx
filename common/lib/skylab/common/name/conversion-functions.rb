@@ -11,7 +11,7 @@ module Skylab::Common
       -> path_x do
         path_x.to_s.gsub( black_rx, EMPTY_S_ ).
           split( ::File::SEPARATOR, -1 ).
-            map( & sanitize_file ) * CONST_SEP_
+            map( & sanitize_file ) * CONST_SEPARATOR
       end
     end.call
 

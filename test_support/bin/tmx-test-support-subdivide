@@ -29,7 +29,7 @@ class << one_off
     def __normalize_and_validate
       @begin ||= BEGIN__
       @next_begin ||= NEXT_BEGIN___
-      if @next_begin <= @begin
+      if @next_begin <= @begin  # :#here-1
         @_listener.call :error, :expression do |y|
           y << "#{ prim :next_begin } must be after #{ prim :begin }"
         end
@@ -44,6 +44,41 @@ class << one_off
     end
 
     def __parse_arguments
+      if @_args.no_unparsed_exists
+        _parse_arguments_normally
+      else
+        md = %r(\A(?<A>\d+)[-:](?<B>\d+)(?:[-:](?<C>\d+))?\z).match @_args.head_as_is
+        if md
+          __fun_with_matchdata md
+        else
+          _parse_arguments_normally
+        end
+      end
+    end
+
+    def __fun_with_matchdata md
+
+      @_args.advance_one
+      d_a = [ md[ :A ].to_i, md[ :B ].to_i ]
+      # we do this fliparound for convenience, giving the user the
+      # freedom to supply the first two numbers in the "wrong" order.
+      # but note that if they are equal it is validated against #here-1
+      if d_a.first > d_a.last
+        d_a.reverse!
+      end
+      @begin, @next_begin = d_a
+      s = md[ :C ]
+      if s
+        @number_of_items = s.to_i
+      end
+      if @_args.no_unparsed_exists
+        ACHIEVED_
+      else
+        _parse_arguments_normally
+      end
+    end
+
+    def _parse_arguments_normally
       @_lib::ParseArguments_via_FeaturesInjections.call @_args, PRIMARIES___, self
     end
 
@@ -55,8 +90,7 @@ class << one_off
         y << "default: #{ NEXT_BEGIN___ }"
       end,
       number_of_items: -> y do
-        y << "required. positive nonzero integer."
-        y << "(one day maybe this will be a regular argument)"
+        y << "positive nonzero integer."
       end,
       help: -> { "this screen" },
     }
@@ -77,7 +111,7 @@ class << one_off
 
       _Help::ScreenForEndpoint.express_into @stderr do |o|
         o.primary_symbols h.keys
-        o.express_usage_section _program_name
+        o.express_usage_section __program_name_plus
         o.express_freeform_section __freeform_description_by
         o.express_items_sections h
       end
@@ -85,22 +119,52 @@ class << one_off
       NIL  # EARLY_END_
     end
 
+    def __program_name_plus
+      "#{ _program_name } [ BEGIN:NEXT_BEGIN[:N] ] "
+    end
+
     def __freeform_description_by
+
+      my_program_name = _program_name
 
       -> serr do
 
-        serr.puts "synopsis: choses numbers for N items given a numberpace"
+        serr.puts "synopsis: choses numbers for N items given a numberspace"
         serr.puts
 
-        serr.puts "our \"formula\" for subdividing spaces:"
-        serr.puts
+_body_string = <<-HERE
+theory and algorithm:
 
-        _body_string = <<-HERE
-if you had 2 items to fit into 1-99: there's always one buffer at the
-beginning and one at the end, and (N-1) * 2 buffers to account for the
-interceding buffers between adjacent items, so four buffers evenly
-spread between 99 (slot) items. (reminder: there is no '0' space and
-no '100' space.)
+the outcome of this appears really simple (and it is), but here's the theory
+behind it:
+
+we are placing positive nonzero N items into a range of 2-dimensional space.
+
+every item will have a same size "buffer" to its "left" and to its "right".
+
+so with '0' as the lower boundary and '10' as the upper and one item:
+
+    #{ my_program_name } 0:10:1  # => 5.0
+
+the item has a buffer 5 units long to its left (0-5) and one 5 units
+long to is right (5-10).
+
+each "buffer" "belongs" to only one item, so buffers are distributed in
+this pattern whereby there are two buffers between each adjacent item:
+
+    lower-limit buffer item buffer buffer item buffer buffer item [..] buffer upper-limit
+
+so:
+
+    #{ my_program_name } 10:14:2  # => 11.0, 13.0
+
+the first item (at 11.0) has a buffer to its left of 10-11, and one to
+its right of 11-12. the second item has the buffers 12-13 and 13-14.
+
+we implement this by determining the number of buffers, which is simply
+N * 2, and dividing the available space by that amount. this gives us
+the buffer width, which we use to calculate each next position of each
+next item.
         HERE
 
         serr.write _body_string
@@ -125,7 +189,12 @@ no '100' space.)
     end
 
     def _program_name
-      @program_name_string_array.join SPACE_
+      @___program_name ||= __program_name
+    end
+
+    def __program_name
+      # @program_name_string_array.join SPACE_
+      ::File.basename @program_name_string_array.last  # looks better in help screen to be shorter
     end
 
     def __execute_normally
@@ -184,7 +253,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit one_off.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
 else
-  Skylab::TMX::OneOffs::Test_support_subdivide = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Test_support_subdivide = -> * five do  # #[#ze-063.1] mountable one-off
     one_off.new( * five ).execute
   end
 end

@@ -1,4 +1,4 @@
-module Skylab::TMX
+module Skylab::Zerk
 
   class Magnetics_::OneOffScanner_via_LoadTicket
 
@@ -46,7 +46,11 @@ module Skylab::TMX
           if md
             _slug_tail = md.post_match
           end
-          OneOff___.new _slug_tail, path, @load_ticket
+          Home_::Models::OneOff.define do |o|
+            o.slug_tail = _slug_tail
+            o.path = path
+            o.load_ticket = @load_ticket
+          end
         end.flush_to_polymorphic_stream
       end
 
@@ -82,95 +86,12 @@ module Skylab::TMX
       end
 
     # -
-
     # ==
 
     BIN___ = 'bin' ; GLOB___ = '*'
 
     # ==
-
-    class OneOff___
-
-      def initialize slug_tail, path, lt
-        @load_ticket = lt
-        @path = path
-        @slug_tail = slug_tail
-        @_slug = :__slug_initially
-      end
-
-      def sub_top_level_const_guess
-        @___STLCG ||= __sub_top_level_const_guess
-      end
-
-      def __sub_top_level_const_guess
-
-        if @slug_tail
-          __sub_top_level_const_guess_normally
-        else
-          __sub_top_level_const_guess_when_weird_name
-        end
-      end
-
-      def __sub_top_level_const_guess_when_weird_name
-
-        # for weird one-offs whose filename entry didn't match the expected
-        # head (a.k.a prefix), generally we derive a name from the whole
-        # filename entry inflected to look like a [#bs-029.3] "function-like
-        # const" (e.g from the file entry "git-stash-untracked" we would
-        # derive `Git_stash_untracked`).
-        #
-        # however if this name has an acronym-looking piece for the first
-        # piece, we don't want to downcase the nonfirst letters (e.g !"Tmx"
-        # for "tmx"). so for the first piece we always use the VERY heuristic
-        # function below...
-
-        pieces = slug.split DASH_
-        _s = @load_ticket.class::Const_guess_via_piece[ pieces.first ]  # meh
-        pieces[0] = _s
-        pieces.join( UNDERSCORE_ ).intern
-      end
-
-      def __sub_top_level_const_guess_normally
-
-        # for one-offs whole filename followe convention, assume:
-
-        _ = @slug_tail.gsub DASH_, UNDERSCORE_
-        "#{ @load_ticket.one_off_const_head }#{ UNDERSCORE_ }#{ _ }".intern
-      end
-
-      def program_name_tail_string_array
-        [ @load_ticket.slug, slug ]
-      end
-
-      def slug
-        send @_slug
-      end
-
-      def __slug_initially
-        if @slug_tail
-          @_slug = :__slug_using_tail
-        else
-          @__slug_derived = ::File.basename( @path ).freeze
-          @_slug = :__slug_derived_from_path
-        end
-        send @_slug
-      end
-
-      def __slug_using_tail
-        @slug_tail
-      end
-
-      def __slug_derived_from_path
-        @__slug_derived
-      end
-
-      attr_reader(
-        :load_ticket,
-        :path,
-      )
-    end
-
-    # ==
   end
 end
+# #history: moved from [tmx] to [ze]
 # #born for one-off mounting

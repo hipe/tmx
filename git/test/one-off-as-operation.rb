@@ -141,10 +141,8 @@ module Skylab::Git::TestSupport
 
       if ! ::Object.const_defined? const
 
-        module ::Skylab::TMX
-          module OneOffs
-            # [#tmx-018.1] is nascent..
-          end
+        module ::Skylab__Zerk__OneOffs
+          # while #nascent [#ze-063.1]
         end
 
         _path =  ::File.join Sidesystem_path__[], 'bin', entry

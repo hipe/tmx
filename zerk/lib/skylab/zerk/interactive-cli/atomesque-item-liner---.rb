@@ -43,7 +43,7 @@ module Skylab::Zerk
         _x_a = @_qk.value_x
 
         long_s = ""
-        y = Home_.lib_.basic::Yielder::Mapper.joiner( long_s, ', ' ).y
+        y = Basic_[]::Yielder::Mapper.joiner( long_s, ', ' ).y
 
         _prepare_etc
 
@@ -76,7 +76,7 @@ module Skylab::Zerk
 
         _QUOTEWORTHY_RX = /[[:space:]'",]/
 
-        o = Home_.lib_.basic::String.via_mixed.dup
+        o = Basic_[]::String.via_mixed.dup
 
         o.non_long_string_by = -> s do
 

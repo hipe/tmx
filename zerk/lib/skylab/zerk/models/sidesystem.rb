@@ -1,9 +1,31 @@
-module Skylab::TMX
+module Skylab::Zerk
 
-  class Models_::LoadTicket  # #testpoint
+  Models::Sidesystem = ::Module.new
 
+  # an important note about the nodes defined here:
+  # as the const names imply ([#bs-029.0]), these are (very much) a part of
+  # our #public-API. these nodes are used heavily by [tmx] (#testpoint too)
+
+  class Models::Sidesystem::GemNameElements < SimpleModel_
+
+    def dup_by
+      otr = dup
+      yield otr
+      otr.freeze
+    end
+
+    attr_accessor(
+      :const_head_path,  # e.g [:SeaLab, :MySidesystem]
+      :exe_prefix,       # always "tmx-" in this universe
+      :entry_string,     # e.g "my_sidesystem"
+      :gem_name,         # e.g "sea_lab-my_sidesystem"
+      :gem_path,         # e.g "/Users/haxor/.gem/ruby/2.2.3/gems/sea_lab-my_sidesystem-0.0.0.pre.bleeding"
+    )
+  end
+
+  class Models::Sidesystem::LoadTicket
     # -
-      def initialize gne  # GemNameElements_
+      def initialize gne  # GemNameElements
 
         @require_path = gne.gem_name.gsub DASH_, ::File::SEPARATOR
         @gem_name_elements = gne
@@ -12,7 +34,7 @@ module Skylab::TMX
 
       def __init_const_path_array_guess
 
-        # (see [#002.A] re: a gem name many segments, segment is many pieces)
+        # (see [#030.1] re: a gem name many segments, segment is many pieces)
 
         const_path_guess = []
         gne = @gem_name_elements
@@ -43,7 +65,7 @@ module Skylab::TMX
 
         # we avoid using `const_reduce` (for name correction) unless we
         # need to (for no good reason).
-        # this is near but not the same as a [#tmx-018.1] mountable one-off
+        # this is near but not the same as a [#063.1] mountable one-off
 
         mod = ::Object
         sym_a = const_path_array_guess
@@ -63,7 +85,7 @@ module Skylab::TMX
       end
 
       def to_one_off_scanner_via_filesystem fs
-         Home_::Magnetics_::OneOffScanner_via_LoadTicket[ self, fs ]
+        Home_::Magnetics_::OneOffScanner_via_LoadTicket[ self, fs ]
       end
 
       def one_off_const_head
@@ -178,4 +200,5 @@ module Skylab::TMX
     # ==
   end
 end
+# #history: moved from [tmx] to [ze]
 # #history: broke out from "installation" model

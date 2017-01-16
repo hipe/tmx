@@ -34,7 +34,7 @@ module Skylab::Common
 
     def __produce_module
 
-      _s_a = @qualified_const_string.split CONST_SEP_
+      _s_a = @qualified_const_string.split CONST_SEPARATOR
 
       _s_a.reduce ::Object do | m, c |
 

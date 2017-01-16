@@ -101,8 +101,8 @@ end
 if __FILE__ == $PROGRAM_NAME
   Skylab::Slicer::SS_Dep__.new( ::ARGV, nil, $stdout, $stderr ).execute
 else
-  # #[#tmx-018.1] mountable one-off
-  Skylab::TMX::OneOffs::Slicer_generate_sidesystem_dependencies_graph = -> * five do
+  # #[#ze-063.1] mountable one-off
+  Skylab__Zerk__OneOffs::Slicer_generate_sidesystem_dependencies_graph = -> * five do
     Skylab::Slicer::SS_Dep__.new( * five ).execute
   end
 end

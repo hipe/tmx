@@ -335,5 +335,5 @@ end
 if __FILE__ == $PROGRAM_NAME
   exit program[ ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ]
 else
-  Skylab::TMX::OneOffs::Beauty_salon_slide_numbers = program  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Beauty_salon_slide_numbers = program  # #[#ze-063.1] mountable one-off
 end

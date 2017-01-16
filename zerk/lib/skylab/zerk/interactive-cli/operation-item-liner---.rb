@@ -24,7 +24,7 @@ module Skylab::Zerk
 
       def __N_lines
 
-        o = Home_.lib_.basic::String::N_Lines.session
+        o = Basic_[]::String::N_Lines.session
         o.description_proc = @__description_proc
         o.expression_agent = @_.expression_agent
         o.number_of_lines = NUMBER_OF_LINES_PER_ITEM_

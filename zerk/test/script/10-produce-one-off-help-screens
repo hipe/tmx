@@ -118,9 +118,8 @@ money_thing = nil
 prepare_for_the_crazy_thing = -> do
 
   require_listener[]
-
-    money_thing =
-  Skylab::TMX::CLI::Magnetics_::SynopsisLines_via_HelpScreen.define do |o|
+  require 'skylab/zerk'
+  money_thing = Skylab::Zerk::CLI::SynopsisLines_via_HelpScreen.define do |o|
     o.number_of_synopsis_lines = 3  # meh
     o.listener = listener
   end
@@ -202,7 +201,7 @@ go = -> do
   st = Skylab::TMX.to_sidesystem_load_ticket_stream
 
   sandbox_module = ::Module.new
-  Skylab::TMX::OneOffs = sandbox_module  # #[#tmx-018.A] place 1 of 2
+  Skylab__Zerk__OneOffs = sandbox_module  # while #nascent [#ze-063.1]
 
   counter = 0
   stay = true
@@ -375,3 +374,4 @@ else
 end
 
 exit exitstatus
+# #history: moved to [ze] from [tmx]

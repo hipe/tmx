@@ -86,7 +86,7 @@ module Skylab::TMX
     def __ o
       o.single_gems_dir = ::File.join ::Gem.paths.home, 'gems'
       o.participating_gem_prefix = 'skylab-'
-      o.participating_gem_const_path_head = [ :Skylab ]
+      o.participating_gem_const_head_path = [ :Skylab ]
       o.participating_exe_prefix = 'tmx-'
     end
 
@@ -164,6 +164,18 @@ module Skylab::TMX
     end
 
     private :dup
+  end
+
+  # ==
+
+  module Models_
+    Autoloader_[ self ]
+    lazily :GemNameElements do
+      Zerk_lib_[]::Models::Sidesystem::GemNameElements
+    end
+    lazily :LoadTicket do
+      Zerk_lib_[]::Models::Sidesystem::LoadTicket
+    end
   end
 
   # ==

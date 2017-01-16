@@ -42,7 +42,7 @@ module Skylab::Common
       end.call
 
       Mod_moniker_via_num_parts_and_module___ = -> num_parts, mod do
-        s_a = mod.name.split CONST_SEP_
+        s_a = mod.name.split CONST_SEPARATOR
         _s_a_ = if ! num_parts then s_a
         elsif num_parts.respond_to? :cover?
           s_a[ num_parts ]

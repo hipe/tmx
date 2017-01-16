@@ -8,10 +8,6 @@ module Skylab::Common
       self::Bundles.edit_module_via_mutable_iambic mod, x_a
     end
 
-    def const_sep
-      CONST_SEP_
-    end
-
     def describe_into_under y, expag
       y << "(as a reactive node, [co] is some ancient artifact..)"
     end
@@ -1252,7 +1248,7 @@ module Skylab::Common
 
         def via_module_name s
 
-          d = s.rindex CONST_SEP_
+          d = s.rindex CONST_SEPARATOR
           if d
             s = s[ d + 2 .. -1 ]
           end
@@ -1807,7 +1803,7 @@ module Skylab::Common
   end
 
   ACHIEVED_ = true
-  CONST_SEP_ = '::'.freeze
+  CONST_SEPARATOR = '::'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }  # to say hi
   EMPTY_S_ = ''.freeze  # think of all the memory you'll save

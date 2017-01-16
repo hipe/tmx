@@ -182,7 +182,7 @@ module Skylab::Zerk
 
     Build_frame_stack_as_array_ = -> top_frame do
 
-      link = Home_.lib_.basic::List::Linked
+      link = Basic_[]::List::Linked
       current_link = link[ NOTHING_, top_frame ]
       begin
         fr = current_link.element_x.below_frame

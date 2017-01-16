@@ -7,7 +7,7 @@ module Skylab
   # might be re-opening, might not. assume might be either
 end
 
-class Skylab::Git_citxt  # #[#tmx-018.1] mountable one-off
+class Skylab::Git_citxt  # #[#ze-063.1] mountable one-off
 
   class << self
     def call * standard_five
@@ -354,5 +354,5 @@ end
 if __FILE__ == $PROGRAM_NAME
   Skylab::Git_citxt.new( ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] ).execute
 else
-  Skylab::TMX::OneOffs::Git_citxt = Skylab::Git_citxt  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::Git_citxt = Skylab::Git_citxt  # #[#ze-063.1] mountable one-off
 end

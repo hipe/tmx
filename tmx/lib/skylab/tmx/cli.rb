@@ -444,6 +444,8 @@ module Skylab::TMX
 
       def __head_matches_mountable_one_off_executable
 
+        self._NOT_COVERED
+
         col = __build_one_off_operator_branch
 
         _init_selective_listener
@@ -464,6 +466,8 @@ module Skylab::TMX
       end
 
       def __build_one_off_operator_branch
+
+        self._NOT_COVERED
 
         remove_instance_variable :@__installation  # #todo
 

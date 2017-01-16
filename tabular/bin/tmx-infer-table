@@ -14,7 +14,7 @@ if __FILE__ == $PROGRAM_NAME
 
   exit d
 else
-  Skylab::TMX::OneOffs::TMX_infer_table = -> * five do  # #[#tmx-018.1] mountable one-off
+  Skylab__Zerk__OneOffs::TMX_infer_table = -> * five do  # #[#ze-063.1] mountable one-off
 
     Skylab::Tabular::Operations_::InferTable::CLI.new( * five ).execute
   end
