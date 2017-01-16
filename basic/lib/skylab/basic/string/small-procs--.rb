@@ -25,9 +25,9 @@ module Skylab::Basic
 
         end_ = string.length
         if end_.zero?
-          Common_::Scn.the_empty_stream
+          Common_::SimpleStream.the_empty_stream
         else
-          Common_::Scn.new do
+          Common_::SimpleStream.by do
             case 0 <=> end_
             when -1
               begin_ = end_ - 1

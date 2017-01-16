@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI
 
-    class SynopsisLines_via_HelpScreen < SimpleModel_  # :[#063.2]
+    class SynopsisLines_via_HelpScreen < Home_::SimpleModel_  # :[#063.2]
 
       # in a manner that is variously violent, efficient and beautiful;
       # attempt to derive N (eg. 2) "synopsis lines" from any agent that

@@ -1,5 +1,6 @@
 {
   "after":"test_support",
   "category":"ad-hoc libs",
+  "framework": "[br]",
   "is lib": true
 }

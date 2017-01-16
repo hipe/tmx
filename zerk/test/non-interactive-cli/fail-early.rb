@@ -246,6 +246,7 @@ module Skylab::Zerk::TestSupport
       # -- convenience functions
 
       def unstyle_styled line
+        # (this could be better integrated but for now meh KISS)
         Home_::CLI_::Remote_lib[]::Styling::Unstyle_styled[ line ]
       end
     end
@@ -446,8 +447,8 @@ module Skylab::Zerk::TestSupport
           else
             exp.assert_against_under act, @test_context
           end
+          NIL
         end
-        NIL
       end
 
       def finished_invoking_notify
@@ -883,7 +884,6 @@ module Skylab::Zerk::TestSupport
       def execute
         super
         @proc[ @actual_emission.string ]
-        NIL
       end
     end
 

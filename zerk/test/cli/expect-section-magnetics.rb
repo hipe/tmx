@@ -8,6 +8,8 @@ module Skylab::Zerk::TestSupport
     # to parse a help screen with a state machine. the scope of the file
     # has been broadened to become general support for the siblings.
 
+    # this is now painfully similiar to [#054.3] but for a very different purpose
+
     module CommonBranchUsageLineIndex_via_Line
 
       # parse a line like this:
@@ -184,10 +186,12 @@ module Skylab::Zerk::TestSupport
 
         use_additional_desc_rx = nil
         use_nonfirst_item_rx = nil
+        nonfirst_item_indented_by_four_rx = nil
+
         setup_shop = -> md do
           setup_shop = nil
 
-          beg, en = md.offset( :spacer )
+          beg, en = md.offset :spacer
 
           use_nonfirst_item_rx = %r(\A
             (?<column_one>.{#{ beg }})
@@ -195,11 +199,16 @@ module Skylab::Zerk::TestSupport
             (?<desc1>[^ ].*)
           $)x
 
+          nonfirst_item_indented_by_four_rx = %r(\A
+            (?<column_one>[ ]{#{ beg }})
+            [ ]{2}
+            (?<desc1>[ ]{4}[^ ].*)
+          $)x
+
           use_additional_desc_rx = %r(\A
             [ ]{#{ en }}
             (?<desc>[^ ].*)
           $)x
-
         end
 
         o.add_state(
@@ -241,7 +250,17 @@ module Skylab::Zerk::TestSupport
         )
 
         _nonfirst_item_rx = Matcher__.new do |s|
-          use_nonfirst_item_rx.match s
+
+          # pretty awful
+
+          md = use_nonfirst_item_rx.match s
+          if ! md
+            md = nonfirst_item_indented_by_four_rx.match s
+            if ! md
+              self._YOU_MIGHT_WANT_TO_CHANGE_TACK
+            end
+          end
+          md
         end
 
         o.add_state(

@@ -24,7 +24,7 @@ a small sliver of strain, however, appeared when we wanted to apply
 this useful pattern to cases where the "representational structure"
 was "normal", but something other than a hash.
 
-(speficially, we mean filesystem directories and/or autoloaderized
+(specifically, we mean filesystem directories and/or autoloaderized
 modules. at writing these use-cases are undergoing full overhaul to
 be corraled into this new moving-target API. implementors are tracked
 with [#subject]. even more volatile information than this should be

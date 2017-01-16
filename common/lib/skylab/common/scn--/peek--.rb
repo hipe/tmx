@@ -8,7 +8,7 @@ module Skylab::Common
       # like this
       #
       #     _scn = Basic_::List.line_stream %i( a b )
-      #     scn = Home_::Scn.peek.gets_under _scn
+      #     scn = Home_::SimpleStream.peek.gets_under _scn
       #     scn.gets  # => :a
       #     scn.peek  # => :b
       #     scn.gets  # => :b
@@ -47,3 +47,4 @@ module Skylab::Common
     end
   end
 end
+# #pending-rename during #open [#044.1]

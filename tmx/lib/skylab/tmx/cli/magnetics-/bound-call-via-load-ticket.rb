@@ -44,7 +44,7 @@ module Skylab::TMX
           _argv = remove_instance_variable :@__ARGV_for_sidesystem
 
           o = @CLI
-          _cli = _cli_class.new _argv, o.sin, o.sout, o.stderr, _pn_s_a do
+          _cli = _cli_class.new _argv, o.stdin, o.stdout, o.stderr, _pn_s_a do
             o  # for special resources
           end
           _ = _cli.to_bound_call  # ..
@@ -53,7 +53,7 @@ module Skylab::TMX
 
         def __init_ARGV_for_sidesystem
 
-          _scn = @CLI.release_argument_scanner_for_sidesystem_mount__
+          _scn = @CLI.release_argument_scanner_for_mounted_operator
           d, argv = _scn.close_and_release
           if @is_for_help
             argv.replace [ HELP_SWITCH_LONG_, * argv[ d .. -1 ] ]

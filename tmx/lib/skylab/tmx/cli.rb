@@ -27,8 +27,8 @@ module Skylab::TMX
         @selection_stack = [ __build_root_frame ]
         @verbose_count_ = 0
 
-        @sin = sin
-        @sout = sout
+        @stdin = sin
+        @stdout = sout
         @stderr = serr
         @program_name_string_array = pn_s_a
       end
@@ -151,12 +151,16 @@ module Skylab::TMX
           __add_sidesystem_mounter_lazily o
         end
 
+        fi.add_lazy_operators_injection_by do |o|
+          __add_one_off_mounter_lazily o
+        end
+
         fi.add_primaries_injection PRIMARIES___, self
       end
 
       def __add_sidesystem_mounter_lazily inj
 
-        _inst = __installation
+        _inst = _installation
 
         ssm = CLI::Magnetics_::OperatorBranch_via_InstalledSidesystems.define do |o|
           o.CLI = self
@@ -168,7 +172,22 @@ module Skylab::TMX
         @__sidesys_mounter = ssm ; nil
       end
 
-      def __installation  # #testpoint
+      def __add_one_off_mounter_lazily inj
+
+        _inst = _installation
+
+        ob = Zerk_lib_[]::Magnetics::OperatorBranch_via_Directory.call_by do |o|
+          o.sidesystem_module = Home_
+          o.glob_entry = "#{ _inst.participating_exe_prefix }*"
+          o.filesystem_for_globbing = __filesystem_for_globbing
+        end
+
+        inj.operators = ob
+        inj.injector = :tmx_mountable_one_off
+        @__one_off_mounter = ob ; nil
+      end
+
+      def _installation  # #testpoint
         Home_.installation_
       end
 
@@ -186,15 +205,9 @@ module Skylab::TMX
           OperatorAdapter_for_Intrinsic___.new lu, self
         when :tmx_mountable_sidesystem
           OperatorAdapter_for_MountableSidesystem___.new lu, self
-        else
-          self._ETC__easy_esque__
-        end
-      end
-
-      def __WAS_bound_call
-        # ..
-        if __head_matches_mountable_one_off_executable
-          __bound_call_for_mountable_one_off_executable
+        when :tmx_mountable_one_off
+          @_express = :__receive_exitstatus_of_one_off
+          lu.mixed_business_value.TO_OPERATOR_ADAPTER_FOR self
         end
       end
 
@@ -320,7 +333,7 @@ module Skylab::TMX
         if @_table_schema
           __attempt_to_render_a_table_in_a_general_way x
         elsif x.respond_to? :id2name
-          @sout.puts x.to_s  # for `ping`
+          @stdout.puts x.to_s  # for `ping`
         else
           _express_stream_of_string_or_name x
         end
@@ -440,79 +453,6 @@ module Skylab::TMX
         NOTHING_
       end
 
-      # -- (experimental) mounting of one-off executables
-
-      def __head_matches_mountable_one_off_executable
-
-        self._NOT_COVERED
-
-        col = __build_one_off_operator_branch
-
-        _init_selective_listener
-
-        _as = _multimode_argument_scanner_by do |o|
-          o.user_scanner _user_scanner
-          o.emit_into @listener
-        end
-
-        o = _as.match_branch(
-          :business_item, :passively, :exactly, :against_branch, col )
-
-        if o
-          @__one_off_branch_item = o ; ACHIEVED_
-        else
-          @__one_off_dir_operator_branch = col ; UNABLE_
-        end
-      end
-
-      def __build_one_off_operator_branch
-
-        self._NOT_COVERED
-
-        remove_instance_variable :@__installation  # #todo
-
-        cls = Zerk_lib_[]::ArgumentScanner.__OperatorBranch_via_Directory  # [#ze-052]
-
-        cls.define do |o|
-
-          o.directory ::File.join( Home_.sidesystem_path_, 'bin' )
-
-          o.parent_module_of_executables Home_
-
-          o.mandatory_prefix_to_disregard 'tmx-'  ; self._CHANGE_readme_ # get this from installation
-
-          o.item_class cls::OneOff  # ..
-
-          o.filesystem_function_implementors ::Dir, ::File, ::Kernel
-        end
-      end
-
-      def __bound_call_for_mountable_one_off_executable
-
-        @argv.advance_one
-
-        _branch = remove_instance_variable :@__one_off_branch_item
-
-        one_off = _branch.branch_item_value
-
-        one_off.terminal_name
-
-        _pn_s_a = [ * @program_name_string_array, one_off.terminal_name.as_slug ]
-
-        _argv = remove_instance_variable( :@argv ).flush_remaining_to_array
-
-        @_express = :__express_result_of_one_off_executable
-
-        one_off.to_bound_call_via_standard_five_resources(
-          _argv, @sin, @sout, @serr, _pn_s_a )
-      end
-
-      def __express_result_of_one_off_executable d
-        d.respond_to? :bit_length || self._NON_COMPLIANT_ONE_OFF_EXECUTABLE
-        @exitstatus = d
-        NIL
-      end
-
       # -- support for customizing emissions
 
       def on_this_do_this k, & p  # k = terminal_channel_symbol
@@ -614,7 +554,7 @@ module Skylab::TMX
         st = _design.line_stream_via_mixed_tuple_stream row_st
 
         while line = st.gets
-          @sout.puts line
+          @stdout.puts line
         end
 
         NIL
@@ -640,7 +580,7 @@ module Skylab::TMX
       end
 
       def __expresser_for_string_or_name x
-        sout = @sout
+        sout = @stdout
         if x.respond_to? :ascii_only?
           -> line do
             sout.puts line  # hi.
@@ -768,6 +708,12 @@ module Skylab::TMX
         UNABLE_
       end
 
+      def __receive_exitstatus_of_one_off d
+        d.respond_to? :bit_length || self._NON_COMPLIANT_ONE_OFF_EXECUTABLE
+        @exitstatus = d
+        NIL
+      end
+
       def _no_op
         NOTHING_
       end
@@ -781,6 +727,10 @@ module Skylab::TMX
       def filesystem_proc  # [ts]
         _always_needed = Home_.lib_.system.filesystem
         -> { _always_needed }
+      end
+
+      def __filesystem_for_globbing  # #testpoint
+        ::Dir
       end
 
       # ~
@@ -831,9 +781,10 @@ module Skylab::TMX
         NIL
       end
 
-      def release_argument_scanner_for_sidesystem_mount__
+      def release_argument_scanner_for_mounted_operator  # 1x here 1x [ze]
 
         # (when having succeeded in mounting a participating sidesystem,
+        #  (and now one-off),
         #  we want to make it clear that we ourselves are totally done
         #  parsing (or otherwise referencing) arguments)
 
@@ -851,8 +802,8 @@ module Skylab::TMX
         :program_name_string_array,
         :selection_stack,
         :stderr,
-        :sin,
-        :sout,
+        :stdin,
+        :stdout,
         :verbose_count_,
       )
     end

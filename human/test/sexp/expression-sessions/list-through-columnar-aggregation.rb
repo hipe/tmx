@@ -72,7 +72,7 @@ module Skylab::Human::TestSupport
 
     def bld_input_scn
       @a_a = []
-      Common_::Scn.new do
+      Common_::SimpleStream.by do
         @a_a.shift
       end
     end

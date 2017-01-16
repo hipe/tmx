@@ -44,6 +44,11 @@ class TMX_snap
           @exitstatus = YEP__
           __express_help
 
+        elsif '--ping' == @argv.current_token
+          @_operation_method_name = :__do_ping
+          @exitstatus = YEP__
+          _flush_bound_call_via_operation_method_name
+
         elsif __parse_operation_name
           @exitstatus = YEP__
           _flush_bound_call_via_operation_method_name
@@ -231,6 +236,11 @@ class TMX_snap
         NIL
       end
 
+      def __do_ping
+        @serr.puts "hello from #{ @program_name_string_array * SPACE_ }!"
+        NIL
+      end
+
       # --
 
       def __describe_commit
@@ -346,7 +356,7 @@ class TMX_snap
         money = -> * s_a do
           s_a.unshift git
           _eew = [ * s_a[ 0 .. -2 ], ::Shellwords.shellescape( s_a.last ) ]
-          @serr.puts "  >>>> #{ _eew.join ' ' }"  # SPACE_
+          @serr.puts "  >>>> #{ _eew.join SPACE_ }"
 
           _EEEGADS s_a
         end
@@ -484,7 +494,7 @@ class TMX_snap
       end
 
       def _program_name
-        ::File.basename @program_name_string_array.last
+        ::File.basename @program_name_string_array * SPACE_
       end
 
       def _flush_bound_call_via_operation_method_name
@@ -503,6 +513,7 @@ class TMX_snap
     HELP_RX__ = %r(\A--?h(?:e(?:l(?:p)?)?)?\z)
     NOPE__ = 5
     NOTHING_ = nil
+    SPACE_ = ' '
     UNABLE_ = false
     YEP__ = 0
 

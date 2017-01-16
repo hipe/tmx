@@ -110,6 +110,7 @@ module Skylab::Common
         Stream_::With_Random_Access__
       end
 
+      alias_method :by, :new  # to look like `SimpleStream` in one place
     end  # >>
 
     def initialize x=nil, & p

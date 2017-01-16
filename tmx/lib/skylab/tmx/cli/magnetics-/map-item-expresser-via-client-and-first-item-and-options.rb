@@ -112,7 +112,7 @@ module Skylab::TMX
       end
 
       def _build_output_line_yielder
-        sout = @client.sout
+        sout = @client.stdout
         ::Enumerator::Yielder.new do |line|
           sout.puts line  # hi.
         end

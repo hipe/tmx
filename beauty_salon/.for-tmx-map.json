@@ -1,4 +1,5 @@
 {
   "after":"treemap",
-  "category":"legacy ad-hoc util"
+  "category":"legacy ad-hoc util",
+  "framework": "[br]"
 }

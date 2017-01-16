@@ -189,7 +189,7 @@ module Skylab::Brazen
         def to_body_line_stream
           nscn = to_node_stream
           lscn = nil
-          Common_::Scn.new do
+          Common_::SimpleStream.by do
             while true
               if lscn
                 x = lscn.gets
@@ -251,12 +251,12 @@ module Skylab::Brazen
         end
 
         def _to_node_scn_via_symbol sym
-          _to_node_streamish Common_::Scn, sym
+          _to_node_streamish Common_::SimpleStream, sym
         end
 
         def _to_node_streamish cls, i
           d = -1 ; last = @a.length - 1
-          cls.new do
+          cls.by do
             while d < last
               d += 1
               if i == @a[ d ].category_symbol

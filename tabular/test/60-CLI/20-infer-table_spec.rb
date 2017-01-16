@@ -130,6 +130,10 @@ module Skylab::Tabular::TestSupport
 
       expect_usage_line_
       expect_empty_puts
+
+      expect %r(\Asynopsis: [a-z])i
+      expect_empty_puts
+
       expect 'options:'
 
       spy = _once_asserter.once

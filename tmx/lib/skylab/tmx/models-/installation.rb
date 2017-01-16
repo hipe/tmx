@@ -20,21 +20,6 @@ module Skylab::TMX
       :single_gems_dir,
     )
 
-    def to_reflective_sidesystem_stream__
-
-      self._NOT_USED__was_once__
-
-      # 2x [sli] both times probably not covered:
-      # 1x to make the sidesystem dependencies graph
-      # 1x a not covered one-off for symlinking gems to a dev dir
-
-      cls = Home_::Models_::Node::Reflective
-
-      to_sidesystem_load_ticket_stream.map_by do | lt |
-        cls.via_load_ticket lt
-      end
-    end
-
     def to_sidesystem_manifest_stream
       Home_::Magnetics_::ManifestStream_via_Installation[ self ]
     end

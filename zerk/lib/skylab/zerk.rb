@@ -43,23 +43,6 @@ module Skylab::Zerk  # intro in [#001] README
 
   # == model support
 
-  class SimpleModel_  # EXPERIMENT import from [tab]
-
-    class << self
-      alias_method :define, :new
-      undef_method :new
-    end  # >>
-
-    def initialize  # (a suggestion)
-      yield self
-      freeze
-    end
-
-    # redefine ..
-
-    private :dup
-  end
-
   class MonadicMagneticAndModel_
     class << self
       alias_method :call, :new
@@ -95,7 +78,30 @@ module Skylab::Zerk  # intro in [#001] README
     Common_::Stream.via_nonsparse_array a, & p  # on stack to move up
   end
 
+  # == stowaways
+
+  Autoloader_ = Common_::Autoloader
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
+
+  module Invocation_
+    Autoloader_[ self ]
+    Here_ = self
+  end
+
+  lazily :Actor_via_SimpleModel_ do
+    No_deps_zerk_[]::Actor_via_SimpleModel
+  end
+
+  lazily :SimpleModel_ do
+    No_deps_zerk_[]::SimpleModel
+  end
+
   # == requirers
+
+  No_deps_zerk_ = Lazy_.call do
+    require 'no-dependencies-zerk'
+    ::NoDependenciesZerk
+  end
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS
@@ -109,15 +115,6 @@ module Skylab::Zerk  # intro in [#001] README
 
   Basic_ = Lazy_.call do
     Home_.lib_.basic
-  end
-
-  # == orphanic stowaways
-
-  Autoloader_ = Common_::Autoloader
-
-  module Invocation_
-    Autoloader_[ self ]
-    Here_ = self
   end
 
   # == canonic
@@ -153,8 +150,6 @@ module Skylab::Zerk  # intro in [#001] README
 
     Tabular = sidesys[ :Tabular ]
   end
-
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   DASH_ = '-'

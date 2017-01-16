@@ -2,7 +2,11 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_MultipleEntities
+    class OperatorBranch_via_MultipleEntities  # :[#051.E].
+
+      # NOTE :#open: this needs to be de-duped with the new work
+      # in "no-deps" near its own feature injection. ideally this node
+      # would just go away in lieu of that..
 
       # #[#051] :[#053] - this is currently *the* center of implementation
       # for "feature injection". (theory at document.)
@@ -123,7 +127,7 @@ module Skylab::Zerk
 
             p = ob.method :dereference
 
-            ob.to_normal_symbol_stream.map_by do |k|
+            ob.to_load_ticket_stream.map_by do |k|
 
               Common_::Pair.via_value_and_name( _special_value( vs, p[k] ), k )
             end
@@ -134,12 +138,12 @@ module Skylab::Zerk
           end
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
 
           Common_::Stream.via_times @_count do |d|
             @_operator_braches.fetch d
           end.expand_by do |ob|
-            ob.to_normal_symbol_stream
+            ob.to_load_ticket_stream
           end
         end
 

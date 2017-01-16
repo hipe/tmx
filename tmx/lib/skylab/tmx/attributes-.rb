@@ -87,6 +87,16 @@ module Skylab::TMX
 
     end
 
+    class Attributes_::Framework
+
+      def initialize(*)
+
+      end
+
+      KEY = :framework
+      Order_commonly__[ self ]
+    end
+
     class Attributes_::IsPotentiallyInterestingApplication
 
       def initialize(*)

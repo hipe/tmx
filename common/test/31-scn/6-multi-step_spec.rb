@@ -8,7 +8,7 @@ module Skylab::Common::TestSupport
 
       a = d = last = nil
 
-      scn = Home_::Scn.multi_step :init, -> do
+      scn = Home_::SimpleStream.multi_step :init, -> do
         a = [ :a, :b, :c ] ; d = -1 ; last = a.length - 1
       end, :gets, -> do
         a.fetch( d += 1 ) if d < last

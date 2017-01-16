@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_VIA_MODULE
+    class OperatorBranch_VIA_MODULE  # :[#051.B]
 
       # NOTE this is not covered, hence the scream-case. this is being
       # bleeding-edged by [tab].
@@ -17,8 +17,10 @@ module Skylab::Zerk
       #
       # if, alternately, you are not using boxxy *and* all your nodes are
       # defined on the filesystem (and isomorphically at that -- no stowaways, 
-      # one file-or-directory per-node); then use
-      # `OperatorBranch_via_AutoloaderizedModule` instead.
+      # one file-or-directory per-node); then look at
+      #
+      #   - [#051.C] (for autoloaderized modules) and
+      #   - [#051.G] (for directories thru filesystem directly; no autoloading)
 
       class << self
         alias_method :define, :new
@@ -75,7 +77,7 @@ module Skylab::Zerk
           @_index.__to_pair_stream_
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
           @_index.__to_normal_symbol_stream_
         end
 

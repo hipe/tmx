@@ -4,6 +4,8 @@ module Skylab::TanMan
 
     # ~ experimental front client customizations:
 
+    expose_executables_with_prefix 'tmx-tan-man-'
+
     Branch_Adapter = Branch_Adapter
 
     class Action_Adapter < Action_Adapter

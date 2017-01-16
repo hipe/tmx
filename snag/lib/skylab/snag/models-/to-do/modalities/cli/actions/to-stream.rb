@@ -354,7 +354,7 @@ module Skylab::Snag
 
       def via_cache_build_stream
         d = -1 ; last = @cache_a.length - 1
-        Common_::Scn.new do
+        Common_::SimpleStream.by do
           if d < last
             line_via_item @cache_a.fetch d += 1
           end

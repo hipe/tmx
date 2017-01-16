@@ -49,7 +49,7 @@ module Skylab::Basic
     Plugin = sidesys[ :Plugin ]
 
     Scn_lib = -> do
-      Common_::Scn
+      Common_::SimpleStream
     end
 
     Set = -> * a do

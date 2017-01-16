@@ -251,8 +251,8 @@ module Skylab::TestSupport
 
     def to_item_normal_tuple_stream_for_didactics
 
-      @_operator_branch.to_normal_symbol_stream.map_by do |sym|
-        [ :primary, sym ]
+      @_operator_branch.to_load_ticket_stream.map_by do |key_x|
+        [ :primary, key_x ]
       end
     end
 

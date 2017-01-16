@@ -218,7 +218,7 @@ module Skylab::Human
             aggregator.flush
           end
         end
-        Common_::Scn.new do
+        Common_::SimpleStream.by do
           p[]
         end
       end

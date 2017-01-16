@@ -1,5 +1,6 @@
 {
   "after":"system",
   "category":"more general libs",
+  "framework": "[br]",
   "is lib":true
 }

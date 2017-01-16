@@ -44,6 +44,8 @@ module Skylab::Tabular
 
         _express_usage
         @stderr.puts
+        @stderr.puts "synopsis: generate an ASCII table from lines of data"
+        @stderr.puts
         @stderr.puts "options:"
 
         # #open [#007.D] we probably should not be rolling our own help screen

@@ -170,11 +170,6 @@ module Skylab::Zerk::TestSupport
 
   # --
 
-  No_deps_zerk_ = Lazy_.call do
-    require 'no-dependencies-zerk'
-    ::NoDependenciesZerk
-  end
-
   # --
 
   Autoloader__[ self, ::File.dirname( __FILE__ ) ]
@@ -187,6 +182,7 @@ module Skylab::Zerk::TestSupport
   EMPTY_S_ = "".freeze
   MONADIC_EMPTINESS_ = Home_::MONADIC_EMPTINESS_
   NEWLINE_ = Home_::NEWLINE_
+  No_deps_zerk_ = Home_::No_deps_zerk_
   NIL_ = nil
   NOTHING_ = Home_::NOTHING_
   SPACE_ = Home_::SPACE_

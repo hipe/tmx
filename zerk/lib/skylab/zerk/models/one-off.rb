@@ -49,86 +49,6 @@ module Skylab::Zerk
 
     # ==
 
-    class NOT_COVERED__ArgumentScanner__OperatorBranch_via_Directory
-
-      # an adaptation of #[#051] for directories (probably "bin/"-like)
-
-      class << self
-        alias_method :define, :new
-        undef_method :new
-      end  # >>
-
-      def initialize
-        @prefix = nil
-        yield self
-        freeze
-      end
-
-      # -- definition time
-
-      def directory dir
-        @directory = dir ; nil
-      end
-
-      def parent_module_of_executables mod
-
-        # (for now we are optimistic that this will result in a read success)
-
-        @__up_const_path = mod.name.split Common_::CONST_SEPARATOR
-        NIL
-      end
-
-      def mandatory_prefix_to_disregard s
-        @prefix = s ; nil
-      end
-
-      def item_class cls
-        @item_class = cls ; nil
-      end
-
-      def filesystem_function_implementors globber, fs, loader
-        @filesystem = fs
-        @globber = globber
-        @loader = loader ; nil
-      end
-
-      # -- read time
-
-      def emit_idea_by
-        NOTHING_  # use default expression. (can be exposed if needed.)
-      end
-
-      def lookup_softly k
-
-        name = _name_via_key k
-        path = _path_via_name name
-
-        if @filesystem.file? path
-          _item_via path, name
-        end
-      end
-
-      def entry_value k
-
-        name = _name_via_key k
-        _item_via _path_via_name( name ), name
-      end
-
-      def _item_via path, nm
-        @item_class.new path, nm, @__up_const_path, @loader
-      end
-
-      def _path_via_name nm
-        ::File.join @directory, "#{ @prefix }#{ nm.as_slug }"
-      end
-
-      def _name_via_key k
-        Common_::Name.via_lowercase_with_underscores_symbol k
-      end
-    end
-
-    # ==
-
     class LEGACY_OneOff_as_Bound__  # will re-open
 
       def bound_call_under fr, & _oes_p  # [tmx]
@@ -147,24 +67,47 @@ module Skylab::Zerk
       def __build_description_proc
 
         one_off = @_one_off
-        -> y do
 
-          _proc_like = one_off.require_proc_like
+        -> y do
 
           _syno = Home_::CLI::SynopsisLines_via_HelpScreen.define do |o|
             o.number_of_synopsis_lines = 1
           end
 
-          _pnsa = one_off.program_name_tail_string_array  # meh
-
-          _argv = HELP_ARGV.dup  # those that use optparse consume
-
-          _lines = _syno.synopsis_lines_by do |serr|
-            _proc_like[ _argv, DUMMY_STDIN, :_no_sout_zerk_, serr, _pnsa ]
+          _lines = _syno.synopsis_lines_by do |downstream|
+            one_off.express_help_by do |o|
+              o.program_name_head_string_array = NOTHING_  # meh
+              o.downstream = downstream
+            end
           end
 
           y << _lines.fetch( 0 )
         end
+      end
+    end
+
+    # ==
+
+    class ExpressHelp_via___ < Home_::Actor_via_SimpleModel_
+
+      attr_writer(
+        :downstream,
+        :one_off,
+        :program_name_head_string_array,
+      )
+
+      def execute
+
+        _proc_like = @one_off.require_proc_like
+
+        _pnsa = [ * @program_name_head_string_array,
+          * @one_off.program_name_tail_string_array ]
+
+        _argv = HELP_ARGV___.dup  # those that use optparse consume
+
+        _es = _proc_like[ _argv, DUMMY_STDIN___, :_no_sout_zerk_, @downstream, _pnsa ]
+
+        _es
       end
     end
 
@@ -184,6 +127,19 @@ module Skylab::Zerk
         :path,         # e.g "/Users/haxor/.gem/ruby/[..]/bin/tmx-meep-mop-frob-jibbers
         :slug_tail,    # e.g "frob-jibbers"
       )
+
+      # --
+
+      def TO_OPERATOR_ADAPTER_FOR cli
+        Home_::Magnetics::OperatorBranch_via_Directory::OA.new self, cli
+      end
+
+      def express_help_by
+        ExpressHelp_via___.call_by do |o|
+          yield o
+          o.one_off = self
+        end
+      end
 
       # --
 
@@ -250,7 +206,19 @@ module Skylab::Zerk
       # --
 
       def program_name_tail_string_array
-        [ @load_ticket.slug, slug ]
+
+        # we do *not* prepend `@load_ticket.slug` here - that should be
+        # expressed in the `program_name_head_string_array`
+
+        [ slug ]
+      end
+
+      def intern  # to compat with branches that use symbols for load tickets
+        normal_symbol
+      end
+
+      def normal_symbol
+        @___normal_symbol ||= slug.gsub( DASH_, UNDERSCORE_ ).intern
       end
 
       def slug
@@ -279,6 +247,10 @@ module Skylab::Zerk
         :load_ticket,
         :path,
       )
+
+      def category_symbol
+        :zerk_one_off_category_symbol
+      end
     # -
 
     # ==
@@ -325,7 +297,7 @@ module Skylab::Zerk
       # ===
     # ==
 
-    module DUMMY_STDIN ; class << self
+    module DUMMY_STDIN___ ; class << self
       def tty?
         false
       end
@@ -337,7 +309,7 @@ module Skylab::Zerk
 
     # ==
 
-    HELP_ARGV = %w( --help ).freeze
+    HELP_ARGV___ = %w( --help ).freeze
 
     # ==
   end

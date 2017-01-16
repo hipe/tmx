@@ -55,11 +55,6 @@ module Skylab::TMX
 
     Stemmish___ = ::Struct.new :stem
 
-    def lookup_sidesystem entry_s
-      self._NOT_USED
-      installation_.lookup_reflective_sidesystem__ entry_s
-    end
-
     def to_reflective_sidesystem_stream
       installation_.to_reflective_sidesystem_stream__
     end

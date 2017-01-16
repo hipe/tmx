@@ -25,7 +25,12 @@ module Skylab::BeautySalon
   end  # >>
 
   lazily :CLI do
-    ::Class.new Home_.lib_.brazen::CLI
+    class CLI < Home_.lib_.brazen::CLI
+
+      expose_executables_with_prefix 'tmx-beauty-salon-'
+
+      self
+    end
   end
 
   module API
@@ -65,7 +70,7 @@ module Skylab::BeautySalon
     end
 
     List_scanner = -> x do
-      Common_::Scn.try_convert x
+      Common_::SimpleStream.try_convert x
     end
 
     ST__ = sidesys[ :SubTree ]

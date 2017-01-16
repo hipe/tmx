@@ -174,7 +174,7 @@ module Skylab::TMX::TestSupport
 
       mock_inst = mock_installation_
 
-      cli.send :define_singleton_method, :__installation do
+      cli.send :define_singleton_method, :_installation do  # per :#testpoint
         mock_inst
       end
 

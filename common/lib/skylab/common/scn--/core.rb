@@ -29,7 +29,7 @@ module Skylab::Common
     #
     #     scn_via = Home_.lib_.basic::List.line_stream.method :new
     #
-    #     scn = Home_::Scn.aggregate(
+    #     scn = Home_::SimpleStream.aggregate(
     #       scn_via[ [ :a, :b ] ],
     #       scn_via[ [] ],
     #       scn_via[ [ :c ] ],
@@ -191,3 +191,4 @@ module Skylab::Common
     end
   end
 end
+# #pending-rename during #open [#044.1]

@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Models::Invocation < SimpleModel_  # 1x here, 1x [tab]
+    class Models::Invocation < Home_::SimpleModel_  # 1x here, 1x [tab]
 
       # the subject's objective is to keep the main rendering logic as
       # ignorant as possible about everything to do with setting up and

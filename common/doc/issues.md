@@ -59,6 +59,8 @@
              ( #was: actor patterns. moved to [#fi-016] )
 
 [#044]       #parent-node: [#049] the stream narrative ..
+       #open  [#here.1]  (explained in document)
+
 [#043]       #doc-node: the subscriptions narrative ..
 
 [#042] #open easy refactor (see)

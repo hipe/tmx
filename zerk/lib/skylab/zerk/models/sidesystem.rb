@@ -111,11 +111,56 @@ module Skylab::Zerk
 
       def to_one_off_scanner_by
         Home_::Magnetics_::OneOffScanner_via_LoadTicket.call_by do |o|
-          o.entry_glob = ONE_OFF_ENTRY_GLOB___
+          o.glob_entry = ONE_OFF_GLOB_ENTRY___
           o.filesystem = ::Dir
           yield o
           o.load_ticket = self
         end
+      end
+
+      # --
+
+      def dereference_one_off_via_entry entry
+
+        exe = ::File.join conventional_executable_directory_, entry
+        _rx = regexp_for_path_head_of_conventional_one_off_
+        md = _rx.match exe
+        if md
+          _slug_tail = md.post_match
+        end
+        Models::OneOff.define do |o|
+          o.slug_tail = _slug_tail
+          o.path = exe
+          o.load_ticket = self
+        end
+      end
+
+      def regexp_for_path_head_of_conventional_one_off_
+        @___rx ||= %r(\A#{ ::Regexp.escape eponymous_executable_path_guess_ }#{ DASH_ })
+      end
+
+      def eponymous_executable_path_guess_
+        @___exponymous_exe ||= __eponymous_exe
+      end
+
+      def __eponymous_exe
+
+        pfx = @gem_name_elements.exe_prefix
+        slug = self.slug
+        head = conventional_executable_directory_
+
+        if pfx.include? slug and pfx[ 0 ... -1 ] == slug
+
+          # the eponymous head for the [tmx] sidesystem is "tmx", not "tmx-tmx"
+
+          ::File.join head, slug
+        else
+          ::File.join head, "#{ pfx }#{ slug }"
+        end
+      end
+
+      def conventional_executable_directory_
+        @___bin_dir ||= ( ::File.join @gem_name_elements.gem_path, BIN___ )
       end
 
       # --
@@ -159,8 +204,8 @@ module Skylab::Zerk
         :gem_name_elements,
       )
 
-      def IS_LOAD_TICKET_tmx_  # temporary
-        true
+      def category_symbol
+        :zerk_sidesystem_load_ticket_category_symbol
       end
     end
 
@@ -239,7 +284,8 @@ module Skylab::Zerk
     # ==
 
     ALL_CAPS___ = /\A[A-Z0-9_]+\z/
-    ONE_OFF_ENTRY_GLOB___ = 'tmx-*'  # don't pickup special ones like `git-stash-untracked`
+    BIN___ = 'bin'
+    ONE_OFF_GLOB_ENTRY___ = 'tmx-*'  # don't pickup special ones like `git-stash-untracked`
 
     # ==
   end

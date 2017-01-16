@@ -62,7 +62,7 @@ module Skylab::Treemap
 
     Build_line_object_upstream_via_line_upstream___ = -> line_upstream do
 
-      Common_::Scn.new do
+      Common_::SimpleStream.by do
         line_s = line_upstream.gets
         if line_s
           Home_::Models::Node::Legacy.new line_s, line_upstream.lineno
@@ -157,7 +157,7 @@ module Skylab::Treemap
         o
       end
 
-      Common_::Scn.new do
+      Common_::SimpleStream.by do
         p[]
       end
     end

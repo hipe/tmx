@@ -22,12 +22,13 @@ module Skylab::TMX
           _  # #todo
         end
 
-        def dereference symbol_or_load_ticket
-          symbol_or_load_ticket.IS_LOAD_TICKET_tmx_ || self._OK_FINE  # [#ze-062]
-          symbol_or_load_ticket
+        def dereference lt
+          _sym = lt.category_symbol  # [#ze-062]
+          :zerk_sidesystem_load_ticket_category_symbol == _sym || self._OK_FINE
+          lt
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
 
           # this comports with "no-deps" [ze] which nominally works in
           # symbols but actually (and experimentally) we use load tickets

@@ -90,13 +90,6 @@ end
 
 # -- send request for help
 
-dummy_sin = -> do
-  FALSE
-end
-class << dummy_sin
-  alias_method :tty?, :call
-end
-
 listener = nil
 require_listener = -> do
   require_listener = nil
@@ -113,21 +106,17 @@ require_listener = -> do
 end
 
 money_thing = nil
-prepare_for_the_crazy_thing = -> do
+fake_pnsa_head = %w( tmz ).freeze
 
-  require_listener[]
-  require 'skylab/zerk'
-  money_thing = Skylab::Zerk::CLI::SynopsisLines_via_HelpScreen.define do |o|
-    o.number_of_synopsis_lines = 3  # meh
-    o.listener = listener
-  end
-  NIL
-end
-
-do_the_crazy_thing = -> argv, pns_a, proc_like, one_off do
+show_the_summary_lines_of_help_via_one_off = -> one_off do
 
   _lines = money_thing.synopsis_lines_by do |downstream_proxy|
-    proc_like[ argv, dummy_sin, :_no_sout_tmx_, downstream_proxy, pns_a ]
+
+    one_off.express_help_by do |o|
+      o.program_name_head_string_array = fake_pnsa_head
+      o.downstream = downstream_proxy
+    end
+    # (don't bother trying to read exitstatus - the throw hack often interrupts it)
   end
 
   _lines.each do |line|
@@ -137,10 +126,13 @@ do_the_crazy_thing = -> argv, pns_a, proc_like, one_off do
   TRUE
 end
 
-do_something_normally = -> argv, pns_a, proc_like, one_off do
+show_all_lines_of_help_via_one_off = -> one_off do
 
   es = serr_for_one_off.call one_off do |downstream|
-    proc_like[ argv, dummy_sin, :_no_sout_tmx_, downstream, pns_a ]
+    one_off.express_help_by do |o|
+      o.program_name_head_string_array = fake_pnsa_head
+      o.downstream = downstream
+    end
   end
   if es.nonzero?
     fail
@@ -149,41 +141,27 @@ do_something_normally = -> argv, pns_a, proc_like, one_off do
   end
 end
 
-do_something = -> * fourish do
+via_one_off = -> one_off do
+
   if do_money
-    prepare_for_the_crazy_thing[]
-    do_something = do_the_crazy_thing
+
+    require_listener[]
+    require 'skylab/zerk'
+    money_thing = Skylab::Zerk::CLI::SynopsisLines_via_HelpScreen.define do |o|
+      o.number_of_synopsis_lines = 3  # meh
+      o.listener = listener
+    end
+    via_one_off = show_the_summary_lines_of_help_via_one_off
   else
-    do_something = do_something_normally
+    via_one_off = show_all_lines_of_help_via_one_off
   end
-  do_something[ * fourish ]
-end
-
-help_argv = %w(--help).freeze
-fake_pnsa_head = [ 'tmz' ].freeze
-
-request_help = -> proc_like, one_off do
-
-  _pnsa = [ * fake_pnsa_head, one_off.load_ticket.slug, one_off.slug ]
-
-  _mutable_argv = help_argv.dup  # those that use optparse need it
-
-  _ok = do_something[ _mutable_argv, _pnsa, proc_like, one_off ]
-  _ok
+  via_one_off[ one_off ]
 end
 
 # -- load one offs
 
 fmt = '%2d'
 special_prefix = '# '
-
-get_really_busy = -> counter, one_off do
-
-  _const = one_off.sub_top_level_const_guess
-  sout.puts "#{ special_prefix }one off #{ fmt % counter }: #{ _const } for #{ one_off.slug }"
-  _proc_like = one_off.require_proc_like
-  request_help[ _proc_like, one_off ]
-end
 
 # -- main
 
@@ -240,7 +218,9 @@ go = -> do
       one_off = scn.gets_one
       counter += 1
       if range_OK[]
-        stay = get_really_busy[ counter, one_off ]
+        _const = one_off.sub_top_level_const_guess
+        sout.puts "#{ special_prefix }one off #{ fmt % counter }: #{ _const } for #{ one_off.slug }"
+        stay = via_one_off[ one_off ]
       end
       stay || break
       scn.no_unparsed_exists && break
@@ -299,7 +279,10 @@ else
   o[ load_only_key ] = -> do
     o[ files_key ] = closed
     o[ money_key ] = closed
-    request_help = -> * { TRUE }
+    via_one_off = -> one_off do
+      one_off.require_proc_like  # load (because "load only")
+      TRUE
+    end
   end
   o[ begin_at_key ] = -> do
     o[ only_key ] = closed

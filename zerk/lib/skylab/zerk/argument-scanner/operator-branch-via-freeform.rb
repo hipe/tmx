@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_FREEFORM  # #cover-me 1x [ts]
+    class OperatorBranch_via_FREEFORM  # #cover-me 1x [ts]  :[#051.F].
 
       # #[#051] - experiment. (used by the client to let method-based
       # and filesystem-based operations live in the same compound operator
@@ -44,7 +44,7 @@ module Skylab::Zerk
           @_box.to_pair_stream
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
           @_box.to_name_stream
         end
       # -

@@ -116,6 +116,7 @@ module Skylab::TMX
           {
             tmx_intrinsic: true,
             tmx_mountable_sidesystem: _do_show_mountable_sidesystems,
+            tmx_mountable_one_off: true,
           }
         end
 
@@ -141,16 +142,55 @@ module Skylab::TMX
         end
       end
 
-      # ==
+      # == the describers.
 
       Same__ = ::Class.new
 
-      class SidesystemDescriber___
-        # the big loader
-        def initialize _cli
+      # ~
+
+      class OneOffDescriber___
+
+        def initialize cli
+          @CLI = cli
         end
+
+        def _description_proc_for_ one_off
+          cli = @CLI
+          -> y do
+            _lines = Synopsis_lineser___[].synopsis_lines_by do |downstream|
+              one_off.express_help_by do |o|
+                o.program_name_head_string_array = cli.program_name_string_array
+                o.downstream = downstream
+              end
+            end
+            _lines.each do |line|
+              y << line
+            end
+          end
+        end
+      end
+
+      Synopsis_lineser___ = Lazy_.call do
+        Zerk_::CLI::SynopsisLines_via_HelpScreen.define do |o|
+          o.number_of_synopsis_lines = 2
+        end
+      end
+
+      # ~
+
+      class SidesystemDescriber___
+
+        # the big loader
+
+        def initialize _cli
+          NOTHING_
+        end
+
         def _description_proc_for_  load_ticket
-          load_ticket.IS_LOAD_TICKET_tmx_ || fail
+
+          _ = load_ticket.category_symbol  # [#ze-062]
+          :zerk_sidesystem_load_ticket_category_symbol == _sym || self._SANITY
+
           -> y do
             _mod = load_ticket.require_sidesystem_module
             _mod.describe_into_under y, self
@@ -158,17 +198,24 @@ module Skylab::TMX
         end
       end
 
+      # ~
+
       class IntrinsicDescriber___ < Same__
         CONST = :OPERATOR_DESCRIPTIONS
       end
+
+      # ~
 
       class PrimaryDescriber___ < Same__
         CONST = :PRIMARY_DESCRIPTIONS
       end
 
+      # ~
+
       OPER_DESCRIBERS___ = {
         tmx_intrinsic: IntrinsicDescriber___,
         tmx_mountable_sidesystem: SidesystemDescriber___,
+        tmx_mountable_one_off: OneOffDescriber___,
       }
 
       class Same__

@@ -1,5 +1,6 @@
 {
   "after":"doc_test",
   "category":"actually useful",
+  "framework": "[ze] (iCLI)",
   "is potentially interesting application":true
 }

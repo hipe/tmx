@@ -173,7 +173,7 @@ module Skylab::Snag
         _send_info_string "none of the #{ @_total_count }#{
           } nodes in the collection are doc nodes."
 
-        Common_::Scn.the_empty_stream
+        Common_::SimpleStream.the_empty_stream
       end
 
       def _send_info_string  s

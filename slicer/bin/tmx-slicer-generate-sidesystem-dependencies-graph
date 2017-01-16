@@ -19,6 +19,9 @@ module Skylab::Slicer
         __go
       else
         express_usage
+        @stderr.puts
+        @stderr.puts "synopsis: interdependencies between sidesystems as .dot"
+        0
       end
     end
 

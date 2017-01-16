@@ -33,5 +33,7 @@ module Skylab::Git::TestSupport
       expect_specific_invite_line_to :ping
       expect_failed
     end
+
+    # (mounted one-offs are covered in "integration")
   end
 end

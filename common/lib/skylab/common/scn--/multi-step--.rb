@@ -42,3 +42,4 @@ module Skylab::Common
     end
   end
 end
+# #pending-rename during #open [#044.1]

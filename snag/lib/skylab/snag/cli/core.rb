@@ -8,12 +8,19 @@ module Skylab::Snag
     # action adapter, an exposure that calls one of two distinct model
     # actions depending on its arguments.
 
+    # awful alias method chain only #while #exist [br] and while #open [#co-044.1]
+
+    expose_executables_with_prefix 'tmx-snag-'
+
+    alias_method :__this_guy, :to_unordered_selection_stream
+
     def to_unordered_selection_stream
 
-      # this is :[#br-066] currently the only example of the code
-      # necessary to expose & implement a modality-only action adatper..
+      _tail_st = __this_guy
 
-      super.unshift_stream CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
+      _head_st = CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
+
+      _tail_st.unshift_stream _head_st
     end
 
     class Action_Adapter < Action_Adapter

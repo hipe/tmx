@@ -1,5 +1,6 @@
 {
   "category":"more general libs",
   "doc test manifest":".doc-test-manifest.list",
+  "framework": "[br]",
   "is lib": true
 }

@@ -67,7 +67,12 @@ module Skylab::TMX::TestSupport
         ZIM_ZUM_
       end
 
+      def participating_exe_prefix
+        MEH___
+      end
+
       CPH___ = %i( ZimZum ).freeze
+      MEH___ = 'PARTICI_EXE_PFX_NO_SEE-'
       ZIM_ZUM_ = 'zim_zum-'.freeze
     end
 

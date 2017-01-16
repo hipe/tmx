@@ -338,8 +338,8 @@ module Skylab::Zerk
 
         def __available_primary_name_stream_via_operator_branch ob
 
-          _st = ob.to_normal_symbol_stream.map_by do |sym|
-            [ :primary, sym ]
+          _st = ob.to_load_ticket_stream.map_by do |key_x|
+            [ :primary, key_x ]
           end
 
           altered_normal_tuple_stream_via( _st ).map_by do |tuple|
@@ -349,8 +349,8 @@ module Skylab::Zerk
 
         def __available_business_name_stream_via_operation_branch ob
 
-          ob.to_normal_symbol_stream.map_by do |sym|
-            Common_::Name.via_variegated_symbol sym
+          ob.to_load_ticket_stream.map_by do |key_x|
+            Common_::Name.via_variegated_symbol key_x.intern
           end
         end
 
@@ -376,8 +376,8 @@ module Skylab::Zerk
 
           if itr.has_addeds
 
-            _ = itr.addeds_as_operator_branchish.to_normal_symbol_stream.map_by do |sym|
-              [ :primary, sym ]
+            _ = itr.addeds_as_operator_branchish.to_load_ticket_stream.map_by do |key_x|
+              [ :primary, key_x ]
             end
 
             reduced_st.concat_stream _
@@ -1178,7 +1178,7 @@ module Skylab::Zerk
           @_box.to_pair_stream
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
           @_box.to_name_stream
         end
       end

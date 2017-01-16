@@ -239,7 +239,7 @@ module Skylab::Zerk
 
       # ==
 
-      class MasterIndex___ < SimpleModel_
+      class MasterIndex___ < Home_::SimpleModel_
 
         def initialize
 

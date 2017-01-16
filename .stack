@@ -8,20 +8,7 @@ try to simplify [ac]/[ze] procure bound call
 use [sa] to convert etc to Stream_
 -1 script to calculate costs [#tmx-011] then [#tmx-010]
 -2 the cost-driven divvy algorithm [#tmx-012]
-get rid of unused [#ze-063.C]
-_NOT_USED in tmx should be used
 -3 unify other tmx node-centric services [#tmx-015]
-say_formal_operation_alternation
--3.2 omni help screen system [#tmx-018]
--3.3 omni fuzzy resolution [#tmx-019]
--3.4 omni "did you mean.." [#tmx-020]
--3.207 i & m.o & mountable one-offs, help
--3.220 i & m.o & mountable one-offs, fuzzy - mock something for ambiguity
--3.233 i & m.o & mountable one-offs, unrec
--3.247 i & m.o & mountable one-offs, no arg
--3.260 i & m.o & mountable one-offs, call
--3.225 figure out how you're going to mock the last step, mock it and merge with the last step. commit.
-       in live code, get the last live-code case working with `tmx` as an entrypoint. commit to branch.
--3.235 figure out how you're going to mock the last step, mock it and merge with the last step. commit.
-       chose an ideally minimal one-off/sidesystem combo, brute force a live-code adaptation of mounting a one-off with the sidesystem as an entrypoint. (add a --ping to a one-off if necessary.) look at the next steps down to -3.207. commit to a branch.
-(-3.240 flush rearch so far while fixing bug for one line synopsis)
+[#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
+[#tmx-019] get fuzzy out of multimode scanner
+look at [sg] and [#co-044.1] (concatted streams refactor), maybe push this back

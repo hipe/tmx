@@ -2,16 +2,6 @@ module Skylab::Zerk
 
   module ArgumentScanner  # [#052]
 
-    class << self
-
-      def __OperatorBranch_via_Directory  # 1x [tmx]
-
-        # #[#051] - until far into the future, currently spliced into [br]
-
-        Home_::ArgumentScanner::OperatorBranch_via_Directory
-      end
-    end  # >>
-
     class CommonImplementation
 
       def parse_primary_value_as_one_such_number_via_mutable_array mutable_a

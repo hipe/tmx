@@ -122,21 +122,14 @@ module Skylab::TMX
 
         def __synopsis_lines_via_one_off one_off
 
-          lib = one_off.class
+          _lines = @__syno.synopsis_lines_by do |downstream|
 
-          _proc_like = one_off.require_proc_like
-
-          _pnsa = [ * @CLI.program_name_string_array, *
-            one_off.program_name_tail_string_array ]
-
-          _argv = lib::HELP_ARGV.dup  # those that use optparse consume
-
-          _lines = @__syno.synopsis_lines_by do |serr|
-
-            _proc_like[ _argv, lib::DUMMY_STDIN, :_no_sout_tmx_, serr, _pnsa ]
+            one_off.express_help_by do |o|
+              o.downstream = downstream
+              o.program_name_head_string_array = @CLI.program_name_string_array
+            end
 
             # (don't bother checking exitstatus - it does the throw hack for early exit)
-
           end
 
           _lines
@@ -148,7 +141,6 @@ module Skylab::TMX
             o.number_of_synopsis_lines = 3
           end
 
-          @_mod = One_off_branch_module___[]
           NIL
         end
 
@@ -157,14 +149,35 @@ module Skylab::TMX
           scn = @omni.to_operator_load_ticket_scanner
           scn.advance_one while ::Symbol === scn.current_token  # horrible
 
-          Common_::Stream.via_scanner( scn ).map_reduce_by do |lt|
+          # because tmx mounts its own one-offs to look like operators
+          # (and we assume a particular order where one-offs are last),
+          # we stop at the first one-off we see. :/
 
-            sub_scn = lt.to_one_off_scanner_via_filesystem @filesystem
+          stay = {
+            zerk_one_off_category_symbol: false,
+            zerk_sidesystem_load_ticket_category_symbol: true
+          }
 
-            unless sub_scn.no_unparsed_exists
-              Sidesystem___.new sub_scn, lt
+          p = -> do
+            # hand-written map-reduce for clarity
+            until scn.no_unparsed_exists
+              lt = scn.gets_one
+              stay.fetch( lt.category_symbol ) || break
+              sub_scn = lt.to_one_off_scanner_via_filesystem @filesystem
+              if sub_scn.no_unparsed_exists
+                # if no one-offs under the operator
+                next
+              end
+              x = Sidesystem___.new sub_scn, lt
+              break
             end
-          end.flush_to_polymorphic_stream
+            x
+          end
+
+          _st = Common_.stream do
+            p[]
+          end
+          _st.flush_to_polymorphic_stream
         end
       # -
 

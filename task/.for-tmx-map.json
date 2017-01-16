@@ -2,5 +2,6 @@
   "after":"css_convert",
   "category":"task family",
   "doc test manifest":".doc-test-manifest.json",
+  "framework": "[ze]",
   "is lib": true
 }

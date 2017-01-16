@@ -29,7 +29,7 @@ module Skylab::TanMan
     end
 
     List_scanner = -> x do
-      Common_::Scn.try_convert x
+      Common_::SimpleStream.try_convert x
     end
 
     Module_lib = -> do

@@ -105,7 +105,6 @@ module Skylab::GitViz
   NEWLINE_ = "\n"
   NIL_ = nil
   MONADIC_EMPTINESS_ = -> _ {}
-  Scn_ = Common_::Scn
   SPACE_ = ' '.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze

@@ -1,5 +1,6 @@
 {
   "after":"code_metrics",
   "category":"bigger",
+  "framework": "[br]",
   "is potentially interesting application": true
 }

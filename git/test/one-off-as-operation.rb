@@ -118,46 +118,42 @@ module Skylab::Git::TestSupport
     # -
     # ==
 
-    cache = {}  # only because you can't `require` an executable file
-    Require = -> entry do
-      cache.fetch entry do
-        x = Load_oneoff_as_operation___[ entry ]
-        cache[ entry ] = x
-        x
-      end
-    end
+    one_off_loader = nil
+    Require = -> do
 
-    rx = /\Atmx-git-(?<stem>[-a-z]+)\z/
-
-    Load_oneoff_as_operation___ = -> entry do
-
-      # go from this: tmx-git-ferllew-ferwerd
-      # to this:      Skylab_Git__ferllew_ferwerd__one_off
-
-      _md = rx.match entry
-      const = :"Skylab_Git__#{ _md[ :stem ].gsub DASH_, UNDERSCORE_ }__one_off"
-
-      # just because it's not cached here doesn't mean it hasn't been loaded
-
-      if ! ::Object.const_defined? const
-
-        $stderr.puts "\n\n\n>>> go this away in the next commit <<<<\n\n\n"
-
-        if ! defined? ::Skylab__Zerk__OneOffs
-        module ::Skylab__Zerk__OneOffs
-          # while #nascent [#ze-063.1]
-        end
-        end
-
-        _path =  ::File.join Sidesystem_path__[], 'bin', entry
-        load _path
+      class_not_proc_via_one_off = -> one_off do
+        one_off.require_proc_like
+        _const = "Skylab_Git__#{ one_off.normal_symbol }__one_off"
+        ::Object.const_get _const, false
       end
 
-      ::Object.const_get const, false
-    end
+      cache = {}
+      main = -> entry do
+        cache.fetch entry do
+          _one_off = one_off_loader.dereference_one_off_via_entry entry
+          cls = class_not_proc_via_one_off[ _one_off ]
+          cache[ entry ] = cls
+          cls
+        end
+      end
 
-    Sidesystem_path__ = Lazy_.call do
-      ::File.expand_path '../../..', Home_.dir_path
+      p = -> entry do
+        one_off_loader[]
+        p = main
+        p[ entry ]
+      end
+
+      -> entry do
+        p[ entry ]
+      end
+    end.call
+
+    one_off_loader = -> do
+      one_off_loader = nil
+      require 'skylab/zerk'  # :#spot-1-1 - later access this normally
+      lib = ::Skylab::Zerk
+      _x = lib::Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ Home_ ]
+      one_off_loader = _x ; nil
     end
 
     # ==

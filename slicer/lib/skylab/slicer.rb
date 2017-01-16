@@ -8,7 +8,12 @@ module Skylab::Slicer
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   lazily :CLI do
-    ::Class.new Brazen_::CLI
+    class CLI < Brazen_::CLI
+
+      expose_executables_with_prefix 'tmx-slicer-'
+
+      self
+    end
   end
 
   module API

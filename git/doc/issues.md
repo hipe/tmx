@@ -1,3 +1,6 @@
+[#015]       borrowing/lending coverage
+             :[#here.1]: we are lending coverage to [#tmx-022.2]
+
 [#014] #open follow-renames issues (see [pl])
 [#013]       follow-forward hiccup (see this #commit, do not touch this line :P)
 [#012]       [ re-number ]

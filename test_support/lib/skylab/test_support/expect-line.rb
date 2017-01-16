@@ -128,7 +128,7 @@ module Skylab::TestSupport
           end
         end
 
-        Common_::Scn.new do
+        Common_::SimpleStream.by do
           p[]
         end
       end

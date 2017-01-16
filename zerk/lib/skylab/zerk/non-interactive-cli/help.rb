@@ -167,7 +167,12 @@ module Skylab::Zerk
           indent_with_spaces = fmt % nil
 
           subsequent_line = -> line do
-            puts.call "#{ indent_with_spaces }#{ @margin }#{ line }"
+            # (don't indent empty lines. this avoids that but doesn't prevent it)
+            if line
+              puts.call "#{ indent_with_spaces }#{ @margin }#{ line }"
+            else
+              puts.call line
+            end
           end
 
           buffer = ""

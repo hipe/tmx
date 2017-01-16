@@ -316,7 +316,7 @@ module Skylab::Common
 
     def to_value_minimal_stream
       d = -1 ; last = @a.length - 1
-      Scn.new do
+      SimpleStream.by do
         if d < last
           @h.fetch @a.fetch d += 1
         end
@@ -1770,7 +1770,7 @@ module Skylab::Common
     oxford_or[ a ]
   end
 
-  class Scn < ::Proc  # see [#049]
+  class SimpleStream < ::Proc  # see [#049]
 
     class << self
 
@@ -1779,7 +1779,7 @@ module Skylab::Common
       end
 
       def the_empty_stream
-        @_tes_ ||= new do end
+        @___the_empty_stream ||= by( ) { NOTHING_ }
       end
 
       def multi_step * x_a
@@ -1797,7 +1797,10 @@ module Skylab::Common
       def try_convert x
         Home_::Scn__.try_convert x
       end
-    end
+
+      alias_method :by, :new
+      undef_method :new
+    end  # >>
 
     alias_method :gets, :call
   end

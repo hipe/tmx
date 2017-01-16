@@ -210,6 +210,12 @@ module Skylab::TMX
             y << "adds (if necessary) this attribute to the set of attributes"
             y << "that will be populated with values in the nodes of the"
             y << "resulting stream"
+            y << nil
+            y << "designed to be piped. hackish but useful example (from CLI):"
+            y << nil
+            y << "    tmx map -select framework | awk '{if ( $2 ~ /\[br\]/ ) print}'"
+            y << nil
+            y << "the above shows all the sidesystem that (still) use the [br] framework"
           end,
         }
       end
@@ -409,8 +415,8 @@ module Skylab::TMX
       end
 
       def to_item_normal_tuple_stream_for_didactics
-        @operator_branch.to_normal_symbol_stream.map_by do |sym|
-          [ :primary, sym ]
+        @operator_branch.to_load_ticket_stream.map_by do |key_x|
+          [ :primary, key_x ]
         end
       end
 

@@ -1,37 +1,25 @@
 [#022]       borrowing/lending coverage
+             [#here.2]: we are borrowing coverage from [gi]
        #open [#here.1]: we are lending coverage to [#ba-060.1]
 
 [#021] #hole
              (#moved-to: [#063.2] help screen scraper)
 
-[#020] #open omni "did you mean.."
-             precursor to: [#019] & [#018]
-             the "did you mean.." expression should reflect the availble
-             operations across the whole omni operator branch.
+[#020] #hole ( #was: "did you mean.." )
 
 
-[#019] #wish omni fuzzy resolution
-             new tests to cover this
-             (related: [#018] the omni help system (design these together).)
+[#019] #open get fuzzy out of multi mode argument scanner - it should
+             only happen in "omni" now (no-deps [ze]). unifying these
+             might take work.
+
              tmx CLI fuzzy resolution for the first token must not happen
              at the level of a single operator branch (for #here these
              three categories). rather, the fuzzy search must happen across
              all N sources in series, for it to work correctly.
 
 
-[#018] #wish omni help screen/system
-             new tests to cover this:
-             (related: [#019] the omni fuzzy search (design these together).)
-             the tmx help system for its top level must reflect operators
-             available from all sources: first the "intrisic" operations
-             (test-all, reports, map), then the "mounted sidesystem"
-             operators (etc many), then the "mounted one-off executables"
-             that exist in [tmx] (in its `bin/` directory). a major implementation
-             decision is whether to build the "omni branch" early for all
-             invocations or whether to build it lazily, only for "did you mean.."
-             a major design decision is whether to express the omni splay
-             outright or whether..
-
+[#018]       tracks our omni help screen/system.
+       #open [#here.3]: what will it take for map primaries to show up in test-all?
              [#here.2]: our "mega-listing" help screen
              [#here.1]: mounted one-off API
 
@@ -70,7 +58,7 @@
 [#010] #wish write a task to update semi-real costs (a bash script loop).
              #depends-on: [#011] update your life to the latest rspec.
              consume rpsec json-formatted output from the test run one
-             per node and use its elapses seconds. you cannot (should not?)
+             per node and use its elapsed seconds. you cannot (should not?)
              do this in multi-node "process-plans" because of "choking"
 
 

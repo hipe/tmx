@@ -43,6 +43,10 @@ module Skylab::TMX::TestSupport
 
     context "help for subject node" do
 
+      it "usage index builds" do
+        _usage_index || fail
+      end
+
       it "usage - head and tail" do
         _ui = _usage_index
         _ui.head == "usage: tmz map " || fail

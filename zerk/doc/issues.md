@@ -1,5 +1,4 @@
 [#063]       one-off mounting
-             [#here.C]: (in .stack) get rid of unused node at this point
              [#here.2]: help screen scraper (also tracked by [#054.3])
              [#here.1]: having to do with the "callback module"
 
@@ -40,16 +39,17 @@
 
 [#052]       argument scanner ("a.s")
 
-[#051]       now: the moving-target "operator branch" API, with at least
-             three implementors. justification in document.
-
+[#051]       the moving-target "operator branch" API,
+             justified aptly in document.
              the comprehensive manifest of implementors is:
 
-       #open        lingering old case (code) in [ts]
-               - 1x hash-based here
-               - 1x for autoloaderized modules here
-               - 1x currently spliced into [br]
-
+              [#here.G]: one-off adapter
+       #open  [#here.F]: freeform  (#not-covered)
+       #open  [#here.E]: mutliple entities  (see #open in code comments)
+              [#here.D]: other branch
+              [#here.C]: autoloaderized module
+              [#here.B]: module
+              [#here.A]: hash
 
              was: track simplified boxxy-like producers of primary hashes.
 

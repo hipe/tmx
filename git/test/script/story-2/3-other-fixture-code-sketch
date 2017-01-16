@@ -29,13 +29,13 @@ module Skylab::Git::TestSupport
         rec.holler_back __FILE__
       end
 
-      _cli = _CLI.new nil, $stderr, $stderr, %w([gizzi3]) do |cli_|
+      _cli = _CLI.new _COMMAND, nil, $stderr, $stderr, %w([gizzi3]) do |cli_|
         cli_.system_by do
           recording
         end
       end
 
-      d = _cli.invoke _COMMAND
+      d = _cli.execute
 
       recording.receive_done
 

@@ -43,9 +43,9 @@ module Skylab::Zerk
 
       def available_branch_item_name_stream_via_operator_branch ob, _
 
-        ob.to_normal_symbol_stream.map_by do |sym|
+        ob.to_load_ticket_stream.map_by do |key_x|
 
-          Common_::Name.via_variegated_symbol sym
+          Common_::Name.via_variegated_symbol key_x.intern
         end
       end
 

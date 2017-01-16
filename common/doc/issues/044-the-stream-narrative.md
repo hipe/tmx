@@ -1,5 +1,57 @@
 # the stream narrative :[#044]
 
+
+## baseless streams #open :[#here.1]
+
+this is a quick sketch for an idea
+see
+
+  snag/lib/skylab/snag/cli/core.rb
+
+we concat one stream by another stream, and then prepend a third stream on
+to that. while this is certainly possible with our functional approach, it
+doesn't scale well.
+
+what would be better is to take the approach we have taken in "no deps" [ze]
+with the scanner there, which is to have a bevy of methods in a methods
+module and then a RISC-like common small interface.
+
+if you were then a client of such a stream and you knew its underlying
+implementation was that of a "concatted stream" (which by the way should
+be a scanner), you could, say
+
+    orig_stream  # you know this is a concatted stream
+
+    _st = [ new_stream, * orig_stream.release_constituent_array ]
+
+    new_stream = Stream.via_stream_array _st
+
+this way, the concatted stream stays as flat as it was originally the whole
+time (better scale), and you can use the familiar array idioms to map new
+concatted streams rather than needed prepend, concat etc.
+
+
+
+
+### but it gets nastier:
+
+unify "simple stream" and "stream" in the following ways: RISC-like,
+move all the methods defined in 'stream/core.rb' up to core common file
+(or don't, it's ~500) lines), but in any case get the 'stream' node
+defined in the toplevel core file (we use it all the time and as it
+is it is two hops in the autoloader)..
+merge the three nodes  'scn--' to under the "stream" node..
+
+
+
+
+
+
+
+
+
+
+
 ## quick historical preface on a name change.
 
 what we used to call "scans" in this universe are in a much more popular
@@ -128,3 +180,9 @@ yet seen all the keys. use the existing scanner we are wrapped around
 *from the current position it is in*, keep grabbing items off of it until
 either we find the item being sought or we run out of items, all the while
 storing each item and its key.
+
+
+
+## document-meta
+
+ - #pending-rename: let's take number [#016] instead of this number

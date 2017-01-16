@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Magnetics_::OneOffScanner_via_LoadTicket < SimpleModel_  # 1x
+  class Magnetics_::OneOffScanner_via_LoadTicket < Actor_via_SimpleModel_  # 1x
 
     # how to "splay" "mountable" "one-offs"
 
@@ -19,18 +19,17 @@ module Skylab::Zerk
       end
 
       attr_writer(
-        :entry_glob,
         :filesystem,
+        :glob_entry,
         :load_ticket,
         :stream_not_scanner,  # only while [br] #[#007.G]
       )
 
       def execute
 
-        @entry_glob || self._REQUIRED
+        @glob_entry || self._REQUIRED
 
         if __resolve_nonzero_paths
-          __init_exponymous_entry
           __remove_eponymous_executable
           if @paths.length.nonzero?
             st = __fluff_it_up
@@ -51,18 +50,19 @@ module Skylab::Zerk
       end
 
       def __resolve_nonzero_paths
-        head = ::File.join @load_ticket.gem_path, BIN___
-        _glob = ::File.join head, @entry_glob
+        head = @load_ticket.conventional_executable_directory_
+        _glob = ::File.join head, @glob_entry
         paths = @filesystem.glob _glob
         if paths.length.nonzero?
-          @_GNE = @load_ticket.gem_name_elements
-          @head = head
+          @__head = head
           @paths = paths ; ACHIEVED_
         end
       end
 
       def __fluff_it_up
-        rx = %r(\A#{ ::Regexp.escape @_eponymous_head }#{ DASH_ })
+
+        rx = @load_ticket.regexp_for_path_head_of_conventional_one_off_
+
         Stream_.call @paths do |path|
           md = rx.match path
           if md
@@ -79,9 +79,9 @@ module Skylab::Zerk
       def __remove_eponymous_executable
         # (do not include the eponymous executable in this listing for now..)
 
-        d = @paths.index @_eponymous_head
+        d = @paths.index @load_ticket.eponymous_executable_path_guess_
         if ! d
-          _thing_without_prefix = ::File.join @head, @load_ticket.slug
+          _thing_without_prefix = ::File.join @__head, @load_ticket.slug
           # [my]
           d = @paths.index _thing_without_prefix
         end
@@ -90,27 +90,9 @@ module Skylab::Zerk
         end
         NIL
       end
-
-      def __init_exponymous_entry
-
-        pfx = @_GNE.exe_prefix
-        slug = @load_ticket.slug
-
-        @_eponymous_head = if pfx.include? slug and pfx[ 0 ... -1 ] == slug
-
-          # the eponymous head for the [tmx] sidesystem is "tmx", not "tmx-tmx"
-
-          ::File.join @head, slug
-        else
-          ::File.join @head, "#{ pfx }#{ slug }"
-        end
-        NIL
-      end
     # -
 
     # ==
-
-    BIN___ = 'bin'
 
     # ==
   end

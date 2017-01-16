@@ -2,12 +2,16 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_AutoloaderizedModule
+    class OperatorBranch_via_AutoloaderizedModule  # :[#051.C].
 
       # the adaptation of #[#051] for autoloaderized modules.
       #
       # this was derived by heavily reafactoring two real-world but oblique
       # use-cases that can be found in our first #history entry below.
+      #
+      # see also
+      #   - [#051.B] "via module" for boxxy-like unobtrusiveness
+      #   - [#051.G] for directories thru filesystem directly; no autoloading
 
       class << self
         alias_method :define, :new
@@ -83,7 +87,7 @@ module Skylab::Zerk
           end
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
 
           @module.entry_tree.to_state_machine_stream.map_by do |sm|
             Symbol_via_slug__[ sm.entry_group_head ]

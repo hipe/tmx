@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     module WhenScratchSpace____
 
-      class When::UnknownBranchItem < SimpleModel_  # 1x
+      class When::UnknownBranchItem < Home_::SimpleModel_  # 1x
 
         # this does the levenshtein-like (but not levenshtein) thing where
         # we explicate valid alternatives.

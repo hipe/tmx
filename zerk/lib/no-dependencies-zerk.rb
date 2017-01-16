@@ -23,10 +23,11 @@ module NoDependenciesZerk
     end
 
     SimpleModel = ::Class.new  # forward declaration
+    Actor_via_SimpleModel = ::Class.new SimpleModel
 
     # = CLI life
 
-    class CLI_Express_via_Emission < SimpleModel
+    class CLI_Express_via_Emission < Actor_via_SimpleModel
 
       class << self
 
@@ -37,10 +38,6 @@ module NoDependenciesZerk
           end
         end
         alias_method :[], :call
-
-        def call_by & p
-          new( & p ).execute
-        end
       end  # >>
 
       def emission_proc_and_channel p, chan
@@ -743,7 +740,7 @@ module NoDependenciesZerk
 
       def to_operator_symbol_scanner
         to_operators_injections_scanner.expand_by do |injt|
-          injt.injection.to_normal_symbol_scanner
+          injt.injection.to_load_ticket_scanner
         end
       end
 
@@ -918,7 +915,7 @@ module NoDependenciesZerk
           freeze ; nil
         else
           injection = @injections.gets_one.injection
-          load_tickets = injection.to_normal_symbol_scanner
+          load_tickets = injection.to_load_ticket_scanner
           if load_tickets.no_unparsed_exists
             advance_big
           else
@@ -984,8 +981,8 @@ module NoDependenciesZerk
       def lookup_softly k
         @operators.lookup_softly k
       end
-      def to_normal_symbol_scanner
-        Scanner_by.new( & @operators.to_normal_symbol_stream )
+      def to_load_ticket_scanner
+        Scanner_by.new( & @operators.to_load_ticket_stream )
       end
       def dereference k
         @operators.dereference k
@@ -1003,7 +1000,7 @@ module NoDependenciesZerk
       def lookup_softly k
         @_hash[ k ]
       end
-      def to_normal_symbol_scanner
+      def to_load_ticket_scanner
         Scanner_via_Array[ @_hash.keys ]
       end
       def dereference k
@@ -1277,6 +1274,14 @@ module NoDependenciesZerk
     class MinimalStream___ < ::Proc ; alias_method :gets, :call ; end
 
     # ==
+
+    class Actor_via_SimpleModel
+      class << self
+        def call_by & p
+          define( & p ).execute
+        end
+      end  # >>
+    end
 
     class SimpleModel
 

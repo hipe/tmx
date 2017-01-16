@@ -28,6 +28,25 @@ module Skylab::Git::TestSupport
       cli.expect_succeeded_under self
     end
 
+    it "yes fuzzy happens between two one-offs (breakout vs. breakup)" do
+
+      # here we are lending coverage for [#tmx-022.2]<->[#015.1]
+
+      cli = _same
+
+      cli.invoke 'git', 'break'
+
+      cli.expect_on_stderr %(ambiguous action "break" - #{
+        }did you mean "breakout" or "breakup"?)
+
+      cli.expect_line_by do |line|
+        _s = cli.unstyle_styled line
+        _s == %(use 'xmt git -h' for help) || fail
+      end
+
+      cli.expect_failed_under self
+    end
+
     it "breakup" do
 
       cli = _same

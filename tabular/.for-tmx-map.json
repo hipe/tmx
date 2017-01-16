@@ -2,5 +2,6 @@
   "after":"autonomous_component_system",
   "category":"more general libs",
   "doc test manifest":".doc-test-manifest.list",
+  "framework": "[CUSTOM]",
   "is lib":true
 }

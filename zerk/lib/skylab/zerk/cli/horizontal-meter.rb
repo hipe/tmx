@@ -363,7 +363,7 @@ module Skylab::Zerk
                   # presumably it's a max share viz. and not a total share viz.)
                   # :#table-coverpoint-I-2
 
-      class BuildCelRenderer___ < SimpleModel_
+      class BuildCelRenderer___ < Home_::SimpleModel_
 
         def initialize
           @negative_minimum = nil

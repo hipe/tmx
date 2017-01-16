@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_Hash
+    class OperatorBranch_via_Hash  # :[#051.A].
 
       # frontier adaptation of #[#051] (hashes)
       # (#a.s-coverpoint-1)
@@ -31,14 +31,14 @@ module Skylab::Zerk
         end
 
         def to_pair_stream
-          to_normal_symbol_stream.map_by( & method( :pair_via_normal_symbol ) )
+          to_load_ticket_stream.map_by( & method( :pair_via_normal_symbol ) )
         end
 
         def pair_via_normal_symbol k
           Common_::Pair.via_value_and_name @hash.fetch(k), k
         end
 
-        def to_normal_symbol_stream
+        def to_load_ticket_stream
           Stream_[ @hash.keys ]
         end
       # -
