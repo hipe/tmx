@@ -1,0 +1,35 @@
+[32musage:[0m tmz git breakout add [opts] PATH
+       tmz git breakout status [opts]
+       tmz git breakout commit [opts]
+       tmz git breakout clean [opts]
+
+[32msynopsis:[0m break up one large commit into two smaller commits by
+       specifying which files to break out of the larger commit.
+
+[32musage:[0m `add` files progressively. they are then (breakout) staged.
+       check your status with (breakout) `status` if you like.
+
+       (breakout) `commit`ting this will add a git commit that UNDOES
+       whatever changes occurred to those files in the HEAD commit.
+       THEN breakout will re-apply the changes back again to those files
+       and `git add` those files, so they are (git) staged for a (git)
+       commit.
+
+       if you commit the above with git, you will have effectively
+       created two commits, one that reverses the changes and one that
+       re-applies them.
+
+       if you then squash the HEAD~1 commit onto the previous, you will
+       be left with one commit that contains only those changes to those
+       files having been isolated from the commit you started with.
+       it's that easy.
+
+       whatever better way there is of doing this, we didn't know it
+       at the time we wrote this one-off, but we probably do now.
+
+[32moptions:[0m
+    -n, --dry-run                    dry run.
+        --[no-]color                 the default is for color to be on when interactive,
+                                     off when not. this will override that
+    -v, --verbose                    verbose output
+    -h, --help                       this screen.

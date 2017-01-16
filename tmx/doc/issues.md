@@ -44,7 +44,7 @@
                old tmx back
                 - integration of sidesystems with TMX should happen in the sides, not TMX )
 
-[#015] #wish unify other tmx node-centric services (that big dependency graph)
+[#015] #open unify other tmx node-centric services (that big dependency graph)
 
 
 [#014] #wish investigate and possibly design and possibly implement either

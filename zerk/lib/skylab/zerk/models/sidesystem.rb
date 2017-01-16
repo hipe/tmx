@@ -1,30 +1,37 @@
 module Skylab::Zerk
 
-  Models::Sidesystem = ::Module.new
+  module Models::Sidesystem
 
-  # an important note about the nodes defined here:
-  # as the const names imply ([#bs-029.0]), these are (very much) a part of
-  # our #public-API. these nodes are used heavily by [tmx] (#testpoint too)
+    # an important note about the nodes defined here:
+    # as the const names imply ([#bs-029.0]), these are (very much) a part of
+    # our #public-API. these nodes are used heavily by [tmx] (#testpoint too)
 
-  class Models::Sidesystem::GemNameElements < SimpleModel_
+    # ==
 
-    def dup_by
-      otr = dup
-      yield otr
-      otr.freeze
+    LoadTicketMethods__ = ::Module.new
+
+    # `_const_path_array_guess_` is #testpoint for [tmx] too :(
+
+    class LoadTicket_via_AlreadyLoaded < MonadicMagneticAndModel_
+
+      include LoadTicketMethods__
+
+      # if you need a load ticket but already have a sidesystem loaded, life is easier
+
+      def initialize ss_mod
+        @gem_name_elements = Models::GemNameElements::Via_AlreadyLoaded[ ss_mod ]
+        # can't freeze - makes things lazily
+      end
+
+      def _const_path_array_guess_
+        @gem_name_elements.const_head_path
+      end
     end
 
-    attr_accessor(
-      :const_head_path,  # e.g [:SeaLab, :MySidesystem]
-      :exe_prefix,       # always "tmx-" in this universe
-      :entry_string,     # e.g "my_sidesystem"
-      :gem_name,         # e.g "sea_lab-my_sidesystem"
-      :gem_path,         # e.g "/Users/haxor/.gem/ruby/2.2.3/gems/sea_lab-my_sidesystem-0.0.0.pre.bleeding"
-    )
-  end
+    # ==
 
-  class Models::Sidesystem::LoadTicket
-    # -
+    class LoadTicket ; include LoadTicketMethods__
+
       def initialize gne  # GemNameElements
 
         @require_path = gne.gem_name.gsub DASH_, ::File::SEPARATOR
@@ -52,7 +59,7 @@ module Skylab::Zerk
           self._NAME_SANITY
         end
 
-        @const_path_array_guess = const_path_guess.freeze ; nil
+        @_const_path_array_guess_ = const_path_guess.freeze ; nil
       end
 
       def require_sidesystem_module
@@ -68,7 +75,7 @@ module Skylab::Zerk
         # this is near but not the same as a [#063.1] mountable one-off
 
         mod = ::Object
-        sym_a = const_path_array_guess
+        sym_a = _const_path_array_guess_
         ( sym_a.length - 1 ).times do |d|
           mod = mod.const_get sym_a.fetch d  # until it fails
         end
@@ -84,9 +91,34 @@ module Skylab::Zerk
         end
       end
 
+      attr_reader(
+        :_const_path_array_guess_,
+        :require_path,
+      )
+    end
+
+    # ==
+
+    module LoadTicketMethods__
+
+      # --
+
       def to_one_off_scanner_via_filesystem fs
-        Home_::Magnetics_::OneOffScanner_via_LoadTicket[ self, fs ]
+        to_one_off_scanner_by do |o|
+          o.filesystem = fs
+        end
       end
+
+      def to_one_off_scanner_by
+        Home_::Magnetics_::OneOffScanner_via_LoadTicket.call_by do |o|
+          o.entry_glob = ONE_OFF_ENTRY_GLOB___
+          o.filesystem = ::Dir
+          yield o
+          o.load_ticket = self
+        end
+      end
+
+      # --
 
       def one_off_const_head
         @___one_off_const_head ||= __one_off_const_head
@@ -94,18 +126,13 @@ module Skylab::Zerk
 
       def __one_off_const_head
 
-        if ALL_CAPS___ =~ @const_path_array_guess.last  # see #here-1
-          @const_path_array_guess.last.id2name.freeze
+        cp = _const_path_array_guess_
+        if ALL_CAPS___ =~ cp.last  # see #here-1
+          cp.last.id2name.freeze
         else
           s = entry_string
           "#{ s[0].upcase }#{ s[1..-1] }".freeze
         end
-      end
-
-      ALL_CAPS___ = /\A[A-Z0-9_]+\z/
-
-      def gem_path
-        @gem_name_elements.gem_path
       end
 
       def slug
@@ -113,23 +140,32 @@ module Skylab::Zerk
       end
 
       def intern
-        @___as_intern ||= @gem_name_elements.entry_string.intern
+        @___as_intern ||= entry_string.intern
       end
+
+      # --
 
       def entry_string
         @gem_name_elements.entry_string
       end
 
+      def gem_path
+        @gem_name_elements.gem_path
+      end
+
+      # --
+
       attr_reader(
-        :const_path_array_guess,
         :gem_name_elements,
-        :require_path,
       )
 
       def IS_LOAD_TICKET_tmx_  # temporary
         true
       end
-    # -
+    end
+
+
+    # ==
 
     # ==
 
@@ -138,7 +174,7 @@ module Skylab::Zerk
     Const_guess_via_segment___ = -> do
       work = -> segment do
         segment.split( UNDERSCORE_ ).map do |piece|
-          Const_guess_via_piece[ piece ]
+          LoadTicket::Const_guess_via_piece[ piece ]
         end.join( EMPTY_S_ ).intern
       end
       cache = {}
@@ -151,7 +187,7 @@ module Skylab::Zerk
       end
     end.call
 
-    Const_guess_via_piece = -> do
+    LoadTicket::Const_guess_via_piece = -> do
 
       # our weak, rough heuristic for guessing if a string is "probably an
       # acronym" is that it must match all of the following criteria:
@@ -174,7 +210,7 @@ module Skylab::Zerk
 
       work = -> piece do
         if 4 < piece.length
-          # save the trouble - if it's not a TLA or a FLA, it should not be an acrony
+          # save the trouble - if it's not a TLA or a FLA, it should not be an acronym
           ucfirst[ piece ]
         else
           # hi. (code, CSS, cull, doc, test, git, TMX)
@@ -196,6 +232,14 @@ module Skylab::Zerk
         end
       end
     end.call
+
+    LoadTicket_via_AlreadyLoaded::Const_guess_via_piece =
+      LoadTicket::Const_guess_via_piece
+
+    # ==
+
+    ALL_CAPS___ = /\A[A-Z0-9_]+\z/
+    ONE_OFF_ENTRY_GLOB___ = 'tmx-*'  # don't pickup special ones like `git-stash-untracked`
 
     # ==
   end

@@ -24,6 +24,4 @@ say_formal_operation_alternation
        in live code, get the last live-code case working with `tmx` as an entrypoint. commit to branch.
 -3.235 figure out how you're going to mock the last step, mock it and merge with the last step. commit.
        chose an ideally minimal one-off/sidesystem combo, brute force a live-code adaptation of mounting a one-off with the sidesystem as an entrypoint. (add a --ping to a one-off if necessary.) look at the next steps down to -3.207. commit to a branch.
--3.245 make [ze] the proprieter of one-off mounting by renaming (without tons of refactor) many of the participants, get it green. look at the next steps downs to -3.207. commit.
-       (unify all declaration of `OneOff`)
--3.255 make a move commit that moves everything to [ze] for our next step. commit.
+(-3.240 flush rearch so far while fixing bug for one line synopsis)

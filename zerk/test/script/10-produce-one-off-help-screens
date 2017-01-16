@@ -51,8 +51,6 @@ end
 
 # -- high level control flow
 
-sandbox_module = nil
-
 begin_at = nil
 do_money = nil
 end_on = nil
@@ -181,13 +179,9 @@ special_prefix = '# '
 
 get_really_busy = -> counter, one_off do
 
-  _path = one_off.path
-  const = one_off.sub_top_level_const_guess
-
-  sout.puts "#{ special_prefix }one off #{ fmt % counter }: #{ const } for #{ one_off.slug }"
-  ::Kernel.load _path
-  _proc_like = sandbox_module.const_get const, false
-
+  _const = one_off.sub_top_level_const_guess
+  sout.puts "#{ special_prefix }one off #{ fmt % counter }: #{ _const } for #{ one_off.slug }"
+  _proc_like = one_off.require_proc_like
   request_help[ _proc_like, one_off ]
 end
 
@@ -199,9 +193,6 @@ go = -> do
 
   require 'skylab/tmx'
   st = Skylab::TMX.to_sidesystem_load_ticket_stream
-
-  sandbox_module = ::Module.new
-  Skylab__Zerk__OneOffs = sandbox_module  # while #nascent [#ze-063.1]
 
   counter = 0
   stay = true

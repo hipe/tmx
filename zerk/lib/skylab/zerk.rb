@@ -60,6 +60,14 @@ module Skylab::Zerk  # intro in [#001] README
     private :dup
   end
 
+  class MonadicMagneticAndModel_
+    class << self
+      alias_method :call, :new
+      alias_method :[], :call
+      private :new
+    end  # >>
+  end
+
   # == functions
 
   Begin_fuzzy_retrieve_ = -> & any_oes_p do

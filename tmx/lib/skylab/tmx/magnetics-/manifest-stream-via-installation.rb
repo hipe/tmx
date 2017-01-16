@@ -1,12 +1,13 @@
 module Skylab::TMX
 
-  class Models_::Installation
+  class Magnetics_::ManifestStream_via_Installation  # 1x
 
-    class ManifestStream_via_Installation___
+    def self.[] o
+      self._NOT_USED__open_015_on_stack__  # #open [#015] on stack
+      new( o ).execute
+    end
 
-      def self.[] o
-        new( o ).execute
-      end
+    # -
 
       def initialize inst
 
@@ -24,7 +25,8 @@ module Skylab::TMX
           ::Dir[ "#{ @gems_dir }/#{ @gem_pass_prefix }*/bin/#{ @exe_pfx }*" ] )
 
         sep = ::Regexp.escape ::File::SEPARATOR
-        _rxs = Gem_name_tools_[].RXS
+        _rxs = Home_::Models_::GemNameElements::Tools[].
+          regexp_source_for_installed_gem_filesystem_entry_extended
 
         rx = /\A
           (?<gem_path> .+ #{ sep } (?<entry> #{ _rxs } ) )
@@ -123,6 +125,6 @@ module Skylab::TMX
           p[]
         end
       end
-    end
+    # -
   end
 end

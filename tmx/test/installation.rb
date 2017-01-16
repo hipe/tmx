@@ -80,7 +80,7 @@ module Skylab::TMX::TestSupport
       class DummyLoadTicket___ < Home_::Models_::LoadTicket
 
         def __induce_sidesystem_module
-          _names = Names___.new @const_path_array_guess, @gem_name_elements
+          _names = Names___.new _const_path_array_guess_, @gem_name_elements
           DummySidesystemModule___.new _names
         end
       end

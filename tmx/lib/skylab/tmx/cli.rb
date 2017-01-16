@@ -479,7 +479,7 @@ module Skylab::TMX
 
           o.parent_module_of_executables Home_
 
-          o.mandatory_prefix_to_disregard 'tmx-'
+          o.mandatory_prefix_to_disregard 'tmx-'  ; self._CHANGE_readme_ # get this from installation
 
           o.item_class cls::OneOff  # ..
 

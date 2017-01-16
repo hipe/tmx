@@ -80,11 +80,30 @@ module Skylab::Zerk::TestSupport
       lines.first[ 0, 8 ] == "tmz tmx " || fail  # #todo bug in (ancient) client
     end
 
+    it "(edge case coverage: one line)" do
+      # #coverpoint-2-7
+
+      _invo = _build_invocation_by do |o|
+        o.number_of_synopsis_lines = 1
+      end
+
+      lines = _lines_via_invocation_against_file _invo, 'git-breakout.output'
+
+      lines.length == 1 || fail
+      lines.first.include? 'break up one large commit' or fail
+    end
+
     def _against entry
+
+      _invo = _build_common_invocation
+      _lines_via_invocation_against_file _invo, entry
+    end
+
+    def _lines_via_invocation_against_file invo, entry
 
       _path = ::File.join _thing_directory, entry
       upstream = ::File.open _path, ::File::RDONLY
-      x = _by do |downstream|
+      x = invo.synopsis_lines_by do |downstream|
         while line=upstream.gets
           downstream.puts line
         end
@@ -94,9 +113,25 @@ module Skylab::Zerk::TestSupport
     end
 
     def _by & p
+      _build_common_invocation.synopsis_lines_by( & p )
+    end
 
+    def _build_common_invocation
+      _build_invocation_by do |o|
+        o.number_of_synopsis_lines = 2
+      end
+    end
+
+    def _build_invocation_by
+      _subject_module.define do |o|
+        yield o
+        o.listener = _listener
+      end
+    end
+
+    def _listener
       if do_debug
-        listener = -> * chan, & msg_p do
+        -> * chan, & msg_p do
           io = debug_IO
           if :expression == chan[1]
             msg_p[ io ] ; io.puts
@@ -106,11 +141,6 @@ module Skylab::Zerk::TestSupport
           NIL
         end
       end
-
-      _subject_module.define do |o|
-        o.number_of_synopsis_lines = 2
-        o.listener = listener
-      end.synopsis_lines_by( & p )
     end
 
     memoize :_thing_directory do

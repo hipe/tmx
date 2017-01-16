@@ -1,41 +1,63 @@
 module Skylab::Zerk
 
-  class Magnetics_::OneOffScanner_via_LoadTicket
+  class Magnetics_::OneOffScanner_via_LoadTicket < SimpleModel_  # 1x
 
-    # experiment with giving "one-offs" a more formal treatment
+    # how to "splay" "mountable" "one-offs"
 
     class << self
-      def call lt, fs
-        head = ::File.join lt.gem_path, BIN___
-        _glob = ::File.join head, GLOB___
-        these = fs.glob _glob
-        if these.length.zero?
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
-        else
-          new( these, head, lt, fs ).execute
-        end
+      def call_by & p
+        define( & p ).execute
       end
-      alias_method :[], :call
-      private :new
+      private :define  # ..
     end  # >>
 
     # -
-      def initialize * four
-        @paths, @head, @load_ticket, @filesystem = four
 
-        @_GNE = @load_ticket.gem_name_elements
+      def initialize
+        @stream_not_scanner = false
+        yield self
       end
+
+      attr_writer(
+        :entry_glob,
+        :filesystem,
+        :load_ticket,
+        :stream_not_scanner,  # only while [br] #[#007.G]
+      )
 
       def execute
 
-        __init_exponymous_entry
+        @entry_glob || self._REQUIRED
 
-        __remove_eponymous_executable
+        if __resolve_nonzero_paths
+          __init_exponymous_entry
+          __remove_eponymous_executable
+          if @paths.length.nonzero?
+            st = __fluff_it_up
+          end
+        end
 
-        if @paths.length.zero?
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+        if st
+          if @stream_not_scanner
+            st
+          else
+            st.flush_to_polymorphic_stream
+          end
+        elsif @stream_not_scanner
+          Common_::Stream.the_empty_stream
         else
-          __fluff_it_up
+          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+        end
+      end
+
+      def __resolve_nonzero_paths
+        head = ::File.join @load_ticket.gem_path, BIN___
+        _glob = ::File.join head, @entry_glob
+        paths = @filesystem.glob _glob
+        if paths.length.nonzero?
+          @_GNE = @load_ticket.gem_name_elements
+          @head = head
+          @paths = paths ; ACHIEVED_
         end
       end
 
@@ -51,7 +73,7 @@ module Skylab::Zerk
             o.path = path
             o.load_ticket = @load_ticket
           end
-        end.flush_to_polymorphic_stream
+        end
       end
 
       def __remove_eponymous_executable
@@ -84,11 +106,11 @@ module Skylab::Zerk
         end
         NIL
       end
-
     # -
+
     # ==
 
-    BIN___ = 'bin' ; GLOB___ = '*'
+    BIN___ = 'bin'
 
     # ==
   end

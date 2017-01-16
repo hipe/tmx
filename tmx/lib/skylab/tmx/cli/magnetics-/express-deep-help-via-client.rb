@@ -122,21 +122,18 @@ module Skylab::TMX
 
         def __synopsis_lines_via_one_off one_off
 
-          const = one_off.sub_top_level_const_guess
-          if ! @_mod.const_defined? const, false
-            load one_off.path
-          end
+          lib = one_off.class
 
-          _proc_like = @_mod.const_get const, false
+          _proc_like = one_off.require_proc_like
 
           _pnsa = [ * @CLI.program_name_string_array, *
             one_off.program_name_tail_string_array ]
 
-          _argv = HELP_ARGV___.dup  # those that use optparse consume
+          _argv = lib::HELP_ARGV.dup  # those that use optparse consume
 
           _lines = @__syno.synopsis_lines_by do |serr|
 
-            _proc_like[ _argv, DUMMY_STDIN___, :_no_sout_tmx_, serr, _pnsa ]
+            _proc_like[ _argv, lib::DUMMY_STDIN, :_no_sout_tmx_, serr, _pnsa ]
 
             # (don't bother checking exitstatus - it does the throw hack for early exit)
 
@@ -189,27 +186,6 @@ module Skylab::TMX
           :sub_scanner
         )
       end
-
-      # ==
-
-      One_off_branch_module___ = Lazy_.call do
-        module ::Skylab__Zerk__OneOffs
-          # while #nascent [#ze-063.1]
-          self
-        end
-      end
-
-      # ==
-
-      module DUMMY_STDIN___ ; class << self
-        def tty?
-          false
-        end
-      end ; end
-
-      # ==
-
-      HELP_ARGV___ = %w( --help ).freeze
 
       # ==
     end

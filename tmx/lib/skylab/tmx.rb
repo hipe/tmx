@@ -171,7 +171,7 @@ module Skylab::TMX
   module Models_
     Autoloader_[ self ]
     lazily :GemNameElements do
-      Zerk_lib_[]::Models::Sidesystem::GemNameElements
+      Zerk_lib_[]::Models::GemNameElements
     end
     lazily :LoadTicket do
       Zerk_lib_[]::Models::Sidesystem::LoadTicket

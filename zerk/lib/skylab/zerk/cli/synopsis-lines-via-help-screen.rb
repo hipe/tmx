@@ -331,6 +331,7 @@ module Skylab::Zerk
           if _stay
             :after_common_section_line
           else
+            sm.send_downstream  # #coverpoint-2-7
             :early_ending
           end
         end,
@@ -452,6 +453,11 @@ module Skylab::Zerk
 
           @N_content_lines.push content_s
           if @number_of_synopsis_lines == @N_content_lines.length
+
+            # (the reason we say "XX" is because the below 4 lines of code
+            # are repeated exactly as-is 2x in this document, for stepability
+            # ("literality") during development)
+
             if _is_target_section_XX
               _stop_parsing_XX
             else

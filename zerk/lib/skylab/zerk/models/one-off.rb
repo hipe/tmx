@@ -4,6 +4,51 @@ module Skylab::Zerk
 
     # ==
 
+    Definition_for_the_LEGACY_method_called_to_unordered_selection_stream = -> exe_prefix do
+
+      -> do
+
+        _ss_mod = lookup_sidesystem_module
+
+        _load_ticket = Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ _ss_mod ]
+
+        _st = _load_ticket.to_one_off_scanner_by do |o|
+          o.stream_not_scanner = true
+        end
+
+        _st2 = _st.map_by do |oo|
+          LEGACY_Whatever_via_OneOff___[ oo ]
+        end
+
+        super().concat_stream _st2
+      end
+    end
+
+    # ==
+
+    class LEGACY_Whatever_via_OneOff___ < MonadicMagneticAndModel_
+
+      def initialize oo
+        _ = oo.load_ticket.gem_name_elements.entry_string
+        @name_function = Common_::Name.via_slug oo.slug
+        @__one_off = oo
+      end
+
+      def new _this, _k, & oes_p
+        LEGACY_OneOff_as_Bound__.new self, @__one_off, & oes_p
+      end
+
+      attr_reader(
+        :name_function,
+      )
+
+      def adapter_class_for _
+        self
+      end
+    end
+
+    # ==
+
     class NOT_COVERED__ArgumentScanner__OperatorBranch_via_Directory
 
       # an adaptation of #[#051] for directories (probably "bin/"-like)
@@ -84,9 +129,53 @@ module Skylab::Zerk
 
     # ==
 
+    class LEGACY_OneOff_as_Bound__  # will re-open
+
+      def bound_call_under fr, & _oes_p  # [tmx]
+
+        _proc_like = @_one_off.require_proc_like
+
+        o = fr.resources
+
+        _pnsa = [ * o.invocation_string_array.dup, @_one_off.slug ]
+
+        _standard_five = [ o.argv, o.sin, o.sout, o.serr, _pnsa ]
+
+        Common_::Bound_Call[ _standard_five, _proc_like, :call ]
+      end
+
+      def __build_description_proc
+
+        one_off = @_one_off
+        -> y do
+
+          _proc_like = one_off.require_proc_like
+
+          _syno = Home_::CLI::SynopsisLines_via_HelpScreen.define do |o|
+            o.number_of_synopsis_lines = 1
+          end
+
+          _pnsa = one_off.program_name_tail_string_array  # meh
+
+          _argv = HELP_ARGV.dup  # those that use optparse consume
+
+          _lines = _syno.synopsis_lines_by do |serr|
+            _proc_like[ _argv, DUMMY_STDIN, :_no_sout_zerk_, serr, _pnsa ]
+          end
+
+          y << _lines.fetch( 0 )
+        end
+      end
+    end
+
+    # ==
+
+    # `OneOff`
+
     # -
       def initialize
         yield self
+        @_proc_like = :__proc_like_initially
         @_slug = :__slug_initially
       end
 
@@ -95,6 +184,29 @@ module Skylab::Zerk
         :path,         # e.g "/Users/haxor/.gem/ruby/[..]/bin/tmx-meep-mop-frob-jibbers
         :slug_tail,    # e.g "frob-jibbers"
       )
+
+      # --
+
+      def require_proc_like
+        send @_proc_like
+      end
+
+      def __proc_like_initially
+        mod = ::Skylab__Zerk__OneOffs
+        const = sub_top_level_const_guess
+        if ! mod.const_defined? const, false
+          ::Kernel.load @path
+        end
+        @__proc_like = mod.const_get const, false
+        @_proc_like = :__proc_like_normally
+        send @_proc_like
+      end
+
+      def __proc_like_normally
+        @__proc_like
+      end
+
+      # --
 
       def sub_top_level_const_guess
         @___STLCG ||= __sub_top_level_const_guess
@@ -135,6 +247,8 @@ module Skylab::Zerk
         "#{ @load_ticket.one_off_const_head }#{ UNDERSCORE_ }#{ _ }".intern
       end
 
+      # --
+
       def program_name_tail_string_array
         [ @load_ticket.slug, slug ]
       end
@@ -169,75 +283,14 @@ module Skylab::Zerk
 
     # ==
 
-      # [br] CLI is an adaptation of a reactive model to a particular
-      # modality. this is an adaption of of scripts written "natively"
-      # in that modality into .. the [br] CLI. yes, it's CLI for CLI.
-
-      Definition_for_the_LEGACY_method_called_to_unordered_selection_stream = -> s do
-
-        # result is the method body for a `to_unordered_selection_stream`
-        # that exposes all the executable files in the usual location that
-        # have the provided prefix, as if they were reactive action nodes.
-
-        -> do
-
-          _stream_1 = super()
-
-          ss_mod = lookup_sidesystem_module
-
-          glob = ::File.expand_path "../../../bin/#{ s }*",
-            ss_mod.dir_path
-
-          range = glob.length - 1 .. -1
-
-          _s_a = ss_mod.name.split Common_::CONST_SEPARATOR
-
-          _stream_2 = Common_::Stream.via_nonsparse_array( ::Dir[ glob ] ) do | path |
-
-            Executable_as_Unbound___.new( path[ range ], path, _s_a )
-          end
-
-          _stream_1.concat_stream _stream_2
-        end
-      end
-
       # ===
 
-      class Executable_as_Unbound___
+      class LEGACY_OneOff_as_Bound__
 
-        attr_reader(
-          :name_function,
-        )
-
-        def initialize slug, path, const_ppfx
-
-          @__const_pfx = const_ppfx
-          @name_function = Common_::Name.via_slug slug
-          @__path = path
-        end
-
-        def adapter_class_for _
-          self
-        end
-
-        def new _this, k, & oes_p
-
-          Executable_as_Bound___.new k, self, & oes_p
-        end
-
-        attr_reader(
-          :__const_pfx,
-          :__path,
-        )
-      end
-
-      # ===
-
-      class Executable_as_Bound___
-
-        def initialize k, bound, & oes_p
+        def initialize bound, oo, & oes_p
 
           @_bound = bound
+          @_one_off = oo
         end
 
         # ~ needed by index
@@ -265,123 +318,26 @@ module Skylab::Zerk
         end
 
         def description_proc
-          @___dp ||= ___build_description_proc
-        end
-
-        def ___build_description_proc
-
-          bound = @_bound
-          -> y do
-            y << ::File.basename( bound.__path )
-          end
-        end
-
-        # ~ needed to invoke
-
-        def bound_call_under fr, & _oes_p  # [tmx]
-
-          _one_off = __build_one_off
-
-          o = fr.resources
-
-          _one_off.to_bound_call_via_standard_five_resources(
-            o.argv, o.sin, o.sout, o.serr, o.invocation_string_array )
-        end
-
-        def __build_one_off
-
-          bo = @_bound
-
-          ONE_OFF_LEGACY_MODEL___.define do |o|
-            o.path = bo.__path
-            o.terminal_name = bo.name_function
-            o.up_const_path = bo.__const_pfx
-            o.loader = ::Kernel
-          end
+          @___dp ||= __build_description_proc
         end
       end
 
       # ===
+    # ==
 
-      class ONE_OFF_LEGACY_MODEL___ < SimpleModel_
-
-            # when it comes time to invoke the executable, it must follow a
-            # few rules in order to be exposed by this [br]-integrated
-            # modality face.
-
-        def initialize
-
-          yield self
-
-          scn = Common_::Polymorphic_Stream.via_array @up_const_path
-
-          _head_const = scn.gets_one
-
-          buffer = ""
-          begin
-            buffer << "#{ scn.gets_one }#{ UNDERSCORE_ }"
-          end until scn.no_unparsed_exists
-          buffer << @terminal_name.as_lowercase_with_underscores_string
-
-          # the above is the predecessor to nascent [#063.1]
-
-          @_tail_const = buffer
-
-          @__universe_module = ::Object.const_get _head_const, false
-        end
-
-        attr_writer(
-          :loader,
-          :path,
-          :terminal_name,
-          :up_const_path,
-        )
-
-        def to_bound_call_via_standard_five_resources argv, i, o, e, up_pn_s_a
-
-          _proc_ish = __proc_like_loaded_if_necessary
-
-          _pn_s_a = [ * up_pn_s_a, @terminal_name.as_slug ]
-
-          _standard_five = [ argv, i, o, e, _pn_s_a ]
-
-          Common_::Bound_Call[ _standard_five, _proc_ish, :call ]
-        end
-
-              # we cannot simply `require` it because it is not an ordinary
-              # ruby library file. hypothetically we could `eval` it but
-              # then it is harder to develop because no stack traces.
-
-        def __proc_like_loaded_if_necessary
-
-          # (the resource may have been loaded already if for example
-          # you are using the test runner to test itself)
-
-          univ_mod = @__universe_module
-          const = @_tail_const
-
-          if ! univ_mod.const_defined? const, false
-            Touch_this_module___[]
-            @loader.load @path
-          end
-
-          univ_mod.const_get const, false
-        end
-
-        attr_reader(
-          :terminal_name,
-        )
+    module DUMMY_STDIN ; class << self
+      def tty?
+        false
       end
+    end ; end
 
-      # ==
+    # ==
 
-      Touch_this_module___ = Lazy_.call do
-        module ::Skylab__Zerk__OneOffs
-        end
-        NIL
-      end
+    ::Skylab__Zerk__OneOffs = ::Module.new
 
-      # ===
+    # ==
+
+    HELP_ARGV = %w( --help ).freeze
 
     # ==
   end

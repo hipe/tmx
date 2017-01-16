@@ -141,8 +141,12 @@ module Skylab::Git::TestSupport
 
       if ! ::Object.const_defined? const
 
+        $stderr.puts "\n\n\n>>> go this away in the next commit <<<<\n\n\n"
+
+        if ! defined? ::Skylab__Zerk__OneOffs
         module ::Skylab__Zerk__OneOffs
           # while #nascent [#ze-063.1]
+        end
         end
 
         _path =  ::File.join Sidesystem_path__[], 'bin', entry

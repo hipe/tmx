@@ -36,8 +36,7 @@ module Skylab::TMX
     end
 
     def to_sidesystem_manifest_stream
-
-      Here_::ManifestStream_via_Installation___[ self ]
+      Home_::Magnetics_::ManifestStream_via_Installation[ self ]
     end
 
     def to_sidesystem_load_ticket_stream
@@ -125,7 +124,8 @@ module Skylab::TMX
       stem_via_range = gem_prefix.length .. -1
       basename_via_range = path.length - ::File.basename( path ).length .. -1
 
-      gem_name_via_entry = Gem_name_tools_[].Gem_name_via_entry
+      gem_name_via_entry = Models_::GemNameElements::Tools[]::
+        Gem_name_via_installed_gem_filesystem_entry
 
       proto = Models_::GemNameElements.define do |ne|
         ne.const_head_path = const_head_path
@@ -144,38 +144,8 @@ module Skylab::TMX
       end
     end
 
-    Gem_name_tools_ = Lazy_.call do
+    # ==
 
-      # EGADS: it would be good to use whatever Gem does instead
-
-      module GEM_NAME_TOOLS___
-
-        user_word = '[a-z][a-z0-9_]*'
-        major_number = '[0-9]+'
-        freeform = '[a-z0-9][a-z0-9_]*'  # a guess
-
-        rxs = "(?<gem_name> #{ user_word } (?: - #{ user_word } )* )
-          - (?<version> #{ major_number } (?: \\. #{ freeform } )*  )"
-
-        rx = /\A#{ rxs }\z/x
-
-        p = -> entry do
-          rx.match( entry )[ :gem_name ]
-        end
-
-        define_singleton_method :Gem_name_via_entry do
-          p
-        end
-
-        define_singleton_method :RXS do
-          rxs
-        end
-
-        self
-      end
-    end
-
-    Here_ = self
   end
 end
 # #tombstone-C: got rid of name fix hack
