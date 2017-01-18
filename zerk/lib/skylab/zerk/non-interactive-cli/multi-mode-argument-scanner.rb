@@ -380,7 +380,10 @@ module Skylab::Zerk
               [ :primary, key_x ]
             end
 
-            reduced_st.concat_stream _
+            Common_::Stream::CompoundStream.define do |o|
+              o.add_stream reduced_st
+              o.add_stream _
+            end
           else
             reduced_st
           end

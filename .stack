@@ -11,4 +11,3 @@ use [sa] to convert etc to Stream_
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
-look at [sg] and [#co-044.1] (concatted streams refactor), maybe push this back

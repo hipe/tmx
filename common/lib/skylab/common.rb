@@ -5,19 +5,12 @@ module Skylab::Common
   class << self
 
     def [] mod, * x_a
+      # #todo no
       self::Bundles.edit_module_via_mutable_iambic mod, x_a
     end
 
     def describe_into_under y, expag
       y << "(as a reactive node, [co] is some ancient artifact..)"
-    end
-
-    def distill * a
-      if a.length.zero?
-        Distill_
-      else
-        Distill_[ * a ]
-      end
     end
 
     def lib_
@@ -31,7 +24,7 @@ module Skylab::Common
     end
 
     def stream( & p )
-      Home_::Stream.new( & p )
+      Stream.by( & p )
     end
 
     def test_support  # #[#ts-035]
@@ -42,41 +35,88 @@ module Skylab::Common
     end
   end  # >>
 
-  module Actor  # see [#fi-016] the actor narrative
+  # -- hybrid "magnetic" (function implemented by class) and model
 
-    module ProcLike
-      def call * a, & p
-        new( * a, & p ).execute
+  # (experiments while we let some dust settle..)
+
+  class SimpleModel
+    class << self
+      alias_method :define, :new
+      undef_method :new
+    end  # >>
+    def initialize
+      yield self
+      freeze
+    end
+    private :dup
+  end
+
+  class MagneticBySimpleModel < SimpleModel  # ~10x
+    class << self
+      def call_by & p
+        define( & p ).execute
       end
-      alias_method :[], :call
+      def prototype_by & p
+        define( & p ).freeze
+      end
+      private :define  # or not, but track it
     end
-
-    class Dyadic
-      class << self
-        def _call x, y, & p
-          new( x, y, & p ).execute
-        end
-        alias_method :[], :_call
-        alias_method :call, :_call
-        private :new
-      end  # >>
-    end
-
-    class Monadic
-      class << self
-        def _call x, & p
-          new( x, & p ).execute
-        end
-        alias_method :[], :_call
-        alias_method :call, :_call
-        private :new
-      end  # >>
+    def initialize
+      yield self  # not freezing by default - magnets usu. want to mutate
     end
   end
+
+  class SimpleModelAsMagnetic < SimpleModel  # experimental variant
+    class << self
+      alias_method :call_by, :define
+      undef_method :define
+    end  # >>
+  end
+
+  class MonadicMagneticAndModel
+    class << self
+      alias_method :call, :new
+      alias_method :[], :call
+      undef_method :new
+    end  # >>
+  end
+
+  # -- used to be "actors" now "magnets" - see [#fi-016] the "actor" narrative
+
+  module ProcLike
+    def call * a, & p
+      new( * a, & p ).execute
+    end
+    alias_method :[], :call
+  end
+
+  class Dyadic
+    class << self
+      def call x, y, & p
+        new( x, y, & p ).execute
+      end
+      alias_method :[], :call
+      private :new
+    end  # >>
+  end
+
+  class Monadic
+    class << self
+      def call x, & p
+        new( x, & p ).execute
+      end
+      alias_method :[], :call
+      private :new
+    end  # >>
+  end
+
+  # --
 
   Home_ = self
 
   class Box  # :[#061]
+
+    InstanceMethods = ::Module.new
 
     class << self
 
@@ -197,7 +237,7 @@ module Skylab::Common
     end
 
     def add_to_front k, x
-      add_at_position 0, k, x
+      add_at_offset 0, k, x
     end
 
     def add k, x
@@ -212,7 +252,7 @@ module Skylab::Common
       end
     end
 
-    def add_at_position d, k, x
+    def add_at_offset d, k, x
       had = true
       @h.fetch k do
         @a[ d, 0 ] = [ k ]
@@ -228,7 +268,7 @@ module Skylab::Common
 
     # ~ ..given nothing
 
-    def first_name
+    def first_key
       @a.first
     end
 
@@ -238,21 +278,21 @@ module Skylab::Common
 
     # ~ ..given a position
 
-    def at_position d
-      @h.fetch name_at_position d
+    def at_offset d
+      @h.fetch key_at_offset d
     end
 
-    def name_at_position d
+    def key_at_offset d
       @a.fetch d
     end
 
     # ~ ..given a name or names
 
-    def has_name k
+    def has_key k
       @h.key? k
     end
 
-    def index k
+    def offset_of k
       @a.index k
     end
 
@@ -290,18 +330,18 @@ module Skylab::Common
 
     # ~ ..of names
 
-    def get_names  # #[#bs-028.6]
+    def get_keys  # #[#bs-028.6]
       @a.dup
     end
 
-    def each_name
+    def each_key
       @a.each do |k|
         yield k
       end
       NIL_
     end
 
-    def to_name_stream & p
+    def to_key_stream & p
       Home_::Stream.via_nonsparse_array @a, & p
     end
 
@@ -316,7 +356,7 @@ module Skylab::Common
 
     def to_value_minimal_stream
       d = -1 ; last = @a.length - 1
-      SimpleStream.by do
+      MinimalStream.by do
         if d < last
           @h.fetch @a.fetch d += 1
         end
@@ -325,7 +365,7 @@ module Skylab::Common
 
     def to_value_stream
       d = -1 ; last = @a.length - 1
-      Home_.stream do
+      Stream.by do
         if d < last
           @h.fetch @a.fetch d += 1
         end
@@ -346,7 +386,7 @@ module Skylab::Common
       d = -1
       last = @a.length - 1
 
-      Home_.stream do
+      Stream.by do
         if d < last
           k = @a.fetch d += 1
           Pair.via_value_and_name @h.fetch( k ), k
@@ -377,38 +417,301 @@ module Skylab::Common
     end
   end
 
-  class Polymorphic_Stream  # :[#069], #[#069]
+  module Box::InstanceMethods  # #experiment
+
+    def [] k
+      fetch( k ) { NOTHING_ }
+    end
+
+    def to_value_stream
+      scn = to_key_scanner
+      Stream.by do
+        unless scn.no_unparsed_exists
+          fetch scn.gets_one
+        end
+      end
+    end
+  end
+
+  # ==
+
+  MinimalStream = ::Class.new ::Proc
+
+  class Stream < MinimalStream  # :[#016.2] (see)
 
     class << self
 
-      def the_empty_polymorphic_stream
-        THE_EMPTY_POLYMORPHIC_SCANNER___
+      def define & p
+        Stream::Magnetics::ResourceReleasingStream_via[ p, self ]
       end
 
-      def try_convert x  # #[#056.1] strain: similar try-convert's for stream
+      def via_range r, & map
+        Stream::Magnetics::Stream_via_Range[ map, r, self ]
+      end
 
-        if x.respond_to? :gets
+      def via_times d, & map
+        Stream::Magnetics::Stream_via_Times[ map, d, self ]
+      end
 
-          x.flush_to_polymorphic_stream  # while it works..
+      def via_item x
+        once() { x }
+      end
 
-        elsif x.respond_to? :each_index
-          via_array x
+      def once & prc
+        p = -> do
+          p = EMPTY_P_
+          prc[]
+        end
+        by() { p[] }
+      end
 
-        elsif x.respond_to? :read
-
-          Home_.lib_.system.IO.polymorphic_stream_via_readable x
-
-        elsif x.respond_to? :each
-
-          Home_.lib_.basic::Enumerator.polymorphic_stream_via_eachable x
-
-        elsif x.respond_to? :ascii_only?
-
-          Home_.lib_.basic::String.polymorphic_stream_via_string x
+      def via_nonsparse_array a, & map
+        d = -1 ; last = a.length - 1
+        st = by do
+          if d < last
+            a.fetch d += 1
+          end
+        end
+        if block_given?
+          st.map_reduce_by( & map )
         else
-          UNABLE_
+          st
         end
       end
+    end  # >>
+
+    def initialize upst=nil, & p
+      @upstream = upst
+      super( & p )
+    end
+
+    attr_reader :upstream
+
+    InstanceMethods = ::Module.new
+    include InstanceMethods
+  end
+
+  module Stream::InstanceMethods
+
+    # NOTE all of the below methods mutate the receiver - they all flush
+
+    # -- flushers that convert to other paradigms (box, scanner, enumerator)
+
+    # ~ see also simliar-looking dedicated children nodes that build lazily
+
+    def flush_to_box_keyed_to_method m  # 5x
+      reduce_into Box.new do |bx|
+        -> x do
+          bx.add x.send( m ), x
+        end
+      end
+    end
+
+    def flush_to_scanner
+      Stream::Magnetics::Scanner_via_Stream[ self ]
+    end
+
+    def each
+      begin
+        x = gets
+        x || break
+        yield x
+        redo
+      end while above
+    end
+
+    def flush_to_count  # 3x
+      _reduce_classically( 0 ) { |memo| memo + 1 }
+    end
+
+    def flush_to_last  # 2x
+      _reduce_classically( NOTHING_ ) { |_memo, x| x }
+    end
+
+    # -- flushers that produce new streams
+
+    # ~ expand: produce a new stream that is longer thru flushing
+    #   see also [#016.3] compound stream
+
+    def expand_by  # 37x
+      p = nil ; st = nil ; main = nil
+      advance = -> do
+        begin
+          o = gets
+          o or ( p = EMPTY_P_ and break )
+          st = yield o
+          st || redo
+          x = st.gets
+          x || redo
+          p = main
+          break
+        end while above
+        x
+      end
+      main = -> do
+        x = st.gets
+        x or ( p = advance )[]
+      end
+      p = advance
+      new_by do
+        p[]
+      end
+    end
+
+    # ~ produce a new stream that is mapped and reduced
+
+    def map_reduce_by  # 22x
+      new_by do
+        begin
+          x = gets
+          x || break
+          x_ = yield x
+        end until x_
+        x_
+      end
+    end
+
+    # ~ reduce in the classical sense: shorten the stream based on some criteria
+
+    def reduce_by & p  # 35x
+      new_by do
+        begin
+          x = gets
+          x || break
+        end until yield x
+        x
+      end
+    end
+
+    # ~ produce a new stream that is mapped. (doesn't reduce - falsish interrupts)
+
+    def map_by  # 100+
+      new_by do
+        x = gets
+        if x
+          yield x
+        end
+      end
+    end
+
+    # ~ result is memo after receiveing every item with `<<`, interspersed
+    #   with the separator. the stream equivalent of `ary.join(" and ")`
+
+    def join_into_with_by memo, separator  # 6x
+      main = -> x do
+        memo << separator
+        memo << yield( x )
+      end
+      p = -> x do
+        memo << yield( x )
+        p = main
+      end
+      reduce_into( memo ) { -> x { p[ x ] } }
+    end
+
+    def to_a  # 50+?
+      join_into []
+    end
+
+    # ~ result is memo after receiving every item with `<<`
+
+    def join_into memo, & map  # 11x
+      map ||= IDENTITY_
+      reduce_into memo do
+        -> x do
+          memo << map[ x ]
+        end
+      end
+    end
+
+    # ~ result is memo after traversing the stream with whatever proc is yielded
+
+    def reduce_into memo  # 3x here, 1x there
+      p = yield memo
+      begin
+        x = gets
+        x || break
+        p[ x ]
+        redo
+      end while above
+      memo
+    end
+
+    # ~ experiment
+
+    def _reduce_classically memo
+      begin
+        x = gets
+        x || break
+        memo = yield memo, x
+        redo
+      end while above
+      memo
+    end
+
+    # ~ result is the map of any first item whose map is trueish
+
+    def flush_until_map_detect  # ONEx [ts]
+      begin
+        x = gets
+        x || break
+        x_ = yield x
+      end until x_
+      x_
+    end
+
+    # ~ result is any first item whose map is trueish
+
+    def flush_until_detect  # 12x
+      begin
+        x = gets
+        x || break
+      end until yield x
+      x
+    end
+
+    # -- support
+
+    def new_by & p
+      self.class.by @upstream, & p
+    end
+  end
+
+  module THE_EMPTY_STREAM ; class << self
+    include Stream::InstanceMethods
+    def gets
+      NOTHING_
+    end
+    def new_by
+      self  # when mapping, reducing, expanding, never do anything
+    end
+  end ; end
+
+  module THE_EMPTY_MINIMAL_STREAM ; class << self
+    def gets
+      NOTHING_
+    end
+  end ; end
+
+  class MinimalStream  # see [#016.1]
+    class << self
+      alias_method :by, :new
+      undef_method :new
+    end
+    alias_method :gets, :call  # `call` is left defined for [#060.1] (no deps)
+  end
+
+  # ==
+
+  module THE_EMPTY_SCANNER ; class << self
+    def no_unparsed_exists
+      true
+    end
+  end ; end
+
+  class Scanner  # :[#069]., #[#069]
+
+    class << self
 
       def via * x_a
         new 0, x_a
@@ -419,7 +722,6 @@ module Skylab::Common
       end
 
       alias_method :via_start_index_and_array, :new
-
       private :new
     end  # >>
 
@@ -458,16 +760,21 @@ module Skylab::Common
     end
 
     def ___say_unexpected
-      "unexpected: #{ Home_.lib_.basic::String.via_mixed current_token }"
+      "unexpected: #{ Home_.lib_.basic::String.via_mixed head_as_is }"
     end
 
     def flush_to_stream
-
-      Home_.stream do
+      Stream.by do
         if unparsed_exists
           gets_one
         end
       end
+    end
+
+    def gets_one
+      x = head_as_is
+      advance_one
+      x
     end
 
     def no_unparsed_exists
@@ -482,13 +789,7 @@ module Skylab::Common
       @x_a_length - @d
     end
 
-    def gets_one
-      x = current_token
-      advance_one
-      x
-    end
-
-    def current_token
+    def head_as_is
       @x_a.fetch @d
     end
 
@@ -541,15 +842,7 @@ module Skylab::Common
     end
 
     attr_accessor :x_a_length
-
-    self
   end
-
-  module THE_EMPTY_POLYMORPHIC_SCANNER___ ; class << self
-    def no_unparsed_exists
-      true
-    end
-  end ; end
 
   # knownnesses (see [#004])
 
@@ -664,7 +957,7 @@ module Skylab::Common
 
       _CA = nil ; p = -> do
         p = nil
-        _CA = Home_.lib_.basic::Minimal_Property.via_variegated_symbol :argument
+        _CA = Home_.lib_.basic::MinimalProperty.via_variegated_symbol :argument
       end
 
       define_method :via_value_and_symbol do | x, sym |
@@ -672,7 +965,7 @@ module Skylab::Common
         _asc = if :argument == sym
           _CA || p[]
         else
-          Home_.lib_.basic::Minimal_Property.via_variegated_symbol sym
+          Home_.lib_.basic::MinimalProperty.via_variegated_symbol sym
         end
 
         via_value_and_association x, _asc
@@ -783,7 +1076,7 @@ module Skylab::Common
     end
   end
 
-  class Bound_Call  # :[#059].
+  class BoundCall  # :[#059].
 
     class << self
 
@@ -973,9 +1266,9 @@ module Skylab::Common
 
       def __process_argument_stream x_a
 
-        @argument_stream = Polymorphic_Stream.via_array x_a
+        @argument_stream = Scanner.via_array x_a
 
-        if @argument_stream.current_token.respond_to? :ascii_only?
+        if @argument_stream.head_as_is.respond_to? :ascii_only?
           __when_path
         end
 
@@ -1173,8 +1466,9 @@ module Skylab::Common
     NODE_PATH_IVAR_ = :@dir_path
   end
 
-  Autoloader[ Actor ]
+  Autoloader[ Scanner ]
   Autoloader[ Box ]
+  Autoloader[ Stream ]
 
   class Name  # see [#060]
 
@@ -1184,9 +1478,9 @@ module Skylab::Common
 
       def labelize * a
         if a.length.zero?
-          Home_::Name::Modality_Functions::Labelize
+          Name::Modality_Functions::Labelize
         else
-          Home_::Name::Modality_Functions::Labelize[ * a ]
+          :Name::Modality_Functions::Labelize[ * a ]
         end
       end
 
@@ -1198,12 +1492,12 @@ module Skylab::Common
         if a.length.zero?
           Home_::Name__::Unique_Features::Module_moniker
         else
-          Home_::Name::Modality_Functions::Module_moniker[ * a ]
+          Name::Modality_Functions::Module_moniker[ * a ]
         end
       end
 
       def empty_name_for__ x
-        Home_::Name::Conversion_Functions::Empty_name_for[ x ]
+        Name::Conversion_Functions::Empty_name_for[ x ]
       end
     end  # >>
 
@@ -1380,7 +1674,7 @@ module Skylab::Common
     end
 
     def as_approximation
-      @___approximation ||= Distill_[ @surface_value_ ]
+      @___approximation ||= Distill[ @surface_value_ ]
     end
 
     def _titlecase_the_pieces
@@ -1717,7 +2011,7 @@ module Skylab::Common
     DASH_ = '-'.freeze
     UNDERSCORE_ = '_'.freeze
 
-  Distill_ = -> do  # [#026]:#the-distill-function  :+[#bm-002]
+  Distill = -> do  # [#026]:#the-distill-function  :+[#bm-002]
     black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes
     dash = DASH_.getbyte 0
     empty_s = ''.freeze
@@ -1770,47 +2064,13 @@ module Skylab::Common
     oxford_or[ a ]
   end
 
-  class SimpleStream < ::Proc  # see [#049]
-
-    class << self
-
-      def aggregate * scn_a
-        Home_::Scn__::Aggregate.new scn_a
-      end
-
-      def the_empty_stream
-        @___the_empty_stream ||= by( ) { NOTHING_ }
-      end
-
-      def multi_step * x_a
-        if x_a.length.zero?
-          Home_::Scn__::Multi_Step__
-        else
-          Home_::Scn__::Multi_Step__.new_via_iambic x_a
-        end
-      end
-
-      def peek
-        Home_::Scn__::Peek__
-      end
-
-      def try_convert x
-        Home_::Scn__.try_convert x
-      end
-
-      alias_method :by, :new
-      undef_method :new
-    end  # >>
-
-    alias_method :gets, :call
-  end
-
   ACHIEVED_ = true
   CONST_SEPARATOR = '::'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> { NOTHING_ }  # to say hi
   EMPTY_S_ = ''.freeze  # think of all the memory you'll save
   KEEP_PARSING_ = true
+  IDENTITY_ = -> x { x }
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
   NOTHING_ = nil
@@ -1821,3 +2081,4 @@ module Skylab::Common
   Autoloader[ self, DIR_PATH__ ]
   # #dogfood
 end
+# #tombstone-A: `try_convert` for scanner

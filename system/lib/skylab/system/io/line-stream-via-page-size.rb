@@ -2,13 +2,23 @@ module Skylab::System
 
   module IO
 
-    Line_Scanner__ = Common_::Session::Ivars_with_Procs_as_Methods.new(
-      :count, :gets, :lineno )
+    class LineStream_via_PageSize < Common_::SimpleModelAsMagnetic  # read [#013]
 
-    class Line_Scanner__  # read [#164]
+      def initialize
+        yield self
+        @page_size ||= MAXLEN_
+        __initialize
+      end
 
-      def initialize fh, maxlen=nil
-        maxlen ||= MAXLEN_
+      attr_writer(
+        :filehandle,
+        :page_size,
+      )
+
+      def __initialize
+        fh = remove_instance_variable :@filehandle
+        maxlen = remove_instance_variable :@page_size
+
         buffer = ''
         buffer_is_loaded = nil
         count = 0
@@ -69,6 +79,18 @@ module Skylab::System
         NIL
       end
 
+      def count
+        @count.call
+      end
+
+      def gets
+        @gets.call
+      end
+
+      def lineno
+        @lineno.call
+      end
+
       attr_reader :fh, :pathname
 
       LINE_RX__ = Basic_[]::String.regex_for_line_scanning
@@ -81,3 +103,4 @@ module Skylab::System
     end
   end
 end
+# #tombstone-A no more Ivars_with_Procs_as_Methods

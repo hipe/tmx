@@ -2,7 +2,9 @@ module Skylab::Basic
 
   module List
 
-    class Line_Scanner__  # read [#023] (in [#022]) the array scanner narrative
+    class LineStream_via_Array < Common_::MonadicMagneticAndModel
+
+      # read [#023] (in [#022]) the array scanner narrative
 
       def initialize a
         @a = a ; @idx = @ridx = 0 ; nil

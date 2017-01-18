@@ -264,7 +264,7 @@ module Skylab::Common
 
       def __big_guns
         o = Here_::FuzzyLookup_.new
-        o.on_exactly_one = -> x { x }  # IDENTITY_
+        o.on_exactly_one = IDENTITY_
         @_const = o.execute_for @module, @_name
         NIL
       end

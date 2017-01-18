@@ -20,7 +20,12 @@ module Skylab::Zerk
           LEGACY_Whatever_via_OneOff___[ oo ]
         end
 
-        super().concat_stream _st2
+        _above_st = super()
+
+        Common_::Stream::CompoundStream.define do |o|
+          o.add_stream _above_st
+          o.add_stream _st2
+        end
       end
     end
 

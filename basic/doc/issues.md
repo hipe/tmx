@@ -50,9 +50,9 @@
              ( was: aggregated articulation refactor )
 [#026]       #doc-node the hash narrative ..
 [#025]       #doc-node #digraph the digraph narrative ..
-[#024]       #parent-node: [#022] "the string scanner narrative.."
-[#023]       #parent-node: [#022] "the array scanner narrative.."
-[#022]       #doc-node the scanners narrative ..
+[#024]       #parent-node: [#022] "the string stream narrative.."
+[#023]       #parent-node: [#022] "the array stream narrative.."
+[#022]       #doc-node the stream manifesto ..
 [#021]       #digraph #redundancy-point
 [#020]       #doc-node the core narrative ..
 [#019]       [ strange ]
@@ -85,7 +85,7 @@
                `operation` posited.
 [#006]       #doc-node developing a pattern language for abstract structures ..
 [#005]       #track-node all String Templating-like nerks
-[#004]       #doc-node the pathname narrative.. (was IO scanner, moved to [#sy-013])
+[#004]       #doc-node the pathname narrative.. (was IO stream, moved to [#sy-013])
 
 [#003]       #track sic
              ( #was: #branch-node, field sub-node (#meta-fields) .. )

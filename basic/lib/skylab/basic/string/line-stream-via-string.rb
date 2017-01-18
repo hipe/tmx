@@ -1,8 +1,6 @@
 module Skylab::Basic
 
-  module String
-
-    class Line_Scanner__ < Common_::Stream  # :[#024]
+  module String::LineStream_via_String  # :[#024]
 
       # represent a string as a stream of "lines", each produced successively
       # through the universal minimal stream interface of a method named
@@ -26,48 +24,59 @@ module Skylab::Basic
       # is not "correct" (per the previous above reference), this will be
       # sunsetted #todo.
 
-      class << self
+    class << self
 
-        def reverse s
-          if block_given?
-            yield Reverse__[ s ]
-          else
-            Reverse__[ s ]
-          end
-        end
-
-        def via_arglist a
-          if 1 == a.length
-            via_big_string a.fetch 0
-          else
-            SeparatorSemanticsScanner___.new( * a )
-          end
-        end
-
-        def via_big_string big_s
-          upstream = TerminatorSemantics___.new big_s
-          new upstream do
-            upstream.gets_
-          end
-        end
-      end  # >>
-
-      def lineno
-        @upstream.lineno_
+      def define & p
+        # make an assuption here
+        SeparatorSemanticsScanner___.new( & p )
       end
 
-      def rewind
-        @upstream.rewind_
+      def call s
+        QuitePopularLineScanner___.new s
       end
+      alias_method :[], :call
+    end  # >>
+
+      # ==
+
+      class QuitePopularLineScanner___
+
+        include Common_::Stream::InstanceMethods
+
+        def initialize s
+          @upstream = TerminatorSemantics___.new s
+        end
+
+        def lineno
+          @upstream.__lineno_
+        end
+
+        def rewind
+          @upstream.__rewind_
+        end
+
+        def gets
+          @upstream.__gets_
+        end
 
       def close
         # (this is stateless unlike a resource handle, but for sanity:)
         remove_instance_variable :@upstream ; nil
       end
 
+        def new_by & p
+          Common_::Stream.by( & p )
+        end
+      end
+
+      # ==
+
       class SeparatorSemanticsScanner___
 
-        def initialize s, rx
+        def initialize
+          yield self
+          s = remove_instance_variable :@string
+          rx = remove_instance_variable :@separator
 
           if rx.respond_to? :ascii_only?
             rx = ::Regexp.new rx
@@ -89,6 +98,11 @@ module Skylab::Basic
           end
         end
 
+        attr_writer(
+          :separator,
+          :string,
+        )
+
         def to_stream
           Common_.stream do
             if @unparsed_exists
@@ -98,7 +112,7 @@ module Skylab::Basic
         end
 
         def gets_one
-          x = current_token
+          x = head_as_is
           advance_one
           x
         end
@@ -114,7 +128,7 @@ module Skylab::Basic
           NIL
         end
 
-        def current_token
+        def head_as_is
           @_kn_kn.value_x
         end
 
@@ -173,7 +187,7 @@ module Skylab::Basic
           scn = Home_.lib_.string_scanner s
 
           @_gets = -> do
-            s = scn.scan LINE_RX_
+            s = scn.scan String::LINE_RX_
             if s
               lineno += 1
             end
@@ -187,22 +201,22 @@ module Skylab::Basic
           end
         end
 
-        def gets_
+        def __gets_
           @_gets[]
         end
 
-        def lineno_
+        def __lineno_
           @_lineno[]
         end
 
-        def rewind_
+        def __rewind_
           @_rewind[]
         end
       end
 
       # ==
 
-      Reverse__ = -> mutable_string do  # see #the-reverse-scanner
+      Reverse = -> mutable_string do  # see #the-reverse-scanner
         is_first = true
         ::Enumerator::Yielder.new do |line|
           if is_first
@@ -219,6 +233,5 @@ module Skylab::Basic
       Writable_Known_Known___ = ::Struct.new :value_x
 
       # ==
-    end
   end
 end

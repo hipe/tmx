@@ -2,7 +2,10 @@ module Skylab::Basic
 
   module String
 
-    class Succ__
+    class Successorer
+
+      # typically for incrementing verison numbers using a template
+      # #TODO here's a great use-case for [dt]
 
       # three laws compliant
 

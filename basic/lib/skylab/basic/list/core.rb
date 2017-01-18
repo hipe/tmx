@@ -68,14 +68,6 @@ module Skylab::Basic
         end
       end
 
-      def line_stream * a
-        if a.length.zero?
-          List_::Line_Scanner__
-        else
-          List_::Line_Scanner__.new( * a )
-        end
-      end
-
       def pair_stream_via_even_iambic a
         Build_pair_stream_via_even_iambic__[ a ]
       end

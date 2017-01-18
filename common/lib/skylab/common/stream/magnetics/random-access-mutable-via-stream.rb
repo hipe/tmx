@@ -1,3 +1,5 @@
+self._NOT_COVERED_NOT_USED  # #todo
+
 module Skylab::Common
 
   class Stream
@@ -20,7 +22,7 @@ module Skylab::Common
         bld_scan.gets
       end
 
-      def has_name name_x
+      def has_key name_x
         x = any_item_at_name name_x
         if x
           true
@@ -48,7 +50,7 @@ module Skylab::Common
         result
       end
 
-      def get_names
+      def get_keys
         scan = bld_scan
         y = []
         while x = scan.gets

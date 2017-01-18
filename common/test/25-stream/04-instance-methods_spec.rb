@@ -2,19 +2,25 @@ require_relative '../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] scn - multi-step" do
+  describe "[co] stream - instance method" do
 
-    it "simply wraps an init-phase along with a 'gets' phase and enumerates" do
+    it "`join_into_with_by`" do
 
-      a = d = last = nil
+      _st = _stream_via 'A', 'B', 'C'
+      _act = _st.join_into_with_by( "", '; ', & :downcase )
+      _act == "a; b; c" || fail
+    end
 
-      scn = Home_::SimpleStream.multi_step :init, -> do
-        a = [ :a, :b, :c ] ; d = -1 ; last = a.length - 1
-      end, :gets, -> do
-        a.fetch( d += 1 ) if d < last
+    def _stream_via * these
+      stack = these.reverse
+      _subject_module.by do
+        stack.pop
       end
+    end
 
-      scn.each.to_a.should eql %i( a b c )
+    def _subject_module
+      Home_::Stream
     end
   end
 end
+# #born years and years later

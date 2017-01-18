@@ -785,8 +785,13 @@ module Skylab::Brazen
       def _to_full_inferred_property_stream
 
         _bx = Home_::CLI_Support.standard_action_property_box_
+
         _help = _bx.fetch :help
-        to_property_stream.push_stream _help
+
+        Common_::Stream::CompoundStream.define do |o|
+          o.add_stream to_property_stream
+          o.add_item _help
+        end
       end
 
       def to_property_stream

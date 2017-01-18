@@ -1,194 +1,107 @@
 module Skylab::Common
 
-  module Scn__  # read [#ba-022] the scanners narrative
+  module Stream::CompoundStream
+
+    # this is a years (and years) old file rewritten fully anew to
+    # realize the bold dream of [#016.1] "baseless" streaming..
+    # the problem is described in the document. this is the solution.
 
     class << self
+      def define
+        o = Builder___.new
+        yield o
+        o.__finish
+      end
+    end  # >>
 
-      def try_convert x  # #[#056.1] strain: similar try-convert's for stream
+    # ==
 
-        if x.respond_to? :each_index
-          Home_.lib_.basic::List.line_stream x
+    class Builder___
 
-        elsif x.respond_to? :read
-          Home_.lib_.system_lib::IO.line_stream x
+      def initialize
+        @_stream_proc_array = []
+        @stream_class = Stream
+      end
 
-        elsif x.respond_to? :each
-          Home_.lib_.basic::Enumerator.line_stream x
+      def add_item x
+        @_stream_proc_array.push -> do
+          @stream_class.via_item x
+        end ; nil
+      end
 
-        elsif x.respond_to? :ascii_only?
-          Home_.lib_.basic::String.line_stream x
+      def add_stream st
+        @_stream_proc_array.push -> { st } ; nil
+      end
 
+      def add_stream_by & st_p
+        @_stream_proc_array.push st_p ; nil
+      end
+
+      def __finish
+        CustomStream___.new(
+          remove_instance_variable( :@_stream_proc_array ),
+          @stream_class,
+        )
+      end
+    end
+
+    # ==
+
+    class CustomStream___
+
+      include Stream::InstanceMethods
+
+      def initialize st_p_a, cls
+        if st_p_a.length.zero?
+          _close
         else
-          false
-        end
-      end
-    end
-
-    # basic list scanner aggregate
-    # aggregates other scanners, makes them behave as one sequence of scanners
-    #
-    #     scn_via = Home_.lib_.basic::List.line_stream.method :new
-    #
-    #     scn = Home_::SimpleStream.aggregate(
-    #       scn_via[ [ :a, :b ] ],
-    #       scn_via[ [] ],
-    #       scn_via[ [ :c ] ],
-    #     )
-    #
-    #     scn.count  # => 0
-    #     scn.gets  # => :a
-    #     scn.count  # => 1
-    #     scn.gets  # => :b
-    #     scn.count  # => 2
-    #     scn.gets  # => :c
-    #     scn.count  # => 3
-    #     scn.gets  # => nil
-    #     scn.count  # => 3
-
-    class Aggregate
-
-      def initialize scn_a
-
-        @gets_p = -> do
-          if scn_a.length.nonzero?
-            scn = scn_a[ 0 ] ; d = 0 ; last = scn_a.length - 1
-            (( @gets_p = -> do
-              while ! (( r = scn.gets ))
-                if last == d
-                  @gets_p = EMPTY_P_ ; break
-                else
-                  scn = scn_a[ d += 1 ]
-                end
-              end
-              r
-            end )).call
-          end
-        end
-
-        @count_p = -> do
-          scn_a.reduce( 0 ) do |m, scn|
-            m + (( scn.count or fail "count from #{ scn.class }?" ))
-          end
-        end
-      end
-
-      def count
-        @count_p.call
-      end
-
-      def gets
-        @gets_p.call
-      end
-    end
-
-    class Delay
-
-      def initialize p
-        close = -> { @gets_p = EMPTY_P_ ; nil }
-        @gets_p = -> do
-          scn = p.call
-          if ! scn then close[] else
-            @gets_p = -> do
-              r = scn.gets
-              r or close[]
-              r
-            end
-            @gets_p.call
-          end
+          @_stack = st_p_a.reverse
+          _st_p = @_stack.pop
+          @_stream = _st_p.call
+          @_gets = :_main
+          @stream_class = cls
         end
       end
 
       def gets
-        @gets_p.call
-      end
-    end
-
-    class Map_Reduce
-
-      def initialize * x_a
-        st = St__.new ; st[ x_a.shift ] = x_a.shift while x_a.length.nonzero?
-        @gets_p_p, @map_pass_filter_p = st.to_a ; @count = 0
-        normal_p = -> do
-          while (( r = @gets_p.call ))
-            if (( r_ = @map_pass_filter_p[ r ] ))
-              break( @count += 1 )
-            end
-          end
-          r_
-        end
-        @p = -> do
-          @gets_p = @gets_p_p.call
-          (( @p = normal_p )).call
-        end
-        nil
+        send @_gets
       end
 
-      St__ = ::Struct.new :gets_p_p,  :map_pass_filter_p
-
-      attr_reader :count
-
-      def gets
-        @p.call
-      end
-    end
-
-    class Map_Expand
-
-      def initialize scn, expand_p
-        @count = 0 ; @expand_p = expand_p ; @expanse = @expanse_fly = nil
-        @hot = true ; @scn = scn ; nil
-      end
-
-      attr_reader :count
-
-      def gets
-        while @hot
-          if @expanse
-            r = @expanse.gets
-            r and break( @count += 1 )
-            @expanse_fly = @expanse ; @expanse = nil
-          end
-          x = @scn.gets
-          x or break( @hot = false )
-          build_expanse x
-        end
-        r
-      end
-
-    private
-
-      def build_expanse x
-        if @expanse_fly
-          @expanse_fly.clear_expanse
-          @expanse = @expanse_fly ; @expanse_fly = nil
+      def _main
+        x = @_stream.gets
+        if x
+          x
+        elsif @_stack.length.zero?
+          remove_instance_variable :@_stream
+          remove_instance_variable :@_stack
+          _close
         else
-          @expanse = Expanse__.new
+          _st_p = @_stack.pop
+          @_stream = _st_p.call
+          _main  # RECURSE (no tail call here :P )
         end
-        @expanse.instance_exec x, & @expand_p
-        nil
       end
 
-      class Expanse__
-        def initialize
-          @p_a = [ ]
-        end
-        def clear_expanse
-          @p_a.clear ; nil
-        end
-        def gets
-          while @p_a.length.nonzero?
-            p = @p_a.shift
-            x = p.call
-            x and break( r = x )
-          end
-          r
-        end
-      private
-        def push_callable p
-          @p_a << p ; nil
-        end
+      def _close
+        @_gets = :_nothing ; freeze ; NOTHING_
+      end
+
+      def _nothing
+        NOTHING_
+      end
+
+      # --
+
+      def new_by & p
+
+        # (for now, when you map, lose the class association. but say hello.
+        #  one day we might try to achieve something hackier, or not #todo)
+
+        Stream.by -> { self._HELLO }, & p
       end
     end
+
+    # ==
   end
 end
-# #pending-rename during #open [#044.1]
+# #history: full rewrite after many many years. #tombstone-A: had doc-test
