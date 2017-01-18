@@ -97,7 +97,7 @@ module Skylab::MyTerm
         elsif __parse_help
           @CLI.when_head_argument_looks_like_help @_md
         else
-          _ = "expected -h or -a. had \"#{ @CLI.current_token }\"."
+          _ = "expected -h or -a. had \"#{ @CLI.head_as_is }\"."
           @CLI.done_because _, :argument
         end
       end
@@ -109,7 +109,7 @@ module Skylab::MyTerm
       def __parse_adapter  # assume starts with dash
 
         st = @CLI.argument_stream
-        s = st.current_token
+        s = st.head_as_is
         md = %r(\A-a([[:alnum:]]+)?\z).match s
         if md
           st.advance_one

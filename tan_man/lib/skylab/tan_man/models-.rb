@@ -133,7 +133,7 @@ module Skylab::TanMan
 
       def bound_call_for_ping_
 
-        Common_::Bound_Call.by do
+        Common_::BoundCall.by do
 
           sym = name.as_lowercase_with_underscores_symbol
 
@@ -291,13 +291,16 @@ module Skylab::TanMan
 
       mc = _model_class
 
-      _st = to_entity_stream_via_model mc do  # :+#hook-in
+      st = to_entity_stream_via_model mc do  # :+#hook-in
         self._HELLO
       end
 
-      _a_few_ent_a = _st.take A_FEW__ do | _fly |
-        _fly.dup
-      end
+      # (we used to have a `take` method on streams #tombstone-D)
+
+      _a_few_ent_a = Common_::Stream.via_times A_FEW__ do |d|
+        fly = st.gets
+        fly && fly.dup
+      end.to_a
 
       build_not_OK_event_with :component_not_found,
           :name_string, name_s,
@@ -593,6 +596,7 @@ module Skylab::TanMan
     Models_::Internal_::Paths[ path, verb, call, & oes_p ]
   end
 end
+# #tombstone-D: we once had `take` defined as a stream method
 # #tombstone: remote add, list, rm (ancient, deprecated); check, which
 # :+#tombstone: this used to be bottom properties frame
 # :+#tombstone: remote model (3 lines)

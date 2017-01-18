@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Models__::Report
 
-      class Actors__::To_stream < Common_::Actor::Dyadic
+      class Actors__::To_stream < Common_::Dyadic
 
         # narrative in [#006]:#note-007
 
@@ -24,7 +24,7 @@ module Skylab::Cull
 
         def normal
 
-          rfstream = Common_::Polymorphic_Stream.via_array @call_a.reverse
+          rfstream = Common_::Scanner.via_array @call_a.reverse
           jogs = []
 
           begin
@@ -35,7 +35,7 @@ module Skylab::Cull
             if :aggregator == func.category_symbol
 
               while rfstream.unparsed_exists &&
-                  :aggregator != rfstream.current_token.category_symbol
+                  :aggregator != rfstream.head_as_is.category_symbol
                 mapishes ||= []
                 mapishes.push rfstream.gets_one
               end
@@ -51,7 +51,7 @@ module Skylab::Cull
               mapishes = [ func ]
 
               while rfstream.unparsed_exists &&
-                  :aggregator != rfstream.current_token.category_symbol
+                  :aggregator != rfstream.head_as_is.category_symbol
                 mapishes.push rfstream.gets_one
               end
 

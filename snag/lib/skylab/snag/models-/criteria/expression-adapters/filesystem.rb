@@ -53,7 +53,7 @@ module Skylab::Snag
 
       def __build_a_stream_of_marshalled_words
 
-        scn = Common_::Polymorphic_Stream.via_array @word_array
+        scn = Common_::Scanner.via_array @word_array
 
         Common_.stream do
 

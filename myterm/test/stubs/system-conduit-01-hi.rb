@@ -10,7 +10,7 @@ module Skylab::MyTerm::TestSupport
 
     _build_instance = -> do
 
-      empty = Common_::Stream.the_empty_stream
+      empty = Common_::THE_EMPTY_STREAM
 
       _wait = Home_.lib_.system.test_support::STUBS.successful_wait
 

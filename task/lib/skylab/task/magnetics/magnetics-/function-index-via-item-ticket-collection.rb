@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::FunctionIndex_via_ItemTicketCollection < Common_::Actor::Monadic
+    class Magnetics_::FunctionIndex_via_ItemTicketCollection < Common_::Monadic
 
       # exactly [#010]
 
@@ -53,7 +53,7 @@ class Skylab::Task
       # --
 
       def to_product_symbol_stream__
-        @_function_indexes_via_product.to_name_stream
+        @_function_indexes_via_product.to_key_stream
       end
 
       def get_functions_that_produce_ sym

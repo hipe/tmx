@@ -309,7 +309,7 @@ module Skylab::Snag
       if @body
         @body.to_entity_stream_via_model Home_::Models_::Tag
       else
-        Common_::Stream.the_empty_stream
+        Common_::THE_EMPTY_STREAM
       end
     end
 
@@ -346,7 +346,7 @@ module Skylab::Snag
 
     define_method :formal_properties, ( Common_.memoize do
 
-      p = Common_.lib_.basic::Minimal_Property.method :via_variegated_symbol
+      p = Common_.lib_.basic::MinimalProperty.method :via_variegated_symbol
 
       [ p[ :identifier ],
         p[ :message ],

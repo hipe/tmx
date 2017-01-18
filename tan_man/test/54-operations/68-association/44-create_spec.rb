@@ -34,7 +34,7 @@ module Skylab::TanMan::TestSupport
 
         scn = @event_log.flush_to_scanner
 
-        _ = scn.current_token.channel_symbol_array.last
+        _ = scn.head_as_is.channel_symbol_array.last
 
         if :creating == _
           scn.advance_one  # ugly fix for [#086]
@@ -86,7 +86,7 @@ module Skylab::TanMan::TestSupport
         # #hack-ignore :found_existing_node (x2), :found_existing_association
 
         begin
-          if :document_did_not_change == scn.current_token.channel_symbol_array.last
+          if :document_did_not_change == scn.head_as_is.channel_symbol_array.last
             break
           end
           scn.advance_one

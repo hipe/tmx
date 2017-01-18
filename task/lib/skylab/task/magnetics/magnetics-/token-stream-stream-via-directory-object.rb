@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::TokenStreamStream_via_DirectoryObject < Common_::Actor::Monadic
+    class Magnetics_::TokenStreamStream_via_DirectoryObject < Common_::Monadic
 
       def initialize dir_object
         @directory_object = dir_object
@@ -38,9 +38,9 @@ class Skylab::Task
       def __init_prepared_entry_stream
 
         _ = remove_instance_variable :@_entries_array
-        st = Common_::Polymorphic_Stream.via_array _
+        st = Common_::Scanner.via_array _
         rx = /\A\.+\z/
-        while rx =~ st.current_token
+        while rx =~ st.head_as_is
           st.advance_one
         end
         @_prepared_entry_stream = st.flush_to_stream

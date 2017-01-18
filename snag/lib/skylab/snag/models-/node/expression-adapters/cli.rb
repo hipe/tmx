@@ -8,7 +8,7 @@ module Skylab::Snag
 
         def express_of_via_into_under_of y, expag, first
 
-          sess = Home_.lib_.string_lib.yamlizer.new
+          sess = Home_.lib_.string_lib::Yamlizer.new
 
           sess.register_properties do | o |
 

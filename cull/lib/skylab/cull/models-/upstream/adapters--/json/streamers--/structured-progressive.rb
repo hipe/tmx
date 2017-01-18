@@ -14,15 +14,14 @@ module Skylab::Cull
         end
 
         def execute
-
-          o = Common_::Stream
-          o.new(
-            o::Resource_Releaser.new do
+          Common_::Stream.define do |o|
+            o.upstream_as_resource_releaser_by do
               @fh.close
               ACHIEVED_
             end
-          ) do
-            @p[]
+            o.stream_by do
+              @p[]
+            end
           end
         end
 

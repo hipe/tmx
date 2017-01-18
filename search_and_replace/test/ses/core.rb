@@ -14,7 +14,7 @@ module Skylab::SearchAndReplace::TestSupport
 
         es = mutated_edit_session_
 
-        exp_st = Home_.lib_.basic::String.line_stream string
+        exp_st = Home_.lib_.basic::String::LineStream_via_String[ string ]
         act_st = es.to_line_stream
         begin
           act = act_st.gets

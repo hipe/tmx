@@ -65,7 +65,7 @@ module Skylab::CodeMetrics
 
     # ==
 
-    class Tuple_via_line__ < Common_::Actor::Dyadic  # #tespoint
+    class Tuple_via_line__ < Common_::Dyadic  # #tespoint
 
       def initialize line, pc, & p
         @listener = p

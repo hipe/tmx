@@ -173,7 +173,7 @@ module Skylab::DocTest::TestSupport
 
   Line_stream_via_string_ = -> do
     p = -> s do
-      p = Home_.lib_.basic::String.line_stream.method :via_big_string
+      p = Home_.lib_.basic::String::LineStream_via_String
       p[ s ]
     end
     -> s do

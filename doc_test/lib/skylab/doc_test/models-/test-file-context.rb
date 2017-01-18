@@ -46,11 +46,14 @@ module Skylab::DocTest
 
         _String = Home_.lib_.basic::String
 
-        scn = _String.line_stream local_path, ::File::SEPARATOR
+        scn = _String::LineStream_via_String.define do |o|
+          o.string = local_path
+          o.separator = ::File::SEPARATOR
+        end
 
         begin
           scn.unparsed_exists || break
-          if test_dir_entry == scn.current_token
+          if test_dir_entry == scn.head_as_is
             scn.advance_one
             break
           end
@@ -63,7 +66,7 @@ module Skylab::DocTest
         end
 
         _st = scn.to_stream
-        _ = _st.join_into_with_using_by "", UNDERSCORE_, :concat do |entry|
+        _ = _st.join_into_with_by "", UNDERSCORE_ do |entry|
 
           _stem = THING_DING_RX___.match( entry )[ :stem ]
 

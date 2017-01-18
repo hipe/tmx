@@ -81,7 +81,7 @@ module Skylab::TanMan::TestSupport
         }
       O
 
-      stmt = graph.node_statements.gets.stmt
+      stmt = graph.to_node_statement_stream.gets.stmt
       alist = stmt.attr_list.content
       alist.class.should eql Home_::Models_::DotFile::Sexps::AList  # meh
       alist.prototype_ = graph.class.parse :a_list, 'a=b, c=d'
@@ -99,7 +99,7 @@ module Skylab::TanMan::TestSupport
         }
       O
 
-      stmt = graph.node_statements.gets.stmt
+      stmt = graph.to_node_statement_stream.gets.stmt
       alist = stmt.attr_list.content
       alist.unparse.should eql( 'label=barl, fillcolor="too"' )
       attrs = [['fontname', 'Futura'], ['fillcolor', '#11c11']]

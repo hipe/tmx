@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::Node_for_Treemap_via_Recording < Common_::Actor::Dyadic
+  class Magnetics_::Node_for_Treemap_via_Recording < Common_::Dyadic
 
     # turn a flat list (stream) of events (modules, files, line numbers)
     # into a data tree suitable for a treemap visualiztion.
@@ -78,7 +78,7 @@ module Skylab::CodeMetrics
 
       def __when_file_box_has_one_item
         bx = remove_instance_variable :@_file_box
-        bx.fetch( bx.first_name ).to_node_for_treemap( & @_listener )
+        bx.fetch( bx.first_key ).to_node_for_treemap( & @_listener )
       end
 
       def __resolve_file_box_via_recording
@@ -353,7 +353,7 @@ module Skylab::CodeMetrics
 
     # ==
 
-    class FileBox_via_Recording__ < Common_::Actor::Dyadic
+    class FileBox_via_Recording__ < Common_::Dyadic
 
       # the stream of tuples can jump around among files as one file loads
       # another file and so on. but towards our objective we see each file

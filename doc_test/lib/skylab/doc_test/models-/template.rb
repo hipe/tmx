@@ -52,7 +52,7 @@ module Skylab::DocTest
 
       _big_string = @_reflection.__express_into_against "", _sbx.h_
 
-      Home_.lib_.basic::String.line_stream _big_string
+      Home_.lib_.basic::String::LineStream_via_String[ _big_string ]
     end
 
     # ==
@@ -101,16 +101,16 @@ module Skylab::DocTest
 
         # any remaining lines *do* get deepened:
 
-        st.reduce_into_by buffer do |m, line|
+        st.join_into buffer do |line|
 
           if ZERO_LENGTH_LINE_RX_ =~ line
             # it is almost certainly the case that when there is a "blank"
             # line in the source document, it should not get deepened.
             # use the user's LTS
-            m << line
+            line
           else
             # since there is content in the line, do this shim sham
-            m << "#{ margin_s }#{ line }"
+            "#{ margin_s }#{ line }"
           end
         end
 

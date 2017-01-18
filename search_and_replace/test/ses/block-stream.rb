@@ -96,33 +96,33 @@ module Skylab::SearchAndReplace::TestSupport
 
       def ___say_arrays_not_equal act_a, exp_a  # assume they are not equal.
 
-        act_st = Common_::Polymorphic_Stream.via_array act_a
-        exp_st = Common_::Polymorphic_Stream.via_array exp_a
+        act_st = Common_::Scanner.via_array act_a
+        exp_st = Common_::Scanner.via_array exp_a
 
         begin
 
           if exp_st.no_unparsed_exists
             x = "array was longer than expected. expected no item at index #{
              }#{ act_st.current_index }. (had #{
-              }#{ act_st.current_token.inspect }.)"
+              }#{ act_st.head_as_is.inspect }.)"
             break
           end
 
-          if exp_st.current_token == act_st.current_token
+          if exp_st.head_as_is == act_st.head_as_is
             act_st.advance_one
             exp_st.advance_one
             if act_st.no_unparsed_exists
               x = "array ended early. expected an item at index #{
                 } #{ exp_st.current_index }. (expected #{
-                 }#{ exp_st.current_token.inspect }.)"
+                 }#{ exp_st.head_as_is.inspect }.)"
               break
             end
             redo
           end
 
           x = "at index #{ act_st.current_index } expected #{
-           }#{ exp_st.current_token.inspect }, had #{
-            }#{ act_st.current_token.inspect }."
+           }#{ exp_st.head_as_is.inspect }, had #{
+            }#{ act_st.head_as_is.inspect }."
           break
         end while nil
         x

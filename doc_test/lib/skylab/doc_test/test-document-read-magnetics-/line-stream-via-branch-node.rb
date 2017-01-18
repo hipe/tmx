@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class TestDocumentReadMagnetics_::LineStream_via_BranchNode < Common_::Actor::Monadic
+  class TestDocumentReadMagnetics_::LineStream_via_BranchNode < Common_::Monadic
 
         # (as we've done many times before)
 

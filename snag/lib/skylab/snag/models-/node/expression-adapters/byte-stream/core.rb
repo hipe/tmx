@@ -180,7 +180,7 @@ module Skylab::Snag
             NIL_
           end
 
-          Common_::Stream.new _reinitializer do
+          Common_::Stream.by _reinitializer do
             p[]
           end
         end

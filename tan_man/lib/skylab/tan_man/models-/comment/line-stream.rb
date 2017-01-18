@@ -31,7 +31,7 @@ module Skylab::TanMan
 
         def self.[] str
           scn = Home_.lib_.string_scanner.new str
-          scan = Stream__.new scn do
+          scan = Stream__.by scn do
             if ! scn.eos?
               scan.last_start_position = scn.pos
               s = scn.scan CONTENT_RX__
@@ -67,7 +67,7 @@ module Skylab::TanMan
       module C_Style__
 
         def self.new scn
-          scan = Stream__.new scn do
+          scan = Stream__.by scn do
             while scn and ! scn.eos?
               scan.last_start_position = scn.pos
               s = scn.scan CONTENT_RX__
@@ -96,7 +96,7 @@ module Skylab::TanMan
 
         def self.new scn
           scn.skip SHELL_OPEN_RX__
-          scan = Stream__.new scn do
+          scan = Stream__.by scn do
             while true
               scn or break
               scan.last_start_position = scn.pos

@@ -42,7 +42,7 @@ module Skylab::TanMan
         st = @in_ID.to_simple_line_stream
         st and begin
           @in_ID = nil
-          @upstream_lines = Common_::SimpleStream.by do
+          @upstream_lines = Common_::MinimalStream.by do
             line = st.gets
             if line
               @line_count += 1

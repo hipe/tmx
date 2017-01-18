@@ -14,7 +14,7 @@ module Skylab::SearchAndReplace
 
       @_LTS_stream = Common_::Stream.via_nonsparse_array o.LTS_indexes do |d|
         a.fetch d
-      end.flush_to_polymorphic_stream
+      end.flush_to_scanner
 
       @_match_stream = Common_::Stream.via_nonsparse_array o.MC_indexes do |d|
         a.fetch d
@@ -52,7 +52,7 @@ module Skylab::SearchAndReplace
       @_match ||= @_match_stream.gets  # leave it if it is there for #here
       if @_match
         if @_LTS_stream.unparsed_exists
-          if @_LTS_stream.current_token.charpos < @_match.charpos
+          if @_LTS_stream.head_as_is.charpos < @_match.charpos
             __transition_to_LTS_then_match
           else
             __transition_to_any_static_then_match_and_LTS
@@ -122,7 +122,7 @@ module Skylab::SearchAndReplace
 
       @_a = nil
 
-      lts = @_LTS_stream.current_token
+      lts = @_LTS_stream.head_as_is
 
       if lts.end_charpos <= @_match.match_charpos
 

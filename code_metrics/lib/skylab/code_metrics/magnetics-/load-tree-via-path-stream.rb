@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::LoadTree_via_PathStream < Common_::Actor::Dyadic
+  class Magnetics_::LoadTree_via_PathStream < Common_::Dyadic
 
     # "load tree" in summary:
     #   - a tree of "abstract names"

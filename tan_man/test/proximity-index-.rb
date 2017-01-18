@@ -199,7 +199,7 @@ module Skylab::TanMan::TestSupport
       _local_path = _localizer[ client_path ]
       _entries = _local_path.split ::File::SEPARATOR
 
-      scn = Common_::Polymorphic_Stream.via_array _entries
+      scn = Common_::Scanner.via_array _entries
 
       mod = @from_module
       begin

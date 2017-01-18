@@ -10,7 +10,7 @@ module Skylab::MyTerm
       end
     end  # >>
 
-    class Adapter_via_Argument_Stream___ < Common_::Actor::Dyadic
+    class Adapter_via_Argument_Stream___ < Common_::Dyadic
 
       def initialize st, k, & pp
         @_arg_st = st
@@ -29,7 +29,7 @@ module Skylab::MyTerm
         _adapters_silo = @kernel_.silo :Adapters
         _stream_method = _adapters_silo.method :to_load_ticket_stream
 
-        _x = @_arg_st.current_token
+        _x = @_arg_st.head_as_is
 
         @_oes_p = @_pp[ nil ]
 

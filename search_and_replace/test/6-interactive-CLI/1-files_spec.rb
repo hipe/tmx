@@ -25,6 +25,7 @@ module Skylab::SearchAndReplace::TestSupport
         end
 
         it "does NOT include line talking bout grep rx", wip: true do  # #[#004]
+          fail "THIS IS WIPPED"
           _screen_has_egrep_field and fail
         end
       end

@@ -218,7 +218,7 @@ module Skylab::TMX
             break
           end
 
-          if @_box.has_name new_very_short
+          if @_box.has_key new_very_short
             ok = false
             break
           end
@@ -278,7 +278,7 @@ module Skylab::TMX
             # to keep sigils down to 2 chars is stronger than the gravity to
             # avoid ambiguity (by this code).
 
-            if @_box.has_name new_very_short
+            if @_box.has_key new_very_short
               ok = false
               break
             end

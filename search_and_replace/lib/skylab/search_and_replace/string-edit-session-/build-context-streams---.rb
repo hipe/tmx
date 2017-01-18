@@ -123,7 +123,7 @@ module Skylab::SearchAndReplace
       target_d = @num_lines_before
 
       if target_d.zero?
-        st = Common_::Stream.the_empty_stream
+        st = Common_::THE_EMPTY_STREAM
       else
 
         st = Home_::StringEditSession_::Build_Before_Context_Stream___.new(

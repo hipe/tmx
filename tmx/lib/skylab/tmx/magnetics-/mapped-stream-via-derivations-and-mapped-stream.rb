@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Magnetics_::MappedStream_via_Derivations_and_MappedStream < Common_::Actor::Dyadic
+  class Magnetics_::MappedStream_via_Derivations_and_MappedStream < Common_::Dyadic
 
     # public API methods effected:
     #   - `begin_deriver`
@@ -116,7 +116,7 @@ module Skylab::TMX
 
     Seer_via_deriver__ = -> key, deri do  # #here
       -> node do
-        if node.box.has_name key
+        if node.box.has_key key
           deri.see_and_or_mutate_for_derivation node
         end
         NIL

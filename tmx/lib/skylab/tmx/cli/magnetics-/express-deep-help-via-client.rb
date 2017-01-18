@@ -2,7 +2,7 @@ module Skylab::TMX
 
   class CLI
 
-    class Magnetics_::ExpressDeepHelp_via_Client < Common_::Actor::Monadic  # 1x
+    class Magnetics_::ExpressDeepHelp_via_Client < Common_::Monadic  # 1x
 
       # you love it
 
@@ -78,7 +78,7 @@ module Skylab::TMX
 
           _items = __synopsis_lines_via_one_off one_off
 
-          scn = Common_::Polymorphic_Stream.via_array _items
+          scn = Common_::Scanner.via_array _items
 
           if is_final
             my_final_head = "#{ head }#{ @_crook }"
@@ -147,7 +147,7 @@ module Skylab::TMX
         def __to_sidesystems_of_interest_scanner
 
           scn = @omni.to_operator_load_ticket_scanner
-          scn.advance_one while ::Symbol === scn.current_token  # horrible
+          scn.advance_one while ::Symbol === scn.head_as_is  # horrible
 
           # because tmx mounts its own one-offs to look like operators
           # (and we assume a particular order where one-offs are last),
@@ -177,7 +177,7 @@ module Skylab::TMX
           _st = Common_.stream do
             p[]
           end
-          _st.flush_to_polymorphic_stream
+          _st.flush_to_scanner
         end
       # -
 

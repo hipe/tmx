@@ -55,25 +55,7 @@ module Skylab::CodeMetrics
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
   Lazy_ = Common_::Lazy
-
-  # == small magnets
-
-  # == model support
-
-  class SimpleModel_
-
-    class << self
-      alias_method :define, :new
-      undef_method :new
-    end
-
-    def initialize  # suggestion
-      yield self
-      freeze
-    end
-
-    private :dup
-  end
+  SimpleModel_ = Common_::SimpleModel
 
   # ==
 
@@ -183,7 +165,7 @@ module Skylab::CodeMetrics
     Parse = sidesys[ :Parse ]
 
     Reverse_string_scanner = -> s do
-      Basic[]::String.line_stream.reverse s
+      Basic[]::String::LineStream_via_String::Reverse[ s ]
     end
 
     Select = -> do

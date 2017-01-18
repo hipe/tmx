@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    class Magnetics_::NormalizedStem_via_Token < Common_::Actor::Monadic  # 1x <
+    class Magnetics_::NormalizedStem_via_Token < Common_::Monadic  # 1x <
 
       def initialize x, & p
         @on_event_selectively = p

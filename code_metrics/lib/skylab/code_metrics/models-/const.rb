@@ -65,7 +65,7 @@ module Skylab::CodeMetrics
       def __flush_to_value
         mod = ::Object
         begin
-          _mod_ = mod.const_get current_token, false
+          _mod_ = mod.const_get head_as_is, false
           mod = _mod_
           advance_one
         end until @no_unparsed_exists
@@ -73,12 +73,12 @@ module Skylab::CodeMetrics
       end
 
       def gets_one
-        x = current_token
+        x = head_as_is
         _ok = send @_advance_one
         _ok && x
       end
 
-      def current_token
+      def head_as_is
         @_current_token_knownness.value_x
       end
 

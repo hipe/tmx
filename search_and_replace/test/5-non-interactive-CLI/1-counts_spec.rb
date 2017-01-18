@@ -35,7 +35,7 @@ module Skylab::SearchAndReplace::TestSupport
         rx = %r(\A\[-[a-z](?: X)?\]\z)  # "[-a X]", "[-b X]" etc
 
         bad_a = _st.map_by do |d|
-          bx.at_position d
+          bx.at_offset d
         end.reduce_by do |s|
           rx !~ s
         end.to_a

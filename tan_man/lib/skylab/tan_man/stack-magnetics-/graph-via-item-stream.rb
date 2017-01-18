@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class StackMagnetics_::Graph_via_ItemStream < Common_::Actor::Monadic
+  class StackMagnetics_::Graph_via_ItemStream < Common_::Monadic
 
     def initialize st
       @__item_stream = st

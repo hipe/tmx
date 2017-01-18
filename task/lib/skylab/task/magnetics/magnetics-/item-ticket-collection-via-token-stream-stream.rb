@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::ItemTicketCollection_via_TokenStreamStream < Common_::Actor::Monadic
+    class Magnetics_::ItemTicketCollection_via_TokenStreamStream < Common_::Monadic
 
       def initialize st_st, & oes_p
         @token_stream_stream = st_st

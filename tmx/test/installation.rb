@@ -135,7 +135,7 @@ module Skylab::TMX::TestSupport
       end
 
       def to_bound_call
-        Common_::Bound_Call[ nil, self, :execute ]
+        Common_::BoundCall[ nil, self, :execute ]
       end
 
       def execute

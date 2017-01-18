@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
-    class Magnetics_::ReappropriablestNode_via_Arguments < Common_::Actor::Monadic
+    class Magnetics_::ReappropriablestNode_via_Arguments < Common_::Monadic
 
       # as an exercise we are sticking as close as is reasonable to a line-
       # by line transformation of the relevant "proto-sudocode" in [#038]

@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   class Image_Output_Adapters_::Imagemagick
 
-    class Magnetics_::Command_via_Appearance < Common_::Actor::Monadic
+    class Magnetics_::Command_via_Appearance < Common_::Monadic
 
       def initialize o, & p
         @_mags = o ; @_oes_p = p

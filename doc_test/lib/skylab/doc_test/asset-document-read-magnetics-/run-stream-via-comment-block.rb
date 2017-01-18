@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class AssetDocumentReadMagnetics_::RunStream_via_CommentBlock < Common_::Actor::Monadic
+  class AssetDocumentReadMagnetics_::RunStream_via_CommentBlock < Common_::Monadic
 
     # three laws (more or less) by its tests which are by [#021]
 

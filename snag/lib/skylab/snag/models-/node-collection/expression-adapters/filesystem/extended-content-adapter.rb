@@ -34,7 +34,7 @@ module Skylab::Snag
             st = begin
               fs.entry_stream dir
             rescue  ::Errno::ENOENT
-              Common_::Stream.the_empty_stream
+              Common_::THE_EMPTY_STREAM
             end
 
             begin

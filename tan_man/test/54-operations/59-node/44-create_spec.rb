@@ -104,9 +104,11 @@ module Skylab::TanMan::TestSupport
         touch_node_via_label 'milk the cow'
         touch_node_via_label 'milk the cat'
         touch_node_via_label 'MiLk the catfish'
-        node_sexp_stream.map( & :node_id ).
-          should eql [ :milk_3, :milk_2, :milk ]
-        a = node_sexp_stream.map( & :label )
+
+        _sym_a = node_sexp_stream.map_by( & :node_id ).to_a
+        _sym_a == %i( milk_3 milk_2 milk ) || fail
+
+        a = node_sexp_stream.map_by( & :label ).to_a
         a.shift.should eql 'MiLk the catfish'
         a.shift.should eql 'milk the cat'
         a.shift.should eql 'milk the cow'

@@ -14,7 +14,9 @@ module Skylab::TMX
 
       _item_stream = Stream_[ @item_array ]
 
-      o = Common_::Stream::Ordered_via_DependencyTree.begin
+      _st = Common_::Stream::Magnetics::
+          OrderedStream_via_DependencyTree_and_Stream.call_by do |o|
+        # <-
       o.upstream = _item_stream
 
       o.identifying_key_by = -> item do
@@ -25,8 +27,8 @@ module Skylab::TMX
       o.reference_key_by = -> item do
         item.box[ key ]  # not fetch. the first item goes after nothing.
       end
-
-      _st = o.execute
+      # ->
+      end
 
       ary = _st.to_a
       if ! @is_forwards

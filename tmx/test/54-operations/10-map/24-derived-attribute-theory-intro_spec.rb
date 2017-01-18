@@ -84,13 +84,13 @@ module Skylab::TMX::TestSupport
         not_a = _custom_partition.last
         not_a.length.zero? && fail
         not_a.each do |entity|
-          entity.box.has_name :squre and fail
+          entity.box.has_key :squre and fail
         end
       end
 
       shared_subject :_custom_partition do
         presumably_ordered_items_.partition do |entity|
-          entity.box.has_name :some_number
+          entity.box.has_key :some_number
         end
       end
     end

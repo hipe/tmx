@@ -14,9 +14,10 @@ module Skylab::TanMan::TestSupport
         o = touch_node_via_label 'cyan'
         o.unparse.should eql "cyan [label=cyan]"  # :node_stmt
         number_of_nodes.should eql 1
-        node_sexp_stream.map do | x |
-          x.node_id
-        end.should eql [ :cyan ]
+
+        _i_a = node_sexp_stream.map_by( & :node_id ).to_a
+        _i_a == %i( cyan ) || fail
+
         unparsed[ -24 .. -1 ].should eql "*/\n\ncyan [label=cyan]\n}\n"
       end
 
@@ -37,9 +38,9 @@ module Skylab::TanMan::TestSupport
         number_of_nodes.should eql 1
         o = touch_node_via_label 'cyan'
         number_of_nodes.should eql 2
-        _i_a = node_sexp_stream.map do | x |
-          x.node_id
-        end
+
+        _i_a = node_sexp_stream.map_by( & :node_id ).to_a
+
         _i_a.should eql [ :blue, :cyan ]
         o.unparse.should eql "cyan [label=cyan]"
         a = unparsed.split NEWLINE_
@@ -55,10 +56,11 @@ module Skylab::TanMan::TestSupport
         number_of_nodes.should eql 1
         o = touch_node_via_label 'cyan'
         number_of_nodes.should eql 2
-        _i_a = node_sexp_stream.map do | x |
-          x.node_id
-        end
+
+        _i_a = node_sexp_stream.map_by( & :node_id ).to_a
+
         _i_a.should eql [ :cyan, :red ]
+
         o.unparse.should eql "cyan [label=cyan]"
 
         a = unparsed.split NEWLINE_
@@ -95,10 +97,8 @@ module Skylab::TanMan::TestSupport
         end
 
         def expect * i_a
-          _i_a = node_sexp_stream.map do | x |
-            x.node_id
-          end
-          _i_a.should eql i_a
+          _i_a = node_sexp_stream.map_by( & :node_id ).to_a
+          _i_a == i_a || fail
         end
       end
 

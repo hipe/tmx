@@ -58,9 +58,12 @@ module Skylab::TanMan
 
         _st = Brazen_::Ordered_stream_via_participating_stream[ _st_ ]
 
-        @definition_collection =
-          _st.flush_to_immutable_with_random_access_keyed_to_method(
-            :name_value_for_order )
+        _st_ = Common_::Stream::Magnetics::RandomAccessImmutable_via_Stream.define do |o|
+          o.upstream = _st
+          o.key_method_name = :name_value_for_order
+        end
+
+        @definition_collection = _st_
       end
 
       def __bound_call_via_qualified_knownness_box bx, & oes_p

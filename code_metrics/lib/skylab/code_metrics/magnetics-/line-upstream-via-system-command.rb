@@ -23,7 +23,7 @@ module Skylab::CodeMetrics
           if s
             self._SQUAWK
           elsif w.value.exitstatus.zero?
-            Common_::Stream.the_empty_stream
+            Common_::THE_EMPTY_STREAM
           else
             self._SQUAWK
           end

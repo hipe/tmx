@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics::AsciiMatrix_via_ShapesLayers < Common_::Actor::Dyadic
+  class Magnetics::AsciiMatrix_via_ShapesLayers < Common_::Dyadic
 
     # -
 
@@ -38,7 +38,7 @@ module Skylab::CodeMetrics
           __stubbed_big_string_via_width width
         end
 
-        Basic_[]::String.line_stream _big_string
+        Basic_[]::String::LineStream_via_String[ _big_string ]
       end
 
       def __stubbed_big_string_via_width w

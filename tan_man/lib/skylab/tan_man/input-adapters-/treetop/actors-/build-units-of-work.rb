@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module Input_Adapters_::Treetop
 
-    class Actors_::Build_units_of_work < Common_::Actor::Dyadic
+    class Actors_::Build_units_of_work < Common_::Dyadic
 
       # build the array of units of work, necessarily in one batch so we
       # memoize the existential state of the various dirs involved, only

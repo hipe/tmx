@@ -166,11 +166,11 @@ module Skylab::TanMan
       end
 
       def to_node_sexp_stream
-        document_.at_graph_sexp :nodes
+        document_.at_graph_sexp :to_node_stream
       end
 
-      def get_node_statement_scan
-        document_.at_graph_sexp :node_statements
+      def to_node_statement_stream
+        document_.at_graph_sexp :to_node_statement_stream
       end
 
       def at_graph_sexp i

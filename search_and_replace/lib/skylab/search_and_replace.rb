@@ -83,7 +83,11 @@ module Skylab::SearchAndReplace
           there is a known issue with files with multibyte characters.
         HERE
 
-      st = Home_.lib_.basic::String[ :line_stream, :mutate_by_unindenting, _ ]
+      st = Home_.lib_.basic::String.via_map_chain( _,
+        :mutated_unindented_string_via_string,
+        :line_stream_via_string,
+      )
+
       while s = st.gets
         y << s
       end
@@ -306,7 +310,7 @@ module Skylab::SearchAndReplace
         end
       end
 
-      def against_nonempty_polymorphic_stream stream
+      def against_nonempty_argument_scanner stream
         s = stream.gets_one
         if SPACE_SPAN_RX_ =~ s
           maybe_send_event :error do

@@ -4,7 +4,7 @@ module Skylab::DocTest
 
     # see [#024] node theory
 
-    extend Common_::Actor::ProcLike
+    extend Common_::ProcLike
 
     def initialize bs, tfcp, cx
       @block_stream = bs

@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class AssetDocumentReadMagnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack < Common_::Actor::Monadic
+  class AssetDocumentReadMagnetics_::BlockStream_via_LineStream_and_Single_Line_Comment_Hack < Common_::Monadic
 
     # (some of this is near [#ta-005]-ish magnetics composition (how?))
 

@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class StackMagnetics_::LineStream_via_Graph < Common_::Actor::Monadic
+  class StackMagnetics_::LineStream_via_Graph < Common_::Monadic
 
     WORD_WRAP_ASPECT_RATIO___ = [ 5, 1 ]
 
@@ -59,7 +59,7 @@ module Skylab::TanMan
         p[ line ]
       end
 
-      Home_.lib_.basic::String.word_wrappers.calm.with(
+      Home_.lib_.basic::String::WordWrapper::Calm.with(
         :aspect_ratio, WORD_WRAP_ASPECT_RATIO___,
         :downstream_yielder, _y,
         :input_words, s_a,
@@ -75,9 +75,7 @@ module Skylab::TanMan
         _st = Common_::Stream.via_nonsparse_array( a ).map_by do |pair|
           ", #{ pair.first}=#{ pair.last }"  # meh
         end
-        _ = _st.reduce_into_by "" do |m, s_|
-          m << s_
-        end
+        _ = _st.join_into ""
       end
 
       # --

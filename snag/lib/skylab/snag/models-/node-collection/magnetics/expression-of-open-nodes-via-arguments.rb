@@ -17,11 +17,11 @@ module Skylab::Snag
 
       attr_accessor :name
 
-      def bound_call_against_polymorphic_stream st
+      def bound_call_against_argument_scanner st
 
         st.unparsed_exists and self._SANITY
 
-        Common_::Bound_Call.via_receiver_and_method_name self, :execute
+        Common_::BoundCall.via_receiver_and_method_name self, :execute
       end
 
       def execute

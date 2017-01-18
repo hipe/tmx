@@ -5,16 +5,7 @@ module Skylab::CodeMetrics
   if ridiculous_
     @ridiculous_ = false
 
-    class CLI__ExpressMondrianHelp_via_  # SimpleModel_
-
-      class << self
-        def call_by
-          o = new
-          yield o
-          o.execute
-        end
-        private :new
-      end  # >>
+    class CLI__ExpressMondrianHelp_via_ < Common_::MagneticBySimpleModel
 
       attr_writer(
         :expression_agent,

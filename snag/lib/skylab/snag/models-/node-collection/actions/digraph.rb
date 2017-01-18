@@ -154,7 +154,7 @@ module Skylab::Snag
 
         node = op.node
         s_a = []
-        ww = Home_.lib_.basic::String.word_wrappers.calm.new_with(
+        ww = Home_.lib_.basic::String::WordWrapper::Calm.new_with(
           :downstream_yielder, s_a,
           :aspect_ratio, WORDWRAP_ASPECT_RATIO___ )
 

@@ -107,7 +107,7 @@ module Skylab::TanMan
           o.preconditions bx
 
           o.mutate_formal_properties do | fo |
-            Models_::Workspace.common_properties.box.each_name do | sym |
+            Models_::Workspace.common_properties.box.each_key do | sym |
               fo.remove sym
             end
           end

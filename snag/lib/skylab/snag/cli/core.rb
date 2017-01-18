@@ -8,7 +8,7 @@ module Skylab::Snag
     # action adapter, an exposure that calls one of two distinct model
     # actions depending on its arguments.
 
-    # awful alias method chain only #while #exist [br] and while #open [#co-044.1]
+    # awful alias method chain only #while #exist [br] and while #open [#co-016.1]
 
     expose_executables_with_prefix 'tmx-snag-'
 
@@ -16,11 +16,14 @@ module Skylab::Snag
 
     def to_unordered_selection_stream
 
+      _head_item = CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
+
       _tail_st = __this_guy
 
-      _head_st = CLI_Lib__::Backless::Backless_Unbound_Action.new Actions::Open
-
-      _tail_st.unshift_stream _head_st
+      Common_::Stream::CompoundStream.define do |o|
+        o.add_item _head_item
+        o.add_stream _tail_st
+      end
     end
 
     class Action_Adapter < Action_Adapter
@@ -125,7 +128,7 @@ module Skylab::Snag
           end
         end
 
-        if bx.has_name :message
+        if bx.has_key :message
 
           if lefts
             _when_non_pertient lefts, :right_unbound, :left_unbound
@@ -206,11 +209,11 @@ module Skylab::Snag
         @_up = x
       end
 
-      def bound_call_against_polymorphic_stream st
+      def bound_call_against_argument_scanner st
 
-        @_bc = @_up.bound_call_against_polymorphic_stream st
+        @_bc = @_up.bound_call_against_argument_scanner st
 
-        Common_::Bound_Call.via_receiver_and_method_name self, :execute
+        Common_::BoundCall.via_receiver_and_method_name self, :execute
       end
 
       def execute

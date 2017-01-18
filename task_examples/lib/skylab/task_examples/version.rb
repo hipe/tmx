@@ -16,7 +16,7 @@ module Skylab::TaskExamples
 
     NOT_VERSION__ = /(?:(?!#{ REGEX.source }).)+/x
 
-    class Parse___ < Common_::Actor::Dyadic
+    class Parse___ < Common_::Dyadic
 
       def initialize str, base_cls, & oes_p
         @string = str

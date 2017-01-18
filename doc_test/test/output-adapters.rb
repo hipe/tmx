@@ -53,9 +53,7 @@ module Skylab::DocTest::TestSupport
       )
 
       def to_string__
-        to_line_stream.reduce_into_by "" do |m, s|
-          m << s
-        end
+        to_line_stream.join_into ""
       end
 
       def to_line_stream

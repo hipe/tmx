@@ -194,7 +194,7 @@ module Skylab::SearchAndReplace
 
           def execute
 
-            _st = Home_.lib_.basic::String.line_stream @md[ 0 ]
+            _st = Home_.lib_.basic::String::LineStream_via_String[ @md[ 0 ] ]
             @_st = @expag.map_match_line_stream _st
             @_p = method :___gets_first_line
 

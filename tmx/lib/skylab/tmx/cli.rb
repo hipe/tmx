@@ -72,7 +72,7 @@ module Skylab::TMX
       def to_bound_call
         # (for now we're doing it this way but if we wanted to we could
         #  probably make it work the weird way, like stop at 3 levels or etc)
-        Common_::Bound_Call.by do
+        Common_::BoundCall.by do
           @stderr.puts "haha no (we could but why?)" ; NOTHING_
         end
       end
@@ -439,7 +439,7 @@ module Skylab::TMX
       # -- ping
 
       def __bound_call_for_ping
-        Common_::Bound_Call[ nil, self, :__do_ping ]
+        Common_::BoundCall[ nil, self, :__do_ping ]
       end
 
       def __describe_ping y
@@ -621,7 +621,7 @@ module Skylab::TMX
           a[1] = '-help'  # like HELP_SWITCH_LONG_ but assert our way
           d -= 1
         end
-        Common_::Polymorphic_Stream.via_start_index_and_array d, a
+        Common_::Scanner.via_start_index_and_array d, a
       end
 
       # --

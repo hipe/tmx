@@ -50,7 +50,7 @@ module Skylab::Snag
 
         count = 0
 
-        Common_::Stream.new st.upstream do
+        Common_::Stream.by st.upstream do
 
           if end_ > count
             x = st.gets

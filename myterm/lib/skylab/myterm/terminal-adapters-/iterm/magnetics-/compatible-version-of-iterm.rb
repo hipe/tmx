@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   class Terminal_Adapters_::Iterm
 
-    class Magnetics_::Compatible_Version_of_Iterm < Common_::Actor::Monadic
+    class Magnetics_::Compatible_Version_of_Iterm < Common_::Monadic
 
       THRESHOLD_ITERM2_VERSION___ = [ 2, 9, 20140903 ]
 

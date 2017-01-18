@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Adapters__::Markdown
 
-      class Table_scanner_via_line_stream__ < Common_::Actor::Monadic
+      class Table_scanner_via_line_stream__ < Common_::Monadic
 
         # our "grammar" for what constitutes a github-flavored markdown table
         # is probably not a perfect subset nor superset of the emergent

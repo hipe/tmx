@@ -5,7 +5,7 @@ module Skylab::TMX
     When_ = ::Module.new
     WhenSupport_ = ::Module.new
 
-    class When_::Help < Common_::Actor::Monadic
+    class When_::Help < Common_::Monadic
 
       # this node has two arguably separate responsibilities: one is to
       # lead to the expression of help screens generally (for local and

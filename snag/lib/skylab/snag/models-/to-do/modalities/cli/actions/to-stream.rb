@@ -118,7 +118,7 @@ module Skylab::Snag
 
             d = occurrences.seen_count or self._SANITY
 
-            Common_::Bound_Call.by do
+            Common_::BoundCall.by do
               __express_as_tree d, bc
             end
           else
@@ -251,7 +251,7 @@ module Skylab::Snag
       end
     end
 
-    class Build_basic_tree_lines_stream___ < Common_::Actor::Dyadic
+    class Build_basic_tree_lines_stream___ < Common_::Dyadic
 
       def initialize t, gs
         @glyphset = gs
@@ -287,7 +287,7 @@ module Skylab::Snag
       end
     end
 
-    class Build_pretty_tree_lines_stream___ < Common_::Actor::Dyadic
+    class Build_pretty_tree_lines_stream___ < Common_::Dyadic
 
       def initialize t, gs
 
@@ -354,7 +354,7 @@ module Skylab::Snag
 
       def via_cache_build_stream
         d = -1 ; last = @cache_a.length - 1
-        Common_::SimpleStream.by do
+        Common_::MinimalStream.by do
           if d < last
             line_via_item @cache_a.fetch d += 1
           end

@@ -13,7 +13,7 @@ module Skylab::TMX::TestSupport
 
         ignore_common_post_operation_emissions_
 
-        call :map, :json_file_stream, Common_::Stream.the_empty_stream, :select, :wipple_wapper
+        call :map, :json_file_stream, Common_::THE_EMPTY_STREAM, :select, :wipple_wapper
       end
 
       it "hi" do

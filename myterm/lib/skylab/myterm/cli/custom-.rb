@@ -7,7 +7,7 @@ module Skylab::MyTerm
       # the non-interactive CLI client requires work to accomodate
       # our custom syntax for setting the adapter.
 
-      class Compound_usage_strings < Common_::Actor::Dyadic
+      class Compound_usage_strings < Common_::Dyadic
 
         # ("sa" = "syntax assembly")
 
@@ -47,7 +47,7 @@ module Skylab::MyTerm
         end
       end
 
-      class Operation_usage_string < Common_::Actor::Monadic
+      class Operation_usage_string < Common_::Monadic
 
         def initialize sa
           @_sa = sa
@@ -113,7 +113,7 @@ module Skylab::MyTerm
 
       # ==
 
-      class Invite < Common_::Actor::Monadic
+      class Invite < Common_::Monadic
 
         # the same logic as the common invite line, plus one element
 

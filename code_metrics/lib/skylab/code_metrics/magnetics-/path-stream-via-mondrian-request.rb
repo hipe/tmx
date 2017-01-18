@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::PathStream_via_MondrianRequest < Common_::Actor::Monadic
+  class Magnetics_::PathStream_via_MondrianRequest < Common_::Monadic
 
     # if any of the paths contain metacharacters that suggest globbing,
     # produce an expanded stream of real file names that accords with the

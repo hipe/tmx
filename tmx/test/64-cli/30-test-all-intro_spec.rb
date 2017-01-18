@@ -215,7 +215,7 @@ module Skylab::TMX::TestSupport
 
       rx = _d_speg_rx
 
-      scn = Common_::Polymorphic_Stream.via_array d_a
+      scn = Common_::Scanner.via_array d_a
 
       expect_each_on_stdout_by do |line|
 

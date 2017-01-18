@@ -36,7 +36,7 @@ module Skylab::SearchAndReplace
 
       if @LTS_stream.unparsed_exists
         # (hi.)
-        if @LTS_stream.current_token.charpos < @_match_end
+        if @LTS_stream.head_as_is.charpos < @_match_end
           _yes = true
         end
       end
@@ -55,7 +55,7 @@ module Skylab::SearchAndReplace
 
     def _populate_cache
 
-      lts = @LTS_stream.current_token
+      lts = @LTS_stream.head_as_is
 
       lts_begin = lts.charpos
       lts_end = lts.end_charpos
@@ -157,7 +157,7 @@ module Skylab::SearchAndReplace
 
     def _when_LTS_ends_before_match_ends
 
-      if @LTS_stream.current_token.charpos < @_match_end
+      if @LTS_stream.head_as_is.charpos < @_match_end
         # if the next LTS begins before the match ends,
         # then it is our problem
 

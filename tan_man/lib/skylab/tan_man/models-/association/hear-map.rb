@@ -78,7 +78,7 @@ module Skylab::TanMan
           ok &&= __via_document_controller_and_nodes_touch_association
           ok &&= __maybe_persist
           if ok
-            Common_::Bound_Call.via_value ok
+            Common_::BoundCall.via_value ok
           else
             ok
           end

@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics_::LoadAdapter_via_Request < Common_::Actor::Monadic  # :[#007.H]
+  class Magnetics_::LoadAdapter_via_Request < Common_::Monadic  # :[#007.H]
 
     # the "load adapter" is what the recording session uses to ensure that
     # all files of interest are loaded.

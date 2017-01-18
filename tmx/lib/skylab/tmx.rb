@@ -43,7 +43,7 @@ module Skylab::TMX
         bx.add lt.entry_string, lt
       end while nil
 
-      if stem and ! bx.has_name stem
+      if stem and ! bx.has_key stem
         stemmish = Stemmish___[ stem ]
         bx.add stemmish.entry_string, stemmish
       end
@@ -144,23 +144,6 @@ module Skylab::TMX
     end
   end
 
-  # == model support
-
-  class SimpleModel_  # EXPERIMENT import from [tab]
-
-    class << self
-      alias_method :define, :new
-      undef_method :new
-    end  # >>
-
-    def initialize  # (a suggestion)
-      yield self
-      freeze
-    end
-
-    private :dup
-  end
-
   # ==
 
   module Models_
@@ -229,6 +212,7 @@ module Skylab::TMX
   NEWLINE_ = "\n"
   NIL_ = nil
   NOTHING_ = nil
+  SimpleModel_ = Common_::SimpleModel
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'

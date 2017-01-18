@@ -133,7 +133,7 @@ class Skylab::Task
     class Dependency___  # just parse
 
       def initialize args
-        @_st = Common_::Polymorphic_Stream.via_array args
+        @_st = Common_::Scanner.via_array args
         @task_name_symbol = @_st.gets_one
         until @_st.no_unparsed_exists
           send SYNTAX___.fetch @_st.gets_one

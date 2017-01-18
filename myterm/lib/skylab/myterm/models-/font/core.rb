@@ -90,7 +90,7 @@ module Skylab::MyTerm
 
       # -
 
-        path = st.current_token
+        path = st.head_as_is
 
         _o = _build_new_collection_controller( & pp )
 

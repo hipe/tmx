@@ -340,15 +340,24 @@ module Skylab::TanMan
         end
 
         def resolve_new_node_id_programmatically
+
           stem_s = @graph_sexp._label2id_stem @name_s
           stem_i = stem_s.intern
-          h = ::Hash[ @graph_sexp.nodes.map do |node|
-            [ node.node_id, true ]
-          end ]
+
+          _st = @graph_sexp.to_node_stream
+
+          h = _st.reduce_into( {} ) do |hash|
+            -> node do
+              hash[ node.node_id ] = true
+            end
+          end
+
           d = 1  # so that the first *numbered* node_id will be foo_2
+
           while h.key? stem_i
             stem_i = :"#{ stem_s }_#{ d += 1 }"
           end
+
           @new_node_ID_sym = stem_i ; ACHIEVED_
         end
 
@@ -427,9 +436,11 @@ module Skylab::TanMan
         def bld_ambiguous_event
           build_not_OK_event_with :ambiguous, :name_s, @name_s,
               :nodes, @fuzzy_matches_found do |y, o|
-            _s_a = o.nodes.map do |n|
+
+            _s_a = o.to_node_stream.map_by do |n|
               lbl n.label_or_node_id_normalized_string
-            end
+            end.to_a
+
             y << "ambiguous node name #{ ick o.name_s }. #{
              }did you mean #{ or_ _s_a }?"
           end

@@ -75,7 +75,7 @@ module Skylab::CodeMetrics
           end
         end
 
-        Common_::Stream.new w do
+        Common_::Stream.by w do
           chunk[]
         end
       end

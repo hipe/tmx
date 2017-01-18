@@ -51,7 +51,7 @@ module Skylab::TanMan
       end
       equals_stmt.rhs = str
       if created
-        first_node_statement = node_statements.gets
+        first_node_statement = to_node_statement_stream.gets
         if first_node_statement
           stmt_list.insert_item_before_item_ equals_stmt, first_node_statement
         else
@@ -68,13 +68,13 @@ module Skylab::TanMan
       end
     end
 
-    def nodes
-      node_statements.map_by do |stmt_list|
+    def to_node_stream
+      to_node_statement_stream.map_by do |stmt_list|
         stmt_list.stmt
       end
     end
 
-    def node_statements
+    def to_node_statement_stream
       get_stmt_scan.reduce_by do |stmt_list|
         :node_stmt == stmt_list.stmt.class.rule
       end
@@ -85,7 +85,7 @@ module Skylab::TanMan
       if sl
         sl.to_node_stream_
       else
-        Common_::Stream.the_empty_stream
+        Common_::THE_EMPTY_STREAM
       end
     end
 

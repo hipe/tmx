@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node_Collection
 
-    class Magnetics_::Digraph_via_NodeUpstream < Common_::Actor::Monadic
+    class Magnetics_::Digraph_via_NodeUpstream < Common_::Monadic
 
       def initialize nu, & x_p
 
@@ -173,7 +173,7 @@ module Skylab::Snag
         _send_info_string "none of the #{ @_total_count }#{
           } nodes in the collection are doc nodes."
 
-        Common_::SimpleStream.the_empty_stream
+        Common_::THE_EMPTY_MINIMAL_STREAM
       end
 
       def _send_info_string  s

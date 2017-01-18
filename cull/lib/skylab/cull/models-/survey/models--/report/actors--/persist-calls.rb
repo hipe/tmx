@@ -4,7 +4,7 @@ module Skylab::Cull
 
     class Models__::Report
 
-      class Actors__::Persist_calls < Common_::Actor::Dyadic  # 1x
+      class Actors__::Persist_calls < Common_::Dyadic  # 1x
 
         # [#005] algorithm decribed in full
 

@@ -56,8 +56,15 @@ module Skylab::TanMan
           g.stmt_list = __empty_stmt_list
         end
 
-        if ! g.stmt_list.prototype_ && ! g.stmt_list.to_node_stream_.length_exceeds( 1 )
-          g.stmt_list.prototype_ = _sl_proto
+        if ! g.stmt_list.prototype_
+          st = g.stmt_list.to_node_stream_  # used to be `length_exceeds( 1 )`
+          _one = st.gets
+          if _one
+            _length_exceeds_one = st.gets
+          end
+          unless _length_exceeds_one
+            g.stmt_list.prototype_ = _sl_proto
+          end
         end
 
         if new_before_this
@@ -102,3 +109,4 @@ module Skylab::TanMan
     end
   end
 end
+# #tombstone-A: `length_exceeds` on stream

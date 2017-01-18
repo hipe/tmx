@@ -123,7 +123,7 @@ module Skylab::DocTest
         @branch_dist_i_a = dist_i_a ; @branch_a = branch_a
       end
 
-      Distill__ = Common_.distill
+      Distill__ = Common_::Distill
 
       def matches_against dist_i_a, node_a
         against_i = @_against_symbol

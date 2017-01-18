@@ -98,7 +98,7 @@ module Skylab::DocTest
         begin
           scn.advance_one  # assume the first line is a `describe` or `context` line
           scn.no_unparsed_exists && break
-          no = scn.current_token
+          no = scn.head_as_is
 
           sym = no.category_symbol
           :blank_line == sym && redo

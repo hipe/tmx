@@ -71,7 +71,7 @@ module Skylab::CodeMetrics
 
         p = lower_mode
 
-        Common_::Stream.new upstream_reference do
+        Common_::Stream.by upstream_reference do
           p[]
         end
       end

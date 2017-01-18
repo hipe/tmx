@@ -25,8 +25,8 @@ module Skylab::SearchAndReplace::TestSupport
       it "matches exist across two files" do
 
         bx = _matches_box
-        bx.has_name _ONE_LINE_FILE or fail
-        bx.has_name _THREE_LINES_FILE or fail
+        bx.has_key _ONE_LINE_FILE or fail
+        bx.has_key _THREE_LINES_FILE or fail
       end
 
       it "each match knows its (starting) line number (starts at one)" do

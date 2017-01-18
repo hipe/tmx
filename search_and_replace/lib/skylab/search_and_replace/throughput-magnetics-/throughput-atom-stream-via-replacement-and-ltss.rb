@@ -30,7 +30,7 @@ module Skylab::SearchAndReplace
         # if the LTS ends after we end (even if it overlaps with us), it is
         # out of our jurisdiction. we must leave it on the queue
 
-        if d < st.current_token.end_charpos
+        if d < st.head_as_is.end_charpos
           break
         end
 

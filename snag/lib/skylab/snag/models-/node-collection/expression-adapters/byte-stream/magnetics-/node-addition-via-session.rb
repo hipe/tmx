@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      class Magnetics_::NodeAddition_via_Session < Common_::Actor::Monadic
+      class Magnetics_::NodeAddition_via_Session < Common_::Monadic
 
         def initialize o, & p
           @on_event_selectively = p

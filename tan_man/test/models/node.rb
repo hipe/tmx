@@ -19,15 +19,15 @@ module Skylab::TanMan::TestSupport
     end
 
     def number_of_nodes
-      get_node_statement_scan.flush_to_count
+      to_node_statement_stream.flush_to_count
     end
 
     def retrieve_any_node_with_id i
       _node_collection_controller.retrieve_any_node_with_id i
     end
 
-    def get_node_statement_scan
-      _node_collection_controller.get_node_statement_scan
+    def to_node_statement_stream
+      _node_collection_controller.to_node_statement_stream
     end
 
     def get_node_array

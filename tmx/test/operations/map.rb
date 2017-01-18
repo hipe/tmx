@@ -196,7 +196,7 @@ module Skylab::TMX::TestSupport
 
         tc = @test_context
 
-        exp_scn = Common_::Polymorphic_Stream.via_array @expect_string_array
+        exp_scn = Common_::Scanner.via_array @expect_string_array
         tc.ignore_common_post_operation_emissions_
         _st = tc.send_subject_call
 
@@ -210,16 +210,16 @@ module Skylab::TMX::TestSupport
             if exp_scn.no_unparsed_exists
               break  # win
             end
-            fail __say_expected exp_scn.current_token
+            fail __say_expected exp_scn.head_as_is
           end
           if exp_scn.no_unparsed_exists
             fail __say_extra actual_s
           end
-          if actual_s == exp_scn.current_token
+          if actual_s == exp_scn.head_as_is
             exp_scn.advance_one
             redo
           end
-          fail __say_not_the_same( actual_s, exp_scn.current_token )
+          fail __say_not_the_same( actual_s, exp_scn.head_as_is )
         end while above
         NIL
       end

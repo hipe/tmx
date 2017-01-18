@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class RecursionMagnetics_::CounterpartDirectory_via_ArgumentPath_and_TestDirectory < Common_::Actor::Dyadic
+  class RecursionMagnetics_::CounterpartDirectory_via_ArgumentPath_and_TestDirectory < Common_::Dyadic
 
     # exactly [#005]
 

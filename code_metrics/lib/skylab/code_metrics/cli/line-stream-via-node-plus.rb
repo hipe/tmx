@@ -1,14 +1,8 @@
 module Skylab::CodeMetrics
 
-  class CLI__LineStream_via_NodePlus
-    # while #open [#010] (brazen away) not actually under `CLI`
+  class CLI__LineStream_via_NodePlus < Common_::MagneticBySimpleModel
 
-    class << self
-      def call_by & p
-        new( & p ).execute
-      end
-      private :new
-    end  #>>
+    # while #open [#010] (brazen away) not actually under `CLI`
 
     # -
       def initialize

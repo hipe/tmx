@@ -99,11 +99,11 @@ module Skylab::DocTest
 
           def write_opening_node_and_any_blank_lines
 
-            st = Common_::Polymorphic_Stream.via_array @original_nodes
+            st = Common_::Scanner.via_array @original_nodes
             @result_nodes.push st.gets_one
             begin
               st.no_unparsed_exists && break
-              o = st.current_token
+              o = st.head_as_is
               :blank_line == o.category_symbol || break
               @result_nodes.push o
               st.advance_one

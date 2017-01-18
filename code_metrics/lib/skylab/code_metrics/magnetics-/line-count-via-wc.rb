@@ -106,7 +106,7 @@ module Skylab::CodeMetrics
         # ridiculous gotcha -  when you have only one we don't have the
         # finaly summary line from `wc` to do the math for us! eek
 
-        @_totes.count = @_totes.at_position( 0 ).count
+        @_totes.count = @_totes.at_offset( 0 ).count
         ACHIEVED_
       end
 

@@ -29,14 +29,14 @@ module Skylab::Snag
             st_ = if :sequence == func_sym  # we change the syntax, experimentally
               _a = st.gets_one
               _a_= [ :functions, * _a ]
-              Common_::Polymorphic_Stream.via_array _a_
+              Common_::Scanner.via_array _a_
             else
               st
             end
 
             _cls = Parse__.function func_sym
 
-            _f = _cls.new_via_polymorphic_stream_passively st_
+            _f = _cls.new_via_argument_scanner_passively st_
 
             bx.add name_sym, _f
 

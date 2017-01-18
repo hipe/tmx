@@ -29,7 +29,7 @@ module Skylab::TanMan
     end
 
     List_scanner = -> x do
-      Common_::SimpleStream.try_convert x
+      Common_::Stream::Magnetics::MinimalStream_via[ x ]
     end
 
     Module_lib = -> do

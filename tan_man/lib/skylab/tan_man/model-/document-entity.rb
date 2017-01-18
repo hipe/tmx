@@ -224,11 +224,12 @@ module Skylab::TanMan
 
       INPUT_PROPERTIES___ = Brazen_::Nodesque::Common_Properties.new( nil ).set_properties_proc do
 
-        IO_PROPERTIES__.to_value_stream.reduce_by do | prp |
+        _st = IO_PROPERTIES__.to_value_stream.reduce_by do | prp |
 
           prp.direction_symbols.include? :input
 
-        end.flush_to_mutable_box_like_proxy_keyed_to_method :name_symbol
+        end
+        Common_::Stream::MutableBox.via_stream_keyed_to_method _st, :name_symbol
       end
 
       # ~

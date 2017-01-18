@@ -178,7 +178,7 @@ module Skylab::TanMan::TestSupport
 
           scn = @event_log.flush_to_scanner
 
-          while :wrote_file != scn.current_token.channel_symbol_array.last
+          while :wrote_file != scn.head_as_is.channel_symbol_array.last
             scn.advance_one
           end
 

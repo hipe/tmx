@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::ItemTicket_via_TokenStream < Common_::Actor::Monadic
+    class Magnetics_::ItemTicket_via_TokenStream < Common_::Monadic
 
       # [#011] explains what the heck this is, why the heck we aren't
       # using plain old regex, and how the heck you are supposed to develop

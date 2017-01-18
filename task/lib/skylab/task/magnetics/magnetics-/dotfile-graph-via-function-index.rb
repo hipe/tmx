@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::DotfileGraph_via_FunctionIndex < Common_::Actor::Monadic
+    class Magnetics_::DotfileGraph_via_FunctionIndex < Common_::Monadic
 
       # exactly [#010]. here for now we stream the work in little clusters
 
@@ -371,7 +371,7 @@ class Skylab::Task
 
         # first, curry a "prototype" of the function:
 
-        ww = Home_.lib_.basic::String.word_wrappers.calm.new
+        ww = Home_.lib_.basic::String::WordWrapper::Calm.new
         ww.aspect_ratio = w_h
 
         _ESCAPED_NEWLINE = "\\n"

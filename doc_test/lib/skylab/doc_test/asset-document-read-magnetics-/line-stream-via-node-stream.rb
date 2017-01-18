@@ -1,6 +1,6 @@
 module Skylab::DocTest
 
-  class AssetDocumentReadMagnetics_::LineStream_via_NodeStream < Common_::Actor::Monadic
+  class AssetDocumentReadMagnetics_::LineStream_via_NodeStream < Common_::Monadic
 
     # given a stream of nodes (of which each object it produces might be
     # "branchy" or "itemy", but hopefully won't matter), in effect we

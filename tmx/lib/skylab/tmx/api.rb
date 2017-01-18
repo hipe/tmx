@@ -101,7 +101,7 @@ module Skylab::TMX
 
         @argument_scanner.advance_one
 
-        Common_::Bound_Call[ nil, op, :execute ]
+        Common_::BoundCall[ nil, op, :execute ]
       end
 
       def _parse_error_listener

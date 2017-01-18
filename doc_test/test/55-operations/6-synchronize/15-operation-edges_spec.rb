@@ -21,7 +21,7 @@ module Skylab::DocTest::TestSupport
 
       it "both nodes came thru" do
         bx = _index
-        bx.has_name "money" or fail
+        bx.has_key "money" or fail
         bx.fetch "wummy mummy" or fail
       end
 

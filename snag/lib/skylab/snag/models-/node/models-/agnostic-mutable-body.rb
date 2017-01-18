@@ -44,7 +44,7 @@ module Skylab::Snag
 
           Common_::Stream.via_item _row
         else
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         end
       end
 

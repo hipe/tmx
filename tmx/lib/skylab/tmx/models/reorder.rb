@@ -8,7 +8,7 @@ module Skylab::TMX
     # that it either does or doesn't opt-in to by providing (or not) an
     # "order plan" for each given "order request".
 
-    class Plan_via_parse_client < Common_::Actor::Monadic
+    class Plan_via_parse_client < Common_::Monadic
 
       # - keep knowledge of the sub-syntax of this modifer out of the main
       #   operation parser.

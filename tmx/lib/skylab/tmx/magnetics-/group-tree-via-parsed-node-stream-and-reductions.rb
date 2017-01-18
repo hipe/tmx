@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class Magnetics_::GroupTree_via_ParsedNodeStream_and_Reductions < Common_::Actor::Dyadic
+  class Magnetics_::GroupTree_via_ParsedNodeStream_and_Reductions < Common_::Dyadic
 
     def initialize st, a
       @parsed_node_stream = st
@@ -113,7 +113,7 @@ module Skylab::TMX
 
     def __init_several_things
 
-      @_reduction_scanner = Common_::Polymorphic_Stream.via_array @reductions
+      @_reduction_scanner = Common_::Scanner.via_array @reductions
       @_current_reduction = @_reduction_scanner.gets_one
 
       _items = @parsed_node_stream.to_a

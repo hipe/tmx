@@ -36,11 +36,11 @@ module Skylab::Cull
 
         # the below is just to keep things rigid but we might back it off later
 
-        if ! bx.has_name :table_number
+        if ! bx.has_key :table_number
           bx.add :table_number, nil
         end
 
-        if ! bx.has_name :upstream_adapter
+        if ! bx.has_key :upstream_adapter
           bx.add :upstream_adapter, nil
         end
 

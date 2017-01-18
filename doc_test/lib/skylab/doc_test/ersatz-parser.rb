@@ -50,7 +50,8 @@ module Skylab::DocTest
       # --
 
       def parse_string s, & x_p
-        parse_line_stream Home_.lib_.basic::String.line_stream( s ), & x_p
+        _st = Home_.lib_.basic::String::LineStream_via_String[ s ]
+        parse_line_stream _st, & x_p
       end
 
       def parse_line_stream st, & x_p
@@ -375,7 +376,7 @@ module Skylab::DocTest
         end
 
         def to_immediate_child_scanner
-          Common_::Polymorphic_Stream.via_array @nodes
+          Common_::Scanner.via_array @nodes
         end
 
         def _insert

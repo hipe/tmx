@@ -1145,7 +1145,7 @@
       end
 
       def gets_one
-        x = remove_instance_variable :@current_token
+        x = remove_instance_variable :@head_as_is
         if @_open
           _reinit_current_token
         else
@@ -1162,7 +1162,7 @@
         if ! s
           self._REGEX_SANITY
         end
-        @current_token = s
+        @head_as_is = s
         if @_scn.eos?
           _pre_close false
         elsif @_scn.skip SEP__
@@ -1190,7 +1190,7 @@
       SEP__ = /#{ esc }/
 
       attr_reader(
-        :current_token,
+        :head_as_is,
         :ended_with_separator,
         :is_absolute,
         :no_unparsed_exists,

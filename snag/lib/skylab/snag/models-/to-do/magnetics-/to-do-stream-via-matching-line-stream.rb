@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::ToDo
 
-    class Magnetics_::ToDoStream_via_MatchingLineStream < Common_::Actor::Dyadic
+    class Magnetics_::ToDoStream_via_MatchingLineStream < Common_::Dyadic
 
       def initialize st, psa, & p
         @on_event_selectively = p

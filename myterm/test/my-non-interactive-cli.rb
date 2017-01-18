@@ -104,7 +104,7 @@ module Skylab::MyTerm::TestSupport
       def matches? sta
 
         @_state = sta
-        @_st = Common_::Polymorphic_Stream.via_array remove_instance_variable :@x_a
+        @_st = Common_::Scanner.via_array remove_instance_variable :@x_a
 
         begin
           send @_st.gets_one
@@ -298,7 +298,7 @@ module Skylab::MyTerm::TestSupport
 
       def _peek_for_matchee
 
-        x = @_st.current_token
+        x = @_st.head_as_is
         if x.respond_to? :ascii_only?
           @_matchee_shape = :__match_against_string
           @_matchee_string = x

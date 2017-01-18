@@ -1,6 +1,6 @@
 module Skylab::CodeMetrics
 
-  class Magnetics::ShapesLayers_via_MondrianTree < Common_::Actor::Monadic
+  class Magnetics::ShapesLayers_via_MondrianTree < Common_::Monadic
 
     # NOTE - mondrian tree has a scaler-translator we're not using
 

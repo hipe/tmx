@@ -20,7 +20,7 @@ class TMX_snap
 
       def initialize * five
         argv, _, @sout, @serr, @program_name_string_array = five
-        @argv = Common_::Polymorphic_Stream.via_array argv
+        @argv = Common_::Scanner.via_array argv
       end
 
       def execute
@@ -40,11 +40,11 @@ class TMX_snap
           @serr.puts "missing argument - expecting <operation>"
           _express_usage
 
-        elsif HELP_RX__ =~ @argv.current_token
+        elsif HELP_RX__ =~ @argv.head_as_is
           @exitstatus = YEP__
           __express_help
 
-        elsif '--ping' == @argv.current_token
+        elsif '--ping' == @argv.head_as_is
           @_operation_method_name = :__do_ping
           @exitstatus = YEP__
           _flush_bound_call_via_operation_method_name
@@ -65,7 +65,7 @@ class TMX_snap
 
       def __parse_operation_name
 
-        tok = @argv.current_token
+        tok = @argv.head_as_is
         k = Common_::Name.via_slug( tok ).as_lowercase_with_underscores_symbol
         m = OPERATIONS__[ k ]
         if m
@@ -81,7 +81,7 @@ class TMX_snap
 
       def __bork_about_unknown_operation
 
-        tok = @argv.current_token
+        tok = @argv.head_as_is
         @serr.puts "unrecognized operation: #{ tok.inspect }"
         @serr.puts "expecting #{ _say_available_operations }"
         __invite_to_help
@@ -207,7 +207,7 @@ class TMX_snap
 
           _bork_about_expecting_argument '<file>'
 
-        elsif HELP_RX__ =~ @argv.current_token
+        elsif HELP_RX__ =~ @argv.head_as_is
 
           _when_operation_help_requested
 
@@ -264,7 +264,7 @@ class TMX_snap
         s_a = eek.array_for_read
         if d == s_a.length - 1
 
-          tok = @argv.current_token
+          tok = @argv.head_as_is
 
           if COMMIT_MESSAGE_WIDE_RX__ =~ tok && HELP_RX__ !~ tok
 
@@ -281,7 +281,7 @@ class TMX_snap
 
           _bork_about_expecting_argument '<commitmsg>'
 
-        elsif HELP_RX__ =~ @argv.current_token
+        elsif HELP_RX__ =~ @argv.head_as_is
 
           _when_operation_help_requested
 
@@ -453,7 +453,7 @@ class TMX_snap
 
       def __maybe_operation_help  # assume nonzero-length argv
 
-        if HELP_RX__ =~ @argv.current_token
+        if HELP_RX__ =~ @argv.head_as_is
           _when_operation_help_requested
         else
           _bork_about_unexpected_argument_for_operation
@@ -462,7 +462,7 @@ class TMX_snap
 
       def _bork_about_unexpected_argument_for_operation
 
-        @serr.puts "unexpected argument #{ @argv.current_token.inspect } #{
+        @serr.puts "unexpected argument #{ @argv.head_as_is.inspect } #{
           }for #{ @_operation_slug }"
 
         _invite_to_operation_help
@@ -500,7 +500,7 @@ class TMX_snap
       def _flush_bound_call_via_operation_method_name
         _m = remove_instance_variable :@_operation_method_name
         _common_init
-        Common_::Bound_Call[ nil, self, _m ]
+        Common_::BoundCall[ nil, self, _m ]
       end
 
       # --

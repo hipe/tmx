@@ -97,15 +97,6 @@ module Skylab::SearchAndReplace
     def _to_grep_result_path_stream
 
       st = nil
-      _Stream = Common_::Stream
-
-      _resource_releaser = _Stream::Resource_Releaser.new do
-        if st
-          st.upstream.release_resource
-        else
-          ACHIEVED_
-        end
-      end
 
       main_p = -> do
         while st
@@ -122,8 +113,17 @@ module Skylab::SearchAndReplace
         p[]
       end
 
-      _Stream.new _resource_releaser do
-        p[]
+      Common_::Stream.define do |o|
+        o.upstream_as_resource_releaser_by do
+          if st
+            st.upstream.release_resource
+          else
+            ACHIEVED_
+          end
+        end
+        o.stream_by do
+          p[]
+        end
       end
     end
 

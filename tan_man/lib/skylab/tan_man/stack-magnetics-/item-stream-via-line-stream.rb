@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class StackMagnetics_::ItemStream_via_LineStream < Common_::Actor::Monadic
+  class StackMagnetics_::ItemStream_via_LineStream < Common_::Monadic
 
     def initialize st
       @_is_first = true

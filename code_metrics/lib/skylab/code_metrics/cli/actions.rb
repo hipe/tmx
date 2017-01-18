@@ -149,7 +149,7 @@ module Skylab::CodeMetrics
 
         def bound_call_via_bound_call_from_back bc
 
-          Common_::Bound_Call.by do
+          Common_::BoundCall.by do
 
             totes = bc.receiver.send bc.method_name, * bc.args
 

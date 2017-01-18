@@ -22,7 +22,7 @@ module Skylab::Snag
 
         include Attrs__::Lib::Polymorphic_Processing_Instance_Methods
 
-        def process_polymorphic_stream_fully st
+        def process_argument_scanner_fully st
           _ok = super
           _ok && Attrs__::Lib::Normalize_using_defaults_and_requireds[ self ]
         end
@@ -36,7 +36,7 @@ module Skylab::Snag
           :subject_number,
         )
 
-        def process_polymorphic_stream_passively st  # variant of #[#fi-022]
+        def process_argument_scanner_passively st  # variant of #[#fi-022]
           super && freeze
         end
 
@@ -187,7 +187,7 @@ module Skylab::Snag
             break
           end
 
-          _s_ = in_st.current_token
+          _s_ = in_st.head_as_is
 
           if s != _s_  # if doesn't match at this column, we are done.
 
@@ -230,7 +230,7 @@ module Skylab::Snag
           if in_st.unparsed_exists
 
             d = 0
-            s = in_st.current_token
+            s = in_st.head_as_is
 
             begin
 

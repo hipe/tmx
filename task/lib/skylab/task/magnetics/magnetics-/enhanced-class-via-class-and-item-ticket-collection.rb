@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::EnhancedClass_via_Class_and_ItemTicketCollection < Common_::Actor::Dyadic
+    class Magnetics_::EnhancedClass_via_Class_and_ItemTicketCollection < Common_::Dyadic
 
       def initialize cls, col
         @class = cls
@@ -65,7 +65,7 @@ class Skylab::Task
         end
 
         def members
-          @collection.manner_box.fetch( @slot_symbol ).get_names
+          @collection.manner_box.fetch( @slot_symbol ).get_keys
         end
 
         def __set_manner ma

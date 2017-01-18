@@ -129,7 +129,7 @@ module Skylab::TMX
           case 1 <=> @_item_count
           when -1 ; __normally
           when 0 ; Common_::Stream.via_item @_item_array.first
-          when 1 ; Common_::Stream.the_empty_stream
+          when 1 ; Common_::THE_EMPTY_STREAM
           end
         end
 
