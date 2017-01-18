@@ -193,7 +193,7 @@ module Skylab::Autonomous_Component_System
 
           bytes = 0
 
-          st = Home_.lib_.basic::String.line_stream s
+          st = Home_.lib_.basic::String::LineStream_via_String[ s ]
           line = st.gets
 
           accept_line = -> do

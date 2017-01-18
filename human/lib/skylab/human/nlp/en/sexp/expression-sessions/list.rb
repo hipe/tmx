@@ -26,7 +26,7 @@ module Skylab::Human
       class << self
 
         def via_ * x_a
-          _st = Common_::Polymorphic_Stream.via_array x_a
+          _st = Common_::Scanner.via_array x_a
           expression_via_sexp_stream_ _st
         end
 
@@ -311,7 +311,7 @@ module Skylab::Human
         _pst = send @_build_stream_method
         _st = _pst.flush_to_stream
         _st_ = _st.map_by( & _p )
-        _st_.flush_to_polymorphic_stream
+        _st_.flush_to_scanner
       end
 
       def __final_separator_sexp
@@ -395,13 +395,13 @@ module Skylab::Human
         else
           @_build_stream_method = :__release_one_time_use_PST
           @_read_read_only_array_method = :_CHA_CHA
-          @__one_time_use_PST = x.flush_to_polymorphic_stream
+          @__one_time_use_PST = x.flush_to_scanner
         end
         NIL_
       end
 
       def __build_stream_via_array
-        Common_::Polymorphic_Stream.via_array @_top_secret_array
+        Common_::Scanner.via_array @_top_secret_array
       end
 
       def __release_one_time_use_PST

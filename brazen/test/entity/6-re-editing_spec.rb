@@ -39,7 +39,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
       it "`edit_entity_class` effects an edit session" do
 
-        Six_My_Class.properties.get_names.should eql [ :foo, :bar, :baz ]
+        Six_My_Class.properties.get_keys.should eql [ :foo, :bar, :baz ]
 
       end
 

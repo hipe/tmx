@@ -2,7 +2,9 @@ module Skylab::Common
 
   class Stream
 
-    class As_Mutable_Box
+    class MutableBox
+
+      # NOTE might deprecate or already be a feature island..  # #todo
 
       # we would just subclass box were it not for the fact that box has a
       # subtly different interface than what we want with good reason: for
@@ -15,8 +17,9 @@ module Skylab::Common
       # plain old box this purpose .. maybe do away with this node ..
 
       class << self
-        def via_flushable_stream__ st, method
-          bx = new [], {}
+
+        def via_stream_keyed_to_method st, method  # 1x, [tm]
+          bx = via_box_members [], {}
           x = st.gets
           while x
             bx.add x.send( method ), x
@@ -24,6 +27,9 @@ module Skylab::Common
           end
           bx
         end
+
+        alias_method :via_box_members, :new
+        undef_method :new
       end  # >>
 
       def initialize a, h
@@ -39,10 +45,10 @@ module Skylab::Common
       end
 
       def to_new_mutable_box_like_proxy
-        Stream_::As_Mutable_Box.new @a.dup, @h.dup
+        Stream::MutableBox.via_box_members @a.dup, @h.dup
       end
 
-      def has_name k
+      def has_key k
         @h.key? k
       end
 
@@ -50,7 +56,7 @@ module Skylab::Common
         @h[ k ]
       end
 
-      def at_position d
+      def at_offset d
         @h.fetch @a.fetch d
       end
 
@@ -62,7 +68,7 @@ module Skylab::Common
         @h.fetch k, & p
       end
 
-      def get_names
+      def get_keys
         @a.dup
       end
 

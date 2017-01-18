@@ -45,9 +45,9 @@ module Skylab::Brazen
       end
 
       def members
-        box.to_value_stream.map do | arity |
+        box.to_value_stream.map_by do |arity|
           arity.name_symbol
-        end
+        end.to_a
       end
 
       def [] nn

@@ -56,7 +56,7 @@ module Skylab::Common
 
           def work
 
-            st = Home_::Polymorphic_Stream.via_array @deflist
+            st = Home_::Scanner.via_array @deflist
 
             _base_class = @base_class || Here___
 
@@ -215,7 +215,7 @@ module Skylab::Common
 
         def replace_some_values * value_a
           value_a.each_with_index do |x, d|
-            instance_variable_set ivar_box.at_position( d ), x
+            instance_variable_set ivar_box.at_offset( d ), x
           end ; nil
         end
 
@@ -224,10 +224,10 @@ module Skylab::Common
         def init_via_value_list x_a  # caller should freeze
           bx = formal_properties
           x_a.length.times do |d|
-            instance_variable_set bx.at_position( d ).name_as_ivar, x_a.fetch( d )
+            instance_variable_set bx.at_offset( d ).name_as_ivar, x_a.fetch( d )
           end
           x_a.length.upto( bx.length - 1 ) do |d|
-            prop = bx.at_position d
+            prop = bx.at_offset d
             instance_variable_set prop.name_as_ivar, prop.default_value
           end
           NIL_
@@ -253,12 +253,12 @@ module Skylab::Common
           #  has a formal property, set the ivar; else call a custom
           #  iambic parsing method. also nil-out any not-set values.)
 
-          _write_members Home_::Polymorphic_Stream.via_array x_a
+          _write_members Home_::Scanner.via_array x_a
         end
 
         def __hack_a_different_term_chan_sym x_a
 
-          st = Home_::Polymorphic_Stream.via_array x_a
+          st = Home_::Scanner.via_array x_a
           _CUSTOM_TERM_CHAN_SYM = st.gets_one
           _write_members st
           define_singleton_method :terminal_channel_i do

@@ -43,7 +43,7 @@ module Skylab::Common
         k = @name.as_approximation
 
         __constants.each do |sym|
-          if k == Distill_[ sym ]
+          if k == Distill[ sym ]
             matches.push sym
           end
         end

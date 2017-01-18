@@ -2,7 +2,7 @@ module Skylab::System
 
   class Find
 
-    class Build_path_stream___ < Common_::Actor::Dyadic
+    class Build_path_stream___ < Common_::Dyadic
 
       def initialize x, sc, & p
         @args = x
@@ -42,16 +42,16 @@ module Skylab::System
           p[]
         end
 
-        o = Common_::Stream
-        o.new(
-          o::Resource_Releaser.new do
+        Common_::Stream.define do |o|
+          o.upstream_as_resource_releaser_by do
             if thread && thread.alive?
               thread.exit
             end
             ACHIEVED_
           end
-        ) do
-          p[]
+          o.stream_by do
+            p[]
+          end
         end
       end
 

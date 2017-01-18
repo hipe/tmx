@@ -7,7 +7,7 @@ module Skylab::Parse
 
       class << self
 
-        def new_via_polymorphic_stream_passively st
+        def new_via_argument_scanner_passively st
           new st.gets_one
         end
 
@@ -31,7 +31,7 @@ module Skylab::Parse
               break
             end
 
-            if s == in_st.current_token
+            if s == in_st.head_as_is
 
               in_st.advance_one
 

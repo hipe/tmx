@@ -18,7 +18,7 @@ module Skylab::Brazen
             if h
               @_p = -> do
 
-                p = h[ sess.upstream.current_token ]
+                p = h[ sess.upstream.head_as_is ]
                 if p
                   sess.upstream.advance_one
                   p[ sess ]
@@ -100,8 +100,8 @@ module Skylab::Brazen
         end
 
         def receive_parse_context parse_context
-          if @h.key? parse_context.upstream.current_token
-            parse_p = @h.fetch parse_context.upstream.current_token
+          if @h.key? parse_context.upstream.head_as_is
+            parse_p = @h.fetch parse_context.upstream.head_as_is
             parse_p[ parse_context ]
           else
             KEEP_PARSING_

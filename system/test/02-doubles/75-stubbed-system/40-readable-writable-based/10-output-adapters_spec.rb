@@ -21,7 +21,7 @@ module Skylab::System::TestSupport
       io = new_string_IO_
       co.write_to io
 
-      st = Basic_[]::String.line_stream io.string
+      st = Basic_[]::String::LineStream_via_String[ io.string ]
 
       st.gets.should eql "command\n"
       st.gets.should eql "  argv\n"

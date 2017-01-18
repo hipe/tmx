@@ -88,7 +88,7 @@ module Skylab::Common
 
       def __autoloaderize_the_host_asset
 
-        scn = Polymorphic_Stream.via_array @_frames
+        scn = Scanner.via_array @_frames
 
         fr = InferenceFrame__.new scn.gets_one, @client.module
 
@@ -135,7 +135,7 @@ module Skylab::Common
       end
 
       def __stream_via_path_tail_pieces
-        Polymorphic_Stream.via_array @__path_tail_pieces
+        Scanner.via_array @__path_tail_pieces
       end
     end
 

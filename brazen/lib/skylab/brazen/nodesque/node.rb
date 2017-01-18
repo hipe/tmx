@@ -92,7 +92,7 @@ module Skylab::Brazen
 
       if foz
 
-        sym_a = foz.get_names
+        sym_a = foz.get_keys
         sym_a.sort!
 
         Common_::Stream.via_nonsparse_array( sym_a ).map_by do | sym |
@@ -100,7 +100,7 @@ module Skylab::Brazen
           qualified_knownness sym
         end
       else
-        Common_::Stream.the_empty_stream
+        Common_::THE_EMPTY_STREAM
       end
     end
 
@@ -147,8 +147,8 @@ module Skylab::Brazen
 
     ## ~~ writers ( & related )
 
-    define_method :process_polymorphic_stream_fully, PPSF_METHOD_
-    ppsp = :process_polymorphic_stream_passively
+    define_method :process_argument_scanner_fully, PPSF_METHOD_
+    ppsp = :process_argument_scanner_passively
     define_method ppsp, PPSP_METHOD_
     private ppsp
 

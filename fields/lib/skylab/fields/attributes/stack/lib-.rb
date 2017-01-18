@@ -42,7 +42,7 @@ module Skylab::Fields
         end
 
         def any_proprietor_of i
-          if @bx.has_name i
+          if @bx.has_key i
             self
           end
         end

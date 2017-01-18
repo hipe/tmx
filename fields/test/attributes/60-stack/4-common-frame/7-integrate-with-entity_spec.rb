@@ -28,7 +28,7 @@ module Skylab::Fields::TestSupport
     end
 
     it "property names look good" do
-      _subject_class.properties.get_names.should eql [ :foo, :bar, :biz ]
+      _subject_class.properties.get_keys.should eql [ :foo, :bar, :biz ]
     end
 
     it "required fields still bork" do

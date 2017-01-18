@@ -7,7 +7,7 @@ module Skylab::Fields
       :x, nil,
       :predicate_string, nil,
       :property_name, nil,
-      :enum_value_polymorphic_streamable, nil,
+      :enum_value_argument_scannerable, nil,
       :valid_value_mapper_from, nil,
       :adjective, nil,
       :exception_class_by, nil,
@@ -50,7 +50,7 @@ module Skylab::Fields
         @expag.calculate do
           me.word ick me.o.x
         end
-        if @o.enum_value_polymorphic_streamable
+        if @o.enum_value_argument_scannerable
           if @o.predicate_string
             punct '.'
           else
@@ -65,7 +65,7 @@ module Skylab::Fields
 
       def __did_you_mean
 
-        x = @o.enum_value_polymorphic_streamable
+        x = @o.enum_value_argument_scannerable
         if x
 
           x_a = ::Array.try_convert x

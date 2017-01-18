@@ -108,8 +108,8 @@ module Skylab::System
 
         # :+#experiment: call on an undifferentiated base actor. by [tr]
 
-        st = Common_::Polymorphic_Stream.via_array x_a
-        if :up_or_down != st.current_token
+        st = Common_::Scanner.via_array x_a
+        if :up_or_down != st.head_as_is
           raise ::ArgumentError, "required first term: `up_or_down`"
         end
         st.advance_one
@@ -143,7 +143,7 @@ module Skylab::System
             @on_event_selectively = oes_p
           end
 
-          ok = process_polymorphic_stream_fully st
+          ok = process_argument_scanner_fully st
         end
 
         ok && o.execute

@@ -92,7 +92,7 @@ module Skylab::Plugin
               break
             end
 
-            g = Bid_group[ st.current_token, @pub_sub_dispatcher ]
+            g = Bid_group[ st.head_as_is, @pub_sub_dispatcher ]
             if ! g
 
               if self.be_passive
@@ -113,7 +113,7 @@ module Skylab::Plugin
         def __build_exception_for_when_unparsed_exists
 
           _ev = Home_.lib_.fields::Events::Extra.build(
-            [ @upstream.current_token ] )
+            [ @upstream.head_as_is ] )
 
           _ev.to_exception
         end
@@ -307,7 +307,7 @@ module Skylab::Plugin
 
             g.a.fetch( 0 ).receive_head_of_argument_parser st
           else
-            raise Definition_Conflict, Say_greedy__[ g.a, st.current_token ]
+            raise Definition_Conflict, Say_greedy__[ g.a, st.head_as_is ]
           end
         end
       end

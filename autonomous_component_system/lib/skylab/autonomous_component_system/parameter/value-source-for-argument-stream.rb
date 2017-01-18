@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System
       def to_controller_against fo_bx  # [#]:#"Head parse". [ze]
 
         if 1 == fo_bx.length
-          When_Single_Formal___.new fo_bx.at_position( 0 ), @argument_stream
+          When_Single_Formal___.new fo_bx.at_offset( 0 ), @argument_stream
         else
           When_Not_Single_Formal___.new fo_bx, @argument_stream
         end
@@ -84,7 +84,7 @@ module Skylab::Autonomous_Component_System
             if st.no_unparsed_exists
               stop[]
             else
-              fo = fo_h[ st.current_token ]
+              fo = fo_h[ st.head_as_is ]
               if fo
                 st.advance_one
                 fo

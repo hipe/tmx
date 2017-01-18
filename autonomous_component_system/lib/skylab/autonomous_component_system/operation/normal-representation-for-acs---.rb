@@ -77,7 +77,7 @@ module Skylab::Autonomous_Component_System
           ok = check_availability_
           ok &&= normalize_
           ok &&= ___second_normalize
-          ok && Common_::Bound_Call[ NOTHING_, @__ACS, :execute, & @call_handler_ ]
+          ok && Common_::BoundCall[ NOTHING_, @__ACS, :execute, & @call_handler_ ]
         end
 
         def ___second_normalize

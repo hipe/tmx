@@ -16,9 +16,8 @@ module Skylab::Autonomous_Component_System
 
                 st = _LL.to_element_stream_assuming_nonsparse
 
-                s_a_ = st.reduce_into_by [] do | m, p |
-
-                  m << calculate( & p )
+                s_a_ = st.join_into [] do |p|
+                  calculate( & p )
                 end
 
                 s_a_.reverse!

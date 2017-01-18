@@ -340,7 +340,7 @@ module Skylab::Common
         def __build_fuzzy_cache
           h = {}
           @_h.keys.each do |s|
-            h[ Distill_[s] ] = s
+            h[ Distill[s] ] = s
           end
           h
         end

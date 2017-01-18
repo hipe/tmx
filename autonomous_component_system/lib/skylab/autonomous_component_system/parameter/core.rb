@@ -59,7 +59,7 @@ module Skylab::Autonomous_Component_System
           _kp = send m, st
           _kp or fail
           st.no_unparsed_exists and break
-          m = :"__interpret__#{ st.current_token }__"
+          m = :"__interpret__#{ st.head_as_is }__"
           if respond_to? m
             st.advance_one
             redo
@@ -70,11 +70,11 @@ module Skylab::Autonomous_Component_System
         NIL_
       end
 
-      def mutate_against_polymorphic_stream_passively st
+      def mutate_against_argument_scanner_passively st
 
         begin
           st.no_unparsed_exists and break
-          m = :"__interpret__#{ st.current_token }__"
+          m = :"__interpret__#{ st.head_as_is }__"
           if respond_to? m
             st.advance_one
             _kp = send m, st

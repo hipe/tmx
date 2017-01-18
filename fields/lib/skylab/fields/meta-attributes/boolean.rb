@@ -16,7 +16,7 @@ module Skylab::Fields
 
       begin
         st.no_unparsed_exists and break
-        p = MODIFIERS___[ st.current_token ]
+        p = MODIFIERS___[ st.head_as_is ]
         p or break
         st.advance_one
         p[ defs, st ]

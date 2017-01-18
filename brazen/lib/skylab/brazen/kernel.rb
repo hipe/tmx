@@ -55,7 +55,7 @@ class Kernel  # [#015]
     o.execute
   end
 
-  def bound_call_via_polymorphic_stream arg_st, & x_p
+  def bound_call_via_argument_scanner arg_st, & x_p
 
     o = Home_::Actionesque::Produce_Bound_Call.new self, & x_p
     o.argument_stream = arg_st
@@ -112,7 +112,7 @@ class Kernel  # [#015]
 
   def silo_via_normal_identifier const_a
 
-    _silos.via_normal_stream Common_::Polymorphic_Stream.via_array const_a
+    _silos.via_normal_stream Common_::Scanner.via_array const_a
   end
 
   def silo_via_normal_stream st

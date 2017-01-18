@@ -28,9 +28,9 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       it "knows the local normal names of the properties" do
 
         o = _subject
-        a = o.get_names
+        a = o.get_keys
         a.should eql [ :foo ]
-        a_ = o.get_names
+        a_ = o.get_keys
         ( a.object_id == a_.object_id ).should eql false
       end
 
@@ -75,8 +75,8 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       end
 
       it "child inherits properties of base" do
-        Foo_Base.properties.get_names.should eql [ :foo ]
-        Foo_Child.properties.get_names.should eql [ :foo, :bar ]
+        Foo_Base.properties.get_keys.should eql [ :foo ]
+        Foo_Child.properties.get_keys.should eql [ :foo, :bar ]
       end
 
       it "the child's handle on the property is THE SAME PROPERTY" do

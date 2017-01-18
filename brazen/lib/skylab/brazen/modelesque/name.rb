@@ -14,12 +14,12 @@ class Skylab::Brazen
       end
 
       def execute
-        :noun == @scanner.current_token or raise ::ArgumentError, __say_only
+        :noun == @scanner.head_as_is or raise ::ArgumentError, __say_only
         @scanner.advance_one
-        x = @scanner.current_token
+        x = @scanner.head_as_is
         if :with_lemma == x
           @scanner.advance_one
-          x = @scanner.current_token
+          x = @scanner.head_as_is
         end
         x.respond_to? :ascii_only? or raise ::ArgumentError, __say_string
         @scanner.advance_one
@@ -28,11 +28,11 @@ class Skylab::Brazen
 
       def __say_only
         "the only kind of inflection a model may customize is 'noun' #{
-          }(had '#{ @scanner.current_token }')"
+          }(had '#{ @scanner.head_as_is }')"
       end
 
       def __say_string
-        "noun lemma must be a string (had #{ @scanner.current_token.inspect })"
+        "noun lemma must be a string (had #{ @scanner.head_as_is.inspect })"
       end
 
       def __accept _MODEL_INFLECTION_

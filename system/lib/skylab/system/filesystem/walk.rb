@@ -14,8 +14,8 @@ module Skylab::System
             case 1 <=> x_a.length
             when -1
 
-              _st = polymorphic_stream_via_iambic x_a
-              _o = new_via_polymorphic_stream _st, & x_p
+              _st = scanner_via_array x_a
+              _o = new_via_argument_scanner _st, & x_p
               _o.execute
 
             when 1
@@ -52,7 +52,7 @@ module Skylab::System
           @property_symbol = nil
         end
 
-        def process_polymorphic_stream_passively st  # #[#fi-022]
+        def process_argument_scanner_passively st  # #[#fi-022]
           super && normalize
         end
 

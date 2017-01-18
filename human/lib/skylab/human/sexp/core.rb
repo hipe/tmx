@@ -14,7 +14,7 @@ module Skylab::Human
 
       def expression_session_via_sexp sx
 
-        st = Common_::Polymorphic_Stream.via_array sx
+        st = Common_::Scanner.via_array sx
         _const = Const_via_tokens_special_[ st ]
         _cls = Expression_Sessions.const_get _const, false
         _cls.expression_via_sexp_stream_ st
@@ -43,7 +43,7 @@ module Skylab::Human
 
       a = [ cache[ st.gets_one ] ]
 
-      if st.unparsed_exists && :through == st.current_token
+      if st.unparsed_exists && :through == st.head_as_is
         a.push st.gets_one
         a.push cache[ st.gets_one ]
       end
@@ -66,7 +66,7 @@ module Skylab::Human
         end
 
         def _via_token_array s_a
-          _st = Common_::Polymorphic_Stream.via_array s_a
+          _st = Common_::Scanner.via_array s_a
           new( _st ).execute
         end
       end  # >>
@@ -131,7 +131,7 @@ module Skylab::Human
       end
 
       def _is_keyword
-        KW___[ @_stream.current_token ]
+        KW___[ @_stream.head_as_is ]
       end
 
       KW___ = {
@@ -141,7 +141,7 @@ module Skylab::Human
       }
 
       def __token_is_head_keyword
-        if THE_ONLY_HEAD_KEYWORD___ == @_stream.current_token
+        if THE_ONLY_HEAD_KEYWORD___ == @_stream.head_as_is
           @_stream.advance_one
           @_result_pieces.push 'When'
           ACHIEVED_

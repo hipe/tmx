@@ -1,28 +1,12 @@
 module Skylab::Common
 
-  class Stream::Ordered_via_DependencyTree
+  class Stream::Magnetics::OrderedStream_via_DependencyTree_and_Stream < MagneticBySimpleModel
 
       # (we're
       # calling this the first known implementation of [#ta-005] pathfinding,
       # although technically that's a misnomer: this does not work against
       # general acyclic directed graphs but only (perhaps) trees, where every
       # node is allowed to point to at most one "parent" that it must go after.)
-
-    class << self
-
-      def prototype_by & p
-        o = self.begin
-        p[ o ]
-        o.freeze
-      end
-
-      alias_method :begin, :new
-      undef_method :new
-    end  # >>
-
-    def initialize
-      NOTHING_  # hi.
-    end
 
     def execute_against item_stream
       otr = dup
@@ -43,7 +27,7 @@ module Skylab::Common
       @_went_h = {}
       @_waiting_h = {}
 
-      Home_.stream do
+      Stream.by do
         send @_state
       end
     end

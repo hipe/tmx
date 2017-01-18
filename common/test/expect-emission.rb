@@ -933,7 +933,7 @@ module Skylab::Common::TestSupport
       def __close_as_scanner
         em_a = release_to_mutable_array
         _close
-        Common_::Polymorphic_Stream.via_array em_a
+        Common_::Scanner.via_array em_a
       end
 
       def __close_as_array

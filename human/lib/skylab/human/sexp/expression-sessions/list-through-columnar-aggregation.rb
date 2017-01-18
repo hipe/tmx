@@ -34,7 +34,7 @@ module Skylab::Human
 
       def __init_and_produce_via_etc st
 
-        _ok = process_polymorphic_stream_fully st
+        _ok = process_argument_scanner_fully st
         _ok && self
       end
 
@@ -50,10 +50,10 @@ module Skylab::Human
         @nucleus.template = Home_.lib_.basic::String::Template.via_string(
           gets_one_polymorphic_value )
 
-        via_template_parse_remainder_of_polymorphic_stream polymorphic_upstream
+        via_template_parse_remainder_of_argument_scanner polymorphic_upstream
       end
 
-      def via_template_parse_remainder_of_polymorphic_stream st
+      def via_template_parse_remainder_of_argument_scanner st
 
         bx = Common_::Box.new
 
@@ -62,14 +62,14 @@ module Skylab::Human
         end
 
         @nucleus.field_box = bx
-        @nucleus.name_i_a = bx.get_names.freeze
-        via_template_variables_parse_remainder_of_polymorphic_stream st
+        @nucleus.name_i_a = bx.get_keys.freeze
+        via_template_variables_parse_remainder_of_argument_scanner st
       end
 
-      def via_template_variables_parse_remainder_of_polymorphic_stream st
+      def via_template_variables_parse_remainder_of_argument_scanner st
         bx = @nucleus.field_box
         while st.unparsed_exists
-          field = bx[ st.current_token ]
+          field = bx[ st.head_as_is ]
           field or break when_extra_field_template_variables
           st.advance_one
           field.process_iambic_passively_via_st st
@@ -131,7 +131,7 @@ module Skylab::Human
         end
 
         def process_iambic_passively_via_st st
-          process_polymorphic_stream_passively st
+          process_argument_scanner_passively st
           nil
         end
 
@@ -159,7 +159,7 @@ module Skylab::Human
 
           def on_subsequent_mentions_of=
             st = polymorphic_upstream
-            i = st.current_token
+            i = st.head_as_is
             case i
             when :frame
               st.advance_one
@@ -218,7 +218,7 @@ module Skylab::Human
             aggregator.flush
           end
         end
-        Common_::SimpleStream.by do
+        Common_::MinimalStream.by do
           p[]
         end
       end

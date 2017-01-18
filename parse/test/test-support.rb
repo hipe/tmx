@@ -49,7 +49,7 @@ module Skylab::Parse::TestSupport
     end
 
     def the_empty_input_stream
-      Home_::Input_Streams_::Array.the_empty_stream
+      Home_::Input_Streams_::Array.the_empty_stream_
     end
 
     def input_stream_containing * x_a

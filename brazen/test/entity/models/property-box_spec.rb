@@ -26,7 +26,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         bx.a_.should eql [ :foo, :bar ]
         _foo = bx.remove :foo
         _foo.name_symbol.should eql :foo
-        prps.get_names.should eql [ :foo, :bar ]
+        prps.get_keys.should eql [ :foo, :bar ]
       end
 
       def _subject

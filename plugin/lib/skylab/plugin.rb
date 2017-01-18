@@ -15,20 +15,6 @@ module Skylab::Plugin
 
   # ==
 
-  class SimpleModel_  # as seen in [tab]
-    class << self
-      alias_method :define, :new
-      private :new
-    end  # >>
-    def initialize
-      yield self
-      freeze
-    end
-    private :dup
-  end
-
-  # ==
-
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
   end
@@ -65,6 +51,7 @@ module Skylab::Plugin
   Home_ = self
   KEEP_PARSING_ = true
   NIL_ = nil
+  SimpleModel_ = Common_::SimpleModel
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'

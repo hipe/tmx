@@ -60,7 +60,7 @@ module Skylab::Common
       h[ :expression ] = o[ :@on_expression, :EXPRESSION_EMISSION_SHAPE ]
 
       def _ m, * args, & x_p
-        Home_::Bound_Call.via_args_and_method_name args, m, & x_p
+        Home_::BoundCall.via_args_and_method_name args, m, & x_p
       end
 
       # --

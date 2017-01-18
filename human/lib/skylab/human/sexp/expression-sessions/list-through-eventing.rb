@@ -65,7 +65,7 @@ module Skylab::Human
 
       def ___init_and_produce_via_etc st  # (used to be #[#ca-063])
         init_ivars
-        process_polymorphic_stream_fully st
+        process_argument_scanner_fully st
         sanity_checks
         defaults
         self

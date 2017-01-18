@@ -39,14 +39,14 @@ module Skylab::Parse
 
       def new_with * x_a  # :(C)
         o = dup
-        _st = polymorphic_stream_via_iambic x_a
+        _st = scanner_via_array x_a
         _kp = o.send :___eek_orig_etc, _st
         _kp && o
       end
 
-      alias_method :___eek_orig_etc, :process_polymorphic_stream_passively
+      alias_method :___eek_orig_etc, :process_argument_scanner_passively
 
-      def process_polymorphic_stream_passively st  # :(B)
+      def process_argument_scanner_passively st  # :(B)
         # implement a [#ca-057] "ideal mixed syntax"
         @value_x = st.gets_one
         super

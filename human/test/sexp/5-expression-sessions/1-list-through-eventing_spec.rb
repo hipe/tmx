@@ -46,7 +46,7 @@ module Skylab::Human::TestSupport
       end
 
       it "when zero input items" do
-        scn = _subject.new_with :gets_under, Common_::Stream.the_empty_stream
+        scn = _subject.new_with :gets_under, Common_::THE_EMPTY_STREAM
         x = scn.gets
         x.should eql '[ ]'
         scn.gets.should be_nil

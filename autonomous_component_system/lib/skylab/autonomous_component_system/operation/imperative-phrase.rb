@@ -64,7 +64,7 @@ module Skylab::Autonomous_Component_System
 
       def __parse_zero_or_more_modifiers  # we peek before loading the node
 
-        if MODIFIER_KEYWORDS___[ @argument_stream.current_token ]
+        if MODIFIER_KEYWORDS___[ @argument_stream.head_as_is ]
           o = Here_::Modifiers_::Parse.call_via_argument_stream__ @argument_stream
         end
 
@@ -105,7 +105,7 @@ module Skylab::Autonomous_Component_System
 
         o.stop_if = -> asc do
           bx = asc.transitive_capabilities_box
-          if bx and bx.has_name sym
+          if bx and bx.has_key sym
             @argument_stream.advance_one
             asc_with_transitive_capability = asc
             transitive_found = true
@@ -186,7 +186,7 @@ module Skylab::Autonomous_Component_System
         # find the recipient for the verb..
 
         _rw = @_stack.last.reader_writer
-        _asc = _rw.read_association @argument_stream.current_token
+        _asc = _rw.read_association @argument_stream.head_as_is
         _asc or self._COVER_ME
 
         @argument_stream.advance_one

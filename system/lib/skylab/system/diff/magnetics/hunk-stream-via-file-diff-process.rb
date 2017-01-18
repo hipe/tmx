@@ -2,7 +2,7 @@ module Skylab::System
 
   class Diff
 
-    class Magnetics::HunkStream_via_FileDiffProcess < Common_::Actor::Monadic
+    class Magnetics::HunkStream_via_FileDiffProcess < Common_::Monadic
 
       # a state machine for parsing a unified diff of two files
 
@@ -23,7 +23,7 @@ module Skylab::System
           out = @process.out
           line_scn = Common_.stream do
             out.gets
-          end.flush_to_polymorphic_stream
+          end.flush_to_scanner
 
           # if we can peek now that the output from the diff command is no
           # output, then we save ourselves the trip to the state macine.

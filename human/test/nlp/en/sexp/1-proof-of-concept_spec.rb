@@ -120,7 +120,7 @@ module Skylab::Human::TestSupport
 
       o.express_none_by { '[none]' }
 
-      _ = o.with_list( Common_::Stream.the_empty_stream ).say
+      _ = o.with_list( Common_::THE_EMPTY_STREAM ).say
 
       _.should eql '[none]'
 

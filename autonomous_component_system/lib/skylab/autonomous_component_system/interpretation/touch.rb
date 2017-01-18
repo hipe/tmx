@@ -100,7 +100,7 @@ module Skylab::Autonomous_Component_System
         o.mixed_argument = if o.looks_like_compound_component__
           IDENTITY_
         else
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+          Common_::THE_EMPTY_SCANNER
         end
 
         o.execute

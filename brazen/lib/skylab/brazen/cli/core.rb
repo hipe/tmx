@@ -93,7 +93,7 @@ module Skylab::Brazen
       end
 
       def to_bound_call
-        Common_::Bound_Call.via_receiver_and_method_name self, :__execute_plus
+        Common_::BoundCall.via_receiver_and_method_name self, :__execute_plus
       end
 
       def __execute_plus
@@ -452,7 +452,7 @@ module Skylab::Brazen
 
       def _bound_action_via_normal_name i_a
         _bound_action_via_normal_name_symbol_stream(
-          Common_::Polymorphic_Stream.via_array i_a )
+          Common_::Scanner.via_array i_a )
       end
 
       def _bound_action_via_normal_name_symbol_stream sym_st
@@ -793,7 +793,7 @@ module Skylab::Brazen
         if @front_properties
           @front_properties.to_value_stream
         else
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         end
       end
 
@@ -874,7 +874,7 @@ module Skylab::Brazen
         if ok
           bound_call_via_bound_action_and_mutated_backbound_iambic
         else
-          Common_::Bound_Call.via_value ok  # failure is not an option
+          Common_::BoundCall.via_value ok  # failure is not an option
         end
       end
 
@@ -924,9 +924,9 @@ module Skylab::Brazen
         # client may want to override this method if for example she is
         # [#043] backless and implements a custom front client.
 
-        bc = @bound.bound_call_against_polymorphic_stream(
+        bc = @bound.bound_call_against_argument_scanner(
 
-          Common_::Polymorphic_Stream.via_array @mutable_backbound_iambic )
+          Common_::Scanner.via_array @mutable_backbound_iambic )
 
         bc and bound_call_via_bound_call_from_back bc
       end
@@ -1230,7 +1230,7 @@ module Skylab::Brazen
         bp = @back_properties
 
         sym_a.each do | sym |
-          if bp.has_name sym
+          if bp.has_key sym
             send :"mutate__#{ sym }__properties"
           end
         end
@@ -1896,7 +1896,7 @@ module Skylab::Brazen
 
       Require_fields_lib_[]
 
-      st = Common_::Polymorphic_Stream.via_array mutable_backbound_iambic
+      st = Common_::Scanner.via_array mutable_backbound_iambic
 
       Common_.stream do
 

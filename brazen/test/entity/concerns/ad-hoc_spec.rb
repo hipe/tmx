@@ -55,7 +55,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       end
 
       it "reflects" do
-        AHP_Child.properties.get_names.
+        AHP_Child.properties.get_keys.
           should eql [ :foo, :bar, :baz, :biff ]
       end
 

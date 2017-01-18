@@ -73,7 +73,7 @@ module Skylab::Fields::TestSupport
       def _unrec
         @session_ = @class_.new
         begin
-          process_polymorphic_stream_fully_via_ :zoik
+          process_argument_scanner_fully_via_ :zoik
         rescue Home_::ArgumentError => e
         end
         e.message.should eql "unrecognized attribute 'zoik'"
@@ -104,13 +104,13 @@ module Skylab::Fields::TestSupport
         [ @session_.jiang, @session_.bar ]
       end
 
-      context "mm - `new_via_polymorphic_stream_passively`" do
+      context "mm - `new_via_argument_scanner_passively`" do
 
         shared_subject :_tuple do
 
-          st = _build_this_polymorphic_stream
-          sess = _hybrid_class.new_via_polymorphic_stream_passively st
-          [ st.current_token, sess.jiang, sess.bar ]
+          st = _build_this_argument_scanner
+          sess = _hybrid_class.new_via_argument_scanner_passively st
+          [ st.head_as_is, sess.jiang, sess.bar ]
         end
 
         it "writes" do
@@ -131,7 +131,7 @@ module Skylab::Fields::TestSupport
       it "passive - none" do
 
         @session_ = _hybrid_class.new
-        x = process_polymorphic_stream_passively_ the_empty_polymorphic_stream_
+        x = process_argument_scanner_passively_ the_empty_argument_scanner_
         x.should eql true
       end
 
@@ -139,9 +139,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_tuple do
           @session_ = _hybrid_class.new
-          st = _build_this_polymorphic_stream
-          x = process_polymorphic_stream_passively_ st
-          [ x, st.current_token, @session_.jiang, @session_.bar ]
+          st = _build_this_argument_scanner
+          x = process_argument_scanner_passively_ st
+          [ x, st.head_as_is, @session_.jiang, @session_.bar ]
         end
 
         it "writes" do
@@ -157,8 +157,8 @@ module Skylab::Fields::TestSupport
         end
       end
 
-      def _build_this_polymorphic_stream
-        polymorphic_stream_via_ :jiang, :J, :bar, :B, :Z
+      def _build_this_argument_scanner
+        argument_scanner_via_ :jiang, :J, :bar, :B, :Z
       end
 
       def _given m

@@ -42,7 +42,7 @@
              change when methodic actor was assimilated by [fi] attributes.
              this is the the prickly problem of how/when we should
              "normalize" vis-a-vis the main method of
-             `process_polymorphic_stream_passively`.
+             `process_argument_scanner_passively`.
 
              2) more generally it may also be used to track "sessions"
              that do not have enclosed edit sessions, so they need to

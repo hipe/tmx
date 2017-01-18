@@ -52,7 +52,7 @@ module Skylab::Tabular
         if mt  # :#here
           new mt, er, mt_st
         else
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+          Common_::THE_EMPTY_SCANNER
         end
       end
     end  # >>

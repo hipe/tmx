@@ -28,7 +28,7 @@ module Skylab::System::TestSupport
         end
       HERE
 
-      _lines = Basic_[]::String.line_stream _whole_s
+      _lines = Basic_[]::String::LineStream_via_String[ _whole_s ]
 
       root = __subject :line_upstream, _lines
 

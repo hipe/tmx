@@ -57,7 +57,7 @@ module Skylab::Human
           @_has_one
         end
 
-        def current_token
+        def head_as_is
           @_cached || _cache
           if @_has_one
             @_x

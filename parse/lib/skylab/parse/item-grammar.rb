@@ -39,7 +39,7 @@ module Skylab::Parse
 
       def parse_one_item_via_iambic_fully x_a
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
         st_ = simple_stream_of_items_via_polymorpic_stream st
         x = st_.gets
         if x
@@ -54,7 +54,7 @@ module Skylab::Parse
 
       def simple_stream_of_items_via_polymorpic_array x_a
 
-        _st = Common_::Polymorphic_Stream.via_array x_a
+        _st = Common_::Scanner.via_array x_a
 
         simple_stream_of_items_via_polymorpic_stream _st
       end
@@ -130,7 +130,7 @@ module Skylab::Parse
 
         begin
 
-          if adj_h[ st.current_token ]
+          if adj_h[ st.head_as_is ]
 
             adj_sct ||= adj_struct.new
             adj_sct[ st.gets_one ] = true
@@ -143,7 +143,7 @@ module Skylab::Parse
 
         # parse the name
 
-        if st.unparsed_exists && keyword_sym == st.current_token
+        if st.unparsed_exists && keyword_sym == st.head_as_is
 
           st.advance_one
 
@@ -157,7 +157,7 @@ module Skylab::Parse
 
             st.unparsed_exists or break
 
-            if pp_h[ st.current_token ]
+            if pp_h[ st.head_as_is ]
 
               pp_sct ||= pp_struct.new
 
@@ -202,7 +202,7 @@ module Skylab::Parse
 
       y = []
 
-      y << "encountered unrecognized token `#{ st.current_token }` #{
+      y << "encountered unrecognized token `#{ st.head_as_is }` #{
         }before reaching required token `#{ self.class::KW_SYM__ }`"
 
       if adj_h.length.nonzero?

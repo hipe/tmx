@@ -73,7 +73,7 @@ module Skylab::Tabular
           fs = bx.h_.fetch k
         else
           fs = Models_FieldSchema__.new
-          bx.add_at_position d, d, fs
+          bx.add_at_offset d, d, fs
         end
         fs
       end
@@ -101,7 +101,7 @@ module Skylab::Tabular
       def initialize args=nil
 
         if args
-          @_scn = Common_::Polymorphic_Stream.via_array args
+          @_scn = Common_::Scanner.via_array args
           @normal_name_symbol = @_scn.gets_one
           until @_scn.no_unparsed_exists
             send OPTIONS___.fetch @_scn.gets_one

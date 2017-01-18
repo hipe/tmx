@@ -336,7 +336,7 @@ module Skylab::Common::TestSupport
       def initialize expression_of_execution, any_ignore_h, exp_em_a, tc
 
         exp_em_a.frozen? || self._NO
-        @expected_emission_scanner = Home_::Polymorphic_Stream.via_array exp_em_a
+        @expected_emission_scanner = Home_::Scanner.via_array exp_em_a
 
         @do_ignore_terminal_channel = ( any_ignore_h || MONADIC_EMPTINESS_ )
         @expression_of_execution = expression_of_execution
@@ -394,7 +394,7 @@ module Skylab::Common::TestSupport
 
       def now_we_are_finished_with_the_execution
         if ! @expected_emission_scanner.no_unparsed_exists
-          raise AssertionFailed, @expected_emission_scanner.current_token.say_missing_emission
+          raise AssertionFailed, @expected_emission_scanner.head_as_is.say_missing_emission
         end
       end
 
@@ -649,9 +649,9 @@ module Skylab::Common::TestSupport
 
       a = _future_expect_queue
       if a
-        Home_::Polymorphic_Stream.via_array a
+        Home_::Scanner.via_array a
       else
-        Home_::Polymorphic_Stream.the_empty_polymorphic_stream
+        Home_::THE_EMPTY_SCANNER
       end
     end
 

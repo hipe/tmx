@@ -150,8 +150,10 @@ module Skylab::Autonomous_Component_System
           _st = ACS_::For_Serialization::Stream.via_customization_and_rw_(
             @customization_structure_x, @_rw )
 
-          _st.flush_to_immutable_with_random_access_keyed_to_method(
-            :name_symbol )
+          Common_::Stream::Magnetics::RandomAccessImmutable_via_Stream.define do |o|
+            o.upstream = _st
+            o.key_method_name = :name_symbol
+          end
         end
 
         def __when_extra sym, st
@@ -419,7 +421,7 @@ module Skylab::Autonomous_Component_System
 
           qkn_a.sort_by do |qk|
 
-            bx.index qk.name_symbol
+            bx.offset_of qk.name_symbol
           end
           NIL_
         end

@@ -111,7 +111,7 @@ module Skylab::Common
       end
 
       def receive_iambic x_a
-        _ok = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+        _ok = process_argument_scanner_fully scanner_via_array x_a
         _ok and execute
       end
 

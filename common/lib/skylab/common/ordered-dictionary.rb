@@ -55,10 +55,10 @@ module Skylab::Common
       def initialize * p_a
         box = ordered_dictionary
         p_a.each_with_index do |p, d|
-          instance_variable_set box.at_position( d ).ivar, p
+          instance_variable_set box.at_offset( d ).ivar, p
         end
         ( p_a.length ... box.length ).each do |d|
-          instance_variable_set box.at_position( d ).ivar, nil
+          instance_variable_set box.at_offset( d ).ivar, nil
         end ; nil
       end
 
@@ -86,7 +86,7 @@ module Skylab::Common
         def merge_in_other_listener_intersect lstn
           my_box = ordered_dictionary
           lstn.ordered_dictionary.each_pair do |i, cb_slot|
-            my_box.has_name i or next
+            my_box.has_key i or next
             p = lstn.send cb_slot.attr_reader_method_name
             p or next
             instance_variable_set cb_slot.ivar, p
@@ -108,7 +108,7 @@ module Skylab::Common
             md = rx.match i
             md or raise ::ArgumentError, say_did_not_match( i, rx )
             i_ = md[ 0 ].intern
-            d_ = box.index i_
+            d_ = box.offset_of i_
             d_ or raise ::ArgumentError, say_no_event( i_ )
             a[ d_ ] = x_a.fetch d + 1
           end
@@ -127,7 +127,7 @@ module Skylab::Common
         end
         def say_no_event i_
           "no such channel '#{ i }' - have: (#{ ordered_dictionary.
-             get_names * ', ' })"
+             get_keys * ', ' })"
         end
       end
 

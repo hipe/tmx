@@ -14,7 +14,7 @@ module Skylab::Brazen
         @_hash_is_mine = false
 
         symbol_to_string_h = {}
-        unbound.properties.get_names.each do |i|
+        unbound.properties.get_keys.each do |i|
           symbol_to_string_h[ i ] = i.id2name
         end
 

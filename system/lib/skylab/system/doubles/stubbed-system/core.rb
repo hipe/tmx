@@ -365,9 +365,9 @@ module Skylab::System
 
       Stream__ = -> x do
         if x
-          Basic_[]::String.line_stream x
+          Basic_[]::String::LineStream_via_String[ x ]
         else
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         end
       end
 
@@ -422,6 +422,12 @@ module Skylab::System
     end
 
     class Stubbed_IO_for_Read_ < Common_::Stream
+
+      class << self
+        def the_empty_stream_
+          @___the_empty_stream ||= by() { NOTHING_ }
+        end
+      end  # >>
 
       def read
         s = gets

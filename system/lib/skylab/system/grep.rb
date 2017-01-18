@@ -173,16 +173,7 @@ module Skylab::System
 
         _tokens = cmd.command_tokens ; cmd = nil
 
-        _Stream = Common_::Stream
         thread = nil
-
-        _resource_releaser = _Stream::Resource_Releaser.new do
-          if thread && thread.alive?
-            thread.exit
-          end
-          ACHIEVED_
-        end
-
         p = -> do
 
           _, o, e, thread = @system_conduit.popen3( * _tokens )
@@ -209,8 +200,16 @@ module Skylab::System
           end
         end
 
-        _Stream.new _resource_releaser do
-          p[]
+        Common_::Stream.define do |o|
+          o.upstream_as_resource_releaser_by do
+            if thread && thread.alive?
+              thread.exit
+            end
+            ACHIEVED_
+          end
+          o.stream_by do
+            p[]
+          end
         end
       end
 

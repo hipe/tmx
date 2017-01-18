@@ -65,7 +65,7 @@ module Skylab::Human
 
           st = @_up
 
-          sym, s = st.current_token
+          sym, s = st.head_as_is
 
           begin
 
@@ -77,7 +77,7 @@ module Skylab::Human
 
             st.advance_one
             if st.unparsed_exists
-              sym, s = st.current_token
+              sym, s = st.head_as_is
               redo
             end
             break

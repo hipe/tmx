@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
       )
 
       def accept_argument_array x_a
-        @argument_stream = Common_::Polymorphic_Stream.via_array x_a
+        @argument_stream = Common_::Scanner.via_array x_a
         NIL_
       end
 
@@ -68,7 +68,7 @@ module Skylab::Autonomous_Component_System
       def __result_for_create_or_interpret
 
         if @argument_stream.unparsed_exists && :passively != @_fully_or_passively
-          raise ::ArgumentError, @argument_stream.current_token
+          raise ::ArgumentError, @argument_stream.head_as_is
         end
 
         if @_unit_of_work_queue.length.zero?
@@ -81,7 +81,7 @@ module Skylab::Autonomous_Component_System
       def __result_for_edit
 
         if @argument_stream.unparsed_exists
-          raise ::ArgumentError, @argument_stream.current_token
+          raise ::ArgumentError, @argument_stream.head_as_is
         end
 
         if @_unit_of_work_queue.length.zero?

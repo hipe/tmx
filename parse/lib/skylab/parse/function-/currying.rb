@@ -28,19 +28,19 @@ module Skylab::Parse
         super
       end
 
-      def process_polymorphic_stream_passively st
+      def process_argument_scanner_passively st
 
         # :+#experimental custom syntax - enclosing a flat list of
         # constituents in an array: nicer than a `end_functions` token?
 
-        a = ::Array.try_convert st.current_token
+        a = ::Array.try_convert st.head_as_is
         if a
 
           st.advance_one
 
-          _st = Common_::Polymorphic_Stream.via_array a
+          _st = Common_::Scanner.via_array a
 
-          _process_functions_via_polymorphic_stream _st
+          _process_functions_via_argument_scanner _st
         else
           super
         end
@@ -65,14 +65,14 @@ module Skylab::Parse
 
       def functions=
 
-        _process_functions_via_polymorphic_stream polymorphic_upstream
+        _process_functions_via_argument_scanner polymorphic_upstream
       end
 
-      def _process_functions_via_polymorphic_stream st
+      def _process_functions_via_argument_scanner st
 
         @function_a = []
 
-        st_ = __produce_parse_function_stream_via_polymorphic_stream st
+        st_ = __produce_parse_function_stream_via_argument_scanner st
 
         begin
           f = st_.gets
@@ -84,7 +84,7 @@ module Skylab::Parse
         UNABLE_ != f
       end
 
-      def __produce_parse_function_stream_via_polymorphic_stream st
+      def __produce_parse_function_stream_via_argument_scanner st
 
         Common_.stream do
           if st.unparsed_exists
@@ -92,7 +92,7 @@ module Skylab::Parse
             if :end_functions == sym
               nil  # not false
             else
-              Home_.function( sym ).new_via_polymorphic_stream_passively st
+              Home_.function( sym ).new_via_argument_scanner_passively st
             end
           end
         end

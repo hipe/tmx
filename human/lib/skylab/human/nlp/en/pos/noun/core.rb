@@ -32,11 +32,11 @@ module Skylab::Human
 
         def new_via_lemma_and_iambic lemma_x, x_a
 
-          st = polymorphic_stream_via_iambic x_a
+          st = scanner_via_array x_a
 
           ok = false
           lemma = new lemma_x do
-            ok = process_polymorphic_stream_fully st
+            ok = process_argument_scanner_fully st
           end
           ok && lemma
 

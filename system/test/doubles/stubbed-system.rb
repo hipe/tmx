@@ -33,7 +33,7 @@ module Skylab::System::TestSupport
       tcm.send :define_method, :against_ do | s |
 
         @st = Home_::Doubles::Stubbed_System::Input_Adapters_::
-        OGDL.tree_stream_from_lines( Basic_[]::String.line_stream s )
+        OGDL.tree_stream_from_lines( Basic_[]::String::LineStream_via_String[ s ] )
 
         NIL_
       end

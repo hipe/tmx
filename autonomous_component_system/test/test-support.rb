@@ -160,7 +160,7 @@ module Skylab::Autonomous_Component_System::TestSupport
     rx_92 = nil
     Class_92_Normal_Primitive_Lemma = -> st, & pp do
       rx_92 ||= /\A[a-z]+\z/
-      s = st.current_token
+      s = st.head_as_is
       if rx_92 =~ s
         st.advance_one
         Common_::Known_Known[ s ]

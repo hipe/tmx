@@ -30,7 +30,7 @@ module Skylab::Fields
 
           if x
             _ = ::Array.try_convert( x ) || [ x ]
-            st = Common_::Polymorphic_Stream.via_array _
+            st = Common_::Scanner.via_array _
             @sexp_stream_for_current_attribute = st
 
             p = @build_N_plus_one_interpreter[ self ]

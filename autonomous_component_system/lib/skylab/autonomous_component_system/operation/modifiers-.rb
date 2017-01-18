@@ -37,7 +37,7 @@ module Skylab::Autonomous_Component_System
             # (because of the imperative phrase grammar,
             # we must have at least one more token:)
 
-            p = op_h[ st.current_token ]
+            p = op_h[ st.head_as_is ]
             if p
               st.advance_one
               redo
@@ -55,7 +55,7 @@ module Skylab::Autonomous_Component_System
       # -- `assuming` & `if` (conditionals)
 
       if_or_assuming = -> st do
-        if :not == st.current_token
+        if :not == st.head_as_is
           is_negated = true
           st.advance_one
         end

@@ -61,7 +61,7 @@ module Skylab::Brazen
 
         class Value_as_Stream___  # #tracking #[#fi-019]
 
-          def current_token
+          def head_as_is
             @p[]
           end
 

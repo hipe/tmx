@@ -97,27 +97,12 @@ module Skylab::Tabular
 
   # == models & support
 
-  class SimpleModel_
-
-    # experiment. generally we hate these but it's DRYing this file up.
-
-    class << self
-      alias_method :define, :new
-      undef_method :new
-    end  # >>
-
-    def initialize
-      yield self
-      freeze
-    end
-
-    def redefine
+  class SimpleModel_ < Common_::SimpleModel
+    def redefine  # (will probably get pushed up) #[#co-049.1]
       otr = dup
       yield otr
       otr.freeze
     end
-
-    private :dup
   end
 
   module Models

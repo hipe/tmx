@@ -34,8 +34,8 @@ module Skylab::Parse::TestSupport
 
     memoize_subject_parse_function_ do
 
-      Home_.function( :non_negative_integer ).new_via_polymorphic_stream_passively(
-        Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+      Home_.function( :non_negative_integer ).new_via_argument_scanner_passively(
+        Common_::THE_EMPTY_SCANNER
       )
     end
   end

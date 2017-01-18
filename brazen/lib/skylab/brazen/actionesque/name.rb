@@ -30,7 +30,7 @@ module Skylab::Brazen
       def execute
 
         @_inflection = Model___.new
-        process_polymorphic_stream_passively @_up
+        process_argument_scanner_passively @_up
         __accept @_inflection
       end
 
@@ -85,7 +85,7 @@ module Skylab::Brazen
 
         while st.unparsed_exists
 
-          x = st.current_token
+          x = st.head_as_is
 
           if x.respond_to? :ascii_only?
 

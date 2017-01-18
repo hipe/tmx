@@ -110,7 +110,7 @@ module Skylab::Fields
         cls.send :define_method, :some_ivar do |x|
           _BOX.fetch x do
             if ::Integer === x and x < _BOX.length
-              _BOX.at_position x
+              _BOX.at_offset x
             else
               when_no_member x
             end
@@ -134,7 +134,7 @@ module Skylab::Fields
       end
 
       def members
-        const_get( CONST__ ).get_names
+        const_get( CONST__ ).get_keys
       end
 
     end
@@ -146,11 +146,11 @@ module Skylab::Fields
         box = __basic_struct_box__
 
         x_a.each_with_index do |x, d|
-          instance_variable_set box.at_position( d ), x
+          instance_variable_set box.at_offset( d ), x
         end
 
         ( x_a.length ... box.length ).each do |d|
-          instance_variable_set box.at_position( d ), nil
+          instance_variable_set box.at_offset( d ), nil
         end
       end
 

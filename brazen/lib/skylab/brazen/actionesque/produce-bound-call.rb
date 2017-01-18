@@ -32,7 +32,7 @@ module Skylab::Brazen
           @on_event_selectively = oes_p
         end
 
-        @argument_stream = Common_::Polymorphic_Stream.via_array x_a
+        @argument_stream = Common_::Scanner.via_array x_a
         NIL_
       end
 
@@ -98,7 +98,7 @@ module Skylab::Brazen
       def find_via_unbound_stream  # resolves current_bound. results in t/f
 
         st = @unbound_stream
-        sym = @argument_stream.current_token
+        sym = @argument_stream.head_as_is
 
         begin
 
@@ -127,7 +127,7 @@ module Skylab::Brazen
       end
 
       def __when_no_bound_at_this_step
-        _end_in_error_with :no_such_action, :action_name, @argument_stream.current_token
+        _end_in_error_with :no_such_action, :action_name, @argument_stream.head_as_is
       end
 
       def __when_name_is_too_short
@@ -141,14 +141,14 @@ module Skylab::Brazen
 
           if @argument_stream.unparsed_exists
 
-            @current_bound.bound_call_against_polymorphic_stream_and_mutable_box(
+            @current_bound.bound_call_against_argument_scanner_and_mutable_box(
               @argument_stream, @mutable_box )
 
           else
             @current_bound.bound_call_against_box @mutable_box
           end
         else
-          @current_bound.bound_call_against_polymorphic_stream @argument_stream
+          @current_bound.bound_call_against_argument_scanner @argument_stream
         end
       end
 
@@ -158,7 +158,7 @@ module Skylab::Brazen
           Common_::Event.inline_not_OK_via_mutable_iambic_and_message_proc x_a, nil
         end
 
-        @bound_call = Common_::Bound_Call.via_value _result
+        @bound_call = Common_::BoundCall.via_value _result
 
         UNABLE_
       end

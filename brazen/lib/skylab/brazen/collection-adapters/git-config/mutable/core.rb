@@ -189,7 +189,7 @@ module Skylab::Brazen
         def to_body_line_stream
           nscn = to_node_stream
           lscn = nil
-          Common_::SimpleStream.by do
+          Common_::MinimalStream.by do
             while true
               if lscn
                 x = lscn.gets
@@ -251,7 +251,7 @@ module Skylab::Brazen
         end
 
         def _to_node_scn_via_symbol sym
-          _to_node_streamish Common_::SimpleStream, sym
+          _to_node_streamish Common_::MinimalStream, sym
         end
 
         def _to_node_streamish cls, i
@@ -1072,7 +1072,7 @@ module Skylab::Brazen
         end
 
         def to_node_stream
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         end
 
         def for_edit

@@ -13,7 +13,7 @@ all that just yet (as in, it's not implemented). instead, try:
 using a model class as the "query" is crude and won't scale, but it's
 enough to give us a quick start.
 
-because the result (when successful) is a [#ca-044] stream, you can get
+because the result (when successful) is a [#co-016] stream, you can get
 the results progressively, and only as many as you need, without necessarily
 knowing how they are being retrieved on tha back (there could be a pager
 going on, etc).
@@ -22,7 +22,7 @@ watch out because we like to use flyweighting here. each next object you
 get might be the same object as before but with different values inside.
 it depends on the silo's treament of this.
 
-because it is a [#ca-044] stream you can do map, reduce, expand, etc (but again
+because it is a [#ibid] stream you can do map, reduce, expand, etc (but again
 flyweighting might trip you up unless you do something like duping your
 each element as necessary).
 

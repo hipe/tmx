@@ -87,19 +87,19 @@ module Skylab::Brazen
 
     # -- Invocation ( various means ) --
 
-    def bound_call_against_polymorphic_stream_and_mutable_box st, bx
+    def bound_call_against_argument_scanner_and_mutable_box st, bx
 
       @argument_box = bx
 
       _bound_call_after do
-        process_polymorphic_stream_fully st
+        process_argument_scanner_fully st
       end
     end
 
-    def bound_call_against_polymorphic_stream st
+    def bound_call_against_argument_scanner st
 
       _bound_call_after do
-        process_polymorphic_stream_fully st
+        process_argument_scanner_fully st
       end
     end
 
@@ -120,7 +120,7 @@ module Skylab::Brazen
       if ok
         via_arguments_produce_bound_call
       else
-        Common_::Bound_Call.via_value ok
+        Common_::BoundCall.via_value ok
       end
     end
 
@@ -177,7 +177,7 @@ module Skylab::Brazen
 
     def via_arguments_produce_bound_call  # :+#public-API [ts]
 
-      # expose the moment between `process_polymorphic_stream_fully` and `normalize`
+      # expose the moment between `process_argument_scanner_fully` and `normalize`
 
       # when we call the user's `produce_result` we must have fulfilled
       # any preconditions. to fulfill preconditions may require that we
@@ -188,9 +188,9 @@ module Skylab::Brazen
       ok = normalize
       ok &&= __resolve_preconditions
       if ok
-        Common_::Bound_Call.via_receiver_and_method_name self, :produce_result
+        Common_::BoundCall.via_receiver_and_method_name self, :produce_result
       else
-        Common_::Bound_Call.via_value ok
+        Common_::BoundCall.via_value ok
       end
     end
 
@@ -354,7 +354,7 @@ module Skylab::Brazen
 
     def when_after_process_iambic_fully_stream_has_content st
 
-      _ev = Home_.lib_.fields::Events::Extra.via_strange st.current_token
+      _ev = Home_.lib_.fields::Events::Extra.via_strange st.head_as_is
 
       receive_extra_values_event _ev
     end

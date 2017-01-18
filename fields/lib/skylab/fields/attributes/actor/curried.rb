@@ -67,7 +67,7 @@ module Skylab::Fields
           delta = rema_bx.length - 1
 
           a.each_with_index do |x, d|
-            sym = rema_bx.name_at_position delta - d
+            sym = rema_bx.key_at_offset delta - d
             deld_sym_a.push sym
             instance_variable_set full_bx.fetch( sym ), x
           end
@@ -125,7 +125,7 @@ module Skylab::Fields
           rb = remove_instance_variable :@_remainder_box
 
           a.each_with_index do |x, d|
-            _sym = rb.name_at_position d
+            _sym = rb.key_at_offset d
             instance_variable_set full_bx.fetch( _sym ), x
           end
 

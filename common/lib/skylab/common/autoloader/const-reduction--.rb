@@ -24,9 +24,9 @@ module Skylab::Common
       end
 
       def __store_named_arguments a
-        @_st = Polymorphic_Stream.via_array a
+        @_st = Scanner.via_array a
         until @_st.no_unparsed_exists
-          send OPTIONS___.fetch @_st.current_token
+          send OPTIONS___.fetch @_st.head_as_is
         end
         remove_instance_variable :@_st
         NIL
@@ -160,7 +160,7 @@ module Skylab::Common
       def __init
         @_error_eventer = nil
         @_frame = @_frame_prototype.for_value @from_module
-        @_token_stream = Polymorphic_Stream.via_array @__sanitized_const_path_mixed_array
+        @_token_stream = Scanner.via_array @__sanitized_const_path_mixed_array
         NIL
       end
 

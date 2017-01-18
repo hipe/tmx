@@ -95,31 +95,31 @@ module Skylab::Fields::TestSupport
 
       def new_with_ * x_a
         sess = @class_.new
-        _st = polymorphic_stream_via_iambic_ x_a
-        kp = sess.send :process_polymorphic_stream_fully, _st
+        _st = scanner_via_array_ x_a
+        kp = sess.send :process_argument_scanner_fully, _st
         kp or ::Kernel.fail
         @session_ = sess ; nil
       end
 
-      def process_polymorphic_stream_fully_via_ * x_a
-        _st = polymorphic_stream_via_iambic_ x_a
-        @session_.send :process_polymorphic_stream_fully, _st
+      def process_argument_scanner_fully_via_ * x_a
+        _st = scanner_via_array_ x_a
+        @session_.send :process_argument_scanner_fully, _st
       end
 
-      def process_polymorphic_stream_passively_ st
-        @session_.send :process_polymorphic_stream_passively, st
+      def process_argument_scanner_passively_ st
+        @session_.send :process_argument_scanner_passively, st
       end
 
-      def the_empty_polymorphic_stream_
-        Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+      def the_empty_argument_scanner_
+        Common_::THE_EMPTY_SCANNER
       end
 
-      def polymorphic_stream_via_ * x_a
-        polymorphic_stream_via_iambic_ x_a
+      def argument_scanner_via_ * x_a
+        scanner_via_array_ x_a
       end
 
-      def polymorphic_stream_via_iambic_ x_a
-        Common_::Polymorphic_Stream.via_array x_a
+      def scanner_via_array_ x_a
+        Common_::Scanner.via_array x_a
       end
 
       Subject_proc_ = -> do

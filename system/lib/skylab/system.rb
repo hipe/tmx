@@ -170,20 +170,6 @@ module Skylab::System
 
   # ==
 
-  class SimpleModel_
-    class << self
-      alias_method :define, :new
-      undef_method :new
-    end  # >>
-    def initialize
-      yield self
-      freeze
-    end
-    private :dup
-  end
-
-  # ==
-
   Autoloader_ = Common_::Autoloader
 
   # ==
@@ -227,6 +213,7 @@ module Skylab::System
   NIL_ = nil
   NILADIC_TRUTH_ = -> { true }
   NOTHING_ = nil
+  SimpleModel_ = Common_::SimpleModel
   SPACE_ = ' '.freeze
   UNABLE_ = false
   UNDERSCORE_ = '_'

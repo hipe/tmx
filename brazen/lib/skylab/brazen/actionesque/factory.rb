@@ -151,7 +151,7 @@ module Skylab::Brazen
 
             begin
 
-              if bx.has_name prp.name_symbol
+              if bx.has_key prp.name_symbol
                 self._NEEDS_POLICY  # #todo
               end
 

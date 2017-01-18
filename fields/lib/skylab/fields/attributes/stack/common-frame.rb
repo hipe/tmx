@@ -81,7 +81,7 @@ module Skylab::Fields
 
           def call_via_arglist x_a
 
-            st = Common_::Polymorphic_Stream.via_array x_a
+            st = Common_::Scanner.via_array x_a
 
             cls = st.gets_one
 
@@ -95,7 +95,7 @@ module Skylab::Fields
                 RMRP_METH___
             end
 
-            Legacy_::Edit_client_class_via_polymorphic_stream_over_extmod[
+            Legacy_::Edit_client_class_via_argument_scanner_over_extmod[
               cls, st, self ]
 
             NIL_
@@ -129,11 +129,11 @@ module Skylab::Fields
         end
 
         def all_names
-          self.class.properties.get_names
+          self.class.properties.get_keys
         end
 
         def any_proprietor_of i
-          if self.class.properties.has_name i
+          if self.class.properties.has_key i
             self
           end
         end

@@ -524,7 +524,7 @@ module Skylab::Plugin
 
         def __deliver_the_goods
 
-          Common_::Bound_Call.via_receiver_and_method_name(
+          Common_::BoundCall.via_receiver_and_method_name(
 
             Plan___.new(
               @argv_2, @input_x, @prcs_argv_meth_name,

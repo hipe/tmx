@@ -176,7 +176,7 @@ module Skylab::Fields
         end
 
         def knows atr
-          @_box.has_name atr.name_symbol
+          @_box.has_key atr.name_symbol
         end
 
         def retrieve atr

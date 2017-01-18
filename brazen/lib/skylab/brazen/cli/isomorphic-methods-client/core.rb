@@ -330,7 +330,7 @@ module Skylab::Brazen
           bc
         else
 
-          Common_::Bound_Call[
+          Common_::BoundCall[
             argv,
             @_custom_kernel._user_utility,
             @_nf.as_variegated_symbol

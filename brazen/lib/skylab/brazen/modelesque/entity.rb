@@ -357,7 +357,7 @@ module Skylab::Brazen
       formals = self.formal_properties
 
       st = formals.to_value_stream
-      stack = Home_.lib_.fields::Attributes::Stack.new formals.get_names  # could pass oes
+      stack = Home_.lib_.fields::Attributes::Stack.new formals.get_keys  # could pass oes
 
       bx = any_secondary_box__
       bx and stack.push_frame_via_box bx

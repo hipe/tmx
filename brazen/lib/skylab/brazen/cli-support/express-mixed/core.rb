@@ -31,7 +31,7 @@ module Skylab::Brazen
         else
           @_is_single_item = true
           @_item = @mixed_non_primitive_value
-          @mixed_non_primitive_value = Common_::SimpleStream.the_empty_stream
+          @mixed_non_primitive_value = Common_::THE_EMPTY_MINIMAL_STREAM
           _when_at_least_one_item
         end
       end

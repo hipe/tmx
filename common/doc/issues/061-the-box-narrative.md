@@ -7,8 +7,8 @@
                 feature name | orig | new
                       length | same | length
                        count | same
-                   get_names | same | same
-                        has? | same | has_name
+                   get_keys | same | same
+                        has? | same | has_key
                          if? | same | [algorithms]
                         each | same | each_pair
                    each_pair | same |

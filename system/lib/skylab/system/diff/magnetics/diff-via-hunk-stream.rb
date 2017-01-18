@@ -2,7 +2,7 @@ module Skylab::System
 
   class Diff
 
-    class Magnetics::Diff_via_HunkStream < Common_::Actor::Monadic
+    class Magnetics::Diff_via_HunkStream < Common_::Monadic
       # -
         def initialize st
           @hunk_stream = st

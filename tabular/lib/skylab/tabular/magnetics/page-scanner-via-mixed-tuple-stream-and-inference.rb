@@ -1,7 +1,7 @@
 module Skylab::Tabular
 
   class Magnetics::PageScanner_via_MixedTupleStream_and_Inference <  # 1x
-      Common_::Actor::Dyadic
+      Common_::Dyadic
 
     # (for now, this is the node that emits the thing about no lines
     #  in upstream. but we might move it to somewhere else.)

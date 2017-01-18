@@ -92,7 +92,9 @@ module Skylab::Brazen
   Ordered_stream_via_participating_stream = -> do  # 1x here, 1x [tm]
 
     prototype = Lazy_.call do
-      Common_::Stream::Ordered_via_DependencyTree.prototype_by do |o|
+      Common_::Stream::Magnetics::
+          OrderedStream_via_DependencyTree_and_Stream.prototype_by(
+      ) do |o|
         o.identifying_key_by = :name_value_for_order.to_proc
         o.reference_key_by = :after_name_value_for_order.to_proc
       end
@@ -107,13 +109,13 @@ module Skylab::Brazen
 
   PPSF_METHOD_ = -> st, & x_p do  # "process polymorphic stream fully"
 
-    kp = process_polymorphic_stream_passively st, & x_p
+    kp = process_argument_scanner_passively st, & x_p
 
     if kp
 
       if st.unparsed_exists
 
-        ev = Home_.lib_.fields::Events::Extra.via_strange st.current_token
+        ev = Home_.lib_.fields::Events::Extra.via_strange st.head_as_is
 
         if respond_to? :receive_extra_values_event
           receive_extra_values_event ev
@@ -141,7 +143,7 @@ module Skylab::Brazen
 
       begin
 
-        k = st.current_token
+        k = st.head_as_is
 
         prp = bx[ k ]
         prp or break
@@ -262,7 +264,7 @@ module Skylab::Brazen
     end
 
     Mutable_iambic_scanner = -> do
-      Home_::Entity.mutable_polymorphic_stream
+      Home_::Entity.mutable_argument_scanner
     end
 
     Net_HTTP = _memoize do

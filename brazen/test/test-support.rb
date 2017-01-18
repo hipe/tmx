@@ -125,8 +125,8 @@ module Skylab::Brazen::TestSupport
   WITH_MODULE_METHOD_ = -> * x_a do
     ok = nil
     x = new do
-      ok = process_polymorphic_stream_fully(
-        Common_::Polymorphic_Stream.via_array x_a )
+      ok = process_argument_scanner_fully(
+        Common_::Scanner.via_array x_a )
     end
     ok && x
   end
@@ -169,15 +169,15 @@ module Skylab::Brazen::TestSupport
 
     private def process_and_normalize_for_test_ * x_a
 
-      _st = Common_::Polymorphic_Stream.via_array x_a
-      _ok = process_polymorphic_stream_fully _st
+      _st = Common_::Scanner.via_array x_a
+      _ok = process_argument_scanner_fully _st
       _ok && normalize
     end
 
     def process_fully_for_test_ * x_a
 
-      process_polymorphic_stream_fully(
-        Common_::Polymorphic_Stream.via_array x_a )
+      process_argument_scanner_fully(
+        Common_::Scanner.via_array x_a )
     end
   end
 

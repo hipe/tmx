@@ -92,7 +92,7 @@ module Skylab::System
             @on_event_selectively = oes_p
           end
 
-          kp = process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+          kp = process_argument_scanner_fully scanner_via_array x_a
           if kp
             frozen? || self._SANITY
             self
@@ -103,7 +103,7 @@ module Skylab::System
 
         protected :__init_new
 
-        def process_polymorphic_stream_passively st  # #[#fi-022]
+        def process_argument_scanner_passively st  # #[#fi-022]
           super && normalize
         end
 

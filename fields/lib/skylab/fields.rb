@@ -188,20 +188,20 @@ module Skylab::Fields
 
         def new_via_iambic x_a, & x_p
 
-          _st = Common_::Polymorphic_Stream.via_array x_a
-          New_via__[ :process_polymorphic_stream_fully, _st, self, & x_p ]
+          _st = Common_::Scanner.via_array x_a
+          New_via__[ :process_argument_scanner_fully, _st, self, & x_p ]
         end
 
-        def new_via_polymorphic_stream st, & x_p
-          New_via__[ :process_polymorphic_stream_fully, st, self, & x_p ]
+        def new_via_argument_scanner st, & x_p
+          New_via__[ :process_argument_scanner_fully, st, self, & x_p ]
         end
 
-        def new_via_polymorphic_stream_passively st, & x_p
-          New_via__[ :process_polymorphic_stream_passively, st, self, & x_p ]
+        def new_via_argument_scanner_passively st, & x_p
+          New_via__[ :process_argument_scanner_passively, st, self, & x_p ]
         end
 
-        def polymorphic_stream_via_iambic x_a
-          Common_::Polymorphic_Stream.via_array x_a
+        def scanner_via_array x_a
+          Common_::Scanner.via_array x_a
         end
       end
 
@@ -236,15 +236,15 @@ module Skylab::Fields
       private
 
         def process_iambic_fully x_a
-          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+          process_argument_scanner_fully scanner_via_array x_a
         end
 
-        def polymorphic_stream_via_iambic x_a
-          Common_::Polymorphic_Stream.via_array x_a
+        def scanner_via_array x_a
+          Common_::Scanner.via_array x_a
         end
 
-        def process_polymorphic_stream_fully st, & x_p
-          kp = process_polymorphic_stream_passively st, & x_p
+        def process_argument_scanner_fully st, & x_p
+          kp = process_argument_scanner_passively st, & x_p
           if kp
             if st.no_unparsed_exists
               kp
@@ -258,14 +258,14 @@ module Skylab::Fields
           end
         end
 
-        def process_polymorphic_stream_passively st, & x_p
+        def process_argument_scanner_passively st, & x_p
 
           cls = self.class
           if cls.const_defined? :ATTRIBUTES, false
             _atrs = cls.const_get :ATTRIBUTES
           end
 
-          Here_::Lib::Process_polymorphic_stream_passively_.call(
+          Here_::Lib::Process_argument_scanner_passively_.call(
             st, self, _atrs,
             polymorphic_writer_method_name_passive_lookup_proc,
             & x_p )
@@ -284,7 +284,7 @@ module Skylab::Fields
         end
 
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
-          _ev = Home_::Events::Extra.via_strange stream.current_token
+          _ev = Home_::Events::Extra.via_strange stream.head_as_is
           receive_extra_values_event _ev
         end  # :#spot-1
 
@@ -329,12 +329,12 @@ module Skylab::Fields
 
         include InstanceMethods
 
-        def process_polymorphic_stream_passively st
+        def process_argument_scanner_passively st
 
           bx = self.class::ATTRIBUTES.ivars_box_
 
           while st.unparsed_exists
-            ivar = bx[ st.current_token ]
+            ivar = bx[ st.head_as_is ]
             ivar or break
             st.advance_one
             instance_variable_set ivar, st.gets_one
@@ -348,7 +348,7 @@ module Skylab::Fields
           bx = self.class::ATTRIBUTES.ivars_box_
 
           a.length.times do |d|
-            instance_variable_set bx.at_position( d ), a.fetch( d )
+            instance_variable_set bx.at_offset( d ), a.fetch( d )
           end
 
           KEEP_PARSING_
@@ -480,12 +480,12 @@ module Skylab::Fields
     end
 
     def gets_one
-      x = current_token
+      x = head_as_is
       advance_one
       x
     end
 
-    def current_token
+    def head_as_is
       @_kn.value_x
     end
 

@@ -19,7 +19,7 @@ module Skylab::Parse
         @minimum_number_of_characters = nil
       end
 
-      def process_polymorphic_stream_passively st  # #[#fi-022], [#ca-057]
+      def process_argument_scanner_passively st  # #[#fi-022], [#ca-057]
 
         @formal_string = st.gets_one
 

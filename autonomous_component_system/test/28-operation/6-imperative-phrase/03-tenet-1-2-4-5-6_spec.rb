@@ -81,7 +81,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
           -> st, & oes_p_p do
 
-            s = st.current_token
+            s = st.head_as_is
             if /\A[A-Z ]+\z/ =~ s
               st.advance_one
               Common_::Known_Known[ s ]

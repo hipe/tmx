@@ -141,7 +141,7 @@ module Skylab::System
 
         def __write_multiline_escaped_string is_addtnl, string, margin
 
-          st = Basic_[]::String.line_stream string
+          st = Basic_[]::String::LineStream_via_String[ string ]
 
           s = st.gets
           if s

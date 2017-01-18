@@ -21,7 +21,7 @@ module Skylab::Parse
         end
 
         def accept_iambic x_a
-          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+          process_argument_scanner_fully scanner_via_array x_a
           nil
         end
 
@@ -129,7 +129,7 @@ module Skylab::Parse
             # (hi.)
           end
 
-          def process_polymorphic_stream_passively st
+          def process_argument_scanner_passively st
             kp = super
             kp && freeze
             kp

@@ -19,14 +19,14 @@ module Skylab::Tabular::TestSupport
 
       it "knows the first field's name and that it is NOT numeric" do
 
-        fld = _schema.field_box.at_position 0
+        fld = _schema.field_box.at_offset 0
         fld.name.as_human == "test directory" || fail
         fld.is_numeric && fail
       end
 
       it "knows the second field's name and that it IS numeric" do
 
-        fld = _schema.field_box.at_position 1
+        fld = _schema.field_box.at_offset 1
         fld.normal_name_symbol == :number_of_test_files || fail
         fld.is_numeric || fail
       end

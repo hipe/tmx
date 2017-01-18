@@ -28,7 +28,7 @@ module Skylab::Brazen
         def edit_via_iambic x_a
 
           _kp = if x_a.length.nonzero?
-            process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+            process_argument_scanner_fully scanner_via_array x_a
           else
             true
           end

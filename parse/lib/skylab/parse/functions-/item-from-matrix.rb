@@ -72,7 +72,7 @@ module Skylab::Parse
             break
           end
 
-          s = @_in_st.current_token
+          s = @_in_st.head_as_is
 
           # build a new list of candidates
 
@@ -220,7 +220,7 @@ module Skylab::Parse
       def _same p
 
         if @_in_st.unparsed_exists
-          _was_token = @_in_st.current_token
+          _was_token = @_in_st.head_as_is
         end
 
         @_in_st.current_index = @__very_first_index

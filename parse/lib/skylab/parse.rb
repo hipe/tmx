@@ -19,8 +19,8 @@ module Skylab::Parse  # see [#001]
       alias_method :function, :function
 
       def function_via_definition_array x_a
-        st = Common_::Polymorphic_Stream.via_array x_a
-        function( st.gets_one ).new_via_polymorphic_stream st
+        st = Common_::Scanner.via_array x_a
+        function( st.gets_one ).new_via_argument_scanner st
       end
 
       def fuzzy_matcher * a

@@ -1,7 +1,7 @@
 module Skylab::Tabular
 
   class Magnetics::MixedTupleStream_via_LineStream_and_Inference <
-      Common_::Actor::Dyadic
+      Common_::Dyadic
 
     # (probably largely redundant with OGDL parser #wish [#007.B])
 

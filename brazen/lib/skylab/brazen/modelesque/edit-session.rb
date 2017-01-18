@@ -73,7 +73,7 @@ module Skylab::Brazen
           bx = @_tree._mutable_delta_box
           fo = @_formals
           pairs.each_pair do | k, x |
-            fo.has_name k or next
+            fo.has_key k or next
             bx.add k, x  # chanage to `set` when necessary
           end
           NIL_
@@ -90,7 +90,7 @@ module Skylab::Brazen
 
           bx = @_tree._mutable_delta_box
           fo = @_formals
-          st = Common_::Polymorphic_Stream.via_array x_a
+          st = Common_::Scanner.via_array x_a
           while st.unparsed_exists
             prp = fo.fetch st.gets_one
             if Field_::Takes_argument[ prp ]
@@ -104,7 +104,7 @@ module Skylab::Brazen
 
         def edit_pair x, k  # e.g by hand
 
-          if @_formals.has_name k
+          if @_formals.has_key k
             @_tree._mutable_delta_box.add k, x
           else
             @_tree.strange_i_a_.push k
@@ -126,7 +126,7 @@ module Skylab::Brazen
             k = k_p[ k ]
             x = x_p[ x ]
 
-            if fo.has_name k
+            if fo.has_key k
               bx.add k, x
             else
               @_tree.strange_i_a_.push k  # [#037] one day..

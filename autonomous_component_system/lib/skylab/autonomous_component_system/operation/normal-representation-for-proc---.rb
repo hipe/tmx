@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
           ok = check_availability_
           ok &&= ___normalize
           ok && __init_args_via_h
-          ok && Common_::Bound_Call[ @_args, @nr_._p, :call, & @call_handler_ ]
+          ok && Common_::BoundCall[ @_args, @nr_._p, :call, & @call_handler_ ]
         end
 
         def ___normalize

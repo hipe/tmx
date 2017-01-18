@@ -93,8 +93,10 @@ module Skylab::System
       def line_stream_via_path path, num_bytes=nil
 
         _io = open path, ::File::RDONLY  # *NOT* the kernel method, ours
-
-        Home_::IO.line_stream _io, num_bytes
+        Home_::IO::LineStream_via_PageSize.call_by do |o|
+          o.filehandle = _io
+          o.page_size = num_bytes
+        end
       end
 
       # ~ read :+#core-services

@@ -71,8 +71,8 @@ module Skylab::System
             send k, x
           end
 
-          _sout = @_stdout_proxy || Stubbed_IO_for_Read_.the_empty_stream
-          _serr = @_stderr_proxy || Stubbed_IO_for_Read_.the_empty_stream
+          _sout = @_stdout_proxy || Stubbed_IO_for_Read_.the_empty_stream_
+          _serr = @_stderr_proxy || Stubbed_IO_for_Read_.the_empty_stream_
 
           [ NOTHING_, _sout, _serr, @__wait ]
         end

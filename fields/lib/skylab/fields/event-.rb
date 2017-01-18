@@ -78,7 +78,7 @@ module Skylab::Fields
 
     # ==
 
-    class Determine_any_subject_string < Common_::Actor::Monadic
+    class Determine_any_subject_string < Common_::Monadic
 
       # ..
 

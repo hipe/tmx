@@ -293,11 +293,10 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
 
           bx = me.transitive_capabilities_box
 
-          _st = bx.to_name_stream
+          _st = bx.to_key_stream
 
-          _s_a = _st.reduce_into_by [] do | m, sym |
-
-            m << Common_::Name.via_variegated_symbol( sym ).as_human
+          _s_a = _st.join_into [] do |sym|
+            Common_::Name.via_variegated_symbol( sym ).as_human
           end
 
           y << "#{ and_ _s_a } #{ me.name.as_human }"  # ..

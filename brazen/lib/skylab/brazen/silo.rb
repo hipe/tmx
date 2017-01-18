@@ -252,7 +252,7 @@ module Skylab::Brazen
           st = o.argument_stream
           h = { qualified_knownness_box: nil, preconditions: nil }
           while st.unparsed_exists
-            if :with == st.current_token
+            if :with == st.head_as_is
               st.advance_one
               break
             end
@@ -276,7 +276,7 @@ module Skylab::Brazen
             ok = act.process_qualified_knownness_box_passively__ qualified_knownness_box
           end
 
-          ok &&= act.process_polymorphic_stream_fully st
+          ok &&= act.process_argument_scanner_fully st
           ok and act.via_arguments_produce_bound_call
         else
           o.bound_call

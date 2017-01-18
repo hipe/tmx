@@ -32,12 +32,12 @@ module Skylab::Human
       end
 
       def _ps x
-        Common_::Polymorphic_Stream.via_array x
+        Common_::Scanner.via_array x
       end
 
       def __expression_session_via_sexp_stream st
 
-        if :when == st.current_token
+        if :when == st.head_as_is
           st.advance_one
           ___magnetic_collection.expression_session_via_sexp_stream__ st
         else
@@ -61,7 +61,7 @@ module Skylab::Human
 
       def interpret_component st, asc
         _sx = st.gets_one
-        st_ = Common_::Polymorphic_Stream.via_array _sx
+        st_ = Common_::Scanner.via_array _sx
         _cls = Here_._lookup_class st_
         _cls.interpret_component_with_own_stream_ st_, asc
       end
@@ -170,7 +170,7 @@ module Skylab::Human
         # --
 
         def express_into_under y, _expag
-          st = Common_::Polymorphic_Stream.via_array @_s_a
+          st = Common_::Scanner.via_array @_s_a
           y << st.gets_one
           until st.no_unparsed_exists
             y << SPACE_

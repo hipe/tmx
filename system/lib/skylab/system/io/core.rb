@@ -12,10 +12,6 @@ module Skylab::System
         Here_::DRY_STUB__
       end
 
-      def line_stream io, num_bytes=nil
-        Here_::Line_Scanner__.new io, num_bytes
-      end
-
       def select
         Here_::Select__
       end

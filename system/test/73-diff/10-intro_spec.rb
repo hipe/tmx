@@ -49,7 +49,7 @@ module Skylab::System::TestSupport
 
         lib = TestSupport_::Expect_Line
 
-        _exp_st = Basic_[]::String.line_stream _exp_str
+        _exp_st = Basic_[]::String::LineStream_via_String[ _exp_str ]
 
         lib::Streams_have_same_content[ act_st, _exp_st, self ]
       end

@@ -25,7 +25,7 @@ module Skylab::Autonomous_Component_System
 
           ok = check_availability_
           ok &&= __normalize
-          ok && Common_::Bound_Call[ NOTHING_, @_sess, :execute ]
+          ok && Common_::BoundCall[ NOTHING_, @_sess, :execute ]
         end
 
         def __normalize

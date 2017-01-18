@@ -17,7 +17,7 @@ module Skylab::Fields
       )
 
       def iambic= x_a
-        @upstream = Common_::Polymorphic_Stream.via_array x_a
+        @upstream = Common_::Scanner.via_array x_a
         x_a
       end
 

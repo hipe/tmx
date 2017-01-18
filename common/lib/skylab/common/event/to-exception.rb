@@ -2,7 +2,7 @@ module Skylab::Common
 
   class Event
     # -
-      class To_exception < Home_::Actor::Monadic
+      class To_exception < Home_::Monadic
 
         def initialize event
           @event = event

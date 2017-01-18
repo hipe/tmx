@@ -13,7 +13,7 @@ module Skylab::Plugin
 
       def edit_module_via_iambic mod, x_a
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
 
         if st.unparsed_exists
 
@@ -65,7 +65,7 @@ module Skylab::Plugin
 
       def delegate * x_a
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
 
         begin
 
@@ -107,7 +107,7 @@ module Skylab::Plugin
 
         begin
 
-          m = p[ st.current_token ]
+          m = p[ st.head_as_is ]
           m or break
 
           did = true
@@ -214,7 +214,7 @@ module Skylab::Plugin
 
         if ! did
 
-          if @_up.current_token.respond_to? :id2name
+          if @_up.head_as_is.respond_to? :id2name
             @method_name_a = [ @_up.gets_one ]
             did = true
           end
@@ -235,7 +235,7 @@ module Skylab::Plugin
 
       def _absorb_any_array_as_method_names
 
-        x = @_up.current_token
+        x = @_up.head_as_is
         if ::Array.try_convert x
           @_up.advance_one
           @method_name_a = x
@@ -453,7 +453,7 @@ module Skylab::Plugin
     end
 
     Strange_ = -> st do
-      Home_.lib_.basic::String.via_mixed st.current_token
+      Home_.lib_.basic::String.via_mixed st.head_as_is
     end
 
     Here_ = self

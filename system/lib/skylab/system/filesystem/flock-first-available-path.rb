@@ -35,7 +35,7 @@ module Skylab::System
         end
 
         def execute
-          p = Basic_[]::String.succ.call_via_iambic @x_a
+          p = Basic_[]::String::Successorer.call_via_iambic @x_a
           begin
             path = p[]
 

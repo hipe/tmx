@@ -37,10 +37,10 @@ module Skylab::Plugin::TestSupport
         o.emits = [ :argument_bid_for ]
         o.index_dependencies_in_module DeA_Mod1
 
-        st = Common_::Polymorphic_Stream.via_array [ :is_diet ]
+        st = Common_::Scanner.via_array [ :is_diet ]
 
         begin
-          o.process_polymorphic_stream_fully st
+          o.process_argument_scanner_fully st
         rescue subject_class_::Definition_Conflict => e
         end
 
@@ -122,7 +122,7 @@ module Skylab::Plugin::TestSupport
 
         o = _common_guy
         st = argument_stream_via_ :is_diet
-        _kp = o.process_polymorphic_stream_fully st
+        _kp = o.process_argument_scanner_fully st
 
         true == _kp or fail
         o[ :brd ].brd_is_diet or fail
@@ -134,7 +134,7 @@ module Skylab::Plugin::TestSupport
 
         o = _common_guy
         st = argument_stream_via_ :color, :red
-        _kp = o.process_polymorphic_stream_fully st
+        _kp = o.process_argument_scanner_fully st
 
         true == _kp or fail
         o[ :brd ].brd_color.should eql :red
@@ -146,9 +146,9 @@ module Skylab::Plugin::TestSupport
 
         o = _common_guy
         st = argument_stream_via_ :is_diet, :color, :red, :howzaa
-        _kp = o.process_polymorphic_stream_passively st
+        _kp = o.process_argument_scanner_passively st
 
-        st.current_token.should eql :howzaa
+        st.head_as_is.should eql :howzaa
         _kp.should eql true
       end
 
@@ -158,7 +158,7 @@ module Skylab::Plugin::TestSupport
         st = argument_stream_via_ :is_diet, :color, :red, :howzaa
 
         begin
-          o.process_polymorphic_stream_fully st
+          o.process_argument_scanner_fully st
         rescue ::Skylab::Fields::ArgumentError => e
         end
 
@@ -208,7 +208,7 @@ module Skylab::Plugin::TestSupport
         o = _common_guy
         st =  argument_stream_via_ :x
         begin
-          o.process_polymorphic_stream_fully st
+          o.process_argument_scanner_fully st
         rescue subject_class_::Definition_Conflict => e
         end
 

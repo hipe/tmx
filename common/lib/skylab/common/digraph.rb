@@ -11,7 +11,7 @@ module Skylab::Common
   private
 
     def build_event_stream_graph  # #storypoint-2
-      scn = Home_::SimpleStream.try_convert ancestors
+      scn = Home_::Stream::Magnetics::MinimalStream_via[ ancestors ]
       cur = found_a = nil
       nil while ( cur = scn.rgets ) && ::Object != cur
       chk = -> do

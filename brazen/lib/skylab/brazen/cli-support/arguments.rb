@@ -169,7 +169,7 @@ module Skylab::Brazen
           end
 
           def build_missing_required_event
-            Missing_.new @arg_a_scan.current_token
+            Missing_.new @arg_a_scan.head_as_is
           end
 
           def parse_any_optional_arguments
@@ -229,7 +229,7 @@ module Skylab::Brazen
 
           def complain_about_any_extra_arguments
             if @argv_scan.unparsed_exists
-              Extra_.new @argv_scan.current_token
+              Extra_.new @argv_scan.head_as_is
             end
           end
 
@@ -281,7 +281,7 @@ module Skylab::Brazen
             end
           end
 
-          class Crazy_Scanner__ < Common_::Polymorphic_Stream  # assumes via array!
+          class Crazy_Scanner__ < Common_::Scanner  # assumes via array!
             attr_writer :d, :x_a_length
             attr_reader :d
           end

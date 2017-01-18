@@ -109,7 +109,7 @@ module Skylab::Plugin::TestSupport
         o.index_dependencies_in_module DeAC1_Box
 
         st = argument_stream_via_ :pear, :zoobie
-        o.process_polymorphic_stream_fully st or fail
+        o.process_argument_scanner_fully st or fail
 
         o[ :pear ].do_use_pear or fail
         o_ = o[ :veg ]

@@ -16,7 +16,7 @@ module Skylab::Autonomous_Component_System
 
       expag.calculate do
 
-        _s_a = _st.reduce_into_by [] do | m, oper |
+        _s_a = _st.join_into [] do |oper|
 
           _assume_plural = oper.formal_properties.length.zero?
 
@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System
             lemma
           end
 
-          m << "#{ oper.name.as_human } #{ _noun_s }"
+          "#{ oper.name.as_human } #{ _noun_s }"
         end
 
         y << _s_a.join( ', ' )

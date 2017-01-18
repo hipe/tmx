@@ -33,7 +33,7 @@ module Skylab::Parse
         @x_a_length != @d
       end
 
-      def current_token
+      def head_as_is
         current_token_object.value_x
       end
 
@@ -60,7 +60,7 @@ module Skylab::Parse
         @x_a[ @d, d ]
       end
 
-      define_singleton_method :the_empty_stream, -> do
+      define_singleton_method :the_empty_stream_, -> do
         p = -> do
           x = new EMPTY_A_
           def x.current_index= d

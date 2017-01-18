@@ -15,7 +15,7 @@ module Skylab::Common::TestSupport
       @emission_a = []
     end
 
-    def process_polymorphic_stream_passively st  # #[#fi-022]
+    def process_argument_scanner_passively st  # #[#fi-022]
       super && normalize
     end
 

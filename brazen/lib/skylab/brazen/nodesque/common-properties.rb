@@ -30,8 +30,8 @@ module Skylab::Brazen
         end
       end
 
-      def has_name sym
-        @_box[].has_name sym
+      def has_key sym
+        @_box[].has_key sym
       end
 
       def at * sym_a

@@ -2,7 +2,7 @@ module Skylab::Common
 
   class Event
     # -
-      class Via_file_utils_message < Home_::Actor::Monadic
+      class Via_file_utils_message < Home_::Monadic
 
         # WARNING - major hack alert
         #

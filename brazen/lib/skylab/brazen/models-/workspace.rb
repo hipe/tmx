@@ -237,7 +237,7 @@ module Skylab::Brazen
           prp = st.gets
           prp or break
           k = prp.name_symbol
-          bx.has_name k and redo
+          bx.has_key k and redo
           bx.add k, prp
           redo
         end while nil
@@ -274,7 +274,7 @@ module Skylab::Brazen
 
           @on_event_selectively.call :error, :missing_required_properties do
 
-            _prp = Home_.lib_.basic::Minimal_Property.via_variegated_symbol(
+            _prp = Home_.lib_.basic::MinimalProperty.via_variegated_symbol(
               :workspace_path )
 
             Home_.lib_.fields::Events::Missing.for_attribute _prp

@@ -39,7 +39,7 @@ module Skylab::Brazen
       o.execute
     end
 
-    Edit_client_class_via_polymorphic_stream_over_extmod = -> (
+    Edit_client_class_via_argument_scanner_over_extmod = -> (
       cls, st, extmod
     ) do
 
@@ -85,7 +85,7 @@ module Skylab::Brazen
       end
 
       def arglist= x_a
-        @upstream = Common_::Polymorphic_Stream.via_array x_a
+        @upstream = Common_::Scanner.via_array x_a
         x_a
       end
 
@@ -304,8 +304,8 @@ module Skylab::Brazen
         rep = :receive_entity_property
         # ~ im
         fps = :formal_properties
-        ppsf = :process_polymorphic_stream_fully
-        ppsp = :process_polymorphic_stream_passively
+        ppsf = :process_argument_scanner_fully
+        ppsp = :process_argument_scanner_passively
         rpp = :receive_polymorphic_property
         gopv = :gets_one_polymorphic_value
 
@@ -387,7 +387,7 @@ module Skylab::Brazen
       def __receive_iambic x_a
 
         @upstream and self._SANITY
-        @upstream = Common_::Polymorphic_Stream.via_array x_a
+        @upstream = Common_::Scanner.via_array x_a
         _process_remainder_of_upstream
         NIL_
       end
@@ -452,7 +452,7 @@ module Skylab::Brazen
         a = @_optimism
         d = 0
         last = a.length - 1
-        m = :"#{ st.current_token }="
+        m = :"#{ st.head_as_is }="
 
         begin
 
@@ -469,7 +469,7 @@ module Skylab::Brazen
               break
             end
 
-            m = :"#{ st.current_token }="
+            m = :"#{ st.head_as_is }="
 
             if d.zero?  # the first nonterminal matched normally
               redo
@@ -493,7 +493,7 @@ module Skylab::Brazen
         end while nil
 
         if ! did
-          raise Home_::ArgumentError, "unrecognized property '#{ st.current_token }'"
+          raise Home_::ArgumentError, "unrecognized property '#{ st.head_as_is }'"
         end
         kp
       end
@@ -886,7 +886,7 @@ module Skylab::Brazen
         @_a.length
       end
 
-      def has_name k
+      def has_key k
         @_h.key? k
       end
 
@@ -894,7 +894,7 @@ module Skylab::Brazen
         fetch k do end
       end
 
-      def at_position d  # no block
+      def at_offset d  # no block
         fetch @_a.fetch d
       end
 
@@ -931,7 +931,7 @@ module Skylab::Brazen
 
       # ~ map operations & support
 
-      def get_names
+      def get_keys
         @_a.dup
       end
 
@@ -939,7 +939,7 @@ module Skylab::Brazen
         @_a
       end
 
-      def each_name( & x_p )
+      def each_key( & x_p )
         @_a.each( & x_p )
       end
 
@@ -1035,7 +1035,7 @@ module Skylab::Brazen
           # the name is reached, not to signal an error state
 
           new_by do
-            process_polymorphic_stream_passively sess.upstream
+            process_argument_scanner_passively sess.upstream
             sess._shake_it_up self
             normalize_property
           end

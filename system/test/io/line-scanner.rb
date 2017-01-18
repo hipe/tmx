@@ -25,7 +25,10 @@ module Skylab::System::TestSupport
     end
 
     def subject_via_filehandle fh, d
-      Home_::IO.line_stream fh, d
+      Home_::IO::LineStream_via_PageSize.call_by do |o|
+        o.filehandle = fh
+        o.page_size = d
+      end
     end
 
     def resolve_some_pathname path_s, o_p

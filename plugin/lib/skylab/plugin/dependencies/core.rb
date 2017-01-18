@@ -408,14 +408,14 @@ module Skylab::Plugin
 
     # ~ concerns & adjuncts
 
-    def process_polymorphic_stream_fully st
+    def process_argument_scanner_fully st
 
       o = _build_arg_demux
       o.upstream = st
       o.execute
     end
 
-    def process_polymorphic_stream_passively st
+    def process_argument_scanner_passively st
 
       o = _build_arg_demux
       o.be_passive = true

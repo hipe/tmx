@@ -16,7 +16,7 @@ module Skylab::Common::TestSupport
 
       _st_ = _build_subject
 
-      st = _st_.map_by do | d |
+      st = _st_.map_by do |d|
         "(#{ d })"
       end
 
@@ -26,7 +26,7 @@ module Skylab::Common::TestSupport
 
     def _build_subject
       d = 4
-      _subject.new :x do
+      _subject.by :x do
         if d > 1
           d -= 1
         end

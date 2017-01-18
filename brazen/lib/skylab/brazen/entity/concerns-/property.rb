@@ -4,7 +4,7 @@ module Skylab::Brazen
 
     module Concerns_::Property
 
-      class Prop_desc_wonderhack < Common_::Actor::Dyadic
+      class Prop_desc_wonderhack < Common_::Dyadic
 
         def initialize a, b
           @expag = a

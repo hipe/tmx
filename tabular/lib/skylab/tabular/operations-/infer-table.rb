@@ -110,7 +110,7 @@ module Skylab::Tabular
 
         @listener = method :__receive_emission
 
-        _real_arg_scn = Common_::Polymorphic_Stream.via_array @ARGV
+        _real_arg_scn = Common_::Scanner.via_array @ARGV
 
         _line_upstreamer = method :__procure_line_upstream
 

@@ -8,7 +8,7 @@ module Skylab::Fields
         Here_::Normalization::Normalize_using_defaults_and_requireds[ sess ]
       end
 
-      Polymorphic_Processing_Instance_Methods = Here_::Actor::InstanceMethods
+      Polymorphic_Processing_Instance_Methods = Actor::InstanceMethods
 
       class Index_of_Definition___
 
@@ -47,7 +47,7 @@ module Skylab::Fields
 
         def define_methods__ mod
 
-          st = @static_index_.method_definers.to_name_stream
+          st = @static_index_.method_definers.to_key_stream
           begin
             k = st.gets
             k or break
@@ -101,7 +101,7 @@ module Skylab::Fields
         )
       end
 
-      Process_polymorphic_stream_passively_ = -> st, sess, formals, meths, & x_p do  # 1x
+      Process_argument_scanner_passively_ = -> st, sess, formals, meths, & x_p do  # 1x
 
         sess.instance_variable_set ARG_STREAM_IVAR_, st  # as we do
 
@@ -158,7 +158,7 @@ module Skylab::Fields
         end
 
         def sexp= sx
-          @argument_stream = Common_::Polymorphic_Stream.via_array sx ; sx
+          @argument_stream = Common_::Scanner.via_array sx ; sx
         end
 
         attr_writer(
@@ -233,7 +233,7 @@ module Skylab::Fields
         end
 
         def __at_extra_then_raise_an_exception  # mimic #spot-1
-          _ev = Home_::Events::Extra.via_strange @argument_stream.current_token
+          _ev = Home_::Events::Extra.via_strange @argument_stream.head_as_is
           raise _ev.to_exception
         end
 
@@ -280,7 +280,7 @@ module Skylab::Fields
 
           p = stack.fetch 0
           -> do
-            p[ @argument_stream.current_token ]
+            p[ @argument_stream.head_as_is ]
           end
         end
 
@@ -292,7 +292,7 @@ module Skylab::Fields
           -> do
 
             d = top_d
-            k = st.current_token
+            k = st.head_as_is
 
             begin
               atr = stack.fetch( d ).call k

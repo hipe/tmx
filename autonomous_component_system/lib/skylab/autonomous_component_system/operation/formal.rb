@@ -98,7 +98,7 @@ module Skylab::Autonomous_Component_System
 
       def _accept_phrase x_a
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
         begin
           x = send :"__accept__#{ st.gets_one }__meta_component", st
           st.no_unparsed_exists ? break : redo

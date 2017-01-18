@@ -230,7 +230,7 @@ module Skylab::Brazen::TestSupport
 
     def _receive_normal_emissions_stream_intended_to_be_used_as_upstream st
 
-      _st_ = st.flush_to_polymorphic_stream
+      _st_ = st.flush_to_scanner
 
       self.stream_for_expect_stdout_stderr = _st_
 

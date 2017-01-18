@@ -46,7 +46,7 @@ module Skylab::Brazen
           @body_s = nil
           @entity_identifier_strategy = nil
           @HTTP_param_box = nil
-          process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+          process_argument_scanner_fully scanner_via_array x_a
           @need_to_prepare_URI = true
         end
 

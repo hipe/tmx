@@ -130,7 +130,7 @@ module Skylab::Fields
 
           ca = @_.current_attribute
           st = @_.sexp_stream_for_current_attribute
-          if st.unparsed_exists && :reader_method_name == st.current_token
+          if st.unparsed_exists && :reader_method_name == st.head_as_is
             st.advance_one
             m = st.gets_one
           end

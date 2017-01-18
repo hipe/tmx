@@ -45,11 +45,11 @@ module Skylab::Parse
 
         # ~ for construction:
 
-        def process_polymorphic_stream_passively st  # #hook-in to [cb] actor construction
+        def process_argument_scanner_passively st  # #hook-in to [cb] actor construction
 
           # we need at least and at most one parse function.
 
-          f = Home_.function( st.gets_one ).new_via_polymorphic_stream_passively st
+          f = Home_.function( st.gets_one ).new_via_argument_scanner_passively st
           f and begin
             @f = f
             KEEP_PARSING_

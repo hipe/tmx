@@ -137,11 +137,11 @@ module Skylab::Brazen
 
         if @x.respond_to? :ascii_only?
 
-          Common_::Bound_Call.via_args_and_method_name @x, :via_path
+          Common_::BoundCall.via_args_and_method_name @x, :via_path
 
         elsif @x.respond_to? :each_with_index
 
-          Common_::Bound_Call.via_args_and_method_name [ @x ], :via_line_array
+          Common_::BoundCall.via_args_and_method_name [ @x ], :via_line_array
 
         else
           stream
@@ -149,11 +149,11 @@ module Skylab::Brazen
       end
 
       def stream
-        Common_::Bound_Call.via_args_and_method_name @x, :via_stream
+        Common_::BoundCall.via_args_and_method_name @x, :via_stream
       end
 
       def string
-        Common_::Bound_Call.via_args_and_method_name @x, :via_string
+        Common_::BoundCall.via_args_and_method_name @x, :via_string
       end
     end
 

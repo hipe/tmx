@@ -2,7 +2,7 @@ module Skylab::Common
 
   class Stream
 
-    class As_::Polymorphic  # #[#co-069]
+    class Magnetics::Scanner_via_Stream < MonadicMagneticAndModel  # #[#co-069]
 
       # etc.
 
@@ -17,7 +17,7 @@ module Skylab::Common
           if no_unparsed_exists
             break
           end
-          a.push current_token
+          a.push head_as_is
           advance_one
           redo
         end while nil
@@ -42,7 +42,7 @@ module Skylab::Common
         end
       end
 
-      def current_token
+      def head_as_is
         if @x
           @x
         else

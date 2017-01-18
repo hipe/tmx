@@ -30,7 +30,7 @@ module Skylab::System
         @_lines = if x.respond_to? :gets
           x
         else
-          Common_::SimpleStream.try_convert x
+          Common_::Stream::Magnetics::MinimalStream_via[ x ]
         end
         NIL_
       end

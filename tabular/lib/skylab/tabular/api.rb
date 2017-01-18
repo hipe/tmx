@@ -33,7 +33,7 @@ module Skylab::Tabular
     end
 
     def __bound_call_for_operation
-      Common_::Bound_Call[ nil, @__operation, :execute ]
+      Common_::BoundCall[ nil, @__operation, :execute ]
     end
 
     def __parse_args_for_operation
@@ -45,7 +45,7 @@ module Skylab::Tabular
     end
 
     def __bound_call_for_proc
-      Common_::Bound_Call[ @argument_scanner, @_executor, :call ]
+      Common_::BoundCall[ @argument_scanner, @_executor, :call ]
     end
 
     def __load_ticket_value_looks_like_proc

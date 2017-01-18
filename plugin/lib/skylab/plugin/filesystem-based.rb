@@ -98,7 +98,7 @@ module Skylab::Plugin
 
         _big_file_list = @system.glob _glob
 
-        scn = Common_::Polymorphic_Stream.via_array _big_file_list
+        scn = Common_::Scanner.via_array _big_file_list
 
         @__long_path_scanner = scn
         @_to_LTS = :__to_load_ticket_stream_midway

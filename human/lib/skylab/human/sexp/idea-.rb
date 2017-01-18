@@ -10,7 +10,7 @@ module Skylab::Human
 
       class << self
 
-        alias_method :new_via_sexp_stream__, :new_via_polymorphic_stream
+        alias_method :new_via_sexp_stream__, :new_via_argument_scanner
 
         alias_method :new_via_sexp__, :new_via_iambic
 
@@ -23,7 +23,7 @@ module Skylab::Human
         @__slots = Common_::Box.new
       end
 
-      def process_polymorphic_stream_passively st  # #[#fi-022]
+      def process_argument_scanner_passively st  # #[#fi-022]
         super && normalize
       end
 

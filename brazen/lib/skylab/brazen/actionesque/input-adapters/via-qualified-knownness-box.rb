@@ -20,7 +20,7 @@ module Skylab::Brazen
           kp = KEEP_PARSING_
           bx.each_pair do | k, qualified_knownness |
 
-            if ! foz.has_name k  # not my formal property - disregard
+            if ! foz.has_key k  # not my formal property - disregard
               next
             end
 

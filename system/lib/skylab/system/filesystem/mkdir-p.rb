@@ -2,7 +2,7 @@ module Skylab::System
 
   module Filesystem
 
-    class Mkdir_p < Common_::Actor::Dyadic  # :[#026].
+    class Mkdir_p < Common_::Dyadic  # :[#026].
 
       # we do this on our own instead of using the FileUtils method because
       # A) we don't like FileUtils's way of "emitting" "events" and B) this

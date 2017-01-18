@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module Skylab::Common::TestSupport
 
-  describe "[co] ordered via dependency trees" do
+  describe "[co] stream - magnetics - ordered stream via dependency tree and stream" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -21,13 +21,13 @@ module Skylab::Common::TestSupport
         # the peanut butter and jelly each (individually) require that the
         # bread has gone before them.
 
-        _proto = X_s_ovdt_prototype[]
+        _proto = X_s_m_osv_prototype[]
 
         _a = [
-          X_x_ovdt_item[ :peanut_butter, :bread ],
-          X_x_ovdt_item[ :garnish ],
-          X_x_ovdt_item[ :bread ],
-          X_x_ovdt_item[ :jelly, :bread ],
+          X_s_m_osv_item[ :peanut_butter, :bread ],
+          X_s_m_osv_item[ :garnish ],
+          X_s_m_osv_item[ :bread ],
+          X_s_m_osv_item[ :jelly, :bread ],
         ]
 
         _st_ = _proto.execute_against Home_::Stream.via_nonsparse_array _a
@@ -46,17 +46,17 @@ module Skylab::Common::TestSupport
     end
 
     subject_module = -> do
-      Home_::Stream::Ordered_via_DependencyTree
+      Home_::Stream::Magnetics::OrderedStream_via_DependencyTree_and_Stream
     end
 
-    X_s_ovdt_prototype = Home_::Lazy.call do
+    X_s_m_osv_prototype = Home_::Lazy.call do
       subject_module[].prototype_by do |o|
         o.identifying_key_by = :_my_name.to_proc
         o.reference_key_by = :_i_go_after.to_proc
       end
     end
 
-    X_x_ovdt_item = ::Struct.new :_my_name, :_i_go_after
+    X_s_m_osv_item = ::Struct.new :_my_name, :_i_go_after
 
     define_method :_subject_module, subject_module
   end

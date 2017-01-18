@@ -48,7 +48,7 @@ module Skylab::Fields
           :x, @invalid_value,
           :predicate_string, @predicate_string,
           :property_name, @property_name,
-          :enum_value_polymorphic_streamable, @valid_collection,
+          :enum_value_argument_scannerable, @valid_collection,
           :valid_value_mapper_from, @valid_value_mapper_from,
           :adjective, @adjective,
           :exception_class_by, @exception_class_by,

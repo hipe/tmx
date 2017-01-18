@@ -60,7 +60,7 @@ module Skylab::Brazen
         state = :initial
         hot = true
 
-        st = Common_::Polymorphic_Stream.via_array sexp
+        st = Common_::Scanner.via_array sexp
 
         building = nil
 

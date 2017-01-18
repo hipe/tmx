@@ -1,4 +1,4 @@
-# the IO line scanner narrative :[#013]
+# the IO line stream narrative :[#013]
 
 (this content was stripped from the corresponding code node and as such
 the age of this content is older that as is reflected in the VCS).

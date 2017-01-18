@@ -15,7 +15,7 @@ module Skylab::Human
 
         def phrase_via_parse st
 
-          if PREP_LEXICON__[ st.current_token.last ]
+          if PREP_LEXICON__[ st.head_as_is.last ]
 
             new.__phrase_via_parse st
           end
@@ -42,7 +42,7 @@ module Skylab::Human
 
       def __phrase_via_parse st
 
-        @_lemma = st.current_token.last
+        @_lemma = st.head_as_is.last
         st.advance_one
         _np = EN_::POS::Noun.phrase_via_parse st
         @_np = _np

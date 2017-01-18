@@ -71,7 +71,7 @@ module Skylab::Autonomous_Component_System
 
         _m = :"__#{ ss.fetch( -1 ).name.as_variegated_symbol }__component"
 
-        _bc = Common_::Bound_Call[
+        _bc = Common_::BoundCall[
           args,
           ss.fetch( -2 ).ACS,  # receiver
           _m,

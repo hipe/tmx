@@ -10,10 +10,10 @@ module Skylab::Parse
 
         __prepare
 
-        f_st = Common_::Polymorphic_Stream.via_array @function_a
+        f_st = Common_::Scanner.via_array @function_a
 
         if f_st.unparsed_exists
-          f = f_st.current_token
+          f = f_st.head_as_is
         end
 
         q = []
@@ -35,7 +35,7 @@ module Skylab::Parse
             @result_x_a[ f_st.current_index ] = on.value_x
             f_st.advance_one
             f = if f_st.unparsed_exists
-              f_st.current_token
+              f_st.head_as_is
             end
             redo
 

@@ -206,10 +206,11 @@ module Skylab::Autonomous_Component_System
 
         _st = _LL.to_element_stream_assuming_nonsparse
 
-        s_a = _st.reduce_into_by [] do | m, x |
-          s = x.description_under @expag_
-          s and m.push s
-          m
+        s_a = _st.reduce_into [] do |a|
+          -> x do
+            s = x.description_under @expag_
+            s and a.push s
+          end
         end
 
         if s_a.length.nonzero?
@@ -314,7 +315,7 @@ module Skylab::Autonomous_Component_System
         #     "user", "super-user"        => "super-user"
         #   ~ "user", "superuser"
 
-        raw_st = Common_::Polymorphic_Stream.via_array s_a
+        raw_st = Common_::Scanner.via_array s_a
 
         st = Common_.stream do  # ignore empties
 

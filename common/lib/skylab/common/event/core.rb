@@ -133,7 +133,7 @@ module Skylab::Common
     private
 
       def __init_via_iambic x_a, & msg_p
-        st = Home_::Polymorphic_Stream.via_array x_a
+        st = Home_::Scanner.via_array x_a
         @terminal_channel_i = st.gets_one
         _process_pairs st.flush_to_each_pairer, & msg_p
         NIL_
@@ -241,7 +241,7 @@ module Skylab::Common
 
         sc = singleton_class
 
-        bx.each_name do |i|
+        bx.each_key do |i|
           sc.send :attr_reader, i
         end
 
@@ -253,15 +253,15 @@ module Skylab::Common
     public
 
       def has_member sym
-        formal_properties.has_name sym
+        formal_properties.has_key sym
       end
 
       def first_member
-        formal_properties.first_name
+        formal_properties.first_key
       end
 
       def members  # :+[#061]
-        formal_properties.get_names
+        formal_properties.get_keys
       end
 
     private

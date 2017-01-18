@@ -37,7 +37,7 @@ module Skylab::Autonomous_Component_System
 
           rw = @stack.last.reader_writer
 
-          asc = rw.read_association st.current_token
+          asc = rw.read_association st.head_as_is
 
           if ! asc
             break

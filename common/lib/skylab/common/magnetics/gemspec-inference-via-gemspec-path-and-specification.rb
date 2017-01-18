@@ -96,9 +96,7 @@ module Skylab::Common
         end
       end
 
-      Home_.stream do
-        p[]
-      end
+      Stream.by( ) { p[] }
     end
 
     def _to_stream_of_executables

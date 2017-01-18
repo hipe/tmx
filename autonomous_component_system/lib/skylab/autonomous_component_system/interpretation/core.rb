@@ -15,7 +15,7 @@ module Skylab::Autonomous_Component_System
 
           qkn = Common_::Qualified_Knownness[ cmp, asc ]
 
-          st = Common_::Polymorphic_Stream.via_array i_a
+          st = Common_::Scanner.via_array i_a
 
           m = find_handler_method[ st, acs ]
 
@@ -39,7 +39,7 @@ module Skylab::Autonomous_Component_System
       base = :"receive_component__"
       begin
 
-        try_m = :"#{ base }#{ st.current_token }__"
+        try_m = :"#{ base }#{ st.head_as_is }__"
 
         if acs.respond_to? try_m
           m = try_m
