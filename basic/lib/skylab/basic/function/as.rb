@@ -118,7 +118,7 @@ module Skylab::Basic
 
         def __build_parameter_box
 
-          bx = Common_::Stream::As_Mutable_Box.new [], {}
+          bx = Common_::Stream::MutableBox.via_box_members [], {}
 
           @signature_classifications.
               business_parameters.each do | opt_req_rest, name_symbol |
@@ -150,11 +150,11 @@ module Skylab::Basic
           bx
         end
 
-        def bound_call_against_polymorphic_stream st  # #hook-out
+        def bound_call_against_argument_scanner st  # #hook-out
 
           arglist = []
 
-          h = __hash_via_flushing_probably_polymorphic_stream st
+          h = __hash_via_flushing_probably_argument_scanner st
 
           miss_prp_a = nil
 
@@ -164,7 +164,7 @@ module Skylab::Basic
 
             if :req == orr && x.nil?
 
-              _prp = Home_::Minimal_Property.
+              _prp = Home_::MinimalProperty.
                 via_variegated_symbol name_sym
 
               miss_prp_a ||= []
@@ -191,7 +191,7 @@ module Skylab::Basic
           end
         end
 
-        def __hash_via_flushing_probably_polymorphic_stream st
+        def __hash_via_flushing_probably_argument_scanner st
 
           h = {}
           while st.unparsed_exists
@@ -249,7 +249,7 @@ module Skylab::Basic
             p = @on_event_selectively
           end
 
-          Common_::Bound_Call[ arglist, @unbound._p, :call, & p ]
+          Common_::BoundCall[ arglist, @unbound._p, :call, & p ]
         end
 
         def _maybe_send_event * i_a, & ev_p

@@ -82,7 +82,7 @@ module Skylab::BeautySalon
         regard for its "context".
       O
 
-      scn = Home_.lib_.basic::String.line_stream _big_string
+      scn = Home_.lib_.basic::String::LineStream_via_String[ _big_string ]
       while (( s = scn.gets ))
         y << s
       end

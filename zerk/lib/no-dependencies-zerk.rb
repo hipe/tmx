@@ -23,11 +23,11 @@ module NoDependenciesZerk
     end
 
     SimpleModel = ::Class.new  # forward declaration
-    Actor_via_SimpleModel = ::Class.new SimpleModel
+    MagneticBySimpleModel = ::Class.new SimpleModel
 
     # = CLI life
 
-    class CLI_Express_via_Emission < Actor_via_SimpleModel
+    class CLI_Express_via_Emission < MagneticBySimpleModel
 
       class << self
 
@@ -710,7 +710,7 @@ module NoDependenciesZerk
         rx = @argument_scanner.current_operator_as_matcher
         scn = to_operator_load_ticket_scanner
         until scn.no_unparsed_exists
-          if rx =~ scn.current_token.intern  # honor [#062]
+          if rx =~ scn.head_as_is.intern  # honor [#062]
             a.push scn.to_found
           end
           scn.advance_one
@@ -892,7 +892,7 @@ module NoDependenciesZerk
       def initialize
         @big_step_pass_filter = nil
         yield self
-        @current_injection = @current_token = nil
+        @current_injection = @head_as_is = nil
         advance_big
       end
 
@@ -910,7 +910,7 @@ module NoDependenciesZerk
           remove_instance_variable :@injections
           remove_instance_variable :@_advance
           @no_unparsed_exists = true
-          remove_instance_variable :@current_token
+          remove_instance_variable :@head_as_is
           remove_instance_variable :@current_injection
           freeze ; nil
         else
@@ -933,7 +933,7 @@ module NoDependenciesZerk
       end
 
       def _advance_small
-        @current_token = @_load_tickets.gets_one
+        @head_as_is = @_load_tickets.gets_one
         if @_load_tickets.no_unparsed_exists
           remove_instance_variable :@_load_tickets
           @_advance = :advance_big ; nil
@@ -941,13 +941,13 @@ module NoDependenciesZerk
       end
 
       def to_found
-        _mixed_business_value = @current_injection.dereference @current_token
-        OperatorFound__[ @current_injection.injector, _mixed_business_value, @current_token ]
+        _mixed_business_value = @current_injection.dereference @head_as_is
+        OperatorFound__[ @current_injection.injector, _mixed_business_value, @head_as_is ]
       end
 
       attr_reader(
         :current_injection,
-        :current_token,
+        :head_as_is,
         :no_unparsed_exists,
       )
     end
@@ -1127,7 +1127,7 @@ module NoDependenciesZerk
         NIL
       end
 
-      def current_token
+      def head_as_is
         @_array.fetch @_pos
       end
 
@@ -1147,8 +1147,8 @@ module NoDependenciesZerk
         @_scn.no_unparsed_exists
       end
 
-      def current_token  # ..
-        @_proc[ @_scn.current_token ]
+      def head_as_is  # ..
+        @_proc[ @_scn.head_as_is ]
       end
 
       def advance_one
@@ -1158,7 +1158,7 @@ module NoDependenciesZerk
 
     class Scanner_by ; include ScannerMethods__
       def initialize & p
-        x = p.call  # same as `.gets`
+        x = p.call  # same as `.gets` but more flexible here :[#060.1]
         if x
           @__current_token = x
           @_current_token = :__current_token_normally
@@ -1179,7 +1179,7 @@ module NoDependenciesZerk
         end
         NIL
       end
-      def current_token
+      def head_as_is
         send @_current_token
       end
       def __current_token_normally
@@ -1265,7 +1265,7 @@ module NoDependenciesZerk
       end
 
       def gets_one
-        x = current_token
+        x = head_as_is
         advance_one
         x
       end
@@ -1275,7 +1275,7 @@ module NoDependenciesZerk
 
     # ==
 
-    class Actor_via_SimpleModel
+    class MagneticBySimpleModel
       class << self
         def call_by & p
           define( & p ).execute

@@ -59,7 +59,7 @@ module Skylab::Zerk::TestSupport
     rx = /\A\Z|[^A-Z]/m  # the empty string or any char other than A-Z, is invalid
 
     All_caps_primitivesque_ = -> st, & pp do
-      s = st.current_token
+      s = st.head_as_is
       md = rx.match s
       if md
         pp[ nil ].call :error, :expression, :not_all_caps do |y|

@@ -6,7 +6,7 @@ module Skylab::Zerk
 
     module When_Support_  # #[#sl-155]
 
-      class Here_::When_ < Common_::Actor::Monadic
+      class Here_::When_ < Common_::Monadic
 
         class Ended_at_Compound < self  # for #t6
 
@@ -20,7 +20,7 @@ module Skylab::Zerk
 
           def sub_execute_
 
-            s = @CLI.current_token ; me = self
+            s = @CLI.head_as_is ; me = self
 
             @CLI.express_ do |y|
               y << "options cannot occur immediately after compound nodes (option: #{ ick s })"

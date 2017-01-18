@@ -2,15 +2,15 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] list scanner for array" do
+  describe "[ba] list - line stream via array" do
 
     it "loads" do
-      subject
+      _subject_module
     end
 
     it "when built with array of lines - `gets` - works the same" do  # mirror 2 others
 
-      scn = subject.new [ "one B\n", "two B\n" ]
+      scn = _subject_module[ [ "one B\n", "two B\n" ] ]
 
       scn.lineno.should be_nil
 
@@ -32,7 +32,7 @@ module Skylab::Basic::TestSupport
 
     it "come in from the end" do
 
-      scn = subject.new [ :A, :B, :C, :D ]
+      scn = _subject_module[ %i( A B C D ) ]
       scn.rgets.should eql :D
       scn.gets.should eql :A
       scn.rgets.should eql :C
@@ -42,8 +42,8 @@ module Skylab::Basic::TestSupport
 
     end
 
-    def subject
-      Home_::List.line_stream
+    def _subject_module
+      Home_::List::LineStream_via_Array
     end
   end
 end

@@ -41,7 +41,7 @@ module Skylab::Basic
         had_more = false
       else
         had_more = true
-        x = upstream.current_token
+        x = upstream.head_as_is
       end
 
       _sta_a = sta_st.to_a

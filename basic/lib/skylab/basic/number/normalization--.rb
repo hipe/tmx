@@ -72,9 +72,9 @@ module Skylab::Basic
 
               x_p and self._NICE
 
-              _x = in_st.current_token
+              _x = in_st.head_as_is
 
-              _kn = Common_::Known_Known[ in_st.current_token ]
+              _kn = Common_::Known_Known[ in_st.head_as_is ]
 
               vw = normalize_knownness _kn do | * i_a, & ev_p |
 

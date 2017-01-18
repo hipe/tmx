@@ -179,7 +179,7 @@ module Skylab::GitViz  # eek get those constants
 
       def _mutate_string_by_converting_each_line_content screen
 
-        st = Home_.lib_.basic::String.line_stream screen
+        st = Home_.lib_.basic::String::LineStream_via_String[ screen ]
 
         a = []
         begin

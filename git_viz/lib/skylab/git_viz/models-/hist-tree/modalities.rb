@@ -59,7 +59,7 @@ module Skylab::GitViz
 
             # ~ w
 
-            _any_prp_class = fp.at_position( 0 ).class
+            _any_prp_class = fp.at_offset( 0 ).class
 
             _prp = _any_prp_class.new_by do
 
@@ -106,7 +106,7 @@ module Skylab::GitViz
 
             @bound_call_from_back = bc
 
-            Common_::Bound_Call.via_receiver_and_method_name self, :__render
+            Common_::BoundCall.via_receiver_and_method_name self, :__render
           end
 
           def __render

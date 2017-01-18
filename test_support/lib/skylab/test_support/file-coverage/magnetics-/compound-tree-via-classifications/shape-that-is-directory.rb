@@ -109,7 +109,7 @@ module Skylab::TestSupport
 
             @_prune_the_other_tree_in_this_order = nil
 
-            @_pre_pruned = if full.asset.has_name LIB_ENTRY_
+            @_pre_pruned = if full.asset.has_key LIB_ENTRY_
 
               Magnetics_::TwoTrees_via_BigTreePattern::Gem[ full, @name_conventions ]
             else

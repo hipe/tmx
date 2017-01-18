@@ -101,7 +101,7 @@ module Skylab::Basic::TestSupport
 
     it "no input" do
 
-      _against Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+      _against Common_::THE_EMPTY_SCANNER
 
       _expect_failed_with "expecting long switch at end of input"
     end
@@ -157,7 +157,7 @@ module Skylab::Basic::TestSupport
 
     def _upstream * s_a
 
-      Common_::Polymorphic_Stream.via_array s_a
+      Common_::Scanner.via_array s_a
     end
 
     def _against st

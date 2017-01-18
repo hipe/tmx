@@ -354,7 +354,7 @@ module Skylab::GitViz::TestSupport
 
     def _expect_headers * s_a
 
-      st = Home_.lib_.basic::String.line_stream @io.string
+      st = Home_.lib_.basic::String::LineStream_via_String[ @io.string ]
       s_a_ = ::Array.new 4
       4.times do | d |
         s_a_[ d ] = st.gets

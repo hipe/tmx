@@ -703,7 +703,7 @@ module Skylab::Git
           PORCELAIN_HACK_TRIM_RX__.match( s )[ 0 ]
         end
 
-        Common_::SimpleStream.by do
+        Common_::MinimalStream.by do
           s = p[]
           if s
             filter[ s ]
@@ -1097,8 +1097,8 @@ module Skylab::Git
       def popen3 * a
         [
           nil,
-          Common_::SimpleStream.the_emtpy_stream,
-          Common_::SimpleStream.the_empty_stream,
+          Common_::THE_EMPTY_MINIMAL_STREAM,
+          Common_::THE_EMPTY_MINIMAL_STREAM,
           WAIT__,
         ]
       end

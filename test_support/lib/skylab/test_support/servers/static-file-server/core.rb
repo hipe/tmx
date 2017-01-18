@@ -14,7 +14,7 @@ module Skylab::TestSupport
       @processes = nil
 
       if x_a.length.nonzero?
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
         begin
           _m = :"#{ st.gets_one }="
           send _m, st.gets_one

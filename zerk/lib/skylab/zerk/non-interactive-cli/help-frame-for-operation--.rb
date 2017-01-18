@@ -14,7 +14,7 @@ module Skylab::Zerk
         def step_
 
           @_upstream = @_session.upstream_
-          @_token = @_upstream.current_token
+          @_token = @_upstream.head_as_is
 
           if Begins_with_dash_[ @_token ]
             __step_for_option

@@ -2,20 +2,11 @@ module Skylab::Basic
 
   module Enumerator
 
-    class << self
-
-      def line_stream * a, & p
-        if p
-          Line_Scanner__.new ::Enumerator.new( * a, & p )
-        elsif a.length.zero?
-          Line_Scanner__
-        else
-          Line_Scanner__.new( * a )
-        end
-      end
+    LineStream_by = -> & p do
+      LineStream_via_Enumerator[ ::Enumerator.new( & p ) ]
     end
 
-    class Line_Scanner__
+    class LineStream_via_Enumerator < Common_::MonadicMagneticAndModel
 
       def initialize enum
         @p = enum.method :next

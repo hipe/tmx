@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
 
       it "rendering a table with no tuples results in no lines" do
 
-        against_stream_expect_lines_ Common_::Stream.the_empty_stream do |y|
+        against_stream_expect_lines_ Common_::THE_EMPTY_STREAM do |y|
           NOTHING_
         end
       end

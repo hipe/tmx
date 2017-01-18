@@ -54,7 +54,7 @@ module Skylab::Basic
       end
     end  # >>
 
-    class Marshal_load___ < Common_::Actor::Monadic
+    class Marshal_load___ < Common_::Monadic
 
       def initialize s, & oes_p
         @on_event_selectively = oes_p

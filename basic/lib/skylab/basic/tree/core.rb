@@ -249,7 +249,7 @@ module Skylab::Basic
         if has_children
           Common_::Stream.via_nonsparse_array @children
         else
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         end
       end
     end

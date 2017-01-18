@@ -157,7 +157,7 @@ module Skylab::Basic
         children_count.zero?
       end
 
-      alias_method :child_at_position, :at_position
+      alias_method :child_at_position, :at_offset
 
       alias_method :to_child_stream, :to_value_stream
 
@@ -180,7 +180,7 @@ module Skylab::Basic
         # because this object *will* be modified mid-scan,
         # we *must* use a duplicate array below.
 
-        Common_::Polymorphic_Stream.via_array @a.dup
+        Common_::Scanner.via_array @a.dup
       end
 
       def touch_node path_x, * x_a, & node_payload_p

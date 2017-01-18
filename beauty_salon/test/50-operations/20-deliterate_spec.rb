@@ -95,7 +95,7 @@ module Skylab::BeautySalon::TestSupport
       sout = cls.new :sout
       serr = cls.new :serr
 
-      st = Home_.lib_.basic::String.line_stream <<-HERE.unindent
+      st = Home_.lib_.basic::String::LineStream_via_String[ <<-HERE.unindent ]
         howza
         wowza # commentie
         nowza

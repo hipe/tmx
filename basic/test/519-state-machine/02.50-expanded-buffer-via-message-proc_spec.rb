@@ -41,7 +41,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _state_via_name_symbol sym
-      _scn = Common_::Polymorphic_Stream.via_array [ sym ]
+      _scn = Common_::Scanner.via_array [ sym ]
       _sta = Home_::StateMachine::State___.
         interpret_compound_component _scn
       _sta

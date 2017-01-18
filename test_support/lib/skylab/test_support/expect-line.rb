@@ -128,7 +128,7 @@ module Skylab::TestSupport
           end
         end
 
-        Common_::SimpleStream.by do
+        Common_::MinimalStream.by do
           p[]
         end
       end
@@ -336,13 +336,9 @@ module Skylab::TestSupport
 
     Expect_same_string = -> actual_s, expected_s, context do
 
-      lib = Home_.lib_.basic::String
+      p = Home_.lib_.basic::String::LineStream_via_String
 
-      Streams_have_same_content.call(
-        lib.line_stream( actual_s ),
-        lib.line_stream( expected_s ),
-        context,
-      )
+      Streams_have_same_content[ p[ actual_s ], p[ expected_s ], context ]
     end
 
     Streams_have_same_content = -> actual_st, expected_st, context do
@@ -384,7 +380,7 @@ module Skylab::TestSupport
         end
 
         def via_string string
-          new Home_.lib_.basic::String.line_stream string
+          new Home_.lib_.basic::String::LineStream_via_String[ string ]
         end
 
         def via_stream st

@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Word_Wrappers__::Calm  # see [#033]
+    class WordWrapper::Calm  # see [#033]
 
       Attributes_actor_.call( self,
 
@@ -29,14 +29,14 @@ module Skylab::Basic
         @margin = nil
       end
 
-      def process_polymorphic_stream_passively st  # #[#fi-022]
+      def process_argument_scanner_passively st  # #[#fi-022]
         super && normalize
       end
 
       def normalize
 
         if @aspect_ratio
-          extend String_::Fit_to_Aspect_Ratio_::Layout_Engine_Methods
+          extend Here_::Fit_to_Aspect_Ratio_::Layout_Engine_Methods
         else
           extend Streaming_Layout_Engine_Methods___
         end

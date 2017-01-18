@@ -212,7 +212,7 @@ module Skylab::TestSupport
 
       def __check_if_ARGV_is_completely_parsed_via_sigs  # assume any
 
-        scn = Common_::Polymorphic_Stream.via_array @_sig_a
+        scn = Common_::Scanner.via_array @_sig_a
 
         sig = Next_trueish__[ scn ]   # assume one
 

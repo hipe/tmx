@@ -2,7 +2,7 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Terms_via_string___ < Common_::Actor::Dyadic
+      class Terms_via_string___ < Common_::Dyadic
 
         def initialize s, y
           @_s = s

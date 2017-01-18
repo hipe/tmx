@@ -16,7 +16,7 @@ module Skylab::Basic
 
         _d_a = _a.map( & :to_f )
 
-        Home_::String.word_wrappers.calm.with(
+        Home_::String::WordWrapper::Calm.with(
 
           :add_newlines,
           :aspect_ratio, _d_a,

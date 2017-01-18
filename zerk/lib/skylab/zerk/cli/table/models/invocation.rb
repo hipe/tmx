@@ -45,7 +45,7 @@ module Skylab::Zerk
         end
 
         def the_only_page_survey= x
-          _scn = Common_::Polymorphic_Stream.via x
+          _scn = Common_::Scanner.via x
           send @_receive_page_scanner, _scn
         end
 

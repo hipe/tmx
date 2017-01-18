@@ -36,7 +36,7 @@ module Skylab::TestSupport::TestSupport
         st.gets
       end
 
-      _hi.nil? || fail
+      false == _hi || fail
     end
 
     it "find self EXPLORATORY" do

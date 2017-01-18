@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class Magnetics::MondrianTree_via_QuantityTree < Common_::Actor::Monadic
+  class Magnetics::MondrianTree_via_QuantityTree < Common_::Monadic
 
     # (supplementary notes in [#003])
 

@@ -120,7 +120,7 @@ module Skylab::TestSupport
           nil
         end
 
-        def bound_call_against_polymorphic_stream st, & oes_p
+        def bound_call_against_argument_scanner st, & oes_p
 
           :arg == st.gets_one or raise ::ArgumentError
           a = st.gets_one
@@ -136,7 +136,7 @@ module Skylab::TestSupport
 
           @argv = a
 
-          Common_::Bound_Call.via_receiver_and_method_name self, :execute
+          Common_::BoundCall.via_receiver_and_method_name self, :execute
         end
 
         def execute

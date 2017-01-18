@@ -15,7 +15,7 @@ module Skylab::Zerk::TestSupport
         end
 
         def real_scanner_for_ * s_a
-          Common_::Polymorphic_Stream.via_array s_a
+          Common_::Scanner.via_array s_a
         end
 
         def define_by_ & p
@@ -35,7 +35,7 @@ module Skylab::Zerk::TestSupport
         end
 
         def the_empty_real_scanner_
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+          Common_::THE_EMPTY_SCANNER
         end
       # -
     end

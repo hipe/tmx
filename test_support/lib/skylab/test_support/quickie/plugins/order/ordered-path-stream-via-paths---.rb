@@ -2,7 +2,7 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Ordered_path_stream_via_paths___ < Common_::Actor::Monadic
+      class Ordered_path_stream_via_paths___ < Common_::Monadic
 
         def initialize a
           @orig_paths = a

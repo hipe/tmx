@@ -252,7 +252,7 @@ module Skylab::Basic
             end
           end
         else
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         end
       end
 

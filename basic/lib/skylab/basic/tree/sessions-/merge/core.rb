@@ -96,7 +96,7 @@ module Skylab::Basic
 
             @o.instance_variable_defined? k
 
-          end.flush_to_polymorphic_stream
+          end.flush_to_scanner
         end
 
         def fetch k

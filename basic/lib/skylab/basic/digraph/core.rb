@@ -58,15 +58,15 @@ module Skylab::Basic
     end
 
     def direct_association_targets_include name_i
-      @has_associations and @associations.has_name name_i
+      @has_associations and @associations.has_key name_i
     end
 
     def direct_association_target_names
-      @has_associations and @associations.get_names
+      @has_associations and @associations.get_keys
     end
 
     def has_association_to name_i
-      @has_associations and @associations.has_name name_i
+      @has_associations and @associations.has_key name_i
     end
 
     attr_reader :normalized_local_node_name

@@ -92,7 +92,7 @@ module Skylab::TestSupport::TestSupport
 
         lib = Home_::Expect_Line
         _actual_st = root_ACS_state.result
-        _exp_st = Home_.lib_.basic::String.line_stream _exp
+        _exp_st = Home_.lib_.basic::String::LineStream_via_String[ _exp ]
 
         lib::Streams_have_same_content[ _actual_st, _exp_st, self ]
       end

@@ -160,7 +160,7 @@ module Skylab::BNF2Treetop
     end
 
     def to_bound_call
-      ::Skylab::Common::Bound_Call.via_receiver_and_method_name self, :__execute_plus
+      ::Skylab::Common::BoundCall.via_receiver_and_method_name self, :__execute_plus
     end
 
     def __execute_plus

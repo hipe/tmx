@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class NonInteractiveCLI
 
-    class When_Help_ < Common_::Actor::Dyadic
+    class When_Help_ < Common_::Dyadic
 
       # this help facility is engaged IFF the main interpreter has matched
       # (somehow) a token at the head of the argument stream that matches
@@ -47,7 +47,7 @@ module Skylab::Zerk
           __warn_about_ignored
         end
 
-        @_upstream = Common_::Polymorphic_Stream.via s ; nil
+        @_upstream = Common_::Scanner.via s ; nil
       end
 
       # as such there are now zero or more tokens remaining in the argument
@@ -91,7 +91,7 @@ module Skylab::Zerk
         end
 
         fr = modality_frame.lookup_and_attach_frame__(
-          @_upstream.current_token,
+          @_upstream.head_as_is,
           set_sym, & _oes_p )
 
         if fr

@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
   Fixture_Top_ACS_Classes::Class_71_Number = -> st, & pp do
 
     if st.unparsed_exists
-      x = st.current_token
+      x = st.head_as_is
       if x.respond_to? :divmod
         ok = true
       else

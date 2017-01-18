@@ -1,6 +1,6 @@
 module Skylab::Treemap
 
-  class Magnetics::QuantityTree_via_Node < Common_::Actor::Monadic
+  class Magnetics::QuantityTree_via_Node < Common_::Monadic
 
     # NOTE this node might go away, it adds very little.
     # but for now it's a stub for [#007.A] whitespace thing for [cm].

@@ -74,7 +74,7 @@ module Skylab::Zerk::TestSupport
 
       def initialize tc, exp_a
 
-        @_expectation_scanner = Common_::Polymorphic_Stream.via_array exp_a
+        @_expectation_scanner = Common_::Scanner.via_array exp_a
         @spying_IO = Spying_IO___.new self
         @test_context = tc
         _reinit_state
@@ -130,7 +130,7 @@ module Skylab::Zerk::TestSupport
         if @_expectation_scanner.no_unparsed_exists
           @_step = :__process_emission_when_expecting_no_more_emissions
         else
-          @_assertion = @_expectation_scanner.current_token.begin_assertion_under @test_context
+          @_assertion = @_expectation_scanner.head_as_is.begin_assertion_under @test_context
           @_step = :__dispatch_emission_to_assertion
         end
         NIL
@@ -152,7 +152,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def __say_unresolved_expectation
-        _ = @_expectation_scanner.current_token.noun_phrase
+        _ = @_expectation_scanner.head_as_is.noun_phrase
         "at end of output, expected but never reached #{ _ }"
       end
 
@@ -451,15 +451,15 @@ module Skylab::Zerk::TestSupport
 
       def to_body_string m
 
-        to_pre_order_stream.reduce_into_by "" do | memo, node |
-          memo << node.x.send( m )
+        to_pre_order_stream.join_into "" do |node|
+          node.x.send m
         end
       end
 
       def to_string m
 
-        _to_full_pre_order_stream.reduce_into_by "" do | memo, node |
-          memo << node.x.send( m )
+        _to_full_pre_order_stream.join_into "" do |node|
+          node.x.send m
         end
       end
 
@@ -590,7 +590,7 @@ module Skylab::Zerk::TestSupport
 
       def process_iambic_fully x_a
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
         @_polymorphic_upstream_ = st
         begin
           _m = st.gets_one
@@ -705,7 +705,7 @@ module Skylab::Zerk::TestSupport
 
       def one_big_string= s
 
-        scn = Basic_[]::String.line_stream s
+        scn = Basic_[]::String::LineStream_via_String[ s ]
 
         _em_st = Common_.stream do
 

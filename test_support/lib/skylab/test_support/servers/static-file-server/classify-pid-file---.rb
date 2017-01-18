@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   class Servers::Static_File_Server
 
-    class Classify_PID_file___ < Common_::Actor::Dyadic
+    class Classify_PID_file___ < Common_::Dyadic
 
       # given the PID path, resolve it into a "normal" PID path by adding
       # the default filename to the end of it as appropriate based on IFF

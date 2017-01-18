@@ -54,7 +54,7 @@ module Skylab::Basic
           @downstream_yielder
         end
 
-        include String_::Word_Wrappers__::Calm::Parse_Context_Methods
+        include Here_::WordWrapper::Calm::Parse_Context_Methods
       end
 
       class Find_Best_Fit___
@@ -346,7 +346,7 @@ module Skylab::Basic
         # at the end of this we make ourselves a frozen structure with the
         # results of these calculations.
 
-        include String_::Word_Wrappers__::Calm::Streaming_Layout_Algorithm_Methods
+        include Here_::WordWrapper::Calm::Streaming_Layout_Algorithm_Methods
 
         def initialize width, tox, trat
 

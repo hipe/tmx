@@ -202,7 +202,7 @@ y << "target distance must be at a minimum N-1."
 
           d = h.fetch sym
 
-          if ! bx.has_name d
+          if ! bx.has_key d
             ( miss_a ||= [] ).push d
           end
         end
@@ -454,7 +454,7 @@ y << "target distance must be at a minimum N-1."
 
         def init_categories_
 
-          st = @item_box.to_name_stream
+          st = @item_box.to_key_stream
           begin
             d = st.gets
             d or break

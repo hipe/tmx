@@ -26,11 +26,11 @@ module Skylab::Zerk
       class Request_via_Array
 
         def initialize arglist
-          st = Common_::Polymorphic_Stream.via_array arglist
+          st = Common_::Scanner.via_array arglist
           h = self.class::HASH
           @_arglist_ = st
           begin
-            send h.fetch st.current_token
+            send h.fetch st.head_as_is
           end until st.no_unparsed_exists
           remove_instance_variable :@_arglist_
           freeze

@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Word_Wrappers__::Crazy < ::Enumerator::Yielder  # :+[#033].
+    class WordWrapper::Crazy < ::Enumerator::Yielder  # :+[#033].
 
     def initialize p, set_indent_p, flush_p
       @flush_p = flush_p ; @set_indent_p = set_indent_p

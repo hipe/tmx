@@ -2,13 +2,13 @@ require_relative '../test-support'
 
 module Skylab::Basic::TestSupport
 
-  describe "[ba] string - line scanner" do
+  describe "[ba] string - line stream via string" do
 
     TS_[ self ]
     use :string
 
     it "loads" do
-      subject
+      _subject_module
     end
 
     it "when built with a string, works the same" do  # mirror 2 others
@@ -80,20 +80,18 @@ module Skylab::Basic::TestSupport
 
     it "reverse" do
       str = "haha\n"
-      y = subject.reverse str
+      y = _subject_module::Reverse[ str ]
       y << 'this'
       y << 'is what'
       str.should eql "haha\nthis\nis what"
     end
 
-    def subject( * a )
-      if a.length.zero?
-        subject_module_.line_stream
-      else
-        subject_module_.line_stream( * a )
-      end
+    def of s
+      _subject_module[ s ]
     end
 
-    alias_method :of, :subject
+    def _subject_module
+      Home_::String::LineStream_via_String
+    end
   end
 end

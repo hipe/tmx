@@ -49,7 +49,7 @@ module Skylab::Basic
 
       def __say_template_variable_not_fond sym
         "template variable `#{ sym }` not found. did you mean #{
-          @tmpl_var_bx.get_names * ' or ' }?"
+          @tmpl_var_bx.get_keys * ' or ' }?"
       end
 
     public

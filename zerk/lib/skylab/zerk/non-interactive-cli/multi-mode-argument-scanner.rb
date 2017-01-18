@@ -719,7 +719,7 @@ module Skylab::Zerk
         def initialize front_tokens, itemer
 
           @_itemer = itemer
-          @_real_scn = Common_::Polymorphic_Stream.via_array front_tokens
+          @_real_scn = Common_::Scanner.via_array front_tokens
         end
 
         # --
@@ -763,7 +763,7 @@ module Skylab::Zerk
         end
 
         def _head
-          @_real_scn.current_token
+          @_real_scn.head_as_is
         end
 
         def _advance_one_
@@ -786,7 +786,7 @@ module Skylab::Zerk
         def initialize pairs
 
           @_is_pointing_at_name = true
-          @_real_scn = Common_::Polymorphic_Stream.via_array pairs
+          @_real_scn = Common_::Scanner.via_array pairs
         end
 
         def _primary_categorization_via_WFR_ wfr
@@ -796,7 +796,7 @@ module Skylab::Zerk
           # although we have a name-value pair, we are only resulting in
           # a derivative of the name (nothing of the value) here.
 
-          k = @_real_scn.current_token.name_x
+          k = @_real_scn.head_as_is.name_x
           k == wfr.well_formed_symbol || self._SANITY
 
           _x = wfr.request.operator_branch.dereference k
@@ -809,7 +809,7 @@ module Skylab::Zerk
         def _well_formed_primary_categorization_
           if @_is_pointing_at_name
             # :#here1.
-            _sym = @_real_scn.current_token.name_x
+            _sym = @_real_scn.head_as_is.name_x
             AS_Lib__::Magnetics::WellFormed_via_WellFormedSymbol[ _sym ]
           else
             self._IF_EVER_THEN_WHY
@@ -818,9 +818,9 @@ module Skylab::Zerk
 
         def _head_as_normal_symbol_
           if @_is_pointing_at_name
-            @_real_scn.current_token.name_x
+            @_real_scn.head_as_is.name_x
           else
-            x = @_real_scn.current_token.value_x
+            x = @_real_scn.head_as_is.value_x
             if ! x.respond_to? :id2name
               self._IF_EVER_THEN_WHY_2
             end
@@ -830,9 +830,9 @@ module Skylab::Zerk
 
         def _head_as_is_
           if @_is_pointing_at_name
-            @_real_scn.current_token.name_x
+            @_real_scn.head_as_is.name_x
           else
-            @_real_scn.current_token.value_x
+            @_real_scn.head_as_is.value_x
           end
         end
 
@@ -929,7 +929,7 @@ module Skylab::Zerk
 
         def _well_formed_primary_categorization_
 
-          s = @_real_scn.current_token
+          s = @_real_scn.head_as_is
 
           if DASH_BYTE_ == s.getbyte(0)  # must begin with one dash
 
@@ -965,7 +965,7 @@ module Skylab::Zerk
 
         def _well_formed_business_item_categorization_  # (rough sketch)
 
-          s = @_real_scn.current_token
+          s = @_real_scn.head_as_is
 
           if DASH_BYTE_ == s.getbyte(0)
             AS_Lib__::known_because.call do |emit|
@@ -981,7 +981,7 @@ module Skylab::Zerk
 
           # for example the name of a report (in tmx reports)
 
-          s = @_real_scn.current_token
+          s = @_real_scn.head_as_is
           if DASH_BYTE_ == s.getbyte(0)
             _whine_into_about_primary @_listener, s  # #not-covered
           else
@@ -997,7 +997,7 @@ module Skylab::Zerk
         end
 
         def _head_as_is_
-          @_real_scn.current_token
+          @_real_scn.head_as_is
         end
 
         def _advance_one_
@@ -1078,7 +1078,7 @@ module Skylab::Zerk
             d = len
           end
 
-          bx.add_at_position d, sym, do_by
+          bx.add_at_offset d, sym, do_by
           NIL
         end
 
@@ -1179,7 +1179,7 @@ module Skylab::Zerk
         end
 
         def to_load_ticket_stream
-          @_box.to_name_stream
+          @_box.to_key_stream
         end
       end
 

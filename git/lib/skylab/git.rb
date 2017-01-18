@@ -89,7 +89,7 @@ module Skylab::Git
     Home_.lib_.basic::Process.via_five( * five )
   end
 
-  ProcLike_ = Common_::Actor::ProcLike
+  ProcLike_ = Common_::ProcLike
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze

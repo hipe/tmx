@@ -69,8 +69,8 @@ module Skylab::Zerk::TestSupport
       it "the first words of the usage line look right" do
 
         bx = _usage_index
-        bx.at_position( 1 ) == 'xyzi' or fail
-        bx.at_position( 2 ) == 'wazoozie-foozie' or fail
+        bx.at_offset( 1 ) == 'xyzi' or fail
+        bx.at_offset( 2 ) == 'wazoozie-foozie' or fail
       end
 
       it "usage section is only one line long" do

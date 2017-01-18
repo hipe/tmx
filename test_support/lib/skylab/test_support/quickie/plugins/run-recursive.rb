@@ -134,7 +134,7 @@ module Skylab::TestSupport
 
       def find_contiguous_range_of_paths argv
 
-        scn = Common_::SimpleStream.try_convert argv
+        scn = Common_::Stream::Magnetics::MinimalStream_via[ argv ]
 
         begin
           tok = scn.gets

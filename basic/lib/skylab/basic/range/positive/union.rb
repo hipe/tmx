@@ -112,7 +112,7 @@ module Skylab::Basic
   private
 
     def find_indexes cur
-      scn = Home_::List.line_stream @a
+      scn = Home_::List::LineStream_via_Array[ @a ]
       while x = scn.gets
         if x.begin < cur.begin
           prev_begin_idx = scn.count - 1

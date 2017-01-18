@@ -69,7 +69,7 @@ else
       line or break
       stem = rx.match( line )[ 0 ]
 
-      if bx.has_name stem
+      if bx.has_key stem
         redo
       end
 

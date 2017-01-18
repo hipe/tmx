@@ -29,15 +29,15 @@ module Skylab::Treemap
         o = @resources
         bp = @back_properties
 
-        if bp.has_name :stdin
+        if bp.has_key :stdin
           x_a.push :stdin, o.sin
         end
 
-        if bp.has_name :stdout
+        if bp.has_key :stdout
           x_a.push :stdout, o.sout
         end
 
-        if bp.has_name :stderr
+        if bp.has_key :stderr
           x_a.push :stderr, o.serr
         end
 

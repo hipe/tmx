@@ -763,7 +763,7 @@ module Skylab::Zerk::TestSupport
 
         io = Fake_Readable_IO___.new
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
 
         lineify = -> s do
 

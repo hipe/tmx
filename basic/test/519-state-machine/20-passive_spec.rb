@@ -116,7 +116,7 @@ module Skylab::Basic::TestSupport
 
     def _against * s_a
 
-      _scn = Common_::Polymorphic_Stream.via_array s_a
+      _scn = Common_::Scanner.via_array s_a
 
       _sess = _state_machine.begin_passive_session_by do |o|
 

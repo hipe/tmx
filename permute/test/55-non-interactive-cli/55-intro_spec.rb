@@ -202,7 +202,7 @@ module Skylab::Permute::TestSupport
           | chocolate |    cup |
         HERE
 
-        _exp_st = Home_.lib_.basic::String.line_stream _exp
+        _exp_st = Home_.lib_.basic::String::LineStream_via_String[ _exp ]
 
         TestSupport_::Expect_Line::Streams_have_same_content[ _st_, _exp_st, self ]
       end

@@ -158,7 +158,7 @@ module Skylab::Zerk
 
         if @_stated_box.length.zero?
           @_evaluation_proc = :__evaluation_proc_which_is_never_called
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         else
           @_has_operation_index || _init_operation_index
           @_evaluation_proc = :__real_evaluation_proc

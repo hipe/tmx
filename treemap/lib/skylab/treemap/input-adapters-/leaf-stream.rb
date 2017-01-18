@@ -178,7 +178,7 @@ module Skylab::Treemap
         end
       end
 
-      Common_::SimpleStream.by do
+      Common_::MinimalStream.by do
         p[]
       end
     end

@@ -376,7 +376,7 @@ module Skylab::Zerk::TestSupport
           self._NO_PROBLEM_just_use_empty_a
         end
 
-        @_expectations_queue = Common_::Polymorphic_Stream.via_array a
+        @_expectations_queue = Common_::Scanner.via_array a
 
         @do_debug = tc.do_debug
         if @do_debug
@@ -468,7 +468,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def __when_missing_emission
-        _exp = @_expectations_queue.current_token
+        _exp = @_expectations_queue.head_as_is
         fail_say "actual output ended when expecting: #{ _exp.inspect_expectation }"
       end
 
@@ -681,7 +681,8 @@ module Skylab::Zerk::TestSupport
 
       def __receive_first_emission em
 
-        @_stream = Basic_[]::String.line_stream remove_instance_variable :@big_string
+        _s = remove_instance_variable :@big_string
+        @_stream = Basic_[]::String::LineStream_via_String[ _s ]
 
         @_reusable_assertion = ReusableExactStringBasedAssertion__.new :puts, @serr_or_sout, @test_context
 

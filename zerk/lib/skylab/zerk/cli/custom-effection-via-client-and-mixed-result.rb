@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     module CustomEffection_via_Client_and_MixedResult
 
-      class Find < Common_::Actor::Dyadic
+      class Find < Common_::Dyadic
 
         def initialize x, cli
           @x = x

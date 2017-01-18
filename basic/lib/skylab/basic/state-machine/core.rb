@@ -136,7 +136,7 @@ module Skylab::Basic
         def interpret_compound_component st
           new do
             @name_symbol = st.gets_one
-            process_polymorphic_stream_passively st
+            process_argument_scanner_passively st
           end
         end
 
@@ -187,7 +187,7 @@ module Skylab::Basic
         _accept_barrier_to_entry do |st|
 
           if ! st.no_unparsed_exists
-            md = rx.match st.current_token
+            md = rx.match st.head_as_is
             if md
               st.advance_one
               md

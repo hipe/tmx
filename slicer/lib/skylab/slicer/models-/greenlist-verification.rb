@@ -46,7 +46,7 @@ module Skylab::Slicer
             if ss
               path = ::File.join ss.norm, _TEST_DIR
               if ::File.directory? path
-                if bx.has_name ss.entry_string
+                if bx.has_key ss.entry_string
                   bx.remove ss.entry_string
                   ok_count += 1
                   redo

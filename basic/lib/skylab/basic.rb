@@ -36,9 +36,10 @@ module Skylab::Basic  # introduction at [#020]
   end  # >>
 
   Common_ = ::Skylab::Common
+  SimpleModel_ = Common_::SimpleModel
 
   Default_property_instance__ = Common_.memoize do
-    Minimal_Property.via_variegated_symbol :argument
+    MinimalProperty.via_variegated_symbol :argument
   end
 
   class Fuzzy  # :[#015].
@@ -130,18 +131,6 @@ module Skylab::Basic  # introduction at [#020]
     end
   end
 
-  class SimpleModel_  # like in [tab]
-    class << self
-      alias_method :define, :new
-      private :new
-    end  # >>
-    def initialize
-      yield self
-      freeze
-    end
-    private :dup
-  end
-
   class Process < SimpleModel_  # [gi], [sy]
 
     class << self
@@ -192,7 +181,7 @@ module Skylab::Basic  # introduction at [#020]
     # ==
   end
 
-  class Minimal_Property
+  class MinimalProperty
 
     class << self
 

@@ -14,7 +14,7 @@ module Skylab::Basic
         @do_solos = nil
         @do_spaces = nil
         @IO = nil
-        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+        process_argument_scanner_fully scanner_via_array x_a
         @association_st = g.to_node_edge_stream_
         init_IO
         @is_first_line = true  # (write the newlines at the beginning not end for reasons)

@@ -1,15 +1,8 @@
 module Skylab::Zerk
 
-  class Magnetics_::OneOffScanner_via_LoadTicket < Actor_via_SimpleModel_  # 1x
+  class Magnetics_::OneOffScanner_via_LoadTicket < Home_::MagneticBySimpleModel  # 1x
 
     # how to "splay" "mountable" "one-offs"
-
-    class << self
-      def call_by & p
-        define( & p ).execute
-      end
-      private :define  # ..
-    end  # >>
 
     # -
 
@@ -40,12 +33,12 @@ module Skylab::Zerk
           if @stream_not_scanner
             st
           else
-            st.flush_to_polymorphic_stream
+            st.flush_to_scanner
           end
         elsif @stream_not_scanner
-          Common_::Stream.the_empty_stream
+          Common_::THE_EMPTY_STREAM
         else
-          Common_::Polymorphic_Stream.the_empty_polymorphic_stream
+          Common_::THE_EMPTY_SCANNER
         end
       end
 

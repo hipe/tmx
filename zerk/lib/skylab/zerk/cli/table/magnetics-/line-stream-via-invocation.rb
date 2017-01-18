@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module CLI::Table
 
-    class Magnetics_::LineStream_via_Invocation < Common_::Actor::Monadic
+    class Magnetics_::LineStream_via_Invocation < Common_::Monadic
 
       # -
         def initialize invo

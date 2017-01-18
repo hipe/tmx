@@ -2,8 +2,8 @@ module Skylab::Basic
 
   module String
 
-      class Yamlizer__  # for now covered by [sg]  #todo
-
+    class Yamlizer  # for now covered by [sg]  #todo
+      # -
         def initialize
           NIL_
         end
@@ -62,7 +62,7 @@ module Skylab::Basic
         end
 
         BAR___ = '---'.freeze
-      end
-
+      # -
+    end
   end
 end

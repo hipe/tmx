@@ -1,22 +1,24 @@
-# the scanners narratives :[#022]
+# the stream narratives :[#022]
 
 ## point of history
 
-ownership of scanning (as the abstract idea) got "promoted" from here up
-to [#ca-044]. what remains of this file are those parts of scanning that
+ownership of streams (as the abstract idea) got "promoted" from here up
+to [#co-016]. what remains of this file are those parts of scanning that
 still remain in this sidesystem.
 
 so the timeline of this document was cleaved, and the other sidesystem
 gets to keep the history because it formally owns the idea now. however
 what appears below what moved from "that" document back into this one.
 the point of all this is that if for whatever reason you are tracking
-the distant DNA of these contents, look there, in [#ca-022], where the
+the distant DNA of these contents, look there, in [#co-016], where the
 bulk of this document moved to.
 
+it's also worth mentioning that blah
 
 
 
-## :[#023] the array scanner narrative
+
+## :[#023] the array stream narrative
 
 in theory the array can be mutated mid-scan, but this is not tested so assume
 it will not work right off the bat. internally this just maintains two
@@ -32,14 +34,14 @@ with [#bm-001])
 
 
 
-## :[#024] the string scanner narrative
+## :[#024] the string stream narrative
 
 (all documentation for this node has been moved *back* to inline.)
 
 
 
 
-### :#the-reverse-scanner
+### :#the-reverse-stream
 
 it is just a clever way of building a yielder that expects to be given with
 `yield` or `<<` a sequence of zero or more lines that do not contain

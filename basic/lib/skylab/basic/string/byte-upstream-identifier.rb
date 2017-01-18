@@ -17,7 +17,7 @@ module Skylab::Basic
       end
 
       def to_rewindable_line_stream
-        String_.line_stream @s
+        Here_::LineStream_via_String[ @s ]
       end
 
       Superclass = superclass
@@ -39,7 +39,7 @@ module Skylab::Basic
         end
 
         def description_under expag
-          s = String_.ellipsify( @s ).inspect
+          s = Here_.ellipsify( @s ).inspect
           expag.calculate do
             val s
           end

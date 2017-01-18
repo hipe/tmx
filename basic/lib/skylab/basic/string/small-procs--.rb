@@ -25,9 +25,9 @@ module Skylab::Basic
 
         end_ = string.length
         if end_.zero?
-          Common_::SimpleStream.the_empty_stream
+          Common_::THE_EMPTY_MINIMAL_STREAM
         else
-          Common_::SimpleStream.by do
+          Common_::MinimalStream.by do
             case 0 <=> end_
             when -1
               begin_ = end_ - 1
@@ -60,7 +60,7 @@ module Skylab::Basic
         end
       end
 
-      class Paragraph_string_via_message_lines < Common_::Actor::Monadic
+      class Paragraph_string_via_message_lines < Common_::Monadic
 
         # transform an array of strings into one "paragraph" string that
         # "looks normal" pursuant to these rules:
@@ -79,7 +79,7 @@ module Skylab::Basic
         #     by a newline (added as necessary).
 
         def initialize s_a
-          @st = Common_::Polymorphic_Stream.via_array s_a
+          @st = Common_::Scanner.via_array s_a
         end
 
         def execute

@@ -124,7 +124,7 @@ module Skylab::Zerk
     # -- invocation
 
     def to_bound_call  # for [tmx]
-      Common_::Bound_Call.via_receiver_and_method_name self, :__execute_plus
+      Common_::BoundCall.via_receiver_and_method_name self, :__execute_plus
     end
 
     def __execute_plus
@@ -135,7 +135,7 @@ module Skylab::Zerk
 
     def execute  # *always* result in an exitstatus
 
-      @_arg_st = Common_::Polymorphic_Stream.via_array remove_instance_variable :@argv
+      @_arg_st = Common_::Scanner.via_array remove_instance_variable :@argv
 
       bc = ___bound_call
       if bc
@@ -203,7 +203,7 @@ module Skylab::Zerk
       if md
         when_head_argument_looks_like_help md
       else
-        _ = "request cannot start with options. (had: \"#{ current_token }\")"
+        _ = "request cannot start with options. (had: \"#{ head_as_is }\")"
         _done_because _, :argument
       end
     end
@@ -234,7 +234,7 @@ module Skylab::Zerk
 
     def ___procure_current_navigational_formal_node
 
-      fn = @_top.lookup_formal_node__ current_token, :navigational, & @_oes_p
+      fn = @_top.lookup_formal_node__ head_as_is, :navigational, & @_oes_p
       if ! fn  # probably the above emitted t3 or t4
         _done_because :argument
       end
@@ -270,7 +270,7 @@ module Skylab::Zerk
     end
 
     def head_token_starting_with_dash_match_help_request
-      Help_rx___[].match current_token
+      Help_rx___[].match head_as_is
     end
 
     def when_head_argument_looks_like_help md
@@ -428,7 +428,7 @@ module Skylab::Zerk
     # in shoutcase (:#here):
 
     def _ARGS_AS_STREAM
-      @_arg_st ||= Common_::Polymorphic_Stream.via_array( remove_instance_variable :@_argv )
+      @_arg_st ||= Common_::Scanner.via_array( remove_instance_variable :@_argv )
     end
 
     def _ARGS_AS_ARGV
@@ -551,11 +551,11 @@ module Skylab::Zerk
     end
 
     def _head_token_starts_with_dash  # assume non-empty stream
-      Begins_with_dash_[ @_arg_st.current_token ]
+      Begins_with_dash_[ @_arg_st.head_as_is ]
     end
 
-    def current_token
-      @_arg_st.current_token
+    def head_as_is
+      @_arg_st.head_as_is
     end
 
     def release_argument_stream__

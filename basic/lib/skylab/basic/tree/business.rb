@@ -81,11 +81,11 @@ module Skylab::Basic
 
       a.each_with_index do | x, d |
 
-         h[ bx.at_position( d ) ] = x
+         h[ bx.at_offset( d ) ] = x
       end
 
       ( a.length ... len ).each do | d |
-        h[ bx.at_position( d ) ] = nil
+        h[ bx.at_offset( d ) ] = nil
       end
 
       @user_data_h_ = h

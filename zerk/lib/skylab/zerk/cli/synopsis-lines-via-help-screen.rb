@@ -97,7 +97,7 @@ module Skylab::Zerk
 
       # ==
 
-      class SynopsisLines_via_Recording___ < Common_::Actor::Monadic
+      class SynopsisLines_via_Recording___ < Common_::Monadic
 
         def initialize rec
           @_ = rec
@@ -172,7 +172,7 @@ module Skylab::Zerk
 
             if MULTIPLE_LINES___ =~ use_s  # #coverpoint-2-4
 
-              line_stream = Basic_[]::String.line_stream use_s
+              line_stream = Basic_[]::String::LineStream_via_String[ use_s ]
               use_s = line_stream.gets
               again = -> do
                 use_s = line_stream.gets
@@ -289,7 +289,7 @@ module Skylab::Zerk
           # #coverpoint-2-2
 
           if ! scn.no_unparsed_exists
-            x = scn.current_token
+            x = scn.head_as_is
             ! x or BLANK_RX_ =~ x
           end
         end,

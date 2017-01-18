@@ -620,7 +620,7 @@ module Skylab::Zerk
         end
       end
 
-      # ==BEGIN only while #open [#007.G] [br] look like a [br] Bound_Call
+      # ==BEGIN only while #open [#007.G] [br] look like a [br] BoundCall
 
       def receiver
         self

@@ -23,11 +23,11 @@ module Skylab::Zerk
 
       def receive x_a
 
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
 
         if @_has_open_section
 
-          _did = @_section.process_polymorphic_stream_all_or_nothing st
+          _did = @_section.process_argument_scanner_all_or_nothing st
 
           if ! _did
             _flush_open_section
@@ -38,7 +38,7 @@ module Skylab::Zerk
         end
 
         if do_it
-          process_polymorphic_stream_fully st
+          process_argument_scanner_fully st
         end
         NIL
       end
@@ -90,7 +90,7 @@ module Skylab::Zerk
         end
 
         def execute
-          via_polymorphic_stream_parse_fully
+          via_argument_scanner_parse_fully
           self
         end
 
@@ -154,7 +154,7 @@ module Skylab::Zerk
         end
 
         def execute
-          via_polymorphic_stream_parse_fully
+          via_argument_scanner_parse_fully
           self
         end
 
@@ -187,24 +187,24 @@ module Skylab::Zerk
 
       module Parsing_Methods__
 
-        def process_polymorphic_stream_all_or_nothing st
+        def process_argument_scanner_all_or_nothing st
 
-          if respond_to? :"#{ st.current_token }="
-            process_polymorphic_stream_fully st
+          if respond_to? :"#{ st.head_as_is }="
+            process_argument_scanner_fully st
             ACHIEVED_
           else
             UNABLE_
           end
         end
 
-        def process_polymorphic_stream_fully st
+        def process_argument_scanner_fully st
           # (rewriting this common method as bespoke)
           @_st = st
-          via_polymorphic_stream_parse_fully
+          via_argument_scanner_parse_fully
           NIL
         end
 
-        def via_polymorphic_stream_parse_fully
+        def via_argument_scanner_parse_fully
           begin
             send :"#{ @_st.gets_one }="
           end until @_st.no_unparsed_exists

@@ -86,7 +86,7 @@ module Skylab::Basic
 
         sym = gets_one_polymorphic_value
         if sym
-          @prop = Minimal_Property.via_variegated_symbol sym
+          @prop = MinimalProperty.via_variegated_symbol sym
           KEEP_PARSING_
         end
       end

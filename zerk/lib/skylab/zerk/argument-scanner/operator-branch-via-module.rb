@@ -114,7 +114,7 @@ module Skylab::Zerk
         end
 
         def __to_normal_symbol_stream_
-          @_box.to_name_stream
+          @_box.to_key_stream
         end
       end
 

@@ -183,9 +183,8 @@ module Skylab::Basic
     end
 
     Build_each_pairable_via_even_iambic__ = -> a do
-      Common_::Scanner.build_each_pairable_via_pair_stream_by do
-        Build_pair_stream_via_even_iambic__[ a ]
-      end
+      _st = Build_pair_stream_via_even_iambic__[ a ]
+      Common_::Stream::Magnetics::EachPairable_via_Stream[ _st ]
     end
 
     Build_pair_stream_via_even_iambic__ = -> a do

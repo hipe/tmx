@@ -187,13 +187,13 @@ module Skylab::CSS_Convert
 
               es = o.exitstatus
               es ||= Brazen_::CLI::SUCCESS_EXITSTATUS
-              Common_::Bound_Call.via_value es
+              Common_::BoundCall.via_value es
             else
               NIL_  # keep going if something said must stay
             end
           else
             express_invite_to_general_help
-            Common_::Bound_Call.via_value d
+            Common_::BoundCall.via_value d
           end
         else  # if no queue keep going
           NIL_

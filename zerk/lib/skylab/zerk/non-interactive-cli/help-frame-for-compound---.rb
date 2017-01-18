@@ -15,7 +15,7 @@ module Skylab::Zerk
 
           @_upstream = @_session.upstream_
 
-          if Begins_with_dash_[ @_upstream.current_token ]
+          if Begins_with_dash_[ @_upstream.head_as_is ]
             __step_for_option
           else
             __step_for_navigational

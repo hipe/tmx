@@ -62,7 +62,7 @@ module Skylab::Basic
 
     def normalize & oes_p
       @a.sort!
-      st = Home_::List.line_stream @a
+      st = Home_::List::LineStream_via_Array[ @a ]
       prev = st.gets
       elim = nil
       if prev

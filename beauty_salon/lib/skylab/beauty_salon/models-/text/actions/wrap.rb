@@ -28,8 +28,11 @@ module Skylab::BeautySalon
             markdown-ish.
           HERE
 
-          st = Home_.lib_.basic::String[ :line_stream, :mutate_by_unindenting, s ]
-          y << s while s = st.gets
+          _st = Home_.lib_.basic::String.result_via_map_chain( s,
+            :mutate_by_unindenting,
+            :line_stream_via_string,
+          )
+          _st.join_into y
         end,
 
         :inflect, :noun, :lemma_string,  # say "couldn't wrap text", not "couldn't wrap a text"

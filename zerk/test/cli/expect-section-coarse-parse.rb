@@ -901,7 +901,7 @@ module Skylab::Zerk::TestSupport
       #   • this does not hold the test context, so all fails are hard..
       # -
         bx = Common_::Box.new
-        st = Common_::Polymorphic_Stream.via_array lines
+        st = Common_::Scanner.via_array lines
 
         li = nil ; s = nil
 

@@ -45,7 +45,7 @@ module Skylab::Zerk
         end
 
         def to_load_ticket_stream
-          @_box.to_name_stream
+          @_box.to_key_stream
         end
       # -
       # ==

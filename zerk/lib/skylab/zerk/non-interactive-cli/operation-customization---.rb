@@ -34,7 +34,7 @@ module Skylab::Zerk
 
         remove_these = nil
 
-        @_box.each_name do |k|
+        @_box.each_key do |k|
           x = read[ k ]
           x.nil? && next
           if x

@@ -2,7 +2,7 @@ module Skylab::Permute
 
   module CLI
 
-    class Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer < Common_::Actor::Monadic
+    class Magnetics_::TokenStream_via_ArgumentArray_and_Tokenizer < Common_::Monadic
 
       # (the name is for self-documentation - the tokenizer is resolved internally)
       #
@@ -60,10 +60,10 @@ module Skylab::Permute
           end
         end
 
-        st = Common_::Polymorphic_Stream.via_array argv
+        st = Common_::Scanner.via_array argv
         @_st = st
 
-        if ! help_requested && st.unparsed_exists && is[ st.current_token ]
+        if ! help_requested && st.unparsed_exists && is[ st.head_as_is ]
           help_requested = true
           st.advance_one
         end

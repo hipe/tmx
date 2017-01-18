@@ -3,7 +3,7 @@ module Skylab::Zerk
   module CLI::Table
 
     class Magnetics_::LineRenderer_via_Page_and_Invocation <  # 1x
-        Common_::Actor::Dyadic
+        Common_::Dyadic
 
       # once per page, we go along every formal column we care to go along
       # (either every column of the page survey or every column ever seen,

@@ -4,31 +4,24 @@ module Skylab::Basic
 
     class << self
 
-      def [] last_op_sym, * op_sym_a, s  # silly fun
-        op_sym_a.each do | op_sym |
-          send op_sym, s
-        end
-        send last_op_sym, s
+      def result_via_map_chain x, * method_names  # silly fun
+        SillyFunMapChain___.new( x, method_names ).execute
       end
 
       def build_proc_for_string_begins_with_string * a
         if a.length.zero?
-          String_::Small_Procs__::Build_proc_for_string_begins_with_string
+          Here_::Small_Procs__::Build_proc_for_string_begins_with_string
         else
-          String_::Small_Procs__::Build_proc_for_string_begins_with_string[ * a ]
+          Here_::Small_Procs__::Build_proc_for_string_begins_with_string[ * a ]
         end
       end
 
       def build_proc_for_string_ends_with_string * a
         if a.length.zero?
-          String_::Small_Procs__::Build_proc_for_string_ends_with_string
+          Here_::Small_Procs__::Build_proc_for_string_ends_with_string
         else
-          String_::Small_Procs__::Build_proc_for_string_ends_with_string[ * a ]
+          Here_::Small_Procs__::Build_proc_for_string_ends_with_string[ * a ]
         end
-      end
-
-      def build_sequence_proc * x_a
-        String_::Succ__.call_via_iambic x_a
       end
 
       def component_model_for sym
@@ -37,32 +30,24 @@ module Skylab::Basic
       end
 
       def count_occurrences_in_string_of_string haystack, needle
-        String_::Small_Time_Actors__::Count_occurrences_OF_string_IN_string[
+        Here_::Small_Time_Actors__::Count_occurrences_OF_string_IN_string[
           needle, haystack ]
       end
 
       def count_occurrences_in_string_of_regex haystack, needle_rx
-        String_::Small_Time_Actors__::Count_occurrences_OF_regex_IN_string[
+        Here_::Small_Time_Actors__::Count_occurrences_OF_regex_IN_string[
           needle_rx, haystack ]
       end
 
       def ellipsify * a  # [#032].
-        String_::Small_Time_Actors__::Ellipsify.call_via_arglist a
-      end
-
-      def line_stream * a
-        if a.length.zero?
-          String_::Line_Scanner__
-        else
-          String_::Line_Scanner__.via_arglist a
-        end
+        Here_::Small_Time_Actors__::Ellipsify.call_via_arglist a
       end
 
       def looks_like_sentence * a
         if a.length.zero?
-          String_::Small_Procs__::Looks_like_sentence
+          Here_::Small_Procs__::Looks_like_sentence
         else
-          String_::Small_Procs__::Looks_like_sentence[ * a ]
+          Here_::Small_Procs__::Looks_like_sentence[ * a ]
         end
       end
 
@@ -99,9 +84,9 @@ module Skylab::Basic
 
       def paragraph_string_via_message_lines * a
         if a.length.zero?
-          String_::Small_Procs__::Paragraph_string_via_message_lines
+          Here_::Small_Procs__::Paragraph_string_via_message_lines
         else
-          String_::Small_Procs__::Paragraph_string_via_message_lines[ * a ]
+          Here_::Small_Procs__::Paragraph_string_via_message_lines[ * a ]
         end
       end
 
@@ -118,7 +103,7 @@ module Skylab::Basic
       end
 
       def reverse_scanner string, d
-        String_::Small_Procs__::Build_reverse_scanner[ string, d ]
+        Here_::Small_Procs__::Build_reverse_scanner[ string, d ]
       end
 
       def shortest_unique_or_first_headstrings a
@@ -137,45 +122,43 @@ module Skylab::Basic
         end
       end
 
-      def succ
-        String_::Succ__
-      end
-
       def unparenthesize_message_string * a
         if a.length.zero?
-          String_::Small_Time_Actors__::Unparenthesize_message_string
+          Here_::Small_Time_Actors__::Unparenthesize_message_string
         else
-          String_::Small_Time_Actors__::Unparenthesize_message_string[ * a ]
+          Here_::Small_Time_Actors__::Unparenthesize_message_string[ * a ]
         end
       end
 
       def via_mixed * a
-        String_::ViaMixed__.call_via_arglist a
-      end
-
-      def word_wrappers
-        Word_Wrappers__
-      end
-
-      def yamlizer
-        String_::Yamlizer__
+        Here_::ViaMixed__.call_via_arglist a
       end
     end  # >>
 
-    module Word_Wrappers__  # notes in [#033]
+    class SillyFunMapChain___
 
-      class << self
-
-        def calm
-          self::Calm
-        end
-
-        def crazy
-          self::Crazy
-        end
+      def initialize x, m_a
+        @__initial_value = x
+        @__operation_names = m_a
       end
 
-      Autoloader_[ self ]
+      def execute
+        x = remove_instance_variable :@__initial_value
+        _m_a = remove_instance_variable :@__operation_names
+        _m_a.each do |m|
+          x = send m, x
+        end
+        x
+      end
+
+      def mutate_by_unindenting s
+        Here_.mutate_by_unindenting s
+        s
+      end
+
+      def line_stream_via_string s
+        Here_::LineStream_via_String[ s ]
+      end
     end
 
     class N_Lines  # :[#030].
@@ -269,7 +252,7 @@ module Skylab::Basic
 
           same = -> arg_st, & oes_p_p do
 
-            x = arg_st.current_token
+            x = arg_st.head_as_is
 
             if nb_t_rx =~ x
 
@@ -498,8 +481,8 @@ module Skylab::Basic
 
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 15
     EMPTY_S_ = ''.freeze
+    Here_ = self
     LINE_RX_  = / [^\r\n]* \r? \n  |  [^\r\n]+ \r? \n? /x
-    String_ = self
   end
 end
 # #history: "tailer via separator" moved here from [cm]

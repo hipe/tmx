@@ -8,7 +8,9 @@ module Skylab::Basic::TestSupport
 
         _ea = Home_::List.build_each_pairable_via_even_iambic [ :a, :b, :c, :d ]
 
-        ( ::Hash[ _ea.each_pair.to_a ] ).should eql ( { a: :b, c: :d } )
+        _a = _ea.enum_for( :each_pair ).to_a
+
+        ( ::Hash[ _a ] ).should eql ( { a: :b, c: :d } )
       end
 
       it "none (left)" do

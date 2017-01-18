@@ -11,7 +11,7 @@ module Skylab::Basic
           if a.length.nonzero?
             k.set_identity_via_args a
           end
-          super k do
+          by k do
             k.gets
           end
         end

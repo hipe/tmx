@@ -78,7 +78,7 @@ module Skylab::Basic::TestSupport
     end
 
     def subject * x_a
-      subject_module_::Succ__.call_via_iambic x_a
+      subject_module_::Successorer.call_via_iambic x_a
     end
   end
 end

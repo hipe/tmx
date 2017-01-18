@@ -2,17 +2,10 @@ module Skylab::Basic
 
   class StateMachine
 
-    class ExpandedBuffer_via_MessageProc_ < SimpleModel_
+    class ExpandedBuffer_via_MessageProc_ < Common_::MagneticBySimpleModel
 
       # similar to [#028] string templates but ad-hoc.
       # we've done it somewhere before..
-
-      class << self
-        def call_by & p
-          define( & p ).execute
-        end
-        private :define  # for now
-      end  # >>
 
       # -
 

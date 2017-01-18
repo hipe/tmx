@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class Magnetics::PrimaryValue_via_ParseRequest < Common_::Actor::Dyadic  # 1x
+    class Magnetics::PrimaryValue_via_ParseRequest < Common_::Dyadic  # 1x
 
       # (for now [#007.D] tracks both this node and one API point in it below)
 
@@ -41,9 +41,9 @@ module Skylab::Zerk
         def __via_normalization_chain a
 
           x = _head_as_is_or_should_be
-          scn = Common_::Polymorphic_Stream.via_array a
+          scn = Common_::Scanner.via_array a
           begin
-            _p = scn.current_token
+            _p = scn.head_as_is
             x = _p[ x, self ]
             x || break
             scn.advance_one

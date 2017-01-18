@@ -15,11 +15,11 @@ module Skylab::Zerk::TestSupport
       end
 
       it "usage line has option" do
-        _ULI.has_name( '[-f X]' ) or fail
+        _ULI.has_key( '[-f X]' ) or fail
       end
 
       it "no args" do
-        _ = _ULI.at_position( -1 )
+        _ = _ULI.at_offset( -1 )
         _[ 0 ] == '[' or fail
       end
 

@@ -47,7 +47,7 @@ module Skylab::Zerk
 
         scn = @page_surveyish.to_field_survey_scanner
 
-        _add_the_width_of_this_field_survey scn.current_token
+        _add_the_width_of_this_field_survey scn.head_as_is
 
         add_width_for_separator = __proc_to_add_width_for_inner_separator
 
@@ -61,7 +61,7 @@ module Skylab::Zerk
 
           add_width_for_separator[]
 
-          _add_the_width_of_this_field_survey scn.current_token
+          _add_the_width_of_this_field_survey scn.head_as_is
 
           redo
         end while above

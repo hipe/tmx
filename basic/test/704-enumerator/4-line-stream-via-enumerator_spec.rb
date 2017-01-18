@@ -27,7 +27,7 @@ module Skylab::Basic::TestSupport
     end
 
     def subject & p
-      Home_::Enumerator.line_stream( & p )
+      Home_::Enumerator::LineStream_by[ & p ]
     end
   end
 end

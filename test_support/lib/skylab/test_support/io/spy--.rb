@@ -56,7 +56,7 @@ module Skylab::TestSupport
 
       def initialize x_a
         @is_standard = true
-        process_polymorphic_stream_fully polymorphic_stream_via_iambic x_a
+        process_argument_scanner_fully scanner_via_array x_a
       end
 
     public

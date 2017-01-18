@@ -13,7 +13,7 @@ module Skylab::Zerk
           @operation_path = nil
           @tuples = []
 
-          scn = Common_::Polymorphic_Stream.via_array x_a
+          scn = Common_::Scanner.via_array x_a
           @_scn = scn
           begin
             send PRIMARIES___.fetch( @_scn.gets_one )
@@ -145,7 +145,7 @@ module Skylab::Zerk
 
       # ==
 
-      class When::Unknown_branch_item_via_two__ < Common_::Actor::Dyadic
+      class When::Unknown_branch_item_via_two__ < Common_::Dyadic
 
         def initialize sym, search
 

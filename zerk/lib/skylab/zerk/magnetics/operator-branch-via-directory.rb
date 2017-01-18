@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Magnetics::OperatorBranch_via_Directory < Actor_via_SimpleModel_  # :[#051.G]
+  class Magnetics::OperatorBranch_via_Directory < Common_::SimpleModelAsMagnetic  # :[#051.G]
 
     # about the asymmetry of where this stored vs the other [#051]'s:
     #
@@ -33,7 +33,7 @@ module Skylab::Zerk
           o.downstream = @CLI.stderr
         end
 
-        Common_::Bound_Call[ nil, @one_off, :express_help_by, & _by_this ]
+        Common_::BoundCall[ nil, @one_off, :express_help_by, & _by_this ]
       end
 
       def to_bound_call_for_invocation
@@ -54,7 +54,7 @@ module Skylab::Zerk
           ::Kernel._K__readme__  # mmmaaayyybeee some one-offs want resources? but don't
         end
 
-        Common_::Bound_Call[ _args, _proc, :call, & _maybe_one_day ]
+        Common_::BoundCall[ _args, _proc, :call, & _maybe_one_day ]
       end
     end
 
@@ -85,10 +85,6 @@ module Skylab::Zerk
         :filesystem_for_globbing,
         :sidesystem_module,
       )
-
-      def execute
-        self  # can't freeze, caches things
-      end
 
       # -- read
 
@@ -145,7 +141,7 @@ module Skylab::Zerk
       end
 
       def __to_item_stream_when_open
-        self._README__fun__  # #open [#co-044.1] concatted streams refactor
+        self._README__fun__  # #open [#co-016.1] concatted streams refactor
       end
 
       def _to_remaining_item_stream_DANGEROUS
@@ -163,7 +159,7 @@ module Skylab::Zerk
         if scn.no_unparsed_exists
           p = EMPTY_P_
         end
-        Common_::SimpleStream.by do
+        Common_::MinimalStream.by do
           p[]
         end
       end

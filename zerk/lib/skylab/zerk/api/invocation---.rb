@@ -18,7 +18,7 @@ module Skylab::Zerk
         @_stack = []
         @_push_compound_qk[ _qk ]
 
-        @_stream = Common_::Polymorphic_Stream.via_array args
+        @_stream = Common_::Scanner.via_array args
         @_pp = pp
       end
 
@@ -55,7 +55,7 @@ module Skylab::Zerk
       def __maybe_parse_component_association  # result parse-tuple or nil
 
         asc = @_stack.last.component_association_via_token__(
-          @_stream.current_token )
+          @_stream.head_as_is )
 
         if asc
           ___maybe_parse_this_component_association asc
@@ -145,7 +145,7 @@ module Skylab::Zerk
 
         _rw = @_stack.last.reader_writer
 
-        fo = _rw.read_formal_operation @_stream.current_token
+        fo = _rw.read_formal_operation @_stream.head_as_is
 
         if fo
           ___when_formal_operation fo
@@ -213,7 +213,7 @@ module Skylab::Zerk
 
       def __stop_parsing_when_extra
 
-        x = @_stream.current_token
+        x = @_stream.head_as_is
         _handler.call(
           :error, :expression, :arguments_continued_past_end_of_phrase
         ) do |y|
@@ -232,7 +232,7 @@ module Skylab::Zerk
       end
 
       def _bound_call_for x
-        Common_::Bound_Call.via_value x
+        Common_::BoundCall.via_value x
       end
 
       # -- support

@@ -4,7 +4,7 @@ module Skylab::GitViz
 
     class Models_::Commit
 
-      class Magnetics_::Commit_via_Identifier_and_Repository < Common_::Actor::Dyadic
+      class Magnetics_::Commit_via_Identifier_and_Repository < Common_::Dyadic
 
         def initialize s, o, & p
           @id_s = s

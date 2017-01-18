@@ -69,7 +69,7 @@ program = -> argv, stdin, stdout, stderr, pn_s_a do
         _cols_ = _DEFAULT_COLS
         _cols = [ _cols_, _MAX_COLS ].min
 
-        yy = _String_lib.word_wrappers.crazy.curry _EMPTY_S, _cols, y
+        yy = _String_lib::WordWrapper::Crazy.curry _EMPTY_S, _cols, y
 
         # yy.indent = _IND
 

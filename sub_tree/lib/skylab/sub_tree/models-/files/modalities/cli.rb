@@ -6,7 +6,7 @@ module Skylab::SubTree
 
       Actions = ::Module.new  # THE_EMPTY_MODULE_
 
-      class Render_table < Common_::Actor::Dyadic
+      class Render_table < Common_::Dyadic
 
         # if any of the activated extensions were #post-notifiees, here is
         # how we express this collection of "line items":

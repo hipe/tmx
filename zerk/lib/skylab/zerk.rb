@@ -43,13 +43,7 @@ module Skylab::Zerk  # intro in [#001] README
 
   # == model support
 
-  class MonadicMagneticAndModel_
-    class << self
-      alias_method :call, :new
-      alias_method :[], :call
-      private :new
-    end  # >>
-  end
+  MonadicMagneticAndModel_ = Common_::MonadicMagneticAndModel
 
   # == functions
 
@@ -88,8 +82,8 @@ module Skylab::Zerk  # intro in [#001] README
     Here_ = self
   end
 
-  lazily :Actor_via_SimpleModel_ do
-    No_deps_zerk_[]::Actor_via_SimpleModel
+  lazily :MagneticBySimpleModel do
+    No_deps_zerk_[]::MagneticBySimpleModel
   end
 
   lazily :SimpleModel_ do

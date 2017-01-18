@@ -127,7 +127,7 @@ module Skylab::Zerk::TestSupport
       Item___ = ::Struct.new :offset, :had_ellipsis
     end
 
-    class CommonItemsSection_via_LineStream < Common_::Actor::Monadic  # 1x
+    class CommonItemsSection_via_LineStream < Common_::Monadic  # 1x
 
       # parse the help screens that are newest at the time of writing -
       # the only tricky thing we do here is that in effect we write the
@@ -142,7 +142,7 @@ module Skylab::Zerk::TestSupport
 
         st = remove_instance_variable :@line_stream
         # ..
-        _scn = st.flush_to_polymorphic_stream
+        _scn = st.flush_to_scanner
         _sm = __build_state_machine
         _memo = _sm.solve_into_against Memo___.new, _scn
         _memo.finish

@@ -135,7 +135,7 @@ module Skylab::TestSupport
         frame.operator_instance = op
       end
 
-      Common_::Bound_Call.via_receiver_and_method_name op, :execute
+      Common_::BoundCall.via_receiver_and_method_name op, :execute
     end
 
     def __bound_call_for_method_based_operation ro
@@ -145,7 +145,7 @@ module Skylab::TestSupport
         frame.operator_instance = :_ts_not_a_class_based_operation_  # in case you ask
       end
 
-      Common_::Bound_Call.via_receiver_and_method_name self, ro.invocation_method_name
+      Common_::BoundCall.via_receiver_and_method_name self, ro.invocation_method_name
     end
 
     def _emit_operator_resolved ro

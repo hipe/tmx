@@ -148,11 +148,11 @@ module Skylab::Basic
 
         def initialize p, p_
           @advance_one = p_
-          @current_token = p
+          @head_as_is = p
         end
 
-        def current_token
-          @current_token[]
+        def head_as_is
+          @head_as_is[]
         end
 
         def advance_one

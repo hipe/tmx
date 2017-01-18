@@ -61,7 +61,7 @@ module Skylab::Zerk
 
         _standard_five = [ o.argv, o.sin, o.sout, o.serr, _pnsa ]
 
-        Common_::Bound_Call[ _standard_five, _proc_like, :call ]
+        Common_::BoundCall[ _standard_five, _proc_like, :call ]
       end
 
       def __build_description_proc
@@ -88,7 +88,7 @@ module Skylab::Zerk
 
     # ==
 
-    class ExpressHelp_via___ < Home_::Actor_via_SimpleModel_
+    class ExpressHelp_via___ < Home_::MagneticBySimpleModel
 
       attr_writer(
         :downstream,

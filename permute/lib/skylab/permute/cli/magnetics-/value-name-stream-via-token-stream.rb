@@ -2,7 +2,7 @@ module Skylab::Permute
 
   module CLI
 
-    class Magnetics_::ValueNameStream_via_TokenStream < Common_::Actor::Monadic
+    class Magnetics_::ValueNameStream_via_TokenStream < Common_::Monadic
 
       def initialize ts, & p
         @token_stream = ts

@@ -5,7 +5,7 @@ module Skylab::Zerk::TestSupport
 
   Fixture_Top_ACS_Classes::Class_72_Color = -> st, & pp do
 
-    sym = st.current_token
+    sym = st.head_as_is
     if h[ sym ]
       st.advance_one
       Common_::Known_Known[ sym ]

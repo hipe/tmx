@@ -22,7 +22,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _subject
-      subject_module_.word_wrappers.crazy
+      subject_module_::WordWrapper::Crazy
     end
   end
 end

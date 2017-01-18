@@ -42,7 +42,7 @@ module Skylab::Basic
           @absolute_is_OK = @relative_is_OK = true
         end
 
-        def process_polymorphic_stream_passively st  # #[#fi-022]
+        def process_argument_scanner_passively st  # #[#fi-022]
           super && freeze
         end
 
@@ -216,7 +216,7 @@ module Skylab::Basic
         end
 
         def when_bad_box
-          nope :"path_cannot_contain_#{ @bad_box.first_name }"
+          nope :"path_cannot_contain_#{ @bad_box.first_key }"
             # for now we don't report every issue
         end
 

@@ -14,11 +14,11 @@ module Skylab::Zerk
           qk.name.as_variegated_symbol
         end
 
-        _st__ = _st_.flush_to_polymorphic_stream
+        _st__ = _st_.flush_to_scanner
 
         o = Field_::MetaAttributes::Enum::Build_extra_value_event.new
 
-        o.invalid_value = arg_st.current_token
+        o.invalid_value = arg_st.head_as_is
 
         o.valid_collection = _st__
 

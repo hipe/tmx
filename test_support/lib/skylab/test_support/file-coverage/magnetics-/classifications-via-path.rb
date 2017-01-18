@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module FileCoverage
 
-    class Magnetics_::Classifications_via_Path < Common_::Actor::Dyadic
+    class Magnetics_::Classifications_via_Path < Common_::Dyadic
 
       def initialize td, path, & p
         @on_event_selectively = p

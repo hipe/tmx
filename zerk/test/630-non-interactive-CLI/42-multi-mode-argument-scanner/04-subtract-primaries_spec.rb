@@ -21,7 +21,7 @@ module Skylab::Zerk::TestSupport
 
           o.subtract_primary :ding_dong, :Dinger_Donger
 
-          _ = Common_::Polymorphic_Stream.via_array %w( -zing-bling zang )
+          _ = Common_::Scanner.via_array %w( -zing-bling zang )
 
           o.user_scanner _
         end
@@ -77,7 +77,7 @@ module Skylab::Zerk::TestSupport
 
         scn = subject_module_.define do |o|
 
-          _ = Common_::Polymorphic_Stream.via_array %w( zing-bling zang )
+          _ = Common_::Scanner.via_array %w( zing-bling zang )
 
           o.user_scanner _
 
@@ -105,7 +105,7 @@ module Skylab::Zerk::TestSupport
 
           o.subtract_primary :ding_dong, :Dinger_Donger
 
-          _ = Common_::Polymorphic_Stream.via_array %w( -ding-dong zang )
+          _ = Common_::Scanner.via_array %w( -ding-dong zang )
 
           o.user_scanner _
 

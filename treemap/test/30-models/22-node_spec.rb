@@ -53,7 +53,7 @@ module Skylab::Treemap::TestSupport
       end
 
       def __line_stream_via_big_string big_s
-        Home_.lib_.basic::String.line_stream big_s
+        Home_.lib_.basic::String::LineStream_via_String[ big_s ]
       end
 
       def _expect_etc node, exp_st

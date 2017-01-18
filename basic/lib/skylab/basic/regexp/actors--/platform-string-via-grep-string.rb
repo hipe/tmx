@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Regexp
 
-    class Actors__::Platform_string_via_grep_string < Common_::Actor::Monadic
+    class Actors__::Platform_string_via_grep_string < Common_::Monadic
 
       # currently covered..
       # only by [sg]: seems like [bs] should use this too but where?

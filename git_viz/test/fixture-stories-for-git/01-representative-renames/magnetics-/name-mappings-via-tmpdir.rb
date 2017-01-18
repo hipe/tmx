@@ -2,7 +2,7 @@ module Skylab::GitViz::TestSupport
 
   module FixtureStoriesForGit::Story_01
 
-    class Magnetics_::NameMappings_via_Tmpdir < Common_::Actor::Monadic
+    class Magnetics_::NameMappings_via_Tmpdir < Common_::Monadic
 
       def initialize o
         @tmpdir = o

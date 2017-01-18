@@ -41,7 +41,7 @@ module Skylab::Zerk::TestSupport
 
           def interpret_component st, & pp
 
-            s = st.current_token
+            s = st.head_as_is
             md = %r(\Asample[- ]rate: ?(\d+(?:\.\d+)?) ?kHz\z).match s
             if md
               d = md[ 1 ].to_f

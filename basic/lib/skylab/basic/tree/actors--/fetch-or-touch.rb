@@ -15,9 +15,9 @@ module Skylab::Basic
       end
 
       def process_iambic_fully x_a
-        st = Common_::Polymorphic_Stream.via_array x_a
+        st = Common_::Scanner.via_array x_a
         while st.unparsed_exists
-          ivar = :"@#{ st.current_token }"
+          ivar = :"@#{ st.head_as_is }"
           if instance_variable_defined? ivar
             st.advance_one
             instance_variable_set ivar, st.gets_one
@@ -34,7 +34,7 @@ module Skylab::Basic
         if a.length.zero?
           @node
         else
-          @_slug_stream = Common_::Polymorphic_Stream.via_array a
+          @_slug_stream = Common_::Scanner.via_array a
           __main_loop_because_nonempty_slug_stream
         end
       end
@@ -57,7 +57,7 @@ module Skylab::Basic
 
         begin
 
-          node_ = node[ st.current_token ]
+          node_ = node[ st.head_as_is ]
 
           if node_
             st.advance_one
@@ -119,7 +119,7 @@ module Skylab::Basic
       end
 
       def ___say_no_such_node
-        "no such node: '#{ @_slug_stream.current_token }'"
+        "no such node: '#{ @_slug_stream.head_as_is }'"
       end
 
       def __when_not_found_via_proc st, node

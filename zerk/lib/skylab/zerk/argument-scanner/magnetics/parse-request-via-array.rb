@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class Magnetics::ParseRequest_via_Array < Common_::Actor::Monadic
+    class Magnetics::ParseRequest_via_Array < Common_::Monadic
 
       # experiment.
 
@@ -26,7 +26,7 @@ module Skylab::Zerk
             @successful_result_will_be_wrapped = true
             false
           else
-            @_scn = Common_::Polymorphic_Stream.via_array x_a
+            @_scn = Common_::Scanner.via_array x_a
             @successful_result_will_be_wrapped = false
             true
           end
@@ -49,7 +49,7 @@ module Skylab::Zerk
           @_seen = {}
 
           begin
-            _recurse @_scn.current_token
+            _recurse @_scn.head_as_is
             @_scn.advance_one  # :#here-1
           end until @_scn.no_unparsed_exists
 
@@ -102,7 +102,7 @@ module Skylab::Zerk
 
         def __at_must_be
           @_scn.advance_one
-          _push @_scn.current_token  # counterintuitively, leave it on scn b.c #here-1
+          _push @_scn.head_as_is  # counterintuitively, leave it on scn b.c #here-1
         end
 
         def _auto p

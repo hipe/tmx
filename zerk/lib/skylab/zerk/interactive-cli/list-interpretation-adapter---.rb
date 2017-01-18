@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-  class List_Interpretation_Adapter___ < Common_::Actor::Monadic  # :[#008]..
+  class List_Interpretation_Adapter___ < Common_::Monadic  # :[#008]..
 
     # #open after incubation (which will be after [#009]), de-dup this
     # with [#sy-029] OGDL which should be similar.. or don't

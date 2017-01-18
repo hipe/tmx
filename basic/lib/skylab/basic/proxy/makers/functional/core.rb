@@ -157,7 +157,7 @@ module Skylab::Basic
 
             Common_::Pair.via_value_and_name(
               p_a.fetch( d ),
-              @box.at_position( d ) )
+              @box.at_offset( d ) )
           end
           NIL_
         end

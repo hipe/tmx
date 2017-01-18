@@ -89,7 +89,7 @@ program = -> argv, sin, sout, serr, pn_s_a do
         _a.push _MAX_COLS
         _cols = _a.min
 
-        yy = _String_lib.word_wrappers.crazy.curry '', _cols, y
+        yy = _String_lib::WordWrapper::Crazy.curry '', _cols, y
         yy.indent = _INDENT
 
         y << "#{ lbl 'synopsis:' }"

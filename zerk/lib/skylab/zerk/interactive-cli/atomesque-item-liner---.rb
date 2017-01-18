@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-    class Atomesque_Item_Liner___ < Common_::Actor::Dyadic  # references reference [#038]
+    class Atomesque_Item_Liner___ < Common_::Dyadic  # references reference [#038]
 
       def initialize lt, _
 

@@ -12,7 +12,7 @@ module Skylab::Permute
       bx = __box_via_pair_stream pair_st
 
       if bx.length.zero?
-        Common_::Stream.the_empty_stream
+        Common_::THE_EMPTY_STREAM
       else
         __via_nonempty_box bx
       end

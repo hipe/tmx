@@ -135,7 +135,7 @@ module Skylab::Basic
 
         defn.add :long_string do |o|
 
-          _moniker = String_.ellipsify o.value, o.choices.max_width
+          _moniker = Here_.ellipsify o.value, o.choices.max_width
 
           o.when( :default )[ o.new_with_value( _moniker ) ]
         end

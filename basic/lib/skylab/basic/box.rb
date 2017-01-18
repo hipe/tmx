@@ -47,7 +47,7 @@ module Skylab::Basic
       @h.key? k
     end
 
-    def get_names
+    def get_keys
       @a.dup
     end
 

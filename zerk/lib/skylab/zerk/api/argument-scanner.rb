@@ -24,7 +24,7 @@ module Skylab::Zerk
 
       def __initialize_normally x_a
 
-        @_scn = Common_::Polymorphic_Stream.via_array x_a
+        @_scn = Common_::Scanner.via_array x_a
         @no_unparsed_exists = @_scn.no_unparsed_exists
         NIL
       end
@@ -79,7 +79,7 @@ module Skylab::Zerk
       end
 
       def _real_scanner_current_token_
-        @_scn.current_token
+        @_scn.head_as_is
       end
 
       def __receive_CPS_ sym

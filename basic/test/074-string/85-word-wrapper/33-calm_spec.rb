@@ -147,7 +147,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _subject
-      subject_module_.word_wrappers.calm
+      subject_module_::WordWrapper::Calm
     end
   end
 end

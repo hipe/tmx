@@ -123,7 +123,7 @@ module Skylab::Zerk
 
       _el = Here_::Event_Loop___.new vmm, self, & @_root_ACS_proc
 
-      Common_::Bound_Call.via_receiver_and_method_name _el, :run
+      Common_::BoundCall.via_receiver_and_method_name _el, :run
     end
 
     def ___init_expression_agent

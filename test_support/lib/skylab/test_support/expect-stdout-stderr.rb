@@ -280,7 +280,7 @@ module Skylab::TestSupport
 
         st = stream_for_expect_stdout_stderr
 
-        if st.unparsed_exists and NEWLINE_ == st.current_token.string
+        if st.unparsed_exists and NEWLINE_ == st.head_as_is.string
           st.advance_one
           nil
         end
@@ -298,7 +298,7 @@ module Skylab::TestSupport
         st = stream_for_expect_stdout_stderr
 
         if st.unparsed_exists
-          _x = st.current_token
+          _x = st.head_as_is
           fail "expected no more lines, had #{ _x.to_a.inspect }"
         end
       end
@@ -400,7 +400,7 @@ module Skylab::TestSupport
       def _sout_serr_chunk_for
         st = @__sout_serr_actual_stream__
         p = -> do
-          if st.unparsed_exists and yield( st.current_token )
+          if st.unparsed_exists and yield( st.head_as_is )
             st.gets_one
           else
             p = EMPTY_P_
@@ -487,7 +487,7 @@ module Skylab::TestSupport
 
       def stdout_stderr_against_emission em
 
-        _st = Common_::Stream.via_item( em ).flush_to_polymorphic_stream
+        _st = Common_::Stream.via_item( em ).flush_to_scanner
         self.stream_for_expect_stdout_stderr = _st
         NIL_
       end
@@ -496,7 +496,7 @@ module Skylab::TestSupport
 
         # the subject of your tests will be this array of emissions.
 
-        _st = Common_::Polymorphic_Stream.via_array em_a
+        _st = Common_::Scanner.via_array em_a
         self.stream_for_expect_stdout_stderr = _st
         NIL_
       end
@@ -516,7 +516,7 @@ module Skylab::TestSupport
       end
 
       def _bake_sout_serr
-        @__sout_serr_actual_stream__ = Common_::Polymorphic_Stream.via_array(
+        @__sout_serr_actual_stream__ = Common_::Scanner.via_array(
           flush_baked_emission_array )
 
         true
@@ -546,7 +546,7 @@ module Skylab::TestSupport
         end
 
         def via_args x_a, & x_p
-          new Common_::Polymorphic_Stream.via_array( x_a ), & x_p
+          new Common_::Scanner.via_array( x_a ), & x_p
         end
 
         private :new
@@ -560,7 +560,7 @@ module Skylab::TestSupport
         @method_name = :_sout_serr_expect_and_resolve_emission
         @stream_symbol = nil
 
-        process_polymorphic_stream_passively st
+        process_argument_scanner_passively st
 
         while st.unparsed_exists
           __process_the_rest_using_shape_hack st
@@ -578,7 +578,7 @@ module Skylab::TestSupport
 
       def __process_the_rest_using_shape_hack st
         begin
-          send st.current_token.class.name, st
+          send st.head_as_is.class.name, st
         end
       end
 

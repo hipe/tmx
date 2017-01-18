@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module Tree
 
-    class Input_Adapters__::Hash < Common_::Actor::Monadic
+    class Input_Adapters__::Hash < Common_::Monadic
 
       def initialize x
         @upstream_x = x
