@@ -1,11 +1,10 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  module CLI::Styling
 
-    module Styling
+    module Chunker
 
-      module Chunker
-
+      # -
         class << self
 
           def via_sexp sexp
@@ -121,8 +120,8 @@ module Skylab::Brazen
         end
       end
     end.call
-    # -> 2
-      end
+
     end
   end
 end
+# #history: moved from [br] to [ze]

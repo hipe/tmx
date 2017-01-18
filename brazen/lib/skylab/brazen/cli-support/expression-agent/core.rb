@@ -166,7 +166,7 @@ module Skylab::Brazen
       end
 
       def stylize s, * i_a
-        Home_::CLI_Support::Styling.stylify i_a, s
+        Zerk_lib_[]::CLI::Styling.stylify i_a, s
       end
       public :stylize
 

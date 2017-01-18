@@ -126,7 +126,7 @@ module Skylab::Zerk
 
   module Types__
 
-    mod = Home_::CLI_Support::Styling
+    mod = Home_::CLI::Styling
     unstyle = mod::Unstyle
 
     parse_styles = mod::Parse_styles
@@ -202,7 +202,7 @@ module Skylab::Zerk
 
     start_type = Types__::INTEGER
 
-    unstyle = Home_::CLI_Support::Styling::Unstyle
+    unstyle = Home_::CLI::Styling::Unstyle
 
     define_method :see do |cel_x|  # `cel_x` must be ::String or nil
       if ! cel_x.nil?

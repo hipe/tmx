@@ -88,7 +88,7 @@ module Skylab::SearchAndReplace::TestSupport
         lines = _st.to_a
         1 == lines.length or fail
 
-        _x_a = Home_.lib_.brazen::CLI_Support::Styling.parse_styles(
+        _x_a = Home_.lib_.zerk::CLI::Styling.parse_styles(
           lines.fetch 0 )
 
         _x_a.map( & :first ).should eql(

@@ -8,7 +8,7 @@ strings are evaluated to be rendered for your particular modality.
 it is also a placeholder for a much bigger idea that we don't fully
 develop here (yet).
 
-the expression agent as a concept is an improvement on [#092] the
+the expression agent as a concept is an improvement on [#!092] the
 headless pen. in fact, although under a different name it has the exact same
 mission statement:
 
@@ -16,7 +16,7 @@ we just went and obliterated pen, and here is all that remains of its once
 vast empire: this one grain of sand: "Pen (at this level) is an experimental
 attempt to generalize and unify a subset of the interface-level string
 decorating functions so that the same utterances can be articulated across
-multiple modalities to whatever extent possible :[#br-092]"
+multiple modalities to whatever extent possible :[#!br-092]"
 
 
 

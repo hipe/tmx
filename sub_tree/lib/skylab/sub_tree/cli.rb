@@ -52,7 +52,7 @@ module Skylab::SubTree
 
       lib = Home_.lib_
 
-      styling = lib.brazen::CLI_Support::Styling
+      styling = lib.zerk::CLI::Styling
 
       define_method :stylify_, styling::Stylify
 

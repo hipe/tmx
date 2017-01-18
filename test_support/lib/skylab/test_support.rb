@@ -146,6 +146,11 @@ module Skylab::TestSupport  # :[#021].
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  CLI_ = Lazy_.call do
+    Require_zerk_[]
+    Zerk_::CLI
+  end
+
   CLI_support_ = -> do
     Home_.lib_.brazen::CLI_Support
   end

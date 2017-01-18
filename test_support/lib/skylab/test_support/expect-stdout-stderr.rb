@@ -317,7 +317,7 @@ module Skylab::TestSupport
 
       def flush_to_unstyled_string_contiguous_lines_on_stream sym
 
-        _p = CLI_support_[]::Styling::Unstyle
+        _p = CLI_[]::Styling::Unstyle
 
         _flush_to_string_on_stream_by sym, & _p
       end
@@ -535,7 +535,7 @@ module Skylab::TestSupport
 
     Common_ = ::Skylab::Common
 
-    SIMPLE_STYLE_RX__ = CLI_support_[]::Styling::SIMPLE_STYLE_RX
+    SIMPLE_STYLE_RX__ = CLI_[]::Styling::SIMPLE_STYLE_RX
 
     class Expectation  # [br], [te]
 

@@ -481,7 +481,7 @@ module Skylab::TestSupport
         @line = @up.gets
         if @line
 
-          line = CLI_support_[]::Styling.unstyle_styled @line
+          line = CLI_[]::Styling.unstyle_styled @line
 
           if line
             @line = line

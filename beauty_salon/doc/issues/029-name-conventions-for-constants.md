@@ -1,6 +1,6 @@
 # name conventions for constants :[#029]
 
-(this is a ground-up re-write of a document "lost in the [#br-092] fire".)
+(this is a ground-up re-write of a document "lost in the [#!br-092] fire".)
 
 ## synopsis
 

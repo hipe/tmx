@@ -306,7 +306,7 @@ module Skylab::SearchAndReplace
 
       def _reinit_styled_expresser  # must rebuild whenever match changes!
 
-        stylify = Home_.lib_.brazen::CLI_Support::Styling::Stylify
+        stylify = Home_.lib_.zerk::CLI::Styling::Stylify
 
         se = Here_::Line_Expresser__.new @_line_yielder
 

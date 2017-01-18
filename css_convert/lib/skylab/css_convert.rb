@@ -60,6 +60,8 @@ module Skylab::CSS_Convert
     TM__ = sidesys[ :TanMan ]
 
     Yacc_to_treetop = sidesys[ :Yacc2Treetop ]
+
+    Zerk = sidesys[ :Zerk ]
   end
 
   Brazen_ = Autoloader_.require_sidesystem :Brazen
@@ -455,7 +457,13 @@ module Skylab::CSS_Convert
 
     STARTS_WITH_VOWEL_RX__ = /\A[aeiouy]/i
 
-    define_method :stylize, Brazen_::CLI_Support::Styling::Stylize
+    define_method :stylize, -> do
+      stylize = nil
+      -> *a do
+        stylize ||= Home_.lib_.zerk::CLI::Styling::Stylize
+        stylize[ * a ]
+      end
+    end.call
   end
 
   # ~ visual tests, etc
@@ -485,11 +493,11 @@ module Skylab::CSS_Convert
     def color_test _test_o
 
       modifiers_a = [ nil, :strong, :reverse ]
-      styling = Brazen_::CLI_Support::Styling
-      stylify = styling::Stylify
+      _Styling = Zerk_lib_[]::CLI::Styling
+      stylify = _Styling::Stylify
       width = 50
 
-      _code_names = Brazen_::CLI_Support::Styling.code_name_symbol_array
+      _code_names = _Styling.code_name_symbol_array
       _code_names.each do | c |
 
         3.times do | d |
@@ -505,7 +513,7 @@ module Skylab::CSS_Convert
           s = "would you like some " <<
             "#{ stylify[ a, _style_label ] } with that?"
 
-          u = styling.unstyle s
+          u = _Styling.unstyle s
 
           fill = SPACE_ * [ width - u.length, 0 ].max
           send_payload_message "#{ fill }#{ s } - #{ u }"

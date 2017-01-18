@@ -150,9 +150,7 @@ module Skylab::Git::TestSupport
 
     one_off_loader = -> do
       one_off_loader = nil
-      require 'skylab/zerk'  # :#spot-1-1 - later access this normally
-      lib = ::Skylab::Zerk
-      _x = lib::Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ Home_ ]
+      _x = Zerk_lib_[]::Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ Home_ ]
       one_off_loader = _x ; nil
     end
 

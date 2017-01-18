@@ -88,5 +88,7 @@ module Skylab::Basic
       require 'treetop'
       ::Treetop
     end
+
+    Zerk = sidesys[ :Zerk ]  # for CLI styling in word wrappers
   end
 end

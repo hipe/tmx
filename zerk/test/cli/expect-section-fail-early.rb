@@ -999,11 +999,11 @@ module Skylab::Zerk::TestSupport
       end
 
       def unstyled_content
-        @___uc ||= Remote_CLI_lib_[]::Styling.unstyle line_content
+        @___uc ||= Home_::CLI::Styling.unstyle line_content
       end
 
       def unstyled
-        @___unst ||= Remote_CLI_lib_[]::Styling.unstyle @string
+        @___unst ||= Home_::CLI::Styling.unstyle @string
       end
 
       def line_content

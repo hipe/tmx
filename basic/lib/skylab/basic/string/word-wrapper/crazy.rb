@@ -46,7 +46,7 @@ module Skylab::Basic
 
           input_line or fail 'never'
 
-          _sx = Home_.lib_.brazen::CLI_Support::Styling.parse_styles input_line
+          _sx = Home_.lib_.zerk::CLI::Styling.parse_styles input_line
 
           _sx ||= [[ :string, input_line ]]
 

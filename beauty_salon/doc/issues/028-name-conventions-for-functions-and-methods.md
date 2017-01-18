@@ -232,7 +232,7 @@ we say "function" to give these ideas a bit of platform independence;
 however in the context of the current host platform, when we say "function"
 we always mean "proc" or proc-like.
 
-this is a re-creation of a document lost in the [#br-092] fire. it will be
+this is a re-creation of a document lost in the [#!br-092] fire. it will be
 better this time.
 
 

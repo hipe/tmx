@@ -112,7 +112,7 @@ module Skylab::Brazen::TestSupport
     end
 
     Zerk_test_support = -> do
-      Home_::Zerk_lib_[].test_support
+      Zerk_lib_[].test_support
     end
   end
 
@@ -195,4 +195,5 @@ module Skylab::Brazen::TestSupport
   NOTHING_ = nil
   SPACE_ = ' '.freeze
   TS_ = self
+  Zerk_lib_ = Home_::Zerk_lib_
 end

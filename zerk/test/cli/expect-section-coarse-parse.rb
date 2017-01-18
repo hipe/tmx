@@ -854,7 +854,7 @@ module Skylab::Zerk::TestSupport
       end
 
       Styling___ = Lazy_.call do
-        Remote_CLI_lib_[]::Styling
+        Home_::CLI::Styling
       end
 
       def is_blank_line
@@ -1026,7 +1026,7 @@ module Skylab::Zerk::TestSupport
     # ==
 
     Unstyle_styled__ = -> s do
-      Remote_CLI_lib_[]::Styling::Unstyle_styled[ s ]
+      Home_::CLI::Styling::Unstyle_styled[ s ]
     end
 
     BLANK_RX___ = %r(\A$)  # be indifferent to newlines

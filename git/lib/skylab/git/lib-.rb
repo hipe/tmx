@@ -50,6 +50,6 @@ module Skylab::Git
 
     Time = Lazy_.call { require 'time' ; ::Time }  # for tests only
 
-    # Zerk  when this see #spot-1-1 in tests
+    Zerk = sidesys[ :Zerk ]
   end
 end

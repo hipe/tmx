@@ -89,6 +89,10 @@ module Skylab::Git
     Home_.lib_.basic::Process.via_five( * five )
   end
 
+  Zerk_lib_ = Lazy_.call do
+    Home_.lib_.zerk
+  end
+
   ProcLike_ = Common_::ProcLike
 
   ACHIEVED_ = true

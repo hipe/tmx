@@ -64,7 +64,7 @@ module Skylab::Brazen::TestSupport
     end
 
     This_lib___ = Lazy_.call do
-      Home_::Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early
+      Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early
     end
 
     def expect_section_ k, exp  # assume `state_`

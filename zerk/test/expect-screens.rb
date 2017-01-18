@@ -166,7 +166,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def unstyle_styled_ s
-        Remote_CLI_lib_[]::Styling::Unstyle_styled[ s ]
+        Home_::CLI::Styling::Unstyle_styled[ s ]
       end
 
       def entity_item_table_simple_regex

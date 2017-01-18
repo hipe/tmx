@@ -47,7 +47,11 @@
              (#was: features that [fa] has that you don't #universal)
 [#094]       expression agents adjunct notes ..
 [#093]       what is the deal with expression agents ..
-[#092]       [ CLI styling ]
+
+[#092] #hole
+             ( #was: [ CLI styling ] ) ( #moved-to: [#ze-021.1] )
+             also seems to be associated with "the fire"
+
 [#091]       [ entity identifier ]
              ( #moved-from [#here-022] )
 [#090] #hole ( #moved to [fi] )

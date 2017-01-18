@@ -83,6 +83,8 @@ module Skylab::Snag
 
     System_lib = sidesys[ :System ]
 
+    Zerk = sidesys[ :Zerk ]
+
     class << self
       attr_reader :instance
     end  # >>

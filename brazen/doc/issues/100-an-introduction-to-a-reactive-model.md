@@ -66,5 +66,5 @@ related articles:
 
 • [#093] "what is the deal with expression agents" discovers the big
   problem with sub-clients (as they were implemented) and tries to fix them
-  and then makes a big mess. (our [#092] spares us no detail of the story
+  and then makes a big mess. (our [#!092] spares us no detail of the story
   of the great earthquake and fire that ensued.)

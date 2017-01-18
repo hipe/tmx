@@ -78,7 +78,7 @@ module Skylab::BNF2Treetop::TestSupport
     def out    ; _frame.out_p.call   end
 
     def unstyle x
-      CLI::TestLib__::Brazen[]::CLI_Support::Styling.unstyle x
+      CLI::TestLib__::Zerk[]::CLI::Styling.unstyle x
     end
   end
 
@@ -89,6 +89,8 @@ module Skylab::BNF2Treetop::TestSupport
     Brazen = sidesys[ :Brazen ]
 
     System_lib = sidesys[ :System ]
+
+    Zerk = sidesys[ :Zerk ]
 
   end
 end

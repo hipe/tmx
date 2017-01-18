@@ -175,7 +175,7 @@ module Skylab::Brazen::TestSupport
         st = stream_for_expect_stdout_stderr
         _line_o = st.gets_one
 
-        _omg = Home_::CLI_Support::Styling::Parse_styles[ _line_o.string ]
+        _omg = Zerk_lib_[]::CLI::Styling::Parse_styles[ _line_o.string ]
 
         _omg.should eql(
 

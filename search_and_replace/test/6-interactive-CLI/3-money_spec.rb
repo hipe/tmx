@@ -222,7 +222,7 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _parse_this_line _
-      Home_.lib_.brazen::CLI_Support::Styling::Parse_styles[ _ ]
+      Home_.lib_.zerk::CLI::Styling::Parse_styles[ _ ]
     end
 
     def __these_lines_of_interest

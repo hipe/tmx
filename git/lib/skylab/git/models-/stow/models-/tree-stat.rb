@@ -86,7 +86,7 @@ module Skylab::Git
       Stylify__ = -> do
 
         p = -> sym_a, s do
-          p = Home_.lib_.brazen::CLI_Support::Styling::Stylify
+          p = Home_.lib_.zerk::CLI::Styling::Stylify
           p[ sym_a, s ]
         end
         -> sym_a, s do

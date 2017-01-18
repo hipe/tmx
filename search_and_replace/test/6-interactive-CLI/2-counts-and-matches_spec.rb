@@ -78,7 +78,7 @@ module Skylab::SearchAndReplace::TestSupport
         # #eyeblood: make sure that the next three lines have both variants
 
         _a = [ st.gets, st.gets, st.gets ]
-        ps = Home_.lib_.brazen::CLI_Support::Styling::Parse_styles
+        ps = Home_.lib_.zerk::CLI::Styling::Parse_styles
 
         a = [ "h#{}inkenlooper" ]
         a.push a.last.upcase

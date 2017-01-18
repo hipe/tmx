@@ -136,4 +136,5 @@ module Skylab::Git::TestSupport
   NOTHING_ = nil
   TS_ = self
   UNDERSCORE_ = '_'
+  Zerk_lib_ = Home_::Zerk_lib_
 end

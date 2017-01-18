@@ -247,7 +247,7 @@ module Skylab::Zerk::TestSupport
 
       def unstyle_styled line
         # (this could be better integrated but for now meh KISS)
-        Home_::CLI_::Remote_lib[]::Styling::Unstyle_styled[ line ]
+        Home_::CLI::Styling::Unstyle_styled[ line ]
       end
     end
 

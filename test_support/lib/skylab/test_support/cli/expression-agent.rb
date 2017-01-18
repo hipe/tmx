@@ -11,7 +11,7 @@ module Skylab::TestSupport
       lib = Home_.lib_
 
       stylify = -> i_a, s do
-        stylify = CLI_support_[]::Styling::Stylify
+        stylify = CLI_[]::Styling::Stylify
         stylify[ i_a, s ]
       end
 

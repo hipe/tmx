@@ -23,7 +23,7 @@ module Skylab::BeautySalon::TestSupport
 
       sect = _guy.children[ 1 ]
 
-      _rx = Home_.lib_.brazen::CLI_Support::Styling::SIMPLE_STYLE_RX
+      _rx = Home_.lib_.zerk::CLI::Styling::SIMPLE_STYLE_RX
       s = sect.x.string.gsub _rx, EMPTY_S_
       s or fail
 

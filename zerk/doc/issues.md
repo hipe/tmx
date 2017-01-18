@@ -125,8 +125,11 @@
 [#024]       stack frame ..  (mostly lengthy code notes) and..
              ( #was: redundancy in two events. removed the other. )
 
-[#023]     #track glob in niCLI
+[#023]       CLI for..
+           #track :[#here.3]: glob in niCLI
              ( #was: #open de-generalize the invites )
+             :[#here.2]: styling diaspora
+             :[#here.1]: styling
 
 [#022]       #track what was lost when we stopped doing summary info (here)
              ( #was: duplicate of [#021] )

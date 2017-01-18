@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  module CLI::Styling  # :[#023.1].
 
-    module Styling  # :[#092].
+    # -
 
       bx = Common_::Box.new
 
@@ -58,7 +58,7 @@ module Skylab::Brazen
 
         -> s do
 
-          sexp ||= Home_.lib_.basic::Sexp
+          sexp ||= Basic_[]::Sexp
 
           y = []
           begin
@@ -180,7 +180,7 @@ module Skylab::Brazen
 
       style_h = bx.h_
 
-      Styling_ = self
-    end
+    # -
   end
 end
+# #history: moved from [br] to [ze]

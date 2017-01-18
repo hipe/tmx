@@ -128,7 +128,7 @@ module Skylab::SearchAndReplace::TestSupport
           parse_styles = nil
           setup = -> do
             setup = nil
-            parse_styles = Home_.lib_.brazen::CLI_Support::Styling::Parse_styles
+            parse_styles = Home_.lib_.zerk::CLI::Styling::Parse_styles
           end
 
           -> lines do
