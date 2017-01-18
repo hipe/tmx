@@ -67,6 +67,7 @@ module Skylab::CSS_Convert
   Brazen_ = Autoloader_.require_sidesystem :Brazen
   Lazy_ = Common_::Lazy
   Home_ = self
+  Zerk_ = Autoloader_.require_sidesystem :Zerk
 
   Conversion_parameters_class___ = Lazy_.call do
 
@@ -112,7 +113,7 @@ module Skylab::CSS_Convert
     end
   end
 
-  class CLI < Brazen_::CLI::Isomorphic_Methods_Client
+  class CLI < Zerk_::CLI::MicroserviceToolkit::IsomorphicMethodsClient
 
     option_parser do | o |
 

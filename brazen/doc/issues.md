@@ -30,10 +30,17 @@
 [#106] #hole ( #moved-to: [#ze-064] )
              ( #was fun with help screen parsing .. )
 
-[#105]       the isomorphic method argument narrative ..
-[#104]       the isomorphic methods client narrative ..
-[#103]       the CLI isomorphic methods client narrative ..
+[#105] #hole ( #moved-to: [#ze-022.4] )
+             ( #was: the isomorphic method argument narrative .. )
+
+[#104]       ( #moved-to: [#ze-022.2] )
+             ( #was: the isomorphic methods client narrative .. )
+
+[#103] #hole ( #moved-to: [#ze-022.3] )
+             ( #was: the CLI isomorphic methods client narrative .. )
+
 [#102]       :+#tombstone: removed old & complex o.p that parsed '--'
+
 [#101]       #investigation - how to architect.
 [#100]       an introduction to a reactive model ..
 [#099]       [ branch node for historical documents ]

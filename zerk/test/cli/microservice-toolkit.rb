@@ -1,16 +1,20 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  module CLI::Isomorphic_Methods_Client
+  module CLI::Microservice_Toolkit
 
     def self.[] tcc
 
-      TestLib_::Memoizer_methods[ tcc ]
-
-      TS_.lib_( :CLI_support_expectations )[ tcc ]
-
+      Use_::Memoizer_methods[ tcc ]
+      This_one_lib___[][ tcc ]
       tcc.send :define_singleton_method, :invoke_appropriate_action, IAA__
-
       tcc.include self
+    end
+
+    This_one_lib___ = Lazy_.call do
+      Home_::Require_brazen_[]
+      _ = Home_::Brazen_.test_support
+      _ = _.lib_ :CLI_support_expectations
+      _
     end
 
     IAA__ = -> do  # infer appropriate action
@@ -26,14 +30,12 @@ module Skylab::Brazen::TestSupport
     define_method :__appropriate_action_slug, -> do
 
       cache = {}
-      _DASH = '-' ; _UNDERSCORE = '_'
-
       -> do
         cls = client_class_
         cache.fetch cls do
           i_a = cls.instance_methods( false )
           1 == i_a.length or fail
-          cache[ cls ] = i_a.fetch( 0 ).id2name.gsub _UNDERSCORE, _DASH
+          cache[ cls ] = i_a.fetch( 0 ).id2name.gsub UNDERSCORE_, DASH_
         end
       end
     end.call
@@ -58,13 +60,9 @@ module Skylab::Brazen::TestSupport
 
       x_a.push :state, _state, :stream, :e
 
-      _cls = This_lib___[]::Help_Screen_State
+      _cls = TS_::CLI::Expect_Section_Fail_Early::Help_Screen_State
 
       _cls.via_iambic x_a
-    end
-
-    This_lib___ = Lazy_.call do
-      Zerk_lib_[].test_support::CLI::Expect_Section_Fail_Early
     end
 
     def expect_section_ k, exp  # assume `state_`
@@ -93,7 +91,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def subject_class_
-      Home_::CLI::Isomorphic_Methods_Client
+      Home_::CLI::MicroserviceToolkit::IsomorphicMethodsClient
     end
 
     def subject_CLI  # for one or more of our bundles

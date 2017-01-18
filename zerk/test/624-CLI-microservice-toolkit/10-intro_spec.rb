@@ -1,16 +1,19 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI - isomorphic methods client - 01 intro" do
+  describe "[ze] CLI microservice toolkit - 01 intro" do
 
     TS_[ self ]
-    use :CLI_isomorphic_methods_client
+    use :CLI_microservice_toolkit
+
+    it "loads" do
+      subject_class_ || fail
+    end
 
     context "a client with one action with no option parser" do
 
       it "make" do
-
         client_class_
       end
 

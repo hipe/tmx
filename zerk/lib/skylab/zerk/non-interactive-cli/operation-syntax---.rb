@@ -338,7 +338,7 @@ module Skylab::Zerk
           unava_p = p[ asc ]
         end
         if unava_p
-          self._WAHOO_this_will_be_fun_for_open  # #open [#022]
+          self._WAHOO_this_will_be_fun_for_open  # #open [#022.A]
         else
           ACHIEVED_
         end

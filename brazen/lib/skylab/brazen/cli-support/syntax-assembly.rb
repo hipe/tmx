@@ -303,7 +303,7 @@ module Skylab::Brazen
         opt: :zero_or_one,
         req: :one,
         rest: :one_or_more,
-        # ([#105]storypoint-2 explains why no `block`)
+        # ([#ze-022.2]storypoint-2 explains why no `block`)
         req_group: :syntactic_group,
       }.method :fetch
 

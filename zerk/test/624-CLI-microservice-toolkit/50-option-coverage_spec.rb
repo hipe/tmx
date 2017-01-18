@@ -1,13 +1,13 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI - iso. - o.p coverage" do
+  describe "[ze] CLI microservice toolkit - o.p coverage" do
 
     # (this is now somewhat of a stub)
 
     TS_[ self ]
-    use :CLI_isomorphic_methods_client
+    use :CLI_microservice_toolkit
 
     context "no o.p" do
 

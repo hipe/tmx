@@ -1,6 +1,16 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  class CLI::Isomorphic_Methods_Client < CLI
+  module CLI::MicroserviceToolkit
+
+    Autoloader_[ self ]
+    lazily :IsomorphicMethodsClient do
+      Egads___[]
+    end
+
+    Egads___ = -> do
+      Require_brazen_[]
+      class IsomorphicMethodsClient < Brazen_::CLI
+#====BEGIN
 
     # ~ definition phase
 
@@ -20,7 +30,7 @@ module Skylab::Brazen
         NIL_
       end
 
-      def method_added m
+      def __method_added m
 
         cls = _current_editable_action_class
         if cls
@@ -185,7 +195,7 @@ module Skylab::Brazen
       end
     end
 
-    class Action_Adapter__ < CLI::Action_Adapter_
+    class Action_Adapter__ < Brazen_::CLI::Action_Adapter_
 
       def initialize defined_entry, bound_kernel
 
@@ -202,7 +212,7 @@ module Skylab::Brazen
 
       def __infer_formal_properties
 
-        o = Here_::Models_::Isomorphic_Method_Parameters.new
+        o = Home_::Magnetics::FormalParameters_via_MethodParameters.new
 
         o.method = @_custom_kernel._user_utility.method( @_nf.as_variegated_symbol )
 
@@ -241,17 +251,17 @@ module Skylab::Brazen
           @_nf.as_variegated_symbol
         ).parameters
 
-        @_stx = Here_::Models_::Isomorphic_Method_Parameters.new _ruby_params
+        @_stx = Home_::Magnetics::FormalParameters_via_MethodParameters.new _ruby_params
 
         _opt_a = [
-          Home_::CLI_Support.standard_action_property_box_.fetch( :help ) ]
+          Brazen_::CLI_Support.standard_action_property_box_.fetch( :help ) ]
 
         if @_stx.argument_term_count.nonzero?
           _arg_a = @_stx.to_a
         end
 
         @categorized_properties =
-          Home_::CLI_Support::Categorized_Properties.via_args_opts_envs(
+          Brazen_::CLI_Support::Categorized_Properties.via_args_opts_envs(
             _arg_a, NIL_, _opt_a )
 
         NIL_
@@ -298,7 +308,7 @@ module Skylab::Brazen
         # unlike parent which checks for the existence of any property
         # called 'help', we always support this action-like option.
 
-        _ho = Home_::CLI_Support.standard_action_property_box_.fetch :help
+        _ho = Brazen_::CLI_Support.standard_action_property_box_.fetch :help
         y << auxiliary_syntax_string_for_help_option_( _ho )
       end
 
@@ -312,12 +322,12 @@ module Skylab::Brazen
 
           o.on__missing__ do |miss_ev|
 
-            When_[]::Missing_Arguments_Fancy.new miss_ev, expression_
+            Brazen_::CLI::When_[]::Missing_Arguments_Fancy.new miss_ev, expression_
           end
 
           o.on__extra__ do |xtra_ev|
 
-            When_[]::Extra_Arguments.new xtra_ev.x, expression_
+            Brazen_::CLI::When_[]::Extra_Arguments.new xtra_ev.x, expression_
           end
 
           o.on__success__ do
@@ -373,14 +383,22 @@ module Skylab::Brazen
       end
     end ; end
 
-    # ==
+    class << self
+      alias_method :method_added, :__method_added
+      undef_method :__method_added
+    end
 
     # ==
 
-    CLI_ = CLI
+    # ==
+
+      end
+
+      NIL
+    end  # egads
+#===
     Here_ = self
-    Autoloader_[ Models_ = ::Module.new ]
-    When_ = CLI::When_
   end
 end
+# #history: moved to [ze] from [br]
 # #tombstone-A: model node used to be in remote node

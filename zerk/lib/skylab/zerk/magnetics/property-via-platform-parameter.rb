@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  class Magnetics::Property_via_PlatformParameter  # 1x here. tiny intro at #[022.4.A]
 
-    class Property_via_Platform_Parameter  # tiny intro at [#105]A
+    # -
 
       def initialize opt_req_rest_sym, name_symbol
 
@@ -69,8 +69,7 @@ module Skylab::Brazen
 
         :reqity_symbol_,  # internally convenient to preserve this
       )
-    end
+    # -
   end
 end
-
 # #tombstone: variegated_human_symbol_via_variable_name_symbol (absorbed here)

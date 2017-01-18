@@ -131,7 +131,10 @@
              :[#here.2]: styling diaspora
              :[#here.1]: styling
 
-[#022]       #track what was lost when we stopped doing summary info (here)
+[#022]       [ microservices ]
+             :[#here.3]: isomorphic method arguments
+             :[#here.2]: isomorphic methods client -
+       #open :[#here.A]: #track whast was lost when we stopped doing summary info
              ( #was: duplicate of [#021] )
 
 [#021] #open #high-value

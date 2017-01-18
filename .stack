@@ -22,5 +22,3 @@ use [sa] to convert etc to Stream_
 -3.149 restore [cs] in new way
 -3.155 bring back each test but in new way
 -3.161 begin to splice into it the same kind of event handler of tmx
--3.166 wip all of [cs] and tests for it
--3.172 re-seat isomorphic methods client as CLI microservice toolkit

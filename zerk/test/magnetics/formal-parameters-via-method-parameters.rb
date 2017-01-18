@@ -1,22 +1,21 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  module CLI::Isomorphic_Methods_Client::Models::Isomorphic_Method_Parameters
+  module Magnetics::Formal_Parameters_Via_Method_Parameters
 
     def self.[] tcc
-      tcc.extend ModuleMethods
-      tcc.include InstanceMethods
+      tcc.send :define_singleton_method, :with, DEF_for_the_method_called_with___
+      tcc.include InstanceMethods___
     end
     # <-
 
-  module ModuleMethods
-
-    def with p
+  # -
+    DEF_for_the_method_called_with___ = -> p do
       parameters = p.parameters
       define_method :ruby_para_a do parameters end
     end
-  end
+  # -
 
-  module InstanceMethods
+  module InstanceMethods___
 
     def with * actual_i_a
       @actual_i_a = actual_i_a ; nil
@@ -53,8 +52,7 @@ module Skylab::Brazen::TestSupport
 
       @m = @x = nil  # miss / xtra
 
-      _stx = Home_::CLI::Isomorphic_Methods_Client::Models_::
-        Isomorphic_Method_Parameters.new ruby_para_a
+      _stx = subject_module_.new ruby_para_a
 
       _stx.validate_against_args @actual_i_a do |o|
 
@@ -69,6 +67,10 @@ module Skylab::Brazen::TestSupport
         end
       end
       NIL_
+    end
+
+    def subject_module_
+      Home_::Magnetics::FormalParameters_via_MethodParameters
     end
   end
 # ->

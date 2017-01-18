@@ -68,6 +68,11 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
+  Attributes_actor_ = -> cls, * a do
+    Require_fields_lib_[]
+    Field_::Attributes::Actor.via cls, a
+  end
+
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p  # on stack to move up
   end
@@ -91,6 +96,10 @@ module Skylab::Zerk  # intro in [#001] README
   end
 
   # == requirers
+
+  Require_brazen_ = Lazy_.call do
+    Brazen_ = Home_.lib_.brazen ; nil
+  end
 
   No_deps_zerk_ = Lazy_.call do
     require 'no-dependencies-zerk'

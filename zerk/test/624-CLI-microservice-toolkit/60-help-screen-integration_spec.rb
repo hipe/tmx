@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI - iso. - help screen integration" do
+  describe "[ze] CLI microservice toolkit - help screen integration" do
 
     TS_[ self ]
-    use :CLI_isomorphic_methods_client
+    use :CLI_microservice_toolkit
 
     context "basic help screen" do
 

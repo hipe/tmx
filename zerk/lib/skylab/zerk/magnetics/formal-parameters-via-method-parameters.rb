@@ -1,10 +1,8 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  class CLI::Isomorphic_Methods_Client
+  class Magnetics::FormalParameters_via_MethodParameters < ::Class.new  # see [#022.4]
 
-    class Models_::Isomorphic_Method_Parameters < ::Class.new  # see [#105]
-
-      # (this is similar to but more specialized than [#057])
+      # (this is similar to but more specialized than [#br-057])
 
       Models_ = ::Module.new
 
@@ -97,7 +95,7 @@ module Skylab::Brazen
 
         a = []
 
-        _cls = Home_::CLI_Support::Property_via_Platform_Parameter
+        _cls = Home_::Magnetics::Property_via_PlatformParameter
 
         ruby_param_a.each do | typ, sym |
 
@@ -331,6 +329,5 @@ module Skylab::Brazen
           @formal_argument.name
         end
       end
-    end
   end
 end

@@ -4,7 +4,7 @@ module Skylab::Zerk
 
     class ExpressResult < Common_::Dyadic
 
-      # #tracked-by [#022]: we no longer display the count of items when stream..
+      # #tracked-by [#022.A]: we no longer display the count of items when stream..
 
       # implement (near) [#025] - a modality-specific result interpretation:
 

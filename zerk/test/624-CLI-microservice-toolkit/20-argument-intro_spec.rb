@@ -1,11 +1,11 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI - iso. - argument intro" do
+  describe "[ze] CLI microservice toolkit - argument intro" do
 
     TS_[ self ]
-    use :CLI_isomorphic_methods_client
+    use :CLI_microservice_toolkit
 
     invoke_appropriate_action
 
@@ -175,7 +175,7 @@ module Skylab::Brazen::TestSupport
         st = stream_for_expect_stdout_stderr
         _line_o = st.gets_one
 
-        _omg = Zerk_lib_[]::CLI::Styling::Parse_styles[ _line_o.string ]
+        _omg = Home_::CLI::Styling::Parse_styles[ _line_o.string ]
 
         _omg.should eql(
 

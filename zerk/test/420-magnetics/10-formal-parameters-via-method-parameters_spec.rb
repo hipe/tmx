@@ -1,11 +1,15 @@
-require_relative '../../../../test-support'
+require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI - iso. - arg coverage" do
+  describe "[ze] microservice toolkit - ismor.." do
 
     TS_[ self ]
-    use :CLI_isomorphic_methods_client_models_isomorphic_method_parameters
+    use :magnetics_formal_parameters_via_method_parameters
+
+    it "loads" do
+      subject_module_ || fail
+    end
 
     context "the zero syntax ()" do
       with -> { }
@@ -100,3 +104,4 @@ module Skylab::Brazen::TestSupport
     end
   end
 end
+# #history: moved from [br] to [ze]
