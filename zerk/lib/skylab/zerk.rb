@@ -87,6 +87,11 @@ module Skylab::Zerk  # intro in [#001] README
     Here_ = self
   end
 
+  lazily :MicroserviceToolkit do
+    # (currently the one is aliased to the other)
+    Home_::API
+  end
+
   lazily :MagneticBySimpleModel do
     No_deps_zerk_[]::MagneticBySimpleModel
   end
@@ -105,6 +110,7 @@ module Skylab::Zerk  # intro in [#001] README
     require 'no-dependencies-zerk'
     ::NoDependenciesZerk
   end
+  No_deps = No_deps_zerk_  # [pl]
 
   Require_ACS_ = Lazy_.call do
     ACS_ = Home_.lib_.ACS

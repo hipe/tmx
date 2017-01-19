@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Regex_vs_string_math__
+  module Benchmarks::Benchmark_07  # regexp vs string match
 
     TIMES__ = 1_000_000  # fast enough to see. increase recommended
 

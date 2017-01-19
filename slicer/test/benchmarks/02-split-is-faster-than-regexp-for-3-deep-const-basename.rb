@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Split_vs_rx_
+  module Benchmarks::Benchmark_02  # split vs regexp for parsing const basename
 
     # <- 2
 

@@ -5,7 +5,7 @@ module Skylab::Zerk
     # about the asymmetry of where this stored vs the other [#051]'s:
     #
     # unlike the other #[#051] operator branches, we are putting this
-    # one here because despite it's name, really it's more of an adapter
+    # one here because despite its name, really it's more of an adapter
     # for mounted one-offs (for now (but it would be nice if it could be
     # generalized in-place to work for any directories we wanted it to)).
     #

@@ -2,32 +2,26 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_via_AutoloaderizedModule  # :[#051.C].
+    class OperatorBranch_via_AutoloaderizedModule < Common_::SimpleModel  # :[#051.C].
 
       # the adaptation of #[#051] for autoloaderized modules.
       #
       # this was derived by heavily reafactoring two real-world but oblique
       # use-cases that can be found in our first #history entry below.
       #
+      # now this is being used to drive the rewrite of [ts] quickie plugins..
+      #
       # see also
       #   - [#051.B] "via module" for boxxy-like unobtrusiveness
       #   - [#051.G] for directories thru filesystem directly; no autoloading
 
-      class << self
-        alias_method :define, :new
-        undef_method :new
-      end  # >>
-
       # -
 
-        def initialize mod
-
-          @item_class = LoadTicketIsh___
-          @module = mod
+        def initialize
 
           @_custom_emitter = nil
-
           yield self
+          @item_class ||= LoadTicketIsh___
 
           ce = remove_instance_variable :@_custom_emitter
           if ce
@@ -56,9 +50,10 @@ module Skylab::Zerk
           end
         end
 
-        def item_class cls
-          @item_class = cls ; nil
-        end
+        attr_writer(
+          :item_class,
+          :module,
+        )
 
         # -- read
 

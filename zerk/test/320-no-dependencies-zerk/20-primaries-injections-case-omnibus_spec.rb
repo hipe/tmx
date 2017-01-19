@@ -248,11 +248,13 @@ module Skylab::Zerk::TestSupport
         end
 
         def __verpose_limit_is_reached
-          # (the semantics are a little broken here..)
-          lu = remove_instance_variable :@_lookup
-          inj = @omni.primary_injectors.fetch lu.injector_offset
-          inj.object_id == object_id || fail
-          _ok = inj.send lu.injector_method_name
+
+          # this is :#nodeps-Coverpoint-1-1, relied upon (& copy-pasted) by [tmx]
+
+          found = remove_instance_variable :@_lookup
+          injr = @omni.injector_via_primary_found found
+          injr.object_id == object_id || fail
+          _ok = injr.send found.trueish_mixed_user_value
           ! _ok
         end
 

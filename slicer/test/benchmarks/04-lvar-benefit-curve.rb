@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Lvar_Bennies
+  module Benchmarks::Benchmark_04  # what is the cost of using a local variable vs not?
 
     TIMES = 1_000_000  # this number has been made low enough so that we can
     # see the benchmark working "immediately". for more rigorous results you

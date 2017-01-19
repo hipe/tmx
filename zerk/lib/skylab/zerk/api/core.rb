@@ -34,6 +34,17 @@ module Skylab::Zerk
       end
     end  # >>
 
+    # -
+
+    Autoloader_[ self ]
+
+    lazily :ParseArguments_via_FeaturesInjections do
+      # a convenience alias so the remote doesn't have to know where it is
+      No_deps_zerk_[]::ParseArguments_via_FeaturesInjections
+    end
+
+    # -
+
     Here_ = self
   end
 end

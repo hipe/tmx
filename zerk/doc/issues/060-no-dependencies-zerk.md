@@ -23,5 +23,72 @@ see [#053] discussion of feature injection
 
 
 
+## why "THREEPLES"?? :[#here.A]
+
+thee following five decisionpoints went into arriving at the
+THREEPLES in the exact way that it is.
+
+this construct must *not* leave this file!! it is SHOUTCASE for
+this reason, as a reminder of all the information that is here,
+too particular to self-document:
+
+the governing interactive idiom of { primary | operator }
+branches (a simplicity we should always aspire to) is that of
+interacting with a simple hash with primary/operator normal
+symbols as keys and e.g method names (but it could be anything) as
+values. as such we must *never* dereference the "user value" in
+any way - all we can know about it is it is trueish, and we must
+get that value back to the user on a successful lookup. but hold
+on to that thought.
+
+this "mental story" of how we resolve features will hold relevance
+to us regardless of whether hashes are the actual substrate of
+our branches.
+
+because it's more convenient and elegant to work in terms of flat
+streams (or scanners in our case) rather than loops inside loops
+(or "multidimensional streams", i.e. streams of streams), whenever
+we externalize our collection of features as a "flat" stream we've
+got to represent a reference back to which of (nonzero positive)
+N "injections" there are in the "omni".
+
+this value (which will be an offset) should be superficially
+meaningless to the user, except to know that it can be used to
+dereference the injection (and then injector). the first value of
+a TWO TUPLE is this offset (1).
+
+the decision was made to keep the "found" structure "light" so to
+represent the injector we result in the offset of the injection,
+rather than placing a handle on "the whole object" in the result
+structure (but this could change) (2). for no other reason, doing
+it this way keeps inspection dumps of the found structure light and
+pretty, at the cost of requiring the user to take one more trip tox
+the "omni" to dereference components from the found structure as
+necessary.
+
+since we implement fuzzy lookups (variously per modality), the user
+will need to know what the normal symbol is of the feature that was
+resolved. (that is, there is no guarantee that it is the same as the
+"normal symbol" that the user sent in.)
+
+this normal symbol is placed as the second component of our tuple
+(3). the user does not (and should not) know whether or not fuzzy
+matching was engaged to resolve the feature, so this normal symbol
+must be in the found structure whether or not fuzzy matching was
+employed.  this normal symbol must be in the found structure even
+if fuzzy matching is not available in the modality.
+
+the "user value" (mentioned at the opening of this section, totally
+meaningless to us) will be included as the third component in this
+structure (4), even though it can (by definition) be derived from
+the first two components that are in this structure. (we'll pretend
+the cost of lookup by the substrate is expensive).
+
+finally, for OCD we use arrays and not structs internally because
+benchmark #15 (in [sli]) shows that this is almost 2x faster (5).
+
+
+
+
 ## tombstones
   - #tombstone-A: full rewrite of legacy [fa] content

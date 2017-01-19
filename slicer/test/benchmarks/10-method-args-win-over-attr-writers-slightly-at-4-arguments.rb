@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Benchmark_10
+  module Benchmarks::Benchmark_10  # method args vs attr writers
 
     class The_Tests__
 

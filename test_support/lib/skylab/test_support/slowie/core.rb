@@ -305,10 +305,9 @@ module Skylab::TestSupport
         defn.add :ping, MethodBasedRouting___.new( :__invoke_ping, :__describe_ping )
       end
 
-      _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define(
-        Here_::Operations
-      ) do |o|
-        o.item_class ModuleBasedRouting___
+      _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define do |o|
+        o.module = Here_::Operations
+        o.item_class = ModuleBasedRouting___
       end
 
       @_operator_branch = lib::OperatorBranch_via_MultipleEntities.define do |o|

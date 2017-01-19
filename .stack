@@ -11,14 +11,13 @@ use [sa] to convert etc to Stream_
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
+-3.102 de-dup fuzzy lookup in [#ze-060] no dependencies
 -3.103 help screen for quickie
 -3.109 request parsing must reconcile the state machine (probably a new branch)
--3.114 plugins are somehow baseless and autonomous but also poka-yoke near DSL
--3.120 plugin discovery only happens if there's primaries to parse
 -3.125 tree runner can be invoked by a CLI or API scanner
--3.132 tree runner is built with an argument scanner and a filesystem
--3.138 rename sessions-/execute to plugins/execute-tests
--3.143 rename front to tree runner
--3.149 restore [cs] in new way
--3.155 bring back each test but in new way
--3.161 begin to splice into it the same kind of event handler of tmx
+-3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
+-3.150 consider mergin that new file in [pl]
+-3.154 begin plugin rewrite
+-3.159 removes
+-3.164 renames
+-3.168 incremental changes to [ze]

@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Bitfield_vs_tuple_
+  module Benchmarks::Benchmark_05  # tuple vs bitfield
 
     TIMES = 1_000_000
 

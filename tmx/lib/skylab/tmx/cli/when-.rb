@@ -255,11 +255,13 @@ module Skylab::TMX
       end
 
       def __verbose_limit_is_reached
-        # (the semantics are a little broken here..)
-        lu = remove_instance_variable :@_lookup
-        inj = @omni.primary_injectors.fetch lu.injector_offset
-        inj.object_id == @CLI.object_id || fail  # it's OK if it's not
-        _ok = inj.send lu.injector_method_name
+
+        # this is a copy-paste of bespoke test case: [ze] #nodeps-Coverpoint-1-1
+
+        found = remove_instance_variable :@_lookup
+        injr = @omni.injector_via_primary_found found
+        injr.object_id == @CLI.object_id || fail
+        _ok = injr.send found.trueish_mixed_user_value
         ! _ok
       end
 

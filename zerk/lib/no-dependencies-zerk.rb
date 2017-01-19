@@ -281,13 +281,14 @@ module NoDependenciesZerk
 
       # --
 
-      def _all_fuzzily_matching_primary_symbols_against_symbol_enumerator_ enum
+      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_  scn  # #here-1
         # assume: a `current_primary_symbol` with no exact match
         rx = /\A#{ ::Regexp.escape current_primary_symbol.id2name }/
         a = []
-        enum.each do |k|
-          rx =~ k or next
-          a.push k
+        until scn.no_unparsed_exists
+          twople = scn.gets_one
+          rx =~ twople.last.intern or next
+          a.push twople
         end
         a
       end
@@ -470,7 +471,7 @@ module NoDependenciesZerk
         @__current_primary_value = sym ; nil
       end
 
-      def _all_fuzzily_matching_primary_symbols_against_symbol_enumerator_ _
+      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_
         # assume: a `current_primary_symbol` with no exact match
         LENGTH_ZERO___
       end
@@ -611,15 +612,27 @@ module NoDependenciesZerk
       )
 
       def add_hash_based_operators_injection h, injector
-        _add_operators_injection HashBasedOperatorsInjection___.new( h, injector )
+        _add_operators_injection HashBasedFeaturesInjection__.new( h, injector )
+      end
+
+      def add_primaries_injection h, injector  # (is the counterpart to above)
+        _add_primaries_injection HashBasedFeaturesInjection__.new( h, injector )
       end
 
       def add_lazy_operators_injection_by & p
         _add_operators_injection LazyOperatorsInjectionTicket___.new p
       end
 
+      def add_lazy_primaries_injection_by & p
+        _add_primaries_injection LazyPrimariesInjectionTicket___.new p
+      end
+
       def _add_operators_injection ada
         send @_add_operators_injection, ada
+      end
+
+      def _add_primaries_injection ada
+        send @_add_primaries_injection, ada
       end
 
       def __add_first_operators_injection ada
@@ -629,29 +642,21 @@ module NoDependenciesZerk
         send @_add_operators_injection, ada
       end
 
+      def __add_first_primaries_injection ada
+        @has_primaries = true
+        @_offset_of_last_primary_injection = -1
+        @_primaries_injections = []
+        @_add_primaries_injection = :__add_primaries_injection_normally
+        send @_add_primaries_injection, ada
+      end
+
       def __add_operators_injection_normally ada
         @_operators_injections.push ada ; nil
       end
 
-      def add_primaries_injection h, injector
-        send @_add_primaries_injection, h, injector
-      end
-
-      def __add_first_primaries_injection h, injector
-        @has_primaries = true
-        @_primaries = {}
-        @primary_injectors = []
-        @_add_primaries_injection = :__add_primaries_injection_normally
-        send @_add_primaries_injection, h, injector
-      end
-
-      def __add_primaries_injection_normally h, injector
-        index_h = @_primaries
-        inj_d = @primary_injectors.length
-        h.each_pair do |k, m|
-          index_h[ k ] = [ inj_d, m ]  # meh for now just overwrite
-        end
-        @primary_injectors[ inj_d ] = injector ; nil
+      def __add_primaries_injection_normally ada
+        @_offset_of_last_primary_injection += 1
+        @_primaries_injections.push ada ; nil
       end
 
       # -- NOTE the below might break out
@@ -777,10 +782,10 @@ module NoDependenciesZerk
             __whine_about_primary_not_found
             break
           end
-          ok_ = @primary_injectors.fetch( o.injector_offset ).
-            send o.injector_method_name
-          if ! ok_
-            ok = ok_ ; break
+          _injn = @_primaries_injections.fetch( o._inj_d_ ).injection
+          parsed_OK = _injn._parse_found_feature_ o  # EXPERIMENT
+          if ! parsed_OK
+            ok = parsed_OK ; break
           end
           if @argument_scanner.no_unparsed_exists
             ok = true
@@ -793,7 +798,7 @@ module NoDependenciesZerk
 
       # some of the below for #nodeps-coverpoint-3
 
-      def lookup_current_primary_symbol_semi_softly
+      def lookup_current_primary_symbol_semi_softly  # #here-1
 
         # assume grammar has primaries and one primary is parsed and on deck
         # result is always of a tuple strain:
@@ -803,30 +808,32 @@ module NoDependenciesZerk
         #   otherwise
         #     `was_found` t/f
         #     if found,
-        #       injector_method_name`, `primary_symbol`, `injector_offset`
+        #       `trueish_mixed_user_value`, `primary_symbol`
 
         k = @argument_scanner.current_primary_symbol
-        tuple = @_primaries[ k ]
+        tuple = __THREEPLE_via_lookup_primary_softly_via_symbol k
         if tuple
-          PrimaryFound__.new tuple.fetch(1), k, tuple.fetch(0)
+          _primary_found_via_THREEPLE tuple
         else
           __when_primary_not_found_by_exact_match
         end
       end
 
-      def __when_primary_not_found_by_exact_match
+      def __when_primary_not_found_by_exact_match  # #here-1
         a = @argument_scanner.
-          _all_fuzzily_matching_primary_symbols_against_symbol_enumerator_(
-            @_primaries.keys )
+          _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_(
+            __to_primary_TWOPLE_scanner )
         case 1 <=> a.length
         when 0  # when exactly one found
-          k = a.fetch 0
-          tuple = @_primaries.fetch k
-          PrimaryFound__.new tuple.fetch(1), k, tuple.fetch(0)
+          inj_offset, load_ticket = a.fetch 0
+          _x = @_primaries_injections.fetch( inj_offset ).
+            injection.dereference load_ticket
+          _three = [ inj_offset, load_ticket.intern, _x ]
+          _primary_found_via_THREEPLE _three
         when 1  # when none found
           NOT_FOUND___
         when -1  # when ambiguous
-          _scn = Scanner_via_Array.new a
+          _scn = Scanner_via_Array.new( a ).map_by() { |two| two.last.intern }
           Ambiguous__[ _scn, :_primary_, @argument_scanner ]
           UNRECOVERABLE___
         end
@@ -837,31 +844,90 @@ module NoDependenciesZerk
         def had_unrecoverable_error_which_was_expressed ; false end
       end ; end
 
-      PrimaryFound__ = ::Struct.new(
-        :injector_method_name, :primary_symbol, :injector_offset
-      ) do
-        def was_found ; true end
-        def had_unrecoverable_error_which_was_expressed ; false end
-      end
-
       module UNRECOVERABLE___ ; class << self
         def had_unrecoverable_error_which_was_expressed ; true end
       end end
 
+      def _primary_found_via_THREEPLE three  # #here-1
+        # convert our nasty internal tuple to something external-friendly
+        PrimaryFound___.new( * three )
+      end
+
+      def injector_via_primary_found found  # see [#060.A.2]
+        @_primaries_injections.fetch( found._inj_d_ ).injection.injector
+      end
+
+      class PrimaryFound___
+        def initialize d, k, x
+          @_inj_d_ = d ; @trueish_mixed_user_value = x ; @primary_symbol = k
+        end
+        attr_reader :_inj_d_, :trueish_mixed_user_value, :primary_symbol
+        def was_found ; true end
+        def had_unrecoverable_error_which_was_expressed ; false end
+      end
+
       def __whine_about_primary_not_found
-        _avail_prim_scn = Scanner_via_Array.new @_primaries.keys
+        _avail_prim_scn = to_primary_symbol_scanner
         When_primary_not_found___[ _avail_prim_scn, @argument_scanner ]
       end
 
-      def to_primary_symbol_scanner  # assume
-        Scanner_via_Array[ @_primaries.keys ]
+      # -- read primaries
+
+      # :#here-1: [#here.A] full justification of the "THREEPLE"
+
+      def __THREEPLE_via_lookup_primary_softly_via_symbol k
+
+        scn = _to_primaries_injections_offset_scanner
+        until scn.no_unparsed_exists
+          offset = scn.gets_one
+          _inj = @_primaries_injections.fetch( offset ).injection
+          user_x = _inj.lookup_softly k
+          if user_x
+            x = [ offset, k, user_x ]
+            break
+          end
+        end
+        x
       end
+
+      def to_primary_symbol_scanner  # assume
+        _to_primaries_injections_offset_scanner.expand_by do |d|
+          @_primaries_injections.fetch( d ).injection.to_load_ticket_scanner
+        end
+      end
+
+      def __to_primary_TWOPLE_scanner
+
+        _to_primaries_injections_offset_scanner.expand_by do |d|
+
+          _inj = @_primaries_injections.fetch( d ).injection
+
+          _inj.to_load_ticket_scanner.map_by do |load_ticket|
+
+            [ d, load_ticket.intern ]  # :#here-1
+          end
+        end
+      end
+
+      def _to_primaries_injections_offset_scanner
+
+        # give priority to those primaries injected most recently, so that
+        # this still behaves the way it did when we indexed every primary
+        # into a single hash.
+        countdown = @_offset_of_last_primary_injection + 1
+        Scanner_by.new do
+          if countdown.nonzero?
+            countdown -= 1
+          end
+        end
+      end
+
+      # --
 
       attr_reader(
         :argument_scanner,
         :has_operators,
         :has_primaries,
-        :primary_injectors,
       )
     end
 
@@ -956,7 +1022,18 @@ module NoDependenciesZerk
 
     # --
 
-    class LazyOperatorsInjectionTicket___
+    LazyFeaturesInjectionTicket__ = ::Class.new
+    class LazyOperatorsInjectionTicket___ < LazyFeaturesInjectionTicket__
+      def _realization_class_
+        LazyOperatorsInjectionRealized___
+      end
+    end
+    class LazyPrimariesInjectionTicket___ < LazyFeaturesInjectionTicket__
+      def _realization_class_
+        LazyPrimariesInjectionRealized___
+      end
+    end
+    class LazyFeaturesInjectionTicket__
       def initialize p
         @_injection = :__injection_initially
         @__proc = p
@@ -966,7 +1043,7 @@ module NoDependenciesZerk
       end
       def __injection_initially
         _p = remove_instance_variable :@__proc
-        @__injection = LazyOperatorsInjectionRealized___.define( & _p )
+        @__injection = _realization_class_.define( & _p )
         @_injection = :__injection_normally
         freeze
         send @_injection
@@ -975,24 +1052,43 @@ module NoDependenciesZerk
         @__injection
       end
     end
-    class LazyOperatorsInjectionRealized___ < SimpleModel
-      attr_writer :operators
+    LazyFeaturesInjectionRealized__ = ::Class.new SimpleModel
+    class LazyOperatorsInjectionRealized___ < LazyFeaturesInjectionRealized__
+      def operators= fz
+        @_substrate_adapter_ = fz
+      end
+    end
+    class LazyPrimariesInjectionRealized___ < LazyFeaturesInjectionRealized__
+      def primaries= fz
+        @_substrate_adapter_ = fz
+      end
+    end
+    class LazyFeaturesInjectionRealized__
+      attr_writer :parse_by
       attr_accessor :injector
+
+      def _parse_found_feature_ o
+        @parse_by[ o ]
+      end
+
       def lookup_softly k
-        @operators.lookup_softly k
+        @_substrate_adapter_.lookup_softly k
       end
       def to_load_ticket_scanner
-        Scanner_by.new( & @operators.to_load_ticket_stream )
+        Scanner_by.new( & @_substrate_adapter_.to_load_ticket_stream )
       end
       def dereference k
-        @operators.dereference k
+        @_substrate_adapter_.dereference k
       end
     end
 
-    class HashBasedOperatorsInjection___
+    class HashBasedFeaturesInjection__
       def initialize h, inj
         @_hash = h
         @injector = inj
+      end
+      def _parse_found_feature_ o  # experiment
+        @injector.send o.trueish_mixed_user_value
       end
       def injection
         self

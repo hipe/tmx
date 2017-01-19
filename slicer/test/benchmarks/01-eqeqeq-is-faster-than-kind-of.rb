@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Eq_Eq_Eq_Vs_Kind_Of_
+  module Benchmarks::Benchmark_01  # `===` vs `kind_of`
 
     # <-2
 

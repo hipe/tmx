@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Bitfield_vs_tuple_
+  module Benchmarks::Benchmark_06  # const vs lvar
 
     TIMES__ = 30_000_000
 

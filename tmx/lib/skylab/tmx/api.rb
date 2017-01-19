@@ -56,9 +56,9 @@ module Skylab::TMX
 
       Operations_module_operator_branch___ = Lazy_.call do
 
-        Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define(
-          Home_::Operations_
-        ) do |defn|
+        Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.define do |defn|
+
+          defn.module = Home_::Operations_
 
           defn.express_unknown_by do |o|
             o.express_unknown_item_smart_prefixed "unknown operation"

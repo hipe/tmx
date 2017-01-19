@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Fourteen_XXX
+  module Benchmarks::Benchmark_14  # dirname( basename( x )) vs regexp
 
     TIMES___ = 250_000
 

@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Struct_Members_Vs_Ivars_Etc_
+  module Benchmarks::Benchmark_03  # ivars vs getters vs struct `[]`
 
     # <-
 

@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module Skylab::Slicer::TestSupport
 
-  module Benchmarks::Scan_vs_each__
+  module Benchmarks::Benchmark_08  # map-reduce with stream vs. each
 
     # an ad-hoc map-reduce operation is implemented variously with a
     # scanner-like implementation and an enumerator-like implementation,

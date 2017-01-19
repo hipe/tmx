@@ -52,5 +52,6 @@ module Skylab::Slicer::TestSupport
 
   Brazen_ = Home_::Brazen_
   NIL_ = nil
+  NOTHING_ = nil
   TS_ = self
 end
