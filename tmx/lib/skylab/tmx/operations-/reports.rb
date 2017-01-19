@@ -160,7 +160,7 @@ module Skylab::TMX
 
         lt = remove_instance_variable :@__report_load_ticket
 
-        _nm = Common_::Name.via_slug lt.state_machine.entry_group_head
+        _nm = Common_::Name.via_slug lt.asset_ticket.entry_group_head
 
         _const = _nm.as_camelcase_const_string
 

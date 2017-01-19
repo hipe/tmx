@@ -21,7 +21,7 @@ module Skylab::Plugin::TestSupport
 
     it "get the stream once, get one item, don't complete the stream" do
       _o = _build_this_one
-      st = _o.to_load_ticket_stream
+      st = _o.to_asset_ticket_stream
       _lt = st.gets
       _lt.normal_symbol == :foo || fail
     end
@@ -29,11 +29,11 @@ module Skylab::Plugin::TestSupport
     it "repeat exactly the above, but get the stream again and get 3 items" do
 
       o = _build_this_one
-      st = o.to_load_ticket_stream
+      st = o.to_asset_ticket_stream
       _lt = st.gets
       _lt.normal_symbol == :foo || fail
 
-      st = o.to_load_ticket_stream
+      st = o.to_asset_ticket_stream
       _st = st.gets
       _lt.normal_symbol == :foo || fail
 

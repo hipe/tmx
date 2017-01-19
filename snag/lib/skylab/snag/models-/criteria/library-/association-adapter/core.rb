@@ -111,7 +111,7 @@ module Skylab::Snag
 
                   if vmp_  # is pink or is green
 
-                    x = __run_against_state_machine( :after_verb_phrase,
+                    x = _run_against_state_machine( :after_verb_phrase,
                       vmp, sym, vmp_, in_st, g_ctxt, self, & x_p )
 
                   else # is pink «or is foo»
@@ -122,7 +122,7 @@ module Skylab::Snag
 
                   if vmp_  # is pink or green
 
-                    x = __run_against_state_machine( :in_verb_modifier_phrase,
+                    x = _run_against_state_machine( :in_verb_modifier_phrase,
                       vmp, sym, vmp_, in_st, g_ctxt, self, & x_p )
 
                   else  # is pink «or bleats»
@@ -222,7 +222,7 @@ module Skylab::Snag
           @model_identifier = x
         end
 
-        def __run_against_state_machine * a, & x_p
+        def _run_against_state_machine * a, & x_p
 
           Here___::State_Machine__.new( * a, & x_p ).execute
         end

@@ -27,7 +27,7 @@ module Skylab::Plugin
     #
     # and then discover your participating sidesystems like this:
     #
-    #      st = col.to_load_ticket_stream
+    #      st = col.to_asset_ticket_stream
     #      plugin = st.gets
     #      plugin.normal_symbol  # => :some_guy
     #      plugin = st.gets
@@ -47,7 +47,7 @@ module Skylab::Plugin
 
         @_is_finished_caching = false
         @_load_ticket_box = Common_::Box.new
-        @_to_LTS = :__to_load_ticket_stream_initially
+        @_to_LTS = :__to_asset_ticket_stream_initially
 
         yield self
         # can't freeze because caches state modes
@@ -71,7 +71,7 @@ module Skylab::Plugin
         h = @_load_ticket_box.h_
         x = h[ sym ]
         if ! x
-          st = to_load_ticket_stream
+          st = to_asset_ticket_stream
           begin
             x = st.gets
             x.normal_symbol == sym && break
@@ -81,11 +81,11 @@ module Skylab::Plugin
         x
       end
 
-      def to_load_ticket_stream
+      def to_asset_ticket_stream
         send @_to_LTS
       end
 
-      def __to_load_ticket_stream_initially  # assumes at least 1 item
+      def __to_asset_ticket_stream_initially  # assumes at least 1 item
 
         # when there's nothing cached
 
@@ -101,12 +101,12 @@ module Skylab::Plugin
         scn = Common_::Scanner.via_array _big_file_list
 
         @__long_path_scanner = scn
-        @_to_LTS = :__to_load_ticket_stream_midway
+        @_to_LTS = :__to_asset_ticket_stream_midway
 
         _to_this_one_stream
       end
 
-      def __to_load_ticket_stream_midway
+      def __to_asset_ticket_stream_midway
 
         first_st = @_load_ticket_box.to_value_stream
         p = -> do
@@ -131,7 +131,7 @@ module Skylab::Plugin
           lt = LoadTicket_via_Path___.new _long_path
           bx.add lt.normal_symbol, lt
           if scn.no_unparsed_exists
-            @_to_LTS = :__to_load_ticket_stream_finally
+            @_to_LTS = :__to_asset_ticket_stream_finally
             remove_instance_variable :@__long_path_scanner
             @_is_finished_caching = true
             freeze
@@ -145,7 +145,7 @@ module Skylab::Plugin
         end
       end
 
-      def __to_load_ticket_stream_finally
+      def __to_asset_ticket_stream_finally
         @_load_ticket_box.to_value_stream
       end
     end

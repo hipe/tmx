@@ -27,7 +27,7 @@ module Skylab::MyTerm
       def __resolve_load_ticket_via_argument_stream
 
         _adapters_silo = @kernel_.silo :Adapters
-        _stream_method = _adapters_silo.method :to_load_ticket_stream
+        _stream_method = _adapters_silo.method :to_asset_ticket_stream
 
         _x = @_arg_st.head_as_is
 
@@ -40,7 +40,7 @@ module Skylab::MyTerm
         end
 
         o.stream_builder = -> do
-          _adapters_silo.to_load_ticket_stream
+          _adapters_silo.to_asset_ticket_stream
         end
 
         o.set_qualified_knownness_value_and_symbol _x, :adapter_name

@@ -4,6 +4,13 @@ module Skylab::Common
 
     class ConstMissing_
 
+      # central workhorse for general autoloading for user.
+      # also exposures to help implement:
+      #
+      #   - boxxy (:#bo)
+      #   - const reduce (:#cr)
+      #   - stowaway magnetics (:#sm)
+
       def initialize const_x, mod
         @__autoloaderization_node_path_knownness = nil
         @const_defined = nil
@@ -56,7 +63,7 @@ module Skylab::Common
 
           if __the_file_tree_has_an_associated_filesystem_entry_group
 
-            name_value_pair_via_state_machine_
+            name_value_pair_via_asset_ticket_
           else
             _msg = Here_::Say_::No_filesystem_node[ name_, @module ]
             raise Here_::NameError, _msg
@@ -81,16 +88,16 @@ module Skylab::Common
 
         # open [#067] why do we do approximation why not etc
         _slug = name_.as_slug
-        sm = @file_tree.value_state_machine_via_head _slug
-        if sm
-          self.state_machine = sm
+        at = @file_tree.asset_ticket_via_entry_group_head _slug
+        if at
+          self.asset_ticket = at
           ACHIEVED_
         end
       end
 
-      def name_value_pair_via_state_machine_  # #cr
+      def name_value_pair_via_asset_ticket_  # #cr
 
-        if @_state_machine.value_is_known
+        if @_asset_ticket.value_is_known
 
           __when_value_has_already_been_determined
         else
@@ -100,7 +107,7 @@ module Skylab::Common
 
       def __when_value_has_already_been_determined  # is #note-5
 
-        _then = @_state_machine.const_symbol
+        _then = @_asset_ticket.const_symbol
         _message = Here_::Say_::Scheme_change[ @const_symbol, _then, @module ]
         raise Here_::NameError, _message
       end
@@ -126,7 +133,7 @@ module Skylab::Common
           __express_trace_info
         end
 
-        @_state_machine.write_and_produce_pair_ x, @const_symbol
+        @_asset_ticket.write_and_produce_pair_ x, @const_symbol
       end
 
       margin = nil
@@ -135,8 +142,8 @@ module Skylab::Common
         DEBUG_IO_.puts "#{ margin }#{ @module }::#{ @const_string }"
       end
 
-      def state_machine= sm
-        @_state_machine = sm
+      def asset_ticket= at
+        @_asset_ticket = at
       end
 
       def __should_autoloaderize_the_value  # #spot-4 does similar
@@ -145,7 +152,7 @@ module Skylab::Common
         if kn
           kn.value_x  # was decided externally. user's choice
 
-        elsif @_state_machine.entry_group.includes_what_is_probably_a_directory
+        elsif @_asset_ticket.entry_group.includes_what_is_probably_a_directory
 
           if Is_probably_module[ @the_asset_value_ ]
 
@@ -163,7 +170,7 @@ module Skylab::Common
         _child_node_path = if kn
           kn.value_x
         else
-          @_state_machine.get_node_path
+          @_asset_ticket.get_node_path
         end
 
         # #open [#158] why not etc below
@@ -185,16 +192,16 @@ module Skylab::Common
 
       def __has_corefile
 
-        @_child_file_tree = @file_tree.child_file_tree @_state_machine
+        @_child_file_tree = @file_tree.child_file_tree @_asset_ticket
 
-        sm = @_child_file_tree.corefile_state_machine
-        if sm
-          @_core_file_state_machine = sm ; ACHIEVED_
+        at = @_child_file_tree.corefile_asset_ticket_
+        if at
+          @_core_file_asset_ticket = at ; ACHIEVED_
         end
       end
 
       def __has_eponymous_file
-        @_state_machine.entry_group.includes_what_is_probably_a_file
+        @_asset_ticket.entry_group.includes_what_is_probably_a_file
       end
 
       # ~ become loaded via X
@@ -210,13 +217,13 @@ module Skylab::Common
 
       def __become_loaded_when_corefile
 
-        @_load_path = @_core_file_state_machine.get_filesystem_path
+        @_load_path = @_core_file_asset_ticket.get_filesystem_path
         _become_loaded_via_load_path
       end
 
       def __become_loaded_when_eponymous_file
 
-        @_load_path = @_state_machine.get_filesystem_path
+        @_load_path = @_asset_ticket.get_filesystem_path
         _become_loaded_via_load_path
       end
 

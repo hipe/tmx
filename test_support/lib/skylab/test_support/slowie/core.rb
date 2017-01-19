@@ -251,7 +251,7 @@ module Skylab::TestSupport
 
     def to_item_normal_tuple_stream_for_didactics
 
-      @_operator_branch.to_load_ticket_stream.map_by do |key_x|
+      @_operator_branch.to_asset_ticket_stream.map_by do |key_x|
         [ :primary, key_x ]
       end
     end

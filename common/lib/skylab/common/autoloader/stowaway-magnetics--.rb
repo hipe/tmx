@@ -186,10 +186,10 @@ module Skylab::Common
       end
 
       def _init_and_cache_and_autoloaderize_or_if_value_is_known
-        @_state_machine = @frame.state_machine
-        if @_state_machine.value_is_known
+        @_asset_ticket = @frame.asset_ticket
+        if @_asset_ticket.value_is_known
           yield
-          @_the_value = @_state_machine.value_x
+          @_the_value = @_asset_ticket.value_x
         else
           __init_and_cache_and_autoloaderize
         end
@@ -207,7 +207,7 @@ module Skylab::Common
 
         if __should_autoloaderize_the_value
 
-          _path = @_state_machine.get_node_path
+          _path = @_asset_ticket.get_node_path
           Here_[ @_the_value, _path, :autoloaderized_parent_module, @module ]
           NIL
         else
@@ -217,7 +217,7 @@ module Skylab::Common
 
       def __should_autoloaderize_the_value  # a near copy-paste of #spot-4
 
-        if @_state_machine.entry_group.includes_what_is_probably_a_directory
+        if @_asset_ticket.entry_group.includes_what_is_probably_a_directory
 
           if Is_probably_module[ @_the_value ]
 
@@ -227,7 +227,7 @@ module Skylab::Common
       end
 
       def __cache
-        @PAIR = @_state_machine.write_and_produce_pair_ @_the_value, @_const
+        @PAIR = @_asset_ticket.write_and_produce_pair_ @_the_value, @_const
         NIL
       end
 
@@ -286,11 +286,11 @@ module Skylab::Common
 
       def next_frame piece
 
-        sm = state_machine
+        at = asset_ticket
 
-        if sm.entry_group.includes_what_is_probably_a_directory
+        if at.entry_group.includes_what_is_probably_a_directory
 
-          _file_tree_ = @file_tree.child_file_tree sm
+          _file_tree_ = @file_tree.child_file_tree at
 
           NameAndValue_via_PathBased___::FilesystemNodeFrame__.new piece, _file_tree_
         else
@@ -307,16 +307,16 @@ module Skylab::Common
         end
       end
 
-      def state_machine
-        @___sm ||= __state_machine
+      def asset_ticket
+        @___at ||= __asset_ticket
       end
 
-      def __state_machine
-        sm = @file_tree.value_state_machine_via_head @piece_string
-        if ! sm
+      def __asset_ticket
+        at = @file_tree.asset_ticket_via_entry_group_head @piece_string
+        if ! at
           self._COVER_ME_bad_path_tail_piece__no_such_filesystem_node
         end
-        sm
+        at
       end
 
       attr_reader(

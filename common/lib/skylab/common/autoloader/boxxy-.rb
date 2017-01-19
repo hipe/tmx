@@ -151,16 +151,16 @@ module Skylab::Common
 
         def __for_now_we_will_assume_that_the_value_is_not_known_for_this_asset
 
-          sm = @_probable_asset.state_machine
+          at = @_probable_asset.asset_ticket
 
-          if sm.value_is_known
+          if at.value_is_known
             # then an incorrect name was used, but why?
             self._HAVE_FUN_readme
           end
 
           o = @_cm
           o.file_tree = @module.entry_tree
-          o.state_machine = sm
+          o.asset_ticket = at
           NIL
         end
 
@@ -269,22 +269,22 @@ module Skylab::Common
 
           normally = method :__index_probable_asset
 
-          p = -> sm do
-            if CORE_ENTRY_STEM == sm.entry_group_head
+          p = -> at do
+            if CORE_ENTRY_STEM == at.entry_group_head
               # boxxy modules usually don't have a corefile but they might (covered)
               p = normally
               NOTHING_
             else
-              normally[ sm ]
+              normally[ at ]
               NIL
             end
           end
 
-          st = mod.entry_tree.to_state_machine_stream_proc_
+          st = mod.entry_tree.to_asset_ticket_stream_proc_
           begin
-            sm = st.call
-            sm || break
-            p[ sm ]
+            at = st.call
+            at || break
+            p[ at ]
             redo
           end while above
 
@@ -300,8 +300,8 @@ module Skylab::Common
           NIL
         end
 
-        def __index_probable_asset sm
-          pa = ProbableAsset___.new sm
+        def __index_probable_asset at
+          pa = ProbableAsset___.new at
           @_box.add pa.head, pa
           NIL
         end
@@ -332,18 +332,19 @@ module Skylab::Common
 
       class ProbableAsset___
 
-        def initialize sm
+        def initialize at
 
-          head = sm.entry_group.head
-          @name = Name.via_slug head
+          head = at.entry_group.head
+
+          @asset_ticket = at
           @head = head
-          @state_machine = sm
+          @name = Name.via_slug head
         end
 
         attr_reader(
+          :asset_ticket,
           :head,
           :name,
-          :state_machine,
         )
       end
 

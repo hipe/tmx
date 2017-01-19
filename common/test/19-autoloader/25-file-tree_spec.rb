@@ -12,7 +12,7 @@ module Skylab::Common::TestSupport
       _ftc[ _path ]
     end
 
-    this_method = :to_state_machine_stream
+    this_method = :to_asset_ticket_stream
 
     context "essentials, `#{ this_method }`" do
 
@@ -21,7 +21,7 @@ module Skylab::Common::TestSupport
       end
 
       it "`#{ this_method }` produces stream ; produces one item" do
-        _state_machine || fail
+        _asset_ticket || fail
       end
     end
 
@@ -34,20 +34,20 @@ module Skylab::Common::TestSupport
       end
     end
 
-    shared_subject :_state_machine do
+    shared_subject :_asset_ticket do
       st = _top_subject.send this_method
-      _sm = st.gets
-      _sm  # #todo
+      _at = st.gets
+      _at  # #todo
     end
 
     context "state machine" do
 
       it "entry group head" do
-        _state_machine.entry_group_head || fail
+        _asset_ticket.entry_group_head || fail
       end
 
       it "get node path" do
-        _state_machine.get_node_path || fail
+        _asset_ticket.get_node_path || fail
       end
     end
   end

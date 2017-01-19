@@ -4,6 +4,10 @@ module Skylab::Common
 
     class FileTree_
 
+      # (defined as class #here)
+
+      # ==
+
       class Via_module
 
         def initialize mod, treerer
@@ -64,9 +68,9 @@ module Skylab::Common
 
           _ft = @_parent_file_tree
 
-          sm = _ft.value_state_machine_via_head _slug
-          if sm
-            eg = sm.entry_group
+          at = _ft.asset_ticket_via_entry_group_head _slug
+          if at
+            eg = at.entry_group
             if eg.includes_what_is_probably_a_directory
               _make_my_own_tree
             else
@@ -269,7 +273,7 @@ module Skylab::Common
 
       # ==
 
-      FilesystemHit___ = self
+      FilesystemHit___ = self  # :#here
 
       class FilesystemHit___
 
@@ -277,67 +281,67 @@ module Skylab::Common
 
           @_a = a ; @_h = h
           @node_path = s
-          @_value_state_machine_cache = {}
+          @_value_asset_ticket_cache = {}
           @treer = treer
         end
 
         def get_load_file_path_for__ head
 
-          sm = value_state_machine_via_head head
-          if sm
-            get_load_file_path_for_state_machine sm
+          at = asset_ticket_via_entry_group_head head
+          if at
+            get_load_file_path_for_asset_ticket at
           end
         end
 
-        def get_load_file_path_for_state_machine sm  # [pl]
+        def get_load_file_path_for_asset_ticket at  # [pl]
 
-          if sm.entry_group.includes_what_is_probably_a_file
-            sm.get_filesystem_path
+          if at.entry_group.includes_what_is_probably_a_file
+            at.get_filesystem_path
           else
             # (hi.)
-            _ft = child_file_tree sm
-            sm_ = _ft.corefile_state_machine
-            if sm_
-              sm_.get_filesystem_path
+            _ft = child_file_tree at
+            at_ = _ft.corefile_asset_ticket_
+            if at_
+              at_.get_filesystem_path
             end
           end
         end
 
-        def child_file_tree sm  # state machine
+        def child_file_tree at  # state machine
 
-          _child_node_path = ::File.join @node_path, sm.entry_group.head
+          _child_node_path = ::File.join @node_path, at.entry_group.head
 
           @treer[ _child_node_path ]
         end
 
-        def corefile_state_machine
-          value_state_machine_via_head CORE_ENTRY_STEM
+        def corefile_asset_ticket_
+          asset_ticket_via_entry_group_head CORE_ENTRY_STEM
         end
 
-        def to_state_machine_stream
-          _ = to_state_machine_stream_proc_
+        def to_asset_ticket_stream
+          _ = to_asset_ticket_stream_proc_
           _ = Home_.stream( & _ )
         end
 
-        def to_state_machine_stream_proc_
+        def to_asset_ticket_stream_proc_
           d = -1 ; head_a = @_a ; last = head_a.length - 1
           -> do
             if last != d
               d += 1
-              dereference_value_state_machine_via_head head_a.fetch d
+              dereference_asset_ticket_via_entry_group_head head_a.fetch d
             end
           end
         end
 
-        def value_state_machine_via_approximation__ k
+        def asset_ticket_via_approximation_softly__ k
 
-          head = ( @___head_via_approximation ||= __build_fuzzy_cache )[ k ]
+          head = ( @___head_via_approximation ||= __build_approximation_cache )[ k ]
           if head
-            dereference_value_state_machine_via_head head
+            dereference_asset_ticket_via_entry_group_head head
           end
         end
 
-        def __build_fuzzy_cache
+        def __build_approximation_cache
           h = {}
           @_h.keys.each do |s|
             h[ Distill[s] ] = s
@@ -345,27 +349,27 @@ module Skylab::Common
           h
         end
 
-        def value_state_machine_via_head head
+        def asset_ticket_via_entry_group_head head
 
           entry_group = @_h[ head ]
           if entry_group
-            @_value_state_machine_cache.fetch head do
-              _add_and_produce_state_machine entry_group, head
+            @_value_asset_ticket_cache.fetch head do
+              _add_and_produce_asset_ticket entry_group, head
             end
           end
         end
 
-        def dereference_value_state_machine_via_head head
-          @_value_state_machine_cache.fetch head do
-            _add_and_produce_state_machine @_h.fetch( head ), head
+        def dereference_asset_ticket_via_entry_group_head head  # 1x [ze]
+          @_value_asset_ticket_cache.fetch head do
+            _add_and_produce_asset_ticket @_h.fetch( head ), head
           end
         end
 
-        def _add_and_produce_state_machine entry_group, head
+        def _add_and_produce_asset_ticket entry_group, head
 
-          sm = ValueStateMachine___.new entry_group, @node_path
-          @_value_state_machine_cache[ head ] = sm
-          sm
+          at = AssetTicketStateMachine___.new entry_group, @node_path
+          @_value_asset_ticket_cache[ head ] = at
+          at
         end
 
         attr_reader(
@@ -375,7 +379,7 @@ module Skylab::Common
 
       # ==
 
-      class ValueStateMachine___
+      class AssetTicketStateMachine___
 
         def initialize eg, node_path
           @entry_group = eg

@@ -54,7 +54,7 @@ module Skylab::Zerk
       end
     end
 
-    def to_load_ticket_stream_for_UI
+    def to_asset_ticket_stream_for_UI
       Common_::Stream.via_nonsparse_array @_load_tickets_for_UI
     end
 

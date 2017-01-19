@@ -178,7 +178,7 @@ module Skylab::MyTerm
 
           appearance = root_frame.ACS
 
-          _ = appearance.kernel_.silo( :Adapters ).to_load_ticket_stream
+          _ = appearance.kernel_.silo( :Adapters ).to_asset_ticket_stream
 
           hs_a = Home_.lib_.basic::Hash::Hotstrings[ _.map_by( & :stem ) ]
 

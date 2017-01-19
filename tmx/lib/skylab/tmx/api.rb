@@ -74,7 +74,7 @@ module Skylab::TMX
 
         o = branch_item.branch_item_value
 
-        name = Common_::Name.via_slug o.state_machine.entry_group_head
+        name = Common_::Name.via_slug o.asset_ticket.entry_group_head
 
         _const = name.as_camelcase_const_string
 

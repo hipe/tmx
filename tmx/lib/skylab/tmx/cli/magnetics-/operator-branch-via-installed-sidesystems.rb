@@ -28,7 +28,7 @@ module Skylab::TMX
           lt
         end
 
-        def to_load_ticket_stream
+        def to_load_ticket_stream  # 1x [ze]
 
           # this comports with "no-deps" [ze] which nominally works in
           # symbols but actually (and experimentally) we use load tickets

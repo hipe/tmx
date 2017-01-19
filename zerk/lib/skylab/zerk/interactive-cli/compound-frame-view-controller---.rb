@@ -139,7 +139,7 @@ module Skylab::Zerk
 
         col_A = [] ; col_B = [] ; max = 0
 
-        st = @top_frame.to_load_ticket_stream_for_UI
+        st = @top_frame.to_asset_ticket_stream_for_UI
 
         item_liner = @item_liner.__for @top_frame, @expression_agent
 

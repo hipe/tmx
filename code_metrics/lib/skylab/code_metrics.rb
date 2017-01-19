@@ -27,7 +27,7 @@ module Skylab::CodeMetrics
         ft || Home_._COVER_ME
 
         _head = nf.as_slug
-        _sm = ft.value_state_machine_via_head _head
+        _sm = ft.asset_ticket_via_entry_group_head _head
         if _sm
           _const = nf.as_camelcase_const_string
           ke.reactive_tree_seed.const_get _const, false

@@ -59,9 +59,9 @@ module Skylab::Zerk
 
         def lookup_softly k
 
-          sm = @module.entry_tree.value_state_machine_via_head Slug_via_symbol__[k]
+          sm = @module.entry_tree.asset_ticket_via_entry_group_head Slug_via_symbol__[k]
           if sm
-            _item_via_state_machine sm
+            _item_via_load_ticket sm
           end
         end
 
@@ -69,34 +69,34 @@ module Skylab::Zerk
 
           _slug = Slug_via_symbol__[ k ]
 
-          @module.entry_tree.dereference_value_state_machine_via_head _slug
+          @module.entry_tree.dereference_asset_ticket_via_entry_group_head _slug
         end
 
         def to_pair_stream
 
-          @module.entry_tree.to_state_machine_stream.map_by do |sm|
+          @module.entry_tree.to_asset_ticket_stream.map_by do |sm|
 
             Common_::Pair.via_value_and_name(
-              _item_via_state_machine( sm ),
+              _item_via_load_ticket( sm ),
               Symbol_via_slug__[ sm.entry_group_head ] )
           end
         end
 
         def to_load_ticket_stream
 
-          @module.entry_tree.to_state_machine_stream.map_by do |sm|
+          @module.entry_tree.to_asset_ticket_stream.map_by do |sm|
             Symbol_via_slug__[ sm.entry_group_head ]
           end
         end
 
         def to_slug_stream  # 1x for [tmx]. not an API #hook-out
 
-          @module.entry_tree.to_state_machine_stream.map_by do |sm|
+          @module.entry_tree.to_asset_ticket_stream.map_by do |sm|
             sm.entry_group_head
           end
         end
 
-        def _item_via_state_machine sm
+        def _item_via_load_ticket sm
           @item_class.new sm, @module
         end
 
@@ -116,14 +116,14 @@ module Skylab::Zerk
 
       class LoadTicketIsh___
 
-        def initialize sm, mod
+        def initialize at, mod
+          @asset_ticket = at
           @module = mod
-          @state_machine = sm
         end
 
         attr_reader(
+          :asset_ticket,
           :module,
-          :state_machine,
         )
       end
 
