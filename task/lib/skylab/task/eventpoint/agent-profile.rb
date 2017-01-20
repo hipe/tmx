@@ -282,6 +282,84 @@ class Skylab::Task
     end  # >>
 
     # ==
+
+    class << self
+
+      def define
+        centrus = DefineTimeAgentProfileFormalTransitionIndex___.new
+        yield Definition___.new centrus
+        new centrus.finish
+      end
+
+      private :new
+    end  # >>
+
+    class Definition___
+
+      def initialize centrus
+        @centrus = centrus
+      end
+
+      def can_transition_from_to from_sym, dest_sym
+        @centrus.__add_ability_transition_ from_sym, dest_sym
+      end
+
+      def must_transition_from_to from_sym, dest_sym
+        @centrus.__add_required_transition_ from_sym, dest_sym
+      end
+    end
+
+    class DefineTimeAgentProfileFormalTransitionIndex___
+
+      def initialize
+        @SOMETHING = []
+      end
+
+      def __add_ability_transition_ from_sym, dest_sym
+        _ft = AbilityFormalTransition___.new from_sym, dest_sym
+        @SOMETHING.push _ft
+        NIL
+      end
+
+      def __add_required_transition_ from_sym, dest_sym
+        _ft = RequiredFormalTransition___.new from_sym, dest_sym
+        @SOMETHING.push _ft
+        NIL
+      end
+
+      def finish
+        remove_instance_variable( :@SOMETHING ).freeze
+      end
+    end
+
+    # -
+      def initialize anything_you_want
+        @ANYTHING_YOU_WANT = nil
+      end
+    # -
+
+    AgentProfileFormalTransition__ = ::Class.new
+
+    class RequiredFormalTransition___ < AgentProfileFormalTransition__
+
+    end
+
+    class AbilityFormalTransition___ < AgentProfileFormalTransition__
+
+    end
+
+    class AgentProfileFormalTransition__
+      def initialize from_sym, dest_sym
+        @destination_symbol = dest_sym
+        @from_symbol = from_sym
+        freeze
+      end
+      attr_reader(
+        :from_symbol,
+        :destination_symbol,
+      )
+    end
+    # ==
   end
 end
 # :#tombstone-A: (could be temporary) remove legacy code we are about to rewrite

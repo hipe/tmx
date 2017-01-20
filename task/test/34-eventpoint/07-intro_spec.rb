@@ -15,7 +15,7 @@ module Skylab::Task::TestSupport
     it "try to build a graph with invalid references" do
 
       begin
-        subject_module_.define_graph do |o|
+        define_graph_ do |o|
           o.beginning_state :begnio
           o.add_state :chumba, :can_transition_to, :wumba
           o.add_state :begino, :can_transition_to, :chumba
@@ -34,7 +34,7 @@ module Skylab::Task::TestSupport
 
       shared_subject :_subject do
 
-        subject_module_.define_graph do |o|
+        define_graph_ do |o|
 
           o.beginning_state :beginning
 

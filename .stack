@@ -19,6 +19,7 @@ use [sa] to convert etc to Stream_
 -3.103 help screen for quickie
 -3.109 request parsing must reconcile the state machine (probably a new branch)
 -3.125 tree runner can be invoked by a CLI or API scanner
+-3.126 cleanup [#ta-004] document so it's all clean and new for eventpoint
 -3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
 -3.132 testfile -1
 -3.141 testfile -2
@@ -26,6 +27,7 @@ use [sa] to convert etc to Stream_
 -3.150 testfile -3
   .. "digraphic" is available to you
 -3.159 testfile -4
+(-3.162 represent agent profiles)  
   (totally unrelated: relate [#ts-033] to some place in slowie)
   wontfix or move to "microservice": #open [#ts-005] stylize
   open [#ts-036] indentation

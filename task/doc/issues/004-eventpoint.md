@@ -1,18 +1,17 @@
-# the latest plugin narrative :[#077]
+# eventpoint :[#004]
 
 
-see [#070] the comprehensive and comparative list of all plugin facilities.
-this document contains content for both the 2015-feb incarnation and the
-2014-jan one, with the intention that we will "soon" assimilate the old
-one into the new one.
+## quick preface to this document.
 
-we demarcate the boundary between new and older with a full horizontal
-line with dashes, the only one in this document.
-
+we merged [pl] "digraphic" and [ta] "eventpoint" so that we would have
+a single, central facility for this kind of pathfinding. this document
+was originally part of the remote side but then moved here during
+ #tombstone-A.
 
 
 
-## #storypoint-01
+
+## general algorithm :#storypoint-01
 
 we are at the 'started' state. we need to get to the 'finished'
 state by finding a fitting sequence of hypothetical state
@@ -28,6 +27,8 @@ such a series of hypothetical state transitions is called a
 "plan". if a plan cannot be found from start to finish given
 the digraph and the input, then the result is the "unable
 case" (:1 of N).
+
+(EDIT: we might now call it "path" not "plan".)
 
 in any "unable case" the dispatcher emits to the selective
 listener callback the possibility of zero or more events
@@ -92,6 +93,15 @@ unrecognized opts. do not mutate the original argv but a copy which
 is held on to. for each option that is parsed hold onto the fact that
 it is parsed and the array of args passed to its callback (zero or
 one arg).
+
+
+
+
+## understanding the model: agent profile
+
+what we call an "agent" is (EDIT)
+
+=> agent profiles are not agents
 
 
 
@@ -169,6 +179,7 @@ the relevant occurrence indexes. HERE
 
 
 
+
 ------------------------------------------------------------------------------
 
 ## (posterity)
@@ -177,5 +188,11 @@ the relevant occurrence indexes. HERE
 shell both models services that the plugin needs from the host, like a
 stream to write info messages to, or perhaps the higher-level "info yielder".
 beyond these basics, the host is invited to subclass and customize this shell
-class as necessary. (kick the class with the 'plugin_conduit_class' class
+class as necessary. (kick the class with the `plugin_conduit_class` class
 method on your host.)
+
+
+
+## document-meta
+
+  - :#tombstone-A: merged [pl] "digraphic" with [ta] "eventpoint". lots of sunset.

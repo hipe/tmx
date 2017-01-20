@@ -13,7 +13,7 @@ dependency, the lower the regression number).
   - 26:  2017-01-08  filesystem-based - newest but seen as lowelevel because
                      of its future intended use by [sy]
 
-  - 42:  2014-01-28  [#004] because came after the rest (i dunno) (has no tests)
+  - 42:  2014-01-28  [#ta-004] because came after the rest (i dunno) (has no tests)
 
   - 59:  2013-06-17  [#023] baseless-collection (because sounds more recent than the remaining)
 

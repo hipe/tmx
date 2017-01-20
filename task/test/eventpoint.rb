@@ -61,11 +61,16 @@ module Skylab::Task::TestSupport
     def new_sig x=:meh
       possible_graph.new_graph_signature x
     end
+    end
 
-    def subject_
-      Eventpoint_Namespace::Subject
-    end
-    end
+      def define_agent_ & p
+        subject_module_::AgentProfile.define( & p )
+      end
+
+      def define_graph_ & p
+        subject_module_.define_graph( & p )
+      end
+
       def subject_module_
         Home_::Eventpoint
       end
