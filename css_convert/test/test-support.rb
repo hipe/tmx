@@ -99,7 +99,7 @@ module Skylab::CSS_Convert::TestSupport
 
     def initialize & oes_p
 
-      @serr = Home_.lib_.basic::String::Receiver::As_IO.new do | o |
+      @serr = Basic_[]::String::Receiver::As_IO.new do | o |
 
         o[ :receive_line_args ] = -> a do
 
@@ -126,7 +126,8 @@ module Skylab::CSS_Convert::TestSupport
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  FIXTURES_DIR___ = ::File.expand_path( '../fixture-files', __FILE__ )
+  Basic_ = Home_::Basic_
+  FIXTURES_DIR___ = ::File.expand_path '../fixture-files', __FILE__
   NIL_ = nil
   TS_ = self
 end

@@ -18,14 +18,18 @@ module Skylab::CSS_Convert
   end  # >>
 
   Common_ = ::Skylab::Common
-
   Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
+
+  Basic_ = Lazy_.call do
+    Autoloader_.require_sidesystem :Basic
+  end
 
   module Lib_
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Basic = sidesys[ :Basic ]
+    # Basic = sidesys[ :Basic ]
 
     # Brazen = sidesys[ :Brazen ]  # stay here for [sl]
 
@@ -47,6 +51,8 @@ module Skylab::CSS_Convert
       path
     end
 
+    Plugin = sidesys[ :Plugin ]
+
     System = -> do
       System_lib[].services
     end
@@ -65,7 +71,6 @@ module Skylab::CSS_Convert
   end
 
   Brazen_ = Autoloader_.require_sidesystem :Brazen
-  Lazy_ = Common_::Lazy
   Home_ = self
   Zerk_ = Autoloader_.require_sidesystem :Zerk
 
@@ -270,7 +275,7 @@ module Skylab::CSS_Convert
 
       @_DUMPABLES = [ 'CSS', 'directives' ]
 
-      s_a = Home_.lib_.basic::Fuzzy.reduce_array_against_string(
+      s_a = Basic_[]::Fuzzy.reduce_array_against_string(
         @_DUMPABLES,
         letter,
       )
@@ -401,7 +406,11 @@ module Skylab::CSS_Convert
     )
 
     def _queue
-      @_queue_ ||= Home_.lib_.basic::Queue.build_for self
+      @_queue_ ||= __queue
+    end
+
+    def __queue
+      Home_.lib_.plugin::Models::PendingProcessingQueue.build_for self
     end
 
     # ~ services for clients
@@ -555,7 +564,7 @@ module Skylab::CSS_Convert
 
       if name
 
-        list = Home_.lib_.basic::Fuzzy.reduce_array_against_string(
+        list = Basic_[]::Fuzzy.reduce_array_against_string(
           Visual_tests__[],
           name
         ) do | o |

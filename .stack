@@ -11,13 +11,7 @@ use [sa] to convert etc to Stream_
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
--3.102 de-dup fuzzy lookup in [#ze-060] no dependencies
 -3.103 help screen for quickie
 -3.109 request parsing must reconcile the state machine (probably a new branch)
 -3.125 tree runner can be invoked by a CLI or API scanner
 -3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
--3.150 consider mergin that new file in [pl]
--3.154 begin plugin rewrite
--3.159 removes
--3.164 renames
--3.168 incremental changes to [ze]

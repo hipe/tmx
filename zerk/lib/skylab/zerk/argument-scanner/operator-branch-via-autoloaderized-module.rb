@@ -57,6 +57,29 @@ module Skylab::Zerk
 
         # -- read
 
+        # ~ experiment for [pl]
+
+        def natural_key_of at
+          at.entry_group_head
+        end
+
+        def dereference_user_value at
+
+          _cls = if at.value_is_known
+            ::Kernel._COVER_ME__very_easy__code_sketch_provided__
+            at.value_x
+          else
+            Autoloader_.const_reduce(
+              :const_path, [ at.entry_group_head ],
+              :from_module, @module,
+              :autoloaderize,
+            )
+          end
+          _cls  # #todo
+        end
+
+        # ~
+
         def lookup_softly k
 
           sm = @module.entry_tree.asset_ticket_via_entry_group_head Slug_via_symbol__[k]
@@ -102,6 +125,7 @@ module Skylab::Zerk
 
         attr_reader(
           :emit_idea_by,
+          :module,
         )
       # -
       # ==

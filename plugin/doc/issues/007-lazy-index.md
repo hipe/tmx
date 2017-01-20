@@ -1,6 +1,10 @@
-# the dependencies narrative :[#007]
+# the lazy index :[#007]
 
 ## introduction
+
+(nothing interesting to say here anymore. the tests are the authoritative
+documentating explaining the subject's intent and means of operation.)
+
 
 
 

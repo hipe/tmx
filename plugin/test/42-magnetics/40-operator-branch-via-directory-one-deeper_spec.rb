@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::Plugin::TestSupport
 
-  describe "[pl] filesystem-based" do
+  describe "[pl] magnetics - [..] one deeper" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -112,7 +112,7 @@ module Skylab::Plugin::TestSupport
     end
 
     def _subject_module
-      Home_::FilesystemBased
+      Home_::Magnetics::OperatorBranch_via_DirectoryOneDeeper
     end
   end
 end

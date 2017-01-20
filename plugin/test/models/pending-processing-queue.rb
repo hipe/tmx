@@ -1,6 +1,8 @@
+self._NOT_YET_REINTEGRATED  # #todo
+
 module Skylab::Basic::TestSupport
 
-  module Queue
+  module Q_ueue
 
     def self.[] tcc
 
@@ -9,7 +11,7 @@ module Skylab::Basic::TestSupport
 
     def subject_module_
 
-      Home_::Queue
+      Home_::Q_ueue
     end
 
     # (the lack of modern namespace conventions below is only for
@@ -49,7 +51,7 @@ module Skylab::Basic::TestSupport
       end
 
       def __build_action_queue
-        Home_::Queue.build_for self
+        Home_::Q_ueue.build_for self
       end
 
       def __receive_execute

@@ -1,6 +1,18 @@
-# introduction to this sidesystem :[#001]
+# the plugin sidesystem :[#001]
 
-## meta-introduction
+
+## objective & scope
+
+a toolkit for dependency injection. *not* a one-size-fits-all approach.
+rather, a collection of models and "magnetics" than can be pieced together
+to assit in architectures resembling a "plugin framework".
+
+see [#008] "the plugin manifesto" for something resembling our "philosophy".
+
+
+
+
+## history
 
 the immediate reason that [pl] was created was to be a more focused,
 dedicated sidesystem for the somewhat ancient bundle- and plugin-related
@@ -15,56 +27,10 @@ the subject has become *the* home for all plugin-like solutions.
 
 
 
-## where are the tests?
-
-the old bundle facilities were frequently either abstracted out of
-working applications with their own test coverage, *or* were implemented to
-help implement tests themselves. so sadly, as this became its own formal
-thing, it did not have its own formal tests that travelled with it.
-
-
-
-
-
-------------------------------
-# comparison of the legacy solutions (historic)
-
-## the scope and purpose of this document is..
-
-.. to give a comprehensive and chronological overview of every re-usable (and
-potentially re-usable) plugin-like solution (or if you prefer, "dependency
-injection framework") in the skylab universe past, present and future.
-
-the purpose of this document is *not* to give comprehensive documentation for
-each such library, but where other documenation exists this document will
-serve as a hub of references to those documents.
-
-
-
-
-## the structure of this document
-
-the top section-item in this document will be the most recent library; and
-each library that preceded it will be described in each following section. we
-will number the solutions in order of their inception, so the top item will
-be item N, and then following it will be N minus one, etc down to solution 1
-which will occur at the bottom.
-
-this structure is employed because we want to keep the most relevant content
-always at the top, and we generally give a greater weight of relevance to
-more recent solutions, because they have the advantage of building on what
-was learned from the previous solutions.
-
-NOTE: we reserve the right to re-sequence or add numbers to the sequence at
-any point at any time as we reconsider and re-discover the history of the
-universe, so do not use them as references either inside or outside of this
-document.
-
-
-
 ## a justification for the utility of dependency injection frameworks..
 
 is outside the scope of this document `^_^ #yolo ¯\_(ツ)_/¯`
+
 
 
 
@@ -75,12 +41,12 @@ is outside the scope of this document `^_^ #yolo ¯\_(ツ)_/¯`
 
 
 
+## brief tombstones & related
 
-## library 8 of N: filesystem-based
+  - library 8 of N: [#012] née "filesystem based", now "[etc]". abstracted
+    from [sy] did solely to facilitate the cleanup of its architecture.
 
-an abstraction of what [sy] did..
-
-
+  - library 7 of N: (WILL SUNSET)
 
 
 ## library 7 of N: digraph-powered simplification of predecessor
@@ -97,6 +63,8 @@ this is a synopsis of what is at [#004]:
     plugin architecture.
 
 
+
+  - library 6 of N: (WILL SUNSET)
 
 
 ## library 6 of N: [gv] rolls an intra-reusable solution
@@ -128,6 +96,8 @@ following reasons:
 
 
 
+  - library 5 of N: [#023] "baseless" will suset or repurpose
+
 ## library 5 of N: [ts] Quickie rolls a reasonable custom solution.
 
 (UPDATE: this moved to here and is now [#023]. EDIT: this makes half of
@@ -143,49 +113,22 @@ at plugins is easily comprehendable; and by this point it's clear that 90%
 of what we are doing "now" was established by this point.
 
 
+  - library 4 of N: [fa] `Services_` sunsetted because it fell ill
 
+  - library 3 of N: [hl] Plugin library became whatever [#ts-025] "slowie"
+    does. used 4x times once, cross-poliated others, sunsetted.
 
-## library 4 of N: [fa] `Services_`
+  - library 2 of N: [tr] ended up being mostly a plugin architecture
+    (really just for output adapters) and ended up being mostly an exercize.
 
-shortly after the previous library, something calling itself "basically
-a miniature version of [hl] Plugin" emerges, but it looks to us now like
-it might be more of a "client services" pattern. regardless, it uses an
-out-of-date style and is being considered now as only a historical artifact.
+  - library 1 of N: [!as] had a self-rolled, ancient solution. sunsetted
+    when that project was dissoved into [tmx] "map" (select) operation.
 
-
-
-## library 3 of N: the [hl] Plugin library
-
-originally abstracted out of the toplevel test-runner in mid-April of 2013,
-this was the first time that we really considered this as a valuable thing
-to have in its own right.
-
-it was at one point used by at least four other subsystems. it helped
-cross-polinate its descendants; and was then sunsetted.
-
-
-
-## library 2 of N: whatever we did in treemap
-
-without at first realizing it, treemap has always been all about being a
-plugin architecture. in mid June of 2012 there is is a commit with a line
-that reads: "make an entire thing for loading plugings ("Adapter")".
-
-although it has survived one rewrite and has one more in progress and stashed
-away in a branch, as yet no effort has been made to abstarct anything
-re-usable from it but this is being considered if we ever get back to finishing
-
-
-
-## library 1 of N: "assess" is absolutely ancient,
-
-but for completeness we include whatever it is that it did in this list,
-because it referred to its things as "plugins". interestingly some of the code
-there looks totally alien, while other parts seem reasonably acceptable.
 
 
 
 
 ## document meta
 
+  - #tombstone-B: susetted longer synopses of each legacy solution
   - #tombstone-A: got rid of confused list

@@ -130,12 +130,18 @@ module Skylab::System
       def __dereference_initially const
 
         @_branch_module = Home_
-        @_load_tickets = Home_.lib_.plugin::FilesystemBased.define do |o|
-          # NOTE - the *only* this this does for use now is constituency validation
+
+        @_load_tickets = Home_.lib_.plugin::Magnetics::
+            OperatorBranch_via_DirectoryOneDeeper.
+        define do |o|
+
+          # NOTE: the only use this has to us for now is constituency validation
+
           o.system = ::Dir
           o.entry = 'service.rb'
           o.branch_module = @_branch_module
         end
+
         @_service_cache = ::Hash.new do |h, k|
           x = __build_service k
           h[k] = x

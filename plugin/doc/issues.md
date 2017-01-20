@@ -1,11 +1,13 @@
 [#033]       explaining the enhance method ..
 [#024]       the bundle fancy lookup exegesis ..
 [#023]       baseless collection ..
+[#013]       pending processing queue ..
 [#012]       [ filesystem-based ]
 [#011] #open legacy table for a help screen is not covered
 [#010]       bundle defined ..
 [#009]       pros and const of the add method pattern
-[#008]       delegation ..
+[#008]       "the plugin manifesto" ..
+             ( #was: delegation .. )
 [#007]       the dependencies narrative ..
 [#006]       #track pub-sub hacks (mutations) #universal
 [#005]       [ pub-sub ]  (currently implemented by [#007])

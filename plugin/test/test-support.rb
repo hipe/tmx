@@ -59,7 +59,14 @@ module Skylab::Plugin::TestSupport
 
   Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
 
+  Lazy_ = Common_::Lazy
+
+  Zerk_lib_ = Lazy_.call do
+    Common_::Autoloader.require_sidesystem :Zerk
+  end
+
   ACHIEVED_ = true
   NIL_ = nil
+  NOTHING_ = nil
   TS_ = self
 end

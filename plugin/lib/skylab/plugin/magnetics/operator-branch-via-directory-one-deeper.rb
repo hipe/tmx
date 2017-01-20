@@ -1,12 +1,17 @@
 module Skylab::Plugin
 
-  module FilesystemBased  # :[#012].
+  class Magnetics::OperatorBranch_via_DirectoryOneDeeper  # :[#012].
 
     # three laws.
 
+    # synopsis - created to clean up what [sy] does with its "services"
+    #   local architecture. after the fact, re-housed as an operator
+    #   branch due to its behavior similarity to its (name head) sibling..
+    #
+
     # generally this is contrary to our most recent plugin architectures
     # because it assumes not that plugin nodes reside directly under one
-    # node, but rather that they reside excatly two levels under the node,
+    # node, but rather that they reside exactly two levels under the node,
     # and all have the same name. (anciently we did it this way too.)
     #
     # so imagine you have the participating subsystems "some guy" and

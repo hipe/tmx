@@ -17,7 +17,8 @@
 [#050] #open tracks universal locations possibly to back-integrate once
              the future non-vapor feature of cached component models
              becomes a thing
-[#049]       queue ..
+[#049]       tree glyphs !
+             ( #was-also: queue. #moved-to: [#pl-013] )
 [#048]       [ module & class creator ]
 [#047]       f.chain ..
 [#046]       the minimal yielder ..

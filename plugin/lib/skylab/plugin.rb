@@ -12,11 +12,17 @@ module Skylab::Plugin
 
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
 
   # ==
 
   Stream_ = -> a, & p do
     Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  Zerk_no_deps_ = Lazy_.call do
+    require 'no-dependencies-zerk'
+    ::NoDependenciesZerk
   end
 
   # ==
