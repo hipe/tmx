@@ -31,19 +31,6 @@ class Skylab::Task
     end
 
     # ==
-        def reconcile y, from_i, to_i, sig_a
-          o = build_reconciliation y, from_i, to_i, sig_a
-          wv = o.work_
-          if wv
-            wv
-          else
-            o._express_via_expression_grid
-          end
-        end
-
-        def build_reconciliation y, from_i, to_i, sig_a
-          Reconciliation___.new y, self, from_i, to_i, sig_a
-        end
 
         def fetch_eventpoint i
           @h.fetch i
@@ -288,49 +275,6 @@ class Skylab::Task
         def get_exponent
           @exponent ||=
             :"#{ Internen__[ @agent.class ]}_#{ Internen__[ @predicate.class ] }"
-        end
-      end
-
-      class Reconciliation___
-
-        include Worker_Methods_
-
-        def initialize y, graph, from_i, to_i, sig_a
-
-          @after_symbol = to_i
-          @expression_grid = nil
-          @before_symbol = from_i
-          @graph = graph
-          @sig_a = sig_a
-          @y = y
-        end
-
-        def work_
-          wv = ___find_path
-          wv && __check_dependencies( wv.value_x )
-        end
-
-        def ___find_path
-
-          _ = Here_::FindPath___.new(
-            @y, @graph, @before_symbol, @after_symbol, @sig_a )
-
-          _common _
-        end
-
-        def __check_dependencies x
-
-          _common Here_::Check_dependencies___.new( @y, @graph, x, @sig_a )
-        end
-
-        def _common o
-          wv = o.work_
-          if wv
-            wv
-          else
-            @expression_grid = o.expression_grid
-            UNABLE_
-          end
         end
       end
 
