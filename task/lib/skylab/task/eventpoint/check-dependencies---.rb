@@ -1,3 +1,4 @@
+self._NOT_YET_USED
 class Skylab::Task
   # ->
     class Eventpoint

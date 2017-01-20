@@ -334,6 +334,19 @@ module Skylab::TestSupport
       "missing expected line - #{ s.inspect }"
     end
 
+    Expect_same_lines = -> do
+      convert = -> x do
+        if x.respond_to? :gets
+          x
+        else
+          Line_stream_via_string__[ x ]
+        end
+      end
+      -> act_x, exp_x, context do
+        Streams_have_same_content[ convert[ act_x ], convert[ exp_x ], context ]
+      end
+    end.call
+
     Expect_same_string = -> actual_s, expected_s, context do
 
       p = Home_.lib_.basic::String::LineStream_via_String
@@ -380,7 +393,7 @@ module Skylab::TestSupport
         end
 
         def via_string string
-          new Home_.lib_.basic::String::LineStream_via_String[ string ]
+          new Line_stream_via_string__[ string ]
         end
 
         def via_stream st
@@ -752,10 +765,15 @@ module Skylab::TestSupport
       end
     end
 
-    Expect_line::Expect_Line_ = self
+    # ==
+
+    Line_stream_via_string__ = -> s do
+      Home_.lib_.basic::String::LineStream_via_String[ s ]
+    end
 
     # ==
 
+    Expect_line::Expect_Line_ = self
     LINE_TERMINATION_SEQUENCE_RXS__ = '(?:\n|\r\n?|\z)'
     LINE_RX__ = /[^\r\n]*#{ LINE_TERMINATION_SEQUENCE_RXS__ }/
 

@@ -1,55 +1,36 @@
 class Skylab::Task
-  # ->
-    class Eventpoint < ::Module  # :[#004].
 
-      class Graph
+  class Eventpoint  # :[#004].
 
-        def self.[] mod
-          Adapter_module_for___[ mod ][ mod ]
-        end
+    # three laws
 
-        Adapter_module_for___ = -> do
-          h = {
-            ::Module => -> { Module_Adapter_Methods___ }
-          }
-          -> x do
-            h.fetch( x.class ).call
-          end
-        end.call
+    class << self
+      def define_graph
+        centrus = GraphDefinition___.new
+        yield DefineGraph___.new centrus
+        centrus.finish
+      end
+    end # >>
 
-        def initialize a, h  # mutates nodes with linkbacks
-          @a = a
-          @h = h
-          calculate_linkbacks
-        end
+    # ==
 
-        def to_text
-          a = [ ]
-          render_text_lines_to a.method( :<< )
-          a * NEWLINE_
-        end
+    class DefineGraph___
 
-        def render_text_lines_to p
-          cache_a = [ ] ; maybe_single_h = { } ; seen_h = { }
-          @a.each do |i|
-            n = @h.fetch i
-            if (( a = n.to_a ))
-              a.each do |n_|
-                seen_h[ i_ = n_.node_symbol ] = true
-                if (( idx = maybe_single_h[ i_ ] ))
-                  cache_a[ idx ] = nil
-                end
-                cache_a << "#{ i } -> #{ i_ }"
-              end
-            elsif ! seen_h[ i ]
-              maybe_single_h[ n.node_symbol ] = cache_a.length
-              cache_a << n.node_symbol.id2name
-            end
-          end
-          cache_a.compact!
-          cache_a.each( & p )
-          nil
-        end
+      def initialize dfn
+        @_definition = dfn
+      end
+
+      def beginning_state sym
+        @_definition.__receive_beginning_state_ sym
+      end
+
+      def add_state * dfn_a
+        @_definition.__receive_node_ DefineEventpoint___.new( dfn_a ).execute
+        NIL
+      end
+    end
+
+    # ==
 
         def new_graph_signature client_x, input_x=nil
 
@@ -78,115 +59,135 @@ class Skylab::Task
           @a.map( & @h.method( :fetch ) )
         end
 
-      private
+    # ==
 
-        def calculate_linkbacks  # algo is repeated at [#ba-021] (`invert`)
-          to_a_h = { } ; a_ = [ ]
-          @a.each do |i|
-            n = @h.fetch i
-            if (( a = n.from_a ))                # if node `n` has from nodes
-              a.each do |n_|                     # then for each from node
-                to_a_h.fetch( n_.node_symbol ) do |i_|  # memo that there is a `to`
-                  a_ << i_                       # from the from node to `n`
-                  to_a_h[ i_ ] = [ ]
-                end << n
-              end
-            end
-          end
-          a_.each do |i|
-            @h.fetch( i ).linkback_notify to_a_h.fetch( i )
-          end
-          nil
-        end
+    class GraphDefinition___
+
+      def initialize
+        @_node_box = Common_::Box.new
+        @_sources_via_destination = {}
+        @__beginning_state_mutex = nil
+
+        @beginning_state_symbol = nil
       end
 
-      module Graph::Module_Adapter_Methods___
+      def __receive_beginning_state_ sym
+        remove_instance_variable :@__beginning_state_mutex
+        @beginning_state_symbol = sym ; nil
+      end
 
-        def self.[] mod
-          mod.extend self
-          nil
-        end
-
-        def eventpoint &blk
-          graph_is_closed and raise "sanity - graph is closed."
-          Eventpoint__.new blk  # re-opening would be trivial
-        end
-
-        attr_reader :graph_is_closed
-
-        def possible_graph
-          if graph_is_closed
-            @possible_graph
-          else
-            @graph_is_closed = true
-            a = [ ] ; h = { }
-            constants.each do |i|
-              ep = const_get i, false
-              ep.name_notify i
-              a << i
-              h[ i ] = ep
-            end
-            @possible_graph = Graph.new a, h
+      def __receive_node_ node
+        name_sym = node.name_symbol
+        @_node_box.add name_sym, node
+        sym_a = node.can_transition_to
+        if sym_a
+          sym_a.each do |sym|
+            ( @_sources_via_destination[ sym ] ||= [] ).push name_sym
           end
         end
       end
 
-      Eventpoint__ = self
-      class Eventpoint__
-
-        def initialize blk
-
-          @node_symbol = nil
-          @to_a = nil
-
-          if blk
-            Shell__.new( a = [] ).instance_exec( & blk )
-            @from_a = a.freeze
-          end
-        end
-
-        class Shell__
-          def initialize a
-            @a = a
-          end
-          def from x
-            @a << x
-            nil
-          end
-        end
-
-        attr_reader :from_a
-
-        attr_reader :node_symbol
-        alias_method :node_id, :node_symbol  # some contexts
-
-        def name_notify node_i
-          @node_symbol and fail "hack failed - do this better"
-          @node_symbol = node_i
-          nil
-        end
-
-        attr_reader :to_a
-
-        def linkback_notify a
-          @to_a and fail "sanity - write once"
-          @to_a = a
-          nil
-        end
-
-        def transitions_to? ep
-          i = ep.node_symbol
-          if @to_a
-            @to_a.index do |x|
-              x.node_symbol == i
-            end
-          end
-        end
-
-        def eventpoint_notify_method_name
-          @enmn ||= :"#{ @node_symbol.downcase }_eventpoint_notify"
+      def finish
+        if __valid
+          __flush
         end
       end
+
+      def __valid
+        __valid_references && __valid_elemental_members
+      end
+
+      def __valid_references
+        h = @_node_box.h_
+        xtra = nil
+        @_sources_via_destination.each_key do |k|
+          h.key? k or ( xtra ||= [] ).push k
+        end
+        if xtra
+          raise KeyError, __say_unre( xtra )
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __valid_elemental_members
+        _must_have :@beginning_state_symbol
+      end
+
+      def _must_have ivar
+        instance_variable_get( ivar ) or raise RuntimeError, __say_req( ivar )
+      end
+
+      def __say_unre xtra
+        "unresolved reference#{ 's' if 1 != xtra.length }: #{
+          }#{ xtra * ', '}"
+      end
+
+      def __say_req ivar
+        "graph must have '#{ ivar.id2name[ 1..-1 ] }'"
+      end
+
+      def __flush
+        Graph___.define do |o|
+          o.beginning_state_symbol = @beginning_state_symbol
+          o.nodes_box = @_node_box.freeze
+          o.sources_via_destination = @_sources_via_destination
+        end
+      end
+    end
+
+    # ==
+
+    class DefineEventpoint___
+
+      # syntax is intentially close to [#ba-044] state machine,
+      # but intentionally implemented separately
+
+      def initialize x_a
+        @_scn = Common_::Scanner.via_array x_a
+        @_has = false
+        @_mutex = nil
+      end
+
+      def execute
+        name_symbol = @_scn.gets_one
+        until @_scn.no_unparsed_exists
+          send PRIMARIES___.fetch @_scn.gets_one
+        end
+        if @_has
+          _a = remove_instance_variable :@can_transition_to
+        end
+        Eventpoint___.new _a, name_symbol
+      end
+
+      PRIMARIES___ = {
+        can_transition_to: :__process_can_transition_to,
+      }
+
+      def __process_can_transition_to
+
+        # passing false-ish, passing the empty array, and not engaging
+        # this primary at all all has the exact same effect.
+
+        # passing only a symbol is a "macro" for passing an array of only that value
+
+        remove_instance_variable :@_mutex
+        x = @_scn.gets_one
+        if x
+          if x.respond_to? :id2name
+            @_has = true
+            x = [x]
+          elsif x.length.nonzero?
+            @_has = true
+          end
+        end
+        if @_has
+          @can_transition_to = x.freeze ; nil
+        end
+      end
+    end
+
+    # ==
 
       Multi_add_ = -> i, x do
         @h.fetch( i ) do |_|
@@ -531,7 +532,53 @@ class Skylab::Task
         end
       end
 
-      Here_ = self
+    # ==
+
+    class Graph___ < Common_::SimpleModel
+
+      attr_accessor(
+        :beginning_state_symbol,
+        :nodes_box,
+        :sources_via_destination,
+      )
+
+      def to_line_stream_for_dot_file
+        _dotfile true
+      end
+
+      def to_line_stream_for_dot_file_inverted
+        _dotfile false
+      end
+
+      def _dotfile fwd
+        Here_::LineStream_for_Dotfile_via_Graph.call_by do |o|
+          o.graph = self
+          o.be_inverted = ! fwd
+        end
+      end
     end
-  # -
+
+    Eventpoint___ = self
+    class Eventpoint___
+      def initialize sym_a, sym
+        if sym_a
+          @can_transition_to = sym_a
+        end
+        @name_symbol = sym
+        freeze
+      end
+      attr_reader(
+        :can_transition_to,
+        :name_symbol,
+      )
+    end
+
+    # ==
+
+    Here_ = self
+    KeyError = ::Class.new ::KeyError
+
+    # ==
+  end
 end
+# #history: massive overhaul begun

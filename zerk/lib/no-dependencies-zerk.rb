@@ -270,6 +270,11 @@ module NoDependenciesZerk
         @_current_primary_symbol = sym ; nil
       end
 
+      def __receive_corrected_primary_normal_symbol sym
+        remove_instance_variable :@_current_primary_symbol
+        @_current_primary_symbol = sym ; nil
+      end
+
       def __read_CPS_initially
         raise ScannerIsNotInThatState,
           "cannot read `current_primary_symbol` from beginning state"
@@ -813,7 +818,7 @@ module NoDependenciesZerk
         k = @argument_scanner.current_primary_symbol
         tuple = __THREEPLE_via_lookup_primary_softly_via_symbol k
         if tuple
-          _primary_found_via_THREEPLE tuple
+          _primary_found_via_THREEPLE( * tuple )
         else
           __when_primary_not_found_by_exact_match
         end
@@ -825,11 +830,7 @@ module NoDependenciesZerk
             __to_primary_TWOPLE_scanner )
         case 1 <=> a.length
         when 0  # when exactly one found
-          inj_offset, load_ticket = a.fetch 0
-          _x = @_primaries_injections.fetch( inj_offset ).
-            injection.dereference load_ticket
-          _three = [ inj_offset, load_ticket.intern, _x ]
-          _primary_found_via_THREEPLE _three
+          __when_found_exactly_one_thru_fuzzy( * a.fetch(0) )
         when 1  # when none found
           NOT_FOUND___
         when -1  # when ambiguous
@@ -848,9 +849,21 @@ module NoDependenciesZerk
         def had_unrecoverable_error_which_was_expressed ; true end
       end end
 
-      def _primary_found_via_THREEPLE three  # #here-1
+      def __when_found_exactly_one_thru_fuzzy inj_offset, load_ticket
+
+        correct_k = load_ticket.intern
+
+        @argument_scanner.__receive_corrected_primary_normal_symbol correct_k
+
+        _x = @_primaries_injections.fetch( inj_offset ).
+          injection.dereference load_ticket
+
+        _primary_found_via_THREEPLE inj_offset, correct_k, _x
+      end
+
+      def _primary_found_via_THREEPLE d, k, x  # #here-1
         # convert our nasty internal tuple to something external-friendly
-        PrimaryFound___.new( * three )
+        PrimaryFound___.new d, k, x
       end
 
       def injector_via_primary_found found  # see [#060.A.2]

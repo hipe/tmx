@@ -36,7 +36,6 @@ module Skylab::CodeMetrics
 
       def load_all_assets_and_support
         ok = true
-        ok &&= __require_any_require_paths
         ok &&= _resolve_load_tree
         ok &&= __load_load_tree
         ok
@@ -58,6 +57,7 @@ module Skylab::CodeMetrics
 
       def _resolve_load_tree
         ok = true
+        ok &&= __require_any_require_paths
         ok &&= __resolve_head_module
         ok &&= __resolve_head_path
         ok &&= __resolve_path_stream_via_modified_request
@@ -69,9 +69,9 @@ module Skylab::CodeMetrics
         st = _load_tree.to_pre_order_normal_path_stream
         ok = true
         begin
-          x = st.gets
-          x || break
-          ok = __load x
+          s_a = st.gets
+          s_a || break
+          ok = __load s_a
           ok || break
           redo
         end while above
@@ -100,6 +100,12 @@ module Skylab::CodeMetrics
         end
 
         ok = true
+
+        # while #open [#co-024.1], can't const reduce on a zero length path
+        if s_a.length.zero?
+          _ = @_head_module
+        else
+
         _ = Autoloader_.const_reduce(
           :const_path, s_a,
           :from_module, @_head_module,
@@ -111,6 +117,7 @@ module Skylab::CodeMetrics
             y << "the above \"abstract path\" inferred from a filename #{
               }failed resolve to a const value."
           end
+        end
         end
 
         if @_be_verbose

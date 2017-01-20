@@ -1,3 +1,4 @@
+self._NOT_YET_USED
 module Skylab
 
   module Plugin

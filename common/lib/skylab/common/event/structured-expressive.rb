@@ -1,8 +1,8 @@
-class Skylab::Task
+module Skylab::Common
 
-  class Eventpoint
+  class Event::StructuredExpressive
 
-    class Expression_
+    # (moved here from [ta]. won't put it next to the others, it's too deep)
 
       # this is a class that makes classes, similar to platform ::Struct.
       # whereas we construct a ::Struct subclass by passing it a list of
@@ -109,6 +109,10 @@ class Skylab::Task
           end
         end  # >>
 
+        def at * i_a
+          i_a.map( & method( :[] ) )
+        end
+
         def members
           self.class.members
         end
@@ -129,15 +133,13 @@ class Skylab::Task
           instance_exec( * to_a, & articulation_proc )
         end
 
-        define_method :at, & Here_::At_
-
         def to_a
           ivar_a.map( & method( :instance_variable_get ) )
         end
 
     begin
 
-      # because the expression proc is expose as the ordinary proc that it
+      # because the expression proc is exposed as the ordinary proc that it
       # is, you can evaluate it in any arbitrary context.
       #
       # here we'll define an expression class and what we call an
@@ -151,9 +153,9 @@ class Skylab::Task
       #         end
       #       end
       #
-      #       _Subject = Home_::Eventpoint::Expression_
+      #       cls = Skylab::Common::Event::StructuredExpressive
       #
-      #       ErrorPredicate = _Subject.new( :name, :value, -> me do
+      #       ErrorPredicate = cls.new( :name, :value, -> me do
       #         n, v = me.at :name, :value
       #         "#{ n } had a #{ em 'bad' } issue - #{ v }"
       #       end )
@@ -190,11 +192,11 @@ class Skylab::Task
       #
       #     module These
       #
-      #       _Subject = Home_::Eventpoint::Expression_
+      #       o = Skylab::Common::Event::StructuredExpressive
       #
-      #       NP = _Subject.new :a, -> a { a * ' and ' }
+      #       NP = o.new :a, -> a { a * ' and ' }
       #
-      #       VP = _Subject.new :tense, :a, -> t, a do
+      #       VP = o.new :tense, :a, -> t, a do
       #         :present == t ? ( 1 == a.length ? 'has' : 'have' ) : 'had'
       #       end
       #     end
@@ -269,6 +271,7 @@ class Skylab::Task
           nil
         end
       end
-    end
+    # -
   end
 end
+# #history-A: moved here from [ta]

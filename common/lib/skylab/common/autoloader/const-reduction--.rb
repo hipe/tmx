@@ -59,8 +59,15 @@ module Skylab::Common
       end
 
       def execute
-
         __init
+        if @_token_scanner.no_unparsed_exists
+          self._COVER_ME__this_used_to_have_a_bug_as_is
+        else
+          __when_nonzero_const_path
+        end
+      end
+
+      def __when_nonzero_const_path
 
         while __there_are_more_tokens
 
@@ -88,7 +95,7 @@ module Skylab::Common
       end
 
       def __there_are_more_tokens
-        @_token_stream.unparsed_exists
+        @_token_scanner.unparsed_exists
       end
 
       def __the_current_frame_is_for_a_module
@@ -100,7 +107,7 @@ module Skylab::Common
       end
 
       def __the_current_token_is_a_valid_const
-        cx = CharacterizeToken__.new( @_token_stream.gets_one ).execute
+        cx = CharacterizeToken__.new( @_token_scanner.gets_one ).execute
         @_token_characterization = cx
         cx.is_valid_const
       end
@@ -116,7 +123,7 @@ module Skylab::Common
 
         if tuple.found
 
-          if @_token_stream.no_unparsed_exists
+          if @_token_scanner.no_unparsed_exists
 
             __at_final_tuple tuple
           else
@@ -160,7 +167,7 @@ module Skylab::Common
       def __init
         @_error_eventer = nil
         @_frame = @_frame_prototype.for_value @from_module
-        @_token_stream = Scanner.via_array @__sanitized_const_path_mixed_array
+        @_token_scanner = Scanner.via_array @__sanitized_const_path_mixed_array
         NIL
       end
 

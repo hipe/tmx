@@ -89,7 +89,12 @@
 [#026]       #doc-point the F-UN narrative ..
 [#025] #open #wishlist: an event duper that lets you add new properties
              ( was: isomorphic event factory is deprecated .. )
+
 [#024]       #doc-node autoloader introduction..
+
+       #open :[#here.1]: const reduce has a known issue when path is zero length
+                         (one subscriber in [cm])
+
 [#023]       #parent-node: [#033] the different kinds of callback patterns ..
 [#022]       #parent-node: [#036] the `call_digraph_listeners` spy narrative ..
 [#021]       #parent-node: [#036] the event predicate narrative ..

@@ -6,6 +6,9 @@ module Skylab::Task::TestSupport
       tcc.include self
     end
 
+    # -
+
+    if false
     def recon from_i, to_i, sig_a
       possible_graph.reconcile y, from_i, to_i, sig_a
     end
@@ -62,10 +65,11 @@ module Skylab::Task::TestSupport
     def subject_
       Eventpoint_Namespace::Subject
     end
-  end
+    end
+      def subject_module_
+        Home_::Eventpoint
+      end
 
-  module Eventpoint_Namespace
-
-    Subject = Home_::Eventpoint
+    # -
   end
 end

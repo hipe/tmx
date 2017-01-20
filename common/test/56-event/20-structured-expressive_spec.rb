@@ -1,11 +1,22 @@
 require_relative '../test-support'
 
-module Skylab::Task::TestSupport
+module Skylab::Common::TestSupport
 
-  describe "[ta] eventpoint - expression" do
+  describe "[co] event - structured expressive" do
 
     TS_[ self ]
     use :memoizer_methods
+
+    # NOTE - these are doctest tests. they are generated from the comments
+    # in the asset code. that is why they are so hard to read :(
+
+    # at writing we have moved this pair here (asset and test) from
+    # elsewhere without regenerating it anew..
+    # it's not even clear if etc..
+
+    it "loads" do
+      _subject_module
+    end
 
     context "this is a class that makes classes, similar to platform ::Struct." do
 
@@ -60,7 +71,7 @@ module Skylab::Task::TestSupport
       end
     end
 
-    context "because the expression proc is expose as the ordinary proc that it" do
+    context "because the expression proc is exposed as the ordinary proc that it" do
 
       before :all do
         module X_e_e_My
@@ -71,9 +82,9 @@ module Skylab::Task::TestSupport
             end
           end
 
-          _Subject = Home_::Eventpoint::Expression_
+          cls = Skylab::Common::Event::StructuredExpressive
 
-          ErrorPredicate = _Subject.new( :name, :value, -> me do
+          ErrorPredicate = cls.new( :name, :value, -> me do
             n, v = me.at :name, :value
             "#{ n } had a #{ em 'bad' } issue - #{ v }"
           end )
@@ -112,11 +123,11 @@ module Skylab::Task::TestSupport
 
         module X_e_e_These
 
-          _Subject = Home_::Eventpoint::Expression_
+          o = Skylab::Common::Event::StructuredExpressive
 
-          NP = _Subject.new :a, -> a { a * ' and ' }
+          NP = o.new :a, -> a { a * ' and ' }
 
-          VP = _Subject.new :tense, :a, -> t, a do
+          VP = o.new :tense, :a, -> t, a do
             :present == t ? ( 1 == a.length ? 'has' : 'have' ) : 'had'
           end
         end
@@ -136,11 +147,13 @@ module Skylab::Task::TestSupport
     end
 
     def self._Subject
-      Home_::Eventpoint::Expression_
+      Home_::Event::StructuredExpressive
     end
 
     def _Subject  # eew r.s only
       self.class._Subject
     end
+
+    alias_method :_subject_module, :_Subject  # for hand-written tests, looks better
   end
 end
