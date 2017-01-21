@@ -132,8 +132,8 @@ ending nodes. so:
      take the set of all SHA's in our bundle (it is a data member of
      the box which is a data member of the bundle).
 
-     make a "diminishing pool" hash of these SHA's. iterate the pool
-     from first SHA in the list of all SHA's. as the current SHA is
+     make a [#ba-061] "diminishing pool" hash of these SHA's. iterate the
+     pool from first SHA in the list of all SHA's. as the current SHA is
      found to be within the diminshing pool, increment a counter and
      associate this SHA with that value of the counter, and remove that
      SHA from the diminishing pool. when the diminishing pool gets down

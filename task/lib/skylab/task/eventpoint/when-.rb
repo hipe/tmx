@@ -1,15 +1,14 @@
-self._NOT_YET_USED
-module Skylab
+class Skylab::Task
 
-  module Plugin
+  class Eventpoint
 
-    class Digraphic
-
-      Events_ = ::Module.new
+    module When_
 
       _Ev = Common_::Event
 
-      Events_::Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
+      # ==
+
+      Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
 
           :steps, nil, :plugin_a, nil, :digraph, nil do | y, o |
 
@@ -25,7 +24,9 @@ module Skylab
 
       end
 
-      Events_::Unused_Actuals = _Ev.prototype_with :unused_actuals,
+      # ==
+
+      Unused_Actuals = _Ev.prototype_with :unused_actuals,
 
           :box, nil, :steps, nil, :plugins, nil do | y, o |
 
@@ -78,7 +79,32 @@ module Skylab
         end while nil
       end
 
-      class Events_::Express_Help < Common_::Event
+      # ==
+
+      NoTransitionFound = -> up do
+
+        up.listener.call :error, :expression, :no_transition_found do |y|
+
+          lib = Eventpoint::Event_
+
+          buff = lib::ThisOneBuffer.new self
+
+          a = up.all_pending_executions
+
+          buff << lib::Pending_execution[ :exclusive, a ]
+            # none of the 3 pending executions,
+            # the only pending execution
+
+          _ = up.current_state_symbol
+          buff << lib::Bring_the_system_to_a_finished_state[ _, :exclusive, a ]
+
+          y << buff.string
+        end
+      end
+
+      # ==
+
+      class Express_Help < Common_::Event
 
         class << self
           public :new
@@ -325,6 +351,8 @@ module Skylab
             end ; nil
           end
         end
+
+        # ==
       end
     end
   end

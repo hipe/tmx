@@ -36,7 +36,7 @@ module Skylab::Common::TestSupport
       end
 
       it "expression object" do
-        expr.instance_exec( & expr.articulation_proc ).should eql "wing is: DING, wang: DANG"
+        expr.instance_exec( & expr.expression_proc ).should eql "wing is: DING, wang: DANG"
       end
     end
 
@@ -46,10 +46,10 @@ module Skylab::Common::TestSupport
         X_e_e_ArgTaker = _Subject.new :a, :b, -> a, b { "#{ a } + #{ b }" }
       end
 
-      it "call `articulate_self` to produce an expression string" do
+      it "call `string_via_express` to produce an expression string" do
         _expr = X_e_e_ArgTaker[ "one", "two" ]  # same as `.new(..)`
 
-        _expr.articulate_self.should eql "one + two"
+        _expr.string_via_express.should eql "one + two"
       end
     end
 
@@ -67,7 +67,7 @@ module Skylab::Common::TestSupport
 
       it "and we can express like the \"arg taker\" form above" do
         _expr = X_e_e_EvenBetter.new "one", "two"
-        _expr.articulate_self.should eql "one + two"
+        _expr.string_via_express.should eql "one + two"
       end
     end
 
@@ -97,7 +97,7 @@ module Skylab::Common::TestSupport
 
         _expag = X_e_e_My::ExpressionAgent.new
 
-        _s = _expag.instance_exec expr, & expr.articulation_proc
+        _s = _expag.instance_exec expr, & expr.expression_proc
 
         _s.should eql "I had a __BAD__ issue - burnout"
       end
@@ -111,9 +111,9 @@ module Skylab::Common::TestSupport
         end
       end
 
-      it "..if for example you wanted to mimic `articulate_self`" do
+      it "..if for example you wanted to mimic `string_via_express`" do
         expr = X_e_e_Pair.new 'hi', 'lo'
-        ( expr.articulation_proc[ * expr.to_a ] ).should eql 'hi and lo'
+        ( expr.expression_proc[ * expr.to_a ] ).should eql 'hi and lo'
       end
     end
 

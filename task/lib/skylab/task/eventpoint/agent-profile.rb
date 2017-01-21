@@ -90,6 +90,30 @@ class Skylab::Task
       private :new
     end  # >>
 
+    class PendingExecutionPool < Common_::SimpleModel  # (might move to its own file if it's prudent)
+
+      def initialize
+        @pending_executions = []
+        yield self
+        @pending_executions.freeze
+      end
+
+      def add_pending_task task_id_x, profile
+        @pending_executions.push PendingExecution___.new( task_id_x, profile )
+        NIL
+      end
+
+      attr_reader(
+        :pending_executions,
+      )
+    end
+
+    # ==
+
+    PendingExecution___ = ::Struct.new :mixed_task_identifier, :agent_profile
+
+    # ==
+
     class Definition___
 
       def initialize centrus
@@ -108,40 +132,50 @@ class Skylab::Task
     class DefineTimeAgentProfileFormalTransitionIndex___
 
       def initialize
-        @SOMETHING = []
+        @_formal_transitions = []
       end
 
       def __add_ability_transition_ from_sym, dest_sym
         _ft = AbilityFormalTransition___.new from_sym, dest_sym
-        @SOMETHING.push _ft
+        @_formal_transitions.push _ft
         NIL
       end
 
       def __add_required_transition_ from_sym, dest_sym
         _ft = RequiredFormalTransition___.new from_sym, dest_sym
-        @SOMETHING.push _ft
+        @_formal_transitions.push _ft
         NIL
       end
 
       def finish
-        remove_instance_variable( :@SOMETHING ).freeze
+        remove_instance_variable( :@_formal_transitions ).freeze
       end
     end
 
     # -
-      def initialize anything_you_want
-        @ANYTHING_YOU_WANT = nil
+      def initialize a
+        @formal_transitions = a
       end
+
+      attr_reader(
+        :formal_transitions,
+      )
     # -
 
     AgentProfileFormalTransition__ = ::Class.new
 
     class RequiredFormalTransition___ < AgentProfileFormalTransition__
 
+      def imperative_not_optional
+        true
+      end
     end
 
     class AbilityFormalTransition___ < AgentProfileFormalTransition__
 
+      def imperative_not_optional
+        false
+      end
     end
 
     class AgentProfileFormalTransition__

@@ -22,6 +22,8 @@
              [hu] is waiting for this at #open [#hu-043]
 
 [#004]       eventpoint ..
+              [#here.B]: this array better be this one way
+              [#here.A]: the algorithm (as described in the document)
 
 [#003]       [new task]
 [#002]       [legacy task]

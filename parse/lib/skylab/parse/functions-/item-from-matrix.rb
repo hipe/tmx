@@ -59,7 +59,7 @@ module Skylab::Parse
         # deep it is at the first pass a stream and at each successive pass
         # an array. at each pass: if you are out of tokens from the input
         # stream, your result is determined by the number of rows remaining
-        # in this diminishing pool; with the 0, one and many cases
+        # in this [#ba-061] diminishing pool; with the 0, one and many cases
         # having the expected semantics. also at each pass: if you are down
         # to zero rows in the running, finish with the expected semantics.
 

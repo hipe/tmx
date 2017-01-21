@@ -422,6 +422,7 @@ y << 'lock *any* files or check permissions, so integrity is not "guaranteed".'
       ACHIEVED_ = true
       CEASE_ = nil
       DEFAULT_ETC__ = 'UNCATEGORIZED'
+      KEEP_PARSING_ = true
       NIL_ = nil
       Me_ = self
       NEWLINE_ = "\n"

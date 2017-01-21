@@ -125,7 +125,7 @@ in a hypothetical eventual case where all the asset items are loaded,
 there is no need to "supplant" these operations with inferential
 approximations, because all the concrete names are known.
 
-by this rationale we conceive of this ad-hoc structure as a
+by this rationale we conceive of this ad-hoc structure as a [#ba-061]
 "diminishing pool" that will either reduce in size or stay the same size
 over time. if it ever gets down to a size of zero we can deactivate this
 entire hack from the subject modue.

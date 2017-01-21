@@ -221,8 +221,8 @@ class Skylab::Task
         #
         # also, this large structure we take pains to build won't be going
         # to "waste" - we need a mutable structure that we can delete from
-        # as we do our "diminishing pool" strategy to see what's missing
-        # based on what's left over in the pool at the end.
+        # as we do our [#ba-061] "diminishing pool" strategy to see what's
+        # missing based on what's left over in the pool at the end.
         #
         # (what's more, we honor (and expect) the different sides to use
         # diffing casing conventions, but internally we make everything

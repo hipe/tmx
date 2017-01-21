@@ -152,6 +152,9 @@ class Skylab::Task
 
         # passing only a symbol is a "macro" for passing an array of only that value
 
+        # :[#004.B]: our own internal API assumes (and this is crucial)
+        # that IFF this member is trueish, it is a nonzero length array.
+
         remove_instance_variable :@_mutex
         x = @_scn.gets_one
         if x
@@ -215,7 +218,7 @@ class Skylab::Task
         end
 
         def errmsg_ agent, predicate, any_conj=nil
-          Grid_Frame__[ agent, predicate, any_conj ].articulate_self
+          Grid_Frame__[ agent, predicate, any_conj ].string_via_express
         end
 
         attr_reader(
@@ -245,7 +248,7 @@ class Skylab::Task
         end
         def articulate_each_frame_to p
           @a.each do |frame|
-            p[ frame.articulate_self ]
+            p[ frame.string_via_express ]
           end
           nil
         end
@@ -259,9 +262,9 @@ class Skylab::Task
           @agent, @predicate, @any_conj = agent, predicate, any_conj
         end
 
-        def articulate_self
+        def string_via_express
           word_a = [ ]
-          (( s = @any_conj && @any_conj.articulate_self )) and word_a << s
+          (( s = @any_conj && @any_conj.string_via_express )) and word_a << s
           (( s = ( @agent | @predicate ).inflect )) and word_a << s
           word_a * SPACE_ if word_a.length.nonzero?
         end

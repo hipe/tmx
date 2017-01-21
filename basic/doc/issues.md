@@ -1,3 +1,17 @@
+[#061]       :"diminishing pool": (this entry is for tracking and describing
+             a commmon pattern. it has no dedicated asset node in this library.)
+
+             a "diminishing pool" is or has the characteristics of a hash
+             that gets smaller over time, typically because when an element
+             of that hash is accessed, it also removed.
+
+             when we use this pattern we typically use it to assert any of:
+
+               - that each element is only accessed at most once
+
+               - that at the end of the "invocation" (for whatever definition
+                 of) that none of the elements remain in the pool.
+
 [#060]       borrowing/lending coverage
        #open [#here.1]: we are borrowing coverage from [#tmx-022.1]
 

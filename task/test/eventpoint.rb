@@ -8,60 +8,34 @@ module Skylab::Task::TestSupport
 
     # -
 
-    if false
-    def recon from_i, to_i, sig_a
-      possible_graph.reconcile y, from_i, to_i, sig_a
-    end
+      def expect_failure_and_emission_from_trying_to_find_path_ pool, graph
 
-    def recon_plus from_i, to_i, sig_a
+        log = Common_.test_support::Expect_Emission::Log.for self
 
-      o = possible_graph.build_reconciliation y, from_i, to_i, sig_a
+        _x = subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
+          o.pending_execution_pool = pool
+          o.graph = graph
+          o.listener = log.handle_event_selectively
+        end
 
-      wv = o.work_
-
-      # (we are translating back to the old "pair" style for legacy tests)
-
-      if wv
-        [ true, wv.value_x ]
-      else
-        [ wv, o.expression_grid ]
+        em = log.gets
+        em_ = log.gets
+        em_ && fail
+        em
       end
-    end
 
-    def y
-      @y ||= begin
-        @do_debug ||= false
-        @err_a = [ ]
-        ::Enumerator::Yielder.new do |msg|
-          @do_debug and LIB_.stderr.puts "(dbg:#{ msg })"
-          @err_a << msg
-          nil
+      def find_path_ pool, graph
+
+        subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
+          o.pending_execution_pool = pool
+          o.graph = graph
+          o.listener = :xx
         end
       end
-    end
 
-    def expect_line msg
-      instance_variable_defined? :@err_a or fail "@err_a not set - #{
-        }was `y` never called?"
-      @err_a.length.zero? and fail "there are no more lines, expected one."
-      (( @err_a.shift )).should eql( msg )
-      nil
-    end
-
-    def expect_no_more_lines
-      @err_a.length.should be_zero
-      nil
-    end
-
-    def expect_only_line msg
-      expect_line msg
-      expect_no_more_lines
-    end
-
-    def new_sig x=:meh
-      possible_graph.new_graph_signature x
-    end
-    end
+      def build_pending_execution_pool_ & p
+        subject_module_::AgentProfile::PendingExecutionPool.define( & p )
+      end
 
       def define_agent_ & p
         subject_module_::AgentProfile.define( & p )
@@ -78,3 +52,4 @@ module Skylab::Task::TestSupport
     # -
   end
 end
+# #history: the last of the old code gone during major rewrite

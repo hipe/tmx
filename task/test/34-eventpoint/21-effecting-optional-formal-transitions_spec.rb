@@ -4,7 +4,7 @@ module Skylab::Task::TestSupport
 
   module Eventpoint_Namespace  # <-
 
-  TS_.describe "[ta] eventpoint - nudge" do
+  TS_.describe "[ta] eventpoint - effecting optional formal transitions" do
 
     TS_[ self ]
     use :eventpoint

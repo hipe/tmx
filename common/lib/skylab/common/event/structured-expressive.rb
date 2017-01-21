@@ -29,7 +29,7 @@ module Skylab::Common
       # action by evaluating our expression proc in the context of our
       # expression object:
       #
-      #     expr.instance_exec( & expr.articulation_proc )  # => "wing is: DING, wang: DANG"
+      #     expr.instance_exec( & expr.expression_proc )  # => "wing is: DING, wang: DANG"
       #
 
       # alternately you can define the proc to take arguments:
@@ -37,11 +37,11 @@ module Skylab::Common
       #     ArgTaker = _Subject.new :a, :b, -> a, b { "#{ a } + #{ b }" }
       #
       # when the expression proc has been defined in this manner,
-      # call `articulate_self` to produce an expression string:
+      # call `string_via_express` to produce an expression string:
       #
       #     _expr = ArgTaker[ "one", "two" ]  # same as `.new(..)`
       #
-      #     _expr.articulate_self  # => "one + two"
+      #     _expr.string_via_express  # => "one + two"
 
       # even better, you can define the articulation class with only a
       # proc (actually a block) and it will work as is (probably) expected:
@@ -58,7 +58,7 @@ module Skylab::Common
       # and we can express like the "arg taker" form above:
       #
       #     _expr = EvenBetter.new "one", "two"
-      #     _expr.articulate_self  # => "one + two"
+      #     _expr.string_via_express  # => "one + two"
 
         class << self
           alias_method :orig_new, :new
@@ -109,6 +109,18 @@ module Skylab::Common
           end
         end  # >>
 
+        def string_via_express
+          NIL.instance_exec( * to_a, & expression_proc )
+        end
+
+        def express_into_under y, expag
+          y << string_via_express_under( expag )
+        end
+
+        def string_via_express_under expag
+          expag.instance_exec( * to_a, & expression_proc )
+        end
+
         def at * i_a
           i_a.map( & method( :[] ) )
         end
@@ -125,12 +137,8 @@ module Skylab::Common
           self.class::IVAR_H_
         end
 
-        def articulation_proc
+        def expression_proc
           self.class::PROC_
-        end
-
-        def articulate_self
-          instance_exec( * to_a, & articulation_proc )
         end
 
         def to_a
@@ -171,7 +179,7 @@ module Skylab::Common
       #
       #     _expag = My::ExpressionAgent.new
       #
-      #     _s = _expag.instance_exec expr, & expr.articulation_proc
+      #     _s = _expag.instance_exec expr, & expr.expression_proc
       #
       #     _s  # => "I had a __BAD__ issue - burnout"
 
@@ -181,10 +189,10 @@ module Skylab::Common
       #       "#{ up } and #{ down }"
       #     end
       #
-      # ..if for example you wanted to mimic `articulate_self`:
+      # ..if for example you wanted to mimic `string_via_express`:
       #
       #     expr = Pair.new 'hi', 'lo'
-      #     expr.articulation_proc[ * expr.to_a ]  # => 'hi and lo'
+      #     expr.expression_proc[ * expr.to_a ]  # => 'hi and lo'
       #
 
       # expression instances have a stupid simple but powerful algorithm
@@ -234,7 +242,7 @@ module Skylab::Common
         def inflect
           resolve_missing_members
           @a.reduce( [] ) do |m, art|
-            (( s = art.articulate_self )) and m << s
+            (( s = art.string_via_express )) and m << s
             m
           end * SPACE_
         end

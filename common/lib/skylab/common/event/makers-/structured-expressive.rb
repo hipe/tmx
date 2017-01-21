@@ -6,6 +6,9 @@ module Skylab::Common
 
       # :[#005.C] (see). (splintered from [#005.B]; more history there)
 
+      # should probably be merged into the older cousin of the same name
+      # that is now nearby
+
       _ = Event_::Actors_::Build_struct_like_constructor_method.call(
 
         :on_args_to_method_called_new, -> x_a, & p do

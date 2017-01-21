@@ -11,7 +11,7 @@ was originally part of the remote side but then moved here during
 
 
 
-## general algorithm :#storypoint-01
+## general algorithm :[#here.A]
 
 we are at the 'started' state. we need to get to the 'finished'
 state by finding a fitting sequence of hypothetical state
@@ -24,11 +24,10 @@ particular combination of:
   • the particular input arguments
 
 such a series of hypothetical state transitions is called a
-"plan". if a plan cannot be found from start to finish given
+"plan". (EDIT: we're probably gonna change this to "path".)
+if a plan cannot be found from start to finish given
 the digraph and the input, then the result is the "unable
-case" (:1 of N).
-
-(EDIT: we might now call it "path" not "plan".)
+case". :[#this.A]
 
 in any "unable case" the dispatcher emits to the selective
 listener callback the possibility of zero or more events
@@ -38,20 +37,21 @@ reach the plugins themselves.
 
 if a plan *is* found but there are input elements that would
 never be processed during the course of executing the plan,
-then this is also classified as the unable case (:2 of N).
+then this is also classified as the unable case. :[#this.B]
 
 a plan is a series of steps, each step changing state until the
 final step (whose final state is always `finished`). at each
 step *exactly one* plugin must be resolved to change the state.
+(EDIT: now a valid ending state is any state with no transitions.)
 
 if a plugin is not found to change the state at this step then
-this is classified as the unable case (:3 of N, which may
-or may not end up as the same logic for 1 of N).
+this is classified as the unable case. (:[#this.C], which may
+or may not end up as the same logic for [#this.A].)
 
 if more than one than one plugin is found that can change the
 state at this step then this is an unrecoverable ambiguity (even
 if they all would transition to the same next state), also the
-unable case (:4 of N).
+unable case. :[#this.D]
 
 steps are added to the plan successively in this manner until
 either inability is detected or the finished state is reached

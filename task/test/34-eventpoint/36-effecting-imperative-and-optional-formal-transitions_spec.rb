@@ -2,14 +2,14 @@ require_relative '../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] eventpoint - effecting passive and active formal transitions" do
+  describe "[ta] eventpoint - effecting imperative and optional formal transitions" do
 
     TS_[ self ]
     use :memoizer_methods
     use :eventpoint
 
     it "graph builds" do
-      _graph || fail
+      graph_ || fail
     end
 
     it "agent with only passive transitions builds" do
@@ -20,7 +20,7 @@ module Skylab::Task::TestSupport
       _agent_two || fail
     end
 
-    shared_subject :_graph do
+    shared_subject :graph_ do
 
       define_graph_ do |o|
 
@@ -53,28 +53,51 @@ module Skylab::Task::TestSupport
       end
     end
 
-      if false
+    it "profile 1 alone completes a path" do
+      # -
+        _pool = build_pending_execution_pool_ do |o|
 
-      it "normally signature 1 can carry it"  do
-        ok, path = recon_plus :A, :D, [ sig1 ]
-        ok.should eql( true )
-        path.length.should eql( 3 )
-        path.map( & :client ).should eql( [ :sig1, :sig1, :sig1 ] )
+          o.add_pending_task :_task_that_uses_profile_1_, _agent_one
+        end
+
+        _path = find_path_ _pool, graph_
+        steps = _path.steps
+
+        steps.length == 3 || fail
+        no = steps.detect do |step|
+          :_task_that_uses_profile_1_ != step.mixed_task_identifier
+        end
+        no && fail
+      # -
+    end
+
+    it "profile 2 alone won't reach an endpoint" do
+
+      _pool = build_pending_execution_pool_ do |o|
+
+        o.add_pending_task :_task_that_uses_profile_2_, _agent_two
       end
 
-      it "signature 2 alone won't reach it" do
-        ok, grid = recon_plus :A, :D, [ sig2 ]
-        ok.should eql( false )
-        a = grid.map( & :get_exponent )
-        a.should be_include( :agents_bring )
-      end
+      _em = expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
+
+      _em.black_and_white_expression_line ==
+       "the only pending execution does not bring the system #{
+         }from the A state to a finished state" or fail
+    end
 
       it "but SOMETHING MAGICAL happens when they are together" do
-        ok, path = recon_plus :A, :D, [ sig1, sig2 ]
-        ok.should eql( true )
-        path.map( & :client ).should eql( [:sig1, :sig2] )
-      end
 
+        _pool = build_pending_execution_pool_ do |o|
+
+          o.add_pending_task :_task_that_uses_profile_1_, _agent_one
+          o.add_pending_task :_task_that_uses_profile_2_, _agent_two
+        end
+
+        _path = find_path_ _pool, graph_
+        steps = _path.steps
+        steps.length == 2 || fail
+        steps.first.mixed_task_identifier == :_task_that_uses_profile_1_ || fail
+        steps.last.mixed_task_identifier == :_task_that_uses_profile_2_ || fail
       end
   end
 end

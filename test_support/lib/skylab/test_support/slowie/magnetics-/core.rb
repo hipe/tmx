@@ -226,7 +226,8 @@ module Skylab::TestSupport
           # since we want to detect variously whether each matcher is never
           # used (matching zero) or ambiguous (matching more than one), we've
           # got to check every remaining matcher against every remaining item
-          # (N^2); there is no "diminishing pool" (early short-circuit) here.
+          # (N^2); there is no [#ba-061] "diminishing pool"
+          # (early short-circuit) here.
 
           passed_h = {}
           every_remaining_matcher = match_a.reduce [] do | m, mtchr |
