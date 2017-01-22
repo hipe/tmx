@@ -16,13 +16,13 @@ use [sa] to convert etc to Stream_
   (#open [#ts-032.B] verbose mode for counts is borked)
 -3.090 #open [#ts-002] coverage in the recursive runner
   (the below is #open [#ts-030.B])
+  .. which closes [#ze-022.4] and has corollaries
 -3.103 help screen for quickie
 -3.109 request parsing must reconcile the state machine (probably a new branch)
 -3.125 tree runner can be invoked by a CLI or API scanner
 -3.126 cleanup [#ta-004] document so it's all clean and new for eventpoint
 -3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
 -3.132 testfile -1
--3.141 testfile -2
   .. "baseless" gonna go away too
 -3.150 testfile -3
   .. "digraphic" is available to you

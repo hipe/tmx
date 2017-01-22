@@ -25,6 +25,10 @@ module Skylab::Brazen
         @app_name_p[]
       end
 
+      def both x
+        _NLP_agent.both x
+      end
+
       def code s
         ick s
       end

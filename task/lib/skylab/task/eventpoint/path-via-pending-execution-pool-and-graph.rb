@@ -77,9 +77,15 @@ class Skylab::Task
           if 1 == d_a.length
             __when_one_formal_transition d_a.fetch 0
           else
-            self._COVER_ME__is_ambiguous__
+            __when_ambiguous d_a
           end
         end
+      end
+
+      def __when_ambiguous d_a
+        Eventpoint::When_::AmbiguousNextStep[ d_a, self ]
+        @_ok = false
+        UNABLE_
       end
 
       def __when_one_formal_transition trans_d  # panic or add one step and succeed
@@ -125,9 +131,24 @@ class Skylab::Task
         pending_executions = remove_instance_variable(
           :@pending_execution_pool ).pending_executions
 
+        graph = remove_instance_variable :@graph
+        verify = graph.nodes_box.h_.dup
+        verify.default_proc = -> h, k do
+          raise Eventpoint::KeyError, __say_levenschtein( k, h )
+        end
+
         pending_executions.each_with_index do |pe, ex_d|
 
           pe.agent_profile.formal_transitions.each do |ft|
+
+            # ~( validation begin
+            eventpoint = verify[ ft.from_symbol ]  # raise
+            a = eventpoint.can_transition_to
+            if ! ( a and a.include? ft.destination_symbol )
+              verify[ ft.destination_symbol ]  # raise
+              raise Eventpoint::RuntimeError, __say_invalid_trans( ft, pe, eventpoint )
+            end
+            # ~)
 
             trans_d = all_formal_transitions.length
             all_formal_transitions.push RegisteredTransition___.new( ex_d, ft )
@@ -150,7 +171,6 @@ class Skylab::Task
         @all_pending_executions = pending_executions
         @all_formal_transitions = all_formal_transitions.freeze
 
-        graph = remove_instance_variable :@graph
         @current_state_symbol = graph.beginning_state_symbol
         @_nodes_box_hash = graph.nodes_box.h_
 
@@ -161,7 +181,17 @@ class Skylab::Task
         NIL
       end
 
+      def __say_invalid_trans ft, pe, eventpoint  # formal transition, pending execution
+        Eventpoint::When_::Say_invalid_transition[ ft, pe, eventpoint ]
+      end
+
+      def __say_levenschtein k, h
+        "unrecognized node '#{ k }'. #{
+          }did you mean #{ Common_::Oxford_or[ h.keys.map(&:id2name) ] }?"  # more like DON'T say levenschtein
+      end
+
       attr_reader(
+        :all_formal_transitions,
         :all_pending_executions,
         :current_state_symbol,
         :graph,

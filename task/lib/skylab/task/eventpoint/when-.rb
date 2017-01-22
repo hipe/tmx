@@ -4,31 +4,66 @@ class Skylab::Task
 
     module When_
 
-      _Ev = Common_::Event
-
       # ==
 
-      Ambiguous_Next_Step = _Ev.prototype_with :ambiguous_next_step,
+      class AmbiguousNextStep < Common_::Dyadic
 
-          :steps, nil, :plugin_a, nil, :digraph, nil do | y, o |
-
-        a = o.steps.map do | step |
-          o.plugin_a.fetch( step.plugin_idx ).name.as_human
+        def initialize d_a, up
+          @all_formal_transitions = up.all_formal_transitions
+          @all_pending_executions = up.all_pending_executions
+          @listener = up.listener
+          @offsets = d_a
         end
 
-        _v = o.digraph.
-          transition( o.steps.first.transition_symbol ).name.as_human
+        def execute
 
-        y << "input has ambiguity - #{ both a }#{ and_ a } #{
-          }want to #{ _v }"
+          exe_a = @all_pending_executions
+          fot_a = @all_formal_transitions
 
+          and_buff_proto = Eventpoint::Event_::JoinerBuffer.new ' and '
+
+          buffer = and_buff_proto.dup_by do |o|
+            o.initial_buffer = "ambiguous: "
+          end
+
+          me = self
+          @listener.call :error, :expression, :ambiguous do |y|
+            me.__formal_transitions_by_common_destination.each_pair do |sym, d_a|
+              buff = and_buff_proto.dup
+              d_a.map do |d|
+                _pending_exe = exe_a.fetch fot_a.fetch( d ).pending_execution_offset
+                buff << "'#{ _pending_exe.mixed_task_identifier.intern }'"  # ..
+              end
+              _subj = buff.finish || 'multiple'
+              _yes = 1 == d_a.length
+              buffer << "#{ both d_a }#{ _subj } transition#{ 's' if _yes } to '#{ sym }'"
+            end
+            y << buffer.finish
+          end
+          UNABLE_
+        end
+
+        def __formal_transitions_by_common_destination
+
+          h = ::Hash.new(){ |h_, k| h_[k] = [] }
+          fot_a = @all_formal_transitions
+          @offsets.each do |d|
+            h[ fot_a.fetch( d ).formal_transition.destination_symbol ].push d
+          end
+          h
+        end
       end
 
       # ==
 
-      Unused_Actuals = _Ev.prototype_with :unused_actuals,
+      _Ev = Common_::Event
 
-          :box, nil, :steps, nil, :plugins, nil do | y, o |
+      UnusedActuals = _Ev.prototype_with(
+        :unused_actuals,
+        :box, nil,
+        :steps, nil,
+        :plugins, nil,
+      ) do |y, o|
 
         # just for fun we make a hand-written :+[#hu-002] EN expression of
         # aggregation:
@@ -81,36 +116,124 @@ class Skylab::Task
 
       # ==
 
-      NoTransitionFound = -> up do
+      class NoTransitionFound < Common_::Monadic
 
-        up.listener.call :error, :expression, :no_transition_found do |y|
+        def initialize up
+          @up = up
+        end
 
-          lib = Eventpoint::Event_
+        def execute
+          me = self
+          @up.listener.call :error, :expression, :no_transition_found do |y|
+            me.__express_into_under y, self
+          end
+        end
 
-          buff = lib::ThisOneBuffer.new self
+        def __express_into_under y, expag
+          @y = y ; @expression_agent = expag
+          if __zero
+            __express_zero
+          else
+            __express_one_or_more
+          end
+        end
 
-          a = up.all_pending_executions
+        def __zero
 
-          buff << lib::Pending_execution[ :exclusive, a ]
-            # none of the 3 pending executions,
-            # the only pending execution
+          @_lib = Eventpoint::Event_
+          @all_pending_executions = @up.all_pending_executions
+          @all_pending_executions.length.zero?
+        end
 
-          _ = up.current_state_symbol
-          buff << lib::Bring_the_system_to_a_finished_state[ _, :exclusive, a ]
+        def __express_zero
 
-          y << buff.string
+          # "there are no pending executions"
+          o = @_lib
+
+          o::SentencePhrase.define do |sp|
+
+            sp.noun_phrase = o::Exist[ :present, EMPTY_A_ ]
+
+            sp.verb_phrase = _pending_executions :inclusive
+
+          end.express_into_under @y, @expression_agent
+
+          # "so nothing brings the system from the A state to a finished state"
+
+          o::SentencePhrase.define do |sp|
+
+            sp.conjunctive_phrase = o::Therefor[]
+
+            sp.noun_phrase = o::Nothing[]
+
+            sp.verb_phrase = _finish
+
+          end.express_into_under @y, @expression_agent
+        end
+
+        def __express_one_or_more
+
+          # "none of the 3 pending executions [..]"
+          # "the only pending execution [..]"
+
+          o = @_lib
+
+          o::SentencePhrase.define do |sp|
+
+            sp.noun_phrase = _pending_executions :exclusive
+
+            sp.verb_phrase = _finish
+
+          end.express_into_under @y, @expression_agent
+        end
+
+        def _pending_executions which
+          @_lib::PendingExecutions[ which, @all_pending_executions ]
+        end
+
+        def _finish
+          @_lib::Finish.call(
+            @up.current_state_symbol,
+            :exclusive,
+            @all_pending_executions,
+          )
         end
       end
 
       # ==
 
-      class Express_Help < Common_::Event
+      Say_invalid_transition = -> ft, pe, eventpoint do
+
+        s = "'#{ ft.from_symbol }' cannot transition to '#{ ft.destination_symbol }'."
+
+        a = eventpoint.can_transition_to
+        if a
+          _a = a.map( & :id2name )
+          s << " it can transition to #{ Common_::Oxford_or[ _a ] }"
+        else
+          s << " it is an endpoint, and so has no transitions"
+        end
+        mti = pe.mixed_task_identifier
+        if mti.respond_to? :intern
+          s << " (in '#{ mti.intern })'"
+        end
+        s << '.'  # DOT_
+      end
+
+      # ==
+
+      class WAS_Express_Help < Common_::Event
+
+        # (although this is no longer used we're keeping it around until
+        # that loop is closed :[#ze-022.4]: help screen for [ts] quickie
+        # using [ze] microservices (somehow).. probably move this code there)
 
         class << self
           public :new
         end  # >>
 
         def initialize resources, & oes_p
+          self._NOT_USED__readme__
           @rsc = resources
           @on_event_selectively = oes_p
         end
@@ -222,7 +345,7 @@ class Skylab::Task
 
           def __render_options
 
-            self._NOT_COVERED__and_when_you_do_you_need_to_modernize_the_table__  # #open [#011]
+            self._NOT_COVERED__and_when_you_do_you_need_to_modernize_the_table__  # #open [#pl-011]
 
             y = @y
 
@@ -351,9 +474,9 @@ class Skylab::Task
             end ; nil
           end
         end
-
-        # ==
       end
+
+      # ==
     end
   end
 end

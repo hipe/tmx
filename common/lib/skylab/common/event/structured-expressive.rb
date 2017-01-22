@@ -77,24 +77,32 @@ module Skylab::Common
           i_a.freeze
 
           ::Class.new( self ).class_exec do
+
             class << self
               alias_method :new, :orig_new
               alias_method :[], :new
-            end
+              alias_method :call, :[]
+            end  # >>
+
             const_set :MEMBER_A_, i_a
             const_set :IVAR_A_, i_a.map { |i| :"@#{ i }" }.freeze
             const_set :IVAR_H_, ::Hash[ i_a.zip self::IVAR_A_ ].freeze
             const_set :PROC_, procedure
+
             def initialize * x_a
+
               ivar_a = self.ivar_a
-              ( 0 ... (( len = x_a.length )) ).each do |idx|
+              len = x_a.length
+
+              ( 0 ... len ).each do |idx|
                 instance_variable_set ivar_a.fetch( idx ), x_a.fetch( idx )
               end
+
               ( len ... ivar_a.length ).each do |idx|
                 instance_variable_set ivar_a.fetch( idx ), nil
               end
-              nil
             end
+
             attr_reader( * i_a )
             self
           end
@@ -114,7 +122,9 @@ module Skylab::Common
         end
 
         def express_into_under y, expag
-          y << string_via_express_under( expag )
+          s = string_via_express_under expag
+          s and y << s
+          y
         end
 
         def string_via_express_under expag

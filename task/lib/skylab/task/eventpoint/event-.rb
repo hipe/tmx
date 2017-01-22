@@ -15,7 +15,7 @@ class Skylab::Task
       o[ p ]
     end
 
-    Pending_execution = -> do
+    PendingExecutions = -> do
 
           h = {
             inclusive: -> n do
@@ -47,22 +47,29 @@ class Skylab::Task
             }#{ The_state_[ ep ] }"
         end ]
 
-    Bring_the_system_to_a_finished_state = new.call do |
+    Finish = new.call do |
       current_state_symbol,
       inclusive_or_exclusive,
-      pending_executions
+      pending_executions,
     |
 
-      excl = :exclusive == inclusive_or_exclusive
-      _v = case pending_executions.length
-
-              when 1 ; excl ? "does not bring" : "brings"
-              else   ; "bring"
-              end
+      _v = case 1 <=> pending_executions.length
+      when 1
+        "brings"  # ick - only because "nothing brings" (compare "no things bring")
+      when 0
+        if :exclusive == inclusive_or_exclusive
+          "does not bring"
+        else
+          "brings"
+        end
+      when -1
+        "bring"
+      end
 
       "#{ _v } the system from #{ The_state__[ current_state_symbol ] }#{
         } to a finished state"
     end
+
 
         Client__ = -> client_x do
           "#{ client_x.intern }"
@@ -96,6 +103,7 @@ class Skylab::Task
         end ]
 
         Reach = o[ -> ep do
+          self._FLAGGED
           "cannot reach #{ The_state_[ ep ] }"
         end ]
 
@@ -103,29 +111,22 @@ class Skylab::Task
           Client__[ sig.client ]
         end ]
 
-        So = o[ -> { "so" } ]
-
-        System = o[ -> { "the system" } ]
-
-        Transition = o[ -> fep, tep do
-
-          a = fep.to_a
-          x = if a
-
-            _ = Common_::Oxford_and[ a.map( & :node_symbol ) ]
-
-            " (#{ Ep__[ fep ] } goes to #{ _ })"
-              else
-            " (#{ Ep__[ fep ] } does not transition to any other nodes)"
-              end
-
-          "expresses an invalid transition from #{ Ep__[ fep ] } to #{
-            }#{ Ep__[ tep ] }#{ x }"
-        end ]
-
         Unmet_Reliance = o[ -> ep do
           "cannot operate without reaching #{ The_state_[ ep ] }"
         end ]
+
+
+    # == n
+
+    Nothing = new.call(){ "nothing" }
+
+    # == v
+
+    # == conjunctive
+
+    Therefor = new.call() { "so" }
+
+    # == support
 
     The_state__ = -> ep do
       "the #{ Ep__[ ep ] } state"
@@ -143,39 +144,107 @@ class Skylab::Task
 
     # ==
 
-    class ThisOneBuffer
+    # we have tried to modernized and simplify and clarify some names,
+    # but mosty this exists to bridge the gap between rignt now and the
+    # very old. was a goofy, fun, interesting experment called "grid"
+    # and "grid frame". moved here from core at #history-B.
 
-      # xx
-      # compare the much more complicated [#hu-046] "phrase assmebly"
+    class SentencePhrase < Common_::SimpleModel
 
-      def initialize expag
-        @_receive = :__receive_initially
-        @_expag = expag
-        @string = ""
+      def initialize
+        @conjunctive_phrase = nil
+        super
       end
 
-      def << phrase
-        send @_receive, phrase
-      end
+      attr_writer(
+        :conjunctive_phrase,
+        :noun_phrase,
+        :verb_phrase,
+      )
 
-      def __receive_initially ph
-        _write_phrase ph
-        @_receive = :__receive_normally ; nil
+      def express_into_under y, expag
+        _o = dup.extend SentencePhraseExpressionMethods___
+        _o.__express_into_under_ y, expag
       end
-
-      def __receive_normally ph
-        @string << SPACE_
-        _write_phrase ph
-      end
-
-      def _write_phrase ph
-        ph.express_into_under @string, @_expag
-        NIL
-      end
-
-      attr_reader :string
     end
+
+    module SentencePhraseExpressionMethods___
+
+      def __express_into_under_ y, expag
+        @_joiner_buffer = JoinerBuffer.new SPACE_
+        @_expression_agent = expag
+        _visit @conjunctive_phrase
+        _visit @noun_phrase
+        _visit @verb_phrase
+        s = @_joiner_buffer.finish
+        if s
+          y << s
+        end
+        y
+      end
+
+      def _visit expresser
+        if expresser
+          expresser.express_into_under @_joiner_buffer, @_expression_agent
+        end
+      end
+    end
+
+    # ==
+
+    class JoinerBuffer
+
+      # (this has to exist somewhere else in our universe, musn't it?)
+
+      def initialize sep
+        @_receive = :__receive_initially_when_raw
+        @separator = sep
+      end
+
+      def dup_by
+        otr = dup
+        yield otr
+        otr
+      end
+
+      def << s
+        send @_receive, s
+        self
+      end
+
+      def __receive_initially_when_raw s
+        self.initial_buffer = ""
+        send @_receive, s
+      end
+
+      def initial_buffer= s
+        @_receive = :__receive_initially_normally
+        @_buffer = s
+      end
+
+      def __receive_initially_normally s
+        if s
+          @_buffer << s
+          @_receive = :__receive_normally
+        end
+      end
+
+      def __receive_normally s
+        if s
+          @_buffer << @separator << s
+        end
+      end
+
+      def finish
+        x = remove_instance_variable :@_buffer
+        remove_instance_variable :@_receive
+        freeze
+        x
+      end
+    end
+
     # ==
   end
 end
+# :#history-B: "grid" thing (now "sentence phrase") emigrates from core
 # #history: begin massive rewrite (used to be "expressions")

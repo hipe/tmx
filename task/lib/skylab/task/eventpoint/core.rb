@@ -32,16 +32,6 @@ class Skylab::Task
 
     # ==
 
-        def fetch_eventpoint i
-          @h.fetch i
-        end
-
-        def get_possible_eventpoints
-          @a.map( & @h.method( :fetch ) )
-        end
-
-    # ==
-
     class GraphDefinition___
 
       def initialize
@@ -173,120 +163,6 @@ class Skylab::Task
 
     # ==
 
-      Multi_add_ = -> i, x do
-        @h.fetch( i ) do |_|
-          @a << i
-          @h[ i ] = [ ]
-        end.push x
-        nil
-      end
-
-      Same_method_ = -> * x_a, & x_p do
-
-        o = new( * x_a, & x_p )
-        wv = o.work_
-        if wv
-          wv
-        else
-          o._express_via_expression_grid
-          UNABLE_
-        end
-      end
-
-      module Worker_Methods_
-
-        def add_statementish_ agent, predicate, any_conj=nil
-
-          eg = @expression_grid
-          if ! eg
-            eg = Grid__.new
-            @expression_grid = eg
-          end
-
-          eg << Grid_Frame__[ agent, predicate, any_conj ]
-
-          NIL_
-        end
-
-        def _express_via_expression_grid
-          @expression_grid.articulate_each_frame_to @y.method( :<< )
-          UNABLE_
-        end
-
-        def express_ const, * args
-          Here_::Expressions___.const_get( const, false )[ * args ]
-        end
-
-        def errmsg_ agent, predicate, any_conj=nil
-          Grid_Frame__[ agent, predicate, any_conj ].string_via_express
-        end
-
-        attr_reader(
-          :expression_grid,
-        )
-      end
-
-      class Grid__
-        def initialize
-          @a = [ ]
-        end
-        def length
-          @a.length
-        end
-        def fetch_frame idx
-          @a.fetch idx
-        end
-        def << frame
-          @a << frame
-          nil
-        end
-        def each &blk
-          @a.each( &blk )
-        end
-        def map &blk
-          @a.map( &blk )
-        end
-        def articulate_each_frame_to p
-          @a.each do |frame|
-            p[ frame.string_via_express ]
-          end
-          nil
-        end
-      end
-
-      class Grid_Frame__
-
-        class << self ; alias_method :[], :new end
-
-        def initialize agent, predicate, any_conj=nil
-          @agent, @predicate, @any_conj = agent, predicate, any_conj
-        end
-
-        def string_via_express
-          word_a = [ ]
-          (( s = @any_conj && @any_conj.string_via_express )) and word_a << s
-          (( s = ( @agent | @predicate ).inflect )) and word_a << s
-          word_a * SPACE_ if word_a.length.nonzero?
-        end
-
-        Internen__ = -> mod_x do
-
-          Common_::Name.via_module( mod_x ).as_const.to_s.
-            gsub( /_+\z/, EMPTY_S_ ).downcase
-        end
-
-        def get_exponent
-          @exponent ||=
-            :"#{ Internen__[ @agent.class ]}_#{ Internen__[ @predicate.class ] }"
-        end
-      end
-
-      At_ = -> * i_a do  # #protected-not-private
-        i_a.map( & method( :send ) )
-      end
-
-    # ==
-
     class Graph___ < Common_::SimpleModel
 
       attr_accessor(
@@ -330,6 +206,7 @@ class Skylab::Task
 
     Here_ = self
     KeyError = ::Class.new ::KeyError
+    RuntimeError = ::Class.new ::RuntimeError
 
     # ==
   end
