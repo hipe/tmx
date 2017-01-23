@@ -130,6 +130,7 @@
              ( #was: rename `name_i` => `name_symbol` universe-wide )
              (was: #done rename `event_cloud` -> `event_graph`)
 [#003]       the event narrative ..
+             :[#here.1]: "structured expressive" (both old (main) node and new)
              (was: #done event class should not be a struct)
 [#002]       #tracking-tag #pattern: public emitters
 [#001]       the selective listener pattern

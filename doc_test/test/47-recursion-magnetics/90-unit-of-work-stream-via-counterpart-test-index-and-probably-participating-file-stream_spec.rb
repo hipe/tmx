@@ -112,7 +112,7 @@ module Skylab::DocTest::TestSupport
         end
 
         it "the emission content makes sense" do
-          _act = the_emission_.black_and_white_expression_line
+          _act = the_emission_.to_black_and_white_line
           _exp = /\Acreated «#{ esc[ _test_file_21 ] }» \([1-9]\d* lines, [1-9]\d+ bytes\)/
           _act =~ _exp || fail
         end
@@ -134,7 +134,7 @@ module Skylab::DocTest::TestSupport
         end
 
         it "the emission content takin bout unversioned changes" do
-          _act = the_emission_.black_and_white_expression_line
+          _act = the_emission_.to_black_and_white_line
           _exp = /\Askipping because has changes: «#{ esc[ _test_file_22 ] }»/
           _act =~ _exp || fail
         end
@@ -151,7 +151,7 @@ module Skylab::DocTest::TestSupport
         end
 
         it "the emission talkin bout updated" do
-          _act = the_emission_.black_and_white_expression_line
+          _act = the_emission_.to_black_and_white_line
           _exp = /\Aupdated «#{ esc[ _test_file_23 ] }» \([1-9]\d* lines, [1-9]\d+ bytes\)/
           _act =~ _exp or fail
         end

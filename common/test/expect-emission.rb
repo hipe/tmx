@@ -1262,7 +1262,7 @@ module Skylab::Common::TestSupport
         _expag.calculate [], & @expression_proc
       end
 
-      def black_and_white_expression_line
+      def to_black_and_white_line
         ( @___2 ||= _kn( "", _black_and_white_expag )).value_x
       end
 

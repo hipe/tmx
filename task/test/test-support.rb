@@ -140,10 +140,6 @@ module Skylab::Task::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  The_Method_Called_Let = -> tcc do
-    TestSupport_::Let[ tcc ]
-  end
-
   # --
 
   Home_ = ::Skylab::Task

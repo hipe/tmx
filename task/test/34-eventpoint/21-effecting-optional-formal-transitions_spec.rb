@@ -31,11 +31,10 @@ module Skylab::Task::TestSupport
 
       it "against an empty pool" do
 
-        _pool = build_pending_execution_pool_ do |o|
+        _em = expect_failure_and_emission_when_find_path_by_ do |_|
           NOTHING_
         end
 
-        _em = expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
         a = _em.to_black_and_white_lines
         2 == a.length || fail
 
@@ -52,26 +51,23 @@ module Skylab::Task::TestSupport
 
       it "reconcile with one dud signature #redundant-sounding" do
 
-        _pool = build_pending_execution_pool_ do |o|
+        _em = expect_failure_and_emission_when_find_path_by_ do |o|
 
           o.add_pending_task :_the_empty_agent, agent_
         end
 
-        _em = expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
-        _s  = _em.black_and_white_expression_line
-
+        _s  = _em.to_black_and_white_line
         _s == "the only #{ noun } does not #{ bring_etc }" || fail
       end
 
       it "same as above but 2x subjects" do
 
-        _pool = build_pending_execution_pool_ do |o|
+        _em = expect_failure_and_emission_when_find_path_by_ do |o|
           o.add_pending_task :_empty_agent_1, agent_
           o.add_pending_task :_empty_agent_2, agent_
         end
 
-        _em = expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
-        _s = _em.black_and_white_expression_line
+        _s = _em.to_black_and_white_line
         _s == "none of the two #{ noun }s #{ bring_etc }" || fail
       end
 
@@ -118,9 +114,11 @@ module Skylab::Task::TestSupport
         rescue subject_module_::RuntimeError => e
         end
 
-        e.message == "'B' cannot transition to 'A'. #{
+        _exp = "'B' cannot transition to 'A'. #{
           }it is an endpoint, and so has no transitions #{
-            }(in '_wrong_direction_agent_1)'." || fail
+            }(in '_wrong_direction_agent_1')." || fail
+
+        e.message == _exp || fail
       end
 
       def agent_
@@ -132,10 +130,9 @@ module Skylab::Task::TestSupport
 
       it "reconcile one nudge - WORKS" do
 
-        _pool = build_pending_execution_pool_ do |o|
+        _ = find_path_by_ do |o|
           o.add_pending_task :_good_agent_1, agent_
         end
-        _ = find_path_ _pool, graph_
         _.steps.length == 1 || fail
       end
 
@@ -148,12 +145,11 @@ module Skylab::Task::TestSupport
 
       it "reconcile with ambiguous nudges - soft failure" do
 
-        _pool = build_pending_execution_pool_ do |o|
+        _em = expect_failure_and_emission_when_find_path_by_ do |o|
           o.add_pending_task :_beavis_agent, agent_
           o.add_pending_task :_butthead_agent, agent_
         end
-        _em = expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
-        _line = _em.black_and_white_expression_line
+        _line = _em.to_black_and_white_line
         _line == "ambiguous: both '_beavis_agent' and '_butthead_agent' transition to 'B'" || fail
       end
 

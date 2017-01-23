@@ -110,7 +110,22 @@ class Skylab::Task
 
     # ==
 
-    PendingExecution___ = ::Struct.new :mixed_task_identifier, :agent_profile
+    class PendingExecution___
+
+      def initialize mixed_task_identifier, agent_profile
+        @agent_profile = agent_profile
+        @mixed_task_identifier = mixed_task_identifier
+      end
+
+      def to_formal_transition_stream
+        Stream_[ @agent_profile.formal_transitions ]  # #here-1
+      end
+
+      attr_reader(
+        :agent_profile,
+        :mixed_task_identifier,
+      )
+    end
 
     # ==
 
@@ -132,7 +147,7 @@ class Skylab::Task
     class DefineTimeAgentProfileFormalTransitionIndex___
 
       def initialize
-        @_formal_transitions = []
+        @_formal_transitions = []  # :#here-1 there must always be some array
       end
 
       def __add_ability_transition_ from_sym, dest_sym
@@ -179,14 +194,19 @@ class Skylab::Task
     end
 
     class AgentProfileFormalTransition__
+
       def initialize from_sym, dest_sym
+
         @destination_symbol = dest_sym
         @from_symbol = from_sym
+        @is_stationary = from_sym == dest_sym
         freeze
       end
+
       attr_reader(
         :from_symbol,
         :destination_symbol,
+        :is_stationary,
       )
     end
     # ==

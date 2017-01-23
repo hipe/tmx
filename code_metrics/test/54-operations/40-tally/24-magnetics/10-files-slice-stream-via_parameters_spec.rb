@@ -56,7 +56,7 @@ module Skylab::CodeMetrics::TestSupport
 
         _ = "find: -egads-not-a-path-nor-an-operator: No such file or directory\n"
 
-        _act = em.black_and_white_expression_line
+        _act = em.to_black_and_white_line
 
         _act == _ || fail
       end

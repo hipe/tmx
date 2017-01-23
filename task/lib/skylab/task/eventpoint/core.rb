@@ -180,7 +180,7 @@ class Skylab::Task
       end
 
       def _dotfile fwd
-        Here_::LineStream_for_Dotfile_via_Graph.call_by do |o|
+        Eventpoint::LineStream_for_Dotfile_via_Graph.call_by do |o|
           o.graph = self
           o.be_inverted = ! fwd
         end
@@ -204,7 +204,6 @@ class Skylab::Task
 
     # ==
 
-    Here_ = self
     KeyError = ::Class.new ::KeyError
     RuntimeError = ::Class.new ::RuntimeError
 

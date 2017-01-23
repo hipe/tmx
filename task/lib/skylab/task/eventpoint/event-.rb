@@ -2,12 +2,29 @@ class Skylab::Task
 
   module Eventpoint::Event_
 
-    # #NOTE: these guys are ANCIENT and shoehorned into a newer paradigm.
+    # :NOTE: the original main content of this file was an ANCIENT
+    # alphabetical list of what we now call "expression micro-agents".
+    # "structured expressive agents" (pushed up to [#co-003.1]) are
+    # generally the idea that you can have an object that is struct-like
+    # but also knows how to express itself into a string under a general
+    # modality-specific expression agent.
+    #
+    # we took this idea to an extreme here combined with another idea that
+    # *all* EN for the library should be in this one file, ostensibly to
+    # ease some future imagined pain of internationalization. some of our
+    # "micro-agents" only existed to express one word! you still see traces
+    # of that now.
+    #
+    # nowadays we find it impractical to hold ourself to this constraint,
+    # but as for the expression micro-agents that remain,
     # they aren't getting a deeper refactor because emissions are an
     # auxiliary side to our central function
 
-    # as they are the look to be like a dictionary (alphabetical, once)
-    # of phrase-specific expression micro-agents
+    # during the modernification, we became less concerned with keeping all
+    # EN in one file so the responsibility of this file shrank. now it's
+    # meant to be only expression support and *reusable* expression micro-
+    # agents. those m.a's that were only used for one kind of event have
+    # been pushed out to where they are used.
 
     o = Common_::Event::StructuredExpressive.method :new  # old way
 
@@ -42,11 +59,6 @@ class Skylab::Task
       end
     end.call
 
-        Ambiguity = o[ -> ep, pred_a do
-          "express transitions of the same strength from #{
-            }#{ The_state_[ ep ] }"
-        end ]
-
     Finish = new.call do |
       current_state_symbol,
       inclusive_or_exclusive,
@@ -66,16 +78,9 @@ class Skylab::Task
         "bring"
       end
 
-      "#{ _v } the system from #{ The_state__[ current_state_symbol ] }#{
+      "#{ _v } the system from #{ Say_state[ current_state_symbol ] }#{
         } to a finished state"
     end
-
-
-        Client__ = -> client_x do
-          "#{ client_x.intern }"
-        end
-
-        Client = o[ Client__ ]
 
         Exist = -> do
           h = {
@@ -87,33 +92,6 @@ class Skylab::Task
           end ]
         end.call
 
-        Got_passed = o[ -> ep, a do
-          if 1 == a.length
-            "failed to get passed #{ The_state_[ ep ] }"
-          else
-            "got passed #{ The_state_[ ep ] }"
-          end
-        end ]
-
-        Had_no_effect = o[ -> ep_a do
-
-          _ = Common_::Oxford_or[ ep_a.map( & The_state_ ) ]
-
-          "will have no effect because the system does not reach #{ _ }"
-        end ]
-
-        Reach = o[ -> ep do
-          self._FLAGGED
-          "cannot reach #{ The_state_[ ep ] }"
-        end ]
-
-        Signature = o[ -> sig do
-          Client__[ sig.client ]
-        end ]
-
-        Unmet_Reliance = o[ -> ep do
-          "cannot operate without reaching #{ The_state_[ ep ] }"
-        end ]
 
 
     # == n
@@ -128,11 +106,22 @@ class Skylab::Task
 
     # == support
 
-    The_state__ = -> ep do
-      "the #{ Ep__[ ep ] } state"
+    Say_pending_execution = -> pending_exe do
+      x = pending_exe.mixed_task_identifier
+      if x.respond_to? :id2name
+        "'#{ x }'"
+      else
+        Eventpoint._DESIGN_ME
+      end
     end
 
-    Ep__ = -> sym do
+    smart_quote = nil
+
+    Say_state = -> sym do
+      "the #{ smart_quote[ sym ] } state"
+    end
+
+    smart_quote = -> sym do
 
       s = sym.id2name
       if s.include? SPACE_
@@ -191,6 +180,10 @@ class Skylab::Task
     end
 
     # ==
+
+    And_buffer = Lazy_.call do
+      JoinerBuffer.new ' and '
+    end
 
     class JoinerBuffer
 

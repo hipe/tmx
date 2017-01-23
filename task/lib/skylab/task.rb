@@ -361,6 +361,10 @@ class Skylab::Task
     Here_ = self
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   ArgumentError = ::Class.new ::ArgumentError
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]

@@ -17,6 +17,8 @@ class Skylab::Task
 
         def execute
 
+          and_buff_proto = Eventpoint::Event_::And_buffer[]
+
           exe_a = @all_pending_executions
           fot_a = @all_formal_transitions
 
@@ -56,62 +58,119 @@ class Skylab::Task
 
       # ==
 
-      _Ev = Common_::Event
+      class UnutilizedPendingExecution < Common_::Dyadic
 
-      UnusedActuals = _Ev.prototype_with(
-        :unused_actuals,
-        :box, nil,
-        :steps, nil,
-        :plugins, nil,
-      ) do |y, o|
+        # a custom #[#hu-002] EN expression of aggregation
 
-        # just for fun we make a hand-written :+[#hu-002] EN expression of
-        # aggregation:
-        #
-        # "the application would finish by expressing help before it would
-        # build hob-nobbers or flush dingle-hoofers, making the '--foo'
-        # option meaningless. also, '--x' would never be processed because
-        # zipping the dipple [ or dopping the nopple ] would never happen."
-        #
-        # sentence 1 and sentence 2..N have different templates, which we
-        # implement by processing the matrix as a stream.
-
-        formal_and_plugins_matrix = o.box.to_enum( :each_value ).map do | unused_a |
-
-          fo = nil
-          _or_s_a = unused_a.map do | unused |
-
-            fo ||= unused.formal  # use the first one for its name
-
-            _pu = o.plugins.fetch( unused.plugin_idx )
-
-            _pu.name.as_human
-
-          end
-          [ fo, _or_s_a ]
+        def initialize d_a, up
+          @offsets = d_a
+          @up = up
         end
 
-        st = Common_::Stream.via_nonsparse_array formal_and_plugins_matrix
+        def execute
 
-        fo, or_s_a = st.gets
+          me = self
+          lib = Eventpoint::Event_
 
-        de = o.plugins.fetch o.steps.last.plugin_idx
+          @up.listener.call :info, :expression, :unutilized_pending_executio do |y|
 
-        y << "the application would finish by #{
-         }#{ progressive_verb de.name.as_human } #{
-          }before it would #{ or_ or_s_a }, making the #{
-           }'#{ fo.local_identifier_x }' option meaningless."
+            me.__to_thing_stream.each do |exe|
 
-        begin
-          fo, or_s_a = st.gets
-          fo or break
-          or_s_a.map!( & method( :progressive_verb ) )
+              buffer = "#{ lib::Say_pending_execution[ exe ] } #{
+                }will have no effect because the system does not reach "
 
-          y << "also, '#{ fo.local_identifier_x }' would never be processed #{
-           }because #{ or_ or_s_a } would never happen"
+              seen = {}
+              _wow = exe.to_formal_transition_stream.map_by do |fo_trans|
+                fo_trans.from_symbol
+              end.reduce_by do |sym|
+                seen.fetch(sym) { seen[sym] = false ; true }
+              end.map_by do |sym|
+                lib::Say_state[ sym ]
+              end.join_into_with_by "", " or ", & IDENTITY_
 
-          redo
-        end while nil
+              buffer << _wow
+              y << buffer
+            end
+            y  # important
+          end
+          NIL
+        end
+
+        def __to_thing_stream
+          exe_a = @up.all_pending_executions
+          Common_::Stream.via_nonsparse_array( @offsets ).map_by do |exe_d|
+            exe_a.fetch exe_d
+          end
+        end
+      end
+
+      # ==
+
+      class UnmetImperativeTransitions < Common_::Dyadic
+
+        # "FOO" and "BAR" {rely|relies} on 'zing zang'
+
+        def initialize d_a, up
+          @offsets = d_a
+          @up = up
+        end
+
+        def execute
+          me = self
+          @up.listener.call :error, :expression, :unmet_imperatives do |y|
+            _big_line = me.__big_line
+            y << _big_line
+          end
+          NIL
+        end
+
+        def __big_line
+
+          _pending_executions_via_source_sym = __pending_executions_via_source_sym
+
+          lib = Eventpoint::Event_
+          say_state = lib::Say_state
+          and_buff_proto = lib::And_buffer[]
+          buffer = and_buff_proto.dup
+
+          exe_a = @up.all_pending_executions
+          and_me = []
+          _pending_executions_via_source_sym.each_pair do |from_sym, exe_d_a|
+
+            buff = and_buff_proto.dup
+
+            exe_d_a.each do |d|
+              buff << lib::Say_pending_execution[ exe_a.fetch( d ) ]
+            end
+
+            _v = 1 == exe_d_a.length ? 'relies' : 'rely'
+
+            s = say_state[ from_sym ]
+            buffer << "#{ buff.finish } #{ _v } on #{ s }"
+            and_me.push s
+          end
+
+          big_line = buffer.finish
+
+          _v = 1 == and_me.length ? "isn't" : "aren't"
+          big_line << " and #{ Common_::Oxford_and[ and_me ] } #{ _v } reached."
+        end
+
+        def __pending_executions_via_source_sym
+
+          # 1. group the things by the source node they needed but didn't have
+
+          fot_a = @up.all_formal_transitions
+
+          pending_executions_via_source_sym = {}
+          @offsets.each do |d|
+            reg_trans = fot_a.fetch d
+            _sym = reg_trans.formal_transition.from_symbol
+            ( pending_executions_via_source_sym[ _sym ] ||= [] ).push(
+              reg_trans.pending_execution_offset )
+          end
+          pending_executions_via_source_sym
+        end
       end
 
       # ==
@@ -215,7 +274,7 @@ class Skylab::Task
         end
         mti = pe.mixed_task_identifier
         if mti.respond_to? :intern
-          s << " (in '#{ mti.intern })'"
+          s << " (in '#{ mti.intern }')"
         end
         s << '.'  # DOT_
       end

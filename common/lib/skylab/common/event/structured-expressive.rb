@@ -1,6 +1,6 @@
 module Skylab::Common
 
-  class Event::StructuredExpressive
+  class Event::StructuredExpressive  # :[003.1].
 
     # (moved here from [ta]. won't put it next to the others, it's too deep)
 

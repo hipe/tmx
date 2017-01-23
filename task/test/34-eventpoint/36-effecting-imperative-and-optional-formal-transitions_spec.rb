@@ -55,12 +55,12 @@ module Skylab::Task::TestSupport
 
     it "profile 1 alone completes a path" do
       # -
-        _pool = build_pending_execution_pool_ do |o|
+
+        _path = find_path_by_ do |o|
 
           o.add_pending_task :_task_that_uses_profile_1_, _agent_one
         end
 
-        _path = find_path_ _pool, graph_
         steps = _path.steps
 
         steps.length == 3 || fail
@@ -73,27 +73,24 @@ module Skylab::Task::TestSupport
 
     it "profile 2 alone won't reach an endpoint" do
 
-      _pool = build_pending_execution_pool_ do |o|
+      _em = expect_failure_and_emission_when_find_path_by_ do |o|
 
         o.add_pending_task :_task_that_uses_profile_2_, _agent_two
       end
 
-      _em = expect_failure_and_emission_from_trying_to_find_path_ _pool, graph_
-
-      _em.black_and_white_expression_line ==
+      _em.to_black_and_white_line ==
        "the only pending execution does not bring the system #{
          }from the A state to a finished state" or fail
     end
 
       it "but SOMETHING MAGICAL happens when they are together" do
 
-        _pool = build_pending_execution_pool_ do |o|
+        _path = find_path_by_ do |o|
 
           o.add_pending_task :_task_that_uses_profile_1_, _agent_one
           o.add_pending_task :_task_that_uses_profile_2_, _agent_two
         end
 
-        _path = find_path_ _pool, graph_
         steps = _path.steps
         steps.length == 2 || fail
         steps.first.mixed_task_identifier == :_task_that_uses_profile_1_ || fail

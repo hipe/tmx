@@ -22,7 +22,7 @@ module Skylab::CodeMetrics::TestSupport
 
       _em = expect_not_OK_event
 
-      _act = _em.black_and_white_expression_line
+      _act = _em.to_black_and_white_line
 
       _act =~ %r(\Ainvalid pattern, must look [a-z ]+: "\[#foo-999\]"\z) || fail
     end

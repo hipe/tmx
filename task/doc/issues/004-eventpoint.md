@@ -1,5 +1,30 @@
 # eventpoint :[#004]
 
+## synopsis of objective and scope via introduction
+
+the "eventpoint" library is an experimental solution to the problem of
+how to manage a "plugin" "architecture" when the plugins have procedural
+interdependencies (and sometimes mutual exclusivities) with each other:
+
+it's a common scenario with non-trivial command-line apps (and hopefully
+others) that certain parameters only make sense to use with other
+parameters, and certain other parameters presuppose that certain other
+paramters are not engaged.
+
+"evenpoint" tries to offers one way to model these arrangements so that
+what makes sense to happen just happens without extra work. the tradeoff
+is up-front: eventpoint wants you to model your problem as a directed-
+graph state machine. your plugins, then, declare the transitions that
+they *can* and/or *must* make on this state machine when they are
+activated.
+
+evenpoint tries to find an execution path in the state machine given
+the active plugins (i.e the activated options). when a path cannot be
+found from the beginning state to an ending state, hopefully meaningful
+language is produced..
+
+
+
 
 ## quick preface to this document.
 
