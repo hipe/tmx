@@ -123,6 +123,8 @@
 
 [#009]       track ways in which quickie might differ behaviorally from rspec
 
+             :[#here.E]: before all blocks give you NO context
+
              :[#here.D]: we are so great because we mock caller locations
                we are so great
 

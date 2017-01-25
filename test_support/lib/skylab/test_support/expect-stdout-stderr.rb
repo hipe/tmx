@@ -131,7 +131,7 @@ module Skylab::TestSupport
         if instance_variable_defined? :@for_expect_stdout_stderr_prepare_invocation
           @for_expect_stdout_stderr_prepare_invocation[ invo ]
         else
-          for_expect_stdout_stderr_prepare_invocation invo
+          prepare_subject_CLI_invocation invo
         end
 
         @invocation = invo
@@ -181,7 +181,7 @@ module Skylab::TestSupport
 
     private
 
-      def for_expect_stdout_stderr_prepare_invocation _  # :+#hook-in
+      def prepare_subject_CLI_invocation _  # #hook-in
         NIL_
       end
 

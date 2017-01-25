@@ -7,7 +7,7 @@ module Skylab::TestSupport
       # (these are the things that can't/shouldn't be covered)
 
       def enable_kernel_describe
-        self._COVERED_BUT_NOT_INTEGRATED
+        _runtime.__enable_kernel_describe
       end
 
       def extended mod  # :+[#sl-111] deprecteded `extended` pattern
@@ -65,9 +65,22 @@ module Skylab::TestSupport
       # -- "kernel describe" (not used often, but available to look like r.s)
 
       def __enable_kernel_describe
-        if @kernel_module.method_defined? :describe
-          NOTHING_  # hi. assume r.s
-        else
+        send( @_enable_kernel_describe ||= :__enable_kernel_describe_initially )
+      end
+
+      def __enable_kernel_describe_initially
+
+        @_enable_kernel_describe = :__runtime_nothing  # no matter what, called 1x
+
+        # [#004.A] discusses the details of how we implement this
+
+        if send @_quickie_has_reign
+          __enable_kernel_describe_for_quickie
+        end
+        NIL
+      end
+
+      def __enable_kernel_describe_for_quickie
           me = self
           @kernel_module.send :define_method, :describe do |*desc_s_a, &p|
             svc = me._touch_quickie_service
@@ -76,7 +89,6 @@ module Skylab::TestSupport
               _hm  # #todo
             end
           end
-        end
         NIL
       end
 
@@ -216,6 +228,10 @@ module Skylab::TestSupport
 
       def __quickie_has_reign
         @__quickie_has_reign
+      end
+
+      def __runtime_nothing
+        NOTHING_  # hi.
       end
     end
 
@@ -816,7 +832,7 @@ module Skylab::TestSupport
         @_EEK_branch_offset = 0  # index into the above
         @_EEK_eg_category = :pass  # the first example, even w/ no tests, is still 'pass'
         @_EEK_failure_count = nil
-        @_EEK_flush = :_nothing
+        @_EEK_flush = :_CLI_client_nothing
         @_EEK_depth = nil  # horrible
 
         @_CLI_expression_resources = rsx
@@ -986,7 +1002,7 @@ module Skylab::TestSupport
 
       def _clear_example
         remove_instance_variable :@_EEK_eg
-        @_EEK_flush = :_nothing
+        @_EEK_flush = :_CLI_client_nothing
         @_EEK_eg_category = :pass  # examples with no tests still pass
         # don't ever clear @_EEK_branch_offset - we use it after flush..
         NIL
@@ -1079,7 +1095,7 @@ module Skylab::TestSupport
         @_stderr.puts s
       end
 
-      def _nothing
+      def _CLI_client_nothing
         NOTHING_
       end
 
@@ -1191,7 +1207,7 @@ module Skylab::TestSupport
           _d = caller_locations( 1, 1 ).first.lineno
           _h = Tagset_hash_via__[ desc_s_a, @_tagset_hash ]  # pops array
           _sea = Searchables___[ _d, _h ]
-          _eg = Example___.new _sea, p, desc_s_a, self
+          _eg = Example__.new _sea, p, desc_s_a, self
           @_elements.push [ :leaf, _eg ]
           NIL
         end
@@ -1289,7 +1305,7 @@ module Skylab::TestSupport
       end
     end.call
 
-    class Example___
+    class Example__
 
       # simple data structure for holding e.g `it` and its block
 
@@ -1302,10 +1318,6 @@ module Skylab::TestSupport
 
       def description
         @__description_string_array.first
-      end
-
-      def has_before_each
-        false  # only while not covered
       end
 
       attr_reader(
@@ -1480,7 +1492,7 @@ module Skylab::TestSupport
   # predicate class) define the corresponding context instance method
 
   Methify_const___ = -> const do  # FooBar NCSASpy CrackNCSACode FOO  # #todo - use [cb] name
-    const.to_s.gsub( /
+    const.id2name.gsub( /
      (    (?<= [a-z] )[A-Z] |
           (?<= . ) [A-Z] (?=[a-z]))
      /x ) { "_#{ $1 }" }.downcase.intern
@@ -1502,7 +1514,7 @@ module Skylab::TestSupport
 
       def method_missing meth, * args, & p
 
-        md = BE_RX___.match meth.to_s
+        md = BE_RX___.match meth.id2name
         if md
           ___be_the_predicate_you_wish_to_see md, args, p
         else
@@ -1514,7 +1526,7 @@ module Skylab::TestSupport
 
       def ___be_the_predicate_you_wish_to_see md, args, p
 
-        const = Constantize_method___[ md.string ]
+        const = Constantize_method_name___[ md.string ]
 
         _cls = if Predicates__.const_defined? const, false
           Predicates__.const_get const, false
@@ -1583,8 +1595,9 @@ module Skylab::TestSupport
         cls
       end
 
-      Constantize_method___ = -> meth do # foo_bar !ncsa_spy !crack_ncsa_code foo
-        meth.to_s.gsub( /(?:^|_)([a-z])/ ) { $1.upcase }.intern
+      Constantize_method_name___ = -> s do
+        # foo_bar !ncsa_spy !crack_ncsa_code foo
+        s.gsub( /(?:^|_)([a-z])/ ) { $1.upcase }.intern
       end
 
       insp = nil
@@ -1597,7 +1610,7 @@ module Skylab::TestSupport
 
       insp = -> x do # yeah..
         str = x.inspect
-        str.length > 80 ? x.class.to_s : str  # WHATEVER
+        str.length > 80 ? x.class.name : str  # WHATEVER
       end
 
       omfg_h = nil
@@ -2228,6 +2241,7 @@ module Skylab::TestSupport
         def bfr_all p
           p_ = -> do
             p.call  # LOOK you get NO text context - maybe diff than rspec
+            # (the above is now tracked with [#009.E])
             p_ = EMPTY_P_
           end
           bfr_each -> do  # so dirty yet so pure
@@ -2247,7 +2261,7 @@ module Skylab::TestSupport
 
     BEFORE_H__ = { each: :bfr_each, all: :bfr_all }.freeze
 
-    class Example__
+    class Example__  # (1st re-open)
       def has_before_each
         @context.const_defined? :BEFORE_EACH_PROC_
       end

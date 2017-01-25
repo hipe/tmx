@@ -55,26 +55,29 @@ module Skylab::TestSupport::TestSupport
 
     context "`enable_kernel_describe`" do
 
-      context "in a runtime where `describe` is already defined" do
+      # [#004.A] speaks at length to the implementation of this
 
-        it "does NOT alter its meaning" do
+      context "when quickie does not have reign" do
+
+        it "does NOT define `describe` on the kernel module" do
           rt = build_runtime_
           rt.__enable_kernel_describe
           # (absence of failure is success)
         end
 
         def kernel_module_
-          ke = begin_mock_module_
-          ke.have_method_defined :describe
-          ke
+          _ke = begin_mock_module_
+          # (the purpose of this mock module is to complain if
+          # something is defined on it..)
+          _ke
         end
 
         def toplevel_module_
-          :_no_see_ts_
+          toplevel_module_with_rspec_already_loaded_
         end
       end
 
-      context "in a runtime where `describe` is NOT already defined" do
+      context "in a runtime where rspec is *not* already loaded" do
 
         it "quickie defines this method on the kernel" do
           rt = build_runtime_
@@ -84,13 +87,13 @@ module Skylab::TestSupport::TestSupport
 
         let :kernel_module_ do
           ke = begin_mock_module_
-          ke.have_method_not_defined :describe
           ke.expect_to_have_method_defined :describe
+          ke.expect_to_have_method_defined :should
           ke
         end
 
         def toplevel_module_
-          NOTHING_
+          toplevel_module_with_rspec_not_loaded_
         end
       end
     end

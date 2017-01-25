@@ -9,27 +9,8 @@ module Skylab::TestSupport::TestSupport
     use :expect_emission_fail_early
     use :quickie
 
-    # ~ BEGIN [#009.D] hack caller locations (NOTE needs to move)
-
-    module TEMPORARY_ModuleMethods___
-
-      def _hack_next_line_number d
-        @WOOHOO = [ LineNo___.new( d ) ]
-      end
-
-      def caller_locations d, d_
-        1 == d || fail
-        1 == d_ || fail
-        remove_instance_variable :@WOOHOO
-      end
-    end
-
-    LineNo___ = ::Struct.new :lineno
-
-    # ~ END
-
     line_numbers_hack = -> mod do
-      mod.extend TEMPORARY_ModuleMethods___
+      mod.extend TS_::Quickie::Indicated_Line_Ranges::TheseModuleMethods
       NIL
     end
 

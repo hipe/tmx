@@ -9,15 +9,14 @@ module Skylab::TMX
     class << self
 
       def call * x_a, & p
+        bc = invocation_via_argument_array( x_a, & p ).to_bound_call_of_operator
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
 
+      def invocation_via_argument_array x_a, & p
         o = self.begin( & p )
         o.argument_scanner = Zerk_lib_[]::API::ArgumentScanner.via_array x_a, & p
-        bc = o.to_bound_call_of_operator
-        if bc
-          bc.receiver.send bc.method_name, * bc.args, & bc.block
-        else
-          bc
-        end
+        o
       end
 
       def to_didactic_operation_name_stream__
@@ -37,6 +36,11 @@ module Skylab::TMX
       attr_writer(
         :argument_scanner,
       )
+
+      def execute
+        bc = to_bound_call_of_operator
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
 
 #==FROM (experimental use of a [#ze-051])
 

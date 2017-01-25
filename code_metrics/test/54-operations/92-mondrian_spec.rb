@@ -44,7 +44,7 @@ module Skylab::CodeMetrics::TestSupport
       # for an API-style interface for the subject operation, yet. so
       # here's how we can cobble one together:
 
-      -> * x_a, & p do
+      X_oper_mon_PretendingToBe_API_Module___.new do |p, x_a|
 
         if do_debug
           x_a[ 0, 0 ] = [ :verbose ]  # gotta go in front
@@ -62,6 +62,27 @@ module Skylab::CodeMetrics::TestSupport
 
         _ = _ok && op.execute
         _  # hi.
+      end
+    end
+
+    class X_oper_mon_PretendingToBe_API_Module___
+
+      # hack to pretend we are an API module that does "invocation" model
+
+      def initialize & p
+        @__runny_money = p
+      end
+
+      def invocation_via_argument_array a, & p
+        @__argument_array = a ; @__listener = p
+        self
+      end
+
+      def execute
+        remove_instance_variable( :@__runny_money ).call(
+          remove_instance_variable( :@__listener ),
+          remove_instance_variable( :@__argument_array ),
+        )
       end
     end
 

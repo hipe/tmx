@@ -5,35 +5,48 @@ module Skylab::TestSupport
     module API ; class << self
 
       def call * a, & listener
-
-        Require_zerk_[]
-
-        _as = Zerk_::API::ArgumentScanner.via_array a, & listener
-
-        _invo = begin_invocation_by _as do |api|
-
-          api.test_file_name_pattern_by do
-            Home_::Init.test_file_name_pattern
-          end
-        end
-
-        bc = _invo.to_bound_call_of_operator
-
-        if bc
-          bc.receiver.send bc.method_name, * bc.args, & bc.block
-        else
-          UNABLE_  # "downgrading" all `nil` to false saves typing in operations
-        end
+        invocation_via_argument_array( listener, a ).execute
       end
 
-      def begin_invocation_by as, & givens
-        API_Invocation___.new givens, as
+      def invocation_via_argument_array a, & listener
+        _begin_invocation.__init_via_array listener, a
       end
-    end ; end  # >>
+
+      def invocation_via_argument_scanner as, & givens  # 1x in UNIVERSE (at writing)
+        _begin_invocation._init_via_scanner as, & givens
+      end
+
+      def _begin_invocation
+        API_Invocation___.__new
+      end
+    end ; end
 
     API_Invocation___ = self
 
-    def initialize givens, scn
+    class << self
+      alias_method :__new, :new
+      undef_method :new
+    end  # >>
+
+    def initialize
+      NOTHING_  # hi.
+    end
+
+    def __init_via_array listener, a
+
+      Require_zerk_[]
+
+      _as = Zerk_::API::ArgumentScanner.via_array a, & listener
+
+      _init_via_scanner _as do |api|
+
+        api.test_file_name_pattern_by do
+          Home_::Init.test_file_name_pattern
+        end
+      end
+    end
+
+    def _init_via_scanner scn, & givens
 
       givens[ self ]
 
@@ -41,10 +54,20 @@ module Skylab::TestSupport
       @listener = scn.listener
 
       __init_operator_branch
+      self
     end
 
     def test_file_name_pattern_by & p
       @__test_file_name_pattern_by = p ; nil
+    end
+
+    def execute
+      bc = to_bound_call_of_operator
+      if bc
+        bc.receiver.send bc.method_name, * bc.args, & bc.block
+      else
+        UNABLE_  # "downgrading" all `nil` to false saves typing in operations
+      end
     end
 
     # -- ad-hoc operation routing

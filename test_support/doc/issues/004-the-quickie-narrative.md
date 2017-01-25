@@ -9,10 +9,13 @@ phases we have gone through. there are some ancient muddy patches from
 our foray into functionalism which remain there today both because
 they have no known issues and because they are amusing to read.
 
+(EDIT: at this writing it has been modernized nearly comprehensively.)
+
 we strictly follow [#bs-029.7] the name conventions for const visibility
 because it has compelling merit in its self-documentation; but the
 effect to the the uninitiated may be jarring with all the trailing
 underscores in the const names.
+
 
 
 
@@ -35,6 +38,7 @@ it is just a means to an end of writing RSpec-compatible tests that
 can run much faster during development provided that you want to run
 only 1 file and are doing something "simple" (for various definitions
 of that) in that file.
+
 
 
 ### RSpec-like features it *does* include include:
@@ -104,6 +108,28 @@ seen yet from the first occurrence of its call that you encounter when
 following the narrative. this is all built around the presupposition
 that your idea of fun (like mine) is to read entire files of code from
 start to finish.
+
+
+
+
+
+## about how we implement "enable kernel describe" :[#here.A]
+
+at the moment, our version of rspec achieves what we call "kernel describe"
+by enhancing the singleton class of the toplevel runtime object `main` with
+a line like this: `extend RSpec::Core::DSL`. it is not chance that this line
+occurs outside of any method, at the toplevel context of the entrypoint file
+of the library: apparently there is no other way to reach the `main` object
+than by being there. and again apparently, they were avoiding monkeypatching
+e.g ::Object or ::Kernel. (note they *do* monkeypatch `::Module` with this
+same `describe` method so (presumably) it is available as a singleton method
+on ordinary modules and classes, for whatever reason..)
+
+anyway all this is to say that we have no "direct" way of reaching `main` to
+see if this enhancement has occurred (without doing something terrible like
+setting it to a const, or no, wait, `TOPLEVEL_BINDING.target`), but that's
+all obnoxious to test and brittle. in its stead, we:
+
 
 
 

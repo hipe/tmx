@@ -12,7 +12,7 @@ module Skylab::MyTerm::TestSupport
 
     Zerk_test_support_[]::CLI::Expect_Section_Coarse_Parse[ self ]
 
-    def for_expect_stdout_stderr_prepare_invocation invo
+    def prepare_subject_CLI_invocation invo
       prepare_CLI_for_niCLI_ invo
       NIL_
     end

@@ -26,7 +26,8 @@ module Skylab::DocTest::TestSupport
   end  # >>
 
   TestSupport_ = ::Skylab::TestSupport
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   # -
     Use_method___ = -> sym do

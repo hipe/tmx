@@ -22,7 +22,8 @@ module Skylab::TMX::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   module ModuleMethods___
 

@@ -51,9 +51,14 @@ module Skylab::TestSupport::TestSupport
 
       # -- example-level testing
 
+      def given_this_context_ & p
+        @CONTEXT_BODY = p
+      end
+
       def given_this_example_ & p
         @EXAMPLE_BODY = p
       end
+
 
       def expect_example_passes_with_message_ s
         exe = _execute_the_example
@@ -69,6 +74,11 @@ module Skylab::TestSupport::TestSupport
 
       def _say_bad_message exe, s
         "for predicate message, expected #{ s.inspect }, had #{ exe.message.inspect }"
+      end
+
+      def run_the_context_
+        ContextExecutionState_via_ContextBody___.call(
+          remove_instance_variable :@CONTEXT_BODY )
       end
 
       def _execute_the_example
@@ -164,12 +174,35 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
+    ContextExecutionState_via_ContextBody___ = -> p do
+      # -
+        lib = Subject_module__[]
+        tcc = New_context_class___[]
+
+        lib::Initialize_context_class__[ tcc, p, [ "_no_see_ts_" ] ]
+
+        rec = MoreRealisticRecordingClient___.new
+        stats = lib::StatisticsAggregator___.new rec
+
+        lib::RunTests_via_TestContextClass_and_Client__.define do |o|
+          o.client = rec
+          o.statistics_aggregator = stats
+          o.test_context_class = tcc
+        end.execute
+
+        _frozen_client = rec.flush_via_result stats
+        _frozen_client  # hi.
+      # -
+    end
+
+    # ==
+
     ExampleExecutionState_via_ExampleBody___ = -> p do
       # -
-        rec = RecordingClient___.new
+        rec = SingleExampleSingleAssertionRecordingClient___.new
         lib = Subject_module__[]
-        _sa = lib::StatisticsAggregator___.new rec
-        _ctx = lib::Context__.new _sa
+        stats = lib::StatisticsAggregator___.new rec
+        _ctx = lib::Context__.new stats
         _result = _ctx.instance_exec( & p )
         rec.flush_via_result _result
       # -
@@ -220,7 +253,14 @@ module Skylab::TestSupport::TestSupport
         @__context = c
       end
 
-      def call * x_a, & p
+      def invocation_via_argument_array x_a, & p
+        @__arguments_array = x_a ; @__listener = p
+        self
+      end
+
+      def execute
+        x_a = remove_instance_variable :@__arguments_array
+        p = remove_instance_variable :@__listener
         _runtime = @__context.build_runtime_
         _ = _runtime.receive_API_call__ p, x_a
         _  # #todo
@@ -229,7 +269,41 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    class RecordingClient___
+    class MoreRealisticRecordingClient___
+
+      def initialize
+        @_seen_FOR_TEST_ = []
+      end
+
+      def begin_branch_node d, tcc
+        @_seen_FOR_TEST_.push [ d, tcc.description ]
+      end
+
+      def begin_leaf_node d, eg
+        @_seen_FOR_TEST_.push [ d, eg.description ]
+      end
+
+      def flush
+        NOTHING_
+      end
+
+      def flush_via_result stats
+        stats.close
+        @_stats_FOR_TEST_ = stats
+        @_seen_FOR_TEST_.freeze
+        freeze
+      end
+
+      def _choices_
+        NOTHING_
+      end
+
+      attr_reader( :_seen_FOR_TEST_, :_stats_FOR_TEST_ )
+    end
+
+    # ==
+
+    class SingleExampleSingleAssertionRecordingClient___
 
       def initialize
         @_receive_category_symbol = :__receive_category_symbol_initially
@@ -315,6 +389,18 @@ module Skylab::TestSupport::TestSupport
       end
     end.call
 
+    # ==
+
+    -> do
+      d = 0
+      New_context_class___ = -> do
+        cls = ::Class.new Subject_module__[]::Context__
+        TS_.const_set "Context#{ d += 1 }", cls
+        cls
+      end
+    end.call
+
+    # ==
     # ==
   end
 end

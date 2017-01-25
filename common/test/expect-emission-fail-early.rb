@@ -95,6 +95,10 @@ module Skylab::Common::TestSupport
         @EEFE_dispatcher ||= Dispatcher__.new
       end
 
+      def prepare_subject_API_invocation invo
+        invo
+      end
+
     # -
 
     class Spy
@@ -312,7 +316,13 @@ module Skylab::Common::TestSupport
 
       def execute_for_real tc
 
-        _user_x = tc.subject_API.call( * @array, & @listener )
+        _module_probably = tc.subject_API
+
+        _invo = _module_probably.invocation_via_argument_array @array, & @listener
+
+        _invo = tc.prepare_subject_API_invocation _invo
+
+        _user_x = _invo.execute
         _user_x  # hi.
       end
     end

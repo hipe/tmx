@@ -280,7 +280,7 @@ module Skylab::TMX
 
         _lib = Home_.lib_.test_support::Slowie
 
-        api = _lib::API.begin_invocation_by arg_scn do |o|
+        api = _lib::API.invocation_via_argument_scanner arg_scn do |o|
 
           _ = remove_instance_variable :@__test_file_name_pattern_by
 

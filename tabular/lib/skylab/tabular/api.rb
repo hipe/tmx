@@ -5,24 +5,30 @@ module Skylab::Tabular
     class << self
 
       def call * x_a, & p
-        Zerk_lib_[]
-        _as = Zerk_::API::ArgumentScanner.via_array x_a, & p
-        bc = new( _as ).__to_bound_call_of_operator
-        if bc
-          bc.receiver.send bc.method_name, * bc.args, & bc.block
-        else
-          bc
-        end
+        bc = invocation_via_argument_array( x_a, & p )._to_bound_call_of_operator
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
-      private :new
+      def invocation_via_argument_array x_a, & p
+        Zerk_lib_[]
+        _as = Zerk_::API::ArgumentScanner.via_array x_a, & p
+        __invocation_via_argument_scanner _as
+      end
+
+      alias_method :__invocation_via_argument_scanner, :new
+      undef_method :new
     end  # >>
 
     def initialize as
       @argument_scanner = as
     end
 
-    def __to_bound_call_of_operator
+    def execute
+      bc = _to_bound_call_of_operator
+      bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+    end
+
+    def _to_bound_call_of_operator
       if __resolve_load_ticket
         if __load_ticket_value_looks_like_proc
           __bound_call_for_proc

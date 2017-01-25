@@ -113,7 +113,7 @@ module Skylab::Brazen::TestSupport
       self.class.sub_action_s_a
     end
 
-    def for_expect_stdout_stderr_prepare_invocation invo
+    def prepare_subject_CLI_invocation invo
       env = {}
       prepare_env env
       invo.receive_environment env  # never use real life ::ENV !

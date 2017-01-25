@@ -115,6 +115,58 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
+    context "dynamic predicate (on the fly it creates a class).." do
+
+      # these are nasty tests because the write to the const space (or don't)
+
+      it "when the subject matches the dynamically created predicate" do
+
+        given_this_example_ do
+
+          2.should_ be_even
+        end
+
+        expect_example_passes_with_message_ "is even"
+      end
+
+      it "when the subject does *not* matdch the dynamically created predicate" do
+
+        given_this_example_ do
+
+          3.should_ be_even
+        end
+
+        expect_example_fails_with_message_ "expected 3 to be even"
+      end
+    end
+
+    # ==
+
+    context "dynamic predicate that takes argument.." do
+
+      it "when match" do
+
+        given_this_example_ do
+
+          [ :A ].should_ be_include :A
+        end
+
+        expect_example_passes_with_message_ "includes :A"
+      end
+
+      it "when not match" do
+
+        given_this_example_ do
+
+          [ :A ].should_ be_include :B
+        end
+
+        expect_example_fails_with_message_ "expected [:A] to include :B"
+      end
+    end
+
+    # ==
+    # ==
   end
 end
 # #history: full rewrite to scrap the hard to read procs used for scope #eyeblood

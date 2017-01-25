@@ -10,7 +10,8 @@ module Skylab::CodeMetrics::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   Home_ = ::Skylab::CodeMetrics
   Common_ = Home_::Common_

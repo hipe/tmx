@@ -5,7 +5,8 @@ module Skylab::Plugin::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   class << self
 

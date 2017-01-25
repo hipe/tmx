@@ -23,7 +23,8 @@ module Skylab::SearchAndReplace::TestSupport
   Common_ = ::Skylab::Common
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   TestSupport_::Memoization_and_subject_sharing[ self ]
 

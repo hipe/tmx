@@ -13,7 +13,8 @@ module Skylab::CSS_Convert::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   TestSupport_::Quickie.enable_kernel_describe
 

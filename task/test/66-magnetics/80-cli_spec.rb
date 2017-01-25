@@ -105,7 +105,7 @@ module Skylab::Task::TestSupport
         TS_::Magnetics::Dotfile_Graph::Reflection.via_line_stream _st
       end
 
-      def for_expect_stdout_stderr_prepare_invocation invo
+      def prepare_subject_CLI_invocation invo
 
         dir = _this_mock_dir_class
         invo.filesystem_by { dir }

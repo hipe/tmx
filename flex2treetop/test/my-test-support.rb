@@ -5,7 +5,8 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   def self.extended tcm
     tcm.extend Headless::ModuleMethods

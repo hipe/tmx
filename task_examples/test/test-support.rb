@@ -33,7 +33,8 @@ module Skylab::TaskExamples::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   module Instance_Methods___
 

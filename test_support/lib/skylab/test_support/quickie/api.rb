@@ -240,7 +240,15 @@ module Skylab::TestSupport
           NOTHING_
         end
 
+        def receive_pending
+          _clear_example
+        end
+
         def receive_skip
+          _clear_example
+        end
+
+        def _clear_example
           remove_instance_variable :@_example_on_deck
           @_has_example_on_deck = false
           NIL

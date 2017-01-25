@@ -23,7 +23,8 @@ module Skylab::SubTree::TestSupport
   Autoloader_ = Common_::Autoloader
   TestSupport_ = Autoloader_.require_sidesystem :TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   module Module_Methods___
 

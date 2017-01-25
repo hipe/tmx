@@ -32,7 +32,6 @@ module Skylab::TestSupport::TestSupport
           NIL
         end
 
-
         def expect_fail tail_sym=:ranges_touch
 
           spy = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
@@ -133,6 +132,26 @@ module Skylab::TestSupport::TestSupport
       # -
 
       # ==
+
+      module TheseModuleMethods
+
+        # [#009.D] hack caller locations (NOTE needs to move)
+
+        def _hack_next_line_number d
+          @WOOHOO = [ LineNo___.new( d ) ]
+        end
+
+        def caller_locations d, d_
+          1 == d || fail
+          1 == d_ || fail
+          remove_instance_variable :@WOOHOO
+        end
+      end
+
+      LineNo___ = ::Struct.new :lineno
+
+      # ==
+
       # ==
     end
   end

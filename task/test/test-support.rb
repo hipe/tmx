@@ -25,7 +25,8 @@ module Skylab::Task::TestSupport
 
   TestSupport_ = ::Skylab::TestSupport
 
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
     Use_method___ = -> sym, * x_a do
       TS_.lib_( sym )[ self, * x_a ]
