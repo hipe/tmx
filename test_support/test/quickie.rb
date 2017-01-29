@@ -11,7 +11,7 @@ module Skylab::TestSupport::TestSupport
       define_singleton_method :_dangerous_memoize, Home_::DANGEROUS_MEMOIZE
 
       def build_runtime_
-        subject_module_::Runtime__.define do |o|
+        subject_module_::Runtime___.define do |o|
           o.kernel_module = kernel_module_
           o.toplevel_module = toplevel_module_
         end
@@ -28,6 +28,13 @@ module Skylab::TestSupport::TestSupport
         :_no_see_ts_
       end
 
+      _dangerous_memoize :kernel_module_with_rspec_not_loaded_ do
+        Home_::MockModule.define do |o|
+          o.have_method_not_defined :should
+          o.expect_to_have_method_defined :should
+        end
+      end
+
       _dangerous_memoize :toplevel_module_with_rspec_not_loaded_ do
         Home_::MockModule.define do |o|
           o.have_const_not_defined :RSpec
@@ -42,16 +49,21 @@ module Skylab::TestSupport::TestSupport
 
       def hack_runtime_to_build_this_service_ rt, & p
         seen = false  # redundant with a test above but meh
-        rt.send :define_singleton_method, :__build_quickie_service_autonomously do
+        rt.send :define_singleton_method, :__start_quickie_service_autonomously do
           seen && fail
           seen = true
-          _x = p[]
-          _x  # hi.
+          svc = p[]
+          send @_write_quickie_service, svc
+          svc
         end
       end
 
       def begin_mock_module_
         Home_::MockModule.new
+      end
+
+      def build_new_sandbox_module_
+        Sandbox_moduler___[]
       end
 
       define_method :subject_module_, ( Lazy_.call do
@@ -115,6 +127,27 @@ module Skylab::TestSupport::TestSupport
         NIL
       end
     end ; end
+
+    # ==
+
+    Sandbox_moduler___ = -> do  # exists elsewhere
+      box_mod = nil ; last_d = nil
+      main = -> do
+        mod = ::Module.new
+        box_mod.const_set "Module#{ last_d += 1 }", mod
+        mod
+      end
+      p = -> do
+        last_d = -1
+        box_mod = module SandboxModules___
+          self
+        end
+        ( p = main )[]
+      end
+      -> do
+        p[]
+      end
+    end.call
 
     # ==
   end

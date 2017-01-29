@@ -59,7 +59,7 @@ module Skylab::TestSupport::TestSupport
         add_output _Emission.new :pend
       end
 
-      _subject_module::Runtime__.new _pass, _fail, _pend
+      _subject_module::Runtime___.new _pass, _fail, _pend
     end
 
     def add_output e

@@ -37,4 +37,3 @@ use [sa] to convert etc to Stream_
   one eg with one predicate passing
 -0.731 predicates:
 -0.808 any will-rewrites for next
--0.847 running one example (in one context) with no predicates (hypothetically self-supporting)

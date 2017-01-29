@@ -44,6 +44,7 @@ module Skylab::TestSupport::TestSupport
 
     TS_[ self ]
     use :memoizer_methods
+    use :the_method_called_let
     use :quickie
 
     it "loads" do
@@ -169,7 +170,7 @@ module Skylab::TestSupport::TestSupport
 
     context "enhance a test support module to have a `describe` (the common way)" do
 
-      subject_method = :enhance_test_support_module_with_the_method_called_describe
+      subject_method = :__enhance_test_support_module_with_the_method_called_describe
 
       context "if r.s is already loaded," do
 

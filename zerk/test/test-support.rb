@@ -24,7 +24,8 @@ module Skylab::Zerk::TestSupport
   end  # >>
 
   TestSupport_ = ::Skylab::TestSupport
-  extend TestSupport_::Quickie
+  TestSupport_::Quickie.
+    enhance_test_support_module_with_the_method_called_describe self
 
   Home_ = ::Skylab::Zerk
   Common_ = Home_::Common_

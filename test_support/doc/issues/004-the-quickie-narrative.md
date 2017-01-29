@@ -108,11 +108,10 @@ start to finish.
 
 
 
-## :#storypoint-465 (method)
+## the CLI client as it pertains to rendering :#storypoint-465
 
 this is kind of derky mostly because we jump through hoops to accomplish two
 behaviors: 1) render the name of the example in the right color, yet do that
 before you render the constituent test(s) inside it that made it fail 2) don't
 render surrounding context description names for nodes in the tree that you
-skipped.. (and it's the weirdest way to do a collection of "view templates"
-that i've ever seen/done.)
+skipped..

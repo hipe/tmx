@@ -4,19 +4,44 @@ module Skylab::TestSupport
 
     class << self
 
-      def extended mod  # :+[#sl-111] deprecteded `extended` pattern
-
-        self._DEPRECATED__extending_quickie_is_deprecated__use_the_new_method_with_the_much_longer_name
-      end
+      # (these are the things that can't/shouldn't be covered)
 
       def enable_kernel_describe
         self._COVERED_BUT_NOT_INTEGRATED
       end
+
+      def extended mod  # :+[#sl-111] deprecteded `extended` pattern
+        self._DEPRECATED__extending_quickie_is_deprecated__use_the_new_method_with_the_much_longer_name
+      end
+
+      def enhance_test_support_module_with_the_method_called_describe mod
+        _runtime.__enhance_test_support_module_with_the_method_called_describe mod
+        NIL
+      end
+
+      def _runtime
+        send @_runtime
+      end
+
+      def __runtime_initially
+        @__runtime = Runtime___.define do |o|
+          o.kernel_module = ::Kernel
+          o.toplevel_module = ::Object
+        end
+        @_runtime = :__runtime
+        send @_runtime
+      end
+
+      def __runtime
+        @__runtime  # hi.
+      end
     end  # >>
 
-    # ==
+    @_runtime = :__runtime_initially
 
-    class Runtime__ < Common_::SimpleModel
+    # === the "SERVICE" ===
+
+    class Runtime___ < Common_::SimpleModel
 
       # responsibility: represent the surrounding platform "runtime" to
       # the inner quickie (er) runtime.
@@ -25,6 +50,7 @@ module Skylab::TestSupport
 
       def initialize
         yield self
+        @_quickie_has_reign = :__determine_if_quickie_has_reign
         @_enhance = :__enhance_a_module_for_the_first_time_ever
         @_read_quickie_service = :__QUICKIE_SERVICE_IS_NOT_STARTED
         @_touch_quickie_service = :__start_quickie_service_autonomously
@@ -44,7 +70,11 @@ module Skylab::TestSupport
         else
           me = self
           @kernel_module.send :define_method, :describe do |*desc_s_a, &p|
-            self._COMING_SOON_1
+            svc = me._touch_quickie_service
+            if svc
+              _hm = svc._receive_describe p, desc_s_a
+              _hm  # #todo
+            end
           end
         end
         NIL
@@ -52,7 +82,7 @@ module Skylab::TestSupport
 
       # -- the more common way to tap into quickie:
 
-      def enhance_test_support_module_with_the_method_called_describe mod
+      def __enhance_test_support_module_with_the_method_called_describe mod
         send @_enhance, mod
       end
 
@@ -60,16 +90,15 @@ module Skylab::TestSupport
 
         remove_instance_variable :@_enhance
 
-        svc = _touch_quickie_service
-
-        if svc
-          if @_quickie_has_reign.value_x
+        if send @_quickie_has_reign
+          svc = _touch_quickie_service
+          if svc
             __when_quickie_has_reign svc
           else
-            __when_quickie_does_not_have_reign
+            __when_service_failed_to_start
           end
         else
-          __when_service_failed_to_start
+          __when_quickie_does_not_have_reign
         end
 
         send @_enhance, mod
@@ -100,7 +129,6 @@ module Skylab::TestSupport
         # service started and there is no r.s loaded. is "normal"
 
         @_definition_for_the_method_called_describe = -> * desc_s_a, & p do
-          self._COVER_ME
           svc._receive_describe p, desc_s_a
         end
         @_enhance = :_enhance_normally
@@ -124,35 +152,23 @@ module Skylab::TestSupport
 
       def __start_quickie_service_autonomously
 
-        svc = __build_quickie_service_autonomously
-        _write_quickie_service svc
-        svc
-      end
-
-      def __build_quickie_service_autonomously
-
         # when single test is loaded thru `ruby -w` in terminal, probably
 
-        build_quickie_service_ ::ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+        start_quickie_service_ ::ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
       end
 
       def start_quickie_service_ * five
-        svc = _build_quickie_service_via_standard_five five
-        _write_quickie_service svc
+        svc = __build_quickie_service_via_standard_five five
+        send @_write_quickie_service, svc  # even if false-ish
         svc
       end
 
-      def _build_quickie_service_via_standard_five five
+      def __build_quickie_service_via_standard_five five
         client = CLI_InjectedClient_via_StandardFive___.new( five ).execute
         client and Service_via_InjectedClient___.new client, @kernel_module
       end
 
-      def _write_quickie_service svc
-        send @_write_quickie_service, svc
-      end
-
       def __write_quickie_service_once svc
-        __inspect_and_maybe_initialize_platform_runtime
         @_write_quickie_service = :__QUICKIE_SERVICE_IS_ALREADY_RUNNING
         @_read_quickie_service = :_read_existing_quickie_service
         @_touch_quickie_service = :_read_existing_quickie_service
@@ -163,19 +179,24 @@ module Skylab::TestSupport
         @__existing_quickie_service
       end
 
-      def __inspect_and_maybe_initialize_platform_runtime
+      def __determine_if_quickie_has_reign
 
         # only once ever per "runtime" (and just before we "start" the
         # service) check to see if r.s is loaded. if it is, do *nothing*
         # later on down the line..
 
         if @toplevel_module.const_defined? :RSpec
-          @_quickie_has_reign = Common_::Known_Known.falseish_instance
+          @__quickie_has_reign = false
         else
-          @_quickie_has_reign = Common_::Known_Known.trueish_instance
+          @__quickie_has_reign = true
           @kernel_module.send :define_method, :should, DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
         end
-        NIL
+        @_quickie_has_reign = :__quickie_has_reign
+        send @_quickie_has_reign
+      end
+
+      def __quickie_has_reign
+        @__quickie_has_reign
       end
     end
 
@@ -196,6 +217,29 @@ module Skylab::TestSupport
 
       def initialize cli, kernel_mod
         @_client = cli
+        @_kernel_module = kernel_mod
+        @_receive_TCC = :__receive_first_TCC
+      end
+
+      def _receive_describe p, s_a
+        tcc = ::Class.new Context__  # test context class
+        Initialize_context_class__[ tcc, p, s_a ]
+        send @_receive_TCC, tcc
+      end
+
+      def __receive_first_TCC tcc
+        @_receive_TCC = :__receive_subsequent_TCC_in_basic_mode
+        _receive_TCC_in_basic_mode tcc
+      end
+
+      def __receive_subsequent_TCC_in_basic_mode tcc
+        self._COVER_ME
+        me = self  # #open [#008]
+        @_client.listener.call :info, :expression, :multiple_describes do |y|
+          y << me.__say_multiple_describes
+        end
+        @_receive_TCC = :_receive_TCC_in_basic_mode
+        send @_receive_TCC, tcc
       end
 
       def __say_multiple_describes
@@ -205,7 +249,135 @@ module Skylab::TestSupport
             }the undocumented, experimental recursive test runner. running #{
             }them individually."
       end
+
+      def _receive_TCC_in_basic_mode tcc
+        RunTests_via_TestContextClass_and_Client___.define do |o|
+          o.client = @_client
+          o.test_context_class = tcc
+        end.execute
+        NIL
+      end
     end
+
+    # === INVOCATION ===
+
+    class RunTests_via_TestContextClass_and_Client___ < Common_::SimpleModel
+
+      attr_writer(
+        :client,
+        :test_context_class,
+      )
+
+      def execute
+        client = @client
+        eg_st = Exampler_via___[ @test_context_class, client ]
+        stats = StatisticalAggregator___.new client  # starts time
+        begin
+          eg = eg_st.call
+          eg || break
+          if false && do_skip
+            client.express_skip
+            redo
+          end
+          block = eg.block
+          if ! block
+            stats.tick_pending
+            redo
+          end
+          # puts "#{ indent[] }<<#{ eg.description }>>"
+
+          stats.tick_example
+          ctx = eg.context.new stats
+          if eg.has_before_each
+            eg.run_before_each ctx
+          end
+          ctx.instance_exec( & block )
+          redo
+        end while above
+        client.flush
+        stats.close
+        @client.receive_test_run_conclusion stats
+        NIL
+      end
+    end
+
+    # ==
+
+    class StatisticalAggregator___
+
+      # primary responsibility: maintain "statistics" (just simple counts)
+      # of example-level events (namely pass, fail or pend) via receiving
+      # notification of same.
+      #
+      # secondarily, at the same time dispatch each such event to the client
+      # for expression.
+      #
+      # finally, keep track of time.
+
+      def initialize client
+
+        @_client = client
+        @_eg_is_failed = nil
+        @__time_one = ::Time.now
+
+        @example_count = 0
+        @example_failed_count = 0
+        @example_pending_count = 0
+      end
+
+      # ~ write
+
+      def _receive_fail_by & msg_p
+
+        # (it's possible for one example to fail several times)
+
+        if ! @_eg_is_failed
+          @_eg_is_failed = true
+          @example_failed_count += 1  # before below (render e.g "(FAILED - 2)")
+        end
+
+        @_client.receive_failure msg_p, @example_failed_count
+
+        UNABLE_
+      end
+
+      def __receive_pass_from_predicate_by & msg_p
+        ::Kernel._K
+        @_client.receive_pass msg_p
+        :_quickie_passed_
+      end
+
+      def tick_example
+        @_eg_is_failed = nil
+        @example_count += 1 ;  nil
+      end
+
+      def tick_pending
+        @_eg_is_failed = nil
+        @example_pending_count += 1
+        @_client.receive_pending
+        NIL
+      end
+
+      def close
+        @elapsed_time = ::Time.now - remove_instance_variable( :@__time_one )
+        remove_instance_variable :@_client
+        remove_instance_variable :@_eg_is_failed
+        freeze
+        NIL
+      end
+
+      # ~ read
+
+      attr_reader(
+        :elapsed_time,
+        :example_count,
+        :example_failed_count,
+        :example_pending_count,
+      )
+    end
+
+    # ==
 
     # === CLIENT ADAPTATION: CLI ===
 
@@ -234,21 +406,216 @@ module Skylab::TestSupport
     # ==
 
     DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___ = -> sym, s do
-      self._COVER_ME
       Stylize__[ sym, s ]
     end
 
+    # ==
+
     class CLI_InjectedClient___
+
+      # responsibility: express all node-level events (e.g when we cross
+      # during traversal an example, a context) via notifications of them.
+
+      # this is rewrite of perhaps the most dense (yet self-contained)
+      # "function soup" we've ever seen.. this replacement is only a slight
+      # improvement: it still has lots of fragile state signified by the
+      # "EEK" ivars, which needs cleanup
+
+      # #storypoint-465 has the legacy intro, still relevant
 
       def initialize cx, so, se
 
+        if cx
+          self._ETC
+          # @choices = cx
+          @_has_search_criteria = true
+        else
+          @_has_search_criteria = false
+        end
+
+        @_EEK_branch_cache = []  # each most recent branch indexed by its depth.
+        @_EEK_branch_offset = 0  # index into the above
+        @_EEK_eg_category = :pass  # the first example, even w/ no tests, is still 'pass'
+        @_EEK_failure_count = nil
+        @_EEK_flush = :_nothing
+        @_EEK_depth = nil  # horrible
+
         @_stderr = se
+        # @_stdout = so
+        @_tab = '  '
+      end
+
+      def begin_branch_node d, ctx
+        send @_EEK_flush
+        if ctx._is_pending
+          ::Kernel._K
+        else
+          __cache_branch d, ctx  # either this
+          # _express_branch d, ctx  # or this
+        end
+        NIL
+      end
+
+      def __cache_branch d, ctx
+        if d < @_EEK_branch_offset
+          # anytime we put a fresh branch at a deeper depth, note that
+          @_EEK_branch_offset = d
+        end
+        @_EEK_branch_cache[ d ] = ctx ; nil
+      end
+
+      def begin_leaf_node d, eg  # called when we *begin* an example
+        send @_EEK_flush
+        @_EEK_flush = :_flush_leaf
+        @_EEK_depth = d
+        @_EEK_eg = eg ; nil
+      end
+
+      # -- called by statistics only
+
+      def receive_failure msg_p, failure_count
+
+        @_EEK_eg_category = :fail
+        @_EEK_failure_count = failure_count
+        send @_EEK_flush
+
+        _some_message = msg_p[] or Here_._DESGIN_ME__no_failure_message__
+        _puts "#{ _say_indent @_EEK_depth }#{ SPACE_ }#{ SPACE_ }#{
+          }#{ _stylize :red, _some_message }"
+
+        NIL
+      end
+
+      def receive_pass msg_p
+
+        # (maybe if verbose we would emit the message but generally this is
+        # too noisy and/or there is not a message for every pass). #tombstone-A
+
+        # we don't flush yet because subsequent tests in the example might
+        # stil fail.
+
+        @_EEK_eg_category = :pass
+        NIL
+      end
+
+      def receive_pending
+
+        @_EEK_eg_category = :pend
+        send @_EEK_flush
+        NIL
+      end
+
+      # --
+
+      def flush
+        _flush_leaf  # hi.
+      end
+
+      def _flush_leaf
+        __flush_branches
+        send EXPRESS_EXAMPLE___.fetch @_EEK_eg_category
+        remove_instance_variable :@_EEK_eg
+        @_EEK_flush = :_nothing
+        @_EEK_eg_category = :pass  # examples with no tests still pass
+        # don't ever clear @_EEK_branch_offset - we use it after flush..
+        NIL
+      end
+
+      def __flush_branches
+        ( @_EEK_branch_offset ... @_EEK_depth ).each do |d|
+          __express_branch d, @_EEK_branch_cache.fetch( d )
+        end
+        @_EEK_branch_offset = @_EEK_depth ; nil
+          # in the future, only render branches at this depth or >
+          # unless we see a new branch that is <, then change it
+      end
+
+      def __express_branch d, ctx
+        if ctx._is_pending  # experimental non-r.s feature
+          ::Kernel._K
+        else
+          _puts "#{ _say_indent d }#{ ctx.description }"
+        end
+        NIL
+      end
+
+      EXPRESS_EXAMPLE___ = {
+        fail: :__express_fail,
+        pass: :__express_pass,
+        pend: :__express_pend,
+      }
+
+      def __express_fail
+        _puts "#{ _say_indent @_EEK_depth }#{
+          }#{ _stylize :red, "#{ @_EEK_eg.description } (FAILED - #{ @_ordinal })" }"
+        NIL
+      end
+
+      def __express_pend
+        _puts "#{ _say_indent @_EEK_depth }#{
+          }#{ _stylize :yellow, "#{ @_EEK_eg.description }" }"
+        NIL
+      end
+
+      def __express_pass
+        _puts "#{ _say_indent @_EEK_depth }#{
+          }#{ _stylize :green, @_EEK_eg.description }"
+        NIL
+      end
+
+      # --
+
+      def receive_test_run_conclusion stats
+
+        e_d = stats.example_count
+        f_d = stats.example_failed_count
+        p_d = stats.example_pending_count
+
+        if e_d.zero?
+          if @_has_search_criteria
+            _puts "All examples were filtered out"
+          else
+            _puts "No examples found.#{ NEWLINE_ }#{ NEWLINE_ }"  # <- trying to look like r.s there
+          end
+        end
+
+        _puts "#{ NEWLINE_ }Finished in #{ stats.elapsed_time } seconds"
+
+        np = -> d, s do  # (or move to expag)
+          "#{ d } #{ s }#{ 's' if 1 != d }"
+        end
+
+        if p_d.nonzero?
+          _ = ", #{ p_d } pending"
+        end
+
+        _msg = "#{ np[ e_d, "example" ] }, #{ np[ f_d, "failure" ] }#{ _ }"
+        _color = f_d.zero? ? p_d.zero? ? :green : :yello : :red
+
+        _puts _stylize( _color, _msg )
+        NIL
+      end
+
+      # --
+
+      def _say_indent d
+        @_tab * d
+      end
+
+      define_method :_stylize, DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___
+
+      def _puts s
+        @_stderr.puts s
+      end
+
+      def _nothing
+        NOTHING_
       end
     end
 
     # ==
 
-if false  # :#here-1
+    # === MODELS ===
 
     class Context__  # (will re-open)
 
@@ -261,41 +628,86 @@ if false  # :#here-1
         end
 
         def description
-          @desc_a.fetch( 0 ) if @desc_a.length.nonzero?  # e.g
+          @_description_string_array[ 0 ]  # if any
         end
 
-        def context * desc_a, & p
+        def context * desc_s_a, & p
           cls = ::Class.new self
-          Init_context__[ cls, desc_a, @tagset_h, p ]
-          @elements.push [ :branch, cls ] ; nil
+          Initialize_context_class__[ cls, @_tagset_hash, p, desc_s_a ]
+          @_elements.push [ :branch, cls ] ; nil
         end
 
-        def it desc, * a, & p
-          @elements.push [ :leaf, Example__.new( self, a.unshift( desc ),
-            Tagset__.new( Build_tagset_h__[ a, @tagset_h ],
-              caller_locations( 1, 1 )[ 0 ].lineno ), p ) ] ; nil
+        def it * desc_s_a, & p
+
+          _d = caller_locations( 1, 1 ).first.lineno
+          _h = Tagset_hash_via__[ desc_s_a, @_tagset_hash ]  # pops array
+          _sea = Searchables___[ _d, _h ]
+          _eg = Example___.new _sea, p, desc_s_a, self
+          @_elements.push [ :leaf, _eg ]
+          NIL
         end
 
-        def __quickie_is_pending
-          @is_pending
+        def _is_pending
+          @_is_pending
+        end
+
+        def __elements_array_read_only_
+          @_elements
         end
       end  # >>
 
-      def initialize rt
-        @__quickie_runtime = rt  # NOTE ivar must be used in this file only!
+      def initialize o
+        @__quickie_mutable_statistics__ = o  # REMINDER: ivar must be used in this file only!
       end
 
       def quickie_fail_with_message_by & msg_p
 
         # (experimental hack to allow custom matchers in both q & r.s)
 
-        @__quickie_runtime._failed_by( & msg_p )
+        @__quickie_mutable_statistics__._receive_fail_by( & msg_p )
         UNABLE_
       end
+
+      Searchables___ = ::Struct.new :lineno, :tagset_hash
 
       # Home_::Let[ self ]
     end
 
+    # ==
+
+    Initialize_context_class__ = -> tcc, inherited_tagset_h=nil, p, desc_s_a do
+
+      tcc.class_exec do
+
+        @_tagset_hash = Tagset_hash_via__[ desc_s_a, inherited_tagset_h ]
+        @_description_string_array = desc_s_a
+        @_elements = []
+
+        if p
+          @_is_pending = false
+          class_exec( & p )
+        else
+          @_is_pending = true
+        end
+      end
+      NIL
+    end
+
+    # ==
+
+    Tagset_hash_via__ = -> desc_s_a, inherited_tagset_h do
+
+      if ::Hash === desc_s_a.last  # meh
+        self._DO_ME
+      end
+
+      if inherited_tagset_h
+        self._DO_ME
+      end
+    end
+
+    # ==
+if false
     class Tagset__
 
       def initialize * a
@@ -309,23 +721,6 @@ if false  # :#here-1
       end
     end
 
-    # <- (net: -1) #open [#036]
-
-  Init_context__ = -> c, desc_a, inherited_tagset, p do
-    c.class_exec do
-      @tagset_h = Build_tagset_h__[ desc_a, inherited_tagset ]
-      @desc_a = desc_a
-      @elements = [ ]
-      if p
-        @is_pending = false
-        class_exec( & p )
-      else
-        @is_pending = true
-      end
-    end
-    NIL_
-  end
-
   Build_tagset_h__ = -> desc, inherited_tagset_h do
     tagset_h = ( desc.pop if ::Hash === desc.last ) # meh
     if inherited_tagset_h
@@ -337,11 +732,16 @@ if false  # :#here-1
     end
     tagset_h
   end
+end  # if false
 
-  Build_example_stream_proc_ = -> ctx_class, branch, leaf do  # i love this
-    stack = [ ] ; cur = ctx_class
+    Exampler_via___ = -> ctx_class, client do
+
+      branch = client.method :begin_branch_node
+      leaf = client.method :begin_leaf_node
+      stack = [] ; cur = ctx_class
+
     push = -> do
-      els = cur.instance_variable_get :@elements
+      els = cur.__elements_array_read_only_
       branch[ stack.length, cur ]
       stack.push els.reverse  # even if empty!
       NIL_
@@ -368,7 +768,9 @@ if false  # :#here-1
       end
     }
     poptop
-  end
+    end
+
+if false
 
       Rewrite_digit_switches___ = -> do
 
@@ -435,6 +837,7 @@ if false  # :#here-1
 
         NIL_
       end
+end  # if false
 
     Stylize__ = -> do  # #open :[#005]. #[#ze-023.2] the stylize diaspora
       h = ::Hash[ %i| red green yellow blue magenta cyan white |.
@@ -444,6 +847,8 @@ if false  # :#here-1
         "\e[#{ p[ i ] }m#{ s }\e[0m"
       end
     end.call
+
+if false
 
     define_method :kbd, & Stylize__.curry[ :green ]
 
@@ -577,38 +982,6 @@ if false  # :#here-1
       NIL_
     end
 
-    def execute_
-      branch, leaf, passed, failed, pended, skip, flush =
-        build_rendering_functions
-      rt = Runtime__.new passed, failed, pended
-      commence
-      next_example = ___build_example_stream_proc branch, leaf
-      @t1 = ::Time.now
-      begin
-        eg = next_example.call
-        eg or break
-        # puts "#{ indent[] }<<#{ eg.description }>>"
-        if @_tag_filter_p[ eg.tagset ]
-          if eg.block
-            rt.tick_example
-            ctx = eg.context.new rt
-            if eg.has_before_each
-              eg.run_before_each ctx
-            end
-            ctx.instance_exec( & eg.block )
-          else
-            rt.tick_pending
-          end
-        else
-          skip[]
-        end
-        redo
-      end while nil
-      flush[]
-      conclude @_info_yielder, rt
-      NIL_
-    end
-
     def ___build_example_stream_proc branch, leaf
       if @_example_stream_p_p
         @_example_stream_p_p[ branch, leaf ]
@@ -616,116 +989,6 @@ if false  # :#here-1
         Build_example_stream_proc_[ @root_context_class, branch, leaf ]
       end
     end
-
-    def build_rendering_functions  # #storypoint-465
-
-      tab = '  ' ; y = @_info_yielder ; d = eg = ordinal = nil  # `depth`, `example`
-
-      state = :pass  # the first example, even w/ no tests, still is 'pass'
-
-      indent = -> depth { tab * depth }  # indent
-
-      render_branch = -> depth, ctx do
-        if ctx.__quickie_is_pending  # experimental non-rspec feature
-          y << "#{ indent[ depth ] }#{ stylize :yellow, ctx.description }"
-        else
-          y << "#{ indent[ depth ] }#{ ctx.description }"
-        end
-      end
-
-      bcache = [ ]  # cache of each most recent branch at that depth.
-      bindex = 0    # range of index to start rendering at of above
-
-      cache_branch = -> depth, ctx do
-        if depth < bindex  # this is a branch that both we haven't seen yet
-          bindex = depth  # (ofc) and one that is at a higher level than
-        end  # the last branch we rendered, so if we end up
-        # flushing the branches, be sure to include this one
-        bcache[ depth ] = ctx
-        NIL_
-      end
-
-      flush_branches = -> do
-        ( bindex ... d ).each do |depth|
-          render_branch[ depth, bcache.fetch( depth ) ]
-        end
-        bindex = d  # in the future, only render branches at this depth or >
-        # unless we see a new branch that is <, then change it
-      end
-
-      flush_h = {
-        pass: -> do
-          y << "#{ indent[ d ] }#{ stylize :green, eg.description }"
-        end,
-        fail: -> do
-          y << "#{ indent[ d ] }#{
-            }#{ stylize :red, "#{ eg.description } (FAILED - #{ ordinal })" }"
-        end,
-        pend: -> do
-          y << "#{ indent[ d ] }#{ stylize :yellow, "#{ eg.description }" }"
-        end
-      }
-
-      flush = -> do
-        flush_branches[ ]
-        flush_h.fetch( state )[ ]
-        state = :pass  # (examples with no tests still pass)
-        eg = nil  # (don't ever clear `d` we use it after flush)
-      end
-
-      passed = -> & msg_p do  # (maybe if verbose, success msg:)
-        state = :pass  # important, ofc
-        # flush[] if eg  # NOTE this might mixed-color results if .. etc
-        # y << "#{ indent[ d + 1 ] }<<#{ msg_func[] }>>"
-      end
-
-      failed = -> ord, & errmsg_p do
-
-        ordinal = ord
-        state = :fail
-
-        if eg
-          flush[]
-        end
-
-        y << "#{ indent[ d ] }  #{ stylize :red, errmsg_p[] }"
-      end
-
-      pended = -> do
-        state = :pend
-        flush[] if eg  # now we certainly want to call_digraph_listeners
-      end
-
-      branch = -> depth, ctx do   # render a description or context heading
-        flush[] if eg
-        if ctx.__quickie_is_pending  # experimental non-rspec thing
-          d = depth
-          flush_branches[ ]
-          render_branch[ depth, ctx ]
-        else
-          cache_branch[ depth, ctx ] # do this and comment out below line
-          # render_branch[ depth, ctx ]  # or do this and comment out above line
-        end
-      end
-
-      leaf = -> depth, example do  # called when we *begin* an example
-        flush[] if eg
-        eg = example ; d = depth
-      end
-
-      skip = -> do
-        # Home_.lib_.stderr.puts "#{ indent[ d ] }(#{ eg.description } SKIPPED)"
-        eg = nil
-      end
-
-      outer_flush = -> do
-        flush[ ] if eg
-      end
-
-      [ branch, leaf, passed, failed, pended, skip, outer_flush ]
-    end
-
-    define_method :stylize, & Stylize__
 
     def commence
       if @_run_option_p_a
@@ -757,50 +1020,34 @@ if false  # :#here-1
     #
     ORDER_A__ = [ :include, :exclude ].freeze
 
-    def conclude y, rt
-      e, f, p = rt.counts   # total [e]xamples, failed, pending
-
-      if e.zero?
-        if @_OR_p_a
-          y << "All examples were filtered out"
-        else
-          y << "No examples found.#{ NEWLINE_ }#{ NEWLINE_ }"  # <- trying to look like r.s there
-        end
-      end
-
-      y << "\nFinished in #{ ::Time.now - @t1 } seconds"
-
-      if p.nonzero?
-        pnd = ", #{ p } pending"
-      end
-
-      txt = "#{ e } example#{ s e }, #{ f } failure#{ s f }#{ pnd }"
-
-      y << stylize( f.zero? ? p.zero? ? :green : :yellow : :red, txt )
-
-      @at_end_of_run_p_a and @at_end_of_run_p_a.each( & :call )
-
-      NIL_
-    end
-
-    def s num
-      's' if 1 != num
-    end
     # -> (net: 0)
 
-end  # if false (#here-1)
+end  # if false
 
-    class Example__  # simple data structure for holding e.g `it` and its block
+    class Example___
 
-      def initialize * a
-        @context, @desc, @tagset, @block = a
+      # simple data structure for holding e.g `it` and its block
+
+      def initialize searchables, block, desc, context
+        @__description_string_array = desc
+        @block = block
+        @context = context
+        @searchables = searchables
       end
-
-      attr_reader :block, :context, :tagset
 
       def description
-        @desc.first
+        @__description_string_array.first
       end
+
+      def has_before_each
+        false  # only while not covered
+      end
+
+      attr_reader(
+        :block,
+        :context,
+        :searchables,
+      )
     end
 
     # -- facet 1 - predicates (core)
@@ -961,8 +1208,6 @@ end  # if false (#here-1)
       end
     end
 
-    # <- (net: -1)
-
   # for each const in the predicates module (each of which must be a
   # predicate class) define the corresponding context instance method
 
@@ -982,8 +1227,6 @@ end  # if false (#here-1)
       end
     end
   end
-
-  # -> (net: 0)
 
     # -- facet 2 - should `be_<foo>()` method_missing hack
 
@@ -1162,8 +1405,6 @@ end  # if false (#here-1)
       end
     end
 
-    # <- (net: -1)
-
     # ~ :+#protected-API
 
   class Tags_Receiver_  # (used by performers too)
@@ -1231,7 +1472,6 @@ end  # if false (#here-1)
       x
     end
   end
-# -> (net: 0)
 
     module Plugins  # ..
       Autoloader_[ self, :boxxy ]

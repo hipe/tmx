@@ -376,48 +376,162 @@ module Skylab::Zerk::TestSupport
           self._NO_PROBLEM_just_use_empty_a
         end
 
-        @_expectations_queue = Common_::Scanner.via_array a
-
-        @do_debug = tc.do_debug
-        if @do_debug
-          @debug_IO = tc.debug_IO
-        end
+        @_emission_receiver = EmissionReceiver__.new a, tc
 
         has = setup.has
 
         _sout_spy = if has[ :sout ]
-          SoutSpy__[].new do |o|
-            o.receive = method :_receive
+          SoutSpy__[].dup_by do |o|
+            o.receive_by = method :_receive
           end
         else
           Expect_nothing_on__[ :sout ]
         end
 
         _serr_spy = if has[ :serr ]
-          SerrSpy__[].new do |o|
-            o.receive = method :_receive
+          SerrSpy__[].dub_by do |o|
+            o.receive_by = method :_receive
           end
         else
           Expect_nothing_on__[ :serr ]
         end
 
-        @_is_using_multi_emission_assertion = false
         @_sout_spy = _sout_spy
         @_serr_spy = _serr_spy
-        @_receive = :_receive_emission_normally
-        @test_context = tc
       end
 
       def _receive s, method_name, stream_sym
 
-        act = ActualEmission___.new s, method_name, stream_sym
+        _act = ActualEmission___.new s, method_name, stream_sym
+        @_emission_receiver.receive_emission _act
+        NIL
+      end
 
-        if @do_debug
-          act.express_debugging_into @debug_IO
+      def finished_invoking_notify
+        _er = remove_instance_variable :@_emission_receiver
+        _er.finish
+        NIL
+      end
+
+      # -- simple readers
+
+      def serr_stream_proxy
+        @_serr_spy.stream_proxy
+      end
+
+      def sout_stream_proxy
+        @_sout_spy.stream_proxy
+      end
+    end
+
+    class SingleStreamAssertionSession___
+
+      # simplified, single-stream counterpart to "spy" above
+
+      def initialize exp_a, ctx
+
+        @_emission_receiver = EmissionReceiver__.new exp_a, ctx
+
+        @downstream_IO_proxy = SingleStreamProxy___.new do |x, m|
+          __receive x, m  # hi.
+        end
+      end
+
+      def __receive x, m
+
+        _act = SingleStreamActualEmission___.new x, m
+        @_emission_receiver.receive_emission _act
+        NIL
+      end
+
+      def finish
+        _er = remove_instance_variable :@_emission_receiver
+        _er.finish
+        NIL
+      end
+
+      attr_reader(
+        :downstream_IO_proxy,
+      )
+    end
+
+    # ==
+
+    class ActualEmission___
+
+      def initialize s, m, sym
+        @method_name = m
+        @serr_or_sout = sym
+        @string = s
+      end
+
+      def stream_is_OK x
+        @err_or_sout == x
+      end
+
+      def express_debugging_into io
+        io.puts inspect_actual
+      end
+
+      def inspect_actual
+        [ @string, @method_name, @serr_or_sout ].inspect
+      end
+
+      attr_reader(
+        :method_name,
+        :serr_or_sout,
+        :string,
+      )
+    end
+
+    class SingleStreamActualEmission___
+
+      # simplified, single-stream counterpart to "actual emission" above
+
+      def initialize s, m
+        @method_name = m
+        @string = s
+      end
+
+      def stream_is_OK _
+        :_not_applicable_for_single_stream_ZE_ == _ || self._SANITY
+      end
+
+      def express_debugging_into io
+        io.puts inspect_actual
+      end
+
+      def inspect_actual
+        [ @method_name, @string ].inspect
+      end
+
+      attr_reader(
+        :method_name,
+        :string,
+      )
+    end
+
+    # ==
+
+    class EmissionReceiver__
+
+      def initialize a, tc
+
+        @_is_using_multi_emission_assertion = false
+        @_receive = :_receive_emission_normally
+
+        @_expectations_queue = Common_::Scanner.via_array a
+
+        @test_context = tc
+      end
+
+      def receive_emission em
+
+        if @test_context.do_debug
+          em.express_debugging_into @test_context.debug_IO
         end
 
-        send @_receive, act
-        NIL
+        send @_receive, em
       end
 
       def __receive_emission_when_under_multi_emission_assertion act
@@ -451,7 +565,7 @@ module Skylab::Zerk::TestSupport
         end
       end
 
-      def finished_invoking_notify
+      def finish
 
         if @_is_using_multi_emission_assertion
 
@@ -465,6 +579,7 @@ module Skylab::Zerk::TestSupport
         if ! @_expectations_queue.no_unparsed_exists
           __when_missing_emission
         end
+        NIL
       end
 
       def __when_missing_emission
@@ -473,41 +588,6 @@ module Skylab::Zerk::TestSupport
       end
 
       define_method :fail_say, DEFINITION_FOR_THE_METHOD_CALLED_FAIL_SAY__
-
-      # -- simple readers
-
-      def serr_stream_proxy
-        @_serr_spy.stream_proxy
-      end
-
-      def sout_stream_proxy
-        @_sout_spy.stream_proxy
-      end
-    end
-
-    # ==
-
-    class ActualEmission___
-
-      def initialize s, m, sym
-        @method_name = m
-        @serr_or_sout = sym
-        @string = s
-      end
-
-      def express_debugging_into io
-        io.puts inspect_actual
-      end
-
-      def inspect_actual
-        [ @string, @method_name, @serr_or_sout ].inspect
-      end
-
-      attr_reader(
-        :method_name,
-        :serr_or_sout,
-        :string,
-      )
     end
 
     # ==
@@ -533,7 +613,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def add_line_based_expectation exp_x, method_name, serr_or_sout
-        _add String_based_expectation___[ exp_x, method_name, serr_or_sout ], serr_or_sout
+        _add Line_based_expectation__[ exp_x, method_name, serr_or_sout ], serr_or_sout
       end
 
       def add_proc_for_line_based_expectation p, m, serr_or_sout
@@ -561,6 +641,50 @@ module Skylab::Zerk::TestSupport
         :subject_CLI_by,
       )
     end
+
+    class SingleStreamExpectations < Common_::SimpleModel
+
+      # simplified, single-stream counterpart to "setup" above
+
+      def initialize
+        @expectations = []
+        @method_name = :puts
+        @serr_or_sout = :_not_applicable_for_single_stream_ZE_
+        yield self
+        @expectations.freeze
+      end
+
+      # -- write
+
+      def expect_big_string s
+        _add BigStringBasedExpectation__.new( s, @method_name, @serr_or_sout )
+      end
+
+      def expect_styled * sym_a, str
+        # (not pushed to the other guy)
+        _exp = ExactStringBasedExpectation__.new str, @method_name, @serr_or_sout do |o|
+          o.expected_styles = sym_a
+        end
+        _add _exp
+      end
+
+      def expect exp_x
+        _add Line_based_expectation__[ exp_x, @method_name, @serr_or_sout ]
+      end
+
+      def _add exp
+        @expectations.push exp
+        NIL
+      end
+
+      # -- read
+
+      def to_assertion_session_under ctx
+        SingleStreamAssertionSession___.new @expectations, ctx
+      end
+    end
+
+    # ==
 
     # == (forward declarations)
 
@@ -769,7 +893,7 @@ module Skylab::Zerk::TestSupport
       end
     end
 
-    String_based_expectation___ = -> x, m, sym do
+    Line_based_expectation__ = -> x, m, sym do
       if x
         if x.respond_to? :ascii_only?
           ExactStringBasedExpectation__.new x, m, sym
@@ -786,19 +910,42 @@ module Skylab::Zerk::TestSupport
     class ExactStringBasedExpectation__ < StringBasedExpectation__
 
       def initialize x, m, sym
+        @expected_styles = nil
+        yield self if block_given?
         @string = x
         super m, sym
       end
+
+      attr_writer(
+        :expected_styles,
+      )
     end
 
     class ExactStringBasedAssertion__ < StringBasedAssertion__
 
       def _actual_string_matches_expected_string_
-        @actual_emission.string == @string
+
+        # (for years and years before this, we would only care *that* the
+        # string was styled, not *how* it is styled. here it's different:)
+
+        sym_a = @expected_styles
+        if sym_a
+          md = /\A([[:space:]]*)(.*[^[:space:]])([[:space:]]*\z)/.match @string
+          _styled = Home_::CLI::Styling::Stylify[ sym_a, md[2] ]
+          use_s = "#{ md[1] }#{ _styled }#{ md[3] }"
+          @EEW = use_s
+          @actual_emission.string == use_s
+        else
+          @actual_emission.string == @string
+        end
       end
 
       def _say_expectation_preterite_infinitive_
-        @string.inspect
+        if @expected_styles
+          @EEW.inspect
+        else
+          @string.inspect
+        end
       end
 
       def _inspectable_
@@ -944,7 +1091,7 @@ module Skylab::Zerk::TestSupport
     class MethodAndStreamAssertion__
 
       def execute
-        if __actual_stream_matches_expected_stream
+        if @actual_emission.stream_is_OK @serr_or_sout
           if ! __actual_method_name_matches_expected_method_name
             __fail_because_actual_method_name_does_not_match_expected_method_name
           end
@@ -954,10 +1101,6 @@ module Skylab::Zerk::TestSupport
       end
 
       # ~
-
-      def __actual_stream_matches_expected_stream
-        @actual_emission.serr_or_sout == @serr_or_sout
-      end
 
       def __fail_because_actual_stream_does_not_match_expected_stream
         fail_say "expected emission on #{ @serr_or_sout }, #{
@@ -1009,9 +1152,9 @@ module Skylab::Zerk::TestSupport
 
       -> sym do
         h.fetch sym do
-          x = StreamSpy__.new do |o|
+          x = StreamSpy__.define do |o|
             o.serr_or_sout = sym
-            o.receive = expect_nothing
+            o.receive_by = expect_nothing
           end
           h[ sym ] = x
           x
@@ -1020,31 +1163,26 @@ module Skylab::Zerk::TestSupport
     end.call
 
     SoutSpy__ = Lazy_.call do
-      StreamSpy__.new do |o|
+      StreamSpy__.define do |o|
         o.serr_or_sout = :sout
       end
     end
 
     SerrSpy__ = Lazy_.call do
-      StreamSpy__.new do |o|
+      StreamSpy__.define do |o|
         o.serr_or_sout = :serr
       end
     end
 
-    class StreamSpy__
+    class StreamSpy__ < Common_::SimpleModel
 
-      def initialize
-        yield self
-        freeze
-      end
-
-      def new
+      def dup_by
         otr = dup
         yield otr
         otr
       end
 
-      def receive= p
+      def receive_by= p
         @stream_proxy = StreamProxy___.new p, @serr_or_sout
         p
       end
@@ -1057,6 +1195,26 @@ module Skylab::Zerk::TestSupport
         :stream_proxy,
         :serr_or_sout,
       )
+    end
+
+    # ==
+
+    class SingleStreamProxy___
+
+      # simplified, single-stream variant of above
+
+      def initialize & p
+        @_receive = p
+      end
+
+      def puts s=nil
+        @_receive[ s, :puts ]
+        NIL
+      end
+
+      def << s
+        @_receive[ s, :<< ]
+      end
     end
 
     # ==
