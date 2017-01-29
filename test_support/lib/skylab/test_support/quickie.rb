@@ -6,118 +6,8 @@ module Skylab::TestSupport
 
       def extended mod  # :+[#sl-111] deprecteded `extended` pattern
 
-        # enhance a module such that it becomes the module for a test context.
-        # we do this only the first time this method is called:
-
-        dae = _any_daemon
-        if ! dae
-          dae = _start_daemon_autonomously
-          dae.listen  # assume we are being invoked in the single file manner
-        end
-
-        # remove the selfsame method *we are in right now*:
-
-        sc = singleton_class
-        sc.send :remove_method, :extended
-
-        if dae.quickie_has_reign  # if quickie trumps other test frameworks
-
-          # then redefine this method *we are in* to do this normal thing:
-
-          sc.send :define_method, :extended do | mod_ |
-            mod_.extend Module_with_Descirbe_Method__
-          end
-
-          extended mod  # call the above
-        else
-
-          # .. otherwise anytime quickie is called upon, ignore it..
-
-          Only_once_sanity_check___[]
-
-        end
+        self._DEPRECATED__extending_quickie_is_deprecated__use_the_new_method_with_the_much_longer_name
       end
-
-      Only_once_sanity_check___ = -> do
-        p = -> do
-          p = nil
-        end
-        -> do
-          p[]
-        end
-      end.call
-
-      def _start_daemon_autonomously  # [#bs-029] name conventions are used
-
-        # lib = Home_.lib_  allow regression of autoloading
-
-        start_daemon_around(
-          nil,  # stdin is never used by this app,
-          $stdout, # lib.stdout,
-          $stderr,  # lib.stderr,
-          [ $PROGRAM_NAME ],
-        )
-      end
-    end  # >>
-
-    def self.build_instance_around__ stdin, sout, serr, pn_s_a
-
-      Top_Front__.new stdin, sout, serr, pn_s_a
-    end
-
-    -> do  # #storypoint-25
-
-      dae = nil
-
-      define_singleton_method :start_daemon_around do | i, o, e, pn_s_a |
-        if dae
-          fail __say_daemon_already_started
-        else
-          dae = Top_Front__.new i, o, e, pn_s_a  # result
-        end
-      end
-
-      def self.__say_daemon_already_started
-        "cannot start daemon - already running."
-      end
-
-      define_singleton_method :daemon_is_running__ do
-        dae ? true : false
-      end
-
-      define_singleton_method :_any_daemon do
-        dae
-      end
-    end.call
-
-    # the interesting activity begins with a message of `describe` sent to
-    # for e.g a quickie-empowered module made from above.
-
-    PASSIVE_DESC_METHOD___ = -> * desc_s_a, & p do
-
-      Here_._any_daemon._receive_describe desc_s_a, & p
-    end
-
-    ACTIVE_DESC_METHOD___ = -> * desc_s_a, & p do
-
-      dae = Here_._any_daemon
-
-      if ! dae
-        dae = Here_._start_daemon_autonomously
-        dae.listen
-      end
-
-      dae._receive_describe desc_s_a, & p
-    end
-
-    module Module_with_Descirbe_Method__
-      define_method :describe, PASSIVE_DESC_METHOD___
-    end
-
-    # (..or you can use `describe` from almost
-    #  anywhere with this experimental hack:)
-
-    class << self
 
       def enable_kernel_describe
 
@@ -130,107 +20,9 @@ module Skylab::TestSupport
         end
         NIL_
       end
+    end  # >>
 
-      attr_reader :_do_EKD
-    end
-
-    class Top_Front__
-
-      def initialize _i, o, e, pn_s_a
-
-        @_client = nil
-        @_did_produce_invoke = false
-        @_did_see_one_describe = false
-        @_kernel_describe_is_enabled = nil
-
-        @_info_yielder = ::Enumerator::Yielder.new do | line |
-          e.puts line
-        end
-
-        @__infostream = e
-
-        @_invoke_is_enabled = true
-        @_is_listening = false
-        @_paystream = o
-        @_program_name_s_a = pn_s_a
-      end
-
-      def quickie_has_reign
-        @quickie_has_reign
-      end
-
-      def listen  # :+public-API
-
-        # intended to be called only ever once immediately after the deamon
-        # is built, this determines whether or not Quickie is the active
-        # test framework and if so it defines the `should` method for all.
-
-        if @_is_listening
-          raise ___say_already_listening
-        end
-        @_is_listening = true
-
-        yes = defined? ::RSpec  # storypoint-10
-        if yes
-          @quickie_has_reign = false
-        else
-          @quickie_has_reign = true
-           ::Kernel.send :define_method, :should, THE_SHOULD_METHOD___
-        end
-        ACHIEVED_
-      end
-
-      def __say_already_listening
-        "daemon is already listening."
-      end
-
-      THE_SHOULD_METHOD___ = -> pred do
-        # alla r.s, monkeypatch the universe for this `should` method
-
-        pred.matches? self  # alla r.s, use same name & semantics
-        # result is result - possibly a matchdata-type structure.
-      end
-
-      def _receive_describe desc_s_a, & x_p
-
-        tcc = ::Class.new Context__  # 1 desc always == 1 test context class
-
-        Init_context__[ tcc, desc_s_a, nil, x_p ]
-
-        if @_invoke_is_enabled
-
-          @_did_produce_invoke = true
-
-          cli = @_client
-          if cli
-
-            # if there is already a client started, assume it will
-            # "drive" itself and does not need to be invoked ..
-
-            cli.receive_test_context_class__ tcc  # nil
-            NIL_
-          else
-
-            if @_did_see_one_describe  # #open [#008]
-
-              cli.puts __say_multiple_describes
-            else
-              @_did_see_one_describe = true
-            end
-
-            cli = Run_.new @_info_yielder, tcc, @_program_name_s_a
-
-            receive_mixed_client_ cli
-
-            cli.__produce_invoke_proc( ::ARGV ).call
-
-            # above ARGV must be the only place we call it.
-            # caller is the test code call to `describe`
-          end
-        else
-          self._HI
-        end
-      end
+if false  # :#here-1
 
       def __say_multiple_describes
         "quickie note - if you want to have multiple root-level #{
@@ -238,55 +30,6 @@ module Skylab::TestSupport
             }the undocumented, experimental recursive test runner. running #{
             }them individually."
       end
-
-      def receive_argv argv
-
-        # currently the "recursive runner" is different than the "file runner"
-        #
-
-        touch_mutable_session_.receive_argv__ argv
-      end
-
-      def touch_mutable_session_
-
-        @___mutable_session ||= __build_mutable_session
-      end
-
-      def __build_mutable_session
-
-        o = Here_::Sessions_::Front.new self
-        o.program_moniker = @_program_name_s_a.last
-        o
-      end
-
-      def receive_mixed_client_ cli
-
-        if @_client
-          fail __say_client
-        else
-          @_client = cli
-        end
-        NIL_
-      end
-
-      def __say_client
-        "sanity - client is already attached"
-      end
-
-      # ~ protected API
-
-      def infostream_
-        @__infostream
-      end
-
-      def paystream_
-        @_paystream
-      end
-
-      def program_name_string_array_
-        @_program_name_s_a
-      end
-    end
 
     class Context__  # (will re-open)
 
@@ -408,81 +151,6 @@ module Skylab::TestSupport
     poptop
   end
 
-  # -> (net: 0)
-
-    class Run_
-
-      # exactly one such client is created per test run. it: drives the CLI
-      # UI, parses the request to run the tests, creates a test runtime, and
-      # initiats the test run on the test context graph.
-
-      def initialize y, root_context_class, program_name_string_array
-
-        @at_end_of_run_p_a = nil
-        @_example_stream_p_p = nil
-        @_info_yielder = y
-        @_line_set = nil
-        @_OR_p_a = nil
-        @_program_name_s_a = program_name_string_array
-        @root_context_class = root_context_class
-        @_run_option_p_a = nil
-        @tag_desc_h = nil
-        @_tag_filter_p = nil
-      end
-
-      def filter_by_tags_by__ & p
-        @_tag_filter_p = p
-      end
-
-      def produce_examples_by__ & p
-        @_example_stream_p_p = p
-      end
-
-      def puts line  # ( svc wants this )
-        @_info_yielder << line
-        NIL_
-      end
-
-      def __produce_invoke_proc argv
-
-        ok = __parse_opts argv
-        ok &&= __parse_args argv
-        if ok
-          method :execute_
-        else
-          -> do
-            ok
-          end
-        end
-      end
-
-      def __parse_opts argv
-
-        Rewrite_digit_switches___[ argv ]
-
-        if argv.length.nonzero?
-          _op = __build_option_parser
-          begin
-            _op.parse! argv
-          rescue Home_::Library_::OptionParser::ParseError => e
-          end
-        end
-
-        if e
-          @_info_yielder << e.message
-          _invite
-          UNABLE_
-        else
-          @_tag_filter_p and fail ___say_this
-          __init_tag_filter_proc
-          ACHIEVED_
-        end
-      end
-
-      def ___say_this
-        "sanity - optparse and tag filter are mutex"
-      end
-
       Rewrite_digit_switches___ = -> do
 
         # an experimental semi-hack: "expand" head-anchored digit-looking
@@ -549,14 +217,6 @@ module Skylab::TestSupport
         NIL_
       end
 
-      # <- (net: -1)
-
-    def at_end_of_run &p
-      ( @at_end_of_run_p_a ||= [] ).push p ; nil
-    end
-
-  private
-
     Stylize__ = -> do  # #open :[#005]. #[#ze-023.2] the stylize diaspora
       h = ::Hash[ %i| red green yellow blue magenta cyan white |.
         each_with_index.map do |i, d| [ i, 31 + d ] end ]
@@ -614,14 +274,6 @@ module Skylab::TestSupport
         :on_filter_proc, method( :_receive_OR_proc ) )
     end
 
-    def _will_OR_reduce_by & p
-      _receive_OR_proc p
-    end
-
-    def _receive_OR_proc p
-      ( @_OR_p_a ||= [] ).push p ; nil
-    end
-
     def add_tag_description include_or_exclude_i, tag_i, val_x
       @tag_desc_h ||= {}
       ( @tag_desc_h[ include_or_exclude_i ] ||= [] ).push [ tag_i, val_x ]
@@ -629,10 +281,6 @@ module Skylab::TestSupport
         _add_run_option_renderer( & method( :render_tag_run_options ) )
         true
       end ; nil
-    end
-
-    def _add_run_option_renderer & p
-      ( @_run_option_p_a ||= [] ).push p ; nil
     end
 
     def process_line_argument s
@@ -920,7 +568,8 @@ module Skylab::TestSupport
       's' if 1 != num
     end
     # -> (net: 0)
-    end  # end `Run_`
+
+end  # if false (#here-1)
 
     class Example__  # simple data structure for holding e.g `it` and its block
 
@@ -1342,59 +991,6 @@ module Skylab::TestSupport
     # --
 
     class << self
-
-      def do_not_invoke!
-
-        # prevents quickie from flushing its tests.
-        # for hacks in e.g your test file. might make noise. might go away..
-
-        _any_daemon.___do_not_invoke
-      end
-    end
-
-    class Top_Front__ # #re-open
-
-      def ___do_not_invoke
-
-        y = @_info_yielder
-
-        if @_invoke_is_enabled
-          @_invoke_is_enabled = false
-          if @_did_produce_invoke
-            y << __say_invoked_too_late
-          else
-            y << __say_wont_run
-          end
-        else
-          y << __say_already_called
-        end
-        NIL_
-      end
-
-      def __say_invoked_too_late
-
-        "(#{ _this_method } called after a `describe` block has already #{
-          }finished - call it earlier if it does not work as expected.)"
-      end
-
-      def __say_wont_run
-
-        "#{ _this_method } called - won't run tests."
-      end
-
-      def __say_already_called
-
-        "(#{ _this_method } already called?)"
-      end
-
-      def _this_method
-        "`#{ self.class }.do_not_invoke!`"
-      end
-    end
-
-    # --
-
-    class << self
       def apply_experimental_specify_hack test_context_class
         Here_::Actors_::Specify.apply_if_not_defined test_context_class
       end
@@ -1478,3 +1074,5 @@ module Skylab::TestSupport
     Here_ = self
   end
 end
+# :#tombstone-A.1: the previous: ( service, main run loop, rendering
+#   functions, "runtime" (now "statistics"), `do_not_invoke!` )

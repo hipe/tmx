@@ -1,3 +1,5 @@
+# file coverage :[#012]
+
 (this copy is very old; salvaged from very old code)
 
 the central thesis of this whole thing is that we hold a test tree up to a

@@ -29,7 +29,7 @@ module Skylab::TestSupport
       def __express_furloughed
 
         @_emit.call :error, :expression, :furloughed do |y|
-          y << "\"cover\" is furloughed, probably won't be on for a while (is [#012])"
+          y << "\"cover\" is furloughed, probably won't be on for a while (is [#002])"
         end
 
         UNABLE_

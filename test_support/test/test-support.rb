@@ -39,7 +39,9 @@ module Skylab::TestSupport::TestSupport
   end  # >>
 
   Home_ = ::Skylab::TestSupport
+  if false  # re-introduce after -0.847 "self supporting"
   extend Home_::Quickie
+  end
 
   # -
     Use_method___ = -> sym do

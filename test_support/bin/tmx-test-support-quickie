@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby -w
 
+$stderr.puts "quickie executable is OFF until about -0.900 [ts]"
+if false
+
 require 'skylab/test_support'
 
 program = -> argv, i, o, e, pn_a, & p do
@@ -59,4 +62,5 @@ if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
   exit _d
 else
   Skylab__Zerk__OneOffs::Test_support_quickie = program  # #[#ze-063.1] mountable one-off
+end
 end

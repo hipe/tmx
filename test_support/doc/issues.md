@@ -41,7 +41,9 @@
 
 [#033]       #historical #done fix test globbing .. [#xx-009]
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
-[#032] #open the "counts" report is not covered, verbose mode is borked
+[#032]       ( assorted plugin issues )
+       #open :[#here.A]: the "counts" report is not covered
+       #open :[#here.B]: verbose mode is borked for counts
              ( #was: white plugin whines weirdly when strange files are in
                lib/skylab ([#xx-007] )
              ( #was: #done folderize plugins ([#xx-008]) )
@@ -50,8 +52,14 @@
 [#031] #open sunset io spy `qualified_knownness` for io spy group, re-purpose former to house mocks
              ( #was: #done #universal while regret no longer wires test nodes for autoloading  )
 
-[#030] #open quickie plugin arch needs rearch - too confusing
-       #open legacy table rendering of some help screen is not covered
+[#030]       (assorted quickie meta)
+
+       #open :[#here.C]: quickie plugin arch needs rearch - too confusing
+
+       #open :[#here.B]: recursive runner (plugins) help screen needs overhaul & cover
+
+       #open :[#here.A]: quickie core features help screen needs covering
+
              ( #was: #moved-to: [#dt-xxx] )
 
 [#029]       #track the 'expect' omnibus and narrative ..
@@ -103,8 +111,7 @@
                (#relates-to [#ts-013]) ([#xx-004]))
              #done 351 extra tests (but this issue 2 states ago .. oh boy)
 
-[#012] #open [ file coverage ] hasn't been working since whenever, do whenever,
-             see other nearby notes.
+[#012]       file coverage (stub file of a public introduction)
              (#moved-to: [xx])
              ( #was: [#xx-006] )
              ( #was: #done #parent-node: [#015] setup vs example? )
@@ -115,7 +122,10 @@
                exceptions) on individual test-failures like ::Rspec?
 [#008]       #track quickie root invocation (runtime/context)
 [#007]       #tracking tag of similar places with line / `call_digraph_listeners` structs
-[#006] #open test/all: redundancy points, maybe waits for [#tm-056]
+
+[#006] #hole (whatever occurrences this had disappeared.)
+             ( #was: test/all: redundancy points, maybe waits for [#tm-056] )
+
 [#005] #open #quickie #redundant s-tylize
              ( #was: confessions of an ambiguous grammar .. )
              ( #was: #done test/all should (whitelist) run the tests in the

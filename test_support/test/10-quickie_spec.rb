@@ -1,9 +1,10 @@
+self._DO_NOT_RUN__readme__
+
+# this is "turned off" until about -0.731 on the stack
+
 require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport
-
-  # the bootstrapping problem here is obvious. Gödel would have
-  # something to say about this..
 
   # ordinarily, if r.s has been loaded by the time the subject loads,
   # it in effect disables itself. however in the below tests we want
@@ -202,3 +203,4 @@ module Skylab::TestSupport::TestSupport
     end
   end
 end
+# #pending-rename: (in quickie directory) "predicates intro" (probably #30)
