@@ -10,26 +10,245 @@ module Skylab::TestSupport
       end
 
       def enable_kernel_describe
-
-        if ! _do_EKD
-          @_do_EKD = true
-
-          if ! ::Kernel.method_defined? :describe  # else just don't mess
-            ::Kernel.send :define_method, :describe, ACTIVE_DESC_METHOD___
-          end
-        end
-        NIL_
+        self._COVERED_BUT_NOT_INTEGRATED
       end
     end  # >>
 
-if false  # :#here-1
+    # ==
+
+    class Runtime__ < Common_::SimpleModel
+
+      # responsibility: represent the surrounding platform "runtime" to
+      # the inner quickie (er) runtime.
+      #
+      # also: manage the memoization of the all-important quickie service.
+
+      def initialize
+        yield self
+        @_enhance = :__enhance_a_module_for_the_first_time_ever
+        @_read_quickie_service = :__QUICKIE_SERVICE_IS_NOT_STARTED
+        @_touch_quickie_service = :__start_quickie_service_autonomously
+        @_write_quickie_service = :__write_quickie_service_once
+      end
+
+      attr_writer(
+        :kernel_module,
+        :toplevel_module,
+      )
+
+      # -- "kernel describe" (not used often, but available to look like r.s)
+
+      def __enable_kernel_describe
+        if @kernel_module.method_defined? :describe
+          NOTHING_  # hi. assume r.s
+        else
+          me = self
+          @kernel_module.send :define_method, :describe do |*desc_s_a, &p|
+            self._COMING_SOON_1
+          end
+        end
+        NIL
+      end
+
+      # -- the more common way to tap into quickie:
+
+      def enhance_test_support_module_with_the_method_called_describe mod
+        send @_enhance, mod
+      end
+
+      def __enhance_a_module_for_the_first_time_ever mod
+
+        remove_instance_variable :@_enhance
+
+        svc = _touch_quickie_service
+
+        if svc
+          if @_quickie_has_reign.value_x
+            __when_quickie_has_reign svc
+          else
+            __when_quickie_does_not_have_reign
+          end
+        else
+          __when_service_failed_to_start
+        end
+
+        send @_enhance, mod
+      end
+
+      def __when_service_failed_to_start
+
+        # service failed to start (maybe ARGV issues). define `describe` anyway
+
+        @_definition_for_the_method_called_describe = -> * do
+          self._COVER_ME
+          NOTHING_  #  SUPER risky - you better hope..
+        end
+
+        @_enhance = :_enhance_normally
+      end
+
+      def __when_quickie_does_not_have_reign
+
+        # r.s is loaded probably. expect that r.s has defined `define`.
+        # do nothing now and subsequently.
+
+        @_enhance = :__do_nothing_because_some_other_test_service_is_in_charge
+      end
+
+      def __when_quickie_has_reign svc
+
+        # service started and there is no r.s loaded. is "normal"
+
+        @_definition_for_the_method_called_describe = -> * desc_s_a, & p do
+          self._COVER_ME
+          svc._receive_describe p, desc_s_a
+        end
+        @_enhance = :_enhance_normally
+      end
+
+      def __do_nothing_because_some_other_test_service_is_in_charge _mod
+        NOTHING_  # hi. probably r.s is driving
+      end
+
+      def _enhance_normally mod
+        mod.send :define_singleton_method, :describe,
+          @_definition_for_the_method_called_describe
+        NIL
+      end
+
+      # -- how the quickie service is normally started:
+
+      def _touch_quickie_service
+        send @_touch_quickie_service
+      end
+
+      def __start_quickie_service_autonomously
+
+        svc = __build_quickie_service_autonomously
+        _write_quickie_service svc
+        svc
+      end
+
+      def __build_quickie_service_autonomously
+
+        # when single test is loaded thru `ruby -w` in terminal, probably
+
+        build_quickie_service_ ::ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
+      end
+
+      def start_quickie_service_ * five
+        svc = _build_quickie_service_via_standard_five five
+        _write_quickie_service svc
+        svc
+      end
+
+      def _build_quickie_service_via_standard_five five
+        client = CLI_InjectedClient_via_StandardFive___.new( five ).execute
+        client and Service_via_InjectedClient___.new client, @kernel_module
+      end
+
+      def _write_quickie_service svc
+        send @_write_quickie_service, svc
+      end
+
+      def __write_quickie_service_once svc
+        __inspect_and_maybe_initialize_platform_runtime
+        @_write_quickie_service = :__QUICKIE_SERVICE_IS_ALREADY_RUNNING
+        @_read_quickie_service = :_read_existing_quickie_service
+        @_touch_quickie_service = :_read_existing_quickie_service
+        @__existing_quickie_service = svc ; nil
+      end
+
+      def _read_existing_quickie_service
+        @__existing_quickie_service
+      end
+
+      def __inspect_and_maybe_initialize_platform_runtime
+
+        # only once ever per "runtime" (and just before we "start" the
+        # service) check to see if r.s is loaded. if it is, do *nothing*
+        # later on down the line..
+
+        if @toplevel_module.const_defined? :RSpec
+          @_quickie_has_reign = Common_::Known_Known.falseish_instance
+        else
+          @_quickie_has_reign = Common_::Known_Known.trueish_instance
+          @kernel_module.send :define_method, :should, DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
+        end
+        NIL
+      end
+    end
+
+    # ==
+
+    DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___ = -> predicate do
+      self._COVER_ME
+      predicate.matches? self  # allà r.s
+    end
+
+    DEFINITION_FOR_THE_METHOD_CALLED_WHINE__ = -> tail_sym, & msg do
+      self._SOON
+    end
+
+    # ==
+
+    class Service_via_InjectedClient___
+
+      def initialize cli, kernel_mod
+        @_client = cli
+      end
 
       def __say_multiple_describes
+        self._NOT_YET_COVERED
         "quickie note - if you want to have multiple root-level #{
             }`describe`s aggregated into one test run, you should try #{
             }the undocumented, experimental recursive test runner. running #{
             }them individually."
       end
+    end
+
+    # === CLIENT ADAPTATION: CLI ===
+
+    class CLI_InjectedClient_via_StandardFive___
+
+      def initialize five
+
+        @__ARGV, _, @_stdout, @_stderr, @program_name_string_array = five
+        @_do_invite = false
+      end
+
+      def execute
+        argv = remove_instance_variable :@__ARGV
+        if argv.length.zero?
+          _client_via_chioces NOTHING_
+        else
+          __when_ARGV argv
+        end
+      end
+
+      def _client_via_chioces cx
+        CLI_InjectedClient___.new cx, @_stdout, @_stderr
+      end
+    end
+
+    # ==
+
+    DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___ = -> sym, s do
+      self._COVER_ME
+      Stylize__[ sym, s ]
+    end
+
+    class CLI_InjectedClient___
+
+      def initialize cx, so, se
+
+        @_stderr = se
+      end
+    end
+
+    # ==
+
+if false  # :#here-1
 
     class Context__  # (will re-open)
 
@@ -582,59 +801,6 @@ end  # if false (#here-1)
       def description
         @desc.first
       end
-    end
-
-    class Runtime__
-
-      def initialize passed_p, failed_p, pended_p
-        @_eg_count = 0
-        @eg_failed_count = 0
-        @_eg_pending_count = 0
-        @_eg_is_failed = nil
-        @_emit_failed = failed_p
-        @_emit_passed = passed_p
-        @_emit_pending = pended_p
-      end
-
-      # ~ writers
-
-      def tick_example
-        @_eg_is_failed = nil
-        @_eg_count += 1 ;  nil
-      end
-
-      def tick_pending
-        @_eg_is_failed = nil
-        @_eg_pending_count += 1
-        @_emit_pending[ ] ; nil
-      end
-
-      def __passed_by & msg_p
-        @_emit_passed[ & msg_p ]
-        :_quickie_passed_
-      end
-
-      def _failed_by & msg_p
-
-        # (it's possible for one example to fail several times)
-
-        if ! @_eg_is_failed
-          @_eg_is_failed = true
-          @eg_failed_count += 1  # before below (render e.g "(FAILED - 2)")
-        end
-
-        @_emit_failed[ @eg_failed_count, & msg_p ]
-
-        UNABLE_
-      end
-
-      # ~ readers
-
-      def counts  # careful
-        [ @_eg_count, @eg_failed_count, @_eg_pending_count ]
-      end
-
-      attr_reader :eg_failed_count
     end
 
     # -- facet 1 - predicates (core)

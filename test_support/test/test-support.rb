@@ -113,6 +113,8 @@ module Skylab::TestSupport::TestSupport
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   Lazy_ = Common_::Lazy
+  EMPTY_A_ = Common_::EMPTY_A_
+  NOTHING_ = nil
   TS_ = self
   UNABLE_ = false
 end

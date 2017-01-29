@@ -49,6 +49,7 @@ program = -> argv, stdin, stdout, stderr, pn_s_a do
     y << usage_line[]
     y << invite_line[]
     done = _NO
+    _NO
   end
 
   nothing = -> msg do
@@ -112,26 +113,37 @@ program = -> argv, stdin, stdout, stderr, pn_s_a do
   op.parse! argv
   done and break done
 
-  resolve_arg_for_interactive = -> do
-    case argv.length
-    when 0 ; es_ = usage[ "expecting FILE" ]
-    when 1 ; arg_ = argv[ 0 ]
-    else   ; es_ = usage[ "unexpected argument: #{ argv[ 1 ].inspect }" ]
+  es = case argv.length <=> 1
+
+  when -1  # zero args
+    if stdin.tty?
+      usage[ "expecting FILE" ]
+    else
+      usage[ "to read filenames from STDIN, use \"-\" as the only argument" ]
     end
-    [ es_, arg_ ]
-  end
 
-  resolve_arg_for_pipe = -> do
-    argv.length.nonzero? and '-' == argv[ 0 ] and argv.shift
-    argv.length.nonzero? and
-      usage[ "unexpected argument (stdin mode): #{ argv[0].inspect }"]
-  end
+  when 0  # when one arg
+    arg_ = argv.fetch 0
+    if '-' == arg_
+      if stdin.tty?
+        usage[ "expecting STDIN input but terminal is interactive." ]
+      else
+        stdin_mode = true
+        NIL
+      end
+    elsif stdin.tty?
+      arg = arg_
+      NIL
+    else
+      # hi. allow filename arguments to be passed one-by-one from shell (xargs style)
+      arg = arg_
+      NIL
+    end
 
-  es, arg = if stdin.tty?
-    resolve_arg_for_interactive[]
-  else
-    stdin_mode = true
-    resolve_arg_for_pipe[]
+  when 1  # when more than one arg
+    y << "for now, multiple filename arguments are not yet supported"
+    usage[ "pipe filenames in with STDIN or do xargs-like trickery" ]
+  else ; never
   end
 
   es and break es
@@ -145,6 +157,10 @@ program = -> argv, stdin, stdout, stderr, pn_s_a do
   if stdin_mode
     is_dry and break invite[ "'dry_run' doesn't make sense for stdin mode" ]
     do_forward or break invite[ "revese mode not yet implemented for stdin" ]
+
+    y << "REMINDER: it appears that we have written this as a dry-run preview"
+    y << "          of the filename name changes that would be made."
+
     while (( line = stdin.gets ))
       line.chomp!
       stdout.puts dashify[ line ]
@@ -313,7 +329,7 @@ end
 
 if __FILE__ == $PROGRAM_NAME
 
-  exit program[ $stdin, $stdout, $stderr, [ $PROGRAM_NAME ], ARGV ]
+  exit program[ ::ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]]
 else
   Skylab__Zerk__OneOffs::TMX_shallowify = program  # #[#ze-063.1] mountable one-off
 end
