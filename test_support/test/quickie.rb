@@ -10,6 +10,35 @@ module Skylab::TestSupport::TestSupport
 
       define_singleton_method :_dangerous_memoize, Home_::DANGEROUS_MEMOIZE
 
+      # -- this thing
+
+      def given_this_example_ & p
+        @EXAMPLE_BODY = p
+      end
+
+      def expect_example_passes_with_message_ s
+        exe = _execute_the_example
+        :pass == exe.category_symbol or fail "expected pass, had fail"
+        exe.message == s or fail _say_bad_message( exe, s )
+      end
+
+      def expect_example_fails_with_message_ s
+        exe = _execute_the_example
+        :fail == exe.category_symbol or fail "expected fail, had pass"
+        exe.message == s or fail _say_bad_message( exe, s )
+      end
+
+      def _say_bad_message exe, s
+        "for predicate message, expected #{ s.inspect }, had #{ exe.message.inspect }"
+      end
+
+      def _execute_the_example
+        _p = remove_instance_variable :@EXAMPLE_BODY
+        ExampleExecutionState_via_ExampleBody___[ _p ]
+      end
+
+      # -- that thing
+
       def build_runtime_
         subject_module_::Runtime___.define do |o|
           o.kernel_module = kernel_module_
@@ -66,15 +95,74 @@ module Skylab::TestSupport::TestSupport
         Sandbox_moduler___[]
       end
 
-      define_method :subject_module_, ( Lazy_.call do
-
-        # (normally we don't memoize these but here we hackishly do so that:)
-
-        CoverageFunctions___.maybe_begin_coverage
-
-        Home_::Quickie
-      end )
+      def subject_module_
+        Subject_module__[]
+      end
     # -
+
+    # ==
+
+    ExampleExecutionState_via_ExampleBody___ = -> p do
+      # -
+        rec = RecordingClient___.new
+        lib = Subject_module__[]
+        _sa = lib::StatisticsAggregator___.new rec
+        _ctx = lib::Context__.new _sa
+        _result = _ctx.instance_exec( & p )
+        rec.flush_via_result _result
+      # -
+    end
+
+    class RecordingClient___
+
+      def initialize
+        @_receive_category_symbol = :__receive_category_symbol_initially
+      end
+
+      def receive_failure msg_p, failed_count
+        send @_receive_category_symbol, :fail
+        _receive_message msg_p
+        NIL  # like the production collaborator
+      end
+
+      def receive_pass msg_p
+        send @_receive_category_symbol, :pass
+        _receive_message msg_p
+        NIL  # ibid
+      end
+
+      def _receive_message msg_p
+        @message = msg_p.call  # call it with its original context
+        NIL
+      end
+
+      def __receive_category_symbol_initially sym
+        @category_symbol = sym
+        @_receive_category_symbol = :_CLOSED ; nil
+      end
+
+      def flush_via_result x
+        remove_instance_variable :@_receive_category_symbol
+        @result = x
+        freeze
+      end
+
+      attr_reader(
+        :category_symbol,
+        :message,
+      )
+    end
+
+    # ==
+
+    Subject_module__ = Lazy_.call do
+
+      # (normally we don't memoize these but here we hackishly do so that:)
+
+      CoverageFunctions___.maybe_begin_coverage
+
+      Home_::Quickie
+    end
 
     # ==
 

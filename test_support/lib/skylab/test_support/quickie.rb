@@ -203,7 +203,6 @@ module Skylab::TestSupport
     # ==
 
     DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___ = -> predicate do
-      self._COVER_ME
       predicate.matches? self  # allà r.s
     end
 
@@ -271,7 +270,7 @@ module Skylab::TestSupport
       def execute
         client = @client
         eg_st = Exampler_via___[ @test_context_class, client ]
-        stats = StatisticalAggregator___.new client  # starts time
+        stats = StatisticsAggregator___.new client  # starts time
         begin
           eg = eg_st.call
           eg || break
@@ -303,7 +302,7 @@ module Skylab::TestSupport
 
     # ==
 
-    class StatisticalAggregator___
+    class StatisticsAggregator___
 
       # primary responsibility: maintain "statistics" (just simple counts)
       # of example-level events (namely pass, fail or pend) via receiving
@@ -327,7 +326,7 @@ module Skylab::TestSupport
 
       # ~ write
 
-      def _receive_fail_by & msg_p
+      def _receive_fail msg_p
 
         # (it's possible for one example to fail several times)
 
@@ -341,8 +340,7 @@ module Skylab::TestSupport
         UNABLE_
       end
 
-      def __receive_pass_from_predicate_by & msg_p
-        ::Kernel._K
+      def __receive_pass msg_p
         @_client.receive_pass msg_p
         :_quickie_passed_
       end
@@ -664,7 +662,7 @@ module Skylab::TestSupport
 
         # (experimental hack to allow custom matchers in both q & r.s)
 
-        @__quickie_mutable_statistics__._receive_fail_by( & msg_p )
+        @__quickie_mutable_statistics__._receive_fail msg_p
         UNABLE_
       end
 
@@ -1081,22 +1079,25 @@ end  # if false
         end
       end  # >>
 
-      def initialize * a
-        @runtime, @context, * rest = a
+      def initialize sa, ctx, * rest
+
         ivars = self.class.ivars
         rest.each_with_index do |x, d|
           instance_variable_set ivars.fetch( d ), x
         end
+
+        @context = ctx
+        @_statistics_aggregator = sa
       end
 
       def _pass_by & msg_p
 
-        @runtime.__passed_by( & msg_p )
+        @_statistics_aggregator.__receive_pass msg_p
       end
 
       def _fail_by & msg_p
 
-        @runtime._failed_by( & msg_p )
+        @_statistics_aggregator._receive_fail msg_p
       end
     end
 
@@ -1211,7 +1212,7 @@ end  # if false
   # for each const in the predicates module (each of which must be a
   # predicate class) define the corresponding context instance method
 
-  Methify_const__ = -> const do  # FooBar NCSASpy CrackNCSACode FOO  # #todo - use [cb] name
+  Methify_const___ = -> const do  # FooBar NCSASpy CrackNCSACode FOO  # #todo - use [cb] name
     const.to_s.gsub( /
      (    (?<= [a-z] )[A-Z] |
           (?<= . ) [A-Z] (?=[a-z]))
@@ -1221,9 +1222,9 @@ end  # if false
   class Context__  # re-open
     Predicates__.constants.each do |const|
       cls = Predicates__.const_get const, false
-      meth = Methify_const__[ const ]
+      meth = Methify_const___[ const ]
       define_method meth do |*expected|
-        cls.new @__quickie_runtime, self, *expected
+        cls.new @__quickie_mutable_statistics__, self, *expected
       end
     end
   end
@@ -1254,7 +1255,7 @@ end  # if false
           ___build_predicate_dynamically_eew const, md, args, p
         end
 
-        _cls.new @__quickie_runtime, self, * args
+        _cls.new @__quickie_mutable_statistics__, self, * args
       end
 
       def ___build_predicate_dynamically_eew const, md, args, p
