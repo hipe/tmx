@@ -159,13 +159,29 @@ module Skylab::TestSupport
 
       def start_quickie_service_ * five
         svc = __build_quickie_service_via_standard_five five
-        send @_write_quickie_service, svc  # even if false-ish
+        _write_first_and_only_service svc
         svc
       end
 
+      def receive_API_call__ p, x_a
+        client = Here_::API::API_InjectedClient_via_Listener_and_Arguments[ p, x_a ]
+        svc = ( client and _build_quickie_service_via_injected_client client )
+        _write_first_and_only_service svc
+        client and client.RECEIVE_RUNTIME__ self
+      end
+
+      def _write_first_and_only_service svc
+        send @_write_quickie_service, svc  # even if false-ish
+        NIL
+      end
+
       def __build_quickie_service_via_standard_five five
-        client = CLI_InjectedClient_via_StandardFive___.new( five ).execute
-        client and Service_via_InjectedClient___.new client, @kernel_module
+        client = CLI_InjectedClient_via_StandardFive___[ five ]
+        client and _build_quickie_service_via_injected_client client
+      end
+
+      def _build_quickie_service_via_injected_client client
+        Service_via_InjectedClient__.new client, @kernel_module
       end
 
       def __write_quickie_service_once svc
@@ -173,6 +189,10 @@ module Skylab::TestSupport
         @_read_quickie_service = :_read_existing_quickie_service
         @_touch_quickie_service = :_read_existing_quickie_service
         @__existing_quickie_service = svc ; nil
+      end
+
+      def __dereference_quickie_service_
+        send @_read_quickie_service
       end
 
       def _read_existing_quickie_service
@@ -210,14 +230,29 @@ module Skylab::TestSupport
       self._SOON
     end
 
+    DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+      if x
+        instance_variable_set ivar, x ; ACHIEVED_
+      else
+        x
+      end
+    end
+
     # ==
 
-    class Service_via_InjectedClient___
+    class Service_via_InjectedClient__
 
       def initialize cli, kernel_mod
         @_client = cli
         @_kernel_module = kernel_mod
-        @_receive_TCC = :__receive_first_TCC
+        @_receive_TCC = :__receive_first_TCC_in_basic_mode
+        @_thing_mutex = nil
+      end
+
+      def __begin_irreversible_one_time_compound_mode_
+        remove_instance_variable :@_thing_mutex
+        @_long_running_statistics = StatisticsAggregator___.new @_client  # starts time
+        @_receive_TCC = :__receive_TCC_in_compound_mode ; nil
       end
 
       def _receive_describe p, s_a
@@ -226,7 +261,8 @@ module Skylab::TestSupport
         send @_receive_TCC, tcc
       end
 
-      def __receive_first_TCC tcc
+      def __receive_first_TCC_in_basic_mode tcc
+        remove_instance_variable :@_thing_mutex
         @_receive_TCC = :__receive_subsequent_TCC_in_basic_mode
         _receive_TCC_in_basic_mode tcc
       end
@@ -249,28 +285,52 @@ module Skylab::TestSupport
             }them individually."
       end
 
-      def _receive_TCC_in_basic_mode tcc
-        RunTests_via_TestContextClass_and_Client___.define do |o|
+      def __receive_TCC_in_compound_mode tcc
+
+        RunTests_via_TestContextClass_and_Client__.define do |o|
           o.client = @_client
+          o.statistics_aggregator = @_long_running_statistics
           o.test_context_class = tcc
         end.execute
         NIL
+      end
+
+      def _receive_TCC_in_basic_mode tcc
+
+        stats = StatisticsAggregator___.new @_client  # starts time
+
+        RunTests_via_TestContextClass_and_Client__.define do |o|
+          o.client = @_client
+          o.statistics_aggregator = stats
+          o.test_context_class = tcc
+        end.execute
+
+        stats.close
+        @_client.receive_test_run_conclusion stats
+
+        NIL
+      end
+
+      def __end_irreversible_one_time_compound_mode_
+        @_receive_TCC = :_COMPOUND_SESSION_CLOSED
+        remove_instance_variable :@_long_running_statistics
       end
     end
 
     # === INVOCATION ===
 
-    class RunTests_via_TestContextClass_and_Client___ < Common_::SimpleModel
+    class RunTests_via_TestContextClass_and_Client__ < Common_::SimpleModel
 
       attr_writer(
         :client,
+        :statistics_aggregator,
         :test_context_class,
       )
 
       def execute
         client = @client
         eg_st = Exampler_via___[ @test_context_class, client ]
-        stats = StatisticsAggregator___.new client  # starts time
+        stats = @statistics_aggregator
         begin
           eg = eg_st.call
           eg || break
@@ -294,15 +354,13 @@ module Skylab::TestSupport
           redo
         end while above
         client.flush
-        stats.close
-        @client.receive_test_run_conclusion stats
         NIL
       end
     end
 
     # ==
 
-    class Choices_via_AssignmentsProc_and_Client___
+    class Choices_via_AssignmentsProc_and_Client__
 
       # responsibility: parse arguments in a modality-agnostic way & represent
 
@@ -324,8 +382,8 @@ module Skylab::TestSupport
         _ok && @_ok && __finish
       end
 
-      def __write_primary_descriptions_into_ receiver
-        PRIMARY_DESCRIPTONS__.__elements_.each do |hi|
+      def write_formal_primaries_into receiver
+        PRIMARIES___.__elements_.each do |hi|
           self._NOT_YET_COVERED
           receiver.add_primary hi.name_symbol, & hi.proc
         end
@@ -420,74 +478,83 @@ module Skylab::TestSupport
 
     # === CLIENT ADAPTATION: CLI ===
 
-    class CLI_InjectedClient_via_StandardFive___
+    DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___ = -> sym, s do
+      Stylize__[ sym, s ]
+    end
+
+    class CLI_InjectedClient_via_StandardFive___ < Common_::Monadic
 
       def initialize five
-
-        @__ARGV, _, @_stdout, @_stderr, @program_name_string_array = five
+        @show_help = false
+        @_ARGV, _, @_stdout, @_stderr, @_program_name_string_array = five
         @_do_invite = false
       end
 
       def execute
-        argv = remove_instance_variable :@__ARGV
-        if argv.length.zero?
-          _client_via_chioces NOTHING_
+        if @_ARGV.length.zero?
+          __client_without_choices
         else
-          __when_ARGV argv
+          __when_arguments
         end
       end
 
-      def __when_ARGV argv  # assume nonzero length
+      def __when_arguments
+        __convert_leading_line_numbers_shorthand_switches
+        if ! __resolve_choices
+          __unable
+        elsif @_ARGV.length.nonzero?
+          __when_extra_arguments
+        elsif @show_help
+          __express_help
+        else
+          _client_via_choices @_choices
+        end
+      end
 
-        Convert_leading_line_number_shorthand_switches___[ argv ]
+      def __convert_leading_line_numbers_shorthand_switches
+        Convert_leading_line_number_shorthand_switches___[ @_ARGV ] ; nil
+      end
 
-        op = nil
-        choices = Choices_via_AssignmentsProc_and_Client___.call self do |cx|
+      def __resolve_choices  # assme ARGV
 
-          op = CLI_OptionParser_via_WritableChoices___.new( cx ).execute
+        _ = Choices_via_AssignmentsProc_and_Client__.call self do |cx|
+          @writable_choices = cx.writable_choices
+          @formal_choices_reader = cx
+          __init_option_parser
           begin
-            op.parse! argv
+            @_option_parser.parse! @_ARGV
             ACHIEVED_
           rescue ::OptionParser::ParseError => e
             __when_optparse_parse_error e
           end
         end
-
-        if choices
-          if argv.length.zero?
-            if choices.do_help
-              __express_help op
-            else
-              _client_via_chioces choices
-            end
-          else
-            __when_extra_arguments argv
-          end
-        else
-          @_do_invite && _invite
-          choices
-        end
+        _store :@_choices, _
       end
 
-      def __express_help op
+      def __express_help
         io = @_stderr
         io.puts "usage: ruby TEST_FILE [options]"
         io.puts
         io.puts "options:"
-        op.summarize( & io.method( :puts ) )
+        @_option_parser.summarize( & io.method( :puts ) )
         NIL
       end
 
       def __when_optparse_parse_error e
         @_stderr.puts e.message
         _invite
-        UNABLE_
       end
 
-      def __when_extra_arguments argv
+      def __when_extra_arguments
+        argv = @_ARGV
         @_stderr.puts "unexpected argument#{ 's' if 1 != argv.length }: #{
           }#{ argv[0].inspect }#{ ' [..]' if argv.length > 1 }"
         _invite
+      end
+
+      def __unable
+        @_do_invite && _invite
+        UNABLE_
       end
 
       def _invite
@@ -496,53 +563,41 @@ module Skylab::TestSupport
       end
 
       def __invocation_string
-        @program_name_string_array * SPACE_
+        @_program_name_string_array * SPACE_
+      end
+
+      def __client_without_choices
+        _client_via_chioces NOTHING_
       end
 
       def _client_via_chioces cx
         CLI_InjectedClient___.new cx, @_stdout, @_stderr
       end
-    end
 
-    # ==
-
-    DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___ = -> sym, s do
-      Stylize__[ sym, s ]
-    end
-
-    # ==
-
-    class CLI_OptionParser_via_WritableChoices___
-
-      def initialize cx
-        @writable_choices = cx.writable_choices
-        @formal_choices_reader = cx
-      end
-
-      def execute
+      def __init_option_parser
 
         @__first_time_letter = ::Hash.new { |h, k| h[k] = false ; true }
 
         require 'optparse'  # or Lib_::OptionParser
         ::OptionParser.new do |o|
-          @_op = o
+          @_option_parser = o
           _cxr = remove_instance_variable :@formal_choices_reader
-          _cxr.__write_primary_descriptions_into_ self
-          __write_help
-          remove_instance_variable :@_op
+          _cxr.write_formal_primaries_into self
+          __add_bespoke_primaries
         end
+        NIL
       end
 
-      def __write_help
-        @_op.on '-h', '--help' do
-          @writable_choices.do_help = true
+      def __add_bespoke_primaries
+        @_option_parser.on '-h', '--help' do
+          @show_help = true
           NIL
         end
         NIL
       end
-    end
 
-    # ==
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    end
 
     class CLI_InjectedClient___
 
@@ -580,7 +635,7 @@ module Skylab::TestSupport
 
       def begin_branch_node d, ctx
         send @_EEK_flush
-        if ctx._is_pending
+        if ctx.is_pending
           ::Kernel._K
         else
           __cache_branch d, ctx  # either this
@@ -664,7 +719,7 @@ module Skylab::TestSupport
       end
 
       def __express_branch d, ctx
-        if ctx._is_pending  # experimental non-r.s feature
+        if ctx.is_pending  # experimental non-r.s feature
           ::Kernel._K
         else
           _puts "#{ _say_indent d }#{ ctx.description }"
@@ -780,13 +835,13 @@ module Skylab::TestSupport
           NIL
         end
 
-        def _is_pending
-          @_is_pending
-        end
-
         def __elements_array_read_only_
           @_elements
         end
+
+        attr_reader(
+          :is_pending,
+        )
       end  # >>
 
       def initialize o
@@ -817,10 +872,10 @@ module Skylab::TestSupport
         @_elements = []
 
         if p
-          @_is_pending = false
+          @is_pending = false
           class_exec( & p )
         else
-          @_is_pending = true
+          @is_pending = true
         end
       end
       NIL
@@ -1468,8 +1523,8 @@ end  # if false
 
     # ===
 
-    primary_descriptions =
-    module PRIMARY_DESCRIPTONS__
+    primaries =
+    module PRIMARIES___
       class << self
         def add_primary k, & p
           self._BOOYEAH
@@ -1481,7 +1536,7 @@ end  # if false
       self
     end
 
-    choices_members = [ :do_help ]
+    choices_members = []  # order does not matter
 
     # === FEATURE: line-numbers (STUB) ===
 
@@ -1612,7 +1667,13 @@ end  # if false
     end
   end
 
-    primary_descriptions.__TEMPORARY_TOUCH__
+    if choices_members.length.zero?
+      choices_members.push :_placeholder_
+    else
+      self._OK__you_can_get_rid_of_this_fluff_now__
+    end
+
+    primaries.__TEMPORARY_TOUCH__
     Choices___ = ::Struct.new( * choices_members )
 
     module Plugins  # ..

@@ -12,28 +12,37 @@ module Skylab::TestSupport::TestSupport
 
       # -- context-level testing (targeting CLI client)
 
-      def run_the_tests_
+      def run_the_tests_thru_a_CLI_expecting_a_single_stream_by__ & p
+
+        args = TheseArgs___.define( & p )
 
         _lib = Zerk_test_support_[]::Non_Interactive_CLI::Fail_Early
 
-        exp = _lib::SingleStreamExpectations.define do |o|
-          expect_these_lines_ o
-        end
-
-        sess = exp.to_assertion_session_under self
+        sess = _lib::SingleStreamExpectations.define do |o|
+          args.expect_lines_by[ o ]  # hi.
+        end.to_assertion_session_under self
 
         @STDERR = sess.downstream_IO_proxy
 
         rt = build_runtime_
         _svc = start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
-        mod = build_new_sandbox_module_
-        rt.__enhance_test_support_module_with_the_method_called_describe mod
-
-        x = given_this_test_file_ mod  # <- runs the tests
-
+        _mod = enhanced_module_via_runtime_ rt
+        x = args.receive_test_support_module_by[ _mod ]  # runs the tests
         sess.finish
-
         x
+      end
+
+      class TheseArgs___ < Common_::SimpleModel
+        attr_accessor(
+          :expect_lines_by,
+          :receive_test_support_module_by,
+        )
+      end
+
+      def enhanced_module_via_runtime_ rt
+        mod = Sandbox_moduler___[]
+        rt.__enhance_test_support_module_with_the_method_called_describe mod
+        mod
       end
 
       # -- example-level testing
@@ -119,7 +128,11 @@ module Skylab::TestSupport::TestSupport
       end
 
       def subject_CLI
-        ProxyThatIsPretendingToBe_CLI_Class.new self
+        ProxyThatIsPretendingToBe_CLI_Class___.new self
+      end
+
+      def subject_API
+        ProxyThatIsPretendingToBe_API_Module___.new self
       end
 
       def prepare_CLI _
@@ -128,10 +141,6 @@ module Skylab::TestSupport::TestSupport
 
       def begin_mock_module_
         Home_::MockModule.new
-      end
-
-      def build_new_sandbox_module_
-        Sandbox_moduler___[]
       end
 
       def subject_module_
@@ -154,7 +163,7 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    class ProxyThatIsPretendingToBe_CLI_Class
+    class ProxyThatIsPretendingToBe_CLI_Class___
 
       # we pretend that our quickie service is "long-running", *and*
       # it starts *around* a client (probably CLI), so it does not exit
@@ -186,6 +195,21 @@ module Skylab::TestSupport::TestSupport
         else
           0  # assume help
         end
+      end
+    end
+
+    # ==
+
+    class ProxyThatIsPretendingToBe_API_Module___
+
+      def initialize c
+        @__context = c
+      end
+
+      def call * x_a, & p
+        _runtime = @__context.build_runtime_
+        _ = _runtime.receive_API_call__ p, x_a
+        _  # #todo
       end
     end
 
@@ -293,6 +317,25 @@ module Skylab::TestSupport::TestSupport
         NIL
       end
     end ; end
+
+    # ==
+
+    ::Kernel.module_exec do
+
+      # we want these tests to run equally well under rspec or quickie.
+      # but whether rspec or quickie is driving the test, we want that the
+      # `should` method being tested is the implementation that belongs to
+      # quickie, not rspec.
+      #
+      # the only practical way to do this is to that for the purposes of
+      # these tests we use a name for this method that is outside of the
+      # rspec namespace:
+
+      def should_ predicate
+        _ = instance_exec predicate, & Home_::Quickie::DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
+        _  # false on fail `_quickie_passed_` on pass
+      end
+    end
 
     # ==
 

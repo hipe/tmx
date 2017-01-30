@@ -19,10 +19,14 @@ module Skylab::TestSupport::TestSupport
       end
 
       shared_subject :_state do
-        run_the_tests_
+
+        run_the_tests_thru_a_CLI_expecting_a_single_stream_by__ do |o|
+          o.receive_test_support_module_by = method :__receive_test_support_module
+          o.expect_lines_by = method :__expect_these_lines
+        end
       end
 
-      def given_this_test_file_ mod
+      def __receive_test_support_module mod
 
         a = []
         mod.describe "desc 1" do
@@ -37,7 +41,7 @@ module Skylab::TestSupport::TestSupport
         a
       end
 
-      def expect_these_lines_ o
+      def __expect_these_lines o
         o.expect                "desc 1"
         o.expect                "  ctxt 1"
         o.expect_styled :green, "    eg 1"

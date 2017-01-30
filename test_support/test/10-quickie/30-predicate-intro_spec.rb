@@ -115,28 +115,6 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    ::Kernel.module_exec do
-
-      # (move this when appropriate)
-
-      # we want these tests to run equally well under rspec or quickie.
-      # but whether rspec or quickie is driving the test, we want that the
-      # `should` method being tested is the implementation that belongs to
-      # quickie, not rspec.
-      #
-      # the only practical way to do this is to that for the purposes of
-      # these tests we use a name for this method that is outside of the
-      # rspec namespace:
-
-      def should_ predicate
-
-        _ = instance_exec predicate, & Home_::Quickie::DEFINITION_FOR_THE_METHOD_CALLED_SHOULD___
-        _  # false on fail `_quickie_passed_` on pass
-      end
-    end
-
-    # ==
-
   end
 end
 # #history: full rewrite to scrap the hard to read procs used for scope #eyeblood
