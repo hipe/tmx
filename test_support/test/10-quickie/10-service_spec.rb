@@ -145,13 +145,13 @@ module Skylab::TestSupport::TestSupport
 
         _svc = _state.first
         _svc.instance_variable_get( :@_client ).
-          instance_variable_get( :@_stderr ) == :_no_see_ts_ || fail
+          instance_variable_get( :@_stderr ) == :_not_applicable__stderr_for_TS_ || fail
       end
 
       shared_subject :_state do
 
         rt = build_runtime_
-        _svc = hackishly_start_service_ rt
+        _svc = start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
         [ _svc ]
       end
 
@@ -178,7 +178,7 @@ module Skylab::TestSupport::TestSupport
 
           rt = build_runtime_
 
-          hackishly_start_service_ rt
+          start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
 
           _NOT_A_MODULE = :z
 
@@ -202,7 +202,7 @@ module Skylab::TestSupport::TestSupport
 
           rt = build_runtime_
 
-          hackishly_start_service_ rt
+          start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
 
           mock_TS_module = begin_mock_module_
           mock_TS_module.expect_to_have_singleton_method_defined :describe
@@ -254,6 +254,16 @@ module Skylab::TestSupport::TestSupport
           toplevel_module_with_rspec_not_loaded_
         end
       end
+    end
+
+    # ==
+
+    def ARGV_
+      EMPTY_A_
+    end
+
+    def stderr_
+      :_not_applicable__stderr_for_TS_
     end
 
     # ==

@@ -10,7 +10,33 @@ module Skylab::TestSupport::TestSupport
 
       define_singleton_method :_dangerous_memoize, Home_::DANGEROUS_MEMOIZE
 
-      # -- this thing
+      # -- context-level testing (targeting CLI client)
+
+      def run_the_tests_
+
+        _lib = Zerk_test_support_[]::Non_Interactive_CLI::Fail_Early
+
+        exp = _lib::SingleStreamExpectations.define do |o|
+          expect_these_lines_ o
+        end
+
+        sess = exp.to_assertion_session_under self
+
+        @STDERR = sess.downstream_IO_proxy
+
+        rt = build_runtime_
+        _svc = start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
+        mod = build_new_sandbox_module_
+        rt.__enhance_test_support_module_with_the_method_called_describe mod
+
+        x = given_this_test_file_ mod  # <- runs the tests
+
+        sess.finish
+
+        x
+      end
+
+      # -- example-level testing
 
       def given_this_example_ & p
         @EXAMPLE_BODY = p
@@ -37,7 +63,7 @@ module Skylab::TestSupport::TestSupport
         ExampleExecutionState_via_ExampleBody___[ _p ]
       end
 
-      # -- that thing
+      # --
 
       def build_runtime_
         subject_module_::Runtime___.define do |o|
@@ -46,15 +72,20 @@ module Skylab::TestSupport::TestSupport
         end
       end
 
-      def hackishly_start_service_ rt
-        o = :_no_see_ts_
+      def start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
+        _argv = self.ARGV_
         _serr = self.stderr_
-        _svc = rt.start_quickie_service_ EMPTY_A_, o, o, _serr, o
+        o = :_no_see_ts_
+        _svc = rt.start_quickie_service_ _argv, o, o, _serr, o
         _svc  # hi. #todo
       end
 
+      def ARGV_
+        remove_instance_variable :@ARGV
+      end
+
       def stderr_
-        :_no_see_ts_
+        remove_instance_variable :@STDERR
       end
 
       _dangerous_memoize :kernel_module_with_rspec_not_loaded_ do
@@ -87,6 +118,14 @@ module Skylab::TestSupport::TestSupport
         end
       end
 
+      def subject_CLI
+        ProxyThatIsPretendingToBe_CLI_Class.new self
+      end
+
+      def prepare_CLI _
+        NIL  # hi.
+      end
+
       def begin_mock_module_
         Home_::MockModule.new
       end
@@ -112,6 +151,45 @@ module Skylab::TestSupport::TestSupport
         rec.flush_via_result _result
       # -
     end
+
+    # ==
+
+    class ProxyThatIsPretendingToBe_CLI_Class
+
+      # we pretend that our quickie service is "long-running", *and*
+      # it starts *around* a client (probably CLI), so it does not exit
+      # per se.. not yet..
+      #
+      # but anyway here we pretend like the service "exits" with exitstatus
+      # integers just so it can play nice with our ever-useful [ze] niCLI
+      # fail-early test library..
+
+      def initialize c
+        @__context = c
+      end
+
+      def new * five
+        @__EEK = five
+        self
+      end
+
+      def execute
+        argv, sin, sout, serr, pn_s_a = remove_instance_variable :@__EEK
+        _rt = @__context.build_runtime_
+        svc = _rt.start_quickie_service_ argv, sin, sout, serr, pn_s_a
+        # (hack it so it results in exitstatuses so we can use the etc)
+        if svc
+          self._CONFIRM_THAT_IT_IS_THE_SERVICE
+          0
+        elsif false == svc
+          113  # any nonzero exitstatus ('q'.ord)
+        else
+          0  # assume help
+        end
+      end
+    end
+
+    # ==
 
     class RecordingClient___
 

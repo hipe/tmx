@@ -54,6 +54,8 @@
 
 [#030]       (assorted quickie meta)
 
+       #wish :[#here.4]: maybe drop quickie onefile into recursive runnner..
+
        #open :[#here.C]: quickie plugin arch needs rearch - too confusing
 
        #open :[#here.B]: recursive runner (plugins) help screen needs overhaul & cover

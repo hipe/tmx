@@ -4,12 +4,6 @@ module Skylab::TestSupport::TestSupport
 
   describe "[ts] quickie - example intro" do
 
-    # temporary note: this test was introduced now only to confirm that we
-    # can run multiple tests with r.s by naming them on the command line
-    # (these seems fairly certain). this is something we may or may not
-    # try to support with core quickie (as opposed to the quickie "recursive
-    # runner") when we flip to self-support pretty soon here (at -0.847)
-
     TS_[ self ]
     use :memoizer_methods
     use :quickie
@@ -56,35 +50,11 @@ module Skylab::TestSupport::TestSupport
       o.expect %r(\A\nFinished in \d+(?:\.\d+)? seconds?\z)
     end
 
-    def run_the_tests_
-
-      _lib = Zerk_test_support_[]::Non_Interactive_CLI::Fail_Early
-
-      exp = _lib::SingleStreamExpectations.define do |o|
-        expect_these_lines_ o
-      end
-
-      sess = exp.to_assertion_session_under self
-
-      @STDERR = sess.downstream_IO_proxy
-
-      rt = build_runtime_
-      _svc = hackishly_start_service_ rt
-      mod = build_new_sandbox_module_
-      rt.__enhance_test_support_module_with_the_method_called_describe mod
-
-      x = given_this_test_file_ mod  # <- runs the tests
-
-      sess.finish
-
-      x
-    end
-
-    def stderr_
-      remove_instance_variable :@STDERR
-    end
-
     # ==
+
+    def ARGV_
+      EMPTY_A_
+    end
 
     def toplevel_module_
       toplevel_module_with_rspec_not_loaded_

@@ -389,7 +389,7 @@ module Skylab::Zerk::TestSupport
         end
 
         _serr_spy = if has[ :serr ]
-          SerrSpy__[].dub_by do |o|
+          SerrSpy__[].dup_by do |o|
             o.receive_by = method :_receive
           end
         else
@@ -466,7 +466,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def stream_is_OK x
-        @err_or_sout == x
+        @serr_or_sout == x
       end
 
       def express_debugging_into io

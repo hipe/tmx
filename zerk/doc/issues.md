@@ -34,7 +34,7 @@
              [#here.4] "coarse parse"
              [#here.3] actually in [tmx], furloughed at writing
              [#here.2] from ancient [br], now "magnetics"
-             [#here.1] now "fail fast" [#here.1-1] #subscribed-by [cm] (see in-line)
+             [#here.1] now "fail early" [#here.1-1] #subscribed-by [cm] (see in-line)
 
 [#053]       feature injection through compounded primaries..
 

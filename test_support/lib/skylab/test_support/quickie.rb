@@ -302,6 +302,47 @@ module Skylab::TestSupport
 
     # ==
 
+    class Choices_via_AssignmentsProc_and_Client___
+
+      # responsibility: parse arguments in a modality-agnostic way & represent
+
+      class << self
+        def call client, & p
+          new( p, client ).execute
+        end
+        private :new
+      end  # >>
+
+      def initialize p, c
+        @client = c ; @proc = p
+      end
+
+      def execute
+        @_ok = true
+        @writable_choices = Choices___.new
+        _ok = remove_instance_variable( :@proc )[ self ]
+        _ok && @_ok && __finish
+      end
+
+      def __write_primary_descriptions_into_ receiver
+        PRIMARY_DESCRIPTONS__.__elements_.each do |hi|
+          self._NOT_YET_COVERED
+          receiver.add_primary hi.name_symbol, & hi.proc
+        end
+        NIL
+      end
+
+      def __finish
+        remove_instance_variable( :@writable_choices ).freeze
+      end
+
+      attr_reader(
+        :writable_choices,
+      )
+    end
+
+    # ==
+
     class StatisticsAggregator___
 
       # primary responsibility: maintain "statistics" (just simple counts)
@@ -396,6 +437,68 @@ module Skylab::TestSupport
         end
       end
 
+      def __when_ARGV argv  # assume nonzero length
+
+        Convert_leading_line_number_shorthand_switches___[ argv ]
+
+        op = nil
+        choices = Choices_via_AssignmentsProc_and_Client___.call self do |cx|
+
+          op = CLI_OptionParser_via_WritableChoices___.new( cx ).execute
+          begin
+            op.parse! argv
+            ACHIEVED_
+          rescue ::OptionParser::ParseError => e
+            __when_optparse_parse_error e
+          end
+        end
+
+        if choices
+          if argv.length.zero?
+            if choices.do_help
+              __express_help op
+            else
+              _client_via_chioces choices
+            end
+          else
+            __when_extra_arguments argv
+          end
+        else
+          @_do_invite && _invite
+          choices
+        end
+      end
+
+      def __express_help op
+        io = @_stderr
+        io.puts "usage: ruby TEST_FILE [options]"
+        io.puts
+        io.puts "options:"
+        op.summarize( & io.method( :puts ) )
+        NIL
+      end
+
+      def __when_optparse_parse_error e
+        @_stderr.puts e.message
+        _invite
+        UNABLE_
+      end
+
+      def __when_extra_arguments argv
+        @_stderr.puts "unexpected argument#{ 's' if 1 != argv.length }: #{
+          }#{ argv[0].inspect }#{ ' [..]' if argv.length > 1 }"
+        _invite
+      end
+
+      def _invite
+        @_stderr.puts "try 'ruby #{ __invocation_string } -h' for help"
+        UNABLE_
+      end
+
+      def __invocation_string
+        @program_name_string_array * SPACE_
+      end
+
       def _client_via_chioces cx
         CLI_InjectedClient___.new cx, @_stdout, @_stderr
       end
@@ -405,6 +508,38 @@ module Skylab::TestSupport
 
     DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___ = -> sym, s do
       Stylize__[ sym, s ]
+    end
+
+    # ==
+
+    class CLI_OptionParser_via_WritableChoices___
+
+      def initialize cx
+        @writable_choices = cx.writable_choices
+        @formal_choices_reader = cx
+      end
+
+      def execute
+
+        @__first_time_letter = ::Hash.new { |h, k| h[k] = false ; true }
+
+        require 'optparse'  # or Lib_::OptionParser
+        ::OptionParser.new do |o|
+          @_op = o
+          _cxr = remove_instance_variable :@formal_choices_reader
+          _cxr.__write_primary_descriptions_into_ self
+          __write_help
+          remove_instance_variable :@_op
+        end
+      end
+
+      def __write_help
+        @_op.on '-h', '--help' do
+          @writable_choices.do_help = true
+          NIL
+        end
+        NIL
+      end
     end
 
     # ==
@@ -808,33 +943,6 @@ if false
         end
         NIL_
       end
-
-      def __parse_args argv
-
-        if argv.length.zero?
-          ACHIEVED_
-        else
-          @_info_yielder << __say_argv( argv )
-          _invite
-          UNABLE_
-        end
-      end
-
-      def __say_argv argv
-        "unexpected argument#{ s argv.length }: #{ argv[0].inspect }#{
-          }#{ ' [..]' if argv.length > 1 }"
-      end
-
-      def _invite
-
-        _program_name = [
-          ::File.basename( @_program_name_s_a.first ),
-          * @_program_name_s_a[ 1 .. -1 ] ].join SPACE_
-
-        @_info_yielder << "try #{ kbd "ruby #{ _program_name } -h" } for help"
-
-        NIL_
-      end
 end  # if false
 
     Stylize__ = -> do  # #open :[#005]. #[#ze-023.2] the stylize diaspora
@@ -1048,7 +1156,7 @@ end  # if false
       )
     end
 
-    # -- facet 1 - predicates (core)
+    # === FEATURE: predicates (core) ==
 
     class Predicate__
 
@@ -1229,7 +1337,7 @@ end  # if false
     end
   end
 
-    # -- facet 2 - should `be_<foo>()` method_missing hack
+    # === FEATURE: should `be_<foo>()` method_missing hack ===
 
     class Context__  # re-open
 
@@ -1358,7 +1466,37 @@ end  # if false
       }
     end
 
-    # -- facet 3 - before hooks
+    # ===
+
+    primary_descriptions =
+    module PRIMARY_DESCRIPTONS__
+      class << self
+        def add_primary k, & p
+          self._BOOYEAH
+        end
+        attr_reader :__elements_
+        def __TEMPORARY_TOUCH__ ; nil end
+      end  # >>
+      @__elements_ = []
+      self
+    end
+
+    choices_members = [ :do_help ]
+
+    # === FEATURE: line-numbers (STUB) ===
+
+    Convert_leading_line_number_shorthand_switches___ = -> do
+
+      rx = /\d/
+
+      -> argv do
+        if rx =~ argv.fetch( 0 )
+          self._RESTORE_ME
+        end
+      end
+    end.call
+
+    # === FEATURE: before hooks ===
 
     class Context__
       class << self
@@ -1473,6 +1611,9 @@ end  # if false
       x
     end
   end
+
+    primary_descriptions.__TEMPORARY_TOUCH__
+    Choices___ = ::Struct.new( * choices_members )
 
     module Plugins  # ..
       Autoloader_[ self, :boxxy ]

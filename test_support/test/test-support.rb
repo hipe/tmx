@@ -94,6 +94,10 @@ module Skylab::TestSupport::TestSupport
     Home_::Memoization_and_subject_sharing[ tcc ]
   end
 
+  Non_Interactive_CLI_Fail_Early = -> tcc do
+    Zerk_test_support_[]::Non_Interactive_CLI::Fail_Early[ tcc ]
+  end
+
   The_Method_Called_Let = -> tcc do
     Home_::Let[ tcc ]
   end

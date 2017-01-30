@@ -2,7 +2,7 @@ module Skylab::Zerk::TestSupport
 
   class CLI::Expect_Section_Fail_Early
 
-    # the first of four similar facilities, this is :[#045] of #[#106]
+    # the first of four similar facilities, this is :[#054.1] of #[#054]
 
     # this also contains a fifth addition to the family strain, a
     # "fail early"-modeled one.
