@@ -120,8 +120,43 @@
 
 [#011]       #track fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #track "dark hack" this one weird old trick makes ..
-[#009]       #subscription - will Quickie ever short-circuit (throw
+
+[#009]       track ways in which quickie might differ behaviorally from rspec
+
+             :[#here.C]: in reporting "Run options", we report all the
+               relevant "reducers" that were provided on the command line,
+               as opposed to r.s which apparently reports only those in the
+               .rspec (or equivalent) file. (we deal with no such file.)
+
+             :[#here.B]: multiple *tags* are AND'ed together,
+               but multiple line ranges are OR'ed together. discussion:
+
+               for practical purposes this makes the most sense:
+               `--tag=focus --tag="~slow"` probably wants to narrow the
+               search, not widen it. (that is, AND, not OR).
+
+               but to AND together multiple line ranges certainly makes
+               no sense, because that would always match nothing.
+
+               furthermore, such a "reducer" of tags and such a "reducer"
+               of line ranges, if present together, are AND'ed not OR'ed.
+               (saying "everything after line 50 that is not wipped" is
+               probably more broadly useful than saying "X OR Y".)
+
+               of course the logical but absurd extreme of this would be
+               to support the same kind of syntax of the unix `find`
+               utility, which we're piddling around in our heads as an
+               idea.
+
+        #open  the above is open while we don't know exactly what r.s does
+               in this regard. it is closed when we can document its
+               difference, or that there is none.
+
+             :[#here.A]: (not referenced anywhere)
+               will Quickie ever short-circuit (throw
                exceptions) on individual test-failures like ::Rspec?
+
+
 [#008]       #track quickie root invocation (runtime/context)
 [#007]       #tracking tag of similar places with line / `call_digraph_listeners` structs
 

@@ -1,4 +1,4 @@
-# about globbing :[#009]
+# about globbing :[#033]
 
 the general syntax of the "test/all" utility is something like:
 

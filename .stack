@@ -20,6 +20,7 @@ use [sa] to convert etc to Stream_
 -3.109 request parsing must reconcile the state machine (probably a new branch)
 -3.125 tree runner can be invoked by a CLI or API scanner
 -3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
+  (totally unrelated: relate [#ts-033] to some place in slowie)
   wontfix or move to "microservice": #open [#ts-005] stylize
   all the method name changes for universal integration
   #open [#ts-036] indentation
@@ -27,7 +28,6 @@ use [sa] to convert etc to Stream_
 -0.077 consider #wish [#ts-030.4] quickie onefile drops into recursive runner
 -0.115 re-integrate with recursive runner - note no line ranges there, yes tags
 -0.192 cover help screens with tags and ranges #open [#ts-030.A]
+-0.231 absurd combinatorials of ranges and line numbers #open [#ts-009.B]
 -0.269 line number/range selection (consider unit tests for all these permutations)
 -0.346 any will-rewrites for next
--0.423 tags
--0.500 any will-rewrites for next

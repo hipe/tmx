@@ -12,7 +12,11 @@ module Skylab::TestSupport::TestSupport
 
       # -- context-level testing (targeting CLI client)
 
-      def run_the_tests_thru_a_CLI_expecting_a_single_stream_by__ & p
+      def expect_finished_line_ o
+        o.expect %r(\A\nFinished in \d+(?:\.\d+)? seconds?\z)
+      end
+
+      def run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ & p
 
         args = TheseArgs___.define( & p )
 
@@ -72,6 +76,14 @@ module Skylab::TestSupport::TestSupport
         ExampleExecutionState_via_ExampleBody___[ _p ]
       end
 
+      def expect_example_ s_a  # for API calls
+        expect :data, :example do |eg|
+          if eg.description_stack != s_a
+            fail
+          end
+        end
+      end
+
       # --
 
       def build_runtime_
@@ -85,9 +97,11 @@ module Skylab::TestSupport::TestSupport
         _argv = self.ARGV_
         _serr = self.stderr_
         o = :_no_see_ts_
-        _svc = rt.start_quickie_service_ _argv, o, o, _serr, o
+        _svc = rt.start_quickie_service_ _argv, o, o, _serr, PNSA___
         _svc  # hi. #todo
       end
+
+      PNSA___ = %w( sperk.kd )
 
       def ARGV_
         remove_instance_variable :@ARGV
@@ -339,7 +353,7 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    Sandbox_moduler___ = -> do  # exists elsewhere
+    Sandbox_moduler___ = -> do  # a bespoke #[#ts-048], here for independence
       box_mod = nil ; last_d = nil
       main = -> do
         mod = ::Module.new

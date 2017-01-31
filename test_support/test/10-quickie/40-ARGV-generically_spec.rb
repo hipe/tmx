@@ -57,6 +57,7 @@ module Skylab::TestSupport::TestSupport
       expect_succeeded
 
       seen.delete( :help ) || fail
+      seen.delete( :tag ) || fail
       if seen.length.nonzero?
         fail "sign off on these new additions to your help screen: (#{ seen.keys * ', ' })"
       end

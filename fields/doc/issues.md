@@ -53,7 +53,8 @@
 
 [#020]       #watch or not to memoize method-based attributes (they are so light)
 
-[#019]       similar implementations
+[#019]       similar implementations (2x in univ) of mocking a scanner
+             around a single value for argument processing.
 
 [#018]       let me count the ways we parse ..
 

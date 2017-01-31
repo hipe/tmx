@@ -159,13 +159,7 @@ module Skylab::TestSupport::TestSupport
       _stats.example_count == 7 || fail
     end
 
-    def _expect s_a
-      expect :data, :example do |eg|
-        if eg.description_stack != s_a
-          fail
-        end
-      end
-    end
+    alias_method :_expect, :expect_example_
 
     # ==
 

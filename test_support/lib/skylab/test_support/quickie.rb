@@ -109,7 +109,6 @@ module Skylab::TestSupport
         # service failed to start (maybe ARGV issues). define `describe` anyway
 
         @_definition_for_the_method_called_describe = -> * do
-          self._COVER_ME
           NOTHING_  #  SUPER risky - you better hope..
         end
 
@@ -227,8 +226,51 @@ module Skylab::TestSupport
     end
 
     DEFINITION_FOR_THE_METHOD_CALLED_WHINE__ = -> tail_sym, & msg do
-      self._SOON
+
+      me = self
+      current_primary_symbol_hello = self.current_primary_symbol
+
+      listener.call :error, :expression, :parse_error, tail_sym do |y|
+
+        if ! msg
+          md = /\A.+_is_/.match tail_sym
+          _ = if md
+            "cannot be #{ md.post_match }"
+          else
+            tail_sym.id2name
+          end
+          _template = "{{ curr_prim }} #{ _.gsub UNDERSCORE_, SPACE_ }"
+          msg = -> { _template }
+        end
+
+        use_y = ::Enumerator::Yielder.new do |unexpanded_line|
+          _final_line = unexpanded_line.gsub MUSTACHE_RX___ do
+            param_sym = $~[ :name ].intern
+            case param_sym
+            when :curr_prim
+              prim current_primary_symbol_hello
+            when :ick_mixed_value
+              ick me.mixed_value
+            else
+              raise ::NameError, param_sym
+            end
+          end
+          y << _final_line
+        end
+
+        if msg.arity.zero?
+          _unexpanded_line = calculate( & msg )
+          use_y << _unexpanded_line
+        else
+          calculate use_y, & msg
+        end
+        y
+      end
+
+      UNABLE_  # <- the result of (usu.) `_whine`
     end
+
+    MUSTACHE_RX___ = /\{\{[ ]*(?<name>[a-z]+(?:_[a-z]+)*)[ ]*\}\}/
 
     DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
       if x
@@ -252,7 +294,7 @@ module Skylab::TestSupport
       def __begin_irreversible_one_time_compound_mode_
         remove_instance_variable :@_thing_mutex
         @_long_running_statistics = StatisticsAggregator___.new @_client  # starts time
-        @_receive_TCC = :__receive_TCC_in_compound_mode ; nil
+        @_receive_TCC = :__receive_first_TCC_in_compound_mode ; nil
       end
 
       def _receive_describe p, s_a
@@ -262,6 +304,9 @@ module Skylab::TestSupport
       end
 
       def __receive_first_TCC_in_basic_mode tcc
+
+        @_client.at_beginning_of_test_run
+
         remove_instance_variable :@_thing_mutex
         @_receive_TCC = :__receive_subsequent_TCC_in_basic_mode
         _receive_TCC_in_basic_mode tcc
@@ -285,13 +330,26 @@ module Skylab::TestSupport
             }them individually."
       end
 
-      def __receive_TCC_in_compound_mode tcc
+      def __receive_first_TCC_in_compound_mode tcc
 
-        RunTests_via_TestContextClass_and_Client__.define do |o|
+        @_test_runner_prototype = RunTests_via_TestContextClass_and_Client__.define do |o|
           o.client = @_client
           o.statistics_aggregator = @_long_running_statistics
+        end
+
+        @_client.at_beginning_of_test_run
+
+        @_receive_TCC = :__receive_TCC_in_compound_mode
+        send @_receive_TCC, tcc
+        NIL
+      end
+
+      def __receive_TCC_in_compound_mode tcc
+
+        _runner = @_test_runner_prototype.dup_by do |o|
           o.test_context_class = tcc
-        end.execute
+        end
+        _runner.execute
         NIL
       end
 
@@ -321,38 +379,81 @@ module Skylab::TestSupport
 
     class RunTests_via_TestContextClass_and_Client__ < Common_::SimpleModel
 
+      def initialize
+        @_reduction_proc = MONADIC_TRUTH_
+        super
+      end
+
+      def dup_by
+        otr = dup
+        yield otr
+        otr
+      end
+
       attr_writer(
-        :client,
         :statistics_aggregator,
         :test_context_class,
       )
 
+      def client= cli
+        cx = cli._choices_
+        if cx
+          cx.members.each do |mem|
+            send RECEIVE_CHOICE___.fetch( mem ), cx[ mem ]
+          end
+        end
+        @client = cli
+      end
+
+      RECEIVE_CHOICE___ = {  # sanity for when new choices are added
+        reducers: :__receive_reducers,
+      }
+
+      def __receive_reducers red
+        if red
+          @_reduction_proc = red.to_proc
+        end
+        NIL
+      end
+
       def execute
+
         client = @client
         eg_st = Exampler_via___[ @test_context_class, client ]
+        reduction_proc = @_reduction_proc
         stats = @statistics_aggregator
+
         begin
+
           eg = eg_st.call
           eg || break
-          if false && do_skip
-            client.express_skip
+
+          _stay = reduction_proc[ eg ]
+          if ! _stay
+            client.receive_skip
+            # (before this cluster there was some commented out expression)
             redo
           end
+
           block = eg.block
           if ! block
             stats.tick_pending
             redo
           end
+
           # puts "#{ indent[] }<<#{ eg.description }>>"
 
           stats.tick_example
           ctx = eg.context.new stats
+
           if eg.has_before_each
             eg.run_before_each ctx
           end
+
           ctx.instance_exec( & block )
           redo
         end while above
+
         client.flush
         NIL
       end
@@ -360,7 +461,7 @@ module Skylab::TestSupport
 
     # ==
 
-    class Choices_via_AssignmentsProc_and_Client__
+    class Choices_via_AssignmentsProc_and_Client_
 
       # responsibility: parse arguments in a modality-agnostic way & represent
 
@@ -383,9 +484,8 @@ module Skylab::TestSupport
       end
 
       def write_formal_primaries_into receiver
-        PRIMARIES___.__elements_.each do |hi|
-          self._NOT_YET_COVERED
-          receiver.add_primary hi.name_symbol, & hi.proc
+        PRIMARIES___.__elements_.each do |(sym, p)| # :#here
+          receiver.add_primary sym, & p
         end
         NIL
       end
@@ -485,9 +585,23 @@ module Skylab::TestSupport
     class CLI_InjectedClient_via_StandardFive___ < Common_::Monadic
 
       def initialize five
-        @show_help = false
-        @_ARGV, _, @_stdout, @_stderr, @_program_name_string_array = five
+
+        @_ARGV, _, sout, serr, @_program_name_string_array = five
+
+        @_CLI_expression_resources = CLI_ExpressionResources___.define do |o|
+          o.stdout = sout
+          o.stderr = serr
+          o.notify_that_should_invite_by = -> do
+            @_do_invite = true
+            @_ok = false
+          end
+        end
+
         @_do_invite = false
+        @_ok = true
+        @_stderr = serr
+
+        @show_help = false
       end
 
       def execute
@@ -517,9 +631,9 @@ module Skylab::TestSupport
 
       def __resolve_choices  # assme ARGV
 
-        _ = Choices_via_AssignmentsProc_and_Client__.call self do |cx|
-          @writable_choices = cx.writable_choices
-          @formal_choices_reader = cx
+        _ = Choices_via_AssignmentsProc_and_Client_.call self do |cx|
+          @_writable_choices = cx.writable_choices
+          @_formal_choices_reader = cx
           __init_option_parser
           begin
             @_option_parser.parse! @_ARGV
@@ -528,7 +642,8 @@ module Skylab::TestSupport
             __when_optparse_parse_error e
           end
         end
-        _store :@_choices, _
+
+        @_ok and _store :@_choices, _
       end
 
       def __express_help
@@ -567,11 +682,11 @@ module Skylab::TestSupport
       end
 
       def __client_without_choices
-        _client_via_chioces NOTHING_
+        _client_via_choices NOTHING_
       end
 
-      def _client_via_chioces cx
-        CLI_InjectedClient___.new cx, @_stdout, @_stderr
+      def _client_via_choices cx
+        CLI_InjectedClient___.new cx, @_CLI_expression_resources
       end
 
       def __init_option_parser
@@ -581,7 +696,7 @@ module Skylab::TestSupport
         require 'optparse'  # or Lib_::OptionParser
         ::OptionParser.new do |o|
           @_option_parser = o
-          _cxr = remove_instance_variable :@formal_choices_reader
+          _cxr = remove_instance_variable :@_formal_choices_reader
           _cxr.write_formal_primaries_into self
           __add_bespoke_primaries
         end
@@ -589,14 +704,82 @@ module Skylab::TestSupport
       end
 
       def __add_bespoke_primaries
-        @_option_parser.on '-h', '--help' do
+        @_option_parser.on '-h', '--help', 'this screen' do
           @show_help = true
           NIL
         end
         NIL
       end
 
+      def add_primary k
+
+        a = []
+
+        prim = CLI_Primary_for_OptionParser___.define do |o|
+          o.name_symbol = k
+          yield o
+        end
+
+        slug = k.id2name.gsub UNDERSCORE_, DASH_
+
+        letter = slug[0]
+
+        if @__first_time_letter[ letter ]
+          a.push "-#{ letter }"
+        end
+
+        if ! prim.is_flag
+          _moniker_part = " #{ prim.__release_value_moniker_ }"
+        end
+
+        a.push "--#{ slug }#{ _moniker_part }"
+        a.push prim.__release_description_line_
+
+        write = -> x do
+          write = CLI_PrimaryWriter___.call_by do |o|
+            o.listener = @_CLI_expression_resources.listener
+            o.primary = prim
+            o.writable_client = @_writable_choices
+          end
+          write[ x ]
+        end
+
+        @_option_parser.on( * a ) do |x|
+          write[ x ]
+        end
+        NIL
+      end
+
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    end
+
+    # ==
+
+    Primary_ = ::Class.new Common_::SimpleModel
+
+    class CLI_Primary_for_OptionParser___ < Primary_
+
+      def initialize
+        yield self
+        # don't freeze
+      end
+
+      def didactics_by
+        yield self
+      end
+
+      attr_writer(
+        :description_line,
+        :value_moniker,
+      )
+
+      def __release_description_line_
+        remove_instance_variable :@description_line
+      end
+
+      def __release_value_moniker_
+        remove_instance_variable :@value_moniker
+      end
     end
 
     class CLI_InjectedClient___
@@ -611,15 +794,15 @@ module Skylab::TestSupport
 
       # #storypoint-465 has the legacy intro, still relevant
 
-      def initialize cx, so, se
+      def initialize cx, rsx
 
         if cx
-          self._ETC
-          # @choices = cx
-          @_has_search_criteria = true
-        else
-          @_has_search_criteria = false
+          @_choices_ = cx
+          if cx.reducers
+            has_reducers = true
+          end
         end
+        @_has_reducers = has_reducers
 
         @_EEK_branch_cache = []  # each most recent branch indexed by its depth.
         @_EEK_branch_offset = 0  # index into the above
@@ -628,9 +811,83 @@ module Skylab::TestSupport
         @_EEK_flush = :_nothing
         @_EEK_depth = nil  # horrible
 
-        @_stderr = se
-        # @_stdout = so
+        @_CLI_expression_resources = rsx
+        @_stderr = rsx.stderr
+        # #todo - isn't there somewhere we want this? like the final summary line?
         @_tab = '  '
+      end
+
+      def at_beginning_of_test_run
+        @_has_reducers && __express_reducers
+        NIL
+      end
+
+      def __express_reducers
+
+        # this doesn't modularize along the same axis as its components:
+        # there is any one line for "includes" and any one for "excludes";
+        # line ranges are always expressed as the former and tags could be
+        # either. visitor pattern would be overkill.
+        # this is near #open [#009.B] how it differs subtly from r.s
+
+        include = nil ; exclude = nil
+
+        via_bc = {
+          _tags_: -> bg do
+            bg.reducers.each do |red|
+              h = if red.positive_not_negative
+                include ||= {}
+              else
+                exclude ||= {}
+              end
+              ( h[ :_tags_ ] ||= [] ).push(
+                ":#{ red.tag_symbol }=>#{ red.mixed_tag_value }" )
+            end
+          end,
+          _lines_ranges_SKETCH_: -> bg do
+            ( include ||= {} )[ :_linez_ ].push red.EXPRESSION_OF_LINE_RANGE  # eg. "156"
+          end,
+        }
+
+        @_choices_.reducers.AND.each_value do |bg|
+          via_bc.fetch( bg.business_category_symbol )[ bg ]
+        end
+
+        say = {
+          _tags_: -> s_a do
+            s_a.join ', '
+          end,
+        }
+
+        a = []
+        say_line_body = -> h do
+          buffer = "{"
+          yes = false
+          h.each_pair do |k, v|
+            if yes
+              buffer << ', '
+            else
+              yes = true
+            end
+            buffer << say.fetch( k )[ v ]
+          end
+          buffer << "}"
+        end
+        if include
+          a.push "include #{ say_line_body[ include ] }"
+        end
+        if exclude
+          a.push "exclude #{ say_line_body[ exclude ] }"
+        end
+        if 1 == a.length
+          @_stderr.puts "Run options: #{ a.first }"
+        else
+          @_stderr.puts "Run options:"
+          a.each { |s| @_stderr.puts "#{ SPACE_ }#{ SPACE_ }#{ s }" }
+        end
+
+        @_stderr.puts  # blank line
+        NIL
       end
 
       def begin_branch_node d, ctx
@@ -693,15 +950,26 @@ module Skylab::TestSupport
         NIL
       end
 
+      def receive_skip
+        _clear_example  # hi.
+        NIL
+      end
+
       # --
 
       def flush
-        _flush_leaf  # hi.
+        send @_EEK_flush
+        NIL
       end
 
       def _flush_leaf
         __flush_branches
         send EXPRESS_EXAMPLE___.fetch @_EEK_eg_category
+        _clear_example
+        NIL
+      end
+
+      def _clear_example
         remove_instance_variable :@_EEK_eg
         @_EEK_flush = :_nothing
         @_EEK_eg_category = :pass  # examples with no tests still pass
@@ -760,7 +1028,7 @@ module Skylab::TestSupport
         p_d = stats.example_pending_count
 
         if e_d.zero?
-          if @_has_search_criteria
+          if @_has_reducers
             _puts "All examples were filtered out"
           else
             _puts "No examples found.#{ NEWLINE_ }#{ NEWLINE_ }"  # <- trying to look like r.s there
@@ -799,9 +1067,70 @@ module Skylab::TestSupport
       def _nothing
         NOTHING_
       end
+
+      attr_reader :_choices_
     end
 
     # ==
+
+    class CLI_ExpressionResources___ < Common_::SimpleModel
+
+      def initialize
+        yield self
+      end
+
+      attr_writer :notify_that_should_invite_by, :stderr, :stdout
+
+      def listener
+        @___listener ||= method :__receive_emission
+      end
+
+      def __receive_emission * channel, & msg
+        expression_agent.calculate info_yielder, & msg
+        if :parse_error == channel.fetch( 2 )
+          @notify_that_should_invite_by.call
+        end
+        NIL
+      end
+
+      def expression_agent
+        CLI_ExpressionAgent___.instance
+      end
+
+      def info_yielder
+        @___info_yielder ||= __build_info_yielder
+      end
+
+      def __build_info_yielder
+        ::Enumerator::Yielder.new do |line|
+          @stderr.puts line
+        end
+      end
+
+      attr_reader :stderr, :stdout
+    end
+
+    # ==
+
+    class CLI_ExpressionAgent___
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
+
+      alias_method :calculate, :instance_exec
+
+      def ick x
+        x.inspect
+      end
+
+      def prim sym
+        "--#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
+      end
+    end
 
     # === MODELS ===
 
@@ -883,45 +1212,6 @@ module Skylab::TestSupport
 
     # ==
 
-    Tagset_hash_via__ = -> desc_s_a, inherited_tagset_h do
-
-      if ::Hash === desc_s_a.last  # meh
-        self._DO_ME
-      end
-
-      if inherited_tagset_h
-        self._DO_ME
-      end
-    end
-
-    # ==
-if false
-    class Tagset__
-
-      def initialize * a
-        @ts_h, @lineno = a
-      end
-
-      attr_reader :lineno
-
-      def [] sym
-        @ts_h && @ts_h[ sym ]
-      end
-    end
-
-  Build_tagset_h__ = -> desc, inherited_tagset_h do
-    tagset_h = ( desc.pop if ::Hash === desc.last ) # meh
-    if inherited_tagset_h
-      if tagset_h
-        tagset_h = inherited_tagset_h.merge tagset_h
-      else
-        tagset_h = inherited_tagset_h
-      end
-    end
-    tagset_h
-  end
-end  # if false
-
     Exampler_via___ = -> ctx_class, client do
 
       branch = client.method :begin_branch_node
@@ -984,20 +1274,6 @@ if false
         end
       end.call
 
-      def __init_tag_filter_proc
-
-        @_tag_filter_p = if @_OR_p_a
-          or_p_a = @_OR_p_a
-          -> tagset do
-            or_p_a.detect do | p |
-              p[ tagset ]
-            end
-          end
-        else
-          MONADIC_TRUTH_
-        end
-        NIL_
-      end
 end  # if false
 
     Stylize__ = -> do  # #open :[#005]. #[#ze-023.2] the stylize diaspora
@@ -1021,11 +1297,6 @@ if false
 
       o = _lib::OptionParser.new
 
-      o.on '-t', '--tag TAG[:VALUE]',
-          '(tries to be like the option in rspec)' do |v|
-        __tags_receiver.receive_tag_argument v
-      end
-
       o.on '--line NUMBER', "run the example whose line number equals this" do |v|
         process_line_argument v
       end
@@ -1038,34 +1309,6 @@ if false
         process_max_line_argument v
       end
       o
-    end
-
-    def __tags_receiver
-      @___tags_receiver ||= ___build_tags_receiver
-    end
-
-    def ___build_tags_receiver
-
-      Tags_Receiver_.new(
-
-        :on_error, -> s do
-          e = ::OptionParser::InvalidArgument.new
-          e.reason = s
-          raise e
-        end,
-
-        :on_info_qualified_knownness, method( :add_tag_description ),
-
-        :on_filter_proc, method( :_receive_OR_proc ) )
-    end
-
-    def add_tag_description include_or_exclude_i, tag_i, val_x
-      @tag_desc_h ||= {}
-      ( @tag_desc_h[ include_or_exclude_i ] ||= [] ).push [ tag_i, val_x ]
-      @did_add_render_tag_run_options ||= begin
-        _add_run_option_renderer( & method( :render_tag_run_options ) )
-        true
-      end ; nil
     end
 
     def process_line_argument s
@@ -1150,38 +1393,6 @@ if false
         Build_example_stream_proc_[ @root_context_class, branch, leaf ]
       end
     end
-
-    def commence
-      if @_run_option_p_a
-        @_info_yielder << "Run options:#{ render_run_options }#{ NEWLINE_ }#{ NEWLINE_ }"
-      end
-      NIL_
-    end
-
-    def render_run_options
-      y = []
-      @_run_option_p_a.each do |p|
-        p[ y ]
-      end
-      if 1 == y.length
-        " #{ y[ 0 ] }"
-      else
-        [ EMPTY_S_, * y ] * "#{ NEWLINE_ } "
-      end
-    end
-
-    def render_tag_run_options y
-      _a = @tag_desc_h.sort_by do |k, v|
-        ORDER_A__.index( k ) || ORDER_A__.length
-      end
-      _a.each do |k, v|
-        y << "#{ k } #{ ::Hash[* v.flatten ].inspect }"
-      end ; nil
-    end
-    #
-    ORDER_A__ = [ :include, :exclude ].freeze
-
-    # -> (net: 0)
 
 end  # if false
 
@@ -1521,16 +1732,15 @@ end  # if false
       }
     end
 
-    # ===
+    # === FEATURES PRE-SUPPPORT ===
 
     primaries =
     module PRIMARIES___
       class << self
         def add_primary k, & p
-          self._BOOYEAH
+          @__elements_.push [ k, p ]  # :#here
         end
         attr_reader :__elements_
-        def __TEMPORARY_TOUCH__ ; nil end
       end  # >>
       @__elements_ = []
       self
@@ -1550,6 +1760,147 @@ end  # if false
         end
       end
     end.call
+
+    # === FEATURE: tags ===
+
+    Tagset_hash_via__ = -> desc_s_a, inherited_tagset_h do
+
+      if ::Hash === desc_s_a.last  # meh
+        tagset_h = desc_s_a.pop  # meh
+      end
+
+      if inherited_tagset_h
+        if tagset_h
+          inherited_tagset_h.merge tagset_h
+        else
+          inherited_tagset_h
+        end
+      else
+        tagset_h
+      end
+    end
+
+    primaries.add_primary :tag do |fo|
+
+      fo.didactics_by do |di|
+        di.description_line = "(tries to be like the option in rspec)"
+        di.value_moniker = 'TAG[:VALUE]'
+      end
+
+      fo.be_plural  # <- has no effect because of custom writer
+
+      fo.write_primary_by do |o|
+        ParseTag_via_ParsePrimary___[ o ]
+      end
+    end
+
+    class ParseTag_via_ParsePrimary___ < Common_::Monadic
+
+      def initialize o
+        @listener = o.listener
+        @mixed_value = o.mixed_value
+        @primary = o.primary
+        @writable_client = o.writable_client
+      end
+
+      def execute
+        md = TAG_RX___.match @mixed_value
+        if md
+          __receive_matchdata md
+        else
+          _whine :invalid_tag_expression do
+            "invalid {{ curr_prim }} expression: {{ ick_mixed_value }}"
+          end
+        end
+      end
+
+      def __receive_matchdata md
+
+        s = md[ :val ]
+        tag_value_x = s ? s.intern : true
+
+        _yes = ! md[ :not ]
+
+        tag_sym = md[ :tag ].intern
+
+        _ = if _yes
+          TagReducerPositive___.new tag_value_x, tag_sym
+        else
+          TagReducerNegative___.new tag_value_x, tag_sym
+        end
+
+        _red = ( @writable_client[ :reducers ] ||= MutableReducers__.new )
+        _red.add_reducer_to_AND_group _, :_tags_
+
+        ACHIEVED_
+      end
+
+      define_method :_whine, DEFINITION_FOR_THE_METHOD_CALLED_WHINE__
+
+      def current_primary_symbol
+        @primary.name_symbol
+      end
+
+      attr_reader :listener, :mixed_value
+    end
+
+    TagReducer__ = ::Class.new
+
+    class TagReducerNegative___ < TagReducer__
+      def initialize tag_value_x, tag_sym
+        @to_proc = -> eg do
+          h = eg.searchables.tagset_hash
+          if h
+            tag_value_x != h[ tag_sym ]
+          else
+            # (if the example has no tags and your criterion is
+            # "not tag X", then the example matches the criterion).
+            ACHIEVED_
+          end
+        end
+        super
+      end
+      def positive_not_negative
+        false
+      end
+    end
+
+    class TagReducerPositive___ < TagReducer__
+      def initialize tag_value_x, tag_sym
+        @to_proc = -> eg do
+          h = eg.searchables.tagset_hash
+          if h
+            tag_value_x == h[ tag_sym ]
+          else
+            # (if you're selecting for examples with a particular tag
+            # and this example has no tags, it's not a match.)
+            UNABLE_
+          end
+        end
+        super
+      end
+      def positive_not_negative
+        true
+      end
+    end
+
+    class TagReducer__
+
+      def initialize tag_value_x, tag_sym
+        @mixed_tag_value = tag_value_x
+        @tag_symbol = tag_sym
+      end
+
+      attr_reader :tag_symbol, :mixed_tag_value, :to_proc
+    end
+
+    TAG_RX___ = /\A
+      (?<not> ~ )?
+      (?<tag> [-a-zA-Z_0-9]+ )  # or whatever
+      (?: : (?<val> .+) )?
+    \z/x
+
+    choices_members.push :reducers
 
     # === FEATURE: before hooks ===
 
@@ -1597,84 +1948,299 @@ end  # if false
       def apply_experimental_specify_hack test_context_class
         Here_::Actors_::Specify.apply_if_not_defined test_context_class
       end
-    end
+    end  # >>
 
-    # ~ :+#protected-API
+    # === FEATURES POST-SUPPORT ===
 
-  class Tags_Receiver_  # (used by performers too)
-
-    def initialize * x_a
-      @send_error_p = @send_info_qualified_knownness_p = @send_filter_proc_p =
-      @send_pass_filter_proc_p = @send_no_pass_filter_proc_p = nil
-      d = -1 ; last = x_a.length - 1
-      while d < last
-        sym = x_a.fetch d += 1
-        md = RX__.match sym
-        md or raise ::ArgumentError, sym
-        ivar = :"@send_#{ md[ 0 ] }_p"
-        instance_variable_get( ivar ).nil? or raise ::ArgumentError, sym
-        instance_variable_set ivar, x_a.fetch( d += 1 )
-      end
-      @send_error_p ||= ev { raise ::ArgumentError, "#{ ev }" }
-      freeze
-    end
-
-    RX__ = /(?<=\A on_ )[_a-z]+\z/x
-
-    def receive_tag_argument s
-
-      md = TAG_RX___.match s
-
-      if md
-        no, tag_s, val_s = md.captures
-
-        _yes = ! no
-        _tag_i = tag_s.intern
-        _val_x = val_s ? val_s.intern : true
-
-        build_and_send_tag_byproducts_via_three_parts _yes, _tag_i, _val_x
-      else
-
-        @send_error_p[ "invalid tag expression: \"#{ s }\"" ]
-      end
-    end
-
-    TAG_RX___ = /\A
-      (?<not> ~ )?
-      (?<tag> [-a-zA-Z_0-9]+ )  # or whatever
-      (?: : (?<val> .+) )?
-    \z/x
-
-  private
-
-    def build_and_send_tag_byproducts_via_three_parts yes, tag_i, val_x
-      if @send_info_qualified_knownness_p
-        x = @send_info_qualified_knownness_p[ yes ? :include : :exclude, tag_i, val_x ]
-      end
-      if yes
-        p = -> tagset do
-          val_x == tagset[ tag_i ]
-        end
-        @send_pass_filter_proc_p and x = @send_pass_filter_proc_p[ p ]
-      else
-        p = -> tagset do
-          val_x != tagset[ tag_i ]
-        end
-        @send_no_pass_filter_proc_p and x = @send_no_pass_filter_proc_p[ p ]
-      end
-      @send_filter_proc_p and x = @send_filter_proc_p[ p ]
-      x
-    end
-  end
-
-    if choices_members.length.zero?
-      choices_members.push :_placeholder_
-    else
-      self._OK__you_can_get_rid_of_this_fluff_now__
-    end
-
-    primaries.__TEMPORARY_TOUCH__
     Choices___ = ::Struct.new( * choices_members )
+
+    # --
+
+    class MutableReducers__
+
+      # [#009.B]: the subject models a group of groups of reducers. (it's
+      # not recursive; it's only those two dimensions.) in practice it
+      # probably models line ranges and/or tags. assume it wouldn't have
+      # been created unless it has at least one of these leaf nodes.
+
+      # for our business needs we need the type of "union" for these groups
+      # to be variously AND or OR depending on the level and/or business
+      # category of the group. (the document provides detail and examples.)
+      # however we want to keep these business values out of the code at the
+      # subject level.
+
+      # to this end the client declares the type of union it wants along
+      # with an arbitrary business identifier to identify the group..
+
+      def initialize
+        @AND = Common_::Box.new
+      end
+
+      # ~ write
+
+      def add_reducer_to_AND_group o, k
+        existing = @AND[ k ]
+        if existing
+          if existing.AND_not_OR
+            existing.add_reducer o
+          else
+            self._COVER_ME__you_cannot_change_the_behavior_of_an_existing_group__
+          end
+        else
+          @AND.add k, BooleanGroup___.new( o, k, :AND )
+        end
+        NIL
+      end
+
+      # ~ read
+
+      def describe_into_under y, expag
+        @AND.each_value do |o|
+          o._describe_into_under_ y, expag
+        end
+        y
+      end
+
+      def to_proc  # assume only called once per invocation
+
+        p_a = @AND.to_enum( :each_value ).map { |x| x.to_proc }
+        if 1 == p_a.length
+          p_a.fetch 0
+        else
+          __when_many p_a
+        end
+      end
+
+      def __when_many p_a
+        last = p_a.length - 1
+        -> item do
+          d = last
+          begin
+            yes = p_a.fetch( d )[ item ]
+            yes || break
+            d.zero? && break
+            d -= 1
+            redo
+          end while above
+          yes
+        end
+      end
+
+      attr_reader :AND
+    end
+
+    class BooleanGroup___
+
+      def initialize rdcr, k, and_or_or
+        @AND_not_OR = AND_OR_OR___.fetch and_or_or
+        @business_category_symbol = k
+        @reducers = [ rdcr ]
+      end
+
+      # -- write
+
+      AND_OR_OR___ = { AND: true, OR: false }
+
+      def add_reducer o
+        @reducers.push o ; nil
+      end
+
+      # -- read
+
+      def to_proc
+        if 1 == @reducers.length
+          @reducers.first.to_proc
+        else
+          __when_many
+        end
+      end
+
+      def __when_many
+        p_a = @reducers.map { |rdcr| rdcr.to_proc }
+        last = p_a.length - 1
+        if @AND_not_OR
+          -> item do
+            d = last
+            begin
+              yes = p_a.fetch( d )[ item ]
+              yes || break
+              d.zero? && break
+              d -= 1
+              redo
+            end while above
+            yes
+          end
+        else
+          self._WAHOO
+        end
+      end
+
+      attr_reader :AND_not_OR, :business_category_symbol, :reducers
+    end
+
+    # --
+
+    class CLI_PrimaryWriter___ < Common_::MagneticBySimpleModel
+
+      # (we would like this to be agnostic but it's not quite..)
+
+      attr_writer(
+        :listener,
+        :primary,
+        :writable_client,
+      )
+
+      def execute
+        p = @primary.custom_primary_writer
+        if p
+          __to_custom_writer p
+        elsif @primary.is_flag
+          if @primary.is_plural
+            __writer_for_plural_flag
+          else
+            __writer_for_flag
+          end
+        elsif @primary.is_plural
+          __writer_for_plural @primary
+        else
+          __writer_for_ordinary @primary
+        end
+      end
+
+      def __to_custom_writer p
+        -> x do
+          if ! @primary.is_flag
+            @__known_known = Common_::Known_Known[ x ]
+          end
+          p[ self ]  # (result is false on failure)
+          NIL
+        end
+      end
+
+      def mixed_value
+        @__known_known.value_x
+      end
+
+      def __writer_for_plural_flag
+        k = @primary.name_symbol
+        -> _ do
+          @writable_client[ k ] ||= 0
+          @writable_client[ k ] += 1
+        end
+      end
+
+      def __writer_for_flag
+
+        # for now we are KISS and not messing with the "[no-]" form: for now
+        # all primaries `foo` start out with `@foo` being effectively `false`
+        # (they should, anyway) and `--foo` always changes its value to
+        # `true`. we can complicate this as necessary, but hopefully it
+        # always fits that the negative/false/no/OFF state is the default
+        # state, and the postive/true/yes/ON state is the marked state.
+
+        # for such a flag the user may confuse it for an accumulating-type
+        # flag (e.g advanced `--verbose` where more than one means something)
+        # when it is not. for these cases we might whine on meaningless
+        # repetition of the flag.
+
+        k = @primary.name_symbol
+        -> _ do
+          if @writable_client[ k ].nil?
+            @writable_client[ k ] = true
+            NIL
+          else
+            ::Kernel._DESIGN_AND_COVER__maybe_warn__
+          end
+        end
+      end
+
+      def __writer_for_plural
+
+        # weird fun: if any one item fails to normalize, "cancel"
+        # the whole thing permanantly by falsing out the value.
+
+        p = -> s do
+          kn = _normalize s
+          if kn
+            ( @writable_client[ k ] ||= [] ).push kn.value_x
+          else
+            @writable_client[ k ] = false
+            p = MONADIC_EMPTINESS_
+          end
+          NIL
+        end
+        -> s do
+          p[ s ]
+        end
+      end
+
+      def __writer_for_ordinary
+        k = @primary.name_symbol
+        no_repeat = -> _ do
+          self._DESIGN_AND_COVER__maybe_warn__
+        end
+        p = -> s do
+          kn = _normalize s
+          if kn
+            @writable_client[ k ] = kn.value_x
+          else
+            @writable_client[ k ] = nil  # propagate the error
+          end
+          p = no_repeat ; nil
+        end
+        -> s do
+          p[ s ]
+        end
+      end
+
+      attr_reader :listener, :primary, :writable_client
+    end
+
+    # ==
+
+    class Primary_  # < Common_::SimpleModel. a bespoke #[#fi-001] field class
+
+      # -- write
+
+      attr_writer(
+        :name_symbol,
+        :route,
+      )
+
+      def write_primary_by & p
+        @custom_primary_writer = p
+      end
+
+      def be_plural
+        @__plural_name_symbol = :"#{ @name_symbol.id2name }s"  # ..
+        @_plural_name_symbol = :__plural_name_symbol
+        @is_plural = true ; nil
+      end
+
+      def be_flag
+        @is_flag = true ; nil
+      end
+
+      # -- read
+
+      def plural_name_symbol  # assume `is_plural`
+        send @_plural_name_symbol
+      end
+
+      def __plural_name_symbol
+        @__plural_name_symbol  # hi.
+      end
+
+      attr_reader(
+        :custom_primary_writer,
+        :is_flag,
+        :is_plural,
+        :name_symbol,
+        :route,
+      )
+    end
+
+    # ===
 
     module Plugins  # ..
       Autoloader_[ self, :boxxy ]
@@ -1683,5 +2249,6 @@ end  # if false
     Here_ = self
   end
 end
+# :#tombstone-A.2: #eyeblood for old "tags receiver" that regexed ..
 # :#tombstone-A.1: the previous: ( service, main run loop, rendering
 #   functions, "runtime" (now "statistics"), `do_not_invoke!` )

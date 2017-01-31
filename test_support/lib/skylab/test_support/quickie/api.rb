@@ -19,7 +19,7 @@ module Skylab::TestSupport
             @_client = o
             ok = __resolve_choices
             if ok
-              o._choices = @__choices
+              o._choices_ = @__choices
               o._listener = @_listener
             end
           end
@@ -29,14 +29,14 @@ module Skylab::TestSupport
         def __resolve_choices
           @_formal_primaries_cache = {}
           @_formal_primaries_hash = {}
-          _ = Choices_via_AssignmentsProc_and_Client__.call self do |cx|
-            @_writable_choices = cx.writable_choices
+          _cx = Choices_via_AssignmentsProc_and_Client_.call self do |cx|
+            @_writable_CHOICES = cx.writable_choices
             cx.write_formal_primaries_into self
-            remove_instance_variable :@_writable_choices
             __add_bespoke_primaries
             __parse_arguments
           end
-          _store :@__choices, _
+          remove_instance_variable :@_writable_CHOICES
+          _store :@__choices, _cx
         end
 
         def __add_bespoke_primaries
@@ -62,10 +62,13 @@ module Skylab::TestSupport
           @_scanner = Common_::Scanner.
             via_array remove_instance_variable :@__arguments_array
 
+          ok = true
           until @_scanner.no_unparsed_exists
-            __accept_one_primary
+            ok = __process_one_primary
+            ok || break
           end
-          __check_requireds
+
+          ok && __check_requireds
         end
 
         def __check_requireds
@@ -83,39 +86,40 @@ module Skylab::TestSupport
           UNABLE_
         end
 
-        def __accept_one_primary
+        def __process_one_primary
           fo = __gets_one_formal_primary
-          send ROUTE___.fetch( fo.route ), fo
-          NIL
+          _ok = send ROUTE___.fetch( fo.route || DEFAULT_ROUTE__ ), fo
+          _ok  # #todo
         end
 
         ROUTE___ = {
+          _this_is_an_agnostic_primary_: :__process_agnostic_primary,
           _this_is_an_API_specific_primary_: :__process_API_specific_primary,
         }
 
+        DEFAULT_ROUTE__ = :_this_is_an_agnostic_primary_
+
         def __process_API_specific_primary fo
-
-          if fo.is_plural
-
-            self._CODE_SKETCH__worked_previously__
-            @_client.send( fo.plural_name_symbol ).push @_scanner.gets_one
-
-          elsif fo.is_flag
-
-            self._CODE_SKETCH__worked_previously__
-            @_client.send :"#{ fo.name_symbol }=", true
-
-          else
-            curr_x = @_client.send fo.name_symbol
-            _next_x = @_scanner.gets_one
-            if curr_x.nil?
-              @_client.send :"#{ fo.name_symbol }=", _next_x
-            else
-              self._COVER_ME__wont_clobber__or_will_I__
-            end
+          _ok = ProcessOne_API_PrimaryValue__.call_by do |o|
+            o.listener = @_listener
+            o.primary = fo
+            o.scanner = @_scanner
+            o.writable_client = @_client
           end
-          NIL
+          _ok  # #todo
         end
+
+        def __process_agnostic_primary fo
+          _ok = ProcessOne_API_PrimaryValue__.call_by do |o|
+            o.listener = @_listener
+            o.primary = fo
+            o.scanner = @_scanner
+            o.writable_client = @_writable_CHOICES
+          end
+          _ok  # #todo
+        end
+
+        # --
 
         def __gets_one_formal_primary
           k = @_scanner.gets_one
@@ -151,7 +155,7 @@ module Skylab::TestSupport
         end
 
         attr_writer(
-          :_choices,
+          :_choices_,
           :_listener,
           :load_tests_by,
         )
@@ -171,6 +175,10 @@ module Skylab::TestSupport
 
           _stats = svc.__end_irreversible_one_time_compound_mode_
           _stats  # #todo
+        end
+
+        def at_beginning_of_test_run( * )
+          NOTHING_  # API does not emit back out the search criteria
         end
 
         def begin_branch_node d, ctx
@@ -232,6 +240,12 @@ module Skylab::TestSupport
           NOTHING_
         end
 
+        def receive_skip
+          remove_instance_variable :@_example_on_deck
+          @_has_example_on_deck = false
+          NIL
+        end
+
         def flush
           _flush_any_example_on_deck  # hi.
         end
@@ -262,6 +276,7 @@ module Skylab::TestSupport
         end
 
         attr_reader(
+          :_choices_,
           :load_tests_by,
         )
       end
@@ -464,55 +479,132 @@ module Skylab::TestSupport
 
       # ==
 
-      class API_Primary___ < Common_::SimpleModel
-
-        def initialize
-          @_argument_arity_mutex = nil
-          yield self
-          instance_variable_defined? :@_argument_arity_mutex and
-            remove_instance_variable :@_argument_arity_mutex
-          freeze
-        end
-
-        # -- write
+      class ProcessOne_API_PrimaryValue__ < Common_::MagneticBySimpleModel
 
         attr_writer(
-          :name_symbol,
-          :route,
+          :listener,
+          :primary,
+          :scanner,
+          :writable_client,
         )
 
-        def be_flag
-          remove_instance_variable :@_argument_arity_mutex
-          @is_flag = true ; nil
+        def execute
+          p = @primary.custom_primary_writer
+          if p
+            __via_custom_primary_writer p
+          elsif @primary.is_flag
+            if @primary.is_plural
+              _write _read + 1
+            else
+              _write true
+            end
+          elsif @primary.is_plural
+            __process_plural
+          else
+            __process_ordinary
+          end
         end
 
-        def be_plural
-          remove_instance_variable :@_argument_arity_mutex
-          @__plural_name_symbol = :"#{ @name_symbol.id2name }s"  # ..
-          @_plural_name_symbol = :__plural_name_symbol
-          @is_plural = true ; nil
+        def __via_custom_primary_writer p
+          # #experimental - interface is VERY in flux..
+          if ! @primary.is_flag
+            x = @scanner.gets_one
+            # (for now, here we convert all symbols to strings so that
+            #  strings are the modality agnostic lingua-franca..)
+            if x.respond_to? :id2name
+              x = x.id2name
+            end
+            @__known_known = Common_::Known_Known[ x ]
+          end
+          _ok = p[ self ]
+          _ok  # #todo
         end
 
-        # -- read
-
-        def plural_name_symbol
-          send @_plural_name_symbol
-        end
-
-        def __plural_name_symbol
-          @__plural_name_symbol  # hi.
-        end
+        # ~ for above:
 
         attr_reader(
-          :is_flag,
-          :is_plural,
-          :name_symbol,
-          :route,
+          :listener,
+          :primary,
+          :writable_client,
         )
+
+        # ~
+
+        def mixed_value
+          @__known_known.value_x
+        end
+
+        def __process_plural
+          kn = _normal_knownness
+          if kn
+            _read.push kn.value_x
+            ACHIEVED_
+          else
+            kn
+          end
+        end
+
+        def __process_ordinary
+          x = _read
+          if x.nil?
+            kn = _normal_knownness
+            kn and _write kn.value_x
+          else
+            self._COVER_ME__policy_for_clobber__
+          end
+        end
+
+        def _normal_knownness
+          # (leaving room for numerizers etc)
+          x = @scanner.gets_one  # this could be fancier, but not today
+          # ..
+            Common_::Known_Known[ x ]
+        end
+
+        def _write x
+          @writable_client.send :"#{ @primary.name_symbol }=", x
+          ACHIEVED_
+        end
+
+        def _read
+          @writable_client.send @primary.name_symbol
+        end
       end
 
       # ==
 
+      class API_Primary___ < Primary_
+
+        def didactics_by
+          # didactics are a CLI thing. API doesn't have help screens.
+          NOTHING_
+        end
+      end
+
+      # ==
+
+      class ExpressionAgent
+
+        class << self
+          def instance
+            @___instance ||= new
+          end
+          private :new
+        end  # >>
+
+        alias_method :calculate, :instance_exec
+
+        def ick x
+          x.inspect
+        end
+
+        def prim sym
+          "'#{ sym }'"
+        end
+      end
+
+      # ==
+      # ==
     end  # API
   end
 end

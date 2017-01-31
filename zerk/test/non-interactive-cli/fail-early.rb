@@ -668,7 +668,7 @@ module Skylab::Zerk::TestSupport
         _add _exp
       end
 
-      def expect exp_x
+      def expect exp_x=nil
         _add Line_based_expectation__[ exp_x, @method_name, @serr_or_sout ]
       end
 
@@ -955,16 +955,39 @@ module Skylab::Zerk::TestSupport
 
     class BlankLineExpectation___ < StringBasedExpectation__
 
+      def initialize(*)
+        @_say = :__say_normally
+        super
+      end
+
       def _actual_string_matches_expected_string_
-        ! @actual_emission.string
+        s = @actual_emission.string
+        if s
+          if s.length.zero?
+            @_say = :__say_eek
+            # (A) we don't remember if we're allowed to change state like
+            # this in an expectation. (B) this makes it really strict.
+          end
+          UNABLE_
+        else
+          ACHIEVED_
+        end
       end
 
       def _say_expectation_preterite_infinitive_
+        send @_say
+      end
+
+      def __say_normally
         "to be a blank line"
       end
 
+      def __say_eek
+        "to be a blank line (as NIL)"
+      end
+
       def _inspectable_
-        EMPTY_S_
+        NIL
       end
     end
 
