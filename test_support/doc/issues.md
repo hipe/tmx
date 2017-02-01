@@ -60,7 +60,7 @@
 
        #open :[#here.B]: recursive runner (plugins) help screen needs overhaul & cover
 
-       #open :[#here.A]: quickie core features help screen needs covering
+             :[#here.A]: quickie core features help screen needs covering (#done)
 
              ( #was: #moved-to: [#dt-xxx] )
 
@@ -123,6 +123,9 @@
 
 [#009]       track ways in which quickie might differ behaviorally from rspec
 
+             :[#here.D]: we are so great because we mock caller locations
+               we are so great
+
              :[#here.C]: in reporting "Run options", we report all the
                relevant "reducers" that were provided on the command line,
                as opposed to r.s which apparently reports only those in the
@@ -148,7 +151,7 @@
                utility, which we're piddling around in our heads as an
                idea.
 
-        #open  the above is open while we don't know exactly what r.s does
+         #open the above is open while we don't know exactly what r.s does
                in this regard. it is closed when we can document its
                difference, or that there is none.
 

@@ -1,3 +1,95 @@
+
+# kind of nasty - besides the block of code associated with this comment,
+# this file is an otherwise straightforward and ordinary "test support"
+# file. like perhaps all other files like this, this file calls quickie's
+#
+#   `enhance_test_support_module_with_the_method_called_describe`
+#
+# , which (if rspec is running) effectively does nothing, but if quickie
+# is running it gives us the implicit assertion that we are not running any
+# tests outside of our sandbox module dedicated to tests, which is something
+# we care about.
+#
+# now, the only issue with that is if we are trying to generate a coverage
+# report *of* quickie. if this is the case, then we need the coverage system
+# "turned on" *before* quickie itself loads.
+#
+# we can generalize this concern to say maybe
+# this is why THIS:
+
+module Skylab
+  module TestSupport
+    module TestSupport
+      module CoverageFunctions___ ; class << self
+
+        # (this is whipped together just to get coverage for the quickie
+        # root file. see [#xxx] and [#yyy] for the "proper" way turn on
+        # coverage #todo)
+
+        def __maybe_begin_coverage_
+          s = ::ENV[ 'COVER' ]
+          if s
+            if s =~ /\A(?:y(?:es)?|t(?:r(?:u(:?e)?)?)?)\z/i
+              _do_cover
+            elsif s =~ /\A(?:no|false)\z/i
+              NOTHING_  # hi.
+            else
+              fail "say 'true' or 'false' for COVER environment variable (had: #{ s.inspect })"
+            end
+          end
+        end
+
+        def _do_cover
+
+          # to tell simpelcov what the root of our "project" (of interest) is,
+          # we need the proper gem path (with all the cruft in front of it)
+          # so we can't (under our normal development environment) get to it
+          # from __FILE__ which normally is a "real" filesystem path and not
+          # the heavily symlinked path used in our development gem installations.
+          # that is, even though this file and the sidsystem root file are
+          # nearby in real life, the latter "thinks" it is in the gem
+          # directory, and we can't otherwise easily infer what that directory
+          # is without first loading the latter gem.
+          #
+          # depending on what you're trying to cover, the above will give you
+          # variously more or less pain. since we're trying to cover quickie
+          # (and not the toplevel [ts] asset node, and not, say [co] toplevel
+          # node), life is easier because toplevel sidesystem nodes "know"
+          # their "crufty" path.
+
+          _gem_dir_path = Home_.dir_path
+
+          require 'simplecov'
+
+          decide = -> path do
+            if 'quickie.rb' == ::File.basename( path )
+              false
+            else
+              $stderr.puts "(STRANGE PATH: #{ path })"
+              true
+            end
+          end
+
+          cache = {}
+          ::SimpleCov.start do
+            add_filter do |source_file|
+              path = source_file.filename
+              cache.fetch path do
+                do_filter_out = decide[ path ]
+                cache[ path ] = do_filter_out
+              end
+            end
+            root _gem_dir_path
+          end
+
+          NIL
+        end
+
+      end ; end
+    end
+  end
+end
+
 require 'skylab/test_support'
 
 module Skylab::TestSupport::TestSupport
@@ -38,6 +130,7 @@ module Skylab::TestSupport::TestSupport
     end
   end  # >>
 
+  CoverageFunctions___.__maybe_begin_coverage_  # see
   Home_ = ::Skylab::TestSupport
   Home_::Quickie.enhance_test_support_module_with_the_method_called_describe self
 

@@ -13,7 +13,7 @@ module Skylab::TestSupport::TestSupport
       # -- context-level testing (targeting CLI client)
 
       def expect_finished_line_ o
-        o.expect %r(\A\nFinished in \d+(?:\.\d+)? seconds?\z)
+        o.expect %r(\A\nFinished in \d+(?:\.\d+)?(?:e-\d+)? seconds?\z)
       end
 
       def run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ & p
@@ -272,65 +272,8 @@ module Skylab::TestSupport::TestSupport
     # ==
 
     Subject_module__ = Lazy_.call do
-
-      # (normally we don't memoize these but here we hackishly do so that:)
-
-      CoverageFunctions___.maybe_begin_coverage
-
       Home_::Quickie
     end
-
-    # ==
-
-    module CoverageFunctions___ ; class << self
-
-      # (this is whipped together just to get coverage for the quickie
-      # root file. see [#xxx] and [#yyy] for the "proper" way turn on
-      # coverage #todo)
-
-      def maybe_begin_coverage
-        s = ::ENV[ 'COVER' ]
-        if s
-          if s =~ /\A(?:yes|true)\z/i
-            _do_cover
-          elsif s =~ /\A(?:no|false)\z/i
-            NOTHING_  # hi.
-          else
-            fail "say 'true' or 'false' for COVER environment variable (had: #{ s.inspect })"
-          end
-        end
-      end
-
-      def _do_cover
-
-        _gem_dir_path = Home_.dir_path
-
-        require 'simplecov'
-
-        decide = -> path do
-          if 'quickie.rb' == ::File.basename( path )
-            false
-          else
-            $stderr.puts "(STRANGE PATH: #{ path })"
-            true
-          end
-        end
-
-        cache = {}
-        ::SimpleCov.start do
-          add_filter do |source_file|
-            path = source_file.filename
-            cache.fetch path do
-              do_filter_out = decide[ path ]
-              cache[ path ] = do_filter_out
-            end
-          end
-          root _gem_dir_path
-        end
-
-        NIL
-      end
-    end ; end
 
     # ==
 

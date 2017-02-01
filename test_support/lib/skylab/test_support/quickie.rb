@@ -477,10 +477,20 @@ module Skylab::TestSupport
       end
 
       def execute
-        @_ok = true
+        ok = __call_proc
+        ok &&= __close_choices
+        ok and remove_instance_variable :@__frozen_choices
+      end
+
+      def __close_choices
+        _cx = remove_instance_variable :@writable_choices
+        _store :@__frozen_choices, _cx.finish
+      end
+
+      def __call_proc
         @writable_choices = Choices___.new
         _ok = remove_instance_variable( :@proc )[ self ]
-        _ok && @_ok && __finish
+        _ok  # #todo
       end
 
       def write_formal_primaries_into receiver
@@ -490,9 +500,7 @@ module Skylab::TestSupport
         NIL
       end
 
-      def __finish
-        remove_instance_variable( :@writable_choices ).freeze
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       attr_reader(
         :writable_choices,
@@ -844,8 +852,12 @@ module Skylab::TestSupport
                 ":#{ red.tag_symbol }=>#{ red.mixed_tag_value }" )
             end
           end,
-          _lines_ranges_SKETCH_: -> bg do
-            ( include ||= {} )[ :_linez_ ].push red.EXPRESSION_OF_LINE_RANGE  # eg. "156"
+          _line_ranges_: -> bg do
+            _h = ( include ||= {} )
+            a = ( _h[ :_line_ranges_ ] ||= [] )
+            bg.reducers.each do |red|
+              a.push red.say_line_range  # eg. "156"
+            end
           end,
         }
 
@@ -854,6 +866,9 @@ module Skylab::TestSupport
         end
 
         say = {
+          _line_ranges_: -> s_a do
+            ":line_numbers=>[#{ s_a * ',' }]"
+          end,
           _tags_: -> s_a do
             s_a.join ', '
           end,
@@ -1003,7 +1018,7 @@ module Skylab::TestSupport
 
       def __express_fail
         _puts "#{ _say_indent @_EEK_depth }#{
-          }#{ _stylize :red, "#{ @_EEK_eg.description } (FAILED - #{ @_ordinal })" }"
+          }#{ _stylize :red, "#{ @_EEK_eg.description } (FAILED - #{ @_EEK_failure_count })" }"
         NIL
       end
 
@@ -1070,6 +1085,23 @@ module Skylab::TestSupport
 
       attr_reader :_choices_
     end
+
+    # ==
+
+    Integer_via_ParsePrimary_ = -> o do  # assume string
+      # -
+        _s = o.mixed_value
+        md = INTEGER_RX___.match _s
+        if md
+          md[0].to_i
+        else
+          _ = o.whine :must_be_digit
+          _  # #todo
+        end
+      # -
+    end
+
+    INTEGER_RX___ = /\A-?\d+\z/
 
     # ==
 
@@ -1248,34 +1280,6 @@ module Skylab::TestSupport
     poptop
     end
 
-if false
-
-      Rewrite_digit_switches___ = -> do
-
-        # an experimental semi-hack: "expand" head-anchored digit-looking
-        # switches to become [etc]. anchored to head so we don't parse an
-        # argument for another option (unlike [#br-074]). the platform o.p
-        # is not sympathetic to causes like this at all.
-
-        rx = /\A-(?<lineno>\d+)\z/
-        -> argv do
-          md = rx.match argv.first  # nil item IFF empty ary
-          if md
-            argv_ = []
-            begin
-              argv.shift
-              argv_.push '--line', md[ :lineno ]
-              md = rx.match argv.first  # nil item IFF empty ary
-              md ? redo : break
-            end while nil
-            argv_.concat argv
-            argv.replace argv_ ; nil
-          end
-        end
-      end.call
-
-end  # if false
-
     Stylize__ = -> do  # #open :[#005]. #[#ze-023.2] the stylize diaspora
       h = ::Hash[ %i| red green yellow blue magenta cyan white |.
         each_with_index.map do |i, d| [ i, 31 + d ] end ]
@@ -1284,117 +1288,6 @@ end  # if false
         "\e[#{ p[ i ] }m#{ s }\e[0m"
       end
     end.call
-
-if false
-
-    define_method :kbd, & Stylize__.curry[ :green ]
-
-    def __build_option_parser
-
-      _lib = Home_::Library_
-
-      _lib || Home_._SANITY  # #todo - catch when "stowaways" breaks in this way, early
-
-      o = _lib::OptionParser.new
-
-      o.on '--line NUMBER', "run the example whose line number equals this" do |v|
-        process_line_argument v
-      end
-
-      o.on '--from NUMBER', "run the examples whose line number is >= this" do |v|
-        process_min_line_argument v
-      end
-
-      o.on '--to NUMBER', "run the examples whose line number is <= this" do |v|
-        process_max_line_argument v
-      end
-      o
-    end
-
-    def process_line_argument s
-      accept_line_argument _convert_line_argument s
-    end
-
-    def accept_line_argument d
-
-      @___did_init_line_set ||= ___init_line_set
-      @_line_set << d ; nil
-    end
-
-    def ___init_line_set
-
-      _will_OR_reduce_by do |tagset|
-        @_line_set.include? tagset.lineno
-      end
-
-      _add_run_option_renderer do |y|
-        @_line_set.each do |d|
-          y << "--line #{ d }"
-        end
-      end
-
-      require 'set'
-      @_line_set = ::Set.new
-      ACHIEVED_
-    end
-
-    def process_min_line_argument s
-      accept_min_line_argument _convert_line_argument s
-    end
-
-    def process_max_line_argument s
-      accept_max_line_argument _convert_line_argument s
-    end
-
-    def _convert_line_argument s
-
-      if LINE_RX__ =~ s
-        s.to_i
-      else
-        @_info_yielder << __say_not_valid_line_argument( s )
-        raise ::OptionParser::InvalidArgument
-      end
-    end
-
-    LINE_RX__ = /\A\d+\z/
-
-    def __say_not_valid_line_argument s
-      "(not a valid line number, expecting integer - #{ s.inspect })"
-    end
-
-    def accept_min_line_argument d
-
-      _will_OR_reduce_by do |tagset|
-        d <= tagset.lineno
-      end
-
-      _add_run_option_renderer do |y|
-        y << "--from #{ d }"
-      end
-      NIL_
-    end
-
-    def accept_max_line_argument d
-
-      _will_OR_reduce_by do |tagset|
-        d >= tagset.lineno
-      end
-
-      _add_run_option_renderer do |y|
-        y << "--to #{ d }"
-      end
-      NIL_
-    end
-
-    def ___build_example_stream_proc branch, leaf
-      if @_example_stream_p_p
-        @_example_stream_p_p[ branch, leaf ]
-      else
-        Build_example_stream_proc_[ @root_context_class, branch, leaf ]
-      end
-    end
-
-end  # if false
 
     class Example___
 
@@ -1748,18 +1641,432 @@ end  # if false
 
     choices_members = []  # order does not matter
 
-    # === FEATURE: line-numbers (STUB) ===
+    # === FEATURE: line-number-ranges ===
 
     Convert_leading_line_number_shorthand_switches___ = -> do
 
-      rx = /\d/
+      # convert head-anchored tokens like "-123" to "--line" "123".
+      # we require these to be head-anchored as an easy way to avoid parsing
+      # arguments for other options; contrast to [#br-074].
+      # the platform o.p is not sympathetic to causes like this at all.
+
+      rx = /\A-(?<lineno>\d+)\z/
 
       -> argv do
-        if rx =~ argv.fetch( 0 )
-          self._RESTORE_ME
+        d = 0
+        begin
+          md = rx.match argv.fetch d
+          md || break
+          argv[ d, 1 ] = [ '--line', md[ :lineno ] ]
+          d += 2
+          d == argv.length ? break : redo
+        end while above
+        NIL
+      end
+    end.call
+
+    # ==
+
+    -> do
+
+      same = 'NUMBER'
+
+      primaries.add_primary :line do |fo|
+
+        fo.didactics_by do |o|
+          o.description_line = "run the example whose line number equals this"
+          o.value_moniker = same
+        end
+
+        fo.write_primary_by do |o|
+          ParseLine_via_ParsePrimary__[ o ]
+        end
+      end
+
+      primaries.add_primary :from do |fo|
+
+        fo.didactics_by do |o|
+          o.description_line = "run the examples whose line number is >= this"
+          o.value_moniker = same
+        end
+
+        fo.write_primary_by do |o|
+          ParseLine_via_ParsePrimary__[ o ]
+        end
+      end
+
+      primaries.add_primary :to do |fo|
+
+        fo.didactics_by do |o|
+          o.description_line = "run the examples whose line number is <= this"
+          o.value_moniker = same
+        end
+
+        fo.write_primary_by do |o|
+          ParseLine_via_ParsePrimary__[ o ]
         end
       end
     end.call
+
+    # ==
+
+    class ParseLine_via_ParsePrimary__ < Common_::Monadic
+
+      def initialize o
+        @parse_primary = o
+      end
+
+      def execute
+        ok = true
+        ok &&= __parse_integer
+        ok && __touch_collection
+        ok &&= __add_integer_to_collection
+        ok
+      end
+
+      def __add_integer_to_collection
+
+        _col = remove_instance_variable :@__reducers
+
+        group = _col.touch_OR_group :_line_ranges_ do  # :#here-2
+          IndicatedLineRanges___.new( & @parse_primary.listener )
+        end
+
+        _ranges = group.passenger
+
+        type_sym = @parse_primary.primary.name_symbol
+
+        _m = METHOD_VIA_PRIMARY___.fetch type_sym
+
+        _ok = _ranges.send _m, remove_instance_variable( :@__integer )
+
+        _ok  # #todo
+      end
+
+      METHOD_VIA_PRIMARY___ = {
+        from: :receive_from, line: :receive_line, to: :receive_to,
+      }
+
+      def __touch_collection
+
+        @__reducers = (
+        @parse_primary.writable_client[ :reducers ] ||= MutableReducers__.new
+        )
+        NIL
+      end
+
+      def __parse_integer
+        _store :@__integer, NonzeroPositiveInteger_via_ParsePrimary___[ @parse_primary ]
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    end
+
+    # ==
+
+    class IndicatedLineRanges___
+
+      # validate that line, range parameters don't overlap, etc
+
+      def initialize & p
+        @_has_dangling_from = false
+        @_receive_range = :__receive_first_range
+        @listener = p
+      end
+
+      def finish_for col
+        _ok = __finish_any_dangling_from
+        _ok and __do_finish col
+      end
+
+      def __do_finish bg
+        bg.AND_not_OR && self._SANITY  # #here-2
+        remove_instance_variable :@_receive_range
+        _a = remove_instance_variable :@_sorted_range_array
+        freeze
+        _a.each do |range|
+          bg.add_reducer range
+        end
+        ACHIEVED_
+      end
+
+      def __finish_any_dangling_from
+        if @_has_dangling_from
+          _from_d = remove_instance_variable :@_dangling_from
+          _receive_range UnboundRange___.new _from_d
+        else
+          ACHIEVED_
+        end
+      end
+
+      def receive_line d
+        if @_has_dangling_from
+          _whine_about_sequence [ "unclosed", :from ], :line
+        else
+          _receive_range IndicatedLine___.new d
+        end
+      end
+
+      def receive_from d
+        if @_has_dangling_from
+          _whine_about_sequence [ "unclosed", :from ], :from
+        else
+          @_has_dangling_from = true
+          @_dangling_from = d
+          ACHIEVED_
+        end
+      end
+
+      def receive_to d
+        if @_has_dangling_from
+          _receive_counterpart_to d
+        else
+          # (all `to` without a dangling `from` expands to `from line 1`)
+          @_has_dangling_from = true
+          @_dangling_from = 1
+          _receive_counterpart_to d
+        end
+      end
+
+      def _receive_counterpart_to d
+        @_has_dangling_from = false
+        from_d = remove_instance_variable :@_dangling_from
+        if from_d < d
+          _receive_range IndicatedRange___.new( from_d, d )
+        else
+          _whine :upsidedown_range do |y|
+            y << "#{ prim :to } must be greater than #{ prim :from }"
+            y << "(had from: #{ from_d } and to: #{ d })"
+          end
+        end
+      end
+
+      def _whine_about_sequence left_x, right_x
+        _left_a = ::Array.try_convert( left_x ) || [ left_x ]
+        _right_a = ::Array.try_convert( right_x ) || [ right_x ]
+        _whine :bad_sequence do |y|
+          p = -> a do
+            a.map do |x|
+              x.respond_to?( :id2name ) ? prim( x ) : x
+            end * SPACE_
+          end
+          y << "#{ p[ _right_a ] } cannot follow #{ p[ _left_a ] }"
+        end
+      end
+
+      def _receive_range o
+        send @_receive_range, o
+      end
+
+      def __receive_first_range o
+        @_receive_range = :__receive_subsequent_range
+        @_sorted_range_array = [ o ] ; ACHIEVED_
+      end
+
+      def __receive_subsequent_range new
+
+        a = @_sorted_range_array
+        st = Common_::Stream.via_times a.length
+
+        if new.is_bound
+          new_end = new.end
+          new_is_bound = true
+        end
+
+        begin  # find first current that is beyond or touching
+          d = st.gets
+          d || break
+          current = a.fetch d
+
+          if new_is_bound
+            diff = current.begin - new_end
+            rel = 1 <=> diff
+          else
+            rel = 1
+          end
+
+          case rel
+          when -1
+            found_cleanly_ahead = true
+            break
+
+          when 0
+            _whine_about_kissing d, new
+            failed = true ; break
+
+          when 1  # current begin is before new end
+            diff_ = new.begin - current.end
+            rel_ = 1 <=> diff_
+            case rel_
+            when -1  # other ends cleanly before new one begins
+              redo
+            when 1
+              _whine_about_overlap d, new
+              failed = true ; break
+            when 0
+              _whine_about_kissing d, new
+              failed = true ; break
+
+            else ; never
+            end
+            never
+          else ; never
+          end
+        end while above
+
+        if failed
+          UNABLE_
+        elsif found_cleanly_ahead
+          __maybe_insert_before d, new
+        else
+          sanity_last = a.fetch( -1 )
+          1 < ( new.begin - sanity_last.end ) || fail
+          a.push new
+          ACHIEVED_
+        end
+      end
+
+      def __maybe_insert_before d, new
+
+        # the begin of the range at index d is "far" ahead of the new range.
+
+        if d.zero?
+          @_sorted_range_array[ 0, 0 ] = [ new ]
+        else
+
+          # since we are not inserting at the very beginning of the list,
+          # sanity check to be sure that we clear *cleanly* the left
+          # neighbor. (this should have been confirmed by caller. covered)
+
+          _left_neighbor = @_sorted_range_array.fetch( d - 1 )
+          new.begin > ( _left_neighbor.end + 1 ) || self._SANITY
+          @_sorted_range_array[ d, 0 ] = [ new ]
+        end
+        ACHIEVED_
+      end
+
+      def _whine_about_kissing d, new
+        _this_whine "kisses", d, new
+      end
+
+      def _whine_about_overlap d, new
+        _this_whine "overlaps with", d, new
+      end
+
+      def _this_whine verb, d, new
+        other = @_sorted_range_array.fetch d
+        _whine :ranges_touch do |y|
+          y << "#{ new.describe_under self } #{ verb } existing #{
+            }#{ other.describe_under self }. combine these ranges."
+        end
+      end
+
+      def _whine tail_sym, & msg
+        @listener.call :error, :expression, :parse_error, tail_sym do |y|
+          calculate y, & msg
+        end
+        UNABLE_
+      end
+    end
+
+    LineRange__ = ::Class.new
+
+    class IndicatedLine___ < LineRange__
+
+      def initialize d
+        @_digit = d
+      end
+
+      def describe_under expag
+        d = @_digit
+        expag.calculate { "#{ prim :line } #{ d }" }
+      end
+
+      def say_line_range
+        "#{ @_digit }"
+      end
+
+      def to_proc
+        -> eg do
+          @_digit == eg.searchables.lineno
+        end
+      end
+
+      attr_reader :_digit
+      alias_method :begin, :_digit
+      alias_method :end, :_digit
+
+      def is_bound
+        true
+      end
+    end
+
+    class UnboundRange___ < LineRange__
+
+      def initialize d
+        @begin = d
+      end
+
+      def describe_under expag
+        me = self
+        expag.calculate do
+          "range #{ prim :from } #{ me.begin } (unbound)"
+        end
+      end
+
+      def say_line_range
+        "#{ @begin }-#{ Infinity_glyph___[] }"  # EEEEEEEEEK
+      end
+
+      def to_proc
+        -> eg do
+          @begin <= eg.searchables.lineno
+        end
+      end
+
+      attr_reader :begin
+
+      def is_bound
+        false
+      end
+    end
+
+    class IndicatedRange___ < LineRange__
+
+      def initialize d, d_
+        @begin = d ; @end = d_
+      end
+
+      def describe_under expag
+        me = self
+        expag.calculate do
+          "range #{ prim :from } #{ me.begin } #{ prim :to } #{ me.end }"
+        end
+      end
+
+      def say_line_range
+        "#{ @begin }-#{ @end }"
+      end
+
+      def to_proc
+        -> eg do
+          d = eg.searchables.lineno
+          @begin <= d && @end >= d
+        end
+      end
+
+      attr_reader :begin, :end
+
+      def is_bound
+        true
+      end
+    end
+
+    class LineRange__
+      def finish
+        ACHIEVED_
+      end
+    end
 
     # === FEATURE: tags ===
 
@@ -1847,6 +2154,7 @@ end  # if false
     TagReducer__ = ::Class.new
 
     class TagReducerNegative___ < TagReducer__
+
       def initialize tag_value_x, tag_sym
         @to_proc = -> eg do
           h = eg.searchables.tagset_hash
@@ -1860,12 +2168,14 @@ end  # if false
         end
         super
       end
+
       def positive_not_negative
         false
       end
     end
 
     class TagReducerPositive___ < TagReducer__
+
       def initialize tag_value_x, tag_sym
         @to_proc = -> eg do
           h = eg.searchables.tagset_hash
@@ -1879,6 +2189,7 @@ end  # if false
         end
         super
       end
+
       def positive_not_negative
         true
       end
@@ -1891,7 +2202,11 @@ end  # if false
         @tag_symbol = tag_sym
       end
 
-      attr_reader :tag_symbol, :mixed_tag_value, :to_proc
+      def finish
+        true
+      end
+
+      attr_reader :mixed_tag_value, :tag_symbol, :to_proc
     end
 
     TAG_RX___ = /\A
@@ -1952,7 +2267,58 @@ end  # if false
 
     # === FEATURES POST-SUPPORT ===
 
-    Choices___ = ::Struct.new( * choices_members )
+    Something_via_ParsePrimary__ = ::Class.new Common_::Monadic
+
+    class NonzeroPositiveInteger_via_ParsePrimary___ < Something_via_ParsePrimary__
+
+      def _execute_
+        case 0 <=> @integer
+        when -1 ; @integer
+        when 1 ; whine :digit_is_negative
+        when 0 ; whine :digit_is_zero
+        else ; never
+        end
+      end
+    end
+
+    class Something_via_ParsePrimary__
+
+      def initialize o
+        @parse_primary = o
+      end
+
+      def execute
+        ok = true
+        ok &&= __parse_integer
+        ok &&= _execute_
+        ok
+      end
+
+      def __parse_integer
+        _  = @parse_primary.parse_integer
+        store :@integer, _
+      end
+
+      def whine *a, &p
+        @parse_primary.whine( *a, &p )
+      end
+
+      define_method :store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    end
+
+    Choices___ = ::Struct.new( * choices_members ) do
+
+      def finish
+        ok = true
+        members.each do |mem|
+          o = self[ mem ]
+          o || next
+          ok = o.finish
+          ok || break  # assume emitted
+        end
+        ok && self
+      end
+    end
 
     # --
 
@@ -1979,17 +2345,44 @@ end  # if false
       # ~ write
 
       def add_reducer_to_AND_group o, k
+        touch_AND_group( k ).add_reducer o
+      end
+
+      def add_reducer_to_OR_group o, k
+        touch_OR_group( k ).add_reducer o
+      end
+
+      def touch_AND_group k, & p
+        _touch_AND_or_OR true, k, & p
+      end
+
+      def touch_OR_group k, & p
+        _touch_AND_or_OR false, k, & p
+      end
+
+      def _touch_AND_or_OR and_not_or, k
         existing = @AND[ k ]
         if existing
-          if existing.AND_not_OR
-            existing.add_reducer o
+          if and_not_or == existing.AND_not_OR
+            existing
           else
             self._COVER_ME__you_cannot_change_the_behavior_of_an_existing_group__
           end
         else
-          @AND.add k, BooleanGroup___.new( o, k, :AND )
+          _x = yield if block_given?  # ick/meh
+          new = BooleanGroup___.new _x, k, ( and_not_or ? :AND : :OR )
+          @AND.add k, new
+          new
         end
-        NIL
+      end
+
+      def finish
+        ok = true
+        @AND.each_value do |o|
+          ok = o.finish
+          ok || break  # assume emitted
+        end
+        ok
       end
 
       # ~ read
@@ -2031,10 +2424,13 @@ end  # if false
 
     class BooleanGroup___
 
-      def initialize rdcr, k, and_or_or
-        @AND_not_OR = AND_OR_OR___.fetch and_or_or
+      def initialize xx, k, and_not_or
+
+        @_add_reducer = :__add_first_reducer
+
+        @AND_not_OR = AND_OR_OR___.fetch and_not_or
         @business_category_symbol = k
-        @reducers = [ rdcr ]
+        @passenger = xx
       end
 
       # -- write
@@ -2042,7 +2438,39 @@ end  # if false
       AND_OR_OR___ = { AND: true, OR: false }
 
       def add_reducer o
+        send @_add_reducer, o
+      end
+
+      def __add_first_reducer o
+        @reducers = []
+        @_add_reducer = :__add_reducer
+        send @_add_reducer, o
+      end
+
+      def __add_reducer o
         @reducers.push o ; nil
+      end
+
+      def finish
+        __finish_any_passenger && __finish_items
+      end
+
+      def __finish_any_passenger
+        if @passenger
+          _ok = @passenger.finish_for self
+          _ok  # #todo
+        else
+          ACHIEVED_
+        end
+      end
+
+      def __finish_items
+        ok = true
+        @reducers.each do |red|
+          ok = red.finish
+          ok || break
+        end
+        ok
       end
 
       # -- read
@@ -2059,7 +2487,7 @@ end  # if false
         p_a = @reducers.map { |rdcr| rdcr.to_proc }
         last = p_a.length - 1
         if @AND_not_OR
-          -> item do
+          -> item do  # do an AND - every item must be true
             d = last
             begin
               yes = p_a.fetch( d )[ item ]
@@ -2071,11 +2499,21 @@ end  # if false
             yes
           end
         else
-          self._WAHOO
+          -> item do  # do an OR - any item can be true; short circuit
+            d = 0
+            begin
+              yes = p_a.fetch( d )[ item ]
+              yes && break
+              last == d && break
+              d += 1
+              redo
+            end while above
+            yes
+          end
         end
       end
 
-      attr_reader :AND_not_OR, :business_category_symbol, :reducers
+      attr_reader :AND_not_OR, :business_category_symbol, :passenger, :reducers
     end
 
     # --
@@ -2115,6 +2553,11 @@ end  # if false
           p[ self ]  # (result is false on failure)
           NIL
         end
+      end
+
+      def parse_integer
+        # (look at API counterparts)
+        Integer_via_ParsePrimary_[ self ]
       end
 
       def mixed_value
@@ -2193,6 +2636,17 @@ end  # if false
         end
       end
 
+      def whine *a, &p
+        # hi.
+        __whine( *a, &p )
+      end
+
+      def current_primary_symbol
+        @primary.name_symbol
+      end
+
+      define_method :__whine, DEFINITION_FOR_THE_METHOD_CALLED_WHINE__
+
       attr_reader :listener, :primary, :writable_client
     end
 
@@ -2245,6 +2699,8 @@ end  # if false
     module Plugins  # ..
       Autoloader_[ self, :boxxy ]
     end
+
+    Infinity_glyph___ = Lazy_.call() { '∞' }
 
     Here_ = self
   end

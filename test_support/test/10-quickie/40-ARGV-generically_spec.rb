@@ -56,8 +56,16 @@ module Skylab::TestSupport::TestSupport
       end
       expect_succeeded
 
-      seen.delete( :help ) || fail
-      seen.delete( :tag ) || fail
+      expect = -> k do
+        seen.delete( k ) || fail
+      end
+
+      expect[ :help ]
+      expect[ :tag ]
+      expect[ :line ]
+      expect[ :from ]
+      expect[ :to ]
+
       if seen.length.nonzero?
         fail "sign off on these new additions to your help screen: (#{ seen.keys * ', ' })"
       end

@@ -522,6 +522,20 @@ module Skylab::TestSupport
 
         # ~ for above:
 
+        def parse_integer
+          # make testing CLI-style arguments easier by parsing strings the same way here
+          x = mixed_value
+          if x.respond_to? :bit_length
+            x
+          else
+            Integer_via_ParsePrimary_[ self ]
+          end
+        end
+
+        def current_primary_symbol
+          @primary.name_symbol
+        end
+
         attr_reader(
           :listener,
           :primary,
@@ -569,6 +583,8 @@ module Skylab::TestSupport
         def _read
           @writable_client.send @primary.name_symbol
         end
+
+        define_method :whine, DEFINITION_FOR_THE_METHOD_CALLED_WHINE__
       end
 
       # ==
