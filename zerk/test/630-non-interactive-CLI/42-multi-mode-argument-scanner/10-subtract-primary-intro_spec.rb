@@ -16,7 +16,7 @@ module Skylab::Zerk::TestSupport
 
       it "first line - acts like it dosn't recognize it" do
         _ = _message_lines.first
-        _ == "unknown primary: \"-cant-touch-this\"" || fail
+        _ == "unknown primary \"-cant-touch-this\"" || fail
       end
 
       it "second line - offers \"did you mean..\"" do

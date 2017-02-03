@@ -21,7 +21,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "says unknown primary **as string (as received)**" do
-        _message_lines.first == 'unknown primary: "wiz_biffle"' || fail
+        _message_lines.first == 'unknown primary "wiz_biffle"' || fail
       end
 
       it "offers the alternatives" do

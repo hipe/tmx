@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport
       add_name_to_string 'bae', s
       expect_OK_event :created_node, 'created node (lbl "bae")'
       s.should eql 'digraph{bae [label=bae]}'
-      expect_succeeded
+      expect_succeed
     end
 
     it "add one before" do
@@ -26,7 +26,7 @@ module Skylab::TanMan::TestSupport
       add_name_to_string 'bar', s
       expect_OK_event :created_node, 'created node (lbl "bar")'
       s.should eql "digraph{ bar [label=bar]\nfoo [label=foo]\n}"
-      expect_succeeded
+      expect_succeed
     end
 
     it "add one after" do
@@ -34,14 +34,14 @@ module Skylab::TanMan::TestSupport
       add_name_to_string 'foo', s
       expect_OK_event :created_node, 'created node (lbl "foo")'
       s.should eql "digraph{\n bar\nfoo [label=foo]}"
-      expect_succeeded
+      expect_succeed
     end
 
     it "add one same - fails with event about node with same name" do
       s = " digraph { zoz } "
       add_name_to_string 'zoz', s
       expect_not_OK_event :found_existing_node, 'node already existed: (lbl "zoz")'
-      expect_failed
+      expect_fail
     end
 
     it "add one in between" do
@@ -55,7 +55,7 @@ module Skylab::TanMan::TestSupport
         ev_.node_stmt.label.should eql 'menengitis'
       end
       s.should eql " digraph { apple ; menengitis [label=menengitis] ; zoz ; } "
-      expect_succeeded
+      expect_succeed
     end
 
     # it "to a empty 'digraph' -- makes up its own prototype" :+#ancient

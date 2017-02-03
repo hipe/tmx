@@ -23,7 +23,7 @@ module Skylab::Git::TestSupport
 
       invoke 'ping', '--channel', 'inf', 'faz'
       expect :e, '(inf: faz)'
-      expect_succeeded
+      expect_succeed
     end
 
     it "ping error channel (expect STDERR)" do
@@ -31,7 +31,7 @@ module Skylab::Git::TestSupport
       invoke 'ping', '--channel', 'ero', 'wrong'
       expect :e, '(failed because pretending this was wrong: "wrong")'
       expect_specific_invite_line_to :ping
-      expect_failed
+      expect_fail
     end
 
     # (mounted one-offs are covered in "integration")

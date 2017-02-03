@@ -84,7 +84,7 @@ module Skylab::Snag::TestSupport
         expect_stdout_stderr_via_arglist x_a, & p
       else
 
-        expect_failed
+        expect_fail
       end
     end
     Here___ = self

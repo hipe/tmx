@@ -78,7 +78,7 @@ module Skylab::TMX::TestSupport
     it "successfull call to mounted sidesystem (dummy)" do
       invoke 'wolly-polly'
       expect_on_stderr "hello from dummy ZimZum::WollyPolly::CLI"
-      expect_succeeded
+      expect_succeed
     end
 
     context "help for mounted sidesystem (dummy)" do
@@ -95,7 +95,7 @@ module Skylab::TMX::TestSupport
 
       def _expect_same_help_for_mocking_jay
         expect_on_stderr "i am help for tmz mocking-jay"
-        expect_succeeded
+        expect_succeed
       end
     end
 
@@ -170,7 +170,7 @@ module Skylab::TMX::TestSupport
       end.execute
     end
 
-    def prepare_CLI cli
+    def prepare_subject_CLI_invocation cli
 
       mock_inst = mock_installation_
 

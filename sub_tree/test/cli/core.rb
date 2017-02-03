@@ -65,7 +65,7 @@ module Skylab::SubTree::TestSupport
 
       end.call  # etc
 
-      def expect_succeeded
+      def expect_succeed
         expect_no_more_lines
         expect_success_result
       end

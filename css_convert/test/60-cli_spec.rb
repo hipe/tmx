@@ -50,7 +50,7 @@ module Skylab::CSS_Convert::TestSupport
 
       cli.expect_on_stderr "hello from css convert."
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     def _expect_specific_usaged_and_invited

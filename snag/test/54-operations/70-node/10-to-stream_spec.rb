@@ -72,7 +72,7 @@ module Skylab::Snag::TestSupport
         "'node-identifier-number-component' #{
          }must be a non-negative integer, had \"-12\"" )
 
-      expect_failed
+      expect_fail
     end
 
     it "`identifier` (RESULT SHAPE IS EXPERIMENTAL)" do

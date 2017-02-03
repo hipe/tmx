@@ -14,7 +14,7 @@ module Skylab::Cull::TestSupport
         :path, dir( :freshly_initted )
 
       expect_not_OK_event :uninitialized_constant
-      expect_failed
+      expect_fail
     end
 
     it "add a good name" do

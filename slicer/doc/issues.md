@@ -1,3 +1,13 @@
+[#160]       #bibliographic-reference
+             "the Grymoire's" AWK tutorial
+             http://www.grymoire.com/Unix/Awk.html
+
+             this reference is used to elucidate isomorphicisms betweeen
+             the way ASCII escape sequences work and the way most UNIX
+             shells handle quotes (which may be different than you think);
+             near "This is a very important concept, and throws experienced
+             programmers a curve ball".
+
 [#159]       martin fowler's oft-referenced "mocks aren't stubs" blog entry
 
 [#158]       rather than a single #bibliographic-referece, for now we
@@ -37,7 +47,7 @@
 
 [#155]       scope stack trick..
 [#154]       #bibliographic-reference:
-             _Crow's Foot Notation_ (short document for coure material),
+             _Crow's Foot Notation_ (short document for course material),
              G Benoït, Ph.D; Simmons University
              http://web.simmons.edu/~benoit/lis458/CrowsFootNotation.pdf
 [#153]       [ example ]

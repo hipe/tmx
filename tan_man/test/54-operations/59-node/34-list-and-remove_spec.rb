@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport
 
       ev.to_event.property_symbol.should eql :graph
 
-      expect_failed
+      expect_fail
     end
 
     it "`list` results in a stream of entities. see node label with 'name' prop" do
@@ -52,7 +52,7 @@ module Skylab::TanMan::TestSupport
 
       _em.cached_event_value.to_event.entity_name_string.should eql 'berk'
 
-      expect_failed
+      expect_fail
     end
 
     it "remove money" do

@@ -30,7 +30,7 @@ module Skylab::BeautySalon::TestSupport
       black_and_white( _em.cached_event_value ).should eql(
         "'from-line' must be greater than or equal to 1, had -1" )
 
-      expect_failed
+      expect_fail
     end
 
     it "bad range (second term) - epic error message" do
@@ -43,7 +43,7 @@ module Skylab::BeautySalon::TestSupport
       black_and_white( _em.cached_event_value ).should eql(
         "'to-line' must be -1 or greater than or equal to 1. had -2" )
 
-      expect_failed
+      expect_fail
     end
 
     it "bad range (relative)" do
@@ -55,7 +55,7 @@ module Skylab::BeautySalon::TestSupport
       black_and_white( _em.cached_event_value ).should eql (
         "'to-line' (2) cannot be less than 'from-line' (3)" )
 
-      expect_failed
+      expect_fail
     end
 
     def _from_to from_d, to_d
@@ -116,7 +116,7 @@ module Skylab::BeautySalon::TestSupport
       sout.should eql [ "wowza\n", "nowza\n", "gowza\n"]
       serr.should eql [ "commentie", "fommentie" ]
 
-      expect_succeeded
+      expect_succeed
     end
 
     def _subject_action

@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
         expect_not_OK_event :non_one_IO,
           "need exactly 1 input-related argument, had 0 #{
            }(provide (or_ [\"(par input_string)\", \"(par input_path)\", \"(par workspace_path)\"]))"
-        expect_failed
+        expect_fail
       end
     end
 
@@ -55,7 +55,7 @@ module Skylab::TanMan::TestSupport
           }
         O
 
-        expect_succeeded
+        expect_succeed
       end
     end
 
@@ -71,7 +71,7 @@ module Skylab::TanMan::TestSupport
           peanut [label="peanut gallery"]
           alpha -> peanut
         O
-        expect_succeeded
+        expect_succeed
       end
     end
 
@@ -137,7 +137,7 @@ module Skylab::TanMan::TestSupport
         expect_OK_event :created_node
         expect_not_OK_event :association_prototypes_not_found,
           "the stmt_list has no prototype named (ick :clancy)"
-        expect_failed
+        expect_fail
       end
 
       it "lets you choose which of several edge prototypes" do

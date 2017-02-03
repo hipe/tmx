@@ -31,7 +31,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
           ev.action_name.should eql :wiggle
         end
-        expect_failed
+        expect_fail
       end
 
       it "version" do
@@ -67,7 +67,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         expect_not_OK_event_ :errno_enoent,
           %r(\bNo such \(par flex_file\) - \(pth ".+not-there\.flex"\)\z)
 
-        expect_failed
+        expect_fail
       end
 
       it "infile not file" do
@@ -82,7 +82,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         black_and_white( em.cached_event_value ).should match(
           %r(\A«[^»]+/fixture-files» exists but is not a file, it is a directory\b) )
 
-        expect_failed
+        expect_fail
       end
 
       it "infile exist, outfile exist and force not present" do
@@ -95,7 +95,7 @@ module Skylab::Flex2Treetop::MyTestSupport
           %r(\A'output-path' exists, won't overwrite without 'force': #{
             }«[^»]+file-with-some-content) )
 
-        expect_failed
+        expect_fail
       end
 
       it "infile exist, outfile not file" do
@@ -112,7 +112,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         black_and_white( _em.cached_event_value ).should match _rx
 
-        expect_failed
+        expect_fail
       end
 
       it "minimal case" do

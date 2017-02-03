@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport
       expect_OK_event :found_existing_node
       expect_OK_event :found_existing_node
       expect_OK_event :found_existing_association
-      expect_succeeded
+      expect_succeed
     end
 
     it "create one association (the 2 nodes exist already)" do
@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
       expect_OK_event :found_existing_node
       expect_OK_event :found_existing_node
       expect_OK_event :created_association
-      expect_succeeded
+      expect_succeed
       scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
       scn.advance_N_lines 3
       scn.next_line.should eql "zip -> zip_work\n"
@@ -38,7 +38,7 @@ module Skylab::TanMan::TestSupport
       expect_OK_event :found_existing_node
       expect_OK_event :found_existing_node
       expect_OK_event :created_association
-      expect_succeeded
+      expect_succeed
       scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
       scn.advance_N_lines 1
       scn.next_line.should eql "zip [label=\"zip win solidly\"]\n"
@@ -53,7 +53,7 @@ module Skylab::TanMan::TestSupport
       expect_OK_event :created_node
       expect_OK_event :created_node
       expect_OK_event :created_association
-      expect_succeeded
+      expect_succeed
       scn = TestSupport_::Expect_Line::Scanner.via_string @output_s
       scn.advance_N_lines 2
       scn.next_line.should eql "zip_2 [label=\"zip win solidly\"]\n"

@@ -111,7 +111,7 @@ describe "[st] CLI - files - main" do
         cli.unstyle_styled( line ) == "hello from sub tree.\n" || fail
       end
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 end
 

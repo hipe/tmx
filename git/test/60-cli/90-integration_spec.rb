@@ -14,7 +14,7 @@ module Skylab::Git::TestSupport
 
       cli.expect_on_stderr "hello from git.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     it "citxt" do
@@ -25,7 +25,7 @@ module Skylab::Git::TestSupport
 
       cli.expect_on_stderr "hello from citxt."
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     it "yes fuzzy happens between two one-offs (breakout vs. breakup)" do
@@ -44,7 +44,7 @@ module Skylab::Git::TestSupport
         _s == %(use 'xmt git -h' for help) || fail
       end
 
-      cli.expect_failed_under self
+      cli.expect_fail_under self
     end
 
     it "breakup" do
@@ -55,7 +55,7 @@ module Skylab::Git::TestSupport
 
       cli.expect_on_stderr "hello from breakup."
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     it "uncommit" do
@@ -66,7 +66,7 @@ module Skylab::Git::TestSupport
 
       cli.expect_on_stderr "hello from uncommit."
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     def _same

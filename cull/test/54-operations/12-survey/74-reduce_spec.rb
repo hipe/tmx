@@ -13,7 +13,7 @@ module Skylab::Cull::TestSupport
         :path, dir( :high_table_number )
 
       expect_not_OK_event :early_end_of_stream
-      expect_failed
+      expect_fail
     end
 
     it "integrate with markdown - will recognize the peristed table count" do
@@ -80,7 +80,7 @@ module Skylab::Cull::TestSupport
         %r(\bJSON files are always exactly one entity #{
          }collection.+table 3 was requested, but had only 1 table\b) )
 
-      expect_failed
+      expect_fail
     end
   end
 end

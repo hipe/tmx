@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport
 
       black_and_white( ev ).should eql s
 
-      expect_failed
+      expect_fail
 
       ev.to_event
     end

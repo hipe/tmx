@@ -41,7 +41,7 @@ module Skylab::Brazen::TestSupport
 
       :start_directory_does_not_exist == _sym or fail
 
-      expect_failed
+      expect_fail
     end
 
     it "with an empty directory workspace path" do
@@ -60,7 +60,7 @@ module Skylab::Brazen::TestSupport
 
       _em.cached_event_value.to_event.invite_to_action.should eql [ :init ]
 
-      expect_failed
+      expect_fail
     end
   end
 end

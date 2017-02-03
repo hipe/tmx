@@ -14,13 +14,13 @@ module Skylab::CodeMetrics::TestSupport
 
       invoke me, '-ping'
       expect_on_stderr 'hello from mondrian'
-      expect_succeeded
+      expect_succeed
     end
 
     it "strange primary - unknown // available" do
 
       invoke me, '-ziz-wiz'
-      expect_on_stderr "unknown primary: \"-ziz-wiz\""
+      expect_on_stderr "unknown primary \"-ziz-wiz\""
       expect %r(\Aavailable primaries: .*(?<![[:alnum:]])-width\b)
         # the above is currently very long but meh
       _expect_failed_commonly
@@ -64,7 +64,7 @@ module Skylab::CodeMetrics::TestSupport
 
       expect_on_stdout_lines_in_big_string _big_string
 
-      expect_succeeded
+      expect_succeed
     end
 
     context "numeric option" do
@@ -105,7 +105,7 @@ module Skylab::CodeMetrics::TestSupport
         HERE
 
         expect_on_stdout_lines_in_big_string _big_string
-        expect_succeeded
+        expect_succeed
       end
     end
 
@@ -137,7 +137,7 @@ module Skylab::CodeMetrics::TestSupport
         %r(\Ausage: ze-pnsa.*(?<![a-z])-path(?!-)),
       ]
 
-      expect_succeeded
+      expect_succeed
 
       if stack.length.nonzero?
         fail
@@ -147,14 +147,14 @@ module Skylab::CodeMetrics::TestSupport
     def _expect_failed_commonly
       # expect "try 'ze-pnsa -h'
         # for now, no invites just to be like `find`
-      expect_failed
+      expect_fail
     end
 
     def subject_CLI
       Home_::Mondrian_[]
     end
 
-    def prepare_CLI cli
+    def prepare_subject_CLI_invocation cli
       NOTHING_
     end
   end

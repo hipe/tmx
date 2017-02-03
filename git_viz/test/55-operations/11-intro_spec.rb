@@ -21,7 +21,7 @@ module Skylab::GitViz::TestSupport
 
       :extra_properties == _sym or fail
 
-      expect_failed
+      expect_fail
     end
 
     it "simple ping" do

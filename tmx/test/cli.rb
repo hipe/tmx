@@ -11,7 +11,7 @@ module Skylab::TMX::TestSupport
     module ModuleMethods___
 
       def given_test_directories s_a
-        define_method :prepare_CLI do |cli|
+        define_method :prepare_subject_CLI_invocation do |cli|
           _st = TS_::Operations::Map::Dir01::JSON_file_stream_via[ s_a ]
           cli.json_file_stream_by { _st } ; nil
         end
@@ -50,7 +50,7 @@ module Skylab::TMX::TestSupport
       def finish_with_common_machine_
         mach = CommonMachine___.new
         expect_each_on_stderr_by( & mach.method( :receive_line ) )
-        expect_failed
+        expect_fail
         mach.finish
       end
 
@@ -85,7 +85,7 @@ module Skylab::TMX::TestSupport
           io.puts line
           NIL  # keep parsing
         end
-        expect_succeeded  # big money
+        expect_succeed  # big money
 
         spy.finish
 
@@ -96,12 +96,12 @@ module Skylab::TMX::TestSupport
 
       def expect_failed_normally_
         expect "try 'tmz -h'"
-        expect_failed
+        expect_fail
       end
 
       # --
 
-      def prepare_CLI cli
+      def prepare_subject_CLI_invocation cli
         NOTHING_
       end
 

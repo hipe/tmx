@@ -10,7 +10,7 @@ module Skylab::Cull::TestSupport
     it "files must be absolute here" do
       call_API :upstream, :map, :upstream, 'non-absolute-path'
       expect_not_OK_event :path_must_be_absolute
-      expect_failed
+      expect_fail
     end
 
     it "empty file" do
@@ -22,13 +22,13 @@ module Skylab::Cull::TestSupport
       black_and_white( _em.cached_event_value ).should match(
         /\Aearly end of stream - there were no markdown tables anywhere/ )
 
-      expect_failed
+      expect_fail
     end
 
     it "file with one empty line" do
       markdown_map_against_file :one_newline_only
       expect_not_OK_event :early_end_of_stream
-      expect_failed
+      expect_fail
     end
 
     def markdown_map_against_file sym
@@ -69,7 +69,7 @@ module Skylab::Cull::TestSupport
       black_and_white( _em.cached_event_value ).should match(
         /\A'table-number' must be greater than or equal to 1, had 0/ )
 
-      expect_failed
+      expect_fail
     end
 
     it "table number too high" do
@@ -81,7 +81,7 @@ module Skylab::Cull::TestSupport
       black_and_white( _em.cached_event_value ).should match(
         / - needed 6 but had only 5 markdown tables in the entirety of the\b/ )
 
-      expect_failed
+      expect_fail
     end
 
     it "table number works" do

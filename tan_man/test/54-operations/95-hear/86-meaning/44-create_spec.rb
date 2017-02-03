@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport
         :config_filename, cfn_shallow
 
       expect_OK_event :wrote_resource
-      expect_succeeded
+      expect_succeed
 
       _exp = <<-O.unindent
         digraph {
@@ -47,7 +47,7 @@ module Skylab::TanMan::TestSupport
         :config_filename, cfn_shallow
 
       expect_OK_event :wrote_resource
-      expect_succeeded
+      expect_succeed
 
       _exp = <<-O.unindent
         digraph {

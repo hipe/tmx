@@ -173,7 +173,7 @@ describe "[y2] CLI integration" do
 
       cli.expect_on_stderr "hello from yacc2treetop."
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     # (the below is experimental fringe to feed into [#br-007])

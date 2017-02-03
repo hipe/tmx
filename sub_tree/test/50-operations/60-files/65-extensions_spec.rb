@@ -29,7 +29,7 @@ module Skylab::SubTree::TestSupport
       scn.next_line.should match %r(\A    └── foo_speg\.kode #{ _MTIME }$)
       scn.next_line.should be_nil
 
-      expect_succeeded
+      expect_succeed
     end
 
     it "a multi-buffer extension - `line count` (results in table renderer)" do

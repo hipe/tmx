@@ -125,21 +125,26 @@ module Skylab::SearchAndReplace::TestSupport
 
         define_method :_treat, -> do
 
-          parse_styles = nil
+          lib = nil
           setup = -> do
             setup = nil
-            parse_styles = Home_.lib_.zerk::CLI::Styling::Parse_styles
+            lib = Home_.lib_.zerk::CLI::Styling
+            lib::ChunkStream_via_String  # load early to fail early
           end
 
           -> lines do
+
             setup && setup[]
 
             parts = []
-            lines.each do | line |
-              sexp = parse_styles[ line ]
-              sexp.each do | x |
-                if :string == x.first
-                  parts.push x.last
+            lines.each do |line|
+
+              st = lib::ChunkStream_via_String[ line ]
+              s = st.gets
+              if s
+                parts.push s
+                st.each do |sct|
+                  parts.push sct.string
                 end
               end
             end

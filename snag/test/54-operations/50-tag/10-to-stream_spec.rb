@@ -22,7 +22,7 @@ module Skylab::Snag::TestSupport
           "'node-identifier-number-component' #{
            }must be a non-negative integer, had \"Xxx\"" )
 
-        expect_failed
+        expect_fail
       end
 
       it "ok with two tags" do

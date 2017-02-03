@@ -12,7 +12,7 @@ module Skylab::TanMan::TestSupport
       expect_event COMMON_MISS_ do |ev|
         ev.to_event.reasons.first.name_symbol.should eql :workspace_path
       end
-      expect_failed
+      expect_fail
     end
 
     it "when workspace path is illegitimate" do
@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport
 
       expect_event :start_directory_is_not_directory
 
-      expect_failed
+      expect_fail
     end
 
     it "when workspace path does not have config filename" do
@@ -36,7 +36,7 @@ module Skylab::TanMan::TestSupport
 
       expect_event :resource_not_found
 
-      expect_failed
+      expect_fail
     end
 
     it "when workspace does not have entity" do
@@ -56,7 +56,7 @@ module Skylab::TanMan::TestSupport
       black_and_white( _em.cached_event_value ).should eql(
         'in workspace config there are no starters' )
 
-      expect_failed
+      expect_fail
     end
 
     it "when workspace has multiple entities, none of which exist" do

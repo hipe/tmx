@@ -88,11 +88,17 @@ module Skylab::SearchAndReplace::TestSupport
         lines = _st.to_a
         1 == lines.length or fail
 
-        _x_a = Home_.lib_.zerk::CLI::Styling.parse_styles(
-          lines.fetch 0 )
+        st = Home_.lib_.zerk::CLI::Styling::ChunkStream_via_String[ lines[0] ]
 
-        _x_a.map( & :first ).should eql(
-          [ :string, :style, :string, :style, :string ] )
+        st.gets.length.nonzero? || fail  # there is some leading, non-styled string
+
+        chunk_1 = st.gets
+        chunk_2 = st.gets
+        st.gets && fail  # there is only one chunk
+        chunk_1.styles == [:strong, :green] || fail
+        chunk_2.styles == [:no_style] || fail
+        chunk_1.string == "WaZOOzle" || fail
+        chunk_2.string == "!\n" || fail
       end
 
       shared_subject :_match do

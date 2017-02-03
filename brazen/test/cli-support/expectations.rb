@@ -212,12 +212,12 @@ module Skylab::Brazen::TestSupport
 
     def expect_generically_invited
       expect_generic_invite_line
-      expect_failed
+      expect_fail
     end
 
     def expect_specifically_invited_to sym
       expect_specific_invite_line_to sym
-      expect_failed
+      expect_fail
     end
 
     def expect_generic_invite_line

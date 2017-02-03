@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
       call_API :graph, :sync
       expect_not_OK_event :non_one_IO, /\Aneed exactly 1 input-related /i
       expect_not_OK_event :non_one_IO, /\Aneed exactly 1 output-related /i
-      expect_failed
+      expect_fail
     end
 
     it "case 4 with input syntax failure" do
@@ -38,7 +38,7 @@ module Skylab::TanMan::TestSupport
         "expecting opening digraph line (e.g \"digraph{\") #{
           }near line 1: \"wazoozle\\n\"" )
 
-      expect_failed
+      expect_fail
     end
 
     it "case 5 (a regressive case) - copy hereput to output" do
@@ -66,7 +66,7 @@ module Skylab::TanMan::TestSupport
         :output_path, same_path_
 
       expect_not_OK_event :hereput_and_output_waypoints_are_the_same
-      expect_failed
+      expect_fail
     end
 
     it "case 4 (a regressive case) - write input to output thru transient graph " do
@@ -80,7 +80,7 @@ module Skylab::TanMan::TestSupport
       expect_OK_event :created_association
       expect_OK_event :created_association
       expect_OK_event :wrote_resource
-      expect_succeeded
+      expect_succeed
     end
 
     it "case 4 - corner case 1 - this. (covers immaculate conception)" do
@@ -110,7 +110,7 @@ module Skylab::TanMan::TestSupport
       expect_OK_event :created_association
       expect_OK_event :found_existing_association
       expect_OK_event :wrote_resource
-      expect_succeeded
+      expect_succeed
 
       ( i_am_this * EMPTY_S_ ).should eql <<-HERE.unindent
         digraph {

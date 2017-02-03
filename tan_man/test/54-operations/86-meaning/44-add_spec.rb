@@ -16,21 +16,21 @@ module Skylab::TanMan::TestSupport
         # fazinkle: doo-dinkle
         #      foo: bar
       O
-      expect_succeeded
+      expect_succeed
     end
 
     it "add - C-style, before, before" do
       s = " /* winterly : wanterly \n bliff blaff */ digraph{}"
       insert_foo_bar_into s
       s.should eql " /* winterly : wanterly \n         foo : bar\n bliff blaff */ digraph{}"
-      expect_succeeded
+      expect_succeed
     end
 
     it "add - C-style, inside, after" do
       s = "digraph{ /* dolan : is \n a : duck \n */ }"
       insert_foo_bar_into s
       s.should eql "digraph{ /* dolan : is \n a : duck \nfoo : bar\n */ }"
-      expect_succeeded
+      expect_succeed
     end
 
     it "add - shell-style, inside, after" do
@@ -58,7 +58,7 @@ module Skylab::TanMan::TestSupport
       s = 'digraph{ }'
       insert_foo_bar_into s
       s.should eql "digraph{ # foo : bar\n}"
-      expect_succeeded
+      expect_succeed
     end
 
     it "add will not clobber" do
@@ -66,7 +66,7 @@ module Skylab::TanMan::TestSupport
       insert_foo_bar_into s
       expect_not_OK_event :name_collision,
         'cannot set (lbl "foo") to (val "bar"), it is already set to (val "x")'
-      expect_failed
+      expect_fail
     end
 
     def insert_foo_bar_into s
@@ -135,7 +135,7 @@ module Skylab::TanMan::TestSupport
 
       _em = expect_OK_event :updated_attributes
 
-      expect_succeeded
+      expect_succeed
 
       black_and_white( _em.cached_event_value ).should eql(
         "on node 'fizzle' added attributes: [ style=filled, fillcolor=#79f234 ]" )

@@ -27,7 +27,7 @@ module Skylab::TMX::TestSupport
         expect same
         expect same
 
-        expect_succeeded
+        expect_succeed
       end
 
       def __this_big_string
@@ -44,7 +44,7 @@ module Skylab::TMX::TestSupport
         [ _top_token, '-counts' ]
       end
 
-      def prepare_CLI cli
+      def prepare_subject_CLI_invocation cli
         _prepare_CLI_as_real cli
       end
     end
@@ -75,7 +75,7 @@ module Skylab::TMX::TestSupport
 
           invoke_it
 
-          expect_on_stderr 'unknown primary: "-strange"'
+          expect_on_stderr 'unknown primary "-strange"'
 
           md = nil
           expect_line_by do |line|
@@ -89,7 +89,7 @@ module Skylab::TMX::TestSupport
           seen
         end
 
-        def prepare_CLI cli
+        def prepare_subject_CLI_invocation cli
           cli.test_file_name_pattern_by { TS_._NEVER_USED }
           cli.test_directory_entry_name_by { TS_._NEVER_USED }
         end
@@ -124,7 +124,7 @@ module Skylab::TMX::TestSupport
           _line_survey_for __FILE__
         end
 
-        def prepare_CLI cli
+        def prepare_subject_CLI_invocation cli
           _prepare_CLI_as_real cli
         end
       end
@@ -140,7 +140,7 @@ module Skylab::TMX::TestSupport
           _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10, 1
         end
 
-        def prepare_CLI cli
+        def prepare_subject_CLI_invocation cli
           _prepare_CLI_for_hacked_universe cli, %w( tyris trix )
         end
       end
@@ -156,7 +156,7 @@ module Skylab::TMX::TestSupport
           _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 1, 9, 10
         end
 
-        def prepare_CLI cli
+        def prepare_subject_CLI_invocation cli
           _prepare_CLI_for_hacked_universe cli, %w( tyris trix )
         end
       end
@@ -191,7 +191,7 @@ module Skylab::TMX::TestSupport
           _expect_the_number_identifiers_of_the_test_files_to_be_in_this_order 9, 10
         end
 
-        def prepare_CLI cli
+        def prepare_subject_CLI_invocation cli
 
           _prepare_CLI_for_hacked_universe cli
 
@@ -228,7 +228,7 @@ module Skylab::TMX::TestSupport
         NOTHING_  # keep parsing
       end
 
-      expect_succeeded
+      expect_succeed
 
       scn.no_unparsed_exists || fail
     end
@@ -243,7 +243,7 @@ module Skylab::TMX::TestSupport
         survey.see_line line
       end
 
-      expect_succeeded
+      expect_succeed
 
       survey.finish
     end

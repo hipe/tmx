@@ -28,7 +28,7 @@ module Skylab::TestSupport::TestSupport
         _hi == "'path' cannot be relative - \"not-absolut[..]\"" || fail
       end
 
-      expect_failed
+      expect_fail
     end
 
     it "easy boogie against the project tree" do
@@ -57,7 +57,7 @@ module Skylab::TestSupport::TestSupport
 
       _against_path fixture_tree( :one, 'not-there.rx' )
       expect_not_OK_event :find_error
-      expect_failed
+      expect_fail
     end
 
     it "sub-tree under the test dir (counterparted)" do

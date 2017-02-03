@@ -87,7 +87,7 @@ module Skylab::Flex2Treetop::MyTestSupport
 
         cli.expect_on_stderr "hello from flex2treetop.\n"
 
-        cli.expect_succeeded_under self
+        cli.expect_succeed_under self
       end
 
       def __expect_all_this
@@ -137,12 +137,12 @@ module Skylab::Flex2Treetop::MyTestSupport
 
       def expect_invite
         expect :styled, "use '#{ _program_name } -h' for help"
-        expect_failed
+        expect_fail
       end
 
       def expect_action_invite
         expect :styled, "use '#{ _program_name } translate -h' for help"
-        expect_failed
+        expect_fail
       end
 
       def result_for_failure_for_expect_stdout_stderr

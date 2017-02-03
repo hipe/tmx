@@ -32,7 +32,7 @@ module Skylab::Common::TestSupport
 
       cli.expect_on_stderr "hello from common.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     def expect expect_s

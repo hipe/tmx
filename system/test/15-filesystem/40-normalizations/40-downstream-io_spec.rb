@@ -41,7 +41,7 @@ module Skylab::System::TestSupport
 
       :missing_required_permission == _sym or fail
 
-      expect_failed
+      expect_fail
     end
 
     def __build_force_yes_arg
@@ -63,7 +63,7 @@ module Skylab::System::TestSupport
 
       against_ _path
       expect_not_OK_event :parent_directory_must_exist
-      expect_failed
+      expect_fail
     end
 
     it "no exist, parent directory is file" do
@@ -78,7 +78,7 @@ module Skylab::System::TestSupport
         :errno_enotdir == ev.terminal_channel_symbol or fail
       end
 
-      expect_failed
+      expect_fail
     end
 
     it "no exist, dry run" do

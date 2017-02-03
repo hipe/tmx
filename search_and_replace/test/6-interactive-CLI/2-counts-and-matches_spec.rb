@@ -78,7 +78,6 @@ module Skylab::SearchAndReplace::TestSupport
         # #eyeblood: make sure that the next three lines have both variants
 
         _a = [ st.gets, st.gets, st.gets ]
-        ps = Home_.lib_.zerk::CLI::Styling::Parse_styles
 
         a = [ "h#{}inkenlooper" ]
         a.push a.last.upcase
@@ -86,17 +85,23 @@ module Skylab::SearchAndReplace::TestSupport
 
         head_rx = /\A[^:]+:\d+:.+/
 
+        lib = Home_.lib_.zerk::CLI::Styling
         _a.each do |line|
 
-          x = ps[ line ]
+          chunk_st = lib::ChunkStream_via_String[ line ]
+          head_s = chunk_st.gets
+          head_s.length.zero? && fail
 
-          :string == x.first.first or fail
-          :style == x[1].first or fail
+          chunk = chunk_st.gets
+          _match = chunk.string
 
-          _head = x.first.last
-          _match = x[2].last
+          _chunk_ = chunk_st.gets
+          _chunk_ || fail
 
-          head_rx =~ _head or fail
+          _chunk_ = chunk_st.gets
+          _chunk_ && fail
+
+          head_rx =~ head_s or fail
           a[ see.fetch( _match ) ] = nil
         end
 

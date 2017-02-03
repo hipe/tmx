@@ -16,7 +16,7 @@ module Skylab::Git::TestSupport
       black_and_white( _em.cached_event_value ).should eql(
         "2 and 4 must be in the collection" )
 
-      expect_failed
+      expect_fail
     end
 
     it "expand - results are in descending order" do
@@ -51,7 +51,7 @@ module Skylab::Git::TestSupport
         }desired contraction of -4 would bring distance down to 2, #{
          }but distance cannot go below 3 for 4 items." )
 
-      expect_failed
+      expect_fail
     end
 
     def _against d_a, trip

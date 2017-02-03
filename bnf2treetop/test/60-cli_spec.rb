@@ -92,7 +92,7 @@ describe "[bnf2tt] CLI" do
 
     cli.expect_on_stderr "hello from bnf2treetop."
 
-    cli.expect_succeeded_under self
+    cli.expect_succeed_under self
   end
 
   def do_debug

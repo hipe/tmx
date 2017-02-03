@@ -16,7 +16,7 @@ module Skylab::Git::TestSupport
         expect :o, "stow-1"
         expect :o, "stow-2"
         expect :e, "(2 stows total)"
-        expect_succeeded
+        expect_succeed
       end
     end
   end

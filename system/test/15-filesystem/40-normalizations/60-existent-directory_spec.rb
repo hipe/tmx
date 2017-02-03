@@ -13,7 +13,7 @@ module Skylab::System::TestSupport
       against_ _path
 
       expect_not_OK_event :enoent
-      expect_failed
+      expect_fail
     end
 
     it "`create_if_not_exist` - creates" do
@@ -60,7 +60,7 @@ module Skylab::System::TestSupport
     def _expect_same
 
       expect_not_OK_event :wrong_ftype
-      expect_failed
+      expect_fail
     end
 
     def subject_

@@ -99,7 +99,7 @@ module Skylab::TestSupport::TestSupport
         cli.unstyle_styled( line ).should eql "pong from [ts]!"
       end
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     it "(stowaway - tmx integration - quickie) README", wip: true do
@@ -118,7 +118,7 @@ module Skylab::TestSupport::TestSupport
 
       cli.expect "hello from quickie."
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     def _same

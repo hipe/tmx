@@ -174,7 +174,7 @@ module Skylab::Basic::TestSupport
 
       black_and_white( _em.cached_event_value ).should eql s
 
-      expect_failed
+      expect_fail
     end
 
     def _expect_same_result

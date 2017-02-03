@@ -21,7 +21,7 @@ module Skylab::Snag::TestSupport
         black_and_white( _em.cached_event_value ).should match(
           /\Athere is no node "\[#10\]" in [^ ]+sutherlands\./ )
 
-        expect_failed
+        expect_fail
       end
 
       it "node is found but doesn't have tag" do
@@ -33,7 +33,7 @@ module Skylab::Snag::TestSupport
         black_and_white( _em.cached_event_value ).should eql(
           "node [#1] does not have tag \"#three\"" )  # :+[#015]
 
-        expect_failed
+        expect_fail
       end
 
       it "remove a tag at the end" do

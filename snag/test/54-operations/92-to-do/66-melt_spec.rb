@@ -132,7 +132,7 @@ module Skylab::Snag::TestSupport
       black_and_white( _em.cached_event_value ).should eql(
         '(dryly) changed the 3 qualified todos of 5 todos in 2 files' )
 
-      expect_succeeded
+      expect_succeed
     end
 
     def _manifest_file

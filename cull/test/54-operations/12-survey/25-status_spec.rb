@@ -10,19 +10,19 @@ module Skylab::Cull::TestSupport
     it "with a noent path" do
       against ::File.join TS_.dir_path, 'no-ent'
       expect_not_OK_event_ :start_directory_does_not_exist
-      expect_failed
+      expect_fail
     end
 
     it "with a path that is a file" do
       against __FILE__
       expect_not_OK_event :start_directory_is_not_directory
-      expect_failed
+      expect_fail
     end
 
     it "with a path that is a directory but workspace not found" do
       against TestSupport_::Fixtures.directory :empty_esque_directory
       expect_not_OK_event :resource_not_found
-      expect_failed
+      expect_fail
     end
 
     it "with a workspace with no datappoints" do

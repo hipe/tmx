@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport
           )
         end
 
-        expect_failed
+        expect_fail
       end
 
       it "just digraph path, no ws resolution" do
@@ -34,7 +34,7 @@ module Skylab::TanMan::TestSupport
         black_and_white( _em.cached_event_value ).should eql(
           "missing required attribute 'workspace_path'\n" )
 
-        expect_failed
+        expect_fail
       end
 
       it "yes args but ws path is noent - workspace not found" do
@@ -53,7 +53,7 @@ module Skylab::TanMan::TestSupport
           ev.start_path.should eql @ws_pn.to_path
         end
 
-        expect_failed
+        expect_fail
       end
     end
 
@@ -74,7 +74,7 @@ module Skylab::TanMan::TestSupport
 
         ev.to_event.path.should eql 'some-relative/path'
 
-        expect_failed
+        expect_fail
       end
 
       it "and digraph is abspath whose dirname is noent - no" do
@@ -100,7 +100,7 @@ module Skylab::TanMan::TestSupport
 
         black_and_white( ev ).should eql "parent directory must exist - some-deep"
 
-        expect_failed
+        expect_fail
       end
 
       context "and digraph is abspath whose dirname exists" do
@@ -128,14 +128,14 @@ module Skylab::TanMan::TestSupport
             /\A\(pth "[^"]+"\) exists but is not \(indefinite_noun #{
              }"file"\), it is \(indefinite_noun "directory"\)\z/
 
-          expect_failed
+          expect_fail
         end
 
         it "and digraph path is file but config parse error" do
 
           shared_setup_via_config_line '["whtvr"]'
           expect_not_OK_event :config_parse_error
-          expect_failed
+          expect_fail
         end
 
         it "and digraph path is file - OK" do
@@ -152,7 +152,7 @@ module Skylab::TanMan::TestSupport
 
           excerpt( -2 .. -1 ).should eql "[graph \"i-exist/like-a-boss.dog\" ]\n[wiw]\n"
 
-          expect_succeeded
+          expect_succeed
         end
 
         it "and diraph path is File object (A HACK)" do
@@ -188,7 +188,7 @@ module Skylab::TanMan::TestSupport
 
           expect_committed_changes_
 
-          expect_succeeded
+          expect_succeed
 
           _read_config_file
 
@@ -267,7 +267,7 @@ module Skylab::TanMan::TestSupport
             o.next_line.should eql "# created by tan-man on XYZ\n"
             io.close
 
-            expect_succeeded
+            expect_succeed
           end
 
           it "and the digraph path is with extension - creates digraph" do

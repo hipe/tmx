@@ -183,23 +183,25 @@ module Skylab::Zerk
 
           def say_unknown_item
 
-            _buffer = case @shape_symbol
+            case @shape_symbol
             when :primary
-              "unknown primary"
+              buffer = "unknown primary"
+              colon = :no
             when :business_item
-              "unknown item"
+              buffer = "unknown item"
+              colon = :yes
             else
               fail
             end
 
-            say_unknown_item_smart_prefixed _buffer
+            _say_unknown_item_smart_prefixed buffer, colon
           end
 
           def express_unknown_item_smart_prefixed buffer
-            @_yielder_ << say_unknown_item_smart_prefixed( buffer )
+            @_yielder_ << _say_unknown_item_smart_prefixed( buffer, :maybe )
           end
 
-          def say_unknown_item_smart_prefixed buffer
+          def _say_unknown_item_smart_prefixed buffer, colon
 
             if buffer.frozen?
               buffer = buffer.dup
@@ -210,9 +212,18 @@ module Skylab::Zerk
               say_strange_branch_item x
             end
 
-            if COLON_BYTE_ != s.getbyte(0)
+            case colon
+            when :yes
               buffer << COLON_
+            when :maybe
+              if ADD_A_COLON_IF_RX___ =~ s  # see
+                buffer << COLON_
+              end
+            when :no
+              NOTHING_
+            else ; never
             end
+
             buffer << SPACE_
             buffer << s
             buffer
@@ -252,6 +263,48 @@ module Skylab::Zerk
           )
         end
       end
+
+      # ==
+
+      # kinky new guidelines for when to use a colon:
+      #
+      # generally we use a colon to separate a descriptive noun phrase
+      # from the referrant being described:
+      #
+      #      never:  'number is too large 10'
+      #     better:  'number is too large: 10'
+      #
+      # but if a colon would precede any other colon, typically we avoid it:
+      #
+      #     zoiks:   'unexpected symbol: :sym_sym'
+      #     better:  'unexpected symbol :sym_sym'
+      #
+      # generally we *do* use a colon for strange business values:
+      #
+      #     worse:  'unexpected token "foo"'
+      #     better: 'unexpected token: "foo"'
+      #
+      #     even:   'unexpected value: :sym'  # but we're not sure
+      #
+      # but don't use a colon if the noun is a familiar, commonly used
+      # noun of one of the "operators" (primary or operation name):
+      #
+      #     worse:  'unexpected primary: "-foo". did you mean..'
+      #     better: 'unexpected primary "-foo". did you mean..'
+      #
+      #
+      # discussion: probably the strongest design objective here is avoiding
+      # semantic redundancy. another strong one is that what we call "ick"-
+      # style noun phrases must have some kind of diacritical markings to
+      # set them apart from plain language..
+
+      ADD_A_COLON_IF_RX___= /\A(?!
+        :  # don't add another colon if a colon is present
+        #  # do add a colon if the "ick" starts with a single quote
+        #  # do add a colon if the "ick" stars with a double quote
+      )/x
+
+      # ==
     end
   end
 end

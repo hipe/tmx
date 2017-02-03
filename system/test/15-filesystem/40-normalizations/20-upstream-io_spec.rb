@@ -17,7 +17,7 @@ module Skylab::System::TestSupport
 
       black_and_white( _em.cached_event_value ).should match %r(\ANo such file or directory )
 
-      expect_failed
+      expect_fail
     end
 
     it "not exist (path arg passed, name is used)" do
@@ -33,7 +33,7 @@ module Skylab::System::TestSupport
 
       black_and_white( _em.cached_event_value ).should match %r(\ANo such 'wazoozie' - )
 
-      expect_failed
+      expect_fail
     end
 
     def _not_here
@@ -44,7 +44,7 @@ module Skylab::System::TestSupport
 
       against_ TestSupport_::Fixtures.directory :empty_esque_directory
       expect_not_OK_event :wrong_ftype
-      expect_failed
+      expect_fail
     end
 
     it "exist" do
@@ -66,7 +66,7 @@ module Skylab::System::TestSupport
         & handle_event_selectively_ )
 
       expect_not_OK_event :ambiguous_upstream_arguments
-      expect_failed
+      expect_fail
     end
 
     def _non_interactive_stdin

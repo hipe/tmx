@@ -26,7 +26,7 @@ module Skylab::TestSupport::TestSupport
         ev_.ok == false || fail
       end
 
-      expect_failed
+      expect_fail
     end
 
     it "against a test file when the root dir is not found" do
@@ -37,7 +37,7 @@ module Skylab::TestSupport::TestSupport
       end
 
       expect_not_OK_event :resource_not_found
-      expect_failed
+      expect_fail
     end
 
     it "against an asset file when the root dir is found" do

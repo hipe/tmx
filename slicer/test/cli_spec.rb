@@ -25,7 +25,7 @@ module Skylab::Slicer::TestSupport
 
       cli.expect_on_stderr "hello from slicer.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
   end
 end

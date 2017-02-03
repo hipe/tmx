@@ -27,7 +27,7 @@ module Skylab::TestSupport::TestSupport
         ::File.basename( ev.path ) == 'i-dont-exist.file' || fail
       end
 
-      expect_failed
+      expect_fail
     end
 
     it "path is a test file" do

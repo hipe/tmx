@@ -159,7 +159,7 @@ module Skylab::TestSupport::TestSupport
         ProxyThatIsPretendingToBe_API_Module___.new self
       end
 
-      def prepare_CLI _
+      def prepare_subject_CLI_invocation _
         NIL  # hi.
       end
 

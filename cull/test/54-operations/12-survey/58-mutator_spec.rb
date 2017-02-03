@@ -15,7 +15,7 @@ module Skylab::Cull::TestSupport
         :path, freshly_initted_path_
 
       expect_not_OK_event :uninitialized_constant
-      expect_failed
+      expect_fail
     end
 
     it "add good name" do
@@ -30,7 +30,7 @@ module Skylab::Cull::TestSupport
 
       expect_event_ :collection_resource_committed_changes
 
-      expect_succeeded
+      expect_succeed
 
       sh = _line_shell td
 
@@ -94,7 +94,7 @@ module Skylab::Cull::TestSupport
         :path, dir( :one_mutator )
 
       expect_not_OK_event :uninitialized_constant
-      expect_failed
+      expect_fail
 
     end
 
@@ -105,7 +105,7 @@ module Skylab::Cull::TestSupport
         :path, dir( :one_mutator )
 
       expect_not_OK_event :function_call_not_found
-      expect_failed
+      expect_fail
 
     end
 
@@ -151,7 +151,7 @@ module Skylab::Cull::TestSupport
 
       expect_OK_event_ :collection_resource_committed_changes
 
-      expect_succeeded
+      expect_succeed
 
       sh = _line_shell td
       sh.advance_to_next_rx %r(\A\[ *report *\])

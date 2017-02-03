@@ -21,7 +21,7 @@ module Skylab::Snag::TestSupport
           "'node-identifier-number-component' #{
             }must be a non-negative integer, had \"ziffy\"" )
 
-        expect_failed
+        expect_fail
       end
 
       it "the node identifier's referrant must resolve" do
@@ -33,7 +33,7 @@ module Skylab::Snag::TestSupport
         black_and_white( _em.cached_event_value ).should match(
           %r(\Athere is no node "\[#2\]") )
 
-        expect_failed
+        expect_fail
       end
 
       it "the tag must be well-formed" do
@@ -46,7 +46,7 @@ module Skylab::Snag::TestSupport
           "tag must be alphanumeric separated with dashes - #{
             }invalid tag name: \"#foo bar\"" )
 
-        expect_failed
+        expect_fail
       end
 
       it "it won't let you add a tag redundantly [#001] 'hi'" do
@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport
         black_and_white( _em.cached_event_value ).should eql(
           "node [#1] already has tag #hi" )
 
-        expect_failed
+        expect_fail
       end
 
       it "to [#07] append tag '2014-ok'" do

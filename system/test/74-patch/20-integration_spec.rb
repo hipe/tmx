@@ -123,7 +123,7 @@ module Skylab::System::TestSupport
       _em = expect_neutral_event :process_line
       line = black_and_white _em.cached_event_value
       line.should match _PATCHING_FILE_RX
-      expect_succeeded
+      expect_succeed
     end
 
     # ~ expected files

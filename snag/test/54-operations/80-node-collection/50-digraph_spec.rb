@@ -52,7 +52,7 @@ module Skylab::Snag::TestSupport
       st.gets.should eql "}\n"
       st.gets.should be_nil
 
-      expect_succeeded
+      expect_succeed
     end
   end
 end

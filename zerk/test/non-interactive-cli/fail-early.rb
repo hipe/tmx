@@ -82,12 +82,12 @@ module Skylab::Zerk::TestSupport
         @ze_niCLI_client.__FLUSH_AND_EXIT_UNDER_ self
       end
 
-      def expect_failed
-        _ze_niCLI_release_client.expect_failed_under self
+      def expect_fail
+        _ze_niCLI_release_client.expect_fail_under self
       end
 
-      def expect_succeeded
-        _ze_niCLI_release_client.expect_succeeded_under self
+      def expect_succeed
+        _ze_niCLI_release_client.expect_succeed_under self
       end
 
       def _ze_niCLI_client
@@ -231,11 +231,11 @@ module Skylab::Zerk::TestSupport
         ::Kernel.exit 0
       end
 
-      def expect_failed_under tc
+      def expect_fail_under tc
         _invocation_under( tc ).execute.__expect_failed
       end
 
-      def expect_succeeded_under tc
+      def expect_succeed_under tc
         _invocation_under( tc ).execute.__expect_succeeded
       end
 
@@ -343,7 +343,7 @@ module Skylab::Zerk::TestSupport
         if p
           p[ cli ]
         elsif classish_came_from_test_context
-          tc.prepare_CLI cli
+          tc.prepare_subject_CLI_invocation cli
         end
 
         @_CLI = cli ; @_spy = spy
@@ -910,10 +910,9 @@ module Skylab::Zerk::TestSupport
     class ExactStringBasedExpectation__ < StringBasedExpectation__
 
       def initialize x, m, sym
-        @expected_styles = nil
+        super m, sym
         yield self if block_given?
         @string = x
-        super m, sym
       end
 
       attr_writer(
@@ -956,8 +955,8 @@ module Skylab::Zerk::TestSupport
     class BlankLineExpectation___ < StringBasedExpectation__
 
       def initialize(*)
-        @_say = :__say_normally
         super
+        @_say = :__say_normally
       end
 
       def _actual_string_matches_expected_string_
@@ -994,8 +993,8 @@ module Skylab::Zerk::TestSupport
     class RegexpBasedStringExpectation__ < StringBasedExpectation__
 
       def initialize x, m, sym
-        @regexp = x
         super m, sym
+        @regexp = x
       end
     end
 
@@ -1061,6 +1060,7 @@ module Skylab::Zerk::TestSupport
     class StringBasedExpectation__
 
       def initialize m, sym
+        @expected_styles = nil
         @method_name = m
         @serr_or_sout = sym
       end

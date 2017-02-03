@@ -12,7 +12,7 @@ module Skylab::Snag::TestSupport
 
         subject 'foo'
         expect_not_OK_event :invalid_date, 'invalid date: (ick "foo")'
-        expect_failed
+        expect_fail
       end
 
       it "valid" do

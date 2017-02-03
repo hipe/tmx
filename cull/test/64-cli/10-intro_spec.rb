@@ -44,7 +44,7 @@ module Skylab::Cull::TestSupport
 
       cli.expect_on_stderr "hello from cull.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     def expect_top_invite_line

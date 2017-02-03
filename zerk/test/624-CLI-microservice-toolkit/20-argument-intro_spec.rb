@@ -175,15 +175,21 @@ module Skylab::Zerk::TestSupport
         st = stream_for_expect_stdout_stderr
         _line_o = st.gets_one
 
-        _omg = Home_::CLI::Styling::Parse_styles[ _line_o.string ]
+        st = Home_::CLI::Styling::ChunkStream_via_String[ _line_o.string ]
 
-        _omg.should eql(
+        _s = st.gets
+        _s == "expecting: [<lip> [..]] " || fail
 
-          [ [:string, "expecting: [<lip> [..]] "],
-            [:style, 1, 32],
-            [:string, "<nip>"],
-            [:style, 0],
-            [:string, "\n"] ] )
+        sct = st.gets
+        sct.styles == [:strong, :green] || fail
+        sct.string == "<nip>" || fail
+
+        scn = st.gets
+        scn.styles == [:no_style] || fail
+        scn.string == NEWLINE_ || fail
+
+        scn = st.gets
+        scn && fail
 
         expect_common_failure_
       end

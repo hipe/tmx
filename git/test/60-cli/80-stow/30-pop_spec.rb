@@ -68,7 +68,7 @@ module Skylab::Git::TestSupport
 
       expect :e, %r(\Amkdir [^ ]+/zerf\b)
       expect :e, "mv ../Stows/stow-1/zerf/ziff.txt ./zerf/ziff.txt"
-      expect_succeeded
+      expect_succeed
 
       st = files_in_ tmpdir_path
       st.gets.should eql './projo/zerf/ziff.txt'
@@ -91,7 +91,7 @@ module Skylab::Git::TestSupport
 
     def _expect_common_failure
       _expect_common_invite_line
-      expect_failed
+      expect_fail
     end
 
     def _expect_common_invite_line

@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport
 
       _actual.should match _rx
 
-      expect_failed
+      expect_fail
     end
 
     it "file and one path - can't read from both path and file" do
@@ -43,7 +43,7 @@ module Skylab::SubTree::TestSupport
       _em.cached_event_value.to_event.a.map( & :name_symbol ).should eql(
         [ :file_of_input_paths, :path ] )
 
-      expect_failed
+      expect_fail
     end
 
     it "all three - can't read from a, b, and c" do
@@ -63,7 +63,7 @@ module Skylab::SubTree::TestSupport
         } and #{
         }«input-stream»#{
         } at the same time" )
-      expect_failed
+      expect_fail
     end
 
     it "reads from an open filehandle" do
@@ -74,7 +74,7 @@ module Skylab::SubTree::TestSupport
 
       call_API :files, :input_stream, fh, :output_stream, io
 
-      expect_succeeded
+      expect_succeed
 
       io.string.should eql _PRETTY_
 
@@ -89,7 +89,7 @@ module Skylab::SubTree::TestSupport
         :file_of_input_paths, fixture_file( :one_find ),
         :output_stream, io
 
-      expect_succeeded
+      expect_succeed
 
       io.string.should eql _PRETTY_
     end
@@ -105,7 +105,7 @@ module Skylab::SubTree::TestSupport
       expect_not_OK_event :find_error,
         'find: not-there: No such file or directory (exitstatus: 1)'
 
-      expect_failed
+      expect_fail
     end
 
     it "from good path (using find) - pretty (well done)" do

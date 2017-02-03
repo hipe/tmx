@@ -2,13 +2,13 @@ module Skylab::Zerk
 
   module CLI::Styling  # :[#023.1].
 
-    # -
-
-      bx = Common_::Box.new
-
-      define_singleton_method :o do | k, p |
-        bx.add k, p
+    class << self
+      def o m, p
+        define_singleton_method m, p
       end
+    end  # >>
+
+    # -
 
       # ~ styling
 
@@ -42,145 +42,47 @@ module Skylab::Zerk
 
       o :unstyle_styled, Unstyle_styled
 
-      # ~ parsing & unparsing
+      # ~ refl
 
-      Parse_styles = -> do
+      class << self
 
-        # produce a structured S-expression from a string with ASCII styles
-
-        rx = /\A
-          (?<string>[^\e]+)?  \e\[
-          (?<digits> \d+  (?: ; \d+ )* )  m
-          (?<rest> .*)
-        \z/mx
-
-        sexp = nil
-
-        -> s do
-
-          sexp ||= Basic_[]::Sexp
-
-          y = []
-          begin
-
-            md = rx.match s
-            md or break
-
-            s_ = md[ :string ]
-            if s_
-              y.push sexp[ :string, s_ ]
-            end
-
-            _s_a = md[ :digits ].split ';'
-            _d_a = _s_a.map( & :to_i )
-
-            y.push sexp[ :style, * _d_a ]
-
-            s = md[ :rest ]
-            redo
-          end while nil
-
-          if y.length.nonzero?
-            if s.length.nonzero?
-              y.push sexp[ :string, s ]
-            end
-            y
-          end
+        def code_name_symbol_array  # [css], uncovered
+          COLORS___
         end
-      end.call
-
-      o :parse_styles, Parse_styles
-
-      Unstyle_sexp = -> sx do
-
-        # from an S-expression produced by the above function,
-        # produce a string representing only the content, with
-        # the styling directives removed.
-
-        a = []
-
-        sx.each do | x |
-          :string == x.first or next
-          a.push x.fetch 1
-        end
-
-        a * EMPTY_S_
-      end
-
-      o :unstyle_sexp, Unstyle_sexp
-
-      Unparse_style_sexp = -> do
-
-        # from an S-expression produced by function 2 functions above,
-        # produce a string that includes the styling represnted therein.
-
-        h = {
-
-          string: -> sexp do
-            sexp.fetch 1
-          end,
-
-          style: -> sexp do
-            "\e[#{ sexp[ 1 .. -1 ] * ';' }m"
-          end
-        }
-
-        -> sexp do
-
-          a = []
-
-          sexp.each do | x |
-            a.push h.fetch( x.first ).call x
-          end
-
-          a * EMPTY_S_
-        end
-      end.call
-
-
-      # ~ reflection & direct exposure
-
-      -> box do
-
-        h = box.h_
-
-        define_singleton_method :each_pair_at do | * i_a, & p |
-
-          i_a.each do | sym |
-
-            p[ sym, h.fetch( sym ) ]
-          end
-          NIL_
-        end
-
-        h.each_pair do | sym, p |
-
-          define_singleton_method sym, p
-        end
-
-      end.call bx
-      bx = nil
-
-      def self.code_name_symbol_array  # [css], uncovered
-        COLORS__
-      end
+      end  # >>
 
       # ~ implementation
 
       bx = Common_::Box.new
       bx.add :strong, 1
       bx.add :reverse, 7
-      a = bx.a_ ; h = bx.h_
+      a = bx.a_ ; fwd_h = bx.h_
 
-      COLORS__ = [ :red, :green, :yellow, :blue, :purple, :cyan, :white ]
-      COLORS__.each_with_index do | sym, d |
+      colors = [ :red, :green, :yellow, :blue, :purple, :cyan, :white ]
+      colors.each_with_index do |sym, d|
         a.push sym
-        h[ sym ] = ( d + 31 )  # ASCII escape sequences, red = 31
+        fwd_h[ sym ] = ( d + 31 )  # ASCII escape sequences, red = 31
       end
 
       style_h = bx.h_
 
+      Reverse_hash_ = Lazy_.call do  # 1x
+        h = style_h.invert
+        h[ 0 ] = :no_style  # <- we never say this explicitly when encoding
+        h.freeze
+      end
+
+      COLORS___ = colors
+      INTEGER_VIA_SYMBOL_HASH = style_h  # 1x [ba]
+
     # -
+
+    # ==
+
+    Autoloader_[ self ]
+    stowaway :ChunkStream_via_String, 'chunker'  # #pending-rename
+
+    # ==
   end
 end
 # #history: moved from [br] to [ze]

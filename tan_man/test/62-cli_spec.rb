@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport
 
       cli.expect_on_stderr "hello from tan man.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
   end
 end

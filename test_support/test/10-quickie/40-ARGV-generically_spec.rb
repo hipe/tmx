@@ -54,7 +54,7 @@ module Skylab::TestSupport::TestSupport
         p[ line ]
         NIL
       end
-      expect_succeeded
+      expect_succeed
 
       expect = -> k do
         seen.delete( k ) || fail
@@ -75,7 +75,7 @@ module Skylab::TestSupport::TestSupport
 
     def expect_CLI_failed_commonly_
       expect "try 'ruby zizzy-the-test-file -h' for help"
-      expect_failed
+      expect_fail
     end
 
     # ==

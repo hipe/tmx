@@ -59,7 +59,7 @@ module Skylab::Zerk::TestSupport
 
         it "first line - unrec" do
 
-          _lines.first == "unknown primary: \"-xx-yy2\"" || fail
+          _lines.first == "unknown primary \"-xx-yy2\"" || fail
         end
 
         it "second and final line - splay of ONLY available primaries" do

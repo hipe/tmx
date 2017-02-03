@@ -122,7 +122,7 @@ module Skylab::Tabular::TestSupport
         expect_on_stdout  "an-other-alternative  16  +++++++       "
 
         # (summaries later, probably as an option.)
-        expect_succeeded
+        expect_succeed
       end
     end
 
@@ -144,18 +144,18 @@ module Skylab::Tabular::TestSupport
         NOTHING_
       end
 
-      expect_succeeded
+      expect_succeed
 
       spy.close
     end
 
     def _expect_no_lines_in_input
       expect_on_stderr '(no lines in input. done.)'
-      expect_succeeded
+      expect_succeed
     end
 
     def _expect_unknown_option_zoopie_etc
-      expect_on_stderr %r(\Aunknown primary: "--zoopie\"\z)
+      expect_on_stderr %r(\Aunknown primary "--zoopie\"\z)
       expect_on_stderr %r(\Aexpecting \{)
       expect_invite_etc_
     end

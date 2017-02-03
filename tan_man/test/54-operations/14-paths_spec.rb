@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport
         black_and_white( ev ).should match(
           %r(\bmissing required arguments 'path' and 'verb') )
 
-        expect_failed
+        expect_fail
       end
 
       it "extra" do
@@ -37,7 +37,7 @@ module Skylab::TanMan::TestSupport
         black_and_white( ev ).should match(
           %r(\bunexpected arguments :wiz and :wazoozle) )
 
-        expect_failed
+        expect_fail
       end
 
       it "strange verb" do
@@ -48,7 +48,7 @@ module Skylab::TanMan::TestSupport
 
         _em.cached_event_value.verb.should eql :wiznippl
 
-        expect_failed
+        expect_fail
       end
 
       it "strange noun" do
@@ -59,7 +59,7 @@ module Skylab::TanMan::TestSupport
 
         _em.cached_event_value.did_you_mean.should be_include :generated_grammar_dir
 
-        expect_failed
+        expect_fail
       end
 
       it "retrieves (and possibly generates) the GGD path" do

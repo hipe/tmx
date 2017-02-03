@@ -32,13 +32,13 @@ module Skylab::TanMan::TestSupport
         ev.name_string.should eql 'wiz'
       end
 
-      expect_failed
+      expect_fail
     end
 
     it "good name, no workspace path" do
       call_API :starter, :set, :name, 'digr'
       expect_not_OK_event COMMON_MISS_
-      expect_failed
+      expect_fail
     end
 
     it "good name, workspace path, but config parse error" do
@@ -61,7 +61,7 @@ module Skylab::TanMan::TestSupport
       a[ 1 ].should eql "  1: using_starter=hoitus-toitus.dot\n"
       a[ 2 ].should eql "     ^"
 
-      expect_failed
+      expect_fail
     end
 
     it "good name, workspace path, good config" do
@@ -87,7 +87,7 @@ module Skylab::TanMan::TestSupport
 
       _ev.to_event.bytes.should eql 64
 
-      expect_succeeded
+      expect_succeed
 
       @output_s = @pn.read
 

@@ -59,7 +59,7 @@ module Skylab::Snag::TestSupport
         o.advance_to_before_Nth_last_line 1
         o.expect_styled_line.should match deeper_invite_rx
 
-        expect_succeeded
+        expect_succeed
       end
 
       it "2.3x4H (good arg/good opt) (help postfix) (param API)" do

@@ -17,9 +17,13 @@ module Skylab::Basic
       @flush_p[]
     end
 
+    word_stream_via_styled_string = nil
+    word_stream_via_plain_string = nil
+    lib = nil
+
     define_singleton_method :curry, ( -> do
 
-      build_word_scanner = build_word_pool = build_indenter = nil
+      build_word_pool = build_indenter = nil
       build_wrapping_indenter = -> indent_s, width_d, downstream_y do
         process_input_line = flush_full_lines = flush_hard = nil
         indenter = build_indenter[ indent_s, downstream_y ]
@@ -42,30 +46,44 @@ module Skylab::Basic
           flush_hard[]
         end
 
-        process_input_line = -> input_line do
+        process_input_line_nomally = -> input_line do
 
           input_line or fail 'never'
 
-          _sx = Home_.lib_.zerk::CLI::Styling.parse_styles input_line
-
-          _sx ||= [[ :string, input_line ]]
-
-          scn = build_word_scanner[ _sx ]
-          while (( word = scn.gets ))
-            word_pool << word
+          st = if lib::SIMPLE_STYLE_RX =~ input_line
+            word_stream_via_styled_string[ input_line ]
+          else
+            word_stream_via_plain_string[ input_line ]
           end
+
+          begin
+            word = st.gets
+            word || break
+            word_pool << word
+            redo
+          end while above
+
           flush_full_lines[]
         end
+
+        process_input_line = -> input_line do
+          lib = Home_.lib_.zerk::CLI::Styling
+          process_input_line = process_input_line_nomally
+          process_input_line[ input_line ]
+        end
+
         flush_hard = -> do
           flush_full_lines[]
           fragment_s = word_pool.flush_any_line_in_progress
           fragment_s and indenter << fragment_s ; nil
         end
+
         flush_full_lines = -> do
           while (( line = word_pool.gets ))
             indenter << line
           end ; nil
         end
+
         windenter
       end
 
@@ -77,51 +95,65 @@ module Skylab::Basic
 
       _SPACE_WORD = _Word.new nil, SPACE_, true
 
-      scan_string = scan_style = skip_final_style = nil
-      build_word_scanner = -> sx do
-        buffer_a = []
-        if sx
-          begin
-            befor = buffer_a.length
-            if :string == sx[ 0 ][ 0 ]
-              string = scan_string[ sx ]
-              word_a = string.split _WORD_SEPARATOR_RX
-              word_a.each do |s|
-                buffer_a << _Word.new( nil, s )
+      no_style = [:no_style]
+
+      word_stream_via_styled_string = -> str do
+
+        chunk_st = lib::ChunkStream_via_String[ str ]
+
+        word_st = nil ; p = nil ; main = nil
+        other_guy = -> do
+          w = word_st.gets
+          if w
+            w
+          else
+            p = main
+            p[]
+          end
+        end
+
+        main = -> do
+          chunk = chunk_st.gets
+          if chunk
+            styles = chunk.styles
+            if 1 == styles.length
+              if no_style == styles
+                word_st = word_stream_via_plain_string[ chunk.string ]
+                p = other_guy
+                p[]
+              else
+                _Word.new(
+                  lib::INTEGER_VIA_SYMBOL_HASH.fetch( styles.fetch 0 ),
+                  chunk.string
+                )
               end
-              sx.length.zero? and break
+            else
+              self._THIS_IS_THE_WORST
             end
-            if :style == sx[ 0 ][ 0 ]
-              _style_d = scan_style[ sx ]
-              _string = scan_string[ sx ]
-              skip_final_style[ sx ]
-              _word = _Word.new _style_d, _string
-              buffer_a << _word
-              sx.length.zero? and break
-            end
-            befor == buffer_a.length and fail "unexpected '#{ sx[ 0 ][ 0 ] }'"
-          end while true
+          end
         end
+
         p = -> do
-          buffer_a.shift
+          s = chunk_st.gets
+          if s
+            p = main
+            if s.length.zero?
+              p[]
+            else
+              _Word.new nil, s
+            end
+          end
         end
-        class << p
-          alias_method :gets, :call
-        end ; p
+
+        Common_.stream do
+          p[]
+        end
       end
-      scan_string = -> sx do
-        i, x = sx.shift
-        :string == i or fail "sanity - expected 'string' had '#{ i }'"
-        x
-      end
-      scan_style = -> sx do
-        i, x = sx.shift
-        :style == i or fail "sanity - expected 'style' had '#{ i }'"
-        x
-      end
-      skip_final_style = -> sx do
-        d = scan_style[ sx ]
-        d.zero? or fail "sanity - expected '0' had '#{ d }'" ; nil
+
+      word_stream_via_plain_string = -> str do
+        Stream_.call( str.split _WORD_SEPARATOR_RX ) do |s|
+          _Word.new nil, s
+        end
       end
 
       word_pool_class = nil
@@ -279,3 +311,4 @@ module Skylab::Basic
     end
   end
 end
+# #history: get rid of ancient sexp techinques, old parse styles

@@ -29,7 +29,7 @@ module Skylab::System::TestSupport
       )
 
       expect_not_OK_event :errno_enoent
-      expect_failed
+      expect_fail
     end
 
     it "do it" do

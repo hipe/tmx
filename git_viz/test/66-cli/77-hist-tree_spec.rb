@@ -114,7 +114,7 @@ module Skylab::GitViz::TestSupport
       expect " │ └funky like that                 |• ⬤ "
       expect " └move-after                        |  ●●"
 
-      expect_succeeded
+      expect_succeed
     end
 
     def __expect_shift_view_dots
@@ -130,7 +130,7 @@ module Skylab::GitViz::TestSupport
       expect " │ └funky like that                 |•     ⬤   "
       expect " └move-after                        |      ●  ●"
 
-      expect_succeeded
+      expect_succeed
     end
 
     def __FOR_THE_FUTURE_expect_solid_dots
@@ -142,7 +142,7 @@ module Skylab::GitViz::TestSupport
       expect " │ └funky like that                 | ⦿   ⬤  "
       expect " └move-after                        |     ⦿ ●"
 
-      expect_succeeded
+      expect_succeed
     end
 
     def manifest_path_for_stubbed_FS

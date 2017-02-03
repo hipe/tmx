@@ -19,7 +19,7 @@ module Skylab::Snag::TestSupport
       expect :o, %r{jerbis/one\.code:3:line three\b}
       expect :e, /\A\(3 to dos total\)\z/
 
-      expect_succeeded
+      expect_succeed
     end
 
     it "black and white tree" do
@@ -71,7 +71,7 @@ module Skylab::Snag::TestSupport
 
       cli.expect_on_stderr "hello from snag.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     define_method :_action, -> do
@@ -93,7 +93,7 @@ module Skylab::Snag::TestSupport
     def _expect_common_finish
       on_stream :e
       expect "(found 3 to do's total)"
-      expect_succeeded
+      expect_succeed
     end
   end
 end

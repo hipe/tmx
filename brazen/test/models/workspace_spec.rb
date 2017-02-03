@@ -80,7 +80,7 @@ module Skylab::Brazen::TestSupport
 
       expect_not_OK_event :resource_not_found
 
-      expect_failed
+      expect_fail
     end
 
     it "summarize (a development proxy of 'plural_noun')" do

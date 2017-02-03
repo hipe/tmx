@@ -397,6 +397,7 @@ module Skylab::Zerk
       NIL
     end  # egads
 #===
+    FAILURE_EXITSTATUS__ = 1319
     Here_ = self
   end
 end

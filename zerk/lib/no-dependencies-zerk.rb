@@ -1157,7 +1157,7 @@ module NoDependenciesZerk
       k = args.current_primary_symbol
       args.no_because do |y|
         _scn = avail_prim_scn.map_by { |sym| prim sym }
-        y << "unknown primary: #{ ick_prim k }"
+        y << "unknown primary #{ ick_prim k }"
         y << "available primaries: #{ oxford_and _scn }"
       end
     end

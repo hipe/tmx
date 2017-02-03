@@ -94,7 +94,7 @@ module Skylab::Brazen::TestSupport
       eql result_for_failure_for_expect_stdout_stderr
     end
 
-    def expect_succeeded
+    def expect_succeed
       expect_no_more_lines
       @exitstatus.should match_successful_exitstatus
     end

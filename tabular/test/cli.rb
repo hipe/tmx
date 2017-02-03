@@ -87,7 +87,7 @@ module Skylab::Tabular::TestSupport
       def expect_invite_etc_
         expect_usage_line_
         expect "use 'tab -h' for help"
-        expect_failed
+        expect_fail
       end
 
       def expect_usage_line_
@@ -96,7 +96,7 @@ module Skylab::Tabular::TestSupport
 
       # --
 
-      def prepare_CLI cli
+      def prepare_subject_CLI_invocation cli
         NOTHING_
       end
 

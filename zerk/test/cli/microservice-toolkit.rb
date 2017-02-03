@@ -76,7 +76,7 @@ module Skylab::Zerk::TestSupport
 
       expect_this_usage_
       expect_specific_invite_line_
-      expect_failed
+      expect_fail
     end
 
     def expect_specific_invite_line_
@@ -87,7 +87,7 @@ module Skylab::Zerk::TestSupport
 
     def expect_succeeded_with_ s
       expect :o, s
-      expect_succeeded
+      expect_succeed
     end
 
     def subject_class_

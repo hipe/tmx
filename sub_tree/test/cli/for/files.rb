@@ -28,7 +28,7 @@ module Skylab::SubTree::TestSupport
       _unindent expect_str
       flush_to_string_contiguous_lines_on_stream( :o ).should eql expect_str
 
-      expect_succeeded
+      expect_succeed
     end
 
     def _unindent str

@@ -24,7 +24,7 @@ module Skylab::TMX::TestSupport
       invoke 'snap'
       expect_on_stderr %r(\bexpecting\b)
       expect %r(\Ausage: tmz snap\b)
-      expect_failed
+      expect_fail
     end
 
     it "ambiguous between two categories of operator:" do
@@ -50,7 +50,7 @@ module Skylab::TMX::TestSupport
     it "ping" do
       invoke 'snap', '--ping'
       expect_on_stderr 'hello from tmz snap!'
-      expect_succeeded
+      expect_succeed
     end
 
     def _expect_this_same_help_screen
@@ -81,10 +81,10 @@ module Skylab::TMX::TestSupport
         line = line_
         p[]
       end
-      expect_succeeded
+      expect_succeed
     end
 
-    def prepare_CLI cli
+    def prepare_subject_CLI_invocation cli
       # (see other)
       NOTHING_
     end

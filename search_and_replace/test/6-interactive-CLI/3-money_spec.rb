@@ -48,13 +48,12 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "first match of first line is highlighted" do
 
-          _ = _lines.fetch 2
-          x_a = _parse_this_line _
+          _big_s = _lines.fetch 2
+          st = _chunk_stream_via_string _big_s
 
-          x_a.first.last == '  "' or fail
-          x_a[ 1 ].first == :style or fail
-
-          _ = x_a.reduce( "" ){ |m, x| :string == x.first and m << x.last ; m }
+          _ = st.join_into st.gets do |chunk|
+            chunk.string
+          end
 
           _ == "  \"wazoozle\" must only appear on this line, and only 2x. (\"wazoozle\")\n" or fail
         end
@@ -74,16 +73,15 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "the secone line is highlighted" do
 
-          _ = _lines.fetch 2
-          _x_a = _parse_this_line _
-          _x_a_ = _x_a.reduce [] do |m, x|
-            if :string == x.first
-              m << x.last
-            end
-            m
+          _big_s = _lines.fetch 2
+
+          st = _chunk_stream_via_string _big_s
+
+          _s_a = st.join_into [ st.gets ] do |chunk|
+            chunk.string
           end
 
-          _x_a_ == [
+          _s_a == [
             "  \"wazoozle\" must only appear on this line, and only 2x. (\"",
             "wazoozle",
             "\")\n",
@@ -105,9 +103,9 @@ module Skylab::SearchAndReplace::TestSupport
 
         it "having said yes to the second one, now it looks changed, colored purple" do
 
-          x_a = _parse_this_line _lines.last
-          x_a[ 1 ] == [ :style, 1, 34 ] or fail
-          x_a[ -3 ].last == "FANTABULOUS" or fail
+          chunks = _parse_this_line _lines.last
+          chunks[1].styles == [:strong, :blue] || fail
+          chunks[1].string == "FANTABULOUS" || fail
         end
 
         shared_subject :_lines do
@@ -222,7 +220,11 @@ module Skylab::SearchAndReplace::TestSupport
     end
 
     def _parse_this_line _
-      Home_.lib_.zerk::CLI::Styling::Parse_styles[ _ ]
+      _chunk_stream_via_string( _ ).to_a  # WEE
+    end
+
+    def _chunk_stream_via_string s
+      Home_.lib_.zerk::CLI::Styling::ChunkStream_via_String[ s ]
     end
 
     def __these_lines_of_interest

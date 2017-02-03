@@ -21,7 +21,7 @@ module Skylab::Snag::TestSupport
       expect_not_OK_event :syntax,
         'can\'t simultaneously (par "save") and (par "edit")'
 
-      expect_failed
+      expect_fail
     end
 
     it "name must be valid" do
@@ -34,7 +34,7 @@ module Skylab::Snag::TestSupport
         & handle_event_selectively_ )
 
       expect_not_OK_event :invalid_name, "invalid name (ick \"-not-valid-\")"
-      expect_failed
+      expect_fail
     end
 
     it "yes" do

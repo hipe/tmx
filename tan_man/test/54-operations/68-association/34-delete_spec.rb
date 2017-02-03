@@ -11,21 +11,21 @@ module Skylab::TanMan::TestSupport
       call_API_against "digraph {\n}\n"
       expect_not_OK_event :no_stmt_list
       expect_empty_output
-      expect_failed
+      expect_fail
     end
 
     it "remove when first node not found" do
       call_API_against "digraph {\nbaz}\n"
       expect_not_OK_event :node_not_found, 'node not found - (ick "foo")'
       expect_empty_output
-      expect_failed
+      expect_fail
     end
 
     it "remove when 2nd node not found" do
       call_API_against "digraph {\n foo [ label = \"foo\"]\n }\n"
       expect_not_OK_event :node_not_found, 'node not found - (ick "bar")'
       expect_empty_output
-      expect_failed
+      expect_fail
     end
 
     it "remove when not associated" do
@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport
       expect_not_OK_event :component_not_found,
         'association not found - (code "foo -> bar")'
       expect_empty_output
-      expect_failed
+      expect_fail
     end
 
     it "remove when associated" do
@@ -43,7 +43,7 @@ module Skylab::TanMan::TestSupport
       end
       @output_s.should eql "digraph {\n foo\nbar\n}\n"
       expect_event :wrote_resource
-      expect_succeeded
+      expect_succeed
     end
 
     def expect_empty_output

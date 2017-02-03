@@ -10,7 +10,7 @@ module Skylab::Cull::TestSupport
     it "a random string with no prefix - treated as path" do
       freshly_initted_against 'zoidberg'
       expect_not_OK_event :path_must_be_absolute
-      expect_failed
+      expect_fail
     end
 
     it "use a strange prefix" do
@@ -22,13 +22,13 @@ module Skylab::Cull::TestSupport
       black_and_white_lines( _em.cached_event_value ).should eql(
         [ 'unrecognized prefix "zoidberg"', 'did you mean "file"?' ] )
 
-      expect_failed
+      expect_fail
     end
 
     it "use the 'file' prefix but noent" do
       freshly_initted_against 'file:wazoo.json'
       expect_not_OK_event_ :errno_enoent
-      expect_failed
+      expect_fail
     end
 
     def freshly_initted_against s
@@ -115,7 +115,7 @@ module Skylab::Cull::TestSupport
         :path, freshly_initted_path_
 
       expect_not_OK_event :no_upstream_set
-      expect_failed
+      expect_fail
     end
 
     it "unset - yes" do
@@ -135,7 +135,7 @@ module Skylab::Cull::TestSupport
       black_and_white( _em.cached_event_value ).should eql(
         "deleted 3 'upstreams'" )
 
-      expect_succeeded
+      expect_succeed
     end
 
     def _prepare_tmpdir_with_patch_and_do_common sym
@@ -173,7 +173,7 @@ module Skylab::Cull::TestSupport
 
       _em.cached_event_value.to_event.is_completion.should eql true
 
-      expect_succeeded
+      expect_succeed
     end
 
     def __expect_detail td

@@ -31,7 +31,7 @@ module Skylab::TMX::TestSupport
 
         invoke _subject_operation, same
 
-        expect_on_stderr "unknown primary: \"#{ same }\""
+        expect_on_stderr "unknown primary \"#{ same }\""
 
         _ = '-[a-z]+(?:-[a-z]+)*'
 
@@ -133,7 +133,7 @@ module Skylab::TMX::TestSupport
         invoke _subject_operation
         expect_on_stdout 'tyris'
         expect 'deka'
-        expect_succeeded
+        expect_succeed
       end
 
       given_ %w( tyris deka )
@@ -147,7 +147,7 @@ module Skylab::TMX::TestSupport
           _invoke_same
           expect_on_stdout "damud 44"
           expect "adder 33"
-          expect_succeeded
+          expect_succeed
         end
 
         given_ %w( damud adder )
@@ -158,7 +158,7 @@ module Skylab::TMX::TestSupport
         it "displays a DASH for the value" do
           _invoke_same
           expect_on_stdout "frim_frum -"
-          expect_succeeded
+          expect_succeed
         end
 
         given_ %w( frim_frum )
@@ -196,7 +196,7 @@ module Skylab::TMX::TestSupport
         NIL
       end
 
-      expect_succeeded
+      expect_succeed
 
       if find
         fail "did not find: #{ find.inspect } in #{ count } lines"
@@ -212,13 +212,13 @@ module Skylab::TMX::TestSupport
         expect_on_stdout 'stern'
         expect 'damud'
         expect 'guld'
-        expect_succeeded
+        expect_succeed
       end
 
       given_ %w( tyris trix stern damud guld )
     end
 
-    def prepare_CLI cli
+    def prepare_subject_CLI_invocation cli
       cli.json_file_stream_by { X_c_op_explosive_stream[] }
       NIL
     end

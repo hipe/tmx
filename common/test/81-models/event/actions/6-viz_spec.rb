@@ -28,7 +28,7 @@ module Skylab::Common::TestSupport
         }
       HERE
 
-      expect_succeeded
+      expect_succeed
     end
 
     def subject_API

@@ -23,7 +23,7 @@ module Skylab::Common::TestSupport
       black_and_white( _em.cached_event_value ).should match(
         %r(\Aevent: #<Skylab::Common::TestSupport::.*\bMock_Old_Event) )
 
-      expect_succeeded
+      expect_succeed
     end
 
     def subject_API

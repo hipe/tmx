@@ -126,6 +126,7 @@ module Skylab::Zerk
 
   module Types__
 
+    self._GONE
     mod = Home_::CLI::Styling
     unstyle = mod::Unstyle
 
@@ -135,7 +136,9 @@ module Skylab::Zerk
     hackable_a = [ :style, :string, :style ]
 
     common = -> fld do
+
       fmt = "%#{ '-' if fld.is_align_left }#{ fld.max_width :full }s"
+
       -> str do
         sexp = parse_styles[ str ]  # are you ready for ridiculous? if the
         if sexp  # string was styled, remove the styling, apply the width

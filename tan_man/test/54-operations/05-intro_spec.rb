@@ -9,13 +9,13 @@ module Skylab::TanMan::TestSupport
     it "the API is called with `call` - the empty call reports as error" do
       call_API
       expect_not_OK_event :no_such_action, "no such action - (ick nil)"
-      expect_failed
+      expect_fail
     end
 
     it "called with a strange name is a soft error" do
       call_API :wazii, :wazoo
       expect_not_OK_event :no_such_action, "no such action - (ick :wazii)"
-      expect_failed
+      expect_fail
     end
 
     it "xtra tokens on a ping" do
@@ -34,7 +34,7 @@ module Skylab::TanMan::TestSupport
 
       black_and_white( ev ).should eql __
 
-      expect_failed
+      expect_fail
     end
 
     it "sing sing sing to me" do

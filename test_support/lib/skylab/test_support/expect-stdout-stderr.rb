@@ -252,12 +252,12 @@ module Skylab::TestSupport
 
       # ~ for the end
 
-      def expect_failed
+      def expect_fail
         expect_no_more_lines
         expect_result_for_failure
       end
 
-      def expect_succeeded
+      def expect_succeed
         expect_no_more_lines
         expect_result_for_success
       end

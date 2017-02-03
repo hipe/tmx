@@ -20,7 +20,7 @@ module Skylab::Git::TestSupport
         black_and_white( _em.cached_event_value ).should match(
           /\Athere is no stow "stow-wadoodle" in stows collection «[^»]+»\z/ )
 
-        expect_failed
+        expect_fail
       end
     end
 
@@ -83,7 +83,7 @@ module Skylab::Git::TestSupport
 
         expect_neutral_event :mkdir
         expect_neutral_event_ :file_utils_mv_event
-        expect_succeeded
+        expect_succeed
 
         st = dirs_in_ path
         st_ = files_in_ path

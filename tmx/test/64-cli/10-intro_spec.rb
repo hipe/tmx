@@ -40,7 +40,7 @@ module Skylab::TMX::TestSupport
 
     it "strange option - explain, splay, invite" do
       invoke '-x'
-      expect_on_stderr "unknown primary: \"-x\""
+      expect_on_stderr "unknown primary \"-x\""
       expect_on_stderr "available primaries: -help and -verbose"
       expect_failed_normally_  # #coverpoint-1-F
     end
@@ -125,7 +125,7 @@ module Skylab::TMX::TestSupport
 
     def _expect_pinged
       expect_on_stderr "hello from tmx"
-      expect_succeeded
+      expect_succeed
     end
 
     # -- setup

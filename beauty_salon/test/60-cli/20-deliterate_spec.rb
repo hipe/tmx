@@ -51,7 +51,7 @@ module Skylab::BeautySalon::TestSupport
       expect :o, EMPTY_S_
       expect :o, "      if @to_line < @from_line"
       expect :e, "for example, you could deliterate these lines."
-      expect_succeeded
+      expect_succeed
     end
   end
 end

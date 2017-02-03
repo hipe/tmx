@@ -39,7 +39,7 @@ module Skylab::BeautySalon::TestSupport
         "i mean WaZOOzle!\n",
       ])
 
-      expect_succeeded
+      expect_succeed
     end
 
     def _universal_fixture sym

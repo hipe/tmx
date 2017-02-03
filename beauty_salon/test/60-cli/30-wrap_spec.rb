@@ -52,7 +52,7 @@ module Skylab::BeautySalon::TestSupport
       expect :e, %r(\Acouldn't wrap text because ambiguous upstr)
       expect :e
 
-      expect_failed
+      expect_fail
     end
 
     it "[tmx] integration (stowaway)", TMX_CLI_integration: true do
@@ -65,7 +65,7 @@ module Skylab::BeautySalon::TestSupport
 
       cli.expect_on_stderr "hello from beauty salon.\n"
 
-      cli.expect_succeeded_under self
+      cli.expect_succeed_under self
     end
 
     def _stdin_mocks

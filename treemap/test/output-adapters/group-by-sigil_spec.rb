@@ -20,7 +20,7 @@ module Skylab::Treemap::TestSupport
         :stderr, :_no_stderr_,
         :output_adapter, 'group-by-sigi'
 
-      expect_succeeded
+      expect_succeed
       scn = TestSupport_::Expect_Line::Scanner.via_string io.string
 
       scn.next_line.should eql "[ab]...(3)\n"

@@ -55,7 +55,7 @@ module Skylab::TestSupport::TestSupport
 
       on_stream :o
       expect :styled, "└──( foo.kode <-> foo_speg.kode )"
-      expect_succeeded
+      expect_succeed
     end
 
     def _invoke * argv

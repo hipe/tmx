@@ -94,7 +94,7 @@ module Skylab::Zerk::TestSupport
 
         _act = em.express_into_under "", expag_
 
-        _act == 'unknown primary: "zing-bling"' || fail
+        _act == 'unknown primary "zing-bling"' || fail
       end
 
       it "when use a primary that was subtracted" do
@@ -134,7 +134,7 @@ module Skylab::Zerk::TestSupport
         em.channel_symbol_array == %i( error expression parse_error subtracted_primary_was_referenced ) || fail
 
         _act = em.express_into_under "", expag_
-        _act == 'unknown primary: "-ding-dong"' || fail
+        _act == 'unknown primary "-ding-dong"' || fail
       end
 
     # -

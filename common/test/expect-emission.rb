@@ -180,11 +180,11 @@ module Skylab::Common::TestSupport
             end
             em_.should _match_expev_em_via_3( false, * x_a, & x_p )
           end
-          expect_failed
+          expect_fail
           em
         end
 
-        def expect_failed
+        def expect_fail
           __expev_expect_failed_result
           _expect_no_next_actual_expev_emission
         end
@@ -194,7 +194,7 @@ module Skylab::Common::TestSupport
           _expect_no_next_actual_expev_emission
         end
 
-        def expect_succeeded
+        def expect_succeed
           expect_succeeded_result
           _expect_no_next_actual_expev_emission
         end
