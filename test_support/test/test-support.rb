@@ -207,10 +207,13 @@ module Skylab::TestSupport::TestSupport
   Autoloader_ = Common_::Autoloader
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
-  Lazy_ = Common_::Lazy
+  DASH_ = Home_::DASH_
   EMPTY_A_ = Common_::EMPTY_A_
+  EMPTY_S_ = Common_::EMPTY_S_
+  Lazy_ = Common_::Lazy
   NOTHING_ = nil
   TS_ = self
   UNABLE_ = false
+  UNDERSCORE_ = Home_::UNDERSCORE_
 end
 # :+tombstone: 'mock_FS' as bundle

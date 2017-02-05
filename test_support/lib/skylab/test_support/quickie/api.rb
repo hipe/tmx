@@ -4,6 +4,135 @@ module Skylab::TestSupport
 
     module API
 
+      # NOTE:
+      #
+      #   - this node started life as a "performer" (session or actor) that
+      #     loaded test files for the quickie recursive runner.
+      #
+      #   - it then evolved to constitute the implementation of the API
+      #     invocation-model for "one-file", an effort whose primary
+      #     objective is to make testing unawkward by obviating a CLI there.
+      #
+      #   - now (ironically or not) it also houses the CLI *for* the
+      #     recursive runner.
+      #
+      #   - also it now holds the API invocation-model for the recursive
+      #     runner.
+
+      class << self
+
+        def invocation_via_argument_array a, & p
+          API_for_RecursiveRunner___.new p, a
+        end
+      end  # >>
+
+      # ==
+
+      class CLI_for_RecursiveRunner
+
+        class << self
+          def call argv, i, o, e, pn_a
+            new( argv, i, o, e, pn_a ).execute
+          end
+          alias_method :[], :call
+          # private :new  #testpoint
+        end  # >>
+
+        def initialize argv, i, o, e, pn_a
+          @__ARGV = argv
+          @stderr = e
+        end
+
+        def execute
+
+          Require_zerk_[]
+          cli = Zerk_::CLI::MicroserviceToolkit
+
+          did_err = false
+
+          _listener = cli::Listener_via.call_by do |o|
+
+            o.receive_did_err_by = -> { did_err = true }
+            o.resource_by = method :__resource
+
+            o.stderr = @stderr
+          end
+
+          _argv = remove_instance_variable :@__ARGV
+
+          _as = cli::ArgumentScanner_via_ArgumentArray[ _argv, & _listener ]
+
+          x = Here_::TreeRunnerMicroservice.call_by do |o|
+            o.argument_scanner = _as
+          end
+
+          if did_err
+            GENERIC_ERROR_EXITSTATUS___
+          elsif x.nil?
+            cli::SUCCESS_EXITSTATUS
+          else
+            :_ping_from_quickie_tree_runner_microservice_ == x || self._DO_ME
+            cli::SUCCESS_EXITSTATUS
+          end
+        end
+
+        def __resource k
+          instance_variable_get RESOURCES___.fetch k
+        end
+
+        RESOURCES___ = { line_downstream_for_help: :@stderr }
+      end
+
+      # ==
+
+      class API_for_RecursiveRunner___
+
+        # (we need a dedicated API invocation client separate from the
+        # tree runner microservice only because we to do the reconciliation
+        # of resources like "line downstream for help" in a way custom for
+        # API, in what we used to call #masking..)
+
+        def initialize p, a
+          @argument_scanner = No_deps_zerk_[]::API_ArgumentScanner.new a, & p
+        end
+
+        def execute
+
+          _msvc = Here_::TreeRunnerMicroservice.define do |o|
+            o.argument_scanner = @argument_scanner
+            o.listener = method :__receive_emission
+          end
+
+          _hi = _msvc.execute
+          _hi  # #todo
+        end
+
+        def __receive_emission * chan, & p
+          if :resource == chan.first
+            _something = receive_resource_request p, chan
+            _something  # #hi.
+          else
+            _maybe_line_medium = @argument_scanner.listener[ * chan, & p ]
+            _maybe_line_medium  # #hi.
+          end
+        end
+
+        def receive_resource_request _p, chan
+          send RESOURCES___.fetch( chan.fetch 1 ), * chan[ 2..-1 ]
+        end
+
+        RESOURCES___ = {
+          line_downstream_for_help: :__line_downstream_for_help,
+        }
+
+        def __line_downstream_for_help
+          @argument_scanner.listener.call :error, :expression, :mode_mismatch do |y|
+            y << "no 'help' for API client"
+          end
+          NOTHING_
+        end
+      end
+
       # ==
 
       class API_InjectedClient_via_Listener_and_Arguments < Common_::Dyadic
@@ -628,6 +757,9 @@ module Skylab::TestSupport
       end
 
       # ==
+
+      GENERIC_ERROR_EXITSTATUS___ = 113
+
       # ==
     end  # API
   end

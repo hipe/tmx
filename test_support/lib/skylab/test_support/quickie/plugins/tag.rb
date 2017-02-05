@@ -4,6 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Tag
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
         @adapter = adapter
         @sw = adapter.build_required_arg_switch FLAG__
@@ -19,11 +23,17 @@ module Skylab::TestSupport
         ARGS_MONIKER__
       end
       ARGS_MONIKER__ = "#{ FLAG__ }=<tag>"
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "passes through to the test runner."
       end
 
+      if false
       def prepare sig
         @sig = sig
         @_d_a = @sw.any_several_indexes_in_input @sig
@@ -85,6 +95,7 @@ module Skylab::TestSupport
         end
         @sig.rely :CULLED_TEST_FILES
         @result_of_prepare = @sig ; nil
+      end
       end
     end
   end

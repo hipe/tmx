@@ -3,7 +3,8 @@
 [#023]       baseless collection ..
 [#013]       pending processing queue ..
 [#012]       [ filesystem-based ]
-[#011] #open legacy table for a help screen is not covered
+[#011] #hole
+             ( #was: legacy table for a help screen is not covered )
 [#010]       bundle defined ..
 [#009]       pros and const of the add method pattern
 [#008]       "the plugin manifesto" ..

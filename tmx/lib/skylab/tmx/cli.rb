@@ -20,7 +20,7 @@ module Skylab::TMX
         Require_interface_lib___[]
 
         @_do_dispatch_help = false
-        @_emission_handler_methods = nil
+        @_data_emission_handler_method_via_terminal_channel_symbol = nil
         @listener = method :__receive_emission
         @args = __argument_scanner_via_argv_and_listener argv
         @__presumably_real_ARGV = argv
@@ -257,12 +257,18 @@ module Skylab::TMX
 
         @_express = :__express_for_test_all
 
-        @_emission_handler_methods = {
-          # (special handling of emissions by terminal channel name symbol)
-          find_command_args: :_no_op,
-        }
-
         @_table_schema = nil  # gets set by an emission if relevant
+
+        _custom_listener = -> * chan, & p do
+          # experimentally this feature was simplified out of the remote lib
+          if :find_command_args == chan.last
+            send @_on_find_command_do_this, p, chan
+          else
+            @listener[ * chan, & p ]
+          end
+        end
+
+        @_on_find_command_do_this = :_no_op
 
         arg_scn = _multimode_argument_scanner_by do |o|
 
@@ -270,7 +276,7 @@ module Skylab::TMX
 
           o.add_primary :help, method( :_express_help ), Describe_help__  # #coverpoint-1-C OPEN
 
-          o.emit_into @listener
+          o.emit_into _custom_listener
         end
 
         arg_scn.on_first_branch_item_not_found do
@@ -313,7 +319,7 @@ module Skylab::TMX
       end
 
       def receive_notification_that_you_should_express_find_commands
-        @_emission_handler_methods[ :find_command_args ] = :__express_current_find_command
+        @_on_find_command_do_this = :__express_current_find_command
         ACHIEVED_
       end
 
@@ -323,8 +329,9 @@ module Skylab::TMX
 
       # ~ emissions
 
-      def __express_current_find_command
-        @_current_emission_expression.express_normally
+      def __express_current_find_command p, chan
+        self._REVIEW__changed_recently__be_sure_it_doesnt_inf_loop
+        @listener[ * chan, & p ]
         NIL
       end
 
@@ -457,7 +464,8 @@ module Skylab::TMX
 
       def on_this_do_this k, & p  # k = terminal_channel_symbol
 
-        @_emission_handler_methods[ k ] = :__on_this_do_this
+        @_data_emission_handler_method_via_terminal_channel_symbol ||= {}
+        @_data_emission_handler_method_via_terminal_channel_symbol[ k ] = :__on_this_do_this
         ( @__on_this_do_this ||= {} )[ k ] = p
 
         NIL
@@ -649,15 +657,14 @@ module Skylab::TMX
           end
 
           o.emission_proc_and_channel em_p, chan
-          o.emission_handler_methods = @_emission_handler_methods
           o.client = self
             # emissions of `emission_handler_methods`, `data`
         end
 
         @_current_emission_expression = expr
 
-        rslt = expr.execute
-        if rslt && rslt.was_error
+        sct = expr.execute
+        if sct && sct.was_error
           __when_result_was_error chan
         end
 
@@ -714,7 +721,7 @@ module Skylab::TMX
         NIL
       end
 
-      def _no_op
+      def _no_op(*)
         NOTHING_
       end
 
@@ -736,7 +743,16 @@ module Skylab::TMX
       # ~
 
       def receive_data_emission data_p, channel
-        send RECEIVE_DATA___.fetch( channel.fetch(1) ), & data_p
+
+        h = @_data_emission_handler_method_via_terminal_channel_symbol
+        if h
+          m = h[ channel.fetch( -1 ) ]
+        end
+        if m
+          send m, & data_p
+        else
+          send RECEIVE_DATA___.fetch( channel.fetch(1) ), & data_p
+        end
       end
 
       RECEIVE_DATA___ = {

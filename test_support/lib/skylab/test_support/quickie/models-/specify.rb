@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    module Actors_::Specify
+    module Models_::Specify
 
       class << self
 

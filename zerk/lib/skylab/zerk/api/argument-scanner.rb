@@ -168,9 +168,12 @@ module Skylab::Zerk
 
         def __branch_item_categorization_via_normal_symbol k
 
-          x = @request.operator_branch.lookup_softly k
-          if x
-            _obe = Home_::ArgumentScanner::OperatorBranchItem.via_user_value_and_normal_symbol x, k
+          trueish_x = @request.operator_branch.lookup_softly k
+          if trueish_x
+
+            _obe = Home_::ArgumentScanner::OperatorBranchItem.
+              via_user_value_and_normal_symbol trueish_x, k
+
             @_::ItemFound_via_Item[ _obe ]
           else
             @_::ItemNotFound_via_ReasoningSymbol[ :unknown_primary ]

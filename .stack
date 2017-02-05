@@ -11,13 +11,11 @@ use [sa] to convert etc to Stream_
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
+[#sa-035] re-integrate this operation with "wip-files"
   (#open [#ts-030.C] quickie plugin arch needs re-arch - too confusing)
   (#open [#ts-032.A] the "counts report is not covered)
   (#open [#ts-032.B] verbose mode for counts is borked)
 -3.090 #open [#ts-002] coverage in the recursive runner
-  (the below is #open [#ts-030.B])
-  .. which closes [#ze-022.4] and has corollaries
--3.103 help screen for quickie
 -3.109 request parsing must reconcile the state machine (probably a new branch)
 -3.125 tree runner can be invoked by a CLI or API scanner
 -3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
@@ -32,3 +30,15 @@ use [sa] to convert etc to Stream_
 -0.038 universal integration closes: [#ts-004] module names (and:)
 -0.077 consider #wish [#ts-030.4] quickie onefile drops into recursive runner
 -0.115 re-integrate with recursive runner - note no line ranges there, yes tags
+-1 plugin
+-2 plugin
+-3 plugin
+-4 plugin
+-5 plugin
+-6 plugin
+-7 plugin
+-8 plugin
+-9 plugin
+-10 plugin
+cover eventpoint-based providing just a list of files (integrated with CLI)
+cover eventpoint-based providing just a listing of test files (API only)

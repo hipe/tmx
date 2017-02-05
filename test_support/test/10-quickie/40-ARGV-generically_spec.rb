@@ -25,7 +25,9 @@ module Skylab::TestSupport::TestSupport
     end
 
     it "help screen!" do
-      # (hand-written #[#ze-054] help screen parser.)
+
+      # #[#007.B] hand-written #[#ze-054] help screen parser for now
+
       invoke '-h'  # NOTE - if you pass an arg it will activate case #here
       on_stream :serr
       p = nil
@@ -40,7 +42,7 @@ module Skylab::TestSupport::TestSupport
       item = -> line do
         md = rx.match line
         # ..
-        seen[ md[1].gsub( Home_::DASH_, Home_::UNDERSCORE_ ).intern ] = true
+        seen[ md[1].gsub( DASH_, UNDERSCORE_ ).intern ] = true
       end
       options = -> line do
         line == "options:" || fail

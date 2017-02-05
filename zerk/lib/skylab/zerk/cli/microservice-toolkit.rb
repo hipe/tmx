@@ -2,6 +2,54 @@ module Skylab::Zerk
 
   module CLI::MicroserviceToolkit
 
+    class Listener_via < Common_::MagneticBySimpleModel
+
+      def initialize
+        @resource_by = nil
+        super
+      end
+
+      attr_writer(
+        :receive_did_err_by,
+        :resource_by,
+        :stderr,
+      )
+
+      def execute
+        method :__receive_emission
+      end
+
+      def __receive_emission * chan, & ev
+
+        sct = No_deps_zerk_[]::CLI_Express_via_Emission.call_by do |o|
+          o.emission_proc_and_channel ev, chan
+          o.resource_by = @resource_by
+          o.stderr = @stderr
+        end
+
+        if sct
+          if sct.has_resource
+            sct.resource
+          elsif sct.was_error
+            @receive_did_err_by[]
+            NIL
+          end
+        end
+      end
+    end
+
+    # ==
+
+    ArgumentScanner_via_ArgumentArray = -> argv, & listener do  # 1x: [ts] (#frontier)
+
+      No_deps_zerk_[]::CLI_ArgumentScanner.define do |o|
+        o.ARGV = argv
+        o.listener = listener
+      end
+    end
+
+    # ==
+
     Autoloader_[ self ]
     lazily :IsomorphicMethodsClient do
       Egads___[]
@@ -397,8 +445,8 @@ module Skylab::Zerk
       NIL
     end  # egads
 #===
-    FAILURE_EXITSTATUS__ = 1319
     Here_ = self
+    SUCCESS_EXITSTATUS = SUCCESS_EXITSTATUS  # part of subject's public API
   end
 end
 # #history: moved to [ze] from [br]

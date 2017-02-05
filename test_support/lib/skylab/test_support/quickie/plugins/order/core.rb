@@ -4,6 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Order
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
 
         @_adapter = adapter
@@ -16,17 +20,25 @@ module Skylab::TestSupport
       def args_moniker
         ARGS_MONIKER__
       end
+      end
 
       FLAG__ = '-order'.freeze
 
+      if false
       ARGS_MONIKER__ = "#{ FLAG__ }=M-N"
 
       DEFAULT__ = '1-N'
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "(use \"#{ _flag }=help\")"
       end
 
+      if false
       def prepare sig
 
         match = @_switch.any_first_match_in_input sig
@@ -192,6 +204,7 @@ module Skylab::TestSupport
 
       def _y
         @_adapter.y
+      end
       end
 
       def _flag

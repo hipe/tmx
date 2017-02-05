@@ -8,7 +8,8 @@ module Skylab::Brazen
 
         class Normalization  # :[#057].
 
-          # NOTE this is similar to but not the same as [#ze-022.2].
+          # NOTE this is similar to but not the same as [#ze-022.4]
+          # isomorphic method arguments.
           #
           # given one array of formal parameters and one ARGV-like array,
           # parse the arguments off the ARGV and into some kind of store

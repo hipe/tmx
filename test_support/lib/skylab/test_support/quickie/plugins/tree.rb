@@ -4,6 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Tree
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -tree )
         @adapter = adapter
@@ -15,12 +19,18 @@ module Skylab::TestSupport
 
       def args_moniker
       end
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "like -list but as a tree (experimental)"
         y << "(mutually exclusive with -list)"
       end
 
+      if false
       def prepare sig
         idx = @fuzzy_flag.any_first_index_in_input sig
         if idx
@@ -65,6 +75,7 @@ module Skylab::TestSupport
         if slug_a
           [ slug_a * tree.path_separator, tree ]
         end
+      end
       end
     end
   end

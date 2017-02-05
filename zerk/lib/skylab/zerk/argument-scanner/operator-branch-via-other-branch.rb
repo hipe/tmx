@@ -47,14 +47,14 @@ module Skylab::Zerk
 
         # -- read-time
 
-        def lookup_softly k
-          x = @_other.lookup_softly k
-          if x
+        def lookup_softly k  # #[#ze-051.1] "trueish item value"
+          trueish_x = @_other.lookup_softly k
+          if trueish_x
             # hi.
             if @_blacklist_hash[ k ]
               NOTHING_  # hi.
             else
-              x
+              trueish_x
             end
           end
         end

@@ -14,7 +14,7 @@ module Skylab::TestSupport::TestSupport
       red.write "r2\nnever see"
       g.lines.length.should eql(4)
       g.lines.map( & :stream_symbol ).should eql( [ :red, :blue, :blue, :red ] )
-      g.lines.map(&:string).join( Home_::EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
+      g.lines.map(&:string).join( EMPTY_S_ ).should eql("r1\nb1\nb2\nr2\n")
     end
 
     def _subject_module

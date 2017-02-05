@@ -138,6 +138,12 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
+  # --
+
   Common_ = ::Skylab::Common
 
   Lazy_ = Common_::Lazy

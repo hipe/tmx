@@ -97,17 +97,15 @@ module Skylab::Zerk
           NOTHING_
         end
 
-        def lookup_softly k
-
-          user_x = nil ; x = nil
+        def lookup_softly k  # #[#ze-051.1] "trueish item value"
+          my_trueish_x = nil
           @_count.times do |d|
-            user_x = @_operator_braches[d].lookup_softly k
-            if user_x
-              x = _special_value @_value_stores.fetch(d), user_x
-              break
-            end
+            trueish_x = @_operator_braches[d].lookup_softly k
+            trueish_x || next
+            my_trueish_x = _special_value @_value_stores.fetch(d), trueish_x
+            break
           end
-          x
+          my_trueish_x
         end
 
         def to_pair_stream

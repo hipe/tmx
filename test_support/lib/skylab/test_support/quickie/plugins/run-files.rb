@@ -2,8 +2,12 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugins::RunRecursive
+    class Plugins::RunFiles
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
         @be_verbose = false
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -verbose )
@@ -23,12 +27,18 @@ module Skylab::TestSupport
       end
 
       ARGS_MONIKER__ = '<path> [..]'.freeze
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "looks for test files recursively"
         y << "in the indicated path(s)"
       end
 
+      if false
       def prepare sig
 
         argv = sig.input
@@ -208,6 +218,7 @@ module Skylab::TestSupport
           }under \"#{ path }\""
 
         NIL_
+      end
       end
     end
   end

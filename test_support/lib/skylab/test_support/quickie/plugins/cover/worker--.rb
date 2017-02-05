@@ -170,7 +170,7 @@ module Skylab::TestSupport
       end
 
       def resolve_stderr_IO
-        @adapter.infostream
+        @adapter.stderr
       end
 
       Longest_common_base_path__ = -> do  # becase we are covering that

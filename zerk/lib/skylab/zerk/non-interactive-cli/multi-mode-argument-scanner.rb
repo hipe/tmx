@@ -1105,9 +1105,9 @@ module Skylab::Zerk
           if p
             item = AddedBranchItem__.via_user_value_and_normal_symbol p, k
           else
-            x = wfr.request.operator_branch.lookup_softly k
-            if x
-              item = OperatorBranchItem__.via_user_value_and_normal_symbol x, k
+            trueish_x = wfr.request.operator_branch.lookup_softly k
+            if trueish_x
+              item = OperatorBranchItem__.via_user_value_and_normal_symbol trueish_x, k
             end
           end
 
@@ -1119,9 +1119,9 @@ module Skylab::Zerk
           req = wfr.request
 
           k = wfr.well_formed_symbol
-          x = req.operator_branch.lookup_softly k
-          if x
-            _item = OperatorBranchItem__.via_user_value_and_normal_symbol x, k
+          trueish_x = req.operator_branch.lookup_softly k
+          if trueish_x
+            _item = OperatorBranchItem__.via_user_value_and_normal_symbol trueish_x, k
             AS_Lib__::Magnetics::ItemFound_via_Item[ _item ]
           elsif req.do_fuzzy_lookup
             __business_categorization_fuzzily wfr

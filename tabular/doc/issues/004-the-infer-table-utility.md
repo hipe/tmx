@@ -18,7 +18,7 @@ implementing an unsurprising grammar for generic "records".
 on a per-line (record) basis, we attempt to convert each of these
 "field" values (as strings) to their simple platform `type`. probably
 we will have builtin support for only strings, ints, floats, and
-booleans.
+booleans. (think JSON.)
 
   - support for parsing numbers only in the most unsurprising,
     simple way: [ negative sign ] digits [ decimal, digits ]
@@ -128,7 +128,7 @@ as numeric but column A is not.
 ## imagined crazy yo-yo sequence:
 
 all of the below will be mocking (or actually doing)
-a "user storey" that is a a minimal super-case.
+a "user story" that is a minimal super-case.
 
   -8. mock UI with a failure case (how?) and success
       this makes the executable binary and some

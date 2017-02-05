@@ -17,7 +17,7 @@ module Skylab::TMX
           :installation,
         )
 
-        def lookup_softly sym
+        def lookup_softly sym  # #[#ze-051.1] "trueish item value"
           _ = @installation.load_ticket_via_normal_symbol_softly sym
           _  # #todo
         end

@@ -183,11 +183,11 @@ module Skylab::TestSupport::TestSupport
         o.expect "  include {:zib_zub=>true}"
         o.expect "  exclude {:shib_shub=>true}"
         o.expect
-        o.expect Home_::EMPTY_S_  # <- this one might an accident (the root node with no desc)?
+        o.expect EMPTY_S_  # <- this one might an accident (the root node with no desc)?
         o.expect                "  c1"
-        o.expect_styled :green, "    eg2"
+        o.expect_styled_content "    eg2", :green
         expect_finished_line_ o
-        o.expect_styled :green, "1 example, 0 failures"
+        o.expect_styled_content "1 example, 0 failures", :green
       end
 
       def ARGV_

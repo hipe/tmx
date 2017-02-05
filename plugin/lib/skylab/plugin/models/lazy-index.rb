@@ -16,7 +16,13 @@ module Skylab::Plugin
         :operator_branch,
       )
 
-      def offset_of_touched_plugin_via_user_value lt
+      def dereference_plugin_via_user_value lt  # #here
+        lt.HELLO_LOAD_TICKET
+        dereference_plugin offset_of_touched_plugin_via_user_value lt
+      end
+
+      def offset_of_touched_plugin_via_user_value lt  # #here
+        lt.HELLO_LOAD_TICKET
         key_x = @operator_branch.natural_key_of lt
         @_offset_via_natural_key.fetch key_x do
           plugin = __load_plugin lt  # if nil/false, it's OK we cache that too
@@ -29,7 +35,9 @@ module Skylab::Plugin
 
       def __load_plugin lt
 
-        cls = @operator_branch.dereference_user_value lt
+        lt.HELLO_LOAD_TICKET
+
+        cls = @operator_branch.dereference_user_value lt  # #here
         # ..
         @construct_plugin_by[ cls ]
       end
@@ -56,4 +64,5 @@ module Skylab::Plugin
     # -
   end
 end
+# :#here denotes areas where we're confused about whether to pass a.t's or l.t's
 # #tombstone-A: full rewrite from "dependencies"

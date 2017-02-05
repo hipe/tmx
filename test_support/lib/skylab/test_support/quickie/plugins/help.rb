@@ -4,110 +4,85 @@ module Skylab::TestSupport
 
     class Plugins::Help
 
-      def initialize adapter
-        @fuzzy_flag = adapter.build_fuzzy_flag %w( -help )
-        @adapter = adapter
-        @y = adapter.y
-      end
+      # -
 
-      def opts_moniker
-        @fuzzy_flag.some_opts_moniker
-      end
-
-      SWITCH__ = '--help'.freeze
-
-      Match__ = -> do
-
-        load = -> do
-          Home_.lib_.brazen::CLI::Actors::Build_basic_switch_proc[ SWITCH__ ]
-        end
-        p = nil
-
-        -> x do
-          p ||= load[]
-          p[ x ]
-        end
-      end.call
-
-      def args_moniker
-      end
-
-      def desc y
-        y << "this screen"
-      end
-
-      def prepare sig
-        idx = @fuzzy_flag.any_first_index_in_input sig
-        if idx
-          sig.nilify_input_element_at_index idx
-          sig.carry :BEGINNING, :FINISHED
-          sig
-        end
-      end
-
-      def beginning_eventpoint_notify
-
-        usage
-
-        @y << "options:"
-        @y << "  -some-opt-1  (broken while #open [#030])"
-        @y << "  -some-opt-2"
-        NIL
-      end
-
-      def _WAS
-
-        row_a = []
-        @adapter.plugins.accept do | da |
-          Multiline_column_B__[ row_a, da.syntax_moniker, da.some_desc_a ]
+        def initialize
+          microservice = yield
+          @lazy_index = microservice.lazy_index
+          @listener = microservice.listener
+          @operator_branch = microservice.operator_branch
         end
 
-        CLI_support_[]::Table::Actor.call(
-          :field,
-          :field, :left,
-          :header, :none,
-          :left, '  ', :sep, '     ', :right, EMPTY_S_,
-          :write_lines_to, @y,
-          :read_rows_from, row_a,
-        )
-        NIL_
-      end
-
-      Multiline_column_B__ = -> row_a, cel_a, a do
-        col_a = [ cel_a ]
-        if a.length.zero?
-          col_a.push EMPTY_S_
-        else
-          col_a.push a.fetch 0
+        def description_proc
+          -> y { y << "this screen" }
         end
-        row_a << col_a
-        if 1 < a.length
-          row_a.concat a[ 1 .. -1 ].map { |s| [ EMPTY_S_, s ] }
-        end ; nil
-      end
 
-      def usage  # may be called directly
-        @y << "usage: #{ @adapter.program_moniker } #{ get_syntax_string }"
-        NIL_
-      end
+        def parse_argument_scanner_head
+          # (scanner is already advanced past activating token
 
-    private
-
-      def get_syntax_string
-
-        s_a = [ ] ; a_a = [ ]
-
-        @adapter.plugins.accept do | da |
-          s = da.dependency_.opts_moniker
-          s and s_a.push s
-          s = da.dependency_.args_moniker
-          s and a_a.push s
+          ACHIEVED_
         end
-        [
-          ( "[#{ s_a * '] [' }]" if s_a.length.nonzero? ),
-          ( "[#{ a_a * '] [' }]" if a_a.length.nonzero? )
-        ].compact.join SPACE_
-      end
+
+        def execute
+          if __resolve_resources
+            __express_screen
+          end
+        end
+
+        def __express_screen
+
+          Zerk_::NonInteractiveCLI::Help::ScreenForBranch.express_into @stderr do |o|
+
+            o.item_normal_tuple_stream __item_normal_tuple_stream
+
+            o.express_usage_section __program_name
+
+            o.express_description_section __description_proc
+
+            o.express_items_sections __description_reader
+          end
+          # (result of above is NIL)
+
+          ACHIEVED_
+        end
+
+        def __item_normal_tuple_stream
+          @operator_branch.to_load_ticket_stream.map_by do |sym|
+            [ :primary, sym ]
+          end
+        end
+
+        def __description_reader
+          -> k do
+            _asset_ticket = @operator_branch.dereference k
+            _ = @lazy_index.dereference_plugin_via_user_value _asset_ticket
+            _wow = _.description_proc
+            _wow  # #todo
+          end
+        end
+
+        def __description_proc
+          -> y do
+            y << "the \"quickie\" \"microservice\""
+          end
+        end
+
+        def __program_name
+          "zingo fasto"
+        end
+
+        # --
+
+        def __resolve_resources
+          # near #masking
+          io = @listener.call :resource, :line_downstream_for_help
+          if io
+            @stderr = io ; ACHIEVED_
+          end
+        end
+
+      # -
     end
   end
 end
+# :#tombstone-A: used to use [#tab-001.2] to express the help screen

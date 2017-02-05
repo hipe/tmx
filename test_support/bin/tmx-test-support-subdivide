@@ -181,8 +181,12 @@ next item.
     end
 
     def __receive_emission * chan, & em_p
-      rslt = @_lib::CLI_Express_via_Emission[ em_p, chan, self ]
-      if rslt && rslt.was_error
+
+      sct = @_lib::CLI_Express_via_Emission.call_by do |o|
+        o.emission_proc_and_channel em_p, chan
+        o.client = self  # for `data`
+      end
+      if sct && sct.was_error
         @stderr.puts "see `#{ _program_name } -help`"
       end
       NIL

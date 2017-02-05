@@ -1,66 +1,47 @@
 #!/usr/bin/env ruby -w
 
-$stderr.puts "quickie executable is OFF until about -0.900 [ts]"
-if false
-
 require 'skylab/test_support'
 
-program = -> argv, i, o, e, pn_a, & p do
+program = Skylab::TestSupport::Quickie::API::CLI_for_RecursiveRunner
 
-  _Q = Skylab::TestSupport::Quickie
-
-  inst = if _Q.daemon_is_running__
-
-    e.puts "(notice - a quickie daemon is already running. #{
-      }creating non-daemonized instance.)"
-
-    _Q.build_instance_around__ i, o, e, pn_a
-  else
-    _Q.start_daemon_around i, o, e, pn_a
-  end
-
-  _ok = if p
-    p[ inst ]
-  else
-    true
-  end
-
-  if _ok
-
-    x = inst.receive_argv argv
-    if x.nil?
-      0
-    elsif true == x
-      0
-    else
-      x
-    end
-  end
-end
-
-# without always assigning the below const, when quickie is used to test
-# its own integration under tmx, the tmx "front loader" will load this file
-# a second time. on any such subsequent time the file is loaded, the below
-# boolean test will again result in "true" (as it was when we invoked this
-# whole test run the first time).
+# TL;DR: getting the below const assigments right matters.
 #
-# the front loader needs a way to know that it is not necessary to load this
-# file. we accomplish that by assigning the const.
-# this is a hacky fix to a deeper design problem.
+# consider the case when we use the [ts] quickie "recursive runner" to
+# run tests that test [tmx] "tmx". specifically consider when we run the
+# tests that cover quickie's integration with tmx. tmx loads executable
+# files like these, the dozens of executable files marked with [#ze-063.1].
 #
-# perhaps a better solution would be to get the above logic out of this
-# runner but that is contray to the fundamental axiom of tmx.
-
-Skylab::TestSupport_quickie = program
+# but when we are running such tests using the recursive runner, this file
+# will have already been loaded. executable files like these can be loaded
+# with `load` but not with `require` because (by apparent happenstance)
+# `require` (but not `load`) requires that your files end with the
+# extension, and executable files (usefully) do not have an extension.
+#
+# as such we have no easy way of `require`-ing such a file, that is, of
+# loading it only if it hasn't been loaded already.
+#
+# (corollarily, this is one reason why we generally see scant few lines
+# of code in such files - because testability is a strong design objective
+# and it's a little obnoxious to load files like these from tests. also
+# generating coverage for such files might be obnoxious too, because they
+# live outside of the `lib` tree of a given gem and we typically use that
+# directory as a root for filtering coverage.)
+#
+# anyway, one (or both) of the consts assigned below addresses the main
+# dynamic discussed here. the interested parties will be able to derive
+# this const from the filename alone. if this const is assigned to already,
+# the part will know not to load the file. whew!
+#
+# the above dynamic would apply to not just this scenario, but any time
+# you "enter" through one such entrypoint file that eventually calls on
+# tmx "mounted one-offs". the reason we draw attention to it here is because
+# it will also hold relevance later :[#007.C]
 
 if ::File.basename( __FILE__ ) == ::File.basename( $PROGRAM_NAME )
 
-  _d = program.call ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ] do |dae|
-    dae.listen
-  end
+  _d = program.call ARGV, $stdin, $stdout, $stderr, [ $PROGRAM_NAME ]
 
   exit _d
 else
   Skylab__Zerk__OneOffs::Test_support_quickie = program  # #[#ze-063.1] mountable one-off
-end
 end

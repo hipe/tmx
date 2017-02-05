@@ -2,11 +2,15 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugins::Wip_It
+    class Plugins::WipFiles
 
       # (experimentally this is tested by the dependee library at [#sa-026])
       # (wormhole with [#sa-024])
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -wip-them-all )
         @adapter = adapter
@@ -18,13 +22,19 @@ module Skylab::TestSupport
 
       def args_moniker
       end
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "a search-replace hack: all `describe` blocks in"
         y << "the files that look \"normal\", add a `wip` tag"
         y << "(no dry-run yet, but only mutates unmodified files)"
       end
 
+      if false
       def prepare sig
         idx = @fuzzy_flag.any_first_index_in_input sig
         if idx
@@ -217,6 +227,7 @@ module Skylab::TestSupport
 
       define_method :__define_constants do
         yes && go[]
+      end
       end
     end
   end

@@ -22,11 +22,11 @@ module Skylab::Zerk
           NOTHING_
         end
 
-        def lookup_softly k
+        def lookup_softly k  # #[#ze-051.1] "trueish item value"
           @hash[ k ]
         end
 
-        def dereference k
+        def dereference k  # #[#ze-051.1] "trueish item value"
           @hash.fetch k
         end
 

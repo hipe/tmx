@@ -24,7 +24,10 @@
 [#027] #open niCLI won't be able to handle a replacement expression that
              looks like an option (i.e starts with "--").
 
-[#026]       (integration test tests a vendor feature ([ts]))
+[#026] #open we have wipped the "wip-files"-related operation pending
+             completion of the [ts] quickie (plugin-driven) recursive runner
+
+             [ integration with a remote feature - [ts] "wip-files" ]
 
 [#025] #flit drop-in from niCLI to CLI, if for e.g there are missing
              required arguments. hypothetically this would be an amusing

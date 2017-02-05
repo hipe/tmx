@@ -65,11 +65,11 @@ module Skylab::Zerk
 
         # -- read
 
-        def lookup_softly k
+        def lookup_softly k  # #[#ze-051.1] "trueish item value"
           @_index.__lookup_softly_ k
         end
 
-        def dereference k
+        def dereference k  # #[#ze-051.1] "trueish item value"
           @_index.__dereference_ k
         end
 

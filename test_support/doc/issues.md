@@ -58,7 +58,8 @@
 
        #open :[#here.C]: quickie plugin arch needs rearch - too confusing
 
-       #open :[#here.B]: recursive runner (plugins) help screen needs overhaul & cover
+             :[#here.B]: recursive runner (plugins) help screen
+               (when open, was the need to cover it)
 
              :[#here.A]: quickie core features help screen needs covering (#done)
 
@@ -163,7 +164,15 @@
 
 
 [#008]       #track quickie root invocation (runtime/context)
-[#007]       #tracking tag of similar places with line / `call_digraph_listeners` structs
+
+[#007]       (mostly) internal tracking
+
+             [#here.C]: #in-situ
+
+             [#here.B]: hand written help screen parsers for tests
+
+       #track [#here.1]: track similar implementations of "line" structs (1x here 1x univ)
+
 
 [#006] #hole (whatever occurrences this had disappeared.)
              ( #was: test/all: redundancy points, maybe waits for [#tm-056] )

@@ -172,12 +172,12 @@ module Skylab::TestSupport::TestSupport
 
         o.expect "Run options: include {:line_numbers=>[5,20-∞]}"
         o.expect
-        o.expect Home_::EMPTY_S_  # <- this one might an accident (the root node with no desc)?
+        o.expect EMPTY_S_  # <- this one might an accident (the root node with no desc)?
         o.expect                "  c1"
-        o.expect_styled :green, "    eg1"
-        o.expect_styled :green, "  eg4"
+        o.expect_styled_content "    eg1", :green
+        o.expect_styled_content "  eg4", :green
         expect_finished_line_ o
-        o.expect_styled :green, "2 examples, 0 failures"
+        o.expect_styled_content "2 examples, 0 failures", :green
       end
 
       def ARGV_

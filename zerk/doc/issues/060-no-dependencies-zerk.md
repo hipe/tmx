@@ -23,20 +23,13 @@ see [#053] discussion of feature injection
 
 
 
-## why "THREEPLES"?? :[#here.A]
-
-thee following five decisionpoints went into arriving at the
-THREEPLES in the exact way that it is.
-
-this construct must *not* leave this file!! it is SHOUTCASE for
-this reason, as a reminder of all the information that is here,
-too particular to self-document:
+## about the structure of "primary found" and the :#TWOPLE :[#here.A]
 
 the governing interactive idiom of { primary | operator }
 branches (a simplicity we should always aspire to) is that of
 interacting with a simple hash with primary/operator normal
 symbols as keys and e.g method names (but it could be anything) as
-values. as such we must *never* dereference the "user value" in
+values. as such we must *never* dereference the "trueish item value" in
 any way - all we can know about it is it is trueish, and we must
 get that value back to the user on a successful lookup. but hold
 on to that thought.
@@ -62,7 +55,7 @@ represent the injector we result in the offset of the injection,
 rather than placing a handle on "the whole object" in the result
 structure (but this could change) (2). for no other reason, doing
 it this way keeps inspection dumps of the found structure light and
-pretty, at the cost of requiring the user to take one more trip tox
+pretty, at the cost of requiring the user to take one more trip to
 the "omni" to dereference components from the found structure as
 necessary.
 
@@ -78,14 +71,20 @@ must be in the found structure whether or not fuzzy matching was
 employed.  this normal symbol must be in the found structure even
 if fuzzy matching is not available in the modality.
 
-the "user value" (mentioned at the opening of this section, totally
+the "trueish item value" (mentioned at the opening of this section, totally
 meaningless to us) will be included as the third component in this
 structure (4), even though it can (by definition) be derived from
-the first two components that are in this structure. (we'll pretend
-the cost of lookup by the substrate is expensive).
+the first two components that are in this structure. (we'll assume
+the cost of lookup by the substrate is expensive).  :[#here.B]
+(the above is more or less [#051.1] restated in a different context.)
 
-finally, for OCD we use arrays and not structs internally because
-benchmark #15 (in [sli]) shows that this is almost 2x faster (5).
+using arrays and not structs internally has been shown to be almost 2x
+faster ([sli] benchmark #15), so we use array internally for the internal
+representation of items when doing a traversal for example for a fuzzy
+lookup. (5)
+
+however this approach is proving too brittle and unscalable elsewhere,
+so we use our custom struct ("primary found") where it makes sense to.
 
 
 

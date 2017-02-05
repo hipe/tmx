@@ -261,7 +261,7 @@ module Skylab::TMX
         found = remove_instance_variable :@_lookup
         injr = @omni.injector_via_primary_found found
         injr.object_id == @CLI.object_id || fail
-        _ok = injr.send found.trueish_mixed_user_value
+        _ok = injr.send found.trueish_item_value
         ! _ok
       end
 

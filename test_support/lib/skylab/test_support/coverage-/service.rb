@@ -6,8 +6,9 @@ module Skylab::TestSupport
       new( infostream ).start path_prefix_p
     end
 
-    def initialize infostream
-      @y = ::Enumerator::Yielder.new( & infostream.method( :puts ) )
+    def initialize stderr
+      stderr.respond_to? :puts or raise ::ArgumentError  # make sure it looks like an IO
+      @y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
       nil
     end
 

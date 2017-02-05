@@ -44,9 +44,9 @@ module Skylab::TestSupport::TestSupport
       def __expect_these_lines o
         o.expect                "desc 1"
         o.expect                "  ctxt 1"
-        o.expect_styled :green, "    eg 1"
+        o.expect_styled_content "    eg 1", :green
         expect_finished_line_ o
-        o.expect_styled :green, "1 example, 0 failures"
+        o.expect_styled_content "1 example, 0 failures", :green
       end
     end
 

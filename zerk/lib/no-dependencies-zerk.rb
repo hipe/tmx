@@ -29,53 +29,35 @@ module NoDependenciesZerk
 
     class CLI_Express_via_Emission < MagneticBySimpleModel
 
-      class << self
-
-        def call p, a, cli
-          call_by do |o|
-            o.emission_proc_and_channel p, a
-            o.client = cli
-          end
-        end
-        alias_method :[], :call
-      end  # >>
-
       def emission_proc_and_channel p, chan
         @channel = chan ; @emission_proc = p ; nil
       end
 
       attr_writer(
-        :client,  # only for `data`
-        :emission_handler_methods,
+        :client,  # for `data`, `resource`, reaching expag, `stderr`
         :expression_agent_by,
+        :resource_by,
         :signal_by,
         :stderr,
       )
 
       def initialize
-        @emission_handler_methods = nil
+        @client = nil
         @expression_agent_by = nil
+        @resource_by = nil
         @stderr = nil
         yield self
-        @emission_handler_methods ||= -> _ { nil }  # MONADIC_EMPTINESS_
         # (but don't freeze)
       end
 
       def execute
-        m = @emission_handler_methods[ @channel.last ]
-        if m
-          @client.send m  # no args - client should have an ivar holding self
-        else
-          express_normally
-        end
+        method_name = nil
+        FIRST_CHANNEL___.fetch( @channel.fetch 0 )[ binding ]  # highly #experimental
+        send method_name
       end
 
       def express_normally
-        method_name = nil
-        FIRST_CHANNEL___.fetch( @channel.fetch 0 )[ binding ]
-        if method_name
-          send method_name
-        elsif :expression == @channel.fetch(1)
+        if :expression == @channel.fetch(1)
           __express_expression
           _flush_result
         else
@@ -84,21 +66,20 @@ module NoDependenciesZerk
         end
       end
 
-      def _flush_result
-        Result___.new remove_instance_variable :@_was_error
-      end
-
-      Result___ = ::Struct.new :was_error
-
       FIRST_CHANNEL___ = {
         data: -> bnd do
           bnd.local_variable_set :method_name, :__when_data
         end,
         error: -> bnd do
+          bnd.local_variable_set :method_name, :express_normally
           bnd.receiver.instance_variable_set :@_was_error, true
         end,
         info: -> bnd do
+          bnd.local_variable_set :method_name, :express_normally
           bnd.receiver.instance_variable_set :@_was_error, false
+        end,
+        resource: -> bnd do
+          bnd.local_variable_set :method_name, :__when_resource
         end,
         signal: -> bnd do
           bnd.local_variable_set :method_name, :__when_signal
@@ -119,6 +100,25 @@ module NoDependenciesZerk
         NIL
       end
 
+      def __when_resource
+        p = @resource_by
+        rsc = if p
+          p[ * @channel[1..-1], & @emission_proc ]
+        else
+          @client.receive_resource_request @emission_proc, @channel
+        end
+        if rsc
+          WrappedResource___[ rsc ]
+        else
+          rsc
+        end
+      end
+      WrappedResource___ = ::Struct.new :resource do
+        def has_resource
+          true
+        end
+      end
+
       def __when_signal
         _ok = @signal_by[ @emission_proc, @channel ]
         @_was_error = ! _ok
@@ -134,7 +134,7 @@ module NoDependenciesZerk
         p = @expression_agent_by
         if p
           p.call
-        elsif @client.respond_to? :expression_agent
+        elsif @client and @client.respond_to? :expression_agent
           @client.expression_agent
         else
           CLI_ExpressionAgent.instance
@@ -153,6 +153,16 @@ module NoDependenciesZerk
         when :error, :info
           ( @stderr || @client.stderr )
         else fail
+        end
+      end
+
+      def _flush_result
+        Result___.new remove_instance_variable :@_was_error
+      end
+
+      Result___ = ::Struct.new :was_error do
+        def has_resource
+          false
         end
       end
 
@@ -261,6 +271,7 @@ module NoDependenciesZerk
       PRIMARY_RX___ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
 
       def __write_CPS_initially sym
+        @has_current_primary_symbol = true
         @_read_CPS = :__read_CPS_normally
         @_write_CPS = :__write_CPS_normally
         send @_write_CPS, sym
@@ -286,7 +297,7 @@ module NoDependenciesZerk
 
       # --
 
-      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_  scn  # #here-1
+      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_ scn  # #TWOPLE
         # assume: a `current_primary_symbol` with no exact match
         rx = /\A#{ ::Regexp.escape current_primary_symbol.id2name }/
         a = []
@@ -397,6 +408,7 @@ module NoDependenciesZerk
       end
 
       attr_reader(
+        :has_current_primary_symbol,
         :is_closed,
         :listener,
         :no_unparsed_exists,
@@ -430,6 +442,11 @@ module NoDependenciesZerk
       def prim sym
         "-#{ oper sym }"
       end
+
+      def em s  # (typically used in tests)
+        # near #open [#ts-005] redundant these, maybe move to here
+        "\e[1;32m#{ s }\e[0m"
+      end
     end
 
     # = API life
@@ -459,6 +476,10 @@ module NoDependenciesZerk
         ACHIEVED_
       end
 
+      def parse_primary_softly
+        parse_primary  # (see)
+      end
+
       def parse_primary
         # (we don't check if it's a symbol but we could)
         send @_receive_current_primary, head_as_is
@@ -467,6 +488,7 @@ module NoDependenciesZerk
       end
 
       def __receive_first_ever_current_primary sym
+        @has_current_primary_symbol = true
         @_current_primary = :__current_primary_normally
         @_receive_current_primary = :__receive_current_primary_normally
         send @_receive_current_primary, sym
@@ -476,7 +498,7 @@ module NoDependenciesZerk
         @__current_primary_value = sym ; nil
       end
 
-      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_
+      def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_ _
         # assume: a `current_primary_symbol` with no exact match
         LENGTH_ZERO___
       end
@@ -518,6 +540,7 @@ module NoDependenciesZerk
       end
 
       attr_reader(
+        :has_current_primary_symbol,
         :listener,
         :no_unparsed_exists,
       )
@@ -555,6 +578,10 @@ module NoDependenciesZerk
 
       def _same sym
         "'#{ sym.id2name }'"
+      end
+
+      def em s
+        "*#{ s }*"
       end
     end
 
@@ -688,11 +715,11 @@ module NoDependenciesZerk
         begin
           inj = scn.gets_one
           inj = inj.injection
-          x = inj.lookup_softly sym
-          x && break
-        end until scn.no_unparsed_exists
-        if x
-          OperatorFound__[ inj.injector, x, sym ]
+          trueish_item_value = inj.lookup_softly sym
+        end until trueish_item_value || scn.no_unparsed_exists
+
+        if trueish_item_value
+          OperatorFound__[ inj.injector, trueish_item_value, sym ]
         elsif @argument_scanner.can_fuzzy
           __fuzzy_lookup_operator
         else
@@ -734,11 +761,12 @@ module NoDependenciesZerk
         scn = to_operators_injections_scanner
         begin
           injn = scn.gets_one.injection
-          user_x = injn.lookup_softly sym
-          user_x && break
+          trueish_item_value = injn.lookup_softly sym
+          trueish_item_value && break
           redo
         end while above
-        OperatorFound__[ injn.injector, user_x, sym ]
+        trueish_item_value || self._SANITY
+        OperatorFound__[ injn.injector, trueish_item_value, sym ]
       end
 
       def to_operator_load_ticket_scanner
@@ -787,7 +815,7 @@ module NoDependenciesZerk
             __whine_about_primary_not_found
             break
           end
-          _injn = @_primaries_injections.fetch( o._inj_d_ ).injection
+          _injn = @_primaries_injections.fetch( o.injection_offset ).injection
           parsed_OK = _injn._parse_found_feature_ o  # EXPERIMENT
           if ! parsed_OK
             ok = parsed_OK ; break
@@ -803,7 +831,7 @@ module NoDependenciesZerk
 
       # some of the below for #nodeps-coverpoint-3
 
-      def lookup_current_primary_symbol_semi_softly  # #here-1
+      def lookup_current_primary_symbol_semi_softly
 
         # assume grammar has primaries and one primary is parsed and on deck
         # result is always of a tuple strain:
@@ -813,18 +841,18 @@ module NoDependenciesZerk
         #   otherwise
         #     `was_found` t/f
         #     if found,
-        #       `trueish_mixed_user_value`, `primary_symbol`
+        #       [primary found structure]
 
         k = @argument_scanner.current_primary_symbol
-        tuple = __THREEPLE_via_lookup_primary_softly_via_symbol k
-        if tuple
-          _primary_found_via_THREEPLE( * tuple )
+        pf = __primary_found_via_lookup_primary_softly_via_symbol k
+        if pf
+          pf
         else
           __when_primary_not_found_by_exact_match
         end
       end
 
-      def __when_primary_not_found_by_exact_match  # #here-1
+      def __when_primary_not_found_by_exact_match
         a = @argument_scanner.
           _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_(
             __to_primary_TWOPLE_scanner )
@@ -849,34 +877,25 @@ module NoDependenciesZerk
         def had_unrecoverable_error_which_was_expressed ; true end
       end end
 
-      def __when_found_exactly_one_thru_fuzzy inj_offset, load_ticket
+      def __when_found_exactly_one_thru_fuzzy inj_offset, correct_k
 
-        correct_k = load_ticket.intern
+        ::Symbol === correct_k || self._RETHINK  # #todo
 
         @argument_scanner.__receive_corrected_primary_normal_symbol correct_k
 
-        _x = @_primaries_injections.fetch( inj_offset ).
-          injection.dereference load_ticket
+        _ob = @_primaries_injections.fetch( inj_offset ).injection
 
-        _primary_found_via_THREEPLE inj_offset, correct_k, _x
-      end
+        _some_trueish_item_value = _ob.dereference correct_k
 
-      def _primary_found_via_THREEPLE d, k, x  # #here-1
-        # convert our nasty internal tuple to something external-friendly
-        PrimaryFound___.new d, k, x
+        PrimaryFound__.define do |o|
+          o.injection_offset = inj_offset
+          o.primary_symbol = correct_k
+          o.trueish_item_value = _some_trueish_item_value
+        end
       end
 
       def injector_via_primary_found found  # see [#060.A.2]
-        @_primaries_injections.fetch( found._inj_d_ ).injection.injector
-      end
-
-      class PrimaryFound___
-        def initialize d, k, x
-          @_inj_d_ = d ; @trueish_mixed_user_value = x ; @primary_symbol = k
-        end
-        attr_reader :_inj_d_, :trueish_mixed_user_value, :primary_symbol
-        def was_found ; true end
-        def had_unrecoverable_error_which_was_expressed ; false end
+        @_primaries_injections.fetch( found.injection_offset ).injection.injector
       end
 
       def __whine_about_primary_not_found
@@ -886,21 +905,22 @@ module NoDependenciesZerk
 
       # -- read primaries
 
-      # :#here-1: [#here.A] full justification of the "THREEPLE"
-
-      def __THREEPLE_via_lookup_primary_softly_via_symbol k
+      def __primary_found_via_lookup_primary_softly_via_symbol k
 
         scn = _to_primaries_injections_offset_scanner
         until scn.no_unparsed_exists
           offset = scn.gets_one
           _inj = @_primaries_injections.fetch( offset ).injection
-          user_x = _inj.lookup_softly k
-          if user_x
-            x = [ offset, k, user_x ]
-            break
+          trueish_item_value = _inj.lookup_softly k
+          trueish_item_value || next
+          pf = PrimaryFound__.define do |o|
+            o.injection_offset = offset
+            o.primary_symbol = k
+            o.trueish_item_value = trueish_item_value
           end
+          break
         end
-        x
+        pf
       end
 
       def to_primary_symbol_scanner  # assume
@@ -917,7 +937,7 @@ module NoDependenciesZerk
 
           _inj.to_load_ticket_scanner.map_by do |load_ticket|
 
-            [ d, load_ticket.intern ]  # :#here-1
+            [ d, load_ticket.intern ]  # :#TWOPLE
           end
         end
       end
@@ -1076,7 +1096,9 @@ module NoDependenciesZerk
         @_substrate_adapter_ = fz
       end
     end
+
     class LazyFeaturesInjectionRealized__
+
       attr_writer :parse_by
       attr_accessor :injector
 
@@ -1084,12 +1106,18 @@ module NoDependenciesZerk
         @parse_by[ o ]
       end
 
-      def lookup_softly k
+      def lookup_softly k  # #[#ze-051.1] "trueish item value"
         @_substrate_adapter_.lookup_softly k
       end
+
       def to_load_ticket_scanner
         Scanner_by.new( & @_substrate_adapter_.to_load_ticket_stream )
       end
+
+      def load_ticket_via_symbol sym
+        @_substrate_adapter_.load_ticket_via_symbol sym
+      end
+
       def dereference k
         @_substrate_adapter_.dereference k
       end
@@ -1101,7 +1129,7 @@ module NoDependenciesZerk
         @injector = inj
       end
       def _parse_found_feature_ o  # experiment
-        @injector.send o.trueish_mixed_user_value
+        @injector.send o.trueish_item_value
       end
       def injection
         self
@@ -1111,6 +1139,9 @@ module NoDependenciesZerk
       end
       def to_load_ticket_scanner
         Scanner_via_Array[ @_hash.keys ]
+      end
+      def load_ticket_via_symbol k
+        k
       end
       def dereference k
         @_hash.fetch k
@@ -1192,6 +1223,16 @@ module NoDependenciesZerk
       def oxford_and scn
         scn.oxford_join '', ' and ', ', '
       end
+    end
+
+    class PrimaryFound__ < SimpleModel  # structure backstory at [#here.A]
+      attr_accessor(
+        :injection_offset,
+        :primary_symbol,
+        :trueish_item_value,
+      )
+      def was_found ; true end
+      def had_unrecoverable_error_which_was_expressed ; false end
     end
 
     # = support
@@ -1432,4 +1473,5 @@ module NoDependenciesZerk
     # ==
   # -
 end
+# :#tombstone-B: no more `emission_handler_methods`
 # #tombstone: (temporary) used to close primaries

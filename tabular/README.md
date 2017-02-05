@@ -53,7 +53,7 @@ longerm goal is (or isn't) to unify all table implementions:
 
     [#.C]  2012-03-16  the old functional experiment
 
-    [#.B]  2011-08-22  the "main" one
+    [#here.2]  2011-08-22  the "main" one
 
     [#.A]  2011-08-22  a tiny, almost minimal one
 
@@ -157,7 +157,7 @@ general principles and behavior intact.
 ## justification
 
 at writing this was re-written from the ground up. we did not use
-[#.B] for this because of the product of these factors:
+[#here.2] for this because of the product of these factors:
 
   • we were in the middle of a full rewrite of the application itself.
     to try and fold-in a unification of libraries on top of this would
@@ -197,7 +197,7 @@ clients needing to deal with it on their own.
 
 ----------------
 
-# the CLI table ACTOR narrative :[#.B]
+# the CLI table ACTOR narrative :[#here.2]
 
 ## introduction (leads to [#.G])
 

@@ -2,8 +2,6 @@ module Skylab::Zerk
 
   module CLI::Styling
 
-    Chunker = ::Module.new  # only until #pending-rename
-
     class ChunkStream_via_String < Common_::Monadic
 
       # synopsis: represent ANY string as a stream that has a particular,
@@ -242,5 +240,4 @@ module Skylab::Zerk
     end
   end
 end
-# #pending-rename: [ magnetic name ]
 # #history: moved from [br] to [ze]

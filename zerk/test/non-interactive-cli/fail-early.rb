@@ -1,6 +1,6 @@
 module Skylab::Zerk::TestSupport
 
-  module Non_Interactive_CLI::Fail_Early
+  module Non_Interactive_CLI::Fail_Early  # (incidental code notes in [#064])
 
     def self.[] tcc
       tcc.include self
@@ -79,7 +79,7 @@ module Skylab::Zerk::TestSupport
       end
 
       def DEBUG_ALL_BY_FLUSH_AND_EXIT
-        @ze_niCLI_client.__FLUSH_AND_EXIT_UNDER_ self
+        @ze_niCLI_client.DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER self
       end
 
       def expect_fail
@@ -135,6 +135,11 @@ module Skylab::Zerk::TestSupport
 
       def invoke_via_argv argv
         @_setup.ARGV = argv ; nil
+      end
+
+      def expect_styled_line_via chunks
+        _ = StyledLineExpectation___.new chunks, @_method, @_stream
+        @_setup._add _, @_stream
       end
 
       def expect_line_by & p
@@ -213,7 +218,7 @@ module Skylab::Zerk::TestSupport
         @_stream = serr_or_sout ; nil
       end
 
-      def __FLUSH_AND_EXIT_UNDER_ tc
+      def DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER tc
 
         @_stream ||= :serr
         io = tc.debug_IO
@@ -660,13 +665,21 @@ module Skylab::Zerk::TestSupport
         _add BigStringBasedExpectation__.new( s, @method_name, @serr_or_sout )
       end
 
-      def expect_styled * sym_a, str
-        # (not pushed to the other guy)
-        _exp = ExactStringBasedExpectation__.new str, @method_name, @serr_or_sout do |o|
-          o.expected_styles = sym_a
-        end
-        _add _exp
+      def expect_styled_content str, * sym_a
+
+        # (full justification at [#here.A])
+
+        md = THIS_RX___.match str
+        # ..
+        _styled = Home_::CLI::Styling::Stylify[ sym_a, md[ :content ] ]
+        _final = "#{ md[ :margin ] }#{ _styled }"
+        expect _final
       end
+
+      THIS_RX___ = /\A
+        (?<margin>[ \t]*)
+        (?<content>.+)
+      \z/x  # note that as an implicit assertion and for now, assert no "\n"
 
       def expect exp_x=nil
         _add Line_based_expectation__[ exp_x, @method_name, @serr_or_sout ]
@@ -692,11 +705,11 @@ module Skylab::Zerk::TestSupport
 
     StringBasedAssertion__ = ::Class.new MethodAndStreamAssertion__
 
-    StringBasedExpectation__ = StringBasedAssertion__  # #for-now
+    StringBasedExpectation__ = StringBasedAssertion__  # #this-dichotomy
 
     ExactStringBasedExpectation__ = ::Class.new StringBasedExpectation__
 
-    ExactStringBasedAssertion__ = ExactStringBasedExpectation__  # #for-now
+    ExactStringBasedAssertion__ = ExactStringBasedExpectation__  # #this-dichotomy
 
     # == (end forward declaration)
 
@@ -907,6 +920,84 @@ module Skylab::Zerk::TestSupport
       end
     end
 
+    class StyledLineExpectation___ < StringBasedExpectation__
+
+      def initialize chunks, m, sym
+        @chunks = chunks
+        super m, sym
+      end
+
+      # #this-dichotomy
+
+      def _actual_string_matches_expected_string_
+        _actual_line = @actual_emission.string
+        act_st = Home_::CLI::Styling::ChunkStream_via_String[ _actual_line ]
+        exp_st = Stream_[ @chunks ]
+        @_assert = :__assert_first
+        ok = true
+        begin
+          exp_x = exp_st.gets
+          act_x = act_st.gets
+          exp_x || act_x || break
+          ok = _assert act_x, exp_x
+        end while ok
+        ok
+      end
+
+      def _assert act_x, exp_x
+        send @_assert, act_x, exp_x
+      end
+
+      def __assert_first act_s, exp_s
+        if _mixed_values_match act_s, exp_s
+          @_assert = :__assert_normally ; true
+        end
+      end
+
+      def __assert_normally act, exp
+        if exp
+          if act
+            ok = _mixed_values_match act.string, exp.fetch(0)
+            if ok
+              styles = exp.fetch 1
+              styles.respond_to? :each_with_index or styles = [styles]
+              _mixed_values_match act.styles, styles
+            else
+              ok
+            end
+          else
+            _will_say_not_same act, exp
+          end
+        else
+          _will_say_not_same [act.string, act.styles], exp
+        end
+      end
+
+      def _mixed_values_match act_x, exp_x
+        if act_x == exp_x
+          ACHIEVED_
+        else
+          _will_say_not_same act_x, exp_x
+        end
+      end
+
+      def _will_say_not_same act_x, exp_x
+        @_act_x = act_x ; @_exp_x = exp_x
+        @_say = :__say_not_same_mixed ; false
+      end
+
+      def _say_actual_string_does_not_match_expected_string_
+        send @_say
+      end
+
+      def __say_not_same_mixed
+        say = -> x do
+          x ? x.inspect : "no more chunks"
+        end
+        _say_expected_this_had_that_ say[ @_exp_x ], say[ @_act_x ]
+      end
+    end
+
     class ExactStringBasedExpectation__ < StringBasedExpectation__
 
       def initialize x, m, sym
@@ -914,37 +1005,16 @@ module Skylab::Zerk::TestSupport
         yield self if block_given?
         @string = x
       end
-
-      attr_writer(
-        :expected_styles,
-      )
     end
 
     class ExactStringBasedAssertion__ < StringBasedAssertion__
 
       def _actual_string_matches_expected_string_
-
-        # (for years and years before this, we would only care *that* the
-        # string was styled, not *how* it is styled. here it's different:)
-
-        sym_a = @expected_styles
-        if sym_a
-          md = /\A([[:space:]]*)(.*[^[:space:]])([[:space:]]*\z)/.match @string
-          _styled = Home_::CLI::Styling::Stylify[ sym_a, md[2] ]
-          use_s = "#{ md[1] }#{ _styled }#{ md[3] }"
-          @EEW = use_s
-          @actual_emission.string == use_s
-        else
-          @actual_emission.string == @string
-        end
+        @actual_emission.string == @string
       end
 
       def _say_expectation_preterite_infinitive_
-        if @expected_styles
-          @EEW.inspect
-        else
-          @string.inspect
-        end
+        @string.inspect
       end
 
       def _inspectable_
@@ -1060,7 +1130,6 @@ module Skylab::Zerk::TestSupport
     class StringBasedExpectation__
 
       def initialize m, sym
-        @expected_styles = nil
         @method_name = m
         @serr_or_sout = sym
       end
@@ -1088,14 +1157,19 @@ module Skylab::Zerk::TestSupport
       def execute
         super
         if ! _actual_string_matches_expected_string_
-          __fail_because_actual_string_does_not_match_expected_string
+          fail_say _say_actual_string_does_not_match_expected_string_
         end
       end
 
-      def __fail_because_actual_string_does_not_match_expected_string
+      def _say_actual_string_does_not_match_expected_string_
+        _say_expected_this_had_that_(
+          _say_expectation_preterite_infinitive_,
+          @actual_emission.string.inspect,
+        )
+      end
 
-        fail_say "expected #{ _say_expectation_preterite_infinitive_ }. had: #{
-          }#{ @actual_emission.string.inspect }"
+      def _say_expected_this_had_that_ exp_s, act_s
+        "expected #{ exp_s }. had: #{ act_s }"
       end
     end
 
@@ -1272,3 +1346,4 @@ module Skylab::Zerk::TestSupport
     # ==
   end
 end
+# :#this-dichotomy is explained at [#here.B]

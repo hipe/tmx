@@ -259,11 +259,11 @@ module Skylab::TestSupport
     def description_proc_reader_for_didactics
       -> k do
 
-        item_of_compound_branch = @_operator_branch.lookup_softly k
+        trueish_x = @_operator_branch.lookup_softly k
 
-        if item_of_compound_branch
+        if trueish_x
 
-          ro = item_of_compound_branch.mixed_user_value  # #here
+          ro = trueish_x.mixed_user_value  # #here
 
           send ro.description_method_name, ro
         else
@@ -274,7 +274,7 @@ module Skylab::TestSupport
 
     def to_item_normal_tuple_stream_for_didactics
 
-      @_operator_branch.to_asset_ticket_stream.map_by do |key_x|
+      @_operator_branch.to_load_ticket_stream.map_by do |key_x|
         [ :primary, key_x ]
       end
     end
@@ -330,7 +330,7 @@ module Skylab::TestSupport
 
       _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define do |o|
         o.module = Here_::Operations
-        o.item_class = ModuleBasedRouting___
+        o.load_ticket_class = ModuleBasedRouting___
       end
 
       @_operator_branch = lib::OperatorBranch_via_MultipleEntities.define do |o|
@@ -413,9 +413,9 @@ module Skylab::TestSupport
 
     class ModuleBasedRouting___
 
-      def initialize sm, mod
+      def initialize at, mod
         @module = mod
-        @name = Common_::Name.via_slug sm.entry_group_head
+        @name = Common_::Name.via_slug at.entry_group_head
       end
 
       def operation_class
@@ -462,12 +462,6 @@ module Skylab::TestSupport
       def bound_call_method_name
         :__bound_call_for_method_based_operation
       end
-    end
-
-    # ==
-
-    Stream_ = -> a, & p do
-      Common_::Stream.via_nonsparse_array a, & p
     end
 
     # ==

@@ -152,11 +152,11 @@ module Skylab::TestSupport::TestSupport
       end
 
       def subject_CLI
-        ProxyThatIsPretendingToBe_CLI_Class___.new self
+        ProxyForQuickieOnefilePretendingToBe_CLI_Class___.new self
       end
 
       def subject_API
-        ProxyThatIsPretendingToBe_API_Module___.new self
+        ProxyForQuickieOnefilePretendingToBe_API_Module___.new self
       end
 
       def prepare_subject_CLI_invocation _
@@ -210,7 +210,7 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    class ProxyThatIsPretendingToBe_CLI_Class___
+    class ProxyForQuickieOnefilePretendingToBe_CLI_Class___
 
       # we pretend that our quickie service is "long-running", *and*
       # it starts *around* a client (probably CLI), so it does not exit
@@ -247,7 +247,7 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    class ProxyThatIsPretendingToBe_API_Module___
+    class ProxyForQuickieOnefilePretendingToBe_API_Module___
 
       def initialize c
         @__context = c

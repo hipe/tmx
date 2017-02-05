@@ -88,16 +88,16 @@ module Skylab::Zerk
 
       # -- read
 
-      def dereference key_x
-        lt = lookup_softly key_x
-        if lt
-          lt
+      def dereference key_x  # #[#ze-051.1] "trueish item value"
+        trueish_x = lookup_softly key_x
+        if trueish_x
+          trueish_x
         else
           raise ::KeyError
         end
       end
 
-      def lookup_softly key_x
+      def lookup_softly key_x  # #[#ze-051.1] "trueish item value"
         x = @CACHE[ key_x.intern ]
         if x
           x

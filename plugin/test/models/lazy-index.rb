@@ -31,9 +31,25 @@ module Skylab::Plugin::TestSupport
 
         _at = ob.module.entry_tree.asset_ticket_via_entry_group_head _k
 
-        _wat = subj.offset_of_touched_plugin_via_user_value _at
+        _trueish_x = EEK_TrueishItemValue___[ _at ]
 
-        [ _wat, _at ]
+        _d = subj.offset_of_touched_plugin_via_user_value _trueish_x
+
+        [ _d, _trueish_x ]
+      end
+
+      EEK_TrueishItemValue___ = ::Struct.new :asset_ticket do
+
+        # (in production we now have the "trueish item value" of this one
+        # kind of operator branch be a custom "load ticket". (it's
+        # potentially confusing: often we think of the "keys" as load tickets
+        # (even when symbols) but in this case the "values" are too). because
+        # that's what we're doing in production and we're in the middle of
+        # debuging it, we follow suite here too. but not it's very short-lived
+
+        def HELLO_LOAD_TICKET
+          NIL
+        end
       end
 
       def subject_from_state_one_
@@ -56,7 +72,6 @@ module Skylab::Plugin::TestSupport
         end
 
         [ subj, ob ]
-
       end
 
       # ~ pick any loadable node (i.e any node) under lib/skylab/plugin

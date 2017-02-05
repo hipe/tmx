@@ -420,6 +420,11 @@ module Skylab::Common
           :parent_node_path,
           :value_is_known,
         )
+
+        def HELLO_ASSET_TICKET
+          # (can probably be removed from universe by the time you read this)
+          NIL
+        end
       end
 
       # ==

@@ -1,13 +1,13 @@
 this is the rationale for the regression order of the toplevel nodes -
 
-  - core test support functioning (#10)
+  - core test support functioning ("quickie corefile") (#10)
 
   - magnetics (#20) (NOTE this directory with this number is assumed in #slowie-spot-2)
 
   - non-magnetic library nodes (not in subsequent categories)
     - IO spy (#30)
 
-  - recursive test support functioning (#40)
+  - recursive test support functioning ("quickie recursive runner") (#40)
 
   - expectation libraries (at toplevel)
     - expect stdout sterr (#50)

@@ -7,7 +7,7 @@ module Skylab::TestSupport
       # (these are the things that can't/shouldn't be covered)
 
       def enable_kernel_describe
-        _runtime.__enable_kernel_describe
+        runtime_.__enable_kernel_describe
       end
 
       def extended mod  # :+[#sl-111] deprecteded `extended` pattern
@@ -15,11 +15,11 @@ module Skylab::TestSupport
       end
 
       def enhance_test_support_module_with_the_method_called_describe mod
-        _runtime.__enhance_test_support_module_with_the_method_called_describe mod
+        runtime_.__enhance_test_support_module_with_the_method_called_describe mod
         NIL
       end
 
-      def _runtime
+      def runtime_
         send @_runtime
       end
 
@@ -198,9 +198,12 @@ module Skylab::TestSupport
       def __write_quickie_service_once svc
         @_write_quickie_service = :__QUICKIE_SERVICE_IS_ALREADY_RUNNING
         @_read_quickie_service = :_read_existing_quickie_service
+        @quickie_service_is_running__ = true
         @_touch_quickie_service = :_read_existing_quickie_service
         @__existing_quickie_service = svc ; nil
       end
+
+      attr_reader :quickie_service_is_running__  # maybe away one day. for bin for now..
 
       def __dereference_quickie_service_
         send @_read_quickie_service
@@ -2275,7 +2278,7 @@ module Skylab::TestSupport
 
     class << self
       def apply_experimental_specify_hack test_context_class
-        Here_::Actors_::Specify.apply_if_not_defined test_context_class
+        Here_::Models_::Specify.apply_if_not_defined test_context_class
       end
     end  # >>
 
@@ -2710,8 +2713,11 @@ module Skylab::TestSupport
 
     # ===
 
-    module Plugins  # ..
-      Autoloader_[ self, :boxxy ]
+    # ==
+
+    No_deps_zerk_ = Lazy_.call do  # #testpoint
+      require 'no-dependencies-zerk'
+      ::NoDependenciesZerk
     end
 
     Infinity_glyph___ = Lazy_.call() { '∞' }

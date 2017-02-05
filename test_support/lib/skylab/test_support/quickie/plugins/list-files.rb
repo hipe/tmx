@@ -2,8 +2,12 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Plugins::List
+    class Plugins::ListFiles
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -list )
         @adapter = adapter
@@ -15,12 +19,18 @@ module Skylab::TestSupport
 
       def args_moniker
       end
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "write to stdout the list of resultant"
         y << "test file(s) then exit"
       end
 
+      if false
       def prepare sig
         idx = @fuzzy_flag.any_first_index_in_input sig
         if idx
@@ -36,6 +46,7 @@ module Skylab::TestSupport
         _ = @adapter.paystream.method :puts
         @adapter.services.to_test_path_stream.each( & _ )
         NIL_
+      end
       end
     end
   end

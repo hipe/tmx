@@ -13,6 +13,9 @@ module Skylab::Zerk
       # ~ styling
 
       Stylize = -> s, * i_a do
+
+        # (this method-form looks better when called inline)
+
         Stylify[ i_a, s ]
       end
 
@@ -21,6 +24,9 @@ module Skylab::Zerk
       style_h = nil
 
       Stylify = -> i_a, s do
+
+        # (this method-form is more #curry-friendly, better for `define_method`)
+
         "\e[#{ i_a.map { |i| style_h.fetch i }.compact * ';' }m#{ s }\e[0m"
       end
 
@@ -73,14 +79,11 @@ module Skylab::Zerk
       end
 
       COLORS___ = colors
-      INTEGER_VIA_SYMBOL_HASH = style_h  # 1x [ba]
 
     # -
-
     # ==
 
-    Autoloader_[ self ]
-    stowaway :ChunkStream_via_String, 'chunker'  # #pending-rename
+    INTEGER_VIA_SYMBOL_HASH = style_h  # 1x [ba]
 
     # ==
   end

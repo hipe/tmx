@@ -113,12 +113,28 @@ module Skylab::Common::TestSupport
         @_dispatcher.listener
       end
 
+      def receive_call x_a
+        @_dispatcher.receive_call x_a
+      end
+
       def call_by & p
         @_dispatcher.receive_call_via_proc p
       end
 
       def expect * chan, & recv_msg
         @_dispatcher.receive_emission_expectation recv_msg, chan
+      end
+
+      def expect_emission recv_msg, chan
+        @_dispatcher.receive_emission_expectation recv_msg, chan
+      end
+
+      def DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER tc
+        @_dispatcher.__DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
+      end
+
+      def expect_result_under x, tc
+        @_dispatcher.receive_expect_result x, tc
       end
 
       def execute_under tc
@@ -147,12 +163,6 @@ module Skylab::Common::TestSupport
         @_mode_implementation._receive_call_via_proc_ p
       end
 
-      def expect_emission_fail_early_listener
-        nu, x = @_mode_implementation._couple_for_listener_
-        nu and @_mode_implementation = nu
-        x
-      end
-
       def receive_ignore_etc sym
         @_mode_implementation._receive_ignore_etc_ sym
       end
@@ -162,21 +172,26 @@ module Skylab::Common::TestSupport
       end
 
       def receive_expect_result x, tc
-        _ = @_mode_implementation._replacement_implementation_for_expect_result_ x, tc
-        _receive_executable_replacement_implementation _
+        _ = @_mode_implementation._flusher_for_expect_result_ x, tc
+        _receive_executable_flusher _
+      end
+
+      def __DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER_ tc
+        _ = @_mode_implementation._flusher_for_DEBUG_AND_EXIT_ tc
+        _receive_executable_flusher _
       end
 
       def receive_finish_by p, tc
-        _ = @_mode_implementation._replacement_implementation_for_finish_by_ p, tc
-        _receive_executable_replacement_implementation _
+        _ = @_mode_implementation._flusher_for_finish_by_ p, tc
+        _receive_executable_flusher _
       end
 
       def receive_result_as_result tc
-        _ = @_mode_implementation._replacement_implementation_for_result_as_result_ tc
-        _receive_executable_replacement_implementation _
+        _ = @_mode_implementation._flusher_for_result_as_result_ tc
+        _receive_executable_flusher _
       end
 
-      def _receive_executable_replacement_implementation nu
+      def _receive_executable_flusher nu
         @_mode_implementation = nu
         o = nu._EXECUTE_
         @_mode_imlementation = o.mode_implementation
@@ -220,15 +235,19 @@ module Skylab::Common::TestSupport
         NIL
       end
 
-      def _replacement_implementation_for_expect_result_ x, tc
+      def _flusher_for_DEBUG_AND_EXIT_ tc
+        DEBUG_AND_EXIT_Flusher___.new( * _release_these, tc )
+      end
+
+      def _flusher_for_expect_result_ x, tc
         ValueBasedFlusher___.new x, * _release_these, tc
       end
 
-      def _replacement_implementation_for_finish_by_ p, tc
+      def _flusher_for_finish_by_ p, tc
         ProcBasedFlusher___.new p, * _release_these, tc
       end
 
-      def _replacement_implementation_for_result_as_result_ tc
+      def _flusher_for_result_as_result_ tc
         ReturnBasedFlusher__.new( * _release_these, tc )
       end
 
@@ -248,6 +267,30 @@ module Skylab::Common::TestSupport
     # ==
 
     Flusher__ = ::Class.new NullImplementations__
+
+    class DEBUG_AND_EXIT_Flusher___ < Flusher__
+
+      def _EXECUTE_
+
+        x = @expression_of_execution.execute_for_real @test_context
+        io = _debug_IO
+        io.puts "(RESULT: #{ x.class }"
+        io.puts "(GOODBYE FROM [co])"
+        exit 0
+      end
+
+      def _receive_non_ignored_actual_emission ae
+
+        _expag = @test_context.expression_agent
+        _io = _debug_IO
+        ae.express_into_under_debuggingly _io, _expag
+        NIL
+      end
+
+      def _debug_IO
+        @test_context.debug_IO
+      end
+    end
 
     class ValueBasedFlusher___ < Flusher__  # asserted result against an expected value
 
@@ -365,11 +408,20 @@ module Skylab::Common::TestSupport
 
         else
 
-          ae = ActualEmission___.new em_p, chan
+          _ae = ActualEmission___.new em_p, chan
 
-          if @test_context.do_debug
-            @test_context.debug_IO.puts chan.inspect
-          end
+          _receive_non_ignored_actual_emission _ae
+        end
+
+        :_co_unreliable_
+      end
+
+      def _receive_non_ignored_actual_emission ae
+
+        if @test_context.do_debug
+          @test_context.debug_IO.puts ae.channel_symbol_array.inspect
+        end
+        # -
 
           if @expected_emission_scanner.no_unparsed_exists
             fail AssertionFailed, __say_extra_emission( ae )
@@ -377,29 +429,15 @@ module Skylab::Common::TestSupport
             _ee = @expected_emission_scanner.gets_one
             _ee.execute_assertion_of_under ae, @test_context
           end
-        end
-
-        :_co_unreliable_
+        # -
+        NIL
       end
 
       def __say_extra_emission ae
-
-        buffer = ae.say_extra_emission
-        if Looks_like_expression__[ ae.channel_symbol_array ]
-          __peek_first_line_of_expression_HACKISHLY buffer, ae
-        end
-        buffer
-      end
-
-      def __peek_first_line_of_expression_HACKISHLY buffer, ae
+        y = ""
+        y << "unexpected emission: #{ ae.channel_symbol_array.inspect }"
         _expag = @test_context.expression_agent
-        _y = ::Enumerator::Yielder.new do |line|
-          throw :eek, line
-        end
-        _wee = catch :eek do
-          _expag.calculate _y, & ae.emission_proc
-        end
-        buffer << " (first line: #{ _wee.inspect })"
+        ae.__maybe_express_first_line_of_expression_into_under_ y, _expag
       end
 
       def now_we_are_finished_with_the_execution
@@ -431,8 +469,48 @@ module Skylab::Common::TestSupport
           @emission_proc = em_p
         end
 
-        def say_extra_emission
-          "unexpected emission: #{ @channel_symbol_array.inspect }"
+        def __maybe_express_first_line_of_expression_into_under y, expag
+          if _looks_like_expression
+            _first_N_lines_HACKISHLY_under 1, expag do |line|
+              y << "  (first line: #{ line.inspect })"
+            end
+          end
+          y
+        end
+
+        def express_into_under_debuggingly y, expag
+          y << "#{ @channel_symbol_array.inspect }#{ NEWLINE_ }"
+          if _looks_like_expression
+            _first_N_lines_HACKISHLY_under( -1, expag ) do |line|
+              y << "  #{ line.inspect }#{ NEWLINE_ }"
+            end
+          end
+          y
+        end
+
+        def _first_N_lines_HACKISHLY_under n, expag  # assume expression
+
+          if n.nonzero?
+
+            count = 0
+
+            _y = ::Enumerator::Yielder.new do |line|
+              yield line
+              count += 1
+              if n == count
+                throw :EEK_co_
+              end
+            end
+
+            catch :EEK_co_ do
+              expag.calculate _y, & @emission_proc
+            end
+          end
+          NIL
+        end
+
+        def _looks_like_expression
+          Looks_like_expression__[ @channel_symbol_array ]
         end
 
         attr_reader(
@@ -554,11 +632,11 @@ module Skylab::Common::TestSupport
         _no
       end
 
-      def _replacement_implementation_for_expect_result_(*)
+      def _flusher_for_expect_result_(*)
         _no
       end
 
-      def _replacement_implementation_for_result_as_result_(*)
+      def _flusher_for_result_as_result_(*)
         _no
       end
 

@@ -1,4 +1,5 @@
 [#069]       [ scanner ]
+       #wish  [#here.2] `via_times` 1x [pl]
        #track [#here.1] similar implementations of "polymorphic stream"
 
 [#068]       #track ancient resolve module (similar in [cm])

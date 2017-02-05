@@ -4,6 +4,10 @@ module Skylab::TestSupport
 
     class Plugins::Cover
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
 
         @fuzzy_flag = adapter.build_fuzzy_flag %w( -cover )
@@ -15,12 +19,18 @@ module Skylab::TestSupport
 
       def args_moniker
       end
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "run the coverage service for the"
         y << "subtree inferred by the test files"
       end
 
+      if false
       def prepare sig
         idx = @fuzzy_flag.any_first_index_in_input sig
         if idx
@@ -32,6 +42,7 @@ module Skylab::TestSupport
 
       def before_execution_eventpoint_notify
         Here_::Plugins::Cover::Worker__.new( @adapter ).execute
+      end
       end
     end
   end

@@ -51,3 +51,18 @@ hashes but against operator branches.
 
 (we will probably want the ability to aggregate a series of these
 nodes into a compound such structure too.)
+
+
+
+
+## `lookup_softly` and `dereference` :[#here.1]
+
+the primary point of this node is to state it explicitly that these two
+methods (in their many adaptation manifestations) must result in the same
+kind of structure, a "trueish item value". the shape of this object is
+totally "mixed" and unknowable to the subject, except to know that it
+must be trueish. (agreeing to this formally allows us to implement the
+many adaptations of `lookup_softly` without needing to wrap its positive
+result.)
+
+the above properties of this result type are more or less restated in [#060.B].

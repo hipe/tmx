@@ -169,7 +169,7 @@ module Skylab::TestSupport
       spy
     end
 
-    class Line___  # #[#007]
+    class Line___  # #[#007.1]
 
       def initialize stream_symbol, string
         @stream_symbol = stream_symbol

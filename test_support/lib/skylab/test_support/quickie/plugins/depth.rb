@@ -4,14 +4,20 @@ module Skylab::TestSupport
 
     class Plugins::Depth
 
+      def initialize
+      end
+
+      if false
       def initialize adapter
         @adapter = adapter
         @sw = adapter.build_required_arg_switch FLAG__
         @y = adapter.y
       end
+      end
 
       FLAG__ = '-depth'.freeze
 
+      if false
       def opts_moniker
       end
 
@@ -19,8 +25,13 @@ module Skylab::TestSupport
         ARGS_MONIKER__
       end
       ARGS_MONIKER__ = "#{ FLAG__ }=<[M-]N>"
+      end
 
-      def desc y
+      def description_proc
+        method :__describe_into
+      end
+
+      def __describe_into y
         y << "only operate on spec files at depths M thru N."
         y << "floor depth M defaults to N. a spec file's depth"
         y << "is how deep its filesystem path is (in terms of"
@@ -32,6 +43,7 @@ module Skylab::TestSupport
         y << "a test-suite one layer at a time."
       end
 
+      if false
       def prepare sig
         @sig = sig
         @idx = @sw.any_first_index_in_input @sig
@@ -231,14 +243,17 @@ module Skylab::TestSupport
       def ick_arg
         "\"#{ flg }=#{ @range }\""
       end
+      end
 
       def flg
         FLAG__
       end
 
+      if false
       def _services
         @adapter.services
       end
+      end  # if false
     end
   end
 end
