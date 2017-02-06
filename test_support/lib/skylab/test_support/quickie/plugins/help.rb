@@ -23,7 +23,13 @@ module Skylab::TestSupport
           ACHIEVED_
         end
 
-        def execute
+        def release_agent_profile
+          Eventpoint_::AgentProfile.define do |o|
+            o.must_transition_from_to :beginning, :finished
+          end
+        end
+
+        def invoke _
           if __resolve_resources
             __express_screen
           end
@@ -43,7 +49,7 @@ module Skylab::TestSupport
           end
           # (result of above is NIL)
 
-          ACHIEVED_
+          NOTHING_
         end
 
         def __item_normal_tuple_stream

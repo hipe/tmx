@@ -8,13 +8,13 @@ numberspace of only 100, that would give us only 10 integers of span
 or so subdivisions between entries; so we're increasing the numberspace
 by 10x and going with a numberspace of 1000.
 
-  - ping and help
-  - list
-  - "run recursive" (name will change)
-  - "test-directory" (name might change) (related to above)
-  - tag (integrate with ONEFILE SOMEHOW)
-  - order (used frequently)
-  - depth (not used frequently)
-  - tree (after list)
-  - wip-these-files (glhf)
-  - cover (glhf)
+  - ping and help (plugin -9)
+  - list-files (plugin -8)
+  - "test-directory" (name might change) (related to above and below)
+  - "run recursive" (name will change) (related to above) (plugin -7)
+  - tag (integrate with ONEFILE SOMEHOW (plugin -6)
+  - order (used frequently) (plugin -5)
+  - depth (not used frequently) (plugin -4)
+  - tree (after list-files) (plugin -3)
+  - wip-files (glhf) (plugin -2)
+  - cover (glhf) (plugin -1)

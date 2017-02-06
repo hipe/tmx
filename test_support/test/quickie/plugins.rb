@@ -28,6 +28,44 @@ module Skylab::TestSupport::TestSupport
 
         # ~
 
+        def write_messages_into_for_no_transition_because_nothing_pending_ y
+          y << "there are no pending executions"
+          y << "so nothing brings the system from the beginning state to a finished state"
+        end
+
+        def expect_no_transition_found_ & p
+          messages_from_expect_for_API_ :error, :expression, :no_transition_found, & p
+        end
+
+        def expect_these_lines_on_stderr_
+          # experiment - not ideal because it confuses who's driving
+          on_stream :serr
+          _y = ::Enumerator::Yielder.new do |line|
+            expect line
+          end
+          yield _y
+          NIL
+        end
+
+        def messages_from_expect_for_API_ * chan, & p
+          msgs = nil
+          expect_for_API_ chan do |y|
+            msgs = y
+          end
+          expect_fail
+          if block_given?
+            _expect_against_these_messages msgs, & p
+          else
+            msgs
+          end
+        end
+
+        def fails_with_these_messages_ & p
+          _expect_against_these_messages messages_, & p
+        end
+
+        # ~
+
         def expect_on_stderr s
           @CLI.expect_on_stderr s
         end
@@ -48,14 +86,41 @@ module Skylab::TestSupport::TestSupport
           send EXPECT___.fetch( @API_OR_CLI ), a, & p
         end
 
-        EXPECT___ = { API: :__expect_for_API, CLI: :__expect_for_CLI }
+        EXPECT___ = { API: :expect_for_API_, CLI: :__expect_for_CLI }
 
         def __expect_for_CLI a
           @CLI.expect( * a )
         end
 
-        def __expect_for_API a, & p
+        def expect_for_API_ a, & p
           @API.expect_emission p, a
+        end
+
+        # ~
+
+        def _expect_against_these_messages actual_messages
+
+          act_line_scn = Common_::Scanner.via_array actual_messages
+
+          _y = ::Enumerator::Yielder.new do |exp_line|
+
+            if act_line_scn.no_unparsed_exists
+              fail "had no more lines when expecting: #{ exp_line.inspect }"
+            else
+              act_line = act_line_scn.gets_one
+              if exp_line.respond_to? :ascii_only?
+                act_line == exp_line || fail
+              else
+                act_line =~ exp_line || fail
+              end
+            end
+          end
+
+          yield _y
+
+          if ! act_line_scn.no_unparsed_exists
+            fail "had unexpected extra line: #{ act_line_scn.head_as_is.inspect }"
+          end
         end
 
         # ~
@@ -75,7 +140,7 @@ module Skylab::TestSupport::TestSupport
         end
 
         EXPECT_FAIL___ = {
-          API: :__expect_fail_for_API,
+          API: :_expect_fail_for_API,
           CLI: :__expect_fail_for_CLI,
         }
 
@@ -83,7 +148,11 @@ module Skylab::TestSupport::TestSupport
           @CLI.expect_fail_under self
         end
 
-        def __expect_fail_for_API
+        def _expect_fail_for_API
+
+          # failure results should now be nil not false to leave room
+          # for meaningful false #coverpoint-1-2
+
           @API.expect_result_under NIL, self
         end
 
@@ -110,6 +179,10 @@ module Skylab::TestSupport::TestSupport
 
         def expect_result x
           @API.expect_result_under x, self
+        end
+
+        def finish_by & p
+          @API.receive_finish_by p, self
         end
 
         # ~

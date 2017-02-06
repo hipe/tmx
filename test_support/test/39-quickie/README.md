@@ -1,6 +1,7 @@
 # about the regression weights near quickie
 
-  - the quickie standalone file has a much earlier regression priority.
+  - the quickie standalone file ("onefile") has a much earlier regression
+    priority than that of the quickie "recursive runner".
     its test node lives outside of the node this file documents.
 
   - the quickie plugins are much later, intentionally being housed right

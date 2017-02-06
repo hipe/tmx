@@ -1,6 +1,7 @@
 [#033]       explaining the enhance method ..
 [#024]       the bundle fancy lookup exegesis ..
-[#023]       baseless collection ..
+[#023] #hole
+             ( #was: baseless collection .. )
 [#013]       pending processing queue ..
 [#012]       [ filesystem-based ]
 [#011] #hole

@@ -1159,6 +1159,16 @@ module NoDependenciesZerk
         :"@#{ current_primary_symbol }"
       end
 
+      def parse_trueish_primary_value  # as in `parse_primary_value` - #borrow-coverage from [#ts-039.2]
+        map_value_by do |x|
+          if x
+            advance_one ; x
+          else
+            no_because { "{{ prim }} must be trueish (had #{ x.inspect })" }
+          end
+        end
+      end
+
       def map_value_by
         if no_unparsed_exists
           no_because { "{{ prim }} requires an argument" }

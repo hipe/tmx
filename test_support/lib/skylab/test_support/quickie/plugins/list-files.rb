@@ -5,20 +5,7 @@ module Skylab::TestSupport
     class Plugins::ListFiles
 
       def initialize
-      end
-
-      if false
-      def initialize adapter
-        @fuzzy_flag = adapter.build_fuzzy_flag %w( -list )
-        @adapter = adapter
-      end
-
-      def opts_moniker
-        @fuzzy_flag.some_opts_moniker
-      end
-
-      def args_moniker
-      end
+        @_waypoint_datapoint_store = yield
       end
 
       def description_proc
@@ -30,24 +17,22 @@ module Skylab::TestSupport
         y << "test file(s) then exit"
       end
 
-      if false
-      def prepare sig
-        idx = @fuzzy_flag.any_first_index_in_input sig
-        if idx
-          sig.nilify_input_element_at_index idx
-          sig.rely :CULLED_TEST_FILES
-          sig.carry :CULLED_TEST_FILES, :FINISHED
-          sig
+      def parse_argument_scanner_head
+        ACHIEVED_  # nothing to do. it's a flag
+      end
+
+      def release_agent_profile
+        Eventpoint_::AgentProfile.define do |o|
+          o.can_transition_from_to :files_stream, :finished
         end
       end
 
-      def culled_test_files_eventpoint_notify
-
-        _ = @adapter.paystream.method :puts
-        @adapter.services.to_test_path_stream.each( & _ )
-        NIL_
-      end
+      def invoke _
+        _sr = @_waypoint_datapoint_store.release_test_file_path_streamer__
+        path_st = _sr.call
+        path_st and Responses_::FinalResult[ path_st ]
       end
     end
   end
 end
+# :#tombstone-A: subtle but pronounced demonstration of improvement

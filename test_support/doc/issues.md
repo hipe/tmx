@@ -15,7 +15,11 @@
              (#was: sidesystem class now in [tmx] & [sli])
 [#040]       is find nearest TS file broken?
 
-[#039] #hole ( #moved-to: [#dt-xxx] )
+[#039]       coverpoints referenced elsewhere (borrow coverage/lend coverage)
+             [#here.2]: with [ze]
+             [#here.1]: with [ze]
+             ( #moved-to: [#dt-xxx] )
+
 
 [#038]       expect line
 
@@ -27,7 +31,8 @@
 
              ( #moved-to: [#dt-XXX] )
 
-[#036] #ongoing   indentation in quickie
+[#036] #hole
+             ( #was: indentation in quickie )
 
 [#035]       #track `def test_support` (for `\.test_support`) occurrences,
              which *must* all follow this:
@@ -174,15 +179,17 @@
        #track [#here.1]: track similar implementations of "line" structs (1x here 1x univ)
 
 
-[#006] #hole (whatever occurrences this had disappeared.)
+[#006]       the quickie recursive runner microservice ..
              ( #was: test/all: redundancy points, maybe waits for [#tm-056] )
 
 [#005] #open #quickie #redundant s-tylize
+             1x subscription in [ts]
              ( #was: confessions of an ambiguous grammar .. )
              ( #was: #done test/all should (whitelist) run the tests in the
                provided order, and not the lexical order? (see [#xxx].))
              ( #was: #done rename `all_specs.rb` -> all )
-[#004] #open quickie: module names into fashion (and now narrative)
+
+[#004]       quickie ..
 
 [#002] #open coverage is waiting for [#tmx-011] upgrade rspec
              (and presumably some other things.._

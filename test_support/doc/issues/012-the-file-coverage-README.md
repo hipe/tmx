@@ -11,5 +11,14 @@ picture, and hold the remaining tree up agains the "hub" node, or parent of
 the test tree. it makes more sense if you use the "-tct" option to see the
 two trees that go into making the final tree.
 
+
+
+
+## see also
+  - [#013] file coverage implementation notes
+
+
+
+
 ## (tombstones etc)
   - #tombstone: was ancient code

@@ -4,7 +4,7 @@
 
 this node is for verifying content & style, but not "encoding" - at
 this level we are agnostic about what particular newline sequences
-(if any) were used to terminate the tested lines by the raionale that:
+(if any) were used to terminate the tested lines by the rationale that:
 
   A) the strings and regexes in tests are more readable when they
      don't have to express newline sequences, and

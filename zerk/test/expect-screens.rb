@@ -509,7 +509,7 @@ module Skylab::Zerk::TestSupport
     end
 
     Stream_Line__ = ::Struct.new :line_string, :stream_symbol
-      # #[#ts-007] (2 of 2 in universe)
+      # #[#ts-007.1] (2 of 2 in universe)
 
     class Button_Set_Matcher__
 

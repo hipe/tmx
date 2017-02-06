@@ -11,34 +11,16 @@ use [sa] to convert etc to Stream_
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
-[#sa-035] re-integrate this operation with "wip-files"
   (#open [#ts-030.C] quickie plugin arch needs re-arch - too confusing)
   (#open [#ts-032.A] the "counts report is not covered)
   (#open [#ts-032.B] verbose mode for counts is borked)
--3.090 #open [#ts-002] coverage in the recursive runner
--3.109 request parsing must reconcile the state machine (probably a new branch)
--3.125 tree runner can be invoked by a CLI or API scanner
--3.127 overhaul of pathfinding to use state machine and DRY that plugin guy
-  .. "baseless" gonna go away too
--3.150 testfile -3
-  .. "digraphic" is available to you
--3.159 testfile -4
-(-3.162 represent agent profiles)  
   (totally unrelated: relate [#ts-033] to some place in slowie)
-  wontfix or move to "microservice": #open [#ts-005] stylize
-  open [#ts-036] indentation
--0.038 universal integration closes: [#ts-004] module names (and:)
--0.077 consider #wish [#ts-030.4] quickie onefile drops into recursive runner
--0.115 re-integrate with recursive runner - note no line ranges there, yes tags
--1 plugin
--2 plugin
--3 plugin
--4 plugin
--5 plugin
--6 plugin
--7 plugin
--8 plugin
--9 plugin
--10 plugin
-cover eventpoint-based providing just a list of files (integrated with CLI)
-cover eventpoint-based providing just a listing of test files (API only)
+  move to "microservice" or wontfix: #open [#ts-005] stylize
+-3.100 finished with quickie recursive runner when:
+-3.111 plugin -1 cover #open #[ts-002] #glhf
+-3.114 plugin -2 wip-files #open [#sa-035] #glhf
+-3.117 plugin -3 tree (after list-files)
+-3.120 plugin -4 depth (not used frequently)
+-3.122 plugin -5 order (used frequently)
+-3.125 plugin -6 tag (integrate with ONEFILE SOMEHOW)
+-3.128 plugin -7 "run recursive"

@@ -10,21 +10,18 @@ module Skylab::TestSupport::TestSupport
 
     context "nothing" do
 
-      same = "nothing gets it to the endpoint (STUB MESSAGE)"
-
-      it "API - whines about not reaching endpoint (STUB)" do
-        $stderr.puts "\n«ALTER ME (STUB IMPLEMENTATION)»\n\n\n"
+      it "API - whines about not reaching endpoint" do
         call
-        expect :error, :expression, :etc_something do |y|
-          y[0] == same || fail
+        expect_no_transition_found_ do |y|
+          write_messages_into_for_no_transition_because_nothing_pending_ y
         end
-        expect_fail
       end
 
-      it "CLI - whines about not reacing endpoint (STUB)" do
-        $stderr.puts "\n«ALTER ME (STUB IMPLEMENTATION) (NOTE NO INVITE)»\n\n\n"
+      it "CLI - whines about not reaching endpoint (STUB)" do
         invoke
-        expect_on_stderr same
+        expect_these_lines_on_stderr_ do |y|
+          write_messages_into_for_no_transition_because_nothing_pending_ y
+        end
         expect_fail
       end
     end
@@ -93,6 +90,7 @@ module Skylab::TestSupport::TestSupport
             :help,
             :list_files,
             :order,
+            :path,
             :run_files,
             :tag,
             :tree,

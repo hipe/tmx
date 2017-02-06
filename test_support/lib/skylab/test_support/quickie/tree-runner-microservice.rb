@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class TreeRunnerMicroservice < Common_::MagneticBySimpleModel
+    class TreeRunnerMicroservice < Common_::MagneticBySimpleModel  # [#006]
 
       # complementing [tmx] which is the first ever client to be purely
       # argument-scanner based, this is the first ever (in our universe)
@@ -11,6 +11,8 @@ module Skylab::TestSupport
       #
       # all of this together allows us to test our "operations" (plugins)
       # without jumping thru the extra hoop of running it through a CLI..
+      #
+      # formal introduction and developer notes are in the document.
 
       class << self
         def define & p
@@ -18,39 +20,28 @@ module Skylab::TestSupport
         end
       end  # >>
 
-    if false
-    module Eventpoint_Graph___
+      # ==
 
-      Home_.lib_.task::Eventpoint::Graph[ self ]
+      The_eventpoint_graph___ = Lazy_.call do
 
-      BEGINNING = eventpoint
+        Quickie::Eventpoint_ = Home_.lib_.task::Eventpoint  # eek/meh
 
-      TEST_FILES = eventpoint do
-        from BEGINNING
+        _hi = Eventpoint_.define_graph do |o|
+
+          o.add_state :beginning,
+            :can_transition_to, [ :files_stream, :finished ]
+
+          o.add_state :files_stream,
+            :can_transition_to, [ :finished ]
+
+          o.add_state :finished
+
+          o.beginning_state :beginning
+        end
+        _hi  # #todo
       end
 
-      CULLED_TEST_FILES = eventpoint do
-        from TEST_FILES
-      end
-
-      BEFORE_EXECUTION = eventpoint do
-        from CULLED_TEST_FILES
-      end
-
-      EXECUTION = eventpoint do
-        from BEFORE_EXECUTION
-      end
-
-      FINISHED = eventpoint do
-        from BEGINNING
-        from CULLED_TEST_FILES
-        from EXECUTION
-      end
-    end
-    # ->
-      POSSIBLE_GRAPH = Eventpoint_Graph___.possible_graph
-
-    end  # if false
+      # ==
 
       # -
         attr_writer(
@@ -77,38 +68,92 @@ module Skylab::TestSupport
 
         def __flush_execution
 
-          # (later we would be working from an execution path.
-          # #only-until-eventpoint, we work directly from the queue..)
+          scn = Common_::Scanner.via_array(
+            remove_instance_variable( :@__path ).steps )
 
-          scn = @lazy_index.to_scanner_of_offsets_of_plugins_with_pending_execution
-          if scn.no_unparsed_exists
-            __when_empty_empty_execution_path
-          else
-            __execute_these scn
-          end
-        end
-
-        def __when_empty_empty_execution_path
-          # #only-until-eventpoint
-          @listener.call :error, :expression, :etc_something do |y|
-            y << "nothing gets it to the endpoint (STUB MESSAGE)"
-          end
-          SOFT_UNABLE_
-        end
-
-        def __execute_these scn
-          ok = ACHIEVED_
+          ok = true
           begin
-            _plugin = @lazy_index.dereference_plugin scn.gets_one
-            ok = _plugin.execute
-            ok || break
-          end until scn.no_unparsed_exists
-          ok ? SOFT_ACHIEVED_ : SOFT_UNABLE_
+            step = scn.gets_one
+            scn.no_unparsed_exists && break
+            ok = __invoke_nonfinal_plugin step
+          end while ok
+
+          if ok
+            __invoke_final_plugin step
+          end
+
+          # #coverpoint-1-2 is about how when this fails, NIL should result
         end
+
+        def __invoke_nonfinal_plugin step
+          sct = _struct_via_step step
+          sct and send PROCESS_RESPONSE___.fetch( sct.category_symbol ), * sct.to_a
+        end
+
+        def __invoke_final_plugin step
+          sct = _struct_via_step step
+          sct and sct.final_result
+        end
+
+        def _struct_via_step step
+
+          hi, d = step.mixed_task_identifier
+          :_hello_my_plugin_ == hi || fail
+
+          _plugin = @lazy_index.dereference_plugin d
+
+          _sct = _plugin.invoke step.formal_transition
+          _sct
+        end
+
+        PROCESS_RESPONSE___ = {
+          datapoint: :__process_datapoint,
+        }
+
+        def __process_datapoint x, name_sym
+          ivar = DATAPOINTS___.fetch name_sym
+          instance_variable_defined? ivar and fail
+          instance_variable_set ivar, x
+          ACHIEVED_
+        end
+
+        DATAPOINTS___ = {
+          test_file_path_streamer: :@test_file_path_streamer,
+        }
+
+        def release_test_file_path_streamer__
+          remove_instance_variable :@test_file_path_streamer
+        end
+
+        # ~
 
         def __resolve_execution_path
-          # #only-until-eventpoint
-          ACHIEVED_
+
+          scn = @lazy_index.to_scanner_of_offsets_of_plugins_with_pending_execution
+
+          _graph = The_eventpoint_graph___[]
+
+          _pool = Eventpoint_::AgentProfile::PendingExecutionPool.define do |pool|
+
+            until scn.no_unparsed_exists
+              d = scn.gets_one
+              _plugin = @lazy_index.dereference_plugin d
+              profile = _plugin.release_agent_profile
+              if ! profile
+                self._HELLO
+                next
+              end
+              pool.add_pending_task [ :_hello_my_plugin_, d ], profile
+            end
+          end
+
+          _maybe_path = Eventpoint_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
+            o.pending_execution_pool = _pool
+            o.graph = _graph
+            o.listener = @listener
+          end
+
+          _store :@__path, _maybe_path
         end
 
         # TL;DR: never don't ping
@@ -159,10 +204,19 @@ module Skylab::TestSupport
           end
 
           if @argument_scanner.has_current_primary_symbol
+
+            # if you parsed one primary initially (softly), bogey down
             @omni.flush_to_lookup_current_and_parse_remaining_primaries
+
           elsif @argument_scanner.no_unparsed_exists
+
+            # (no args will always fail (right?) but ride along.. #coverpoint-1-1)
             ACHIEVED_
+
           else
+
+            self._WHAT_COVER
+            # whine town
             _no = @argument_scanner.parse_primary
             _no == UNABLE_ || fail
             _no
@@ -176,318 +230,12 @@ module Skylab::TestSupport
 
           d = @lazy_index.offset_of_touched_plugin_via_user_value _custom_load_ticket
           pi = @lazy_index.dereference_plugin d
-          remove_instance_variable :@__only_one_plugin_mutex  # #only-until-eventpoint
           ok = pi.parse_argument_scanner_head
           if ok
             @lazy_index.enqueue d
           end
           ok
         end
-
-    if false
-      def initialize dae
-
-        dae.receive_mixed_client_ self
-
-        @_daemon = dae
-        @infostream = nil
-        @paystream = nil
-        @_plugins = nil
-        @program_moniker = nil
-        @x_a_a = nil
-        @y = nil
-      end
-
-      def _svc
-        @_daemon  # #hacks-only
-      end
-
-      attr_writer :do_recursive, :program_moniker
-
-      def set_three_streams _, o, e
-        @paystream = o ; @infostream = e
-        @y = nil
-      end
-
-      def receive_argv__ argv
-
-        @_do_execute = false
-
-        ok = __load_plugins
-        ok &&= __via_plugins_resolve_signatures argv
-        ok &&= __check_if_ARGV_is_completely_parsed_via_sigs
-        ok &&= __resolve_path_via_trueish_sigs
-        ok &&= __emit_each_eventpoint_to_all_subscribed_plugins
-
-        if @_do_execute
-          bc = __bound_call_for_test_execution
-          if bc
-            bc.receiver.send bc.method_name, * bc.args, & bc.block
-          else
-            bc
-          end
-        else
-          ok
-        end
-      end
-
-      # -- services for dependencies
-
-      # ~ test path, execution writers
-
-      def yes_do_execute__
-        @_do_execute = true
-      end
-
-      def replace_test_path_s_a path_s_a
-        @_plugins[ :run_recursive ].dependency_.replace_test_path_s_a path_s_a
-      end
-
-      # ~ test-path readers
-
-      def get_test_path_array  # #reach-down
-        @_plugins[ :run_recursive ].dependency_.get_any_test_path_array
-      end
-
-      def to_test_path_stream
-        @_plugins[ :run_recursive ].dependency_.to_test_path_stream
-      end
-
-      # ~ UI-related readers
-
-      def program_moniker
-        @program_moniker or ::File.basename $PROGRAM_NAME
-      end
-
-      def moniker_
-        "#{ program_moniker } "
-      end
-
-      # ~ IO-related readers
-
-      def y
-        @y ||= ::Enumerator::Yielder.new( & infostream_.method( :puts ) )
-      end
-
-      def infostream_
-        @infostream || @_daemon.infostream_
-      end
-
-      def paystream_
-        @paystream || @_daemon.paystream_  # may be mounted under a supernode
-      end
-
-      # ~ misc
-
-      def add_iambic x_a
-        @x_a_a ||= []
-        @x_a_a.push x_a ; nil
-      end
-
-      attr_reader :x_a_a
-
-      # -- service API for performers
-
-      def receive_test_context_class__ tcc  # from an outermost runtime
-        # when the files start loading, this is the hookback
-        @executor.receive_test_context_class___ tcc
-      end
-
-    private
-
-      # -- UI
-
-      def invite_string
-        "see '#{ program_moniker } --help'"
-      end
-
-      def argument_error argv
-
-        @y << "#{ moniker_ }aborting because none of the plugins or #{
-          }loaded spec files processed the argument(s) - #{
-          }#{ argv.map( & :inspect ) * SPACE_ }"
-
-        @y << invite_string
-
-        NIL_
-      end
-
-      def usage
-        @_plugins[ :help ].dependency_.usage
-        NIL_
-      end
-
-      # -- plugin mechanics
-
-      def __load_plugins
-
-        @_plugins and self._STATE_FAILURE
-
-        o = Home_.lib_.plugin::BaselessCollection.new
-        o.eventpoint_graph = POSSIBLE_GRAPH
-        o.modality_const = :CLI
-        o.plugin_services = self
-        o.plugin_tree_seed = Here_::Plugins
-
-        ok = o.load_all_plugins
-        ok and begin @_plugins = o ; ACHIEVED_ end
-      end
-
-      def __via_plugins_resolve_signatures argv
-
-        if '--help' == argv[0]  # while #open [#030]
-          argv[0] = '-help'
-        end
-
-        frozen_argv = argv.dup.freeze
-
-        a = []
-
-        @_plugins.accept do | de |
-          a.push de.prepare frozen_argv
-        end
-
-        if ! a.any?  # not a.lenght.zero?
-          if frozen_argv.length.zero?
-            @y << "nothing to do."
-            @y << invite_string
-            NIL_
-          else
-            argument_error argv
-          end
-        else
-          @_sig_a = a ; KEEP_PARSING_
-        end
-      end
-
-      def __check_if_ARGV_is_completely_parsed_via_sigs  # assume any
-
-        scn = Common_::Scanner.via_array @_sig_a
-
-        sig = Next_trueish__[ scn ]   # assume one
-
-        xtra_a = ::Array.new sig.input.length, true
-
-        begin
-
-          sig.input.each_with_index do |x, idx|  # ( bitwise OR )
-            if x.nil?
-              xtra_a[ idx ] &&= nil
-            elsif true == xtra_a[ idx ]
-              xtra_a[ idx ] = x
-            end
-          end
-
-          sig = Next_trueish__[ scn ]
-
-          sig or break
-          redo
-        end while nil
-
-        if xtra_a.any?
-          argument_error xtra_a.compact
-        else
-          ( @_trueish_sig_a = remove_instance_variable( :@_sig_a ) ).compact!
-          ACHIEVED_
-        end
-      end
-
-      Next_trueish__ = -> scn do
-        begin
-          if scn.no_unparsed_exists
-            break
-          end
-          x = scn.gets_one
-          x and break
-          redo
-        end while nil
-        x
-      end
-
-      def __resolve_path_via_trueish_sigs
-
-        @_graph = POSSIBLE_GRAPH
-
-        wv = @_graph.reconcile @y, :BEGINNING, :FINISHED, @_trueish_sig_a
-        if wv
-          @_path = wv.value_x
-          ACHIEVED_
-        else
-          @y << "aborting because of the above. #{ invite_string }"
-          NIL_
-        end
-      end
-
-      def __emit_each_eventpoint_to_all_subscribed_plugins
-
-        st = @_path.to_stream
-        sym = :BEGINNING
-        begin
-
-          ok = ___emit_eventpoint_to_all_subscribed_plugins sym
-          ok or break
-
-          pred = st.gets
-          if ! pred
-            break
-          end
-
-          sym = pred.after_symbol
-
-          redo
-        end while nil
-        ok
-      end
-
-      def ___emit_eventpoint_to_all_subscribed_plugins eventpoint_sym
-
-        ep = @_graph.fetch_eventpoint eventpoint_sym
-
-        ok = true
-
-        @_plugins.accept do | de |
-
-          sig = de.signature
-          sig or next
-
-          if ! sig.subscribed_to? ep
-            next
-          end
-
-          x = de.eventpoint_notify ep
-          if false == x
-            ok = x
-            break
-          end
-        end
-        ok
-      end
-
-      def __bound_call_for_test_execution
-
-        o = Here_::Sessions_::Execute.new(
-
-          @y, get_test_path_array, @_daemon.program_name_string_array_
-
-        ) do | q |
-
-          if @x_a_a
-            __set_quickie_options q
-          end
-        end
-
-        o.be_verbose = @_plugins[ :run_recursive ].dependency_.be_verbose
-        @executor = o
-        o.produce_bound_call
-      end
-
-      def __set_quickie_options quickie
-        @x_a_a.each do |x_a|
-          quickie.with_iambic_phrase x_a
-        end
-        NIL_
-      end
-    end  # if false
 
         # -- initting the plugins
 
@@ -506,13 +254,20 @@ module Skylab::TestSupport
           cls.new { self }
         end
 
+        # ~ services for above
+
+        def test_filename_tail
+          Home_.spec_rb
+        end
+
+        # ~
+
         def __init_operator_branch
 
           Require_zerk_[]
           @_MTk = Zerk_::MicroserviceToolkit
 
           @_has_result = false  # might be temporary
-          @__only_one_plugin_mutex = nil   # #only-until-eventpoint
           @operator_branch =
             Zerk_::ArgumentScanner::OperatorBranch_via_AutoloaderizedModule.
           define do |o|
@@ -520,6 +275,8 @@ module Skylab::TestSupport
           end
           NIL
         end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
         # --
 
@@ -533,18 +290,27 @@ module Skylab::TestSupport
 
       # ==
 
+      module Quickie::Responses_  # [#here.A] realise local conventions for plugin communication
+
+        FinalResult = ::Struct.new :final_result
+
+        Datapoint = ::Struct.new :value, :name_symbol do
+          def category_symbol
+            :datapoint
+          end
+        end
+      end
+
+      # ==
+
       Require_plugin_ = Lazy_.call do
         Plugin_ = Home_.lib_.plugin ; nil
       end
 
       # ==
-
-      SOFT_ACHIEVED_ = nil  # so now this is purely for self-documenting
-      SOFT_UNABLE_ = nil  # one day we might want `false` to mean `no`
-
-      # ==
     end
   end
 end
+# :#tombstone-B: replaced legacy eventpoint graph with beginnings of new
 # :#history-A: begin overhaul to use new eventpoint
 # #tombstone: `function_chain`

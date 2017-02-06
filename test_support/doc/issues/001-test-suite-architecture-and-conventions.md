@@ -6,6 +6,10 @@ tests are architected into a file tree that confers a "regression friendly"
 order; an order that must be expressed solely by the use of leading integers
 in the filesystem node's entry name.
 
+(this convention is optional; but as a practical matter we always follow
+it for new tests because there is good reason to do so and no good reason
+not to.)
+
 this is to say, a priori knowledge of any (test or application) framework
 and its various conceptions of terms like "models", "features", "functions",
 "integration" etc must NOT be assumed when determining the "regression

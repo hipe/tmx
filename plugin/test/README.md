@@ -15,8 +15,6 @@ dependency, the lower the regression number).
 
   - 42:  2014-01-28  [#ta-004] because came after the rest (i dunno) (has no tests)
 
-  - 59:  2013-06-17  [#023] baseless-collection (because sounds more recent than the remaining)
-
   - 75:  2012-08-02  [#010] delegation (less tests than dependency)
 
   - 92:  2012-06-19  [#007] dependencies

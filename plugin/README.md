@@ -94,24 +94,8 @@ following reasons:
     plugin automatically gets its name appended to each option it defines
     (it defines its options via a "recorder" proxy without knowing it).
 
-
-
-  - library 5 of N: [#023] "baseless" will suset or repurpose
-
-## library 5 of N: [ts] Quickie rolls a reasonable custom solution.
-
-(UPDATE: this moved to here and is now [#023]. EDIT: this makes half of
-the below historial sentiment. we add fresh commentary in a dedicated
-document at that node but the below is still half-relevant.)
-
-for quickie to have its own custom solution makes like easier because
-we can use the quickie in the same distribution as the plugin lib
-(or whichever) we are developing without breaking quickie.
-
-although it's not as minimal and powerful as our latest effort, this stab
-at plugins is easily comprehendable; and by this point it's clear that 90%
-of what we are doing "now" was established by this point.
-
+  - library 5 of N: [#!023] "baseless" now sunsetted (evaporated when we
+    simplified the [#ts-006] quickie recursive runner microservice)
 
   - library 4 of N: [fa] `Services_` sunsetted because it fell ill
 
@@ -130,5 +114,6 @@ of what we are doing "now" was established by this point.
 
 ## document meta
 
+  - #tombstone-C: sunsetted "baseless"
   - #tombstone-B: susetted longer synopses of each legacy solution
   - #tombstone-A: got rid of confused list

@@ -140,6 +140,10 @@ module Skylab::Common::TestSupport
       def execute_under tc
         @_dispatcher.receive_result_as_result tc
       end
+
+      def receive_finish_by p, tc
+        @_dispatcher.receive_finish_by p, tc
+      end
     end
 
     # ==

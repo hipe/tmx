@@ -1,5 +1,10 @@
 # confessions of an ambiguous grammar
 
+(EDIT #todo - this node is disjoint - we suspect it was supposed to be
+sunsetted but we will have to do some forensics to figure this out,
+pending #open [#gi-014] "follow renames")
+
+
 NOTE - it bears pointing out that the grammar for this utility is
 ambiguous. it draws symbols from both the set of available action names
 and the set of existing subproduct names, such that how your command is
