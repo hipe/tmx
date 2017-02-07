@@ -16,7 +16,15 @@ module Skylab::TestSupport::TestSupport
         o.expect %r(\A\nFinished in \d+(?:\.\d+)?(?:e-\d+)? seconds?\z)
       end
 
-      def run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ & p
+      def run_the_tests_thru_a_CLI_expecting_everything_on_STDOUT_ & p
+        _run_the_tests_thu_a_CLI_expecting true, p
+      end
+
+      def run_the_tests_thru_a_CLI_expecting_everything_on_STDERR_ & p
+        _run_the_tests_thu_a_CLI_expecting false, p
+      end
+
+      def _run_the_tests_thu_a_CLI_expecting sout_not_serr, p
 
         args = TheseArgs___.define( & p )
 
@@ -26,10 +34,18 @@ module Skylab::TestSupport::TestSupport
           args.expect_lines_by[ o ]  # hi.
         end.to_assertion_session_under self
 
-        @STDERR = sess.downstream_IO_proxy
+        if sout_not_serr
+          @STDERR = :_not_expecting_stderr_TS_
+          @STDOUT = sess.downstream_IO_proxy
+        else
+          @STDERR = sess.downstream_IO_proxy
+          @STDOUT = :_not_expecting_stdout_TS_
+        end
 
         rt = build_runtime_
-        _svc = start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
+
+        _svc = _start_quickie_service_expecting_CLI sout_not_serr, rt
+
         _mod = enhanced_module_via_runtime_ rt
         x = args.receive_test_support_module_by[ _mod ]  # runs the tests
         sess.finish
@@ -58,7 +74,6 @@ module Skylab::TestSupport::TestSupport
       def given_this_example_ & p
         @EXAMPLE_BODY = p
       end
-
 
       def expect_example_passes_with_message_ s
         exe = _execute_the_example
@@ -96,6 +111,12 @@ module Skylab::TestSupport::TestSupport
 
       # --
 
+      def expect_API_result_for_fail_
+        expect_result NIL
+      end
+
+      # --
+
       def build_runtime_
         subject_module_::Runtime___.define do |o|
           o.kernel_module = kernel_module_
@@ -104,10 +125,26 @@ module Skylab::TestSupport::TestSupport
       end
 
       def start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
+        _start_quickie_service_expecting_CLI false, rt
+      end
+
+      def start_quickie_service_expecting_CLI_output_all_on_STDOUT_ rt
+        _start_quickie_service_expecting_CLI true, rt
+      end
+
+      def _start_quickie_service_expecting_CLI sout_not_serr, rt
+
+        if sout_not_serr
+          serr = :_not_expecting_stderr_TS_
+          sout = stdout_
+        else
+          serr = stderr_
+          sout = :_not_expecting_stdout_TS_
+        end
+
         _argv = self.ARGV_
-        _serr = self.stderr_
-        o = :_no_see_ts_
-        _svc = rt.start_quickie_service_ _argv, o, o, _serr, PNSA___
+
+        _svc = rt.start_quickie_service_ _argv, :_no_see_ts_, sout, serr, PNSA___
         _svc  # hi. #todo
       end
 
@@ -119,6 +156,10 @@ module Skylab::TestSupport::TestSupport
 
       def stderr_
         remove_instance_variable :@STDERR
+      end
+
+      def stdout_
+        remove_instance_variable :@STDOUT
       end
 
       _dangerous_memoize :kernel_module_with_rspec_not_loaded_ do
@@ -262,7 +303,7 @@ module Skylab::TestSupport::TestSupport
         x_a = remove_instance_variable :@__arguments_array
         p = remove_instance_variable :@__listener
         _runtime = @__context.build_runtime_
-        _ = _runtime.receive_API_call__ p, x_a
+        _ = _runtime.receive_API_call_ p, x_a
         _  # #todo
       end
     end

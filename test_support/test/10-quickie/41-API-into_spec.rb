@@ -23,7 +23,7 @@ module Skylab::TestSupport::TestSupport
       expect :error, :expression, :missing_requireds do |y|
         y == [ "missing required argument(s): (load_tests_by)" ] || fail
       end
-      expect_result false
+      expect_API_result_for_fail_
     end
 
     context "look at this variety of emissions and results that we get.." do

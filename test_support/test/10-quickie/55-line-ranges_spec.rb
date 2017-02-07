@@ -64,7 +64,7 @@ module Skylab::TestSupport::TestSupport
       expect :error, :expression, :parse_error, :must_be_digit do |y|
         y == [ "'from' must be digit" ] || fail
       end
-      expect_result false
+      expect_API_result_for_fail_
     end
 
     it "look like negative integer" do
@@ -73,7 +73,7 @@ module Skylab::TestSupport::TestSupport
       expect :error, :expression, :parse_error, :digit_is_negative do |y|
         y == [ "'to' cannot be negative" ] || fail
       end
-      expect_result false
+      expect_API_result_for_fail_
     end
 
     it "is zero" do
@@ -82,7 +82,7 @@ module Skylab::TestSupport::TestSupport
       expect :error, :expression, :parse_error, :digit_is_zero do |y|
         y == [ "'line' cannot be zero" ] || fail
       end
-      expect_result false
+      expect_API_result_for_fail_
     end
 
     it "two ranges are OR'ed together" do
@@ -156,7 +156,7 @@ module Skylab::TestSupport::TestSupport
 
       shared_subject :_state do
 
-        run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ do |o|
+        run_the_tests_thru_a_CLI_expecting_everything_on_STDOUT_ do |o|
 
           o.receive_test_support_module_by = -> mod do
             a = []

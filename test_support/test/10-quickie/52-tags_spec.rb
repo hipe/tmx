@@ -15,7 +15,7 @@ module Skylab::TestSupport::TestSupport
         expect :error, :expression, :parse_error, :invalid_tag_expression do |y|
           y == [ %(invalid 'tag' expression: "%%YIPEE%%") ] || fail
         end
-        expect_result false
+        expect_API_result_for_fail_
       # -
     end
 
@@ -123,7 +123,7 @@ module Skylab::TestSupport::TestSupport
 
         seen = false
 
-        run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ do |o|
+        run_the_tests_thru_a_CLI_expecting_everything_on_STDERR_ do |o|
 
           o.receive_test_support_module_by = -> mod do
 
@@ -165,7 +165,7 @@ module Skylab::TestSupport::TestSupport
 
       shared_subject :_state do
 
-        run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ do |o|
+        run_the_tests_thru_a_CLI_expecting_everything_on_STDOUT_ do |o|
 
           o.receive_test_support_module_by = -> mod do
             a = []

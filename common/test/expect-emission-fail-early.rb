@@ -473,7 +473,7 @@ module Skylab::Common::TestSupport
           @emission_proc = em_p
         end
 
-        def __maybe_express_first_line_of_expression_into_under y, expag
+        def __maybe_express_first_line_of_expression_into_under_ y, expag
           if _looks_like_expression
             _first_N_lines_HACKISHLY_under 1, expag do |line|
               y << "  (first line: #{ line.inspect })"

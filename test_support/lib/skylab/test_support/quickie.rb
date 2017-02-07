@@ -174,11 +174,15 @@ module Skylab::TestSupport
         svc
       end
 
-      def receive_API_call__ p, x_a
-        client = Here_::API::API_InjectedClient_via_Listener_and_Arguments[ p, x_a ]
+      def call * x_a, & p
+        receive_API_call_ p, x_a
+      end
+
+      def receive_API_call_ p, x_a
+        client = Here_::API::InjectedClient_via_Listener_and_Arguments[ p, x_a ]
         svc = ( client and _build_quickie_service_via_injected_client client )
         _write_first_and_only_service svc
-        client and client.RECEIVE_RUNTIME__ self
+        client and client.RECEIVE_RUNTIME_ self
       end
 
       def _write_first_and_only_service svc
@@ -203,9 +207,9 @@ module Skylab::TestSupport
         @__existing_quickie_service = svc ; nil
       end
 
-      attr_reader :quickie_service_is_running__  # maybe away one day. for bin for now..
+      attr_reader :quickie_service_is_running__  # for now, for recursive runner
 
-      def __dereference_quickie_service_
+      def dereference_quickie_service_
         send @_read_quickie_service
       end
 
@@ -310,7 +314,7 @@ module Skylab::TestSupport
         @_thing_mutex = nil
       end
 
-      def __begin_irreversible_one_time_compound_mode_
+      def begin_irreversible_one_time_compound_mode_
         remove_instance_variable :@_thing_mutex
         @_long_running_statistics = StatisticsAggregator___.new @_client  # starts time
         @_receive_TCC = :__receive_first_TCC_in_compound_mode ; nil
@@ -388,9 +392,11 @@ module Skylab::TestSupport
         NIL
       end
 
-      def __end_irreversible_one_time_compound_mode_
+      def end_irreversible_one_time_compound_mode_
         @_receive_TCC = :_COMPOUND_SESSION_CLOSED
-        remove_instance_variable :@_long_running_statistics
+        stats = remove_instance_variable :@_long_running_statistics
+        stats.close  # or move out outward for whatever reason
+        stats
       end
     end
 
@@ -615,7 +621,7 @@ module Skylab::TestSupport
 
         @_ARGV, _, sout, serr, @_program_name_string_array = five
 
-        @_CLI_expression_resources = CLI_ExpressionResources___.define do |o|
+        @_CLI_expression_resources = CLI_ExpressionResources_.define do |o|
           o.stdout = sout
           o.stderr = serr
           o.notify_that_should_invite_by = -> do
@@ -713,7 +719,10 @@ module Skylab::TestSupport
       end
 
       def _client_via_choices cx
-        CLI_InjectedClient___.new cx, @_CLI_expression_resources
+        CLI_InjectedClient_.define do |o|
+          o.choices = cx
+          o.CLI_expression_resources = @_CLI_expression_resources
+        end
       end
 
       def __init_option_parser
@@ -809,7 +818,7 @@ module Skylab::TestSupport
       end
     end
 
-    class CLI_InjectedClient___
+    class CLI_InjectedClient_ < Common_::SimpleModel
 
       # responsibility: express all node-level events (e.g when we cross
       # during traversal an example, a context) via notifications of them.
@@ -821,8 +830,7 @@ module Skylab::TestSupport
 
       # #storypoint-465 has the legacy intro, still relevant
 
-      def initialize cx, rsx
-
+      def choices= cx  # (historical placement)
         if cx
           @_choices_ = cx
           if cx.reducers
@@ -830,19 +838,64 @@ module Skylab::TestSupport
           end
         end
         @_has_reducers = has_reducers
+        cx
+      end
 
+      def initialize
+        @load_tests_by = nil
+        yield self
         @_EEK_branch_cache = []  # each most recent branch indexed by its depth.
         @_EEK_branch_offset = 0  # index into the above
         @_EEK_eg_category = :pass  # the first example, even w/ no tests, is still 'pass'
         @_EEK_failure_count = nil
         @_EEK_flush = :_CLI_client_nothing
         @_EEK_depth = nil  # horrible
-
-        @_CLI_expression_resources = rsx
-        @_stderr = rsx.stderr
-        # #todo - isn't there somewhere we want this? like the final summary line?
         @_tab = '  '
       end
+
+      def define
+        # experimental for recursive runner
+        yield self
+        self
+      end
+
+      # --
+
+      def CLI_expression_resources= rsx
+        @__test_line_downstream = rsx.stdout
+        rsx
+      end
+
+      def _listener_= x
+        @LISTENER = x
+      end
+
+      def _choices_= cx
+        self.choices = cx
+      end
+
+      attr_writer :load_tests_by
+
+      # ~
+
+      def RECEIVE_RUNTIME_ rt
+
+        # the recursive runner CLI is invoked. to run tests, it calls the
+        # onefile API and in that call it injects an injected client. that
+        # client is the subject. partial copypasta with the counterpart.
+
+        svc = rt.dereference_quickie_service_
+
+        svc.begin_irreversible_one_time_compound_mode_
+
+        @load_tests_by[ rt ]  # result is specified as insignificant
+
+        stats = svc.end_irreversible_one_time_compound_mode_
+        receive_test_run_conclusion stats
+        stats
+      end
+
+      # --
 
       def at_beginning_of_test_run
         @_has_reducers && __express_reducers
@@ -914,13 +967,13 @@ module Skylab::TestSupport
           a.push "exclude #{ say_line_body[ exclude ] }"
         end
         if 1 == a.length
-          @_stderr.puts "Run options: #{ a.first }"
+          _puts "Run options: #{ a.first }"
         else
-          @_stderr.puts "Run options:"
-          a.each { |s| @_stderr.puts "#{ SPACE_ }#{ SPACE_ }#{ s }" }
+          _puts "Run options:"
+          a.each { |s| _puts "#{ SPACE_ }#{ SPACE_ }#{ s }" }
         end
 
-        @_stderr.puts  # blank line
+        _puts nil  # blank line
         NIL
       end
 
@@ -1095,7 +1148,7 @@ module Skylab::TestSupport
       define_method :_stylize, DEFINITION_FOR_THE_METHOD_CALLED_STYLIZE___
 
       def _puts s
-        @_stderr.puts s
+        @__test_line_downstream.puts s
       end
 
       def _CLI_client_nothing
@@ -1124,7 +1177,7 @@ module Skylab::TestSupport
 
     # ==
 
-    class CLI_ExpressionResources___ < Common_::SimpleModel
+    class CLI_ExpressionResources_ < Common_::SimpleModel
 
       def initialize
         yield self

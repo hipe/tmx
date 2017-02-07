@@ -16,6 +16,11 @@ module Skylab::Plugin
         :operator_branch,
       )
 
+      def dereference_plugin_via_normal_symbol sym
+        _lt = @operator_branch.dereference sym
+        dereference_plugin_via_user_value _lt
+      end
+
       def dereference_plugin_via_user_value lt  # #here
         lt.HELLO_LOAD_TICKET
         dereference_plugin offset_of_touched_plugin_via_user_value lt

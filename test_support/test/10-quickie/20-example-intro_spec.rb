@@ -20,7 +20,7 @@ module Skylab::TestSupport::TestSupport
 
       shared_subject :_state do
 
-        run_the_tests_thru_a_CLI_expecting_a_single_stream_by_ do |o|
+        run_the_tests_thru_a_CLI_expecting_everything_on_STDOUT_ do |o|
           o.receive_test_support_module_by = method :__receive_test_support_module
           o.expect_lines_by = method :__expect_these_lines
         end

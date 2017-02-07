@@ -147,14 +147,14 @@ module Skylab::TestSupport::TestSupport
       it "the service is started by being injected with a client" do
 
         _svc = _state.first
-        _svc.instance_variable_get( :@_client ).
-          instance_variable_get( :@_stderr ) == :_not_applicable__stderr_for_TS_ || fail
+        _cli = _svc.instance_variable_get :@_client
+        _cli.instance_variable_get( :@__test_line_downstream ) == :_canary__stdout_for_TS_ || fail
       end
 
       shared_subject :_state do
 
         rt = build_runtime_
-        _svc = start_quickie_service_expecting_CLI_output_all_on_STDERR_ rt
+        _svc = start_quickie_service_expecting_CLI_output_all_on_STDOUT_ rt
         [ _svc ]
       end
 
@@ -266,7 +266,11 @@ module Skylab::TestSupport::TestSupport
     end
 
     def stderr_
-      :_not_applicable__stderr_for_TS_
+      :_no_see_ts_
+    end
+
+    def stdout_
+      :_canary__stdout_for_TS_
     end
 
     # ==

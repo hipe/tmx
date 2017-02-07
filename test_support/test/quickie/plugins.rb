@@ -153,7 +153,7 @@ module Skylab::TestSupport::TestSupport
           # failure results should now be nil not false to leave room
           # for meaningful false #coverpoint-1-2
 
-          @API.expect_result_under NIL, self
+          @API.expect_result_under NIL, self  # #here
         end
 
         # ~
@@ -172,9 +172,8 @@ module Skylab::TestSupport::TestSupport
         end
 
         def __expect_succeed_for_API
-          # #only-until-eventpoint
-          _hi = @API.expect_result_under FALSE, self
-          _hi
+          # same as #here (succeed) becuase (see)
+          @API.expect_result_under NIL, self
         end
 
         def expect_result x

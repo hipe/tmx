@@ -121,7 +121,7 @@ module Skylab::TestSupport
           test_file_path_streamer: :@test_file_path_streamer,
         }
 
-        def release_test_file_path_streamer__
+        def release_test_file_path_streamer_
           remove_instance_variable :@test_file_path_streamer
         end
 

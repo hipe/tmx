@@ -5,28 +5,9 @@ module Skylab::TestSupport
     class Plugins::RunFiles
 
       def initialize
-      end
-
-      if false
-      def initialize adapter
-        @be_verbose = false
-        @fuzzy_flag = adapter.build_fuzzy_flag %w( -verbose )
-        @test_path_a = nil
-        @adapter = adapter
-        @y = adapter.y
-      end
-
-      attr_reader :be_verbose
-
-      def opts_moniker
-        @fuzzy_flag.some_opts_moniker
-      end
-
-      def args_moniker
-        ARGS_MONIKER__
-      end
-
-      ARGS_MONIKER__ = '<path> [..]'.freeze
+        o = yield
+        @_listener = o.listener
+        @_shared_datapoint_store = o
       end
 
       def description_proc
@@ -34,112 +15,99 @@ module Skylab::TestSupport
       end
 
       def __describe_into y
-        y << "looks for test files recursively"
-        y << "in the indicated path(s)"
+        y << "run the tests in the files"
       end
 
-      if false
-      def prepare sig
+      def parse_argument_scanner_head
+        ACHIEVED_  # nothing to do. it's a flag
+      end
 
-        argv = sig.input
-
-        a, b = find_contiguous_range_of_paths argv
-        if a
-          idx = @fuzzy_flag.any_first_index_in_input sig
-          if idx
-            sig.nilify_input_element_at_index idx
-            @be_verbose = true
-          end
-
-          @input_path_a = argv[ a, b ]
-
-          @_do_ping = false
-
-          argv[ a, b ] = ::Array.new b
-          sig.nudge :BEGINNING, :TEST_FILES
-          sig.nudge :TEST_FILES, :CULLED_TEST_FILES
-          sig.nudge :CULLED_TEST_FILES, :BEFORE_EXECUTION
-          sig.carry :BEFORE_EXECUTION, :EXECUTION
-          sig.nudge :EXECUTION, :FINISHED
-          sig
-
-        elsif 1 == argv.length && '-ping' == argv.first
-
-          @_do_ping = true
-
-          argv.clear
-          sig.carry :BEGINNING, :FINISHED
-          sig
+      def release_agent_profile
+        Eventpoint_::AgentProfile.define do |o|
+          o.can_transition_from_to :files_stream, :finished
         end
       end
 
-      def beginning_eventpoint_notify
+      def invoke _
+        ok = true
+        ok &&= __resolve_path_stream
+        ok &&= __resolve_injected_client
+        ok &&= __resolve_callable_runtime
+        ok && __call_the_runtime
+        NIL  # no tangible result for now
+      end
 
-        # at our notification of the beginning, we do the work that needs
-        # to be available for the next eventpoint. if we fail to resolve the
-        # test path, we must alert the system to halt normal flow by resulting
-        # in false.
+      def __call_the_runtime
 
-        if @_do_ping
+        _ic = remove_instance_variable :@__injected_client
 
-          @y << "hello from quickie."
+        _stats = @_runtime.call(
+          :injected_client, _ic,
+          :load_tests_by, method( :__load_the_test_files ),
+          & @_listener
+        )
 
-          :_xx_
+        NIL
+      end
+
+      def __load_the_test_files _runtime
+        st = remove_instance_variable :@__path_stream
+        count = 0  # ignored
+        begin
+          path = st.gets
+          path || break
+          count += 1
+          load path  #testpoint
+          redo
+        end while above
+        count.nonzero? and __express_count count
+        NIL
+      end
+
+      def __express_count count
+        @_listener.call :info, :expression, :number_of_files do |y|
+          y << "(ran tests in #{ count } file#{ 's' if 1 != count })"
+        end
+        NIL
+      end
+
+      def __resolve_callable_runtime
+        @_runtime = __quickie_runtime
+        if @_runtime.quickie_service_is_running__
+          __when_service_is_already_running
+          remove_instance_variable :@_runtime
+          ::Kernel._A
         else
-          ready_test_path_a
-          if false == @test_path_a
-            false
-          end
+          ACHIEVED_
         end
       end
 
-      def test_files_eventpoint_notify
-
-        # the parent node issued this eventpoint because that is how the
-        # path reconciled. we should have calculated it in the previous
-        # eventpoint, because we are the only ones that move the application
-        # state from BEGINNING to TEST_FILES
-
-        NIL_
+      def __when_service_is_already_running
+        self._COVER_ME
+        # near "creating non-daemonized instance" before the overhaul
       end
 
-      def culled_test_files_eventpoint_notify
-
-        NIL_
+      def __quickie_runtime  # #testpoint
+        Here_.runtime_
       end
 
-      def execution_eventpoint_notify
-
-        @adapter.services.yes_do_execute__
-
-        NIL_
+      def __resolve_injected_client
+        ok = true
+        p = @_listener
+        ok &&= _store( :@__injected_client, p[ :resource, :injected_client_resource ] )
+        ok
       end
 
-      # ~ services that this node provides upwards (for siblings!) ~
-
-      def get_any_test_path_array
-        # assume that pathfinder worked and the eventpoint path is working..
-        a = @test_path_a
-        if a
-          a.dup
-        else
-          a
-        end
+      def __resolve_path_stream
+        _sr = @_shared_datapoint_store.release_test_file_path_streamer_
+        _store :@__path_stream, _sr.call
       end
 
-      def to_test_path_stream
-        Common_::Stream.via_nonsparse_array @test_path_a
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-      def replace_test_path_s_a path_s_a
-        @test_path_a = path_s_a
-        ACHIEVED_
-      end
-
-      def before_execution_eventpoint_notify
-        # nah.
-      end
-      end  # if false
+      # ==
+      # ==
     end
   end
 end
+# :#tombstone-A: old, complex eventpoint graph

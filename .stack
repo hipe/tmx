@@ -23,4 +23,4 @@ use [sa] to convert etc to Stream_
 -3.120 plugin -4 depth (not used frequently)
 -3.122 plugin -5 order (used frequently)
 -3.125 plugin -6 tag (integrate with ONEFILE SOMEHOW)
--3.128 plugin -7 "run recursive"
+list files CLI ; multiple paths there

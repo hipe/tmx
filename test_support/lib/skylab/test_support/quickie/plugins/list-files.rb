@@ -5,7 +5,7 @@ module Skylab::TestSupport
     class Plugins::ListFiles
 
       def initialize
-        @_waypoint_datapoint_store = yield
+        @_shared_datapoint_store = yield
       end
 
       def description_proc
@@ -28,7 +28,7 @@ module Skylab::TestSupport
       end
 
       def invoke _
-        _sr = @_waypoint_datapoint_store.release_test_file_path_streamer__
+        _sr = @_shared_datapoint_store.release_test_file_path_streamer_
         path_st = _sr.call
         path_st and Responses_::FinalResult[ path_st ]
       end

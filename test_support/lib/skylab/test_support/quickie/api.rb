@@ -40,47 +40,93 @@ module Skylab::TestSupport
 
         def initialize argv, i, o, e, pn_a
           @__ARGV = argv
-          @stderr = e
+          @__program_name_string_array = pn_a
+          @_stderr = e
+          @__stdout = o
         end
 
         def execute
 
           Require_zerk_[]
-          cli = Zerk_::CLI::MicroserviceToolkit
-
-          did_err = false
-
-          _listener = cli::Listener_via.call_by do |o|
-
-            o.receive_did_err_by = -> { did_err = true }
-            o.resource_by = method :__resource
-
-            o.stderr = @stderr
-          end
+          @_CLI_Mtk = Zerk_::CLI::MicroserviceToolkit
 
           _argv = remove_instance_variable :@__ARGV
 
-          _as = cli::ArgumentScanner_via_ArgumentArray[ _argv, & _listener ]
+          _as = @_CLI_Mtk::ArgumentScanner_via_ArgumentArray.call(
+            _argv, & method( :__receive_emission ) )
+
+          __init_listener
+
+          @_did_err = false
 
           x = Here_::TreeRunnerMicroservice.call_by do |o|
             o.argument_scanner = _as
           end
 
-          if did_err
-            GENERIC_ERROR_EXITSTATUS___
+          if @_did_err
+            GENERIC_ERROR_EXITSTATUS_
           elsif x.nil?
-            cli::SUCCESS_EXITSTATUS
+            @_CLI_Mtk::SUCCESS_EXITSTATUS
           else
             :_ping_from_quickie_tree_runner_microservice_ == x || self._DO_ME
-            cli::SUCCESS_EXITSTATUS
+            @_CLI_Mtk::SUCCESS_EXITSTATUS
           end
         end
 
-        def __resource k
-          instance_variable_get RESOURCES___.fetch k
+        def __receive_emission * chan, & p
+
+          if :warning == chan.first
+
+            # the remote library doesn't speak warnings, for now.
+
+            chan[0] = :info
+
+            # for now we'll upgrade warnings to errors (which may have
+            # limited effect)..
+
+            @_did_err = true
+          end
+
+          @__plain_listener[ * chan, & p ]
         end
 
-        RESOURCES___ = { line_downstream_for_help: :@stderr }
+        def __init_listener
+
+          @__plain_listener = @_CLI_Mtk::Listener_via.call_by do |o|
+
+            o.receive_did_err_by = -> { @_did_err = true }
+            o.resource_by = method :__resource
+            o.stderr = @_stderr
+          end
+          NIL
+        end
+
+        def __resource k
+          send RESOURCES___.fetch k
+        end
+
+        RESOURCES___ = {
+          injected_client_resource: :__injected_client_resource,
+          line_downstream_for_help: :__line_downstream_for_help,
+        }
+
+        def __injected_client_resource
+
+          _er = CLI_ExpressionResources_.define do |o|
+            o.stderr = @_stderr
+            o.stdout = remove_instance_variable :@__stdout
+          end
+
+          _ic = CLI_InjectedClient_.define do |o|
+            o.CLI_expression_resources = _er
+          end
+
+          _ic  # hi. #todo
+        end
+
+        def __line_downstream_for_help
+          @_stderr
+        end
       end
 
       # ==
@@ -93,17 +139,20 @@ module Skylab::TestSupport
         # API, in what we used to call #masking..)
 
         def initialize p, a
-          @argument_scanner = No_deps_zerk_[]::API_ArgumentScanner.new a, & p
+
+          as = No_deps_zerk_[]::API_ArgumentScanner.new a, & p
+
+          @__tree_runner_microservice = Here_::TreeRunnerMicroservice.define do |o|
+            o.argument_scanner = as
+            o.listener = method :__receive_emission
+          end
+          # (above ivar name is a #testpoint)
+
+          @argument_scanner = as
         end
 
         def execute
-
-          _msvc = Here_::TreeRunnerMicroservice.define do |o|
-            o.argument_scanner = @argument_scanner
-            o.listener = method :__receive_emission
-          end
-
-          _hi = _msvc.execute
+          _hi = remove_instance_variable( :@__tree_runner_microservice ).execute
           _hi  # #todo
         end
 
@@ -122,8 +171,16 @@ module Skylab::TestSupport
         end
 
         RESOURCES___ = {
+          injected_client_resource: :__injected_client_resource,
           line_downstream_for_help: :__line_downstream_for_help,
         }
+
+        def __injected_client_resource
+          # (this is the default client to use in an API call, which would
+          # suggest that we could result in nothing to the same effect. but
+          # the plugin caller needs something trueish.)
+          API_InjectedClient__
+        end
 
         def __line_downstream_for_help
           @argument_scanner.listener.call :error, :expression, :mode_mismatch do |y|
@@ -135,21 +192,52 @@ module Skylab::TestSupport
 
       # ==
 
-      class API_InjectedClient_via_Listener_and_Arguments < Common_::Dyadic
+      class InjectedClient_via_Listener_and_Arguments < Common_::Dyadic  # 1x
 
         def initialize p, a
           @__arguments_array = a
           @_listener = p
+
+          @injected_client = nil
+          @load_tests_by = nil
         end
 
         def execute
+          if __resolve_choices
+            __WEE
+          end
+        end
+
+        def __WEE
+
+          _cx = remove_instance_variable :@__choices
+          _xx = __injected_clienter
+          p = remove_instance_variable :@load_tests_by
+
+          _xx.define do |o|
+
+            if p
+              o.load_tests_by = p
+            end
+
+            o._choices_ = _cx
+            o._listener_ = @_listener
+          end
+        end
+
+        def __injected_clienter
+          _xx = remove_instance_variable :@injected_client
+          _xx || API_InjectedClient__
+        end
+
+        def _xxx_GET_RID_OF_ME
           ok = nil
-          API_InjectedClient___.define do |o|
+          API_InjectedClient__.define do |o|
             @_client = o
             ok = __resolve_choices
             if ok
               o._choices_ = @__choices
-              o._listener = @_listener
+              o._listener_ = @_listener
             end
           end
           ok && @_client
@@ -159,16 +247,23 @@ module Skylab::TestSupport
           @_formal_primaries_cache = {}
           @_formal_primaries_hash = {}
           _cx = Choices_via_AssignmentsProc_and_Client_.call self do |cx|
-            @_writable_CHOICES = cx.writable_choices
-            cx.write_formal_primaries_into self
-            __add_bespoke_primaries
-            __parse_arguments
+            __write_choices_into cx
           end
-          remove_instance_variable :@_writable_CHOICES
           _store :@__choices, _cx
         end
 
+        def __write_choices_into cx
+          @_writable_CHOICES = cx.writable_choices
+          cx.write_formal_primaries_into self
+          __add_bespoke_primaries
+          ok = __read_arguments
+          ok &&= __check_requireds
+          remove_instance_variable :@_writable_CHOICES
+          ok
+        end
+
         def __add_bespoke_primaries
+          _add_bespoke_primary :injected_client
           _add_bespoke_primary :load_tests_by
           NIL
         end
@@ -186,7 +281,7 @@ module Skylab::TestSupport
           NIL
         end
 
-        def __parse_arguments
+        def __read_arguments
 
           @_scanner = Common_::Scanner.
             via_array remove_instance_variable :@__arguments_array
@@ -196,12 +291,11 @@ module Skylab::TestSupport
             ok = __process_one_primary
             ok || break
           end
-
-          ok && __check_requireds
+          ok
         end
 
         def __check_requireds
-          if @_client.load_tests_by
+          if @load_tests_by
             ACHIEVED_
           else
             __whine_about_missing_required [ :load_tests_by ]
@@ -233,10 +327,16 @@ module Skylab::TestSupport
             o.listener = @_listener
             o.primary = fo
             o.scanner = @_scanner
-            o.writable_client = @_client
+            # o.writable_client = @_client
+            o.writable_client = self
           end
           _ok  # #todo
         end
+
+        attr_accessor(
+          :injected_client,
+          :load_tests_by,
+        )
 
         def __process_agnostic_primary fo
           _ok = ProcessOne_API_PrimaryValue__.call_by do |o|
@@ -273,7 +373,7 @@ module Skylab::TestSupport
 
       # ==
 
-      class API_InjectedClient___ < Common_::SimpleModel
+      class API_InjectedClient__ < Common_::SimpleModel
 
         def initialize
           yield self
@@ -285,24 +385,24 @@ module Skylab::TestSupport
 
         attr_writer(
           :_choices_,
-          :_listener,
+          :_listener_,
           :load_tests_by,
         )
 
-        def RECEIVE_RUNTIME__ rt
+        def RECEIVE_RUNTIME_ rt
 
           # unlike under onefile CLI, with an API call you have to
           # do the extra work of loading the files..
 
-          svc = rt.__dereference_quickie_service_
+          svc = rt.dereference_quickie_service_
 
-          svc.__begin_irreversible_one_time_compound_mode_
+          svc.begin_irreversible_one_time_compound_mode_
 
           _x = @load_tests_by[ rt ]  # all 3 major players are accessible by runtime
 
           # (to have the above result be meaningful would be really annoying near tests..)
 
-          _stats = svc.__end_irreversible_one_time_compound_mode_
+          _stats = svc.end_irreversible_one_time_compound_mode_
           _stats  # #todo
         end
 
@@ -397,7 +497,7 @@ module Skylab::TestSupport
           d = ( @_expiration_counter += 1 )
           yes = @_current_example_passed
           @_current_example_passed = true
-          @_listener.call :data, :example do
+          @_listener_.call :data, :example do
             if d == @_expiration_counter  # (otherwise the event is stale - you get nothing)
               __example yes
             end
@@ -419,200 +519,6 @@ module Skylab::TestSupport
       end
 
       API_Example___ = ::Struct.new :passed, :description_stack
-
-      # ==
-
-    if false
-    class Sessions_::Execute
-
-      def initialize y, test_file_path_a, pn_s_a
-        @ctx_class_a = []
-        @ok = true
-        @_pn_s_a = pn_s_a
-        @tag_shell = nil
-        @tag_filter_p = MONADIC_TRUTH_
-        @test_file_path_a = test_file_path_a
-        @be_verbose = nil
-        @y = y
-        block_given? and yield self
-      end
-
-      attr_accessor :be_verbose
-
-      def with_iambic_phrase x_a
-        @x_a = x_a
-        send :"#{ x_a.fetch 0 }="
-        @x_a = nil
-        self
-      end
-
-      def produce_bound_call
-        ok = @ok
-        ok &&= load_test_files
-        ok &&= resolve_client
-        ok && via_client_produce_bound_call
-      end
-
-      def receive_test_context_class___ ctx_class
-        @ctx_class_a << ctx_class
-        nil
-      end
-
-    private
-
-      def tag=
-
-        ts = tag_shell
-
-        1.upto( @x_a.length - 1 ).each do |d|
-          ts.receive_tag_argument @x_a.fetch d
-        end
-
-        NIL_
-      end
-
-      def tag_shell
-        @tag_shell ||= bld_tag_shell
-      end
-
-      def bld_tag_shell
-        @excluded_count = 0
-        wt_p_a = bk_p_a = nil
-        @tag_filter_p = -> tagset do
-          do_allow = true
-          if bk_p_a
-            bk_p_a.each do |p|
-              _ok = p[ tagset ]
-              if ! _ok
-                do_allow = false
-                break
-              end
-            end
-          end
-          if wt_p_a && do_allow
-            do_allow = false
-            wt_p_a.each do |p|
-              _ok = p[ tagset ]
-              if _ok
-                do_allow = true
-                break
-              end
-            end
-          end
-          if ! do_allow
-            @excluded_count += 1
-          end
-          do_allow
-        end
-
-        Tags_Receiver_.new(
-
-          :on_error, -> x do
-            @ok = false
-            @y << "#{ x }" ; nil
-          end,
-
-          :on_pass_filter_proc, -> p do
-            ( wt_p_a ||= [] ).push p ; nil
-          end,
-
-          :on_no_pass_filter_proc, -> p do
-            ( bk_p_a ||= [] ).push p ; nil
-          end,
-
-          :on_info_qualified_knownness, method( :report_tag ),
-        )
-      end
-
-      def report_tag i, i_, x
-        send :"report_#{ i }_tag", i_, x ; nil
-      end
-
-      def report_include_tag i, x
-        @did_report_include_tag_once ||= begin
-          @y << "(iff included then the test is run)" ; nil
-        end
-        @y << "(if not excluded and #{ i }:#{ x } then the test is included)" ; nil
-      end
-
-      def report_exclude_tag i, x
-        @y << "(if #{ i }:#{ x } then the test is excluded)" ; nil
-      end
-
-      def load_test_files
-        if ! (( a = @test_file_path_a )) then a else
-          a.each do |path_s|
-            @y << "(loading : #{ path_s })" if @be_verbose
-            load path_s  # these attach context classes to the hookback above
-          end
-          true
-        end
-      end
-
-      def resolve_client
-        @client = build_client
-        if @tag_shell
-          @client.at_end_of_run do
-            if @excluded_count.nonzero?
-              @y << "(#{ @excluded_count } tests were excluded because tags)"
-            end
-          end
-        end
-        true
-      end
-
-      def via_client_produce_bound_call
-        Common_::BoundCall[ nil, @client, :execute_ ]
-      end
-
-      def build_client
-
-        a = @ctx_class_a ; @ctx_class_a = nil
-
-        cli = Run_.new @y, :no_root_context, @_pn_s_a
-
-        cli.filter_by_tags_by__( & @tag_filter_p )
-
-        cli.produce_examples_by__ do | branch, leaf |
-          p = nil
-          pp = -> do
-            if p
-              true
-            elsif a.length.nonzero?
-              p = Build_example_stream_proc_[ a.shift, branch, leaf ]
-              true
-            end
-          end
-          none = get_saw_none_p
-          -> do
-            res = catch :res do
-              while true
-                pp[] or throw :res
-                r = p[] and throw :res, r
-                p = nil
-              end
-            end
-            none[ res ]
-          end
-        end
-        cli
-      end
-
-      def get_saw_none_p
-        saw_none = true
-        -> res do
-          if saw_none
-            if res
-              saw_none = false
-            else
-              @y << "(no examples found by recursive runner)"
-            end
-          end
-          res
-        end
-      end
-    end
-    end  # if false
 
       # ==
 
@@ -758,10 +664,11 @@ module Skylab::TestSupport
 
       # ==
 
-      GENERIC_ERROR_EXITSTATUS___ = 113
+      GENERIC_ERROR_EXITSTATUS_ = 113  # 'q'.ord
 
       # ==
     end  # API
   end
 end
+# :#tombstone-A: #temporary
 # #history: began to splice brand new API client into legacy file
