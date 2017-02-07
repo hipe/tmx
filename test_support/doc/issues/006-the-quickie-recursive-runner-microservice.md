@@ -119,6 +119,46 @@ of the problems discussed above without creating new ones.
 
 
 
+## EEK :[#here.B]
+
+when we got here, the "doc only" plugin (which is itself kind of a hack)
+worked like a charm simply by reusing part of the "main workhorse" plugin
+(now called "run files"). it did this, in turn, simply by instantiating
+the remote plugin like a plain old class and then calling certain of its
+methods (made into an internal API). this was all fine and good except
+when the time came to testing.
+
+during testing we've got to hack that workhorse plugin so that it uses
+a "runtime" of our chosing rather than the actual, memoized runtime
+singleton. (it's an open question whether plugins should resolve such a
+resource thru the "shared datapoints" rather that reaching up to it
+directly; current we chose the latter only because this dependency on
+runtime is limited only to one plugin.)
+
+(also the above ties into the broader problem discussed [#here.C] inline.)
+
+the subject method, then, exists both:
+
+  - for this dodgy activity of one plugin "touching" another plugin directly,
+
+  - to allow test setup to "touch" the remote ("workhorse") plugin instance
+    before invocation to hack its methods for mocking/stubbing. (note this
+    plugin instance must persist long enough for the next plugin to use
+    this same instance.)
+
+plugins depending on other plugins is a whole thing..
+
+
+
+
+
+## the "grand bargain" of rspec and quickie :[#here.C]
+
+(currenty the description appears inline in a test a referenced.)
+
+
+
+
 ## document meta
 
   - :#tombstone-A referenced above.

@@ -342,7 +342,7 @@ module Skylab::Common
     end
 
     def to_key_stream & p
-      Home_::Stream.via_nonsparse_array @a, & p
+      Stream.via_nonsparse_array @a, & p
     end
 
     # ~ ..of values

@@ -6,7 +6,7 @@ module Skylab::TestSupport
 
       def initialize
         o = yield
-        @_listener = o.listener
+        @listener = o.listener
         @_shared_datapoint_store = o
       end
 
@@ -29,35 +29,57 @@ module Skylab::TestSupport
       end
 
       def invoke _
+        if prepare_
+          __call_the_runtime
+        end
+      end
+
+      def prepare_
         ok = true
         ok &&= __resolve_path_stream
         ok &&= __resolve_injected_client
         ok &&= __resolve_callable_runtime
-        ok && __call_the_runtime
-        NIL  # no tangible result for now
+        ok
       end
 
       def __call_the_runtime
 
-        _ic = remove_instance_variable :@__injected_client
+        # (horribly mimicked by #quickie-spot-2-2)
 
-        _stats = @_runtime.call(
+        _plus_these = flush_optional_arguments_
+
+        _ic = remove_instance_variable :@injected_client
+
+        @runtime.call_the_quickie_runtime_(
+          * _plus_these,
           :injected_client, _ic,
-          :load_tests_by, method( :__load_the_test_files ),
-          & @_listener
+          :load_tests_by, method( :load_the_test_files_ ),
+          & @listener
         )
-
+        # (result of above is stats object)
         NIL
       end
 
-      def __load_the_test_files _runtime
+      def flush_optional_arguments_
+        plus_these = nil
+        s_a = @_shared_datapoint_store.release_any_unparsed_tags__
+        if s_a
+          plus_these ||= []
+          s_a.each do |s|
+            plus_these.push :tag, s
+          end
+        end
+        plus_these
+      end
+
+      def load_the_test_files_ _runtime
         st = remove_instance_variable :@__path_stream
-        count = 0  # ignored
+        count = 0
         begin
           path = st.gets
           path || break
           count += 1
-          load path  #testpoint
+          load path  #testpoint 2x
           redo
         end while above
         count.nonzero? and __express_count count
@@ -65,17 +87,17 @@ module Skylab::TestSupport
       end
 
       def __express_count count
-        @_listener.call :info, :expression, :number_of_files do |y|
-          y << "(ran tests in #{ count } file#{ 's' if 1 != count })"
+        @listener.call :info, :expression, :number_of_files do |y|
+          y << "(#{ count } file#{ 's' if 1 != count } loaded)"
         end
         NIL
       end
 
       def __resolve_callable_runtime
-        @_runtime = __quickie_runtime
-        if @_runtime.quickie_service_is_running__
+        @runtime = __quickie_runtime
+        if @runtime.quickie_service_is_running__
           __when_service_is_already_running
-          remove_instance_variable :@_runtime
+          remove_instance_variable :@runtime
           ::Kernel._A
         else
           ACHIEVED_
@@ -93,8 +115,8 @@ module Skylab::TestSupport
 
       def __resolve_injected_client
         ok = true
-        p = @_listener
-        ok &&= _store( :@__injected_client, p[ :resource, :injected_client_resource ] )
+        p = @listener
+        ok &&= _store( :@injected_client, p[ :resource, :injected_client_resource ] )
         ok
       end
 
@@ -106,6 +128,13 @@ module Skylab::TestSupport
       define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # ==
+
+      attr_reader(
+        :injected_client,
+        :listener,
+        :runtime,
+      )
+
       # ==
     end
   end

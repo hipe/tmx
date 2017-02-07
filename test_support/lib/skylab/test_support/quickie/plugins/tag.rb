@@ -5,24 +5,9 @@ module Skylab::TestSupport
     class Plugins::Tag
 
       def initialize
-      end
-
-      if false
-      def initialize adapter
-        @adapter = adapter
-        @sw = adapter.build_required_arg_switch FLAG__
-        @y = adapter.y
-      end
-
-      FLAG__ = '-tag'.freeze
-
-      def opts_moniker
-      end
-
-      def args_moniker
-        ARGS_MONIKER__
-      end
-      ARGS_MONIKER__ = "#{ FLAG__ }=<tag>"
+        o = yield
+        @_shared_datapoint_store = o
+        @_unparsed_tag_expressions = []
       end
 
       def description_proc
@@ -33,70 +18,37 @@ module Skylab::TestSupport
         y << "passes through to the test runner."
       end
 
-      if false
-      def prepare sig
-        @sig = sig
-        @_d_a = @sw.any_several_indexes_in_input @sig
-        @result_of_prepare = nil
-        if @_d_a
-          __via_d_a_prepare
+      def parse_argument_scanner_head
+        x = @_shared_datapoint_store.argument_scanner.parse_trueish_primary_value
+        if x
+          @_unparsed_tag_expressions.push x ; ACHIEVED_
         end
-        @result_of_prepare
       end
 
-      def culled_test_files_eventpoint_notify
-        @adapter.add_iambic [ :tag, * @o_a ]
-        NIL_
+      def release_agent_profile
+        send ( @_once ||= :__release_agent_profile_once )
       end
 
-      def __via_d_a_prepare
-        @o_a = []
-        @_d_a.each do |d|
-          @s = @sig.input[ d ][ @sw.s.length + 1 .. -1 ]
-          if @s.length.zero?
-            @y << "#{ _flag } must have an argument"
-            @o_a = nil
-            break
-          else
-            ___via_s_parse
-            @o_a or break
-          end
+      def __release_agent_profile_once
+        @_once = :__nothing
+        Eventpoint_::AgentProfile.define do |o|
+          o.must_transition_from_to :files_stream, :files_stream
         end
-        if @o_a
-          __accept_args_and_activate_plugin
-        end
-        NIL_
       end
 
-      def ___via_s_parse
-        md = TAG_RX___.match @s
-        if md
-          ___parse_tag( * md.captures )
-        else
-          @y << "#{ _flag } must be a valid tag (had: \"#{ @s }\")"
-          @o_a = nil
-        end ; nil
+      def __nothing
+        # subsequent occurrences in the argument array are all processed
+        # by the same plugin instance as a single invocation
+        NOTHING_
       end
 
-      TAG_RX___ = /\A(~)?([_a-zA-Z][_a-zA-Z0-9]*)(:.+)?\z/
+      def invoke _
 
-      def _flag
-        FLAG__
-      end
+        _x_a = remove_instance_variable :@_unparsed_tag_expressions
 
-      def ___parse_tag not_, tag, asst
-        @o_a.push "#{ not_ }#{ tag }#{ asst }"
-        NIL_
-      end
-
-      def __accept_args_and_activate_plugin
-        @_d_a.each do |d|
-          @sig.nilify_input_element_at_index d
-        end
-        @sig.rely :CULLED_TEST_FILES
-        @result_of_prepare = @sig ; nil
-      end
+        Responses_::Datapoint[ _x_a, :unparsed_tag_expressions ]
       end
     end
   end
 end
+# #history: mostly full rewrite

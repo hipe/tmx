@@ -60,7 +60,8 @@ module Skylab::SearchAndReplace::TestSupport
 
       it "no summary (only 3 content lines) for now because of simplified etc" do
 
-        _interesting_lines.length == 3 or fail
+        act_d = _interesting_lines.length
+        act_d == 3 or ( act_d.should eql 3 )  # #flickered
       end
 
       it "skipped file that was not under version control" do

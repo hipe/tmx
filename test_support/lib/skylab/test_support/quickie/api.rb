@@ -42,7 +42,7 @@ module Skylab::TestSupport
           @__ARGV = argv
           @__program_name_string_array = pn_a
           @_stderr = e
-          @__stdout = o
+          @_stdout = o
         end
 
         def execute
@@ -66,6 +66,9 @@ module Skylab::TestSupport
           if @_did_err
             GENERIC_ERROR_EXITSTATUS_
           elsif x.nil?
+            @_CLI_Mtk::SUCCESS_EXITSTATUS
+          elsif x.respond_to? :gets
+            line = nil ; @_stdout.puts line while ( line = x.gets )
             @_CLI_Mtk::SUCCESS_EXITSTATUS
           else
             :_ping_from_quickie_tree_runner_microservice_ == x || self._DO_ME
@@ -114,7 +117,7 @@ module Skylab::TestSupport
 
           _er = CLI_ExpressionResources_.define do |o|
             o.stderr = @_stderr
-            o.stdout = remove_instance_variable :@__stdout
+            o.stdout = @_stdout
           end
 
           _ic = CLI_InjectedClient_.define do |o|
@@ -253,18 +256,24 @@ module Skylab::TestSupport
         end
 
         def __write_choices_into cx
-          @_writable_CHOICES = cx.writable_choices
+          @_writable_choices = cx.writable_choices
           cx.write_formal_primaries_into self
           __add_bespoke_primaries
           ok = __read_arguments
           ok &&= __check_requireds
-          remove_instance_variable :@_writable_CHOICES
+          remove_instance_variable :@_writable_choices
           ok
         end
 
         def __add_bespoke_primaries
+
+          _add_bespoke_primary :do_documentation_only do |o|
+            o.be_flag
+          end
+
           _add_bespoke_primary :injected_client
           _add_bespoke_primary :load_tests_by
+          _add_bespoke_primary :statistics_class
           NIL
         end
 
@@ -327,10 +336,40 @@ module Skylab::TestSupport
             o.listener = @_listener
             o.primary = fo
             o.scanner = @_scanner
-            # o.writable_client = @_client
+
             o.writable_client = self
           end
           _ok  # #todo
+        end
+
+        def statistics_class= x
+          @_writable_choices.statistics_class = Ick_wrap__[ x ]
+        end
+
+        def statistics_class
+          @_writable_choices.statistics_class ? true : nil
+        end
+
+        def do_documentation_only= x
+          @_writable_choices.do_documentation_only = Ick_wrap__[ x ]
+        end
+
+        Ick_wrap__ = -> x do
+          if x
+            IckWrap___.new x
+          else
+            x
+          end
+        end
+
+        class IckWrap___
+          def initialize x
+            @value = x
+          end
+          attr_reader :value
+          def finish
+            ACHIEVED_
+          end
         end
 
         attr_accessor(
@@ -343,7 +382,7 @@ module Skylab::TestSupport
             o.listener = @_listener
             o.primary = fo
             o.scanner = @_scanner
-            o.writable_client = @_writable_CHOICES
+            o.writable_client = @_writable_choices
           end
           _ok  # #todo
         end
@@ -416,7 +455,9 @@ module Skylab::TestSupport
 
         def __begin_branch_node_initially d, ctx
           d.zero? || self._SANITY
-          ctx.description && self._SANITY
+          if ctx.description
+            NOTHING_  # #coverpoint-2-5
+          end
           @_branch_stack = []
           @_expected_leaf_depth = 1
           @_begin_branch_node = :__begin_branch_node_normally

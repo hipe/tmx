@@ -70,6 +70,10 @@ module Skylab::TestSupport::TestSupport
           @CLI.expect_on_stderr s
         end
 
+        def expect_on_stdout s
+          @CLI.expect_on_stdout s
+        end
+
         def on_stream sym
           @CLI.on_stream sym
         end
@@ -151,7 +155,7 @@ module Skylab::TestSupport::TestSupport
         def _expect_fail_for_API
 
           # failure results should now be nil not false to leave room
-          # for meaningful false #coverpoint-1-2
+          # for meaningful false #coverpoint-2-2
 
           @API.expect_result_under NIL, self  # #here
         end
@@ -202,6 +206,39 @@ module Skylab::TestSupport::TestSupport
 
         # --
 
+        def hack_that_one_plugin_of_invocation_to_use_this_runtime_ invo, & p
+
+          # touch the particular plugin "early" and hack this one method on it
+
+          _msvc = invo.instance_variable_get :@__tree_runner_microservice
+
+          pi = _msvc.DEREFERENCE_PLUGIN :run_files
+
+          once = -> do # assert that it's only called once just because
+            rt = p[]
+            once = nil
+            rt
+          end
+
+          pi.send :define_singleton_method, :__quickie_runtime do
+            once[]
+          end
+
+          pi
+        end
+
+        def build_fresh_dummy_runtime_
+
+          # don't read from or write to the real life production runtime
+
+          Home_::Quickie::Runtime___.define do |o|
+            o.kernel_module = :_no_see_ts_
+            o.toplevel_module = :_no_see_ts_
+          end
+        end
+
+        # --
+
         def expression_agent
           send EXPAG___.fetch @API_OR_CLI
         end
@@ -241,6 +278,15 @@ module Skylab::TestSupport::TestSupport
       # -
 
       # ==
+
+      class DescribeProxy  # 1x
+        def initialize & p
+          @__once = p
+        end
+        def describe * s_a, & p
+          remove_instance_variable( :@__once )[ p, s_a ]
+        end
+      end
 
       # ==
 

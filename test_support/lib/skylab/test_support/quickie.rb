@@ -174,7 +174,7 @@ module Skylab::TestSupport
         svc
       end
 
-      def call * x_a, & p
+      def call_the_quickie_runtime_ * x_a, & p  # recursive runner plugins
         receive_API_call_ p, x_a
       end
 
@@ -316,11 +316,11 @@ module Skylab::TestSupport
 
       def begin_irreversible_one_time_compound_mode_
         remove_instance_variable :@_thing_mutex
-        @_long_running_statistics = StatisticsAggregator___.new @_client  # starts time
+        @_long_running_statistics = _build_and_start_statistics
         @_receive_TCC = :__receive_first_TCC_in_compound_mode ; nil
       end
 
-      def _receive_describe p, s_a
+      def _receive_describe p, s_a  # #testpoint
         tcc = ::Class.new Context__  # test context class
         Initialize_context_class__[ tcc, p, s_a ]
         send @_receive_TCC, tcc
@@ -378,7 +378,7 @@ module Skylab::TestSupport
 
       def _receive_TCC_in_basic_mode tcc
 
-        stats = StatisticsAggregator___.new @_client  # starts time
+        stats = _build_and_start_statistics
 
         RunTests_via_TestContextClass_and_Client__.define do |o|
           o.client = @_client
@@ -390,6 +390,19 @@ module Skylab::TestSupport
         @_client.receive_test_run_conclusion stats
 
         NIL
+      end
+
+      def _build_and_start_statistics
+        cx = @_client._choices_
+        if cx
+          choice = cx.statistics_class
+        end
+        if choice
+          cx.statistics_class = NOTHING_  # THE WORST
+          choice.value.new @_client  # should start time
+        else
+          StatisticsAggregator___.new @_client  # starts time
+        end
       end
 
       def end_irreversible_one_time_compound_mode_
@@ -404,7 +417,10 @@ module Skylab::TestSupport
 
     class RunTests_via_TestContextClass_and_Client__ < Common_::SimpleModel
 
+      # typically one such performer is build (or duped) for every test file
+
       def initialize
+        @documentation_only = false
         @_reduction_proc = MONADIC_TRUTH_
         super
       end
@@ -424,20 +440,25 @@ module Skylab::TestSupport
         cx = cli._choices_
         if cx
           cx.members.each do |mem|
-            send RECEIVE_CHOICE___.fetch( mem ), cx[ mem ]
+            x = cx[ mem ]
+            x || next
+            send RECEIVE_CHOICE___.fetch( mem ), x
           end
         end
         @client = cli
       end
 
       RECEIVE_CHOICE___ = {  # sanity for when new choices are added
+        do_documentation_only: :__receive_doc_only,
         reducers: :__receive_reducers,
       }
 
+      def __receive_doc_only _
+        @documentation_only = true
+      end
+
       def __receive_reducers red
-        if red
           @_reduction_proc = red.to_proc
-        end
         NIL
       end
 
@@ -467,6 +488,11 @@ module Skylab::TestSupport
           end
 
           # puts "#{ indent[] }<<#{ eg.description }>>"
+
+          if @documentation_only
+            stats.tick_documentation_only
+            redo
+          end
 
           stats.tick_example
           ctx = eg.context.new stats
@@ -599,12 +625,58 @@ module Skylab::TestSupport
 
       # ~ read
 
+      def tempurature_between_zero_and_ten_inclusive
+        @example_failed_count.zero? ? @example_pending_count.zero? ? 0 : 5 : 10
+      end
+
+      def main_count_is_zero
+        @example_count.zero?
+      end
+
+      def to_qualified_datapoint_stream
+        a = []
+        a.push QualifiedDatapoint_.new( @example_count, "example" )
+        a.push QualifiedDatapoint_.new( @example_failed_count,  "failure" )
+        a.push QualifiedDatapoint_.new( @example_pending_count, "pending", false, false )
+        Stream_[ a ]
+      end
+
       attr_reader(
         :elapsed_time,
+        # maybe only #testpoint(s):
         :example_count,
         :example_failed_count,
-        :example_pending_count,
       )
+    end
+
+    class QualifiedDatapoint_
+
+      # a simple name-value pair plus rough hax for EN linguistic inflection
+
+      def initialize d, s, plur=true, show_zero=true
+        @__infer_pluralization = plur
+        @_lemma = s
+        @_number = d
+        @__zero_is_still_significant = show_zero
+      end
+
+      def is_known_known
+        @_number.nonzero? || @__zero_is_still_significant
+      end
+
+      def to_string sym
+        :EN == sym || self._I18N
+        _lexeme = if 1 == @_number || ! @__infer_pluralization
+          @_lemma
+        elsif @_lemma.include? SPACE_
+          s_a = @_lemma.split SPACE_
+          s_a.first << 's'
+          s_a * SPACE_
+        else
+          "#{ @_lemma }s"
+        end
+        "#{ @_number } #{ _lexeme }"
+      end
     end
 
     # ==
@@ -1110,11 +1182,7 @@ module Skylab::TestSupport
 
       def receive_test_run_conclusion stats
 
-        e_d = stats.example_count
-        f_d = stats.example_failed_count
-        p_d = stats.example_pending_count
-
-        if e_d.zero?
+        if stats.main_count_is_zero
           if @_has_reducers
             _puts "All examples were filtered out"
           else
@@ -1124,16 +1192,17 @@ module Skylab::TestSupport
 
         _puts "#{ NEWLINE_ }Finished in #{ stats.elapsed_time } seconds"
 
-        np = -> d, s do  # (or move to expag)
-          "#{ d } #{ s }#{ 's' if 1 != d }"
+        _msg = stats.to_qualified_datapoint_stream.reduce_by do |o|
+          o.is_known_known
+        end.join_into_with_by "", ", " do |o|
+          o.to_string :EN
         end
 
-        if p_d.nonzero?
-          _ = ", #{ p_d } pending"
+        _color = case stats.tempurature_between_zero_and_ten_inclusive
+        when 0...3 ; :green   # cool
+        when 3...7 ; :yellow  # warm
+        when 7..10 ; :red     # hot
         end
-
-        _msg = "#{ np[ e_d, "example" ] }, #{ np[ f_d, "failure" ] }#{ _ }"
-        _color = f_d.zero? ? p_d.zero? ? :green : :yello : :red
 
         _puts _stylize( _color, _msg )
         NIL
@@ -1709,6 +1778,11 @@ module Skylab::TestSupport
     end
 
     choices_members = []  # order does not matter
+
+    choices_members.push(
+      :do_documentation_only,  # for recursive runner
+      :statistics_class,  # for recursive runner
+    )
 
     # === FEATURE: line-number-ranges ===
 

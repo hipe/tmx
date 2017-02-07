@@ -11,7 +11,7 @@ module Skylab::TestSupport
         @_argument_scanner = microservice.argument_scanner
         @_did_release = false
         @_listener = microservice.listener
-        @_mixed_directory_arguments = []
+        @_mixed_path_arguments = []
 
         @test_filename_tail = microservice.test_filename_tail
       end
@@ -28,13 +28,14 @@ module Skylab::TestSupport
       def parse_argument_scanner_head
         x = @_argument_scanner.parse_trueish_primary_value
         if x
-          @_mixed_directory_arguments.push x ; ACHIEVED_
+          @_mixed_path_arguments.push x ; ACHIEVED_
         end
       end
 
       def release_agent_profile
         if @_did_release
-          self._RIDE_ME__this_is_what_you_want_is_to_reduce_multiple_argument_invocations_into_one_actual_invocation__
+          # #coverpoint-2-4 is about how a single plugin instance can
+          # process multiple expressions of its argument in this manner
           NOTHING_
         else
           @_did_release = true
@@ -63,7 +64,7 @@ module Skylab::TestSupport
 
         glob_tail = ::File.join '**', @_glob_and_moniker
 
-        Stream_.call( @_mixed_directory_arguments ).expand_by do |path|
+        Stream_.call( @_mixed_path_arguments ).expand_by do |path|
 
           if looks_like_test[ path ]
             Common_::Stream.via_item path
@@ -73,7 +74,7 @@ module Skylab::TestSupport
             big_list = ::Dir[ _glob ]
             if big_list.length.zero?
               __whine_about_no_ent path
-              # #coverpoint-1-3: no longer do we break the stream here
+              # #coverpoint-2-3: no longer do we break the stream here
               Common_::THE_EMPTY_STREAM
             else
               Stream_[ big_list ]

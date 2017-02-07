@@ -128,8 +128,10 @@ on ordinary modules and classes, for whatever reason..)
 anyway all this is to say that we have no "direct" way of reaching `main` to
 see if this enhancement has occurred (without doing something terrible like
 setting it to a const, or no, wait, `TOPLEVEL_BINDING.target`), but that's
-all obnoxious to test and brittle. in its stead, we:
+all obnoxious to test and brittle. in its stead, we: [the subject code].
 
+we ponder this architectural mechanic of rspec (and so quickie) more deeply
+at [#006.C] "grand bargain" (inline in code).
 
 
 

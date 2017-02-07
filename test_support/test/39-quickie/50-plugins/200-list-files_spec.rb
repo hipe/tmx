@@ -10,7 +10,7 @@ module Skylab::TestSupport::TestSupport
 
     context "no args" do
 
-      # :#coverpoint-1-1: no args will always fail, right?
+      # :#coverpoint-2-1: no args will always fail, right?
 
       # - API
 
@@ -107,7 +107,7 @@ module Skylab::TestSupport::TestSupport
 
         it "still results in stream (the empty stream)" do
 
-          # #coverpoint-1-3: no longer do we break the stream in these cases
+          # #coverpoint-2-3: no longer do we break the stream in these cases
 
           binding_.local_variable_get( :_items ).length.zero? || fail
         end
@@ -141,17 +141,14 @@ module Skylab::TestSupport::TestSupport
 
     # ==
 
-    context "yay - find self as a test file" do
+    eek = __FILE__
+    dir = ::File.dirname eek
 
+    # - context
       # - API
+        it "API - yay - find self as a test file. no emissions, just stream of file" do
 
-        it "no emissions - just a stream of files" do
-
-          eek = __FILE__
-
-          _dir = ::File.dirname eek
-
-          call :list_files, path, _dir
+          call :list_files, path, dir
 
           _a = finish_by do |st|
             st.to_a
@@ -160,7 +157,42 @@ module Skylab::TestSupport::TestSupport
           _a.include? eek or fail
         end
       # -
-    end
+    # -
+
+    # - context
+      # - CLI
+        it "CLI - just this one file - writes one line to stdout" do
+
+          invoke '-path', eek, '-list-files'
+          expect_on_stdout eek
+          expect_succeed
+        end
+      # -
+    # -
+
+    # - context
+      # - API
+
+        it "API - multiple directories!" do
+
+          # :#quickie-spot-2-1 (assume a certain test subtree)
+
+          eek_ = TS_.dir_path
+          _one = ::File.join eek_, '20-magnetics'
+          _two = ::File.join eek_, '30-io-spy'  # name :(
+
+          call :list_files, :path, _one, :path, _two
+
+          a = finish_by do |st|
+            st.to_a
+          end
+
+          a.first.ascii_only?  # assert that it is a string
+
+          ( 3..4 ).include? a.length or fial
+        end
+      # -
+    # -
 
     # ==
 

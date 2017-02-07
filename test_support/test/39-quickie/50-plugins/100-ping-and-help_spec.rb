@@ -87,6 +87,7 @@ module Skylab::TestSupport::TestSupport
           _expected = [
             :cover,
             :depth,
+            :doc_only,
             :help,
             :list_files,
             :order,

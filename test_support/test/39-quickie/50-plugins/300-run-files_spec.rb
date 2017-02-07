@@ -22,7 +22,7 @@ module Skylab::TestSupport::TestSupport
 
         it "said how many it loaded" do
           a = _tuple
-          _exp = "(ran tests in #{ a[2] } files)"
+          _exp = "(#{ a[2] } files loaded)"
           a[1] == [ _exp ] || fail
         end
 
@@ -64,16 +64,8 @@ module Skylab::TestSupport::TestSupport
 
     def prepare_subject_API_invocation invo
 
-      # touch "early" the subject plugin and hack 2 methods on it..
-
-      _msvc = invo.instance_variable_get :@__tree_runner_microservice
-
-      pi = _msvc.lazy_index.dereference_plugin_via_normal_symbol :run_files
-
-      _rt = __build_fresh_runtime  # see
-      p = -> { p = nil ; _rt }  # assert that it's only called once just because
-      pi.send :define_singleton_method, :__quickie_runtime do
-        p[]
+      pi = hack_that_one_plugin_of_invocation_to_use_this_runtime_ invo do
+        build_fresh_dummy_runtime_
       end
 
       # don't actually load the file but:
@@ -84,16 +76,6 @@ module Skylab::TestSupport::TestSupport
       end
 
       super
-    end
-
-    def __build_fresh_runtime
-
-      # don't read from or write to the real life production runtime
-
-      Home_::Quickie::Runtime___.define do |o|
-        o.kernel_module = :_no_see_ts_
-        o.toplevel_module = :_no_see_ts_
-      end
     end
 
     # ==

@@ -82,12 +82,12 @@ module Skylab::TestSupport
             __invoke_final_plugin step
           end
 
-          # #coverpoint-1-2 is about how when this fails, NIL should result
+          # #coverpoint-2-2 is about how when this fails, NIL should result
         end
 
         def __invoke_nonfinal_plugin step
           sct = _struct_via_step step
-          sct and send PROCESS_RESPONSE___.fetch( sct.category_symbol ), * sct.to_a
+          sct and __receive_plugin_product sct
         end
 
         def __invoke_final_plugin step
@@ -103,7 +103,19 @@ module Skylab::TestSupport
           _plugin = @lazy_index.dereference_plugin d
 
           _sct = _plugin.invoke step.formal_transition
-          _sct
+          _sct  # #todo
+        end
+
+        # -- EXPERIMENTAL - see [#here.B]
+
+        def DEREFERENCE_PLUGIN sym
+          @lazy_index.dereference_plugin_via_normal_symbol sym
+        end
+
+        # -- receiving plugin products
+
+        def __receive_plugin_product sct
+          send PROCESS_RESPONSE___.fetch( sct.category_symbol ), * sct.to_a
         end
 
         PROCESS_RESPONSE___ = {
@@ -111,18 +123,39 @@ module Skylab::TestSupport
         }
 
         def __process_datapoint x, name_sym
-          ivar = DATAPOINTS___.fetch name_sym
-          instance_variable_defined? ivar and fail
-          instance_variable_set ivar, x
-          ACHIEVED_
+          send PROCESS_DATAPOINT___.fetch( name_sym ), x
         end
 
-        DATAPOINTS___ = {
-          test_file_path_streamer: :@test_file_path_streamer,
+        PROCESS_DATAPOINT___ = {
+          test_file_path_streamer: :__process_test_file_path_streamer,
+          unparsed_tag_expressions: :__process_unparsed_tag_expressions,
         }
+
+        def __process_unparsed_tag_expressions x
+          _safe_write :@_unparsed_tags, x
+        end
+
+        def release_any_unparsed_tags__
+          if instance_variable_defined? :@_unparsed_tags
+            remove_instance_variable :@_unparsed_tags
+          end
+        end
+
+        def __process_test_file_path_streamer x
+          _safe_write :@test_file_path_streamer, x
+        end
 
         def release_test_file_path_streamer_
           remove_instance_variable :@test_file_path_streamer
+        end
+
+        def _safe_write ivar, x
+          if instance_variable_defined? ivar
+            orig_x = instance_variable_get ivar
+          end
+          orig_x.nil? || self._EVENTPOINT_GRAPH_SANITY
+          instance_variable_set ivar, x
+          ACHIEVED_
         end
 
         # ~
@@ -140,7 +173,8 @@ module Skylab::TestSupport
               _plugin = @lazy_index.dereference_plugin d
               profile = _plugin.release_agent_profile
               if ! profile
-                self._HELLO
+                # hi: #coverpoint-2-4 is about how a single plugin (instance)
+                # can fulfill multiple argument expressions in one invocation
                 next
               end
               pool.add_pending_task [ :_hello_my_plugin_, d ], profile
@@ -210,7 +244,7 @@ module Skylab::TestSupport
 
           elsif @argument_scanner.no_unparsed_exists
 
-            # (no args will always fail (right?) but ride along.. #coverpoint-1-1)
+            # (no args will always fail (right?) but ride along.. #coverpoint-2-1)
             ACHIEVED_
 
           else
