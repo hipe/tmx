@@ -2,19 +2,12 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Normal_terms_via_parameters___
+      class NormalTerms_via_Parameters___ < Common_::Dyadic
 
-        class << self
-          def [] a, b, c
-            new( a, b, c ).execute
-          end
-          private :new
-        end  # >>
-
-        def initialize terms, ordered_paths, y
-          @_terms = terms
+        def initialize terms, ordered_paths, & listener
+          @_listener = listener
           @_ordered_paths = ordered_paths
-          @_y = y
+          @_terms = terms
         end
 
         def execute
@@ -62,12 +55,16 @@ module Skylab::TestSupport
         end
 
         def ___too_low d, sym
-          @_y << "#{ sym } term cannot be #{ d }. must be at least 1."
+          @_listener.call :error, :expression, :primary_parse_error do |y|
+            y << "#{ sym } term cannot be #{ d }. must be at least 1."
+          end
           UNABLE_
         end
 
         def __too_high d, len, sym
-          @_y << "#{ sym } term cannot be greater than #{ len }. (had #{ d }.)"
+          @_listener.call :error, :expression, :primary_parse_error do |y|
+            y << "#{ sym } term cannot be greater than #{ len }. (had #{ d }.)"
+          end
           UNABLE_
         end
       end

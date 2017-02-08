@@ -54,14 +54,14 @@ module Skylab::TestSupport::TestSupport
           end
           expect_fail
           if block_given?
-            _expect_against_these_messages msgs, & p
+            expect_these_lines_in_array_ msgs, & p
           else
             msgs
           end
         end
 
         def fails_with_these_messages_ & p
-          _expect_against_these_messages messages_, & p
+          expect_these_lines_in_array_ messages_, & p
         end
 
         # ~
@@ -102,7 +102,7 @@ module Skylab::TestSupport::TestSupport
 
         # ~
 
-        def _expect_against_these_messages actual_messages
+        def expect_these_lines_in_array_ actual_messages
 
           act_line_scn = Common_::Scanner.via_array actual_messages
 

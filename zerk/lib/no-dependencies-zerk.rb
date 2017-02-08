@@ -253,7 +253,7 @@ module NoDependenciesZerk
       end
 
       def parse_primary_softly
-        md = PRIMARY_RX___.match head_as_is
+        md = PRIMARY_RX__.match head_as_is
         if md
           _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
           send @_write_CPS, _
@@ -268,7 +268,11 @@ module NoDependenciesZerk
         end
       end
 
-      PRIMARY_RX___ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
+      def head_looks_like_optional_argument  # assume no empty
+        PRIMARY_RX__ !~ head_as_is
+      end
+
+      PRIMARY_RX__ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
 
       def __write_CPS_initially sym
         @has_current_primary_symbol = true
@@ -414,6 +418,10 @@ module NoDependenciesZerk
         :no_unparsed_exists,
       )
 
+      def can_optional_argument
+        true
+      end
+
       def can_fuzzy
         true
       end
@@ -544,6 +552,10 @@ module NoDependenciesZerk
         :listener,
         :no_unparsed_exists,
       )
+
+      def can_optional_argument
+        false
+      end
 
       def can_fuzzy
         false

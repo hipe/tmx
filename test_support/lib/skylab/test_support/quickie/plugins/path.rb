@@ -11,7 +11,7 @@ module Skylab::TestSupport
         @_argument_scanner = microservice.argument_scanner
         @_did_release = false
         @_listener = microservice.listener
-        @_mixed_path_arguments = []
+        @_mixed_path_arguments = []  # #testpoint
 
         @test_filename_tail = microservice.test_filename_tail
       end
@@ -55,7 +55,7 @@ module Skylab::TestSupport
         )
       end
 
-      def __to_test_file_path_stream
+      def __to_test_file_path_stream  # #testpoint
 
         looks_like_test = Home_.lib_.basic::String.
           build_proc_for_string_ends_with_string @test_filename_tail

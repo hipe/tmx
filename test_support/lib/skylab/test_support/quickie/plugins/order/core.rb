@@ -5,29 +5,9 @@ module Skylab::TestSupport
     class Plugins::Order
 
       def initialize
-      end
-
-      if false
-      def initialize adapter
-
-        @_adapter = adapter
-        @_switch = adapter.build_optional_arg_switch FLAG__
-      end
-
-      def opts_moniker
-      end
-
-      def args_moniker
-        ARGS_MONIKER__
-      end
-      end
-
-      FLAG__ = '-order'.freeze
-
-      if false
-      ARGS_MONIKER__ = "#{ FLAG__ }=M-N"
-
-      DEFAULT__ = '1-N'
+        o = yield
+        @_listener = o.listener
+        @_shared_datapoint_store = o
       end
 
       def description_proc
@@ -35,92 +15,50 @@ module Skylab::TestSupport
       end
 
       def __describe_into y
-        y << "(use \"#{ _flag }=help\")"
+        y << "(use \"#{ _moniker } help\")"
       end
 
-      if false
-      def prepare sig
+      def parse_argument_scanner_head
+        send ( @_parse_argument_scanner_head ||= :__parse_first )
+      end
 
-        match = @_switch.any_first_match_in_input sig
-        if match
+      def __parse_first
 
-          @_argument_value = match.matchdata[ :value ]  # nil or empty s or etc
-          @_index = match.index
-          @_request = sig
+        @_parse_argument_scanner_head = :__CLOSED__or_watever__
 
-          ___via_index_prepare  # result is sig
-        else
-          NIL_
+        as = @_shared_datapoint_store.argument_scanner
+        if ! as.no_unparsed_exists
+          if as.can_optional_argument
+            if as.head_looks_like_optional_argument
+              s = as.head_as_is
+              as.advance_one
+            end
+          else
+            s = as.head_as_is
+            as.advance_one
+          end
         end
-      end
-
-      def ___via_index_prepare
-
-        s = remove_instance_variable :@_argument_value
 
         if ! s
           s = DEFAULT__
         end
 
-        if s.length.zero?
-
-          __when_flag_does_not_have_an_argument
-
-        elsif 'help' == s
+        if 'help' == s
           __when_help
-
         else
 
-          @_argument_string = s
-          __via_argument_string
+          _ = Here_::Terms_via_String___[ s, & @_listener ]
+          _store :@_terms, _
         end
       end
 
-      def __when_flag_does_not_have_an_argument
-
-        _y << "#{ _flag } argument (if any) must be nonzero in length"
-        _invite_to_me
-
-        NIL_
-      end
-
-      # -- Parse --
-
-      def __via_argument_string
-
-        _ok = ___resolve_terms
-        _ok && __via_terms
-      end
-
-      def ___resolve_terms
-
-        x = Here_::Terms_via_string___[ @_argument_string, _y ]
-        if x
-          @_terms = x
-          ACHIEVED_
-        else
-          _invite_to_me
-          x
+      def release_agent_profile
+        Eventpoint_::AgentProfile.define do |o|
+          o.can_transition_from_to :files_stream, :files_stream
         end
       end
 
-      def _invite_to_me
-        _y << "use `#{ _flag }=help` for help on this option."
-      end
-
-      def __via_terms
-
-        sig = @_request
-        sig.nilify_input_element_at_index @_index
-        sig.carry :TEST_FILES, :CULLED_TEST_FILES
-        sig
-      end
-
-      # -- Main --
-
-      def test_files_eventpoint_notify
-
-        ___init_ordered_path_stream
+      def invoke _
 
         # you may be thinking there's an "optimization" here that could be
         # done when you have a forwards-facing, non-comprehensive range
@@ -136,20 +74,18 @@ module Skylab::TestSupport
         #      plugin is forwards-comprehensive ("1-N"), so we traverse
         #      the whole stream anyway.
 
-        @_ordered_paths = remove_instance_variable( :@_ordered_path_stream ).to_a
-        @_orig_paths.length == @_ordered_paths.length or self._I_HAVE_MADE_A_TE
-
-        ok = __normalize_terms
+        ok = true
+        ok &&= __resolve_ordered_paths
+        ok &&= __normalize_terms
         ok && __init_range
         ok && __via_ordered_paths
-      end
-
-      def ___init_ordered_path_stream
-
-        @_orig_paths = @_adapter.services.get_test_path_array
-        _st = Here_::Ordered_path_stream_via_paths___[ @_orig_paths ]
-        @_ordered_path_stream = _st
-        NIL_
+        if ok
+          _st = Stream_[ remove_instance_variable :@__final_paths ]
+          once = -> { once = nil ; _st }
+          Responses_::Datapoint.new ->{once[]}, :test_file_path_streamer
+        else
+          Responses_.the_stop_response
+        end
       end
 
       def __normalize_terms
@@ -158,17 +94,12 @@ module Skylab::TestSupport
         #  we know how many paths there are.)
 
         x = remove_instance_variable :@_terms
-        x = Here_::Normal_terms_via_parameters___[ x, @_ordered_paths, _y ]
-        if x
-          @_terms = x
-          ACHIEVED_
-        else
-          x
-        end
+        x = Here_::NormalTerms_via_Parameters___[ x, @_ordered_paths, & @_listener ]
+        _store :@_terms, x
       end
 
       def __init_range
-        o = Here_::Range_via_terms___[ remove_instance_variable( :@_terms ) ]
+        o = Here_::Range_via_Terms___[ remove_instance_variable( :@_terms ) ]
         @_do_reverse = o.do_reverse
         @_range = o.range
         NIL_
@@ -180,38 +111,40 @@ module Skylab::TestSupport
         if @_do_reverse
           slice.reverse!
         end
-        @_adapter.replace_test_path_s_a slice  # result is result
+        @__final_paths = slice ; nil
       end
+
+      def __resolve_ordered_paths
+
+        _st = @_shared_datapoint_store.release_test_file_path_streamer_.call
+        orig_paths = _st.to_a
+        _st_ = Here_::OrderedPathStream_via_Paths___[ orig_paths ]
+        ordered_paths = _st_.to_a
+        orig_paths.length == ordered_paths.length || self._I_HAVE_MADE_A_HUGE_MI
+        @_ordered_paths = ordered_paths ; ACHIEVED_
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
       # -- Help --
 
       def __when_help
-
-        Here_::Express_help_via_parameters___[ _y, DEFAULT__, _flag ]
-
-        sig = @_request
-
-        sig.nilify_input_element_at_index @_index
-        sig.carry :BEGINNING, :FINISHED
-
-        sig
+        io = @_listener.call :resource, :line_downstream_for_help
+        io and __express_help io
       end
 
-      def beginning_eventpoint_notify
-        # (when help)
-        NIL_
+      def __express_help io
+        _y = ::Enumerator::Yielder.new( & io.method( :puts ) )
+        Here_::ExpressHelp_via_Parameters___[ _y, DEFAULT__, _moniker ]
+        NOTHING_
       end
 
-      def _y
-        @_adapter.y
-      end
-      end
-
-      def _flag
-        FLAG__
+      def _moniker
+        '-order'
       end
 
       Here_ = self
+      DEFAULT__ = '1-N'
     end
   end
 end

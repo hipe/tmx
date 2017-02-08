@@ -2,7 +2,7 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Range_via_terms___ < Common_::Monadic
+      class Range_via_Terms___ < Common_::Monadic
 
         # assume that any "N" has been converted to a count number.
         #

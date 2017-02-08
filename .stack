@@ -17,6 +17,7 @@ use [sa] to convert etc to Stream_
   (totally unrelated: relate [#ts-033] to some place in slowie)
   move to "microservice" or wontfix: #open [#ts-005] stylize
   (consider adding an explicit "traverse examples" state to eventpoint graph)
+  (omg what would be great is default arguments or equivalent - CLI only)
   (somewhere do default operation (run tests) - this will be harder - CLI only)
   (somewhere do default primary - so filename withouth -path - CLI only)
 -3.100 finished with quickie recursive runner when:
@@ -24,4 +25,3 @@ use [sa] to convert etc to Stream_
 -3.114 plugin -2 wip-files #open [#sa-035] #glhf
 -3.117 plugin -3 tree (after list-files)
 -3.120 plugin -4 depth (not used frequently)
--3.122 plugin -5 order (used frequently)

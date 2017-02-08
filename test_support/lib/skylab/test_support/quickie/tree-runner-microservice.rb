@@ -120,7 +120,13 @@ module Skylab::TestSupport
 
         PROCESS_RESPONSE___ = {
           datapoint: :__process_datapoint,
+          stop_now: :__stop_now,
         }
+
+        def __stop_now
+          # assume emitted
+          NIL
+        end
 
         def __process_datapoint x, name_sym
           send PROCESS_DATAPOINT___.fetch( name_sym ), x
@@ -325,6 +331,22 @@ module Skylab::TestSupport
       # ==
 
       module Quickie::Responses_  # [#here.A] realise local conventions for plugin communication
+
+        class << self
+          def the_stop_response
+            @___the_stop_response ||= TheStopResponse___.new
+          end
+        end  # >>
+
+        class TheStopResponse___
+          # interrupts the execution of the eventpoint path early, error probably
+          def category_symbol
+            :stop_now
+          end
+          def to_a
+            NOTHING_
+          end
+        end
 
         FinalResult = ::Struct.new :final_result
 

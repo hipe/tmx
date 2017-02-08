@@ -2,7 +2,7 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Express_help_via_parameters___
+      class ExpressHelp_via_Parameters___
 
         class << self
           def [] a, b, c

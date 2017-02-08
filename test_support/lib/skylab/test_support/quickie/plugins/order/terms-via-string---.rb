@@ -2,11 +2,11 @@ module Skylab::TestSupport
   module Quickie
     class Plugins::Order
 
-      class Terms_via_string___ < Common_::Dyadic
+      class Terms_via_String___ < Common_::Monadic
 
-        def initialize s, y
+        def initialize s, & p
+          @__listener = p
           @_s = s
-          @_y = y
         end
 
         def execute
@@ -126,7 +126,9 @@ module Skylab::TestSupport
             "for #{ scn.rest.inspect }"
           end
 
-          @_y << "expecting #{ _exp_s } #{ _prep }"
+          @__listener.call :error, :expression, :primary_parse_error do |y|
+            y << "expecting #{ _exp_s } #{ _prep }"
+          end
           UNABLE_
         end
 
