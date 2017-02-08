@@ -60,6 +60,14 @@ module Skylab::Task::TestSupport
         log = build_event_log_
 
         _x = subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
+
+          o.say_plugin_by = -> mixed_x, _ba_API_expag do
+
+            # (this is a minimal example; clients will probably be more sophisticated)
+
+            "'#{ mixed_x }'"
+          end
+
           o.pending_execution_pool = pool
           o.graph = graph
           o.listener = log.handle_event_selectively
@@ -82,6 +90,7 @@ module Skylab::Task::TestSupport
         subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
           o.pending_execution_pool = pool
           o.graph = graph
+          o.say_plugin_by = -> * { TS_._NOT_USED_HERE }
           o.listener = :_NO_LISTENER_ta_
         end
       end

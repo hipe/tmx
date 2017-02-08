@@ -12,6 +12,7 @@ use [sa] to convert etc to Stream_
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
   (#open [#ts-030.C] quickie plugin arch needs re-arch - too confusing)
+  see #needs-invite (there are others that are not tagged)
   (#open [#ts-032.A] the "counts report is not covered)
   (#open [#ts-032.B] verbose mode for counts is borked)
   (totally unrelated: relate [#ts-033] to some place in slowie)
@@ -23,4 +24,3 @@ use [sa] to convert etc to Stream_
 -3.100 finished with quickie recursive runner when:
 -3.111 plugin -1 cover #open #[ts-002] #glhf
 -3.114 plugin -2 wip-files #open [#sa-035] #glhf
--3.117 plugin -3 tree (after list-files)

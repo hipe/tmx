@@ -78,6 +78,7 @@ module Skylab::Task::TestSupport
         path = subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
           o.pending_execution_pool = _pool
           o.graph = graph_
+          o.say_plugin_by = -> * { TS_._NOT_USED_HERE }
           o.listener = log.handle_event_selectively
         end
 

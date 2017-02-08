@@ -6,41 +6,51 @@ class Skylab::Task
 
       # ==
 
-      class AmbiguousNextStep < Common_::Dyadic
+      class AmbiguousNextStep < Common_::Dyadic  # #borrow-coverage from [#ts-039.3]
 
         def initialize d_a, up
           @all_formal_transitions = up.all_formal_transitions
           @all_pending_executions = up.all_pending_executions
           @listener = up.listener
           @offsets = d_a
+          @say_plugin_by = up.say_plugin_by
         end
 
         def execute
 
-          and_buff_proto = Eventpoint::Event_::And_buffer[]
+          aggregation_prototype = Eventpoint::Event_::And_buffer[]
 
           exe_a = @all_pending_executions
           fot_a = @all_formal_transitions
 
-          and_buff_proto = Eventpoint::Event_::JoinerBuffer.new ' and '
-
-          buffer = and_buff_proto.dup_by do |o|
+          ambiguous_aggregation = aggregation_prototype.dup_by do |o|
             o.initial_buffer = "ambiguous: "
           end
 
           me = self
+          messagario_by = @say_plugin_by or self._FAIL_EARLIER
+
           @listener.call :error, :expression, :ambiguous do |y|
+
             me.__formal_transitions_by_common_destination.each_pair do |sym, d_a|
-              buff = and_buff_proto.dup
-              d_a.map do |d|
+
+              aggregation = aggregation_prototype.dup
+
+              d_a.each do |d|
+
                 _pending_exe = exe_a.fetch fot_a.fetch( d ).pending_execution_offset
-                buff << "'#{ _pending_exe.mixed_task_identifier.intern }'"  # ..
+                _mixed_user_tuple = _pending_exe.mixed_task_identifier
+                _moniker = messagario_by[ _mixed_user_tuple, self ]
+                aggregation << _moniker
               end
-              _subj = buff.finish || 'multiple'
-              _yes = 1 == d_a.length
-              buffer << "#{ both d_a }#{ _subj } transition#{ 's' if _yes } to '#{ sym }'"
+
+              _subj = aggregation.finish || 'multiple'
+
+              ambiguous_aggregation << "#{ both_ d_a }#{ _subj } #{
+               }transition to #{ prim sym }"
             end
-            y << buffer.finish
+
+            y << ambiguous_aggregation.finish
           end
           UNABLE_
         end

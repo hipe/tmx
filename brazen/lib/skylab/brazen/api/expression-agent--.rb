@@ -17,6 +17,18 @@ module Skylab::Brazen
 
       alias_method :calculate, :instance_exec
 
+      # -- while #open [#ze-040] expags are disunified
+
+      def both_ x
+        both x
+      end
+
+      def prim x
+        "'#{ x }'"
+      end
+
+      # -
+
       def and_ x
         _NLP_agent.and_ x
       end

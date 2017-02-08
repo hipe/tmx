@@ -16,6 +16,7 @@
 [#040]       is find nearest TS file broken?
 
 [#039]       coverpoints referenced elsewhere (borrow coverage/lend coverage)
+             [#here.3]: with [ta], [ze]
              [#here.2]: with [ze]
              [#here.1]: with [ze]
              ( #moved-to: [#dt-xxx] )

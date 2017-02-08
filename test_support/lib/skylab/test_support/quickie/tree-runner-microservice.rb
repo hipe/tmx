@@ -188,6 +188,16 @@ module Skylab::TestSupport
           end
 
           _maybe_path = Eventpoint_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
+
+            o.say_plugin_by = -> my_tuple, expag, * _maybe_other_args do
+              my_tuple.first == :_hello_my_plugin_ || fail
+              # holy name conversions batman:
+              _nat_key = @lazy_index.natural_key_via_offset my_tuple.last
+              _sym = _nat_key.gsub( DASH_, UNDERSCORE_ ).intern
+              _moniker = expag.prim _sym
+              _moniker  # hi. #todo
+            end
+
             o.pending_execution_pool = _pool
             o.graph = _graph
             o.listener = @listener

@@ -1286,6 +1286,16 @@ module NoDependenciesZerk
       def oxford_and scn
         scn.oxford_join '', ' and ', ', '
       end
+
+      # (they all #borrow-coverage from [#ts-039.3] (by way of [ta]))
+
+      def both_ x  # say "both " IFF count is 2
+        "both " if 2 == __count_via_mixed( x )
+      end
+
+      def __count_via_mixed x
+        ::Array.try_convert( x ) ? x.length : x.tap( & :bit_length )  # #type-check
+      end
     end
 
     class PrimaryFound__ < SimpleModel  # structure backstory at [#here.A]

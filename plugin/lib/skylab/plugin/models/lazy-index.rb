@@ -7,6 +7,7 @@ module Skylab::Plugin
       def initialize
         @_plugins = []  # array of instances
         @_queue_of_offsets_of_plugins_with_execution_pending = []
+        @_natural_key_via_offset = []  # the reverse of the below
         @_offset_via_natural_key = {}  # index into the array of instances
         super
       end
@@ -33,6 +34,7 @@ module Skylab::Plugin
           plugin = __load_plugin lt  # if nil/false, it's OK we cache that too
           d = @_plugins.length
           @_plugins.push plugin
+          @_natural_key_via_offset[ d ] = key_x
           @_offset_via_natural_key[ key_x ] = d
           d
         end
@@ -65,6 +67,10 @@ module Skylab::Plugin
             @_queue_of_offsets_of_plugins_with_execution_pending.fetch d
           end
         end
+      end
+
+      def natural_key_via_offset d
+        @_natural_key_via_offset.fetch d
       end
     # -
   end

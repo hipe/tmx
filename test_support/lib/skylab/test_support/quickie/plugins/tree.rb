@@ -5,20 +5,9 @@ module Skylab::TestSupport
     class Plugins::Tree
 
       def initialize
-      end
-
-      if false
-      def initialize adapter
-        @fuzzy_flag = adapter.build_fuzzy_flag %w( -tree )
-        @adapter = adapter
-      end
-
-      def opts_moniker
-        @fuzzy_flag.some_opts_moniker
-      end
-
-      def args_moniker
-      end
+        o = yield
+        @_listener = o.listener
+        @_shared_datapoint_store = o
       end
 
       def description_proc
@@ -30,53 +19,76 @@ module Skylab::TestSupport
         y << "(mutually exclusive with -list)"
       end
 
-      if false
-      def prepare sig
-        idx = @fuzzy_flag.any_first_index_in_input sig
-        if idx
-          sig.nilify_input_element_at_index idx
-          sig.rely :CULLED_TEST_FILES
-          sig.carry :CULLED_TEST_FILES, :FINISHED
-          sig
+      def parse_argument_scanner_head
+        ACHIEVED_  # nothing to do. it's a flag
+      end
+
+      def release_agent_profile
+        Eventpoint_::AgentProfile.define do |o|
+          o.can_transition_from_to :files_stream, :finished
         end
       end
 
-      def culled_test_files_eventpoint_notify
+      def invoke _
 
-        io = @adapter.paystream
-        _a = @adapter.services.get_test_path_array
+        _path_st = @_shared_datapoint_store.release_test_file_path_streamer_.call
 
-        tree = Home_.lib_.basic::Tree.via :paths, _a
-        path_s, tree_ = condense_stem tree
-        if path_s
-          io.puts path_s
-          tree = tree_
+        tree = Home_.lib_.basic::Tree.via :paths, _path_st
+        p = nil ; path = nil ; st = nil
+
+        main = -> do
+          card = st.gets
+          if card
+            "#{ card.prefix_string }#{ card.node.slug }"
+          end
         end
-        st = tree.to_classified_stream_for( :text )
-        x = st.gets
-        if ! path_s
-          x.node.slug and fail "what: #{ x.node.slug }"
+
+        init = -> do
+          st = tree.to_classified_stream_for :text
+          x = st.gets
+          if ! path
+            x.node.slug and fail "what: #{ x.node.slug }"
+          end
+          p = main
+          p[]
         end
-        while (( card = st.gets ))
-          io.puts "#{ card.prefix_string }#{ card.node.slug }"
+
+        p = -> do
+          path, tree_ = Condense_stem___[ tree ]
+          p = init
+          if path
+            tree = tree_
+            path
+          else
+            p[]
+          end
         end
-        NIL_
+
+        _st = Common_.stream do
+          p[]
+        end
+
+        Responses_::FinalResult[ _st ]
       end
 
-    private
+      # ==
 
-      def condense_stem tree
-        slug_a = nil
+      Condense_stem___ = -> tree do
+        slugs = nil
         while 1 == tree.children_count
           tree_ = tree.fetch_only_child
-          ( slug_a ||= [] ).push tree_.slug
+          ( slugs ||= [] ).push tree_.slug
           tree = tree_
         end
-        if slug_a
-          [ slug_a * tree.path_separator, tree ]
+        if slugs
+          [ slugs * tree.path_separator, tree ]
         end
       end
-      end
+
+      # ==
+
+      # ==
     end
   end
 end
+# #history: superficial but full rewrite for modernization

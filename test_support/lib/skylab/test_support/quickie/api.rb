@@ -108,7 +108,7 @@ module Skylab::TestSupport
           send RESOURCES___.fetch k
         end
 
-        RESOURCES___ = {
+        RESOURCES___ = {  # CLI
           injected_client_resource: :__injected_client_resource,
           line_downstream_for_help: :__line_downstream_for_help,
         }
@@ -173,7 +173,7 @@ module Skylab::TestSupport
           send RESOURCES___.fetch( chan.fetch 1 ), * chan[ 2..-1 ]
         end
 
-        RESOURCES___ = {
+        RESOURCES___ = {  # API
           injected_client_resource: :__injected_client_resource,
           line_downstream_for_help: :__line_downstream_for_help,
         }

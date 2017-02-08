@@ -18,6 +18,7 @@ class Skylab::Task
         :graph,
         :listener,
         :pending_execution_pool,
+        :say_plugin_by,
       )
 
       def execute
@@ -318,6 +319,7 @@ class Skylab::Task
         :current_state_symbol,
         :graph,
         :listener,
+        :say_plugin_by,
       )
     # -
 
