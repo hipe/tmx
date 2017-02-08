@@ -57,7 +57,7 @@ module Skylab::TestSupport::TestSupport
 
           call :order, '1-N', :list_files, :path, 'mock-key-1'
 
-          _use_fake_paths 'mock-key-1' do |y|
+          use_fake_paths_ 'mock-key-1' do |y|
             y << 'fake-path/030-jumanji/040-chim-chum.xx'
             y << 'fake-path/010-herkemer/020-xx.xx'
             y << 'fake-path/030-jumanji/010-yy.xx'
@@ -78,7 +78,7 @@ module Skylab::TestSupport::TestSupport
 
           call :order, '1-4', :list_files, :path, 'mock-key-1'
 
-          _use_fake_paths 'mock-key-1' do |y|
+          use_fake_paths_ 'mock-key-1' do |y|
             y << 123  # while it works..
             y << 456
             y << 789
@@ -92,34 +92,12 @@ module Skylab::TestSupport::TestSupport
         end
 
         def prepare_subject_API_invocation invo
-          _prepare_subject_API_invocation_for_fake_paths invo
+          prepare_subject_API_invocation_for_fake_paths_ invo
         end
       # -
     end
 
     # ==
-
-    def _use_fake_paths mock_key
-      @THESE_FAKE_PATHS = yield []
-      @MOCK_KEY = mock_key ; nil
-    end
-
-    def _prepare_subject_API_invocation_for_fake_paths invo
-
-      fake_paths = remove_instance_variable :@THESE_FAKE_PATHS
-      mock_key = remove_instance_variable :@MOCK_KEY
-
-      _msvc = invo.instance_variable_get :@__tree_runner_microservice
-      _pi = _msvc.DEREFERENCE_PLUGIN :path
-      _pi.send :define_singleton_method, :__to_test_file_path_stream do
-
-        _s_a = remove_instance_variable :@_mixed_path_arguments  # implicit assertion of once
-        _s_a == [ mock_key ] || TS_._SANITY
-        Home_::Stream_[ fake_paths ]
-      end
-
-      invo
-    end
 
     # ==
   end

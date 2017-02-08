@@ -443,6 +443,10 @@ module NoDependenciesZerk
         prim( sym ).inspect
       end
 
+      def ick_mixed x
+        x.inspect
+      end
+
       def oper sym
         sym.id2name.gsub UNDERSCORE_, DASH_
       end
@@ -578,6 +582,10 @@ module NoDependenciesZerk
 
       def ick_prim sym
         _same sym
+      end
+
+      def ick_mixed x
+        x.inspect  # ..
       end
 
       def oper sym
@@ -1171,10 +1179,30 @@ module NoDependenciesZerk
         :"@#{ current_primary_symbol }"
       end
 
+      def parse_argument_via_regexp rx, & msg  # #experiment [ts]
+        map_trueish_value_by do |x|
+          md = rx.match x
+          if md
+            advance_one ; md
+          else
+            @LAST_REGEXP = rx
+            no_because( & msg )
+            remove_instance_variable :@LAST_REGEXP
+            UNABLE_
+          end
+        end
+      end
+
       def parse_trueish_primary_value  # as in `parse_primary_value` - #borrow-coverage from [#ts-039.2]
+        map_trueish_value_by do |x|
+          advance_one ; x
+        end
+      end
+
+      def map_trueish_value_by
         map_value_by do |x|
           if x
-            advance_one ; x
+            yield x
           else
             no_because { "{{ prim }} must be trueish (had #{ x.inspect })" }
           end
@@ -1190,14 +1218,27 @@ module NoDependenciesZerk
       end
 
       def no_because reason_symbol=:primary_parse_error, & msg_p
+        _the_best_expresser_ever msg_p, :error, :expression, reason_symbol
+        UNABLE_
+      end
+
+      def express_info * channel_tail, & msg_p
+        _the_best_expresser_ever msg_p, :info, :expression, * channel_tail
+        NIL
+      end
+
+      def _the_best_expresser_ever msg_p, * channel
 
         scn = self
-        @listener.call :error, :expression, reason_symbol do |y|
+        @listener.call( * channel ) do |y|
 
           map = -> sym do
             case sym
             when :prim
               prim scn.current_primary_symbol
+            when :ick
+              ick_mixed scn.head_as_is
+            else never
             end
           end
 
@@ -1215,7 +1256,7 @@ module NoDependenciesZerk
           y
         end
 
-        UNABLE_
+        NIL
       end
     end
 

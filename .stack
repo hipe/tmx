@@ -24,4 +24,3 @@ use [sa] to convert etc to Stream_
 -3.111 plugin -1 cover #open #[ts-002] #glhf
 -3.114 plugin -2 wip-files #open [#sa-035] #glhf
 -3.117 plugin -3 tree (after list-files)
--3.120 plugin -4 depth (not used frequently)

@@ -206,6 +206,30 @@ module Skylab::TestSupport::TestSupport
 
         # --
 
+        def use_fake_paths_ mock_key
+          @THESE_FAKE_PATHS = yield []
+          @MOCK_KEY = mock_key ; nil
+        end
+
+        def prepare_subject_API_invocation_for_fake_paths_ invo
+
+          fake_paths = remove_instance_variable :@THESE_FAKE_PATHS
+          mock_key = remove_instance_variable :@MOCK_KEY
+
+          _msvc = invo.instance_variable_get :@__tree_runner_microservice
+          _pi = _msvc.DEREFERENCE_PLUGIN :path
+          _pi.send :define_singleton_method, :__to_test_file_path_stream do
+
+            _s_a = remove_instance_variable :@_mixed_path_arguments  # implicit assertion of once
+            _s_a == [ mock_key ] || TS_._SANITY
+            Home_::Stream_[ fake_paths ]
+          end
+
+          invo
+        end
+
+        # --
+
         def hack_that_one_plugin_of_invocation_to_use_this_runtime_ invo, & p
 
           # touch the particular plugin "early" and hack this one method on it
