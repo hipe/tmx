@@ -16,5 +16,5 @@ by 10x and going with a numberspace of 1000.
   - order (used frequently) (plugin -5)
   - depth (not used frequently) (plugin -4)
   - tree (after list-files) (plugin -3)
-  - wip-files (glhf) (plugin -2)
+  - wip-files (glhf) (plugin -2) (REMINDER: covered in [sa])
   - cover (glhf) (plugin -1)
