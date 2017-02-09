@@ -47,32 +47,37 @@ module Skylab::TestSupport
 
         def execute
 
-          Require_zerk_[]
-          @_CLI_Mtk = Zerk_::CLI::MicroserviceToolkit
+          @_CLI_MTk = Zerk_lib_[]::CLI::MicroserviceToolkit
 
-          _argv = remove_instance_variable :@__ARGV
+          as = @_CLI_MTk::ArgumentScanner.define do |o|
 
-          _as = @_CLI_Mtk::ArgumentScanner_via_ArgumentArray.call(
-            _argv, & method( :__receive_emission ) )
+            o.default_primary_symbol = :path  # <- when there is an argument
+              # without a primary before it, use this as the primary
+
+            o.ARGV = remove_instance_variable :@__ARGV
+            o.listener = method :__receive_emission
+          end
 
           __init_listener
-
+          @__argument_scanner = as
           @_did_err = false
 
           x = Here_::TreeRunnerMicroservice.call_by do |o|
-            o.argument_scanner = _as
+            o.argument_scanner = as
           end
+
+          __flush_any_invite
 
           if @_did_err
             GENERIC_ERROR_EXITSTATUS_
           elsif x.nil?
-            @_CLI_Mtk::SUCCESS_EXITSTATUS
+            @_CLI_MTk::SUCCESS_EXITSTATUS
           elsif x.respond_to? :gets
             line = nil ; @_stdout.puts line while ( line = x.gets )
-            @_CLI_Mtk::SUCCESS_EXITSTATUS
+            @_CLI_MTk::SUCCESS_EXITSTATUS
           else
             :_ping_from_quickie_tree_runner_microservice_ == x || self._DO_ME
-            @_CLI_Mtk::SUCCESS_EXITSTATUS
+            @_CLI_MTk::SUCCESS_EXITSTATUS
           end
         end
 
@@ -90,12 +95,118 @@ module Skylab::TestSupport
             @_did_err = true
           end
 
+          __maybe_increase_invitation_plan chan
+
           @__plain_listener[ * chan, & p ]
         end
 
+        # -- BEGIN experiment for invites - we want to push a facility that does this up to CLI MTk
+
+        def __maybe_increase_invitation_plan chan
+          case chan[0]
+          when :info, :resource ; NOTHING_
+          when :error
+            if :expression == chan[1]
+              case chan[2]
+              when :primary_parse_error
+                if :primary_not_found == chan[3]
+                  _maybe_upgrade_invite_to_plain_parse_error
+                else
+                  _maybe_upgrade_invite_to_primary_parse_error
+                end
+              when :ambiguous, :no_transition_found, :unmet_imperatives
+                _maybe_upgrade_invite_to_plain_parse_error
+              else
+                self._COVER_ME__new_tail_channel__
+              end
+            else
+              self._COVER_ME__new_midlevel_channel__
+            end
+          else
+            self._COVER_ME__new_toplevel_channel__
+          end
+        end
+
+        def _maybe_upgrade_invite_to_primary_parse_error
+          _maybe_upgrade_invite 4 do
+            [ :_invite_to_primaries_, { _curr_prim_sym => true } ]
+          end
+        end
+
+        def _maybe_upgrade_invite_to_plain_parse_error
+          _maybe_upgrade_invite 2 do
+            [ :_invite_plainly_ ]
+          end
+        end
+
+        def _maybe_upgrade_invite d
+
+          tuple = @_invite_plan_CRAY_TUPLE
+          if tuple
+            case tuple.first <=> d
+            when  1  ; NOTHING_
+            when -1  ; do_init = true
+            when  0  ;
+              self._KRAY
+            else never
+            end
+          else
+            do_init = true
+          end
+          if do_init
+            a = yield
+            a[ 0, 0 ] = [ d ]
+            @_invite_plan_CRAY_TUPLE = a
+          end
+          NIL
+        end
+
+        def _curr_prim_sym
+          @__argument_scanner.current_primary_symbol
+        end
+
+        # ~ read
+
+        def __flush_any_invite
+          tuple = remove_instance_variable :@_invite_plan_CRAY_TUPLE
+          tuple and send INVITE___.fetch( tuple.fetch 1 ), * tuple[ 2..-1 ]
+        end
+
+        INVITE___ = {
+          _invite_plainly_: :__invite_plainly,
+          _invite_to_primaries_: :__invite_to_primaries,
+        }
+
+        def __invite_to_primaries h
+
+          mtk = @_CLI_MTk ; serr = @_stderr ; _PN_moniker = self._PN_moniker
+         _expression_agent.calculate do
+
+           _scn = mtk::Scanners::Scanner_via_Array.new h.keys
+
+           _these = simple_inflection do
+             oxford_join "", _scn, " and/or " do |k|
+               ick_prim k
+             end
+           end
+
+            serr.puts "see '#{ _PN_moniker } -h' for any help on #{ _these }."
+          end
+          NIL
+        end
+
+        def __invite_plainly
+          @_stderr.puts "see '#{ _PN_moniker } -h' for help."
+          NIL
+        end
+
+        # -- end experiment for invites
+
         def __init_listener
 
-          @__plain_listener = @_CLI_Mtk::Listener_via.call_by do |o|
+          @_invite_plan_CRAY_TUPLE = nil
+
+          @__plain_listener = @_CLI_MTk::Listener_via.call_by do |o|
 
             o.receive_did_err_by = -> { @_did_err = true }
             o.resource_by = method :__resource
@@ -109,6 +220,7 @@ module Skylab::TestSupport
         end
 
         RESOURCES___ = {  # CLI
+          expression_agent: :_expression_agent,  # way deep in [ta]
           injected_client_resource: :__injected_client_resource,
           line_downstream_for_help: :__line_downstream_for_help,
         }
@@ -129,6 +241,14 @@ module Skylab::TestSupport
 
         def __line_downstream_for_help
           @_stderr
+        end
+
+        def _expression_agent
+          CLI_InterfaceExpressionAgent.instance
+        end
+
+        def _PN_moniker
+          ::File.basename @__program_name_string_array.last  # or whatever
         end
       end
 
@@ -174,6 +294,7 @@ module Skylab::TestSupport
         end
 
         RESOURCES___ = {  # API
+          expression_agent: :_expression_agent,
           injected_client_resource: :__injected_client_resource,
           line_downstream_for_help: :__line_downstream_for_help,
         }
@@ -683,7 +804,9 @@ module Skylab::TestSupport
 
       # ==
 
-      class TinyExpressionAgent___  # #testpoint
+      class InterfaceExpressionAgent  # #testpoint
+
+        # (this has become an ersatz of what is is [ze] nodeps, which is great)
 
         class << self
           def instance
@@ -693,6 +816,12 @@ module Skylab::TestSupport
         end  # >>
 
         alias_method :calculate, :instance_exec
+
+        def simple_inflection & p
+          o = dup
+          o.extend Zerk_lib_[].lib_.human::NLP::EN::SimpleInflectionSession::Methods
+          o.calculate( & p )
+        end
 
         def ick x
           x.inspect

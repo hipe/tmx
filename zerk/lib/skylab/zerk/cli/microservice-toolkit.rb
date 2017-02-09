@@ -2,6 +2,8 @@ module Skylab::Zerk
 
   module CLI::MicroserviceToolkit
 
+    Autoloader_[ self ]
+
     class Listener_via < Common_::MagneticBySimpleModel
 
       def initialize
@@ -40,19 +42,16 @@ module Skylab::Zerk
 
     # ==
 
-    ArgumentScanner_via_ArgumentArray = -> argv, & listener do  # 1x: [ts] (#frontier)
-
-      No_deps_zerk_[]::CLI_ArgumentScanner.define do |o|
-        o.ARGV = argv
-        o.listener = listener
-      end
-    end
-
-    # ==
-
-    Autoloader_[ self ]
     lazily :IsomorphicMethodsClient do
       Egads___[]
+    end
+
+    lazily :ArgumentScanner do
+      No_deps_zerk_[]::CLI_ArgumentScanner
+    end
+
+    lazily :Scanners do  # you know.. for now..
+      No_deps_zerk_[]
     end
 
     Egads___ = -> do

@@ -522,11 +522,11 @@ module Skylab::Common::TestSupport
         if respond_to? BLACK_AND_WHITE_EXPEV_METHOD__
           send BLACK_AND_WHITE_EXPEV_METHOD__
         else
-          black_and_white_expression_agent_for_expect_event_normally
+          black_and_white_expression_agent_for_expect_emission_normally
         end
       end
 
-      def black_and_white_expression_agent_for_expect_event_normally
+      def black_and_white_expression_agent_for_expect_emission_normally
         Black_and_white_expression_agent__[]
       end
 
@@ -534,11 +534,11 @@ module Skylab::Common::TestSupport
         if respond_to? MY_EXPEV_METHOD__
           send MY_EXPEV_METHOD__
         else
-          expression_agent_for_expect_event_normally
+          expression_agent_for_expect_emission_normally
         end
       end
 
-      def expression_agent_for_expect_event_normally
+      def expression_agent_for_expect_emission_normally
         Codifying_expresion_agent__[]
       end
     end

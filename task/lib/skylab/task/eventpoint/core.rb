@@ -204,6 +204,7 @@ class Skylab::Task
 
     # ==
 
+    Here_ = self
     KeyError = ::Class.new ::KeyError
     RuntimeError = ::Class.new ::RuntimeError
 

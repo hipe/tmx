@@ -5,7 +5,7 @@ module Skylab::TestSupport
     module API ; class << self
 
       def call * x_a, & oes_p
-        Require_zerk_[]
+        Zerk_lib_[]
         _acs = Root_Autonomous_Component_System.__instance
         Zerk_::API.call( x_a, _acs ) { |_| oes_p }
       end

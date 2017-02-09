@@ -21,9 +21,8 @@ module Skylab::TestSupport::TestSupport
         it "whines obscurely that it doesn't reach a finished state" do
 
           fails_with_these_messages_ do |y|
-            y << "there are no pending executions"
-            y << "so nothing brings the system from the beginning state to #{
-              }a finished state"
+            y << "there are no state transitions so #{
+              }nothing brings the system from the beginning state to a finished state."
           end
         end
 
@@ -48,8 +47,9 @@ module Skylab::TestSupport::TestSupport
 
           fails_with_these_messages_ do |y|
 
-            y << "the only pending execution does not bring #{
-              }the system from the beginning state to a finished state"
+            y << "'list_files' requires the \"files stream\" state."
+            y << "it does not transition from the state you are in, #{
+             }which is the beginning state."
           end
         end
 
@@ -79,7 +79,7 @@ module Skylab::TestSupport::TestSupport
 
         shared_subject :messages_ do
           call :list_files, :jajoomba
-          expect_primary_parse_error_
+          messages_from_expect_for_API_ :error, :expression, :primary_parse_error, :primary_not_found
         end
       # -
     end

@@ -6,9 +6,7 @@ module Skylab::TestSupport
 
       def new argv, sin, sout, serr, pn_s_a, & p
 
-        Require_zerk_[]
-
-        cli = Zerk_::NonInteractiveCLI.begin
+        cli = Zerk_lib_[]::NonInteractiveCLI.begin
 
         cli.argv = argv
 

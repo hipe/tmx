@@ -11,14 +11,5 @@ use [sa] to convert etc to Stream_
 -3 unify other tmx node-centric services [#tmx-015]
 [#tmx-018.3] primaries of the `select` operation should show up in the `test-all` screen
 [#tmx-019] get fuzzy out of multimode scanner
-  (#open [#ts-030.C] quickie plugin arch needs re-arch - too confusing)
-  see #needs-invite (there are others that are not tagged)
-  (#open [#ts-032.A] the "counts report is not covered)
-  (#open [#ts-032.B] verbose mode for counts is borked)
-  (totally unrelated: relate [#ts-033] to some place in slowie)
-  move to "microservice" or wontfix: #open [#ts-005] stylize
-  (consider adding an explicit "traverse examples" state to eventpoint graph)
-  (omg what would be great is default arguments or equivalent - CLI only)
-  (somewhere do default operation (run tests) - this will be harder - CLI only)
-  (somewhere do default primary - so filename withouth -path - CLI only)
--3.100 finished with quickie recursive runner when:
+(eventpoint event can go away to somewhere)
+[ze] Expresser needs slight cleanup, should be simple model

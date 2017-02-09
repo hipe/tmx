@@ -183,7 +183,7 @@
       end
 
       def _expression_agent
-        Interface__::CLI_ExpressionAgent.instance
+        Interface__::CLI_InterfaceExpressionAgent.instance
       end
 
       DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do

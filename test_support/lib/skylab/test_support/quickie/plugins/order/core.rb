@@ -54,7 +54,7 @@ module Skylab::TestSupport
 
       def release_agent_profile
         Eventpoint_::AgentProfile.define do |o|
-          o.can_transition_from_to :files_stream, :files_stream
+          o.must_transition_from_to :files_stream, :files_stream
         end
       end
 

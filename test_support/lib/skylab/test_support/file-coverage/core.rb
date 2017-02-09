@@ -8,9 +8,7 @@ module Skylab::TestSupport
 
       def call * x_a, & oes_p
 
-        Require_zerk_[]
-
-        Zerk_::API.call x_a, Here_.__root_ACS do |_|
+        Zerk_lib_[]::API.call x_a, Here_.__root_ACS do |_|
           oes_p
         end
       end

@@ -24,8 +24,7 @@ module Skylab::Task::TestSupport
       end
     end
 
-    noun = "pending execution"
-    bring_etc = "bring the system from the A state to a finished state"
+    same = "transition from the state you are in, which is the A state."
 
     context "(empty)" do
 
@@ -35,11 +34,9 @@ module Skylab::Task::TestSupport
           NOTHING_
         end
 
-        a = _em.to_black_and_white_lines
-        2 == a.length || fail
-
-        a.first == "there are no #{ noun }s" || fail
-        a.last == "so nothing brings the system from the A state to a finished state" || fail
+        _line = black_and_white_line_of_ _em
+        _line == "there are no state transitions so #{
+          }nothing brings the system from the A state to a finished state." || fail
       end
     end
 
@@ -49,15 +46,16 @@ module Skylab::Task::TestSupport
         agent_ || fail
       end
 
-      it "reconcile with one dud signature #redundant-sounding" do
+      it "reconcile with one dud signature" do
 
         _em = expect_failure_and_emission_when_find_path_by_ do |o|
 
           o.add_pending_task :_the_empty_agent, agent_
         end
 
-        _s  = _em.to_black_and_white_line
-        _s == "the only #{ noun } does not #{ bring_etc }" || fail
+        s_a = black_and_white_lines_of_ _em
+        "'_the_empty_agent' requires nothing." == s_a.first || fail
+        "it does not #{ same }" == s_a.last || fail
       end
 
       it "same as above but 2x subjects" do
@@ -67,8 +65,9 @@ module Skylab::Task::TestSupport
           o.add_pending_task :_empty_agent_2, agent_
         end
 
-        _s = _em.to_black_and_white_line
-        _s == "none of the two #{ noun }s #{ bring_etc }" || fail
+        s_a = black_and_white_lines_of_ _em
+        s_a.first == "'_empty_agent_1' and '_empty_agent_2' require nothing." || fail
+        s_a.last == "neither or them #{ same }" || fail
       end
 
       def agent_
@@ -149,8 +148,11 @@ module Skylab::Task::TestSupport
           o.add_pending_task :_beavis_agent, agent_
           o.add_pending_task :_butthead_agent, agent_
         end
-        _line = _em.to_black_and_white_line
-        _line == "ambiguous: both '_beavis_agent' and '_butthead_agent' transition to 'B'" || fail
+
+        s_a = black_and_white_lines_of_ _em
+
+        s_a[0] == "both '_beavis_agent' and '_butthead_agent' transition to 'B'" || fail
+        s_a[1] == "so you can't have both of them at the same time." || fail
       end
 
       def agent_

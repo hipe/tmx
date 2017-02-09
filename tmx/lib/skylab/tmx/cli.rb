@@ -698,7 +698,7 @@ module Skylab::TMX
       end
 
       def __expression_agent_for_minimal
-        Interface__::CLI_ExpressionAgent.instance
+        Interface__::CLI_InterfaceExpressionAgent.instance
       end
 
       def _invite_to_general_help

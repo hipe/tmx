@@ -189,21 +189,45 @@ module Skylab::TestSupport
 
           _maybe_path = Eventpoint_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
 
-            o.say_plugin_by = -> my_tuple, expag, * _maybe_other_args do
-              my_tuple.first == :_hello_my_plugin_ || fail
-              # holy name conversions batman:
-              _nat_key = @lazy_index.natural_key_via_offset my_tuple.last
-              _sym = _nat_key.gsub( DASH_, UNDERSCORE_ ).intern
-              _moniker = expag.prim _sym
-              _moniker  # hi. #todo
-            end
-
+            o.default_finisher_by = method :__maybe_default_finisher
             o.pending_execution_pool = _pool
             o.graph = _graph
+            o.say_plugin_by = method :__say_plugin
             o.listener = @listener
           end
 
           _store :@__path, _maybe_path
+        end
+
+        def __maybe_default_finisher sym
+
+          # supreme hack for the convenience of the most typical use case:
+          # if we didn't get to a finished state but we *did* get to the
+          # `files_stream` state, then "nudge" it to a finished state by
+          # telling the pathfinding to use the `run_files` plugin. this in
+          # combination with the `default_primary_symbol` of `path` is what
+          # allows us to provide only one argument (a path) and still work.
+
+          if :files_stream == sym
+            d = @lazy_index.offset_of_touched_plugin_via_normal_symbol :run_files
+            _pi = @lazy_index.dereference_plugin d
+            _profile = _pi.release_agent_profile
+            _eek = [ [ :_hello_my_plugin_, d ], _profile ]  # [#ta-013] will probably improve
+            _eek  # hi. #todo
+          end
+        end
+
+        def __say_plugin my_tuple, m=:prim, expag
+
+          my_tuple.first == :_hello_my_plugin_ || fail
+          _nat_key = @lazy_index.natural_key_via_offset my_tuple.last
+          sym = _nat_key.gsub( DASH_, UNDERSCORE_ ).intern
+
+          if :ick == m
+            m = :ick_prim
+          end
+
+          expag.send m, sym
         end
 
         # TL;DR: never don't ping
@@ -314,8 +338,7 @@ module Skylab::TestSupport
 
         def __init_operator_branch
 
-          Require_zerk_[]
-          @_MTk = Zerk_::MicroserviceToolkit
+          @_MTk = Zerk_lib_[]::MicroserviceToolkit
 
           @_has_result = false  # might be temporary
           @operator_branch =

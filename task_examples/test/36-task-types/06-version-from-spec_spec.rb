@@ -246,7 +246,7 @@ module Skylab::TaskExamples::TestSupport
     end
 
     def expression_agent_for_expect_emission
-      common_expression_agent_for_expect_event_
+      common_expression_agent_for_expect_emission_
     end
   end
 end

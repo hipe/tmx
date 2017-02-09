@@ -39,7 +39,7 @@ module Skylab::Task::TestSupport
           o.add_pending_task :_ag1, _pro1_must_B
           o.add_pending_task :_ag2, _pro2B_can_A2C_can_B2C
         end
-        _ = _em.to_black_and_white_line
+        _ = black_and_white_line_of_ _em
         _ == "'_ag1' relies on the B state and the B state isn't reached." || fail
       end
 
@@ -51,11 +51,13 @@ module Skylab::Task::TestSupport
       end
 
       it "sig 2 short-circuits - sig 3 is ok because it doesn't *NEED* B BUT WHIMPERS!!" do
+
         _em = __emission
-        _ = _em.to_black_and_white_line
-        _ == ( ( "'_ag3' will have no effect because the system #{
-          }does not reach the B state" )
-        ) or fail
+
+        _ = black_and_white_line_of_ _em
+
+        _ == "'_ag3' will have no effect because the system #{
+          }does not reach the B state" || fail
       end
 
       def __path
@@ -76,9 +78,13 @@ module Skylab::Task::TestSupport
         end
 
         path = subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
+
+          o.say_plugin_by = -> sym, * do
+            "'#{ sym }'"
+          end
+
           o.pending_execution_pool = _pool
           o.graph = graph_
-          o.say_plugin_by = -> * { TS_._NOT_USED_HERE }
           o.listener = log.handle_event_selectively
         end
 

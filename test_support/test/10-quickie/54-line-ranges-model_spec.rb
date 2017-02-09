@@ -191,7 +191,7 @@ module Skylab::TestSupport::TestSupport
 
       # subject_module_::CLI_ExpressionAgent___.instance
 
-      subject_module_::API::TinyExpressionAgent___.instance
+      subject_module_::API::InterfaceExpressionAgent.instance
     end
   end
 end

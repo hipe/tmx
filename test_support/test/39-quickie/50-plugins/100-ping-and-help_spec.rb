@@ -21,6 +21,7 @@ module Skylab::TestSupport::TestSupport
         invoke
         expect_these_lines_on_stderr_ do |y|
           write_messages_into_for_no_transition_because_nothing_pending_ y
+          write_messages_into_for_invite_generically_ y
         end
         expect_fail
       end
@@ -30,7 +31,7 @@ module Skylab::TestSupport::TestSupport
 
       it "API - splay" do
         call :wuz_up
-        expect :error, :expression, :primary_parse_error do |y|
+        expect :error, :expression, :primary_parse_error, :primary_not_found do |y|
           y[0] == "unknown primary 'wuz_up'" || fail
           y[1] =~ /\Aavailable primaries: '/ || fail
         end
@@ -39,8 +40,11 @@ module Skylab::TestSupport::TestSupport
 
       it "CLI - splay" do
         invoke '-wuz-up'
-        expect_on_stderr 'unknown primary "-wuz-up"'
-        expect %r(\Aavailable primaries: -[a-z])
+        expect_these_lines_on_stderr_ do |y|
+          y << 'unknown primary "-wuz-up"'
+          y << %r(\Aavailable primaries: -[a-z])
+          write_messages_into_for_invite_generically_ y
+        end
         expect_fail
       end
     end

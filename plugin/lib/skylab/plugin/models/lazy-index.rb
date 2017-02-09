@@ -27,6 +27,11 @@ module Skylab::Plugin
         dereference_plugin offset_of_touched_plugin_via_user_value lt
       end
 
+      def offset_of_touched_plugin_via_normal_symbol sym  # 1x [ts]
+        _lt = @operator_branch.dereference sym
+        offset_of_touched_plugin_via_user_value _lt
+      end
+
       def offset_of_touched_plugin_via_user_value lt  # #here
         lt.HELLO_LOAD_TICKET
         key_x = @operator_branch.natural_key_of lt

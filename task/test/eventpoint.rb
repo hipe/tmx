@@ -61,7 +61,7 @@ module Skylab::Task::TestSupport
 
         _x = subject_module_::Path_via_PendingExecutionPool_and_Graph.call_by do |o|
 
-          o.say_plugin_by = -> mixed_x, _ba_API_expag do
+          o.say_plugin_by = -> mixed_x, * do
 
             # (this is a minimal example; clients will probably be more sophisticated)
 
@@ -79,6 +79,23 @@ module Skylab::Task::TestSupport
         em_ = log.gets
         em_ && fail
         em
+      end
+
+      def black_and_white_line_of_ em
+        a = black_and_white_lines_of_ em
+        if 1 == a.length
+          a.fetch 0
+        else
+          fail "unexpected: #{ a.fetch(1).inspect }"
+        end
+      end
+
+      def black_and_white_lines_of_ em
+
+        # is basically `black_and_white_expression_agent_for_expect_emission`
+        _for_example = expression_agent
+        _wat = em.express_into_under [], _for_example
+        _wat  # hi. #todo
       end
 
       def build_event_log_
@@ -107,11 +124,23 @@ module Skylab::Task::TestSupport
         subject_module_.define_graph( & p )
       end
 
+      def expression_agent
+        # TestSupport_::Quickie::API::InterfaceExpressionAgent.instance
+        No_deps_zerk_[]::API_InterfaceExpressionAgent.instance
+      end
+
       def subject_module_
         Home_::Eventpoint
       end
-
     # -
+    # ==
+
+    No_deps_zerk_ = Lazy_.call do
+      require 'no-dependencies-zerk'
+      ::NoDependenciesZerk
+   end
+
+    # ==
   end
 end
 # #history: the last of the old code gone during major rewrite

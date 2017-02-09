@@ -57,7 +57,7 @@ module Skylab::Zerk::TestSupport
             em = state_1[2]
             a = em.channel_symbol_array
             a[ 0, 2 ] == [ :error, :expression ] || fail
-            sym = a.last
+            sym = a[2]
             sym == :primary_parse_error || sym == :parse_error || fail  # for now meh
             _expag = self.expression_agent
             _lines = em.express_into_under [], _expag

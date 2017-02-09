@@ -97,7 +97,7 @@ module Skylab::Task::TestSupport
 
         _ev = _em.cached_event_value
 
-        _expag = common_expression_agent_for_expect_event_
+        _expag = common_expression_agent_for_expect_emission_
 
         _s_a = _ev.express_into_under [], _expag
 

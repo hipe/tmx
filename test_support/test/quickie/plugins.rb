@@ -29,8 +29,13 @@ module Skylab::TestSupport::TestSupport
         # ~
 
         def write_messages_into_for_no_transition_because_nothing_pending_ y
-          y << "there are no pending executions"
-          y << "so nothing brings the system from the beginning state to a finished state"
+
+          y << "there are no state transitions so #{
+            }nothing brings the system from the beginning state to a finished state."
+        end
+
+        def write_messages_into_for_invite_generically_ y
+          y << "see 'quee -h' for help."
         end
 
         def expect_no_transition_found_ & p
@@ -113,9 +118,9 @@ module Skylab::TestSupport::TestSupport
             else
               act_line = act_line_scn.gets_one
               if exp_line.respond_to? :ascii_only?
-                act_line == exp_line || fail
+                act_line == exp_line or act_line.should eql exp_line
               else
-                act_line =~ exp_line || fail
+                act_line =~ exp_line or act_line.should match exp_line
               end
             end
           end
@@ -276,7 +281,7 @@ module Skylab::TestSupport::TestSupport
         def __expag_for_API
           # (assume this guy is loaded:)
           # Home_::Quickie::TreeRunnerMicroservice::No_deps_zerk_[]
-          ::NoDependenciesZerk::API_ExpressionAgent.instance
+          ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance
         end
 
         def prepare_subject_CLI_invocation invo

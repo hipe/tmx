@@ -1,5 +1,17 @@
 # what is the deal with expression agents? :[#040]
 
+## design objectives for the new expression agent technique
+
+  - expression agents are stateless
+  - expression agents can often have no member data
+
+  - the newest scanner is the way
+
+
+## about the new methods :[#here.3]
+
+
+
 ## objective & scope
 
 generally we use "expression agents" when we want to say something.
@@ -20,6 +32,8 @@ can usually be stateless and without member data, so usually we implement
 them as singleton.
 
 whereas we used to use this "NLP Agent" to XX we YY
+
+
 
 
 

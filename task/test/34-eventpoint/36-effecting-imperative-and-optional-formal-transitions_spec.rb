@@ -78,9 +78,9 @@ module Skylab::Task::TestSupport
         o.add_pending_task :_task_that_uses_profile_2_, _agent_two
       end
 
-      _em.to_black_and_white_line ==
-       "the only pending execution does not bring the system #{
-         }from the A state to a finished state" or fail
+      s_a = black_and_white_lines_of_ _em
+      s_a[0] == "'_task_that_uses_profile_2_' requires the B state." || fail
+      s_a[1] == "it does not transition from the state you are in, which is the A state." || fail
     end
 
       it "but SOMETHING MAGICAL happens when they are together" do

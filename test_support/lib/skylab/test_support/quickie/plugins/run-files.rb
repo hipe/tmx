@@ -15,7 +15,8 @@ module Skylab::TestSupport
       end
 
       def __describe_into y
-        y << "run the tests in the files"
+        y << "run the tests in the files."
+        y << "this is defaulted when appropriate, probably."
       end
 
       def parse_argument_scanner_head
@@ -24,7 +25,7 @@ module Skylab::TestSupport
 
       def release_agent_profile
         Eventpoint_::AgentProfile.define do |o|
-          o.can_transition_from_to :files_stream, :finished
+          o.must_transition_from_to :files_stream, :finished
         end
       end
 

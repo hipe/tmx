@@ -146,7 +146,7 @@ module Skylab::TaskExamples::TestSupport
 
         it "errput lists etc" do
 
-          expag = common_expression_agent_for_expect_event_
+          expag = common_expression_agent_for_expect_emission_
 
           s_a = []
           emission_array[ 1 .. -1 ].each do |em|

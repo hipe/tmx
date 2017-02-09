@@ -36,8 +36,7 @@ module Skylab::TestSupport
       # -- ..
 
       def begin_handler_expresser
-        Require_zerk_[]
-        Zerk_::Expresser.via_expression_agent self
+        Zerk_lib_[]::Expresser.via_expression_agent self
       end
 
       # --

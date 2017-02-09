@@ -83,7 +83,7 @@ module Skylab::Task::TestSupport
       o
     end
 
-    def common_expression_agent_for_expect_event_
+    def common_expression_agent_for_expect_emission_
       Home_.lib_.brazen::API.expression_agent_instance
     end
 

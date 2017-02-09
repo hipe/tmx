@@ -34,7 +34,7 @@ module Skylab::CodeMetrics::TestSupport
     end
 
     def expression_agent
-      _interface_library::API_ExpressionAgent.instance
+      _interface_library::API_InterfaceExpressionAgent.instance
     end
 
     def subject_API

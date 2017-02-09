@@ -276,28 +276,36 @@ module Skylab::Zerk
         end
 
         def __express_splay_of_available_features
-          o = @omni
+          o = @omni ; y = @y
           if o.has_operators
             if o.has_primaries
-              buff = "available operators and primaries: "
+              lem = "available operators and primaries"
               scn = _to_operation_and_primary_moniker_scanner
             else
-              buff = "available operators: "
+              lem = "available operators"
               scn = _to_operation_moniker_scanner
             end
           else
-            buff = "available primaries: "
+            lem = "available primaries"
             scn = _to_primary_moniker_scanner
           end
-          _oxford_and buff, scn
-          @y << buff
+          @expression_agent.calculate do
+            simple_inflection do
+              _ = oxford_join scn  # (get the number from this)
+              y << "#{ n lem }: #{ _ }"  # (use the number here)
+            end
+          end
         end
 
         def __express_splay_of_available_operators
-          buff = "available operators: "
-          _scn = _to_operation_moniker_scanner
-          _oxford_and buff, _scn
-          @y << buff
+
+          scn = _to_operation_moniker_scanner ; y = @y
+          @expression_agent.calculate do
+            simple_inflection do
+              _ = oxford_join "", scn, " and "
+              y << "#{ n "available operators" }: #{ _ }"
+            end
+          end
         end
 
         def _to_operation_and_primary_moniker_scanner
@@ -320,10 +328,6 @@ module Skylab::Zerk
               send m, sym.intern  # respect [#062]
             end
           end
-        end
-
-        def _oxford_and buff, scn
-          scn.oxford_join buff, ' and ', ', '
         end
       end
 

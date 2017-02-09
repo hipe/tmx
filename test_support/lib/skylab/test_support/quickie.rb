@@ -1267,7 +1267,7 @@ module Skylab::TestSupport
       end
 
       def expression_agent
-        CLI_ExpressionAgent___.instance
+        CLI_InterfaceExpressionAgent.instance
       end
 
       def info_yielder
@@ -1285,7 +1285,9 @@ module Skylab::TestSupport
 
     # ==
 
-    class CLI_ExpressionAgent___
+    class CLI_InterfaceExpressionAgent
+
+      # (this has become an an ersatz of what is in [ze] nodeps, which is great)
 
       class << self
         def instance
@@ -1295,6 +1297,16 @@ module Skylab::TestSupport
       end  # >>
 
       alias_method :calculate, :instance_exec
+
+      def simple_inflection & p
+        o = dup
+        o.extend Zerk_lib_[].lib_.human::NLP::EN::SimpleInflectionSession::Methods
+        o.calculate( & p )
+      end
+
+      def ick_prim sym
+        %("#{ prim sym }")
+      end
 
       def ick x
         x.inspect
@@ -1421,7 +1433,7 @@ module Skylab::TestSupport
     poptop
     end
 
-    Stylize__ = -> do  # #open :[#005]. #[#ze-023.2] the stylize diaspora
+    Stylize__ = -> do  # #[#ze-023.2] the stylize diaspora
       h = ::Hash[ %i| red green yellow blue magenta cyan white |.
         each_with_index.map do |i, d| [ i, 31 + d ] end ]
       h[ :strong ] = 1 ; p = h.method :fetch

@@ -292,4 +292,5 @@ module Skylab::Common
     # -
   end
 end
+# #tombstone-B: perhaps the last remaining production use of structured expressive :[#014.1]
 # #history-A: moved here from [ta]

@@ -14,10 +14,19 @@ class Skylab::Task
         # result is some kind of execution path structure.
     # -
 
+      def initialize
+        @default_finisher_by = nil
+        super
+      end
+
+      def pending_execution_pool= o
+        @pending_execution_pool_object = o
+      end
+
       attr_writer(
+        :default_finisher_by,
         :graph,
         :listener,
-        :pending_execution_pool,
         :say_plugin_by,
       )
 
@@ -29,15 +38,18 @@ class Skylab::Task
 
         begin
           __accept_any_and_all_stationary_transitions
-          if __current_state_is_ending_state
+
+          if _current_state_is_ending_state
             break
           end
-          _yes = __resolve_one_single_active_transition_for_this_step
+
+          _yes = _resolve_one_single_motive_transition_for_this_step
           _yes && redo
           @_ok || break
-          _yes = __resolve_one_single_passive_transition_for_this_step
+
+          _yes = __maybe_use_default_finisher
           _yes && redo
-          @_ok || break
+
           __whine_about_how_no_transition_was_found
           break
         end while above
@@ -70,7 +82,7 @@ class Skylab::Task
 
       def __maybe_mention_that_there_are_some_unemployed_pending_executions
         #coverpoint-1.1.2 - this does not cause failure, is just a notice
-        h = remove_instance_variable :@_pending_execution_pool
+        h = remove_instance_variable :@pending_execution_pool_hash
         if h.length.nonzero?
           Eventpoint::When_::UnutilizedPendingExecution.call(
             h.keys, self )
@@ -97,6 +109,45 @@ class Skylab::Task
           end
         end
         NIL
+      end
+
+      # ~ EXPERIMENTAL :[#013] "default finishers"
+
+      def __maybe_use_default_finisher
+        send ( @_default_finisher ||= :__default_finisher_initially )
+      end
+
+      def __default_finisher_initially
+        if @default_finisher_by
+          two = @default_finisher_by[ @current_state_symbol ]
+        end
+        if two
+          @_default_finisher = :_NEVER
+          _pe = Eventpoint::AgentProfile::PendingExecution.new( * two )
+          _index_pending_execution _pe
+          yes = _resolve_one_single_motive_transition_for_this_step
+          if yes
+            yes
+          elsif @_ok
+            self._COVER_ME__default_finisher_did_not_finish__
+          end
+        else
+          @_default_finisher = :_no
+          FALSE
+        end
+      end
+
+      # ~
+
+      def _resolve_one_single_motive_transition_for_this_step
+
+        yes = __resolve_one_single_active_transition_for_this_step
+        if yes
+          yes
+        elsif @_ok
+          _yes = __resolve_one_single_passive_transition_for_this_step
+          _yes  # hi. #todo
+        end
       end
 
       def __resolve_one_single_active_transition_for_this_step
@@ -151,7 +202,7 @@ class Skylab::Task
         end
 
         ex_d = reg_trans.pending_execution_offset
-        @_pending_execution_pool.delete ex_d
+        @pending_execution_pool_hash.delete ex_d
 
         # (multiple transitions can be associated with one pending
         # execution, so the above is not guaranteed to delete an entry.)
@@ -165,7 +216,7 @@ class Skylab::Task
         ACHIEVED_
       end
 
-      def __current_state_is_ending_state
+      def _current_state_is_ending_state
 
         # (experimentally) rather than specify directly (in the graph or in
         # arguments) what the ending state is, we stipulate that an ending
@@ -180,78 +231,70 @@ class Skylab::Task
 
       def __index_all_formal_transitions
 
-        imperative_transition_pool = {}
-        pending_execution_pool = {}
+        @_imperative_transition_pool = {}
+        @pending_execution_pool_hash = {}  # CAREFUL not to be confused with @pending_execution_pool_object
 
-        stationary_formal_transitions_via_source = {}
-        active_formal_transitions_via_source = {}
-        passive_formal_transitions_via_source = {}
+        @stationary_formal_transitions_via_source = {}
+        @active_formal_transitions_via_source = {}
+        @passive_formal_transitions_via_source = {}
 
-        all_formal_transitions = []
-
-        pending_executions = remove_instance_variable(
-          :@pending_execution_pool ).pending_executions
+        @all_formal_transitions = []
+        @all_pending_executions = []
 
         __init_verifier
-        graph = remove_instance_variable :@graph
 
-        trans_d = nil
+        _pending_executions = remove_instance_variable(
+          :@pending_execution_pool_object ).pending_executions
 
-        note_it_is_imperative = -> do
-          imperative_transition_pool[ trans_d ] = true
-        end
+        _pending_executions.each( & method( :_index_pending_execution ) )
 
-        pending_executions.each_with_index do |pe, ex_d|
+        # -- other indexing/initting
 
-          pe.agent_profile.formal_transitions.each do |ft|
-
-            __verify ft, pe
-
-            trans_d = all_formal_transitions.length
-            all_formal_transitions.push RegisteredTransition___.new( ex_d, ft )
-
-            from_sym = ft.from_symbol
-
-            if ft.is_stationary
-
-              if ft.imperative_not_optional
-
-                note_it_is_imperative[]
-              end
-              a = ( stationary_formal_transitions_via_source[ from_sym ] ||= [] )
-
-            elsif ft.imperative_not_optional
-
-              note_it_is_imperative[]
-
-              a = ( active_formal_transitions_via_source[ from_sym ] ||= [] )
-            else
-              a = ( passive_formal_transitions_via_source[ from_sym ] ||= [] )
-            end
-
-            a.push trans_d
-          end
-
-          pending_execution_pool[ ex_d ] = true
-        end
-
-        @stationary_formal_transitions_via_source = stationary_formal_transitions_via_source
-        @active_formal_transitions_via_source = active_formal_transitions_via_source
-        @passive_formal_transitions_via_source = passive_formal_transitions_via_source
-
-        pending_executions.frozen? || self._EASY__just_dup_and_freeze__
-        @all_pending_executions = pending_executions
-        @all_formal_transitions = all_formal_transitions.freeze
-
-        @current_state_symbol = graph.beginning_state_symbol
-        @_nodes_box_hash = graph.nodes_box.h_
-
-        @_imperative_transition_pool = imperative_transition_pool
-        @_pending_execution_pool = pending_execution_pool
+        @current_state_symbol = @graph.beginning_state_symbol
+        @_nodes_box_hash = @graph.nodes_box.h_
 
         @_cycle_sanity_check = { @current_state_symbol => true }
-        @_path = []
 
+        @_path = []
+        NIL
+      end
+
+      def _index_pending_execution pe
+
+        ex_d = @all_pending_executions.length
+        @all_pending_executions.push pe
+        @pending_execution_pool_hash[ ex_d ] = true
+
+        pe.agent_profile.formal_transitions.each do |ft|
+          __index_formal_transition ft, ex_d
+        end
+        NIL
+      end
+
+      def __index_formal_transition ft, ex_d
+
+        __verify ft, @all_pending_executions.fetch( ex_d )
+
+        d = @all_formal_transitions.length
+        @all_formal_transitions.push RegisteredTransition___.new( ex_d, ft )
+
+        k = ft.from_symbol
+
+        if ft.is_stationary
+
+          if ft.imperative_not_optional
+            @_imperative_transition_pool[ d ] = true
+          end
+          ( @stationary_formal_transitions_via_source[ k ] ||= [] ).push d
+
+        elsif ft.imperative_not_optional
+
+          @_imperative_transition_pool[ d ] = true
+          ( @active_formal_transitions_via_source[ k ] ||= [] ).push d
+
+        else
+          ( @passive_formal_transitions_via_source[ k ] ||= [] ).push d
+        end
         NIL
       end
 
@@ -297,7 +340,7 @@ class Skylab::Task
       end
 
       def __init_verifier
-        @_verify = graph.nodes_box.h_.dup
+        @_verify = @graph.nodes_box.h_.dup
         @_verify.default_proc = -> h, k do
           raise Eventpoint::KeyError, __say_levenschtein( k, h )
         end
@@ -313,12 +356,17 @@ class Skylab::Task
           }did you mean #{ Common_::Oxford_or[ h.keys.map(&:id2name) ] }?"  # more like DON'T say levenschtein
       end
 
+      def _no
+        FALSE
+      end
+
       attr_reader(
         :all_formal_transitions,
         :all_pending_executions,
         :current_state_symbol,
         :graph,
         :listener,
+        :pending_execution_pool_hash,
         :say_plugin_by,
       )
     # -

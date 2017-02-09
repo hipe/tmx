@@ -34,9 +34,7 @@ module Skylab::TestSupport
 
     def __init_via_array listener, a
 
-      Require_zerk_[]
-
-      _as = Zerk_::API::ArgumentScanner.via_array a, & listener
+      _as = Zerk_lib_[]::API::ArgumentScanner.via_array a, & listener
 
       _init_via_scanner _as do |api|
 
@@ -320,9 +318,7 @@ module Skylab::TestSupport
 
     def __init_operator_branch
 
-      Require_zerk_[]
-
-      lib = Zerk_::ArgumentScanner
+      lib = Zerk_lib_[]::ArgumentScanner
 
       _ping_ob = lib::OperatorBranch_via_FREEFORM.define do |defn|
         defn.add :ping, MethodBasedRouting___.new( :__invoke_ping, :__describe_ping )

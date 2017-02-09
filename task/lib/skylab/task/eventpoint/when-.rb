@@ -6,59 +6,54 @@ class Skylab::Task
 
       # ==
 
-      class AmbiguousNextStep < Common_::Dyadic  # #borrow-coverage from [#ts-039.3]
+      module AmbiguousNextStep  # #borrow-coverage from [#ts-039.3]
 
-        def initialize d_a, up
-          @all_formal_transitions = up.all_formal_transitions
-          @all_pending_executions = up.all_pending_executions
-          @listener = up.listener
-          @offsets = d_a
-          @say_plugin_by = up.say_plugin_by
+        def self.[] d_a, up
+          up.listener.call :error, :expression, :ambiguous do |y|
+            simple_inflection do
+              extend Here_::Event_::ExpressionMethods
+              extend AmbiguousNextStep
+              init_for_wonderful_expression_hack_( y, d_a, up ).express
+            end
+          end
         end
 
-        def execute
+        def express
 
-          aggregation_prototype = Eventpoint::Event_::And_buffer[]
+          exe_a = @up.all_pending_executions
+          fot_a = @up.all_formal_transitions
 
-          exe_a = @all_pending_executions
-          fot_a = @all_formal_transitions
+          primary_total = 0
 
-          ambiguous_aggregation = aggregation_prototype.dup_by do |o|
-            o.initial_buffer = "ambiguous: "
-          end
+          h = __formal_transitions_by_common_destination
 
-          me = self
-          messagario_by = @say_plugin_by or self._FAIL_EARLIER
+          _line = oxford_join_do_not_store_count scanner_ h.keys do |sym|
 
-          @listener.call :error, :expression, :ambiguous do |y|
+            _d_a = h.fetch sym
 
-            me.__formal_transitions_by_common_destination.each_pair do |sym, d_a|
+            _this_and_this = oxford_join scanner_( _d_a ) do |d|
 
-              aggregation = aggregation_prototype.dup
+              primary_total += 1
 
-              d_a.each do |d|
-
-                _pending_exe = exe_a.fetch fot_a.fetch( d ).pending_execution_offset
-                _mixed_user_tuple = _pending_exe.mixed_task_identifier
-                _moniker = messagario_by[ _mixed_user_tuple, self ]
-                aggregation << _moniker
-              end
-
-              _subj = aggregation.finish || 'multiple'
-
-              ambiguous_aggregation << "#{ both_ d_a }#{ _subj } #{
-               }transition to #{ prim sym }"
+              _pending_exe = exe_a.fetch fot_a.fetch( d ).pending_execution_offset
+              say_pending_execution_ickily_ _pending_exe
             end
 
-            y << ambiguous_aggregation.finish
+            _to_this = oper sym  # ick
+
+            s = "#{ both_ }#{ _this_and_this } #{ all_ }#{ v "transition" } to #{ _to_this }"
+            clear_count_for_inflection
+            s
           end
-          UNABLE_
+
+          @y << _line
+          @y << "so you can't have #{ both_or_all primary_total } of them at the same time."
         end
 
         def __formal_transitions_by_common_destination
 
           h = ::Hash.new(){ |h_, k| h_[k] = [] }
-          fot_a = @all_formal_transitions
+          fot_a = @up.all_formal_transitions
           @offsets.each do |d|
             h[ fot_a.fetch( d ).formal_transition.destination_symbol ].push d
           end
@@ -66,25 +61,29 @@ class Skylab::Task
         end
       end
 
-      class UnutilizedPendingExecution < Common_::Dyadic
+      # ==
+
+      module UnutilizedPendingExecution
 
         # a custom #[#hu-002] EN expression of aggregation
+        # one line per pending execution
 
-        def initialize d_a, up
-          @offsets = d_a
-          @up = up
+        def self.call d_a, up
+          up.listener.call :error, :expression, :unutilized_pending_execution do |y|
+            simple_inflection do
+              extend Here_::Event_::ExpressionMethods
+              extend UnutilizedPendingExecution
+              init_for_wonderful_expression_hack_( y, d_a, up ).express
+            end
+          end
+          NIL
         end
 
-        def execute
+        def express
 
-          me = self
-          lib = Eventpoint::Event_
+          __to_thing_stream.each do |exe|
 
-          @up.listener.call :info, :expression, :unutilized_pending_executio do |y|
-
-            me.__to_thing_stream.each do |exe|
-
-              buffer = "#{ lib::Say_pending_execution[ exe ] } #{
+              buffer = "#{ say_pending_execution_ickily_ exe } #{
                 }will have no effect because the system does not reach "
 
               seen = {}
@@ -93,15 +92,14 @@ class Skylab::Task
               end.reduce_by do |sym|
                 seen.fetch(sym) { seen[sym] = false ; true }
               end.map_by do |sym|
-                lib::Say_state[ sym ]
-              end.join_into_with_by "", " or ", & IDENTITY_
+                say_state_ sym
+              end.flush_to_scanner
 
-              buffer << _wow
-              y << buffer
-            end
-            y  # important
+            oxford_join_do_not_store_count buffer, _wow, " or "
+            @y << buffer
           end
-          NIL
+
+          @y
         end
 
         def __to_thing_stream
@@ -114,54 +112,54 @@ class Skylab::Task
 
       # ==
 
-      class UnmetImperativeTransitions < Common_::Dyadic
+      module UnmetImperativeTransitions
 
         # "FOO" and "BAR" {rely|relies} on 'zing zang'
 
-        def initialize d_a, up
-          @offsets = d_a
-          @up = up
-        end
-
-        def execute
-          me = self
-          @up.listener.call :error, :expression, :unmet_imperatives do |y|
-            _big_line = me.__big_line
-            y << _big_line
+        def self.call d_a, up
+          up.listener.call :error, :expression, :unmet_imperatives do |y|
+            simple_inflection do
+              extend Here_::Event_::ExpressionMethods
+              extend UnmetImperativeTransitions
+              init_for_wonderful_expression_hack_( y, d_a, up ).express
+            end
           end
-          NIL
         end
 
-        def __big_line
+        def express
 
-          _pending_executions_via_source_sym = __pending_executions_via_source_sym
+          # "fizz and buzz rely on A and bazz relies on B and A and B aren't reached
 
-          lib = Eventpoint::Event_
-          say_state = lib::Say_state
-          and_buff_proto = lib::And_buffer[]
-          buffer = and_buff_proto.dup
+          h = __pending_executions_via_source_sym
+          not_reached = []
 
-          exe_a = @up.all_pending_executions
-          and_me = []
-          _pending_executions_via_source_sym.each_pair do |from_sym, exe_d_a|
+          big_buff = oxford_join scanner_ h.keys do |from_sym|
 
-            buff = and_buff_proto.dup
+            _scn = scanner_ h.fetch from_sym  # an array of exe offsets
 
-            exe_d_a.each do |d|
-              buff << lib::Say_pending_execution[ exe_a.fetch( d ) ]
+            buff = oxford_join _scn do |d|
+
+              say_pending_execution_ickily_ @up.all_pending_executions.fetch d
             end
 
-            _v = 1 == exe_d_a.length ? 'relies' : 'rely'
+            s = say_state_ from_sym
 
-            s = say_state[ from_sym ]
-            buffer << "#{ buff.finish } #{ _v } on #{ s }"
-            and_me.push s
+            not_reached.push s
+
+            buff << SPACE_ << v( 'rely' ) << " on " << s
+
+            clear_count_for_inflection
+
+            buff
           end
 
-          big_line = buffer.finish
+          clear_count_for_inflection
 
-          _v = 1 == and_me.length ? "isn't" : "aren't"
-          big_line << " and #{ Common_::Oxford_and[ and_me ] } #{ _v } reached."
+          big_buff << " and #{ oxford_join scanner_ not_reached }"
+
+          big_buff << " #{ v false, :is } reached."  # isn't reached / aren't reached
+
+          @y << big_buff
         end
 
         def __pending_executions_via_source_sym
@@ -183,87 +181,109 @@ class Skylab::Task
 
       # ==
 
-      class NoTransitionFound < Common_::Monadic
+      module NoTransitionFound  # 1 X
 
-        def initialize up
-          @up = up
-        end
+        # totally new techniques.
+        # one line or two.
 
-        def execute
-          me = self
-          @up.listener.call :error, :expression, :no_transition_found do |y|
-            me.__express_into_under y, self
+        def self.[] up
+          up.listener.call :error, :expression, :no_transition_found do |y|
+            simple_inflection do
+              extend Here_::Event_::ExpressionMethods
+              extend NoTransitionFound
+              init_for_wonderful_expression_hack_( y, up ).express
+            end
           end
         end
 
-        def __express_into_under y, expag
-          @y = y ; @expression_agent = expag
-          if __zero
-            __express_zero
+        def express
+
+          if there_are_none_in_the_pool_
+
+            if there_were_no_pending_executions_at_all_
+
+              # "there are no state transitions so nothing brings the system [to a close]"
+
+              write_count_for_inflection 0
+              lem = "state transition"
+
+            else
+
+              # "none of the 3 pending executions brings the system [to a close]"
+              # "the only pending execution fails to bring the system [to a close]"
+
+              write_count_for_inflection @_remaining_pool_exe_offsets.length
+              lem = "pending execution"
+            end
+
+            _object = "the system from #{ say_current_state_ } to a finished state."
+
+            @y << "#{ the_only } #{ n lem } #{ no_double_negative "bring" } #{ _object }"
           else
-            __express_one_or_more
+            __the_fun_one
           end
         end
 
-        def __zero
-
-          @_lib = Eventpoint::Event_
-          @all_pending_executions = @up.all_pending_executions
-          @all_pending_executions.length.zero?
+        def there_are_none_in_the_pool_
+          @_remaining_pool_exe_offsets = @up.pending_execution_pool_hash.keys
+          @_remaining_pool_exe_offsets.length.zero?
         end
 
-        def __express_zero
-
-          # "there are no pending executions"
-          o = @_lib
-
-          o::SentencePhrase.define do |sp|
-
-            sp.noun_phrase = o::Exist[ :present, EMPTY_A_ ]
-
-            sp.verb_phrase = _pending_executions :inclusive
-
-          end.express_into_under @y, @expression_agent
-
-          # "so nothing brings the system from the A state to a finished state"
-
-          o::SentencePhrase.define do |sp|
-
-            sp.conjunctive_phrase = o::Therefor[]
-
-            sp.noun_phrase = o::Nothing[]
-
-            sp.verb_phrase = _finish
-
-          end.express_into_under @y, @expression_agent
+        def there_were_no_pending_executions_at_all_
+          @up.all_pending_executions.length.zero?
         end
 
-        def __express_one_or_more
+        def __the_fun_one
 
-          # "none of the 3 pending executions [..]"
-          # "the only pending execution [..]"
+          # y << %("-run-files" requires "files stream")
+          # y << %("-run-files" and "-doc-only" require things like "beginning" and "files stream".)
+          # y << %(none of them transition from the state you are in, which is "the beginning state")
+          # y << %(it does not transition from the state you are in, which is "the beginning state")
 
-          o = @_lib
+          # two buckets: the switches and the graph state nodes. hearing
+          # duplicates of the second bucket is not interesting so we de-dup
+          # it (set not list) but if there are repeats of the same switch,
+          # we want this staed explicitly (list not set).
 
-          o::SentencePhrase.define do |sp|
+          source_node_set = {}
 
-            sp.noun_phrase = _pending_executions :exclusive
+          _scn = scanner_ @_remaining_pool_exe_offsets
 
-            sp.verb_phrase = _finish
+          buff = oxford_join _scn do |d|
 
-          end.express_into_under @y, @expression_agent
-        end
+            exe = @up.all_pending_executions.fetch d
 
-        def _pending_executions which
-          @_lib::PendingExecutions[ which, @all_pending_executions ]
-        end
+            exe.agent_profile.formal_transitions.each do |ft|
+              source_node_set[ ft.from_symbol ] = true
+            end
 
-        def _finish
-          @_lib::Finish.call(
-            @up.current_state_symbol,
-            :exclusive,
-            @all_pending_executions,
-          )
+            say_pending_execution_ickily_ exe
+          end
+
+          if 1 == source_node_set.length
+            s = both_or_all and buff << " #{ s }"
+          end
+
+          buff << SPACE_ << v( "require" )
+
+          if 1 < source_node_set.length
+            buff << " things like"  # (as in, "not respectively")
+          end
+
+          buff << SPACE_
+
+          _scn = scanner_ source_node_set.keys
+
+          oxford_join_do_not_store_count buff, _scn, " and " do |sym|
+            say_state_ sym
+          end
+
+          buff << DOT_
+
+          @y << buff
+
+          @y << "#{ none_of_them "transition" } #{
+            }from the state you are in, which is #{ say_current_state_ }."
         end
       end
 
@@ -284,12 +304,17 @@ class Skylab::Task
         if mti.respond_to? :intern
           s << " (in '#{ mti.intern }')"
         end
-        s << '.'  # DOT_
+        s << DOT_
       end
+
+      # ==
+
+      DOT_ = '.'
 
       # ==
     end
   end
 end
+# #tombstone-B: rewrote all for simplified modules hack
 # :#tombstone-A: we're not clear when this [#tab-001.2] help screen was used,
 #   because it was apparently not used by the eponymous [ts] quickie plugin

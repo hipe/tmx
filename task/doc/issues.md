@@ -1,3 +1,8 @@
+[#014]       external tombstone references
+             :[#here.1]: we used to use [#co-003.1] structured expressive events; no longer
+
+[#013]       experimental feature 1x here 1x [ts] default finisher
+
 [#012]       unified langauge for magnetics implementation
 
 [#011]       magnetics item syntax..

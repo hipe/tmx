@@ -40,7 +40,7 @@ module Skylab::TestSupport
         else
           @_did_release = true
           Eventpoint_::AgentProfile.define do |o|
-            o.can_transition_from_to :beginning, :files_stream
+            o.must_transition_from_to :beginning, :files_stream
           end
         end
       end

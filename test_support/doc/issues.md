@@ -45,11 +45,11 @@
 [#034] #open what is the r.s equivalent to this? [ canon ]
              ( #moved-to: [#dt-XXX] )
 
-[#033]       #historical #done fix test globbing .. [#xx-009]
+[#033] #hole ( #was: #historical #done fix test globbing .. [#xx-009] )
              ( #was: #done if you un-orphanize core.rb it presents an issue with autoloader) )
 [#032]       ( assorted plugin issues )
-       #open :[#here.A]: the "counts" report is not covered
-       #open :[#here.B]: verbose mode is borked for counts
+             ( #was: :[#here.A]: the "counts" report is not covered )
+             ( #was: :[#here.B]: verbose mode is borked for counts )
              ( #was: white plugin whines weirdly when strange files are in
                lib/skylab ([#xx-007] )
              ( #was: #done folderize plugins ([#xx-008]) )
@@ -62,7 +62,7 @@
 
        #wish :[#here.4]: maybe drop quickie onefile into recursive runnner..
 
-       #open :[#here.C]: quickie plugin arch needs rearch - too confusing
+             ( #was: :[#here.C]: quickie plugin arch needs rearch - too confusing )
 
              :[#here.B]: recursive runner (plugins) help screen
                (when open, was the need to cover it)
@@ -185,8 +185,8 @@
 [#006]       the quickie recursive runner microservice ..
              ( #was: test/all: redundancy points, maybe waits for [#tm-056] )
 
-[#005] #open #quickie #redundant s-tylize
-             1x subscription in [ts]
+[#005] #hole
+             ( #was: #redundant s-tylize. wontfix - it's ok to be redundant here)
              ( #was: confessions of an ambiguous grammar .. )
              ( #was: #done test/all should (whitelist) run the tests in the
                provided order, and not the lexical order? (see [#xxx].))
@@ -194,7 +194,9 @@
 
 [#004]       quickie ..
 
-[#002] #open coverage is waiting for [#tmx-011] upgrade rspec
+[#002] #open cover and finish "pending" feature to be feature complete
+
+             ( #was: coverage is waiting for [#tmx-011] upgrade rspec )
              (and presumably some other things.._
 
              coverage is a no fun zone ..

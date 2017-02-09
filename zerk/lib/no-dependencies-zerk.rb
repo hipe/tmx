@@ -137,7 +137,7 @@ module NoDependenciesZerk
         elsif @client and @client.respond_to? :expression_agent
           @client.expression_agent
         else
-          CLI_ExpressionAgent.instance
+          CLI_InterfaceExpressionAgent.instance
         end
       end
 
@@ -431,9 +431,9 @@ module NoDependenciesZerk
 
     # ==
 
-    ExpressionAgent__ = ::Class.new  # forward declaration
+    InterfaceExpressionAgent__ = ::Class.new  # forward declaration
 
-    class CLI_ExpressionAgent < ExpressionAgent__
+    class CLI_InterfaceExpressionAgent < InterfaceExpressionAgent__
 
       def ick_oper sym
         oper( sym ).inspect
@@ -574,7 +574,7 @@ module NoDependenciesZerk
 
     # ==
 
-    class API_ExpressionAgent < ExpressionAgent__
+    class API_InterfaceExpressionAgent < InterfaceExpressionAgent__
 
       def ick_oper sym
         _same sym
@@ -632,8 +632,9 @@ module NoDependenciesZerk
           _scn = Scanner_via_Array.call missing do |sym|
             prim sym
           end
-          _and = oxford_and _scn
-          y << "required: #{ _and }"
+          simple_inflection do
+            y << "required: #{ oxford_join "", _scn, " and " }"
+          end
         end
         UNABLE_
       end
@@ -985,18 +986,27 @@ module NoDependenciesZerk
     end
 
     Ambiguous__ = -> sym_scn, which, argument_scanner do
+
       case which
       when :_operator_
-        ick_m, good_m, curr_m = :ick_oper, :oper, :current_operator_symbol
+        noun, ick_m, good_m, curr_m = "operator", :ick_oper, :oper, :current_operator_symbol
       when :_primary_
-        ick_m, good_m, curr_m = :ick_prim, :prim, :current_primary_symbol
+        noun, ick_m, good_m, curr_m = "primary", :ick_prim, :prim, :current_primary_symbol
       end
+
       k = argument_scanner.send curr_m
-      # (or load [ze] for this instead:)
+
       argument_scanner.no_because do |y|
-        _scn = sym_scn.map_by { |sym| send good_m, sym }
-        y << "ambiguous primary #{ send ick_m, k } - #{
-          }did you mean #{ oxford_or _scn }?"
+
+        buff = "did you mean "
+
+        simple_inflection do
+          oxford_join buff, sym_scn, " or " do |sym|
+            send good_m, sym
+          end
+        end
+
+        y << "ambiguous primary #{ send ick_m, k } - #{ buff }?"
       end
     end
 
@@ -1217,8 +1227,11 @@ module NoDependenciesZerk
         end
       end
 
-      def no_because reason_symbol=:primary_parse_error, & msg_p
-        _the_best_expresser_ever msg_p, :error, :expression, reason_symbol
+      def no_because *channel_tail, & msg_p
+        if channel_tail.length.zero?
+          channel_tail.push :primary_parse_error
+        end
+        _the_best_expresser_ever msg_p, :error, :expression, * channel_tail
         UNABLE_
       end
 
@@ -1261,40 +1274,39 @@ module NoDependenciesZerk
     end
 
     When_primary_not_found___ = -> avail_prim_scn, args do
+
       k = args.current_primary_symbol
-      args.no_because do |y|
-        _scn = avail_prim_scn.map_by { |sym| prim sym }
+
+      args.no_because :primary_parse_error, :primary_not_found do |y|
+
         y << "unknown primary #{ ick_prim k }"
-        y << "available primaries: #{ oxford_and _scn }"
+
+        simple_inflection do
+
+          _ = oxford_join "", avail_prim_scn, " and " do |sym|
+            prim sym
+          end
+
+          y << "#{ n "available primary" }: #{ _ }"
+        end
       end
     end
 
-    class ExpressionAgent__
+    class InterfaceExpressionAgent__  # theory at [#040]
 
       class << self
         def instance
           @___instance ||= new
         end
+        private :new
       end
 
       alias_method :calculate, :instance_exec
 
-      def oxford_or scn
-        scn.oxford_join '', ' or ', ', '
-      end
-
-      def oxford_and scn
-        scn.oxford_join '', ' and ', ', '
-      end
-
-      # (they all #borrow-coverage from [#ts-039.3] (by way of [ta]))
-
-      def both_ x  # say "both " IFF count is 2
-        "both " if 2 == __count_via_mixed( x )
-      end
-
-      def __count_via_mixed x
-        ::Array.try_convert( x ) ? x.length : x.tap( & :bit_length )  # #type-check
+      def simple_inflection & p
+        o = dup
+        o.extend Zerk_lib_[].lib_.human::NLP::EN::SimpleInflectionSession::Methods
+        o.calculate( & p )
       end
     end
 
@@ -1414,20 +1426,6 @@ module NoDependenciesZerk
     end
 
     module ScannerMethods__
-
-      def oxford_join buff, ult, sep  # assume some
-        buff << gets_one
-        unless no_unparsed_exists
-          begin
-            s = gets_one
-            no_unparsed_exists && break
-            buff << sep << s
-            redo
-          end while above
-          buff << ult << s
-        end
-        buff
-      end
 
       def concat_scanner tail_scn
         if no_unparsed_exists

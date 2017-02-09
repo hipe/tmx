@@ -6,6 +6,120 @@ module Skylab::Human::TestSupport
 
     TS_[ self ]
 
+    context "(this new regex)" do
+
+      it "looks plural" do
+        _against "foos"
+        _plural ; _not_Y ; _lowercase
+      end
+
+      it "looks plural (ends in Y)" do
+        _against "PONIES"
+        _plural ; _Y ; _uppercase
+      end
+
+      it "looks singular (ends in Y but not of the category)" do
+        _against "play"
+        _singular ; _not_Y ; _lowercase
+      end
+
+      def _against s
+        md = _subject_module::SING_PLUR_REGEX_HACK___.match s
+        md or fail "regex failed against: #{ s.inpsect }"
+        @MD = md ; nil
+      end
+
+      def _plural
+        @MD[ :looks_plural ]
+      end
+
+      def _singular
+        @MD[ :looks_singular ]
+      end
+
+      def _not_Y
+        @MD[ :the_not_Y_category ]
+      end
+
+      def _Y
+        @MD[ :the_Y_category ]
+      end
+
+      def _uppercase
+        @MD[ :all_caps ]
+      end
+
+      def _lowercase
+        ! @MD[ :all_caps ]
+      end
+    end
+
+    context "(redux of hacky stuff)" do
+
+      # #coverpoint-1-1
+
+      context "(the primitive cases)" do
+
+        it "many" do
+          _given_count 3
+          _expect "3 foobrics frobulate"
+        end
+
+        it "one" do
+          _given_count 1
+          _expect "1 foobric frobulates"
+        end
+
+        it "none" do
+          _given_count 0
+          _expect "0 foobrics frobulate"
+        end
+
+        def _express_by sess
+          sess.calculate do
+            _d = count_for_inflection
+            "#{ _d } #{ n "foobric" } #{ v "frobulate" }"
+          end
+        end
+      end
+
+      context "(this target thing)" do
+
+        it "many" do
+          _given_count 3
+          _expect "none of the 3 state transitions brings etc"
+        end
+
+        it "one" do
+          _given_count 1
+          _expect "the only state transition fails to bring etc"
+        end
+
+        it "none" do
+          _given_count 0
+          _expect "there are no state transitions so nothing brings etc"
+        end
+
+        def _express_by sess
+          sess.calculate do
+            "#{ the_only } #{ n "state transition" } #{ no_double_negative "bring" } etc"
+          end
+        end
+      end
+
+      def _given_count d
+        @COUNT = d
+      end
+
+      def _expect expect_s
+
+        sess = X_nlp_en_sis_SessionClass.new
+        sess.write_count_for_inflection remove_instance_variable :@COUNT
+        actual_s = _express_by sess
+        actual_s == expect_s or actual_s.should eql expect_s
+      end
+    end
+
     it "an - matches a/an, case" do
 
       sc = _soliloquizing_client_for :an
@@ -95,7 +209,6 @@ module Skylab::Human::TestSupport
     def __dangerous_build
 
       _soliloquizing_client_for :and_, :_and, :_non_one, :s
-
     end
 
     define_method :_soliloquizing_client_for, -> do
@@ -110,5 +223,14 @@ module Skylab::Human::TestSupport
         cls.new
       end
     end.call
+
+    class X_nlp_en_sis_SessionClass
+      include Home_::NLP::EN::SimpleInflectionSession::Methods
+      alias_method :calculate, :instance_exec
+    end
+
+    def _subject_module
+      Home_::NLP::EN::SimpleInflectionSession
+    end
   end
 end

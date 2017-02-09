@@ -11,8 +11,11 @@ module Skylab::TestSupport::TestSupport
       # :[#039.3] #lend-coverage to [ta], [ze]
       # #needs-invite
       call :tree, :list_files, :path, 'xx'
-      expect :error, :expression, :ambiguous do |y|
-        y == [ "ambiguous: both 'tree' and 'list_files' transition to 'finished'" ] || fail
+      expect :error, :expression, :ambiguous do |msgs|
+        expect_these_lines_in_array_ msgs do |y|
+          y << "both 'tree' and 'list_files' transition to 'finished'"
+          y << "so you can't have both of them at the same time."
+        end
       end
       expect_fail
     end

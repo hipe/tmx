@@ -153,8 +153,7 @@ module Skylab::TestSupport  # :[#021].
   end
 
   CLI_ = Lazy_.call do
-    Require_zerk_[]
-    Zerk_::CLI
+    Zerk_lib_[]::CLI
   end
 
   CLI_support_ = -> do
@@ -169,8 +168,10 @@ module Skylab::TestSupport  # :[#021].
     Home_.lib_.system.path_looks_relative path
   end
 
-  Require_zerk_ = Lazy_.call do
-    Zerk_ = Home_.lib_.zerk ; nil
+  Zerk_lib_ = Lazy_.call do
+    x = Home_.lib_.zerk
+    Zerk_ = x  # for those who know
+    x
   end
 
   # --

@@ -99,7 +99,7 @@ class Skylab::Task
       end
 
       def add_pending_task task_id_x, profile
-        @pending_executions.push PendingExecution___.new( task_id_x, profile )
+        @pending_executions.push PendingExecution.new( task_id_x, profile )
         NIL
       end
 
@@ -110,7 +110,7 @@ class Skylab::Task
 
     # ==
 
-    class PendingExecution___
+    class PendingExecution  # 1x outside of file, by a sibling
 
       def initialize mixed_task_identifier, agent_profile
         @agent_profile = agent_profile
