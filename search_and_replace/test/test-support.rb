@@ -252,6 +252,8 @@ module Skylab::SearchAndReplace::TestSupport
   Autoloader_[ self, ::File.dirname( __FILE__ ) ]
   Home_ = ::Skylab::SearchAndReplace
 
+  Stream_ = -> a, & p { Common_::Stream.via_nonsparse_array a, & p }
+
   EMPTY_A_ = []  # Home_::EMPTY_A_
   EMPTY_S_ = Home_::EMPTY_S_
   NEWLINE_ = Home_::NEWLINE_

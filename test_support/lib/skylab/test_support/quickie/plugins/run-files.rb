@@ -19,7 +19,7 @@ module Skylab::TestSupport
       end
 
       def parse_argument_scanner_head
-        ACHIEVED_  # nothing to do. it's a flag
+        ACHIEVED_  # it's a flag; nothing to do.
       end
 
       def release_agent_profile

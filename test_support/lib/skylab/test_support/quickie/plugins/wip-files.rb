@@ -8,20 +8,9 @@ module Skylab::TestSupport
       # (wormhole with [#sa-024])
 
       def initialize
-      end
-
-      if false
-      def initialize adapter
-        @fuzzy_flag = adapter.build_fuzzy_flag %w( -wip-them-all )
-        @adapter = adapter
-      end
-
-      def opts_moniker
-        @fuzzy_flag.some_opts_moniker
-      end
-
-      def args_moniker
-      end
+        o = yield
+        @_client_listener = o.listener
+        @_shared_datapoint_store = o
       end
 
       def description_proc
@@ -34,33 +23,28 @@ module Skylab::TestSupport
         y << "(no dry-run yet, but only mutates unmodified files)"
       end
 
-      if false
-      def prepare sig
-        idx = @fuzzy_flag.any_first_index_in_input sig
-        if idx
-          sig.nilify_input_element_at_index idx
-          sig.rely :CULLED_TEST_FILES
-          sig.carry :CULLED_TEST_FILES, :FINISHED
-          sig
+      def parse_argument_scanner_head
+        ACHIEVED_  # it's a flag; nothing to do
+      end
+
+      def release_agent_profile
+        Eventpoint_::AgentProfile.define do |o|
+          o.can_transition_from_to :files_stream, :finished
         end
       end
 
-      def culled_test_files_eventpoint_notify
+      def invoke _  # #testpoint (over in [sa])
 
-        @y = @adapter.y
-        ___via_test_path_stream @adapter.services.to_test_path_stream
-        NIL_  # for now, ignore any failure from above..
-      end
+        st = @_shared_datapoint_store.release_test_file_path_streamer_.call
 
-      def ___via_test_path_stream st  # #testpoint
-
-        __define_constants
-
-        __init_emission_handlers
+        __init_vendor_listener
+        @_vendor_listener = method :__receive_emission_from_vendor
+        __init_skip_listener
+        @_skip_listener = method :__receive_emission_from_skip
 
         @_Search_and_Replace = Autoloader_.require_sidesystem :SearchAndReplace
 
-        sess = Home_.lib_.git.check_SCM::Session.begin( & @_skip_oes_p ).finish
+        sess = Home_.lib_.git.check_SCM::Session.begin( & @_skip_listener ).finish
 
         __init_counters
 
@@ -76,14 +60,14 @@ module Skylab::TestSupport
             redo
           end
 
-          ok = ___replace_the_things_in_this_one_file path
+          ok = __replace_the_things_in_this_one_file path
           # (but if something failed here, let's stop for now)
           ok or break
 
           redo
-        end while nil
+        end while above
 
-        if ok
+        msg = if ok
 
           pcs = []
           if @_skip_count.nonzero?
@@ -96,38 +80,54 @@ module Skylab::TestSupport
           end
 
           if pcs.length.zero?
-            @y << "(did nothing.)"
+            "(did nothing.)"
           else
-            @y << "(#{ pcs.join ' and ' }.)"
+            "(#{ pcs.join ' and ' }.)"
           end
         else
-          @y << "(had errors.)"
+          "(had errors.)"
         end
 
-        ok
+        @_client_listener.call :info, :expression, :summary do |y|
+          y << msg
+        end
+
+        NIL
       end
 
-      def ___replace_the_things_in_this_one_file path
+      def __replace_the_things_in_this_one_file path
+        if __thing_one path
+          __thing_two
+          ACHIEVED_
+        end
+      end
+
+      def __thing_one path
 
         # (change `:path` to `:paths` for this to work on multiple files)
 
-        st = @_Search_and_Replace::API.call(
+        _ = @_Search_and_Replace::API.call(
           :ruby_regexp, RX___,
           :path, path,
           :search,
           :replacement_expression, REPLACEMENT_EXPRESSION___,
           :replace,
-          & @_vendor_oes_p )
+          & @_vendor_listener )
 
-        if st  # #tracked [#sa-024] complicated client interface
+        _store :@__custom_stream, _
+      end
+
+      def __thing_two
+        st = remove_instance_variable :@__custom_stream
+        # -
           begin
-            es = st.gets
+            es = st.gets  # #tracked [#sa-024] complicated client interface
             es or break
             @_edit_session_count += 1
             mc = es.first_match_controller
             d = 0
             begin
-              _ = mc.engage_replacement( & @_vendor_oes_p )
+              _ = mc.engage_replacement( & @_vendor_listener )
               _ or self._SANITY
               d += 1
               mc = mc.next_match_controller
@@ -139,21 +139,27 @@ module Skylab::TestSupport
 
             fh = ::File.open path_, ::File::WRONLY
 
-            es.write_output_lines_into fh do | * _, & ev_p |
-              _bytes = ev_p[]
-              @_oes_p.call :_, :expression do |y|
-                y << "wrote #{ d } change(s) (#{ _bytes } bytes) - #{ path_ }"
-              end
+            es.write_output_lines_into fh do | * chan, & p|
+              __express_thing p, chan, d, path_
             end
 
             fh.close
 
             redo
-          end while nil
-          ACHIEVED_
-        else
-          st
+          end while above
+        # -
+        NIL
+      end
+
+      def __express_thing p, chan, d, path_
+
+        [ :info, :data, :number_of_bytes_written ] == chan || self._SANITY
+        _bytes = p[]
+
+        @_client_listener.call :info, :expression, :rewrote_file do |y|
+          y << "wrote #{ d } change(s) (#{ _bytes } bytes) - #{ pth path_ }"
         end
+        NIL
       end
 
       def __init_counters
@@ -167,68 +173,92 @@ module Skylab::TestSupport
         @_replacement_count += d
       end
 
-      def __init_emission_handlers
-
-        @_vendor_oes_p = -> * a, & p do
-          ( @__ves ||= __build_vendor_emission_handler ).handle a, & p
-        end
-
-        @_skip_oes_p = -> * a, & p do
-          ( @__seh ||= __build_skip_emission_handler ).handle a, & p
-        end
-
-        @_oes_p = -> * a, & p do
-          ( @___geh ||= __build_generic_emission_handler ).handle a, & p
-        end
+      def __receive_emission_from_vendor * a, & p
+        _treetown p, a, @_vendor_emission_treetown
       end
 
-      def __build_vendor_emission_handler
+      def __init_vendor_listener
+        # ETC ETC :set_leaf_component  # always ignore these
+        # VERBO `grep_command_head`
 
-        he = _begin_handler_expresser
+        @_vendor_emission_treetown = {
+          info: {
+            expression: {
+              grep_command_head: :__maybe_express_grep_command_head,
+            },
+            event: {
+              find_command_args: :__maybe_express_find_command_args,
+            },
+            set_leaf_component: :__always_ignore_set_leaf_component,
+          }
+        }
+        NIL
+      end
 
-        he.ignore_emissions_ending_with :set_leaf_component
+      def __maybe_express_find_command_args & p
+        # #verbose here
+        NIL
+      end
 
-        # :#here - verbose would go here
+      def __maybe_express_grep_command_head & p
+        # #verbose here
+        NIL
+      end
 
-        he.maybe_ignore_emissions_ending_with :grep_command_head do
-          false  # #here
+      def __always_ignore_set_leaf_component
+        # (these are for zerk iCLI; uninteresting to us)
+        NOTHING_
+      end
+
+      def __receive_emission_from_skip * a, & p
+        _treetown p, a, @_skip_listener_treetown
+        NIL
+      end
+
+      def __init_skip_listener
+        @_skip_listener_treetown = {
+          error: {
+            expression: :__receive_error_expression_from_skip,
+          }
+        }
+        NIL
+      end
+
+      def _treetown p, a, node
+        a.each do |sym|
+          node = node.fetch sym
         end
+        send node, & p
+      end
 
-        he.maybe_ignore_emissions_starting_with :info, :event, :find_command_args do
-          false  # #here
+      def __receive_error_expression_from_skip & orig_p
+
+        @_client_listener.call :info, :expression, :skip do |y|
+          main = -> line do
+            y << line
+          end
+          p = -> line do
+            p = main
+            y << "skipping because #{ line }"
+          end
+          _y = ::Enumerator::Yielder.new do |line|
+            p[ line ]
+          end
+          calculate _y, & orig_p
+          y
         end
-
-        he.finish
+        NIL
       end
 
-      def __build_skip_emission_handler
-        he = _begin_handler_expresser
-        he.prefix_first_expression_lines_with "skipping because "
-        he.finish
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
 
-      def __build_generic_emission_handler
-        _begin_handler_expresser.finish
-      end
-
-      def _begin_handler_expresser
-        he = CLI_support_[]::ExpressionAgent.instance.begin_handler_expresser
-        he.downstream_yielder = @y
-        he
-      end
-
-      yes = true ; go = -> do
-        yes = false
+      # ==
 
         RX___ = /^([ ]+)describe "((?:[^\\"]|\\.)+)" do$/
 
         REPLACEMENT_EXPRESSION___ = '{{ $1 }}describe "{{ $2 }}", wip: true do'
-      end
-
-      define_method :__define_constants do
-        yes && go[]
-      end
-      end
+      # ==
     end
   end
 end
+# #tombstone-A: "handler expresser"

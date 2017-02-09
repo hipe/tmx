@@ -23,4 +23,3 @@ use [sa] to convert etc to Stream_
   (somewhere do default primary - so filename withouth -path - CLI only)
 -3.100 finished with quickie recursive runner when:
 -3.111 plugin -1 cover #open #[ts-002] #glhf
--3.114 plugin -2 wip-files #open [#sa-035] #glhf

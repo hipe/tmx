@@ -22,7 +22,7 @@ module Skylab::SearchAndReplace
 
       @_state = :__main
 
-      Common_.stream do  # #[#035]
+      Common_.stream do
         send @_state
       end
     end

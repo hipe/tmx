@@ -24,8 +24,9 @@
 [#027] #open niCLI won't be able to handle a replacement expression that
              looks like an option (i.e starts with "--").
 
-[#026] #open we have wipped the "wip-files"-related operation pending
-             completion of the [ts] quickie (plugin-driven) recursive runner
+[#026] #hole
+             ( #was: we have wipped the "wip-files"-related operation pending
+             completion of the [ts] quickie (plugin-driven) recursive runner )
 
              [ integration with a remote feature - [ts] "wip-files" ]
 

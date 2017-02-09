@@ -19,7 +19,6 @@ module Skylab::TestSupport
 
         def parse_argument_scanner_head
           # (scanner is already advanced past activating token
-
           ACHIEVED_
         end
 
