@@ -128,7 +128,8 @@ module Skylab::Zerk
 
     def ___init_expression_agent
 
-      expag = Remote_CLI_lib_[]::ExpressionAgent.new_proc_based
+      expag = Home_::CLI::InterfaceExpressionAgent::
+        THE_LEGACY_CLASS.new_proc_based
 
       expag.expression_strategy_for_property = -> _prp do
         :render_property_in_black_and_white_customly

@@ -1,17 +1,25 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
   module API
 
-    class Expression_Agent__
+    module InterfaceExpressionAgent
+
+      class THE_LEGACY_CLASS
+
+        class << self
+          alias_method :via_expression_agent_injection, :new
+          undef_method :new
+        end  # >>
+
     private
 
       # specifically we created this expression agent to render expressions
       # in "black & white" when we are rendering their messages
       # to be used in exception messages.
 
-      def initialize kr
+      def initialize injection
         @app_name_p = -> do
-          kr.app_name
+          injection.app_name
         end
       end
 
@@ -146,48 +154,10 @@ module Skylab::Brazen
       # --
 
       def _NLP_agent
-        @context ||= self.class.NLP_agent.new
+        @___NLP_agent ||= Home_::Expresser::NLP_EN_ExpressionAgent.new
       end
 
-      class << self
-
-        def NLP_agent
-          const_get( :NLP_agent__, false ).call
-        end
-      end  # >>
-
-      NLP_agent__ = Common_.memoize do
-
-        NLP_Agent__ = LIB.make_NLP_agent(
-          :public, [
-            :and_,
-            :both,
-            :indefinite_noun,
-            :noun_phrase,
-            :or_,
-            :plural_noun,
-            :preterite_verb,
-            :progressive_verb,
-            :s,
-            :sentence_phrase_via_mutable_iambic,
-          ]
-        )
-      end
-
-      module LIB
-
-        class << self
-
-          def make_NLP_agent * x_a
-
-            cls = ::Class.new
-
-            LIB_.human::NLP::EN::Methods.edit_module_via_iambic cls, x_a
-
-            cls
-          end
-        end
-      end
-    end
+      end  # legacy class
+    end  # module
   end
 end

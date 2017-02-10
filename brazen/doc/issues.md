@@ -52,8 +52,12 @@
 [#096] #hole ( #was: open the (CLI) table narrative )
 [#095] #hole (#was: old o.p notes)
              (#was: features that [fa] has that you don't #universal)
-[#094]       expression agents adjunct notes ..
-[#093]       what is the deal with expression agents ..
+
+[#094] #hole ( #was: expression agents adjunct notes .. #moved-to: [#ze-040.2] )
+
+[#093] #hole
+             ( #was: what is the deal with expression agents .. )
+             ( #moved-to: [#ze-040] )
 
 [#092] #hole
              ( #was: [ CLI styling ] ) ( #moved-to: [#ze-021.1] )

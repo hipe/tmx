@@ -76,7 +76,7 @@ module Skylab::Common::TestSupport
       before :all do
         module X_e_e_My
 
-          class ExpressionAgent
+          class CustomExpressionAgent
             def em s
               "__#{ s.upcase }__"
             end
@@ -95,7 +95,7 @@ module Skylab::Common::TestSupport
 
         expr = X_e_e_My::ErrorPredicate.new 'I', 'burnout'
 
-        _expag = X_e_e_My::ExpressionAgent.new
+        _expag = X_e_e_My::CustomExpressionAgent.new
 
         _s = _expag.instance_exec expr, & expr.expression_proc
 

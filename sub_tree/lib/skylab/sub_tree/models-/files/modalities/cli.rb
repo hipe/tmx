@@ -79,5 +79,6 @@ module Skylab::SubTree
   end
 end
 
+# (note regarding below tombstones: [#br-093] changed to [#ze-040])
 # #tombstone: [#br-093]:#case-study-st-2 ("when to subclass expression agents"
 #             [#br-093]:#point-10 is relevant here (expag state)

@@ -61,9 +61,8 @@ module Skylab::Brazen::TestSupport
       td
     end
 
-    expag = nil
-    define_method :black_and_white_expression_agent_for_expect_emission do
-      expag ||= Home_::API.expression_agent_class.new Home_.application_kernel_  # ..no..
+    def black_and_white_expression_agent_for_expect_emission
+      This_one_expression_agent___[]
     end
 
     def cfg_filename
@@ -78,6 +77,11 @@ module Skylab::Brazen::TestSupport
   Common_ = ::Skylab::Common
 
   Lazy_ = Common_::Lazy
+
+  This_one_expression_agent___ = Lazy_.call do
+    Zerk_lib_[]::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.
+      via_expression_agent_injection :_no_injection_for_tests_BR_
+  end
 
   module TestLib_
 

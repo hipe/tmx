@@ -1,9 +1,8 @@
-
 require_relative '../test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Zerk::TestSupport
 
-  describe "[br] CLI support - expression agent" do
+  describe "[ze] CLI - interface expression agent" do
 
     TS_[ self ]
     use :memoizer_methods
@@ -66,7 +65,7 @@ module Skylab::Brazen::TestSupport
     end
 
     def _common_begin
-      he = Home_::CLI_Support::ExpressionAgent.instance.begin_handler_expresser
+      he = _subject_module.instance.begin_handler_expresser
       he.downstream_yielder = []
       he
     end
@@ -76,7 +75,7 @@ module Skylab::Brazen::TestSupport
     end
 
     shared_subject :_Fake_Event do
-      class X_CS_EA_Fake_Event
+      class X_cli_Fake_Event
         def initialize y_p
           @_y_p = y_p
         end
@@ -85,6 +84,10 @@ module Skylab::Brazen::TestSupport
         end
         self
       end
+    end
+
+    def _subject_module
+      Home_::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS
     end
   end
 end

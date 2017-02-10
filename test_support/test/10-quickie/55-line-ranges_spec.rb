@@ -198,7 +198,7 @@ module Skylab::TestSupport::TestSupport
     # ==
 
     def expression_agent
-      subject_module_::API::ExpressionAgent.instance
+      subject_module_::API::TinyExpressionAgent___.instance
     end
 
     # ==

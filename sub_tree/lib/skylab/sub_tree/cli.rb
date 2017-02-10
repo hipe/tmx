@@ -8,6 +8,10 @@ module Skylab::SubTree
       API.application_kernel_
     end
 
+    def build_expression_agent_for_this_invocation invo
+      FullyCustomInterfaceExpressionAgent___.new invo
+    end
+
     module Actions
 
       class Files < CLI::Action_Adapter
@@ -40,7 +44,7 @@ module Skylab::SubTree
       end
     end
 
-    class ExpressionAgent
+    class FullyCustomInterfaceExpressionAgent___  #testpoint
 
       def initialize ar
         @_action_reflection = ar
@@ -140,12 +144,13 @@ module Skylab::SubTree
 
       # ~ EN NLP
 
-      lib.human::NLP::EN::Methods[ self, :private, [
+      lib.human::NLP::EN::SimpleInflectionSession.edit_module self, :private, [
         :and_,
         :both,
         :or_,
         :s,
-      ]]
+      ]
+
     end
   end
 end

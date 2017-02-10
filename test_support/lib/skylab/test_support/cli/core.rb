@@ -23,7 +23,7 @@ module Skylab::TestSupport
           end,
         }
 
-        cli.expression_agent = CLI::ExpressionAgent.instance__
+        cli.expression_agent = CLI::InterfaceExpressionAgent.instance__
 
         if 1 == p.arity  # yuck - better for testing..
           yield cli

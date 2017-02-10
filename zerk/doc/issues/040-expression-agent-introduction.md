@@ -1,6 +1,33 @@
-# what is the deal with expression agents? :[#093]
+# what is the deal with expression agents? :[#040]
 
+## objective & scope
+
+generally we use "expression agents" when we want to say something.
+in an ideally simple scenario, in your "domain" you have a particular
+set of things you want to talk about. for example, in the domain of
+[#052] argument-scanner based invocation models, in error messages the
+things we talk about are often primaries and operators. so for such a
+"domain" we end up with a set (imagine it is abstract) of method that
+we use XXX
+
+
+
+
+## MUSINGS
+
+expression agent classes themselves should be small, and their instances
+can usually be stateless and without member data, so usually we implement
+them as singleton.
+
+whereas we used to use this "NLP Agent" to XX we YY
+
+
+
+
+## (the rest)
 (EDIT: parts of this document are very old..)
+
+
 
 in simplest terms the expression agent is the context in which your UI
 strings are evaluated to be rendered for your particular modality.

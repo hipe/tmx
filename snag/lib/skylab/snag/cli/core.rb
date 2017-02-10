@@ -26,6 +26,10 @@ module Skylab::Snag
       end
     end
 
+    def build_expression_agent_for_this_invocation invo
+      CLI::InterfaceExpressionAgent.new invo
+    end
+
     class Action_Adapter < Action_Adapter
 
       MUTATE_THESE_PROPERTIES = [ :upstream_identifier ]

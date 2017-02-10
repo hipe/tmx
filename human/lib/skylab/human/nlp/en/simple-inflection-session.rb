@@ -2,25 +2,26 @@ module Skylab::Human
 
   module NLP::EN
 
-    module Methods  # [#032]
+    class SimpleInflectionSession  # [#032]
 
       class << self
 
-        def _call mod, * x_a
+        def edit_module mod, * x_a
           if x_a.length.zero?
-            mod.include self
+            self._WHERE
+            mod.include TheseMethods___
           else
             edit_module_via_iambic mod, x_a
           end
         end
-
-        alias_method :[], :_call
-        alias_method :call, :_call
       end  # >>
 
-      define_method :an, EN_[ :an ]
+      module TheseMethods___
 
-      define_method :s, EN_[ :s ]
+        define_method :an, EN_[ :an ]
+
+        define_method :s, EN_[ :s ]
+      end
 
       # this is its hacky power:
       #

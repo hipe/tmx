@@ -7,7 +7,7 @@ module Skylab::Common
         alias_method :construct, :new
 
         def codifying_expression_agent_instance
-          Event_::Expression_Agent___::INSTANCE
+          Event_::InterfaceExpressionAgent.instance
         end
 
         def data_event_class_maker

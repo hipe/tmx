@@ -10,7 +10,7 @@ module Skylab::Snag
 
           @downstream_identifier = nil
 
-          @expression_agent = Expression_Agent_.new(
+          @expression_agent = ByteStreamExpressionAgent.new(
             DEFAULT_WIDTH_,
             DEFAULT_SUB_MARGIN_WIDTH_,
             DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )

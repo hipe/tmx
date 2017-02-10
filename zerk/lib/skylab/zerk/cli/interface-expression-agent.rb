@@ -1,32 +1,45 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  module CLI::InterfaceExpressionAgent
 
-    class ExpressionAgent
+    class THE_LEGACY_CLASS
 
       class << self
 
-        def instance  # see #note-br-10 in [#br-093]. this is for hacks
-          @___instance ||= Singleton_instance___[]
+        def instance  # see #note-br-10 in [#ze-040]. this is for hacks
+          @___instance ||= __instance
+        end
+
+        def __instance
+          el = new_proc_based
+
+          el.expression_strategy_for_property = -> _prp do
+            :render_property_as_unknown
+          end
+
+          el
         end
 
         def new_proc_based
-          new Procmun___.new
+          via_expression_agent_injection ProcBasedArgumentElementExpresser___.new
         end
+
+        alias_method :via_expression_agent_injection, :new
+        undef_method :new
       end  # >>
 
       # --
 
       def initialize ar
-        @_action_reflection = ar
+        @_injection = ar
       end
 
       def expression_strategy_for_property= p
-        @_action_reflection._expression_strategy_for_property = p
+        @_injection._expression_strategy_for_property = p
       end
 
       def render_property_in_black_and_white_customly= p
-        @_action_reflection._etc_customly = p
+        @_injection._etc_customly = p
       end
 
       # --
@@ -40,7 +53,7 @@ module Skylab::Brazen
       end
 
       def app_name
-        @_action_reflection.app_name
+        @_injection.app_name
       end
 
       def both x
@@ -97,7 +110,7 @@ module Skylab::Brazen
 
       def parameter_in_black_and_white prp
 
-        m, * a = @_action_reflection.expression_strategy_for_property prp
+        m, * a = @_injection.expression_strategy_for_property prp
 
         send m, prp, * a
       end
@@ -126,7 +139,7 @@ module Skylab::Brazen
           s = s.to_path
         end
 
-        if Path_looks_absolute_[ s ]
+        if Home_.lib_.system.path_looks_absolute s
 
           @___pather ||= Home_.lib_.system.new_pather
           @___pather.call s
@@ -136,7 +149,7 @@ module Skylab::Brazen
       end
 
       def render_property_in_black_and_white_customly prp
-        @_action_reflection._etc_customly[ prp, self ]
+        @_injection._etc_customly[ prp, self ]
       end
 
       def render_property_as__option__ prop
@@ -150,7 +163,7 @@ module Skylab::Brazen
       alias_method :render_property_as_argument, :render_property_as__argument__
 
       def render_property_as__environment_variable__ prp
-        @_action_reflection.environment_variable_name_string_via_property_ prp
+        @_injection.environment_variable_name_string_via_property_ prp
       end
 
       def render_propperty_without_styling prp
@@ -166,7 +179,7 @@ module Skylab::Brazen
       end
 
       def stylize s, * i_a
-        Zerk_lib_[]::CLI::Styling.stylify i_a, s
+        CLI::Styling.stylify i_a, s
       end
       public :stylize
 
@@ -181,7 +194,7 @@ module Skylab::Brazen
       end
 
       def _NLP_agent
-        @NLP_agent ||= Home_::API.expression_agent_class.NLP_agent.new
+        @___NLP_agent ||= Home_::Expresser::NLP_EN_ExpressionAgent.new
       end
 
       # -- #experiment
@@ -189,7 +202,7 @@ module Skylab::Brazen
     public
 
       def begin_handler_expresser
-        This_::Handler_Expresser.new self
+        Home_::Expresser.via_expression_agent self
       end
 
       def new_expression_context
@@ -209,25 +222,12 @@ module Skylab::Brazen
       # --
 
       def action_reflection  # [bs], [cme]
-        @_action_reflection
+        @_injection
       end
 
       # ==
 
-      Singleton_instance___ = Lazy_.call do
-
-        el = new_proc_based
-
-        el.expression_strategy_for_property = -> _prp do
-          :render_property_as_unknown
-        end
-
-        el
-      end
-
-      # ==
-
-      class Procmun___
+      class ProcBasedArgumentElementExpresser___
 
         # instead of subclassing your expag..
 
@@ -247,7 +247,7 @@ module Skylab::Brazen
 
       # ==
 
-      This_ = self
-    end
-  end
+    end  # the legacy class
+  end  # module "interface expression agent"
 end
+# #history: beginning hopefully final unification into [ze]

@@ -275,8 +275,7 @@ module Skylab::Common::TestSupport
 
       _expag = debugging_expression_agent_for[ tc ]
 
-      _Brazen = Home_.lib_.brazen
-      o = _Brazen::CLI_Support::ExpressionAgent::Handler_Expresser.new _expag
+      o = Zerk_for_test_support_[]::Expresser.via_expression_agent _expag
       o.downstream_stream = io
       o = o.finish
 
@@ -1337,6 +1336,12 @@ module Skylab::Common::TestSupport
         false => "negative",
         true => "positive",
       }
+    end
+
+    # ==
+
+    Zerk_for_test_support_ = Lazy_.call do
+      Autoloader_.require_sidesystem :Zerk
     end
 
     # ==

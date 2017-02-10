@@ -17,12 +17,13 @@ module Skylab::Brazen
         Exit_statii___[]
       end
 
-      def expression_agent_class
-        API::Expression_Agent__
+      def expression_agent_instance  # #note-015
+        @___expag ||= __expag
       end
 
-      def expression_agent_instance  # #note-015
-        @expag ||= expression_agent_class.new :_no_kernel_
+      def __expag
+        Zerk_lib_[]::API::InterfaceExpressionAgent::
+          THE_LEGACY_CLASS.via_expression_agent_injection :_no_kernel_for_expag_for_BR_
       end
 
       def the_empty_expression_agent

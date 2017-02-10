@@ -2,7 +2,14 @@ module Skylab::Common
 
   class Event
 
-    class Expression_Agent___  # :[#010].
+    class InterfaceExpressionAgent  # :[#010].
+
+      class << self
+        def instance
+          @___instance ||= new
+        end
+        private :new
+      end  # >>
 
       # ->
 

@@ -2,7 +2,13 @@ module Skylab::TestSupport
 
   module CLI
 
-    module ExpressionAgent ; class << self  # see [#br-093]
+    module InterfaceExpressionAgent ; class << self
+
+      # fully custom [#ze-040] implementation that is stateless and memberless
+
+      def instance__
+        self
+      end
 
       alias_method :calculate, :instance_exec
 
@@ -30,7 +36,8 @@ module Skylab::TestSupport
       # -- ..
 
       def begin_handler_expresser
-        CLI_support_[]::ExpressionAgent::Handler_Expresser.new self
+        Require_zerk_[]
+        Zerk_::Expresser.via_expression_agent self
       end
 
       # --
@@ -45,11 +52,11 @@ module Skylab::TestSupport
 
       # -- reduce other structures to strings (& related)
 
-      def render_list_commonly_ s_a
+      def render_list_commonly__ s_a
         s_a.map( & method( :ick ) ).join ', '
       end
 
-      lib.human::NLP::EN::Methods.call self, :private,
+      lib.human::NLP::EN::SimpleInflectionSession.edit_module self, :private,
         [ :and_, :or_, :plural_noun, :s ]
 
       # -- ways to style strings
@@ -91,10 +98,6 @@ module Skylab::TestSupport
 
       define_method :stylify_ do |i_a, s|
         stylify[ i_a, s ]
-      end
-
-      def instance__
-        self
       end
     end ; end
   end

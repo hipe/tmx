@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Human::TestSupport
 
-  describe "[hu] NLP - EN - methods" do
+  describe "[hu] NLP - EN - simple inflection session" do
 
     TS_[ self ]
 
@@ -106,7 +106,7 @@ module Skylab::Human::TestSupport
 
         cls = ::Class.new
         TS_.const_set "#{ prefix }#{ d += 1 }", cls
-        Home_::NLP::EN::Methods.edit_module_via_iambic cls, [ :public, i_a ]
+        Home_::NLP::EN::SimpleInflectionSession.edit_module_via_iambic cls, [ :public, i_a ]
         cls.new
       end
     end.call

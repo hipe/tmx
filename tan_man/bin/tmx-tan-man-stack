@@ -148,7 +148,7 @@ class Skylab::Stack
     end
 
     def _expag
-      @___expag ||= Expression_Agent___.new
+      InterfaceExpressionAgent___.instance
     end
 
     attr_reader(
@@ -157,7 +157,14 @@ class Skylab::Stack
     )
   end
 
-  class Expression_Agent___
+  class InterfaceExpressionAgent___
+
+    class << self
+      def instance
+        @___instance ||= new
+      end
+      private :new
+    end  # >>
 
     alias_method :calculate, :instance_exec
 

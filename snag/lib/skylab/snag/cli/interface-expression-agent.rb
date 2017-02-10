@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI
 
-    class ExpressionAgent
+    class InterfaceExpressionAgent
 
       # subclass Home_.lib_.CLI_lib::Pen::Minimal for less DIY
 
@@ -129,8 +129,7 @@ module Skylab::Snag
       end
 
       def _NLP_agent
-
-        @___NLP_agent ||= Brazen_::API.expression_agent_class.NLP_agent.new
+        @___NLP_agent ||= Home_.lib_.zerk::Expresser::NLP_EN_ExpressionAgent.new
       end
 
       # ~
@@ -151,3 +150,4 @@ module Skylab::Snag
     end
   end
 end
+# #tombstone-A: there was a counterpart expression agent for API, not used, orphanic

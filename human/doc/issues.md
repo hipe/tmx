@@ -58,7 +58,9 @@
 [#034] #open we are tracking production failures with this one
              expression frames
 [#033]       understanding the EN module graph .. #parent-node:[#002]
-[#032]       the NLP en methods ..
+
+[#032]       NLP EN simple inflection session ..
+
 [#031]       being "optimally concise" may be one of the essential
              vectors of langauge production, as far as we're concerned
 [#030]       #doc-point #parent:003 #body-is-inline-in-parent an optional

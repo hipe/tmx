@@ -22,7 +22,7 @@ module Skylab::Autonomous_Component_System
 
     module Events::Component_Already_Added::Expresser___
 
-      include Expresser
+      include ExpressionMethods
 
       def __express_into_under y, expag
 

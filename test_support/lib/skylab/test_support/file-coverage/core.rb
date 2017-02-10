@@ -104,7 +104,7 @@ module Skylab::TestSupport
 
         yield :description, -> y do
 
-          _ = render_list_commonly_ Test_file_suffix_array__[]
+          _ = render_list_commonly__ Test_file_suffix_array__[]
           y << "the test file suffixes to use (default: #{ _ })"
         end
 

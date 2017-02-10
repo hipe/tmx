@@ -25,10 +25,6 @@ module Skylab::Slicer
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
-      def expression_agent_class
-        Brazen_::API.expression_agent_class
-      end
-
       def expression_agent_instance
         Brazen_::API.expression_agent_instance
       end

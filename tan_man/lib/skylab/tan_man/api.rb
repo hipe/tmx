@@ -11,28 +11,22 @@ module Skylab::TanMan
         bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
       end
 
-      def expression_agent_class
-        Expression_Agent__
-      end
-
       def expression_agent_instance  # :+[#051]
-        @expag ||= Expression_Agent__.new Home_.application_kernel_
+        InterfaceExpressionAgent___.instance
       end
     end  # >>
 
     # ~
 
-    class Expression_Agent__  # follows [#br-093]:#the-semantic-markup-guidelines
+    class InterfaceExpressionAgent___
+      # follows [#ze-040]:#the-semantic-markup-guidelines
 
       class << self
-        def NLP_agent_class
-          NLP_agent___[]
+        def instance
+          @___instance ||= new
         end
+        private :new
       end  # >>
-
-      def initialize k
-        # you could use kernel for app_name but we don't
-      end
 
       alias_method :calculate, :instance_exec
 
@@ -114,15 +108,25 @@ module Skylab::TanMan
       end
 
       def _NLP_agent
-        @NLP_agent ||= self.class.NLP_agent_class.new
+        NLP_agent_instance___[]
       end
 
-      NLP_agent___ = Common_.memoize do
-        NLP_Agent____ = Brazen_.expression_agent_library.make_NLP_agent(
+      NLP_agent_instance___ = Lazy_.call do
+        self::NLP_Agent___.new
+      end
+
+      Autoloader_[ self ]
+      lazily :NLP_Agent___ do
+
+        cls = ::Class.new
+
+        Home_.lib_.human::NLP::EN::SimpleInflectionSession.edit_module cls,
           :public,
           [ :and_, :indefinite_noun,
             :or_, :plural_noun,
-            :s, :sentence_phrase_via_mutable_iambic ] )
+            :s, :sentence_phrase_via_mutable_iambic ]
+
+        cls
       end
     end
 

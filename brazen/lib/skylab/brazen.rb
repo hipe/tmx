@@ -43,10 +43,6 @@ module Skylab::Brazen
       Home_.lib_.the_ACS_lib::Events.const_get const, false
     end
 
-    def expression_agent_library
-      Home_::API::Expression_Agent__::LIB
-    end
-
     def event_class const
       Home_::Actionesque::Factory::Events.const_get const, false
     end
@@ -211,14 +207,6 @@ module Skylab::Brazen
 
   Attributes_ = -> h do
     Home_.lib_.fields::Attributes[ h ]
-  end
-
-  Path_looks_absolute_ = -> path do
-    Home_.lib_.system.path_looks_absolute path
-  end
-
-  Path_looks_relative_ = -> path do
-    Home_.lib_.system.path_looks_absolute path
   end
 
   Require_fields_lib_ = Lazy_.call do  # ..

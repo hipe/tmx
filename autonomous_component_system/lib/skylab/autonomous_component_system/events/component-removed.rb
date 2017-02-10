@@ -14,7 +14,7 @@ module Skylab::Autonomous_Component_System
 
     ) do | y, o |
 
-      o = Event_Support_::Expresser[ self, o ]
+      o = Event_Support_::ExpressionMethods[ self, o ]
 
       o << 'removed'  # one day [#007]:WISH-A
       o.express_component_via_members or accept_sentence_part 'component'

@@ -431,7 +431,7 @@ module Skylab::CSS_Convert
 
   CLI.include Transitional___
 
-  class CLI::ExpressionAgent < Brazen_::CLI_Support::ExpressionAgent
+  class CLI::CustomExpressionAgent < Zerk_::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS
 
     # (this is a pedagogic example of taking the default expag from the
     # distribution and customizing it with in this case a specific color)
@@ -503,7 +503,7 @@ module Skylab::CSS_Convert
     def color_test _test_o
 
       modifiers_a = [ nil, :strong, :reverse ]
-      _Styling = Zerk_lib_[]::CLI::Styling
+      _Styling = Zerk_::CLI::Styling
       stylify = _Styling::Stylify
       width = 50
 

@@ -165,7 +165,7 @@ module Skylab::Common
       #
       #     module My
       #
-      #       class ExpressionAgent
+      #       class CustomExpressionAgent
       #         def em s
       #           "__#{ s.upcase }__"
       #         end
@@ -187,7 +187,7 @@ module Skylab::Common
       #
       #     expr = My::ErrorPredicate.new 'I', 'burnout'
       #
-      #     _expag = My::ExpressionAgent.new
+      #     _expag = My::CustomExpressionAgent.new
       #
       #     _s = _expag.instance_exec expr, & expr.expression_proc
       #

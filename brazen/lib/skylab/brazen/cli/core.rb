@@ -13,11 +13,11 @@ module Skylab::Brazen
       end
 
       def expression_agent_instance
-        Home_::CLI_Support::ExpressionAgent.instance
+        Zerk_lib_[]::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.instance
       end
 
       def pretty_path x
-        Home_::CLI_Support::ExpressionAgent::Pretty_path[ x ]
+        Zerk_lib_[]::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS::Pretty_path[ x ]
       end
 
       def some_screen_width
@@ -327,8 +327,9 @@ module Skylab::Brazen
 
       ## ~~ expag top-stopper
 
-      def _expression_agent_class
-        const_get_magically_ :ExpressionAgent
+      def build_expression_agent_for_this_invocation invo
+        Zerk_lib_[]::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.
+          via_expression_agent_injection invo
       end
 
       ## ~~ event receiving & sending
@@ -371,8 +372,8 @@ module Skylab::Brazen
       public(
         :app_name,  # by our expag (covered by [f2])
         :application_kernel,
+        :build_expression_agent_for_this_invocation,
         :branch_adapter_class_,
-        :_expression_agent_class,
         :leaf_adapter_class_,
         :maybe_use_exit_status,
         :outbound_line_yielder_for__payload__,  # [gi]
@@ -1058,10 +1059,6 @@ module Skylab::Brazen
         @parent.expression_strategy_for_uncategorized_property prp
       end
 
-      def _expression_agent_class
-        @parent._expression_agent_class
-      end
-
       def outbound_line_yielder_for__payload__
         @parent.outbound_line_yielder_for__payload__
       end
@@ -1090,7 +1087,6 @@ module Skylab::Brazen
         # UI
         :app_name,  # ibid
         :after_name_value_for_order,
-        :_expression_agent_class,
         :is_visible,
         :name_value_for_order,
         :_receive_invitation,  # [gi]
@@ -1177,7 +1173,7 @@ module Skylab::Brazen
         if qkn.is_known_known
           path = qkn.value_x
           if path
-            if Path_looks_relative_[ path ]
+            if Home_.lib_.system.path_looks_relative path
               _path_ = _filesystem.expand_path path, present_working_directory
               kn = Common_::Known_Known[ _path_ ]
             end
@@ -1584,7 +1580,15 @@ module Skylab::Brazen
       # -- invocation - expag
 
       def expression_agent  # [cme]
-        @_expag ||= _expression_agent_class.new self
+        @_expag ||= build_expression_agent_for_invocation
+      end
+
+      def build_expression_agent_for_invocation
+        build_expression_agent_for_this_invocation self
+      end
+
+      def build_expression_agent_for_this_invocation invo
+        @parent.build_expression_agent_for_this_invocation invo
       end
 
       # -- invocation - view controller ("when") support
@@ -1873,6 +1877,7 @@ module Skylab::Brazen
       alias_method :option_parser, :_option_parser  # publicize only one
 
       public(
+        :build_expression_agent_for_this_invocation,
         :category_for,  # [st]
         :const_get_magically_,  # performers
         :description_proc,  # expr
@@ -2198,10 +2203,13 @@ module Skylab::Brazen
 
     o = Home_::CLI_Support
 
-
     When_help__ = -> do
       Zerk_lib_[]::NonInteractiveCLI::Help
     end
+
+    # ==
+
+    # ==
 
     CLI_ = self
     DASH_BYTE_ = DASH_.getbyte 0

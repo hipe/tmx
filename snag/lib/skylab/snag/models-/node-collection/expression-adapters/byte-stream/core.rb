@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Expression_Adapters::Byte_Stream
 
-      # ~ for use with Expression_Agent_ below
+      # ~ for use with ByteStreamExpressionAgent below
 
       DEFAULT_WIDTH_ = 79
       DEFAULT_SUB_MARGIN_WIDTH_ = ' #open '.length
@@ -15,7 +15,7 @@ module Skylab::Snag
       class << self
 
         def build_default_expression_agent
-          Expression_Agent_.new(
+          ByteStreamExpressionAgent.new(
             DEFAULT_WIDTH_,
             DEFAULT_SUB_MARGIN_WIDTH_,
             DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
@@ -197,7 +197,7 @@ module Skylab::Snag
         end
       end
 
-      class Expression_Agent_
+      class ByteStreamExpressionAgent
 
         def initialize d, d_, d__
 

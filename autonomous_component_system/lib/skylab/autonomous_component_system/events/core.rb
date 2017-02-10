@@ -15,7 +15,7 @@ module Skylab::Autonomous_Component_System
 
     Express = -> y, expag, ev, & expression do
       o = ev.dup
-      o.extend Expresser
+      o.extend ExpressionMethods
       o.initialize_as_expresser expag
       o.calculate( & expression )
       o.flush_into y
@@ -23,7 +23,7 @@ module Skylab::Autonomous_Component_System
 
     SubPhrase_Methods__ = ::Module.new
 
-    module Expresser
+    module ExpressionMethods
 
       # although an event object itself is immutable, it is convenient for
       # the sake of complex expression strategies to use [#fi-007] "session pattern"

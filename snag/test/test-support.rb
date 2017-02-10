@@ -81,7 +81,7 @@ module Skylab::Snag::TestSupport
     def build_byte_stream_expag_ d, d_, d__
 
       Home_::Models_::Node_Collection::Expression_Adapters::
-        Byte_Stream::Expression_Agent_.new d, d_, d__
+        Byte_Stream::ByteStreamExpressionAgent.new d, d_, d__
     end
 
     def downstream_ID_for_output_string_ivar_

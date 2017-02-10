@@ -683,7 +683,7 @@ module Skylab::TestSupport
 
       # ==
 
-      class ExpressionAgent
+      class TinyExpressionAgent___  # #testpoint
 
         class << self
           def instance

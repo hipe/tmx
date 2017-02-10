@@ -20,7 +20,7 @@ module Skylab::Autonomous_Component_System
 
     module Events::Component_Not_Found::Express_into_under_of___
 
-      include Expresser  # (see comments here)
+      include ExpressionMethods  # (see comments here)
 
       def self.[] y, expag, o
         o.dup.extend( self ).__express_into_under y, expag

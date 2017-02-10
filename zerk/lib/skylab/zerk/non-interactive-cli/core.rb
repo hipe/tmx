@@ -53,7 +53,7 @@ module Skylab::Zerk
     end
 
     def expression_agent= x
-      @__expag = x
+      @__expag = x  # :#here-2
     end
 
     def root_ACS_by & p
@@ -743,7 +743,12 @@ module Skylab::Zerk
     end
 
     def expression_agent
-      @__expag ||= Remote_CLI_lib_[]::ExpressionAgent.new self
+      @__expag ||= __expression_agent  # #here-2
+    end
+
+    def __expression_agent
+      Home_::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.
+        via_expression_agent_injection self
     end
 
     def line_yielder

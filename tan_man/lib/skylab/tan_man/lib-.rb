@@ -28,6 +28,8 @@ module Skylab::TanMan
       System[].environment.any_home_directory_pathname
     end
 
+    Human = sidesys[ :Human ]
+
     List_scanner = -> x do
       Common_::Stream::Magnetics::MinimalStream_via[ x ]
     end
@@ -62,6 +64,8 @@ module Skylab::TanMan
     end
 
     TT = stdlib[ :Treetop ]
+
+    # = sidesys[ :Zerk ]  # for [sl]
 
     INSTANCE = Common_.produce_library_shell_via_library_and_app_modules(
       self, Home_ )

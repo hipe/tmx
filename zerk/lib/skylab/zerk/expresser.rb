@@ -1,10 +1,11 @@
-module Skylab::Brazen
+module Skylab::Zerk
 
-  module CLI_Support
+  class Expresser
 
-    class ExpressionAgent
-
-      class Handler_Expresser
+    class << self
+      alias_method :via_expression_agent, :new
+      undef_method :new
+    end  # >>
 
         def initialize expag
 
@@ -190,12 +191,39 @@ module Skylab::Brazen
         end
 
         # ==
+    # ==
 
-        MONADIC_FALSEHOOD_ = -> do
-          false
-        end
-      end
+    Autoloader_[ self ]
+    lazily :NLP_EN_ExpressionAgent do
+
+      # (a weird but parsimonious way to achieve this..
+
+      cls = ::Class.new
+
+      Home_.lib_.human::NLP::EN::SimpleInflectionSession.edit_module cls,
+        :public, [
+          :and_,
+          :both,
+          :indefinite_noun,
+          :noun_phrase,
+          :or_,
+          :plural_noun,
+          :preterite_verb,
+          :progressive_verb,
+          :s,
+          :sentence_phrase_via_mutable_iambic,
+        ]
+
+      cls
     end
+
+    # ==
+
+    MONADIC_FALSEHOOD_ = -> do
+      false
+    end
+
+    # ==
   end
 end
 # #history: was originally a stowaway in "expression agent"

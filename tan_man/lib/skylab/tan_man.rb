@@ -60,6 +60,12 @@ module Skylab::TanMan
 
   # ==
 
+  Zerk_lib_ = Lazy_.call do
+    Autoloader_.require_sidesystem :Zerk
+  end
+
+  # ==
+
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true

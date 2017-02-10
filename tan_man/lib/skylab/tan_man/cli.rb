@@ -64,7 +64,7 @@ module Skylab::TanMan
 
     # ~ could go away:
 
-    class ExpressionAgent
+    class CustomExpressionAgent
 
       def initialize action_reflection
         @kernel = action_reflection.application_kernel
@@ -82,7 +82,7 @@ module Skylab::TanMan
 
     private
 
-      # follows [#br-093]:#the-semantic-markup-guidelines
+      # follows [#ze-040]:#the-semantic-markup-guidelines
 
       green = 32 ; strong = 1
 
@@ -141,7 +141,7 @@ module Skylab::TanMan
           s = s.to_path
         end
         if DIR_SEP___ == s.getbyte( 0 )
-          Brazen_::CLI_Support::ExpressionAgent.pretty_path s
+          Zerk_lib_[]::CLI::InterfaceExpressionAgent::THE_LEGACY_CLASS.pretty_path s
         else
           s
         end
@@ -161,7 +161,7 @@ module Skylab::TanMan
       end
 
       def _NLP_agent
-        @NLP_agent ||= Home_::API.expression_agent_class.NLP_agent_class.new
+        @___NLP_agent ||= Zerk_lib_[]::Expresser::NLP_EN_ExpressionAgent.new
       end
     end
   end

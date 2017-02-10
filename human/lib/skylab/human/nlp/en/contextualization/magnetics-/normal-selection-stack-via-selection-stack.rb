@@ -11,7 +11,7 @@ module Skylab::Human
         ps = @ps_
 
         ea = ps.expression_agent
-        ea ||= Non_expressive_expresion_agent_instance___[]
+        ea ||= THE_EMPTY_EXPRESSION_AGENT___
 
         st = __build_selection_stack_value_scanner
 
@@ -79,7 +79,7 @@ module Skylab::Human
 
       # ==
 
-      Non_expressive_expresion_agent_instance___ = Lazy_.call do
+      module THE_EMPTY_EXPRESSION_AGENT___ ; class << self
 
         # if the client didn't pass an expression agent, the case may be
         # that of callbacks A) she expects that they are *not* called in
@@ -87,16 +87,13 @@ module Skylab::Human
         # equal she may expect that her callbacks are called in their
         # original context..
 
-        class Not_Expression_Agent____
+        def calculate x, & p
+          p[ x ]  # call it with its original context..
+        end
 
-          def calculate x, & p
-            p[ x ]  # call it with its original context..
-          end
+      end ; end
 
-          self
-        end.new
-      end
-
+      # ==
       # ==
     end
   end
