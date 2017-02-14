@@ -1,4 +1,5 @@
-[#034] #open places tagged `#{}cover-me`
+[#034] #open places tagged `#{}not-covered`
+             NOTE 1x in [ac]
 
 [#033] #track be *sure* you change this part too if you change the
              throughput syntax for `match_continuing`

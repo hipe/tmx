@@ -17,7 +17,7 @@ module Skylab::Zerk
       # to the operation result.
 
       # in adherence to [#ac-002]#DT2 modal dynamicism, we must not apply
-      # and modality-specific interpretations of these results either.
+      # any modality-specific interpretations of these results either.
       # (that is, we cannot specify our own special API for how results are
       # are to be interpreted and expressed in this modality in any way that
       # would detract from their own inherent, intuitive expressiveness.
@@ -71,7 +71,8 @@ module Skylab::Zerk
             redo
           end while nil
         else
-          self._COVER_ME_empty_list
+          # #not-covered #open [#sn-034]
+          @CLI.stderr.puts "(the list had no items ([ze]) #not-covered.)"
         end
         NIL_
       end

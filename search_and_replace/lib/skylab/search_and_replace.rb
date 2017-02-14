@@ -17,10 +17,10 @@ module Skylab::SearchAndReplace
   Lazy_ = Common_::Lazy
 
   rx = /(?:\r?\n|\r)\z/
-  Mutate_by_my_chomp_ = -> mutable_s do
+  Mutate_by_my_chomp_ = -> mutable_s do  # 1x
     md = rx.match mutable_s
     if md
-      self._COVER_ME
+      # #not-covered (i.e #open [#034])
       s = md[ 0 ]
       mutable_s[ ( - s.length )..-1 ] = EMPTY_S_
       s

@@ -5,7 +5,7 @@ module Skylab::SearchAndReplace
     class Interactive_View_Controllers_::Edit_File
 
       # encompasses all the behavior that UI does that API does not,
-      # namely, the *interative* parts of search & replace (and all
+      # namely, the *interactive* parts of search & replace (and all
       # the UI & UI state that goes along with that).
 
       def initialize st, _
@@ -42,7 +42,7 @@ module Skylab::SearchAndReplace
 
       def __all_remaining  # assume has next file
 
-        # #cover-me
+        # #not-covered
 
         o = Home_::Magnetics_::All_Remaining_via_Parameters.new( & @UI_event_handler )
         o.expression_agent = @_expression_agent
@@ -233,9 +233,9 @@ module Skylab::SearchAndReplace
 
         if @_file_UOW.has_file
           if @_file_UOW.has_current_match
-            ___express_body_normally
+            __express_body_normally
           else
-            self._COVER_ME_no_current_match
+            __express_body_when_no_current_match
           end
         else
           self._COVER_ME_no_current_file
@@ -243,7 +243,7 @@ module Skylab::SearchAndReplace
         NIL_
       end
 
-      def ___express_body_normally  # assume current match
+      def __express_body_normally  # assume current match
 
         uow = @_file_UOW
 
@@ -279,6 +279,22 @@ module Skylab::SearchAndReplace
       NUM_LINES_AFTER__ = 2
       RE___ = ' (replacement engaged)'
       RNE___ = ' (before)'
+
+      def __express_body_when_no_current_match  # #not-covered (i.e #open [#034])
+
+        uow = @_file_UOW
+
+        _fileno = @_file_UOW_prototype.instance_count
+        _path = uow.path
+        _y = @_line_yielder
+
+        _boundary
+
+        _y << "file #{ _fileno } (no matches): #{ _path }"
+
+        _boundary
+        NIL
+      end
 
       def __express_buttonesques
         @_main_view_controller.express_buttonesques @_available_butz_a

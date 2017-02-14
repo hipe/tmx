@@ -61,7 +61,7 @@ module Skylab::Autonomous_Component_System
         if @_asc.model_classifications.looks_primitivesque
           __when_primitivesque
         elsif @_is_known
-          self._COVER_ME_probably_fine
+          # #open [#se-034] #cover-me
           @_qk
         else
           ___when_unknown_nonprimitivesque

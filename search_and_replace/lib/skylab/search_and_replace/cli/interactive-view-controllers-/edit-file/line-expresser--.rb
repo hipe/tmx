@@ -56,7 +56,11 @@ module Skylab::SearchAndReplace
           @_is_in_a_match = false ; nil
         end
 
-        def static_continuing  # #not-covered
+        def match_continuing  # #not-covered  (i.e #open [#034])
+          @_is_in_a_match = true ; nil
+        end
+
+        def static_continuing  # #not-covered  (i.e #open [#034])
           @_is_in_a_match = false ; nil
         end
 

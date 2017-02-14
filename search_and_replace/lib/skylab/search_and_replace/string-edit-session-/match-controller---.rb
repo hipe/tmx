@@ -67,7 +67,11 @@ module Skylab::SearchAndReplace
             engage_replacement_via_string presumably_string
             ACHIEVED_
           else
-            self._COVER_ME
+            # #not-covered (i.e #open [#034])
+            oes_p.call :error, :expression, :invalid_replacement_value do |y|
+              y << "got strange result from replace function: #{ presumably_string.inspect }"
+            end
+            UNABLE_
           end
         end
 

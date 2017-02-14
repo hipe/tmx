@@ -300,7 +300,12 @@ module Skylab::SearchAndReplace
     # ~~
 
     def match_count
-      @_max_match_controller_index + 1
+      d = @_max_match_controller_index
+      if d
+        @_max_match_controller_index + 1
+      else
+        0  # ??
+      end
     end
 
     attr_reader(

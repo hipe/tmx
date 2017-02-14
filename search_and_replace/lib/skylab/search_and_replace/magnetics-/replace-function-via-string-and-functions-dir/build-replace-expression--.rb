@@ -66,23 +66,29 @@ module Skylab::SearchAndReplace
 
         def __via_fulfiller
 
-          Replace_Expression___.new(
-            @method_call_chain,
-            @capture_identifier,
-            @fulfiller,
-          )
+          ReplacementExpression___.define do |o|
+            o.capture_identifier = @capture_identifier
+            o.fulfiller = @fulfiller
+            o.listener = @_oes_p
+            o.method_call_chain = @method_call_chain
+          end
         end
 
         define_method :__store_trueish, METHOD_DEFINITION_FOR_STORE_TRUEISH_
 
-        class Replace_Expression___
+        class ReplacementExpression___ < Common_::SimpleModel
 
           # proof of concept class. currently not robust, secure, scalable
 
-          def initialize * a
-            @method_call_chain, capture_identifier, @fulfiller = a
-            @d = capture_identifier.to_i
+          def capture_identifier= ci
+            @d = ci.to_i ; ci
           end
+
+          attr_writer(
+            :fulfiller,
+            :listener,
+            :method_call_chain,
+          )
 
           def marshal_dump
             "{{ $#{ @d }#{ @method_call_chain.map do |s|
@@ -93,8 +99,27 @@ module Skylab::SearchAndReplace
           alias_method :as_text, :marshal_dump
 
           def call md
-            @method_call_chain.reduce md[ @d ] do | x, method_i |
-              @fulfiller.__send__ method_i, x
+            s = md[ @d ]
+            if s
+              __call_normally s
+            else
+              __when_etc
+              s
+            end
+          end
+
+          def __when_etc
+            d = @d
+            @listener.call :error, :expression, :captured_subexpression_not_found do |y|
+              y << "we are into uncharted territory here:"
+              y << "what is the replacement value with there is nothing at"
+              y << "that capture offset (capture offset: #{ d })?"
+            end
+          end
+
+          def __call_normally s
+            @method_call_chain.reduce s do |x, m|
+              @fulfiller.__send__ m, x
             end
           end
         end

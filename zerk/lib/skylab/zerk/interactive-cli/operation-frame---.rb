@@ -152,6 +152,10 @@ module Skylab::Zerk
         def expression_agent
           @MVC.expression_agent_for_niCLI_library_
         end
+
+        def stderr
+          @MVC.serr
+        end
       end
 
       # ==
