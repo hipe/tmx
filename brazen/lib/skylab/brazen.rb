@@ -103,70 +103,6 @@ module Skylab::Brazen
 
   # --
 
-  PPSF_METHOD_ = -> st, & x_p do  # "process polymorphic stream fully"
-
-    kp = process_argument_scanner_passively st, & x_p
-
-    if kp
-
-      if st.unparsed_exists
-
-        ev = Home_.lib_.fields::Events::Extra.via_strange st.head_as_is
-
-        if respond_to? :receive_extra_values_event
-          receive_extra_values_event ev
-        else
-          raise ev.to_exception
-        end
-      else
-        kp
-      end
-    else
-      kp
-    end
-  end
-
-  PPSP_METHOD_ = -> st, & x_p do  # "process polymorphic stream passively"  make it private
-
-    bx = formal_properties
-    kp = KEEP_PARSING_
-
-    if st.unparsed_exists
-
-      bx ||= MONADIC_EMPTINESS_
-
-      instance_variable_set :@_polymorphic_upstream_, st
-
-      begin
-
-        k = st.head_as_is
-
-        prp = bx[ k ]
-        prp or break
-
-        st.advance_one
-
-        m = prp.custom_polymorphic_writer_method_name
-
-        kp = if m
-          send m
-        else
-          receive_polymorphic_property prp, & x_p
-        end
-
-        kp or break
-
-        if st.unparsed_exists
-          redo
-        end
-        break
-      end while nil
-
-      remove_instance_variable :@_polymorphic_upstream_
-    end
-    kp
-  end
-
   Autoloader_ = Common_::Autoloader
 
   module Collection_Adapters
@@ -183,7 +119,7 @@ module Skylab::Brazen
   module Modelesque
 
     def self.entity * a, & edit_p
-      Home_::Entity::Apply_entity[ self::Entity, a, & edit_p ]
+      Entity_lib_[]::Apply_entity[ self::Entity, a, & edit_p ]
     end
 
     Autoloader_[ self ]
@@ -200,6 +136,11 @@ module Skylab::Brazen
   end
 
   # ==
+
+  Entity_lib_ = -> do
+    Require_fields_lib_[]
+    Field_::Entity
+  end
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
@@ -251,10 +192,6 @@ module Skylab::Brazen
       Basic[]::Module
     end
 
-    Mutable_iambic_scanner = -> do
-      Home_::Entity.mutable_argument_scanner
-    end
-
     Net_HTTP = _memoize do
       require 'net/http'
       ::Net::HTTP
@@ -294,7 +231,7 @@ module Skylab::Brazen
       System[].IO.some_two_IOs
     end
 
-    Zerk = sidesys[ :Zerk ]  # for testing only
+    Zerk = sidesys[ :Zerk ]
   end
 
   # ==
@@ -322,7 +259,6 @@ module Skylab::Brazen
   NIL_ = nil
   NOTHING_ = nil
   SPACE_ = ' '.freeze
-  STOP_PARSING_ = false
   stowaway :TestSupport, 'test/test-support'
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze

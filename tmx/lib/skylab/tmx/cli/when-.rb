@@ -64,7 +64,7 @@ module Skylab::TMX
         if @_is_root
           if _argument_scanner_is_empty
             _money
-          elsif _parse_primary_softly
+          elsif _scan_primary_symbol_softly
             if __parse_primaries
               _money
             end
@@ -216,7 +216,7 @@ module Skylab::TMX
             _show_help_screen
             break
           end
-          if ! _parse_primary_softly
+          if ! _scan_primary_symbol_softly
             self._COVER_ME__say_something_about_going_to_ignore_this_term__
             _show_help_screen
             break
@@ -231,8 +231,8 @@ module Skylab::TMX
         @args.no_unparsed_exists
       end
 
-      def _parse_primary_softly
-        @args.parse_primary_softly
+      def _scan_primary_symbol_softly
+        @args.scan_primary_symbol_softly
       end
 
       def __lookup_primary

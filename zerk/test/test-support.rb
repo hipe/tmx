@@ -23,6 +23,215 @@ module Skylab::Zerk::TestSupport
     end
   end  # >>
 
+#==BEGIN
+  module Expect_CLI_or_API
+
+    # experiment: allow CLI and API tests of a common-enough complexity to
+    # co-exist side-by-side in the same node.
+
+    def self.[] tcc
+      tcc.include self
+    end
+
+    # -- modeling the invocation-under-test of your CLI or API
+
+    def invoke * argv
+      @API_OR_CLI = :CLI
+      @CLI = TS_::Non_Interactive_CLI::Fail_Early::Client_for_Expectations_of_Invocation.new
+      @CLI.invoke_via_argv argv
+      NIL
+    end
+
+    def call * x_a
+      @API_OR_CLI = :API
+      @API = Common_.test_support::Expect_Emission_Fail_Early::Spy.new
+      @API.receive_call x_a
+    end
+
+    # -- line-oriented expectations of emission..
+
+    # ~ of CLI
+
+    def expect_on_stderr s
+      @CLI.expect_on_stderr s
+    end
+
+    def expect_on_stdout s
+      @CLI.expect_on_stdout s
+    end
+
+    def on_stream sym
+      @CLI.on_stream sym
+    end
+
+    def expect_styled_line * chunks
+      @CLI.expect_styled_line_via chunks
+    end
+
+    def expect_each_by & p
+      @CLI.expect_each_by( & p )
+    end
+
+    # ~ shared syntax
+
+    def expect *a, &p
+      send EXPECT___.fetch( @API_OR_CLI ), a, & p
+    end
+
+    EXPECT___ = { API: :_expect_for_API_ZE, CLI: :__expect_for_CLI_ZE }
+
+    def __expect_for_CLI_ZE a
+      @CLI.expect( * a )
+    end
+
+    # ~ of API
+
+    def expect_these_lines_on_stderr
+      # experiment - not ideal because it confuses who's driving
+      on_stream :serr
+      _y = ::Enumerator::Yielder.new do |line|
+        expect line
+      end
+      yield _y
+      NIL
+    end
+
+    def expect_these_lines_via_expect_fail * chan, & p
+      _msgs = _messages_via_expect_fail_ZE chan
+      expect_these_lines_in_array _msgs, & p
+    end
+
+    def messages_via_expect_fail * chan
+      _messages_via_expect_fail_ZE chan
+    end
+
+    def _messages_via_expect_fail_ZE chan
+      msgs = nil
+      _expect_for_API_ZE chan do |y|
+        msgs = y
+      end
+      expect_fail
+      msgs
+    end
+
+    def _expect_for_API_ZE a, & p
+      @API.expect_emission p, a
+    end
+
+    # -- finishers
+
+    def expect_fail
+      send EXPECT_FAIL___.fetch @API_OR_CLI
+    end
+
+    EXPECT_FAIL___ = {
+      API: :_expect_nil_result_for_API_ZE,
+      CLI: :__expect_fail_for_CLI_ZE,
+    }
+
+    def __expect_fail_for_CLI_ZE
+      @CLI.expect_fail_under self
+    end
+
+    def _expect_nil_result_for_API_ZE
+
+      # [#ze-026.1] NIL (not FALSE) happens when failure :#here
+
+      @API.expect_result_under NIL, self
+    end
+
+    def expect_succeed
+      send EXPECT_SUCCEED___.fetch @API_OR_CLI
+    end
+
+    EXPECT_SUCCEED___ = {
+      API: :__expect_succeed_for_API_ZE,
+      CLI: :__expect_succeed_for_CLI_ZE,
+    }
+
+    def __expect_succeed_for_CLI_ZE
+      @CLI.expect_succeed_under self
+    end
+
+    def __expect_succeed_for_API_ZE
+
+      # [#ze-026.1] NIL (not TRUE) happens when success :#here
+
+      @API.expect_result_under NIL, self
+    end
+
+    def expect_result x
+      @API.expect_result_under x, self
+    end
+
+    def finish_by & p
+      @API.receive_finish_by p, self
+    end
+
+    # ~
+
+    def DEBUG_ALL_BY_FLUSH_AND_EXIT
+      send DEBUG_etc___.fetch @API_OR_CLI
+    end
+
+    DEBUG_etc___ = { API: :__DEBUG_for_API_ZE, CLI: :__DEBUG_for_CLI_ZE }
+
+    def __DEBUG_for_CLI_ZE
+      @CLI.DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER self
+    end
+
+    def __DEBUG_for_API_ZE
+      @API.DEBUG_ALL_BY_FLUSH_AND_EXIT_UNDER self
+    end
+
+    def expression_agent
+      send EXPAG___.fetch @API_OR_CLI
+    end
+
+    EXPAG___ = { API: :expression_agent_for_API, CLI: :expression_agent_for_CLI }
+
+    def expression_agent_for_CLI
+      ::Kernel._K
+    end
+
+    def expression_agent_for_API
+      ::NoDependenciesZerk::API_InterfaceExpressionAgent.instance  # ..
+    end
+
+    # -- practically (if not actually) functions & derivatives
+
+    def expect_these_lines_in_messages & p
+      expect_these_lines_in_array messages, & p
+    end
+
+    def expect_these_lines_in_array actual_messages
+
+      act_line_scn = Common_::Scanner.via_array actual_messages
+
+      _y = ::Enumerator::Yielder.new do |exp_line|
+
+        if act_line_scn.no_unparsed_exists
+          fail "had no more lines when expecting: #{ exp_line.inspect }"
+        else
+          act_line = act_line_scn.gets_one
+          if exp_line.respond_to? :ascii_only?
+            act_line == exp_line or act_line.should eql exp_line
+          else
+            act_line =~ exp_line or act_line.should match exp_line
+          end
+        end
+      end
+
+      yield _y
+
+      if ! act_line_scn.no_unparsed_exists
+        fail "had unexpected extra line: #{ act_line_scn.head_as_is.inspect }"
+      end
+    end
+  end
+
+#==END
+
   TestSupport_ = ::Skylab::TestSupport
   TestSupport_::Quickie.
     enhance_test_support_module_with_the_method_called_describe self
@@ -190,5 +399,4 @@ module Skylab::Zerk::TestSupport
   TS_ = self
   UNABLE_ = false
   UNDERSCORE_ = '_'
-
 end

@@ -91,12 +91,14 @@ module Skylab::Brazen
         @_p = -> x_a, & edit_p do
           @_p = nil
 
-          sess = Home_::Entity::Session.new
+          Entity_lib_[].call_by do |sess|
+            # -
           sess.arglist = x_a
           sess.block = edit_p
           sess.client = empty_module
           sess.extmod = extmod
-          sess.execute
+            # -
+          end
         end
       end
 

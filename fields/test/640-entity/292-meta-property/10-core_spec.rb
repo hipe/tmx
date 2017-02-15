@@ -1,60 +1,63 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - concerns - meta-property - core" do
 
-  describe "[br] entity - concerns - meta-property - core" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     it "(sneak ahead to an essential case)" do
 
-        class MP_Sneak
-          Subject_[].call self do
+        class X_e_mp_c_Sneak
+          Entity.lib.call self do
             o :argument_arity, :zero, :meta_property, :requored,
               :requored, :property, :wazoozle,
               :property, :foozle
           end
         end
 
-        _a = MP_Sneak.properties.reduce_by do |prop|
-          prop.requored
+        _a = X_e_mp_c_Sneak.properties.reduce_by do |prp|
+          prp.requored
         end.to_a
 
         _a.length.should eql 1
-        prop = _a.first
-        prop.name_symbol.should eql :wazoozle
+        prp = _a.first
+        prp.name_symbol.should eql :wazoozle
     end
 
     context "create arbitrary meta-properties and use them in the properties" do
 
-      before :all do
+      shared_subject :_subject_module do
 
-        class MP_Foo
-          Subject_[].call self do
+        class X_e_mp_c_Foo
+
+          Entity.lib.call self do
             o :meta_property, :fun_ness
             o :fun_ness, :really_fun, :property, :foo
           end
 
-          Add_common_methods_[ self ]
+          Entity::Define_common_initialize_and_with[ self ]
         end
       end
 
       it "still works as a property ofc" do
-        expect_works_as_property MP_Foo
+        expect_works_as_property _subject_module
       end
 
       it "reflect with your meta-properties" do
-        expect_reflects MP_Foo
+        expect_reflects _subject_module
       end
     end
 
     context "if your iambic writer is defined classically, works the same" do
 
-      before :all do
+      shared_subject :_subject_module do
 
-        class MP_Bar
+        class X_e_mp_c_Bar
 
-          Subject_[].call self do
+          Entity.lib.call self do
 
             o :meta_property, :fun_ness
             o :fun_ness, :really_fun
@@ -64,16 +67,16 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
           end
 
-          Add_common_methods_[ self ]
+          Entity::Define_common_initialize_and_with[ self ]
         end
       end
 
-      it "works as prop" do
-        expect_works_as_property MP_Bar
+      it "works as property" do
+        expect_works_as_property _subject_module
       end
 
       it "reflects" do
-        expect_reflects MP_Bar
+        expect_reflects _subject_module
       end
     end
 

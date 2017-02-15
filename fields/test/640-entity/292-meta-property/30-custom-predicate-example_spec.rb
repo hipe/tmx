@@ -1,16 +1,18 @@
 require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity meta-properties examples: customizing the.." do
 
-  describe "[br] entity meta-properties examples: customizing the.." do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     context "..property class w/ a boolean predicate & custom niladic writer" do
 
-      before :all do
+      shared_subject :_subject_module do
 
-        MPEC_Entity = Subject_[].call do
+        X_e_mp_cpe_Entity = Entity.lib.call do
 
           o :enum, [ :"0-1", :"1" ],
 
@@ -31,9 +33,9 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
           end
         end
 
-        class MPEC_Business_Widget
+        class X_e_mp_cpe_Business_Widget
 
-          MPEC_Entity.call self do
+          X_e_mp_cpe_Entity.call self do
 
             o :necessary
 
@@ -44,12 +46,14 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
 
           end
+
+          self
         end
       end
 
       it "..can make property-based code arbitrarily more readable" do
 
-        hi, hey = MPEC_Business_Widget.properties.each_value.to_a
+        hi, hey = _subject_module.properties.each_value.to_a
         hi.is_necessary.should eql true
         hey.is_necessary.should eql false
       end

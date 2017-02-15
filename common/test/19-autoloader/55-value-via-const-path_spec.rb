@@ -16,16 +16,10 @@ module Skylab::Common::TestSupport
 
       it "normative use-case" do
 
-        _ = _subject %i( bar_biff baz ), X_a_c_Foo1
-        _ == :some_x or fail
-      end
-
-      it "& it has an explicit form of syntax (tight form, remote ctx)" do
-
-        _ = _subject(
-          :from_module, X_a_c_Foo1,
-          :const_path, %i( bar_biff baz ),
-        )
+        _ = _call_by do |o|
+          o.from_module = X_a_c_Foo1
+          o.const_path = %i( bar_biff baz )
+        end
         _ == :some_x or fail
       end
 
@@ -34,17 +28,15 @@ module Skylab::Common::TestSupport
         _rx = %r(\Aname_error: uninitialized constant #{
           }[A-Za-z:]+::X_a_c_Foo1::Bar_Biff::\( ~ cowabungaa \))
 
-        _ = _subject(
-
-          :from_module, X_a_c_Foo1,
-          :const_path, %i( bar_biff cowabungaa bowzer ),
-
-        ) do | name_error_event |
+        _ = _call_by do |o|
+          o.from_module = X_a_c_Foo1
+          o.const_path = %i( bar_biff cowabungaa bowzer )
+          o.receive_name_error_by = -> name_error_event do
 
           name_error = name_error_event.to_exception
 
           "name_error: #{ name_error.message } (#{ name_error.name })"
-        end
+        end ; end
 
         _ =~ _rx or fail
       end
@@ -130,12 +122,11 @@ module Skylab::Common::TestSupport
 
       it ".. which allows you correct a name" do
 
-        pair = _subject(
-
-          :const_path, %i( NCSASpy ),
-          :from_module, X_a_c_Foo3,
-          :result_in_name_and_value,
-        )
+        pair = _call_by do |o|
+          o.from_module = X_a_c_Foo3
+          o.const_path = %i( NCSASpy )
+          o.result_in_name_and_value
+        end
 
         pair.name_x == :NCSA_Spy or fail
         pair.value_x == :x or fail
@@ -162,11 +153,12 @@ module Skylab::Common::TestSupport
 
       it "with a node that is not itself designed to autoload" do
 
-        pair = _subject_plus_real_file_tree_cache(
-          :result_in_name_and_value,
-          :from_module, fixture_tree_::One_Skorlab,
-          :const_path, :Infermation_Terktix,
-        )
+        pair = _call_by_plus_real_life_file_tree_cache do |o|
+
+          o.from_module = fixture_tree_::One_Skorlab
+          o.const_path = :Infermation_Terktix
+          o.result_in_name_and_value
+        end
 
         pair.name_x == :InfermationTerktix or fail
         pair.value_x.name =~ %r(FixtureTree::One_Skorlab::InfermationTerktix\z) or fail
@@ -174,10 +166,10 @@ module Skylab::Common::TestSupport
 
       it "the same as above but value only (name correction)" do
 
-        _mod = _subject_plus_real_file_tree_cache(
-          :from_module, fixture_tree_::Two_Skorlab,
-          :const_path, :Infermation_Terktix,
-        )
+        _mod = _call_by_plus_real_life_file_tree_cache do |o|
+          o.from_module = fixture_tree_::Two_Skorlab
+          o.const_path = :Infermation_Terktix
+        end
 
         _mod.name =~ %r(FixtureTree::Two_Skorlab::InfermationTerktix\z) or fail
       end
@@ -209,8 +201,8 @@ module Skylab::Common::TestSupport
           :FIV_SAME_TWEEDLE_DEE
         end
 
-        def _yes_no
-          NOTHING_
+        def _yes_autoloaderize
+          false
         end
 
         it "sic" do
@@ -224,8 +216,8 @@ module Skylab::Common::TestSupport
           :FIV_SAME_TWEEDLE_DUM
         end
 
-        def _yes_no
-          :autoloaderize
+        def _yes_autoloaderize
+          TRUE
         end
 
         it "sic" do
@@ -238,30 +230,47 @@ module Skylab::Common::TestSupport
         _from_here = fixture_tree_
         _use_const_path = _const_path
 
-        _mod = _subject_plus_real_file_tree_cache(
-          :from_module, _from_here,
-          :const_path, _use_const_path,
-          * _yes_no,
-        )
+
+        _mod = _call_by_plus_real_life_file_tree_cache do |o|
+          o.from_module = _from_here
+          o.const_path = _use_const_path
+          if _yes_autoloaderize
+            o.autoloaderize
+          end
+        end
 
         _mod  # #todo
       end
     end
 
-    def _subject_plus_real_file_tree_cache * x_a, & x_p
-
-      Home_::Autoloader::ConstReduction__.new(
-        x_a,
-        Autoloader_::File_tree_cache___,  # ..
-        & x_p ).execute
+    def _subject_plus_real_file_tree_cache cp, fm, & p
+      _call_by_plus_real_life_file_tree_cache do |o|
+        o.from_module = fm
+        o.const_path = cp
+        o.receive_name_error_by = p
+      end
     end
 
-    def _subject * x_a, & x_p
+    def _subject cp, fm, & p
+      _call_by do |o|
+        o.from_module = fm
+        o.const_path = cp
+        o.receive_name_error_by = p
+      end
+    end
 
-      # (all the testing in this file forgoes the surface entrypoint
-      # for the performer, but meh that's not the focus)
+    def _call_by_plus_real_life_file_tree_cache
+      _call_by do |o|
+        yield o
+        o.file_tree_cache_by = Autoloader_::File_tree_cache__
+      end
+    end
 
-      Home_::Autoloader::ConstReduction__.new( x_a, & x_p ).execute
+    def _call_by
+      Home_::Autoloader::Value_via_ConstPath.call_by do |o|
+        o.file_tree_cache_by = :_no_see_CO_
+        yield o
+      end
     end
 
     def _name_error_class
@@ -273,6 +282,7 @@ module Skylab::Common::TestSupport
     end
   end
 end
+# #tombstone-D: bye bye iambic interface
 # :+#tombsone: integration with autoloader methods
 # :+#tombstone: curry
 # :+#tombstone: original issue

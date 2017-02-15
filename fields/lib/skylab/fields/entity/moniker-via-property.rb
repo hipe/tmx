@@ -1,14 +1,22 @@
-module Skylab::Brazen
+module Skylab::Fields
 
   module Entity
 
-    module Concerns_::Property
+    class Moniker_via_Property
 
-      class Prop_desc_wonderhack < Common_::Dyadic
+      class << self
+        def call expag=THIS_EXPRESSION_AGENT___, prp
+          new( expag, prp ).execute
+        end
+        alias_method :[], :call
+        private :new
+      end  # >>
 
-        def initialize a, b
-          @expag = a
-          @property = b
+      # -
+
+        def initialize expag, prp
+          @expression_agent = expag
+          @property = prp
         end
 
         def execute
@@ -34,7 +42,7 @@ module Skylab::Brazen
           end
 
           if use
-            @expag.calculate do
+            @expression_agent.calculate do
               _ast_a = use.map do | sym |
                 _x = prp.instance_variable_get :"@#{ sym }"
                 "#{ sym } = #{ ick _x }"
@@ -56,8 +64,28 @@ module Skylab::Brazen
           a
         end
 
-        RX__ = /\A.+(?==\z)/
-      end
+      # -
+
+      # ==
+
+      module THIS_EXPRESSION_AGENT___ ; class << self  # #testpoint
+
+        alias_method :calculate, :instance_exec
+
+        def code x
+          ick x
+        end
+
+        def ick x
+          Home_.lib_.basic::String.via_mixed x
+        end
+      end ; end
+
+      # ==
+
+      RX__ = /\A.+(?==\z)/
+
+      # ==
     end
   end
 end

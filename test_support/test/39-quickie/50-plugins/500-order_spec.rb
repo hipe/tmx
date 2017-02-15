@@ -67,7 +67,7 @@ module Skylab::TestSupport::TestSupport
             st.to_a
           end
 
-          expect_these_lines_in_array_ _these do |y|
+          expect_these_lines_in_array _these do |y|
             y << "fake-path/010-herkemer/020-xx.xx"
             y << "fake-path/030-jumanji/010-yy.xx"
             y << "fake-path/030-jumanji/040-chim-chum.xx"

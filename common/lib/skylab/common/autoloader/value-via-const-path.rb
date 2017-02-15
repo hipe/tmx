@@ -2,57 +2,40 @@ module Skylab::Common
 
   module Autoloader
 
-    class ConstReduction__  # see [#029]
+    class Value_via_ConstPath < MagneticBySimpleModel  # see [#029]
 
-      def initialize a, ftc=nil, & p
+      def initialize
 
-        @autoloaderize = false  # in keeping with the non-
+        @__do_autoloaderize = false  # in keeping with the non-
           # invasive spirit of this facility, default is false.
 
-        @file_tree_cacher = ftc
-        @listener = p
-        @result_in_name_and_value = nil
+        @__do_result_in_name_and_value = false
 
-        if 2 == a.length
-          @const_path, @from_module = a
-        else
-          @const_path = nil
-          @from_module = nil
-          __store_named_arguments a
-        end
-        __normalize
+        yield self
+
+        __post_process_arguments
       end
 
-      def __store_named_arguments a
-        @_st = Scanner.via_array a
-        until @_st.no_unparsed_exists
-          send OPTIONS___.fetch @_st.head_as_is
-        end
-        remove_instance_variable :@_st
-        NIL
+      def autoloaderize  # #covered-by [dt]
+        @__do_autoloaderize = true
       end
 
-      OPTIONS___ = {
-        autoloaderize: :_boolean,  # #covered-by [dt]
-        const_path: :_mixed_value,
-        from_module: :_mixed_value,
-        result_in_name_and_value: :_boolean,
-      }
-
-      # -- (or [#fi-013])
-
-      def _boolean
-        instance_variable_set :"@#{ @_st.gets_one }", true ; nil
+      def result_in_name_and_value
+        @__do_result_in_name_and_value = true
       end
 
-      def _mixed_value
-        instance_variable_set :"@#{ @_st.gets_one }", @_st.gets_one ; nil
-      end
+      attr_writer(
+        :const_path,
+        :file_tree_cache_by,
+        :from_module,
+        :receive_name_error_by,
+      )
 
       # --
 
-      def __normalize
-        @_frame_prototype = Framer___.new @file_tree_cacher, @autoloaderize
+      def __post_process_arguments
+        _yes = remove_instance_variable :@__do_autoloaderize
+        @_frame_prototype = Framer___.new @file_tree_cache_by, _yes
         x = remove_instance_variable :@const_path
         @__sanitized_const_path_mixed_array = ::Array.try_convert( x ) || [ x ]
         NIL
@@ -157,7 +140,7 @@ module Skylab::Common
 
         di = remove_instance_variable :@__discovered
 
-        if @result_in_name_and_value
+        if @__do_result_in_name_and_value
           di.name_value_pair
         else
           di.the_value
@@ -165,15 +148,17 @@ module Skylab::Common
       end
 
       def __init
-        @_error_eventer = nil
+
+        @_token_scanner = Scanner.via_array(
+          remove_instance_variable :@__sanitized_const_path_mixed_array )
+
         @_frame = @_frame_prototype.for_value @from_module
-        @_token_scanner = Scanner.via_array @__sanitized_const_path_mixed_array
-        NIL
+        @_error_eventer = nil
       end
 
       def __express_the_error
-        if @listener
-          case 0 <=> @listener.arity
+        if @receive_name_error_by
+          case 0 <=> @receive_name_error_by.arity
           when 0
             __when_error_and_listener_for_which_no_arguments_are_received
           when -1
@@ -188,7 +173,7 @@ module Skylab::Common
 
       def __emit_the_emittable_error_when_looks_like_selective_listener
         ee = @_error_eventer
-        @listener.call :error, ee.error_name_symbol do
+        @receive_name_error_by.call :error, ee.error_name_symbol do
           ee.to_event
         end
         UNABLE_
@@ -196,7 +181,7 @@ module Skylab::Common
 
       def __emit_the_emittable_error_when_one_argument_is_received
         _em = @_error_eventer.to_event
-        _x = @listener.call _em  # result is result
+        _x = @receive_name_error_by.call _em  # result is result
         _x
       end
 
@@ -207,7 +192,7 @@ module Skylab::Common
       end
 
       def __when_error_and_listener_for_which_no_arguments_are_received
-        _x = @listener.call  # result is result
+        _x = @receive_name_error_by.call  # result is result
         _x
       end
 
@@ -215,7 +200,7 @@ module Skylab::Common
 
         def initialize ftc, yes
           @do_autoloaderize = yes
-          @file_tree_cacher = ftc
+          @file_tree_cache_by = ftc
         end
 
         def for_value x
@@ -228,7 +213,7 @@ module Skylab::Common
 
         attr_reader(
           :do_autoloaderize,
-          :file_tree_cacher,
+          :file_tree_cache_by,
         )
       end
 
@@ -298,7 +283,7 @@ module Skylab::Common
 
           if @module.respond_to? NODE_PATH_METHOD_
 
-            ftc = @_frame_prototype.file_tree_cacher
+            ftc = @_frame_prototype.file_tree_cache_by
             if ftc
               @__file_tree_cache = ftc.call
               __do_attempt_to_lookup_awkwardly
@@ -607,5 +592,6 @@ module Skylab::Common
     end  # :#cr
   end
 end
+# #tombstone-C: no more iambic arguments
 # #tombstone: full rewrite
 # #tombstone: assume_is_defined

@@ -8,7 +8,7 @@ module Skylab::Common::TestSupport
 
     shared_subject :_top_subject do
       _path = TestSupport_.dir_path  # this is the only one that is already loaded for sure
-      _ftc = Autoloader_::File_tree_cache___[]
+      _ftc = Autoloader_::File_tree_cache__[]
       _ftc[ _path ]
     end
 

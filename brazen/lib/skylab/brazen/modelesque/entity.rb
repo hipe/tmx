@@ -2,9 +2,9 @@ module Skylab::Brazen
 
   Modelesque::Entity = ::Module.new
 
-  # ->
+  Entity_lib_[].call( Modelesque::Entity,  # see [#047]
 
-    Home_::Entity.call( Modelesque::Entity,  # see [#047]
+    # ->
 
       # ~ ad-hoc processors
 
@@ -62,10 +62,10 @@ module Skylab::Brazen
       :meta_property, :option_argument_moniker  # [sg]
         # (used in some modalities to label the argument term itself)
 
-    )
+  )
 
-    module Modelesque::Entity
-
+  module Modelesque::Entity
+    # -
       def receive_polymorphic_property prp  # (method MUST be public)  :.A
 
         # (overwrite this #hook-out so we write not to ivars but to our box)
@@ -124,7 +124,7 @@ module Skylab::Brazen
       if const_defined? :Property
         # ok. it means we defined meta-properties above
       else
-        const_set :Property, ::Class.new( Home_::Entity::Property )
+        const_set :Property, ::Class.new( Entity_lib_[]::Property )
       end
 
       # ---- ( Property must be set as an *owned* constant by this point ) ---
@@ -229,7 +229,7 @@ module Skylab::Brazen
               accept_description_proc p
               KEEP_PARSING_
             else
-              STOP_PARSING_
+              FALSE  # STOP_PARSING_
             end
           end
 
@@ -403,7 +403,6 @@ module Skylab::Brazen
       "sanity - won't clobber existing #{ ivar } #{
         }(#{ p[ x ] }) with new value (#{ p[ x_ ] })"
     end
-    # ->
-    end
-    # <-
+  end
 end
+# #history-A: (here by association) "entity" moved to [fi]

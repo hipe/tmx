@@ -1,8 +1,8 @@
-module Skylab::Brazen
+module Skylab::Fields
 
   module Entity
 
-    module Concerns_::Ad_Hoc
+    module AdHocProcessor_
 
       class Processors
 
@@ -43,7 +43,7 @@ module Skylab::Brazen
         end
       end
 
-      class Processor_Processor
+      class ProcessorProcessor
 
         def initialize sess
 
@@ -83,7 +83,7 @@ module Skylab::Brazen
         end
       end
 
-      class Mutable_Nonterminal_Queue
+      class MutableNonterminalQueue
 
         def initialize
           @box = Common_::Box.new

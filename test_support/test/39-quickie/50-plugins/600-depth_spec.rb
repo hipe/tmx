@@ -37,7 +37,7 @@ module Skylab::TestSupport::TestSupport
       context "API - yay" do
 
         it "it reduces the list" do
-          expect_these_lines_in_array_ _tuple[0] do |y|
+          expect_these_lines_in_array _tuple[0] do |y|
             y << 'dip/dop/doop/deep/dope'
             y << 'fanduckle/fondookel/fif-diffle/foip'
           end

@@ -156,13 +156,12 @@ module Skylab::Common::TestSupport
 
         _b = _a::Tre_Skorlab  # #spot-2
 
-        _pair = Autoloader_::ConstReduction__.new([
-          :from_module, _b,
-          :const_path, :Infermation_Terktix,  # this is conventioned incorrectly
-          :result_in_name_and_value,
-        ],
-          Autoloader_::File_tree_cache___,
-        ).execute
+        _pair = Autoloader_::Value_via_ConstPath.call_by do |o|
+          o.from_module = _b
+          o.const_path = :Infermation_Terktix  # this is conventioned incorrectly
+          o.result_in_name_and_value
+          o.file_tree_cache_by = Autoloader_::File_tree_cache__
+        end
 
         _pair.name_x == :InfermationTerktix || fail
       end

@@ -65,7 +65,7 @@ module Skylab::Zerk::TestSupport
           end
 
           o.add_test :attempting_to_read_the_current_primary_symbol_raises do
-            _cls = scanner_class::ScannerIsNotInThatState
+            _cls = Subject_library_[]::ScannerIsNotInThatState
             _scn = state_1[1] || fail
             begin
               _scn.current_primary_symbol
@@ -87,7 +87,7 @@ module Skylab::Zerk::TestSupport
 
           o.add_sequential_memoization :state_1 do |state_0|
             scn = state_0[0]
-            _yes_or_no = scn.parse_primary
+            _yes_or_no = scn.scan_primary_symbol
             _em = state_0[1].gets
             [ _yes_or_no, scn, _em ]
           end
@@ -117,7 +117,7 @@ module Skylab::Zerk::TestSupport
           end
 
           o.add_sequential_memoization :state_1 do |scn|
-            _yes_or_no = scn.parse_primary
+            _yes_or_no = scn.scan_primary_symbol
             [ _yes_or_no, scn ]
           end
         end
@@ -141,7 +141,7 @@ module Skylab::Zerk::TestSupport
 
       class ArgumentScannerForTesting___ < ::NoDependenciesZerk::API_ArgumentScanner
 
-        def parse_primary
+        def scan_primary_symbol
           sym = head_as_is
           if :_not_a_primary_ == sym
             __whine_about_not_a_primary sym

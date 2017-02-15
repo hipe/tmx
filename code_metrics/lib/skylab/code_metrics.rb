@@ -158,6 +158,8 @@ module Skylab::CodeMetrics
       Parse[]::DSL_DSL.enhance_module x, & p
     end
 
+    Fields = sidesys[ :Fields]
+
     Human = sidesys[ :Human ]
 
     Open_3 = stdlib[ :Open3 ]

@@ -34,7 +34,6 @@ module Skylab::Snag
     Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
 
     Basic = sidesys[ :Basic ]
-    Fields = sidesys[ :Fields ]
     Brazen = sidesys[ :Brazen ]
 
     CLI_legacy_DSL = -> mod do
@@ -46,12 +45,14 @@ module Skylab::Snag
     end
 
     Entity = -> do
-      Brazen[]::Entity
+      Fields[]::Entity
     end
 
     Event = -> do
       Brazen[].event
     end
+
+    Fields = sidesys[ :Fields ]
 
     FUC = -> do
       System[].filesystem.file_utils_controller

@@ -1,22 +1,26 @@
 require_relative '../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - classic property creation" do
 
-  describe "[br] entity - classic property creation" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     context "minimal non-empty" do
 
-      before :all do
+      shared_subject :_subject_module do
 
-        class Foo
-          Subject_[].call self do
+        class X_e_cpc_Foo
+
+          Entity.lib.call self do
 
           def foo
           end
 
           end
+          self
         end
       end
 
@@ -41,8 +45,12 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         end
 
         it "description 2" do
-          _subject.description_under( Home_::API.expression_agent_instance ).
-            should eql "'foo'"
+
+          _expag = expression_agent
+
+          _ = _subject.description_under _expag
+
+          _.should eql "'foo'"
         end
 
         def _subject
@@ -51,37 +59,40 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       end
 
       def _subject
-        Foo.properties
+        _subject_module.properties
       end
     end
 
     context "basic behavior of inheritence" do
 
-      before :all do
+      shared_subject :_subject_modules do
 
-        class Foo_Base
-          Subject_[].call self do
+        class X_e_cpc_Base
+          Entity.lib.call self do
             def foo
             end
           end
         end
 
-        class Foo_Child < Foo_Base
-          Subject_[].call self do
+        class X_e_cpc_Child < X_e_cpc_Base
+          Entity.lib.call self do
             def bar
             end
           end
         end
+        NIL
       end
 
       it "child inherits properties of base" do
-        Foo_Base.properties.get_keys.should eql [ :foo ]
-        Foo_Child.properties.get_keys.should eql [ :foo, :bar ]
+        _subject_modules
+        X_e_cpc_Base.properties.get_keys.should eql [ :foo ]
+        X_e_cpc_Child.properties.get_keys.should eql [ :foo, :bar ]
       end
 
       it "the child's handle on the property is THE SAME PROPERTY" do
-        foo1 = Foo_Base.properties.fetch :foo
-        foo2 = Foo_Child.properties.fetch :foo
+        _subject_modules
+        foo1 = X_e_cpc_Base.properties.fetch :foo
+        foo2 = X_e_cpc_Child.properties.fetch :foo
         foo1 or fail
         foo1.object_id.should eql foo2.object_id
       end
@@ -91,15 +102,15 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
       it "is something you can do" do
 
-          class Foo_Reopener_Base
-            Subject_[].call self do
+          class X_e_cpc_Reopener_Base
+            Entity.lib.call self do
             def foo
             end
             end
           end
 
-          class Foo_Reopener_Child < Foo_Reopener_Base
-            Subject_[].call self do
+          class X_e_cpc_Reopener_Child < X_e_cpc_Reopener_Base
+            Entity.lib.call self do
             def foo
             end
             end
@@ -107,5 +118,15 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
       end
     end
+
+    # ==
+
+    def expression_agent
+
+      Entity.lib::Moniker_via_Property::THIS_EXPRESSION_AGENT___
+    end
+
+    # ==
+    # ==
   end
 end

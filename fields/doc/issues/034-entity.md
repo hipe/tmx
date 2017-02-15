@@ -1,4 +1,11 @@
-# the entity enhancement narrative :[#001]
+# the "entity" library :[#034]
+
+## introduction to the new edition
+
+this library is old, probably don't use it but that is subject to #open [#034.1]
+
+
+
 
 ## introduction
 

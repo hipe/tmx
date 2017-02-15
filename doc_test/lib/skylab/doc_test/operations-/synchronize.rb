@@ -161,11 +161,13 @@ module Skylab::DocTest
     end.call
 
     def __lookup_output_adapter_module
-      Autoloader_.const_reduce(
-        :from_module, Home_::OutputAdapters_,
-        :const_path, [ @output_adapter ],
-        :autoloaderize,
-        & @listener )
+
+      Autoloader_.const_reduce_by do |o|
+        o.from_module = Home_::OutputAdapters_
+        o.const_path = [ @output_adapter ]
+        o.autoloaderize
+        o.receive_name_error_by = @listener
+      end
     end
 
     def _ok ivar, x

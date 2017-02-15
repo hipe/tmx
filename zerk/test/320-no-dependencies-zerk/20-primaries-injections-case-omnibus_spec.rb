@@ -188,7 +188,7 @@ module Skylab::Zerk::TestSupport
               _show_help_screen
               break
             end
-            if ! __parse_primary_softly
+            if ! __scan_primary_symbol_softly
               _show_help_screen
               break
             end
@@ -219,8 +219,8 @@ module Skylab::Zerk::TestSupport
           @args.no_unparsed_exists
         end
 
-        def __parse_primary_softly
-          @args.parse_primary_softly
+        def __scan_primary_symbol_softly
+          @args.scan_primary_symbol_softly
         end
 
         def __lookup_primary

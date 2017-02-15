@@ -16,9 +16,74 @@ module Skylab::Fields
     end
   end  # >>
 
-  Common_ = ::Skylab::Common
+  # ==
 
+  Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
+
+  # ==
+
+  DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_FULLY = -> scn, & p do
+
+    # (migrated from [br]. better fit here but may be legacy.)
+
+    kp = process_argument_scanner_passively scn, & p
+
+    if ! kp || scn.no_unparsed_exists
+      kp
+    else
+      ev = Home_::Events::Extra.via_strange scn.head_as_is
+
+      if respond_to? :receive_extra_values_event
+        receive_extra_values_event ev
+      else
+        raise ev.to_exception
+      end
+    end
+  end
+
+  # ==
+
+  DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_PARTIALLY = -> scn, & p do
+
+    # (import from [br]. probably legacy.) make it private.
+
+    kp = KEEP_PARSING_ ; bx = formal_properties
+
+    if scn.unparsed_exists
+
+      bx ||= MONADIC_EMPTINESS_
+
+      instance_variable_set :@_polymorphic_upstream_, scn
+
+      begin
+
+        k = scn.head_as_is
+
+        prp = bx[ k ]
+        prp || break
+
+        scn.advance_one
+
+        m = prp.custom_polymorphic_writer_method_name
+
+        kp = if m
+          send m
+        else
+          receive_polymorphic_property prp, & p
+        end
+
+        kp || break
+
+        scn.no_unparsed_exists ? break : redo
+      end while above
+
+      remove_instance_variable :@_polymorphic_upstream_
+    end
+    kp
+  end
+
+  # ==
 
   class Attributes < ::Module  # :[#013]
 
@@ -663,6 +728,7 @@ module Skylab::Fields
   end
   NOTHING_ = nil
   SPACE_ = ' '
+  STOP_PARSING_ = false
   UNABLE_ = false
 
   def self.describe_into_under y, _

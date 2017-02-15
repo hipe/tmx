@@ -1,18 +1,20 @@
 require_relative '../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - simple modern property creation" do
 
-  describe "[br] entity - simple modern property creation" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     context "there are at least 5 ways of creating monadic iambic props" do
 
       it "1)  the classic form with method definitions as iambic writers" do
 
-        class P_Classic
+        class X_e_smpc_Classic
 
-          Subject_[].call self do
+          Entity.lib.call self do
 
             def foo
               @foo = gets_one_polymorphic_value
@@ -25,110 +27,110 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
           end
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_Classic
+        _expect X_e_smpc_Classic
       end
 
       it "2)  in the '[]' with the 'property' keyword" do
 
-        class P_Simplest
-          Subject_[][ self, :property, :foo, :property, :bar ]
-          Enhance_for_test_[ self ]
+        class X_e_smpc_Simplest
+          Entity.lib[ self, :property, :foo, :property, :bar ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_Simplest
+        _expect X_e_smpc_Simplest
       end
 
       it "3)  in the '[]' with the 'properties' keyword" do
 
-        class P_Props_3
-          Subject_[][ self, :properties, :foo, :bar ]
-          Enhance_for_test_[ self ]
+        class X_e_smpc_Props_3
+          Entity.lib[ self, :properties, :foo, :bar ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_Props_3
+        _expect X_e_smpc_Props_3
       end
 
       it "4)  in the '-> { }' with the 'property' keyword" do
 
-        class P_In_Block
+        class X_e_smpc_In_Block
 
-          Subject_[].call self do
+          Entity.lib.call self do
             o :property, :foo
             o :property, :bar
           end
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_In_Block
+        _expect X_e_smpc_In_Block
       end
 
       it "4b) in the '-> { }' with the 'property' keyword (one line)" do
 
-        class P_In_Block_B
+        class X_e_smpc_In_Block_B
 
-          Subject_[].call self do
+          Entity.lib.call self do
             o :property, :foo, :property, :bar
           end
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_In_Block_B
+        _expect X_e_smpc_In_Block_B
       end
 
       it  "5)  in the '-> { }' with the 'properties' keyword" do
 
-        class P_In_Block_Props
+        class X_e_smpc_In_Block_Props
 
-          Subject_[].call self do
+          Entity.lib.call self do
             o :properties, :foo, :bar
           end
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_In_Block_Props
+        _expect X_e_smpc_In_Block_Props
       end
 
       it "6) re-use properties with 'reuse'" do
 
-        class P_Reuse_Multiple
+        class X_e_smpc_Reuse_Multiple
 
-          Subject_[].call self,
-            :reuse, P_reuse_source__[].properties.at( :foo, :bar )
+          Entity.lib.call self,
+            :reuse, X_e_smpc_reuse_source__[].properties.at( :foo, :bar )
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_Reuse_Multiple
+        _expect X_e_smpc_Reuse_Multiple
       end
 
       it "7) like (6) but only one object" do
 
-        class P_Reuse_One
+        class X_e_smpc_Reuse_One
 
-          bx = P_reuse_source__[].properties
+          bx = X_e_smpc_reuse_source__[].properties
 
-          Subject_[].call self,
+          Entity.lib.call self,
 
             :property_object, bx.fetch( :foo ),
             :property_object, bx.fetch( :bar )
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-        _expect P_Reuse_One
+        _expect X_e_smpc_Reuse_One
       end
 
-      P_reuse_source__ = Common_.memoize do
+      X_e_smpc_reuse_source__ = Lazy_.call do
 
-        class P_Reuse_Source
+        class X_e_smpc_Reuse_Source
 
-          Subject_[].call self,
+          Entity.lib.call self,
             :property, :bar,
             :property, :foo
 
@@ -143,5 +145,8 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         subj.instance_variable_get( :@bar ).should eql :y
       end
     end
+
+    # ==
+    # ==
   end
 end

@@ -99,26 +99,33 @@ module Skylab::CodeMetrics
           s_a = s_a[ 0 .. -2 ]
         end
 
-        ok = true
-
         # while #open [#co-024.1], can't const reduce on a zero length path
         if s_a.length.zero?
-          _ = @_head_module
+          @_head_module && ACHIEVED_
         else
+          __load_normally s_a
+        end
+      end
 
-        _ = Autoloader_.const_reduce(
-          :const_path, s_a,
-          :from_module, @_head_module,
-          :autoloaderize,
-        ) do |*chan, &msg|
+      def __load_normally s_a  # only while above is open
+
+        ok = true
+
+        _ = Autoloader_.const_reduce_by do |o|
+          o.from_module = @_head_module
+          o.const_path = s_a
+          o.autoloaderize
+
+        o.receive_name_error_by = -> *chan, &msg do
           ok = false
           @_listener[ *chan, &msg ]
           @_listener.call :error, :expression, :autoload_error do |y|
             y << "the above \"abstract path\" inferred from a filename #{
               }failed resolve to a const value."
           end
-        end
-        end
+          :_no_see_CM_
+
+        end ; end
 
         if @_be_verbose
           if ok

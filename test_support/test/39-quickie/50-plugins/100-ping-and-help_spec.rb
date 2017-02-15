@@ -12,14 +12,14 @@ module Skylab::TestSupport::TestSupport
 
       it "API - whines about not reaching endpoint" do
         call
-        expect_no_transition_found_ do |y|
+        expect_these_lines_via_no_transition_found_ do |y|
           write_messages_into_for_no_transition_because_nothing_pending_ y
         end
       end
 
       it "CLI - whines about not reaching endpoint (STUB)" do
         invoke
-        expect_these_lines_on_stderr_ do |y|
+        expect_these_lines_on_stderr do |y|
           write_messages_into_for_no_transition_because_nothing_pending_ y
           write_messages_into_for_invite_generically_ y
         end
@@ -40,7 +40,7 @@ module Skylab::TestSupport::TestSupport
 
       it "CLI - splay" do
         invoke '-wuz-up'
-        expect_these_lines_on_stderr_ do |y|
+        expect_these_lines_on_stderr do |y|
           y << 'unknown primary "-wuz-up"'
           y << %r(\Aavailable primaries: -[a-z])
           write_messages_into_for_invite_generically_ y

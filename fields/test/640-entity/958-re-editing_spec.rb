@@ -1,16 +1,17 @@
 require_relative '../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - re-editing" do
 
-  describe "[br] entity - re-editing" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
-    # (one context) ->
+    # -
+      shared_subject :_subject_class do
 
-      before :all do
-
-        Six_My_Extmod = Subject_[].call do
+        X_e_ree_Extmod = subject_library_.call do
 
           o :ad_hoc_processor, :wizzzle, -> sess do
 
@@ -19,11 +20,11 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
           end
         end
 
-        class Six_My_Class
+        class X_e_ree_Class
 
           singleton_class.send :attr_accessor, :x
 
-          Six_My_Extmod.call self,
+          X_e_ree_Extmod.call self,
             :wizzzle, :_sure_,
             :properties, :foo, :bar
 
@@ -33,16 +34,15 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
           :_yup_ == self.x or fail
 
+          self
         end
-
       end
 
       it "`edit_entity_class` effects an edit session" do
 
-        Six_My_Class.properties.get_keys.should eql [ :foo, :bar, :baz ]
-
+        _cls = _subject_class
+        _cls.properties.get_keys.should eql [ :foo, :bar, :baz ]
       end
-
-      # <-
+    # -
   end
 end

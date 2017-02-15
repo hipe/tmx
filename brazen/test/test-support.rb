@@ -121,21 +121,6 @@ module Skylab::Brazen::TestSupport
     end
   end
 
-  Enhance_for_test_ = -> mod do
-    mod.send :define_singleton_method, :with, WITH_MODULE_METHOD_
-    mod.include Test_Instance_Methods_
-    nil
-  end
-
-  WITH_MODULE_METHOD_ = -> * x_a do
-    ok = nil
-    x = new do
-      ok = process_argument_scanner_fully(
-        Common_::Scanner.via_array x_a )
-    end
-    ok && x
-  end
-
   module Test_Instance_Methods_
 
     def initialize & edit_p
@@ -177,12 +162,6 @@ module Skylab::Brazen::TestSupport
       _st = Common_::Scanner.via_array x_a
       _ok = process_argument_scanner_fully _st
       _ok && normalize
-    end
-
-    def process_fully_for_test_ * x_a
-
-      process_argument_scanner_fully(
-        Common_::Scanner.via_array x_a )
     end
   end
 

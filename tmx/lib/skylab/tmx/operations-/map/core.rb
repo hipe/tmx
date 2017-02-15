@@ -213,7 +213,7 @@ module Skylab::TMX
             y << nil
             y << "designed to be piped. hackish but useful example (from CLI):"
             y << nil
-            y << "    tmx map -select framework | awk '{if ( $2 ~ /\[br\]/ ) print}'"
+            y << "    tmx map -select framework | awk '{if ( $2 ~ /\\[br\\]/ ) print}'"
             y << nil
             y << "the above shows all the sidesystem that (still) use the [br] framework"
           end,

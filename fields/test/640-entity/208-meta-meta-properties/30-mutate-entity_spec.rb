@@ -1,10 +1,12 @@
 require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - meta-meta-properties - mutate entity (ISLAND)" do  # :+[#sl-134]..
 
-  describe "[br] entity - meta-meta-properties - 3. mutate entity (ISLAND)" do  # :+[#sl-134]..
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     # define a meta-entity by what it does to the entity.
     #
@@ -13,9 +15,9 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
     # ( the only context ) ->
 
-      before :all do
+      shared_subject :_subject_module do
 
-        MMPH_Entity = Subject_[].call do
+        X_e_mmp_me_Entity = Entity.lib.call do
 
           o :mutate_entity, -> prp, st do
 
@@ -28,18 +30,20 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
           self::Property.send :attr_accessor, :wants_to_know
         end
 
-        class MMPH_Business_Widget
+        class X_e_mmp_me_Business_Widget
 
-          MMPH_Entity.call self do
+          X_e_mmp_me_Entity.call self do
 
             o :teach_me_how_to_dougie, true, :property, :hi
             o :property, :hey
           end
+
+          self
         end
       end
 
       it "ok" do
-        hi, hey = MMPH_Business_Widget.properties.each_value.to_a
+        hi, hey = _subject_module.properties.each_value.to_a
         hi.wants_to_know.should eql true
         hey.wants_to_know.should eql nil
       end

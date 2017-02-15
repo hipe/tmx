@@ -1,23 +1,25 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - concerns - ad-hoc" do
 
-  describe "[br] entity - concerns - ad-hoc" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     context "for e.g a DSL extension that adds properties" do
 
-      before :all do
+      shared_subject :_subject_module do
 
-        class AHP_Base
+        class X_e_ahp_Base
 
-          Subject_[].call self do
-            o :ad_hoc_processor, :gazoink, -> x { Gazoink_.new( x ).go }
+          Entity.lib.call self do
+            o :ad_hoc_processor, :gazoink, -> x { X_e_ahp_Gazoink.new( x ).go }
           end
         end
 
-        class Gazoink_
+        class X_e_ahp_Gazoink
 
           def initialize pc
             @pc = pc
@@ -33,9 +35,9 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
           end
         end
 
-        class AHP_Child < AHP_Base
+        class X_e_ahp_Child < X_e_ahp_Base
 
-          Subject_[].call self do
+          Entity.lib.call self do
             o :polymorphic_writer_method_name_suffix, :'='
             def foo=
               @foo = gets_one_polymorphic_value
@@ -47,23 +49,27 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
           attr_reader :foo, :baz
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
       end
 
-      it "loads" do
+      it "enhances" do
+        _subject_module || fail
       end
 
       it "reflects" do
-        AHP_Child.properties.get_keys.
+        _subject_module.properties.get_keys.
           should eql [ :foo, :bar, :baz, :biff ]
       end
 
       it "writes" do
-        o = AHP_Child.with :foo, :F, :baz, :B
+        o = _subject_module.with :foo, :F, :baz, :B
         o.foo.should eql :F
         o.baz.should eql :B
       end
     end
+
+    # ==
+    # ==
   end
 end

@@ -188,9 +188,6 @@ module NoDependenciesZerk
 
       def initialize
 
-        @_read_CPS = :__read_CPS_initially
-        @_write_CPS = :__write_CPS_initially
-
         @initial_ARGV_offset = 0
         @default_primary_symbol = nil
         @listener = nil
@@ -217,12 +214,11 @@ module NoDependenciesZerk
 
       # --
 
-      def parse_operator_softly
+      def scan_operator_symbol_softly
         s = head_as_is
         if OPERATOR_RX___ =~ s
           _ = s.gsub( DASH_, UNDERSCORE_ ).intern
-          @_read_COS = :__read_COS_normally  # usu. 1x
-          @__current_operator_symbol = _
+          send ( @_write_COS_ ||= :_write_COS_initially ), _
           advance_one
           ACHIEVED_
         else
@@ -236,32 +232,25 @@ module NoDependenciesZerk
         %r(\A#{ ::Regexp.escape current_operator_symbol.id2name })i
       end
 
-      def current_operator_symbol
-        send @_read_COS
-      end
-
-      def __read_COS_normally
-        @__current_operator_symbol
-      end
-
-      def parse_primary  # exactly as [#ze-052.1] canon
-        if parse_primary_softly
+      def scan_primary_symbol  # exactly as [#ze-052.1] canon
+        if scan_primary_symbol_softly
           ACHIEVED_
         else
           __when_malformed_primary
         end
       end
 
-      def parse_primary_softly
+      def scan_primary_symbol_softly
+        @_write_CPS_ ||= :_write_CPS_initially
         md = PRIMARY_RX__.match head_as_is
         if md
           _ = md[ 1 ].gsub( DASH_, UNDERSCORE_ ).intern
-          send @_write_CPS, _
+          send @_write_CPS_, _
           advance_one
           ACHIEVED_
         elsif @default_primary_symbol
           # #not-covered - blind faith
-          send @_write_CPS, @default_primary_symbol
+          send @_write_CPS_, @default_primary_symbol
           ACHIEVED_
         else
           NIL  # #nodeps-coverpoint-2
@@ -274,29 +263,8 @@ module NoDependenciesZerk
 
       PRIMARY_RX__ = /\A--?([a-z0-9]+(?:-[a-z0-9]+)*)\z/i
 
-      def __write_CPS_initially sym
-        @has_current_primary_symbol = true
-        @_read_CPS = :__read_CPS_normally
-        @_write_CPS = :__write_CPS_normally
-        send @_write_CPS, sym
-      end
-
-      def __write_CPS_normally sym
-        @_current_primary_symbol = sym ; nil
-      end
-
       def __receive_corrected_primary_normal_symbol sym
-        remove_instance_variable :@_current_primary_symbol
-        @_current_primary_symbol = sym ; nil
-      end
-
-      def __read_CPS_initially
-        raise ScannerIsNotInThatState,
-          "cannot read `current_primary_symbol` from beginning state"
-      end
-
-      def __read_CPS_normally
-        @_current_primary_symbol
+        remove_instance_variable :@_CPS_ ; @_CPS_ = sym ; nil
       end
 
       # --
@@ -403,10 +371,6 @@ module NoDependenciesZerk
 
       # --
 
-      def current_primary_symbol
-        send @_read_CPS
-      end
-
       def head_as_is
         @_array.fetch @_current_index
       end
@@ -425,8 +389,6 @@ module NoDependenciesZerk
       def can_fuzzy
         true
       end
-
-      ScannerIsNotInThatState = ::Class.new ::RuntimeError
     end
 
     # ==
@@ -468,8 +430,6 @@ module NoDependenciesZerk
       include ArgumentScannerMethods__
 
       def initialize a, & l
-        @_current_primary = :__current_primary_invalid
-        @_receive_current_primary = :__receive_first_ever_current_primary
         @listener = l  # not used here presently, just a courtesy
         if a.length.zero?
           @no_unparsed_exists = true
@@ -481,33 +441,26 @@ module NoDependenciesZerk
         end
       end
 
-      def _parse_operator_softly_
-        # (we don't check if it's a symbol but we could)
-        @current_operator_symbol = head_as_is
+      def scan_operator_symbol_softly
+        scan_operator_symbol  # (see)
+      end
+
+      def scan_primary_symbol_softly
+        scan_primary_symbol  # (see)
+      end
+
+      def scan_operator_symbol
+        # (under API, we don't check if it's a symbol :#here-2 but we could)
+        send ( @_write_COS_ ||= :_write_COS_initially ), head_as_is
         advance_one
         ACHIEVED_
       end
 
-      def parse_primary_softly
-        parse_primary  # (see)
-      end
-
-      def parse_primary
-        # (we don't check if it's a symbol but we could)
-        send @_receive_current_primary, head_as_is
+      def scan_primary_symbol
+        # (under API, we don't check if it's a symbol but we could)
+        send ( @_write_CPS_ ||= :_write_CPS_initially ), head_as_is
         advance_one
         ACHIEVED_
-      end
-
-      def __receive_first_ever_current_primary sym
-        @has_current_primary_symbol = true
-        @_current_primary = :__current_primary_normally
-        @_receive_current_primary = :__receive_current_primary_normally
-        send @_receive_current_primary, sym
-      end
-
-      def __receive_current_primary_normally sym
-        @__current_primary_value = sym ; nil
       end
 
       def _all_fuzzily_matching_primary_TWOPLES_by_TWOPLE_scanner_ _
@@ -519,19 +472,6 @@ module NoDependenciesZerk
 
       def _fuzzy_lookup_primary_or_fail h
         When_primary_not_found__[ h, self ]
-      end
-
-      def current_primary_symbol
-        send @_current_primary
-      end
-
-      def __current_primary_invalid
-        raise ScannerIsNotInThatState,
-          "cannot read `current_primary_symbol` from beginning state"
-      end
-
-      def __current_primary_normally
-        @__current_primary_value
       end
 
       def advance_one
@@ -564,12 +504,6 @@ module NoDependenciesZerk
       def can_fuzzy
         false
       end
-
-      # ===
-
-      ScannerIsNotInThatState = ::Class.new ::RuntimeError
-
-      # ===
     end
 
     # ==
@@ -642,7 +576,7 @@ module NoDependenciesZerk
       main[]
     end
 
-    class ParseArguments_via_FeaturesInjections < SimpleModel
+    class ParseArguments_via_FeaturesInjections < SimpleModel  # "omni branch"
 
       class << self
         def call scn, prim_h, client
@@ -680,6 +614,11 @@ module NoDependenciesZerk
         _add_primaries_injection LazyPrimariesInjectionTicket___.new p
       end
 
+      def add_operators_injection_by & p
+        _inj = LazyOperatorsInjectionRealized__.define( & p )
+        _add_operators_injection WrapInjection___.new _inj
+      end
+
       def _add_operators_injection ada
         send @_add_operators_injection, ada
       end
@@ -714,21 +653,37 @@ module NoDependenciesZerk
 
       # -- NOTE the below might break out
 
-      def parse_primary_softly
-        @argument_scanner.parse_primary_softly
+      def parse_operator
+
+        # the hierarchy is `parse` (which calls `lookup` (which calls `scan`))
+
+        if @argument_scanner.no_unparsed_exists
+          Zerk_lib_[]::ArgumentScanner::When::No_arguments[ self ]
+
+        elsif scan_operator_symbol_softly
+          flush_to_lookup_operator
+
+        else
+          # (assume this will never hit API while #here-2)
+          when_malformed_primary_or_operator
+        end
       end
 
-      def parse_operator_softly  # see next method
-        @argument_scanner.parse_operator_softly
+      def scan_operator_symbol_softly
+        @argument_scanner.scan_operator_symbol_softly
+      end
+
+      def scan_primary_symbol_softly
+        @argument_scanner.scan_primary_symbol_softly
       end
 
       def flush_to_lookup_operator  # assume:
 
-        #  - assume above method succeeded
+        #  - assume `scan_operator_symbol_softly` succeeds
         #  - assume there are some operators injections
         #
         #  result is a "found tuple" if found, and FOR NOW
-        #  on failure we emit here and resutt in false.
+        #  on failure we emit here and result in false.
 
         sym = @argument_scanner.current_operator_symbol
         scn = to_operators_injections_scanner
@@ -816,7 +771,7 @@ module NoDependenciesZerk
         if args.no_unparsed_exists
           ACHIEVED_
         else
-          ok = args.parse_primary
+          ok = args.scan_primary_symbol
           if ok
             flush_to_lookup_current_and_parse_remaining_primaries
           else
@@ -845,7 +800,7 @@ module NoDependenciesZerk
             ok = true
             break
           end
-          @argument_scanner.parse_primary ? redo : break
+          @argument_scanner.scan_primary_symbol ? redo : break
         end while above
         ok
       end
@@ -1088,7 +1043,7 @@ module NoDependenciesZerk
     LazyFeaturesInjectionTicket__ = ::Class.new
     class LazyOperatorsInjectionTicket___ < LazyFeaturesInjectionTicket__
       def _realization_class_
-        LazyOperatorsInjectionRealized___
+        LazyOperatorsInjectionRealized__
       end
     end
     class LazyPrimariesInjectionTicket___ < LazyFeaturesInjectionTicket__
@@ -1116,7 +1071,7 @@ module NoDependenciesZerk
       end
     end
     LazyFeaturesInjectionRealized__ = ::Class.new SimpleModel
-    class LazyOperatorsInjectionRealized___ < LazyFeaturesInjectionRealized__
+    class LazyOperatorsInjectionRealized__ < LazyFeaturesInjectionRealized__
       def operators= fz
         @_substrate_adapter_ = fz
       end
@@ -1126,6 +1081,7 @@ module NoDependenciesZerk
         @_substrate_adapter_ = fz
       end
     end
+    WrapInjection___ = ::Struct.new :injection
 
     class LazyFeaturesInjectionRealized__
 
@@ -1185,9 +1141,7 @@ module NoDependenciesZerk
 
     module ArgumentScannerMethods__
 
-      def current_primary_as_ivar
-        :"@#{ current_primary_symbol }"
-      end
+      # -- higher-level parsers
 
       def parse_argument_via_regexp rx, & msg  # #experiment [ts]
         map_trueish_value_by do |x|
@@ -1226,6 +1180,63 @@ module NoDependenciesZerk
           yield head_as_is
         end
       end
+
+      # -- lower-level parsing and reading
+
+      def _write_COS_initially sym
+        @_read_COS_ = :__read_COS_normally
+        @_write_COS_ = :__write_COS_normally
+        send @_write_COS_, sym
+      end
+
+      def _write_CPS_initially sym
+        @has_current_primary_symbol = true
+        @_read_CPS_ = :__read_CPS_normally
+        @_write_CPS_ = :__write_CPS_normally
+        send @_write_CPS_, sym
+      end
+
+      def current_operator_symbol
+        send ( @_read_COS_ ||= :__read_COS_initially )
+      end
+
+      def current_primary_as_ivar
+        :"@#{ current_primary_symbol }"
+      end
+
+      def current_primary_symbol
+        send ( @_read_CPS_ ||= :__read_CPS_initially )
+      end
+
+      def __read_COS_initially
+        raise _not_in_that_state 'current_operator_symbol'
+      end
+
+      def __read_CPS_initially
+        raise _not_in_that_state 'current_primary_symbol'
+      end
+
+      def _not_in_that_state s
+        raise ScannerIsNotInThatState, "cannot read `#{ s }` from beginning state"
+      end
+
+      def __write_COS_normally sym
+        @_COS_ = sym ; nil
+      end
+
+      def __write_CPS_normally sym
+        @_CPS_ = sym ; nil
+      end
+
+      def __read_COS_normally
+        @_COS_
+      end
+
+      def __read_CPS_normally
+        @_CPS_
+      end
+
+      # -- emission support
 
       def no_because *channel_tail, & msg_p
         if channel_tail.length.zero?
@@ -1531,6 +1542,10 @@ module NoDependenciesZerk
       require 'skylab/zerk'
       ::Skylab::Zerk
     end
+
+    # ==
+
+    ScannerIsNotInThatState = ::Class.new ::RuntimeError
 
     # ==
 

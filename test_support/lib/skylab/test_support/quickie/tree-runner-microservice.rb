@@ -82,7 +82,7 @@ module Skylab::TestSupport
             __invoke_final_plugin step
           end
 
-          # #coverpoint-2-2 is about how when this fails, NIL should result
+          # when this fails we must result in NIL (not false) per [#ze-026.1]
         end
 
         def __invoke_nonfinal_plugin step
@@ -250,7 +250,7 @@ module Skylab::TestSupport
 
           as = @argument_scanner
           yes = ! as.no_unparsed_exists
-          yes &&= as.parse_primary_softly
+          yes &&= as.scan_primary_symbol_softly
           if yes && :ping == as.current_primary_symbol
             __express_ping
           else
@@ -288,12 +288,7 @@ module Skylab::TestSupport
             ACHIEVED_
 
           else
-
-            self._WHAT_COVER
-            # whine town
-            _no = @argument_scanner.parse_primary
-            _no == UNABLE_ || fail
-            _no
+            self._COVER_ME__see_tombstone_for_ideas__  # (was #tombstone-C)
           end
         end
 
@@ -400,6 +395,7 @@ module Skylab::TestSupport
     end
   end
 end
+# :#tombstone-C: (probably temporary)
 # :#tombstone-B: replaced legacy eventpoint graph with beginnings of new
 # :#history-A: begin overhaul to use new eventpoint
 # #tombstone: `function_chain`

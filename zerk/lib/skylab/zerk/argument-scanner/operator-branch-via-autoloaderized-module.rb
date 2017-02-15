@@ -71,11 +71,11 @@ module Skylab::Zerk
             # #borrow-coverage from [#ts-039.1]
             at.value_x
           else
-            Autoloader_.const_reduce(
-              :const_path, [ at.entry_group_head ],
-              :from_module, @module,
-              :autoloaderize,
-            )
+            Autoloader_.const_reduce_by do |o|
+              o.from_module = @module
+              o.const_path = [ at.entry_group_head ]
+              o.autoloaderize
+            end
           end
           _cls  # #todo
         end

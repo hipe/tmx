@@ -163,7 +163,9 @@
 [#048]       #parent-node: [#024] "#action-preconditions.."
 [#047]       #parent-node: [#013] the model entity narrative
 [#046]       #parent-ndoe: [#024] the action factory narrative ..
-[#045] #hole ( #moved-to: [#ze-054.1] )
+
+[#045] #open TRANSITION NOTES for sunset brazen ..
+             ( #was: #moved-to: [#ze-054.1] )
              ( #was: #done graph has an action so maybe we don't need to pass it everywhere )
 
 [#044] #open integrate new pretty path with all [br] CLI clients
@@ -212,7 +214,7 @@
 [#023]       track the magic of `expression` ( described in [#024] )
              ( was: #parent-node: [#011] event prototype )
 [#022]       [ EDIT: document formal properties  ]
-             ( #was: entity identifier. #moved-to: [#here-091] )
+             ( #was: entity identifier. #moved-to: [#091] )
              ( #was: #done obliterate `r_eceive_negative_event` and the rest - single
              entrypoint is better. rely on `ok` : false )
 [#021]       the API magic result shape narrative .. (was "scope kernel")

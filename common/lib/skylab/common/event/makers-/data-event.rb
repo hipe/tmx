@@ -130,5 +130,5 @@ module Skylab::Common
     end
   end
 end
-
+# NOTE: the below posterity entry refers to [#br-001], which is now [#fi-034]
 # :+#posterity message event may have been earliest version of [#br-001]

@@ -4,10 +4,6 @@ module Skylab::Brazen
 
     class << self
 
-      def bound_call_session
-        API::Produce_bound_call__
-      end
-
       def call * x_a, & oes_p
         bc = Home_.application_kernel_.bound_call_via_mutable_iambic x_a, & oes_p
         bc and bc.receiver.send bc.method_name, * bc.args

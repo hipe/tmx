@@ -1,10 +1,10 @@
-module Skylab::Brazen
+module Skylab::Fields
 
   module Entity
 
-    module Concerns_::Meta_Property
+    module MetaProperty
 
-      class Property_Normalizer
+      class PropertyNormalizer
 
         def initialize sess
 
@@ -25,7 +25,7 @@ module Skylab::Brazen
 
           _st = Common_::Stream.via_nonsparse_array @_mprp_a
 
-          Home_.lib_.fields::Attributes::Normalization_against_Model::Stream.call(
+          Home_::Attributes::Normalization_against_Model::Stream.call(
             prp,
             _st,
           )

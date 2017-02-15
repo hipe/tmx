@@ -75,9 +75,10 @@ module Skylab::Tabular
   end
 
   Operations_module_operator_branch___ = Lazy_.call do  # c.p/m from [tmx]
-    Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define(
-      Home_::Operations_
-    ) do |defn|
+
+    Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define do |defn|
+
+      defn.module = Home_::Operations_
       defn.express_unknown_by do |o|
         o.express_unknown_item_smart_prefixed "unknown operation"
         o.express_via_template "available operations: {{ say_splay }}"

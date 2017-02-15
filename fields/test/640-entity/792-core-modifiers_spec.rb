@@ -1,16 +1,18 @@
 require_relative '../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - core modifiers" do
 
-  describe "[br] entity - core modifiers" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     it "minimal" do
 
-        class DCF_Minimal
+        class X_e_cm_Minimal
 
-          Subject_[].call self do
+          Entity.lib.call self do
 
             o :polymorphic_writer_method_name_suffix, :_ZOINK
 
@@ -20,18 +22,18 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
           end
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-      obj = DCF_Minimal.with :foo_bar, :xyz
+      obj = X_e_cm_Minimal.with :foo_bar, :xyz
       obj.instance_variable_get( :@foo_bar ).should eql :xyz
     end
 
     it "with two (together)" do
 
-        class DCF_With_Two
+        class X_e_cm_With_Two
 
-          Subject_[].call self do
+          Entity.lib.call self do
 
             o :polymorphic_writer_method_name_suffix, :_ZEE
 
@@ -50,10 +52,10 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
           end
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
 
-      obj = DCF_With_Two.with :foo, :F, :bar, :B, :baz, :Z
+      obj = X_e_cm_With_Two.with :foo, :F, :bar, :B, :baz, :Z
       a = obj.instance_exec do
         [ :foo, :bar, :baz ].map do |i|
           instance_variable_get :"@#{ i }"
@@ -61,5 +63,8 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       end
       a.should eql [ :F, :B, :Z ]
     end
+
+    # ==
+    # ==
   end
 end

@@ -1,15 +1,17 @@
 require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - meta-meta-properties - enum" do
 
-  describe "[br] entity - meta-meta-properties - 2. enum" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     it "(minimal)" do
 
-        class MME_Min
-          Subject_[].call self do
+        class X_e_mmp_enum_Min
+          Entity.lib.call self do
             o :enum, [ :foo, :bar ], :meta_property, :zig
           end
         end
@@ -17,11 +19,11 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
     context "a normative example is boring" do
 
-      before :all do
+      shared_subject :_subject_module do
 
-        class MME_Foo
+        class X_e_mmp_enum_Foo
 
-          Subject_[].call self do
+          Entity.lib.call self do
 
             o :enum, [ :red, :blue ],
 
@@ -48,11 +50,12 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
 
           end
+          self
         end
       end
 
       it "the properties abstraction is useful here with `group_by`" do
-        h = MME_Foo.properties.group_by( & :color )
+        h = _subject_module.properties.group_by( & :color )
         a = h.keys
         a.length.should eql 3
         ( a - [ :red, :blue, nil ] ).length.should be_zero
@@ -67,9 +70,9 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       _rx = /\Ainvalid color 'red', expecting { green \| purple }/
 
       begin
-        class MME_Bar
+        class X_e_mmp_enum_Bar
 
-          Subject_[].call self do
+          Entity.lib.call self do
 
             o :enum, [ :green, :purple ],
               :meta_property, :color
@@ -80,7 +83,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
           end
         end
-      rescue Home_::Field_::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message.should match _rx

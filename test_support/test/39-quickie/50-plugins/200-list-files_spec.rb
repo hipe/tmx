@@ -15,20 +15,20 @@ module Skylab::TestSupport::TestSupport
       # - API
 
         it "fails on this channel" do
-          messages_ || fail
+          messages || fail
         end
 
         it "whines obscurely that it doesn't reach a finished state" do
 
-          fails_with_these_messages_ do |y|
+          expect_these_lines_in_messages do |y|
             y << "there are no state transitions so #{
               }nothing brings the system from the beginning state to a finished state."
           end
         end
 
-        shared_subject :messages_ do
+        shared_subject :messages do
           call
-          expect_no_transition_found_
+          messages_via_no_transition_found_
         end
       # -
     end
@@ -40,12 +40,12 @@ module Skylab::TestSupport::TestSupport
       # - API
 
         it "fails on this channel" do
-          messages_ || fail
+          messages || fail
         end
 
         it "whines obscurely that it doesn't reach a finished state" do
 
-          fails_with_these_messages_ do |y|
+          expect_these_lines_in_messages do |y|
 
             y << "'list_files' requires the \"files stream\" state."
             y << "it does not transition from the state you are in, #{
@@ -53,9 +53,9 @@ module Skylab::TestSupport::TestSupport
           end
         end
 
-        shared_subject :messages_ do
+        shared_subject :messages do
           call :list_files
-          expect_no_transition_found_
+          messages_via_no_transition_found_
         end
       # -
     end
@@ -67,19 +67,19 @@ module Skylab::TestSupport::TestSupport
       # - API
 
         it "primary parse error" do
-          messages_ || fail
+          messages || fail
         end
 
         it "lists available primaries" do
-          fails_with_these_messages_ do |y|
+          expect_these_lines_in_messages do |y|
             y << "unknown primary 'jajoomba'"
             y << %r(\Aavailable primaries: ')
           end
         end
 
-        shared_subject :messages_ do
+        shared_subject :messages do
           call :list_files, :jajoomba
-          messages_from_expect_for_API_ :error, :expression, :primary_parse_error, :primary_not_found
+          messages_via_expect_fail :error, :expression, :primary_parse_error, :primary_not_found
         end
       # -
     end
@@ -197,7 +197,7 @@ module Skylab::TestSupport::TestSupport
     # ==
 
     def expect_primary_parse_error_
-      messages_from_expect_for_API_ :error, :expression, :primary_parse_error
+      messages_via_expect_fail :error, :expression, :primary_parse_error
     end
 
     # ==

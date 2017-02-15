@@ -1,27 +1,18 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - models - property box" do
 
-  describe "[br] entity - models - property box" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
-    # (no context)
-
-      before :all do
-
-        class M_PB_Hi
-
-          Subject_[].call self,
-            :properties, :foo, :bar
-
-          # Enhance_for_test_[ self ]
-        end
-      end
+    # -
 
       it "`to_mutable_box_like_proxy`" do
 
-        prps = _subject
+        prps = _subject_module.properties
         bx = prps.to_mutable_box_like_proxy
         bx.a_.should eql [ :foo, :bar ]
         _foo = bx.remove :foo
@@ -30,7 +21,17 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
       end
 
       def _subject
-        M_PB_Hi.properties
+        _subject_module.properties
       end
+
+      shared_subject :_subject_module do
+
+        class X_e_pb_Hi
+          Entity.lib.call self, :properties, :foo, :bar
+          self
+        end
+      end
+
+    # -
   end
 end

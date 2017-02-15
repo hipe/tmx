@@ -260,7 +260,7 @@ better this time.
   [#141] expression agents are exemplary of this.
 
 + `call` - for proc-like objects (typically [#fi-016] actors or
-  [#br-001] entities), must do the same as `[]` for this object.
+  [#fi-034] entities), must do the same as `[]` for this object.
   in these kind of objects, arguments are a (non-iambic) (positional)
   arglist. must not be used for non-proc-like classes. #[#here.9]
 

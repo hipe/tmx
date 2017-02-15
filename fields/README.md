@@ -71,7 +71,7 @@ feature summary:
 
 ### 4. brazen entities / properties
 
-"[br] entities" [#br-001] was the first such effort that was supposed to
+"entities" [#034]  (born in [br]) was the first such effort that was supposed to
 be the last. distinct from its forebears was the (at the time) new
 concept of "edit sessions" through which we would process "iambic" [#033]
 streams of notation. this was a solution to the problem of

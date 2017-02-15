@@ -96,6 +96,5 @@ module Skylab::Fields
     end
 
     Here_ = self
-    STOP_PARSING_ = false
   end
 end

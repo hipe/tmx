@@ -12,7 +12,7 @@ module Skylab::TestSupport::TestSupport
       # #needs-invite
       call :tree, :list_files, :path, 'xx'
       expect :error, :expression, :ambiguous do |msgs|
-        expect_these_lines_in_array_ msgs do |y|
+        expect_these_lines_in_array msgs do |y|
           y << "both 'tree' and 'list_files' transition to 'finished'"
           y << "so you can't have both of them at the same time."
         end
@@ -38,7 +38,7 @@ module Skylab::TestSupport::TestSupport
             st.to_a
           end
 
-          expect_these_lines_in_array_ _these do |y|
+          expect_these_lines_in_array _these do |y|
             y << "kniff/knaff"
             y << " ├zingo"
             y << " │ ├bongo"

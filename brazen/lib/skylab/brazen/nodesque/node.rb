@@ -147,9 +147,11 @@ module Skylab::Brazen
 
     ## ~~ writers ( & related )
 
-    define_method :process_argument_scanner_fully, PPSF_METHOD_
+    Require_fields_lib_[]
+
+    define_method :process_argument_scanner_fully, Field_::DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_FULLY
     ppsp = :process_argument_scanner_passively
-    define_method ppsp, PPSP_METHOD_
+    define_method ppsp, Field_::DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_PARTIALLY
     private ppsp
 
     def receive_missing_required_properties_event ev
@@ -169,12 +171,14 @@ module Skylab::Brazen
 
         _what = entity_enhancement_module
 
-        o = Home_::Entity::Session.new
+        Entity_lib_[].call_by do |o|
+          # -
         o.arglist = x_a
         o.client = self
         o.extmod = _what
         o.block = edit_p
-        o.execute
+          # -
+        end
       end
     end
 

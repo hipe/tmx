@@ -1,6 +1,12 @@
-module Skylab::Zerk
+self._NEVER_LOADED__readme__
 
-  module API
+# the asset contents (i.e code) of this node became so small that having
+# its own file was no longer justified; but in such cases we keep these
+# files around both for continuity with a possible future where the file
+# is again needed, and to hold this note. what follows is the original
+# comment explaining the node.
+
+begin ; begin ; begin
 
     # attempt to realize a zerk-compatible [ac] ACS as an "API", so that
     # its underlying operations can be invoked directly without needing to
@@ -14,37 +20,6 @@ module Skylab::Zerk
     #
     # (more notes would go in [#002])
 
-    class << self
-
-      def call args, acs, & pp
-
-        Require_ACS_[]
-
-        if ! pp
-          pp = ACS_.handler_builder_for acs
-        end
-
-        o = Here_::Invocation___.new args, acs, & pp
-        bc = o.execute
-        if bc
-          bc.receiver.send bc.method_name, * bc.args, & bc.block
-        else
-          bc
-        end
-      end
-    end  # >>
-
-    # -
-
-    Autoloader_[ self ]
-
-    lazily :ParseArguments_via_FeaturesInjections do
-      # a convenience alias so the remote doesn't have to know where it is
-      No_deps_zerk_[]::ParseArguments_via_FeaturesInjections
     end
-
-    # -
-
-    Here_ = self
   end
 end

@@ -1,20 +1,22 @@
 require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - meta-meta-properties - default" do
 
-  describe "[br] entity - meta-meta-properties - 1. default" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     context "uses an event hook" do
 
-      before :all do
+      shared_subject :_subject_class do
 
-        class MMD_Foo
+        class X_e_mmp_d_One
 
           attr_reader :foo, :bar, :baz
 
-          Subject_[].call self, :polymorphic_writer_method_name_suffix, :"=" do
+          Entity.lib.call self, :polymorphic_writer_method_name_suffix, :"=" do
 
             o :default, 22,
               :meta_property, :importance,
@@ -36,14 +38,23 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
             end
 
           end
+
+          self
         end
       end
 
+      it "(builds)" do
+        _subject_class || fail
+      end
+
       it "ok" do
-        a = MMD_Foo.properties.each_value.to_a
+        a = _subject_class.properties.each_value.to_a
         a.map( & :name_symbol ).should eql [ :foo, :bar, :baz ]
         a.map( & :importance ).should eql [ 10, 20, 22 ]
       end
     end
+
+    # ==
+    # ==
   end
 end

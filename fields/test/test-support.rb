@@ -107,6 +107,7 @@ module Skylab::Fields::TestSupport
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
+  KEEP_PARSING_ = true
   Lazy_ = Home_::Lazy_
   NIL_ = nil
   TS_ = self

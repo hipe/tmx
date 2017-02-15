@@ -1,18 +1,20 @@
 require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity meta-properties examples: flag." do
 
-  describe "[br] entity meta-properties examples: flag." do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     # implement a flag-like property...
 
     # ( the only context ) ->
 
-      before :all do
+      shared_subject :_subject_module do
 
-        MPEF_Entity = Subject_[].call do
+        X_e_mp_Entity = Entity.lib.call do
 
           class self::Property < Home_::Entity::Property
 
@@ -29,21 +31,21 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
           end
         end
 
-        class MPEF_Business_Widget
+        class X_e_mp_Business_Widget
 
           attr_reader :hi, :hey
 
-          MPEF_Entity.call self,
+          X_e_mp_Entity.call self,
 
             :florg, :property, :hi,
             :property, :hey
 
-          Enhance_for_test_[ self ]
+          Entity::Enhance_for_test[ self ]
         end
       end
 
       it "add and write to fields to your property in the classic way" do
-        hi, hey = MPEF_Business_Widget.properties.each_value.to_a
+        hi, hey = _subject_module.properties.each_value.to_a
         hi.is_florg.should eql true
         hey.is_florg.should eql false
       end
@@ -52,7 +54,7 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
         kp = nil
 
-        o = MPEF_Business_Widget.new do
+        o = _subject_module.new do
           kp = process_fully_for_test_ :hi, :hey, :ho
         end
 

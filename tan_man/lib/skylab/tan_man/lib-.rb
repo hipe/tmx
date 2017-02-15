@@ -17,7 +17,7 @@ module Skylab::TanMan
     end
 
     Entity = -> do
-      Brazen_::Entity
+      Fields[]::Entity
     end
 
     Fields = sidesys[ :Fields ]

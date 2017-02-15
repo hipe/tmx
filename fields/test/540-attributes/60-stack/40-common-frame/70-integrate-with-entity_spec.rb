@@ -13,7 +13,7 @@ module Skylab::Fields::TestSupport
           :readable, :field, :foo,
           :required, :readable, :field, :bar
 
-        Home_.lib_.brazen::Entity.call self do
+        Home_::Entity.call self do
           def biz
             @biz_x = gets_one_polymorphic_value
             true

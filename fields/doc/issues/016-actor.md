@@ -50,7 +50,7 @@ focus.
 ## the actor's external interface, theory and practice
 
 every actor's external invocation interface is intentionally a subset of
-[#br-001] the way we interact with entites.
+the way we interact with [#034] entites.
 
 (#todo talk about building vs. calling, maybe between actors v.s
 entities. this space is evolving presently, specifically we don't know
@@ -147,7 +147,7 @@ see [#001] the comprehensive list of libraries like this.
 
 here is how it compares:
 
- + unlike [#br-001] the entity library, actors do not currently (and
+ + unlike [#034] the entity library, actors do not currently (and
    probably never will) support meta-properties (like `required` and so
    on). actors embody an intentional simplification of entities.
 

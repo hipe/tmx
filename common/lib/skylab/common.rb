@@ -1151,8 +1151,19 @@ module Skylab::Common
 
       alias_method :call, :[]
 
-      def const_reduce * a, & p
-        Here_::ConstReduction__.new( a, File_tree_cache___, & p ).execute
+      def const_reduce cp, fm, & p
+        const_reduce_by do |o|
+          o.from_module = fm
+          o.const_path = cp
+          o.receive_name_error_by = p
+        end
+      end
+
+      def const_reduce_by
+        Here_::Value_via_ConstPath.call_by do |o|
+          yield o
+          o.file_tree_cache_by = File_tree_cache__
+        end
       end
 
       # --
@@ -1422,7 +1433,7 @@ module Skylab::Common
 
       def entry_tree
         kn = ( @____file_tree_knownness ||= begin
-          Knownish__[ Here_::FileTree_::Via_module.new( self, File_tree_cache___ ).execute ]
+          Knownish__[ Here_::FileTree_::Via_module.new( self, File_tree_cache__ ).execute ]
         end )
         kn.value_x if kn.is_known_known
       end
@@ -1441,7 +1452,7 @@ module Skylab::Common
       end
     end
 
-    File_tree_cache___ = Lazy_.call do
+    File_tree_cache__ = Lazy_.call do
       Here_::FileTree_::Cache[ ::Dir ]
     end
 

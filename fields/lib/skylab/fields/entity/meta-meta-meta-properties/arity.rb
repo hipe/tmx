@@ -1,6 +1,6 @@
-module Skylab::Brazen
+module Skylab::Fields
 
-  class Entity::Meta_Meta_Meta_Properties::Arity < ::Module
+  class Entity::MetaMetaMetaProperties::Arity < ::Module
 
     # (the spec provides comprehensive documentation and 100% coverage)
 
@@ -28,7 +28,7 @@ module Skylab::Brazen
     public
 
       def new lo, hi
-        Arity_.new lo, hi
+        This_.new lo, hi
       end
 
       def each
@@ -104,7 +104,7 @@ module Skylab::Brazen
   private
     def bld_lnn
       n = name
-      n[ n.rindex( CONST_SEP_ ) + 2 .. -1 ].downcase.intern
+      n[ n.rindex( Entity::CONST_SEP_ ) + 2 .. -1 ].downcase.intern
     end
   public
 
@@ -112,6 +112,6 @@ module Skylab::Brazen
       @begin <= d and @end.nil? || @end >= d
     end
 
-    Arity_ = self
+    This_ = self
   end
 end

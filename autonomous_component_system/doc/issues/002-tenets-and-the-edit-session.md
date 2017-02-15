@@ -86,7 +86,7 @@ violoation of which should occur only with good reason.
 
 
 
-## how it is better (or worse) than [#br-001] entities?
+## how it is better (or worse) than [#fi-034] entities?
 
 • no subclassing or mixin modules or load-time DSL's -
 

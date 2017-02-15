@@ -11,12 +11,13 @@ module Skylab::CodeMetrics
         def add_additional_properties * x_a
 
           empty_module  = ::Module.new
-          sess = Brazen_::Entity::Session.new
+
+          Home_.lib_.fields::Entity.call_by do |sess|
           sess.arglist = x_a
           sess.block = nil
           sess.client = empty_module
           sess.extmod = @extmod
-          sess.execute
+          end
 
           foz = empty_module.properties
 

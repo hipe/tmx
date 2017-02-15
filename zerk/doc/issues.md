@@ -119,8 +119,13 @@
 [#029]       introducing isomorphic interfaces ..
 [#028]       in-situ
 [#027]       formal parameter sharing ..
-[#026]       API-choice for niCLI - emitting one or more `error` during
-             during operation means your result will be disreagarded.
+
+[#026]
+             [#here.2]: API-choice for niCLI - emitting one or more `error`
+             during during operation means your result will be disreagarded.
+
+             [#here.1]: under API, `true`/`false` are now reserved for
+             meaningful boolean.
 
 [#025]       the result shape of operations ..
 

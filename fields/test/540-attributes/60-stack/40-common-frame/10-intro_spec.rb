@@ -16,7 +16,7 @@ module Skylab::Fields::TestSupport
         class X_a_s_cf_Intro_A
           Home_::Attributes::Stack::CommonFrame.call self, :weirdness
         end
-      rescue ::Skylab::Brazen::ArgumentError => e
+      rescue Home_::ArgumentError => e
       end
 
       e.message.should match _rx
@@ -44,9 +44,9 @@ module Skylab::Fields::TestSupport
 
       it "we have full reflection on these properties" do
 
-        prop = X_a_s_cf_Intro_B.properties.fetch :foo_diddle
-        prop.reader_classification.should eql :method
-        prop.parameter_arity.should eql :zero_or_one
+        prp = X_a_s_cf_Intro_B.properties.fetch :foo_diddle
+        prp.reader_classification.should eql :method
+        prp.parameter_arity.should eql :zero_or_one
 
       end
 
@@ -57,7 +57,7 @@ module Skylab::Fields::TestSupport
       end
     end
 
-    context "`prop` macro (not memoized)" do
+    context "`proc` macro (not memoized)" do
 
       before :all do
 

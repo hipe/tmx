@@ -102,10 +102,10 @@ module Skylab::TMX
         end
         if @args.no_unparsed_exists
           _when_no_arguments
-        elsif _parse_operator_softly
+        elsif _scan_operator_symbol_softly
           lu = @omni.flush_to_lookup_operator
           lu and __bound_call_via_found_operator lu
-        elsif _parse_primary_softly
+        elsif _scan_primary_symbol_softly
           __when_primary_at_head
         else
           _fail_about_unknown_primary_or_operator
@@ -122,7 +122,7 @@ module Skylab::TMX
           _when_no_arguments  # assume parsed -v but no -h
         elsif @_do_dispatch_help
           # assume nonempty argument scanner
-          if _parse_operator_softly
+          if _scan_operator_symbol_softly
             lu = @omni.flush_to_lookup_operator
             lu and __bound_call_via_found_operator_when_dispatch_help lu
           else
@@ -211,12 +211,12 @@ module Skylab::TMX
         end
       end
 
-      def _parse_operator_softly
-        @args.parse_operator_softly
+      def _scan_operator_symbol_softly
+        @args.scan_operator_symbol_softly
       end
 
-      def _parse_primary_softly
-        @args.parse_primary_softly
+      def _scan_primary_symbol_softly
+        @args.scan_primary_symbol_softly
       end
 
       OPERATOR_DESCRIPTIONS = {

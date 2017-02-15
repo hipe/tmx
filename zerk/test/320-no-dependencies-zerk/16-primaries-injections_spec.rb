@@ -143,7 +143,7 @@ module Skylab::Zerk::TestSupport
 
     def _flush_parsation log=nil
       omni = produce_omni_
-      _x = omni.parse_primary_softly
+      _x = omni.scan_primary_symbol_softly
       parsation_via_ _x, omni, log
     end
 

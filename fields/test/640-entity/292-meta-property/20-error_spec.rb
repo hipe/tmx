@@ -1,16 +1,18 @@
-require_relative '../../../test-support'
+require_relative '../../test-support'
 
-Skylab::Brazen::TestSupport.lib_( :entity ).require_common_sandbox
+module Skylab::Fields::TestSupport
 
-module Skylab::Brazen::TestSupport::Entity_Sandbox
+  describe "[fi] entity - concerns - meta-property - errors" do
 
-  describe "[br] entity - concerns - meta-property - errors" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :entity
 
     context "there are times when given the syntax you create" do
 
-      before :all do
+      shared_subject :_extension_module do
 
-        MPE_Extmod = Subject_[].call do
+        X_e_mp_e_Extmod = Entity.lib.call do
 
           o :meta_property, :aruty
 
@@ -21,9 +23,11 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
 
         it "in `[]`" do
 
+          _extension_module
+
           begin
-            class MPE_EOI
-              MPE_Extmod[ self, :aruty, :whatever ]
+            class X_e_mp_e_EOI
+              X_e_mp_e_Extmod[ self, :aruty, :whatever ]
             end
           rescue Home_::ArgumentError => e
           end
@@ -32,9 +36,12 @@ module Skylab::Brazen::TestSupport::Entity_Sandbox
         end
 
         it "in 'o'" do
+
+          _extension_module
+
           begin
-            class MPE_EOI_B
-              MPE_Extmod.call self do
+            class X_e_mp_e_EOI_B
+              X_e_mp_e_Extmod.call self do
                 o :aruty, :whatever
               end
             end

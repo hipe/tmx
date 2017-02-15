@@ -130,7 +130,7 @@ module Skylab::Zerk::TestSupport
 
     def _flush_parsation log=nil
       omni = dup_and_mutate_omni_
-      _x = omni.parse_operator_softly
+      _x = omni.scan_operator_symbol_softly
       parsation_via_ _x, omni, log
     end
 

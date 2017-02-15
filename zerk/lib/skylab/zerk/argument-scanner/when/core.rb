@@ -234,7 +234,7 @@ module Skylab::Zerk
 
         def execute
           me = self
-          @listener.call :error, :expression, :parse_error do |y|
+          @listener.call :error, :expression, :parse_error, :no_arguments do |y|
             me.for( y, self ).__express_splay_of_available_features
           end
           UNABLE_

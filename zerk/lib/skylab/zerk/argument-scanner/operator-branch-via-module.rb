@@ -2,7 +2,7 @@ module Skylab::Zerk
 
   module ArgumentScanner
 
-    class OperatorBranch_VIA_MODULE  # :[#051.B]
+    class OperatorBranch_VIA_MODULE < Common_::SimpleModel  # :[#051.B]
 
       # NOTE this is not covered, hence the scream-case. this is being
       # bleeding-edged by [tab].
@@ -22,19 +22,22 @@ module Skylab::Zerk
       #   - [#051.C] (for autoloaderized modules) and
       #   - [#051.G] (for directories thru filesystem directly; no autoloading)
 
-      class << self
-        alias_method :define, :new
-        undef_method :new
-      end  # >>
-
       # -
 
-        def initialize mod
+        def initialize
 
           @_custom_emitter = nil
-          @_index = Index___.new mod
+          @load_ticket_by = nil
 
           yield self
+
+          bm = remove_instance_variable :@module  # branch module
+          @load_ticket_by ||= -> const do
+            LoadTicket___.new const, bm
+          end
+
+          @_index = Index___.new( bm,
+            remove_instance_variable( :@load_ticket_by ) )
 
           ce = remove_instance_variable :@_custom_emitter
           if ce
@@ -46,6 +49,8 @@ module Skylab::Zerk
 
           freeze
         end
+
+        # -- totally optional
 
         def channel_for_unknown_by & p
           _maybe_customize p, :channel_for_unknown_by=
@@ -62,6 +67,13 @@ module Skylab::Zerk
             NIL
           end
         end
+
+        # --
+
+        attr_writer(
+          :load_ticket_by,
+          :module,
+        )
 
         # -- read
 
@@ -89,13 +101,13 @@ module Skylab::Zerk
 
       class Index___
 
-        def initialize mod
+        def initialize mod, load_ticket_by
 
           bx = Common_::Box.new
 
           mod.constants.each do |const|
-            item = LoadTicket___.new const, mod
-            bx.add item.normal_symbol, item
+            item = load_ticket_by[ const ]
+            bx.add item.name_symbol, item
           end
 
           @_box = bx
@@ -156,7 +168,7 @@ module Skylab::Zerk
           @__value
         end
 
-        def normal_symbol
+        def name_symbol
           @_name.as_lowercase_with_underscores_symbol
         end
       end

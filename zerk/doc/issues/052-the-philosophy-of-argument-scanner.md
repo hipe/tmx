@@ -69,7 +69,7 @@ in various ways for years) is to meet these design objectives:
 (new for [cm], needs to be more evenly integrated into the docs..)
 
 
-### the `parse_primary` method
+### the `scan_primary_symbol` method
 
   - assume some unparsed exists
 
@@ -105,9 +105,9 @@ details/corollaries:
 
 
 
-#### why does `parse_primary` advance the scanner?
+#### why does `scan_primary_symbol` advance the scanner?
 
-as an implied byproduct of `parse_primary` having produced a `true`
+as an implied byproduct of `scan_primary_symbol` having produced a `true`
 result, the subject (not client) will have advanced the scanner head
 just *past* the relevant token (where applicable). why we keep
 saying "where applicable" is explained here:

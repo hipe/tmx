@@ -1,4 +1,4 @@
-module Skylab::Brazen
+module Skylab::Fields
 
   class Entity::Inflection
 

@@ -1,47 +1,83 @@
-module Skylab::Brazen::TestSupport
+module Skylab::Fields::TestSupport
 
   module Entity
 
+    # (this is mostly used for its constants)
+
     class << self
-      def require_common_sandbox
-        # (currently it is defined by having loaded this support file)
-        NIL_
+
+      def [] tcc
+        tcc.include self
+      end
+
+      def lib
+
+        # this method is how we reach the asset node from within artifact
+        # modules in tests. reaching it in this way:
+        #
+        #   - insulates us from name/location change
+        #
+        #   - does not require the toplevel test support node to know us
+
+        Home_::Entity
       end
     end  # >>
-  end
 
-  module Entity_Sandbox
+    # -
 
-    TestSupport_::Quickie.
-      enhance_test_support_module_with_the_method_called_describe self
+      def subject_library_
+        Home_::Entity
+      end
+    # -
 
-    # -- Functions
+    # == enhancer functions
 
-    # <-
-  Add_common_methods_ = -> mod do
+    Define_common_initialize_and_with = -> mod do
 
-    mod.send :define_method, :initialize do | & edit_p |
-      instance_exec( & edit_p )
+      mod.send :define_method, :initialize, DEFINITION_FOR_THE_METHOD_CALLED_INITIALIZE__
+
+      mod.send :define_singleton_method, :with, DEFINITION_FOR_THE_METHOD_CALLED_WITH
+
+      mod
     end
 
-    mod.send :define_singleton_method, :with, WITH_MODULE_METHOD_
-
-    NIL_
-  end
-  # ->
-
-    Subject_ = -> do
-      Home_::Entity
+    Enhance_for_test = -> mod do
+      mod.send :define_singleton_method, :with, DEFINITION_FOR_THE_METHOD_CALLED_WITH
+      mod.include TestInstanceMethods
+      mod
     end
 
-    # -- Constants (we do X=X because [#ts-044])
+    # == method definitions
 
-    Common_ = Common_
-    Enhance_for_test_ = Enhance_for_test_
-    Home_ = Home_
-    KEEP_PARSING_ = Home_::KEEP_PARSING_
-    Test_Instance_Methods_ = Test_Instance_Methods_
-    TS_ = self
-    WITH_MODULE_METHOD_ = WITH_MODULE_METHOD_
+    DEFINITION_FOR_THE_METHOD_CALLED_WITH = -> * x_a do
+      ok = nil
+      x = new do
+        ok = process_argument_scanner_fully(
+          Common_::Scanner.via_array x_a )
+      end
+      ok && x
+    end
+
+    DEFINITION_FOR_THE_METHOD_CALLED_INITIALIZE__ = -> & p do
+      instance_exec( & p )
+    end
+
+    # == modules
+
+    module TestInstanceMethods
+
+      define_method :initialize, DEFINITION_FOR_THE_METHOD_CALLED_INITIALIZE__
+
+      def process_fully_for_test_ * x_a
+
+        _scn = Common_::Scanner.via_array x_a
+
+        process_argument_scanner_fully _scn
+      end
+    end
+
+    # ==
+    # ==
   end
 end
+# #history: full rewrite: no more sandbox module.

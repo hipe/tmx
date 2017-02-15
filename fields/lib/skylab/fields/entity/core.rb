@@ -1,71 +1,69 @@
-module Skylab::Brazen
+module Skylab::Fields
 
   module Entity  # [#001]
 
     class << self
 
-      def call * a, & edit_p
-        _call_via_arglist a, & edit_p
+      def call * a, & p
+        _call_via_arglist p, a
       end
 
-      def [] * a, & edit_p
-        _call_via_arglist a, & edit_p
+      def [] * a, & p
+        _call_via_arglist p, a
       end
 
-      def _call_via_arglist a, & edit_p
+      def _call_via_arglist p, a
+        call_by do |o|
+          o.arglist = a
+          o.block = p
+        end
+      end
 
-        o = Session.new
-        o.arglist = a
-        o.block = edit_p
-        o.execute
+      def call_by & p
+        Session.call_by( & p )
       end
     end  # >>
 
     EXTMOD_CALL_METHOD__ = -> * x_a, & edit_p do
 
-      o = Session.new
+      Session.call_by do |o|
       o.arglist = x_a
       o.block = edit_p
       o.extmod = self
-      o.execute
+      end
     end
 
     EEC_METHOD__ = -> * a, & edit_p do
 
-      o = Session.new
+      Session.call_by do |o|
       o.client = self
       o.arglist = a
       o.block = edit_p
-      o.execute
+      end
     end
 
     Edit_client_class_via_argument_scanner_over_extmod = -> (
       cls, st, extmod
     ) do
 
-      o = Session.new
+      Session.call_by do |o|
       o.block = NIL_
       o.client = cls
       o.extmod = extmod
       o.upstream = st
-      o.execute
+      end
     end
 
     Apply_entity = -> extmod, arglist, & edit_p do
 
-      o = Session.new
+      Session.call_by do |o|
       o.arglist = arglist
       o.block = edit_p
       o.extmod = extmod
-      o.execute
+      end
     end
 
-    Require_fields_lib_[]  # the only place where we do this statically?
-
-    class Session
-
-      attr_reader :client, :upstream
-      alias_method :downstream, :client  # for now
+    class Session < Common_::MagneticBySimpleModel
 
       def initialize
 
@@ -82,6 +80,7 @@ module Skylab::Brazen
         ]
 
         @_writer_rx = nil
+        yield self
       end
 
       def arglist= x_a
@@ -96,6 +95,8 @@ module Skylab::Brazen
         :upstream,
       )
 
+      # (this class is too large. readers are wayy down #here)
+
       def execute  # assume upstream and block
 
         if @upstream.unparsed_exists
@@ -109,7 +110,7 @@ module Skylab::Brazen
           if @block
             __when_block_only
           else
-            Entity_
+            Here_
           end
         end
       end
@@ -335,13 +336,13 @@ module Skylab::Brazen
             end
 
             if ! private_method_defined? ppsf
-              define_method ppsf, PPSF_METHOD_
+              define_method ppsf, DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_FULLY
             end
 
           private
 
             if ! private_method_defined? ppsp
-              define_method ppsp, PPSP_METHOD_
+              define_method ppsp, DEFINITION_FOR_THE_METHOD_CALLED_PROCESS_POLYMORPHIC_STREAM_PARTIALLY
             end
 
             if ! private_method_defined? gopv
@@ -439,7 +440,7 @@ module Skylab::Brazen
 
             -> do
 
-              ahp ||= ( @___ahp ||= Concerns_::Ad_Hoc::Processors.new self )
+              ahp ||= ( @___ahp ||= Here_::AdHocProcessor_::Processors.new self )
 
               d_ = st.current_index
               kp_ = ahp.consume_passively
@@ -506,7 +507,7 @@ module Skylab::Brazen
 
         ahpp = @_ad_hoc_processor_processor
         if ! ahpp
-          ahpp = Concerns_::Ad_Hoc::Processor_Processor.new self
+          ahpp = Here_::AdHocProcessor_::ProcessorProcessor.new self
           @_ad_hoc_processor_processor = ahpp
         end
         ahpp.consume
@@ -666,7 +667,7 @@ module Skylab::Brazen
 
         cls = property_class
         if cls.const_defined? METAPROPERTIES_WITH_HOOKS_
-          @_prop_normalizer = Concerns_::Meta_Property::Property_Normalizer.new self
+          @_prop_normalizer = Here_::MetaProperty::PropertyNormalizer.new self
         else
           @_prop_normalizer = false
         end
@@ -711,7 +712,7 @@ module Skylab::Brazen
 
       def __receive_meta_property prp
 
-        ( @___mpp ||= Concerns_::Meta_Property::Processor.new self ) << prp
+        ( @___mpp ||= Here_::MetaProperty::Processor.new self ) << prp
 
         KEEP_PARSING_
       end
@@ -726,10 +727,17 @@ module Skylab::Brazen
       end
 
       def __say_floating
-        _s = Concerns_::Property::Prop_desc_wonderhack[
-          Home_::API.expression_agent_instance, @_floating ]
+
+        _s = Here_::Moniker_via_Property[ @_floating ]
+
         "property or metaproperty never received a name - #{ _s }"
       end
+
+      attr_reader(  # :#here
+        :client,
+        :upstream,
+      )
+      alias_method :downstream, :client  # for now
     end
 
     # ~ module methods (some)
@@ -1011,7 +1019,7 @@ module Skylab::Brazen
       end
     end
 
-    class Property  # < Home_.lib_.fields::SimplifiedName (no reason to)
+    class Property  # < Home_::SimplifiedName (no reason to)
 
       class << self
 
@@ -1053,7 +1061,7 @@ module Skylab::Brazen
         freeze
       end
 
-      include Home_.lib_.fields::Attributes::Actor::InstanceMethods
+      include Home_::Attributes::Actor::InstanceMethods
 
       # ~ description (for [#ca-010])
 
@@ -1072,8 +1080,7 @@ module Skylab::Brazen
             code nm.as_variegated_symbol
           end
         else
-          Concerns_::Property::Prop_desc_wonderhack[
-            expag, self ]
+          Here_::Moniker_via_Property[ expag, self ]
         end
       end
 
@@ -1116,12 +1123,12 @@ module Skylab::Brazen
 
       def normalize_qualified_knownness qkn, & x_p  # :+[#ba-027] assume some normalizer (for now)
 
-        Home_.lib_.fields::Attributes::Normalization_Against_Model[ qkn, self, & x_p ]
+        Home_::Attributes::Normalization_Against_Model[ qkn, self, & x_p ]
       end
 
       def is_normalizable__
 
-        if Field_::Has_default[ self ]
+        if Has_default[ self ]
           ACHIEVED_
         elsif ad_hoc_normalizer_box
           ACHIEVED_
@@ -1225,7 +1232,7 @@ module Skylab::Brazen
         @enum_box = bx.freeze
 
         _touch_AHN_box.touch :__enum__ do
-          Home_.lib_.fields::MetaAttributes::Enum::Normalize_via_qualified_known
+          Home_::MetaAttributes::Enum::Normalize_via_qualified_known
         end
 
         KEEP_PARSING_
@@ -1262,7 +1269,7 @@ module Skylab::Brazen
 
         # (for better regressions we load this late)
 
-        x = Entity_::Meta_Meta_Meta_Properties::Arity::Space.create do
+        x = Here_::MetaMetaMetaProperties::Arity::Space.create do
           self::ZERO_OR_ONE = new 0, 1
           self::ONE = new 1, 1
         end
@@ -1340,10 +1347,14 @@ module Skylab::Brazen
       )
     end
 
-    Autoloader_[ Concerns_ = ::Module.new ]
-    Entity_ = self
+    # ==
+
+    CONST_SEP_ = Common_::CONST_SEPARATOR
+    Here_ = self
     METAPROPERTIES_WITH_HOOKS_ = :METAPROPERTIES_WITH_HOOKS___
 
+    # ==
   end
 end
+# #tombstone-B: re-housed from [br] to [fi]
 # :+#tombsone: class for #note-185 self-adapting syntax

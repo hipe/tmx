@@ -82,14 +82,41 @@ module Skylab::Zerk  # intro in [#001] README
   Autoloader_ = Common_::Autoloader
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
-  module Invocation_
+  module API  # (description in placeholder file)
+    class << self
+      def call args, acs, & pp
+        Require_ACS_[]
+        pp ||= ACS_.handler_builder_for acs
+        o = Here_::Invocation___.new args, acs, & pp
+        bc = o.execute
+        bc and bc.receiver.send bc.method_name, * bc.args, & bc.block
+      end
+    end  # >>
     Autoloader_[ self ]
     Here_ = self
   end
 
-  lazily :MicroserviceToolkit do
-    # (currently the one is aliased to the other)
-    Home_::API
+  module MicroserviceToolkit  # (attempt to stitch together old and new semi-hiddenly)
+
+    Autoloader_[ self ]
+
+    lazily :ParseArguments_via_FeaturesInjections do
+      # a convenience alias so the remote doesn't have to know where it is
+      No_deps_zerk_[]::ParseArguments_via_FeaturesInjections
+    end
+
+    lazily :ModelCentricOperatorsBranch do
+      Home_.lib_.brazen::Actionesque::Produce_Bound_Call::ModelCentricOperatorsBranch
+    end
+
+    lazily :API_ArgumentScanner do
+      No_deps_zerk_[]::API_ArgumentScanner
+    end
+  end
+
+  module Invocation_
+    Autoloader_[ self ]
+    Here_ = self
   end
 
   lazily :MagneticBySimpleModel do

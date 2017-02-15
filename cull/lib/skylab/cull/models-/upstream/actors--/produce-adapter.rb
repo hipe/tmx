@@ -169,7 +169,7 @@ module Skylab::Cull
       end
 
       def __class_via_const_guess x
-        Autoloader_.const_reduce( x, Here_::Adapters__ ) do  end
+        Autoloader_.const_reduce( x, Here_::Adapters__ ) { NOTHING_ }
       end
 
       def when_bad_extension extname

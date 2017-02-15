@@ -87,7 +87,7 @@ module Skylab::Zerk
         else
           # (strange - probably a holdover from when we had old toplevel names)
           _ = Autoloader_.const_reduce [ const ], mod
-          _
+          _  # hi. #todo
         end
       end
 

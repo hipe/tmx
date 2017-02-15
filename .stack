@@ -13,3 +13,12 @@ use [sa] to convert etc to Stream_
 [#tmx-019] get fuzzy out of multimode scanner
 (eventpoint event can go away to somewhere)
 [ze] Expresser needs slight cleanup, should be simple model
+(-4 cleanup the items between this one and -3)
+-5 [br] is renovated when it is only datastore adapteres and the example app
+-6 [cs] have fun figuring out what to do with isomorpic methods client
+-7 also: decide if entity library is deprecated (#open [#fi-034.1])
+-17 down to -7 (11 items): [ta],[gv],[cu],[cm],[gi],[f2],[bs],[tr],[sl],[st],[co]
+-18.333 down to -18.001: [sg] all CLI down to finish
+explain MTk and associate the explanation with its nodes
+-18.666 down to -18.334: [sg] all API etc
+-18.833: break out entity into its own library, flush incidentals
