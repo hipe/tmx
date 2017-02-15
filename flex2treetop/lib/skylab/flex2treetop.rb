@@ -390,16 +390,11 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
     sidesys = Autoloader_.build_require_sidesystem_proc
     vendor = Autoloader_.build_require_stdlib_proc
 
-    Basic = sidesys[ :Basic ]
-    Fields = sidesys[ :Fields ]
-
     # = sidesys[ :Brazen ]  # for [sl]
 
     IO = -> do
       System[]::IO
     end
-
-    Option_parser = -> { require 'optparse' ; ::OptionParser }
 
     PP = -> do
       require 'pp' ; ::PP
@@ -418,14 +413,15 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
       Basic[]::String
     end
 
-    String_scanner = -> { require 'strscan' ; ::StringScanner }
-
     System = -> do
       System_lib___[].services
     end
 
+    Basic = sidesys[ :Basic ]
+    Fields = sidesys[ :Fields ]
+    Option_parser = -> { require 'optparse' ; ::OptionParser }
+    String_scanner = -> { require 'strscan' ; ::StringScanner }
     System_lib___ = sidesys[ :System ]
-
     Treetop = vendor[ :Treetop ]
   end
 

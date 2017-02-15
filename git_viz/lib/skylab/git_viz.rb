@@ -14,10 +14,10 @@ module Skylab::GitViz
   end  # >>
 
   Common_ = ::Skylab::Common
-
   Autoloader_ = Common_::Autoloader
-
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
+
+  # --
 
   lazily :CLI do
 
@@ -93,6 +93,96 @@ module Skylab::GitViz
 
   # --
 
+  module Lib_  # :+[#ss-001]
+
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    define_singleton_method :_memoize, Common_::Memoize
+
+    gem = stdlib
+
+    # ~ universe modules, sidesystem facilities and short procs all as procs
+
+    _Hu = nil
+
+    Basic_Set = -> * a do
+      Basic[]::Set[ * a ]
+    end
+
+    Date_time = _memoize do
+      require 'date'
+      ::DateTime
+    end
+
+    Grit = _memoize do
+      require 'grit'
+      ::Grit
+    end
+
+    Local_normal_name_from_module = -> x do
+      Common_::Name.via_module( x ).as_lowercase_with_underscores_symbol
+    end
+
+    MD5 = _memoize do
+      require 'digest/md5'
+      ::Digest::MD5
+    end
+
+    NLP = -> do
+      _Hu[]::NLP
+    end
+
+    Mock_system_lib = -> do
+      Home_::Test_Lib_
+    end
+
+    Option_parser = _memoize do
+      require 'optparse'
+      ::OptionParser
+    end
+
+    Power_scanner = -> * x_a do
+      Common_::Scn.multi_step.new_via_iambic x_a
+    end
+
+    Shellwords = stdlib[ :Shellwords ]
+
+    Some_stderr_IO = -> do
+      System[].IO.some_stderr_IO
+    end
+
+    strange = Common_::Lazy.call do
+
+      o = Basic[]::String.via_mixed.dup
+      o.max_width = 120
+      o.to_proc
+    end
+
+    Strange = -> x do
+      strange[][ x ]
+    end
+
+    System = -> do
+      System_lib[].services
+    end
+
+    Brazen = sidesys[ :Brazen ]
+    Basic = sidesys[ :Basic ]  # was wall
+    Fields = sidesys[ :Fields ]
+    JSON = stdlib[ :JSON ]
+    Listen = gem[ :Listen ]
+    _Hu = sidesys[ :Human ]
+    Open3 = stdlib[ :Open3 ]
+    Plugin = sidesys[ :Plugin ]
+    Set = stdlib[ :Set ]
+    System_lib = sidesys[ :System ]
+    # ZMQ = memo[ -> do require 'ffi-rzmq' ; ::ZMQ end ]
+  end
+
+  # --
+
   ACHIEVED_ = true
   CONTINUE_ = nil
   DASH_ = '-'.freeze
@@ -109,5 +199,6 @@ module Skylab::GitViz
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 end
+# #double-tombstone: "wall" (for rbx) (was in "lib-.rb")
 # #tombstone - extensive task to build rbx
 # :#tombstone: [#005]:#this-node-looks-funny-because-it-is-multi-domain

@@ -210,13 +210,12 @@ module Skylab::Tabular
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Basic = sidesys[ :Basic ]
-
     String_scanner = Lazy_.call do
       require 'strscan'
       ::StringScanner
     end
 
+    Basic = sidesys[ :Basic ]
     Zerk = sidesys[ :Zerk ]
   end
 

@@ -138,15 +138,10 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
-  Stream_ = -> a, & p do
-    Common_::Stream.via_nonsparse_array a, & p
-  end
+  Common_ = ::Skylab::Common
+  Lazy_ = Common_::Lazy
 
   # --
-
-  Common_ = ::Skylab::Common
-
-  Lazy_ = Common_::Lazy
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
@@ -168,10 +163,81 @@ module Skylab::TestSupport  # :[#021].
     Home_.lib_.system.path_looks_relative path
   end
 
+  Stream_ = -> a, & p do
+    Common_::Stream.via_nonsparse_array a, & p
+  end
+
   Zerk_lib_ = Lazy_.call do
     x = Home_.lib_.zerk
     Zerk_ = x  # for those who know
     x
+  end
+
+  # --
+
+  module Library_
+
+    stdlib = Autoloader_.method :require_stdlib
+    gemlib = stdlib
+
+    o = { }
+
+    o[ :Adsf ] = gemlib
+    o[ :Benchmark ] = stdlib
+    o[ :Open3 ] = stdlib
+    o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Rack ] = gemlib
+    o[ :StringIO ] = stdlib
+    o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
+
+    def self.const_missing c
+      const_set c, H___.fetch( c )[ c ]
+    end
+    H___ = o.freeze
+
+    def self.touch * i_a
+      i_a.each do |i|
+        const_get i, false
+      end ; nil
+    end
+  end
+
+  # --
+
+  module Lib_
+
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc,
+    )
+
+    Match_test_dir_proc = -> do
+      mtdp = nil
+      -> do
+        mtdp ||= Home_.constant( :TEST_DIR_NAME_A ).method( :include? )
+      end
+    end.call
+
+    System = -> do
+      System_lib[].services
+    end
+
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Git = sidesys[ :Git ]
+    Human = sidesys[ :Human ]
+    Parse = sidesys[ :Parse ]  # only for 1 tree runner plugin (greenlist)
+    Permute = sidesys[ :Permute ]
+    Plugin = sidesys[ :Plugin ]
+    Stderr = -> { ::STDERR }  # [#001.E]: why access system resources this way
+    Stdout = -> { ::STDOUT }
+    Open3 = stdlib[ :Open3 ]
+    System_lib = sidesys[ :System ]
+    Tabular = sidesys[ :Tabular ]
+    Task = sidesys[ :Task ]
+    TMX = sidesys[ :TMX ]
+    Zerk = sidesys[ :Zerk ]
   end
 
   # --

@@ -60,10 +60,6 @@ module Skylab::BeautySalon
 
     sidesys, = Autoloader_.at :build_require_sidesystem_proc
 
-    Basic = sidesys[ :Basic ]
-
-    Brazen = sidesys[ :Brazen ]
-
     File_utils = Common_.memoize do
       require 'fileutils'
       ::FileUtils
@@ -72,8 +68,6 @@ module Skylab::BeautySalon
     List_scanner = -> x do
       Common_::Stream::Magnetics::MinimalStream_via[ x ]
     end
-
-    ST__ = sidesys[ :SubTree ]
 
     String_scanner = Common_.memoize do
       require 'strscan'
@@ -84,8 +78,6 @@ module Skylab::BeautySalon
       System_lib___[].services
     end
 
-    System_lib___ = sidesys[ :System ]
-
     Token_buffer = -> x, y do
       Basic[]::Token::Buffer.new x, y
     end
@@ -94,6 +86,10 @@ module Skylab::BeautySalon
       ST__[]::Tree
     end
 
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    ST__ = sidesys[ :SubTree ]
+    System_lib___ = sidesys[ :System ]
     Zerk = sidesys[ :Zerk ]
   end
 

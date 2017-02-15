@@ -347,13 +347,6 @@ module Skylab::SearchAndReplace
   module Lib_  # use this name per [sl] utilities
 
     sidesys = Autoloader_.build_require_sidesystem_proc
-
-    ACS = sidesys[ :Autonomous_Component_System ]
-    Basic = sidesys[ :Basic ]
-    Brazen = sidesys[ :Brazen ]
-    Fields = sidesys[ :Fields ]
-    Git = sidesys[ :Git ]
-
     Shellwords = -> do
       require 'shellwords'
       ::Shellwords
@@ -375,6 +368,11 @@ module Skylab::SearchAndReplace
       ::Dir.tmpdir
     end
 
+    ACS = sidesys[ :Autonomous_Component_System ]
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Git = sidesys[ :Git ]
     Zerk = sidesys[ :Zerk ]
   end
 

@@ -161,13 +161,6 @@ module Skylab::Zerk  # intro in [#001] README
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    ACS = sidesys[ :Autonomous_Component_System ]
-    Basic = sidesys[ :Basic ]
-    Brazen = sidesys[ :Brazen ]
-    Fields = sidesys[ :Fields ]
-    Human = sidesys[ :Human ]
-    Open_3 = stdlib[ :Open3 ]
-
     Stdlib_option_parser = Lazy_.call do
       require 'optparse'
       ::OptionParser
@@ -182,8 +175,13 @@ module Skylab::Zerk  # intro in [#001] README
       System_lib[].services
     end
 
+    ACS = sidesys[ :Autonomous_Component_System ]
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Human = sidesys[ :Human ]
+    Open_3 = stdlib[ :Open3 ]
     System_lib = sidesys[ :System ]
-
     Tabular = sidesys[ :Tabular ]
   end
 

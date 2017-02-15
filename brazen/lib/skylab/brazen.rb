@@ -177,16 +177,9 @@ module Skylab::Brazen
 
     define_singleton_method :_memoize, Common_::Lazy
 
-    The_ACS_lib = sidesys[ :Autonomous_Component_System ]
-    Basic = sidesys[ :Basic ]
-    Fields = sidesys[ :Fields ]
-    Human = sidesys[ :Human ]
-
     IO_lib = -> do
       System_lib[]::IO
     end
-
-    JSON = stdlib[ :JSON ]
 
     Module_lib = -> do
       Basic[]::Module
@@ -197,14 +190,6 @@ module Skylab::Brazen
       ::Net::HTTP
     end
 
-    Open_3 = stdlib[ :Open3 ]
-
-    Parse = sidesys[ :Parse ]
-
-    Pathname = stdlib[ :Pathname ]
-
-    Plugin = sidesys[ :Plugin ]
-
     Stdlib_option_parser = _memoize do
       require 'optparse'
       ::OptionParser
@@ -213,8 +198,6 @@ module Skylab::Brazen
     Strange = -> x do
       Basic[]::String.via_mixed x
     end
-
-    String_IO = stdlib[ :StringIO ]
 
     String_scanner = _memoize do
       require 'strscan'
@@ -225,12 +208,17 @@ module Skylab::Brazen
       System_lib[].services
     end
 
+    The_ACS_lib = sidesys[ :Autonomous_Component_System ]
+    Basic = sidesys[ :Basic ]
+    Fields = sidesys[ :Fields ]
+    Human = sidesys[ :Human ]
+    JSON = stdlib[ :JSON ]
+    Open_3 = stdlib[ :Open3 ]
+    Parse = sidesys[ :Parse ]
+    Pathname = stdlib[ :Pathname ]
+    Plugin = sidesys[ :Plugin ]
+    String_IO = stdlib[ :StringIO ]
     System_lib = sidesys[ :System ]
-
-    Two_streams = -> do
-      System[].IO.some_two_IOs
-    end
-
     Zerk = sidesys[ :Zerk ]
   end
 

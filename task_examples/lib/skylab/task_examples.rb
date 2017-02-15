@@ -14,13 +14,77 @@ module Skylab::TaskExamples
     end
   end  # >>
 
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+
+  # --
+
   Common_task_ = -> do
     Home_.lib_.task
   end
 
-  Common_ = ::Skylab::Common
+  # --
 
-  Autoloader_ = Common_::Autoloader
+  module Lib_
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    Home_dir_pn = -> do
+      System_lib___[].services.environment.any_home_directory_pathname
+    end
+
+    System = -> do
+      System_lib[].services
+    end
+
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Task = sidesys[ :Task ]
+    System_lib = sidesys[ :System ]
+  end
+
+  # --
+
+  module Library_  # :+[#su-001]
+
+    # #todo etc
+
+    class << self
+
+      cache = {}
+      define_method :o do | sym, & p |
+        cache[ sym ] = p
+      end
+
+      define_method :const_missing do | sym |
+        x = cache.fetch( sym ).call
+        const_set sym, x
+        x
+      end
+    end  # >>
+
+    o :FileUtils do
+      require 'fileutils'
+      ::FileUtils
+    end
+
+    o :Shellwords do
+      require 'shellwords'
+      ::Shellwords
+    end
+
+    o :StringIO do
+      require 'stringio'
+      ::StringIO
+    end
+
+    o :StringScanner do
+      require 'strscan'
+      ::StringScanner
+    end
+  end
+
+  # --
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 

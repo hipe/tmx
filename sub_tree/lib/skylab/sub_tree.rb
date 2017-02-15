@@ -2,11 +2,12 @@ require 'skylab/common'
 
 module Skylab::SubTree
 
-  Common_ = ::Skylab::Common
-
   def self.describe_into_under y, _
     y << "an umbrella node for varous operations on a filesystem tree"
   end
+
+  Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
 
   module API
 
@@ -30,7 +31,8 @@ module Skylab::SubTree
   class << self
 
     def lib_
-      @lib ||= Home_::Lib_::INSTANCE
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Lib_, self )
     end
   end  # >>
 
@@ -38,14 +40,50 @@ module Skylab::SubTree
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
-  Autoloader_ = Common_::Autoloader
-
   module Models_
 
     Autoloader_[ self, :boxxy ]
 
     stowaway :Directories, 'directories/actions/dirstat'
   end
+
+  # --
+
+  module Lib_
+
+    sidesys = Autoloader_.build_require_sidesystem_proc
+
+    _System_lib = nil
+
+    System = -> do
+      _System_lib[].services
+    end
+
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Human = sidesys[ :Human ]
+    _System_lib = sidesys[ :System ]
+    Zerk = sidesys[ :Zerk ]
+  end
+
+  module Library_
+
+    stdlib = Autoloader_.method :require_stdlib
+
+    o = {}
+    o[ :FileUtils ] = stdlib
+    o[ :Open3 ] = stdlib
+    o[ :Shellwords ] = stdlib
+    o[ :StringIO ] = stdlib
+    o[ :Time ] = stdlib
+
+    define_singleton_method :const_missing do |sym|
+      const_set sym, o.fetch( sym )[ sym ]
+    end
+  end
+
+  # --
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
@@ -66,5 +104,4 @@ module Skylab::SubTree
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze
 end
-
 # :+#tombstone: dedicated API node

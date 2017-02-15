@@ -6,7 +6,7 @@ module Skylab::Human  # :[#001].
 
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
-        self::Lib_, self )
+        Lib_, self )
     end
   end  # >>
 
@@ -46,6 +46,31 @@ module Skylab::Human  # :[#001].
   module NLP
     Autoloader_[ self ]
     NLP_ = self
+  end
+
+  # --
+
+  module Lib_
+
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    gemlib = stdlib
+
+    String_scanner = -> s do
+      require 'strscan'
+      ::StringScanner.new s
+    end
+
+    ACS = sidesys[ :Autonomous_Component_System ]
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Levenshtein = gemlib[ :Levenshtein ]
+    Parse = sidesys[ :Parse ]
+    Plugin = sidesys[ :Plugin ]
+    Task = sidesys[ :Task ]
   end
 
   # --

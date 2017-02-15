@@ -16,7 +16,8 @@ module Skylab::TanMan
     end )
 
     def lib_
-      @lib ||= Home_::Lib_::INSTANCE
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Lib_, self )
     end
 
     def name_function
@@ -62,6 +63,72 @@ module Skylab::TanMan
 
   Zerk_lib_ = Lazy_.call do
     Autoloader_.require_sidesystem :Zerk
+  end
+
+  # ==
+
+  module Lib_
+
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    # --
+
+    Dev_tmpdir_path = -> do
+      System[].defaults.dev_tmpdir_path
+    end
+
+    Ellipsify = -> s do
+      Basic[]::String.ellipsify s
+    end
+
+    Entity = -> do
+      Fields[]::Entity
+    end
+
+    Home_directory_pathname = -> do
+      System[].environment.any_home_directory_pathname
+    end
+
+    List_scanner = -> x do
+      Common_::Stream::Magnetics::MinimalStream_via[ x ]
+    end
+
+    Module_lib = -> do
+      Basic[]::Module
+    end
+
+    Some_stderr = -> do
+      System[].IO.some_stderr_IO
+    end
+
+    String_scanner = Common_.memoize do
+      require 'strscan'
+      ::StringScanner
+    end
+
+    System = -> do
+      System_lib___[].services
+    end
+
+    Tmpdir_stem = Common_.memoize do
+      'tm-production-cache'.freeze
+    end
+
+    # --
+
+    Basic = sidesys[ :Basic ]
+    # = sidesys[ :Brazen ]  # for [sl]
+    Fields = sidesys[ :Fields ]
+    File_utils = stdlib[ :FileUtils ]
+    Human = sidesys[ :Human ]
+    Parse_lib = sidesys[ :Parse ]
+    Pretty_print = stdlib[ :PP ]
+    String_IO = stdlib[ :StringIO ]
+    System_lib___ = sidesys[ :System ]
+    TT = stdlib[ :Treetop ]
+    # = sidesys[ :Zerk ]  # for [sl]
   end
 
   # ==

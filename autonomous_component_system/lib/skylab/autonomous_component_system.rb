@@ -594,17 +594,15 @@ module Skylab::Autonomous_Component_System  # notes in [#002]
         :build_require_sidesystem_proc,
         :build_require_stdlib_proc )
 
-      Basic = sidesys[ :Basic ]
-      Brazen = sidesys[ :Brazen ]
-      Fields = sidesys[ :Fields ]
-      Human = sidesys[ :Human ]
-
-      JSON = stdlib[ :JSON ]
-
       System = -> do
         System_lib[].services
       end
 
+      Basic = sidesys[ :Basic ]
+      Brazen = sidesys[ :Brazen ]
+      Fields = sidesys[ :Fields ]
+      Human = sidesys[ :Human ]
+      JSON = stdlib[ :JSON ]
       System_lib = sidesys[ :System ]
     end
 

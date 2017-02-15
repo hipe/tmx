@@ -78,6 +78,8 @@ module Skylab::Git
     Autoloader_[ self, :boxxy ]
   end
 
+  # --
+
   Lazy_ = Common_::Lazy
 
   Require_brazen_ = Lazy_.call do
@@ -93,7 +95,56 @@ module Skylab::Git
     Home_.lib_.zerk
   end
 
-  ProcLike_ = Common_::ProcLike
+  # --
+
+  module Lib_
+
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    FUC = -> do
+      System[].filesystem.file_utils_controller
+    end
+
+    Shellwords = -> do
+      require 'shellwords'
+      ::Shellwords
+    end
+
+    System = -> do
+      System_lib[].services
+    end
+
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Git_viz = sidesys[ :GitViz ]
+    Open_3 = stdlib[ :Open3 ]
+    Plugin = sidesys[ :Plugin ]
+    System_lib = sidesys[ :System ]
+    Time = Lazy_.call { require 'time' ; ::Time }  # for tests only
+    Zerk = sidesys[ :Zerk ]
+  end
+
+  # --
+
+  module Library_
+
+    stdlib, = Autoloader_.at :require_stdlib
+
+    o = { }
+    o[ :FileUtils ] = stdlib
+    o[ :Open3 ] = stdlib
+    o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
+    o[ :Set ] = o[ :Shellwords ] = o[ :StringIO ] = stdlib
+
+    define_singleton_method :const_missing do |const_i|
+      const_set const_i, o.fetch( const_i )[ const_i ]
+    end
+  end
+
+  # --
 
   ACHIEVED_ = true
   DASH_ = '-'.freeze
@@ -104,6 +155,7 @@ module Skylab::Git
   KEEP_PARSING_ = true
   NIL_ = nil
   NOTHING_ = nil
+  ProcLike_ = Common_::ProcLike
   SPACE_ = ' '
   UNABLE_ = false
   UNDERSCORE_ = '_'.freeze

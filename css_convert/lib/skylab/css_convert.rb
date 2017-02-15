@@ -29,14 +29,6 @@ module Skylab::CSS_Convert
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    # Basic = sidesys[ :Basic ]
-
-    # Brazen = sidesys[ :Brazen ]  # stay here for [sl]
-
-    Fields = sidesys[ :Fields ]
-
-    Flex_to_treetop = sidesys[ :Flex2Treetop ]
-
     My_sufficiently_existent_tmpdir = Common_.memoize do
 
       dirname = Home_.lib_.system.defaults.dev_tmpdir_path
@@ -51,22 +43,22 @@ module Skylab::CSS_Convert
       path
     end
 
-    Plugin = sidesys[ :Plugin ]
-
     System = -> do
       System_lib[].services
     end
-
-    System_lib = sidesys[ :System ]
 
     Treetop_tools = -> do
       TM__[]::Input_Adapters_::Treetop
     end
 
+    # Basic = sidesys[ :Basic ]
+    # Brazen = sidesys[ :Brazen ]  # stay here for [sl]
+    Fields = sidesys[ :Fields ]
+    Flex_to_treetop = sidesys[ :Flex2Treetop ]
+    Plugin = sidesys[ :Plugin ]
+    System_lib = sidesys[ :System ]
     TM__ = sidesys[ :TanMan ]
-
     Yacc_to_treetop = sidesys[ :Yacc2Treetop ]
-
     Zerk = sidesys[ :Zerk ]
   end
 

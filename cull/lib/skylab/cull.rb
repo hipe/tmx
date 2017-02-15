@@ -166,12 +166,6 @@ module Skylab::Cull
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    Basic = sidesys[ :Basic ]
-
-    # = sidesys[ :Brazen ]  # for [sl]
-
-    Fields = sidesys[ :Fields ]
-
     Filesystem = -> do
       System[].filesystem
     end
@@ -186,11 +180,15 @@ module Skylab::Cull
       ::StringScanner.new x
     end
 
-    system_lib = sidesys[ :System ]
-
+    system_lib = nil
     System = -> do
       system_lib[].services
     end
+
+    Basic = sidesys[ :Basic ]
+    # = sidesys[ :Brazen ]  # for [sl]
+    Fields = sidesys[ :Fields ]
+    system_lib = sidesys[ :System ]
   end
 
   # ==

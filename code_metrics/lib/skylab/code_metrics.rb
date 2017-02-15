@@ -150,21 +150,9 @@ module Skylab::CodeMetrics
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    Brazen = sidesys[ :Brazen ]
-
-    Basic = sidesys[ :Basic ]
-
     DSL_DSL_enhance_module = -> x, p do
       Parse[]::DSL_DSL.enhance_module x, & p
     end
-
-    Fields = sidesys[ :Fields]
-
-    Human = sidesys[ :Human ]
-
-    Open_3 = stdlib[ :Open3 ]
-
-    Parse = sidesys[ :Parse ]
 
     Reverse_string_scanner = -> s do
       Basic[]::String::LineStream_via_String::Reverse[ s ]
@@ -173,8 +161,6 @@ module Skylab::CodeMetrics
     Select = -> do
       System_lib__[]::IO.select.new
     end
-
-    Shellwords = stdlib[ :Shellwords ]
 
     sketchy_rx = /[ $']/
     Shellescape_path = -> x do
@@ -194,14 +180,17 @@ module Skylab::CodeMetrics
       System_lib__[].services
     end
 
+    Brazen = sidesys[ :Brazen ]
+    Basic = sidesys[ :Basic ]
+    Fields = sidesys[ :Fields]
+    Human = sidesys[ :Human ]
+    Open_3 = stdlib[ :Open3 ]
+    Parse = sidesys[ :Parse ]
+    Shellwords = stdlib[ :Shellwords ]
     System_lib__ = sidesys[ :System ]
-
     Task = sidesys[ :Task ]
-
     Test_support = sidesys[ :TestSupport ]
-
     Treemap = sidesys[ :Treemap ]
-
     Zerk = sidesys[ :Zerk ]
   end
 

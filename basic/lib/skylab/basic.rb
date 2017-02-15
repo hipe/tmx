@@ -26,8 +26,8 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     def lib_
-      @lib ||= Common_.produce_library_shell_via_library_and_app_modules(
-        self::Lib_, self )
+      @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
+        Lib_, self )
     end
 
     def normalizers
@@ -289,12 +289,96 @@ module Skylab::Basic  # introduction at [#020]
     Home_.lib_.fields::Attributes::Actor.via cls, a
   end
 
+  # --
+
+  Autoloader_ = Common_::Autoloader
+
+  module Lib_
+
+    sidesys, stdlib = Autoloader_.at(
+      :build_require_sidesystem_proc,
+      :build_require_stdlib_proc )
+
+    Bundle_Directory = -> mod do
+      Plugin[]::Bundle::Directory[ mod ]
+    end
+
+    Bundle_Multiset = -> mod do
+      Plugin[]::Bundle::Multiset[ mod ]
+    end
+
+    Empty_string_scanner = -> do
+      StringScanner__[].new ''
+    end
+
+    Enhancement_shell = -> a do
+      Plugin[]::Bundle::Enhance::Shell.new a
+    end
+
+    IO_lib = -> do
+      System_lib__[]::IO
+    end
+
+    NLP_EN = -> do
+      Human[]::NLP::EN
+    end
+
+    Oxford_or = -> a do
+      Common_::Oxford_or[ a ]
+    end
+
+    Set = -> * a do
+      Set__[].new( * a )
+    end
+
+    Some_stderr_IO = -> do
+      System_lib__[]::IO.some_stderr_IO
+    end
+
+    Strange = -> x do  # looks better in expressions for this to be here
+      Home_::String.via_mixed x
+    end
+
+    String_IO = -> do
+      StringIO__[].new
+    end
+
+    String_scanner = -> str do
+      StringScanner__[].new str
+    end
+
+    StringScanner__ = Common_.memoize do
+      require 'strscan'
+      ::StringScanner
+    end
+
+    Treetop = Common_.memoize do
+      require 'treetop'
+      ::Treetop
+    end
+
+    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+    Brazen = sidesys[ :Brazen ]
+    Fields = sidesys[ :Fields ]
+    Human = sidesys[ :Human ]
+    Parse_lib = sidesys[ :Parse ]
+    Pathname = stdlib[ :Pathname ]
+    Plugin = sidesys[ :Plugin ]
+    Set__ = stdlib[ :Set ]
+    StringIO__ = stdlib[ :StringIO ]
+    System_lib__ = sidesys[ :System ]
+    Test_support = sidesys[ :TestSupport ]
+    Time = stdlib[ :Time ]
+    Zerk = sidesys[ :Zerk ]  # for CLI styling in word wrappers
+  end
+
+  # --
+
   ArgumentError = ::Class.new ::ArgumentError
 
   ACHIEVED_ = true
   CLI = nil  # for host
   CONST_SEP_ = '::'.freeze
-  Autoloader_ = Common_::Autoloader
   Home_ = self
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}

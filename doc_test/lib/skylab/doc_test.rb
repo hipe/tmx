@@ -176,12 +176,6 @@ module Skylab::DocTest
 
     sidesys = Autoloader_.build_require_sidesystem_proc
 
-    ACS = sidesys[ :Autonomous_Component_System ]
-    Basic = sidesys[ :Basic ]
-    Fields = sidesys[ :Fields ]
-
-    Git = sidesys[ :Git ]
-
     _Strscn = Lazy_.call do
       require 'strscan' ; ::StringScanner
     end
@@ -194,8 +188,11 @@ module Skylab::DocTest
       System_lib[].services
     end
 
+    ACS = sidesys[ :Autonomous_Component_System ]
+    Basic = sidesys[ :Basic ]
+    Fields = sidesys[ :Fields ]
+    Git = sidesys[ :Git ]
     System_lib = sidesys[ :System ]
-
     Test_support = sidesys[ :TestSupport ]
     Zerk = sidesys[ :Zerk ]
   end

@@ -145,20 +145,16 @@ module Skylab::MyTerm
       :build_require_sidesystem_proc,
       :build_require_stdlib_proc )
 
-    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
-    Basic = sidesys[ :Basic ]
-    Brazen = sidesys[ :Brazen ]
-
-    Open3 = stdlib[ :Open3 ]
-
-    Shellwords = stdlib[ :Shellwords ]
-
     System = -> do
       System_lib[].services
     end
 
+    Autonomous_component_system = sidesys[ :Autonomous_Component_System ]
+    Basic = sidesys[ :Basic ]
+    Brazen = sidesys[ :Brazen ]
+    Open3 = stdlib[ :Open3 ]
+    Shellwords = stdlib[ :Shellwords ]
     System_lib = sidesys[ :System ]
-
     Zerk = sidesys[ :Zerk ]
   end
 
