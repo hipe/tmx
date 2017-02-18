@@ -87,6 +87,9 @@
              defaulting across the bundled modalities ..
 
 [#040] #open unify expression agent-ry between niCLI and iCLI
+
+             get rid of [#co-010]; it's toxic
+
              #after #milestone-9 AND
              #after [#sy-005] unify pretty path
              [#here.1]: the idea of `human_escape` is actually write-your-own

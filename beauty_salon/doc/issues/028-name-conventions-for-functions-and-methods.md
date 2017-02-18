@@ -125,18 +125,45 @@ methods it defines is sort of a "sub-contract" with the same audience.
 
 
 
-### "public API variant" (probably deprecating) :[#here.1.1.2]
+### "public API variant" :[#here.1.1.2]
 
-(this same surface convention is instead used more frequently these days
-for the semantics described at [#here.1.0].)
+(this is one "visual" convention with two distinct meanings. the
+other meaning is described next, at [#here.1.0]. which meaning is
+intended can typically be inferred from context.)
 
-this convention is (perhaps deprecatedly) used in cases where the method
-is part of the implementing module's public API (so, exactly [#here.0.0])
-but the `public_method_name` convention cannot be used because that method
-"namespace" is explictly reserved for arbitrary, ad-hoc business needs
-(simlar to the way a ::Struct sub-class's name space should be).
+methods defined following this convention are part of the defining
+module's public API (exactly as [#here.0.0]), but for those cases where
+that convention cannot be used because the "namespace" of methods that
+look like that is strictly reserved (i.e left "wide open") for another
+purpose.
 
-it is probably a smell to employ this "pattern"; it is probably deprecating.
+typically we see this in a case when there's a "hook-out" API that
+participates with something like an "entity class" - the entity class
+might want to use its public-"looking" methods for ad-hoc business
+properties, and so the remote library does not want to require the
+local entity class to "pollute" its method namespace with methods
+that look like [#here.1.0].
+
+rather, the remote library uses the subject convention so that "hook-out"
+methods required to be defined on the entity "stay out of the way"
+of its business fields.
+
+(because otherwise your code is not future-proof. you should not
+have to think about what names are OK to use in such cases - even
+if you did think about this, there's no guarantee that the remote
+library won't introduce some name that collides with one of your
+business names.)
+
+(for another exploration of this dynamic, imagine making a `::Struct`
+subclass, but that you want one of its members to be called `members`.
+if you do this (and we had to try this ourselves), the member called
+`members` effectively overwrites the method `::Struct#members`, so you
+can't reach the latter method. under our convention, you might make
+a subclass of Stuct that aliases `members` to `_members_` so you can
+reach both.)
+
+this convention, of course, presupposes that "business members" are
+not allowed to occupy names `_like_these_`.
 
 
 

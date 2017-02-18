@@ -204,29 +204,9 @@ module Skylab::Zerk::TestSupport
       expect_these_lines_in_array messages, & p
     end
 
-    def expect_these_lines_in_array actual_messages
+    def expect_these_lines_in_array actual_messages, & p
 
-      act_line_scn = Common_::Scanner.via_array actual_messages
-
-      _y = ::Enumerator::Yielder.new do |exp_line|
-
-        if act_line_scn.no_unparsed_exists
-          fail "had no more lines when expecting: #{ exp_line.inspect }"
-        else
-          act_line = act_line_scn.gets_one
-          if exp_line.respond_to? :ascii_only?
-            act_line == exp_line or act_line.should eql exp_line
-          else
-            act_line =~ exp_line or act_line.should match exp_line
-          end
-        end
-      end
-
-      yield _y
-
-      if ! act_line_scn.no_unparsed_exists
-        fail "had unexpected extra line: #{ act_line_scn.head_as_is.inspect }"
-      end
+      TestSupport_::Expect_these_lines_in_array[ actual_messages, p, self ]
     end
   end
 

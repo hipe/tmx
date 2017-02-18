@@ -2,22 +2,21 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - meta-attributes - default" do
 
-    TS_.describe "[fi] attributes - meta-attributes - default" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_meta_attributes
 
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes::Meta_Attributes[ self ]
+    # ==
 
       context "intro" do
 
         shared_subject :entity_class_ do
 
-          class X_Default_A
+          class X_a_ma_d_NoSee_1A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               starts_as_true: [ :default, true ],
             )
 
@@ -67,11 +66,11 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_Default_B
+          class X_a_ma_d_NoSee_1B
 
             d = 0
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               wahoo: [ :default_proc, -> { "wahootie: #{ d += 1 }" } ],
               other: nil,
             )
@@ -97,6 +96,91 @@ module Skylab::Fields::TestSupport
           "wahootie: 1" == o.wahoo or fail
         end
       end
+
+    # ==
+    # ==
+
+    context "(E.K)" do
+
+      context "(against this one entity class)" do
+
+        it "defaulting happens in this semi-normal case" do
+
+          ent = call_thru_normalize_(
+            :secret_horrible_dont_do_this, :_make_the_default_OK_,
+            :jamooka, :J1,
+          )
+
+          ent.jamooka == :J1 || fail
+          ent.faflooka == :always_sunny || fail
+        end
+
+        it "(obv you can set the other one too)" do
+
+          ent = call_thru_normalize_(
+            :secret_horrible_dont_do_this, :_make_the_default_OK_,
+            :faflooka, :F1
+          )
+
+          ent.faflooka == :F1 || fail
+          ent.jamooka == :JAMOOKA || fail
+        end
+
+        it "but defaulting can fail, which is when required defaultant makes sense" do
+
+          a = call_thru_normalize_(
+            :secret_horrible_dont_do_this, :_make_the_default_not_OK_,
+            :faflooka, :F1
+          )
+          expect_channel_looks_like_missing_required_ a
+          _ev = a[1].call
+          _ev.reasons.map( & :name_symbol ) == [ :jamooka ] || fail
+        end
+
+        def entity_class_
+          _entity_class_2A
+        end
+      end
+
+      shared_subject :_entity_class_2A do
+
+        class X_a_ma_d_NoSee_2A
+
+          include Attributes::EK_ModelMethods
+
+          # (the below nastiness is so we have a defaulting proc
+          # that "flickers" - under some conditions it appears to fail)
+
+          def _definition_ ; [
+
+            :property, :faflooka, :default_by, -> _xx do
+              Common_::KnownKnown[ :always_sunny ]
+            end,
+
+            :required, :property, :jamooka, :default_by, -> ent do
+
+              case ent.secret_horrible_dont_do_this
+              when :_make_the_default_OK_
+                Common_::KnownKnown[ :JAMOOKA ]
+              when :_make_the_default_not_OK_
+                NIL  # NOTHING_
+              else ; fail
+              end
+            end,
+
+            :property, :secret_horrible_dont_do_this,
+          ] end
+
+          attr_reader(
+            :jamooka, :faflooka, :secret_horrible_dont_do_this,
+          )
+
+          self
+        end
+      end
     end
+
+    # ==
+    # ==
   end
 end

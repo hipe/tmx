@@ -44,16 +44,16 @@ module Skylab::Plugin
     sidesys, _stdlib = Autoloader_.at :build_require_sidesystem_proc,
       :build_require_stdlib_proc
 
-    Stdlib_option_parser = -> do
-      require 'optparse'
-      ::OptionParser
-    end
-
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Fields = sidesys[ :Fields ]
     Parse = sidesys[ :Parse ]
     Zerk = sidesys[ :Zerk ]
+
+    Stdlib_option_parser = -> do
+      require 'optparse'
+      ::OptionParser
+    end
   end
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]

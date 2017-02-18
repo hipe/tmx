@@ -1,11 +1,119 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Brazen::TestSupport
+module Skylab::Plugin::TestSupport
 
-  describe "[br] branchesque - unbounds indexation - promotions" do
+  describe "[pl] model-centric obperator branch" do
 
     TS_[ self ]
     use :memoizer_methods
+
+    # the subject started life as a anything-goes attempt to make a classic
+    # [br]-powered app ([sg]) work under [ze]. the thrust was to blah
+
+    it "loads" do
+      _subject_module || fail
+    end
+
+    context "hi" do
+
+      it "builds" do
+        _ob || fail
+      end
+
+      it "to LT stream - load tickets know their name based on filename alone" do
+        _hi = _ob
+        st = _hi.to_load_ticket_stream
+        lt = st.gets
+        lt.name_symbol == :zib_flib || fail
+      end
+
+      it "make that call" do
+
+        _rsx = _build_resources :inigo_montoya, :wahoo
+        lt = _ob.to_load_ticket_stream.gets
+        bc = lt.bound_call_of_operator_via_resources _rsx
+        _wat = bc.receiver.send bc.method_name, * bc.args, & bc.block
+        _wat == [ :woohoo, :wahoo ] || fail
+      end
+
+      it "when failure strikes" do
+
+        # [#004.1]: #lend-coverage [ze]
+
+        chan = nil ; msg_p = nil
+
+        _rsx = _build_resources :not_nigo_montonya, :wahoo do |*a, &p|
+          chan = a ; msg_p = p
+        end
+
+        lt = _ob.to_load_ticket_stream.gets
+
+        _bc = lt.bound_call_of_operator_via_resources _rsx
+
+        _bc.nil? || fail
+
+        chan == %i( error expression parse_error unknown_operator ) || fail
+
+        # (at writing it worked (it splayed). let's avoid the dependency)
+
+        #_expag = Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
+
+        #_wee = _expag.calculate [], & msg_p
+      end
+
+      shared_subject :_ob do
+
+        _subject_module.define do |o|
+          o.models_branch_module = X_mcob_PrentendModels
+          o.add_actions_module_path_tail "zib-flib/zub-flub"
+        end
+      end
+    end
+
+    # ==
+
+    def _build_resources * x_a, & p
+
+      _scn = Zerk_lib_[]::No_deps[]::API_ArgumentScanner.new x_a, & p
+
+      X_mcob_Resources.new _scn
+    end
+
+    # ==
+
+    module X_mcob_PrentendModels
+
+      module Zib_Flib  # the classic dumb way, just to avoid fuzzy search
+
+        module ZubFlub  # pretend it's `Actions`
+
+          class Inigo_Montoya
+
+            def initialize
+              o = yield
+              o.__HELLO_MY_OWN_RESOURCES__
+              @__as = o.argument_scanner
+            end
+
+            def execute
+              [ :woohoo, @__as.head_as_is ]
+            end
+          end
+
+          # (because this doesn't define `dir_path`, it does not recurse)
+        end
+      end
+
+      def self.dir_path
+        "fake/dir/path"
+      end
+    end
+
+    X_mcob_Resources = ::Struct.new :argument_scanner do
+      def __HELLO_MY_OWN_RESOURCES__
+        NIL
+      end
+    end
 
     context "full minimal example (scene 1)" do
 
@@ -47,11 +155,11 @@ module Skylab::Brazen::TestSupport
 
       dangerous_memoize :_kernel do
 
-        module BUI_App1
+        module X_LEGACY_BR_FAKE_APP
 
           module Models_
 
-            class Node_1_Action < Home_::Action
+            class Node_1_Action < BRAZEN[]::Action
 
             end
 
@@ -59,11 +167,11 @@ module Skylab::Brazen::TestSupport
 
               module Actions
 
-                class Node_3_Act_2 < Home_::Action
+                class Node_3_Act_2 < BRAZEN[]::Action
 
                 end
 
-                class Node_3_Act_3 < Home_::Action
+                class Node_3_Act_3 < BRAZEN[]::Action
 
                   @is_promoted = true
                 end
@@ -72,7 +180,7 @@ module Skylab::Brazen::TestSupport
           end
         end
 
-        Home_::Kernel.new BUI_App1
+        BRAZEN[]::Kernel.new X_LEGACY_BR_FAKE_APP
       end
     end
 
@@ -136,5 +244,15 @@ module Skylab::Brazen::TestSupport
       @_found_node = unb
       nil
     end
+
+    # ==
+    # ==
+
+    def _subject_module
+      Home_::ModelCentricOperatorBranch
+    end
+
+    # ==
+    # ==
   end
 end

@@ -102,5 +102,38 @@ module Skylab::Fields::TestSupport
         e.message.should match _rx
       end
     end
+
+    # ==
+
+    context "(E.K)" do
+
+      it "parses two properties" do
+        _subject.length == 2 || fail
+      end
+
+      it "names look good" do
+        _subject.map( & :name_symbol ) == %i( foo bar ) || fail
+      end
+
+      it "properties know whether they are required" do
+        a = _subject
+        a.first.is_required && fail
+        a.last.is_required || fail
+      end
+
+      shared_subject :_subject do
+
+        given_definition_(
+          :property, :foo,
+          :required, :property, :bar,
+        )
+
+        _st = flush_to_item_stream_expecting_all_items_are_parameters_
+        _st.to_a
+      end
+    end
+
+    # ==
+    # ==
   end
 end

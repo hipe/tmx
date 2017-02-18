@@ -2,13 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - misc meta attributes one" do
 
-    TS_.describe "[fi] attributes - misc meta attributes one" do
-
-      TS_[ self ]
-      use :memoizer_methods
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_entity_killer_methods
 
       context "`ivar`" do
 
@@ -40,7 +38,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_some_class_over_here do
 
-          class X_MMA_CW
+          class X_a_ma_CW
 
             def zizzie=
               st = @_polymorphic_upstream_
@@ -82,9 +80,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_MA_CIMO_A
+          class X_a_ma_CIMO_A
 
-            ATTRIBUTES = Subject_module_[].call(
+            ATTRIBUTES = Attributes::Meta_Attributes.lib.call(
               zing: [ :custom_interpreter_method_of, :zung ],
             )
 
@@ -108,6 +106,84 @@ module Skylab::Fields::TestSupport
           _o._hi.should eql [ :la, :lah ]
         end
       end
+
+    # ==
+
+    context "(E.K)" do
+
+      it "use any arbitrary normalization proc" do
+
+        # :#coverpoint-1-1: the first tail leg (disassociated)
+
+        _subject = __this_one_subject_not_memoized_but_could_be
+        2 == _subject.length || fail
+
+        foo, bar = _subject
+
+        foo.name_symbol == :foo || fail
+        bar.name_symbol == :bar || fail
+
+        foo.normalize_by || fail
+
+        foo.normalize_by[ :xx ] == [ :_hi_from_FI_, :xx ] || fail
+      end
+
+      def __this_one_subject_not_memoized_but_could_be
+
+        given_definition_(
+          :property, :foo, :normalize_by, -> x { [ :_hi_from_FI_, x ] },
+          :property, :bar
+        )
+
+        flush_to_item_stream_expecting_all_items_are_parameters_.to_a
+      end
+
+      context "use this one \"macro\"" do
+
+        it "yes" do
+
+          _attr = _attribute
+          _qkn = Common_::QualifiedKnownness.via_value_and_symbol( -2, :_no_see_FI_ )
+          _kn = _attr.normalize_by[ _qkn ]
+          _kn.value_x == -2 || fail
+        end
+
+        it "no" do
+
+          _attr = _attribute
+
+          _qkn = Common_::QualifiedKnownness.via_value_and_symbol( -3, :_no_see_FI_ )
+
+          chan = nil ; ev_p = nil
+
+          _kn = _attr.normalize_by.call _qkn do |*a, &p|
+            chan = a ; ev_p = p ; :_no_see_FI_
+          end
+
+          _kn == false || fail
+
+          chan == [ :error, :invalid_property_value ] || fail
+
+          _ev = ev_p[]
+
+          _expag = my_all_purpose_expression_agent_
+
+          _act = _ev.express_into_under "", _expag
+
+          _act == "«prp: _no_see_FI_» must be greater than or equal to «val: -2», had «ick: -3»" or fail
+        end
+
+        shared_subject :_attribute do
+
+          given_definition_(
+            :property, :foo, :must_be_integer_greater_than_or_equal_to, -2,
+          )
+          flush_to_item_
+        end
+      end
     end
+
+    # ==
+    # ==
   end
 end

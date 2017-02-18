@@ -14,7 +14,8 @@
 [#006]       #track pub-sub hacks (mutations) #universal
 [#005]       [ pub-sub ]  (currently implemented by [#007])
 
-[#004] #hole
+[#004]       coverpoint assets & liabilities
+             [#here.1]: #lend-to [ze]
              ( #merged-to: [#ta-004] #was: digraphic .. )
 
 [#003]       there is a possible new parse function we might subsume in [sg]

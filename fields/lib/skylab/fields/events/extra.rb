@@ -7,7 +7,7 @@ module Skylab::Fields
       :extra_properties,
 
       :name_x_a, nil,
-      :did_you_mean_i_a, nil,
+      :did_you_mean_symbol_array, nil,
       :prefixed_conjunctive_phrase_context_proc, nil,
       :prefixed_conjunctive_phrase_context_stack, nil,
       :suffixed_prepositional_phrase_context_proc, nil,
@@ -31,11 +31,19 @@ module Skylab::Fields
       s = o.adj
       a.push s || "unrecognized"
 
-      s_a = o.name_x_a.map( & method( :ick ) )
-      _lemma = o.lemma || DEFAULT_PROPERTY_LEMMA_
-      a.push plural_noun s_a.length, _lemma
+      simple_inflection do
 
-      a.push and_ s_a
+        # "unrecognized property 'mlem'" | "unrecogized properties 'mlem' and 'baz'"
+
+        _scn = Scanner_[ o.name_x_a ]
+
+        buff = oxford_join _scn do |x|  # determine the count
+          ick_mixed x
+        end
+
+        a.push n ( o.lemma || DEFAULT_PROPERTY_LEMMA_ )  # use the count
+        a.push buff
+      end
 
       p = o.suffixed_prepositional_phrase_context_proc
       if p
@@ -44,10 +52,23 @@ module Skylab::Fields
 
       y << a.join( SPACE_ )
 
-      if o.did_you_mean_i_a
-        _s_a_ = o.did_you_mean_i_a.map( & method( :code ) )
-        y << "did you mean #{ or_ _s_a_ }?"
+      sym_a = o.did_you_mean_symbol_array
+
+      if sym_a
+        _m = respond_to?( :code ) ? :code : :ick_mixed
+        code = method _m
+
+        simple_inflection do
+          buff = "did you mean "
+          oxford_join buff, Scanner_[ sym_a ], " or " do |sym|
+            code[ sym ]
+          end
+          buff << "?"
+          y << buff
+        end
       end
+
+      y
     end
 
     class Events::Extra
@@ -74,7 +95,7 @@ module Skylab::Fields
 
           new_with(
             :name_x_a, name_x_a,
-            :did_you_mean_i_a, did_you_mean_i_a,
+            :did_you_mean_symbol_array, did_you_mean_i_a,
             :lemma, lemma,
             :adj, adj,
           )
@@ -97,33 +118,33 @@ module Skylab::Fields
             if @expected.length > @length_limit
               ___reduce_exp_i_a
             else
-              @_strange_x_ = @strange_x
+              @_use_strange_x = @strange_x
               @_exp_x_a = @expected
             end
           else
-            @_strange_x_ = @strange_x
+            @_use_strange_x = @strange_x
             @_exp_x_a = nil
           end
 
-          Here_.new_via [ @_strange_x_ ], @_exp_x_a
+          Here_.new_via [ @_use_strange_x ], @_exp_x_a
         end
 
         def ___reduce_exp_i_a
           if @strange_x.respond_to? :id2name
-            @_strange_x_ = @strange_x.id2name
+            @_use_strange_x = @strange_x.id2name
             _exp_s_a = @expected.map( & :id2name )
-            @_exp_x_a = Levenshtein___[ @length_limit, _exp_s_a, @_strange_x_ ]
+            @_exp_x_a = Levenshtein___[ @length_limit, _exp_s_a, @_use_strange_x ]
           else
-            @_strange_x_ = Home_.lib_.strange @strange_x
+            @_use_strange_x = Home_.lib_.strange @strange_x
             @_exp_x_a = exp_i_a[ 0, @length_limit ]
           end
         end
       end
 
-      Levenshtein___ = -> closest_d, good_x_a, strange_x do  # #curry-friendly
+      Levenshtein___ = -> closest_d, good_x_a, strange_s do  # #curry-friendly
 
         Home_.lib_.human::Levenshtein.with(
-          :item, strange_x,
+          :item_string, strange_s,
           :closest_N_items, closest_d,
           :items, good_x_a,
           :aggregate_by, -> x_a do
@@ -135,7 +156,12 @@ module Skylab::Fields
         )
       end
 
+      # ==
+      # ==
+
       Here_ = self
+
+      # ==
     end
   end
 end

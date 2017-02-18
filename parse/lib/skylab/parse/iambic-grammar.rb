@@ -1,6 +1,109 @@
 module Skylab::Parse
 
-  class Item_Grammar  # see [#005]
+  class IambicGrammar < Common_::SimpleModel  # :[#006].
+
+    # (three laws. would replace entity)
+
+    # entity is at once too rigid, too over-abstracted, and too overwrought
+
+    # -
+
+      def initialize
+        @_injections = []
+        @_keyword_cache = {}
+        yield self
+        @_injections.freeze
+        @_length = @_injections.length
+        @_final = @_length - 1
+        @_search_order = ( 0 ... @_length ).to_a
+      end
+
+      def add_grammatical_injection k, impl
+        @_injections.push GrammaticalInjection___[ k, impl ] ; nil
+      end
+
+      def stream_via_scanner scn
+
+        d = nil
+
+        when_found = -> do
+          inj = @_injections.fetch d
+          x = inj.injection_implementation.gets_one_item_via_scanner scn
+          if x
+            QualifiedItem___[ x, inj.injection_identifier ]
+          else
+            ::Kernel._COVER_ME__when_falseish_result_from_grammatical_injection__
+          end
+        end
+
+        when_some = -> do
+          k = scn.head_as_is
+          d = __find_it k
+          if d
+            when_found[]
+          else
+            raise ::NameError, __say_keyword_not_found( k )
+          end
+        end
+
+        Common_.stream do
+          when_some[] unless scn.no_unparsed_exists
+        end
+      end
+
+      def __say_keyword_not_found k
+        "keyword not found in grammar: '#{ k }' (and this message is not covered)"  # #cover-me
+      end
+
+      def __find_it k
+        d = @_keyword_cache[ k ]
+        if ! d
+          d = __look_it_up k
+          if d
+            @_keyword_cache[ k ] = d
+          end
+        end
+        d
+      end
+
+      def __look_it_up k
+        dd = @_length
+        until dd.zero?
+          dd -= 1
+          d = @_search_order.fetch dd
+          inj = @_injections.fetch d
+          if inj.injection_implementation.is_keyword k
+            found = true
+            break
+          end
+        end
+        if found
+          if @_final != dd
+            # near [#034.2] adapting optimising
+            @_search_order[ dd, 1 ] = EMPTY_A_
+            @_search_order.push d
+          end
+          d
+        end
+      end
+
+    # -
+    # ==
+
+    QualifiedItem___ = ::Struct.new :item, :injection_identifier
+
+    GrammaticalInjection___ = ::Struct.new :injection_identifier, :injection_implementation
+
+    # ==
+    # ==
+    # ==
+    # ==
+    # ==
+  end
+
+  class IambicGrammar::ItemGrammar_LEGACY  # see [#005]
+
+    # (this is the legacy, more specialized implementatio
 
     class << self
 
@@ -217,4 +320,137 @@ module Skylab::Parse
       y.join ' or '
     end
   end
+
+  class IambicGrammar
+
+    # ==
+
+    class ItemGrammarInjection < Common_::SimpleModel
+
+      # (meant to realize "entity killer", and be a broader replacement for legacy item grammar)
+
+      attr_writer(
+        :item_class,
+        :postfixed_modifiers,
+        :prefixed_modifiers
+      )
+
+      def is_keyword k
+        @prefixed_modifiers.method_defined? k
+      end
+
+      def gets_one_item_via_scanner scn
+        GetsOneItem___.new(
+          scn, @prefixed_modifiers, @postfixed_modifiers, @item_class
+        ).execute
+      end
+    end
+
+    # ==
+
+    class GetsOneItem___
+
+      # every grammar in this category of grammars has what we call a "pivot
+      # point" keyword, which is that keyword around which the parse "pivots"
+      # from being in the "head" state (where prefixed modifers are parsed)
+      # to the "tail" state (where any postfixed modifiers are parsed).
+      #
+      # (this keyword is classically `property` but it could be anything.)
+      #
+      # it's convenient to implement the pivotpoint keyword itself as a
+      # prefixed modifier. as such all surface expressions of item will
+      # have least one prefixed modifier expression.
+      #
+      # we then conceive of the parse as being broken up into one and
+      # possibly two "legs" (as in "leg of a journey"), corresponding to
+      # the parsing of the one or more prefixed then zero or more postfixed
+      # modifiers: when parsing the prefixed modifiers we are in the "head"
+      # leg and when parsing the any postfix modifiers we call that the
+      # "tail" leg (to mix metaphors within a category of metaphors).
+
+      def initialize scn, pre, post, ic
+        @item_class = ic
+        @prefixed_modifiers = pre
+        @postfixed_modifiers = post
+        @scanner = scn
+      end
+
+      def execute
+
+        @item_class.define do |o|
+          ok = __parse_head_leg o
+          ok &&= __maybe_parse_tail_leg o
+          ok && o.finish
+          NIL
+        end
+      end
+
+      def __maybe_parse_tail_leg o
+
+        if @scanner.no_unparsed_exists
+          KEEP_PARSING_
+
+        elsif @postfixed_modifiers.method_defined? @scanner.head_as_is
+
+          __do_parse_tail_leg o
+
+        else
+
+          # (this is a streaming parse. although we could peek to see if
+          # the scanner head looks like a next item, there is no reason to.)
+
+          KEEP_PARSING_
+        end
+      end
+
+      def __do_parse_tail_leg o
+
+        # (#coverpoint-1-1: tail leg)
+
+        leg = Leg__.new o, @scanner, self
+        leg.extend @postfixed_modifiers
+        begin
+          ok = leg.__send__ @scanner.gets_one
+          ok || break
+          @scanner.no_unparsed_exists && break
+        end while @postfixed_modifiers.method_defined? @scanner.head_as_is
+        ok
+      end
+
+      def __parse_head_leg o
+
+        leg = Leg__.new o, @scanner, self
+        leg.extend @prefixed_modifiers
+        @_did_pivot = false
+        begin
+          ok = leg.__send__ @scanner.gets_one
+        end while ok && ! @_did_pivot
+        ok
+      end
+
+      def transition_from_prefix_to_postfix
+        @_did_pivot = true
+      end
+    end
+
+    # ==
+
+    class Leg__
+      def initialize pt, scn, pa
+        @parse_tree = pt
+        @parser = pa
+        @scanner = scn
+      end
+    end
+
+    # ==
+    # ==
+    # ==
+    # ==
+
+    NOTHING_ = nil
+
+    # ==
+  end
 end
+# #history: spike "iambic grammar" into "item grammar"

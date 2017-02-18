@@ -1,5 +1,17 @@
 # the item grammar narrative :[#005]
 
+## pillars of the rewrite
+
+  - no subclassing
+
+  - stream the parse - parse only what you need
+
+  - simple yet flexible: "meta-attributes" are always implemented as
+    modules, built-in meta-attributes for 80% use case
+
+
+
+
 ## introduction
 
 "the item grammar" is designed for parsing a simple class of grammars
@@ -8,6 +20,7 @@ simply. you define your grammar as:
    • set F of zero or more "flag" keywords ("adjectives")
    • one "keyword" keyword
    • set M of zero or more monadic parameters ("prepositional phrases")
+
 
 
 

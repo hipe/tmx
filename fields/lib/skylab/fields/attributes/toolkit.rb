@@ -1,100 +1,85 @@
 module Skylab::Fields
 
-  class Attributes::Stack  # :[#028].
+  module Attributes::Toolkit
 
-    class << self
-      def common_frame * a
-        if a.length.zero?
-          Here_::CommonFrame
-        else
-          Here_::CommonFrame.call_via_arglist a
+    # EXPERIMENT towards E.K
+
+#___FROM
+
+    class Normalize < Common_::MagneticBySimpleModel
+
+      # (bridge the gap between bleeding new and the more general one)
+
+      def self.[] ent
+        call_by do |o|
+          o.entity = ent
         end
       end
-    end  # >>
 
-    def initialize namelist=nil, & oes_p
-      @a = []
-      @d = -1
-      @on_event_selectively = oes_p
-      if namelist
-        push_frame Here_::Lib_::Name_frame_via_namelist[ namelist ]
-      end
-    end
+      attr_writer(
+        :argument_scanner,
+        :entity,
+        :formal_attribute_stream,
+        :listener,
+      )
 
-    def property_value_via_symbol sym
+      def execute
 
-      pptr = any_proprietor_of sym
+        @formal_attribute_stream ||= __formal_attribute_stream
+        @argument_scanner ||= @entity._argument_scanner_
+        @listener ||= @entity._listener_
 
-      if pptr
+        Attributes::Normalization::EK.call_by do |o|
 
-        pptr.property_value_via_symbol sym
+          o.arguments_to_default_proc_by = method :__args_to_default_proc_by
 
-      else
-        maybe_send_event :error, :extra_properties do
-          _build_extra_properties_event [ sym ]
-        end
-        UNABLE_
-      end
-    end
-
-    def any_proprietor_of sym
-      d = @d
-      while -1 != d
-        x = @a.fetch( d ).any_proprietor_of sym
-        x and break
-        d -= 1
-      end
-      x
-    end
-
-    def push_frame_with * x_a
-      push_frame Here_::Lib_::Frame_via_iambic[ x_a ]
-    end
-
-    def push_frame_via_box bx
-      push_frame Here_::Lib_::Frame_via_box[ bx ]
-    end
-
-    def push_frame x
-      ok = true
-      if @a.length.nonzero?
-        a = x.any_all_names
-        if a
-          xtra_a = a - @a.first.all_names
-          if xtra_a.length.nonzero?
-            when_xtra xtra_a
-            ok = false
-          end
+          o.argument_scanner = @argument_scanner
+          o.read_by = @entity.method :_read_
+          o.write_by = @entity.method :_write_
+          o.formal_attribute_stream = @formal_attribute_stream
+          o.listener = @listener
         end
       end
-      if ok
-        @a.push x
-        @d += 1
+
+      def __args_to_default_proc_by _k
+        [ @entity, @listener ]  # (last element is the proc to use)
       end
-      ok
-    end
 
-  private
+      def __formal_attribute_stream
 
-    def when_xtra xtra_a
-      maybe_send_event :error, :extra_properties do
-        _build_extra_properties_event xtra_a
-      end
-      UNABLE_
-    end
+        _array = @entity._definition_
+        _scn = Common_::Scanner.via_array _array
 
-    def _build_extra_properties_event xtra_a
-      Home_::Events::Extra.build xtra_a
-    end
+        _pg = Here__.properties_grammar_
+        _qual_item_st = _pg.stream_via_scanner _scn
 
-    def maybe_send_event * i_a, & ev_p  # #[#ca-066]
-      if @on_event_selectively
-        @on_event_selectively.call( * i_a, & ev_p )
-      elsif :error == i_a.first
-        raise ev_p[].to_exception
+        _qual_item_st.map_by do |qual_item|
+          :_parameter_FI_ == qual_item.injection_identifier || fail
+          qual_item.item
+        end
       end
     end
 
-    Here_ = self
+    # ==
+
+    # ==
+
+    define_singleton_method :properties_grammar_, ( Lazy_.call do
+
+      _inj = Attributes::
+        DefinedAttribute::EntityKillerParameter.grammatical_injection
+
+      Home_.lib_.parse::IambicGrammar.define do |o|
+
+        o.add_grammatical_injection :_parameter_FI_, _inj
+      end
+    end )
+
+    # ==
+
+    Here__ = self
+
+    # ==
   end
 end
+# #history-A - repurposed file from "stack" to "toolkit"

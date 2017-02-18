@@ -61,6 +61,27 @@ module Skylab::Fields::TestSupport
 
   module InstanceMethods___
 
+    def black_and_white_line_via_event_ ev
+      a = black_and_white_lines_via_event_ ev
+      1 == a.length || fail
+      a[0]
+    end
+
+    def black_and_white_lines_via_event_ ev
+      _expag = Zerk_lib_[]::No_deps[]::API_InterfaceExpressionAgent.instance
+      _lines = ev.express_into_under [], _expag
+      _lines  # hi. #todo
+    end
+
+    def expect_these_lines_in_array_ a, & p
+      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    end
+
+    def my_all_purpose_expression_agent_
+
+      MY_ALL_PURPOSE_EXPRESSION_AGENT___
+    end
+
     def debug!
       @do_debug = true
     end
@@ -75,14 +96,39 @@ module Skylab::Fields::TestSupport
       event_log.handle_event_selectively
     end
 
-    def common_expression_agent_
-      Home_.lib_.brazen::API.expression_agent_instance
-    end
-
     def state_for_expect_emission
       state_
     end
   end
+
+  # ==
+
+  module MY_ALL_PURPOSE_EXPRESSION_AGENT___ ; class << self
+
+    # (writing our own just to get a sense for what is called by whom)
+
+    alias_method :calculate, :instance_exec
+
+    def ick x
+      "«ick: #{ x }»"
+    end
+
+    def par prp
+      "«prp: #{ prp.name_symbol }»"
+    end
+
+    def val x
+      "«val: #{ x }»"
+    end
+
+    def nm name
+      # "«nm: #{ name.as_slug }»"  too painful
+      "'#{ name.as_slug }'"
+    end
+
+  end ; end
+
+  # --
 
   Build_next_integer_generator_starting_after = -> d do
 
@@ -91,9 +137,15 @@ module Skylab::Fields::TestSupport
     end
   end
 
-  Home_ = ::Skylab::Fields
 
+  # --
+
+  Home_ = ::Skylab::Fields
+  Autoloader_ = Home_::Autoloader_
   Common_ = Home_::Common_
+  Lazy_ = Home_::Lazy_
+
+  # --
 
   Expect_Event = -> tcm do
 
@@ -105,10 +157,21 @@ module Skylab::Fields::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+  # --
+
+  Zerk_lib_ = Lazy_.call do  # it would be eew to need this in production
+    Autoloader_.require_sidesystem :Zerk
+  end
+
+  Parse_lib_ = Lazy_.call do  # 1x
+    Autoloader_.require_sidesystem :Parse
+  end
+
+  # --
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
   KEEP_PARSING_ = true
-  Lazy_ = Home_::Lazy_
   NIL_ = nil
   TS_ = self
 end

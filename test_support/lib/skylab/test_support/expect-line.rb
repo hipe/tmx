@@ -327,7 +327,7 @@ module Skylab::TestSupport
     say_not_same = -> act_s, exp_s do
       "(expected, had): (#{ exp_s.inspect }, #{ act_s.inspect })"
     end
-    say_unexpected = -> s do
+    say_extra = -> s do
       "unexpected extra line - #{ s.inspect }"
     end
     say_missing = -> s do
@@ -354,6 +354,31 @@ module Skylab::TestSupport
       Streams_have_same_content[ p[ actual_s ], p[ expected_s ], context ]
     end
 
+    Expect_these_lines_in_array = -> act_s_a, p, _context do
+
+      act_line_scn = Common_::Scanner.via_array act_s_a
+
+      _y = ::Enumerator::Yielder.new do |exp_line|
+
+        if act_line_scn.no_unparsed_exists
+          fail say_missing[ exp_line ]
+        else
+          act_line = act_line_scn.gets_one
+          if exp_line.respond_to? :ascii_only?
+            act_line == exp_line or fail say_not_same[ act_line, exp_line ]
+          else
+            act_line =~ exp_line or fail say_not_same[ act_line, exp_line ]
+          end
+        end
+      end
+
+      p[ _y ]
+
+      if ! act_line_scn.no_unparsed_exists
+        fail say_extra[ act_line_scn.head_as_is ]
+      end
+    end
+
     Streams_have_same_content = -> actual_st, expected_st, context do
 
       begin
@@ -370,7 +395,7 @@ module Skylab::TestSupport
               fail say_not_same[ act_s, exp_s ]
             end
           else
-            fail say_unexpected[ act_s ]
+            fail say_extra[ act_s ]
           end
         elsif exp_s
           fail say_missing[ exp_s ]

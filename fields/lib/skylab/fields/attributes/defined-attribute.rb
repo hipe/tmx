@@ -4,6 +4,117 @@ module Skylab::Fields
 
     class DefinedAttribute < SimplifiedName  # :[#039].
 
+      # ==
+
+      class EntityKillerParameter < Common_::SimpleModel
+
+        define_singleton_method :grammatical_injection, ( Lazy_.call do
+
+          mod = Attributes::MetaAttributes::EntityKillerModifiers
+
+          Home_.lib_.parse::IambicGrammar::ItemGrammarInjection.define do |o|
+
+            o.item_class = self
+            o.prefixed_modifiers = mod::PrefixedModifiers
+            o.postfixed_modifiers = mod::PostfixedModifiers
+          end
+        end )
+
+        def will_describe_by_this p
+          send ( @_receive_description ||= :__receive_1st_description ), p
+        end
+
+        def __receive_1st_description p
+          @_receive_description = :_CLOSED
+          @describe_by = p ; KEEP_PARSING_
+        end
+
+        def must_be_integer_greater_than_or_equal_to_this d
+          _add_number_normalization :number_set, :integer, :minimum, d
+        end
+
+        def _add_number_normalization * x_a  # (as seen in [br])
+
+          normer = Home_.lib_.basic.normalizers.number.new_via_iambic x_a
+          will_normalize_by do |qkn, &p|
+            if qkn.is_effectively_known
+              normer.normalize_qualified_knownness qkn, & p
+            else
+              qkn.to_knownness
+            end
+          end
+        end
+
+        def will_normalize_by & p
+          send ( @_receive_normalizer ||= :__receive_1st_normalizer ), p
+        end
+
+        def __receive_1st_normalizer p
+          @_receive_normalizer = :_CLOSED
+          @normalize_by = p ; KEEP_PARSING_
+        end
+
+        # --
+
+        def will_default_by & p
+          send ( @_receive_default ||= :__receive_1st_default ), p
+        end
+
+        def __receive_1st_default p
+          @_receive_default = :_CLOSED
+          @default_by = p ; KEEP_PARSING_
+        end
+
+        # --
+
+        def become_required
+          @is_required = true ; ACHIEVED_
+        end
+
+        def become_flag
+          _argument_arity_mutex :@is_flag
+        end
+
+        def become_glob
+          _argument_arity_mutex :@is_glob
+        end
+
+        def _argument_arity_mutex ivar
+          send ( @_receive_arg_arity ||= :__receive_1st_arg_arity ), ivar
+        end
+
+        def __receive_1st_arg_arity ivar
+          @_receive_arg_arity = :_CLOSED
+          instance_variable_set ivar, true ; KEEP_PARSING_
+        end
+
+        def accept_name_symbol sym
+          @name_symbol = sym
+        end
+
+        def finish
+          # (or not:)
+          freeze ; nil
+        end
+
+        def id2name
+          name_symbol  # :#coverpoint-1-2
+        end
+
+        attr_reader(
+          :default_by,
+          :describe_by,
+          :normalize_by,
+          :is_flag, :is_glob,
+          :is_required,
+          :name_symbol,
+        )
+      end
+
+      # ==
+      # ==
+      # ==
+
       def initialize k, & edit_p
 
         @argument_arity = :one

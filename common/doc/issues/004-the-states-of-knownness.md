@@ -8,9 +8,12 @@
   other value.
 
 • a "known known" has the important side-effect that it itself is always
-  true-ish (because it is an instance of a class we created).
+  true-ish (because it is an instance of a class we created, and all such
+  instances are trueish (try subclassing `NilClass` or `FalseClass` - you
+  can do it but you can't instantiate any instance of it!)).
 
 • a "known known" can be "qualified" or "unqualified".
+  (in implementation we have at least two separate classes for these.)
 
 • the qualified variety of "known known" has an `association` field that
   must produce an assocation structure of any shape provided that it has
@@ -24,7 +27,7 @@
   unknown has no internal state to maintain, it is a singleton object.
 
   EDIT: we can now construct a known unknown with a
-  [#ze-030]#A "reasoning" object.
+  [#ze-030.1] "reasoning" object.
 
 
 

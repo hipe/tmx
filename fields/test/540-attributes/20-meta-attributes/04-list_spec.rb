@@ -2,22 +2,19 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - meta-attributes - list" do
 
-    TS_.describe "[fi] attributes - meta-attributes - list" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes::Meta_Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_meta_attributes
 
       context "(context)" do
 
         shared_subject :entity_class_ do
 
-          class X_List_A
+          class X_a_ma_List_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               topping: :list,
             )
 
@@ -44,6 +41,33 @@ module Skylab::Fields::TestSupport
           o.instance_variable_get( :@topping ).should eql [ :sprinkles, :sparkles ]
         end
       end
+
+    # ==
+
+    it "(E.K)" do
+
+        _subject = __not_memoized_but_could_be_subject
+
+        _subject.length == 2 || fail
+
+        _subject.map( & :name_symbol ) == %i( foo bar ) || fail
+
+        a = _subject
+        a.first.is_glob && fail
+        a.last.is_glob || fail
     end
+
+    def __not_memoized_but_could_be_subject
+
+        given_definition_(
+          :property, :foo,
+          :glob, :property, :bar,
+        )
+
+        _st = flush_to_item_stream_expecting_all_items_are_parameters_
+        _st.to_a
+    end
+
+    # ==
   end
 end

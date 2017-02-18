@@ -2,22 +2,19 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - meta-attributes - boolean" do
 
-    TS_.describe "[fi] attributes - meta-attributes - boolean" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes::Meta_Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_meta_attributes
 
       context "intro" do
 
         shared_subject :entity_class_ do
 
-          class X_Boolean_A
+          class X_a_ma_Boolean_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               finished: :boolean,
             )
 
@@ -65,9 +62,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_Boolean_B
+          class X_a_ma_Boolean_B
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               ready: [ :boolean, :negative_stem, :pending, :positive_stem, :is_ready ],
             )
 
@@ -95,6 +92,37 @@ module Skylab::Fields::TestSupport
           sess.is_ready? and fail
         end
       end
+
+    # ==
+
+    context "(E.K)" do
+
+      it "hi" do
+
+        a = _subject
+
+        first = a.first ; last = a.last
+        first.is_flag && fail
+        first.name_symbol == :jablookie || fail
+
+        last.is_flag || fail
+        last.name_symbol == :jamoney || fail
+      end
+
+      def _subject
+
+        given_definition_(
+          :property, :jablookie,
+          :flag, :property, :jamoney, :wippelzorff,
+        )
+
+        st = flush_to_item_stream_expecting_all_items_are_parameters_
+
+        [ st.gets, st.gets ]
+      end
     end
+
+    # ==
+    # ==
   end
 end

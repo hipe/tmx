@@ -2,22 +2,19 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - meta-attributes - desc" do
 
-    TS_.describe "[fi] attributes - meta-attributes - desc" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes::Meta_Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_meta_attributes
 
       context "(context)" do
 
         shared_subject :entity_class_ do
 
-          class X_Desc_A
+          class X_a_ma_Desc_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               wazlow: [ :desc, -> y { y << "line 1: #{ self._hi }" ; y << "line 2" } ],
               pazlow: [ :desc, -> { "this way #{ self._hi }" } ],
             )
@@ -52,7 +49,7 @@ module Skylab::Fields::TestSupport
 
       memoize :_would_be_expression_agent do
 
-        cls = class X_Desc_Expag
+        cls = class X_a_ma_Desc_Expag
 
           alias_method :calculate, :instance_exec
 
@@ -65,6 +62,35 @@ module Skylab::Fields::TestSupport
 
         cls.new
       end
+
+    # ==
+
+    it "(E.K)" do
+
+        _subject = __subject
+
+        _subject.length == 2 || fail
+
+        _subject.map( & :name_symbol ) == %i( foo bar ) || fail
+
+        a = _subject
+        a.first.describe_by && fail
+        a.last.describe_by[ [] ] == %w(hallo) || fail
     end
+
+    def __subject
+
+        given_definition_(
+          :property, :foo,
+          :property, :bar, :description, -> y do
+            y << "hallo"
+          end,
+        )
+
+        _st = flush_to_item_stream_expecting_all_items_are_parameters_
+        _st.to_a
+    end
+    # ==
+    # ==
   end
 end

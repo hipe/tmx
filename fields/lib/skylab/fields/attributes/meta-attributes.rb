@@ -4,6 +4,56 @@ module Skylab::Fields
 
     class MetaAttributes < ::BasicObject  # 1x (this lib only). [#009]..
 
+      # ==
+
+      module EntityKillerModifiers
+
+        module PrefixedModifiers
+
+          def required
+            @parse_tree.become_required
+          end
+
+          def flag
+            @parse_tree.become_flag
+          end
+
+          def glob
+            @parse_tree.become_glob
+          end
+
+          def property
+            @parse_tree.accept_name_symbol @scanner.gets_one
+            @parser.transition_from_prefix_to_postfix
+          end
+        end
+
+        module PostfixedModifiers
+
+          def description
+            @parse_tree.will_describe_by_this @scanner.gets_one
+          end
+
+          def must_be_integer_greater_than_or_equal_to
+            @parse_tree.must_be_integer_greater_than_or_equal_to_this @scanner.gets_one
+          end
+
+          def default_by
+            @parse_tree.will_default_by( & @scanner.gets_one )
+          end
+
+          def normalize_by
+            @parse_tree.will_normalize_by( & @scanner.gets_one )
+          end
+
+          def argument_moniker
+            @parse_tree.receive_argument_moniker @scanner.gets_one
+          end
+        end
+      end
+
+      # ==
+
       def initialize build
         @_ = build
       end

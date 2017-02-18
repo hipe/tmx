@@ -19,6 +19,8 @@ use [sa] to convert etc to Stream_
 -7 also: decide if entity library is deprecated (#open [#fi-034.1])
 -17 down to -7 (11 items): [ta],[gv],[cu],[cm],[gi],[f2],[bs],[tr],[sl],[st],[co]
 -18.333 down to -18.001: [sg] all CLI down to finish
+imagine inverting required/optional
+finish what you started with expag (somewhere)
 explain MTk and associate the explanation with its nodes
 -18.666 down to -18.334: [sg] all API etc
--18.833: break out entity into its own library, flush incidentals
+(sg action branch nodes: criteria, node collection, node, tag, todo)

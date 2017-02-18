@@ -127,9 +127,12 @@
              ( was: #event-marker: asssuming event shape/utility is a smell )
 [#005]       track all (usually legacy) event class [generator] transplants
              ( #was: use nifty ridiculous of treemap )
-[#004] #open [ the "knownness" structure ] and "the states of knownness" ..
+
+[#004]       "qualified knownness", "known known"
+             [ the "knownness" structure ] and "the states of knownness" ..
              ( #was: rename `name_i` => `name_symbol` universe-wide )
              (was: #done rename `event_cloud` -> `event_graph`)
+
 [#003]       the event narrative ..
              :[#here.1]: "structured expressive" (both old (main) node and new)
              (was: #done event class should not be a struct)
