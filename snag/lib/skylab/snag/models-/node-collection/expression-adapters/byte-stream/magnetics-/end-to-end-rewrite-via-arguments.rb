@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class Magnetics_::EndToEndRewrite_via_Arguments  # see [#038]
 
@@ -166,7 +166,7 @@ module Skylab::Snag
 
         def __mutate_collection_and_subject_entity_by_reappropriation__
 
-          _ = Home_::Models_::Node::Actions::Open::Try_to_reappropriate
+          _ = Models_::Node::Actions::Open::Try_to_reappropriate
 
           x = _[ @subject_entity, @_self, & @on_event_selectively ]
           if x

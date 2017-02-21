@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       Mutable_Models_ = ::Module.new
 
@@ -155,7 +155,7 @@ module Skylab::Snag
         end
 
         def modality_const  # #experimental mechanic
-          :Byte_Stream
+          :ByteStream
         end
 
         class Row___

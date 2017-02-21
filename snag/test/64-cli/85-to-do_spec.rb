@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI - to-do" do
+  describe "[sg] CLI - to-do", wip: true do
 
     TS_[ self ]
     use :my_CLI

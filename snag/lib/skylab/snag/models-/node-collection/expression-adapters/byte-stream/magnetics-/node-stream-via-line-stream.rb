@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class Magnetics_::NodeStream_via_LineStream
 
@@ -86,8 +86,8 @@ module Skylab::Snag
           _BODY = []
           _STRING_SCANNER = Home_::Library_::StringScanner.new s
 
-          _Models = Home_::Models_
-          _Models_ = _Models::Node::Expression_Adapters::Byte_Stream::Models_
+          _Models = Models_
+          _Models_ = _Models::Node::ExpressionAdapters::ByteStream::Models_
           @Substring = _Models_::Substring
 
             # (we don't memoize instances of the above because it would
@@ -95,11 +95,11 @@ module Skylab::Snag
 
           # ~ ID related
 
-          @ID = _Models::Node_Identifier.new_empty
-          @ID_ = _Models::Node_Identifier.new_empty
+          @ID = _Models::NodeIdentifier.new_empty
+          @ID_ = _Models::NodeIdentifier.new_empty
 
-          @reinterpret_ID = _Models::Node_Identifier::Expression_Adapters::
-            Byte_Stream.build_reinterpreter _STRING_SCANNER
+          @reinterpret_ID = _Models::NodeIdentifier::ExpressionAdapters::
+            ByteStream.build_reinterpreter _STRING_SCANNER
 
           # ~ body related
 

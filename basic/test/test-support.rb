@@ -90,6 +90,10 @@ module Skylab::Basic
         em.cached_event_value.to_event.terminal_channel_symbol.should eql sym
         em
       end
+
+      def subject_API_value_of_failure
+        FALSE
+      end
     end
 
     Expect_CLI = -> tcc do

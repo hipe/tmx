@@ -11,7 +11,7 @@ module Skylab::Snag
         @_action_reflection = action_reflection
 
         @_up =
-          Home_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+          Home_::Models_::NodeCollection::ExpressionAdapters::ByteStream.
             build_default_expression_agent
       end
 
@@ -129,7 +129,7 @@ module Skylab::Snag
       end
 
       def _NLP_agent
-        @___NLP_agent ||= Home_.lib_.zerk::Expresser::NLP_EN_ExpressionAgent.new
+        @___NLP_agent ||= Zerk_lib_[]::Expresser::NLP_EN_ExpressionAgent.new
       end
 
       # ~

@@ -105,7 +105,7 @@ module Skylab::Basic
       attr_reader :path
 
       def modality_const  # :+#experimental
-        :Byte_Stream
+        :ByteStream
       end
 
       def description_under expag

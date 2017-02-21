@@ -200,8 +200,9 @@ module Skylab::Common::TestSupport
         end
 
         def __expev_expect_failed_result
-          if false != @result
-            _expev_fail Say_unexpected_result__[ @result, false ]
+
+          if subject_API_value_of_failure != @result
+            _expev_fail Say_unexpected_result__[ @result, subject_API_value_of_failure ]
           end
         end
 

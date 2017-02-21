@@ -31,7 +31,7 @@ module Skylab::Plugin::TestSupport
 
         _rsx = _build_resources :inigo_montoya, :wahoo
         lt = _ob.to_load_ticket_stream.gets
-        bc = lt.bound_call_of_operator_via_resources _rsx
+        bc = lt.bound_call_of_operator_via_invocation_resouces _rsx
         _wat = bc.receiver.send bc.method_name, * bc.args, & bc.block
         _wat == [ :woohoo, :wahoo ] || fail
       end
@@ -48,7 +48,7 @@ module Skylab::Plugin::TestSupport
 
         lt = _ob.to_load_ticket_stream.gets
 
-        _bc = lt.bound_call_of_operator_via_resources _rsx
+        _bc = lt.bound_call_of_operator_via_invocation_resouces _rsx
 
         _bc.nil? || fail
 
@@ -64,8 +64,16 @@ module Skylab::Plugin::TestSupport
       shared_subject :_ob do
 
         _subject_module.define do |o|
+
           o.models_branch_module = X_mcob_PrentendModels
+
           o.add_actions_module_path_tail "zib-flib/zub-flub"
+
+          o.filesystem = :_no_filesystem_used_in_this_test_PL_
+
+          o.bound_call_via_action_with_definition_by = -> xx do
+            TS_._NEVER_CALLED
+          end
         end
       end
     end

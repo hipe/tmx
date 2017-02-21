@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::CLI
+    module ExpressionAdapters::CLI
 
       class << self
 
@@ -19,7 +19,7 @@ module Skylab::Snag
             first.formal_properties.each do |prp|
 
               _asc = comp_assoc_for[ prp.name_symbol ]
-              _CLI = _asc.component_model::Expression_Adapters::CLI
+              _CLI = _asc.component_model::ExpressionAdapters::CLI
               _p = _CLI.express_of_via_under expag
 
               o.register_property prp, & _p

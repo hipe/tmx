@@ -55,7 +55,7 @@ bit like the reverse of the DOM event model in a web brower, where a component
 the event "bubbles up" out to larger and larger components until it finds
 one (if any) that wants the event.
 
-in our case (what we now call the [#br-100] "client tree model"), the event
+in our case (what we now call the [#pl-011] "model-centric operator branch), the event
 is received by the outermost component and gets "bubbled in" to successive
 layers of component whereby at each level, all the component needs to to
 is either ignore the incoming event, respond to to the incoming event, or

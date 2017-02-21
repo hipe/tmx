@@ -100,13 +100,17 @@ module Skylab::Zerk  # intro in [#001] README
 
     Autoloader_[ self ]
 
+    lazily :ModelCentricOperatorBranch do
+      Home_.lib_.plugin::ModelCentricOperatorBranch
+    end
+
+    lazily :Normalize do
+      Home_.lib_.fields::Attributes::Toolkit::Normalize
+    end
+
     lazily :ParseArguments_via_FeaturesInjections do
       # a convenience alias so the remote doesn't have to know where it is
       No_deps_zerk_[]::ParseArguments_via_FeaturesInjections
-    end
-
-    lazily :ModelCentricOperatorBranch do
-      Home_.lib_.plugin::ModelCentricOperatorBranch
     end
 
     lazily :API_ArgumentScanner do
@@ -181,6 +185,7 @@ module Skylab::Zerk  # intro in [#001] README
     Fields = sidesys[ :Fields ]
     Human = sidesys[ :Human ]
     Open_3 = stdlib[ :Open3 ]
+    Plugin = sidesys[ :Plugin ]
     System_lib = sidesys[ :System ]
     Tabular = sidesys[ :Tabular ]
   end

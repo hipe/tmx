@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class Magnetics_::ParseNestedParenthesis_via_Arguments
 

@@ -111,7 +111,7 @@ module Skylab::System
       end
 
       def modality_const
-        :Byte_Stream
+        :ByteStream
       end
     end
 

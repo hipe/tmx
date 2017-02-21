@@ -26,8 +26,10 @@ available as "Testing and Metaprogramming eXeriments". but meh.
 
 ## what is tmx here?
 
-in the context of the diaspora before you, "tmx" is a [#br-100]
-"reactive node" whose only purpose is to glue together other such nodes.
+in the context of the diaspora before you, "tmx" is an "operator branch"
+whose only purpose is to glue together other such branches.
+
+(EDIT: the above used to reference what is now [#pl-011] but may no longer be relevant)
 
 
 

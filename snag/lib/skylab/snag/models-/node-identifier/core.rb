@@ -1,10 +1,10 @@
 module Skylab::Snag
 
-  class Models_::Node_Identifier
+  class Models_::NodeIdentifier
 
-    Expression_Adapters = ::Module.new
+    ExpressionAdapters = ::Module.new
 
-    class << ( Expression_Adapters::Byte_Stream = ::Module.new )
+    class << ( ExpressionAdapters::ByteStream = ::Module.new )
 
       # parsing the byte stream is like parsing the user argument but:
       #   • minus error reporting (because of its syntax) -AND-
@@ -35,11 +35,11 @@ module Skylab::Snag
 
       def express_into_under_of_ y, expag, id
 
-        y << Expression_Adapters::CLI.express_of_via_under( expag )[ id ]
+        y << ExpressionAdapters::CLI.express_of_via_under( expag )[ id ]
       end
     end  # >>
 
-    module Expression_Adapters::CLI ; class << self
+    module ExpressionAdapters::CLI ; class << self
 
       def express_of_via_under expag
 
@@ -182,7 +182,7 @@ module Skylab::Snag
 
       def __something_after_digit integer_d, id, scn, & x_p
 
-        sfx = Here_::Models_::Suffix::Interpret[ scn, :Byte_Stream, & x_p ]
+        sfx = Here_::Models_::Suffix::Interpret[ scn, :ByteStream, & x_p ]
 
         if sfx
           id.reinitialize sfx, integer_d
@@ -339,9 +339,7 @@ module Skylab::Snag
 
     include Expression_Methods_
 
-    Actions = THE_EMPTY_MODULE_
-
-    Expression_Adapters::EN = nil
+    ExpressionAdapters::EN = nil
 
     Here_ = self
   end

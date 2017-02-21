@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
     class Magnetics_::Digraph_via_NodeUpstream < Common_::Monadic
 
@@ -76,14 +76,14 @@ module Skylab::Snag
 
       def __prepare_to_iterate  # take this and the other and abstract it one day ..
 
-        nid = Home_::Models_::Node_Identifier.new_empty
+        nid = Models_::NodeIdentifier.new_empty
         @_nid_fly = nid
 
         @__scan_for_nid = -> str do
 
           strscn = Home_::Library_::StringScanner.new str
 
-          p = Home_::Models_::Node_Identifier::Expression_Adapters::Byte_Stream.
+          p = Models_::NodeIdentifier::ExpressionAdapters::ByteStream.
             build_reinterpreter strscn
 
           @__scan_for_nid = -> str_ do

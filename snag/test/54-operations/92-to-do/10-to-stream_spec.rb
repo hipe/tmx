@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] to-do - to stream" do
+  describe "[sg] to-do - to stream", wip: true do
 
     TS_[ self ]
     use :expect_event, :ignore, :find_command_args

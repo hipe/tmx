@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class << self
 
@@ -15,7 +15,7 @@ module Skylab::Snag
           body = node.body
 
           if body.is_mutable
-            if :Byte_Stream == body.modality_const
+            if :ByteStream == body.modality_const
               Delineate__[][ d, y, expag, node ]
             else
               Delineate__[].new_via( d, y, expag, node ).execute_agnostic
@@ -49,7 +49,7 @@ module Skylab::Snag
           fly.initialize_string_scanner_ sstr.begin, sstr.end, sstr.s
 
           fly.receive_hashtag_class_(
-            Home_::Models_::Tag::Expression_Adapters::Byte_Stream::Models_::Tag
+            Home_::Models_::Tag::ExpressionAdapters::ByteStream::Models::Tag
           )
 
           fly.init

@@ -4,38 +4,57 @@ module Skylab::Snag
 
     module Library_
 
-      class Domain_Adapter
+      class DomainAdapter
 
         # immutability? who needs it! conceived in [#029]
 
         class << self
 
-          def new_via_kernel_and_NLP_const kr, const
+          def via_NLP_const_and_invocation_resources__ const, invo_rsx
 
-            x = new kr
-            src = kr.reactive_tree_seed
+            # crazy but OK: in order for every "silo" to write their domain-
+            # specific linguistic knowledge into the subject, we traverse
+            # over all the "model" "modules (those that are modules) and:
 
-            src.constants.each do | const_ |
+            mutable_me = __begin_mutable_me
 
-              x_ = src.const_get const_, false
-              x_.respond_to? :const_get or next
+            st = invo_rsx.microservice_operator_branch_.to_load_ticket_stream
 
-              p = x_.const_get( :Expression_Adapters, false ).
-                const_get :EN, false
+            begin
 
-              p or next
-              p[ x ]
-            end
-            x
+              lt = st.gets
+              lt || break
+
+              x = lt.dereference_load_ticket
+              if ! x.respond_to? :const_get
+                redo  # maybe the "silo" is not a module. (ping used to be this. no longer)
+              end
+
+              expads = x.const_get :ExpressionAdapters, false
+              if ! expads
+                redo  # the "silo" is stating explicitly that it doesn't participate
+              end
+
+              p = expads.const_get :EN, false
+              if ! p
+                redo
+              end
+
+              p[ mutable_me ]
+              redo
+            end while above
+
+            mutable_me
           end
+
+          alias_method :__begin_mutable_me, :new  # #testpoint
+          undef_method :new
         end  # >>
 
-        def initialize kr
+        def initialize
 
-          @_kernel = kr
           @model_box_ = Common_::Box.new
         end
-
 
         def new_criteria_tree_via_word_array s_a, & x_p
 

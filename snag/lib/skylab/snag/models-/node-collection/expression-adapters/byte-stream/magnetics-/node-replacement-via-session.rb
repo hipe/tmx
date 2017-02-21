@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class Magnetics_::NodeReplacement_via_Session < Common_::Monadic
 

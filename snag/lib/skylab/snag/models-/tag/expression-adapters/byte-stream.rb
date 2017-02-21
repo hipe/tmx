@@ -2,21 +2,21 @@ module Skylab::Snag
 
   class Models_::Tag
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class << self
 
         def express_into_under_of_ y, _expag, tag
 
-          y << "#{ HASHTAG_PREFIX___ }#{ tag.intern }"  # :+[#007]
+          y << "#{ HASHTAG_PREFIX___ }#{ tag.intern }"  # #[#007.A]
         end
       end  # >>
 
       HASHTAG_PREFIX___ = '#'
 
-      Models_ = ::Module.new
+      Models = ::Module.new
 
-      class Models_::Tag < Home_::Models_::Tag
+      class Models::Tag < Home_::Models_::Tag
 
         # so we can have fast scanning of hashtags but still leverage
         # the arbitrary business methods of our parent (all from the

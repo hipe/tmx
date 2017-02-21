@@ -90,6 +90,10 @@ module Skylab::System::TestSupport
       Home_.services
     end
 
+    def subject_API_value_of_failure
+      FALSE
+    end
+
     def handle_event_selectively_
       event_log.handle_event_selectively
     end

@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class Magnetics_::ExpressDelineatedLines_via_Node  # exactly [#010]
 

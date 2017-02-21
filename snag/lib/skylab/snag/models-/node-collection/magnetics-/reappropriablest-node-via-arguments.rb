@@ -1,21 +1,26 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    class Magnetics_::ReappropriablestNode_via_Arguments < Common_::Monadic
+    class Magnetics_::ReappropriablestNode_via_Arguments < Common_::Dyadic
 
       # as an exercise we are sticking as close as is reasonable to a line-
       # by line transformation of the relevant "proto-sudocode" in [#038]
 
-      def initialize nu
+      def initialize nu, invo_rsx
+        @__invocation_resources = invo_rsx
         @node_upstream = nu
       end
 
       def execute
 
-        criteria_p = Home_::Models_::Node::Criteria.new( %w(
+        criteria_p = Models_::Node::Criteria.via_words_and_invocation_resources_( %w(
           the node is tagged with #done or #hole and has
-          no extended content ) ).to_proc
+          no extended content ),
+
+          @__invocation_resources,
+
+        ).to_proc
 
         memoized_node = nil
         memoized_node_number = nil

@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
     class Magnetics::Expression_of_OpenNodes_via_Arguments
 

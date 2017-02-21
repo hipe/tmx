@@ -21,7 +21,7 @@ module Skylab::Snag::TestSupport
     end
 
     _Subject = -> do
-      Home_::Models_::Node_Identifier
+      Home_::Models_::NodeIdentifier
     end
 
     context "suffixes - use '.', '-', or '/' to separate components" do

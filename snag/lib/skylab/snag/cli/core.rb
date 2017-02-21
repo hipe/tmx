@@ -98,7 +98,7 @@ module Skylab::Snag
         # ( not here, but where?
 
         path = bx.fetch :upstream_identifier
-        path = Home_::Models_::Node_Collection.nearest_path(
+        path = Home_::Models_::NodeCollection.nearest_path(
           path, @_filesystem, & @_oes_p )
 
         # )
@@ -180,7 +180,7 @@ module Skylab::Snag
 
       def __prepare_backstream_for_report bx
 
-        o = Home_::Models_::Node_Collection::Magnetics::Expression_of_OpenNodes_via_Arguments.
+        o = Home_::Models_::NodeCollection::Magnetics::Expression_of_OpenNodes_via_Arguments.
           new( & @_oes_p )
 
         o.filesystem = @_filesystem

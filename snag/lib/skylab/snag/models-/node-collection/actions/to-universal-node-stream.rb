@@ -1,6 +1,8 @@
+self._NOT_COVERED_AND_GROWING_OLD
+
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
     class Actions::To_Universal_Node_Stream  # [#001].
 
@@ -38,7 +40,7 @@ module Skylab::Snag
         NIL_
       end
 
-      def produce_result
+      def execute
 
         ok = __resolve_path
         ok &&= __via_path_resolve_manifest_stream
@@ -61,7 +63,8 @@ module Skylab::Snag
         end
       end
 
-      alias_method :execute, :produce_result
+      self._WHAT
+      alias_method :execute, :execute
 
       def __via_path_resolve_manifest_stream
 
@@ -71,7 +74,7 @@ module Skylab::Snag
 
         @_mani_st = Common_::Stream.via_nonsparse_array _s_a do | path |
 
-           Models_::Node_Collection.new_via_path path, & @_oes_p
+           Models_::NodeCollection.new_via_path path, & @_oes_p
         end
 
         ACHIEVED_
@@ -107,7 +110,7 @@ module Skylab::Snag
         focus_count = 0
         total_count = 0
 
-        expag = Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+        expag = Models_::NodeCollection::ExpressionAdapters::ByteStream.
           build_default_expression_agent
 
         st = @_node_st

@@ -112,14 +112,7 @@ module Skylab::Snag
       @_header_r.begin
     end
 
-    module Actions
-
-      ToStream = Make_action_loader_[]
-
-      Melt = Make_action_loader_[]
-    end
-
-    module Expression_Adapters
+    module ExpressionAdapters
       EN = nil
     end
 

@@ -42,7 +42,9 @@
 [#102]       :+#tombstone: removed old & complex o.p that parsed '--'
 
 [#101]       #investigation - how to architect.
-[#100]       an introduction to a reactive model ..
+
+[#100] #hole ( #moved-to: [#pl-011]  #was: an introduction to a reactive model .. )
+
 [#099]       [ branch node for historical documents ]
 
 [#098] #hole ( #was: ouroboros. #moved-to: [#ze-055] )

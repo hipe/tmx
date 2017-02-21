@@ -2,8 +2,6 @@ module Skylab::Snag
 
   class Models_::Date
 
-    Actions = THE_EMPTY_MODULE_
-
     class << self
 
       def normalize_qualified_knownness qkn, & oes_p  # :+[#ba-027]
@@ -39,8 +37,10 @@ module Skylab::Snag
 
     attr_reader :string
 
-    module Expression_Adapters
+    module ExpressionAdapters
       EN = nil
     end
+
+    # ==
   end
 end

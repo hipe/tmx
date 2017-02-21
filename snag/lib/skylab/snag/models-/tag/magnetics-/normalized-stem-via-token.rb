@@ -18,7 +18,7 @@ module Skylab::Snag
           x  # assumed
         end
 
-        @as_string = "##{ @symbol.id2name }"  # :+[#007] add hashtag prefix
+        @as_string = "##{ @symbol.id2name }"  # #[#007.A] add hashtag prefix
 
         st = Home_::Models::Hashtag::Stream[ @as_string ]
 

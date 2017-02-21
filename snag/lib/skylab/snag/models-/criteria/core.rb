@@ -8,15 +8,21 @@ module Skylab::Snag
 
     Actions = ::Module.new
 
-    class Action__ < Brazen_::Action  # re-opens
+    # (as model starts #here)
 
-      Brazen_::Modelesque.entity self
-
+    class CriteriaAction__
+      def self.edit_entity_class( * )
+        NOTHING_  # until we come around
+      end
     end
 
-    class Actions::Criteria_To_Stream < Action__
+    class Actions::Criteria_To_Stream < CriteriaAction__
 
-      edit_entity_class(
+      def definition
+        self._NEED
+      end
+
+      def __definition ; [
 
         :description, -> y do
           y << "adds to the persisted criteria collection"
@@ -37,9 +43,9 @@ module Skylab::Snag
         :argument_arity, :one_or_more,
         :property, :criteria
 
-      )
+      ] end
 
-      def produce_result
+      def execute
 
         ok = __resolve_any_persistence_operation
         ok &&= __resolve_criteria
@@ -50,13 +56,14 @@ module Skylab::Snag
       def __resolve_any_persistence_operation
 
         ok = ACHIEVED_
+        self._NO_MORE_ARGUMENT_BOX
         h = @argument_box.h_
         save_x = h[ :save ]
         edit_x = h[ :edit ]
 
         if save_x
           if edit_x
-            handle_event_selectively.call :error, :expression, :syntax do | y |
+            _listener_.call :error, :expression, :syntax do | y |
               y << "can't simultaneously #{ par 'save' } and #{ par 'edit' }"
             end
             ok = UNABLE_
@@ -75,10 +82,13 @@ module Skylab::Snag
 
       def __resolve_criteria
 
+        self._NO_MORE_ARGUMENT_BOX
+        self._NO_MORE_KERNEL
+
         c = Here_.new_via_expression(
           @argument_box.fetch( :criteria ),
           @kernel,
-          & handle_event_selectively )
+          & _listener_ )
 
         if c
           @_criteria = c
@@ -98,6 +108,7 @@ module Skylab::Snag
       end
 
       def __save__criteria
+        self._NO_MORE_KERNEL
 
         @_criteria.__receive_persistence_slug_and_cetera(
           @_persistence_arg,
@@ -107,27 +118,28 @@ module Skylab::Snag
           :via, :object,
           :assuming, :not, :exists,
           :add, :criteria, @_criteria,
-          & handle_event_selectively )
+          & _listener_ )
 
         _o && ACHIEVED_
       end
 
       def __stream_via_criteria
 
+        self._NO_MORE_ARGUMENT_BOX
         _us_id = @argument_box.fetch :upstream_identifier
         @_criteria.to_reduced_entity_stream_via_collection_identifier _us_id
       end
     end
 
-    class Actions::To_Criteria_Stream < Action__
+    class Actions::To_Criteria_Stream < CriteriaAction__
 
-      def produce_result
+      def execute
 
         _cc.to_entity_stream
       end
     end
 
-    class Actions::Delete < Action__
+    class Actions::Delete < CriteriaAction__
 
       edit_entity_class(
 
@@ -138,30 +150,36 @@ module Skylab::Snag
         :required, :property, :name
       )
 
-      def produce_result
+      def execute
 
         _cc.edit(
           :assuming, :exists,
           :via, :slug,
           :remove, :critera, @property_box.fetch( :name ),
-          & handle_event_selectively )
+          & _listener_ )
       end
     end
 
-    class Action__
+    class CriteriaAction__
       def _cc
+        self._NO_MORE_KERNEL
         @kernel.silo( :criteria )._cc
       end
     end
 
-    class Silo_Daemon
+    class CriteriaResources
 
-      def initialize kr, _mod
+      class << self
+        alias_method :via_invocation_resources__, :new
+        undef_method :new
+      end  # >>
 
-        @_kr = kr
+      def initialize invo_rsx
+        @__invocation_resources = invo_rsx
       end
 
       def _cc
+        self._RECONSIDER
         @__cc ||= self.class.__build_collection_via_kernel @_kr
       end
 
@@ -189,9 +207,12 @@ module Skylab::Snag
       end
 
       def EN_domain_adapter
+        @__eda ||= __EN_domain_adapter
+      end
 
-        @__eda ||= Here_::Library_::Domain_Adapter.
-          new_via_kernel_and_NLP_const( @_kr, :EN )
+      def __EN_domain_adapter
+        Here_::Library_::DomainAdapter.via_NLP_const_and_invocation_resources__(
+          :EN, @__invocation_resources )
       end
     end
 
@@ -223,7 +244,7 @@ module Skylab::Snag
       end
     end
 
-    # -> ( criteria model )
+    # - as model (:#here)
 
       class << self
 
@@ -268,11 +289,10 @@ module Skylab::Snag
         ].freeze
       end
 
-      # ~ as class
 
-      def initialize k, & oes_p
+      def initialize invo_rsx, & oes_p
 
-        @kernel = k
+        @_invocation_resources = invo_rsx
         @on_event_selectively = oes_p
         @ok = true
       end
@@ -305,7 +325,7 @@ module Skylab::Snag
 
       def express_into__Filesystem__under col_x, fs, & x_p
 
-        Here_::Expression_Adapters::Filesystem[
+        Here_::ExpressionAdapters::Filesystem[
           col_x, @_word_array, self, @_tmpfile_sessioner, fs, & x_p ]
       end
 
@@ -375,27 +395,38 @@ module Skylab::Snag
 
       def _via_word_array_produce_criteria_tree
 
-        @kernel.silo( :criteria ).EN_domain_adapter.
+        @_invocation_resources.criteria_resources.EN_domain_adapter.
           new_criteria_tree_via_word_array(
             @_word_array, & @on_event_selectively )
       end
 
       def __receive_trueish__criteria_tree__ ct
 
-        @criteria_tree =  ct
+        _irsx = remove_instance_variable :@_invocation_resources  # or not
 
-        unb = @kernel.unbound_via :normal_identifier, @criteria_tree.name_x
+        sym_a = ct.name_x
 
-        remove_instance_variable :@kernel  # ick/meh
+        1 == sym_a.length || self._HAVE_FUN__deep_names_you_dont_want_this__
 
-        _receive unb.silo_module, :silo_module
+        _normal_symbol = Common_::Name.via_const_symbol( sym_a.fetch 0 ).
+          as_lowercase_with_underscores_symbol  # NodeCollection -> node_collection etc
+
+        _ob = _irsx.microservice_operator_branch_
+
+        _load_ticket = _ob.dereference _normal_symbol
+
+        _business_module = _load_ticket.dereference_load_ticket
+
+        @criteria_tree = ct
+
+        _receive _business_module, :business_module
       end
 
-      def __receive_trueish__silo_module__ sm
+      def __receive_trueish__business_module__ bm
 
-        @silo_module = sm
+        @business_module = bm
 
-        _expad = sm::Expression_Adapters::Criteria_Tree
+        _expad = bm::ExpressionAdapters::CriteriaTree
 
         _receive _expad, :expression_adapter
       end
@@ -415,7 +446,9 @@ module Skylab::Snag
 
       def to_reduced_entity_stream_via_collection_identifier id_x
 
-        col = @silo_module.collection_module_for_criteria_resolution.
+        self._WTF
+
+        col = @business_module.collection_module_for_criteria_resolution.
 
           new_via_upstream_identifier( id_x, & @on_event_selectively )
 
@@ -458,7 +491,7 @@ module Skylab::Snag
 
       # <-
 
-    module Expression_Adapters
+    module ExpressionAdapters
       EN = nil
       Autoloader_[ self ]
     end

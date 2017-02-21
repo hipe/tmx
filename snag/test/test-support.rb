@@ -19,7 +19,7 @@ module Skylab::Snag::TestSupport
 
     def use sym, * x_a
 
-      _ = TS_.___lib sym
+      _ = TS_.__lib sym
 
       if x_a.length.nonzero?
         x = [ x_a ]
@@ -36,7 +36,7 @@ module Skylab::Snag::TestSupport
   end
 
   cache = {}
-  define_singleton_method :___lib do | sym |
+  define_singleton_method :__lib do |sym|
     cache.fetch sym do
       x = TestSupport_.fancy_lookup sym, TS_
       cache[ sym ] = x
@@ -44,7 +44,15 @@ module Skylab::Snag::TestSupport
     end
   end
 
+  Home_ = ::Skylab::Snag
+  Common_ = Home_::Common_
+  Lazy_ = Common_::Lazy
+
   module InstanceMethods___
+
+    define_method :invocation_resources_, ( Lazy_.call do
+      Home_::InvocationResources___.new :_no_argument_scanner_from_SN_
+    end )
 
     def debug!
       @do_debug = true
@@ -60,6 +68,8 @@ module Skylab::Snag::TestSupport
       event_log.handle_event_selectively
     end
   end
+
+  # == test support extension modules
 
   module Byte_Up_And_Downstreams
 
@@ -80,8 +90,8 @@ module Skylab::Snag::TestSupport
 
     def build_byte_stream_expag_ d, d_, d__
 
-      Home_::Models_::Node_Collection::Expression_Adapters::
-        Byte_Stream::ByteStreamExpressionAgent.new d, d_, d__
+      Home_::Models_::NodeCollection::ExpressionAdapters::
+        ByteStream::ByteStreamExpressionAgent.new d, d_, d__
     end
 
     def downstream_ID_for_output_string_ivar_
@@ -139,6 +149,10 @@ module Skylab::Snag::TestSupport
       end
     end  # >>
 
+    def subject_API_value_of_failure
+      NIL  # not false - i.e use [#ze-007.5] semantics
+    end
+
     def subject_API
       Home_::API
     end
@@ -175,6 +189,12 @@ module Skylab::Snag::TestSupport
     NIL_
   end
 
+  Memoizer_Methods = -> tcc do
+    TestSupport_::Memoization_and_subject_sharing[ tcc ]
+  end
+
+  # ==
+
   Fixture_file_ = -> do
     p = -> sym do
       h = {}
@@ -210,10 +230,6 @@ module Skylab::Snag::TestSupport
     end
   end.call
 
-  Home_ = ::Skylab::Snag
-
-  Common_ = Home_::Common_
-
   Fixture_tree_dir___ = Common_.memoize do
     ::File.join TS_.dir_path, 'fixture-trees'
   end
@@ -247,6 +263,22 @@ module Skylab::Snag::TestSupport
     end
   end.call
 
+  module Operations
+
+    def self.[] tcc
+      Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
+      tcc.include self
+    end
+
+    def prepare_subject_API_invocation invo
+      invo
+    end
+
+    def subject_API
+      Home_::API
+    end
+  end
+
   module Nodes
 
     class << self
@@ -273,8 +305,10 @@ module Skylab::Snag::TestSupport
   EMPTY_P_ = Home_::EMPTY_P_
   EMPTY_S_ = Home_::EMPTY_S_
   NIL_ = nil
+  NOTHING_ = Home_::NOTHING_
   NEWLINE_ = "\n"
   SPACE_ = Home_::SPACE_
   TS_ = self
   UNDERSCORE_ = Home_::UNDERSCORE_
+  Zerk_lib_ = Home_::Zerk_lib_
 end

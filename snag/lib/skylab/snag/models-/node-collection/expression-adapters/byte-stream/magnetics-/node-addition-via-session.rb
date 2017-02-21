@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       class Magnetics_::NodeAddition_via_Session < Common_::Monadic
 
@@ -95,7 +95,7 @@ module Skylab::Snag
             break
           end while nil
 
-          Home_::Models_::Node_Identifier.new_via_integer int
+          Models_::NodeIdentifier.new_via_integer int
         end
       end # >>
     end

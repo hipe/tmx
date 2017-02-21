@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] CLI - intro" do
+  describe "[sg] CLI - intro", wip: true do
 
     TS_[ self ]
 

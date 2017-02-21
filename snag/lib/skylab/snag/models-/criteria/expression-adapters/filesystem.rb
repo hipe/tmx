@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Criteria
 
-    class Expression_Adapters::Filesystem
+    class ExpressionAdapters::Filesystem
 
       class << self
 

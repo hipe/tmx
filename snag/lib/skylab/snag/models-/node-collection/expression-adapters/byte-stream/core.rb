@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    module Expression_Adapters::Byte_Stream
+    module ExpressionAdapters::ByteStream
 
       # ~ for use with ByteStreamExpressionAgent below
 
@@ -21,27 +21,19 @@ module Skylab::Snag
             DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
         end
 
-        def node_collection_via_upstream_identifier_ id, & oes_p
+        def node_collection_via_upstream_identifier__ id, fsa
 
-          Native_Collection___.new id
+          Native_Collection___.new id, fsa
         end
       end  # >>
 
       class Native_Collection___ < Here_  # or whatever
 
-        def initialize id
+        def initialize id, fsa
+
+          @_FS_adapter = fsa
 
           @byte_upstream_ID = id
-
-          @extc_adptr = -> do
-            x = __build_extc_adpr
-            @extc_adptr = -> { x }
-            x
-          end
-
-          @_FS_adapter = Home_.application_kernel_.silo(
-            :node_collection
-          ).FS_adapter_
         end
 
         # ~ for [#ac-002] the ACS (compliments same in parent class)
@@ -98,7 +90,7 @@ module Skylab::Snag
 
         def entity_via_intrinsic_key node_id_x, & oes_p
 
-          id = Home_::Models_::Node_Identifier.new_via_user_value_(
+          id = Models_::NodeIdentifier.new_via_user_value_(
             node_id_x, & oes_p )
 
           id and entity_via_identifier_object id, & oes_p
@@ -166,35 +158,36 @@ module Skylab::Snag
 
         def node_has_extended_content_via_node_ID id
 
-          @extc_adptr[].node_has_extended_content_via_node_ID__ id
+          _extc_adapter.node_has_extended_content_via_node_ID__ id
         end
 
         def any_extended_content_filename_via_node_ID id
 
-          @extc_adptr[].any_extended_content_filename_via_node_ID__ id
+          _extc_adapter.any_extended_content_filename_via_node_ID__ id
         end
 
-        def __build_extc_adpr
+        def _extc_adapter
+          @__extc_adapter ||= __extc_adapter
+        end
+
+        def __extc_adapter
 
           bu_id = @byte_upstream_ID
           if bu_id.respond_to? :path
 
-            Expression_Adapters::Filesystem::Extended_Content_Adapter.
+            ExpressionAdapters::Filesystem::Extended_Content_Adapter.
               new_via_manifest_path_and_filesystem(
                 bu_id.path, @_FS_adapter.filesystem )
           else
-            EC_Adapter_Dummy___[]
+            THE_EMPTY_EC_ADAPTER___
           end
         end
 
-        EC_Adapter_Dummy___ = Common_.memoize do
-          o = ::Object.new
-          o.send :define_singleton_method,
-              :node_has_extended_content_via_node_ID__ do | _ |
-            false
+        module THE_EMPTY_EC_ADAPTER___ ; class << self
+          def node_has_extended_content_via_node_ID__ _
+            FALSE
           end
-          o
-        end
+        end ; end
       end
 
       class ByteStreamExpressionAgent
@@ -204,7 +197,7 @@ module Skylab::Snag
           @identifier_integer_width = d__
           @sub_margin_width = d_
           @width = d
-          @modality_const = :Byte_Stream
+          @modality_const = :ByteStream
         end
 
         attr_reader :identifier_integer_width, :modality_const,

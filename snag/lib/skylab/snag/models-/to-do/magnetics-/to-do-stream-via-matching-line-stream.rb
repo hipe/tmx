@@ -124,7 +124,7 @@ module Skylab::Snag
         body_begin, body_end = md.offset d
         header_begin, header_end = md.offset( d - 1 )
 
-        Home_::Models_::ToDo.new do | o |
+        Models_::ToDo.new do | o |
 
           o.accept_matching_line my_line_o
           o.accept_header_range header_begin, header_end

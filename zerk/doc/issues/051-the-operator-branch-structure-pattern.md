@@ -12,7 +12,7 @@ the value of the entry is used (somehow) to drive the next step of
 the parse.
 
 (often the values in the hash are method names, but this entirely
-the choice of the caller. compare a more conventional implementation
+the choice of the caller (more at [#here.1] below). compare a more conventional implementation
 of such a "control-flow structure" by switch statements (platform:
 case expressions) or if-else chains, which could be used similarly.)
 
@@ -34,7 +34,6 @@ as such, we now conceptualize the above described hash as a concrete
 example of an abstract "structure-pattern" endemic to parsing with
 argument scanners. we have tentatively dubbed this structure-pattern
 "operator branch".
-
 
 
 

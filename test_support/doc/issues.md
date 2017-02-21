@@ -15,12 +15,8 @@
              (#was: sidesystem class now in [tmx] & [sli])
 [#040]       is find nearest TS file broken?
 
-[#039]       coverpoints referenced elsewhere (borrow coverage/lend coverage)
-             [#here.3]: with [ta], [ze]
-             [#here.2]: with [ze]
-             [#here.1]: with [ze]
+[#039] #hole (#was: lend/borrow coverage, moved to [#008])
              ( #moved-to: [#dt-xxx] )
-
 
 [#038]       expect line
 
@@ -171,9 +167,18 @@
                exceptions) on individual test-failures like ::Rspec?
 
 
-[#008]       #track quickie root invocation (runtime/context)
+[#008]       lend coverage / borrow coverage / referenced elsewhere small
+
+             [#here.4]: referenced by [ze]
+             [#here.3]: with [ta], [ze]
+             [#here.2]: with [ze]
+             [#here.1]: with [ze]
+
 
 [#007]       (mostly) internal tracking
+
+      #open  [#here.D]: quickie root invocation (runtime/context)
+               (a not-covered code sketch/vestigial abandoned feature)
 
              [#here.C]: #in-situ
 
@@ -185,7 +190,7 @@
 [#006]       the quickie recursive runner microservice ..
              ( #was: test/all: redundancy points, maybe waits for [#tm-056] )
 
-[#005] #hole
+[#005] #open quickie recursive runner '-tag=~wip' doesn't work (try it in [sn])
              ( #was: #redundant s-tylize. wontfix - it's ok to be redundant here)
              ( #was: confessions of an ambiguous grammar .. )
              ( #was: #done test/all should (whitelist) run the tests in the

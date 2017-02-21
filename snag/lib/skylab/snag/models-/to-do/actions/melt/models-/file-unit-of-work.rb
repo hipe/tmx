@@ -67,7 +67,7 @@ module Skylab::Snag
 
           @_node_message = s
 
-          node = Home_::Models_::Node.edit_entity(
+          node = Models_::Node.edit_entity(
             # note an identifier is not set
             :append, :string, @_node_message
           )

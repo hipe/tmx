@@ -5,6 +5,7 @@ module Skylab::Snag::TestSupport
   describe "[sg] models - node collection [..] find reappropriablest node" do
 
     TS_[ self ]
+    use :memoizer_methods
 
     it "if no nodes match the criteria, result is nil" do
 
@@ -49,23 +50,33 @@ module Skylab::Snag::TestSupport
 
     def _against_path path
 
-      @col = Home_::Models_::Node_Collection.new_via_path path
+      _fsa = _this_one_filesystem_adapter
+
+      @col = Home_::Models_::NodeCollection.new_via_path path, _fsa
       NIL_
     end
 
     def _against s
 
+      _fsa = _this_one_filesystem_adapter
+
       _BU_ID = Home_.lib_.basic::String::Byte_Upstream_Identifier.new s
-      @col = Home_::Models_::Node_Collection.new_via_upstream_identifier _BU_ID
+
+      @col = Home_::Models_::NodeCollection.new_via_upstream_identifier _BU_ID, _fsa
       NIL_
     end
 
     def _gimme
-      _subject.call @col.to_entity_stream
+      _subject.call @col.to_entity_stream, invocation_resources_
+    end
+
+    def _this_one_filesystem_adapter
+      _fsa = invocation_resources_.node_collection_filesystem_adapter
+      _fsa  # hi. #todo
     end
 
     def _subject
-      Home_::Models_::Node_Collection::Magnetics_::ReappropriablestNode_via_Arguments
+      Home_::Models_::NodeCollection::Magnetics_::ReappropriablestNode_via_Arguments
     end
   end
 end

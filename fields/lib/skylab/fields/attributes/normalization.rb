@@ -160,6 +160,8 @@ module Skylab::Fields
               next
             end
 
+            # EEW - we never FOO so we never BAR
+            @_do_advance_EEW = false  # not necessary only the 1st time EEW
             _maybe_check_required_and_maybe_send  # assume value was resolved
           end
 
@@ -274,8 +276,9 @@ module Skylab::Fields
         end
 
         def __resolve_sanitized_value_via_ad_hoc_normalizer_against_something
-          self._CODE_SKETCH
-          # NOTE RIDE The below - the doo-hah is name-centric ..
+
+          # #borrow-coverage from [#sn-008.2], use E.K prop as an "association" in a qkn
+
           _x = remove_instance_variable :@_current_unsanitized_value
           _qkn = Common_::QualifiedKnownness[ _x, @_current_formal_attribute ]  # NOTE RIDE
           _resolve_sanitized_value_via_ad_hoc_normalizer _qkn
@@ -308,7 +311,12 @@ module Skylab::Fields
           kn = @_current_formal_attribute.normalize_by[ qkn, & @listener ]
 
           if kn
-            @_current_sanitized_value = kn.value_x ; ACHIEVED_
+            if kn.is_known_known
+              @_current_sanitized_value = kn.value_x
+            else
+              @_current_sanitized_value = NOTHING_  # hi. ([sn])
+            end
+            ACHIEVED_
           else
             # assume the remote normalizer emitted some compaint.
             _unable

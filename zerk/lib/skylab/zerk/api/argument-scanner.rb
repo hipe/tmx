@@ -54,7 +54,7 @@ module Skylab::Zerk
       end
 
       def match_integer_
-        # 2 defs one call. assume nonempty. caller emits IFF result is nil #[#007.E]
+        # 2 defs one call. assume nonempty. caller emits IFF result is nil #[#007.5]
         x = head_as_is
         if x.respond_to? :bit_length
           x

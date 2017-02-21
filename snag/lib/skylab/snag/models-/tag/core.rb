@@ -40,7 +40,7 @@ module Skylab::Snag
 
     def express_under expag
 
-      Here_::Expression_Adapters::Byte_Stream.express_into_under_of_(
+      Here_::ExpressionAdapters::ByteStream.express_into_under_of_(
         "", expag, self )
     end
 
@@ -50,7 +50,7 @@ module Skylab::Snag
       # no assistance from the expression adapter can we do this reach-down
       # but this is fragile, begin wholly dependant on that assumption.
 
-      Here_::Expression_Adapters::Byte_Stream.express_into_under_of_(
+      Here_::ExpressionAdapters::ByteStream.express_into_under_of_(
         y, nil, self )
     end
 
@@ -81,7 +81,7 @@ module Skylab::Snag
 
     include Expression_Methods_
 
-    module Expression_Adapters
+    module ExpressionAdapters
       EN = nil
       Autoloader_[ self ]
     end

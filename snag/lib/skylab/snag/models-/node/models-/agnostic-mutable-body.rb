@@ -39,7 +39,7 @@ module Skylab::Snag
             redo
           end while nil
 
-          _row = Here_::Expression_Adapters::Byte_Stream::Models_::Substring.
+          _row = Here_::ExpressionAdapters::ByteStream::Models_::Substring.
             new( 0, s.length, s )  # :+#visibility-breach
 
           Common_::Stream.via_item _row

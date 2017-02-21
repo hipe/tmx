@@ -30,6 +30,11 @@ module Skylab::Snag::TestSupport
 
         NIL_
       end
+
+      def subject_API_value_of_failure
+        false  # #open [#007.B]
+      end
+
     # -
   end
 end

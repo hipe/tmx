@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - to-do - actions - melt" do
+  describe "[sg] models - to-do - actions - melt", wip: true do
 
     TS_[ self ]
 
@@ -137,7 +137,7 @@ module Skylab::Snag::TestSupport
 
     def _manifest_file
 
-      Home_::Models_::Node_Collection::COMMON_MANIFEST_FILENAME_
+      Home_::Models_::NodeCollection::COMMON_MANIFEST_FILENAME_
     end
   end
 end

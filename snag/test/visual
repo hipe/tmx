@@ -13,7 +13,7 @@ module Skylab::Snag
 
     def produce_executable_when_nonzero_length_argv_
 
-      o = Home_::Models_::Node_Collection::Actions::To_Universal_Node_Stream.new
+      o = Home_::Models_::NodeCollection::Actions::To_Universal_Node_Stream.new
 
       o.sout_serr @stdout, @stderr
       o.argv( * @argv )

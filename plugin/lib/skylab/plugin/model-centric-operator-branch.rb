@@ -2,9 +2,29 @@ module Skylab::Plugin
 
   module ModelCentricOperatorBranch
 
-    # this puppy was born to assuage the PLETHORA (14?) of sidesystems
-    # that use the old [br] architecture, into the modern age. generally
-    # it uses filesystem globbing (not `boxxy`) to get a splay of nodes..
+    # introduction and tutorial/case-study at [#011]
+
+    # primarily this file's responsibility is to know how to load endpoints.
+    # this can involve the loading of not just the endpoints themselves, but
+    # their (any) "pure branch node" (a.k.a "splay [module]"), and possibly
+    # the parent module of these modules too (i.e a business model node).
+    #
+    # (for an in-depth discussion of this architectural convention see
+    # [#br-013] (which is at present half out-of-date but still spiritually
+    # relevant).)
+    #
+    # there are 3 ways (currently) endpoints can be "positioned" "physically":
+    #
+    #   1) "conventionally" which is where each action gets its own file
+    #   2) all actions (and only actions) in one file
+    #   3) all actions ["already"] defined in their business parent node file.
+    #
+    # currently it's all or nothing, i.e. for any given splay you can't
+    # mix-and-match the above techniques (although using a technique with
+    # a lower number might just magically work "out of the box" on techniques
+    # of a higher number, we're not sure.)
+    #
+    # (more about each above sub-convention at its corresponding section below.)
 
     class << self
 
@@ -13,6 +33,10 @@ module Skylab::Plugin
         Define___.call_by( & p )
       end
     end  # >>
+
+    # (N is "5")
+
+    # == section 1 of 3 - define-time
 
     class Define___ < Common_::MagneticBySimpleModel
 
@@ -37,284 +61,122 @@ module Skylab::Plugin
 
       def execute
 
+        fs = remove_instance_variable :@filesystem
+
+        _ir = LocalInvocationResources___.new(
+          remove_instance_variable( :@bound_call_via_action_with_definition_by ),
+          fs,
+        )
+
+        gr = GlobResources___.new(
+          remove_instance_variable( :@models_branch_module ),
+          fs,
+        )
+
         paths = []
         remove_instance_variable( :@_a ).each do |obj|
-          obj.write_into_using paths, self
+          obj.write_into_using paths, gr
         end
+        _path_scanner = Scanner_[ paths ]
 
-        @const_cache = ::Hash.new do |h, k|
-          x = k.split( DASH_ ).map { |s| s[0].upcase << s[1..-1] }.join
-          h[k] = x ; x  # always "actions" => `Actions` (maybe `Operations`)
-        end
-
-        RecursiveProgressiveOperatorBranch__.define do |o|
-          o.branch_module = remove_instance_variable :@models_branch_module
-          o.path_scanner = Common_::Scanner.via_array paths
-          o.topmost_local_resources = self
-        end
+        OperatorBranch_via_ActionsPaths___.new _path_scanner, gr, _ir
       end
-
-      def this_path
-        @models_branch_module.dir_path
-      end
-
-      attr_reader(
-        :bound_call_via_action_with_definition_by,
-        :const_cache,
-        :filesystem,
-      )
     end
 
-    # ==
-
     class ActionsModulesGlob___
+
+      # implement this kind of path glob specification.
+
       def initialize s
         @glob = s
       end
+
       def write_into_using y, o
-        glob = ::File.join o.this_path, @glob
+        glob = ::File.join o.path_head, @glob
         a = o.filesystem.glob glob
         if a.length.zero?
           self._SANITY__this_is_probably_not_what_you_want__
+          # (the above could maybe be an exception, but should never be an emission)
         else
           y.concat a ; nil
         end
       end
     end
 
-    # ==
-
     class ActionsModulePathTail___
+
+      # implement this kind of path glob specification (not actually a glob)
+
       def initialize s
         @path_tail = s
       end
+
       def write_into_using y, o
-        y << ::File.join( o.this_path, @path_tail )
+        y << ::File.join( o.path_head, @path_tail )
       end
     end
 
-    # ==
+    # == section 2 of 3 - operator branch via [3 means]
 
-    class RecursiveProgressiveOperatorBranch__ < Common_::SimpleModel
+    # ~ 1. via actionS paths
 
-      # only a slight variation on [#pl-012]; track it closely.
+    class OperatorBranch_via_ActionsPaths___
 
-      def initialize
+      # very close to [#pl-012] "operator branch via directories one deeper".
+      # also stay close to our counterpart #here-1.
 
-        yield self
+      def initialize scn, gr, lirx
+        @glob_resources = gr
+        @local_invocation_resources = lirx
 
-        @__LT_resources = LoadTicketResources___.new @branch_module, @topmost_local_resources
+        @__localize = Home_.lib_.basic::Pathname::Localizer[ gr.path_head ]
 
-        @_cache = {}
-        @_lookup_softly = :__lookup_softly_initially
-        @_splay = :__splay_initially
+        @_implementor = CachingOperatorBranch__.new scn do |path|
+          __build_load_ticket_via_path path  # hi.
+        end
       end
 
-      attr_writer(
-        :branch_module,
-        :const_cache,
-        :path_scanner,
-        :topmost_local_resources,
-      )
-
-      # ~ exposures
+      def dereference k
+        _x = lookup_softly k
+        _x or raise ::NameError, k
+        _x
+      end
 
       def lookup_softly k
-        send @_lookup_softly, k
+        @_implementor._lookup_softly k
       end
 
       def to_load_ticket_stream
-        send @_splay
+        @_implementor._to_load_ticket_stream
       end
 
-      # ~
+      def __build_load_ticket_via_path path
 
-      def __lookup_softly_initially k
-        x = @_cache[ k ]
-        if x ; x ; else
-          __lookup_non_cached k
-        end
-      end
+        _tail = @__localize[ path ]
 
-      def __lookup_softly_normally k
-        @_cache[ k ]
-      end
-
-      def __lookup_non_cached k
-        found = false ; @_done = false
-        begin
-          ticket = _gets_ticket
-          if k == ticket.name_symbol
-            found = true
-            break
-          end
-        end until @_done
-        found && ticket
-      end
-
-      def __splay_initially
-        @_done = false
-        Common_.stream do
-          _gets_ticket unless @_done
-        end
-      end
-
-      def __splay_normally
-        Stream_[ @_cache.values ]
-      end
-
-      def _gets_ticket
-
-        _path = @path_scanner.gets_one
-
-        if @path_scanner.no_unparsed_exists
-          remove_instance_variable :@path_scanner
-          @_lookup_softly = :__lookup_softly_normally
-          @_splay = :__splay_normally
-          @_done = true
-        end
-
-        ticket = @__LT_resources.build_ticket _path
-        @_cache[ ticket.name_symbol ] = ticket
-        ticket
-      end
-    end
-
-    # ==
-
-    class LoadTicketResources___
-
-      def initialize mod, tlr
-
-        @__localize = Home_.lib_.basic::Pathname::Localizer[ mod.dir_path ]
-
-        @bound_call_via_action_with_definition_by = tlr.bound_call_via_action_with_definition_by
-        @branch_module = mod
-        @const_cache = tlr.const_cache
-        @filesystem = tlr.filesystem
-      end
-
-      def build_ticket path
-
-        _tail = @__localize[ path ]  # "ping/actions"
         s_a = _tail.split ::File::SEPARATOR
-        2 == s_a.length || fail  # this could be arranged
 
-        LazyLoadTicket___.new @const_cache[ s_a.pop ], s_a, self
-      end
+        2 == s_a.length || fail  # th
 
-      def bound_call_via_three mod, rsx, const
-        if const and mod.const_get const, false
-          BoundCall_via_BranchStuff___.new( const, rsx, mod, self ).execute
+        # _tail  # =>  "ping/actions", "tag/actions.rb"
+
+        entry = s_a.pop
+        d = ::File.extname( entry ).length
+        if d.zero?
+          _stem = entry  # "actions"
         else
-          __bound_call_when_terminal rsx, mod
+          _stem = entry[ 0 ... -d ]  # "actions.rb" => "actions"  [#here.2]
+        end
+
+        _const = @local_invocation_resources.const_cache[ _stem ]
+
+        LazyLoadTicket_for_ModelProbably___.define do |o|
+          o.glob_resources = @glob_resources
+          o.local_invocation_resources = @local_invocation_resources
+          o.single_element_const_path = s_a
+          o.sub_branch_const = _const
         end
       end
-
-      def __bound_call_when_terminal rsx, mod
-
-        op = mod.new(){ rsx }
-
-        if op.respond_to? :to_bound_call_of_operator
-          op.to_bound_call_of_operator
-
-        elsif op.respond_to? :definition
-          @bound_call_via_action_with_definition_by[ op ]
-
-        else
-          Common_::BoundCall.by( & op.method( :execute ) )
-        end
-      end
-
-      attr_reader(
-        :branch_module,
-      )
-    end
-
-    # ==
-
-    class BoundCall_via_BranchStuff___  # for conventional operations
-
-      # very close to [#pl-012] "operator branch via directories one deeper"
-
-      def initialize const, rsx, mod, lrsx
-
-        @__local_resources = lrsx
-
-        @branch_module_const = const
-        @class_or_module = mod
-        @resources = rsx
-      end
-
-      def execute
-        __init_operator_branch
-        if __parse_operator
-          __bound_call_via_found_operator
-        end
-      end
-
-      def __bound_call_via_found_operator
-        _lt = remove_instance_variable( :@__found_operator ).mixed_business_value
-        _lt.bound_call_of_operator_via_resources @resources
-      end
-
-      def __parse_operator
-
-        _ob = remove_instance_variable :@__operator_branch
-
-        _ = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
-
-          o.argument_scanner = @resources.argument_scanner
-
-          o.add_operators_injection_by do |inj|
-            inj.operators = _ob
-            inj.injector = :_no_injector_for_now_from_BR_
-          end
-        end.parse_operator
-
-        _store :@__found_operator, _
-      end
-
-      def __init_operator_branch
-
-        @branch_module = @class_or_module.const_get @branch_module_const, false
-
-        _ = if @branch_module.respond_to? :dir_path
-          __operator_branch_recursively
-        else
-          __operator_branch_via_module
-        end
-        @__operator_branch = _ ; nil
-      end
-
-      def __operator_branch_via_module
-
-        _lrx = remove_instance_variable :@__local_resources
-
-        Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define do |o|
-          o.module = @branch_module
-          o.load_ticket_by = -> const do
-            AlreadyLoadedLoadTicket___.new const, @branch_module, _lrx
-          end
-        end
-      end
-
-      def __operator_branch_recursively
-
-        self._CODE_SKETCH_
-
-        _glob = ::File.join @branch_module.dir_path, GLOB_STAR_
-        _paths = @local_resources.filesystem.glob _glob
-
-        RecursiveProgressiveOperatorBranch__.define do |o|
-          o.branch_module = xxx
-          o.const_cache = @const_cache
-          o.local_resources = @local_resources
-          o.path_scanner = Common_::Scanner.via_array _paths
-        end
-      end
-
-      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
 #=== BEGIN LEGACY
@@ -518,40 +380,255 @@ module Skylab::Plugin
     # ==
 #=== END LEGACY
 
-    class LazyLoadTicket___  # when there's a file to load, do it late
+    class LazyLoadTicket_for_ModelProbably___ < Common_::SimpleModel
 
-      def initialize const, cp, lrx
+      # when there's a file to load, do it late (hence "lazy").
+      #
+      # assume the resource represented by this load ticket is (equivalent
+      # to) the kind of node we put under `Models_`, i.e a business model.
+      #
+      # but it MIGHT actually be itself a terminal action (e.g our [sn] Ping),
+      # we don't know until we load the file and see what things look like..
 
-        @name_symbol = cp.fetch(0).gsub( DASH_, UNDERSCORE_ ).intern
-
-        @_local_resources = lrx
-
-        @const_path = cp
-        @sub_branch_module_const = const
-        freeze
+      def initialize
+        yield self
+        @name_symbol = @single_element_const_path.fetch(0).gsub( DASH_, UNDERSCORE_ ).intern
+        @_business_module = :__business_module_initially
       end
 
-      def bound_call_of_operator_via_resources rsx
+      attr_writer(
+        :glob_resources,
+        :local_invocation_resources,
+        :single_element_const_path,
+        :sub_branch_const,
+      )
+
+      def bound_call_of_operator_via_invocation_resouces rirsx
 
         # (must be reentrant - is evident if you run all tests in the file)
 
-        _module = __operator_module
+        mod = dereference_load_ticket
+        const = @sub_branch_const  # `Actions`, probably
+        if const
+          if mod.const_get const, false
+            _is_conventional_model = true
+          else
+            NOTHING_  # as described [#here.3], this is how we hack having
+            # an action "sitting" in a spot where a model is supposed to go.
+            # (#borrow-coverage from [sn] (references the subject docpoint))
+          end
+        else
+          self._WE_FORGOT__when_does_this_happen_if_ever?
+        end
 
-        @_local_resources.bound_call_via_three _module, rsx, @sub_branch_module_const
+        if _is_conventional_model
+          BoundCall_via_Branch___.call_by do |o|
+            o.remote_invocation_resources = rirsx
+            o.business_module = mod
+            o.glob_resources = @glob_resources
+            o.local_invocation_resources = @local_invocation_resources
+            o.sub_branch_const = const
+          end
+        else
+          BoundCall_via_Action__[ mod, rirsx, @local_invocation_resources ]
+        end
       end
 
-      def __operator_module
+      def dereference_load_ticket  # as used by [sn]. might rename to "derefence"
+        send @_business_module
+      end
 
-        _hi = Autoloader_.const_reduce_by do |o|
-          o.from_module = @_local_resources.branch_module
-          o.const_path = @const_path
+      def __business_module_initially
+        @_business_module = :__business_module
+        @__business_module = Autoloader_.const_reduce_by do |o|
+          o.from_module = @glob_resources.splay_module
+          o.const_path = @single_element_const_path
           o.autoloaderize
         end
-        _hi  # hi. #todo
+        send @_business_module
       end
 
-      def intern
-        @name_symbol
+      def __business_module
+        @__business_module
+      end
+
+      attr_reader(
+        :name_symbol,
+      )
+
+      alias_method :intern, :name_symbol  # #borrow-coverage from [#sn-008.3]
+    end
+
+    class BoundCall_via_Branch___ < Common_::MagneticBySimpleModel
+
+      # for conventional operations. this is probably the essential algorithm
+      # of the file: resolve an operator branch and use it to parse the next
+      # step.
+
+      attr_writer(
+        :business_module,
+        :glob_resources,
+        :local_invocation_resources,
+        :remote_invocation_resources,
+        :sub_branch_const,
+      )
+
+      def execute
+        __init_things_and_operator_branch
+        if __find_operator
+          __bound_call_via_found_operator
+        end
+      end
+
+      def __bound_call_via_found_operator
+
+        _lt = remove_instance_variable( :@__found_operator ).mixed_business_value
+        _lt.bound_call_of_operator_via_invocation_resouces @remote_invocation_resources
+      end
+
+      # --
+
+      def __find_operator
+
+        _ob = remove_instance_variable :@__operator_branch
+
+        _ = MTk_::ParseArguments_via_FeaturesInjections.define do |o|
+
+          o.argument_scanner = @remote_invocation_resources.argument_scanner
+
+          o.add_operators_injection_by do |inj|
+            inj.operators = _ob
+            inj.injector = :_no_injector_for_now_from_BR_
+          end
+        end.parse_operator
+
+        _store :@__found_operator, _
+      end
+
+      # --
+
+      def __init_things_and_operator_branch
+
+        @_actions_branch_module =
+          @business_module.const_get @sub_branch_const, false
+
+        @__operator_branch = if @_actions_branch_module.respond_to? :dir_path
+          _gr = @glob_resources.dup_for @_actions_branch_module
+          OperatorBranch_via_ACTION_Paths___.new _gr, @local_invocation_resources
+        else
+          OperatorBranch_via_Action_CONSTANTS___.call(
+            @_actions_branch_module, @local_invocation_resources )
+        end
+        NIL
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+    end
+
+    # ~ 2. via ACTION paths
+
+    class OperatorBranch_via_ACTION_Paths___
+
+      # an "actION" path is different from an "actionS" path. the first
+      # represents a would-be filesystem path (actually "node path") for an
+      # action node, the other represents a would-be filesystem path
+      # (actually node path) for a "branch module" of several actions
+      # (typically called `Actions`). we scream-case our name to emphasize
+      # the distinction.
+      #
+      # the counterpart class for "actionS" is #here-1. some copy-pasta,
+      # but we are different because we don't hop 2-deep, we hop 1-deep.
+
+      def initialize gr, lirsx
+
+        _glob = ::File.join gr.path_head, GLOB_STAR_
+
+        _paths = gr.filesystem.glob _glob
+          # now we can "know" what the actions are of this model
+
+        _path_scn = Scanner_[ _paths ]
+
+        @__localize = Home_.lib_.basic::Pathname::Localizer[ gr.path_head ]
+
+        @local_invocation_resources = lirsx
+        @glob_resources = gr
+
+        @_implementor = CachingOperatorBranch__.new _path_scn do |path|
+          __build_load_ticket_via_path path
+        end
+      end
+
+      def lookup_softly k
+        @_implementor._lookup_softly k
+      end
+
+      def to_load_ticket_stream
+        @_implementor._to_load_ticket_stream
+      end
+
+      def __build_load_ticket_via_path path
+
+        tail = @__localize[ path ]
+
+        tail.include? ::File::SEPARATOR and self._SANITY__should_be_one_deep__
+
+        d = ::File.extname( tail ).length
+
+        if d.zero?
+          self._INTERESTING__this_should_work_fine__right?
+          # if you have a complicated action node (which, we don't want those,
+          # right?) it could be a directory with a corefile and it should
+          # still work with the same code thanks to our excellent autoloading
+        else
+          _stem = tail[ 0 ... -d ]
+        end ; tail = nil
+
+        LazyLoadTicket_for_ActionProbably___.define do |o|
+          o.glob_resources = @glob_resources
+          o.local_invocation_resources = @local_invocation_resources
+          o.stem = _stem
+        end
+      end
+    end
+
+    class LazyLoadTicket_for_ActionProbably___ < Common_::SimpleModel
+
+      # when there's a file to load, do it late (hence "lazy").
+      #
+      # assume the resource represented by this load ticket is (equivalent
+      # to) the kind of node we put under `Actions`, i.e an action.
+
+      def initialize
+        yield self
+        @_action_module = :__action_module_initially
+        @name_symbol = @stem.gsub( DASH_, UNDERSCORE_ ).intern
+      end
+
+      attr_writer(
+        :glob_resources,
+        :local_invocation_resources,
+        :stem,
+      )
+
+      def bound_call_of_operator_via_invocation_resouces rirsx
+
+        _action_mod = send @_action_module
+
+        BoundCall_via_Action__[ _action_mod, rirsx, @local_invocation_resources ]
+      end
+
+      def __action_module_initially
+        @_action_module = :__action_module
+        @__action_module = Autoloader_.const_reduce_by do |o|
+          o.from_module = @glob_resources.splay_module
+          o.const_path = [ @stem ]
+          o.autoloaderize
+        end
+        send @_action_module
+      end
+
+      def __action_module
+        @__action_module
       end
 
       attr_reader(
@@ -559,36 +636,222 @@ module Skylab::Plugin
       )
     end
 
+    # ~ 3. via action CONSTANS
+
+    OperatorBranch_via_Action_CONSTANTS___ = -> splay, lirsx do
+
+      # much less moving parts because the constants (nodes) are already loaded
+
+      # -
+        Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define do |o|
+          o.module = splay
+          o.load_ticket_by = -> const do
+            AlreadyLoadedLoadTicket___.new const, splay, lirsx
+          end
+        end
+      # -
+    end
+
     class AlreadyLoadedLoadTicket___
 
-      # NOTE you get none
-
-      def initialize const, bm, lrx
+      def initialize const, splay, lirsx
 
         @name_symbol = Common_::Name.via_const_symbol( const ).
           as_lowercase_with_underscores_symbol
 
-        @__local_resources = lrx
-
-        @branch_module = bm
-        @const = const
+        @__const = const
+        @__local_invocation_resources = lirsx
+        @__splay = splay
       end
 
-      def bound_call_of_operator_via_resources rsx
+      def bound_call_of_operator_via_invocation_resouces irsx
 
-        _lrx = remove_instance_variable :@__local_resources
+        @__splay.const_defined? @__const, false or fail self._SANITY
 
-        mod = @branch_module.const_get @const, false
+        _action_mod = @__splay.const_get @__const, false
 
-        if mod.respond_to? :dir_path
-          self._RECONSIDER
-        end
-
-        _lrx.bound_call_via_three mod, rsx, NOTHING_
+        BoundCall_via_Action__[ _action_mod, irsx, @__local_invocation_resources ]
       end
 
       attr_reader(
         :name_symbol,
+      )
+    end
+
+    # == section 3 of 3 - support (shared)
+
+    class CachingOperatorBranch__
+
+      def initialize scn, & p
+        @_cached_load_ticket_via_normal_name = {}
+        @_lookup = :__lookup_when_open
+        @_splay = :__splay_when_open
+        @_open = true
+
+        @_path_scanner = scn
+        @__ticket_via_path = p
+      end
+
+      # -- exposures (all local)
+
+      def _lookup_softly k
+        send @_lookup, k
+      end
+
+      def _to_load_ticket_stream
+        send @_splay
+      end
+
+      # -- lookup
+
+      def __lookup_when_open k
+        lt = @_cached_load_ticket_via_normal_name[ k ]
+        if lt ; lt ; else
+          __lookup_non_cached k
+        end
+      end
+
+      def __lookup_non_cached k
+        begin
+          ticket = _gets_ticket
+          if k == ticket.name_symbol
+            found = true
+            break
+          end
+        end while @_open
+        found && ticket
+      end
+
+      def __lookup_when_closed k
+        @_cached_load_ticket_via_normal_name[ k ]
+      end
+
+      # -- splay
+
+      def __splay_when_open
+
+        if @_cached_load_ticket_via_normal_name.length.zero?
+          _to_remaining_live_splay
+        else
+          __to_hybrid_splay
+        end
+      end
+
+      def __to_hybrid_splay
+
+        # "in nature" this doesn't happen unless (e.g) in [sn] you running
+        # multiple test files, leading to the reuse of the same microservice
+        # operator branch across several invocations
+
+        Common_::Stream::CompoundStream.define do |o|
+
+          o.add_stream _splay_of_cached
+
+          o.add_stream_by( & method( :_to_remaining_live_splay ) )
+        end
+      end
+
+      def _to_remaining_live_splay
+        Common_.stream do
+          @_open && _gets_ticket
+        end
+      end
+
+      def _splay_of_cached
+        Stream_[ @_cached_load_ticket_via_normal_name.values ]
+      end
+
+      # -- support
+
+      def _gets_ticket
+
+        _path = @_path_scanner.gets_one
+
+        ticket = @__ticket_via_path[ _path ]
+
+        if @_path_scanner.no_unparsed_exists
+          __close
+        end
+
+        @_cached_load_ticket_via_normal_name[ ticket.name_symbol ] = ticket
+        ticket
+      end
+
+      def __close
+        @_lookup = :__lookup_when_closed
+        @_splay = :_splay_of_cached
+        remove_instance_variable :@_path_scanner
+        remove_instance_variable :@__ticket_via_path
+        @_open = false
+        freeze
+      end
+    end
+
+    # ==
+
+    BoundCall_via_Action__ = -> action_mod, irsx, invo_rsx do
+
+      op = action_mod.new(){ irsx }
+
+      if op.respond_to? :to_bound_call_of_operator
+        op.to_bound_call_of_operator
+
+      elsif op.respond_to? :definition
+
+        invo_rsx.bound_call_via_action_with_definition_by[ op ]
+      else
+        Common_::BoundCall.by( & op.method( :execute ) )
+      end
+    end
+
+    # ==
+
+    class GlobResources___
+
+      def initialize mod, fs
+        _init_via_module mod
+        @filesystem = fs
+      end
+
+      def dup_for mod
+        dup._init_via_module mod
+      end
+
+      def _init_via_module mod
+        @path_head = mod.dir_path
+        @splay_module = mod ; self
+      end
+
+      attr_reader(
+        :filesystem,
+        :path_head,
+        :splay_module,
+      )
+    end
+
+    # ==
+
+    class LocalInvocationResources___
+
+      # so called because it is a discrete, shared set of resources meant to
+      # last through the whole "invocation" of this whole thing that is happening
+      # not to be confused with what the client application usually calls
+      # "invocation reources", which is a fully remote concern.
+
+      def initialize p, fs
+
+        @const_cache = ::Hash.new do |h, k|
+          x = k.split( DASH_ ).map { |s| s[0].upcase << s[1..-1] }.join.intern
+          h[k] = x ; x  # always "actions" => `Actions` (maybe `Operations`)
+        end
+
+        @bound_call_via_action_with_definition_by = p
+        @filesystem = fs
+      end
+
+      attr_reader(
+        :bound_call_via_action_with_definition_by,
+        :const_cache,
       )
     end
 
@@ -601,7 +864,8 @@ module Skylab::Plugin
 
     # ==
 
-    DASH_GLOB_ = '*'
+    GLOB_STAR_ = '*'
+    Scanner_ = Common_::Scanner.method :via_array
 
     # ==
   end

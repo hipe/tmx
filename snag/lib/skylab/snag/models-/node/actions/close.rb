@@ -2,6 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
+    Home_._NO_MORE_COMMON_ACTION
     class Actions::Close < Common_Action_
 
       edit_entity_class(
@@ -15,11 +16,13 @@ module Skylab::Snag
         :required, :property, :node_identifier
       )
 
-      def produce_result
-        resolve_node_collection_and_node_then_
+      def execute
+        if resolve_node_collection_and_node_
+          __via_node_collection_and_node
+        end
       end
 
-      def via_node_collection_and_node_
+      def __via_node_collection_and_node
 
         _ok = @node.edit(
 
@@ -29,7 +32,7 @@ module Skylab::Snag
           :if, :not, :present,
             :prepend, :tag, :done,
 
-          & handle_event_selectively )
+          & _listener_ )
 
         _ok && persist_node_
       end

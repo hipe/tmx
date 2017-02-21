@@ -179,9 +179,9 @@
 
              :[#this.G] - waiting for [br] to sunset
        #wish [#this.F] (crossreference to [#050.I]) total cels plus viz
-             [#this.E] - this microconvention of nil-vs-false semantics (see)
+             [#this.5] - this microconvention of nil-vs-false semantics (see)
              [#this.D] - primary value parsing API
-             #thread-three - nils vs. false
+             #thread-three - nils vs. false (w/ re: to input)
              #thread-two - `gets` resulting in `nil` == interrupt
              #!thread-one - used to be "hot model", now we use cold model
 

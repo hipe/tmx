@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    Expression_Adapters::EN = -> da do
+    ExpressionAdapters::EN = -> da do
 
       da.under_target_model_add_association_adapter :Ext_Cnt, (
         da.module::Association_Adapter.new_with(

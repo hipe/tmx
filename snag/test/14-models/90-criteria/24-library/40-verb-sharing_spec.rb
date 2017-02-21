@@ -70,7 +70,7 @@ module Skylab::Snag::TestSupport
 
             :keyword, 'wide' ] )
 
-      da = mod::Domain_Adapter.new :_no_kernel_for_this_test_
+      da = mod::DomainAdapter.__begin_mutable_me
       da.under_target_model_add_association_adapter %i( Height ), _h
       da.under_target_model_add_association_adapter :Width, _w
       da.source_and_target_models_are_associated %i( Thing ), :Height

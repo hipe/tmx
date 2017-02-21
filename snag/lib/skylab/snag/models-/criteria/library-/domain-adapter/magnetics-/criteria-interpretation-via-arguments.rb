@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module Library_
 
-      class Domain_Adapter
+      class DomainAdapter
 
         class Magnetics_::CriteriaInterpretation_via_Arguments
 

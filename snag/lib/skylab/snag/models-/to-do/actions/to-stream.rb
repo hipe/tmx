@@ -46,10 +46,11 @@ module Skylab::Snag
         :parameter_arity, :one,
         :property, :path
 
-      def produce_result
+      def execute
 
-        o = Here_::Magnetics_::Collection_via_Arguments.new( & handle_event_selectively )
+        o = Here_::Magnetics_::Collection_via_Arguments.new( & _listener_ )
 
+        self._NO_MORE_ARGUMENT_BOX
         h = @argument_box.h_
         o.filename_pattern_s_a = h[ :name ]
         o.path_s_a = h.fetch :path

@@ -421,6 +421,12 @@ module NoDependenciesZerk
         # near #open [#ts-005] redundant these, maybe move to here
         "\e[1;32m#{ s }\e[0m"
       end
+
+      # -- not doing anything for these, legacy compat for now
+
+      def pth s  # (needed by [#ts-008.4])
+        s
+      end
     end
 
     # = API life
@@ -536,6 +542,12 @@ module NoDependenciesZerk
 
       def em s
         "*#{ s }*"
+      end
+
+      # -- not doing anything for these, legacy compat for now
+
+      def pth s  # (needed by [#ts-008.4])
+        s
       end
     end
 
@@ -1161,7 +1173,7 @@ module NoDependenciesZerk
         end
       end
 
-      def parse_trueish_primary_value  # as in `parse_primary_value` - #borrow-coverage from [#ts-039.2]
+      def parse_trueish_primary_value  # as in `parse_primary_value` - #borrow-coverage from [#ts-008.2]
         map_trueish_value_by do |x|
           advance_one ; x
         end

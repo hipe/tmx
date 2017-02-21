@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
     COMMON_MANIFEST_FILENAME_ = 'doc/issues.md'.freeze
 
@@ -24,36 +24,36 @@ module Skylab::Snag
         end
       end
 
-      def new_via_upstream_identifier x, & oes_p
+      def new_via_upstream_identifier x, fsa, & p
 
         if x.respond_to? :to_simple_line_stream
 
-          _new_via_upstream_identifier x, & oes_p
+          _new_via_upstream_identifier x, fsa, & p
         else
 
           # (the current fallback assumption is that this is an FS path)
-          new_via_path x, & oes_p
+          new_via_path x, fsa, & p
         end
       end
 
-      def new_via_path path, & oes_p
+      def new_via_path path, fsa, & p
 
         _id = Home_.lib_.
           system_lib::Filesystem::Byte_Upstream_Identifier.new path
 
-        _new_via_upstream_identifier _id, & oes_p
+        _new_via_upstream_identifier _id, fsa, & p
       end
 
-      def _new_via_upstream_identifier id, & oes_p
+      def _new_via_upstream_identifier id, fsa, & p
 
-        expression_adapter_( id.modality_const ).
+        _expad = expression_adapter_ id.modality_const
 
-          node_collection_via_upstream_identifier_( id, & oes_p )
+        _expad.node_collection_via_upstream_identifier__ id, fsa, & p
       end
 
       def expression_adapter_ modality_const
 
-        Here_::Expression_Adapters.const_get modality_const, false
+        Here_::ExpressionAdapters.const_get modality_const, false
       end
     end  # >>
 
@@ -67,23 +67,14 @@ module Skylab::Snag
       Models_::Node
     end
 
-    module Expression_Adapters
+    module ExpressionAdapters
       EN = nil
       Autoloader_[ self ]
     end
 
-    class Silo_Daemon
+    class FilesystemAdapter  # 1x
 
-      def initialize kr, mc
-        @_kernel = kr
-      end
-
-      def FS_adapter_
-        @___fsa ||= Filesystem_Adapter___.new Home_.lib_.system.filesystem
-      end
-    end
-
-    class Filesystem_Adapter___
+      # (hard-coded collaborator with "full stack resources")
 
       def initialize fs
         @filesystem = fs
@@ -113,14 +104,6 @@ module Skylab::Snag
 
         o.using_filesystem @filesystem
       end
-    end
-
-    module Actions
-
-      Digraph = Make_action_loader_[]
-
-      To_Universal_Node_Stream = Make_action_loader_[]
-
     end
 
     Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, fs, * x_a, & x_p do

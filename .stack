@@ -17,10 +17,41 @@ use [sa] to convert etc to Stream_
 -5 [br] is renovated when it is only datastore adapteres and the example app
 -6 [cs] have fun figuring out what to do with isomorpic methods client
 -7 also: decide if entity library is deprecated (#open [#fi-034.1])
--17 down to -7 (11 items): [ta],[gv],[cu],[cm],[gi],[f2],[bs],[tr],[sl],[st],[co]
--18.333 down to -18.001: [sg] all CLI down to finish
+thru -13: API's: [ta],[gv],[cu],[cm],[gi],[f2],[bs],[tr],[sl],[st],[co]
 imagine inverting required/optional
 finish what you started with expag (somewhere)
 explain MTk and associate the explanation with its nodes
--18.666 down to -18.334: [sg] all API etc
+-18.666 down to -18.500: [sg] all API
 (sg action branch nodes: criteria, node collection, node, tag, todo)
+TD snag/test/64-cli/85-to-do_spec.rb
+TD snag/test/64-cli/11-intro_spec.rb
+TD snag/test/54-operations/94-criteria/40-create_spec.rb
+TD snag/test/54-operations/94-criteria/30-delete_spec.rb
+TD snag/test/54-operations/94-criteria/20-retrieve_spec.rb
+TD snag/test/54-operations/94-criteria/10-to-stream_spec.rb
+TD snag/test/54-operations/92-to-do/66-melt_spec.rb
+TD snag/test/54-operations/92-to-do/10-to-stream_spec.rb
+TD snag/test/54-operations/80-node-collection/50-digraph_spec.rb
+TD snag/test/54-operations/70-node/94-open_spec.rb
+TD snag/test/54-operations/70-node/92-close_spec.rb
+TD snag/test/54-operations/70-node/74-create_spec.rb
+TD snag/test/54-operations/70-node/72-create-errors_spec.rb
+OK snag/test/54-operations/70-node/10-to-stream_spec.rb
+TD snag/test/54-operations/50-tag/70-create_spec.rb
+TD snag/test/54-operations/50-tag/50-delete_spec.rb
+TD snag/test/54-operations/50-tag/10-to-stream_spec.rb
+OK snag/test/54-operations/11-intro_spec.rb
+OK snag/test/34-models/40-hashtag_spec.rb
+WI snag/test/14-models/90-criteria/50-integration_spec.rb
+OK snag/test/14-models/90-criteria/24-library/50-target-ersatz_spec.rb
+OK snag/test/14-models/90-criteria/24-library/40-verb-sharing_spec.rb
+OK snag/test/14-models/90-criteria/24-library/30-delayed-tail_spec.rb
+OK snag/test/14-models/90-criteria/24-library/20-deambiguation-experiment_spec.rb
+OK snag/test/14-models/90-criteria/24-library/10-fundamentals_spec.rb
+OK snag/test/14-models/80-node-collection/20-magnetics/50-reappropriablest-node-via-arguments_spec.rb
+OK snag/test/14-models/80-node-collection/15-expression-adapters/50-filesystem/50-extended-content_spec.rb
+OK snag/test/14-models/70-node/50-expression-adapters/50-byte-stream/20-magnetics/50-express-delineated-lines-via-node_spec.rb
+OK snag/test/14-models/50-tag/75-collection_spec.rb
+OK snag/test/14-models/50-tag/50-expression-adapters/50-byte-stream_spec.rb
+OK snag/test/14-models/20-date_spec.rb
+OK snag/test/14-models/10-node-identifier_spec.rb

@@ -381,6 +381,10 @@ module Skylab::TanMan::TestSupport
 
     # ~ hook-outs to ancillary API's
 
+    def subject_API_value_of_failure
+      FALSE
+    end
+
     def subject_API
       Home_::API
     end

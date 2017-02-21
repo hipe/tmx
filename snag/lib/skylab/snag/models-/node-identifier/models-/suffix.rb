@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models_::Node_Identifier
+  class Models_::NodeIdentifier
 
     class Models_::Suffix  # described in the node identifier spec
 

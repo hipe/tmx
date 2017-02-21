@@ -49,6 +49,10 @@ module Skylab::SubTree::TestSupport
       TestSupport_::Fixtures.tree sym
     end
 
+    def subject_API_value_of_failure
+      FALSE
+    end
+
     def subject_API
       Home_::API
     end

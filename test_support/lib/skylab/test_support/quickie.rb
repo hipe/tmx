@@ -337,7 +337,7 @@ module Skylab::TestSupport
 
       def __receive_subsequent_TCC_in_basic_mode tcc
         self._COVER_ME
-        me = self  # #open [#008]
+        me = self  # #open [#007.D]
         @_client.listener.call :info, :expression, :multiple_describes do |y|
           y << me.__say_multiple_describes
         end

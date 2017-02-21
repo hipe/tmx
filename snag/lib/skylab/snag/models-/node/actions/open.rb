@@ -2,29 +2,33 @@ module Skylab::Snag
 
   class Models_::Node
 
+    Home_._NO_MORE_COMMON_ACTION
     class Actions::Create < Common_Action_
 
-      edit_entity_class(
+      def definition ; [
 
                    :property, :downstream_identifier,
         :required, :property, :upstream_identifier,
         :required, :argument_arity, :one_or_more, :property, :message
-      )
+      ] end
 
-      def produce_result
-        resolve_node_collection_then_
+      def execute
+        if resolve_node_collection_
+          __via_node_collection
+        end
       end
 
-      def via_node_collection_
+      def __via_node_collection
 
+        self._NO_MORE_ARGUMENT_BOX
         bx = @argument_box
 
-        @node_collection.edit(
+        @_node_collection_.edit(
 
           :using, bx,
           :add, :node,
             :append, :message, bx.fetch( :message ),
-          & handle_event_selectively )
+          & _listener_ )
       end
     end
 
@@ -39,27 +43,30 @@ module Skylab::Snag
           # (arity thing is experiment for the future)
       )
 
-      def produce_result
-        resolve_node_collection_then_
+      def execute
+        if resolve_node_collection_
+          __via_node_collection
+        end
       end
 
-      def via_node_collection_
+      def __via_node_collection
 
+        self._NO_MORE_ARGUMENT_BOX
         bx = @argument_box
 
-        @node_collection.edit(
+        @_node_collection_.edit(
 
           :using, bx,
           :add, :node,
             :append, :tag, :open,
             :append, :message, bx.fetch( :message ),
-          & handle_event_selectively )
+          & _listener_ )
       end
 
       Try_to_reappropriate = -> node_, sess, & x_p do
 
         node =
-        Home_::Models_::Node_Collection::Magnetics_::
+        Models_::NodeCollection::Magnetics_::
             ReappropriablestNode_via_Arguments.call(
           sess.entity_upstream,
           & x_p )

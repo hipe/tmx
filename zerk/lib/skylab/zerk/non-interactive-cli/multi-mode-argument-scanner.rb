@@ -297,7 +297,7 @@ module Skylab::Zerk
         end
 
         def match_integer_
-          # 2 defs 1 call. assume nonempty. caller emits IFF result is nil #[#007.E]
+          # 2 defs 1 call. assume nonempty. caller emits IFF result is nil #[#007.5]
           s = head_as_is
           if %r(\A-?\d+\z) =~ s  # ..
             s.to_i

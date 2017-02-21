@@ -65,7 +65,7 @@ module Skylab::Snag::TestSupport
             :keyword, 'particular',
             :keyword, 'shortcomings' ] )
 
-      da = mod::Domain_Adapter.new :_no_kernel_for_this_test_
+      da = mod::DomainAdapter.__begin_mutable_me
 
       da.under_target_model_add_association_adapter :Sticker, sticker
       da.under_target_model_add_association_adapter :Shortcomings, shortcomings

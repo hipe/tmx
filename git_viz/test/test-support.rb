@@ -74,6 +74,10 @@ module Skylab::GitViz::TestSupport
 
       ev
     end
+
+    def subject_API_value_of_failure
+      FALSE
+    end
   end
 
   Common_ = ::Skylab::Common

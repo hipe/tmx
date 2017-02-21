@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::Criteria_Tree
+    module ExpressionAdapters::CriteriaTree
 
       class << self
 

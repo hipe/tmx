@@ -48,7 +48,7 @@ module Skylab::Snag
           end
 
           def modality_const
-            :Criteria_Tree
+            :CriteriaTree
           end
         end
 
@@ -211,7 +211,7 @@ module Skylab::Snag
           end
 
           def modality_const
-            :Criteria_Tree
+            :CriteriaTree
           end
         end
       end

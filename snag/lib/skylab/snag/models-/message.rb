@@ -159,10 +159,10 @@ module Skylab::Snag
       end
     end
 
-    module Expression_Adapters
+    module ExpressionAdapters
       EN = nil
     end
 
-    Actions = THE_EMPTY_MODULE_
+    # ==
   end
 end

@@ -1,8 +1,8 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
-    module Expression_Adapters::Filesystem
+    module ExpressionAdapters::Filesystem
 
       class Extended_Content_Adapter
 

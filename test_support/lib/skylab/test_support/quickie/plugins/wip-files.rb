@@ -159,6 +159,7 @@ module Skylab::TestSupport
         @_client_listener.call :info, :expression, :rewrote_file do |y|
           y << "wrote #{ d } change(s) (#{ _bytes } bytes) - #{ pth path_ }"
         end
+        # (the above is reference in [ze] as [#008.4]
         NIL
       end
 

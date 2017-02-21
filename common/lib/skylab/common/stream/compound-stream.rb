@@ -3,7 +3,7 @@ module Skylab::Common
   module Stream::CompoundStream
 
     # this is a years (and years) old file rewritten fully anew to
-    # realize the bold dream of [#016.1] "baseless" streaming..
+    # realize the bold dream of [#016.2.3] "baseless" streaming..
     # the problem is described in the document. this is the solution.
 
     class << self

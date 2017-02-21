@@ -127,12 +127,12 @@ module Skylab::Snag::TestSupport
     end
 
     def _id d
-      Home_::Models_::Node_Identifier.send :new, nil, d
+      Home_::Models_::NodeIdentifier.send :new, nil, d
     end
 
     memoize :_body do
 
-      o = Home_::Models_::Node::Expression_Adapters::Byte_Stream::Models_
+      o = Home_::Models_::Node::ExpressionAdapters::ByteStream::Models_
 
       o::Body.via_range_and_substring_array( 1...4, [
         o::Substring.new( nil, nil, "not a business line\n" ),

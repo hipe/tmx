@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models_::Node_Collection
+  class Models_::NodeCollection
 
     class Actions::Digraph
 
@@ -21,8 +21,9 @@ module Skylab::Snag
         super
       end
 
-      def produce_result
+      def execute
 
+        self._NO_MORE_ARGUMENT_BOX
         @byte_downstream = @argument_box.fetch :byte_downstream
 
         ok = __resolve_node_upstream
@@ -47,8 +48,9 @@ module Skylab::Snag
 
       def __resolve_node_upstream
 
-        p = handle_event_selectively
+        p = _listener_
 
+        self._NO_MORE_ARGUMENT_BOX
         _us_id = @argument_box.fetch :upstream_identifier
 
         nc = Here_.new_via_upstream_identifier _us_id, & p
@@ -114,7 +116,7 @@ module Skylab::Snag
 
       def __produce_stream_for_output_body
 
-        _p = handle_event_selectively
+        _p = _listener_
 
         Here_::Magnetics_::Digraph_via_NodeUpstream.call(
           @_node_upstream,
@@ -144,7 +146,7 @@ module Skylab::Snag
 
       def __init_rendering_ivars
 
-        @_expag = Home_::Models_::Node_Collection::Expression_Adapters::Byte_Stream.
+        @_expag = Models_::NodeCollection::ExpressionAdapters::ByteStream.
           build_default_expression_agent
 
         NIL_

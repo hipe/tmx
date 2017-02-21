@@ -22,6 +22,10 @@ module Skylab::Parse
         @_injections.push GrammaticalInjection___[ k, impl ] ; nil
       end
 
+      def stream_via_array ary
+        stream_via_scanner Common_::Scanner.via_array ary
+      end
+
       def stream_via_scanner scn
 
         d = nil

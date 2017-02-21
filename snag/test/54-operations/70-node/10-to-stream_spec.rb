@@ -52,6 +52,8 @@ module Skylab::Snag::TestSupport
 
     it "`number_limit`" do
 
+      # (#lend-coverage to [fi] [#008.2])
+
       call_API :node, :to_stream,
         :number_limit, 1,
         :upstream_identifier, _alpha_path

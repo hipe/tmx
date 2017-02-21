@@ -4,8 +4,10 @@
              ( #was: baseless collection .. )
 [#013]       pending processing queue ..
 [#012]       [ filesystem-based ]
-[#011] #hole
+
+[#011]       rewrite
              ( #was: legacy table for a help screen is not covered )
+
 [#010]       bundle defined ..
 [#009]       pros and const of the add method pattern
 [#008]       "the plugin manifesto" ..

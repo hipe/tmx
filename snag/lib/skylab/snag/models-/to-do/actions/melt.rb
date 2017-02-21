@@ -28,11 +28,12 @@ module Skylab::Snag
         :required, :argument_arity, :one_or_more, :property, :path
       )
 
-      def produce_result
+      def execute
 
+        self._NO_MORE_ARGUMENT_BOX
         h = @argument_box.h_
 
-        o = Session___.new @kernel, & handle_event_selectively
+        o = Session___.new @kernel, & _listener_
 
         o.is_dry = h[ :dry_run ]
         o.downstream_identifier = h[ :downstream_identifier ]
@@ -78,7 +79,7 @@ module Skylab::Snag
 
           if ! @downstream_identifier
 
-            path = Home_::Models_::Node_Collection.nearest_path(
+            path = Models_::NodeCollection.nearest_path(
               @paths.fetch( 0 ), @filesystem_conduit, & @_oes_p )
 
             if path
@@ -97,7 +98,7 @@ module Skylab::Snag
 
         def __via_downstream_identifier_resolve_collection
 
-          col = Home_::Models_::Node_Collection.new_via_upstream_identifier(
+          col = Models_::NodeCollection.new_via_upstream_identifier(
             @downstream_identifier, & @_oes_p )
           if col
             @_collection = col

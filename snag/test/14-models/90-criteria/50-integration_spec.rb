@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - criteria - integration" do
+  describe "[sg] models - criteria - integration", wip: true do
 
     TS_[ self ]
     use :expect_event

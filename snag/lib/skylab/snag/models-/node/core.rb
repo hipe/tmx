@@ -6,11 +6,9 @@ module Skylab::Snag
 
       class << self
 
-        def new s_a
+        def via_words_and_invocation_resources_ s_a, invo_rsx
 
-          Home_::Models_::Criteria.new_via_expression(
-            s_a,
-            Home_.application_kernel_ )
+          HomeModels__::Criteria.new_via_expression s_a, invo_rsx
         end
       end  # >>
     end
@@ -33,7 +31,7 @@ module Skylab::Snag
 
       def collection_module_for_criteria_resolution
 
-        Home_::Models_::Node_Collection
+        HomeModels__::NodeCollection
       end
 
       def new_via_body x  # #Tenet7A1
@@ -141,7 +139,7 @@ module Skylab::Snag
 
       yield :stored_in_ivar, :@ID
 
-      Home_::Models_::Node_Identifier
+      HomeModels__::NodeIdentifier
     end
 
     def __message__component_association
@@ -162,7 +160,7 @@ module Skylab::Snag
 
       yield :can, :prepend, :append, :remove
 
-      Home_::Models_::Tag
+      HomeModels__::Tag
     end
 
     ## ~~ assumption & conditional test implementations
@@ -307,7 +305,7 @@ module Skylab::Snag
     def to_tag_stream
 
       if @body
-        @body.to_entity_stream_via_model Home_::Models_::Tag
+        @body.to_entity_stream_via_model HomeModels__::Tag
       else
         Common_::THE_EMPTY_STREAM
       end
@@ -383,77 +381,53 @@ module Skylab::Snag
       :ID,
     )
 
-    Brazen_ = Home_.lib_.brazen
+    module NodeRelatedMethods_
 
-    class Common_Action_ < Brazen_::Action
+      def resolve_node_only__
 
-      # (this could just as easily be a plain mixin module but it's slightly
-      # convenient to be able to establish the entity module in one place)
+        self._README___close_to_OK__  # this used to pass the whole argument box
 
-      Brazen_::Modelesque.entity self
+        _ = @_callable_API_.call :node, :to_stream,
+          :identifier, @node_identifier,
+          & _listener_
 
-    private
+        _store_ :@_node_, _
+      end
 
-      def resolve_node_only_then_
+      def resolve_node_collection_and_node_
 
-        _oes_p = handle_event_selectively
-
-        node = @kernel.call_via_mutable_box :node, :to_stream,
-
-          :identifier, @argument_box.remove( :node_identifier ),
-
-          @argument_box,
-          & _oes_p
-
-        node and begin
-          @node = node
-          via_node_only_
+        if resolve_node_collection_
+          __via_collection_resolve_node_SN
         end
       end
 
-      def resolve_node_collection_and_node_then_
+      def resolve_node_collection_
 
-        ok = _resolve_node_collection
-        ok &&= __via_collection_resolve_node
-        ok && via_node_collection_and_node_
+        _fsa = @_invocation_resources_.node_collection_filesystem_adapter
+
+        _ = HomeModels__::NodeCollection.new_via_upstream_identifier(
+          @upstream_identifier, _fsa, & _listener_ )
+
+        _store_ :@_node_collection_, _
       end
 
-      def resolve_node_collection_then_
+      def __via_collection_resolve_node_SN
 
-        _ok = _resolve_node_collection
-        _ok && via_node_collection_
-      end
-
-      def _resolve_node_collection
-
-        co = Home_::Models_::Node_Collection.new_via_upstream_identifier(
-          @argument_box.fetch( :upstream_identifier ),
-          & handle_event_selectively )
-
-        co and begin
-          @node_collection = co
-          ACHIEVED_
-        end
-      end
-
-      def __via_collection_resolve_node
-
-        node = @node_collection.entity_via_intrinsic_key(
+        self._NO_MORE_ARGUMENT_BOX
+        _ = @_node_collection_.entity_via_intrinsic_key(
           @argument_box.fetch( :node_identifier ),
-          & handle_event_selectively )
+          & _listener_ )
 
-        node and begin
-          @node = node
-          ACHIEVED_
-        end
+        _store_ :@_node_, _
       end
 
       def persist_node_
 
-        @node_collection.persist_entity(
+        self._NO_MORE_ARGUMENT_BOX
+        @_node_collection_.persist_entity(
           @argument_box,
           @node,
-          & handle_event_selectively )
+          & _listener_ )
       end
     end
 
@@ -478,11 +452,11 @@ module Skylab::Snag
       # goal, for example to append string pieces to a mutable body, or
       # to assemble all of the body lines as one string.
 
-      Expression_Adapters = ::Module.new
+      ExpressionAdapters = ::Module.new
 
-      Expression_Adapters::CLI = ::Module.new
+      ExpressionAdapters::CLI = ::Module.new
 
-      class << Expression_Adapters::CLI
+      class << ExpressionAdapters::CLI
 
         def express_of_via_under _expag
 
@@ -521,7 +495,7 @@ module Skylab::Snag
 
       a.each do | x_ |
 
-        s = Home_::Models_::Message.normalize_value__ x_, & x_p
+        s = HomeModels__::Message.normalize_value__ x_, & x_p
         if s
           s_a.push s
         else
@@ -542,7 +516,7 @@ module Skylab::Snag
       x = ( qkn.value_x if qkn.is_known_known )
       if x
 
-        o = Home_::Models_::Node_Identifier.new_via_user_value_ x, & oes_p  # yes
+        o = HomeModels__::NodeIdentifier.new_via_user_value_ x, & oes_p  # yes
 
         if o
           Common_::Known_Known[ o ]
@@ -555,7 +529,7 @@ module Skylab::Snag
     end
 
     module EC___
-      module Expression_Adapters
+      module ExpressionAdapters
         module CLI ; class << self
           def express_of_via_under _expag
             -> entry_s do
@@ -569,11 +543,8 @@ module Skylab::Snag
 
     # ~
 
-    module Actions
-      Autoloader_[ self, :boxxy ]
-    end
-
     Here_= self
+    HomeModels__ = Models_  # reminder: we have a local module of this same name
   end
 end
 # #tombstone: events with one event

@@ -155,7 +155,7 @@ module Skylab::Zerk
       #     otherwise (and result is trueish)
       #       we assume it is an integer and apply our range validations.
       #
-      # (this extremely local "microconvention" is :[#007.E].)
+      # (this "microconvention" is :[#007.5].)
       #
       # the adapter might or might not be using [ba] number to parse the
       # number; we don't care. we ourselves do not use [ba] number for the

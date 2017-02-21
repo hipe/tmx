@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - criteria - retrieve" do
+  describe "[sg] operations - criteria - retrieve", wip: true do
 
     TS_[ self ]
     use :expect_event

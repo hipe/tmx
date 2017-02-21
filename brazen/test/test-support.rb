@@ -69,6 +69,10 @@ module Skylab::Brazen::TestSupport
       Home_::Models_::Workspace.default_config_filename
     end
 
+    def subject_API_value_of_failure
+      FALSE
+    end
+
     def subject_API
       Home_::API
     end

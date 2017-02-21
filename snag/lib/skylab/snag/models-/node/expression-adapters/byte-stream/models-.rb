@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class Models_::Node
 
-    module Expression_Adapters::Byte_Stream  # [#038]
+    module ExpressionAdapters::ByteStream  # [#038]
 
       Models_ = ::Module.new
 
@@ -115,7 +115,7 @@ module Skylab::Snag
 
         def express_N_units_into_under_ d, y, expag
 
-          :Byte_Stream == expag.modality_const or self._DO_ME
+          :ByteStream == expag.modality_const or self._DO_ME
 
           stay = if d && -1 != d
             if 0 > d
