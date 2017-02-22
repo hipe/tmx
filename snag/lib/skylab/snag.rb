@@ -88,6 +88,15 @@ module Skylab::Snag
     def initialize as
       @argument_scanner = as
     end
+    protected :initialize  # for #here-2
+
+    def call_snag_API__ * a, & p
+      _use_p = p || listener
+      _as = MTk_::API_ArgumentScanner.new a, & _use_p
+      otr = dup
+      otr.initialize _as  # :#here-2
+      MicroserviceInvocation__.new( otr ).execute
+    end
 
     # (hard-coded per (what we used to call) "silo" - it has been un-abstracted)
 
@@ -125,6 +134,8 @@ module Skylab::Snag
     end
 
     attr_reader :argument_scanner
+
+    def HELLO_INVO_RSX ; end
   end
 
   # ==

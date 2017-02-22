@@ -89,10 +89,11 @@ module Skylab::Snag
 
         _oes_p.call :info, :added_entity do
 
-          _nf = @col_x.model_name
+          _nf = @col_x.to_model_name  # why we added [#sy-008.2] (for us)
+
           _linked_list = Home_.lib_.basic::List::Linked[ nil, _nf ]
 
-          ACS_[].event( :Component_Added ).new_with(
+          ACS_[].event( :Component_Added ).with(
             :component, @ent,
             :context_as_linked_list_of_names, _linked_list,
           )

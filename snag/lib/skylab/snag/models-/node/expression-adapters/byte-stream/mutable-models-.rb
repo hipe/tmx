@@ -58,7 +58,7 @@ module Skylab::Snag
 
         Space_piece_singleton__ = Common_.memoize do
 
-          Home_::Models::Hashtag::String_Piece.new_via_string SPACE_
+          Home_::Models::Hashtag::String_Piece.via_string SPACE_
         end
 
         def remove_component_ qk

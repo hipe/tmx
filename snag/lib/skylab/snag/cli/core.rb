@@ -98,7 +98,7 @@ module Skylab::Snag
         # ( not here, but where?
 
         path = bx.fetch :upstream_identifier
-        path = Home_::Models_::NodeCollection.nearest_path(
+        path = Home_::Models_::NodeCollection::Nearest_path.call(
           path, @_filesystem, & @_oes_p )
 
         # )
@@ -289,7 +289,7 @@ module Skylab::Snag
 
         @hybrid.moz.replace_by :message do | prp |
 
-          prp.new_with(
+          prp.with(
             :argument_arity, :zero_or_more,
             :parameter_arity, :zero_or_one,
             :description, -> y do
@@ -304,7 +304,7 @@ module Skylab::Snag
 
         @hybrid.moz.replace_by :number_limit do | prp |
 
-          prp.new_with(
+          prp.with(
             :description, -> y do
               y << "`-<number>` too"
             end )

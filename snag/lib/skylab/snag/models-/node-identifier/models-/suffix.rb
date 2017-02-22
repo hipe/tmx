@@ -12,7 +12,7 @@ module Skylab::Snag
 
       class << self
 
-        def new_via__string__ s, & x_p
+        def via__string__ s, & x_p
 
           _scn = Home_::Library_::StringScanner.new s
           a = Interpret_out_of_string_scanner__[ _scn, & x_p ]

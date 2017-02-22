@@ -2,16 +2,17 @@ module Skylab::Snag
 
   class Models_::ToDo
 
-    class Magnetics_::Collection_via_Arguments
+    class Magnetics_::Collection_via_Arguments < Common_::SimpleModel
 
-      def initialize & oes_p
-        @on_event_selectively = oes_p
+      def initialize
+        yield self
       end
 
       attr_writer(
-        :filename_pattern_s_a,
-        :path_s_a,
-        :pattern_s_a,
+        :filename_patterns,
+        :listener,
+        :paths,
+        :patterns,
         :system_conduit,
       )
 
@@ -22,7 +23,7 @@ module Skylab::Snag
 
           @command = cmd
 
-          p = @on_event_selectively
+          p = @listener
 
           st = Magnetics_::MatchingLineStream_via_FindCommand.call(
             cmd, @system_conduit, & p )
@@ -30,7 +31,7 @@ module Skylab::Snag
           st and begin
 
             Magnetics_::ToDoStream_via_MatchingLineStream.call(
-              st, @pattern_s_a, & p )
+              st, @patterns, & p )
           end
         end
       end

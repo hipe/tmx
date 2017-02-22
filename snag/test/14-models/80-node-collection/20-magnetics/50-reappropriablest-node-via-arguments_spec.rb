@@ -50,29 +50,24 @@ module Skylab::Snag::TestSupport
 
     def _against_path path
 
-      _fsa = _this_one_filesystem_adapter
+      _invo_rsx = invocation_resources_
 
-      @col = Home_::Models_::NodeCollection.new_via_path path, _fsa
+      @col = Home_::Models_::NodeCollection.via_path path, _invo_rsx
       NIL_
     end
 
     def _against s
 
-      _fsa = _this_one_filesystem_adapter
+      _invo_rsx = invocation_resources_
 
       _BU_ID = Home_.lib_.basic::String::Byte_Upstream_Identifier.new s
 
-      @col = Home_::Models_::NodeCollection.new_via_upstream_identifier _BU_ID, _fsa
+      @col = Home_::Models_::NodeCollection.via_upstream_identifier _BU_ID, _invo_rsx
       NIL_
     end
 
     def _gimme
       _subject.call @col.to_entity_stream, invocation_resources_
-    end
-
-    def _this_one_filesystem_adapter
-      _fsa = invocation_resources_.node_collection_filesystem_adapter
-      _fsa  # hi. #todo
     end
 
     def _subject

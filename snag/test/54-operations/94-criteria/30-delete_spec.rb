@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - criteria - delete - (NOT FULLY INTEGRATED)", wip: true do
+  describe "[sg] operations - criteria - delete - (NOT FULLY INTEGRATED)" do
 
     TS_[ self ]
     use :expect_event
@@ -46,20 +46,18 @@ module Skylab::Snag::TestSupport
 
     def _init_cc_via_path path
 
-      self._NO_MORE_APPLICATION_KERNEL
+      _ = invocation_resources_
 
-      @cc = Home_::Models_::Criteria::Silo_Daemon.__build_collection_via_kernel(
-        Home_.application_kernel_
-      ) do | o |
-        o.directory_path =  path
+      @CC = Home_::Models_::Criteria::CriterionCollection___.define do |o|
+        o.directory_path = path
+        o.invocation_resources = _
       end
-
-      NIL_
+      NIL
     end
 
     def _common
 
-      @cc.edit(
+      @CC.edit(
         :assuming, :exists,
         :via, :slug,
         :remove, :criteria, 'zap-tango',

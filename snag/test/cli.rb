@@ -4,7 +4,7 @@ module Skylab::Snag::TestSupport
 
     class << self
 
-      def new_with * x_a
+      def with * x_a
         Modifiers___.new x_a
       end
     end  # >>

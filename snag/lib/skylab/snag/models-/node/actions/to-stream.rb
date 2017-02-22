@@ -23,10 +23,8 @@ module Skylab::Snag
 
 
       def initialize
-        extend NodeRelatedMethods_, ActionRelatedMethods_
-        o = yield
-        init_action_ o
-        @_invocation_resources_ = o  # node identifier filesystem adapter
+        extend NodeRelatedMethods, ActionRelatedMethods_
+        init_action_ yield
         @identifier = nil  # #[#026]
       end
 

@@ -19,7 +19,7 @@ module Skylab::Snag
         # built more dynamically, for example as a product of arguments
         # or the environment
 
-        Normalization___.new_with(
+        Normalization___.with(
 
           :must_be_trueish,
           :no_blanks,

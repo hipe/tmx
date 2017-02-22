@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - criteria - integration", wip: true do
+  describe "[sg] models - criteria - integration" do
 
     TS_[ self ]
     use :expect_event
@@ -112,7 +112,7 @@ module Skylab::Snag::TestSupport
 
     def _call_API_with_criteria s_a
 
-      call_API :criteria, :criteria_to_stream, :criteria, s_a,
+      call_API :criteria, :issues_via_criteria, :criteria, s_a,
         :upstream_identifier, _path_, & EMPTY_P_
       NIL_
     end

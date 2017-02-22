@@ -6,30 +6,32 @@ module Skylab::Snag
 
       WORDWRAP_ASPECT_RATIO___ = [ 3, 1 ]
 
-      Home_.lib_.brazen::Modelesque.entity( self,
+      def definition ; [
 
         :branch_description, -> y do
           y << "write to the output stream a digrpah of doc nodes"
         end,
 
         :required, :property, :byte_downstream,
-        :required, :property, :upstream_identifier
-      )
+        :required, :property, :upstream_identifier,
 
-      def initialize( * )
+      ] end
+
+      def initialize
+        extend ActionRelatedMethods_
+        @_invocation_resources_ = yield
+        init_action_ @_invocation_resources_
         __init_default_styles
-        super
       end
 
       def execute
-
-        self._NO_MORE_ARGUMENT_BOX
-        @byte_downstream = @argument_box.fetch :byte_downstream
-
-        ok = __resolve_node_upstream
+        ok = true
+        ok &&= __resolve_node_controller
+        ok &&= __resolve_node_upstream_via_node_controller
         ok &&= __express_opening
         ok &&= __express_body
-        ok && __express_closing
+        ok &&= __express_closing
+        ok || NIL
       end
 
       def __init_default_styles
@@ -46,30 +48,6 @@ module Skylab::Snag
       NODE_ATTR_I_A__ = [ :fillcolor, :fontname, :label,
         :penwidth, :shape, :style ]
 
-      def __resolve_node_upstream
-
-        p = _listener_
-
-        self._NO_MORE_ARGUMENT_BOX
-        _us_id = @argument_box.fetch :upstream_identifier
-
-        nc = Here_.new_via_upstream_identifier _us_id, & p
-
-        if nc
-
-          st = nc.to_entity_stream( & p )
-
-          if st
-            @_node_upstream = st
-            ACHIEVED_
-          else
-            st
-          end
-        else
-          nc
-        end
-      end
-
       def __express_opening
 
         _express_unindented_line 'digraph {'
@@ -79,7 +57,7 @@ module Skylab::Snag
 
       def __express_label
 
-        uid = @argument_box[ :upstream_identifier ]
+        uid = @upstream_identifier
         if uid.respond_to? :to_path
 
           _express_line "label=\"docs for #{ _esc uid.to_path }\""
@@ -109,24 +87,16 @@ module Skylab::Snag
 
       def __express_body
 
-        st = __produce_stream_for_output_body
-
-        st and __express_body_via_stream st
+        if __resolve_stream_for_output_body_via_node_upstream
+          __express_body_via_stream_for_output_body
+        end
       end
 
-      def __produce_stream_for_output_body
-
-        _p = _listener_
-
-        Here_::Magnetics_::Digraph_via_NodeUpstream.call(
-          @_node_upstream,
-          & _p )
-      end
-
-      def __express_body_via_stream st
+      def __express_body_via_stream_for_output_body
 
         __init_rendering_ivars
 
+        st = remove_instance_variable :@__stream_for_output_body
         begin
           op = st.gets
           op or break
@@ -135,6 +105,15 @@ module Skylab::Snag
         end while nil
 
         ACHIEVED_
+      end
+
+      def __resolve_stream_for_output_body_via_node_upstream
+
+        _ = Here_::Magnetics_::Digraph_via_NodeUpstream.call(
+          remove_instance_variable( :@__node_upstream ),
+          & _listener_ )
+
+        _store :@__stream_for_output_body, _
       end
 
       def __draw_arc__ op
@@ -156,7 +135,7 @@ module Skylab::Snag
 
         node = op.node
         s_a = []
-        ww = Home_.lib_.basic::String::WordWrapper::Calm.new_with(
+        ww = Home_.lib_.basic::String::WordWrapper::Calm.with(
           :downstream_yielder, s_a,
           :aspect_ratio, WORDWRAP_ASPECT_RATIO___ )
 
@@ -234,6 +213,30 @@ module Skylab::Snag
         ACHIEVED_
       end
 
+      # --
+
+      # --
+
+
+      def __resolve_node_upstream_via_node_controller
+
+        _nc = remove_instance_variable :@__node_controller
+        _ = _nc.to_entity_stream( & _listener_ )
+        _store :@__node_upstream, _
+      end
+
+      def __resolve_node_controller
+
+        _ = Here_.via_upstream_identifier(
+          @upstream_identifier, @_invocation_resources_, & _listener_ )
+
+        _store :@__node_controller, _
+      end
+
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
+
+      # ==
+      # ==
     end
   end
 end

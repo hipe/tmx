@@ -95,7 +95,7 @@ module Skylab::Snag
             break
           end while nil
 
-          Models_::NodeIdentifier.new_via_integer int
+          Models_::NodeIdentifier.via_integer int
         end
       end # >>
     end

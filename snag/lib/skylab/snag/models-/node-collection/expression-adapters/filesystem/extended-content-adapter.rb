@@ -4,7 +4,7 @@ module Skylab::Snag
 
     module ExpressionAdapters::Filesystem
 
-      class Extended_Content_Adapter
+      class ExtendedContentAdapter
 
         # this adapter decides that a node has "extended content" if there
         # is a filesystem entry whose name corresponds to the node's
@@ -17,7 +17,7 @@ module Skylab::Snag
 
         class << self
 
-          def new_via_manifest_path_and_filesystem path, fs
+          def via_manifest_path_and_filesystem path, fs
 
             new(
               path[ 0 .. - ( ::File.extname( path ).length + 1 ) ],  # better way?

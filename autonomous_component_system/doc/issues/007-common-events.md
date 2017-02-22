@@ -11,20 +11,19 @@ conventions discovered since their inception.
 
 
 
-# == from the original
-
+# a flat taxonomy of the commonest kinds of events
 
   • we started DRY-tracking these common sorts of events.
   • the common theme here is that they relate to *mutating* a collection
 
   • we have assigned them tracking node sub-identifiers. they are:
 
-    • A - not found
-    • B - deleted (removed, destroyed)
-    • C - already added
-    • D - added (created)
-    • E - no change
-    • F - modified (updated, edited)
+    - :[#here.1]: not found
+    - :[#here.2]: deleted (removed, destroyed)
+    - :[#here.C]: already added (ergo cannot add because of this)
+    - :[#here.4]: added (created)
+    - :[#here.E]: no change
+    - :[#here.6]: modified (updated, edited)
 
    the above order is inspired by "practical dev order for CRUD" [#sl-137]:H
 
@@ -54,9 +53,15 @@ we want merely
 
 
 
+## ([#here.8] is inline - it's about how we derive names)
+
+
+
+
+
 ## wishes
 
-• :#WISH-A: one day tie EN-like expression adaters in with expressive
+• :[#here.G]: one day tie EN-like expression adaters in with expressive
   events so that individual component (models) can specifiy what verbs to
   use and so on (and maybe what expression structures to use too) much like
   we do with [near]  [#016] reactive tree models that specify how to

@@ -10,10 +10,18 @@ module Skylab::Snag::TestSupport
     end
   end  # >>
 
+  # --
+
   TestSupport_ = ::Skylab::TestSupport
 
   TestSupport_::Quickie.
     enhance_test_support_module_with_the_method_called_describe self
+
+  Home_ = ::Skylab::Snag
+  Common_ = Home_::Common_
+  Lazy_ = Common_::Lazy
+
+  # --
 
   module ModuleMethods___
 
@@ -44,15 +52,31 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  Home_ = ::Skylab::Snag
-  Common_ = Home_::Common_
-  Lazy_ = Common_::Lazy
-
   module InstanceMethods___
+
+    # -- assertions
+
+    def expect_these_lines_in_array_ a, & p
+      TestSupport_::Expect_these_lines_in_array[ a, p, self ]
+    end
+
+    # -- setup
+
+    def subject_API_value_of_failure
+      NIL  # not false - i.e use [#ze-007.5] semantics
+    end
+
+    def subject_API
+      Home_::API
+    end
 
     define_method :invocation_resources_, ( Lazy_.call do
       Home_::InvocationResources___.new :_no_argument_scanner_from_SN_
     end )
+
+    def handle_event_selectively_
+      event_log.handle_event_selectively
+    end
 
     def debug!
       @do_debug = true
@@ -63,13 +87,35 @@ module Skylab::Snag::TestSupport
     def debug_IO
       TestSupport_.debug_IO
     end
+  end
 
-    def handle_event_selectively_
-      event_log.handle_event_selectively
+  # -- large-ish and/or application-level test-support extension modules
+
+  module Operations
+
+    def self.[] tcc
+      Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
+      tcc.include self
+    end
+
+    def prepare_subject_API_invocation invo
+      invo
     end
   end
 
-  # == test support extension modules
+  My_CLI = -> tcc do
+    Eew_get_rid_of_this___[][ tcc ]
+  end
+
+  Eew_get_rid_of_this___ = Lazy_.call do
+
+    _ = TS_::CLI.with(
+        :subject_CLI, -> { Home_::CLI },
+        :program_name, 'sn0g',
+        :generic_error_exitstatus,
+          -> { Home_.lib_.brazen::CLI_Support::GENERIC_ERROR_EXITSTATUS } )
+    _  # hi. #todo
+  end
 
   module Byte_Up_And_Downstreams
 
@@ -122,41 +168,7 @@ module Skylab::Snag::TestSupport
     end
   end
 
-  My_CLI = -> do
-
-    p = -> tcc do
-
-      p = TS_::CLI.new_with(
-        :subject_CLI, -> { Home_::CLI },
-        :program_name, 'sn0g',
-        :generic_error_exitstatus,
-          -> { Home_.lib_.brazen::CLI_Support::GENERIC_ERROR_EXITSTATUS } )
-
-      p[ tcc ]
-    end
-
-    -> tcm do
-      p[ tcm ]
-    end
-  end.call
-
-  module Expect_Event
-
-    class << self
-      def [] tcm, x_a=nil
-        Common_.test_support::Expect_Emission[ tcm, x_a ]
-        tcm.include self
-      end
-    end  # >>
-
-    def subject_API_value_of_failure
-      NIL  # not false - i.e use [#ze-007.5] semantics
-    end
-
-    def subject_API
-      Home_::API
-    end
-  end
+  # -- test-support extension modules for models & similar
 
   module Expect_Piece
 
@@ -182,18 +194,43 @@ module Skylab::Snag::TestSupport
     end
   end
 
+  Nodes = -> tcc do
+
+    tcc.send :define_method, :expect_noded_, -> node_id_d do
+      expect_no_more_events
+      @result.ID.to_i.should eql node_id_d
+    end
+  end
+
+  # -- short test support extensions
+
   Expect_Stdout_Stderr = -> tcm do
 
     tcm.include TestSupport_::Expect_Stdout_Stderr::Test_Context_Instance_Methods
-    tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
-    NIL_
+    # tcm.send :define_method, :expect, tcm.instance_method( :expect )  # :+#this-rspec-annoyance
+    NIL
+  end
+
+  Expect_Emission_Fail_Early = -> tcc do
+    Common_.test_support::Expect_Emission_Fail_Early[ tcc ]
+  end
+
+  Expect_Event = -> tcc, x=nil do  # deprected-ish. as you can, etc
+    Common_.test_support::Expect_Emission[ tcc, x ]
   end
 
   Memoizer_Methods = -> tcc do
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  # ==
+  # -- objects
+
+  API_expag_ = Lazy_.call do
+    Home_::Zerk_lib_[]::API::InterfaceExpressionAgent::THE_LEGACY_CLASS.
+      via_expression_agent_injection :_no_injection_from_SN
+  end
+
+  # -- functions
 
   Fixture_file_ = -> do
     p = -> sym do
@@ -245,13 +282,13 @@ module Skylab::Snag::TestSupport
         if o
           if do_debug
             if ! o.be_verbose
-              o = o.new_with :debug_IO, debug_IO, :be_verbose, true
+              o = o.with :debug_IO, debug_IO, :be_verbose, true
             end
           elsif o.be_verbose
-            o.new_with :be_verbose, false
+            o.with :be_verbose, false
           end
         else
-          o = TestSupport_.tmpdir.new_with(
+          o = TestSupport_.tmpdir.with(
             :path, ::File.join(
                Home_.lib_.system.defaults.dev_tmpdir_path,
                'snaggle' ),
@@ -263,41 +300,12 @@ module Skylab::Snag::TestSupport
     end
   end.call
 
-  module Operations
-
-    def self.[] tcc
-      Zerk_lib_[].test_support::Expect_CLI_or_API[ tcc ]
-      tcc.include self
-    end
-
-    def prepare_subject_API_invocation invo
-      invo
-    end
-
-    def subject_API
-      Home_::API
-    end
-  end
-
-  module Nodes
-
-    class << self
-
-      def [] tcm
-        tcm.send :define_method, :expect_noded_, EXPECT_NODED___
-      end  # >>
-
-      EXPECT_NODED___ = -> node_id_d do
-        expect_no_more_events
-        @result.ID.to_i.should eql node_id_d
-      end
-    end
-  end
-
   Path_alpha_ = Common_.memoize do
 
     ::File.join( Fixture_tree_[ :mock_project_alpha ], 'doc/issues.md' )
   end
+
+  # --
 
   Home_::Autoloader_[ self, ::File.dirname( __FILE__ ) ]
 
@@ -312,3 +320,4 @@ module Skylab::Snag::TestSupport
   UNDERSCORE_ = Home_::UNDERSCORE_
   Zerk_lib_ = Home_::Zerk_lib_
 end
+# #tombstone-A (temporary)

@@ -206,12 +206,12 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_component arg_st, & x_p
+        def interpret_component scn, & x_p
 
-          new_via_string arg_st.gets_one
+          via_string scn.gets_one
         end
 
-        def new_via_string s
+        def via_string s
 
           new 0, s.length, s
         end

@@ -52,7 +52,7 @@ module Skylab::Snag::TestSupport
 
     it "read from byte-stream" do
 
-      o = _subject.new_via_body _body
+      o = _subject.via_body _body
       st = o.to_tag_stream
 
       tag = st.gets

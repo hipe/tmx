@@ -2,16 +2,21 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] to-do - to stream", wip: true do
+  describe "[sg] to-do - to stream" do
 
     TS_[ self ]
+    use :memoizer_methods
     use :expect_event, :ignore, :find_command_args
 
     it "one fine | multiple matches on one line | multiple patterns " do
 
-      call_API :to_do, :to_stream,
-        :path, [ Fixture_file_[ :foo_txt ] ],
-        :pattern, [ '\<deta\>', '\<geta', 'jeta\>' ]
+      # #lends-coverage to [#pl-008.5] (along the way)
+
+      call_API(
+        :to_do, :to_stream,
+        :path, Fixture_file_[ :foo_txt ],
+        :pattern, '\<deta\>', :pattern, '\<geta', :pattern, 'jeta\>',  # #[#007.D]
+      )
 
       st = @result
 
@@ -30,10 +35,12 @@ module Skylab::Snag::TestSupport
 
     it "the name option" do
 
-      call_API :to_do, :to_stream,
-        :path, [ Fixture_tree_[ :some_todos ] ],
-        :pattern, [ '[%]to-dew\>' ],
-        :name, [ '*.code' ]
+      call_API(
+        :to_do, :to_stream,
+        :path, Fixture_tree_[ :some_todos ],
+        :pattern, '[%]to-dew\>',
+        :name, '*.code',
+      )
 
       st = @result
 
@@ -54,9 +61,11 @@ module Skylab::Snag::TestSupport
 
     it "tries to avoid false matches" do  # but this is not language aware [#068]
 
-      call_API :to_do, :to_stream,
-        :path, [ Fixture_file_[ :matched_by_first_but_not_second_phase ] ],
-        :pattern, [ '@todo\>' ]
+      call_API(
+        :to_do, :to_stream,
+        :path, Fixture_file_[ :matched_by_first_but_not_second_phase ],
+        :pattern, '@todo\>',
+      )
 
       _st = @result
 

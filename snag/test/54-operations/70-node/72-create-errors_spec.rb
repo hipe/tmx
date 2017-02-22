@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - node - create errors", wip: true do
+  describe "[sg] operations - node - create errors" do
 
     # (this was originally positioned as the model test for Message but
     # because of the manner in which is it tested it must be here instead.)
@@ -10,7 +10,7 @@ module Skylab::Snag::TestSupport
     TS_[ self ]
     use :expect_event
 
-    it "no false-ish'es (false)" do
+    it "no false-ish'es (false)" do  # #lends-coverage to [#pl-008.2]
 
       _against false
       _expect :not_a_string, "need string, had false"
@@ -32,7 +32,6 @@ module Skylab::Snag::TestSupport
       ev.x.should eql "x\n"
       ev.string_proc
       ev.error_category.should eql :argument_error
-
     end
 
     it "no escaped newlines" do
@@ -49,7 +48,6 @@ module Skylab::Snag::TestSupport
       call_API :node, :create, :message, s,
         :upstream_identifier, Fixture_file_[ :rochambeaux_mani ],
         :downstream_identifier, _the_null_DS_ID
-
     end
 
     def _expect sym, s

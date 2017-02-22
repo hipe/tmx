@@ -45,7 +45,7 @@ module Skylab::Snag::TestSupport
 
       mod = subject_module_
 
-      sticker = mod::Association_Adapter.new_with(
+      sticker = mod::Association_Adapter.with(
 
         :verb_lemma_and_phrase_head_s_a, %w( be marked with ),
 
@@ -54,7 +54,7 @@ module Skylab::Snag::TestSupport
           :the_sticker, :regex,
             /\A" (?<body> (?: \\["\\] | [^\\"] )+ ) "\z/x )
 
-      shortcomings = mod::Association_Adapter.new_with(
+      shortcomings = mod::Association_Adapter.with(
 
         :verb_lemma, 'have',
 

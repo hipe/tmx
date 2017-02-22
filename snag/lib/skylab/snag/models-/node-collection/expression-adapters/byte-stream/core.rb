@@ -21,62 +21,68 @@ module Skylab::Snag
             DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
         end
 
-        def node_collection_via_upstream_identifier__ id, fsa
+        def node_collection_via_upstream_identifier__ id, invo_rsx
 
-          Native_Collection___.new id, fsa
+          Native_Collection___.new id, invo_rsx
         end
       end  # >>
 
       class Native_Collection___ < Here_  # or whatever
 
-        def initialize id, fsa
+        def initialize id, invo_rsx
 
-          @_FS_adapter = fsa
+          @_invocation_resources = invo_rsx
 
           @byte_upstream_ID = id
         end
 
         # ~ for [#ac-002] the ACS (compliments same in parent class)
 
-        def __add__component bx, qk, & oes_p_p
+        def __add__component cx, qk, & oes_p_p
 
           node = qk.value_x
 
           _oes_p = oes_p_p[ node ]  # transition from hot to cold
 
-          persist_entity bx, node, & _oes_p
+          persist_entity cx, node, & _oes_p
         end
 
         # c r u d
 
         # ~ create / update
 
-        def persist_entity bx, node, & x_p  # per [#br-011] in [#038] (pseudocode)
+        def persist_entity cx, node, & x_p  # per [#br-011] in [#038] (pseudocode)
 
-          o = start_sessioner( & x_p )
+          if cx
+            _ds_x = cx._snag_downstream_identifier_
+          end
 
-          o.downstream_identifier = bx && bx[ :downstream_identifier ]
+          _sessioner = sessioner_by do |o|
 
-          o.subject_entity = node
+            o.downstream_identifier = _ds_x
+            o.subject_entity = node
+            o.listener = x_p
+          end
 
-          o.during_locked_write_session do | sess |
+          _sessioner.during_locked_write_session do |sess|
 
-            __mutate_collection bx, node, sess, & x_p
+            __mutate_collection cx, node, sess, & x_p
           end
         end
 
-        def start_sessioner & x_p
+        def sessioner_by
 
-          o = Here_::Magnetics_::EndToEndRewrite_via_Arguments.new( & x_p )
-          o.collection = self
-          o.expression_adapter_actor_box = Here_::Magnetics_
-          o.FS_adapter = @_FS_adapter
-          o
+          Here_::Magnetics_::EndToEndRewrite_via_Arguments.define do |o|
+            yield o
+            o.collection = self
+            o.expression_adapter_actor_box = Here_::Magnetics_
+            o.invocation_resources = @_invocation_resources
+          end
         end
 
-        def __mutate_collection bx, node, sess, & x_p
+        def __mutate_collection cx, node, sess, & x_p
 
-          if bx[ :try_to_reappropriate ]
+          if cx._snag_try_to_reappropriate_
 
             sess.mutate_collection_and_subject_entity_by_reappropriation
           end
@@ -90,7 +96,7 @@ module Skylab::Snag
 
         def entity_via_intrinsic_key node_id_x, & oes_p
 
-          id = Models_::NodeIdentifier.new_via_user_value_(
+          id = Models_::NodeIdentifier.via_user_value_(
             node_id_x, & oes_p )
 
           id and entity_via_identifier_object id, & oes_p
@@ -118,7 +124,7 @@ module Skylab::Snag
 
         def __build_enity_not_found_event id_o
 
-          Brazen_.event( :Component_Not_Found ).new_with(
+          Brazen_.event( :Component_Not_Found ).with(
 
             :component, id_o,
             :component_association, Models_::Node,
@@ -175,9 +181,10 @@ module Skylab::Snag
           bu_id = @byte_upstream_ID
           if bu_id.respond_to? :path
 
-            ExpressionAdapters::Filesystem::Extended_Content_Adapter.
-              new_via_manifest_path_and_filesystem(
-                bu_id.path, @_FS_adapter.filesystem )
+            _fsa = @_invocation_resources.node_collection_filesystem_adapter
+
+            ExpressionAdapters::Filesystem::ExtendedContentAdapter.
+              via_manifest_path_and_filesystem bu_id.path, _fsa.filesystem
           else
             THE_EMPTY_EC_ADAPTER___
           end

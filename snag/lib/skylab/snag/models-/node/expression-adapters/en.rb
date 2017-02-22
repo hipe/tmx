@@ -5,7 +5,7 @@ module Skylab::Snag
     ExpressionAdapters::EN = -> da do
 
       da.under_target_model_add_association_adapter :Ext_Cnt, (
-        da.module::Association_Adapter.new_with(
+        da.module::Association_Adapter.with(
 
           :verb_lemma, 'have',
 
@@ -19,7 +19,7 @@ module Skylab::Snag
       da.source_and_target_models_are_associated :Node, :Ext_Cnt
 
       da.under_target_model_add_association_adapter :ID_Int, (
-        da.module::Association_Adapter.new_with(
+        da.module::Association_Adapter.with(
 
           :verb_lemma_and_phrase_head_s_a,
             %w( have an identifier with an integer ),
@@ -54,7 +54,7 @@ module Skylab::Snag
 
       da.under_target_model_add_association_adapter :Tags, (
 
-        da.module::Association_Adapter.new_with(
+        da.module::Association_Adapter.with(
 
           :verb_lemma_and_phrase_head_s_a, %w( be tagged with ),
 
@@ -63,7 +63,7 @@ module Skylab::Snag
 
       da.under_target_model_add_association_adapter :Tags, (
 
-        da.module::Association_Adapter.new_with(
+        da.module::Association_Adapter.with(
 
           :verb_lemma_and_phrase_head_s_a, %w( be not tagged with ),
 

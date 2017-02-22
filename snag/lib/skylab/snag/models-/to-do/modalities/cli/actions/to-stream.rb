@@ -58,10 +58,10 @@ module Skylab::Snag
 
           cls = @bound.class::Property
 
-          prp = cls.new_with :name_symbol, :verbose, :flag
+          prp = cls.with :name_symbol, :verbose, :flag
           fp.add prp.name_symbol, prp
 
-          prp = cls.new_with :name_symbol, :tree,
+          prp = cls.with :name_symbol, :tree,
             :parameter_arity, :zero_or_more,
             :argument_arity, :zero,
             :description, -> y do

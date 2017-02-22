@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - criteria - to-stream", wip: true do
+  describe "[sg] operations - criteria - to-stream" do
 
     TS_[ self ]
     use :expect_event

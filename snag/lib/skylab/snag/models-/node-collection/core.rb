@@ -6,49 +6,33 @@ module Skylab::Snag
 
     class << self
 
-      def nearest_path dir, filesystem, & x_p
-
-        fn = COMMON_MANIFEST_FILENAME_
-
-        sp = Walk_upwards_to_find_nearest_surrounding_path_[
-          dir,
-          fn,
-          filesystem,
-          :argument_path_might_be_target_path,
-          & x_p ]
-
-        if sp
-          ::File.join sp, fn
-        else
-          sp
-        end
-      end
-
-      def new_via_upstream_identifier x, fsa, & p
+      def via_upstream_identifier x, invo_rsx, & p
 
         if x.respond_to? :to_simple_line_stream
 
-          _new_via_upstream_identifier x, fsa, & p
+          _via_upstream_identifier x, invo_rsx, & p
         else
 
           # (the current fallback assumption is that this is an FS path)
-          new_via_path x, fsa, & p
+          via_path x, invo_rsx, & p
         end
       end
 
-      def new_via_path path, fsa, & p
+      def via_path path, invo_rsx, & p
 
         _id = Home_.lib_.
           system_lib::Filesystem::Byte_Upstream_Identifier.new path
 
-        _new_via_upstream_identifier _id, fsa, & p
+        _via_upstream_identifier _id, invo_rsx, & p
       end
 
-      def _new_via_upstream_identifier id, fsa, & p
+      def _via_upstream_identifier id, invo_rsx, & p
+
+        invo_rsx.HELLO_INVO_RSX
 
         _expad = expression_adapter_ id.modality_const
 
-        _expad.node_collection_via_upstream_identifier__ id, fsa, & p
+        _expad.node_collection_via_upstream_identifier__ id, invo_rsx, & p
       end
 
       def expression_adapter_ modality_const
@@ -106,9 +90,23 @@ module Skylab::Snag
       end
     end
 
+    Nearest_path = -> dir, filesystem, & p do
+
+      fn = COMMON_MANIFEST_FILENAME_
+
+      sp = Walk_upwards_to_find_nearest_surrounding_path_.call(
+        dir,
+        fn,
+        filesystem,
+        :argument_path_might_be_target_path,
+        & p )
+
+      sp and ::File.join sp, fn
+    end
+
     Walk_upwards_to_find_nearest_surrounding_path_ = -> s, fn, fs, * x_a, & x_p do
 
-      Home_.lib_.system.filesystem.walk.new_with(
+      Home_.lib_.system.filesystem.walk.with(
 
         :filename, fn,
         :max_num_dirs_to_look, 10,  # whatever

@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport
     it "you gotta have a verb lemma" do
 
       begin
-        subject_module_::Association_Adapter.new_with
+        subject_module_::Association_Adapter.with
       rescue ::Skylab::Fields::MissingRequiredAttributes => e
       end
 
@@ -173,7 +173,7 @@ module Skylab::Snag::TestSupport
 
     memoize :_min_assoc_adptr do
 
-      subject_module_::Association_Adapter.new_with(
+      subject_module_::Association_Adapter.with(
         :verb_lemma, 'be',
         :named_functions,
           :the_ON_form, :keyword, 'on',

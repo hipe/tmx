@@ -8,7 +8,7 @@ module Skylab::Snag
 
         def via_words_and_invocation_resources_ s_a, invo_rsx
 
-          HomeModels__::Criteria.new_via_expression s_a, invo_rsx
+          HomeModels__::Criteria.via_expression s_a, invo_rsx
         end
       end  # >>
     end
@@ -34,12 +34,12 @@ module Skylab::Snag
         HomeModels__::NodeCollection
       end
 
-      def new_via_body x  # #Tenet7A1
+      def via_body x  # #Tenet7A1
 
         new nil, x
       end
 
-      def new_via__identifier__ x  # #Tenet7
+      def via__identifier__ x  # #Tenet7
 
         new x
       end
@@ -381,17 +381,11 @@ module Skylab::Snag
       :ID,
     )
 
-    module NodeRelatedMethods_
+    module NodeRelatedMethods
 
-      def resolve_node_only__
-
-        self._README___close_to_OK__  # this used to pass the whole argument box
-
-        _ = @_callable_API_.call :node, :to_stream,
-          :identifier, @node_identifier,
-          & _listener_
-
-        _store_ :@_node_, _
+      def init_action_ o
+        @_invocation_resources_ = o  # node identifier filesystem adapter
+        super
       end
 
       def resolve_node_collection_and_node_
@@ -403,19 +397,16 @@ module Skylab::Snag
 
       def resolve_node_collection_
 
-        _fsa = @_invocation_resources_.node_collection_filesystem_adapter
-
-        _ = HomeModels__::NodeCollection.new_via_upstream_identifier(
-          @upstream_identifier, _fsa, & _listener_ )
+        _ = HomeModels__::NodeCollection.via_upstream_identifier(
+          @upstream_identifier, @_invocation_resources_, & _listener_ )
 
         _store_ :@_node_collection_, _
       end
 
       def __via_collection_resolve_node_SN
 
-        self._NO_MORE_ARGUMENT_BOX
         _ = @_node_collection_.entity_via_intrinsic_key(
-          @argument_box.fetch( :node_identifier ),
+          @node_identifier,
           & _listener_ )
 
         _store_ :@_node_, _
@@ -423,13 +414,25 @@ module Skylab::Snag
 
       def persist_node_
 
-        self._NO_MORE_ARGUMENT_BOX
-        @_node_collection_.persist_entity(
-          @argument_box,
-          @node,
-          & _listener_ )
+        _cx = build_choices_by_ do |o|
+          o._snag_downstream_identifier_ = @downstream_identifier
+        end
+
+        @_node_collection_.persist_entity _cx, @_node_, & _listener_
+      end
+
+      def build_choices_by_
+        o = THESE_Choices___.new
+        yield o
+        o.freeze
       end
     end
+
+    THESE_Choices___ = ::Struct.new(
+      :_snag_downstream_identifier_,
+      :_snag_try_to_reappropriate_,
+      :_snag_upstream_identifier_,
+    )
 
     class Common_Body_  # (for three)
 
@@ -479,15 +482,15 @@ module Skylab::Snag
 
       class << self
 
-        def interpret_component arg_st, & oes_p_p
-          Interpret_mixed_message___[ arg_st, & oes_p_p ]
+        def interpret_component scn, & oes_p_p
+          Interpret_mixed_message___[ scn, & oes_p_p ]
         end
       end  # >>
     end
 
-    Interpret_mixed_message___ = -> arg_st, & x_p do
+    Interpret_mixed_message___ = -> scn, & x_p do
 
-      x = arg_st.gets_one
+      x = scn.gets_one
       a = ::Array.try_convert x
       a ||= [ x ]
       ok = true
@@ -505,7 +508,7 @@ module Skylab::Snag
       end
 
       if ok
-        Home_::Models::Hashtag::String_Piece.new_via_string s_a * SPACE_
+        Home_::Models::Hashtag::String_Piece.via_string s_a * SPACE_
       else
         ok
       end
@@ -516,7 +519,7 @@ module Skylab::Snag
       x = ( qkn.value_x if qkn.is_known_known )
       if x
 
-        o = HomeModels__::NodeIdentifier.new_via_user_value_ x, & oes_p  # yes
+        o = HomeModels__::NodeIdentifier.via_user_value_ x, & oes_p  # yes
 
         if o
           Common_::Known_Known[ o ]

@@ -39,10 +39,10 @@ module Skylab::Snag::TestSupport
 
       mod = subject_module_
 
-      n11n = Home_.lib_.basic::Number.normalization.new_with(
+      n11n = Home_.lib_.basic::Number.normalization.with(
         :number_set, :integer, :minimum, 0 ).to_parser_proc
 
-      _h = mod::Association_Adapter.new_with(
+      _h = mod::Association_Adapter.with(
 
         :verb_lemma, 'be',
 
@@ -56,7 +56,7 @@ module Skylab::Snag::TestSupport
 
             :keyword, 'tall' ] )
 
-      _w = mod::Association_Adapter.new_with(
+      _w = mod::Association_Adapter.with(
 
         :verb_lemma, 'be',
 

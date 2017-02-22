@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - criteria - create", wip: true do
+  describe "[sg] operations - criteria - create" do
 
     TS_[ self ]
     use :expect_event
@@ -10,8 +10,10 @@ module Skylab::Snag::TestSupport
 
     it "action has custom syntax: can't edit and save at the same time" do
 
+      # ((begins to) #lends-coverage to [#fi-008.4] (argument monikers))
+
       call_API(
-        :criteria, :criteria_to_stream,
+        :criteria, :issues_via_criteria,
         :criteria, :hi,
         :upstream_identifier, :hi,
         :save, :hi,
@@ -27,7 +29,7 @@ module Skylab::Snag::TestSupport
     it "name must be valid" do
 
       call_API(
-        :criteria, :criteria_to_stream,
+        :criteria, :issues_via_criteria,
         :criteria, %w( nodes that are tagged with #rocket ),
         :upstream_identifier, :hi,
         :save, '-not-valid-',
@@ -38,6 +40,8 @@ module Skylab::Snag::TestSupport
     end
 
     it "yes" do
+
+      # #lends-coverage to [#sy-008.2] (which is for us)
 
       fn = 'xozzo1-tmp-for-test'
       path = ::File.join criteria_directory_, fn
@@ -51,7 +55,7 @@ module Skylab::Snag::TestSupport
 
       call_API(
 
-        :criteria, :criteria_to_stream,
+        :criteria, :issues_via_criteria,
 
         :criteria, %w( nodes that are tagged with #rocket ),
 

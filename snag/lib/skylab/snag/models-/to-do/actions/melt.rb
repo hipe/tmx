@@ -4,107 +4,79 @@ module Skylab::Snag
 
     class Actions::Melt  # see [#063]
 
-      Home_.lib_.brazen::Modelesque.entity( self,
+      def definition ; [
 
-        :default_proc, -> do
-          Here_.default_pattern_strings
+        :glob, :property, :pattern,
+        :default_by, -> _act do
+          Common_::KnownKnown[ Here_.default_pattern_strings ]
         end,
-        :argument_arity, :one_or_more, :property, :pattern,
 
-
+        :glob, :property, :name,
         :description, -> y do
           y << "(see [#063]..)"
         end,
-        :default_proc, -> do
-          [ "*#{ Autoloader_::EXTNAME }" ]
+        :default_by, -> _act do
+          Common_::KnownKnown[ [ "*#{ Autoloader_::EXTNAME }" ] ]
         end,
-        :argument_arity, :one_or_more, :property, :name,
-
 
         :flag, :property, :dry_run,
 
         :property, :downstream_identifier,
 
-        :required, :argument_arity, :one_or_more, :property, :path
-      )
+        :required, :glob, :property, :path,
+      ] end
 
-      def execute
+      # -
 
-        self._NO_MORE_ARGUMENT_BOX
-        h = @argument_box.h_
+        def initialize
+          extend ActionRelatedMethods_
+          @_invocation_resources_ = yield
+          init_action_ @_invocation_resources_
+          @downstream_identifier = @dry_run = nil  # #[#026]
+        end
 
-        o = Session___.new @kernel, & _listener_
+        def execute
 
-        o.is_dry = h[ :dry_run ]
-        o.downstream_identifier = h[ :downstream_identifier ]
-        o.filesystem_conduit = Home_.lib_.system.filesystem
-        o.names = h[ :name ]
-        o.paths = h[ :path ]
-        o.patterns = h[ :pattern ]
-        o.system_conduit = Home_::Library_::Open3
+          Session___.call_by do |o|
+            o.is_dry = @dry_run
+            o.downstream_identifier = @downstream_identifier
+            o.filesystem_conduit = Home_.lib_.system.filesystem
+            o.names = @name
+            o.paths = @path
+            o.patterns = @pattern
+            o.system_conduit = Home_::Library_::Open3
+            o.invocation_resources = @_invocation_resources_
+            o.listener = _listener_
+          end
+        end
+      # -
 
-        o.execute
-      end
+      # ==
 
-      class Session___
+      class Session___ < Common_::MagneticBySimpleModel
 
-        def initialize kr, & x_p
-
+        def initialize
+          yield self
           @be_verbose = true  # will probably go away
-
-          @is_dry = nil
-          @_kernel = kr
-          @_oes_p = x_p
         end
 
         attr_writer(
           :downstream_identifier,
           :filesystem_conduit,
+          :invocation_resources,
           :is_dry,
+          :listener,
           :names,
           :paths,
           :patterns,
-          :system_conduit
+          :system_conduit,
         )
 
         def execute
-
           ok = __resolve_collection
           ok &&= __resolve_file_unit_of_work_stream
           ok &&= __within_edit_session_flush_each_file_unit_of_work
           ok && __summarize
-        end
-
-        def __resolve_collection
-
-          if ! @downstream_identifier
-
-            path = Models_::NodeCollection.nearest_path(
-              @paths.fetch( 0 ), @filesystem_conduit, & @_oes_p )
-
-            if path
-              @downstream_identifier = path
-            else
-              ok = path
-            end
-          end
-
-          if @downstream_identifier
-            __via_downstream_identifier_resolve_collection
-          else
-            ok
-          end
-        end
-
-        def __via_downstream_identifier_resolve_collection
-
-          col = Models_::NodeCollection.new_via_upstream_identifier(
-            @downstream_identifier, & @_oes_p )
-          if col
-            @_collection = col
-          else
-            col
-          end
         end
 
         def __resolve_file_unit_of_work_stream
@@ -125,22 +97,21 @@ module Skylab::Snag
 
         def __init_match_session
 
-          o = Here_::Magnetics_::Collection_via_Arguments.new( & @_oes_p )
-
-          o.filename_pattern_s_a = @names
-          o.path_s_a = @paths
-          o.pattern_s_a = @patterns
-          o.system_conduit = @system_conduit
-          @_match_session = o
-          NIL_
+          @_match_session = Here_::Magnetics_::Collection_via_Arguments.define do |o|
+            o.patterns = @patterns
+            o.paths = @paths
+            o.filename_patterns = @names
+            o.system_conduit = @system_conduit
+            o.listener = @listener
+          end
+          NIL
         end
 
         def __init_counts
 
           @_counts__number_of_seen_matches = 0
           @_counts__number_of_qualified_matches = 0
-
-          NIL_
+          NIL
         end
 
         def ___reduce_to_qualified_match_stream st
@@ -160,20 +131,7 @@ module Skylab::Snag
         def __aggregate_to_file_unit_of_work_stream st
 
           p = nil
-
-          sr = @_collection.start_sessioner( & @_oes_p )
-          sr.is_dry = @is_dry
-
-          # sr.downstream_identifier = @downstream_identifier
-
-          _Unit_of_Work = Here___::Models_::FileUnitOfWork.new_prototype do | o |
-            o.is_dry = @is_dry
-            o.filesystem_conduit = @filesystem_conduit
-            o.kernel = @_kernel
-            o.on_event_selectively = @_oes_p
-            o.sessioner = sr
-            o.system_conduit = @system_conduit
-          end
+          _Unit_of_Work = __unit_of_work_prototype
 
           build_proc_for_when_match = -> match do
 
@@ -236,6 +194,24 @@ module Skylab::Snag
           end
         end
 
+        def __unit_of_work_prototype
+
+          _sessioner = @__collection.sessioner_by do |o|
+            o.is_dry = @is_dry
+            o.listener = @listener
+          end
+
+          # _sessioner.downstream_identifier = @downstream_identifier
+
+          This_::Models_::FileUnitOfWork.define do |o|
+            o.is_dry = @is_dry
+            o.filesystem_conduit = @filesystem_conduit
+            o.listener = @listener
+            o.sessioner = _sessioner
+            o.system_conduit = @system_conduit
+          end
+        end
+
         def __within_edit_session_flush_each_file_unit_of_work
 
           st = @_file_unit_of_work_stream
@@ -244,11 +220,11 @@ module Skylab::Snag
           if uow
             begin
               ok = uow.OMG_try
-              ok or break
+              ok || break
               uow = st.gets
-              uow or break
+              uow || break
               redo
-            end while nil
+            end while above
             ok
           else
             __when_no_file_units_of_work
@@ -257,16 +233,16 @@ module Skylab::Snag
 
         def __when_no_file_units_of_work
 
-          @_oes_p.call :info, :no_matches do
+          @listener.call :info, :no_matches do
 
             __build_no_file_units_of_work_event
           end
-          NIL_
+          NIL
         end
 
         def __build_no_file_units_of_work_event
 
-          Here_::Events_::No_Matches.new_with(
+          Here_::Events_::No_Matches.with(
             :command, @_match_session.command,
             :patterns, @patterns,
             :number_of_matches, @_counts__number_of_seen_matches
@@ -275,17 +251,45 @@ module Skylab::Snag
 
         def __summarize
 
-          @_oes_p.call :info, :summary do
-
-            Summary___[
+          @listener.call :info, :summary do
+            Summary___.new(  # `new` with positional args is experimental [#co-070.2]
               @is_dry,
               @_counts__number_of_files_seen_here,
               @_counts__number_of_qualified_matches,
-              @_counts__number_of_seen_matches ]
+              @_counts__number_of_seen_matches,
+            )
           end
           ACHIEVED_
         end
+
+        def __resolve_collection
+          if __resolve_downstream_identifier
+            __resolve_collection_via_downstream_identifier
+          end
+        end
+
+        def __resolve_collection_via_downstream_identifier
+
+          _ = Home_::Models_::NodeCollection.via_upstream_identifier(
+            @downstream_identifier, @invocation_resources, & @listener )
+
+          _store :@__collection, _
+        end
+
+        def __resolve_downstream_identifier
+          if @downstream_identifier
+            ACHIEVED_
+          else
+            _ = Home_::Models_::NodeCollection::Nearest_path.call(
+              @paths.fetch( 0 ), @filesystem_conduit, & @listener )
+            _store :@downstream_identifier, _
+          end
+        end
+
+        define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
       end
+
+      # ==
 
       Summary___ = Common_::Event.prototype_with(
         :summary,
@@ -294,7 +298,7 @@ module Skylab::Snag
         :number_of_qualified_matches, nil,
         :number_of_seen_matches, nil,
         :ok, true
-      ) do | y, o |
+      ) do |y, o|
 
         y << "#{ '(dryly) ' if o.was_dry }changed the #{
          }#{ np_ o.number_of_qualified_matches, 'qualified todo' } #{
@@ -302,10 +306,12 @@ module Skylab::Snag
            }#{ np_ o.number_of_files_seen_here, 'file' }"
       end
 
-      # because [#026]:
+      # ==
 
-      Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
-      Here___ = self
+      This_ = self
+
+      # ==
+      # ==
     end
   end
 end

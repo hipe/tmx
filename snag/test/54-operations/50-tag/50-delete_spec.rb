@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - tag - delete", wip: true do
+  describe "[sg] operations - tag - delete" do
 
     TS_[ self ]
     use :expect_event

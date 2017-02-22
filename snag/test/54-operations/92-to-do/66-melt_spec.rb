@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] models - to-do - actions - melt", wip: true do
+  describe "[sg] models - to-do - actions - melt" do
 
     TS_[ self ]
 
@@ -13,17 +13,21 @@ module Skylab::Snag::TestSupport
 
     it "if there are no file matches at all - looks same as no content matches" do
 
-      call_API :to_do, :melt,
-        :path, [ Fixture_tree_[ :some_todos ] ]
+      call_API(
+        :to_do, :melt,
+        :path, Fixture_tree_[ :some_todos ],
+      )
 
       _expect_same
     end
 
     it "if files are matched but no content, is same" do
 
-      call_API :to_do, :melt,
-        :path, [ Fixture_tree_[ :some_todos ] ],
-        :name, [ '*.code' ]
+      call_API(
+        :to_do, :melt,
+        :path, Fixture_tree_[ :some_todos ],
+        :name, '*.code',
+      )
 
       _expect_same
     end
@@ -42,10 +46,12 @@ module Skylab::Snag::TestSupport
 
     it "with plain old todo's with no message, explains the pain" do
 
-      call_API :to_do, :melt,
-        :pattern, [ '%to-dew' ],
-        :path, [ Fixture_tree_[ :some_todos ] ],
-        :name, [ '*.code' ]
+      call_API(
+        :to_do, :melt,
+        :pattern, '%to-dew',
+        :path, Fixture_tree_[ :some_todos ],
+        :name, '*.code',
+      )
 
       _em = expect_neutral_event :no_matches
 
@@ -72,9 +78,11 @@ module Skylab::Snag::TestSupport
         [#02]       i started at two just to be cute
       O
 
-      call_API :to_do, :melt,
-        :path, [ td.to_path ],
-        :name, [ '*.sc' ]
+      call_API(
+        :to_do, :melt,
+        :path, td.to_path,
+        :name, '*.sc',
+      )
 
       __expect_these_events
     end
@@ -110,12 +118,14 @@ module Skylab::Snag::TestSupport
       _mani_path = Fixture_file_[ :rochambeaux_mani ]
       _tree_path = Fixture_tree_[ :melt_bonanza ]
 
-      call_API :to_do, :melt,
+      call_API(
+        :to_do, :melt,
         :downstream_identifier, _mani_path,
-        :path, [ _tree_path ],
-        :name, [ '*.code' ],
-        :pattern, [ '%to-dew' ],
-        :dry_run
+        :path, _tree_path,
+        :name, '*.code',
+        :pattern, '%to-dew',
+        :dry_run,
+      )
 
       __expect_these_multiple_files_events
     end

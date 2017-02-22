@@ -72,7 +72,7 @@ module Skylab::Snag
       #   • plus error reporting -AND-
       #   • minus the recognition of the open and close sequence
 
-      def new_via_user_value_ x, & oes_p
+      def via_user_value_ x, & oes_p
 
         # (oldschool handler b.c we bridge the gap between [br] and [co] API)
 
@@ -97,21 +97,21 @@ module Skylab::Snag
         end
       end
 
-      def new_via__object__ x  # ..
+      def via__object__ x  # ..
         x
       end
 
       alias_method :new_empty, :new
 
-      def new_via_integer d
+      def via_integer d
         new nil, d
       end
 
-      def new_via__integer__ d
+      def via__integer__ d
         new nil, d
       end
 
-      def new_via__suffix_and_integer__ x, x_
+      def via__suffix_and_integer__ x, x_
         new x, x_
       end
 
@@ -171,7 +171,7 @@ module Skylab::Snag
 
       def __build_uninterpretable_as_integer_event x
 
-        Home_.lib_.basic::Number::Uninterpretable.new_with(
+        Home_.lib_.basic::Number::Uninterpretable.with(
           :x, x,
           :property_name_symbol, :node_identifier_number_component,
           :minimum, 0,
@@ -243,7 +243,7 @@ module Skylab::Snag
       # expirimental near :+[#ba-050]
       # ->
 
-        _n11n = Home_.lib_.basic::Number.normalization.new_with(
+        _n11n = Home_.lib_.basic::Number.normalization.with(
           :minimum, 1,
           :number_set, :integer,
         )

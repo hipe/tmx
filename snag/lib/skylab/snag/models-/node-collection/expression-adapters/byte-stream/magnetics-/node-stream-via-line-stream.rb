@@ -106,7 +106,7 @@ module Skylab::Snag
           @body = _Models_::Body.via_range_and_substring_array nil, _BODY
           @body.receive_extended_content_adapter__ @extended_content_adapter
 
-          @node = _Models::Node.new_via_body @body
+          @node = _Models::Node.via_body @body
 
           # ~ lowlevel
 

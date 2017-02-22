@@ -53,10 +53,10 @@ module Skylab::Snag::TestSupport
 
     memoize :_simplest_width do
 
-      n11n = Home_.lib_.basic::Number.normalization.new_with(
+      n11n = Home_.lib_.basic::Number.normalization.with(
         :number_set, :integer, :minimum, 0 ).to_parser_proc
 
-      subject_module_::Association_Adapter.new_with(
+      subject_module_::Association_Adapter.with(
 
         :verb_lemma, 'be',
 

@@ -2,46 +2,25 @@ module Skylab::Snag
 
   class Models_::Node
 
-    Home_._NO_MORE_COMMON_ACTION
-    class Actions::Create < Common_Action_
+    class Actions::Open
 
       def definition ; [
 
-                   :property, :downstream_identifier,
+        :flag, :property, :try_to_reappropriate,
+
+        :property, :downstream_identifier,
+
         :required, :property, :upstream_identifier,
-        :required, :argument_arity, :one_or_more, :property, :message
+
+        :required, :glob, :property, :message,
       ] end
 
-      def execute
-        if resolve_node_collection_
-          __via_node_collection
-        end
+      def initialize
+        extend NodeRelatedMethods, ActionRelatedMethods_
+        init_action_ yield
+        @downstream_identifier = nil  # #[#026] (and:)
+        @try_to_reappropriate = nil
       end
-
-      def __via_node_collection
-
-        self._NO_MORE_ARGUMENT_BOX
-        bx = @argument_box
-
-        @_node_collection_.edit(
-
-          :using, bx,
-          :add, :node,
-            :append, :message, bx.fetch( :message ),
-          & _listener_ )
-      end
-    end
-
-    class Actions::Open < Common_Action_  # egads as long as it is found here :+#stowaway
-
-      edit_entity_class(
-
-            :flag, :property, :try_to_reappropriate,
-                   :property, :downstream_identifier,
-        :required, :property, :upstream_identifier,
-        :required, :argument_arity, :one_or_more, :property, :message
-          # (arity thing is experiment for the future)
-      )
 
       def execute
         if resolve_node_collection_
@@ -51,24 +30,25 @@ module Skylab::Snag
 
       def __via_node_collection
 
-        self._NO_MORE_ARGUMENT_BOX
-        bx = @argument_box
+        _cx = build_choices_by_ do |o|
+          o._snag_downstream_identifier_ = @downstream_identifier
+          o._snag_try_to_reappropriate_ = @try_to_reappropriate
+        end
 
         @_node_collection_.edit(
-
-          :using, bx,
+          :using, _cx,
           :add, :node,
             :append, :tag, :open,
-            :append, :message, bx.fetch( :message ),
+            :append, :message, @message,
           & _listener_ )
       end
 
-      Try_to_reappropriate = -> node_, sess, & x_p do
+      Try_to_reappropriate = -> node_, sess, invo_rsx, & x_p do  # 1x
 
-        node =
-        Models_::NodeCollection::Magnetics_::
+        node = Home_::Models_::NodeCollection::Magnetics_::
             ReappropriablestNode_via_Arguments.call(
           sess.entity_upstream,
+          invo_rsx,
           & x_p )
 
         sess.reset_the_entity_upstream

@@ -46,7 +46,7 @@ module Skylab::Snag
         _s_a = %w( nodes that are tagged with #open )
 
         st = @kernel.call :criteria,
-          :criteria_to_stream,
+          :issues_via_criteria,
           :criteria, _s_a,
           :upstream_identifier, @upstream_identifier,
           & @oes_p

@@ -25,7 +25,7 @@ module Skylab::Snag::TestSupport
 
       x = nil
       -> do
-        x ||= subject_module_::Grammatical_Context_.new_with :subject_number, :singular
+        x ||= subject_module_::Grammatical_Context_.with :subject_number, :singular
       end
     end.call
 

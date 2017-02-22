@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::Snag::TestSupport
 
-  describe "[sg] operations - node - open", wip: true do
+  describe "[sg] operations - node - open" do
 
     TS_[ self ]
     use :expect_event
@@ -18,11 +18,11 @@ module Skylab::Snag::TestSupport
         :node, :open,
         :try_to_reappropriate,
         :upstream_identifier, path,
-        :message, [
+        :message,
 <<-O.chop
 1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__ 7___ 7b__ 8___ 8b__
 O
-        ] )
+      )
 
       ev = expect_OK_event( :wrote ).cached_event_value.to_event
       ev.bytes or fail
@@ -47,6 +47,8 @@ O
 
     it "reappropriation" do
 
+      # (#lend-coverage to [#fi-008.2])
+
       _did = downstream_ID_via_array_ y=[]
 
       _uid = upstream_identifier_via_string_ <<-HERE.unindent.freeze
@@ -61,7 +63,8 @@ O
         :try_to_reappropriate,
         :upstream_identifier, _uid,
         :downstream_identifier, _did,
-        :message, [ "so far", "so good" ]
+        :message, "so far",
+        :message, "so good",
       )
 
       y[ 0 ].should eql(

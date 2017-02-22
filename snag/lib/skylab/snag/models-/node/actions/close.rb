@@ -2,10 +2,9 @@ module Skylab::Snag
 
   class Models_::Node
 
-    Home_._NO_MORE_COMMON_ACTION
-    class Actions::Close < Common_Action_
+    class Actions::Close
 
-      edit_entity_class(
+      def definition ; [
 
         :branch_description, -> y do
           'close a node (remove tag #open and add tag #done)'
@@ -13,8 +12,14 @@ module Skylab::Snag
 
         :property, :downstream_identifier,
         :required, :property, :upstream_identifier,
-        :required, :property, :node_identifier
-      )
+        :required, :property, :node_identifier,
+      ] end
+
+      def initialize
+        extend NodeRelatedMethods, ActionRelatedMethods_
+        init_action_ yield
+        @downstream_identifier = nil  # #[#026]
+      end
 
       def execute
         if resolve_node_collection_and_node_
@@ -24,7 +29,7 @@ module Skylab::Snag
 
       def __via_node_collection_and_node
 
-        _ok = @node.edit(
+        _ok = @_node_.edit(
 
           :if, :present,
             :remove, :tag, :open,
@@ -36,6 +41,9 @@ module Skylab::Snag
 
         _ok && persist_node_
       end
+
+      # ==
+      # ==
     end
   end
 end

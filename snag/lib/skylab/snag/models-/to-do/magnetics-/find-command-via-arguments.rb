@@ -2,9 +2,9 @@ module Skylab::Snag
 
   class Models_::ToDo
 
-    module Magnetics_::FindCommand_via_Arguments  # (was [#032] try to unify)
+    module Magnetics_::FindCommand_via_Arguments  # 1x (was [#032] try to unify)
 
-      # assume @filename_pattern_s_a, @path_s_a, @pattern_s_a
+      # assume @filename_patterns, @paths, @patterns
       # (but sanity-check their arities anyway)
 
       def execute
@@ -16,14 +16,14 @@ module Skylab::Snag
 
       def __sanity_checks
 
-        ok = @filename_pattern_s_a.nil? || @filename_pattern_s_a.length.nonzero?
-        ok &&= @path_s_a.length.nonzero?
-        ok && @pattern_s_a.length.nonzero?
+        ok = @filename_patterns.nil? || @filename_patterns.length.nonzero?
+        ok &&= @paths.length.nonzero?
+        ok && @patterns.length.nonzero?
       end
 
       def __resolve_pattern_string_for_grep
 
-        @pattern_string_for_grep = @pattern_s_a * PIPE_FOR_GREP___  # :+#security - this is a hole
+        @pattern_string_for_grep = @patterns * PIPE_FOR_GREP___  # :+#security - this is a hole
         ACHIEVED_
       end
 
@@ -31,11 +31,11 @@ module Skylab::Snag
 
       def __build
 
-        Home_.lib_.system.find.new_with(
+        Home_.lib_.system.find.with(
 
-          :filenames, @filename_pattern_s_a,
+          :filenames, @filename_patterns,
 
-          :paths, @path_s_a,
+          :paths, @paths,
 
           :trusted_strings,
             [ @pattern_string_for_grep, '{}', '+' ],
@@ -47,7 +47,7 @@ module Skylab::Snag
           :freeform_query_infix_words,
             COMMON___,
 
-          & @on_event_selectively )
+          & @listener )
       end
 
       COMMON___ = %w( -type f ).freeze

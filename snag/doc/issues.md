@@ -69,7 +69,9 @@
 [#016] #idea "decision tree" - see why a particular entity failed
                against the criteria as a subset tree of the crit. tree
              ( #was: #done remove fixed field requirement )
-[#015]       ( #moved-to: [#ac-007.WISH-A] )
+
+[#015] #hole
+             ( #moved-to: #wish [#ac-007.G] )
              ( #was: #done rearch to find issues.md )
 [#014]       the open issue report, stored critera ..
 [#013] #open overreach - #waiting-for: [#005]
@@ -82,15 +84,13 @@
              all.rb dep now )
 [#009] #open awesome semantic open tag search - ("smart twitter")
 
-[#008]       externally referenced coverpoints ("lend coverage")
-
-             [#here.3] #lend-coverage to [pl]
-             [#here.2] #lend-coverage to [fi]
-
+[#008]       coverage assets/liabilities
              [#here.A] #feature structured tags (never referenced anywhwere)
              ( #was: #done -n on all destructive actions )
 
 [#007]       misc internal references
+             [#here.D] wish we had array, near #masking
+             [#here.C]: NIL not FALSE for API failure
        #open [#here.B]: comment this eventually
              [#here.A]: where we add (or "subtract") hashtag prefix
              ( #was: #done autoloadify )

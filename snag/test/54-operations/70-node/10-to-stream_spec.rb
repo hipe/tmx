@@ -50,9 +50,7 @@ module Skylab::Snag::TestSupport
       st.gets.should be_nil
     end
 
-    it "`number_limit`" do
-
-      # (#lend-coverage to [fi] [#008.2])
+    it "`number_limit`" do  # #lends-coverage to [#fi-008.3]
 
       call_API :node, :to_stream,
         :number_limit, 1,

@@ -27,9 +27,11 @@ module Skylab::Snag::TestSupport
 
       it "ok with two tags" do
 
-        call_API :tag, :to_stream,
+        call_API(
+          :tag, :to_stream,
           :upstream_identifier, Fixture_file_[ :the_sutherlands_mani ],
-          :node_identifier, 1, & EMPTY_P_
+          :node_identifier, 1,
+          & EMPTY_P_ )
 
         st = @result
         o = st.gets

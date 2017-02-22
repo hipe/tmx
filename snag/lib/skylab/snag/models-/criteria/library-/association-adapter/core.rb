@@ -36,7 +36,7 @@ module Skylab::Snag
 
             _cls = Parse__.function func_sym
 
-            _f = _cls.new_via_argument_scanner_passively st_
+            _f = _cls.via_argument_scanner_passively st_
 
             bx.add name_sym, _f
 

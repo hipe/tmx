@@ -121,7 +121,7 @@ module Skylab::Snag
 
             :item_from_matrix
 
-          ).new_via_item_stream_proc do
+          ).via_item_stream_proc do
 
             _to_model_reflection_stream( & rfx_p )
           end

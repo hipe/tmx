@@ -308,7 +308,7 @@ module Skylab::Snag
             _idx_a = ::Array.try_convert( idx_x_ ) || [ idx_x_ ]
             _word_a = ::Array.try_convert( word_x_ ) || [ word_x_ ]
 
-            Event_for_Expecting___.new_with(
+            Event_for_Expecting___.with(
               :input_stream_indexes, _idx_a,
               :word_s_a, _word_a,
               :input_stream, in_st_

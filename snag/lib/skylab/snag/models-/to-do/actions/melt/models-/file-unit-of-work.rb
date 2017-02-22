@@ -4,25 +4,15 @@ module Skylab::Snag
 
     class Actions::Melt
 
-      class Models_::FileUnitOfWork # see [#068]:#note-110
+      class Models_::FileUnitOfWork < Common_::SimpleModel  # see [#068]:#note-110
 
-        class << self
-
-          alias_method :new_prototype, :new
-          private :new
-        end  # >>
-
-        def initialize
-          yield self
-          freeze
-        end
-
-        attr_writer :is_dry,
+        attr_writer(
+          :is_dry,
           :filesystem_conduit,
-          :kernel,
-          :on_event_selectively,
+          :listener,
           :sessioner,
-          :system_conduit
+          :system_conduit,
+        )
 
         def new match_ary, path
           dup.__init match_ary, path
@@ -37,11 +27,12 @@ module Skylab::Snag
 
         def OMG_try  # #note-40
 
-          @_patch = Home_.lib_.system.patch.new_via_file_content_before(
-            @filesystem_conduit.open @_path )
+          _io = @filesystem_conduit.open @_path
+
+          @_patch = Home_.lib_.system.patch.new_via_file_content_before _io
 
           ok = true
-          @sessioner.during_locked_write_session do | sess |
+          @sessioner.during_locked_write_session do |sess|
 
             @_sess = sess
             @_match_a.each do | match |
@@ -67,7 +58,7 @@ module Skylab::Snag
 
           @_node_message = s
 
-          node = Models_::Node.edit_entity(
+          node = Home_::Models_::Node.edit_entity(
             # note an identifier is not set
             :append, :string, @_node_message
           )
@@ -126,8 +117,11 @@ module Skylab::Snag
             :is_dry_run, @is_dry,
             @_path,
             @system_conduit,
-            & @on_event_selectively )
+            & @listener )
         end
+
+        # ==
+        # ==
       end
     end
   end

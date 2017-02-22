@@ -97,7 +97,7 @@ module Skylab::Snag
 
             x_a = []
             send :"__edit_grammatical_context_for__#{ @used_form_symbol }__", x_a
-            @g_ctxt = Library_::Grammatical_Context_.new_via_iambic x_a
+            @g_ctxt = Library_::Grammatical_Context_.via_iambic x_a
 
             error_cache = nil
             x_p_ = if x_p

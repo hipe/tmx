@@ -74,7 +74,7 @@ module Skylab::Snag
 
         @_mani_st = Common_::Stream.via_nonsparse_array _s_a do | path |
 
-           Models_::NodeCollection.new_via_path path, & @_oes_p
+           Models_::NodeCollection.via_path path, & @_oes_p
         end
 
         ACHIEVED_

@@ -18,17 +18,26 @@ module Skylab::Snag
       ] end
 
       def initialize
-        self._README__this_requires_this_one_essential_feature__
-        # this looked good, but it wants to call to the selfsame API
-        extend ActionMethodsRelatedToTags_
-        o = yield
-        init_action_ o
+        extend ActionRelatedMethods_
+        @_invocation_resources_ = yield
+        init_action_ @_invocation_resources_
       end
 
       def execute
-        if resolve_node_only__
+        if __resolve_node_only
           @_node_.to_tag_stream
         end
+      end
+
+      def __resolve_node_only  # (used to be part of NodeRelatedMethods)
+
+        _ = @_invocation_resources_.call_snag_API__(
+          :node, :to_stream,
+          :identifier, @node_identifier,
+          :upstream_identifier, @upstream_identifier,
+          & _listener_ )
+
+        _store_ :@_node_, _
       end
     end
 
@@ -49,8 +58,13 @@ module Skylab::Snag
         :required, :property, :tag
       ] end
 
+      def initialize
+        extend Home_::Models_::Node::NodeRelatedMethods, ActionRelatedMethods_
+        init_action_ yield
+        @prepend = nil  # #[#026]
+      end
+
       def execute
-        extend ActionMethodsRelatedToTags_
         if resolve_node_collection_and_node_
           __via_node_collection_and_node
         end
@@ -58,20 +72,17 @@ module Skylab::Snag
 
       def __via_node_collection_and_node
 
-        self._NO_MORE_ARGUMENT_BOX
-        h = @argument_box.h_
-
-        _ok = @node.edit(
+        ok = @_node_.edit(
 
           :assuming, :absent,
 
-          ( h[ :prepend ] ? :prepend : :append ),
+          ( @prepend ? :prepend : :append ),
 
-          :tag, h[ :tag ],
+          :tag, @tag,
 
           & _listener_ )
 
-        _ok && persist_node_
+        persist_node_ if ok
       end
     end
 
@@ -91,8 +102,13 @@ module Skylab::Snag
         :required, :property, :tag
       ] end
 
+      def initialize
+        extend Home_::Models_::Node::NodeRelatedMethods, ActionRelatedMethods_
+        init_action_ yield
+        @downstream_identifier = nil  # #[#026]
+      end
+
       def execute
-        extend ActionMethodsRelatedToTags_
         if resolve_node_collection_and_node_
           __via_node_collection_and_node
         end
@@ -100,15 +116,12 @@ module Skylab::Snag
 
       def __via_node_collection_and_node
 
-        self._NO_MORE_ARGUMENT_BOX
-        _h = @argument_box.h_
-
-        _ok = @node.edit(
+        ok = @_node_.edit(
           :assuming, :present,
-          :remove, :tag, _h.fetch( :tag ),
+          :remove, :tag, @tag,
           & _listener_ )
 
-        _ok && persist_node_
+        persist_node_ if ok
       end
     end
 
