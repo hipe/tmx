@@ -79,21 +79,21 @@ module Skylab::Fields
           if 1 == x_a.length
             Special_single_digle___.new( x_a.first, did_you_mean_x_a ).execute
           else
-            new_via x_a, did_you_mean_x_a
+            new x_a, did_you_mean_x_a
           end
         end
 
         def via_strange x
-          new_via [ x ]
+          new [ x ]
         end
 
-        def new_via_arglist a
-          new_via( * a )
+        def via_arglist a
+          new( * a )
         end
 
-        def new_via name_x_a, did_you_mean_i_a=nil, lemma=nil, adj=nil  # [br]
+        def new name_x_a, did_you_mean_i_a=nil, lemma=nil, adj=nil  # [br]  # a custom [#co-070.2]
 
-          new_with(
+          with(
             :name_x_a, name_x_a,
             :did_you_mean_symbol_array, did_you_mean_i_a,
             :lemma, lemma,
@@ -126,7 +126,7 @@ module Skylab::Fields
             @_exp_x_a = nil
           end
 
-          Here_.new_via [ @_use_strange_x ], @_exp_x_a
+          Here_.new [ @_use_strange_x ], @_exp_x_a
         end
 
         def ___reduce_exp_i_a
@@ -143,7 +143,7 @@ module Skylab::Fields
 
       Levenshtein___ = -> closest_d, good_x_a, strange_s do  # #curry-friendly
 
-        Home_.lib_.human::Levenshtein.with(
+        Home_.lib_.human::Levenshtein.via(
           :item_string, strange_s,
           :closest_N_items, closest_d,
           :items, good_x_a,

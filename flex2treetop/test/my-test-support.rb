@@ -112,7 +112,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         if dbg_IO
           x_a.push :be_verbose, true, :debug_IO, dbg_IO
         end
-        td = TestSupport_.tmpdir.new_via_iambic x_a
+        td = TestSupport_.tmpdir.via_iambic x_a
         p = -> _ { td }
         td
       end

@@ -53,7 +53,7 @@ module Skylab::DocTest
 
       @the_grep_service ||= Home_.lib_.system.grep  # module
 
-      proto = @the_grep_service.new_with(
+      proto = @the_grep_service.with(
         :grep_extended_regexp_string, '[^[:space:]][ ]+# =>',
         :freeform_options, %w( --files-with-matches ),
         :system_conduit, @system_conduit,
@@ -125,7 +125,7 @@ module Skylab::DocTest
 
       find = @the_find_service.statuser_by( & @_on_event_selectively )
 
-      _command = @the_find_service.new_with(
+      _command = @the_find_service.with(
         :path, @argument_path,
         :filenames, remove_instance_variable( :@__valid_filenames ),
         :freeform_query_infix_words, remove_instance_variable( :@__infix ),

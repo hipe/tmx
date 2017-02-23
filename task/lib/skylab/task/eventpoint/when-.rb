@@ -6,7 +6,7 @@ class Skylab::Task
 
       # ==
 
-      module AmbiguousNextStep  # #borrow-coverage from [#ts-008.3]
+      module AmbiguousNextStep  # :[#008.2] #borrow-coverage from [ts]
 
         def self.[] d_a, up
           up.listener.call :error, :expression, :ambiguous do |y|

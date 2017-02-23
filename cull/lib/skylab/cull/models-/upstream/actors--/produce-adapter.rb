@@ -63,7 +63,7 @@ module Skylab::Cull
 
           _s_a = get_available_prefixes
 
-          Home_.lib_.fields::Events::Extra.new_via [ @prefix ], _s_a, "prefix"
+          Home_.lib_.fields::Events::Extra.new [ @prefix ], _s_a, "prefix"
         end
 
         UNABLE_
@@ -180,7 +180,7 @@ module Skylab::Cull
             ".#{ nm.as_slug }"
           end
 
-          Home_.lib_.fields::Events::Extra.new_via [ extname ], _s_a, "extension"
+          Home_.lib_.fields::Events::Extra.new [ extname ], _s_a, "extension"
         end
 
         UNABLE_
@@ -194,7 +194,8 @@ module Skylab::Cull
             nm.as_lowercase_with_underscores_symbol
           end
 
-          Home_.lib_.fields::Events.build [ sym ], _s_a, "upstream adapter"
+          self._REVEIW
+          Home_.lib_.fields::Events.new [ sym ], _s_a, "upstream adapter"
         end
 
         UNABLE_

@@ -44,7 +44,7 @@ module Skylab::Basic::TestSupport
       end
 
       it "custom glyph, use iambic args" do
-        subject.with( :input_string, '012345', :max_width, 5, :glyph, '*' ).
+        subject.via( :input_string, '012345', :max_width, 5, :glyph, '*' ).
           should eql '0123*'
       end
 

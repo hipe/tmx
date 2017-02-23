@@ -286,7 +286,7 @@ module Skylab::TanMan
             # this might give us "human" inflection. we could do better,
             # but it would invole heavy hacking of the node class
 
-            Brazen_.event( :Component_Not_Found ).new_with(
+            Brazen_.event( :Component_Not_Found ).with(
 
               :component, _as_componet,
               :component_association, Here_,
@@ -400,7 +400,7 @@ module Skylab::TanMan
 
             lib = Here_::Events__
 
-            lib::Found_Existing_Node.new_with(
+            lib::Found_Existing_Node.with(
               :component, lib::Node_Statement_as_Component.new( one ),
               :ok, is_ok,
             )
@@ -486,7 +486,7 @@ module Skylab::TanMan
 
         def __build_created_node_event node_stmt
 
-          build_OK_event_with :created_node,  # :+[#ac-007]:D
+          build_OK_event_with :created_node,  # #[#ac-007.4]
 
               :node_stmt, node_stmt,
               :did_mutate_document, true do | y, o |

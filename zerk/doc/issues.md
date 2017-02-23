@@ -173,7 +173,11 @@
 [#011]     #track whether/how to share across 3 CLI client classes
 [#010]       custom view controllers
 [#009] #in-progress this rewrite (and new architecture..)
-[#008] #open eventually de-dup this with [#sy-029] OGDL
+
+[#008]       coverage assets & liabilities (& other misc small)
+
+             [#here.2] borrow. [#here.3] borrow. [#here.4] borrow.
+       #open [#here.1]: eventually de-dup this with [#sy-029] OGDL
 
 [#007] "threads" (tracking tags for experimentals towards public API)
 

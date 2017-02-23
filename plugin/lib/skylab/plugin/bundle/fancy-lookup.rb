@@ -272,7 +272,7 @@ module Skylab::Plugin
         raise ev_p[].to_exception
       end
 
-      Parse_lib_[].function( :item_from_matrix ).new_with(
+      Parse_lib_[].function( :item_from_matrix ).with(
 
         :item_stream_proc, -> do
 

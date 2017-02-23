@@ -48,7 +48,7 @@ module Skylab::Fields::TestSupport
 
           ca = _curried_actor
 
-          _ = ca.with :top_slice, :A, :bottom_slice, :B
+          _ = ca.call_via :top_slice, :A, :bottom_slice, :B
 
           _.should eql [ :A, :Pastrami, :B ]
 

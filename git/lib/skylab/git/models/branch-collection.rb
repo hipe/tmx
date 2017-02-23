@@ -6,16 +6,9 @@ module Skylab::Git
 
       def via_project_path_and_cetera pp, sc, & oes_p
 
-        repo = Home_.lib_.git_viz.repository.new_via_path(
-          pp,
-          sc,
-          & oes_p )
+        repo = Home_.lib_.git_viz.repository.via_path pp, sc, & oes_p
 
-        if repo
-          __via_at_one_time_valid_project_path repo.path, sc, & oes_p
-        else
-          repo
-        end
+        repo and __via_at_one_time_valid_project_path repo.path, sc, & oes_p
       end
 
       def __via_at_one_time_valid_project_path path, system_conduit, & oes_p

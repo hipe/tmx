@@ -48,7 +48,7 @@ module Skylab::Human
 
       def ___magnetic_collection
         @___mc ||= Home_::Sexp::Expression_Collection.
-          new_via_multipurpose_module__( EN_::Sexp::Expression_Sessions )
+          via_multipurpose_module__( EN_::Sexp::Expression_Sessions )
       end
 
       def _lookup_class st

@@ -199,9 +199,12 @@ module Skylab::TanMan::TestSupport
 
           __like_a_boss config_line
 
-          call_API :graph, :use,
+          call_API(
+            :graph, :use,
             :digraph_path, @digraph_path,
-            :workspace_path, @ws_pn.to_path, :config_filename, cfn
+            :workspace_path, @ws_pn.to_path,
+            :config_filename, cfn,
+          )
         end
 
         def __like_a_boss config_line

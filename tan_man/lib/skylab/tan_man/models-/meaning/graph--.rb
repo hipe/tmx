@@ -91,9 +91,9 @@ module Skylab::TanMan
         end
         oes_p.call :error, :interminal_meaning, * ( :circular if is_circular ) do
           if is_circular
-            Circular__.new_with :trail_a, trail_a
+            Circular__.with :trail_a, trail_a
           else
-            Interminable__.new_with :trail_a, trail_a
+            Interminable__.with :trail_a, trail_a
           end
         end
         UNABLE_

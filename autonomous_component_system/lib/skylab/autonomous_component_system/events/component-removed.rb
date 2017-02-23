@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events::Component_Removed = Common_::Event.prototype_with(  # [#007]:B
+    Events::Component_Removed = Common_::Event.prototype_with(  # :[#007.2]
 
       :component_removed,
       :component, nil,
@@ -16,7 +16,7 @@ module Skylab::Autonomous_Component_System
 
       o = Event_Support_::ExpressionMethods[ self, o ]
 
-      o << 'removed'  # one day [#007]:WISH-A
+      o << 'removed'  # one day #wish #[#007.G]
       o.express_component_via_members or accept_sentence_part 'component'
       o << 'from'
       o.express_collection_via_members or accept_sentence_part 'collection'

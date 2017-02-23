@@ -92,7 +92,7 @@ module Skylab::TestSupport
 
         _ = Home_.lib_.system.find
 
-        @__find = _.new_with(
+        @__find = _.with(
           :filenames, @filenames,  # "always safe"
           :freeform_query_infix_words, %w( -type dir -maxdepth 1 )
         ) do | * i_a, & ev_p |
@@ -118,7 +118,7 @@ module Skylab::TestSupport
 
         @did_find = false
 
-        st = @__find.new_with( :path, current_path ).to_path_stream
+        st = @__find.with( :path, current_path ).to_path_stream
 
         if st
           one = st.gets

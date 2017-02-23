@@ -37,7 +37,7 @@ module Skylab::Human::TestSupport
       end
 
       it "\"pull\"-style: use `with` to get a dup, set `gets_under`, call `gets`" do
-        scn = _subject.new_with :gets_under, Common_::Stream.via_nonsparse_array( [ :A ] )
+        scn = _subject.with :gets_under, Common_::Stream.via_nonsparse_array( [ :A ] )
         x = scn.gets
         x.should eql "[#{ NEWLINE_ } A"
         x = scn.gets
@@ -46,7 +46,7 @@ module Skylab::Human::TestSupport
       end
 
       it "when zero input items" do
-        scn = _subject.new_with :gets_under, Common_::THE_EMPTY_STREAM
+        scn = _subject.with :gets_under, Common_::THE_EMPTY_STREAM
         x = scn.gets
         x.should eql '[ ]'
         scn.gets.should be_nil

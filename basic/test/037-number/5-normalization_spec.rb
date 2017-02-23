@@ -16,7 +16,7 @@ module Skylab::Basic::TestSupport
     context "the normalizer with no args" do
 
       shared_subject :subject_normalization_ do
-        _subject_module.new_via_arglist Home_::EMPTY_A_
+        _subject_module.via_arglist Home_::EMPTY_A_
       end
 
       it "builds" do
@@ -50,7 +50,7 @@ module Skylab::Basic::TestSupport
     context "the normalizer with a minimum" do
 
       shared_subject :subject_normalization_ do
-        _subject_module.new_with :minimum, -3
+        _subject_module.with :minimum, -3
       end
 
       it "when input is below minimum (string)" do

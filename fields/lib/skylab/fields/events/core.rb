@@ -36,7 +36,7 @@ module Skylab::Fields
           via a
         end
 
-        def new_via_arglist a
+        def via_arglist a
           via( * a )
         end
 
@@ -46,7 +46,7 @@ module Skylab::Fields
             x_a.unshift :lemma
           end
 
-          new_with :reasons, miss_a, * x_a
+          with :reasons, miss_a, * x_a
         end
       end  # >>
 

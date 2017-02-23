@@ -29,13 +29,17 @@ module Skylab::Fields
           @describe_by = p ; KEEP_PARSING_
         end
 
+        def receive_argument_moniker sym  # :[#008.4]: #borrow-coverage from [sn]  (implementation in progress)
+          @ARGUMENT_MONIKER_SYMBOL = sym ; KEEP_PARSING_
+        end
+
         def must_be_integer_greater_than_or_equal_to_this d
           _add_number_normalization :number_set, :integer, :minimum, d
         end
 
         def _add_number_normalization * x_a  # (as seen in [br])
 
-          normer = Home_.lib_.basic.normalizers.number.new_via_iambic x_a
+          normer = Home_.lib_.basic.normalizers.number.via_iambic x_a
           will_normalize_by do |qkn, &p|
             if qkn.is_effectively_known
               normer.normalize_qualified_knownness qkn, & p

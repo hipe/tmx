@@ -48,7 +48,7 @@ module Skylab::Human
 
         _row = @_h.fetch lemma_x
 
-        lexeme = _lxm_cls.new_via_lemma_and_iambic lemma_x, _row
+        lexeme = _lxm_cls.via_lemma_and_iambic lemma_x, _row
 
         @_h[ lemma_x ] = lexeme
 

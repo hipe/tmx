@@ -92,6 +92,8 @@ module Skylab::System
 
       def __can_create  # assume path does not exist
 
+        Home_.lib_.pathname
+
         stop_p = __build_proc_for_stop_because_reached_max_mkdirs
 
         @_num_dirs_needed_to_create = 1  # you need to create at least the tgt

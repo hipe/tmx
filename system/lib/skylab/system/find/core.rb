@@ -70,7 +70,7 @@ module Skylab::System
           end
         end
 
-        def new_with * x_a, & oes_p
+        def with * x_a, & oes_p
           dup.__init_new x_a, & oes_p
         end
 
@@ -267,7 +267,7 @@ module Skylab::System
         end
 
         def to_event
-          Find_::Expression_Adapters::Event.new_with(
+          Find_::Expression_Adapters::Event.with(
             :find_command_args, @args )
         end
 

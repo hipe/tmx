@@ -10,9 +10,9 @@ module Skylab::Human
 
       class << self
 
-        alias_method :new_via_sexp_stream__, :new_via_argument_scanner
+        alias_method :via_sexp_stream__, :via_argument_scanner
 
-        alias_method :new_via_sexp__, :new_via_iambic
+        alias_method :via_sexp__, :via_iambic
 
         # #itch [#fi-035] - it would be nice to get nothing from methodic..
 

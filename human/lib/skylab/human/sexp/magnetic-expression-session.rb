@@ -10,7 +10,7 @@ module Skylab::Human
     class << self
 
       def list_argument_via_array a
-        Here_::Idea_Argument_Adapter_for_Nounish_.new_via_array a
+        Here_::Idea_Argument_Adapter_for_Nounish_.via_array a
       end
 
       def match_for_idea__ idea
@@ -18,10 +18,10 @@ module Skylab::Human
       end
 
       def new_session_via_sexp__ x_a  # assume receiver is an e.f subclass
-        new_via_idea_ Here_::Idea_.new_via_sexp__ x_a
+        via_idea_ Here_::Idea_.via_sexp__ x_a
       end
 
-      def new_via_idea_ x
+      def via_idea_ x
         new x
       end
 

@@ -46,7 +46,7 @@ module Skylab::MyTerm
 
             have_seen = false
 
-            load_ticket = Home_::Models_::Adapter::Load_Ticket.new_via__(
+            load_ticket = Home_::Models_::Adapter::Load_Ticket.via__(
               stem, path, category, single_mod )
 
             cache_a.push load_ticket

@@ -19,7 +19,7 @@ module Skylab::Brazen
         class << self
 
           def build_mutable_with * x_a, & x_p
-            new_via_iambic x_a, & x_p
+            via_iambic x_a, & x_p
           end
 
           private :new

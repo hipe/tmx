@@ -196,7 +196,7 @@ module Skylab::Brazen
 
     # ~~ dup-like and dup-related
 
-    def new_via_iambic x_a
+    def via_iambic x_a
       dup.__init_duplication_via_iambic x_a
     end
 

@@ -214,7 +214,7 @@ module Skylab::Basic
         def __build_when_extra_arguments_event extra_sym_a
 
           _ev = Home_.lib_.fields::Events::Extra.
-            new_via extra_sym_a, nil, 'argument', 'unexpected'
+            new extra_sym_a, nil, 'argument', 'unexpected'  # #[#co-070.2] `new`
 
           _sign_event _ev
         end

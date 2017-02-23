@@ -122,10 +122,12 @@ module Skylab::Brazen
     end
 
     def to_entity_stream_via_model cls, & oes_p
-      Couch_::Actors__::Build_stream.with :model_class, cls,
+
+      Couch_::Actors__::Build_stream.via(
+        :model_class, cls,
         :collection, self,
         :kernel, @kernel,
-        & oes_p
+        & oes_p )
     end
 
     def delete_entity action, ent, & oes_p

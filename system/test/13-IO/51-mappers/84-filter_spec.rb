@@ -22,7 +22,7 @@ module Skylab::System::TestSupport
     context "with a line boundary event handler" do
       let(:downstream) { ::StringIO.new }
       let(:stream) do
-        o = Home_::IO::Mappers::Filter.new_with(
+        o = Home_::IO::Mappers::Filter.with(
           :downstream_IO, downstream,
           :line_begin_proc, -> do
             o.downstream_IO.write 'Z '
@@ -59,7 +59,7 @@ module Skylab::System::TestSupport
     context "with a puts filter" do
       it "works with one filter" do
         downstream = ::StringIO.new
-        stream = Home_::IO::Mappers::Filter.new_with(
+        stream = Home_::IO::Mappers::Filter.with(
           :downstream_IO, downstream,
           :puts_map_proc, -> x do
             "  << epic: #{ x } >>\n"

@@ -10,7 +10,7 @@ module Skylab::Human
 
           class << self
 
-            def new_via__polymorphic_upstream__ st
+            def via__polymorphic_upstream__ st
               Self_._new do
                 @role_symbol = :object
                 _receive_etc st
@@ -23,7 +23,7 @@ module Skylab::Human
 
           class << self
 
-            def new_via__polymorphic_upstream__ st
+            def via__polymorphic_upstream__ st
               Self_._new do
                 @role_symbol = :subject
                 _receive_etc st
@@ -33,7 +33,7 @@ module Skylab::Human
         end
 
         class << self
-          def new_via_array a
+          def via_array a
             Self_._new do
               @role_symbol = :_neither_
               _init_via_array a

@@ -13,7 +13,7 @@ module Skylab::GitViz
 
       class << self
 
-        def new_via_system_conduit sc, & oes_p
+        def via_system_conduit sc, & oes_p
           new sc, & oes_p
         end
 

@@ -77,7 +77,7 @@ module Skylab::Human
         dup
       end
 
-      def new_with * x_a
+      def with * x_a
         otr = dup
         otr.init_copy x_a
         otr

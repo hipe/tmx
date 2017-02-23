@@ -171,7 +171,7 @@ module Skylab::SearchAndReplace
 
     def ___on_end_of_magic s_a, d
 
-      repl_expr = Self_::Build_replace_expression__.with(
+      repl_expr = Self_::Build_replace_expression__.via(
 
         :capture_identifier, d,
         :method_call_chain, s_a,

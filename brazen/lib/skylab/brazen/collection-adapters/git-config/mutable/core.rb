@@ -7,7 +7,7 @@ module Skylab::Brazen
       class << self
 
         def new & oes_p
-          Document__.new Parse__.new_with( & oes_p )
+          Document__.new Parse__.with( & oes_p )
         end
 
         def parse_string str, & oes_p
@@ -26,7 +26,7 @@ module Skylab::Brazen
       class Parse__ < Parse_
 
         class << self
-          def new_with * x_a, & oes_p
+          def with * x_a, & oes_p
             new x_a, & oes_p
           end
         end
@@ -1079,9 +1079,10 @@ module Skylab::Brazen
 
           unparse_into_yielder y=[]
 
-          _parse = Parse__.new_with :via_string_for_immediate_parse,
+          _parse = Parse__.with(
+            :via_string_for_immediate_parse,
             y * EMPTY_S_,
-            & @parse.handle_event_selectively
+            & @parse.handle_event_selectively )
 
           otr = Section_or_Subsection_Parse__.new _parse
           otr.parse or self._SYNTAX_MISMATCH

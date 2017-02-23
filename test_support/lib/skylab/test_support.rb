@@ -28,7 +28,7 @@ module Skylab::TestSupport  # :[#021].
     define_method :fancy_lookup, -> do
 
       build_curry = -> do
-        Home_.lib_.plugin::Bundle::Fancy_lookup.new_with(
+        Home_.lib_.plugin::Bundle::Fancy_lookup.with(
           :entry_group_head_filter, /_spec\z/,
         ).freeze
       end
@@ -92,9 +92,17 @@ module Skylab::TestSupport  # :[#021].
     alias_method :calculate, :instance_exec
   end ; end
 
-  # -- (see discussion of "dangerous memoize" at [#042])
+  # --
 
-  DANGEROUS_MEMOIZE = -> m, & p do
+  DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
+    if x
+      instance_variable_set ivar, x ; ACHIEVED_
+    else
+      x
+    end
+  end
+
+  DANGEROUS_MEMOIZE = -> m, & p do  # see discussion at [#042]
     Define_dangerous_memoizer[ self, m, & p ]
   end
 

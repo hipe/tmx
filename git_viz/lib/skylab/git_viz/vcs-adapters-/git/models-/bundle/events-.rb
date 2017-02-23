@@ -39,7 +39,7 @@ module Skylab::GitViz
             @s = @e.gets
             if @s.nil?
               [[ :error, :directory_is_not_tracked ], -> do
-                Directory_is_not_tracked___.new_with(
+                Directory_is_not_tracked___.with(
                   :path, @full_POI,
                   :exitstatus, @d )
               end ]

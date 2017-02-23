@@ -15,6 +15,13 @@ nodes..
 
 
 
+## philosophical lala
+
+  - a little more boilerplate in exchange for no subclassing
+
+
+
+
 ## case-study/tutorial :[#here.1]
 
 (this coincides with real production code (contemporary with this

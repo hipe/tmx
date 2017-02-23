@@ -295,14 +295,6 @@ module Skylab::TestSupport
 
     MUSTACHE_RX___ = /\{\{[ ]*(?<name>[a-z]+(?:_[a-z]+)*)[ ]*\}\}/
 
-    DEFINITION_FOR_THE_METHOD_CALLED_STORE_ = -> ivar, x do
-      if x
-        instance_variable_set ivar, x ; ACHIEVED_
-      else
-        x
-      end
-    end
-
     # ==
 
     class Service_via_InjectedClient__

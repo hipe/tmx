@@ -11,7 +11,7 @@ module Skylab::Fields::TestSupport
       context "for example if you wanted a \"list\"-style (`argument_arity` many)" do
 
         it "ok." do
-          o = _cls.new_with :foopie, :x, :foopie, :y, :harbinger, :j, :foopie, :z
+          o = _cls.with :foopie, :x, :foopie, :y, :harbinger, :j, :foopie, :z
           o.foopie.should eql [ :x, :y, :z ]
           o.harbinger.should eql :j
         end
@@ -56,7 +56,7 @@ module Skylab::Fields::TestSupport
 
           class X_a_cma_m_A
 
-            def self.new_with * x_a
+            def self.with * x_a
               o = new
               _kp = self::ATTRIBUTES.init o, x_a
               _kp or self._SANITY

@@ -4,12 +4,12 @@ module Skylab::System::TestSupport
 
     Expect_Event[ tcm ]
 
-    tcm.send :define_method, :against_ do | path |
+    tcm.send :define_method, :against_ do |path|
 
       # confusingly, we do not test `against_path` here -
       # we want the full knownness result
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :path, path,
         & handle_event_selectively_ )
       NIL_

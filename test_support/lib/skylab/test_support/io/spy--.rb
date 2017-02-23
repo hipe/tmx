@@ -123,7 +123,7 @@ module Skylab::TestSupport
 
       _niladic_pass_filter_proc = @do_debug_p
 
-      _io = Home_.lib_.system_lib::IO::Mappers::Filter.new_with(
+      _io = Home_.lib_.system_lib::IO::Mappers::Filter.with(
         :downstream_IO, _downstream_IO,
         :line_begin_string, _line_begin_string,
         :niladic_pass_filter_proc, _niladic_pass_filter_proc,

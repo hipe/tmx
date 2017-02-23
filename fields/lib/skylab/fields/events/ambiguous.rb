@@ -7,14 +7,14 @@ module Skylab::Fields
       :ambiguous_property,
 
       :x, nil,
-      :name_s_a, nil,
+      :name_string_array, nil,
       :name, nil,
       :error_category, :argument_error,
       :ok, false
 
     ) do | y, o |
 
-      _s_a = o.name_s_a.map( & method( :val ) )
+      _s_a = o.name_string_array.map( & method( :val ) )
 
       name = o.name
       name ||= Common_::Name.via_variegated_symbol DEFAULT_PROPERTY_LEMMA_
@@ -25,11 +25,11 @@ module Skylab::Fields
 
     class << Events::Ambiguous
 
-      def new_via_arglist a, & slug
-        new_via( * a, & slug )
+      def via_arglist a, & slug
+        new( * a, & slug )
       end
 
-      def new_via ent_a, x, lemma_x=nil, & slug
+      def new ent_a, x, lemma_x=nil, & slug  # custom `new` near #[#co-070.2]
 
         if ! slug
           slug = -> ent do
@@ -49,9 +49,9 @@ module Skylab::Fields
           end
         end
 
-        new_with(
+        with(
           :x, x,
-          :name_s_a, _name_s_a,
+          :name_string_array, _name_s_a,
           :name, _name )
       end
     end

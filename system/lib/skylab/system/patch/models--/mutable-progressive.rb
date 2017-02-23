@@ -6,7 +6,7 @@ module Skylab::System
 
       class << self
 
-        def new_via_file_content_before_ content_x
+        def via_file_content_before_ content_x
           new do
             __init_via_file_content content_x
           end

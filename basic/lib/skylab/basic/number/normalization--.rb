@@ -12,9 +12,9 @@ module Skylab::Basic
             @inst ||= new
           end
 
-          def new_via_arglist a, & x_p  # #[#ca-063] used to have this, may again..
+          def via_arglist a, & x_p  # #[#ca-063] used to have this, may again..
             # (hi.)
-            new_via_iambic a, & x_p
+            via_iambic a, & x_p
           end
 
           # include Simple_Selective_Sender_Methods_  # ick/meh
@@ -232,7 +232,7 @@ module Skylab::Basic
         end
 
         def _new_invalid_event
-          Number_::Uninterpretable.new
+          Number_::Uninterpretable.new  # example of #expermiental #[#co-070.1] plain old `new` constructs malleable event
         end
       end
 

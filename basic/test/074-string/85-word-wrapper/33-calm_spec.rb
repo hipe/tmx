@@ -5,18 +5,19 @@ module Skylab::Basic::TestSupport
   describe "[ba] string - word wrappers - calm" do
 
     TS_[ self ]
-    use :string
+    use :word_wrapper_calm
 
     it "loads" do
-
-      _subject
+      subject_module_
     end
 
     it "two words" do
 
-      ww = _subject.new_with :margin, 'X',
+      ww = subject_with_(
+        :margin, 'X',
         :width, 5,
         :downstream_yielder, []
+      )
 
       ww << 'foo bar'
 
@@ -26,7 +27,7 @@ module Skylab::Basic::TestSupport
 
     it "`input_words`, just one column too shy of a single line" do
 
-      _subject.with(
+      subject_via_(
         :width, 24,
         :input_words, %w( chaos computer collective ),
         :downstream_yielder, []
@@ -36,7 +37,7 @@ module Skylab::Basic::TestSupport
 
     it "remove existing spaces and don't add spaces" do
 
-      ww = _subject.new_with(
+      ww = subject_with_(
         :width, 3,
         :downstream_yielder, [] )
 
@@ -49,7 +50,7 @@ module Skylab::Basic::TestSupport
 
     it "breaks on hyphens" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'foo-bar',
         :width, 4,
         :downstream_yielder, []
@@ -59,7 +60,7 @@ module Skylab::Basic::TestSupport
 
     it "won't break (on hyphens) if it's perfect fit for the one line" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'foo-bar',
         :width, 7,
         :downstream_yielder, []
@@ -69,7 +70,7 @@ module Skylab::Basic::TestSupport
 
     it "hyphenation - don't break a hyphenation before the hyphen" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'never re-think it',
         :width, 8,
         :downstream_yielder, []
@@ -79,7 +80,7 @@ module Skylab::Basic::TestSupport
 
     it "hyphenation - do break a hyphenation afer the hyphen" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'never re-think it',
         :width, 9,
         :downstream_yielder, []
@@ -89,7 +90,7 @@ module Skylab::Basic::TestSupport
 
     it "words longer than target width must be allowed in & out" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'on tw threez fo fi',
         :width, 5,
         :downstream_yielder, []
@@ -101,7 +102,7 @@ module Skylab::Basic::TestSupport
 
     it "amazingly, zero width doesn't bork" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'fe fi fo',
         :width, 0,
         :downstream_yielder, []
@@ -112,7 +113,7 @@ module Skylab::Basic::TestSupport
 
     it "for now, negative width is borkless too" do
 
-      _subject.with(
+      subject_via_(
         :input_string, 'fe fi fo',
         :width, -1,
         :downstream_yielder, []
@@ -126,7 +127,7 @@ module Skylab::Basic::TestSupport
 
     it "target edge case, the catalyst of the most recent rewrite" do
 
-      a = _subject.with(
+      a = subject_via_(
                      # 0___ 0b__ 1__
                      # [#xxx] #nepo Xxx
         :input_string, '#nepo 0b_ 1___ 1b__ 2___ 2b___',
@@ -144,10 +145,6 @@ module Skylab::Basic::TestSupport
 
       s1.should eql "[#xxx] #nepo 0b_ 1___ 1b__"
       s2.should eql "             2___ 2b___"
-    end
-
-    def _subject
-      subject_module_::WordWrapper::Calm
     end
   end
 end

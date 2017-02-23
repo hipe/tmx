@@ -272,7 +272,7 @@ module Skylab::Brazen
         #           [ <name>, <value> [..]] <delegate>
 
         def response_receiver * x_a
-          Respose_Receiver__.new_via_iambic x_a
+          Respose_Receiver__.via_iambic x_a
         end
       end
 
@@ -284,7 +284,7 @@ module Skylab::Brazen
 
         class << self
 
-          def new_via_iambic x_a
+          def via_iambic x_a
             case x_a.length
             when 0 ; self
             when 1 ; new x_a.first
@@ -302,7 +302,7 @@ module Skylab::Brazen
           @delegate = delegate
         end
 
-        def new_with * x_a
+        def with * x_a
           dup.init_dup x_a
         end
       protected

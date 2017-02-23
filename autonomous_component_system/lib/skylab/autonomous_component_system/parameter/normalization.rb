@@ -152,7 +152,7 @@ module Skylab::Autonomous_Component_System
 
       def ___when_failures_and_or_missing_requireds miss_a
 
-        ev = Field_::Events::Missing.new_with(
+        ev = Field_::Events::Missing.with(
           :reasons, miss_a,
           :selection_stack, @selection_stack,
           :lemma, :parameter,

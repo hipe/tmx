@@ -122,7 +122,7 @@ module Skylab::Brazen
 
         @make_these_directories.each do | dir |
 
-          kn = LIB_.system.filesystem( :Existent_Directory ).with(
+          kn = LIB_.system.filesystem( :Existent_Directory ).call_via(
 
             :path, dir,
             :create,

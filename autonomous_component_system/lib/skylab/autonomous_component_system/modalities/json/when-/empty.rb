@@ -27,7 +27,7 @@ module Skylab::Autonomous_Component_System
 
         sess.caller_emission_handler_.call :error, :empty_object do
 
-          new_with :context_linked_list, sess.context_linked_list
+          with :context_linked_list, sess.context_linked_list
         end
 
         UNABLE_  # important

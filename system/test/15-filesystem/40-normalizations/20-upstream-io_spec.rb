@@ -25,7 +25,7 @@ module Skylab::System::TestSupport
       _pa = Common_::Qualified_Knownness.via_value_and_symbol(
         _not_here, :wazoozie )
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :qualified_knownness_of_path, _pa,
         & handle_event_selectively_ )
 
@@ -60,7 +60,7 @@ module Skylab::System::TestSupport
 
     it "sin and file" do
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :stdin, _non_interactive_stdin,
         :path, 'no-see',
         & handle_event_selectively_ )

@@ -31,7 +31,7 @@ module Skylab::Brazen
         end
 
         def via_stream io
-          Home_.lib_.IO_lib::Byte_Upstream_Identifier.new_via_open_IO io
+          Home_.lib_.IO_lib::Byte_Upstream_Identifier.via_open_IO io
         end
 
         def via_line_array s_a
@@ -87,7 +87,7 @@ module Skylab::Brazen
         end
 
         def via_stream io
-          Home_.lib_.IO_lib::Byte_Downstream_Identifier.new_via_open_IO io
+          Home_.lib_.IO_lib::Byte_Downstream_Identifier.via_open_IO io
         end
 
         def via_line_array s_a
@@ -285,7 +285,7 @@ module Skylab::Brazen
       def ___ambiguous a
 
         @on_event_selectively.call :error, :ambiguous_property do
-          Home_.lib_.fields::Events::Ambiguous.new_via(
+          Home_.lib_.fields::Events::Ambiguous.new(  # CUSTOM #[#co-070.2]
             a,
             @qualified_knownness.value_x,
             @qualified_knownness.name,
@@ -313,7 +313,7 @@ module Skylab::Brazen
 
             _Lev = Home_.lib_.human::Levenshtein
 
-            a = _Lev.with(
+            a = _Lev.via(
               :item_string, kn.value_x,
               :items, did_you_mean_s_a,
               :closest_N_items, d,
@@ -324,7 +324,7 @@ module Skylab::Brazen
             end
           end
 
-          Home_.lib_.fields::Events::Extra.new_with(
+          Home_.lib_.fields::Events::Extra.with(
             :name_x_a, [ kn.value_x ],
             :did_you_mean_symbol_array, did_you_mean_s_a,
             :lemma, kn.name.as_human,

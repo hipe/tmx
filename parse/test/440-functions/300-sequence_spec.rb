@@ -9,7 +9,7 @@ module Skylab::Parse::TestSupport
     context "the empty sequence" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions
+        subject_parse_module_.with :functions
       end
 
       it "builds" do
@@ -30,7 +30,7 @@ module Skylab::Parse::TestSupport
     context "a sequence of two rigid atomic items" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :keyword, 'foo',
           :keyword, 'bar'
       end
@@ -61,7 +61,7 @@ module Skylab::Parse::TestSupport
     context "non-colliding range item, keyword (enter monadic range)" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with( :functions,
+        subject_parse_module_.with( :functions,
           :zero_or_one, :keyword, 'foo',
           :keyword, 'bar' )
       end
@@ -104,7 +104,7 @@ module Skylab::Parse::TestSupport
     context "non-colliding unbound range item, keyword (enter unbound range)" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :zero_or_more, :keyword, 'foo',
           :keyword, 'bar'
       end
@@ -147,7 +147,7 @@ module Skylab::Parse::TestSupport
     context "the minimal colliding sequence whose range term is monadic" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :zero_or_one, :keyword, 'zep',
           :keyword, 'zep'
       end
@@ -168,7 +168,7 @@ module Skylab::Parse::TestSupport
     context "the minimal colliding sequence whose range term is unbound" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :zero_or_more, :keyword, 'zo',
           :keyword, 'zo'
       end
@@ -195,7 +195,7 @@ module Skylab::Parse::TestSupport
     context "A+ A (enter any token, one or more)" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :one_or_more, :any_token,
           :keyword, 'zoink', :minimum_number_of_characters, 1
 
@@ -233,7 +233,7 @@ module Skylab::Parse::TestSupport
     context "A A+ (trailing unbound)" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :keyword, 'zank',
           :one_or_more, :any_token
       end
@@ -254,7 +254,7 @@ module Skylab::Parse::TestSupport
     context "A+ A A+" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :one_or_more, :any_token,
           :keyword, 'has', :minimum_number_of_characters, 1,
           :one_or_more, :any_token
@@ -300,7 +300,7 @@ module Skylab::Parse::TestSupport
     context "the catalyst case (enter a compound grammar (curries inside curries))" do
 
       memoize_subject_parse_function_ do
-        subject_parse_module_.new_with :functions,
+        subject_parse_module_.with :functions,
           :one_or_more, :any_token,
           :sequence, :functions,
             :keyword, "would",

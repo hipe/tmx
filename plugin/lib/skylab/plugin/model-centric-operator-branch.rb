@@ -415,7 +415,7 @@ module Skylab::Plugin
           else
             NOTHING_  # as described [#here.3], this is how we hack having
             # an action "sitting" in a spot where a model is supposed to go.
-            # (#borrow-coverage from [sn] (references the subject docpoint))
+            # :[#008.4] #borrow-coverage from [sn]
           end
         else
           self._WE_FORGOT__when_does_this_happen_if_ever?
@@ -456,7 +456,7 @@ module Skylab::Plugin
         :name_symbol,
       )
 
-      alias_method :intern, :name_symbol  # #borrow-coverage from [#sn-008.3]
+      alias_method :intern, :name_symbol  # :[#008.3] #borrow-coverage from [sn]
     end
 
     class BoundCall_via_Branch___ < Common_::MagneticBySimpleModel
@@ -575,10 +575,10 @@ module Skylab::Plugin
         d = ::File.extname( tail ).length
 
         if d.zero?
-          self._INTERESTING__this_should_work_fine__right?
-          # if you have a complicated action node (which, we don't want those,
-          # right?) it could be a directory with a corefile and it should
-          # still work with the same code thanks to our excellent autoloading
+          _stem = tail  # this occurs when the action has its own directory.
+          # (in such cases consider breaking your action down into magnets
+          # and models that live outside this directory.)
+          # :[#008.5] #borrow-coverage from [sn]
         else
           _stem = tail[ 0 ... -d ]
         end ; tail = nil
@@ -634,6 +634,8 @@ module Skylab::Plugin
       attr_reader(
         :name_symbol,
       )
+
+      alias_method :intern, :name_symbol  # :[#008.2] #borrow-coverage from [sn]
     end
 
     # ~ 3. via action CONSTANS

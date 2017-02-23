@@ -155,7 +155,7 @@ module Skylab::TanMan
 
         def via_enoent_bld_event
 
-          Common_::Event.wrap.exception.with(
+          Common_::Event.wrap.exception.via(
             :path_hack,
             :terminal_channel_i, :resource_not_found,
             :exception, @enoent )

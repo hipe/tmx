@@ -441,7 +441,7 @@ that symbol will be interpolated into a method name that will be sent
 to the component model to build the sub-component:
 
 for example, if `foo` is the argument to the `via` modifer, the ACS will
-send `new_via__foo__` to the component model, along with the main
+send `via__foo__` to the component model, along with the main
 argument from the operation expression.
 
 (we may refer to the `foo` term as the "shape" in some contexts.)
@@ -470,8 +470,8 @@ in such a proc-like.
 
 A1) as a somewhat parenthetical aside, constructors like those defined
    for (A), when needed for human consumption must be exposed to the
-   human thru the appropriate counterpart human names (e.g `new_via_foo`
-   for `new_via__foo__`). an existence of the human-such form does not
+   human thru the appropriate counterpart human names (e.g `via_foo`
+   for `via__foo__`). an existence of the human-such form does not
    necessarily indicate the existence of the machine-such counterpart
    nor vice-versa: which forms to expose is a design choice for the
    particular component.

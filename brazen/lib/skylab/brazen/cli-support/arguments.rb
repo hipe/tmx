@@ -89,10 +89,10 @@ module Skylab::Brazen
           # --
 
           def any_error_event_via_validate_x argv
-            new_via_argv( argv ).execute
+            via_argv( argv ).execute
           end
 
-          def new_via_argv argv
+          def via_argv argv
             otr = dup
             otr.init_copy_via_argv argv
             otr

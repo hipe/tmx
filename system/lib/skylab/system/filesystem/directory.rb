@@ -5,7 +5,7 @@ module Skylab::System
     module Directory
 
       As = ::Module.new
-      class As::Collection
+      class As::Collection < Common_::SimpleModel  # #open [#040] modernize/unify (or not)
 
         # <-x2
 
@@ -17,11 +17,11 @@ module Skylab::System
 
     # -- Initializers
 
-    def initialize & build
-
+    def initialize
       @directory_is_assumed_to_exist = true
       @filename_pattern = nil
-      build[ self ]
+      @name_maybe_under_by = nil
+      yield self
     end
 
     attr_writer(
@@ -30,7 +30,8 @@ module Skylab::System
       :filesystem,
       :filename_pattern,  # respond to `=~`
       :flyweight_class,
-      :kernel,
+      :flyweight_arguments,
+      :name_maybe_under_by,
       :on_event_selectively,
     )
 
@@ -138,7 +139,7 @@ module Skylab::System
       # this is only exploraory - we emit an event on success
 
       o = qk.value_x
-      succ = Basic_[]::String::Successorer.with(
+      succ = Basic_[]::String::Successorer.via(
 
         :beginning_width, 2,
         :first_item_does_not_use_number,
@@ -270,18 +271,18 @@ module Skylab::System
 
     def __proc_via_path_a path_a, & x_p
 
-      fly = @flyweight_class.new_flyweight @kernel, & x_p
+      fly = @flyweight_class.new_flyweight( * @flyweight_arguments, & x_p )
 
       pass = __produce_pass_proc
 
       st = Common_::Stream.via_nonsparse_array(
         path_a
-      ).map_reduce_by do | path_ |
+      ).map_reduce_by do |path|
 
-        _yes = pass[ path_ ]
+        _yes = pass[ path ]
         if _yes
 
-          fly.reinitialize_via_path_for_directory_as_collection path_
+          fly.reinitialize_via_path_for_directory_as_collection path
           fly
         end
       end
@@ -301,6 +302,32 @@ module Skylab::System
       else
         MONADIC_TRUTH_
       end
+    end
+
+    def to_model_name  # :[#008.2]: #borrow-coverage from [sn] (it's for same)
+      p = @name_maybe_under_by
+      if p
+        p[]
+      else
+        _to_same_name
+      end
+    end
+
+    def description_under expag  # for [#ac-007.8]
+      p = @name_maybe_under_by
+      if p
+        p[ expag ].as_human
+      else
+        _to_same_name.as_human
+      end
+    end
+
+    def _same_name
+      Common_::Name.via_module self.class
+    end
+
+    def name  # also for [#ac-007.8]
+      NOTHING_
     end
 
     # -- Components (none formal: here, the components are filesystem entries!)

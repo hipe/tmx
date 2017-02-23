@@ -68,8 +68,7 @@ module Skylab::Zerk
           at = my_custom_load_ticket.asset_ticket
 
           _cls = if at.value_is_known
-            # #borrow-coverage from [#ts-008.1]
-            at.value_x
+            at.value_x  # :[#008.2] #borrow-coverage from [ts]
           else
             Autoloader_.const_reduce_by do |o|
               o.from_module = @module

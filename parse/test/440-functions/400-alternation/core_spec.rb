@@ -10,7 +10,7 @@ module Skylab::Parse::TestSupport
     context "the output node reports the winning index. can be called inline." do
 
       shared_subject :on do
-        on = Home_.function( :alternation ).with(
+        on = Home_.function( :alternation ).via(
           :input_array, [ :b ],
           :functions,
             :trueish_single_value_mapper, -> x { :a == x and :A },
@@ -31,7 +31,7 @@ module Skylab::Parse::TestSupport
     context "you can curry the parser separately" do
 
       shared_subject :p do
-        p = Home_.function( :alternation ).new_with(
+        p = Home_.function( :alternation ).with(
           :functions,
             :trueish_single_value_mapper, -> x { :a == x and :A },
             :trueish_single_value_mapper, -> x { :b == x and :B } ).
@@ -51,14 +51,14 @@ module Skylab::Parse::TestSupport
     end
 
     it "in the minimal case, the empty parser always results in nil" do
-      g = Home_.function( :alternation ).new_with :functions
+      g = Home_.function( :alternation ).with :functions
       g.output_node_via_single_token_value( :bizzie ).should eql nil
     end
 
     context "maintaining parse state (artibrary extra arguments)" do
 
       shared_subject :p do
-        g = Home_.function( :alternation ).new_with(
+        g = Home_.function( :alternation ).with(
           :functions,
             :trueish_single_value_mapper, -> x { :one == x and :is_one },
             :trueish_single_value_mapper, -> x { :two == x and :is_two } )

@@ -85,7 +85,7 @@ module Skylab::TanMan
 
       def find_nodes
 
-        @touch_node_p = Models_::Node.touch.curry_with(
+        @touch_node = Models_::Node.touch.curry_with(
           :verb,  send( :"node_verb_when_#{ @verb }" ),
           :document, @document,
           :kernel, @kernel,
@@ -102,12 +102,12 @@ module Skylab::TanMan
       end
 
       def rslv_from_node
-        _from_node = @touch_node_p.with :name, @from_node_label
+        _from_node = @touch_node.call_via :name, @from_node_label
         _store :@from_node, _from_node
       end
 
       def rslv_to_node
-        _to_node = @touch_node_p.with :name, @to_node_label
+        _to_node = @touch_node.call_via :name, @to_node_label
         _store :@to_node, _to_node
       end
 
@@ -393,7 +393,7 @@ module Skylab::TanMan
 
           _as_component = Conceptual_Association___.new @from_node, @to_node
 
-          Brazen_.event( :Component_Not_Found ).new_with(
+          Brazen_.event( :Component_Not_Found ).with(
             :component, _as_component,
             :component_association, Models_::Association,
           )

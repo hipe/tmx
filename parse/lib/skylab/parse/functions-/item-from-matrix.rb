@@ -24,8 +24,8 @@ module Skylab::Parse
 
       class << self
 
-        def new_via_item_stream_proc & p
-          new_with :item_stream_proc, p
+        def via_item_stream_proc & p
+          with :item_stream_proc, p
         end
 
         private :new

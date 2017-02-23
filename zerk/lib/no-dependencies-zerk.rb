@@ -711,7 +711,7 @@ module NoDependenciesZerk
         elsif @argument_scanner.can_fuzzy
           __fuzzy_lookup_operator
         else
-          _when_operator_not_found  # #borrow-coverage from [#pl-004.1]
+          _when_operator_not_found  # :[#008.4] #borrow-coverage from [pl]
         end
       end
 
@@ -1173,7 +1173,21 @@ module NoDependenciesZerk
         end
       end
 
-      def parse_trueish_primary_value  # as in `parse_primary_value` - #borrow-coverage from [#ts-008.2]
+      def scan_glob_values  # currently nothing fancy. maybe one day CLI etc
+        map_value_by do |x|
+          if ::Array.try_convert x  # remove at [#008.2] on stack
+            self._THIS_HAS_CHANGED__if_its_glob_just_pass_a_single_value_at_a_time__
+          end
+          advance_one ; [ x ]
+        end
+      end
+
+      def scan_flag_value  # currently if a flag is mentioned, it's true. maybe one day etc
+        Zerk_lib_[]::Common_::KnownKnown.trueish_instance
+      end
+
+      def parse_trueish_primary_value  # as in `parse_primary_value`. :[#008.3] #borrow-coverage from [ts]
+
         map_trueish_value_by do |x|
           advance_one ; x
         end

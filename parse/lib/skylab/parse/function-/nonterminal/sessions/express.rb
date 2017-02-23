@@ -74,7 +74,7 @@ module Skylab::Parse
             @x_h.each_pair do | sym, x |
               x_a.push sym, x
             end
-            EXPRESSION_AGENT.new_via_iambic x_a
+            EXPRESSION_AGENT.via_iambic x_a
           end
         end
 
@@ -135,14 +135,14 @@ module Skylab::Parse
             kp
           end
 
-          def new_via_iambic x_a
+          def via_iambic x_a
             o = dup
             _kp = o.send :process_iambic_fully, x_a
             _kp && o.freeze
           end
         end
 
-        EXPRESSION_AGENT = Expag__.new_with(
+        EXPRESSION_AGENT = Expag__.with(
           :any_first_constituent_string, -> x { x },  # `IDENTITY_`
           :any_subsequent_constituent_string, -> s { " #{ s }" },
           :express_all_segments_into_under_of_constituent_reflective_function,

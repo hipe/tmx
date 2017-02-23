@@ -849,7 +849,7 @@ module Skylab::Brazen
         _n11n = Home_::CLI_Support::Arguments::Normalization.via_properties(
           @categorized_properties.arg_a || EMPTY_A_ )
 
-        @arg_parse = _n11n.new_via_argv @resources.argv
+        @arg_parse = _n11n.via_argv @resources.argv
 
         ev = @arg_parse.execute
         if ev

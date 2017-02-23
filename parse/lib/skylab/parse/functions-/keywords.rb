@@ -7,7 +7,7 @@ module Skylab::Parse
 
       class << self
 
-        def new_via_argument_scanner_passively st
+        def via_argument_scanner_passively st
           new st.gets_one
         end
 

@@ -34,7 +34,7 @@ module Skylab::Parse::TestSupport
 
     memoize_subject_parse_function_ do
 
-      Home_.function( :non_negative_integer ).new_via_argument_scanner_passively(
+      Home_.function( :non_negative_integer ).via_argument_scanner_passively(
         Common_::THE_EMPTY_SCANNER
       )
     end

@@ -152,7 +152,8 @@ module Skylab::Autonomous_Component_System
         # a hyphen in its own phrase, rather than the second form that
         # places the full collection string as the agent of the sentence.
         #
-        # we started [#hu-044]:1 to explore this
+        # we started [#hu-044]:1 to explore this.
+        # this whole above comment section itself is :[#007.8].
 
         acs = @ACS
         if acs

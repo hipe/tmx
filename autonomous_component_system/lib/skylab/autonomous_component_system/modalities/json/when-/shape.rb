@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
 
         sess.caller_emission_handler_.call :error, :strange_shape do
 
-          new_with(
+          with(
             :x, x,
             :context_linked_list, sess.context_linked_list,
           )

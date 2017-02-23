@@ -229,7 +229,7 @@ module Skylab::Basic  # introduction at [#020]
           if a.length.zero?
             Home_.const_get( _CONST, false ).normalization
           else
-            Home_.const_get( _CONST, false ).normalization.new_via_arglist a
+            Home_.const_get( _CONST, false ).normalization.via_arglist a
           end
         end
       end

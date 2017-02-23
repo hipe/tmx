@@ -57,7 +57,7 @@ module Skylab::Parse
 
         _cls = Home_.function( _sym )
 
-        o = _cls.new_via_argument_scanner_passively polymorphic_upstream
+        o = _cls.via_argument_scanner_passively polymorphic_upstream
 
         o and begin
           instance_variable_set ivar, o

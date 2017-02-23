@@ -43,7 +43,7 @@ module Skylab::Fields::TestSupport
 
           ca2 = ca.curry_with( :static, :s, :somewhat_volatile, :SV )
 
-          _ = ca2.with( :very_volatile, :V, :a_medium_amount_of_volatile, :AM,
+          _ = ca2.call_via( :very_volatile, :V, :a_medium_amount_of_volatile, :AM,
                    :almost_not_at_all_volatile, :ANVAA )
 
           _.should eql [ :V, :SV, :AM, :NVV, :ANVAA, :s ]

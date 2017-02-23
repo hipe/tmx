@@ -14,7 +14,7 @@ module Skylab::System::TestSupport
         o.directory_is_assumed_to_exist = true
         o.directory_path = TestSupport_::Fixtures.files_path
         o.flyweight_class = _Whatever_Flyweight_Class
-        o.kernel = :_no_kernel_
+        o.flyweight_arguments = [ :_nothing_from_SY_ ]
       end
 
       st = _subject.to_entity_stream

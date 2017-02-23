@@ -10,14 +10,17 @@
 
 [#010]       bundle defined ..
 [#009]       pros and const of the add method pattern
-[#008]       "the plugin manifesto" ..
+
+[#008]       coverage assets & liabilities
+             [#here.2], [#here.3], [#here.4], [#here.5] borrow
+             [#here.1] "the plugin manifesto" ..
              ( #was: delegation .. )
+
 [#007]       the dependencies narrative ..
 [#006]       #track pub-sub hacks (mutations) #universal
 [#005]       [ pub-sub ]  (currently implemented by [#007])
 
-[#004]       coverpoint assets & liabilities
-             [#here.1]: #lend-to [ze]
+[#004] #hole
              ( #merged-to: [#ta-004] #was: digraphic .. )
 
 [#003]       there is a possible new parse function we might subsume in [sg]

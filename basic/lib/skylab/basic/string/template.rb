@@ -15,11 +15,11 @@ module Skylab::Basic
         end
 
         def via_path path
-          new_with :path, path
+          with :path, path
         end
 
         def via_string string
-          new_with :string, string
+          with :string, string
         end
       end  # >>
 

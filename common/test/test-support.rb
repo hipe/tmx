@@ -14,7 +14,7 @@ module Skylab::Common::TestSupport
       if a.length.zero?
         TS_::Call_Digraph_Listeners_Spy__
       else
-        TS_::Call_Digraph_Listeners_Spy__.new_via_iambic a
+        TS_::Call_Digraph_Listeners_Spy__.via_iambic a
       end
     end
   end  # >>

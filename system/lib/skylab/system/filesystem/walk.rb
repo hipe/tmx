@@ -15,7 +15,7 @@ module Skylab::System
             when -1
 
               _st = scanner_via_array x_a
-              _o = new_via_argument_scanner _st, & x_p
+              _o = via_argument_scanner _st, & x_p
               _o.execute
 
             when 1

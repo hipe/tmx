@@ -122,7 +122,7 @@ module Skylab::TestSupport
         -> st, & pp do
           _x = st.gets_one
           _qkn = Common_::Qualified_Knownness.via_value_and_symbol _x, :path
-          _n11n = Home_.lib_.basic::Pathname.normalization.new_with :absolute
+          _n11n = Home_.lib_.basic::Pathname.normalization.with :absolute
           _n11n.normalize_qualified_knownness _qkn do |*i_a, &ev_p|
             _oes_p = pp[ :_fc_hi_ ]
             _oes_p[ * i_a, & ev_p ]
@@ -177,14 +177,14 @@ module Skylab::TestSupport
 
       def __find_the_test_directory  # assume @max_num_dirs and @path
 
-        _x = Home_::Magnetics::TestDirectory_via_Path.with(
+        _x = Home_::Magnetics::TestDirectory_via_Path.via(
           :start_path, @path,
           :filenames, [ @test_directory_filename ],
           :be_verbose, @be_verbose,
           :max_num_dirs_to_look, @max_num_dirs,
           & @_on_event_selectively )
 
-        _ _x, :@test_dir
+        _store :@test_dir, _x
       end
 
       def __classify_the_path
@@ -192,7 +192,7 @@ module Skylab::TestSupport
         _cx = Here_::Magnetics_::Classifications_via_Path.call(
           @test_dir, @path, & @_on_event_selectively )
 
-        _ _cx, :@classifications
+        _store :@classifications, _cx
       end
 
       def __resolve_name_conventions
@@ -231,13 +231,7 @@ module Skylab::TestSupport
         end
       end
 
-      def _ x, ivar
-        if x
-          instance_variable_set ivar, x ; ACHIEVED_
-        else
-          x
-        end
-      end
+      define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_
     end
 
     class Expressive_Tree___
@@ -305,3 +299,4 @@ module Skylab::TestSupport
     Here_ = self
   end
 end
+# #tombstone: perhaps the first occurrence of the `_store` method pattern

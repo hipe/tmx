@@ -92,7 +92,7 @@ module Skylab::Basic
 
       module Component_Models
 
-        _positive_integer = Number_.normalization.new_with(
+        _positive_integer = Number_.normalization.with(
 
           :minimum, 1,
           :number_set, :integer,

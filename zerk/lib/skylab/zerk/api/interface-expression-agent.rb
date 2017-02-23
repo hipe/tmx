@@ -31,6 +31,8 @@ module Skylab::Zerk
         o.calculate( & p )
       end
 
+      # --
+
       def and_ x
         _NLP_agent.and_ x
       end
@@ -126,6 +128,16 @@ module Skylab::Zerk
 
       def val s
         s.inspect
+      end
+
+      # -- while we don't know what we're doing
+
+      def ick_oper sym
+        "'#{ sym }'"
+      end
+
+      def oper sym
+        "'#{ sym }'"
       end
 
       # -- #experiment

@@ -69,7 +69,7 @@ module Skylab::Brazen::TestSupport
 
       _oes_p = event_log.handle_event_selectively
 
-      subject::Parse__.new_with( & _oes_p )
+      subject::Parse__.with( & _oes_p )
     end
 
     def touch_section subsect_s=nil, sect_s, & x_p

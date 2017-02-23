@@ -65,20 +65,19 @@ module Skylab::System
         end
       end
 
-      def _call * x_a, & oes_p
+      def call * x_a, & oes_p
 
-        kn = _with x_a, & oes_p
+        kn = call_via_iambic x_a, & oes_p
         kn && kn.value_x
       end
 
-      alias_method :[], :_call
-      alias_method :call, :_call
+      alias_method :[], :call
 
-      def with * x_a, & oes_p
-        _with x_a, & oes_p
+      def call_via * x_a, & oes_p
+        call_via_iambic x_a, & oes_p
       end
 
-      def _with x_a, & oes_p
+      def call_via_iambic x_a, & oes_p
 
         if frozen?
 
@@ -99,7 +98,7 @@ module Skylab::System
           raise ::ArgumentError, up_or_down
         end
 
-        _cls.new_via_open_IO open_IO
+        _cls.via_open_IO open_IO
       end
 
       # ~ (( BEGIN :+#experiment a callable undifferentiated base actr [tr]

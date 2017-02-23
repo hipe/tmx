@@ -20,10 +20,10 @@ module Skylab::Common
       module Module_Methods__
 
         def [] * a
-          new_via_arglist a
+          via_arglist a
         end
 
-        def new_via_arglist a
+        def via_arglist a
           evnt_class.call_via_arglist a
         end
 
@@ -73,7 +73,7 @@ module Skylab::Common
             end
           end
 
-          def new_via_arglist a
+          def via_arglist a
             new do
               @a = a
             end

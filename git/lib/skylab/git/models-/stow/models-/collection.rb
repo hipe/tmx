@@ -36,9 +36,9 @@ module Skylab::Git
 
       def __when_not_found name_s
 
-        _stow = Stow_.new_via_path ::File.join( @path, name_s )
+        _stow = Stow_.via_path ::File.join( @path, name_s )
 
-        _ev = Home_.lib_.brazen.event( :Component_Not_Found ).new_with(
+        _ev = Home_.lib_.brazen.event( :Component_Not_Found ).with(
           :component, _stow,
           :component_association, Stow_.name_function,
           :ACS, self,
@@ -53,7 +53,7 @@ module Skylab::Git
 
       def to_entity_stream
 
-        _dac = Home_.lib_.system_lib::Filesystem::Directory::As::Collection.new do |o|
+        _dac = Home_.lib_.system_lib::Filesystem::Directory::As::Collection.define do |o|
 
           o.directory_path = @path
           o.directory_is_assumed_to_exist = true  # so it whines
@@ -61,7 +61,7 @@ module Skylab::Git
           o.filesystem = @filesystem
           o.flyweight_class = Stow_
 
-          o.kernel = @kernel
+          o.flyweight_arguments = [ @kernel ]
 
           o.on_event_selectively = @on_event_selectively
         end

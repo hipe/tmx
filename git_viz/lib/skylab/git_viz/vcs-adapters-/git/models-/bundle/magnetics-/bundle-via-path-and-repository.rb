@@ -39,7 +39,7 @@ module Skylab::GitViz
 
           _n11n = Home_.lib_.basic::Pathname.normalization
 
-          _ = _n11n.new_with :relative, :downward_only  #, :no_single_dots
+          _ = _n11n.with :relative, :downward_only  #, :no_single_dots
 
           arg = _.normalize_value @path, & @on_event_selectively
 
@@ -58,7 +58,7 @@ module Skylab::GitViz
            ::File.join @repo.path, @path
           end
 
-          kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
+          kn = Home_.lib_.system.filesystem( :Existent_Directory ).call_via(
             :path, _path,
             :filesystem, @filesystem,
             & @on_event_selectively )

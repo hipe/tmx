@@ -21,7 +21,7 @@ module Skylab::Basic::TestSupport
     context "the empty normalizer" do
 
       shared_subject :subject_normalization_ do
-        _subject_module.new_via_iambic Home_::EMPTY_A_
+        _subject_module.via_iambic Home_::EMPTY_A_
       end
 
       it "against nil does nothing - checking required-ness is outside of scope" do
@@ -184,7 +184,7 @@ module Skylab::Basic::TestSupport
     end
 
     def _new_subject * x_a
-      _subject_module.new_via_iambic x_a
+      _subject_module.via_iambic x_a
     end
 
     def _subject_module

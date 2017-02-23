@@ -28,7 +28,7 @@ module Skylab::Autonomous_Component_System
 
             Require_fields_lib_[]
 
-            _ev = Field_::Events::Extra.new_with(
+            _ev = Field_::Events::Extra.with(
               :name_x_a, sym_a,
               :lemma, 'element',
               :suffixed_prepositional_phrase_context_proc, _p,

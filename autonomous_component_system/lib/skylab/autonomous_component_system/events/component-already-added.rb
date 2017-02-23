@@ -2,7 +2,7 @@ module Skylab::Autonomous_Component_System
 
   module Event_Support_  # #[#sl-155] scope stack trick
 
-    Events::Component_Already_Added = Common_::Event.prototype_with(  # [#007]:#C
+    Events::Component_Already_Added = Common_::Event.prototype_with(  # :[#007.C]
 
       :component_already_added,
 
@@ -62,7 +62,7 @@ module Skylab::Autonomous_Component_System
         elsif @can_express_collection_related_
 
           express_collection_via_members
-          accept_sentence_part 'already has'  # [#007]:#WISH-A
+          accept_sentence_part 'already has'  # #wish #[#007.G]
           _express_component_somehow
 
         else

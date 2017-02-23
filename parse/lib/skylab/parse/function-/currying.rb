@@ -58,7 +58,7 @@ module Skylab::Parse
         @function_a = []
         cls = Home_::Functions_::Simple_Matcher
         while st.unparsed_exists
-          @function_a.push cls.new_via_proc st.gets_one
+          @function_a.push cls.via_proc st.gets_one
         end
         KEEP_PARSING_
       end
@@ -92,7 +92,7 @@ module Skylab::Parse
             if :end_functions == sym
               nil  # not false
             else
-              Home_.function( sym ).new_via_argument_scanner_passively st
+              Home_.function( sym ).via_argument_scanner_passively st
             end
           end
         end

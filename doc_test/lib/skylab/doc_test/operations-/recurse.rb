@@ -226,7 +226,7 @@ module Skylab::DocTest
 
     Path_must_be_absolute___ = Lazy_.call do
 
-      Home_.lib_.basic::Pathname.normalization.new_with(
+      Home_.lib_.basic::Pathname.normalization.with(
         :absolute,
         :downward_only,
         :no_single_dots,

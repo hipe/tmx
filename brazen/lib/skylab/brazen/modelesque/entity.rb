@@ -268,7 +268,7 @@ module Skylab::Brazen
 
           def _add_number_normalization * x_a
 
-            _n11n = Home_.lib_.basic.normalizers.number.new_via_iambic x_a
+            _n11n = Home_.lib_.basic.normalizers.number.via_iambic x_a
 
             __add_ad_hoc_normalization _n11n
           end

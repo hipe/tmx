@@ -8,7 +8,7 @@ module Skylab::Human::TestSupport
 
       _a = [ :apple, :banana, :ernana, :onono, :strawberry, :orange ]
 
-      _a_ = Home_::Levenshtein.with(
+      _a_ = Home_::Levenshtein.via(
         :item_string, "bernono",
         :items, _a,
         :stringify_by, :id2name.to_proc,

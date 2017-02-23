@@ -36,7 +36,7 @@ module Skylab::SubTree
 
         @stack_label_x_a = []
 
-        @traversal = Continuous_::Traversal.new_with(
+        @traversal = Continuous_::Traversal.with(
           :do_verbose_lines, do_verbose_lines,
           :output_proc, method( :__three_from_traversal )
 

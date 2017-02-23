@@ -106,7 +106,7 @@ module Skylab::Fields
           otr._call_as_curry_via_arglist a, & x_p
         end
 
-        def with * x_a, & x_p
+        def call_via * x_a, & x_p
           otr = dup
           otr.extend Curried_Call_Instance_Methods__
           otr.__call_as_curry_via_iambic x_a, & x_p

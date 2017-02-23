@@ -47,7 +47,7 @@ module Skylab::SearchAndReplace
 
         if is_dry || d.zero?
 
-          _ev = Home_.lib_.system_lib::Filesystem::Events::Wrote.new_with(
+          _ev = Home_.lib_.system_lib::Filesystem::Events::Wrote.with(
             :bytes, @_bytes,
             :path, real_path,
             :is_dry, is_dry,

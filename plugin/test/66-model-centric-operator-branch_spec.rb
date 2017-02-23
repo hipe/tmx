@@ -36,9 +36,7 @@ module Skylab::Plugin::TestSupport
         _wat == [ :woohoo, :wahoo ] || fail
       end
 
-      it "when failure strikes" do
-
-        # [#004.1]: #lend-coverage [ze]
+      it "when failure strikes" do  # #lends-coverage to [#ze-008.4]
 
         chan = nil ; msg_p = nil
 

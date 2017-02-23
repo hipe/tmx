@@ -229,7 +229,7 @@ module Skylab::Autonomous_Component_System
 
       def ___build_via_via via, asc  # :[#002]:Tenet7.
         _x = @argument_stream.gets_one
-        comp_x = asc.component_model.send :"new_via__#{ via }__", _x, & @_pp
+        comp_x = asc.component_model.send :"via__#{ via }__", _x, & @_pp
         if comp_x
           Common_::Qualified_Knownness[ comp_x, asc ]
         else

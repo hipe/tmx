@@ -26,13 +26,13 @@ module Skylab::Fields::TestSupport
       end
 
       it "the default is applied when it should be" do
-        o = entity_class_.new_with :other, :k
+        o = entity_class_.with :other, :k
         o.starts_as_true.should eql true
         :k == o.other or fail
       end
 
       it "the default is not applied when it shouldn't be" do
-        o = entity_class_.new_with :other, :k, :starts_as_true, false
+        o = entity_class_.with :other, :k, :starts_as_true, false
         false == o.starts_as_true or fail
         :k == o.other or fail
       end
@@ -41,12 +41,12 @@ module Skylab::Fields::TestSupport
 
         shared_subject :state_ do  # #open [#ts-049]
 
-          _x = entity_class_.new_with( & event_log.handle_event_selectively )
+          _x = entity_class_.with( & event_log.handle_event_selectively )
 
           flush_event_log_and_result_to_state _x
         end
 
-        it "fails (`new_with` results in false)" do
+        it "fails (`with` results in false)" do
           false == state_.result or fail  # ..
         end
 

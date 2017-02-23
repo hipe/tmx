@@ -68,7 +68,7 @@ module Skylab::Brazen
       # cases we report (a neutral version of) the event IFF verbose
       if @argument_box[ :verbose ]
         maybe_send_event_via_channel i_a do
-          ev_p[].with :ok, nil
+          ev_p[].new_with :ok, nil
         end
       end
       ACHIEVED_

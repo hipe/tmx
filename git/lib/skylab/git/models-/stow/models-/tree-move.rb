@@ -100,7 +100,7 @@ module Skylab::Git
 
         p = -> path do
 
-          n18n = Home_.lib_.basic::Pathname.normalization.new_with(
+          n18n = Home_.lib_.basic::Pathname.normalization.with(
             :absolute,
             :downward_only,
             :no_single_dots,
@@ -121,7 +121,7 @@ module Skylab::Git
 
         p = -> path do
 
-          n18n = Home_.lib_.basic::Pathname.normalization.new_with(
+          n18n = Home_.lib_.basic::Pathname.normalization.with(
             :relative,
             :downward_only,
           )

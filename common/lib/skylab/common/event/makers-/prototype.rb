@@ -66,7 +66,7 @@ module Skylab::Common
 
             cls.class_exec do
 
-              extend Module_Methods__
+              extend ModuleMethods___
 
               const_set :TERMINAL_CHANNEL_SYMBOL___, st.gets_one
 
@@ -161,7 +161,33 @@ module Skylab::Common
           attr_reader :name_symbol, :name_as_ivar, :default_value
         end
 
-        module Module_Methods__
+        module ModuleMethods___
+
+          def new * x_a  # #experimental - :[#070]: when we want to
+            # construct an event from a prototype with its actual arguments
+            # interpreted "positionally", the interface of "least surprise"
+            # would be to support the same methods that platform struct does
+            # (namely `[]` and `new`, indifferently) because the semantics
+            # are so similar. :[#here.2]
+            #
+            # however, because events must normally be frozen at the end of
+            # their construction (before the method returns); but `new` is
+            # also used to contruct "empty", "malleable" events in some
+            # places, we have to do the below check. :[#here.1]
+            #
+            #
+            # some participating (depdendent) callpoints reference this identifier.
+
+            if x_a.length.zero?
+              super  # :[#here.3] pass blocks
+            else
+              block_given? and self._WHERE
+              construct do
+                init_via_value_list x_a
+                freeze
+              end
+            end
+          end
 
           def [] * x_a
             construct do
@@ -183,7 +209,7 @@ module Skylab::Common
             end
           end
 
-          def new_with * x_a
+          def with * x_a
             construct do
               process_iambic_fully x_a
               freeze
@@ -199,7 +225,7 @@ module Skylab::Common
             end
           end
 
-          def new_via_each_pairable bx
+          def via_each_pairable bx
             construct do
               __init_via_each_pairable bx
               freeze
@@ -266,7 +292,7 @@ module Skylab::Common
           end
         end
 
-        def _write_members st  # caller should freeeze
+        def _write_members scn  # caller should freeeze
 
           bx = formal_properties
           ok = true
@@ -278,22 +304,22 @@ module Skylab::Common
             at_end = -> do
               remove_instance_variable :@_polymorphic_upstream_
             end
-            @_polymorphic_upstream_ = st
+            @_polymorphic_upstream_ = scn
             NIL_
           end
 
           seen_h = {}
 
-          while st.unparsed_exists
+          while scn.unparsed_exists
 
-            sym = st.gets_one
+            sym = scn.gets_one
 
             seen_h[ sym ] = true
 
             prp = bx[ sym ]
 
             if prp
-              instance_variable_set prp.name_as_ivar, st.gets_one
+              instance_variable_set prp.name_as_ivar, scn.gets_one
               next
             end
 

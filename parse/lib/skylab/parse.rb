@@ -19,12 +19,12 @@ module Skylab::Parse  # see [#001]
       alias_method :function, :function
 
       def function_via_definition_array x_a
-        st = Common_::Scanner.via_array x_a
-        function( st.gets_one ).new_via_argument_scanner st
+        scn = Common_::Scanner.via_array x_a
+        function( scn.gets_one ).via_argument_scanner scn
       end
 
       def fuzzy_matcher * a
-        Home_::Functions_::Keyword.new_via_arglist( a ).to_matcher
+        Home_::Functions_::Keyword.via_arglist( a ).to_matcher
       end
 
       def input_stream

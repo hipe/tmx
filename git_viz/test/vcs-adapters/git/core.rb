@@ -20,7 +20,7 @@ module Skylab::GitViz::TestSupport
       end
 
       def __build_front
-        subject_VCS::Front.new_via_system_conduit(
+        subject_VCS::Front.via_system_conduit(
           stubbed_system_conduit, & handle_event_selectively_ )
       end
 

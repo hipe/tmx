@@ -72,7 +72,7 @@ module Skylab::BeautySalon
           # ( was :+[#ba-027], used to have what is now [#br.024.C] shape )
 
           if qkn.is_known_known
-            Home_.lib_.basic::Number.normalization.with(
+            Home_.lib_.basic::Number.normalization.via(
               :number_set, :integer,
               :minimum, 1,
               :qualified_knownness, qkn, & oes_p )

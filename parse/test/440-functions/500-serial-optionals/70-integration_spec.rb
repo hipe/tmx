@@ -12,7 +12,7 @@ module Skylab::Parse::TestSupport
 
     before :all do
 
-      G = Home_.function( :serial_optionals ).new_with(
+      G = Home_.function( :serial_optionals ).with(
         :functions,
           :non_negative_integer,
             :moniker_symbol, :integer,

@@ -34,7 +34,7 @@ module Skylab::TestSupport
 
         # (the below was `__build_find_test_files_prototype`)
 
-        @__prototype_for_the_find_command = Home_.lib_.system.find.new_with(
+        @__prototype_for_the_find_command = Home_.lib_.system.find.with(
           :freeform_query_infix_words, FIND_FILES_ONLY___,
           :filename, @test_file_name_pattern,
           & @listener
@@ -63,7 +63,7 @@ module Skylab::TestSupport
 
         _find_proto = remove_instance_variable :@__prototype_for_the_find_command
 
-        @_find_command = _find_proto.new_with :path, dir
+        @_find_command = _find_proto.with :path, dir
 
         freeze
       end

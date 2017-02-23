@@ -12,7 +12,7 @@ module Skylab::SubTree::TestSupport
 
       _tree = __build_tree
 
-      Home_::OutputAdapters_::Continuous.with(
+      Home_::OutputAdapters_::Continuous.via(
 
         :upstream_tree, _tree,
         :output_line_downstream_yielder, io,

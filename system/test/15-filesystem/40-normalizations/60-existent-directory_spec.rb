@@ -21,7 +21,7 @@ module Skylab::System::TestSupport
       td = memoized_tmpdir_.clear
       _path = ::File.join td.path, 'mambazo'
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :path, _path,
         :create_if_not_exist,
         & handle_event_selectively_ )

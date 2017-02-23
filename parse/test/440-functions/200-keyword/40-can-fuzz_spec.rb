@@ -8,7 +8,7 @@ module Skylab::Parse::TestSupport
 
     memoize_subject_parse_function_ do
 
-      Home_.function( :serial_optionals ).new_with(
+      Home_.function( :serial_optionals ).with(
         :functions,
         :keyword, 'zipili',
         :keyword, 'zipolo',

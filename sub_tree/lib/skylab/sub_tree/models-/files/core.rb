@@ -170,7 +170,7 @@ module Skylab::SubTree
 
         def __normalize__path__upstream
 
-          sess = Files_::Small_Time_Sessions_::Perform_aggregate_find.new_with(
+          sess = Files_::Small_Time_Sessions_::Perform_aggregate_find.with(
 
               :paths, @upstream_arg.value_x,
               :pattern, @pattern ) do | * i_a, & ev_p |
@@ -222,7 +222,7 @@ module Skylab::SubTree
             _when_pattern
           else
 
-            kn = Home_.lib_.system.filesystem( :Upstream_IO ).with(
+            kn = Home_.lib_.system.filesystem( :Upstream_IO ).call_via(
               :qualified_knownness_of_path, @upstream_arg,
               & handle_event_selectively )
 
@@ -365,7 +365,7 @@ module Skylab::SubTree
 
         def _init_traversal
 
-          @tr = Home_::OutputAdapters_::Continuous::Traversal.new_with(
+          @tr = Home_::OutputAdapters_::Continuous::Traversal.with(
 
             :output_proc, @downstream_p,
             :do_verbose_lines, @argument_box[ :show_lines ],

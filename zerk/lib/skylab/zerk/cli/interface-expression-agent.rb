@@ -54,6 +54,8 @@ module Skylab::Zerk
         o.calculate( & p )
       end
 
+      # --
+
       def and_ a
         _NLP_agent.and_ a
       end
@@ -192,6 +194,16 @@ module Skylab::Zerk
 
       def val x  # assume "primitive"
         x.inspect
+      end
+
+      # -- while we don't know what we're doing
+
+      def ick_oper sym
+        oper( sym ).inspect
+      end
+
+      def oper sym
+        "--#{ sym.id2name.gsub UNDERSCORE_, DASH_ }"
       end
 
       # -- support

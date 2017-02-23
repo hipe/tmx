@@ -156,7 +156,7 @@ module Skylab::TestSupport
         NIL_
       end
 
-      _filter = Home_.lib_.system_lib::IO::Mappers::Filter.new_with(
+      _filter = Home_.lib_.system_lib::IO::Mappers::Filter.with(
         :downstream_IO, downstream_IO,
         :line_end_proc, _line_end_proc,
       )

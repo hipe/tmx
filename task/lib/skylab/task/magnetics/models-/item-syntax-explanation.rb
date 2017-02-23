@@ -20,7 +20,7 @@ class Skylab::Task
       class << self
         def begin
           new do
-            NOTHING_
+            NOTHING_  # #[#co-070.1] (empty `new` makes malleable mutable)
           end
         end
       end  # >>

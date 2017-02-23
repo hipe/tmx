@@ -42,7 +42,7 @@ module Skylab::TanMan
 
     def __build_invalid_characters_event xtra_a
 
-      Models_::DotFile::Events_::Invalid_Characters.new_with :chars, xtra_a
+      Models_::DotFile::Events_::Invalid_Characters.with :chars, xtra_a
     end
 
     def normalized_string

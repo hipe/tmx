@@ -7,7 +7,7 @@ module Skylab::Parse::TestSupport
     context "unlike \"serial optionals\" and \"simple pool\", this non-terminal function" do
 
       before :all do
-        X_f_sp_None = Home_.function( :spending_pool ).new_with( :functions ).to_output_node_and_mutate_array_proc
+        X_f_sp_None = Home_.function( :spending_pool ).with( :functions ).to_output_node_and_mutate_array_proc
       end
 
       it "a parser with no nodes in it will always report 'no parse' and 'spent'" do
@@ -22,7 +22,7 @@ module Skylab::Parse::TestSupport
     context "with parser with one node that reports it always matches & always spends" do
 
       before :all do
-        X_f_sp_One = Home_.function( :spending_pool ).new_with(
+        X_f_sp_One = Home_.function( :spending_pool ).with(
           :functions,
             :proc, -> in_st do
               Home_::OutputNode.for nil
@@ -39,7 +39,7 @@ module Skylab::Parse::TestSupport
     context "with a parser with one node that reports it never matches & always spends" do
 
       before :all do
-        X_f_sp_Spendless = Home_.function( :spending_pool ).new_with(
+        X_f_sp_Spendless = Home_.function( :spending_pool ).with(
           :functions,
             :proc, -> in_st do
               nil
@@ -59,14 +59,14 @@ module Skylab::Parse::TestSupport
 
           _NNI = Home_.function( :non_negative_integer )
 
-          Home_.function( :spending_pool ).new_with(
+          Home_.function( :spending_pool ).with(
           :functions,
             :keyword, "foo",
             :keyword, "bar",
             :proc, -> in_st do
               on = _NNI.output_node_via_input_stream in_st
               if on
-                on.new_with :function_is_not_spent
+                on.with :function_is_not_spent
               end
             end,
           ).to_output_node_and_mutate_array_proc

@@ -291,11 +291,11 @@ better this time.
   in these kind of objects, arguments are a (non-iambic) (positional)
   arglist. must not be used for non-proc-like classes. #[#here.9]
 
-+ `curry_with` - see the #iambic family of method name conventions
++ `curry_with` - see [#here.3] the iambic family of method name conventions
 
 + `decide_` - in hand-written language production, result in any string
 
-+ `edit_with` - see the #iambic family of method name conventions
++ `edit_with` - see [#here.3] the iambic family of method name conventions
 
 + `execute` has a strict API meaning for a lot of our libraries as the
   one #hook-out method the client must supply. it must take no
@@ -369,7 +369,7 @@ better this time.
   if you were going to use this verb the semantics described here to not
   fit your method, consider (see) `build`.
 
-+ `new_with` - see the #iambic family of method name conventions below.
++ `with` - see [#here.3] the iambic family of method name conventions below.
 
   `new_with_` - similar to `to_` in that it does not mutate the receiver
   and results in an object with similar identity, this one results in
@@ -385,7 +385,7 @@ better this time.
   memoized instance but want the ability to change that decision in the
   future.
 
-+ `reduce_with` - see the #iambic family of method name conventions below
++ `reduce_with` - see [#here.3] the iambic family of method name conventions
 
 + `resolve_` - has a dedicated [#031] document that needs a rewrite.
 
@@ -427,7 +427,9 @@ better this time.
   foo bar (ergo the "foo bar" of these methods cannot be something that is
   validly false-ish). similar to `_by` (see).
 
-+ `via_` will one day have its own section #todo
++ `via`, `_via` - see [#here.3] the iambic family of method name conventions
+
++ `_via_` - hopefully self-evident, but #todo
 
 + `when_`, `_when_` - often takes no arguments, must be private when using
   this convention: this starts the name of a method whose role is as a node
@@ -441,7 +443,7 @@ better this time.
 
 + `where` -  see #name-shootout below
 
-+ `with` - see the #iambic family of method name conventions below
++ `with` - see [#here.3] the iambic family of method name conventions below
 
 + `work` is our "go-to" name for the interesting body of ..er.. work
   that is done in an [#fi-016] actor's `execute` methods after the
@@ -596,7 +598,23 @@ for methods that sign the events they produce or transform.
 
 
 
-## the :#iambics method naming convention family
+## the iambic method naming convention family :[#here.3]
+
+in summary, for a class or instance that participates in "iambics",
+
+  - `with*`    produces new objects
+  - `via*`     performs operations
+  - `with`     produces a new object from a class
+  - `via`      performs an operation implemented with a class
+  - `new_with` produces a new object from another object
+  - `call_via` performs an operation probably from a "curred" object
+
+  - ! `call`   explicitly not proscribed here - never takes iambics
+  - ! `[]      explicitly not proscribed here - never takes iambics
+  - ! `new`    explicitly not proscribed here - never takes iambics
+
+
+the rest of this is rambling that could use an (EDIT)
 
 the meta-classification of "iambic" applies tautologically to method
 name conventions that apply to iambic methods. that is, if any method
@@ -654,7 +672,30 @@ to those conventions. conversely any method with any meaning that is
 covered by the below (for some definition of "good fit") must employ the
 below pertinent convention(s).
 
-this is the comprehensive constituency of this family:
+
+
+### mainly:
+
++ `via` - receiver is a class-like with [#fi-016] "actor" semantics. typically
+  the iambic arguments are processed by an instance of the class and some
+  sort of operation (described by the name of the class) is carried out.
+
+  summary: ( mutates receiver: no. result is receiver-ish: no. )
+
+
+
+
++ `with` - receiver is a class-like. result is an instance of the class
+  or equivalent. this is like calling `new` on a class, but in a form
+  expressly made for accepting literal iambics.
+
+  summary: ( mutates receiver: no. result is receiver-ish: yes. )
+
+
+
+
+
+### also:
 
 + `curry_with` - receiver has an actor shape. result must be an actor of
   the same sort, modified (or even the same) per the characteristics
@@ -664,11 +705,12 @@ this is the comprehensive constituency of this family:
   class-like or instance-like is not a meaningful distiction. they are
   both actor-like and that is the extent of the specification.
 
-  this could be easily confused with `new_with` unless you remember that
-  this one is for actors and `new_with` is for with class- (or
+  this could be easily confused with `with` unless you remember that
+  this one is for actors and `with` is for with class- (or
   instance-) likes actors are never interacted with in class-like way.
 
   summary: ( mutates receiver: no. result is receiver-ish: yes. )
+
 
 
 
@@ -681,15 +723,6 @@ this is the comprehensive constituency of this family:
 
 
 
-+ `new_with` - receiver is a class-like OR instance-like. if receiver is
-  class-like, result is a would-be instance of that class. if receiver is
-  not class-like, result is of same shape as receiver. this is like calling
-  `new` on a class, but in a form expressly made for accepting literal
-  iambics.
-
-  summary: ( mutates receiver: no. result is receiver-ish: maybe. )
-
-
 
 + `reduce_with` - receiver is a collection (ideally a stream) or something
   with a collection sub-shape. result is ideally of the exact same shape
@@ -698,31 +731,6 @@ this is the comprehensive constituency of this family:
 
   summary: ( mutates receiver: no. result is receiver-ish: yes. )
 
-
-
-+ `with` - if this method name followed the meta-convention implied by the
-  rest of the constituency, we might call it something like `call_with`.
-  but we let it occupy a whole (and quite essential) single word of the host
-  natural language because of how much of a consistently natural-sounding
-  fit it is in code-use.
-
-  the receiver must have [#fi-016] actor semantics (but may have other
-  shapes as well). if the receiver (actor) supports this method then the
-  receiver supports iambic calls and vice versa. since the receiver is
-  an actor, whether the call has side-effects on the receiver itself is
-  unknowable and inconsequential; the result is always the yield of the
-  call and the yield of the call is always the result.
-
-      proxy = Build_wazoozle_proxy.with :upstream, foo
-
-  whether or not it is OK to call a `with` with no arguments is
-  explicitly not defined here, but may be so in the future (one way or
-  the other). regardless of any existing specification here, as with any
-  iambic call the particular actor may always chose to raise argument
-  errors (or otherwise act) when the request is un-normalizable, as
-  may be the case of the empty iambic, dependng on the actor.
-
-  summary: ( mutates receiver: no. result is receiver-ish: no. )
 
 
 

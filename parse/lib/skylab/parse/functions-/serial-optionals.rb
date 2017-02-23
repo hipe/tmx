@@ -48,7 +48,7 @@ module Skylab::Parse
     #
     # curried usage:
     #
-    #     p = Home_.function( :serial_optionals ).new_with(
+    #     p = Home_.function( :serial_optionals ).with(
     #       :matcher_functions,
     #         -> age do
     #           /\A\d+\z/ =~ age
@@ -94,10 +94,10 @@ module Skylab::Parse
           arg_st = Common_::Scanner.via_array a
           input_array = arg_st.gets_one
 
-          new_with(
+          with(
             :function_objects_array, Common_.stream do
               if arg_st.unparsed_exists
-                Functions_::Simple_Matcher.new_via_proc arg_st.gets_one
+                Functions_::Simple_Matcher.via_proc arg_st.gets_one
               end
             end.to_a ).to_parse_array_fully_proc[ input_array ]
         end
@@ -161,7 +161,7 @@ module Skylab::Parse
     #     feet_rx = /\A\d+\z/
     #     inch_rx = /\A\d+(?:\.\d+)?\z/
     #
-    #     p = Home_.function( :serial_optionals ).new_with(
+    #     p = Home_.function( :serial_optionals ).with(
     #       :functions,
     #       :proc, -> st do
     #         if feet_rx =~ st.current_token_object.value_x

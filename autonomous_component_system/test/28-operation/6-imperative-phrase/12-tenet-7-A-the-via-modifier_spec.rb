@@ -63,10 +63,10 @@ module Skylab::Autonomous_Component_System::TestSupport
         class ACS_28_6_12_Thinger
 
           class << self
-            def new_via__regulo_expo__ rx
+            def via__regulo_expo__ rx
               new :is_regex
             end
-            def new_via__procky__ x
+            def via__procky__ x
               new :is_prockie
             end
             private :new

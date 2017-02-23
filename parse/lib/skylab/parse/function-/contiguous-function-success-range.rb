@@ -49,7 +49,7 @@ module Skylab::Parse
 
           # we need at least and at most one parse function.
 
-          f = Home_.function( st.gets_one ).new_via_argument_scanner_passively st
+          f = Home_.function( st.gets_one ).via_argument_scanner_passively st
           f and begin
             @f = f
             KEEP_PARSING_
@@ -105,7 +105,7 @@ module Skylab::Parse
               _try_next = self
             end
 
-            Home_::OutputNode.new_with ov_x, :try_next, _try_next
+            Home_::OutputNode.with ov_x, :try_next, _try_next
           end
 
           def _become_first_next_try

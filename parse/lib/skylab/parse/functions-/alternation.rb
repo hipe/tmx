@@ -39,7 +39,7 @@ module Skylab::Parse
 
           if on
 
-            break Home_::OutputNode.new_with on.value_x,
+            break Home_::OutputNode.with on.value_x,
               :constituent_index, d
 
           end
@@ -69,7 +69,7 @@ begin  # :/
 
   # you can curry the parser separately
   #
-  #     p = Home_.function( :alternation ).new_with(
+  #     p = Home_.function( :alternation ).with(
   #       :functions,
   #         :trueish_single_value_mapper, -> x { :a == x and :A },
   #         :trueish_single_value_mapper, -> x { :b == x and :B } ).
@@ -86,12 +86,12 @@ begin  # :/
 
   # in the minimal case, the empty parser always results in nil
   #
-  #     g = Home_.function( :alternation ).new_with :functions
+  #     g = Home_.function( :alternation ).with :functions
   #     g.output_node_via_single_token_value( :bizzie )  # => nil
 
   # maintaining parse state (artibrary extra arguments)
   #
-  #     g = Home_.function( :alternation ).new_with(
+  #     g = Home_.function( :alternation ).with(
   #       :functions,
   #         :trueish_single_value_mapper, -> x { :one == x and :is_one },
   #         :trueish_single_value_mapper, -> x { :two == x and :is_two } )

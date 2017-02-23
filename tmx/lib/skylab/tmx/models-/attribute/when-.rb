@@ -75,7 +75,7 @@ module Skylab::TMX
 
           say_attr = method :say_formal_component_
 
-          _s_a = Home_.lib_.human::Levenshtein.with(
+          _s_a = Home_.lib_.human::Levenshtein.via(
             :item_string, k.id2name,
             :items, _st,
             :stringify_by, _stringify_by,

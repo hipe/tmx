@@ -239,12 +239,12 @@ module Skylab::Fields
 
         # ~ ways to call your actor (pursuant to [#bs-028.5] name conventions)
 
-        def with * x_a, & x_p  # #[#bs-028] reserved method name.
+        def via * x_a, & x_p  # #[#bs-028] reserved method name.
           call_via_iambic x_a, & x_p
         end
 
         def call_via_iambic x_a, & x_p
-          sess = new_via_iambic x_a, & x_p
+          sess = via_iambic x_a, & x_p
           if sess
             sess.execute
           else
@@ -252,21 +252,21 @@ module Skylab::Fields
           end
         end
 
-        def new_with * x_a, & x_p
-          new_via_iambic x_a, & x_p
+        def with * x_a, & x_p
+          via_iambic x_a, & x_p
         end
 
-        def new_via_iambic x_a, & x_p
+        def via_iambic x_a, & x_p
 
           _st = Common_::Scanner.via_array x_a
           New_via__[ :process_argument_scanner_fully, _st, self, & x_p ]
         end
 
-        def new_via_argument_scanner st, & x_p
+        def via_argument_scanner st, & x_p
           New_via__[ :process_argument_scanner_fully, st, self, & x_p ]
         end
 
-        def new_via_argument_scanner_passively st, & x_p
+        def via_argument_scanner_passively st, & x_p
           New_via__[ :process_argument_scanner_passively, st, self, & x_p ]
         end
 

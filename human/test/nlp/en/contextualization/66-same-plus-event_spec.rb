@@ -25,7 +25,7 @@ module Skylab::Human::TestSupport
 
         oes_p.call :error, :extra_properties do
 
-          Home_.lib_.fields::Events::Extra.new_with(
+          Home_.lib_.fields::Events::Extra.with(
             :name_x_a, [ 'bezo' ],
             :did_you_mean_symbol_array, [ 'wezo', 'dezo' ],
             :lemma, 'kershploink',

@@ -36,7 +36,7 @@ module Skylab::BeautySalon::TestSupport
 
     it "via STDIN" do
 
-      @_stdin = _stdin_mocks.noninteractive_STDIN_class.new_via_lines(
+      @_stdin = _stdin_mocks.noninteractive_STDIN_class.via_lines(
         [ "one two\n", "three four\n" ] )
 
       invoke 'wrap', '-n5', '-'

@@ -33,7 +33,7 @@ module Skylab::Parse
 
     # with an ordered set parser (built from a list of arbitrary procs)
     #
-    #     SP = Home_.function( :simple_pool ).new_with(
+    #     SP = Home_.function( :simple_pool ).with(
     #       :functions,
     #         :trueish_mapper, -> in_st do
     #           if /bill/i =~ in_st.current_token_object.value_x

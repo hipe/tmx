@@ -45,31 +45,34 @@ module Skylab::TanMan
 
       def __build_updated_attributes_event add_a, change_a
 
-        Updated_Attributes___.new_with(
+        Updated_Attributes___.with(
           :node_stmt, @node.node_stmt,
-          :add_a, add_a,
-          :change_a, change_a )
-
+          :adds, add_a,
+          :changes, change_a,
+        )
       end
 
-      Updated_Attributes___ = Common_::Event.prototype_with :updated_attributes,
-
-          :node_stmt, nil, :add_a, nil, :change_a, nil, :ok, true do | y, o |
+      Updated_Attributes___ = Common_::Event.prototype_with(
+        :updated_attributes,
+        :node_stmt, nil,
+        :adds, nil, :changes, nil,
+        :ok, true,
+      ) do |y, o|
 
         pred_a = []
 
-        if o.add_a.length.nonzero?
+        if o.adds.length.nonzero?
 
-          _s_a = o.add_a.map do | k_s, v_s |
+          _s_a = o.adds.map do | k_s, v_s |
             "#{ k_s }=#{ v_s }"
           end.join ', '
 
-          pred_a.push "added attribute#{ s o.add_a }: [ #{ _s_a } ]"
+          pred_a.push "added attribute#{ s o.adds }: [ #{ _s_a } ]"
         end
 
-        if o.change_a.length.nonzero?
+        if o.changes.length.nonzero?
 
-          _s_a = o.change_a.map do | k_s, old, new |
+          _s_a = o.changes.map do | k_s, old, new |
             "#{ k_s } from #{ val old } to #{ val new }"
           end.join ' and '
 

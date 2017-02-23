@@ -13,7 +13,9 @@
 
 [#009]       this needs comparative analysis (has subscribers)
 
-[#008]       synthesis dependencies..
+[#008]       coverage assets & liabilities
+             [#here.2] borrow.
+             [#here.1] synthesis dependencies..
 
 [#007]       for tracking - we have a circular dependency expression
              logic, so do areas marked with this tag.

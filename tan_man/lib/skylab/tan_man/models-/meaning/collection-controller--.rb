@@ -6,7 +6,7 @@ module Skylab::TanMan
 
       class << self
 
-        def new_via_iambic x_a
+        def via_iambic x_a
           new do
             init_via_iambic x_a
           end

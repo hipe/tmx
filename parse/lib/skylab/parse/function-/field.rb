@@ -13,8 +13,8 @@ module Skylab::Parse
 
           # ~ narrative (not alpha) order
 
-          def new_via_arglist a
-            new_via_argument_scanner scanner_via_array a
+          def via_arglist a
+            via_argument_scanner scanner_via_array a
           end
 
           # ~ others
@@ -79,11 +79,11 @@ module Skylab::Parse
 
         class << self
 
-          def new_via_argument_scanner_passively st
-            new_via_proc st.gets_one
+          def via_argument_scanner_passively st
+            via_proc st.gets_one
           end
 
-          def new_via_proc p
+          def via_proc p
             new( p )
           end
         end

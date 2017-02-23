@@ -41,7 +41,7 @@ module Skylab::System
       class << self
 
         def [] x  # sort of like #[#ca-057]
-          new_with :downstream_IO, x
+          with :downstream_IO, x
         end
 
         private :new

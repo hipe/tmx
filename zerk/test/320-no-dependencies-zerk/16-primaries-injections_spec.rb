@@ -16,7 +16,6 @@ module Skylab::Zerk::TestSupport
       context "parsing softly" do
 
         it "does not parse" do
-          debug!
           parsation_.result.nil? || fail
         end
 

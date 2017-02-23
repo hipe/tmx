@@ -92,7 +92,9 @@
 [#009]       meta-attributes ..
              ( #was: transplant "parameters" from [hl] )
 
-[#008]       #in-situ [ the absorber method maker ]
+[#008]       borrow/lend coverage
+             [#here.2], [#here.3], [#here.4] borrow
+             [#here.A] #in-situ [ the absorber method maker ]
 
 [#007]       [ SESSION PATTERN ]
 

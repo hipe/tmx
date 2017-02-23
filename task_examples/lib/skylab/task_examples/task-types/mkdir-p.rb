@@ -17,7 +17,7 @@ module Skylab::TaskExamples
 
       did_send_event = nil
 
-      kn = Home_.lib_.system.filesystem( :Existent_Directory ).with(
+      kn = Home_.lib_.system.filesystem( :Existent_Directory ).call_via(
         :path, @mkdir_p,
         :is_dry_run, @dry_run,
         :max_mkdirs, @max_depth,

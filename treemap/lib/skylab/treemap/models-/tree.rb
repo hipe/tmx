@@ -87,8 +87,7 @@ module Skylab::Treemap
         def __resolve_waypoints
 
           @_n11n = Home_.lib_.system.filesystem( :Path_Based ).new_with(
-            :recognize_common_string_patterns,
-            & handle_event_selectively )
+            :recognize_common_string_patterns, & handle_event_selectively )
 
           ok = __resolve_up
           ok &&= __resolve_thru
@@ -141,7 +140,7 @@ module Skylab::Treemap
             [ :stdin, h.fetch( :stdin ) ]
           end
 
-          kn = @_n11n.with(
+          kn = @_n11n.call_via(
             :up_or_down, up_down,
             * _standards,
             :qualified_knownness_of_path, qualified_knownness,

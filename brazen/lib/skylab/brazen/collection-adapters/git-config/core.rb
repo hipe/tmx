@@ -158,7 +158,7 @@ module Skylab::Brazen
 
     def _via_mutated_mutable_document_write_file_via_persist bx, & oes_p  # #covered-by [tm]
 
-      Git_Config_::Mutable::Actors::Persist.with(
+      Git_Config_::Mutable::Actors::Persist.via(
         :is_dry, bx[ :dry_run ],
         :path, @mutable_document.input_id.to_path,
         :document, @mutable_document,
@@ -168,9 +168,11 @@ module Skylab::Brazen
     class Parse_  # the [#fi-016] "any result" pattern is employed.
 
       class << self
-        def [] *a, & oes_p
+        def via *a, & oes_p
           new( a, & oes_p ).execute
         end
+        alias_method :[], :via
+        private :new
       end  # >>
 
       Common_::Event.selective_builder_sender_receiver self

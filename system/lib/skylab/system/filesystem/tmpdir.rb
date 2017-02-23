@@ -20,15 +20,15 @@ module Skylab::System
           if x_a.length.zero?
             self
           else
-            new_via_iambic x_a, & x_p
+            via_iambic x_a, & x_p
           end
         end
 
-        def new_with * x_a  # we would use la la but for #here
-          new_via_iambic x_a
+        def with * x_a  # we would use la la but for #here
+          via_iambic x_a
         end
 
-        alias_method :new_via_iambic, :new
+        alias_method :via_iambic, :new
         undef_method :new
       end  # >>
 
@@ -128,7 +128,7 @@ module Skylab::System
             new_with :debug_IO, debug_IO, :be_verbose, true
           end
         elsif yes_ && ! yes
-          td.new_with :be_verbose, false
+          tc.new_with :be_verbose, false
         end
       end
 
@@ -571,7 +571,7 @@ module Skylab::System
 
           _path = ::File.join tc.tmpdir_path_for_memoized_tmpdir, slug
 
-          @instance = This___.new_with(
+          @instance = This___.with(
             :path, _path,
             :be_verbose, tc.do_debug,
             :debug_IO, tc.debug_IO,

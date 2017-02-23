@@ -109,7 +109,7 @@ module Skylab::Zerk
 
         def ___check_argument_arity
 
-          o = remove_instance_variable( :@__n11n ).new_via_argv remove_instance_variable :@__argv
+          o = remove_instance_variable( :@__n11n ).via_argv remove_instance_variable :@__argv
           ev = o.execute
           if ev
             @_result = @client.send H___.fetch( ev.terminal_channel_i ), ev

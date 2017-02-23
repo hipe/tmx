@@ -68,7 +68,7 @@ module Skylab::Parse::TestSupport
       end
 
       memoize_subject_parse_function_ do
-        _subject_parse_module.new_with(
+        _subject_parse_module.with(
           :item, :proc, same_item_proc,
           :separator, :keyword, 'or' )
       end
@@ -107,7 +107,7 @@ module Skylab::Parse::TestSupport
       end
 
       memoize_subject_parse_function_ do
-        _subject_parse_module.new_with(
+        _subject_parse_module.with(
           :item, :proc, same_item_proc,
           :ultimate_separator, :keyword, 'or',
           :non_ultimate_separator, :keyword, ',' )

@@ -72,7 +72,7 @@ module Skylab::GitViz
             @argument_box.fetch( :VCS_adapter_name ).to_s
           ).as_const, false )
 
-        fro = _VCS_mod::Front.new_via_system_conduit(
+        fro = _VCS_mod::Front.via_system_conduit(
           @argument_box.fetch( :system_conduit ),
           & handle_event_selectively )
 

@@ -255,7 +255,7 @@ module Skylab::TanMan
 
         o.directory_path = Here_.path_for_directory_as_collection_
         o.flyweight_class = Here_
-        o.kernel = kr
+        o.flyweight_arguments = [ kr ]
         o.on_event_selectively = oes_p
       end
     end

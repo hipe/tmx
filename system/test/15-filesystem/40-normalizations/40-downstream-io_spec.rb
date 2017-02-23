@@ -20,7 +20,7 @@ module Skylab::System::TestSupport
 
       _setup_same
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :path, @_path,
         :force_arg, __build_force_yes_arg,
         & handle_event_selectively_ )
@@ -30,7 +30,7 @@ module Skylab::System::TestSupport
 
     it "exists, formal force, actual force is known and false" do
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :path, TestSupport_::Fixtures.file( :three_lines ),
         :force_arg, __build_force_no_arg,
         & handle_event_selectively_ )
@@ -85,7 +85,7 @@ module Skylab::System::TestSupport
 
       _path = _not_here
 
-      @result = subject_.with(
+      @result = subject_.call_via(
         :path, _path,
         :is_dry_run, true,
         & handle_event_selectively_ )

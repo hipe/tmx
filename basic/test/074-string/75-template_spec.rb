@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport
       context "left diff -- params that are in template but not in actuals" do
 
         it "are left as-is (for now) in the output (!)" do
-          o = subject.new_with :string, ' {{foo}} {{bar}} {{baz}} '
+          o = subject.with :string, ' {{foo}} {{bar}} {{baz}} '
           str = o.call bar: 'biff'
           str.should eql(' {{foo}} biff {{baz}} ')
         end
@@ -32,7 +32,7 @@ module Skylab::Basic::TestSupport
       context "right diff -- params that are in params but not in template" do
 
         it "do not trigger any errors" do
-          o = subject.new_with :string, 'one{{two}}'
+          o = subject.with :string, 'one{{two}}'
           str = o.call two: 'TWO', three: 'THREE'
           str.should eql('oneTWO')
         end
@@ -47,14 +47,14 @@ module Skylab::Basic::TestSupport
 
       it '`to_parameter_occurrence_stream`' do
 
-        subject.new_with( :string, template_string ).
+        subject.with( :string, template_string ).
           to_parameter_occurrence_stream.map_by( & :name_symbol ).to_a.should eql(
             [ :bar_baz, :bongo ] )
       end
 
       it "with `formal_paramters`, offset data, surface representation too" do
 
-        o = subject.new_with :string, template_string
+        o = subject.with :string, template_string
         a = o.to_parameter_occurrence_stream.to_a
 
         a.length.should eql 2
@@ -79,7 +79,7 @@ module Skylab::Basic::TestSupport
           {{dork}}
         HERE
 
-        _template = subject.new_with :string, _doc_s
+        _template = subject.with :string, _doc_s
         p = _template.method :first_margin_for
 
         p[ :day ].should eql 'so the other '

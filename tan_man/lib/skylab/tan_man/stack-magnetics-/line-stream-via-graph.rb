@@ -59,7 +59,7 @@ module Skylab::TanMan
         p[ line ]
       end
 
-      Home_.lib_.basic::String::WordWrapper::Calm.with(
+      Home_.lib_.basic::String::WordWrapper::Calm.via(
         :aspect_ratio, WORD_WRAP_ASPECT_RATIO___,
         :downstream_yielder, _y,
         :input_words, s_a,

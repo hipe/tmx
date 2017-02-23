@@ -6,7 +6,7 @@ module Skylab::Human
 
       class << self
 
-        def new_via_multipurpose_module__ mod
+        def via_multipurpose_module__ mod
           new.__init_etc mod
         end
 
@@ -74,7 +74,7 @@ module Skylab::Human
       def expression_session_via_sexp_stream__ st
 
         best_match = nil
-        idea = Here_::Idea_.new_via_sexp_stream__ st
+        idea = Here_::Idea_.via_sexp_stream__ st
 
         st = send @_stream
         begin

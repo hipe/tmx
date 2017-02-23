@@ -144,7 +144,7 @@ module Skylab::DocTest
 
       @_find = @the_find_service.statuser_by( & @_on_event_selectively )
 
-      _command = @the_find_service.new_with(
+      _command = @the_find_service.with(
         :path, @test_directory,
         :filenames, _patterns,
         :freeform_query_infix_words, TYPE_FILE___,

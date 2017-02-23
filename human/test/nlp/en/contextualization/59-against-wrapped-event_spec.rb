@@ -86,7 +86,7 @@ module Skylab::Human::TestSupport
 
       require 'skylab/system'  # ([hu] and [sy] are diametrically opposed!)
 
-      _ = ::Skylab::System::Filesystem::Events::Wrote.new_with(
+      _ = ::Skylab::System::Filesystem::Events::Wrote.with(
         :preterite_verb, 'updated',
         :bytes, 123,
         :path, '/some/file',

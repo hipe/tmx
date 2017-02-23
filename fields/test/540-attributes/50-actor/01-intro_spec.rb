@@ -84,15 +84,15 @@ module Skylab::Fields::TestSupport
         sess.qing.should eql :Q
       end
 
-      it "mm - `new_with`, `new_via_iambic`" do
+      it "mm - `with`, `via_iambic`" do
         _given :_hybrid_class
-        @session_ = @class_.new_with :jiang, :J, :bar, :B
+        @session_ = @class_.with :jiang, :J, :bar, :B
         _this.should eql [ :J, :B ]
       end
 
       it "i.m - `new_with` (makes a dup)" do
 
-        @session_ = _hybrid_class.new_with :jiang, :J, :bar, :B
+        @session_ = _hybrid_class.with :jiang, :J, :bar, :B
         otr = @session_.send :new_with, :jiang, :K
         _this.should eql [ :J, :B ]
         @session_ = otr
@@ -103,12 +103,12 @@ module Skylab::Fields::TestSupport
         [ @session_.jiang, @session_.bar ]
       end
 
-      context "mm - `new_via_argument_scanner_passively`" do
+      context "mm - `via_argument_scanner_passively`" do
 
         shared_subject :_tuple do
 
           st = _build_this_argument_scanner
-          sess = _hybrid_class.new_via_argument_scanner_passively st
+          sess = _hybrid_class.via_argument_scanner_passively st
           [ st.head_as_is, sess.jiang, sess.bar ]
         end
 
@@ -121,9 +121,9 @@ module Skylab::Fields::TestSupport
         end
       end
 
-      it "mm - `with`" do
+      it "mm - `via` calls the actor" do
         _given :_hybrid_class
-        _ = @class_.with :jiang, :J, :bar, :B
+        _ = @class_.via :jiang, :J, :bar, :B
         _.should eql [ :JIANG, :J, :BAR, :B ]
       end
 

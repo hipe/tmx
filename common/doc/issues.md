@@ -1,3 +1,6 @@
+[#070]       #track #short-lived constructing events with positional args
+             with `new` not just `[]`
+
 [#069]       [ scanner ]
        #wish  [#here.2] `via_times` 1x [pl]
        #track [#here.1] similar implementations of "polymorphic stream"

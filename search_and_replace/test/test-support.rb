@@ -54,7 +54,7 @@ module Skylab::SearchAndReplace::TestSupport
 
       _path = ::File.join sys.defaults.dev_tmpdir_path, '[sa]'
 
-      sys.filesystem.tmpdir.new_with(
+      sys.filesystem.tmpdir.with(
         :path, _path,
         :be_verbose, do_debug,
         :debug_IO, debug_IO,

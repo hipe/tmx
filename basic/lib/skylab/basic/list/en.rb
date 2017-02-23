@@ -4,7 +4,7 @@ module Skylab::Basic
 
     Say_not_found = -> d, a, k do
 
-      s = Home_.lib_.human::Levenshtein.with(
+      s = Home_.lib_.human::Levenshtein.via(
         :item_string, k.id2name,
         :items, a,
         :stringify_by, -> x do

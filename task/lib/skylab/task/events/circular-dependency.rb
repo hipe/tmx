@@ -52,7 +52,7 @@ class Skylab::Task
           end
         end
 
-        Here_.new_with(
+        Here_.with(
           :arc_streamer, _streamer,
           :task_name, task.name,
         )

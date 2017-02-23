@@ -37,7 +37,7 @@ module Skylab::Parse
 
       @the_empty_node = self.for( nil ).freeze
 
-      def new_with * x_a  # :(C)
+      def with * x_a  # :(C)
         o = dup
         _st = scanner_via_array x_a
         _kp = o.send :___eek_orig_etc, _st

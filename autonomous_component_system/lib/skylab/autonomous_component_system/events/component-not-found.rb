@@ -32,7 +32,7 @@ module Skylab::Autonomous_Component_System
         # structures. even with just the condition tree being the four
         # permutation of two conditionals, the cleanup of a jumble like this
         # is the purpose of [#hu-039] (rule-table-like), investigation of
-        # which we are prerequisiting on the completion of [#ac-007] at
+        # which we are prerequisiting on the completion of [#007] at
         # least.
 
         # remember that by design any client can implement its own

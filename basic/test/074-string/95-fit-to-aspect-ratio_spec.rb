@@ -5,11 +5,11 @@ module Skylab::Basic::TestSupport
   describe "[ba] string - fit to aspect ratio" do
 
     TS_[ self ]
-    use :string
+    use :word_wrapper_calm
 
     it "target aspect ratio of 2:3 against 4 pairs" do
 
-      ww = _subject.new_with(
+      ww = subject_with_(
         :aspect_ratio, [ 2, 3 ],
         :downstream_yielder, [] )
 
@@ -22,7 +22,7 @@ module Skylab::Basic::TestSupport
 
     it "target aspect ratio of 3:2 against 4 pairs" do
 
-      ww = _subject.new_with(
+      ww = subject_with_(
         :aspect_ratio, [ 3, 2 ],
         :downstream_yielder, [] )
 
@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport
 
     it "a more attractive fit wins over a closer aspect ratio (widen)" do
 
-      _a = _subject.with(
+      _a = subject_via_(
         :aspect_ratio, [ 8, 3 ],
         :downstream_yielder, [],
         :input_string, 'never re-think it' )
@@ -52,7 +52,7 @@ module Skylab::Basic::TestSupport
 
     it "a more attractive fit wins over a closer aspect ratio (shrinken)" do
 
-      _a = _subject.with(
+      _a = subject_via_(
         :aspect_ratio, [ 11, 2 ],
         :downstream_yielder, [],
         :input_string, 'i love this city' )
@@ -68,7 +68,7 @@ module Skylab::Basic::TestSupport
 
     it "reduction / lockdown (taller)" do
 
-      _subject.with(
+      subject_via_(
         :aspect_ratio, [ 5, 1 ],
         :downstream_yielder, [],
         :input_words, %w( chaos computer collective )
@@ -78,16 +78,12 @@ module Skylab::Basic::TestSupport
 
     it "reduction / lockdown (wider)" do
 
-      _subject.with(
+      subject_via_(
         :aspect_ratio, [ 16, 3 ],
         :downstream_yielder, [],
         :input_words, %w( chaos computer collective )
 
       ).should eql [ "chaos computer", "collective" ]
-    end
-
-    def _subject
-      subject_module_::WordWrapper::Calm
     end
   end
 end

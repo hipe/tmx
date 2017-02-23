@@ -24,7 +24,7 @@ module Skylab::Parse::TestSupport
     context "currying can make your code more readable and may improve performance" do
 
       shared_subject :p do
-        p = Home_.function( :serial_optionals ).new_with(
+        p = Home_.function( :serial_optionals ).with(
           :matcher_functions,
             -> age do
               /\A\d+\z/ =~ age
@@ -76,7 +76,7 @@ module Skylab::Parse::TestSupport
         feet_rx = /\A\d+\z/
         inch_rx = /\A\d+(?:\.\d+)?\z/
 
-        p = Home_.function( :serial_optionals ).new_with(
+        p = Home_.function( :serial_optionals ).with(
           :functions,
           :proc, -> st do
             if feet_rx =~ st.current_token_object.value_x

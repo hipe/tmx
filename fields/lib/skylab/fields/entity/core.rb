@@ -1023,7 +1023,7 @@ module Skylab::Fields
 
       class << self
 
-        def new_with * x_a
+        def with * x_a
           # (rather than bring in the m.m of [#fi-016] whole hog, cherry-pick)
           kp = true
           prp = new_by do

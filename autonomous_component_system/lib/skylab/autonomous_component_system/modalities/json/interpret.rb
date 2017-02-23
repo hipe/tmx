@@ -447,7 +447,7 @@ module Skylab::Autonomous_Component_System
 
             p.call do
 
-              Modalities::JSON::When_::Empty.new_with(
+              Modalities::JSON::When_::Empty.with(
                 :context_linked_list, @context_linked_list,
                 :ok, nil,  # neutralize its semantic gravity
               )

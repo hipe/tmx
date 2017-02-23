@@ -293,7 +293,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
           end
 
-          kn = LIB_.system.filesystem( :Upstream_IO ).with(
+          kn = LIB_.system.filesystem( :Upstream_IO ).call_via(
             :qualified_knownness_of_path, qualified_knownness_of_path,
             :stdin, @resources.sin,
             & handle_event_selectively )
@@ -328,7 +328,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
             qualified_knownness_of_path = qualified_knownness_of_path.to_unknown
           end
 
-          kn = LIB_.system.filesystem( :Downstream_IO ).with(
+          kn = LIB_.system.filesystem( :Downstream_IO ).call_via(
 
             :qualified_knownness_of_path, qualified_knownness_of_path,
             :stdout, @resources.sout,
@@ -441,7 +441,7 @@ module Skylab::Flex2Treetop  # see [#008] the narrative
 
       _cls = cls_p.call
 
-      sess = _cls.new_via_iambic x_a, & oes_p
+      sess = _cls.via_iambic x_a, & oes_p
 
       if sess
         sess.procede_until_endpoint_

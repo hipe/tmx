@@ -140,7 +140,7 @@ module Skylab::Parse::TestSupport
 
     it "you can build it with a proc that produces the stream" do
 
-      _o = self.class._function_class.new_via_item_stream_proc do
+      _o = self.class._function_class.via_item_stream_proc do
         self.class._build_item_stream_via_string_matrix [ [ 'a', 'b' ] ]
       end
 
@@ -169,7 +169,7 @@ module Skylab::Parse::TestSupport
 
       def _build_function_against_matrix * a_a
 
-        _function_class.new_with(
+        _function_class.with(
           :item_stream_proc, -> do
             _build_item_stream_via_string_matrix a_a
           end

@@ -29,7 +29,7 @@ module Skylab::System
 
       def new_via_file_content_before file_content_x
 
-        Patch_::Models__::Mutable_Progressive.new_via_file_content_before_ file_content_x
+        Patch_::Models__::Mutable_Progressive.via_file_content_before_ file_content_x
       end
 
       def call_via_arglist x_a, & p

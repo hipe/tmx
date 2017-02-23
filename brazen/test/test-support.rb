@@ -52,7 +52,7 @@ module Skylab::Brazen::TestSupport
       td = TestLib_::Tmpdir_controller_instance[]
       if do_debug
         if ! td.be_verbose
-          td = td.new_with :be_verbose, true, :debug_IO, debug_IO
+          td = td.with :be_verbose, true, :debug_IO, debug_IO
         end
       elsif td.be_verbose
         self._IT_WILL_BE_EASY

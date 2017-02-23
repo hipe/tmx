@@ -185,7 +185,7 @@ module Skylab::TanMan
         end
 
         if a
-          asc.new_via_iambic a
+          asc.via_iambic a
         end
       end
 
@@ -253,7 +253,7 @@ module Skylab::TanMan
 
         bx = action.argument_box
 
-        _ok = Here_::Actors__::Mutate.with(
+        _ok = Here_::Actors__::Mutate.via(
           :verb, :delete,
           :from_node_label, bx.fetch( :from_node_label ),
           :to_node_label, bx.fetch( :to_node_label ),

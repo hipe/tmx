@@ -69,7 +69,7 @@ module Skylab::Basic::TestSupport
 
     def __build_subject_curry
 
-     _subject_module.normalization.new_with(
+     _subject_module.normalization.with(
         :begin, 'barbie',
         :end, 'foobie',
       )

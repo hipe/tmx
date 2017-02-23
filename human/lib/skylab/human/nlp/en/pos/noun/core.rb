@@ -30,7 +30,7 @@ module Skylab::Human
 
       class << self
 
-        def new_via_lemma_and_iambic lemma_x, x_a
+        def via_lemma_and_iambic lemma_x, x_a
 
           st = scanner_via_array x_a
 

@@ -11,7 +11,7 @@ module Skylab::MyTerm
       # (:#spot-1)
 
       class << self
-        alias_method :new_via__, :new
+        alias_method :via__, :new
         private :new
       end  # >>
 

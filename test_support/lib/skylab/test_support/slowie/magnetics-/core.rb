@@ -97,7 +97,7 @@ module Skylab::TestSupport
 
           if test_directory_path
 
-            _find = proto.new_with :path, test_directory_path
+            _find = proto.with :path, test_directory_path
 
             st_ = _find.to_path_stream
 

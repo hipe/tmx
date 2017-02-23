@@ -38,11 +38,11 @@ module Skylab::System
             case 1 <=> a.length
 
             when -1
-              new_via_iambic( a, & oes_p ).execute
+              via_iambic( a, & oes_p ).execute
 
             when 0
               a.unshift :path
-              new_via_iambic( a, & oes_p ).execute
+              via_iambic( a, & oes_p ).execute
 
             when 1
               self._COVER_ME_easy

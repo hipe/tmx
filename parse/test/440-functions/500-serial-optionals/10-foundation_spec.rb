@@ -11,7 +11,7 @@ describe "[pa] fuctions - serial optionals - foundation" do
 
     memoize_subject_parse_function_ do
 
-      Home_.function( :serial_optionals ).new_with(
+      Home_.function( :serial_optionals ).with(
         :functions,
           :keyword,
             'randomize', :minimum_number_of_characters, 3,

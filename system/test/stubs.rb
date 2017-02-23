@@ -51,7 +51,7 @@ module Skylab::System
 
       class << self
 
-        def new_via_lines s_a
+        def via_lines s_a
           new s_a
         end
 

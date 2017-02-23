@@ -1,3 +1,4 @@
+[#040] #open modernize "directory as collection"
 [#039]
              [#here.1] track all similar proxy classes for acting like a writable IO
 [#038]       [ the "readable writable" legacy system recorder ]
@@ -48,7 +49,9 @@
 
 [#009]       #parent-node: [#001]. the filesystem narrative ..
 
-[#008]       small issues tethered to external locations
+[#008]       coverage assets & liabilities & similar
+
+             [#here.2], .. : borrow coverage
 
              [#here.1]: we're relying on the content of these two files
                         to be self-similar (cross referenced to [ts])

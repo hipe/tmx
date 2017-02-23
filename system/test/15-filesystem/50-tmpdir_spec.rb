@@ -9,7 +9,7 @@ module Skylab::System::TestSupport
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
 
-      _tmpdir = services_.filesystem.tmpdir.new_with
+      _tmpdir = services_.filesystem.tmpdir.with
       _tmpdir.to_path.should eql ::Dir.tmpdir
     end
 

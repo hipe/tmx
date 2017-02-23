@@ -46,7 +46,7 @@ module Skylab::Basic
 
       _sta_a = sta_st.to_a
 
-      new_with(
+      with(
         :x, x,
         :had_more, had_more,
         :possible_state_array, _sta_a,

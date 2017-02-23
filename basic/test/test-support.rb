@@ -96,6 +96,29 @@ module Skylab::Basic
       end
     end
 
+    # --
+
+    module Word_Wrapper_Calm  # #stowaway
+
+      def self.[] tcc
+        tcc.include self
+      end
+
+      def subject_via_ *x_a
+        subject_module_.call_via_iambic x_a
+      end
+
+      def subject_with_ *x_a
+        subject_module_.via_iambic x_a
+      end
+
+      def subject_module_
+        Home_::String::WordWrapper::Calm
+      end
+    end
+
+    # --
+
     Expect_CLI = -> tcc do
       Home_.lib_.brazen.test_support.lib( :CLI_support_expectations )[ tcc ]
     end

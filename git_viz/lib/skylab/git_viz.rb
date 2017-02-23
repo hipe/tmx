@@ -144,7 +144,7 @@ module Skylab::GitViz
     end
 
     Power_scanner = -> * x_a do
-      Common_::Scn.multi_step.new_via_iambic x_a
+      Common_::Scn.multi_step.via_iambic x_a
     end
 
     Shellwords = stdlib[ :Shellwords ]

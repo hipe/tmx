@@ -87,7 +87,7 @@ module Skylab::TestSupport
           _oes_p = pp[ nil ]
 
           _fs = @_filesystem_proc.call
-          _fs.normalization( :Upstream_IO ).with(
+          _fs.normalization( :Upstream_IO ).call_via(
             :qualified_knownness_of_path, _kn,
             & _oes_p )
         end

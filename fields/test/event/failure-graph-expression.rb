@@ -88,7 +88,7 @@ module Skylab::Fields::TestSupport
       def initialize a, nf
 
         @mixed_event_proc = -> do
-          _ = Home_::Events::Missing.new_with(
+          _ = Home_::Events::Missing.with(
             :selection_stack, [ nil, nf ],
             :reasons, a,
           )

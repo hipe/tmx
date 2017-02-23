@@ -105,7 +105,7 @@ module Skylab::Fields
             @_formal_attribute_via_name_symbol.fetch k
           end
 
-          _ev = Home_::Events::Missing.new_with(
+          _ev = Home_::Events::Missing.with(
 
             :reasons, _miss_a,
             # :lemma, :attribute | :parameter | :property | :primary | :field
@@ -217,7 +217,17 @@ module Skylab::Fields
 
         def _SEND_THIS_VALUE x
 
-          @write_by[ _sanitized_key, x ]
+          k = _sanitized_key
+          if _is_glob
+            a = @read_by[ k ]
+            if a
+              a.concat x  # also [#008.2]
+            else
+              @write_by[ k, x ]
+            end
+          else
+            @write_by[ k, x ]
+          end
 
           _yes = remove_instance_variable :@_do_advance_EEW
           _yes && @argument_scanner.advance_one
@@ -268,8 +278,13 @@ module Skylab::Fields
         end
 
         def _normalizer_or_YIKES
+
           if _has_ad_hoc_normalizer
-            __resolve_sanitized_value_via_ad_hoc_normalizer_against_something
+            if _is_glob
+              self._HAVE_FUN__shouldnt_be_that_bad__
+            else
+              __resolve_sanitized_value_via_ad_hoc_normalizer_against_something
+            end
           else
             __use_the_unsanitized_value_as_the_sanitized_value_YIKES
           end
@@ -277,7 +292,7 @@ module Skylab::Fields
 
         def __resolve_sanitized_value_via_ad_hoc_normalizer_against_something
 
-          # #borrow-coverage from [#sn-008.2], use E.K prop as an "association" in a qkn
+          # :[#008.3] #borrow-coverage from [sn]
 
           _x = remove_instance_variable :@_current_unsanitized_value
           _qkn = Common_::QualifiedKnownness[ _x, @_current_formal_attribute ]  # NOTE RIDE
@@ -330,7 +345,7 @@ module Skylab::Fields
           k = _sanitized_key
           if @_seen[ k ]
             if _is_glob
-              self._COVER_ME__this_is_supposed_to_be_OK__
+              ACHIEVED_  # :[#008.2] #borrow-coverage from [sn]
             else
               self._COVER_ME__this_is_supposed_to_be_not_OK__
             end
@@ -350,23 +365,31 @@ module Skylab::Fields
 
           if _is_glob
 
-            ::Kernel._COVER_ME__resolve_unsanitized_vaue_for_glob__
+            a = @argument_scanner.scan_glob_values
+            if a
+              @_current_unsanitized_value = a ; true  # <-- LOOK
+            else
+              _unable
+            end
 
           elsif _is_flag
 
-            ::Kernel._COVER_ME__resolve_unsanitized_vaue_for_flag__
-
+            kn = @argument_scanner.scan_flag_value
+            if kn
+              @_current_unsanitized_value = kn.value_x
+            else
+              _unable
+            end
           else
             @argument_scanner.map_value_by do |x|
               @_do_advance_EEW = true
               ok = true ; unsanitized_value = x ; nil
             end
-          end
-
-          if ok
-            @_current_unsanitized_value = unsanitized_value ; true
-          else
-            _unable
+            if ok
+              @_current_unsanitized_value = unsanitized_value ; true
+            else
+              _unable
+            end
           end
         end
 

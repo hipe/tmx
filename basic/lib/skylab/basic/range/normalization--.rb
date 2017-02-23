@@ -7,7 +7,7 @@ module Skylab::Basic
       Attributes_actor_[ self ]
 
       class << self
-        def new_with * x_a, & x_p
+        def with * x_a, & x_p
           o = super
           if o
             o.freeze  # :+[#036]
@@ -126,7 +126,7 @@ module Skylab::Basic
           oes_p = @on_event_selectively
           if oes_p
             oes_p.call :error, :not_in_range do
-              Explanation__.new_with QKN__, @qualified_knownness, :or_a, @or_a
+              Explanation__.with QKN__, @qualified_knownness, :or_a, @or_a
             end
           end
 

@@ -13,7 +13,7 @@ module Skylab::Fields
         class << self
 
           def _call sess, & x_p
-            with :sess, sess, & x_p
+            via :sess, sess, & x_p
           end
 
           alias_method :[], :_call

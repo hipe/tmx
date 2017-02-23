@@ -16,7 +16,7 @@ module Skylab::GitViz
 
               [ [ :error, :bad_revision ], -> do
 
-                Bad_Revision___.new_with(
+                Bad_Revision___.with(
                   :revision_identifier, md[ 1 ],
                   :exitstatus, t.value.exitstatus )
 

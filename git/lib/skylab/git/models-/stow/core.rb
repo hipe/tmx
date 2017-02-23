@@ -320,7 +320,7 @@ module Skylab::Git
           o
         end
 
-        def new_via_path path
+        def via_path path
           o = new :_no_kernel_
           o.reinitialize_via_path_for_directory_as_collection path
           o

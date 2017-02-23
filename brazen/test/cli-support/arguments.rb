@@ -36,7 +36,7 @@ module Skylab::Brazen::TestSupport
 
         _n11n_prototype = __n11n
 
-        @__normalization = _n11n_prototype.new_via_argv actual_arg_a
+        @__normalization = _n11n_prototype.via_argv actual_arg_a
 
         @__result = @__normalization.execute
 

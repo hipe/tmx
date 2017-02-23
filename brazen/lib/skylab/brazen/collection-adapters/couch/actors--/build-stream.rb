@@ -56,7 +56,7 @@ module Skylab::Brazen
 
         _body = _JSON.pretty_generate _ick_h
 
-        _rr = @response_receiver.new_with :channel, :my_face
+        _rr = @response_receiver.with :channel, :my_face
 
         @collection.put _body,
           :entity_identifier_strategy, :append_URI_tail,

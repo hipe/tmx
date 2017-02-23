@@ -61,7 +61,7 @@ module Skylab::TanMan
 
         def __path_is_absolute
 
-          _n11n = Path_lib_[].normalization.new_with :absolute
+          _n11n = Path_lib_[].normalization.with :absolute
 
           _ok_arg = _n11n.normalize_qualified_knownness(
             @_qkn, & @on_event_selectively )
@@ -160,7 +160,7 @@ module Skylab::TanMan
 
         def __resolve_downstream_file
 
-          kn = _sys.filesystem( :Downstream_IO ).with(
+          kn = _sys.filesystem( :Downstream_IO ).call_via(
             :qualified_knownness_of_path, @_qkn,
             & @on_event_selectively )
 
