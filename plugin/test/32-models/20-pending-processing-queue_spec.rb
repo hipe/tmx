@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::Plugin::TestSupport
 
-  describe "[ba] queue [action queue] - args" do
+  describe "[pl] queue [action queue] - args" do
 
     TS_[ self ]
     use :memoizer_methods

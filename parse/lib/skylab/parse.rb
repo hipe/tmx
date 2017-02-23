@@ -31,6 +31,13 @@ module Skylab::Parse  # see [#001]
         Home_::Input_Stream_
       end
 
+      def test_support  # #[#ts-035]
+        if ! Home_.const_defined? :TestSupport
+          require_relative '../../test/test-support'
+        end
+        Home_::TestSupport
+      end
+
       def lib_
         @lib ||= Common_.produce_library_shell_via_library_and_app_modules(
           Lib___, self )

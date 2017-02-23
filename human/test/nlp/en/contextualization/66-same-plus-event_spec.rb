@@ -27,7 +27,7 @@ module Skylab::Human::TestSupport
 
           Home_.lib_.fields::Events::Extra.new_with(
             :name_x_a, [ 'bezo' ],
-            :did_you_mean_i_a, [ 'wezo', 'dezo' ],
+            :did_you_mean_symbol_array, [ 'wezo', 'dezo' ],
             :lemma, 'kershploink',
             :suffixed_prepositional_phrase_context_proc, wat,
           )

@@ -53,7 +53,7 @@ module Skylab::Zerk::TestSupport
 
         it "emits a `parse_error` (not a primary parse error)" do
 
-          _emission.channel_symbol_array.last == :parse_error || fail
+          _emission.channel_symbol_array[2] == :parse_error || fail
         end
 
         it "first line - unrec" do

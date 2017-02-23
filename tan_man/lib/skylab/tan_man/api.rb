@@ -30,6 +30,12 @@ module Skylab::TanMan
 
       alias_method :calculate, :instance_exec
 
+      def simple_inflection & p
+        o = dup
+        o.extend Home_.lib_.human::NLP::EN::SimpleInflectionSession::Methods
+        o.calculate( & p )
+      end
+
       def and_ a
         _NLP_agent.and_ a
       end
@@ -50,7 +56,7 @@ module Skylab::TanMan
         "** #{ string } **"
       end
 
-      def ick x
+      def ick_mixed x
         val x
       end
 

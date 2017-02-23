@@ -1,7 +1,7 @@
 # numbering scheme
 
 • a high-level overview is earliest because it is a common use-case
-  (alghouth this as a rationale contradicts other rationale..)
+  (although this as a rationale contradicts other rationale..)
 
 • `list` is earlier because it is a frequently used meta-parameter
 

@@ -2,6 +2,8 @@ module Skylab::Plugin
 
   class Magnetics::OperatorBranch_via_DirectoryOneDeeper  # :[#012].
 
+    # (look for this reference in [br] - we are making a close cousin)
+
     # three laws.
 
     # synopsis - created to clean up what [sy] does with its "services"
@@ -173,7 +175,6 @@ module Skylab::Plugin
     # ==
 
     EMPTY_P_ = -> { NOTHING_ }
-    NOTHING_ = NIL
 
     # ==
   end

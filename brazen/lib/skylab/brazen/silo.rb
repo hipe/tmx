@@ -238,7 +238,7 @@ module Skylab::Brazen
 
       def _bound_call_via x_a, & oes_p
 
-        o = Home_::Actionesque::Produce_Bound_Call.new @kernel, & oes_p
+        o = Home_::Actionesque_ProduceBoundCall.new @kernel, & oes_p
         o.iambic = x_a
         bound = @silo_module.new @kernel, & oes_p
         o.current_bound = bound

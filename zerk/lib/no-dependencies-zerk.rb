@@ -699,7 +699,7 @@ module NoDependenciesZerk
         elsif @argument_scanner.can_fuzzy
           __fuzzy_lookup_operator
         else
-          self._COVER_ME__easy_probably__
+          _when_operator_not_found  # #borrow-coverage from [#pl-004.1]
         end
       end
 
@@ -709,13 +709,17 @@ module NoDependenciesZerk
         when 0  # when found
           a.fetch 0
         when 1  # when not found
-          Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ self ]
+          _when_operator_not_found
         else  # when ambiguous
           _scn = Scanner_via_Array.call a do |of|
             of.load_ticket.intern  # [#ze-062]
           end
           Ambiguous__[ _scn, :_operator_, @argument_scanner ]
         end
+      end
+
+      def _when_operator_not_found
+        Zerk_lib_[]::ArgumentScanner::When::Unknown_operator[ self ]
       end
 
       def __all_fuzzily_matching_operators_found

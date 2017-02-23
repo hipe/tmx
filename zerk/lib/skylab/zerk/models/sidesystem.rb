@@ -41,7 +41,7 @@ module Skylab::Zerk
 
       def __init_const_path_array_guess
 
-        # (see [#030.1] re: a gem name many segments, segment is many pieces)
+        # (see [#030.B] re: a gem name many segments, segment is many pieces)
 
         const_path_guess = []
         gne = @gem_name_elements

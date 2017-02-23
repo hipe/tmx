@@ -57,7 +57,7 @@ module Skylab::MyTerm::TestSupport
 
       it "did you mean" do
 
-        expect :penultimate_line, :styled, %r(\Adid you mean ['"]?[a-z])
+        expect :penultimate_line, %r(\Adid you mean ['"]?[a-z])
       end
 
       it "invite" do

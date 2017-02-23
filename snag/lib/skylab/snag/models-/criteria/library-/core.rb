@@ -20,7 +20,7 @@ module Skylab::Snag
 
       class Common_Adapter_
 
-        include Attrs__::Lib::Polymorphic_Processing_Instance_Methods
+        include Attrs__::Lib::PolymorphicProcessingInstanceMethods
 
         def process_argument_scanner_fully st
           _ok = super

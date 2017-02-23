@@ -34,7 +34,7 @@ class Kernel  # [#015]
 
   def bound_call_via_mutable_iambic x_a, & oes_p
 
-    o = Home_::Actionesque::Produce_Bound_Call.new self, & oes_p
+    o = Home_::Actionesque_ProduceBoundCall.new self, & oes_p
     o.iambic = x_a
     o.module = @module
     o.execute
@@ -49,7 +49,7 @@ class Kernel  # [#015]
 
   def bound_call_via_mutable_box i_a, bx, & x_p  # [bs] only so far
 
-    o = Home_::Actionesque::Produce_Bound_Call.new self, & x_p
+    o = Home_::Actionesque_ProduceBoundCall.new self, & x_p
     o.iambic = i_a
     o.mutable_box = bx
     o.execute
@@ -57,7 +57,7 @@ class Kernel  # [#015]
 
   def bound_call_via_argument_scanner arg_st, & x_p
 
-    o = Home_::Actionesque::Produce_Bound_Call.new self, & x_p
+    o = Home_::Actionesque_ProduceBoundCall.new self, & x_p
     o.argument_stream = arg_st
     o.execute
   end

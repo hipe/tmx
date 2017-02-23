@@ -26,7 +26,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "did you mean" do
-        expect :second_line, :styled, %r(\Adid you mean '[a-z])
+        expect :second_line, %r(\Adid you mean "[a-z])
       end
 
       it "invite" do
@@ -88,7 +88,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "did you mean" do
-        expect :second_line, :styled, "did you mean 'imagemagick'?"
+        expect :second_line, %(did you mean "imagemagick"?)
       end
 
       it "(no invite for now)" do

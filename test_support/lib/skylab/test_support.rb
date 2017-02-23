@@ -81,6 +81,11 @@ module Skylab::TestSupport  # :[#021].
     end
   end
 
+  Expect_these_lines_in_array = -> act_s_a, p, tc do
+
+    Home_::Expect_Line::Expect_these_lines_in_array[ act_s_a, p, tc ]
+  end
+
   # --
 
   module THE_EMPTY_EXPRESSION_AGENT ; class << self
@@ -175,6 +180,8 @@ module Skylab::TestSupport  # :[#021].
 
   # --
 
+  Autoloader_ = Common_::Autoloader
+
   module Library_
 
     stdlib = Autoloader_.method :require_stdlib
@@ -241,8 +248,6 @@ module Skylab::TestSupport  # :[#021].
   end
 
   # --
-
-  Autoloader_ = Common_::Autoloader
 
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 

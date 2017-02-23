@@ -2,21 +2,20 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_actor  # #[#017]
-  module Attributes::Actor
+  describe "[fi] attributes - actor - intro" do
 
-    TS_.describe "[fi] attributes - actor - intro" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_actor
 
-      TS_[ self ]
-      use :memoizer_methods
-      Here_[ self ]
+    # ==
 
       it "left loads" do
         _left_class
       end
 
       it "this i.m loads" do
-        Subject_module_[]::Lib::Polymorphic_Processing_Instance_Methods
+        Attributes.lib::Lib::PolymorphicProcessingInstanceMethods
       end
 
       it "i.m only loads" do
@@ -167,9 +166,9 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_left_class do
 
-        class X_Intro_Left
+        class X_a_a_i_NoSee_Left
 
-          attrs = Subject_proc_[].call( self,
+          attrs = Attributes::Actor.lib.call( self,
             jiang: nil,
             xiao: nil,
             qing: nil,
@@ -183,9 +182,9 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_instance_methods_only_class do
 
-        class X_Intro_IM_Only
+        class X_a_a_i_NoSee_IM_Only
 
-          include Subject_module_[]::Lib::Polymorphic_Processing_Instance_Methods
+          include Attributes.lib::Lib::PolymorphicProcessingInstanceMethods
 
         private
 
@@ -207,9 +206,9 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_right_class do
 
-        class X_Intro_Right
+        class X_a_a_i_NoSee_Right
 
-          Subject_proc_[].call self
+          Attributes::Actor.lib.call self
 
         private
 
@@ -231,9 +230,9 @@ module Skylab::Fields::TestSupport
 
       shared_subject :_hybrid_class do
 
-        class X_Intro_Hybrid
+        class X_a_a_i_NoSee_Hybrid
 
-          attrs = Subject_proc_[].call( self,
+          attrs = Attributes::Actor.lib.call( self,
             jiang: nil,
             xiao: nil,
             qing: nil,
@@ -261,8 +260,7 @@ module Skylab::Fields::TestSupport
           self
         end
       end
-
-    end
+    # ==
   end
 end
 # #tombstone - `ignore` keyword

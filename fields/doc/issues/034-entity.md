@@ -129,9 +129,9 @@ collision first before defining them these complex reasons:
 
 
 
-## a "clever" parsing experiment  (#note-185, also was #note-330)
+## a "clever" parsing experiment  (#note-185, also was #note-330) :[#here.2]
 
-interstingly, this current form of the method (that may look like
+interestingly, this current form of the method (that may look like
 function soup) buries a previous form of the same thing that had
 a dedicated class for it (find it thru the tombstone). usually
 this goes in the other direction, with the functional soup getting

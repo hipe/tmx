@@ -2,22 +2,21 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_actor  # #[#017]
-  module Attributes::Actor
+  describe "[fi] attributes - actor - curried" do
 
-    TS_.describe "[fi] attributes - actor - curried" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes
 
-      TS_[ self ]
-      use :memoizer_methods
-      Here_[ self ]
+    # ==
 
       context "(context 1)" do
 
         shared_subject :_class do
 
-          class X_Curried_A
+          class X_a_a_curr_NoSee
 
-            Subject_proc_[].call( self,
+            Attributes::Actor.lib.call( self,
               :top_slice,
               :inside,
               :bottom_slice,
@@ -42,9 +41,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_curried_actor do
 
-          o =  _class.curry_with :inside, :Pastrami
-          # X_Curried_B_Make_pastrami_sandwich = o  # it's not a class
-          o
+          _class.curry_with :inside, :Pastrami
         end
 
         it "the curried actor executes when given iambic arguments" do
@@ -80,6 +77,7 @@ module Skylab::Fields::TestSupport
           ca._number_of_times.nil? or fail
         end
       end
-    end
+    # ==
+    # ==
   end
 end

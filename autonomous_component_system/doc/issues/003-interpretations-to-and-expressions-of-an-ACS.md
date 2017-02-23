@@ -58,7 +58,7 @@ below, and relates to both sections. the concept is assembled at [#022].)
 
 
 
-## towards an interpretation API - unmarshaling
+## towards an interpretation API - unmarshaling :[#here.1]
 
 there exists a potentially limitless variety of ways that one component
 for one ACS can be interpreted from the potentially limitless variety of
@@ -72,6 +72,8 @@ from there (thru which all compound components are presumably built in
 a normal world). (however, internally it is the particular component class
 itself that actually constructs a mutable component, before passing it off
 to a mutation session which interprets the input.)
+
+
 
 
 

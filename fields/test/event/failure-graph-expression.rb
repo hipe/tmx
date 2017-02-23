@@ -53,7 +53,7 @@ module Skylab::Fields::TestSupport
         buffer << line
       end
 
-      _expag = common_expression_agent_
+      _expag = my_all_purpose_expression_agent_
       _ev = self.event_
       _ev.express_into_under _y, _expag
       buffer

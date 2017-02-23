@@ -219,14 +219,15 @@ module Skylab::Zerk::TestSupport
 
     def _match_did_you_mean_at_least_N_items d
 
-      s = "'[^']+'"
+      s = %("[^"]+")
       if 1 < d
         _or_etc = "(?: or #{ s }){#{ d - 1 }}"
       end
 
       _rx = /\Adid you mean #{ s }#{ _or_etc }\?\z/
 
-      match_ expectation( :styled, :e, _rx )
+      # match_ expectation( :styled, :e, _rx )
+      match_ expectation( :e, _rx )
     end
 
     def _have_first_usage_line_of s

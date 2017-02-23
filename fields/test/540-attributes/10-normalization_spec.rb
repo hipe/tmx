@@ -2,23 +2,22 @@ require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes   # #[#017]
-  module Attributes
+  describe "[fi] attributes - normalization (progressive edit sessions)" do
 
-    TS_.describe "[fi] attributes - normalization (progressive edit sessions)" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
+    use :attributes
 
-      TS_[ self ]
-      use :memoizer_methods
-      use :expect_event
-      Attributes[ self ]
+    # ==
 
       context "for requireds" do
 
         shared_subject :entity_class_ do
 
-          class X_A_N11n_A
+          class X_a_n_NoSee_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes.lib.call(
               first_name: :optional,
               last_name: nil,
               soc: nil,
@@ -110,9 +109,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_A_N11n_B
+          class X_a_n_NoSee_B
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes.lib.call(
               a: [ :default, :one ],
               b: nil,
               c: [ :default, :three, ],
@@ -170,9 +169,9 @@ module Skylab::Fields::TestSupport
 
         shared_subject :entity_class_ do
 
-          class X_A_N11n_C
+          class X_a_n_NoSee_C
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes.lib.call(
 
               a: :optional,
               b: nil,
@@ -274,6 +273,6 @@ module Skylab::Fields::TestSupport
 
         flush_event_log_and_result_to_state _x
       end
-    end
+    # ==
   end
 end

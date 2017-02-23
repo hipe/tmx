@@ -2,22 +2,19 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - meta-attributes - enum" do
 
-    TS_.describe "[fi] attributes - meta-attributes - enum" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      use :expect_event
-      Attributes::Meta_Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
+    use :attributes_meta_attributes
 
       context "(context)" do
 
         shared_subject :entity_class_ do
-          class X_Enum_A
+          class X_a_ma_Enum_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               color: [ :enum, [ :red, :blue ] ],
             )
 
@@ -64,6 +61,8 @@ module Skylab::Fields::TestSupport
           end
         end
       end
-    end
+
+    # ==
+    # ==
   end
 end

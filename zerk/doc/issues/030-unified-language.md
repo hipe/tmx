@@ -56,7 +56,7 @@ in niCLI the (selection stack) frame holds a lot of responsibility..
 
 
 
-## "sidesystem" and related  :[#here.1]
+## "sidesystem" and related  :[#here.B]
 
 this was originally solely the domain of [tmx], but we broadened it
 to here so that sidesystems could integrate "one-off" scripts as
@@ -95,7 +95,7 @@ to `require` this gem, you simply exchange the dash for a slash:
 
 ## evaluations, reasonings, emissions, and states
 
-  • a "reasoning" (:#A) is structure that can be used to help explain
+  • a "reasoning" :[#here.1] is structure that can be used to help explain
     why a particular node is unavailable. it has the structure:
 
          +----------------------------------+

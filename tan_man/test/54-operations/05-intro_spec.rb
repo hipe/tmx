@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport
 
       call_API :ping, :wahootey
 
-      _ = 'unrecognized (plural_noun [1, :attribute]) (and_ ["(ick :wahootey)"])'
+      _ = 'unrecognized attribute (ick_mixed :wahootey)'
 
       __ = "unrecognized attribute :wahootey"
 

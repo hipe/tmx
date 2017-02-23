@@ -6,7 +6,7 @@ module Skylab::Fields
       # you can define [non-]memoized { proc | inline } methods
       #
       #     class Foo
-      #       Home_::Attributes::Stack.common_frame self,
+      #       Home_::Attributes::Stack::CommmonFrame.call self,
       #         :proc, :foo, -> do
       #            d = 0
       #            -> { d += 1 }
@@ -59,12 +59,12 @@ module Skylab::Fields
         o(
           :ad_hoc_processor, :globbing, -> sess do
             sess.upstream.backtrack_one
-            Here_::Define_process_method__[ sess ]
+            Attributes::Stack::Define_process_method__[ sess ]
           end,
 
           :ad_hoc_processor, :processor, -> sess do
             sess.upstream.backtrack_one
-            Here_::Define_process_method__[ sess ]
+            Attributes::Stack::Define_process_method__[ sess ]
           end
         )
       end
@@ -317,7 +317,7 @@ module Skylab::Fields
     # [ `required` ] `field`s -
     #
     #     class Bar
-    #       Home_::Attributes::Stack.common_frame self,
+    #       Home_::Attributes::Stack::CommonFrame.call self,
     #         :globbing, :processor, :initialize,
     #         :required, :readable, :field, :foo,
     #         :readable, :field, :bar

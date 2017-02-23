@@ -17,6 +17,12 @@ module Skylab::Common
 
         alias_method :calculate, :instance_exec
 
+        def simple_inflection & p
+          o = dup
+          o.extend Home_.lib_.human::NLP::EN::SimpleInflectionSession::Methods
+          o.calculate( & p )
+        end
+
         def modality_const
           NIL_
         end

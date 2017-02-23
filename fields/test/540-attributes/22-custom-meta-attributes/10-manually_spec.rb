@@ -2,14 +2,11 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes  # #[#017]
-  module Attributes
+  describe "[fi] attributes - custom meta attributes - manually" do
 
-    TS_.describe "[fi] attributes - custom meta attributes - manually" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes
 
       context "for example if you wanted a \"list\"-style (`argument_arity` many)" do
 
@@ -21,7 +18,7 @@ module Skylab::Fields::TestSupport
 
         shared_subject :_cls do
 
-          class X_CMAE_Attr < Subject_module_[]::DefinedAttribute
+          class X_a_cma_m_Attr < Attributes.lib::DefinedAttribute
             # oh. nothing, i guess
 
             def __hello
@@ -29,7 +26,7 @@ module Skylab::Fields::TestSupport
             end
           end
 
-          class X_CMAE_Mattrs  # note we only define what we will use..
+          class X_a_cma_m_Mattrs  # note we only define what we will use..
 
             def initialize bld
               @_build = bld
@@ -57,7 +54,7 @@ module Skylab::Fields::TestSupport
             end
           end
 
-          class X_CMAE_A
+          class X_a_cma_m_A
 
             def self.new_with * x_a
               o = new
@@ -66,15 +63,15 @@ module Skylab::Fields::TestSupport
               o
             end
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes.lib.call(
               foopie: :list,
               harbinger: nil,
             )
 
             attr_reader( * attrs.symbols )
 
-            attrs.meta_attributes = X_CMAE_Mattrs
-            attrs.attribute_class = X_CMAE_Attr
+            attrs.meta_attributes = X_a_cma_m_Mattrs
+            attrs.attribute_class = X_a_cma_m_Attr
 
             const_set :ATTRIBUTES, attrs
 
@@ -82,6 +79,8 @@ module Skylab::Fields::TestSupport
           end
         end
       end
-    end
+
+    # ==
+    # ==
   end
 end

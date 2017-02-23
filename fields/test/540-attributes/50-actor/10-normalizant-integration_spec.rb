@@ -2,21 +2,20 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_actor  # #[#017]
-  module Attributes::Actor
+  describe "[fi] attributes - actor - normalizant integration" do
 
-    TS_.describe "[fi] attributes - actor - normalizant integration" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
+    use :attributes
 
-      TS_[ self ]
-      use :memoizer_methods
-      use :expect_event
-      Here_[ self ]
+    # ==
 
       shared_subject :entity_class_ do
 
-        class X_Nznt_A
+        class X_a_a_ni_NoSee
 
-          Subject_proc_[].call( self,
+          Attributes::Actor.lib.call( self,
             starts_as_true: [ :default, true ],
             other: nil,
           )
@@ -63,6 +62,6 @@ module Skylab::Fields::TestSupport
           only_emission.should _be_this
         end
       end
-    end
+    # ==
   end
 end

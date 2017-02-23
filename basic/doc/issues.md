@@ -12,6 +12,9 @@
                - that at the end of the "invocation" (for whatever definition
                  of) that none of the elements remain in the pool.
 
+               - in order to see what elements remain in the pool after some
+                 operation, to do something with them.
+
 [#060]       borrowing/lending coverage
        #open [#here.1]: we are borrowing coverage from [#tmx-022.1]
 

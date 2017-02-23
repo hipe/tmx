@@ -132,7 +132,7 @@ module Skylab::TanMan
               :words, words,
               :parse_functions, _f_a do | y, o |
 
-            y << "unrecognized input #{ ick o.words }. known definitions: "
+            y << "unrecognized input #{ ick_mixed o.words }. known definitions: "
 
             o.parse_functions.each do | f |
               y << f.express_all_segments_into_under( "" )

@@ -878,7 +878,7 @@ module Skylab::Common
     end
 
     attr_reader(
-      :reasoning,  # #[#ze-030]#A
+      :reasoning,  # #[#ze-030.1]
     )
 
     def is_effectively_known
@@ -896,7 +896,7 @@ module Skylab::Common
 
   KNOWN_UNKNOWN = Known_Unknown.via_reasoning nil
 
-  class Known_Known
+  class KnownKnown  # #[#004]
 
     class << self
 
@@ -946,8 +946,9 @@ module Skylab::Common
       false
     end
   end
+  Known_Known = KnownKnown  # soon..
 
-  class Qualified_Knownness  # [#004]
+  class QualifiedKnownness  # #[#004]
 
     class << self
 
@@ -1059,6 +1060,7 @@ module Skylab::Common
       true
     end
   end
+  Qualified_Knownness = QualifiedKnownness  # soon..
 
   Pair = ::Struct.new :value_x, :name_x do  # :[#055].
 

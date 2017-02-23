@@ -260,7 +260,7 @@ module Skylab::System
                 d = o.num_dirs_looked - 1
                 _xtra = " or #{ d } dir#{ s d } up"
               end
-              y << "#{ ick o.file_pattern_x } #{
+              y << "#{ ick_mixed o.file_pattern_x } #{
                 }not found in #{ pth o.start_path }#{ _xtra }"
             end
           end

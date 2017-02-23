@@ -11,7 +11,7 @@ module Skylab::Fields::TestSupport
 
       before :all do
         class X_a_s_cf_c_Foo
-          Home_::Attributes::Stack.common_frame self,
+          Home_::Attributes::Stack::CommonFrame.call self,
             :proc, :foo, -> do
                d = 0
                -> { d += 1 }
@@ -60,7 +60,7 @@ module Skylab::Fields::TestSupport
       before :all do
 
         class X_a_s_cf_c_Bar
-          Home_::Attributes::Stack.common_frame self,
+          Home_::Attributes::Stack::CommonFrame.call self,
             :globbing, :processor, :initialize,
             :required, :readable, :field, :foo,
             :readable, :field, :bar

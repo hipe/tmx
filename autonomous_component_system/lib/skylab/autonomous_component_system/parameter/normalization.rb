@@ -100,7 +100,7 @@ module Skylab::Autonomous_Component_System
           # assume it is not effectively known. it must be either known
           # unknown or known to be nil (right?). IFF the former it may have
           # some "reasoning" attached to it. if it does then this constitutes
-          # *the* implementation of [#fi-036]#"Storypoint-2". otherwise munge
+          # *the* implementation of [#fi-036.5] "reasoning". otherwise munge
           # these two cases with one behavior.
 
           if evl.is_known_known

@@ -72,6 +72,10 @@ module Skylab::Parse::TestSupport
       Common_.test_support::Expect_Emission[ tcm ]
     end
 
+    Iambic_Grammar = -> tcc do
+      TS_::Iambic_Grammar[ tcc ]
+    end
+
     Memoizer_Methods = -> tcc do
       TestSupport_::Memoization_and_subject_sharing[ tcc ]
     end

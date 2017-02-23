@@ -173,11 +173,11 @@ module Skylab::MyTerm::TestSupport
 
         sym = @_st.gets_one
         d = Home_::Zerk_::NonInteractiveCLI::Exit_status_for___[ sym ]
-        d or fail ___say_bad_es sym
+        d or fail __say_bad_es sym
         _expect_exitstatus d
       end
 
-      def ___say_bad_es sym
+      def __say_bad_es sym
         "not an exitstatus: '#{ sym }'"
       end
 
@@ -267,11 +267,11 @@ module Skylab::MyTerm::TestSupport
           ACHIEVED_
         else
           @_act = s_ ; @_exp = expect
-          _fail_by :___say_etc
+          _fail_by :__say_etc
         end
       end
 
-      def ___say_etc
+      def __say_etc
         "needed #{ @_exp.inspect } had #{ @_act.inspect }"
       end
     end
@@ -353,6 +353,14 @@ module Skylab::MyTerm::TestSupport
 
       def __say_rx
         "needed to match against /#{ @_matchee_regexp.source }/: #{ @_use_s.inspect }"
+      end
+
+      def __say_not_styled
+        "expected styled but was not styled: #{ @_use_s.inspect }"
+      end
+
+      def __say_is_styled
+        "expected was not styled but was styled: #{ @_use_s.inspect }"
       end
 
       def __match_against_string

@@ -2,22 +2,21 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_actor  # #[#017]
-  module Attributes::Actor
+  describe "[fi] attributes - actor - curry the curry" do
 
-    TS_.describe "[fi] attributes - actor - curry the curry" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes
 
-      TS_[ self ]
-      use :memoizer_methods
-      Here_[ self ]
+    # ==
 
       context "(context 1)" do
 
         shared_subject :_class do
 
-          class X_CtC_A
+          class X_a_a_ctc_NoSee
 
-            Subject_proc_[].call( self,
+            Attributes::Actor.lib.call( self,
               :very_volatile,
               :somewhat_volatile,
               :a_medium_amount_of_volatile,
@@ -64,6 +63,6 @@ module Skylab::Fields::TestSupport
 
         end
       end
-    end
+    # ==
   end
 end

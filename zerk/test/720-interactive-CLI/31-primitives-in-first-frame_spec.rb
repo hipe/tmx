@@ -55,8 +55,8 @@ module Skylab::Zerk::TestSupport
 
       it "asks \"did you mean?\"" do
 
-        unstyle_styled_( second_line ).should eql(
-          "did you mean 'fozzer', 'fizzie-nizzie' or 'biz-nappe'?" )
+        second_line.should eql(
+          %(did you mean "fozzer", "fizzie-nizzie" or "biz-nappe"?) )
       end
 
       it "displays the first screen again" do

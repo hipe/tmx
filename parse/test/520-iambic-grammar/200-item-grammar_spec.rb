@@ -1,8 +1,8 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 module Skylab::Parse::TestSupport
 
-  describe "[pa] item grammar" do
+  describe "[pa] iambic grammar - item grammar" do
 
     it "builds" do
       _subject
@@ -64,7 +64,7 @@ module Skylab::Parse::TestSupport
 
       TS_.const_set(
         :IG_Shh___,
-        Home_::Item_Grammar.new( [ :hot, :cold ], :tea, [ :with, :and ] ) )
+        Home_::IambicGrammar::ItemGrammar_LEGACY.new( [ :hot, :cold ], :tea, [ :with, :and ] ) )
     end
   end
 end

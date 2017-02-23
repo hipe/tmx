@@ -20,6 +20,7 @@ module Skylab::Fields
 
   Common_ = ::Skylab::Common
   Autoloader_ = Common_::Autoloader
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   # ==
 
@@ -191,6 +192,8 @@ module Skylab::Fields
       )
     end
 
+    # ==
+
     module Actor
 
       class << self
@@ -229,6 +232,8 @@ module Skylab::Fields
           end
         end
       end  # >>
+
+      # ===
 
       module Module_Methods__
 
@@ -270,6 +275,8 @@ module Skylab::Fields
         end
       end
 
+      # ===
+
       New_via__ = -> m, st, cls, & x_p do  # near #open [#026]
 
         sess = cls.send :new, & x_p  # actors reasonably expect the handler here [br]
@@ -283,7 +290,7 @@ module Skylab::Fields
         end
       end
 
-      # ==
+      # ===
 
       module InstanceMethods
 
@@ -351,14 +358,14 @@ module Skylab::Fields
         def when_after_process_iambic_fully_stream_has_content stream  # :+#public-API
           _ev = Home_::Events::Extra.via_strange stream.head_as_is
           receive_extra_values_event _ev
-        end  # :#spot-1
+        end  # :#spot-1-1
 
         def receive_extra_values_event ev  # :+#public-API (name) :+#hook-in
           raise ev.to_exception
         end
       end
 
-      # ==
+      # ===
 
       module Flat_Actor_MMs___
 
@@ -390,6 +397,8 @@ module Skylab::Fields
         end
       end
 
+      # ===
+
       module Flat_Actor_IMs___
 
         include InstanceMethods
@@ -420,7 +429,7 @@ module Skylab::Fields
         end
       end
 
-      # ==
+      # ===
 
       class Flat_Attributes___
 
@@ -447,10 +456,10 @@ module Skylab::Fields
         end
       end
 
-      # =
+      # ===
 
       Autoloader_[ self ]
-    end
+    end  # actor
 
     # --
 
@@ -464,7 +473,7 @@ module Skylab::Fields
 
     ARG_STREAM_IVAR_ = :@_polymorphic_upstream_
     Here_ = self
-  end
+  end  # attributes
 
   class SimplifiedName
 
@@ -709,13 +718,13 @@ module Skylab::Fields
     Basic = sidesys[ :Basic ]
     Brazen = sidesys[ :Brazen ]
     Human = sidesys[ :Human ]
+    Parse = sidesys[ :Parse ]
     Plugin = sidesys[ :Plugin ]
   end
 
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
-
   ACHIEVED_ = true
   CLI = nil  # for host
+  CONST_SEP_ = Common_::CONST_SEPARATOR
   EMPTY_A_ = []
   EMPTY_S_ = ""
   Home_ = self

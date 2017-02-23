@@ -1,6 +1,6 @@
 module Skylab::Fields
 
-  module Entity  # [#001]
+  module Entity  # [#034]
 
     class << self
 
@@ -1349,7 +1349,6 @@ module Skylab::Fields
 
     # ==
 
-    CONST_SEP_ = Common_::CONST_SEPARATOR
     Here_ = self
     METAPROPERTIES_WITH_HOOKS_ = :METAPROPERTIES_WITH_HOOKS___
 

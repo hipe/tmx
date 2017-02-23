@@ -18,7 +18,7 @@ module Skylab::Fields::TestSupport
       it "(uses \"invariant be\" form)" do
 
         _be_this_message = eql(
-          "missing required attributes 'foo-bar' and 'quux-grault'\n" )
+          "missing required attributes «prp: foo_bar» and «prp: quux_grault»\n" )
 
         event_message_as_string_.should _be_this_message
       end
@@ -38,7 +38,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "the toplevel attributes get aggregated (again)" do
-        _(0) == "missing required attributes 'a' and 'b'\n" or fail
+        _(0) == "missing required attributes «prp: A» and «prp: B»\n" or fail
       end
 
       it "the toplevel branch nodes are aggregated, note the expression template" do
@@ -46,7 +46,7 @@ module Skylab::Fields::TestSupport
       end
 
       it "we descend one level and list all (one) missingattributes of that" do
-        _(2) == "'d' is missing required attribute 'f'.\n" or fail
+        _(2) == "'d' is missing required attribute «prp: F».\n" or fail
       end
 
       it "it is 'd' that introduces 'g'" do
@@ -54,11 +54,11 @@ module Skylab::Fields::TestSupport
       end
 
       it "it is 'g' that introduces 'j'" do
-        _(4) == "'g' is missing required attribute 'j'.\n" or fail
+        _(4) == "'g' is missing required attribute «prp: J».\n" or fail
       end
 
       it "'e' is free to reference attribute 'j' (that is descended already)" do
-        _(5) == "'e' is missing required attributes 'h' and 'j'.\n" or fail
+        _(5) == "'e' is missing required attributes «prp: H» and «prp: J».\n" or fail
       end
 
       it "'e' when referencing the visited branch 'g' says \"also\"" do

@@ -326,7 +326,7 @@ module Skylab::Brazen
 
           Home_.lib_.fields::Events::Extra.new_with(
             :name_x_a, [ kn.value_x ],
-            :did_you_mean_i_a, did_you_mean_s_a,
+            :did_you_mean_symbol_array, did_you_mean_s_a,
             :lemma, kn.name.as_human,
             :suffixed_prepositional_phrase_context_proc,
               @suffixed_contextualization_message_proc,

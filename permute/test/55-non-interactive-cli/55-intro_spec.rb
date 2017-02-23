@@ -118,7 +118,7 @@ module Skylab::Permute::TestSupport
       end
 
       it "did you mean" do
-        second_line.should be_line( :styled, :e, "did you mean 'long'?")
+        second_line.should be_line( :e, %(did you mean "long"?) )
       end
     end
 

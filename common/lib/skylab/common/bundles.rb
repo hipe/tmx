@@ -20,7 +20,7 @@ module Skylab::Common
 
     module Digraph_methods  # assumes an `call_digraph_listeners` method
 
-      Item_Grammar__ = Home_.lib_.parse::Item_Grammar.
+      Item_Grammar__ = Home_.lib_.parse::IambicGrammar::ItemGrammar_LEGACY.
         new %i( structure structifiying ), :emitter, %i( emits_to_channel )
 
       build_method = -> sp do

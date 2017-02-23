@@ -2,25 +2,22 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
-
-    TS_.describe "[fi] attributes - meta-attributes - component" do
+  describe "[fi] attributes - meta-attributes - component" do
 
       # (this is just a stub - see end of file)
 
-      TS_[ self ]
-      use :memoizer_methods
-      use :expect_event
-      Attributes::Meta_Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :expect_event
+    use :attributes_meta_attributes
 
       context "(context)" do
 
         shared_subject :entity_class_ do
 
-          class X_Component_A
+          class X_a_ma_Component_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               roland_808: :component
             )
 
@@ -61,7 +58,9 @@ module Skylab::Fields::TestSupport
           o.result.roland_808.yep.should eql [ :roland_808, :x, :y ]
         end
       end
-    end
+
+    # ==
+    # ==
   end
 end
 

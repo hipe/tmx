@@ -16,7 +16,7 @@ language production yet..
 
 
 
-## explanation of the structure near `reasons` :#"c1"
+## explanation of the structure near `reasons` :[#here.A]
 
 this member has been given the intentionally overly simple name `reasons`
 with this comment added to help future-proof it from endless future
@@ -26,7 +26,7 @@ the structure of each item is a bit of a subjunctive:
 
 at present each "reason" item is either a formal-attribute-like
 (representing a missing required field, which is the classic use case)
-*or* the item is a #[#ze-030]:#A "reasoning" structure (see).
+*or* the item is a #[#ze-030.1] "reasoning" structure (see).
 
 we want that this event structure is something like a simple recursive
 tree with the following structure:
@@ -58,7 +58,7 @@ unavailability,
 
 
 
-## this event expresses as a stream of statement-ishes :#"c2"
+## this event expresses as a stream of statement-ishes :[#here.B]
 
 a "statementish" is something like a sentence-phrase (e.g "it is
 missing FOO") or a meaningful sentence fragment (e.g "missing FOO").
@@ -72,7 +72,7 @@ the statement-ish had a subject (i.e was sentence-phrase-ish).
 
 
 
-## similar statement-ishes are aggregated into compound statement-ishes.. #"c3"
+## similar statement-ishes are aggregated into compound statement-ishes.. [#here.C]
 
 if we are missing A and we are missing B, rather that express those
 sentiments as separate statement-ishes ("missing A" "missing B"), we
@@ -116,15 +116,14 @@ without a named parent..)
 
           fig. 1.
 
-([#]/figure-1.dot is a graph-viz diagram of this.)
+([#here]/figure-1.dot is a graph-viz diagram of this.)
 
-here is a fuzzy sketch of severa expression strategies for this craziness:
+here is a fuzzy sketch of several expression strategies for this craziness:
 
   the first time a branch node is traversed, descend.
 
   each (if any) subsequent time it is traversed, do not descend.
 
-(the above section would be :~c5~.)
 
 
 if we wanted to be really cool,
@@ -144,22 +143,23 @@ if we wanted to be really cool,
 
 ## :"the story"
 
-### :"Storypoint-1":
+### :[#here.4]
 
-somewhere, somehow a recursive-style [#ze-030] "reasoning" object is created.
+somewhere, somehow a recursive-style [#ze-030.1] "reasoning" object is created.
 (happens in [ze].)
 
 
 
-### :"Storypoint-2":
 
-somewhere, somehow this recursive-style [#ze-030] "reasoning" object is added
+### :[#here.5]
+
+somewhere, somehow this recursive-style [#ze-030.1] "reasoning" object is added
 to the array of mixed reasoning objects.
 (happens in [ac].)
 
 
 
-### :"storypoint-3": depth first vs. synopses first :"c6"
+### :"storypoint-3": depth first vs. synopses first :[#here.F]
 
 we express synopses first partially so that aggregation can work:
 aggregation needs its input stream to be complete before it can flush.

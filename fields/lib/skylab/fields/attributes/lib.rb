@@ -5,10 +5,10 @@ module Skylab::Fields
     module Lib
 
       Normalize_using_defaults_and_requireds = -> sess do
-        Here_::Normalization::Normalize_using_defaults_and_requireds[ sess ]
+        Here_::Normalization::Normalize_via_Session_with_StaticAttributes[ sess ]
       end
 
-      Polymorphic_Processing_Instance_Methods = Actor::InstanceMethods
+      PolymorphicProcessingInstanceMethods = Actor::InstanceMethods
 
       class Index_of_Definition___
 
@@ -34,13 +34,18 @@ module Skylab::Fields
 
         def begin_normalization_ & x_p
 
-          o = Here_::Normalization.begin( & x_p )
+          _ = Here_::Normalization.define do |o|  # :#spot-1-3
+            # -
 
           sidx = static_index_
           o.effectively_defaultants = sidx.effectively_defaultants
           o.lookup = lookup_attribute_proc_
           o.requireds = sidx.requireds
-          o
+
+            # -
+            o.listener = x_p
+          end
+          _  # hi.
         end
 
         # --
@@ -232,7 +237,7 @@ module Skylab::Fields
           KEEP_PARSING_
         end
 
-        def __at_extra_then_raise_an_exception  # mimic #spot-1
+        def __at_extra_then_raise_an_exception  # mimic #spot-1-1
           _ev = Home_::Events::Extra.via_strange @argument_stream.head_as_is
           raise _ev.to_exception
         end
@@ -243,7 +248,7 @@ module Skylab::Fields
           if idx
 
             sidx = idx.static_index_
-            if sidx.effectively_defaultants  # [#012] #spot-2
+            if sidx.effectively_defaultants  # [#012.B]
               yes = true
             end
 

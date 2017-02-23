@@ -64,7 +64,7 @@ module Skylab::Zerk::TestSupport
       end
 
       it "levenschtein (\"did you mean..\")" do
-        second_line.should be_line( :styled, :e, %r(\Adid you mean 'add') )
+        second_line.should be_line( :e, %r(\Adid you mean "add") )
       end
 
       it "invite" do

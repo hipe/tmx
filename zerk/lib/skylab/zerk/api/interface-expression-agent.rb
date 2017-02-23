@@ -25,6 +25,12 @@ module Skylab::Zerk
 
       alias_method :calculate, :instance_exec
 
+      def simple_inflection & p
+        o = dup
+        o.extend Home_.lib_.human::NLP::EN::SimpleInflectionSession::Methods
+        o.calculate( & p )
+      end
+
       def and_ x
         _NLP_agent.and_ x
       end
@@ -52,6 +58,7 @@ module Skylab::Zerk
       def ick x
         Home_.lib_.basic::String.via_mixed x
       end
+      alias_method :ick_mixed, :ick
 
       def indefinite_noun lemma_s
         _NLP_agent.indefinite_noun lemma_s

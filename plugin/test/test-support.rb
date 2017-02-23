@@ -26,6 +26,13 @@ module Skylab::Plugin::TestSupport
     end
   end  # >>
 
+  Home_ = ::Skylab::Plugin
+  Common_ = Home_::Common_
+  Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
+
+  # -- module methods and instance methods
+
     The_use_method___ = -> sym do
       TS_.lib_( sym )[ self ]
     end
@@ -43,6 +50,10 @@ module Skylab::Plugin::TestSupport
     end
   end
 
+  # -- test support enhancement modules
+
+  Autoloader_[ self, ::File.dirname( __FILE__ ) ]
+
   Expect_Event = -> tcc do
 
     Common_.test_support::Expect_Emission[ tcc ]
@@ -54,20 +65,21 @@ module Skylab::Plugin::TestSupport
     TestSupport_::Memoization_and_subject_sharing[ tcc ]
   end
 
-  Home_ = ::Skylab::Plugin
-
-  Common_ = Home_::Common_
-
-  Common_::Autoloader[ self, ::File.dirname( __FILE__ ) ]
-
-  Lazy_ = Common_::Lazy
+  # -- plain old functions
 
   Zerk_lib_ = Lazy_.call do
-    Common_::Autoloader.require_sidesystem :Zerk
+    Autoloader_.require_sidesystem :Zerk
   end
+
+  BRAZEN = Lazy_.call do
+    _ = Autoloader_.require_sidesystem :Brazen
+    _  # #hi. #todo
+  end
+
+  # -- these
 
   ACHIEVED_ = true
   NIL_ = nil
-  NOTHING_ = nil
+  NOTHING_ = Home_::NOTHING_
   TS_ = self
 end

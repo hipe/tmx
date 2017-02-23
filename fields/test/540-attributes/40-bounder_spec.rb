@@ -2,22 +2,21 @@ require_relative '../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes   # #[#017]
-  module Attributes
+  describe "[fi] attributes - bounder" do
 
-    TS_.describe "[fi] attributes - bounder" do
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes
 
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes[ self ]
+    # ==
 
       context "(context)" do
 
         shared_subject :entity_class_ do
 
-          class X_A_Bounder_A
+          class X_a_b_NoSee_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes.lib.call(
               age: :_write,
               pet: :list,
               hobby: :_write,
@@ -76,5 +75,8 @@ module Skylab::Fields::TestSupport
         Home_::Attributes::Bounder
       end
     end
-  end
+  # ==
+
+  # ==
+  # ==
 end

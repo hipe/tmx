@@ -104,7 +104,7 @@ module Skylab::Fields
   private
     def bld_lnn
       n = name
-      n[ n.rindex( Entity::CONST_SEP_ ) + 2 .. -1 ].downcase.intern
+      n[ n.rindex( CONST_SEP_ ) + 2 .. -1 ].downcase.intern
     end
   public
 

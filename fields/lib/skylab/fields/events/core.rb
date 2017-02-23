@@ -11,9 +11,10 @@ module Skylab::Fields
 
       :missing_required_attributes,
 
-      :reasons, nil,  # #"c1"
+      :reasons, nil,  # #[#here.A]
       :selection_stack, nil,
       :lemma, DEFAULT_PROPERTY_LEMMA_,
+      :USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER, :par,
       :exception_class_by, -> { Home_::MissingRequiredAttributes },  # ..
       :error_category, :argument_error,
       :ok, false,
@@ -49,7 +50,7 @@ module Skylab::Fields
         end
       end  # >>
 
-      # this event expresses as a stream of statement-ishes.. #"c2"
+      # this event expresses as a stream of statement-ishes.. #[#here.B]
 
       def _begin_expression_session_for y, expag
         dup.___init_dup_for_expression y, expag
@@ -66,10 +67,10 @@ module Skylab::Fields
         :_recurse_memory,
       )
 
-      # algorithm overview at #"c6". at present this recursion is self-
+      # algorithm overview at [#here.F]. at present this recursion is self-
       # contained: the subject node "knows" that it is recursing with other
       # instances of its own class. but imagine that one day it might not
-      # because we would like to open it up when a need arises :#here.
+      # because we would like to open it up when a need arises :#here-1
 
       def _express
 
@@ -133,6 +134,7 @@ module Skylab::Fields
         _reason = Missing_Required_Attribute_Synopsis_Predicate.new_by_ do |o|
           o.attribute_lemma_symbol = @lemma
           o.formal_attribute = nf
+          o.THIS_ONE_METHOD = @USE_THIS_EXPRESSION_AGENT_METHOD_TO_DESCRIBE_THE_PARAMETER
         end
 
         _ = _reason.to_predicateish_sexp_
@@ -167,7 +169,7 @@ module Skylab::Fields
             :early_adverbial_phrase, adv,
             :surface_verb, _styled_surface_verb,
           ],
-        ]  # near #here
+        ]  # near #here-1
 
         @_recurses.add_sexp _hard_coded_for_now
 
@@ -207,7 +209,7 @@ module Skylab::Fields
 
         em_a = reason_x.emissions
         if 1 < em_a.length
-          self._DESIGN_ME  # #open [#ze-030]:#A
+          self._DESIGN_ME  # #open [#ze-030.1]
         end
 
         em = em_a.fetch 0

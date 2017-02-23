@@ -217,7 +217,7 @@ module Skylab::Zerk
 
         def execute
           me = self
-          @listener.call :error, :expression, :parse_error do |y|
+          @listener.call :error, :expression, :parse_error, :unknown_operator do |y|
             o = me.for y, self
             o.__express_unrecognized_operator
             o.__express_splay_of_available_operators

@@ -2,7 +2,7 @@ module Skylab::Fields
 
   class Attributes
 
-    class Bounder  # ANCIENT
+    class Bounder  # ANCIENT - like an early [#ca-004] qkn that's writable
 
       class << self
 
@@ -31,7 +31,7 @@ module Skylab::Fields
         Bound___.new @session, _attr
       end
 
-      class Bound___  # much like a writable [#ca-004] qkn
+      class Bound___
 
         # (note we scrapped TONS of blah blah because it wasn't covered..)
 
@@ -55,7 +55,8 @@ module Skylab::Fields
           "cannot read, is known unknown - #{ ivar }"
         end
       end
-    end
-  end
+
+    end  # bounder
+  end  # attributes
 end
 # #tombsone: rewrote from ANCIENT. not-covered behavior was archived.

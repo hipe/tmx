@@ -56,7 +56,7 @@ family thread:
     new components during this work, we need only check the values of
     existing components.
 
-  • because its in scope, "definition-based" defaults get effected here
+  • because it's in scope, "definition-based" defaults get effected here
     too. (non-proc-based implementations may have their own form of
     effectively defaulting component values.) HOWEVER, a corollary of
     the above bullet and this one is that default values do NOT get

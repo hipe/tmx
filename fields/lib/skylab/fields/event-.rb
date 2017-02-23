@@ -18,6 +18,7 @@ module Skylab::Fields
 
       Prototype = Lazy_.call do
         o = _begin_toplevel_prototype
+        o.THIS_ONE_METHOD = :par
         o.attribute_lemma_symbol = DEFAULT_PROPERTY_LEMMA_
         o.modifier_word_list = %w( required )
         o.freeze
@@ -31,11 +32,14 @@ module Skylab::Fields
         :attribute_lemma_symbol,
         :formal_attribute,
         :modifier_word_list,
+        :THIS_ONE_METHOD,
       )
 
       def to_predicateish_sexp_
 
-        _guy = [ :for_expag, :par, @formal_attribute ]
+        _m = @THIS_ONE_METHOD or self._SANITY
+
+        _guy = [ :for_expag, _m, @formal_attribute ]
 
         [ :predicateish,  # as demonstrated in test [#hu-053]
           :lemma, :be,
@@ -135,6 +139,11 @@ module Skylab::Fields
 
     # ==
 
+    Scanner_ = -> a do
+      Common_::Scanner.via_array a
+    end
+
+    # ==
   end
 end
 # #history: abstracted from the "missing" event

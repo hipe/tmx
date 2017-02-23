@@ -3,6 +3,9 @@ require 'skylab/common'
 module Skylab::Brazen
 
   Common_ = ::Skylab::Common
+  Autoloader_ = Common_::Autoloader
+  Lazy_ = Common_::Lazy
+  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   class << self
 
@@ -83,8 +86,6 @@ module Skylab::Brazen
 
   # --
 
-  Lazy_ = Common_::Lazy
-
   Ordered_stream_via_participating_stream = -> do  # 1x here, 1x [tm]
 
     prototype = Lazy_.call do
@@ -102,8 +103,6 @@ module Skylab::Brazen
   end.call
 
   # --
-
-  Autoloader_ = Common_::Autoloader
 
   module Collection_Adapters
 
@@ -123,6 +122,12 @@ module Skylab::Brazen
     end
 
     Autoloader_[ self ]
+  end
+
+  lazily :Actionesque_ProduceBoundCall do
+
+    _wee = Home_.lib_.plugin::ModelCentricOperatorBranch
+    _wee::LEGACY_Brazen_Actionesque_ProduceBoundCall
   end
 
   # ==
@@ -223,8 +228,6 @@ module Skylab::Brazen
   end
 
   # ==
-
-  Autoloader_[ self, Common_::Without_extension[ __FILE__ ] ]
 
   ACHIEVED_ = true
   ACTIONS_CONST = :Actions

@@ -2,22 +2,19 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes_meta_attributes  # #[#017]
-  module Attributes::Meta_Attributes
+  describe "[fi] attributes - meta-attributes - hook" do
 
-    TS_.describe "[fi] attributes - meta-attributes - hook" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes::Meta_Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes_meta_attributes
 
       context "intro" do
 
         shared_subject :entity_class_ do
 
-          class X_Hook_A
+          class X_a_ma_Hook_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes::Meta_Attributes.lib.call(
               error: :hook,
             )
 
@@ -77,6 +74,8 @@ module Skylab::Fields::TestSupport
           end
         end
       end
-    end
+
+    # ==
+    # ==
   end
 end

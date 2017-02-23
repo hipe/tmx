@@ -43,7 +43,7 @@ module Skylab::Zerk
 
           @did_emit_ = true
 
-          # (be *the* contributor of [#fi-036]:"Storypoint-1":)
+          # (be *the* contributor of a [#fi-036.4] reasoning object:)
           _reasoning = ( @_reasoning ||= Reasoning___.new( fo ) )
           _reasoning.__add i_a, & ev_p
 

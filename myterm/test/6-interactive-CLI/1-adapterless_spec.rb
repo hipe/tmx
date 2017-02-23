@@ -47,7 +47,7 @@ module Skylab::MyTerm::TestSupport
       end
 
       it "did you mean (IMPROVE THIS)" do
-        second_line == "did you mean '\e[32mimagemagick\e[0m'?" or fail
+        second_line == %(did you mean "imagemagick"?) or fail
       end
     end
   end

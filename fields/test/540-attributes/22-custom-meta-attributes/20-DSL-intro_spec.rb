@@ -2,22 +2,19 @@ require_relative '../../test-support'
 
 module Skylab::Fields::TestSupport
 
-  TS_.require_ :attributes  # #[#017]
-  module Attributes
+  describe "[fi] attributes - meta-attributes - DSL experiment (P.o.C)" do
 
-    TS_.describe "[fi] attributes - meta-attributes - DSL experiment (P.o.C)" do
-
-      TS_[ self ]
-      use :memoizer_methods
-      Attributes[ self ]
+    TS_[ self ]
+    use :memoizer_methods
+    use :attributes
 
       context "flag-based meta-attribute" do
 
         shared_subject :entity_class_ do
 
-          class X_MA_DSL_E_A
+          class X_a_cma_DSL_A
 
-            attrs = Subject_module_[].call(
+            attrs = Attributes.lib.call(
               social_security_number: :highly_sensitive,
               last_name: nil,
             )
@@ -44,6 +41,8 @@ module Skylab::Fields::TestSupport
       end
 
       # (we will also likely implement & test a plain old valued meta-attribute)
-    end
+
+    # ==
+    # ==
   end
 end

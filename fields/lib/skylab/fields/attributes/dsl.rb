@@ -173,5 +173,4 @@ module Skylab::Fields
     end
   end
 end
-
 # #history: broke out at #spot-3
