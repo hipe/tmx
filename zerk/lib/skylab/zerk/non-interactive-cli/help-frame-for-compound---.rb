@@ -123,8 +123,8 @@ module Skylab::Zerk
               operation: Operation_as_Item___,
             }
 
-            @modality_frame_.to_navigational_node_ticket_stream_.map_by do |nt|
-              h.fetch( nt.node_ticket_category ).new nt, @modality_frame_
+            @modality_frame_.to_navigational_node_reference_stream_.map_by do |nt|
+              h.fetch( nt.node_reference_category ).new nt, @modality_frame_
             end
           end
 
@@ -199,7 +199,7 @@ module Skylab::Zerk
 
           def initialize nt, frame
             @_frame = frame
-            @_node_ticket = nt
+            @_node_reference = nt
           end
 
           def description_proc_for_summary_under _expag
@@ -226,11 +226,11 @@ module Skylab::Zerk
           end
 
           def ___build_formal_operation
-            @_frame.build_formal_operation_via_node_ticket_ @_node_ticket
+            @_frame.build_formal_operation_via_node_reference_ @_node_reference
           end
 
           def name
-            @_node_ticket.name
+            @_node_reference.name
           end
         end
 

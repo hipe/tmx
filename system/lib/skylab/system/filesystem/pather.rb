@@ -76,9 +76,9 @@ module Skylab::System
           a = nil
 
           @_converters.each do |cvrtr|
-            ticket = cvrtr._ticket_for ar
-            ticket or next
-            ( a ||= [] ).push ticket
+            reference = cvrtr._reference_for ar
+            reference or next
+            ( a ||= [] ).push reference
           end
 
           if a
@@ -119,7 +119,7 @@ module Skylab::System
 
       class PWD_Converter___
 
-        def _ticket_for ar
+        def _reference_for ar
           ti = super
           if ti
             # if we found a conversion that can be made and we would have
@@ -244,7 +244,7 @@ module Skylab::System
           @string_array = s_a
         end
 
-        def _ticket_for ar
+        def _reference_for ar
           Conversion__.new( ar, self ).execute
         end
 

@@ -9,12 +9,12 @@ module Skylab::Zerk
         _.expression_agent  # LOOK
         _.compound_frame  # LOOK
 
-        @load_ticket = lt
+        @loadable_reference = lt
       end
 
       def execute
 
-        @_qk = @load_ticket.to_qualified_knownness__
+        @_qk = @loadable_reference.to_qualified_knownness__
 
         _is_listy = Is_listy_[ @_qk.association.argument_arity ]
         _is_known = @_qk.is_effectively_known

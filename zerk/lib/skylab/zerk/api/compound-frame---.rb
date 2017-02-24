@@ -32,9 +32,9 @@ module Skylab::Zerk
 
       # -- read
 
-      def to_every_node_ticket_stream_  # near c.p w/ #spot-7
+      def to_every_node_reference_stream_  # near c.p w/ #spot-7
 
-        sr = reader_writer.to_node_ticket_streamer
+        sr = reader_writer.to_node_reference_streamer
 
         x = __mask__
         if x
@@ -90,7 +90,7 @@ module Skylab::Zerk
         @qualified_knownness.value_x
       end
 
-      def build_formal_operation_via_node_ticket_ nt
+      def build_formal_operation_via_node_reference_ nt
 
         stack = [ self ]  # shallow stack for now ! meh
         stack.push nt.name

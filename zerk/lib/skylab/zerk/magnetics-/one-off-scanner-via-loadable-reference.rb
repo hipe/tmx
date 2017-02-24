@@ -1,6 +1,6 @@
 module Skylab::Zerk
 
-  class Magnetics_::OneOffScanner_via_LoadTicket < Home_::MagneticBySimpleModel  # 1x
+  class Magnetics_::OneOffScanner_via_LoadableReference < Home_::MagneticBySimpleModel  # 1x
 
     # how to "splay" "mountable" "one-offs"
 
@@ -14,7 +14,7 @@ module Skylab::Zerk
       attr_writer(
         :filesystem,
         :glob_entry,
-        :load_ticket,
+        :loadable_reference,
         :stream_not_scanner,  # only while [br] #[#007.G]
       )
 
@@ -43,7 +43,7 @@ module Skylab::Zerk
       end
 
       def __resolve_nonzero_paths
-        head = @load_ticket.conventional_executable_directory_
+        head = @loadable_reference.conventional_executable_directory_
         _glob = ::File.join head, @glob_entry
         paths = @filesystem.glob _glob
         if paths.length.nonzero?
@@ -54,7 +54,7 @@ module Skylab::Zerk
 
       def __fluff_it_up
 
-        rx = @load_ticket.regexp_for_path_head_of_conventional_one_off_
+        rx = @loadable_reference.regexp_for_path_head_of_conventional_one_off_
 
         Stream_.call @paths do |path|
           md = rx.match path
@@ -64,7 +64,7 @@ module Skylab::Zerk
           Home_::Models::OneOff.define do |o|
             o.slug_tail = _slug_tail
             o.path = path
-            o.load_ticket = @load_ticket
+            o.loadable_reference = @loadable_reference
           end
         end
       end
@@ -72,9 +72,9 @@ module Skylab::Zerk
       def __remove_eponymous_executable
         # (do not include the eponymous executable in this listing for now..)
 
-        d = @paths.index @load_ticket.eponymous_executable_path_guess_
+        d = @paths.index @loadable_reference.eponymous_executable_path_guess_
         if ! d
-          _thing_without_prefix = ::File.join @__head, @load_ticket.slug
+          _thing_without_prefix = ::File.join @__head, @loadable_reference.slug
           # [my]
           d = @paths.index _thing_without_prefix
         end

@@ -4,7 +4,7 @@
              [#here.2]: help screen scraper (also tracked by [#054.3])
              [#here.1]: having to do with the "callback module"
 
-[#062]       sometimes some clients want load tickets not symbols
+[#062]       sometimes some clients want loadable references not symbols
 
 [#061]       [ section ]  (imported from [br])
              [#here.3]: tracking where colons are added
@@ -94,7 +94,7 @@
              #after [#sy-005] unify pretty path
              [#here.1]: the idea of `human_escape` is actually write-your-own
 
-[#039]       iCLI load tickets and customization DSL ..
+[#039]       iCLI loadable references and customization DSL ..
 
 [#038]       [iCLI performer] ..
 

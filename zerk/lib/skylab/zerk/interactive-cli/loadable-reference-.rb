@@ -2,13 +2,13 @@ module Skylab::Zerk
 
   class InteractiveCLI
 
-    class Load_Ticket_  # read [#039]
+    class LoadableReference_  # read [#039]
 
       class << self
 
         def [] x, nt, moda_frame
 
-          _ = Node_ticket_4_category_[ nt ]
+          _ = Node_reference_4_category_[ nt ]
           _cls = This_.const_get NT3___.fetch _
           _cls._via_three x, nt, moda_frame
         end
@@ -24,7 +24,7 @@ module Skylab::Zerk
       class Common_Customization_DSL__ < ::BasicObject
 
         def initialize lt, a_p
-          @load_ticket = lt
+          @loadable_reference = lt
           @proc = a_p
         end
 
@@ -36,10 +36,10 @@ module Skylab::Zerk
             __when_oldschool
           end
 
-          if @load_ticket.__is_masked
+          if @loadable_reference.__is_masked
             NOTHING_
           else
-            @load_ticket
+            @loadable_reference
           end
         end
 
@@ -60,28 +60,28 @@ module Skylab::Zerk
         end
 
         def ___say x
-          "needed array had #{ x.class } for '#{ @load_ticket.name.name_symbol }'"
+          "needed array had #{ x.class } for '#{ @loadable_reference.name.name_symbol }'"
         end
 
       # -- DSL
 
         def hotstring_delineation s_a
-          @load_ticket.__receive_custom_hotstring_pieces s_a ; nil
+          @loadable_reference.__receive_custom_hotstring_pieces s_a ; nil
         end
 
         def mask _=nil
-          @load_ticket.__be_masked ; nil
+          @loadable_reference.__be_masked ; nil
         end
 
         def on_change x
-          @load_ticket.__receive_on_change x ; nil
+          @loadable_reference.__receive_on_change x ; nil
         end
       end
 
-      COMMON_LEAF_INITIALIZE__ = -> node_ticket, modality_frame do
+      COMMON_LEAF_INITIALIZE__ = -> node_reference, modality_frame do
         @_moda_frame = modality_frame
-        @name = node_ticket.name
-        @node_ticket = node_ticket
+        @name = node_reference.name
+        @node_reference = node_reference
       end
 
       NonRoot_Methods__ = ::Module.new
@@ -126,8 +126,8 @@ module Skylab::Zerk
 
         attr_reader :custom_hotstring_structure
 
-        def node_ticket
-          @node_ticket  # (hi.)
+        def node_reference
+          @node_reference  # (hi.)
         end
 
         def name
@@ -140,7 +140,7 @@ module Skylab::Zerk
       class Compound_Customization_DSL__ < Common_Customization_DSL__
 
         def children x
-          @load_ticket.__receive_custom_tree_for x ; nil
+          @loadable_reference.__receive_custom_tree_for x ; nil
         end
       end
 
@@ -164,11 +164,11 @@ module Skylab::Zerk
       class Operation_Customization_DSL___ < Common_Customization_DSL__
 
         def custom_view_controller x  # this form might deprecate
-          @load_ticket._receive_custom_view_controller_proc x ; nil
+          @loadable_reference._receive_custom_view_controller_proc x ; nil
         end
 
         def custom_view_controller_by( & p )
-          @load_ticket._receive_custom_view_controller_proc p ; nil
+          @loadable_reference._receive_custom_view_controller_proc p ; nil
         end
       end
 
@@ -208,7 +208,7 @@ module Skylab::Zerk
           :primitivesque
         end
 
-        def on_load_ticket_pressed
+        def on_loadable_reference_pressed
 
           # only because boolean is primitivesque, the main work for [#044]:
 
@@ -266,11 +266,11 @@ module Skylab::Zerk
         # --
 
         def to_qualified_knownness__
-          @_moda_frame.qualified_knownness_for__ @node_ticket
+          @_moda_frame.qualified_knownness_for__ @node_reference
         end
 
         def to_knownness__
-          @_moda_frame.knownness_for__ @node_ticket
+          @_moda_frame.knownness_for__ @node_reference
         end
 
         attr_reader(
@@ -302,7 +302,7 @@ module Skylab::Zerk
 
         # --
 
-        def on_load_ticket_pressed
+        def on_loadable_reference_pressed
 
           # the default reaction to having been "pressed" as a "buttonesque"
           # is to build a new appropriate frame and push it on to the stack

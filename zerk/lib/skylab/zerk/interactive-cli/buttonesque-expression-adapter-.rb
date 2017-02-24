@@ -8,8 +8,8 @@ module Skylab::Zerk
     # of all the buttons that happen to be in that frame at the moment,
     # taking into account (for each button) either its custom hotstring
     # delineation or its slug. as such the constituency of a button is not
-    # a property to be stored within the load ticket but rather each button
-    # should store a reference to the load ticket it represents.
+    # a property to be stored within the loadable reference but rather each button
+    # should store a reference to the loadable reference it represents.
 
     class Frame
 
@@ -21,23 +21,23 @@ module Skylab::Zerk
       def initialize
 
         @_black = {}
-        @_load_ticket_d_via_slug_d = []
-        @_load_tickets = []
+        @_loadable_reference_d_via_slug_d = []
+        @_loadable_references = []
         @_sct_a = []
         @_slug_a = []
       end
 
       def add lt  # by compound frame
 
-        d = @_load_tickets.length
-        @_load_tickets.push lt
+        d = @_loadable_references.length
+        @_loadable_references.push lt
 
         sct = lt.custom_hotstring_structure
         if sct
           @_black[ sct.hotstring_for_expression ] = true
           @_sct_a[ d ] = sct
         else
-          @_load_ticket_d_via_slug_d.push d
+          @_loadable_reference_d_via_slug_d.push d
           @_slug_a.push lt.name.as_slug
         end
         NIL_
@@ -51,9 +51,9 @@ module Skylab::Zerk
 
           _slug = @_slug_a.fetch slug_d
 
-          lt_d = @_load_ticket_d_via_slug_d.fetch slug_d
+          lt_d = @_loadable_reference_d_via_slug_d.fetch slug_d
 
-          _lt = @_load_tickets.fetch lt_d
+          _lt = @_loadable_references.fetch lt_d
 
           _button = Inferred_Button___.new sct.hotstring, sct.rest, _slug, _lt
           @_sct_a[ lt_d ] = _button
@@ -66,7 +66,7 @@ module Skylab::Zerk
     class Inferred_Button___
 
       def initialize hs, rest, whole, lt
-        @load_ticket = lt
+        @loadable_reference = lt
         @hotstring_for_expression = hs
         @hotstring_to_resolve_selection = whole
         @tail = rest
@@ -79,7 +79,7 @@ module Skylab::Zerk
       attr_reader(
         :hotstring_for_expression,
         :hotstring_to_resolve_selection,
-        :load_ticket,
+        :loadable_reference,
         :tail,
       )
     end
@@ -90,14 +90,14 @@ module Skylab::Zerk
       def initialize s, s_, s__, lt
         @head = s
         @hotstring_for_expression = s_
-        @load_ticket = lt
+        @loadable_reference = lt
         @tail = s__
       end
 
       attr_reader(
         :head,
         :hotstring_for_expression,
-        :load_ticket,
+        :loadable_reference,
         :tail,
       )
 

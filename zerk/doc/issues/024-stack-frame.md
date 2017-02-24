@@ -84,7 +84,7 @@ class). this is yet another potentially "heavy lift" that we can avoid.
 
 an earlier go at this indexing involved having assymetrical streams of
 these nodes: the formal operations in these streams where in stage 2
-(they were node tickets), but the association nodes were in stage 3
+(they were node references), but the association nodes were in stage 3
 (they were "associations"). however this approach gave us downstream
 pain having to account for this assymetry in code, what with the
 irregular meta-shapes of nodes.

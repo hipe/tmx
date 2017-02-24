@@ -8,15 +8,15 @@ module Skylab::Zerk
 
     # ==
 
-    LoadTicketMethods__ = ::Module.new
+    LoadableReferenceMethods__ = ::Module.new
 
     # `_const_path_array_guess_` is #testpoint for [tmx] too :(
 
-    class LoadTicket_via_AlreadyLoaded < MonadicMagneticAndModel_
+    class LoadableReference_via_AlreadyLoaded < MonadicMagneticAndModel_
 
-      include LoadTicketMethods__
+      include LoadableReferenceMethods__
 
-      # if you need a load ticket but already have a sidesystem loaded, life is easier
+      # if you need a loadable reference but already have a sidesystem loaded, life is easier
 
       def initialize ss_mod
         @gem_name_elements = Models::GemNameElements::Via_AlreadyLoaded[ ss_mod ]
@@ -30,7 +30,7 @@ module Skylab::Zerk
 
     # ==
 
-    class LoadTicket ; include LoadTicketMethods__
+    class LoadableReference ; include LoadableReferenceMethods__
 
       def initialize gne  # GemNameElements
 
@@ -99,7 +99,7 @@ module Skylab::Zerk
 
     # ==
 
-    module LoadTicketMethods__
+    module LoadableReferenceMethods__
 
       # --
 
@@ -110,11 +110,11 @@ module Skylab::Zerk
       end
 
       def to_one_off_scanner_by
-        Home_::Magnetics_::OneOffScanner_via_LoadTicket.call_by do |o|
+        Home_::Magnetics_::OneOffScanner_via_LoadableReference.call_by do |o|
           o.glob_entry = ONE_OFF_GLOB_ENTRY___
           o.filesystem = ::Dir
           yield o
-          o.load_ticket = self
+          o.loadable_reference = self
         end
       end
 
@@ -131,7 +131,7 @@ module Skylab::Zerk
         Models::OneOff.define do |o|
           o.slug_tail = _slug_tail
           o.path = exe
-          o.load_ticket = self
+          o.loadable_reference = self
         end
       end
 
@@ -205,7 +205,7 @@ module Skylab::Zerk
       )
 
       def category_symbol
-        :zerk_sidesystem_load_ticket_category_symbol
+        :zerk_sidesystem_loadable_reference_category_symbol
       end
     end
 
@@ -219,7 +219,7 @@ module Skylab::Zerk
     Const_guess_via_segment___ = -> do
       work = -> segment do
         segment.split( UNDERSCORE_ ).map do |piece|
-          LoadTicket::Const_guess_via_piece[ piece ]
+          LoadableReference::Const_guess_via_piece[ piece ]
         end.join( EMPTY_S_ ).intern
       end
       cache = {}
@@ -232,7 +232,7 @@ module Skylab::Zerk
       end
     end.call
 
-    LoadTicket::Const_guess_via_piece = -> do
+    LoadableReference::Const_guess_via_piece = -> do
 
       # our weak, rough heuristic for guessing if a string is "probably an
       # acronym" is that it must match all of the following criteria:
@@ -278,8 +278,8 @@ module Skylab::Zerk
       end
     end.call
 
-    LoadTicket_via_AlreadyLoaded::Const_guess_via_piece =
-      LoadTicket::Const_guess_via_piece
+    LoadableReference_via_AlreadyLoaded::Const_guess_via_piece =
+      LoadableReference::Const_guess_via_piece
 
     # ==
 

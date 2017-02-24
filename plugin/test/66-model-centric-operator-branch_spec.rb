@@ -20,9 +20,9 @@ module Skylab::Plugin::TestSupport
         _ob || fail
       end
 
-      it "to LT stream - load tickets know their name based on filename alone" do
+      it "to LT stream - loadable references know their name based on filename alone" do
         _hi = _ob
-        st = _hi.to_load_ticket_stream
+        st = _hi.to_loadable_reference_stream
         lt = st.gets
         lt.name_symbol == :zib_flib || fail
       end
@@ -30,7 +30,7 @@ module Skylab::Plugin::TestSupport
       it "make that call" do
 
         _rsx = _build_resources :inigo_montoya, :wahoo
-        lt = _ob.to_load_ticket_stream.gets
+        lt = _ob.to_loadable_reference_stream.gets
         bc = lt.bound_call_of_operator_via_invocation_resouces _rsx
         _wat = bc.receiver.send bc.method_name, * bc.args, & bc.block
         _wat == [ :woohoo, :wahoo ] || fail
@@ -44,7 +44,7 @@ module Skylab::Plugin::TestSupport
           chan = a ; msg_p = p
         end
 
-        lt = _ob.to_load_ticket_stream.gets
+        lt = _ob.to_loadable_reference_stream.gets
 
         _bc = lt.bound_call_of_operator_via_invocation_resouces _rsx
 

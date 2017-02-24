@@ -355,19 +355,19 @@ module Skylab::Zerk
           ACS_::Interpretation::Touch[ asc, _reader ]
         end
 
-        def streamer_for_navigational_node_tickets_  # [#030] defines "navigational"
+        def streamer_for_navigational_node_references_  # [#030] defines "navigational"
 
-          method :to_navigational_node_ticket_stream_
+          method :to_navigational_node_reference_stream_
         end
 
-        def to_navigational_node_ticket_stream_
+        def to_navigational_node_reference_stream_
 
           @_did_big_index || _do_big_index
 
           Common_::Stream.via_nonsparse_array @__navigational_NTs
         end
 
-        def to_referenceable_node_ticket_stream__
+        def to_referenceable_node_reference_stream__
 
           @_did_big_index || _do_big_index
 
@@ -406,11 +406,11 @@ module Skylab::Zerk
             end,
           }
 
-          st = _reader.to_node_ticket_streamer.execute
+          st = _reader.to_node_reference_streamer.execute
           begin
             nt = st.gets
             nt or break
-            which.fetch( nt.node_ticket_category ).call
+            which.fetch( nt.node_reference_category ).call
             redo
           end while nil
 
@@ -433,7 +433,7 @@ module Skylab::Zerk
 
         # ~ formal operation - formal node / proc
 
-        def build_formal_operation_via_node_ticket_ nt  # should be 2x, is 1 for nau
+        def build_formal_operation_via_node_reference_ nt  # should be 2x, is 1 for nau
 
           _fo_p = _fo_proc_via_name_symbol nt.name_symbol
 
@@ -664,7 +664,7 @@ module Skylab::Zerk
 
           nt = o.execute
           if nt
-            send INIT_FORMAL_NODE___.fetch( nt.node_ticket_category ), nt
+            send INIT_FORMAL_NODE___.fetch( nt.node_reference_category ), nt
           else
             @_formal_node = nt
             nt
@@ -672,7 +672,7 @@ module Skylab::Zerk
         end
 
         APPROPRIATE_STREAMER___ = {
-          navigational: :streamer_for_navigational_node_tickets_,
+          navigational: :streamer_for_navigational_node_references_,
         }
 
         INIT_FORMAL_NODE___ = {

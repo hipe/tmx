@@ -27,17 +27,17 @@ module Skylab::Zerk
         def initialize
 
           @_custom_emitter = nil
-          @load_ticket_by = nil
+          @loadable_reference_by = nil
 
           yield self
 
           bm = remove_instance_variable :@module  # branch module
-          @load_ticket_by ||= -> const do
-            LoadTicket___.new const, bm
+          @loadable_reference_by ||= -> const do
+            LoadableReference___.new const, bm
           end
 
           @_index = Index___.new( bm,
-            remove_instance_variable( :@load_ticket_by ) )
+            remove_instance_variable( :@loadable_reference_by ) )
 
           ce = remove_instance_variable :@_custom_emitter
           if ce
@@ -71,7 +71,7 @@ module Skylab::Zerk
         # --
 
         attr_writer(
-          :load_ticket_by,
+          :loadable_reference_by,
           :module,
         )
 
@@ -89,7 +89,7 @@ module Skylab::Zerk
           @_index.__to_pair_stream_
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
           @_index.__to_normal_symbol_stream_
         end
 
@@ -101,12 +101,12 @@ module Skylab::Zerk
 
       class Index___
 
-        def initialize mod, load_ticket_by
+        def initialize mod, loadable_reference_by
 
           bx = Common_::Box.new
 
           mod.constants.each do |const|
-            item = load_ticket_by[ const ]
+            item = loadable_reference_by[ const ]
             bx.add item.name_symbol, item
           end
 
@@ -132,7 +132,7 @@ module Skylab::Zerk
 
       # ==
 
-      class LoadTicket___
+      class LoadableReference___
 
         def initialize unsanitized_const, box_mod
           @_box_module = box_mod

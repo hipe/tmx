@@ -38,7 +38,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       _acs = _ACS
 
-      _node_sr = Home_::Reflection::Node_Ticket_Streamer.via_ACS _acs
+      _node_sr = Home_::Reflection::NodeReferenceStreamer.via_ACS _acs
 
       o = Home_::Intent::Streamer.via_streamer__ _node_sr
 

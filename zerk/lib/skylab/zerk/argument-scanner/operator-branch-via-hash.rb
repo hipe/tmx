@@ -31,14 +31,14 @@ module Skylab::Zerk
         end
 
         def to_pair_stream
-          to_load_ticket_stream.map_by( & method( :pair_via_normal_symbol ) )
+          to_loadable_reference_stream.map_by( & method( :pair_via_normal_symbol ) )
         end
 
         def pair_via_normal_symbol k
           Common_::Pair.via_value_and_name @hash.fetch(k), k
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
           Stream_[ @hash.keys ]
         end
       # -

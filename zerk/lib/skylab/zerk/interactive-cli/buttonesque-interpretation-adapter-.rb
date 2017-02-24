@@ -31,7 +31,7 @@ module Skylab::Zerk
     # -- resultage
 
     o.success_map = -> bsque do
-      bsque.load_ticket
+      bsque.loadable_reference
     end
 
     o.on_event_selectively = -> * i_a, & ev_p do

@@ -60,7 +60,7 @@ module Skylab::Autonomous_Component_System
       _read_association_: :__build_read_association,
       _read_formal_operation_: :__build_read_formal_operation,
       _read_value_: :__build_value_reader,
-      _to_node_ticket_streamer_: :__build_node_ticket_streamer,
+      _to_node_reference_streamer_: :__build_node_reference_streamer,
       _write_if_not_set_: :__build_write_if_not_set,
       _write_value_: :__build_value_writer,
     }
@@ -69,7 +69,7 @@ module Skylab::Autonomous_Component_System
       _read_association_: :component_association_reader,
       _read_formal_operation_: :component_operation_reader,
       _read_value_: :component_value_reader,
-      _to_node_ticket_streamer_: :to_component_node_ticket_streamer,
+      _to_node_reference_streamer_: :to_component_node_reference_streamer,
       _write_value_: :component_value_writer,
     }
 
@@ -136,28 +136,28 @@ module Skylab::Autonomous_Component_System
 
     # -
 
-    def to_non_operation_node_ticket_stream
-      to_non_operation_node_ticket_streamer.execute
+    def to_non_operation_node_reference_stream
+      to_non_operation_node_reference_streamer.execute
     end
 
-    def to_non_operation_node_ticket_streamer
-      o = to_node_ticket_streamer
+    def to_non_operation_node_reference_streamer
+      o = to_node_reference_streamer
       o.on_operation = MONADIC_EMPTINESS_  # operation nodes don't get serialized
       o
     end
 
-    def to_node_ticket_streamer
-      @_cached[ :_to_node_ticket_streamer_ ].call
+    def to_node_reference_streamer
+      @_cached[ :_to_node_reference_streamer_ ].call
     end
 
-    def __build_node_ticket_streamer
+    def __build_node_reference_streamer
 
-      m = CUSTOM_METHOD__.fetch :_to_node_ticket_streamer_
+      m = CUSTOM_METHOD__.fetch :_to_node_reference_streamer_
       if @ACS_.respond_to? m
         @ACS_.method m
       else
         -> do
-          Home_::Reflection::Node_Ticket_Streamer.via_reader__ self
+          Home_::Reflection::NodeReferenceStreamer.via_reader__ self
         end
       end
     end

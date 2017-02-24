@@ -10,9 +10,9 @@ module Skylab::Zerk
 
         _ss_mod = lookup_sidesystem_module
 
-        _load_ticket = Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ _ss_mod ]
+        _loadable_reference = Models::Sidesystem::LoadableReference_via_AlreadyLoaded[ _ss_mod ]
 
-        _st = _load_ticket.to_one_off_scanner_by do |o|
+        _st = _loadable_reference.to_one_off_scanner_by do |o|
           o.stream_not_scanner = true
         end
 
@@ -34,7 +34,7 @@ module Skylab::Zerk
     class LEGACY_Whatever_via_OneOff___ < MonadicMagneticAndModel_
 
       def initialize oo
-        _ = oo.load_ticket.gem_name_elements.entry_string
+        _ = oo.loadable_reference.gem_name_elements.entry_string
         @name_function = Common_::Name.via_slug oo.slug
         @__one_off = oo
       end
@@ -128,7 +128,7 @@ module Skylab::Zerk
       end
 
       attr_writer(
-        :load_ticket,  # instance of the model
+        :loadable_reference,  # instance of the model
         :path,         # e.g "/Users/haxor/.gem/ruby/[..]/bin/tmx-meep-mop-frob-jibbers
         :slug_tail,    # e.g "frob-jibbers"
       )
@@ -195,7 +195,7 @@ module Skylab::Zerk
         # function below...
 
         pieces = slug.split DASH_
-        _s = @load_ticket.class::Const_guess_via_piece[ pieces.first ]  # meh
+        _s = @loadable_reference.class::Const_guess_via_piece[ pieces.first ]  # meh
         pieces[0] = _s
         pieces.join( UNDERSCORE_ ).intern
       end
@@ -205,20 +205,20 @@ module Skylab::Zerk
         # for one-offs whole filename followe convention, assume:
 
         _ = @slug_tail.gsub DASH_, UNDERSCORE_
-        "#{ @load_ticket.one_off_const_head }#{ UNDERSCORE_ }#{ _ }".intern
+        "#{ @loadable_reference.one_off_const_head }#{ UNDERSCORE_ }#{ _ }".intern
       end
 
       # --
 
       def program_name_tail_string_array
 
-        # we do *not* prepend `@load_ticket.slug` here - that should be
+        # we do *not* prepend `@loadable_reference.slug` here - that should be
         # expressed in the `program_name_head_string_array`
 
         [ slug ]
       end
 
-      def intern  # to compat with branches that use symbols for load tickets
+      def intern  # to compat with branches that use symbols for loadable references
         normal_symbol
       end
 
@@ -249,7 +249,7 @@ module Skylab::Zerk
       end
 
       attr_reader(
-        :load_ticket,
+        :loadable_reference,
         :path,
       )
 

@@ -67,11 +67,11 @@ module Skylab::Zerk
         @glob_entry ||= GLOB_STAR_
         mod = @sidesystem_module
         # ..
-          load_ticket = Home_::Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ mod ]
+          loadable_reference = Home_::Models::Sidesystem::LoadableReference_via_AlreadyLoaded[ mod ]
         # ..
 
-        @_scn = Home_::Magnetics_::OneOffScanner_via_LoadTicket.call_by do |o|
-          o.load_ticket = load_ticket
+        @_scn = Home_::Magnetics_::OneOffScanner_via_LoadableReference.call_by do |o|
+          o.loadable_reference = loadable_reference
           o.filesystem = remove_instance_variable :@filesystem_for_globbing
           o.glob_entry = remove_instance_variable :@glob_entry
         end
@@ -128,7 +128,7 @@ module Skylab::Zerk
         end
       end
 
-      def to_load_ticket_stream
+      def to_loadable_reference_stream
         if @_open
           if @CACHE.length.zero?
             _to_remaining_item_stream_DANGEROUS

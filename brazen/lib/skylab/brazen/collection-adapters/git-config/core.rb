@@ -179,7 +179,7 @@ module Skylab::Brazen
 
       def initialize a, & oes_p
         input_method_i, input_x = a
-        @input_id = Home_::Collection::Byte_Upstream_Identifier.send input_method_i, input_x
+        @input_id = Byte_upstream_reference_[].send input_method_i, input_x
         @on_event_selectively = oes_p
       end
 

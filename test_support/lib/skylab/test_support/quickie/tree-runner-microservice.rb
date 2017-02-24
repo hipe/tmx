@@ -294,10 +294,10 @@ module Skylab::TestSupport
 
         def __PARSE_HEAD_VIA_PLUGIN primary_found
 
-          _custom_load_ticket = primary_found.trueish_item_value
-          _custom_load_ticket.HELLO_LOAD_TICKET
+          _custom_loadable_reference = primary_found.trueish_item_value
+          _custom_loadable_reference.HELLO_LOADABLE_REFERENCE
 
-          d = @lazy_index.offset_of_touched_plugin_via_user_value _custom_load_ticket
+          d = @lazy_index.offset_of_touched_plugin_via_user_value _custom_loadable_reference
           pi = @lazy_index.dereference_plugin d
           ok = pi.parse_argument_scanner_head
           if ok

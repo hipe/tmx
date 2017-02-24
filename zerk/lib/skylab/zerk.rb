@@ -59,9 +59,9 @@ module Skylab::Zerk  # intro in [#001] README
     end
   end
 
-  Node_ticket_4_category_ = -> nt do  # might become :[#ac-034]. :#spot-5
+  Node_reference_4_category_ = -> nt do  # might become :[#ac-034]. :#spot-5
 
-    if :operation == nt.node_ticket_category
+    if :operation == nt.node_reference_category
       :operation
     else
       nt.association.model_classifications.category_symbol

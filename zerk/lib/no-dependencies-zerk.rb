@@ -619,11 +619,11 @@ module NoDependenciesZerk
       end
 
       def add_lazy_operators_injection_by & p
-        _add_operators_injection LazyOperatorsInjectionTicket___.new p
+        _add_operators_injection LazyOperatorsInjectionReference___.new p
       end
 
       def add_lazy_primaries_injection_by & p
-        _add_primaries_injection LazyPrimariesInjectionTicket___.new p
+        _add_primaries_injection LazyPrimariesInjectionReference___.new p
       end
 
       def add_operators_injection_by & p
@@ -724,7 +724,7 @@ module NoDependenciesZerk
           _when_operator_not_found
         else  # when ambiguous
           _scn = Scanner_via_Array.call a do |of|
-            of.load_ticket.intern  # [#ze-062]
+            of.loadable_reference.intern  # [#ze-062]
           end
           Ambiguous__[ _scn, :_operator_, @argument_scanner ]
         end
@@ -737,7 +737,7 @@ module NoDependenciesZerk
       def __all_fuzzily_matching_operators_found
         a = []
         rx = @argument_scanner.current_operator_as_matcher
-        scn = to_operator_load_ticket_scanner
+        scn = to_operator_loadable_reference_scanner
         until scn.no_unparsed_exists
           if rx =~ scn.head_as_is.intern  # honor [#062]
             a.push scn.to_found
@@ -761,8 +761,8 @@ module NoDependenciesZerk
         OperatorFound__[ injn.injector, trueish_item_value, sym ]
       end
 
-      def to_operator_load_ticket_scanner
-        OperatorLoadTicketScanner___.define do |o|
+      def to_operator_loadable_reference_scanner
+        OperatorLoadableReferenceScanner___.define do |o|
           yield o if block_given?
           o.injections = to_operators_injections_scanner
         end
@@ -770,7 +770,7 @@ module NoDependenciesZerk
 
       def to_operator_symbol_scanner
         to_operators_injections_scanner.expand_by do |injt|
-          injt.injection.to_load_ticket_scanner
+          injt.injection.to_loadable_reference_scanner
         end
       end
 
@@ -917,7 +917,7 @@ module NoDependenciesZerk
 
       def to_primary_symbol_scanner  # assume
         _to_primaries_injections_offset_scanner.expand_by do |d|
-          @_primaries_injections.fetch( d ).injection.to_load_ticket_scanner
+          @_primaries_injections.fetch( d ).injection.to_loadable_reference_scanner
         end
       end
 
@@ -927,9 +927,9 @@ module NoDependenciesZerk
 
           _inj = @_primaries_injections.fetch( d ).injection
 
-          _inj.to_load_ticket_scanner.map_by do |load_ticket|
+          _inj.to_loadable_reference_scanner.map_by do |loadable_reference|
 
-            [ d, load_ticket.intern ]  # :#TWOPLE
+            [ d, loadable_reference.intern ]  # :#TWOPLE
           end
         end
       end
@@ -983,7 +983,7 @@ module NoDependenciesZerk
 
     ScannerMethods__ = ::Module.new
 
-    class OperatorLoadTicketScanner___ < SimpleModel
+    class OperatorLoadableReferenceScanner___ < SimpleModel
       include ScannerMethods__
 
       # a custom scanner that traverses over all operators of all
@@ -1015,13 +1015,13 @@ module NoDependenciesZerk
           freeze ; nil
         else
           injection = @injections.gets_one.injection
-          load_tickets = injection.to_load_ticket_scanner
-          if load_tickets.no_unparsed_exists
+          loadable_references = injection.to_loadable_reference_scanner
+          if loadable_references.no_unparsed_exists
             advance_big
           else
             @current_injection = injection
             if ( ! @big_step_pass_filter ) || @big_step_pass_filter[ self ]
-              @_load_tickets = load_tickets
+              @_loadable_references = loadable_references
               @_advance = :_advance_small
               _advance_small
             else
@@ -1033,9 +1033,9 @@ module NoDependenciesZerk
       end
 
       def _advance_small
-        @head_as_is = @_load_tickets.gets_one
-        if @_load_tickets.no_unparsed_exists
-          remove_instance_variable :@_load_tickets
+        @head_as_is = @_loadable_references.gets_one
+        if @_loadable_references.no_unparsed_exists
+          remove_instance_variable :@_loadable_references
           @_advance = :advance_big ; nil
         end
       end
@@ -1052,22 +1052,22 @@ module NoDependenciesZerk
       )
     end
 
-    OperatorFound__ = ::Struct.new :injector, :mixed_business_value, :load_ticket
+    OperatorFound__ = ::Struct.new :injector, :mixed_business_value, :loadable_reference
 
     # --
 
-    LazyFeaturesInjectionTicket__ = ::Class.new
-    class LazyOperatorsInjectionTicket___ < LazyFeaturesInjectionTicket__
+    LazyFeaturesInjectionReference__ = ::Class.new
+    class LazyOperatorsInjectionReference___ < LazyFeaturesInjectionReference__
       def _realization_class_
         LazyOperatorsInjectionRealized__
       end
     end
-    class LazyPrimariesInjectionTicket___ < LazyFeaturesInjectionTicket__
+    class LazyPrimariesInjectionReference___ < LazyFeaturesInjectionReference__
       def _realization_class_
         LazyPrimariesInjectionRealized___
       end
     end
-    class LazyFeaturesInjectionTicket__
+    class LazyFeaturesInjectionReference__
       def initialize p
         @_injection = :__injection_initially
         @__proc = p
@@ -1112,12 +1112,12 @@ module NoDependenciesZerk
         @_substrate_adapter_.lookup_softly k
       end
 
-      def to_load_ticket_scanner
-        Scanner_by.new( & @_substrate_adapter_.to_load_ticket_stream )
+      def to_loadable_reference_scanner
+        Scanner_by.new( & @_substrate_adapter_.to_loadable_reference_stream )
       end
 
-      def load_ticket_via_symbol sym
-        @_substrate_adapter_.load_ticket_via_symbol sym
+      def loadable_reference_via_symbol sym
+        @_substrate_adapter_.loadable_reference_via_symbol sym
       end
 
       def dereference k
@@ -1139,10 +1139,10 @@ module NoDependenciesZerk
       def lookup_softly k
         @_hash[ k ]
       end
-      def to_load_ticket_scanner
+      def to_loadable_reference_scanner
         Scanner_via_Array[ @_hash.keys ]
       end
-      def load_ticket_via_symbol k
+      def loadable_reference_via_symbol k
         k
       end
       def dereference k

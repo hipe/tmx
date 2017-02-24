@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module List
 
-    class Byte_Downstream_Identifier
+    class ByteDownstreamReference
 
-      # :+[#br-019.D] comport to a semi-unified interface for writing bytes into
+      # #[#ba-062.2] comport to a semi-unified interface for writing bytes into
       # this "waypoint", when the waypoint is a mutable array presumably
       # with lines in it.
 

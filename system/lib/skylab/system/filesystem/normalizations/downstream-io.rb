@@ -279,7 +279,7 @@ module Skylab::System
 
       def byte_whichstream_identifier_
 
-        Home_::IO::Byte_Downstream_Identifier
+        Home_::IO::ByteDownstreamReference
       end
 
       def which_stream_

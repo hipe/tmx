@@ -1,4 +1,4 @@
-[#036]       [ the node ticket streamer ]
+[#036]       [ the node reference streamer ]
 
 [#035]       unified language ..
 
@@ -66,7 +66,7 @@
              ( #was: assimilated c15n into [hu] )
 
 [#019]       [ intent ]
-[#018]       [ load ticket ]  (as a concept)
+[#018]       [ loadable reference ]  (as a concept)
 [#017]       #when: [#010] finally look at keyword args
 
 [#016] #open will this treatment of "floating" steam-roll existing values?

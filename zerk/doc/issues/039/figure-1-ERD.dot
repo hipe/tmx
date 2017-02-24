@@ -21,7 +21,7 @@ digraph g {
 
   /*labels*/
 
-  LT[label="load\nticket"]
+  LT[label="load\nreference"]
   NR[label="non-root\n(a mixin)" shape=rectangle]
   NRC[label="non-root\ncompound"]
   NRNC[label="non-root\nnon-compound"]

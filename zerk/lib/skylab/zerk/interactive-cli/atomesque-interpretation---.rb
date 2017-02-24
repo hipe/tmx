@@ -43,7 +43,7 @@ module Skylab::Zerk
 
         @_event_loop.pop_me_off_of_the_stack @_
 
-        p = @_.load_ticket.on_change__
+        p = @_.loadable_reference.on_change__
         if p
           p[ @_ ]  # from the top modality frame you can reach almost anything
         end
@@ -61,7 +61,7 @@ module Skylab::Zerk
         end
 
         _ACS = @_event_loop.penultimate_frame.ACS
-        _asc = @_.load_ticket.association
+        _asc = @_.loadable_reference.association
         _st = remove_instance_variable :@__stream
 
         qk = ACS_::Interpretation::Build_value[ _st, _asc, _ACS, & _pp ]

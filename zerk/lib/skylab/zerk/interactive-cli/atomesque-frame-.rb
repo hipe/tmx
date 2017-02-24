@@ -12,7 +12,7 @@ module Skylab::Zerk
       @below_frame = bf
       @event_loop = el
       @_line_yielder = el.line_yielder
-      @load_ticket = lt
+      @loadable_reference = lt
       @_prompt_once = false  # nasty
       @UI_event_handler = el.UI_event_handler
     end
@@ -33,36 +33,36 @@ module Skylab::Zerk
 
       if @_prompt_once
         @_prompt_once = false
-        @_load_tickets_for_UI = nil
+        @_loadable_references_for_UI = nil
         NIL_
 
       else
 
-        bx = @load_ticket.association.transitive_capabilities_box
+        bx = @loadable_reference.association.transitive_capabilities_box
         if bx
           self._REVIEW
-          @_load_tickets_for_UI = bx.a_.map do |sym|
+          @_loadable_references_for_UI = bx.a_.map do |sym|
             Common_::Name.via_variegated_symbol sym
           end
 
-          Common_::Stream.via_nonsparse_array @_load_tickets_for_UI
+          Common_::Stream.via_nonsparse_array @_loadable_references_for_UI
         else
 
-          @_load_tickets_for_UI = nil
+          @_loadable_references_for_UI = nil
           NIL_
         end
       end
     end
 
-    def to_asset_ticket_stream_for_UI
-      Common_::Stream.via_nonsparse_array @_load_tickets_for_UI
+    def to_asset_reference_stream_for_UI
+      Common_::Stream.via_nonsparse_array @_loadable_references_for_UI
     end
 
     # -- user input
 
     def process_mutable_string_input s  # contrast with sibling
 
-      if @_load_tickets_for_UI  # will probably go away
+      if @_loadable_references_for_UI  # will probably go away
         s.strip!
         if s.length.zero?
           @_line_yielder << "(nothing entered.)"
@@ -101,7 +101,7 @@ module Skylab::Zerk
       # `set` (ick) will be effected through a "normal" mutation session:
 
       a = [ sym ]
-      a.push @load_ticket.name_symbol
+      a.push @loadable_reference.name_symbol
 
       _ACS = @event_loop.penultimate_frame.ACS
 
@@ -123,7 +123,7 @@ module Skylab::Zerk
     end
 
     def ___determine_listy_kn
-      Common_::Known_Known[ Is_listy_[ @load_ticket.association.argument_arity ] ]
+      Common_::Known_Known[ Is_listy_[ @loadable_reference.association.argument_arity ] ]
     end
 
     # -- events
@@ -150,13 +150,13 @@ module Skylab::Zerk
     # -- instrinsic constituency & shape reflection
 
     def name
-      @load_ticket.name
+      @loadable_reference.name
     end
 
     attr_reader(
       :below_frame,
       :event_loop,
-      :load_ticket,
+      :loadable_reference,
     )
 
     def four_category_symbol

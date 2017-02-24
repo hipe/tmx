@@ -186,7 +186,7 @@ module Skylab::Zerk
       def _when_scope_value
 
         @_si = @_oi.scope_index_
-        @_asc = @_si.node_ticket_via_node_name_symbol_( @_k ).association
+        @_asc = @_si.node_reference_via_node_name_symbol_( @_k ).association
 
         ok = __check_availability
         ok &&= __init_appropriated_component_value
@@ -258,7 +258,7 @@ module Skylab::Zerk
 
         _value_x = sing_qkn.value_x
         _plur_k = sing_asc.singplur_referent_symbol
-        _plur_asc = @_si.node_ticket_via_node_name_symbol_( _plur_k ).association
+        _plur_asc = @_si.node_reference_via_node_name_symbol_( _plur_k ).association
 
         # --
 

@@ -36,7 +36,7 @@ module Skylab::Human
 
         cache = []
         mod = @__module
-        st = @__file_tree.to_asset_ticket_stream
+        st = @__file_tree.to_asset_reference_stream
 
         Common_.stream do  # hand-written map-reduce for clarity
 

@@ -34,7 +34,7 @@ module Skylab::Plugin
     #
     # and then discover your participating sidesystems like this:
     #
-    #      st = col.to_asset_ticket_stream
+    #      st = col.to_asset_reference_stream
     #      plugin = st.gets
     #      plugin.normal_symbol  # => :some_guy
     #      plugin = st.gets
@@ -53,8 +53,8 @@ module Skylab::Plugin
       def initialize
 
         @_is_finished_caching = false
-        @_load_ticket_box = Common_::Box.new
-        @_to_LTS = :__to_asset_ticket_stream_initially
+        @_loadable_reference_box = Common_::Box.new
+        @_to_LTS = :__to_asset_reference_stream_initially
 
         yield self
         # can't freeze because caches state modes
@@ -68,17 +68,17 @@ module Skylab::Plugin
 
       def dereference sym
         if @_is_finished_caching
-          @_load_ticket_box.fetch sym
+          @_loadable_reference_box.fetch sym
         else
           __dereference_when_no_yet_cached sym
         end
       end
 
       def __dereference_when_no_yet_cached sym
-        h = @_load_ticket_box.h_
+        h = @_loadable_reference_box.h_
         x = h[ sym ]
         if ! x
-          st = to_asset_ticket_stream
+          st = to_asset_reference_stream
           begin
             x = st.gets
             x.normal_symbol == sym && break
@@ -88,11 +88,11 @@ module Skylab::Plugin
         x
       end
 
-      def to_asset_ticket_stream
+      def to_asset_reference_stream
         send @_to_LTS
       end
 
-      def __to_asset_ticket_stream_initially  # assumes at least 1 item
+      def __to_asset_reference_stream_initially  # assumes at least 1 item
 
         # when there's nothing cached
 
@@ -108,14 +108,14 @@ module Skylab::Plugin
         scn = Common_::Scanner.via_array _big_file_list
 
         @__long_path_scanner = scn
-        @_to_LTS = :__to_asset_ticket_stream_midway
+        @_to_LTS = :__to_asset_reference_stream_midway
 
         _to_this_one_stream
       end
 
-      def __to_asset_ticket_stream_midway
+      def __to_asset_reference_stream_midway
 
-        first_st = @_load_ticket_box.to_value_stream
+        first_st = @_loadable_reference_box.to_value_stream
         p = -> do
           x = first_st.gets
           if x
@@ -131,14 +131,14 @@ module Skylab::Plugin
       end
 
       def _to_this_one_stream
-        bx = @_load_ticket_box
+        bx = @_loadable_reference_box
         scn = @__long_path_scanner
         p = -> do
           _long_path = scn.gets_one
-          lt = LoadTicket_via_Path___.new _long_path
+          lt = LoadableReference_via_Path___.new _long_path
           bx.add lt.normal_symbol, lt
           if scn.no_unparsed_exists
-            @_to_LTS = :__to_asset_ticket_stream_finally
+            @_to_LTS = :__to_asset_reference_stream_finally
             remove_instance_variable :@__long_path_scanner
             @_is_finished_caching = true
             freeze
@@ -152,14 +152,14 @@ module Skylab::Plugin
         end
       end
 
-      def __to_asset_ticket_stream_finally
-        @_load_ticket_box.to_value_stream
+      def __to_asset_reference_stream_finally
+        @_loadable_reference_box.to_value_stream
       end
     end
 
     # ==
 
-    class LoadTicket_via_Path___
+    class LoadableReference_via_Path___
 
       def initialize path
         @normal_symbol =

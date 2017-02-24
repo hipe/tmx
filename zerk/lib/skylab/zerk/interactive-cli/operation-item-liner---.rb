@@ -5,7 +5,7 @@ module Skylab::Zerk
     class Operation_Item_Liner___ < Common_::Dyadic  # references reference [#038]
 
       def initialize lt, _
-        @load_ticket = lt
+        @loadable_reference = lt
         @_ = _
       end
 
@@ -33,7 +33,7 @@ module Skylab::Zerk
 
       def __try_description_proc_of_formal_operation
 
-        @_fo = @_.compound_frame.build_formal_operation_via_node_ticket_ @load_ticket.node_ticket
+        @_fo = @_.compound_frame.build_formal_operation_via_node_reference_ @loadable_reference.node_reference
         _maybe @_fo.description_proc
       end
 

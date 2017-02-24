@@ -32,12 +32,12 @@ module Skylab::Plugin::TestSupport
     it "if you touch the same plugin multiple times, same plugin instance" do
 
       subj = subject_from_state_one_
-      load_ticket = load_ticket_from_state_two_
+      loadable_reference = loadable_reference_from_state_two_
 
-      d = subj.offset_of_touched_plugin_via_user_value load_ticket
+      d = subj.offset_of_touched_plugin_via_user_value loadable_reference
       pi = subj.dereference_plugin d
 
-      d_ = subj.offset_of_touched_plugin_via_user_value load_ticket
+      d_ = subj.offset_of_touched_plugin_via_user_value loadable_reference
       pi_ = subj.dereference_plugin d_
 
       d == d_ || fail

@@ -52,15 +52,15 @@ module Skylab::TestSupport
         end
 
         def __item_normal_tuple_stream
-          @operator_branch.to_load_ticket_stream.map_by do |sym|
+          @operator_branch.to_loadable_reference_stream.map_by do |sym|
             [ :primary, sym ]
           end
         end
 
         def __description_reader
           -> k do
-            _asset_ticket = @operator_branch.dereference k
-            _ = @lazy_index.dereference_plugin_via_user_value _asset_ticket
+            _asset_reference = @operator_branch.dereference k
+            _ = @lazy_index.dereference_plugin_via_user_value _asset_reference
             _wow = _.description_proc
             _wow  # #todo
           end

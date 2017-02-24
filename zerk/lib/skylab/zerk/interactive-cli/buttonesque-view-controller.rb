@@ -5,7 +5,7 @@ module Skylab::Zerk
   class ButtonesqueViewController
 
     # specifically so that custom views can work with buttonesques in
-    # a more straightforward way - no load tickets, just labels and
+    # a more straightforward way - no loadable references, just labels and
     # event callbacks. (maybe merge later..)
 
     class << self

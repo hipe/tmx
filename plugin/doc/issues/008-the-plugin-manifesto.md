@@ -8,14 +8,13 @@ as we write this we are undertaking a full "underhaul" of the whole
 
 
 
-## objective, scope, and approach
+## objective, scope, and approach in synopsis
 
-"toolkit", not one-size-fits-most one-stop magic DSL
+  - "toolkit" not "framework": not a once-size-fits-most one-stop magic DSL
 
-no subclassing
+  - composition not subclassing (a little more boilerplate in exchange for this)
 
-independent, isolated components
-
+  - independent, isolated components
 
 
 

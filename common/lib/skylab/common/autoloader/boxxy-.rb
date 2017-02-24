@@ -151,7 +151,7 @@ module Skylab::Common
 
         def __for_now_we_will_assume_that_the_value_is_not_known_for_this_asset
 
-          at = @_probable_asset.asset_ticket
+          at = @_probable_asset.asset_reference
 
           if at.value_is_known
             # then an incorrect name was used, but why?
@@ -160,7 +160,7 @@ module Skylab::Common
 
           o = @_cm
           o.file_tree = @module.entry_tree
-          o.asset_ticket = at
+          o.asset_reference = at
           NIL
         end
 
@@ -280,7 +280,7 @@ module Skylab::Common
             end
           end
 
-          st = mod.entry_tree.to_asset_ticket_stream_proc_
+          st = mod.entry_tree.to_asset_reference_stream_proc_
           begin
             at = st.call
             at || break
@@ -336,13 +336,13 @@ module Skylab::Common
 
           head = at.entry_group.head
 
-          @asset_ticket = at
+          @asset_reference = at
           @head = head
           @name = Name.via_slug head
         end
 
         attr_reader(
-          :asset_ticket,
+          :asset_reference,
           :head,
           :name,
         )

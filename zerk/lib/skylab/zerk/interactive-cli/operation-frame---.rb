@@ -10,7 +10,7 @@ module Skylab::Zerk
 
         @below_frame = below_frame
         @event_loop = el
-        @load_ticket = lt
+        @loadable_reference = lt
         @serr = el.serr
         @UI_event_handler = el.UI_event_handler
       end
@@ -55,7 +55,7 @@ module Skylab::Zerk
 
         x = bc.receiver.send bc.method_name, * bc.args, & bc.block
 
-        p = @load_ticket.custom_view_controller_proc__
+        p = @loadable_reference.custom_view_controller_proc__
 
         @main_view_controller = mvc
 
@@ -100,7 +100,7 @@ module Skylab::Zerk
 
         # to build one, you need the full stack (because scope stack)
 
-        _p = @load_ticket.node_ticket.proc_to_build_formal_operation
+        _p = @loadable_reference.node_reference.proc_to_build_formal_operation
         _ss = Build_frame_stack_as_array_[ self ]
         _p[ _ss ]
       end
@@ -127,7 +127,7 @@ module Skylab::Zerk
       end
 
       def name
-        @load_ticket.name
+        @loadable_reference.name
       end
 
       attr_reader(

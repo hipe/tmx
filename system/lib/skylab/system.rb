@@ -131,7 +131,7 @@ module Skylab::System
 
         @_branch_module = Home_
 
-        @_load_tickets = Home_.lib_.plugin::Magnetics::
+        @_loadable_references = Home_.lib_.plugin::Magnetics::
             OperatorBranch_via_DirectoryOneDeeper.
         define do |o|
 
@@ -159,7 +159,7 @@ module Skylab::System
 
         _normal_symbol = const.downcase  # ..
 
-        @_load_tickets.dereference _normal_symbol
+        @_loadable_references.dereference _normal_symbol
 
         _subsystem_mod = @_branch_module.const_get const, false
 

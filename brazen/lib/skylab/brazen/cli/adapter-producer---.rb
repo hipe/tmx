@@ -116,7 +116,7 @@ module Skylab::Brazen
           if sm.respond_to? :entry_tree
             ft = sm.entry_tree
             if ft
-              _sm = ft.asset_ticket_via_entry_group_head _SLUG
+              _sm = ft.asset_reference_via_entry_group_head _SLUG
               if _sm
                 sm.const_get :Modalities, false
               end

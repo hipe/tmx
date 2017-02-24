@@ -2,14 +2,14 @@ module Skylab::Autonomous_Component_System
 
   module Reflection
 
-    class Node_Ticket_Streamer  # :[#036]
+    class NodeReferenceStreamer  # :[#036]
 
       # a "streamer" generally is a performer that produces a stream
       # (re-entrantly): it's like a proc that you can call multiple times,
       # each time producing a new same-ish stream.
       #
       # the subject streamer produces streams of what we now call
-      # "node tickets". the "node ticket":
+      # "node references". the "node reference":
       #
       #   • munges generally operations and components (and whatever else
       #     similar we might come up with).
@@ -17,7 +17,7 @@ module Skylab::Autonomous_Component_System
       #   • facilitates the delivery of both operation- and component- related
       #     values in a semi-uniform way.
       #
-      #   • is an implementation of a #[#018] "load ticket" - resolves the
+      #   • is an implementation of a #[#018] "loadable reference" - resolves the
       #     various implementation components of the association-or-formal
       #     lazily, as-needed.
       #
@@ -41,7 +41,7 @@ module Skylab::Autonomous_Component_System
         end
 
         def ___via_reader rdr
-          rdr.to_node_ticket_streamer
+          rdr.to_node_reference_streamer
         end
 
         def via_reader__ x
@@ -94,7 +94,7 @@ module Skylab::Autonomous_Component_System
       def default_on_association
 
         p = -> first_en do
-          node = NodeTicket_for_Assoc___.new @_reader
+          node = NodeReference_for_Assoc___.new @_reader
           p = -> en do
             node.new en
           end
@@ -109,7 +109,7 @@ module Skylab::Autonomous_Component_System
       def default_on_operation
 
         p = -> first_en do
-          node = NodeTicket_for_Operation___.new @_reader
+          node = NodeReference_for_Operation___.new @_reader
           p = -> en do
             node.new en
           end
@@ -122,7 +122,7 @@ module Skylab::Autonomous_Component_System
 
       # <-
 
-    class NodeTicket_for_Assoc___
+    class NodeReference_for_Assoc___
 
       def initialize rdr
         @__reader = rdr
@@ -231,12 +231,12 @@ module Skylab::Autonomous_Component_System
         :name_symbol,
       )
 
-      def node_ticket_category
+      def node_reference_category
         :association
       end
     end
 
-    class NodeTicket_for_Operation___
+    class NodeReference_for_Operation___
 
       def initialize reader
         @_reader = reader
@@ -263,7 +263,7 @@ module Skylab::Autonomous_Component_System
         @_entry.name_symbol
       end
 
-      def node_ticket_category
+      def node_reference_category
         :operation
       end
 

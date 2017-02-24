@@ -272,7 +272,7 @@ module Skylab::TestSupport
 
     def to_item_normal_tuple_stream_for_didactics
 
-      @_operator_branch.to_load_ticket_stream.map_by do |key_x|
+      @_operator_branch.to_loadable_reference_stream.map_by do |key_x|
         [ :primary, key_x ]
       end
     end
@@ -326,7 +326,7 @@ module Skylab::TestSupport
 
       _main_ob = lib::OperatorBranch_via_AutoloaderizedModule.define do |o|
         o.module = Here_::Operations
-        o.load_ticket_class = ModuleBasedRouting___
+        o.loadable_reference_class = ModuleBasedRouting___
       end
 
       @_operator_branch = lib::OperatorBranch_via_MultipleEntities.define do |o|

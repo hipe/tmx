@@ -324,8 +324,8 @@ module Skylab::Zerk
 
         def _map_by_expag_method m, scn
           @expression_agent.calculate do
-            scn.map_by do |mixed_load_ticket|
-              send m, mixed_load_ticket.intern  # respect [#062]
+            scn.map_by do |mixed_loadable_reference|
+              send m, mixed_loadable_reference.intern  # respect [#062]
             end
           end
         end

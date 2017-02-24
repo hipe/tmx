@@ -55,7 +55,7 @@ module Skylab::Autonomous_Component_System
           @_indexed || _index
           if instance_variable_get( ivar )
             to_entry_stream.reduce_by do |nt|
-              sym == nt.node_ticket_category
+              sym == nt.node_reference_category
             end
           end
         end
@@ -101,7 +101,7 @@ module Skylab::Autonomous_Component_System
 
           st = @_entry_stream[]
           while nt = st.gets
-            h.fetch( nt.node_ticket_category ).call
+            h.fetch( nt.node_reference_category ).call
           end
 
           freeze_me.each( & :freeze )

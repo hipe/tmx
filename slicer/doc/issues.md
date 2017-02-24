@@ -165,7 +165,7 @@
 [#042] 2012-02-06 @closed cov: add --rerun
 [#041] 2012-02-24 @closed muxer: custom event classes
 [#040] 2012-02-04 @closed porcelain: actions have descriptions
-[#038] 2012-02-04 @closed add script to show fake ticket numbers
+[#038] 2012-02-04 @closed add script to show fake reference numbers
 [#037] 2012-01-31 @closed move tree renderer to porcelain
 [#036] 2012-01-31 @closed experimental compat between face & porcelain
 [#035] 2012-01-30 @closed cleanup and refactor of tests

@@ -39,7 +39,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       dangerous_memoize :_the_memoized_array do
 
         _hi = ___the_ACS_class.new
-        _st = Home_::Reflection::Node_Ticket_Streamer.via_ACS( _hi ).call
+        _st = Home_::Reflection::NodeReferenceStreamer.via_ACS( _hi ).call
         _st.to_a
       end
 

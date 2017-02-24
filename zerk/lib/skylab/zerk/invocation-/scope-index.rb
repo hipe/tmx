@@ -35,7 +35,7 @@ module Skylab::Zerk
           mode_frames.push mode_frame
           frame_index += 1
 
-          st_ = mode_frame.to_every_node_ticket_stream_
+          st_ = mode_frame.to_every_node_reference_stream_
           begin
             nt = st_.gets
             nt or break
@@ -69,7 +69,7 @@ module Skylab::Zerk
 
       # --
 
-      def node_ticket_via_node_name_symbol_ k
+      def node_reference_via_node_name_symbol_ k
 
         @_all_NTs.fetch @_ntindex_via_name_symbol.fetch k
       end

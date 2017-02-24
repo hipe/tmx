@@ -68,7 +68,7 @@ module Skylab::Common
 
           _ft = @_parent_file_tree
 
-          at = _ft.asset_ticket_via_entry_group_head _slug
+          at = _ft.asset_reference_via_entry_group_head _slug
           if at
             eg = at.entry_group
             if eg.includes_what_is_probably_a_directory
@@ -281,26 +281,26 @@ module Skylab::Common
 
           @_a = a ; @_h = h
           @node_path = s
-          @_value_asset_ticket_cache = {}
+          @_value_asset_reference_cache = {}
           @treer = treer
         end
 
         def get_load_file_path_for__ head
 
-          at = asset_ticket_via_entry_group_head head
+          at = asset_reference_via_entry_group_head head
           if at
-            get_load_file_path_for_asset_ticket at
+            get_load_file_path_for_asset_reference at
           end
         end
 
-        def get_load_file_path_for_asset_ticket at  # [pl]
+        def get_load_file_path_for_asset_reference at  # [pl]
 
           if at.entry_group.includes_what_is_probably_a_file
             at.get_filesystem_path
           else
             # (hi.)
             _ft = child_file_tree at
-            at_ = _ft.corefile_asset_ticket_
+            at_ = _ft.corefile_asset_reference_
             if at_
               at_.get_filesystem_path
             end
@@ -314,30 +314,30 @@ module Skylab::Common
           @treer[ _child_node_path ]
         end
 
-        def corefile_asset_ticket_
-          asset_ticket_via_entry_group_head CORE_ENTRY_STEM
+        def corefile_asset_reference_
+          asset_reference_via_entry_group_head CORE_ENTRY_STEM
         end
 
-        def to_asset_ticket_stream
-          _ = to_asset_ticket_stream_proc_
+        def to_asset_reference_stream
+          _ = to_asset_reference_stream_proc_
           _ = Home_.stream( & _ )
         end
 
-        def to_asset_ticket_stream_proc_
+        def to_asset_reference_stream_proc_
           d = -1 ; head_a = @_a ; last = head_a.length - 1
           -> do
             if last != d
               d += 1
-              dereference_asset_ticket_via_entry_group_head head_a.fetch d
+              dereference_asset_reference_via_entry_group_head head_a.fetch d
             end
           end
         end
 
-        def asset_ticket_via_approximation_softly__ k
+        def asset_reference_via_approximation_softly__ k
 
           head = ( @___head_via_approximation ||= __build_approximation_cache )[ k ]
           if head
-            dereference_asset_ticket_via_entry_group_head head
+            dereference_asset_reference_via_entry_group_head head
           end
         end
 
@@ -349,26 +349,26 @@ module Skylab::Common
           h
         end
 
-        def asset_ticket_via_entry_group_head head
+        def asset_reference_via_entry_group_head head
 
           entry_group = @_h[ head ]
           if entry_group
-            @_value_asset_ticket_cache.fetch head do
-              _add_and_produce_asset_ticket entry_group, head
+            @_value_asset_reference_cache.fetch head do
+              _add_and_produce_asset_reference entry_group, head
             end
           end
         end
 
-        def dereference_asset_ticket_via_entry_group_head head  # 1x [ze]
-          @_value_asset_ticket_cache.fetch head do
-            _add_and_produce_asset_ticket @_h.fetch( head ), head
+        def dereference_asset_reference_via_entry_group_head head  # 1x [ze]
+          @_value_asset_reference_cache.fetch head do
+            _add_and_produce_asset_reference @_h.fetch( head ), head
           end
         end
 
-        def _add_and_produce_asset_ticket entry_group, head
+        def _add_and_produce_asset_reference entry_group, head
 
-          at = AssetTicketStateMachine___.new entry_group, @node_path
-          @_value_asset_ticket_cache[ head ] = at
+          at = AssetReferenceStateMachine___.new entry_group, @node_path
+          @_value_asset_reference_cache[ head ] = at
           at
         end
 
@@ -379,7 +379,7 @@ module Skylab::Common
 
       # ==
 
-      class AssetTicketStateMachine___
+      class AssetReferenceStateMachine___
 
         def initialize eg, node_path
           @entry_group = eg
@@ -421,7 +421,7 @@ module Skylab::Common
           :value_is_known,
         )
 
-        def HELLO_ASSET_TICKET
+        def HELLO_ASSET_REFERENCE
           # (can probably be removed from universe by the time you read this)
           NIL
         end

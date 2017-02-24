@@ -19,7 +19,7 @@ legend: associations with no label are \"is built with\"."
 
   # (was subgraph)
 
-    entitesque [label="entitesque\n• load ticket"]
+    entitesque [label="entitesque\n• loadable reference"]
     entitesque->el
     entitesque->fvc
 }

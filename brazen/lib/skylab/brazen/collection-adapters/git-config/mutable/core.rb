@@ -58,10 +58,10 @@ module Skylab::Brazen
             @receiver = x
           end
           def via_path x
-            @receiver.accept_input_ID Home_::Collection::Byte_Upstream_Identifier.via_path x
+            @receiver.accept_input_ID Byte_upstream_reference_[].via_path x
           end
           def via_string x
-            @receiver.accept_input_ID Home_::Collection::Byte_Upstream_Identifier.via_string x
+            @receiver.accept_input_ID Byte_upstream_reference_[].via_string x
           end
           def via_input_adapter x
             @receiver.accept_input_ID x

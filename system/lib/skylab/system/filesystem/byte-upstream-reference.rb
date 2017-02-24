@@ -2,9 +2,9 @@ module Skylab::System
 
   module Filesystem
 
-    class Byte_Upstream_Identifier  # [#003].
+    class ByteUpstreamReference  # [#003].
 
-      # a :+[#br-019] unified interface for accessing the bytes in a file.
+      # a #[#ba-062] unified interface for accessing the bytes in a file.
 
       def initialize path, & oes_p
 
@@ -40,8 +40,8 @@ module Skylab::System
 
       # ~ conversion, standard readers, reflection, etc
 
-      def to_byte_downstream_identifier
-        Home_::Filesystem::Byte_Downstream_Identifier.new @path, & @on_event_selectively
+      def to_byte_downstream_reference
+        Home_::Filesystem::ByteDownstreamReference.new @path, & @on_event_selectively
       end
 
       def is_same_waypoint_as x

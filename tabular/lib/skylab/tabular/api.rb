@@ -29,8 +29,8 @@ module Skylab::Tabular
     end
 
     def _to_bound_call_of_operator
-      if __resolve_load_ticket
-        if __load_ticket_value_looks_like_proc
+      if __resolve_loadable_reference
+        if __loadable_reference_value_looks_like_proc
           __bound_call_for_proc
         elsif __parse_args_for_operation
           __bound_call_for_operation
@@ -54,21 +54,21 @@ module Skylab::Tabular
       Common_::BoundCall[ @argument_scanner, @_executor, :call ]
     end
 
-    def __load_ticket_value_looks_like_proc
+    def __loadable_reference_value_looks_like_proc
       @argument_scanner.advance_one  # (no selection stack here)
-      x = remove_instance_variable( :@__load_ticket ).const_value
+      x = remove_instance_variable( :@__loadable_reference ).const_value
       @_executor = x
       x.respond_to? :call
     end
 
-    def __resolve_load_ticket
+    def __resolve_loadable_reference
 
       _ada = Operations_module_operator_branch___[]
 
       _lt = @argument_scanner.match_branch(
         :business_item, :value, :against_branch, _ada )
 
-      _store :@__load_ticket, _lt
+      _store :@__loadable_reference, _lt
     end
 
     define_method :_store, DEFINITION_FOR_THE_METHOD_CALLED_STORE_

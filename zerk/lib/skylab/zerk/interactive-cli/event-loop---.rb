@@ -89,10 +89,10 @@ module Skylab::Zerk
 
       a_p = @_view_maker_maker.custom_tree_array_proc__
       if a_p
-        _load_ticket = Here_::Load_Ticket_::Root.via_array_proc a_p
+        _loadable_reference = Here_::LoadableReference_::Root.via_array_proc a_p
       end
 
-      @top_frame = _build_compound_adapter top_ACS, _load_ticket
+      @top_frame = _build_compound_adapter top_ACS, _loadable_reference
 
       NIL_
     end
@@ -131,7 +131,7 @@ module Skylab::Zerk
 
     def ___attempt_to_touch_ACS_for lt
 
-      _asc = lt.node_ticket.association
+      _asc = lt.node_reference.association
       _rw = @top_frame.reader_writer
 
       ACS_::Interpretation::Touch[ _asc, _rw ].value_x  # result is ACS itself

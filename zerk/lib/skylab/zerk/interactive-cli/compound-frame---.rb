@@ -13,7 +13,7 @@ module Skylab::Zerk
       @UI_event_handler = el.UI_event_handler
 
       if lt
-        @_load_ticket = lt
+        @_loadable_reference = lt
         h = lt.custom_tree_hash__
       end
 
@@ -49,14 +49,14 @@ module Skylab::Zerk
     end
 
     def end_UI_panel_expression
-      # remove_instance_variable :@_load_tickets_for_UI  # used again ..
+      # remove_instance_variable :@_loadable_references_for_UI  # used again ..
       NIL_
     end
 
-    def to_every_node_ticket_stream_  # near c.p w/ #spot-7
+    def to_every_node_reference_stream_  # near c.p w/ #spot-7
 
-      Common_::Stream.via_nonsparse_array @_load_tickets_for_UI do |x|
-        x.node_ticket
+      Common_::Stream.via_nonsparse_array @_loadable_references_for_UI do |x|
+        x.node_reference
       end
     end
 
@@ -66,7 +66,7 @@ module Skylab::Zerk
       # do some serious indexing to make some nodes (of various sorts)
       # disabled (that is, not visible or accessible at all)..)
 
-      load_tickets = []
+      loadable_references = []
 
       # (during #description, use the above somehow ..)
 
@@ -74,7 +74,7 @@ module Skylab::Zerk
 
       h = @__any_custom_tree_hash || MONADIC_EMPTINESS_
 
-      st = reader_writer.to_node_ticket_streamer.execute
+      st = reader_writer.to_node_reference_streamer.execute
 
       begin
         nt = st.gets
@@ -86,15 +86,15 @@ module Skylab::Zerk
 
         _cust_x = h[ nt.name_symbol ]
 
-        lt = Here_::Load_Ticket_[ _cust_x, nt, self ]
+        lt = Here_::LoadableReference_[ _cust_x, nt, self ]
         lt or redo  # #mode-tweaking
 
         butz.add lt
-        load_tickets.push lt
+        loadable_references.push lt
 
         # (the remainder of this loop is for #defaults)
 
-        :association == nt.node_ticket_category or redo
+        :association == nt.node_reference_category or redo
         asc = nt.association
         p = asc.default_proc
         p or redo
@@ -103,12 +103,12 @@ module Skylab::Zerk
       end while nil
 
       @button_frame = butz.finish
-      @_load_tickets_for_UI = load_tickets
+      @_loadable_references_for_UI = loadable_references
       NIL_
     end
 
-    def to_asset_ticket_stream_for_UI
-      Common_::Stream.via_nonsparse_array @_load_tickets_for_UI
+    def to_asset_reference_stream_for_UI
+      Common_::Stream.via_nonsparse_array @_loadable_references_for_UI
     end
 
     def to_stream_for_resolving_buttonesque_selection
@@ -125,7 +125,7 @@ module Skylab::Zerk
       else
         lt = Here_::Buttonesque_Interpretation_Adapter_[ s, self ]
         if lt
-          lt.on_load_ticket_pressed
+          lt.on_loadable_reference_pressed
         end
       end
       NIL_
@@ -133,7 +133,7 @@ module Skylab::Zerk
 
     # -- reflection for ancilliaries
 
-    def build_formal_operation_via_node_ticket_ nt
+    def build_formal_operation_via_node_reference_ nt
 
       ss = Build_frame_stack_as_array_[ self ]
       ss.push nt.name
@@ -174,7 +174,7 @@ module Skylab::Zerk
     end
 
     def name  # will fail for root compound frame
-      @_load_ticket.name
+      @_loadable_reference.name
     end
 
     attr_reader(

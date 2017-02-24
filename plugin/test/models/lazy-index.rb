@@ -12,7 +12,7 @@ module Skylab::Plugin::TestSupport
 
       define_singleton_method :shared_subject, TestSupport_::DANGEROUS_MEMOIZE
 
-      def load_ticket_from_state_two_
+      def loadable_reference_from_state_two_
         tuple_from_state_two_.fetch 1
       end
 
@@ -24,12 +24,12 @@ module Skylab::Plugin::TestSupport
 
         subj, ob = tuple_from_state_one_
 
-        # (pretend that the operator branch produced the load ticket (in
-        # this branch's case an asset ticket) through streaming or whatever)
+        # (pretend that the operator branch produced the loadable reference (in
+        # this branch's case an asset reference) through streaming or whatever)
 
         _k = this_one_natural_key_
 
-        _at = ob.module.entry_tree.asset_ticket_via_entry_group_head _k
+        _at = ob.module.entry_tree.asset_reference_via_entry_group_head _k
 
         _trueish_x = EEK_TrueishItemValue___[ _at ]
 
@@ -38,16 +38,16 @@ module Skylab::Plugin::TestSupport
         [ _d, _trueish_x ]
       end
 
-      EEK_TrueishItemValue___ = ::Struct.new :asset_ticket do
+      EEK_TrueishItemValue___ = ::Struct.new :asset_reference do
 
         # (in production we now have the "trueish item value" of this one
-        # kind of operator branch be a custom "load ticket". (it's
-        # potentially confusing: often we think of the "keys" as load tickets
+        # kind of operator branch be a custom "loadable reference". (it's
+        # potentially confusing: often we think of the "keys" as loadable references
         # (even when symbols) but in this case the "values" are too). because
         # that's what we're doing in production and we're in the middle of
         # debuging it, we follow suite here too. but not it's very short-lived
 
-        def HELLO_LOAD_TICKET
+        def HELLO_LOADABLE_REFERENCE
           NIL
         end
       end

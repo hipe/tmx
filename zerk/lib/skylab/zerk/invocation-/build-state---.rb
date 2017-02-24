@@ -9,7 +9,7 @@ module Skylab::Zerk
       si = oper_index.scope_index_
       k = par.name_symbol
       @_modality_frame = si.modality_frame_via_node_name_symbol_ k
-      @_node_ticket = si.node_ticket_via_node_name_symbol_ k
+      @_node_reference = si.node_reference_via_node_name_symbol_ k
       @_parameter = par
       @_pbc = pbc
     end
@@ -25,7 +25,7 @@ module Skylab::Zerk
     end
 
     def _specialize
-      send @_node_ticket.node_ticket_category ; nil
+      send @_node_reference.node_reference_category ; nil
     end
 
   private
@@ -54,7 +54,7 @@ module Skylab::Zerk
         # (if there is such a thing) to be an association that is depended
         # upon for the purposes of sharing.
 
-        @_asc = remove_instance_variable( :@_node_ticket ).association
+        @_asc = remove_instance_variable( :@_node_reference ).association
         send @_asc.model_classifications.category_symbol
       end
 
@@ -199,9 +199,9 @@ module Skylab::Zerk
 
       def _unavailability_proc
 
-        _nt = remove_instance_variable :@_node_ticket
+        _nt = remove_instance_variable :@_node_reference
 
-        @_fo = @_modality_frame.build_formal_operation_via_node_ticket_ _nt
+        @_fo = @_modality_frame.build_formal_operation_via_node_reference_ _nt
 
         p = @_fo.unavailability_proc
         if p

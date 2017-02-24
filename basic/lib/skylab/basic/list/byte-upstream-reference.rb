@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module List
 
-    class Byte_Upstream_Identifier
+    class ByteUpstreamReference
 
-      # a :+[#br-019] unified interface for accessing the bytes of an
+      # a #[#ba-062.1] unified interface for accessing the bytes of an
       # array of strings representing the lines in a file.
 
       # shh don't tell we only ever use this to mock an IO stream opened
@@ -48,8 +48,8 @@ module Skylab::Basic
 
       # ~ fun etc.
 
-      def to_byte_downstream_identifier
-        List_::Byte_Downstream_Identifier.new @s_a
+      def to_byte_downstream_reference
+        List_::ByteDownstreamReference.new @s_a
       end
     end
   end

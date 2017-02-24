@@ -2,7 +2,7 @@ module Skylab::System
 
   module Filesystem
 
-    class Byte_Downstream_Identifier  # :+[#br-019.D]
+    class ByteDownstreamReference  # #[#ba-062.2]
 
       def initialize path, & oes_p
         @path = path

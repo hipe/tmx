@@ -314,10 +314,10 @@ module Skylab::Zerk
 
           h = @_itemer.description_proc_for_addeds_hash
           if h
-            -> symbol_or_load_ticket do
+            -> symbol_or_loadable_reference do
               # when a primary of a remote "mounted" operator, is symbol
-              ::Symbol === symbol_or_load_ticket or self._OK_FINE
-              k = symbol_or_load_ticket  # [#062] might be symbol, might be object
+              ::Symbol === symbol_or_loadable_reference or self._OK_FINE
+              k = symbol_or_loadable_reference  # [#062] might be symbol, might be object
               h[ k ] || remote[ k ]
             end
           else
@@ -338,7 +338,7 @@ module Skylab::Zerk
 
         def __available_primary_name_stream_via_operator_branch ob
 
-          _st = ob.to_load_ticket_stream.map_by do |key_x|
+          _st = ob.to_loadable_reference_stream.map_by do |key_x|
             [ :primary, key_x ]
           end
 
@@ -349,7 +349,7 @@ module Skylab::Zerk
 
         def __available_business_name_stream_via_operation_branch ob
 
-          ob.to_load_ticket_stream.map_by do |key_x|
+          ob.to_loadable_reference_stream.map_by do |key_x|
             Common_::Name.via_variegated_symbol key_x.intern
           end
         end
@@ -376,7 +376,7 @@ module Skylab::Zerk
 
           if itr.has_addeds
 
-            _ = itr.addeds_as_operator_branchish.to_load_ticket_stream.map_by do |key_x|
+            _ = itr.addeds_as_operator_branchish.to_loadable_reference_stream.map_by do |key_x|
               [ :primary, key_x ]
             end
 
@@ -1181,7 +1181,7 @@ module Skylab::Zerk
           @_box.to_pair_stream
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
           @_box.to_key_stream
         end
       end

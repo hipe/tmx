@@ -35,7 +35,7 @@ module Skylab::Autonomous_Component_System
 
         @_did || _do
 
-        nt_st = @_reader.to_non_operation_node_ticket_stream
+        nt_st = @_reader.to_non_operation_node_reference_stream
 
         bx = @formal_.parameter_box
         h = if bx
@@ -157,9 +157,9 @@ module Skylab::Autonomous_Component_System
       class Association_as_Parameter___
 
         def initialize fopa, nt
-          :association == nt.node_ticket_category || Home_._EEK
+          :association == nt.node_reference_category || Home_._EEK
           @_has_own_default_proc = false
-          @_node_ticket = nt
+          @_node_reference = nt
           @name = nt.name
           @name_symbol = nt.name_symbol
 
@@ -194,11 +194,11 @@ module Skylab::Autonomous_Component_System
         }
 
         def prepend_normalization_by & p
-          nt = @_node_ticket
+          nt = @_node_reference
           _asc_ = nt.association.prepend_normalization__ p
           _nt_ = nt.new_with_association__ _asc_
           otr = dup
-          otr.instance_variable_set :@_node_ticket, _nt_
+          otr.instance_variable_set :@_node_reference, _nt_
           otr
         end
 
@@ -271,7 +271,7 @@ module Skylab::Autonomous_Component_System
         end
 
         def _defined_association
-          @_node_ticket.association
+          @_node_reference.association
         end
 
         attr_reader(

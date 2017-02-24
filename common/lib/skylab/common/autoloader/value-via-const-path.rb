@@ -303,9 +303,9 @@ module Skylab::Common
           _node_path = @module.send NODE_PATH_METHOD_
           @_file_tree = @__file_tree_cache[ _node_path ]
           _sym = @_name.as_approximation
-          at = @_file_tree.asset_ticket_via_approximation_softly__ _sym
+          at = @_file_tree.asset_reference_via_approximation_softly__ _sym
           if at
-            @__asset_ticket = at
+            @__asset_reference = at
             ACHIEVED_
           else
             UNABLE_  # #covered-by [dt]
@@ -316,13 +316,13 @@ module Skylab::Common
 
           # there is a filesystem "node" that approximately matches the const
 
-          _at = remove_instance_variable :@__asset_ticket
+          _at = remove_instance_variable :@__asset_reference
 
           cm = Here_::ConstMissing_.new @_const_symbol, @module
 
           cm.file_tree = @_file_tree
 
-          cm.asset_ticket = _at
+          cm.asset_reference = _at
 
           cm.do_autoloaderize = @_frame_prototype.do_autoloaderize
 
@@ -334,7 +334,7 @@ module Skylab::Common
           @_name_was_corrected = false  # this must get set, so default to
             # false for those cases where the name is already correct
 
-          _nv = cm.name_value_pair_via_asset_ticket_
+          _nv = cm.name_value_pair_via_asset_reference_
 
             # if at the time of the above line the const is not defined as-is,
             # triggers the name correction hook we set above. if after that

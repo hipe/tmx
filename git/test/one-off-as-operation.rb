@@ -150,7 +150,7 @@ module Skylab::Git::TestSupport
 
     one_off_loader = -> do
       one_off_loader = nil
-      _x = Zerk_lib_[]::Models::Sidesystem::LoadTicket_via_AlreadyLoaded[ Home_ ]
+      _x = Zerk_lib_[]::Models::Sidesystem::LoadableReference_via_AlreadyLoaded[ Home_ ]
       one_off_loader = _x ; nil
     end
 

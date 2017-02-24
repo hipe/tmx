@@ -2,9 +2,9 @@ module Skylab::Basic
 
   module String
 
-    class Byte_Downstream_Identifier < String::Byte_Upstream_Identifier::Superclass
+    class ByteDownstreamReference < String::ByteUpstreamReference::Superclass
 
-      #  conform to :+[#br-019.D] a semi-unified interface for writing bytes to a string
+      #  conform to #[#ba-062.2] a semi-unified interface for writing bytes to a string
 
       # ~ reflection
 

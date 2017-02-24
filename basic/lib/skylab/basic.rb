@@ -316,7 +316,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     IO_lib = -> do
-      System_lib__[]::IO
+      System_lib[]::IO
     end
 
     NLP_EN = -> do
@@ -332,7 +332,7 @@ module Skylab::Basic  # introduction at [#020]
     end
 
     Some_stderr_IO = -> do
-      System_lib__[]::IO.some_stderr_IO
+      System_lib[]::IO.some_stderr_IO
     end
 
     Strange = -> x do  # looks better in expressions for this to be here
@@ -366,7 +366,7 @@ module Skylab::Basic  # introduction at [#020]
     Plugin = sidesys[ :Plugin ]
     Set__ = stdlib[ :Set ]
     StringIO__ = stdlib[ :StringIO ]
-    System_lib__ = sidesys[ :System ]
+    System_lib = sidesys[ :System ]
     Test_support = sidesys[ :TestSupport ]
     Time = stdlib[ :Time ]
     Zerk = sidesys[ :Zerk ]  # for CLI styling in word wrappers

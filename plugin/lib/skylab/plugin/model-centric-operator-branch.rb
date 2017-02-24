@@ -132,7 +132,7 @@ module Skylab::Plugin
         @__localize = Home_.lib_.basic::Pathname::Localizer[ gr.path_head ]
 
         @_implementor = CachingOperatorBranch__.new scn do |path|
-          __build_load_ticket_via_path path  # hi.
+          __build_loadable_reference_via_path path  # hi.
         end
       end
 
@@ -146,11 +146,11 @@ module Skylab::Plugin
         @_implementor._lookup_softly k
       end
 
-      def to_load_ticket_stream
-        @_implementor._to_load_ticket_stream
+      def to_loadable_reference_stream
+        @_implementor._to_loadable_reference_stream
       end
 
-      def __build_load_ticket_via_path path
+      def __build_loadable_reference_via_path path
 
         _tail = @__localize[ path ]
 
@@ -170,7 +170,7 @@ module Skylab::Plugin
 
         _const = @local_invocation_resources.const_cache[ _stem ]
 
-        LazyLoadTicket_for_ModelProbably___.define do |o|
+        LazyLoadableReference_for_ModelProbably___.define do |o|
           o.glob_resources = @glob_resources
           o.local_invocation_resources = @local_invocation_resources
           o.single_element_const_path = s_a
@@ -380,11 +380,11 @@ module Skylab::Plugin
     # ==
 #=== END LEGACY
 
-    class LazyLoadTicket_for_ModelProbably___ < Common_::SimpleModel
+    class LazyLoadableReference_for_ModelProbably___ < Common_::SimpleModel
 
       # when there's a file to load, do it late (hence "lazy").
       #
-      # assume the resource represented by this load ticket is (equivalent
+      # assume the resource represented by this loadable reference is (equivalent
       # to) the kind of node we put under `Models_`, i.e a business model.
       #
       # but it MIGHT actually be itself a terminal action (e.g our [sn] Ping),
@@ -407,7 +407,7 @@ module Skylab::Plugin
 
         # (must be reentrant - is evident if you run all tests in the file)
 
-        mod = dereference_load_ticket
+        mod = dereference_loadable_reference
         const = @sub_branch_const  # `Actions`, probably
         if const
           if mod.const_get const, false
@@ -434,7 +434,7 @@ module Skylab::Plugin
         end
       end
 
-      def dereference_load_ticket  # as used by [sn]. might rename to "derefence"
+      def dereference_loadable_reference  # as used by [sn]. might rename to "derefence"
         send @_business_module
       end
 
@@ -554,7 +554,7 @@ module Skylab::Plugin
         @glob_resources = gr
 
         @_implementor = CachingOperatorBranch__.new _path_scn do |path|
-          __build_load_ticket_via_path path
+          __build_loadable_reference_via_path path
         end
       end
 
@@ -562,11 +562,11 @@ module Skylab::Plugin
         @_implementor._lookup_softly k
       end
 
-      def to_load_ticket_stream
-        @_implementor._to_load_ticket_stream
+      def to_loadable_reference_stream
+        @_implementor._to_loadable_reference_stream
       end
 
-      def __build_load_ticket_via_path path
+      def __build_loadable_reference_via_path path
 
         tail = @__localize[ path ]
 
@@ -583,7 +583,7 @@ module Skylab::Plugin
           _stem = tail[ 0 ... -d ]
         end ; tail = nil
 
-        LazyLoadTicket_for_ActionProbably___.define do |o|
+        LazyLoadableReference_for_ActionProbably___.define do |o|
           o.glob_resources = @glob_resources
           o.local_invocation_resources = @local_invocation_resources
           o.stem = _stem
@@ -591,11 +591,11 @@ module Skylab::Plugin
       end
     end
 
-    class LazyLoadTicket_for_ActionProbably___ < Common_::SimpleModel
+    class LazyLoadableReference_for_ActionProbably___ < Common_::SimpleModel
 
       # when there's a file to load, do it late (hence "lazy").
       #
-      # assume the resource represented by this load ticket is (equivalent
+      # assume the resource represented by this loadable reference is (equivalent
       # to) the kind of node we put under `Actions`, i.e an action.
 
       def initialize
@@ -647,14 +647,14 @@ module Skylab::Plugin
       # -
         Zerk_::ArgumentScanner::OperatorBranch_VIA_MODULE.define do |o|
           o.module = splay
-          o.load_ticket_by = -> const do
-            AlreadyLoadedLoadTicket___.new const, splay, lirsx
+          o.loadable_reference_by = -> const do
+            AlreadyLoadedLoadableReference___.new const, splay, lirsx
           end
         end
       # -
     end
 
-    class AlreadyLoadedLoadTicket___
+    class AlreadyLoadedLoadableReference___
 
       def initialize const, splay, lirsx
 
@@ -685,13 +685,13 @@ module Skylab::Plugin
     class CachingOperatorBranch__
 
       def initialize scn, & p
-        @_cached_load_ticket_via_normal_name = {}
+        @_cached_loadable_reference_via_normal_name = {}
         @_lookup = :__lookup_when_open
         @_splay = :__splay_when_open
         @_open = true
 
         @_path_scanner = scn
-        @__ticket_via_path = p
+        @__reference_via_path = p
       end
 
       # -- exposures (all local)
@@ -700,14 +700,14 @@ module Skylab::Plugin
         send @_lookup, k
       end
 
-      def _to_load_ticket_stream
+      def _to_loadable_reference_stream
         send @_splay
       end
 
       # -- lookup
 
       def __lookup_when_open k
-        lt = @_cached_load_ticket_via_normal_name[ k ]
+        lt = @_cached_loadable_reference_via_normal_name[ k ]
         if lt ; lt ; else
           __lookup_non_cached k
         end
@@ -715,24 +715,24 @@ module Skylab::Plugin
 
       def __lookup_non_cached k
         begin
-          ticket = _gets_ticket
-          if k == ticket.name_symbol
+          reference = _gets_reference
+          if k == reference.name_symbol
             found = true
             break
           end
         end while @_open
-        found && ticket
+        found && reference
       end
 
       def __lookup_when_closed k
-        @_cached_load_ticket_via_normal_name[ k ]
+        @_cached_loadable_reference_via_normal_name[ k ]
       end
 
       # -- splay
 
       def __splay_when_open
 
-        if @_cached_load_ticket_via_normal_name.length.zero?
+        if @_cached_loadable_reference_via_normal_name.length.zero?
           _to_remaining_live_splay
         else
           __to_hybrid_splay
@@ -755,35 +755,35 @@ module Skylab::Plugin
 
       def _to_remaining_live_splay
         Common_.stream do
-          @_open && _gets_ticket
+          @_open && _gets_reference
         end
       end
 
       def _splay_of_cached
-        Stream_[ @_cached_load_ticket_via_normal_name.values ]
+        Stream_[ @_cached_loadable_reference_via_normal_name.values ]
       end
 
       # -- support
 
-      def _gets_ticket
+      def _gets_reference
 
         _path = @_path_scanner.gets_one
 
-        ticket = @__ticket_via_path[ _path ]
+        reference = @__reference_via_path[ _path ]
 
         if @_path_scanner.no_unparsed_exists
           __close
         end
 
-        @_cached_load_ticket_via_normal_name[ ticket.name_symbol ] = ticket
-        ticket
+        @_cached_loadable_reference_via_normal_name[ reference.name_symbol ] = reference
+        reference
       end
 
       def __close
         @_lookup = :__lookup_when_closed
         @_splay = :_splay_of_cached
         remove_instance_variable :@_path_scanner
-        remove_instance_variable :@__ticket_via_path
+        remove_instance_variable :@__reference_via_path
         @_open = false
         freeze
       end

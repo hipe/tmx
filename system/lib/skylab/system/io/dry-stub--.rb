@@ -56,7 +56,7 @@ module Skylab::System
 
       class << self
 
-        def the_dry_byte_downstream_identifier
+        def the_dry_byte_downstream_reference
           THE_DRY_BYTE_DOWNSTREAM_IDENTIFIER___
         end
       end

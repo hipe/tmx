@@ -70,16 +70,16 @@ module Skylab::Zerk
 
           p = @_other.method :pair_via_normal_symbol
 
-          to_load_ticket_stream.map_by do |k|
+          to_loadable_reference_stream.map_by do |k|
             p[ k ]
           end
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
 
           h = @_blacklist_hash
 
-          @_other.to_load_ticket_stream.reduce_by do |k|
+          @_other.to_loadable_reference_stream.reduce_by do |k|
             ! h[k]
           end
         end

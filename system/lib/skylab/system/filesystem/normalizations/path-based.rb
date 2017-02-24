@@ -91,9 +91,9 @@ module Skylab::System
 
         _cls = case up_or_down
         when :down
-          Home_::IO::Byte_Downstream_Identifier
+          Home_::IO::ByteDownstreamReference
         when :up
-          Home_::IO::Byte_Upstream_Identifier
+          Home_::IO::ByteUpstreamReference
         else
           raise ::ArgumentError, up_or_down
         end

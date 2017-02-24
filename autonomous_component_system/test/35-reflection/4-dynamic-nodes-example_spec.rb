@@ -16,7 +16,7 @@ module Skylab::Autonomous_Component_System::TestSupport
 
       shared_subject :_tuple do
         _o = build_root_ACS
-        st = Home_::Reflection::Node_Ticket_Streamer.via_ACS( _o ).call
+        st = Home_::Reflection::NodeReferenceStreamer.via_ACS( _o ).call
         _x = st.gets
         _xx = st.gets
         _xxx = st.gets and fail
@@ -26,7 +26,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       context "injected association" do
 
         it "knowns its own category" do
-          :association == _node.node_ticket_category or fail
+          :association == _node.node_reference_category or fail
         end
 
         it "reaches a name" do
@@ -47,7 +47,7 @@ module Skylab::Autonomous_Component_System::TestSupport
       context "injected operation (perhaps useless without more hacking)" do
 
         it "knows its own category" do
-          :operation == _node.node_ticket_category or fail
+          :operation == _node.node_reference_category or fail
         end
 
         it "reaches a name" do

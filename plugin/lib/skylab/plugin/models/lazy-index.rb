@@ -23,7 +23,7 @@ module Skylab::Plugin
       end
 
       def dereference_plugin_via_user_value lt  # #here
-        lt.HELLO_LOAD_TICKET
+        lt.HELLO_LOADABLE_REFERENCE
         dereference_plugin offset_of_touched_plugin_via_user_value lt
       end
 
@@ -33,7 +33,7 @@ module Skylab::Plugin
       end
 
       def offset_of_touched_plugin_via_user_value lt  # #here
-        lt.HELLO_LOAD_TICKET
+        lt.HELLO_LOADABLE_REFERENCE
         key_x = @operator_branch.natural_key_of lt
         @_offset_via_natural_key.fetch key_x do
           plugin = __load_plugin lt  # if nil/false, it's OK we cache that too
@@ -47,7 +47,7 @@ module Skylab::Plugin
 
       def __load_plugin lt
 
-        lt.HELLO_LOAD_TICKET
+        lt.HELLO_LOADABLE_REFERENCE
 
         cls = @operator_branch.dereference_user_value lt  # #here
         # ..

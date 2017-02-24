@@ -2,7 +2,7 @@ module Skylab::System
 
   module IO
 
-    class Byte_Upstream_Identifier < Byte_Identifer_   # :+[#br-019.D]
+    class ByteUpstreamReference < Byte_Identifer_   # #[#ba-062.1]
 
       # comport to a semi-unified interface for accessing the bytes in a stream.
       #

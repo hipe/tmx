@@ -14,7 +14,7 @@ module Skylab::Autonomous_Component_System
 
       def via_customization_and_rw_ customization_x, rw
 
-        o = rw.to_non_operation_node_ticket_streamer
+        o = rw.to_non_operation_node_reference_streamer
 
         if customization_x
           ___when_customizations customization_x, o

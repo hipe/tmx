@@ -30,7 +30,7 @@
     + if it's a component, say that.
     + if it's a formal operation or an association, say that.
       (to be indifferent to which one it is, say "formal node".)
-    + if it's a "node ticket", say that
+    + if it's a "node reference", say that
     + if it's a "node entry", say that (very low-level)
 
   • compound. (don't say "branch" here.)

@@ -1850,7 +1850,7 @@ module Skylab::Brazen
             ft = entry_tree
 
             if ft
-              _sm = ft.asset_ticket_via_entry_group_head _slug
+              _sm = ft.asset_reference_via_entry_group_head _slug
               if _sm
                 _definitely_there self, const
               end

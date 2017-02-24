@@ -114,7 +114,7 @@ module Skylab::Basic
       end
     end
 
-    class Byte_Downstream_Identifier  # :+[#br-019.D]
+    class ByteDownstreamReference  # #[#ba-062.2]
 
       def initialize yld
 

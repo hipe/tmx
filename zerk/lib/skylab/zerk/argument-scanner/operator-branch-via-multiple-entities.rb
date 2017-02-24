@@ -125,7 +125,7 @@ module Skylab::Zerk
 
             p = ob.method :dereference
 
-            ob.to_load_ticket_stream.map_by do |k|
+            ob.to_loadable_reference_stream.map_by do |k|
 
               Common_::Pair.via_value_and_name( _special_value( vs, p[k] ), k )
             end
@@ -136,12 +136,12 @@ module Skylab::Zerk
           end
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
 
           Common_::Stream.via_times @_count do |d|
             @_operator_braches.fetch d
           end.expand_by do |ob|
-            ob.to_load_ticket_stream
+            ob.to_loadable_reference_stream
           end
         end
 

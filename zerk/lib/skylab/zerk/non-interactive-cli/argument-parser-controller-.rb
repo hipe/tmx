@@ -56,7 +56,7 @@ module Skylab::Zerk
 
         par_a = oi.arguments_  # assume nonzero length
 
-        nt_d_a = oi.node_ticket_index_via_argument_index__ || EMPTY_A_
+        nt_d_a = oi.node_reference_index_via_argument_index__ || EMPTY_A_
 
         _par_d_st = Common_::Stream.via_times par_a.length
 

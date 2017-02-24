@@ -38,13 +38,13 @@ module Skylab::Basic
     private
 
       def path=
-        @buid = Home_.lib_.brazen.byte_upstream_identifier.via_path(
+        @buid = Home_::ByteStream::UpstreamReference.via_path(
           gets_one_polymorphic_value )
         KEEP_PARSING_
       end
 
       def string=
-        @buid = Home_.lib_.brazen.byte_upstream_identifier.via_string(
+        @buid = Home_::ByteStream::UpstreamReference.via_string(
           gets_one_polymorphic_value )
         KEEP_PARSING_
       end

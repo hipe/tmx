@@ -159,7 +159,7 @@ module Skylab::Plugin
 
         if Autoloader_::Is_probably_module[ x ]
 
-          _node_path = @_asset_ticket.get_node_path
+          _node_path = @_asset_reference.get_node_path
 
           Autoloader_[ x, _node_path, :autoloaderized_parent_module, @module ]
         end
@@ -173,7 +173,7 @@ module Skylab::Plugin
 
         @module.const_set @const, mod
 
-        _node_path = @_asset_ticket.get_node_path
+        _node_path = @_asset_reference.get_node_path
 
         Autoloader_[ mod, _node_path, :autoloaderized_parent_module, @module ]
 
@@ -213,7 +213,7 @@ module Skylab::Plugin
       end
 
       def _any_load_file_path
-        @file_tree.get_load_file_path_for_asset_ticket @_asset_ticket
+        @file_tree.get_load_file_path_for_asset_reference @_asset_reference
       end
 
       def __init_const
@@ -241,7 +241,7 @@ module Skylab::Plugin
 
         _result = _pf.output_node_via_input_stream @stream
 
-        @_asset_ticket = _result.value_x
+        @_asset_reference = _result.value_x
         NIL
       end
 
@@ -276,7 +276,7 @@ module Skylab::Plugin
 
         :item_stream_proc, -> do
 
-          st = ft.to_asset_ticket_stream
+          st = ft.to_asset_reference_stream
 
           Common_.stream do
 

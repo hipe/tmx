@@ -221,8 +221,9 @@
              entrypoint is better. rely on `ok` : false )
 [#021]       the API magic result shape narrative .. (was "scope kernel")
 [#020] #open  --help and --host
-[#019]       [ byte upstream identifiers. ]
-             :[#.D]: byte downstream identitfiers.
+
+[#019] #hole
+             ( #was: [ byte upstream identifiers. ] #moved-to: [#ba-062] )
              ( was: #done turn `is_positive` into `ok` to match HTTP responses )
 [#018]       #parent-node: [#013] "the model property ordering rationale.."
              ( #was: #parent-node: [#013] "model ivars..")

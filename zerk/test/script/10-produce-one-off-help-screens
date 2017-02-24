@@ -170,7 +170,7 @@ go = -> do
   exitstatus = 0
 
   require 'skylab/tmx'
-  st = Skylab::TMX.to_sidesystem_load_ticket_stream
+  st = Skylab::TMX.to_sidesystem_reference_stream
 
   counter = 0
   stay = true

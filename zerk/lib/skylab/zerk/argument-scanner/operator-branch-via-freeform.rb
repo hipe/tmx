@@ -44,7 +44,7 @@ module Skylab::Zerk
           @_box.to_pair_stream
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
           @_box.to_key_stream
         end
       # -

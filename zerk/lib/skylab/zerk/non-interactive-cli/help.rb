@@ -194,7 +194,7 @@ module Skylab::Zerk
             name = pa.name
             buffer = fmt % name.as_slug
 
-            desc_p = description_proc_for[ pa.load_ticket ]
+            desc_p = description_proc_for[ pa.loadable_reference ]
             if desc_p
               p = first_line
               _express_into y, desc_p
@@ -296,9 +296,9 @@ module Skylab::Zerk
           begin
             tuple = st.gets
             tuple || break
-            type_sym, load_ticket = tuple
-            load_ticket || ::Kernel._OOPS  # #todo
-            normal_sym = load_ticket.intern
+            type_sym, loadable_reference = tuple
+            loadable_reference || ::Kernel._OOPS  # #todo
+            normal_sym = loadable_reference.intern
             name = NAME_FOR___.fetch( type_sym )[ normal_sym ]
 
             # -- maybe increase max width
@@ -315,7 +315,7 @@ module Skylab::Zerk
               current_item_group_normal_sym = type_sym
             end
 
-            current_item_array.push Item___.new( name, load_ticket )
+            current_item_array.push Item___.new( name, loadable_reference )
             redo
           end while above
 
@@ -372,15 +372,15 @@ module Skylab::Zerk
 
       class Item___
         def initialize nm, lt
-          @load_ticket = lt
+          @loadable_reference = lt
           @name = nm
         end
         if false
         def intern # [#ze-062] (the other side)
-          @load_ticket.intern
+          @loadable_reference.intern
         end
         end
-        attr_reader :name, :load_ticket
+        attr_reader :name, :loadable_reference
         def _IS_ITEM_SANITY_CHECK_ze_  # [tmx] too
           true
         end

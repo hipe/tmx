@@ -2,7 +2,7 @@ module Skylab::Basic
 
   module String
 
-    class Byte_Upstream_Identifier < ::Class.new  # :+[#br-019.D]
+    class ByteUpstreamReference < ::Class.new  # #[#ba-062.2]
 
       # comport to a universal interface for accessing the bytes in a string.
 

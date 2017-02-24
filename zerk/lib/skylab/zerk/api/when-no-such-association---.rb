@@ -8,7 +8,7 @@ module Skylab::Zerk
 
         Require_fields_lib_[]
 
-        _st = ss.last.to_every_node_ticket_stream_
+        _st = ss.last.to_every_node_reference_stream_
 
         _st_ = _st.map_by do |qk|
           qk.name.as_variegated_symbol

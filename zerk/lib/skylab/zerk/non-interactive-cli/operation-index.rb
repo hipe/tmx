@@ -47,7 +47,7 @@ module Skylab::Zerk
         @_k = nil
         @_my_set_symbol_via_name_symbol = {}
         @_scope_node_identifier = nil
-        @_scope_node_ticket = nil
+        @_scope_node_reference = nil
 
         h = @_si.hash_for_scope_node_identifier_via_name_symbol__
         st = @stack_frame_.to_defined_formal_parameter_stream__
@@ -76,7 +76,7 @@ module Skylab::Zerk
         remove_instance_variable :@_k
         remove_instance_variable :@_parameter
         remove_instance_variable :@_scope_node_identifier
-        remove_instance_variable :@_scope_node_ticket
+        remove_instance_variable :@_scope_node_reference
         NIL_
       end
 
@@ -150,9 +150,9 @@ module Skylab::Zerk
           self._ENJOY
         end
 
-        @_scope_node_ticket = @_si.scope_node_ @_scope_node_identifier
+        @_scope_node_reference = @_si.scope_node_ @_scope_node_identifier
 
-        _ = Node_ticket_4_category_[ @_scope_node_ticket ]
+        _ = Node_reference_4_category_[ @_scope_node_reference ]
 
         m = WHEN_APPROPRIATION___.fetch _
 
@@ -177,7 +177,7 @@ module Skylab::Zerk
 
         @_my_set_symbol_via_name_symbol[ @_k ] = :_appropriated_
 
-        @_asc = @_scope_node_ticket.association
+        @_asc = @_scope_node_reference.association
 
         if :zero == @_asc.argument_arity
 
@@ -290,7 +290,7 @@ module Skylab::Zerk
 
         _d = ( @_arguments ||= [] ).length
 
-        ( @node_ticket_index_via_argument_index__ ||= [] )[ _d ] =
+        ( @node_reference_index_via_argument_index__ ||= [] )[ _d ] =
           @_scope_node_identifier
 
         @_arguments.push @_parameter ; nil
@@ -400,7 +400,7 @@ module Skylab::Zerk
       end
 
       attr_reader(
-        :node_ticket_index_via_argument_index__,
+        :node_reference_index_via_argument_index__,
         :stack_frame_,
       )
 
@@ -437,8 +437,8 @@ module Skylab::Zerk
 
         def _set_symbol_via_name_symbol k
 
-          _nt = @_si.node_ticket_via_node_name_symbol_ k
-          SET_SYMBOL_WHEN___.fetch _nt.node_ticket_category
+          _nt = @_si.node_reference_via_node_name_symbol_ k
+          SET_SYMBOL_WHEN___.fetch _nt.node_reference_category
         end
 
         SET_SYMBOL_WHEN___ = {

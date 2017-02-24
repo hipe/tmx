@@ -13,7 +13,7 @@ module Skylab::Zerk
         @_primitivesque_appropriation_op_box = nil
         @_scope_node_identifier = nil
 
-        node_tickets = []
+        node_references = []
         snivns = {}
 
         st = fo_frame.to_frame_stream_from_top_
@@ -24,21 +24,21 @@ module Skylab::Zerk
 
         begin
 
-          st_ = frame.to_referenceable_node_ticket_stream__
+          st_ = frame.to_referenceable_node_reference_stream__
           begin
 
-            @_scope_node_ticket = st_.gets
-            @_scope_node_ticket or break
+            @_scope_node_reference = st_.gets
+            @_scope_node_reference or break
 
-            @_k = @_scope_node_ticket.name_symbol
+            @_k = @_scope_node_reference.name_symbol
 
-            @_scope_node_identifier = node_tickets.length
+            @_scope_node_identifier = node_references.length
 
             snivns[ @_k ] = @_scope_node_identifier
 
-            node_tickets.push @_scope_node_ticket
+            node_references.push @_scope_node_reference
 
-            m = INDEX___.fetch Node_ticket_4_category_[ @_scope_node_ticket ]
+            m = INDEX___.fetch Node_reference_4_category_[ @_scope_node_reference ]
             # ..
             send m
 
@@ -57,31 +57,31 @@ module Skylab::Zerk
         remove_instance_variable :@_index_into_reverse_stack
         remove_instance_variable :@_k
         remove_instance_variable :@_scope_node_identifier
-        remove_instance_variable :@_scope_node_ticket
+        remove_instance_variable :@_scope_node_reference
 
         @__reverse_stack = rev_stack
         @_scope_node_identifier_via_name_symbol = snivns
-        @_scope_nodes = node_tickets
+        @_scope_nodes = node_references
         NIL_
       end
 
       INDEX___ = {
-        operation: :__index_operation_node_ticket,
-        primitivesque: :__index_primitivesque_node_ticket,
+        operation: :__index_operation_node_reference,
+        primitivesque: :__index_primitivesque_node_reference,
       }
 
-      def __index_operation_node_ticket
+      def __index_operation_node_reference
         _index_as_scope_node
       end
 
-      def __index_primitivesque_node_ticket
+      def __index_primitivesque_node_reference
 
         # index all of these as scope nodes, including both sides of
         # [#036] a singular-plural pair.
 
         _index_as_scope_node
 
-        @_asc = @_scope_node_ticket.association
+        @_asc = @_scope_node_reference.association
         send SINGPLUR___.fetch @_asc.singplur_category
         remove_instance_variable :@_asc
 
@@ -142,7 +142,7 @@ module Skylab::Zerk
         @__reverse_stack.fetch @_frame_index_via_node_identifier.fetch @_scope_node_identifier_via_name_symbol.fetch k
       end
 
-      def node_ticket_via_node_name_symbol_ k
+      def node_reference_via_node_name_symbol_ k
         @_scope_nodes.fetch @_scope_node_identifier_via_name_symbol.fetch k
       end
 

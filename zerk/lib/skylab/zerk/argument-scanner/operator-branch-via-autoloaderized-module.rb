@@ -21,7 +21,7 @@ module Skylab::Zerk
 
           @_custom_emitter = nil
           yield self
-          @load_ticket_class ||= LoadTicketIsh___
+          @loadable_reference_class ||= LoadableReferenceIsh___
 
           ce = remove_instance_variable :@_custom_emitter
           if ce
@@ -51,7 +51,7 @@ module Skylab::Zerk
         end
 
         attr_writer(
-          :load_ticket_class,
+          :loadable_reference_class,
           :module,
         )
 
@@ -59,13 +59,13 @@ module Skylab::Zerk
 
         # ~ experiment for [pl]
 
-        def natural_key_of my_custom_load_ticket  # #here
-          my_custom_load_ticket.asset_ticket.entry_group_head
+        def natural_key_of my_custom_loadable_reference  # #here
+          my_custom_loadable_reference.asset_reference.entry_group_head
         end
 
-        def dereference_user_value my_custom_load_ticket  # #here
+        def dereference_user_value my_custom_loadable_reference  # #here
 
-          at = my_custom_load_ticket.asset_ticket
+          at = my_custom_loadable_reference.asset_reference
 
           _cls = if at.value_is_known
             at.value_x  # :[#008.2] #borrow-coverage from [ts]
@@ -84,51 +84,51 @@ module Skylab::Zerk
         def lookup_softly k  # #[#ze-051.1] "trueish item value"
 
           at = @module.entry_tree.
-            asset_ticket_via_entry_group_head Slug_via_symbol__[k]
+            asset_reference_via_entry_group_head Slug_via_symbol__[k]
           if at
-            _trueish_item_value_via_asset_ticket at
+            _trueish_item_value_via_asset_reference at
           end
         end
 
         def dereference k  # #[#ze-051.1] "trueish item value"
 
           _at = @module.entry_tree.
-            dereference_asset_ticket_via_entry_group_head Slug_via_symbol__[k]
-          _trueish_item_value_via_asset_ticket _at
+            dereference_asset_reference_via_entry_group_head Slug_via_symbol__[k]
+          _trueish_item_value_via_asset_reference _at
         end
 
         def to_pair_stream
 
-          @module.entry_tree.to_asset_ticket_stream.map_by do |at|
+          @module.entry_tree.to_asset_reference_stream.map_by do |at|
 
             Common_::Pair.via_value_and_name(
-              _trueish_item_value_via_asset_ticket( at ),
+              _trueish_item_value_via_asset_reference( at ),
               Symbol_via_slug__[ at.entry_group_head ] )
           end
         end
 
-        def to_load_ticket_stream
+        def to_loadable_reference_stream
 
-          @module.entry_tree.to_asset_ticket_stream.map_by do |sm|
+          @module.entry_tree.to_asset_reference_stream.map_by do |sm|
             Symbol_via_slug__[ sm.entry_group_head ]
           end
         end
 
         def to_slug_stream  # 1x for [tmx]. not an API #hook-out
 
-          @module.entry_tree.to_asset_ticket_stream.map_by do |sm|
+          @module.entry_tree.to_asset_reference_stream.map_by do |sm|
             sm.entry_group_head
           end
         end
 
-        def _trueish_item_value_via_asset_ticket at
+        def _trueish_item_value_via_asset_reference at
 
-          @load_ticket_class.new at, @module
+          @loadable_reference_class.new at, @module
         end
 
         attr_reader(
           :emit_idea_by,
-          :load_ticket_class,
+          :loadable_reference_class,
           :module,
         )
       # -
@@ -142,19 +142,19 @@ module Skylab::Zerk
         s.gsub( DASH_, UNDERSCORE_ ).intern
       end
 
-      class LoadTicketIsh___  # :#here
+      class LoadableReferenceIsh___  # :#here
 
         def initialize at, mod
-          @asset_ticket = at
+          @asset_reference = at
           @module = mod
         end
 
         attr_reader(
-          :asset_ticket,
+          :asset_reference,
           :module,
         )
 
-        def HELLO_LOAD_TICKET  # #temporary
+        def HELLO_LOADABLE_REFERENCE  # #temporary
           NIL
         end
       end
