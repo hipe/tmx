@@ -472,6 +472,7 @@ module Skylab::TanMan::TestSupport
   Home_ = ::Skylab::TanMan
 
   ACHIEVED_ = true
+  Byte_upstream_reference_ = Home_::Byte_upstream_reference_
   COMMON_MISS_ = :missing_required_attributes
   DASH_ = Home_::DASH_
   EMPTY_A_ = Home_::EMPTY_A_

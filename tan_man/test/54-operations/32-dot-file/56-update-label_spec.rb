@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - dot file - update label" do
+  describe "[tm] operations - dot file - update label", wip: true do
 
     TS_[ self ]
     use :models_dot_file

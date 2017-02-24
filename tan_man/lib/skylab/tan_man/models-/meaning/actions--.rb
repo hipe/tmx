@@ -2,6 +2,7 @@ module Skylab::TanMan
 
   class Models_::Meaning  # re-opening
 
+    if false
     edit_entity_class(
 
       :persist_to, :meaning,
@@ -101,6 +102,7 @@ module Skylab::TanMan
     NAME_ = 'name'.freeze
     NEWLINE_ = "\n".freeze
     VALUE_ = 'value'.freeze
+    end
 
   end
 end

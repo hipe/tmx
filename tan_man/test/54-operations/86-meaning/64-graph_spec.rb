@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - meaning graph (resolving (i.e expand NT into N T's))" do
+  describe "[tm] operations - meaning graph (resolving (i.e expand NT into N T's))", wip: true do
 
     TS_[ self ]
     use :the_method_called_let

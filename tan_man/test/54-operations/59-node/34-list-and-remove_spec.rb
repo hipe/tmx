@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] node list and remove" do
+  describe "[tm] node list and remove", wip: true do
 
     TS_[ self ]
     use :models_node

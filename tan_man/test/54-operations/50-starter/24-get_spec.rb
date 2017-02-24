@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - starter get" do
+  describe "[tm] operations - starter get", wip: true do
 
     TS_[ self ]
     use :operations

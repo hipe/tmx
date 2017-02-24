@@ -21,14 +21,6 @@ module Skylab::Brazen
       Home_::Nodesque::Methods::Branchesque_Defaults
     end
 
-    def byte_downstream_identifier
-      Home_::Collection::Byte_Downstream_Identifier
-    end
-
-    def byte_upstream_identifier
-      Home_::Collection::Byte_Upstream_Identifier
-    end
-
     def cfg
       Home_::Collection_Adapters::Git_Config
     end
@@ -164,6 +156,10 @@ module Skylab::Brazen
     Common_::Stream.via_nonsparse_array a, & p
   end
 
+  Byte_upstream_reference_ = -> do
+    Home_.lib_.basic::ByteStream::UpstreamReference
+  end
+
   Zerk_lib_ = Lazy_.call do
     Home_.lib_.zerk
   end
@@ -181,10 +177,6 @@ module Skylab::Brazen
       :build_require_stdlib_proc )
 
     define_singleton_method :_memoize, Common_::Lazy
-
-    IO_lib = -> do
-      System_lib[]::IO
-    end
 
     Module_lib = -> do
       Basic[]::Module

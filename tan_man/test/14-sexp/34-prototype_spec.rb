@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] sexp prototype" do
+  describe "[tm] sexp prototype", wip: true do
 
     TS_[ self ]
     use :sexp_prototype

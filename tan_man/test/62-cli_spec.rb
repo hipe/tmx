@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] CLI" do
+  describe "[tm] CLI", wip: true do
 
     TS_[ self ]
 

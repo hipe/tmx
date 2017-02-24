@@ -1,4 +1,5 @@
-require 'skylab/brazen'
+require 'skylab/common'
+# require 'skylab/brazen'
 
 module Skylab::TanMan
 
@@ -11,9 +12,11 @@ module Skylab::TanMan
 
   class << self
 
+    if false
     define_method :application_kernel_, ( Lazy_.call do
       Brazen_::Kernel.new Home_
     end )
+    end
 
     def lib_
       @___lib ||= Common_.produce_library_shell_via_library_and_app_modules(
@@ -46,6 +49,14 @@ module Skylab::TanMan
   end
 
   # ==
+
+  Byte_downstream_reference_ = Lazy_.call do
+    Home_.lib_.basic::ByteStream::DownstreamReference
+  end
+
+  Byte_upstream_reference_ = Lazy_.call do
+    Home_.lib_.basic::ByteStream::UpstreamReference
+  end
 
   Attributes_actor_ = -> cls, * a do
     Home_.lib_.fields::Attributes::Actor.via cls, a
@@ -136,15 +147,15 @@ module Skylab::TanMan
   Autoloader_[ self, Common_::Without_extension[ __FILE__ ]]
 
   ACHIEVED_ = true
-  Brazen_ = ::Skylab::Brazen
+  # Brazen_ = ::Skylab::Brazen
   CONST_SEP_ = '::'.freeze
   DASH_ = '-'.freeze
   EMPTY_A_ = [].freeze
   EMPTY_P_ = -> {}
   EMPTY_S_ = ''.freeze
-  stowaway :Entity_, 'models-'
+  # stowaway :Entity_, 'models-'
   FILE_SEPARATOR_ = ::File::SEPARATOR
-  stowaway :Kernel_, 'models-'
+  # stowaway :Kernel_, 'models-'
   NEWLINE_ = "\n".freeze
   NIL_ = nil
   NOTHING_ = nil

@@ -2,7 +2,7 @@ require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - intro" do
+  describe "[tm] operations - intro", wip: true do
 
     TS_[ self ]
 

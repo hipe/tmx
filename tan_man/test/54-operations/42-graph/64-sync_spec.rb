@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport
   # case 7      Y  error - no output
   # case 8         error - no input, no output
 
-  describe "[tm] operations - graph - sync" do
+  describe "[tm] operations - graph - sync", wip: true do
 
     TS_[ self ]
     use :operations

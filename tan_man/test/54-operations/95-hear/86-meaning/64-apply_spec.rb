@@ -2,7 +2,7 @@ require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - hear - meaning - apply" do
+  describe "[tm] operations - hear - meaning - apply", wip: true do
 
     TS_[ self ]
     use :expect_line

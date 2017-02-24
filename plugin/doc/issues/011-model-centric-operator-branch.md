@@ -15,9 +15,13 @@ nodes..
 
 
 
-## philosophical lala
+## philosophical underpinnings
 
-  - a little more boilerplate in exchange for no subclassing
+the "philosophy" of the subject is exactly that as described in [#008]
+"the plugin manifesto", which is to say generally composition over
+subclassing, and avoiding "lot of magic" DSL's, with the overall goal
+begin clarity and readability.
+
 
 
 

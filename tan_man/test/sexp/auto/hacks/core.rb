@@ -175,8 +175,8 @@ module Skylab::TanMan::TestSupport
 
       @graph_sexp = Home_::Models_::DotFile.produce_parse_tree_with(
 
-        :byte_upstream_identifier,
-          Home_::Brazen_.byte_upstream_identifier.via_string(
+        :byte_upstream_reference,
+          Byte_upstream_reference_[].via_string(
             produce_digraph_input_string_ ),
 
         :generated_grammar_dir_path, existent_testing_GGD_path,

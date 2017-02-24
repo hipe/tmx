@@ -1,12 +1,13 @@
 module Skylab::TanMan
 
   module Models_::DotFile  # cannot be a model subclass because of the
-    # combinaton of facts that a) treetop allows grmamar to be nested within
+    # combinaton of facts that a) treetop allows grammar to be nested within
     # ruby modules but not classes and b) we want to nest our treetop
     # grammars under the relevant model node (this one).
 
     DEFAULT_EXTENSION = '.dot'.freeze
 
+    if false
     class << self
 
       def produce_parse_tree_with * x_a, & oes_p
@@ -51,10 +52,10 @@ module Skylab::TanMan
         o.produce_document_controller
       end
 
-      def document_controller_via_byte_upstream_identifier id, & oes_p
+      def document_controller_via_byte_upstream_reference id, & oes_p
 
         o = Here_::Small_Time_::Sessions::Build_Document_Controller.new( @kernel, & oes_p )
-        o.receive_byte_upstream_identifier id
+        o.receive_byte_upstream_reference id
         o.produce_document_controller
       end
 
@@ -66,6 +67,7 @@ module Skylab::TanMan
       end
     end
 
+    end
     Here_ = self
   end
 end

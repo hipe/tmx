@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport
 
   TS_[ self ]
 
-  describe "[tm] comment stream" do
+  describe "[tm] comment stream", wip: true do
 
     class << self
       def use m

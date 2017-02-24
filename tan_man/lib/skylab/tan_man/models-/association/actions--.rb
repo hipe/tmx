@@ -2,6 +2,7 @@ module Skylab::TanMan
 
   class Models_::Association  # re-opening
 
+    if false
     edit_entity_class(
 
       :persist_to, :association,
@@ -266,5 +267,6 @@ module Skylab::TanMan
     end
 
     Here_ = self
+    end
   end
 end

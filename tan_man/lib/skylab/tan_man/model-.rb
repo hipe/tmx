@@ -1,5 +1,6 @@
 module Skylab::TanMan
 
+  if false
   DESCRIPTION_METHOD_ = -> s do
 
     self.instance_description_proc = -> y do
@@ -506,7 +507,7 @@ module Skylab::TanMan
 
       entity_collection.persist_entity(
         action.argument_box,
-        action.document_entity_byte_downstream_identifier,
+        action.document_entity_byte_downstream_reference,
         self, & oes_p )
     end
 
@@ -594,6 +595,7 @@ module Skylab::TanMan
 
   Models_::Paths = -> path, verb, call, & oes_p do
     Models_::Internal_::Paths[ path, verb, call, & oes_p ]
+  end
   end
 end
 # #tombstone-D: we once had `take` defined as a stream method

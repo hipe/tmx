@@ -1,3 +1,5 @@
+[#062]       [ byte stream identifer. ]
+
 [#061]       :"diminishing pool": (this entry is for tracking and describing
              a commmon pattern. it has no dedicated asset node in this library.)
 

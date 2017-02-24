@@ -2,6 +2,7 @@ module Skylab::TanMan
 
   class Models_::Node  # re-opening
 
+    if false
     edit_entity_class(
 
       :persist_to, :node,
@@ -214,7 +215,7 @@ module Skylab::TanMan
 
       def delete_entity action, ent, & oes_p
 
-        byte_downstream_ID = action.document_entity_byte_downstream_identifier
+        byte_downstream_ID = action.document_entity_byte_downstream_reference
         bx = action.argument_box
 
         _ok = Here_::Actors__::Mutate::Via_entity.call(
@@ -243,7 +244,7 @@ module Skylab::TanMan
 
       def _commit_changes bx, byte_downstream_ID, & oes_p
 
-        document_.persist_into_byte_downstream_identifier(
+        document_.persist_into_byte_downstream_reference(
           byte_downstream_ID,
           :is_dry, bx[ :dry_run ],
           & oes_p )
@@ -263,5 +264,6 @@ module Skylab::TanMan
     end
 
     STOP_ = false
+    end
   end
 end

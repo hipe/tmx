@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   class Models_::Starter  # re-opening
 
+    if false
+
     edit_entity_class(
       :persist_to, :starter,
       :property, :name )
@@ -261,5 +263,6 @@ module Skylab::TanMan
     end
 
     Here_ = self
+    end
   end
 end

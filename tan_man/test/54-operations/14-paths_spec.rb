@@ -2,7 +2,7 @@ require_relative '.././test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] internal models" do
+  describe "[tm] internal models", wip: true do
 
     TS_[ self ]
 

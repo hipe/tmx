@@ -1,6 +1,7 @@
 module Skylab::TanMan
 
   class Models_::Graph
+    if false
 
     edit_entity_class(
 
@@ -160,5 +161,6 @@ module Skylab::TanMan
     end
 
     Here_ = self
+    end
   end
 end

@@ -2,7 +2,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "[tm] operations - starter set" do
+  describe "[tm] operations - starter set", wip: true do
 
     TS_[ self ]
     use :expect_line
