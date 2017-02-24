@@ -14,7 +14,7 @@ module Skylab::TMX
 
     def development_directory_json_file_stream__ & emit
 
-      # (compare `installation_.to_sidesystem_load_ticket_stream`)
+      # (compare `installation_.to_sidesystem_reference_stream`)
 
       _dir = __development_directory
       glob = ::File.join _dir, '*', METADATA_FILENAME
@@ -36,7 +36,7 @@ module Skylab::TMX
       # sidesystem a sidesystem that has not yet been made a gem, for example
       # if you are making it into a gem..
 
-      st = to_sidesystem_load_ticket_stream
+      st = to_sidesystem_reference_stream
       bx = Common_::Box.new
       begin
         lt = st.gets
@@ -59,8 +59,8 @@ module Skylab::TMX
       installation_.to_reflective_sidesystem_stream__
     end
 
-    def to_sidesystem_load_ticket_stream
-      installation_.to_sidesystem_load_ticket_stream
+    def to_sidesystem_reference_stream
+      installation_.to_sidesystem_reference_stream
     end
 
     define_method :application_kernel_, ( Lazy_.call do
@@ -151,8 +151,8 @@ module Skylab::TMX
     lazily :GemNameElements do
       Zerk_lib_[]::Models::GemNameElements
     end
-    lazily :LoadTicket do
-      Zerk_lib_[]::Models::Sidesystem::LoadTicket
+    lazily :LoadableReference do
+      Zerk_lib_[]::Models::Sidesystem::LoadableReference
     end
   end
 

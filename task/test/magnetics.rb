@@ -16,13 +16,13 @@ module Skylab::Task::TestSupport
         Mock_Manner_Class__.new sym
       end
 
-      def item_ticket_collection_via_ ir, * s_s_a
+      def item_reference_collection_via_ ir, * s_s_a
         _tss = token_stream_stream_via_ s_s_a
-        item_ticket_collection_via_item_resolver_and_token_stream_stream_ ir, _tss
+        item_reference_collection_via_item_resolver_and_token_stream_stream_ ir, _tss
       end
 
-      def item_ticket_collection_via_item_resolver_and_token_stream_stream_ ir, tss
-        col = magnetics_module_::ItemTicketCollection_via_TokenStreamStream[ tss ]
+      def item_reference_collection_via_item_resolver_and_token_stream_stream_ ir, tss
+        col = magnetics_module_::ItemReferenceCollection_via_TokenStreamStream[ tss ]
         col.item_resolver = ir
         col
       end

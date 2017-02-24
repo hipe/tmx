@@ -11,7 +11,7 @@ module Skylab::Task::TestSupport
       def dotfile_graph_reflection_via_ * s_s_a
 
         _tss = token_stream_stream_via_ s_s_a
-        _itc = item_ticket_collection_via_item_resolver_and_token_stream_stream_ nil, _tss
+        _itc = item_reference_collection_via_item_resolver_and_token_stream_stream_ nil, _tss
         o = magnetics_module_
         _fi = _itc.function_index_
         _dfg = o::DotfileGraph_via_FunctionIndex[ _fi ]

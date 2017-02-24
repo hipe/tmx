@@ -29,10 +29,10 @@ module Skylab::MyTerm
 
     def ___list
 
-      # produce a stream NOT of adapter "load ticket"s (see #spot-1)
+      # produce a stream NOT of adapter "loadable reference"s (see #spot-1)
       # but of adapter instances..
 
-      lt_st = @kernel_.silo( :Adapters ).to_asset_ticket_stream
+      lt_st = @kernel_.silo( :Adapters ).to_asset_reference_stream
 
       proto = Models_::Adapter::Instance.new_prototype_ @kernel_
 
@@ -73,7 +73,7 @@ module Skylab::MyTerm
         @kernel_ = k
       end
 
-      def to_asset_ticket_stream
+      def to_asset_reference_stream
 
         # to address the PRO's *and* CON's in [#010], the below strikes a
         # "good" compromise: assume that the filesystem can always change

@@ -41,7 +41,7 @@ module Skylab::TanMan
       else
         _ft = entry_tree
         _slug = Common_::Name.via_const_symbol( const_x.intern ).as_slug
-        _sm = _ft.asset_ticket_via_entry_group_head _slug
+        _sm = _ft.asset_reference_via_entry_group_head _slug
         _sm ? ACHIEVED_ : UNABLE_
       end
     end

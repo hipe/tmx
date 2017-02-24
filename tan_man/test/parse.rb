@@ -32,12 +32,12 @@ module Skylab::TanMan::TestSupport
     # ~ work phase
 
     def parse_file path
-      @bx.set :buid, Home_::Brazen_.byte_upstream_identifier.via_path( path )
+      @bx.set :buid, Byte_upstream_reference_[].via_path( path )
       _work
     end
 
     def parse_string s
-      @bx.set :buid, Home_::Brazen_.byte_upstream_identifier.via_string( s )
+      @bx.set :buid, Byte_upstream_reference_[].via_string( s )
       _work
     end
 
@@ -50,7 +50,7 @@ module Skylab::TanMan::TestSupport
       def initialize bx, & oes_p
         @_h = bx.h_
         @on_event_selectively = oes_p
-        @byte_upstream_identifier = @_h.fetch :buid
+        @byte_upstream_reference = @_h.fetch :buid
         nil
       end
 

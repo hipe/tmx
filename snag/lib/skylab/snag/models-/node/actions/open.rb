@@ -8,9 +8,9 @@ module Skylab::Snag
 
         :flag, :property, :try_to_reappropriate,
 
-        :property, :downstream_identifier,
+        :property, :downstream_reference,
 
-        :required, :property, :upstream_identifier,
+        :required, :property, :upstream_reference,
 
         :required, :glob, :property, :message,
       ] end
@@ -18,7 +18,7 @@ module Skylab::Snag
       def initialize
         extend NodeRelatedMethods, ActionRelatedMethods_
         init_action_ yield
-        @downstream_identifier = nil  # #[#026] (and:)
+        @downstream_reference = nil  # #[#026] (and:)
         @try_to_reappropriate = nil
       end
 
@@ -31,7 +31,7 @@ module Skylab::Snag
       def __via_node_collection
 
         _cx = build_choices_by_ do |o|
-          o._snag_downstream_identifier_ = @downstream_identifier
+          o._snag_downstream_reference_ = @downstream_reference
           o._snag_try_to_reappropriate_ = @try_to_reappropriate
         end
 

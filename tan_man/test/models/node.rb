@@ -81,7 +81,7 @@ module Skylab::TanMan::TestSupport
       oes_p = handle_event_selectively_
 
       action = Mock_Action___.new(
-        send( :"__via__#{ input_mechanism_i }__build_byte_upstream_identifier" ),
+        send( :"__via__#{ input_mechanism_i }__build_byte_upstream_reference" ),
         kr, & oes_p )
 
       bx = Home_::Common_::Box.new
@@ -91,23 +91,22 @@ module Skylab::TanMan::TestSupport
       silo.precondition_for_self action, id, bx, & oes_p
     end
 
-    def __via__input_file_granule__build_byte_upstream_identifier
+    def __via__input_file_granule__build_byte_upstream_reference
 
-      Home_::Brazen_.byte_upstream_identifier.via_path input_file_path
-
+      Byte_upstream_reference_[].via_path input_file_path
     end
   end
 
   class Mock_Action___
 
     def initialize up_id, k, & oes_p
-      @document_entity_byte_upstream_identifier = up_id
+      @document_entity_byte_upstream_reference = up_id
       @kernel = k
       @oes_p = oes_p
     end
 
     attr_reader(
-      :document_entity_byte_upstream_identifier,
+      :document_entity_byte_upstream_reference,
       :kernel,
     )
 

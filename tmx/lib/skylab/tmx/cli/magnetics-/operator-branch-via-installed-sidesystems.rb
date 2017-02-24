@@ -18,25 +18,25 @@ module Skylab::TMX
         )
 
         def lookup_softly sym  # #[#ze-051.1] "trueish item value"
-          _ = @installation.load_ticket_via_normal_symbol_softly sym
+          _ = @installation.loadable_reference_via_normal_symbol_softly sym
           _  # #todo
         end
 
         def dereference lt
           _sym = lt.category_symbol  # [#ze-062]
-          :zerk_sidesystem_load_ticket_category_symbol == _sym || self._OK_FINE
+          :zerk_sidesystem_loadable_reference_category_symbol == _sym || self._OK_FINE
           lt
         end
 
-        def to_load_ticket_stream  # 1x [ze]
+        def to_loadable_reference_stream  # 1x [ze]
 
           # this comports with "no-deps" [ze] which nominally works in
-          # symbols but actually (and experimentally) we use load tickets
+          # symbols but actually (and experimentally) we use loadable references
 
           # because this is so experimental, we map the stream to itself
           # just so this touches down here at each step.
 
-          lt_st = @installation.to_sidesystem_load_ticket_stream
+          lt_st = @installation.to_sidesystem_reference_stream
           -> do
             lt_st.gets  # hi.
           end
@@ -47,7 +47,7 @@ module Skylab::TMX
           # :[#007.B]: if you're wondering how you might reach the same
           # sort of stream we see in the `map` operation, it might look
           # like this (it worked until we hit a wall with needing load
-          # tickets to get descriptions).
+          # references to get descriptions).
           #
           # the main reason we backed off from this approach was the idea
           # that what's more approprite for The TMX is that it uses the gems
@@ -70,16 +70,16 @@ module Skylab::TMX
           end
         end
 
-        def bound_call_for_help_via_load_ticket__ lt
-          Magnetics_::BoundCall_via_LoadTicket.define do |o|
+        def bound_call_for_help_via_loadable_reference__ lt
+          Magnetics_::BoundCall_via_LoadableReference.define do |o|
             o.is_for_help = true
-            o.load_ticket = lt
+            o.loadable_reference = lt
             o.CLI = @CLI
           end.execute
         end
 
-        def bound_call_for_invocation_via_load_ticket__ lt
-          Magnetics_::BoundCall_via_LoadTicket[ lt, @CLI ]
+        def bound_call_for_invocation_via_loadable_reference__ lt
+          Magnetics_::BoundCall_via_LoadableReference[ lt, @CLI ]
         end
       # -
 

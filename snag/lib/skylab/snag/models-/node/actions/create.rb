@@ -6,9 +6,9 @@ module Skylab::Snag
 
       def definition ; [
 
-        :property, :downstream_identifier,
+        :property, :downstream_reference,
 
-        :required, :property, :upstream_identifier,
+        :required, :property, :upstream_reference,
 
         :required, :glob, :property, :message,
 
@@ -17,7 +17,7 @@ module Skylab::Snag
       def initialize
         extend NodeRelatedMethods, ActionRelatedMethods_
         init_action_ yield
-        @downstream_identifier = nil  # [#026]
+        @downstream_reference = nil  # [#026]
       end
 
       def execute
@@ -29,8 +29,8 @@ module Skylab::Snag
       def __via_node_collection
 
         _cx = build_choices_by_ do |o|
-          o._snag_downstream_identifier_ = @downstream_identifier
-          o._snag_upstream_identifier_ = @upstream_identifier
+          o._snag_downstream_reference_ = @downstream_reference
+          o._snag_upstream_reference_ = @upstream_reference
         end
 
         _last_action = @_node_collection_.edit(

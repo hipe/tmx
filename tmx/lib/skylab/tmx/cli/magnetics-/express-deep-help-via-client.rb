@@ -146,7 +146,7 @@ module Skylab::TMX
 
         def __to_sidesystems_of_interest_scanner
 
-          scn = @omni.to_operator_load_ticket_scanner
+          scn = @omni.to_operator_loadable_reference_scanner
           scn.advance_one while ::Symbol === scn.head_as_is  # horrible
 
           # because tmx mounts its own one-offs to look like operators
@@ -155,7 +155,7 @@ module Skylab::TMX
 
           stay = {
             zerk_one_off_category_symbol: false,
-            zerk_sidesystem_load_ticket_category_symbol: true
+            zerk_sidesystem_loadable_reference_category_symbol: true
           }
 
           p = -> do
@@ -186,16 +186,16 @@ module Skylab::TMX
       class Sidesystem___
 
         def initialize sub_scn, lt
-          @load_ticket = lt
+          @loadable_reference = lt
           @sub_scanner = sub_scn
         end
 
         def slug
-          @load_ticket.slug
+          @loadable_reference.slug
         end
 
         attr_reader(
-          :load_ticket,
+          :loadable_reference,
           :sub_scanner
         )
       end

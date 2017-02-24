@@ -99,7 +99,7 @@ module Skylab::Snag
         @_mani_st.expand_by do | mani |
 
 
-          @e.puts "# #{ bn[ dn[ dn[ mani.upstream_identifier.to_path ] ] ] }"
+          @e.puts "# #{ bn[ dn[ dn[ mani.upstream_reference.to_path ] ] ] }"
 
           mani.to_entity_stream
         end

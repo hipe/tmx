@@ -2,7 +2,7 @@ module Skylab::MyTerm
 
   module Models_::Adapter
 
-    class Load_Ticket
+    class LoadableReference
 
       # NOTE - this is cached and used by long-running ("silo-") daemons
       # and so (for example) must NOT know whether or not it represents a

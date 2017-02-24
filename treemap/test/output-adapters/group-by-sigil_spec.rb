@@ -14,7 +14,7 @@ module Skylab::Treemap::TestSupport
       io = TS_.string_IO.new
 
       call_API :session,
-        :upstream_identifier, _path,
+        :upstream_reference, _path,
         :stdin, Home_.lib_.system.test_support::STUBS.interactive_STDIN_instance,
         :stdout, io,
         :stderr, :_no_stderr_,

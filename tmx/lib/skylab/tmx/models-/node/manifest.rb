@@ -4,11 +4,11 @@ module Skylab::TMX
 
     class Manifest
 
-      def initialize items, load_ticket
+      def initialize items, loadable_reference
 
         @_items = items
-        @_load_ticket = load_ticket
-        @_gne = load_ticket.gem_name_elements
+        @_loadable_reference = loadable_reference
+        @_gne = loadable_reference.gem_name_elements
 
         _slug = @_gne.entry_string.gsub UNDERSCORE_, DASH_
 
@@ -44,7 +44,7 @@ module Skylab::TMX
       end
 
       def _sidesys_mod
-        @_load_ticket.require_sidesystem_module
+        @_loadable_reference.require_sidesystem_module
       end
 
       def __child_count

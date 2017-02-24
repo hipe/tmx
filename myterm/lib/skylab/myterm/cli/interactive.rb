@@ -103,7 +103,7 @@ module Skylab::MyTerm
         # that component value has changed. when this happens we need to
         # let the modality know so that it can do whatever re-indexing or
         # clearing of caches (etc) is necessary to reflect this change in
-        # its generated UI (so that newly available component (tickets)
+        # its generated UI (so that newly available component (references)
         # appear).
 
         root_frame = adapter_frame.below_frame

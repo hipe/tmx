@@ -120,7 +120,7 @@ module Skylab::Snag::TestSupport
 
       call_API(
         :to_do, :melt,
-        :downstream_identifier, _mani_path,
+        :downstream_reference, _mani_path,
         :path, _tree_path,
         :name, '*.code',
         :pattern, '%to-dew',

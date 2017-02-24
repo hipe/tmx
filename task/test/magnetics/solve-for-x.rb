@@ -108,7 +108,7 @@ module Skylab::Task::TestSupport
 
         _tss = o::TokenStreamStream_via_DirectoryObject[ _dir ]
 
-        o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
+        o::ItemReferenceCollection_via_TokenStreamStream[ _tss ]
       end
 
       def subject_module_

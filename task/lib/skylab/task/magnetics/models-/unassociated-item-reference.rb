@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Models_::Unassociated_ItemTicket
+    class Models_::Unassociated_ItemReference
 
       def initialize sym
         @term_symbol = sym

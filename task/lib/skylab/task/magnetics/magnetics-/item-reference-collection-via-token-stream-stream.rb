@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::ItemTicketCollection_via_TokenStreamStream < Common_::Monadic
+    class Magnetics_::ItemReferenceCollection_via_TokenStreamStream < Common_::Monadic
 
       def initialize st_st, & oes_p
         @token_stream_stream = st_st
@@ -11,7 +11,7 @@ class Skylab::Task
 
       def execute
 
-        col = Here_::Models_::ItemTicketCollection.begin
+        col = Here_::Models_::ItemReferenceCollection.begin
 
         oes_p = method :__when_upstream_fails
         ok = true
@@ -20,9 +20,9 @@ class Skylab::Task
         begin
           ts = st.gets
           ts or break
-          it = Magnetics_::ItemTicket_via_TokenStream.call ts, & oes_p
+          it = Magnetics_::ItemReference_via_TokenStream.call ts, & oes_p
           if it
-            col.accept_item_ticket it
+            col.accept_item_reference it
             redo
           end
           ok = it  # or not..

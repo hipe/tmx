@@ -7,15 +7,15 @@ module Skylab::TMX
   class Reflective
 
     class << self
-      def via_load_ticket lt
+      def via_loadable_reference lt
         new lt
       end
       private :new
     end
 
-    def initialize load_ticket
+    def initialize loadable_reference
 
-      @_lt = load_ticket
+      @_lt = loadable_reference
       @mod = @_lt.require_sidesystem_module
       @_nf = Common_::Name.via_module @mod
     end

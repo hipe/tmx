@@ -84,7 +84,7 @@
 [#030]       #done reconceive api as a service
 [#029]       track classes for entities not yet associated with documents? ..
              ( #was: #done no more api knob (api.invoke -> `api_invoke`))
-[#028]       #bad-ticket any and all changes to CLI core client
+[#028]       #bad-reference any and all changes to CLI core client
 [#027]       overhaul to cli actions base class
 [#026]       #doc-node: the syncing narrative ..
              ( #was: #done API::InvocationMethods away! )

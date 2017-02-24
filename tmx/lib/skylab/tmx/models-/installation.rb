@@ -24,7 +24,7 @@ module Skylab::TMX
       Home_::Magnetics_::ManifestStream_via_Installation[ self ]
     end
 
-    def to_sidesystem_load_ticket_stream
+    def to_sidesystem_reference_stream
 
       # if you would want the same results as what we see in the `map`
       # operation, see discussion at [#007.B] (inline)
@@ -37,7 +37,7 @@ module Skylab::TMX
         # strip from the directory path gem-related information we need
 
         _ne = name_elements_for[ path ]
-        Models_::LoadTicket.new _ne
+        Models_::LoadableReference.new _ne
       end
 
       p = -> path do
@@ -59,7 +59,7 @@ module Skylab::TMX
       ::Dir[ ::File.join( @single_gems_dir, "#{ @participating_gem_prefix }*" ) ]
     end
 
-    def load_ticket_via_normal_symbol_softly sym  # 1x here
+    def loadable_reference_via_normal_symbol_softly sym  # 1x here
 
       _entry = sym.id2name  # gem name segments (like normal symbols) use underscores
 
@@ -69,12 +69,12 @@ module Skylab::TMX
 
       _yes = ::Gem.try_activate gem_name
       if _yes
-        _lt = load_ticket_via_gem_name gem_name
+        _lt = loadable_reference_via_gem_name gem_name
         _lt
       end
     end
 
-    def load_ticket_via_gem_name gem_require_path
+    def loadable_reference_via_gem_name gem_require_path
 
       gem_name = gem_require_path.gsub ::File::SEPARATOR, DASH_
 
@@ -90,7 +90,7 @@ module Skylab::TMX
         ne.exe_prefix = @participating_exe_prefix
       end
 
-      Models_::LoadTicket.new _gne
+      Models_::LoadableReference.new _gne
     end
 
     # our coupling to the gem API (and beyond) is both tight and

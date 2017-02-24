@@ -2,7 +2,7 @@ module Skylab::Task::TestSupport
 
   module Magnetics
 
-    module Item_Ticket_Via_Token_Stream
+    module Item_Reference_Via_Token_Stream
 
       def self.[] tcc
         tcc.send :define_singleton_method, :given_parse, Given_parse_method___
@@ -132,7 +132,7 @@ module Skylab::Task::TestSupport
 
           i_a = nil ; ev_p = nil
 
-          x = magnetics_module_::ItemTicket_via_TokenStream.call _st do |*a, &p|
+          x = magnetics_module_::ItemReference_via_TokenStream.call _st do |*a, &p|
             i_a = a ; ev_p = p ; :_unreliable_from_ITvTS_test_
           end
 

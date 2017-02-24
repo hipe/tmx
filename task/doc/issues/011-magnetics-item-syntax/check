@@ -25,7 +25,7 @@ class Skylab::Task
     end
 
     def __init
-      @asset_module = Home_::Magnetics::Magnetics_::ItemTicket_via_TokenStream
+      @asset_module = Home_::Magnetics::Magnetics_::ItemReference_via_TokenStream
       @dot_path = ::File.join Home_.sidesystem_path_, 'doc/issues/011-magnetics-item-syntax/figure-1-syntax.dot'
       NIL_
     end

@@ -64,7 +64,7 @@ module Skylab::Snag::TestSupport
       it "to [#07] append tag '2014-ok'" do
 
         _call :node_identifier, 7, :tag, '2014-ok',
-          :downstream_identifier, downstream_ID_for_output_string_ivar_
+          :downstream_reference, downstream_ID_for_output_string_ivar_
 
         scn = scanner_via_output_string_
 
@@ -81,7 +81,7 @@ module Skylab::Snag::TestSupport
       def _call * x_a, & x_p
 
         x_a.unshift :tag, :create,
-          :upstream_identifier,
+          :upstream_reference,
           Fixture_file_[ :for_tag_create_mani ]
 
         call_API_via_iambic x_a, & x_p

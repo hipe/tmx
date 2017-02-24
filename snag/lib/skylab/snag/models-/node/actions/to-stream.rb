@@ -18,7 +18,7 @@ module Skylab::Snag
           y << 'limit output to N nodes'
         end,
 
-        :required, :property, :upstream_identifier
+        :required, :property, :upstream_reference
       ] end
 
 

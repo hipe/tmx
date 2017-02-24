@@ -6,8 +6,8 @@ module Skylab::TanMan
 
       class << self
 
-        def downstream_identifier_via_qualified_knownnesss qkn_a, & oes_p
-          Brazen_.byte_downstream_identifier.via_qualified_knownnesses qkn_a, & oes_p
+        def downstream_reference_via_qualified_knownnesss qkn_a, & oes_p
+          Byte_downstream_reference_[].via_qualified_knownnesses qkn_a, & oes_p
         end
 
         def entity_property_class
@@ -26,8 +26,8 @@ module Skylab::TanMan
           IO_PROPERTIES__.output_stream
         end
 
-        def upstream_identifier_via_qualified_knownnesss qkn_a, & oes_p
-          Brazen_.byte_upstream_identifier.via_qualified_knownnesses qkn_a, & oes_p
+        def upstream_reference_via_qualified_knownnesss qkn_a, & oes_p
+          Byte_upstream_reference_[].via_qualified_knownnesses qkn_a, & oes_p
         end
       end  # >>
 
@@ -37,11 +37,11 @@ module Skylab::TanMan
 
         include Brazen_::Modelesque::Entity
 
-        def document_entity_byte_upstream_identifier
+        def document_entity_byte_upstream_reference
           @_DEBUID
         end
 
-        def document_entity_byte_downstream_identifier
+        def document_entity_byte_downstream_reference
           @_DEBDID
         end
 
@@ -100,7 +100,7 @@ module Skylab::TanMan
               maybe_send_event :error, :stdin_should_probably_not_be_interactive
               UNABLE_
             else
-              Brazen_::Collection::Byte_Upstream_Identifier.via_stream sin
+              Byte_upstream_reference_[].via_stream sin
             end
           else
             id
@@ -116,7 +116,7 @@ module Skylab::TanMan
         def __maybe_convert_to_stdout_stream id
 
           if id && :path == id.shape_symbol && DASH_ == id.path
-            Brazen_::Collection::Byte_Downstream_Identifier.via_stream stdout_
+            Brazen_::Collection::ByteDownstreamReference.via_stream stdout_
           else
             id
           end
@@ -614,8 +614,8 @@ module Skylab::TanMan
       end
 
       CONST_VIA_DIRECTION = {
-        input: :Byte_Upstream_Identifier,
-        output: :Byte_Downstream_Identifier
+        input: :ByteUpstreamReference,
+        output: :ByteDownstreamReference
       }.freeze
 
       class Collection_Controller
@@ -672,9 +672,9 @@ module Skylab::TanMan
 
         def flush_changed_document_to_output_adapter_per_action action
 
-          @df.persist_into_byte_downstream_identifier(
+          @df.persist_into_byte_downstream_reference(
 
-            action.document_entity_byte_downstream_identifier,
+            action.document_entity_byte_downstream_reference,
 
             :is_dry, action.argument_box[ :dry_run ],
 

@@ -5,7 +5,7 @@ module Skylab::TanMan
     class Sessions__::Produce_Parse_Tree
 
       Attributes_actor_.call( self,
-        byte_upstream_identifier: nil,
+        byte_upstream_reference: nil,
         generated_grammar_dir_path: nil,
       )
 
@@ -23,7 +23,7 @@ module Skylab::TanMan
         o = Home_::Input_Adapters_::Treetop::Sessions::Parse.new(
           & @on_event_selectively )
 
-        o.receive_byte_upstream_identifier @byte_upstream_identifier
+        o.receive_byte_upstream_reference @byte_upstream_reference
 
         o.accept_parser_class produce_parser_class_
 

@@ -13,7 +13,7 @@ module Skylab::Snag::TestSupport
 
         call_API :node, :to_stream,
           :identifier, 2,
-          :upstream_identifier, _path, & EMPTY_P_
+          :upstream_reference, _path, & EMPTY_P_
 
         @result.has_extended_content.should eql true
       end
@@ -22,7 +22,7 @@ module Skylab::Snag::TestSupport
 
         call_API :node, :to_stream,
           :identifier, 5,
-          :upstream_identifier, _path, & EMPTY_P_
+          :upstream_reference, _path, & EMPTY_P_
 
         @result.has_extended_content.should eql false
       end

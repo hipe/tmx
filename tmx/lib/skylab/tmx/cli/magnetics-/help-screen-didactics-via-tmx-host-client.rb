@@ -65,9 +65,9 @@ module Skylab::TMX
 
         def description_proc_reader
           h = remove_instance_variable :@_eek
-          -> symbol_or_load_ticket do
-            _type_sym = h.fetch symbol_or_load_ticket.intern
-            @_describers.fetch( _type_sym )._description_proc_for_ symbol_or_load_ticket
+          -> symbol_or_loadable_reference do
+            _type_sym = h.fetch symbol_or_loadable_reference.intern
+            @_describers.fetch( _type_sym )._description_proc_for_ symbol_or_loadable_reference
           end
         end
 
@@ -82,19 +82,19 @@ module Skylab::TMX
 
         def __to_operator_normal_tuple_scanner
 
-          scn = __to_reduced_operator_load_ticket_scanner
+          scn = __to_reduced_operator_loadable_reference_scanner
 
-          scn.map_by do |symbol_or_load_ticket|
-            @_eek[ symbol_or_load_ticket.intern ] = scn.current_injection.injector
-            [ :operator, symbol_or_load_ticket ]  # [#ze-062] sneak in an l.t not a symbol
+          scn.map_by do |symbol_or_loadable_reference|
+            @_eek[ symbol_or_loadable_reference.intern ] = scn.current_injection.injector
+            [ :operator, symbol_or_loadable_reference ]  # [#ze-062] sneak in an l.t not a symbol
           end
         end
 
-        def __to_reduced_operator_load_ticket_scanner
+        def __to_reduced_operator_loadable_reference_scanner
 
           stay = __to_stay_map
 
-          @omni.to_operator_load_ticket_scanner do |o|
+          @omni.to_operator_loadable_reference_scanner do |o|
             o.big_step_pass_filter = -> scn do
               k = scn.current_injection.injector
               yes = stay.fetch k
@@ -186,13 +186,13 @@ module Skylab::TMX
           NOTHING_
         end
 
-        def _description_proc_for_  load_ticket
+        def _description_proc_for_  loadable_reference
 
-          _ = load_ticket.category_symbol  # [#ze-062]
-          :zerk_sidesystem_load_ticket_category_symbol == _sym || self._SANITY
+          _ = loadable_reference.category_symbol  # [#ze-062]
+          :zerk_sidesystem_loadable_reference_category_symbol == _sym || self._SANITY
 
           -> y do
-            _mod = load_ticket.require_sidesystem_module
+            _mod = loadable_reference.require_sidesystem_module
             _mod.describe_into_under y, self
           end
         end

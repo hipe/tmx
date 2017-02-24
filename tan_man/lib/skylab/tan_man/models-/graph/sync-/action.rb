@@ -73,14 +73,14 @@ module Skylab::TanMan
 
           # see the spec which expresses the below as a rule table
 
-          in_ID = document_entity_byte_upstream_identifier
+          in_ID = document_entity_byte_upstream_reference
           here_ID = @byte_herestream_ID
-          out_ID = document_entity_byte_downstream_identifier
+          out_ID = document_entity_byte_downstream_reference
 
           if in_ID
             if here_ID
               if ! out_ID  # case 2
-                out_ID = here_ID.to_byte_downstream_identifier
+                out_ID = here_ID.to_byte_downstream_reference
                 @_DEBDID = out_ID
               end
             elsif out_ID
@@ -125,8 +125,8 @@ module Skylab::TanMan
 
         def __persist
 
-          @gsync.the_document_controller.persist_into_byte_downstream_identifier(
-            document_entity_byte_downstream_identifier,
+          @gsync.the_document_controller.persist_into_byte_downstream_reference(
+            document_entity_byte_downstream_reference,
             :is_dry, @argument_box[ :dry_run ],
             & handle_event_selectively )
         end

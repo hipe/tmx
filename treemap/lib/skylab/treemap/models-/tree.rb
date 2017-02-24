@@ -34,7 +34,7 @@ module Skylab::Treemap
           :default_proc, -> do
             '-'  # excercize it
           end,
-          :property, :downstream_identifier,
+          :property, :downstream_reference,
 
           :description, -> y do
             y << "echo each line of input to this waypoint (debugging)"
@@ -51,7 +51,7 @@ module Skylab::Treemap
           :default_proc, -> do
             '-'  # excercize it
           end,
-          :property, :upstream_identifier,
+          :property, :upstream_reference,
 
           :required, :property, :stdin,
           :required, :property, :stdout,
@@ -98,7 +98,7 @@ module Skylab::Treemap
 
           _resolve_waypoint(
             :@upstream_ID,
-            qualified_knownness( :upstream_identifier ),
+            qualified_knownness( :upstream_reference ),
             :up, :stdin )
         end
 
@@ -122,7 +122,7 @@ module Skylab::Treemap
 
           _resolve_waypoint(
             :@downstream_ID,
-            qualified_knownness( :downstream_identifier ),
+            qualified_knownness( :downstream_reference ),
             :down, :stdout )
         end
 

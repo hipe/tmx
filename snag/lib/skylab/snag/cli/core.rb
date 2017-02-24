@@ -32,9 +32,9 @@ module Skylab::Snag
 
     class Action_Adapter < Action_Adapter
 
-      MUTATE_THESE_PROPERTIES = [ :upstream_identifier ]
+      MUTATE_THESE_PROPERTIES = [ :upstream_reference ]
 
-      def mutate__upstream_identifier__properties
+      def mutate__upstream_reference__properties
 
         _mutate_upstream_adapter_in mutable_front_properties
         NIL_
@@ -42,7 +42,7 @@ module Skylab::Snag
 
       def _mutate_upstream_adapter_in bx
 
-        bx.replace_by :upstream_identifier do | prp |
+        bx.replace_by :upstream_reference do | prp |
 
           prp.dup.set_default_proc do
 
@@ -97,14 +97,14 @@ module Skylab::Snag
 
         # ( not here, but where?
 
-        path = bx.fetch :upstream_identifier
+        path = bx.fetch :upstream_reference
         path = Home_::Models_::NodeCollection::Nearest_path.call(
           path, @_filesystem, & @_oes_p )
 
         # )
 
         if path
-          bx.replace :upstream_identifier, path
+          bx.replace :upstream_reference, path
 
           __finish_prepare_backstream_call bx
         else
@@ -187,7 +187,7 @@ module Skylab::Snag
         o.kernel = application_kernel
         o.name = self.name
         o.number_limit = bx[ :number_limit ]
-        o.upstream_identifier = bx.fetch :upstream_identifier
+        o.upstream_reference = bx.fetch :upstream_reference
 
         @bound = o  # overwrites mock bound
 

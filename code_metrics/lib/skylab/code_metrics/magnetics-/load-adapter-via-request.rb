@@ -7,7 +7,7 @@ module Skylab::CodeMetrics
     #
     # our decision to insulate this through this façade is informed by
     # experience: this is the third such would-be adapter. other efforts
-    # have included a const-based "load ticket" as well as a single path
+    # have included a const-based "loadable reference" as well as a single path
     # variant. (the latter is not in history, but is what brought us to the
     # ideas that led to the massive rearchitecting.)
     #

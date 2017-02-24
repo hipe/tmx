@@ -39,7 +39,7 @@ module Skylab::Snag::TestSupport
       it "remove a tag at the end" do
 
         _call :node_identifier, 1, :tag, :two,
-          :downstream_identifier, downstream_ID_for_output_string_ivar_
+          :downstream_reference, downstream_ID_for_output_string_ivar_
 
         scn = scanner_via_output_string_
         scn.next_line.should eql "[#001]       keifer #one\n"
@@ -64,7 +64,7 @@ module Skylab::Snag::TestSupport
         my_tmpfile_path = pn.to_path
 
         call_API :tag, :delete,
-          :upstream_identifier, my_tmpfile_path,
+          :upstream_reference, my_tmpfile_path,
           :node_identifier, 1, :tag, :one
 
         ev = expect_OK_event( :component_removed ).cached_event_value.to_event
@@ -87,7 +87,7 @@ module Skylab::Snag::TestSupport
 
       memoize :__common_head do
         [ :tag, :delete,
-          :upstream_identifier, Fixture_file_[ :the_sutherlands_mani ] ]
+          :upstream_reference, Fixture_file_[ :the_sutherlands_mani ] ]
       end
     end
   end

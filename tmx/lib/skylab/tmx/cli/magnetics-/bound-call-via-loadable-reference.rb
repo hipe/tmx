@@ -2,13 +2,13 @@ module Skylab::TMX
 
   class CLI
 
-    class Magnetics_::BoundCall_via_LoadTicket < SimpleModel_  # 2x here
+    class Magnetics_::BoundCall_via_LoadableReference < SimpleModel_  # 2x here
 
       class << self
         def call lt, cli
           define do |o|
             o.CLI = cli
-            o.load_ticket = lt
+            o.loadable_reference = lt
           end.execute
         end
         alias_method :[], :call
@@ -25,7 +25,7 @@ module Skylab::TMX
         attr_writer(
           :CLI,
           :is_for_help,
-          :load_ticket,
+          :loadable_reference,
         )
 
         def execute
@@ -66,7 +66,7 @@ module Skylab::TMX
 
         def __init_program_name_string_array
 
-          _slug = @load_ticket.gem_name_elements.entry_string.gsub UNDERSCORE_, DASH_
+          _slug = @loadable_reference.gem_name_elements.entry_string.gsub UNDERSCORE_, DASH_
           _pnsa = [ * @CLI.program_name_string_array, _slug ]
           @__program_name_string_array = _pnsa ; nil
         end
@@ -89,7 +89,7 @@ module Skylab::TMX
         end
 
         def __init_sidesystem_module
-          @_sidesystem_module = @load_ticket.require_sidesystem_module
+          @_sidesystem_module = @loadable_reference.require_sidesystem_module
           NIL
         end
       # -

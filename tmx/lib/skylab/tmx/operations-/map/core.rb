@@ -415,7 +415,7 @@ module Skylab::TMX
       end
 
       def to_item_normal_tuple_stream_for_didactics
-        @operator_branch.to_load_ticket_stream.map_by do |key_x|
+        @operator_branch.to_loadable_reference_stream.map_by do |key_x|
           [ :primary, key_x ]
         end
       end

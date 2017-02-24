@@ -54,7 +54,7 @@
 [#012] #open #tracking-tag all purpose legacy (porcelain) marker
 [#011] #open unacceptable stylus wiring
 [#010] #open #tracking-tag once we get hl sub-client in here
-[#009]       #doc-point (ticket changed) `o-ption_parser_blocks` is sweetened
+[#009]       #doc-point (reference changed) `o-ption_parser_blocks` is sweetened
 [#008]       #done audit public / private
 
 [#007]       local only

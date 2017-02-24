@@ -6,11 +6,11 @@ module Skylab::Snag
 
     class << self
 
-      def via_upstream_identifier x, invo_rsx, & p
+      def via_upstream_reference x, invo_rsx, & p
 
         if x.respond_to? :to_simple_line_stream
 
-          _via_upstream_identifier x, invo_rsx, & p
+          _via_upstream_reference x, invo_rsx, & p
         else
 
           # (the current fallback assumption is that this is an FS path)
@@ -21,18 +21,18 @@ module Skylab::Snag
       def via_path path, invo_rsx, & p
 
         _id = Home_.lib_.
-          system_lib::Filesystem::Byte_Upstream_Identifier.new path
+          system_lib::Filesystem::ByteUpstreamReference.new path
 
-        _via_upstream_identifier _id, invo_rsx, & p
+        _via_upstream_reference _id, invo_rsx, & p
       end
 
-      def _via_upstream_identifier id, invo_rsx, & p
+      def _via_upstream_reference id, invo_rsx, & p
 
         invo_rsx.HELLO_INVO_RSX
 
         _expad = expression_adapter_ id.modality_const
 
-        _expad.node_collection_via_upstream_identifier__ id, invo_rsx, & p
+        _expad.node_collection_via_upstream_reference__ id, invo_rsx, & p
       end
 
       def expression_adapter_ modality_const

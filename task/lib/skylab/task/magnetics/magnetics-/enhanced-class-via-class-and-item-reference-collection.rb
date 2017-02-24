@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::EnhancedClass_via_Class_and_ItemTicketCollection < Common_::Dyadic
+    class Magnetics_::EnhancedClass_via_Class_and_ItemReferenceCollection < Common_::Dyadic
 
       def initialize cls, col
         @class = cls
@@ -69,7 +69,7 @@ class Skylab::Task
         end
 
         def __set_manner ma
-          _class = @collection.__item_via_item_ticket ma
+          _class = @collection.__item_via_item_reference ma
           @client.receive_magnetic_manner _class, ma, @collection
         end
       end

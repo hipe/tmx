@@ -168,7 +168,7 @@ class Skylab::Task
         _path = remove_instance_variable :@path
         _dir = remove_instance_variable( :@directory_class ).new _path
         _tss = o::TokenStreamStream_via_DirectoryObject[ _dir ]
-        _col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
+        _col = o::ItemReferenceCollection_via_TokenStreamStream[ _tss ]
         # (wants [#005])
         _line_stream_via_collection _col
       end

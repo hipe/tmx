@@ -20,14 +20,14 @@ module Skylab::MyTerm
 
       def execute
 
-        _ok = __resolve_load_ticket_via_argument_stream
-        _ok and Instance.__via_selection_load_ticket @_load_ticket, @kernel_
+        _ok = __resolve_loadable_reference_via_argument_stream
+        _ok and Instance.__via_selection_loadable_reference @_loadable_reference, @kernel_
       end
 
-      def __resolve_load_ticket_via_argument_stream
+      def __resolve_loadable_reference_via_argument_stream
 
         _adapters_silo = @kernel_.silo :Adapters
-        _stream_method = _adapters_silo.method :to_asset_ticket_stream
+        _stream_method = _adapters_silo.method :to_asset_reference_stream
 
         _x = @_arg_st.head_as_is
 
@@ -40,7 +40,7 @@ module Skylab::MyTerm
         end
 
         o.stream_builder = -> do
-          _adapters_silo.to_asset_ticket_stream
+          _adapters_silo.to_asset_reference_stream
         end
 
         o.set_qualified_knownness_value_and_symbol _x, :adapter_name
@@ -48,7 +48,7 @@ module Skylab::MyTerm
         lt = o.execute
         if lt
           remove_instance_variable( :@_arg_st ).advance_one
-          @_load_ticket = lt
+          @_loadable_reference = lt
           ACHIEVED_
         else
           lt
@@ -64,7 +64,7 @@ module Skylab::MyTerm
 
       class << self
 
-        def __via_selection_load_ticket lt, ke
+        def __via_selection_loadable_reference lt, ke
           new_prototype_( ke ).__init_as_selected lt
         end
 
@@ -80,7 +80,7 @@ module Skylab::MyTerm
 
       def __init_as_selected lt
         @_is_selected = true
-        _init_via_load_ticket lt
+        _init_via_loadable_reference lt
       end
 
       # ~
@@ -91,15 +91,15 @@ module Skylab::MyTerm
 
       def ___init_not_selected lt
         @_is_selected = false
-        _init_via_load_ticket lt
+        _init_via_loadable_reference lt
       end
 
       # ~
 
-      def _init_via_load_ticket lt
+      def _init_via_loadable_reference lt
 
         @_impl = lt.module.new self
-        @_load_ticket = lt
+        @_loadable_reference = lt
         @_rw = ACS_::ReaderWriter.for_componentesque @_impl
         self
       end
@@ -177,7 +177,7 @@ module Skylab::MyTerm
       end
 
       def name
-        @_load_ticket.adapter_name
+        @_loadable_reference.adapter_name
       end
 
       def implementation_
@@ -185,7 +185,7 @@ module Skylab::MyTerm
       end
 
       def path
-        @_load_ticket.path
+        @_loadable_reference.path
       end
 
       def reader_writer__

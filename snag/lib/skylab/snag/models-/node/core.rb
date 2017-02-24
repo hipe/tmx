@@ -397,8 +397,8 @@ module Skylab::Snag
 
       def resolve_node_collection_
 
-        _ = HomeModels__::NodeCollection.via_upstream_identifier(
-          @upstream_identifier, @_invocation_resources_, & _listener_ )
+        _ = HomeModels__::NodeCollection.via_upstream_reference(
+          @upstream_reference, @_invocation_resources_, & _listener_ )
 
         _store_ :@_node_collection_, _
       end
@@ -415,7 +415,7 @@ module Skylab::Snag
       def persist_node_
 
         _cx = build_choices_by_ do |o|
-          o._snag_downstream_identifier_ = @downstream_identifier
+          o._snag_downstream_reference_ = @downstream_reference
         end
 
         @_node_collection_.persist_entity _cx, @_node_, & _listener_
@@ -429,9 +429,9 @@ module Skylab::Snag
     end
 
     THESE_Choices___ = ::Struct.new(
-      :_snag_downstream_identifier_,
+      :_snag_downstream_reference_,
       :_snag_try_to_reappropriate_,
-      :_snag_upstream_identifier_,
+      :_snag_upstream_reference_,
     )
 
     class Common_Body_  # (for three)

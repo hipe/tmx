@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::ItemTicket_via_TokenStream < Common_::Monadic
+    class Magnetics_::ItemReference_via_TokenStream < Common_::Monadic
 
       # [#011] explains what the heck this is, why the heck we aren't
       # using plain old regex, and how the heck you are supposed to develop
@@ -100,7 +100,7 @@ class Skylab::Task
       end
 
       def __transition_from_IT20_to_finish20
-        Here_::Models_::Unassociated_ItemTicket.new _finish_term
+        Here_::Models_::Unassociated_ItemReference.new _finish_term
       end
 
       # -- area 40
@@ -125,7 +125,7 @@ class Skylab::Task
 
       def __transition_from_IT40_to_finish40
 
-        Here_::Models_::Manner_ItemTicket.new(
+        Here_::Models_::Manner_ItemReference.new(
           _finish_term,
           @__slot_term_symbol,
         )
@@ -193,7 +193,7 @@ class Skylab::Task
 
         @_function_prerequisite_term_list.push _finish_term
 
-        Here_::Models_::Function_ItemTicket.via_prerequisites_and_products__(
+        Here_::Models_::Function_ItemReference.via_prerequisites_and_products__(
           @_function_prerequisite_term_list,
           @_function_product_term_list,
         )

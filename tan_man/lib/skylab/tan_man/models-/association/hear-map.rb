@@ -161,7 +161,7 @@ module Skylab::TanMan
 
             if :path == id.shape_symbol && DASH_ == id.path
 
-              id = Brazen_::Collection::Byte_Downstream_Identifier.via_stream(
+              id = Brazen_::Collection::ByteDownstreamReference.via_stream(
                 @qualified_knownness_box.fetch( :stdout ).value_x )
             end
 
@@ -176,7 +176,7 @@ module Skylab::TanMan
             is_dry = arg.value_x
           end
 
-          @dc.persist_into_byte_downstream_identifier id,
+          @dc.persist_into_byte_downstream_reference id,
             :is_dry, is_dry,
             & @on_event_selectively
         end

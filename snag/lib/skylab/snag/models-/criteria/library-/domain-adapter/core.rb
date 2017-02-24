@@ -18,14 +18,14 @@ module Skylab::Snag
 
             mutable_me = __begin_mutable_me
 
-            st = invo_rsx.microservice_operator_branch_.to_load_ticket_stream
+            st = invo_rsx.microservice_operator_branch_.to_loadable_reference_stream
 
             begin
 
               lt = st.gets
               lt || break
 
-              x = lt.dereference_load_ticket
+              x = lt.dereference_loadable_reference
               if ! x.respond_to? :const_get
                 redo  # maybe the "silo" is not a module. (ping used to be this. no longer)
               end

@@ -111,7 +111,7 @@ class Skylab::Task
         if fit_a
           case 1 <=> fit_a.length
           when 0
-            _solve_for_function_item_ticket fit_a.fetch 0
+            _solve_for_function_item_reference fit_a.fetch 0
           when -1
             __branch_out_into_alternatives fit_a
           else
@@ -160,7 +160,7 @@ class Skylab::Task
 
         fit_a.each do |fit|
           _fork = __build_a_fork
-          ok, x = _fork._solve_for_function_item_ticket fit
+          ok, x = _fork._solve_for_function_item_reference fit
           if ok
             ( solution_stacks ||= [] ).push x
           elsif do_trace
@@ -195,7 +195,7 @@ class Skylab::Task
         # if we like this it may have to get a more articulated API..
 
         d_a = nil
-        read = @function_index.proc_for_read_function_item_ticket_via_const_
+        read = @function_index.proc_for_read_function_item_reference_via_const_
         solution_stacks.each_with_index do |stack, d|
           stack.each do |function_sym|
             if read[ function_sym ].prerequisite_term_symbols.include? sym
@@ -252,7 +252,7 @@ class Skylab::Task
         end
       end
 
-      def _solve_for_function_item_ticket fit
+      def _solve_for_function_item_reference fit
 
         # assume this is the only alternative we are investigating -
         # we can mutate the notespace toward this end.
@@ -333,7 +333,7 @@ class Skylab::Task
       # :#here-arbitrariness
       #
       # each argument of a function is processed in the order as expressed
-      # by the function's "item ticket" which we can assume is determined by
+      # by the function's "item reference" which we can assume is determined by
       # the actual name of the function in the actual collection. (for
       # example, for a function named "X-via-A-and-B", assume we first see
       # argument "A", then "B".)

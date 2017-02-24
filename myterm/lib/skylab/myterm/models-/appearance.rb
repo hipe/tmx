@@ -73,18 +73,18 @@ module Skylab::MyTerm
       end
     end
 
-    def to_component_node_ticket_streamer
+    def to_component_node_reference_streamer
 
       Require_ACS_[]
 
       if @adapter
 
-        ACS_::Reflection::Node_Ticket_Streamer.via_ACS @adapter.implementation_
+        ACS_::Reflection::NodeReferenceStreamer.via_ACS @adapter.implementation_
       else
 
         _rw = ACS_::ReaderWriter.for_componentesque self  # just reads ivar
 
-        _hi = ACS_::Reflection::Node_Ticket_Streamer.via_reader__ _rw  # #todo - change method name
+        _hi = ACS_::Reflection::NodeReferenceStreamer.via_reader__ _rw  # #todo - change method name
 
         _hi
       end

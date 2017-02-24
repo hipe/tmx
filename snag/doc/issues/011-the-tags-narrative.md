@@ -172,7 +172,7 @@ these things are so volatile, they can easily go stale quickly, and/or
 if they live in the code they can lay around for months or longer,
 possibly causing confusion or mis-information in the future. The general
 spirit of planning/contingency analysis has value, but consider instead
-melting such a comment into a ticket and having the battle over
+melting such a comment into a reference and having the battle over
 depencies and pre-requisites there instead. while code is a poor
 fit for this kind of discussion, it is precisely what the
 issue collection exists for.

@@ -95,8 +95,8 @@ module Skylab::Snag::TestSupport
 
       call_API :node, :close,
 
-        :upstream_identifier, Fixture_file_[ :for_close_mani ],
-        :downstream_identifier, __DS_ID,
+        :upstream_reference, Fixture_file_[ :for_close_mani ],
+        :downstream_reference, __DS_ID,
         :node_identifier, s
 
     end

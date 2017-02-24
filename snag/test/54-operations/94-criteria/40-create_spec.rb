@@ -15,7 +15,7 @@ module Skylab::Snag::TestSupport
       call_API(
         :criteria, :issues_via_criteria,
         :criteria, :hi,
-        :upstream_identifier, :hi,
+        :upstream_reference, :hi,
         :save, :hi,
         :edit, :hi,
         & handle_event_selectively_ )
@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
       call_API(
         :criteria, :issues_via_criteria,
         :criteria, %w( nodes that are tagged with #rocket ),
-        :upstream_identifier, :hi,
+        :upstream_reference, :hi,
         :save, '-not-valid-',
         & handle_event_selectively_ )
 
@@ -59,7 +59,7 @@ module Skylab::Snag::TestSupport
 
         :criteria, %w( nodes that are tagged with #rocket ),
 
-        :upstream_identifier, Fixture_file_[ :hot_rocket_mani ],
+        :upstream_reference, Fixture_file_[ :hot_rocket_mani ],
 
         :save, fn,
 

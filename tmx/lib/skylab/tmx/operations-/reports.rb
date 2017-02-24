@@ -98,11 +98,11 @@ module Skylab::TMX
       def __when_head_is_execute
 
         if _parse_mutex_operation
-          __parse_report_load_ticket_from_head
+          __parse_report_loadable_reference_from_head
         end
       end
 
-      def __parse_report_load_ticket_from_head
+      def __parse_report_loadable_reference_from_head
 
         _COL = _report_name_collection
 
@@ -112,7 +112,7 @@ module Skylab::TMX
 
         if lt
           @argument_scanner.advance_one
-          @__report_load_ticket = lt
+          @__report_loadable_reference = lt
           ACHIEVED_
         else
           lt
@@ -158,9 +158,9 @@ module Skylab::TMX
 
       def __execute_report
 
-        lt = remove_instance_variable :@__report_load_ticket
+        lt = remove_instance_variable :@__report_loadable_reference
 
-        _nm = Common_::Name.via_slug lt.asset_ticket.entry_group_head
+        _nm = Common_::Name.via_slug lt.asset_reference.entry_group_head
 
         _const = _nm.as_camelcase_const_string
 

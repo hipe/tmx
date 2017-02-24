@@ -16,7 +16,7 @@ module Skylab::TanMan
 
       def initialize id, gsp, x_a, & oes_p
 
-        @byte_downstream_identifier = id
+        @byte_downstream_reference = id
         @graph_sexp = gsp
         @is_dry = false
         @on_event_selectively = oes_p
@@ -30,9 +30,9 @@ module Skylab::TanMan
       def execute
 
         y = if @is_dry
-          Brazen_::Collection::Byte_Downstream_Identifier.the_dry_identifier.to_minimal_yielder
+          Brazen_::Collection::ByteDownstreamReference.the_dry_identifier.to_minimal_yielder
         else
-          @byte_downstream_identifier.to_minimal_yielder
+          @byte_downstream_reference.to_minimal_yielder
         end
 
         bytes = @graph_sexp.unparse_into y
@@ -52,12 +52,12 @@ module Skylab::TanMan
 
         Common_::Event.inline_OK_with :wrote_resource,
 
-            :byte_downstream_identifier, @byte_downstream_identifier,
+            :byte_downstream_reference, @byte_downstream_reference,
             :bytes, bytes,
             :is_dry, @is_dry,
             :is_completion, true do  | y, o |
 
-          id = o.byte_downstream_identifier
+          id = o.byte_downstream_reference
 
           _s = id.description_under self
 
@@ -86,7 +86,7 @@ module Skylab::TanMan
         @kernel = action.kernel
         @on_event_selectively = action.handle_event_selectively
 
-        receive_byte_upstream_identifier action.document_entity_byte_upstream_identifier
+        receive_byte_upstream_reference action.document_entity_byte_upstream_reference
         produce_document_controller
       end
 
@@ -103,7 +103,7 @@ module Skylab::TanMan
         nil
       end
 
-      def receive_byte_upstream_identifier id
+      def receive_byte_upstream_reference id
         @_BUID = id ; nil
       end
 
@@ -118,7 +118,7 @@ module Skylab::TanMan
 
         _gs = Here_.produce_parse_tree_with(
 
-          :byte_upstream_identifier, @_BUID,
+          :byte_upstream_reference, @_BUID,
           :generated_grammar_dir_path, __GGD_path,
 
           & @on_event_selectively )

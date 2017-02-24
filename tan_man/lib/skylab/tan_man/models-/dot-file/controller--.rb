@@ -10,28 +10,28 @@ module Skylab::TanMan
         # every document has exactly one BUID. however the same relationship
         # does not hold with byte downstream ID's so they are passed as args.
 
-        @byte_upstream_identifier = bu_id
+        @byte_upstream_reference = bu_id
         @graph_sexp = gsp
         @on_event_selectively = oes_p
         @kernel = k
       end
 
       def members
-        [ :graph_sexp, :persist_into_byte_downstream_identifier, :unparse_into ]
+        [ :graph_sexp, :persist_into_byte_downstream_reference, :unparse_into ]
       end
 
       attr_reader :graph_sexp
 
       # ~ readers
 
-      def persist_into_byte_downstream_identifier id, * x_a, & oes_p  # [ :is_try, true ]
+      def persist_into_byte_downstream_reference id, * x_a, & oes_p  # [ :is_try, true ]
 
         Here_::Small_Time_::Actors::Persist.new(
           id, @graph_sexp, x_a, & oes_p ).execute
       end
 
       def description_under expag
-        @byte_upstream_identifier.description_under expag
+        @byte_upstream_reference.description_under expag
       end
 
       def at_graph_sexp i

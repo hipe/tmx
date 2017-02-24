@@ -13,7 +13,7 @@ module Skylab::Snag
         end,
 
         :required, :property, :byte_downstream,
-        :required, :property, :upstream_identifier,
+        :required, :property, :upstream_reference,
 
       ] end
 
@@ -57,7 +57,7 @@ module Skylab::Snag
 
       def __express_label
 
-        uid = @upstream_identifier
+        uid = @upstream_reference
         if uid.respond_to? :to_path
 
           _express_line "label=\"docs for #{ _esc uid.to_path }\""
@@ -227,8 +227,8 @@ module Skylab::Snag
 
       def __resolve_node_controller
 
-        _ = Here_.via_upstream_identifier(
-          @upstream_identifier, @_invocation_resources_, & _listener_ )
+        _ = Here_.via_upstream_reference(
+          @upstream_reference, @_invocation_resources_, & _listener_ )
 
         _store :@__node_controller, _
       end

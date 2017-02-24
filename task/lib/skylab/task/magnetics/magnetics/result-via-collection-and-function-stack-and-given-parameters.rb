@@ -12,8 +12,8 @@ class Skylab::Task
       end  # >>
 
       def collection= col
-        @_read_FIT_via_const = col.proc_for_read_function_item_ticket_via_const
-        @_read_function_via_FIT = col.proc_for_read_function_item_via_function_item_ticket
+        @_read_FIT_via_const = col.proc_for_read_function_item_reference_via_const
+        @_read_function_via_FIT = col.proc_for_read_function_item_via_function_item_reference
         @collection = col
       end
 
@@ -53,7 +53,7 @@ class Skylab::Task
           # when there's a next function, write the results
           # from that last function into the parameter store
 
-          sym_a = inv.item_ticket.product_term_symbols
+          sym_a = inv.item_reference.product_term_symbols
           if 1 == sym_a.length
 
             ps._write_magnetic_value_ x, sym_a.first
@@ -73,7 +73,7 @@ class Skylab::Task
 
       def __build_arguments_for_function inv, ps
         a = []
-        inv.item_ticket.prerequisite_term_symbols.each do |sym|
+        inv.item_reference.prerequisite_term_symbols.each do |sym|
           a.push ps._read_magnetic_value_ sym
         end
         a
@@ -85,7 +85,7 @@ class Skylab::Task
 
         a = ( @_mutable_stack_array ||= __flush_to_mutable_stack )
 
-        sym_a = a.first.item_ticket.product_term_symbols
+        sym_a = a.first.item_reference.product_term_symbols
 
         if ! sym_a.include? sym
 
@@ -93,7 +93,7 @@ class Skylab::Task
 
           _const = @collection.const_for_A_atom_via_B_atom sym, via_sym
 
-          _fit = @collection.read_function_item_ticket_via_const _const
+          _fit = @collection.read_function_item_reference_via_const _const
 
           _f = @_read_function_via_FIT[ _fit ]
 
@@ -105,7 +105,7 @@ class Skylab::Task
         NIL_
       end
 
-      def bottom_item_ticket_
+      def bottom_item_reference_
         @_read_FIT_via_const[ @function_symbol_stack.fetch( 0 ) ]
       end
 
@@ -126,12 +126,12 @@ class Skylab::Task
 
         def initialize x, it
           @function = x
-          @item_ticket = it
+          @item_reference = it
         end
 
         attr_reader(
           :function,
-          :item_ticket,
+          :item_reference,
         )
       end
 

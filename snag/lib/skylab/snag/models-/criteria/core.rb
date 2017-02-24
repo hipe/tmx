@@ -26,7 +26,7 @@ module Skylab::Snag
         end,
         :argument_moniker, :name,
 
-        :required, :property, :upstream_identifier,
+        :required, :property, :upstream_reference,
 
         :required, :property, :criteria,  # #tombstone-A: used to be `glob`
 
@@ -48,7 +48,7 @@ module Skylab::Snag
 
       def __stream_via_criteria
 
-        _us_id = remove_instance_variable :@upstream_identifier
+        _us_id = remove_instance_variable :@upstream_reference
 
         @_criteria.to_reduced_entity_stream_via_collection_identifier _us_id
       end
@@ -360,9 +360,9 @@ module Skylab::Snag
 
         _ob = @_invocation_resources.microservice_operator_branch_
 
-        _load_ticket = _ob.dereference _normal_symbol
+        _loadable_reference = _ob.dereference _normal_symbol
 
-        _business_module = _load_ticket.dereference_load_ticket
+        _business_module = _loadable_reference.dereference_loadable_reference
 
         @criteria_tree = ct
 
@@ -395,7 +395,7 @@ module Skylab::Snag
 
         col = @business_module.collection_module_for_criteria_resolution.
 
-          via_upstream_identifier id_x, @_invocation_resources, & @_listener
+          via_upstream_reference id_x, @_invocation_resources, & @_listener
 
         col and to_reduced_entity_stream_against_collection col
       end

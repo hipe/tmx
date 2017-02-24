@@ -2,13 +2,13 @@ class Skylab::Task
 
   module Magnetics
 
-    class Magnetics_::FunctionIndex_via_ItemTicketCollection < Common_::Monadic
+    class Magnetics_::FunctionIndex_via_ItemReferenceCollection < Common_::Monadic
 
       # exactly [#010]
 
       def initialize itc
 
-        @item_ticket_collection = itc
+        @item_reference_collection = itc
 
         @_function_indexes_via_product = Common_::Box.new
         @_function_indexes_via_product_h = @_function_indexes_via_product.h_
@@ -17,18 +17,18 @@ class Skylab::Task
 
       def execute
 
-        _itc = remove_instance_variable :@item_ticket_collection
-        st = _itc.to_function_item_ticket_stream__
+        _itc = remove_instance_variable :@item_reference_collection
+        st = _itc.to_function_item_reference_stream__
         begin
           fit = st.gets
           fit || break
-          ___accept_function_item_ticket fit
+          ___accept_function_item_reference fit
           redo
         end while nil
         __finish
       end
 
-      def ___accept_function_item_ticket fit
+      def ___accept_function_item_reference fit
 
         d = @_functions.length
         fit.accept_function_offset__ d
@@ -67,11 +67,11 @@ class Skylab::Task
         end
       end
 
-      def read_function_item_ticket_via_const__ const
+      def read_function_item_reference_via_const__ const
         @_functions.fetch const_h_.fetch const
       end
 
-      def proc_for_read_function_item_ticket_via_const_
+      def proc_for_read_function_item_reference_via_const_
         h = const_h_
         a = @_functions
         -> const do

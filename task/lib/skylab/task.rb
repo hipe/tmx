@@ -333,10 +333,10 @@ class Skylab::Task
 
         _tss = o::TokenStreamStream_via_DirectoryObject[ dir_o ]
 
-        col = o::ItemTicketCollection_via_TokenStreamStream[ _tss ]
+        col = o::ItemReferenceCollection_via_TokenStreamStream[ _tss ]
 
-        col.item_resolver = -> ticket do
-          mod.const_get ticket.const, false  # NOTE  just the const's value here
+        col.item_resolver = -> reference do
+          mod.const_get reference.const, false  # NOTE  just the const's value here
         end
 
         col

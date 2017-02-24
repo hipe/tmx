@@ -73,7 +73,7 @@ module Skylab::Task::TestSupport
         h.fetch( mit.const ).call
       end
 
-      item_ticket_collection_via_(
+      item_reference_collection_via_(
         _p,
         %w( express problem as friendly ),
         %w( chip chop via yin and yang ),

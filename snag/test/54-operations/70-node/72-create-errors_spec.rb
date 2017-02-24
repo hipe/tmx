@@ -46,8 +46,8 @@ module Skylab::Snag::TestSupport
     def _against s
 
       call_API :node, :create, :message, s,
-        :upstream_identifier, Fixture_file_[ :rochambeaux_mani ],
-        :downstream_identifier, _the_null_DS_ID
+        :upstream_reference, Fixture_file_[ :rochambeaux_mani ],
+        :downstream_reference, _the_null_DS_ID
     end
 
     def _expect sym, s

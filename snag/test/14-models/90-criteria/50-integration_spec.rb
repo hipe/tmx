@@ -113,7 +113,7 @@ module Skylab::Snag::TestSupport
     def _call_API_with_criteria s_a
 
       call_API :criteria, :issues_via_criteria, :criteria, s_a,
-        :upstream_identifier, _path_, & EMPTY_P_
+        :upstream_reference, _path_, & EMPTY_P_
       NIL_
     end
   end

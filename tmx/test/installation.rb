@@ -20,11 +20,11 @@ module Skylab::TMX::TestSupport
 
       # -- read
 
-      def to_sidesystem_load_ticket_stream
+      def to_sidesystem_reference_stream
         _cached_box.to_value_stream
       end
 
-      def load_ticket_via_normal_symbol_softly sym
+      def loadable_reference_via_normal_symbol_softly sym
         lt = _cached_box[ sym ]
         if lt
           lt
@@ -39,20 +39,20 @@ module Skylab::TMX::TestSupport
 
       def __build_cached_box
         bx = Common_::Box.new
-        Require_mocked_load_ticket___[]
+        Require_mocked_loadable_reference___[]
         @_fake_sidesystem_entry_strings.each do |string|
-          _guy = __Build_load_ticket_from_fake_sidesys_entry_string string
+          _guy = __Build_loadable_reference_from_fake_sidesys_entry_string string
           bx.add string.intern, _guy
         end
         bx.freeze
       end
 
-      def __Build_load_ticket_from_fake_sidesys_entry_string entry_string
+      def __Build_loadable_reference_from_fake_sidesys_entry_string entry_string
 
         _ = Home_::Models_::GemNameElements.define do |gne|
           __define_gem_name_elements gne, entry_string
         end
-        DummyLoadTicket___.new _
+        DummyLoadableReference___.new _
       end
 
       def __define_gem_name_elements gne, entry_string
@@ -80,9 +80,9 @@ module Skylab::TMX::TestSupport
     # NOTE - most of the below work is to mock out a conventional, minimal CLI
     # ==
 
-    Require_mocked_load_ticket___ = Lazy_.call do
+    Require_mocked_loadable_reference___ = Lazy_.call do
 
-      class DummyLoadTicket___ < Home_::Models_::LoadTicket
+      class DummyLoadableReference___ < Home_::Models_::LoadableReference
 
         def __induce_sidesystem_module
           _names = Names___.new _const_path_array_guess_, @gem_name_elements

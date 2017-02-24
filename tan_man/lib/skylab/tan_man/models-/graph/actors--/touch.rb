@@ -17,19 +17,19 @@ module Skylab::TanMan
       end
 
       def execute
-        __init_downstream_identifier
+        __init_downstream_reference
         send :"__execute_for__#{ @down_ID.shape_symbol }__"
       end
 
-      def __init_downstream_identifier
+      def __init_downstream_reference
 
         @_qkn = @entity.qualified_knownness :digraph_path
         x = @_qkn.value_x
 
         if x.respond_to? :write
-          @down_ID = Brazen_.byte_downstream_identifier.via_stream x
+          @down_ID = Byte_downstream_reference_[].via_stream x
         else
-          @down_ID = Brazen_.byte_downstream_identifier.via_path x
+          @down_ID = Byte_downstream_reference_[].via_path x
         end
         nil
       end

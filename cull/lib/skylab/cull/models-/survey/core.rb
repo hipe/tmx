@@ -509,7 +509,7 @@ module Skylab::Cull
 
       h = {}
 
-      st = mod.entry_tree.to_asset_ticket_stream
+      st = mod.entry_tree.to_asset_reference_stream
       begin
         sm = st.gets
         sm || break

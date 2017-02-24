@@ -21,7 +21,7 @@ module Skylab::Snag
 
         :flag, :property, :dry_run,
 
-        :property, :downstream_identifier,
+        :property, :downstream_reference,
 
         :required, :glob, :property, :path,
       ] end
@@ -32,14 +32,14 @@ module Skylab::Snag
           extend ActionRelatedMethods_
           @_invocation_resources_ = yield
           init_action_ @_invocation_resources_
-          @downstream_identifier = @dry_run = nil  # #[#026]
+          @downstream_reference = @dry_run = nil  # #[#026]
         end
 
         def execute
 
           Session___.call_by do |o|
             o.is_dry = @dry_run
-            o.downstream_identifier = @downstream_identifier
+            o.downstream_reference = @downstream_reference
             o.filesystem_conduit = Home_.lib_.system.filesystem
             o.names = @name
             o.paths = @path
@@ -61,7 +61,7 @@ module Skylab::Snag
         end
 
         attr_writer(
-          :downstream_identifier,
+          :downstream_reference,
           :filesystem_conduit,
           :invocation_resources,
           :is_dry,
@@ -201,7 +201,7 @@ module Skylab::Snag
             o.listener = @listener
           end
 
-          # _sessioner.downstream_identifier = @downstream_identifier
+          # _sessioner.downstream_reference = @downstream_reference
 
           This_::Models_::FileUnitOfWork.define do |o|
             o.is_dry = @is_dry
@@ -263,26 +263,26 @@ module Skylab::Snag
         end
 
         def __resolve_collection
-          if __resolve_downstream_identifier
-            __resolve_collection_via_downstream_identifier
+          if __resolve_downstream_reference
+            __resolve_collection_via_downstream_reference
           end
         end
 
-        def __resolve_collection_via_downstream_identifier
+        def __resolve_collection_via_downstream_reference
 
-          _ = Home_::Models_::NodeCollection.via_upstream_identifier(
-            @downstream_identifier, @invocation_resources, & @listener )
+          _ = Home_::Models_::NodeCollection.via_upstream_reference(
+            @downstream_reference, @invocation_resources, & @listener )
 
           _store :@__collection, _
         end
 
-        def __resolve_downstream_identifier
-          if @downstream_identifier
+        def __resolve_downstream_reference
+          if @downstream_reference
             ACHIEVED_
           else
             _ = Home_::Models_::NodeCollection::Nearest_path.call(
               @paths.fetch( 0 ), @filesystem_conduit, & @listener )
-            _store :@downstream_identifier, _
+            _store :@downstream_reference, _
           end
         end
 

@@ -12,7 +12,7 @@ module Skylab::Snag
 
           @_locks = []
 
-          @downstream_identifier = nil
+          @downstream_reference = nil
           @is_dry = nil
           @listener = nil
           @subject_entity = nil
@@ -27,7 +27,7 @@ module Skylab::Snag
 
         attr_writer(
           :collection,
-          :downstream_identifier,
+          :downstream_reference,
           :expression_adapter_actor_box,
           :invocation_resources,
           :is_dry,
@@ -95,7 +95,7 @@ module Skylab::Snag
 
         def __resolve_the_upstream
 
-          @_BUs_ID = @collection.upstream_identifier
+          @_BUs_ID = @collection.upstream_reference
 
           _ = @_BUs_ID.to_rewindable_line_stream( & @listener )
 
@@ -120,9 +120,9 @@ module Skylab::Snag
 
         def __via_upstream_resolve_the_downstream_adapter
 
-          ds_id = @downstream_identifier
+          ds_id = @downstream_reference
           if ! ds_id
-            ds_id = @_BUs_ID.to_byte_downstream_identifier
+            ds_id = @_BUs_ID.to_byte_downstream_reference
           end
 
           if ds_id.is_same_waypoint_as @_BUs_ID  # #note-85

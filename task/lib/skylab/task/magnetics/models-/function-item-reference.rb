@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Models_::Function_ItemTicket
+    class Models_::Function_ItemReference
 
       class << self
         alias_method :via_prerequisites_and_products__, :new

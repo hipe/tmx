@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
         call(
           :node_collection, :digraph,
           :byte_downstream, produced_lines,
-          :upstream_identifier, Fixture_file_[ :rochambeaux_mani ],
+          :upstream_reference, Fixture_file_[ :rochambeaux_mani ],
         )
 
         expect :info, :expression do |y|
@@ -71,7 +71,7 @@ module Skylab::Snag::TestSupport
         call(
           :node_collection, :digraph,
           :byte_downstream, produced_lines,
-          :upstream_identifier, Fixture_file_[ :for_digraph_simple_mani ],
+          :upstream_reference, Fixture_file_[ :for_digraph_simple_mani ],
         )
 
         expect_result ACHIEVED_

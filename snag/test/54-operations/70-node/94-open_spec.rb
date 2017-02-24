@@ -17,7 +17,7 @@ module Skylab::Snag::TestSupport
       call_API(
         :node, :open,
         :try_to_reappropriate,
-        :upstream_identifier, path,
+        :upstream_reference, path,
         :message,
 <<-O.chop
 1___ 1b__ 2___ 2b__ 3___ 3b__ 4___ 4b__ 5___ 5b__ 6___ 6b__ 7___ 7b__ 8___ 8b__
@@ -51,7 +51,7 @@ O
 
       _did = downstream_ID_via_array_ y=[]
 
-      _uid = upstream_identifier_via_string_ <<-HERE.unindent.freeze
+      _uid = upstream_reference_via_string_ <<-HERE.unindent.freeze
         [#02] #done  item 2 line one
           item 2 line two xyzyz
         [#03] B
@@ -61,8 +61,8 @@ O
       call_API(
         :node, :open,
         :try_to_reappropriate,
-        :upstream_identifier, _uid,
-        :downstream_identifier, _did,
+        :upstream_reference, _uid,
+        :downstream_reference, _did,
         :message, "so far",
         :message, "so good",
       )

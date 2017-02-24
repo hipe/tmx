@@ -5,8 +5,8 @@ module Skylab::MyTerm
     class Index___
 
       # if you receive the entries from the filesystem in a non-deterministic
-      # order, you can't stream the list of adapter "load tickets", period.
-      # (because each load ticket needs to know which it has among directory
+      # order, you can't stream the list of adapter "loadable references", period.
+      # (because each loadable reference needs to know which it has among directory
       # and file.) but how many adapters will there ever be anyway!? sheesh
       # (but we did try. see last line of file.)
 
@@ -46,13 +46,13 @@ module Skylab::MyTerm
 
             have_seen = false
 
-            load_ticket = Home_::Models_::Adapter::Load_Ticket.via__(
+            loadable_reference = Home_::Models_::Adapter::LoadableReference.via__(
               stem, path, category, single_mod )
 
-            cache_a.push load_ticket
-            cache_h[ stem ] = load_ticket
+            cache_a.push loadable_reference
+            cache_h[ stem ] = loadable_reference
 
-            load_ticket
+            loadable_reference
           end
 
           if have_seen

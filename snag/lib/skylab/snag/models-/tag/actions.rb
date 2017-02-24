@@ -12,7 +12,7 @@ module Skylab::Snag
           y << 'list the tags for a given node.'
         end,
 
-        :required, :property, :upstream_identifier,
+        :required, :property, :upstream_reference,
         :required, :property, :node_identifier,
 
       ] end
@@ -34,7 +34,7 @@ module Skylab::Snag
         _ = @_invocation_resources_.call_snag_API__(
           :node, :to_stream,
           :identifier, @node_identifier,
-          :upstream_identifier, @upstream_identifier,
+          :upstream_reference, @upstream_reference,
           & _listener_ )
 
         _store_ :@_node_, _
@@ -52,8 +52,8 @@ module Skylab::Snag
         end,
 
         :flag, :property, :prepend,
-        :property, :downstream_identifier,
-        :required, :property, :upstream_identifier,
+        :property, :downstream_reference,
+        :required, :property, :upstream_reference,
         :required, :property, :node_identifier,
         :required, :property, :tag
       ] end
@@ -96,8 +96,8 @@ module Skylab::Snag
           y << 'remove a tag from a node.'
         end,
 
-        :property, :downstream_identifier,
-        :required, :property, :upstream_identifier,
+        :property, :downstream_reference,
+        :required, :property, :upstream_reference,
         :required, :property, :node_identifier,
         :required, :property, :tag
       ] end
@@ -105,7 +105,7 @@ module Skylab::Snag
       def initialize
         extend Home_::Models_::Node::NodeRelatedMethods, ActionRelatedMethods_
         init_action_ yield
-        @downstream_identifier = nil  # #[#026]
+        @downstream_reference = nil  # #[#026]
       end
 
       def execute

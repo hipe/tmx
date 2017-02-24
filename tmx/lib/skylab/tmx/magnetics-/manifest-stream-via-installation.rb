@@ -65,7 +65,7 @@ module Skylab::TMX
           gne.gem_path = prev_md[ :gem_path ]
 
           Models_::Node::Manifest.new(
-            items, Models_::LoadTicket.new( gne ) )
+            items, Models_::LoadableReference.new( gne ) )
         end
 
         body_p = nil

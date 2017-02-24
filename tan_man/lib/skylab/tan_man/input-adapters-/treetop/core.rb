@@ -12,12 +12,12 @@ module Skylab::TanMan
 
       def accept_upstream_path path
 
-        _bu_ID =  Brazen_.byte_upstream_identifier.via_path path
-        receive_byte_upstream_identifier _bu_ID
+        _bu_ID = Byte_upstream_reference_[].via_path path
+        receive_byte_upstream_reference _bu_ID
         NIL_
       end
 
-      def receive_byte_upstream_identifier x
+      def receive_byte_upstream_reference x
         @_upstream_ID = x ; nil
       end
 

@@ -2,10 +2,10 @@ require_relative '../../test-support'
 
 module Skylab::Task::TestSupport
 
-  describe "[ta] magnetics - magnetics - item ticket via token stream" do
+  describe "[ta] magnetics - magnetics - item reference via token stream" do
 
     TS_[ self ]
-    use :magnetics, :item_ticket_via_token_stream
+    use :magnetics, :item_reference_via_token_stream
 
     context 'two words (produce unassociated)' do
 

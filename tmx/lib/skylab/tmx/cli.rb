@@ -900,11 +900,11 @@ module Skylab::TMX
       end
 
       def to_bound_call_for_help
-        @sidesystem_mounter.bound_call_for_help_via_load_ticket__ _LT
+        @sidesystem_mounter.bound_call_for_help_via_loadable_reference__ _LT
       end
 
       def to_bound_call_for_invocation
-        @sidesystem_mounter.bound_call_for_invocation_via_load_ticket__ _LT
+        @sidesystem_mounter.bound_call_for_invocation_via_loadable_reference__ _LT
       end
 
       def _LT

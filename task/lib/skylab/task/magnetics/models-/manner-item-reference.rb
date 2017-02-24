@@ -3,7 +3,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Models_::Manner_ItemTicket
+    class Models_::Manner_ItemReference
 
       def initialize _MANNNER_sym, slot_sym  # the more specifics things earlier
         @manner_term_symbol = _MANNNER_sym

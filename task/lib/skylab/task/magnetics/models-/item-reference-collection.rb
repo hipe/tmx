@@ -2,7 +2,7 @@ class Skylab::Task
 
   module Magnetics
 
-    class Models_::ItemTicketCollection
+    class Models_::ItemReferenceCollection
 
       class << self
         alias_method :begin, :new
@@ -35,13 +35,13 @@ class Skylab::Task
         mod.constants.each do |sym|
           h[ sym ] && next
           _ts = Here_::Magnetics_::TokenStream_via_Const[ sym ]
-          _it = Magnetics_::ItemTicket_via_TokenStream[ _ts ]
-          accept_item_ticket _it
+          _it = Magnetics_::ItemReference_via_TokenStream[ _ts ]
+          accept_item_reference _it
         end
         NIL_
       end
 
-      def accept_item_ticket it
+      def accept_item_reference it
         send ACCEPT___.fetch( it.category_symbol ), it
         NIL_
       end
@@ -84,7 +84,7 @@ class Skylab::Task
       # -- use manners
 
       def write_manner_methods_onto cls
-        Here_::Magnetics_::EnhancedClass_via_Class_and_ItemTicketCollection[ cls, self ]
+        Here_::Magnetics_::EnhancedClass_via_Class_and_ItemReferenceCollection[ cls, self ]
       end
 
       def manner_slot_setter_class_cache___
@@ -93,25 +93,25 @@ class Skylab::Task
 
       # -- use functions
 
-      def to_function_item_ticket_stream__
+      def to_function_item_reference_stream__
         Common_::Stream.via_nonsparse_array @_function_items
       end
 
       def const_for_A_atom_via_B_atom sym_A, sym_B
-        Here_::Models_::Function_ItemTicket::Const[ [sym_A], [sym_B] ]
+        Here_::Models_::Function_ItemReference::Const[ [sym_A], [sym_B] ]
       end
 
-      def read_function_item_ticket_via_const const
+      def read_function_item_reference_via_const const
 
-        function_index_.read_function_item_ticket_via_const__ const
+        function_index_.read_function_item_reference_via_const__ const
       end
 
-      def proc_for_read_function_item_ticket_via_const
+      def proc_for_read_function_item_reference_via_const
 
-        function_index_.proc_for_read_function_item_ticket_via_const_
+        function_index_.proc_for_read_function_item_reference_via_const_
       end
 
-      def proc_for_read_function_item_via_function_item_ticket
+      def proc_for_read_function_item_via_function_item_reference
 
         -> fit do
           @item_resolver[ fit ]  # (hi.)
@@ -119,12 +119,12 @@ class Skylab::Task
       end
 
       def function_index_
-        @___fi ||= Here_::Magnetics_::FunctionIndex_via_ItemTicketCollection[ self ]
+        @___fi ||= Here_::Magnetics_::FunctionIndex_via_ItemReferenceCollection[ self ]
       end
 
       # -- support
 
-      def __item_via_item_ticket it
+      def __item_via_item_reference it
         @item_resolver[ it ]
       end
 

@@ -13,7 +13,7 @@ module Skylab::Snag::TestSupport
       it "we need a valid node identifier (node model is used painlessly)" do
 
         call_API :tag, :to_stream,
-          :upstream_identifier, :xxx,
+          :upstream_reference, :xxx,
           :node_identifier, 'Xxx'
 
         _em = expect_not_OK_event :expecting_number
@@ -29,7 +29,7 @@ module Skylab::Snag::TestSupport
 
         call_API(
           :tag, :to_stream,
-          :upstream_identifier, Fixture_file_[ :the_sutherlands_mani ],
+          :upstream_reference, Fixture_file_[ :the_sutherlands_mani ],
           :node_identifier, 1,
           & EMPTY_P_ )
 
@@ -48,13 +48,13 @@ module Skylab::Snag::TestSupport
 
       it "x." do
 
-        _us_id = upstream_identifier_via_string_ <<-O
+        _us_id = upstream_reference_via_string_ <<-O
 [#77] ( #fml: x
  y ) no see ( #fml: z )
         O
 
         call_API :tag, :to_stream,
-          :upstream_identifier, _us_id,
+          :upstream_reference, _us_id,
           :node_identifier, 77, & EMPTY_P_
 
         st = @result

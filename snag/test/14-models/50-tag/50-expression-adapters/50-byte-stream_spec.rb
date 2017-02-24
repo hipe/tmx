@@ -63,7 +63,7 @@ module Skylab::Snag::TestSupport
 
       def _init_piece_stream
 
-        call_API :node, :to_stream, :upstream_identifier, _the_byte_upstream
+        call_API :node, :to_stream, :upstream_reference, _the_byte_upstream
         _node = @result.gets
         _body = _node.body
         @piece_st = _body.to_object_stream_
@@ -72,7 +72,7 @@ module Skylab::Snag::TestSupport
 
       memoize :_the_byte_upstream do
 
-        Home_.lib_.basic::String::Byte_Upstream_Identifier.new(
+        Home_.lib_.basic::String::ByteUpstreamReference.new(
 
           "[#07] hi #normal-tag ( #wiz: hey #other-tag hi ) and #normal-again.\n"
         )

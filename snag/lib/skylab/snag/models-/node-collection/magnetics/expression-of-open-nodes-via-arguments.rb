@@ -12,7 +12,7 @@ module Skylab::Snag
         :filesystem,
         :kernel,
         :number_limit,
-        :upstream_identifier,
+        :upstream_reference,
       )
 
       attr_accessor :name
@@ -48,7 +48,7 @@ module Skylab::Snag
         st = @kernel.call :criteria,
           :issues_via_criteria,
           :criteria, _s_a,
-          :upstream_identifier, @upstream_identifier,
+          :upstream_reference, @upstream_reference,
           & @oes_p
 
         if st

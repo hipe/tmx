@@ -10,15 +10,15 @@ module Skylab::Snag
           'close a node (remove tag #open and add tag #done)'
         end,
 
-        :property, :downstream_identifier,
-        :required, :property, :upstream_identifier,
+        :property, :downstream_reference,
+        :required, :property, :upstream_reference,
         :required, :property, :node_identifier,
       ] end
 
       def initialize
         extend NodeRelatedMethods, ActionRelatedMethods_
         init_action_ yield
-        @downstream_identifier = nil  # #[#026]
+        @downstream_reference = nil  # #[#026]
       end
 
       def execute

@@ -64,7 +64,7 @@ module Skylab::TanMan
       end
 
       def __resolve_session_with_transient_graph
-        @here_ID = Brazen_.byte_upstream_identifier.via_string "digraph{\n}\n"
+        @here_ID = Byte_upstream_reference_[].via_string "digraph{\n}\n"
         _via_hereput_resolve_session
       end
 
@@ -78,7 +78,7 @@ module Skylab::TanMan
       end
 
       def _via_here_ID_build_document_controller
-        @dot_file_silo.document_controller_via_byte_upstream_identifier(
+        @dot_file_silo.document_controller_via_byte_upstream_reference(
           @here_ID, & @on_event_selectively )
       end
 

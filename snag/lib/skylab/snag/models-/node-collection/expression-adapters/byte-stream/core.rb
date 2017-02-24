@@ -21,7 +21,7 @@ module Skylab::Snag
             DEFAULT_IDENTIFIER_INTEGER_WIDTH_ )
         end
 
-        def node_collection_via_upstream_identifier__ id, invo_rsx
+        def node_collection_via_upstream_reference__ id, invo_rsx
 
           Native_Collection___.new id, invo_rsx
         end
@@ -54,12 +54,12 @@ module Skylab::Snag
         def persist_entity cx, node, & x_p  # per [#br-011] in [#038] (pseudocode)
 
           if cx
-            _ds_x = cx._snag_downstream_identifier_
+            _ds_x = cx._snag_downstream_reference_
           end
 
           _sessioner = sessioner_by do |o|
 
-            o.downstream_identifier = _ds_x
+            o.downstream_reference = _ds_x
             o.subject_entity = node
             o.listener = x_p
           end
@@ -156,7 +156,7 @@ module Skylab::Snag
             self, @byte_upstream_ID, & oes_p )
         end
 
-        def upstream_identifier
+        def upstream_reference
           @byte_upstream_ID
         end
 

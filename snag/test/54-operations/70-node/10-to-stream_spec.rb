@@ -10,7 +10,7 @@ module Skylab::Snag::TestSupport
     it "upstream identifer not resolved - you won't see it till you gets" do
 
       call_API :node, :to_stream,
-        :upstream_identifier, Fixture_file_[ :not_there ]
+        :upstream_reference, Fixture_file_[ :not_there ]
 
       st = @result
       _x = st.gets
@@ -22,7 +22,7 @@ module Skylab::Snag::TestSupport
     it "uses flyweighting" do
 
       call_API :node, :to_stream,
-        :upstream_identifier, Fixture_file_[ :the_first_manifest ]
+        :upstream_reference, Fixture_file_[ :the_first_manifest ]
 
       st = @result
 
@@ -54,7 +54,7 @@ module Skylab::Snag::TestSupport
 
       call_API :node, :to_stream,
         :number_limit, 1,
-        :upstream_identifier, _alpha_path
+        :upstream_reference, _alpha_path
 
       st = @result
       st.gets.ID.to_i.should eql 5
@@ -79,7 +79,7 @@ module Skylab::Snag::TestSupport
 
       call_API :node, :to_stream,
         :identifier, '0002',
-        :upstream_identifier, _alpha_path
+        :upstream_reference, _alpha_path
 
       expect_no_events
       st = @result.body.to_business_row_stream_
@@ -92,7 +92,7 @@ module Skylab::Snag::TestSupport
 
       call_API :node, :to_stream,
         :identifier, '98.6',
-        :upstream_identifier, _second_manifest
+        :upstream_reference, _second_manifest
 
       st = @result.body.to_business_row_stream_
       st.gets.s.should eql "[#98.6]  don't use these\n"
